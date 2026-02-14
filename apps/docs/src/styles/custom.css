@@ -3091,3 +3091,211 @@ div[data-pagefind-ignore] footer {
   border-bottom-right-radius: 0 !important;
 }
 
+/* ============================================
+   Component Library — Live Demos & API Tables
+   ============================================ */
+
+/* FOUC prevention: hide unregistered custom elements until defined */
+wc-button:not(:defined),
+wc-card:not(:defined),
+wc-text-input:not(:defined) {
+  opacity: 0;
+  display: block;
+  min-height: 2rem;
+  transition: opacity 0.3s ease;
+}
+
+/* --- Component Demo Preview Container --- */
+.component-demo {
+  margin: 1rem 0 1.5rem;
+  border: 1px solid var(--glass-border-strong);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+}
+
+.component-demo__header {
+  padding: 0.625rem 1rem;
+  border-bottom: 1px solid var(--glass-border);
+  background: var(--glass-bg-strong);
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.component-demo__title {
+  margin: 0 !important;
+  font-size: 0.8rem !important;
+  font-weight: 600;
+  color: var(--text-secondary);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.component-demo__desc {
+  margin: 0 !important;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.component-demo__preview {
+  padding: 2rem 1.5rem;
+  background-image: radial-gradient(circle, var(--glass-border) 1px, transparent 1px);
+  background-size: 20px 20px;
+  background-position: 10px 10px;
+  min-height: 4rem;
+  display: flex;
+  align-items: flex-start;
+}
+
+/* When preview has a direct div child (flex/grid wrapper), let it fill */
+.component-demo__preview > div {
+  width: 100%;
+}
+
+/* When preview has a direct wc-* element, give it reasonable width */
+.component-demo__preview > wc-text-input,
+.component-demo__preview > wc-card {
+  width: 100%;
+  max-width: 480px;
+}
+
+/* --- API Reference Tables --- */
+.api-table {
+  margin: 1.5rem 0;
+}
+
+.api-table__header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.api-table__title {
+  margin: 0 !important;
+  font-size: 0.95rem !important;
+  font-weight: 600;
+  color: var(--sl-color-white);
+}
+
+.api-table__badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.5rem;
+  height: 1.35rem;
+  padding: 0 0.4rem;
+  border-radius: var(--radius-full);
+  background: hsla(var(--wc-accent-h), var(--wc-accent-s), var(--wc-accent-l), 0.2);
+  color: var(--sl-color-accent-high);
+  font-size: 0.7rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.api-table__scroll {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  border: 1px solid var(--glass-border-strong);
+  border-radius: var(--radius-sm);
+  background: var(--glass-bg);
+}
+
+.api-table table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.825rem;
+}
+
+.api-table th {
+  padding: 0.6rem 0.75rem;
+  text-align: left;
+  font-weight: 600;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+  background: var(--glass-bg-strong);
+  border-bottom: 1px solid var(--glass-border-strong);
+  white-space: nowrap;
+}
+
+.api-table td {
+  padding: 0.5rem 0.75rem;
+  color: var(--text-secondary);
+  border-bottom: 1px solid var(--glass-border);
+  vertical-align: top;
+}
+
+.api-table tbody tr:nth-child(even) td {
+  background: var(--glass-bg);
+}
+
+.api-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.api-table__code code {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  padding: 0.1rem 0.35rem;
+  border-radius: 0.25rem;
+  background: hsla(var(--wc-accent-h), var(--wc-accent-s), var(--wc-accent-l), 0.1);
+  color: var(--sl-color-accent-high);
+  white-space: nowrap;
+}
+
+/* --- Component Doc Layout --- */
+.component-doc__summary {
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--glass-border);
+}
+
+.component-doc__tag {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 1.1rem;
+  font-weight: 600;
+  padding: 0.3rem 0.75rem;
+  border-radius: var(--radius-sm);
+  background: hsla(var(--wc-accent-h), var(--wc-accent-s), var(--wc-accent-l), 0.15);
+  color: var(--sl-color-accent-high);
+  margin-bottom: 0.5rem;
+}
+
+.component-doc__summary-text {
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--sl-color-white);
+  margin: 0.5rem 0 0;
+}
+
+.component-doc__description {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin: 0.25rem 0 0;
+}
+
+.component-doc__api {
+  margin-top: 1rem;
+}
+
+/* Reset Starlight's aggressive table styles inside our API tables */
+.api-table table th,
+.api-table table td {
+  border: none;
+}
+.api-table table thead th {
+  border-bottom: 1px solid var(--glass-border-strong);
+}
+.api-table table td {
+  border-bottom: 1px solid var(--glass-border);
+}
+.api-table table tbody tr:last-child td {
+  border-bottom: none;
+}
+

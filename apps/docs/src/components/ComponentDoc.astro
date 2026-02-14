@@ -1,0 +1,93 @@
+---
+/**
+ * ComponentDoc — reads CEM data for a tag and renders the summary + API reference tables.
+ * Used at the TOP of a page for the tag summary, and at the BOTTOM for API tables.
+ * Demos and markdown headings live directly in the MDX so Starlight can build the TOC.
+ *
+ * Usage (in MDX):
+ *   <ComponentDoc tagName="wc-button" section="summary" />
+ *   ... markdown headings + demos ...
+ *   <ComponentDoc tagName="wc-button" section="api" />
+ */
+import ApiTable from './ApiTable.astro';
+import { getComponentData } from '../lib/cem-utils';
+
+interface Props {
+  tagName: string;
+  section: 'summary' | 'api';
+}
+
+const { tagName, section } = Astro.props;
+const data = getComponentData(tagName);
+
+// Build table rows from CEM data
+const propertyRows = (data?.properties ?? []).map((p) => [
+  { value: p.attribute, code: true },
+  { value: p.type, code: true },
+  { value: p.default, code: true },
+  { value: p.description, code: false },
+]);
+
+const eventRows = (data?.events ?? []).map((e) => [
+  { value: e.name, code: true },
+  { value: e.type, code: true },
+  { value: e.description, code: false },
+]);
+
+const slotRows = (data?.slots ?? []).map((s) => [
+  { value: s.name, code: true },
+  { value: s.description, code: false },
+]);
+
+const cssPropertyRows = (data?.cssProperties ?? []).map((p) => [
+  { value: p.name, code: true },
+  { value: p.description, code: false },
+]);
+
+const cssPartRows = (data?.cssParts ?? []).map((p) => [
+  { value: p.name, code: true },
+  { value: p.description, code: false },
+]);
+---
+
+{section === 'summary' && data && (
+  <div class="component-doc__summary">
+    <code class="component-doc__tag">&lt;{data.tagName}&gt;</code>
+    {data.summary && <p class="component-doc__summary-text">{data.summary}</p>}
+    {data.description && <p class="component-doc__description">{data.description}</p>}
+  </div>
+)}
+
+{section === 'api' && data && (
+  <div class="component-doc__api">
+    <ApiTable
+      title="Properties"
+      columns={['Attribute', 'Type', 'Default', 'Description']}
+      rows={propertyRows}
+    />
+
+    <ApiTable
+      title="Events"
+      columns={['Name', 'Type', 'Description']}
+      rows={eventRows}
+    />
+
+    <ApiTable
+      title="Slots"
+      columns={['Name', 'Description']}
+      rows={slotRows}
+    />
+
+    <ApiTable
+      title="CSS Custom Properties"
+      columns={['Property', 'Description']}
+      rows={cssPropertyRows}
+    />
+
+    <ApiTable
+      title="CSS Parts"
+      columns={['Part', 'Description']}
+      rows={cssPartRows}
+    />
+  </div>
+)}

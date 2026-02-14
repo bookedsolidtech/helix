@@ -1,0 +1,50 @@
+---
+/**
+ * ApiTable — generic table for API reference sections.
+ * Renders styled tables for properties, events, slots, CSS parts, CSS custom properties.
+ */
+interface CellData {
+  value: string;
+  code: boolean;
+}
+
+interface Props {
+  title: string;
+  columns: string[];
+  rows: CellData[][];
+}
+
+const { title, columns, rows } = Astro.props;
+const count = rows.length;
+---
+
+{count > 0 && (
+  <div class="api-table">
+    <div class="api-table__header">
+      <h4 class="api-table__title">{title}</h4>
+      <span class="api-table__badge">{count}</span>
+    </div>
+    <div class="api-table__scroll">
+      <table>
+        <thead>
+          <tr>
+            {columns.map((col) => (
+              <th>{col}</th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {rows.map((row) => (
+            <tr>
+              {row.map((cell) => (
+                <td class:list={[cell.code && 'api-table__code']}>
+                  {cell.code ? <code>{cell.value}</code> : cell.value}
+                </td>
+              ))}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  </div>
+)}

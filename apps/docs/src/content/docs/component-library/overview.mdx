@@ -1,0 +1,64 @@
+---
+title: Component Library
+description: Live rendered WC-2026 web components with auto-generated API documentation
+---
+
+import ComponentLoader from '../../../components/ComponentLoader.astro';
+import ComponentDemo from '../../../components/ComponentDemo.astro';
+
+<ComponentLoader />
+
+The WC-2026 component library ships **production-ready Lit 3.x web components** with design tokens, form association, and full accessibility. Every component on this page is **rendered live** in your browser.
+
+## Installation
+
+```bash
+npm install @wc-2026/library
+```
+
+```html
+<!-- Use anywhere — no framework required -->
+<script type="module">
+  import '@wc-2026/library';
+</script>
+
+<wc-button variant="primary">Get Started</wc-button>
+```
+
+## Available Components
+
+| Component | Tag | Description |
+|-----------|-----|-------------|
+| [Button](/component-library/wc-button/) | `<wc-button>` | Interactive buttons with variants, sizes, and states |
+| [Card](/component-library/wc-card/) | `<wc-card>` | Content containers with image, heading, body, footer, and action slots |
+| [Text Input](/component-library/wc-text-input/) | `<wc-text-input>` | Form-associated text input with label, validation, and help text |
+
+## Live Demo
+
+All three components composed together:
+
+<ComponentDemo title="Composed Example" description="Card containing a form with text input and button">
+  <wc-card variant="default" elevation="raised">
+    <span slot="heading">Contact Us</span>
+    <div>
+      <wc-text-input
+        label="Email address"
+        type="email"
+        placeholder="you@example.com"
+        help-text="We'll never share your email."
+      ></wc-text-input>
+      <div style="margin-top: 1rem; display: flex; gap: 0.5rem;">
+        <wc-button variant="primary">Subscribe</wc-button>
+        <wc-button variant="ghost">Cancel</wc-button>
+      </div>
+    </div>
+  </wc-card>
+</ComponentDemo>
+
+## Key Features
+
+- **Framework-agnostic** — works with React, Vue, Angular, Svelte, or vanilla HTML
+- **Design token-driven** — themed via CSS custom properties
+- **Form-associated** — `<wc-text-input>` and `<wc-button>` participate in native `<form>` elements
+- **Accessible** — ARIA attributes, keyboard navigation, and focus management built in
+- **Lightweight** — Lit 3.x with zero external dependencies beyond the framework

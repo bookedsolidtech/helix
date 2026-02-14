@@ -232,7 +232,18 @@ export default defineConfig({
           ],
         },
         {
-          label: 'Components',
+          label: 'Component Library',
+          collapsed: false,
+          badge: { text: 'Live', variant: 'success' },
+          items: [
+            { label: 'Overview', slug: 'component-library/overview' },
+            { label: 'wc-button', slug: 'component-library/wc-button' },
+            { label: 'wc-card', slug: 'component-library/wc-card' },
+            { label: 'wc-text-input', slug: 'component-library/wc-text-input' },
+          ],
+        },
+        {
+          label: 'Component Building',
           items: [
             { label: 'Overview', slug: 'components/overview' },
             {

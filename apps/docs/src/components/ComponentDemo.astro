@@ -1,0 +1,22 @@
+---
+/**
+ * ComponentDemo — glass-styled preview container for live rendered components.
+ * Dot-grid background indicates "live rendering area."
+ */
+interface Props {
+  title: string;
+  description?: string;
+}
+
+const { title, description } = Astro.props;
+---
+
+<div class="component-demo">
+  <div class="component-demo__header">
+    <h3 class="component-demo__title">{title}</h3>
+    {description && <p class="component-demo__desc">{description}</p>}
+  </div>
+  <div class="component-demo__preview">
+    <slot />
+  </div>
+</div>

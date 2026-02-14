@@ -303,6 +303,7 @@
       // Check auth immediately
       if (this.isAuthenticated()) {
         this.hide();
+        this.startActivityTracking();
         return;
       }
 
@@ -326,6 +327,35 @@
       } catch {
         return false;
       }
+    }
+
+    /** Refresh the session timestamp on user activity */
+    private refreshSession(): void {
+      try {
+        const raw = localStorage.getItem(this.STORAGE_KEY);
+        if (!raw) return;
+        const data = JSON.parse(raw);
+        if (data.authenticated) {
+          data.timestamp = Date.now();
+          localStorage.setItem(this.STORAGE_KEY, JSON.stringify(data));
+        }
+      } catch { /* ignore */ }
+    }
+
+    /** Start listening for user activity to keep session alive */
+    private startActivityTracking(): void {
+      // Throttle to once per 60s to avoid hammering localStorage
+      let lastRefresh = 0;
+      const throttledRefresh = () => {
+        const now = Date.now();
+        if (now - lastRefresh > 60_000) {
+          lastRefresh = now;
+          this.refreshSession();
+        }
+      };
+      document.addEventListener('click', throttledRefresh, { passive: true });
+      document.addEventListener('keydown', throttledRefresh, { passive: true });
+      document.addEventListener('scroll', throttledRefresh, { passive: true });
     }
 
     authenticate(role: string = 'viewer'): void {
@@ -482,6 +512,7 @@
         // Success
         this.dots.forEach(dot => dot.classList.add('success'));
         this.authenticate(role);
+        this.startActivityTracking();
         setTimeout(() => {
           this.hide();
           // Dispatch event so admin menu can react
