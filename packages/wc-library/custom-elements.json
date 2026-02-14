@@ -1,0 +1,1051 @@
+{
+  "schemaVersion": "1.0.0",
+  "readme": "",
+  "modules": [
+    {
+      "kind": "javascript-module",
+      "path": "src/components/wc-button/index.ts",
+      "declarations": [],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "WcButton",
+          "declaration": {
+            "name": "WcButton",
+            "module": "./wc-button.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/components/wc-button/wc-button.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "A button component for user interaction.",
+          "name": "WcButton",
+          "cssProperties": [
+            {
+              "description": "Button background color.",
+              "name": "--wc-button-bg"
+            },
+            {
+              "description": "Button text color.",
+              "name": "--wc-button-color"
+            },
+            {
+              "description": "Button border color.",
+              "name": "--wc-button-border-color"
+            },
+            {
+              "description": "Button border radius.",
+              "name": "--wc-button-border-radius"
+            },
+            {
+              "description": "Button font family.",
+              "name": "--wc-button-font-family"
+            },
+            {
+              "description": "Button font weight.",
+              "name": "--wc-button-font-weight"
+            },
+            {
+              "description": "Focus ring color.",
+              "name": "--wc-button-focus-ring-color"
+            }
+          ],
+          "cssParts": [
+            {
+              "description": "The native button element.",
+              "name": "button"
+            }
+          ],
+          "slots": [
+            {
+              "description": "Default slot for button label text or content.",
+              "name": ""
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "variant",
+              "type": {
+                "text": "'primary' | 'secondary' | 'ghost'"
+              },
+              "default": "'primary'",
+              "description": "Visual style variant of the button.",
+              "attribute": "variant",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "size",
+              "type": {
+                "text": "'sm' | 'md' | 'lg'"
+              },
+              "default": "'md'",
+              "description": "Size of the button.",
+              "attribute": "size",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "disabled",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the button is disabled.",
+              "attribute": "disabled",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "type",
+              "type": {
+                "text": "'button' | 'submit' | 'reset'"
+              },
+              "default": "'button'",
+              "description": "The type attribute for the underlying button element.",
+              "attribute": "type"
+            },
+            {
+              "kind": "field",
+              "name": "formAssociated",
+              "type": {
+                "text": "boolean"
+              },
+              "static": true,
+              "default": "true"
+            },
+            {
+              "kind": "field",
+              "name": "_internals",
+              "type": {
+                "text": "ElementInternals"
+              },
+              "privacy": "private"
+            },
+            {
+              "kind": "field",
+              "name": "form",
+              "type": {
+                "text": "HTMLFormElement | null"
+              },
+              "description": "Returns the associated form element, if any.",
+              "readonly": true
+            },
+            {
+              "kind": "method",
+              "name": "_handleClick",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "e",
+                  "type": {
+                    "text": "MouseEvent"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "_handleKeyDown",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "e",
+                  "type": {
+                    "text": "KeyboardEvent"
+                  }
+                }
+              ]
+            }
+          ],
+          "events": [
+            {
+              "name": "wc-click",
+              "type": {
+                "text": "CustomEvent"
+              },
+              "description": "Dispatched when the button is clicked (not disabled)."
+            }
+          ],
+          "attributes": [
+            {
+              "name": "variant",
+              "type": {
+                "text": "'primary' | 'secondary' | 'ghost'"
+              },
+              "default": "'primary'",
+              "description": "Visual style variant of the button.",
+              "fieldName": "variant",
+              "attribute": "variant"
+            },
+            {
+              "name": "size",
+              "type": {
+                "text": "'sm' | 'md' | 'lg'"
+              },
+              "default": "'md'",
+              "description": "Size of the button.",
+              "fieldName": "size",
+              "attribute": "size"
+            },
+            {
+              "name": "disabled",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the button is disabled.",
+              "fieldName": "disabled",
+              "attribute": "disabled"
+            },
+            {
+              "name": "type",
+              "type": {
+                "text": "'button' | 'submit' | 'reset'"
+              },
+              "default": "'button'",
+              "description": "The type attribute for the underlying button element.",
+              "fieldName": "type",
+              "attribute": "type"
+            }
+          ],
+          "superclass": {
+            "name": "LitElement",
+            "package": "lit"
+          },
+          "tagName": "wc-button",
+          "customElement": true,
+          "summary": "Primary interactive element for triggering actions."
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "WcButton",
+          "declaration": {
+            "name": "WcButton",
+            "module": "src/components/wc-button/wc-button.ts"
+          }
+        },
+        {
+          "kind": "custom-element-definition",
+          "name": "wc-button",
+          "declaration": {
+            "name": "WcButton",
+            "module": "src/components/wc-button/wc-button.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/components/wc-card/index.ts",
+      "declarations": [],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "WcCard",
+          "declaration": {
+            "name": "WcCard",
+            "module": "./wc-card.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/components/wc-card/wc-card.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "A flexible card component for displaying grouped content.",
+          "name": "WcCard",
+          "cssProperties": [
+            {
+              "description": "Card background color.",
+              "name": "--wc-card-bg"
+            },
+            {
+              "description": "Card text color.",
+              "name": "--wc-card-color"
+            },
+            {
+              "description": "Card border color.",
+              "name": "--wc-card-border-color"
+            },
+            {
+              "description": "Card border radius.",
+              "name": "--wc-card-border-radius"
+            },
+            {
+              "description": "Internal padding for card sections.",
+              "name": "--wc-card-padding"
+            },
+            {
+              "description": "Gap between card sections.",
+              "name": "--wc-card-gap"
+            }
+          ],
+          "cssParts": [
+            {
+              "description": "The outer card container element.",
+              "name": "card"
+            },
+            {
+              "description": "The image slot container.",
+              "name": "image"
+            },
+            {
+              "description": "The heading slot container.",
+              "name": "heading"
+            },
+            {
+              "description": "The body slot container.",
+              "name": "body"
+            },
+            {
+              "description": "The footer slot container.",
+              "name": "footer"
+            },
+            {
+              "description": "The actions slot container.",
+              "name": "actions"
+            }
+          ],
+          "slots": [
+            {
+              "description": "Optional image or media content at the top of the card.",
+              "name": "image"
+            },
+            {
+              "description": "The card heading/title content.",
+              "name": "heading"
+            },
+            {
+              "description": "Default slot for the card body content.",
+              "name": ""
+            },
+            {
+              "description": "Optional footer content below the body.",
+              "name": "footer"
+            },
+            {
+              "description": "Optional action buttons, rendered with a top border separator.",
+              "name": "actions"
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "variant",
+              "type": {
+                "text": "'default' | 'featured' | 'compact'"
+              },
+              "default": "'default'",
+              "description": "Visual style variant of the card.",
+              "attribute": "variant",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "elevation",
+              "type": {
+                "text": "'flat' | 'raised' | 'floating'"
+              },
+              "default": "'flat'",
+              "description": "Elevation (shadow depth) of the card.",
+              "attribute": "elevation",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "href",
+              "type": {
+                "text": "string | undefined"
+              },
+              "description": "Optional URL. When set, the card becomes interactive (clickable)\nand navigates to this URL on click.",
+              "attribute": "href"
+            },
+            {
+              "kind": "field",
+              "name": "_hasSlotContent",
+              "type": {
+                "text": "object"
+              },
+              "privacy": "private",
+              "default": "{ image: false, heading: false, footer: false, actions: false, }"
+            },
+            {
+              "kind": "method",
+              "name": "_handleSlotChange",
+              "privacy": "private",
+              "parameters": [
+                {
+                  "name": "slotName",
+                  "type": {
+                    "text": "keyof typeof this._hasSlotContent"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "_handleClick",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "e",
+                  "type": {
+                    "text": "MouseEvent"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "_handleKeyDown",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "e",
+                  "type": {
+                    "text": "KeyboardEvent"
+                  }
+                }
+              ]
+            }
+          ],
+          "events": [
+            {
+              "name": "wc-card-click",
+              "type": {
+                "text": "CustomEvent"
+              },
+              "description": "Dispatched when an interactive card (with href) is clicked."
+            }
+          ],
+          "attributes": [
+            {
+              "name": "variant",
+              "type": {
+                "text": "'default' | 'featured' | 'compact'"
+              },
+              "default": "'default'",
+              "description": "Visual style variant of the card.",
+              "fieldName": "variant",
+              "attribute": "variant"
+            },
+            {
+              "name": "elevation",
+              "type": {
+                "text": "'flat' | 'raised' | 'floating'"
+              },
+              "default": "'flat'",
+              "description": "Elevation (shadow depth) of the card.",
+              "fieldName": "elevation",
+              "attribute": "elevation"
+            },
+            {
+              "name": "href",
+              "type": {
+                "text": "string | undefined"
+              },
+              "description": "Optional URL. When set, the card becomes interactive (clickable)\nand navigates to this URL on click.",
+              "fieldName": "href",
+              "attribute": "href"
+            }
+          ],
+          "superclass": {
+            "name": "LitElement",
+            "package": "lit"
+          },
+          "tagName": "wc-card",
+          "customElement": true,
+          "summary": "Content container with image, heading, body, footer, and action slots."
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "WcCard",
+          "declaration": {
+            "name": "WcCard",
+            "module": "src/components/wc-card/wc-card.ts"
+          }
+        },
+        {
+          "kind": "custom-element-definition",
+          "name": "wc-card",
+          "declaration": {
+            "name": "WcCard",
+            "module": "src/components/wc-card/wc-card.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/components/wc-text-input/index.ts",
+      "declarations": [],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "WcTextInput",
+          "declaration": {
+            "name": "WcTextInput",
+            "module": "./wc-text-input.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/components/wc-text-input/wc-text-input.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "A text input component with label, validation, and form association.",
+          "name": "WcTextInput",
+          "cssProperties": [
+            {
+              "description": "Input background color.",
+              "name": "--wc-input-bg"
+            },
+            {
+              "description": "Input text color.",
+              "name": "--wc-input-color"
+            },
+            {
+              "description": "Input border color.",
+              "name": "--wc-input-border-color"
+            },
+            {
+              "description": "Input border radius.",
+              "name": "--wc-input-border-radius"
+            },
+            {
+              "description": "Input font family.",
+              "name": "--wc-input-font-family"
+            },
+            {
+              "description": "Focus ring color.",
+              "name": "--wc-input-focus-ring-color"
+            },
+            {
+              "description": "Error state color.",
+              "name": "--wc-input-error-color"
+            },
+            {
+              "description": "Label text color.",
+              "name": "--wc-input-label-color"
+            }
+          ],
+          "cssParts": [
+            {
+              "description": "The outer field container.",
+              "name": "field"
+            },
+            {
+              "description": "The label element.",
+              "name": "label"
+            },
+            {
+              "description": "The wrapper around prefix, input, and suffix.",
+              "name": "input-wrapper"
+            },
+            {
+              "description": "The native input element.",
+              "name": "input"
+            },
+            {
+              "description": "The help text container.",
+              "name": "help-text"
+            },
+            {
+              "description": "The error message container.",
+              "name": "error"
+            }
+          ],
+          "slots": [
+            {
+              "description": "Content rendered before the input (e.g., icon).",
+              "name": "prefix"
+            },
+            {
+              "description": "Content rendered after the input (e.g., icon or button).",
+              "name": "suffix"
+            },
+            {
+              "description": "Custom help text content (overrides the helpText property).",
+              "name": "help-text"
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "formAssociated",
+              "type": {
+                "text": "boolean"
+              },
+              "static": true,
+              "default": "true"
+            },
+            {
+              "kind": "field",
+              "name": "_internals",
+              "type": {
+                "text": "ElementInternals"
+              },
+              "privacy": "private"
+            },
+            {
+              "kind": "field",
+              "name": "label",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "The visible label text for the input.",
+              "attribute": "label"
+            },
+            {
+              "kind": "field",
+              "name": "placeholder",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Placeholder text shown when the input is empty.",
+              "attribute": "placeholder"
+            },
+            {
+              "kind": "field",
+              "name": "value",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "The current value of the input.",
+              "attribute": "value"
+            },
+            {
+              "kind": "field",
+              "name": "type",
+              "type": {
+                "text": "'text' | 'email' | 'password' | 'tel' | 'url' | 'search' | 'number'"
+              },
+              "default": "'text'",
+              "description": "The type of the native input element.",
+              "attribute": "type"
+            },
+            {
+              "kind": "field",
+              "name": "required",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the input is required for form submission.",
+              "attribute": "required",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "disabled",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the input is disabled.",
+              "attribute": "disabled",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "error",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Error message to display. When set, the input enters an error state.",
+              "attribute": "error"
+            },
+            {
+              "kind": "field",
+              "name": "helpText",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Help text displayed below the input for guidance.",
+              "attribute": "help-text"
+            },
+            {
+              "kind": "field",
+              "name": "name",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "The name of the input, used for form submission.",
+              "attribute": "name"
+            },
+            {
+              "kind": "field",
+              "name": "ariaLabel",
+              "type": {
+                "text": "string | null"
+              },
+              "default": "null",
+              "description": "Accessible name for screen readers, if different from the visible label.",
+              "attribute": "aria-label"
+            },
+            {
+              "kind": "field",
+              "name": "_input",
+              "type": {
+                "text": "HTMLInputElement"
+              },
+              "privacy": "private"
+            },
+            {
+              "kind": "field",
+              "name": "form",
+              "type": {
+                "text": "HTMLFormElement | null"
+              },
+              "description": "Returns the associated form element, if any.",
+              "readonly": true
+            },
+            {
+              "kind": "field",
+              "name": "validationMessage",
+              "type": {
+                "text": "string"
+              },
+              "description": "Returns the validation message.",
+              "readonly": true
+            },
+            {
+              "kind": "field",
+              "name": "validity",
+              "type": {
+                "text": "ValidityState"
+              },
+              "description": "Returns the ValidityState object.",
+              "readonly": true
+            },
+            {
+              "kind": "method",
+              "name": "checkValidity",
+              "return": {
+                "type": {
+                  "text": "boolean"
+                }
+              },
+              "description": "Checks whether the input satisfies its constraints."
+            },
+            {
+              "kind": "method",
+              "name": "reportValidity",
+              "return": {
+                "type": {
+                  "text": "boolean"
+                }
+              },
+              "description": "Reports validity and shows the browser's constraint validation UI."
+            },
+            {
+              "kind": "method",
+              "name": "_updateValidity",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "formResetCallback",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "formStateRestoreCallback",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "state",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "_handleInput",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "e",
+                  "type": {
+                    "text": "Event"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "_handleChange",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "e",
+                  "type": {
+                    "text": "Event"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "focus",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "options",
+                  "optional": true,
+                  "type": {
+                    "text": "FocusOptions"
+                  }
+                }
+              ],
+              "description": "Moves focus to the input element."
+            },
+            {
+              "kind": "method",
+              "name": "select",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Selects all text in the input."
+            },
+            {
+              "kind": "field",
+              "name": "_inputId",
+              "privacy": "private",
+              "default": "`wc-text-input-${Math.random().toString(36).slice(2, 9)}`"
+            },
+            {
+              "kind": "field",
+              "name": "_helpTextId",
+              "privacy": "private",
+              "default": "`${this._inputId}-help`"
+            },
+            {
+              "kind": "field",
+              "name": "_errorId",
+              "privacy": "private",
+              "default": "`${this._inputId}-error`"
+            }
+          ],
+          "events": [
+            {
+              "name": "wc-input",
+              "type": {
+                "text": "CustomEvent<{value: string}>"
+              },
+              "description": "Dispatched on every keystroke as the user types."
+            },
+            {
+              "name": "wc-change",
+              "type": {
+                "text": "CustomEvent<{value: string}>"
+              },
+              "description": "Dispatched when the input loses focus after its value changed."
+            }
+          ],
+          "attributes": [
+            {
+              "name": "label",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "The visible label text for the input.",
+              "fieldName": "label",
+              "attribute": "label"
+            },
+            {
+              "name": "placeholder",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Placeholder text shown when the input is empty.",
+              "fieldName": "placeholder",
+              "attribute": "placeholder"
+            },
+            {
+              "name": "value",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "The current value of the input.",
+              "fieldName": "value",
+              "attribute": "value"
+            },
+            {
+              "name": "type",
+              "type": {
+                "text": "'text' | 'email' | 'password' | 'tel' | 'url' | 'search' | 'number'"
+              },
+              "default": "'text'",
+              "description": "The type of the native input element.",
+              "fieldName": "type",
+              "attribute": "type"
+            },
+            {
+              "name": "required",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the input is required for form submission.",
+              "fieldName": "required",
+              "attribute": "required"
+            },
+            {
+              "name": "disabled",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the input is disabled.",
+              "fieldName": "disabled",
+              "attribute": "disabled"
+            },
+            {
+              "name": "error",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Error message to display. When set, the input enters an error state.",
+              "fieldName": "error",
+              "attribute": "error"
+            },
+            {
+              "name": "help-text",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Help text displayed below the input for guidance.",
+              "fieldName": "helpText",
+              "attribute": "help-text"
+            },
+            {
+              "name": "name",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "The name of the input, used for form submission.",
+              "fieldName": "name",
+              "attribute": "name"
+            },
+            {
+              "name": "aria-label",
+              "type": {
+                "text": "string | null"
+              },
+              "default": "null",
+              "description": "Accessible name for screen readers, if different from the visible label.",
+              "fieldName": "ariaLabel",
+              "attribute": "aria-label"
+            }
+          ],
+          "superclass": {
+            "name": "LitElement",
+            "package": "lit"
+          },
+          "tagName": "wc-text-input",
+          "customElement": true,
+          "summary": "Form-associated text input with built-in label, error, and help text."
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "WcTextInput",
+          "declaration": {
+            "name": "WcTextInput",
+            "module": "src/components/wc-text-input/wc-text-input.ts"
+          }
+        },
+        {
+          "kind": "custom-element-definition",
+          "name": "wc-text-input",
+          "declaration": {
+            "name": "WcTextInput",
+            "module": "src/components/wc-text-input/wc-text-input.ts"
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,27 @@
+# EditorConfig for WC-2026
+# https://editorconfig.org
+
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+indent_style = space
+indent_size = 2
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+[*.md]
+trim_trailing_whitespace = false
+
+[*.json]
+indent_size = 2
+
+[*.{js,ts,jsx,tsx,astro}]
+indent_size = 2
+
+[*.{css,scss}]
+indent_size = 2
+
+[*.sh]
+indent_size = 2

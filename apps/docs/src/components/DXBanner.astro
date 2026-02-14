@@ -1,0 +1,83 @@
+---
+/**
+ * DXBanner - Full-width showcase banner for the Developer Experience page.
+ *
+ * Features:
+ * - Full-bleed dark section with animated gradient border
+ * - 3-stat highlight row (< 5 min, 4 gates, 8s builds)
+ * - Compelling CTA linking to /developer-experience/
+ * - Subtle background animation with floating orbs
+ * - Scroll-reveal animation
+ * - Responsive layout
+ */
+---
+
+<section class="dx-banner" aria-label="Developer Experience & Quality Pipeline">
+  <div class="dx-banner-glow-1" aria-hidden="true"></div>
+  <div class="dx-banner-glow-2" aria-hidden="true"></div>
+
+  <div class="dx-banner-inner scroll-reveal">
+    <div class="dx-banner-content">
+      <span class="dx-banner-label">
+        <i class="fa-solid fa-rocket" aria-hidden="true"></i>
+        Developer Experience
+      </span>
+
+      <h2 class="dx-banner-title">
+        From First Clone to Production&nbsp;Confidence
+      </h2>
+
+      <p class="dx-banner-description">
+        Developer onboarding in under 5 minutes. Four automated quality gates
+        on every commit. Turborepo-powered builds that finish before you reach
+        for your coffee. This is what operational engineering excellence looks like.
+      </p>
+
+      <div class="dx-banner-stats">
+        <div class="dx-banner-stat">
+          <span class="dx-banner-stat-value">&lt; 5 min</span>
+          <span class="dx-banner-stat-label">First Component</span>
+        </div>
+        <div class="dx-banner-stat-divider" aria-hidden="true"></div>
+        <div class="dx-banner-stat">
+          <span class="dx-banner-stat-value">4-Level</span>
+          <span class="dx-banner-stat-label">Quality Pipeline</span>
+        </div>
+        <div class="dx-banner-stat-divider" aria-hidden="true"></div>
+        <div class="dx-banner-stat">
+          <span class="dx-banner-stat-value">~8s</span>
+          <span class="dx-banner-stat-label">Cached Builds</span>
+        </div>
+      </div>
+
+      <a href="/developer-experience/" class="dx-banner-cta">
+        Explore the Pipeline
+        <span class="dx-banner-cta-arrow" aria-hidden="true">&rarr;</span>
+      </a>
+    </div>
+
+    <div class="dx-banner-visual" aria-hidden="true">
+      <div class="dx-banner-pipeline">
+        <div class="dx-banner-pipe-step">
+          <div class="dx-banner-pipe-icon"><i class="fa-solid fa-code"></i></div>
+          <span>Clone</span>
+        </div>
+        <div class="dx-banner-pipe-connector"></div>
+        <div class="dx-banner-pipe-step">
+          <div class="dx-banner-pipe-icon"><i class="fa-solid fa-check-double"></i></div>
+          <span>Test</span>
+        </div>
+        <div class="dx-banner-pipe-connector"></div>
+        <div class="dx-banner-pipe-step">
+          <div class="dx-banner-pipe-icon"><i class="fa-solid fa-shield-halved"></i></div>
+          <span>Gate</span>
+        </div>
+        <div class="dx-banner-pipe-connector"></div>
+        <div class="dx-banner-pipe-step dx-banner-pipe-step-active">
+          <div class="dx-banner-pipe-icon"><i class="fa-solid fa-rocket"></i></div>
+          <span>Ship</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

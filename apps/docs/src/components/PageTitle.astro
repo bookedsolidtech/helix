@@ -1,0 +1,238 @@
+---
+const PAGE_TITLE_ID = '_top';
+const route = Astro.locals.starlightRoute;
+const title = route.entry.data.title;
+const filePath = `apps/docs/src/content/docs/${route.entry.id}`;
+---
+
+<div class="page-title-wrapper">
+  <h1 id={PAGE_TITLE_ID}>{title}</h1>
+  <div class="source-path" id="source-path-pill" onclick={`
+    (function(el) {
+      var path = '${filePath}';
+      var toast = document.getElementById('copy-toast');
+      var toastPath = document.getElementById('copy-toast-path');
+
+      function showSuccess() {
+        el.classList.add('copied');
+        if (toast) {
+          if (toastPath) toastPath.textContent = path;
+          toast.classList.add('visible');
+          setTimeout(function() { toast.classList.remove('visible'); }, 2500);
+        }
+        setTimeout(function() { el.classList.remove('copied'); }, 3000);
+      }
+
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(path).then(showSuccess).catch(function() {
+          /* fallback */
+          var ta = document.createElement('textarea');
+          ta.value = path;
+          ta.style.cssText = 'position:fixed;opacity:0;left:-9999px';
+          document.body.appendChild(ta);
+          ta.select();
+          document.execCommand('copy');
+          document.body.removeChild(ta);
+          showSuccess();
+        });
+      } else {
+        var ta = document.createElement('textarea');
+        ta.value = path;
+        ta.style.cssText = 'position:fixed;opacity:0;left:-9999px';
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+        showSuccess();
+      }
+    })(this)
+  `}>
+    <i class="fa-regular fa-copy source-copy-icon"></i>
+    <i class="fa-solid fa-check source-check-icon"></i>
+    <code class="path-text">{filePath}</code>
+    <span class="copy-label">Click to copy</span>
+  </div>
+</div>
+
+<div class="copy-toast" id="copy-toast" aria-live="assertive">
+  <i class="fa-solid fa-circle-check toast-icon"></i>
+  <div class="toast-content">
+    <span class="toast-title">Copied!</span>
+    <code class="toast-path" id="copy-toast-path">{filePath}</code>
+  </div>
+</div>
+
+<style is:global>
+  .page-title-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .page-title-wrapper h1 {
+    margin-top: 1rem;
+    font-size: var(--sl-text-h1);
+    line-height: var(--sl-line-height-headings);
+    font-weight: 600;
+    color: var(--sl-color-white);
+  }
+
+  /* The entire path pill is the click target */
+  .source-path {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    margin-top: 0.5rem;
+    padding: 0.3rem 0.65rem;
+    background: var(--sl-color-gray-6, #1e1e2e);
+    border: 1px solid var(--sl-color-gray-5, #2e2e3e);
+    border-radius: 0.375rem;
+    width: fit-content;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+
+  .source-path:hover {
+    border-color: var(--sl-color-accent, #6c63ff);
+    background: var(--sl-color-gray-5, #2e2e3e);
+  }
+
+  .source-path:hover .copy-label {
+    opacity: 1;
+  }
+
+  .source-path:active {
+    transform: scale(0.97);
+  }
+
+  /* ===== COPIED STATE ===== */
+  .source-path.copied {
+    border-color: #22c55e !important;
+    background: rgba(34, 197, 94, 0.15) !important;
+  }
+
+  .source-path.copied .path-text {
+    color: #4ade80 !important;
+  }
+
+  .source-path.copied .source-check-icon {
+    display: inline !important;
+  }
+
+  .source-path.copied .source-copy-icon {
+    display: none !important;
+  }
+
+  .source-path.copied .copy-label {
+    opacity: 0 !important;
+  }
+
+  /* ===== Path text ===== */
+  .source-path .path-text {
+    font-family: var(--sl-font-mono, 'JetBrains Mono', monospace);
+    font-size: 0.7rem;
+    color: var(--sl-color-gray-3, #8e8ea0);
+    letter-spacing: -0.01em;
+    line-height: 1.2;
+    background: none;
+    padding: 0;
+    border: none;
+    pointer-events: none;
+    transition: color 0.2s ease;
+  }
+
+  .source-path:hover .path-text {
+    color: var(--sl-color-gray-2, #c0c0d0);
+  }
+
+  /* ===== "Click to copy" hint ===== */
+  .source-path .copy-label {
+    font-size: 0.6rem;
+    color: var(--sl-color-accent, #6c63ff);
+    opacity: 0;
+    transition: opacity 0.15s ease;
+    pointer-events: none;
+    margin-left: 0.25rem;
+    font-weight: 500;
+  }
+
+  /* ===== Icons ===== */
+  .source-path .source-copy-icon,
+  .source-path .source-check-icon {
+    font-size: 0.7rem;
+    pointer-events: none;
+    transition: all 0.2s ease;
+  }
+
+  .source-path .source-copy-icon {
+    display: inline;
+    color: var(--sl-color-gray-3, #8e8ea0);
+  }
+
+  .source-path:hover .source-copy-icon {
+    color: var(--sl-color-accent, #6c63ff);
+  }
+
+  .source-path .source-check-icon {
+    display: none;
+    color: #4ade80;
+  }
+
+  /* ===== Toast notification ===== */
+  .copy-toast {
+    position: fixed;
+    bottom: 2rem;
+    left: 50%;
+    transform: translateX(-50%) translateY(1.5rem);
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.65rem 1.25rem;
+    background: #14532d;
+    border: 1px solid #22c55e;
+    border-radius: 0.5rem;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(34, 197, 94, 0.2);
+    z-index: 99999;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    pointer-events: none;
+  }
+
+  .copy-toast.visible {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(-50%) translateY(0);
+  }
+
+  .copy-toast .toast-icon {
+    color: #4ade80;
+    font-size: 1.1rem;
+    flex-shrink: 0;
+  }
+
+  .copy-toast .toast-content {
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
+  }
+
+  .copy-toast .toast-title {
+    color: #dcfce7;
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+  }
+
+  .copy-toast .toast-path {
+    color: #86efac;
+    font-family: var(--sl-font-mono, 'JetBrains Mono', monospace);
+    font-size: 0.65rem;
+    background: none;
+    padding: 0;
+    border: none;
+    opacity: 0.8;
+  }
+</style>

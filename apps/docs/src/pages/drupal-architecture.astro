@@ -1,0 +1,3803 @@
+---
+/**
+ * Drupal Integration Architecture - Full visual experience page.
+ *
+ * This is a standalone Astro page (not Starlight content) that provides
+ * an immersive visual walkthrough of the core architectural decision:
+ * Where does control live - in the Web Component or in Drupal?
+ *
+ * Sections:
+ * 1. Hero - The Architecture Decision That Defines Everything
+ * 2. The Spectrum - Property-driven vs Slot-driven visual slider
+ * 3. Side-by-Side Comparison - Code examples for both approaches
+ * 4. Decision Matrix - Drupal module compatibility grid
+ * 5. Component Strategy Map - Atoms/Organisms/Forms categorization
+ * 6. The Recommendation - Slot-First, Property-Enhanced
+ * 7. Component Loading Strategies - Bundle vs Per-Component vs Hybrid
+ * 8. Code Examples - Real TWIG/HTML patterns
+ */
+
+// Code examples stored as strings to avoid JSX parsing of curly braces
+const codePropsTemplate = `<span class="cmt">{# Component controls ALL rendering #}</span>
+&lt;<span class="tag">wc-card</span>
+  <span class="prop-hl">title</span>=<span class="val">"{{ content.field_title }}"</span>
+  <span class="prop-hl">description</span>=<span class="val">"{{ content.field_body }}"</span>
+  <span class="prop-hl">image-src</span>=<span class="val">"{{ file_url(content.field_image) }}"</span>
+  <span class="prop-hl">image-alt</span>=<span class="val">"{{ content.field_image.alt }}"</span>
+  <span class="prop-hl">href</span>=<span class="val">"{{ url }}"</span>
+  <span class="prop-hl">variant</span>=<span class="val">"elevated"</span>
+&gt;&lt;/<span class="tag">wc-card</span>&gt;`;
+
+const codePropsStorybook = `<span class="cmt">// Perfect in Storybook - all props visible</span>
+<span class="kw">export const</span> <span class="var">Default</span> = {
+  args: {
+    <span class="prop-hl">title</span>: <span class="str">'Article Title'</span>,
+    <span class="prop-hl">description</span>: <span class="str">'Summary text...'</span>,
+    <span class="prop-hl">imageSrc</span>: <span class="str">'/placeholder.jpg'</span>,
+    <span class="prop-hl">variant</span>: <span class="str">'elevated'</span>,
+  },
+};`;
+
+const codeSlotsTemplate = `<span class="cmt">{# Drupal controls ALL content #}</span>
+&lt;<span class="tag">wc-card</span> <span class="attr">variant</span>=<span class="val">"elevated"</span>&gt;
+  &lt;<span class="tag">img</span> <span class="slot-hl">slot</span>=<span class="val">"media"</span>
+    <span class="attr">src</span>=<span class="val">"{{ file_url(content.field_image) }}"</span>
+    <span class="attr">alt</span>=<span class="val">"{{ content.field_image.alt }}"</span> /&gt;
+  &lt;<span class="tag">h3</span> <span class="slot-hl">slot</span>=<span class="val">"heading"</span>&gt;
+    {{ content.field_title }}
+  &lt;/<span class="tag">h3</span>&gt;
+  &lt;<span class="tag">div</span> <span class="slot-hl">slot</span>=<span class="val">"body"</span>&gt;
+    {{ content.field_body }}
+  &lt;/<span class="tag">div</span>&gt;
+  &lt;<span class="tag">a</span> <span class="slot-hl">slot</span>=<span class="val">"actions"</span> <span class="attr">href</span>=<span class="val">"{{ url }}"</span>&gt;
+    Read More
+  &lt;/<span class="tag">a</span>&gt;
+&lt;/<span class="tag">wc-card</span>&gt;`;
+
+const codeSlotsStorybook = `<span class="cmt">// Slots need HTML strings in Storybook</span>
+<span class="kw">export const</span> <span class="var">Default</span> = {
+  args: {
+    <span class="attr">variant</span>: <span class="str">'elevated'</span>,
+  },
+  render: <span class="fn">(args)</span> <span class="kw">=&gt;</span> <span class="str">\`
+    &lt;wc-card variant="\${</span><span class="var">args.variant</span><span class="str">}"&gt;
+      &lt;img </span><span class="slot-hl">slot="media"</span><span class="str"> ... /&gt;
+      &lt;h3 </span><span class="slot-hl">slot="heading"</span><span class="str">&gt;...&lt;/h3&gt;
+      &lt;div </span><span class="slot-hl">slot="body"</span><span class="str">&gt;...&lt;/div&gt;
+    &lt;/wc-card&gt;\`</span>,
+};`;
+
+const codeExampleCard = `&lt;<span class="tag">wc-card</span> <span class="attr">variant</span>=<span class="val">"elevated"</span> <span class="attr">interactive</span>&gt;
+  &lt;<span class="tag">img</span> <span class="slot-hl">slot="media"</span>
+    <span class="attr">src</span>=<span class="val">"{{ file_url(image.uri) }}"</span>
+    <span class="attr">alt</span>=<span class="val">"{{ image.alt }}"</span>
+    <span class="attr">loading</span>=<span class="val">"lazy"</span> /&gt;
+
+  &lt;<span class="tag">h3</span> <span class="slot-hl">slot="heading"</span>&gt;
+    {{ title }}
+  &lt;/<span class="tag">h3</span>&gt;
+
+  &lt;<span class="tag">p</span> <span class="slot-hl">slot="body"</span>&gt;
+    {{ body|striptags|truncate(120) }}
+  &lt;/<span class="tag">p</span>&gt;
+
+  &lt;<span class="tag">a</span> <span class="slot-hl">slot="actions"</span> <span class="attr">href</span>=<span class="val">"{{ url }}"</span>&gt;
+    Read More &amp;rarr;
+  &lt;/<span class="tag">a</span>&gt;
+&lt;/<span class="tag">wc-card</span>&gt;`;
+
+const codeExampleButton = `&lt;<span class="tag">wc-button</span>
+  <span class="prop-hl">variant</span>=<span class="val">"primary"</span>
+  <span class="prop-hl">size</span>=<span class="val">"large"</span>
+  <span class="prop-hl">icon</span>=<span class="val">"arrow-right"</span>
+  <span class="prop-hl">icon-position</span>=<span class="val">"end"</span>
+  {% <span class="kw">if</span> is_disabled %}
+    <span class="prop-hl">disabled</span>
+  {% <span class="kw">endif</span> %}
+&gt;
+  {{ button_label }}
+&lt;/<span class="tag">wc-button</span>&gt;
+
+<span class="cmt">{# Loading state example #}</span>
+&lt;<span class="tag">wc-button</span>
+  <span class="prop-hl">variant</span>=<span class="val">"primary"</span>
+  <span class="prop-hl">loading</span>
+  <span class="prop-hl">aria-busy</span>=<span class="val">"true"</span>
+&gt;
+  Submitting...
+&lt;/<span class="tag">wc-button</span>&gt;`;
+
+// Component Loading Strategy code examples
+const codeLoadingSingleBundle = `<span class="cmt"># Single bundle - every component in one file</span>
+<span class="var">wc_2026</span>:
+  <span class="prop-hl">js</span>:
+    <span class="str">dist/wc-2026.bundle.js</span>: <span class="val">{ minified: true }</span>
+  <span class="kw">dependencies</span>:
+    - <span class="attr">core/drupal</span>
+    - <span class="attr">core/once</span>`;
+
+const codeLoadingPerComponent = `<span class="cmt"># Per-component - surgical loading</span>
+<span class="var">wc_2026/card</span>:
+  <span class="prop-hl">js</span>:
+    <span class="str">dist/components/wc-card.js</span>: <span class="val">{ minified: true }</span>
+  <span class="kw">dependencies</span>:
+    - <span class="attr">wc_2026/lit-runtime</span>
+
+<span class="var">wc_2026/button</span>:
+  <span class="prop-hl">js</span>:
+    <span class="str">dist/components/wc-button.js</span>: <span class="val">{ minified: true }</span>
+  <span class="kw">dependencies</span>:
+    - <span class="attr">wc_2026/lit-runtime</span>
+
+<span class="var">wc_2026/accordion</span>:
+  <span class="prop-hl">js</span>:
+    <span class="str">dist/components/wc-accordion.js</span>: <span class="val">{ minified: true }</span>
+  <span class="kw">dependencies</span>:
+    - <span class="attr">wc_2026/lit-runtime</span>`;
+
+const codeLoadingHybridGroups = `<span class="cmt"># Smart bundles - grouped by usage context</span>
+<span class="var">wc_2026/core</span>:
+  <span class="prop-hl">js</span>:
+    <span class="str">dist/groups/core.js</span>: <span class="val">{ minified: true }</span>
+  <span class="cmt"># button, badge, spinner, avatar (~32KB)</span>
+  <span class="kw">dependencies</span>:
+    - <span class="attr">wc_2026/lit-runtime</span>
+
+<span class="var">wc_2026/navigation</span>:
+  <span class="prop-hl">js</span>:
+    <span class="str">dist/groups/navigation.js</span>: <span class="val">{ minified: true }</span>
+  <span class="cmt"># nav, breadcrumb, tabs, sidebar (~28KB)</span>
+  <span class="kw">dependencies</span>:
+    - <span class="attr">wc_2026/core</span>
+
+<span class="var">wc_2026/content</span>:
+  <span class="prop-hl">js</span>:
+    <span class="str">dist/groups/content.js</span>: <span class="val">{ minified: true }</span>
+  <span class="cmt"># card, hero, accordion, modal (~45KB)</span>
+  <span class="kw">dependencies</span>:
+    - <span class="attr">wc_2026/core</span>
+
+<span class="var">wc_2026/forms</span>:
+  <span class="prop-hl">js</span>:
+    <span class="str">dist/groups/forms.js</span>: <span class="val">{ minified: true }</span>
+  <span class="cmt"># text-input, select, checkbox, radio (~38KB)</span>
+  <span class="kw">dependencies</span>:
+    - <span class="attr">wc_2026/core</span>`;
+
+const codeLoadingTwigAttach = `<span class="cmt">{# In paragraph--card.html.twig #}</span>
+{{ <span class="fn">attach_library</span>(<span class="str">'wc_2026/card'</span>) }}
+
+&lt;<span class="tag">wc-card</span> <span class="attr">variant</span>=<span class="val">"elevated"</span>&gt;
+  &lt;<span class="tag">img</span> <span class="slot-hl">slot="media"</span> <span class="attr">src</span>=<span class="val">"{{ image_url }}"</span> /&gt;
+  &lt;<span class="tag">h3</span> <span class="slot-hl">slot="heading"</span>&gt;{{ title }}&lt;/<span class="tag">h3</span>&gt;
+  &lt;<span class="tag">div</span> <span class="slot-hl">slot="body"</span>&gt;{{ body }}&lt;/<span class="tag">div</span>&gt;
+&lt;/<span class="tag">wc-card</span>&gt;
+
+<span class="cmt">{# Drupal only loads wc-card.js + lit-runtime.js #}</span>
+<span class="cmt">{# Total: ~18KB for this page (not 220KB!) #}</span>`;
+
+const codeLoadingSharedRuntime = `<span class="cmt"># Shared Lit runtime - loaded once, cached forever</span>
+<span class="var">wc_2026/lit-runtime</span>:
+  <span class="prop-hl">js</span>:
+    <span class="str">dist/vendor/lit-core.js</span>: <span class="val">{ minified: true }</span>
+  <span class="kw">dependencies</span>:
+    - <span class="attr">core/drupal</span>
+    - <span class="attr">core/once</span>
+  <span class="cmt"># ~15KB gzipped - Lit 3 runtime</span>
+  <span class="cmt"># Cached across ALL pages after first load</span>`;
+
+const codeExampleForm = `&lt;<span class="tag">wc-text-input</span>
+  <span class="prop-hl">name</span>=<span class="val">"{{ field_name }}"</span>
+  <span class="prop-hl">type</span>=<span class="val">"{{ field_type }}"</span>
+  <span class="prop-hl">required</span>
+  <span class="prop-hl">pattern</span>=<span class="val">"{{ validation_pattern }}"</span>
+  <span class="prop-hl">maxlength</span>=<span class="val">"{{ max_length }}"</span>
+&gt;
+  <span class="cmt">&lt;!-- Slots for custom content --&gt;</span>
+  &lt;<span class="tag">span</span> <span class="slot-hl">slot="label"</span>&gt;
+    {{ field_label }}
+    {% <span class="kw">if</span> required %}
+      &lt;<span class="tag">abbr</span> <span class="attr">title</span>=<span class="val">"required"</span>&gt;*&lt;/<span class="tag">abbr</span>&gt;
+    {% <span class="kw">endif</span> %}
+  &lt;/<span class="tag">span</span>&gt;
+
+  &lt;<span class="tag">span</span> <span class="slot-hl">slot="help"</span>&gt;
+    {{ field_description }}
+  &lt;/<span class="tag">span</span>&gt;
+
+  &lt;<span class="tag">span</span> <span class="slot-hl">slot="error"</span>&gt;
+    {{ error_message }}
+  &lt;/<span class="tag">span</span>&gt;
+&lt;/<span class="tag">wc-text-input</span>&gt;`;
+---
+
+<!doctype html>
+<html lang="en" data-theme="dark">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Drupal Integration Architecture | WC-2026</title>
+    <meta
+      name="description"
+      content="The architecture decision that defines everything: Property-driven vs Slot-driven Web Components for Drupal CMS integration."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=JetBrains+Mono:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
+      integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+
+    <style>
+      /* ============================================
+         DRUPAL ARCHITECTURE PAGE - Self-contained styles
+         Uses same design tokens as the main site
+         ============================================ */
+
+      /* --- CSS Custom Properties (mirrored from custom.css) --- */
+      @property --gradient-angle {
+        syntax: '<angle>';
+        initial-value: 0deg;
+        inherits: false;
+      }
+
+      :root {
+        --wc-accent-h: 250;
+        --wc-accent-s: 70%;
+        --wc-accent-l: 60%;
+        --wc-accent: hsl(var(--wc-accent-h), var(--wc-accent-s), var(--wc-accent-l));
+        --wc-cyan: #06b6d4;
+        --wc-pink: #ec4899;
+        --wc-green: #10b981;
+        --wc-amber: #f59e0b;
+        --wc-red: #ef4444;
+
+        --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        --gradient-hero: linear-gradient(135deg, #0a0a1a 0%, #1a1040 40%, #0f0f2e 100%);
+        --gradient-cyan-purple: linear-gradient(135deg, #06b6d4, #8b5cf6);
+        --gradient-pink-orange: linear-gradient(135deg, #ec4899, #f97316);
+        --gradient-green-cyan: linear-gradient(135deg, #10b981, #06b6d4);
+
+        --font-heading: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        --font-body: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+
+        --space-1: 0.25rem;
+        --space-2: 0.5rem;
+        --space-3: 0.75rem;
+        --space-4: 1rem;
+        --space-5: 1.25rem;
+        --space-6: 1.5rem;
+        --space-8: 2rem;
+        --space-10: 2.5rem;
+        --space-12: 3rem;
+        --space-16: 4rem;
+        --space-20: 5rem;
+        --space-24: 6rem;
+
+        --radius-sm: 0.5rem;
+        --radius-md: 0.75rem;
+        --radius-lg: 1rem;
+        --radius-xl: 1.5rem;
+        --radius-2xl: 2rem;
+        --radius-full: 9999px;
+
+        --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
+        --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.4);
+        --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.5);
+        --shadow-xl: 0 16px 64px rgba(0, 0, 0, 0.6);
+        --shadow-2xl: 0 24px 80px rgba(0, 0, 0, 0.2);
+
+        --glass-bg: rgba(255, 255, 255, 0.03);
+        --glass-bg-strong: rgba(255, 255, 255, 0.06);
+        --glass-border: rgba(255, 255, 255, 0.06);
+        --glass-border-strong: rgba(255, 255, 255, 0.12);
+
+        --glow-primary: 0 0 50px rgba(102, 126, 234, 0.25);
+        --glow-subtle: 0 0 20px rgba(102, 126, 234, 0.15);
+
+        --surface-0: #0a0a14;
+        --surface-1: #111122;
+        --surface-2: #1a1a32;
+        --surface-3: #252545;
+        --text-primary: #eaeaf4;
+        --text-secondary: #a8a8c8;
+        --text-muted: #6868a0;
+      }
+
+      /* --- Reset & Base --- */
+      *,
+      *::before,
+      *::after {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: var(--font-body);
+        line-height: 1.6;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        background: var(--surface-0);
+        color: var(--text-primary);
+        scroll-behavior: smooth;
+        overflow-x: clip;
+      }
+
+      h1, h2, h3, h4, h5, h6 {
+        font-family: var(--font-heading);
+        font-weight: 700;
+        letter-spacing: -0.025em;
+        line-height: 1.15;
+      }
+
+      code, pre {
+        font-family: var(--font-mono);
+      }
+
+      a {
+        color: var(--wc-accent);
+        text-decoration: none;
+        transition: color 0.2s ease;
+      }
+
+      a:hover {
+        color: hsl(var(--wc-accent-h), var(--wc-accent-s), 75%);
+      }
+
+      /* --- Keyframes --- */
+      @keyframes fadeInUp {
+        from { opacity: 0; transform: translateY(40px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+
+      @keyframes fadeInDown {
+        from { opacity: 0; transform: translateY(-20px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+
+      @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+      }
+
+      @keyframes float-slow {
+        0%, 100% { transform: translate(0, 0) scale(1); }
+        25% { transform: translate(30px, -20px) scale(1.05); }
+        50% { transform: translate(-10px, -35px) scale(0.97); }
+        75% { transform: translate(-25px, -10px) scale(1.02); }
+      }
+
+      @keyframes float-drift {
+        0%, 100% { transform: translate(0, 0) rotate(0deg); }
+        33% { transform: translate(20px, 15px) rotate(2deg); }
+        66% { transform: translate(-15px, -20px) rotate(-2deg); }
+      }
+
+      @keyframes orb-pulse {
+        0%, 100% { opacity: 0.3; filter: blur(100px); }
+        50% { opacity: 0.5; filter: blur(120px); }
+      }
+
+      @keyframes pulse-glow {
+        0%, 100% { box-shadow: 0 0 8px rgba(74, 222, 128, 0.4); }
+        50% { box-shadow: 0 0 24px rgba(74, 222, 128, 0.7); }
+      }
+
+      @keyframes border-rotate {
+        0% { --gradient-angle: 0deg; }
+        100% { --gradient-angle: 360deg; }
+      }
+
+      @keyframes spectrum-pulse {
+        0%, 100% { transform: scaleX(1); }
+        50% { transform: scaleX(1.02); }
+      }
+
+      @keyframes particle-drift {
+        0% { background-position: 0 0, 200px 200px, 400px 100px; }
+        100% { background-position: 800px 800px, 1000px 1000px, 1200px 900px; }
+      }
+
+      @keyframes flow-line {
+        0% { stroke-dashoffset: 100; }
+        100% { stroke-dashoffset: 0; }
+      }
+
+      @keyframes scroll-fade {
+        0% { opacity: 1; transform: translateX(-50%) translateY(0); }
+        100% { opacity: 0; transform: translateX(-50%) translateY(12px); }
+      }
+
+      @keyframes shimmer {
+        0% { background-position: -200% 0; }
+        100% { background-position: 200% 0; }
+      }
+
+      /* --- Scroll Reveal --- */
+      .scroll-reveal {
+        opacity: 0;
+        transform: translateY(40px);
+        transition: opacity 0.8s cubic-bezier(0.22, 1, 0.36, 1),
+                    transform 0.8s cubic-bezier(0.22, 1, 0.36, 1),
+                    filter 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+        filter: blur(4px);
+      }
+
+      .scroll-reveal.is-visible {
+        opacity: 1;
+        transform: translateY(0);
+        filter: blur(0);
+      }
+
+      .scroll-reveal-delay-1 { transition-delay: 0.1s; }
+      .scroll-reveal-delay-2 { transition-delay: 0.2s; }
+      .scroll-reveal-delay-3 { transition-delay: 0.3s; }
+      .scroll-reveal-delay-4 { transition-delay: 0.4s; }
+      .scroll-reveal-delay-5 { transition-delay: 0.5s; }
+      .scroll-reveal-delay-6 { transition-delay: 0.6s; }
+
+      /* --- Top Navigation Bar --- */
+      .da-topbar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 100;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: var(--space-3) var(--space-8);
+        background: rgba(10, 10, 20, 0.85);
+        backdrop-filter: blur(16px) saturate(180%);
+        -webkit-backdrop-filter: blur(16px) saturate(180%);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      }
+
+      .da-topbar-left {
+        display: flex;
+        align-items: center;
+        gap: var(--space-4);
+      }
+
+      .da-back-link {
+        display: inline-flex;
+        align-items: center;
+        gap: var(--space-2);
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: var(--text-secondary);
+        transition: all 0.2s ease;
+        padding: var(--space-2) var(--space-3);
+        border-radius: var(--radius-md);
+      }
+
+      .da-back-link:hover {
+        color: var(--text-primary);
+        background: var(--glass-bg-strong);
+      }
+
+      .da-topbar-title {
+        font-size: 0.875rem;
+        font-weight: 700;
+        color: var(--text-primary);
+        letter-spacing: -0.01em;
+      }
+
+      .da-topbar-right {
+        display: flex;
+        align-items: center;
+        gap: var(--space-3);
+      }
+
+      .da-topbar-link {
+        display: inline-flex;
+        align-items: center;
+        gap: var(--space-2);
+        font-size: 0.8125rem;
+        font-weight: 600;
+        color: var(--text-muted);
+        padding: var(--space-2) var(--space-4);
+        border-radius: var(--radius-md);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        transition: all 0.2s ease;
+      }
+
+      .da-topbar-link:hover {
+        color: var(--wc-accent);
+        border-color: rgba(102, 126, 234, 0.3);
+        background: rgba(102, 126, 234, 0.06);
+      }
+
+      /* ============================================
+         SECTION 1: HERO
+         ============================================ */
+      .da-hero {
+        min-height: 100vh;
+        min-height: 100dvh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        overflow: hidden;
+        isolation: isolate;
+        padding: var(--space-24) var(--space-8) var(--space-16);
+      }
+
+      .da-hero::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: var(--gradient-hero);
+        z-index: -3;
+      }
+
+      .da-hero::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background-image:
+          radial-gradient(circle at 20% 30%, rgba(6, 120, 190, 0.04) 2px, transparent 2px),
+          radial-gradient(circle at 60% 70%, rgba(102, 126, 234, 0.04) 3px, transparent 3px),
+          radial-gradient(circle at 80% 20%, rgba(236, 72, 153, 0.03) 2px, transparent 2px);
+        background-size: 800px 800px;
+        animation: particle-drift 60s linear infinite;
+        opacity: 0.6;
+        z-index: -2;
+      }
+
+      .da-hero-orb {
+        position: absolute;
+        border-radius: 50%;
+        filter: blur(100px);
+        opacity: 0.3;
+        z-index: -1;
+        pointer-events: none;
+      }
+
+      .da-hero-orb-1 {
+        width: 600px;
+        height: 600px;
+        background: radial-gradient(circle, rgba(6, 120, 190, 0.4), transparent 70%);
+        top: -200px;
+        right: -100px;
+        animation: float-slow 20s ease-in-out infinite, orb-pulse 8s ease-in-out infinite;
+      }
+
+      .da-hero-orb-2 {
+        width: 400px;
+        height: 400px;
+        background: radial-gradient(circle, rgba(236, 72, 153, 0.3), transparent 70%);
+        bottom: -100px;
+        left: -80px;
+        animation: float-slow 25s ease-in-out infinite reverse, orb-pulse 10s ease-in-out infinite;
+      }
+
+      .da-hero-orb-3 {
+        width: 350px;
+        height: 350px;
+        background: radial-gradient(circle, rgba(16, 185, 129, 0.25), transparent 70%);
+        top: 40%;
+        left: 15%;
+        animation: float-drift 18s ease-in-out infinite, orb-pulse 7s ease-in-out infinite;
+      }
+
+      .da-hero-grid {
+        position: absolute;
+        inset: 0;
+        z-index: -1;
+        background-image:
+          linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+        background-size: 60px 60px;
+        mask-image: radial-gradient(ellipse 80% 60% at 50% 50%, black 30%, transparent 70%);
+        -webkit-mask-image: radial-gradient(ellipse 80% 60% at 50% 50%, black 30%, transparent 70%);
+      }
+
+      .da-hero-content {
+        text-align: center;
+        max-width: 900px;
+        z-index: 1;
+      }
+
+      .da-hero-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: var(--space-3);
+        padding: var(--space-2) var(--space-6);
+        border-radius: var(--radius-full);
+        background: rgba(255, 255, 255, 0.06);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(20px);
+        color: rgba(255, 255, 255, 0.85);
+        font-size: 0.875rem;
+        font-weight: 500;
+        letter-spacing: 0.02em;
+        margin-bottom: var(--space-10);
+        animation: fadeInDown 0.8s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+      }
+
+      .da-hero-badge-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--wc-cyan);
+        animation: pulse-glow 2s ease infinite;
+        flex-shrink: 0;
+      }
+
+      .da-hero-title {
+        font-size: clamp(2.5rem, 8vw, 5rem);
+        font-weight: 900;
+        line-height: 1.15;
+        margin-bottom: var(--space-6);
+        background: linear-gradient(180deg, rgba(255,255,255,1) 0%, rgba(255,255,255,0.7) 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        letter-spacing: -0.04em;
+        animation: fadeInUp 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.1s backwards;
+      }
+
+      .da-hero-subtitle {
+        font-size: clamp(1.125rem, 2.5vw, 1.5rem);
+        font-weight: 300;
+        margin-bottom: var(--space-8);
+        background: linear-gradient(90deg, rgba(255,255,255,0.9), rgba(6, 182, 212, 0.9));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        animation: fadeInUp 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.2s backwards;
+      }
+
+      .da-hero-description {
+        font-size: clamp(1rem, 1.5vw, 1.25rem);
+        color: rgba(255, 255, 255, 0.55);
+        max-width: 700px;
+        margin: 0 auto var(--space-12);
+        line-height: 1.75;
+        animation: fadeInUp 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.3s backwards;
+      }
+
+      .da-hero-scroll {
+        position: absolute;
+        bottom: var(--space-10);
+        left: 50%;
+        transform: translateX(-50%);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: var(--space-2);
+        color: rgba(255, 255, 255, 0.3);
+        font-size: 0.6875rem;
+        font-weight: 500;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        animation: fadeIn 1s ease 1.5s backwards;
+      }
+
+      .da-hero-scroll-line {
+        width: 1px;
+        height: 40px;
+        background: linear-gradient(to bottom, rgba(255,255,255,0.3), transparent);
+        position: relative;
+        overflow: hidden;
+      }
+
+      .da-hero-scroll-line::after {
+        content: '';
+        position: absolute;
+        top: -100%;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(to bottom, transparent, rgba(255,255,255,0.8), transparent);
+        animation: scroll-fade 2s ease-in-out infinite;
+      }
+
+      /* ============================================
+         SHARED SECTION STYLES
+         ============================================ */
+      .da-section {
+        width: 100%;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .da-section-inner {
+        padding: var(--space-24) var(--space-8);
+        max-width: 1400px;
+        margin: 0 auto;
+      }
+
+      .da-section-header {
+        text-align: center;
+        margin-bottom: var(--space-16);
+      }
+
+      .da-section-label {
+        display: inline-block;
+        padding: var(--space-1) var(--space-4);
+        border-radius: var(--radius-full);
+        font-size: 0.8125rem;
+        font-weight: 600;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        margin-bottom: var(--space-4);
+        background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+        color: var(--wc-accent);
+        border: 1px solid rgba(102, 126, 234, 0.15);
+      }
+
+      .da-section-title {
+        font-size: clamp(2rem, 5vw, 3.25rem);
+        font-weight: 800;
+        letter-spacing: -0.035em;
+        margin-bottom: var(--space-5);
+        color: var(--text-primary);
+        line-height: 1.1;
+      }
+
+      .da-section-description {
+        font-size: clamp(1rem, 1.5vw, 1.2rem);
+        color: var(--text-secondary);
+        max-width: 650px;
+        margin: 0 auto;
+        line-height: 1.7;
+      }
+
+      /* --- Cards base --- */
+      .da-card {
+        padding: var(--space-8);
+        border-radius: var(--radius-2xl);
+        background: var(--surface-1);
+        border: 1px solid var(--surface-3);
+        transition: all 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+        position: relative;
+        overflow: hidden;
+      }
+
+      .da-card::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        border-radius: inherit;
+        padding: 1.5px;
+        background: conic-gradient(from var(--gradient-angle), #667eea, #764ba2, #f093fb, #06b6d4, #667eea);
+        -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+        -webkit-mask-composite: xor;
+        mask-composite: exclude;
+        opacity: 0;
+        transition: opacity 0.5s ease;
+        pointer-events: none;
+        animation: border-rotate 4s linear infinite;
+      }
+
+      .da-card::after {
+        content: '';
+        position: absolute;
+        width: 300px;
+        height: 300px;
+        border-radius: 50%;
+        background: radial-gradient(circle, rgba(102, 126, 234, 0.12), transparent 70%);
+        opacity: 0;
+        transition: opacity 0.5s ease;
+        pointer-events: none;
+        top: var(--mouse-y, 50%);
+        left: var(--mouse-x, 50%);
+        transform: translate(-50%, -50%);
+      }
+
+      .da-card:hover::before { opacity: 1; }
+      .da-card:hover::after { opacity: 1; }
+      .da-card:hover {
+        transform: translateY(-4px);
+        box-shadow: var(--shadow-xl), var(--glow-subtle);
+        background: var(--surface-2);
+      }
+
+      /* ============================================
+         SECTION 2: THE SPECTRUM
+         ============================================ */
+      .da-spectrum-section {
+        background: var(--surface-0);
+        border-top: 1px solid var(--surface-3);
+        border-bottom: 1px solid var(--surface-3);
+      }
+
+      .da-spectrum-track-wrapper {
+        position: relative;
+        max-width: 1000px;
+        margin: 0 auto;
+      }
+
+      .da-spectrum-labels {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: var(--space-8);
+        gap: var(--space-4);
+      }
+
+      .da-spectrum-label {
+        flex: 1;
+        text-align: center;
+        max-width: 280px;
+      }
+
+      .da-spectrum-label-icon {
+        width: 64px;
+        height: 64px;
+        border-radius: var(--radius-xl);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto var(--space-3);
+        font-size: 1.5rem;
+        transition: all 0.3s ease;
+      }
+
+      .da-spectrum-label:first-child .da-spectrum-label-icon {
+        background: linear-gradient(135deg, rgba(6, 182, 212, 0.15), rgba(6, 182, 212, 0.05));
+        border: 1px solid rgba(6, 182, 212, 0.2);
+        color: var(--wc-cyan);
+      }
+
+      .da-spectrum-label:nth-child(2) .da-spectrum-label-icon {
+        background: linear-gradient(135deg, rgba(16, 185, 129, 0.15), rgba(16, 185, 129, 0.05));
+        border: 1px solid rgba(16, 185, 129, 0.2);
+        color: var(--wc-green);
+        width: 80px;
+        height: 80px;
+        font-size: 2rem;
+      }
+
+      .da-spectrum-label:last-child .da-spectrum-label-icon {
+        background: linear-gradient(135deg, rgba(236, 72, 153, 0.15), rgba(236, 72, 153, 0.05));
+        border: 1px solid rgba(236, 72, 153, 0.2);
+        color: var(--wc-pink);
+      }
+
+      .da-spectrum-label-title {
+        font-size: 1.125rem;
+        font-weight: 700;
+        margin-bottom: var(--space-2);
+        color: var(--text-primary);
+      }
+
+      .da-spectrum-label-desc {
+        font-size: 0.875rem;
+        color: var(--text-secondary);
+        line-height: 1.6;
+      }
+
+      .da-spectrum-track {
+        position: relative;
+        height: 8px;
+        border-radius: var(--radius-full);
+        background: linear-gradient(90deg, var(--wc-cyan), var(--wc-green), var(--wc-pink));
+        margin: var(--space-10) 0 var(--space-6);
+        overflow: visible;
+      }
+
+      .da-spectrum-track::before {
+        content: '';
+        position: absolute;
+        inset: -4px;
+        border-radius: var(--radius-full);
+        background: linear-gradient(90deg, var(--wc-cyan), var(--wc-green), var(--wc-pink));
+        filter: blur(12px);
+        opacity: 0.4;
+        z-index: -1;
+      }
+
+      .da-spectrum-marker {
+        position: absolute;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        border: 3px solid white;
+        box-shadow: 0 0 20px rgba(255,255,255,0.3);
+        z-index: 2;
+      }
+
+      .da-spectrum-marker-left {
+        left: 15%;
+        background: var(--wc-cyan);
+      }
+
+      .da-spectrum-marker-center {
+        left: 50%;
+        background: var(--wc-green);
+        width: 32px;
+        height: 32px;
+        border-width: 4px;
+        box-shadow: 0 0 30px rgba(16, 185, 129, 0.5);
+      }
+
+      .da-spectrum-marker-right {
+        left: 85%;
+        background: var(--wc-pink);
+      }
+
+      .da-spectrum-sweet-spot {
+        text-align: center;
+        margin-top: var(--space-8);
+        padding: var(--space-6) var(--space-8);
+        border-radius: var(--radius-xl);
+        background: linear-gradient(135deg, rgba(16, 185, 129, 0.08), rgba(6, 182, 212, 0.08));
+        border: 1px solid rgba(16, 185, 129, 0.15);
+      }
+
+      .da-spectrum-sweet-spot-title {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: var(--wc-green);
+        margin-bottom: var(--space-2);
+      }
+
+      .da-spectrum-sweet-spot-desc {
+        font-size: 0.9375rem;
+        color: var(--text-secondary);
+        line-height: 1.7;
+        max-width: 600px;
+        margin: 0 auto;
+      }
+
+      /* ============================================
+         SECTION 3: SIDE-BY-SIDE COMPARISON
+         ============================================ */
+      .da-comparison-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        grid-template-rows: auto auto auto;
+        gap: var(--space-4) var(--space-6);
+      }
+
+      .da-comparison-column {
+        display: grid;
+        grid-template-rows: subgrid;
+        grid-row: span 3;
+        gap: var(--space-4);
+      }
+
+      .da-comparison-header {
+        display: flex;
+        align-items: center;
+        gap: var(--space-3);
+        padding: var(--space-4) var(--space-6);
+        border-radius: var(--radius-lg);
+        font-size: 1.125rem;
+        font-weight: 700;
+      }
+
+      .da-comparison-header-props {
+        background: linear-gradient(135deg, rgba(6, 182, 212, 0.1), rgba(6, 182, 212, 0.02));
+        border: 1px solid rgba(6, 182, 212, 0.2);
+        color: var(--wc-cyan);
+      }
+
+      .da-comparison-header-slots {
+        background: linear-gradient(135deg, rgba(236, 72, 153, 0.1), rgba(236, 72, 153, 0.02));
+        border: 1px solid rgba(236, 72, 153, 0.2);
+        color: var(--wc-pink);
+      }
+
+      .da-comparison-header i {
+        font-size: 1.25rem;
+      }
+
+      .da-code-block {
+        position: relative;
+        background: #0a0e18;
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        border-radius: var(--radius-lg);
+        overflow: hidden;
+      }
+
+      .da-code-titlebar {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        padding: 10px 16px;
+        background: rgba(0, 0, 0, 0.3);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      }
+
+      .da-code-dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+      }
+
+      .da-code-dot:nth-child(1) { background: #ff5f57; }
+      .da-code-dot:nth-child(2) { background: #ffbd2e; }
+      .da-code-dot:nth-child(3) { background: #28c840; }
+
+      .da-code-filename {
+        margin-left: auto;
+        font-size: 0.75rem;
+        color: rgba(255, 255, 255, 0.4);
+        font-family: var(--font-mono);
+      }
+
+      .da-code-body {
+        padding: var(--space-4) var(--space-5);
+        overflow-x: auto;
+      }
+
+      .da-code-body pre {
+        margin: 0;
+        font-size: 0.8125rem;
+        line-height: 1.7;
+        color: #d6deeb;
+        white-space: pre;
+      }
+
+      .da-code-body .kw { color: #c792ea; }
+      .da-code-body .tag { color: #7fdbca; }
+      .da-code-body .attr { color: #addb67; }
+      .da-code-body .val { color: #ecc48d; }
+      .da-code-body .str { color: #c3e88d; }
+      .da-code-body .cmt { color: #637777; font-style: italic; }
+      .da-code-body .var { color: #82aaff; }
+      .da-code-body .fn { color: #82aaff; }
+      .da-code-body .slot-hl { color: #ff79c6; font-weight: 600; }
+      .da-code-body .prop-hl { color: #06b6d4; font-weight: 600; }
+
+      .da-code-label {
+        display: inline-block;
+        padding: var(--space-1) var(--space-3);
+        border-radius: var(--radius-sm);
+        font-size: 0.6875rem;
+        font-weight: 600;
+        font-family: var(--font-mono);
+        margin-bottom: var(--space-3);
+      }
+
+      .da-code-label-twig {
+        background: rgba(245, 158, 11, 0.12);
+        color: var(--wc-amber);
+        border: 1px solid rgba(245, 158, 11, 0.2);
+      }
+
+      .da-code-label-sb {
+        background: rgba(236, 72, 153, 0.12);
+        color: var(--wc-pink);
+        border: 1px solid rgba(236, 72, 153, 0.2);
+      }
+
+      .da-code-label-html {
+        background: rgba(6, 182, 212, 0.12);
+        color: var(--wc-cyan);
+        border: 1px solid rgba(6, 182, 212, 0.2);
+      }
+
+      /* ============================================
+         SECTION 4: DECISION MATRIX
+         ============================================ */
+      .da-matrix-section {
+        background: var(--surface-0);
+        border-top: 1px solid var(--surface-3);
+      }
+
+      .da-matrix {
+        border-radius: var(--radius-xl);
+        overflow: hidden;
+        border: 1px solid var(--surface-3);
+        background: var(--surface-1);
+      }
+
+      .da-matrix-header {
+        display: grid;
+        grid-template-columns: 1.5fr 1fr 1fr 1fr;
+        background: var(--surface-2);
+        border-bottom: 1px solid var(--surface-3);
+      }
+
+      .da-matrix-header-cell {
+        padding: var(--space-4) var(--space-5);
+        font-size: 0.8125rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: var(--text-muted);
+      }
+
+      .da-matrix-header-cell.header-props {
+        color: var(--wc-cyan);
+      }
+
+      .da-matrix-header-cell.header-slots {
+        color: var(--wc-pink);
+      }
+
+      .da-matrix-header-cell.header-hybrid {
+        color: var(--wc-green);
+      }
+
+      .da-matrix-row {
+        display: grid;
+        grid-template-columns: 1.5fr 1fr 1fr 1fr;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+        transition: background 0.2s ease;
+      }
+
+      .da-matrix-row:last-child {
+        border-bottom: none;
+      }
+
+      .da-matrix-row:hover {
+        background: rgba(102, 126, 234, 0.03);
+      }
+
+      .da-matrix-cell {
+        padding: var(--space-4) var(--space-5);
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-1);
+      }
+
+      .da-matrix-module {
+        display: flex;
+        align-items: center;
+        gap: var(--space-3);
+        font-weight: 600;
+        color: var(--text-primary);
+        font-size: 0.9375rem;
+      }
+
+      .da-matrix-module i {
+        font-size: 1.125rem;
+        color: var(--text-muted);
+        width: 24px;
+        text-align: center;
+      }
+
+      .da-matrix-rating {
+        display: flex;
+        align-items: center;
+        gap: var(--space-2);
+        font-size: 0.8125rem;
+        line-height: 1.4;
+      }
+
+      .da-matrix-rating i {
+        font-size: 1rem;
+        flex-shrink: 0;
+      }
+
+      .da-matrix-rating-great i { color: var(--wc-green); }
+      .da-matrix-rating-great { color: var(--text-secondary); }
+
+      .da-matrix-rating-ok i { color: var(--wc-amber); }
+      .da-matrix-rating-ok { color: var(--text-secondary); }
+
+      .da-matrix-rating-bad i { color: var(--wc-red); }
+      .da-matrix-rating-bad { color: var(--text-muted); }
+
+      /* ============================================
+         SECTION 5: COMPONENT STRATEGY MAP
+         ============================================ */
+      .da-strategy-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: var(--space-6);
+      }
+
+      .da-strategy-card {
+        text-align: center;
+      }
+
+      .da-strategy-card-inner {
+        padding: var(--space-8) var(--space-6);
+        border-radius: var(--radius-2xl);
+        background: var(--surface-1);
+        border: 1px solid var(--surface-3);
+        transition: all 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+        position: relative;
+        overflow: hidden;
+        height: 100%;
+      }
+
+      .da-strategy-card-inner::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        border-radius: inherit;
+        padding: 1.5px;
+        background: conic-gradient(from var(--gradient-angle), #667eea, #764ba2, #f093fb, #06b6d4, #667eea);
+        -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+        -webkit-mask-composite: xor;
+        mask-composite: exclude;
+        opacity: 0;
+        transition: opacity 0.5s ease;
+        pointer-events: none;
+        animation: border-rotate 4s linear infinite;
+      }
+
+      .da-strategy-card-inner::after {
+        content: '';
+        position: absolute;
+        width: 250px;
+        height: 250px;
+        border-radius: 50%;
+        background: radial-gradient(circle, rgba(102, 126, 234, 0.1), transparent 70%);
+        opacity: 0;
+        transition: opacity 0.5s ease;
+        pointer-events: none;
+        top: var(--mouse-y, 50%);
+        left: var(--mouse-x, 50%);
+        transform: translate(-50%, -50%);
+      }
+
+      .da-strategy-card-inner:hover::before { opacity: 1; }
+      .da-strategy-card-inner:hover::after { opacity: 1; }
+      .da-strategy-card-inner:hover {
+        transform: translateY(-6px);
+        box-shadow: var(--shadow-xl), var(--glow-subtle);
+        background: var(--surface-2);
+      }
+
+      .da-strategy-icon {
+        width: 80px;
+        height: 80px;
+        border-radius: var(--radius-2xl);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto var(--space-5);
+        font-size: 2rem;
+        position: relative;
+        z-index: 1;
+      }
+
+      .da-strategy-icon-atoms {
+        background: linear-gradient(135deg, rgba(6, 182, 212, 0.15), rgba(6, 182, 212, 0.05));
+        border: 1px solid rgba(6, 182, 212, 0.2);
+        color: var(--wc-cyan);
+      }
+
+      .da-strategy-icon-organisms {
+        background: linear-gradient(135deg, rgba(236, 72, 153, 0.15), rgba(236, 72, 153, 0.05));
+        border: 1px solid rgba(236, 72, 153, 0.2);
+        color: var(--wc-pink);
+      }
+
+      .da-strategy-icon-forms {
+        background: linear-gradient(135deg, rgba(16, 185, 129, 0.15), rgba(16, 185, 129, 0.05));
+        border: 1px solid rgba(16, 185, 129, 0.2);
+        color: var(--wc-green);
+      }
+
+      .da-strategy-title {
+        font-size: 1.25rem;
+        font-weight: 700;
+        margin-bottom: var(--space-2);
+        color: var(--text-primary);
+        position: relative;
+        z-index: 1;
+      }
+
+      .da-strategy-approach {
+        display: inline-block;
+        padding: var(--space-1) var(--space-3);
+        border-radius: var(--radius-full);
+        font-size: 0.75rem;
+        font-weight: 600;
+        margin-bottom: var(--space-4);
+        position: relative;
+        z-index: 1;
+      }
+
+      .da-strategy-approach-props {
+        background: rgba(6, 182, 212, 0.12);
+        color: var(--wc-cyan);
+        border: 1px solid rgba(6, 182, 212, 0.2);
+      }
+
+      .da-strategy-approach-slots {
+        background: rgba(236, 72, 153, 0.12);
+        color: var(--wc-pink);
+        border: 1px solid rgba(236, 72, 153, 0.2);
+      }
+
+      .da-strategy-approach-hybrid {
+        background: rgba(16, 185, 129, 0.12);
+        color: var(--wc-green);
+        border: 1px solid rgba(16, 185, 129, 0.2);
+      }
+
+      .da-strategy-desc {
+        font-size: 0.9375rem;
+        color: var(--text-secondary);
+        line-height: 1.7;
+        margin-bottom: var(--space-5);
+        position: relative;
+        z-index: 1;
+      }
+
+      .da-strategy-items {
+        list-style: none;
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--space-2);
+        justify-content: center;
+        position: relative;
+        z-index: 1;
+      }
+
+      .da-strategy-item {
+        display: inline-flex;
+        align-items: center;
+        gap: var(--space-2);
+        padding: var(--space-1) var(--space-3);
+        border-radius: var(--radius-full);
+        font-size: 0.75rem;
+        font-weight: 500;
+        background: var(--glass-bg-strong);
+        border: 1px solid var(--glass-border);
+        color: var(--text-secondary);
+      }
+
+      .da-strategy-item i {
+        font-size: 0.875rem;
+        color: var(--text-muted);
+      }
+
+      /* --- Flow arrows between strategy cards --- */
+      .da-strategy-flow {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: var(--space-4);
+        margin-top: var(--space-8);
+        color: var(--text-muted);
+        font-size: 0.875rem;
+        font-weight: 500;
+      }
+
+      .da-strategy-flow-line {
+        height: 1px;
+        flex: 1;
+        max-width: 100px;
+        background: linear-gradient(90deg, var(--wc-cyan), var(--wc-green), var(--wc-pink));
+        opacity: 0.4;
+      }
+
+      /* ============================================
+         SECTION 6: THE RECOMMENDATION
+         ============================================ */
+      .da-rec-section {
+        background: var(--surface-0);
+        border-top: 1px solid var(--surface-3);
+      }
+
+      .da-rec-hero {
+        text-align: center;
+        padding: var(--space-12) var(--space-8);
+        border-radius: var(--radius-2xl);
+        background: linear-gradient(135deg, rgba(16, 185, 129, 0.08), rgba(6, 182, 212, 0.06), rgba(102, 126, 234, 0.06));
+        border: 1px solid rgba(16, 185, 129, 0.15);
+        margin-bottom: var(--space-12);
+        position: relative;
+        overflow: hidden;
+      }
+
+      .da-rec-hero::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(ellipse at 50% 0%, rgba(16, 185, 129, 0.1), transparent 60%);
+        pointer-events: none;
+      }
+
+      .da-rec-title {
+        font-size: clamp(1.75rem, 4vw, 2.75rem);
+        font-weight: 900;
+        letter-spacing: -0.03em;
+        margin-bottom: var(--space-4);
+        background: var(--gradient-green-cyan);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        position: relative;
+        z-index: 1;
+      }
+
+      .da-rec-subtitle {
+        font-size: clamp(1rem, 1.5vw, 1.25rem);
+        color: var(--text-secondary);
+        max-width: 600px;
+        margin: 0 auto;
+        line-height: 1.7;
+        position: relative;
+        z-index: 1;
+      }
+
+      .da-rec-principles {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: var(--space-6);
+      }
+
+      .da-rec-principle {
+        padding: var(--space-6);
+        border-radius: var(--radius-xl);
+        background: var(--surface-1);
+        border: 1px solid var(--surface-3);
+        transition: all 0.3s ease;
+      }
+
+      .da-rec-principle:hover {
+        background: var(--surface-2);
+        border-color: rgba(16, 185, 129, 0.2);
+        transform: translateY(-3px);
+      }
+
+      .da-rec-principle-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: var(--radius-lg);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.25rem;
+        margin-bottom: var(--space-4);
+        background: linear-gradient(135deg, rgba(16, 185, 129, 0.12), rgba(6, 182, 212, 0.08));
+        border: 1px solid rgba(16, 185, 129, 0.15);
+        color: var(--wc-green);
+      }
+
+      .da-rec-principle-title {
+        font-size: 1rem;
+        font-weight: 700;
+        margin-bottom: var(--space-2);
+        color: var(--text-primary);
+      }
+
+      .da-rec-principle-desc {
+        font-size: 0.875rem;
+        color: var(--text-secondary);
+        line-height: 1.65;
+      }
+
+      /* ============================================
+         SECTION 7: COMPONENT LOADING STRATEGIES
+         ============================================ */
+      .da-loading-section {
+        background: var(--surface-0);
+        border-top: 1px solid var(--surface-3);
+      }
+
+      /* --- Strategy comparison cards --- */
+      .da-loading-strategies {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: var(--space-6);
+        margin-bottom: var(--space-16);
+      }
+
+      .da-loading-card {
+        padding: var(--space-8) var(--space-6);
+        border-radius: var(--radius-2xl);
+        background: var(--surface-1);
+        border: 1px solid var(--surface-3);
+        transition: all 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+        position: relative;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .da-loading-card:hover {
+        transform: translateY(-4px);
+        box-shadow: var(--shadow-xl), var(--glow-subtle);
+        background: var(--surface-2);
+      }
+
+      .da-loading-card-recommended {
+        border-color: rgba(16, 185, 129, 0.3);
+      }
+
+      .da-loading-card-recommended::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        border-radius: inherit;
+        background: radial-gradient(ellipse at 50% 0%, rgba(16, 185, 129, 0.06), transparent 60%);
+        pointer-events: none;
+      }
+
+      .da-loading-badge {
+        position: absolute;
+        top: var(--space-4);
+        right: var(--space-4);
+        padding: var(--space-1) var(--space-3);
+        border-radius: var(--radius-full);
+        font-size: 0.6875rem;
+        font-weight: 700;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        background: rgba(16, 185, 129, 0.15);
+        color: var(--wc-green);
+        border: 1px solid rgba(16, 185, 129, 0.25);
+      }
+
+      .da-loading-icon {
+        width: 64px;
+        height: 64px;
+        border-radius: var(--radius-xl);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: var(--space-5);
+        font-size: 1.5rem;
+      }
+
+      .da-loading-icon-single {
+        background: linear-gradient(135deg, rgba(245, 158, 11, 0.15), rgba(245, 158, 11, 0.05));
+        border: 1px solid rgba(245, 158, 11, 0.2);
+        color: var(--wc-amber);
+      }
+
+      .da-loading-icon-per {
+        background: linear-gradient(135deg, rgba(6, 182, 212, 0.15), rgba(6, 182, 212, 0.05));
+        border: 1px solid rgba(6, 182, 212, 0.2);
+        color: var(--wc-cyan);
+      }
+
+      .da-loading-icon-hybrid {
+        background: linear-gradient(135deg, rgba(16, 185, 129, 0.15), rgba(16, 185, 129, 0.05));
+        border: 1px solid rgba(16, 185, 129, 0.2);
+        color: var(--wc-green);
+      }
+
+      .da-loading-card-title {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin-bottom: var(--space-1);
+      }
+
+      .da-loading-card-subtitle {
+        font-size: 0.875rem;
+        color: var(--text-muted);
+        font-weight: 500;
+        margin-bottom: var(--space-5);
+      }
+
+      /* Visual loading pattern representations */
+      .da-loading-visual {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: var(--space-2);
+        padding: var(--space-5) var(--space-4);
+        border-radius: var(--radius-lg);
+        background: rgba(0, 0, 0, 0.2);
+        margin-bottom: var(--space-5);
+        min-height: 80px;
+        flex-wrap: wrap;
+      }
+
+      .da-loading-block {
+        border-radius: var(--radius-sm);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.625rem;
+        font-weight: 700;
+        font-family: var(--font-mono);
+        letter-spacing: 0.02em;
+        color: rgba(255, 255, 255, 0.8);
+        transition: transform 0.3s ease;
+      }
+
+      .da-loading-block-single {
+        width: 100%;
+        height: 48px;
+        background: linear-gradient(135deg, rgba(245, 158, 11, 0.3), rgba(245, 158, 11, 0.15));
+        border: 1px solid rgba(245, 158, 11, 0.3);
+      }
+
+      .da-loading-block-per {
+        width: 44px;
+        height: 44px;
+        background: linear-gradient(135deg, rgba(6, 182, 212, 0.3), rgba(6, 182, 212, 0.15));
+        border: 1px solid rgba(6, 182, 212, 0.3);
+        font-size: 0.5rem;
+      }
+
+      .da-loading-block-group {
+        padding: var(--space-2) var(--space-3);
+        height: 40px;
+        background: linear-gradient(135deg, rgba(16, 185, 129, 0.3), rgba(16, 185, 129, 0.15));
+        border: 1px solid rgba(16, 185, 129, 0.3);
+        font-size: 0.5625rem;
+      }
+
+      .da-loading-card:hover .da-loading-block {
+        transform: scale(1.05);
+      }
+
+      .da-loading-size {
+        display: inline-flex;
+        align-items: center;
+        gap: var(--space-2);
+        padding: var(--space-2) var(--space-4);
+        border-radius: var(--radius-full);
+        font-size: 0.8125rem;
+        font-weight: 700;
+        font-family: var(--font-mono);
+        margin-bottom: var(--space-5);
+      }
+
+      .da-loading-size-amber {
+        background: rgba(245, 158, 11, 0.1);
+        color: var(--wc-amber);
+        border: 1px solid rgba(245, 158, 11, 0.2);
+      }
+
+      .da-loading-size-cyan {
+        background: rgba(6, 182, 212, 0.1);
+        color: var(--wc-cyan);
+        border: 1px solid rgba(6, 182, 212, 0.2);
+      }
+
+      .da-loading-size-green {
+        background: rgba(16, 185, 129, 0.1);
+        color: var(--wc-green);
+        border: 1px solid rgba(16, 185, 129, 0.2);
+      }
+
+      /* Performance rating indicators */
+      .da-loading-ratings {
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-3);
+        margin-bottom: var(--space-5);
+        flex: 1;
+      }
+
+      .da-loading-rating {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        font-size: 0.8125rem;
+        color: var(--text-secondary);
+      }
+
+      .da-loading-rating-label {
+        display: flex;
+        align-items: center;
+        gap: var(--space-2);
+      }
+
+      .da-loading-rating-label i {
+        font-size: 0.75rem;
+        color: var(--text-muted);
+        width: 16px;
+        text-align: center;
+      }
+
+      .da-loading-rating-dots {
+        display: flex;
+        gap: 4px;
+      }
+
+      .da-loading-rating-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--surface-3);
+        transition: background 0.3s ease;
+      }
+
+      .da-loading-rating-dot.filled-green { background: var(--wc-green); }
+      .da-loading-rating-dot.filled-amber { background: var(--wc-amber); }
+      .da-loading-rating-dot.filled-red { background: var(--wc-red); }
+      .da-loading-rating-dot.filled-cyan { background: var(--wc-cyan); }
+
+      /* Code snippet inside card */
+      .da-loading-code {
+        margin-top: auto;
+      }
+
+      .da-loading-code .da-code-block {
+        font-size: 0.75rem;
+      }
+
+      .da-loading-code .da-code-body {
+        padding: var(--space-3) var(--space-4);
+      }
+
+      .da-loading-code .da-code-body pre {
+        font-size: 0.7rem;
+        line-height: 1.55;
+      }
+
+      /* --- Performance comparison bars --- */
+      .da-perf-comparison {
+        margin-bottom: var(--space-16);
+      }
+
+      .da-perf-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: var(--space-6);
+      }
+
+      .da-perf-metric {
+        padding: var(--space-6);
+        border-radius: var(--radius-xl);
+        background: var(--surface-1);
+        border: 1px solid var(--surface-3);
+      }
+
+      .da-perf-metric-header {
+        display: flex;
+        align-items: center;
+        gap: var(--space-3);
+        margin-bottom: var(--space-5);
+      }
+
+      .da-perf-metric-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: var(--radius-md);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1rem;
+        background: linear-gradient(135deg, rgba(102, 126, 234, 0.12), rgba(118, 75, 162, 0.08));
+        border: 1px solid rgba(102, 126, 234, 0.15);
+        color: var(--wc-accent);
+      }
+
+      .da-perf-metric-title {
+        font-size: 1rem;
+        font-weight: 700;
+        color: var(--text-primary);
+      }
+
+      .da-perf-metric-desc {
+        font-size: 0.8125rem;
+        color: var(--text-muted);
+        font-weight: 400;
+      }
+
+      .da-perf-bars {
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-3);
+      }
+
+      .da-perf-bar-row {
+        display: grid;
+        grid-template-columns: 140px 1fr 60px;
+        align-items: center;
+        gap: var(--space-4);
+      }
+
+      .da-perf-bar-label {
+        font-size: 0.8125rem;
+        font-weight: 600;
+        color: var(--text-secondary);
+        text-align: right;
+      }
+
+      .da-perf-bar-track {
+        height: 28px;
+        background: rgba(255, 255, 255, 0.03);
+        border-radius: var(--radius-full);
+        overflow: hidden;
+        position: relative;
+      }
+
+      .da-perf-bar-fill {
+        height: 100%;
+        border-radius: var(--radius-full);
+        transition: width 1.2s cubic-bezier(0.22, 1, 0.36, 1);
+        display: flex;
+        align-items: center;
+        padding-left: var(--space-3);
+        font-size: 0.6875rem;
+        font-weight: 700;
+        font-family: var(--font-mono);
+        color: rgba(255, 255, 255, 0.9);
+        width: 0;
+      }
+
+      .da-perf-bar-fill.is-visible {
+        width: var(--bar-width);
+      }
+
+      .da-perf-bar-fill-amber {
+        background: linear-gradient(90deg, rgba(245, 158, 11, 0.4), rgba(245, 158, 11, 0.25));
+        border: 1px solid rgba(245, 158, 11, 0.3);
+      }
+
+      .da-perf-bar-fill-cyan {
+        background: linear-gradient(90deg, rgba(6, 182, 212, 0.4), rgba(6, 182, 212, 0.25));
+        border: 1px solid rgba(6, 182, 212, 0.3);
+      }
+
+      .da-perf-bar-fill-green {
+        background: linear-gradient(90deg, rgba(16, 185, 129, 0.4), rgba(16, 185, 129, 0.25));
+        border: 1px solid rgba(16, 185, 129, 0.3);
+      }
+
+      .da-perf-bar-value {
+        font-size: 0.8125rem;
+        font-weight: 700;
+        font-family: var(--font-mono);
+        color: var(--text-secondary);
+        text-align: right;
+      }
+
+      /* --- Integration flow diagram --- */
+      .da-flow-section {
+        margin-bottom: var(--space-16);
+      }
+
+      .da-flow-subtitle {
+        font-size: 1.125rem;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin-bottom: var(--space-2);
+        text-align: center;
+      }
+
+      .da-flow-desc {
+        font-size: 0.9375rem;
+        color: var(--text-secondary);
+        text-align: center;
+        max-width: 600px;
+        margin: 0 auto var(--space-8);
+        line-height: 1.7;
+      }
+
+      .da-flow-steps {
+        display: flex;
+        align-items: center;
+        gap: 0;
+        max-width: 1200px;
+        margin: 0 auto;
+      }
+
+      .da-flow-step {
+        flex: 1;
+        padding: var(--space-6) var(--space-4);
+        background: var(--surface-1);
+        border: 1px solid var(--surface-3);
+        border-radius: var(--radius-xl);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        transition: all 0.3s ease;
+      }
+
+      .da-flow-step:hover {
+        background: var(--surface-2);
+        border-color: rgba(255, 255, 255, 0.1);
+        transform: translateY(-2px);
+      }
+
+      .da-flow-step-header {
+        display: flex;
+        align-items: center;
+        gap: var(--space-3);
+        margin-bottom: var(--space-4);
+      }
+
+      .da-flow-step-number {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1rem;
+        font-weight: 800;
+        background: linear-gradient(135deg, rgba(6, 182, 212, 0.15), rgba(102, 126, 234, 0.1));
+        border: 1px solid rgba(6, 182, 212, 0.25);
+        color: var(--wc-cyan);
+        flex-shrink: 0;
+      }
+
+      .da-flow-step-icon {
+        font-size: 1.75rem;
+        color: var(--text-secondary);
+      }
+
+      .da-flow-arrow {
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 2rem;
+        font-size: 0.875rem;
+        color: var(--text-muted);
+        opacity: 0.4;
+      }
+
+      .da-flow-step-title {
+        font-size: 0.9375rem;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin-bottom: var(--space-2);
+      }
+
+      .da-flow-step-desc {
+        font-size: 0.75rem;
+        color: var(--text-muted);
+        line-height: 1.5;
+      }
+
+      .da-flow-step-code {
+        margin-top: var(--space-3);
+        padding: var(--space-2) var(--space-3);
+        border-radius: var(--radius-sm);
+        background: rgba(0, 0, 0, 0.3);
+        font-family: var(--font-mono);
+        font-size: 0.6875rem;
+        color: var(--wc-cyan);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 100%;
+      }
+
+      /* --- Loading strategy code examples --- */
+      .da-loading-examples {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: var(--space-6);
+      }
+
+      .da-loading-example-label {
+        font-size: 0.875rem;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin-bottom: var(--space-3);
+        display: flex;
+        align-items: center;
+        gap: var(--space-2);
+      }
+
+      .da-loading-example-label i {
+        color: var(--text-muted);
+      }
+
+      /* --- Responsive for loading section --- */
+      @media (max-width: 1100px) {
+        .da-loading-strategies {
+          grid-template-columns: 1fr;
+          max-width: 500px;
+          margin-left: auto;
+          margin-right: auto;
+        }
+
+        .da-loading-examples {
+          grid-template-columns: 1fr;
+        }
+
+        .da-flow-steps {
+          flex-direction: column;
+          gap: 0;
+        }
+
+        .da-flow-arrow {
+          transform: rotate(90deg);
+          width: auto;
+          height: 1.5rem;
+        }
+
+        .da-perf-bar-row {
+          grid-template-columns: 100px 1fr 50px;
+        }
+      }
+
+      @media (max-width: 768px) {
+        .da-loading-strategies {
+          max-width: none;
+        }
+
+        .da-perf-bar-row {
+          grid-template-columns: 1fr;
+          gap: var(--space-2);
+        }
+
+        .da-perf-bar-label {
+          text-align: left;
+        }
+      }
+
+      /* ============================================
+         SECTION 8: CODE EXAMPLES
+         ============================================ */
+      .da-examples-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        grid-template-rows: auto auto 1fr;
+        gap: var(--space-4) var(--space-6);
+      }
+
+      .da-example {
+        display: grid;
+        grid-template-rows: subgrid;
+        grid-row: span 3;
+        gap: var(--space-4);
+      }
+
+      .da-example-title {
+        display: flex;
+        align-items: center;
+        gap: var(--space-3);
+        font-size: 1rem;
+        font-weight: 700;
+        color: var(--text-primary);
+      }
+
+      .da-example-title i {
+        font-size: 1.25rem;
+      }
+
+      .da-example-desc {
+        font-size: 0.875rem;
+        color: var(--text-secondary);
+        line-height: 1.6;
+      }
+
+      /* ============================================
+         FOOTER CTA
+         ============================================ */
+      .da-footer-cta {
+        text-align: center;
+        padding: var(--space-24) var(--space-8);
+        background: var(--surface-0);
+        border-top: 1px solid var(--surface-3);
+      }
+
+      .da-footer-cta-inner {
+        max-width: 700px;
+        margin: 0 auto;
+      }
+
+      .da-footer-cta h2 {
+        font-size: clamp(1.75rem, 4vw, 2.5rem);
+        font-weight: 800;
+        letter-spacing: -0.03em;
+        margin-bottom: var(--space-4);
+        color: var(--text-primary);
+      }
+
+      .da-footer-cta p {
+        font-size: 1.0625rem;
+        color: var(--text-secondary);
+        margin-bottom: var(--space-8);
+        line-height: 1.7;
+      }
+
+      .da-footer-cta-buttons {
+        display: flex;
+        gap: var(--space-4);
+        justify-content: center;
+        flex-wrap: wrap;
+      }
+
+      /* --- Buttons (mirrored from custom.css) --- */
+      .da-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: var(--space-2);
+        padding: var(--space-4) var(--space-8);
+        font-size: 1rem;
+        font-weight: 600;
+        text-decoration: none;
+        border-radius: var(--radius-lg);
+        transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+        cursor: pointer;
+        border: none;
+        white-space: nowrap;
+        min-height: 48px;
+        line-height: 1;
+      }
+
+      .da-btn-primary {
+        background: white;
+        color: #1a1040;
+        box-shadow: var(--shadow-md);
+      }
+
+      .da-btn-primary:hover {
+        transform: translateY(-3px);
+        box-shadow: var(--shadow-xl), 0 0 40px rgba(255,255,255,0.15);
+        color: #1a1040;
+      }
+
+      .da-btn-secondary {
+        background: rgba(255, 255, 255, 0.05);
+        color: white;
+        border: 1.5px solid rgba(255, 255, 255, 0.15);
+        backdrop-filter: blur(10px);
+      }
+
+      .da-btn-secondary:hover {
+        background: rgba(255, 255, 255, 0.1);
+        border-color: rgba(255, 255, 255, 0.3);
+        transform: translateY(-3px);
+        color: white;
+      }
+
+      .da-btn-solid {
+        background: var(--gradient-primary);
+        color: white;
+        box-shadow: var(--shadow-md);
+      }
+
+      .da-btn-solid:hover {
+        transform: translateY(-3px);
+        box-shadow: var(--shadow-xl), var(--glow-primary);
+        color: white;
+      }
+
+      .da-btn-ghost {
+        background: transparent;
+        color: var(--text-secondary);
+        border: 1.5px solid var(--surface-3);
+      }
+
+      .da-btn-ghost:hover {
+        background: var(--glass-bg-strong);
+        border-color: var(--glass-border-strong);
+        color: var(--text-primary);
+        transform: translateY(-2px);
+      }
+
+      .da-btn-arrow {
+        transition: transform 0.3s ease;
+        display: inline-block;
+      }
+
+      .da-btn:hover .da-btn-arrow {
+        transform: translateX(4px);
+      }
+
+      /* ============================================
+         RESPONSIVE
+         ============================================ */
+      @media (max-width: 1100px) {
+        .da-comparison-grid {
+          grid-template-columns: 1fr;
+          gap: var(--space-8);
+        }
+
+        .da-examples-grid {
+          grid-template-columns: 1fr;
+          gap: var(--space-8);
+        }
+
+        .da-rec-principles {
+          grid-template-columns: 1fr 1fr;
+        }
+      }
+
+      @media (max-width: 768px) {
+        .da-topbar {
+          padding: var(--space-3) var(--space-4);
+        }
+
+        .da-topbar-title {
+          display: none;
+        }
+
+        .da-hero {
+          min-height: auto;
+          padding: calc(var(--space-24) + var(--space-8)) var(--space-4) var(--space-16);
+        }
+
+        .da-hero-scroll {
+          display: none;
+        }
+
+        .da-section-inner {
+          padding: var(--space-16) var(--space-4);
+        }
+
+        .da-section-header {
+          margin-bottom: var(--space-10);
+        }
+
+        .da-spectrum-labels {
+          flex-direction: column;
+          align-items: center;
+        }
+
+        .da-spectrum-label {
+          max-width: none;
+        }
+
+        .da-comparison-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .da-matrix-header,
+        .da-matrix-row {
+          grid-template-columns: 1fr;
+        }
+
+        .da-matrix-header-cell:not(:first-child) {
+          display: none;
+        }
+
+        .da-matrix-cell {
+          padding: var(--space-3) var(--space-5);
+        }
+
+        .da-matrix-cell::before {
+          font-size: 0.6875rem;
+          font-weight: 600;
+          text-transform: uppercase;
+          letter-spacing: 0.06em;
+          margin-bottom: var(--space-1);
+          display: block;
+        }
+
+        .da-matrix-cell:nth-child(2)::before { content: 'Property-Driven:'; color: var(--wc-cyan); }
+        .da-matrix-cell:nth-child(3)::before { content: 'Slot-Driven:'; color: var(--wc-pink); }
+        .da-matrix-cell:nth-child(4)::before { content: 'Hybrid:'; color: var(--wc-green); }
+
+        .da-strategy-grid {
+          grid-template-columns: 1fr;
+          gap: var(--space-4);
+        }
+
+        .da-rec-principles {
+          grid-template-columns: 1fr;
+        }
+
+        .da-examples-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .da-footer-cta-buttons {
+          flex-direction: column;
+          align-items: stretch;
+        }
+
+        .da-btn {
+          width: 100%;
+          justify-content: center;
+        }
+      }
+
+      @media (max-width: 480px) {
+        .da-hero-title {
+          font-size: clamp(2rem, 10vw, 3rem);
+        }
+
+        .da-topbar-right {
+          display: none;
+        }
+      }
+
+      /* --- Reduced Motion --- */
+      @media (prefers-reduced-motion: reduce) {
+        *,
+        *::before,
+        *::after {
+          animation-duration: 0.01ms !important;
+          animation-iteration-count: 1 !important;
+          transition-duration: 0.01ms !important;
+          scroll-behavior: auto !important;
+        }
+
+        .scroll-reveal {
+          opacity: 1;
+          transform: none;
+          filter: none;
+          transition: none;
+        }
+
+        .da-hero-orb {
+          animation: none !important;
+          opacity: 0.15;
+        }
+      }
+
+      /* --- Focus States --- */
+      .da-btn:focus-visible,
+      .da-back-link:focus-visible,
+      .da-topbar-link:focus-visible,
+      .da-strategy-card-inner:focus-visible {
+        outline: 3px solid var(--wc-accent);
+        outline-offset: 3px;
+      }
+
+      /* ==========================================
+         STICKY TAB NAV (2-tab content switcher)
+         ========================================== */
+      .da-section-nav {
+        position: sticky;
+        top: 3.9rem;
+        z-index: 90;
+        background: rgba(10, 10, 20, 0.92);
+        backdrop-filter: blur(20px) saturate(180%);
+        -webkit-backdrop-filter: blur(20px) saturate(180%);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      }
+
+      .da-section-nav-inner {
+        display: flex;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0.5rem;
+        gap: 0.5rem;
+      }
+
+      .da-nav-tab {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.25rem;
+        padding: 0.75rem 1.5rem;
+        border-radius: 0.75rem;
+        border: 1px solid transparent;
+        background: transparent;
+        color: rgba(255, 255, 255, 0.45);
+        cursor: pointer;
+        transition: all 0.25s ease;
+        font-family: var(--font-heading);
+      }
+
+      .da-nav-tab i {
+        font-size: 1.25rem;
+        opacity: 0.5;
+        transition: all 0.25s ease;
+      }
+
+      .da-nav-tab-label {
+        font-size: 0.9375rem;
+        font-weight: 700;
+        letter-spacing: -0.01em;
+      }
+
+      .da-nav-tab-subtitle {
+        font-size: 0.6875rem;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        opacity: 0.5;
+      }
+
+      .da-nav-tab:hover {
+        color: rgba(255, 255, 255, 0.8);
+        background: rgba(255, 255, 255, 0.04);
+      }
+
+      .da-nav-tab:hover i {
+        opacity: 0.9;
+      }
+
+      .da-nav-tab.is-active {
+        color: white;
+        background: rgba(102, 126, 234, 0.1);
+        border-color: rgba(102, 126, 234, 0.25);
+        box-shadow: 0 0 20px rgba(102, 126, 234, 0.08);
+      }
+
+      .da-nav-tab.is-active i {
+        opacity: 1;
+        color: var(--wc-accent);
+      }
+
+      .da-nav-tab.is-active .da-nav-tab-subtitle {
+        opacity: 0.8;
+      }
+
+      .da-nav-tab:focus-visible {
+        outline: 2px solid var(--wc-accent);
+        outline-offset: 2px;
+      }
+
+      /* Tab content panels */
+      .da-tab-content {
+        display: none;
+      }
+
+      .da-tab-content.is-active {
+        display: block;
+      }
+
+      /* Loading hero color variant */
+      .da-hero-loading .da-hero-title {
+        background: linear-gradient(180deg, rgba(6, 182, 212, 1) 0%, rgba(16, 185, 129, 0.7) 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+
+      .da-hero-loading .da-hero-subtitle {
+        background: linear-gradient(90deg, rgba(6, 182, 212, 0.9), rgba(16, 185, 129, 0.9));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+
+      .da-hero-loading .da-hero-badge-dot {
+        background: var(--wc-cyan);
+        box-shadow: 0 0 8px var(--wc-cyan);
+      }
+
+      .da-hero-loading .da-hero-orb-1 {
+        background: radial-gradient(circle, rgba(6, 182, 212, 0.3), transparent 70%);
+      }
+
+      .da-hero-loading .da-hero-orb-2 {
+        background: radial-gradient(circle, rgba(16, 185, 129, 0.25), transparent 70%);
+      }
+
+      @media (max-width: 768px) {
+        .da-nav-tab {
+          padding: 0.625rem 1rem;
+        }
+        .da-nav-tab-label {
+          font-size: 0.8125rem;
+        }
+        .da-nav-tab-subtitle {
+          font-size: 0.625rem;
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        .da-nav-tab {
+          transition: none;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <!-- Top Navigation Bar -->
+    <nav class="da-topbar" aria-label="Page navigation">
+      <div class="da-topbar-left">
+        <a href="/" class="da-back-link" aria-label="Back to WC-2026 Dashboard">
+          <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
+          Dashboard
+        </a>
+        <span class="da-topbar-title" aria-hidden="true">|</span>
+        <span class="da-topbar-title">Drupal Architecture</span>
+      </div>
+      <div class="da-topbar-right">
+        <a href="/drupal-integration/overview/" class="da-topbar-link">
+          <i class="fa-solid fa-book" aria-hidden="true"></i>
+          Full Docs
+        </a>
+        <a href="/drupal-integration/twig/" class="da-topbar-link">
+          <i class="fa-solid fa-code" aria-hidden="true"></i>
+          TWIG Patterns
+        </a>
+      </div>
+    </nav>
+
+    <main id="main-content">
+      <!-- STICKY TAB NAV -->
+      <nav class="da-section-nav" aria-label="Architecture decisions" role="tablist">
+        <div class="da-section-nav-inner">
+          <button class="da-nav-tab is-active" role="tab" aria-selected="true" aria-controls="tab-slots-props" data-tab="tab-slots-props">
+            <i class="fa-solid fa-code-compare" aria-hidden="true"></i>
+            <span class="da-nav-tab-label">Slots vs Props</span>
+            <span class="da-nav-tab-subtitle">Architecture Decision</span>
+          </button>
+          <button class="da-nav-tab" role="tab" aria-selected="false" aria-controls="tab-loading" data-tab="tab-loading">
+            <i class="fa-solid fa-bolt" aria-hidden="true"></i>
+            <span class="da-nav-tab-label">Component Loading</span>
+            <span class="da-nav-tab-subtitle">Delivery Strategy</span>
+          </button>
+        </div>
+      </nav>
+
+      <!-- TAB 1: SLOTS VS PROPS ADR -->
+      <div id="tab-slots-props" class="da-tab-content is-active" role="tabpanel">
+        <section class="da-hero" aria-label="Slots vs Props Architecture Decision">
+          <div class="da-hero-grid" aria-hidden="true"></div>
+          <div class="da-hero-orb da-hero-orb-1" aria-hidden="true"></div>
+          <div class="da-hero-orb da-hero-orb-2" aria-hidden="true"></div>
+          <div class="da-hero-orb da-hero-orb-3" aria-hidden="true"></div>
+
+          <div class="da-hero-content">
+            <div class="da-hero-badge">
+              <span class="da-hero-badge-dot" aria-hidden="true"></span>
+              Architecture Decision Record
+            </div>
+
+            <h1 class="da-hero-title">The Decision That<br />Defines Everything</h1>
+
+            <p class="da-hero-subtitle">Properties vs. Slots: Where Does Control Live?</p>
+
+            <p class="da-hero-description">
+              Every web component in this system must answer one fundamental question:
+              does the <strong>component</strong> control the rendering, or does <strong>Drupal</strong>?
+              This architectural decision shapes every integration pattern, every TWIG template,
+              and every content editor's experience.
+            </p>
+          </div>
+
+          <div class="da-hero-scroll" aria-hidden="true">
+            <span>Explore</span>
+            <div class="da-hero-scroll-line"></div>
+          </div>
+        </section>
+
+        <!-- ============================================
+             SECTION 2: THE SPECTRUM
+             ============================================ -->
+      <section id="spectrum" class="da-section da-spectrum-section" aria-label="The architecture spectrum">
+        <div class="da-section-inner">
+          <div class="da-section-header scroll-reveal">
+            <span class="da-section-label">The Spectrum</span>
+            <h2 class="da-section-title">Three Strategies, One Goal</h2>
+            <p class="da-section-description">
+              Every component sits somewhere on this spectrum. Understanding where
+              helps you choose the right approach for each use case.
+            </p>
+          </div>
+
+          <div class="da-spectrum-track-wrapper scroll-reveal scroll-reveal-delay-2">
+            <div class="da-spectrum-labels">
+              <div class="da-spectrum-label">
+                <div class="da-spectrum-label-icon" aria-hidden="true">
+                  <i class="fa-solid fa-microchip"></i>
+                </div>
+                <div class="da-spectrum-label-title">Property-Driven</div>
+                <div class="da-spectrum-label-desc">
+                  Component controls everything. Data passed via attributes and properties.
+                  Storybook-first, Drupal passes data.
+                </div>
+              </div>
+
+              <div class="da-spectrum-label">
+                <div class="da-spectrum-label-icon" aria-hidden="true">
+                  <i class="fa-solid fa-star"></i>
+                </div>
+                <div class="da-spectrum-label-title">Hybrid</div>
+                <div class="da-spectrum-label-desc">
+                  The sweet spot. Atoms use properties, organisms use slots,
+                  forms use both. Best of both worlds.
+                </div>
+              </div>
+
+              <div class="da-spectrum-label">
+                <div class="da-spectrum-label-icon" aria-hidden="true">
+                  <i class="fa-brands fa-drupal"></i>
+                </div>
+                <div class="da-spectrum-label-title">Slot-Driven</div>
+                <div class="da-spectrum-label-desc">
+                  Drupal controls everything. Component provides structure via named slots.
+                  "Let Drupal Drupal."
+                </div>
+              </div>
+            </div>
+
+            <div class="da-spectrum-track" role="img" aria-label="Spectrum from property-driven through hybrid to slot-driven">
+              <div class="da-spectrum-marker da-spectrum-marker-left" aria-hidden="true"></div>
+              <div class="da-spectrum-marker da-spectrum-marker-center" aria-hidden="true"></div>
+              <div class="da-spectrum-marker da-spectrum-marker-right" aria-hidden="true"></div>
+            </div>
+
+            <div class="da-spectrum-sweet-spot scroll-reveal scroll-reveal-delay-3">
+              <div class="da-spectrum-sweet-spot-title">
+                <i class="fa-solid fa-bullseye" aria-hidden="true"></i>
+                The Sweet Spot: Slot-First, Property-Enhanced
+              </div>
+              <div class="da-spectrum-sweet-spot-desc">
+                Default to slots for content flexibility (Drupal controls structure),
+                then add properties for behavior, state, and configuration.
+                This gives content editors maximum freedom while components handle the hard parts.
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================
+           SECTION 3: SIDE-BY-SIDE COMPARISON
+           ============================================ -->
+      <section id="comparison" class="da-section" aria-label="Code comparison">
+        <div class="da-section-inner">
+          <div class="da-section-header scroll-reveal">
+            <span class="da-section-label">Comparison</span>
+            <h2 class="da-section-title">See the Difference in Code</h2>
+            <p class="da-section-description">
+              The same card component, built two ways. See how each approach
+              impacts both your TWIG templates and your Storybook stories.
+            </p>
+          </div>
+
+          <div class="da-comparison-grid">
+            <!-- LEFT: Property-Driven -->
+            <div class="da-comparison-column scroll-reveal scroll-reveal-delay-1">
+              <div class="da-comparison-header da-comparison-header-props">
+                <i class="fa-solid fa-microchip" aria-hidden="true"></i>
+                Property-Driven
+              </div>
+
+              <div>
+                <span class="da-code-label da-code-label-twig">TWIG Template</span>
+                <div class="da-code-block">
+                  <div class="da-code-titlebar">
+                    <span class="da-code-dot"></span>
+                    <span class="da-code-dot"></span>
+                    <span class="da-code-dot"></span>
+                    <span class="da-code-filename">card.html.twig</span>
+                  </div>
+                  <div class="da-code-body">
+                    <pre set:html={codePropsTemplate} />
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <span class="da-code-label da-code-label-sb">Storybook</span>
+                <div class="da-code-block">
+                  <div class="da-code-titlebar">
+                    <span class="da-code-dot"></span>
+                    <span class="da-code-dot"></span>
+                    <span class="da-code-dot"></span>
+                    <span class="da-code-filename">card.stories.ts</span>
+                  </div>
+                  <div class="da-code-body">
+                    <pre set:html={codePropsStorybook} />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- RIGHT: Slot-Driven -->
+            <div class="da-comparison-column scroll-reveal scroll-reveal-delay-2">
+              <div class="da-comparison-header da-comparison-header-slots">
+                <i class="fa-brands fa-drupal" aria-hidden="true"></i>
+                Slot-Driven
+              </div>
+
+              <div>
+                <span class="da-code-label da-code-label-twig">TWIG Template</span>
+                <div class="da-code-block">
+                  <div class="da-code-titlebar">
+                    <span class="da-code-dot"></span>
+                    <span class="da-code-dot"></span>
+                    <span class="da-code-dot"></span>
+                    <span class="da-code-filename">card.html.twig</span>
+                  </div>
+                  <div class="da-code-body">
+                    <pre set:html={codeSlotsTemplate} />
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <span class="da-code-label da-code-label-sb">Storybook</span>
+                <div class="da-code-block">
+                  <div class="da-code-titlebar">
+                    <span class="da-code-dot"></span>
+                    <span class="da-code-dot"></span>
+                    <span class="da-code-dot"></span>
+                    <span class="da-code-filename">card.stories.ts</span>
+                  </div>
+                  <div class="da-code-body">
+                    <pre set:html={codeSlotsStorybook} />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================
+           SECTION 4: DECISION MATRIX
+           ============================================ -->
+      <section id="matrix" class="da-section da-matrix-section" aria-label="Drupal module decision matrix">
+        <div class="da-section-inner">
+          <div class="da-section-header scroll-reveal">
+            <span class="da-section-label">Decision Matrix</span>
+            <h2 class="da-section-title">Drupal Module Compatibility</h2>
+            <p class="da-section-description">
+              Not every Drupal module works equally well with every strategy.
+              Here is how each approach maps to the modules you use daily.
+            </p>
+          </div>
+
+          <div class="da-matrix scroll-reveal scroll-reveal-delay-2" role="table" aria-label="Drupal module strategy compatibility">
+            <div class="da-matrix-header" role="row">
+              <div class="da-matrix-header-cell" role="columnheader">Drupal Module</div>
+              <div class="da-matrix-header-cell header-props" role="columnheader">Property-Driven</div>
+              <div class="da-matrix-header-cell header-slots" role="columnheader">Slot-Driven</div>
+              <div class="da-matrix-header-cell header-hybrid" role="columnheader">Hybrid</div>
+            </div>
+
+            <!-- Layout Builder -->
+            <div class="da-matrix-row" role="row">
+              <div class="da-matrix-cell" role="cell">
+                <div class="da-matrix-module">
+                  <i class="fa-solid fa-table-columns" aria-hidden="true"></i>
+                  Layout Builder
+                </div>
+              </div>
+              <div class="da-matrix-cell" role="cell">
+                <div class="da-matrix-rating da-matrix-rating-ok">
+                  <i class="fa-solid fa-circle-minus" aria-hidden="true"></i>
+                  <span>Requires custom block plugins to map fields</span>
+                </div>
+              </div>
+              <div class="da-matrix-cell" role="cell">
+                <div class="da-matrix-rating da-matrix-rating-great">
+                  <i class="fa-solid fa-circle-check" aria-hidden="true"></i>
+                  <span>Blocks drop content into slots naturally</span>
+                </div>
+              </div>
+              <div class="da-matrix-cell" role="cell">
+                <div class="da-matrix-rating da-matrix-rating-great">
+                  <i class="fa-solid fa-circle-check" aria-hidden="true"></i>
+                  <span>Best of both - slots for layout, props for config</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Paragraphs -->
+            <div class="da-matrix-row" role="row">
+              <div class="da-matrix-cell" role="cell">
+                <div class="da-matrix-module">
+                  <i class="fa-solid fa-paragraph" aria-hidden="true"></i>
+                  Paragraphs
+                </div>
+              </div>
+              <div class="da-matrix-cell" role="cell">
+                <div class="da-matrix-rating da-matrix-rating-great">
+                  <i class="fa-solid fa-circle-check" aria-hidden="true"></i>
+                  <span>Paragraph fields map directly to properties</span>
+                </div>
+              </div>
+              <div class="da-matrix-cell" role="cell">
+                <div class="da-matrix-rating da-matrix-rating-great">
+                  <i class="fa-solid fa-circle-check" aria-hidden="true"></i>
+                  <span>Paragraph content renders into named slots</span>
+                </div>
+              </div>
+              <div class="da-matrix-cell" role="cell">
+                <div class="da-matrix-rating da-matrix-rating-great">
+                  <i class="fa-solid fa-circle-check" aria-hidden="true"></i>
+                  <span>Ideal match - structured data + flexible content</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Media -->
+            <div class="da-matrix-row" role="row">
+              <div class="da-matrix-cell" role="cell">
+                <div class="da-matrix-module">
+                  <i class="fa-solid fa-photo-film" aria-hidden="true"></i>
+                  Media
+                </div>
+              </div>
+              <div class="da-matrix-cell" role="cell">
+                <div class="da-matrix-rating da-matrix-rating-ok">
+                  <i class="fa-solid fa-circle-minus" aria-hidden="true"></i>
+                  <span>Must extract URL/alt from media entity manually</span>
+                </div>
+              </div>
+              <div class="da-matrix-cell" role="cell">
+                <div class="da-matrix-rating da-matrix-rating-great">
+                  <i class="fa-solid fa-circle-check" aria-hidden="true"></i>
+                  <span>Drupal renders media natively into slots</span>
+                </div>
+              </div>
+              <div class="da-matrix-cell" role="cell">
+                <div class="da-matrix-rating da-matrix-rating-great">
+                  <i class="fa-solid fa-circle-check" aria-hidden="true"></i>
+                  <span>Slot for media, props for display config</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Views -->
+            <div class="da-matrix-row" role="row">
+              <div class="da-matrix-cell" role="cell">
+                <div class="da-matrix-module">
+                  <i class="fa-solid fa-table-list" aria-hidden="true"></i>
+                  Views
+                </div>
+              </div>
+              <div class="da-matrix-cell" role="cell">
+                <div class="da-matrix-rating da-matrix-rating-bad">
+                  <i class="fa-solid fa-circle-xmark" aria-hidden="true"></i>
+                  <span>Views HTML output is hard to serialize to props</span>
+                </div>
+              </div>
+              <div class="da-matrix-cell" role="cell">
+                <div class="da-matrix-rating da-matrix-rating-great">
+                  <i class="fa-solid fa-circle-check" aria-hidden="true"></i>
+                  <span>Views row output drops into slots perfectly</span>
+                </div>
+              </div>
+              <div class="da-matrix-cell" role="cell">
+                <div class="da-matrix-rating da-matrix-rating-ok">
+                  <i class="fa-solid fa-circle-minus" aria-hidden="true"></i>
+                  <span>Slots for content, limited prop use for views</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Webform -->
+            <div class="da-matrix-row" role="row">
+              <div class="da-matrix-cell" role="cell">
+                <div class="da-matrix-module">
+                  <i class="fa-solid fa-file-lines" aria-hidden="true"></i>
+                  Webform
+                </div>
+              </div>
+              <div class="da-matrix-cell" role="cell">
+                <div class="da-matrix-rating da-matrix-rating-ok">
+                  <i class="fa-solid fa-circle-minus" aria-hidden="true"></i>
+                  <span>Props work for simple field config (label, type)</span>
+                </div>
+              </div>
+              <div class="da-matrix-cell" role="cell">
+                <div class="da-matrix-rating da-matrix-rating-ok">
+                  <i class="fa-solid fa-circle-minus" aria-hidden="true"></i>
+                  <span>Slots handle form rendering but lose validation</span>
+                </div>
+              </div>
+              <div class="da-matrix-cell" role="cell">
+                <div class="da-matrix-rating da-matrix-rating-great">
+                  <i class="fa-solid fa-circle-check" aria-hidden="true"></i>
+                  <span>Props for validation/state, slots for form layout</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================
+           SECTION 5: COMPONENT STRATEGY MAP
+           ============================================ -->
+      <section id="strategy" class="da-section" aria-label="Component strategy map">
+        <div class="da-section-inner">
+          <div class="da-section-header scroll-reveal">
+            <span class="da-section-label">Strategy Map</span>
+            <h2 class="da-section-title">Right Tool for Each Level</h2>
+            <p class="da-section-description">
+              The component's complexity determines the right strategy. Simple atoms
+              use properties. Complex organisms use slots. Forms use both.
+            </p>
+          </div>
+
+          <div class="da-strategy-grid">
+            <!-- Atoms -->
+            <div class="da-strategy-card scroll-reveal scroll-reveal-delay-1">
+              <div class="da-strategy-card-inner da-spotlight-card">
+                <div class="da-strategy-icon da-strategy-icon-atoms" aria-hidden="true">
+                  <i class="fa-solid fa-atom"></i>
+                </div>
+                <div class="da-strategy-title">Atoms</div>
+                <span class="da-strategy-approach da-strategy-approach-props">
+                  <i class="fa-solid fa-microchip" aria-hidden="true"></i>
+                  Property-Driven
+                </span>
+                <p class="da-strategy-desc">
+                  Small, self-contained components with a fixed API.
+                  All rendering logic lives in the component.
+                </p>
+                <ul class="da-strategy-items" aria-label="Atom components">
+                  <li class="da-strategy-item"><i class="fa-solid fa-hand-pointer" aria-hidden="true"></i> Button</li>
+                  <li class="da-strategy-item"><i class="fa-solid fa-tag" aria-hidden="true"></i> Badge</li>
+                  <li class="da-strategy-item"><i class="fa-solid fa-toggle-on" aria-hidden="true"></i> Toggle</li>
+                  <li class="da-strategy-item"><i class="fa-solid fa-circle-info" aria-hidden="true"></i> Tooltip</li>
+                  <li class="da-strategy-item"><i class="fa-solid fa-spinner" aria-hidden="true"></i> Spinner</li>
+                  <li class="da-strategy-item"><i class="fa-solid fa-image" aria-hidden="true"></i> Avatar</li>
+                </ul>
+              </div>
+            </div>
+
+            <!-- Organisms -->
+            <div class="da-strategy-card scroll-reveal scroll-reveal-delay-2">
+              <div class="da-strategy-card-inner da-spotlight-card">
+                <div class="da-strategy-icon da-strategy-icon-organisms" aria-hidden="true">
+                  <i class="fa-solid fa-layer-group"></i>
+                </div>
+                <div class="da-strategy-title">Organisms</div>
+                <span class="da-strategy-approach da-strategy-approach-slots">
+                  <i class="fa-brands fa-drupal" aria-hidden="true"></i>
+                  Slot-Driven
+                </span>
+                <p class="da-strategy-desc">
+                  Complex, content-rich components. Drupal editors
+                  need full control over what appears inside.
+                </p>
+                <ul class="da-strategy-items" aria-label="Organism components">
+                  <li class="da-strategy-item"><i class="fa-solid fa-id-card" aria-hidden="true"></i> Card</li>
+                  <li class="da-strategy-item"><i class="fa-solid fa-panorama" aria-hidden="true"></i> Hero</li>
+                  <li class="da-strategy-item"><i class="fa-solid fa-window-maximize" aria-hidden="true"></i> Modal</li>
+                  <li class="da-strategy-item"><i class="fa-solid fa-bars" aria-hidden="true"></i> Navigation</li>
+                  <li class="da-strategy-item"><i class="fa-solid fa-table" aria-hidden="true"></i> Data Table</li>
+                  <li class="da-strategy-item"><i class="fa-solid fa-rectangle-list" aria-hidden="true"></i> Accordion</li>
+                </ul>
+              </div>
+            </div>
+
+            <!-- Forms -->
+            <div class="da-strategy-card scroll-reveal scroll-reveal-delay-3">
+              <div class="da-strategy-card-inner da-spotlight-card">
+                <div class="da-strategy-icon da-strategy-icon-forms" aria-hidden="true">
+                  <i class="fa-solid fa-sliders"></i>
+                </div>
+                <div class="da-strategy-title">Forms</div>
+                <span class="da-strategy-approach da-strategy-approach-hybrid">
+                  <i class="fa-solid fa-star" aria-hidden="true"></i>
+                  Hybrid
+                </span>
+                <p class="da-strategy-desc">
+                  Properties control validation, state, and behavior.
+                  Slots allow custom labels, help text, and error messages.
+                </p>
+                <ul class="da-strategy-items" aria-label="Form components">
+                  <li class="da-strategy-item"><i class="fa-solid fa-keyboard" aria-hidden="true"></i> Text Input</li>
+                  <li class="da-strategy-item"><i class="fa-solid fa-list" aria-hidden="true"></i> Select</li>
+                  <li class="da-strategy-item"><i class="fa-solid fa-square-check" aria-hidden="true"></i> Checkbox</li>
+                  <li class="da-strategy-item"><i class="fa-solid fa-circle-dot" aria-hidden="true"></i> Radio</li>
+                  <li class="da-strategy-item"><i class="fa-solid fa-calendar" aria-hidden="true"></i> Date Picker</li>
+                  <li class="da-strategy-item"><i class="fa-solid fa-upload" aria-hidden="true"></i> File Upload</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <div class="da-strategy-flow scroll-reveal scroll-reveal-delay-4" aria-hidden="true">
+            <span>Simple</span>
+            <div class="da-strategy-flow-line"></div>
+            <span>Complex</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================
+           SECTION 6: THE RECOMMENDATION
+           ============================================ -->
+      <section id="recommendation" class="da-section da-rec-section" aria-label="Architecture recommendation">
+        <div class="da-section-inner">
+          <div class="da-section-header scroll-reveal">
+            <span class="da-section-label">Recommendation</span>
+            <h2 class="da-section-title">Our Architecture Decision</h2>
+          </div>
+
+          <div class="da-rec-hero scroll-reveal scroll-reveal-delay-1">
+            <h3 class="da-rec-title">Slot-First, Property-Enhanced</h3>
+            <p class="da-rec-subtitle">
+              Default to slots for content flexibility. Use properties for behavior,
+              configuration, and state management. This approach maximizes Drupal's
+              strengths while keeping components powerful and testable.
+            </p>
+          </div>
+
+          <div class="da-rec-principles">
+            <div class="da-rec-principle scroll-reveal scroll-reveal-delay-2">
+              <div class="da-rec-principle-icon" aria-hidden="true">
+                <i class="fa-brands fa-drupal"></i>
+              </div>
+              <div class="da-rec-principle-title">Let Drupal Own Content</div>
+              <p class="da-rec-principle-desc">
+                Content editors already know how to use Drupal's field system,
+                media library, and WYSIWYG. Slots let them keep using these
+                tools without learning component APIs.
+              </p>
+            </div>
+
+            <div class="da-rec-principle scroll-reveal scroll-reveal-delay-3">
+              <div class="da-rec-principle-icon" aria-hidden="true">
+                <i class="fa-solid fa-sliders"></i>
+              </div>
+              <div class="da-rec-principle-title">Properties for Behavior</div>
+              <p class="da-rec-principle-desc">
+                Use properties for things content editors should not control:
+                variant styles, validation rules, accessibility states,
+                animation settings, and component configuration.
+              </p>
+            </div>
+
+            <div class="da-rec-principle scroll-reveal scroll-reveal-delay-4">
+              <div class="da-rec-principle-icon" aria-hidden="true">
+                <i class="fa-solid fa-heart-pulse"></i>
+              </div>
+              <div class="da-rec-principle-title">Healthcare First</div>
+              <p class="da-rec-principle-desc">
+                Healthcare organizations need robust content governance.
+                Slot-driven components give editorial teams control
+                while maintaining WCAG AAA accessibility standards.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+      </div><!-- end tab-slots-props -->
+
+      <!-- TAB 2: COMPONENT LOADING ADR -->
+      <div id="tab-loading" class="da-tab-content" role="tabpanel">
+        <section class="da-hero da-hero-loading" aria-label="Component Loading Strategy Decision">
+          <div class="da-hero-grid" aria-hidden="true"></div>
+          <div class="da-hero-orb da-hero-orb-1" aria-hidden="true"></div>
+          <div class="da-hero-orb da-hero-orb-2" aria-hidden="true"></div>
+          <div class="da-hero-orb da-hero-orb-3" aria-hidden="true"></div>
+
+          <div class="da-hero-content">
+            <div class="da-hero-badge">
+              <span class="da-hero-badge-dot" aria-hidden="true"></span>
+              Architecture Decision Record
+            </div>
+
+            <h1 class="da-hero-title">How Components<br />Reach the Browser</h1>
+
+            <p class="da-hero-subtitle">Bundle Strategy: One File, Many Files, or Smart Groups?</p>
+
+            <p class="da-hero-description">
+              The second critical architecture decision: how do web components
+              get delivered to each page? A single monolithic bundle, individual
+              per-component files, or intelligent context-based groups? The right
+              strategy means <strong>fast first paint</strong> and <strong>zero wasted bytes</strong>.
+            </p>
+          </div>
+
+          <div class="da-hero-scroll" aria-hidden="true">
+            <span>Explore</span>
+            <div class="da-hero-scroll-line"></div>
+          </div>
+        </section>
+
+        <!-- ============================================
+             SECTION 7: COMPONENT LOADING STRATEGIES
+             ============================================ -->
+        <section id="loading" class="da-section da-loading-section" aria-label="Component loading strategies">
+        <div class="da-section-inner">
+          <div class="da-section-header scroll-reveal">
+            <span class="da-section-label">Loading Strategies</span>
+            <h2 class="da-section-title">How Components Reach the Browser</h2>
+            <p class="da-section-description">
+              The architecture decision does not stop at props vs. slots. How you
+              physically load web component JavaScript into Drupal pages has a
+              direct impact on performance, cacheability, and maintainability.
+            </p>
+          </div>
+
+          <!-- Visual 1: Three-Strategy Comparison Cards -->
+          <div class="da-loading-strategies">
+            <!-- Strategy A: Single Bundle -->
+            <div class="da-loading-card scroll-reveal scroll-reveal-delay-1">
+              <div class="da-loading-icon da-loading-icon-single" aria-hidden="true">
+                <i class="fa-solid fa-box"></i>
+              </div>
+              <div class="da-loading-card-title">Single Bundle</div>
+              <div class="da-loading-card-subtitle">"Load Everything"</div>
+
+              <div class="da-loading-visual" aria-label="One large block representing all components" role="img">
+                <div class="da-loading-block da-loading-block-single">ALL COMPONENTS</div>
+              </div>
+
+              <div class="da-loading-size da-loading-size-amber">
+                <i class="fa-solid fa-weight-hanging" aria-hidden="true"></i>
+                ~220KB per page
+              </div>
+
+              <div class="da-loading-ratings">
+                <div class="da-loading-rating">
+                  <span class="da-loading-rating-label">
+                    <i class="fa-solid fa-bolt" aria-hidden="true"></i>
+                    FCP Impact
+                  </span>
+                  <div class="da-loading-rating-dots" aria-label="Poor - 1 out of 5">
+                    <span class="da-loading-rating-dot filled-red"></span>
+                    <span class="da-loading-rating-dot"></span>
+                    <span class="da-loading-rating-dot"></span>
+                    <span class="da-loading-rating-dot"></span>
+                    <span class="da-loading-rating-dot"></span>
+                  </div>
+                </div>
+                <div class="da-loading-rating">
+                  <span class="da-loading-rating-label">
+                    <i class="fa-solid fa-database" aria-hidden="true"></i>
+                    Cache Efficiency
+                  </span>
+                  <div class="da-loading-rating-dots" aria-label="OK - 3 out of 5">
+                    <span class="da-loading-rating-dot filled-amber"></span>
+                    <span class="da-loading-rating-dot filled-amber"></span>
+                    <span class="da-loading-rating-dot filled-amber"></span>
+                    <span class="da-loading-rating-dot"></span>
+                    <span class="da-loading-rating-dot"></span>
+                  </div>
+                </div>
+                <div class="da-loading-rating">
+                  <span class="da-loading-rating-label">
+                    <i class="fa-solid fa-wrench" aria-hidden="true"></i>
+                    Setup Complexity
+                  </span>
+                  <div class="da-loading-rating-dots" aria-label="Easy - 5 out of 5">
+                    <span class="da-loading-rating-dot filled-green"></span>
+                    <span class="da-loading-rating-dot filled-green"></span>
+                    <span class="da-loading-rating-dot filled-green"></span>
+                    <span class="da-loading-rating-dot filled-green"></span>
+                    <span class="da-loading-rating-dot filled-green"></span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="da-loading-code">
+                <div class="da-code-block">
+                  <div class="da-code-titlebar">
+                    <span class="da-code-dot"></span>
+                    <span class="da-code-dot"></span>
+                    <span class="da-code-dot"></span>
+                    <span class="da-code-filename">wc_2026.libraries.yml</span>
+                  </div>
+                  <div class="da-code-body">
+                    <pre set:html={codeLoadingSingleBundle} />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Strategy B: Per-Component -->
+            <div class="da-loading-card scroll-reveal scroll-reveal-delay-2">
+              <div class="da-loading-icon da-loading-icon-per" aria-hidden="true">
+                <i class="fa-solid fa-cubes"></i>
+              </div>
+              <div class="da-loading-card-title">Per-Component Libraries</div>
+              <div class="da-loading-card-subtitle">"Surgical Loading"</div>
+
+              <div class="da-loading-visual" aria-label="Many small blocks, each a separate component" role="img">
+                <div class="da-loading-block da-loading-block-per">card</div>
+                <div class="da-loading-block da-loading-block-per">btn</div>
+                <div class="da-loading-block da-loading-block-per">nav</div>
+                <div class="da-loading-block da-loading-block-per">hero</div>
+                <div class="da-loading-block da-loading-block-per">tab</div>
+                <div class="da-loading-block da-loading-block-per">acc</div>
+              </div>
+
+              <div class="da-loading-size da-loading-size-cyan">
+                <i class="fa-solid fa-weight-hanging" aria-hidden="true"></i>
+                ~5-15KB per page
+              </div>
+
+              <div class="da-loading-ratings">
+                <div class="da-loading-rating">
+                  <span class="da-loading-rating-label">
+                    <i class="fa-solid fa-bolt" aria-hidden="true"></i>
+                    FCP Impact
+                  </span>
+                  <div class="da-loading-rating-dots" aria-label="Excellent - 5 out of 5">
+                    <span class="da-loading-rating-dot filled-green"></span>
+                    <span class="da-loading-rating-dot filled-green"></span>
+                    <span class="da-loading-rating-dot filled-green"></span>
+                    <span class="da-loading-rating-dot filled-green"></span>
+                    <span class="da-loading-rating-dot filled-green"></span>
+                  </div>
+                </div>
+                <div class="da-loading-rating">
+                  <span class="da-loading-rating-label">
+                    <i class="fa-solid fa-database" aria-hidden="true"></i>
+                    Cache Efficiency
+                  </span>
+                  <div class="da-loading-rating-dots" aria-label="Good - 4 out of 5">
+                    <span class="da-loading-rating-dot filled-green"></span>
+                    <span class="da-loading-rating-dot filled-green"></span>
+                    <span class="da-loading-rating-dot filled-green"></span>
+                    <span class="da-loading-rating-dot filled-green"></span>
+                    <span class="da-loading-rating-dot"></span>
+                  </div>
+                </div>
+                <div class="da-loading-rating">
+                  <span class="da-loading-rating-label">
+                    <i class="fa-solid fa-wrench" aria-hidden="true"></i>
+                    Setup Complexity
+                  </span>
+                  <div class="da-loading-rating-dots" aria-label="Medium - 2 out of 5">
+                    <span class="da-loading-rating-dot filled-amber"></span>
+                    <span class="da-loading-rating-dot filled-amber"></span>
+                    <span class="da-loading-rating-dot"></span>
+                    <span class="da-loading-rating-dot"></span>
+                    <span class="da-loading-rating-dot"></span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="da-loading-code">
+                <div class="da-code-block">
+                  <div class="da-code-titlebar">
+                    <span class="da-code-dot"></span>
+                    <span class="da-code-dot"></span>
+                    <span class="da-code-dot"></span>
+                    <span class="da-code-filename">wc_2026.libraries.yml</span>
+                  </div>
+                  <div class="da-code-body">
+                    <pre set:html={codeLoadingPerComponent} />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Strategy C: Hybrid Groups (Recommended) -->
+            <div class="da-loading-card da-loading-card-recommended scroll-reveal scroll-reveal-delay-3">
+              <span class="da-loading-badge">Recommended</span>
+              <div class="da-loading-icon da-loading-icon-hybrid" aria-hidden="true">
+                <i class="fa-solid fa-boxes-stacked"></i>
+              </div>
+              <div class="da-loading-card-title">Hybrid Groups</div>
+              <div class="da-loading-card-subtitle">"Smart Bundles"</div>
+
+              <div class="da-loading-visual" aria-label="Three grouped blocks by usage context" role="img">
+                <div class="da-loading-block da-loading-block-group">core</div>
+                <div class="da-loading-block da-loading-block-group">navigation</div>
+                <div class="da-loading-block da-loading-block-group">content</div>
+                <div class="da-loading-block da-loading-block-group">forms</div>
+              </div>
+
+              <div class="da-loading-size da-loading-size-green">
+                <i class="fa-solid fa-weight-hanging" aria-hidden="true"></i>
+                ~30-60KB per group
+              </div>
+
+              <div class="da-loading-ratings">
+                <div class="da-loading-rating">
+                  <span class="da-loading-rating-label">
+                    <i class="fa-solid fa-bolt" aria-hidden="true"></i>
+                    FCP Impact
+                  </span>
+                  <div class="da-loading-rating-dots" aria-label="Great - 4 out of 5">
+                    <span class="da-loading-rating-dot filled-green"></span>
+                    <span class="da-loading-rating-dot filled-green"></span>
+                    <span class="da-loading-rating-dot filled-green"></span>
+                    <span class="da-loading-rating-dot filled-green"></span>
+                    <span class="da-loading-rating-dot"></span>
+                  </div>
+                </div>
+                <div class="da-loading-rating">
+                  <span class="da-loading-rating-label">
+                    <i class="fa-solid fa-database" aria-hidden="true"></i>
+                    Cache Efficiency
+                  </span>
+                  <div class="da-loading-rating-dots" aria-label="Excellent - 5 out of 5">
+                    <span class="da-loading-rating-dot filled-green"></span>
+                    <span class="da-loading-rating-dot filled-green"></span>
+                    <span class="da-loading-rating-dot filled-green"></span>
+                    <span class="da-loading-rating-dot filled-green"></span>
+                    <span class="da-loading-rating-dot filled-green"></span>
+                  </div>
+                </div>
+                <div class="da-loading-rating">
+                  <span class="da-loading-rating-label">
+                    <i class="fa-solid fa-wrench" aria-hidden="true"></i>
+                    Setup Complexity
+                  </span>
+                  <div class="da-loading-rating-dots" aria-label="Moderate - 3 out of 5">
+                    <span class="da-loading-rating-dot filled-amber"></span>
+                    <span class="da-loading-rating-dot filled-amber"></span>
+                    <span class="da-loading-rating-dot filled-amber"></span>
+                    <span class="da-loading-rating-dot"></span>
+                    <span class="da-loading-rating-dot"></span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="da-loading-code">
+                <div class="da-code-block">
+                  <div class="da-code-titlebar">
+                    <span class="da-code-dot"></span>
+                    <span class="da-code-dot"></span>
+                    <span class="da-code-dot"></span>
+                    <span class="da-code-filename">wc_2026.libraries.yml</span>
+                  </div>
+                  <div class="da-code-body">
+                    <pre set:html={codeLoadingHybridGroups} />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Visual 2: Performance Impact Comparison -->
+          <div class="da-perf-comparison scroll-reveal scroll-reveal-delay-2">
+            <div class="da-flow-subtitle">Performance Impact Comparison</div>
+            <div class="da-flow-desc">
+              Side-by-side metrics showing how each loading strategy affects
+              real-world performance. Bars animate when scrolled into view.
+            </div>
+
+            <div class="da-perf-grid">
+              <!-- Initial Page Load -->
+              <div class="da-perf-metric">
+                <div class="da-perf-metric-header">
+                  <div class="da-perf-metric-icon" aria-hidden="true">
+                    <i class="fa-solid fa-download"></i>
+                  </div>
+                  <div>
+                    <div class="da-perf-metric-title">Initial Page Load</div>
+                    <div class="da-perf-metric-desc">KB transferred on first visit</div>
+                  </div>
+                </div>
+                <div class="da-perf-bars">
+                  <div class="da-perf-bar-row">
+                    <span class="da-perf-bar-label">Single Bundle</span>
+                    <div class="da-perf-bar-track">
+                      <div class="da-perf-bar-fill da-perf-bar-fill-amber scroll-reveal-bar" style="--bar-width: 100%;">220KB</div>
+                    </div>
+                    <span class="da-perf-bar-value">220KB</span>
+                  </div>
+                  <div class="da-perf-bar-row">
+                    <span class="da-perf-bar-label">Per-Component</span>
+                    <div class="da-perf-bar-track">
+                      <div class="da-perf-bar-fill da-perf-bar-fill-cyan scroll-reveal-bar" style="--bar-width: 11%;">25KB</div>
+                    </div>
+                    <span class="da-perf-bar-value">25KB</span>
+                  </div>
+                  <div class="da-perf-bar-row">
+                    <span class="da-perf-bar-label">Hybrid Groups</span>
+                    <div class="da-perf-bar-track">
+                      <div class="da-perf-bar-fill da-perf-bar-fill-green scroll-reveal-bar" style="--bar-width: 27%;">60KB</div>
+                    </div>
+                    <span class="da-perf-bar-value">60KB</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- HTTP Requests -->
+              <div class="da-perf-metric">
+                <div class="da-perf-metric-header">
+                  <div class="da-perf-metric-icon" aria-hidden="true">
+                    <i class="fa-solid fa-arrow-right-arrow-left"></i>
+                  </div>
+                  <div>
+                    <div class="da-perf-metric-title">HTTP Requests</div>
+                    <div class="da-perf-metric-desc">Script requests per page load</div>
+                  </div>
+                </div>
+                <div class="da-perf-bars">
+                  <div class="da-perf-bar-row">
+                    <span class="da-perf-bar-label">Single Bundle</span>
+                    <div class="da-perf-bar-track">
+                      <div class="da-perf-bar-fill da-perf-bar-fill-amber scroll-reveal-bar" style="--bar-width: 10%;">1</div>
+                    </div>
+                    <span class="da-perf-bar-value">1 req</span>
+                  </div>
+                  <div class="da-perf-bar-row">
+                    <span class="da-perf-bar-label">Per-Component</span>
+                    <div class="da-perf-bar-track">
+                      <div class="da-perf-bar-fill da-perf-bar-fill-cyan scroll-reveal-bar" style="--bar-width: 80%;">3-8</div>
+                    </div>
+                    <span class="da-perf-bar-value">3-8 req</span>
+                  </div>
+                  <div class="da-perf-bar-row">
+                    <span class="da-perf-bar-label">Hybrid Groups</span>
+                    <div class="da-perf-bar-track">
+                      <div class="da-perf-bar-fill da-perf-bar-fill-green scroll-reveal-bar" style="--bar-width: 30%;">2-3</div>
+                    </div>
+                    <span class="da-perf-bar-value">2-3 req</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Cache Hit Rate -->
+              <div class="da-perf-metric">
+                <div class="da-perf-metric-header">
+                  <div class="da-perf-metric-icon" aria-hidden="true">
+                    <i class="fa-solid fa-bolt"></i>
+                  </div>
+                  <div>
+                    <div class="da-perf-metric-title">Cache Hit Rate</div>
+                    <div class="da-perf-metric-desc">After navigating to a second page</div>
+                  </div>
+                </div>
+                <div class="da-perf-bars">
+                  <div class="da-perf-bar-row">
+                    <span class="da-perf-bar-label">Single Bundle</span>
+                    <div class="da-perf-bar-track">
+                      <div class="da-perf-bar-fill da-perf-bar-fill-amber scroll-reveal-bar" style="--bar-width: 100%;">100%</div>
+                    </div>
+                    <span class="da-perf-bar-value">100%</span>
+                  </div>
+                  <div class="da-perf-bar-row">
+                    <span class="da-perf-bar-label">Per-Component</span>
+                    <div class="da-perf-bar-track">
+                      <div class="da-perf-bar-fill da-perf-bar-fill-cyan scroll-reveal-bar" style="--bar-width: 60%;">~60%</div>
+                    </div>
+                    <span class="da-perf-bar-value">~60%</span>
+                  </div>
+                  <div class="da-perf-bar-row">
+                    <span class="da-perf-bar-label">Hybrid Groups</span>
+                    <div class="da-perf-bar-track">
+                      <div class="da-perf-bar-fill da-perf-bar-fill-green scroll-reveal-bar" style="--bar-width: 90%;">~90%</div>
+                    </div>
+                    <span class="da-perf-bar-value">~90%</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Visual 3: Drupal Integration Flow -->
+          <div class="da-flow-section scroll-reveal scroll-reveal-delay-2">
+            <div class="da-flow-subtitle">How Per-Component Loading Works in Practice</div>
+            <div class="da-flow-desc">
+              From content creation to Custom Element upgrade, every step is designed
+              to deliver only the JavaScript each page actually needs.
+            </div>
+
+            <div class="da-flow-steps">
+              <div class="da-flow-step">
+                <div class="da-flow-step-header">
+                  <div class="da-flow-step-number">1</div>
+                  <div class="da-flow-step-icon" aria-hidden="true">
+                    <i class="fa-solid fa-pen-to-square"></i>
+                  </div>
+                </div>
+                <div class="da-flow-step-title">Content Editor</div>
+                <div class="da-flow-step-desc">Creates node with paragraph types (Card, Hero, etc.)</div>
+              </div>
+
+              <div class="da-flow-arrow" aria-hidden="true"><i class="fa-solid fa-chevron-right"></i></div>
+
+              <div class="da-flow-step">
+                <div class="da-flow-step-header">
+                  <div class="da-flow-step-number">2</div>
+                  <div class="da-flow-step-icon" aria-hidden="true">
+                    <i class="fa-brands fa-drupal"></i>
+                  </div>
+                </div>
+                <div class="da-flow-step-title">TWIG Template</div>
+                <div class="da-flow-step-desc">Renders component and attaches library</div>
+                <div class="da-flow-step-code">attach_library('wc_2026/card')</div>
+              </div>
+
+              <div class="da-flow-arrow" aria-hidden="true"><i class="fa-solid fa-chevron-right"></i></div>
+
+              <div class="da-flow-step">
+                <div class="da-flow-step-header">
+                  <div class="da-flow-step-number">3</div>
+                  <div class="da-flow-step-icon" aria-hidden="true">
+                    <i class="fa-solid fa-gears"></i>
+                  </div>
+                </div>
+                <div class="da-flow-step-title">Drupal Aggregation</div>
+                <div class="da-flow-step-desc">Combines only the needed assets into optimized bundles</div>
+              </div>
+
+              <div class="da-flow-arrow" aria-hidden="true"><i class="fa-solid fa-chevron-right"></i></div>
+
+              <div class="da-flow-step">
+                <div class="da-flow-step-header">
+                  <div class="da-flow-step-number">4</div>
+                  <div class="da-flow-step-icon" aria-hidden="true">
+                    <i class="fa-solid fa-cloud-arrow-down"></i>
+                  </div>
+                </div>
+                <div class="da-flow-step-title">Minimal JS Load</div>
+                <div class="da-flow-step-desc">Browser downloads only card.js + lit-runtime.js</div>
+                <div class="da-flow-step-code">~18KB total (not 220KB)</div>
+              </div>
+
+              <div class="da-flow-arrow" aria-hidden="true"><i class="fa-solid fa-chevron-right"></i></div>
+
+              <div class="da-flow-step">
+                <div class="da-flow-step-header">
+                  <div class="da-flow-step-number">5</div>
+                  <div class="da-flow-step-icon" aria-hidden="true">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i>
+                  </div>
+                </div>
+                <div class="da-flow-step-title">CE Upgrade</div>
+                <div class="da-flow-step-desc">Custom Elements register and upgrade in the DOM</div>
+                <div class="da-flow-step-code">customElements.define()</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Visual 4: .libraries.yml Code Examples -->
+          <div class="da-loading-examples scroll-reveal scroll-reveal-delay-2">
+            <div>
+              <div class="da-loading-example-label">
+                <i class="fa-solid fa-code" aria-hidden="true"></i>
+                TWIG Template Integration
+              </div>
+              <div class="da-code-block">
+                <div class="da-code-titlebar">
+                  <span class="da-code-dot"></span>
+                  <span class="da-code-dot"></span>
+                  <span class="da-code-dot"></span>
+                  <span class="da-code-filename">paragraph--card.html.twig</span>
+                </div>
+                <div class="da-code-body">
+                  <pre set:html={codeLoadingTwigAttach} />
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <div class="da-loading-example-label">
+                <i class="fa-solid fa-share-nodes" aria-hidden="true"></i>
+                Shared Runtime Dependency
+              </div>
+              <div class="da-code-block">
+                <div class="da-code-titlebar">
+                  <span class="da-code-dot"></span>
+                  <span class="da-code-dot"></span>
+                  <span class="da-code-dot"></span>
+                  <span class="da-code-filename">wc_2026.libraries.yml</span>
+                </div>
+                <div class="da-code-body">
+                  <pre set:html={codeLoadingSharedRuntime} />
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- ============================================
+           SECTION 8: CODE EXAMPLES
+           ============================================ -->
+      <section id="examples" class="da-section" aria-label="Real code examples">
+        <div class="da-section-inner">
+          <div class="da-section-header scroll-reveal">
+            <span class="da-section-label">In Practice</span>
+            <h2 class="da-section-title">Real-World Patterns</h2>
+            <p class="da-section-description">
+              Three components, three strategies. Here is how each approach
+              looks in production TWIG templates.
+            </p>
+          </div>
+
+          <div class="da-examples-grid">
+            <!-- Slot-driven card -->
+            <div class="da-example scroll-reveal scroll-reveal-delay-1">
+              <div class="da-example-title">
+                <i class="fa-solid fa-id-card" style="color: var(--wc-pink);" aria-hidden="true"></i>
+                Card (Slot-Driven)
+              </div>
+              <p class="da-example-desc">
+                Drupal renders content into named slots. The component provides
+                layout, elevation, and interaction patterns.
+              </p>
+              <div class="da-code-block">
+                <div class="da-code-titlebar">
+                  <span class="da-code-dot"></span>
+                  <span class="da-code-dot"></span>
+                  <span class="da-code-dot"></span>
+                  <span class="da-code-filename">card.html.twig</span>
+                </div>
+                <div class="da-code-body">
+                  <pre set:html={codeExampleCard} />
+                </div>
+              </div>
+            </div>
+
+            <!-- Property-driven button -->
+            <div class="da-example scroll-reveal scroll-reveal-delay-2">
+              <div class="da-example-title">
+                <i class="fa-solid fa-hand-pointer" style="color: var(--wc-cyan);" aria-hidden="true"></i>
+                Button (Property-Driven)
+              </div>
+              <p class="da-example-desc">
+                All configuration via properties. The component handles
+                all rendering, states, and accessibility.
+              </p>
+              <div class="da-code-block">
+                <div class="da-code-titlebar">
+                  <span class="da-code-dot"></span>
+                  <span class="da-code-dot"></span>
+                  <span class="da-code-dot"></span>
+                  <span class="da-code-filename">button.html.twig</span>
+                </div>
+                <div class="da-code-body">
+                  <pre set:html={codeExampleButton} />
+                </div>
+              </div>
+            </div>
+
+            <!-- Hybrid form field -->
+            <div class="da-example scroll-reveal scroll-reveal-delay-3">
+              <div class="da-example-title">
+                <i class="fa-solid fa-sliders" style="color: var(--wc-green);" aria-hidden="true"></i>
+                Form Field (Hybrid)
+              </div>
+              <p class="da-example-desc">
+                Properties handle validation and state. Slots allow
+                custom labels, descriptions, and error messages.
+              </p>
+              <div class="da-code-block">
+                <div class="da-code-titlebar">
+                  <span class="da-code-dot"></span>
+                  <span class="da-code-dot"></span>
+                  <span class="da-code-dot"></span>
+                  <span class="da-code-filename">text-input.html.twig</span>
+                </div>
+                <div class="da-code-body">
+                  <pre set:html={codeExampleForm} />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+      </div><!-- end tab-loading -->
+
+      <!-- ============================================
+           FOOTER CTA
+           ============================================ -->
+      <section class="da-footer-cta" aria-label="Next steps">
+        <div class="da-footer-cta-inner scroll-reveal">
+          <h2>Ready to Build?</h2>
+          <p>
+            Explore the full documentation for detailed integration patterns,
+            TWIG template recipes, and Drupal Behaviors integration guides.
+          </p>
+          <div class="da-footer-cta-buttons">
+            <a href="/drupal-integration/overview/" class="da-btn da-btn-solid">
+              Drupal Integration Docs
+              <span class="da-btn-arrow" aria-hidden="true">&rarr;</span>
+            </a>
+            <a href="/drupal-integration/twig/" class="da-btn da-btn-ghost">
+              TWIG Patterns
+              <span class="da-btn-arrow" aria-hidden="true">&rarr;</span>
+            </a>
+            <a href="/" class="da-btn da-btn-ghost">
+              Back to Dashboard
+              <span class="da-btn-arrow" aria-hidden="true">&rarr;</span>
+            </a>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <script is:inline>
+      // Scroll-reveal animation using Intersection Observer
+      // Respects prefers-reduced-motion
+      (function () {
+        var prefersReduced = window.matchMedia(
+          '(prefers-reduced-motion: reduce)'
+        ).matches;
+
+        if (prefersReduced) {
+          document.querySelectorAll('.scroll-reveal').forEach(function (el) {
+            el.classList.add('is-visible');
+          });
+          document.querySelectorAll('.scroll-reveal-bar').forEach(function (el) {
+            el.classList.add('is-visible');
+          });
+          return;
+        }
+
+        var observer = new IntersectionObserver(
+          function (entries) {
+            entries.forEach(function (entry) {
+              if (entry.isIntersecting) {
+                entry.target.classList.add('is-visible');
+                observer.unobserve(entry.target);
+              }
+            });
+          },
+          {
+            threshold: 0.1,
+            rootMargin: '0px 0px -60px 0px',
+          }
+        );
+
+        document.querySelectorAll('.scroll-reveal').forEach(function (el) {
+          observer.observe(el);
+        });
+
+        // Performance bar fill animation on scroll
+        var barObserver = new IntersectionObserver(
+          function (entries) {
+            entries.forEach(function (entry) {
+              if (entry.isIntersecting) {
+                entry.target.classList.add('is-visible');
+                barObserver.unobserve(entry.target);
+              }
+            });
+          },
+          {
+            threshold: 0.3,
+            rootMargin: '0px 0px -40px 0px',
+          }
+        );
+
+        document.querySelectorAll('.scroll-reveal-bar').forEach(function (el) {
+          barObserver.observe(el);
+        });
+
+        // Cursor-following spotlight effect on cards
+        document.querySelectorAll('.da-spotlight-card, .da-card').forEach(function (card) {
+          card.addEventListener('mousemove', function (e) {
+            var rect = card.getBoundingClientRect();
+            var x = e.clientX - rect.left;
+            var y = e.clientY - rect.top;
+            card.style.setProperty('--mouse-x', x + 'px');
+            card.style.setProperty('--mouse-y', y + 'px');
+          });
+        });
+
+        // Tab switching
+        var tabButtons = document.querySelectorAll('.da-nav-tab[role="tab"]');
+        var tabPanels = document.querySelectorAll('.da-tab-content');
+
+        tabButtons.forEach(function (btn) {
+          btn.addEventListener('click', function () {
+            var targetId = btn.getAttribute('data-tab');
+
+            // Update buttons
+            tabButtons.forEach(function (b) {
+              b.classList.remove('is-active');
+              b.setAttribute('aria-selected', 'false');
+            });
+            btn.classList.add('is-active');
+            btn.setAttribute('aria-selected', 'true');
+
+            // Update panels
+            tabPanels.forEach(function (panel) {
+              panel.classList.remove('is-active');
+            });
+            var target = document.getElementById(targetId);
+            if (target) {
+              target.classList.add('is-active');
+
+              // Scroll to top of content area
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+
+              // Re-trigger scroll-reveal for newly visible panel
+              setTimeout(function () {
+                target.querySelectorAll('.scroll-reveal:not(.is-visible)').forEach(function (el) {
+                  observer.unobserve(el);
+                  observer.observe(el);
+                });
+                target.querySelectorAll('.scroll-reveal-bar:not(.is-visible)').forEach(function (el) {
+                  barObserver.unobserve(el);
+                  barObserver.observe(el);
+                });
+              }, 50);
+            }
+          });
+        });
+
+        // Keyboard navigation for tabs
+        tabButtons.forEach(function (btn, index) {
+          btn.addEventListener('keydown', function (e) {
+            var next = null;
+            if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+              next = tabButtons[(index + 1) % tabButtons.length];
+            } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+              next = tabButtons[(index - 1 + tabButtons.length) % tabButtons.length];
+            }
+            if (next) {
+              e.preventDefault();
+              next.focus();
+              next.click();
+            }
+          });
+        });
+      })();
+    </script>
+  </body>
+</html>

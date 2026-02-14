@@ -1,0 +1,136 @@
+---
+/**
+ * Roadmap - Interactive timeline showing project phases.
+ *
+ * Features:
+ * - Vertical timeline with gradient connector line
+ * - Phase dots with status-based coloring (green/purple/gray)
+ * - In-progress dot has pulsing glow animation
+ * - Status badges (Complete, In Progress, Upcoming)
+ * - Deliverable pills per phase
+ * - Scroll-reveal staggered animations
+ * - Responsive layout
+ */
+
+interface Phase {
+  title: string;
+  status: 'complete' | 'in-progress' | 'upcoming';
+  description: string;
+  items: string[];
+  icon: string;
+  color: string;
+  dates?: string;
+}
+
+const phases: Phase[] = [
+  {
+    title: 'Phase 0: Rapid Prototype',
+    status: 'in-progress',
+    description: 'Rapid prototyping and proof-of-concept development to validate architecture decisions and design patterns.',
+    items: ['proof of concept', 'architecture validation', 'design patterns', 'tooling evaluation'],
+    icon: 'fa-solid fa-flask',
+    color: '#8b5cf6',
+    dates: 'Feb 2026',
+  },
+  {
+    title: 'Phase 1: Planning & Discovery',
+    status: 'upcoming',
+    description: 'Complete technical specifications, architecture decisions, component inventory, and 10,000+ lines of documentation.',
+    items: ['architecture', 'component specs', 'design tokens', 'drupal strategy', 'documentation'],
+    icon: 'fa-solid fa-clipboard-list',
+    color: '#06b6d4',
+    dates: 'Apr 23 - May 4, 2026 (4-6 weeks)',
+  },
+  {
+    title: 'Phase 2: Foundation',
+    status: 'upcoming',
+    description: 'Monorepo setup, build pipeline, design token generation, Storybook configuration, and CI/CD infrastructure.',
+    items: ['turborepo', 'terrazzo tokens', 'storybook 9', 'vitest setup', 'ci/cd'],
+    icon: 'fa-solid fa-layer-group',
+    color: '#10b981',
+    dates: 'May - Jun 2026',
+  },
+  {
+    title: 'Phase 3: Core Components',
+    status: 'upcoming',
+    description: 'Build the foundational component set: buttons, inputs, cards, alerts, modals, and typography components.',
+    items: ['button', 'input', 'card', 'alert', 'modal', 'typography'],
+    icon: 'fa-solid fa-cubes',
+    color: '#f59e0b',
+    dates: 'Jun - Jul 2026',
+  },
+  {
+    title: 'Phase 4: Data Components',
+    status: 'upcoming',
+    description: 'Complex data display components: tables, charts, grids, and healthcare-specific data visualizations.',
+    items: ['data table', 'charts', 'pagination', 'filters', 'search'],
+    icon: 'fa-solid fa-table',
+    color: '#ec4899',
+    dates: 'Jul - Aug 2026',
+  },
+  {
+    title: 'Phase 5: Client Integration & Handoff',
+    status: 'upcoming',
+    description: 'Client-led Drupal integration with our technical support. TWIG templates, Drupal module, Behaviors integration, and comprehensive CMS testing. Handoff occurs ~2 months after development starts.',
+    items: ['twig templates', 'drupal module', 'behaviors', 'field mapping', 'technical support'],
+    icon: 'fa-solid fa-handshake',
+    color: '#6366f1',
+    dates: 'Jul - Aug 2026 (Client-led)',
+  },
+  {
+    title: 'Phase 6: Polish & Launch',
+    status: 'upcoming',
+    description: 'Performance optimization, accessibility audits, documentation finalization, and npm publication.',
+    items: ['a11y audit', 'performance', 'npm publish', 'launch docs'],
+    icon: 'fa-solid fa-rocket',
+    color: '#14b8a6',
+    dates: 'Aug 2026',
+  },
+];
+
+function getStatusLabel(status: string): string {
+  if (status === 'complete') return 'Complete';
+  if (status === 'in-progress') return 'In Progress';
+  return 'Upcoming';
+}
+---
+
+<section class="roadmap-section" aria-label="Project roadmap">
+  <div class="roadmap-inner">
+    <div class="section-header scroll-reveal">
+      <span class="section-label">Roadmap</span>
+      <h2 class="section-title">The Path Forward</h2>
+      <p class="section-description">
+        Six phases from architecture to launch. Transparent progress, clear milestones.
+      </p>
+    </div>
+
+    <div class="roadmap-timeline">
+      {phases.map((phase, i) => (
+        <div class={`roadmap-phase scroll-reveal scroll-reveal-delay-${Math.min(i + 1, 6)}`}>
+          <div class={`roadmap-dot ${phase.status}`} aria-hidden="true"></div>
+          <div class="roadmap-phase-content">
+            <i class={`${phase.icon} roadmap-phase-icon`} style={`color: ${phase.color}`} aria-hidden="true"></i>
+            <div class="roadmap-phase-details">
+              <div class="roadmap-phase-header">
+                <div>
+                  <h3 class="roadmap-phase-title">{phase.title}</h3>
+                  {phase.dates && <span class="roadmap-phase-dates">{phase.dates}</span>}
+                </div>
+                <span class={`roadmap-phase-status ${phase.status}`}>
+                  {getStatusLabel(phase.status)}
+                </span>
+              </div>
+              <p class="roadmap-phase-desc">{phase.description}</p>
+              <div class="roadmap-phase-items">
+                {phase.items.map((item) => (
+                  <span class="roadmap-item">{item}</span>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>

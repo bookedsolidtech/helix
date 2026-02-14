@@ -1,0 +1,234 @@
+---
+title: WC-2026 Documentation
+description: Enterprise Healthcare Web Components - Complete documentation and build plan
+template: splash
+hero:
+  title: ''
+  tagline: ''
+---
+
+import Hero from '../../components/Hero.astro';
+import StatsBar from '../../components/StatsBar.astro';
+import FeatureGrid from '../../components/FeatureGrid.astro';
+import CodeShowcase from '../../components/CodeShowcase.astro';
+import TechStack from '../../components/TechStack.astro';
+import Comparison from '../../components/Comparison.astro';
+import Roadmap from '../../components/Roadmap.astro';
+import QuickLinks from '../../components/QuickLinks.astro';
+import CTASection from '../../components/CTASection.astro';
+import DXBanner from '../../components/DXBanner.astro';
+
+<Hero />
+
+<StatsBar />
+
+<FeatureGrid />
+
+<CodeShowcase />
+
+<TechStack />
+
+<Comparison />
+
+<DXBanner />
+
+<QuickLinks />
+
+<Roadmap />
+
+<CTASection />
+
+<script>
+{`
+// Scroll-reveal animation using Intersection Observer
+// Respects prefers-reduced-motion
+(function() {
+  const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  if (prefersReduced) {
+    // Make everything visible immediately
+    document.querySelectorAll('.scroll-reveal').forEach(function(el) {
+      el.classList.add('is-visible');
+    });
+    return;
+  }
+
+  var observer = new IntersectionObserver(function(entries) {
+    entries.forEach(function(entry) {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('is-visible');
+        observer.unobserve(entry.target);
+      }
+    });
+  }, {
+    threshold: 0.1,
+    rootMargin: '0px 0px -60px 0px'
+  });
+
+  document.querySelectorAll('.scroll-reveal').forEach(function(el) {
+    observer.observe(el);
+  });
+
+  // Feature card spotlight effect (cursor-following glow)
+  document.querySelectorAll('.feature-card').forEach(function(card) {
+    card.addEventListener('mousemove', function(e) {
+      var rect = card.getBoundingClientRect();
+      var x = e.clientX - rect.left;
+      var y = e.clientY - rect.top;
+      card.style.setProperty('--mouse-x', x + 'px');
+      card.style.setProperty('--mouse-y', y + 'px');
+    });
+  });
+
+  // ===== SIDEBAR COLLAPSE WITH LOCALSTORAGE =====
+  function initSidebarCollapse() {
+    var leftSidebar = document.querySelector('.sidebar');
+    var rightSidebar = document.querySelector('.right-sidebar');
+
+    if (!leftSidebar && !rightSidebar) return;
+
+    // Load saved states
+    var leftCollapsed = localStorage.getItem('sidebar-left-collapsed') === 'true';
+    var rightCollapsed = localStorage.getItem('sidebar-right-collapsed') === 'true';
+
+    if (leftCollapsed && leftSidebar) leftSidebar.classList.add('collapsed');
+    if (rightCollapsed && rightSidebar) rightSidebar.classList.add('collapsed');
+
+    // Create collapse buttons
+    if (leftSidebar && !document.querySelector('.left-collapse-btn')) {
+      var leftBtn = document.createElement('button');
+      leftBtn.className = 'sidebar-collapse-btn left-collapse-btn';
+      leftBtn.innerHTML = '<i class="fa-solid fa-chevron-left"></i>';
+      leftBtn.setAttribute('aria-label', 'Collapse left sidebar');
+      leftSidebar.style.position = 'relative';
+      leftSidebar.appendChild(leftBtn);
+
+      leftBtn.addEventListener('click', function() {
+        leftSidebar.classList.toggle('collapsed');
+        var isCollapsed = leftSidebar.classList.contains('collapsed');
+        localStorage.setItem('sidebar-left-collapsed', isCollapsed);
+      });
+    }
+
+    if (rightSidebar && !document.querySelector('.right-collapse-btn')) {
+      var rightBtn = document.createElement('button');
+      rightBtn.className = 'sidebar-collapse-btn right-collapse-btn';
+      rightBtn.innerHTML = '<i class="fa-solid fa-chevron-right"></i>';
+      rightBtn.setAttribute('aria-label', 'Collapse right sidebar');
+      rightSidebar.style.position = 'relative';
+      rightSidebar.appendChild(rightBtn);
+
+      rightBtn.addEventListener('click', function() {
+        rightSidebar.classList.toggle('collapsed');
+        var isCollapsed = rightSidebar.classList.contains('collapsed');
+        localStorage.setItem('sidebar-right-collapsed', isCollapsed);
+      });
+    }
+
+    // Create expand buttons
+    if (leftSidebar && !document.querySelector('.sidebar-expand-btn.left')) {
+      var leftExpandBtn = document.createElement('button');
+      leftExpandBtn.className = 'sidebar-expand-btn left';
+      leftExpandBtn.innerHTML = '<i class="fa-solid fa-chevron-right"></i>';
+      leftExpandBtn.setAttribute('aria-label', 'Expand left sidebar');
+      document.body.appendChild(leftExpandBtn);
+
+      leftExpandBtn.addEventListener('click', function() {
+        leftSidebar.classList.remove('collapsed');
+        localStorage.setItem('sidebar-left-collapsed', 'false');
+      });
+    }
+
+    if (rightSidebar && !document.querySelector('.sidebar-expand-btn.right')) {
+      var rightExpandBtn = document.createElement('button');
+      rightExpandBtn.className = 'sidebar-expand-btn right';
+      rightExpandBtn.innerHTML = '<i class="fa-solid fa-chevron-left"></i>';
+      rightExpandBtn.setAttribute('aria-label', 'Expand right sidebar');
+      document.body.appendChild(rightExpandBtn);
+
+      rightExpandBtn.addEventListener('click', function() {
+        rightSidebar.classList.remove('collapsed');
+        localStorage.setItem('sidebar-right-collapsed', 'false');
+      });
+    }
+  }
+
+  // ===== SCROLLSPY WITH URL HASH UPDATE =====
+  function initScrollspy() {
+    var tocLinks = document.querySelectorAll('.right-sidebar .sl-toc a');
+    if (!tocLinks.length) return;
+
+    var headings = [];
+    tocLinks.forEach(function(link) {
+      var href = link.getAttribute('href');
+      if (href && href.startsWith('#')) {
+        var id = href.substring(1);
+        var heading = document.getElementById(id);
+        if (heading) {
+          headings.push({ id: id, element: heading, link: link });
+        }
+      }
+    });
+
+    if (!headings.length) return;
+
+    var currentActive = null;
+
+    function updateActive() {
+      var scrollPos = window.scrollY + 100; // Offset for header
+
+      var current = null;
+      for (var i = headings.length - 1; i >= 0; i--) {
+        var heading = headings[i];
+        if (heading.element.offsetTop <= scrollPos) {
+          current = heading;
+          break;
+        }
+      }
+
+      if (current && current !== currentActive) {
+        // Remove previous active
+        tocLinks.forEach(function(link) {
+          link.removeAttribute('aria-current');
+        });
+
+        // Set new active
+        current.link.setAttribute('aria-current', 'true');
+        currentActive = current;
+
+        // Update URL hash without scrolling
+        if (history.replaceState) {
+          history.replaceState(null, null, '#' + current.id);
+        }
+      }
+    }
+
+    // Throttle scroll handler
+    var ticking = false;
+    window.addEventListener('scroll', function() {
+      if (!ticking) {
+        window.requestAnimationFrame(function() {
+          updateActive();
+          ticking = false;
+        });
+        ticking = true;
+      }
+    });
+
+    // Initial update
+    updateActive();
+  }
+
+  // Initialize on DOMContentLoaded
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', function() {
+      initSidebarCollapse();
+      initScrollspy();
+    });
+  } else {
+    initSidebarCollapse();
+    initScrollspy();
+  }
+})();
+`}
+</script>

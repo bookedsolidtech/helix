@@ -1,0 +1,1136 @@
+---
+/**
+ * Full Presentation - 30-Minute Discussion Experience
+ *
+ * Full-page section-by-section experience with snap-scrolling on desktop.
+ * 10 viewport-height sections covering:
+ *  1. Title/Hero
+ *  2. The Problem
+ *  3. The Vision
+ *  4. Architecture Deep Dive
+ *  5. The Stack
+ *  6. Quality & Compliance
+ *  7. The Team & Process
+ *  8. Implementation Timeline
+ *  9. Risk Mitigation
+ * 10. The Ask / Q&A
+ *
+ * Desktop: CSS scroll-snap-type: y mandatory
+ * Mobile: Normal stacking (snap disabled)
+ */
+---
+
+<!doctype html>
+<html lang="en" data-theme="dark">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Full Presentation | WC-2026</title>
+    <meta
+      name="description"
+      content="The complete 30-minute presentation: WC-2026 enterprise web components for healthcare. Architecture, stack, compliance, timeline, and the ask."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=JetBrains+Mono:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
+      integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+
+    <style is:inline>
+      /* ============================================
+         FULL PRESENTATION - 30-MINUTE EXPERIENCE
+         Snap-scroll on desktop, normal flow on mobile
+         ============================================ */
+
+      @property --gradient-angle {
+        syntax: '<angle>';
+        initial-value: 0deg;
+        inherits: false;
+      }
+
+      :root {
+        --wc-accent-h: 250;
+        --wc-accent-s: 70%;
+        --wc-accent-l: 60%;
+        --wc-accent: hsl(var(--wc-accent-h), var(--wc-accent-s), var(--wc-accent-l));
+        --wc-cyan: #06b6d4;
+        --wc-pink: #ec4899;
+        --wc-green: #10b981;
+        --wc-amber: #f59e0b;
+        --wc-red: #ef4444;
+        --wc-electric: #3b82f6;
+
+        --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        --gradient-hero: linear-gradient(135deg, #0a0a18 0%, #0f1030 40%, #0a0a2e 100%);
+        --gradient-cyan-purple: linear-gradient(135deg, #06b6d4, #8b5cf6);
+        --gradient-pink-orange: linear-gradient(135deg, #ec4899, #f97316);
+        --gradient-green-cyan: linear-gradient(135deg, #10b981, #06b6d4);
+
+        --font-heading: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        --font-body: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+
+        --surface-0: #0a0a14; --surface-1: #111122;
+        --surface-2: #1a1a32; --surface-3: #252545;
+        --text-primary: #eaeaf4; --text-secondary: #a8a8c8; --text-muted: #6868a0;
+
+        --glass-bg: rgba(255,255,255,0.03);
+        --glass-bg-strong: rgba(255,255,255,0.06);
+        --glass-border: rgba(255,255,255,0.06);
+        --glass-border-strong: rgba(255,255,255,0.12);
+
+        --radius-sm: 0.5rem; --radius-md: 0.75rem; --radius-lg: 1rem;
+        --radius-xl: 1.5rem; --radius-full: 9999px;
+
+        --shadow-md: 0 4px 16px rgba(0,0,0,0.4);
+        --shadow-lg: 0 8px 32px rgba(0,0,0,0.5);
+        --shadow-xl: 0 16px 64px rgba(0,0,0,0.6);
+        --glow-primary: 0 0 50px rgba(102,126,234,0.25);
+        --glow-subtle: 0 0 20px rgba(102,126,234,0.15);
+      }
+
+      *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+      html {
+        scroll-behavior: smooth;
+      }
+
+      body {
+        font-family: var(--font-body); line-height: 1.6;
+        -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;
+        background: var(--surface-0); color: var(--text-primary);
+        overflow-x: hidden;
+      }
+
+      h1,h2,h3,h4,h5,h6 { font-family: var(--font-heading); font-weight: 700; letter-spacing: -0.025em; line-height: 1.15; }
+      code, pre { font-family: var(--font-mono); }
+      a { color: var(--wc-accent); text-decoration: none; transition: color 0.2s ease; }
+
+      /* Keyframes */
+      @keyframes fadeInUp { from { opacity:0; transform:translateY(40px); } to { opacity:1; transform:translateY(0); } }
+      @keyframes fadeInDown { from { opacity:0; transform:translateY(-20px); } to { opacity:1; transform:translateY(0); } }
+      @keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
+      @keyframes float-slow { 0%,100% { transform:translate(0,0) scale(1); } 25% { transform:translate(30px,-20px) scale(1.05); } 50% { transform:translate(-10px,-35px) scale(0.97); } 75% { transform:translate(-25px,-10px) scale(1.02); } }
+      @keyframes orb-pulse { 0%,100% { opacity:0.3; filter:blur(100px); } 50% { opacity:0.5; filter:blur(120px); } }
+      @keyframes particle-drift { 0% { background-position: 0 0, 200px 200px, 400px 100px; } 100% { background-position: 800px 800px, 1000px 1000px, 1200px 900px; } }
+      @keyframes border-rotate { 0% { --gradient-angle:0deg; } 100% { --gradient-angle:360deg; } }
+      @keyframes pulse-ring { 0% { box-shadow: 0 0 0 0 rgba(102,126,234,0.4); } 70% { box-shadow: 0 0 0 15px rgba(102,126,234,0); } 100% { box-shadow: 0 0 0 0 rgba(102,126,234,0); } }
+      @keyframes scroll-fade { 0% { opacity:1; transform:translateX(-50%) translateY(0); } 100% { opacity:0; transform:translateX(-50%) translateY(12px); } }
+      @keyframes slide-in-left { from { opacity:0; transform:translateX(-60px); } to { opacity:1; transform:translateX(0); } }
+      @keyframes slide-in-right { from { opacity:0; transform:translateX(60px); } to { opacity:1; transform:translateX(0); } }
+
+      /* Scroll Reveal */
+      .scroll-reveal { opacity:0; transform:translateY(40px); transition: opacity 0.8s cubic-bezier(0.22,1,0.36,1), transform 0.8s cubic-bezier(0.22,1,0.36,1), filter 0.8s cubic-bezier(0.22,1,0.36,1); filter:blur(4px); }
+      .scroll-reveal.is-visible { opacity:1; transform:translateY(0); filter:blur(0); }
+      .scroll-reveal-delay-1 { transition-delay:0.1s; } .scroll-reveal-delay-2 { transition-delay:0.2s; }
+      .scroll-reveal-delay-3 { transition-delay:0.3s; } .scroll-reveal-delay-4 { transition-delay:0.4s; }
+      .scroll-reveal-delay-5 { transition-delay:0.5s; } .scroll-reveal-delay-6 { transition-delay:0.6s; }
+
+      /* Snap scroll container -- desktop only */
+      @media (min-width: 1025px) {
+        .fp-container {
+          height: 100vh;
+          overflow-y: scroll;
+          scroll-snap-type: y mandatory;
+          scroll-behavior: smooth;
+        }
+      }
+
+      /* Floating Pitch Nav */
+      .pitch-nav {
+        position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%); z-index: 200;
+        display: flex; align-items: center; gap: 0.25rem; padding: 0.375rem;
+        background: rgba(10,10,20,0.9); backdrop-filter: blur(20px) saturate(180%);
+        -webkit-backdrop-filter: blur(20px) saturate(180%);
+        border: 1px solid var(--glass-border-strong); border-radius: var(--radius-full);
+        box-shadow: var(--shadow-xl);
+      }
+      .pitch-nav-link {
+        display: inline-flex; align-items: center; gap: 0.375rem;
+        padding: 0.5rem 1rem; font-size: 0.8125rem; font-weight: 600;
+        color: var(--text-secondary); border-radius: var(--radius-full);
+        transition: all 0.25s ease; white-space: nowrap;
+      }
+      .pitch-nav-link:hover { color: var(--text-primary); background: var(--glass-bg-strong); }
+      .pitch-nav-link.active { color: white; background: var(--gradient-primary); box-shadow: 0 2px 12px rgba(102,126,234,0.3); }
+      .pitch-nav-divider { width: 1px; height: 20px; background: var(--glass-border-strong); margin: 0 0.25rem; }
+      .pitch-nav-home {
+        display: inline-flex; align-items: center; justify-content: center;
+        width: 32px; height: 32px; font-size: 0.875rem; color: var(--text-muted);
+        border-radius: 50%; transition: all 0.25s ease;
+      }
+      .pitch-nav-home:hover { color: var(--text-primary); background: var(--glass-bg-strong); }
+
+      /* Section dots nav - right side */
+      .fp-dots {
+        position: fixed; right: 1.5rem; bottom: 6rem; z-index: 200;
+        display: flex; flex-direction: column; gap: 0.75rem;
+      }
+      .fp-dot {
+        width: 10px; height: 10px; border-radius: 50%;
+        background: var(--glass-border-strong);
+        border: none; cursor: pointer;
+        transition: all 0.3s ease; position: relative;
+      }
+      .fp-dot.active { background: var(--wc-accent); box-shadow: 0 0 10px rgba(139,92,246,0.5); transform: scale(1.3); }
+      .fp-dot:hover { background: var(--text-muted); transform: scale(1.2); }
+      .fp-dot-label {
+        position: absolute; right: 20px; top: 50%; transform: translateY(-50%);
+        font-size: 0.6875rem; font-weight: 600; color: var(--text-muted);
+        white-space: nowrap; opacity: 0; transition: opacity 0.2s ease;
+        pointer-events: none; background: rgba(10,10,20,0.9);
+        padding: 0.25rem 0.5rem; border-radius: 4px;
+      }
+      .fp-dot:hover .fp-dot-label { opacity: 1; }
+
+      /* Slide base */
+      .fp-slide {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        overflow: hidden;
+        padding: 4rem 2rem;
+      }
+
+      @media (min-width: 1025px) {
+        .fp-slide { scroll-snap-align: start; }
+      }
+
+      .fp-slide-inner {
+        max-width: 1100px;
+        width: 100%;
+        position: relative;
+        z-index: 2;
+      }
+
+      /* Particle & grid backgrounds */
+      .fp-particles {
+        position: absolute; inset: 0; pointer-events: none;
+        background-image:
+          radial-gradient(1.5px 1.5px at 10% 20%, rgba(102,126,234,0.2) 50%, transparent 50%),
+          radial-gradient(1px 1px at 40% 70%, rgba(6,182,212,0.15) 50%, transparent 50%),
+          radial-gradient(1.5px 1.5px at 80% 30%, rgba(236,72,153,0.12) 50%, transparent 50%),
+          radial-gradient(1px 1px at 60% 90%, rgba(16,185,129,0.15) 50%, transparent 50%);
+        animation: particle-drift 80s linear infinite;
+      }
+      .fp-grid {
+        position: absolute; inset: 0; pointer-events: none;
+        background-image: linear-gradient(rgba(255,255,255,0.012) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(255,255,255,0.012) 1px, transparent 1px);
+        background-size: 60px 60px;
+      }
+      .fp-orb { position: absolute; border-radius: 50%; pointer-events: none; }
+
+      /* Slide headers */
+      .fp-slide-header { text-align: center; margin-bottom: 3rem; }
+      .fp-slide-num {
+        display: inline-flex; align-items: center; justify-content: center;
+        width: 48px; height: 48px; border-radius: 50%;
+        font-size: 1.125rem; font-weight: 800; margin-bottom: 1rem;
+      }
+      .fp-slide-label {
+        display: inline-block; font-size: 0.75rem; font-weight: 700;
+        text-transform: uppercase; letter-spacing: 0.1em;
+        padding: 0.25rem 1rem; border-radius: var(--radius-full);
+        margin-bottom: 1rem;
+      }
+      .fp-slide-title {
+        font-size: clamp(1.75rem, 4vw, 3rem);
+        margin-bottom: 1rem;
+      }
+      .fp-slide-desc {
+        font-size: 1.0625rem; color: var(--text-secondary);
+        max-width: 700px; margin: 0 auto; line-height: 1.8;
+      }
+      .gradient-text { background: var(--gradient-cyan-purple); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+
+      /* Cards */
+      .fp-card {
+        background: var(--surface-1); border: 1px solid var(--surface-3);
+        border-radius: var(--radius-xl); padding: 1.5rem;
+        transition: all 0.4s cubic-bezier(0.22,1,0.36,1); position: relative; overflow: hidden;
+      }
+      .fp-card::before {
+        content: ''; position: absolute; inset: 0; border-radius: inherit; padding: 1.5px;
+        background: conic-gradient(from var(--gradient-angle), #667eea, #764ba2, #f093fb, #06b6d4, #667eea);
+        -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+        -webkit-mask-composite: xor; mask-composite: exclude;
+        opacity: 0; transition: opacity 0.5s ease; pointer-events: none;
+        animation: border-rotate 4s linear infinite;
+      }
+      .fp-card:hover::before { opacity: 1; }
+      .fp-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-xl), var(--glow-subtle); background: var(--surface-2); }
+      .fp-card-icon {
+        width: 48px; height: 48px; border-radius: var(--radius-lg);
+        display: flex; align-items: center; justify-content: center;
+        font-size: 1.125rem; margin-bottom: 0.75rem; position: relative; z-index: 1;
+      }
+      .fp-card-title { font-size: 1rem; font-weight: 700; margin-bottom: 0.375rem; position: relative; z-index: 1; }
+      .fp-card-desc { font-size: 0.875rem; color: var(--text-secondary); line-height: 1.6; position: relative; z-index: 1; }
+
+      /* Color helpers */
+      .icon-cyan { background:linear-gradient(135deg,rgba(6,182,212,0.15),rgba(6,182,212,0.05)); border:1px solid rgba(6,182,212,0.2); color:var(--wc-cyan); }
+      .icon-green { background:linear-gradient(135deg,rgba(16,185,129,0.15),rgba(16,185,129,0.05)); border:1px solid rgba(16,185,129,0.2); color:var(--wc-green); }
+      .icon-accent { background:linear-gradient(135deg,rgba(139,92,246,0.15),rgba(139,92,246,0.05)); border:1px solid rgba(139,92,246,0.2); color:var(--wc-accent); }
+      .icon-pink { background:linear-gradient(135deg,rgba(236,72,153,0.15),rgba(236,72,153,0.05)); border:1px solid rgba(236,72,153,0.2); color:var(--wc-pink); }
+      .icon-amber { background:linear-gradient(135deg,rgba(245,158,11,0.15),rgba(245,158,11,0.05)); border:1px solid rgba(245,158,11,0.2); color:var(--wc-amber); }
+      .icon-electric { background:linear-gradient(135deg,rgba(59,130,246,0.15),rgba(59,130,246,0.05)); border:1px solid rgba(59,130,246,0.2); color:var(--wc-electric); }
+      .icon-red { background:linear-gradient(135deg,rgba(239,68,68,0.15),rgba(239,68,68,0.05)); border:1px solid rgba(239,68,68,0.2); color:var(--wc-red); }
+      .label-cyan { background:rgba(6,182,212,0.08); color:var(--wc-cyan); border:1px solid rgba(6,182,212,0.15); }
+      .label-green { background:rgba(16,185,129,0.08); color:var(--wc-green); border:1px solid rgba(16,185,129,0.15); }
+      .label-accent { background:rgba(139,92,246,0.08); color:var(--wc-accent); border:1px solid rgba(139,92,246,0.15); }
+      .label-pink { background:rgba(236,72,153,0.08); color:var(--wc-pink); border:1px solid rgba(236,72,153,0.15); }
+      .label-amber { background:rgba(245,158,11,0.08); color:var(--wc-amber); border:1px solid rgba(245,158,11,0.15); }
+      .label-electric { background:rgba(59,130,246,0.08); color:var(--wc-electric); border:1px solid rgba(59,130,246,0.15); }
+      .label-red { background:rgba(239,68,68,0.08); color:var(--wc-red); border:1px solid rgba(239,68,68,0.15); }
+      .num-cyan { background:rgba(6,182,212,0.12); color:var(--wc-cyan); border:1px solid rgba(6,182,212,0.25); }
+      .num-green { background:rgba(16,185,129,0.12); color:var(--wc-green); border:1px solid rgba(16,185,129,0.25); }
+      .num-accent { background:rgba(139,92,246,0.12); color:var(--wc-accent); border:1px solid rgba(139,92,246,0.25); }
+      .num-pink { background:rgba(236,72,153,0.12); color:var(--wc-pink); border:1px solid rgba(236,72,153,0.25); }
+      .num-amber { background:rgba(245,158,11,0.12); color:var(--wc-amber); border:1px solid rgba(245,158,11,0.25); }
+      .num-electric { background:rgba(59,130,246,0.12); color:var(--wc-electric); border:1px solid rgba(59,130,246,0.25); }
+      .num-red { background:rgba(239,68,68,0.12); color:var(--wc-red); border:1px solid rgba(239,68,68,0.25); }
+
+      /* Grids */
+      .fp-grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.25rem; }
+      .fp-grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.25rem; }
+      .fp-grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; }
+
+      /* Stats */
+      .fp-stat { text-align: center; padding: 1rem; }
+      .fp-stat-value { font-size: clamp(1.75rem, 3vw, 2.5rem); font-weight: 800; letter-spacing: -0.03em; line-height: 1.2; }
+      .fp-stat-label { font-size: 0.8125rem; color: var(--text-muted); margin-top: 0.25rem; }
+
+      /* Comparison table */
+      .fp-table {
+        width: 100%; border-collapse: collapse; background: var(--surface-1);
+        border-radius: var(--radius-xl); overflow: hidden; border: 1px solid var(--surface-3);
+      }
+      .fp-table th {
+        padding: 0.75rem 1rem; text-align: left; font-size: 0.75rem; font-weight: 700;
+        text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted);
+        background: var(--surface-2); border-bottom: 1px solid var(--surface-3);
+      }
+      .fp-table td {
+        padding: 0.625rem 1rem; font-size: 0.875rem;
+        border-bottom: 1px solid rgba(255,255,255,0.03);
+      }
+      .fp-table tr:last-child td { border-bottom: none; }
+
+      /* Code */
+      .fp-code {
+        background: var(--surface-1); border: 1px solid var(--surface-3);
+        border-radius: var(--radius-lg); overflow: hidden;
+      }
+      .fp-code-header {
+        padding: 0.5rem 1rem; background: var(--surface-2);
+        border-bottom: 1px solid var(--surface-3); display: flex; align-items: center;
+        gap: 0.5rem; font-size: 0.75rem; font-weight: 600; color: var(--text-muted);
+      }
+      .fp-code-dots { display: flex; gap: 6px; }
+      .fp-code-dot { width: 10px; height: 10px; border-radius: 50%; }
+      .fp-code pre {
+        padding: 1rem; font-size: 0.75rem; line-height: 1.7;
+        color: #d6deeb; overflow-x: auto; margin: 0;
+      }
+
+      /* Pipeline - horizontal flow */
+      .fp-pipeline { display: flex; align-items: center; justify-content: center; gap: 0.75rem; flex-wrap: wrap; margin-bottom: 2rem; }
+      .fp-pipeline-step { display: flex; flex-direction: column; align-items: center; gap: 0.375rem; text-align: center; min-width: 100px; }
+      .fp-pipeline-icon { width: 56px; height: 56px; border-radius: var(--radius-xl); display: flex; align-items: center; justify-content: center; font-size: 1.25rem; }
+      .fp-pipeline-label { font-size: 0.8125rem; font-weight: 700; }
+      .fp-pipeline-sub { font-size: 0.6875rem; color: var(--text-muted); }
+      .fp-pipeline-arrow { font-size: 1rem; color: var(--text-muted); }
+
+      /* Timeline */
+      .fp-timeline-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; }
+      .fp-timeline-phase {
+        background: var(--surface-1); border: 1px solid var(--surface-3);
+        border-radius: var(--radius-xl); padding: 1.25rem; position: relative;
+      }
+      .fp-timeline-phase-num {
+        font-family: var(--font-mono); font-size: 0.6875rem; font-weight: 700;
+        text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.5rem;
+      }
+      .fp-timeline-phase-title { font-size: 1rem; font-weight: 700; margin-bottom: 0.375rem; }
+      .fp-timeline-phase-time { font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.5rem; }
+      .fp-timeline-phase-items { list-style: none; }
+      .fp-timeline-phase-items li {
+        font-size: 0.8125rem; color: var(--text-secondary); padding: 0.25rem 0;
+        display: flex; align-items: flex-start; gap: 0.5rem; line-height: 1.4;
+      }
+      .fp-timeline-phase-items li i { color: var(--wc-green); margin-top: 0.15em; flex-shrink: 0; font-size: 0.625rem; }
+
+      /* Risk items */
+      .fp-risk {
+        display: grid; grid-template-columns: auto 1fr auto; gap: 1rem;
+        align-items: center; padding: 1rem 1.25rem;
+        background: var(--surface-1); border: 1px solid var(--surface-3);
+        border-radius: var(--radius-lg); margin-bottom: 0.75rem;
+      }
+      .fp-risk-icon { width: 40px; height: 40px; border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; font-size: 1rem; }
+      .fp-risk-text { }
+      .fp-risk-title { font-size: 0.9375rem; font-weight: 700; margin-bottom: 0.125rem; }
+      .fp-risk-desc { font-size: 0.8125rem; color: var(--text-secondary); line-height: 1.4; }
+      .fp-risk-badge {
+        font-size: 0.6875rem; font-weight: 700; text-transform: uppercase;
+        letter-spacing: 0.03em; padding: 0.25rem 0.75rem; border-radius: var(--radius-full);
+        white-space: nowrap;
+      }
+
+      /* Buttons */
+      .fp-btn {
+        display: inline-flex; align-items: center; gap: 0.5rem;
+        padding: 0.75rem 1.5rem; border-radius: var(--radius-full);
+        font-weight: 600; font-size: 0.9375rem; transition: all 0.3s ease; text-decoration: none;
+      }
+      .fp-btn-solid { background: var(--gradient-primary); color: white; border: none; box-shadow: var(--shadow-md), var(--glow-subtle); }
+      .fp-btn-solid:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg), var(--glow-primary); color: white; }
+      .fp-btn-ghost { background: var(--glass-bg); color: var(--text-secondary); border: 1px solid var(--glass-border-strong); }
+      .fp-btn-ghost:hover { background: var(--glass-bg-strong); color: var(--text-primary); transform: translateY(-2px); }
+      .fp-btn-arrow { transition: transform 0.2s ease; }
+      .fp-btn:hover .fp-btn-arrow { transform: translateX(4px); }
+      .fp-btn-group { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; margin-top: 2rem; }
+
+      /* Slide alternating backgrounds */
+      .fp-slide-dark { background: var(--surface-0); }
+      .fp-slide-mid { background: var(--surface-1); }
+      .fp-slide-hero { background: linear-gradient(135deg, #0a0a18 0%, #0f1030 30%, #1a0a2e 60%, #0a0a18 100%); }
+
+      /* Responsive */
+      @media (max-width: 1024px) {
+        .fp-grid-2 { grid-template-columns: 1fr; }
+        .fp-grid-3 { grid-template-columns: 1fr; }
+        .fp-grid-4 { grid-template-columns: repeat(2, 1fr); }
+        .fp-timeline-grid { grid-template-columns: repeat(2, 1fr); }
+        .fp-dots { display: none; }
+        .fp-risk { grid-template-columns: auto 1fr; }
+        .fp-risk-badge { grid-column: 1 / -1; justify-self: start; }
+      }
+
+      @media (max-width: 768px) {
+        .fp-slide { padding: 4rem 1rem 5rem; min-height: auto; }
+        .fp-grid-4 { grid-template-columns: 1fr; }
+        .fp-timeline-grid { grid-template-columns: 1fr; }
+        .fp-pipeline { flex-direction: column; }
+        .fp-pipeline-arrow { transform: rotate(90deg); }
+        .fp-btn-group { flex-direction: column; align-items: stretch; }
+        .fp-btn { width: 100%; justify-content: center; }
+        .pitch-nav { bottom: 1rem; left: 0.5rem; right: 0.5rem; transform: none; justify-content: center; }
+        .pitch-nav-link { padding: 0.5rem 0.75rem; font-size: 0.75rem; }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
+        .scroll-reveal { opacity: 1; transform: none; filter: none; transition: none; }
+        .fp-orb { animation: none !important; opacity: 0.15; }
+        html { scroll-behavior: auto; }
+        .fp-container { scroll-snap-type: none !important; scroll-behavior: auto !important; }
+      }
+
+      .fp-btn:focus-visible, .pitch-nav-link:focus-visible, .pitch-nav-home:focus-visible, .fp-dot:focus-visible {
+        outline: 3px solid var(--wc-accent); outline-offset: 3px;
+      }
+    </style>
+  </head>
+
+  <body>
+    <!-- Floating pitch navigation -->
+    <nav class="pitch-nav" aria-label="Pitch pages">
+      <a href="/" class="pitch-nav-home" aria-label="Back to Dashboard">
+        <i class="fa-solid fa-house" aria-hidden="true"></i>
+      </a>
+      <div class="pitch-nav-divider" aria-hidden="true"></div>
+      <a href="/elevator-pitch/" class="pitch-nav-link">
+        <i class="fa-solid fa-bolt" aria-hidden="true"></i>
+        30s
+      </a>
+      <a href="/detailed-pitch/" class="pitch-nav-link">
+        <i class="fa-solid fa-clock" aria-hidden="true"></i>
+        5 min
+      </a>
+      <a href="/full-presentation/" class="pitch-nav-link active" aria-current="page">
+        <i class="fa-solid fa-presentation-screen" aria-hidden="true"></i>
+        30 min
+      </a>
+    </nav>
+
+    <!-- Section dots navigation (desktop) -->
+    <nav class="fp-dots" aria-label="Slide navigation">
+      <button class="fp-dot active" data-slide="0" aria-label="Slide 1: Title"><span class="fp-dot-label">Title</span></button>
+      <button class="fp-dot" data-slide="1" aria-label="Slide 2: The Problem"><span class="fp-dot-label">Problem</span></button>
+      <button class="fp-dot" data-slide="2" aria-label="Slide 3: The Vision"><span class="fp-dot-label">Vision</span></button>
+      <button class="fp-dot" data-slide="3" aria-label="Slide 4: Architecture"><span class="fp-dot-label">Architecture</span></button>
+      <button class="fp-dot" data-slide="4" aria-label="Slide 5: The Stack"><span class="fp-dot-label">Stack</span></button>
+      <button class="fp-dot" data-slide="5" aria-label="Slide 6: Quality"><span class="fp-dot-label">Quality</span></button>
+      <button class="fp-dot" data-slide="6" aria-label="Slide 7: Team"><span class="fp-dot-label">Team</span></button>
+      <button class="fp-dot" data-slide="7" aria-label="Slide 8: Timeline"><span class="fp-dot-label">Timeline</span></button>
+      <button class="fp-dot" data-slide="8" aria-label="Slide 9: Risk"><span class="fp-dot-label">Risk</span></button>
+      <button class="fp-dot" data-slide="9" aria-label="Slide 10: The Ask"><span class="fp-dot-label">The Ask</span></button>
+    </nav>
+
+    <main id="main-content" class="fp-container">
+
+      <!-- SLIDE 1: TITLE / HERO -->
+      <section class="fp-slide fp-slide-hero" id="slide-0" aria-label="Title">
+        <div class="fp-particles" aria-hidden="true"></div>
+        <div class="fp-grid" aria-hidden="true"></div>
+        <div class="fp-orb" style="width:600px;height:600px;background:radial-gradient(circle,rgba(102,126,234,0.15),transparent 70%);top:-15%;right:-10%;animation:float-slow 22s ease-in-out infinite, orb-pulse 8s ease-in-out infinite;" aria-hidden="true"></div>
+        <div class="fp-orb" style="width:400px;height:400px;background:radial-gradient(circle,rgba(6,182,212,0.12),transparent 70%);bottom:-10%;left:-8%;animation:float-slow 28s ease-in-out infinite reverse, orb-pulse 10s ease-in-out infinite 2s;" aria-hidden="true"></div>
+        <div class="fp-orb" style="width:300px;height:300px;background:radial-gradient(circle,rgba(236,72,153,0.1),transparent 70%);top:30%;left:15%;animation:float-slow 18s ease-in-out infinite 3s;" aria-hidden="true"></div>
+
+        <div class="fp-slide-inner" style="text-align:center;">
+          <div style="display:inline-flex;align-items:center;gap:0.5rem;padding:0.5rem 1.25rem;background:var(--glass-bg-strong);border:1px solid var(--glass-border-strong);border-radius:var(--radius-full);font-size:0.8125rem;font-weight:600;color:var(--wc-cyan);margin-bottom:2rem;animation:fadeInDown 0.8s ease-out;">
+            <span style="width:8px;height:8px;border-radius:50%;background:var(--wc-cyan);box-shadow:0 0 8px var(--wc-cyan);animation:pulse-ring 2s ease-out infinite;" aria-hidden="true"></span>
+            Full Technical Presentation
+          </div>
+          <h1 style="font-size:clamp(2.5rem,7vw,5rem);font-weight:900;letter-spacing:-0.05em;line-height:1.05;margin-bottom:1.5rem;animation:fadeInUp 0.8s ease-out 0.15s both;">
+            WC-2026<br/>
+            <span class="gradient-text">Enterprise Web Components<br/>for Healthcare</span>
+          </h1>
+          <p style="font-size:clamp(1.125rem,2.5vw,1.375rem);color:var(--text-secondary);margin-bottom:1rem;animation:fadeInUp 0.8s ease-out 0.3s both;">
+            A complete architecture for building, documenting, and delivering<br/>
+            accessible, framework-agnostic web components at enterprise scale.
+          </p>
+          <p style="font-size:0.9375rem;color:var(--text-muted);animation:fadeInUp 0.8s ease-out 0.45s both;">
+            Presented by a 28-year engineering veteran &middot; February 2026
+          </p>
+        </div>
+        <div style="position:absolute;bottom:2rem;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:0.5rem;color:var(--text-muted);font-size:0.75rem;font-weight:500;letter-spacing:0.05em;text-transform:uppercase;animation:scroll-fade 2s ease-in-out infinite;z-index:10;" aria-hidden="true">
+          <span>Scroll or use dots</span>
+          <div style="width:1px;height:24px;background:linear-gradient(to bottom,var(--text-muted),transparent);"></div>
+        </div>
+      </section>
+
+      <!-- SLIDE 2: THE PROBLEM -->
+      <section class="fp-slide fp-slide-mid" id="slide-1" aria-label="The Problem">
+        <div class="fp-particles" aria-hidden="true"></div>
+        <div class="fp-slide-inner">
+          <div class="fp-slide-header scroll-reveal">
+            <div class="fp-slide-num num-red" aria-hidden="true">2</div>
+            <span class="fp-slide-label label-red">The Problem</span>
+            <h2 class="fp-slide-title">Why Current Approaches Fail</h2>
+            <p class="fp-slide-desc">Healthcare organizations face compounding technical debt and compliance risk from fragmented frontend approaches.</p>
+          </div>
+
+          <div class="fp-grid-3 scroll-reveal scroll-reveal-delay-1">
+            <div class="fp-card">
+              <div class="fp-card-icon icon-red" aria-hidden="true"><i class="fa-solid fa-puzzle-piece"></i></div>
+              <div class="fp-card-title">Fragmented Components</div>
+              <div class="fp-card-desc">Every team builds their own buttons, cards, and forms. No shared design language. Inconsistent UX across the organization. Duplicated effort across teams.</div>
+            </div>
+            <div class="fp-card">
+              <div class="fp-card-icon icon-amber" aria-hidden="true"><i class="fa-solid fa-triangle-exclamation"></i></div>
+              <div class="fp-card-title">Accessibility Gaps</div>
+              <div class="fp-card-desc">WCAG compliance treated as an afterthought. HHS Section 508 mandate (May 2026) approaching. Retrofit costs 10x more than building it in. Litigation risk.</div>
+            </div>
+            <div class="fp-card">
+              <div class="fp-card-icon icon-pink" aria-hidden="true"><i class="fa-solid fa-lock"></i></div>
+              <div class="fp-card-title">Framework Lock-In</div>
+              <div class="fp-card-desc">React/Angular components tied to specific versions. Drupal teams cannot consume them directly. Migration costs grow with every release cycle.</div>
+            </div>
+          </div>
+
+          <div class="fp-grid-4 scroll-reveal scroll-reveal-delay-2" style="margin-top:2rem;">
+            <div class="fp-stat">
+              <div class="fp-stat-value" style="color:var(--wc-red);">10x</div>
+              <div class="fp-stat-label">Cost to retrofit<br/>vs. build accessible</div>
+            </div>
+            <div class="fp-stat">
+              <div class="fp-stat-value" style="color:var(--wc-amber);">May '26</div>
+              <div class="fp-stat-label">HHS mandate<br/>compliance deadline</div>
+            </div>
+            <div class="fp-stat">
+              <div class="fp-stat-value" style="color:var(--wc-pink);">3-5x</div>
+              <div class="fp-stat-label">Duplicated effort<br/>without shared library</div>
+            </div>
+            <div class="fp-stat">
+              <div class="fp-stat-value" style="color:var(--wc-electric);">0</div>
+              <div class="fp-stat-label">Design tokens<br/>in most Drupal sites</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SLIDE 3: THE VISION -->
+      <section class="fp-slide fp-slide-dark" id="slide-2" aria-label="The Vision">
+        <div class="fp-particles" aria-hidden="true"></div>
+        <div class="fp-slide-inner">
+          <div class="fp-slide-header scroll-reveal">
+            <div class="fp-slide-num num-green" aria-hidden="true">3</div>
+            <span class="fp-slide-label label-green">The Vision</span>
+            <h2 class="fp-slide-title">One Library. Every Platform. Full Compliance.</h2>
+            <p class="fp-slide-desc">A single, enterprise-grade web component library that works in Drupal, React, Vue, or any HTML context -- with accessibility baked in from day one.</p>
+          </div>
+
+          <div class="fp-grid-2 scroll-reveal scroll-reveal-delay-1">
+            <div class="fp-card">
+              <div class="fp-card-icon icon-green" aria-hidden="true"><i class="fa-solid fa-globe"></i></div>
+              <div class="fp-card-title">Framework-Agnostic</div>
+              <div class="fp-card-desc">
+                Web Components are a W3C standard. They work in any HTML context without a JavaScript framework.
+                Drupal TWIG templates consume them like native HTML elements. React and Vue can use them directly.
+                No wrapper libraries, no framework adapters, no version coupling.
+              </div>
+            </div>
+            <div class="fp-card">
+              <div class="fp-card-icon icon-cyan" aria-hidden="true"><i class="fa-solid fa-universal-access"></i></div>
+              <div class="fp-card-title">Accessible by Architecture</div>
+              <div class="fp-card-desc">
+                WCAG 2.2 AA compliance is not a checklist item -- it is an architectural constraint.
+                Every component uses ElementInternals for form participation, manages focus properly,
+                supports keyboard navigation, and passes axe-core validation in Storybook.
+              </div>
+            </div>
+          </div>
+
+          <div class="fp-grid-3 scroll-reveal scroll-reveal-delay-2" style="margin-top:1.25rem;">
+            <div class="fp-card">
+              <div class="fp-card-icon icon-accent" aria-hidden="true"><i class="fa-solid fa-palette"></i></div>
+              <div class="fp-card-title">Design Token Powered</div>
+              <div class="fp-card-desc">W3C DTCG three-tier tokens enable multi-brand theming, dark mode, and high-contrast without touching component code.</div>
+            </div>
+            <div class="fp-card">
+              <div class="fp-card-icon icon-pink" aria-hidden="true"><i class="fa-solid fa-file-code"></i></div>
+              <div class="fp-card-title">Self-Documenting</div>
+              <div class="fp-card-desc">CEM pipeline generates Storybook controls, API docs, IDE hints, and Drupal tooling from JSDoc annotations automatically.</div>
+            </div>
+            <div class="fp-card">
+              <div class="fp-card-icon icon-amber" aria-hidden="true"><i class="fa-solid fa-gauge-high"></i></div>
+              <div class="fp-card-title">5KB Runtime</div>
+              <div class="fp-card-desc">Lit adds just 5KB gzipped. No virtual DOM. No runtime framework. Components are fast because they are close to the platform.</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SLIDE 4: ARCHITECTURE DEEP DIVE -->
+      <section class="fp-slide fp-slide-mid" id="slide-3" aria-label="Architecture">
+        <div class="fp-particles" aria-hidden="true"></div>
+        <div class="fp-slide-inner">
+          <div class="fp-slide-header scroll-reveal">
+            <div class="fp-slide-num num-accent" aria-hidden="true">4</div>
+            <span class="fp-slide-label label-accent">Architecture</span>
+            <h2 class="fp-slide-title">Three-Tier Tokens. CEM Pipeline. Zero Coupling.</h2>
+          </div>
+
+          <!-- Token tiers -->
+          <div class="fp-grid-3 scroll-reveal scroll-reveal-delay-1" style="margin-bottom:2rem;">
+            <div class="fp-card" style="border-top:3px solid var(--wc-cyan);">
+              <div style="font-family:var(--font-mono);font-size:0.6875rem;font-weight:700;color:var(--wc-cyan);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:0.5rem;">Tier 1: Primitive</div>
+              <div class="fp-card-title">Raw Values</div>
+              <div class="fp-card-desc">Color scales, spacing, font stacks. Never referenced directly by consumers.</div>
+              <div style="margin-top:0.75rem;display:flex;flex-wrap:wrap;gap:0.375rem;">
+                <code style="font-size:0.6875rem;padding:0.125rem 0.5rem;background:rgba(6,182,212,0.08);border:1px solid rgba(6,182,212,0.15);border-radius:4px;color:var(--wc-cyan);">--wc-blue-500</code>
+                <code style="font-size:0.6875rem;padding:0.125rem 0.5rem;background:rgba(6,182,212,0.08);border:1px solid rgba(6,182,212,0.15);border-radius:4px;color:var(--wc-cyan);">--wc-space-4</code>
+              </div>
+            </div>
+            <div class="fp-card" style="border-top:3px solid var(--wc-accent);">
+              <div style="font-family:var(--font-mono);font-size:0.6875rem;font-weight:700;color:var(--wc-accent);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:0.5rem;">Tier 2: Semantic</div>
+              <div class="fp-card-title">Brand Decisions</div>
+              <div class="fp-card-desc">Maps primitives to intent. Theme switching happens here. Public API.</div>
+              <div style="margin-top:0.75rem;display:flex;flex-wrap:wrap;gap:0.375rem;">
+                <code style="font-size:0.6875rem;padding:0.125rem 0.5rem;background:rgba(139,92,246,0.08);border:1px solid rgba(139,92,246,0.15);border-radius:4px;color:var(--wc-accent);">--wc-brand-primary</code>
+                <code style="font-size:0.6875rem;padding:0.125rem 0.5rem;background:rgba(139,92,246,0.08);border:1px solid rgba(139,92,246,0.15);border-radius:4px;color:var(--wc-accent);">--wc-brand-surface</code>
+              </div>
+            </div>
+            <div class="fp-card" style="border-top:3px solid var(--wc-green);">
+              <div style="font-family:var(--font-mono);font-size:0.6875rem;font-weight:700;color:var(--wc-green);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:0.5rem;">Tier 3: Component</div>
+              <div class="fp-card-title">Per-Component</div>
+              <div class="fp-card-desc">Override points for fine-grained customization. Defaults to semantic tokens.</div>
+              <div style="margin-top:0.75rem;display:flex;flex-wrap:wrap;gap:0.375rem;">
+                <code style="font-size:0.6875rem;padding:0.125rem 0.5rem;background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.15);border-radius:4px;color:var(--wc-green);">--wc-button-bg</code>
+                <code style="font-size:0.6875rem;padding:0.125rem 0.5rem;background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.15);border-radius:4px;color:var(--wc-green);">--wc-card-padding</code>
+              </div>
+            </div>
+          </div>
+
+          <!-- CEM Pipeline -->
+          <div class="fp-pipeline scroll-reveal scroll-reveal-delay-2">
+            <div class="fp-pipeline-step">
+              <div class="fp-pipeline-icon icon-cyan"><i class="fa-solid fa-code" aria-hidden="true"></i></div>
+              <div class="fp-pipeline-label">JSDoc</div>
+              <div class="fp-pipeline-sub">Source annotations</div>
+            </div>
+            <div class="fp-pipeline-arrow" aria-hidden="true"><i class="fa-solid fa-chevron-right"></i></div>
+            <div class="fp-pipeline-step">
+              <div class="fp-pipeline-icon icon-accent"><i class="fa-solid fa-gears" aria-hidden="true"></i></div>
+              <div class="fp-pipeline-label">CEM Analyzer</div>
+              <div class="fp-pipeline-sub">Build step</div>
+            </div>
+            <div class="fp-pipeline-arrow" aria-hidden="true"><i class="fa-solid fa-chevron-right"></i></div>
+            <div class="fp-pipeline-step">
+              <div class="fp-pipeline-icon icon-green"><i class="fa-solid fa-file-code" aria-hidden="true"></i></div>
+              <div class="fp-pipeline-label">CEM JSON</div>
+              <div class="fp-pipeline-sub">API manifest</div>
+            </div>
+            <div class="fp-pipeline-arrow" aria-hidden="true"><i class="fa-solid fa-chevron-right"></i></div>
+            <div class="fp-pipeline-step">
+              <div class="fp-pipeline-icon icon-pink"><i class="fa-solid fa-arrows-split-up-and-left" aria-hidden="true"></i></div>
+              <div class="fp-pipeline-label">4 Outputs</div>
+              <div class="fp-pipeline-sub">Auto-generated</div>
+            </div>
+          </div>
+
+          <div class="fp-grid-4 scroll-reveal scroll-reveal-delay-3">
+            <div style="background:var(--surface-1);border:1px solid var(--surface-3);border-radius:var(--radius-lg);padding:1rem;text-align:center;">
+              <div style="font-size:1.25rem;color:var(--wc-pink);margin-bottom:0.5rem;"><i class="fa-solid fa-book-open" aria-hidden="true"></i></div>
+              <div style="font-size:0.8125rem;font-weight:700;">Storybook</div>
+            </div>
+            <div style="background:var(--surface-1);border:1px solid var(--surface-3);border-radius:var(--radius-lg);padding:1rem;text-align:center;">
+              <div style="font-size:1.25rem;color:var(--wc-cyan);margin-bottom:0.5rem;"><i class="fa-solid fa-file-lines" aria-hidden="true"></i></div>
+              <div style="font-size:0.8125rem;font-weight:700;">Starlight Docs</div>
+            </div>
+            <div style="background:var(--surface-1);border:1px solid var(--surface-3);border-radius:var(--radius-lg);padding:1rem;text-align:center;">
+              <div style="font-size:1.25rem;color:var(--wc-green);margin-bottom:0.5rem;"><i class="fa-solid fa-laptop-code" aria-hidden="true"></i></div>
+              <div style="font-size:0.8125rem;font-weight:700;">IDE IntelliSense</div>
+            </div>
+            <div style="background:var(--surface-1);border:1px solid var(--surface-3);border-radius:var(--radius-lg);padding:1rem;text-align:center;">
+              <div style="font-size:1.25rem;color:var(--wc-amber);margin-bottom:0.5rem;"><i class="fa-brands fa-drupal" aria-hidden="true"></i></div>
+              <div style="font-size:0.8125rem;font-weight:700;">Drupal Tooling</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SLIDE 5: THE STACK -->
+      <section class="fp-slide fp-slide-dark" id="slide-4" aria-label="The Stack">
+        <div class="fp-particles" aria-hidden="true"></div>
+        <div class="fp-slide-inner">
+          <div class="fp-slide-header scroll-reveal">
+            <div class="fp-slide-num num-amber" aria-hidden="true">5</div>
+            <span class="fp-slide-label label-amber">Technology</span>
+            <h2 class="fp-slide-title">The 2026 Stack</h2>
+            <p class="fp-slide-desc">Every tool chosen for measurable advantage, not hype.</p>
+          </div>
+
+          <div class="scroll-reveal scroll-reveal-delay-1" style="overflow-x:auto;">
+            <table class="fp-table">
+              <thead>
+                <tr>
+                  <th>Layer</th>
+                  <th>Technology</th>
+                  <th>Why This One</th>
+                  <th>Alternative Rejected</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td style="font-weight:700;color:var(--wc-pink);">Components</td>
+                  <td><strong>Lit 3</strong></td>
+                  <td style="color:var(--text-secondary);">5KB runtime, W3C standards, Shadow DOM encapsulation</td>
+                  <td style="color:var(--text-muted);">Stencil (heavier), React (framework lock-in)</td>
+                </tr>
+                <tr>
+                  <td style="font-weight:700;color:var(--wc-amber);">Build</td>
+                  <td><strong>Vite 7</strong></td>
+                  <td style="color:var(--text-secondary);">Rolldown engine, instant HMR, native ESM</td>
+                  <td style="color:var(--text-muted);">Webpack (slow), Turbopack (less mature)</td>
+                </tr>
+                <tr>
+                  <td style="font-weight:700;color:var(--wc-accent);">Docs</td>
+                  <td><strong>Storybook 9</strong></td>
+                  <td style="color:var(--text-secondary);">Vitest integration, CEM autodocs, Chromatic</td>
+                  <td style="color:var(--text-muted);">Histoire (less ecosystem), custom (high effort)</td>
+                </tr>
+                <tr>
+                  <td style="font-weight:700;color:var(--wc-cyan);">Types</td>
+                  <td><strong>TypeScript 5.7+</strong></td>
+                  <td style="color:var(--text-secondary);">Strict mode, zero any, CEM-generated types</td>
+                  <td style="color:var(--text-muted);">JSDoc-only (less tooling), Flow (dead)</td>
+                </tr>
+                <tr>
+                  <td style="font-weight:700;color:var(--wc-green);">Tokens</td>
+                  <td><strong>W3C DTCG + Terrazzo</strong></td>
+                  <td style="color:var(--text-secondary);">First stable spec (2025.10), vendor-neutral</td>
+                  <td style="color:var(--text-muted);">Style Dictionary (pre-DTCG format)</td>
+                </tr>
+                <tr>
+                  <td style="font-weight:700;color:var(--wc-electric);">Testing</td>
+                  <td><strong>Vitest 4 + Playwright</strong></td>
+                  <td style="color:var(--text-secondary);">Browser Mode, 2-10x faster than Jest, real browsers</td>
+                  <td style="color:var(--text-muted);">Jest (no browser mode), Cypress (slower)</td>
+                </tr>
+                <tr>
+                  <td style="font-weight:700;color:var(--wc-pink);">Site</td>
+                  <td><strong>Astro 5 / Starlight</strong></td>
+                  <td style="color:var(--text-secondary);">Zero JS by default, MDX, Pagefind search</td>
+                  <td style="color:var(--text-muted);">Docusaurus (React-dependent), VitePress (Vue-focused)</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="fp-grid-4 scroll-reveal scroll-reveal-delay-2" style="margin-top:2rem;">
+            <div class="fp-stat">
+              <div class="fp-stat-value" style="background:var(--gradient-cyan-purple);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">5KB</div>
+              <div class="fp-stat-label">Lit runtime<br/>(gzipped)</div>
+            </div>
+            <div class="fp-stat">
+              <div class="fp-stat-value" style="background:var(--gradient-green-cyan);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">0</div>
+              <div class="fp-stat-label">Framework<br/>dependencies</div>
+            </div>
+            <div class="fp-stat">
+              <div class="fp-stat-value" style="background:var(--gradient-pink-orange);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">100%</div>
+              <div class="fp-stat-label">TypeScript<br/>coverage</div>
+            </div>
+            <div class="fp-stat">
+              <div class="fp-stat-value" style="background:linear-gradient(135deg,var(--wc-amber),var(--wc-green));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">W3C</div>
+              <div class="fp-stat-label">Standards<br/>compliance</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SLIDE 6: QUALITY & COMPLIANCE -->
+      <section class="fp-slide fp-slide-mid" id="slide-5" aria-label="Quality and Compliance">
+        <div class="fp-particles" aria-hidden="true"></div>
+        <div class="fp-slide-inner">
+          <div class="fp-slide-header scroll-reveal">
+            <div class="fp-slide-num num-green" aria-hidden="true">6</div>
+            <span class="fp-slide-label label-green">Quality</span>
+            <h2 class="fp-slide-title">WCAG 2.2 AA + Six Automated Quality Gates</h2>
+          </div>
+
+          <div class="fp-grid-3 scroll-reveal scroll-reveal-delay-1">
+            <div class="fp-card">
+              <div class="fp-card-icon icon-cyan" aria-hidden="true"><i class="fa-solid fa-vial"></i></div>
+              <div class="fp-card-title">Unit Tests</div>
+              <div class="fp-card-desc">Vitest 4.x -- property validation, event dispatch, state transitions. 2-10x faster than Jest.</div>
+            </div>
+            <div class="fp-card">
+              <div class="fp-card-icon icon-green" aria-hidden="true"><i class="fa-solid fa-display"></i></div>
+              <div class="fp-card-title">Component Tests</div>
+              <div class="fp-card-desc">Web Test Runner -- real browser rendering, Shadow DOM traversal, slot projection verification.</div>
+            </div>
+            <div class="fp-card">
+              <div class="fp-card-icon icon-electric" aria-hidden="true"><i class="fa-solid fa-browsers"></i></div>
+              <div class="fp-card-title">Integration Tests</div>
+              <div class="fp-card-desc">Playwright -- cross-browser (Chrome, Firefox, Safari), keyboard navigation, screen reader flows.</div>
+            </div>
+            <div class="fp-card">
+              <div class="fp-card-icon icon-pink" aria-hidden="true"><i class="fa-solid fa-universal-access"></i></div>
+              <div class="fp-card-title">Accessibility</div>
+              <div class="fp-card-desc">axe-core + Storybook a11y addon -- every story validated for WCAG violations on every build.</div>
+            </div>
+            <div class="fp-card">
+              <div class="fp-card-icon icon-amber" aria-hidden="true"><i class="fa-solid fa-eye"></i></div>
+              <div class="fp-card-title">Visual Regression</div>
+              <div class="fp-card-desc">Chromatic -- pixel-level screenshot comparison catches unintended visual changes before merge.</div>
+            </div>
+            <div class="fp-card">
+              <div class="fp-card-icon icon-accent" aria-hidden="true"><i class="fa-solid fa-spell-check"></i></div>
+              <div class="fp-card-title">Static Analysis</div>
+              <div class="fp-card-desc">ESLint + lit-analyzer -- template type-checking, unused properties, deprecation warnings.</div>
+            </div>
+          </div>
+
+          <div class="scroll-reveal scroll-reveal-delay-2" style="margin-top:2rem;padding:1.25rem;background:var(--glass-bg);border:1px solid rgba(16,185,129,0.2);border-radius:var(--radius-xl);text-align:center;">
+            <div style="display:flex;align-items:center;justify-content:center;gap:0.75rem;flex-wrap:wrap;">
+              <span style="font-size:0.875rem;font-weight:700;color:var(--wc-green);"><i class="fa-solid fa-shield-halved" aria-hidden="true" style="margin-right:0.375rem;"></i>HHS Section 508 Mandate</span>
+              <span style="font-size:0.8125rem;color:var(--text-muted);">&mdash;</span>
+              <span style="font-size:0.875rem;color:var(--text-secondary);">May 2026 compliance deadline. This architecture is ready <strong style="color:var(--wc-green);">today</strong>.</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SLIDE 7: THE TEAM & PROCESS -->
+      <section class="fp-slide fp-slide-dark" id="slide-6" aria-label="Team and Process">
+        <div class="fp-particles" aria-hidden="true"></div>
+        <div class="fp-slide-inner">
+          <div class="fp-slide-header scroll-reveal">
+            <div class="fp-slide-num num-pink" aria-hidden="true">7</div>
+            <span class="fp-slide-label label-pink">Leadership</span>
+            <h2 class="fp-slide-title">This Documentation System Is the Proof</h2>
+            <p class="fp-slide-desc">How I organize, delegate, and lead is not a claim. It is the artifact you are evaluating right now.</p>
+          </div>
+
+          <div class="fp-grid-2 scroll-reveal scroll-reveal-delay-1">
+            <div class="fp-card">
+              <div class="fp-card-icon icon-cyan" aria-hidden="true"><i class="fa-solid fa-sitemap"></i></div>
+              <div class="fp-card-title">Structured Planning</div>
+              <div class="fp-card-desc">
+                6 planning documents totaling 10,000+ lines. Each owned by a domain expert with clear scope:
+                architecture, components, tokens, documentation, integration, testing. No ambiguity about who owns what.
+              </div>
+            </div>
+            <div class="fp-card">
+              <div class="fp-card-icon icon-accent" aria-hidden="true"><i class="fa-solid fa-users-gear"></i></div>
+              <div class="fp-card-title">Multi-Stakeholder Docs</div>
+              <div class="fp-card-desc">
+                Three audience-specific documentation tracks: component builders get TypeScript patterns,
+                Drupal teams get TWIG integration examples, designers get token visualization. Every persona has a tailored path.
+              </div>
+            </div>
+            <div class="fp-card">
+              <div class="fp-card-icon icon-green" aria-hidden="true"><i class="fa-solid fa-gauge-high"></i></div>
+              <div class="fp-card-title">Execution Velocity</div>
+              <div class="fp-card-desc">
+                5 immersive showcase pages with particle effects, animated counters, and CSS-drawn architecture diagrams.
+                22 documentation pages. A working Turborepo monorepo. All built in a single sprint.
+              </div>
+            </div>
+            <div class="fp-card">
+              <div class="fp-card-icon icon-pink" aria-hidden="true"><i class="fa-solid fa-eye"></i></div>
+              <div class="fp-card-title">Visual Communication</div>
+              <div class="fp-card-desc">
+                Every technical concept has a visual counterpart: architecture diagrams, comparison tables,
+                pipeline visualizations, and animated stats. Because technical leadership requires clear communication.
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SLIDE 8: IMPLEMENTATION TIMELINE -->
+      <section class="fp-slide fp-slide-mid" id="slide-7" aria-label="Implementation Timeline">
+        <div class="fp-particles" aria-hidden="true"></div>
+        <div class="fp-slide-inner">
+          <div class="fp-slide-header scroll-reveal">
+            <div class="fp-slide-num num-electric" aria-hidden="true">8</div>
+            <span class="fp-slide-label label-electric">Timeline</span>
+            <h2 class="fp-slide-title">Implementation Roadmap</h2>
+            <p class="fp-slide-desc">Four phases from infrastructure to production deployment.</p>
+          </div>
+
+          <div class="fp-timeline-grid scroll-reveal scroll-reveal-delay-1">
+            <div class="fp-timeline-phase" style="border-top:3px solid var(--wc-cyan);">
+              <div class="fp-timeline-phase-num" style="color:var(--wc-cyan);">Phase 1</div>
+              <div class="fp-timeline-phase-title">Foundation</div>
+              <div class="fp-timeline-phase-time"><i class="fa-regular fa-clock" aria-hidden="true" style="margin-right:0.25rem;"></i>Weeks 1-3</div>
+              <ul class="fp-timeline-phase-items">
+                <li><i class="fa-solid fa-circle" aria-hidden="true"></i>Monorepo + Turborepo setup</li>
+                <li><i class="fa-solid fa-circle" aria-hidden="true"></i>Astro/Starlight documentation hub</li>
+                <li><i class="fa-solid fa-circle" aria-hidden="true"></i>Design token infrastructure</li>
+                <li><i class="fa-solid fa-circle" aria-hidden="true"></i>CI/CD pipeline (lint, type-check)</li>
+              </ul>
+            </div>
+            <div class="fp-timeline-phase" style="border-top:3px solid var(--wc-accent);">
+              <div class="fp-timeline-phase-num" style="color:var(--wc-accent);">Phase 2</div>
+              <div class="fp-timeline-phase-title">Core Library</div>
+              <div class="fp-timeline-phase-time"><i class="fa-regular fa-clock" aria-hidden="true" style="margin-right:0.25rem;"></i>Weeks 4-8</div>
+              <ul class="fp-timeline-phase-items">
+                <li><i class="fa-solid fa-circle" aria-hidden="true"></i>Lit 3 component scaffolding</li>
+                <li><i class="fa-solid fa-circle" aria-hidden="true"></i>CEM analyzer integration</li>
+                <li><i class="fa-solid fa-circle" aria-hidden="true"></i>First 10 core components</li>
+                <li><i class="fa-solid fa-circle" aria-hidden="true"></i>Storybook 9 with autodocs</li>
+              </ul>
+            </div>
+            <div class="fp-timeline-phase" style="border-top:3px solid var(--wc-green);">
+              <div class="fp-timeline-phase-num" style="color:var(--wc-green);">Phase 3</div>
+              <div class="fp-timeline-phase-title">Integration</div>
+              <div class="fp-timeline-phase-time"><i class="fa-regular fa-clock" aria-hidden="true" style="margin-right:0.25rem;"></i>Weeks 9-12</div>
+              <ul class="fp-timeline-phase-items">
+                <li><i class="fa-solid fa-circle" aria-hidden="true"></i>Drupal TWIG integration</li>
+                <li><i class="fa-solid fa-circle" aria-hidden="true"></i>Full component suite (40+)</li>
+                <li><i class="fa-solid fa-circle" aria-hidden="true"></i>Visual regression (Chromatic)</li>
+                <li><i class="fa-solid fa-circle" aria-hidden="true"></i>WCAG audit + remediation</li>
+              </ul>
+            </div>
+            <div class="fp-timeline-phase" style="border-top:3px solid var(--wc-pink);">
+              <div class="fp-timeline-phase-num" style="color:var(--wc-pink);">Phase 4</div>
+              <div class="fp-timeline-phase-title">Production</div>
+              <div class="fp-timeline-phase-time"><i class="fa-regular fa-clock" aria-hidden="true" style="margin-right:0.25rem;"></i>Weeks 13-16</div>
+              <ul class="fp-timeline-phase-items">
+                <li><i class="fa-solid fa-circle" aria-hidden="true"></i>npm package publishing</li>
+                <li><i class="fa-solid fa-circle" aria-hidden="true"></i>CDN distribution</li>
+                <li><i class="fa-solid fa-circle" aria-hidden="true"></i>Team onboarding materials</li>
+                <li><i class="fa-solid fa-circle" aria-hidden="true"></i>Production Drupal deployment</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SLIDE 9: RISK MITIGATION -->
+      <section class="fp-slide fp-slide-dark" id="slide-8" aria-label="Risk Mitigation">
+        <div class="fp-particles" aria-hidden="true"></div>
+        <div class="fp-slide-inner">
+          <div class="fp-slide-header scroll-reveal">
+            <div class="fp-slide-num num-amber" aria-hidden="true">9</div>
+            <span class="fp-slide-label label-amber">Risk</span>
+            <h2 class="fp-slide-title">Known Risks and Mitigations</h2>
+            <p class="fp-slide-desc">Every project has risks. The difference is whether you have identified them and planned for them.</p>
+          </div>
+
+          <div class="scroll-reveal scroll-reveal-delay-1">
+            <div class="fp-risk">
+              <div class="fp-risk-icon icon-amber" aria-hidden="true"><i class="fa-solid fa-clock-rotate-left"></i></div>
+              <div class="fp-risk-text">
+                <div class="fp-risk-title">Bleeding-Edge Dependencies</div>
+                <div class="fp-risk-desc">Lit 3, Vite 7, and Storybook 9 are new. Breaking changes are possible.</div>
+              </div>
+              <span class="fp-risk-badge" style="background:rgba(16,185,129,0.1);color:var(--wc-green);border:1px solid rgba(16,185,129,0.2);">Mitigated</span>
+            </div>
+            <div style="padding:0 0 0.75rem 4rem;font-size:0.8125rem;color:var(--text-muted);line-height:1.5;">
+              <strong style="color:var(--text-secondary);">Strategy:</strong> Pin versions. Follow RC channels. All tools are from mature teams (Google, Chromatic, Evan You). Fallback versions documented.
+            </div>
+
+            <div class="fp-risk">
+              <div class="fp-risk-icon icon-pink" aria-hidden="true"><i class="fa-solid fa-people-group"></i></div>
+              <div class="fp-risk-text">
+                <div class="fp-risk-title">Drupal Team Adoption</div>
+                <div class="fp-risk-desc">Drupal developers unfamiliar with Web Components may resist adoption.</div>
+              </div>
+              <span class="fp-risk-badge" style="background:rgba(16,185,129,0.1);color:var(--wc-green);border:1px solid rgba(16,185,129,0.2);">Mitigated</span>
+            </div>
+            <div style="padding:0 0 0.75rem 4rem;font-size:0.8125rem;color:var(--text-muted);line-height:1.5;">
+              <strong style="color:var(--text-secondary);">Strategy:</strong> 2,100-line Drupal integration guide. TWIG examples for every component. SDC wrappers for module-based consumption. Zero Drupal coupling means zero breaking changes.
+            </div>
+
+            <div class="fp-risk">
+              <div class="fp-risk-icon icon-electric" aria-hidden="true"><i class="fa-solid fa-shield-halved"></i></div>
+              <div class="fp-risk-text">
+                <div class="fp-risk-title">WCAG Compliance Scope</div>
+                <div class="fp-risk-desc">Meeting AA across 40+ components requires significant testing effort.</div>
+              </div>
+              <span class="fp-risk-badge" style="background:rgba(16,185,129,0.1);color:var(--wc-green);border:1px solid rgba(16,185,129,0.2);">Mitigated</span>
+            </div>
+            <div style="padding:0 0 0 4rem;font-size:0.8125rem;color:var(--text-muted);line-height:1.5;">
+              <strong style="color:var(--text-secondary);">Strategy:</strong> Automated axe-core in every Storybook story. Playwright keyboard navigation tests. ElementInternals for form participation. 4-level accessibility testing pyramid.
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SLIDE 10: THE ASK / Q&A -->
+      <section class="fp-slide fp-slide-hero" id="slide-9" aria-label="The Ask">
+        <div class="fp-particles" aria-hidden="true"></div>
+        <div class="fp-grid" aria-hidden="true"></div>
+        <div class="fp-orb" style="width:500px;height:500px;background:radial-gradient(circle,rgba(102,126,234,0.12),transparent 70%);top:-10%;right:-10%;animation:float-slow 22s ease-in-out infinite, orb-pulse 8s ease-in-out infinite;" aria-hidden="true"></div>
+        <div class="fp-orb" style="width:400px;height:400px;background:radial-gradient(circle,rgba(16,185,129,0.1),transparent 70%);bottom:-10%;left:-5%;animation:float-slow 25s ease-in-out infinite reverse, orb-pulse 10s ease-in-out infinite 2s;" aria-hidden="true"></div>
+
+        <div class="fp-slide-inner" style="text-align:center;">
+          <div class="scroll-reveal">
+            <div class="fp-slide-num num-green" style="margin:0 auto 1rem;" aria-hidden="true">10</div>
+            <h2 style="font-size:clamp(2rem,5vw,3.5rem);font-weight:800;letter-spacing:-0.04em;margin-bottom:1.5rem;">
+              <span class="gradient-text">The Ask</span>
+            </h2>
+            <p style="font-size:1.125rem;color:var(--text-secondary);max-width:700px;margin:0 auto 3rem;line-height:1.8;">
+              I am looking for a tech lead role where I can architect, build, and deliver
+              an enterprise web component library for a healthcare organization.
+              This documentation system is not a proposal -- it is a working prototype
+              of how I lead and execute.
+            </p>
+          </div>
+
+          <div class="fp-grid-3 scroll-reveal scroll-reveal-delay-1" style="margin-bottom:3rem;">
+            <div class="fp-card" style="text-align:center;">
+              <div style="font-size:2rem;margin-bottom:0.75rem;"><i class="fa-solid fa-code" style="color:var(--wc-cyan);" aria-hidden="true"></i></div>
+              <div class="fp-card-title">Technical Leadership</div>
+              <div class="fp-card-desc">Architecture decisions, code reviews, technology strategy, mentoring junior engineers.</div>
+            </div>
+            <div class="fp-card" style="text-align:center;">
+              <div style="font-size:2rem;margin-bottom:0.75rem;"><i class="fa-solid fa-hammer" style="color:var(--wc-accent);" aria-hidden="true"></i></div>
+              <div class="fp-card-title">Hands-On Building</div>
+              <div class="fp-card-desc">I write code. I build components. I ship features. Leadership and execution are not mutually exclusive.</div>
+            </div>
+            <div class="fp-card" style="text-align:center;">
+              <div style="font-size:2rem;margin-bottom:0.75rem;"><i class="fa-solid fa-handshake" style="color:var(--wc-green);" aria-hidden="true"></i></div>
+              <div class="fp-card-title">Team Enablement</div>
+              <div class="fp-card-desc">Documentation, tooling, patterns, and guardrails that make every developer on the team more productive.</div>
+            </div>
+          </div>
+
+          <div class="fp-btn-group scroll-reveal scroll-reveal-delay-2">
+            <a href="/elevator-pitch/" class="fp-btn fp-btn-ghost">
+              <i class="fa-solid fa-bolt" aria-hidden="true"></i>
+              30-Second Pitch
+            </a>
+            <a href="/enterprise-architecture/" class="fp-btn fp-btn-solid">
+              Explore Architecture
+              <span class="fp-btn-arrow" aria-hidden="true">&rarr;</span>
+            </a>
+            <a href="/tech-stack/" class="fp-btn fp-btn-ghost">
+              Tech Stack Details
+              <span class="fp-btn-arrow" aria-hidden="true">&rarr;</span>
+            </a>
+          </div>
+
+          <div class="scroll-reveal scroll-reveal-delay-3" style="margin-top:3rem;padding-top:1.5rem;border-top:1px solid var(--glass-border);">
+            <p style="font-size:0.8125rem;color:var(--text-muted);font-style:italic;">
+              Questions? Let us discuss any section in depth.
+              This architecture has been designed to withstand scrutiny --
+              because that is how enterprise systems should be built.
+            </p>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <script is:inline>
+      (function () {
+        var prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+        // Scroll reveal
+        if (prefersReduced) {
+          document.querySelectorAll('.scroll-reveal').forEach(function (el) { el.classList.add('is-visible'); });
+        } else {
+          var observer = new IntersectionObserver(
+            function (entries) {
+              entries.forEach(function (entry) {
+                if (entry.isIntersecting) { entry.target.classList.add('is-visible'); observer.unobserve(entry.target); }
+              });
+            },
+            { threshold: 0.1, rootMargin: '0px 0px -60px 0px' }
+          );
+          document.querySelectorAll('.scroll-reveal').forEach(function (el) { observer.observe(el); });
+        }
+
+        // Card mouse tracking
+        document.querySelectorAll('.fp-card').forEach(function (card) {
+          card.addEventListener('mousemove', function (e) {
+            var rect = card.getBoundingClientRect();
+            card.style.setProperty('--mouse-x', (e.clientX - rect.left) + 'px');
+            card.style.setProperty('--mouse-y', (e.clientY - rect.top) + 'px');
+          });
+        });
+
+        // Section dot navigation
+        var slides = document.querySelectorAll('.fp-slide');
+        var dots = document.querySelectorAll('.fp-dot');
+        var container = document.querySelector('.fp-container');
+
+        // Click handlers for dots
+        dots.forEach(function (dot) {
+          dot.addEventListener('click', function () {
+            var slideIndex = parseInt(dot.getAttribute('data-slide'), 10);
+            var target = slides[slideIndex];
+            if (target) {
+              target.scrollIntoView({ behavior: prefersReduced ? 'auto' : 'smooth' });
+            }
+          });
+        });
+
+        // Update active dot on scroll
+        var scrollTarget = container || window;
+        var dotObserver = new IntersectionObserver(
+          function (entries) {
+            entries.forEach(function (entry) {
+              if (entry.isIntersecting) {
+                var slideId = entry.target.id;
+                var slideNum = parseInt(slideId.replace('slide-', ''), 10);
+                dots.forEach(function (d, i) {
+                  d.classList.toggle('active', i === slideNum);
+                });
+              }
+            });
+          },
+          { threshold: 0.5, root: container || null }
+        );
+        slides.forEach(function (slide) { dotObserver.observe(slide); });
+      })();
+    </script>
+  </body>
+</html>

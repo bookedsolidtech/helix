@@ -1,0 +1,33 @@
+{
+  "name": "wc-2026",
+  "version": "0.0.1",
+  "private": true,
+  "description": "Enterprise Healthcare Web Component Library - Monorepo",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "turbo dev",
+    "dev:docs": "turbo dev --filter=docs",
+    "dev:storybook": "turbo dev --filter=@wc-2026/storybook",
+    "dev:library": "turbo dev --filter=@wc-2026/library",
+    "build": "turbo build",
+    "build:docs": "turbo build --filter=docs",
+    "build:library": "turbo build --filter=@wc-2026/library",
+    "build:storybook": "turbo build --filter=@wc-2026/storybook",
+    "type-check": "turbo type-check",
+    "lint": "turbo lint",
+    "clean": "turbo clean",
+    "cem": "turbo cem --filter=@wc-2026/library",
+    "preview:docs": "turbo preview --filter=docs"
+  },
+  "devDependencies": {
+    "turbo": "^2.3.3",
+    "typescript": "^5.7.2"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "packageManager": "npm@10.8.2"
+}

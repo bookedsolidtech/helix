@@ -1,0 +1,24 @@
+{
+  "name": "@wc-2026/storybook",
+  "version": "0.0.1",
+  "private": true,
+  "description": "Storybook design system playground for WC-2026 components",
+  "type": "module",
+  "scripts": {
+    "dev": "storybook dev -p 6006 --no-open",
+    "build": "storybook build -o dist",
+    "clean": "rm -rf dist"
+  },
+  "dependencies": {
+    "@wc-2026/library": "*"
+  },
+  "devDependencies": {
+    "@storybook/addon-a11y": "^8.6.15",
+    "@storybook/addon-essentials": "^8.6.15",
+    "@storybook/blocks": "^8.6.15",
+    "@storybook/web-components-vite": "^8.6.15",
+    "lit": "^3.3.2",
+    "storybook": "^8.6.15",
+    "vite": "^6.2.0"
+  }
+}

@@ -1,0 +1,103 @@
+---
+/**
+ * QuickLinks - Navigation cards for key documentation sections.
+ *
+ * Features:
+ * - 3-column responsive grid (3 -> 2 -> 1)
+ * - Animated conic gradient border reveal on hover
+ * - Arrow animation on hover
+ * - Scroll-reveal staggered animations
+ * - Semantic HTML with proper link structure
+ */
+
+interface QuickLink {
+  icon: string;
+  title: string;
+  description: string;
+  href: string;
+  cta: string;
+}
+
+const links: QuickLink[] = [
+  {
+    icon: 'fa-solid fa-clipboard-list',
+    title: 'Planning & Discovery',
+    description:
+      'Complete technical specifications, architecture decisions, and implementation roadmap across 10,000+ lines of documentation.',
+    href: '/pre-planning/overview/',
+    cta: 'Explore',
+  },
+  {
+    icon: 'fa-solid fa-rocket',
+    title: 'Getting Started',
+    description:
+      'Installation guide, quick start tutorial, and project structure overview to get your development environment ready.',
+    href: '/getting-started/installation/',
+    cta: 'Get Started',
+  },
+  {
+    icon: 'fa-solid fa-diagram-project',
+    title: 'Architecture',
+    description:
+      'System design, monorepo structure, build pipeline, and testing strategy for the enterprise component library.',
+    href: '/architecture/overview/',
+    cta: 'Learn More',
+  },
+  {
+    icon: 'fa-solid fa-palette',
+    title: 'Design Tokens',
+    description:
+      'Three-tier W3C DTCG token system with global, alias, and component tiers. Light, dark, and high-contrast themes.',
+    href: '/design-tokens/overview/',
+    cta: 'View Guide',
+  },
+  {
+    icon: 'fa-solid fa-plug',
+    title: 'Drupal Integration',
+    description:
+      'Complete TWIG template patterns, Drupal Behaviors integration, library installation methods, and troubleshooting.',
+    href: '/drupal-integration/overview/',
+    cta: 'Integration Guide',
+  },
+  {
+    icon: 'fa-solid fa-book-open',
+    title: 'API Reference',
+    description:
+      'Auto-generated component API documentation from the Custom Elements Manifest. Properties, events, slots, and CSS parts.',
+    href: '/api-reference/overview/',
+    cta: 'API Docs',
+  },
+];
+---
+
+<section class="quick-links-section" aria-label="Quick navigation">
+  <div class="quick-links-inner">
+    <div class="section-header scroll-reveal">
+      <span class="section-label">Documentation</span>
+      <h2 class="section-title">Explore the Docs</h2>
+      <p class="section-description">
+        Comprehensive guides for every audience &mdash;
+        component builders, Drupal teams, and designers.
+      </p>
+    </div>
+
+    <nav class="quick-links-grid" aria-label="Documentation sections">
+      {links.map((link, i) => (
+        <a
+          href={link.href}
+          class={`quick-link-card scroll-reveal scroll-reveal-delay-${(i % 3) + 1}`}
+        >
+          <div class="quick-link-header">
+            <i class={`${link.icon} quick-link-icon`} aria-hidden="true"></i>
+            <h3 class="quick-link-title">{link.title}</h3>
+          </div>
+          <p class="quick-link-description">{link.description}</p>
+          <span class="quick-link-cta">
+            {link.cta}
+            <span class="quick-link-cta-arrow" aria-hidden="true">&rarr;</span>
+          </span>
+        </a>
+      ))}
+    </nav>
+  </div>
+</section>

@@ -1,0 +1,39 @@
+---
+/**
+ * SkipLink.astro — Starlight component override
+ *
+ * Replaces the default SkipLink to inject the PinGate overlay
+ * as the first element inside <body>. The original skip-link
+ * functionality is preserved below the gate.
+ */
+import PinGate from './PinGate.astro';
+
+const PAGE_TITLE_ID = '_top';
+---
+
+<!-- PIN Gate overlay — renders first in body -->
+<PinGate />
+
+<!-- Original skip link for accessibility -->
+<a class="sl-skiplink" href={`#${PAGE_TITLE_ID}`}>{Astro.locals.t('skipLink.label')}</a>
+
+<style>
+  @layer starlight.core {
+    .sl-skiplink {
+      clip: rect(0, 0, 0, 0);
+      position: fixed;
+      top: 0.75rem;
+      inset-inline-start: 0.75rem;
+    }
+    .sl-skiplink:focus {
+      clip: unset;
+      z-index: var(--sl-z-index-skiplink);
+      display: block;
+      padding: 0.5rem 1rem;
+      text-decoration: none;
+      color: var(--sl-color-text-invert);
+      background-color: var(--sl-color-text-accent);
+      box-shadow: var(--sl-shadow-lg);
+    }
+  }
+</style>

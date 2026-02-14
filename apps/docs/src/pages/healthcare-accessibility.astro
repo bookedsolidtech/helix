@@ -1,0 +1,2586 @@
+---
+/**
+ * Healthcare Accessibility - Full visual experience page.
+ *
+ * This is a standalone Astro page (not Starlight content) that provides
+ * an immersive visual walkthrough of the WC-2026 accessibility compliance
+ * strategy for healthcare web components.
+ *
+ * Sections:
+ * 1. Hero - "Accessibility Is Not Optional"
+ * 2. Compliance Landscape - Timeline & competitive positioning
+ * 3. 4-Level Testing Strategy - Visual testing pyramid
+ * 4. Component A11y Checklist - What every component guarantees
+ * 5. Before/After Comparison - Typical vs WC-2026
+ * 6. WCAG Success Criteria Coverage - POUR matrix
+ * 7. The Business Case - Stats & numbers
+ */
+
+// Code examples for comparison section
+const codeBadButton = `<span class="cmt">&lt;!-- Typical component library --&gt;</span>
+&lt;<span class="tag">div</span> <span class="attr">class</span>=<span class="val">"btn"</span>
+  <span class="attr">onclick</span>=<span class="val">"handleClick()"</span>&gt;
+  Submit
+&lt;/<span class="tag">div</span>&gt;
+
+<span class="cmt">&lt;!-- No focus indicator --&gt;</span>
+<span class="cmt">&lt;!-- No keyboard support --&gt;</span>
+<span class="cmt">&lt;!-- No ARIA role --&gt;</span>
+<span class="cmt">&lt;!-- No loading state --&gt;</span>
+<span class="cmt">&lt;!-- Color-only disabled state --&gt;</span>`;
+
+const codeGoodButton = `<span class="cmt">&lt;!-- WC-2026 component --&gt;</span>
+&lt;<span class="tag">wc-button</span>
+  <span class="prop-hl">variant</span>=<span class="val">"primary"</span>
+  <span class="prop-hl">type</span>=<span class="val">"submit"</span>
+  <span class="prop-hl">aria-describedby</span>=<span class="val">"help-text"</span>&gt;
+  Submit Form
+&lt;/<span class="tag">wc-button</span>&gt;
+
+<span class="cmt">&lt;!-- Focus ring: 3px solid, 3:1 contrast --&gt;</span>
+<span class="cmt">&lt;!-- Enter + Space keyboard activation --&gt;</span>
+<span class="cmt">&lt;!-- role="button" + aria-pressed --&gt;</span>
+<span class="cmt">&lt;!-- aria-busy loading state --&gt;</span>
+<span class="cmt">&lt;!-- Icon + text disabled indicator --&gt;</span>`;
+
+const codeBadContrast = `<span class="tag">.btn</span> {
+  <span class="attr">background</span>: <span class="val">#6c757d</span>;
+  <span class="attr">color</span>: <span class="val">#999</span>;
+  <span class="cmt">/* Contrast ratio: 1.9:1 */</span>
+  <span class="cmt">/* FAILS WCAG AA (4.5:1) */</span>
+}
+
+<span class="tag">.btn:focus</span> {
+  <span class="attr">outline</span>: <span class="val">none</span>;
+  <span class="cmt">/* Focus indicator removed */</span>
+}`;
+
+const codeGoodContrast = `<span class="tag">:host</span> {
+  <span class="attr">--btn-bg</span>: <span class="val">var(--hds-interactive-primary)</span>;
+  <span class="attr">--btn-text</span>: <span class="val">var(--hds-text-on-primary)</span>;
+  <span class="cmt">/* Contrast ratio: 8.2:1 */</span>
+  <span class="cmt">/* EXCEEDS WCAG AAA (7:1) */</span>
+}
+
+<span class="tag">:host(:focus-visible)</span> {
+  <span class="attr">outline</span>: <span class="val">3px solid var(--hds-focus-ring)</span>;
+  <span class="attr">outline-offset</span>: <span class="val">3px</span>;
+}`;
+---
+
+<!doctype html>
+<html lang="en" data-theme="dark">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Healthcare Accessibility Strategy | WC-2026</title>
+    <meta
+      name="description"
+      content="WCAG 2.1 AA compliance strategy for healthcare web components. HHS May 2026 mandate readiness, 4-level testing, and component accessibility guarantees."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=JetBrains+Mono:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
+      integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+
+    <style>
+      /* ============================================
+         HEALTHCARE ACCESSIBILITY PAGE - Self-contained styles
+         Uses same design tokens as the main site
+         ============================================ */
+
+      @property --gradient-angle {
+        syntax: '<angle>';
+        initial-value: 0deg;
+        inherits: false;
+      }
+
+      :root {
+        --wc-accent-h: 250;
+        --wc-accent-s: 70%;
+        --wc-accent-l: 60%;
+        --wc-accent: hsl(var(--wc-accent-h), var(--wc-accent-s), var(--wc-accent-l));
+        --wc-cyan: #06b6d4;
+        --wc-pink: #ec4899;
+        --wc-green: #10b981;
+        --wc-amber: #f59e0b;
+        --wc-red: #ef4444;
+        --wc-teal: #14b8a6;
+        --wc-emerald: #34d399;
+
+        --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        --gradient-hero: linear-gradient(135deg, #0a0a1a 0%, #0a1a1a 40%, #0f0f2e 100%);
+        --gradient-cyan-purple: linear-gradient(135deg, #06b6d4, #8b5cf6);
+        --gradient-pink-orange: linear-gradient(135deg, #ec4899, #f97316);
+        --gradient-green-cyan: linear-gradient(135deg, #10b981, #06b6d4);
+        --gradient-teal-emerald: linear-gradient(135deg, #14b8a6, #34d399);
+        --gradient-health: linear-gradient(135deg, #10b981, #14b8a6, #06b6d4);
+
+        --font-heading: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        --font-body: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+
+        --space-1: 0.25rem;
+        --space-2: 0.5rem;
+        --space-3: 0.75rem;
+        --space-4: 1rem;
+        --space-5: 1.25rem;
+        --space-6: 1.5rem;
+        --space-8: 2rem;
+        --space-10: 2.5rem;
+        --space-12: 3rem;
+        --space-16: 4rem;
+        --space-20: 5rem;
+        --space-24: 6rem;
+
+        --radius-sm: 0.5rem;
+        --radius-md: 0.75rem;
+        --radius-lg: 1rem;
+        --radius-xl: 1.5rem;
+        --radius-2xl: 2rem;
+        --radius-full: 9999px;
+
+        --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
+        --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.4);
+        --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.5);
+        --shadow-xl: 0 16px 64px rgba(0, 0, 0, 0.6);
+
+        --glass-bg: rgba(255, 255, 255, 0.03);
+        --glass-bg-strong: rgba(255, 255, 255, 0.06);
+        --glass-border: rgba(255, 255, 255, 0.06);
+        --glass-border-strong: rgba(255, 255, 255, 0.12);
+
+        --glow-primary: 0 0 50px rgba(102, 126, 234, 0.25);
+        --glow-subtle: 0 0 20px rgba(102, 126, 234, 0.15);
+        --glow-health: 0 0 40px rgba(16, 185, 129, 0.25);
+
+        --surface-0: #0a0a14;
+        --surface-1: #111122;
+        --surface-2: #1a1a32;
+        --surface-3: #252545;
+        --text-primary: #eaeaf4;
+        --text-secondary: #a8a8c8;
+        --text-muted: #6868a0;
+      }
+
+      /* --- Reset & Base --- */
+      *, *::before, *::after {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: var(--font-body);
+        line-height: 1.6;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        background: var(--surface-0);
+        color: var(--text-primary);
+        scroll-behavior: smooth;
+        overflow-x: hidden;
+      }
+
+      h1, h2, h3, h4, h5, h6 {
+        font-family: var(--font-heading);
+        font-weight: 700;
+        letter-spacing: -0.025em;
+        line-height: 1.15;
+      }
+
+      code, pre { font-family: var(--font-mono); }
+
+      a {
+        color: var(--wc-accent);
+        text-decoration: none;
+        transition: color 0.2s ease;
+      }
+
+      a:hover {
+        color: hsl(var(--wc-accent-h), var(--wc-accent-s), 75%);
+      }
+
+      /* --- Keyframes --- */
+      @keyframes fadeInUp {
+        from { opacity: 0; transform: translateY(40px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+
+      @keyframes fadeInDown {
+        from { opacity: 0; transform: translateY(-20px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+
+      @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+      }
+
+      @keyframes float-slow {
+        0%, 100% { transform: translate(0, 0) scale(1); }
+        25% { transform: translate(30px, -20px) scale(1.05); }
+        50% { transform: translate(-10px, -35px) scale(0.97); }
+        75% { transform: translate(-25px, -10px) scale(1.02); }
+      }
+
+      @keyframes float-drift {
+        0%, 100% { transform: translate(0, 0) rotate(0deg); }
+        33% { transform: translate(20px, 15px) rotate(2deg); }
+        66% { transform: translate(-15px, -20px) rotate(-2deg); }
+      }
+
+      @keyframes orb-pulse {
+        0%, 100% { opacity: 0.3; filter: blur(100px); }
+        50% { opacity: 0.5; filter: blur(120px); }
+      }
+
+      @keyframes pulse-glow {
+        0%, 100% { box-shadow: 0 0 8px rgba(239, 68, 68, 0.4); }
+        50% { box-shadow: 0 0 24px rgba(239, 68, 68, 0.7); }
+      }
+
+      @keyframes pulse-glow-green {
+        0%, 100% { box-shadow: 0 0 8px rgba(16, 185, 129, 0.4); }
+        50% { box-shadow: 0 0 24px rgba(16, 185, 129, 0.7); }
+      }
+
+      @keyframes border-rotate {
+        0% { --gradient-angle: 0deg; }
+        100% { --gradient-angle: 360deg; }
+      }
+
+      @keyframes particle-drift {
+        0% { background-position: 0 0, 200px 200px, 400px 100px; }
+        100% { background-position: 800px 800px, 1000px 1000px, 1200px 900px; }
+      }
+
+      @keyframes scroll-fade {
+        0% { opacity: 1; transform: translateX(-50%) translateY(0); }
+        100% { opacity: 0; transform: translateX(-50%) translateY(12px); }
+      }
+
+      @keyframes countdown-pulse {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.03); }
+      }
+
+      /* --- Scroll Reveal --- */
+      .scroll-reveal {
+        opacity: 0;
+        transform: translateY(40px);
+        transition: opacity 0.8s cubic-bezier(0.22, 1, 0.36, 1),
+                    transform 0.8s cubic-bezier(0.22, 1, 0.36, 1),
+                    filter 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+        filter: blur(4px);
+      }
+
+      .scroll-reveal.is-visible {
+        opacity: 1;
+        transform: translateY(0);
+        filter: blur(0);
+      }
+
+      .scroll-reveal-delay-1 { transition-delay: 0.1s; }
+      .scroll-reveal-delay-2 { transition-delay: 0.2s; }
+      .scroll-reveal-delay-3 { transition-delay: 0.3s; }
+      .scroll-reveal-delay-4 { transition-delay: 0.4s; }
+      .scroll-reveal-delay-5 { transition-delay: 0.5s; }
+      .scroll-reveal-delay-6 { transition-delay: 0.6s; }
+      .scroll-reveal-delay-7 { transition-delay: 0.7s; }
+      .scroll-reveal-delay-8 { transition-delay: 0.8s; }
+
+      /* --- Top Navigation Bar --- */
+      .ha-topbar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 100;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: var(--space-3) var(--space-8);
+        background: rgba(10, 10, 20, 0.85);
+        backdrop-filter: blur(16px) saturate(180%);
+        -webkit-backdrop-filter: blur(16px) saturate(180%);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      }
+
+      .ha-topbar-left {
+        display: flex;
+        align-items: center;
+        gap: var(--space-4);
+      }
+
+      .ha-back-link {
+        display: inline-flex;
+        align-items: center;
+        gap: var(--space-2);
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: var(--text-secondary);
+        transition: all 0.2s ease;
+        padding: var(--space-2) var(--space-3);
+        border-radius: var(--radius-md);
+      }
+
+      .ha-back-link:hover {
+        color: var(--text-primary);
+        background: var(--glass-bg-strong);
+      }
+
+      .ha-topbar-title {
+        font-size: 0.875rem;
+        font-weight: 700;
+        color: var(--text-primary);
+        letter-spacing: -0.01em;
+      }
+
+      .ha-topbar-right {
+        display: flex;
+        align-items: center;
+        gap: var(--space-3);
+      }
+
+      .ha-topbar-link {
+        display: inline-flex;
+        align-items: center;
+        gap: var(--space-2);
+        font-size: 0.8125rem;
+        font-weight: 600;
+        color: var(--text-muted);
+        padding: var(--space-2) var(--space-4);
+        border-radius: var(--radius-md);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        transition: all 0.2s ease;
+      }
+
+      .ha-topbar-link:hover {
+        color: var(--wc-green);
+        border-color: rgba(16, 185, 129, 0.3);
+        background: rgba(16, 185, 129, 0.06);
+      }
+
+      /* ============================================
+         SECTION 1: HERO
+         ============================================ */
+      .ha-hero {
+        min-height: 100vh;
+        min-height: 100dvh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        overflow: hidden;
+        isolation: isolate;
+        padding: var(--space-24) var(--space-8) var(--space-16);
+      }
+
+      .ha-hero::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: var(--gradient-hero);
+        z-index: -3;
+      }
+
+      .ha-hero::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background-image:
+          radial-gradient(circle at 20% 30%, rgba(16, 185, 129, 0.04) 2px, transparent 2px),
+          radial-gradient(circle at 60% 70%, rgba(20, 184, 166, 0.04) 3px, transparent 3px),
+          radial-gradient(circle at 80% 20%, rgba(6, 182, 212, 0.03) 2px, transparent 2px);
+        background-size: 800px 800px;
+        animation: particle-drift 60s linear infinite;
+        opacity: 0.6;
+        z-index: -2;
+      }
+
+      .ha-hero-orb {
+        position: absolute;
+        border-radius: 50%;
+        filter: blur(100px);
+        opacity: 0.3;
+        z-index: -1;
+        pointer-events: none;
+      }
+
+      .ha-hero-orb-1 {
+        width: 600px;
+        height: 600px;
+        background: radial-gradient(circle, rgba(16, 185, 129, 0.4), transparent 70%);
+        top: -200px;
+        right: -100px;
+        animation: float-slow 20s ease-in-out infinite, orb-pulse 8s ease-in-out infinite;
+      }
+
+      .ha-hero-orb-2 {
+        width: 400px;
+        height: 400px;
+        background: radial-gradient(circle, rgba(239, 68, 68, 0.3), transparent 70%);
+        bottom: -100px;
+        left: -80px;
+        animation: float-slow 25s ease-in-out infinite reverse, orb-pulse 10s ease-in-out infinite;
+      }
+
+      .ha-hero-orb-3 {
+        width: 350px;
+        height: 350px;
+        background: radial-gradient(circle, rgba(20, 184, 166, 0.25), transparent 70%);
+        top: 40%;
+        left: 15%;
+        animation: float-drift 18s ease-in-out infinite, orb-pulse 7s ease-in-out infinite;
+      }
+
+      .ha-hero-grid {
+        position: absolute;
+        inset: 0;
+        z-index: -1;
+        background-image:
+          linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+        background-size: 60px 60px;
+        mask-image: radial-gradient(ellipse 80% 60% at 50% 50%, black 30%, transparent 70%);
+        -webkit-mask-image: radial-gradient(ellipse 80% 60% at 50% 50%, black 30%, transparent 70%);
+      }
+
+      .ha-hero-content {
+        text-align: center;
+        max-width: 900px;
+        z-index: 1;
+      }
+
+      .ha-hero-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: var(--space-3);
+        padding: var(--space-2) var(--space-6);
+        border-radius: var(--radius-full);
+        background: rgba(239, 68, 68, 0.08);
+        border: 1px solid rgba(239, 68, 68, 0.2);
+        backdrop-filter: blur(20px);
+        color: var(--wc-red);
+        font-size: 0.875rem;
+        font-weight: 600;
+        letter-spacing: 0.02em;
+        margin-bottom: var(--space-10);
+        animation: fadeInDown 0.8s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+      }
+
+      .ha-hero-badge-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--wc-red);
+        animation: pulse-glow 2s ease infinite;
+        flex-shrink: 0;
+      }
+
+      .ha-hero-title {
+        font-size: clamp(2.5rem, 8vw, 5rem);
+        font-weight: 900;
+        line-height: 1.15;
+        margin-bottom: var(--space-6);
+        background: linear-gradient(180deg, rgba(255,255,255,1) 0%, rgba(255,255,255,0.7) 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        letter-spacing: -0.04em;
+        animation: fadeInUp 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.1s backwards;
+      }
+
+      .ha-hero-subtitle {
+        font-size: clamp(1.125rem, 2.5vw, 1.5rem);
+        font-weight: 300;
+        margin-bottom: var(--space-8);
+        background: linear-gradient(90deg, rgba(255,255,255,0.9), rgba(16, 185, 129, 0.9));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        animation: fadeInUp 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.2s backwards;
+      }
+
+      .ha-hero-description {
+        font-size: clamp(1rem, 1.5vw, 1.25rem);
+        color: rgba(255, 255, 255, 0.55);
+        max-width: 700px;
+        margin: 0 auto var(--space-10);
+        line-height: 1.75;
+        animation: fadeInUp 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.3s backwards;
+      }
+
+      .ha-hero-deadline {
+        display: inline-flex;
+        align-items: center;
+        gap: var(--space-4);
+        padding: var(--space-4) var(--space-8);
+        border-radius: var(--radius-xl);
+        background: rgba(239, 68, 68, 0.06);
+        border: 1px solid rgba(239, 68, 68, 0.15);
+        animation: fadeInUp 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.4s backwards, countdown-pulse 3s ease-in-out infinite;
+      }
+
+      .ha-hero-deadline-label {
+        font-size: 0.8125rem;
+        font-weight: 600;
+        color: rgba(255, 255, 255, 0.5);
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+      }
+
+      .ha-hero-deadline-date {
+        font-size: 1.5rem;
+        font-weight: 900;
+        color: var(--wc-red);
+        font-family: var(--font-mono);
+        letter-spacing: -0.02em;
+      }
+
+      .ha-hero-scroll {
+        position: absolute;
+        bottom: var(--space-10);
+        left: 50%;
+        transform: translateX(-50%);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: var(--space-2);
+        color: rgba(255, 255, 255, 0.3);
+        font-size: 0.6875rem;
+        font-weight: 500;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        animation: fadeIn 1s ease 1.5s backwards;
+      }
+
+      .ha-hero-scroll-line {
+        width: 1px;
+        height: 40px;
+        background: linear-gradient(to bottom, rgba(255,255,255,0.3), transparent);
+        position: relative;
+        overflow: hidden;
+      }
+
+      .ha-hero-scroll-line::after {
+        content: '';
+        position: absolute;
+        top: -100%;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(to bottom, transparent, rgba(255,255,255,0.8), transparent);
+        animation: scroll-fade 2s ease-in-out infinite;
+      }
+
+      /* ============================================
+         SHARED SECTION STYLES
+         ============================================ */
+      .ha-section {
+        width: 100%;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .ha-section-inner {
+        padding: var(--space-24) var(--space-8);
+        max-width: 1400px;
+        margin: 0 auto;
+      }
+
+      .ha-section-header {
+        text-align: center;
+        margin-bottom: var(--space-16);
+      }
+
+      .ha-section-label {
+        display: inline-block;
+        padding: var(--space-1) var(--space-4);
+        border-radius: var(--radius-full);
+        font-size: 0.8125rem;
+        font-weight: 600;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        margin-bottom: var(--space-4);
+        background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(20, 184, 166, 0.1));
+        color: var(--wc-green);
+        border: 1px solid rgba(16, 185, 129, 0.15);
+      }
+
+      .ha-section-label-urgent {
+        background: linear-gradient(135deg, rgba(239, 68, 68, 0.1), rgba(245, 158, 11, 0.1));
+        color: var(--wc-red);
+        border: 1px solid rgba(239, 68, 68, 0.15);
+      }
+
+      .ha-section-title {
+        font-size: clamp(2rem, 5vw, 3.25rem);
+        font-weight: 800;
+        letter-spacing: -0.035em;
+        margin-bottom: var(--space-5);
+        color: var(--text-primary);
+        line-height: 1.1;
+      }
+
+      .ha-section-description {
+        font-size: clamp(1rem, 1.5vw, 1.2rem);
+        color: var(--text-secondary);
+        max-width: 650px;
+        margin: 0 auto;
+        line-height: 1.7;
+      }
+
+      /* --- Card base with conic gradient + spotlight --- */
+      .ha-card {
+        padding: var(--space-8);
+        border-radius: var(--radius-2xl);
+        background: var(--surface-1);
+        border: 1px solid var(--surface-3);
+        transition: all 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+        position: relative;
+        overflow: hidden;
+      }
+
+      .ha-card::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        border-radius: inherit;
+        padding: 1.5px;
+        background: conic-gradient(from var(--gradient-angle), #10b981, #14b8a6, #06b6d4, #10b981);
+        -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+        -webkit-mask-composite: xor;
+        mask-composite: exclude;
+        opacity: 0;
+        transition: opacity 0.5s ease;
+        pointer-events: none;
+        animation: border-rotate 4s linear infinite;
+      }
+
+      .ha-card::after {
+        content: '';
+        position: absolute;
+        width: 300px;
+        height: 300px;
+        border-radius: 50%;
+        background: radial-gradient(circle, rgba(16, 185, 129, 0.12), transparent 70%);
+        opacity: 0;
+        transition: opacity 0.5s ease;
+        pointer-events: none;
+        top: var(--mouse-y, 50%);
+        left: var(--mouse-x, 50%);
+        transform: translate(-50%, -50%);
+      }
+
+      .ha-card:hover::before { opacity: 1; }
+      .ha-card:hover::after { opacity: 1; }
+      .ha-card:hover {
+        transform: translateY(-4px);
+        box-shadow: var(--shadow-xl), var(--glow-health);
+        background: var(--surface-2);
+      }
+
+      /* ============================================
+         SECTION 2: COMPLIANCE LANDSCAPE (TIMELINE)
+         ============================================ */
+      .ha-timeline-section {
+        background: var(--surface-0);
+        border-top: 1px solid var(--surface-3);
+        border-bottom: 1px solid var(--surface-3);
+      }
+
+      .ha-timeline {
+        position: relative;
+        max-width: 1000px;
+        margin: 0 auto;
+      }
+
+      .ha-timeline-track {
+        position: relative;
+        height: 6px;
+        border-radius: var(--radius-full);
+        background: linear-gradient(90deg,
+          var(--text-muted) 0%,
+          var(--wc-amber) 25%,
+          var(--wc-red) 60%,
+          var(--wc-green) 85%,
+          var(--wc-teal) 100%
+        );
+        margin: var(--space-8) 0;
+      }
+
+      .ha-timeline-track::before {
+        content: '';
+        position: absolute;
+        inset: -4px;
+        border-radius: var(--radius-full);
+        background: linear-gradient(90deg,
+          var(--text-muted) 0%,
+          var(--wc-amber) 25%,
+          var(--wc-red) 60%,
+          var(--wc-green) 85%,
+          var(--wc-teal) 100%
+        );
+        filter: blur(12px);
+        opacity: 0.3;
+        z-index: -1;
+      }
+
+      .ha-timeline-items {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: var(--space-4);
+        margin-top: var(--space-12);
+      }
+
+      .ha-timeline-item {
+        text-align: center;
+        padding: var(--space-5) var(--space-3);
+        border-radius: var(--radius-xl);
+        background: var(--surface-1);
+        border: 1px solid var(--surface-3);
+        transition: all 0.3s ease;
+      }
+
+      .ha-timeline-item:hover {
+        background: var(--surface-2);
+        transform: translateY(-3px);
+      }
+
+      .ha-timeline-item-urgent {
+        border-color: rgba(239, 68, 68, 0.3);
+        background: rgba(239, 68, 68, 0.04);
+        box-shadow: 0 0 30px rgba(239, 68, 68, 0.08);
+      }
+
+      .ha-timeline-item-achieved {
+        border-color: rgba(16, 185, 129, 0.3);
+        background: rgba(16, 185, 129, 0.04);
+      }
+
+      .ha-timeline-item-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: var(--radius-lg);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto var(--space-3);
+        font-size: 1.25rem;
+      }
+
+      .ha-timeline-item-year {
+        font-size: 0.75rem;
+        font-weight: 700;
+        font-family: var(--font-mono);
+        margin-bottom: var(--space-2);
+        letter-spacing: 0.02em;
+      }
+
+      .ha-timeline-item-title {
+        font-size: 0.9375rem;
+        font-weight: 700;
+        margin-bottom: var(--space-2);
+        color: var(--text-primary);
+      }
+
+      .ha-timeline-item-desc {
+        font-size: 0.8125rem;
+        color: var(--text-secondary);
+        line-height: 1.5;
+      }
+
+      .ha-competitive-bar {
+        margin-top: var(--space-12);
+        padding: var(--space-6) var(--space-8);
+        border-radius: var(--radius-xl);
+        background: linear-gradient(135deg, rgba(16, 185, 129, 0.06), rgba(6, 182, 212, 0.04));
+        border: 1px solid rgba(16, 185, 129, 0.12);
+      }
+
+      .ha-competitive-bar-title {
+        font-size: 1rem;
+        font-weight: 700;
+        color: var(--wc-green);
+        margin-bottom: var(--space-4);
+        text-align: center;
+      }
+
+      .ha-competitive-track {
+        position: relative;
+        height: 40px;
+        border-radius: var(--radius-lg);
+        background: var(--surface-2);
+        overflow: hidden;
+      }
+
+      .ha-competitive-fill-others {
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 55%;
+        border-radius: var(--radius-lg);
+        background: linear-gradient(90deg, rgba(104, 104, 160, 0.3), rgba(104, 104, 160, 0.15));
+        display: flex;
+        align-items: center;
+        padding-left: var(--space-4);
+        font-size: 0.75rem;
+        font-weight: 600;
+        color: var(--text-muted);
+      }
+
+      .ha-competitive-fill-wc {
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 92%;
+        border-radius: var(--radius-lg);
+        background: linear-gradient(90deg, rgba(16, 185, 129, 0.2), rgba(20, 184, 166, 0.3));
+        border: 1px solid rgba(16, 185, 129, 0.2);
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        padding-right: var(--space-4);
+        font-size: 0.75rem;
+        font-weight: 700;
+        color: var(--wc-green);
+      }
+
+      .ha-competitive-labels {
+        display: flex;
+        justify-content: space-between;
+        margin-top: var(--space-3);
+        font-size: 0.75rem;
+        color: var(--text-muted);
+      }
+
+      /* ============================================
+         SECTION 3: 4-LEVEL TESTING STRATEGY (PYRAMID)
+         ============================================ */
+      .ha-pyramid-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: var(--space-4);
+        max-width: 900px;
+        margin: 0 auto;
+      }
+
+      .ha-pyramid-level {
+        display: grid;
+        grid-template-columns: auto 1fr;
+        gap: var(--space-6);
+        align-items: center;
+        padding: var(--space-6) var(--space-8);
+        border-radius: var(--radius-2xl);
+        background: var(--surface-1);
+        border: 1px solid var(--surface-3);
+        transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+        position: relative;
+        overflow: hidden;
+      }
+
+      .ha-pyramid-level::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        border-radius: inherit;
+        padding: 1.5px;
+        background: conic-gradient(from var(--gradient-angle), #10b981, #14b8a6, #06b6d4, #10b981);
+        -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+        -webkit-mask-composite: xor;
+        mask-composite: exclude;
+        opacity: 0;
+        transition: opacity 0.5s ease;
+        pointer-events: none;
+        animation: border-rotate 4s linear infinite;
+      }
+
+      .ha-pyramid-level:hover::before { opacity: 1; }
+      .ha-pyramid-level:hover {
+        transform: translateY(-3px);
+        box-shadow: var(--shadow-lg), var(--glow-health);
+        background: var(--surface-2);
+      }
+
+      .ha-pyramid-icon {
+        width: 72px;
+        height: 72px;
+        border-radius: var(--radius-xl);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.75rem;
+        flex-shrink: 0;
+      }
+
+      .ha-pyramid-icon-1 {
+        background: linear-gradient(135deg, rgba(6, 182, 212, 0.15), rgba(6, 182, 212, 0.05));
+        border: 1px solid rgba(6, 182, 212, 0.2);
+        color: var(--wc-cyan);
+      }
+
+      .ha-pyramid-icon-2 {
+        background: linear-gradient(135deg, rgba(16, 185, 129, 0.15), rgba(16, 185, 129, 0.05));
+        border: 1px solid rgba(16, 185, 129, 0.2);
+        color: var(--wc-green);
+      }
+
+      .ha-pyramid-icon-3 {
+        background: linear-gradient(135deg, rgba(245, 158, 11, 0.15), rgba(245, 158, 11, 0.05));
+        border: 1px solid rgba(245, 158, 11, 0.2);
+        color: var(--wc-amber);
+      }
+
+      .ha-pyramid-icon-4 {
+        background: linear-gradient(135deg, rgba(236, 72, 153, 0.15), rgba(236, 72, 153, 0.05));
+        border: 1px solid rgba(236, 72, 153, 0.2);
+        color: var(--wc-pink);
+      }
+
+      .ha-pyramid-content {
+        min-width: 0;
+      }
+
+      .ha-pyramid-level-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: var(--space-2);
+        padding: var(--space-1) var(--space-3);
+        border-radius: var(--radius-full);
+        font-size: 0.6875rem;
+        font-weight: 700;
+        font-family: var(--font-mono);
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        margin-bottom: var(--space-2);
+      }
+
+      .ha-pyramid-level-badge-1 {
+        background: rgba(6, 182, 212, 0.1);
+        color: var(--wc-cyan);
+        border: 1px solid rgba(6, 182, 212, 0.2);
+      }
+
+      .ha-pyramid-level-badge-2 {
+        background: rgba(16, 185, 129, 0.1);
+        color: var(--wc-green);
+        border: 1px solid rgba(16, 185, 129, 0.2);
+      }
+
+      .ha-pyramid-level-badge-3 {
+        background: rgba(245, 158, 11, 0.1);
+        color: var(--wc-amber);
+        border: 1px solid rgba(245, 158, 11, 0.2);
+      }
+
+      .ha-pyramid-level-badge-4 {
+        background: rgba(236, 72, 153, 0.1);
+        color: var(--wc-pink);
+        border: 1px solid rgba(236, 72, 153, 0.2);
+      }
+
+      .ha-pyramid-title {
+        font-size: 1.25rem;
+        font-weight: 700;
+        margin-bottom: var(--space-2);
+        color: var(--text-primary);
+      }
+
+      .ha-pyramid-desc {
+        font-size: 0.9375rem;
+        color: var(--text-secondary);
+        line-height: 1.65;
+        margin-bottom: var(--space-3);
+      }
+
+      .ha-pyramid-tools {
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--space-2);
+      }
+
+      .ha-pyramid-tool {
+        display: inline-flex;
+        align-items: center;
+        gap: var(--space-2);
+        padding: var(--space-1) var(--space-3);
+        border-radius: var(--radius-full);
+        font-size: 0.75rem;
+        font-weight: 500;
+        background: var(--glass-bg-strong);
+        border: 1px solid var(--glass-border);
+        color: var(--text-secondary);
+      }
+
+      .ha-pyramid-coverage {
+        font-size: 0.75rem;
+        font-weight: 700;
+        font-family: var(--font-mono);
+        padding: var(--space-1) var(--space-3);
+        border-radius: var(--radius-full);
+        background: rgba(16, 185, 129, 0.1);
+        color: var(--wc-green);
+        border: 1px solid rgba(16, 185, 129, 0.15);
+        white-space: nowrap;
+      }
+
+      /* ============================================
+         SECTION 4: COMPONENT A11Y CHECKLIST
+         ============================================ */
+      .ha-checklist-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: var(--space-5);
+      }
+
+      .ha-check-card {
+        padding: var(--space-6);
+        border-radius: var(--radius-xl);
+        background: var(--surface-1);
+        border: 1px solid var(--surface-3);
+        transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+        position: relative;
+        overflow: hidden;
+      }
+
+      .ha-check-card::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        border-radius: inherit;
+        padding: 1.5px;
+        background: conic-gradient(from var(--gradient-angle), #10b981, #14b8a6, #06b6d4, #10b981);
+        -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+        -webkit-mask-composite: xor;
+        mask-composite: exclude;
+        opacity: 0;
+        transition: opacity 0.5s ease;
+        pointer-events: none;
+        animation: border-rotate 4s linear infinite;
+      }
+
+      .ha-check-card::after {
+        content: '';
+        position: absolute;
+        width: 200px;
+        height: 200px;
+        border-radius: 50%;
+        background: radial-gradient(circle, rgba(16, 185, 129, 0.1), transparent 70%);
+        opacity: 0;
+        transition: opacity 0.5s ease;
+        pointer-events: none;
+        top: var(--mouse-y, 50%);
+        left: var(--mouse-x, 50%);
+        transform: translate(-50%, -50%);
+      }
+
+      .ha-check-card:hover::before { opacity: 1; }
+      .ha-check-card:hover::after { opacity: 1; }
+      .ha-check-card:hover {
+        transform: translateY(-4px);
+        box-shadow: var(--shadow-lg), var(--glow-health);
+        background: var(--surface-2);
+      }
+
+      .ha-check-header {
+        display: flex;
+        align-items: center;
+        gap: var(--space-3);
+        margin-bottom: var(--space-3);
+        position: relative;
+        z-index: 1;
+      }
+
+      .ha-check-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: var(--radius-md);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.125rem;
+        background: linear-gradient(135deg, rgba(16, 185, 129, 0.12), rgba(16, 185, 129, 0.04));
+        border: 1px solid rgba(16, 185, 129, 0.15);
+        color: var(--wc-green);
+        flex-shrink: 0;
+      }
+
+      .ha-check-mark {
+        color: var(--wc-green);
+        font-size: 1rem;
+        flex-shrink: 0;
+      }
+
+      .ha-check-title {
+        font-size: 1rem;
+        font-weight: 700;
+        color: var(--text-primary);
+        position: relative;
+        z-index: 1;
+      }
+
+      .ha-check-desc {
+        font-size: 0.875rem;
+        color: var(--text-secondary);
+        line-height: 1.6;
+        position: relative;
+        z-index: 1;
+      }
+
+      /* ============================================
+         SECTION 5: BEFORE/AFTER COMPARISON
+         ============================================ */
+      .ha-comparison-section {
+        background: var(--surface-0);
+        border-top: 1px solid var(--surface-3);
+        border-bottom: 1px solid var(--surface-3);
+      }
+
+      .ha-comparison-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        grid-template-rows: auto auto auto auto auto auto;
+        gap: var(--space-4) var(--space-6);
+      }
+
+      .ha-comparison-column {
+        display: grid;
+        grid-template-rows: subgrid;
+        grid-row: span 6;
+        gap: var(--space-4);
+      }
+
+      .ha-comparison-header {
+        display: flex;
+        align-items: center;
+        gap: var(--space-3);
+        padding: var(--space-4) var(--space-6);
+        border-radius: var(--radius-lg);
+        font-size: 1.125rem;
+        font-weight: 700;
+      }
+
+      .ha-comparison-header i { font-size: 1.25rem; }
+
+      .ha-comparison-header-bad {
+        background: linear-gradient(135deg, rgba(239, 68, 68, 0.1), rgba(239, 68, 68, 0.02));
+        border: 1px solid rgba(239, 68, 68, 0.2);
+        color: var(--wc-red);
+      }
+
+      .ha-comparison-header-good {
+        background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(16, 185, 129, 0.02));
+        border: 1px solid rgba(16, 185, 129, 0.2);
+        color: var(--wc-green);
+      }
+
+      .ha-code-block {
+        position: relative;
+        background: #0a0e18;
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        border-radius: var(--radius-lg);
+        overflow: hidden;
+      }
+
+      .ha-code-titlebar {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        padding: 10px 16px;
+        background: rgba(0, 0, 0, 0.3);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      }
+
+      .ha-code-dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+      }
+
+      .ha-code-dot:nth-child(1) { background: #ff5f57; }
+      .ha-code-dot:nth-child(2) { background: #ffbd2e; }
+      .ha-code-dot:nth-child(3) { background: #28c840; }
+
+      .ha-code-filename {
+        margin-left: auto;
+        font-size: 0.75rem;
+        color: rgba(255, 255, 255, 0.4);
+        font-family: var(--font-mono);
+      }
+
+      .ha-code-body {
+        padding: var(--space-4) var(--space-5);
+        overflow-x: auto;
+      }
+
+      .ha-code-body pre {
+        margin: 0;
+        font-size: 0.8125rem;
+        line-height: 1.7;
+        color: #d6deeb;
+        white-space: pre;
+      }
+
+      .ha-code-body .kw { color: #c792ea; }
+      .ha-code-body .tag { color: #7fdbca; }
+      .ha-code-body .attr { color: #addb67; }
+      .ha-code-body .val { color: #ecc48d; }
+      .ha-code-body .str { color: #c3e88d; }
+      .ha-code-body .cmt { color: #637777; font-style: italic; }
+      .ha-code-body .var { color: #82aaff; }
+      .ha-code-body .fn { color: #82aaff; }
+      .ha-code-body .slot-hl { color: #ff79c6; font-weight: 600; }
+      .ha-code-body .prop-hl { color: #06b6d4; font-weight: 600; }
+
+      .ha-code-label {
+        display: inline-block;
+        padding: var(--space-1) var(--space-3);
+        border-radius: var(--radius-sm);
+        font-size: 0.6875rem;
+        font-weight: 600;
+        font-family: var(--font-mono);
+        margin-bottom: var(--space-3);
+      }
+
+      .ha-code-label-html {
+        background: rgba(6, 182, 212, 0.12);
+        color: var(--wc-cyan);
+        border: 1px solid rgba(6, 182, 212, 0.2);
+      }
+
+      .ha-code-label-css {
+        background: rgba(236, 72, 153, 0.12);
+        color: var(--wc-pink);
+        border: 1px solid rgba(236, 72, 153, 0.2);
+      }
+
+      .ha-contrast-demo {
+        padding: var(--space-5);
+        border-radius: var(--radius-lg);
+        background: var(--surface-1);
+        border: 1px solid var(--surface-3);
+      }
+
+      .ha-contrast-demo-title {
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        margin-bottom: var(--space-3);
+        color: var(--text-muted);
+      }
+
+      .ha-contrast-swatch {
+        display: flex;
+        align-items: center;
+        gap: var(--space-3);
+        padding: var(--space-3) var(--space-4);
+        border-radius: var(--radius-md);
+        margin-bottom: var(--space-2);
+      }
+
+      .ha-contrast-swatch-bad {
+        background: #6c757d;
+        color: #999;
+      }
+
+      .ha-contrast-swatch-good {
+        background: #047857;
+        color: #ffffff;
+      }
+
+      .ha-contrast-ratio {
+        margin-left: auto;
+        font-family: var(--font-mono);
+        font-size: 0.75rem;
+        font-weight: 700;
+        padding: var(--space-1) var(--space-2);
+        border-radius: var(--radius-sm);
+      }
+
+      .ha-contrast-ratio-fail {
+        background: rgba(239, 68, 68, 0.15);
+        color: var(--wc-red);
+      }
+
+      .ha-contrast-ratio-pass {
+        background: rgba(16, 185, 129, 0.15);
+        color: var(--wc-green);
+      }
+
+      .ha-focus-demo {
+        display: flex;
+        gap: var(--space-4);
+        margin-top: var(--space-3);
+      }
+
+      .ha-focus-example {
+        flex: 1;
+        text-align: center;
+      }
+
+      .ha-focus-example-label {
+        font-size: 0.6875rem;
+        font-weight: 600;
+        color: var(--text-muted);
+        margin-bottom: var(--space-2);
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+      }
+
+      .ha-focus-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: var(--space-2) var(--space-5);
+        border-radius: var(--radius-md);
+        font-size: 0.875rem;
+        font-weight: 600;
+        border: none;
+        cursor: default;
+      }
+
+      .ha-focus-btn-bad {
+        background: #6c757d;
+        color: #ccc;
+        outline: none;
+      }
+
+      .ha-focus-btn-good {
+        background: #047857;
+        color: #ffffff;
+        outline: 3px solid #34d399;
+        outline-offset: 3px;
+      }
+
+      /* ============================================
+         SECTION 6: WCAG COVERAGE MATRIX
+         ============================================ */
+      .ha-wcag-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: var(--space-6);
+      }
+
+      .ha-wcag-principle {
+        padding: var(--space-6);
+        border-radius: var(--radius-2xl);
+        background: var(--surface-1);
+        border: 1px solid var(--surface-3);
+        transition: all 0.4s ease;
+      }
+
+      .ha-wcag-principle:hover {
+        background: var(--surface-2);
+        transform: translateY(-3px);
+        box-shadow: var(--shadow-lg);
+      }
+
+      .ha-wcag-principle-header {
+        display: flex;
+        align-items: center;
+        gap: var(--space-3);
+        margin-bottom: var(--space-5);
+      }
+
+      .ha-wcag-principle-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: var(--radius-lg);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.25rem;
+        flex-shrink: 0;
+      }
+
+      .ha-wcag-icon-perceivable {
+        background: linear-gradient(135deg, rgba(6, 182, 212, 0.12), rgba(6, 182, 212, 0.04));
+        border: 1px solid rgba(6, 182, 212, 0.15);
+        color: var(--wc-cyan);
+      }
+
+      .ha-wcag-icon-operable {
+        background: linear-gradient(135deg, rgba(16, 185, 129, 0.12), rgba(16, 185, 129, 0.04));
+        border: 1px solid rgba(16, 185, 129, 0.15);
+        color: var(--wc-green);
+      }
+
+      .ha-wcag-icon-understandable {
+        background: linear-gradient(135deg, rgba(245, 158, 11, 0.12), rgba(245, 158, 11, 0.04));
+        border: 1px solid rgba(245, 158, 11, 0.15);
+        color: var(--wc-amber);
+      }
+
+      .ha-wcag-icon-robust {
+        background: linear-gradient(135deg, rgba(236, 72, 153, 0.12), rgba(236, 72, 153, 0.04));
+        border: 1px solid rgba(236, 72, 153, 0.15);
+        color: var(--wc-pink);
+      }
+
+      .ha-wcag-principle-title {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: var(--text-primary);
+      }
+
+      .ha-wcag-principle-letter {
+        font-size: 0.75rem;
+        font-weight: 700;
+        font-family: var(--font-mono);
+        color: var(--text-muted);
+      }
+
+      .ha-wcag-criteria {
+        list-style: none;
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-2);
+      }
+
+      .ha-wcag-criterion {
+        display: flex;
+        align-items: center;
+        gap: var(--space-3);
+        padding: var(--space-2) var(--space-3);
+        border-radius: var(--radius-md);
+        font-size: 0.8125rem;
+        color: var(--text-secondary);
+        transition: background 0.2s ease;
+      }
+
+      .ha-wcag-criterion:hover {
+        background: var(--glass-bg-strong);
+      }
+
+      .ha-wcag-criterion i {
+        font-size: 0.875rem;
+        flex-shrink: 0;
+        width: 18px;
+        text-align: center;
+      }
+
+      .ha-wcag-criterion-full i { color: var(--wc-green); }
+      .ha-wcag-criterion-partial i { color: var(--wc-amber); }
+      .ha-wcag-criterion-exceeds i { color: var(--wc-cyan); }
+
+      .ha-wcag-legend {
+        display: flex;
+        justify-content: center;
+        gap: var(--space-8);
+        margin-top: var(--space-8);
+        flex-wrap: wrap;
+      }
+
+      .ha-wcag-legend-item {
+        display: flex;
+        align-items: center;
+        gap: var(--space-2);
+        font-size: 0.8125rem;
+        color: var(--text-secondary);
+      }
+
+      .ha-wcag-legend-dot {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+      }
+
+      .ha-wcag-legend-dot-full { background: var(--wc-green); }
+      .ha-wcag-legend-dot-partial { background: var(--wc-amber); }
+      .ha-wcag-legend-dot-exceeds { background: var(--wc-cyan); }
+
+      /* ============================================
+         SECTION 7: THE BUSINESS CASE
+         ============================================ */
+      .ha-stats-section {
+        background: var(--surface-0);
+        border-top: 1px solid var(--surface-3);
+      }
+
+      .ha-stats-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: var(--space-5);
+      }
+
+      .ha-stat-card {
+        text-align: center;
+        padding: var(--space-8) var(--space-5);
+        border-radius: var(--radius-2xl);
+        background: var(--surface-1);
+        border: 1px solid var(--surface-3);
+        transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+        position: relative;
+        overflow: hidden;
+      }
+
+      .ha-stat-card::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        border-radius: inherit;
+        padding: 1.5px;
+        background: conic-gradient(from var(--gradient-angle), #10b981, #14b8a6, #06b6d4, #10b981);
+        -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+        -webkit-mask-composite: xor;
+        mask-composite: exclude;
+        opacity: 0;
+        transition: opacity 0.5s ease;
+        pointer-events: none;
+        animation: border-rotate 4s linear infinite;
+      }
+
+      .ha-stat-card:hover::before { opacity: 1; }
+      .ha-stat-card:hover {
+        transform: translateY(-6px);
+        box-shadow: var(--shadow-xl), var(--glow-health);
+        background: var(--surface-2);
+      }
+
+      .ha-stat-icon {
+        width: 56px;
+        height: 56px;
+        border-radius: var(--radius-xl);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto var(--space-5);
+        font-size: 1.5rem;
+        position: relative;
+        z-index: 1;
+      }
+
+      .ha-stat-number {
+        font-size: clamp(2rem, 4vw, 3rem);
+        font-weight: 900;
+        letter-spacing: -0.03em;
+        line-height: 1;
+        margin-bottom: var(--space-3);
+        position: relative;
+        z-index: 1;
+      }
+
+      .ha-stat-label {
+        font-size: 0.9375rem;
+        font-weight: 600;
+        color: var(--text-primary);
+        margin-bottom: var(--space-2);
+        position: relative;
+        z-index: 1;
+      }
+
+      .ha-stat-desc {
+        font-size: 0.8125rem;
+        color: var(--text-muted);
+        line-height: 1.5;
+        position: relative;
+        z-index: 1;
+      }
+
+      /* ============================================
+         FOOTER CTA
+         ============================================ */
+      .ha-footer-cta {
+        text-align: center;
+        padding: var(--space-24) var(--space-8);
+        background: var(--surface-0);
+        border-top: 1px solid var(--surface-3);
+      }
+
+      .ha-footer-cta-inner {
+        max-width: 700px;
+        margin: 0 auto;
+      }
+
+      .ha-footer-cta h2 {
+        font-size: clamp(1.75rem, 4vw, 2.5rem);
+        font-weight: 800;
+        letter-spacing: -0.03em;
+        margin-bottom: var(--space-4);
+        color: var(--text-primary);
+      }
+
+      .ha-footer-cta p {
+        font-size: 1.0625rem;
+        color: var(--text-secondary);
+        margin-bottom: var(--space-8);
+        line-height: 1.7;
+      }
+
+      .ha-footer-cta-buttons {
+        display: flex;
+        gap: var(--space-4);
+        justify-content: center;
+        flex-wrap: wrap;
+      }
+
+      /* --- Buttons --- */
+      .ha-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: var(--space-2);
+        padding: var(--space-4) var(--space-8);
+        font-size: 1rem;
+        font-weight: 600;
+        text-decoration: none;
+        border-radius: var(--radius-lg);
+        transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+        cursor: pointer;
+        border: none;
+        white-space: nowrap;
+        min-height: 48px;
+        line-height: 1;
+      }
+
+      .ha-btn-primary {
+        background: var(--gradient-teal-emerald);
+        color: #0a1a14;
+        box-shadow: var(--shadow-md);
+      }
+
+      .ha-btn-primary:hover {
+        transform: translateY(-3px);
+        box-shadow: var(--shadow-xl), 0 0 40px rgba(16, 185, 129, 0.25);
+        color: #0a1a14;
+      }
+
+      .ha-btn-solid {
+        background: var(--gradient-primary);
+        color: white;
+        box-shadow: var(--shadow-md);
+      }
+
+      .ha-btn-solid:hover {
+        transform: translateY(-3px);
+        box-shadow: var(--shadow-xl), var(--glow-primary);
+        color: white;
+      }
+
+      .ha-btn-ghost {
+        background: transparent;
+        color: var(--text-secondary);
+        border: 1.5px solid var(--surface-3);
+      }
+
+      .ha-btn-ghost:hover {
+        background: var(--glass-bg-strong);
+        border-color: var(--glass-border-strong);
+        color: var(--text-primary);
+        transform: translateY(-2px);
+      }
+
+      .ha-btn-arrow {
+        transition: transform 0.3s ease;
+        display: inline-block;
+      }
+
+      .ha-btn:hover .ha-btn-arrow {
+        transform: translateX(4px);
+      }
+
+      /* ============================================
+         RESPONSIVE
+         ============================================ */
+      @media (max-width: 1100px) {
+        .ha-comparison-grid {
+          grid-template-columns: 1fr;
+          grid-template-rows: auto;
+          gap: var(--space-8);
+        }
+
+        .ha-comparison-column {
+          grid-template-rows: auto;
+          grid-row: auto;
+        }
+
+        .ha-stats-grid {
+          grid-template-columns: repeat(2, 1fr);
+        }
+
+        .ha-wcag-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      @media (max-width: 768px) {
+        .ha-topbar {
+          padding: var(--space-3) var(--space-4);
+        }
+
+        .ha-topbar-title {
+          display: none;
+        }
+
+        .ha-hero {
+          min-height: auto;
+          padding: calc(var(--space-24) + var(--space-8)) var(--space-4) var(--space-16);
+        }
+
+        .ha-hero-scroll {
+          display: none;
+        }
+
+        .ha-section-inner {
+          padding: var(--space-16) var(--space-4);
+        }
+
+        .ha-section-header {
+          margin-bottom: var(--space-10);
+        }
+
+        .ha-timeline-items {
+          grid-template-columns: 1fr;
+          gap: var(--space-3);
+        }
+
+        .ha-pyramid-level {
+          grid-template-columns: 1fr;
+          text-align: center;
+        }
+
+        .ha-pyramid-icon {
+          margin: 0 auto;
+        }
+
+        .ha-pyramid-tools {
+          justify-content: center;
+        }
+
+        .ha-checklist-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .ha-comparison-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .ha-stats-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .ha-wcag-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .ha-footer-cta-buttons {
+          flex-direction: column;
+          align-items: stretch;
+        }
+
+        .ha-btn {
+          width: 100%;
+          justify-content: center;
+        }
+
+        .ha-hero-deadline {
+          flex-direction: column;
+          gap: var(--space-2);
+        }
+      }
+
+      @media (max-width: 480px) {
+        .ha-hero-title {
+          font-size: clamp(2rem, 10vw, 3rem);
+        }
+
+        .ha-topbar-right {
+          display: none;
+        }
+      }
+
+      /* --- Reduced Motion --- */
+      @media (prefers-reduced-motion: reduce) {
+        *, *::before, *::after {
+          animation-duration: 0.01ms !important;
+          animation-iteration-count: 1 !important;
+          transition-duration: 0.01ms !important;
+          scroll-behavior: auto !important;
+        }
+
+        .scroll-reveal {
+          opacity: 1;
+          transform: none;
+          filter: none;
+          transition: none;
+        }
+
+        .ha-hero-orb {
+          animation: none !important;
+          opacity: 0.15;
+        }
+      }
+
+      /* --- Focus States --- */
+      .ha-btn:focus-visible,
+      .ha-back-link:focus-visible,
+      .ha-topbar-link:focus-visible,
+      .ha-check-card:focus-visible,
+      .ha-stat-card:focus-visible {
+        outline: 3px solid var(--wc-green);
+        outline-offset: 3px;
+      }
+    </style>
+  </head>
+
+  <body>
+    <!-- Top Navigation Bar -->
+    <nav class="ha-topbar" aria-label="Page navigation">
+      <div class="ha-topbar-left">
+        <a href="/" class="ha-back-link" aria-label="Back to WC-2026 Dashboard">
+          <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
+          Dashboard
+        </a>
+        <span class="ha-topbar-title" aria-hidden="true">|</span>
+        <span class="ha-topbar-title">Healthcare Accessibility</span>
+      </div>
+      <div class="ha-topbar-right">
+        <a href="/pre-planning/components/" class="ha-topbar-link">
+          <i class="fa-solid fa-book" aria-hidden="true"></i>
+          Full Docs
+        </a>
+        <a href="/pre-planning/overview/" class="ha-topbar-link">
+          <i class="fa-solid fa-clipboard-list" aria-hidden="true"></i>
+          Build Plan
+        </a>
+      </div>
+    </nav>
+
+    <main id="main-content">
+      <!-- ============================================
+           SECTION 1: HERO
+           ============================================ -->
+      <section class="ha-hero" aria-label="Healthcare Accessibility Strategy">
+        <div class="ha-hero-grid" aria-hidden="true"></div>
+        <div class="ha-hero-orb ha-hero-orb-1" aria-hidden="true"></div>
+        <div class="ha-hero-orb ha-hero-orb-2" aria-hidden="true"></div>
+        <div class="ha-hero-orb ha-hero-orb-3" aria-hidden="true"></div>
+
+        <div class="ha-hero-content">
+          <div class="ha-hero-badge">
+            <span class="ha-hero-badge-dot" aria-hidden="true"></span>
+            HHS Mandate Active -- Compliance Required
+          </div>
+
+          <h1 class="ha-hero-title">Accessibility Is<br />Not Optional</h1>
+
+          <p class="ha-hero-subtitle">WCAG 2.1 AA is now legally required for healthcare. We exceed it.</p>
+
+          <p class="ha-hero-description">
+            The HHS final rule mandates WCAG 2.1 Level AA compliance for all healthcare
+            organizations receiving federal funding. WC-2026 does not just meet the bar --
+            every component is built to <strong>exceed</strong> it, targeting WCAG 2.2 AAA
+            for critical interactions. Compliance is the floor, not the ceiling.
+          </p>
+
+          <div class="ha-hero-deadline">
+            <span class="ha-hero-deadline-label">HHS Compliance Deadline</span>
+            <span class="ha-hero-deadline-date">MAY 2026</span>
+          </div>
+        </div>
+
+        <div class="ha-hero-scroll" aria-hidden="true">
+          <span>Explore</span>
+          <div class="ha-hero-scroll-line"></div>
+        </div>
+      </section>
+
+      <!-- ============================================
+           SECTION 2: COMPLIANCE LANDSCAPE
+           ============================================ -->
+      <section class="ha-section ha-timeline-section" aria-label="Compliance timeline">
+        <div class="ha-section-inner">
+          <div class="ha-section-header scroll-reveal">
+            <span class="ha-section-label ha-section-label-urgent">Compliance Landscape</span>
+            <h2 class="ha-section-title">The Regulatory Timeline</h2>
+            <p class="ha-section-description">
+              Accessibility in healthcare is not aspirational -- it is a legal requirement
+              with an immovable deadline. Here is where the industry stands.
+            </p>
+          </div>
+
+          <div class="ha-timeline scroll-reveal scroll-reveal-delay-1">
+            <div class="ha-timeline-track" aria-hidden="true"></div>
+
+            <div class="ha-timeline-items">
+              <div class="ha-timeline-item">
+                <div class="ha-timeline-item-icon" style="background: linear-gradient(135deg, rgba(104, 104, 160, 0.15), rgba(104, 104, 160, 0.05)); border: 1px solid rgba(104, 104, 160, 0.2); color: var(--text-muted);" aria-hidden="true">
+                  <i class="fa-solid fa-landmark"></i>
+                </div>
+                <div class="ha-timeline-item-year" style="color: var(--text-muted);">1998</div>
+                <div class="ha-timeline-item-title">Section 508</div>
+                <div class="ha-timeline-item-desc">Federal agencies required to make IT accessible</div>
+              </div>
+
+              <div class="ha-timeline-item">
+                <div class="ha-timeline-item-icon" style="background: linear-gradient(135deg, rgba(245, 158, 11, 0.15), rgba(245, 158, 11, 0.05)); border: 1px solid rgba(245, 158, 11, 0.2); color: var(--wc-amber);" aria-hidden="true">
+                  <i class="fa-solid fa-file-shield"></i>
+                </div>
+                <div class="ha-timeline-item-year" style="color: var(--wc-amber);">2018</div>
+                <div class="ha-timeline-item-title">WCAG 2.1 AA</div>
+                <div class="ha-timeline-item-desc">Current standard with mobile and cognitive improvements</div>
+              </div>
+
+              <div class="ha-timeline-item ha-timeline-item-urgent">
+                <div class="ha-timeline-item-icon" style="background: linear-gradient(135deg, rgba(239, 68, 68, 0.15), rgba(239, 68, 68, 0.05)); border: 1px solid rgba(239, 68, 68, 0.2); color: var(--wc-red);" aria-hidden="true">
+                  <i class="fa-solid fa-gavel"></i>
+                </div>
+                <div class="ha-timeline-item-year" style="color: var(--wc-red);">MAY 2026</div>
+                <div class="ha-timeline-item-title">HHS Mandate</div>
+                <div class="ha-timeline-item-desc">WCAG 2.1 AA legally required for healthcare orgs</div>
+              </div>
+
+              <div class="ha-timeline-item ha-timeline-item-achieved">
+                <div class="ha-timeline-item-icon" style="background: linear-gradient(135deg, rgba(16, 185, 129, 0.15), rgba(16, 185, 129, 0.05)); border: 1px solid rgba(16, 185, 129, 0.2); color: var(--wc-green);" aria-hidden="true">
+                  <i class="fa-solid fa-shield-halved"></i>
+                </div>
+                <div class="ha-timeline-item-year" style="color: var(--wc-green);">WC-2026</div>
+                <div class="ha-timeline-item-title">AA Guaranteed</div>
+                <div class="ha-timeline-item-desc">Every component meets AA. Critical ones exceed it.</div>
+              </div>
+
+              <div class="ha-timeline-item ha-timeline-item-achieved">
+                <div class="ha-timeline-item-icon" style="background: linear-gradient(135deg, rgba(20, 184, 166, 0.15), rgba(20, 184, 166, 0.05)); border: 1px solid rgba(20, 184, 166, 0.2); color: var(--wc-teal);" aria-hidden="true">
+                  <i class="fa-solid fa-trophy"></i>
+                </div>
+                <div class="ha-timeline-item-year" style="color: var(--wc-teal);">Stretch</div>
+                <div class="ha-timeline-item-title">WCAG 2.2 AAA</div>
+                <div class="ha-timeline-item-desc">Our target for forms, navigation, and alerts</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="ha-competitive-bar scroll-reveal scroll-reveal-delay-3">
+            <div class="ha-competitive-bar-title">
+              <i class="fa-solid fa-chart-bar" aria-hidden="true"></i>
+              Where Competitors Stop vs. Where WC-2026 Goes
+            </div>
+            <div class="ha-competitive-track">
+              <div class="ha-competitive-fill-others">Most libraries stop here (WCAG AA partial)</div>
+              <div class="ha-competitive-fill-wc">WC-2026 (WCAG AAA target)</div>
+            </div>
+            <div class="ha-competitive-labels">
+              <span>No a11y</span>
+              <span>WCAG A</span>
+              <span>WCAG AA</span>
+              <span>WCAG AAA</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================
+           SECTION 3: 4-LEVEL TESTING STRATEGY
+           ============================================ -->
+      <section class="ha-section" aria-label="4-level testing strategy">
+        <div class="ha-section-inner">
+          <div class="ha-section-header scroll-reveal">
+            <span class="ha-section-label">Testing Strategy</span>
+            <h2 class="ha-section-title">Four Levels of Assurance</h2>
+            <p class="ha-section-description">
+              Automated tools catch roughly 30% of accessibility issues. That is why
+              WC-2026 uses a four-level testing strategy -- from CI pipelines to real
+              users with disabilities.
+            </p>
+          </div>
+
+          <div class="ha-pyramid-grid">
+            <!-- Level 1: Automated -->
+            <div class="ha-pyramid-level scroll-reveal scroll-reveal-delay-1">
+              <div class="ha-pyramid-icon ha-pyramid-icon-1" aria-hidden="true">
+                <i class="fa-solid fa-robot"></i>
+              </div>
+              <div class="ha-pyramid-content">
+                <span class="ha-pyramid-level-badge ha-pyramid-level-badge-1">Level 1 -- Automated</span>
+                <div class="ha-pyramid-title">Automated Testing</div>
+                <p class="ha-pyramid-desc">
+                  axe-core runs in every unit test and every Storybook story. Catches color contrast
+                  failures, missing ARIA labels, invalid roles, and structural issues automatically
+                  on every commit.
+                </p>
+                <div class="ha-pyramid-tools">
+                  <span class="ha-pyramid-tool"><i class="fa-solid fa-vial" aria-hidden="true"></i> axe-core</span>
+                  <span class="ha-pyramid-tool"><i class="fa-solid fa-code" aria-hidden="true"></i> ESLint a11y</span>
+                  <span class="ha-pyramid-tool"><i class="fa-solid fa-terminal" aria-hidden="true"></i> Vitest</span>
+                  <span class="ha-pyramid-coverage">~30% issues caught</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Level 2: Semi-automated -->
+            <div class="ha-pyramid-level scroll-reveal scroll-reveal-delay-2">
+              <div class="ha-pyramid-icon ha-pyramid-icon-2" aria-hidden="true">
+                <i class="fa-solid fa-eye"></i>
+              </div>
+              <div class="ha-pyramid-content">
+                <span class="ha-pyramid-level-badge ha-pyramid-level-badge-2">Level 2 -- Semi-automated</span>
+                <div class="ha-pyramid-title">Interactive Validation</div>
+                <p class="ha-pyramid-desc">
+                  Storybook accessibility addon provides real-time a11y feedback during development.
+                  Tab-order visualization, keyboard interaction testing, and ARIA inspector
+                  integrated into the component playground.
+                </p>
+                <div class="ha-pyramid-tools">
+                  <span class="ha-pyramid-tool"><i class="fa-solid fa-book-open" aria-hidden="true"></i> Storybook a11y addon</span>
+                  <span class="ha-pyramid-tool"><i class="fa-solid fa-keyboard" aria-hidden="true"></i> Keyboard testing</span>
+                  <span class="ha-pyramid-tool"><i class="fa-solid fa-palette" aria-hidden="true"></i> Chromatic</span>
+                  <span class="ha-pyramid-coverage">~55% issues caught</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Level 3: Manual -->
+            <div class="ha-pyramid-level scroll-reveal scroll-reveal-delay-3">
+              <div class="ha-pyramid-icon ha-pyramid-icon-3" aria-hidden="true">
+                <i class="fa-solid fa-hand"></i>
+              </div>
+              <div class="ha-pyramid-content">
+                <span class="ha-pyramid-level-badge ha-pyramid-level-badge-3">Level 3 -- Manual Expert</span>
+                <div class="ha-pyramid-title">Screen Reader & Cognitive Review</div>
+                <p class="ha-pyramid-desc">
+                  Expert manual testing with JAWS, NVDA, and VoiceOver. Cognitive load assessment
+                  ensures components do not overwhelm users. Reading order, announcement quality,
+                  and interaction patterns verified by accessibility specialists.
+                </p>
+                <div class="ha-pyramid-tools">
+                  <span class="ha-pyramid-tool"><i class="fa-solid fa-volume-high" aria-hidden="true"></i> JAWS / NVDA</span>
+                  <span class="ha-pyramid-tool"><i class="fa-brands fa-apple" aria-hidden="true"></i> VoiceOver</span>
+                  <span class="ha-pyramid-tool"><i class="fa-solid fa-brain" aria-hidden="true"></i> Cognitive review</span>
+                  <span class="ha-pyramid-coverage">~85% issues caught</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Level 4: User testing -->
+            <div class="ha-pyramid-level scroll-reveal scroll-reveal-delay-4">
+              <div class="ha-pyramid-icon ha-pyramid-icon-4" aria-hidden="true">
+                <i class="fa-solid fa-users"></i>
+              </div>
+              <div class="ha-pyramid-content">
+                <span class="ha-pyramid-level-badge ha-pyramid-level-badge-4">Level 4 -- User Testing</span>
+                <div class="ha-pyramid-title">Real Users with Disabilities</div>
+                <p class="ha-pyramid-desc">
+                  The ultimate validation. Real users with visual, motor, cognitive, and auditory
+                  disabilities test critical workflows. Their feedback shapes component design
+                  decisions. Nothing replaces lived experience.
+                </p>
+                <div class="ha-pyramid-tools">
+                  <span class="ha-pyramid-tool"><i class="fa-solid fa-universal-access" aria-hidden="true"></i> Usability testing</span>
+                  <span class="ha-pyramid-tool"><i class="fa-solid fa-comments" aria-hidden="true"></i> Feedback sessions</span>
+                  <span class="ha-pyramid-tool"><i class="fa-solid fa-clipboard-check" aria-hidden="true"></i> Task completion</span>
+                  <span class="ha-pyramid-coverage">~98% issues caught</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================
+           SECTION 4: COMPONENT A11Y CHECKLIST
+           ============================================ -->
+      <section class="ha-section" aria-label="Component accessibility checklist">
+        <div class="ha-section-inner">
+          <div class="ha-section-header scroll-reveal">
+            <span class="ha-section-label">Component Guarantees</span>
+            <h2 class="ha-section-title">What Every Component Delivers</h2>
+            <p class="ha-section-description">
+              Every WC-2026 component ships with these seven accessibility guarantees.
+              No exceptions. No opt-in flags. Accessible by default.
+            </p>
+          </div>
+
+          <div class="ha-checklist-grid">
+            <div class="ha-check-card ha-spotlight-card scroll-reveal scroll-reveal-delay-1">
+              <div class="ha-check-header">
+                <div class="ha-check-icon" aria-hidden="true"><i class="fa-solid fa-keyboard"></i></div>
+                <i class="fa-solid fa-circle-check ha-check-mark" aria-hidden="true"></i>
+              </div>
+              <div class="ha-check-title">Keyboard Navigable</div>
+              <p class="ha-check-desc">
+                Every interactive element is reachable and operable via keyboard alone. Tab order
+                follows logical reading order. Enter and Space activate controls. Escape closes overlays.
+              </p>
+            </div>
+
+            <div class="ha-check-card ha-spotlight-card scroll-reveal scroll-reveal-delay-2">
+              <div class="ha-check-header">
+                <div class="ha-check-icon" aria-hidden="true"><i class="fa-solid fa-volume-high"></i></div>
+                <i class="fa-solid fa-circle-check ha-check-mark" aria-hidden="true"></i>
+              </div>
+              <div class="ha-check-title">Screen Reader Compatible</div>
+              <p class="ha-check-desc">
+                Semantic ARIA attributes, live regions for dynamic content, and proper role
+                announcements. Tested with JAWS, NVDA, and VoiceOver on every release.
+              </p>
+            </div>
+
+            <div class="ha-check-card ha-spotlight-card scroll-reveal scroll-reveal-delay-3">
+              <div class="ha-check-header">
+                <div class="ha-check-icon" aria-hidden="true"><i class="fa-solid fa-droplet"></i></div>
+                <i class="fa-solid fa-circle-check ha-check-mark" aria-hidden="true"></i>
+              </div>
+              <div class="ha-check-title">Color Independent</div>
+              <p class="ha-check-desc">
+                Information is never conveyed by color alone. Icons, text labels, and patterns
+                supplement all color-coded indicators. Works for all types of color vision deficiency.
+              </p>
+            </div>
+
+            <div class="ha-check-card ha-spotlight-card scroll-reveal scroll-reveal-delay-4">
+              <div class="ha-check-header">
+                <div class="ha-check-icon" aria-hidden="true"><i class="fa-solid fa-gauge-simple"></i></div>
+                <i class="fa-solid fa-circle-check ha-check-mark" aria-hidden="true"></i>
+              </div>
+              <div class="ha-check-title">Motion Safe</div>
+              <p class="ha-check-desc">
+                All animations respect <code>prefers-reduced-motion</code>. Users with vestibular
+                disorders never see unexpected motion. Critical for healthcare patients.
+              </p>
+            </div>
+
+            <div class="ha-check-card ha-spotlight-card scroll-reveal scroll-reveal-delay-5">
+              <div class="ha-check-header">
+                <div class="ha-check-icon" aria-hidden="true"><i class="fa-solid fa-circle-half-stroke"></i></div>
+                <i class="fa-solid fa-circle-check ha-check-mark" aria-hidden="true"></i>
+              </div>
+              <div class="ha-check-title">High Contrast</div>
+              <p class="ha-check-desc">
+                Full Windows High Contrast Mode support. Components adapt to forced-colors
+                media query. Text meets 7:1 AAA contrast ratios in high-contrast themes.
+              </p>
+            </div>
+
+            <div class="ha-check-card ha-spotlight-card scroll-reveal scroll-reveal-delay-6">
+              <div class="ha-check-header">
+                <div class="ha-check-icon" aria-hidden="true"><i class="fa-solid fa-hand-pointer"></i></div>
+                <i class="fa-solid fa-circle-check ha-check-mark" aria-hidden="true"></i>
+              </div>
+              <div class="ha-check-title">Touch Target 44x44</div>
+              <p class="ha-check-desc">
+                All interactive elements meet the minimum 44x44 CSS pixel touch target. Users with
+                motor impairments, tremors, or limited dexterity can activate every control.
+              </p>
+            </div>
+
+            <div class="ha-check-card ha-spotlight-card scroll-reveal scroll-reveal-delay-7">
+              <div class="ha-check-header">
+                <div class="ha-check-icon" aria-hidden="true"><i class="fa-solid fa-crosshairs"></i></div>
+                <i class="fa-solid fa-circle-check ha-check-mark" aria-hidden="true"></i>
+              </div>
+              <div class="ha-check-title">Focus Visible</div>
+              <p class="ha-check-desc">
+                Clear, high-contrast focus indicators on every interactive element. 3px solid
+                ring with 3:1 contrast against adjacent colors. Never hidden, never suppressed.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================
+           SECTION 5: BEFORE/AFTER COMPARISON
+           ============================================ -->
+      <section class="ha-section ha-comparison-section" aria-label="Before and after accessibility comparison">
+        <div class="ha-section-inner">
+          <div class="ha-section-header scroll-reveal">
+            <span class="ha-section-label">Side by Side</span>
+            <h2 class="ha-section-title">Typical vs. WC-2026</h2>
+            <p class="ha-section-description">
+              Most component libraries treat accessibility as an afterthought. WC-2026
+              builds it into the architecture from the first line of code.
+            </p>
+          </div>
+
+          <div class="ha-comparison-grid">
+            <!-- Left column: Bad -->
+            <div class="ha-comparison-column scroll-reveal scroll-reveal-delay-1">
+              <div class="ha-comparison-header ha-comparison-header-bad">
+                <i class="fa-solid fa-circle-xmark" aria-hidden="true"></i>
+                Typical Component Library
+              </div>
+
+              <span class="ha-code-label ha-code-label-html">HTML</span>
+              <div class="ha-code-block">
+                <div class="ha-code-titlebar">
+                  <span class="ha-code-dot"></span>
+                  <span class="ha-code-dot"></span>
+                  <span class="ha-code-dot"></span>
+                  <span class="ha-code-filename">button.html</span>
+                </div>
+                <div class="ha-code-body">
+                  <pre set:html={codeBadButton} />
+                </div>
+              </div>
+
+              <span class="ha-code-label ha-code-label-css">CSS</span>
+              <div class="ha-code-block">
+                <div class="ha-code-titlebar">
+                  <span class="ha-code-dot"></span>
+                  <span class="ha-code-dot"></span>
+                  <span class="ha-code-dot"></span>
+                  <span class="ha-code-filename">button.css</span>
+                </div>
+                <div class="ha-code-body">
+                  <pre set:html={codeBadContrast} />
+                </div>
+              </div>
+
+              <div class="ha-contrast-demo">
+                <div class="ha-contrast-demo-title">Color Contrast</div>
+                <div class="ha-contrast-swatch ha-contrast-swatch-bad">
+                  <span>Button Text</span>
+                  <span class="ha-contrast-ratio ha-contrast-ratio-fail">1.9:1 FAIL</span>
+                </div>
+                <div class="ha-focus-demo">
+                  <div class="ha-focus-example">
+                    <div class="ha-focus-example-label">Focus State</div>
+                    <div class="ha-focus-btn ha-focus-btn-bad">Submit</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Right column: Good -->
+            <div class="ha-comparison-column scroll-reveal scroll-reveal-delay-2">
+              <div class="ha-comparison-header ha-comparison-header-good">
+                <i class="fa-solid fa-circle-check" aria-hidden="true"></i>
+                WC-2026
+              </div>
+
+              <span class="ha-code-label ha-code-label-html">HTML</span>
+              <div class="ha-code-block">
+                <div class="ha-code-titlebar">
+                  <span class="ha-code-dot"></span>
+                  <span class="ha-code-dot"></span>
+                  <span class="ha-code-dot"></span>
+                  <span class="ha-code-filename">wc-button.html</span>
+                </div>
+                <div class="ha-code-body">
+                  <pre set:html={codeGoodButton} />
+                </div>
+              </div>
+
+              <span class="ha-code-label ha-code-label-css">CSS</span>
+              <div class="ha-code-block">
+                <div class="ha-code-titlebar">
+                  <span class="ha-code-dot"></span>
+                  <span class="ha-code-dot"></span>
+                  <span class="ha-code-dot"></span>
+                  <span class="ha-code-filename">wc-button.css</span>
+                </div>
+                <div class="ha-code-body">
+                  <pre set:html={codeGoodContrast} />
+                </div>
+              </div>
+
+              <div class="ha-contrast-demo">
+                <div class="ha-contrast-demo-title">Color Contrast</div>
+                <div class="ha-contrast-swatch ha-contrast-swatch-good">
+                  <span>Button Text</span>
+                  <span class="ha-contrast-ratio ha-contrast-ratio-pass">8.2:1 AAA</span>
+                </div>
+                <div class="ha-focus-demo">
+                  <div class="ha-focus-example">
+                    <div class="ha-focus-example-label">Focus State</div>
+                    <div class="ha-focus-btn ha-focus-btn-good">Submit</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================
+           SECTION 6: WCAG SUCCESS CRITERIA COVERAGE
+           ============================================ -->
+      <section class="ha-section" aria-label="WCAG success criteria coverage">
+        <div class="ha-section-inner">
+          <div class="ha-section-header scroll-reveal">
+            <span class="ha-section-label">WCAG Coverage</span>
+            <h2 class="ha-section-title">POUR Principles Coverage</h2>
+            <p class="ha-section-description">
+              WCAG is organized around four principles: Perceivable, Operable,
+              Understandable, and Robust. Here is how WC-2026 addresses each.
+            </p>
+          </div>
+
+          <div class="ha-wcag-grid">
+            <!-- Perceivable -->
+            <div class="ha-wcag-principle scroll-reveal scroll-reveal-delay-1">
+              <div class="ha-wcag-principle-header">
+                <div class="ha-wcag-principle-icon ha-wcag-icon-perceivable" aria-hidden="true">
+                  <i class="fa-solid fa-eye"></i>
+                </div>
+                <div>
+                  <div class="ha-wcag-principle-title">Perceivable</div>
+                  <div class="ha-wcag-principle-letter">Principle 1</div>
+                </div>
+              </div>
+              <ul class="ha-wcag-criteria">
+                <li class="ha-wcag-criterion ha-wcag-criterion-full">
+                  <i class="fa-solid fa-circle-check" aria-hidden="true"></i>
+                  <span>1.1 Text Alternatives -- Alt text for all non-text content</span>
+                </li>
+                <li class="ha-wcag-criterion ha-wcag-criterion-full">
+                  <i class="fa-solid fa-circle-check" aria-hidden="true"></i>
+                  <span>1.2 Time-based Media -- Captions and audio descriptions</span>
+                </li>
+                <li class="ha-wcag-criterion ha-wcag-criterion-full">
+                  <i class="fa-solid fa-circle-check" aria-hidden="true"></i>
+                  <span>1.3 Adaptable -- Meaningful structure and relationships</span>
+                </li>
+                <li class="ha-wcag-criterion ha-wcag-criterion-exceeds">
+                  <i class="fa-solid fa-star" aria-hidden="true"></i>
+                  <span>1.4 Distinguishable -- 7:1 AAA contrast ratios targeted</span>
+                </li>
+              </ul>
+            </div>
+
+            <!-- Operable -->
+            <div class="ha-wcag-principle scroll-reveal scroll-reveal-delay-2">
+              <div class="ha-wcag-principle-header">
+                <div class="ha-wcag-principle-icon ha-wcag-icon-operable" aria-hidden="true">
+                  <i class="fa-solid fa-hand-pointer"></i>
+                </div>
+                <div>
+                  <div class="ha-wcag-principle-title">Operable</div>
+                  <div class="ha-wcag-principle-letter">Principle 2</div>
+                </div>
+              </div>
+              <ul class="ha-wcag-criteria">
+                <li class="ha-wcag-criterion ha-wcag-criterion-full">
+                  <i class="fa-solid fa-circle-check" aria-hidden="true"></i>
+                  <span>2.1 Keyboard Accessible -- All functionality via keyboard</span>
+                </li>
+                <li class="ha-wcag-criterion ha-wcag-criterion-full">
+                  <i class="fa-solid fa-circle-check" aria-hidden="true"></i>
+                  <span>2.2 Enough Time -- Adjustable time limits</span>
+                </li>
+                <li class="ha-wcag-criterion ha-wcag-criterion-exceeds">
+                  <i class="fa-solid fa-star" aria-hidden="true"></i>
+                  <span>2.3 Seizures -- No flashing content, motion-safe default</span>
+                </li>
+                <li class="ha-wcag-criterion ha-wcag-criterion-full">
+                  <i class="fa-solid fa-circle-check" aria-hidden="true"></i>
+                  <span>2.4 Navigable -- Focus order, skip links, breadcrumbs</span>
+                </li>
+                <li class="ha-wcag-criterion ha-wcag-criterion-exceeds">
+                  <i class="fa-solid fa-star" aria-hidden="true"></i>
+                  <span>2.5 Input Modalities -- 44x44px targets, no complex gestures</span>
+                </li>
+              </ul>
+            </div>
+
+            <!-- Understandable -->
+            <div class="ha-wcag-principle scroll-reveal scroll-reveal-delay-3">
+              <div class="ha-wcag-principle-header">
+                <div class="ha-wcag-principle-icon ha-wcag-icon-understandable" aria-hidden="true">
+                  <i class="fa-solid fa-brain"></i>
+                </div>
+                <div>
+                  <div class="ha-wcag-principle-title">Understandable</div>
+                  <div class="ha-wcag-principle-letter">Principle 3</div>
+                </div>
+              </div>
+              <ul class="ha-wcag-criteria">
+                <li class="ha-wcag-criterion ha-wcag-criterion-full">
+                  <i class="fa-solid fa-circle-check" aria-hidden="true"></i>
+                  <span>3.1 Readable -- Language identification, clear labels</span>
+                </li>
+                <li class="ha-wcag-criterion ha-wcag-criterion-full">
+                  <i class="fa-solid fa-circle-check" aria-hidden="true"></i>
+                  <span>3.2 Predictable -- Consistent navigation and behavior</span>
+                </li>
+                <li class="ha-wcag-criterion ha-wcag-criterion-exceeds">
+                  <i class="fa-solid fa-star" aria-hidden="true"></i>
+                  <span>3.3 Input Assistance -- Error prevention, suggestions, review</span>
+                </li>
+              </ul>
+            </div>
+
+            <!-- Robust -->
+            <div class="ha-wcag-principle scroll-reveal scroll-reveal-delay-4">
+              <div class="ha-wcag-principle-header">
+                <div class="ha-wcag-principle-icon ha-wcag-icon-robust" aria-hidden="true">
+                  <i class="fa-solid fa-shield-halved"></i>
+                </div>
+                <div>
+                  <div class="ha-wcag-principle-title">Robust</div>
+                  <div class="ha-wcag-principle-letter">Principle 4</div>
+                </div>
+              </div>
+              <ul class="ha-wcag-criteria">
+                <li class="ha-wcag-criterion ha-wcag-criterion-full">
+                  <i class="fa-solid fa-circle-check" aria-hidden="true"></i>
+                  <span>4.1.1 Parsing -- Valid HTML, no duplicate IDs</span>
+                </li>
+                <li class="ha-wcag-criterion ha-wcag-criterion-exceeds">
+                  <i class="fa-solid fa-star" aria-hidden="true"></i>
+                  <span>4.1.2 Name, Role, Value -- Full ARIA + ElementInternals</span>
+                </li>
+                <li class="ha-wcag-criterion ha-wcag-criterion-full">
+                  <i class="fa-solid fa-circle-check" aria-hidden="true"></i>
+                  <span>4.1.3 Status Messages -- Live regions for all updates</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="ha-wcag-legend scroll-reveal scroll-reveal-delay-5">
+            <div class="ha-wcag-legend-item">
+              <span class="ha-wcag-legend-dot ha-wcag-legend-dot-full" aria-hidden="true"></span>
+              Fully Covered (AA)
+            </div>
+            <div class="ha-wcag-legend-item">
+              <span class="ha-wcag-legend-dot ha-wcag-legend-dot-exceeds" aria-hidden="true"></span>
+              Exceeds Requirement (AAA target)
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================
+           SECTION 7: THE BUSINESS CASE
+           ============================================ -->
+      <section class="ha-section ha-stats-section" aria-label="The business case for accessibility">
+        <div class="ha-section-inner">
+          <div class="ha-section-header scroll-reveal">
+            <span class="ha-section-label ha-section-label-urgent">The Business Case</span>
+            <h2 class="ha-section-title">The Cost of Doing Nothing</h2>
+            <p class="ha-section-description">
+              Accessibility is not just the right thing to do -- it is a financial
+              imperative. The numbers make the case undeniable.
+            </p>
+          </div>
+
+          <div class="ha-stats-grid">
+            <div class="ha-stat-card scroll-reveal scroll-reveal-delay-1">
+              <div class="ha-stat-icon" style="background: linear-gradient(135deg, rgba(6, 182, 212, 0.12), rgba(6, 182, 212, 0.04)); border: 1px solid rgba(6, 182, 212, 0.15); color: var(--wc-cyan);" aria-hidden="true">
+                <i class="fa-solid fa-users"></i>
+              </div>
+              <div class="ha-stat-number" style="background: var(--gradient-cyan-purple); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">1 in 4</div>
+              <div class="ha-stat-label">US Adults with Disabilities</div>
+              <div class="ha-stat-desc">61 million Americans -- your users, your patients, your community</div>
+            </div>
+
+            <div class="ha-stat-card scroll-reveal scroll-reveal-delay-2">
+              <div class="ha-stat-icon" style="background: linear-gradient(135deg, rgba(239, 68, 68, 0.12), rgba(239, 68, 68, 0.04)); border: 1px solid rgba(239, 68, 68, 0.15); color: var(--wc-red);" aria-hidden="true">
+                <i class="fa-solid fa-person-walking-arrow-right"></i>
+              </div>
+              <div class="ha-stat-number" style="background: linear-gradient(135deg, #ef4444, #f97316); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">71%</div>
+              <div class="ha-stat-label">Leave Inaccessible Sites</div>
+              <div class="ha-stat-desc">Users with disabilities abandon sites that do not work for them</div>
+            </div>
+
+            <div class="ha-stat-card scroll-reveal scroll-reveal-delay-3">
+              <div class="ha-stat-icon" style="background: linear-gradient(135deg, rgba(16, 185, 129, 0.12), rgba(16, 185, 129, 0.04)); border: 1px solid rgba(16, 185, 129, 0.15); color: var(--wc-green);" aria-hidden="true">
+                <i class="fa-solid fa-dollar-sign"></i>
+              </div>
+              <div class="ha-stat-number" style="background: var(--gradient-green-cyan); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">$13B</div>
+              <div class="ha-stat-label">Annual Spending Affected</div>
+              <div class="ha-stat-desc">Healthcare spending impacted by digital accessibility barriers</div>
+            </div>
+
+            <div class="ha-stat-card scroll-reveal scroll-reveal-delay-4">
+              <div class="ha-stat-icon" style="background: linear-gradient(135deg, rgba(245, 158, 11, 0.12), rgba(245, 158, 11, 0.04)); border: 1px solid rgba(245, 158, 11, 0.15); color: var(--wc-amber);" aria-hidden="true">
+                <i class="fa-solid fa-scale-balanced"></i>
+              </div>
+              <div class="ha-stat-number" style="background: var(--gradient-pink-orange); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">$25K+</div>
+              <div class="ha-stat-label">Average ADA Settlement</div>
+              <div class="ha-stat-desc">Per lawsuit -- and digital accessibility complaints are rising 23% yearly</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================
+           FOOTER CTA
+           ============================================ -->
+      <section class="ha-footer-cta" aria-label="Next steps">
+        <div class="ha-footer-cta-inner scroll-reveal">
+          <h2>Ready to Build Accessible?</h2>
+          <p>
+            Explore the full documentation for component accessibility patterns,
+            testing strategies, and WCAG compliance implementation guides.
+          </p>
+          <div class="ha-footer-cta-buttons">
+            <a href="/pre-planning/components/" class="ha-btn ha-btn-primary">
+              Component A11y Docs
+              <span class="ha-btn-arrow" aria-hidden="true">&rarr;</span>
+            </a>
+            <a href="/pre-planning/overview/" class="ha-btn ha-btn-ghost">
+              Build Plan
+              <span class="ha-btn-arrow" aria-hidden="true">&rarr;</span>
+            </a>
+            <a href="/" class="ha-btn ha-btn-ghost">
+              Back to Dashboard
+              <span class="ha-btn-arrow" aria-hidden="true">&rarr;</span>
+            </a>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <script is:inline>
+      // Scroll-reveal animation using Intersection Observer
+      // Respects prefers-reduced-motion
+      (function () {
+        var prefersReduced = window.matchMedia(
+          '(prefers-reduced-motion: reduce)'
+        ).matches;
+
+        if (prefersReduced) {
+          document.querySelectorAll('.scroll-reveal').forEach(function (el) {
+            el.classList.add('is-visible');
+          });
+          return;
+        }
+
+        var observer = new IntersectionObserver(
+          function (entries) {
+            entries.forEach(function (entry) {
+              if (entry.isIntersecting) {
+                entry.target.classList.add('is-visible');
+                observer.unobserve(entry.target);
+              }
+            });
+          },
+          {
+            threshold: 0.1,
+            rootMargin: '0px 0px -60px 0px',
+          }
+        );
+
+        document.querySelectorAll('.scroll-reveal').forEach(function (el) {
+          observer.observe(el);
+        });
+
+        // Cursor-following spotlight effect on cards
+        document.querySelectorAll('.ha-spotlight-card, .ha-card').forEach(function (card) {
+          card.addEventListener('mousemove', function (e) {
+            var rect = card.getBoundingClientRect();
+            var x = e.clientX - rect.left;
+            var y = e.clientY - rect.top;
+            card.style.setProperty('--mouse-x', x + 'px');
+            card.style.setProperty('--mouse-y', y + 'px');
+          });
+        });
+      })();
+    </script>
+  </body>
+</html>

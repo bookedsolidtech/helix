@@ -1,0 +1,195 @@
+---
+/**
+ * StatsBar - Animated metrics strip showcasing key project stats.
+ *
+ * Features:
+ * - Glassmorphic stat cards with animated gradient mesh background
+ * - Different gradient colors per stat for visual variety
+ * - Scroll-reveal animation with staggered delays
+ * - Responsive: 5-across desktop, wraps on mobile
+ * - Click to open modal with details
+ * - Accessible modals with ESC key support
+ */
+
+interface Stat {
+  value: string;
+  label: string;
+  colorClass: string;
+  description: string;
+  relevance: string;
+  docsUrl?: string;
+  docsLabel?: string;
+  iconClass: string;
+}
+
+const stats: Stat[] = [
+  {
+    value: '10K+',
+    label: 'Lines Documented',
+    colorClass: 'stat-value-gradient',
+    iconClass: 'fa-solid fa-file-lines',
+    description: 'Comprehensive documentation covering every aspect of the component library.',
+    relevance: 'Complete API documentation, usage examples, and integration guides ensure your team can adopt WC-2026 components with zero ramp-up time. Every prop, method, event, and CSS custom property is documented with TypeScript types and JSDoc comments.',
+    docsUrl: '/pre-planning/overview/',
+    docsLabel: 'View Documentation Plan'
+  },
+  {
+    value: '40+',
+    label: 'Components Planned',
+    colorClass: 'stat-value-cyan',
+    iconClass: 'fa-solid fa-puzzle-piece',
+    description: 'Production-ready UI components covering healthcare workflows.',
+    relevance: 'From alerts and buttons to complex data tables and form validation—every component your healthcare application needs. Each component is built with accessibility, theming, and Drupal integration as first-class concerns.',
+    docsUrl: '/pre-planning/component-inventory/',
+    docsLabel: 'Browse Component List'
+  },
+  {
+    value: 'AAA',
+    label: 'WCAG Target',
+    colorClass: 'stat-value-pink',
+    iconClass: 'fa-solid fa-universal-access',
+    description: 'WCAG 2.1 AAA accessibility compliance for critical healthcare components.',
+    relevance: 'Healthcare organizations must meet HHS accessibility requirements by May 2026. WC-2026 targets AA minimum with AAA for critical components, ensuring compliance and inclusive patient experiences with high contrast ratios, keyboard navigation, and comprehensive screen reader support.',
+    docsUrl: '/pre-planning/design-system/#accessibility',
+    docsLabel: 'Accessibility Standards'
+  },
+  {
+    value: '3-Tier',
+    label: 'Design Tokens',
+    colorClass: 'stat-value-green',
+    iconClass: 'fa-solid fa-layer-group',
+    description: 'W3C Design Token Community Group (DTCG) compliant token architecture.',
+    relevance: 'Primitive → Semantic → Component token hierarchy enables consistent theming, dark mode, and brand customization. Tokens integrate with Figma via Tokens Studio plugin for true design-development sync. Change a primitive color once, update your entire system.',
+    docsUrl: '/design-tokens/overview/',
+    docsLabel: 'Token Architecture Guide'
+  },
+  {
+    value: '100%',
+    label: 'TypeScript',
+    colorClass: 'stat-value-gradient',
+    iconClass: 'fa-solid fa-code',
+    description: 'Full TypeScript coverage with strict mode and comprehensive type safety.',
+    relevance: 'Enterprise teams demand type safety. Every component, utility, and API is fully typed with JSDoc documentation. Strict mode enabled catches errors at compile-time, not runtime. Your IDE provides intelligent autocomplete for every prop and method.',
+    docsUrl: '/architecture/overview/#typescript',
+    docsLabel: 'TypeScript Architecture'
+  },
+];
+---
+
+<section class="stats-section" aria-label="Project statistics">
+  <div class="stats-bar">
+    {stats.map((stat, i) => (
+      <button
+        type="button"
+        class={`stat-card scroll-reveal scroll-reveal-delay-${i + 1}`}
+        aria-label={`View details for ${stat.value} ${stat.label}`}
+        data-stat-modal={`stat-${i}`}
+      >
+        <div class="stat-card-header">
+          <i class={`${stat.iconClass} stat-main-icon`} aria-hidden="true"></i>
+          <div class={`stat-value ${stat.colorClass}`}>{stat.value}</div>
+          <div class="stat-label">{stat.label}</div>
+        </div>
+        <i class="stat-expand-icon fa-solid fa-circle-plus" aria-hidden="true"></i>
+      </button>
+    ))}
+  </div>
+
+  <!-- Modals -->
+  {stats.map((stat, i) => (
+    <div
+      id={`stat-modal-${i}`}
+      class="stat-modal"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby={`stat-modal-title-${i}`}
+    >
+      <div class="stat-modal-content">
+        <button
+          type="button"
+          class="stat-modal-close"
+          aria-label="Close modal"
+        >
+          <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+        </button>
+
+        <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem;">
+          <i class={`${stat.iconClass}`} style="font-size: 3rem; color: var(--text-muted);" aria-hidden="true"></i>
+          <div>
+            <div class={`${stat.colorClass}`} style="font-size: 2.5rem; font-weight: 800; line-height: 1;">{stat.value}</div>
+            <div style="color: var(--text-muted); font-size: 0.875rem; text-transform: uppercase; letter-spacing: 0.05em; margin-top: 0.25rem;">{stat.label}</div>
+          </div>
+        </div>
+
+        <p style="color: var(--text-secondary); font-size: 1.125rem; line-height: 1.6; margin-bottom: 1.5rem;">{stat.description}</p>
+
+        <div style="background: var(--glass-bg); border-radius: var(--radius-lg); padding: 1.5rem; margin-bottom: 1.5rem; border: 1px solid var(--glass-border);">
+          <h4 style="color: var(--text-primary); font-weight: 600; font-size: 1.125rem; margin-bottom: 0.75rem; display: flex; align-items: center; gap: 0.5rem;">
+            <i class="fa-solid fa-lightbulb" style="color: #fbbf24;" aria-hidden="true"></i>
+            Why It Matters
+          </h4>
+          <p style="color: var(--text-secondary); line-height: 1.7;">{stat.relevance}</p>
+        </div>
+
+        {stat.docsUrl && (
+          <a
+            href={stat.docsUrl}
+            style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.75rem 1.5rem; background: var(--accent-color); color: white; font-weight: 600; border-radius: var(--radius-md); text-decoration: none; transition: all 0.2s ease;"
+            target={stat.docsUrl.startsWith('http') ? '_blank' : undefined}
+            rel={stat.docsUrl.startsWith('http') ? 'noopener noreferrer' : undefined}
+          >
+            {stat.docsLabel || 'Learn More'}
+            <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+          </a>
+        )}
+      </div>
+    </div>
+  ))}
+</section>
+
+<script>
+  // Modal functionality
+  document.addEventListener('DOMContentLoaded', () => {
+    const statCards = document.querySelectorAll('[data-stat-modal]');
+
+    statCards.forEach((card) => {
+      const modalId = card.getAttribute('data-stat-modal');
+      if (!modalId) return;
+      const modal = document.getElementById(`stat-modal-${modalId.split('-')[1]}`);
+      if (!modal) return;
+
+      const closeBtn = modal.querySelector('.stat-modal-close');
+
+      // Open modal
+      card.addEventListener('click', () => {
+        modal.classList.add('active');
+        document.body.style.overflow = 'hidden';
+        // Focus the close button for accessibility
+        (closeBtn as HTMLElement)?.focus();
+      });
+
+      // Close modal
+      const closeModal = () => {
+        modal.classList.remove('active');
+        document.body.style.overflow = '';
+        (card as HTMLElement).focus(); // Return focus to trigger
+      };
+
+      closeBtn?.addEventListener('click', closeModal);
+
+      // Close on backdrop click
+      modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+          closeModal();
+        }
+      });
+
+      // Close on ESC key
+      modal.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+          closeModal();
+        }
+      });
+    });
+  });
+</script>

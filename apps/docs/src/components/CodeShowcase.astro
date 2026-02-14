@@ -1,0 +1,105 @@
+---
+/**
+ * CodeShowcase - Terminal-style code display showing real usage.
+ *
+ * Features:
+ * - Split layout: info panel + code window
+ * - macOS-style window chrome (traffic light dots)
+ * - Syntax highlighted code with line numbers
+ * - Copy button with clipboard interaction
+ * - Scroll-reveal animation
+ * - Responsive: stacks on mobile/tablet
+ */
+import CodeBlock from './CodeBlock.astro';
+
+const terminalCode = `# Install the component library
+npm install @wc-2026/components
+
+# Or use the CDN for quick prototyping
+npx create-wc-2026-app my-project`;
+
+const htmlCode = `<!-- Import once, use everywhere -->
+<script type="module">
+  import '@wc-2026/components';
+</script>
+
+<!-- Accessible alert component -->
+<wc-alert
+  variant="success"
+  dismissible
+  role="alert"
+>
+  Article published successfully.
+</wc-alert>
+
+<!-- Data table with sorting -->
+<wc-data-table
+  sortable
+  paginated
+  page-size="25"
+></wc-data-table>
+
+<!-- Themed with design tokens -->
+<wc-card elevation="2">
+  <wc-avatar
+    src="/img/author-profile.jpg"
+    alt="Content Author"
+  ></wc-avatar>
+</wc-card>`;
+---
+
+<section class="code-showcase-section" aria-label="Code examples">
+  <div class="code-showcase-inner">
+    <div class="section-header scroll-reveal">
+      <span class="section-label">Developer Experience</span>
+      <h2 class="section-title">Ship Components in Minutes</h2>
+      <p class="section-description">
+        Drop-in web components that work everywhere. No framework lock-in,
+        no complex setup, no compromises.
+      </p>
+    </div>
+
+    <div class="code-showcase-grid">
+      <!-- Info panel -->
+      <div class="code-showcase-info scroll-reveal scroll-reveal-delay-1">
+        <h3>Install and Use</h3>
+        <p>
+          One package install. One import. Your components are ready for any
+          page, any CMS, any framework. Standard HTML custom elements that
+          integrate with existing Drupal themes or standalone applications.
+        </p>
+
+        <CodeBlock
+          code={terminalCode}
+          lang="bash"
+          filename="terminal"
+          class="showcase-terminal-block"
+        />
+
+        <h3>Why Web Components?</h3>
+        <p>
+          Framework-agnostic by design. Use with React, Vue, Angular, Svelte,
+          or vanilla HTML. Once registered, they work like native HTML elements
+          with full TypeScript intellisense.
+        </p>
+        <ul class="wc-benefits-list">
+          <li>Future-proof with native browser standards</li>
+          <li>Zero runtime overhead - just HTML and JavaScript</li>
+          <li>Built-in accessibility with ARIA support</li>
+          <li>Themeable via CSS custom properties and design tokens</li>
+        </ul>
+      </div>
+
+      <!-- Code window -->
+      <div class="scroll-reveal scroll-reveal-delay-2">
+        <CodeBlock
+          code={htmlCode}
+          lang="html"
+          filename="content-dashboard.html"
+          showLineNumbers={true}
+          class="showcase-main-block"
+        />
+      </div>
+    </div>
+  </div>
+</section>

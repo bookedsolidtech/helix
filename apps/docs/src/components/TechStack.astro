@@ -1,0 +1,258 @@
+---
+/**
+ * TechStack - Technology showcase with detail cards.
+ *
+ * Features:
+ * - 3-column grid of glassmorphic cards
+ * - Large Font Awesome icons with hover effects
+ * - Version badge in top right corner
+ * - Two links: official site + our internal guide
+ * - Scroll-reveal animations
+ * - Responsive: 3 cols -> 2 cols -> 1 col
+ */
+
+interface Technology {
+  name: string;
+  version: string;
+  color: string;
+  description: string;
+  features: string[];
+  officialUrl: string;  // External link to official product site
+  guideUrl: string;     // Internal link to our documentation
+  logoPath: string;
+}
+
+const technologies: Technology[] = [
+  {
+    name: 'Lit',
+    version: '3.x',
+    color: '#324FFF',
+    description: 'Simple, fast, and modern web component library built on web standards.',
+    features: [
+      'Lightweight reactive properties and templating',
+      'Standards-based Custom Elements API',
+      'Reactive Controllers for shared behaviors',
+      'Scoped styles with Shadow DOM encapsulation',
+      'TypeScript decorators for clean component code'
+    ],
+    officialUrl: 'https://lit.dev',
+    guideUrl: '/guides/lit',
+    logoPath: '/logos/lit.svg'
+  },
+  {
+    name: 'Storybook',
+    version: '9.x',
+    color: '#FF4785',
+    description: 'UI development environment for building, testing, and documenting components in isolation.',
+    features: [
+      'Component playground with hot module reloading',
+      'Visual testing and accessibility checks',
+      'Integrated Vitest unit tests in same UI',
+      'Auto-generated documentation from JSDoc',
+      'Interaction testing with play functions'
+    ],
+    officialUrl: 'https://storybook.js.org',
+    guideUrl: '/guides/storybook',
+    logoPath: '/logos/storybook.svg'
+  },
+  {
+    name: 'Vitest',
+    version: '4.x',
+    color: '#729B1B',
+    description: 'Blazing fast unit testing framework powered by Vite with native ESM and TypeScript support.',
+    features: [
+      'Lightning-fast execution with Vite integration',
+      'Native ESM and TypeScript support',
+      'Jest-compatible API for easy migration',
+      'Built-in code coverage with c8',
+      'Watch mode with smart re-run algorithms'
+    ],
+    officialUrl: 'https://vitest.dev',
+    guideUrl: '/guides/vitest',
+    logoPath: '/logos/vitest.svg'
+  },
+  {
+    name: 'Astro',
+    version: '5.x',
+    color: '#FF5D01',
+    description: 'All-in-one web framework for building fast, content-focused websites with zero JavaScript by default.',
+    features: [
+      'Zero-JS by default with island architecture',
+      'Starlight documentation theme built-in',
+      'MDX support for interactive content',
+      'Automatic image optimization',
+      'Framework-agnostic component integration'
+    ],
+    officialUrl: 'https://docs.astro.build',
+    guideUrl: '/guides/astro',
+    logoPath: '/logos/astro.svg'
+  },
+  {
+    name: 'Turborepo',
+    version: '2.x',
+    color: '#0096FF',
+    description: 'High-performance build system for JavaScript and TypeScript monorepos with intelligent caching.',
+    features: [
+      'Parallel task execution across packages',
+      'Smart incremental builds with task hashing',
+      'Remote caching for CI/CD speedups',
+      'Task pipelines with dependency management',
+      'Zero-config workspace detection'
+    ],
+    officialUrl: 'https://turbo.build/repo',
+    guideUrl: '/guides/turborepo',
+    logoPath: '/logos/turborepo.svg'
+  },
+  {
+    name: 'TypeScript',
+    version: '5.7',
+    color: '#3178C6',
+    description: 'Strongly typed programming language that builds on JavaScript with compile-time type safety.',
+    features: [
+      '100% type coverage with strict mode',
+      'Advanced type inference and generics',
+      'JSDoc integration for documentation',
+      'Decorator support for clean metadata',
+      'Enterprise-grade tooling and IDE support'
+    ],
+    officialUrl: 'https://www.typescriptlang.org',
+    guideUrl: '/guides/typescript',
+    logoPath: '/logos/typescript.svg'
+  },
+  {
+    name: 'Drupal',
+    version: '10/11',
+    color: '#0678BE',
+    description: 'Enterprise content management system with powerful APIs, field architecture, and theming engine.',
+    features: [
+      'Zero-coupling web component integration',
+      'TWIG template system for rendering',
+      'Drupal Behaviors for progressive enhancement',
+      'Field-based content architecture',
+      'Enterprise security and compliance'
+    ],
+    officialUrl: 'https://www.drupal.org',
+    guideUrl: '/pre-planning/drupal-guide',
+    logoPath: '/logos/drupal.svg'
+  },
+  {
+    name: 'npm',
+    version: '10+',
+    color: '#C12127',
+    description: 'Package manager for JavaScript with registry hosting and workspace support for monorepos.',
+    features: [
+      'Scoped @wc-2026 organization packages',
+      'Workspace monorepo support',
+      'Lockfile for reproducible installs',
+      'Peer dependency resolution',
+      'Public and private package hosting'
+    ],
+    officialUrl: 'https://www.npmjs.com',
+    guideUrl: '/guides/npm',
+    logoPath: '/logos/npm.svg'
+  },
+];
+---
+
+<section class="tech-section" aria-label="Technology stack">
+  <div class="tech-section-inner">
+    <div class="section-header scroll-reveal">
+      <span class="section-label">Technology</span>
+      <h2 class="section-title">Built With the Best</h2>
+      <p class="section-description">
+        Every tool chosen for 2026 production readiness, developer experience,
+        and long-term enterprise support.
+      </p>
+    </div>
+
+    <div class="tech-grid" role="list">
+      {technologies.map((tech, i) => (
+        <article
+          class={`tech-card scroll-reveal scroll-reveal-delay-${(i % 4) + 1}`}
+          role="listitem"
+        >
+          <span class="tech-version">{tech.version}</span>
+
+          <div class="tech-card-header">
+            <div class="tech-logo-wrapper">
+              <img
+                src={tech.logoPath}
+                alt={`${tech.name} logo`}
+                width="64"
+                height="64"
+                loading="lazy"
+                class="tech-logo"
+              />
+            </div>
+            <h3 class="tech-name">{tech.name}</h3>
+          </div>
+
+          <p class="tech-description">{tech.description}</p>
+
+          <ul class="tech-features">
+            {tech.features.map((feature) => (
+              <li class="tech-feature-item">{feature}</li>
+            ))}
+          </ul>
+
+          <div class="tech-links">
+            <a
+              href={tech.officialUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="tech-link tech-link-external"
+            >
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 16 16"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+                class="tech-link-icon"
+              >
+                <path
+                  d="M12 8.66667V12.6667C12 13.0203 11.8595 13.3594 11.6095 13.6095C11.3594 13.8595 11.0203 14 10.6667 14H3.33333C2.97971 14 2.64057 13.8595 2.39052 13.6095C2.14048 13.3594 2 13.0203 2 12.6667V5.33333C2 4.97971 2.14048 4.64057 2.39052 4.39052C2.64057 4.14048 2.97971 4 3.33333 4H7.33333M10 2H14M14 2V6M14 2L6.66667 9.33333"
+                  stroke="currentColor"
+                  stroke-width="1.5"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+              </svg>
+              Official Site
+            </a>
+            <a
+              href={tech.guideUrl}
+              class="tech-link tech-link-internal"
+            >
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 16 16"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+                class="tech-link-icon"
+              >
+                <path
+                  d="M4 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2zM9 7l2.5 2.5M11.5 7L9 9.5"
+                  stroke="currentColor"
+                  stroke-width="1.5"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+                <path
+                  d="M5 5h3M5 8h2M5 11h4"
+                  stroke="currentColor"
+                  stroke-width="1.5"
+                  stroke-linecap="round"
+                />
+              </svg>
+              Our Guide
+            </a>
+          </div>
+        </article>
+      ))}
+    </div>
+  </div>
+</section>

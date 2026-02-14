@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 200" fill="none">
+  <path d="M40 120V40l40 40v80z" fill="#324FFF"/>
+  <path d="M80 80V0l40 40v80z" fill="#324FFF"/>
+  <path d="M120 120V40l40 40v80z" fill="#324FFF"/>
+  <path d="M40 200v-80l40 40v80z" fill="#283198" transform="translate(0,-40)"/>
+  <path d="M0 160V80l40 40v80z" fill="#0D1030"/>
+</svg>

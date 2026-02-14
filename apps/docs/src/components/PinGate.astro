@@ -1,0 +1,1902 @@
+---
+/**
+ * PinGate.astro
+ *
+ * A "silly auth" T9-style numeric keypad PIN gate.
+ * Renders a full-screen overlay that blocks site access until
+ * the correct PIN (4843 = "HUGE") is entered.
+ *
+ * Client-side only -- uses localStorage with 30-minute expiry.
+ * Uses the custom element pattern consistent with Header.astro.
+ */
+---
+
+<wc-pin-gate id="wc-pin-gate" class="pin-gate" aria-hidden="true">
+  <!-- Particle canvas background -->
+  <canvas class="pin-particles" aria-hidden="true"></canvas>
+
+  <!-- Flip Phone Device -->
+  <div class="pin-container flip-phone">
+    <!-- TOP HALF: Screen -->
+    <div class="phone-screen">
+      <div class="screen-bezel">
+        <!-- Speaker slit -->
+        <div class="screen-speaker" aria-hidden="true"></div>
+
+        <!-- Status bar -->
+        <div class="screen-statusbar" aria-hidden="true">
+          <div class="status-left">
+            <div class="status-signal">
+              <span class="signal-bar bar-1"></span>
+              <span class="signal-bar bar-2"></span>
+              <span class="signal-bar bar-3"></span>
+              <span class="signal-bar bar-4"></span>
+            </div>
+            <div class="status-carrier">Huge Network</div>
+          </div>
+          <div class="status-right">
+            <svg class="status-wifi" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M12 18.5a1 1 0 1 0 0 2 1 1 0 0 0 0-2Z" fill="currentColor"/>
+              <path d="M8.53 15.53a5 5 0 0 1 6.94 0" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+              <path d="M5.64 12.64a9 9 0 0 1 12.72 0" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+              <path d="M2.1 9.1a14 14 0 0 1 19.8 0" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" opacity="0.35"/>
+            </svg>
+            <div class="status-battery">
+              <div class="battery-body">
+                <div class="battery-level"></div>
+              </div>
+              <div class="battery-tip"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Screen content area -->
+        <div class="screen-content">
+          <!-- Scanline overlay -->
+          <div class="screen-scanlines" aria-hidden="true"></div>
+
+          <!-- Branding -->
+          <div class="pin-brand">
+            <div class="brand-icon" aria-hidden="true">
+              <div class="brand-ring ring-outer"></div>
+              <div class="brand-ring ring-middle"></div>
+              <div class="brand-ring ring-inner"></div>
+              <div class="brand-core"></div>
+            </div>
+            <div class="brand-text">WC-2026</div>
+            <div class="brand-sub">Enter access code to continue</div>
+          </div>
+
+          <!-- PIN dots display -->
+          <div class="pin-display" role="status" aria-live="polite" aria-label="PIN entry">
+            <div class="pin-dot" data-index="0"></div>
+            <div class="pin-dot" data-index="1"></div>
+            <div class="pin-dot" data-index="2"></div>
+            <div class="pin-dot" data-index="3"></div>
+          </div>
+
+          <!-- Error message -->
+          <div class="pin-error" id="pin-error" aria-live="assertive"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- HINGE -->
+    <div class="phone-hinge" aria-hidden="true">
+      <div class="hinge-groove"></div>
+      <div class="hinge-groove"></div>
+      <div class="hinge-groove"></div>
+      <div class="hinge-groove"></div>
+      <div class="hinge-groove"></div>
+    </div>
+
+    <!-- BOTTOM HALF: Keypad -->
+    <div class="phone-keypad-body">
+      <!-- T9 Keypad -->
+      <div class="pin-keypad" role="group" aria-label="Numeric keypad">
+        <button class="key" data-digit="1" type="button" aria-label="1">
+          <span class="key-digit">1</span>
+          <span class="key-letters">&nbsp;</span>
+        </button>
+        <button class="key" data-digit="2" type="button" aria-label="2, A B C">
+          <span class="key-digit">2</span>
+          <span class="key-letters">ABC</span>
+        </button>
+        <button class="key" data-digit="3" type="button" aria-label="3, D E F">
+          <span class="key-digit">3</span>
+          <span class="key-letters">D<b class="huge-e">E</b>F</span>
+        </button>
+        <button class="key" data-digit="4" type="button" aria-label="4, G H I">
+          <span class="key-digit">4</span>
+          <span class="key-letters"><b class="huge-g">G</b><b class="huge-h">H</b>I</span>
+        </button>
+        <button class="key" data-digit="5" type="button" aria-label="5, J K L">
+          <span class="key-digit">5</span>
+          <span class="key-letters">JKL</span>
+        </button>
+        <button class="key" data-digit="6" type="button" aria-label="6, M N O">
+          <span class="key-digit">6</span>
+          <span class="key-letters">MNO</span>
+        </button>
+        <button class="key" data-digit="7" type="button" aria-label="7, P Q R S">
+          <span class="key-digit">7</span>
+          <span class="key-letters">PQRS</span>
+        </button>
+        <button class="key" data-digit="8" type="button" aria-label="8, T U V">
+          <span class="key-digit">8</span>
+          <span class="key-letters">T<b class="huge-u">U</b>V</span>
+        </button>
+        <button class="key" data-digit="9" type="button" aria-label="9, W X Y Z">
+          <span class="key-digit">9</span>
+          <span class="key-letters">WXYZ</span>
+        </button>
+        <button class="key key-empty" type="button" disabled aria-hidden="true">
+          <span class="key-digit"></span>
+        </button>
+        <button class="key" data-digit="0" type="button" aria-label="0">
+          <span class="key-digit">0</span>
+          <span class="key-letters">&nbsp;</span>
+        </button>
+        <button class="key key-delete" data-action="delete" type="button" aria-label="Delete last digit">
+          <span class="key-digit"><i class="fa-solid fa-delete-left"></i></span>
+        </button>
+      </div>
+
+      <!-- Brand logo at bottom of keypad body -->
+      <div class="phone-brand-logo" aria-hidden="true">by Bandy Jacob Strawn</div>
+    </div>
+  </div>
+</wc-pin-gate>
+
+<!-- Admin floating pitch menu (only visible with 0727 code) -->
+<wc-admin-fab id="wc-admin-fab" aria-hidden="true">
+  <div class="fab-nudge" aria-hidden="true">
+    <span class="fab-nudge-text">Pitch Deck</span>
+    <span class="fab-nudge-arrow"></span>
+  </div>
+  <button class="fab-trigger" type="button" aria-label="Pitch deck menu" aria-expanded="false">
+    <i class="fa-solid fa-bolt" aria-hidden="true"></i>
+  </button>
+
+  <div class="fab-panel" role="menu" aria-label="Pitch pages">
+    <div class="fab-panel-header">
+      <span class="fab-badge"><i class="fa-solid fa-rocket" aria-hidden="true"></i> Pitch Deck</span>
+    </div>
+
+    <a href="/elevator-pitch/" class="fab-card fab-card-cyan" role="menuitem">
+      <div class="fab-card-icon"><i class="fa-solid fa-bolt" aria-hidden="true"></i></div>
+      <div class="fab-card-body">
+        <div class="fab-card-title">30 Second Pitch</div>
+        <div class="fab-card-desc">Elevator pitch — billboard impact</div>
+      </div>
+      <div class="fab-card-tag">30s</div>
+    </a>
+
+    <a href="/detailed-pitch/" class="fab-card fab-card-magenta" role="menuitem">
+      <div class="fab-card-icon"><i class="fa-solid fa-presentation-screen fa-chart-line" aria-hidden="true"></i></div>
+      <div class="fab-card-body">
+        <div class="fab-card-title">5 Minute Pitch</div>
+        <div class="fab-card-desc">Deep dive — plan, team, stack</div>
+      </div>
+      <div class="fab-card-tag">5m</div>
+    </a>
+
+    <a href="/full-presentation/" class="fab-card fab-card-amber" role="menuitem">
+      <div class="fab-card-icon"><i class="fa-solid fa-display" aria-hidden="true"></i></div>
+      <div class="fab-card-body">
+        <div class="fab-card-title">Full Presentation</div>
+        <div class="fab-card-desc">30 min deck — snap-scroll slides</div>
+      </div>
+      <div class="fab-card-tag">30m</div>
+    </a>
+  </div>
+</wc-admin-fab>
+
+<script>
+  // Pitch FAB — visible to ALL authenticated users
+  class WcAdminFab extends HTMLElement {
+    trigger: HTMLButtonElement;
+    panel: HTMLElement;
+    nudge: HTMLElement;
+
+    constructor() {
+      super();
+      this.trigger = this.querySelector('.fab-trigger')!;
+      this.panel = this.querySelector('.fab-panel')!;
+      this.nudge = this.querySelector('.fab-nudge')!;
+
+      if (this.isAuthenticated()) this.reveal();
+
+      // Listen for auth changes (login event)
+      window.addEventListener('wc-auth-change', (() => {
+        this.reveal();
+      }) as EventListener);
+
+      this.trigger.addEventListener('click', () => {
+        this.dismissNudge();
+        this.toggle();
+      });
+
+      document.addEventListener('click', (e) => {
+        if (!this.contains(e.target as Node)) this.closePanel();
+      });
+
+      this.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+          this.closePanel();
+          this.trigger.focus();
+        }
+      });
+    }
+
+    isAuthenticated(): boolean {
+      try {
+        const raw = localStorage.getItem('wc-auth');
+        if (!raw) return false;
+        const data = JSON.parse(raw);
+        return data.authenticated === true;
+      } catch { return false; }
+    }
+
+    reveal() {
+      this.setAttribute('aria-hidden', 'false');
+      this.classList.add('visible');
+      // Show nudge tooltip after a beat
+      setTimeout(() => this.showNudge(), 1500);
+    }
+
+    showNudge() {
+      this.nudge.classList.add('visible');
+      // Auto-dismiss after 6s
+      setTimeout(() => this.dismissNudge(), 6000);
+    }
+
+    dismissNudge() {
+      this.nudge.classList.remove('visible');
+    }
+
+    conceal() {
+      this.setAttribute('aria-hidden', 'true');
+      this.classList.remove('visible');
+      this.closePanel();
+    }
+
+    toggle() {
+      this.trigger.getAttribute('aria-expanded') === 'true' ? this.closePanel() : this.openPanel();
+    }
+
+    openPanel() {
+      this.trigger.setAttribute('aria-expanded', 'true');
+      this.panel.classList.add('is-open');
+    }
+
+    closePanel() {
+      this.trigger.setAttribute('aria-expanded', 'false');
+      this.panel.classList.remove('is-open');
+    }
+  }
+
+  customElements.define('wc-admin-fab', WcAdminFab);
+</script>
+
+<script>
+  class WcPinGate extends HTMLElement {
+    private pin: string = '';
+    private readonly VALID_PINS: Record<string, string> = { '4843': 'viewer', '0727': 'admin' };
+    private readonly STORAGE_KEY = 'wc-auth';
+    private readonly TIMEOUT_MS = 30 * 60 * 1000; // 30 minutes
+    private dots: NodeListOf<Element>;
+    private errorEl: HTMLElement;
+    private canvas: HTMLCanvasElement;
+    private ctx: CanvasRenderingContext2D | null = null;
+    private animFrame: number = 0;
+    private particles: { x: number; y: number; size: number; vx: number; vy: number; color: string; opacity: number }[] = [];
+
+    constructor() {
+      super();
+      this.dots = this.querySelectorAll('.pin-dot');
+      this.errorEl = this.querySelector('#pin-error')!;
+      this.canvas = this.querySelector('.pin-particles')!;
+
+      // Check auth immediately
+      if (this.isAuthenticated()) {
+        this.hide();
+        return;
+      }
+
+      // Show the gate
+      this.show();
+      this.bindEvents();
+    }
+
+    isAuthenticated(): boolean {
+      try {
+        const raw = localStorage.getItem(this.STORAGE_KEY);
+        if (!raw) return false;
+        const data = JSON.parse(raw);
+        if (!data.authenticated || !data.timestamp) return false;
+        const elapsed = Date.now() - data.timestamp;
+        if (elapsed > this.TIMEOUT_MS) {
+          localStorage.removeItem(this.STORAGE_KEY);
+          return false;
+        }
+        return true;
+      } catch {
+        return false;
+      }
+    }
+
+    authenticate(role: string = 'viewer'): void {
+      localStorage.setItem(this.STORAGE_KEY, JSON.stringify({
+        authenticated: true,
+        timestamp: Date.now(),
+        role
+      }));
+    }
+
+    show(): void {
+      // Reset PIN state
+      this.pin = '';
+      this.dots.forEach(dot => dot.classList.remove('filled', 'success', 'error'));
+      this.clearError();
+
+      this.setAttribute('aria-hidden', 'false');
+      this.classList.remove('dismissing');
+      this.classList.add('visible');
+      document.body.style.overflow = 'hidden';
+      this.startParticles();
+
+      // Make gate itself focusable and grab focus
+      this.setAttribute('tabindex', '-1');
+      requestAnimationFrame(() => {
+        this.focus();
+      });
+
+      // Focus trap: if anything outside the gate gets focus, steal it back
+      this._focusTrap = (e: FocusEvent) => {
+        if (!this.classList.contains('visible')) return;
+        const target = e.target as Node;
+        if (target && !this.contains(target)) {
+          e.preventDefault();
+          e.stopImmediatePropagation();
+          this.focus();
+        }
+      };
+      document.addEventListener('focusin', this._focusTrap, true);
+    }
+
+    private _focusTrap: ((e: FocusEvent) => void) | null = null;
+
+    hide(): void {
+      this.classList.add('dismissing');
+      document.body.style.overflow = '';
+      this.stopParticles();
+      // Remove focus trap
+      if (this._focusTrap) {
+        document.removeEventListener('focusin', this._focusTrap, true);
+        this._focusTrap = null;
+      }
+      setTimeout(() => {
+        this.setAttribute('aria-hidden', 'true');
+        this.classList.remove('visible', 'dismissing');
+      }, 600);
+    }
+
+    bindEvents(): void {
+      // Key button clicks
+      this.querySelectorAll('.key[data-digit]').forEach(key => {
+        key.addEventListener('click', () => {
+          const digit = (key as HTMLElement).dataset.digit;
+          if (digit !== undefined) this.addDigit(digit);
+        });
+      });
+
+      // Delete button
+      this.querySelector('[data-action="delete"]')?.addEventListener('click', () => {
+        this.deleteDigit();
+      });
+
+      // T9 letter-to-digit mapping (so typing "HUGE" works)
+      const letterMap: Record<string, string> = {
+        a:'2',b:'2',c:'2', d:'3',e:'3',f:'3',
+        g:'4',h:'4',i:'4', j:'5',k:'5',l:'5',
+        m:'6',n:'6',o:'6', p:'7',q:'7',r:'7',s:'7',
+        t:'8',u:'8',v:'8', w:'9',x:'9',y:'9',z:'9',
+      };
+
+      // Keyboard input — capture phase so we beat Starlight's handlers,
+      // but let system shortcuts (Cmd/Ctrl combos) pass through.
+      document.addEventListener('keydown', (e: KeyboardEvent) => {
+        if (!this.classList.contains('visible')) return;
+
+        // Let system/OS shortcuts through (screenshots, copy, etc.)
+        if (e.metaKey || e.ctrlKey || e.altKey) return;
+
+        let digit: string | undefined;
+
+        if (e.key >= '0' && e.key <= '9') {
+          digit = e.key;
+        } else if (letterMap[e.key.toLowerCase()]) {
+          digit = letterMap[e.key.toLowerCase()];
+        }
+
+        if (digit) {
+          e.preventDefault();
+          e.stopImmediatePropagation();
+          this.addDigit(digit);
+          const keyEl = this.querySelector(`.key[data-digit="${digit}"]`);
+          if (keyEl) {
+            keyEl.classList.add('pressed');
+            setTimeout(() => keyEl.classList.remove('pressed'), 150);
+          }
+        } else if (e.key === 'Backspace' || e.key === 'Delete') {
+          e.preventDefault();
+          e.stopImmediatePropagation();
+          this.deleteDigit();
+          const delEl = this.querySelector('[data-action="delete"]');
+          if (delEl) {
+            delEl.classList.add('pressed');
+            setTimeout(() => delEl.classList.remove('pressed'), 150);
+          }
+        } else if (e.key === 'Tab') {
+          // Prevent tab from leaving the gate
+          e.preventDefault();
+          e.stopImmediatePropagation();
+        }
+      }, true); // CAPTURE phase — fires before Starlight search etc.
+    }
+
+    addDigit(digit: string): void {
+      if (this.pin.length >= 4) return;
+      this.pin += digit;
+      this.updateDots();
+      this.clearError();
+
+      if (this.pin.length === 4) {
+        setTimeout(() => this.checkPin(), 200);
+      }
+    }
+
+    deleteDigit(): void {
+      if (this.pin.length === 0) return;
+      this.pin = this.pin.slice(0, -1);
+      this.updateDots();
+      this.clearError();
+    }
+
+    updateDots(): void {
+      this.dots.forEach((dot, i) => {
+        if (i < this.pin.length) {
+          dot.classList.add('filled');
+        } else {
+          dot.classList.remove('filled');
+        }
+      });
+    }
+
+    checkPin(): void {
+      const role = this.VALID_PINS[this.pin];
+      if (role) {
+        // Success
+        this.dots.forEach(dot => dot.classList.add('success'));
+        this.authenticate(role);
+        setTimeout(() => {
+          this.hide();
+          // Dispatch event so admin menu can react
+          window.dispatchEvent(new CustomEvent('wc-auth-change', { detail: { role } }));
+        }, 500);
+      } else {
+        // Failure - shake animation
+        this.dots.forEach(dot => dot.classList.add('error'));
+        const display = this.querySelector('.pin-display');
+        if (display) {
+          display.classList.add('shake');
+          setTimeout(() => display.classList.remove('shake'), 500);
+        }
+        this.showError('Incorrect code');
+        setTimeout(() => {
+          this.pin = '';
+          this.dots.forEach(dot => {
+            dot.classList.remove('filled', 'error');
+          });
+        }, 600);
+      }
+    }
+
+    showError(msg: string): void {
+      this.errorEl.textContent = msg;
+      this.errorEl.classList.add('visible');
+    }
+
+    clearError(): void {
+      this.errorEl.textContent = '';
+      this.errorEl.classList.remove('visible');
+    }
+
+    // === Particle system (matches Header.astro molecular pattern) ===
+    initParticles(): void {
+      const w = this.canvas.width;
+      const h = this.canvas.height;
+      const colors = [
+        'rgba(6, 182, 212,',    // cyan
+        'rgba(16, 185, 129,',   // emerald
+        'rgba(102, 126, 234,',  // indigo
+        'rgba(139, 92, 246,',   // violet
+        'rgba(59, 130, 246,',   // blue
+      ];
+      this.particles = [];
+      const count = 120;
+      const idx = colors.length;
+      for (let i = 0; i < count; i++) {
+        this.particles.push({
+          x: Math.random() * w,
+          y: Math.random() * h,
+          size: Math.random() * 2.5 + 0.6,
+          vx: (Math.random() - 0.5) * 0.3,
+          vy: (Math.random() - 0.5) * 0.3,
+          color: colors[Math.floor(Math.random() * idx)]!,
+          opacity: Math.random() * 0.3 + 0.1,
+        });
+      }
+    }
+
+    animateParticles(): void {
+      if (!this.ctx) return;
+      const ctx = this.ctx;
+      const w = this.canvas.width;
+      const h = this.canvas.height;
+
+      ctx.clearRect(0, 0, w, h);
+
+      for (const p of this.particles) {
+        p.x += p.vx;
+        p.y += p.vy;
+        if (p.x > w) p.x = 0;
+        if (p.x < 0) p.x = w;
+        if (p.y > h) p.y = 0;
+        if (p.y < 0) p.y = h;
+
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+        ctx.fillStyle = p.color + p.opacity + ')';
+        ctx.fill();
+      }
+
+      // Molecular connections
+      const maxDist = 120;
+      for (let i = 0; i < this.particles.length; i++) {
+        const a = this.particles[i]!;
+        for (let j = i + 1; j < this.particles.length; j++) {
+          const b = this.particles[j]!;
+          const dx = a.x - b.x;
+          const dy = a.y - b.y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist < maxDist) {
+            const alpha = 0.06 * (1 - dist / maxDist);
+            ctx.beginPath();
+            ctx.strokeStyle = `rgba(6, 182, 212, ${alpha})`;
+            ctx.lineWidth = 0.5;
+            ctx.moveTo(a.x, a.y);
+            ctx.lineTo(b.x, b.y);
+            ctx.stroke();
+          }
+        }
+      }
+
+      this.animFrame = requestAnimationFrame(() => this.animateParticles());
+    }
+
+    startParticles(): void {
+      const dpr = window.devicePixelRatio || 1;
+      this.canvas.width = window.innerWidth * dpr;
+      this.canvas.height = window.innerHeight * dpr;
+      this.canvas.style.width = window.innerWidth + 'px';
+      this.canvas.style.height = window.innerHeight + 'px';
+      this.ctx = this.canvas.getContext('2d');
+      if (this.ctx) {
+        this.ctx.scale(dpr, dpr);
+        // Reset canvas dimensions after scale
+        this.canvas.width = window.innerWidth * dpr;
+        this.canvas.height = window.innerHeight * dpr;
+      }
+      this.initParticles();
+      this.animateParticles();
+    }
+
+    stopParticles(): void {
+      cancelAnimationFrame(this.animFrame);
+    }
+  }
+
+  customElements.define('wc-pin-gate', WcPinGate);
+</script>
+
+<style>
+  /* ==========================================
+     PIN GATE - OVERLAY
+     ========================================== */
+  .pin-gate {
+    position: fixed;
+    inset: 0;
+    z-index: 99999;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    background: #07071a;
+    opacity: 0;
+    outline: none;
+    transition: opacity 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .pin-gate.visible {
+    display: flex;
+    opacity: 1;
+  }
+
+  .pin-gate.dismissing {
+    opacity: 0;
+    transition: opacity 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  /* Particle canvas */
+  .pin-particles {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* ==========================================
+     FLIP PHONE - DEVICE SHELL
+     ========================================== */
+  .flip-phone {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 380px;
+    max-width: calc(100vw - 2rem);
+    max-height: 100dvh;
+    /* Subtle floating shadow — particles do the heavy lifting */
+    filter:
+      drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3))
+      drop-shadow(0 8px 24px rgba(0, 0, 0, 0.25))
+      drop-shadow(0 20px 50px rgba(0, 0, 0, 0.15));
+  }
+
+  /* ==========================================
+     PHONE SCREEN - TOP HALF
+     ========================================== */
+  .phone-screen {
+    width: 100%;
+    background: linear-gradient(
+      170deg,
+      #2a2d3a 0%,
+      #1e2030 40%,
+      #1a1c2e 100%
+    );
+    border-radius: 24px 24px 0 0;
+    padding: 6px;
+    position: relative;
+    /* Metallic edge highlights */
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    border-bottom: none;
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.06),
+      inset 1px 0 0 rgba(255, 255, 255, 0.03),
+      inset -1px 0 0 rgba(255, 255, 255, 0.03);
+  }
+
+  /* Chamfered edge effect on left and right */
+  .phone-screen::before {
+    content: '';
+    position: absolute;
+    top: 12px;
+    bottom: 0;
+    left: -1px;
+    width: 2px;
+    background: linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.1) 0%,
+      rgba(255, 255, 255, 0.03) 50%,
+      transparent 100%
+    );
+    border-radius: 1px;
+  }
+
+  .phone-screen::after {
+    content: '';
+    position: absolute;
+    top: 12px;
+    bottom: 0;
+    right: -1px;
+    width: 2px;
+    background: linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.06) 0%,
+      rgba(255, 255, 255, 0.02) 50%,
+      transparent 100%
+    );
+    border-radius: 1px;
+  }
+
+  /* ==========================================
+     SCREEN BEZEL - Inset LCD Effect
+     ========================================== */
+  .screen-bezel {
+    width: 100%;
+    background: linear-gradient(
+      180deg,
+      #0a0c1a 0%,
+      #080a16 50%,
+      #0c0e1e 100%
+    );
+    border-radius: 20px 20px 2px 2px;
+    padding: 0.5rem 1rem 1.25rem;
+    position: relative;
+    overflow: hidden;
+    /* Inset/recessed look */
+    box-shadow:
+      inset 0 2px 6px rgba(0, 0, 0, 0.8),
+      inset 0 0 20px rgba(0, 0, 0, 0.4),
+      0 1px 0 rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(0, 0, 0, 0.6);
+  }
+
+  /* ==========================================
+     SCREEN SPEAKER SLIT
+     ========================================== */
+  .screen-speaker {
+    width: 48px;
+    height: 4px;
+    margin: 0.375rem auto 0.25rem;
+    border-radius: 2px;
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      #1a1c2e 10%,
+      #1a1c2e 90%,
+      transparent 100%
+    );
+    position: relative;
+    overflow: hidden;
+    box-shadow:
+      inset 0 1px 2px rgba(0, 0, 0, 0.8);
+  }
+
+  /* Speaker hole pattern */
+  .screen-speaker::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(
+      90deg,
+      transparent 0px,
+      transparent 2px,
+      rgba(0, 0, 0, 0.5) 2px,
+      rgba(0, 0, 0, 0.5) 3px
+    );
+  }
+
+  /* ==========================================
+     STATUS BAR - Fake UI elements
+     ========================================== */
+  .screen-statusbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.25rem 0.25rem 0.375rem;
+    font-family: 'JetBrains Mono', 'Fira Code', monospace;
+    font-size: 0.5625rem;
+    color: rgba(255, 255, 255, 0.25);
+    letter-spacing: 0.05em;
+  }
+
+  .status-left {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  .status-right {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .status-signal {
+    display: flex;
+    align-items: flex-end;
+    gap: 1.5px;
+    height: 10px;
+  }
+
+  .signal-bar {
+    width: 3px;
+    background: rgba(102, 126, 234, 0.5);
+    border-radius: 0.5px;
+  }
+
+  .bar-1 { height: 3px; }
+  .bar-2 { height: 5px; }
+  .bar-3 { height: 7px; }
+  .bar-4 { height: 10px; opacity: 0.3; }
+
+  .status-carrier {
+    font-weight: 700;
+    color: rgba(102, 126, 234, 0.45);
+    font-size: 0.625rem;
+    letter-spacing: 0.08em;
+  }
+
+  .status-wifi {
+    width: 14px;
+    height: 14px;
+    color: rgba(255, 255, 255, 0.35);
+  }
+
+  .status-battery {
+    display: flex;
+    align-items: center;
+    gap: 1px;
+  }
+
+  .battery-body {
+    width: 16px;
+    height: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 2px;
+    padding: 1px;
+    position: relative;
+  }
+
+  .battery-level {
+    width: 75%;
+    height: 100%;
+    background: rgba(16, 185, 129, 0.5);
+    border-radius: 1px;
+  }
+
+  .battery-tip {
+    width: 2px;
+    height: 4px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 0 1px 1px 0;
+  }
+
+  /* ==========================================
+     SCREEN CONTENT AREA
+     ========================================== */
+  .screen-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.5rem 0 0.25rem;
+    position: relative;
+  }
+
+  /* Scanline / pixel grid overlay for LCD authenticity */
+  .screen-scanlines {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 2;
+    background:
+      repeating-linear-gradient(
+        0deg,
+        transparent 0px,
+        transparent 2px,
+        rgba(0, 0, 0, 0.03) 2px,
+        rgba(0, 0, 0, 0.03) 4px
+      );
+    mix-blend-mode: multiply;
+    opacity: 0.6;
+  }
+
+  /* ==========================================
+     BRANDING (inside screen)
+     ========================================== */
+  .pin-brand {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    position: relative;
+    z-index: 1;
+  }
+
+  .brand-icon {
+    position: relative;
+    width: 48px;
+    height: 48px;
+    margin-bottom: 0.125rem;
+  }
+
+  .brand-ring {
+    position: absolute;
+    border-radius: 50%;
+  }
+
+  .ring-outer {
+    inset: 0;
+    border: 1px solid rgba(102, 126, 234, 0.2);
+    animation: ring-spin 8s linear infinite;
+  }
+
+  .ring-middle {
+    inset: 5px;
+    border: 1px solid rgba(6, 182, 212, 0.25);
+    animation: ring-spin 6s linear infinite reverse;
+  }
+
+  .ring-inner {
+    inset: 10px;
+    border: 1px solid rgba(139, 92, 246, 0.3);
+    animation: ring-spin 4s linear infinite;
+  }
+
+  .brand-core {
+    position: absolute;
+    inset: 15px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.4), rgba(6, 182, 212, 0.4));
+    box-shadow: 0 0 24px rgba(102, 126, 234, 0.3);
+    animation: core-pulse 3s ease-in-out infinite;
+  }
+
+  @keyframes ring-spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+
+  @keyframes core-pulse {
+    0%, 100% { box-shadow: 0 0 24px rgba(102, 126, 234, 0.3); transform: scale(1); }
+    50% { box-shadow: 0 0 32px rgba(102, 126, 234, 0.5), 0 0 48px rgba(6, 182, 212, 0.2); transform: scale(1.05); }
+  }
+
+  .brand-text {
+    font-family: 'JetBrains Mono', 'Fira Code', monospace;
+    font-size: 1.25rem;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    color: #fff;
+    background: linear-gradient(135deg, #667eea, #06b6d4);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    position: relative;
+    z-index: 1;
+  }
+
+  .brand-sub {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.35);
+    letter-spacing: 0.02em;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* ==========================================
+     PIN DOTS DISPLAY (inside screen)
+     ========================================== */
+  .pin-display {
+    display: flex;
+    gap: 1rem;
+    padding: 0.25rem 0;
+    position: relative;
+    z-index: 1;
+  }
+
+  .pin-display.shake {
+    animation: shake 0.5s cubic-bezier(0.36, 0.07, 0.19, 0.97);
+  }
+
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    10%, 30%, 50%, 70%, 90% { transform: translateX(-6px); }
+    20%, 40%, 60%, 80% { transform: translateX(6px); }
+  }
+
+  .pin-dot {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    border: 2px solid rgba(255, 255, 255, 0.15);
+    background: transparent;
+    transition: all 0.2s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .pin-dot.filled {
+    background: rgba(102, 126, 234, 0.8);
+    border-color: rgba(102, 126, 234, 0.6);
+    box-shadow: 0 0 12px rgba(102, 126, 234, 0.4);
+    transform: scale(1.15);
+  }
+
+  .pin-dot.success {
+    background: rgba(16, 185, 129, 0.8);
+    border-color: rgba(16, 185, 129, 0.6);
+    box-shadow: 0 0 16px rgba(16, 185, 129, 0.5);
+    transform: scale(1.2);
+  }
+
+  .pin-dot.error {
+    background: rgba(239, 68, 68, 0.8);
+    border-color: rgba(239, 68, 68, 0.6);
+    box-shadow: 0 0 12px rgba(239, 68, 68, 0.4);
+  }
+
+  /* ==========================================
+     ERROR MESSAGE (inside screen)
+     ========================================== */
+  .pin-error {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.75rem;
+    color: rgba(239, 68, 68, 0.9);
+    min-height: 1rem;
+    opacity: 0;
+    transform: translateY(-4px);
+    transition: all 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+    position: relative;
+    z-index: 1;
+  }
+
+  .pin-error.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* ==========================================
+     HINGE - Metallic Center Band
+     ========================================== */
+  .phone-hinge {
+    width: 100%;
+    height: 16px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 1px;
+    padding: 2px 0;
+    position: relative;
+    z-index: 2;
+    /* Cylindrical metallic gradient */
+    background: linear-gradient(
+      180deg,
+      #1a1c2e 0%,
+      #2a2d3a 8%,
+      #3d4155 20%,
+      #525770 35%,
+      #5e6380 50%,
+      #525770 65%,
+      #3d4155 80%,
+      #2a2d3a 92%,
+      #1a1c2e 100%
+    );
+    /* Shadow above and below for physical protrusion */
+    box-shadow:
+      0 -3px 6px rgba(0, 0, 0, 0.5),
+      0 3px 6px rgba(0, 0, 0, 0.5),
+      inset 0 1px 0 rgba(255, 255, 255, 0.08),
+      inset 0 -1px 0 rgba(255, 255, 255, 0.04);
+    /* Left/right edge continuity */
+    border-left: 1px solid rgba(255, 255, 255, 0.05);
+    border-right: 1px solid rgba(255, 255, 255, 0.05);
+  }
+
+  .hinge-groove {
+    width: 100%;
+    height: 1px;
+    background: linear-gradient(
+      90deg,
+      transparent 5%,
+      rgba(0, 0, 0, 0.4) 15%,
+      rgba(0, 0, 0, 0.3) 50%,
+      rgba(0, 0, 0, 0.4) 85%,
+      transparent 95%
+    );
+    position: relative;
+  }
+
+  .hinge-groove::after {
+    content: '';
+    position: absolute;
+    top: 1px;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(
+      90deg,
+      transparent 5%,
+      rgba(255, 255, 255, 0.06) 15%,
+      rgba(255, 255, 255, 0.08) 50%,
+      rgba(255, 255, 255, 0.06) 85%,
+      transparent 95%
+    );
+  }
+
+  /* ==========================================
+     PHONE KEYPAD BODY - BOTTOM HALF
+     ========================================== */
+  .phone-keypad-body {
+    width: 100%;
+    background: linear-gradient(
+      170deg,
+      #1e2030 0%,
+      #22243a 30%,
+      #1c1e32 60%,
+      #1a1c2e 100%
+    );
+    border-radius: 0 0 24px 24px;
+    padding: 1rem 1.25rem 1rem;
+    position: relative;
+    /* Edge highlights */
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    border-top: none;
+    box-shadow:
+      inset 0 -1px 0 rgba(255, 255, 255, 0.04),
+      inset 1px 0 0 rgba(255, 255, 255, 0.03),
+      inset -1px 0 0 rgba(255, 255, 255, 0.03);
+  }
+
+  /* Subtle brushed-metal texture on keypad body */
+  .phone-keypad-body::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: repeating-linear-gradient(
+      90deg,
+      transparent 0px,
+      transparent 1px,
+      rgba(255, 255, 255, 0.003) 1px,
+      rgba(255, 255, 255, 0.003) 2px
+    );
+    pointer-events: none;
+  }
+
+  /* Brand logo at the bottom */
+  .phone-brand-logo {
+    text-align: center;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.5rem;
+    font-weight: 600;
+    letter-spacing: 0.35em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.08);
+    margin-top: 0.625rem;
+    padding-top: 0.375rem;
+  }
+
+  /* ==========================================
+     T9 KEYPAD - Tactile Physical Keys
+     ========================================== */
+  .pin-keypad {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    width: 100%;
+    max-width: 300px;
+    margin: 0 auto;
+  }
+
+  .key {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1px;
+    height: 56px;
+    /* Physical button look: slightly convex with bevel */
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 10px;
+    background: linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.06) 0%,
+      rgba(255, 255, 255, 0.02) 50%,
+      rgba(0, 0, 0, 0.05) 100%
+    );
+    color: #fff;
+    cursor: pointer;
+    transition: all 0.1s cubic-bezier(0.22, 1, 0.36, 1);
+    position: relative;
+    overflow: hidden;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+    font-family: inherit;
+    padding: 0;
+    /* Convex 3D bevel effect */
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.07),
+      inset 0 -1px 0 rgba(0, 0, 0, 0.15),
+      0 2px 4px rgba(0, 0, 0, 0.3),
+      0 1px 2px rgba(0, 0, 0, 0.2);
+  }
+
+  .key::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: radial-gradient(circle at center, rgba(102, 126, 234, 0.12), transparent 70%);
+    opacity: 0;
+    transition: opacity 0.15s ease;
+  }
+
+  .key:hover:not(:disabled) {
+    background: linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.08) 0%,
+      rgba(255, 255, 255, 0.04) 50%,
+      rgba(0, 0, 0, 0.02) 100%
+    );
+    border-color: rgba(255, 255, 255, 0.1);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.1),
+      inset 0 -1px 0 rgba(0, 0, 0, 0.15),
+      0 2px 6px rgba(0, 0, 0, 0.35),
+      0 1px 2px rgba(0, 0, 0, 0.2);
+  }
+
+  .key:hover:not(:disabled)::before {
+    opacity: 1;
+  }
+
+  /* Pressed state: key physically presses in */
+  .key:active:not(:disabled),
+  .key.pressed {
+    transform: translateY(1px);
+    background: linear-gradient(
+      180deg,
+      rgba(0, 0, 0, 0.05) 0%,
+      rgba(102, 126, 234, 0.08) 50%,
+      rgba(0, 0, 0, 0.02) 100%
+    );
+    border-color: rgba(102, 126, 234, 0.2);
+    box-shadow:
+      inset 0 2px 4px rgba(0, 0, 0, 0.3),
+      inset 0 0 8px rgba(102, 126, 234, 0.08),
+      0 0px 1px rgba(0, 0, 0, 0.2);
+  }
+
+  .key:focus-visible {
+    outline: 2px solid rgba(102, 126, 234, 0.6);
+    outline-offset: 2px;
+  }
+
+  .key-empty {
+    border-color: transparent;
+    background: transparent;
+    cursor: default;
+    box-shadow: none;
+  }
+
+  .key-empty::before {
+    display: none;
+  }
+
+  .key-delete {
+    color: rgba(255, 255, 255, 0.5);
+  }
+
+  .key-delete:hover:not(:disabled) {
+    color: rgba(239, 68, 68, 0.8);
+    border-color: rgba(239, 68, 68, 0.15);
+    background: linear-gradient(
+      180deg,
+      rgba(239, 68, 68, 0.06) 0%,
+      rgba(239, 68, 68, 0.02) 100%
+    );
+  }
+
+  .key-delete:hover:not(:disabled)::before {
+    background: radial-gradient(circle at center, rgba(239, 68, 68, 0.08), transparent 70%);
+  }
+
+  .key-digit {
+    font-family: 'Inter', sans-serif;
+    font-size: 1.25rem;
+    font-weight: 600;
+    line-height: 1;
+    position: relative;
+    z-index: 1;
+  }
+
+  .key-letters {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.5rem;
+    font-weight: 500;
+    letter-spacing: 0.15em;
+    color: rgba(255, 255, 255, 0.25);
+    line-height: 1;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* HUGE letters -- each in CMYK, sequential pulse */
+  .key-letters b {
+    font-weight: 800;
+    display: inline-block;
+    transition: all 0.3s ease;
+  }
+
+  /*
+   * HUGE sequential pulse: H -> U -> G -> E
+   * 3 word-blinks (escalating intensity), then 2s dark, repeat.
+   *
+   * Total cycle: 14s (2x slower blinks + 2s dark pause)
+   * Word 1: H@0s    U@0.84s  G@1.68s  E@2.52s
+   * Word 2: H@4.48s U@5.32s  G@6.16s  E@7.0s
+   * Word 3: H@8.96s U@9.8s   G@10.64s E@11.48s
+   * Dark:   ~12s -> 14s (2s pause)
+   */
+
+  /* H = Cyan */
+  .huge-h {
+    color: #06b6d4;
+    animation: pulse-h 14s ease-in-out infinite;
+  }
+
+  /* U = Magenta */
+  .huge-u {
+    color: #ec4899;
+    animation: pulse-u 14s ease-in-out infinite;
+  }
+
+  /* G = Yellow */
+  .huge-g {
+    color: #eab308;
+    animation: pulse-g 14s ease-in-out infinite;
+  }
+
+  /* E = Key (white) */
+  .huge-e {
+    color: #f1f5f9;
+    animation: pulse-e 14s ease-in-out infinite;
+  }
+
+  /* --- H: pulses at 0%, 32%, 64% --- */
+  @keyframes pulse-h {
+    0%   { opacity: 0.2; text-shadow: none; transform: scale(1); }
+    1.5% { opacity: 0.85; text-shadow: 0 0 6px currentColor, 0 0 14px currentColor; transform: scale(1.25); }
+    4%   { opacity: 0.2; text-shadow: none; transform: scale(1); }
+
+    32%  { opacity: 0.2; transform: scale(1); }
+    33.5%{ opacity: 0.95; text-shadow: 0 0 8px currentColor, 0 0 20px currentColor; transform: scale(1.3); }
+    36%  { opacity: 0.2; text-shadow: none; transform: scale(1); }
+
+    64%  { opacity: 0.2; transform: scale(1); }
+    65.5%{ opacity: 1; text-shadow: 0 0 10px currentColor, 0 0 25px currentColor, 0 0 45px currentColor; transform: scale(1.4); }
+    68%  { opacity: 0.2; text-shadow: none; transform: scale(1); }
+
+    84%  { opacity: 0.08; }
+    100% { opacity: 0.08; }
+  }
+
+  /* --- U: pulses at 6%, 38%, 70% --- */
+  @keyframes pulse-u {
+    0%   { opacity: 0.2; text-shadow: none; transform: scale(1); }
+
+    6%   { opacity: 0.2; transform: scale(1); }
+    7.5% { opacity: 0.85; text-shadow: 0 0 6px currentColor, 0 0 14px currentColor; transform: scale(1.25); }
+    10%  { opacity: 0.2; text-shadow: none; transform: scale(1); }
+
+    38%  { opacity: 0.2; transform: scale(1); }
+    39.5%{ opacity: 0.95; text-shadow: 0 0 8px currentColor, 0 0 20px currentColor; transform: scale(1.3); }
+    42%  { opacity: 0.2; text-shadow: none; transform: scale(1); }
+
+    70%  { opacity: 0.2; transform: scale(1); }
+    71.5%{ opacity: 1; text-shadow: 0 0 10px currentColor, 0 0 25px currentColor, 0 0 45px currentColor; transform: scale(1.4); }
+    74%  { opacity: 0.2; text-shadow: none; transform: scale(1); }
+
+    84%  { opacity: 0.08; }
+    100% { opacity: 0.08; }
+  }
+
+  /* --- G: pulses at 12%, 44%, 76% --- */
+  @keyframes pulse-g {
+    0%   { opacity: 0.2; text-shadow: none; transform: scale(1); }
+
+    12%  { opacity: 0.2; transform: scale(1); }
+    13.5%{ opacity: 0.85; text-shadow: 0 0 6px currentColor, 0 0 14px currentColor; transform: scale(1.25); }
+    16%  { opacity: 0.2; text-shadow: none; transform: scale(1); }
+
+    44%  { opacity: 0.2; transform: scale(1); }
+    45.5%{ opacity: 0.95; text-shadow: 0 0 8px currentColor, 0 0 20px currentColor; transform: scale(1.3); }
+    48%  { opacity: 0.2; text-shadow: none; transform: scale(1); }
+
+    76%  { opacity: 0.2; transform: scale(1); }
+    77.5%{ opacity: 1; text-shadow: 0 0 10px currentColor, 0 0 25px currentColor, 0 0 45px currentColor; transform: scale(1.4); }
+    80%  { opacity: 0.2; text-shadow: none; transform: scale(1); }
+
+    84%  { opacity: 0.08; }
+    100% { opacity: 0.08; }
+  }
+
+  /* --- E: pulses at 18%, 50%, 82% --- */
+  @keyframes pulse-e {
+    0%   { opacity: 0.2; text-shadow: none; transform: scale(1); }
+
+    18%  { opacity: 0.2; transform: scale(1); }
+    19.5%{ opacity: 0.85; text-shadow: 0 0 6px currentColor, 0 0 14px currentColor; transform: scale(1.25); }
+    22%  { opacity: 0.2; text-shadow: none; transform: scale(1); }
+
+    50%  { opacity: 0.2; transform: scale(1); }
+    51.5%{ opacity: 0.95; text-shadow: 0 0 8px currentColor, 0 0 20px currentColor; transform: scale(1.3); }
+    54%  { opacity: 0.2; text-shadow: none; transform: scale(1); }
+
+    82%  { opacity: 0.2; transform: scale(1); }
+    83.5%{ opacity: 1; text-shadow: 0 0 10px currentColor, 0 0 25px currentColor, 0 0 45px currentColor; transform: scale(1.4); }
+    86%  { opacity: 0.2; text-shadow: none; transform: scale(1); }
+
+    88%  { opacity: 0.08; }
+    100% { opacity: 0.08; }
+  }
+
+  /* ==========================================
+     REDUCED MOTION
+     ========================================== */
+  @media (prefers-reduced-motion: reduce) {
+    .pin-gate {
+      transition: none;
+    }
+    .pin-dot,
+    .pin-error,
+    .key {
+      transition: none;
+    }
+    .pin-display.shake {
+      animation: none;
+    }
+    .brand-ring,
+    .brand-core {
+      animation: none;
+    }
+    .huge-h, .huge-u, .huge-g, .huge-e {
+      animation: none;
+      opacity: 1;
+    }
+    .pin-particles {
+      display: none;
+    }
+  }
+
+  /* ==========================================
+     RESPONSIVE - SMALL PHONES
+     ========================================== */
+  @media (max-width: 400px) {
+    .flip-phone {
+      max-width: calc(100vw - 1rem);
+    }
+
+    .phone-screen {
+      padding: 5px;
+      border-radius: 20px 20px 0 0;
+    }
+
+    .screen-bezel {
+      border-radius: 16px 16px 2px 2px;
+      padding: 0.375rem 0.75rem 1rem;
+    }
+
+    .phone-keypad-body {
+      padding: 0.75rem 1rem 0.75rem;
+      border-radius: 0 0 20px 20px;
+    }
+
+    .pin-keypad {
+      gap: 6px;
+      max-width: 280px;
+    }
+
+    .key {
+      height: 50px;
+      border-radius: 8px;
+    }
+
+    .key-digit {
+      font-size: 1.125rem;
+    }
+
+    .brand-text {
+      font-size: 1.125rem;
+    }
+
+    .brand-icon {
+      width: 40px;
+      height: 40px;
+    }
+
+    .ring-middle { inset: 4px; }
+    .ring-inner { inset: 8px; }
+    .brand-core { inset: 12px; }
+
+
+  }
+
+  /* ==========================================
+     RESPONSIVE - SHORT VIEWPORTS
+     ========================================== */
+  @media (max-height: 700px) {
+    .phone-screen {
+      padding: 4px;
+    }
+
+    .screen-bezel {
+      padding: 0.25rem 0.75rem 0.75rem;
+    }
+
+    .screen-content {
+      gap: 0.5rem;
+      padding: 0.25rem 0 0;
+    }
+
+    .screen-statusbar {
+      padding: 0.125rem 0.25rem 0.25rem;
+    }
+
+    .brand-icon {
+      width: 36px;
+      height: 36px;
+    }
+
+    .ring-middle { inset: 4px; }
+    .ring-inner { inset: 8px; }
+    .brand-core { inset: 12px; }
+
+    .brand-text {
+      font-size: 1rem;
+    }
+
+    .brand-sub {
+      font-size: 0.6875rem;
+    }
+
+    .pin-dot {
+      width: 12px;
+      height: 12px;
+    }
+
+    .pin-display {
+      padding: 0.125rem 0;
+    }
+
+    .phone-hinge {
+      height: 12px;
+    }
+
+    .phone-keypad-body {
+      padding: 0.625rem 1rem 0.625rem;
+    }
+
+    .pin-keypad {
+      gap: 5px;
+    }
+
+    .key {
+      height: 46px;
+      border-radius: 8px;
+    }
+
+    .key-digit {
+      font-size: 1.125rem;
+    }
+
+    .key-letters {
+      font-size: 0.4375rem;
+    }
+
+    .phone-brand-logo {
+      margin-top: 0.375rem;
+      padding-top: 0.25rem;
+    }
+
+
+
+  }
+
+  /* Very short viewports (e.g. landscape phone) */
+  @media (max-height: 580px) {
+    .screen-speaker,
+    .screen-statusbar,
+    .phone-brand-logo {
+      display: none;
+    }
+
+    .screen-bezel {
+      padding: 0.375rem 0.75rem 0.5rem;
+    }
+
+    .screen-content {
+      gap: 0.375rem;
+    }
+
+    .brand-icon {
+      width: 30px;
+      height: 30px;
+    }
+
+    .ring-middle { inset: 3px; }
+    .ring-inner { inset: 6px; }
+    .brand-core { inset: 9px; }
+
+    .brand-sub {
+      display: none;
+    }
+
+    .phone-hinge {
+      height: 8px;
+    }
+
+    .key {
+      height: 40px;
+    }
+
+    .pin-keypad {
+      gap: 4px;
+    }
+
+    .phone-keypad-body {
+      padding: 0.5rem 0.75rem 0.5rem;
+    }
+  }
+
+  /* ==========================================
+     PITCH FLOATING ACTION BUTTON + PANEL
+     ========================================== */
+  wc-admin-fab {
+    position: fixed;
+    top: calc(var(--sl-nav-height, 3.5rem) + 0.75rem);
+    right: 1.25rem;
+    z-index: 9000;
+    display: none;
+  }
+
+  wc-admin-fab.visible {
+    display: block;
+  }
+
+  .fab-trigger {
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    border: 1px solid rgba(139, 92, 246, 0.3);
+    background: rgba(139, 92, 246, 0.15);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    color: #a78bfa;
+    font-size: 1.5rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+    box-shadow: 0 4px 20px rgba(139, 92, 246, 0.2);
+    animation: fab-breathe 4s ease-in-out infinite;
+    position: relative;
+  }
+
+  @keyframes fab-breathe {
+    0%, 100% {
+      box-shadow: 0 4px 20px rgba(139, 92, 246, 0.2);
+      transform: scale(1);
+    }
+    50% {
+      box-shadow:
+        0 4px 20px rgba(139, 92, 246, 0.35),
+        0 0 40px rgba(139, 92, 246, 0.15);
+      transform: scale(1.08);
+    }
+  }
+
+  .fab-trigger:hover {
+    background: rgba(139, 92, 246, 0.25);
+    border-color: rgba(139, 92, 246, 0.5);
+    transform: scale(1.12);
+    box-shadow: 0 8px 30px rgba(139, 92, 246, 0.35);
+    animation: none;
+  }
+
+  .fab-trigger[aria-expanded='true'] {
+    background: rgba(139, 92, 246, 0.3);
+    border-color: rgba(139, 92, 246, 0.6);
+    transform: rotate(45deg) scale(1.05);
+    animation: none;
+  }
+
+  /* Nudge tooltip */
+  .fab-nudge {
+    position: absolute;
+    right: calc(100% + 0.75rem);
+    top: 50%;
+    transform: translateY(-50%) translateX(8px);
+    opacity: 0;
+    pointer-events: none;
+    transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+  }
+
+  .fab-nudge.visible {
+    opacity: 1;
+    transform: translateY(-50%) translateX(0);
+  }
+
+  .fab-nudge-text {
+    background: rgba(139, 92, 246, 0.9);
+    color: #fff;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    padding: 0.5rem 0.875rem;
+    border-radius: 0.5rem;
+    box-shadow: 0 4px 16px rgba(139, 92, 246, 0.3);
+    animation: nudge-bounce 2s ease-in-out infinite;
+  }
+
+  .fab-nudge-arrow {
+    width: 0;
+    height: 0;
+    border-top: 6px solid transparent;
+    border-bottom: 6px solid transparent;
+    border-left: 6px solid rgba(139, 92, 246, 0.9);
+    flex-shrink: 0;
+  }
+
+  @keyframes nudge-bounce {
+    0%, 100% { transform: translateX(0); }
+    50% { transform: translateX(-4px); }
+  }
+
+  .fab-panel {
+    position: absolute;
+    top: calc(100% + 0.75rem);
+    right: 0;
+    width: 320px;
+    padding: 0.75rem;
+    background: rgba(10, 10, 24, 0.95);
+    backdrop-filter: blur(40px) saturate(200%);
+    -webkit-backdrop-filter: blur(40px) saturate(200%);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 1rem;
+    box-shadow:
+      0 16px 60px rgba(0, 0, 0, 0.5),
+      0 4px 20px rgba(0, 0, 0, 0.3);
+    display: flex;
+    flex-direction: column;
+    gap: 0.375rem;
+    opacity: 0;
+    transform: translateY(8px) scale(0.95);
+    pointer-events: none;
+    transition:
+      opacity 0.25s cubic-bezier(0.22, 1, 0.36, 1),
+      transform 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .fab-panel.is-open {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    pointer-events: auto;
+  }
+
+  .fab-panel-header {
+    padding: 0.25rem 0.5rem 0.5rem;
+  }
+
+  .fab-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    font-size: 0.5625rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: rgba(167, 139, 250, 0.7);
+  }
+
+  .fab-card {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    border-radius: 0.75rem;
+    text-decoration: none !important;
+    color: inherit;
+    border: 1px solid transparent;
+    transition: all 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+    position: relative;
+  }
+
+  .fab-card:hover {
+    background: rgba(255, 255, 255, 0.04);
+    border-color: var(--fab-card-color, rgba(255, 255, 255, 0.1));
+    transform: translateX(-4px);
+  }
+
+  .fab-card-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.875rem;
+    flex-shrink: 0;
+    background: var(--fab-icon-bg);
+    color: var(--fab-icon-color);
+  }
+
+  .fab-card-cyan {
+    --fab-card-color: rgba(6, 182, 212, 0.25);
+    --fab-icon-bg: rgba(6, 182, 212, 0.12);
+    --fab-icon-color: #06b6d4;
+  }
+
+  .fab-card-magenta {
+    --fab-card-color: rgba(236, 72, 153, 0.25);
+    --fab-icon-bg: rgba(236, 72, 153, 0.12);
+    --fab-icon-color: #ec4899;
+  }
+
+  .fab-card-amber {
+    --fab-card-color: rgba(245, 158, 11, 0.25);
+    --fab-icon-bg: rgba(245, 158, 11, 0.12);
+    --fab-icon-color: #f59e0b;
+  }
+
+  .fab-card-body {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .fab-card-title {
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.9);
+    line-height: 1.2;
+  }
+
+  .fab-card-desc {
+    font-size: 0.6875rem;
+    color: rgba(255, 255, 255, 0.4);
+    line-height: 1.3;
+    margin-top: 0.125rem;
+  }
+
+  .fab-card-tag {
+    font-size: 0.625rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--fab-icon-color);
+    opacity: 0.7;
+    flex-shrink: 0;
+  }
+
+  .fab-card:hover .fab-card-icon {
+    box-shadow: 0 0 12px var(--fab-card-color);
+  }
+
+  @media (max-width: 400px) {
+    wc-admin-fab {
+      top: calc(var(--sl-nav-height, 3.5rem) + 0.5rem);
+      right: 0.5rem;
+    }
+    .fab-trigger {
+      width: 56px;
+      height: 56px;
+      font-size: 1.25rem;
+    }
+    .fab-panel {
+      width: calc(100vw - 1rem);
+      right: -0.5rem;
+    }
+    .fab-nudge {
+      display: none;
+    }
+  }
+</style>

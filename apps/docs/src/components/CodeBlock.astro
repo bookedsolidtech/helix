@@ -1,0 +1,219 @@
+---
+/**
+ * CodeBlock - Terminal-style code display with Shiki syntax highlighting.
+ *
+ * Features:
+ * - Shiki-powered syntax highlighting (build-time, zero runtime overhead)
+ * - macOS-style window chrome with traffic light dots
+ * - Optional line numbers
+ * - Copy to clipboard functionality
+ * - Dark theme matching site aesthetic
+ * - Support for multiple languages
+ *
+ * @example
+ * <CodeBlock code={myCode} lang="typescript" filename="my-file.ts" showLineNumbers />
+ */
+
+import { codeToHtml } from 'shiki';
+
+interface Props {
+  code: string;
+  lang?: string;
+  filename?: string;
+  showLineNumbers?: boolean;
+  class?: string;
+}
+
+const {
+  code,
+  lang = 'html',
+  filename = 'terminal',
+  showLineNumbers = false,
+  class: className = '',
+} = Astro.props;
+
+// Generate syntax-highlighted HTML using Shiki
+const highlightedCode = await codeToHtml(code, {
+  lang,
+  theme: 'material-theme-palenight',
+  transformers: showLineNumbers ? [
+    {
+      name: 'add-line-numbers',
+      line(node, line) {
+        node.children.unshift({
+          type: 'element',
+          tagName: 'span',
+          properties: { class: 'line-number' },
+          children: [{ type: 'text', value: String(line).padStart(2, ' ') }],
+        });
+      },
+    },
+  ] : [],
+});
+---
+
+<div class={`code-window ${className}`}>
+  <div class="code-titlebar">
+    <span class="code-dot"></span>
+    <span class="code-dot"></span>
+    <span class="code-dot"></span>
+    <span class="code-filename">{filename}</span>
+  </div>
+  <div class="code-body">
+    <div class="shiki-wrapper" set:html={highlightedCode} />
+    <button
+      class="code-copy-btn"
+      data-code={code}
+      aria-label="Copy code to clipboard"
+      title="Copy code"
+    >
+      <i class="fa-regular fa-copy"></i>
+    </button>
+  </div>
+</div>
+
+<style>
+  .code-window {
+    position: relative;
+    background: rgba(10, 10, 26, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    backdrop-filter: blur(12px);
+  }
+
+  .code-titlebar {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 12px 16px;
+    background: rgba(0, 0, 0, 0.3);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  }
+
+  .code-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.15);
+  }
+
+  .code-dot:nth-child(1) {
+    background: #ff5f57;
+  }
+
+  .code-dot:nth-child(2) {
+    background: #ffbd2e;
+  }
+
+  .code-dot:nth-child(3) {
+    background: #28c840;
+  }
+
+  .code-filename {
+    margin-left: auto;
+    font-size: 0.875rem;
+    color: rgba(255, 255, 255, 0.5);
+    font-family: var(--font-mono);
+  }
+
+  .code-body {
+    position: relative;
+    padding: 0;
+    overflow-x: auto;
+  }
+
+  .shiki-wrapper :global(pre) {
+    margin: 0;
+    padding: 1.25rem 1.5rem;
+    background: transparent !important;
+    border-radius: 0 !important;
+    font-size: 0.875rem;
+    line-height: 1.7;
+    font-family: var(--font-mono);
+    text-align: left;
+  }
+
+  .shiki-wrapper :global(code) {
+    font-family: var(--font-mono);
+    counter-reset: line;
+    text-align: left;
+    display: block;
+  }
+
+  .shiki-wrapper :global(.line-number) {
+    display: inline-block;
+    width: 2.5rem;
+    margin-right: 1.5rem;
+    text-align: right;
+    color: rgba(255, 255, 255, 0.3);
+    user-select: none;
+  }
+
+  .code-copy-btn {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    padding: 8px 12px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: var(--radius-sm);
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    opacity: 0;
+  }
+
+  .code-window:hover .code-copy-btn {
+    opacity: 1;
+  }
+
+  .code-copy-btn:hover {
+    background: rgba(255, 255, 255, 0.15);
+    color: rgba(255, 255, 255, 0.9);
+  }
+
+  .code-copy-btn:active {
+    transform: scale(0.95);
+  }
+
+  .code-copy-btn.copied {
+    background: var(--wc-green);
+    color: white;
+  }
+</style>
+
+<script>
+  // Copy to clipboard functionality
+  document.addEventListener('DOMContentLoaded', () => {
+    const copyButtons = document.querySelectorAll('.code-copy-btn');
+
+    copyButtons.forEach((button) => {
+      button.addEventListener('click', async () => {
+        const code = button.getAttribute('data-code');
+        if (!code) return;
+
+        try {
+          await navigator.clipboard.writeText(code);
+
+          // Visual feedback
+          button.classList.add('copied');
+          const icon = button.querySelector('i');
+          if (icon) {
+            icon.className = 'fa-solid fa-check';
+          }
+
+          setTimeout(() => {
+            button.classList.remove('copied');
+            if (icon) {
+              icon.className = 'fa-regular fa-copy';
+            }
+          }, 2000);
+        } catch (err) {
+          console.error('Failed to copy code:', err);
+        }
+      });
+    });
+  });
+</script>

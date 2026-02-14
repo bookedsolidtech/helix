@@ -1,0 +1,109 @@
+---
+/**
+ * FeatureGrid - Key differentiators with 2030-forward card design.
+ *
+ * Features:
+ * - 2-column grid with generous padding
+ * - Rotating conic gradient border on hover
+ * - Cursor-following spotlight glow effect (via JS)
+ * - Colored icon wrappers per category
+ * - Scroll-reveal staggered animations
+ * - Tag pills with hover highlight
+ */
+
+interface Feature {
+  icon: string;
+  iconClass: string;
+  title: string;
+  description: string;
+  tags: string[];
+  href?: string;
+  cta?: string;
+}
+
+const features: Feature[] = [
+  {
+    icon: 'fa-solid fa-heart-pulse',
+    iconClass: 'icon-healthcare',
+    title: 'Healthcare First',
+    description:
+      'WCAG 2.1 AA minimum with AAA targets for critical components. High contrast ratios, reduced motion support, and comprehensive screen reader testing built into every component from day one.',
+    tags: ['WCAG AAA', 'Accessibility', 'HHS 2026 Compliance'],
+    href: '/healthcare-accessibility/',
+    cta: 'View Compliance Strategy',
+  },
+  {
+    icon: 'fa-brands fa-drupal',
+    iconClass: 'icon-drupal',
+    title: 'Drupal Optimized',
+    description:
+      'Zero-coupling architecture that provides APIs designed for Drupal field structures. Complete TWIG templates, Drupal Behaviors integration, and minimal team effort for adoption.',
+    tags: ['Framework Agnostic', 'TWIG Templates', 'Zero Coupling'],
+    href: '/drupal-architecture/',
+    cta: 'View Architecture Decision',
+  },
+  {
+    icon: 'fa-solid fa-building',
+    iconClass: 'icon-enterprise',
+    title: 'Enterprise Grade',
+    description:
+      '100% TypeScript with comprehensive JSDoc documentation. Custom Elements Manifest as single source of truth. Three-tier W3C DTCG design tokens powering consistent theming across the system.',
+    tags: ['TypeScript', 'Custom Elements Manifest', 'W3C DTCG'],
+    href: '/enterprise-architecture/',
+    cta: 'View Enterprise Strategy',
+  },
+  {
+    icon: 'fa-solid fa-rocket',
+    iconClass: 'icon-tech',
+    title: 'Cutting-Edge Stack',
+    description:
+      'Lit 3.x with Reactive Controllers, Storybook 8.x with Vitest integration (planned), Terrazzo for token generation (planned), and Astro/Starlight for documentation. Every tool chosen for 2026 production readiness.',
+    tags: ['Lit 3.x', 'Storybook 8', 'Vitest (planned)'],
+    href: '/tech-stack/',
+    cta: 'Explore the Stack',
+  },
+];
+---
+
+<section class="section" aria-label="Key features">
+  <div class="section-inner">
+    <div class="section-header scroll-reveal">
+      <span class="section-label">Why WC-2026</span>
+      <h2 class="section-title">Built Different, By Design</h2>
+      <p class="section-description">
+        Every architectural decision optimized for healthcare compliance,
+        Drupal integration, and enterprise-scale delivery.
+      </p>
+    </div>
+
+    <div class="feature-grid">
+      {features.map((feature, i) => {
+        const CardTag = feature.href ? 'a' : 'article';
+        const linkProps = feature.href ? { href: feature.href } : {};
+        return (
+          <CardTag
+            class={`feature-card scroll-reveal scroll-reveal-delay-${i + 1}${feature.href ? ' feature-card-linked' : ''}`}
+            {...linkProps}
+          >
+            {feature.cta && (
+              <span class="feature-cta-badge">
+                {feature.cta}
+                <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+              </span>
+            )}
+            <div class={`feature-icon-wrapper ${feature.iconClass}`} aria-hidden="true">
+              <i class={feature.icon}></i>
+            </div>
+            <h3 class="feature-title">{feature.title}</h3>
+            <p class="feature-description">{feature.description}</p>
+            <div class="feature-tags">
+              {feature.tags.map((tag) => (
+                <span class="feature-tag">{tag}</span>
+              ))}
+            </div>
+          </CardTag>
+        );
+      })}
+    </div>
+  </div>
+</section>

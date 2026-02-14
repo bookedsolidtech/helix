@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="none">
+  <path d="M128 0C57.308 0 0 57.308 0 128s57.308 128 128 128 128-57.308 128-128S198.692 0 128 0z" fill="url(#turbo-a)"/>
+  <path d="M128 40c-48.601 0-88 39.399-88 88s39.399 88 88 88 88-39.399 88-88-39.399-88-88-88zm0 144c-30.928 0-56-25.072-56-56s25.072-56 56-56 56 25.072 56 56-25.072 56-56 56z" fill="#fff"/>
+  <circle cx="128" cy="128" r="24" fill="#fff"/>
+  <defs>
+    <linearGradient id="turbo-a" x1="0" y1="0" x2="256" y2="256" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#0096FF"/>
+      <stop offset="1" stop-color="#FF1E56"/>
+    </linearGradient>
+  </defs>
+</svg>

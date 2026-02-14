@@ -1,0 +1,37 @@
+{
+  "$schema": "https://turbo.build/schema.json",
+  "globalDependencies": ["**/.env.*local"],
+  "tasks": {
+    "build": {
+      "dependsOn": ["^build"],
+      "outputs": ["dist/**", ".astro/**"]
+    },
+    "dev": {
+      "cache": false,
+      "persistent": true
+    },
+    "preview": {
+      "cache": false,
+      "persistent": true
+    },
+    "type-check": {
+      "dependsOn": ["^build"]
+    },
+    "lint": {},
+    "clean": {
+      "cache": false
+    },
+    "cem": {
+      "dependsOn": ["^build"],
+      "outputs": ["custom-elements.json"]
+    },
+    "storybook:build": {
+      "dependsOn": ["^build"],
+      "outputs": ["dist/**"]
+    },
+    "storybook:dev": {
+      "cache": false,
+      "persistent": true
+    }
+  }
+}

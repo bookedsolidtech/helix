@@ -1,0 +1,136 @@
+---
+/**
+ * Comparison - Visual before/after table showing WC-2026 advantages.
+ *
+ * Features:
+ * - Three-column comparison grid (feature, traditional, WC-2026)
+ * - Color-coded cells (green checks, muted X marks, amber partial)
+ * - Row hover highlight
+ * - Gradient accent on WC-2026 column header
+ * - Responsive: collapses to stacked layout on mobile with labels
+ * - Scroll-reveal animation
+ */
+
+interface ComparisonRow {
+  feature: string;
+  icon: string; // Font Awesome icon class
+  traditional: string;
+  wc2026: string;
+  traditionalType: 'check' | 'x' | 'partial';
+  wc2026Type: 'check' | 'x' | 'partial';
+}
+
+const rows: ComparisonRow[] = [
+  {
+    feature: 'Accessibility Standard',
+    icon: 'fa-solid fa-universal-access',
+    traditional: 'WCAG AA (often partial)',
+    wc2026: 'WCAG AAA target',
+    traditionalType: 'partial',
+    wc2026Type: 'check',
+  },
+  {
+    feature: 'TypeScript Coverage',
+    icon: 'fa-solid fa-code',
+    traditional: 'Varies (often mixed JS/TS)',
+    wc2026: '100% strict TypeScript',
+    traditionalType: 'partial',
+    wc2026Type: 'check',
+  },
+  {
+    feature: 'Framework Lock-in',
+    icon: 'fa-solid fa-link-slash',
+    traditional: 'React / Angular / Vue only',
+    wc2026: 'Framework agnostic',
+    traditionalType: 'x',
+    wc2026Type: 'check',
+  },
+  {
+    feature: 'Design Token Standard',
+    icon: 'fa-solid fa-palette',
+    traditional: 'Custom or none',
+    wc2026: 'W3C DTCG compliant',
+    traditionalType: 'x',
+    wc2026Type: 'check',
+  },
+  {
+    feature: 'CMS Integration',
+    icon: 'fa-solid fa-plug',
+    traditional: 'Requires adapters',
+    wc2026: 'Native Drupal support',
+    traditionalType: 'partial',
+    wc2026Type: 'check',
+  },
+  {
+    feature: 'Component Documentation',
+    icon: 'fa-solid fa-book',
+    traditional: 'Manual, often outdated',
+    wc2026: 'Auto-generated from CEM',
+    traditionalType: 'partial',
+    wc2026Type: 'check',
+  },
+  {
+    feature: 'Theme System',
+    icon: 'fa-solid fa-wand-magic-sparkles',
+    traditional: 'CSS overrides',
+    wc2026: '3-tier token architecture',
+    traditionalType: 'partial',
+    wc2026Type: 'check',
+  },
+  {
+    feature: 'Healthcare Compliance',
+    icon: 'fa-solid fa-heart-pulse',
+    traditional: 'Not purpose-built',
+    wc2026: 'HHS 2026 ready',
+    traditionalType: 'x',
+    wc2026Type: 'check',
+  },
+];
+
+function getTypeClass(type: string): string {
+  if (type === 'check') return 'comparison-check';
+  if (type === 'x') return 'comparison-x';
+  return 'comparison-partial';
+}
+---
+
+<section class="comparison-section" aria-label="Feature comparison">
+  <div class="comparison-inner">
+    <div class="section-header scroll-reveal">
+      <span class="section-label">Comparison</span>
+      <h2 class="section-title">Traditional vs. WC-2026</h2>
+      <p class="section-description">
+        See how a purpose-built healthcare component library compares
+        to traditional approaches.
+      </p>
+    </div>
+
+    <div class="comparison-table scroll-reveal scroll-reveal-delay-2" role="table" aria-label="Feature comparison table">
+      <div class="comparison-header" role="row">
+        <div class="comparison-header-cell" role="columnheader">Feature</div>
+        <div class="comparison-header-cell traditional" role="columnheader">Traditional</div>
+        <div class="comparison-header-cell wc-2026" role="columnheader">WC-2026</div>
+      </div>
+      {rows.map((row) => (
+        <div class="comparison-row" role="row">
+          <div class="comparison-cell feature-cell" role="cell">
+            <i class={`${row.icon} feature-icon`} aria-hidden="true"></i>
+            <span>{row.feature}</span>
+          </div>
+          <div class={`comparison-cell ${getTypeClass(row.traditionalType)}`} role="cell">
+            {row.traditionalType === 'check' && <i class="fa-solid fa-circle-check comparison-icon-check" aria-hidden="true"></i>}
+            {row.traditionalType === 'x' && <i class="fa-solid fa-circle-xmark comparison-icon-x" aria-hidden="true"></i>}
+            {row.traditionalType === 'partial' && <i class="fa-solid fa-circle-minus comparison-icon-partial" aria-hidden="true"></i>}
+            <span>{row.traditional}</span>
+          </div>
+          <div class={`comparison-cell ${getTypeClass(row.wc2026Type)}`} role="cell">
+            {row.wc2026Type === 'check' && <i class="fa-solid fa-circle-check comparison-icon-check" aria-hidden="true"></i>}
+            {row.wc2026Type === 'x' && <i class="fa-solid fa-circle-xmark comparison-icon-x" aria-hidden="true"></i>}
+            {row.wc2026Type === 'partial' && <i class="fa-solid fa-circle-minus comparison-icon-partial" aria-hidden="true"></i>}
+            <span>{row.wc2026}</span>
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>

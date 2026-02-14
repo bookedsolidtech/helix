@@ -1,0 +1,93 @@
+---
+/**
+ * Hero Section - 2030-forward dramatic full-viewport showcase.
+ *
+ * Features:
+ * - Animated gradient mesh background with floating orbs
+ * - Grid pattern overlay for depth
+ * - Extreme typography with weight contrast (300 to 900)
+ * - Gradient text effects on title and subtitle
+ * - Glassmorphic status badge with pulse indicator
+ * - Floating code preview window showing real component usage
+ * - Scroll indicator with animated line
+ * - Fully responsive (mobile hides code preview)
+ * - Respects prefers-reduced-motion
+ */
+import CodeBlock from './CodeBlock.astro';
+
+const codeExample = `<!-- Drop-in healthcare components -->
+<wc-alert variant="success" dismissible>
+  Patient record saved successfully.
+</wc-alert>
+
+<wc-data-table
+  sortable
+  paginated
+  page-size="25">
+</wc-data-table>
+
+<!-- Themed with design tokens -->
+<wc-card elevation="2">
+  <wc-avatar src="/img/dr-chen.jpg"></wc-avatar>
+</wc-card>`;
+---
+
+<section class="hero-section" aria-label="WC-2026 Enterprise Healthcare Web Components">
+  <!-- Grid pattern for depth -->
+  <div class="hero-grid-pattern" aria-hidden="true"></div>
+
+  <!-- Floating ambient orbs -->
+  <div class="hero-orb hero-orb-1" aria-hidden="true"></div>
+  <div class="hero-orb hero-orb-2" aria-hidden="true"></div>
+  <div class="hero-orb hero-orb-3" aria-hidden="true"></div>
+  <div class="hero-orb hero-orb-4" aria-hidden="true"></div>
+
+  <div class="hero-content">
+    <!-- Status badge -->
+    <div class="hero-badge">
+      <span class="hero-badge-dot" aria-hidden="true"></span>
+      Pre-Planning Complete &mdash; Ready for Implementation
+    </div>
+
+    <!-- Main heading - extreme size -->
+    <h1 class="hero-title">WC-2026</h1>
+
+    <!-- Subtitle - light weight contrast -->
+    <p class="hero-subtitle">Enterprise Healthcare Web Components</p>
+
+    <!-- Description -->
+    <p class="hero-description">
+      Production-ready Lit&nbsp;3.x components with a three-tier design token system,
+      WCAG&nbsp;2.1&nbsp;AAA accessibility, and seamless Drupal&nbsp;CMS integration.
+      Built for healthcare organizations that refuse to compromise.
+    </p>
+
+    <!-- Call to action buttons -->
+    <div class="hero-cta">
+      <a href="/getting-started/installation/" class="btn btn-primary">
+        Get Started
+        <span class="btn-arrow" aria-hidden="true">&rarr;</span>
+      </a>
+      <a href="/pre-planning/overview/" class="btn btn-secondary">
+        View Architecture
+        <span class="btn-arrow" aria-hidden="true">&rarr;</span>
+      </a>
+    </div>
+
+    <!-- Floating code preview -->
+    <div class="hero-code-preview" aria-hidden="true">
+      <CodeBlock
+        code={codeExample}
+        lang="html"
+        filename="my-page.html"
+        class="hero-code-block"
+      />
+    </div>
+  </div>
+
+  <!-- Scroll indicator -->
+  <div class="hero-scroll-indicator" aria-hidden="true">
+    <span>Explore</span>
+    <div class="hero-scroll-line"></div>
+  </div>
+</section>
