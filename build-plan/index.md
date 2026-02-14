@@ -3,7 +3,7 @@
 
 **Project**: Healthcare Content Hub Web Component Library
 **Target**: Enterprise healthcare organizations (Drupal integration)
-**Tech Stack**: Lit 3.x + Storybook 8.x/9.x + Astro/Starlight + TypeScript
+**Tech Stack**: Lit 3.x + Storybook 10.x + Astro/Starlight + TypeScript
 **Purpose**: Tech lead interview preparation + implementation roadmap
 **Interview Date**: Monday, February 17, 2026
 
@@ -40,7 +40,7 @@ This build plan documents the architecture, implementation strategy, and compreh
 
 5. **Latest 2025-2026 Technologies**
    - Lit 3.x with Reactive Controllers
-   - Storybook 9.x with Vitest integration
+   - Storybook 10.x with Vitest integration
    - Terrazzo for W3C DTCG token generation
    - Pagefind for unified cross-system search
 
@@ -89,7 +89,7 @@ This build plan consists of 6 comprehensive documents organized by domain:
 - Technology decision log
 
 **Key Decisions**:
-- Storybook 9.x with `@storybook/web-components-vite`
+- Storybook 10.x with `@storybook/web-components-vite`
 - Custom Elements Manifest (CEM) as machine-readable API contract
 - Vitest 4.x with Browser Mode (Playwright provider)
 - Style Dictionary 4.x for token generation
@@ -216,7 +216,7 @@ This build plan consists of 6 comprehensive documents organized by domain:
 |------------|---------|---------|
 | **Lit** | 3.x | Web Component framework (5KB runtime) |
 | **TypeScript** | 5.x | Type safety, JSDoc documentation |
-| **Storybook** | 8.x/9.x | Component playground, design system |
+| **Storybook** | 10.x | Component playground, design system |
 | **Vitest** | 4.x | Testing framework (Browser Mode) |
 | **Astro** | 5.x | Documentation site generator |
 | **Starlight** | 0.32+ | Documentation theme |
@@ -508,7 +508,7 @@ Mode switching via `data-theme` attribute + CSS custom properties (zero JavaScri
 
 ### Phase 3: Storybook Integration (Week 7)
 
-- [ ] Storybook 9.x installation
+- [ ] Storybook 10.x installation
 - [ ] `@storybook/web-components-vite` configuration
 - [ ] CEM analyzer integration
 - [ ] Story creation for all components (8 variants each)
@@ -587,7 +587,7 @@ Mode switching via `data-theme` attribute + CSS custom properties (zero JavaScri
 4. **Enterprise-Grade Architecture**
    - W3C DTCG-compliant design tokens (2025.10 spec)
    - Vitest 4.x Browser Mode (2-10x faster than Jest)
-   - Storybook 9.x with native Vitest integration
+   - Storybook 10.x with native Vitest integration
    - Terrazzo for cutting-edge token generation
 
 5. **Dual Documentation System**
@@ -645,7 +645,7 @@ Mode switching via `data-theme` attribute + CSS custom properties (zero JavaScri
 
 | Risk | Impact | Mitigation |
 |------|--------|------------|
-| **Storybook 9.x stability** | Medium | Start with stable 8.x, migrate to 9.x in Phase 3 |
+| **Storybook 10.x** | Low | Now running Storybook 10.2.8 with CSF Factories support |
 | **Drupal SSR complexity** | Low | Skip SSR initially (progressive enhancement) |
 | **Browser compatibility** | Medium | Target modern evergreen browsers (Chrome 90+, Firefox 88+, Safari 14+) |
 | **Design token tooling maturity** | Low | Terrazzo is production-ready (Cobalt UI successor) |
@@ -685,7 +685,7 @@ Mode switching via `data-theme` attribute + CSS custom properties (zero JavaScri
 
 ### Official Documentation
 - [Lit 3.x Documentation](https://lit.dev)
-- [Storybook 8.x/9.x Documentation](https://storybook.js.org)
+- [Storybook 10.x Documentation](https://storybook.js.org)
 - [Astro 5.x Documentation](https://astro.build)
 - [Starlight Documentation](https://starlight.astro.build)
 - [Drupal 10.3+ Documentation](https://drupal.org)

@@ -30,7 +30,7 @@ description: Technical preparation materials and key talking points for the WC-2
 ### 4. Enterprise-Grade Architecture
 - W3C DTCG-compliant design tokens (2025.10 spec)
 - Vitest 4.x Browser Mode (2-10x faster than Jest)
-- Storybook 9.x with native Vitest integration
+- Storybook 10.x with native Vitest integration
 - Terrazzo for cutting-edge token generation
 
 ### 5. Dual Documentation System

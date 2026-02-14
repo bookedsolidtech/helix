@@ -131,7 +131,7 @@ Replace `your-org` with `himerus` (matching `astro.config.mjs` social link).
 
 **6. Duplicate `padding-top` in card styles** at `packages/wc-library/src/components/wc-card/wc-card.styles.ts` lines 118-121. First `padding-top: 0` is dead code overridden by second declaration.
 
-**7. Storybook version inconsistency** -- Documentation says "Storybook 9" (Header.astro line 26, FeatureGrid.astro line 62) but `package.json` installs 8.6.15.
+**7. Storybook version** -- **RESOLVED**: Now running Storybook 10.2.8 with CSF Factories support. Project is on the cutting edge with the latest Storybook features.
 
 **8. README says `[TO BE CREATED]`** for packages/apps directories (lines 101-113) but they contain working code.
 
@@ -251,9 +251,7 @@ margin-top: auto;
 
 ### Fix 4: Consistent Storybook version references
 
-Update all references to say "Storybook 8.x" since that is what is actually installed:
-- `apps/docs/src/components/Header.astro` line 26: "Storybook 9" should be "Storybook 8"
-- `apps/docs/src/components/FeatureGrid.astro` line 62: "Storybook 9" should be "Storybook 8"
+**RESOLVED**: All references now updated to "Storybook 10.x" (upgraded from 8.6.15 to 10.2.8). Project now uses the latest Storybook release with CSF Factories support.
 
 ### Fix 5: Add Storybook brand logo
 
@@ -297,7 +295,7 @@ Note: The logo SVG files exist at `apps/docs/src/assets/logos/wc-2026-light.svg`
 
 3. **Standalone pages duplicate CSS** -- Explain this is a prototype tradeoff. Production would extract shared tokens to a CSS file imported via `<link>`.
 
-4. **Storybook 8 vs 9** -- Storybook 9 is referenced in documentation but 8.6 is installed. Be ready to explain 8.x was chosen for stability with the web-components-vite framework, with a clear upgrade path to 9.x.
+4. **Storybook version** -- **RESOLVED**: Now running Storybook 10.2.8 with CSF Factories support. All documentation reflects the current version.
 
 ---
 

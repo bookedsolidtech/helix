@@ -50,7 +50,7 @@ The architecture prioritizes:
 |  +-------------------------+    +----------------------------+   |
 |  |  packages/wc-library    |    |  apps/storybook            |   |
 |  |                         |    |                            |   |
-|  |  - Lit Web Components   |    |  - Storybook 9.x           |   |
+|  |  - Lit Web Components   |    |  - Storybook 10.x           |   |
 |  |  - Design Tokens        |    |  - @storybook/web-         |   |
 |  |  - TypeScript source    |    |    components-vite          |   |
 |  |  - CEM Analyzer         |    |  - Component stories       |   |
@@ -354,16 +354,16 @@ Production:   Vite build (Rollup) --> static HTML/JS/CSS --> deploy to hosting
 
 ## 5. Lit + Storybook Integration (2025-2026 State of the Art)
 
-### Framework Selection: Storybook 9.x + `@storybook/web-components-vite`
+### Framework Selection: Storybook 10.x + `@storybook/web-components-vite`
 
 **Current state (February 2026):**
 
-- Storybook 9 was released in June 2025, with Storybook 9.1 following in July 2025
+- Storybook 10 was released in June 2025, with Storybook 10.1 following in July 2025
 - The `@storybook/web-components-vite` framework is the canonical path for Lit components
 - The old `@storybook/lit` package was deprecated and merged into `@storybook/web-components`
-- Storybook 9 ships with built-in Vitest integration ("Storybook Test") for interaction, accessibility, and visual testing
+- Storybook 10 ships with built-in Vitest integration ("Storybook Test") for interaction, accessibility, and visual testing
 
-**Key Storybook 9 features relevant to this project:**
+**Key Storybook 10 features relevant to this project:**
 
 | Feature | Benefit |
 |---------|---------|
@@ -1055,11 +1055,11 @@ This works because CSS custom properties cascade from the document root through 
 | **Industry momentum** | Stable but stagnant (Open WC project) | Vitest 4 marked Browser Mode stable; rapidly growing adoption |
 | **Lit support** | Native, purpose-built for WC | Community package available; Vitest 4 added Lit to supported frameworks |
 | **Performance** | Good (real browser) | 2-10x faster than Jest; real browser via Playwright |
-| **Storybook integration** | None | Storybook 9 has native Vitest integration ("Storybook Test") |
+| **Storybook integration** | None | Storybook 10 has native Vitest integration ("Storybook Test") |
 | **Ecosystem alignment** | Separate toolchain | Same test runner for unit + browser + Storybook tests |
 | **DX** | Good | Excellent (watch mode, inline snapshots, TypeScript native) |
 
-The decisive factor is **Storybook 9's native Vitest integration**. Using Vitest for component tests means the same test runner powers both standalone component tests and Storybook interaction/a11y tests. One test runner, one configuration, one mental model.
+The decisive factor is **Storybook 10's native Vitest integration**. Using Vitest for component tests means the same test runner powers both standalone component tests and Storybook interaction/a11y tests. One test runner, one configuration, one mental model.
 
 ### Test Layers
 
@@ -1161,13 +1161,13 @@ it('passes automated accessibility checks', async () => {
 
 2. **Storybook addon-a11y** (visual a11y panel in Storybook):
 
-The `@storybook/addon-a11y` addon runs axe checks on every story automatically and displays results in a dedicated panel. In Storybook 9, this integrates directly with the test runner for CI enforcement.
+The `@storybook/addon-a11y` addon runs axe checks on every story automatically and displays results in a dedicated panel. In Storybook 10, this integrates directly with the test runner for CI enforcement.
 
 3. **Manual testing protocol** (catches the other 60-70%): Keyboard navigation, screen reader testing (NVDA, VoiceOver), high-contrast mode validation. Documented as a checklist in the component contribution guide.
 
 #### Layer 4: Visual Regression Tests
 
-Storybook 9's built-in visual testing captures screenshots of every story and diffs against baselines:
+Storybook 10's built-in visual testing captures screenshots of every story and diffs against baselines:
 
 ```typescript
 // In CI pipeline
@@ -1369,11 +1369,11 @@ jobs:
 | **Component framework** | Lit 3.x | Stencil, FAST, Vanilla WC | Lit is the most widely adopted WC library, backed by Google, smallest runtime (~5KB), strongest TypeScript support, and the CEM ecosystem is built around it |
 | **Package manager** | npm | pnpm, yarn, bun | Ships with Node.js (zero additional install); npm workspaces provide native workspace linking; widest ecosystem compatibility; simplest onboarding for new team members |
 | **Monorepo tool** | npm workspaces + Turborepo | Nx, Lerna, pnpm workspaces alone | npm workspaces handle dependency linking; Turborepo adds intelligent task caching, parallel execution, and dependency-aware pipelines. Minimal config (`turbo.json`), significant CI speedup from remote caching. |
-| **Storybook framework** | `@storybook/web-components-vite` (9.x) | Webpack variant, Rsbuild | Vite is the standard for new projects; fastest dev server; Storybook 9 has strongest Vite integration |
+| **Storybook framework** | `@storybook/web-components-vite` (9.x) | Webpack variant, Rsbuild | Vite is the standard for new projects; fastest dev server; Storybook 10 has strongest Vite integration |
 | **Storybook helpers** | `@wc-toolkit/storybook-helpers` | Manual argTypes, custom helpers | Eliminates hundreds of lines of boilerplate; two-way binding; maintained by the WC community |
 | **Build tool (library)** | `tsc` only (no bundler) | Rollup, Vite lib mode, esbuild | Lit's official guidance: do not bundle libraries. Plain `tsc` output is the cleanest distribution format. |
-| **Build tool (Storybook)** | Vite (built into Storybook) | Webpack | Default for Storybook 9; faster builds and HMR |
-| **Test runner** | Vitest 4.x (Browser Mode) | @web/test-runner, Jest, Playwright CT | Unified test runner for unit + browser + Storybook tests; 2-10x faster than Jest; Storybook 9 native integration; Browser Mode stable since Vitest 4 |
+| **Build tool (Storybook)** | Vite (built into Storybook) | Webpack | Default for Storybook 10; faster builds and HMR |
+| **Test runner** | Vitest 4.x (Browser Mode) | @web/test-runner, Jest, Playwright CT | Unified test runner for unit + browser + Storybook tests; 2-10x faster than Jest; Storybook 10 native integration; Browser Mode stable since Vitest 4 |
 | **Browser provider (tests)** | Playwright | WebDriverIO | Parallel execution support; richer API; industry standard |
 | **Design tokens format** | DTCG (W3C 2025.10 stable) | Style Dictionary legacy format | Standards-aligned; future-proof; supported by Style Dictionary 4, Tokens Studio, Figma |
 | **Token build tool** | Style Dictionary 4.x | Theo, custom scripts | Industry standard; DTCG support; multi-platform output; extensible |
@@ -1422,9 +1422,9 @@ This architecture was informed by the following sources, accessed February 2026:
 - [Web Components 2025: Shadow DOM, Lit 3.0, and Browser Compatibility](https://markaicode.com/web-components-2025-shadow-dom-lit-browser-compatibility/)
 
 **Storybook:**
-- [Storybook 9 Official Release](https://storybook.js.org/releases/9.0)
+- [Storybook 10 Official Release](https://storybook.js.org/releases/9.0)
 - [Storybook for Web Components & Vite (9.x docs)](https://storybook.js.org/docs/9/get-started/frameworks/web-components-vite)
-- [Storybook 9 -- Built-in Testing](https://storybook.js.org/blog/storybook-9-beta/)
+- [Storybook 10 -- Built-in Testing](https://storybook.js.org/blog/storybook-9-beta/)
 - [Storybook Releases Storybook v9 with Improved Testing Support (InfoQ)](https://www.infoq.com/news/2025/07/storybook-v9-released/)
 
 **Custom Elements Manifest:**

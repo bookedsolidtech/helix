@@ -344,13 +344,16 @@
         color: #d6deeb; overflow-x: auto; margin: 0;
       }
 
-      /* Pipeline - horizontal flow */
-      .fp-pipeline { display: flex; align-items: center; justify-content: center; gap: 0.75rem; flex-wrap: wrap; margin-bottom: 2rem; }
+      /* Pipeline - horizontal flow (desktop) */
+      .fp-pipeline { display: flex; align-items: center; justify-content: center; gap: 0.75rem; flex-wrap: wrap; margin-bottom: 2rem; position: relative; }
       .fp-pipeline-step { display: flex; flex-direction: column; align-items: center; gap: 0.375rem; text-align: center; min-width: 100px; }
       .fp-pipeline-icon { width: 56px; height: 56px; border-radius: var(--radius-xl); display: flex; align-items: center; justify-content: center; font-size: 1.25rem; }
       .fp-pipeline-label { font-size: 0.8125rem; font-weight: 700; }
       .fp-pipeline-sub { font-size: 0.6875rem; color: var(--text-muted); }
       .fp-pipeline-arrow { font-size: 1rem; color: var(--text-muted); }
+
+      /* Pipeline snake connectors - hidden on desktop */
+      .fp-snake-connector { display: none; }
 
       /* Timeline */
       .fp-timeline-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; }
@@ -422,12 +425,44 @@
         .fp-slide { padding: 4rem 1rem 5rem; min-height: auto; }
         .fp-grid-4 { grid-template-columns: 1fr; }
         .fp-timeline-grid { grid-template-columns: 1fr; }
-        .fp-pipeline { flex-direction: column; }
-        .fp-pipeline-arrow { transform: rotate(90deg); }
+
+        /* Pipeline: 2x2 snake grid on mobile */
+        .fp-pipeline {
+          display: grid;
+          grid-template-columns: 1fr auto 1fr;
+          grid-template-rows: auto auto auto;
+          gap: 0;
+          align-items: center;
+          justify-items: center;
+        }
+
+        /* Hide desktop inline arrows */
+        .fp-pipeline > .fp-pipeline-arrow { display: none; }
+
+        /* Place steps in snake order */
+        .fp-pipeline-step.fp-step-1 { grid-column: 1; grid-row: 1; }
+        .fp-pipeline-step.fp-step-2 { grid-column: 3; grid-row: 1; }
+        .fp-pipeline-step.fp-step-3 { grid-column: 3; grid-row: 3; }
+        .fp-pipeline-step.fp-step-4 { grid-column: 1; grid-row: 3; }
+
+        /* Show snake connectors - same style as desktop .fp-pipeline-arrow */
+        .fp-snake-connector {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 1rem;
+          color: var(--text-muted);
+        }
+
+        .fp-snake-right { grid-column: 2; grid-row: 1; }
+        .fp-snake-down  { grid-column: 3; grid-row: 2; padding: 0.25rem 0; }
+        .fp-snake-left  { grid-column: 2; grid-row: 3; }
+
         .fp-btn-group { flex-direction: column; align-items: stretch; }
         .fp-btn { width: 100%; justify-content: center; }
         .pitch-nav { bottom: 1rem; left: 0.5rem; right: 0.5rem; transform: none; justify-content: center; }
-        .pitch-nav-link { padding: 0.5rem 0.75rem; font-size: 0.75rem; }
+        .pitch-nav-link { padding: 0.5rem 0.75rem; font-size: 0.75rem; min-height: 44px; }
+        .pitch-nav-home { min-width: 44px; min-height: 44px; }
       }
 
       @media (prefers-reduced-motion: reduce) {
@@ -655,31 +690,36 @@
             </div>
           </div>
 
-          <!-- CEM Pipeline -->
+          <!-- CEM Pipeline - desktop: horizontal flow, mobile: 2×2 snake -->
           <div class="fp-pipeline scroll-reveal scroll-reveal-delay-2">
-            <div class="fp-pipeline-step">
+            <div class="fp-pipeline-step fp-step-1">
               <div class="fp-pipeline-icon icon-cyan"><i class="fa-solid fa-code" aria-hidden="true"></i></div>
               <div class="fp-pipeline-label">JSDoc</div>
               <div class="fp-pipeline-sub">Source annotations</div>
             </div>
             <div class="fp-pipeline-arrow" aria-hidden="true"><i class="fa-solid fa-chevron-right"></i></div>
-            <div class="fp-pipeline-step">
+            <div class="fp-pipeline-step fp-step-2">
               <div class="fp-pipeline-icon icon-accent"><i class="fa-solid fa-gears" aria-hidden="true"></i></div>
               <div class="fp-pipeline-label">CEM Analyzer</div>
               <div class="fp-pipeline-sub">Build step</div>
             </div>
             <div class="fp-pipeline-arrow" aria-hidden="true"><i class="fa-solid fa-chevron-right"></i></div>
-            <div class="fp-pipeline-step">
+            <div class="fp-pipeline-step fp-step-3">
               <div class="fp-pipeline-icon icon-green"><i class="fa-solid fa-file-code" aria-hidden="true"></i></div>
               <div class="fp-pipeline-label">CEM JSON</div>
               <div class="fp-pipeline-sub">API manifest</div>
             </div>
             <div class="fp-pipeline-arrow" aria-hidden="true"><i class="fa-solid fa-chevron-right"></i></div>
-            <div class="fp-pipeline-step">
+            <div class="fp-pipeline-step fp-step-4">
               <div class="fp-pipeline-icon icon-pink"><i class="fa-solid fa-arrows-split-up-and-left" aria-hidden="true"></i></div>
               <div class="fp-pipeline-label">4 Outputs</div>
               <div class="fp-pipeline-sub">Auto-generated</div>
             </div>
+
+            <!-- Mobile snake connectors (hidden on desktop) -->
+            <div class="fp-snake-connector fp-snake-right" aria-hidden="true"><i class="fa-solid fa-chevron-right"></i></div>
+            <div class="fp-snake-connector fp-snake-down" aria-hidden="true"><i class="fa-solid fa-chevron-down"></i></div>
+            <div class="fp-snake-connector fp-snake-left" aria-hidden="true"><i class="fa-solid fa-chevron-left"></i></div>
           </div>
 
           <div class="fp-grid-4 scroll-reveal scroll-reveal-delay-3">
@@ -739,7 +779,7 @@
                 </tr>
                 <tr>
                   <td style="font-weight:700;color:var(--wc-accent);">Docs</td>
-                  <td><strong>Storybook 9</strong></td>
+                  <td><strong>Storybook 10</strong></td>
                   <td style="color:var(--text-secondary);">Vitest integration, CEM autodocs, Chromatic</td>
                   <td style="color:var(--text-muted);">Histoire (less ecosystem), custom (high effort)</td>
                 </tr>
@@ -924,7 +964,7 @@
                 <li><i class="fa-solid fa-circle" aria-hidden="true"></i>Lit 3 component scaffolding</li>
                 <li><i class="fa-solid fa-circle" aria-hidden="true"></i>CEM analyzer integration</li>
                 <li><i class="fa-solid fa-circle" aria-hidden="true"></i>First 10 core components</li>
-                <li><i class="fa-solid fa-circle" aria-hidden="true"></i>Storybook 9 with autodocs</li>
+                <li><i class="fa-solid fa-circle" aria-hidden="true"></i>Storybook 10 with autodocs</li>
               </ul>
             </div>
             <div class="fp-timeline-phase" style="border-top:3px solid var(--wc-green);">
@@ -969,7 +1009,7 @@
               <div class="fp-risk-icon icon-amber" aria-hidden="true"><i class="fa-solid fa-clock-rotate-left"></i></div>
               <div class="fp-risk-text">
                 <div class="fp-risk-title">Bleeding-Edge Dependencies</div>
-                <div class="fp-risk-desc">Lit 3, Vite 7, and Storybook 9 are new. Breaking changes are possible.</div>
+                <div class="fp-risk-desc">Lit 3, Vite 7, and Storybook 10 are new. Breaking changes are possible.</div>
               </div>
               <span class="fp-risk-badge" style="background:rgba(16,185,129,0.1);color:var(--wc-green);border:1px solid rgba(16,185,129,0.2);">Mitigated</span>
             </div>

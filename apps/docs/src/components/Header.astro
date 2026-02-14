@@ -23,7 +23,7 @@ const showcasePages = [
     href: '/tech-stack/',
     icon: 'fa-solid fa-layer-group',
     title: 'The 2026 Stack',
-    desc: 'Lit 3, Vite 7, Storybook 8, Web Test Runner',
+    desc: 'Lit 3, Vite 7, Storybook 10, Web Test Runner',
     colorClass: 'sc-accent',
     color: '#8b5cf6',
     tag: 'Tooling',
@@ -399,6 +399,14 @@ const currentPath = Astro.url.pathname;
     transition: all 0.2s ease;
     opacity: 0.4;
     flex-shrink: 0;
+    /* Expand touch target to 44px minimum on touch devices */
+    position: relative;
+  }
+
+  .logout-btn::after {
+    content: '';
+    position: absolute;
+    inset: -8px;
   }
 
   .logout-btn:hover {
@@ -436,6 +444,7 @@ const currentPath = Astro.url.pathname;
     align-items: center;
     gap: 0.5rem;
     padding: 0.45rem 0.7rem;
+    min-height: 44px;
     border: 1px solid rgba(255, 255, 255, 0.08);
     border-radius: 0.625rem;
     background: rgba(255, 255, 255, 0.03);
@@ -532,7 +541,7 @@ const currentPath = Astro.url.pathname;
     width: 720px;
     max-width: calc(100vw - 2rem);
     padding: 0;
-    background: rgba(10, 10, 24, 0.95);
+    background: rgba(10, 10, 24, 0.98);
     backdrop-filter: blur(40px) saturate(200%);
     -webkit-backdrop-filter: blur(40px) saturate(200%);
     border: 1px solid rgba(255, 255, 255, 0.06);

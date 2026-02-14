@@ -1,6 +1,6 @@
 ---
 title: Component Architecture & Storybook Integration
-description: Lit 3.x component architecture, Storybook 9.x integration, and enterprise-grade patterns
+description: Lit 3.x component architecture, Storybook 10.x integration, and enterprise-grade patterns
 ---
 
 > **Section Owner**: Senior Frontend Engineer
@@ -817,7 +817,7 @@ These components are designed specifically for the healthcare content hub use ca
 
 ### 3.3.1 Storybook Configuration
 
-The project targets **Storybook 8.x** with the Web Components framework. While Storybook 9 and 10 have been released with CSF Factories, CSF Factory support for Web Components is still being finalized. We use CSF3 (the current stable format for web components) and will migrate to CSF Factories when official web component support lands.
+The project now uses **Storybook 10.x** (10.2.8) with CSF Factories support. The upgrade from 8.x brings improved performance, better Web Components integration, and native support for modern story formats.
 
 **`.storybook/main.ts`:**
 
@@ -2168,9 +2168,8 @@ The following architectural decisions define the WC-2026 component library:
 - [Custom Elements Manifest: The Killer Feature (Dave Rupert, 2025)](https://daverupert.com/2025/10/custom-elements-manifest-killer-feature)
 - [Custom Elements Manifest Analyzer](https://custom-elements-manifest.open-wc.org/analyzer/getting-started/)
 - [Server Rendering Lit Web Components with Drupal (Benny Powers)](https://bennypowers.dev/posts/drupal-lit-ssr/)
-- [Storybook 8 Announcement](https://storybook.js.org/blog/storybook-8/)
-- [Storybook 9 Release (InfoQ)](https://www.infoq.com/news/2025/07/storybook-v9-released/)
-- [CSF Factories Documentation](https://storybook.js.org/docs/8/api/csf/csf-factories)
+- [Storybook Documentation](https://storybook.js.org)
+- [CSF Factories Documentation](https://storybook.js.org/docs/api/csf)
 - [Chromatic Accessibility Regression Testing](https://www.chromatic.com/blog/sneak-peek-accessibility-regression-testing/)
 - [Storybook Accessibility Testing Docs](https://storybook.js.org/docs/writing-tests/accessibility-testing)
 - [Testing - Lit](https://lit.dev/docs/tools/testing/)

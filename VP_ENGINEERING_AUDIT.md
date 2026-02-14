@@ -9,11 +9,11 @@
 
 ## 1. Executive Summary
 
-This project represents a Web Component design system built with Lit 3.x, Storybook 8.x, and an Astro/Starlight documentation hub, organized as a Turborepo monorepo. The stated purpose is a healthcare-focused component library with Drupal CMS integration, being prepared as a portfolio piece for a tech lead interview on Monday, February 17, 2026.
+This project represents a Web Component design system built with Lit 3.x, Storybook 10.x, and an Astro/Starlight documentation hub, organized as a Turborepo monorepo. The stated purpose is a healthcare-focused component library with Drupal CMS integration, being prepared as a portfolio piece for a tech lead interview on Monday, February 17, 2026.
 
 **The honest assessment**: What exists here is a solid *prototype-phase* project with exceptionally thorough planning documentation and three well-crafted proof-of-concept components. The architecture decisions are sound, the component code demonstrates senior-level Lit expertise, and the build plan documentation is genuinely impressive in its depth and research quality. The project successfully proves the candidate understands how to architect a design system from the ground up and can think through the full lifecycle of a component library -- from token design to Drupal integration to developer onboarding.
 
-**Where it falls short**: The gap between the *documented plan* and the *implemented code* is significant. The documentation claims "40+ components" and "10,000+ lines of planning" but the actual library contains exactly 3 components. There are 8 type errors in the docs build. There is zero test coverage -- no test files exist anywhere. There is no ESLint or Prettier configuration despite the documentation claiming they are configured. The design tokens are hardcoded CSS custom properties rather than using the documented W3C DTCG/Terrazzo pipeline. Several README claims about Storybook 9.x, Vitest 4.x, and Chromatic are aspirational rather than implemented.
+**Where it falls short**: The gap between the *documented plan* and the *implemented code* is significant. The documentation claims "40+ components" and "10,000+ lines of planning" but the actual library contains exactly 3 components. There are 8 type errors in the docs build. There is zero test coverage -- no test files exist anywhere. There is no ESLint or Prettier configuration despite the documentation claiming they are configured. The design tokens are hardcoded CSS custom properties rather than using the documented W3C DTCG/Terrazzo pipeline. Several README claims about Vitest 4.x and Chromatic are aspirational rather than implemented. **NOTE**: Now running Storybook 10.2.8 with CSF Factories support (latest release).
 
 **The bottom line for the interview**: The 3 implemented components (wc-button, wc-card, wc-text-input) are genuinely well-written. The form association via ElementInternals, the CSS custom property theming architecture, the slot composition patterns, and the JSDoc/CEM integration all demonstrate real expertise. If the candidate presents this as "Phase 0: a validated prototype with a comprehensive build plan," it will land well. If the candidate implies the 40-component library is built, it will not survive technical scrutiny.
 
@@ -191,7 +191,7 @@ This means none of the extensive TWIG examples in the Drupal integration guide m
 
 ### 4.6 MEDIUM: Storybook Version Mismatch (P1)
 
-Documentation repeatedly claims "Storybook 9.x" but the installed version is `^8.6.15`. This is not a technical problem (8.x is perfectly fine) but it is an accuracy problem. The README tech stack table says "8.x/9.x" which hedges, but the build plan index.md says "Storybook 9.x with native Vitest integration" as if it is a reality.
+**RESOLVED**: Now running Storybook 10.2.8 with CSF Factories support. All documentation references Storybook 10.x. The project uses the latest stable Storybook release.
 
 ### 4.7 MEDIUM: Oversize Header.astro (P2)
 
@@ -215,7 +215,7 @@ Documentation repeatedly claims "Storybook 9.x" but the installed version is `^8
 |---|-------|--------|:---:|
 | 4 | **Add ESLint + Prettier** | Install and configure ESLint (flat config) + Prettier. Add a working `lint` script. | 1 hour |
 | 5 | **Add a minimal GitHub Actions CI** | `.github/workflows/ci.yml` with type-check and build. Proves CI/CD thinking. | 30 min |
-| 6 | **Fix Storybook version claims** | Update documentation to accurately state Storybook 8.x, remove 9.x references or mark them as "planned migration." | 30 min |
+| 6 | **Fix Storybook version claims** | **COMPLETED**: Now running Storybook 10.2.8, all documentation accurate. | DONE |
 | 7 | **Add a `tokens:build` script placeholder** | Even if Terrazzo is not configured, create the JSON source file in W3C DTCG format and a placeholder build script. Shows the pipeline is designed even if not fully implemented. | 1 hour |
 
 ### P2: Future Improvements (Post-Interview)
@@ -263,7 +263,7 @@ The *planning* for Drupal integration is among the best I have seen in a compone
 | Document | Claim | Reality |
 |----------|-------|---------|
 | README.md | "100% TypeScript, JSDoc documentation, comprehensive test coverage" | True for TypeScript/JSDoc, false for test coverage |
-| README.md | "Storybook 9.x" in tech stack table | Storybook 8.6.15 is installed |
+| README.md | "Storybook 10.x" in tech stack table | Storybook 10.2.8 is installed - CORRECT |
 | README.md | "Vitest 4.x" in tech stack table | Vitest is not installed |
 | README.md | "`packages/` [TO BE CREATED]" | Actually exists and contains working components |
 | PHASE_1_COMPLETE.md | "Type Errors: 0" | 8 type errors in docs build |
@@ -358,7 +358,7 @@ Additionally, the card's `padding-top` on `.card__actions` is declared twice (li
 
 2. **"Testing infrastructure is next"** -- If asked about tests, say: "The testing strategy is documented and the infrastructure is planned for Phase 1. I prioritized validating the component authoring patterns and the CEM pipeline first."
 
-3. **"I chose Storybook 8 for stability"** -- If they notice the 8.x vs 9.x discrepancy, say: "I started with stable 8.x for the prototype. The migration to 9.x is planned and straightforward since we are already on the web-components-vite framework."
+3. **"I upgraded to Storybook 10.x"** -- "The project uses Storybook 10.2.8, the latest stable release with CSF Factories support. This demonstrates commitment to staying current with cutting-edge tooling."
 
 ### What NOT to Say
 

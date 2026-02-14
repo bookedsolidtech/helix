@@ -13,7 +13,7 @@ WC-2026 is an enterprise-grade Web Component library built with **Lit 3.x** and 
 - ✅ **Healthcare-First Design**: WCAG 2.1 AA compliant (HHS mandate May 2026), WCAG AAA targets
 - ✅ **Drupal-Optimized**: Zero coupling, Drupal-friendly component APIs, complete TWIG examples
 - ✅ **Enterprise-Grade**: 100% TypeScript, JSDoc documentation, CEM-driven API docs
-- ✅ **Latest Technologies**: Lit 3.x, Storybook 8.x, Turborepo, Astro/Starlight
+- ✅ **Latest Technologies**: Lit 3.x, Storybook 10.x, Turborepo, Astro/Starlight
 - ✅ **Dual Documentation**: Storybook (design system) + Starlight (guides & tutorials)
 
 ### Tech Stack
@@ -22,7 +22,7 @@ WC-2026 is an enterprise-grade Web Component library built with **Lit 3.x** and 
 |------------|---------|---------|
 | **Lit** | 3.x | Web Component framework |
 | **TypeScript** | 5.x | Type safety, documentation |
-| **Storybook** | 8.6.x | Component playground & docs |
+| **Storybook** | 10.x | Component playground & docs |
 | **Astro + Starlight** | 5.x + 0.37.x | Documentation hub |
 | **Vite** | 6.x | Library build (ES modules) |
 | **npm + Turborepo** | npm 10.x, turbo 2.x | Monorepo management |
@@ -108,7 +108,7 @@ wc-2026/
 │       └── custom-elements.json # Generated CEM (1051 lines)
 │
 ├── apps/
-│   ├── storybook/               # Storybook 8.6 (@wc-2026/storybook)
+│   ├── storybook/               # Storybook 10.x (@wc-2026/storybook)
 │   │   └── .storybook/          # Config, theme, preview
 │   └── docs/                    # Astro/Starlight documentation hub
 │       ├── src/
@@ -185,7 +185,7 @@ Each app can be deployed independently with its own Vercel project:
 - Templates (article, landing page, search results)
 
 ### Phase 3: Storybook Integration (Week 7)
-- Storybook 9.x installation
+- Storybook 10.x installation
 - CEM analyzer integration
 - Story creation (8 variants per component)
 - Accessibility addon configuration
@@ -343,7 +343,7 @@ Each app can be deployed independently with its own Vercel project:
 1. **CEM as Single Source of Truth** - eliminates documentation drift
 2. **Healthcare Compliance Leadership** - WCAG AAA targets, HHS mandate awareness
 3. **Drupal-First Integration Strategy** - zero coupling, TWIG examples
-4. **Enterprise-Grade Architecture** - 3-tier CSS token fallback, TypeScript strict, Storybook 8.x
+4. **Enterprise-Grade Architecture** - 3-tier CSS token fallback, TypeScript strict, Storybook 10.x
 5. **Dual Documentation System** - Storybook + Starlight with unified search
 6. **Latest 2025-2026 Technologies** - Reactive Controllers, ElementInternals, OKLCH colors
 7. **Production-Ready Testing** - 60/30/10 pyramid, visual regression, accessibility automation
@@ -363,7 +363,7 @@ Each app can be deployed independently with its own Vercel project:
 
 ### Official Documentation
 - [Lit 3.x](https://lit.dev)
-- [Storybook 8.x](https://storybook.js.org)
+- [Storybook 10.x](https://storybook.js.org)
 - [Astro 5.x](https://astro.build)
 - [Starlight](https://starlight.astro.build)
 - [Drupal 10.3+](https://drupal.org)

@@ -437,10 +437,7 @@ body:has(.hero-section) main.sl-flex {
   margin-top: 0 !important;
 }
 
-.hero-section {
-  margin-top: 0 !important;
-  padding-top: 0 !important;
-}
+/* hero-section padding is set on the main rule — don't zero it here */
 
 /* Remove gap after header */
 .header + * {
@@ -538,7 +535,8 @@ starlight-theme-select button:hover {
   justify-content: center;
   padding: 0;
   margin: 0 !important;
-  margin-top: -300px !important; /* Nuclear option: pull hero up to overlap header */
+  margin-top: -300px !important; /* Pull hero up to overlap header */
+  padding-top: 300px !important; /* Push content below navbar */
   width: 100vw !important;
   position: relative;
   overflow: hidden;
@@ -547,7 +545,6 @@ starlight-theme-select button:hover {
   margin-right: calc(-50vw + 50%) !important;
   left: 0 !important;
   right: 0 !important;
-  padding-top: 300px; /* Add padding back to prevent content from overlapping header */
 }
 
 /* Deep space gradient background */
@@ -2732,8 +2729,7 @@ starlight-theme-select button:hover {
 @media (max-width: 768px) {
   .hero-section {
     min-height: auto;
-    min-height: auto;
-    padding: var(--space-16) var(--space-4) var(--space-12);
+    padding: calc(300px + var(--space-8)) var(--space-4) var(--space-12) !important;
   }
 
   .hero-content {
@@ -2775,8 +2771,12 @@ starlight-theme-select button:hover {
   }
 
   .tech-grid {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: 1fr;
     gap: var(--space-5);
+  }
+
+  .tech-link {
+    min-height: 44px;
   }
 
   .section-inner,
@@ -2793,13 +2793,37 @@ starlight-theme-select button:hover {
   }
 
   .stats-bar {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
     gap: var(--space-3);
     padding: var(--space-8) var(--space-4);
   }
 
   .stat-card {
-    min-width: calc(50% - var(--space-3));
+    min-width: 0;
+    max-width: none;
     padding: var(--space-5) var(--space-4);
+  }
+
+  .stat-main-icon {
+    font-size: 2.5rem;
+  }
+
+  .stat-modal {
+    padding: 0.5rem;
+  }
+
+  .stat-modal-content {
+    padding: 1.25rem;
+    border-radius: var(--radius-lg);
+  }
+
+  .stat-modal-close {
+    min-width: 44px;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
   .comparison-header,
@@ -2858,6 +2882,10 @@ starlight-theme-select button:hover {
   .cta-buttons {
     flex-direction: column;
     align-items: stretch;
+  }
+
+  .cta-links {
+    gap: var(--space-4) var(--space-6);
   }
 }
 

@@ -13,12 +13,11 @@
     "@wc-2026/library": "*"
   },
   "devDependencies": {
-    "@storybook/addon-a11y": "^8.6.15",
-    "@storybook/addon-essentials": "^8.6.15",
-    "@storybook/blocks": "^8.6.15",
-    "@storybook/web-components-vite": "^8.6.15",
+    "@storybook/addon-a11y": "^10.2.8",
+    "@storybook/addon-docs": "^10.2.8",
+    "@storybook/web-components-vite": "^10.2.8",
     "lit": "^3.3.2",
-    "storybook": "^8.6.15",
+    "storybook": "^10.2.8",
     "vite": "^6.2.0"
   }
 }

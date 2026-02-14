@@ -7,12 +7,16 @@
  * functionality is preserved below the gate.
  */
 import PinGate from './PinGate.astro';
+import Analytics from '@vercel/analytics/astro';
 
 const PAGE_TITLE_ID = '_top';
 ---
 
 <!-- PIN Gate overlay — renders first in body -->
 <PinGate />
+
+<!-- Vercel Analytics -->
+<Analytics />
 
 <!-- Original skip link for accessibility -->
 <a class="sl-skiplink" href={`#${PAGE_TITLE_ID}`}>{Astro.locals.t('skipLink.label')}</a>

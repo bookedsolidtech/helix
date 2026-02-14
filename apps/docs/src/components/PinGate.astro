@@ -160,7 +160,7 @@
 
   <div class="fab-panel" role="menu" aria-label="Pitch pages">
     <div class="fab-panel-header">
-      <span class="fab-badge"><i class="fa-solid fa-rocket" aria-hidden="true"></i> Pitch Deck</span>
+      <span class="fab-badge"><i class="fa-solid fa-rocket" aria-hidden="true"></i> Personal Pitch Deck — Temporary</span>
     </div>
 
     <a href="/elevator-pitch/" class="fab-card fab-card-cyan" role="menuitem">
@@ -246,6 +246,8 @@
     }
 
     showNudge() {
+      // Skip nudge on mobile viewports (matches 50rem breakpoint)
+      if (window.matchMedia('(max-width: 50rem)').matches) return;
       this.nudge.classList.add('visible');
       // Auto-dismiss after 6s
       setTimeout(() => this.dismissNudge(), 6000);
@@ -1881,22 +1883,67 @@
     box-shadow: 0 0 12px var(--fab-card-color);
   }
 
-  @media (max-width: 400px) {
+  /* ==========================================
+     FAB - MOBILE (Starlight mobile breakpoint)
+     Match the hamburger icon aesthetic:
+     small, subtle, no pulse, no nudge.
+     ========================================== */
+  @media (max-width: 50rem) {
     wc-admin-fab {
+      /* Align with the right edge of the Starlight mobile header */
       top: calc(var(--sl-nav-height, 3.5rem) + 0.5rem);
-      right: 0.5rem;
+      right: 1rem;
     }
+
     .fab-trigger {
-      width: 56px;
-      height: 56px;
-      font-size: 1.25rem;
+      width: 32px;
+      height: 32px;
+      font-size: 0.8125rem;
+      border-radius: 8px;
+      border: 1px solid rgba(139, 92, 246, 0.2);
+      background: rgba(139, 92, 246, 0.08);
+      box-shadow: none;
+      animation: none;
     }
-    .fab-panel {
-      width: calc(100vw - 1rem);
-      right: -0.5rem;
+
+    .fab-trigger:hover {
+      background: rgba(139, 92, 246, 0.15);
+      border-color: rgba(139, 92, 246, 0.35);
+      transform: none;
+      box-shadow: none;
     }
+
+    .fab-trigger[aria-expanded='true'] {
+      background: rgba(139, 92, 246, 0.2);
+      border-color: rgba(139, 92, 246, 0.4);
+      transform: rotate(45deg);
+    }
+
+    /* Hide nudge tooltip on mobile */
     .fab-nudge {
       display: none;
+    }
+
+    /* Full-width panel on mobile */
+    .fab-panel {
+      position: fixed;
+      top: calc(var(--sl-nav-height, 3.5rem) + 0.5rem + 32px + 0.5rem);
+      right: 0.5rem;
+      left: 0.5rem;
+      width: auto;
+      border-radius: 0.75rem;
+    }
+  }
+
+  /* Very small phones -- tighten further */
+  @media (max-width: 400px) {
+    wc-admin-fab {
+      right: 0.75rem;
+    }
+
+    .fab-panel {
+      right: 0.25rem;
+      left: 0.25rem;
     }
   }
 </style>

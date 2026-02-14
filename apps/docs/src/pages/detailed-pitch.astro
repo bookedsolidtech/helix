@@ -421,7 +421,8 @@
         .dp-cta-buttons { flex-direction: column; align-items: stretch; }
         .dp-btn { width: 100%; justify-content: center; }
         .pitch-nav { bottom: 1rem; left: 0.5rem; right: 0.5rem; transform: none; justify-content: center; }
-        .pitch-nav-link { padding: 0.5rem 0.75rem; font-size: 0.75rem; }
+        .pitch-nav-link { padding: 0.5rem 0.75rem; font-size: 0.75rem; min-height: 44px; }
+        .pitch-nav-home { min-width: 44px; min-height: 44px; }
       }
 
       @media (prefers-reduced-motion: reduce) {
@@ -488,52 +489,94 @@
           <div class="dp-section-header scroll-reveal">
             <div class="dp-section-num num-cyan" aria-hidden="true">1</div>
             <span class="dp-section-label label-cyan">Background</span>
-            <h2 class="dp-section-title">28 Years Shipping Production Code</h2>
+            <h2 class="dp-section-title">Self-Taught. Battle-Tested. 28 Years Deep.</h2>
             <p class="dp-section-desc">
-              Not 28 years of "knowing about" tech. 28 years of building, deploying, debugging,
-              and leading teams that ship real software to real users.
+              Learned to type on a typewriter. Learned to code hacking computer labs. Bought books off Amazon
+              before Amazon sold anything else. Spoke at DrupalCons around the world. Created the #3 theme in all of Drupal.
+              Contracted 7 years before they finally said yes. Published author. Principal Engineer. Startup founder.
+              This is the trajectory.
             </p>
           </div>
 
           <div class="dp-timeline scroll-reveal scroll-reveal-delay-1">
             <div class="dp-timeline-item">
               <div class="dp-timeline-year" style="color:var(--wc-cyan);">
-                1998
+                ~1996
                 <span style="position:absolute;right:-6px;top:50%;transform:translateY(-50%);width:12px;height:12px;border-radius:50%;background:var(--wc-cyan);border:2px solid var(--surface-0);"></span>
               </div>
               <div class="dp-timeline-content">
-                <div class="dp-timeline-title">Started Writing Code</div>
-                <div class="dp-timeline-desc">First production websites. HTML, CSS, JavaScript -- before jQuery, before React, before the web was "cool."</div>
+                <div class="dp-timeline-title">Typewriter to Terminal</div>
+                <div class="dp-timeline-desc">Learned to type on a typewriter. Found a college computer lab and never came back out. Taught myself HTML and JavaScript hacking terminals after hours while everyone else was at parties. No bootcamp. No tutorial. Just a blinking cursor and the kind of obsession that doesn't sleep.</div>
               </div>
             </div>
             <div class="dp-timeline-item">
               <div class="dp-timeline-year" style="color:var(--wc-accent);">
-                2005-15
+                ~2001
                 <span style="position:absolute;right:-6px;top:50%;transform:translateY(-50%);width:12px;height:12px;border-radius:50%;background:var(--wc-accent);border:2px solid var(--surface-0);"></span>
               </div>
               <div class="dp-timeline-content">
-                <div class="dp-timeline-title">Enterprise & Agency Work</div>
-                <div class="dp-timeline-desc">Full-stack engineering across healthcare, finance, and e-commerce. Led teams of 5-15 engineers. Drupal, WordPress, custom frameworks.</div>
+                <div class="dp-timeline-title">Amazon.com Was Still a Bookstore</div>
+                <div class="dp-timeline-desc">Ordered every programming book Amazon carried -- back when that's all they sold. CSS, PHP, JavaScript, server administration. Earned mastery the hard way: reading covers to covers, building things that broke until they didn't, and doing it all over again on a dial-up connection in the mountains of Colorado.</div>
               </div>
             </div>
             <div class="dp-timeline-item">
               <div class="dp-timeline-year" style="color:var(--wc-pink);">
-                2015-24
+                2002-08
                 <span style="position:absolute;right:-6px;top:50%;transform:translateY(-50%);width:12px;height:12px;border-radius:50%;background:var(--wc-pink);border:2px solid var(--surface-0);"></span>
               </div>
               <div class="dp-timeline-content">
-                <div class="dp-timeline-title">Modern Stack Leadership</div>
-                <div class="dp-timeline-desc">Component architecture, design systems, TypeScript-first development. Led migration of legacy systems to modern stacks.</div>
+                <div class="dp-timeline-title">In the Trenches</div>
+                <div class="dp-timeline-desc">Years of grinding across both hardware and software industries. Denver, Boulder, then east coast. Web agencies, marketing departments, internal tools teams. Took every project that would teach me something new. Learned that the gap between "knows how to code" and "ships production software" is measured in broken deployments and all-nighters. Built the calluses that make the rest of this timeline possible.</div>
+              </div>
+            </div>
+            <div class="dp-timeline-item">
+              <div class="dp-timeline-year" style="color:var(--wc-amber);">
+                2009-21
+                <span style="position:absolute;right:-6px;top:50%;transform:translateY(-50%);width:12px;height:12px;border-radius:50%;background:var(--wc-amber);border:2px solid var(--surface-0);"></span>
+              </div>
+              <div class="dp-timeline-content">
+                <div class="dp-timeline-title">Found Open Source & Hit the World Stage</div>
+                <div class="dp-timeline-desc">Discovered Drupal, fell into the open source community, and everything changed. Created the <strong>Omega base theme</strong> -- it became the <strong>#3 most-used theme in all of Drupal</strong>. Started speaking at DrupalCons around the world -- London, Paris, San Francisco, Denver, Portland, Montreal, and too many camps and summits to count. Co-authored the <em>Definitive Guide to Drupal 7</em>. Spent over a decade contributing to Drupal core and contrib, building tools used by hundreds of thousands of sites worldwide. My final DrupalCon talk was on Web Components at Portland 2021 -- lovingly known as <em>CovidCon</em>. Our first time together in years -- karaoke bars, spreading handshakes, and hating masks like everybody else. Out of 50+ Phase2 employees, 30+ caught COVID in the fallout. I was the lone soul who tested positive and got stuck in Portland for 10 days. Still shipped the talk.</div>
+              </div>
+            </div>
+            <div class="dp-timeline-item">
+              <div class="dp-timeline-year" style="color:var(--wc-electric);">
+                2011-18
+                <span style="position:absolute;right:-6px;top:50%;transform:translateY(-50%);width:12px;height:12px;border-radius:50%;background:var(--wc-electric);border:2px solid var(--surface-0);"></span>
+              </div>
+              <div class="dp-timeline-content">
+                <div class="dp-timeline-title">Phase2: 7 Years Proving It as a Contractor</div>
+                <div class="dp-timeline-desc">Began a 7-year contracting partnership with Phase2 Technology. Led frontend teams. Brought responsive design to every Drupal project in the organization. Shipped for major universities, state &amp; federal government, major TV networks, and multi-brand platforms with dozens of themes and applications running on shared codebases. They asked me to come on full-time for seven straight years. I liked my independence. They kept asking. I kept delivering.</div>
               </div>
             </div>
             <div class="dp-timeline-item">
               <div class="dp-timeline-year" style="color:var(--wc-green);">
-                2026
+                2018-24
                 <span style="position:absolute;right:-6px;top:50%;transform:translateY(-50%);width:12px;height:12px;border-radius:50%;background:var(--wc-green);border:2px solid var(--surface-0);"></span>
               </div>
               <div class="dp-timeline-content">
-                <div class="dp-timeline-title">WC-2026: Enterprise Web Components</div>
-                <div class="dp-timeline-desc">Designed and documented a complete enterprise healthcare web component library -- 10,000+ lines of planning, 5 immersive showcase pages, and a full documentation hub. This site is the proof.</div>
+                <div class="dp-timeline-title">I Finally Said Yes. Then Principal Engineer.</div>
+                <div class="dp-timeline-desc">After seven years of saying "not yet," I finally took the full-time offer. Rose from Software Architect to Engineering Manager to <strong>Principal Engineer</strong>. Led the creation of <a href="https://github.com/phase2/outline" target="_blank" rel="noopener" style="color:var(--wc-green);text-decoration:underline;">Outline</a> -- a Web Components design system that standardized frontend development across the entire organization. Onboarded teams, unified tooling, and shipped components consumed by Drupal, React, Angular, and .NET projects alike. In 2023, Dries Buytaert highlighted Omega at DrupalCon Portland as one of a select handful of <strong>pioneering low-code/no-code solutions</strong> -- over a decade after its creation.</div>
+              </div>
+            </div>
+            <div class="dp-timeline-item">
+              <div class="dp-timeline-year" style="color:var(--wc-cyan);">
+                2026
+                <span style="position:absolute;right:-6px;top:50%;transform:translateY(-50%);width:12px;height:12px;border-radius:50%;background:var(--wc-cyan);border:2px solid var(--surface-0);"></span>
+              </div>
+              <div class="dp-timeline-content">
+                <div class="dp-timeline-title">Clarity House Press -- The Startup</div>
+                <div class="dp-timeline-desc">Founded <strong>Clarity House Press</strong> and built the entire technology platform from scratch. Next.js 16, TypeScript strict mode, Supabase backend, AI-orchestrated content pipelines with 280+ specialized agents, automated LaTeX book production, and a full publishing operations stack. Not a WordPress blog -- a <strong>next-generation content platform</strong> designed to scale, designed to license, and designed to prove that one engineer with the right architecture can outbuild a team of twenty. Currently exploring paths to either build out the platform commercially or bring investors to the table.</div>
+              </div>
+            </div>
+            <div class="dp-timeline-item">
+              <div class="dp-timeline-year" style="color:var(--wc-pink);">
+                Now
+                <span style="position:absolute;right:-6px;top:50%;transform:translateY(-50%);width:12px;height:12px;border-radius:50%;background:var(--wc-pink);border:2px solid var(--surface-0);"></span>
+              </div>
+              <div class="dp-timeline-content">
+                <div class="dp-timeline-title">WC-2026 -- The Late-Night Vibe Code</div>
+                <div class="dp-timeline-desc">This project. A late-night vibe coding exercise that turned into a complete enterprise healthcare web component architecture. 28 years of design systems, Web Components, Drupal integration, and hard-won opinions -- distilled into one prototype. 10,000+ lines of planning. 5 immersive showcase pages. A full documentation hub. Built in a sprint because after doing this for three decades, the architecture just <em>flows</em>. This site is what happens when experience meets obsession at 2am.</div>
               </div>
             </div>
           </div>
@@ -541,19 +584,19 @@
           <div class="dp-stats-row scroll-reveal scroll-reveal-delay-2">
             <div class="dp-stat">
               <div class="dp-stat-value" data-count="28" style="background:var(--gradient-cyan-purple);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">0</div>
-              <div class="dp-stat-label">Years Experience</div>
+              <div class="dp-stat-label">Years Shipping Code</div>
             </div>
             <div class="dp-stat">
-              <div class="dp-stat-value" data-count="10000" data-suffix="+" style="background:var(--gradient-green-cyan);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">0</div>
-              <div class="dp-stat-label">Lines of Planning</div>
+              <div class="dp-stat-value" data-count="13" data-suffix="+" style="background:var(--gradient-green-cyan);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">0</div>
+              <div class="dp-stat-label">Years at Phase2</div>
             </div>
             <div class="dp-stat">
-              <div class="dp-stat-value" data-count="40" data-suffix="+" style="background:var(--gradient-pink-orange);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">0</div>
-              <div class="dp-stat-label">Components Specified</div>
+              <div class="dp-stat-value" data-count="6" data-suffix="+" style="background:var(--gradient-pink-orange);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">0</div>
+              <div class="dp-stat-label">DrupalCons Spoken</div>
             </div>
             <div class="dp-stat">
-              <div class="dp-stat-value" data-count="5" style="background:linear-gradient(135deg,var(--wc-amber),var(--wc-green));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">0</div>
-              <div class="dp-stat-label">Showcase Pages</div>
+              <div class="dp-stat-value" style="background:linear-gradient(135deg,var(--wc-amber),var(--wc-green));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">#3</div>
+              <div class="dp-stat-label">Theme in All of Drupal</div>
             </div>
           </div>
         </div>
@@ -602,7 +645,7 @@
           <div class="dp-arch-outputs scroll-reveal scroll-reveal-delay-2">
             <div class="dp-arch-output">
               <div class="dp-arch-output-icon" style="color:var(--wc-pink);"><i class="fa-solid fa-book-open" aria-hidden="true"></i></div>
-              <div class="dp-arch-output-label">Storybook 9</div>
+              <div class="dp-arch-output-label">Storybook 10</div>
             </div>
             <div class="dp-arch-output">
               <div class="dp-arch-output-icon" style="color:var(--wc-cyan);"><i class="fa-solid fa-file-lines" aria-hidden="true"></i></div>
@@ -726,7 +769,7 @@
                 </tr>
                 <tr>
                   <td class="dp-tech-name"><i class="fa-solid fa-book-open" style="color:var(--wc-accent);margin-right:0.5rem;" aria-hidden="true"></i>Storybook</td>
-                  <td><span class="dp-tech-badge" style="background:rgba(139,92,246,0.1);color:var(--wc-accent);">9.x</span></td>
+                  <td><span class="dp-tech-badge" style="background:rgba(139,92,246,0.1);color:var(--wc-accent);">10.x</span></td>
                   <td class="dp-tech-why">Vitest integration. CEM-powered autodocs. Visual regression with Chromatic.</td>
                 </tr>
                 <tr>

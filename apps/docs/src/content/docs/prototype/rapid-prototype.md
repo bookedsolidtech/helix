@@ -64,7 +64,7 @@ Week 1: Environment setup
   ├── npm workspaces + Turborepo initialization
   ├── TypeScript strict configuration
   ├── Lit 3.x + Vite library mode
-  ├── Storybook 8.x installation
+  ├── Storybook 10.x installation
   └── Terrazzo token pipeline
 
 Week 2: First component

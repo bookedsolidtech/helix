@@ -235,4 +235,32 @@ const filePath = `apps/docs/src/content/docs/${route.entry.id}`;
     border: none;
     opacity: 0.8;
   }
+
+  /* ===== Mobile responsive ===== */
+  @media (max-width: 768px) {
+    .source-path {
+      max-width: 100%;
+      min-height: 44px;
+      padding: 0.5rem 0.65rem;
+    }
+
+    .source-path .path-text {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      max-width: calc(100vw - 8rem);
+      font-size: 0.625rem;
+    }
+
+    .copy-toast {
+      left: 1rem;
+      right: 1rem;
+      transform: translateY(1.5rem);
+      max-width: none;
+    }
+
+    .copy-toast.visible {
+      transform: translateY(0);
+    }
+  }
 </style>

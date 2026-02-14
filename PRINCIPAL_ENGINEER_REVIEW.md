@@ -14,7 +14,7 @@
 | Line | Issue | What it says | What it should say |
 |------|-------|-------------|-------------------|
 | 16 | Inflated claim | "comprehensive test coverage" | Zero test files exist. Remove or change to "comprehensive test strategy" |
-| 53 | Wrong version | "Storybook 9.x" | Storybook 8.6.15 is installed |
+| 53 | Correct version | "Storybook 10.x" | Storybook 10.2.8 is installed - CORRECT |
 | 54 | Missing dependency | "Vitest 4.x" | Vitest is not installed |
 | 55 | Missing dependency | "Terrazzo" | Terrazzo is not installed |
 | 91-117 | **CRITICAL** | `packages/` listed as "[TO BE CREATED]" | `packages/wc-library/` exists with 3 working components |
@@ -481,7 +481,7 @@ These are the strongest technical talking points:
 ### CRITICAL (5 items -- fix before Monday)
 1. README.md lines 91-117: "[TO BE CREATED]" for directories that exist
 2. README.md lines 409-417: "Planning Phase Complete" when implementation has started
-3. README.md tech stack table: Wrong versions (Storybook 9.x, Vitest 4.x)
+3. README.md tech stack table: Storybook 10.x correct, Vitest 4.x planned
 4. prototype/overview.md lines 37-40: "Planned" status for implemented components
 5. api-reference/overview.md line 42: Phantom `icon` slot on wc-button
 

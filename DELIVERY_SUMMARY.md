@@ -119,7 +119,7 @@ Your enterprise-grade Web Component library build plan is **100% complete** with
 **Key Sections**:
 - Overall system architecture (monorepo with npm workspaces + Turborepo)
 - Two-artifact model (library package + Storybook)
-- Latest Lit + Storybook integration patterns (Storybook 9.x, CEM)
+- Latest Lit + Storybook integration patterns (Storybook 10.x, CEM)
 - Drupal integration architecture (npm + CDN delivery)
 - Testing strategy (Vitest 4.x Browser Mode vs. alternatives)
 - 3-tier design token system (W3C DTCG compliant)
@@ -127,7 +127,7 @@ Your enterprise-grade Web Component library build plan is **100% complete** with
 - Technology decision log (10 decisions with rationale)
 
 **Key Decisions**:
-- Storybook 9.x with `@storybook/web-components-vite`
+- Storybook 10.x with `@storybook/web-components-vite`
 - Custom Elements Manifest as machine-readable API contract
 - Vitest 4.x Browser Mode (2-10x faster than Jest)
 - Style Dictionary 4.x for token generation
@@ -321,7 +321,7 @@ Your enterprise-grade Web Component library build plan is **100% complete** with
 1. CEM as Single Source of Truth
 2. Healthcare Compliance Leadership (HHS May 2026 mandate)
 3. Drupal-First Integration Strategy
-4. Enterprise-Grade Architecture (W3C DTCG, Vitest 4.x, Storybook 9.x)
+4. Enterprise-Grade Architecture (W3C DTCG, Vitest 4.x, Storybook 10.x)
 5. Dual Documentation System
 6. Latest 2025-2026 Technologies
 7. Production-Ready Testing
@@ -351,7 +351,7 @@ Your enterprise-grade Web Component library build plan is **100% complete** with
 
 **Phase 3: Storybook Integration (Week 7)**
 - Read: [03-component-architecture-storybook-integration.md](./build-plan/03-component-architecture-storybook-integration.md) (Storybook section)
-- Focus: Storybook 9.x setup, CEM integration, story creation
+- Focus: Storybook 10.x setup, CEM integration, story creation
 - Create: 8 story variants per component
 
 **Phase 4: Testing Infrastructure (Week 8)**
@@ -402,7 +402,7 @@ Your enterprise-grade Web Component library build plan is **100% complete** with
 
 ✅ **Comprehensive**: 10,000+ lines covering architecture through implementation
 ✅ **Researched**: 44+ authoritative sources (official docs, W3C specs, healthcare compliance)
-✅ **Current**: Latest 2025-2026 technologies (Lit 3.x, Storybook 9.x, Vitest 4.x, Terrazzo)
+✅ **Current**: Latest 2025-2026 technologies (Lit 3.x, Storybook 10.x, Vitest 4.x planned, Terrazzo planned)
 ✅ **Practical**: 12 complete component specifications with working TWIG examples
 ✅ **Enterprise-Grade**: Healthcare compliance, accessibility (WCAG AAA), testing strategy
 ✅ **Multi-Audience**: Guides for component builders, Drupal teams, designers, architects

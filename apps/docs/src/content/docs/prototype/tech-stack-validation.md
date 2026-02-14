@@ -46,10 +46,10 @@ Each technology choice was evaluated against alternatives. This document capture
 |----------|---------------|--------------|-----------------|
 | Real browser | Yes | No | Yes |
 | Speed | Fast (2-10x) | Slow | Medium |
-| Storybook | Native (v9) | Plugin | Manual |
+| Storybook | Native (v10) | Plugin | Manual |
 | Watch mode | Yes | Yes | Yes |
 
-**Decision**: Vitest 4.x - real browser testing, native Storybook 9.x integration.
+**Decision**: Vitest 4.x - real browser testing, native Storybook 10.x integration.
 
 **Validation**: Write tests for prototype components and benchmark against Jest baseline.
 

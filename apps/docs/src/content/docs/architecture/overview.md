@@ -10,7 +10,7 @@ WC-2026 follows a **layered architecture** designed for enterprise healthcare or
 ```
 ┌─────────────────────────────────────────────┐
 │           Documentation Layer               │
-│  Astro/Starlight + Storybook 9.x            │
+│  Astro/Starlight + Storybook 10.x            │
 ├─────────────────────────────────────────────┤
 │           Component Layer                   │
 │  Lit 3.x Web Components + TypeScript        │

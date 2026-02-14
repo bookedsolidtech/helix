@@ -11,7 +11,7 @@ description: Rapid prototyping phase - validate core technology decisions before
 
 ## Objectives
 
-1. **Validate Technology Stack** - Confirm Lit 3.x + Storybook 8.x/9.x + Astro/Starlight work together seamlessly
+1. **Validate Technology Stack** - Confirm Lit 3.x + Storybook 10.x + Astro/Starlight work together seamlessly
 2. **Prove Component Architecture** - Build 2-3 proof-of-concept components that demonstrate the full pattern
 3. **Test Drupal Integration** - Verify web components render correctly in Drupal TWIG templates
 4. **Establish Build Pipeline** - Set up monorepo, TypeScript, build tooling, and CI/CD

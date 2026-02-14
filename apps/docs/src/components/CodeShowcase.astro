@@ -18,10 +18,12 @@ npm install @wc-2026/components
 # Or use the CDN for quick prototyping
 npx create-wc-2026-app my-project`;
 
+const scriptOpen = '<' + 'script type="module">';
+const scriptClose = '</' + 'script>';
 const htmlCode = `<!-- Import once, use everywhere -->
-<script type="module">
+${scriptOpen}
   import '@wc-2026/components';
-</script>
+${scriptClose}
 
 <!-- Accessible alert component -->
 <wc-alert

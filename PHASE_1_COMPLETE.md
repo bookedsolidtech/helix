@@ -259,7 +259,7 @@ wc-2026/
 - [ ] Set up Figma Tokens plugin
 
 ### Phase 3: Storybook Integration (Week 7)
-- [ ] Install Storybook 9.x
+- [x] Install Storybook 10.x
 - [ ] Create token visualization stories
 - [ ] Create component stories (8 variants each)
 - [ ] Configure accessibility addon
