@@ -3082,9 +3082,13 @@ starlight-theme-select button:hover {
    ================================================ */
 @media (max-width: 768px) {
   .hero-section {
-    min-height: 100dvh;
+    height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
     margin-top: calc(-1 * var(--sl-nav-height)) !important;
-    padding-top: calc(var(--sl-nav-height) + var(--space-8)) !important;
+    padding-top: var(--sl-nav-height) !important;
     padding-bottom: var(--space-12) !important;
     padding-left: var(--space-4) !important;
     padding-right: var(--space-4) !important;
