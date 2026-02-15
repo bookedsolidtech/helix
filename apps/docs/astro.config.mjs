@@ -18,11 +18,6 @@ export default defineConfig({
         'lit-element/lit-element.js',
       ],
     },
-    build: {
-      rollupOptions: {
-        external: [/^@helix\/tokens/],
-      },
-    },
   },
   markdown: {
     shikiConfig: {
