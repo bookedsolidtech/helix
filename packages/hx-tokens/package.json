@@ -9,15 +9,18 @@
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "import": "./dist/index.js"
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
     },
     "./css": {
       "types": "./dist/css.d.ts",
-      "import": "./dist/css.js"
+      "import": "./dist/css.js",
+      "default": "./dist/css.js"
     },
     "./lit": {
       "types": "./dist/lit.d.ts",
-      "import": "./dist/lit.js"
+      "import": "./dist/lit.js",
+      "default": "./dist/lit.js"
     },
     "./utils": {
       "types": "./dist/utils.d.ts",
