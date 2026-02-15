@@ -1,6 +1,6 @@
 {
   "framework": "nextjs",
-  "buildCommand": "turbo run build",
+  "buildCommand": "cd ../.. && npm run build --workspace=packages/hx-tokens && cd apps/admin && next build",
   "headers": [
     {
       "source": "/(.*)",
