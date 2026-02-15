@@ -21,7 +21,8 @@
     },
     "./utils": {
       "types": "./dist/utils.d.ts",
-      "import": "./dist/utils.js"
+      "import": "./dist/utils.js",
+      "default": "./dist/utils.js"
     },
     "./tokens.css": "./dist/tokens.css",
     "./tokens.json": "./src/tokens.json"
