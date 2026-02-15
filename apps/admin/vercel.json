@@ -1,6 +1,4 @@
 {
-  "buildCommand": "cd ../.. && npx turbo build --filter=@helix/admin",
-  "installCommand": "cd ../.. && npm install",
   "headers": [
     {
       "source": "/(.*)",
