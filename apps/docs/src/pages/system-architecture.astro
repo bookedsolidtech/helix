@@ -489,9 +489,20 @@ import ArchTab4LightDOM from '../components/showcase/arch/ArchTab4LightDOM.astro
         .da-section-header { margin-bottom: var(--space-10); }
         .da-footer-cta-buttons { flex-direction: column; align-items: stretch; }
         .da-btn { width: 100%; justify-content: center; }
-        .da-nav-tab { padding: 0.625rem 1rem; }
-        .da-nav-tab-label { font-size: 0.8125rem; }
-        .da-nav-tab-subtitle { font-size: 0.625rem; }
+
+        /* Stack tabs vertically on mobile */
+        .da-section-nav-inner { flex-direction: column; max-width: 100%; padding: 0.75rem; }
+        .da-nav-tab {
+          flex: none;
+          flex-direction: row;
+          justify-content: flex-start;
+          gap: 0.75rem;
+          padding: 0.75rem 1rem;
+          text-align: left;
+        }
+        .da-nav-tab i { font-size: 1.125rem; }
+        .da-nav-tab-label { font-size: 0.875rem; }
+        .da-nav-tab-subtitle { font-size: 0.6875rem; }
       }
 
       @media (max-width: 480px) {
