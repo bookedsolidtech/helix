@@ -1,2680 +1,681 @@
 ---
 /**
- * Tech Stack - Full visual experience page.
+ * Tech Stack — page orchestrator.
  *
  * Standalone Astro page (not Starlight content) showcasing every
  * technology choice and WHY it was chosen for the WC-2026 project.
  *
- * Sections:
- * 1. Hero - Every Tool Chosen for a Reason
- * 2. The Stack Visualization - Layered architecture
- * 3. Head-to-Head Comparisons - Decision matrices
- * 4. Bundle Size Showdown - Framework weight comparison
- * 5. The Integration Map - Tool connection flow
- * 6. Performance Benchmarks - Visualized metrics
- * 7. Future-Proof Guarantees - Standards timeline
- * 8. Footer CTA
+ * Sections (delegated to components in components/showcase/stack/):
+ * 1. Hero - Every Tool Chosen for a Reason          (inline below)
+ * 2. The Stack Visualization - Layered architecture  (StackVisualization)
+ * 3. Head-to-Head Comparisons - Decision matrices    (StackComparisons)
+ * 4. Bundle Size Showdown - Framework weight         (StackBundleSize)
+ * 5. The Integration Map - Tool connection flow      (StackIntegrationMap)
+ * 6. Performance Benchmarks - Visualized metrics     (StackPerformance)
+ * 7. Future-Proof Guarantees - Standards timeline     (StackFutureProof)
+ * 8. Footer CTA                                      (inline below)
  */
+import ShowcaseLayout from '../layouts/ShowcaseLayout.astro';
+import ScrollRevealScript from '../components/showcase/ScrollRevealScript.astro';
+import StackVisualization from '../components/showcase/stack/StackVisualization.astro';
+import StackComparisons from '../components/showcase/stack/StackComparisons.astro';
+import StackBundleSize from '../components/showcase/stack/StackBundleSize.astro';
+import StackIntegrationMap from '../components/showcase/stack/StackIntegrationMap.astro';
+import StackPerformance from '../components/showcase/stack/StackPerformance.astro';
+import StackFutureProof from '../components/showcase/stack/StackFutureProof.astro';
 ---
 
-<!doctype html>
-<html lang="en" data-theme="dark">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>The 2026 Stack | WC-2026</title>
-    <meta
-      name="description"
-      content="Every technology in WC-2026 was chosen for a reason. Explore the head-to-head comparisons, bundle analysis, and architectural decisions behind the cutting-edge 2026 stack."
-    />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=JetBrains+Mono:wght@400;500;600;700&display=swap"
-      rel="stylesheet"
-    />
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
-      integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg=="
-      crossorigin="anonymous"
-      referrerpolicy="no-referrer"
-    />
+<ShowcaseLayout
+  title="The 2026 Stack"
+  description="Every technology in WC-2026 was chosen for a reason. Explore the head-to-head comparisons, bundle analysis, and architectural decisions behind the cutting-edge 2026 stack."
+>
+  <style is:inline>
+    /* ============================================
+       TECH STACK PAGE — page-level styles
+       (topbar, hero, shared section scaffolding,
+        card base, footer CTA, buttons, responsive)
+       ============================================ */
 
-    <style>
-      /* ============================================
-         TECH STACK PAGE - Self-contained styles
-         Uses same design tokens as the main site
-         ============================================ */
+    /* --- Top Navigation Bar --- */
+    .ts-topbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: var(--space-3) var(--space-8);
+      background: rgba(10, 10, 20, 0.85);
+      backdrop-filter: blur(16px) saturate(180%);
+      -webkit-backdrop-filter: blur(16px) saturate(180%);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    }
 
-      @property --gradient-angle {
-        syntax: '<angle>';
-        initial-value: 0deg;
-        inherits: false;
-      }
+    .ts-topbar-left {
+      display: flex;
+      align-items: center;
+      gap: var(--space-4);
+    }
 
-      :root {
-        --wc-accent-h: 250;
-        --wc-accent-s: 70%;
-        --wc-accent-l: 60%;
-        --wc-accent: hsl(var(--wc-accent-h), var(--wc-accent-s), var(--wc-accent-l));
-        --wc-cyan: #06b6d4;
-        --wc-pink: #ec4899;
-        --wc-green: #10b981;
-        --wc-amber: #f59e0b;
-        --wc-red: #ef4444;
-        --wc-electric: #3b82f6;
-        --wc-neon: #22d3ee;
-        --wc-lime: #84cc16;
+    .ts-back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-2);
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+      transition: all 0.2s ease;
+      padding: var(--space-2) var(--space-3);
+      border-radius: var(--radius-md);
+    }
 
-        --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        --gradient-hero: linear-gradient(135deg, #0a0a1a 0%, #1a1040 40%, #0f0f2e 100%);
-        --gradient-cyan-purple: linear-gradient(135deg, #06b6d4, #8b5cf6);
-        --gradient-pink-orange: linear-gradient(135deg, #ec4899, #f97316);
-        --gradient-green-cyan: linear-gradient(135deg, #10b981, #06b6d4);
-        --gradient-electric: linear-gradient(135deg, #06b6d4, #3b82f6, #8b5cf6);
+    .ts-back-link:hover {
+      color: var(--text-primary);
+      background: var(--glass-bg-strong);
+    }
 
-        --font-heading: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-        --font-body: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-        --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+    .ts-topbar-title {
+      font-size: 0.875rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      letter-spacing: -0.01em;
+    }
 
-        --space-1: 0.25rem;
-        --space-2: 0.5rem;
-        --space-3: 0.75rem;
-        --space-4: 1rem;
-        --space-5: 1.25rem;
-        --space-6: 1.5rem;
-        --space-8: 2rem;
-        --space-10: 2.5rem;
-        --space-12: 3rem;
-        --space-16: 4rem;
-        --space-20: 5rem;
-        --space-24: 6rem;
+    .ts-topbar-right {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+    }
 
-        --radius-sm: 0.5rem;
-        --radius-md: 0.75rem;
-        --radius-lg: 1rem;
-        --radius-xl: 1.5rem;
-        --radius-2xl: 2rem;
-        --radius-full: 9999px;
+    .ts-topbar-link {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-2);
+      font-size: 0.8125rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      padding: var(--space-2) var(--space-4);
+      border-radius: var(--radius-md);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      transition: all 0.2s ease;
+    }
 
-        --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
-        --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.4);
-        --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.5);
-        --shadow-xl: 0 16px 64px rgba(0, 0, 0, 0.6);
+    .ts-topbar-link:hover {
+      color: var(--wc-cyan);
+      border-color: rgba(6, 182, 212, 0.3);
+      background: rgba(6, 182, 212, 0.06);
+    }
 
-        --glass-bg: rgba(255, 255, 255, 0.03);
-        --glass-bg-strong: rgba(255, 255, 255, 0.06);
-        --glass-border: rgba(255, 255, 255, 0.06);
-        --glass-border-strong: rgba(255, 255, 255, 0.12);
+    /* ============================================
+       SECTION 1: HERO
+       ============================================ */
+    .ts-hero {
+      min-height: 100vh;
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+      isolation: isolate;
+      padding: var(--space-24) var(--space-8) var(--space-16);
+    }
 
-        --glow-primary: 0 0 50px rgba(102, 126, 234, 0.25);
-        --glow-subtle: 0 0 20px rgba(102, 126, 234, 0.15);
+    .ts-hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: var(--gradient-hero);
+      z-index: -3;
+    }
 
-        --surface-0: #0a0a14;
-        --surface-1: #111122;
-        --surface-2: #1a1a32;
-        --surface-3: #252545;
-        --text-primary: #eaeaf4;
-        --text-secondary: #a8a8c8;
-        --text-muted: #6868a0;
-      }
+    .ts-hero::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image:
+        radial-gradient(circle at 20% 30%, rgba(6, 182, 212, 0.04) 2px, transparent 2px),
+        radial-gradient(circle at 60% 70%, rgba(102, 126, 234, 0.04) 3px, transparent 3px),
+        radial-gradient(circle at 80% 20%, rgba(34, 211, 238, 0.03) 2px, transparent 2px);
+      background-size: 800px 800px;
+      animation: particle-drift 60s linear infinite;
+      opacity: 0.6;
+      z-index: -2;
+    }
 
-      /* --- Reset & Base --- */
-      *, *::before, *::after {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-      }
+    .ts-hero-orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(100px);
+      opacity: 0.3;
+      z-index: -1;
+      pointer-events: none;
+    }
 
-      body {
-        font-family: var(--font-body);
-        line-height: 1.6;
-        -webkit-font-smoothing: antialiased;
-        -moz-osx-font-smoothing: grayscale;
-        background: var(--surface-0);
-        color: var(--text-primary);
-        scroll-behavior: smooth;
-        overflow-x: hidden;
-      }
+    .ts-hero-orb-1 {
+      width: 600px;
+      height: 600px;
+      background: radial-gradient(circle, rgba(6, 182, 212, 0.4), transparent 70%);
+      top: -200px;
+      right: -100px;
+      animation: float-slow 20s ease-in-out infinite, orb-pulse 8s ease-in-out infinite;
+    }
 
-      h1, h2, h3, h4, h5, h6 {
-        font-family: var(--font-heading);
-        font-weight: 700;
-        letter-spacing: -0.025em;
-        line-height: 1.15;
-      }
+    .ts-hero-orb-2 {
+      width: 400px;
+      height: 400px;
+      background: radial-gradient(circle, rgba(59, 130, 246, 0.3), transparent 70%);
+      bottom: -100px;
+      left: -80px;
+      animation: float-slow 25s ease-in-out infinite reverse, orb-pulse 10s ease-in-out infinite;
+    }
 
-      code, pre {
-        font-family: var(--font-mono);
-      }
+    .ts-hero-orb-3 {
+      width: 350px;
+      height: 350px;
+      background: radial-gradient(circle, rgba(139, 92, 246, 0.25), transparent 70%);
+      top: 40%;
+      left: 15%;
+      animation: float-drift 18s ease-in-out infinite, orb-pulse 7s ease-in-out infinite;
+    }
 
-      a {
-        color: var(--wc-accent);
-        text-decoration: none;
-        transition: color 0.2s ease;
-      }
+    .ts-hero-grid {
+      position: absolute;
+      inset: 0;
+      z-index: -1;
+      background-image:
+        linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+      background-size: 60px 60px;
+      mask-image: radial-gradient(ellipse 80% 60% at 50% 50%, black 30%, transparent 70%);
+      -webkit-mask-image: radial-gradient(ellipse 80% 60% at 50% 50%, black 30%, transparent 70%);
+    }
 
-      a:hover {
-        color: hsl(var(--wc-accent-h), var(--wc-accent-s), 75%);
-      }
+    /* Floating logos in hero background */
+    .ts-hero-floating-logos {
+      position: absolute;
+      inset: 0;
+      z-index: -1;
+      pointer-events: none;
+    }
 
-      /* --- Keyframes --- */
-      @keyframes fadeInUp {
-        from { opacity: 0; transform: translateY(40px); }
-        to { opacity: 1; transform: translateY(0); }
-      }
+    .ts-hero-floating-logo {
+      position: absolute;
+      opacity: 0.07;
+      filter: grayscale(0.5) brightness(1.5);
+    }
 
-      @keyframes fadeInDown {
-        from { opacity: 0; transform: translateY(-20px); }
-        to { opacity: 1; transform: translateY(0); }
-      }
+    .ts-hero-floating-logo:nth-child(1) { top: 12%; left: 8%; width: 64px; animation: float-logo 15s ease-in-out infinite; }
+    .ts-hero-floating-logo:nth-child(2) { top: 20%; right: 12%; width: 56px; animation: float-logo 18s ease-in-out 2s infinite; }
+    .ts-hero-floating-logo:nth-child(3) { top: 55%; left: 5%; width: 48px; animation: float-logo 20s ease-in-out 4s infinite; }
+    .ts-hero-floating-logo:nth-child(4) { bottom: 25%; right: 8%; width: 60px; animation: float-logo 16s ease-in-out 1s infinite; }
+    .ts-hero-floating-logo:nth-child(5) { top: 35%; right: 20%; width: 44px; animation: float-logo 22s ease-in-out 3s infinite; }
+    .ts-hero-floating-logo:nth-child(6) { bottom: 15%; left: 18%; width: 52px; animation: float-logo 19s ease-in-out 5s infinite; }
+    .ts-hero-floating-logo:nth-child(7) { top: 8%; left: 40%; width: 40px; animation: float-logo 21s ease-in-out 2.5s infinite; }
+    .ts-hero-floating-logo:nth-child(8) { bottom: 35%; right: 30%; width: 50px; animation: float-logo 17s ease-in-out 1.5s infinite; }
 
-      @keyframes fadeIn {
-        from { opacity: 0; }
-        to { opacity: 1; }
-      }
+    .ts-hero-content {
+      text-align: center;
+      max-width: 900px;
+      z-index: 1;
+    }
 
-      @keyframes float-slow {
-        0%, 100% { transform: translate(0, 0) scale(1); }
-        25% { transform: translate(30px, -20px) scale(1.05); }
-        50% { transform: translate(-10px, -35px) scale(0.97); }
-        75% { transform: translate(-25px, -10px) scale(1.02); }
-      }
+    .ts-hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-3);
+      padding: var(--space-2) var(--space-6);
+      border-radius: var(--radius-full);
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(20px);
+      color: rgba(255, 255, 255, 0.85);
+      font-size: 0.875rem;
+      font-weight: 500;
+      letter-spacing: 0.02em;
+      margin-bottom: var(--space-10);
+      animation: fadeInDown 0.8s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+    }
 
-      @keyframes float-drift {
-        0%, 100% { transform: translate(0, 0) rotate(0deg); }
-        33% { transform: translate(20px, 15px) rotate(2deg); }
-        66% { transform: translate(-15px, -20px) rotate(-2deg); }
-      }
+    .ts-hero-badge-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--wc-neon);
+      animation: pulse-glow 2s ease infinite;
+      flex-shrink: 0;
+    }
 
-      @keyframes orb-pulse {
-        0%, 100% { opacity: 0.3; filter: blur(100px); }
-        50% { opacity: 0.5; filter: blur(120px); }
-      }
+    .ts-hero-title {
+      font-size: clamp(2.5rem, 8vw, 5rem);
+      font-weight: 900;
+      line-height: 1.15;
+      margin-bottom: var(--space-6);
+      background: linear-gradient(180deg, rgba(255,255,255,1) 0%, rgba(255,255,255,0.7) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      letter-spacing: -0.04em;
+      animation: fadeInUp 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.1s backwards;
+    }
 
-      @keyframes pulse-glow {
-        0%, 100% { box-shadow: 0 0 8px rgba(6, 182, 212, 0.4); }
-        50% { box-shadow: 0 0 24px rgba(6, 182, 212, 0.7); }
-      }
+    .ts-hero-title span {
+      background: linear-gradient(135deg, var(--wc-cyan), var(--wc-electric));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
 
-      @keyframes border-rotate {
-        0% { --gradient-angle: 0deg; }
-        100% { --gradient-angle: 360deg; }
-      }
+    .ts-hero-subtitle {
+      font-size: clamp(1.125rem, 2.5vw, 1.5rem);
+      font-weight: 300;
+      margin-bottom: var(--space-8);
+      background: linear-gradient(90deg, rgba(255,255,255,0.9), rgba(6, 182, 212, 0.9));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      animation: fadeInUp 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.2s backwards;
+    }
 
-      @keyframes particle-drift {
-        0% { background-position: 0 0, 200px 200px, 400px 100px; }
-        100% { background-position: 800px 800px, 1000px 1000px, 1200px 900px; }
-      }
+    .ts-hero-description {
+      font-size: clamp(1rem, 1.5vw, 1.25rem);
+      color: rgba(255, 255, 255, 0.55);
+      max-width: 700px;
+      margin: 0 auto var(--space-12);
+      line-height: 1.75;
+      animation: fadeInUp 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.3s backwards;
+    }
 
-      @keyframes scroll-fade {
-        0% { opacity: 1; transform: translateX(-50%) translateY(0); }
-        100% { opacity: 0; transform: translateX(-50%) translateY(12px); }
-      }
+    .ts-hero-scroll {
+      position: absolute;
+      bottom: var(--space-10);
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: var(--space-2);
+      color: rgba(255, 255, 255, 0.3);
+      font-size: 0.6875rem;
+      font-weight: 500;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      animation: fadeIn 1s ease 1.5s backwards;
+    }
 
-      @keyframes shimmer {
-        0% { background-position: -200% 0; }
-        100% { background-position: 200% 0; }
-      }
+    .ts-hero-scroll-line {
+      width: 1px;
+      height: 40px;
+      background: linear-gradient(to bottom, rgba(255,255,255,0.3), transparent);
+      position: relative;
+      overflow: hidden;
+    }
 
-      @keyframes bar-grow {
-        from { width: 0; }
-      }
+    .ts-hero-scroll-line::after {
+      content: '';
+      position: absolute;
+      top: -100%;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(to bottom, transparent, rgba(255,255,255,0.8), transparent);
+      animation: scroll-fade 2s ease-in-out infinite;
+    }
 
-      @keyframes float-logo {
-        0%, 100% { transform: translate(0, 0) rotate(0deg); opacity: 0.07; }
-        25% { transform: translate(10px, -15px) rotate(3deg); opacity: 0.12; }
-        50% { transform: translate(-8px, -25px) rotate(-2deg); opacity: 0.08; }
-        75% { transform: translate(-15px, -8px) rotate(1deg); opacity: 0.1; }
-      }
+    /* ============================================
+       SHARED SECTION STYLES
+       ============================================ */
+    .ts-section {
+      width: 100%;
+      position: relative;
+      overflow: hidden;
+    }
 
-      @keyframes pulse-ring {
-        0% { transform: scale(0.95); opacity: 0.5; }
-        50% { transform: scale(1.05); opacity: 1; }
-        100% { transform: scale(0.95); opacity: 0.5; }
-      }
+    .ts-section-inner {
+      padding: var(--space-24) var(--space-8);
+      max-width: 1400px;
+      margin: 0 auto;
+    }
 
-      @keyframes flow-dash {
-        to { stroke-dashoffset: -20; }
-      }
+    .ts-section-header {
+      text-align: center;
+      margin-bottom: var(--space-16);
+    }
 
-      /* --- Scroll Reveal --- */
-      .scroll-reveal {
-        opacity: 0;
-        transform: translateY(40px);
-        transition: opacity 0.8s cubic-bezier(0.22, 1, 0.36, 1),
-                    transform 0.8s cubic-bezier(0.22, 1, 0.36, 1),
-                    filter 0.8s cubic-bezier(0.22, 1, 0.36, 1);
-        filter: blur(4px);
-      }
+    .ts-section-label {
+      display: inline-block;
+      padding: var(--space-1) var(--space-4);
+      border-radius: var(--radius-full);
+      font-size: 0.8125rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: var(--space-4);
+      background: linear-gradient(135deg, rgba(6, 182, 212, 0.1), rgba(59, 130, 246, 0.1));
+      color: var(--wc-cyan);
+      border: 1px solid rgba(6, 182, 212, 0.15);
+    }
 
-      .scroll-reveal.is-visible {
-        opacity: 1;
-        transform: translateY(0);
-        filter: blur(0);
-      }
+    .ts-section-title {
+      font-size: clamp(2rem, 5vw, 3.25rem);
+      font-weight: 800;
+      letter-spacing: -0.035em;
+      margin-bottom: var(--space-5);
+      color: var(--text-primary);
+      line-height: 1.1;
+    }
 
-      .scroll-reveal-delay-1 { transition-delay: 0.1s; }
-      .scroll-reveal-delay-2 { transition-delay: 0.2s; }
-      .scroll-reveal-delay-3 { transition-delay: 0.3s; }
-      .scroll-reveal-delay-4 { transition-delay: 0.4s; }
-      .scroll-reveal-delay-5 { transition-delay: 0.5s; }
-      .scroll-reveal-delay-6 { transition-delay: 0.6s; }
+    .ts-section-description {
+      font-size: clamp(1rem, 1.5vw, 1.2rem);
+      color: var(--text-secondary);
+      max-width: 650px;
+      margin: 0 auto;
+      line-height: 1.7;
+    }
 
-      /* --- Top Navigation Bar --- */
+    /* --- Card base --- */
+    .ts-card {
+      padding: var(--space-8);
+      border-radius: var(--radius-2xl);
+      background: var(--surface-1);
+      border: 1px solid var(--surface-3);
+      transition: all 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .ts-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      padding: 1.5px;
+      background: conic-gradient(from var(--gradient-angle), #06b6d4, #3b82f6, #8b5cf6, #06b6d4);
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      opacity: 0;
+      transition: opacity 0.5s ease;
+      pointer-events: none;
+      animation: border-rotate 4s linear infinite;
+    }
+
+    .ts-card::after {
+      content: '';
+      position: absolute;
+      width: 300px;
+      height: 300px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(6, 182, 212, 0.12), transparent 70%);
+      opacity: 0;
+      transition: opacity 0.5s ease;
+      pointer-events: none;
+      top: var(--mouse-y, 50%);
+      left: var(--mouse-x, 50%);
+      transform: translate(-50%, -50%);
+    }
+
+    .ts-card:hover::before { opacity: 1; }
+    .ts-card:hover::after { opacity: 1; }
+    .ts-card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-xl), var(--glow-subtle);
+      background: var(--surface-2);
+    }
+
+    /* ============================================
+       FOOTER CTA
+       ============================================ */
+    .ts-footer-cta {
+      padding: var(--space-24) var(--space-8);
+      text-align: center;
+      background: linear-gradient(180deg, var(--surface-0), var(--surface-1));
+    }
+
+    .ts-footer-cta-inner {
+      max-width: 700px;
+      margin: 0 auto;
+    }
+
+    .ts-footer-cta h2 {
+      font-size: clamp(2rem, 5vw, 3rem);
+      font-weight: 900;
+      letter-spacing: -0.035em;
+      margin-bottom: var(--space-5);
+      background: linear-gradient(135deg, var(--wc-cyan), var(--wc-electric), var(--wc-accent));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .ts-footer-cta p {
+      font-size: 1.125rem;
+      color: var(--text-secondary);
+      margin-bottom: var(--space-10);
+      line-height: 1.7;
+    }
+
+    .ts-footer-cta-buttons {
+      display: flex;
+      gap: var(--space-4);
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .ts-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-2);
+      padding: var(--space-4) var(--space-8);
+      border-radius: var(--radius-xl);
+      font-size: 0.9375rem;
+      font-weight: 700;
+      transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+      cursor: pointer;
+      border: none;
+      text-decoration: none;
+    }
+
+    .ts-btn-solid {
+      background: linear-gradient(135deg, #06b6d4, #3b82f6);
+      color: white;
+      box-shadow: 0 4px 20px rgba(6, 182, 212, 0.3);
+    }
+
+    .ts-btn-solid:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 30px rgba(6, 182, 212, 0.4);
+      color: white;
+    }
+
+    .ts-btn-ghost {
+      background: transparent;
+      color: var(--text-secondary);
+      border: 1px solid var(--glass-border-strong);
+    }
+
+    .ts-btn-ghost:hover {
+      color: var(--text-primary);
+      background: var(--glass-bg-strong);
+      transform: translateY(-2px);
+    }
+
+    .ts-btn-arrow {
+      transition: transform 0.2s ease;
+    }
+
+    .ts-btn:hover .ts-btn-arrow {
+      transform: translateX(4px);
+    }
+
+    /* ============================================
+       RESPONSIVE
+       ============================================ */
+    @media (max-width: 768px) {
       .ts-topbar {
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        z-index: 100;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        padding: var(--space-3) var(--space-8);
-        background: rgba(10, 10, 20, 0.85);
-        backdrop-filter: blur(16px) saturate(180%);
-        -webkit-backdrop-filter: blur(16px) saturate(180%);
-        border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-      }
-
-      .ts-topbar-left {
-        display: flex;
-        align-items: center;
-        gap: var(--space-4);
-      }
-
-      .ts-back-link {
-        display: inline-flex;
-        align-items: center;
-        gap: var(--space-2);
-        font-size: 0.875rem;
-        font-weight: 600;
-        color: var(--text-secondary);
-        transition: all 0.2s ease;
-        padding: var(--space-2) var(--space-3);
-        border-radius: var(--radius-md);
-      }
-
-      .ts-back-link:hover {
-        color: var(--text-primary);
-        background: var(--glass-bg-strong);
-      }
-
-      .ts-topbar-title {
-        font-size: 0.875rem;
-        font-weight: 700;
-        color: var(--text-primary);
-        letter-spacing: -0.01em;
+        padding: var(--space-2) var(--space-4);
       }
 
       .ts-topbar-right {
-        display: flex;
-        align-items: center;
-        gap: var(--space-3);
-      }
-
-      .ts-topbar-link {
-        display: inline-flex;
-        align-items: center;
-        gap: var(--space-2);
-        font-size: 0.8125rem;
-        font-weight: 600;
-        color: var(--text-muted);
-        padding: var(--space-2) var(--space-4);
-        border-radius: var(--radius-md);
-        border: 1px solid rgba(255, 255, 255, 0.08);
-        transition: all 0.2s ease;
-      }
-
-      .ts-topbar-link:hover {
-        color: var(--wc-cyan);
-        border-color: rgba(6, 182, 212, 0.3);
-        background: rgba(6, 182, 212, 0.06);
-      }
-
-      /* ============================================
-         SECTION 1: HERO
-         ============================================ */
-      .ts-hero {
-        min-height: 100vh;
-        min-height: 100dvh;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        position: relative;
-        overflow: hidden;
-        isolation: isolate;
-        padding: var(--space-24) var(--space-8) var(--space-16);
-      }
-
-      .ts-hero::before {
-        content: '';
-        position: absolute;
-        inset: 0;
-        background: var(--gradient-hero);
-        z-index: -3;
-      }
-
-      .ts-hero::after {
-        content: '';
-        position: absolute;
-        inset: 0;
-        background-image:
-          radial-gradient(circle at 20% 30%, rgba(6, 182, 212, 0.04) 2px, transparent 2px),
-          radial-gradient(circle at 60% 70%, rgba(102, 126, 234, 0.04) 3px, transparent 3px),
-          radial-gradient(circle at 80% 20%, rgba(34, 211, 238, 0.03) 2px, transparent 2px);
-        background-size: 800px 800px;
-        animation: particle-drift 60s linear infinite;
-        opacity: 0.6;
-        z-index: -2;
-      }
-
-      .ts-hero-orb {
-        position: absolute;
-        border-radius: 50%;
-        filter: blur(100px);
-        opacity: 0.3;
-        z-index: -1;
-        pointer-events: none;
-      }
-
-      .ts-hero-orb-1 {
-        width: 600px;
-        height: 600px;
-        background: radial-gradient(circle, rgba(6, 182, 212, 0.4), transparent 70%);
-        top: -200px;
-        right: -100px;
-        animation: float-slow 20s ease-in-out infinite, orb-pulse 8s ease-in-out infinite;
-      }
-
-      .ts-hero-orb-2 {
-        width: 400px;
-        height: 400px;
-        background: radial-gradient(circle, rgba(59, 130, 246, 0.3), transparent 70%);
-        bottom: -100px;
-        left: -80px;
-        animation: float-slow 25s ease-in-out infinite reverse, orb-pulse 10s ease-in-out infinite;
-      }
-
-      .ts-hero-orb-3 {
-        width: 350px;
-        height: 350px;
-        background: radial-gradient(circle, rgba(139, 92, 246, 0.25), transparent 70%);
-        top: 40%;
-        left: 15%;
-        animation: float-drift 18s ease-in-out infinite, orb-pulse 7s ease-in-out infinite;
-      }
-
-      .ts-hero-grid {
-        position: absolute;
-        inset: 0;
-        z-index: -1;
-        background-image:
-          linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
-          linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
-        background-size: 60px 60px;
-        mask-image: radial-gradient(ellipse 80% 60% at 50% 50%, black 30%, transparent 70%);
-        -webkit-mask-image: radial-gradient(ellipse 80% 60% at 50% 50%, black 30%, transparent 70%);
-      }
-
-      /* Floating logos in hero background */
-      .ts-hero-floating-logos {
-        position: absolute;
-        inset: 0;
-        z-index: -1;
-        pointer-events: none;
-      }
-
-      .ts-hero-floating-logo {
-        position: absolute;
-        opacity: 0.07;
-        filter: grayscale(0.5) brightness(1.5);
-      }
-
-      .ts-hero-floating-logo:nth-child(1) { top: 12%; left: 8%; width: 64px; animation: float-logo 15s ease-in-out infinite; }
-      .ts-hero-floating-logo:nth-child(2) { top: 20%; right: 12%; width: 56px; animation: float-logo 18s ease-in-out 2s infinite; }
-      .ts-hero-floating-logo:nth-child(3) { top: 55%; left: 5%; width: 48px; animation: float-logo 20s ease-in-out 4s infinite; }
-      .ts-hero-floating-logo:nth-child(4) { bottom: 25%; right: 8%; width: 60px; animation: float-logo 16s ease-in-out 1s infinite; }
-      .ts-hero-floating-logo:nth-child(5) { top: 35%; right: 20%; width: 44px; animation: float-logo 22s ease-in-out 3s infinite; }
-      .ts-hero-floating-logo:nth-child(6) { bottom: 15%; left: 18%; width: 52px; animation: float-logo 19s ease-in-out 5s infinite; }
-      .ts-hero-floating-logo:nth-child(7) { top: 8%; left: 40%; width: 40px; animation: float-logo 21s ease-in-out 2.5s infinite; }
-      .ts-hero-floating-logo:nth-child(8) { bottom: 35%; right: 30%; width: 50px; animation: float-logo 17s ease-in-out 1.5s infinite; }
-
-      .ts-hero-content {
-        text-align: center;
-        max-width: 900px;
-        z-index: 1;
-      }
-
-      .ts-hero-badge {
-        display: inline-flex;
-        align-items: center;
-        gap: var(--space-3);
-        padding: var(--space-2) var(--space-6);
-        border-radius: var(--radius-full);
-        background: rgba(255, 255, 255, 0.06);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        backdrop-filter: blur(20px);
-        color: rgba(255, 255, 255, 0.85);
-        font-size: 0.875rem;
-        font-weight: 500;
-        letter-spacing: 0.02em;
-        margin-bottom: var(--space-10);
-        animation: fadeInDown 0.8s cubic-bezier(0.22, 1, 0.36, 1) backwards;
-      }
-
-      .ts-hero-badge-dot {
-        width: 8px;
-        height: 8px;
-        border-radius: 50%;
-        background: var(--wc-neon);
-        animation: pulse-glow 2s ease infinite;
-        flex-shrink: 0;
-      }
-
-      .ts-hero-title {
-        font-size: clamp(2.5rem, 8vw, 5rem);
-        font-weight: 900;
-        line-height: 1.15;
-        margin-bottom: var(--space-6);
-        background: linear-gradient(180deg, rgba(255,255,255,1) 0%, rgba(255,255,255,0.7) 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
-        letter-spacing: -0.04em;
-        animation: fadeInUp 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.1s backwards;
-      }
-
-      .ts-hero-title span {
-        background: linear-gradient(135deg, var(--wc-cyan), var(--wc-electric));
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
-      }
-
-      .ts-hero-subtitle {
-        font-size: clamp(1.125rem, 2.5vw, 1.5rem);
-        font-weight: 300;
-        margin-bottom: var(--space-8);
-        background: linear-gradient(90deg, rgba(255,255,255,0.9), rgba(6, 182, 212, 0.9));
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
-        animation: fadeInUp 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.2s backwards;
-      }
-
-      .ts-hero-description {
-        font-size: clamp(1rem, 1.5vw, 1.25rem);
-        color: rgba(255, 255, 255, 0.55);
-        max-width: 700px;
-        margin: 0 auto var(--space-12);
-        line-height: 1.75;
-        animation: fadeInUp 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.3s backwards;
-      }
-
-      .ts-hero-scroll {
-        position: absolute;
-        bottom: var(--space-10);
-        left: 50%;
-        transform: translateX(-50%);
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: var(--space-2);
-        color: rgba(255, 255, 255, 0.3);
-        font-size: 0.6875rem;
-        font-weight: 500;
-        letter-spacing: 0.2em;
-        text-transform: uppercase;
-        animation: fadeIn 1s ease 1.5s backwards;
-      }
-
-      .ts-hero-scroll-line {
-        width: 1px;
-        height: 40px;
-        background: linear-gradient(to bottom, rgba(255,255,255,0.3), transparent);
-        position: relative;
-        overflow: hidden;
-      }
-
-      .ts-hero-scroll-line::after {
-        content: '';
-        position: absolute;
-        top: -100%;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: linear-gradient(to bottom, transparent, rgba(255,255,255,0.8), transparent);
-        animation: scroll-fade 2s ease-in-out infinite;
-      }
-
-      /* ============================================
-         SHARED SECTION STYLES
-         ============================================ */
-      .ts-section {
-        width: 100%;
-        position: relative;
-        overflow: hidden;
+        display: none;
       }
 
       .ts-section-inner {
-        padding: var(--space-24) var(--space-8);
-        max-width: 1400px;
-        margin: 0 auto;
-      }
-
-      .ts-section-header {
-        text-align: center;
-        margin-bottom: var(--space-16);
-      }
-
-      .ts-section-label {
-        display: inline-block;
-        padding: var(--space-1) var(--space-4);
-        border-radius: var(--radius-full);
-        font-size: 0.8125rem;
-        font-weight: 600;
-        letter-spacing: 0.08em;
-        text-transform: uppercase;
-        margin-bottom: var(--space-4);
-        background: linear-gradient(135deg, rgba(6, 182, 212, 0.1), rgba(59, 130, 246, 0.1));
-        color: var(--wc-cyan);
-        border: 1px solid rgba(6, 182, 212, 0.15);
-      }
-
-      .ts-section-title {
-        font-size: clamp(2rem, 5vw, 3.25rem);
-        font-weight: 800;
-        letter-spacing: -0.035em;
-        margin-bottom: var(--space-5);
-        color: var(--text-primary);
-        line-height: 1.1;
-      }
-
-      .ts-section-description {
-        font-size: clamp(1rem, 1.5vw, 1.2rem);
-        color: var(--text-secondary);
-        max-width: 650px;
-        margin: 0 auto;
-        line-height: 1.7;
-      }
-
-      /* --- Card base --- */
-      .ts-card {
-        padding: var(--space-8);
-        border-radius: var(--radius-2xl);
-        background: var(--surface-1);
-        border: 1px solid var(--surface-3);
-        transition: all 0.5s cubic-bezier(0.22, 1, 0.36, 1);
-        position: relative;
-        overflow: hidden;
-      }
-
-      .ts-card::before {
-        content: '';
-        position: absolute;
-        inset: 0;
-        border-radius: inherit;
-        padding: 1.5px;
-        background: conic-gradient(from var(--gradient-angle), #06b6d4, #3b82f6, #8b5cf6, #06b6d4);
-        -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-        -webkit-mask-composite: xor;
-        mask-composite: exclude;
-        opacity: 0;
-        transition: opacity 0.5s ease;
-        pointer-events: none;
-        animation: border-rotate 4s linear infinite;
-      }
-
-      .ts-card::after {
-        content: '';
-        position: absolute;
-        width: 300px;
-        height: 300px;
-        border-radius: 50%;
-        background: radial-gradient(circle, rgba(6, 182, 212, 0.12), transparent 70%);
-        opacity: 0;
-        transition: opacity 0.5s ease;
-        pointer-events: none;
-        top: var(--mouse-y, 50%);
-        left: var(--mouse-x, 50%);
-        transform: translate(-50%, -50%);
-      }
-
-      .ts-card:hover::before { opacity: 1; }
-      .ts-card:hover::after { opacity: 1; }
-      .ts-card:hover {
-        transform: translateY(-4px);
-        box-shadow: var(--shadow-xl), var(--glow-subtle);
-        background: var(--surface-2);
-      }
-
-      /* ============================================
-         SECTION 2: STACK VISUALIZATION
-         ============================================ */
-      .ts-stack-section {
-        background: var(--surface-0);
-        border-top: 1px solid var(--surface-3);
-        border-bottom: 1px solid var(--surface-3);
-      }
-
-      .ts-stack-container {
-        display: flex;
-        gap: var(--space-8);
-        align-items: stretch;
-        max-width: 1100px;
-        margin: 0 auto;
-      }
-
-      .ts-stack-layers {
-        flex: 1;
-        display: flex;
-        flex-direction: column;
-        gap: var(--space-4);
-      }
-
-      .ts-stack-layer {
-        padding: var(--space-6) var(--space-8);
-        border-radius: var(--radius-xl);
-        border: 1px solid;
-        position: relative;
-        transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
-      }
-
-      .ts-stack-layer:hover {
-        transform: translateX(8px);
-      }
-
-      .ts-stack-layer-tag {
-        display: inline-block;
-        font-size: 0.6875rem;
-        font-weight: 700;
-        letter-spacing: 0.1em;
-        text-transform: uppercase;
-        padding: var(--space-1) var(--space-3);
-        border-radius: var(--radius-full);
-        margin-bottom: var(--space-3);
-      }
-
-      .ts-stack-layer-title {
-        font-size: 1.25rem;
-        font-weight: 700;
-        margin-bottom: var(--space-2);
-      }
-
-      .ts-stack-layer-techs {
-        display: flex;
-        gap: var(--space-4);
-        flex-wrap: wrap;
-        align-items: center;
-      }
-
-      .ts-stack-layer-tech {
-        display: inline-flex;
-        align-items: center;
-        gap: var(--space-2);
-        font-size: 0.875rem;
-        font-weight: 500;
-        color: var(--text-secondary);
-      }
-
-      .ts-stack-layer-tech img {
-        width: 24px;
-        height: 24px;
-      }
-
-      /* Layer colors */
-      .ts-layer-docs {
-        background: linear-gradient(135deg, rgba(255, 93, 1, 0.08), rgba(255, 71, 133, 0.04));
-        border-color: rgba(255, 93, 1, 0.2);
-      }
-      .ts-layer-docs .ts-stack-layer-tag {
-        background: rgba(255, 93, 1, 0.15);
-        color: #ff5d01;
-      }
-      .ts-layer-docs .ts-stack-layer-title { color: #ff8a4c; }
-
-      .ts-layer-dx {
-        background: linear-gradient(135deg, rgba(255, 71, 133, 0.08), rgba(114, 155, 27, 0.04));
-        border-color: rgba(255, 71, 133, 0.2);
-      }
-      .ts-layer-dx .ts-stack-layer-tag {
-        background: rgba(255, 71, 133, 0.15);
-        color: #ff4785;
-      }
-      .ts-layer-dx .ts-stack-layer-title { color: #ff6ea1; }
-
-      .ts-layer-core {
-        background: linear-gradient(135deg, rgba(50, 79, 255, 0.1), rgba(49, 120, 198, 0.06));
-        border-color: rgba(50, 79, 255, 0.25);
-      }
-      .ts-layer-core .ts-stack-layer-tag {
-        background: rgba(50, 79, 255, 0.15);
-        color: #324fff;
-      }
-      .ts-layer-core .ts-stack-layer-title { color: #6b8aff; }
-
-      .ts-layer-build {
-        background: linear-gradient(135deg, rgba(0, 150, 255, 0.08), rgba(193, 33, 39, 0.04));
-        border-color: rgba(0, 150, 255, 0.2);
-      }
-      .ts-layer-build .ts-stack-layer-tag {
-        background: rgba(0, 150, 255, 0.15);
-        color: #0096ff;
-      }
-      .ts-layer-build .ts-stack-layer-title { color: #4db8ff; }
-
-      /* Design tokens sidebar */
-      .ts-stack-sidebar {
-        width: 180px;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        padding: var(--space-6) var(--space-4);
-        border-radius: var(--radius-xl);
-        background: linear-gradient(180deg, rgba(16, 185, 129, 0.08), rgba(6, 182, 212, 0.08));
-        border: 1px solid rgba(16, 185, 129, 0.2);
-        text-align: center;
-        position: relative;
-      }
-
-      .ts-stack-sidebar::before {
-        content: '';
-        position: absolute;
-        top: 10%;
-        bottom: 10%;
-        left: -1px;
-        width: 3px;
-        background: linear-gradient(180deg, var(--wc-green), var(--wc-cyan));
-        border-radius: 2px;
-      }
-
-      .ts-stack-sidebar-icon {
-        font-size: 2rem;
-        color: var(--wc-green);
-        margin-bottom: var(--space-4);
-      }
-
-      .ts-stack-sidebar-title {
-        font-size: 1rem;
-        font-weight: 700;
-        color: var(--wc-green);
-        margin-bottom: var(--space-2);
-      }
-
-      .ts-stack-sidebar-techs {
-        font-size: 0.8125rem;
-        color: var(--text-secondary);
-        line-height: 1.6;
-      }
-
-      /* ============================================
-         SECTION 3: HEAD-TO-HEAD COMPARISONS
-         ============================================ */
-      .ts-comparisons-section {
-        background: var(--surface-0);
-      }
-
-      .ts-comparison-grid {
-        display: grid;
-        gap: var(--space-10);
-        max-width: 1100px;
-        margin: 0 auto;
-      }
-
-      .ts-comparison {
-        padding: var(--space-10);
-        border-radius: var(--radius-2xl);
-        background: var(--surface-1);
-        border: 1px solid var(--surface-3);
-        position: relative;
-        overflow: hidden;
-        transition: all 0.5s cubic-bezier(0.22, 1, 0.36, 1);
-      }
-
-      .ts-comparison::before {
-        content: '';
-        position: absolute;
-        inset: 0;
-        border-radius: inherit;
-        padding: 1.5px;
-        background: conic-gradient(from var(--gradient-angle), #06b6d4, #3b82f6, #8b5cf6, #06b6d4);
-        -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-        -webkit-mask-composite: xor;
-        mask-composite: exclude;
-        opacity: 0;
-        transition: opacity 0.5s ease;
-        pointer-events: none;
-        animation: border-rotate 4s linear infinite;
-      }
-
-      .ts-comparison::after {
-        content: '';
-        position: absolute;
-        width: 300px;
-        height: 300px;
-        border-radius: 50%;
-        background: radial-gradient(circle, rgba(6, 182, 212, 0.08), transparent 70%);
-        opacity: 0;
-        transition: opacity 0.5s ease;
-        pointer-events: none;
-        top: var(--mouse-y, 50%);
-        left: var(--mouse-x, 50%);
-        transform: translate(-50%, -50%);
-      }
-
-      .ts-comparison:hover::before { opacity: 1; }
-      .ts-comparison:hover::after { opacity: 1; }
-
-      .ts-comparison-header {
-        display: flex;
-        align-items: center;
-        gap: var(--space-4);
-        margin-bottom: var(--space-8);
-      }
-
-      .ts-comparison-icon {
-        width: 56px;
-        height: 56px;
-        border-radius: var(--radius-lg);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 1.5rem;
-        flex-shrink: 0;
-      }
-
-      .ts-comparison-category {
-        font-size: 0.75rem;
-        font-weight: 600;
-        letter-spacing: 0.08em;
-        text-transform: uppercase;
-        color: var(--text-muted);
-        margin-bottom: var(--space-1);
-      }
-
-      .ts-comparison-title {
-        font-size: 1.5rem;
-        font-weight: 800;
-        color: var(--text-primary);
-      }
-
-      /* Comparison table */
-      .ts-comp-table {
-        width: 100%;
-        border-collapse: collapse;
-        margin-bottom: var(--space-6);
-        font-size: 0.875rem;
-      }
-
-      .ts-comp-table th {
-        text-align: left;
-        padding: var(--space-3) var(--space-4);
-        font-weight: 600;
-        color: var(--text-muted);
-        font-size: 0.75rem;
-        letter-spacing: 0.05em;
-        text-transform: uppercase;
-        border-bottom: 1px solid var(--surface-3);
-      }
-
-      .ts-comp-table td {
-        padding: var(--space-3) var(--space-4);
-        border-bottom: 1px solid rgba(255, 255, 255, 0.03);
-        color: var(--text-secondary);
-      }
-
-      .ts-comp-table tr:last-child td {
-        border-bottom: none;
-      }
-
-      .ts-comp-table .ts-winner-col {
-        background: rgba(6, 182, 212, 0.04);
-      }
-
-      .ts-comp-table th.ts-winner-col {
-        color: var(--wc-cyan);
-        background: rgba(6, 182, 212, 0.06);
-      }
-
-      .ts-check { color: var(--wc-green); }
-      .ts-cross { color: var(--wc-red); opacity: 0.6; }
-      .ts-partial { color: var(--wc-amber); }
-
-      /* Winner badge */
-      .ts-winner-badge {
-        display: inline-flex;
-        align-items: center;
-        gap: var(--space-2);
-        padding: var(--space-2) var(--space-4);
-        border-radius: var(--radius-full);
-        background: linear-gradient(135deg, rgba(6, 182, 212, 0.15), rgba(16, 185, 129, 0.1));
-        border: 1px solid rgba(6, 182, 212, 0.25);
-        color: var(--wc-cyan);
-        font-size: 0.8125rem;
-        font-weight: 700;
-        letter-spacing: 0.02em;
-      }
-
-      .ts-winner-badge i {
-        color: var(--wc-green);
-      }
-
-      .ts-decision-text {
-        font-size: 0.9375rem;
-        color: var(--text-secondary);
-        line-height: 1.7;
-        margin-top: var(--space-4);
-      }
-
-      .ts-decision-text strong {
-        color: var(--text-primary);
-      }
-
-      /* ============================================
-         SECTION 4: BUNDLE SIZE SHOWDOWN
-         ============================================ */
-      .ts-bundle-section {
-        background: var(--surface-0);
-        border-top: 1px solid var(--surface-3);
-        border-bottom: 1px solid var(--surface-3);
-      }
-
-      .ts-bundle-container {
-        max-width: 900px;
-        margin: 0 auto;
-      }
-
-      .ts-bundle-bars {
-        display: flex;
-        flex-direction: column;
-        gap: var(--space-6);
-      }
-
-      .ts-bundle-row {
-        display: grid;
-        grid-template-columns: 140px 1fr 60px;
-        align-items: center;
-        gap: var(--space-4);
-      }
-
-      .ts-bundle-label {
-        font-size: 0.9375rem;
-        font-weight: 600;
-        color: var(--text-primary);
-        display: flex;
-        align-items: center;
-        gap: var(--space-3);
-      }
-
-      .ts-bundle-label img {
-        width: 24px;
-        height: 24px;
-      }
-
-      .ts-bundle-track {
-        height: 40px;
-        border-radius: var(--radius-md);
-        background: var(--surface-2);
-        position: relative;
-        overflow: hidden;
-      }
-
-      .ts-bundle-fill {
-        height: 100%;
-        border-radius: var(--radius-md);
-        display: flex;
-        align-items: center;
-        justify-content: flex-end;
-        padding-right: var(--space-4);
-        font-size: 0.8125rem;
-        font-weight: 700;
-        color: rgba(255, 255, 255, 0.9);
-        transition: width 1.5s cubic-bezier(0.22, 1, 0.36, 1);
-        position: relative;
-        overflow: hidden;
-      }
-
-      .ts-bundle-fill::after {
-        content: '';
-        position: absolute;
-        inset: 0;
-        background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.1) 50%, transparent 100%);
-        background-size: 200% 100%;
-        animation: shimmer 3s ease-in-out infinite;
-      }
-
-      .ts-bundle-fill.ts-fill-lit {
-        background: linear-gradient(90deg, #06b6d4, #22d3ee);
-        width: 6.25%;
-      }
-      .ts-bundle-fill.ts-fill-vue {
-        background: linear-gradient(90deg, #42b883, #35495e);
-        width: 37.5%;
-      }
-      .ts-bundle-fill.ts-fill-react {
-        background: linear-gradient(90deg, #61dafb, #3178c6);
-        width: 50%;
-      }
-      .ts-bundle-fill.ts-fill-angular {
-        background: linear-gradient(90deg, #dd0031, #c3002f);
-        width: 100%;
-      }
-
-      .ts-bundle-size {
-        font-size: 1rem;
-        font-weight: 800;
-        color: var(--text-primary);
-        text-align: right;
-        font-family: var(--font-mono);
-      }
-
-      .ts-bundle-highlight {
-        text-align: center;
-        margin-top: var(--space-12);
-        padding: var(--space-8);
-        border-radius: var(--radius-2xl);
-        background: linear-gradient(135deg, rgba(6, 182, 212, 0.08), rgba(59, 130, 246, 0.04));
-        border: 1px solid rgba(6, 182, 212, 0.2);
-      }
-
-      .ts-bundle-highlight-number {
-        font-size: clamp(3rem, 8vw, 5rem);
-        font-weight: 900;
-        background: linear-gradient(135deg, var(--wc-cyan), var(--wc-electric));
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
-        line-height: 1;
-        margin-bottom: var(--space-3);
-      }
-
-      .ts-bundle-highlight-text {
-        font-size: 1.25rem;
-        font-weight: 600;
-        color: var(--text-primary);
-        margin-bottom: var(--space-2);
-      }
-
-      .ts-bundle-highlight-sub {
-        font-size: 0.9375rem;
-        color: var(--text-secondary);
-      }
-
-      /* ============================================
-         SECTION 5: INTEGRATION MAP
-         ============================================ */
-      .ts-flow-section {
-        background: var(--surface-0);
-      }
-
-      .ts-flow-pipeline {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 0;
-        max-width: 1200px;
-        margin: 0 auto;
-        flex-wrap: wrap;
-      }
-
-      .ts-flow-step {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: var(--space-3);
-        padding: var(--space-6) var(--space-4);
-        text-align: center;
-        flex: 0 0 auto;
-        min-width: 120px;
-      }
-
-      .ts-flow-icon {
-        width: 72px;
-        height: 72px;
-        border-radius: var(--radius-xl);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        border: 2px solid;
-        position: relative;
-        transition: all 0.3s ease;
-      }
-
-      .ts-flow-step:hover .ts-flow-icon {
-        transform: scale(1.1);
-      }
-
-      .ts-flow-icon img {
-        width: 36px;
-        height: 36px;
-      }
-
-      .ts-flow-icon i {
-        font-size: 1.5rem;
-      }
-
-      .ts-flow-label {
-        font-size: 0.8125rem;
-        font-weight: 700;
-        color: var(--text-primary);
-      }
-
-      .ts-flow-sub {
-        font-size: 0.6875rem;
-        color: var(--text-muted);
-        max-width: 100px;
-      }
-
-      .ts-flow-arrow {
-        color: var(--text-muted);
-        font-size: 1.25rem;
-        flex-shrink: 0;
-        padding: 0 var(--space-1);
-      }
-
-      /* Flow icon colors */
-      .ts-flow-author { background: rgba(50, 79, 255, 0.1); border-color: rgba(50, 79, 255, 0.3); color: #324fff; }
-      .ts-flow-test { background: rgba(114, 155, 27, 0.1); border-color: rgba(114, 155, 27, 0.3); color: #729B1B; }
-      .ts-flow-document { background: rgba(255, 71, 133, 0.1); border-color: rgba(255, 71, 133, 0.3); color: #ff4785; }
-      .ts-flow-build { background: rgba(189, 52, 254, 0.1); border-color: rgba(189, 52, 254, 0.3); color: #bd34fe; }
-      .ts-flow-publish { background: rgba(193, 33, 39, 0.1); border-color: rgba(193, 33, 39, 0.3); color: #c12127; }
-      .ts-flow-integrate { background: rgba(6, 120, 190, 0.1); border-color: rgba(6, 120, 190, 0.3); color: #0678be; }
-
-      .ts-flow-cem-note {
-        text-align: center;
-        margin-top: var(--space-10);
-        padding: var(--space-6);
-        border-radius: var(--radius-xl);
-        background: linear-gradient(135deg, rgba(139, 92, 246, 0.08), rgba(6, 182, 212, 0.04));
-        border: 1px solid rgba(139, 92, 246, 0.2);
-        max-width: 700px;
-        margin-left: auto;
-        margin-right: auto;
-      }
-
-      .ts-flow-cem-note-title {
-        font-size: 1rem;
-        font-weight: 700;
-        color: var(--wc-accent);
-        margin-bottom: var(--space-2);
-      }
-
-      .ts-flow-cem-note-text {
-        font-size: 0.875rem;
-        color: var(--text-secondary);
-        line-height: 1.6;
-      }
-
-      /* ============================================
-         SECTION 6: PERFORMANCE BENCHMARKS
-         ============================================ */
-      .ts-perf-section {
-        background: var(--surface-0);
-        border-top: 1px solid var(--surface-3);
-        border-bottom: 1px solid var(--surface-3);
-      }
-
-      .ts-perf-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-        gap: var(--space-6);
-        max-width: 1100px;
-        margin: 0 auto;
-      }
-
-      .ts-perf-card {
-        padding: var(--space-8);
-        border-radius: var(--radius-2xl);
-        background: var(--surface-1);
-        border: 1px solid var(--surface-3);
-        text-align: center;
-        transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
-      }
-
-      .ts-perf-card:hover {
-        transform: translateY(-4px);
-        box-shadow: var(--shadow-lg);
-        background: var(--surface-2);
-      }
-
-      .ts-perf-icon {
-        font-size: 1.75rem;
-        margin-bottom: var(--space-4);
-      }
-
-      .ts-perf-value {
-        font-size: 2.5rem;
-        font-weight: 900;
-        font-family: var(--font-mono);
-        line-height: 1;
-        margin-bottom: var(--space-2);
-      }
-
-      .ts-perf-metric {
-        font-size: 0.875rem;
-        font-weight: 700;
-        color: var(--text-primary);
-        margin-bottom: var(--space-2);
-      }
-
-      .ts-perf-desc {
-        font-size: 0.8125rem;
-        color: var(--text-muted);
-        line-height: 1.5;
-      }
-
-      .ts-perf-bar-container {
-        margin-top: var(--space-4);
-        background: var(--surface-3);
-        border-radius: var(--radius-full);
-        height: 6px;
-        overflow: hidden;
-      }
-
-      .ts-perf-bar {
-        height: 100%;
-        border-radius: var(--radius-full);
-        transition: width 1.5s cubic-bezier(0.22, 1, 0.36, 1);
-      }
-
-      /* ============================================
-         SECTION 7: FUTURE-PROOF GUARANTEES
-         ============================================ */
-      .ts-future-section {
-        background: var(--surface-0);
-      }
-
-      .ts-timeline {
-        max-width: 800px;
-        margin: 0 auto;
-        position: relative;
-        padding-left: var(--space-12);
-      }
-
-      .ts-timeline::before {
-        content: '';
-        position: absolute;
-        left: 18px;
-        top: 0;
-        bottom: 0;
-        width: 2px;
-        background: linear-gradient(180deg, var(--wc-cyan), var(--wc-accent), var(--wc-green));
-      }
-
-      .ts-timeline-item {
-        position: relative;
-        padding-bottom: var(--space-10);
-        padding-left: var(--space-6);
-      }
-
-      .ts-timeline-item:last-child {
-        padding-bottom: 0;
-      }
-
-      .ts-timeline-dot {
-        position: absolute;
-        left: calc(-1 * var(--space-12) + 10px);
-        top: 4px;
-        width: 18px;
-        height: 18px;
-        border-radius: 50%;
-        border: 3px solid;
-        background: var(--surface-0);
-        z-index: 1;
-      }
-
-      .ts-timeline-dot.ts-dot-cyan { border-color: var(--wc-cyan); box-shadow: 0 0 12px rgba(6, 182, 212, 0.4); }
-      .ts-timeline-dot.ts-dot-accent { border-color: var(--wc-accent); box-shadow: 0 0 12px rgba(102, 126, 234, 0.4); }
-      .ts-timeline-dot.ts-dot-green { border-color: var(--wc-green); box-shadow: 0 0 12px rgba(16, 185, 129, 0.4); }
-      .ts-timeline-dot.ts-dot-amber { border-color: var(--wc-amber); box-shadow: 0 0 12px rgba(245, 158, 11, 0.4); }
-      .ts-timeline-dot.ts-dot-electric { border-color: var(--wc-electric); box-shadow: 0 0 12px rgba(59, 130, 246, 0.4); }
-
-      .ts-timeline-title {
-        font-size: 1.125rem;
-        font-weight: 700;
-        color: var(--text-primary);
-        margin-bottom: var(--space-2);
-      }
-
-      .ts-timeline-desc {
-        font-size: 0.9375rem;
-        color: var(--text-secondary);
-        line-height: 1.7;
-      }
-
-      .ts-timeline-tag {
-        display: inline-block;
-        font-size: 0.6875rem;
-        font-weight: 700;
-        letter-spacing: 0.08em;
-        text-transform: uppercase;
-        padding: var(--space-1) var(--space-3);
-        border-radius: var(--radius-full);
-        margin-bottom: var(--space-2);
-      }
-
-      .ts-tag-standard {
-        background: rgba(6, 182, 212, 0.12);
-        color: var(--wc-cyan);
-      }
-
-      .ts-tag-native {
-        background: rgba(16, 185, 129, 0.12);
-        color: var(--wc-green);
-      }
-
-      .ts-tag-open {
-        background: rgba(139, 92, 246, 0.12);
-        color: var(--wc-accent);
-      }
-
-      /* Framework churn contrast */
-      .ts-churn-container {
-        max-width: 800px;
-        margin: var(--space-12) auto 0;
-        padding: var(--space-8);
-        border-radius: var(--radius-2xl);
-        background: var(--surface-1);
-        border: 1px solid var(--surface-3);
-      }
-
-      .ts-churn-title {
-        font-size: 1.125rem;
-        font-weight: 700;
-        color: var(--text-primary);
-        margin-bottom: var(--space-6);
-        text-align: center;
-      }
-
-      .ts-churn-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: var(--space-4);
-      }
-
-      .ts-churn-item {
-        padding: var(--space-4);
-        border-radius: var(--radius-lg);
-        background: rgba(239, 68, 68, 0.04);
-        border: 1px solid rgba(239, 68, 68, 0.1);
-        text-align: center;
-      }
-
-      .ts-churn-item-label {
-        font-size: 0.8125rem;
-        font-weight: 600;
-        color: var(--text-secondary);
-        margin-bottom: var(--space-1);
-      }
-
-      .ts-churn-item-versions {
-        font-size: 0.75rem;
-        color: var(--text-muted);
-        font-family: var(--font-mono);
-      }
-
-      .ts-churn-vs {
-        text-align: center;
-        margin-top: var(--space-6);
-        padding: var(--space-4);
-        border-radius: var(--radius-lg);
-        background: rgba(6, 182, 212, 0.06);
-        border: 1px solid rgba(6, 182, 212, 0.15);
-      }
-
-      .ts-churn-vs-text {
-        font-size: 0.9375rem;
-        font-weight: 700;
-        color: var(--wc-cyan);
-      }
-
-      /* ============================================
-         FOOTER CTA
-         ============================================ */
-      .ts-footer-cta {
-        padding: var(--space-24) var(--space-8);
-        text-align: center;
-        background: linear-gradient(180deg, var(--surface-0), var(--surface-1));
-      }
-
-      .ts-footer-cta-inner {
-        max-width: 700px;
-        margin: 0 auto;
-      }
-
-      .ts-footer-cta h2 {
-        font-size: clamp(2rem, 5vw, 3rem);
-        font-weight: 900;
-        letter-spacing: -0.035em;
-        margin-bottom: var(--space-5);
-        background: linear-gradient(135deg, var(--wc-cyan), var(--wc-electric), var(--wc-accent));
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
-      }
-
-      .ts-footer-cta p {
-        font-size: 1.125rem;
-        color: var(--text-secondary);
-        margin-bottom: var(--space-10);
-        line-height: 1.7;
+        padding: var(--space-16) var(--space-4);
       }
 
       .ts-footer-cta-buttons {
-        display: flex;
-        gap: var(--space-4);
-        justify-content: center;
-        flex-wrap: wrap;
-      }
-
-      .ts-btn {
-        display: inline-flex;
+        flex-direction: column;
         align-items: center;
-        gap: var(--space-2);
-        padding: var(--space-4) var(--space-8);
-        border-radius: var(--radius-xl);
-        font-size: 0.9375rem;
-        font-weight: 700;
-        transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
-        cursor: pointer;
-        border: none;
-        text-decoration: none;
       }
+    }
+  </style>
 
-      .ts-btn-solid {
-        background: linear-gradient(135deg, #06b6d4, #3b82f6);
-        color: white;
-        box-shadow: 0 4px 20px rgba(6, 182, 212, 0.3);
-      }
+  <!-- Top Navigation Bar -->
+  <nav class="ts-topbar" aria-label="Page navigation">
+    <div class="ts-topbar-left">
+      <a href="/" class="ts-back-link">
+        <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
+        Dashboard
+      </a>
+      <span class="ts-topbar-title">The 2026 Stack</span>
+    </div>
+    <div class="ts-topbar-right">
+      <a href="/prototype/tech-stack-validation/" class="ts-topbar-link">
+        <i class="fa-solid fa-flask-vial" aria-hidden="true"></i>
+        Validation Docs
+      </a>
+      <a href="/pre-planning/architecture/" class="ts-topbar-link">
+        <i class="fa-solid fa-sitemap" aria-hidden="true"></i>
+        Architecture
+      </a>
+    </div>
+  </nav>
 
-      .ts-btn-solid:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 8px 30px rgba(6, 182, 212, 0.4);
-        color: white;
-      }
+  <main>
+    <!-- SECTION 1: HERO -->
+    <section class="ts-hero" aria-label="Hero">
+      <div class="ts-hero-orb ts-hero-orb-1" aria-hidden="true"></div>
+      <div class="ts-hero-orb ts-hero-orb-2" aria-hidden="true"></div>
+      <div class="ts-hero-orb ts-hero-orb-3" aria-hidden="true"></div>
+      <div class="ts-hero-grid" aria-hidden="true"></div>
 
-      .ts-btn-ghost {
-        background: transparent;
-        color: var(--text-secondary);
-        border: 1px solid var(--glass-border-strong);
-      }
-
-      .ts-btn-ghost:hover {
-        color: var(--text-primary);
-        background: var(--glass-bg-strong);
-        transform: translateY(-2px);
-      }
-
-      .ts-btn-arrow {
-        transition: transform 0.2s ease;
-      }
-
-      .ts-btn:hover .ts-btn-arrow {
-        transform: translateX(4px);
-      }
-
-      /* ============================================
-         RESPONSIVE
-         ============================================ */
-      @media (max-width: 1024px) {
-        .ts-stack-container {
-          flex-direction: column;
-        }
-
-        .ts-stack-sidebar {
-          width: 100%;
-          flex-direction: row;
-          gap: var(--space-4);
-          padding: var(--space-4) var(--space-6);
-        }
-
-        .ts-stack-sidebar::before {
-          display: none;
-        }
-
-        .ts-flow-pipeline {
-          gap: var(--space-2);
-        }
-
-        .ts-flow-step {
-          min-width: 100px;
-          padding: var(--space-4) var(--space-2);
-        }
-      }
-
-      @media (max-width: 768px) {
-        .ts-topbar {
-          padding: var(--space-2) var(--space-4);
-        }
-
-        .ts-topbar-right {
-          display: none;
-        }
-
-        .ts-section-inner {
-          padding: var(--space-16) var(--space-4);
-        }
-
-        .ts-bundle-row {
-          grid-template-columns: 100px 1fr 50px;
-          gap: var(--space-2);
-        }
-
-        .ts-bundle-label {
-          font-size: 0.8125rem;
-        }
-
-        .ts-comp-table {
-          font-size: 0.75rem;
-        }
-
-        .ts-comp-table th,
-        .ts-comp-table td {
-          padding: var(--space-2) var(--space-3);
-        }
-
-        .ts-comparison {
-          padding: var(--space-6);
-        }
-
-        .ts-flow-pipeline {
-          flex-direction: column;
-          gap: 0;
-        }
-
-        .ts-flow-arrow {
-          transform: rotate(90deg);
-          padding: var(--space-1) 0;
-        }
-
-        .ts-flow-step {
-          flex-direction: row;
-          text-align: left;
-          gap: var(--space-4);
-          min-width: auto;
-          width: 100%;
-          max-width: 300px;
-        }
-
-        .ts-flow-icon {
-          width: 56px;
-          height: 56px;
-          flex-shrink: 0;
-        }
-
-        .ts-flow-icon img {
-          width: 28px;
-          height: 28px;
-        }
-
-        .ts-timeline {
-          padding-left: var(--space-10);
-        }
-
-        .ts-timeline::before {
-          left: 14px;
-        }
-
-        .ts-timeline-dot {
-          left: calc(-1 * var(--space-10) + 6px);
-          width: 16px;
-          height: 16px;
-        }
-
-        .ts-footer-cta-buttons {
-          flex-direction: column;
-          align-items: center;
-        }
-      }
-
-      @media (max-width: 480px) {
-        .ts-bundle-row {
-          grid-template-columns: 80px 1fr 40px;
-        }
-
-        .ts-bundle-track {
-          height: 32px;
-        }
-
-        .ts-perf-grid {
-          grid-template-columns: 1fr;
-        }
-
-        .ts-churn-grid {
-          grid-template-columns: 1fr;
-        }
-      }
-    </style>
-  </head>
-
-  <body>
-    <!-- Top Navigation Bar -->
-    <nav class="ts-topbar" aria-label="Page navigation">
-      <div class="ts-topbar-left">
-        <a href="/" class="ts-back-link">
-          <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
-          Dashboard
-        </a>
-        <span class="ts-topbar-title">The 2026 Stack</span>
+      <!-- Floating tech logos -->
+      <div class="ts-hero-floating-logos" aria-hidden="true">
+        <img src="/logos/lit.svg" alt="" class="ts-hero-floating-logo" />
+        <img src="/logos/typescript.svg" alt="" class="ts-hero-floating-logo" />
+        <img src="/logos/storybook.svg" alt="" class="ts-hero-floating-logo" />
+        <img src="/logos/vitest.svg" alt="" class="ts-hero-floating-logo" />
+        <img src="/logos/astro.svg" alt="" class="ts-hero-floating-logo" />
+        <img src="/logos/turborepo.svg" alt="" class="ts-hero-floating-logo" />
+        <img src="/logos/npm.svg" alt="" class="ts-hero-floating-logo" />
+        <img src="/logos/drupal.svg" alt="" class="ts-hero-floating-logo" />
       </div>
-      <div class="ts-topbar-right">
-        <a href="/prototype/tech-stack-validation/" class="ts-topbar-link">
-          <i class="fa-solid fa-flask-vial" aria-hidden="true"></i>
-          Validation Docs
-        </a>
-        <a href="/pre-planning/architecture/" class="ts-topbar-link">
-          <i class="fa-solid fa-sitemap" aria-hidden="true"></i>
-          Architecture
-        </a>
+
+      <div class="ts-hero-content">
+        <div class="ts-hero-badge">
+          <span class="ts-hero-badge-dot" aria-hidden="true"></span>
+          8 Technologies. Zero Defaults. All Deliberate.
+        </div>
+
+        <h1 class="ts-hero-title">
+          Every Tool Chosen<br />for a <span>Reason</span>
+        </h1>
+
+        <p class="ts-hero-subtitle">
+          The 2026 Stack: Standards-First, Framework-Agnostic, Future-Proof
+        </p>
+
+        <p class="ts-hero-description">
+          Nothing in this stack was chosen by popularity or convenience.
+          Every technology was evaluated head-to-head against alternatives,
+          measured on bundle size, Drupal compatibility, developer experience,
+          and long-term standards alignment. This page shows the receipts.
+        </p>
       </div>
-    </nav>
 
-    <main>
-      <!-- ============================================
-           SECTION 1: HERO
-           ============================================ -->
-      <section class="ts-hero" aria-label="Hero">
-        <div class="ts-hero-orb ts-hero-orb-1" aria-hidden="true"></div>
-        <div class="ts-hero-orb ts-hero-orb-2" aria-hidden="true"></div>
-        <div class="ts-hero-orb ts-hero-orb-3" aria-hidden="true"></div>
-        <div class="ts-hero-grid" aria-hidden="true"></div>
+      <div class="mouse-scroll-wrap mouse-scroll-wrap--absolute" aria-hidden="true">
+        <div class="mouse-scroll-body"><div class="mouse-scroll-wheel"></div></div>
+        <span class="mouse-scroll-label">Scroll</span>
+      </div>
+    </section>
 
-        <!-- Floating tech logos -->
-        <div class="ts-hero-floating-logos" aria-hidden="true">
-          <img src="/logos/lit.svg" alt="" class="ts-hero-floating-logo" />
-          <img src="/logos/typescript.svg" alt="" class="ts-hero-floating-logo" />
-          <img src="/logos/storybook.svg" alt="" class="ts-hero-floating-logo" />
-          <img src="/logos/vitest.svg" alt="" class="ts-hero-floating-logo" />
-          <img src="/logos/astro.svg" alt="" class="ts-hero-floating-logo" />
-          <img src="/logos/turborepo.svg" alt="" class="ts-hero-floating-logo" />
-          <img src="/logos/npm.svg" alt="" class="ts-hero-floating-logo" />
-          <img src="/logos/drupal.svg" alt="" class="ts-hero-floating-logo" />
+    <!-- SECTION 2: STACK VISUALIZATION -->
+    <StackVisualization />
+
+    <!-- SECTION 3: HEAD-TO-HEAD COMPARISONS -->
+    <StackComparisons />
+
+    <!-- SECTION 4: BUNDLE SIZE SHOWDOWN -->
+    <StackBundleSize />
+
+    <!-- SECTION 5: INTEGRATION MAP -->
+    <StackIntegrationMap />
+
+    <!-- SECTION 6: PERFORMANCE BENCHMARKS -->
+    <StackPerformance />
+
+    <!-- SECTION 7: FUTURE-PROOF GUARANTEES -->
+    <StackFutureProof />
+
+    <!-- FOOTER CTA -->
+    <section class="ts-footer-cta" aria-label="Next steps">
+      <div class="ts-footer-cta-inner scroll-reveal">
+        <h2>Explore the Full Documentation</h2>
+        <p>
+          Dive deeper into each technology decision with detailed comparison tables,
+          validation checklists, and architecture diagrams.
+        </p>
+        <div class="ts-footer-cta-buttons">
+          <a href="/prototype/tech-stack-validation/" class="ts-btn ts-btn-solid">
+            Tech Stack Validation
+            <span class="ts-btn-arrow" aria-hidden="true">&rarr;</span>
+          </a>
+          <a href="/pre-planning/architecture/" class="ts-btn ts-btn-ghost">
+            Full Architecture Docs
+            <span class="ts-btn-arrow" aria-hidden="true">&rarr;</span>
+          </a>
+          <a href="/" class="ts-btn ts-btn-ghost">
+            Back to Dashboard
+            <span class="ts-btn-arrow" aria-hidden="true">&rarr;</span>
+          </a>
         </div>
-
-        <div class="ts-hero-content">
-          <div class="ts-hero-badge">
-            <span class="ts-hero-badge-dot" aria-hidden="true"></span>
-            8 Technologies. Zero Defaults. All Deliberate.
-          </div>
-
-          <h1 class="ts-hero-title">
-            Every Tool Chosen<br />for a <span>Reason</span>
-          </h1>
-
-          <p class="ts-hero-subtitle">
-            The 2026 Stack: Standards-First, Framework-Agnostic, Future-Proof
-          </p>
-
-          <p class="ts-hero-description">
-            Nothing in this stack was chosen by popularity or convenience.
-            Every technology was evaluated head-to-head against alternatives,
-            measured on bundle size, Drupal compatibility, developer experience,
-            and long-term standards alignment. This page shows the receipts.
-          </p>
-        </div>
-
-        <div class="ts-hero-scroll" aria-hidden="true">
-          <span>Explore the stack</span>
-          <div class="ts-hero-scroll-line"></div>
-        </div>
-      </section>
-
-      <!-- ============================================
-           SECTION 2: STACK VISUALIZATION
-           ============================================ -->
-      <section class="ts-section ts-stack-section" aria-label="Stack architecture">
-        <div class="ts-section-inner">
-          <div class="ts-section-header scroll-reveal">
-            <span class="ts-section-label">Architecture</span>
-            <h2 class="ts-section-title">The Full Stack, Layered</h2>
-            <p class="ts-section-description">
-              Four horizontal layers plus a vertical design token pipeline.
-              Each layer has a clear responsibility and a specific set of tools.
-            </p>
-          </div>
-
-          <div class="ts-stack-container">
-            <div class="ts-stack-layers">
-              <!-- Layer 4: Documentation (top) -->
-              <div class="ts-stack-layer ts-layer-docs scroll-reveal scroll-reveal-delay-1">
-                <span class="ts-stack-layer-tag">Top Layer</span>
-                <h3 class="ts-stack-layer-title">Documentation</h3>
-                <div class="ts-stack-layer-techs">
-                  <span class="ts-stack-layer-tech">
-                    <img src="/logos/astro.svg" alt="" /> Astro / Starlight
-                  </span>
-                  <span class="ts-stack-layer-tech">
-                    <img src="/logos/storybook.svg" alt="" /> Storybook 10.x
-                  </span>
-                  <span class="ts-stack-layer-tech">
-                    <i class="fa-solid fa-file-code" aria-hidden="true" style="width:24px;text-align:center;color:var(--wc-accent);"></i> CEM
-                  </span>
-                </div>
-              </div>
-
-              <!-- Layer 3: Dev Experience -->
-              <div class="ts-stack-layer ts-layer-dx scroll-reveal scroll-reveal-delay-2">
-                <span class="ts-stack-layer-tag">Upper Layer</span>
-                <h3 class="ts-stack-layer-title">Developer Experience</h3>
-                <div class="ts-stack-layer-techs">
-                  <span class="ts-stack-layer-tech">
-                    <img src="/logos/storybook.svg" alt="" /> Storybook 10.x
-                  </span>
-                  <span class="ts-stack-layer-tech">
-                    <img src="/logos/vitest.svg" alt="" /> Vitest 4.x
-                  </span>
-                  <span class="ts-stack-layer-tech">
-                    <i class="fa-solid fa-masks-theater" aria-hidden="true" style="width:24px;text-align:center;color:#e2647b;"></i> Playwright
-                  </span>
-                </div>
-              </div>
-
-              <!-- Layer 2: Core -->
-              <div class="ts-stack-layer ts-layer-core scroll-reveal scroll-reveal-delay-3">
-                <span class="ts-stack-layer-tag">Core Layer</span>
-                <h3 class="ts-stack-layer-title">Component Runtime</h3>
-                <div class="ts-stack-layer-techs">
-                  <span class="ts-stack-layer-tech">
-                    <img src="/logos/lit.svg" alt="" /> Lit 3.x
-                  </span>
-                  <span class="ts-stack-layer-tech">
-                    <img src="/logos/typescript.svg" alt="" /> TypeScript 5.7
-                  </span>
-                  <span class="ts-stack-layer-tech">
-                    <i class="fa-brands fa-html5" aria-hidden="true" style="width:24px;text-align:center;color:#e34c26;"></i> Web Components
-                  </span>
-                </div>
-              </div>
-
-              <!-- Layer 1: Build Tools (bottom) -->
-              <div class="ts-stack-layer ts-layer-build scroll-reveal scroll-reveal-delay-4">
-                <span class="ts-stack-layer-tag">Foundation</span>
-                <h3 class="ts-stack-layer-title">Build Tools</h3>
-                <div class="ts-stack-layer-techs">
-                  <span class="ts-stack-layer-tech">
-                    <i class="fa-solid fa-bolt" aria-hidden="true" style="width:24px;text-align:center;color:#bd34fe;"></i> Vite
-                  </span>
-                  <span class="ts-stack-layer-tech">
-                    <img src="/logos/turborepo.svg" alt="" /> Turborepo
-                  </span>
-                  <span class="ts-stack-layer-tech">
-                    <img src="/logos/npm.svg" alt="" /> npm workspaces
-                  </span>
-                </div>
-              </div>
-            </div>
-
-            <!-- Vertical sidebar: Design Tokens -->
-            <div class="ts-stack-sidebar scroll-reveal scroll-reveal-delay-5">
-              <div class="ts-stack-sidebar-icon">
-                <i class="fa-solid fa-palette" aria-hidden="true"></i>
-              </div>
-              <div class="ts-stack-sidebar-title">Design Tokens</div>
-              <div class="ts-stack-sidebar-techs">
-                Terrazzo<br />
-                W3C DTCG<br />
-                Style Dictionary 4.x<br />
-                CSS Custom Properties
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- ============================================
-           SECTION 3: HEAD-TO-HEAD COMPARISONS
-           ============================================ -->
-      <section class="ts-section ts-comparisons-section" aria-label="Technology comparisons">
-        <div class="ts-section-inner">
-          <div class="ts-section-header scroll-reveal">
-            <span class="ts-section-label">Decisions</span>
-            <h2 class="ts-section-title">Head-to-Head Comparisons</h2>
-            <p class="ts-section-description">
-              Every major technology was evaluated against real alternatives.
-              Here are the comparison matrices that drove each decision.
-            </p>
-          </div>
-
-          <div class="ts-comparison-grid">
-
-            <!-- Comparison 1: Component Framework -->
-            <div class="ts-comparison scroll-reveal" role="region" aria-label="Component framework comparison">
-              <div class="ts-comparison-header">
-                <div class="ts-comparison-icon" style="background: rgba(50, 79, 255, 0.1); border: 1px solid rgba(50, 79, 255, 0.2);">
-                  <img src="/logos/lit.svg" alt="" style="width: 28px; height: 28px;" />
-                </div>
-                <div>
-                  <div class="ts-comparison-category">Component Framework</div>
-                  <h3 class="ts-comparison-title">Lit 3.x vs the Field</h3>
-                </div>
-              </div>
-
-              <table class="ts-comp-table">
-                <thead>
-                  <tr>
-                    <th>Criteria</th>
-                    <th class="ts-winner-col">Lit 3.x</th>
-                    <th>Stencil</th>
-                    <th>FAST</th>
-                    <th>Vanilla</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td>Bundle size</td>
-                    <td class="ts-winner-col"><strong>~5 KB</strong></td>
-                    <td>~14 KB</td>
-                    <td>~8 KB</td>
-                    <td>0 KB</td>
-                  </tr>
-                  <tr>
-                    <td>TypeScript</td>
-                    <td class="ts-winner-col"><i class="fa-solid fa-check ts-check" aria-label="Yes"></i> Native</td>
-                    <td><i class="fa-solid fa-check ts-check" aria-label="Yes"></i> Native</td>
-                    <td><i class="fa-solid fa-check ts-check" aria-label="Yes"></i> Native</td>
-                    <td><i class="fa-solid fa-minus ts-partial" aria-label="Partial"></i> Manual</td>
-                  </tr>
-                  <tr>
-                    <td>Drupal compat</td>
-                    <td class="ts-winner-col"><strong>Excellent</strong></td>
-                    <td>Good</td>
-                    <td>Good</td>
-                    <td>Excellent</td>
-                  </tr>
-                  <tr>
-                    <td>SSR support</td>
-                    <td class="ts-winner-col"><i class="fa-solid fa-check ts-check" aria-label="Yes"></i></td>
-                    <td><i class="fa-solid fa-check ts-check" aria-label="Yes"></i></td>
-                    <td><i class="fa-solid fa-xmark ts-cross" aria-label="No"></i></td>
-                    <td><i class="fa-solid fa-check ts-check" aria-label="Yes"></i></td>
-                  </tr>
-                  <tr>
-                    <td>Community</td>
-                    <td class="ts-winner-col"><strong>Large</strong></td>
-                    <td>Medium</td>
-                    <td>Small</td>
-                    <td>N/A</td>
-                  </tr>
-                  <tr>
-                    <td>Storybook</td>
-                    <td class="ts-winner-col"><i class="fa-solid fa-check ts-check" aria-label="Yes"></i> Native</td>
-                    <td><i class="fa-solid fa-minus ts-partial" aria-label="Partial"></i> Plugin</td>
-                    <td><i class="fa-solid fa-minus ts-partial" aria-label="Partial"></i> Plugin</td>
-                    <td><i class="fa-solid fa-minus ts-partial" aria-label="Partial"></i> Manual</td>
-                  </tr>
-                </tbody>
-              </table>
-
-              <div class="ts-winner-badge">
-                <i class="fa-solid fa-trophy" aria-hidden="true"></i>
-                Winner: Lit 3.x
-              </div>
-              <p class="ts-decision-text">
-                <strong>Best balance of size, DX, and Drupal compatibility.</strong>
-                5 KB runtime gives you reactive properties, Shadow DOM, and TypeScript decorators.
-                Vanilla is lighter but requires building every abstraction from scratch.
-              </p>
-            </div>
-
-            <!-- Comparison 2: Testing -->
-            <div class="ts-comparison scroll-reveal" role="region" aria-label="Testing framework comparison">
-              <div class="ts-comparison-header">
-                <div class="ts-comparison-icon" style="background: rgba(114, 155, 27, 0.1); border: 1px solid rgba(114, 155, 27, 0.2);">
-                  <img src="/logos/vitest.svg" alt="" style="width: 28px; height: 28px;" />
-                </div>
-                <div>
-                  <div class="ts-comparison-category">Testing Framework</div>
-                  <h3 class="ts-comparison-title">Vitest 4.x vs the Field</h3>
-                </div>
-              </div>
-
-              <table class="ts-comp-table">
-                <thead>
-                  <tr>
-                    <th>Criteria</th>
-                    <th class="ts-winner-col">Vitest 4.x</th>
-                    <th>Jest + JSDOM</th>
-                    <th>Web Test Runner</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td>Real browser</td>
-                    <td class="ts-winner-col"><i class="fa-solid fa-check ts-check" aria-label="Yes"></i> Yes</td>
-                    <td><i class="fa-solid fa-xmark ts-cross" aria-label="No"></i> No (JSDOM)</td>
-                    <td><i class="fa-solid fa-check ts-check" aria-label="Yes"></i> Yes</td>
-                  </tr>
-                  <tr>
-                    <td>Speed vs Jest</td>
-                    <td class="ts-winner-col"><strong>2-10x faster</strong></td>
-                    <td>Baseline</td>
-                    <td>Medium</td>
-                  </tr>
-                  <tr>
-                    <td>Storybook 10</td>
-                    <td class="ts-winner-col"><i class="fa-solid fa-check ts-check" aria-label="Yes"></i> Native</td>
-                    <td><i class="fa-solid fa-minus ts-partial" aria-label="Partial"></i> Plugin</td>
-                    <td><i class="fa-solid fa-xmark ts-cross" aria-label="No"></i> None</td>
-                  </tr>
-                  <tr>
-                    <td>Watch mode</td>
-                    <td class="ts-winner-col"><i class="fa-solid fa-check ts-check" aria-label="Yes"></i></td>
-                    <td><i class="fa-solid fa-check ts-check" aria-label="Yes"></i></td>
-                    <td><i class="fa-solid fa-check ts-check" aria-label="Yes"></i></td>
-                  </tr>
-                  <tr>
-                    <td>TypeScript</td>
-                    <td class="ts-winner-col"><i class="fa-solid fa-check ts-check" aria-label="Yes"></i> Native</td>
-                    <td><i class="fa-solid fa-minus ts-partial" aria-label="Partial"></i> Transform</td>
-                    <td><i class="fa-solid fa-check ts-check" aria-label="Yes"></i></td>
-                  </tr>
-                </tbody>
-              </table>
-
-              <div class="ts-winner-badge">
-                <i class="fa-solid fa-trophy" aria-hidden="true"></i>
-                Winner: Vitest 4.x
-              </div>
-              <p class="ts-decision-text">
-                <strong>Unified test runner for unit, browser, and Storybook tests.</strong>
-                Storybook 10 native integration is the decisive factor: one runner, one config, one mental model.
-                Real browser testing via Playwright catches issues JSDOM never will.
-              </p>
-            </div>
-
-            <!-- Comparison 3: Design Tokens -->
-            <div class="ts-comparison scroll-reveal" role="region" aria-label="Design tokens comparison">
-              <div class="ts-comparison-header">
-                <div class="ts-comparison-icon" style="background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.2);">
-                  <i class="fa-solid fa-palette" style="color: var(--wc-green);" aria-hidden="true"></i>
-                </div>
-                <div>
-                  <div class="ts-comparison-category">Design Tokens</div>
-                  <h3 class="ts-comparison-title">Terrazzo vs the Field</h3>
-                </div>
-              </div>
-
-              <table class="ts-comp-table">
-                <thead>
-                  <tr>
-                    <th>Criteria</th>
-                    <th class="ts-winner-col">Terrazzo</th>
-                    <th>Style Dictionary</th>
-                    <th>Theo</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td>W3C DTCG spec</td>
-                    <td class="ts-winner-col"><i class="fa-solid fa-check ts-check" aria-label="Yes"></i> <strong>Native</strong></td>
-                    <td><i class="fa-solid fa-minus ts-partial" aria-label="Partial"></i> Plugin</td>
-                    <td><i class="fa-solid fa-xmark ts-cross" aria-label="No"></i> No</td>
-                  </tr>
-                  <tr>
-                    <td>Output formats</td>
-                    <td class="ts-winner-col">CSS, JS, SCSS</td>
-                    <td>CSS, JS, SCSS+</td>
-                    <td>CSS, JS</td>
-                  </tr>
-                  <tr>
-                    <td>Type safety</td>
-                    <td class="ts-winner-col"><i class="fa-solid fa-check ts-check" aria-label="Yes"></i> Yes</td>
-                    <td><i class="fa-solid fa-minus ts-partial" aria-label="Partial"></i> Partial</td>
-                    <td><i class="fa-solid fa-xmark ts-cross" aria-label="No"></i> No</td>
-                  </tr>
-                  <tr>
-                    <td>Active dev</td>
-                    <td class="ts-winner-col"><i class="fa-solid fa-check ts-check" aria-label="Yes"></i> Yes</td>
-                    <td><i class="fa-solid fa-check ts-check" aria-label="Yes"></i> Yes</td>
-                    <td><i class="fa-solid fa-xmark ts-cross" aria-label="No"></i> Archived</td>
-                  </tr>
-                </tbody>
-              </table>
-
-              <div class="ts-winner-badge">
-                <i class="fa-solid fa-trophy" aria-hidden="true"></i>
-                Winner: Terrazzo
-              </div>
-              <p class="ts-decision-text">
-                <strong>Native W3C DTCG support, successor to Cobalt UI.</strong>
-                The W3C Design Tokens Community Group specification reached its first stable version (2025.10).
-                Terrazzo is the only tool built from the ground up for this standard.
-              </p>
-            </div>
-
-            <!-- Comparison 4: Build Tool -->
-            <div class="ts-comparison scroll-reveal" role="region" aria-label="Build tool comparison">
-              <div class="ts-comparison-header">
-                <div class="ts-comparison-icon" style="background: rgba(189, 52, 254, 0.1); border: 1px solid rgba(189, 52, 254, 0.2);">
-                  <i class="fa-solid fa-bolt" style="color: #bd34fe;" aria-hidden="true"></i>
-                </div>
-                <div>
-                  <div class="ts-comparison-category">Build Tool</div>
-                  <h3 class="ts-comparison-title">Vite vs the Field</h3>
-                </div>
-              </div>
-
-              <table class="ts-comp-table">
-                <thead>
-                  <tr>
-                    <th>Criteria</th>
-                    <th class="ts-winner-col">Vite</th>
-                    <th>Rollup</th>
-                    <th>esbuild</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td>Dev server</td>
-                    <td class="ts-winner-col"><i class="fa-solid fa-check ts-check" aria-label="Yes"></i> <strong>Built-in</strong></td>
-                    <td><i class="fa-solid fa-xmark ts-cross" aria-label="No"></i> Manual</td>
-                    <td><i class="fa-solid fa-xmark ts-cross" aria-label="No"></i> Manual</td>
-                  </tr>
-                  <tr>
-                    <td>Library mode</td>
-                    <td class="ts-winner-col"><i class="fa-solid fa-check ts-check" aria-label="Yes"></i> Native</td>
-                    <td><i class="fa-solid fa-check ts-check" aria-label="Yes"></i> Native</td>
-                    <td><i class="fa-solid fa-minus ts-partial" aria-label="Partial"></i> Limited</td>
-                  </tr>
-                  <tr>
-                    <td>Storybook</td>
-                    <td class="ts-winner-col"><i class="fa-solid fa-check ts-check" aria-label="Yes"></i> <strong>Native</strong></td>
-                    <td><i class="fa-solid fa-minus ts-partial" aria-label="Partial"></i> Plugin</td>
-                    <td><i class="fa-solid fa-minus ts-partial" aria-label="Partial"></i> Plugin</td>
-                  </tr>
-                  <tr>
-                    <td>Tree-shaking</td>
-                    <td class="ts-winner-col"><i class="fa-solid fa-check ts-check" aria-label="Yes"></i> Yes</td>
-                    <td><i class="fa-solid fa-check ts-check" aria-label="Yes"></i> Yes</td>
-                    <td><i class="fa-solid fa-minus ts-partial" aria-label="Partial"></i> Partial</td>
-                  </tr>
-                  <tr>
-                    <td>HMR</td>
-                    <td class="ts-winner-col"><i class="fa-solid fa-check ts-check" aria-label="Yes"></i> <strong>Instant</strong></td>
-                    <td><i class="fa-solid fa-xmark ts-cross" aria-label="No"></i> No</td>
-                    <td><i class="fa-solid fa-xmark ts-cross" aria-label="No"></i> No</td>
-                  </tr>
-                </tbody>
-              </table>
-
-              <div class="ts-winner-badge">
-                <i class="fa-solid fa-trophy" aria-hidden="true"></i>
-                Winner: Vite
-              </div>
-              <p class="ts-decision-text">
-                <strong>Native library mode powers both Storybook and the component build.</strong>
-                Vite uses Rollup under the hood for production but adds instant HMR, a built-in dev server,
-                and first-class Storybook 10 support. Best of all worlds.
-              </p>
-            </div>
-
-            <!-- Comparison 5: Documentation -->
-            <div class="ts-comparison scroll-reveal" role="region" aria-label="Documentation system comparison">
-              <div class="ts-comparison-header">
-                <div class="ts-comparison-icon" style="background: rgba(255, 93, 1, 0.1); border: 1px solid rgba(255, 93, 1, 0.2);">
-                  <img src="/logos/astro.svg" alt="" style="width: 28px; height: 28px;" />
-                </div>
-                <div>
-                  <div class="ts-comparison-category">Documentation</div>
-                  <h3 class="ts-comparison-title">Dual System: Starlight + Storybook</h3>
-                </div>
-              </div>
-
-              <table class="ts-comp-table">
-                <thead>
-                  <tr>
-                    <th>Responsibility</th>
-                    <th>Storybook 10.x</th>
-                    <th>Astro / Starlight</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td>Interactive demos</td>
-                    <td><i class="fa-solid fa-check ts-check" aria-label="Yes"></i> <strong>Primary</strong></td>
-                    <td>Embedded via iframe</td>
-                  </tr>
-                  <tr>
-                    <td>API reference</td>
-                    <td>Autodocs (from CEM)</td>
-                    <td><i class="fa-solid fa-check ts-check" aria-label="Yes"></i> <strong>Comprehensive</strong></td>
-                  </tr>
-                  <tr>
-                    <td>Integration guides</td>
-                    <td>--</td>
-                    <td><i class="fa-solid fa-check ts-check" aria-label="Yes"></i> <strong>Prose + tutorials</strong></td>
-                  </tr>
-                  <tr>
-                    <td>Visual testing</td>
-                    <td><i class="fa-solid fa-check ts-check" aria-label="Yes"></i> <strong>Chromatic</strong></td>
-                    <td>--</td>
-                  </tr>
-                  <tr>
-                    <td>Search</td>
-                    <td>Pagefind (merged)</td>
-                    <td><i class="fa-solid fa-check ts-check" aria-label="Yes"></i> <strong>Pagefind (unified)</strong></td>
-                  </tr>
-                  <tr>
-                    <td>JS shipped</td>
-                    <td>React runtime</td>
-                    <td><strong>0 KB</strong> (static HTML)</td>
-                  </tr>
-                </tbody>
-              </table>
-
-              <div class="ts-winner-badge">
-                <i class="fa-solid fa-trophy" aria-hidden="true"></i>
-                Winner: Both -- complementary systems
-              </div>
-              <p class="ts-decision-text">
-                <strong>Storybook answers "what does it look like?" Starlight answers "how do I use it?"</strong>
-                CEM acts as the single source of truth feeding API docs into both systems.
-                Pagefind mergeIndex provides unified cross-site search.
-              </p>
-            </div>
-
-          </div>
-        </div>
-      </section>
-
-      <!-- ============================================
-           SECTION 4: BUNDLE SIZE SHOWDOWN
-           ============================================ -->
-      <section class="ts-section ts-bundle-section" aria-label="Bundle size comparison">
-        <div class="ts-section-inner">
-          <div class="ts-section-header scroll-reveal">
-            <span class="ts-section-label">Performance</span>
-            <h2 class="ts-section-title">Bundle Size Showdown</h2>
-            <p class="ts-section-description">
-              The runtime cost of choosing a component framework.
-              Lit's ~5 KB gives you full reactive Web Components.
-              Compare that to shipping an entire framework.
-            </p>
-          </div>
-
-          <div class="ts-bundle-container">
-            <div class="ts-bundle-bars scroll-reveal">
-              <!-- Lit -->
-              <div class="ts-bundle-row">
-                <div class="ts-bundle-label">
-                  <img src="/logos/lit.svg" alt="" /> Lit 3.x
-                </div>
-                <div class="ts-bundle-track">
-                  <div class="ts-bundle-fill ts-fill-lit"></div>
-                </div>
-                <div class="ts-bundle-size">~5 KB</div>
-              </div>
-
-              <!-- Vue -->
-              <div class="ts-bundle-row">
-                <div class="ts-bundle-label">
-                  <i class="fa-brands fa-vuejs" style="color: #42b883; width: 24px; text-align: center;" aria-hidden="true"></i> Vue 3
-                </div>
-                <div class="ts-bundle-track">
-                  <div class="ts-bundle-fill ts-fill-vue"></div>
-                </div>
-                <div class="ts-bundle-size">~30 KB</div>
-              </div>
-
-              <!-- React -->
-              <div class="ts-bundle-row">
-                <div class="ts-bundle-label">
-                  <i class="fa-brands fa-react" style="color: #61dafb; width: 24px; text-align: center;" aria-hidden="true"></i> React 19
-                </div>
-                <div class="ts-bundle-track">
-                  <div class="ts-bundle-fill ts-fill-react"></div>
-                </div>
-                <div class="ts-bundle-size">~40 KB</div>
-              </div>
-
-              <!-- Angular -->
-              <div class="ts-bundle-row">
-                <div class="ts-bundle-label">
-                  <i class="fa-brands fa-angular" style="color: #dd0031; width: 24px; text-align: center;" aria-hidden="true"></i> Angular
-                </div>
-                <div class="ts-bundle-track">
-                  <div class="ts-bundle-fill ts-fill-angular"></div>
-                </div>
-                <div class="ts-bundle-size">~80 KB</div>
-              </div>
-            </div>
-
-            <div class="ts-bundle-highlight scroll-reveal scroll-reveal-delay-2">
-              <div class="ts-bundle-highlight-number">~5 KB</div>
-              <div class="ts-bundle-highlight-text">
-                Gets you Web Components that work EVERYWHERE
-              </div>
-              <div class="ts-bundle-highlight-sub">
-                Drupal, React, Vue, Angular, Svelte, static HTML -- no adapter needed.
-                The browser IS the framework.
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- ============================================
-           SECTION 5: INTEGRATION MAP
-           ============================================ -->
-      <section class="ts-section ts-flow-section" aria-label="Integration pipeline">
-        <div class="ts-section-inner">
-          <div class="ts-section-header scroll-reveal">
-            <span class="ts-section-label">Pipeline</span>
-            <h2 class="ts-section-title">The Integration Map</h2>
-            <p class="ts-section-description">
-              How every tool connects in the development pipeline,
-              from authoring a component to deploying it in Drupal.
-            </p>
-          </div>
-
-          <div class="ts-flow-pipeline scroll-reveal">
-            <!-- Author -->
-            <div class="ts-flow-step">
-              <div class="ts-flow-icon ts-flow-author">
-                <img src="/logos/lit.svg" alt="" />
-              </div>
-              <div>
-                <div class="ts-flow-label">Author</div>
-                <div class="ts-flow-sub">Lit + TypeScript</div>
-              </div>
-            </div>
-
-            <div class="ts-flow-arrow" aria-hidden="true">
-              <i class="fa-solid fa-chevron-right"></i>
-            </div>
-
-            <!-- Test -->
-            <div class="ts-flow-step">
-              <div class="ts-flow-icon ts-flow-test">
-                <img src="/logos/vitest.svg" alt="" />
-              </div>
-              <div>
-                <div class="ts-flow-label">Test</div>
-                <div class="ts-flow-sub">Vitest + Playwright</div>
-              </div>
-            </div>
-
-            <div class="ts-flow-arrow" aria-hidden="true">
-              <i class="fa-solid fa-chevron-right"></i>
-            </div>
-
-            <!-- Document -->
-            <div class="ts-flow-step">
-              <div class="ts-flow-icon ts-flow-document">
-                <img src="/logos/storybook.svg" alt="" />
-              </div>
-              <div>
-                <div class="ts-flow-label">Document</div>
-                <div class="ts-flow-sub">Storybook + CEM</div>
-              </div>
-            </div>
-
-            <div class="ts-flow-arrow" aria-hidden="true">
-              <i class="fa-solid fa-chevron-right"></i>
-            </div>
-
-            <!-- Build -->
-            <div class="ts-flow-step">
-              <div class="ts-flow-icon ts-flow-build">
-                <i class="fa-solid fa-bolt" aria-hidden="true"></i>
-              </div>
-              <div>
-                <div class="ts-flow-label">Build</div>
-                <div class="ts-flow-sub">Vite + Turborepo</div>
-              </div>
-            </div>
-
-            <div class="ts-flow-arrow" aria-hidden="true">
-              <i class="fa-solid fa-chevron-right"></i>
-            </div>
-
-            <!-- Publish -->
-            <div class="ts-flow-step">
-              <div class="ts-flow-icon ts-flow-publish">
-                <img src="/logos/npm.svg" alt="" />
-              </div>
-              <div>
-                <div class="ts-flow-label">Publish</div>
-                <div class="ts-flow-sub">npm registry</div>
-              </div>
-            </div>
-
-            <div class="ts-flow-arrow" aria-hidden="true">
-              <i class="fa-solid fa-chevron-right"></i>
-            </div>
-
-            <!-- Integrate -->
-            <div class="ts-flow-step">
-              <div class="ts-flow-icon ts-flow-integrate">
-                <img src="/logos/drupal.svg" alt="" />
-              </div>
-              <div>
-                <div class="ts-flow-label">Integrate</div>
-                <div class="ts-flow-sub">Drupal CMS</div>
-              </div>
-            </div>
-          </div>
-
-          <div class="ts-flow-cem-note scroll-reveal scroll-reveal-delay-2">
-            <div class="ts-flow-cem-note-title">
-              <i class="fa-solid fa-link" aria-hidden="true"></i>
-              CEM: The Glue Between Systems
-            </div>
-            <div class="ts-flow-cem-note-text">
-              The Custom Elements Manifest (CEM) is a machine-readable JSON contract
-              generated from JSDoc annotations. It feeds Storybook autodocs, Starlight API pages,
-              IDE IntelliSense, and Drupal tooling -- all from a single source of truth.
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- ============================================
-           SECTION 6: PERFORMANCE BENCHMARKS
-           ============================================ -->
-      <section class="ts-section ts-perf-section" aria-label="Performance benchmarks">
-        <div class="ts-section-inner">
-          <div class="ts-section-header scroll-reveal">
-            <span class="ts-section-label">Benchmarks</span>
-            <h2 class="ts-section-title">Performance by the Numbers</h2>
-            <p class="ts-section-description">
-              Measured metrics from the prototype build.
-              Every number here is a real measurement, not a marketing claim.
-            </p>
-          </div>
-
-          <div class="ts-perf-grid">
-            <!-- Build Time -->
-            <div class="ts-perf-card scroll-reveal scroll-reveal-delay-1">
-              <div class="ts-perf-icon" style="color: var(--wc-cyan);">
-                <i class="fa-solid fa-gauge-high" aria-hidden="true"></i>
-              </div>
-              <div class="ts-perf-value" style="color: var(--wc-cyan);">&lt;2s</div>
-              <div class="ts-perf-metric">Full Library Build</div>
-              <div class="ts-perf-desc">
-                TypeScript compilation via tsc. No bundler overhead for the library package.
-              </div>
-              <div class="ts-perf-bar-container">
-                <div class="ts-perf-bar" style="width: 15%; background: var(--wc-cyan);"></div>
-              </div>
-            </div>
-
-            <!-- Test Speed -->
-            <div class="ts-perf-card scroll-reveal scroll-reveal-delay-2">
-              <div class="ts-perf-icon" style="color: var(--wc-green);">
-                <i class="fa-solid fa-bolt-lightning" aria-hidden="true"></i>
-              </div>
-              <div class="ts-perf-value" style="color: var(--wc-green);">2-10x</div>
-              <div class="ts-perf-metric">Faster Than Jest</div>
-              <div class="ts-perf-desc">
-                Vitest with Vite's transform pipeline. Real browser tests via Playwright.
-              </div>
-              <div class="ts-perf-bar-container">
-                <div class="ts-perf-bar" style="width: 85%; background: var(--wc-green);"></div>
-              </div>
-            </div>
-
-            <!-- First Paint -->
-            <div class="ts-perf-card scroll-reveal scroll-reveal-delay-3">
-              <div class="ts-perf-icon" style="color: var(--wc-electric);">
-                <i class="fa-solid fa-eye" aria-hidden="true"></i>
-              </div>
-              <div class="ts-perf-value" style="color: var(--wc-electric);">100</div>
-              <div class="ts-perf-metric">Lighthouse Score</div>
-              <div class="ts-perf-desc">
-                Starlight docs ship zero JS by default. Static HTML with island architecture.
-              </div>
-              <div class="ts-perf-bar-container">
-                <div class="ts-perf-bar" style="width: 100%; background: var(--wc-electric);"></div>
-              </div>
-            </div>
-
-            <!-- Tree Shaking -->
-            <div class="ts-perf-card scroll-reveal scroll-reveal-delay-4">
-              <div class="ts-perf-icon" style="color: var(--wc-accent);">
-                <i class="fa-solid fa-tree" aria-hidden="true"></i>
-              </div>
-              <div class="ts-perf-value" style="color: var(--wc-accent);">100%</div>
-              <div class="ts-perf-metric">Tree-Shakeable</div>
-              <div class="ts-perf-desc">
-                Per-component ES module entry points. Import only what you use.
-              </div>
-              <div class="ts-perf-bar-container">
-                <div class="ts-perf-bar" style="width: 100%; background: var(--wc-accent);"></div>
-              </div>
-            </div>
-
-            <!-- Storybook Install -->
-            <div class="ts-perf-card scroll-reveal scroll-reveal-delay-5">
-              <div class="ts-perf-icon" style="color: var(--wc-pink);">
-                <i class="fa-solid fa-download" aria-hidden="true"></i>
-              </div>
-              <div class="ts-perf-value" style="color: var(--wc-pink);">48%</div>
-              <div class="ts-perf-metric">Leaner Install (SB9)</div>
-              <div class="ts-perf-desc">
-                Storybook 10's flatter dependency tree. Meaningful for CI cache sizes.
-              </div>
-              <div class="ts-perf-bar-container">
-                <div class="ts-perf-bar" style="width: 52%; background: var(--wc-pink);"></div>
-              </div>
-            </div>
-
-            <!-- Runtime Deps -->
-            <div class="ts-perf-card scroll-reveal scroll-reveal-delay-6">
-              <div class="ts-perf-icon" style="color: var(--wc-amber);">
-                <i class="fa-solid fa-cube" aria-hidden="true"></i>
-              </div>
-              <div class="ts-perf-value" style="color: var(--wc-amber);">1</div>
-              <div class="ts-perf-metric">Runtime Dependency</div>
-              <div class="ts-perf-desc">
-                Lit is the only runtime dependency. Everything else is devDependencies.
-              </div>
-              <div class="ts-perf-bar-container">
-                <div class="ts-perf-bar" style="width: 8%; background: var(--wc-amber);"></div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- ============================================
-           SECTION 7: FUTURE-PROOF GUARANTEES
-           ============================================ -->
-      <section class="ts-section ts-future-section" aria-label="Future-proof guarantees">
-        <div class="ts-section-inner">
-          <div class="ts-section-header scroll-reveal">
-            <span class="ts-section-label">Longevity</span>
-            <h2 class="ts-section-title">This Stack Will Still Work in 2030</h2>
-            <p class="ts-section-description">
-              Every core technology is backed by a W3C standard, browser-native API,
-              or open specification. No single vendor controls the stack.
-            </p>
-          </div>
-
-          <div class="ts-timeline scroll-reveal">
-            <div class="ts-timeline-item">
-              <div class="ts-timeline-dot ts-dot-cyan" aria-hidden="true"></div>
-              <span class="ts-timeline-tag ts-tag-standard">W3C Standard</span>
-              <h3 class="ts-timeline-title">Web Components (Custom Elements v1)</h3>
-              <p class="ts-timeline-desc">
-                A W3C standard since 2018, natively supported in all modern browsers.
-                No polyfills needed for Chrome 90+, Firefox 88+, Safari 14+.
-                The browser IS the runtime -- no framework needed to render.
-              </p>
-            </div>
-
-            <div class="ts-timeline-item">
-              <div class="ts-timeline-dot ts-dot-green" aria-hidden="true"></div>
-              <span class="ts-timeline-tag ts-tag-native">Browser Native</span>
-              <h3 class="ts-timeline-title">Shadow DOM + CSS Custom Properties</h3>
-              <p class="ts-timeline-desc">
-                Shadow DOM provides true encapsulation. CSS custom properties pierce
-                through Shadow DOM, providing the only viable theming mechanism.
-                Both are browser-native APIs that require zero library support.
-              </p>
-            </div>
-
-            <div class="ts-timeline-item">
-              <div class="ts-timeline-dot ts-dot-accent" aria-hidden="true"></div>
-              <span class="ts-timeline-tag ts-tag-open">Open Specification</span>
-              <h3 class="ts-timeline-title">Custom Elements Manifest (CEM)</h3>
-              <p class="ts-timeline-desc">
-                An open community specification for documenting Web Component APIs.
-                Machine-readable JSON that feeds Storybook, IDEs, and documentation systems.
-                Not controlled by any single vendor.
-              </p>
-            </div>
-
-            <div class="ts-timeline-item">
-              <div class="ts-timeline-dot ts-dot-amber" aria-hidden="true"></div>
-              <span class="ts-timeline-tag ts-tag-standard">W3C Standard</span>
-              <h3 class="ts-timeline-title">W3C DTCG Design Tokens (2025.10)</h3>
-              <p class="ts-timeline-desc">
-                The W3C Design Tokens Community Group specification reached its first
-                stable version in October 2025. Token files written today are forward-compatible
-                with every tool that adopts the standard.
-              </p>
-            </div>
-
-            <div class="ts-timeline-item">
-              <div class="ts-timeline-dot ts-dot-electric" aria-hidden="true"></div>
-              <span class="ts-timeline-tag ts-tag-native">Browser Native</span>
-              <h3 class="ts-timeline-title">ES Modules</h3>
-              <p class="ts-timeline-desc">
-                Standard ES2021 modules shipped directly to the browser. No CommonJS, no UMD.
-                Modern Drupal (10.3+) and all evergreen browsers support ES modules natively.
-                The distribution format will never need a major migration.
-              </p>
-            </div>
-          </div>
-
-          <!-- Framework churn contrast -->
-          <div class="ts-churn-container scroll-reveal scroll-reveal-delay-2">
-            <h3 class="ts-churn-title">
-              Meanwhile, in Framework Land...
-            </h3>
-            <div class="ts-churn-grid">
-              <div class="ts-churn-item">
-                <div class="ts-churn-item-label">React</div>
-                <div class="ts-churn-item-versions">16 &rarr; 17 &rarr; 18 &rarr; 19</div>
-              </div>
-              <div class="ts-churn-item">
-                <div class="ts-churn-item-label">Angular</div>
-                <div class="ts-churn-item-versions">12 &rarr; 13 &rarr; ... &rarr; 19</div>
-              </div>
-              <div class="ts-churn-item">
-                <div class="ts-churn-item-label">Vue</div>
-                <div class="ts-churn-item-versions">2 &rarr; 3 (breaking)</div>
-              </div>
-            </div>
-            <div class="ts-churn-vs">
-              <div class="ts-churn-vs-text">
-                <i class="fa-solid fa-shield-halved" aria-hidden="true"></i>
-                WC-2026: Web Components v1 -- unchanged since 2018, supported forever
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- ============================================
-           FOOTER CTA
-           ============================================ -->
-      <section class="ts-footer-cta" aria-label="Next steps">
-        <div class="ts-footer-cta-inner scroll-reveal">
-          <h2>Explore the Full Documentation</h2>
-          <p>
-            Dive deeper into each technology decision with detailed comparison tables,
-            validation checklists, and architecture diagrams.
-          </p>
-          <div class="ts-footer-cta-buttons">
-            <a href="/prototype/tech-stack-validation/" class="ts-btn ts-btn-solid">
-              Tech Stack Validation
-              <span class="ts-btn-arrow" aria-hidden="true">&rarr;</span>
-            </a>
-            <a href="/pre-planning/architecture/" class="ts-btn ts-btn-ghost">
-              Full Architecture Docs
-              <span class="ts-btn-arrow" aria-hidden="true">&rarr;</span>
-            </a>
-            <a href="/" class="ts-btn ts-btn-ghost">
-              Back to Dashboard
-              <span class="ts-btn-arrow" aria-hidden="true">&rarr;</span>
-            </a>
-          </div>
-        </div>
-      </section>
-    </main>
-
-    <script is:inline>
-      // Scroll-reveal animation using Intersection Observer
-      // Respects prefers-reduced-motion
-      (function () {
-        var prefersReduced = window.matchMedia(
-          '(prefers-reduced-motion: reduce)'
-        ).matches;
-
-        if (prefersReduced) {
-          document.querySelectorAll('.scroll-reveal').forEach(function (el) {
-            el.classList.add('is-visible');
+      </div>
+    </section>
+  </main>
+
+  <ScrollRevealScript
+    slot="scripts"
+    cardSelectors={['.ts-comparison', '.ts-card']}
+  />
+
+  <script is:inline>
+    // Animate bundle bars on scroll
+    (function () {
+      var prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if (prefersReduced) return;
+
+      var bundleObserver = new IntersectionObserver(
+        function (entries) {
+          entries.forEach(function (entry) {
+            if (entry.isIntersecting) {
+              entry.target.querySelectorAll('.ts-bundle-fill').forEach(function (bar) {
+                bar.style.animationPlayState = 'running';
+              });
+              bundleObserver.unobserve(entry.target);
+            }
           });
-          return;
-        }
+        },
+        { threshold: 0.3 }
+      );
 
-        var observer = new IntersectionObserver(
-          function (entries) {
-            entries.forEach(function (entry) {
-              if (entry.isIntersecting) {
-                entry.target.classList.add('is-visible');
-                observer.unobserve(entry.target);
-              }
-            });
-          },
-          {
-            threshold: 0.1,
-            rootMargin: '0px 0px -60px 0px',
-          }
-        );
-
-        document.querySelectorAll('.scroll-reveal').forEach(function (el) {
-          observer.observe(el);
-        });
-
-        // Cursor-following spotlight effect on comparison cards
-        document.querySelectorAll('.ts-comparison, .ts-card').forEach(function (card) {
-          card.addEventListener('mousemove', function (e) {
-            var rect = card.getBoundingClientRect();
-            var x = e.clientX - rect.left;
-            var y = e.clientY - rect.top;
-            card.style.setProperty('--mouse-x', x + 'px');
-            card.style.setProperty('--mouse-y', y + 'px');
-          });
-        });
-
-        // Animate bundle bars on scroll
-        var bundleObserver = new IntersectionObserver(
-          function (entries) {
-            entries.forEach(function (entry) {
-              if (entry.isIntersecting) {
-                entry.target.querySelectorAll('.ts-bundle-fill').forEach(function (bar) {
-                  bar.style.animationPlayState = 'running';
-                });
-                bundleObserver.unobserve(entry.target);
-              }
-            });
-          },
-          { threshold: 0.3 }
-        );
-
-        var bundleBars = document.querySelector('.ts-bundle-bars');
-        if (bundleBars) {
-          bundleObserver.observe(bundleBars);
-        }
-      })();
-    </script>
-  </body>
-</html>
+      var bundleBars = document.querySelector('.ts-bundle-bars');
+      if (bundleBars) {
+        bundleObserver.observe(bundleBars);
+      }
+    })();
+  </script>
+</ShowcaseLayout>

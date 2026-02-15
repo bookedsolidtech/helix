@@ -1,0 +1,107 @@
+/* ==========================================================================
+ * _checkbox.css — Checkbox styles for native form elements
+ *
+ * Matches the visual appearance of the Shadow DOM wc-checkbox component.
+ * Uses appearance: none with custom visual rendering.
+ * ==========================================================================
+ */
+
+input[type='checkbox'] {
+  /* Reset native appearance */
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+
+  /* Visual sizing */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: var(--wc-checkbox-size, var(--wc-size-5, 1.25rem));
+  height: var(--wc-checkbox-size, var(--wc-size-5, 1.25rem));
+  margin: 0;
+
+  /* Border and shape */
+  border: var(--wc-border-width-medium, 2px) solid var(--wc-checkbox-border-color, var(--wc-color-neutral-300, #ced4da));
+  border-radius: var(--wc-checkbox-border-radius, var(--wc-border-radius-sm, 0.25rem));
+  background-color: var(--wc-color-neutral-0, #ffffff);
+
+  /* Transition */
+  transition: background-color var(--wc-transition-fast, 150ms ease),
+              border-color var(--wc-transition-fast, 150ms ease),
+              box-shadow var(--wc-transition-fast, 150ms ease);
+
+  cursor: pointer;
+  vertical-align: middle;
+}
+
+/* ─── Checked State ─── */
+
+input[type='checkbox']:checked {
+  background-color: var(--wc-checkbox-checked-bg, var(--wc-color-primary-500, #007878));
+  border-color: var(--wc-checkbox-checked-border-color, var(--wc-color-primary-500, #007878));
+
+  /* Checkmark via encoded SVG */
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none'%3E%3Cpath d='M3.5 8.5L6.5 11.5L12.5 4.5' stroke='%23ffffff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 100%;
+}
+
+/* ─── Indeterminate State ─── */
+
+input[type='checkbox']:indeterminate {
+  background-color: var(--wc-checkbox-checked-bg, var(--wc-color-primary-500, #007878));
+  border-color: var(--wc-checkbox-checked-border-color, var(--wc-color-primary-500, #007878));
+
+  /* Dash via encoded SVG */
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none'%3E%3Cpath d='M4 8H12' stroke='%23ffffff' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 100%;
+}
+
+/* ─── Focus State ─── */
+
+input[type='checkbox']:focus-visible {
+  outline: var(--wc-focus-ring-width, 2px) solid var(--wc-checkbox-focus-ring-color, var(--wc-focus-ring-color, #007878));
+  outline-offset: var(--wc-focus-ring-offset, 2px);
+}
+
+/* ─── Hover State ─── */
+
+input[type='checkbox']:hover:not(:disabled) {
+  border-color: var(--wc-color-primary-500, #007878);
+}
+
+input[type='checkbox']:checked:hover:not(:disabled) {
+  filter: brightness(var(--wc-filter-brightness-hover, 0.9));
+}
+
+/* ─── Disabled State ─── */
+
+input[type='checkbox']:disabled {
+  opacity: var(--wc-opacity-disabled, 0.5);
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* ─── Checkbox + Label Layout ─── */
+
+.form-type-checkbox,
+.form-type-checkbox-toggle {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--wc-space-2, 0.5rem);
+}
+
+.form-type-checkbox label,
+.form-type-checkbox-toggle label {
+  font-size: var(--wc-font-size-sm, 0.875rem);
+  font-weight: var(--wc-font-weight-medium, 500);
+  color: var(--wc-checkbox-label-color, var(--wc-color-neutral-700, #343a40));
+  line-height: var(--wc-line-height-normal, 1.5);
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+}

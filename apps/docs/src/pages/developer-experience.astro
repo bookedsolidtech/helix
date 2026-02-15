@@ -11,1470 +11,425 @@
  * 2. Quality Pipeline - Four Automated Gates, Zero Manual Steps
  * 3. CI/CD & Delivery - From Commit to CDN in 8 Seconds
  */
+import ShowcaseLayout from '../layouts/ShowcaseLayout.astro';
+import DxTab1Onboarding from '../components/showcase/dx/DxTab1Onboarding.astro';
+import DxTab2QualityPipeline from '../components/showcase/dx/DxTab2QualityPipeline.astro';
+import DxTab3CiCd from '../components/showcase/dx/DxTab3CiCd.astro';
 ---
 
-<!doctype html>
-<html lang="en" data-theme="dark">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Developer Experience &amp; Quality Pipeline | WC-2026</title>
-    <meta
-      name="description"
-      content="From first clone to production confidence in under 5 minutes. Developer onboarding, automated quality gates, and Turborepo-powered CI/CD delivery."
-    />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=JetBrains+Mono:wght@400;500;600;700&display=swap"
-      rel="stylesheet"
-    />
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
-      integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg=="
-      crossorigin="anonymous"
-      referrerpolicy="no-referrer"
-    />
+<ShowcaseLayout
+  title="Developer Experience &amp; Quality Pipeline"
+  description="From first clone to production confidence in under 5 minutes. Developer onboarding, automated quality gates, and Turborepo-powered CI/CD delivery."
+>
+  <style is:inline>
+    /* ==========================================
+       PAGE-LEVEL TOKEN OVERRIDES
+       (tokens not in shared tokens.css)
+       ========================================== */
+    :root {
+      --wc-violet: #8b5cf6;
+      --wc-indigo: #6366f1;
+      --gradient-cyan-white: linear-gradient(135deg, #06b6d4, #ffffff);
+      --gradient-green-emerald: linear-gradient(135deg, #10b981, #059669);
+      --gradient-violet-indigo: linear-gradient(135deg, #8b5cf6, #6366f1);
+    }
 
-    <style>
-      /* ============================================
-         DEVELOPER EXPERIENCE PAGE - Self-contained
-         ============================================ */
+    /* ==========================================
+       TOP NAVIGATION BAR
+       ========================================== */
+    .dx-topbar { position:fixed; top:0; left:0; right:0; z-index:100; display:flex; align-items:center; justify-content:space-between; padding:var(--space-3) var(--space-8); background:rgba(10,10,20,0.85); backdrop-filter:blur(16px) saturate(180%); -webkit-backdrop-filter:blur(16px) saturate(180%); border-bottom:1px solid rgba(255,255,255,0.06); }
+    .dx-topbar-left { display:flex; align-items:center; gap:var(--space-4); }
+    .dx-back-link { display:inline-flex; align-items:center; gap:var(--space-2); font-size:0.875rem; font-weight:600; color:var(--text-secondary); transition:all 0.2s ease; padding:var(--space-2) var(--space-3); border-radius:var(--radius-md); }
+    .dx-back-link:hover { color:var(--text-primary); background:var(--glass-bg-strong); }
+    .dx-topbar-title { font-size:0.875rem; font-weight:700; color:var(--text-primary); letter-spacing:-0.01em; }
+    .dx-topbar-right { display:flex; align-items:center; gap:var(--space-3); }
+    .dx-topbar-link { display:inline-flex; align-items:center; gap:var(--space-2); font-size:0.8125rem; font-weight:600; color:var(--text-muted); padding:var(--space-2) var(--space-4); border-radius:var(--radius-md); border:1px solid rgba(255,255,255,0.08); transition:all 0.2s ease; }
+    .dx-topbar-link:hover { color:var(--wc-accent); border-color:rgba(102,126,234,0.3); background:rgba(102,126,234,0.06); }
 
-      @property --gradient-angle {
-        syntax: '<angle>';
-        initial-value: 0deg;
-        inherits: false;
-      }
+    /* ==========================================
+       STICKY TAB NAV (3-tab content switcher)
+       ========================================== */
+    .dx-section-nav { position:sticky; top:3.9rem; z-index:90; background:rgba(10,10,20,0.92); backdrop-filter:blur(20px) saturate(180%); -webkit-backdrop-filter:blur(20px) saturate(180%); border-bottom:1px solid rgba(255,255,255,0.08); }
+    .dx-section-nav-inner { display:flex; max-width:1200px; margin:0 auto; padding:0.5rem; gap:0.5rem; }
+    .dx-nav-tab { flex:1; display:flex; flex-direction:column; align-items:center; gap:0.25rem; padding:0.75rem 1.5rem; border-radius:0.75rem; border:1px solid transparent; background:transparent; color:rgba(255,255,255,0.45); cursor:pointer; transition:all 0.25s ease; font-family:var(--font-heading); }
+    .dx-nav-tab i { font-size:1.25rem; opacity:0.5; transition:all 0.25s ease; }
+    .dx-nav-tab-label { font-size:0.9375rem; font-weight:700; letter-spacing:-0.01em; }
+    .dx-nav-tab-subtitle { font-size:0.6875rem; font-weight:500; text-transform:uppercase; letter-spacing:0.06em; opacity:0.5; }
+    .dx-nav-tab:hover { color:rgba(255,255,255,0.8); background:rgba(255,255,255,0.04); }
+    .dx-nav-tab:hover i { opacity:0.9; }
+    .dx-nav-tab.is-active { color:white; background:rgba(102,126,234,0.1); border-color:rgba(102,126,234,0.25); box-shadow:0 0 20px rgba(102,126,234,0.08); }
+    .dx-nav-tab.is-active i { opacity:1; color:var(--wc-accent); }
+    .dx-nav-tab.is-active .dx-nav-tab-subtitle { opacity:0.8; }
+    .dx-nav-tab:focus-visible { outline:2px solid var(--wc-accent); outline-offset:2px; }
 
-      :root {
-        --wc-accent-h: 250;
-        --wc-accent-s: 70%;
-        --wc-accent-l: 60%;
-        --wc-accent: hsl(var(--wc-accent-h), var(--wc-accent-s), var(--wc-accent-l));
-        --wc-cyan: #06b6d4;
-        --wc-pink: #ec4899;
-        --wc-green: #10b981;
-        --wc-emerald: #059669;
-        --wc-amber: #f59e0b;
-        --wc-red: #ef4444;
-        --wc-electric: #3b82f6;
-        --wc-violet: #8b5cf6;
-        --wc-indigo: #6366f1;
+    /* Tab-specific active colors */
+    .dx-nav-tab[data-tab="tab-dx"].is-active { background:rgba(6,182,212,0.1); border-color:rgba(6,182,212,0.25); box-shadow:0 0 20px rgba(6,182,212,0.08); }
+    .dx-nav-tab[data-tab="tab-dx"].is-active i { color:var(--wc-cyan); }
+    .dx-nav-tab[data-tab="tab-quality"].is-active { background:rgba(16,185,129,0.1); border-color:rgba(16,185,129,0.25); box-shadow:0 0 20px rgba(16,185,129,0.08); }
+    .dx-nav-tab[data-tab="tab-quality"].is-active i { color:var(--wc-green); }
+    .dx-nav-tab[data-tab="tab-cicd"].is-active { background:rgba(139,92,246,0.1); border-color:rgba(139,92,246,0.25); box-shadow:0 0 20px rgba(139,92,246,0.08); }
+    .dx-nav-tab[data-tab="tab-cicd"].is-active i { color:var(--wc-violet); }
 
-        --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        --gradient-hero: linear-gradient(135deg, #0a0a1a 0%, #1a1040 40%, #0f0f2e 100%);
-        --gradient-cyan-white: linear-gradient(135deg, #06b6d4, #ffffff);
-        --gradient-green-emerald: linear-gradient(135deg, #10b981, #059669);
-        --gradient-violet-indigo: linear-gradient(135deg, #8b5cf6, #6366f1);
+    /* Tab content panels */
+    .dx-tab-content { display:none; }
+    .dx-tab-content.is-active { display:block; }
 
-        --font-heading: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-        --font-body: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-        --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+    /* ==========================================
+       HERO (shared base, color variants per tab)
+       ========================================== */
+    .dx-hero { min-height:100vh; min-height:100dvh; display:flex; flex-direction:column; align-items:center; justify-content:center; position:relative; overflow:hidden; isolation:isolate; padding:var(--space-24) var(--space-8) var(--space-16); }
+    .dx-hero::before { content:''; position:absolute; inset:0; background:var(--gradient-hero); z-index:-3; }
+    .dx-hero::after { content:''; position:absolute; inset:0; background-image:radial-gradient(circle at 20% 30%, rgba(6,120,190,0.04) 2px, transparent 2px), radial-gradient(circle at 60% 70%, rgba(102,126,234,0.04) 3px, transparent 3px), radial-gradient(circle at 80% 20%, rgba(236,72,153,0.03) 2px, transparent 2px); background-size:800px 800px; animation:particle-drift 60s linear infinite; opacity:0.6; z-index:-2; }
+    .dx-hero-orb { position:absolute; border-radius:50%; filter:blur(100px); opacity:0.3; z-index:-1; pointer-events:none; }
+    .dx-hero-orb-1 { width:600px; height:600px; top:-200px; right:-100px; animation:float-slow 20s ease-in-out infinite, orb-pulse 8s ease-in-out infinite; }
+    .dx-hero-orb-2 { width:400px; height:400px; bottom:-100px; left:-80px; animation:float-slow 25s ease-in-out infinite reverse, orb-pulse 10s ease-in-out infinite; }
+    .dx-hero-orb-3 { width:350px; height:350px; top:40%; left:15%; animation:float-drift 18s ease-in-out infinite, orb-pulse 7s ease-in-out infinite; }
+    .dx-hero-grid { position:absolute; inset:0; z-index:-1; background-image:linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px); background-size:60px 60px; mask-image:radial-gradient(ellipse 80% 60% at 50% 50%, black 30%, transparent 70%); -webkit-mask-image:radial-gradient(ellipse 80% 60% at 50% 50%, black 30%, transparent 70%); }
+    .dx-hero-content { text-align:center; max-width:900px; z-index:1; }
+    .dx-hero-badge { display:inline-flex; align-items:center; gap:var(--space-3); padding:var(--space-2) var(--space-6); border-radius:var(--radius-full); background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.1); backdrop-filter:blur(20px); color:rgba(255,255,255,0.85); font-size:0.875rem; font-weight:500; letter-spacing:0.02em; margin-bottom:var(--space-10); animation:fadeInDown 0.8s cubic-bezier(0.22,1,0.36,1) backwards; }
+    .dx-hero-badge-dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
+    .dx-hero-title { font-size:clamp(2.5rem,8vw,5rem); font-weight:900; line-height:1.15; margin-bottom:var(--space-6); letter-spacing:-0.04em; animation:fadeInUp 0.9s cubic-bezier(0.22,1,0.36,1) 0.1s backwards; }
+    .dx-hero-subtitle { font-size:clamp(1.125rem,2.5vw,1.5rem); font-weight:300; margin-bottom:var(--space-8); animation:fadeInUp 0.9s cubic-bezier(0.22,1,0.36,1) 0.2s backwards; }
+    .dx-hero-description { font-size:clamp(1rem,1.5vw,1.25rem); color:rgba(255,255,255,0.55); max-width:700px; margin:0 auto var(--space-12); line-height:1.75; animation:fadeInUp 0.9s cubic-bezier(0.22,1,0.36,1) 0.3s backwards; }
+    .dx-hero-scroll { position:absolute; bottom:var(--space-10); left:50%; transform:translateX(-50%); display:flex; flex-direction:column; align-items:center; gap:var(--space-2); color:rgba(255,255,255,0.3); font-size:0.6875rem; font-weight:500; letter-spacing:0.2em; text-transform:uppercase; animation:fadeIn 1s ease 1.5s backwards; }
+    .dx-hero-scroll-line { width:1px; height:40px; background:linear-gradient(to bottom, rgba(255,255,255,0.3), transparent); position:relative; overflow:hidden; }
+    .dx-hero-scroll-line::after { content:''; position:absolute; top:-100%; left:0; width:100%; height:100%; background:linear-gradient(to bottom, transparent, white, transparent); animation:scroll-fade 2s ease-in-out infinite; }
 
-        --space-1: 0.25rem; --space-2: 0.5rem; --space-3: 0.75rem;
-        --space-4: 1rem; --space-5: 1.25rem; --space-6: 1.5rem;
-        --space-8: 2rem; --space-10: 2.5rem; --space-12: 3rem;
-        --space-16: 4rem; --space-20: 5rem; --space-24: 6rem;
+    /* Tab 1 hero: Cyan */
+    .dx-hero-dx .dx-hero-title { background:linear-gradient(180deg, rgba(6,182,212,1) 0%, rgba(255,255,255,0.8) 100%); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+    .dx-hero-dx .dx-hero-subtitle { background:linear-gradient(90deg, rgba(6,182,212,0.9), rgba(255,255,255,0.9)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+    .dx-hero-dx .dx-hero-badge-dot { background:var(--wc-cyan); animation:pulse-glow 2s ease infinite; box-shadow:0 0 8px var(--wc-cyan); }
+    .dx-hero-dx .dx-hero-orb-1 { background:radial-gradient(circle, rgba(6,182,212,0.4), transparent 70%); }
+    .dx-hero-dx .dx-hero-orb-2 { background:radial-gradient(circle, rgba(6,182,212,0.2), transparent 70%); }
+    .dx-hero-dx .dx-hero-orb-3 { background:radial-gradient(circle, rgba(56,189,248,0.2), transparent 70%); }
 
-        --radius-sm: 0.5rem; --radius-md: 0.75rem; --radius-lg: 1rem;
-        --radius-xl: 1.5rem; --radius-2xl: 2rem; --radius-full: 9999px;
+    /* Tab 2 hero: Green/Emerald */
+    .dx-hero-quality .dx-hero-title { background:linear-gradient(180deg, rgba(16,185,129,1) 0%, rgba(5,150,105,0.8) 100%); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+    .dx-hero-quality .dx-hero-subtitle { background:linear-gradient(90deg, rgba(16,185,129,0.9), rgba(52,211,153,0.9)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+    .dx-hero-quality .dx-hero-badge-dot { background:var(--wc-green); box-shadow:0 0 8px var(--wc-green); animation:pulse-glow 2s ease infinite; }
+    .dx-hero-quality .dx-hero-orb-1 { background:radial-gradient(circle, rgba(16,185,129,0.35), transparent 70%); }
+    .dx-hero-quality .dx-hero-orb-2 { background:radial-gradient(circle, rgba(5,150,105,0.25), transparent 70%); }
+    .dx-hero-quality .dx-hero-orb-3 { background:radial-gradient(circle, rgba(52,211,153,0.2), transparent 70%); }
 
-        --shadow-sm: 0 2px 8px rgba(0,0,0,0.3);
-        --shadow-md: 0 4px 16px rgba(0,0,0,0.4);
-        --shadow-lg: 0 8px 32px rgba(0,0,0,0.5);
-        --shadow-xl: 0 16px 64px rgba(0,0,0,0.6);
+    /* Tab 3 hero: Purple/Violet */
+    .dx-hero-cicd .dx-hero-title { background:linear-gradient(180deg, rgba(139,92,246,1) 0%, rgba(99,102,241,0.8) 100%); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+    .dx-hero-cicd .dx-hero-subtitle { background:linear-gradient(90deg, rgba(139,92,246,0.9), rgba(167,139,250,0.9)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+    .dx-hero-cicd .dx-hero-badge-dot { background:var(--wc-violet); box-shadow:0 0 8px var(--wc-violet); animation:pulse-glow 2s ease infinite; }
+    .dx-hero-cicd .dx-hero-orb-1 { background:radial-gradient(circle, rgba(139,92,246,0.35), transparent 70%); }
+    .dx-hero-cicd .dx-hero-orb-2 { background:radial-gradient(circle, rgba(99,102,241,0.25), transparent 70%); }
+    .dx-hero-cicd .dx-hero-orb-3 { background:radial-gradient(circle, rgba(167,139,250,0.2), transparent 70%); }
 
-        --glass-bg: rgba(255,255,255,0.03);
-        --glass-bg-strong: rgba(255,255,255,0.06);
-        --glass-border: rgba(255,255,255,0.06);
-        --glass-border-strong: rgba(255,255,255,0.12);
+    /* ==========================================
+       SECTIONS (shared)
+       ========================================== */
+    .dx-section { position:relative; }
+    .dx-section-inner { max-width:1200px; margin:0 auto; padding:var(--space-24) var(--space-8); }
+    .dx-section-header { text-align:center; margin-bottom:var(--space-16); }
+    .dx-section-label { display:inline-block; font-size:0.75rem; font-weight:700; text-transform:uppercase; letter-spacing:0.1em; padding:var(--space-1) var(--space-4); border-radius:var(--radius-full); margin-bottom:var(--space-4); }
+    .dx-section-label-cyan { background:rgba(6,182,212,0.08); color:var(--wc-cyan); border:1px solid rgba(6,182,212,0.15); }
+    .dx-section-label-green { background:rgba(16,185,129,0.08); color:var(--wc-green); border:1px solid rgba(16,185,129,0.15); }
+    .dx-section-label-violet { background:rgba(139,92,246,0.08); color:var(--wc-violet); border:1px solid rgba(139,92,246,0.15); }
+    .dx-section-label-amber { background:rgba(245,158,11,0.08); color:var(--wc-amber); border:1px solid rgba(245,158,11,0.15); }
+    .dx-section-title { font-size:clamp(2rem,5vw,3rem); margin-bottom:var(--space-4); }
+    .dx-section-description { font-size:1.0625rem; color:var(--text-secondary); max-width:700px; margin:0 auto; line-height:1.8; }
 
-        --glow-primary: 0 0 50px rgba(102,126,234,0.25);
-        --glow-subtle: 0 0 20px rgba(102,126,234,0.15);
+    /* ==========================================
+       CARDS
+       ========================================== */
+    .dx-card { background:var(--surface-1); border:1px solid var(--surface-3); border-radius:var(--radius-xl); padding:var(--space-8) var(--space-6); transition:all 0.5s cubic-bezier(0.22,1,0.36,1); position:relative; overflow:hidden; }
+    .dx-card::before { content:''; position:absolute; inset:0; border-radius:inherit; padding:1.5px; background:conic-gradient(from var(--gradient-angle), #667eea, #764ba2, #f093fb, #06b6d4, #667eea); -webkit-mask:linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0); -webkit-mask-composite:xor; mask-composite:exclude; opacity:0; transition:opacity 0.5s ease; pointer-events:none; animation:border-rotate 4s linear infinite; }
+    .dx-card:hover::before { opacity:1; }
+    .dx-card:hover { transform:translateY(-6px); box-shadow:var(--shadow-xl), var(--glow-subtle); background:var(--surface-2); }
+    .dx-card-icon { width:64px; height:64px; border-radius:var(--radius-xl); display:flex; align-items:center; justify-content:center; font-size:1.5rem; margin-bottom:var(--space-5); position:relative; z-index:1; }
+    .dx-card-title { font-size:1.25rem; font-weight:700; margin-bottom:var(--space-3); color:var(--text-primary); position:relative; z-index:1; }
+    .dx-card-desc { font-size:0.9375rem; color:var(--text-secondary); line-height:1.7; position:relative; z-index:1; }
 
-        --surface-0: #0a0a14; --surface-1: #111122;
-        --surface-2: #1a1a32; --surface-3: #252545;
-        --text-primary: #eaeaf4; --text-secondary: #a8a8c8; --text-muted: #6868a0;
-      }
+    /* Color icon helpers */
+    .icon-cyan { background:linear-gradient(135deg,rgba(6,182,212,0.15),rgba(6,182,212,0.05)); border:1px solid rgba(6,182,212,0.2); color:var(--wc-cyan); }
+    .icon-green { background:linear-gradient(135deg,rgba(16,185,129,0.15),rgba(16,185,129,0.05)); border:1px solid rgba(16,185,129,0.2); color:var(--wc-green); }
+    .icon-violet { background:linear-gradient(135deg,rgba(139,92,246,0.15),rgba(139,92,246,0.05)); border:1px solid rgba(139,92,246,0.2); color:var(--wc-violet); }
+    .icon-amber { background:linear-gradient(135deg,rgba(245,158,11,0.15),rgba(245,158,11,0.05)); border:1px solid rgba(245,158,11,0.2); color:var(--wc-amber); }
+    .icon-pink { background:linear-gradient(135deg,rgba(236,72,153,0.15),rgba(236,72,153,0.05)); border:1px solid rgba(236,72,153,0.2); color:var(--wc-pink); }
+    .icon-electric { background:linear-gradient(135deg,rgba(59,130,246,0.15),rgba(59,130,246,0.05)); border:1px solid rgba(59,130,246,0.2); color:var(--wc-electric); }
+    .icon-red { background:linear-gradient(135deg,rgba(239,68,68,0.15),rgba(239,68,68,0.05)); border:1px solid rgba(239,68,68,0.2); color:var(--wc-red); }
 
-      *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    /* ==========================================
+       CODE BLOCKS
+       ========================================== */
+    .dx-code-block { background:var(--surface-1); border:1px solid var(--surface-3); border-radius:var(--radius-lg); overflow:hidden; }
+    .dx-code-titlebar { display:flex; align-items:center; gap:var(--space-3); padding:var(--space-3) var(--space-4); background:rgba(0,0,0,0.3); border-bottom:1px solid var(--surface-3); }
+    .dx-code-dot { width:10px; height:10px; border-radius:50%; }
+    .dx-code-dot:nth-child(1) { background:#ff5f57; }
+    .dx-code-dot:nth-child(2) { background:#ffbd2e; }
+    .dx-code-dot:nth-child(3) { background:#28c840; }
+    .dx-code-filename { font-family:var(--font-mono); font-size:0.75rem; color:var(--text-muted); margin-left:var(--space-2); }
+    .dx-code-body { padding:var(--space-4) var(--space-5); overflow-x:auto; }
+    .dx-code-body pre { font-size:0.8125rem; line-height:1.7; color:#d6deeb; white-space:pre; margin:0; }
 
-      body {
-        font-family: var(--font-body); line-height: 1.6;
-        -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;
-        background: var(--surface-0); color: var(--text-primary);
-        scroll-behavior: smooth; overflow-x: clip;
-      }
+    /* Syntax highlighting */
+    .dx-code-body .cmt { color:#637777; font-style:italic; }
+    .dx-code-body .kw { color:#c792ea; }
+    .dx-code-body .fn { color:#82aaff; }
+    .dx-code-body .str { color:#ecc48d; }
+    .dx-code-body .val { color:#addb67; }
+    .dx-code-body .tag { color:#7fdbca; }
+    .dx-code-body .attr { color:#addb67; }
+    .dx-code-body .var { color:#d6deeb; }
+    .dx-code-body .num { color:#f78c6c; }
+    .dx-code-body .prop-hl { color:#ffcb6b; }
 
-      h1,h2,h3,h4,h5,h6 { font-family: var(--font-heading); font-weight: 700; letter-spacing: -0.025em; line-height: 1.15; }
-      code, pre { font-family: var(--font-mono); }
-      a { color: var(--wc-accent); text-decoration: none; transition: color 0.2s ease; }
-      a:hover { color: hsl(var(--wc-accent-h), var(--wc-accent-s), 75%); }
+    /* ==========================================
+       SCROLL-REVEAL BAR (page-specific)
+       ========================================== */
+    .scroll-reveal-bar { --bar-width: 0%; }
+    .scroll-reveal-bar.is-visible { --bar-width: var(--target-width, 80%); }
 
-      /* --- Keyframes --- */
-      @keyframes fadeInUp { from { opacity:0; transform:translateY(40px); } to { opacity:1; transform:translateY(0); } }
-      @keyframes fadeInDown { from { opacity:0; transform:translateY(-20px); } to { opacity:1; transform:translateY(0); } }
-      @keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
-      @keyframes float-slow { 0%,100% { transform:translate(0,0) scale(1); } 25% { transform:translate(30px,-20px) scale(1.05); } 50% { transform:translate(-10px,-35px) scale(0.97); } 75% { transform:translate(-25px,-10px) scale(1.02); } }
-      @keyframes float-drift { 0%,100% { transform:translate(0,0) rotate(0deg); } 33% { transform:translate(20px,15px) rotate(2deg); } 66% { transform:translate(-15px,-20px) rotate(-2deg); } }
-      @keyframes orb-pulse { 0%,100% { opacity:0.3; filter:blur(100px); } 50% { opacity:0.5; filter:blur(120px); } }
-      @keyframes pulse-glow { 0%,100% { box-shadow:0 0 8px rgba(74,222,128,0.4); } 50% { box-shadow:0 0 24px rgba(74,222,128,0.7); } }
-      @keyframes border-rotate { 0% { --gradient-angle:0deg; } 100% { --gradient-angle:360deg; } }
-      @keyframes scroll-fade { 0% { opacity:1; transform:translateX(-50%) translateY(0); } 100% { opacity:0; transform:translateX(-50%) translateY(12px); } }
-      @keyframes particle-drift { 0% { background-position:0 0, 200px 200px, 400px 100px; } 100% { background-position:800px 800px, 1000px 1000px, 1200px 900px; } }
-      @keyframes bar-fill { from { width: 0; } }
-      @keyframes pulse-ring { 0% { transform:scale(0.8); opacity:1; } 100% { transform:scale(2); opacity:0; } }
-      @keyframes shimmer { 0% { background-position:-200% 0; } 100% { background-position:200% 0; } }
+    /* ==========================================
+       FOOTER CTA
+       ========================================== */
+    .dx-footer-cta { text-align:center; padding:var(--space-24) var(--space-8); background:var(--surface-0); border-top:1px solid var(--surface-3); }
+    .dx-footer-cta-inner { max-width:700px; margin:0 auto; }
+    .dx-footer-cta h2 { font-size:clamp(1.75rem,4vw,2.5rem); font-weight:800; letter-spacing:-0.03em; margin-bottom:var(--space-4); color:var(--text-primary); }
+    .dx-footer-cta p { font-size:1.0625rem; color:var(--text-secondary); margin-bottom:var(--space-8); line-height:1.7; }
+    .dx-footer-cta-buttons { display:flex; gap:var(--space-4); justify-content:center; flex-wrap:wrap; }
 
-      /* --- Scroll Reveal --- */
-      .scroll-reveal { opacity:0; transform:translateY(40px); transition: opacity 0.8s cubic-bezier(0.22,1,0.36,1), transform 0.8s cubic-bezier(0.22,1,0.36,1), filter 0.8s cubic-bezier(0.22,1,0.36,1); filter:blur(4px); }
-      .scroll-reveal.is-visible { opacity:1; transform:translateY(0); filter:blur(0); }
-      .scroll-reveal-delay-1 { transition-delay:0.1s; } .scroll-reveal-delay-2 { transition-delay:0.2s; }
-      .scroll-reveal-delay-3 { transition-delay:0.3s; } .scroll-reveal-delay-4 { transition-delay:0.4s; }
-      .scroll-reveal-delay-5 { transition-delay:0.5s; } .scroll-reveal-delay-6 { transition-delay:0.6s; }
+    /* Buttons */
+    .dx-btn { display:inline-flex; align-items:center; gap:var(--space-2); padding:var(--space-4) var(--space-8); font-size:1rem; font-weight:600; text-decoration:none; border-radius:var(--radius-lg); transition:all 0.3s cubic-bezier(0.22,1,0.36,1); cursor:pointer; border:none; white-space:nowrap; min-height:48px; line-height:1; }
+    .dx-btn-solid { background:var(--gradient-primary); color:white; box-shadow:var(--shadow-md); }
+    .dx-btn-solid:hover { transform:translateY(-3px); box-shadow:var(--shadow-xl), var(--glow-primary); color:white; }
+    .dx-btn-ghost { background:transparent; color:var(--text-secondary); border:1.5px solid var(--surface-3); }
+    .dx-btn-ghost:hover { background:var(--glass-bg-strong); border-color:var(--glass-border-strong); color:var(--text-primary); transform:translateY(-2px); }
+    .dx-btn-arrow { transition:transform 0.3s ease; display:inline-block; }
+    .dx-btn:hover .dx-btn-arrow { transform:translateX(4px); }
 
-      /* Scroll-reveal bar fill */
-      .scroll-reveal-bar { --bar-width: 0%; }
-      .scroll-reveal-bar.is-visible { --bar-width: var(--target-width, 80%); }
+    /* ==========================================
+       RESPONSIVE
+       ========================================== */
+    @media (max-width:768px) {
+      .dx-topbar { padding:var(--space-3) var(--space-4); }
+      .dx-topbar-title { display:none; }
+      .dx-hero { min-height:auto; padding:calc(var(--space-24) + var(--space-8)) var(--space-4) var(--space-16); }
+      .dx-hero-scroll { display:none; }
+      .dx-section-inner { padding:var(--space-16) var(--space-4); }
+      .dx-nav-tab { padding:0.625rem 0.5rem; }
+      .dx-nav-tab-label { font-size:0.75rem; }
+      .dx-nav-tab-subtitle { font-size:0.5625rem; }
+      .dx-footer-cta-buttons { flex-direction:column; align-items:stretch; }
+      .dx-btn { width:100%; justify-content:center; }
+    }
 
-      /* ==========================================
-         TOP NAVIGATION BAR
-         ========================================== */
-      .dx-topbar { position:fixed; top:0; left:0; right:0; z-index:100; display:flex; align-items:center; justify-content:space-between; padding:var(--space-3) var(--space-8); background:rgba(10,10,20,0.85); backdrop-filter:blur(16px) saturate(180%); -webkit-backdrop-filter:blur(16px) saturate(180%); border-bottom:1px solid rgba(255,255,255,0.06); }
-      .dx-topbar-left { display:flex; align-items:center; gap:var(--space-4); }
-      .dx-back-link { display:inline-flex; align-items:center; gap:var(--space-2); font-size:0.875rem; font-weight:600; color:var(--text-secondary); transition:all 0.2s ease; padding:var(--space-2) var(--space-3); border-radius:var(--radius-md); }
-      .dx-back-link:hover { color:var(--text-primary); background:var(--glass-bg-strong); }
-      .dx-topbar-title { font-size:0.875rem; font-weight:700; color:var(--text-primary); letter-spacing:-0.01em; }
-      .dx-topbar-right { display:flex; align-items:center; gap:var(--space-3); }
-      .dx-topbar-link { display:inline-flex; align-items:center; gap:var(--space-2); font-size:0.8125rem; font-weight:600; color:var(--text-muted); padding:var(--space-2) var(--space-4); border-radius:var(--radius-md); border:1px solid rgba(255,255,255,0.08); transition:all 0.2s ease; }
-      .dx-topbar-link:hover { color:var(--wc-accent); border-color:rgba(102,126,234,0.3); background:rgba(102,126,234,0.06); }
+    /* ==========================================
+       REDUCED MOTION (page-specific overrides)
+       ========================================== */
+    @media (prefers-reduced-motion:reduce) {
+      .dx-hero-orb { animation:none !important; opacity:0.15; }
+      .dx-nav-tab { transition:none; }
+      .dx-shift-bar-fill, .dx-build-bar-fill { transition:none; }
+    }
 
-      /* ==========================================
-         STICKY TAB NAV (3-tab content switcher)
-         ========================================== */
-      .dx-section-nav { position:sticky; top:3.9rem; z-index:90; background:rgba(10,10,20,0.92); backdrop-filter:blur(20px) saturate(180%); -webkit-backdrop-filter:blur(20px) saturate(180%); border-bottom:1px solid rgba(255,255,255,0.08); }
-      .dx-section-nav-inner { display:flex; max-width:1200px; margin:0 auto; padding:0.5rem; gap:0.5rem; }
-      .dx-nav-tab { flex:1; display:flex; flex-direction:column; align-items:center; gap:0.25rem; padding:0.75rem 1.5rem; border-radius:0.75rem; border:1px solid transparent; background:transparent; color:rgba(255,255,255,0.45); cursor:pointer; transition:all 0.25s ease; font-family:var(--font-heading); }
-      .dx-nav-tab i { font-size:1.25rem; opacity:0.5; transition:all 0.25s ease; }
-      .dx-nav-tab-label { font-size:0.9375rem; font-weight:700; letter-spacing:-0.01em; }
-      .dx-nav-tab-subtitle { font-size:0.6875rem; font-weight:500; text-transform:uppercase; letter-spacing:0.06em; opacity:0.5; }
-      .dx-nav-tab:hover { color:rgba(255,255,255,0.8); background:rgba(255,255,255,0.04); }
-      .dx-nav-tab:hover i { opacity:0.9; }
-      .dx-nav-tab.is-active { color:white; background:rgba(102,126,234,0.1); border-color:rgba(102,126,234,0.25); box-shadow:0 0 20px rgba(102,126,234,0.08); }
-      .dx-nav-tab.is-active i { opacity:1; color:var(--wc-accent); }
-      .dx-nav-tab.is-active .dx-nav-tab-subtitle { opacity:0.8; }
-      .dx-nav-tab:focus-visible { outline:2px solid var(--wc-accent); outline-offset:2px; }
+    /* --- Focus States --- */
+    .dx-btn:focus-visible,
+    .dx-back-link:focus-visible,
+    .dx-topbar-link:focus-visible,
+    .dx-nav-tab:focus-visible {
+      outline:3px solid var(--wc-accent); outline-offset:3px;
+    }
+  </style>
 
-      /* Tab-specific active colors */
-      .dx-nav-tab[data-tab="tab-dx"].is-active { background:rgba(6,182,212,0.1); border-color:rgba(6,182,212,0.25); box-shadow:0 0 20px rgba(6,182,212,0.08); }
-      .dx-nav-tab[data-tab="tab-dx"].is-active i { color:var(--wc-cyan); }
-      .dx-nav-tab[data-tab="tab-quality"].is-active { background:rgba(16,185,129,0.1); border-color:rgba(16,185,129,0.25); box-shadow:0 0 20px rgba(16,185,129,0.08); }
-      .dx-nav-tab[data-tab="tab-quality"].is-active i { color:var(--wc-green); }
-      .dx-nav-tab[data-tab="tab-cicd"].is-active { background:rgba(139,92,246,0.1); border-color:rgba(139,92,246,0.25); box-shadow:0 0 20px rgba(139,92,246,0.08); }
-      .dx-nav-tab[data-tab="tab-cicd"].is-active i { color:var(--wc-violet); }
+  <!-- Top Navigation Bar -->
+  <nav class="dx-topbar" aria-label="Page navigation">
+    <div class="dx-topbar-left">
+      <a href="/" class="dx-back-link" aria-label="Back to WC-2026 Dashboard">
+        <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
+        Dashboard
+      </a>
+      <span class="dx-topbar-title" aria-hidden="true">|</span>
+      <span class="dx-topbar-title">Developer Experience</span>
+    </div>
+    <div class="dx-topbar-right">
+      <a href="/getting-started/quickstart/" class="dx-topbar-link">
+        <i class="fa-solid fa-book" aria-hidden="true"></i>
+        Quickstart
+      </a>
+      <a href="/architecture/testing/" class="dx-topbar-link">
+        <i class="fa-solid fa-vial" aria-hidden="true"></i>
+        Testing Docs
+      </a>
+    </div>
+  </nav>
 
-      /* Tab content panels */
-      .dx-tab-content { display:none; }
-      .dx-tab-content.is-active { display:block; }
-
-      /* ==========================================
-         HERO (shared base, color variants per tab)
-         ========================================== */
-      .dx-hero { min-height:100vh; min-height:100dvh; display:flex; flex-direction:column; align-items:center; justify-content:center; position:relative; overflow:hidden; isolation:isolate; padding:var(--space-24) var(--space-8) var(--space-16); }
-      .dx-hero::before { content:''; position:absolute; inset:0; background:var(--gradient-hero); z-index:-3; }
-      .dx-hero::after { content:''; position:absolute; inset:0; background-image:radial-gradient(circle at 20% 30%, rgba(6,120,190,0.04) 2px, transparent 2px), radial-gradient(circle at 60% 70%, rgba(102,126,234,0.04) 3px, transparent 3px), radial-gradient(circle at 80% 20%, rgba(236,72,153,0.03) 2px, transparent 2px); background-size:800px 800px; animation:particle-drift 60s linear infinite; opacity:0.6; z-index:-2; }
-      .dx-hero-orb { position:absolute; border-radius:50%; filter:blur(100px); opacity:0.3; z-index:-1; pointer-events:none; }
-      .dx-hero-orb-1 { width:600px; height:600px; top:-200px; right:-100px; animation:float-slow 20s ease-in-out infinite, orb-pulse 8s ease-in-out infinite; }
-      .dx-hero-orb-2 { width:400px; height:400px; bottom:-100px; left:-80px; animation:float-slow 25s ease-in-out infinite reverse, orb-pulse 10s ease-in-out infinite; }
-      .dx-hero-orb-3 { width:350px; height:350px; top:40%; left:15%; animation:float-drift 18s ease-in-out infinite, orb-pulse 7s ease-in-out infinite; }
-      .dx-hero-grid { position:absolute; inset:0; z-index:-1; background-image:linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px); background-size:60px 60px; mask-image:radial-gradient(ellipse 80% 60% at 50% 50%, black 30%, transparent 70%); -webkit-mask-image:radial-gradient(ellipse 80% 60% at 50% 50%, black 30%, transparent 70%); }
-      .dx-hero-content { text-align:center; max-width:900px; z-index:1; }
-      .dx-hero-badge { display:inline-flex; align-items:center; gap:var(--space-3); padding:var(--space-2) var(--space-6); border-radius:var(--radius-full); background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.1); backdrop-filter:blur(20px); color:rgba(255,255,255,0.85); font-size:0.875rem; font-weight:500; letter-spacing:0.02em; margin-bottom:var(--space-10); animation:fadeInDown 0.8s cubic-bezier(0.22,1,0.36,1) backwards; }
-      .dx-hero-badge-dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
-      .dx-hero-title { font-size:clamp(2.5rem,8vw,5rem); font-weight:900; line-height:1.15; margin-bottom:var(--space-6); letter-spacing:-0.04em; animation:fadeInUp 0.9s cubic-bezier(0.22,1,0.36,1) 0.1s backwards; }
-      .dx-hero-subtitle { font-size:clamp(1.125rem,2.5vw,1.5rem); font-weight:300; margin-bottom:var(--space-8); animation:fadeInUp 0.9s cubic-bezier(0.22,1,0.36,1) 0.2s backwards; }
-      .dx-hero-description { font-size:clamp(1rem,1.5vw,1.25rem); color:rgba(255,255,255,0.55); max-width:700px; margin:0 auto var(--space-12); line-height:1.75; animation:fadeInUp 0.9s cubic-bezier(0.22,1,0.36,1) 0.3s backwards; }
-      .dx-hero-scroll { position:absolute; bottom:var(--space-10); left:50%; transform:translateX(-50%); display:flex; flex-direction:column; align-items:center; gap:var(--space-2); color:rgba(255,255,255,0.3); font-size:0.6875rem; font-weight:500; letter-spacing:0.2em; text-transform:uppercase; animation:fadeIn 1s ease 1.5s backwards; }
-      .dx-hero-scroll-line { width:1px; height:40px; background:linear-gradient(to bottom, rgba(255,255,255,0.3), transparent); position:relative; overflow:hidden; }
-      .dx-hero-scroll-line::after { content:''; position:absolute; top:-100%; left:0; width:100%; height:100%; background:linear-gradient(to bottom, transparent, white, transparent); animation:scroll-fade 2s ease-in-out infinite; }
-
-      /* Tab 1 hero: Cyan */
-      .dx-hero-dx .dx-hero-title { background:linear-gradient(180deg, rgba(6,182,212,1) 0%, rgba(255,255,255,0.8) 100%); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
-      .dx-hero-dx .dx-hero-subtitle { background:linear-gradient(90deg, rgba(6,182,212,0.9), rgba(255,255,255,0.9)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
-      .dx-hero-dx .dx-hero-badge-dot { background:var(--wc-cyan); animation:pulse-glow 2s ease infinite; box-shadow:0 0 8px var(--wc-cyan); }
-      .dx-hero-dx .dx-hero-orb-1 { background:radial-gradient(circle, rgba(6,182,212,0.4), transparent 70%); }
-      .dx-hero-dx .dx-hero-orb-2 { background:radial-gradient(circle, rgba(6,182,212,0.2), transparent 70%); }
-      .dx-hero-dx .dx-hero-orb-3 { background:radial-gradient(circle, rgba(56,189,248,0.2), transparent 70%); }
-
-      /* Tab 2 hero: Green/Emerald */
-      .dx-hero-quality .dx-hero-title { background:linear-gradient(180deg, rgba(16,185,129,1) 0%, rgba(5,150,105,0.8) 100%); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
-      .dx-hero-quality .dx-hero-subtitle { background:linear-gradient(90deg, rgba(16,185,129,0.9), rgba(52,211,153,0.9)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
-      .dx-hero-quality .dx-hero-badge-dot { background:var(--wc-green); box-shadow:0 0 8px var(--wc-green); animation:pulse-glow 2s ease infinite; }
-      .dx-hero-quality .dx-hero-orb-1 { background:radial-gradient(circle, rgba(16,185,129,0.35), transparent 70%); }
-      .dx-hero-quality .dx-hero-orb-2 { background:radial-gradient(circle, rgba(5,150,105,0.25), transparent 70%); }
-      .dx-hero-quality .dx-hero-orb-3 { background:radial-gradient(circle, rgba(52,211,153,0.2), transparent 70%); }
-
-      /* Tab 3 hero: Purple/Violet */
-      .dx-hero-cicd .dx-hero-title { background:linear-gradient(180deg, rgba(139,92,246,1) 0%, rgba(99,102,241,0.8) 100%); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
-      .dx-hero-cicd .dx-hero-subtitle { background:linear-gradient(90deg, rgba(139,92,246,0.9), rgba(167,139,250,0.9)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
-      .dx-hero-cicd .dx-hero-badge-dot { background:var(--wc-violet); box-shadow:0 0 8px var(--wc-violet); animation:pulse-glow 2s ease infinite; }
-      .dx-hero-cicd .dx-hero-orb-1 { background:radial-gradient(circle, rgba(139,92,246,0.35), transparent 70%); }
-      .dx-hero-cicd .dx-hero-orb-2 { background:radial-gradient(circle, rgba(99,102,241,0.25), transparent 70%); }
-      .dx-hero-cicd .dx-hero-orb-3 { background:radial-gradient(circle, rgba(167,139,250,0.2), transparent 70%); }
-
-      /* ==========================================
-         SECTIONS (shared)
-         ========================================== */
-      .dx-section { position:relative; }
-      .dx-section-inner { max-width:1200px; margin:0 auto; padding:var(--space-24) var(--space-8); }
-      .dx-section-header { text-align:center; margin-bottom:var(--space-16); }
-      .dx-section-label { display:inline-block; font-size:0.75rem; font-weight:700; text-transform:uppercase; letter-spacing:0.1em; padding:var(--space-1) var(--space-4); border-radius:var(--radius-full); margin-bottom:var(--space-4); }
-      .dx-section-label-cyan { background:rgba(6,182,212,0.08); color:var(--wc-cyan); border:1px solid rgba(6,182,212,0.15); }
-      .dx-section-label-green { background:rgba(16,185,129,0.08); color:var(--wc-green); border:1px solid rgba(16,185,129,0.15); }
-      .dx-section-label-violet { background:rgba(139,92,246,0.08); color:var(--wc-violet); border:1px solid rgba(139,92,246,0.15); }
-      .dx-section-label-amber { background:rgba(245,158,11,0.08); color:var(--wc-amber); border:1px solid rgba(245,158,11,0.15); }
-      .dx-section-title { font-size:clamp(2rem,5vw,3rem); margin-bottom:var(--space-4); }
-      .dx-section-description { font-size:1.0625rem; color:var(--text-secondary); max-width:700px; margin:0 auto; line-height:1.8; }
-
-      /* ==========================================
-         CARDS
-         ========================================== */
-      .dx-card { background:var(--surface-1); border:1px solid var(--surface-3); border-radius:var(--radius-xl); padding:var(--space-8) var(--space-6); transition:all 0.5s cubic-bezier(0.22,1,0.36,1); position:relative; overflow:hidden; }
-      .dx-card::before { content:''; position:absolute; inset:0; border-radius:inherit; padding:1.5px; background:conic-gradient(from var(--gradient-angle), #667eea, #764ba2, #f093fb, #06b6d4, #667eea); -webkit-mask:linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0); -webkit-mask-composite:xor; mask-composite:exclude; opacity:0; transition:opacity 0.5s ease; pointer-events:none; animation:border-rotate 4s linear infinite; }
-      .dx-card:hover::before { opacity:1; }
-      .dx-card:hover { transform:translateY(-6px); box-shadow:var(--shadow-xl), var(--glow-subtle); background:var(--surface-2); }
-      .dx-card-icon { width:64px; height:64px; border-radius:var(--radius-xl); display:flex; align-items:center; justify-content:center; font-size:1.5rem; margin-bottom:var(--space-5); position:relative; z-index:1; }
-      .dx-card-title { font-size:1.25rem; font-weight:700; margin-bottom:var(--space-3); color:var(--text-primary); position:relative; z-index:1; }
-      .dx-card-desc { font-size:0.9375rem; color:var(--text-secondary); line-height:1.7; position:relative; z-index:1; }
-
-      /* Color icon helpers */
-      .icon-cyan { background:linear-gradient(135deg,rgba(6,182,212,0.15),rgba(6,182,212,0.05)); border:1px solid rgba(6,182,212,0.2); color:var(--wc-cyan); }
-      .icon-green { background:linear-gradient(135deg,rgba(16,185,129,0.15),rgba(16,185,129,0.05)); border:1px solid rgba(16,185,129,0.2); color:var(--wc-green); }
-      .icon-violet { background:linear-gradient(135deg,rgba(139,92,246,0.15),rgba(139,92,246,0.05)); border:1px solid rgba(139,92,246,0.2); color:var(--wc-violet); }
-      .icon-amber { background:linear-gradient(135deg,rgba(245,158,11,0.15),rgba(245,158,11,0.05)); border:1px solid rgba(245,158,11,0.2); color:var(--wc-amber); }
-      .icon-pink { background:linear-gradient(135deg,rgba(236,72,153,0.15),rgba(236,72,153,0.05)); border:1px solid rgba(236,72,153,0.2); color:var(--wc-pink); }
-      .icon-electric { background:linear-gradient(135deg,rgba(59,130,246,0.15),rgba(59,130,246,0.05)); border:1px solid rgba(59,130,246,0.2); color:var(--wc-electric); }
-      .icon-red { background:linear-gradient(135deg,rgba(239,68,68,0.15),rgba(239,68,68,0.05)); border:1px solid rgba(239,68,68,0.2); color:var(--wc-red); }
-
-      /* ==========================================
-         CODE BLOCKS
-         ========================================== */
-      .dx-code-block { background:var(--surface-1); border:1px solid var(--surface-3); border-radius:var(--radius-lg); overflow:hidden; }
-      .dx-code-titlebar { display:flex; align-items:center; gap:var(--space-3); padding:var(--space-3) var(--space-4); background:rgba(0,0,0,0.3); border-bottom:1px solid var(--surface-3); }
-      .dx-code-dot { width:10px; height:10px; border-radius:50%; }
-      .dx-code-dot:nth-child(1) { background:#ff5f57; }
-      .dx-code-dot:nth-child(2) { background:#ffbd2e; }
-      .dx-code-dot:nth-child(3) { background:#28c840; }
-      .dx-code-filename { font-family:var(--font-mono); font-size:0.75rem; color:var(--text-muted); margin-left:var(--space-2); }
-      .dx-code-body { padding:var(--space-4) var(--space-5); overflow-x:auto; }
-      .dx-code-body pre { font-size:0.8125rem; line-height:1.7; color:#d6deeb; white-space:pre; margin:0; }
-
-      /* Syntax highlighting */
-      .dx-code-body .cmt { color:#637777; font-style:italic; }
-      .dx-code-body .kw { color:#c792ea; }
-      .dx-code-body .fn { color:#82aaff; }
-      .dx-code-body .str { color:#ecc48d; }
-      .dx-code-body .val { color:#addb67; }
-      .dx-code-body .tag { color:#7fdbca; }
-      .dx-code-body .attr { color:#addb67; }
-      .dx-code-body .var { color:#d6deeb; }
-      .dx-code-body .num { color:#f78c6c; }
-      .dx-code-body .prop-hl { color:#ffcb6b; }
-
-      /* ==========================================
-         TAB 1: ONBOARDING TIMELINE
-         ========================================== */
-      .dx-timeline { position:relative; padding-left:3rem; }
-      .dx-timeline::before { content:''; position:absolute; left:1rem; top:0; bottom:0; width:2px; background:linear-gradient(to bottom, var(--wc-cyan), var(--wc-green), var(--wc-violet)); border-radius:1px; }
-      .dx-timeline-step { position:relative; padding-bottom:var(--space-10); }
-      .dx-timeline-step:last-child { padding-bottom:0; }
-      .dx-timeline-marker { position:absolute; left:-2.5rem; top:0; width:2.5rem; height:2.5rem; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:0.875rem; z-index:2; }
-      .dx-timeline-marker-cyan { background:rgba(6,182,212,0.15); border:2px solid var(--wc-cyan); color:var(--wc-cyan); }
-      .dx-timeline-marker-green { background:rgba(16,185,129,0.15); border:2px solid var(--wc-green); color:var(--wc-green); }
-      .dx-timeline-marker-violet { background:rgba(139,92,246,0.15); border:2px solid var(--wc-violet); color:var(--wc-violet); }
-      .dx-timeline-marker-amber { background:rgba(245,158,11,0.15); border:2px solid var(--wc-amber); color:var(--wc-amber); }
-      .dx-timeline-marker-pink { background:rgba(236,72,153,0.15); border:2px solid var(--wc-pink); color:var(--wc-pink); }
-      .dx-timeline-card { background:var(--surface-1); border:1px solid var(--surface-3); border-radius:var(--radius-lg); padding:var(--space-5) var(--space-6); transition:all 0.3s ease; }
-      .dx-timeline-card:hover { background:var(--surface-2); transform:translateX(4px); }
-      .dx-timeline-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:var(--space-2); flex-wrap:wrap; gap:var(--space-2); }
-      .dx-timeline-title { font-size:1.125rem; font-weight:700; color:var(--text-primary); display:flex; align-items:center; gap:var(--space-2); }
-      .dx-timeline-title i { font-size:1rem; }
-      .dx-timeline-time { font-family:var(--font-mono); font-size:0.75rem; font-weight:700; padding:var(--space-1) var(--space-3); border-radius:var(--radius-full); }
-      .dx-timeline-time-cyan { background:rgba(6,182,212,0.1); color:var(--wc-cyan); border:1px solid rgba(6,182,212,0.2); }
-      .dx-timeline-time-green { background:rgba(16,185,129,0.1); color:var(--wc-green); border:1px solid rgba(16,185,129,0.2); }
-      .dx-timeline-time-violet { background:rgba(139,92,246,0.1); color:var(--wc-violet); border:1px solid rgba(139,92,246,0.2); }
-      .dx-timeline-time-amber { background:rgba(245,158,11,0.1); color:var(--wc-amber); border:1px solid rgba(245,158,11,0.2); }
-      .dx-timeline-time-pink { background:rgba(236,72,153,0.1); color:var(--wc-pink); border:1px solid rgba(236,72,153,0.2); }
-      .dx-timeline-desc { font-size:0.9375rem; color:var(--text-secondary); line-height:1.6; }
-      .dx-timeline-cmd { font-family:var(--font-mono); font-size:0.8125rem; color:var(--wc-cyan); background:rgba(6,182,212,0.06); padding:var(--space-2) var(--space-3); border-radius:var(--radius-sm); margin-top:var(--space-2); display:inline-block; border:1px solid rgba(6,182,212,0.12); }
-
-      /* ==========================================
-         TAB 1: MONOREPO TOPOLOGY
-         ========================================== */
-      .dx-topo-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:var(--space-6); }
-      .dx-topo-card { background:var(--surface-1); border:1px solid var(--surface-3); border-radius:var(--radius-xl); padding:var(--space-6); text-align:center; transition:all 0.3s ease; }
-      .dx-topo-card:hover { background:var(--surface-2); transform:translateY(-4px); border-color:var(--glass-border-strong); }
-      .dx-topo-icon { width:56px; height:56px; border-radius:var(--radius-lg); display:flex; align-items:center; justify-content:center; font-size:1.25rem; margin:0 auto var(--space-4); }
-      .dx-topo-name { font-family:var(--font-mono); font-size:0.875rem; font-weight:700; color:var(--text-primary); margin-bottom:var(--space-2); }
-      .dx-topo-desc { font-size:0.875rem; color:var(--text-secondary); line-height:1.6; margin-bottom:var(--space-3); }
-      .dx-topo-tags { display:flex; flex-wrap:wrap; justify-content:center; gap:var(--space-2); }
-      .dx-topo-tag { font-family:var(--font-mono); font-size:0.6875rem; padding:var(--space-1) var(--space-2); border-radius:var(--radius-sm); background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.06); color:var(--text-muted); }
-      .dx-turbo-banner { background:var(--surface-1); border:1px solid rgba(6,182,212,0.2); border-radius:var(--radius-xl); padding:var(--space-6); margin-top:var(--space-8); display:flex; align-items:center; gap:var(--space-6); }
-      .dx-turbo-icon { width:72px; height:72px; border-radius:var(--radius-xl); display:flex; align-items:center; justify-content:center; font-size:2rem; flex-shrink:0; }
-      .dx-turbo-content { flex:1; }
-      .dx-turbo-title { font-size:1.125rem; font-weight:700; color:var(--text-primary); margin-bottom:var(--space-2); }
-      .dx-turbo-desc { font-size:0.9375rem; color:var(--text-secondary); line-height:1.6; }
-
-      /* ==========================================
-         TAB 1: IDE MOCKUP
-         ========================================== */
-      .dx-ide { background:var(--surface-1); border:1px solid var(--surface-3); border-radius:var(--radius-xl); overflow:hidden; max-width:700px; margin:0 auto; }
-      .dx-ide-titlebar { display:flex; align-items:center; gap:var(--space-3); padding:var(--space-3) var(--space-4); background:rgba(0,0,0,0.4); border-bottom:1px solid var(--surface-3); }
-      .dx-ide-body { position:relative; padding:var(--space-6); }
-      .dx-ide-line { display:flex; align-items:center; gap:var(--space-2); font-family:var(--font-mono); font-size:0.8125rem; line-height:2; color:#d6deeb; }
-      .dx-ide-line-num { color:var(--text-muted); width:2rem; text-align:right; flex-shrink:0; font-size:0.75rem; }
-      .dx-ide-dropdown { position:absolute; top:4.5rem; left:8rem; background:var(--surface-2); border:1px solid var(--glass-border-strong); border-radius:var(--radius-md); padding:var(--space-2) 0; min-width:280px; box-shadow:var(--shadow-xl); z-index:5; }
-      .dx-ide-suggestion { display:flex; align-items:center; gap:var(--space-3); padding:var(--space-2) var(--space-3); font-family:var(--font-mono); font-size:0.8125rem; color:var(--text-secondary); transition:background 0.15s ease; }
-      .dx-ide-suggestion:first-child { background:rgba(6,182,212,0.1); color:var(--text-primary); }
-      .dx-ide-suggestion-icon { width:20px; height:20px; border-radius:4px; display:flex; align-items:center; justify-content:center; font-size:0.625rem; font-weight:700; flex-shrink:0; }
-      .dx-ide-suggestion-prop { color:var(--wc-cyan); }
-      .dx-ide-suggestion-type { margin-left:auto; font-size:0.6875rem; color:var(--text-muted); }
-
-      /* ==========================================
-         TAB 1: DOC PIPELINE FLOW
-         ========================================== */
-      .dx-flow { display:flex; align-items:center; justify-content:center; gap:var(--space-4); flex-wrap:wrap; padding:var(--space-6) 0; }
-      .dx-flow-source { display:flex; flex-direction:column; align-items:center; gap:var(--space-2); text-align:center; }
-      .dx-flow-icon { width:72px; height:72px; border-radius:var(--radius-xl); display:flex; align-items:center; justify-content:center; font-size:1.75rem; transition:all 0.3s ease; }
-      .dx-flow-icon:hover { transform:scale(1.1); }
-      .dx-flow-label { font-size:0.875rem; font-weight:700; color:var(--text-primary); }
-      .dx-flow-sub { font-size:0.75rem; color:var(--text-muted); }
-      .dx-flow-arrow { font-size:1.25rem; color:var(--text-muted); }
-      .dx-flow-outputs { display:grid; grid-template-columns:repeat(3,1fr); gap:var(--space-4); margin-top:var(--space-8); }
-      .dx-flow-output { background:var(--surface-1); border:1px solid var(--surface-3); border-radius:var(--radius-lg); padding:var(--space-5); text-align:center; transition:all 0.3s ease; }
-      .dx-flow-output:hover { background:var(--surface-2); transform:translateY(-4px); }
-      .dx-flow-output-icon { font-size:1.5rem; margin-bottom:var(--space-3); }
-      .dx-flow-output-title { font-size:0.9375rem; font-weight:700; color:var(--text-primary); margin-bottom:var(--space-1); }
-      .dx-flow-output-desc { font-size:0.8125rem; color:var(--text-muted); line-height:1.5; }
-
-      /* ==========================================
-         TAB 2: TESTING PYRAMID
-         ========================================== */
-      .dx-pyramid { display:flex; flex-direction:column; align-items:center; gap:var(--space-4); }
-      .dx-pyramid-level { border-radius:var(--radius-xl); padding:var(--space-5) var(--space-6); transition:all 0.4s ease; cursor:default; display:flex; align-items:center; gap:var(--space-5); }
-      .dx-pyramid-level:hover { transform:scale(1.03); }
-      .dx-pyramid-level-4 { width:45%; background:var(--surface-1); border:1px solid rgba(139,92,246,0.25); }
-      .dx-pyramid-level-4:hover { border-color:rgba(139,92,246,0.5); box-shadow:0 0 30px rgba(139,92,246,0.1); }
-      .dx-pyramid-level-3 { width:60%; background:var(--surface-1); border:1px solid rgba(236,72,153,0.25); }
-      .dx-pyramid-level-3:hover { border-color:rgba(236,72,153,0.5); box-shadow:0 0 30px rgba(236,72,153,0.1); }
-      .dx-pyramid-level-2 { width:75%; background:var(--surface-1); border:1px solid rgba(245,158,11,0.25); }
-      .dx-pyramid-level-2:hover { border-color:rgba(245,158,11,0.5); box-shadow:0 0 30px rgba(245,158,11,0.1); }
-      .dx-pyramid-level-1 { width:90%; background:var(--surface-1); border:1px solid rgba(16,185,129,0.25); }
-      .dx-pyramid-level-1:hover { border-color:rgba(16,185,129,0.5); box-shadow:0 0 30px rgba(16,185,129,0.1); }
-      .dx-pyramid-icon { width:48px; height:48px; border-radius:var(--radius-lg); display:flex; align-items:center; justify-content:center; font-size:1.25rem; flex-shrink:0; }
-      .dx-pyramid-info { flex:1; }
-      .dx-pyramid-label { font-size:0.8125rem; font-weight:700; text-transform:uppercase; letter-spacing:0.05em; margin-bottom:var(--space-1); }
-      .dx-pyramid-name { font-size:1.125rem; font-weight:700; color:var(--text-primary); margin-bottom:var(--space-1); }
-      .dx-pyramid-tool { font-family:var(--font-mono); font-size:0.75rem; padding:var(--space-1) var(--space-3); border-radius:var(--radius-full); background:rgba(255,255,255,0.04); color:var(--text-muted); display:inline-block; margin-bottom:var(--space-2); }
-      .dx-pyramid-desc { font-size:0.875rem; color:var(--text-secondary); line-height:1.6; }
-
-      /* ==========================================
-         TAB 2: SHIFT-LEFT COMPARISON
-         ========================================== */
-      .dx-shift-grid { display:grid; grid-template-columns:1fr 1fr; gap:var(--space-6); }
-      .dx-shift-card { background:var(--surface-1); border-radius:var(--radius-xl); padding:var(--space-6); overflow:hidden; }
-      .dx-shift-card-bad { border:1px solid rgba(239,68,68,0.2); }
-      .dx-shift-card-good { border:1px solid rgba(16,185,129,0.2); }
-      .dx-shift-header { display:flex; align-items:center; gap:var(--space-3); margin-bottom:var(--space-6); }
-      .dx-shift-icon { width:40px; height:40px; border-radius:var(--radius-md); display:flex; align-items:center; justify-content:center; font-size:1rem; }
-      .dx-shift-title { font-size:1.125rem; font-weight:700; }
-      .dx-shift-bar-row { display:flex; align-items:center; gap:var(--space-3); margin-bottom:var(--space-4); }
-      .dx-shift-bar-label { font-size:0.8125rem; color:var(--text-secondary); min-width:80px; }
-      .dx-shift-bar-track { flex:1; height:8px; background:rgba(255,255,255,0.04); border-radius:4px; overflow:hidden; }
-      .dx-shift-bar-fill { height:100%; border-radius:4px; transition:width 1s cubic-bezier(0.22,1,0.36,1); width:var(--bar-width); }
-      .dx-shift-bar-fill-red { background:linear-gradient(90deg, var(--wc-red), var(--wc-pink)); }
-      .dx-shift-bar-fill-green { background:linear-gradient(90deg, var(--wc-green), var(--wc-cyan)); }
-      .dx-shift-bar-value { font-family:var(--font-mono); font-size:0.75rem; color:var(--text-muted); min-width:36px; text-align:right; }
-
-      /* ==========================================
-         TAB 2: COVERAGE DASHBOARD
-         ========================================== */
-      .dx-coverage-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:var(--space-6); }
-      .dx-coverage-card { background:var(--surface-1); border:1px solid var(--surface-3); border-radius:var(--radius-xl); padding:var(--space-6); text-align:center; transition:all 0.3s ease; }
-      .dx-coverage-card:hover { background:var(--surface-2); transform:translateY(-4px); }
-      .dx-coverage-ring { width:100px; height:100px; border-radius:50%; margin:0 auto var(--space-4); position:relative; display:flex; align-items:center; justify-content:center; }
-      .dx-coverage-ring::before { content:''; position:absolute; inset:0; border-radius:50%; }
-      .dx-coverage-value { font-size:1.5rem; font-weight:800; letter-spacing:-0.03em; position:relative; z-index:1; }
-      .dx-coverage-label { font-size:0.9375rem; font-weight:700; color:var(--text-primary); margin-bottom:var(--space-1); }
-      .dx-coverage-desc { font-size:0.8125rem; color:var(--text-muted); line-height:1.5; }
-
-      /* ==========================================
-         TAB 3: PIPELINE FLOW
-         ========================================== */
-      .dx-pipeline { display:flex; align-items:stretch; gap:0; overflow-x:auto; padding:var(--space-4) 0; }
-      .dx-pipeline-step { flex:1; min-width:120px; display:flex; flex-direction:column; align-items:center; gap:var(--space-3); text-align:center; position:relative; padding:var(--space-4); }
-      .dx-pipeline-step::after { content:''; position:absolute; right:-1px; top:50%; width:24px; height:2px; background:linear-gradient(90deg, var(--wc-violet), rgba(139,92,246,0.3)); transform:translateY(-50%); }
-      .dx-pipeline-step:last-child::after { display:none; }
-      .dx-pipeline-step-icon { width:56px; height:56px; border-radius:var(--radius-lg); display:flex; align-items:center; justify-content:center; font-size:1.25rem; transition:all 0.3s ease; }
-      .dx-pipeline-step-icon:hover { transform:scale(1.1); }
-      .dx-pipeline-step-label { font-size:0.8125rem; font-weight:700; color:var(--text-primary); }
-      .dx-pipeline-step-time { font-family:var(--font-mono); font-size:0.6875rem; color:var(--text-muted); }
-
-      /* ==========================================
-         TAB 3: BUILD COMPARISON
-         ========================================== */
-      .dx-build-grid { display:grid; grid-template-columns:1fr 1fr; gap:var(--space-6); }
-      .dx-build-card { background:var(--surface-1); border:1px solid var(--surface-3); border-radius:var(--radius-xl); padding:var(--space-8) var(--space-6); text-align:center; transition:all 0.3s ease; }
-      .dx-build-card:hover { background:var(--surface-2); }
-      .dx-build-value { font-size:3rem; font-weight:900; letter-spacing:-0.04em; margin-bottom:var(--space-2); }
-      .dx-build-label { font-size:1rem; font-weight:700; color:var(--text-primary); margin-bottom:var(--space-3); }
-      .dx-build-bar { height:12px; border-radius:6px; background:rgba(255,255,255,0.04); overflow:hidden; margin-bottom:var(--space-3); }
-      .dx-build-bar-fill { height:100%; border-radius:6px; transition:width 1.5s cubic-bezier(0.22,1,0.36,1); width:var(--bar-width); }
-      .dx-build-desc { font-size:0.875rem; color:var(--text-muted); line-height:1.6; }
-
-      /* ==========================================
-         TAB 3: DISTRIBUTION / RELEASE
-         ========================================== */
-      .dx-dist-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:var(--space-6); }
-      .dx-release-flow { display:flex; flex-direction:column; gap:var(--space-4); max-width:600px; margin:0 auto; }
-      .dx-release-step { display:flex; align-items:center; gap:var(--space-4); background:var(--surface-1); border:1px solid var(--surface-3); border-radius:var(--radius-lg); padding:var(--space-4) var(--space-5); transition:all 0.3s ease; }
-      .dx-release-step:hover { background:var(--surface-2); transform:translateX(4px); }
-      .dx-release-num { width:32px; height:32px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:0.875rem; font-weight:800; flex-shrink:0; }
-      .dx-release-info { flex:1; }
-      .dx-release-name { font-size:0.9375rem; font-weight:700; color:var(--text-primary); }
-      .dx-release-desc { font-size:0.8125rem; color:var(--text-muted); }
-
-      /* ==========================================
-         FOOTER CTA
-         ========================================== */
-      .dx-footer-cta { text-align:center; padding:var(--space-24) var(--space-8); background:var(--surface-0); border-top:1px solid var(--surface-3); }
-      .dx-footer-cta-inner { max-width:700px; margin:0 auto; }
-      .dx-footer-cta h2 { font-size:clamp(1.75rem,4vw,2.5rem); font-weight:800; letter-spacing:-0.03em; margin-bottom:var(--space-4); color:var(--text-primary); }
-      .dx-footer-cta p { font-size:1.0625rem; color:var(--text-secondary); margin-bottom:var(--space-8); line-height:1.7; }
-      .dx-footer-cta-buttons { display:flex; gap:var(--space-4); justify-content:center; flex-wrap:wrap; }
-
-      /* Buttons */
-      .dx-btn { display:inline-flex; align-items:center; gap:var(--space-2); padding:var(--space-4) var(--space-8); font-size:1rem; font-weight:600; text-decoration:none; border-radius:var(--radius-lg); transition:all 0.3s cubic-bezier(0.22,1,0.36,1); cursor:pointer; border:none; white-space:nowrap; min-height:48px; line-height:1; }
-      .dx-btn-solid { background:var(--gradient-primary); color:white; box-shadow:var(--shadow-md); }
-      .dx-btn-solid:hover { transform:translateY(-3px); box-shadow:var(--shadow-xl), var(--glow-primary); color:white; }
-      .dx-btn-ghost { background:transparent; color:var(--text-secondary); border:1.5px solid var(--surface-3); }
-      .dx-btn-ghost:hover { background:var(--glass-bg-strong); border-color:var(--glass-border-strong); color:var(--text-primary); transform:translateY(-2px); }
-      .dx-btn-arrow { transition:transform 0.3s ease; display:inline-block; }
-      .dx-btn:hover .dx-btn-arrow { transform:translateX(4px); }
-
-      /* ==========================================
-         RESPONSIVE
-         ========================================== */
-      @media (max-width:1100px) {
-        .dx-topo-grid { grid-template-columns:1fr; }
-        .dx-flow-outputs { grid-template-columns:1fr; }
-        .dx-shift-grid { grid-template-columns:1fr; }
-        .dx-coverage-grid { grid-template-columns:repeat(2,1fr); }
-        .dx-build-grid { grid-template-columns:1fr; }
-        .dx-dist-grid { grid-template-columns:1fr; }
-        .dx-pyramid-level-1, .dx-pyramid-level-2, .dx-pyramid-level-3, .dx-pyramid-level-4 { width:100%; }
-      }
-
-      @media (max-width:768px) {
-        .dx-topbar { padding:var(--space-3) var(--space-4); }
-        .dx-topbar-title { display:none; }
-        .dx-hero { min-height:auto; padding:calc(var(--space-24) + var(--space-8)) var(--space-4) var(--space-16); }
-        .dx-hero-scroll { display:none; }
-        .dx-section-inner { padding:var(--space-16) var(--space-4); }
-        .dx-nav-tab { padding:0.625rem 0.5rem; }
-        .dx-nav-tab-label { font-size:0.75rem; }
-        .dx-nav-tab-subtitle { font-size:0.5625rem; }
-        .dx-topo-grid { grid-template-columns:1fr; }
-        .dx-turbo-banner { flex-direction:column; text-align:center; }
-        .dx-coverage-grid { grid-template-columns:1fr; }
-        .dx-pipeline { flex-direction:column; align-items:center; }
-        .dx-pipeline-step::after { display:none; }
-        .dx-footer-cta-buttons { flex-direction:column; align-items:stretch; }
-        .dx-btn { width:100%; justify-content:center; }
-        .dx-ide-dropdown { left:2rem; min-width:220px; }
-        .dx-timeline { padding-left:2.5rem; }
-        .dx-timeline::before { left:0.75rem; }
-        .dx-timeline-marker { left:-2.25rem; width:2rem; height:2rem; font-size:0.75rem; }
-      }
-
-      /* ==========================================
-         REDUCED MOTION
-         ========================================== */
-      @media (prefers-reduced-motion:reduce) {
-        *, *::before, *::after { animation-duration:0.01ms !important; animation-iteration-count:1 !important; transition-duration:0.01ms !important; scroll-behavior:auto !important; }
-        .scroll-reveal { opacity:1; transform:none; filter:none; transition:none; }
-        .dx-hero-orb { animation:none !important; opacity:0.15; }
-        .dx-nav-tab { transition:none; }
-        .dx-shift-bar-fill, .dx-build-bar-fill { transition:none; }
-      }
-
-      /* --- Focus States --- */
-      .dx-btn:focus-visible,
-      .dx-back-link:focus-visible,
-      .dx-topbar-link:focus-visible,
-      .dx-nav-tab:focus-visible {
-        outline:3px solid var(--wc-accent); outline-offset:3px;
-      }
-    </style>
-  </head>
-
-  <body>
-    <!-- Top Navigation Bar -->
-    <nav class="dx-topbar" aria-label="Page navigation">
-      <div class="dx-topbar-left">
-        <a href="/" class="dx-back-link" aria-label="Back to WC-2026 Dashboard">
-          <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
-          Dashboard
-        </a>
-        <span class="dx-topbar-title" aria-hidden="true">|</span>
-        <span class="dx-topbar-title">Developer Experience</span>
-      </div>
-      <div class="dx-topbar-right">
-        <a href="/getting-started/quickstart/" class="dx-topbar-link">
-          <i class="fa-solid fa-book" aria-hidden="true"></i>
-          Quickstart
-        </a>
-        <a href="/architecture/testing/" class="dx-topbar-link">
-          <i class="fa-solid fa-vial" aria-hidden="true"></i>
-          Testing Docs
-        </a>
+  <main id="main-content">
+    <!-- STICKY TAB NAV -->
+    <nav class="dx-section-nav" aria-label="Developer experience topics" role="tablist">
+      <div class="dx-section-nav-inner">
+        <button class="dx-nav-tab is-active" role="tab" aria-selected="true" aria-controls="tab-dx" data-tab="tab-dx">
+          <i class="fa-solid fa-rocket" aria-hidden="true"></i>
+          <span class="dx-nav-tab-label">Onboarding &amp; DX</span>
+          <span class="dx-nav-tab-subtitle">Developer Experience</span>
+        </button>
+        <button class="dx-nav-tab" role="tab" aria-selected="false" aria-controls="tab-quality" data-tab="tab-quality">
+          <i class="fa-solid fa-shield-halved" aria-hidden="true"></i>
+          <span class="dx-nav-tab-label">Quality Pipeline</span>
+          <span class="dx-nav-tab-subtitle">Automated Gates</span>
+        </button>
+        <button class="dx-nav-tab" role="tab" aria-selected="false" aria-controls="tab-cicd" data-tab="tab-cicd">
+          <i class="fa-solid fa-code-branch" aria-hidden="true"></i>
+          <span class="dx-nav-tab-label">CI/CD &amp; Delivery</span>
+          <span class="dx-nav-tab-subtitle">Build Pipeline</span>
+        </button>
       </div>
     </nav>
 
-    <main id="main-content">
-      <!-- STICKY TAB NAV -->
-      <nav class="dx-section-nav" aria-label="Developer experience topics" role="tablist">
-        <div class="dx-section-nav-inner">
-          <button class="dx-nav-tab is-active" role="tab" aria-selected="true" aria-controls="tab-dx" data-tab="tab-dx">
-            <i class="fa-solid fa-rocket" aria-hidden="true"></i>
-            <span class="dx-nav-tab-label">Onboarding &amp; DX</span>
-            <span class="dx-nav-tab-subtitle">Developer Experience</span>
-          </button>
-          <button class="dx-nav-tab" role="tab" aria-selected="false" aria-controls="tab-quality" data-tab="tab-quality">
-            <i class="fa-solid fa-shield-halved" aria-hidden="true"></i>
-            <span class="dx-nav-tab-label">Quality Pipeline</span>
-            <span class="dx-nav-tab-subtitle">Automated Gates</span>
-          </button>
-          <button class="dx-nav-tab" role="tab" aria-selected="false" aria-controls="tab-cicd" data-tab="tab-cicd">
-            <i class="fa-solid fa-code-branch" aria-hidden="true"></i>
-            <span class="dx-nav-tab-label">CI/CD &amp; Delivery</span>
-            <span class="dx-nav-tab-subtitle">Build Pipeline</span>
-          </button>
+    <!-- TAB 1: ONBOARDING & DX -->
+    <DxTab1Onboarding />
+
+    <!-- TAB 2: QUALITY PIPELINE -->
+    <DxTab2QualityPipeline />
+
+    <!-- TAB 3: CI/CD & DELIVERY -->
+    <DxTab3CiCd />
+
+    <!-- FOOTER CTA (outside tabs) -->
+    <section class="dx-footer-cta" aria-label="Next steps">
+      <div class="dx-footer-cta-inner scroll-reveal">
+        <h2>Ready to Experience It?</h2>
+        <p>
+          Clone the repo, run the dev server, and build your first component.
+          The documentation covers everything from quickstart to advanced patterns.
+        </p>
+        <div class="dx-footer-cta-buttons">
+          <a href="/getting-started/quickstart/" class="dx-btn dx-btn-solid">
+            Quickstart Guide
+            <span class="dx-btn-arrow" aria-hidden="true">&rarr;</span>
+          </a>
+          <a href="/architecture/testing/" class="dx-btn dx-btn-ghost">
+            Testing Strategy
+            <span class="dx-btn-arrow" aria-hidden="true">&rarr;</span>
+          </a>
+          <a href="/" class="dx-btn dx-btn-ghost">
+            Back to Dashboard
+            <span class="dx-btn-arrow" aria-hidden="true">&rarr;</span>
+          </a>
         </div>
-      </nav>
-
-      <!-- ============================================
-           TAB 1: ONBOARDING & DX
-           ============================================ -->
-      <div id="tab-dx" class="dx-tab-content is-active" role="tabpanel">
-        <section class="dx-hero dx-hero-dx" aria-label="Developer onboarding experience">
-          <div class="dx-hero-grid" aria-hidden="true"></div>
-          <div class="dx-hero-orb dx-hero-orb-1" aria-hidden="true"></div>
-          <div class="dx-hero-orb dx-hero-orb-2" aria-hidden="true"></div>
-          <div class="dx-hero-orb dx-hero-orb-3" aria-hidden="true"></div>
-
-          <div class="dx-hero-content">
-            <div class="dx-hero-badge">
-              <span class="dx-hero-badge-dot" aria-hidden="true"></span>
-              Developer Experience
-            </div>
-
-            <h1 class="dx-hero-title">Zero to Component<br />in Under 5 Minutes</h1>
-
-            <p class="dx-hero-subtitle">Developer onboarding that respects your time</p>
-
-            <p class="dx-hero-description">
-              Clone, install, run. No environment configuration, no secret keys,
-              no "ask Dave about the wiki page." Every developer hits a working
-              Storybook with hot-reload in under five minutes.
-            </p>
-          </div>
-
-          <div class="dx-hero-scroll" aria-hidden="true">
-            <span>Explore</span>
-            <div class="dx-hero-scroll-line"></div>
-          </div>
-        </section>
-
-        <!-- SECTION: Zero to Component Timeline -->
-        <section class="dx-section" aria-label="Onboarding timeline">
-          <div class="dx-section-inner">
-            <div class="dx-section-header scroll-reveal">
-              <span class="dx-section-label dx-section-label-cyan">Onboarding Timeline</span>
-              <h2 class="dx-section-title">From Clone to First Component</h2>
-              <p class="dx-section-description">
-                Every step measured, every dependency automated. Here is the actual
-                timeline a new developer experiences on day one.
-              </p>
-            </div>
-
-            <div class="dx-timeline">
-              <!-- Step 1 -->
-              <div class="dx-timeline-step scroll-reveal scroll-reveal-delay-1">
-                <div class="dx-timeline-marker dx-timeline-marker-cyan">1</div>
-                <div class="dx-timeline-card">
-                  <div class="dx-timeline-header">
-                    <div class="dx-timeline-title">
-                      <i class="fa-solid fa-clone" style="color: var(--wc-cyan);" aria-hidden="true"></i>
-                      Clone Repository
-                    </div>
-                    <span class="dx-timeline-time dx-timeline-time-cyan">~30s</span>
-                  </div>
-                  <p class="dx-timeline-desc">Single monorepo. One clone gets you the component library, Storybook, documentation site, and all tooling.</p>
-                  <code class="dx-timeline-cmd">git clone git@github.com:org/wc-2026.git</code>
-                </div>
-              </div>
-
-              <!-- Step 2 -->
-              <div class="dx-timeline-step scroll-reveal scroll-reveal-delay-2">
-                <div class="dx-timeline-marker dx-timeline-marker-green">2</div>
-                <div class="dx-timeline-card">
-                  <div class="dx-timeline-header">
-                    <div class="dx-timeline-title">
-                      <i class="fa-solid fa-download" style="color: var(--wc-green);" aria-hidden="true"></i>
-                      Install Dependencies
-                    </div>
-                    <span class="dx-timeline-time dx-timeline-time-green">~45s</span>
-                  </div>
-                  <p class="dx-timeline-desc">npm workspaces resolve all cross-package dependencies in a single install. No manual linking, no hoisting issues.</p>
-                  <code class="dx-timeline-cmd">npm install</code>
-                </div>
-              </div>
-
-              <!-- Step 3 -->
-              <div class="dx-timeline-step scroll-reveal scroll-reveal-delay-3">
-                <div class="dx-timeline-marker dx-timeline-marker-amber">3</div>
-                <div class="dx-timeline-card">
-                  <div class="dx-timeline-header">
-                    <div class="dx-timeline-title">
-                      <i class="fa-solid fa-play" style="color: var(--wc-amber);" aria-hidden="true"></i>
-                      Start Dev Server
-                    </div>
-                    <span class="dx-timeline-time dx-timeline-time-amber">~10s</span>
-                  </div>
-                  <p class="dx-timeline-desc">Turborepo orchestrates parallel builds. Vite dev server with HMR starts in under 10 seconds from cold.</p>
-                  <code class="dx-timeline-cmd">turbo run dev</code>
-                </div>
-              </div>
-
-              <!-- Step 4 -->
-              <div class="dx-timeline-step scroll-reveal scroll-reveal-delay-4">
-                <div class="dx-timeline-marker dx-timeline-marker-violet">4</div>
-                <div class="dx-timeline-card">
-                  <div class="dx-timeline-header">
-                    <div class="dx-timeline-title">
-                      <i class="fa-solid fa-book-open" style="color: var(--wc-violet);" aria-hidden="true"></i>
-                      Storybook Opens
-                    </div>
-                    <span class="dx-timeline-time dx-timeline-time-violet">Instant</span>
-                  </div>
-                  <p class="dx-timeline-desc">Every component rendered with all variants, states, and theme combinations. Interactive controls powered by CEM autodiscovery.</p>
-                </div>
-              </div>
-
-              <!-- Step 5 -->
-              <div class="dx-timeline-step scroll-reveal scroll-reveal-delay-5">
-                <div class="dx-timeline-marker dx-timeline-marker-pink">5</div>
-                <div class="dx-timeline-card">
-                  <div class="dx-timeline-header">
-                    <div class="dx-timeline-title">
-                      <i class="fa-solid fa-pen-nib" style="color: var(--wc-pink);" aria-hidden="true"></i>
-                      First Edit &mdash; Live
-                    </div>
-                    <span class="dx-timeline-time dx-timeline-time-pink">&lt; 2min</span>
-                  </div>
-                  <p class="dx-timeline-desc">Edit a component, see it update instantly in Storybook. TypeScript catches errors before you save. CEM regenerates on file change.</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <!-- SECTION: Monorepo Topology -->
-        <section class="dx-section" aria-label="Monorepo developer ergonomics">
-          <div class="dx-section-inner">
-            <div class="dx-section-header scroll-reveal">
-              <span class="dx-section-label dx-section-label-cyan">Workspace Architecture</span>
-              <h2 class="dx-section-title">Monorepo Developer Ergonomics</h2>
-              <p class="dx-section-description">
-                Three focused workspaces, one Turborepo pipeline. Changes propagate
-                instantly across packages with zero manual coordination.
-              </p>
-            </div>
-
-            <div class="dx-topo-grid">
-              <div class="dx-topo-card scroll-reveal scroll-reveal-delay-1">
-                <div class="dx-topo-icon icon-cyan"><i class="fa-solid fa-cubes" aria-hidden="true"></i></div>
-                <div class="dx-topo-name">packages/wc-library</div>
-                <p class="dx-topo-desc">Core component library. Lit 3 web components, design tokens, and the Custom Elements Manifest source of truth.</p>
-                <div class="dx-topo-tags">
-                  <span class="dx-topo-tag">Lit 3</span>
-                  <span class="dx-topo-tag">TypeScript</span>
-                  <span class="dx-topo-tag">CEM</span>
-                  <span class="dx-topo-tag">W3C DTCG</span>
-                </div>
-              </div>
-
-              <div class="dx-topo-card scroll-reveal scroll-reveal-delay-2">
-                <div class="dx-topo-icon icon-violet"><i class="fa-solid fa-palette" aria-hidden="true"></i></div>
-                <div class="dx-topo-name">apps/storybook</div>
-                <p class="dx-topo-desc">Interactive component explorer with autodiscovered controls, multi-theme preview, and accessibility testing built in.</p>
-                <div class="dx-topo-tags">
-                  <span class="dx-topo-tag">Storybook 10</span>
-                  <span class="dx-topo-tag">Web Components</span>
-                  <span class="dx-topo-tag">Autodocs</span>
-                </div>
-              </div>
-
-              <div class="dx-topo-card scroll-reveal scroll-reveal-delay-3">
-                <div class="dx-topo-icon icon-green"><i class="fa-solid fa-book" aria-hidden="true"></i></div>
-                <div class="dx-topo-name">apps/docs</div>
-                <p class="dx-topo-desc">Starlight-powered documentation with auto-generated API reference pages sourced directly from the CEM pipeline.</p>
-                <div class="dx-topo-tags">
-                  <span class="dx-topo-tag">Astro</span>
-                  <span class="dx-topo-tag">Starlight</span>
-                  <span class="dx-topo-tag">MDX</span>
-                </div>
-              </div>
-            </div>
-
-            <div class="dx-turbo-banner scroll-reveal scroll-reveal-delay-4">
-              <div class="dx-turbo-icon icon-cyan">
-                <i class="fa-solid fa-bolt" aria-hidden="true"></i>
-              </div>
-              <div class="dx-turbo-content">
-                <div class="dx-turbo-title">Turborepo Orchestration</div>
-                <p class="dx-turbo-desc">
-                  Every task runs in parallel with intelligent caching. Edit a token in the library, and Storybook
-                  plus Docs rebuild simultaneously. Remote cache means CI builds are near-instant when the
-                  dependency graph has not changed.
-                </p>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <!-- SECTION: IDE Integration -->
-        <section class="dx-section" aria-label="IDE integration via Custom Elements Manifest">
-          <div class="dx-section-inner">
-            <div class="dx-section-header scroll-reveal">
-              <span class="dx-section-label dx-section-label-cyan">IDE Integration</span>
-              <h2 class="dx-section-title">Autocomplete That Knows Your Components</h2>
-              <p class="dx-section-description">
-                The Custom Elements Manifest powers IDE autocomplete out of the box.
-                Every property, event, slot, and CSS custom property is discoverable
-                without leaving your editor.
-              </p>
-            </div>
-
-            <div class="dx-ide scroll-reveal scroll-reveal-delay-1">
-              <div class="dx-ide-titlebar">
-                <span class="dx-code-dot"></span>
-                <span class="dx-code-dot"></span>
-                <span class="dx-code-dot"></span>
-                <span class="dx-code-filename">page-template.html</span>
-              </div>
-              <div class="dx-ide-body">
-                <div class="dx-ide-line">
-                  <span class="dx-ide-line-num">14</span>
-                  <span>&lt;<span style="color:#7fdbca;">wc-button</span></span>
-                </div>
-                <div class="dx-ide-line">
-                  <span class="dx-ide-line-num">15</span>
-                  <span>&nbsp;&nbsp;<span style="color:#ffcb6b;">variant</span>=<span style="color:#addb67;">"primary"</span></span>
-                </div>
-                <div class="dx-ide-line">
-                  <span class="dx-ide-line-num">16</span>
-                  <span>&nbsp;&nbsp;<span style="color:#ffcb6b;">s</span><span style="color:var(--text-muted);">|</span></span>
-                </div>
-
-                <div class="dx-ide-dropdown">
-                  <div class="dx-ide-suggestion">
-                    <span class="dx-ide-suggestion-icon" style="background:rgba(6,182,212,0.15); color:var(--wc-cyan);">P</span>
-                    <span class="dx-ide-suggestion-prop">size</span>
-                    <span class="dx-ide-suggestion-type">"small" | "medium" | "large"</span>
-                  </div>
-                  <div class="dx-ide-suggestion">
-                    <span class="dx-ide-suggestion-icon" style="background:rgba(139,92,246,0.15); color:var(--wc-violet);">S</span>
-                    <span>slot</span>
-                    <span class="dx-ide-suggestion-type">default | icon | prefix</span>
-                  </div>
-                  <div class="dx-ide-suggestion">
-                    <span class="dx-ide-suggestion-icon" style="background:rgba(6,182,212,0.15); color:var(--wc-cyan);">P</span>
-                    <span>shape</span>
-                    <span class="dx-ide-suggestion-type">"rounded" | "pill" | "square"</span>
-                  </div>
-                  <div class="dx-ide-suggestion">
-                    <span class="dx-ide-suggestion-icon" style="background:rgba(245,158,11,0.15); color:var(--wc-amber);">E</span>
-                    <span>@submit</span>
-                    <span class="dx-ide-suggestion-type">CustomEvent&lt;void&gt;</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <!-- SECTION: Documentation Pipeline -->
-        <section class="dx-section" aria-label="Documentation that writes itself">
-          <div class="dx-section-inner">
-            <div class="dx-section-header scroll-reveal">
-              <span class="dx-section-label dx-section-label-cyan">Single Source of Truth</span>
-              <h2 class="dx-section-title">Documentation That Writes Itself</h2>
-              <p class="dx-section-description">
-                Write JSDoc once in your component. The CEM pipeline automatically
-                generates Storybook controls, API reference pages, and IDE intellisense.
-              </p>
-            </div>
-
-            <div class="dx-flow scroll-reveal scroll-reveal-delay-1">
-              <div class="dx-flow-source">
-                <div class="dx-flow-icon icon-cyan">
-                  <i class="fa-solid fa-code" aria-hidden="true"></i>
-                </div>
-                <span class="dx-flow-label">JSDoc</span>
-                <span class="dx-flow-sub">Write once</span>
-              </div>
-              <i class="fa-solid fa-arrow-right dx-flow-arrow" aria-hidden="true"></i>
-              <div class="dx-flow-source">
-                <div class="dx-flow-icon icon-amber">
-                  <i class="fa-solid fa-gears" aria-hidden="true"></i>
-                </div>
-                <span class="dx-flow-label">CEM Analyzer</span>
-                <span class="dx-flow-sub">Auto-extract</span>
-              </div>
-              <i class="fa-solid fa-arrow-right dx-flow-arrow" aria-hidden="true"></i>
-              <div class="dx-flow-source">
-                <div class="dx-flow-icon icon-green">
-                  <i class="fa-solid fa-file-code" aria-hidden="true"></i>
-                </div>
-                <span class="dx-flow-label">CEM JSON</span>
-                <span class="dx-flow-sub">Manifest</span>
-              </div>
-            </div>
-
-            <div class="dx-flow-outputs scroll-reveal scroll-reveal-delay-2">
-              <div class="dx-flow-output">
-                <div class="dx-flow-output-icon" style="color:var(--wc-violet);">
-                  <i class="fa-solid fa-palette" aria-hidden="true"></i>
-                </div>
-                <div class="dx-flow-output-title">Storybook Autodocs</div>
-                <p class="dx-flow-output-desc">Interactive controls, prop tables, and live examples generated from the manifest.</p>
-              </div>
-              <div class="dx-flow-output">
-                <div class="dx-flow-output-icon" style="color:var(--wc-green);">
-                  <i class="fa-solid fa-book" aria-hidden="true"></i>
-                </div>
-                <div class="dx-flow-output-title">Starlight API Ref</div>
-                <p class="dx-flow-output-desc">Complete API reference pages with property tables, slot docs, and event signatures.</p>
-              </div>
-              <div class="dx-flow-output">
-                <div class="dx-flow-output-icon" style="color:var(--wc-cyan);">
-                  <i class="fa-solid fa-keyboard" aria-hidden="true"></i>
-                </div>
-                <div class="dx-flow-output-title">VS Code Intellisense</div>
-                <p class="dx-flow-output-desc">Rich autocomplete for HTML templates with property types, slots, events, and CSS parts.</p>
-              </div>
-            </div>
-          </div>
-        </section>
-      </div><!-- end tab-dx -->
-
-      <!-- ============================================
-           TAB 2: QUALITY PIPELINE
-           ============================================ -->
-      <div id="tab-quality" class="dx-tab-content" role="tabpanel">
-        <section class="dx-hero dx-hero-quality" aria-label="Quality pipeline overview">
-          <div class="dx-hero-grid" aria-hidden="true"></div>
-          <div class="dx-hero-orb dx-hero-orb-1" aria-hidden="true"></div>
-          <div class="dx-hero-orb dx-hero-orb-2" aria-hidden="true"></div>
-          <div class="dx-hero-orb dx-hero-orb-3" aria-hidden="true"></div>
-
-          <div class="dx-hero-content">
-            <div class="dx-hero-badge">
-              <span class="dx-hero-badge-dot" aria-hidden="true"></span>
-              Quality Engineering
-            </div>
-
-            <h1 class="dx-hero-title">Four Automated Gates,<br />Zero Manual Steps</h1>
-
-            <p class="dx-hero-subtitle">Quality engineered into the process, not bolted on after</p>
-
-            <p class="dx-hero-description">
-              Every commit passes through unit tests, accessibility audits,
-              visual regression checks, and end-to-end validation. No human
-              gatekeeping required. The pipeline catches what code review cannot.
-            </p>
-          </div>
-
-          <div class="dx-hero-scroll" aria-hidden="true">
-            <span>Explore</span>
-            <div class="dx-hero-scroll-line"></div>
-          </div>
-        </section>
-
-        <!-- SECTION: Testing Pyramid -->
-        <section class="dx-section" aria-label="Testing pyramid">
-          <div class="dx-section-inner">
-            <div class="dx-section-header scroll-reveal">
-              <span class="dx-section-label dx-section-label-green">Testing Strategy</span>
-              <h2 class="dx-section-title">The Testing Pyramid</h2>
-              <p class="dx-section-description">
-                Four layers of automated validation. Each level catches a different
-                category of defect, from logic errors to visual regressions.
-              </p>
-            </div>
-
-            <div class="dx-pyramid">
-              <!-- Level 4 - E2E (top, narrowest) -->
-              <div class="dx-pyramid-level dx-pyramid-level-4 scroll-reveal scroll-reveal-delay-1">
-                <div class="dx-pyramid-icon icon-violet">
-                  <i class="fa-solid fa-display" aria-hidden="true"></i>
-                </div>
-                <div class="dx-pyramid-info">
-                  <div class="dx-pyramid-label" style="color:var(--wc-violet);">Level 4</div>
-                  <div class="dx-pyramid-name">End-to-End Tests</div>
-                  <span class="dx-pyramid-tool">Playwright</span>
-                  <p class="dx-pyramid-desc">Full page integration testing across real browsers. Validates component interactions in complete page contexts.</p>
-                </div>
-              </div>
-
-              <!-- Level 3 - Visual Regression -->
-              <div class="dx-pyramid-level dx-pyramid-level-3 scroll-reveal scroll-reveal-delay-2">
-                <div class="dx-pyramid-icon icon-pink">
-                  <i class="fa-solid fa-camera" aria-hidden="true"></i>
-                </div>
-                <div class="dx-pyramid-info">
-                  <div class="dx-pyramid-label" style="color:var(--wc-pink);">Level 3</div>
-                  <div class="dx-pyramid-name">Visual Regression</div>
-                  <span class="dx-pyramid-tool">Chromatic</span>
-                  <p class="dx-pyramid-desc">Pixel-perfect screenshot diffing across every variant, theme combination, and viewport. Catches CSS regressions invisible to unit tests.</p>
-                </div>
-              </div>
-
-              <!-- Level 2 - Accessibility -->
-              <div class="dx-pyramid-level dx-pyramid-level-2 scroll-reveal scroll-reveal-delay-3">
-                <div class="dx-pyramid-icon icon-amber">
-                  <i class="fa-solid fa-universal-access" aria-hidden="true"></i>
-                </div>
-                <div class="dx-pyramid-info">
-                  <div class="dx-pyramid-label" style="color:var(--wc-amber);">Level 2</div>
-                  <div class="dx-pyramid-name">Accessibility Audits</div>
-                  <span class="dx-pyramid-tool">axe-core</span>
-                  <p class="dx-pyramid-desc">WCAG 2.1 AA compliance on every commit. Automated audits catch color contrast, ARIA, keyboard nav, and screen reader issues before merge.</p>
-                </div>
-              </div>
-
-              <!-- Level 1 - Unit Tests (bottom, widest) -->
-              <div class="dx-pyramid-level dx-pyramid-level-1 scroll-reveal scroll-reveal-delay-4">
-                <div class="dx-pyramid-icon icon-green">
-                  <i class="fa-solid fa-vial" aria-hidden="true"></i>
-                </div>
-                <div class="dx-pyramid-info">
-                  <div class="dx-pyramid-label" style="color:var(--wc-green);">Level 1</div>
-                  <div class="dx-pyramid-name">Unit Tests</div>
-                  <span class="dx-pyramid-tool">Vitest Browser Mode</span>
-                  <p class="dx-pyramid-desc">Real DOM, real browser, real rendering. Not jsdom approximations. Every component tested against actual browser APIs.</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <!-- SECTION: Shift-Left Comparison -->
-        <section class="dx-section" aria-label="Shift-left quality comparison">
-          <div class="dx-section-inner">
-            <div class="dx-section-header scroll-reveal">
-              <span class="dx-section-label dx-section-label-green">Shift-Left Quality</span>
-              <h2 class="dx-section-title">Catch Bugs Where They Are Cheapest to Fix</h2>
-              <p class="dx-section-description">
-                Traditional pipelines find bugs in QA or production. This system
-                shifts detection to the moment of creation.
-              </p>
-            </div>
-
-            <div class="dx-shift-grid">
-              <!-- Traditional -->
-              <div class="dx-shift-card dx-shift-card-bad scroll-reveal scroll-reveal-delay-1">
-                <div class="dx-shift-header">
-                  <div class="dx-shift-icon icon-red">
-                    <i class="fa-solid fa-xmark" aria-hidden="true"></i>
-                  </div>
-                  <div class="dx-shift-title" style="color:var(--wc-red);">Traditional Pipeline</div>
-                </div>
-                <div class="dx-shift-bar-row">
-                  <span class="dx-shift-bar-label">Coding</span>
-                  <div class="dx-shift-bar-track">
-                    <div class="dx-shift-bar-fill dx-shift-bar-fill-red scroll-reveal-bar" style="--target-width:15%;"></div>
-                  </div>
-                  <span class="dx-shift-bar-value">15%</span>
-                </div>
-                <div class="dx-shift-bar-row">
-                  <span class="dx-shift-bar-label">Code Review</span>
-                  <div class="dx-shift-bar-track">
-                    <div class="dx-shift-bar-fill dx-shift-bar-fill-red scroll-reveal-bar" style="--target-width:20%;"></div>
-                  </div>
-                  <span class="dx-shift-bar-value">20%</span>
-                </div>
-                <div class="dx-shift-bar-row">
-                  <span class="dx-shift-bar-label">QA Testing</span>
-                  <div class="dx-shift-bar-track">
-                    <div class="dx-shift-bar-fill dx-shift-bar-fill-red scroll-reveal-bar" style="--target-width:40%;"></div>
-                  </div>
-                  <span class="dx-shift-bar-value">40%</span>
-                </div>
-                <div class="dx-shift-bar-row">
-                  <span class="dx-shift-bar-label">Production</span>
-                  <div class="dx-shift-bar-track">
-                    <div class="dx-shift-bar-fill dx-shift-bar-fill-red scroll-reveal-bar" style="--target-width:25%;"></div>
-                  </div>
-                  <span class="dx-shift-bar-value">25%</span>
-                </div>
-              </div>
-
-              <!-- This System -->
-              <div class="dx-shift-card dx-shift-card-good scroll-reveal scroll-reveal-delay-2">
-                <div class="dx-shift-header">
-                  <div class="dx-shift-icon icon-green">
-                    <i class="fa-solid fa-check" aria-hidden="true"></i>
-                  </div>
-                  <div class="dx-shift-title" style="color:var(--wc-green);">WC-2026 Pipeline</div>
-                </div>
-                <div class="dx-shift-bar-row">
-                  <span class="dx-shift-bar-label">Coding</span>
-                  <div class="dx-shift-bar-track">
-                    <div class="dx-shift-bar-fill dx-shift-bar-fill-green scroll-reveal-bar" style="--target-width:55%;"></div>
-                  </div>
-                  <span class="dx-shift-bar-value">55%</span>
-                </div>
-                <div class="dx-shift-bar-row">
-                  <span class="dx-shift-bar-label">Pre-commit</span>
-                  <div class="dx-shift-bar-track">
-                    <div class="dx-shift-bar-fill dx-shift-bar-fill-green scroll-reveal-bar" style="--target-width:30%;"></div>
-                  </div>
-                  <span class="dx-shift-bar-value">30%</span>
-                </div>
-                <div class="dx-shift-bar-row">
-                  <span class="dx-shift-bar-label">CI Pipeline</span>
-                  <div class="dx-shift-bar-track">
-                    <div class="dx-shift-bar-fill dx-shift-bar-fill-green scroll-reveal-bar" style="--target-width:13%;"></div>
-                  </div>
-                  <span class="dx-shift-bar-value">13%</span>
-                </div>
-                <div class="dx-shift-bar-row">
-                  <span class="dx-shift-bar-label">Production</span>
-                  <div class="dx-shift-bar-track">
-                    <div class="dx-shift-bar-fill dx-shift-bar-fill-green scroll-reveal-bar" style="--target-width:2%;"></div>
-                  </div>
-                  <span class="dx-shift-bar-value">2%</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <!-- SECTION: Coverage Dashboard -->
-        <section class="dx-section" aria-label="Coverage dashboard">
-          <div class="dx-section-inner">
-            <div class="dx-section-header scroll-reveal">
-              <span class="dx-section-label dx-section-label-green">Coverage Metrics</span>
-              <h2 class="dx-section-title">Quality at a Glance</h2>
-              <p class="dx-section-description">
-                Real-time quality metrics tracked across every component in the library.
-              </p>
-            </div>
-
-            <div class="dx-coverage-grid">
-              <div class="dx-coverage-card scroll-reveal scroll-reveal-delay-1">
-                <div class="dx-coverage-ring" style="background:conic-gradient(var(--wc-green) 0% 92%, rgba(255,255,255,0.06) 92% 100%);">
-                  <div class="dx-coverage-value" style="color:var(--wc-green);">&gt;90%</div>
-                </div>
-                <div class="dx-coverage-label">Unit Coverage</div>
-                <p class="dx-coverage-desc">Statement and branch coverage across all components</p>
-              </div>
-
-              <div class="dx-coverage-card scroll-reveal scroll-reveal-delay-2">
-                <div class="dx-coverage-ring" style="background:conic-gradient(var(--wc-amber) 0% 100%, rgba(255,255,255,0.06) 100% 100%);">
-                  <div class="dx-coverage-value" style="color:var(--wc-amber);">100%</div>
-                </div>
-                <div class="dx-coverage-label">A11y Audited</div>
-                <p class="dx-coverage-desc">Every component passes axe-core WCAG 2.1 AA audit</p>
-              </div>
-
-              <div class="dx-coverage-card scroll-reveal scroll-reveal-delay-3">
-                <div class="dx-coverage-ring" style="background:conic-gradient(var(--wc-pink) 0% 100%, rgba(255,255,255,0.06) 100% 100%);">
-                  <div class="dx-coverage-value" style="color:var(--wc-pink);">All</div>
-                </div>
-                <div class="dx-coverage-label">Visual Tested</div>
-                <p class="dx-coverage-desc">Every variant and theme combination screenshot tested</p>
-              </div>
-
-              <div class="dx-coverage-card scroll-reveal scroll-reveal-delay-4">
-                <div class="dx-coverage-ring" style="background:conic-gradient(var(--wc-violet) 0% 100%, rgba(255,255,255,0.06) 100% 100%);">
-                  <div class="dx-coverage-value" style="color:var(--wc-violet);">E2E</div>
-                </div>
-                <div class="dx-coverage-label">Critical Flows</div>
-                <p class="dx-coverage-desc">Every critical user flow validated end-to-end in CI</p>
-              </div>
-            </div>
-          </div>
-        </section>
-      </div><!-- end tab-quality -->
-
-      <!-- ============================================
-           TAB 3: CI/CD & DELIVERY
-           ============================================ -->
-      <div id="tab-cicd" class="dx-tab-content" role="tabpanel">
-        <section class="dx-hero dx-hero-cicd" aria-label="CI/CD and delivery pipeline">
-          <div class="dx-hero-grid" aria-hidden="true"></div>
-          <div class="dx-hero-orb dx-hero-orb-1" aria-hidden="true"></div>
-          <div class="dx-hero-orb dx-hero-orb-2" aria-hidden="true"></div>
-          <div class="dx-hero-orb dx-hero-orb-3" aria-hidden="true"></div>
-
-          <div class="dx-hero-content">
-            <div class="dx-hero-badge">
-              <span class="dx-hero-badge-dot" aria-hidden="true"></span>
-              Continuous Delivery
-            </div>
-
-            <h1 class="dx-hero-title">From Commit to CDN<br />in 8 Seconds</h1>
-
-            <p class="dx-hero-subtitle">Turborepo-powered builds with intelligent caching</p>
-
-            <p class="dx-hero-description">
-              Push code, watch it flow through type checking, testing, accessibility
-              auditing, visual regression, and deployment. Cached builds complete
-              in seconds. Full builds complete in under a minute.
-            </p>
-          </div>
-
-          <div class="dx-hero-scroll" aria-hidden="true">
-            <span>Explore</span>
-            <div class="dx-hero-scroll-line"></div>
-          </div>
-        </section>
-
-        <!-- SECTION: Pipeline Flow -->
-        <section class="dx-section" aria-label="CI pipeline flow">
-          <div class="dx-section-inner">
-            <div class="dx-section-header scroll-reveal">
-              <span class="dx-section-label dx-section-label-violet">Pipeline Architecture</span>
-              <h2 class="dx-section-title">Seven Stages, Fully Automated</h2>
-              <p class="dx-section-description">
-                Every push triggers a deterministic pipeline. Each stage gates the next.
-                Failures halt deployment and notify the author instantly.
-              </p>
-            </div>
-
-            <div class="dx-pipeline scroll-reveal scroll-reveal-delay-1">
-              <div class="dx-pipeline-step">
-                <div class="dx-pipeline-step-icon icon-violet"><i class="fa-solid fa-code-commit" aria-hidden="true"></i></div>
-                <span class="dx-pipeline-step-label">git push</span>
-                <span class="dx-pipeline-step-time">trigger</span>
-              </div>
-              <div class="dx-pipeline-step">
-                <div class="dx-pipeline-step-icon icon-cyan"><i class="fa-solid fa-spell-check" aria-hidden="true"></i></div>
-                <span class="dx-pipeline-step-label">Type Check</span>
-                <span class="dx-pipeline-step-time">~3s</span>
-              </div>
-              <div class="dx-pipeline-step">
-                <div class="dx-pipeline-step-icon icon-green"><i class="fa-solid fa-vial" aria-hidden="true"></i></div>
-                <span class="dx-pipeline-step-label">Unit Tests</span>
-                <span class="dx-pipeline-step-time">~5s</span>
-              </div>
-              <div class="dx-pipeline-step">
-                <div class="dx-pipeline-step-icon icon-amber"><i class="fa-solid fa-universal-access" aria-hidden="true"></i></div>
-                <span class="dx-pipeline-step-label">A11y Audit</span>
-                <span class="dx-pipeline-step-time">~4s</span>
-              </div>
-              <div class="dx-pipeline-step">
-                <div class="dx-pipeline-step-icon icon-pink"><i class="fa-solid fa-camera" aria-hidden="true"></i></div>
-                <span class="dx-pipeline-step-label">Visual Reg.</span>
-                <span class="dx-pipeline-step-time">~12s</span>
-              </div>
-              <div class="dx-pipeline-step">
-                <div class="dx-pipeline-step-icon icon-electric"><i class="fa-solid fa-hammer" aria-hidden="true"></i></div>
-                <span class="dx-pipeline-step-label">Build</span>
-                <span class="dx-pipeline-step-time">~8s</span>
-              </div>
-              <div class="dx-pipeline-step">
-                <div class="dx-pipeline-step-icon icon-green"><i class="fa-solid fa-cloud-arrow-up" aria-hidden="true"></i></div>
-                <span class="dx-pipeline-step-label">Deploy</span>
-                <span class="dx-pipeline-step-time">~6s</span>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <!-- SECTION: Build Intelligence -->
-        <section class="dx-section" aria-label="Build intelligence comparison">
-          <div class="dx-section-inner">
-            <div class="dx-section-header scroll-reveal">
-              <span class="dx-section-label dx-section-label-violet">Build Intelligence</span>
-              <h2 class="dx-section-title">Turborepo Remote Cache in Action</h2>
-              <p class="dx-section-description">
-                When the dependency graph has not changed, builds are served from cache.
-                The difference is dramatic.
-              </p>
-            </div>
-
-            <div class="dx-build-grid">
-              <div class="dx-build-card scroll-reveal scroll-reveal-delay-1">
-                <div class="dx-build-value" style="color:var(--text-muted);">~45s</div>
-                <div class="dx-build-label">Full Build (Cold)</div>
-                <div class="dx-build-bar">
-                  <div class="dx-build-bar-fill scroll-reveal-bar" style="--target-width:100%; background:linear-gradient(90deg, var(--wc-amber), var(--wc-red));"></div>
-                </div>
-                <p class="dx-build-desc">Complete rebuild of all packages, components, Storybook, and documentation from scratch.</p>
-              </div>
-
-              <div class="dx-build-card scroll-reveal scroll-reveal-delay-2" style="border-color:rgba(16,185,129,0.25);">
-                <div class="dx-build-value" style="color:var(--wc-green);">~8s</div>
-                <div class="dx-build-label">Cached Build (Warm)</div>
-                <div class="dx-build-bar">
-                  <div class="dx-build-bar-fill scroll-reveal-bar" style="--target-width:18%; background:linear-gradient(90deg, var(--wc-green), var(--wc-cyan));"></div>
-                </div>
-                <p class="dx-build-desc">Turborepo remote cache restores unchanged outputs. Only modified packages rebuild. An 82% reduction.</p>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <!-- SECTION: Distribution Strategy -->
-        <section class="dx-section" aria-label="Distribution strategy">
-          <div class="dx-section-inner">
-            <div class="dx-section-header scroll-reveal">
-              <span class="dx-section-label dx-section-label-violet">Distribution</span>
-              <h2 class="dx-section-title">Three Channels, One Pipeline</h2>
-              <p class="dx-section-description">
-                Components ship through three parallel channels, each optimized
-                for a different consumption pattern.
-              </p>
-            </div>
-
-            <div class="dx-dist-grid">
-              <div class="dx-card scroll-reveal scroll-reveal-delay-1">
-                <div class="dx-card-icon icon-violet"><i class="fa-brands fa-npm" aria-hidden="true"></i></div>
-                <div class="dx-card-title">npm Package</div>
-                <p class="dx-card-desc">
-                  Full library with TypeScript types, CEM manifest, and tree-shakeable ESM exports. For Drupal teams integrating via build tools.
-                </p>
-                <code class="dx-timeline-cmd" style="margin-top:var(--space-3);">npm install @org/wc-2026</code>
-              </div>
-
-              <div class="dx-card scroll-reveal scroll-reveal-delay-2">
-                <div class="dx-card-icon icon-cyan"><i class="fa-solid fa-globe" aria-hidden="true"></i></div>
-                <div class="dx-card-title">CDN Script</div>
-                <p class="dx-card-desc">
-                  Single script tag for quick integration. Auto-registers all components. Ideal for prototyping, CMS embeds, and static sites.
-                </p>
-                <code class="dx-timeline-cmd" style="margin-top:var(--space-3);">&lt;script src="cdn/wc-2026.js"&gt;</code>
-              </div>
-
-              <div class="dx-card scroll-reveal scroll-reveal-delay-3">
-                <div class="dx-card-icon icon-amber"><i class="fa-solid fa-paintbrush" aria-hidden="true"></i></div>
-                <div class="dx-card-title">Token Package</div>
-                <p class="dx-card-desc">
-                  Design tokens only, published separately. Allows theme updates without touching component code. CSS custom properties and SCSS maps.
-                </p>
-                <code class="dx-timeline-cmd" style="margin-top:var(--space-3);">npm install @org/wc-tokens</code>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <!-- SECTION: Release Governance -->
-        <section class="dx-section" aria-label="Release governance">
-          <div class="dx-section-inner">
-            <div class="dx-section-header scroll-reveal">
-              <span class="dx-section-label dx-section-label-violet">Release Governance</span>
-              <h2 class="dx-section-title">Automated, Auditable, Reversible</h2>
-              <p class="dx-section-description">
-                No human runs npm publish. Every release is triggered by merging
-                a changeset PR, fully automated through CI.
-              </p>
-            </div>
-
-            <div class="dx-release-flow">
-              <div class="dx-release-step scroll-reveal scroll-reveal-delay-1">
-                <div class="dx-release-num icon-violet">1</div>
-                <div class="dx-release-info">
-                  <div class="dx-release-name">Changeset PR Created</div>
-                  <p class="dx-release-desc">Developers add changeset files describing what changed and the semver impact (patch, minor, major).</p>
-                </div>
-              </div>
-              <div class="dx-release-step scroll-reveal scroll-reveal-delay-2">
-                <div class="dx-release-num icon-cyan">2</div>
-                <div class="dx-release-info">
-                  <div class="dx-release-name">Version Bump &amp; Changelog</div>
-                  <p class="dx-release-desc">CI automatically determines the next version, updates package.json, and generates release notes.</p>
-                </div>
-              </div>
-              <div class="dx-release-step scroll-reveal scroll-reveal-delay-3">
-                <div class="dx-release-num icon-green">3</div>
-                <div class="dx-release-info">
-                  <div class="dx-release-name">Publish to npm + CDN</div>
-                  <p class="dx-release-desc">CI publishes the package to npm and deploys the CDN bundle. No developer credentials required.</p>
-                </div>
-              </div>
-              <div class="dx-release-step scroll-reveal scroll-reveal-delay-4">
-                <div class="dx-release-num icon-amber">4</div>
-                <div class="dx-release-info">
-                  <div class="dx-release-name">GitHub Release + Tag</div>
-                  <p class="dx-release-desc">Automated GitHub release with full changelog, contributor credits, and downloadable artifacts.</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-      </div><!-- end tab-cicd -->
-
-      <!-- ============================================
-           FOOTER CTA (outside tabs)
-           ============================================ -->
-      <section class="dx-footer-cta" aria-label="Next steps">
-        <div class="dx-footer-cta-inner scroll-reveal">
-          <h2>Ready to Experience It?</h2>
-          <p>
-            Clone the repo, run the dev server, and build your first component.
-            The documentation covers everything from quickstart to advanced patterns.
-          </p>
-          <div class="dx-footer-cta-buttons">
-            <a href="/getting-started/quickstart/" class="dx-btn dx-btn-solid">
-              Quickstart Guide
-              <span class="dx-btn-arrow" aria-hidden="true">&rarr;</span>
-            </a>
-            <a href="/architecture/testing/" class="dx-btn dx-btn-ghost">
-              Testing Strategy
-              <span class="dx-btn-arrow" aria-hidden="true">&rarr;</span>
-            </a>
-            <a href="/" class="dx-btn dx-btn-ghost">
-              Back to Dashboard
-              <span class="dx-btn-arrow" aria-hidden="true">&rarr;</span>
-            </a>
-          </div>
-        </div>
-      </section>
-    </main>
-
-    <script is:inline>
-      (function () {
-        var prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-        if (prefersReduced) {
-          document.querySelectorAll('.scroll-reveal').forEach(function (el) {
-            el.classList.add('is-visible');
-          });
-          document.querySelectorAll('.scroll-reveal-bar').forEach(function (el) {
-            el.classList.add('is-visible');
-          });
-          return;
-        }
-
-        // Scroll reveal observer
-        var observer = new IntersectionObserver(
-          function (entries) {
-            entries.forEach(function (entry) {
-              if (entry.isIntersecting) {
-                entry.target.classList.add('is-visible');
-                observer.unobserve(entry.target);
-              }
-            });
-          },
-          { threshold: 0.1, rootMargin: '0px 0px -60px 0px' }
-        );
-
+      </div>
+    </section>
+  </main>
+
+  <script is:inline>
+    (function () {
+      var prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      if (prefersReduced) {
         document.querySelectorAll('.scroll-reveal').forEach(function (el) {
-          observer.observe(el);
+          el.classList.add('is-visible');
         });
-
-        // Bar fill animation observer
-        var barObserver = new IntersectionObserver(
-          function (entries) {
-            entries.forEach(function (entry) {
-              if (entry.isIntersecting) {
-                entry.target.classList.add('is-visible');
-                barObserver.unobserve(entry.target);
-              }
-            });
-          },
-          { threshold: 0.3, rootMargin: '0px 0px -40px 0px' }
-        );
-
         document.querySelectorAll('.scroll-reveal-bar').forEach(function (el) {
-          barObserver.observe(el);
+          el.classList.add('is-visible');
         });
+        return;
+      }
 
-        // Cursor-following spotlight on cards
-        document.querySelectorAll('.dx-card').forEach(function (card) {
-          card.addEventListener('mousemove', function (e) {
-            var rect = card.getBoundingClientRect();
-            card.style.setProperty('--mouse-x', (e.clientX - rect.left) + 'px');
-            card.style.setProperty('--mouse-y', (e.clientY - rect.top) + 'px');
-          });
-        });
-
-        // Tab switching
-        var tabButtons = document.querySelectorAll('.dx-nav-tab[role="tab"]');
-        var tabPanels = document.querySelectorAll('.dx-tab-content');
-
-        tabButtons.forEach(function (btn) {
-          btn.addEventListener('click', function () {
-            var targetId = btn.getAttribute('data-tab');
-
-            // Update buttons
-            tabButtons.forEach(function (b) {
-              b.classList.remove('is-active');
-              b.setAttribute('aria-selected', 'false');
-            });
-            btn.classList.add('is-active');
-            btn.setAttribute('aria-selected', 'true');
-
-            // Update panels
-            tabPanels.forEach(function (panel) {
-              panel.classList.remove('is-active');
-            });
-            var target = document.getElementById(targetId);
-            if (target) {
-              target.classList.add('is-active');
-
-              // Scroll to top
-              window.scrollTo({ top: 0, behavior: 'smooth' });
-
-              // Re-trigger scroll-reveal for newly visible panel
-              setTimeout(function () {
-                target.querySelectorAll('.scroll-reveal:not(.is-visible)').forEach(function (el) {
-                  observer.unobserve(el);
-                  observer.observe(el);
-                });
-                target.querySelectorAll('.scroll-reveal-bar:not(.is-visible)').forEach(function (el) {
-                  barObserver.unobserve(el);
-                  barObserver.observe(el);
-                });
-              }, 50);
+      // Scroll reveal observer
+      var observer = new IntersectionObserver(
+        function (entries) {
+          entries.forEach(function (entry) {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('is-visible');
+              observer.unobserve(entry.target);
             }
           });
-        });
+        },
+        { threshold: 0.1, rootMargin: '0px 0px -60px 0px' }
+      );
 
-        // Keyboard navigation for tabs
-        tabButtons.forEach(function (btn, index) {
-          btn.addEventListener('keydown', function (e) {
-            var next = null;
-            if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
-              next = tabButtons[(index + 1) % tabButtons.length];
-            } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
-              next = tabButtons[(index - 1 + tabButtons.length) % tabButtons.length];
-            }
-            if (next) {
-              e.preventDefault();
-              next.focus();
-              next.click();
+      document.querySelectorAll('.scroll-reveal').forEach(function (el) {
+        observer.observe(el);
+      });
+
+      // Bar fill animation observer
+      var barObserver = new IntersectionObserver(
+        function (entries) {
+          entries.forEach(function (entry) {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('is-visible');
+              barObserver.unobserve(entry.target);
             }
           });
+        },
+        { threshold: 0.3, rootMargin: '0px 0px -40px 0px' }
+      );
+
+      document.querySelectorAll('.scroll-reveal-bar').forEach(function (el) {
+        barObserver.observe(el);
+      });
+
+      // Cursor-following spotlight on cards
+      document.querySelectorAll('.dx-card').forEach(function (card) {
+        card.addEventListener('mousemove', function (e) {
+          var rect = card.getBoundingClientRect();
+          card.style.setProperty('--mouse-x', (e.clientX - rect.left) + 'px');
+          card.style.setProperty('--mouse-y', (e.clientY - rect.top) + 'px');
         });
-      })();
-    </script>
-  </body>
-</html>
+      });
+
+      // Tab switching
+      var tabButtons = document.querySelectorAll('.dx-nav-tab[role="tab"]');
+      var tabPanels = document.querySelectorAll('.dx-tab-content');
+
+      tabButtons.forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          var targetId = btn.getAttribute('data-tab');
+
+          // Update buttons
+          tabButtons.forEach(function (b) {
+            b.classList.remove('is-active');
+            b.setAttribute('aria-selected', 'false');
+          });
+          btn.classList.add('is-active');
+          btn.setAttribute('aria-selected', 'true');
+
+          // Update panels
+          tabPanels.forEach(function (panel) {
+            panel.classList.remove('is-active');
+          });
+          var target = document.getElementById(targetId);
+          if (target) {
+            target.classList.add('is-active');
+
+            // Scroll to top
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+
+            // Re-trigger scroll-reveal for newly visible panel
+            setTimeout(function () {
+              target.querySelectorAll('.scroll-reveal:not(.is-visible)').forEach(function (el) {
+                observer.unobserve(el);
+                observer.observe(el);
+              });
+              target.querySelectorAll('.scroll-reveal-bar:not(.is-visible)').forEach(function (el) {
+                barObserver.unobserve(el);
+                barObserver.observe(el);
+              });
+            }, 50);
+          }
+        });
+      });
+
+      // Keyboard navigation for tabs
+      tabButtons.forEach(function (btn, index) {
+        btn.addEventListener('keydown', function (e) {
+          var next = null;
+          if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+            next = tabButtons[(index + 1) % tabButtons.length];
+          } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+            next = tabButtons[(index - 1 + tabButtons.length) % tabButtons.length];
+          }
+          if (next) {
+            e.preventDefault();
+            next.focus();
+            next.click();
+          }
+        });
+      });
+    })();
+  </script>
+</ShowcaseLayout>

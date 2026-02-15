@@ -82,7 +82,7 @@ The index page at `apps/docs/src/content/docs/index.mdx` composes: Hero, StatsBa
 | Enterprise Architecture | `src/pages/enterprise-architecture.astro` | Self-contained dark-themed page. Covers TypeScript strategy, CEM pipeline, 3-tier tokens, quality automation. |
 | Tech Stack | `src/pages/tech-stack.astro` | Self-contained. Head-to-head comparisons, bundle size visualization, integration map, performance benchmarks. |
 | Healthcare Accessibility | `src/pages/healthcare-accessibility.astro` | Self-contained. HHS mandate timeline, 4-level testing pyramid, before/after code comparisons, POUR matrix. |
-| Drupal Architecture | `src/pages/drupal-architecture.astro` | Self-contained. Property-driven vs slot-driven spectrum, TWIG code examples, decision matrix, component strategy map. |
+| System Architecture | `src/pages/system-architecture.astro` | Self-contained. Tabbed ADRs: Slots vs Props, Component Loading, Attribute Naming. TWIG code examples, decision matrices, component strategy map. |
 | Developer Experience | `src/pages/developer-experience.astro` | Self-contained. Tabbed interface: Onboarding, Quality Pipeline, CI/CD. Pipeline visualization. |
 
 **Common issue with standalone pages**: All 5 pages duplicate CSS custom properties and design tokens inline rather than importing from a shared source. This is acceptable for a prototype but would need refactoring for production.

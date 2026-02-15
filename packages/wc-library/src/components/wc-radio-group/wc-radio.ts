@@ -1,0 +1,137 @@
+import { LitElement, html } from 'lit';
+import { customElement, property } from 'lit/decorators.js';
+import { classMap } from 'lit/directives/class-map.js';
+import { tokenStyles } from '@wc-2026/tokens/lit';
+import { wcRadioStyles } from './wc-radio.styles.js';
+
+/**
+ * An individual radio button, designed to be used inside a `<wc-radio-group>`.
+ *
+ * @summary Presentational radio button managed by its parent radio group.
+ *
+ * @tag wc-radio
+ *
+ * @slot - Custom label content (overrides the label property).
+ *
+ * @csspart radio - The visual radio circle.
+ * @csspart label - The label text.
+ *
+ * @cssprop [--wc-radio-size=var(--wc-size-5, 1.25rem)] - Radio circle size.
+ * @cssprop [--wc-radio-border-color=var(--wc-color-neutral-300, #ced4da)] - Radio border color.
+ * @cssprop [--wc-radio-checked-bg=var(--wc-color-primary-500, #007878)] - Checked background color.
+ * @cssprop [--wc-radio-checked-border-color=var(--wc-color-primary-500, #007878)] - Checked border color.
+ * @cssprop [--wc-radio-dot-color=var(--wc-color-neutral-0, #ffffff)] - Inner dot color when checked.
+ * @cssprop [--wc-radio-focus-ring-color=var(--wc-focus-ring-color, #007878)] - Focus ring color.
+ * @cssprop [--wc-radio-label-color=var(--wc-color-neutral-700, #343a40)] - Label text color.
+ */
+@customElement('wc-radio')
+export class WcRadio extends LitElement {
+  static override styles = [tokenStyles, wcRadioStyles];
+
+  // ─── Properties ───
+
+  /**
+   * The value this radio represents.
+   * @attr value
+   */
+  @property({ type: String })
+  value = '';
+
+  /**
+   * Visible label text for the radio.
+   * @attr label
+   */
+  @property({ type: String })
+  label = '';
+
+  /**
+   * Whether this radio is disabled.
+   * @attr disabled
+   */
+  @property({ type: Boolean, reflect: true })
+  disabled = false;
+
+  /**
+   * Whether this radio is checked. Managed by the parent group.
+   * @attr checked
+   */
+  @property({ type: Boolean, reflect: true })
+  checked = false;
+
+  // ─── Lifecycle ───
+
+  override connectedCallback(): void {
+    super.connectedCallback();
+    this.setAttribute('role', 'radio');
+  }
+
+  override updated(changedProperties: Map<string, unknown>): void {
+    if (changedProperties.has('checked')) {
+      this.setAttribute('aria-checked', String(this.checked));
+    }
+    if (changedProperties.has('disabled')) {
+      this.setAttribute('aria-disabled', String(this.disabled));
+    }
+  }
+
+  // ─── Internal IDs ───
+
+  private _inputId = `wc-radio-${Math.random().toString(36).slice(2, 9)}`;
+
+  // ─── Event Handling ───
+
+  private _handleClick(): void {
+    if (this.disabled) {
+      return;
+    }
+
+    /**
+     * Internal event dispatched to signal selection to the parent group.
+     * Not part of the public API.
+     * @internal
+     */
+    this.dispatchEvent(
+      new CustomEvent('wc-radio-select', {
+        bubbles: true,
+        composed: true,
+        detail: { value: this.value },
+      })
+    );
+  }
+
+  // ─── Render ───
+
+  override render() {
+    const classes = {
+      radio: true,
+      'radio--checked': this.checked,
+      'radio--disabled': this.disabled,
+    };
+
+    return html`
+      <div class=${classMap(classes)} @click=${this._handleClick}>
+        <input
+          class="radio__input"
+          type="radio"
+          id=${this._inputId}
+          .checked=${this.checked}
+          ?disabled=${this.disabled}
+          tabindex="-1"
+          aria-hidden="true"
+        />
+        <span part="radio" class="radio__control" aria-hidden="true">
+          <span class="radio__dot"></span>
+        </span>
+        <span part="label" class="radio__label">
+          <slot>${this.label}</slot>
+        </span>
+      </div>
+    `;
+  }
+}
+
+declare global {
+  interface HTMLElementTagNameMap {
+    'wc-radio': WcRadio;
+  }
+}

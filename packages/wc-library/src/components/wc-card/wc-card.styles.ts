@@ -3,15 +3,6 @@ import { css } from 'lit';
 export const wcCardStyles = css`
   :host {
     display: block;
-
-    /**
-     * @cssprop [--wc-card-bg=var(--wc-color-neutral-0, #ffffff)] - Card background color.
-     * @cssprop [--wc-card-color=var(--wc-color-neutral-800, #212529)] - Card text color.
-     * @cssprop [--wc-card-border-color=var(--wc-color-neutral-200, #dee2e6)] - Card border color.
-     * @cssprop [--wc-card-border-radius=var(--wc-border-radius-lg, 0.5rem)] - Card border radius.
-     * @cssprop [--wc-card-padding=var(--wc-space-6, 1.5rem)] - Internal padding.
-     * @cssprop [--wc-card-gap=var(--wc-space-4, 1rem)] - Gap between card sections.
-     */
   }
 
   .card {
@@ -64,7 +55,7 @@ export const wcCardStyles = css`
 
   .card--interactive:hover {
     box-shadow: var(--wc-shadow-lg, 0 10px 15px -3px rgb(0 0 0 / 0.1));
-    transform: translateY(-2px);
+    transform: translateY(var(--wc-transform-lift-md, -2px));
   }
 
   .card--interactive:focus-visible {
@@ -97,8 +88,10 @@ export const wcCardStyles = css`
   }
 
   .card__heading {
-    padding: var(--wc-card-padding, var(--wc-space-6, 1.5rem));
+    padding-top: var(--wc-card-padding, var(--wc-space-6, 1.5rem));
+    padding-right: var(--wc-card-padding, var(--wc-space-6, 1.5rem));
     padding-bottom: 0;
+    padding-left: var(--wc-card-padding, var(--wc-space-6, 1.5rem));
     font-size: var(--wc-font-size-xl, 1.25rem);
     font-weight: var(--wc-font-weight-semibold, 600);
     line-height: var(--wc-line-height-tight, 1.25);
@@ -113,16 +106,20 @@ export const wcCardStyles = css`
   }
 
   .card__footer {
-    padding: var(--wc-card-padding, var(--wc-space-6, 1.5rem));
     padding-top: 0;
+    padding-right: var(--wc-card-padding, var(--wc-space-6, 1.5rem));
+    padding-bottom: var(--wc-card-padding, var(--wc-space-6, 1.5rem));
+    padding-left: var(--wc-card-padding, var(--wc-space-6, 1.5rem));
   }
 
   .card__actions {
     display: flex;
     gap: var(--wc-space-2, 0.5rem);
-    padding: var(--wc-card-padding, var(--wc-space-6, 1.5rem));
-    border-top: var(--wc-border-width-thin, 1px) solid var(--wc-card-border-color, var(--wc-color-neutral-200, #dee2e6));
     padding-top: var(--wc-space-4, 1rem);
+    padding-right: var(--wc-card-padding, var(--wc-space-6, 1.5rem));
+    padding-bottom: var(--wc-card-padding, var(--wc-space-6, 1.5rem));
+    padding-left: var(--wc-card-padding, var(--wc-space-6, 1.5rem));
+    border-top: var(--wc-border-width-thin, 1px) solid var(--wc-card-border-color, var(--wc-color-neutral-200, #dee2e6));
     margin-top: auto;
   }
 `;

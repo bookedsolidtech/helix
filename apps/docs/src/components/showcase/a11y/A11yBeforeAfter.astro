@@ -1,0 +1,356 @@
+---
+/**
+ * A11yBeforeAfter — Before/After comparison (typical vs WC-2026).
+ *
+ * Shows side-by-side code examples and visual demos comparing a typical
+ * component library's accessibility failings against WC-2026's approach.
+ *
+ * Props receive the pre-formatted HTML code example strings from the
+ * page frontmatter.
+ */
+interface Props {
+  codeBadButton: string;
+  codeGoodButton: string;
+  codeBadContrast: string;
+  codeGoodContrast: string;
+}
+
+const { codeBadButton, codeGoodButton, codeBadContrast, codeGoodContrast } = Astro.props;
+---
+
+<style is:inline>
+  /* --- Before/After Comparison --- */
+  .ha-comparison-section {
+    background: var(--surface-0);
+    border-top: 1px solid var(--surface-3);
+    border-bottom: 1px solid var(--surface-3);
+  }
+
+  .ha-comparison-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto auto auto auto auto auto;
+    gap: var(--space-4) var(--space-6);
+  }
+
+  .ha-comparison-column {
+    display: grid;
+    grid-template-rows: subgrid;
+    grid-row: span 6;
+    gap: var(--space-4);
+  }
+
+  .ha-comparison-header {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-4) var(--space-6);
+    border-radius: var(--radius-lg);
+    font-size: 1.125rem;
+    font-weight: 700;
+  }
+
+  .ha-comparison-header i { font-size: 1.25rem; }
+
+  .ha-comparison-header-bad {
+    background: linear-gradient(135deg, rgba(239, 68, 68, 0.1), rgba(239, 68, 68, 0.02));
+    border: 1px solid rgba(239, 68, 68, 0.2);
+    color: var(--wc-red);
+  }
+
+  .ha-comparison-header-good {
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(16, 185, 129, 0.02));
+    border: 1px solid rgba(16, 185, 129, 0.2);
+    color: var(--wc-green);
+  }
+
+  .ha-code-block {
+    position: relative;
+    background: #0a0e18;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+  }
+
+  .ha-code-titlebar {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 16px;
+    background: rgba(0, 0, 0, 0.3);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  }
+
+  .ha-code-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+  }
+
+  .ha-code-dot:nth-child(1) { background: #ff5f57; }
+  .ha-code-dot:nth-child(2) { background: #ffbd2e; }
+  .ha-code-dot:nth-child(3) { background: #28c840; }
+
+  .ha-code-filename {
+    margin-left: auto;
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.4);
+    font-family: var(--font-mono);
+  }
+
+  .ha-code-body {
+    padding: var(--space-4) var(--space-5);
+    overflow-x: auto;
+  }
+
+  .ha-code-body pre {
+    margin: 0;
+    font-size: 0.8125rem;
+    line-height: 1.7;
+    color: #d6deeb;
+    white-space: pre;
+  }
+
+  .ha-code-body .kw { color: #c792ea; }
+  .ha-code-body .tag { color: #7fdbca; }
+  .ha-code-body .attr { color: #addb67; }
+  .ha-code-body .val { color: #ecc48d; }
+  .ha-code-body .str { color: #c3e88d; }
+  .ha-code-body .cmt { color: #637777; font-style: italic; }
+  .ha-code-body .var { color: #82aaff; }
+  .ha-code-body .fn { color: #82aaff; }
+  .ha-code-body .slot-hl { color: #ff79c6; font-weight: 600; }
+  .ha-code-body .prop-hl { color: #06b6d4; font-weight: 600; }
+
+  .ha-code-label {
+    display: inline-block;
+    padding: var(--space-1) var(--space-3);
+    border-radius: var(--radius-sm);
+    font-size: 0.6875rem;
+    font-weight: 600;
+    font-family: var(--font-mono);
+    margin-bottom: var(--space-3);
+  }
+
+  .ha-code-label-html {
+    background: rgba(6, 182, 212, 0.12);
+    color: var(--wc-cyan);
+    border: 1px solid rgba(6, 182, 212, 0.2);
+  }
+
+  .ha-code-label-css {
+    background: rgba(236, 72, 153, 0.12);
+    color: var(--wc-pink);
+    border: 1px solid rgba(236, 72, 153, 0.2);
+  }
+
+  .ha-contrast-demo {
+    padding: var(--space-5);
+    border-radius: var(--radius-lg);
+    background: var(--surface-1);
+    border: 1px solid var(--surface-3);
+  }
+
+  .ha-contrast-demo-title {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: var(--space-3);
+    color: var(--text-muted);
+  }
+
+  .ha-contrast-swatch {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-3) var(--space-4);
+    border-radius: var(--radius-md);
+    margin-bottom: var(--space-2);
+  }
+
+  .ha-contrast-swatch-bad {
+    background: #6c757d;
+    color: #999;
+  }
+
+  .ha-contrast-swatch-good {
+    background: #047857;
+    color: #ffffff;
+  }
+
+  .ha-contrast-ratio {
+    margin-left: auto;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: var(--space-1) var(--space-2);
+    border-radius: var(--radius-sm);
+  }
+
+  .ha-contrast-ratio-fail {
+    background: rgba(239, 68, 68, 0.15);
+    color: var(--wc-red);
+  }
+
+  .ha-contrast-ratio-pass {
+    background: rgba(16, 185, 129, 0.15);
+    color: var(--wc-green);
+  }
+
+  .ha-focus-demo {
+    display: flex;
+    gap: var(--space-4);
+    margin-top: var(--space-3);
+  }
+
+  .ha-focus-example {
+    flex: 1;
+    text-align: center;
+  }
+
+  .ha-focus-example-label {
+    font-size: 0.6875rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    margin-bottom: var(--space-2);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  .ha-focus-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-2) var(--space-5);
+    border-radius: var(--radius-md);
+    font-size: 0.875rem;
+    font-weight: 600;
+    border: none;
+    cursor: default;
+  }
+
+  .ha-focus-btn-bad {
+    background: #6c757d;
+    color: #ccc;
+    outline: none;
+  }
+
+  .ha-focus-btn-good {
+    background: #047857;
+    color: #ffffff;
+    outline: 3px solid #34d399;
+    outline-offset: 3px;
+  }
+</style>
+
+<section class="ha-section ha-comparison-section" aria-label="Before and after accessibility comparison">
+  <div class="ha-section-inner">
+    <div class="ha-section-header scroll-reveal">
+      <span class="ha-section-label">Side by Side</span>
+      <h2 class="ha-section-title">Typical vs. WC-2026</h2>
+      <p class="ha-section-description">
+        Most component libraries treat accessibility as an afterthought. WC-2026
+        builds it into the architecture from the first line of code.
+      </p>
+    </div>
+
+    <div class="ha-comparison-grid">
+      <!-- Left column: Bad -->
+      <div class="ha-comparison-column scroll-reveal scroll-reveal-delay-1">
+        <div class="ha-comparison-header ha-comparison-header-bad">
+          <i class="fa-solid fa-circle-xmark" aria-hidden="true"></i>
+          Typical Component Library
+        </div>
+
+        <span class="ha-code-label ha-code-label-html">HTML</span>
+        <div class="ha-code-block">
+          <div class="ha-code-titlebar">
+            <span class="ha-code-dot"></span>
+            <span class="ha-code-dot"></span>
+            <span class="ha-code-dot"></span>
+            <span class="ha-code-filename">button.html</span>
+          </div>
+          <div class="ha-code-body">
+            <pre set:html={codeBadButton} />
+          </div>
+        </div>
+
+        <span class="ha-code-label ha-code-label-css">CSS</span>
+        <div class="ha-code-block">
+          <div class="ha-code-titlebar">
+            <span class="ha-code-dot"></span>
+            <span class="ha-code-dot"></span>
+            <span class="ha-code-dot"></span>
+            <span class="ha-code-filename">button.css</span>
+          </div>
+          <div class="ha-code-body">
+            <pre set:html={codeBadContrast} />
+          </div>
+        </div>
+
+        <div class="ha-contrast-demo">
+          <div class="ha-contrast-demo-title">Color Contrast</div>
+          <div class="ha-contrast-swatch ha-contrast-swatch-bad">
+            <span>Button Text</span>
+            <span class="ha-contrast-ratio ha-contrast-ratio-fail">1.9:1 FAIL</span>
+          </div>
+          <div class="ha-focus-demo">
+            <div class="ha-focus-example">
+              <div class="ha-focus-example-label">Focus State</div>
+              <div class="ha-focus-btn ha-focus-btn-bad">Submit</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right column: Good -->
+      <div class="ha-comparison-column scroll-reveal scroll-reveal-delay-2">
+        <div class="ha-comparison-header ha-comparison-header-good">
+          <i class="fa-solid fa-circle-check" aria-hidden="true"></i>
+          WC-2026
+        </div>
+
+        <span class="ha-code-label ha-code-label-html">HTML</span>
+        <div class="ha-code-block">
+          <div class="ha-code-titlebar">
+            <span class="ha-code-dot"></span>
+            <span class="ha-code-dot"></span>
+            <span class="ha-code-dot"></span>
+            <span class="ha-code-filename">wc-button.html</span>
+          </div>
+          <div class="ha-code-body">
+            <pre set:html={codeGoodButton} />
+          </div>
+        </div>
+
+        <span class="ha-code-label ha-code-label-css">CSS</span>
+        <div class="ha-code-block">
+          <div class="ha-code-titlebar">
+            <span class="ha-code-dot"></span>
+            <span class="ha-code-dot"></span>
+            <span class="ha-code-dot"></span>
+            <span class="ha-code-filename">wc-button.css</span>
+          </div>
+          <div class="ha-code-body">
+            <pre set:html={codeGoodContrast} />
+          </div>
+        </div>
+
+        <div class="ha-contrast-demo">
+          <div class="ha-contrast-demo-title">Color Contrast</div>
+          <div class="ha-contrast-swatch ha-contrast-swatch-good">
+            <span>Button Text</span>
+            <span class="ha-contrast-ratio ha-contrast-ratio-pass">8.2:1 AAA</span>
+          </div>
+          <div class="ha-focus-demo">
+            <div class="ha-focus-example">
+              <div class="ha-focus-example-label">Focus State</div>
+              <div class="ha-focus-btn ha-focus-btn-good">Submit</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

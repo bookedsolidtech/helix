@@ -5,6 +5,20 @@ import starlight from '@astrojs/starlight';
 // https://astro.build/config
 export default defineConfig({
   site: 'https://wc-2026.dev',
+  vite: {
+    optimizeDeps: {
+      include: [
+        'lit',
+        'lit/decorators.js',
+        'lit/directives/class-map.js',
+        'lit/directives/if-defined.js',
+        'lit/directives/live.js',
+        '@lit/reactive-element',
+        'lit-html',
+        'lit-element/lit-element.js',
+      ],
+    },
+  },
   markdown: {
     shikiConfig: {
       theme: 'material-theme-palenight',
@@ -155,85 +169,17 @@ export default defineConfig({
       ],
       sidebar: [
         {
-          label: 'Phase 0: Prototype',
-          collapsed: false,
-          badge: { text: 'In Progress', variant: 'caution' },
-          items: [
-            { label: 'Overview', slug: 'prototype/overview' },
-            {
-              label: 'Rapid Prototype',
-              slug: 'prototype/rapid-prototype',
-            },
-            {
-              label: 'Tech Stack Validation',
-              slug: 'prototype/tech-stack-validation',
-            },
-            {
-              label: 'Interview Prep',
-              slug: 'prototype/interview-prep',
-            },
-          ],
-        },
-        {
-          label: 'Planning & Discovery',
-          collapsed: false,
-          items: [
-            { label: 'Overview', slug: 'pre-planning/overview' },
-            {
-              label: 'Architecture & System Design',
-              slug: 'pre-planning/architecture',
-            },
-            {
-              label: 'Component Architecture',
-              slug: 'pre-planning/components',
-            },
-            {
-              label: 'Design System & Tokens',
-              slug: 'pre-planning/design-system',
-            },
-            {
-              label: 'Documentation Hub',
-              slug: 'pre-planning/docs-hub',
-            },
-            {
-              label: 'Component Building Guide',
-              slug: 'pre-planning/building-guide',
-            },
-            {
-              label: 'Drupal Integration Guide',
-              slug: 'pre-planning/drupal-guide',
-            },
-          ],
-        },
-        {
           label: 'Getting Started',
+          collapsed: true,
           items: [
             { label: 'Installation', slug: 'getting-started/installation' },
             { label: 'Quick Start', slug: 'getting-started/quick-start' },
-            {
-              label: 'Project Structure',
-              slug: 'getting-started/project-structure',
-            },
-          ],
-        },
-        {
-          label: 'Architecture',
-          items: [
-            { label: 'Overview', slug: 'architecture/overview' },
-            { label: 'Monorepo Structure', slug: 'architecture/monorepo' },
-            {
-              label: 'Build Pipeline',
-              slug: 'architecture/build-pipeline',
-            },
-            {
-              label: 'Testing Strategy',
-              slug: 'architecture/testing',
-            },
+            { label: 'Project Structure', slug: 'getting-started/project-structure' },
           ],
         },
         {
           label: 'Component Library',
-          collapsed: false,
+          collapsed: true,
           badge: { text: 'Live', variant: 'success' },
           items: [
             { label: 'Overview', slug: 'component-library/overview' },
@@ -243,56 +189,86 @@ export default defineConfig({
           ],
         },
         {
-          label: 'Component Building',
-          items: [
-            { label: 'Overview', slug: 'components/overview' },
-            {
-              label: 'Building Components',
-              slug: 'components/building',
-            },
-            { label: 'Component API', slug: 'components/api' },
-            { label: 'Examples', slug: 'components/examples' },
-          ],
-        },
-        {
           label: 'Design Tokens',
+          collapsed: true,
           items: [
             { label: 'Overview', slug: 'design-tokens/overview' },
             { label: 'Token Tiers', slug: 'design-tokens/tiers' },
             { label: 'Theming', slug: 'design-tokens/theming' },
+            { label: 'Customization', slug: 'design-tokens/customization' },
+          ],
+        },
+        {
+          label: 'Guides',
+          collapsed: true,
+          items: [
             {
-              label: 'Customization',
-              slug: 'design-tokens/customization',
+              label: 'Building Components',
+              collapsed: true,
+              items: [
+                { label: 'Overview', slug: 'components/overview' },
+                { label: 'Building', slug: 'components/building' },
+                { label: 'Component API', slug: 'components/api' },
+                { label: 'Examples', slug: 'components/examples' },
+              ],
+            },
+            {
+              label: 'Drupal Integration',
+              collapsed: true,
+              items: [
+                { label: 'Overview', slug: 'drupal-integration/overview' },
+                { label: 'Installation', slug: 'drupal-integration/installation' },
+                { label: 'Twig Patterns', slug: 'drupal-integration/twig' },
+                { label: 'Behaviors', slug: 'drupal-integration/behaviors' },
+                { label: 'Troubleshooting', slug: 'drupal-integration/troubleshooting' },
+                { label: 'Loading Strategy', slug: 'guides/drupal-component-loading-strategy' },
+                { label: 'Integration Architecture', slug: 'guides/drupal-integration-architecture' },
+              ],
             },
           ],
         },
         {
-          label: 'Drupal Integration',
+          label: 'Architecture',
+          collapsed: true,
+          items: [
+            { label: 'Overview', slug: 'architecture/overview' },
+            { label: 'Monorepo Structure', slug: 'architecture/monorepo' },
+            { label: 'Build Pipeline', slug: 'architecture/build-pipeline' },
+            { label: 'Testing Strategy', slug: 'architecture/testing' },
+          ],
+        },
+        {
+          label: 'Planning',
+          collapsed: true,
           items: [
             {
-              label: 'Overview',
-              slug: 'drupal-integration/overview',
+              label: 'Prototype',
+              collapsed: true,
+              items: [
+                { label: 'Overview', slug: 'prototype/overview' },
+                { label: 'Rapid Prototype', slug: 'prototype/rapid-prototype' },
+                { label: 'Tech Stack Validation', slug: 'prototype/tech-stack-validation' },
+                { label: 'Interview Prep', slug: 'prototype/interview-prep' },
+              ],
             },
             {
-              label: 'Installation',
-              slug: 'drupal-integration/installation',
-            },
-            {
-              label: 'TWIG Patterns',
-              slug: 'drupal-integration/twig',
-            },
-            {
-              label: 'Behaviors',
-              slug: 'drupal-integration/behaviors',
-            },
-            {
-              label: 'Troubleshooting',
-              slug: 'drupal-integration/troubleshooting',
+              label: 'Discovery',
+              collapsed: true,
+              items: [
+                { label: 'Overview', slug: 'pre-planning/overview' },
+                { label: 'Architecture & System Design', slug: 'pre-planning/architecture' },
+                { label: 'Components', slug: 'pre-planning/components' },
+                { label: 'Design System & Tokens', slug: 'pre-planning/design-system' },
+                { label: 'Documentation Hub', slug: 'pre-planning/docs-hub' },
+                { label: 'Building Guide', slug: 'pre-planning/building-guide' },
+                { label: 'Drupal Guide', slug: 'pre-planning/drupal-guide' },
+              ],
             },
           ],
         },
         {
           label: 'API Reference',
+          collapsed: true,
           items: [
             { label: 'Overview', slug: 'api-reference/overview' },
           ],

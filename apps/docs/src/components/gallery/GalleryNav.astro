@@ -1,0 +1,33 @@
+---
+/**
+ * GalleryNav — Fixed right-side dot navigation.
+ * One dot per component section + hero. Shows tag name on hover.
+ */
+interface NavItem {
+  tagName: string;
+  label: string;
+  index: number;
+}
+
+interface Props {
+  items: NavItem[];
+}
+
+const { items } = Astro.props;
+---
+
+<nav class="cg-dots" aria-label="Component navigation">
+  <button class="cg-dot active" data-slide="cg-hero" aria-label="Gallery hero">
+    <span class="cg-dot-label">Gallery</span>
+  </button>
+  {items.map((item) => (
+    <button
+      class="cg-dot"
+      data-slide={item.tagName}
+      data-category-dot={true}
+      aria-label={`Navigate to ${item.tagName}`}
+    >
+      <span class="cg-dot-label">{item.label}</span>
+    </button>
+  ))}
+</nav>

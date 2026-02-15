@@ -1,0 +1,82 @@
+/* ==========================================================================
+   Prose Tables
+   Table styles for rich text / WYSIWYG content.
+   Full-width tables with borders, padding, and zebra striping.
+   ========================================================================== */
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  border-spacing: 0;
+  margin-top: 0;
+  margin-bottom: var(--wc-space-6, 1.5rem);
+  font-size: var(--wc-prose-font-size, var(--wc-font-size-md, 1rem));
+  line-height: var(--wc-line-height-normal, 1.5);
+  color: var(--wc-prose-color, var(--wc-color-neutral-700, #343a40));
+  overflow-x: auto;
+  display: block;
+}
+
+/* Restore table display for wider viewports or when wrapped */
+@media (min-width: 640px) {
+  table {
+    display: table;
+  }
+}
+
+caption {
+  padding-top: var(--wc-space-3, 0.75rem);
+  padding-bottom: var(--wc-space-3, 0.75rem);
+  font-size: var(--wc-font-size-sm, 0.875rem);
+  font-weight: var(--wc-font-weight-medium, 500);
+  color: var(--wc-color-text-muted, var(--wc-color-neutral-500, #6c757d));
+  text-align: left;
+  caption-side: bottom;
+}
+
+thead {
+  border-bottom: var(--wc-border-width-medium, 2px) solid var(--wc-color-border-default, var(--wc-color-neutral-200, #dee2e6));
+}
+
+tfoot {
+  border-top: var(--wc-border-width-medium, 2px) solid var(--wc-color-border-default, var(--wc-color-neutral-200, #dee2e6));
+}
+
+th {
+  padding: var(--wc-space-3, 0.75rem) var(--wc-space-4, 1rem);
+  font-weight: var(--wc-font-weight-semibold, 600);
+  color: var(--wc-prose-heading-color, var(--wc-color-neutral-900, #111827));
+  text-align: left;
+  white-space: nowrap;
+  background-color: var(--wc-color-surface-raised, var(--wc-color-neutral-50, #f8f9fa));
+}
+
+td {
+  padding: var(--wc-space-3, 0.75rem) var(--wc-space-4, 1rem);
+  border-bottom: var(--wc-border-width-thin, 1px) solid var(--wc-color-border-default, var(--wc-color-neutral-200, #dee2e6));
+  vertical-align: top;
+}
+
+/* ─── Zebra Striping ─── */
+
+tbody tr:nth-child(even) {
+  background-color: var(--wc-color-surface-raised, var(--wc-color-neutral-50, #f8f9fa));
+}
+
+/* ─── Row Hover ─── */
+
+tbody tr:hover {
+  background-color: var(--wc-color-primary-50, #e6f3f3);
+}
+
+/* ─── Alignment Helpers (CKEditor output) ─── */
+
+th[align="center"],
+td[align="center"] {
+  text-align: center;
+}
+
+th[align="right"],
+td[align="right"] {
+  text-align: right;
+}

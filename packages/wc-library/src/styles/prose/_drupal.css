@@ -1,0 +1,171 @@
+/* ==========================================================================
+   Prose Drupal
+   Drupal CMS-specific classes and CKEditor output patterns.
+   Handles field wrappers, media embeds, alignment classes,
+   and other Drupal-generated markup.
+   ========================================================================== */
+
+/* ─── Drupal Field Wrappers ─── */
+
+.field {
+  margin-bottom: var(--wc-space-4, 1rem);
+}
+
+.field:last-child {
+  margin-bottom: 0;
+}
+
+.field__label {
+  font-weight: var(--wc-font-weight-semibold, 600);
+  font-size: var(--wc-font-size-sm, 0.875rem);
+  color: var(--wc-color-text-secondary, var(--wc-color-neutral-600, #495057));
+  margin-bottom: var(--wc-space-1, 0.25rem);
+  text-transform: uppercase;
+  letter-spacing: var(--wc-letter-spacing-wide, 0.025em);
+}
+
+.field__item {
+  margin-bottom: var(--wc-space-2, 0.5rem);
+}
+
+.field__item:last-child {
+  margin-bottom: 0;
+}
+
+.field__items {
+  list-style: none;
+  padding-left: 0;
+  margin: 0;
+}
+
+/* ─── Text Formatted (CKEditor wrapper) ─── */
+
+.text-formatted {
+  /* Inherits prose styles; no additional rules needed */
+}
+
+.text-formatted > *:last-child {
+  margin-bottom: 0;
+}
+
+/* ─── Drupal Media Embeds ─── */
+
+.media-embed,
+.embedded-entity,
+.media--type-image,
+.media--type-remote-video {
+  margin-top: var(--wc-space-4, 1rem);
+  margin-bottom: var(--wc-space-6, 1.5rem);
+}
+
+.media-embed img,
+.embedded-entity img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* ─── CKEditor Alignment Classes ─── */
+
+.align-left {
+  float: left;
+  margin-right: var(--wc-space-6, 1.5rem);
+  margin-bottom: var(--wc-space-4, 1rem);
+  max-width: 50%;
+}
+
+.align-right {
+  float: right;
+  margin-left: var(--wc-space-6, 1.5rem);
+  margin-bottom: var(--wc-space-4, 1rem);
+  max-width: 50%;
+}
+
+.align-center {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  margin-bottom: var(--wc-space-6, 1.5rem);
+  text-align: center;
+}
+
+/* Reset float when alignment classes are on images */
+.align-left img,
+.align-right img {
+  display: block;
+}
+
+/* Clearfix after floated elements */
+.align-left + *,
+.align-right + * {
+  clear: none;
+}
+
+/* ─── CKEditor Caption ─── */
+
+.caption {
+  margin-bottom: var(--wc-space-6, 1.5rem);
+}
+
+.caption figcaption,
+.caption .caption-text {
+  font-size: var(--wc-font-size-sm, 0.875rem);
+  color: var(--wc-color-text-muted, var(--wc-color-neutral-500, #6c757d));
+  font-style: italic;
+  margin-top: var(--wc-space-2, 0.5rem);
+}
+
+/* ─── Drupal Table Classes ─── */
+
+.table-responsive {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  margin-bottom: var(--wc-space-6, 1.5rem);
+}
+
+.table-responsive table {
+  margin-bottom: 0;
+}
+
+/* ─── Drupal Messages / Callouts (within content) ─── */
+
+.messages,
+.callout {
+  padding: var(--wc-space-4, 1rem) var(--wc-space-5, 1.25rem);
+  margin-bottom: var(--wc-space-4, 1rem);
+  border: var(--wc-border-width-thin, 1px) solid var(--wc-color-border-default, var(--wc-color-neutral-200, #dee2e6));
+  border-radius: var(--wc-border-radius-md, 0.375rem);
+  border-left-width: var(--wc-border-width-thick, 3px);
+}
+
+.messages--status {
+  border-left-color: var(--wc-color-success-500, #198754);
+  background-color: var(--wc-color-success-50, #f0fdf4);
+}
+
+.messages--warning {
+  border-left-color: var(--wc-color-warning-500, #ffc107);
+  background-color: var(--wc-color-warning-50, #fffbeb);
+}
+
+.messages--error {
+  border-left-color: var(--wc-color-error-500, #dc3545);
+  background-color: var(--wc-color-error-50, #fef2f2);
+}
+
+/* ─── CKEditor Content Separator ─── */
+
+.page-break {
+  border: 0;
+  border-top: var(--wc-border-width-thin, 1px) dashed var(--wc-color-border-default, var(--wc-color-neutral-200, #dee2e6));
+  margin-top: var(--wc-space-8, 2rem);
+  margin-bottom: var(--wc-space-8, 2rem);
+}
+
+/* ─── Clear Floats ─── */
+
+.clearfix::after {
+  content: "";
+  display: table;
+  clear: both;
+}

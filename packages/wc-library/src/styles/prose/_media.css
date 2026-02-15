@@ -1,0 +1,104 @@
+/* ==========================================================================
+   Prose Media
+   Images, figures, video, iframes, and other embedded media
+   for rich text / WYSIWYG content.
+   ========================================================================== */
+
+/* ─── Images ─── */
+
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  border-radius: var(--wc-border-radius-sm, 0.25rem);
+}
+
+/* ─── Figure ─── */
+
+figure {
+  margin: 0;
+  margin-bottom: var(--wc-space-6, 1.5rem);
+}
+
+figure img {
+  margin-bottom: 0;
+}
+
+figure > a {
+  display: block;
+}
+
+figure > a img {
+  border-radius: var(--wc-border-radius-sm, 0.25rem);
+}
+
+figcaption {
+  margin-top: var(--wc-space-2, 0.5rem);
+  font-size: var(--wc-font-size-sm, 0.875rem);
+  line-height: var(--wc-line-height-normal, 1.5);
+  color: var(--wc-color-text-muted, var(--wc-color-neutral-500, #6c757d));
+  font-style: italic;
+}
+
+/* ─── Video ─── */
+
+video {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  margin-bottom: var(--wc-space-6, 1.5rem);
+  border-radius: var(--wc-border-radius-sm, 0.25rem);
+}
+
+/* ─── Iframes (embedded video, maps, etc.) ─── */
+
+iframe {
+  max-width: 100%;
+  border: 0;
+  margin-bottom: var(--wc-space-6, 1.5rem);
+  border-radius: var(--wc-border-radius-sm, 0.25rem);
+}
+
+/* ─── Responsive Embed Wrapper ─── */
+/* Standard 16:9 aspect ratio container for video embeds */
+
+.embed-responsive,
+.video-embed,
+.media-oembed {
+  position: relative;
+  width: 100%;
+  padding-bottom: 56.25%; /* 16:9 aspect ratio */
+  height: 0;
+  overflow: hidden;
+  margin-bottom: var(--wc-space-6, 1.5rem);
+  border-radius: var(--wc-border-radius-sm, 0.25rem);
+}
+
+.embed-responsive iframe,
+.embed-responsive video,
+.video-embed iframe,
+.video-embed video,
+.media-oembed iframe,
+.media-oembed video {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  margin-bottom: 0;
+  border-radius: 0;
+}
+
+/* ─── Audio ─── */
+
+audio {
+  width: 100%;
+  margin-bottom: var(--wc-space-6, 1.5rem);
+}
+
+/* ─── Object / Embed ─── */
+
+object,
+embed {
+  max-width: 100%;
+}

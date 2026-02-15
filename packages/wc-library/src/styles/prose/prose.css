@@ -1,0 +1,25 @@
+/* ==========================================================================
+   Prose — Unscoped Barrel File
+   Imports all prose partials for use as global rich text / WYSIWYG styles.
+
+   Usage:
+     @import '@wc-2026/library/styles/prose/prose.css';
+
+   Override prose custom properties at :root or on any ancestor:
+     :root {
+       --wc-prose-max-width: 720px;
+       --wc-prose-font-size: var(--wc-font-size-md, 1rem);
+       --wc-prose-line-height: var(--wc-line-height-relaxed, 1.75);
+       --wc-prose-color: var(--wc-color-neutral-700, #343a40);
+       --wc-prose-heading-color: var(--wc-color-neutral-900, #111827);
+       --wc-prose-link-color: var(--wc-color-primary-500, #007878);
+     }
+   ========================================================================== */
+
+@import './_headings.css';
+@import './_body.css';
+@import './_lists.css';
+@import './_tables.css';
+@import './_code.css';
+@import './_media.css';
+@import './_drupal.css';

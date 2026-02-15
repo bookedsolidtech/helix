@@ -1,0 +1,266 @@
+---
+/**
+ * A11yComplianceLandscape — Timeline & competitive positioning section.
+ *
+ * Displays the regulatory timeline from Section 508 through the HHS May 2026
+ * mandate, plus a competitive positioning bar comparing WC-2026 coverage
+ * against typical component libraries.
+ */
+---
+
+<style is:inline>
+  /* --- Compliance Landscape (Timeline) --- */
+  .ha-timeline-section {
+    background: var(--surface-0);
+    border-top: 1px solid var(--surface-3);
+    border-bottom: 1px solid var(--surface-3);
+  }
+
+  .ha-timeline {
+    position: relative;
+    max-width: 1000px;
+    margin: 0 auto;
+  }
+
+  .ha-timeline-track {
+    position: relative;
+    height: 6px;
+    border-radius: var(--radius-full);
+    background: linear-gradient(90deg,
+      var(--text-muted) 0%,
+      var(--wc-amber) 25%,
+      var(--wc-red) 60%,
+      var(--wc-green) 85%,
+      var(--wc-teal) 100%
+    );
+    margin: var(--space-8) 0;
+  }
+
+  .ha-timeline-track::before {
+    content: '';
+    position: absolute;
+    inset: -4px;
+    border-radius: var(--radius-full);
+    background: linear-gradient(90deg,
+      var(--text-muted) 0%,
+      var(--wc-amber) 25%,
+      var(--wc-red) 60%,
+      var(--wc-green) 85%,
+      var(--wc-teal) 100%
+    );
+    filter: blur(12px);
+    opacity: 0.3;
+    z-index: -1;
+  }
+
+  .ha-timeline-items {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: var(--space-4);
+    margin-top: var(--space-12);
+  }
+
+  .ha-timeline-item {
+    text-align: center;
+    padding: var(--space-5) var(--space-3);
+    border-radius: var(--radius-xl);
+    background: var(--surface-1);
+    border: 1px solid var(--surface-3);
+    transition: all 0.3s ease;
+  }
+
+  .ha-timeline-item:hover {
+    background: var(--surface-2);
+    transform: translateY(-3px);
+  }
+
+  .ha-timeline-item-urgent {
+    border-color: rgba(239, 68, 68, 0.3);
+    background: rgba(239, 68, 68, 0.04);
+    box-shadow: 0 0 30px rgba(239, 68, 68, 0.08);
+  }
+
+  .ha-timeline-item-achieved {
+    border-color: rgba(16, 185, 129, 0.3);
+    background: rgba(16, 185, 129, 0.04);
+  }
+
+  .ha-timeline-item-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: var(--radius-lg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto var(--space-3);
+    font-size: 1.25rem;
+  }
+
+  .ha-timeline-item-year {
+    font-size: 0.75rem;
+    font-weight: 700;
+    font-family: var(--font-mono);
+    margin-bottom: var(--space-2);
+    letter-spacing: 0.02em;
+  }
+
+  .ha-timeline-item-title {
+    font-size: 0.9375rem;
+    font-weight: 700;
+    margin-bottom: var(--space-2);
+    color: var(--text-primary);
+  }
+
+  .ha-timeline-item-desc {
+    font-size: 0.8125rem;
+    color: var(--text-secondary);
+    line-height: 1.5;
+  }
+
+  .ha-competitive-bar {
+    margin-top: var(--space-12);
+    padding: var(--space-6) var(--space-8);
+    border-radius: var(--radius-xl);
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.06), rgba(6, 182, 212, 0.04));
+    border: 1px solid rgba(16, 185, 129, 0.12);
+  }
+
+  .ha-competitive-bar-title {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--wc-green);
+    margin-bottom: var(--space-4);
+    text-align: center;
+  }
+
+  .ha-competitive-track {
+    position: relative;
+    height: 40px;
+    border-radius: var(--radius-lg);
+    background: var(--surface-2);
+    overflow: hidden;
+  }
+
+  .ha-competitive-fill-others {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 55%;
+    border-radius: var(--radius-lg);
+    background: linear-gradient(90deg, rgba(104, 104, 160, 0.3), rgba(104, 104, 160, 0.15));
+    display: flex;
+    align-items: center;
+    padding-left: var(--space-4);
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--text-muted);
+  }
+
+  .ha-competitive-fill-wc {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 92%;
+    border-radius: var(--radius-lg);
+    background: linear-gradient(90deg, rgba(16, 185, 129, 0.2), rgba(20, 184, 166, 0.3));
+    border: 1px solid rgba(16, 185, 129, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding-right: var(--space-4);
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--wc-green);
+  }
+
+  .ha-competitive-labels {
+    display: flex;
+    justify-content: space-between;
+    margin-top: var(--space-3);
+    font-size: 0.75rem;
+    color: var(--text-muted);
+  }
+</style>
+
+<section class="ha-section ha-timeline-section" aria-label="Compliance timeline">
+  <div class="ha-section-inner">
+    <div class="ha-section-header scroll-reveal">
+      <span class="ha-section-label ha-section-label-urgent">Compliance Landscape</span>
+      <h2 class="ha-section-title">The Regulatory Timeline</h2>
+      <p class="ha-section-description">
+        Accessibility in healthcare is not aspirational -- it is a legal requirement
+        with an immovable deadline. Here is where the industry stands.
+      </p>
+    </div>
+
+    <div class="ha-timeline scroll-reveal scroll-reveal-delay-1">
+      <div class="ha-timeline-track" aria-hidden="true"></div>
+
+      <div class="ha-timeline-items">
+        <div class="ha-timeline-item">
+          <div class="ha-timeline-item-icon" style="background: linear-gradient(135deg, rgba(104, 104, 160, 0.15), rgba(104, 104, 160, 0.05)); border: 1px solid rgba(104, 104, 160, 0.2); color: var(--text-muted);" aria-hidden="true">
+            <i class="fa-solid fa-landmark"></i>
+          </div>
+          <div class="ha-timeline-item-year" style="color: var(--text-muted);">1998</div>
+          <div class="ha-timeline-item-title">Section 508</div>
+          <div class="ha-timeline-item-desc">Federal agencies required to make IT accessible</div>
+        </div>
+
+        <div class="ha-timeline-item">
+          <div class="ha-timeline-item-icon" style="background: linear-gradient(135deg, rgba(245, 158, 11, 0.15), rgba(245, 158, 11, 0.05)); border: 1px solid rgba(245, 158, 11, 0.2); color: var(--wc-amber);" aria-hidden="true">
+            <i class="fa-solid fa-file-shield"></i>
+          </div>
+          <div class="ha-timeline-item-year" style="color: var(--wc-amber);">2018</div>
+          <div class="ha-timeline-item-title">WCAG 2.1 AA</div>
+          <div class="ha-timeline-item-desc">Current standard with mobile and cognitive improvements</div>
+        </div>
+
+        <div class="ha-timeline-item ha-timeline-item-urgent">
+          <div class="ha-timeline-item-icon" style="background: linear-gradient(135deg, rgba(239, 68, 68, 0.15), rgba(239, 68, 68, 0.05)); border: 1px solid rgba(239, 68, 68, 0.2); color: var(--wc-red);" aria-hidden="true">
+            <i class="fa-solid fa-gavel"></i>
+          </div>
+          <div class="ha-timeline-item-year" style="color: var(--wc-red);">MAY 2026</div>
+          <div class="ha-timeline-item-title">HHS Mandate</div>
+          <div class="ha-timeline-item-desc">WCAG 2.1 AA legally required for healthcare orgs</div>
+        </div>
+
+        <div class="ha-timeline-item ha-timeline-item-achieved">
+          <div class="ha-timeline-item-icon" style="background: linear-gradient(135deg, rgba(16, 185, 129, 0.15), rgba(16, 185, 129, 0.05)); border: 1px solid rgba(16, 185, 129, 0.2); color: var(--wc-green);" aria-hidden="true">
+            <i class="fa-solid fa-shield-halved"></i>
+          </div>
+          <div class="ha-timeline-item-year" style="color: var(--wc-green);">WC-2026</div>
+          <div class="ha-timeline-item-title">AA Guaranteed</div>
+          <div class="ha-timeline-item-desc">Every component meets AA. Critical ones exceed it.</div>
+        </div>
+
+        <div class="ha-timeline-item ha-timeline-item-achieved">
+          <div class="ha-timeline-item-icon" style="background: linear-gradient(135deg, rgba(20, 184, 166, 0.15), rgba(20, 184, 166, 0.05)); border: 1px solid rgba(20, 184, 166, 0.2); color: var(--wc-teal);" aria-hidden="true">
+            <i class="fa-solid fa-trophy"></i>
+          </div>
+          <div class="ha-timeline-item-year" style="color: var(--wc-teal);">Stretch</div>
+          <div class="ha-timeline-item-title">WCAG 2.2 AAA</div>
+          <div class="ha-timeline-item-desc">Our target for forms, navigation, and alerts</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="ha-competitive-bar scroll-reveal scroll-reveal-delay-3">
+      <div class="ha-competitive-bar-title">
+        <i class="fa-solid fa-chart-bar" aria-hidden="true"></i>
+        Where Competitors Stop vs. Where WC-2026 Goes
+      </div>
+      <div class="ha-competitive-track">
+        <div class="ha-competitive-fill-others">Most libraries stop here (WCAG AA partial)</div>
+        <div class="ha-competitive-fill-wc">WC-2026 (WCAG AAA target)</div>
+      </div>
+      <div class="ha-competitive-labels">
+        <span>No a11y</span>
+        <span>WCAG A</span>
+        <span>WCAG AA</span>
+        <span>WCAG AAA</span>
+      </div>
+    </div>
+  </div>
+</section>

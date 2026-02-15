@@ -13,23 +13,6 @@
  * - Fully responsive (mobile hides code preview)
  * - Respects prefers-reduced-motion
  */
-import CodeBlock from './CodeBlock.astro';
-
-const codeExample = `<!-- Drop-in healthcare components -->
-<wc-alert variant="success" dismissible>
-  Patient record saved successfully.
-</wc-alert>
-
-<wc-data-table
-  sortable
-  paginated
-  page-size="25">
-</wc-data-table>
-
-<!-- Themed with design tokens -->
-<wc-card elevation="2">
-  <wc-avatar src="/img/dr-chen.jpg"></wc-avatar>
-</wc-card>`;
 ---
 
 <section class="hero-section" aria-label="WC-2026 Enterprise Healthcare Web Components">
@@ -68,20 +51,35 @@ const codeExample = `<!-- Drop-in healthcare components -->
       </a>
     </div>
 
-    <!-- Floating code preview -->
-    <div class="hero-code-preview" aria-hidden="true">
-      <CodeBlock
-        code={codeExample}
-        lang="html"
-        filename="my-page.html"
-        class="hero-code-block"
-      />
-    </div>
   </div>
 
-  <!-- Scroll indicator -->
-  <div class="hero-scroll-indicator" aria-hidden="true">
-    <span>Explore</span>
-    <div class="hero-scroll-line"></div>
+  <!-- Scroll indicator (mouse) — clicks scroll to next section -->
+  <div class="mouse-scroll-wrap mouse-scroll-wrap--absolute hero-scroll-btn" role="button" tabindex="0" aria-label="Scroll to content">
+    <div class="mouse-scroll-body"><div class="mouse-scroll-wheel"></div></div>
+    <span class="mouse-scroll-label">Scroll</span>
   </div>
 </section>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const btn = document.querySelector('.hero-scroll-btn');
+    if (!btn) return;
+    const scroll = () => {
+      const hero = document.querySelector('.hero-section');
+      if (!hero) return;
+      const next = hero.nextElementSibling as HTMLElement | null;
+      if (!next) return;
+      const style = getComputedStyle(document.documentElement);
+      const navRem = parseFloat(style.getPropertyValue('--sl-nav-height'));
+      const fontSize = parseFloat(style.fontSize);
+      window.scrollTo({ top: next.offsetTop - (navRem * fontSize), behavior: 'smooth' });
+    };
+    btn.addEventListener('click', scroll);
+    btn.addEventListener('keydown', (e) => {
+      if ((e as KeyboardEvent).key === 'Enter' || (e as KeyboardEvent).key === ' ') {
+        e.preventDefault();
+        scroll();
+      }
+    });
+  });
+</script>

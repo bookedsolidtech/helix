@@ -1,0 +1,49 @@
+---
+/**
+ * ShowcaseLayout — shared HTML shell for standalone showcase pages.
+ *
+ * Replaces the duplicate <!doctype>, <head>, fonts, and Font Awesome
+ * CDN links that were previously copy-pasted across all 8 pages.
+ *
+ * Imports the 4 shared CSS files so Astro bundles them automatically.
+ */
+interface Props {
+  title: string;
+  description: string;
+}
+
+const { title, description } = Astro.props;
+
+import '../styles/showcase/tokens.css';
+import '../styles/showcase/base.css';
+import '../styles/showcase/animations.css';
+import '../styles/showcase/utilities.css';
+---
+
+<!doctype html>
+<html lang="en" data-theme="dark">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title} | WC-2026</title>
+    <meta name="description" content={description} />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=JetBrains+Mono:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
+      integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+    <slot name="head" />
+  </head>
+  <body>
+    <slot />
+    <slot name="scripts" />
+  </body>
+</html>

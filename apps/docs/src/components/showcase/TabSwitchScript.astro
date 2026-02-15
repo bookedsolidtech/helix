@@ -1,0 +1,65 @@
+---
+/**
+ * TabSwitchScript — shared tab switching logic for tabbed showcase pages.
+ *
+ * Handles click and keyboard (ArrowLeft/ArrowRight) navigation.
+ * Expects tabs with [role="tab"][data-tab] and panels with [role="tabpanel"][data-tab-panel].
+ */
+interface Props {
+  tabSelector?: string;
+  panelSelector?: string;
+}
+
+const {
+  tabSelector = '[role="tab"][data-tab]',
+  panelSelector = '[role="tabpanel"][data-tab-panel]',
+} = Astro.props;
+---
+
+<script is:inline
+  data-tab-selector={tabSelector}
+  data-panel-selector={panelSelector}
+>
+  (function () {
+    var script = document.currentScript;
+    var tabSel = script.getAttribute('data-tab-selector');
+    var panelSel = script.getAttribute('data-panel-selector');
+
+    var tabs = Array.from(document.querySelectorAll(tabSel));
+    var panels = Array.from(document.querySelectorAll(panelSel));
+
+    function switchTab(tabId) {
+      tabs.forEach(function (t) {
+        var isActive = t.getAttribute('data-tab') === tabId;
+        t.setAttribute('aria-selected', isActive ? 'true' : 'false');
+        t.setAttribute('tabindex', isActive ? '0' : '-1');
+        t.classList.toggle('active', isActive);
+      });
+      panels.forEach(function (p) {
+        var isActive = p.getAttribute('data-tab-panel') === tabId;
+        p.hidden = !isActive;
+        p.classList.toggle('active', isActive);
+      });
+    }
+
+    tabs.forEach(function (tab) {
+      tab.addEventListener('click', function () {
+        switchTab(tab.getAttribute('data-tab'));
+      });
+
+      tab.addEventListener('keydown', function (e) {
+        var idx = tabs.indexOf(tab);
+        var next = -1;
+        if (e.key === 'ArrowRight') next = (idx + 1) % tabs.length;
+        if (e.key === 'ArrowLeft') next = (idx - 1 + tabs.length) % tabs.length;
+        if (e.key === 'Home') next = 0;
+        if (e.key === 'End') next = tabs.length - 1;
+        if (next >= 0) {
+          e.preventDefault();
+          tabs[next].focus();
+          switchTab(tabs[next].getAttribute('data-tab'));
+        }
+      });
+    });
+  })();
+</script>

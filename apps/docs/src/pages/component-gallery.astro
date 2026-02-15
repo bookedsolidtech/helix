@@ -1,0 +1,466 @@
+---
+/**
+ * Component Gallery — CEM-Driven Scroll-Snap Showcase
+ *
+ * Auto-discovers all registered web components from the Custom Elements Manifest
+ * and renders a full-VH scroll-snapping gallery with live, interactive demos.
+ *
+ * Add a component to the library → run `npm run cem` → it appears here automatically.
+ */
+import ShowcaseLayout from '../layouts/ShowcaseLayout.astro';
+import ComponentLoader from '../components/ComponentLoader.astro';
+import GalleryHero from '../components/gallery/GalleryHero.astro';
+import GallerySection from '../components/gallery/GallerySection.astro';
+import GalleryNav from '../components/gallery/GalleryNav.astro';
+import GalleryScript from '../components/gallery/GalleryScript.astro';
+import { getAllComponentNames, getComponentData } from '../lib/cem-utils';
+import {
+  sortComponentsByCategory,
+  getCategoryForTag,
+  getCategoryAccent,
+  getGalleryStats,
+  getUniqueCategories,
+} from '../lib/cem-gallery-utils';
+import { getDemoConfig } from '../lib/gallery-demo-config';
+
+const allNames = getAllComponentNames();
+const allComponents = allNames
+  .map((name) => getComponentData(name))
+  .filter((d): d is NonNullable<typeof d> => d !== undefined);
+const sorted = sortComponentsByCategory(allComponents);
+const stats = getGalleryStats(allComponents);
+const categories = getUniqueCategories(allComponents);
+---
+
+<ShowcaseLayout
+  title="Component Gallery"
+  description="Every WC-2026 web component in one scroll-snapping, interactive showcase. CEM-driven auto-discovery with live demos."
+>
+  <ComponentLoader />
+
+  <style is:inline>
+    /* ============================================
+       COMPONENT GALLERY — page-specific styles
+       ============================================ */
+
+    /* --- Body override --- */
+    body { overflow-x: hidden; }
+    html { scroll-behavior: smooth; }
+
+    /* --- Keyframes --- */
+    @keyframes pulse-ring {
+      0% { box-shadow: 0 0 0 0 rgba(6,182,212,0.4); }
+      70% { box-shadow: 0 0 0 15px rgba(6,182,212,0); }
+      100% { box-shadow: 0 0 0 0 rgba(6,182,212,0); }
+    }
+
+    /* --- Scroll-snap container (desktop only) --- */
+    @media (min-width: 1025px) {
+      .cg-container {
+        height: 100vh;
+        overflow-y: scroll;
+        scroll-snap-type: y mandatory;
+        scroll-behavior: smooth;
+      }
+    }
+
+    /* --- Slide base --- */
+    .cg-slide {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+      padding: 4rem 2rem;
+    }
+
+    @media (min-width: 1025px) {
+      .cg-slide { scroll-snap-align: start; }
+    }
+
+    .cg-slide-inner {
+      max-width: 1100px;
+      width: 100%;
+      position: relative;
+      z-index: 2;
+    }
+
+    /* --- Slide backgrounds --- */
+    .cg-hero {
+      background: linear-gradient(135deg, #0a0a18 0%, #0f1030 30%, #1a0a2e 60%, #0a0a18 100%);
+    }
+    .cg-slide-dark { background: var(--surface-0); }
+    .cg-slide-mid { background: var(--surface-1); }
+
+    /* --- Decorative elements --- */
+    .cg-particles {
+      position: absolute; inset: 0; pointer-events: none;
+      background-image:
+        radial-gradient(1.5px 1.5px at 10% 20%, rgba(6,182,212,0.2) 50%, transparent 50%),
+        radial-gradient(1px 1px at 40% 70%, rgba(245,158,11,0.15) 50%, transparent 50%),
+        radial-gradient(1.5px 1.5px at 80% 30%, rgba(139,92,246,0.12) 50%, transparent 50%),
+        radial-gradient(1px 1px at 60% 90%, rgba(16,185,129,0.15) 50%, transparent 50%);
+      animation: particle-drift 80s linear infinite;
+    }
+    .cg-grid-bg {
+      position: absolute; inset: 0; pointer-events: none;
+      background-image: linear-gradient(rgba(255,255,255,0.012) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.012) 1px, transparent 1px);
+      background-size: 60px 60px;
+    }
+    .cg-orb { position: absolute; border-radius: 50%; pointer-events: none; }
+
+    /* --- Gradient text --- */
+    .gradient-text {
+      background: var(--gradient-cyan-purple);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    /* --- Hero stats --- */
+    .cg-hero-stats {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 1.5rem;
+      flex-wrap: wrap;
+    }
+    .cg-hero-stat { display: flex; flex-direction: column; align-items: center; gap: 0.125rem; }
+    .cg-hero-stat-value {
+      font-size: clamp(1.75rem, 3vw, 2.5rem);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      line-height: 1.2;
+    }
+    .cg-hero-stat-label {
+      font-size: 0.8125rem;
+      color: var(--text-muted);
+    }
+    .cg-hero-stat-divider {
+      width: 1px;
+      height: 2.5rem;
+      background: linear-gradient(to bottom, transparent, rgba(255,255,255,0.1), transparent);
+    }
+
+    /* --- Hero filter buttons --- */
+    .cg-hero-filters {
+      display: flex;
+      gap: 0.5rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    .cg-filter-btn {
+      padding: 0.5rem 1rem;
+      font-size: 0.8125rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border-strong);
+      border-radius: var(--radius-full);
+      cursor: pointer;
+      transition: all 0.25s ease;
+      min-height: 36px;
+    }
+    .cg-filter-btn:hover {
+      color: var(--text-primary);
+      background: var(--glass-bg-strong);
+    }
+    .cg-filter-btn.cg-filter-active {
+      color: white;
+      background: var(--gradient-primary);
+      border-color: transparent;
+      box-shadow: 0 2px 12px rgba(102,126,234,0.3);
+    }
+    .cg-filter-btn:focus-visible {
+      outline: 3px solid var(--wc-accent);
+      outline-offset: 3px;
+    }
+
+    /* --- Section header --- */
+    .cg-section-header { text-align: center; margin-bottom: 2rem; }
+    .cg-section-label {
+      display: inline-block;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      padding: 0.25rem 1rem;
+      border-radius: var(--radius-full);
+      margin-bottom: 0.75rem;
+    }
+    .cg-section-title {
+      font-size: clamp(1.75rem, 4vw, 3rem);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      margin-bottom: 0.75rem;
+      font-family: var(--font-mono);
+    }
+    .cg-section-tag { color: var(--text-muted); opacity: 0.5; }
+    .cg-section-desc {
+      font-size: 1.0625rem;
+      color: var(--text-secondary);
+      max-width: 700px;
+      margin: 0 auto;
+      line-height: 1.8;
+    }
+
+    /* --- Section stat badges --- */
+    .cg-section-stats {
+      display: flex;
+      gap: 0.75rem;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-bottom: 2rem;
+    }
+    .cg-stat-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.375rem;
+      padding: 0.375rem 0.875rem;
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border-strong);
+      border-radius: var(--radius-full);
+      font-size: 0.8125rem;
+    }
+    .cg-stat-badge-value {
+      font-weight: 800;
+      color: var(--text-primary);
+    }
+    .cg-stat-badge-label {
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    /* --- Demo area (glass-styled) --- */
+    .cg-demo-area {
+      background: var(--surface-1);
+      border: 1px solid var(--surface-3);
+      border-radius: var(--radius-xl);
+      overflow: hidden;
+      position: relative;
+    }
+    .cg-demo-header {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.625rem 1rem;
+      background: var(--surface-2);
+      border-bottom: 1px solid var(--surface-3);
+    }
+    .cg-demo-dots {
+      display: flex;
+      gap: 6px;
+    }
+    .cg-demo-dots span {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--surface-3);
+    }
+    .cg-demo-dots span:first-child { background: #ef4444; }
+    .cg-demo-dots span:nth-child(2) { background: #f59e0b; }
+    .cg-demo-dots span:last-child { background: #10b981; }
+    .cg-demo-label {
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .cg-demo-content {
+      padding: 2rem;
+      position: relative;
+      background-image:
+        radial-gradient(circle at 1px 1px, rgba(255,255,255,0.03) 1px, transparent 0);
+      background-size: 24px 24px;
+    }
+
+    /* --- Section links --- */
+    .cg-section-links {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      margin-top: 1.5rem;
+      flex-wrap: wrap;
+    }
+    .cg-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.625rem 1.25rem;
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border-strong);
+      border-radius: var(--radius-full);
+      text-decoration: none;
+      transition: all 0.3s ease;
+      min-height: 44px;
+    }
+    .cg-link:hover {
+      color: var(--text-primary);
+      background: var(--glass-bg-strong);
+      transform: translateY(-2px);
+    }
+    .cg-link:focus-visible {
+      outline: 3px solid var(--wc-accent);
+      outline-offset: 3px;
+    }
+
+    /* --- Dot navigation --- */
+    .cg-dots {
+      position: fixed;
+      right: 1.5rem;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 200;
+      display: flex;
+      flex-direction: column;
+      gap: 0.625rem;
+    }
+    .cg-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--glass-border-strong);
+      border: none;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      position: relative;
+      padding: 0;
+    }
+    .cg-dot.active {
+      background: var(--wc-cyan);
+      box-shadow: 0 0 10px rgba(6,182,212,0.5);
+      transform: scale(1.3);
+    }
+    .cg-dot:hover {
+      background: var(--text-muted);
+      transform: scale(1.2);
+    }
+    .cg-dot-label {
+      position: absolute;
+      right: 20px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 0.6875rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      white-space: nowrap;
+      opacity: 0;
+      transition: opacity 0.2s ease;
+      pointer-events: none;
+      background: rgba(10,10,20,0.9);
+      padding: 0.25rem 0.5rem;
+      border-radius: 4px;
+    }
+    .cg-dot:hover .cg-dot-label { opacity: 1; }
+    .cg-dot:focus-visible {
+      outline: 3px solid var(--wc-accent);
+      outline-offset: 3px;
+    }
+
+    /* --- Category label colors (reuse from full-presentation) --- */
+    .label-electric { background:rgba(59,130,246,0.08); color:var(--wc-electric); border:1px solid rgba(59,130,246,0.15); }
+    .label-amber { background:rgba(245,158,11,0.08); color:var(--wc-amber); border:1px solid rgba(245,158,11,0.15); }
+    .label-accent { background:rgba(139,92,246,0.08); color:var(--wc-accent); border:1px solid rgba(139,92,246,0.15); }
+    .label-cyan { background:rgba(6,182,212,0.08); color:var(--wc-cyan); border:1px solid rgba(6,182,212,0.15); }
+    .label-green { background:rgba(16,185,129,0.08); color:var(--wc-green); border:1px solid rgba(16,185,129,0.15); }
+    .label-pink { background:rgba(236,72,153,0.08); color:var(--wc-pink); border:1px solid rgba(236,72,153,0.15); }
+
+    /* --- Hidden (filtered out) --- */
+    .cg-hidden { display: none !important; }
+
+    /* --- Responsive --- */
+    @media (max-width: 1024px) {
+      .cg-dots { display: none; }
+    }
+
+    @media (max-width: 768px) {
+      .cg-slide { padding: 4rem 1rem 5rem; min-height: auto; }
+      .cg-hero-stats { gap: 1rem; }
+      .cg-hero-stat-divider { display: none; }
+      .cg-demo-content { padding: 1.25rem; }
+    }
+
+    /* --- Mouse scroll indicator --- */
+    .cg-hero-mouse-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.625rem;
+      margin-top: 2.5rem;
+      animation: fadeInUp 0.8s ease-out 0.9s both;
+    }
+    .cg-hero-mouse {
+      width: 26px;
+      height: 42px;
+      border: 2px solid rgba(255, 255, 255, 0.25);
+      border-radius: 13px;
+      position: relative;
+      display: flex;
+      justify-content: center;
+    }
+    .cg-hero-mouse-wheel {
+      width: 4px;
+      height: 8px;
+      background: rgba(255, 255, 255, 0.5);
+      border-radius: 2px;
+      margin-top: 7px;
+      animation: mouse-scroll 2s ease-in-out infinite;
+    }
+    .cg-hero-mouse-label {
+      font-size: 0.6875rem;
+      font-weight: 500;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+    @keyframes mouse-scroll {
+      0%   { opacity: 1; transform: translateY(0); }
+      50%  { opacity: 0.3; transform: translateY(10px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+
+    /* --- Reduced motion --- */
+    @media (prefers-reduced-motion: reduce) {
+      .cg-orb { animation: none !important; opacity: 0.15; }
+      .cg-hero-mouse-wheel { animation: none !important; }
+      html { scroll-behavior: auto; }
+      .cg-container { scroll-snap-type: none !important; scroll-behavior: auto !important; }
+    }
+  </style>
+
+  <GalleryNav
+    items={sorted.map((c, i) => ({
+      tagName: c.tagName,
+      label: c.tagName.replace('wc-', ''),
+      index: i + 1,
+    }))}
+  />
+
+  <main id="main-content" class="cg-container">
+    <GalleryHero stats={stats} categories={categories} />
+
+    {sorted.map((comp, idx) => (
+      <GallerySection
+        tagName={comp.tagName}
+        description={comp.description || comp.summary}
+        category={getCategoryForTag(comp.tagName)}
+        sectionIndex={idx + 1}
+        propertyCount={comp.properties.length}
+        eventCount={comp.events.length}
+        slotCount={comp.slots.length}
+        cssPropertyCount={comp.cssProperties.length}
+        accentColor={getCategoryAccent(getCategoryForTag(comp.tagName))}
+      >
+        <Fragment set:html={getDemoConfig(comp.tagName).primary} />
+      </GallerySection>
+    ))}
+  </main>
+
+  <GalleryScript slot="scripts" />
+</ShowcaseLayout>

@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/web-components';
 import { html } from 'lit';
+import { expect, within, userEvent } from 'storybook/test';
 import './wc-text-input.js';
 
 const meta = {
@@ -90,6 +91,14 @@ export const Default: Story = {
   args: {
     label: 'Full Name',
     placeholder: 'Enter your full name',
+  },
+  play: async ({ canvasElement }) => {
+    const input = canvasElement.querySelector('wc-text-input');
+    expect(input).toBeTruthy();
+    const nativeInput = input?.shadowRoot?.querySelector('input');
+    expect(nativeInput).toBeTruthy();
+    await userEvent.type(nativeInput!, 'Hello');
+    expect(nativeInput!.value).toBe('Hello');
   },
 };
 

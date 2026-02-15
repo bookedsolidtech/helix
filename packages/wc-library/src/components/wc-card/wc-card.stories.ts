@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/web-components';
 import { html } from 'lit';
+import { expect, within, userEvent } from 'storybook/test';
 import './wc-card.js';
 import '../wc-button/wc-button.js';
 
@@ -48,6 +49,11 @@ export const Default: Story = {
       <p>This is the card body content. It can contain any HTML or text you need to display.</p>
     </wc-card>
   `,
+  play: async ({ canvasElement }) => {
+    const button = canvasElement.querySelector('wc-card');
+    expect(button).toBeTruthy();
+    expect(button?.shadowRoot?.querySelector('.card')).toBeTruthy();
+  },
 };
 
 // ─── With All Slots ───
@@ -62,8 +68,8 @@ export const WithAllSlots: Story = {
         <small>Last updated: Feb 2026</small>
       </span>
       <span slot="actions">
-        <wc-button size="sm">Action 1</wc-button>
-        <wc-button size="sm" variant="secondary">Action 2</wc-button>
+        <wc-button wc-size="sm">Action 1</wc-button>
+        <wc-button wc-size="sm" variant="secondary">Action 2</wc-button>
       </span>
     </wc-card>
   `,
@@ -77,7 +83,7 @@ export const Featured: Story = {
       <span slot="heading">Featured Card</span>
       <p>This card uses the featured variant, which adds a colored border to draw attention.</p>
       <span slot="actions">
-        <wc-button size="sm">Learn More</wc-button>
+        <wc-button wc-size="sm">Learn More</wc-button>
       </span>
     </wc-card>
   `,
@@ -99,7 +105,7 @@ export const Compact: Story = {
 export const Interactive: Story = {
   render: () => html`
     <wc-card
-      href="https://example.com"
+      wc-href="https://example.com"
       elevation="raised"
       style="max-width: 400px;"
       @wc-card-click=${(e: CustomEvent) => console.log('Card clicked:', e.detail)}

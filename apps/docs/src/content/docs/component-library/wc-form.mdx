@@ -1,0 +1,27 @@
+---
+title: "wc-form"
+description: "A Light DOM form wrapper that styles native HTML form elements and wc-* components with the design system's form styles. When action is set, renders a form wrapper around slotted content. When no action is set (the Drupal pattern), renders only a slot so Drupal can provide its own form tag. Uses adopted stylesheets to inject scoped CSS into the document without Shadow DOM, keeping native form participation and Drupal compatibility."
+---
+
+import ComponentLoader from '../../../components/ComponentLoader.astro';
+import ComponentDoc from '../../../components/ComponentDoc.astro';
+
+<ComponentLoader />
+
+<ComponentDoc tagName="wc-form" section="summary" />
+
+## Overview
+
+A Light DOM form wrapper that styles native HTML form elements and
+wc-* components with the design system's form styles.
+
+When `action` is set, renders a `<form>` wrapper around slotted content.
+When no `action` is set (the Drupal pattern), renders only a `<slot>`
+so Drupal can provide its own `<form>` tag.
+
+Uses adopted stylesheets to inject scoped CSS into the document without
+Shadow DOM, keeping native form participation and Drupal compatibility.
+
+## API Reference
+
+<ComponentDoc tagName="wc-form" section="api" />

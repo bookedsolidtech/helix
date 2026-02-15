@@ -1,0 +1,284 @@
+---
+/**
+ * GalleryBanner — CTA banner for the Starlight dashboard.
+ *
+ * CEM-driven stats computed at build time. Follows DXBanner pattern:
+ * full-width dark section with glowing orbs and gradient accent.
+ */
+import { getAllComponentNames, getComponentData } from '../lib/cem-utils';
+import { getGalleryStats } from '../lib/cem-gallery-utils';
+
+const allNames = getAllComponentNames();
+const allComponents = allNames
+  .map((name) => getComponentData(name))
+  .filter((d) => d !== undefined);
+const stats = getGalleryStats(allComponents);
+---
+
+<section class="cg-banner" aria-label="Component Gallery">
+  <div class="cg-banner-glow-1" aria-hidden="true"></div>
+  <div class="cg-banner-glow-2" aria-hidden="true"></div>
+
+  <div class="cg-banner-inner scroll-reveal">
+    <div class="cg-banner-content">
+      <span class="cg-banner-label">
+        <i class="fa-solid fa-shapes" aria-hidden="true"></i>
+        Component Gallery
+      </span>
+
+      <h2 class="cg-banner-title">
+        Every Component. One Page. Live.
+      </h2>
+
+      <p class="cg-banner-description">
+        A CEM-driven, scroll-snapping showcase of every web component in the library.
+        Search, filter by category, and interact with live demos &mdash; all auto-discovered
+        from the Custom Elements Manifest.
+      </p>
+
+      <div class="cg-banner-stats">
+        <div class="cg-banner-stat">
+          <span class="cg-banner-stat-value">{stats.components}</span>
+          <span class="cg-banner-stat-label">Components</span>
+        </div>
+        <div class="cg-banner-stat-divider" aria-hidden="true"></div>
+        <div class="cg-banner-stat">
+          <span class="cg-banner-stat-value">{stats.properties}</span>
+          <span class="cg-banner-stat-label">Properties</span>
+        </div>
+        <div class="cg-banner-stat-divider" aria-hidden="true"></div>
+        <div class="cg-banner-stat">
+          <span class="cg-banner-stat-value">100%</span>
+          <span class="cg-banner-stat-label">Interactive</span>
+        </div>
+      </div>
+
+      <a href="/component-gallery/" class="cg-banner-cta">
+        Explore the Gallery
+        <span class="cg-banner-cta-arrow" aria-hidden="true">&rarr;</span>
+      </a>
+    </div>
+
+    <div class="cg-banner-visual" aria-hidden="true">
+      <div class="cg-banner-constellation">
+        <div class="cg-banner-tag-card" style="--delay:0s;--x:0;--y:0;">
+          <span class="cg-banner-tag-icon"><i class="fa-solid fa-hand-pointer"></i></span>
+          <span>wc-button</span>
+        </div>
+        <div class="cg-banner-tag-card" style="--delay:0.1s;--x:60%;--y:15%;">
+          <span class="cg-banner-tag-icon"><i class="fa-solid fa-bell"></i></span>
+          <span>wc-alert</span>
+        </div>
+        <div class="cg-banner-tag-card" style="--delay:0.2s;--x:10%;--y:55%;">
+          <span class="cg-banner-tag-icon"><i class="fa-solid fa-rectangle-list"></i></span>
+          <span>wc-card</span>
+        </div>
+        <div class="cg-banner-tag-card" style="--delay:0.3s;--x:55%;--y:65%;">
+          <span class="cg-banner-tag-icon"><i class="fa-solid fa-keyboard"></i></span>
+          <span>wc-form</span>
+        </div>
+        <div class="cg-banner-tag-card" style="--delay:0.4s;--x:30%;--y:85%;">
+          <span class="cg-banner-tag-icon"><i class="fa-solid fa-toggle-on"></i></span>
+          <span>wc-switch</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .cg-banner {
+    width: 100% !important;
+    position: relative;
+    overflow: hidden;
+    padding: var(--space-12) var(--space-8);
+    background: linear-gradient(135deg, #0a0a1a 0%, #1a1208 50%, #0a0a1a 100%);
+    border-top: 1px solid rgba(245, 158, 11, 0.1);
+    border-bottom: 1px solid rgba(6, 182, 212, 0.1);
+  }
+
+  .cg-banner-glow-1 {
+    position: absolute;
+    width: 500px;
+    height: 500px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(245, 158, 11, 0.12), transparent 70%);
+    top: -200px;
+    right: -100px;
+    filter: blur(80px);
+    pointer-events: none;
+  }
+
+  .cg-banner-glow-2 {
+    position: absolute;
+    width: 400px;
+    height: 400px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(6, 182, 212, 0.1), transparent 70%);
+    bottom: -150px;
+    left: -100px;
+    filter: blur(80px);
+    pointer-events: none;
+  }
+
+  .cg-banner-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 3fr 2fr;
+    gap: var(--space-8);
+    align-items: center;
+  }
+
+  .cg-banner-label {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-size: 0.8125rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--wc-amber);
+    margin-bottom: var(--space-4);
+  }
+  .cg-banner-label i { font-size: 0.75rem; }
+
+  .cg-banner-title {
+    font-size: clamp(1.75rem, 4vw, 2.75rem);
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    line-height: 1.15;
+    margin-bottom: var(--space-4);
+    background: linear-gradient(180deg, rgba(255,255,255,1) 0%, rgba(255,255,255,0.75) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .cg-banner-description {
+    font-size: 1.0625rem;
+    line-height: 1.75;
+    color: var(--text-secondary);
+    margin-bottom: var(--space-8);
+  }
+
+  .cg-banner-stats {
+    display: flex;
+    align-items: baseline;
+    gap: var(--space-6);
+    margin-bottom: var(--space-6);
+  }
+  .cg-banner-stat {
+    display: flex;
+    flex-direction: column;
+    gap: 0.125rem;
+  }
+  .cg-banner-stat-value {
+    font-size: 1.5rem;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+    color: var(--wc-amber);
+    font-family: var(--font-heading);
+    margin: 0;
+    padding: 0;
+  }
+  .cg-banner-stat-label {
+    font-size: 0.75rem;
+    font-weight: 500;
+    line-height: 1.2;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin: 0;
+    padding: 0;
+  }
+  .cg-banner-stat-divider {
+    width: 1px;
+    align-self: center;
+    height: 2rem;
+    background: linear-gradient(to bottom, transparent, rgba(255,255,255,0.1), transparent);
+  }
+
+  .cg-banner-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-4) var(--space-8);
+    font-size: 1rem;
+    font-weight: 600;
+    color: #0a0a1a;
+    background: linear-gradient(135deg, var(--wc-amber), #fbbf24);
+    border-radius: var(--radius-lg);
+    text-decoration: none;
+    transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+    box-shadow: 0 4px 16px rgba(245, 158, 11, 0.25);
+    min-height: 48px;
+    line-height: 1;
+  }
+  .cg-banner-cta:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 32px rgba(245, 158, 11, 0.35), 0 0 60px rgba(245, 158, 11, 0.15);
+    color: #0a0a1a;
+  }
+  .cg-banner-cta-arrow {
+    transition: transform 0.3s ease;
+    display: inline-block;
+  }
+  .cg-banner-cta:hover .cg-banner-cta-arrow {
+    transform: translateX(4px);
+  }
+
+  /* Constellation visual */
+  .cg-banner-visual {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .cg-banner-constellation {
+    position: relative;
+    width: 280px;
+    height: 260px;
+  }
+  .cg-banner-tag-card {
+    position: absolute;
+    left: var(--x);
+    top: var(--y);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 0.875rem;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: var(--radius-md);
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    font-family: var(--font-mono);
+    backdrop-filter: blur(8px);
+    animation: fadeInUp 0.6s ease-out calc(var(--delay) + 0.3s) both;
+    white-space: nowrap;
+  }
+  .cg-banner-tag-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    border-radius: 6px;
+    background: rgba(245, 158, 11, 0.1);
+    color: var(--wc-amber);
+    font-size: 0.6875rem;
+  }
+
+  @media (max-width: 768px) {
+    .cg-banner { padding: var(--space-12) var(--space-4); }
+    .cg-banner-inner { grid-template-columns: 1fr; gap: var(--space-8); text-align: center; }
+    .cg-banner-visual { display: none; }
+    .cg-banner-label { justify-content: center; }
+    .cg-banner-stats { flex-wrap: wrap; gap: var(--space-4); justify-content: center; }
+    .cg-banner-stat-divider { display: none; }
+    .cg-banner-stat { align-items: center; }
+    .cg-banner-cta { width: 100%; justify-content: center; }
+  }
+</style>

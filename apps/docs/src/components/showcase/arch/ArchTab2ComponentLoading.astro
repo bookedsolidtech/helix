@@ -1,0 +1,1259 @@
+---
+/**
+ * ArchTab2ComponentLoading — Tab 2 of the System Architecture page.
+ *
+ * Contains the "Component Loading" Architecture Decision Record:
+ * - Hero section (loading variant)
+ * - Three loading strategies comparison cards
+ * - Performance comparison bars
+ * - Drupal integration flow diagram
+ * - Code examples (Twig + shared runtime)
+ * - Real-world pattern examples (card, button, form)
+ */
+import {
+  codeLoadingSingleBundle,
+  codeLoadingPerComponent,
+  codeLoadingHybridGroups,
+  codeLoadingTwigAttach,
+  codeLoadingSharedRuntime,
+  codeExampleCard,
+  codeExampleButton,
+  codeExampleForm,
+} from './ArchCodeExamples';
+---
+
+<div id="tab-loading" class="da-tab-content" role="tabpanel">
+  <section class="da-hero da-hero-loading" aria-label="Component Loading Strategy Decision">
+    <div class="da-hero-grid" aria-hidden="true"></div>
+    <div class="da-hero-orb da-hero-orb-1" aria-hidden="true"></div>
+    <div class="da-hero-orb da-hero-orb-2" aria-hidden="true"></div>
+    <div class="da-hero-orb da-hero-orb-3" aria-hidden="true"></div>
+
+    <div class="da-hero-content">
+      <div class="da-hero-badge">
+        <span class="da-hero-badge-dot" aria-hidden="true"></span>
+        Architecture Decision Record
+      </div>
+
+      <h1 class="da-hero-title">How Components<br />Reach the Browser</h1>
+
+      <p class="da-hero-subtitle">Bundle Strategy: One File, Many Files, or Smart Groups?</p>
+
+      <p class="da-hero-description">
+        The second critical architecture decision: how do web components
+        get delivered to each page? A single monolithic bundle, individual
+        per-component files, or intelligent context-based groups? The right
+        strategy means <strong>fast first paint</strong> and <strong>zero wasted bytes</strong>.
+      </p>
+    </div>
+
+    <div class="mouse-scroll-wrap mouse-scroll-wrap--absolute" aria-hidden="true">
+      <div class="mouse-scroll-body"><div class="mouse-scroll-wheel"></div></div>
+      <span class="mouse-scroll-label">Scroll</span>
+    </div>
+  </section>
+
+  <!-- ============================================
+       SECTION 7: COMPONENT LOADING STRATEGIES
+       ============================================ -->
+  <section id="loading" class="da-section da-loading-section" aria-label="Component loading strategies">
+    <div class="da-section-inner">
+      <div class="da-section-header scroll-reveal">
+        <span class="da-section-label">Loading Strategies</span>
+        <h2 class="da-section-title">How Components Reach the Browser</h2>
+        <p class="da-section-description">
+          The architecture decision does not stop at props vs. slots. How you
+          physically load web component JavaScript into Drupal pages has a
+          direct impact on performance, cacheability, and maintainability.
+        </p>
+      </div>
+
+      <!-- Visual 1: Three-Strategy Comparison Cards -->
+      <div class="da-loading-strategies">
+        <!-- Strategy A: Single Bundle -->
+        <div class="da-loading-card scroll-reveal scroll-reveal-delay-1">
+          <div class="da-loading-icon da-loading-icon-single" aria-hidden="true">
+            <i class="fa-solid fa-box"></i>
+          </div>
+          <div class="da-loading-card-title">Single Bundle</div>
+          <div class="da-loading-card-subtitle">"Load Everything"</div>
+
+          <div class="da-loading-visual" aria-label="One large block representing all components" role="img">
+            <div class="da-loading-block da-loading-block-single">ALL COMPONENTS</div>
+          </div>
+
+          <div class="da-loading-size da-loading-size-amber">
+            <i class="fa-solid fa-weight-hanging" aria-hidden="true"></i>
+            ~220KB per page
+          </div>
+
+          <div class="da-loading-ratings">
+            <div class="da-loading-rating">
+              <span class="da-loading-rating-label">
+                <i class="fa-solid fa-bolt" aria-hidden="true"></i>
+                FCP Impact
+              </span>
+              <div class="da-loading-rating-dots" aria-label="Poor - 1 out of 5">
+                <span class="da-loading-rating-dot filled-red"></span>
+                <span class="da-loading-rating-dot"></span>
+                <span class="da-loading-rating-dot"></span>
+                <span class="da-loading-rating-dot"></span>
+                <span class="da-loading-rating-dot"></span>
+              </div>
+            </div>
+            <div class="da-loading-rating">
+              <span class="da-loading-rating-label">
+                <i class="fa-solid fa-database" aria-hidden="true"></i>
+                Cache Efficiency
+              </span>
+              <div class="da-loading-rating-dots" aria-label="OK - 3 out of 5">
+                <span class="da-loading-rating-dot filled-amber"></span>
+                <span class="da-loading-rating-dot filled-amber"></span>
+                <span class="da-loading-rating-dot filled-amber"></span>
+                <span class="da-loading-rating-dot"></span>
+                <span class="da-loading-rating-dot"></span>
+              </div>
+            </div>
+            <div class="da-loading-rating">
+              <span class="da-loading-rating-label">
+                <i class="fa-solid fa-wrench" aria-hidden="true"></i>
+                Setup Complexity
+              </span>
+              <div class="da-loading-rating-dots" aria-label="Easy - 5 out of 5">
+                <span class="da-loading-rating-dot filled-green"></span>
+                <span class="da-loading-rating-dot filled-green"></span>
+                <span class="da-loading-rating-dot filled-green"></span>
+                <span class="da-loading-rating-dot filled-green"></span>
+                <span class="da-loading-rating-dot filled-green"></span>
+              </div>
+            </div>
+          </div>
+
+          <div class="da-loading-code">
+            <div class="da-code-block">
+              <div class="da-code-titlebar">
+                <span class="da-code-dot"></span>
+                <span class="da-code-dot"></span>
+                <span class="da-code-dot"></span>
+                <span class="da-code-filename">wc_2026.libraries.yml</span>
+              </div>
+              <div class="da-code-body">
+                <pre set:html={codeLoadingSingleBundle} />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Strategy B: Per-Component -->
+        <div class="da-loading-card scroll-reveal scroll-reveal-delay-2">
+          <div class="da-loading-icon da-loading-icon-per" aria-hidden="true">
+            <i class="fa-solid fa-cubes"></i>
+          </div>
+          <div class="da-loading-card-title">Per-Component Libraries</div>
+          <div class="da-loading-card-subtitle">"Surgical Loading"</div>
+
+          <div class="da-loading-visual" aria-label="Many small blocks, each a separate component" role="img">
+            <div class="da-loading-block da-loading-block-per">card</div>
+            <div class="da-loading-block da-loading-block-per">btn</div>
+            <div class="da-loading-block da-loading-block-per">nav</div>
+            <div class="da-loading-block da-loading-block-per">hero</div>
+            <div class="da-loading-block da-loading-block-per">tab</div>
+            <div class="da-loading-block da-loading-block-per">acc</div>
+          </div>
+
+          <div class="da-loading-size da-loading-size-cyan">
+            <i class="fa-solid fa-weight-hanging" aria-hidden="true"></i>
+            ~5-15KB per page
+          </div>
+
+          <div class="da-loading-ratings">
+            <div class="da-loading-rating">
+              <span class="da-loading-rating-label">
+                <i class="fa-solid fa-bolt" aria-hidden="true"></i>
+                FCP Impact
+              </span>
+              <div class="da-loading-rating-dots" aria-label="Excellent - 5 out of 5">
+                <span class="da-loading-rating-dot filled-green"></span>
+                <span class="da-loading-rating-dot filled-green"></span>
+                <span class="da-loading-rating-dot filled-green"></span>
+                <span class="da-loading-rating-dot filled-green"></span>
+                <span class="da-loading-rating-dot filled-green"></span>
+              </div>
+            </div>
+            <div class="da-loading-rating">
+              <span class="da-loading-rating-label">
+                <i class="fa-solid fa-database" aria-hidden="true"></i>
+                Cache Efficiency
+              </span>
+              <div class="da-loading-rating-dots" aria-label="Good - 4 out of 5">
+                <span class="da-loading-rating-dot filled-green"></span>
+                <span class="da-loading-rating-dot filled-green"></span>
+                <span class="da-loading-rating-dot filled-green"></span>
+                <span class="da-loading-rating-dot filled-green"></span>
+                <span class="da-loading-rating-dot"></span>
+              </div>
+            </div>
+            <div class="da-loading-rating">
+              <span class="da-loading-rating-label">
+                <i class="fa-solid fa-wrench" aria-hidden="true"></i>
+                Setup Complexity
+              </span>
+              <div class="da-loading-rating-dots" aria-label="Medium - 2 out of 5">
+                <span class="da-loading-rating-dot filled-amber"></span>
+                <span class="da-loading-rating-dot filled-amber"></span>
+                <span class="da-loading-rating-dot"></span>
+                <span class="da-loading-rating-dot"></span>
+                <span class="da-loading-rating-dot"></span>
+              </div>
+            </div>
+          </div>
+
+          <div class="da-loading-code">
+            <div class="da-code-block">
+              <div class="da-code-titlebar">
+                <span class="da-code-dot"></span>
+                <span class="da-code-dot"></span>
+                <span class="da-code-dot"></span>
+                <span class="da-code-filename">wc_2026.libraries.yml</span>
+              </div>
+              <div class="da-code-body">
+                <pre set:html={codeLoadingPerComponent} />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Strategy C: Hybrid Groups (Recommended) -->
+        <div class="da-loading-card da-loading-card-recommended scroll-reveal scroll-reveal-delay-3">
+          <span class="da-loading-badge">Recommended</span>
+          <div class="da-loading-icon da-loading-icon-hybrid" aria-hidden="true">
+            <i class="fa-solid fa-boxes-stacked"></i>
+          </div>
+          <div class="da-loading-card-title">Hybrid Groups</div>
+          <div class="da-loading-card-subtitle">"Smart Bundles"</div>
+
+          <div class="da-loading-visual" aria-label="Three grouped blocks by usage context" role="img">
+            <div class="da-loading-block da-loading-block-group">core</div>
+            <div class="da-loading-block da-loading-block-group">navigation</div>
+            <div class="da-loading-block da-loading-block-group">content</div>
+            <div class="da-loading-block da-loading-block-group">forms</div>
+          </div>
+
+          <div class="da-loading-size da-loading-size-green">
+            <i class="fa-solid fa-weight-hanging" aria-hidden="true"></i>
+            ~30-60KB per group
+          </div>
+
+          <div class="da-loading-ratings">
+            <div class="da-loading-rating">
+              <span class="da-loading-rating-label">
+                <i class="fa-solid fa-bolt" aria-hidden="true"></i>
+                FCP Impact
+              </span>
+              <div class="da-loading-rating-dots" aria-label="Great - 4 out of 5">
+                <span class="da-loading-rating-dot filled-green"></span>
+                <span class="da-loading-rating-dot filled-green"></span>
+                <span class="da-loading-rating-dot filled-green"></span>
+                <span class="da-loading-rating-dot filled-green"></span>
+                <span class="da-loading-rating-dot"></span>
+              </div>
+            </div>
+            <div class="da-loading-rating">
+              <span class="da-loading-rating-label">
+                <i class="fa-solid fa-database" aria-hidden="true"></i>
+                Cache Efficiency
+              </span>
+              <div class="da-loading-rating-dots" aria-label="Excellent - 5 out of 5">
+                <span class="da-loading-rating-dot filled-green"></span>
+                <span class="da-loading-rating-dot filled-green"></span>
+                <span class="da-loading-rating-dot filled-green"></span>
+                <span class="da-loading-rating-dot filled-green"></span>
+                <span class="da-loading-rating-dot filled-green"></span>
+              </div>
+            </div>
+            <div class="da-loading-rating">
+              <span class="da-loading-rating-label">
+                <i class="fa-solid fa-wrench" aria-hidden="true"></i>
+                Setup Complexity
+              </span>
+              <div class="da-loading-rating-dots" aria-label="Moderate - 3 out of 5">
+                <span class="da-loading-rating-dot filled-amber"></span>
+                <span class="da-loading-rating-dot filled-amber"></span>
+                <span class="da-loading-rating-dot filled-amber"></span>
+                <span class="da-loading-rating-dot"></span>
+                <span class="da-loading-rating-dot"></span>
+              </div>
+            </div>
+          </div>
+
+          <div class="da-loading-code">
+            <div class="da-code-block">
+              <div class="da-code-titlebar">
+                <span class="da-code-dot"></span>
+                <span class="da-code-dot"></span>
+                <span class="da-code-dot"></span>
+                <span class="da-code-filename">wc_2026.libraries.yml</span>
+              </div>
+              <div class="da-code-body">
+                <pre set:html={codeLoadingHybridGroups} />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Visual 2: Performance Impact Comparison -->
+      <div class="da-perf-comparison scroll-reveal scroll-reveal-delay-2">
+        <div class="da-flow-subtitle">Performance Impact Comparison</div>
+        <div class="da-flow-desc">
+          Side-by-side metrics showing how each loading strategy affects
+          real-world performance. Bars animate when scrolled into view.
+        </div>
+
+        <div class="da-perf-grid">
+          <!-- Initial Page Load -->
+          <div class="da-perf-metric">
+            <div class="da-perf-metric-header">
+              <div class="da-perf-metric-icon" aria-hidden="true">
+                <i class="fa-solid fa-download"></i>
+              </div>
+              <div>
+                <div class="da-perf-metric-title">Initial Page Load</div>
+                <div class="da-perf-metric-desc">KB transferred on first visit</div>
+              </div>
+            </div>
+            <div class="da-perf-bars">
+              <div class="da-perf-bar-row">
+                <span class="da-perf-bar-label">Single Bundle</span>
+                <div class="da-perf-bar-track">
+                  <div class="da-perf-bar-fill da-perf-bar-fill-amber scroll-reveal-bar" style="--bar-width: 100%;">220KB</div>
+                </div>
+                <span class="da-perf-bar-value">220KB</span>
+              </div>
+              <div class="da-perf-bar-row">
+                <span class="da-perf-bar-label">Per-Component</span>
+                <div class="da-perf-bar-track">
+                  <div class="da-perf-bar-fill da-perf-bar-fill-cyan scroll-reveal-bar" style="--bar-width: 11%;">25KB</div>
+                </div>
+                <span class="da-perf-bar-value">25KB</span>
+              </div>
+              <div class="da-perf-bar-row">
+                <span class="da-perf-bar-label">Hybrid Groups</span>
+                <div class="da-perf-bar-track">
+                  <div class="da-perf-bar-fill da-perf-bar-fill-green scroll-reveal-bar" style="--bar-width: 27%;">60KB</div>
+                </div>
+                <span class="da-perf-bar-value">60KB</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- HTTP Requests -->
+          <div class="da-perf-metric">
+            <div class="da-perf-metric-header">
+              <div class="da-perf-metric-icon" aria-hidden="true">
+                <i class="fa-solid fa-arrow-right-arrow-left"></i>
+              </div>
+              <div>
+                <div class="da-perf-metric-title">HTTP Requests</div>
+                <div class="da-perf-metric-desc">Script requests per page load</div>
+              </div>
+            </div>
+            <div class="da-perf-bars">
+              <div class="da-perf-bar-row">
+                <span class="da-perf-bar-label">Single Bundle</span>
+                <div class="da-perf-bar-track">
+                  <div class="da-perf-bar-fill da-perf-bar-fill-amber scroll-reveal-bar" style="--bar-width: 10%;">1</div>
+                </div>
+                <span class="da-perf-bar-value">1 req</span>
+              </div>
+              <div class="da-perf-bar-row">
+                <span class="da-perf-bar-label">Per-Component</span>
+                <div class="da-perf-bar-track">
+                  <div class="da-perf-bar-fill da-perf-bar-fill-cyan scroll-reveal-bar" style="--bar-width: 80%;">3-8</div>
+                </div>
+                <span class="da-perf-bar-value">3-8 req</span>
+              </div>
+              <div class="da-perf-bar-row">
+                <span class="da-perf-bar-label">Hybrid Groups</span>
+                <div class="da-perf-bar-track">
+                  <div class="da-perf-bar-fill da-perf-bar-fill-green scroll-reveal-bar" style="--bar-width: 30%;">2-3</div>
+                </div>
+                <span class="da-perf-bar-value">2-3 req</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Cache Hit Rate -->
+          <div class="da-perf-metric">
+            <div class="da-perf-metric-header">
+              <div class="da-perf-metric-icon" aria-hidden="true">
+                <i class="fa-solid fa-bolt"></i>
+              </div>
+              <div>
+                <div class="da-perf-metric-title">Cache Hit Rate</div>
+                <div class="da-perf-metric-desc">After navigating to a second page</div>
+              </div>
+            </div>
+            <div class="da-perf-bars">
+              <div class="da-perf-bar-row">
+                <span class="da-perf-bar-label">Single Bundle</span>
+                <div class="da-perf-bar-track">
+                  <div class="da-perf-bar-fill da-perf-bar-fill-amber scroll-reveal-bar" style="--bar-width: 100%;">100%</div>
+                </div>
+                <span class="da-perf-bar-value">100%</span>
+              </div>
+              <div class="da-perf-bar-row">
+                <span class="da-perf-bar-label">Per-Component</span>
+                <div class="da-perf-bar-track">
+                  <div class="da-perf-bar-fill da-perf-bar-fill-cyan scroll-reveal-bar" style="--bar-width: 60%;">~60%</div>
+                </div>
+                <span class="da-perf-bar-value">~60%</span>
+              </div>
+              <div class="da-perf-bar-row">
+                <span class="da-perf-bar-label">Hybrid Groups</span>
+                <div class="da-perf-bar-track">
+                  <div class="da-perf-bar-fill da-perf-bar-fill-green scroll-reveal-bar" style="--bar-width: 90%;">~90%</div>
+                </div>
+                <span class="da-perf-bar-value">~90%</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Visual 3: Drupal Integration Flow -->
+      <div class="da-flow-section scroll-reveal scroll-reveal-delay-2">
+        <div class="da-flow-subtitle">How Per-Component Loading Works in Practice</div>
+        <div class="da-flow-desc">
+          From content creation to Custom Element upgrade, every step is designed
+          to deliver only the JavaScript each page actually needs.
+        </div>
+
+        <div class="da-flow-steps">
+          <div class="da-flow-step">
+            <div class="da-flow-step-header">
+              <div class="da-flow-step-number">1</div>
+              <div class="da-flow-step-icon" aria-hidden="true">
+                <i class="fa-solid fa-pen-to-square"></i>
+              </div>
+            </div>
+            <div class="da-flow-step-title">Content Editor</div>
+            <div class="da-flow-step-desc">Creates node with paragraph types (Card, Hero, etc.)</div>
+          </div>
+
+          <div class="da-flow-arrow" aria-hidden="true"><i class="fa-solid fa-chevron-right"></i></div>
+
+          <div class="da-flow-step">
+            <div class="da-flow-step-header">
+              <div class="da-flow-step-number">2</div>
+              <div class="da-flow-step-icon" aria-hidden="true">
+                <i class="fa-brands fa-drupal"></i>
+              </div>
+            </div>
+            <div class="da-flow-step-title">TWIG Template</div>
+            <div class="da-flow-step-desc">Renders component and attaches library</div>
+            <div class="da-flow-step-code">attach_library('wc_2026/card')</div>
+          </div>
+
+          <div class="da-flow-arrow" aria-hidden="true"><i class="fa-solid fa-chevron-right"></i></div>
+
+          <div class="da-flow-step">
+            <div class="da-flow-step-header">
+              <div class="da-flow-step-number">3</div>
+              <div class="da-flow-step-icon" aria-hidden="true">
+                <i class="fa-solid fa-gears"></i>
+              </div>
+            </div>
+            <div class="da-flow-step-title">Drupal Aggregation</div>
+            <div class="da-flow-step-desc">Combines only the needed assets into optimized bundles</div>
+          </div>
+
+          <div class="da-flow-arrow" aria-hidden="true"><i class="fa-solid fa-chevron-right"></i></div>
+
+          <div class="da-flow-step">
+            <div class="da-flow-step-header">
+              <div class="da-flow-step-number">4</div>
+              <div class="da-flow-step-icon" aria-hidden="true">
+                <i class="fa-solid fa-cloud-arrow-down"></i>
+              </div>
+            </div>
+            <div class="da-flow-step-title">Minimal JS Load</div>
+            <div class="da-flow-step-desc">Browser downloads only card.js + lit-runtime.js</div>
+            <div class="da-flow-step-code">~18KB total (not 220KB)</div>
+          </div>
+
+          <div class="da-flow-arrow" aria-hidden="true"><i class="fa-solid fa-chevron-right"></i></div>
+
+          <div class="da-flow-step">
+            <div class="da-flow-step-header">
+              <div class="da-flow-step-number">5</div>
+              <div class="da-flow-step-icon" aria-hidden="true">
+                <i class="fa-solid fa-wand-magic-sparkles"></i>
+              </div>
+            </div>
+            <div class="da-flow-step-title">CE Upgrade</div>
+            <div class="da-flow-step-desc">Custom Elements register and upgrade in the DOM</div>
+            <div class="da-flow-step-code">customElements.define()</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Visual 4: .libraries.yml Code Examples -->
+      <div class="da-loading-examples scroll-reveal scroll-reveal-delay-2">
+        <div>
+          <div class="da-loading-example-label">
+            <i class="fa-solid fa-code" aria-hidden="true"></i>
+            TWIG Template Integration
+          </div>
+          <div class="da-code-block">
+            <div class="da-code-titlebar">
+              <span class="da-code-dot"></span>
+              <span class="da-code-dot"></span>
+              <span class="da-code-dot"></span>
+              <span class="da-code-filename">paragraph--card.html.twig</span>
+            </div>
+            <div class="da-code-body">
+              <pre set:html={codeLoadingTwigAttach} />
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <div class="da-loading-example-label">
+            <i class="fa-solid fa-share-nodes" aria-hidden="true"></i>
+            Shared Runtime Dependency
+          </div>
+          <div class="da-code-block">
+            <div class="da-code-titlebar">
+              <span class="da-code-dot"></span>
+              <span class="da-code-dot"></span>
+              <span class="da-code-dot"></span>
+              <span class="da-code-filename">wc_2026.libraries.yml</span>
+            </div>
+            <div class="da-code-body">
+              <pre set:html={codeLoadingSharedRuntime} />
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ============================================
+       SECTION 8: CODE EXAMPLES
+       ============================================ -->
+  <section id="examples" class="da-section" aria-label="Real code examples">
+    <div class="da-section-inner">
+      <div class="da-section-header scroll-reveal">
+        <span class="da-section-label">In Practice</span>
+        <h2 class="da-section-title">Real-World Patterns</h2>
+        <p class="da-section-description">
+          Three components, three strategies. Here is how each approach
+          looks in production TWIG templates.
+        </p>
+      </div>
+
+      <div class="da-examples-grid">
+        <!-- Slot-driven card -->
+        <div class="da-example scroll-reveal scroll-reveal-delay-1">
+          <div class="da-example-title">
+            <i class="fa-solid fa-id-card" style="color: var(--wc-pink);" aria-hidden="true"></i>
+            Card (Slot-Driven)
+          </div>
+          <p class="da-example-desc">
+            Drupal renders content into named slots. The component provides
+            layout, elevation, and interaction patterns.
+          </p>
+          <div class="da-code-block">
+            <div class="da-code-titlebar">
+              <span class="da-code-dot"></span>
+              <span class="da-code-dot"></span>
+              <span class="da-code-dot"></span>
+              <span class="da-code-filename">card.html.twig</span>
+            </div>
+            <div class="da-code-body">
+              <pre set:html={codeExampleCard} />
+            </div>
+          </div>
+        </div>
+
+        <!-- Property-driven button -->
+        <div class="da-example scroll-reveal scroll-reveal-delay-2">
+          <div class="da-example-title">
+            <i class="fa-solid fa-hand-pointer" style="color: var(--wc-cyan);" aria-hidden="true"></i>
+            Button (Property-Driven)
+          </div>
+          <p class="da-example-desc">
+            All configuration via properties. The component handles
+            all rendering, states, and accessibility.
+          </p>
+          <div class="da-code-block">
+            <div class="da-code-titlebar">
+              <span class="da-code-dot"></span>
+              <span class="da-code-dot"></span>
+              <span class="da-code-dot"></span>
+              <span class="da-code-filename">button.html.twig</span>
+            </div>
+            <div class="da-code-body">
+              <pre set:html={codeExampleButton} />
+            </div>
+          </div>
+        </div>
+
+        <!-- Hybrid form field -->
+        <div class="da-example scroll-reveal scroll-reveal-delay-3">
+          <div class="da-example-title">
+            <i class="fa-solid fa-sliders" style="color: var(--wc-green);" aria-hidden="true"></i>
+            Form Field (Hybrid)
+          </div>
+          <p class="da-example-desc">
+            Properties handle validation and state. Slots allow
+            custom labels, descriptions, and error messages.
+          </p>
+          <div class="da-code-block">
+            <div class="da-code-titlebar">
+              <span class="da-code-dot"></span>
+              <span class="da-code-dot"></span>
+              <span class="da-code-dot"></span>
+              <span class="da-code-filename">text-input.html.twig</span>
+            </div>
+            <div class="da-code-body">
+              <pre set:html={codeExampleForm} />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</div><!-- end tab-loading -->
+
+<style is:inline>
+  /* ============================================
+     TAB 2: COMPONENT LOADING STRATEGIES
+     ============================================ */
+  .da-loading-section {
+    background: var(--surface-0);
+    border-top: 1px solid var(--surface-3);
+  }
+
+  /* --- Strategy comparison cards --- */
+  .da-loading-strategies {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-6);
+    margin-bottom: var(--space-16);
+  }
+
+  .da-loading-card {
+    padding: var(--space-8) var(--space-6);
+    border-radius: var(--radius-2xl);
+    background: var(--surface-1);
+    border: 1px solid var(--surface-3);
+    transition: all 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .da-loading-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-xl), var(--glow-subtle);
+    background: var(--surface-2);
+  }
+
+  .da-loading-card-recommended {
+    border-color: rgba(16, 185, 129, 0.3);
+  }
+
+  .da-loading-card-recommended::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: radial-gradient(ellipse at 50% 0%, rgba(16, 185, 129, 0.06), transparent 60%);
+    pointer-events: none;
+  }
+
+  .da-loading-badge {
+    position: absolute;
+    top: var(--space-4);
+    right: var(--space-4);
+    padding: var(--space-1) var(--space-3);
+    border-radius: var(--radius-full);
+    font-size: 0.6875rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    background: rgba(16, 185, 129, 0.15);
+    color: var(--wc-green);
+    border: 1px solid rgba(16, 185, 129, 0.25);
+  }
+
+  .da-loading-icon {
+    width: 64px;
+    height: 64px;
+    border-radius: var(--radius-xl);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: var(--space-5);
+    font-size: 1.5rem;
+  }
+
+  .da-loading-icon-single {
+    background: linear-gradient(135deg, rgba(245, 158, 11, 0.15), rgba(245, 158, 11, 0.05));
+    border: 1px solid rgba(245, 158, 11, 0.2);
+    color: var(--wc-amber);
+  }
+
+  .da-loading-icon-per {
+    background: linear-gradient(135deg, rgba(6, 182, 212, 0.15), rgba(6, 182, 212, 0.05));
+    border: 1px solid rgba(6, 182, 212, 0.2);
+    color: var(--wc-cyan);
+  }
+
+  .da-loading-icon-hybrid {
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.15), rgba(16, 185, 129, 0.05));
+    border: 1px solid rgba(16, 185, 129, 0.2);
+    color: var(--wc-green);
+  }
+
+  .da-loading-card-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: var(--space-1);
+  }
+
+  .da-loading-card-subtitle {
+    font-size: 0.875rem;
+    color: var(--text-muted);
+    font-weight: 500;
+    margin-bottom: var(--space-5);
+  }
+
+  /* Visual loading pattern representations */
+  .da-loading-visual {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-2);
+    padding: var(--space-5) var(--space-4);
+    border-radius: var(--radius-lg);
+    background: rgba(0, 0, 0, 0.2);
+    margin-bottom: var(--space-5);
+    min-height: 80px;
+    flex-wrap: wrap;
+  }
+
+  .da-loading-block {
+    border-radius: var(--radius-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.625rem;
+    font-weight: 700;
+    font-family: var(--font-mono);
+    letter-spacing: 0.02em;
+    color: rgba(255, 255, 255, 0.8);
+    transition: transform 0.3s ease;
+  }
+
+  .da-loading-block-single {
+    width: 100%;
+    height: 48px;
+    background: linear-gradient(135deg, rgba(245, 158, 11, 0.3), rgba(245, 158, 11, 0.15));
+    border: 1px solid rgba(245, 158, 11, 0.3);
+  }
+
+  .da-loading-block-per {
+    width: 44px;
+    height: 44px;
+    background: linear-gradient(135deg, rgba(6, 182, 212, 0.3), rgba(6, 182, 212, 0.15));
+    border: 1px solid rgba(6, 182, 212, 0.3);
+    font-size: 0.5rem;
+  }
+
+  .da-loading-block-group {
+    padding: var(--space-2) var(--space-3);
+    height: 40px;
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.3), rgba(16, 185, 129, 0.15));
+    border: 1px solid rgba(16, 185, 129, 0.3);
+    font-size: 0.5625rem;
+  }
+
+  .da-loading-card:hover .da-loading-block {
+    transform: scale(1.05);
+  }
+
+  .da-loading-size {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-2) var(--space-4);
+    border-radius: var(--radius-full);
+    font-size: 0.8125rem;
+    font-weight: 700;
+    font-family: var(--font-mono);
+    margin-bottom: var(--space-5);
+  }
+
+  .da-loading-size-amber {
+    background: rgba(245, 158, 11, 0.1);
+    color: var(--wc-amber);
+    border: 1px solid rgba(245, 158, 11, 0.2);
+  }
+
+  .da-loading-size-cyan {
+    background: rgba(6, 182, 212, 0.1);
+    color: var(--wc-cyan);
+    border: 1px solid rgba(6, 182, 212, 0.2);
+  }
+
+  .da-loading-size-green {
+    background: rgba(16, 185, 129, 0.1);
+    color: var(--wc-green);
+    border: 1px solid rgba(16, 185, 129, 0.2);
+  }
+
+  /* Performance rating indicators */
+  .da-loading-ratings {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    margin-bottom: var(--space-5);
+    flex: 1;
+  }
+
+  .da-loading-rating {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 0.8125rem;
+    color: var(--text-secondary);
+  }
+
+  .da-loading-rating-label {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+  }
+
+  .da-loading-rating-label i {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    width: 16px;
+    text-align: center;
+  }
+
+  .da-loading-rating-dots {
+    display: flex;
+    gap: 4px;
+  }
+
+  .da-loading-rating-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--surface-3);
+    transition: background 0.3s ease;
+  }
+
+  .da-loading-rating-dot.filled-green { background: var(--wc-green); }
+  .da-loading-rating-dot.filled-amber { background: var(--wc-amber); }
+  .da-loading-rating-dot.filled-red { background: var(--wc-red); }
+  .da-loading-rating-dot.filled-cyan { background: var(--wc-cyan); }
+
+  /* Code snippet inside card */
+  .da-loading-code {
+    margin-top: auto;
+  }
+
+  .da-loading-code .da-code-block {
+    font-size: 0.75rem;
+  }
+
+  .da-loading-code .da-code-body {
+    padding: var(--space-3) var(--space-4);
+  }
+
+  .da-loading-code .da-code-body pre {
+    font-size: 0.7rem;
+    line-height: 1.55;
+  }
+
+  /* --- Performance comparison bars --- */
+  .da-perf-comparison {
+    margin-bottom: var(--space-16);
+  }
+
+  .da-perf-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-6);
+  }
+
+  .da-perf-metric {
+    padding: var(--space-6);
+    border-radius: var(--radius-xl);
+    background: var(--surface-1);
+    border: 1px solid var(--surface-3);
+  }
+
+  .da-perf-metric-header {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    margin-bottom: var(--space-5);
+  }
+
+  .da-perf-metric-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.12), rgba(118, 75, 162, 0.08));
+    border: 1px solid rgba(102, 126, 234, 0.15);
+    color: var(--wc-accent);
+  }
+
+  .da-perf-metric-title {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--text-primary);
+  }
+
+  .da-perf-metric-desc {
+    font-size: 0.8125rem;
+    color: var(--text-muted);
+    font-weight: 400;
+  }
+
+  .da-perf-bars {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+
+  .da-perf-bar-row {
+    display: grid;
+    grid-template-columns: 140px 1fr 60px;
+    align-items: center;
+    gap: var(--space-4);
+  }
+
+  .da-perf-bar-label {
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-align: right;
+  }
+
+  .da-perf-bar-track {
+    height: 28px;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: var(--radius-full);
+    overflow: hidden;
+    position: relative;
+  }
+
+  .da-perf-bar-fill {
+    height: 100%;
+    border-radius: var(--radius-full);
+    transition: width 1.2s cubic-bezier(0.22, 1, 0.36, 1);
+    display: flex;
+    align-items: center;
+    padding-left: var(--space-3);
+    font-size: 0.6875rem;
+    font-weight: 700;
+    font-family: var(--font-mono);
+    color: rgba(255, 255, 255, 0.9);
+    width: 0;
+  }
+
+  .da-perf-bar-fill.is-visible {
+    width: var(--bar-width);
+  }
+
+  .da-perf-bar-fill-amber {
+    background: linear-gradient(90deg, rgba(245, 158, 11, 0.4), rgba(245, 158, 11, 0.25));
+    border: 1px solid rgba(245, 158, 11, 0.3);
+  }
+
+  .da-perf-bar-fill-cyan {
+    background: linear-gradient(90deg, rgba(6, 182, 212, 0.4), rgba(6, 182, 212, 0.25));
+    border: 1px solid rgba(6, 182, 212, 0.3);
+  }
+
+  .da-perf-bar-fill-green {
+    background: linear-gradient(90deg, rgba(16, 185, 129, 0.4), rgba(16, 185, 129, 0.25));
+    border: 1px solid rgba(16, 185, 129, 0.3);
+  }
+
+  .da-perf-bar-value {
+    font-size: 0.8125rem;
+    font-weight: 700;
+    font-family: var(--font-mono);
+    color: var(--text-secondary);
+    text-align: right;
+  }
+
+  /* --- Integration flow diagram --- */
+  .da-flow-section {
+    margin-bottom: var(--space-16);
+  }
+
+  .da-flow-subtitle {
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: var(--space-2);
+    text-align: center;
+  }
+
+  .da-flow-desc {
+    font-size: 0.9375rem;
+    color: var(--text-secondary);
+    text-align: center;
+    max-width: 600px;
+    margin: 0 auto var(--space-8);
+    line-height: 1.7;
+  }
+
+  .da-flow-steps {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .da-flow-step {
+    flex: 1;
+    padding: var(--space-6) var(--space-4);
+    background: var(--surface-1);
+    border: 1px solid var(--surface-3);
+    border-radius: var(--radius-xl);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    transition: all 0.3s ease;
+  }
+
+  .da-flow-step:hover {
+    background: var(--surface-2);
+    border-color: rgba(255, 255, 255, 0.1);
+    transform: translateY(-2px);
+  }
+
+  .da-flow-step-header {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    margin-bottom: var(--space-4);
+  }
+
+  .da-flow-step-number {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    font-weight: 800;
+    background: linear-gradient(135deg, rgba(6, 182, 212, 0.15), rgba(102, 126, 234, 0.1));
+    border: 1px solid rgba(6, 182, 212, 0.25);
+    color: var(--wc-cyan);
+    flex-shrink: 0;
+  }
+
+  .da-flow-step-icon {
+    font-size: 1.75rem;
+    color: var(--text-secondary);
+  }
+
+  .da-flow-arrow {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    font-size: 0.875rem;
+    color: var(--text-muted);
+    opacity: 0.4;
+  }
+
+  .da-flow-step-title {
+    font-size: 0.9375rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: var(--space-2);
+  }
+
+  .da-flow-step-desc {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    line-height: 1.5;
+  }
+
+  .da-flow-step-code {
+    margin-top: var(--space-3);
+    padding: var(--space-2) var(--space-3);
+    border-radius: var(--radius-sm);
+    background: rgba(0, 0, 0, 0.3);
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    color: var(--wc-cyan);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+  }
+
+  /* --- Loading strategy code examples --- */
+  .da-loading-examples {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-6);
+  }
+
+  .da-loading-example-label {
+    font-size: 0.875rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: var(--space-3);
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+  }
+
+  .da-loading-example-label i {
+    color: var(--text-muted);
+  }
+
+  /* ============================================
+     TAB 2: CODE EXAMPLES
+     ============================================ */
+  .da-examples-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: auto auto 1fr;
+    gap: var(--space-4) var(--space-6);
+  }
+
+  .da-example {
+    display: grid;
+    grid-template-rows: subgrid;
+    grid-row: span 3;
+    gap: var(--space-4);
+  }
+
+  .da-example-title {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--text-primary);
+  }
+
+  .da-example-title i {
+    font-size: 1.25rem;
+  }
+
+  .da-example-desc {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    line-height: 1.6;
+  }
+
+  /* Loading hero color variant */
+  .da-hero-loading .da-hero-title {
+    background: linear-gradient(180deg, rgba(6, 182, 212, 1) 0%, rgba(16, 185, 129, 0.7) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .da-hero-loading .da-hero-subtitle {
+    background: linear-gradient(90deg, rgba(6, 182, 212, 0.9), rgba(16, 185, 129, 0.9));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .da-hero-loading .da-hero-badge-dot {
+    background: var(--wc-cyan);
+    box-shadow: 0 0 8px var(--wc-cyan);
+  }
+
+  .da-hero-loading .da-hero-orb-1 {
+    background: radial-gradient(circle, rgba(6, 182, 212, 0.3), transparent 70%);
+  }
+
+  .da-hero-loading .da-hero-orb-2 {
+    background: radial-gradient(circle, rgba(16, 185, 129, 0.25), transparent 70%);
+  }
+
+  /* ============================================
+     TAB 2: RESPONSIVE
+     ============================================ */
+  @media (max-width: 1100px) {
+    .da-loading-strategies {
+      grid-template-columns: 1fr;
+      max-width: 500px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .da-loading-examples {
+      grid-template-columns: 1fr;
+    }
+
+    .da-flow-steps {
+      flex-direction: column;
+      gap: 0;
+    }
+
+    .da-flow-arrow {
+      transform: rotate(90deg);
+      width: auto;
+      height: 1.5rem;
+    }
+
+    .da-perf-bar-row {
+      grid-template-columns: 100px 1fr 50px;
+    }
+
+    .da-examples-grid {
+      grid-template-columns: 1fr;
+      gap: var(--space-8);
+    }
+  }
+
+  @media (max-width: 768px) {
+    .da-loading-strategies {
+      max-width: none;
+    }
+
+    .da-perf-bar-row {
+      grid-template-columns: 1fr;
+      gap: var(--space-2);
+    }
+
+    .da-perf-bar-label {
+      text-align: left;
+    }
+
+    .da-examples-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

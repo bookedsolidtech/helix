@@ -1,6 +1,7 @@
 import { LitElement, html, nothing } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
+import { tokenStyles } from '@wc-2026/tokens/lit';
 import { wcCardStyles } from './wc-card.styles.js';
 
 /**
@@ -16,7 +17,7 @@ import { wcCardStyles } from './wc-card.styles.js';
  * @slot footer - Optional footer content below the body.
  * @slot actions - Optional action buttons, rendered with a top border separator.
  *
- * @fires {CustomEvent} wc-card-click - Dispatched when an interactive card (with href) is clicked.
+ * @fires {CustomEvent<{url: string, originalEvent: MouseEvent}>} wc-card-click - Dispatched when an interactive card (with wc-href) is clicked.
  *
  * @csspart card - The outer card container element.
  * @csspart image - The image slot container.
@@ -25,16 +26,16 @@ import { wcCardStyles } from './wc-card.styles.js';
  * @csspart footer - The footer slot container.
  * @csspart actions - The actions slot container.
  *
- * @cssprop [--wc-card-bg] - Card background color.
- * @cssprop [--wc-card-color] - Card text color.
- * @cssprop [--wc-card-border-color] - Card border color.
- * @cssprop [--wc-card-border-radius] - Card border radius.
- * @cssprop [--wc-card-padding] - Internal padding for card sections.
- * @cssprop [--wc-card-gap] - Gap between card sections.
+ * @cssprop [--wc-card-bg=var(--wc-color-neutral-0)] - Card background color.
+ * @cssprop [--wc-card-color=var(--wc-color-neutral-800)] - Card text color.
+ * @cssprop [--wc-card-border-color=var(--wc-color-neutral-200)] - Card border color.
+ * @cssprop [--wc-card-border-radius=var(--wc-border-radius-lg)] - Card border radius.
+ * @cssprop [--wc-card-padding=var(--wc-space-6)] - Internal padding for card sections.
+ * @cssprop [--wc-card-gap=var(--wc-space-4)] - Gap between card sections.
  */
 @customElement('wc-card')
 export class WcCard extends LitElement {
-  static override styles = wcCardStyles;
+  static override styles = [tokenStyles, wcCardStyles];
 
   /**
    * Visual style variant of the card.
@@ -53,10 +54,11 @@ export class WcCard extends LitElement {
   /**
    * Optional URL. When set, the card becomes interactive (clickable)
    * and navigates to this URL on click.
-   * @attr href
+   * Uses wc-href to avoid conflicting with the native HTML href attribute.
+   * @attr wc-href
    */
-  @property({ type: String })
-  href?: string;
+  @property({ type: String, attribute: 'wc-href' })
+  wcHref = '';
 
   // ─── Slot Detection ───
 
@@ -78,7 +80,7 @@ export class WcCard extends LitElement {
   // ─── Event Handling ───
 
   private _handleClick(e: MouseEvent): void {
-    if (!this.href) return;
+    if (!this.wcHref) return;
 
     /**
      * Dispatched when an interactive card is clicked.
@@ -89,13 +91,13 @@ export class WcCard extends LitElement {
       new CustomEvent('wc-card-click', {
         bubbles: true,
         composed: true,
-        detail: { href: this.href, originalEvent: e },
+        detail: { url: this.wcHref, originalEvent: e },
       })
     );
   }
 
   private _handleKeyDown(e: KeyboardEvent): void {
-    if (!this.href) return;
+    if (!this.wcHref) return;
 
     if (e.key === 'Enter' || e.key === ' ') {
       e.preventDefault();
@@ -106,7 +108,7 @@ export class WcCard extends LitElement {
   // ─── Render ───
 
   override render() {
-    const isInteractive = !!this.href;
+    const isInteractive = !!this.wcHref;
 
     const classes = {
       card: true,
@@ -121,7 +123,7 @@ export class WcCard extends LitElement {
         class=${classMap(classes)}
         role=${isInteractive ? 'link' : nothing}
         tabindex=${isInteractive ? '0' : nothing}
-        aria-label=${isInteractive ? `Navigate to ${this.href}` : nothing}
+        aria-label=${isInteractive ? `Navigate to ${this.wcHref}` : nothing}
         @click=${this._handleClick}
         @keydown=${this._handleKeyDown}
       >

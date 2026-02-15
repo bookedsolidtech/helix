@@ -1,0 +1,419 @@
+---
+/**
+ * DxTab1Onboarding — "Onboarding & DX" tab panel content.
+ *
+ * Sections:
+ *   1. Hero (cyan theme)
+ *   2. Zero-to-Component Timeline
+ *   3. Monorepo Topology
+ *   4. IDE Integration (CEM autocomplete mockup)
+ *   5. Documentation Pipeline
+ */
+---
+
+<style is:inline>
+  /* ==========================================
+     TAB 1: ONBOARDING TIMELINE
+     ========================================== */
+  .dx-timeline { position:relative; padding-left:3rem; }
+  .dx-timeline::before { content:''; position:absolute; left:1rem; top:0; bottom:0; width:2px; background:linear-gradient(to bottom, var(--wc-cyan), var(--wc-green), var(--wc-violet)); border-radius:1px; }
+  .dx-timeline-step { position:relative; padding-bottom:var(--space-10); }
+  .dx-timeline-step:last-child { padding-bottom:0; }
+  .dx-timeline-marker { position:absolute; left:-2.5rem; top:0; width:2.5rem; height:2.5rem; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:0.875rem; z-index:2; }
+  .dx-timeline-marker-cyan { background:rgba(6,182,212,0.15); border:2px solid var(--wc-cyan); color:var(--wc-cyan); }
+  .dx-timeline-marker-green { background:rgba(16,185,129,0.15); border:2px solid var(--wc-green); color:var(--wc-green); }
+  .dx-timeline-marker-violet { background:rgba(139,92,246,0.15); border:2px solid var(--wc-violet); color:var(--wc-violet); }
+  .dx-timeline-marker-amber { background:rgba(245,158,11,0.15); border:2px solid var(--wc-amber); color:var(--wc-amber); }
+  .dx-timeline-marker-pink { background:rgba(236,72,153,0.15); border:2px solid var(--wc-pink); color:var(--wc-pink); }
+  .dx-timeline-card { background:var(--surface-1); border:1px solid var(--surface-3); border-radius:var(--radius-lg); padding:var(--space-5) var(--space-6); transition:all 0.3s ease; }
+  .dx-timeline-card:hover { background:var(--surface-2); transform:translateX(4px); }
+  .dx-timeline-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:var(--space-2); flex-wrap:wrap; gap:var(--space-2); }
+  .dx-timeline-title { font-size:1.125rem; font-weight:700; color:var(--text-primary); display:flex; align-items:center; gap:var(--space-2); }
+  .dx-timeline-title i { font-size:1rem; }
+  .dx-timeline-time { font-family:var(--font-mono); font-size:0.75rem; font-weight:700; padding:var(--space-1) var(--space-3); border-radius:var(--radius-full); }
+  .dx-timeline-time-cyan { background:rgba(6,182,212,0.1); color:var(--wc-cyan); border:1px solid rgba(6,182,212,0.2); }
+  .dx-timeline-time-green { background:rgba(16,185,129,0.1); color:var(--wc-green); border:1px solid rgba(16,185,129,0.2); }
+  .dx-timeline-time-violet { background:rgba(139,92,246,0.1); color:var(--wc-violet); border:1px solid rgba(139,92,246,0.2); }
+  .dx-timeline-time-amber { background:rgba(245,158,11,0.1); color:var(--wc-amber); border:1px solid rgba(245,158,11,0.2); }
+  .dx-timeline-time-pink { background:rgba(236,72,153,0.1); color:var(--wc-pink); border:1px solid rgba(236,72,153,0.2); }
+  .dx-timeline-desc { font-size:0.9375rem; color:var(--text-secondary); line-height:1.6; }
+  .dx-timeline-cmd { font-family:var(--font-mono); font-size:0.8125rem; color:var(--wc-cyan); background:rgba(6,182,212,0.06); padding:var(--space-2) var(--space-3); border-radius:var(--radius-sm); margin-top:var(--space-2); display:inline-block; border:1px solid rgba(6,182,212,0.12); }
+
+  /* ==========================================
+     TAB 1: MONOREPO TOPOLOGY
+     ========================================== */
+  .dx-topo-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:var(--space-6); }
+  .dx-topo-card { background:var(--surface-1); border:1px solid var(--surface-3); border-radius:var(--radius-xl); padding:var(--space-6); text-align:center; transition:all 0.3s ease; }
+  .dx-topo-card:hover { background:var(--surface-2); transform:translateY(-4px); border-color:var(--glass-border-strong); }
+  .dx-topo-icon { width:56px; height:56px; border-radius:var(--radius-lg); display:flex; align-items:center; justify-content:center; font-size:1.25rem; margin:0 auto var(--space-4); }
+  .dx-topo-name { font-family:var(--font-mono); font-size:0.875rem; font-weight:700; color:var(--text-primary); margin-bottom:var(--space-2); }
+  .dx-topo-desc { font-size:0.875rem; color:var(--text-secondary); line-height:1.6; margin-bottom:var(--space-3); }
+  .dx-topo-tags { display:flex; flex-wrap:wrap; justify-content:center; gap:var(--space-2); }
+  .dx-topo-tag { font-family:var(--font-mono); font-size:0.6875rem; padding:var(--space-1) var(--space-2); border-radius:var(--radius-sm); background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.06); color:var(--text-muted); }
+  .dx-turbo-banner { background:var(--surface-1); border:1px solid rgba(6,182,212,0.2); border-radius:var(--radius-xl); padding:var(--space-6); margin-top:var(--space-8); display:flex; align-items:center; gap:var(--space-6); }
+  .dx-turbo-icon { width:72px; height:72px; border-radius:var(--radius-xl); display:flex; align-items:center; justify-content:center; font-size:2rem; flex-shrink:0; }
+  .dx-turbo-content { flex:1; }
+  .dx-turbo-title { font-size:1.125rem; font-weight:700; color:var(--text-primary); margin-bottom:var(--space-2); }
+  .dx-turbo-desc { font-size:0.9375rem; color:var(--text-secondary); line-height:1.6; }
+
+  /* ==========================================
+     TAB 1: IDE MOCKUP
+     ========================================== */
+  .dx-ide { background:var(--surface-1); border:1px solid var(--surface-3); border-radius:var(--radius-xl); overflow:hidden; max-width:700px; margin:0 auto; }
+  .dx-ide-titlebar { display:flex; align-items:center; gap:var(--space-3); padding:var(--space-3) var(--space-4); background:rgba(0,0,0,0.4); border-bottom:1px solid var(--surface-3); }
+  .dx-ide-body { position:relative; padding:var(--space-6); }
+  .dx-ide-line { display:flex; align-items:center; gap:var(--space-2); font-family:var(--font-mono); font-size:0.8125rem; line-height:2; color:#d6deeb; }
+  .dx-ide-line-num { color:var(--text-muted); width:2rem; text-align:right; flex-shrink:0; font-size:0.75rem; }
+  .dx-ide-dropdown { position:absolute; top:4.5rem; left:8rem; background:var(--surface-2); border:1px solid var(--glass-border-strong); border-radius:var(--radius-md); padding:var(--space-2) 0; min-width:280px; box-shadow:var(--shadow-xl); z-index:5; }
+  .dx-ide-suggestion { display:flex; align-items:center; gap:var(--space-3); padding:var(--space-2) var(--space-3); font-family:var(--font-mono); font-size:0.8125rem; color:var(--text-secondary); transition:background 0.15s ease; }
+  .dx-ide-suggestion:first-child { background:rgba(6,182,212,0.1); color:var(--text-primary); }
+  .dx-ide-suggestion-icon { width:20px; height:20px; border-radius:4px; display:flex; align-items:center; justify-content:center; font-size:0.625rem; font-weight:700; flex-shrink:0; }
+  .dx-ide-suggestion-prop { color:var(--wc-cyan); }
+  .dx-ide-suggestion-type { margin-left:auto; font-size:0.6875rem; color:var(--text-muted); }
+
+  /* ==========================================
+     TAB 1: DOC PIPELINE FLOW
+     ========================================== */
+  .dx-flow { display:flex; align-items:center; justify-content:center; gap:var(--space-4); flex-wrap:wrap; padding:var(--space-6) 0; }
+  .dx-flow-source { display:flex; flex-direction:column; align-items:center; gap:var(--space-2); text-align:center; }
+  .dx-flow-icon { width:72px; height:72px; border-radius:var(--radius-xl); display:flex; align-items:center; justify-content:center; font-size:1.75rem; transition:all 0.3s ease; }
+  .dx-flow-icon:hover { transform:scale(1.1); }
+  .dx-flow-label { font-size:0.875rem; font-weight:700; color:var(--text-primary); }
+  .dx-flow-sub { font-size:0.75rem; color:var(--text-muted); }
+  .dx-flow-arrow { font-size:1.25rem; color:var(--text-muted); }
+  .dx-flow-outputs { display:grid; grid-template-columns:repeat(3,1fr); gap:var(--space-4); margin-top:var(--space-8); }
+  .dx-flow-output { background:var(--surface-1); border:1px solid var(--surface-3); border-radius:var(--radius-lg); padding:var(--space-5); text-align:center; transition:all 0.3s ease; }
+  .dx-flow-output:hover { background:var(--surface-2); transform:translateY(-4px); }
+  .dx-flow-output-icon { font-size:1.5rem; margin-bottom:var(--space-3); }
+  .dx-flow-output-title { font-size:0.9375rem; font-weight:700; color:var(--text-primary); margin-bottom:var(--space-1); }
+  .dx-flow-output-desc { font-size:0.8125rem; color:var(--text-muted); line-height:1.5; }
+
+  /* --- Tab 1 responsive --- */
+  @media (max-width:1100px) {
+    .dx-topo-grid { grid-template-columns:1fr; }
+    .dx-flow-outputs { grid-template-columns:1fr; }
+  }
+
+  @media (max-width:768px) {
+    .dx-topo-grid { grid-template-columns:1fr; }
+    .dx-turbo-banner { flex-direction:column; text-align:center; }
+    .dx-ide-dropdown { left:2rem; min-width:220px; }
+    .dx-timeline { padding-left:2.5rem; }
+    .dx-timeline::before { left:0.75rem; }
+    .dx-timeline-marker { left:-2.25rem; width:2rem; height:2rem; font-size:0.75rem; }
+  }
+</style>
+
+<div id="tab-dx" class="dx-tab-content is-active" role="tabpanel">
+  <section class="dx-hero dx-hero-dx" aria-label="Developer onboarding experience">
+    <div class="dx-hero-grid" aria-hidden="true"></div>
+    <div class="dx-hero-orb dx-hero-orb-1" aria-hidden="true"></div>
+    <div class="dx-hero-orb dx-hero-orb-2" aria-hidden="true"></div>
+    <div class="dx-hero-orb dx-hero-orb-3" aria-hidden="true"></div>
+
+    <div class="dx-hero-content">
+      <div class="dx-hero-badge">
+        <span class="dx-hero-badge-dot" aria-hidden="true"></span>
+        Developer Experience
+      </div>
+
+      <h1 class="dx-hero-title">Zero to Component<br />in Under 5 Minutes</h1>
+
+      <p class="dx-hero-subtitle">Developer onboarding that respects your time</p>
+
+      <p class="dx-hero-description">
+        Clone, install, run. No environment configuration, no secret keys,
+        no "ask Dave about the wiki page." Every developer hits a working
+        Storybook with hot-reload in under five minutes.
+      </p>
+    </div>
+
+    <div class="mouse-scroll-wrap mouse-scroll-wrap--absolute" aria-hidden="true">
+      <div class="mouse-scroll-body"><div class="mouse-scroll-wheel"></div></div>
+      <span class="mouse-scroll-label">Scroll</span>
+    </div>
+  </section>
+
+  <!-- SECTION: Zero to Component Timeline -->
+  <section class="dx-section" aria-label="Onboarding timeline">
+    <div class="dx-section-inner">
+      <div class="dx-section-header scroll-reveal">
+        <span class="dx-section-label dx-section-label-cyan">Onboarding Timeline</span>
+        <h2 class="dx-section-title">From Clone to First Component</h2>
+        <p class="dx-section-description">
+          Every step measured, every dependency automated. Here is the actual
+          timeline a new developer experiences on day one.
+        </p>
+      </div>
+
+      <div class="dx-timeline">
+        <!-- Step 1 -->
+        <div class="dx-timeline-step scroll-reveal scroll-reveal-delay-1">
+          <div class="dx-timeline-marker dx-timeline-marker-cyan">1</div>
+          <div class="dx-timeline-card">
+            <div class="dx-timeline-header">
+              <div class="dx-timeline-title">
+                <i class="fa-solid fa-clone" style="color: var(--wc-cyan);" aria-hidden="true"></i>
+                Clone Repository
+              </div>
+              <span class="dx-timeline-time dx-timeline-time-cyan">~30s</span>
+            </div>
+            <p class="dx-timeline-desc">Single monorepo. One clone gets you the component library, Storybook, documentation site, and all tooling.</p>
+            <code class="dx-timeline-cmd">git clone git@github.com:org/wc-2026.git</code>
+          </div>
+        </div>
+
+        <!-- Step 2 -->
+        <div class="dx-timeline-step scroll-reveal scroll-reveal-delay-2">
+          <div class="dx-timeline-marker dx-timeline-marker-green">2</div>
+          <div class="dx-timeline-card">
+            <div class="dx-timeline-header">
+              <div class="dx-timeline-title">
+                <i class="fa-solid fa-download" style="color: var(--wc-green);" aria-hidden="true"></i>
+                Install Dependencies
+              </div>
+              <span class="dx-timeline-time dx-timeline-time-green">~45s</span>
+            </div>
+            <p class="dx-timeline-desc">npm workspaces resolve all cross-package dependencies in a single install. No manual linking, no hoisting issues.</p>
+            <code class="dx-timeline-cmd">npm install</code>
+          </div>
+        </div>
+
+        <!-- Step 3 -->
+        <div class="dx-timeline-step scroll-reveal scroll-reveal-delay-3">
+          <div class="dx-timeline-marker dx-timeline-marker-amber">3</div>
+          <div class="dx-timeline-card">
+            <div class="dx-timeline-header">
+              <div class="dx-timeline-title">
+                <i class="fa-solid fa-play" style="color: var(--wc-amber);" aria-hidden="true"></i>
+                Start Dev Server
+              </div>
+              <span class="dx-timeline-time dx-timeline-time-amber">~10s</span>
+            </div>
+            <p class="dx-timeline-desc">Turborepo orchestrates parallel builds. Vite dev server with HMR starts in under 10 seconds from cold.</p>
+            <code class="dx-timeline-cmd">turbo run dev</code>
+          </div>
+        </div>
+
+        <!-- Step 4 -->
+        <div class="dx-timeline-step scroll-reveal scroll-reveal-delay-4">
+          <div class="dx-timeline-marker dx-timeline-marker-violet">4</div>
+          <div class="dx-timeline-card">
+            <div class="dx-timeline-header">
+              <div class="dx-timeline-title">
+                <i class="fa-solid fa-book-open" style="color: var(--wc-violet);" aria-hidden="true"></i>
+                Storybook Opens
+              </div>
+              <span class="dx-timeline-time dx-timeline-time-violet">Instant</span>
+            </div>
+            <p class="dx-timeline-desc">Every component rendered with all variants, states, and theme combinations. Interactive controls powered by CEM autodiscovery.</p>
+          </div>
+        </div>
+
+        <!-- Step 5 -->
+        <div class="dx-timeline-step scroll-reveal scroll-reveal-delay-5">
+          <div class="dx-timeline-marker dx-timeline-marker-pink">5</div>
+          <div class="dx-timeline-card">
+            <div class="dx-timeline-header">
+              <div class="dx-timeline-title">
+                <i class="fa-solid fa-pen-nib" style="color: var(--wc-pink);" aria-hidden="true"></i>
+                First Edit &mdash; Live
+              </div>
+              <span class="dx-timeline-time dx-timeline-time-pink">&lt; 2min</span>
+            </div>
+            <p class="dx-timeline-desc">Edit a component, see it update instantly in Storybook. TypeScript catches errors before you save. CEM regenerates on file change.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION: Monorepo Topology -->
+  <section class="dx-section" aria-label="Monorepo developer ergonomics">
+    <div class="dx-section-inner">
+      <div class="dx-section-header scroll-reveal">
+        <span class="dx-section-label dx-section-label-cyan">Workspace Architecture</span>
+        <h2 class="dx-section-title">Monorepo Developer Ergonomics</h2>
+        <p class="dx-section-description">
+          Three focused workspaces, one Turborepo pipeline. Changes propagate
+          instantly across packages with zero manual coordination.
+        </p>
+      </div>
+
+      <div class="dx-topo-grid">
+        <div class="dx-topo-card scroll-reveal scroll-reveal-delay-1">
+          <div class="dx-topo-icon icon-cyan"><i class="fa-solid fa-cubes" aria-hidden="true"></i></div>
+          <div class="dx-topo-name">packages/wc-library</div>
+          <p class="dx-topo-desc">Core component library. Lit 3 web components, design tokens, and the Custom Elements Manifest source of truth.</p>
+          <div class="dx-topo-tags">
+            <span class="dx-topo-tag">Lit 3</span>
+            <span class="dx-topo-tag">TypeScript</span>
+            <span class="dx-topo-tag">CEM</span>
+            <span class="dx-topo-tag">W3C DTCG</span>
+          </div>
+        </div>
+
+        <div class="dx-topo-card scroll-reveal scroll-reveal-delay-2">
+          <div class="dx-topo-icon icon-violet"><i class="fa-solid fa-palette" aria-hidden="true"></i></div>
+          <div class="dx-topo-name">apps/storybook</div>
+          <p class="dx-topo-desc">Interactive component explorer with autodiscovered controls, multi-theme preview, and accessibility testing built in.</p>
+          <div class="dx-topo-tags">
+            <span class="dx-topo-tag">Storybook 10</span>
+            <span class="dx-topo-tag">Web Components</span>
+            <span class="dx-topo-tag">Autodocs</span>
+          </div>
+        </div>
+
+        <div class="dx-topo-card scroll-reveal scroll-reveal-delay-3">
+          <div class="dx-topo-icon icon-green"><i class="fa-solid fa-book" aria-hidden="true"></i></div>
+          <div class="dx-topo-name">apps/docs</div>
+          <p class="dx-topo-desc">Starlight-powered documentation with auto-generated API reference pages sourced directly from the CEM pipeline.</p>
+          <div class="dx-topo-tags">
+            <span class="dx-topo-tag">Astro</span>
+            <span class="dx-topo-tag">Starlight</span>
+            <span class="dx-topo-tag">MDX</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="dx-turbo-banner scroll-reveal scroll-reveal-delay-4">
+        <div class="dx-turbo-icon icon-cyan">
+          <i class="fa-solid fa-bolt" aria-hidden="true"></i>
+        </div>
+        <div class="dx-turbo-content">
+          <div class="dx-turbo-title">Turborepo Orchestration</div>
+          <p class="dx-turbo-desc">
+            Every task runs in parallel with intelligent caching. Edit a token in the library, and Storybook
+            plus Docs rebuild simultaneously. Remote cache means CI builds are near-instant when the
+            dependency graph has not changed.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION: IDE Integration -->
+  <section class="dx-section" aria-label="IDE integration via Custom Elements Manifest">
+    <div class="dx-section-inner">
+      <div class="dx-section-header scroll-reveal">
+        <span class="dx-section-label dx-section-label-cyan">IDE Integration</span>
+        <h2 class="dx-section-title">Autocomplete That Knows Your Components</h2>
+        <p class="dx-section-description">
+          The Custom Elements Manifest powers IDE autocomplete out of the box.
+          Every property, event, slot, and CSS custom property is discoverable
+          without leaving your editor.
+        </p>
+      </div>
+
+      <div class="dx-ide scroll-reveal scroll-reveal-delay-1">
+        <div class="dx-ide-titlebar">
+          <span class="dx-code-dot"></span>
+          <span class="dx-code-dot"></span>
+          <span class="dx-code-dot"></span>
+          <span class="dx-code-filename">page-template.html</span>
+        </div>
+        <div class="dx-ide-body">
+          <div class="dx-ide-line">
+            <span class="dx-ide-line-num">14</span>
+            <span>&lt;<span style="color:#7fdbca;">wc-button</span></span>
+          </div>
+          <div class="dx-ide-line">
+            <span class="dx-ide-line-num">15</span>
+            <span>&nbsp;&nbsp;<span style="color:#ffcb6b;">variant</span>=<span style="color:#addb67;">"primary"</span></span>
+          </div>
+          <div class="dx-ide-line">
+            <span class="dx-ide-line-num">16</span>
+            <span>&nbsp;&nbsp;<span style="color:#ffcb6b;">s</span><span style="color:var(--text-muted);">|</span></span>
+          </div>
+
+          <div class="dx-ide-dropdown">
+            <div class="dx-ide-suggestion">
+              <span class="dx-ide-suggestion-icon" style="background:rgba(6,182,212,0.15); color:var(--wc-cyan);">P</span>
+              <span class="dx-ide-suggestion-prop">size</span>
+              <span class="dx-ide-suggestion-type">"small" | "medium" | "large"</span>
+            </div>
+            <div class="dx-ide-suggestion">
+              <span class="dx-ide-suggestion-icon" style="background:rgba(139,92,246,0.15); color:var(--wc-violet);">S</span>
+              <span>slot</span>
+              <span class="dx-ide-suggestion-type">default | icon | prefix</span>
+            </div>
+            <div class="dx-ide-suggestion">
+              <span class="dx-ide-suggestion-icon" style="background:rgba(6,182,212,0.15); color:var(--wc-cyan);">P</span>
+              <span>shape</span>
+              <span class="dx-ide-suggestion-type">"rounded" | "pill" | "square"</span>
+            </div>
+            <div class="dx-ide-suggestion">
+              <span class="dx-ide-suggestion-icon" style="background:rgba(245,158,11,0.15); color:var(--wc-amber);">E</span>
+              <span>@submit</span>
+              <span class="dx-ide-suggestion-type">CustomEvent&lt;void&gt;</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION: Documentation Pipeline -->
+  <section class="dx-section" aria-label="Documentation that writes itself">
+    <div class="dx-section-inner">
+      <div class="dx-section-header scroll-reveal">
+        <span class="dx-section-label dx-section-label-cyan">Single Source of Truth</span>
+        <h2 class="dx-section-title">Documentation That Writes Itself</h2>
+        <p class="dx-section-description">
+          Write JSDoc once in your component. The CEM pipeline automatically
+          generates Storybook controls, API reference pages, and IDE intellisense.
+        </p>
+      </div>
+
+      <div class="dx-flow scroll-reveal scroll-reveal-delay-1">
+        <div class="dx-flow-source">
+          <div class="dx-flow-icon icon-cyan">
+            <i class="fa-solid fa-code" aria-hidden="true"></i>
+          </div>
+          <span class="dx-flow-label">JSDoc</span>
+          <span class="dx-flow-sub">Write once</span>
+        </div>
+        <i class="fa-solid fa-arrow-right dx-flow-arrow" aria-hidden="true"></i>
+        <div class="dx-flow-source">
+          <div class="dx-flow-icon icon-amber">
+            <i class="fa-solid fa-gears" aria-hidden="true"></i>
+          </div>
+          <span class="dx-flow-label">CEM Analyzer</span>
+          <span class="dx-flow-sub">Auto-extract</span>
+        </div>
+        <i class="fa-solid fa-arrow-right dx-flow-arrow" aria-hidden="true"></i>
+        <div class="dx-flow-source">
+          <div class="dx-flow-icon icon-green">
+            <i class="fa-solid fa-file-code" aria-hidden="true"></i>
+          </div>
+          <span class="dx-flow-label">CEM JSON</span>
+          <span class="dx-flow-sub">Manifest</span>
+        </div>
+      </div>
+
+      <div class="dx-flow-outputs scroll-reveal scroll-reveal-delay-2">
+        <div class="dx-flow-output">
+          <div class="dx-flow-output-icon" style="color:var(--wc-violet);">
+            <i class="fa-solid fa-palette" aria-hidden="true"></i>
+          </div>
+          <div class="dx-flow-output-title">Storybook Autodocs</div>
+          <p class="dx-flow-output-desc">Interactive controls, prop tables, and live examples generated from the manifest.</p>
+        </div>
+        <div class="dx-flow-output">
+          <div class="dx-flow-output-icon" style="color:var(--wc-green);">
+            <i class="fa-solid fa-book" aria-hidden="true"></i>
+          </div>
+          <div class="dx-flow-output-title">Starlight API Ref</div>
+          <p class="dx-flow-output-desc">Complete API reference pages with property tables, slot docs, and event signatures.</p>
+        </div>
+        <div class="dx-flow-output">
+          <div class="dx-flow-output-icon" style="color:var(--wc-cyan);">
+            <i class="fa-solid fa-keyboard" aria-hidden="true"></i>
+          </div>
+          <div class="dx-flow-output-title">VS Code Intellisense</div>
+          <p class="dx-flow-output-desc">Rich autocomplete for HTML templates with property types, slots, events, and CSS parts.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>

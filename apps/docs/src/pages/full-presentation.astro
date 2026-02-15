@@ -18,121 +18,38 @@
  * Desktop: CSS scroll-snap-type: y mandatory
  * Mobile: Normal stacking (snap disabled)
  */
+import ShowcaseLayout from '../layouts/ShowcaseLayout.astro';
 ---
 
-<!doctype html>
-<html lang="en" data-theme="dark">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Full Presentation | WC-2026</title>
-    <meta
-      name="description"
-      content="The complete 30-minute presentation: WC-2026 enterprise web components for healthcare. Architecture, stack, compliance, timeline, and the ask."
-    />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=JetBrains+Mono:wght@400;500;600;700&display=swap"
-      rel="stylesheet"
-    />
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
-      integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg=="
-      crossorigin="anonymous"
-      referrerpolicy="no-referrer"
-    />
-
+<ShowcaseLayout
+  title="Full Presentation"
+  description="The complete 30-minute presentation: WC-2026 enterprise web components for healthcare. Architecture, stack, compliance, timeline, and the ask."
+>
     <style is:inline>
       /* ============================================
-         FULL PRESENTATION - 30-MINUTE EXPERIENCE
-         Snap-scroll on desktop, normal flow on mobile
+         FULL PRESENTATION - page-specific styles
          ============================================ */
 
-      @property --gradient-angle {
-        syntax: '<angle>';
-        initial-value: 0deg;
-        inherits: false;
-      }
-
+      /* --- Token overrides (page differs from shared tokens) --- */
       :root {
-        --wc-accent-h: 250;
-        --wc-accent-s: 70%;
-        --wc-accent-l: 60%;
-        --wc-accent: hsl(var(--wc-accent-h), var(--wc-accent-s), var(--wc-accent-l));
-        --wc-cyan: #06b6d4;
-        --wc-pink: #ec4899;
-        --wc-green: #10b981;
-        --wc-amber: #f59e0b;
-        --wc-red: #ef4444;
-        --wc-electric: #3b82f6;
-
-        --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         --gradient-hero: linear-gradient(135deg, #0a0a18 0%, #0f1030 40%, #0a0a2e 100%);
-        --gradient-cyan-purple: linear-gradient(135deg, #06b6d4, #8b5cf6);
-        --gradient-pink-orange: linear-gradient(135deg, #ec4899, #f97316);
-        --gradient-green-cyan: linear-gradient(135deg, #10b981, #06b6d4);
-
-        --font-heading: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-        --font-body: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-        --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
-
-        --surface-0: #0a0a14; --surface-1: #111122;
-        --surface-2: #1a1a32; --surface-3: #252545;
-        --text-primary: #eaeaf4; --text-secondary: #a8a8c8; --text-muted: #6868a0;
-
-        --glass-bg: rgba(255,255,255,0.03);
-        --glass-bg-strong: rgba(255,255,255,0.06);
-        --glass-border: rgba(255,255,255,0.06);
-        --glass-border-strong: rgba(255,255,255,0.12);
-
-        --radius-sm: 0.5rem; --radius-md: 0.75rem; --radius-lg: 1rem;
-        --radius-xl: 1.5rem; --radius-full: 9999px;
-
-        --shadow-md: 0 4px 16px rgba(0,0,0,0.4);
-        --shadow-lg: 0 8px 32px rgba(0,0,0,0.5);
-        --shadow-xl: 0 16px 64px rgba(0,0,0,0.6);
-        --glow-primary: 0 0 50px rgba(102,126,234,0.25);
-        --glow-subtle: 0 0 20px rgba(102,126,234,0.15);
       }
 
-      *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+      /* --- Body override: this page uses overflow-x: hidden (shared base uses clip) --- */
+      body {
+        overflow-x: hidden;
+      }
 
       html {
         scroll-behavior: smooth;
       }
 
-      body {
-        font-family: var(--font-body); line-height: 1.6;
-        -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;
-        background: var(--surface-0); color: var(--text-primary);
-        overflow-x: hidden;
-      }
-
-      h1,h2,h3,h4,h5,h6 { font-family: var(--font-heading); font-weight: 700; letter-spacing: -0.025em; line-height: 1.15; }
-      code, pre { font-family: var(--font-mono); }
-      a { color: var(--wc-accent); text-decoration: none; transition: color 0.2s ease; }
-
-      /* Keyframes */
-      @keyframes fadeInUp { from { opacity:0; transform:translateY(40px); } to { opacity:1; transform:translateY(0); } }
-      @keyframes fadeInDown { from { opacity:0; transform:translateY(-20px); } to { opacity:1; transform:translateY(0); } }
-      @keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
-      @keyframes float-slow { 0%,100% { transform:translate(0,0) scale(1); } 25% { transform:translate(30px,-20px) scale(1.05); } 50% { transform:translate(-10px,-35px) scale(0.97); } 75% { transform:translate(-25px,-10px) scale(1.02); } }
-      @keyframes orb-pulse { 0%,100% { opacity:0.3; filter:blur(100px); } 50% { opacity:0.5; filter:blur(120px); } }
-      @keyframes particle-drift { 0% { background-position: 0 0, 200px 200px, 400px 100px; } 100% { background-position: 800px 800px, 1000px 1000px, 1200px 900px; } }
-      @keyframes border-rotate { 0% { --gradient-angle:0deg; } 100% { --gradient-angle:360deg; } }
-      @keyframes pulse-ring { 0% { box-shadow: 0 0 0 0 rgba(102,126,234,0.4); } 70% { box-shadow: 0 0 0 15px rgba(102,126,234,0); } 100% { box-shadow: 0 0 0 0 rgba(102,126,234,0); } }
-      @keyframes scroll-fade { 0% { opacity:1; transform:translateX(-50%) translateY(0); } 100% { opacity:0; transform:translateX(-50%) translateY(12px); } }
+      /* --- Keyframes not in shared animations.css --- */
       @keyframes slide-in-left { from { opacity:0; transform:translateX(-60px); } to { opacity:1; transform:translateX(0); } }
       @keyframes slide-in-right { from { opacity:0; transform:translateX(60px); } to { opacity:1; transform:translateX(0); } }
 
-      /* Scroll Reveal */
-      .scroll-reveal { opacity:0; transform:translateY(40px); transition: opacity 0.8s cubic-bezier(0.22,1,0.36,1), transform 0.8s cubic-bezier(0.22,1,0.36,1), filter 0.8s cubic-bezier(0.22,1,0.36,1); filter:blur(4px); }
-      .scroll-reveal.is-visible { opacity:1; transform:translateY(0); filter:blur(0); }
-      .scroll-reveal-delay-1 { transition-delay:0.1s; } .scroll-reveal-delay-2 { transition-delay:0.2s; }
-      .scroll-reveal-delay-3 { transition-delay:0.3s; } .scroll-reveal-delay-4 { transition-delay:0.4s; }
-      .scroll-reveal-delay-5 { transition-delay:0.5s; } .scroll-reveal-delay-6 { transition-delay:0.6s; }
+      /* --- Page-specific pulse-ring (differs from shared: uses box-shadow, not scale) --- */
+      @keyframes pulse-ring { 0% { box-shadow: 0 0 0 0 rgba(102,126,234,0.4); } 70% { box-shadow: 0 0 0 15px rgba(102,126,234,0); } 100% { box-shadow: 0 0 0 0 rgba(102,126,234,0); } }
 
       /* Snap scroll container -- desktop only */
       @media (min-width: 1025px) {
@@ -465,9 +382,8 @@
         .pitch-nav-home { min-width: 44px; min-height: 44px; }
       }
 
+      /* Page-specific reduced-motion overrides (orb, snap-scroll, html scroll) */
       @media (prefers-reduced-motion: reduce) {
-        *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
-        .scroll-reveal { opacity: 1; transform: none; filter: none; transition: none; }
         .fp-orb { animation: none !important; opacity: 0.15; }
         html { scroll-behavior: auto; }
         .fp-container { scroll-snap-type: none !important; scroll-behavior: auto !important; }
@@ -477,9 +393,7 @@
         outline: 3px solid var(--wc-accent); outline-offset: 3px;
       }
     </style>
-  </head>
 
-  <body>
     <!-- Floating pitch navigation -->
     <nav class="pitch-nav" aria-label="Pitch pages">
       <a href="/" class="pitch-nav-home" aria-label="Back to Dashboard">
@@ -541,9 +455,9 @@
             Presented by a 28-year engineering veteran &middot; February 2026
           </p>
         </div>
-        <div style="position:absolute;bottom:2rem;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:0.5rem;color:var(--text-muted);font-size:0.75rem;font-weight:500;letter-spacing:0.05em;text-transform:uppercase;animation:scroll-fade 2s ease-in-out infinite;z-index:10;" aria-hidden="true">
-          <span>Scroll or use dots</span>
-          <div style="width:1px;height:24px;background:linear-gradient(to bottom,var(--text-muted),transparent);"></div>
+        <div class="mouse-scroll-wrap mouse-scroll-wrap--absolute" aria-hidden="true">
+          <div class="mouse-scroll-body"><div class="mouse-scroll-wheel"></div></div>
+          <span class="mouse-scroll-label">Scroll</span>
         </div>
       </section>
 
@@ -1109,7 +1023,7 @@
       </section>
     </main>
 
-    <script is:inline>
+    <script slot="scripts" is:inline>
       (function () {
         var prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -1172,5 +1086,4 @@
         slides.forEach(function (slide) { dotObserver.observe(slide); });
       })();
     </script>
-  </body>
-</html>
+</ShowcaseLayout>

@@ -1,0 +1,104 @@
+/* ==========================================================================
+   Prose Lists
+   Ordered lists, unordered lists, and nested list handling
+   for rich text / WYSIWYG content.
+   ========================================================================== */
+
+ul,
+ol {
+  margin-top: 0;
+  margin-bottom: var(--wc-space-4, 1rem);
+  padding-left: var(--wc-space-6, 1.5rem);
+  color: var(--wc-prose-color, var(--wc-color-neutral-700, #343a40));
+}
+
+ul {
+  list-style-type: disc;
+}
+
+ol {
+  list-style-type: decimal;
+}
+
+li {
+  margin-bottom: var(--wc-space-2, 0.5rem);
+  font-size: var(--wc-prose-font-size, var(--wc-font-size-md, 1rem));
+  line-height: var(--wc-prose-line-height, var(--wc-line-height-relaxed, 1.75));
+}
+
+li:last-child {
+  margin-bottom: 0;
+}
+
+/* Paragraph inside a list item (common in CMS output) */
+li > p {
+  margin-bottom: var(--wc-space-2, 0.5rem);
+}
+
+li > p:last-child {
+  margin-bottom: 0;
+}
+
+/* ─── Nested Lists ─── */
+
+ul ul,
+ol ul {
+  list-style-type: circle;
+  margin-top: var(--wc-space-2, 0.5rem);
+  margin-bottom: var(--wc-space-2, 0.5rem);
+}
+
+ul ul ul,
+ol ul ul,
+ul ol ul,
+ol ol ul {
+  list-style-type: square;
+}
+
+ol ol,
+ul ol {
+  list-style-type: lower-alpha;
+  margin-top: var(--wc-space-2, 0.5rem);
+  margin-bottom: var(--wc-space-2, 0.5rem);
+}
+
+ol ol ol,
+ul ol ol,
+ol ul ol,
+ul ul ol {
+  list-style-type: lower-roman;
+}
+
+/* ─── List Marker Color ─── */
+
+ul ::marker,
+ol ::marker {
+  color: var(--wc-color-text-muted, var(--wc-color-neutral-500, #6c757d));
+}
+
+/* ─── Definition Lists ─── */
+
+dl {
+  margin-top: 0;
+  margin-bottom: var(--wc-space-4, 1rem);
+}
+
+dt {
+  font-weight: var(--wc-font-weight-semibold, 600);
+  color: var(--wc-prose-heading-color, var(--wc-color-neutral-900, #111827));
+  margin-bottom: var(--wc-space-1, 0.25rem);
+}
+
+dt + dt {
+  margin-top: var(--wc-space-4, 1rem);
+}
+
+dd {
+  margin-left: var(--wc-space-6, 1.5rem);
+  margin-bottom: var(--wc-space-4, 1rem);
+  color: var(--wc-prose-color, var(--wc-color-neutral-700, #343a40));
+}
+
+dd:last-child {
+  margin-bottom: 0;
+}

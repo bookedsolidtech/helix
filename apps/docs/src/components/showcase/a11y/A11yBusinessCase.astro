@@ -1,0 +1,148 @@
+---
+/**
+ * A11yBusinessCase — The business case stats & numbers.
+ *
+ * Presents four key statistics that make the financial case for
+ * accessibility: disability prevalence, site abandonment, spending
+ * impact, and ADA settlement costs.
+ */
+---
+
+<style is:inline>
+  /* --- The Business Case --- */
+  .ha-stats-section {
+    background: var(--surface-0);
+    border-top: 1px solid var(--surface-3);
+  }
+
+  .ha-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--space-5);
+  }
+
+  .ha-stat-card {
+    text-align: center;
+    padding: var(--space-8) var(--space-5);
+    border-radius: var(--radius-2xl);
+    background: var(--surface-1);
+    border: 1px solid var(--surface-3);
+    transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .ha-stat-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1.5px;
+    background: conic-gradient(from var(--gradient-angle), #10b981, #14b8a6, #06b6d4, #10b981);
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+    pointer-events: none;
+    animation: border-rotate 4s linear infinite;
+  }
+
+  .ha-stat-card:hover::before { opacity: 1; }
+  .ha-stat-card:hover {
+    transform: translateY(-6px);
+    box-shadow: var(--shadow-xl), var(--glow-health);
+    background: var(--surface-2);
+  }
+
+  .ha-stat-icon {
+    width: 56px;
+    height: 56px;
+    border-radius: var(--radius-xl);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto var(--space-5);
+    font-size: 1.5rem;
+    position: relative;
+    z-index: 1;
+  }
+
+  .ha-stat-number {
+    font-size: clamp(2rem, 4vw, 3rem);
+    font-weight: 900;
+    letter-spacing: -0.03em;
+    line-height: 1;
+    margin-bottom: var(--space-3);
+    position: relative;
+    z-index: 1;
+  }
+
+  .ha-stat-label {
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: var(--space-2);
+    position: relative;
+    z-index: 1;
+  }
+
+  .ha-stat-desc {
+    font-size: 0.8125rem;
+    color: var(--text-muted);
+    line-height: 1.5;
+    position: relative;
+    z-index: 1;
+  }
+</style>
+
+<section class="ha-section ha-stats-section" aria-label="The business case for accessibility">
+  <div class="ha-section-inner">
+    <div class="ha-section-header scroll-reveal">
+      <span class="ha-section-label ha-section-label-urgent">The Business Case</span>
+      <h2 class="ha-section-title">The Cost of Doing Nothing</h2>
+      <p class="ha-section-description">
+        Accessibility is not just the right thing to do -- it is a financial
+        imperative. The numbers make the case undeniable.
+      </p>
+    </div>
+
+    <div class="ha-stats-grid">
+      <div class="ha-stat-card scroll-reveal scroll-reveal-delay-1">
+        <div class="ha-stat-icon" style="background: linear-gradient(135deg, rgba(6, 182, 212, 0.12), rgba(6, 182, 212, 0.04)); border: 1px solid rgba(6, 182, 212, 0.15); color: var(--wc-cyan);" aria-hidden="true">
+          <i class="fa-solid fa-users"></i>
+        </div>
+        <div class="ha-stat-number" style="background: var(--gradient-cyan-purple); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">1 in 4</div>
+        <div class="ha-stat-label">US Adults with Disabilities</div>
+        <div class="ha-stat-desc">61 million Americans -- your users, your patients, your community</div>
+      </div>
+
+      <div class="ha-stat-card scroll-reveal scroll-reveal-delay-2">
+        <div class="ha-stat-icon" style="background: linear-gradient(135deg, rgba(239, 68, 68, 0.12), rgba(239, 68, 68, 0.04)); border: 1px solid rgba(239, 68, 68, 0.15); color: var(--wc-red);" aria-hidden="true">
+          <i class="fa-solid fa-person-walking-arrow-right"></i>
+        </div>
+        <div class="ha-stat-number" style="background: linear-gradient(135deg, #ef4444, #f97316); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">71%</div>
+        <div class="ha-stat-label">Leave Inaccessible Sites</div>
+        <div class="ha-stat-desc">Users with disabilities abandon sites that do not work for them</div>
+      </div>
+
+      <div class="ha-stat-card scroll-reveal scroll-reveal-delay-3">
+        <div class="ha-stat-icon" style="background: linear-gradient(135deg, rgba(16, 185, 129, 0.12), rgba(16, 185, 129, 0.04)); border: 1px solid rgba(16, 185, 129, 0.15); color: var(--wc-green);" aria-hidden="true">
+          <i class="fa-solid fa-dollar-sign"></i>
+        </div>
+        <div class="ha-stat-number" style="background: var(--gradient-green-cyan); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">$13B</div>
+        <div class="ha-stat-label">Annual Spending Affected</div>
+        <div class="ha-stat-desc">Healthcare spending impacted by digital accessibility barriers</div>
+      </div>
+
+      <div class="ha-stat-card scroll-reveal scroll-reveal-delay-4">
+        <div class="ha-stat-icon" style="background: linear-gradient(135deg, rgba(245, 158, 11, 0.12), rgba(245, 158, 11, 0.04)); border: 1px solid rgba(245, 158, 11, 0.15); color: var(--wc-amber);" aria-hidden="true">
+          <i class="fa-solid fa-scale-balanced"></i>
+        </div>
+        <div class="ha-stat-number" style="background: var(--gradient-pink-orange); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">$25K+</div>
+        <div class="ha-stat-label">Average ADA Settlement</div>
+        <div class="ha-stat-desc">Per lawsuit -- and digital accessibility complaints are rising 23% yearly</div>
+      </div>
+    </div>
+  </div>
+</section>

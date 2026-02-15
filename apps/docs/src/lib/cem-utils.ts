@@ -158,7 +158,7 @@ export function getComponentData(tagName: string): ComponentData | undefined {
     )
     .map((m) => ({
       name: m.name,
-      attribute: m.attribute!,
+      attribute: m.attribute ?? '',
       type: m.type?.text ?? 'unknown',
       default: m.default ?? '—',
       description: m.description ?? '',
@@ -190,7 +190,7 @@ export function getComponentData(tagName: string): ComponentData | undefined {
   );
 
   return {
-    tagName: decl.tagName!,
+    tagName: decl.tagName ?? '',
     className: decl.name,
     description: decl.description ?? '',
     summary: decl.summary ?? '',

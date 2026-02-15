@@ -1,0 +1,280 @@
+---
+/**
+ * StackFutureProof — Section 7: Future-Proof Guarantees
+ *
+ * Standards timeline showing Web Components, Shadow DOM, CEM, DTCG, ES Modules,
+ * plus a framework churn comparison sidebar.
+ */
+---
+
+<style is:inline>
+  /* ============================================
+     SECTION 7: FUTURE-PROOF GUARANTEES
+     ============================================ */
+  .ts-future-section {
+    background: var(--surface-0);
+  }
+
+  .ts-timeline {
+    max-width: 800px;
+    margin: 0 auto;
+    position: relative;
+    padding-left: var(--space-12);
+  }
+
+  .ts-timeline::before {
+    content: '';
+    position: absolute;
+    left: 18px;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: linear-gradient(180deg, var(--wc-cyan), var(--wc-accent), var(--wc-green));
+  }
+
+  .ts-timeline-item {
+    position: relative;
+    padding-bottom: var(--space-10);
+    padding-left: var(--space-6);
+  }
+
+  .ts-timeline-item:last-child {
+    padding-bottom: 0;
+  }
+
+  .ts-timeline-dot {
+    position: absolute;
+    left: calc(-1 * var(--space-12) + 10px);
+    top: 4px;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    border: 3px solid;
+    background: var(--surface-0);
+    z-index: 1;
+  }
+
+  .ts-timeline-dot.ts-dot-cyan { border-color: var(--wc-cyan); box-shadow: 0 0 12px rgba(6, 182, 212, 0.4); }
+  .ts-timeline-dot.ts-dot-accent { border-color: var(--wc-accent); box-shadow: 0 0 12px rgba(102, 126, 234, 0.4); }
+  .ts-timeline-dot.ts-dot-green { border-color: var(--wc-green); box-shadow: 0 0 12px rgba(16, 185, 129, 0.4); }
+  .ts-timeline-dot.ts-dot-amber { border-color: var(--wc-amber); box-shadow: 0 0 12px rgba(245, 158, 11, 0.4); }
+  .ts-timeline-dot.ts-dot-electric { border-color: var(--wc-electric); box-shadow: 0 0 12px rgba(59, 130, 246, 0.4); }
+
+  .ts-timeline-title {
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: var(--space-2);
+  }
+
+  .ts-timeline-desc {
+    font-size: 0.9375rem;
+    color: var(--text-secondary);
+    line-height: 1.7;
+  }
+
+  .ts-timeline-tag {
+    display: inline-block;
+    font-size: 0.6875rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: var(--space-1) var(--space-3);
+    border-radius: var(--radius-full);
+    margin-bottom: var(--space-2);
+  }
+
+  .ts-tag-standard {
+    background: rgba(6, 182, 212, 0.12);
+    color: var(--wc-cyan);
+  }
+
+  .ts-tag-native {
+    background: rgba(16, 185, 129, 0.12);
+    color: var(--wc-green);
+  }
+
+  .ts-tag-open {
+    background: rgba(139, 92, 246, 0.12);
+    color: var(--wc-accent);
+  }
+
+  /* Framework churn contrast */
+  .ts-churn-container {
+    max-width: 800px;
+    margin: var(--space-12) auto 0;
+    padding: var(--space-8);
+    border-radius: var(--radius-2xl);
+    background: var(--surface-1);
+    border: 1px solid var(--surface-3);
+  }
+
+  .ts-churn-title {
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: var(--space-6);
+    text-align: center;
+  }
+
+  .ts-churn-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: var(--space-4);
+  }
+
+  .ts-churn-item {
+    padding: var(--space-4);
+    border-radius: var(--radius-lg);
+    background: rgba(239, 68, 68, 0.04);
+    border: 1px solid rgba(239, 68, 68, 0.1);
+    text-align: center;
+  }
+
+  .ts-churn-item-label {
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    margin-bottom: var(--space-1);
+  }
+
+  .ts-churn-item-versions {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    font-family: var(--font-mono);
+  }
+
+  .ts-churn-vs {
+    text-align: center;
+    margin-top: var(--space-6);
+    padding: var(--space-4);
+    border-radius: var(--radius-lg);
+    background: rgba(6, 182, 212, 0.06);
+    border: 1px solid rgba(6, 182, 212, 0.15);
+  }
+
+  .ts-churn-vs-text {
+    font-size: 0.9375rem;
+    font-weight: 700;
+    color: var(--wc-cyan);
+  }
+
+  @media (max-width: 768px) {
+    .ts-timeline {
+      padding-left: var(--space-10);
+    }
+
+    .ts-timeline::before {
+      left: 14px;
+    }
+
+    .ts-timeline-dot {
+      left: calc(-1 * var(--space-10) + 6px);
+      width: 16px;
+      height: 16px;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .ts-churn-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+
+<section class="ts-section ts-future-section" aria-label="Future-proof guarantees">
+  <div class="ts-section-inner">
+    <div class="ts-section-header scroll-reveal">
+      <span class="ts-section-label">Longevity</span>
+      <h2 class="ts-section-title">This Stack Will Still Work in 2030</h2>
+      <p class="ts-section-description">
+        Every core technology is backed by a W3C standard, browser-native API,
+        or open specification. No single vendor controls the stack.
+      </p>
+    </div>
+
+    <div class="ts-timeline scroll-reveal">
+      <div class="ts-timeline-item">
+        <div class="ts-timeline-dot ts-dot-cyan" aria-hidden="true"></div>
+        <span class="ts-timeline-tag ts-tag-standard">W3C Standard</span>
+        <h3 class="ts-timeline-title">Web Components (Custom Elements v1)</h3>
+        <p class="ts-timeline-desc">
+          A W3C standard since 2018, natively supported in all modern browsers.
+          No polyfills needed for Chrome 90+, Firefox 88+, Safari 14+.
+          The browser IS the runtime -- no framework needed to render.
+        </p>
+      </div>
+
+      <div class="ts-timeline-item">
+        <div class="ts-timeline-dot ts-dot-green" aria-hidden="true"></div>
+        <span class="ts-timeline-tag ts-tag-native">Browser Native</span>
+        <h3 class="ts-timeline-title">Shadow DOM + CSS Custom Properties</h3>
+        <p class="ts-timeline-desc">
+          Shadow DOM provides true encapsulation. CSS custom properties pierce
+          through Shadow DOM, providing the only viable theming mechanism.
+          Both are browser-native APIs that require zero library support.
+        </p>
+      </div>
+
+      <div class="ts-timeline-item">
+        <div class="ts-timeline-dot ts-dot-accent" aria-hidden="true"></div>
+        <span class="ts-timeline-tag ts-tag-open">Open Specification</span>
+        <h3 class="ts-timeline-title">Custom Elements Manifest (CEM)</h3>
+        <p class="ts-timeline-desc">
+          An open community specification for documenting Web Component APIs.
+          Machine-readable JSON that feeds Storybook, IDEs, and documentation systems.
+          Not controlled by any single vendor.
+        </p>
+      </div>
+
+      <div class="ts-timeline-item">
+        <div class="ts-timeline-dot ts-dot-amber" aria-hidden="true"></div>
+        <span class="ts-timeline-tag ts-tag-standard">W3C Standard</span>
+        <h3 class="ts-timeline-title">W3C DTCG Design Tokens (2025.10)</h3>
+        <p class="ts-timeline-desc">
+          The W3C Design Tokens Community Group specification reached its first
+          stable version in October 2025. Token files written today are forward-compatible
+          with every tool that adopts the standard.
+        </p>
+      </div>
+
+      <div class="ts-timeline-item">
+        <div class="ts-timeline-dot ts-dot-electric" aria-hidden="true"></div>
+        <span class="ts-timeline-tag ts-tag-native">Browser Native</span>
+        <h3 class="ts-timeline-title">ES Modules</h3>
+        <p class="ts-timeline-desc">
+          Standard ES2021 modules shipped directly to the browser. No CommonJS, no UMD.
+          Modern Drupal (10.3+) and all evergreen browsers support ES modules natively.
+          The distribution format will never need a major migration.
+        </p>
+      </div>
+    </div>
+
+    <!-- Framework churn contrast -->
+    <div class="ts-churn-container scroll-reveal scroll-reveal-delay-2">
+      <h3 class="ts-churn-title">
+        Meanwhile, in Framework Land...
+      </h3>
+      <div class="ts-churn-grid">
+        <div class="ts-churn-item">
+          <div class="ts-churn-item-label">React</div>
+          <div class="ts-churn-item-versions">16 &rarr; 17 &rarr; 18 &rarr; 19</div>
+        </div>
+        <div class="ts-churn-item">
+          <div class="ts-churn-item-label">Angular</div>
+          <div class="ts-churn-item-versions">12 &rarr; 13 &rarr; ... &rarr; 19</div>
+        </div>
+        <div class="ts-churn-item">
+          <div class="ts-churn-item-label">Vue</div>
+          <div class="ts-churn-item-versions">2 &rarr; 3 (breaking)</div>
+        </div>
+      </div>
+      <div class="ts-churn-vs">
+        <div class="ts-churn-vs-text">
+          <i class="fa-solid fa-shield-halved" aria-hidden="true"></i>
+          WC-2026: Web Components v1 -- unchanged since 2018, supported forever
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

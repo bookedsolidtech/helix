@@ -1,0 +1,286 @@
+---
+/**
+ * StackVisualization — Section 2: The Full Stack, Layered
+ *
+ * Displays the four horizontal architecture layers (Docs, DX, Core, Build)
+ * plus the vertical Design Tokens sidebar.
+ */
+---
+
+<style is:inline>
+  /* ============================================
+     SECTION 2: STACK VISUALIZATION
+     ============================================ */
+  .ts-stack-section {
+    background: var(--surface-0);
+    border-top: 1px solid var(--surface-3);
+    border-bottom: 1px solid var(--surface-3);
+  }
+
+  .ts-stack-container {
+    display: flex;
+    gap: var(--space-8);
+    align-items: stretch;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  .ts-stack-layers {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+  }
+
+  .ts-stack-layer {
+    padding: var(--space-6) var(--space-8);
+    border-radius: var(--radius-xl);
+    border: 1px solid;
+    position: relative;
+    transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .ts-stack-layer:hover {
+    transform: translateX(8px);
+  }
+
+  .ts-stack-layer-tag {
+    display: inline-block;
+    font-size: 0.6875rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: var(--space-1) var(--space-3);
+    border-radius: var(--radius-full);
+    margin-bottom: var(--space-3);
+  }
+
+  .ts-stack-layer-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin-bottom: var(--space-2);
+  }
+
+  .ts-stack-layer-techs {
+    display: flex;
+    gap: var(--space-4);
+    flex-wrap: wrap;
+    align-items: center;
+  }
+
+  .ts-stack-layer-tech {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+  }
+
+  .ts-stack-layer-tech img {
+    width: 24px;
+    height: 24px;
+  }
+
+  /* Layer colors */
+  .ts-layer-docs {
+    background: linear-gradient(135deg, rgba(255, 93, 1, 0.08), rgba(255, 71, 133, 0.04));
+    border-color: rgba(255, 93, 1, 0.2);
+  }
+  .ts-layer-docs .ts-stack-layer-tag {
+    background: rgba(255, 93, 1, 0.15);
+    color: #ff5d01;
+  }
+  .ts-layer-docs .ts-stack-layer-title { color: #ff8a4c; }
+
+  .ts-layer-dx {
+    background: linear-gradient(135deg, rgba(255, 71, 133, 0.08), rgba(114, 155, 27, 0.04));
+    border-color: rgba(255, 71, 133, 0.2);
+  }
+  .ts-layer-dx .ts-stack-layer-tag {
+    background: rgba(255, 71, 133, 0.15);
+    color: #ff4785;
+  }
+  .ts-layer-dx .ts-stack-layer-title { color: #ff6ea1; }
+
+  .ts-layer-core {
+    background: linear-gradient(135deg, rgba(50, 79, 255, 0.1), rgba(49, 120, 198, 0.06));
+    border-color: rgba(50, 79, 255, 0.25);
+  }
+  .ts-layer-core .ts-stack-layer-tag {
+    background: rgba(50, 79, 255, 0.15);
+    color: #324fff;
+  }
+  .ts-layer-core .ts-stack-layer-title { color: #6b8aff; }
+
+  .ts-layer-build {
+    background: linear-gradient(135deg, rgba(0, 150, 255, 0.08), rgba(193, 33, 39, 0.04));
+    border-color: rgba(0, 150, 255, 0.2);
+  }
+  .ts-layer-build .ts-stack-layer-tag {
+    background: rgba(0, 150, 255, 0.15);
+    color: #0096ff;
+  }
+  .ts-layer-build .ts-stack-layer-title { color: #4db8ff; }
+
+  /* Design tokens sidebar */
+  .ts-stack-sidebar {
+    width: 180px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-6) var(--space-4);
+    border-radius: var(--radius-xl);
+    background: linear-gradient(180deg, rgba(16, 185, 129, 0.08), rgba(6, 182, 212, 0.08));
+    border: 1px solid rgba(16, 185, 129, 0.2);
+    text-align: center;
+    position: relative;
+  }
+
+  .ts-stack-sidebar::before {
+    content: '';
+    position: absolute;
+    top: 10%;
+    bottom: 10%;
+    left: -1px;
+    width: 3px;
+    background: linear-gradient(180deg, var(--wc-green), var(--wc-cyan));
+    border-radius: 2px;
+  }
+
+  .ts-stack-sidebar-icon {
+    font-size: 2rem;
+    color: var(--wc-green);
+    margin-bottom: var(--space-4);
+  }
+
+  .ts-stack-sidebar-title {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--wc-green);
+    margin-bottom: var(--space-2);
+  }
+
+  .ts-stack-sidebar-techs {
+    font-size: 0.8125rem;
+    color: var(--text-secondary);
+    line-height: 1.6;
+  }
+
+  @media (max-width: 1024px) {
+    .ts-stack-container {
+      flex-direction: column;
+    }
+
+    .ts-stack-sidebar {
+      width: 100%;
+      flex-direction: row;
+      gap: var(--space-4);
+      padding: var(--space-4) var(--space-6);
+    }
+
+    .ts-stack-sidebar::before {
+      display: none;
+    }
+  }
+</style>
+
+<section class="ts-section ts-stack-section" aria-label="Stack architecture">
+  <div class="ts-section-inner">
+    <div class="ts-section-header scroll-reveal">
+      <span class="ts-section-label">Architecture</span>
+      <h2 class="ts-section-title">The Full Stack, Layered</h2>
+      <p class="ts-section-description">
+        Four horizontal layers plus a vertical design token pipeline.
+        Each layer has a clear responsibility and a specific set of tools.
+      </p>
+    </div>
+
+    <div class="ts-stack-container">
+      <div class="ts-stack-layers">
+        <!-- Layer 4: Documentation (top) -->
+        <div class="ts-stack-layer ts-layer-docs scroll-reveal scroll-reveal-delay-1">
+          <span class="ts-stack-layer-tag">Top Layer</span>
+          <h3 class="ts-stack-layer-title">Documentation</h3>
+          <div class="ts-stack-layer-techs">
+            <span class="ts-stack-layer-tech">
+              <img src="/logos/astro.svg" alt="" /> Astro / Starlight
+            </span>
+            <span class="ts-stack-layer-tech">
+              <img src="/logos/storybook.svg" alt="" /> Storybook 10.x
+            </span>
+            <span class="ts-stack-layer-tech">
+              <i class="fa-solid fa-file-code" aria-hidden="true" style="width:24px;text-align:center;color:var(--wc-accent);"></i> CEM
+            </span>
+          </div>
+        </div>
+
+        <!-- Layer 3: Dev Experience -->
+        <div class="ts-stack-layer ts-layer-dx scroll-reveal scroll-reveal-delay-2">
+          <span class="ts-stack-layer-tag">Upper Layer</span>
+          <h3 class="ts-stack-layer-title">Developer Experience</h3>
+          <div class="ts-stack-layer-techs">
+            <span class="ts-stack-layer-tech">
+              <img src="/logos/storybook.svg" alt="" /> Storybook 10.x
+            </span>
+            <span class="ts-stack-layer-tech">
+              <img src="/logos/vitest.svg" alt="" /> Vitest 4.x
+            </span>
+            <span class="ts-stack-layer-tech">
+              <i class="fa-solid fa-masks-theater" aria-hidden="true" style="width:24px;text-align:center;color:#e2647b;"></i> Playwright
+            </span>
+          </div>
+        </div>
+
+        <!-- Layer 2: Core -->
+        <div class="ts-stack-layer ts-layer-core scroll-reveal scroll-reveal-delay-3">
+          <span class="ts-stack-layer-tag">Core Layer</span>
+          <h3 class="ts-stack-layer-title">Component Runtime</h3>
+          <div class="ts-stack-layer-techs">
+            <span class="ts-stack-layer-tech">
+              <img src="/logos/lit.svg" alt="" /> Lit 3.x
+            </span>
+            <span class="ts-stack-layer-tech">
+              <img src="/logos/typescript.svg" alt="" /> TypeScript 5.7
+            </span>
+            <span class="ts-stack-layer-tech">
+              <i class="fa-brands fa-html5" aria-hidden="true" style="width:24px;text-align:center;color:#e34c26;"></i> Web Components
+            </span>
+          </div>
+        </div>
+
+        <!-- Layer 1: Build Tools (bottom) -->
+        <div class="ts-stack-layer ts-layer-build scroll-reveal scroll-reveal-delay-4">
+          <span class="ts-stack-layer-tag">Foundation</span>
+          <h3 class="ts-stack-layer-title">Build Tools</h3>
+          <div class="ts-stack-layer-techs">
+            <span class="ts-stack-layer-tech">
+              <i class="fa-solid fa-bolt" aria-hidden="true" style="width:24px;text-align:center;color:#bd34fe;"></i> Vite
+            </span>
+            <span class="ts-stack-layer-tech">
+              <img src="/logos/turborepo.svg" alt="" /> Turborepo
+            </span>
+            <span class="ts-stack-layer-tech">
+              <img src="/logos/npm.svg" alt="" /> npm workspaces
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Vertical sidebar: Design Tokens -->
+      <div class="ts-stack-sidebar scroll-reveal scroll-reveal-delay-5">
+        <div class="ts-stack-sidebar-icon">
+          <i class="fa-solid fa-palette" aria-hidden="true"></i>
+        </div>
+        <div class="ts-stack-sidebar-title">Design Tokens</div>
+        <div class="ts-stack-sidebar-techs">
+          Terrazzo<br />
+          W3C DTCG<br />
+          Style Dictionary 4.x<br />
+          CSS Custom Properties
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

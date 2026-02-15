@@ -1,0 +1,882 @@
+/* ==========================================================================
+ * form.scoped.css — Scoped barrel file
+ *
+ * Contains all form styles with every selector prefixed by `wc-form` to
+ * prevent leaking outside the <wc-form> Light DOM wrapper.
+ *
+ * IMPORTANT: This file does NOT use @import because CSS imports cannot
+ * add scope prefixes. All styles are written inline.
+ * ==========================================================================
+ */
+
+
+/* ==========================================================================
+ * FIELD (_field.css scoped)
+ * ========================================================================== */
+
+/* ─── Field Container ─── */
+
+wc-form .form-item {
+  display: flex;
+  flex-direction: column;
+  gap: var(--wc-space-1, 0.25rem);
+  font-family: var(--wc-input-font-family, var(--wc-font-family-sans, sans-serif));
+}
+
+wc-form .form-item + .form-item {
+  margin-top: var(--wc-space-4, 1rem);
+}
+
+/* ─── Label ─── */
+
+wc-form label {
+  display: flex;
+  align-items: baseline;
+  gap: var(--wc-space-1, 0.25rem);
+  font-size: var(--wc-font-size-sm, 0.875rem);
+  font-weight: var(--wc-font-weight-medium, 500);
+  color: var(--wc-input-label-color, var(--wc-color-neutral-700, #343a40));
+  line-height: var(--wc-line-height-normal, 1.5);
+}
+
+/* ─── Required Marker ─── */
+
+wc-form .form-required {
+  color: var(--wc-input-error-color, var(--wc-color-error-500, #dc3545));
+  font-weight: var(--wc-font-weight-bold, 700);
+}
+
+/* ─── Description / Help Text ─── */
+
+wc-form .description {
+  font-size: var(--wc-font-size-xs, 0.75rem);
+  color: var(--wc-color-neutral-500, #6c757d);
+  line-height: var(--wc-line-height-normal, 1.5);
+}
+
+/* ─── Box Sizing Reset ─── */
+
+wc-form .form-item *,
+wc-form .form-item *::before,
+wc-form .form-item *::after {
+  box-sizing: border-box;
+}
+
+
+/* ==========================================================================
+ * TEXT INPUT (_text-input.css scoped)
+ * ========================================================================== */
+
+wc-form input[type='text'],
+wc-form input[type='email'],
+wc-form input[type='password'],
+wc-form input[type='tel'],
+wc-form input[type='url'],
+wc-form input[type='search'],
+wc-form input[type='number'] {
+  display: block;
+  width: 100%;
+  border: var(--wc-border-width-thin, 1px) solid var(--wc-input-border-color, var(--wc-color-neutral-300, #ced4da));
+  border-radius: var(--wc-input-border-radius, var(--wc-border-radius-md, 0.375rem));
+  background-color: var(--wc-input-bg, var(--wc-color-neutral-0, #ffffff));
+  padding: var(--wc-space-2, 0.5rem) var(--wc-space-3, 0.75rem);
+  font-family: var(--wc-input-font-family, var(--wc-font-family-sans, sans-serif));
+  font-size: var(--wc-font-size-md, 1rem);
+  color: var(--wc-input-color, var(--wc-color-neutral-800, #212529));
+  line-height: var(--wc-line-height-normal, 1.5);
+  min-height: var(--wc-size-10, 2.5rem);
+  transition: border-color var(--wc-transition-fast, 150ms ease),
+              box-shadow var(--wc-transition-fast, 150ms ease);
+}
+
+/* ─── Placeholder ─── */
+
+wc-form input[type='text']::placeholder,
+wc-form input[type='email']::placeholder,
+wc-form input[type='password']::placeholder,
+wc-form input[type='tel']::placeholder,
+wc-form input[type='url']::placeholder,
+wc-form input[type='search']::placeholder,
+wc-form input[type='number']::placeholder {
+  color: var(--wc-color-neutral-400, #adb5bd);
+}
+
+/* ─── Focus State ─── */
+
+wc-form input[type='text']:focus,
+wc-form input[type='email']:focus,
+wc-form input[type='password']:focus,
+wc-form input[type='tel']:focus,
+wc-form input[type='url']:focus,
+wc-form input[type='search']:focus,
+wc-form input[type='number']:focus {
+  outline: none;
+  border-color: var(--wc-input-focus-ring-color, var(--wc-focus-ring-color, #007878));
+  box-shadow: 0 0 0 var(--wc-focus-ring-width, 2px) color-mix(in srgb, var(--wc-input-focus-ring-color, var(--wc-focus-ring-color, #007878)) calc(var(--wc-focus-ring-opacity, 0.25) * 100%), transparent);
+}
+
+/* ─── Disabled State ─── */
+
+wc-form input[type='text']:disabled,
+wc-form input[type='email']:disabled,
+wc-form input[type='password']:disabled,
+wc-form input[type='tel']:disabled,
+wc-form input[type='url']:disabled,
+wc-form input[type='search']:disabled,
+wc-form input[type='number']:disabled {
+  opacity: var(--wc-opacity-disabled, 0.5);
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* ─── Read-Only State ─── */
+
+wc-form input[type='text']:read-only,
+wc-form input[type='email']:read-only,
+wc-form input[type='password']:read-only,
+wc-form input[type='tel']:read-only,
+wc-form input[type='url']:read-only,
+wc-form input[type='search']:read-only,
+wc-form input[type='number']:read-only {
+  background-color: var(--wc-color-neutral-100, #e9ecef);
+}
+
+/* ─── Remove browser search decorations ─── */
+
+wc-form input[type='search']::-webkit-search-decoration,
+wc-form input[type='search']::-webkit-search-cancel-button,
+wc-form input[type='search']::-webkit-search-results-button,
+wc-form input[type='search']::-webkit-search-results-decoration {
+  -webkit-appearance: none;
+}
+
+/* ─── Remove number input spinners ─── */
+
+wc-form input[type='number']::-webkit-inner-spin-button,
+wc-form input[type='number']::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+wc-form input[type='number'] {
+  -moz-appearance: textfield;
+}
+
+
+/* ==========================================================================
+ * TEXTAREA (_textarea.css scoped)
+ * ========================================================================== */
+
+wc-form textarea {
+  display: block;
+  width: 100%;
+  border: var(--wc-border-width-thin, 1px) solid var(--wc-input-border-color, var(--wc-color-neutral-300, #ced4da));
+  border-radius: var(--wc-input-border-radius, var(--wc-border-radius-md, 0.375rem));
+  background-color: var(--wc-input-bg, var(--wc-color-neutral-0, #ffffff));
+  padding: var(--wc-space-2, 0.5rem) var(--wc-space-3, 0.75rem);
+  font-family: var(--wc-input-font-family, var(--wc-font-family-sans, sans-serif));
+  font-size: var(--wc-font-size-md, 1rem);
+  color: var(--wc-input-color, var(--wc-color-neutral-800, #212529));
+  line-height: var(--wc-line-height-normal, 1.5);
+  min-height: var(--wc-textarea-min-height, var(--wc-size-20, 5rem));
+  resize: vertical;
+  transition: border-color var(--wc-transition-fast, 150ms ease),
+              box-shadow var(--wc-transition-fast, 150ms ease);
+}
+
+wc-form textarea::placeholder {
+  color: var(--wc-color-neutral-400, #adb5bd);
+}
+
+wc-form textarea:focus {
+  outline: none;
+  border-color: var(--wc-input-focus-ring-color, var(--wc-focus-ring-color, #007878));
+  box-shadow: 0 0 0 var(--wc-focus-ring-width, 2px) color-mix(in srgb, var(--wc-input-focus-ring-color, var(--wc-focus-ring-color, #007878)) calc(var(--wc-focus-ring-opacity, 0.25) * 100%), transparent);
+}
+
+wc-form textarea:disabled {
+  opacity: var(--wc-opacity-disabled, 0.5);
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+wc-form textarea:read-only {
+  background-color: var(--wc-color-neutral-100, #e9ecef);
+}
+
+
+/* ==========================================================================
+ * SELECT (_select.css scoped)
+ * ========================================================================== */
+
+wc-form select {
+  display: block;
+  width: 100%;
+  border: var(--wc-border-width-thin, 1px) solid var(--wc-select-border-color, var(--wc-color-neutral-300, #ced4da));
+  border-radius: var(--wc-select-border-radius, var(--wc-border-radius-md, 0.375rem));
+  background-color: var(--wc-select-bg, var(--wc-color-neutral-0, #ffffff));
+  padding: var(--wc-space-2, 0.5rem) var(--wc-space-8, 2rem) var(--wc-space-2, 0.5rem) var(--wc-space-3, 0.75rem);
+  font-family: var(--wc-select-font-family, var(--wc-font-family-sans, sans-serif));
+  font-size: var(--wc-font-size-md, 1rem);
+  color: var(--wc-select-color, var(--wc-color-neutral-800, #212529));
+  line-height: var(--wc-line-height-normal, 1.5);
+  min-height: var(--wc-input-height-md, var(--wc-size-10, 2.5rem));
+  cursor: pointer;
+  transition: border-color var(--wc-transition-fast, 150ms ease),
+              box-shadow var(--wc-transition-fast, 150ms ease);
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5L6 6.5L11 1.5' stroke='%236c757d' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round' fill='none'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right var(--wc-space-3, 0.75rem) center;
+  background-size: 12px 8px;
+}
+
+wc-form select:focus {
+  outline: none;
+  border-color: var(--wc-select-focus-ring-color, var(--wc-focus-ring-color, #007878));
+  box-shadow: 0 0 0 var(--wc-focus-ring-width, 2px) color-mix(in srgb, var(--wc-select-focus-ring-color, var(--wc-focus-ring-color, #007878)) calc(var(--wc-focus-ring-opacity, 0.25) * 100%), transparent);
+}
+
+wc-form select:disabled {
+  opacity: var(--wc-opacity-disabled, 0.5);
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+wc-form select[multiple] {
+  min-height: var(--wc-size-20, 5rem);
+  padding-right: var(--wc-space-3, 0.75rem);
+  background-image: none;
+}
+
+wc-form select[multiple] option {
+  padding: var(--wc-space-1, 0.25rem) var(--wc-space-2, 0.5rem);
+}
+
+wc-form select::-ms-expand {
+  display: none;
+}
+
+
+/* ==========================================================================
+ * CHECKBOX (_checkbox.css scoped)
+ * ========================================================================== */
+
+wc-form input[type='checkbox'] {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: var(--wc-checkbox-size, var(--wc-size-5, 1.25rem));
+  height: var(--wc-checkbox-size, var(--wc-size-5, 1.25rem));
+  margin: 0;
+  border: var(--wc-border-width-medium, 2px) solid var(--wc-checkbox-border-color, var(--wc-color-neutral-300, #ced4da));
+  border-radius: var(--wc-checkbox-border-radius, var(--wc-border-radius-sm, 0.25rem));
+  background-color: var(--wc-color-neutral-0, #ffffff);
+  transition: background-color var(--wc-transition-fast, 150ms ease),
+              border-color var(--wc-transition-fast, 150ms ease),
+              box-shadow var(--wc-transition-fast, 150ms ease);
+  cursor: pointer;
+  vertical-align: middle;
+}
+
+wc-form input[type='checkbox']:checked {
+  background-color: var(--wc-checkbox-checked-bg, var(--wc-color-primary-500, #007878));
+  border-color: var(--wc-checkbox-checked-border-color, var(--wc-color-primary-500, #007878));
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none'%3E%3Cpath d='M3.5 8.5L6.5 11.5L12.5 4.5' stroke='%23ffffff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 100%;
+}
+
+wc-form input[type='checkbox']:indeterminate {
+  background-color: var(--wc-checkbox-checked-bg, var(--wc-color-primary-500, #007878));
+  border-color: var(--wc-checkbox-checked-border-color, var(--wc-color-primary-500, #007878));
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none'%3E%3Cpath d='M4 8H12' stroke='%23ffffff' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 100%;
+}
+
+wc-form input[type='checkbox']:focus-visible {
+  outline: var(--wc-focus-ring-width, 2px) solid var(--wc-checkbox-focus-ring-color, var(--wc-focus-ring-color, #007878));
+  outline-offset: var(--wc-focus-ring-offset, 2px);
+}
+
+wc-form input[type='checkbox']:hover:not(:disabled) {
+  border-color: var(--wc-color-primary-500, #007878);
+}
+
+wc-form input[type='checkbox']:checked:hover:not(:disabled) {
+  filter: brightness(var(--wc-filter-brightness-hover, 0.9));
+}
+
+wc-form input[type='checkbox']:disabled {
+  opacity: var(--wc-opacity-disabled, 0.5);
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+wc-form .form-type-checkbox,
+wc-form .form-type-checkbox-toggle {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--wc-space-2, 0.5rem);
+}
+
+wc-form .form-type-checkbox label,
+wc-form .form-type-checkbox-toggle label {
+  font-size: var(--wc-font-size-sm, 0.875rem);
+  font-weight: var(--wc-font-weight-medium, 500);
+  color: var(--wc-checkbox-label-color, var(--wc-color-neutral-700, #343a40));
+  line-height: var(--wc-line-height-normal, 1.5);
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+
+/* ==========================================================================
+ * RADIO (_radio.css scoped)
+ * ========================================================================== */
+
+wc-form input[type='radio'] {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: var(--wc-radio-size, var(--wc-size-5, 1.25rem));
+  height: var(--wc-radio-size, var(--wc-size-5, 1.25rem));
+  margin: 0;
+  border: var(--wc-border-width-medium, 2px) solid var(--wc-radio-border-color, var(--wc-color-neutral-300, #ced4da));
+  border-radius: var(--wc-border-radius-full, 9999px);
+  background-color: var(--wc-color-neutral-0, #ffffff);
+  transition: border-color var(--wc-transition-fast, 150ms ease),
+              background-color var(--wc-transition-fast, 150ms ease),
+              box-shadow var(--wc-transition-fast, 150ms ease);
+  cursor: pointer;
+  vertical-align: middle;
+}
+
+wc-form input[type='radio']:checked {
+  border-color: var(--wc-radio-checked-border-color, var(--wc-color-primary-500, #007878));
+  background-color: var(--wc-radio-checked-bg, var(--wc-color-primary-500, #007878));
+  box-shadow: inset 0 0 0 calc(var(--wc-radio-size, var(--wc-size-5, 1.25rem)) * 0.3) var(--wc-radio-dot-color, var(--wc-color-neutral-0, #ffffff));
+}
+
+wc-form input[type='radio']:focus-visible {
+  outline: var(--wc-focus-ring-width, 2px) solid var(--wc-radio-focus-ring-color, var(--wc-focus-ring-color, #007878));
+  outline-offset: var(--wc-focus-ring-offset, 2px);
+}
+
+wc-form input[type='radio']:hover:not(:disabled):not(:checked) {
+  border-color: var(--wc-color-neutral-400, #adb5bd);
+}
+
+wc-form input[type='radio']:disabled {
+  opacity: var(--wc-opacity-disabled, 0.5);
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+wc-form .form-type-radio {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--wc-space-2, 0.5rem);
+}
+
+wc-form .form-type-radio label {
+  font-size: var(--wc-font-size-md, 1rem);
+  color: var(--wc-radio-label-color, var(--wc-color-neutral-700, #343a40));
+  line-height: var(--wc-line-height-normal, 1.5);
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+wc-form .form-radios {
+  display: flex;
+  flex-direction: column;
+  gap: var(--wc-radio-group-gap, var(--wc-space-3, 0.75rem));
+}
+
+wc-form .form-radios--horizontal {
+  flex-direction: row;
+  flex-wrap: wrap;
+}
+
+
+/* ==========================================================================
+ * SWITCH (_switch.css scoped)
+ * ========================================================================== */
+
+wc-form .form-type-switch {
+  display: flex;
+  flex-direction: column;
+  gap: var(--wc-space-1, 0.25rem);
+  font-family: var(--wc-font-family-sans, sans-serif);
+}
+
+wc-form .form-type-switch .switch__control-row {
+  display: flex;
+  align-items: center;
+  gap: var(--wc-space-2, 0.5rem);
+}
+
+wc-form .form-type-switch input[type='checkbox'] {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+  width: var(--wc-switch-track-width-md, var(--wc-size-10, 2.5rem));
+  height: var(--wc-switch-track-height-md, var(--wc-size-5-5, 1.375rem));
+  margin: 0;
+  border: none;
+  border-radius: var(--wc-border-radius-full, 9999px);
+  background-color: var(--wc-switch-track-bg, var(--wc-color-neutral-300, #ced4da));
+  transition: background-color var(--wc-transition-fast, 150ms ease);
+  cursor: pointer;
+  background-image: none;
+}
+
+wc-form .form-type-switch input[type='checkbox']::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: var(--wc-switch-thumb-offset, var(--wc-space-0-5, 0.125rem));
+  transform: translateY(-50%);
+  width: var(--wc-switch-thumb-size-md, var(--wc-size-4-5, 1.125rem));
+  height: var(--wc-switch-thumb-size-md, var(--wc-size-4-5, 1.125rem));
+  border-radius: var(--wc-border-radius-full, 9999px);
+  background-color: var(--wc-switch-thumb-bg, var(--wc-color-neutral-0, #ffffff));
+  box-shadow: var(--wc-switch-thumb-shadow, var(--wc-shadow-sm, 0 1px 2px 0 rgb(0 0 0 / 0.05)));
+  transition: transform var(--wc-transition-fast, 150ms ease);
+}
+
+wc-form .form-type-switch input[type='checkbox']:checked {
+  background-color: var(--wc-switch-track-checked-bg, var(--wc-color-primary-500, #007878));
+  background-image: none;
+}
+
+wc-form .form-type-switch input[type='checkbox']:checked::before {
+  transform: translateY(-50%) translateX(var(--wc-switch-thumb-size-md, var(--wc-size-4-5, 1.125rem)));
+}
+
+wc-form .form-type-switch input[type='checkbox']:focus-visible {
+  outline: var(--wc-focus-ring-width, 2px) solid var(--wc-switch-focus-ring-color, var(--wc-focus-ring-color, #007878));
+  outline-offset: var(--wc-focus-ring-offset, 2px);
+}
+
+wc-form .form-type-switch input[type='checkbox']:disabled {
+  opacity: var(--wc-opacity-disabled, 0.5);
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+wc-form .form-type-switch label {
+  font-size: var(--wc-font-size-sm, 0.875rem);
+  font-weight: var(--wc-font-weight-medium, 500);
+  color: var(--wc-switch-label-color, var(--wc-color-neutral-700, #343a40));
+  line-height: var(--wc-line-height-normal, 1.5);
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* Small */
+wc-form .form-type-switch--sm input[type='checkbox'] {
+  width: var(--wc-switch-track-width-sm, var(--wc-size-8, 2rem));
+  height: var(--wc-switch-track-height-sm, var(--wc-size-4-5, 1.125rem));
+}
+
+wc-form .form-type-switch--sm input[type='checkbox']::before {
+  width: var(--wc-switch-thumb-size-sm, var(--wc-size-3-5, 0.875rem));
+  height: var(--wc-switch-thumb-size-sm, var(--wc-size-3-5, 0.875rem));
+}
+
+wc-form .form-type-switch--sm input[type='checkbox']:checked::before {
+  transform: translateY(-50%) translateX(var(--wc-switch-thumb-size-sm, var(--wc-size-3-5, 0.875rem)));
+}
+
+/* Large */
+wc-form .form-type-switch--lg input[type='checkbox'] {
+  width: var(--wc-switch-track-width-lg, var(--wc-size-12, 3rem));
+  height: var(--wc-switch-track-height-lg, var(--wc-size-6-5, 1.625rem));
+}
+
+wc-form .form-type-switch--lg input[type='checkbox']::before {
+  width: var(--wc-switch-thumb-size-lg, var(--wc-size-5-5, 1.375rem));
+  height: var(--wc-switch-thumb-size-lg, var(--wc-size-5-5, 1.375rem));
+}
+
+wc-form .form-type-switch--lg input[type='checkbox']:checked::before {
+  transform: translateY(-50%) translateX(var(--wc-switch-thumb-size-lg, var(--wc-size-5-5, 1.375rem)));
+}
+
+
+/* ==========================================================================
+ * FORM LAYOUT (_form-layout.css scoped)
+ * ========================================================================== */
+
+/* ─── Form Root ─── */
+
+wc-form form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--wc-space-4, 1rem);
+  font-family: var(--wc-input-font-family, var(--wc-font-family-sans, sans-serif));
+}
+
+/* ─── Fieldset ─── */
+
+wc-form fieldset {
+  border: var(--wc-border-width-thin, 1px) solid var(--wc-color-neutral-200, #dee2e6);
+  border-radius: var(--wc-border-radius-md, 0.375rem);
+  padding: var(--wc-space-4, 1rem) var(--wc-space-4, 1rem) var(--wc-space-4, 1rem);
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--wc-space-4, 1rem);
+}
+
+/* ─── Legend ─── */
+
+wc-form legend {
+  display: flex;
+  align-items: baseline;
+  gap: var(--wc-space-1, 0.25rem);
+  font-size: var(--wc-font-size-sm, 0.875rem);
+  font-weight: var(--wc-font-weight-semibold, 600);
+  color: var(--wc-color-neutral-700, #343a40);
+  line-height: var(--wc-line-height-normal, 1.5);
+  padding: 0 var(--wc-space-1, 0.25rem);
+}
+
+/* ─── Details / Collapsible Fieldset (Drupal) ─── */
+
+wc-form details {
+  border: var(--wc-border-width-thin, 1px) solid var(--wc-color-neutral-200, #dee2e6);
+  border-radius: var(--wc-border-radius-md, 0.375rem);
+  padding: var(--wc-space-4, 1rem);
+  margin: 0;
+}
+
+wc-form summary {
+  font-size: var(--wc-font-size-sm, 0.875rem);
+  font-weight: var(--wc-font-weight-semibold, 600);
+  color: var(--wc-color-neutral-700, #343a40);
+  line-height: var(--wc-line-height-normal, 1.5);
+  cursor: pointer;
+  padding: var(--wc-space-1, 0.25rem) 0;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+wc-form summary:focus-visible {
+  outline: var(--wc-focus-ring-width, 2px) solid var(--wc-focus-ring-color, #007878);
+  outline-offset: var(--wc-focus-ring-offset, 2px);
+  border-radius: var(--wc-border-radius-sm, 0.25rem);
+}
+
+/* ─── Form Actions (button group) ─── */
+
+wc-form .form-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--wc-space-3, 0.75rem);
+  padding-top: var(--wc-space-4, 1rem);
+}
+
+wc-form .form-actions--end {
+  justify-content: flex-end;
+}
+
+wc-form .form-actions--between {
+  justify-content: space-between;
+}
+
+/* ─── Multi-Column Layout ─── */
+
+wc-form .form-columns {
+  display: grid;
+  gap: var(--wc-space-4, 1rem);
+}
+
+wc-form .form-columns--2 {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+wc-form .form-columns--3 {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+wc-form .form-columns--4 {
+  grid-template-columns: repeat(4, 1fr);
+}
+
+@media (max-width: 640px) {
+  wc-form .form-columns--2,
+  wc-form .form-columns--3,
+  wc-form .form-columns--4 {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ─── Full-Width Form Item (spans all columns) ─── */
+
+wc-form .form-item--full {
+  grid-column: 1 / -1;
+}
+
+/* ─── Inline Form Layout ─── */
+
+wc-form .form-inline {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: var(--wc-space-3, 0.75rem);
+}
+
+wc-form .form-inline .form-item {
+  flex: 1;
+  min-width: 0;
+}
+
+wc-form .form-inline .form-item + .form-item {
+  margin-top: 0;
+}
+
+/* ─── Form Divider ─── */
+
+wc-form .form-divider {
+  border: none;
+  border-top: var(--wc-border-width-thin, 1px) solid var(--wc-color-neutral-200, #dee2e6);
+  margin: var(--wc-space-2, 0.5rem) 0;
+}
+
+
+/* ==========================================================================
+ * VALIDATION (_validation.css scoped)
+ * ========================================================================== */
+
+/* ─── Error State on Field Wrapper ─── */
+
+wc-form .form-item.error label,
+wc-form .form-item.has-error label,
+wc-form .form-item--error label {
+  color: var(--wc-input-error-color, var(--wc-color-error-500, #dc3545));
+}
+
+wc-form .form-item.error input[type='text'],
+wc-form .form-item.error input[type='email'],
+wc-form .form-item.error input[type='password'],
+wc-form .form-item.error input[type='tel'],
+wc-form .form-item.error input[type='url'],
+wc-form .form-item.error input[type='search'],
+wc-form .form-item.error input[type='number'],
+wc-form .form-item.error textarea,
+wc-form .form-item.error select,
+wc-form .form-item.has-error input[type='text'],
+wc-form .form-item.has-error input[type='email'],
+wc-form .form-item.has-error input[type='password'],
+wc-form .form-item.has-error input[type='tel'],
+wc-form .form-item.has-error input[type='url'],
+wc-form .form-item.has-error input[type='search'],
+wc-form .form-item.has-error input[type='number'],
+wc-form .form-item.has-error textarea,
+wc-form .form-item.has-error select,
+wc-form .form-item--error input[type='text'],
+wc-form .form-item--error input[type='email'],
+wc-form .form-item--error input[type='password'],
+wc-form .form-item--error input[type='tel'],
+wc-form .form-item--error input[type='url'],
+wc-form .form-item--error input[type='search'],
+wc-form .form-item--error input[type='number'],
+wc-form .form-item--error textarea,
+wc-form .form-item--error select {
+  border-color: var(--wc-input-error-color, var(--wc-color-error-500, #dc3545));
+}
+
+wc-form .form-item.error input[type='text']:focus,
+wc-form .form-item.error input[type='email']:focus,
+wc-form .form-item.error input[type='password']:focus,
+wc-form .form-item.error input[type='tel']:focus,
+wc-form .form-item.error input[type='url']:focus,
+wc-form .form-item.error input[type='search']:focus,
+wc-form .form-item.error input[type='number']:focus,
+wc-form .form-item.error textarea:focus,
+wc-form .form-item.error select:focus,
+wc-form .form-item.has-error input[type='text']:focus,
+wc-form .form-item.has-error input[type='email']:focus,
+wc-form .form-item.has-error input[type='password']:focus,
+wc-form .form-item.has-error input[type='tel']:focus,
+wc-form .form-item.has-error input[type='url']:focus,
+wc-form .form-item.has-error input[type='search']:focus,
+wc-form .form-item.has-error input[type='number']:focus,
+wc-form .form-item.has-error textarea:focus,
+wc-form .form-item.has-error select:focus,
+wc-form .form-item--error input[type='text']:focus,
+wc-form .form-item--error input[type='email']:focus,
+wc-form .form-item--error input[type='password']:focus,
+wc-form .form-item--error input[type='tel']:focus,
+wc-form .form-item--error input[type='url']:focus,
+wc-form .form-item--error input[type='search']:focus,
+wc-form .form-item--error input[type='number']:focus,
+wc-form .form-item--error textarea:focus,
+wc-form .form-item--error select:focus {
+  border-color: var(--wc-input-error-color, var(--wc-color-error-500, #dc3545));
+  box-shadow: 0 0 0 var(--wc-focus-ring-width, 2px) color-mix(in srgb, var(--wc-input-error-color, var(--wc-color-error-500, #dc3545)) calc(var(--wc-focus-ring-opacity, 0.25) * 100%), transparent);
+}
+
+/* ─── Error State on Checkbox/Radio ─── */
+
+wc-form .form-item.error input[type='checkbox'],
+wc-form .form-item.has-error input[type='checkbox'],
+wc-form .form-item--error input[type='checkbox'] {
+  border-color: var(--wc-checkbox-error-color, var(--wc-color-error-500, #dc3545));
+}
+
+wc-form .form-item.error input[type='checkbox']:checked,
+wc-form .form-item.has-error input[type='checkbox']:checked,
+wc-form .form-item--error input[type='checkbox']:checked {
+  background-color: var(--wc-checkbox-error-color, var(--wc-color-error-500, #dc3545));
+  border-color: var(--wc-checkbox-error-color, var(--wc-color-error-500, #dc3545));
+}
+
+wc-form .form-item.error input[type='radio'],
+wc-form .form-item.has-error input[type='radio'],
+wc-form .form-item--error input[type='radio'] {
+  border-color: var(--wc-color-error-500, #dc3545);
+}
+
+/* ─── Inline Error Message ─── */
+
+wc-form .form-item__error-message,
+wc-form .form-item .error-message,
+wc-form .error-message {
+  font-size: var(--wc-font-size-xs, 0.75rem);
+  color: var(--wc-input-error-color, var(--wc-color-error-500, #dc3545));
+  line-height: var(--wc-line-height-normal, 1.5);
+}
+
+/* ─── Success State on Field Wrapper ─── */
+
+wc-form .form-item.success label,
+wc-form .form-item.has-success label,
+wc-form .form-item--success label {
+  color: var(--wc-color-success-500, #198754);
+}
+
+wc-form .form-item.success input[type='text'],
+wc-form .form-item.success input[type='email'],
+wc-form .form-item.success input[type='password'],
+wc-form .form-item.success input[type='tel'],
+wc-form .form-item.success input[type='url'],
+wc-form .form-item.success input[type='search'],
+wc-form .form-item.success input[type='number'],
+wc-form .form-item.success textarea,
+wc-form .form-item.success select,
+wc-form .form-item.has-success input[type='text'],
+wc-form .form-item.has-success input[type='email'],
+wc-form .form-item.has-success input[type='password'],
+wc-form .form-item.has-success input[type='tel'],
+wc-form .form-item.has-success input[type='url'],
+wc-form .form-item.has-success input[type='search'],
+wc-form .form-item.has-success input[type='number'],
+wc-form .form-item.has-success textarea,
+wc-form .form-item.has-success select,
+wc-form .form-item--success input[type='text'],
+wc-form .form-item--success input[type='email'],
+wc-form .form-item--success input[type='password'],
+wc-form .form-item--success input[type='tel'],
+wc-form .form-item--success input[type='url'],
+wc-form .form-item--success input[type='search'],
+wc-form .form-item--success input[type='number'],
+wc-form .form-item--success textarea,
+wc-form .form-item--success select {
+  border-color: var(--wc-color-success-500, #198754);
+}
+
+wc-form .form-item.success input[type='text']:focus,
+wc-form .form-item.success input[type='email']:focus,
+wc-form .form-item.success input[type='password']:focus,
+wc-form .form-item.success input[type='tel']:focus,
+wc-form .form-item.success input[type='url']:focus,
+wc-form .form-item.success input[type='search']:focus,
+wc-form .form-item.success input[type='number']:focus,
+wc-form .form-item.success textarea:focus,
+wc-form .form-item.success select:focus,
+wc-form .form-item.has-success input[type='text']:focus,
+wc-form .form-item.has-success input[type='email']:focus,
+wc-form .form-item.has-success input[type='password']:focus,
+wc-form .form-item.has-success input[type='tel']:focus,
+wc-form .form-item.has-success input[type='url']:focus,
+wc-form .form-item.has-success input[type='search']:focus,
+wc-form .form-item.has-success input[type='number']:focus,
+wc-form .form-item.has-success textarea:focus,
+wc-form .form-item.has-success select:focus,
+wc-form .form-item--success input[type='text']:focus,
+wc-form .form-item--success input[type='email']:focus,
+wc-form .form-item--success input[type='password']:focus,
+wc-form .form-item--success input[type='tel']:focus,
+wc-form .form-item--success input[type='url']:focus,
+wc-form .form-item--success input[type='search']:focus,
+wc-form .form-item--success input[type='number']:focus,
+wc-form .form-item--success textarea:focus,
+wc-form .form-item--success select:focus {
+  border-color: var(--wc-color-success-500, #198754);
+  box-shadow: 0 0 0 var(--wc-focus-ring-width, 2px) color-mix(in srgb, var(--wc-color-success-500, #198754) calc(var(--wc-focus-ring-opacity, 0.25) * 100%), transparent);
+}
+
+/* ─── Inline Success Message ─── */
+
+wc-form .form-item__success-message,
+wc-form .form-item .success-message,
+wc-form .success-message {
+  font-size: var(--wc-font-size-xs, 0.75rem);
+  color: var(--wc-color-success-500, #198754);
+  line-height: var(--wc-line-height-normal, 1.5);
+}
+
+/* ─── Drupal System Messages ─── */
+
+wc-form .messages--error {
+  border: var(--wc-border-width-thin, 1px) solid var(--wc-input-error-color, var(--wc-color-error-500, #dc3545));
+  border-radius: var(--wc-border-radius-md, 0.375rem);
+  background-color: var(--wc-color-error-50, #fef2f2);
+  color: var(--wc-input-error-color, var(--wc-color-error-500, #dc3545));
+  padding: var(--wc-space-3, 0.75rem) var(--wc-space-4, 1rem);
+  font-size: var(--wc-font-size-sm, 0.875rem);
+  line-height: var(--wc-line-height-normal, 1.5);
+}
+
+wc-form .messages--status {
+  border: var(--wc-border-width-thin, 1px) solid var(--wc-color-success-500, #198754);
+  border-radius: var(--wc-border-radius-md, 0.375rem);
+  background-color: var(--wc-color-success-50, #f0fdf4);
+  color: var(--wc-color-success-500, #198754);
+  padding: var(--wc-space-3, 0.75rem) var(--wc-space-4, 1rem);
+  font-size: var(--wc-font-size-sm, 0.875rem);
+  line-height: var(--wc-line-height-normal, 1.5);
+}
+
+wc-form .messages--warning {
+  border: var(--wc-border-width-thin, 1px) solid var(--wc-color-warning-500, #ffc107);
+  border-radius: var(--wc-border-radius-md, 0.375rem);
+  background-color: var(--wc-color-warning-50, #fffbeb);
+  color: var(--wc-color-warning-700, #92400e);
+  padding: var(--wc-space-3, 0.75rem) var(--wc-space-4, 1rem);
+  font-size: var(--wc-font-size-sm, 0.875rem);
+  line-height: var(--wc-line-height-normal, 1.5);
+}

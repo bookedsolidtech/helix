@@ -1,0 +1,127 @@
+---
+/**
+ * GallerySection — Full-VH section for a single component.
+ *
+ * Shows category label, tag name, CEM description, stat badges,
+ * a glass-styled live demo area, and links to docs/Storybook.
+ */
+import { getCategoryLabel } from '../../lib/cem-gallery-utils';
+import type { GalleryCategory } from '../../lib/cem-gallery-utils';
+
+interface Props {
+  tagName: string;
+  description: string;
+  category: GalleryCategory;
+  sectionIndex: number;
+  propertyCount: number;
+  eventCount: number;
+  slotCount: number;
+  cssPropertyCount: number;
+  accentColor: string;
+}
+
+const {
+  tagName,
+  description,
+  category,
+  sectionIndex,
+  propertyCount,
+  eventCount,
+  slotCount,
+  cssPropertyCount,
+  accentColor,
+} = Astro.props;
+
+const shortName = tagName.replace('wc-', '');
+const searchable = `${tagName} ${shortName} ${description} ${getCategoryLabel(category)}`.toLowerCase();
+const docsHref = `/component-library/${tagName}/`;
+
+// Storybook story IDs: "Components/Button" → "components-button", "Layout/Container" → "layout-container"
+// wc-radio shares stories with wc-radio-group
+const storybookMap: Record<string, string> = {
+  'wc-container': 'layout-container',
+  'wc-radio': 'components-radio-group',
+};
+const storybookId = storybookMap[tagName] ?? `components-${shortName}`;
+const storybookHref = `/storybook/?path=/docs/${storybookId}--docs`;
+
+const isOdd = sectionIndex % 2 === 1;
+---
+
+<section
+  class:list={['cg-slide', isOdd ? 'cg-slide-dark' : 'cg-slide-mid']}
+  id={tagName}
+  data-category={category}
+  data-tag={tagName}
+  data-searchable={searchable}
+  aria-label={tagName}
+>
+  <div class="cg-particles" aria-hidden="true"></div>
+
+  <div class="cg-slide-inner">
+    <div class="cg-section-header scroll-reveal">
+      <span class={`cg-section-label label-${accentColor}`}>
+        {getCategoryLabel(category)}
+      </span>
+      <h2 class="cg-section-title" style={`--accent: var(--wc-${accentColor});`}>
+        <span class="cg-section-tag">&lt;</span>{tagName}<span class="cg-section-tag">&gt;</span>
+      </h2>
+      {description && (
+        <p class="cg-section-desc">{description}</p>
+      )}
+    </div>
+
+    <!-- Stat badges -->
+    <div class="cg-section-stats scroll-reveal scroll-reveal-delay-1">
+      {propertyCount > 0 && (
+        <div class="cg-stat-badge">
+          <span class="cg-stat-badge-value">{propertyCount}</span>
+          <span class="cg-stat-badge-label">{propertyCount === 1 ? 'Property' : 'Properties'}</span>
+        </div>
+      )}
+      {eventCount > 0 && (
+        <div class="cg-stat-badge">
+          <span class="cg-stat-badge-value">{eventCount}</span>
+          <span class="cg-stat-badge-label">{eventCount === 1 ? 'Event' : 'Events'}</span>
+        </div>
+      )}
+      {slotCount > 0 && (
+        <div class="cg-stat-badge">
+          <span class="cg-stat-badge-value">{slotCount}</span>
+          <span class="cg-stat-badge-label">{slotCount === 1 ? 'Slot' : 'Slots'}</span>
+        </div>
+      )}
+      {cssPropertyCount > 0 && (
+        <div class="cg-stat-badge">
+          <span class="cg-stat-badge-value">{cssPropertyCount}</span>
+          <span class="cg-stat-badge-label">CSS Props</span>
+        </div>
+      )}
+    </div>
+
+    <!-- Live demo area -->
+    <div class="cg-demo-area scroll-reveal scroll-reveal-delay-2" style={`--demo-accent: var(--wc-${accentColor});`}>
+      <div class="cg-demo-header">
+        <div class="cg-demo-dots" aria-hidden="true">
+          <span></span><span></span><span></span>
+        </div>
+        <span class="cg-demo-label">Live Demo</span>
+      </div>
+      <div class="cg-demo-content">
+        <slot />
+      </div>
+    </div>
+
+    <!-- Links -->
+    <div class="cg-section-links scroll-reveal scroll-reveal-delay-3">
+      <a href={docsHref} class="cg-link">
+        <i class="fa-solid fa-book-open" aria-hidden="true"></i>
+        Full Docs
+      </a>
+      <a href={storybookHref} class="cg-link" target="_blank" rel="noopener noreferrer">
+        <i class="fa-solid fa-flask" aria-hidden="true"></i>
+        Storybook
+      </a>
+    </div>
+  </div>
+</section>

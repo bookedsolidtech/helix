@@ -1,0 +1,879 @@
+---
+/**
+ * ArchTab3AttributeNaming — Tab 3 of the System Architecture page.
+ *
+ * Contains the "Attribute Naming" Architecture Decision Record:
+ * - Hero section (attribute variant)
+ * - The Problem / The Rule split section
+ * - Wrong vs Correct code comparison
+ * - Allowed vs Must-prefix classification
+ * - Cross-platform safety matrix
+ * - Recommendation section
+ */
+---
+
+<div id="tab-attributes" class="da-tab-content" role="tabpanel">
+  <section class="da-hero da-hero-attributes" aria-label="Attribute Naming Convention Decision">
+    <div class="da-hero-grid" aria-hidden="true"></div>
+    <div class="da-hero-orb da-hero-orb-1" aria-hidden="true"></div>
+    <div class="da-hero-orb da-hero-orb-2" aria-hidden="true"></div>
+    <div class="da-hero-orb da-hero-orb-3" aria-hidden="true"></div>
+
+    <div class="da-hero-content">
+      <div class="da-hero-badge">
+        <span class="da-hero-badge-dot" aria-hidden="true"></span>
+        Architecture Decision Record
+      </div>
+
+      <h1 class="da-hero-title">The Attribute That<br />Breaks Everything</h1>
+
+      <p class="da-hero-subtitle">How a Single Attribute Name Causes Silent Failures</p>
+
+      <p class="da-hero-description">
+        When a custom element uses an attribute name that matches a standard HTML attribute,
+        CMS preprocessors, framework compilers, and browser parsers may intercept, rewrite,
+        or strip it <strong>before</strong> your web component ever receives it. The result:
+        <strong>silent failures</strong> that are nearly impossible to debug in production.
+      </p>
+    </div>
+
+    <div class="mouse-scroll-wrap mouse-scroll-wrap--absolute" aria-hidden="true">
+      <div class="mouse-scroll-body"><div class="mouse-scroll-wheel"></div></div>
+      <span class="mouse-scroll-label">Scroll</span>
+    </div>
+  </section>
+
+  <!-- THE PROBLEM & THE RULE -->
+  <section class="da-section" aria-label="The problem and the rule">
+    <div class="da-section-inner">
+      <div class="da-section-header scroll-reveal">
+        <span class="da-section-label">The Core Issue</span>
+        <h2 class="da-section-title">Invisible Collisions</h2>
+        <p class="da-section-description">
+          Standard HTML attributes carry semantic meaning. When custom elements reuse
+          those names, entire layers of the web stack fight over control.
+        </p>
+      </div>
+
+      <div class="da-attr-split">
+        <div class="da-attr-problem scroll-reveal scroll-reveal-delay-1">
+          <div class="da-attr-icon-wrap da-attr-icon-danger" aria-hidden="true">
+            <i class="fa-solid fa-explosion"></i>
+          </div>
+          <h3 class="da-attr-heading">The Problem</h3>
+          <p class="da-attr-text">
+            When a custom element uses an attribute name that matches a standard HTML attribute
+            &mdash; like <strong>href</strong>, <strong>src</strong>, <strong>action</strong>,
+            <strong>target</strong>, <strong>method</strong>, <strong>role</strong>,
+            <strong>for</strong>, or <strong>data</strong> &mdash;
+            CMS preprocessors (Drupal, WordPress), framework compilers (React, Vue, Angular),
+            and browser HTML parsers may intercept, rewrite, or strip these attributes
+            before the web component receives them.
+          </p>
+          <p class="da-attr-text" style="margin-top: var(--space-4);">
+            This causes <strong>silent failures</strong> that are extremely difficult to debug.
+            The component renders, but the data never arrives. No error is thrown. No warning
+            appears in the console. The attribute simply vanishes.
+          </p>
+        </div>
+
+        <div class="da-attr-rule scroll-reveal scroll-reveal-delay-2">
+          <div class="da-attr-icon-wrap da-attr-icon-safe" aria-hidden="true">
+            <i class="fa-solid fa-shield-halved"></i>
+          </div>
+          <h3 class="da-attr-heading">The Rule</h3>
+          <p class="da-attr-text">
+            Any attribute that does <strong>NOT</strong> mirror standard HTMLElement behavior
+            must be prefixed with <strong>wc-</strong>. This ensures zero conflict with any
+            current or future HTML specification attribute.
+          </p>
+          <p class="da-attr-text" style="margin-top: var(--space-4);">
+            The prefix acts as a <strong>namespace</strong>, clearly signaling to every layer
+            of the stack &mdash; browsers, CMS engines, bundlers, and frameworks &mdash; that
+            this attribute belongs exclusively to the web component and should be passed
+            through without modification.
+          </p>
+        </div>
+      </div>
+
+      <!-- Code Comparison: Wrong vs Correct -->
+      <div class="da-section-header scroll-reveal">
+        <span class="da-section-label">In Practice</span>
+        <h2 class="da-section-title">Wrong vs. Correct</h2>
+        <p class="da-section-description">
+          A single prefix makes the difference between a component that works
+          everywhere and one that silently fails in production.
+        </p>
+      </div>
+
+      <div class="da-attr-code-compare scroll-reveal scroll-reveal-delay-1">
+        <div class="da-attr-code-col">
+          <span class="da-attr-code-label da-attr-code-label-wrong">
+            <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+            Dangerous &mdash; Attribute Collision
+          </span>
+          <div class="da-code-block">
+            <div class="da-code-titlebar">
+              <span class="da-code-dot"></span>
+              <span class="da-code-dot"></span>
+              <span class="da-code-dot"></span>
+              <span class="da-code-filename">card.html.twig</span>
+            </div>
+            <div class="da-code-body">
+              <pre><span class="cmt">&#123;# DANGER: href collides with HTML spec #&#125;</span>
+&lt;<span class="tag">wc-card</span>
+  <span class="prop-hl">href</span>=<span class="val">"/patient/&#123;&#123; nid &#125;&#125;"</span>
+  <span class="prop-hl">target</span>=<span class="val">"_blank"</span>
+&gt;
+  &lt;<span class="tag">h3</span> <span class="slot-hl">slot="heading"</span>&gt;&#123;&#123; title &#125;&#125;&lt;/<span class="tag">h3</span>&gt;
+&lt;/<span class="tag">wc-card</span>&gt;</pre>
+            </div>
+          </div>
+          <p class="da-attr-code-caption">
+            <strong>Drupal's link preprocessor intercepts <code>href</code></strong> and
+            attempts to resolve it as a route. The attribute may be rewritten, stripped,
+            or cause a Twig rendering error.
+          </p>
+        </div>
+
+        <div class="da-attr-code-col">
+          <span class="da-attr-code-label da-attr-code-label-correct">
+            <i class="fa-solid fa-check" aria-hidden="true"></i>
+            Safe &mdash; Prefixed Attribute
+          </span>
+          <div class="da-code-block">
+            <div class="da-code-titlebar">
+              <span class="da-code-dot"></span>
+              <span class="da-code-dot"></span>
+              <span class="da-code-dot"></span>
+              <span class="da-code-filename">card.html.twig</span>
+            </div>
+            <div class="da-code-body">
+              <pre><span class="cmt">&#123;# SAFE: wc- prefix avoids all collisions #&#125;</span>
+&lt;<span class="tag">wc-card</span>
+  <span class="prop-hl">wc-href</span>=<span class="val">"/patient/&#123;&#123; nid &#125;&#125;"</span>
+  <span class="prop-hl">wc-target</span>=<span class="val">"_blank"</span>
+&gt;
+  &lt;<span class="tag">h3</span> <span class="slot-hl">slot="heading"</span>&gt;&#123;&#123; title &#125;&#125;&lt;/<span class="tag">h3</span>&gt;
+&lt;/<span class="tag">wc-card</span>&gt;</pre>
+            </div>
+          </div>
+          <p class="da-attr-code-caption is-safe">
+            <strong>No CMS preprocessor touches <code>wc-href</code></strong>. The attribute
+            passes through every layer untouched and arrives safely at the web component.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ALLOWED vs MUST-PREFIX -->
+  <section class="da-section" style="border-top: 1px solid var(--surface-3);" aria-label="Attribute classification">
+    <div class="da-section-inner">
+      <div class="da-section-header scroll-reveal">
+        <span class="da-section-label">Classification</span>
+        <h2 class="da-section-title">Safe vs. Dangerous</h2>
+        <p class="da-section-description">
+          Some attributes mirror native HTML behavior and are expected by browsers.
+          Others will collide with the platform if used directly.
+        </p>
+      </div>
+
+      <div class="da-attr-lists">
+        <div class="da-attr-list-card scroll-reveal scroll-reveal-delay-1">
+          <div class="da-attr-list-header">
+            <div class="da-attr-list-icon da-attr-list-icon-safe" aria-hidden="true">
+              <i class="fa-solid fa-lock-open"></i>
+            </div>
+            <div>
+              <div class="da-attr-list-title">Allowed Without Prefix</div>
+              <div class="da-attr-list-desc">Mirrors native HTML behavior</div>
+            </div>
+          </div>
+          <div class="da-attr-tags">
+            <span class="da-attr-tag da-attr-tag-safe">disabled</span>
+            <span class="da-attr-tag da-attr-tag-safe">required</span>
+            <span class="da-attr-tag da-attr-tag-safe">name</span>
+            <span class="da-attr-tag da-attr-tag-safe">value</span>
+            <span class="da-attr-tag da-attr-tag-safe">type</span>
+            <span class="da-attr-tag da-attr-tag-safe">placeholder</span>
+            <span class="da-attr-tag da-attr-tag-safe">hidden</span>
+            <span class="da-attr-tag da-attr-tag-safe">tabindex</span>
+          </div>
+          <p class="da-attr-list-note">
+            These attributes mirror behavior that browsers and frameworks expect on
+            form-associated and interactive elements. Using them without a prefix ensures
+            compatibility with native form participation, accessibility APIs, and
+            framework bindings.
+          </p>
+        </div>
+
+        <div class="da-attr-list-card scroll-reveal scroll-reveal-delay-2">
+          <div class="da-attr-list-header">
+            <div class="da-attr-list-icon da-attr-list-icon-prefix" aria-hidden="true">
+              <i class="fa-solid fa-lock"></i>
+            </div>
+            <div>
+              <div class="da-attr-list-title">Must Use wc- Prefix</div>
+              <div class="da-attr-list-desc">Would conflict with HTML/CMS/frameworks</div>
+            </div>
+          </div>
+          <div class="da-attr-tags">
+            <span class="da-attr-tag da-attr-tag-danger">href</span>
+            <span class="da-attr-tag-arrow" aria-hidden="true"><i class="fa-solid fa-arrow-right"></i></span>
+            <span class="da-attr-tag da-attr-tag-result">wc-href</span>
+
+            <span class="da-attr-tag da-attr-tag-danger">src</span>
+            <span class="da-attr-tag-arrow" aria-hidden="true"><i class="fa-solid fa-arrow-right"></i></span>
+            <span class="da-attr-tag da-attr-tag-result">wc-src</span>
+
+            <span class="da-attr-tag da-attr-tag-danger">action</span>
+            <span class="da-attr-tag-arrow" aria-hidden="true"><i class="fa-solid fa-arrow-right"></i></span>
+            <span class="da-attr-tag da-attr-tag-result">wc-action</span>
+
+            <span class="da-attr-tag da-attr-tag-danger">target</span>
+            <span class="da-attr-tag-arrow" aria-hidden="true"><i class="fa-solid fa-arrow-right"></i></span>
+            <span class="da-attr-tag da-attr-tag-result">wc-target</span>
+
+            <span class="da-attr-tag da-attr-tag-danger">method</span>
+            <span class="da-attr-tag-arrow" aria-hidden="true"><i class="fa-solid fa-arrow-right"></i></span>
+            <span class="da-attr-tag da-attr-tag-result">wc-method</span>
+
+            <span class="da-attr-tag da-attr-tag-danger">role</span>
+            <span class="da-attr-tag-arrow" aria-hidden="true"><i class="fa-solid fa-arrow-right"></i></span>
+            <span class="da-attr-tag da-attr-tag-result">wc-role</span>
+
+            <span class="da-attr-tag da-attr-tag-danger">for</span>
+            <span class="da-attr-tag-arrow" aria-hidden="true"><i class="fa-solid fa-arrow-right"></i></span>
+            <span class="da-attr-tag da-attr-tag-result">wc-for</span>
+
+            <span class="da-attr-tag da-attr-tag-danger">data</span>
+            <span class="da-attr-tag-arrow" aria-hidden="true"><i class="fa-solid fa-arrow-right"></i></span>
+            <span class="da-attr-tag da-attr-tag-result">wc-data</span>
+          </div>
+          <p class="da-attr-list-note">
+            These attribute names have established meaning in HTML, ARIA, or CMS
+            template engines. Using them directly on custom elements causes preprocessors,
+            compilers, and parsers to intercept and modify them before the web component
+            ever sees the value.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- DECISION MATRIX -->
+  <section class="da-section" style="border-top: 1px solid var(--surface-3);" aria-label="Attribute safety matrix">
+    <div class="da-section-inner">
+      <div class="da-section-header scroll-reveal">
+        <span class="da-section-label">Compatibility</span>
+        <h2 class="da-section-title">Cross-Platform Safety Matrix</h2>
+        <p class="da-section-description">
+          How unprefixed attributes behave across the five layers of the web stack
+          that process HTML before your component receives it.
+        </p>
+      </div>
+
+      <div class="da-attr-matrix scroll-reveal scroll-reveal-delay-1">
+        <div class="da-attr-matrix-header">
+          <div class="da-attr-matrix-header-cell">Attribute</div>
+          <div class="da-attr-matrix-header-cell" style="color: var(--wc-cyan);">
+            <i class="fa-solid fa-code" aria-hidden="true"></i> HTML Parser
+          </div>
+          <div class="da-attr-matrix-header-cell" style="color: var(--wc-amber);">
+            <i class="fa-brands fa-drupal" aria-hidden="true"></i> Drupal
+          </div>
+          <div class="da-attr-matrix-header-cell" style="color: var(--wc-pink);">
+            <i class="fa-brands fa-wordpress" aria-hidden="true"></i> WordPress
+          </div>
+          <div class="da-attr-matrix-header-cell" style="color: var(--wc-accent);">
+            <i class="fa-solid fa-cubes" aria-hidden="true"></i> Frameworks
+          </div>
+          <div class="da-attr-matrix-header-cell" style="color: var(--wc-green);">
+            <i class="fa-solid fa-universal-access" aria-hidden="true"></i> A11y Tree
+          </div>
+        </div>
+
+        <!-- href -->
+        <div class="da-attr-matrix-row is-danger">
+          <div class="da-attr-matrix-cell">href</div>
+          <div class="da-attr-matrix-cell da-attr-matrix-danger"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i></div>
+          <div class="da-attr-matrix-cell da-attr-matrix-danger"><i class="fa-solid fa-xmark" aria-hidden="true"></i></div>
+          <div class="da-attr-matrix-cell da-attr-matrix-danger"><i class="fa-solid fa-xmark" aria-hidden="true"></i></div>
+          <div class="da-attr-matrix-cell da-attr-matrix-warn"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i></div>
+          <div class="da-attr-matrix-cell da-attr-matrix-danger"><i class="fa-solid fa-xmark" aria-hidden="true"></i></div>
+        </div>
+
+        <!-- src -->
+        <div class="da-attr-matrix-row is-danger">
+          <div class="da-attr-matrix-cell">src</div>
+          <div class="da-attr-matrix-cell da-attr-matrix-danger"><i class="fa-solid fa-xmark" aria-hidden="true"></i></div>
+          <div class="da-attr-matrix-cell da-attr-matrix-danger"><i class="fa-solid fa-xmark" aria-hidden="true"></i></div>
+          <div class="da-attr-matrix-cell da-attr-matrix-danger"><i class="fa-solid fa-xmark" aria-hidden="true"></i></div>
+          <div class="da-attr-matrix-cell da-attr-matrix-danger"><i class="fa-solid fa-xmark" aria-hidden="true"></i></div>
+          <div class="da-attr-matrix-cell da-attr-matrix-safe"><i class="fa-solid fa-check" aria-hidden="true"></i></div>
+        </div>
+
+        <!-- action -->
+        <div class="da-attr-matrix-row is-danger">
+          <div class="da-attr-matrix-cell">action</div>
+          <div class="da-attr-matrix-cell da-attr-matrix-danger"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i></div>
+          <div class="da-attr-matrix-cell da-attr-matrix-danger"><i class="fa-solid fa-xmark" aria-hidden="true"></i></div>
+          <div class="da-attr-matrix-cell da-attr-matrix-warn"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i></div>
+          <div class="da-attr-matrix-cell da-attr-matrix-warn"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i></div>
+          <div class="da-attr-matrix-cell da-attr-matrix-safe"><i class="fa-solid fa-check" aria-hidden="true"></i></div>
+        </div>
+
+        <!-- target -->
+        <div class="da-attr-matrix-row is-danger">
+          <div class="da-attr-matrix-cell">target</div>
+          <div class="da-attr-matrix-cell da-attr-matrix-danger"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i></div>
+          <div class="da-attr-matrix-cell da-attr-matrix-danger"><i class="fa-solid fa-xmark" aria-hidden="true"></i></div>
+          <div class="da-attr-matrix-cell da-attr-matrix-warn"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i></div>
+          <div class="da-attr-matrix-cell da-attr-matrix-warn"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i></div>
+          <div class="da-attr-matrix-cell da-attr-matrix-safe"><i class="fa-solid fa-check" aria-hidden="true"></i></div>
+        </div>
+
+        <!-- method -->
+        <div class="da-attr-matrix-row is-danger">
+          <div class="da-attr-matrix-cell">method</div>
+          <div class="da-attr-matrix-cell da-attr-matrix-danger"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i></div>
+          <div class="da-attr-matrix-cell da-attr-matrix-warn"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i></div>
+          <div class="da-attr-matrix-cell da-attr-matrix-safe"><i class="fa-solid fa-check" aria-hidden="true"></i></div>
+          <div class="da-attr-matrix-cell da-attr-matrix-warn"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i></div>
+          <div class="da-attr-matrix-cell da-attr-matrix-safe"><i class="fa-solid fa-check" aria-hidden="true"></i></div>
+        </div>
+
+        <!-- role -->
+        <div class="da-attr-matrix-row is-danger">
+          <div class="da-attr-matrix-cell">role</div>
+          <div class="da-attr-matrix-cell da-attr-matrix-safe"><i class="fa-solid fa-check" aria-hidden="true"></i></div>
+          <div class="da-attr-matrix-cell da-attr-matrix-warn"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i></div>
+          <div class="da-attr-matrix-cell da-attr-matrix-safe"><i class="fa-solid fa-check" aria-hidden="true"></i></div>
+          <div class="da-attr-matrix-cell da-attr-matrix-danger"><i class="fa-solid fa-xmark" aria-hidden="true"></i></div>
+          <div class="da-attr-matrix-cell da-attr-matrix-danger"><i class="fa-solid fa-xmark" aria-hidden="true"></i></div>
+        </div>
+
+        <!-- for -->
+        <div class="da-attr-matrix-row is-danger">
+          <div class="da-attr-matrix-cell">for</div>
+          <div class="da-attr-matrix-cell da-attr-matrix-danger"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i></div>
+          <div class="da-attr-matrix-cell da-attr-matrix-danger"><i class="fa-solid fa-xmark" aria-hidden="true"></i></div>
+          <div class="da-attr-matrix-cell da-attr-matrix-warn"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i></div>
+          <div class="da-attr-matrix-cell da-attr-matrix-danger"><i class="fa-solid fa-xmark" aria-hidden="true"></i></div>
+          <div class="da-attr-matrix-cell da-attr-matrix-danger"><i class="fa-solid fa-xmark" aria-hidden="true"></i></div>
+        </div>
+
+        <!-- data -->
+        <div class="da-attr-matrix-row is-danger">
+          <div class="da-attr-matrix-cell">data</div>
+          <div class="da-attr-matrix-cell da-attr-matrix-danger"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i></div>
+          <div class="da-attr-matrix-cell da-attr-matrix-danger"><i class="fa-solid fa-xmark" aria-hidden="true"></i></div>
+          <div class="da-attr-matrix-cell da-attr-matrix-danger"><i class="fa-solid fa-xmark" aria-hidden="true"></i></div>
+          <div class="da-attr-matrix-cell da-attr-matrix-danger"><i class="fa-solid fa-xmark" aria-hidden="true"></i></div>
+          <div class="da-attr-matrix-cell da-attr-matrix-safe"><i class="fa-solid fa-check" aria-hidden="true"></i></div>
+        </div>
+
+        <!-- wc-href (safe) -->
+        <div class="da-attr-matrix-row is-highlighted">
+          <div class="da-attr-matrix-cell" style="color: var(--wc-green);">wc-href</div>
+          <div class="da-attr-matrix-cell da-attr-matrix-safe"><i class="fa-solid fa-check" aria-hidden="true"></i></div>
+          <div class="da-attr-matrix-cell da-attr-matrix-safe"><i class="fa-solid fa-check" aria-hidden="true"></i></div>
+          <div class="da-attr-matrix-cell da-attr-matrix-safe"><i class="fa-solid fa-check" aria-hidden="true"></i></div>
+          <div class="da-attr-matrix-cell da-attr-matrix-safe"><i class="fa-solid fa-check" aria-hidden="true"></i></div>
+          <div class="da-attr-matrix-cell da-attr-matrix-safe"><i class="fa-solid fa-check" aria-hidden="true"></i></div>
+        </div>
+
+        <!-- wc-src (safe) -->
+        <div class="da-attr-matrix-row is-highlighted">
+          <div class="da-attr-matrix-cell" style="color: var(--wc-green);">wc-src</div>
+          <div class="da-attr-matrix-cell da-attr-matrix-safe"><i class="fa-solid fa-check" aria-hidden="true"></i></div>
+          <div class="da-attr-matrix-cell da-attr-matrix-safe"><i class="fa-solid fa-check" aria-hidden="true"></i></div>
+          <div class="da-attr-matrix-cell da-attr-matrix-safe"><i class="fa-solid fa-check" aria-hidden="true"></i></div>
+          <div class="da-attr-matrix-cell da-attr-matrix-safe"><i class="fa-solid fa-check" aria-hidden="true"></i></div>
+          <div class="da-attr-matrix-cell da-attr-matrix-safe"><i class="fa-solid fa-check" aria-hidden="true"></i></div>
+        </div>
+
+        <!-- wc-action (safe) -->
+        <div class="da-attr-matrix-row is-highlighted">
+          <div class="da-attr-matrix-cell" style="color: var(--wc-green);">wc-action</div>
+          <div class="da-attr-matrix-cell da-attr-matrix-safe"><i class="fa-solid fa-check" aria-hidden="true"></i></div>
+          <div class="da-attr-matrix-cell da-attr-matrix-safe"><i class="fa-solid fa-check" aria-hidden="true"></i></div>
+          <div class="da-attr-matrix-cell da-attr-matrix-safe"><i class="fa-solid fa-check" aria-hidden="true"></i></div>
+          <div class="da-attr-matrix-cell da-attr-matrix-safe"><i class="fa-solid fa-check" aria-hidden="true"></i></div>
+          <div class="da-attr-matrix-cell da-attr-matrix-safe"><i class="fa-solid fa-check" aria-hidden="true"></i></div>
+        </div>
+      </div>
+
+      <!-- Legend -->
+      <div class="scroll-reveal scroll-reveal-delay-2" style="display: flex; gap: var(--space-8); justify-content: center; flex-wrap: wrap; margin-bottom: var(--space-8);">
+        <div style="display: flex; align-items: center; gap: var(--space-2); font-size: 0.8125rem; color: var(--text-secondary);">
+          <i class="fa-solid fa-check" style="color: var(--wc-green);" aria-hidden="true"></i>
+          Safe &mdash; passes through unchanged
+        </div>
+        <div style="display: flex; align-items: center; gap: var(--space-2); font-size: 0.8125rem; color: var(--text-secondary);">
+          <i class="fa-solid fa-triangle-exclamation" style="color: var(--wc-amber);" aria-hidden="true"></i>
+          Risky &mdash; may be intercepted or modified
+        </div>
+        <div style="display: flex; align-items: center; gap: var(--space-2); font-size: 0.8125rem; color: var(--text-secondary);">
+          <i class="fa-solid fa-xmark" style="color: var(--wc-red);" aria-hidden="true"></i>
+          Dangerous &mdash; will be rewritten or stripped
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- RECOMMENDATION -->
+  <section class="da-section da-rec-section" aria-label="Attribute naming recommendation">
+    <div class="da-section-inner">
+      <div class="da-rec-hero scroll-reveal" style="border-color: rgba(245, 158, 11, 0.2); background: linear-gradient(135deg, rgba(245, 158, 11, 0.06), rgba(239, 68, 68, 0.04), rgba(16, 185, 129, 0.06));">
+        <div class="da-rec-title" style="background: linear-gradient(135deg, var(--wc-amber), var(--wc-green)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">
+          Prefix Everything. Trust Nothing.
+        </div>
+        <p class="da-rec-subtitle">
+          When in doubt, use the <code style="background: rgba(255,255,255,0.08); padding: 0.15em 0.5em; border-radius: 4px; font-family: var(--font-mono); font-weight: 700; color: var(--wc-green);">wc-</code> prefix.
+          It is always safe. Omitting the prefix is only safe when you are
+          <strong>intentionally mirroring</strong> native HTMLElement behavior.
+        </p>
+      </div>
+
+      <div class="da-rec-principles scroll-reveal scroll-reveal-delay-1">
+        <div class="da-rec-principle">
+          <div class="da-rec-principle-icon" style="background: linear-gradient(135deg, rgba(239, 68, 68, 0.12), rgba(245, 158, 11, 0.08)); border-color: rgba(239, 68, 68, 0.15); color: var(--wc-red);">
+            <i class="fa-solid fa-ghost" aria-hidden="true"></i>
+          </div>
+          <h3 class="da-rec-principle-title">Silent Failures Kill</h3>
+          <p class="da-rec-principle-desc">
+            An attribute stripped by a CMS preprocessor produces no error, no warning,
+            and no stack trace. The component renders, but the data is gone. In healthcare
+            applications, silent data loss is unacceptable.
+          </p>
+        </div>
+
+        <div class="da-rec-principle">
+          <div class="da-rec-principle-icon" style="background: linear-gradient(135deg, rgba(6, 182, 212, 0.12), rgba(102, 126, 234, 0.08)); border-color: rgba(6, 182, 212, 0.15); color: var(--wc-cyan);">
+            <i class="fa-solid fa-forward" aria-hidden="true"></i>
+          </div>
+          <h3 class="da-rec-principle-title">Future-Proof by Default</h3>
+          <p class="da-rec-principle-desc">
+            The HTML specification adds new attributes over time. An attribute name safe
+            today may collide tomorrow. The <code>wc-</code> prefix guarantees permanent
+            safety because no specification will ever use that namespace.
+          </p>
+        </div>
+
+        <div class="da-rec-principle">
+          <div class="da-rec-principle-icon">
+            <i class="fa-solid fa-handshake" aria-hidden="true"></i>
+          </div>
+          <h3 class="da-rec-principle-title">Universal Compatibility</h3>
+          <p class="da-rec-principle-desc">
+            Prefixed attributes pass through every layer of every stack without
+            interference: Drupal Twig, WordPress PHP, React JSX, Vue templates,
+            Angular bindings, and browser HTML parsers all leave them untouched.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+</div><!-- end tab-attributes -->
+
+<style is:inline>
+  /* ============================================
+     TAB 3: ATTRIBUTE NAMING ADR
+     ============================================ */
+
+  /* Hero variant for attribute naming tab */
+  .da-hero-attributes .da-hero-title {
+    background: linear-gradient(180deg, rgba(239, 68, 68, 1) 0%, rgba(245, 158, 11, 0.7) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .da-hero-attributes .da-hero-subtitle {
+    background: linear-gradient(90deg, rgba(239, 68, 68, 0.9), rgba(245, 158, 11, 0.9));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .da-hero-attributes .da-hero-badge-dot {
+    background: var(--wc-red);
+    box-shadow: 0 0 8px var(--wc-red);
+  }
+
+  .da-hero-attributes .da-hero-orb-1 {
+    background: radial-gradient(circle, rgba(239, 68, 68, 0.3), transparent 70%);
+  }
+
+  .da-hero-attributes .da-hero-orb-2 {
+    background: radial-gradient(circle, rgba(245, 158, 11, 0.25), transparent 70%);
+  }
+
+  .da-hero-attributes .da-hero-orb-3 {
+    background: radial-gradient(circle, rgba(139, 92, 246, 0.2), transparent 70%);
+  }
+
+  /* The Problem / The Rule split section */
+  .da-attr-split {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-8);
+    margin-bottom: var(--space-16);
+  }
+
+  .da-attr-problem,
+  .da-attr-rule {
+    padding: var(--space-8);
+    border-radius: var(--radius-2xl);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .da-attr-problem {
+    background: linear-gradient(135deg, rgba(239, 68, 68, 0.06), rgba(245, 158, 11, 0.04));
+    border: 1px solid rgba(239, 68, 68, 0.2);
+  }
+
+  .da-attr-rule {
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.06), rgba(6, 182, 212, 0.04));
+    border: 1px solid rgba(16, 185, 129, 0.2);
+  }
+
+  .da-attr-icon-wrap {
+    width: 64px;
+    height: 64px;
+    border-radius: var(--radius-xl);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    margin-bottom: var(--space-5);
+  }
+
+  .da-attr-icon-danger {
+    background: linear-gradient(135deg, rgba(239, 68, 68, 0.15), rgba(239, 68, 68, 0.05));
+    border: 1px solid rgba(239, 68, 68, 0.2);
+    color: var(--wc-red);
+  }
+
+  .da-attr-icon-safe {
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.15), rgba(16, 185, 129, 0.05));
+    border: 1px solid rgba(16, 185, 129, 0.2);
+    color: var(--wc-green);
+  }
+
+  .da-attr-heading {
+    font-size: 1.5rem;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    margin-bottom: var(--space-4);
+    color: var(--text-primary);
+  }
+
+  .da-attr-text {
+    font-size: 0.9375rem;
+    color: var(--text-secondary);
+    line-height: 1.75;
+  }
+
+  .da-attr-text strong {
+    color: var(--text-primary);
+    font-weight: 700;
+  }
+
+  /* Code comparison columns */
+  .da-attr-code-compare {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-6);
+    margin-bottom: var(--space-16);
+  }
+
+  .da-attr-code-col {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+
+  .da-attr-code-label {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-size: 0.8125rem;
+    font-weight: 700;
+    padding: var(--space-2) var(--space-4);
+    border-radius: var(--radius-full);
+  }
+
+  .da-attr-code-label-wrong {
+    background: rgba(239, 68, 68, 0.1);
+    color: var(--wc-red);
+    border: 1px solid rgba(239, 68, 68, 0.2);
+  }
+
+  .da-attr-code-label-correct {
+    background: rgba(16, 185, 129, 0.1);
+    color: var(--wc-green);
+    border: 1px solid rgba(16, 185, 129, 0.2);
+  }
+
+  .da-attr-code-caption {
+    font-size: 0.8125rem;
+    color: var(--text-muted);
+    line-height: 1.6;
+    font-style: italic;
+  }
+
+  .da-attr-code-caption strong {
+    color: var(--wc-red);
+    font-style: normal;
+  }
+
+  .da-attr-code-caption.is-safe strong {
+    color: var(--wc-green);
+  }
+
+  /* Allowed / Must-prefix lists */
+  .da-attr-lists {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-8);
+    margin-bottom: var(--space-16);
+  }
+
+  .da-attr-list-card {
+    padding: var(--space-8);
+    border-radius: var(--radius-2xl);
+    background: var(--surface-1);
+    border: 1px solid var(--surface-3);
+    transition: all 0.3s ease;
+  }
+
+  .da-attr-list-card:hover {
+    background: var(--surface-2);
+    transform: translateY(-3px);
+  }
+
+  .da-attr-list-header {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    margin-bottom: var(--space-5);
+  }
+
+  .da-attr-list-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: var(--radius-lg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+  }
+
+  .da-attr-list-icon-safe {
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.12), rgba(6, 182, 212, 0.08));
+    border: 1px solid rgba(16, 185, 129, 0.15);
+    color: var(--wc-green);
+  }
+
+  .da-attr-list-icon-prefix {
+    background: linear-gradient(135deg, rgba(245, 158, 11, 0.12), rgba(239, 68, 68, 0.08));
+    border: 1px solid rgba(245, 158, 11, 0.15);
+    color: var(--wc-amber);
+  }
+
+  .da-attr-list-title {
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: var(--text-primary);
+  }
+
+  .da-attr-list-desc {
+    font-size: 0.8125rem;
+    color: var(--text-muted);
+  }
+
+  .da-attr-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    margin-bottom: var(--space-5);
+  }
+
+  .da-attr-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-2) var(--space-4);
+    border-radius: var(--radius-full);
+    font-size: 0.8125rem;
+    font-weight: 600;
+    font-family: var(--font-mono);
+  }
+
+  .da-attr-tag-safe {
+    background: rgba(16, 185, 129, 0.08);
+    color: var(--wc-green);
+    border: 1px solid rgba(16, 185, 129, 0.15);
+  }
+
+  .da-attr-tag-danger {
+    background: rgba(239, 68, 68, 0.08);
+    color: var(--wc-red);
+    border: 1px solid rgba(239, 68, 68, 0.15);
+  }
+
+  .da-attr-tag-arrow {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    margin: 0 var(--space-1);
+  }
+
+  .da-attr-tag-result {
+    background: rgba(16, 185, 129, 0.08);
+    color: var(--wc-green);
+    border: 1px solid rgba(16, 185, 129, 0.15);
+  }
+
+  .da-attr-list-note {
+    font-size: 0.8125rem;
+    color: var(--text-muted);
+    line-height: 1.6;
+    padding-top: var(--space-4);
+    border-top: 1px solid var(--surface-3);
+  }
+
+  /* Decision matrix for attribute safety */
+  .da-attr-matrix {
+    border-radius: var(--radius-xl);
+    overflow: hidden;
+    border: 1px solid var(--surface-3);
+    background: var(--surface-1);
+    margin-bottom: var(--space-16);
+  }
+
+  .da-attr-matrix-header {
+    display: grid;
+    grid-template-columns: 1.4fr 1fr 1fr 1fr 1fr 1fr;
+    background: var(--surface-2);
+    border-bottom: 1px solid var(--surface-3);
+  }
+
+  .da-attr-matrix-header-cell {
+    padding: var(--space-4) var(--space-3);
+    font-size: 0.6875rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text-muted);
+    text-align: center;
+  }
+
+  .da-attr-matrix-header-cell:first-child {
+    text-align: left;
+  }
+
+  .da-attr-matrix-row {
+    display: grid;
+    grid-template-columns: 1.4fr 1fr 1fr 1fr 1fr 1fr;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+    transition: background 0.2s ease;
+  }
+
+  .da-attr-matrix-row:last-child {
+    border-bottom: none;
+  }
+
+  .da-attr-matrix-row:hover {
+    background: rgba(102, 126, 234, 0.03);
+  }
+
+  .da-attr-matrix-cell {
+    padding: var(--space-3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8125rem;
+  }
+
+  .da-attr-matrix-cell:first-child {
+    justify-content: flex-start;
+    gap: var(--space-2);
+    font-weight: 600;
+    font-family: var(--font-mono);
+    color: var(--text-primary);
+    font-size: 0.8125rem;
+  }
+
+  .da-attr-matrix-safe {
+    color: var(--wc-green);
+  }
+
+  .da-attr-matrix-danger {
+    color: var(--wc-red);
+  }
+
+  .da-attr-matrix-warn {
+    color: var(--wc-amber);
+  }
+
+  .da-attr-matrix-row.is-highlighted {
+    background: rgba(16, 185, 129, 0.04);
+  }
+
+  .da-attr-matrix-row.is-danger {
+    background: rgba(239, 68, 68, 0.03);
+  }
+
+  /* Responsive for attribute tab */
+  @media (max-width: 1100px) {
+    .da-attr-split,
+    .da-attr-code-compare,
+    .da-attr-lists {
+      grid-template-columns: 1fr;
+    }
+
+    .da-attr-matrix-header,
+    .da-attr-matrix-row {
+      grid-template-columns: 1.4fr 1fr 1fr;
+    }
+
+    .da-attr-matrix-header-cell:nth-child(n+5),
+    .da-attr-matrix-cell:nth-child(n+5) {
+      display: none;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .da-attr-matrix-header,
+    .da-attr-matrix-row {
+      grid-template-columns: 1fr;
+    }
+
+    .da-attr-matrix-header-cell:not(:first-child) {
+      display: none;
+    }
+
+    .da-attr-matrix-cell {
+      padding: var(--space-3) var(--space-4);
+    }
+
+    .da-attr-matrix-cell::before {
+      font-size: 0.6875rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-right: var(--space-2);
+      display: inline;
+    }
+
+    .da-attr-matrix-cell:nth-child(2)::before { content: 'HTML: '; color: var(--wc-cyan); }
+    .da-attr-matrix-cell:nth-child(3)::before { content: 'Drupal: '; color: var(--wc-amber); }
+    .da-attr-matrix-cell:nth-child(4)::before { content: 'WP: '; color: var(--wc-pink); }
+    .da-attr-matrix-cell:nth-child(5)::before { content: 'FW: '; color: var(--wc-accent); }
+    .da-attr-matrix-cell:nth-child(6)::before { content: 'A11y: '; color: var(--wc-green); }
+  }
+</style>

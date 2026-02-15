@@ -3,21 +3,11 @@ import { css } from 'lit';
 export const wcButtonStyles = css`
   :host {
     display: inline-block;
-
-    /**
-     * @cssprop [--wc-button-bg=var(--wc-color-primary-500, #007878)] - Background color
-     * @cssprop [--wc-button-color=var(--wc-color-neutral-0, #ffffff)] - Text color
-     * @cssprop [--wc-button-border-color=transparent] - Border color
-     * @cssprop [--wc-button-border-radius=var(--wc-border-radius-md, 0.375rem)] - Border radius
-     * @cssprop [--wc-button-font-family=var(--wc-font-family-sans, sans-serif)] - Font family
-     * @cssprop [--wc-button-font-weight=var(--wc-font-weight-semibold, 600)] - Font weight
-     * @cssprop [--wc-button-focus-ring-color=var(--wc-focus-ring-color, #007878)] - Focus ring color
-     */
   }
 
   :host([disabled]) {
     pointer-events: none;
-    opacity: 0.5;
+    opacity: var(--wc-opacity-disabled, 0.5);
   }
 
   .button {
@@ -49,11 +39,11 @@ export const wcButtonStyles = css`
   }
 
   .button:hover {
-    filter: brightness(0.9);
+    filter: brightness(var(--wc-filter-brightness-hover, 0.9));
   }
 
   .button:active {
-    filter: brightness(0.8);
+    filter: brightness(var(--wc-filter-brightness-active, 0.8));
   }
 
   /* ─── Size Variants ─── */
@@ -61,19 +51,19 @@ export const wcButtonStyles = css`
   .button--sm {
     padding: var(--wc-space-1, 0.25rem) var(--wc-space-3, 0.75rem);
     font-size: var(--wc-font-size-sm, 0.875rem);
-    min-height: 2rem;
+    min-height: var(--wc-size-8, 2rem);
   }
 
   .button--md {
     padding: var(--wc-space-2, 0.5rem) var(--wc-space-4, 1rem);
     font-size: var(--wc-font-size-md, 1rem);
-    min-height: 2.5rem;
+    min-height: var(--wc-size-10, 2.5rem);
   }
 
   .button--lg {
     padding: var(--wc-space-3, 0.75rem) var(--wc-space-6, 1.5rem);
     font-size: var(--wc-font-size-lg, 1.125rem);
-    min-height: 3rem;
+    min-height: var(--wc-size-12, 3rem);
   }
 
   /* ─── Style Variants ─── */
@@ -108,6 +98,6 @@ export const wcButtonStyles = css`
 
   .button[disabled] {
     cursor: not-allowed;
-    opacity: 0.5;
+    opacity: var(--wc-opacity-disabled, 0.5);
   }
 `;

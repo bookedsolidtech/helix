@@ -1,0 +1,73 @@
+/* ==========================================================================
+   Prose Code
+   Inline code, code blocks, and pre-formatted text
+   for rich text / WYSIWYG content.
+   ========================================================================== */
+
+/* ─── Inline Code ─── */
+
+code {
+  font-family: var(--wc-font-family-mono, 'JetBrains Mono', ui-monospace, 'Cascadia Code', monospace);
+  font-size: 0.875em;
+  font-weight: var(--wc-font-weight-normal, 400);
+  background-color: var(--wc-color-surface-sunken, var(--wc-color-neutral-100, #e9ecef));
+  color: var(--wc-color-error-600, #b02a37);
+  padding: 0.125em var(--wc-space-1, 0.25rem);
+  border-radius: var(--wc-border-radius-sm, 0.25rem);
+  word-break: break-word;
+}
+
+/* ─── Code Blocks (pre > code) ─── */
+
+pre {
+  margin-top: 0;
+  margin-bottom: var(--wc-space-6, 1.5rem);
+  padding: var(--wc-space-4, 1rem) var(--wc-space-5, 1.25rem);
+  overflow-x: auto;
+  font-family: var(--wc-font-family-mono, 'JetBrains Mono', ui-monospace, 'Cascadia Code', monospace);
+  font-size: var(--wc-font-size-sm, 0.875rem);
+  line-height: var(--wc-line-height-relaxed, 1.75);
+  color: var(--wc-color-neutral-800, #212529);
+  background-color: var(--wc-color-surface-sunken, var(--wc-color-neutral-100, #e9ecef));
+  border: var(--wc-border-width-thin, 1px) solid var(--wc-color-border-default, var(--wc-color-neutral-200, #dee2e6));
+  border-radius: var(--wc-border-radius-md, 0.375rem);
+  -webkit-overflow-scrolling: touch;
+  tab-size: 2;
+}
+
+/* Reset inline code styles when inside a pre block */
+pre code {
+  background-color: transparent;
+  color: inherit;
+  padding: 0;
+  border-radius: 0;
+  font-size: inherit;
+  font-weight: inherit;
+  word-break: normal;
+}
+
+/* ─── Keyboard Input ─── */
+
+kbd {
+  font-family: var(--wc-font-family-mono, 'JetBrains Mono', ui-monospace, 'Cascadia Code', monospace);
+  font-size: 0.875em;
+  padding: 0.125em var(--wc-space-2, 0.5rem);
+  background-color: var(--wc-color-neutral-800, #212529);
+  color: var(--wc-color-neutral-0, #ffffff);
+  border-radius: var(--wc-border-radius-sm, 0.25rem);
+  box-shadow: inset 0 -1px 0 rgba(0, 0, 0, 0.25);
+}
+
+/* ─── Sample Output ─── */
+
+samp {
+  font-family: var(--wc-font-family-mono, 'JetBrains Mono', ui-monospace, 'Cascadia Code', monospace);
+  font-size: 0.875em;
+}
+
+/* ─── Variable ─── */
+
+var {
+  font-style: italic;
+  color: var(--wc-color-secondary-600, #4f46e5);
+}

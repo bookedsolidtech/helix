@@ -445,15 +445,42 @@ body:has(.hero-section) main.sl-flex {
   padding-top: 0 !important;
 }
 
-/* Nuclear option - target EVERYTHING when hero is present */
+/* Nuclear option - kill top spacing on wrappers */
 body:has(.hero-section) .page,
 body:has(.hero-section) .main-pane,
 body:has(.hero-section) .sl-markdown-content,
+body:has(.hero-section) .content-panel,
 body:has(.hero-section) .content-panel > *:first-child,
 body:has(.hero-section) main > *:first-child,
 body:has(.hero-section) [data-pagefind-body] {
   margin-top: 0 !important;
   padding-top: 0 !important;
+}
+
+/* Kill ALL between-section gaps on splash/hero pages */
+body:has(.hero-section) .sl-markdown-content > * + * {
+  margin-top: 0 !important;
+}
+
+/* Scroll-snap on homepage — sections snap below the fixed nav */
+@media (min-width: 1025px) {
+  html:has(.hero-section) {
+    scroll-snap-type: y proximity;
+  }
+  body:has(.hero-section) .sl-markdown-content > * {
+    scroll-snap-align: start;
+    scroll-margin-top: var(--sl-nav-height);
+  }
+  body:has(.hero-section) .hero-section {
+    scroll-snap-align: start;
+    scroll-margin-top: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html:has(.hero-section) {
+    scroll-snap-type: none !important;
+  }
 }
 
 /* Target Starlight's splash template specifically */
@@ -527,8 +554,7 @@ starlight-theme-select button:hover {
    HERO SECTION - Dramatic full-viewport showcase
    ================================================ */
 .hero-section {
-  min-height: 100vh;
-  min-height: 100dvh;
+  min-height: calc(100dvh - var(--sl-nav-height) - var(--sl-mobile-toc-height) + 300px);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -657,6 +683,7 @@ starlight-theme-select button:hover {
   text-align: center;
   z-index: 1;
   padding: var(--space-20) var(--space-8) var(--space-12);
+  margin-top: -150px;
 }
 
 /* Status badge - glassmorphic */
@@ -757,47 +784,74 @@ starlight-theme-select button:hover {
   box-shadow: 0 25px 60px rgba(0, 0, 0, 0.4), 0 0 40px rgba(102, 126, 234, 0.1);
 }
 
-/* Scroll indicator - minimal */
-.hero-scroll-indicator {
-  position: absolute;
-  bottom: var(--space-10);
-  left: 50%;
-  transform: translateX(-50%);
+/* Mouse scroll indicator (global — matches showcase animations.css) */
+@keyframes mouse-scroll {
+  0%   { opacity: 1; transform: translateY(0); }
+  50%  { opacity: 0.4; transform: translateY(6px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+.mouse-scroll-wrap {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: var(--space-2);
-  color: rgba(255, 255, 255, 0.3);
-  font-size: 0.6875rem;
-  font-weight: 500;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
+  gap: 0.625rem;
+  margin-top: 2.5rem;
   animation: fadeIn 1s ease 1.5s backwards;
 }
 
-.hero-scroll-line {
-  width: 1px;
-  height: 40px;
-  background: linear-gradient(to bottom, rgba(255, 255, 255, 0.3), transparent);
-  position: relative;
-  overflow: hidden;
-}
-
-.hero-scroll-line::after {
-  content: '';
+.mouse-scroll-wrap--absolute {
   position: absolute;
-  top: -100%;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(to bottom, transparent, rgba(255, 255, 255, 0.8), transparent);
-  animation: scroll-fade 2s ease-in-out infinite;
+  bottom: 4rem;
+  left: 50%;
+  transform: translateX(-50%);
+  margin-top: 0;
+  z-index: 10;
+  cursor: pointer;
 }
 
-.hero-scroll-arrow {
-  width: 20px;
-  height: 20px;
-  animation: bounce-subtle 2s ease infinite;
+/* Homepage hero — push mouse up higher */
+.hero-section .mouse-scroll-wrap--absolute {
+  bottom: 8rem;
+}
+
+/* Hover/focus styles for clickable mouse indicator */
+.mouse-scroll-wrap[role="button"]:hover .mouse-scroll-body {
+  border-color: rgba(255, 255, 255, 0.45);
+}
+.mouse-scroll-wrap[role="button"]:hover .mouse-scroll-label {
+  color: rgba(255, 255, 255, 0.5);
+}
+.mouse-scroll-wrap[role="button"]:focus-visible {
+  outline: 2px solid var(--sl-color-accent, #667eea);
+  outline-offset: 4px;
+  border-radius: 1rem;
+}
+
+.mouse-scroll-body {
+  width: 26px;
+  height: 42px;
+  border: 2px solid rgba(255, 255, 255, 0.25);
+  border-radius: 13px;
+  display: flex;
+  justify-content: center;
+}
+
+.mouse-scroll-wheel {
+  width: 4px;
+  height: 8px;
+  background: rgba(255, 255, 255, 0.5);
+  border-radius: 2px;
+  margin-top: 7px;
+  animation: mouse-scroll 2s ease-in-out infinite;
+}
+
+.mouse-scroll-label {
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.3);
 }
 
 /* ================================================
@@ -835,7 +889,7 @@ starlight-theme-select button:hover {
   justify-content: center;
   gap: var(--space-4);
   flex-wrap: wrap;
-  padding: var(--space-20) var(--space-8) var(--space-12) var(--space-8);
+  padding: var(--space-12) var(--space-8);
   max-width: 1400px;
   margin: 0 auto;
   position: relative;
@@ -884,15 +938,13 @@ starlight-theme-select button:hover {
 
 .stat-main-icon {
   font-size: 3.5rem;
-  color: var(--text-muted);
-  opacity: 0.5;
+  opacity: 0.4;
   margin-bottom: 0;
   transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .stat-card:hover .stat-main-icon {
-  opacity: 0.8;
-  color: var(--accent-color);
+  opacity: 0.7;
   transform: scale(1.15);
 }
 
@@ -2748,7 +2800,7 @@ starlight-theme-select button:hover {
     min-height: 48px;
   }
 
-  .hero-scroll-indicator {
+  .mouse-scroll-wrap--absolute {
     display: none;
   }
 
@@ -2939,7 +2991,7 @@ starlight-theme-select button:hover {
   .hero-section::before,
   .hero-section::after,
   .hero-orb,
-  .hero-scroll-indicator,
+  .mouse-scroll-wrap,
   .hero-grid-pattern {
     display: none !important;
   }

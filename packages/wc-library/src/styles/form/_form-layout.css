@@ -1,0 +1,144 @@
+/* ==========================================================================
+ * _form-layout.css — Form-level layout styles
+ *
+ * Form spacing, fieldset styling, button alignment, and grid/column
+ * layouts for multi-column forms. Targets Drupal Form API patterns.
+ * ==========================================================================
+ */
+
+/* ─── Form Root ─── */
+
+form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--wc-space-4, 1rem);
+  font-family: var(--wc-input-font-family, var(--wc-font-family-sans, sans-serif));
+}
+
+/* ─── Fieldset ─── */
+
+fieldset {
+  border: var(--wc-border-width-thin, 1px) solid var(--wc-color-neutral-200, #dee2e6);
+  border-radius: var(--wc-border-radius-md, 0.375rem);
+  padding: var(--wc-space-4, 1rem) var(--wc-space-4, 1rem) var(--wc-space-4, 1rem);
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--wc-space-4, 1rem);
+}
+
+/* ─── Legend ─── */
+
+legend {
+  display: flex;
+  align-items: baseline;
+  gap: var(--wc-space-1, 0.25rem);
+  font-size: var(--wc-font-size-sm, 0.875rem);
+  font-weight: var(--wc-font-weight-semibold, 600);
+  color: var(--wc-color-neutral-700, #343a40);
+  line-height: var(--wc-line-height-normal, 1.5);
+  padding: 0 var(--wc-space-1, 0.25rem);
+}
+
+/* ─── Details / Collapsible Fieldset (Drupal) ─── */
+
+details {
+  border: var(--wc-border-width-thin, 1px) solid var(--wc-color-neutral-200, #dee2e6);
+  border-radius: var(--wc-border-radius-md, 0.375rem);
+  padding: var(--wc-space-4, 1rem);
+  margin: 0;
+}
+
+summary {
+  font-size: var(--wc-font-size-sm, 0.875rem);
+  font-weight: var(--wc-font-weight-semibold, 600);
+  color: var(--wc-color-neutral-700, #343a40);
+  line-height: var(--wc-line-height-normal, 1.5);
+  cursor: pointer;
+  padding: var(--wc-space-1, 0.25rem) 0;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+summary:focus-visible {
+  outline: var(--wc-focus-ring-width, 2px) solid var(--wc-focus-ring-color, #007878);
+  outline-offset: var(--wc-focus-ring-offset, 2px);
+  border-radius: var(--wc-border-radius-sm, 0.25rem);
+}
+
+/* ─── Form Actions (button group) ─── */
+
+.form-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--wc-space-3, 0.75rem);
+  padding-top: var(--wc-space-4, 1rem);
+}
+
+.form-actions--end {
+  justify-content: flex-end;
+}
+
+.form-actions--between {
+  justify-content: space-between;
+}
+
+/* ─── Multi-Column Layout ─── */
+
+.form-columns {
+  display: grid;
+  gap: var(--wc-space-4, 1rem);
+}
+
+.form-columns--2 {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.form-columns--3 {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.form-columns--4 {
+  grid-template-columns: repeat(4, 1fr);
+}
+
+/* Stack columns on small screens */
+@media (max-width: 640px) {
+  .form-columns--2,
+  .form-columns--3,
+  .form-columns--4 {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ─── Full-Width Form Item (spans all columns) ─── */
+
+.form-item--full {
+  grid-column: 1 / -1;
+}
+
+/* ─── Inline Form Layout ─── */
+
+.form-inline {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: var(--wc-space-3, 0.75rem);
+}
+
+.form-inline .form-item {
+  flex: 1;
+  min-width: 0;
+}
+
+.form-inline .form-item + .form-item {
+  margin-top: 0;
+}
+
+/* ─── Form Divider ─── */
+
+.form-divider {
+  border: none;
+  border-top: var(--wc-border-width-thin, 1px) solid var(--wc-color-neutral-200, #dee2e6);
+  margin: var(--wc-space-2, 0.5rem) 0;
+}

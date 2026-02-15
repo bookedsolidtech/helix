@@ -1,0 +1,266 @@
+---
+/**
+ * DxTab3CiCd — "CI/CD & Delivery" tab panel content.
+ *
+ * Sections:
+ *   1. Hero (violet theme)
+ *   2. Pipeline Flow (7-stage)
+ *   3. Build Intelligence (cold vs cached comparison)
+ *   4. Distribution Strategy (npm, CDN, tokens)
+ *   5. Release Governance (4-step flow)
+ */
+---
+
+<style is:inline>
+  /* ==========================================
+     TAB 3: PIPELINE FLOW
+     ========================================== */
+  .dx-pipeline { display:flex; align-items:stretch; gap:0; overflow-x:auto; padding:var(--space-4) 0; }
+  .dx-pipeline-step { flex:1; min-width:120px; display:flex; flex-direction:column; align-items:center; gap:var(--space-3); text-align:center; position:relative; padding:var(--space-4); }
+  .dx-pipeline-step::after { content:''; position:absolute; right:-1px; top:50%; width:24px; height:2px; background:linear-gradient(90deg, var(--wc-violet), rgba(139,92,246,0.3)); transform:translateY(-50%); }
+  .dx-pipeline-step:last-child::after { display:none; }
+  .dx-pipeline-step-icon { width:56px; height:56px; border-radius:var(--radius-lg); display:flex; align-items:center; justify-content:center; font-size:1.25rem; transition:all 0.3s ease; }
+  .dx-pipeline-step-icon:hover { transform:scale(1.1); }
+  .dx-pipeline-step-label { font-size:0.8125rem; font-weight:700; color:var(--text-primary); }
+  .dx-pipeline-step-time { font-family:var(--font-mono); font-size:0.6875rem; color:var(--text-muted); }
+
+  /* ==========================================
+     TAB 3: BUILD COMPARISON
+     ========================================== */
+  .dx-build-grid { display:grid; grid-template-columns:1fr 1fr; gap:var(--space-6); }
+  .dx-build-card { background:var(--surface-1); border:1px solid var(--surface-3); border-radius:var(--radius-xl); padding:var(--space-8) var(--space-6); text-align:center; transition:all 0.3s ease; }
+  .dx-build-card:hover { background:var(--surface-2); }
+  .dx-build-value { font-size:3rem; font-weight:900; letter-spacing:-0.04em; margin-bottom:var(--space-2); }
+  .dx-build-label { font-size:1rem; font-weight:700; color:var(--text-primary); margin-bottom:var(--space-3); }
+  .dx-build-bar { height:12px; border-radius:6px; background:rgba(255,255,255,0.04); overflow:hidden; margin-bottom:var(--space-3); }
+  .dx-build-bar-fill { height:100%; border-radius:6px; transition:width 1.5s cubic-bezier(0.22,1,0.36,1); width:var(--bar-width); }
+  .dx-build-desc { font-size:0.875rem; color:var(--text-muted); line-height:1.6; }
+
+  /* ==========================================
+     TAB 3: DISTRIBUTION / RELEASE
+     ========================================== */
+  .dx-dist-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:var(--space-6); }
+  .dx-release-flow { display:flex; flex-direction:column; gap:var(--space-4); max-width:600px; margin:0 auto; }
+  .dx-release-step { display:flex; align-items:center; gap:var(--space-4); background:var(--surface-1); border:1px solid var(--surface-3); border-radius:var(--radius-lg); padding:var(--space-4) var(--space-5); transition:all 0.3s ease; }
+  .dx-release-step:hover { background:var(--surface-2); transform:translateX(4px); }
+  .dx-release-num { width:32px; height:32px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:0.875rem; font-weight:800; flex-shrink:0; }
+  .dx-release-info { flex:1; }
+  .dx-release-name { font-size:0.9375rem; font-weight:700; color:var(--text-primary); }
+  .dx-release-desc { font-size:0.8125rem; color:var(--text-muted); }
+
+  /* --- Tab 3 responsive --- */
+  @media (max-width:1100px) {
+    .dx-build-grid { grid-template-columns:1fr; }
+    .dx-dist-grid { grid-template-columns:1fr; }
+  }
+
+  @media (max-width:768px) {
+    .dx-pipeline { flex-direction:column; align-items:center; }
+    .dx-pipeline-step::after { display:none; }
+  }
+</style>
+
+<div id="tab-cicd" class="dx-tab-content" role="tabpanel">
+  <section class="dx-hero dx-hero-cicd" aria-label="CI/CD and delivery pipeline">
+    <div class="dx-hero-grid" aria-hidden="true"></div>
+    <div class="dx-hero-orb dx-hero-orb-1" aria-hidden="true"></div>
+    <div class="dx-hero-orb dx-hero-orb-2" aria-hidden="true"></div>
+    <div class="dx-hero-orb dx-hero-orb-3" aria-hidden="true"></div>
+
+    <div class="dx-hero-content">
+      <div class="dx-hero-badge">
+        <span class="dx-hero-badge-dot" aria-hidden="true"></span>
+        Continuous Delivery
+      </div>
+
+      <h1 class="dx-hero-title">From Commit to CDN<br />in 8 Seconds</h1>
+
+      <p class="dx-hero-subtitle">Turborepo-powered builds with intelligent caching</p>
+
+      <p class="dx-hero-description">
+        Push code, watch it flow through type checking, testing, accessibility
+        auditing, visual regression, and deployment. Cached builds complete
+        in seconds. Full builds complete in under a minute.
+      </p>
+    </div>
+
+    <div class="mouse-scroll-wrap mouse-scroll-wrap--absolute" aria-hidden="true">
+      <div class="mouse-scroll-body"><div class="mouse-scroll-wheel"></div></div>
+      <span class="mouse-scroll-label">Scroll</span>
+    </div>
+  </section>
+
+  <!-- SECTION: Pipeline Flow -->
+  <section class="dx-section" aria-label="CI pipeline flow">
+    <div class="dx-section-inner">
+      <div class="dx-section-header scroll-reveal">
+        <span class="dx-section-label dx-section-label-violet">Pipeline Architecture</span>
+        <h2 class="dx-section-title">Seven Stages, Fully Automated</h2>
+        <p class="dx-section-description">
+          Every push triggers a deterministic pipeline. Each stage gates the next.
+          Failures halt deployment and notify the author instantly.
+        </p>
+      </div>
+
+      <div class="dx-pipeline scroll-reveal scroll-reveal-delay-1">
+        <div class="dx-pipeline-step">
+          <div class="dx-pipeline-step-icon icon-violet"><i class="fa-solid fa-code-commit" aria-hidden="true"></i></div>
+          <span class="dx-pipeline-step-label">git push</span>
+          <span class="dx-pipeline-step-time">trigger</span>
+        </div>
+        <div class="dx-pipeline-step">
+          <div class="dx-pipeline-step-icon icon-cyan"><i class="fa-solid fa-spell-check" aria-hidden="true"></i></div>
+          <span class="dx-pipeline-step-label">Type Check</span>
+          <span class="dx-pipeline-step-time">~3s</span>
+        </div>
+        <div class="dx-pipeline-step">
+          <div class="dx-pipeline-step-icon icon-green"><i class="fa-solid fa-vial" aria-hidden="true"></i></div>
+          <span class="dx-pipeline-step-label">Unit Tests</span>
+          <span class="dx-pipeline-step-time">~5s</span>
+        </div>
+        <div class="dx-pipeline-step">
+          <div class="dx-pipeline-step-icon icon-amber"><i class="fa-solid fa-universal-access" aria-hidden="true"></i></div>
+          <span class="dx-pipeline-step-label">A11y Audit</span>
+          <span class="dx-pipeline-step-time">~4s</span>
+        </div>
+        <div class="dx-pipeline-step">
+          <div class="dx-pipeline-step-icon icon-pink"><i class="fa-solid fa-camera" aria-hidden="true"></i></div>
+          <span class="dx-pipeline-step-label">Visual Reg.</span>
+          <span class="dx-pipeline-step-time">~12s</span>
+        </div>
+        <div class="dx-pipeline-step">
+          <div class="dx-pipeline-step-icon icon-electric"><i class="fa-solid fa-hammer" aria-hidden="true"></i></div>
+          <span class="dx-pipeline-step-label">Build</span>
+          <span class="dx-pipeline-step-time">~8s</span>
+        </div>
+        <div class="dx-pipeline-step">
+          <div class="dx-pipeline-step-icon icon-green"><i class="fa-solid fa-cloud-arrow-up" aria-hidden="true"></i></div>
+          <span class="dx-pipeline-step-label">Deploy</span>
+          <span class="dx-pipeline-step-time">~6s</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION: Build Intelligence -->
+  <section class="dx-section" aria-label="Build intelligence comparison">
+    <div class="dx-section-inner">
+      <div class="dx-section-header scroll-reveal">
+        <span class="dx-section-label dx-section-label-violet">Build Intelligence</span>
+        <h2 class="dx-section-title">Turborepo Remote Cache in Action</h2>
+        <p class="dx-section-description">
+          When the dependency graph has not changed, builds are served from cache.
+          The difference is dramatic.
+        </p>
+      </div>
+
+      <div class="dx-build-grid">
+        <div class="dx-build-card scroll-reveal scroll-reveal-delay-1">
+          <div class="dx-build-value" style="color:var(--text-muted);">~45s</div>
+          <div class="dx-build-label">Full Build (Cold)</div>
+          <div class="dx-build-bar">
+            <div class="dx-build-bar-fill scroll-reveal-bar" style="--target-width:100%; background:linear-gradient(90deg, var(--wc-amber), var(--wc-red));"></div>
+          </div>
+          <p class="dx-build-desc">Complete rebuild of all packages, components, Storybook, and documentation from scratch.</p>
+        </div>
+
+        <div class="dx-build-card scroll-reveal scroll-reveal-delay-2" style="border-color:rgba(16,185,129,0.25);">
+          <div class="dx-build-value" style="color:var(--wc-green);">~8s</div>
+          <div class="dx-build-label">Cached Build (Warm)</div>
+          <div class="dx-build-bar">
+            <div class="dx-build-bar-fill scroll-reveal-bar" style="--target-width:18%; background:linear-gradient(90deg, var(--wc-green), var(--wc-cyan));"></div>
+          </div>
+          <p class="dx-build-desc">Turborepo remote cache restores unchanged outputs. Only modified packages rebuild. An 82% reduction.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION: Distribution Strategy -->
+  <section class="dx-section" aria-label="Distribution strategy">
+    <div class="dx-section-inner">
+      <div class="dx-section-header scroll-reveal">
+        <span class="dx-section-label dx-section-label-violet">Distribution</span>
+        <h2 class="dx-section-title">Three Channels, One Pipeline</h2>
+        <p class="dx-section-description">
+          Components ship through three parallel channels, each optimized
+          for a different consumption pattern.
+        </p>
+      </div>
+
+      <div class="dx-dist-grid">
+        <div class="dx-card scroll-reveal scroll-reveal-delay-1">
+          <div class="dx-card-icon icon-violet"><i class="fa-brands fa-npm" aria-hidden="true"></i></div>
+          <div class="dx-card-title">npm Package</div>
+          <p class="dx-card-desc">
+            Full library with TypeScript types, CEM manifest, and tree-shakeable ESM exports. For Drupal teams integrating via build tools.
+          </p>
+          <code class="dx-timeline-cmd" style="margin-top:var(--space-3);">npm install @org/wc-2026</code>
+        </div>
+
+        <div class="dx-card scroll-reveal scroll-reveal-delay-2">
+          <div class="dx-card-icon icon-cyan"><i class="fa-solid fa-globe" aria-hidden="true"></i></div>
+          <div class="dx-card-title">CDN Script</div>
+          <p class="dx-card-desc">
+            Single script tag for quick integration. Auto-registers all components. Ideal for prototyping, CMS embeds, and static sites.
+          </p>
+          <code class="dx-timeline-cmd" style="margin-top:var(--space-3);">&lt;script src="cdn/wc-2026.js"&gt;</code>
+        </div>
+
+        <div class="dx-card scroll-reveal scroll-reveal-delay-3">
+          <div class="dx-card-icon icon-amber"><i class="fa-solid fa-paintbrush" aria-hidden="true"></i></div>
+          <div class="dx-card-title">Token Package</div>
+          <p class="dx-card-desc">
+            Design tokens only, published separately. Allows theme updates without touching component code. CSS custom properties and SCSS maps.
+          </p>
+          <code class="dx-timeline-cmd" style="margin-top:var(--space-3);">npm install @org/wc-tokens</code>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION: Release Governance -->
+  <section class="dx-section" aria-label="Release governance">
+    <div class="dx-section-inner">
+      <div class="dx-section-header scroll-reveal">
+        <span class="dx-section-label dx-section-label-violet">Release Governance</span>
+        <h2 class="dx-section-title">Automated, Auditable, Reversible</h2>
+        <p class="dx-section-description">
+          No human runs npm publish. Every release is triggered by merging
+          a changeset PR, fully automated through CI.
+        </p>
+      </div>
+
+      <div class="dx-release-flow">
+        <div class="dx-release-step scroll-reveal scroll-reveal-delay-1">
+          <div class="dx-release-num icon-violet">1</div>
+          <div class="dx-release-info">
+            <div class="dx-release-name">Changeset PR Created</div>
+            <p class="dx-release-desc">Developers add changeset files describing what changed and the semver impact (patch, minor, major).</p>
+          </div>
+        </div>
+        <div class="dx-release-step scroll-reveal scroll-reveal-delay-2">
+          <div class="dx-release-num icon-cyan">2</div>
+          <div class="dx-release-info">
+            <div class="dx-release-name">Version Bump &amp; Changelog</div>
+            <p class="dx-release-desc">CI automatically determines the next version, updates package.json, and generates release notes.</p>
+          </div>
+        </div>
+        <div class="dx-release-step scroll-reveal scroll-reveal-delay-3">
+          <div class="dx-release-num icon-green">3</div>
+          <div class="dx-release-info">
+            <div class="dx-release-name">Publish to npm + CDN</div>
+            <p class="dx-release-desc">CI publishes the package to npm and deploys the CDN bundle. No developer credentials required.</p>
+          </div>
+        </div>
+        <div class="dx-release-step scroll-reveal scroll-reveal-delay-4">
+          <div class="dx-release-num icon-amber">4</div>
+          <div class="dx-release-info">
+            <div class="dx-release-name">GitHub Release + Tag</div>
+            <p class="dx-release-desc">Automated GitHub release with full changelog, contributor credits, and downloadable artifacts.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>

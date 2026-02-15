@@ -1,0 +1,17 @@
+/* ==========================================================================
+ * form.css — Barrel file (unscoped)
+ *
+ * Imports all form partials. Use this when global form styles are desired.
+ * For scoped usage within <wc-form>, use form.scoped.css instead.
+ * ==========================================================================
+ */
+
+@import './_field.css';
+@import './_text-input.css';
+@import './_textarea.css';
+@import './_select.css';
+@import './_checkbox.css';
+@import './_radio.css';
+@import './_switch.css';
+@import './_form-layout.css';
+@import './_validation.css';

@@ -2,12 +2,15 @@
   "name": "wc-2026",
   "version": "0.0.1",
   "private": true,
+  "type": "module",
   "description": "Enterprise Healthcare Web Component Library - Monorepo",
   "workspaces": [
     "apps/*",
     "packages/*"
   ],
   "scripts": {
+    "kill-ports": "bash scripts/kill-ports.sh",
+    "restart": "npm run kill-ports && turbo dev",
     "dev": "turbo dev",
     "dev:docs": "turbo dev --filter=docs",
     "dev:storybook": "turbo dev --filter=@wc-2026/storybook",
@@ -20,11 +23,37 @@
     "lint": "turbo lint",
     "clean": "turbo clean",
     "cem": "turbo cem --filter=@wc-2026/library",
-    "preview:docs": "turbo preview --filter=docs"
+    "generate-docs": "tsx scripts/generate-component-docs.ts",
+    "preview:docs": "turbo preview --filter=docs",
+    "dev:admin": "turbo dev --filter=@wc-2026/admin",
+    "build:admin": "turbo build --filter=@wc-2026/admin",
+    "test": "turbo test",
+    "test:library": "turbo test --filter=@wc-2026/library",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "prepare": "husky"
+  },
+  "lint-staged": {
+    "*.{ts,tsx,js,jsx}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "*.{json,md,css,html}": [
+      "prettier --write"
+    ]
   },
   "devDependencies": {
+    "@eslint/js": "^9.0.0",
+    "@playwright/test": "^1.58.2",
+    "eslint": "^9.0.0",
+    "eslint-plugin-lit": "^1.15.0",
+    "eslint-plugin-wc": "^2.2.0",
+    "husky": "^9.0.0",
+    "lint-staged": "^15.0.0",
+    "prettier": "^3.0.0",
     "turbo": "^2.3.3",
-    "typescript": "^5.7.2"
+    "typescript": "^5.7.2",
+    "typescript-eslint": "^8.0.0"
   },
   "engines": {
     "node": ">=20.0.0"

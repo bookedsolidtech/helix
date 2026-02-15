@@ -1,0 +1,146 @@
+/* ============================================
+   Showcase Animations — shared @keyframes
+   ============================================ */
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(40px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeInDown {
+  from { opacity: 0; transform: translateY(-20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes float-slow {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  25% { transform: translate(30px, -20px) scale(1.05); }
+  50% { transform: translate(-10px, -35px) scale(0.97); }
+  75% { transform: translate(-25px, -10px) scale(1.02); }
+}
+
+@keyframes float-drift {
+  0%, 100% { transform: translate(0, 0) rotate(0deg); }
+  33% { transform: translate(20px, 15px) rotate(2deg); }
+  66% { transform: translate(-15px, -20px) rotate(-2deg); }
+}
+
+@keyframes orb-pulse {
+  0%, 100% { opacity: 0.3; filter: blur(100px); }
+  50% { opacity: 0.5; filter: blur(120px); }
+}
+
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 8px rgba(74, 222, 128, 0.4); }
+  50% { box-shadow: 0 0 24px rgba(74, 222, 128, 0.7); }
+}
+
+@keyframes border-rotate {
+  0% { --gradient-angle: 0deg; }
+  100% { --gradient-angle: 360deg; }
+}
+
+@keyframes spectrum-pulse {
+  0%, 100% { transform: scaleX(1); }
+  50% { transform: scaleX(1.02); }
+}
+
+@keyframes particle-drift {
+  0% { background-position: 0 0, 200px 200px, 400px 100px; }
+  100% { background-position: 800px 800px, 1000px 1000px, 1200px 900px; }
+}
+
+@keyframes flow-line {
+  0% { stroke-dashoffset: 100; }
+  100% { stroke-dashoffset: 0; }
+}
+
+@keyframes scroll-fade {
+  0% { opacity: 1; transform: translateX(-50%) translateY(0); }
+  100% { opacity: 0; transform: translateX(-50%) translateY(12px); }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@keyframes bar-grow {
+  from { width: 0; }
+}
+
+@keyframes float-logo {
+  0%, 100% { transform: translate(0, 0) rotate(0deg); opacity: 0.07; }
+  25% { transform: translate(10px, -15px) rotate(3deg); opacity: 0.12; }
+  50% { transform: translate(-8px, -25px) rotate(-2deg); opacity: 0.08; }
+  75% { transform: translate(-15px, -8px) rotate(1deg); opacity: 0.1; }
+}
+
+@keyframes pulse-ring {
+  0% { transform: scale(0.95); opacity: 0.5; }
+  50% { transform: scale(1.05); opacity: 1; }
+  100% { transform: scale(0.95); opacity: 0.5; }
+}
+
+@keyframes flow-dash {
+  to { stroke-dashoffset: -20; }
+}
+
+@keyframes mouse-scroll {
+  0%   { opacity: 1; transform: translateY(0); }
+  50%  { opacity: 0.3; transform: translateY(10px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+/* --- Shared mouse scroll indicator --- */
+.mouse-scroll-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.625rem;
+  margin-top: 2.5rem;
+  animation: fadeIn 1s ease 1.5s backwards;
+}
+.mouse-scroll-wrap--absolute {
+  position: absolute;
+  bottom: 2rem;
+  left: 50%;
+  transform: translateX(-50%);
+  margin-top: 0;
+  z-index: 10;
+}
+.mouse-scroll-body {
+  width: 26px;
+  height: 42px;
+  border: 2px solid rgba(255, 255, 255, 0.25);
+  border-radius: 13px;
+  display: flex;
+  justify-content: center;
+}
+.mouse-scroll-wheel {
+  width: 4px;
+  height: 8px;
+  background: rgba(255, 255, 255, 0.5);
+  border-radius: 2px;
+  margin-top: 7px;
+  animation: mouse-scroll 2s ease-in-out infinite;
+}
+.mouse-scroll-label {
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+@media (max-width: 768px) {
+  .mouse-scroll-wrap--absolute { display: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .mouse-scroll-wheel { animation: none !important; }
+}

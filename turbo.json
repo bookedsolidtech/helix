@@ -4,7 +4,7 @@
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
-      "outputs": ["dist/**", ".astro/**"]
+      "outputs": ["dist/**", ".astro/**", ".next/**"]
     },
     "dev": {
       "cache": false,
@@ -17,7 +17,13 @@
     "type-check": {
       "dependsOn": ["^build"]
     },
-    "lint": {},
+    "test": {
+      "dependsOn": ["^build"],
+      "outputs": [".cache/test-results.json"]
+    },
+    "lint": {
+      "dependsOn": ["^build"]
+    },
     "clean": {
       "cache": false
     },

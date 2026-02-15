@@ -1,6 +1,7 @@
 import { LitElement, html, nothing } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
+import { tokenStyles } from '@wc-2026/tokens/lit';
 import { wcButtonStyles } from './wc-button.styles.js';
 
 /**
@@ -12,21 +13,21 @@ import { wcButtonStyles } from './wc-button.styles.js';
  *
  * @slot - Default slot for button label text or content.
  *
- * @fires {CustomEvent} wc-click - Dispatched when the button is clicked (not disabled).
+ * @fires {CustomEvent<{originalEvent: MouseEvent}>} wc-click - Dispatched when the button is clicked (not disabled).
  *
  * @csspart button - The native button element.
  *
- * @cssprop [--wc-button-bg] - Button background color.
- * @cssprop [--wc-button-color] - Button text color.
- * @cssprop [--wc-button-border-color] - Button border color.
- * @cssprop [--wc-button-border-radius] - Button border radius.
- * @cssprop [--wc-button-font-family] - Button font family.
- * @cssprop [--wc-button-font-weight] - Button font weight.
- * @cssprop [--wc-button-focus-ring-color] - Focus ring color.
+ * @cssprop [--wc-button-bg=var(--wc-color-primary-500)] - Button background color.
+ * @cssprop [--wc-button-color=var(--wc-color-neutral-0)] - Button text color.
+ * @cssprop [--wc-button-border-color=transparent] - Button border color.
+ * @cssprop [--wc-button-border-radius=var(--wc-border-radius-md)] - Button border radius.
+ * @cssprop [--wc-button-font-family=var(--wc-font-family-sans)] - Button font family.
+ * @cssprop [--wc-button-font-weight=var(--wc-font-weight-semibold)] - Button font weight.
+ * @cssprop [--wc-button-focus-ring-color=var(--wc-focus-ring-color)] - Focus ring color.
  */
 @customElement('wc-button')
 export class WcButton extends LitElement {
-  static override styles = wcButtonStyles;
+  static override styles = [tokenStyles, wcButtonStyles];
 
   /**
    * Visual style variant of the button.
@@ -37,9 +38,9 @@ export class WcButton extends LitElement {
 
   /**
    * Size of the button.
-   * @attr size
+   * @attr wc-size
    */
-  @property({ type: String, reflect: true })
+  @property({ type: String, reflect: true, attribute: 'wc-size' })
   size: 'sm' | 'md' | 'lg' = 'md';
 
   /**

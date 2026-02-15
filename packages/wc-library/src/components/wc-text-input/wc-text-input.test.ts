@@ -1,0 +1,425 @@
+import { describe, it, expect, afterEach } from 'vitest';
+import { fixture, shadowQuery, oneEvent, cleanup, checkA11y } from '../../test-utils.js';
+import type { WcTextInput } from './wc-text-input.js';
+import './index.js';
+
+afterEach(cleanup);
+
+describe('wc-text-input', () => {
+
+  // ─── Rendering (4) ───
+
+  describe('Rendering', () => {
+    it('renders with shadow DOM', async () => {
+      const el = await fixture<WcTextInput>('<wc-text-input></wc-text-input>');
+      expect(el.shadowRoot).toBeTruthy();
+    });
+
+    it('renders native <input>', async () => {
+      const el = await fixture<WcTextInput>('<wc-text-input></wc-text-input>');
+      const input = shadowQuery(el, 'input');
+      expect(input).toBeInstanceOf(HTMLInputElement);
+    });
+
+    it('exposes "field" CSS part', async () => {
+      const el = await fixture<WcTextInput>('<wc-text-input></wc-text-input>');
+      const field = shadowQuery(el, '[part="field"]');
+      expect(field).toBeTruthy();
+    });
+
+    it('exposes "input" CSS part', async () => {
+      const el = await fixture<WcTextInput>('<wc-text-input></wc-text-input>');
+      const input = shadowQuery(el, '[part="input"]');
+      expect(input).toBeTruthy();
+    });
+  });
+
+  // ─── Property: label (3) ───
+
+  describe('Property: label', () => {
+    it('renders label text', async () => {
+      const el = await fixture<WcTextInput>('<wc-text-input label="Username"></wc-text-input>');
+      const label = shadowQuery(el, 'label');
+      expect(label?.textContent?.trim()).toContain('Username');
+    });
+
+    it('does not render label when empty', async () => {
+      const el = await fixture<WcTextInput>('<wc-text-input></wc-text-input>');
+      const label = shadowQuery(el, 'label');
+      expect(label).toBeNull();
+    });
+
+    it('shows asterisk when required', async () => {
+      const el = await fixture<WcTextInput>('<wc-text-input label="Email" required></wc-text-input>');
+      const marker = shadowQuery(el, '.field__required-marker');
+      expect(marker).toBeTruthy();
+      expect(marker?.textContent).toBe('*');
+    });
+  });
+
+  // ─── Property: placeholder (1) ───
+
+  describe('Property: placeholder', () => {
+    it('sets placeholder attr on native input', async () => {
+      const el = await fixture<WcTextInput>('<wc-text-input placeholder="Enter text..."></wc-text-input>');
+      const input = shadowQuery<HTMLInputElement>(el, 'input')!;
+      expect(input.getAttribute('placeholder')).toBe('Enter text...');
+    });
+  });
+
+  // ─── Property: value (2) ───
+
+  describe('Property: value', () => {
+    it('syncs value to native input', async () => {
+      const el = await fixture<WcTextInput>('<wc-text-input value="hello"></wc-text-input>');
+      const input = shadowQuery<HTMLInputElement>(el, 'input')!;
+      expect(input.value).toBe('hello');
+    });
+
+    it('programmatic value update is reflected', async () => {
+      const el = await fixture<WcTextInput>('<wc-text-input></wc-text-input>');
+      el.value = 'updated';
+      await el.updateComplete;
+      const input = shadowQuery<HTMLInputElement>(el, 'input')!;
+      expect(input.value).toBe('updated');
+    });
+  });
+
+  // ─── Property: type (4) ───
+
+  describe('Property: type', () => {
+    it('defaults to type=text', async () => {
+      const el = await fixture<WcTextInput>('<wc-text-input></wc-text-input>');
+      const input = shadowQuery<HTMLInputElement>(el, 'input')!;
+      expect(input.getAttribute('type')).toBe('text');
+    });
+
+    it('sets email type', async () => {
+      const el = await fixture<WcTextInput>('<wc-text-input type="email"></wc-text-input>');
+      const input = shadowQuery<HTMLInputElement>(el, 'input')!;
+      expect(input.getAttribute('type')).toBe('email');
+    });
+
+    it('sets password type', async () => {
+      const el = await fixture<WcTextInput>('<wc-text-input type="password"></wc-text-input>');
+      const input = shadowQuery<HTMLInputElement>(el, 'input')!;
+      expect(input.getAttribute('type')).toBe('password');
+    });
+
+    it('sets number type', async () => {
+      const el = await fixture<WcTextInput>('<wc-text-input type="number"></wc-text-input>');
+      const input = shadowQuery<HTMLInputElement>(el, 'input')!;
+      expect(input.getAttribute('type')).toBe('number');
+    });
+  });
+
+  // ─── Property: required (2) ───
+
+  describe('Property: required', () => {
+    it('sets required attr on native input', async () => {
+      const el = await fixture<WcTextInput>('<wc-text-input required></wc-text-input>');
+      const input = shadowQuery<HTMLInputElement>(el, 'input')!;
+      expect(input.required).toBe(true);
+    });
+
+    it('sets aria-required="true" on native input', async () => {
+      const el = await fixture<WcTextInput>('<wc-text-input required></wc-text-input>');
+      const input = shadowQuery<HTMLInputElement>(el, 'input')!;
+      expect(input.getAttribute('aria-required')).toBe('true');
+    });
+  });
+
+  // ─── Property: disabled (2) ───
+
+  describe('Property: disabled', () => {
+    it('sets disabled attr on native input', async () => {
+      const el = await fixture<WcTextInput>('<wc-text-input disabled></wc-text-input>');
+      const input = shadowQuery<HTMLInputElement>(el, 'input')!;
+      expect(input.disabled).toBe(true);
+    });
+
+    it('applies host opacity via disabled attribute', async () => {
+      const el = await fixture<WcTextInput>('<wc-text-input disabled></wc-text-input>');
+      expect(el.hasAttribute('disabled')).toBe(true);
+    });
+  });
+
+  // ─── Property: error (4) ───
+
+  describe('Property: error', () => {
+    it('renders error message in role="alert" div', async () => {
+      const el = await fixture<WcTextInput>('<wc-text-input error="Required field"></wc-text-input>');
+      const errorDiv = shadowQuery(el, '[role="alert"]');
+      expect(errorDiv).toBeTruthy();
+      expect(errorDiv?.textContent?.trim()).toBe('Required field');
+    });
+
+    it('error div has aria-live="polite"', async () => {
+      const el = await fixture<WcTextInput>('<wc-text-input error="Required"></wc-text-input>');
+      const errorDiv = shadowQuery(el, '.field__error');
+      expect(errorDiv?.getAttribute('aria-live')).toBe('polite');
+    });
+
+    it('sets aria-invalid="true" on input', async () => {
+      const el = await fixture<WcTextInput>('<wc-text-input error="Required"></wc-text-input>');
+      const input = shadowQuery<HTMLInputElement>(el, 'input')!;
+      expect(input.getAttribute('aria-invalid')).toBe('true');
+    });
+
+    it('error hides help text', async () => {
+      const el = await fixture<WcTextInput>('<wc-text-input error="Error" help-text="Help"></wc-text-input>');
+      const helpText = shadowQuery(el, '.field__help-text');
+      expect(helpText).toBeNull();
+    });
+  });
+
+  // ─── Property: helpText (2) ───
+
+  describe('Property: helpText', () => {
+    it('renders help text below input', async () => {
+      const el = await fixture<WcTextInput>('<wc-text-input help-text="Enter your username"></wc-text-input>');
+      const helpText = shadowQuery(el, '.field__help-text');
+      expect(helpText).toBeTruthy();
+      expect(helpText?.textContent?.trim()).toContain('Enter your username');
+    });
+
+    it('help text hidden when error present', async () => {
+      const el = await fixture<WcTextInput>('<wc-text-input help-text="Help" error="Error"></wc-text-input>');
+      const helpText = shadowQuery(el, '.field__help-text');
+      expect(helpText).toBeNull();
+    });
+  });
+
+  // ─── Property: name (1) ───
+
+  describe('Property: name', () => {
+    it('sets name attr on native input', async () => {
+      const el = await fixture<WcTextInput>('<wc-text-input name="username"></wc-text-input>');
+      const input = shadowQuery<HTMLInputElement>(el, 'input')!;
+      expect(input.getAttribute('name')).toBe('username');
+    });
+  });
+
+  // ─── Property: ariaLabel (1) ───
+
+  describe('Property: ariaLabel', () => {
+    it('sets aria-label on native input', async () => {
+      const el = await fixture<WcTextInput>('<wc-text-input aria-label="Search field"></wc-text-input>');
+      const input = shadowQuery<HTMLInputElement>(el, 'input')!;
+      expect(input.getAttribute('aria-label')).toBe('Search field');
+    });
+  });
+
+  // ─── Events (4) ───
+
+  describe('Events', () => {
+    it('dispatches wc-input on keystroke', async () => {
+      const el = await fixture<WcTextInput>('<wc-text-input></wc-text-input>');
+      const input = shadowQuery<HTMLInputElement>(el, 'input')!;
+      const eventPromise = oneEvent<CustomEvent>(el, 'wc-input');
+      input.value = 'a';
+      input.dispatchEvent(new Event('input', { bubbles: true }));
+      const event = await eventPromise;
+      expect(event).toBeTruthy();
+    });
+
+    it('wc-input detail.value is correct', async () => {
+      const el = await fixture<WcTextInput>('<wc-text-input></wc-text-input>');
+      const input = shadowQuery<HTMLInputElement>(el, 'input')!;
+      const eventPromise = oneEvent<CustomEvent>(el, 'wc-input');
+      input.value = 'hello';
+      input.dispatchEvent(new Event('input', { bubbles: true }));
+      const event = await eventPromise;
+      expect(event.detail.value).toBe('hello');
+    });
+
+    it('dispatches wc-change on blur', async () => {
+      const el = await fixture<WcTextInput>('<wc-text-input></wc-text-input>');
+      const input = shadowQuery<HTMLInputElement>(el, 'input')!;
+      const eventPromise = oneEvent<CustomEvent>(el, 'wc-change');
+      input.value = 'changed';
+      input.dispatchEvent(new Event('change', { bubbles: true }));
+      const event = await eventPromise;
+      expect(event).toBeTruthy();
+    });
+
+    it('wc-change bubbles and is composed', async () => {
+      const el = await fixture<WcTextInput>('<wc-text-input></wc-text-input>');
+      const input = shadowQuery<HTMLInputElement>(el, 'input')!;
+      const eventPromise = oneEvent<CustomEvent>(el, 'wc-change');
+      input.value = 'test';
+      input.dispatchEvent(new Event('change', { bubbles: true }));
+      const event = await eventPromise;
+      expect(event.bubbles).toBe(true);
+      expect(event.composed).toBe(true);
+    });
+  });
+
+  // ─── Slots (3) ───
+
+  describe('Slots', () => {
+    it('prefix slot renders', async () => {
+      const el = await fixture<WcTextInput>('<wc-text-input><span slot="prefix">@</span></wc-text-input>');
+      const prefix = el.querySelector('[slot="prefix"]');
+      expect(prefix).toBeTruthy();
+      expect(prefix?.textContent).toBe('@');
+    });
+
+    it('suffix slot renders', async () => {
+      const el = await fixture<WcTextInput>('<wc-text-input><span slot="suffix">.com</span></wc-text-input>');
+      const suffix = el.querySelector('[slot="suffix"]');
+      expect(suffix).toBeTruthy();
+      expect(suffix?.textContent).toBe('.com');
+    });
+
+    it('help-text slot renders', async () => {
+      const el = await fixture<WcTextInput>('<wc-text-input help-text="default"><em slot="help-text">Custom help</em></wc-text-input>');
+      const helpSlot = el.querySelector('[slot="help-text"]');
+      expect(helpSlot).toBeTruthy();
+      expect(helpSlot?.textContent).toBe('Custom help');
+    });
+  });
+
+  // ─── CSS Parts (2) ───
+
+  describe('CSS Parts', () => {
+    it('label part exposed', async () => {
+      const el = await fixture<WcTextInput>('<wc-text-input label="Test"></wc-text-input>');
+      const label = shadowQuery(el, '[part="label"]');
+      expect(label).toBeTruthy();
+    });
+
+    it('input-wrapper part exposed', async () => {
+      const el = await fixture<WcTextInput>('<wc-text-input></wc-text-input>');
+      const wrapper = shadowQuery(el, '[part="input-wrapper"]');
+      expect(wrapper).toBeTruthy();
+    });
+  });
+
+  // ─── Form (5) ───
+
+  describe('Form', () => {
+    it('has formAssociated=true', () => {
+      const ctor = customElements.get('wc-text-input') as unknown as { formAssociated: boolean };
+      expect(ctor.formAssociated).toBe(true);
+    });
+
+    it('has ElementInternals attached', async () => {
+      const el = await fixture<WcTextInput>('<wc-text-input></wc-text-input>');
+      expect(el.form).toBe(null);
+    });
+
+    it('form getter returns associated form', async () => {
+      const form = document.createElement('form');
+      form.innerHTML = '<wc-text-input name="test"></wc-text-input>';
+      document.getElementById('test-fixture-container')!.appendChild(form);
+      const el = form.querySelector('wc-text-input') as WcTextInput;
+      await el.updateComplete;
+      expect(el.form).toBe(form);
+    });
+
+    it('formResetCallback resets value to empty', async () => {
+      const el = await fixture<WcTextInput>('<wc-text-input value="hello"></wc-text-input>');
+      el.formResetCallback();
+      await el.updateComplete;
+      expect(el.value).toBe('');
+    });
+
+    it('formStateRestoreCallback restores value', async () => {
+      const el = await fixture<WcTextInput>('<wc-text-input></wc-text-input>');
+      el.formStateRestoreCallback('restored');
+      await el.updateComplete;
+      expect(el.value).toBe('restored');
+    });
+  });
+
+  // ─── Validation (3) ───
+
+  describe('Validation', () => {
+    it('checkValidity returns false when required + empty', async () => {
+      const el = await fixture<WcTextInput>('<wc-text-input required></wc-text-input>');
+      expect(el.checkValidity()).toBe(false);
+    });
+
+    it('checkValidity returns true when required + filled', async () => {
+      const el = await fixture<WcTextInput>('<wc-text-input required value="filled"></wc-text-input>');
+      expect(el.checkValidity()).toBe(true);
+    });
+
+    it('valueMissing validity flag is set when required + empty', async () => {
+      const el = await fixture<WcTextInput>('<wc-text-input required></wc-text-input>');
+      expect(el.validity.valueMissing).toBe(true);
+    });
+  });
+
+  // ─── Methods (2) ───
+
+  describe('Methods', () => {
+    it('focus() moves focus to native input', async () => {
+      const el = await fixture<WcTextInput>('<wc-text-input></wc-text-input>');
+      el.focus();
+      await new Promise((r) => setTimeout(r, 50));
+      const input = shadowQuery<HTMLInputElement>(el, 'input')!;
+      expect(el.shadowRoot?.activeElement).toBe(input);
+    });
+
+    it('select() selects text in native input', async () => {
+      const el = await fixture<WcTextInput>('<wc-text-input value="hello world"></wc-text-input>');
+      el.focus();
+      el.select();
+      await new Promise((r) => setTimeout(r, 50));
+      const input = shadowQuery<HTMLInputElement>(el, 'input')!;
+      expect(input.selectionStart).toBe(0);
+      expect(input.selectionEnd).toBe('hello world'.length);
+    });
+  });
+
+  // ─── aria-describedby (2) ───
+
+  describe('aria-describedby', () => {
+    it('references error ID when error set', async () => {
+      const el = await fixture<WcTextInput>('<wc-text-input error="Bad input"></wc-text-input>');
+      const input = shadowQuery<HTMLInputElement>(el, 'input')!;
+      const errorDiv = shadowQuery(el, '.field__error')!;
+      const describedBy = input.getAttribute('aria-describedby');
+      expect(describedBy).toContain(errorDiv.id);
+    });
+
+    it('references help text ID when helpText set', async () => {
+      const el = await fixture<WcTextInput>('<wc-text-input help-text="Some help"></wc-text-input>');
+      const input = shadowQuery<HTMLInputElement>(el, 'input')!;
+      const helpDiv = shadowQuery(el, '.field__help-text')!;
+      const describedBy = input.getAttribute('aria-describedby');
+      expect(describedBy).toContain(helpDiv.id);
+    });
+  });
+
+  // ─── Accessibility (axe-core) ───
+
+  describe('Accessibility (axe-core)', () => {
+    it('has no axe violations in default state', async () => {
+      const el = await fixture<WcTextInput>('<wc-text-input label="Name"></wc-text-input>');
+      const { violations } = await checkA11y(el);
+      expect(violations).toEqual([]);
+    });
+
+    it('has no axe violations in error state', async () => {
+      const el = await fixture<WcTextInput>('<wc-text-input label="Email" error="Invalid email"></wc-text-input>');
+      const { violations } = await checkA11y(el);
+      expect(violations).toEqual([]);
+    });
+
+    it('has no axe violations when disabled', async () => {
+      const el = await fixture<WcTextInput>('<wc-text-input label="Name" disabled></wc-text-input>');
+      const { violations } = await checkA11y(el);
+      expect(violations).toEqual([]);
+    });
+
+    it('has no axe violations when required', async () => {
+      const el = await fixture<WcTextInput>('<wc-text-input label="Name" required></wc-text-input>');
+      const { violations } = await checkA11y(el);
+      expect(violations).toEqual([]);
+    });
+  });
+
+});

@@ -1,3 +1,4 @@
+import '@wc-2026/tokens/tokens.css';
 import type { Preview } from '@storybook/web-components';
 
 const preview: Preview = {
@@ -10,6 +11,18 @@ const preview: Preview = {
     },
     docs: {
       toc: true,
+    },
+    options: {
+      storySort: {
+        order: [
+          'Introduction',
+          'Design Tokens',
+          ['Colors', 'Spacing', 'Typography', 'Borders', 'Shadows'],
+          'Components',
+          ['Button', 'Card', 'Text Input', '*'],
+          '*',
+        ],
+      },
     },
     a11y: {
       // axe-core configuration
@@ -27,16 +40,16 @@ const preview: Preview = {
       options: {
         light: { name: 'light', value: '#ffffff' },
         grey: { name: 'grey', value: '#f8f9fa' },
-        dark: { name: 'dark', value: '#212529' }
-      }
+        dark: { name: 'dark', value: '#212529' },
+      },
     },
   },
 
   initialGlobals: {
     backgrounds: {
-      value: 'light'
-    }
-  }
+      value: 'light',
+    },
+  },
 };
 
 export default preview;

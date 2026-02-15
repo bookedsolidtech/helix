@@ -1,0 +1,233 @@
+---
+/**
+ * StackBundleSize — Section 4: Bundle Size Showdown
+ *
+ * Framework weight comparison bars showing Lit vs Vue vs React vs Angular.
+ */
+---
+
+<style is:inline>
+  /* ============================================
+     SECTION 4: BUNDLE SIZE SHOWDOWN
+     ============================================ */
+  .ts-bundle-section {
+    background: var(--surface-0);
+    border-top: 1px solid var(--surface-3);
+    border-bottom: 1px solid var(--surface-3);
+  }
+
+  .ts-bundle-container {
+    max-width: 900px;
+    margin: 0 auto;
+  }
+
+  .ts-bundle-bars {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-6);
+  }
+
+  .ts-bundle-row {
+    display: grid;
+    grid-template-columns: 140px 1fr 60px;
+    align-items: center;
+    gap: var(--space-4);
+  }
+
+  .ts-bundle-label {
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+  }
+
+  .ts-bundle-label img {
+    width: 24px;
+    height: 24px;
+  }
+
+  .ts-bundle-track {
+    height: 40px;
+    border-radius: var(--radius-md);
+    background: var(--surface-2);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .ts-bundle-fill {
+    height: 100%;
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding-right: var(--space-4);
+    font-size: 0.8125rem;
+    font-weight: 700;
+    color: rgba(255, 255, 255, 0.9);
+    transition: width 1.5s cubic-bezier(0.22, 1, 0.36, 1);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .ts-bundle-fill::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.1) 50%, transparent 100%);
+    background-size: 200% 100%;
+    animation: shimmer 3s ease-in-out infinite;
+  }
+
+  .ts-bundle-fill.ts-fill-lit {
+    background: linear-gradient(90deg, #06b6d4, #22d3ee);
+    width: 6.25%;
+  }
+  .ts-bundle-fill.ts-fill-vue {
+    background: linear-gradient(90deg, #42b883, #35495e);
+    width: 37.5%;
+  }
+  .ts-bundle-fill.ts-fill-react {
+    background: linear-gradient(90deg, #61dafb, #3178c6);
+    width: 50%;
+  }
+  .ts-bundle-fill.ts-fill-angular {
+    background: linear-gradient(90deg, #dd0031, #c3002f);
+    width: 100%;
+  }
+
+  .ts-bundle-size {
+    font-size: 1rem;
+    font-weight: 800;
+    color: var(--text-primary);
+    text-align: right;
+    font-family: var(--font-mono);
+  }
+
+  .ts-bundle-highlight {
+    text-align: center;
+    margin-top: var(--space-12);
+    padding: var(--space-8);
+    border-radius: var(--radius-2xl);
+    background: linear-gradient(135deg, rgba(6, 182, 212, 0.08), rgba(59, 130, 246, 0.04));
+    border: 1px solid rgba(6, 182, 212, 0.2);
+  }
+
+  .ts-bundle-highlight-number {
+    font-size: clamp(3rem, 8vw, 5rem);
+    font-weight: 900;
+    background: linear-gradient(135deg, var(--wc-cyan), var(--wc-electric));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    line-height: 1;
+    margin-bottom: var(--space-3);
+  }
+
+  .ts-bundle-highlight-text {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: var(--space-2);
+  }
+
+  .ts-bundle-highlight-sub {
+    font-size: 0.9375rem;
+    color: var(--text-secondary);
+  }
+
+  @media (max-width: 768px) {
+    .ts-bundle-row {
+      grid-template-columns: 100px 1fr 50px;
+      gap: var(--space-2);
+    }
+
+    .ts-bundle-label {
+      font-size: 0.8125rem;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .ts-bundle-row {
+      grid-template-columns: 80px 1fr 40px;
+    }
+
+    .ts-bundle-track {
+      height: 32px;
+    }
+  }
+</style>
+
+<section class="ts-section ts-bundle-section" aria-label="Bundle size comparison">
+  <div class="ts-section-inner">
+    <div class="ts-section-header scroll-reveal">
+      <span class="ts-section-label">Performance</span>
+      <h2 class="ts-section-title">Bundle Size Showdown</h2>
+      <p class="ts-section-description">
+        The runtime cost of choosing a component framework.
+        Lit's ~5 KB gives you full reactive Web Components.
+        Compare that to shipping an entire framework.
+      </p>
+    </div>
+
+    <div class="ts-bundle-container">
+      <div class="ts-bundle-bars scroll-reveal">
+        <!-- Lit -->
+        <div class="ts-bundle-row">
+          <div class="ts-bundle-label">
+            <img src="/logos/lit.svg" alt="" /> Lit 3.x
+          </div>
+          <div class="ts-bundle-track">
+            <div class="ts-bundle-fill ts-fill-lit"></div>
+          </div>
+          <div class="ts-bundle-size">~5 KB</div>
+        </div>
+
+        <!-- Vue -->
+        <div class="ts-bundle-row">
+          <div class="ts-bundle-label">
+            <i class="fa-brands fa-vuejs" style="color: #42b883; width: 24px; text-align: center;" aria-hidden="true"></i> Vue 3
+          </div>
+          <div class="ts-bundle-track">
+            <div class="ts-bundle-fill ts-fill-vue"></div>
+          </div>
+          <div class="ts-bundle-size">~30 KB</div>
+        </div>
+
+        <!-- React -->
+        <div class="ts-bundle-row">
+          <div class="ts-bundle-label">
+            <i class="fa-brands fa-react" style="color: #61dafb; width: 24px; text-align: center;" aria-hidden="true"></i> React 19
+          </div>
+          <div class="ts-bundle-track">
+            <div class="ts-bundle-fill ts-fill-react"></div>
+          </div>
+          <div class="ts-bundle-size">~40 KB</div>
+        </div>
+
+        <!-- Angular -->
+        <div class="ts-bundle-row">
+          <div class="ts-bundle-label">
+            <i class="fa-brands fa-angular" style="color: #dd0031; width: 24px; text-align: center;" aria-hidden="true"></i> Angular
+          </div>
+          <div class="ts-bundle-track">
+            <div class="ts-bundle-fill ts-fill-angular"></div>
+          </div>
+          <div class="ts-bundle-size">~80 KB</div>
+        </div>
+      </div>
+
+      <div class="ts-bundle-highlight scroll-reveal scroll-reveal-delay-2">
+        <div class="ts-bundle-highlight-number">~5 KB</div>
+        <div class="ts-bundle-highlight-text">
+          Gets you Web Components that work EVERYWHERE
+        </div>
+        <div class="ts-bundle-highlight-sub">
+          Drupal, React, Vue, Angular, Svelte, static HTML -- no adapter needed.
+          The browser IS the framework.
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

@@ -11,121 +11,29 @@
  *
  * Target audience: Technical leads, CTOs, hiring managers with 5 minutes.
  */
+import ShowcaseLayout from '../layouts/ShowcaseLayout.astro';
 ---
 
-<!doctype html>
-<html lang="en" data-theme="dark">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>The 5-Minute Pitch | WC-2026</title>
-    <meta
-      name="description"
-      content="A concise 5-minute walkthrough of the WC-2026 enterprise healthcare web component architecture, the engineer behind it, and why this stack was chosen."
-    />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=JetBrains+Mono:wght@400;500;600;700&display=swap"
-      rel="stylesheet"
-    />
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
-      integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg=="
-      crossorigin="anonymous"
-      referrerpolicy="no-referrer"
-    />
-
+<ShowcaseLayout
+  title="The 5-Minute Pitch"
+  description="A concise 5-minute walkthrough of the WC-2026 enterprise healthcare web component architecture, the engineer behind it, and why this stack was chosen."
+>
     <style is:inline>
       /* ============================================
-         DETAILED PITCH - 5 MINUTE EXPERIENCE
+         DETAILED PITCH - PAGE-SPECIFIC CSS
          ============================================ */
 
-      @property --gradient-angle {
-        syntax: '<angle>';
-        initial-value: 0deg;
-        inherits: false;
-      }
-
+      /* Override shared --gradient-hero for this page's darker palette */
       :root {
-        --wc-accent-h: 250;
-        --wc-accent-s: 70%;
-        --wc-accent-l: 60%;
-        --wc-accent: hsl(var(--wc-accent-h), var(--wc-accent-s), var(--wc-accent-l));
-        --wc-cyan: #06b6d4;
-        --wc-pink: #ec4899;
-        --wc-green: #10b981;
-        --wc-amber: #f59e0b;
-        --wc-red: #ef4444;
-        --wc-electric: #3b82f6;
-
-        --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         --gradient-hero: linear-gradient(135deg, #0a0a18 0%, #0f1030 40%, #0a0a2e 100%);
-        --gradient-cyan-purple: linear-gradient(135deg, #06b6d4, #8b5cf6);
-        --gradient-pink-orange: linear-gradient(135deg, #ec4899, #f97316);
-        --gradient-green-cyan: linear-gradient(135deg, #10b981, #06b6d4);
-
-        --font-heading: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-        --font-body: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-        --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
-
-        --space-1: 0.25rem; --space-2: 0.5rem; --space-3: 0.75rem;
-        --space-4: 1rem; --space-5: 1.25rem; --space-6: 1.5rem;
-        --space-8: 2rem; --space-10: 2.5rem; --space-12: 3rem;
-        --space-16: 4rem; --space-20: 5rem; --space-24: 6rem;
-
-        --radius-sm: 0.5rem; --radius-md: 0.75rem; --radius-lg: 1rem;
-        --radius-xl: 1.5rem; --radius-2xl: 2rem; --radius-full: 9999px;
-
-        --shadow-sm: 0 2px 8px rgba(0,0,0,0.3);
-        --shadow-md: 0 4px 16px rgba(0,0,0,0.4);
-        --shadow-lg: 0 8px 32px rgba(0,0,0,0.5);
-        --shadow-xl: 0 16px 64px rgba(0,0,0,0.6);
-
-        --glass-bg: rgba(255,255,255,0.03);
-        --glass-bg-strong: rgba(255,255,255,0.06);
-        --glass-border: rgba(255,255,255,0.06);
-        --glass-border-strong: rgba(255,255,255,0.12);
-
-        --glow-primary: 0 0 50px rgba(102,126,234,0.25);
-        --glow-subtle: 0 0 20px rgba(102,126,234,0.15);
-
-        --surface-0: #0a0a14; --surface-1: #111122;
-        --surface-2: #1a1a32; --surface-3: #252545;
-        --text-primary: #eaeaf4; --text-secondary: #a8a8c8; --text-muted: #6868a0;
       }
 
-      *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-
-      body {
-        font-family: var(--font-body); line-height: 1.6;
-        -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;
-        background: var(--surface-0); color: var(--text-primary);
-        scroll-behavior: smooth; overflow-x: hidden;
+      /* Override shared pulse-ring: this page uses box-shadow ring, not scale/opacity */
+      @keyframes pulse-ring {
+        0% { box-shadow: 0 0 0 0 rgba(102,126,234,0.4); }
+        70% { box-shadow: 0 0 0 15px rgba(102,126,234,0); }
+        100% { box-shadow: 0 0 0 0 rgba(102,126,234,0); }
       }
-
-      h1,h2,h3,h4,h5,h6 { font-family: var(--font-heading); font-weight: 700; letter-spacing: -0.025em; line-height: 1.15; }
-      code, pre { font-family: var(--font-mono); }
-      a { color: var(--wc-accent); text-decoration: none; transition: color 0.2s ease; }
-
-      /* Keyframes */
-      @keyframes fadeInUp { from { opacity:0; transform:translateY(40px); } to { opacity:1; transform:translateY(0); } }
-      @keyframes fadeInDown { from { opacity:0; transform:translateY(-20px); } to { opacity:1; transform:translateY(0); } }
-      @keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
-      @keyframes float-slow { 0%,100% { transform:translate(0,0) scale(1); } 25% { transform:translate(30px,-20px) scale(1.05); } 50% { transform:translate(-10px,-35px) scale(0.97); } 75% { transform:translate(-25px,-10px) scale(1.02); } }
-      @keyframes orb-pulse { 0%,100% { opacity:0.3; filter:blur(100px); } 50% { opacity:0.5; filter:blur(120px); } }
-      @keyframes particle-drift { 0% { background-position: 0 0, 200px 200px, 400px 100px; } 100% { background-position: 800px 800px, 1000px 1000px, 1200px 900px; } }
-      @keyframes border-rotate { 0% { --gradient-angle:0deg; } 100% { --gradient-angle:360deg; } }
-      @keyframes pulse-ring { 0% { box-shadow: 0 0 0 0 rgba(102,126,234,0.4); } 70% { box-shadow: 0 0 0 15px rgba(102,126,234,0); } 100% { box-shadow: 0 0 0 0 rgba(102,126,234,0); } }
-      @keyframes scroll-fade { 0% { opacity:1; transform:translateX(-50%) translateY(0); } 100% { opacity:0; transform:translateX(-50%) translateY(12px); } }
-
-      /* Scroll Reveal */
-      .scroll-reveal { opacity:0; transform:translateY(40px); transition: opacity 0.8s cubic-bezier(0.22,1,0.36,1), transform 0.8s cubic-bezier(0.22,1,0.36,1), filter 0.8s cubic-bezier(0.22,1,0.36,1); filter:blur(4px); }
-      .scroll-reveal.is-visible { opacity:1; transform:translateY(0); filter:blur(0); }
-      .scroll-reveal-delay-1 { transition-delay:0.1s; } .scroll-reveal-delay-2 { transition-delay:0.2s; }
-      .scroll-reveal-delay-3 { transition-delay:0.3s; } .scroll-reveal-delay-4 { transition-delay:0.4s; }
-      .scroll-reveal-delay-5 { transition-delay:0.5s; } .scroll-reveal-delay-6 { transition-delay:0.6s; }
 
       /* Floating Pitch Nav */
       .pitch-nav {
@@ -425,9 +333,8 @@
         .pitch-nav-home { min-width: 44px; min-height: 44px; }
       }
 
+      /* Page-specific reduced motion rules */
       @media (prefers-reduced-motion: reduce) {
-        *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
-        .scroll-reveal { opacity: 1; transform: none; filter: none; transition: none; }
         .dp-hero-orb { animation: none !important; opacity: 0.15; }
       }
 
@@ -435,9 +342,7 @@
         outline: 3px solid var(--wc-accent); outline-offset: 3px;
       }
     </style>
-  </head>
 
-  <body>
     <!-- Floating pitch navigation -->
     <nav class="pitch-nav" aria-label="Pitch pages">
       <a href="/" class="pitch-nav-home" aria-label="Back to Dashboard">
@@ -477,9 +382,9 @@
           </p>
         </div>
 
-        <div class="dp-hero-scroll" aria-hidden="true">
-          <span>Scroll</span>
-          <div class="dp-hero-scroll-line"></div>
+        <div class="mouse-scroll-wrap mouse-scroll-wrap--absolute" aria-hidden="true">
+          <div class="mouse-scroll-body"><div class="mouse-scroll-wheel"></div></div>
+          <span class="mouse-scroll-label">Scroll</span>
         </div>
       </section>
 
@@ -822,7 +727,7 @@
       </section>
     </main>
 
-    <script is:inline>
+    <script is:inline slot="scripts">
       (function () {
         var prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -885,5 +790,4 @@
         document.querySelectorAll('.dp-stats-row').forEach(function (row) { counterObserver.observe(row); });
       })();
     </script>
-  </body>
-</html>
+</ShowcaseLayout>

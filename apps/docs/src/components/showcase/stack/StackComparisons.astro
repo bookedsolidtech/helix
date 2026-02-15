@@ -1,0 +1,541 @@
+---
+/**
+ * StackComparisons — Section 3: Head-to-Head Comparisons
+ *
+ * Five technology comparison matrices showing the decision rationale
+ * for Lit, Vitest, Terrazzo, Vite, and the Starlight+Storybook doc system.
+ */
+---
+
+<style is:inline>
+  /* ============================================
+     SECTION 3: HEAD-TO-HEAD COMPARISONS
+     ============================================ */
+  .ts-comparisons-section {
+    background: var(--surface-0);
+  }
+
+  .ts-comparison-grid {
+    display: grid;
+    gap: var(--space-10);
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  .ts-comparison {
+    padding: var(--space-10);
+    border-radius: var(--radius-2xl);
+    background: var(--surface-1);
+    border: 1px solid var(--surface-3);
+    position: relative;
+    overflow: hidden;
+    transition: all 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .ts-comparison::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1.5px;
+    background: conic-gradient(from var(--gradient-angle), #06b6d4, #3b82f6, #8b5cf6, #06b6d4);
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+    pointer-events: none;
+    animation: border-rotate 4s linear infinite;
+  }
+
+  .ts-comparison::after {
+    content: '';
+    position: absolute;
+    width: 300px;
+    height: 300px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(6, 182, 212, 0.08), transparent 70%);
+    opacity: 0;
+    transition: opacity 0.5s ease;
+    pointer-events: none;
+    top: var(--mouse-y, 50%);
+    left: var(--mouse-x, 50%);
+    transform: translate(-50%, -50%);
+  }
+
+  .ts-comparison:hover::before { opacity: 1; }
+  .ts-comparison:hover::after { opacity: 1; }
+
+  .ts-comparison-header {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    margin-bottom: var(--space-8);
+  }
+
+  .ts-comparison-icon {
+    width: 56px;
+    height: 56px;
+    border-radius: var(--radius-lg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    flex-shrink: 0;
+  }
+
+  .ts-comparison-category {
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: var(--space-1);
+  }
+
+  .ts-comparison-title {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: var(--text-primary);
+  }
+
+  /* Comparison table */
+  .ts-comp-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: var(--space-6);
+    font-size: 0.875rem;
+  }
+
+  .ts-comp-table th {
+    text-align: left;
+    padding: var(--space-3) var(--space-4);
+    font-weight: 600;
+    color: var(--text-muted);
+    font-size: 0.75rem;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    border-bottom: 1px solid var(--surface-3);
+  }
+
+  .ts-comp-table td {
+    padding: var(--space-3) var(--space-4);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+    color: var(--text-secondary);
+  }
+
+  .ts-comp-table tr:last-child td {
+    border-bottom: none;
+  }
+
+  .ts-comp-table .ts-winner-col {
+    background: rgba(6, 182, 212, 0.04);
+  }
+
+  .ts-comp-table th.ts-winner-col {
+    color: var(--wc-cyan);
+    background: rgba(6, 182, 212, 0.06);
+  }
+
+  .ts-check { color: var(--wc-green); }
+  .ts-cross { color: var(--wc-red); opacity: 0.6; }
+  .ts-partial { color: var(--wc-amber); }
+
+  /* Winner badge */
+  .ts-winner-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-2) var(--space-4);
+    border-radius: var(--radius-full);
+    background: linear-gradient(135deg, rgba(6, 182, 212, 0.15), rgba(16, 185, 129, 0.1));
+    border: 1px solid rgba(6, 182, 212, 0.25);
+    color: var(--wc-cyan);
+    font-size: 0.8125rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+  }
+
+  .ts-winner-badge i {
+    color: var(--wc-green);
+  }
+
+  .ts-decision-text {
+    font-size: 0.9375rem;
+    color: var(--text-secondary);
+    line-height: 1.7;
+    margin-top: var(--space-4);
+  }
+
+  .ts-decision-text strong {
+    color: var(--text-primary);
+  }
+
+  @media (max-width: 768px) {
+    .ts-comp-table {
+      font-size: 0.75rem;
+    }
+
+    .ts-comp-table th,
+    .ts-comp-table td {
+      padding: var(--space-2) var(--space-3);
+    }
+
+    .ts-comparison {
+      padding: var(--space-6);
+    }
+  }
+</style>
+
+<section class="ts-section ts-comparisons-section" aria-label="Technology comparisons">
+  <div class="ts-section-inner">
+    <div class="ts-section-header scroll-reveal">
+      <span class="ts-section-label">Decisions</span>
+      <h2 class="ts-section-title">Head-to-Head Comparisons</h2>
+      <p class="ts-section-description">
+        Every major technology was evaluated against real alternatives.
+        Here are the comparison matrices that drove each decision.
+      </p>
+    </div>
+
+    <div class="ts-comparison-grid">
+
+      <!-- Comparison 1: Component Framework -->
+      <div class="ts-comparison scroll-reveal" role="region" aria-label="Component framework comparison">
+        <div class="ts-comparison-header">
+          <div class="ts-comparison-icon" style="background: rgba(50, 79, 255, 0.1); border: 1px solid rgba(50, 79, 255, 0.2);">
+            <img src="/logos/lit.svg" alt="" style="width: 28px; height: 28px;" />
+          </div>
+          <div>
+            <div class="ts-comparison-category">Component Framework</div>
+            <h3 class="ts-comparison-title">Lit 3.x vs the Field</h3>
+          </div>
+        </div>
+
+        <table class="ts-comp-table">
+          <thead>
+            <tr>
+              <th>Criteria</th>
+              <th class="ts-winner-col">Lit 3.x</th>
+              <th>Stencil</th>
+              <th>FAST</th>
+              <th>Vanilla</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Bundle size</td>
+              <td class="ts-winner-col"><strong>~5 KB</strong></td>
+              <td>~14 KB</td>
+              <td>~8 KB</td>
+              <td>0 KB</td>
+            </tr>
+            <tr>
+              <td>TypeScript</td>
+              <td class="ts-winner-col"><i class="fa-solid fa-check ts-check" aria-label="Yes"></i> Native</td>
+              <td><i class="fa-solid fa-check ts-check" aria-label="Yes"></i> Native</td>
+              <td><i class="fa-solid fa-check ts-check" aria-label="Yes"></i> Native</td>
+              <td><i class="fa-solid fa-minus ts-partial" aria-label="Partial"></i> Manual</td>
+            </tr>
+            <tr>
+              <td>Drupal compat</td>
+              <td class="ts-winner-col"><strong>Excellent</strong></td>
+              <td>Good</td>
+              <td>Good</td>
+              <td>Excellent</td>
+            </tr>
+            <tr>
+              <td>SSR support</td>
+              <td class="ts-winner-col"><i class="fa-solid fa-check ts-check" aria-label="Yes"></i></td>
+              <td><i class="fa-solid fa-check ts-check" aria-label="Yes"></i></td>
+              <td><i class="fa-solid fa-xmark ts-cross" aria-label="No"></i></td>
+              <td><i class="fa-solid fa-check ts-check" aria-label="Yes"></i></td>
+            </tr>
+            <tr>
+              <td>Community</td>
+              <td class="ts-winner-col"><strong>Large</strong></td>
+              <td>Medium</td>
+              <td>Small</td>
+              <td>N/A</td>
+            </tr>
+            <tr>
+              <td>Storybook</td>
+              <td class="ts-winner-col"><i class="fa-solid fa-check ts-check" aria-label="Yes"></i> Native</td>
+              <td><i class="fa-solid fa-minus ts-partial" aria-label="Partial"></i> Plugin</td>
+              <td><i class="fa-solid fa-minus ts-partial" aria-label="Partial"></i> Plugin</td>
+              <td><i class="fa-solid fa-minus ts-partial" aria-label="Partial"></i> Manual</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="ts-winner-badge">
+          <i class="fa-solid fa-trophy" aria-hidden="true"></i>
+          Winner: Lit 3.x
+        </div>
+        <p class="ts-decision-text">
+          <strong>Best balance of size, DX, and Drupal compatibility.</strong>
+          5 KB runtime gives you reactive properties, Shadow DOM, and TypeScript decorators.
+          Vanilla is lighter but requires building every abstraction from scratch.
+        </p>
+      </div>
+
+      <!-- Comparison 2: Testing -->
+      <div class="ts-comparison scroll-reveal" role="region" aria-label="Testing framework comparison">
+        <div class="ts-comparison-header">
+          <div class="ts-comparison-icon" style="background: rgba(114, 155, 27, 0.1); border: 1px solid rgba(114, 155, 27, 0.2);">
+            <img src="/logos/vitest.svg" alt="" style="width: 28px; height: 28px;" />
+          </div>
+          <div>
+            <div class="ts-comparison-category">Testing Framework</div>
+            <h3 class="ts-comparison-title">Vitest 4.x vs the Field</h3>
+          </div>
+        </div>
+
+        <table class="ts-comp-table">
+          <thead>
+            <tr>
+              <th>Criteria</th>
+              <th class="ts-winner-col">Vitest 4.x</th>
+              <th>Jest + JSDOM</th>
+              <th>Web Test Runner</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Real browser</td>
+              <td class="ts-winner-col"><i class="fa-solid fa-check ts-check" aria-label="Yes"></i> Yes</td>
+              <td><i class="fa-solid fa-xmark ts-cross" aria-label="No"></i> No (JSDOM)</td>
+              <td><i class="fa-solid fa-check ts-check" aria-label="Yes"></i> Yes</td>
+            </tr>
+            <tr>
+              <td>Speed vs Jest</td>
+              <td class="ts-winner-col"><strong>2-10x faster</strong></td>
+              <td>Baseline</td>
+              <td>Medium</td>
+            </tr>
+            <tr>
+              <td>Storybook 10</td>
+              <td class="ts-winner-col"><i class="fa-solid fa-check ts-check" aria-label="Yes"></i> Native</td>
+              <td><i class="fa-solid fa-minus ts-partial" aria-label="Partial"></i> Plugin</td>
+              <td><i class="fa-solid fa-xmark ts-cross" aria-label="No"></i> None</td>
+            </tr>
+            <tr>
+              <td>Watch mode</td>
+              <td class="ts-winner-col"><i class="fa-solid fa-check ts-check" aria-label="Yes"></i></td>
+              <td><i class="fa-solid fa-check ts-check" aria-label="Yes"></i></td>
+              <td><i class="fa-solid fa-check ts-check" aria-label="Yes"></i></td>
+            </tr>
+            <tr>
+              <td>TypeScript</td>
+              <td class="ts-winner-col"><i class="fa-solid fa-check ts-check" aria-label="Yes"></i> Native</td>
+              <td><i class="fa-solid fa-minus ts-partial" aria-label="Partial"></i> Transform</td>
+              <td><i class="fa-solid fa-check ts-check" aria-label="Yes"></i></td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="ts-winner-badge">
+          <i class="fa-solid fa-trophy" aria-hidden="true"></i>
+          Winner: Vitest 4.x
+        </div>
+        <p class="ts-decision-text">
+          <strong>Unified test runner for unit, browser, and Storybook tests.</strong>
+          Storybook 10 native integration is the decisive factor: one runner, one config, one mental model.
+          Real browser testing via Playwright catches issues JSDOM never will.
+        </p>
+      </div>
+
+      <!-- Comparison 3: Design Tokens -->
+      <div class="ts-comparison scroll-reveal" role="region" aria-label="Design tokens comparison">
+        <div class="ts-comparison-header">
+          <div class="ts-comparison-icon" style="background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.2);">
+            <i class="fa-solid fa-palette" style="color: var(--wc-green);" aria-hidden="true"></i>
+          </div>
+          <div>
+            <div class="ts-comparison-category">Design Tokens</div>
+            <h3 class="ts-comparison-title">Terrazzo vs the Field</h3>
+          </div>
+        </div>
+
+        <table class="ts-comp-table">
+          <thead>
+            <tr>
+              <th>Criteria</th>
+              <th class="ts-winner-col">Terrazzo</th>
+              <th>Style Dictionary</th>
+              <th>Theo</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>W3C DTCG spec</td>
+              <td class="ts-winner-col"><i class="fa-solid fa-check ts-check" aria-label="Yes"></i> <strong>Native</strong></td>
+              <td><i class="fa-solid fa-minus ts-partial" aria-label="Partial"></i> Plugin</td>
+              <td><i class="fa-solid fa-xmark ts-cross" aria-label="No"></i> No</td>
+            </tr>
+            <tr>
+              <td>Output formats</td>
+              <td class="ts-winner-col">CSS, JS, SCSS</td>
+              <td>CSS, JS, SCSS+</td>
+              <td>CSS, JS</td>
+            </tr>
+            <tr>
+              <td>Type safety</td>
+              <td class="ts-winner-col"><i class="fa-solid fa-check ts-check" aria-label="Yes"></i> Yes</td>
+              <td><i class="fa-solid fa-minus ts-partial" aria-label="Partial"></i> Partial</td>
+              <td><i class="fa-solid fa-xmark ts-cross" aria-label="No"></i> No</td>
+            </tr>
+            <tr>
+              <td>Active dev</td>
+              <td class="ts-winner-col"><i class="fa-solid fa-check ts-check" aria-label="Yes"></i> Yes</td>
+              <td><i class="fa-solid fa-check ts-check" aria-label="Yes"></i> Yes</td>
+              <td><i class="fa-solid fa-xmark ts-cross" aria-label="No"></i> Archived</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="ts-winner-badge">
+          <i class="fa-solid fa-trophy" aria-hidden="true"></i>
+          Winner: Terrazzo
+        </div>
+        <p class="ts-decision-text">
+          <strong>Native W3C DTCG support, successor to Cobalt UI.</strong>
+          The W3C Design Tokens Community Group specification reached its first stable version (2025.10).
+          Terrazzo is the only tool built from the ground up for this standard.
+        </p>
+      </div>
+
+      <!-- Comparison 4: Build Tool -->
+      <div class="ts-comparison scroll-reveal" role="region" aria-label="Build tool comparison">
+        <div class="ts-comparison-header">
+          <div class="ts-comparison-icon" style="background: rgba(189, 52, 254, 0.1); border: 1px solid rgba(189, 52, 254, 0.2);">
+            <i class="fa-solid fa-bolt" style="color: #bd34fe;" aria-hidden="true"></i>
+          </div>
+          <div>
+            <div class="ts-comparison-category">Build Tool</div>
+            <h3 class="ts-comparison-title">Vite vs the Field</h3>
+          </div>
+        </div>
+
+        <table class="ts-comp-table">
+          <thead>
+            <tr>
+              <th>Criteria</th>
+              <th class="ts-winner-col">Vite</th>
+              <th>Rollup</th>
+              <th>esbuild</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Dev server</td>
+              <td class="ts-winner-col"><i class="fa-solid fa-check ts-check" aria-label="Yes"></i> <strong>Built-in</strong></td>
+              <td><i class="fa-solid fa-xmark ts-cross" aria-label="No"></i> Manual</td>
+              <td><i class="fa-solid fa-xmark ts-cross" aria-label="No"></i> Manual</td>
+            </tr>
+            <tr>
+              <td>Library mode</td>
+              <td class="ts-winner-col"><i class="fa-solid fa-check ts-check" aria-label="Yes"></i> Native</td>
+              <td><i class="fa-solid fa-check ts-check" aria-label="Yes"></i> Native</td>
+              <td><i class="fa-solid fa-minus ts-partial" aria-label="Partial"></i> Limited</td>
+            </tr>
+            <tr>
+              <td>Storybook</td>
+              <td class="ts-winner-col"><i class="fa-solid fa-check ts-check" aria-label="Yes"></i> <strong>Native</strong></td>
+              <td><i class="fa-solid fa-minus ts-partial" aria-label="Partial"></i> Plugin</td>
+              <td><i class="fa-solid fa-minus ts-partial" aria-label="Partial"></i> Plugin</td>
+            </tr>
+            <tr>
+              <td>Tree-shaking</td>
+              <td class="ts-winner-col"><i class="fa-solid fa-check ts-check" aria-label="Yes"></i> Yes</td>
+              <td><i class="fa-solid fa-check ts-check" aria-label="Yes"></i> Yes</td>
+              <td><i class="fa-solid fa-minus ts-partial" aria-label="Partial"></i> Partial</td>
+            </tr>
+            <tr>
+              <td>HMR</td>
+              <td class="ts-winner-col"><i class="fa-solid fa-check ts-check" aria-label="Yes"></i> <strong>Instant</strong></td>
+              <td><i class="fa-solid fa-xmark ts-cross" aria-label="No"></i> No</td>
+              <td><i class="fa-solid fa-xmark ts-cross" aria-label="No"></i> No</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="ts-winner-badge">
+          <i class="fa-solid fa-trophy" aria-hidden="true"></i>
+          Winner: Vite
+        </div>
+        <p class="ts-decision-text">
+          <strong>Native library mode powers both Storybook and the component build.</strong>
+          Vite uses Rollup under the hood for production but adds instant HMR, a built-in dev server,
+          and first-class Storybook 10 support. Best of all worlds.
+        </p>
+      </div>
+
+      <!-- Comparison 5: Documentation -->
+      <div class="ts-comparison scroll-reveal" role="region" aria-label="Documentation system comparison">
+        <div class="ts-comparison-header">
+          <div class="ts-comparison-icon" style="background: rgba(255, 93, 1, 0.1); border: 1px solid rgba(255, 93, 1, 0.2);">
+            <img src="/logos/astro.svg" alt="" style="width: 28px; height: 28px;" />
+          </div>
+          <div>
+            <div class="ts-comparison-category">Documentation</div>
+            <h3 class="ts-comparison-title">Dual System: Starlight + Storybook</h3>
+          </div>
+        </div>
+
+        <table class="ts-comp-table">
+          <thead>
+            <tr>
+              <th>Responsibility</th>
+              <th>Storybook 10.x</th>
+              <th>Astro / Starlight</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Interactive demos</td>
+              <td><i class="fa-solid fa-check ts-check" aria-label="Yes"></i> <strong>Primary</strong></td>
+              <td>Embedded via iframe</td>
+            </tr>
+            <tr>
+              <td>API reference</td>
+              <td>Autodocs (from CEM)</td>
+              <td><i class="fa-solid fa-check ts-check" aria-label="Yes"></i> <strong>Comprehensive</strong></td>
+            </tr>
+            <tr>
+              <td>Integration guides</td>
+              <td>--</td>
+              <td><i class="fa-solid fa-check ts-check" aria-label="Yes"></i> <strong>Prose + tutorials</strong></td>
+            </tr>
+            <tr>
+              <td>Visual testing</td>
+              <td><i class="fa-solid fa-check ts-check" aria-label="Yes"></i> <strong>Chromatic</strong></td>
+              <td>--</td>
+            </tr>
+            <tr>
+              <td>Search</td>
+              <td>Pagefind (merged)</td>
+              <td><i class="fa-solid fa-check ts-check" aria-label="Yes"></i> <strong>Pagefind (unified)</strong></td>
+            </tr>
+            <tr>
+              <td>JS shipped</td>
+              <td>React runtime</td>
+              <td><strong>0 KB</strong> (static HTML)</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="ts-winner-badge">
+          <i class="fa-solid fa-trophy" aria-hidden="true"></i>
+          Winner: Both -- complementary systems
+        </div>
+        <p class="ts-decision-text">
+          <strong>Storybook answers "what does it look like?" Starlight answers "how do I use it?"</strong>
+          CEM acts as the single source of truth feeding API docs into both systems.
+          Pagefind mergeIndex provides unified cross-site search.
+        </p>
+      </div>
+
+    </div>
+  </div>
+</section>

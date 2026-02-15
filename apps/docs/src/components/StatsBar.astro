@@ -86,7 +86,7 @@ const stats: Stat[] = [
         data-stat-modal={`stat-${i}`}
       >
         <div class="stat-card-header">
-          <i class={`${stat.iconClass} stat-main-icon`} aria-hidden="true"></i>
+          <i class={`${stat.iconClass} stat-main-icon ${stat.colorClass}`} aria-hidden="true"></i>
           <div class={`stat-value ${stat.colorClass}`}>{stat.value}</div>
           <div class="stat-label">{stat.label}</div>
         </div>

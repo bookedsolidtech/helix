@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/web-components';
 import { html } from 'lit';
+import { expect, within, userEvent } from 'storybook/test';
 import './wc-button.js';
 
 const meta = {
@@ -53,7 +54,7 @@ const meta = {
   render: (args) => html`
     <wc-button
       variant=${args.variant}
-      size=${args.size}
+      wc-size=${args.size}
       ?disabled=${args.disabled}
       type=${args.type}
     >
@@ -72,6 +73,13 @@ export const Primary: Story = {
   args: {
     variant: 'primary',
     label: 'Primary Button',
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const button = canvasElement.querySelector('wc-button');
+    expect(button).toBeTruthy();
+    expect(button?.shadowRoot?.querySelector('button')).toBeTruthy();
+    await userEvent.click(button!);
   },
 };
 
@@ -143,9 +151,9 @@ export const AllVariants: Story = {
 export const AllSizes: Story = {
   render: () => html`
     <div style="display: flex; gap: 1rem; align-items: center;">
-      <wc-button size="sm">Small</wc-button>
-      <wc-button size="md">Medium</wc-button>
-      <wc-button size="lg">Large</wc-button>
+      <wc-button wc-size="sm">Small</wc-button>
+      <wc-button wc-size="md">Medium</wc-button>
+      <wc-button wc-size="lg">Large</wc-button>
     </div>
   `,
 };

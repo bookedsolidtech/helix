@@ -1,0 +1,1640 @@
+---
+/**
+ * ArchTab4LightDOM — Tab 4 of the System Architecture page.
+ *
+ * Contains the "Light DOM Architecture" Decision Record:
+ * - Hero section — "Rendering Without Walls"
+ * - The Spectrum — Shadow DOM vs Light DOM decision
+ * - The Controller — AdoptedStylesheetsController flow
+ * - CMS Content — The WYSIWYG problem and wc-prose
+ * - Drupal Forms — wc-form dual-mode pattern
+ * - System Architecture — full diagram
+ * - Recommendation — decision matrix
+ */
+import {
+  codeAdoptedController,
+  codeLightDomPattern,
+  codeDrupalWysiwyg,
+  codeProseWrapper,
+  codeFormStandalone,
+  codeFormDrupal,
+  codeFormInternals,
+  codeScopedCss,
+} from './ArchCodeExamples';
+---
+
+<div id="tab-lightdom" class="da-tab-content" role="tabpanel">
+  <!-- HERO -->
+  <section class="da-hero da-hero-lightdom" aria-label="Light DOM Architecture Decision">
+    <div class="da-hero-grid" aria-hidden="true"></div>
+    <div class="da-hero-orb da-hero-orb-1" aria-hidden="true"></div>
+    <div class="da-hero-orb da-hero-orb-2" aria-hidden="true"></div>
+    <div class="da-hero-orb da-hero-orb-3" aria-hidden="true"></div>
+
+    <div class="da-hero-content">
+      <div class="da-hero-badge">
+        <span class="da-hero-badge-dot" aria-hidden="true"></span>
+        Architecture Decision Record
+      </div>
+
+      <h1 class="da-hero-title">Rendering<br />Without Walls</h1>
+
+      <p class="da-hero-subtitle">When Shadow DOM Gets in the Way</p>
+
+      <p class="da-hero-description">
+        Shadow DOM is the default for encapsulated UI controls &mdash; buttons, inputs, cards.
+        But when content editors control the markup, when Drupal's Form API owns the
+        <code>&lt;form&gt;</code> tag, or when CKEditor outputs unpredictable HTML,
+        the shadow boundary becomes a <strong>barrier</strong>, not a benefit.
+        Light DOM components solve this.
+      </p>
+    </div>
+
+    <div class="mouse-scroll-wrap mouse-scroll-wrap--absolute" aria-hidden="true">
+      <div class="mouse-scroll-body"><div class="mouse-scroll-wheel"></div></div>
+      <span class="mouse-scroll-label">Scroll</span>
+    </div>
+  </section>
+
+  <!-- SECTION 2: THE SPECTRUM -->
+  <section class="da-section" aria-label="Shadow DOM vs Light DOM spectrum">
+    <div class="da-section-inner">
+      <div class="da-section-header scroll-reveal">
+        <span class="da-section-label">The Spectrum</span>
+        <h2 class="da-section-title">When to Break the Boundary</h2>
+        <p class="da-section-description">
+          Not every component benefits from Shadow DOM encapsulation. The rendering
+          strategy depends on who controls the content inside the component.
+        </p>
+      </div>
+
+      <div class="da-lightdom-spectrum scroll-reveal scroll-reveal-delay-1">
+        <!-- Shadow DOM card -->
+        <div class="da-lightdom-choice da-lightdom-choice-shadow">
+          <div class="da-lightdom-choice-icon" aria-hidden="true">
+            <i class="fa-solid fa-shield-halved"></i>
+          </div>
+          <h3 class="da-lightdom-choice-title">Shadow DOM</h3>
+          <p class="da-lightdom-choice-subtitle">Encapsulated UI Controls</p>
+          <p class="da-lightdom-choice-desc">
+            The component owns all rendering. Styles are encapsulated.
+            External CSS cannot leak in or out. Ideal for <strong>interactive
+            controls</strong> with predictable internal markup.
+          </p>
+          <div class="da-lightdom-choice-tags">
+            <span class="da-lightdom-tag da-lightdom-tag-cyan">wc-button</span>
+            <span class="da-lightdom-tag da-lightdom-tag-cyan">wc-text-input</span>
+            <span class="da-lightdom-tag da-lightdom-tag-cyan">wc-card</span>
+            <span class="da-lightdom-tag da-lightdom-tag-cyan">wc-badge</span>
+            <span class="da-lightdom-tag da-lightdom-tag-cyan">wc-alert</span>
+            <span class="da-lightdom-tag da-lightdom-tag-cyan">wc-select</span>
+            <span class="da-lightdom-tag da-lightdom-tag-cyan">wc-checkbox</span>
+            <span class="da-lightdom-tag da-lightdom-tag-cyan">wc-switch</span>
+          </div>
+          <div class="da-lightdom-choice-when">
+            <strong>Use when:</strong>
+            <ul>
+              <li>Component controls all internal markup</li>
+              <li>Style isolation is required</li>
+              <li>Interactive behavior is self-contained</li>
+              <li>Slots project content without styling it</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Light DOM card -->
+        <div class="da-lightdom-choice da-lightdom-choice-light">
+          <div class="da-lightdom-choice-icon" aria-hidden="true">
+            <i class="fa-solid fa-lightbulb"></i>
+          </div>
+          <h3 class="da-lightdom-choice-title">Light DOM</h3>
+          <p class="da-lightdom-choice-subtitle">CMS Content Containers</p>
+          <p class="da-lightdom-choice-desc">
+            The CMS or content editor owns the markup. The component provides
+            <strong>styling and behavior</strong> without creating a shadow boundary.
+            CSS must reach deeply nested children.
+          </p>
+          <div class="da-lightdom-choice-tags">
+            <span class="da-lightdom-tag da-lightdom-tag-amber">wc-prose</span>
+            <span class="da-lightdom-tag da-lightdom-tag-amber">wc-form</span>
+            <span class="da-lightdom-tag da-lightdom-tag-amber">wc-container</span>
+          </div>
+          <div class="da-lightdom-choice-when">
+            <strong>Use when:</strong>
+            <ul>
+              <li>CMS editors control the child markup</li>
+              <li>Drupal Form API provides the <code>&lt;form&gt;</code></li>
+              <li>WYSIWYG output must be styled directly</li>
+              <li>SEO requires content in the main DOM</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 3: THE CONTROLLER -->
+  <section class="da-section" style="border-top: 1px solid var(--surface-3);" aria-label="AdoptedStylesheetsController">
+    <div class="da-section-inner">
+      <div class="da-section-header scroll-reveal">
+        <span class="da-section-label">The Controller</span>
+        <h2 class="da-section-title">Scoped CSS Without Shadow DOM</h2>
+        <p class="da-section-description">
+          The <code style="background: rgba(255,255,255,0.08); padding: 0.15em 0.5em; border-radius: 4px; font-family: var(--font-mono);">AdoptedStylesheetsController</code>
+          injects CSS into the document via the Adopted Stylesheets API,
+          with automatic deduplication and cleanup.
+        </p>
+      </div>
+
+      <!-- 4-step flow diagram -->
+      <div class="da-adopted-flow scroll-reveal scroll-reveal-delay-1">
+        <div class="da-adopted-step">
+          <div class="da-adopted-step-num" aria-hidden="true">1</div>
+          <div class="da-adopted-step-icon" aria-hidden="true"><i class="fa-solid fa-file-import"></i></div>
+          <h4 class="da-adopted-step-title">CSS Imported</h4>
+          <p class="da-adopted-step-desc">Scoped CSS string imported from <code>.styles.ts</code> barrel file</p>
+        </div>
+        <div class="da-adopted-arrow" aria-hidden="true"><i class="fa-solid fa-arrow-right"></i></div>
+        <div class="da-adopted-step">
+          <div class="da-adopted-step-num" aria-hidden="true">2</div>
+          <div class="da-adopted-step-icon" aria-hidden="true"><i class="fa-solid fa-gear"></i></div>
+          <h4 class="da-adopted-step-title">Controller Init</h4>
+          <p class="da-adopted-step-desc">Controller created with host, cssText, and target root</p>
+        </div>
+        <div class="da-adopted-arrow" aria-hidden="true"><i class="fa-solid fa-arrow-right"></i></div>
+        <div class="da-adopted-step">
+          <div class="da-adopted-step-num" aria-hidden="true">3</div>
+          <div class="da-adopted-step-icon" aria-hidden="true"><i class="fa-solid fa-layer-group"></i></div>
+          <h4 class="da-adopted-step-title">Deduplicated</h4>
+          <p class="da-adopted-step-desc">Global cache ensures one <code>CSSStyleSheet</code> per unique CSS string</p>
+        </div>
+        <div class="da-adopted-arrow" aria-hidden="true"><i class="fa-solid fa-arrow-right"></i></div>
+        <div class="da-adopted-step">
+          <div class="da-adopted-step-num" aria-hidden="true">4</div>
+          <div class="da-adopted-step-icon" aria-hidden="true"><i class="fa-solid fa-syringe"></i></div>
+          <h4 class="da-adopted-step-title">Injected</h4>
+          <p class="da-adopted-step-desc">Added to <code>document.adoptedStyleSheets</code>, removed on disconnect</p>
+        </div>
+      </div>
+
+      <!-- Code blocks: controller usage + light dom pattern -->
+      <div class="da-adopted-code-grid scroll-reveal scroll-reveal-delay-2">
+        <div>
+          <span class="da-code-label da-code-label-twig">Controller Usage</span>
+          <div class="da-code-block">
+            <div class="da-code-titlebar">
+              <span class="da-code-dot"></span>
+              <span class="da-code-dot"></span>
+              <span class="da-code-dot"></span>
+              <span class="da-code-filename">wc-prose.ts</span>
+            </div>
+            <div class="da-code-body"><pre set:html={codeAdoptedController} /></div>
+          </div>
+        </div>
+        <div>
+          <span class="da-code-label da-code-label-html">Render Pattern</span>
+          <div class="da-code-block">
+            <div class="da-code-titlebar">
+              <span class="da-code-dot"></span>
+              <span class="da-code-dot"></span>
+              <span class="da-code-dot"></span>
+              <span class="da-code-filename">light-dom-pattern.ts</span>
+            </div>
+            <div class="da-code-body"><pre set:html={codeLightDomPattern} /></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Three benefit callouts -->
+      <div class="da-adopted-benefits scroll-reveal scroll-reveal-delay-3">
+        <div class="da-adopted-benefit">
+          <i class="fa-solid fa-clone" aria-hidden="true"></i>
+          <div>
+            <strong>No Duplication</strong>
+            <p>Global cache keyed by CSS text &mdash; 100 instances of <code>wc-prose</code> create only one <code>CSSStyleSheet</code>.</p>
+          </div>
+        </div>
+        <div class="da-adopted-benefit">
+          <i class="fa-solid fa-crosshairs" aria-hidden="true"></i>
+          <div>
+            <strong>Scoped Selectors</strong>
+            <p>All rules are tag-qualified: <code>wc-prose h2</code>, <code>wc-form label</code>. No risk of global style leaks.</p>
+          </div>
+        </div>
+        <div class="da-adopted-benefit">
+          <i class="fa-solid fa-broom" aria-hidden="true"></i>
+          <div>
+            <strong>Auto Cleanup</strong>
+            <p>Stylesheet is removed from <code>adoptedStyleSheets</code> when the last instance disconnects.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 4: CMS CONTENT -->
+  <section class="da-section" style="border-top: 1px solid var(--surface-3);" aria-label="CMS content and WYSIWYG">
+    <div class="da-section-inner">
+      <div class="da-section-header scroll-reveal">
+        <span class="da-section-label">CMS Content</span>
+        <h2 class="da-section-title">When the Editor Owns the Markup</h2>
+        <p class="da-section-description">
+          CKEditor, the WYSIWYG at the heart of Drupal, outputs unpredictable HTML.
+          Field wrappers, media embeds, tables, blockquotes &mdash; all generated at
+          authoring time. Shadow DOM cannot style any of it.
+        </p>
+      </div>
+
+      <!-- The WYSIWYG problem explanation -->
+      <div class="da-prose-problem scroll-reveal scroll-reveal-delay-1">
+        <div class="da-prose-problem-icon" aria-hidden="true">
+          <i class="fa-solid fa-triangle-exclamation"></i>
+        </div>
+        <div>
+          <h3 class="da-prose-problem-title">The WYSIWYG Problem</h3>
+          <p class="da-prose-problem-text">
+            Content editors paste from Word, embed media, create tables, and format text
+            using CKEditor's toolbar. The resulting HTML is <strong>structurally unpredictable</strong>.
+            You cannot slot it. You cannot wrap each element in a shadow-aware template.
+            You must style it <strong>as-is, wherever it appears</strong>.
+          </p>
+        </div>
+      </div>
+
+      <!-- Raw vs Wrapped code blocks -->
+      <div class="da-prose-code-grid scroll-reveal scroll-reveal-delay-2">
+        <div>
+          <span class="da-code-label" style="background: rgba(239, 68, 68, 0.12); color: var(--wc-red); border: 1px solid rgba(239, 68, 68, 0.2);">Raw Drupal Output</span>
+          <div class="da-code-block">
+            <div class="da-code-titlebar">
+              <span class="da-code-dot"></span>
+              <span class="da-code-dot"></span>
+              <span class="da-code-dot"></span>
+              <span class="da-code-filename">node--article.html.twig</span>
+            </div>
+            <div class="da-code-body"><pre set:html={codeDrupalWysiwyg} /></div>
+          </div>
+        </div>
+        <div>
+          <span class="da-code-label da-code-label-twig">Wrapped in wc-prose</span>
+          <div class="da-code-block">
+            <div class="da-code-titlebar">
+              <span class="da-code-dot"></span>
+              <span class="da-code-dot"></span>
+              <span class="da-code-dot"></span>
+              <span class="da-code-filename">node--article.html.twig</span>
+            </div>
+            <div class="da-code-body"><pre set:html={codeProseWrapper} /></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Architecture diagram: CSS partials flow -->
+      <div class="da-prose-arch scroll-reveal scroll-reveal-delay-3">
+        <h3 class="da-prose-arch-title">
+          <i class="fa-solid fa-sitemap" aria-hidden="true"></i>
+          CSS Architecture
+        </h3>
+        <div class="da-prose-arch-flow">
+          <div class="da-prose-arch-col">
+            <div class="da-prose-arch-label">CSS Partials</div>
+            <div class="da-prose-arch-items">
+              <span>typography.css</span>
+              <span>tables.css</span>
+              <span>media.css</span>
+              <span>blockquotes.css</span>
+              <span>lists.css</span>
+              <span>code.css</span>
+              <span>links.css</span>
+            </div>
+          </div>
+          <div class="da-prose-arch-arrow" aria-hidden="true"><i class="fa-solid fa-arrow-right"></i></div>
+          <div class="da-prose-arch-col">
+            <div class="da-prose-arch-label">Scoped Barrel</div>
+            <div class="da-prose-arch-items">
+              <span>prose.scoped.css</span>
+            </div>
+          </div>
+          <div class="da-prose-arch-arrow" aria-hidden="true"><i class="fa-solid fa-arrow-right"></i></div>
+          <div class="da-prose-arch-col">
+            <div class="da-prose-arch-label">Controller</div>
+            <div class="da-prose-arch-items">
+              <span>AdoptedStylesheets</span>
+            </div>
+          </div>
+          <div class="da-prose-arch-arrow" aria-hidden="true"><i class="fa-solid fa-arrow-right"></i></div>
+          <div class="da-prose-arch-col">
+            <div class="da-prose-arch-label">Document</div>
+            <div class="da-prose-arch-items">
+              <span>adoptedStyleSheets</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Scoped CSS example -->
+      <div class="scroll-reveal scroll-reveal-delay-4" style="max-width: 700px; margin: 0 auto;">
+        <span class="da-code-label da-code-label-html">Scoped Selectors</span>
+        <div class="da-code-block">
+          <div class="da-code-titlebar">
+            <span class="da-code-dot"></span>
+            <span class="da-code-dot"></span>
+            <span class="da-code-dot"></span>
+            <span class="da-code-filename">prose.scoped.css</span>
+          </div>
+          <div class="da-code-body"><pre set:html={codeScopedCss} /></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 5: DRUPAL FORMS -->
+  <section class="da-section" style="border-top: 1px solid var(--surface-3);" aria-label="Drupal Form API integration">
+    <div class="da-section-inner">
+      <div class="da-section-header scroll-reveal">
+        <span class="da-section-label">Drupal Forms</span>
+        <h2 class="da-section-title">The Form API Challenge</h2>
+        <p class="da-section-description">
+          Drupal's Form API generates the <code>&lt;form&gt;</code> tag, CSRF tokens,
+          AJAX wrappers, and submission handlers. A Shadow DOM component cannot wrap
+          this without breaking form participation. <code>wc-form</code> solves this
+          with a dual-mode pattern.
+        </p>
+      </div>
+
+      <!-- Two mode cards -->
+      <div class="da-form-modes scroll-reveal scroll-reveal-delay-1">
+        <div class="da-form-mode">
+          <div class="da-form-mode-header">
+            <div class="da-form-mode-icon" aria-hidden="true" style="background: linear-gradient(135deg, rgba(6, 182, 212, 0.15), rgba(102, 126, 234, 0.08)); border-color: rgba(6, 182, 212, 0.2); color: var(--wc-cyan);">
+              <i class="fa-solid fa-rocket"></i>
+            </div>
+            <div>
+              <h3 class="da-form-mode-title">Standalone Mode</h3>
+              <p class="da-form-mode-subtitle">With <code>action</code> attribute</p>
+            </div>
+          </div>
+          <p class="da-form-mode-desc">
+            When <code>action</code> is set, <code>wc-form</code> renders a native
+            <code>&lt;form&gt;</code> element. Client-side validation, <code>wc-submit</code>
+            events, and direct HTTP submission all work out of the box.
+          </p>
+          <div class="da-code-block" style="margin-top: var(--space-4);">
+            <div class="da-code-titlebar">
+              <span class="da-code-dot"></span>
+              <span class="da-code-dot"></span>
+              <span class="da-code-dot"></span>
+              <span class="da-code-filename">contact-form.html.twig</span>
+            </div>
+            <div class="da-code-body"><pre set:html={codeFormStandalone} /></div>
+          </div>
+        </div>
+
+        <div class="da-form-mode">
+          <div class="da-form-mode-header">
+            <div class="da-form-mode-icon" aria-hidden="true" style="background: linear-gradient(135deg, rgba(245, 158, 11, 0.15), rgba(239, 68, 68, 0.08)); border-color: rgba(245, 158, 11, 0.2); color: var(--wc-amber);">
+              <i class="fa-brands fa-drupal"></i>
+            </div>
+            <div>
+              <h3 class="da-form-mode-title">Drupal-Wrapped Mode</h3>
+              <p class="da-form-mode-subtitle">Without <code>action</code> &mdash; bare <code>&lt;slot&gt;</code></p>
+            </div>
+          </div>
+          <p class="da-form-mode-desc">
+            When no <code>action</code> is set, <code>wc-form</code> renders only a
+            <code>&lt;slot&gt;</code>. Drupal provides its own <code>&lt;form&gt;</code>
+            tag with CSRF tokens and AJAX handlers. The component only injects styling.
+          </p>
+          <div class="da-code-block" style="margin-top: var(--space-4);">
+            <div class="da-code-titlebar">
+              <span class="da-code-dot"></span>
+              <span class="da-code-dot"></span>
+              <span class="da-code-dot"></span>
+              <span class="da-code-filename">form--webform.html.twig</span>
+            </div>
+            <div class="da-code-body"><pre set:html={codeFormDrupal} /></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ElementInternals flow -->
+      <div class="da-section-header scroll-reveal" style="margin-top: var(--space-16);">
+        <span class="da-section-label">Form Participation</span>
+        <h2 class="da-section-title" style="font-size: clamp(1.5rem, 3vw, 2.25rem);">ElementInternals Bridge</h2>
+        <p class="da-section-description">
+          Shadow DOM form controls use <code>ElementInternals</code> to participate
+          in native <code>&lt;form&gt;</code> elements &mdash; reporting values, validity,
+          and labels to the parent form.
+        </p>
+      </div>
+
+      <!-- Internals flow steps -->
+      <div class="da-form-internals-flow scroll-reveal scroll-reveal-delay-1">
+        <div class="da-form-internals-step">
+          <code>formAssociated = true</code>
+          <span>Declares form participation</span>
+        </div>
+        <div class="da-form-internals-arrow" aria-hidden="true"><i class="fa-solid fa-arrow-right"></i></div>
+        <div class="da-form-internals-step">
+          <code>attachInternals()</code>
+          <span>Gets the internals API</span>
+        </div>
+        <div class="da-form-internals-arrow" aria-hidden="true"><i class="fa-solid fa-arrow-right"></i></div>
+        <div class="da-form-internals-step">
+          <code>setFormValue()</code>
+          <span>Reports value to form</span>
+        </div>
+        <div class="da-form-internals-arrow" aria-hidden="true"><i class="fa-solid fa-arrow-right"></i></div>
+        <div class="da-form-internals-step">
+          <code>setValidity()</code>
+          <span>Reports validation state</span>
+        </div>
+      </div>
+
+      <!-- Code block: form internals pattern -->
+      <div class="scroll-reveal scroll-reveal-delay-2" style="max-width: 700px; margin: 0 auto var(--space-12);">
+        <span class="da-code-label da-code-label-html">ElementInternals Pattern</span>
+        <div class="da-code-block">
+          <div class="da-code-titlebar">
+            <span class="da-code-dot"></span>
+            <span class="da-code-dot"></span>
+            <span class="da-code-dot"></span>
+            <span class="da-code-filename">wc-text-input.ts</span>
+          </div>
+          <div class="da-code-body"><pre set:html={codeFormInternals} /></div>
+        </div>
+      </div>
+
+      <!-- Three benefit callouts -->
+      <div class="da-form-benefits scroll-reveal scroll-reveal-delay-3">
+        <div class="da-adopted-benefit">
+          <i class="fa-solid fa-check-double" aria-hidden="true"></i>
+          <div>
+            <strong>Native Validation</strong>
+            <p>Constraint validation API works across Shadow DOM &mdash; <code>:invalid</code> pseudo-class, custom messages, and browser-native UI.</p>
+          </div>
+        </div>
+        <div class="da-adopted-benefit">
+          <i class="fa-solid fa-database" aria-hidden="true"></i>
+          <div>
+            <strong>FormData Integration</strong>
+            <p><code>new FormData(form)</code> automatically includes values from Shadow DOM controls with <code>formAssociated</code>.</p>
+          </div>
+        </div>
+        <div class="da-adopted-benefit">
+          <i class="fa-brands fa-drupal" aria-hidden="true"></i>
+          <div>
+            <strong>Drupal Compatible</strong>
+            <p>Drupal behaviors, AJAX handlers, and Form API validation work with wc-* form controls without modification.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 6: SYSTEM ARCHITECTURE -->
+  <section class="da-section" style="border-top: 1px solid var(--surface-3);" aria-label="System architecture diagram">
+    <div class="da-section-inner">
+      <div class="da-section-header scroll-reveal">
+        <span class="da-section-label">Architecture</span>
+        <h2 class="da-section-title">How It All Works Together</h2>
+        <p class="da-section-description">
+          The complete rendering architecture: Shadow DOM for encapsulated controls,
+          Light DOM with adopted stylesheets for CMS content containers.
+        </p>
+      </div>
+
+      <div class="da-arch-diagram scroll-reveal scroll-reveal-delay-1">
+        <!-- Document layer -->
+        <div class="da-arch-layer da-arch-layer-doc">
+          <div class="da-arch-layer-label">
+            <i class="fa-solid fa-globe" aria-hidden="true"></i>
+            Document
+          </div>
+          <div class="da-arch-layer-desc">adoptedStyleSheets &bull; Global design tokens &bull; CSS custom properties cascade</div>
+        </div>
+
+        <!-- Two branches -->
+        <div class="da-arch-branches">
+          <!-- Shadow DOM branch -->
+          <div class="da-arch-branch da-arch-branch-shadow">
+            <div class="da-arch-branch-header">
+              <i class="fa-solid fa-shield-halved" aria-hidden="true"></i>
+              Shadow DOM
+            </div>
+            <div class="da-arch-branch-body">
+              <div class="da-arch-branch-section">
+                <div class="da-arch-branch-label">Styling</div>
+                <p>Lit <code>static styles</code> &mdash; encapsulated CSS via constructable stylesheets in each shadow root</p>
+              </div>
+              <div class="da-arch-branch-section">
+                <div class="da-arch-branch-label">Capabilities</div>
+                <ul>
+                  <li>Full style encapsulation</li>
+                  <li>Slot-based content projection</li>
+                  <li>CSS Parts for theming</li>
+                  <li>ElementInternals for forms</li>
+                </ul>
+              </div>
+              <div class="da-arch-branch-section">
+                <div class="da-arch-branch-label">Components</div>
+                <div class="da-arch-branch-tags">
+                  <span>wc-button</span>
+                  <span>wc-card</span>
+                  <span>wc-text-input</span>
+                  <span>wc-select</span>
+                  <span>wc-checkbox</span>
+                  <span>wc-badge</span>
+                  <span>wc-alert</span>
+                  <span>wc-switch</span>
+                  <span>wc-radio-group</span>
+                  <span>wc-textarea</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Light DOM branch -->
+          <div class="da-arch-branch da-arch-branch-light">
+            <div class="da-arch-branch-header">
+              <i class="fa-solid fa-lightbulb" aria-hidden="true"></i>
+              Light DOM
+            </div>
+            <div class="da-arch-branch-body">
+              <div class="da-arch-branch-section">
+                <div class="da-arch-branch-label">Styling</div>
+                <p><code>AdoptedStylesheetsController</code> &mdash; scoped CSS injected into <code>document.adoptedStyleSheets</code></p>
+              </div>
+              <div class="da-arch-branch-section">
+                <div class="da-arch-branch-label">Capabilities</div>
+                <ul>
+                  <li>Direct child styling</li>
+                  <li>CMS content passthrough</li>
+                  <li>Native form participation</li>
+                  <li>SEO-friendly rendering</li>
+                </ul>
+              </div>
+              <div class="da-arch-branch-section">
+                <div class="da-arch-branch-label">Components</div>
+                <div class="da-arch-branch-tags">
+                  <span>wc-prose</span>
+                  <span>wc-form</span>
+                  <span>wc-container</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Drupal CMS layer -->
+        <div class="da-arch-layer da-arch-layer-cms">
+          <div class="da-arch-layer-label">
+            <i class="fa-brands fa-drupal" aria-hidden="true"></i>
+            Drupal CMS
+          </div>
+          <div class="da-arch-layer-desc">Twig templates &bull; Form API &bull; CKEditor WYSIWYG &bull; Drupal Behaviors</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 7: RECOMMENDATION -->
+  <section class="da-section da-rec-section" aria-label="Light DOM recommendation">
+    <div class="da-section-inner">
+      <div class="da-section-header scroll-reveal">
+        <span class="da-section-label">Decision</span>
+        <h2 class="da-section-title">When to Choose Light DOM</h2>
+        <p class="da-section-description">
+          A decision matrix for every rendering scenario in the system.
+        </p>
+      </div>
+
+      <!-- Decision matrix table -->
+      <div class="da-decision-matrix scroll-reveal scroll-reveal-delay-1">
+        <div class="da-decision-header">
+          <div class="da-decision-header-cell">Scenario</div>
+          <div class="da-decision-header-cell" style="color: var(--wc-cyan);">
+            <i class="fa-solid fa-shield-halved" aria-hidden="true"></i> Shadow DOM
+          </div>
+          <div class="da-decision-header-cell" style="color: var(--wc-amber);">
+            <i class="fa-solid fa-lightbulb" aria-hidden="true"></i> Light DOM
+          </div>
+        </div>
+
+        <div class="da-decision-row">
+          <div class="da-decision-cell da-decision-scenario">CMS WYSIWYG Content</div>
+          <div class="da-decision-cell da-decision-no">
+            <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+            Cannot style child content
+          </div>
+          <div class="da-decision-cell da-decision-yes">
+            <i class="fa-solid fa-check" aria-hidden="true"></i>
+            Direct styling via scoped CSS
+          </div>
+        </div>
+
+        <div class="da-decision-row">
+          <div class="da-decision-cell da-decision-scenario">Drupal Form API</div>
+          <div class="da-decision-cell da-decision-no">
+            <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+            Breaks form participation
+          </div>
+          <div class="da-decision-cell da-decision-yes">
+            <i class="fa-solid fa-check" aria-hidden="true"></i>
+            Native form wrapping
+          </div>
+        </div>
+
+        <div class="da-decision-row">
+          <div class="da-decision-cell da-decision-scenario">UI Controls</div>
+          <div class="da-decision-cell da-decision-yes">
+            <i class="fa-solid fa-check" aria-hidden="true"></i>
+            Full encapsulation
+          </div>
+          <div class="da-decision-cell da-decision-no">
+            <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+            Style leaks risk
+          </div>
+        </div>
+
+        <div class="da-decision-row">
+          <div class="da-decision-cell da-decision-scenario">SEO / Reader Modes</div>
+          <div class="da-decision-cell da-decision-warn">
+            <i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>
+            Content in shadow root
+          </div>
+          <div class="da-decision-cell da-decision-yes">
+            <i class="fa-solid fa-check" aria-hidden="true"></i>
+            Content in main DOM
+          </div>
+        </div>
+
+        <div class="da-decision-row">
+          <div class="da-decision-cell da-decision-scenario">Style Isolation</div>
+          <div class="da-decision-cell da-decision-yes">
+            <i class="fa-solid fa-check" aria-hidden="true"></i>
+            Complete isolation
+          </div>
+          <div class="da-decision-cell da-decision-warn">
+            <i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>
+            Tag-scoped selectors
+          </div>
+        </div>
+      </div>
+
+      <!-- Closing principle callout -->
+      <div class="da-rec-hero scroll-reveal scroll-reveal-delay-2" style="border-color: rgba(245, 158, 11, 0.2); background: linear-gradient(135deg, rgba(245, 158, 11, 0.06), rgba(6, 182, 212, 0.04), rgba(16, 185, 129, 0.06));">
+        <div class="da-rec-title" style="background: linear-gradient(135deg, var(--wc-amber), var(--wc-green)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">
+          Default to Shadow DOM
+        </div>
+        <p class="da-rec-subtitle">
+          Use Light DOM <strong>only</strong> when: content editors control the markup,
+          Drupal Form API is required, SEO is critical, or global styles must reach
+          children. <strong>Always</strong> use
+          <code style="background: rgba(255,255,255,0.08); padding: 0.15em 0.5em; border-radius: 4px; font-family: var(--font-mono); font-weight: 700; color: var(--wc-amber);">AdoptedStylesheetsController</code>
+          for Light DOM styling.
+        </p>
+      </div>
+
+      <div class="da-rec-principles scroll-reveal scroll-reveal-delay-3">
+        <div class="da-rec-principle">
+          <div class="da-rec-principle-icon" style="background: linear-gradient(135deg, rgba(6, 182, 212, 0.12), rgba(102, 126, 234, 0.08)); border-color: rgba(6, 182, 212, 0.15); color: var(--wc-cyan);">
+            <i class="fa-solid fa-shield-halved" aria-hidden="true"></i>
+          </div>
+          <h3 class="da-rec-principle-title">Shadow First</h3>
+          <p class="da-rec-principle-desc">
+            Every new component starts with Shadow DOM. Only break the boundary
+            when a concrete integration requirement demands it &mdash; never for
+            convenience or familiarity with global CSS.
+          </p>
+        </div>
+
+        <div class="da-rec-principle">
+          <div class="da-rec-principle-icon" style="background: linear-gradient(135deg, rgba(245, 158, 11, 0.12), rgba(239, 68, 68, 0.08)); border-color: rgba(245, 158, 11, 0.15); color: var(--wc-amber);">
+            <i class="fa-solid fa-lightbulb" aria-hidden="true"></i>
+          </div>
+          <h3 class="da-rec-principle-title">Light When Needed</h3>
+          <p class="da-rec-principle-desc">
+            CMS WYSIWYG, Drupal forms, and SEO-critical content containers are the
+            three proven cases. Each uses <code>AdoptedStylesheetsController</code>
+            for scoped, deduplicated CSS.
+          </p>
+        </div>
+
+        <div class="da-rec-principle">
+          <div class="da-rec-principle-icon" style="background: linear-gradient(135deg, rgba(16, 185, 129, 0.12), rgba(6, 182, 212, 0.08)); border-color: rgba(16, 185, 129, 0.15); color: var(--wc-green);">
+            <i class="fa-solid fa-handshake" aria-hidden="true"></i>
+          </div>
+          <h3 class="da-rec-principle-title">Bridge the Gap</h3>
+          <p class="da-rec-principle-desc">
+            <code>ElementInternals</code> lets Shadow DOM controls participate in
+            Light DOM forms. The two strategies are complementary, not competing.
+            Use both in the same form.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+</div><!-- end tab-lightdom -->
+
+<style is:inline>
+  /* ============================================
+     TAB 4: LIGHT DOM ARCHITECTURE ADR
+     ============================================ */
+
+  /* Hero variant for Light DOM tab */
+  .da-hero-lightdom .da-hero-title {
+    background: linear-gradient(180deg, rgba(245, 158, 11, 1) 0%, rgba(251, 191, 36, 0.7) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .da-hero-lightdom .da-hero-subtitle {
+    background: linear-gradient(90deg, rgba(245, 158, 11, 0.9), rgba(6, 182, 212, 0.9));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .da-hero-lightdom .da-hero-badge-dot {
+    background: var(--wc-amber);
+    box-shadow: 0 0 8px var(--wc-amber);
+  }
+
+  .da-hero-lightdom .da-hero-orb-1 {
+    background: radial-gradient(circle, rgba(245, 158, 11, 0.3), transparent 70%);
+  }
+
+  .da-hero-lightdom .da-hero-orb-2 {
+    background: radial-gradient(circle, rgba(6, 182, 212, 0.25), transparent 70%);
+  }
+
+  .da-hero-lightdom .da-hero-orb-3 {
+    background: radial-gradient(circle, rgba(16, 185, 129, 0.2), transparent 70%);
+  }
+
+  /* --- Section 2: Spectrum --- */
+  .da-lightdom-spectrum {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-8);
+    margin-bottom: var(--space-8);
+  }
+
+  .da-lightdom-choice {
+    padding: var(--space-8);
+    border-radius: var(--radius-2xl);
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+  }
+
+  .da-lightdom-choice:hover {
+    transform: translateY(-4px);
+  }
+
+  .da-lightdom-choice-shadow {
+    background: linear-gradient(135deg, rgba(6, 182, 212, 0.06), rgba(102, 126, 234, 0.04));
+    border: 1px solid rgba(6, 182, 212, 0.2);
+  }
+
+  .da-lightdom-choice-shadow:hover {
+    border-color: rgba(6, 182, 212, 0.35);
+    box-shadow: 0 8px 32px rgba(6, 182, 212, 0.1);
+  }
+
+  .da-lightdom-choice-light {
+    background: linear-gradient(135deg, rgba(245, 158, 11, 0.06), rgba(251, 191, 36, 0.04));
+    border: 1px solid rgba(245, 158, 11, 0.2);
+  }
+
+  .da-lightdom-choice-light:hover {
+    border-color: rgba(245, 158, 11, 0.35);
+    box-shadow: 0 8px 32px rgba(245, 158, 11, 0.1);
+  }
+
+  .da-lightdom-choice-icon {
+    width: 56px;
+    height: 56px;
+    border-radius: var(--radius-xl);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    margin-bottom: var(--space-5);
+  }
+
+  .da-lightdom-choice-shadow .da-lightdom-choice-icon {
+    background: linear-gradient(135deg, rgba(6, 182, 212, 0.15), rgba(6, 182, 212, 0.05));
+    border: 1px solid rgba(6, 182, 212, 0.2);
+    color: var(--wc-cyan);
+  }
+
+  .da-lightdom-choice-light .da-lightdom-choice-icon {
+    background: linear-gradient(135deg, rgba(245, 158, 11, 0.15), rgba(245, 158, 11, 0.05));
+    border: 1px solid rgba(245, 158, 11, 0.2);
+    color: var(--wc-amber);
+  }
+
+  .da-lightdom-choice-title {
+    font-size: 1.5rem;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    margin-bottom: var(--space-1);
+    color: var(--text-primary);
+  }
+
+  .da-lightdom-choice-subtitle {
+    font-size: 0.875rem;
+    font-weight: 600;
+    margin-bottom: var(--space-4);
+  }
+
+  .da-lightdom-choice-shadow .da-lightdom-choice-subtitle { color: var(--wc-cyan); }
+  .da-lightdom-choice-light .da-lightdom-choice-subtitle { color: var(--wc-amber); }
+
+  .da-lightdom-choice-desc {
+    font-size: 0.9375rem;
+    color: var(--text-secondary);
+    line-height: 1.7;
+    margin-bottom: var(--space-5);
+  }
+
+  .da-lightdom-choice-desc strong { color: var(--text-primary); }
+
+  .da-lightdom-choice-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    margin-bottom: var(--space-5);
+  }
+
+  .da-lightdom-tag {
+    display: inline-flex;
+    align-items: center;
+    padding: var(--space-1) var(--space-3);
+    border-radius: var(--radius-full);
+    font-size: 0.75rem;
+    font-weight: 600;
+    font-family: var(--font-mono);
+  }
+
+  .da-lightdom-tag-cyan {
+    background: rgba(6, 182, 212, 0.08);
+    color: var(--wc-cyan);
+    border: 1px solid rgba(6, 182, 212, 0.15);
+  }
+
+  .da-lightdom-tag-amber {
+    background: rgba(245, 158, 11, 0.08);
+    color: var(--wc-amber);
+    border: 1px solid rgba(245, 158, 11, 0.15);
+  }
+
+  .da-lightdom-choice-when {
+    padding-top: var(--space-4);
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    line-height: 1.65;
+  }
+
+  .da-lightdom-choice-when strong {
+    color: var(--text-primary);
+    display: block;
+    margin-bottom: var(--space-2);
+  }
+
+  .da-lightdom-choice-when ul {
+    list-style: none;
+    padding: 0;
+  }
+
+  .da-lightdom-choice-when li {
+    padding-left: var(--space-5);
+    position: relative;
+    margin-bottom: var(--space-1);
+  }
+
+  .da-lightdom-choice-when li::before {
+    content: '\2713';
+    position: absolute;
+    left: 0;
+    font-weight: 700;
+  }
+
+  .da-lightdom-choice-shadow .da-lightdom-choice-when li::before { color: var(--wc-cyan); }
+  .da-lightdom-choice-light .da-lightdom-choice-when li::before { color: var(--wc-amber); }
+
+  .da-lightdom-choice-when code {
+    background: rgba(255, 255, 255, 0.06);
+    padding: 0.1em 0.4em;
+    border-radius: 3px;
+    font-size: 0.8125rem;
+    font-family: var(--font-mono);
+  }
+
+  /* --- Section 3: Adopted Stylesheets Controller --- */
+  .da-adopted-flow {
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    gap: var(--space-4);
+    margin-bottom: var(--space-12);
+    flex-wrap: wrap;
+  }
+
+  .da-adopted-step {
+    flex: 0 1 200px;
+    text-align: center;
+    padding: var(--space-5);
+    border-radius: var(--radius-xl);
+    background: var(--surface-1);
+    border: 1px solid var(--surface-3);
+    position: relative;
+    transition: all 0.3s ease;
+  }
+
+  .da-adopted-step:hover {
+    background: var(--surface-2);
+    transform: translateY(-3px);
+    border-color: rgba(245, 158, 11, 0.2);
+  }
+
+  .da-adopted-step-num {
+    position: absolute;
+    top: -10px;
+    left: -10px;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: var(--wc-amber);
+    color: #000;
+    font-size: 0.75rem;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .da-adopted-step-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: var(--radius-md);
+    background: rgba(245, 158, 11, 0.1);
+    border: 1px solid rgba(245, 158, 11, 0.15);
+    color: var(--wc-amber);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    margin: 0 auto var(--space-3);
+  }
+
+  .da-adopted-step-title {
+    font-size: 0.875rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: var(--space-2);
+  }
+
+  .da-adopted-step-desc {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    line-height: 1.5;
+  }
+
+  .da-adopted-step-desc code {
+    background: rgba(255, 255, 255, 0.06);
+    padding: 0.1em 0.3em;
+    border-radius: 3px;
+    font-size: 0.6875rem;
+    font-family: var(--font-mono);
+  }
+
+  .da-adopted-arrow {
+    display: flex;
+    align-items: center;
+    color: var(--wc-amber);
+    opacity: 0.5;
+    font-size: 1rem;
+    padding-top: var(--space-8);
+  }
+
+  .da-adopted-code-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-6);
+    margin-bottom: var(--space-12);
+  }
+
+  .da-adopted-benefits {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-6);
+    margin-bottom: var(--space-8);
+  }
+
+  .da-adopted-benefit {
+    display: flex;
+    gap: var(--space-4);
+    padding: var(--space-5);
+    border-radius: var(--radius-xl);
+    background: var(--surface-1);
+    border: 1px solid var(--surface-3);
+    transition: all 0.3s ease;
+  }
+
+  .da-adopted-benefit:hover {
+    background: var(--surface-2);
+    transform: translateY(-2px);
+  }
+
+  .da-adopted-benefit > i {
+    font-size: 1.25rem;
+    color: var(--wc-amber);
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  .da-adopted-benefit strong {
+    display: block;
+    font-size: 0.9375rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: var(--space-1);
+  }
+
+  .da-adopted-benefit p {
+    font-size: 0.8125rem;
+    color: var(--text-secondary);
+    line-height: 1.6;
+    margin: 0;
+  }
+
+  .da-adopted-benefit code {
+    background: rgba(255, 255, 255, 0.06);
+    padding: 0.1em 0.3em;
+    border-radius: 3px;
+    font-size: 0.75rem;
+    font-family: var(--font-mono);
+  }
+
+  /* --- Section 4: CMS Content / Prose --- */
+  .da-prose-problem {
+    display: flex;
+    gap: var(--space-5);
+    padding: var(--space-6);
+    border-radius: var(--radius-xl);
+    background: linear-gradient(135deg, rgba(245, 158, 11, 0.06), rgba(239, 68, 68, 0.04));
+    border: 1px solid rgba(245, 158, 11, 0.2);
+    margin-bottom: var(--space-10);
+  }
+
+  .da-prose-problem-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: var(--radius-lg);
+    background: linear-gradient(135deg, rgba(245, 158, 11, 0.15), rgba(245, 158, 11, 0.05));
+    border: 1px solid rgba(245, 158, 11, 0.2);
+    color: var(--wc-amber);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+    flex-shrink: 0;
+  }
+
+  .da-prose-problem-title {
+    font-size: 1.125rem;
+    font-weight: 800;
+    color: var(--text-primary);
+    margin-bottom: var(--space-2);
+  }
+
+  .da-prose-problem-text {
+    font-size: 0.9375rem;
+    color: var(--text-secondary);
+    line-height: 1.7;
+  }
+
+  .da-prose-problem-text strong { color: var(--text-primary); }
+
+  .da-prose-code-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-6);
+    margin-bottom: var(--space-12);
+  }
+
+  .da-prose-arch {
+    padding: var(--space-8);
+    border-radius: var(--radius-2xl);
+    background: var(--surface-1);
+    border: 1px solid var(--surface-3);
+    margin-bottom: var(--space-10);
+  }
+
+  .da-prose-arch-title {
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: var(--space-6);
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+  }
+
+  .da-prose-arch-title i { color: var(--wc-amber); }
+
+  .da-prose-arch-flow {
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    gap: var(--space-4);
+    flex-wrap: wrap;
+  }
+
+  .da-prose-arch-col {
+    flex: 1;
+    min-width: 120px;
+    text-align: center;
+  }
+
+  .da-prose-arch-label {
+    font-size: 0.6875rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--wc-amber);
+    margin-bottom: var(--space-3);
+  }
+
+  .da-prose-arch-items {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+
+  .da-prose-arch-items span {
+    display: inline-block;
+    padding: var(--space-1) var(--space-3);
+    border-radius: var(--radius-sm);
+    background: rgba(245, 158, 11, 0.06);
+    border: 1px solid rgba(245, 158, 11, 0.12);
+    font-size: 0.75rem;
+    font-family: var(--font-mono);
+    color: var(--text-secondary);
+  }
+
+  .da-prose-arch-arrow {
+    color: var(--wc-amber);
+    opacity: 0.4;
+    font-size: 1rem;
+    padding-top: var(--space-6);
+  }
+
+  /* --- Section 5: Drupal Forms --- */
+  .da-form-modes {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-8);
+    margin-bottom: var(--space-8);
+  }
+
+  .da-form-mode {
+    padding: var(--space-6);
+    border-radius: var(--radius-2xl);
+    background: var(--surface-1);
+    border: 1px solid var(--surface-3);
+    transition: all 0.3s ease;
+  }
+
+  .da-form-mode:hover {
+    background: var(--surface-2);
+    transform: translateY(-3px);
+  }
+
+  .da-form-mode-header {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    margin-bottom: var(--space-4);
+  }
+
+  .da-form-mode-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: var(--radius-lg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+    flex-shrink: 0;
+    border: 1px solid;
+  }
+
+  .da-form-mode-title {
+    font-size: 1.125rem;
+    font-weight: 800;
+    color: var(--text-primary);
+  }
+
+  .da-form-mode-subtitle {
+    font-size: 0.8125rem;
+    color: var(--text-muted);
+  }
+
+  .da-form-mode-subtitle code {
+    background: rgba(255, 255, 255, 0.06);
+    padding: 0.1em 0.4em;
+    border-radius: 3px;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+  }
+
+  .da-form-mode-desc {
+    font-size: 0.9375rem;
+    color: var(--text-secondary);
+    line-height: 1.7;
+  }
+
+  .da-form-mode-desc code {
+    background: rgba(255, 255, 255, 0.06);
+    padding: 0.1em 0.4em;
+    border-radius: 3px;
+    font-family: var(--font-mono);
+    font-size: 0.8125rem;
+  }
+
+  /* ElementInternals flow */
+  .da-form-internals-flow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-3);
+    margin-bottom: var(--space-10);
+    flex-wrap: wrap;
+  }
+
+  .da-form-internals-step {
+    text-align: center;
+    padding: var(--space-4) var(--space-5);
+    border-radius: var(--radius-lg);
+    background: var(--surface-1);
+    border: 1px solid var(--surface-3);
+    transition: all 0.3s ease;
+  }
+
+  .da-form-internals-step:hover {
+    background: var(--surface-2);
+    transform: translateY(-2px);
+    border-color: rgba(16, 185, 129, 0.2);
+  }
+
+  .da-form-internals-step code {
+    display: block;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    font-family: var(--font-mono);
+    color: var(--wc-green);
+    margin-bottom: var(--space-1);
+  }
+
+  .da-form-internals-step span {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+  }
+
+  .da-form-internals-arrow {
+    color: var(--wc-green);
+    opacity: 0.4;
+    font-size: 0.875rem;
+  }
+
+  .da-form-benefits {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-6);
+    margin-bottom: var(--space-8);
+  }
+
+  /* --- Section 6: Architecture Diagram --- */
+  .da-arch-diagram {
+    margin-bottom: var(--space-8);
+  }
+
+  .da-arch-layer {
+    padding: var(--space-5) var(--space-6);
+    border-radius: var(--radius-xl);
+    text-align: center;
+  }
+
+  .da-arch-layer-doc {
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.08), rgba(139, 92, 246, 0.06));
+    border: 1px solid rgba(102, 126, 234, 0.2);
+    margin-bottom: var(--space-6);
+  }
+
+  .da-arch-layer-cms {
+    background: linear-gradient(135deg, rgba(245, 158, 11, 0.08), rgba(239, 68, 68, 0.06));
+    border: 1px solid rgba(245, 158, 11, 0.2);
+    margin-top: var(--space-6);
+  }
+
+  .da-arch-layer-label {
+    font-size: 1rem;
+    font-weight: 800;
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-2);
+    margin-bottom: var(--space-2);
+  }
+
+  .da-arch-layer-doc .da-arch-layer-label i { color: var(--wc-accent); }
+  .da-arch-layer-cms .da-arch-layer-label i { color: var(--wc-amber); }
+
+  .da-arch-layer-desc {
+    font-size: 0.8125rem;
+    color: var(--text-muted);
+  }
+
+  .da-arch-branches {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-6);
+  }
+
+  .da-arch-branch {
+    border-radius: var(--radius-xl);
+    overflow: hidden;
+    transition: all 0.3s ease;
+  }
+
+  .da-arch-branch:hover { transform: translateY(-3px); }
+
+  .da-arch-branch-shadow {
+    background: var(--surface-1);
+    border: 1px solid rgba(6, 182, 212, 0.2);
+  }
+
+  .da-arch-branch-light {
+    background: var(--surface-1);
+    border: 1px solid rgba(245, 158, 11, 0.2);
+  }
+
+  .da-arch-branch-header {
+    padding: var(--space-4) var(--space-5);
+    font-size: 1rem;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    color: var(--text-primary);
+  }
+
+  .da-arch-branch-shadow .da-arch-branch-header {
+    background: rgba(6, 182, 212, 0.06);
+    border-bottom: 1px solid rgba(6, 182, 212, 0.12);
+  }
+
+  .da-arch-branch-shadow .da-arch-branch-header i { color: var(--wc-cyan); }
+
+  .da-arch-branch-light .da-arch-branch-header {
+    background: rgba(245, 158, 11, 0.06);
+    border-bottom: 1px solid rgba(245, 158, 11, 0.12);
+  }
+
+  .da-arch-branch-light .da-arch-branch-header i { color: var(--wc-amber); }
+
+  .da-arch-branch-body {
+    padding: var(--space-5);
+  }
+
+  .da-arch-branch-section {
+    margin-bottom: var(--space-4);
+  }
+
+  .da-arch-branch-section:last-child { margin-bottom: 0; }
+
+  .da-arch-branch-label {
+    font-size: 0.6875rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-muted);
+    margin-bottom: var(--space-2);
+  }
+
+  .da-arch-branch-section p {
+    font-size: 0.8125rem;
+    color: var(--text-secondary);
+    line-height: 1.6;
+    margin: 0;
+  }
+
+  .da-arch-branch-section p code {
+    background: rgba(255, 255, 255, 0.06);
+    padding: 0.1em 0.3em;
+    border-radius: 3px;
+    font-size: 0.75rem;
+    font-family: var(--font-mono);
+  }
+
+  .da-arch-branch-section ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .da-arch-branch-section li {
+    font-size: 0.8125rem;
+    color: var(--text-secondary);
+    padding-left: var(--space-4);
+    position: relative;
+    margin-bottom: var(--space-1);
+  }
+
+  .da-arch-branch-section li::before {
+    content: '\2022';
+    position: absolute;
+    left: 0;
+    font-weight: 700;
+    color: var(--text-muted);
+  }
+
+  .da-arch-branch-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-1);
+  }
+
+  .da-arch-branch-tags span {
+    display: inline-block;
+    padding: 2px var(--space-2);
+    border-radius: var(--radius-sm);
+    font-size: 0.6875rem;
+    font-family: var(--font-mono);
+    font-weight: 600;
+  }
+
+  .da-arch-branch-shadow .da-arch-branch-tags span {
+    background: rgba(6, 182, 212, 0.06);
+    color: var(--wc-cyan);
+    border: 1px solid rgba(6, 182, 212, 0.12);
+  }
+
+  .da-arch-branch-light .da-arch-branch-tags span {
+    background: rgba(245, 158, 11, 0.06);
+    color: var(--wc-amber);
+    border: 1px solid rgba(245, 158, 11, 0.12);
+  }
+
+  /* --- Section 7: Decision Matrix --- */
+  .da-decision-matrix {
+    border-radius: var(--radius-xl);
+    overflow: hidden;
+    border: 1px solid var(--surface-3);
+    background: var(--surface-1);
+    margin-bottom: var(--space-12);
+  }
+
+  .da-decision-header {
+    display: grid;
+    grid-template-columns: 1.5fr 1fr 1fr;
+    background: var(--surface-2);
+    border-bottom: 1px solid var(--surface-3);
+  }
+
+  .da-decision-header-cell {
+    padding: var(--space-4) var(--space-5);
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+  }
+
+  .da-decision-row {
+    display: grid;
+    grid-template-columns: 1.5fr 1fr 1fr;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+    transition: background 0.2s ease;
+  }
+
+  .da-decision-row:last-child { border-bottom: none; }
+  .da-decision-row:hover { background: rgba(102, 126, 234, 0.03); }
+
+  .da-decision-cell {
+    padding: var(--space-4) var(--space-5);
+    font-size: 0.8125rem;
+    color: var(--text-secondary);
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+  }
+
+  .da-decision-scenario {
+    font-weight: 700;
+    color: var(--text-primary);
+  }
+
+  .da-decision-yes {
+    color: var(--wc-green);
+  }
+
+  .da-decision-yes i { color: var(--wc-green); }
+
+  .da-decision-no {
+    color: var(--text-muted);
+  }
+
+  .da-decision-no i { color: var(--wc-red); }
+
+  .da-decision-warn {
+    color: var(--wc-amber);
+  }
+
+  .da-decision-warn i { color: var(--wc-amber); }
+
+  /* --- Responsive --- */
+  @media (max-width: 1100px) {
+    .da-lightdom-spectrum,
+    .da-adopted-code-grid,
+    .da-prose-code-grid,
+    .da-form-modes,
+    .da-arch-branches {
+      grid-template-columns: 1fr;
+    }
+
+    .da-adopted-benefits,
+    .da-form-benefits {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .da-adopted-flow {
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .da-adopted-arrow {
+      transform: rotate(90deg);
+      padding-top: 0;
+    }
+
+    .da-adopted-benefits,
+    .da-form-benefits {
+      grid-template-columns: 1fr;
+    }
+
+    .da-form-internals-flow {
+      flex-direction: column;
+    }
+
+    .da-form-internals-arrow {
+      transform: rotate(90deg);
+    }
+
+    .da-prose-arch-flow {
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .da-prose-arch-arrow {
+      transform: rotate(90deg);
+    }
+
+    .da-decision-header,
+    .da-decision-row {
+      grid-template-columns: 1fr;
+    }
+
+    .da-decision-header-cell:not(:first-child) {
+      display: none;
+    }
+
+    .da-decision-cell {
+      padding: var(--space-3) var(--space-5);
+    }
+
+    .da-decision-cell::before {
+      font-size: 0.6875rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-right: var(--space-2);
+      display: inline;
+    }
+
+    .da-decision-cell:nth-child(2)::before { content: 'Shadow: '; color: var(--wc-cyan); }
+    .da-decision-cell:nth-child(3)::before { content: 'Light: '; color: var(--wc-amber); }
+  }
+</style>

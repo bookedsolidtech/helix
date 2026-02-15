@@ -1,0 +1,313 @@
+---
+/**
+ * DxTab2QualityPipeline — "Quality Pipeline" tab panel content.
+ *
+ * Sections:
+ *   1. Hero (green/emerald theme)
+ *   2. Testing Pyramid
+ *   3. Shift-Left Comparison
+ *   4. Coverage Dashboard
+ */
+---
+
+<style is:inline>
+  /* ==========================================
+     TAB 2: TESTING PYRAMID
+     ========================================== */
+  .dx-pyramid { display:flex; flex-direction:column; align-items:center; gap:var(--space-4); }
+  .dx-pyramid-level { border-radius:var(--radius-xl); padding:var(--space-5) var(--space-6); transition:all 0.4s ease; cursor:default; display:flex; align-items:center; gap:var(--space-5); }
+  .dx-pyramid-level:hover { transform:scale(1.03); }
+  .dx-pyramid-level-4 { width:45%; background:var(--surface-1); border:1px solid rgba(139,92,246,0.25); }
+  .dx-pyramid-level-4:hover { border-color:rgba(139,92,246,0.5); box-shadow:0 0 30px rgba(139,92,246,0.1); }
+  .dx-pyramid-level-3 { width:60%; background:var(--surface-1); border:1px solid rgba(236,72,153,0.25); }
+  .dx-pyramid-level-3:hover { border-color:rgba(236,72,153,0.5); box-shadow:0 0 30px rgba(236,72,153,0.1); }
+  .dx-pyramid-level-2 { width:75%; background:var(--surface-1); border:1px solid rgba(245,158,11,0.25); }
+  .dx-pyramid-level-2:hover { border-color:rgba(245,158,11,0.5); box-shadow:0 0 30px rgba(245,158,11,0.1); }
+  .dx-pyramid-level-1 { width:90%; background:var(--surface-1); border:1px solid rgba(16,185,129,0.25); }
+  .dx-pyramid-level-1:hover { border-color:rgba(16,185,129,0.5); box-shadow:0 0 30px rgba(16,185,129,0.1); }
+  .dx-pyramid-icon { width:48px; height:48px; border-radius:var(--radius-lg); display:flex; align-items:center; justify-content:center; font-size:1.25rem; flex-shrink:0; }
+  .dx-pyramid-info { flex:1; }
+  .dx-pyramid-label { font-size:0.8125rem; font-weight:700; text-transform:uppercase; letter-spacing:0.05em; margin-bottom:var(--space-1); }
+  .dx-pyramid-name { font-size:1.125rem; font-weight:700; color:var(--text-primary); margin-bottom:var(--space-1); }
+  .dx-pyramid-tool { font-family:var(--font-mono); font-size:0.75rem; padding:var(--space-1) var(--space-3); border-radius:var(--radius-full); background:rgba(255,255,255,0.04); color:var(--text-muted); display:inline-block; margin-bottom:var(--space-2); }
+  .dx-pyramid-desc { font-size:0.875rem; color:var(--text-secondary); line-height:1.6; }
+
+  /* ==========================================
+     TAB 2: SHIFT-LEFT COMPARISON
+     ========================================== */
+  .dx-shift-grid { display:grid; grid-template-columns:1fr 1fr; gap:var(--space-6); }
+  .dx-shift-card { background:var(--surface-1); border-radius:var(--radius-xl); padding:var(--space-6); overflow:hidden; }
+  .dx-shift-card-bad { border:1px solid rgba(239,68,68,0.2); }
+  .dx-shift-card-good { border:1px solid rgba(16,185,129,0.2); }
+  .dx-shift-header { display:flex; align-items:center; gap:var(--space-3); margin-bottom:var(--space-6); }
+  .dx-shift-icon { width:40px; height:40px; border-radius:var(--radius-md); display:flex; align-items:center; justify-content:center; font-size:1rem; }
+  .dx-shift-title { font-size:1.125rem; font-weight:700; }
+  .dx-shift-bar-row { display:flex; align-items:center; gap:var(--space-3); margin-bottom:var(--space-4); }
+  .dx-shift-bar-label { font-size:0.8125rem; color:var(--text-secondary); min-width:80px; }
+  .dx-shift-bar-track { flex:1; height:8px; background:rgba(255,255,255,0.04); border-radius:4px; overflow:hidden; }
+  .dx-shift-bar-fill { height:100%; border-radius:4px; transition:width 1s cubic-bezier(0.22,1,0.36,1); width:var(--bar-width); }
+  .dx-shift-bar-fill-red { background:linear-gradient(90deg, var(--wc-red), var(--wc-pink)); }
+  .dx-shift-bar-fill-green { background:linear-gradient(90deg, var(--wc-green), var(--wc-cyan)); }
+  .dx-shift-bar-value { font-family:var(--font-mono); font-size:0.75rem; color:var(--text-muted); min-width:36px; text-align:right; }
+
+  /* ==========================================
+     TAB 2: COVERAGE DASHBOARD
+     ========================================== */
+  .dx-coverage-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:var(--space-6); }
+  .dx-coverage-card { background:var(--surface-1); border:1px solid var(--surface-3); border-radius:var(--radius-xl); padding:var(--space-6); text-align:center; transition:all 0.3s ease; }
+  .dx-coverage-card:hover { background:var(--surface-2); transform:translateY(-4px); }
+  .dx-coverage-ring { width:100px; height:100px; border-radius:50%; margin:0 auto var(--space-4); position:relative; display:flex; align-items:center; justify-content:center; }
+  .dx-coverage-ring::before { content:''; position:absolute; inset:0; border-radius:50%; }
+  .dx-coverage-value { font-size:1.5rem; font-weight:800; letter-spacing:-0.03em; position:relative; z-index:1; }
+  .dx-coverage-label { font-size:0.9375rem; font-weight:700; color:var(--text-primary); margin-bottom:var(--space-1); }
+  .dx-coverage-desc { font-size:0.8125rem; color:var(--text-muted); line-height:1.5; }
+
+  /* --- Tab 2 responsive --- */
+  @media (max-width:1100px) {
+    .dx-shift-grid { grid-template-columns:1fr; }
+    .dx-coverage-grid { grid-template-columns:repeat(2,1fr); }
+    .dx-pyramid-level-1, .dx-pyramid-level-2, .dx-pyramid-level-3, .dx-pyramid-level-4 { width:100%; }
+  }
+
+  @media (max-width:768px) {
+    .dx-coverage-grid { grid-template-columns:1fr; }
+  }
+</style>
+
+<div id="tab-quality" class="dx-tab-content" role="tabpanel">
+  <section class="dx-hero dx-hero-quality" aria-label="Quality pipeline overview">
+    <div class="dx-hero-grid" aria-hidden="true"></div>
+    <div class="dx-hero-orb dx-hero-orb-1" aria-hidden="true"></div>
+    <div class="dx-hero-orb dx-hero-orb-2" aria-hidden="true"></div>
+    <div class="dx-hero-orb dx-hero-orb-3" aria-hidden="true"></div>
+
+    <div class="dx-hero-content">
+      <div class="dx-hero-badge">
+        <span class="dx-hero-badge-dot" aria-hidden="true"></span>
+        Quality Engineering
+      </div>
+
+      <h1 class="dx-hero-title">Four Automated Gates,<br />Zero Manual Steps</h1>
+
+      <p class="dx-hero-subtitle">Quality engineered into the process, not bolted on after</p>
+
+      <p class="dx-hero-description">
+        Every commit passes through unit tests, accessibility audits,
+        visual regression checks, and end-to-end validation. No human
+        gatekeeping required. The pipeline catches what code review cannot.
+      </p>
+    </div>
+
+    <div class="mouse-scroll-wrap mouse-scroll-wrap--absolute" aria-hidden="true">
+      <div class="mouse-scroll-body"><div class="mouse-scroll-wheel"></div></div>
+      <span class="mouse-scroll-label">Scroll</span>
+    </div>
+  </section>
+
+  <!-- SECTION: Testing Pyramid -->
+  <section class="dx-section" aria-label="Testing pyramid">
+    <div class="dx-section-inner">
+      <div class="dx-section-header scroll-reveal">
+        <span class="dx-section-label dx-section-label-green">Testing Strategy</span>
+        <h2 class="dx-section-title">The Testing Pyramid</h2>
+        <p class="dx-section-description">
+          Four layers of automated validation. Each level catches a different
+          category of defect, from logic errors to visual regressions.
+        </p>
+      </div>
+
+      <div class="dx-pyramid">
+        <!-- Level 4 - E2E (top, narrowest) -->
+        <div class="dx-pyramid-level dx-pyramid-level-4 scroll-reveal scroll-reveal-delay-1">
+          <div class="dx-pyramid-icon icon-violet">
+            <i class="fa-solid fa-display" aria-hidden="true"></i>
+          </div>
+          <div class="dx-pyramid-info">
+            <div class="dx-pyramid-label" style="color:var(--wc-violet);">Level 4</div>
+            <div class="dx-pyramid-name">End-to-End Tests</div>
+            <span class="dx-pyramid-tool">Playwright</span>
+            <p class="dx-pyramid-desc">Full page integration testing across real browsers. Validates component interactions in complete page contexts.</p>
+          </div>
+        </div>
+
+        <!-- Level 3 - Visual Regression -->
+        <div class="dx-pyramid-level dx-pyramid-level-3 scroll-reveal scroll-reveal-delay-2">
+          <div class="dx-pyramid-icon icon-pink">
+            <i class="fa-solid fa-camera" aria-hidden="true"></i>
+          </div>
+          <div class="dx-pyramid-info">
+            <div class="dx-pyramid-label" style="color:var(--wc-pink);">Level 3</div>
+            <div class="dx-pyramid-name">Visual Regression</div>
+            <span class="dx-pyramid-tool">Chromatic</span>
+            <p class="dx-pyramid-desc">Pixel-perfect screenshot diffing across every variant, theme combination, and viewport. Catches CSS regressions invisible to unit tests.</p>
+          </div>
+        </div>
+
+        <!-- Level 2 - Accessibility -->
+        <div class="dx-pyramid-level dx-pyramid-level-2 scroll-reveal scroll-reveal-delay-3">
+          <div class="dx-pyramid-icon icon-amber">
+            <i class="fa-solid fa-universal-access" aria-hidden="true"></i>
+          </div>
+          <div class="dx-pyramid-info">
+            <div class="dx-pyramid-label" style="color:var(--wc-amber);">Level 2</div>
+            <div class="dx-pyramid-name">Accessibility Audits</div>
+            <span class="dx-pyramid-tool">axe-core</span>
+            <p class="dx-pyramid-desc">WCAG 2.1 AA compliance on every commit. Automated audits catch color contrast, ARIA, keyboard nav, and screen reader issues before merge.</p>
+          </div>
+        </div>
+
+        <!-- Level 1 - Unit Tests (bottom, widest) -->
+        <div class="dx-pyramid-level dx-pyramid-level-1 scroll-reveal scroll-reveal-delay-4">
+          <div class="dx-pyramid-icon icon-green">
+            <i class="fa-solid fa-vial" aria-hidden="true"></i>
+          </div>
+          <div class="dx-pyramid-info">
+            <div class="dx-pyramid-label" style="color:var(--wc-green);">Level 1</div>
+            <div class="dx-pyramid-name">Unit Tests</div>
+            <span class="dx-pyramid-tool">Vitest Browser Mode</span>
+            <p class="dx-pyramid-desc">Real DOM, real browser, real rendering. Not jsdom approximations. Every component tested against actual browser APIs.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION: Shift-Left Comparison -->
+  <section class="dx-section" aria-label="Shift-left quality comparison">
+    <div class="dx-section-inner">
+      <div class="dx-section-header scroll-reveal">
+        <span class="dx-section-label dx-section-label-green">Shift-Left Quality</span>
+        <h2 class="dx-section-title">Catch Bugs Where They Are Cheapest to Fix</h2>
+        <p class="dx-section-description">
+          Traditional pipelines find bugs in QA or production. This system
+          shifts detection to the moment of creation.
+        </p>
+      </div>
+
+      <div class="dx-shift-grid">
+        <!-- Traditional -->
+        <div class="dx-shift-card dx-shift-card-bad scroll-reveal scroll-reveal-delay-1">
+          <div class="dx-shift-header">
+            <div class="dx-shift-icon icon-red">
+              <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+            </div>
+            <div class="dx-shift-title" style="color:var(--wc-red);">Traditional Pipeline</div>
+          </div>
+          <div class="dx-shift-bar-row">
+            <span class="dx-shift-bar-label">Coding</span>
+            <div class="dx-shift-bar-track">
+              <div class="dx-shift-bar-fill dx-shift-bar-fill-red scroll-reveal-bar" style="--target-width:15%;"></div>
+            </div>
+            <span class="dx-shift-bar-value">15%</span>
+          </div>
+          <div class="dx-shift-bar-row">
+            <span class="dx-shift-bar-label">Code Review</span>
+            <div class="dx-shift-bar-track">
+              <div class="dx-shift-bar-fill dx-shift-bar-fill-red scroll-reveal-bar" style="--target-width:20%;"></div>
+            </div>
+            <span class="dx-shift-bar-value">20%</span>
+          </div>
+          <div class="dx-shift-bar-row">
+            <span class="dx-shift-bar-label">QA Testing</span>
+            <div class="dx-shift-bar-track">
+              <div class="dx-shift-bar-fill dx-shift-bar-fill-red scroll-reveal-bar" style="--target-width:40%;"></div>
+            </div>
+            <span class="dx-shift-bar-value">40%</span>
+          </div>
+          <div class="dx-shift-bar-row">
+            <span class="dx-shift-bar-label">Production</span>
+            <div class="dx-shift-bar-track">
+              <div class="dx-shift-bar-fill dx-shift-bar-fill-red scroll-reveal-bar" style="--target-width:25%;"></div>
+            </div>
+            <span class="dx-shift-bar-value">25%</span>
+          </div>
+        </div>
+
+        <!-- This System -->
+        <div class="dx-shift-card dx-shift-card-good scroll-reveal scroll-reveal-delay-2">
+          <div class="dx-shift-header">
+            <div class="dx-shift-icon icon-green">
+              <i class="fa-solid fa-check" aria-hidden="true"></i>
+            </div>
+            <div class="dx-shift-title" style="color:var(--wc-green);">WC-2026 Pipeline</div>
+          </div>
+          <div class="dx-shift-bar-row">
+            <span class="dx-shift-bar-label">Coding</span>
+            <div class="dx-shift-bar-track">
+              <div class="dx-shift-bar-fill dx-shift-bar-fill-green scroll-reveal-bar" style="--target-width:55%;"></div>
+            </div>
+            <span class="dx-shift-bar-value">55%</span>
+          </div>
+          <div class="dx-shift-bar-row">
+            <span class="dx-shift-bar-label">Pre-commit</span>
+            <div class="dx-shift-bar-track">
+              <div class="dx-shift-bar-fill dx-shift-bar-fill-green scroll-reveal-bar" style="--target-width:30%;"></div>
+            </div>
+            <span class="dx-shift-bar-value">30%</span>
+          </div>
+          <div class="dx-shift-bar-row">
+            <span class="dx-shift-bar-label">CI Pipeline</span>
+            <div class="dx-shift-bar-track">
+              <div class="dx-shift-bar-fill dx-shift-bar-fill-green scroll-reveal-bar" style="--target-width:13%;"></div>
+            </div>
+            <span class="dx-shift-bar-value">13%</span>
+          </div>
+          <div class="dx-shift-bar-row">
+            <span class="dx-shift-bar-label">Production</span>
+            <div class="dx-shift-bar-track">
+              <div class="dx-shift-bar-fill dx-shift-bar-fill-green scroll-reveal-bar" style="--target-width:2%;"></div>
+            </div>
+            <span class="dx-shift-bar-value">2%</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION: Coverage Dashboard -->
+  <section class="dx-section" aria-label="Coverage dashboard">
+    <div class="dx-section-inner">
+      <div class="dx-section-header scroll-reveal">
+        <span class="dx-section-label dx-section-label-green">Coverage Metrics</span>
+        <h2 class="dx-section-title">Quality at a Glance</h2>
+        <p class="dx-section-description">
+          Real-time quality metrics tracked across every component in the library.
+        </p>
+      </div>
+
+      <div class="dx-coverage-grid">
+        <div class="dx-coverage-card scroll-reveal scroll-reveal-delay-1">
+          <div class="dx-coverage-ring" style="background:conic-gradient(var(--wc-green) 0% 92%, rgba(255,255,255,0.06) 92% 100%);">
+            <div class="dx-coverage-value" style="color:var(--wc-green);">&gt;90%</div>
+          </div>
+          <div class="dx-coverage-label">Unit Coverage</div>
+          <p class="dx-coverage-desc">Statement and branch coverage across all components</p>
+        </div>
+
+        <div class="dx-coverage-card scroll-reveal scroll-reveal-delay-2">
+          <div class="dx-coverage-ring" style="background:conic-gradient(var(--wc-amber) 0% 100%, rgba(255,255,255,0.06) 100% 100%);">
+            <div class="dx-coverage-value" style="color:var(--wc-amber);">100%</div>
+          </div>
+          <div class="dx-coverage-label">A11y Audited</div>
+          <p class="dx-coverage-desc">Every component passes axe-core WCAG 2.1 AA audit</p>
+        </div>
+
+        <div class="dx-coverage-card scroll-reveal scroll-reveal-delay-3">
+          <div class="dx-coverage-ring" style="background:conic-gradient(var(--wc-pink) 0% 100%, rgba(255,255,255,0.06) 100% 100%);">
+            <div class="dx-coverage-value" style="color:var(--wc-pink);">All</div>
+          </div>
+          <div class="dx-coverage-label">Visual Tested</div>
+          <p class="dx-coverage-desc">Every variant and theme combination screenshot tested</p>
+        </div>
+
+        <div class="dx-coverage-card scroll-reveal scroll-reveal-delay-4">
+          <div class="dx-coverage-ring" style="background:conic-gradient(var(--wc-violet) 0% 100%, rgba(255,255,255,0.06) 100% 100%);">
+            <div class="dx-coverage-value" style="color:var(--wc-violet);">E2E</div>
+          </div>
+          <div class="dx-coverage-label">Critical Flows</div>
+          <p class="dx-coverage-desc">Every critical user flow validated end-to-end in CI</p>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>

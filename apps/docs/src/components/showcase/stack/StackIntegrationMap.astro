@@ -1,0 +1,271 @@
+---
+/**
+ * StackIntegrationMap — Section 5: The Integration Map
+ *
+ * Tool connection flow showing the pipeline from authoring to deployment:
+ * Author -> Test -> Document -> Build -> Publish -> Integrate
+ */
+---
+
+<style is:inline>
+  /* ============================================
+     SECTION 5: INTEGRATION MAP
+     ============================================ */
+  .ts-flow-section {
+    background: var(--surface-0);
+  }
+
+  .ts-flow-pipeline {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+    max-width: 1200px;
+    margin: 0 auto;
+    flex-wrap: wrap;
+  }
+
+  .ts-flow-step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-6) var(--space-4);
+    text-align: center;
+    flex: 0 0 auto;
+    min-width: 120px;
+  }
+
+  .ts-flow-icon {
+    width: 72px;
+    height: 72px;
+    border-radius: var(--radius-xl);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid;
+    position: relative;
+    transition: all 0.3s ease;
+  }
+
+  .ts-flow-step:hover .ts-flow-icon {
+    transform: scale(1.1);
+  }
+
+  .ts-flow-icon img {
+    width: 36px;
+    height: 36px;
+  }
+
+  .ts-flow-icon i {
+    font-size: 1.5rem;
+  }
+
+  .ts-flow-label {
+    font-size: 0.8125rem;
+    font-weight: 700;
+    color: var(--text-primary);
+  }
+
+  .ts-flow-sub {
+    font-size: 0.6875rem;
+    color: var(--text-muted);
+    max-width: 100px;
+  }
+
+  .ts-flow-arrow {
+    color: var(--text-muted);
+    font-size: 1.25rem;
+    flex-shrink: 0;
+    padding: 0 var(--space-1);
+  }
+
+  /* Flow icon colors */
+  .ts-flow-author { background: rgba(50, 79, 255, 0.1); border-color: rgba(50, 79, 255, 0.3); color: #324fff; }
+  .ts-flow-test { background: rgba(114, 155, 27, 0.1); border-color: rgba(114, 155, 27, 0.3); color: #729B1B; }
+  .ts-flow-document { background: rgba(255, 71, 133, 0.1); border-color: rgba(255, 71, 133, 0.3); color: #ff4785; }
+  .ts-flow-build { background: rgba(189, 52, 254, 0.1); border-color: rgba(189, 52, 254, 0.3); color: #bd34fe; }
+  .ts-flow-publish { background: rgba(193, 33, 39, 0.1); border-color: rgba(193, 33, 39, 0.3); color: #c12127; }
+  .ts-flow-integrate { background: rgba(6, 120, 190, 0.1); border-color: rgba(6, 120, 190, 0.3); color: #0678be; }
+
+  .ts-flow-cem-note {
+    text-align: center;
+    margin-top: var(--space-10);
+    padding: var(--space-6);
+    border-radius: var(--radius-xl);
+    background: linear-gradient(135deg, rgba(139, 92, 246, 0.08), rgba(6, 182, 212, 0.04));
+    border: 1px solid rgba(139, 92, 246, 0.2);
+    max-width: 700px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .ts-flow-cem-note-title {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--wc-accent);
+    margin-bottom: var(--space-2);
+  }
+
+  .ts-flow-cem-note-text {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    line-height: 1.6;
+  }
+
+  @media (max-width: 1024px) {
+    .ts-flow-pipeline {
+      gap: var(--space-2);
+    }
+
+    .ts-flow-step {
+      min-width: 100px;
+      padding: var(--space-4) var(--space-2);
+    }
+  }
+
+  @media (max-width: 768px) {
+    .ts-flow-pipeline {
+      flex-direction: column;
+      gap: 0;
+    }
+
+    .ts-flow-arrow {
+      transform: rotate(90deg);
+      padding: var(--space-1) 0;
+    }
+
+    .ts-flow-step {
+      flex-direction: row;
+      text-align: left;
+      gap: var(--space-4);
+      min-width: auto;
+      width: 100%;
+      max-width: 300px;
+    }
+
+    .ts-flow-icon {
+      width: 56px;
+      height: 56px;
+      flex-shrink: 0;
+    }
+
+    .ts-flow-icon img {
+      width: 28px;
+      height: 28px;
+    }
+  }
+</style>
+
+<section class="ts-section ts-flow-section" aria-label="Integration pipeline">
+  <div class="ts-section-inner">
+    <div class="ts-section-header scroll-reveal">
+      <span class="ts-section-label">Pipeline</span>
+      <h2 class="ts-section-title">The Integration Map</h2>
+      <p class="ts-section-description">
+        How every tool connects in the development pipeline,
+        from authoring a component to deploying it in Drupal.
+      </p>
+    </div>
+
+    <div class="ts-flow-pipeline scroll-reveal">
+      <!-- Author -->
+      <div class="ts-flow-step">
+        <div class="ts-flow-icon ts-flow-author">
+          <img src="/logos/lit.svg" alt="" />
+        </div>
+        <div>
+          <div class="ts-flow-label">Author</div>
+          <div class="ts-flow-sub">Lit + TypeScript</div>
+        </div>
+      </div>
+
+      <div class="ts-flow-arrow" aria-hidden="true">
+        <i class="fa-solid fa-chevron-right"></i>
+      </div>
+
+      <!-- Test -->
+      <div class="ts-flow-step">
+        <div class="ts-flow-icon ts-flow-test">
+          <img src="/logos/vitest.svg" alt="" />
+        </div>
+        <div>
+          <div class="ts-flow-label">Test</div>
+          <div class="ts-flow-sub">Vitest + Playwright</div>
+        </div>
+      </div>
+
+      <div class="ts-flow-arrow" aria-hidden="true">
+        <i class="fa-solid fa-chevron-right"></i>
+      </div>
+
+      <!-- Document -->
+      <div class="ts-flow-step">
+        <div class="ts-flow-icon ts-flow-document">
+          <img src="/logos/storybook.svg" alt="" />
+        </div>
+        <div>
+          <div class="ts-flow-label">Document</div>
+          <div class="ts-flow-sub">Storybook + CEM</div>
+        </div>
+      </div>
+
+      <div class="ts-flow-arrow" aria-hidden="true">
+        <i class="fa-solid fa-chevron-right"></i>
+      </div>
+
+      <!-- Build -->
+      <div class="ts-flow-step">
+        <div class="ts-flow-icon ts-flow-build">
+          <i class="fa-solid fa-bolt" aria-hidden="true"></i>
+        </div>
+        <div>
+          <div class="ts-flow-label">Build</div>
+          <div class="ts-flow-sub">Vite + Turborepo</div>
+        </div>
+      </div>
+
+      <div class="ts-flow-arrow" aria-hidden="true">
+        <i class="fa-solid fa-chevron-right"></i>
+      </div>
+
+      <!-- Publish -->
+      <div class="ts-flow-step">
+        <div class="ts-flow-icon ts-flow-publish">
+          <img src="/logos/npm.svg" alt="" />
+        </div>
+        <div>
+          <div class="ts-flow-label">Publish</div>
+          <div class="ts-flow-sub">npm registry</div>
+        </div>
+      </div>
+
+      <div class="ts-flow-arrow" aria-hidden="true">
+        <i class="fa-solid fa-chevron-right"></i>
+      </div>
+
+      <!-- Integrate -->
+      <div class="ts-flow-step">
+        <div class="ts-flow-icon ts-flow-integrate">
+          <img src="/logos/drupal.svg" alt="" />
+        </div>
+        <div>
+          <div class="ts-flow-label">Integrate</div>
+          <div class="ts-flow-sub">Drupal CMS</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="ts-flow-cem-note scroll-reveal scroll-reveal-delay-2">
+      <div class="ts-flow-cem-note-title">
+        <i class="fa-solid fa-link" aria-hidden="true"></i>
+        CEM: The Glue Between Systems
+      </div>
+      <div class="ts-flow-cem-note-text">
+        The Custom Elements Manifest (CEM) is a machine-readable JSON contract
+        generated from JSDoc annotations. It feeds Storybook autodocs, Starlight API pages,
+        IDE IntelliSense, and Drupal tooling -- all from a single source of truth.
+      </div>
+    </div>
+  </div>
+</section>

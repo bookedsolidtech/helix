@@ -1,0 +1,55 @@
+/* ==========================================================================
+ * _field.css — Shared field layout for native form elements
+ *
+ * Targets Drupal Form API output: .form-item wrappers, labels,
+ * .description help text, and .form-required markers.
+ * ==========================================================================
+ */
+
+/* ─── Field Container ─── */
+
+.form-item {
+  display: flex;
+  flex-direction: column;
+  gap: var(--wc-space-1, 0.25rem);
+  font-family: var(--wc-input-font-family, var(--wc-font-family-sans, sans-serif));
+}
+
+.form-item + .form-item {
+  margin-top: var(--wc-space-4, 1rem);
+}
+
+/* ─── Label ─── */
+
+label {
+  display: flex;
+  align-items: baseline;
+  gap: var(--wc-space-1, 0.25rem);
+  font-size: var(--wc-font-size-sm, 0.875rem);
+  font-weight: var(--wc-font-weight-medium, 500);
+  color: var(--wc-input-label-color, var(--wc-color-neutral-700, #343a40));
+  line-height: var(--wc-line-height-normal, 1.5);
+}
+
+/* ─── Required Marker ─── */
+
+.form-required {
+  color: var(--wc-input-error-color, var(--wc-color-error-500, #dc3545));
+  font-weight: var(--wc-font-weight-bold, 700);
+}
+
+/* ─── Description / Help Text ─── */
+
+.description {
+  font-size: var(--wc-font-size-xs, 0.75rem);
+  color: var(--wc-color-neutral-500, #6c757d);
+  line-height: var(--wc-line-height-normal, 1.5);
+}
+
+/* ─── Box Sizing Reset ─── */
+
+.form-item *,
+.form-item *::before,
+.form-item *::after {
+  box-sizing: border-box;
+}

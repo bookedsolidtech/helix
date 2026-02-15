@@ -3,6 +3,7 @@ import { customElement, property, query } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import { live } from 'lit/directives/live.js';
+import { tokenStyles } from '@wc-2026/tokens/lit';
 import { wcTextInputStyles } from './wc-text-input.styles.js';
 
 /**
@@ -12,9 +13,11 @@ import { wcTextInputStyles } from './wc-text-input.styles.js';
  *
  * @tag wc-text-input
  *
+ * @slot label - Custom label content (overrides the label property). Use for Drupal Form API rendered labels.
  * @slot prefix - Content rendered before the input (e.g., icon).
  * @slot suffix - Content rendered after the input (e.g., icon or button).
  * @slot help-text - Custom help text content (overrides the helpText property).
+ * @slot error - Custom error content (overrides the error property). Use for Drupal Form API rendered errors.
  *
  * @fires {CustomEvent<{value: string}>} wc-input - Dispatched on every keystroke as the user types.
  * @fires {CustomEvent<{value: string}>} wc-change - Dispatched when the input loses focus after its value changed.
@@ -26,18 +29,18 @@ import { wcTextInputStyles } from './wc-text-input.styles.js';
  * @csspart help-text - The help text container.
  * @csspart error - The error message container.
  *
- * @cssprop [--wc-input-bg] - Input background color.
- * @cssprop [--wc-input-color] - Input text color.
- * @cssprop [--wc-input-border-color] - Input border color.
- * @cssprop [--wc-input-border-radius] - Input border radius.
- * @cssprop [--wc-input-font-family] - Input font family.
- * @cssprop [--wc-input-focus-ring-color] - Focus ring color.
- * @cssprop [--wc-input-error-color] - Error state color.
- * @cssprop [--wc-input-label-color] - Label text color.
+ * @cssprop [--wc-input-bg=var(--wc-color-neutral-0)] - Input background color.
+ * @cssprop [--wc-input-color=var(--wc-color-neutral-800)] - Input text color.
+ * @cssprop [--wc-input-border-color=var(--wc-color-neutral-300)] - Input border color.
+ * @cssprop [--wc-input-border-radius=var(--wc-border-radius-md)] - Input border radius.
+ * @cssprop [--wc-input-font-family=var(--wc-font-family-sans)] - Input font family.
+ * @cssprop [--wc-input-focus-ring-color=var(--wc-focus-ring-color)] - Focus ring color.
+ * @cssprop [--wc-input-error-color=var(--wc-color-error-500)] - Error state color.
+ * @cssprop [--wc-input-label-color=var(--wc-color-neutral-700)] - Label text color.
  */
 @customElement('wc-text-input')
 export class WcTextInput extends LitElement {
-  static override styles = wcTextInputStyles;
+  static override styles = [tokenStyles, wcTextInputStyles];
 
   // ─── Form Association ───
 
@@ -126,6 +129,29 @@ export class WcTextInput extends LitElement {
 
   @query('.field__input')
   private _input!: HTMLInputElement;
+
+  // ─── Slot Tracking ───
+
+  private _hasLabelSlot = false;
+  private _hasErrorSlot = false;
+
+  private _handleLabelSlotChange(e: Event): void {
+    const slot = e.target as HTMLSlotElement;
+    this._hasLabelSlot = slot.assignedElements().length > 0;
+    if (this._hasLabelSlot) {
+      const slottedLabel = slot.assignedElements()[0];
+      if (!slottedLabel.id) {
+        slottedLabel.id = `${this._inputId}-slotted-label`;
+      }
+    }
+    this.requestUpdate();
+  }
+
+  private _handleErrorSlotChange(e: Event): void {
+    const slot = e.target as HTMLSlotElement;
+    this._hasErrorSlot = slot.assignedElements().length > 0;
+    this.requestUpdate();
+  }
 
   // ─── Lifecycle ───
 
@@ -244,7 +270,7 @@ export class WcTextInput extends LitElement {
   private _errorId = `${this._inputId}-error`;
 
   override render() {
-    const hasError = !!this.error;
+    const hasError = !!this.error || this._hasErrorSlot;
 
     const fieldClasses = {
       field: true,
@@ -262,16 +288,20 @@ export class WcTextInput extends LitElement {
 
     return html`
       <div part="field" class=${classMap(fieldClasses)}>
-        ${this.label
-          ? html`
-              <label part="label" class="field__label" for=${this._inputId}>
-                ${this.label}
-                ${this.required
-                  ? html`<span class="field__required-marker" aria-hidden="true">*</span>`
-                  : nothing}
-              </label>
-            `
-          : nothing}
+        <div class="field__label-wrapper">
+          <slot name="label" @slotchange=${this._handleLabelSlotChange}>
+            ${this.label
+              ? html`
+                  <label part="label" class="field__label" for=${this._inputId}>
+                    ${this.label}
+                    ${this.required
+                      ? html`<span class="field__required-marker" aria-hidden="true">*</span>`
+                      : nothing}
+                  </label>
+                `
+              : nothing}
+          </slot>
+        </div>
 
         <div part="input-wrapper" class="field__input-wrapper">
           <span class="field__prefix">
@@ -289,6 +319,7 @@ export class WcTextInput extends LitElement {
             ?disabled=${this.disabled}
             name=${ifDefined(this.name || undefined)}
             aria-label=${ifDefined(this.ariaLabel ?? undefined)}
+            aria-labelledby=${ifDefined(this._hasLabelSlot ? `${this._inputId}-slotted-label` : undefined)}
             aria-invalid=${hasError ? 'true' : nothing}
             aria-describedby=${ifDefined(describedBy)}
             aria-required=${this.required ? 'true' : nothing}
@@ -301,13 +332,15 @@ export class WcTextInput extends LitElement {
           </span>
         </div>
 
-        ${hasError
-          ? html`
-              <div part="error" class="field__error" id=${this._errorId} role="alert" aria-live="polite">
-                ${this.error}
-              </div>
-            `
-          : nothing}
+        <slot name="error" @slotchange=${this._handleErrorSlotChange}>
+          ${this.error
+            ? html`
+                <div part="error" class="field__error" id=${this._errorId} role="alert" aria-live="polite">
+                  ${this.error}
+                </div>
+              `
+            : nothing}
+        </slot>
 
         ${this.helpText && !hasError
           ? html`

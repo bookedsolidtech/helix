@@ -1,0 +1,211 @@
+---
+/**
+ * A11yComponentChecklist — What every component guarantees.
+ *
+ * Displays seven accessibility guarantees that every WC-2026 component
+ * ships with: keyboard nav, screen reader compat, color independence,
+ * motion safety, high contrast, touch targets, and focus visibility.
+ */
+---
+
+<style is:inline>
+  /* --- Component A11y Checklist --- */
+  .ha-checklist-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: var(--space-5);
+  }
+
+  .ha-check-card {
+    padding: var(--space-6);
+    border-radius: var(--radius-xl);
+    background: var(--surface-1);
+    border: 1px solid var(--surface-3);
+    transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .ha-check-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1.5px;
+    background: conic-gradient(from var(--gradient-angle), #10b981, #14b8a6, #06b6d4, #10b981);
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+    pointer-events: none;
+    animation: border-rotate 4s linear infinite;
+  }
+
+  .ha-check-card::after {
+    content: '';
+    position: absolute;
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(16, 185, 129, 0.1), transparent 70%);
+    opacity: 0;
+    transition: opacity 0.5s ease;
+    pointer-events: none;
+    top: var(--mouse-y, 50%);
+    left: var(--mouse-x, 50%);
+    transform: translate(-50%, -50%);
+  }
+
+  .ha-check-card:hover::before { opacity: 1; }
+  .ha-check-card:hover::after { opacity: 1; }
+  .ha-check-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-lg), var(--glow-health);
+    background: var(--surface-2);
+  }
+
+  .ha-check-header {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    margin-bottom: var(--space-3);
+    position: relative;
+    z-index: 1;
+  }
+
+  .ha-check-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.125rem;
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.12), rgba(16, 185, 129, 0.04));
+    border: 1px solid rgba(16, 185, 129, 0.15);
+    color: var(--wc-green);
+    flex-shrink: 0;
+  }
+
+  .ha-check-mark {
+    color: var(--wc-green);
+    font-size: 1rem;
+    flex-shrink: 0;
+  }
+
+  .ha-check-title {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    position: relative;
+    z-index: 1;
+  }
+
+  .ha-check-desc {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    line-height: 1.6;
+    position: relative;
+    z-index: 1;
+  }
+</style>
+
+<section class="ha-section" aria-label="Component accessibility checklist">
+  <div class="ha-section-inner">
+    <div class="ha-section-header scroll-reveal">
+      <span class="ha-section-label">Component Guarantees</span>
+      <h2 class="ha-section-title">What Every Component Delivers</h2>
+      <p class="ha-section-description">
+        Every WC-2026 component ships with these seven accessibility guarantees.
+        No exceptions. No opt-in flags. Accessible by default.
+      </p>
+    </div>
+
+    <div class="ha-checklist-grid">
+      <div class="ha-check-card ha-spotlight-card scroll-reveal scroll-reveal-delay-1">
+        <div class="ha-check-header">
+          <div class="ha-check-icon" aria-hidden="true"><i class="fa-solid fa-keyboard"></i></div>
+          <i class="fa-solid fa-circle-check ha-check-mark" aria-hidden="true"></i>
+        </div>
+        <div class="ha-check-title">Keyboard Navigable</div>
+        <p class="ha-check-desc">
+          Every interactive element is reachable and operable via keyboard alone. Tab order
+          follows logical reading order. Enter and Space activate controls. Escape closes overlays.
+        </p>
+      </div>
+
+      <div class="ha-check-card ha-spotlight-card scroll-reveal scroll-reveal-delay-2">
+        <div class="ha-check-header">
+          <div class="ha-check-icon" aria-hidden="true"><i class="fa-solid fa-volume-high"></i></div>
+          <i class="fa-solid fa-circle-check ha-check-mark" aria-hidden="true"></i>
+        </div>
+        <div class="ha-check-title">Screen Reader Compatible</div>
+        <p class="ha-check-desc">
+          Semantic ARIA attributes, live regions for dynamic content, and proper role
+          announcements. Tested with JAWS, NVDA, and VoiceOver on every release.
+        </p>
+      </div>
+
+      <div class="ha-check-card ha-spotlight-card scroll-reveal scroll-reveal-delay-3">
+        <div class="ha-check-header">
+          <div class="ha-check-icon" aria-hidden="true"><i class="fa-solid fa-droplet"></i></div>
+          <i class="fa-solid fa-circle-check ha-check-mark" aria-hidden="true"></i>
+        </div>
+        <div class="ha-check-title">Color Independent</div>
+        <p class="ha-check-desc">
+          Information is never conveyed by color alone. Icons, text labels, and patterns
+          supplement all color-coded indicators. Works for all types of color vision deficiency.
+        </p>
+      </div>
+
+      <div class="ha-check-card ha-spotlight-card scroll-reveal scroll-reveal-delay-4">
+        <div class="ha-check-header">
+          <div class="ha-check-icon" aria-hidden="true"><i class="fa-solid fa-gauge-simple"></i></div>
+          <i class="fa-solid fa-circle-check ha-check-mark" aria-hidden="true"></i>
+        </div>
+        <div class="ha-check-title">Motion Safe</div>
+        <p class="ha-check-desc">
+          All animations respect <code>prefers-reduced-motion</code>. Users with vestibular
+          disorders never see unexpected motion. Critical for healthcare patients.
+        </p>
+      </div>
+
+      <div class="ha-check-card ha-spotlight-card scroll-reveal scroll-reveal-delay-5">
+        <div class="ha-check-header">
+          <div class="ha-check-icon" aria-hidden="true"><i class="fa-solid fa-circle-half-stroke"></i></div>
+          <i class="fa-solid fa-circle-check ha-check-mark" aria-hidden="true"></i>
+        </div>
+        <div class="ha-check-title">High Contrast</div>
+        <p class="ha-check-desc">
+          Full Windows High Contrast Mode support. Components adapt to forced-colors
+          media query. Text meets 7:1 AAA contrast ratios in high-contrast themes.
+        </p>
+      </div>
+
+      <div class="ha-check-card ha-spotlight-card scroll-reveal scroll-reveal-delay-6">
+        <div class="ha-check-header">
+          <div class="ha-check-icon" aria-hidden="true"><i class="fa-solid fa-hand-pointer"></i></div>
+          <i class="fa-solid fa-circle-check ha-check-mark" aria-hidden="true"></i>
+        </div>
+        <div class="ha-check-title">Touch Target 44x44</div>
+        <p class="ha-check-desc">
+          All interactive elements meet the minimum 44x44 CSS pixel touch target. Users with
+          motor impairments, tremors, or limited dexterity can activate every control.
+        </p>
+      </div>
+
+      <div class="ha-check-card ha-spotlight-card scroll-reveal scroll-reveal-delay-7">
+        <div class="ha-check-header">
+          <div class="ha-check-icon" aria-hidden="true"><i class="fa-solid fa-crosshairs"></i></div>
+          <i class="fa-solid fa-circle-check ha-check-mark" aria-hidden="true"></i>
+        </div>
+        <div class="ha-check-title">Focus Visible</div>
+        <p class="ha-check-desc">
+          Clear, high-contrast focus indicators on every interactive element. 3px solid
+          ring with 3:1 contrast against adjacent colors. Never hidden, never suppressed.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>

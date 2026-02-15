@@ -11,390 +11,278 @@
  * 6. Documentation Strategy - Write once, publish everywhere
  * 7. Footer CTA
  */
+import ShowcaseLayout from '../layouts/ShowcaseLayout.astro';
 ---
 
-<!doctype html>
-<html lang="en" data-theme="dark">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Enterprise Architecture | WC-2026</title>
-    <meta
-      name="description"
-      content="100% TypeScript, CEM-driven documentation, three-tier W3C DTCG design tokens, and automated quality pipelines. Enterprise architecture that scales."
-    />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=JetBrains+Mono:wght@400;500;600;700&display=swap"
-      rel="stylesheet"
-    />
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
-      integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg=="
-      crossorigin="anonymous"
-      referrerpolicy="no-referrer"
-    />
+<ShowcaseLayout
+  title="Enterprise Architecture"
+  description="100% TypeScript, CEM-driven documentation, three-tier W3C DTCG design tokens, and automated quality pipelines. Enterprise architecture that scales."
+>
+  <style is:inline>
+    /* Page-specific gradient-hero override */
+    :root { --gradient-hero: linear-gradient(135deg, #0a0a1a 0%, #0f1030 40%, #0a0a2e 100%); }
 
-    <style is:inline>
-      /* ============================================
-         ENTERPRISE ARCHITECTURE PAGE
-         ============================================ */
+    /* Top Navigation */
+    .ea-topbar { position:fixed; top:0; left:0; right:0; z-index:100; display:flex; align-items:center; justify-content:space-between; padding:var(--space-3) var(--space-8); background:rgba(10,10,20,0.85); backdrop-filter:blur(16px) saturate(180%); -webkit-backdrop-filter:blur(16px) saturate(180%); border-bottom:1px solid rgba(255,255,255,0.06); }
+    .ea-topbar-left { display:flex; align-items:center; gap:var(--space-4); }
+    .ea-back-link { display:inline-flex; align-items:center; gap:var(--space-2); font-size:0.875rem; font-weight:600; color:var(--text-secondary); transition:all 0.2s ease; padding:var(--space-2) var(--space-3); border-radius:var(--radius-md); }
+    .ea-back-link:hover { color:var(--text-primary); background:var(--glass-bg-strong); }
+    .ea-topbar-title { font-size:0.875rem; font-weight:700; color:var(--text-primary); }
+    .ea-topbar-right { display:flex; align-items:center; gap:var(--space-4); }
+    .ea-topbar-link { font-size:0.8125rem; font-weight:500; color:var(--text-secondary); display:inline-flex; align-items:center; gap:var(--space-2); padding:var(--space-2) var(--space-3); border-radius:var(--radius-md); transition:all 0.2s ease; }
+    .ea-topbar-link:hover { color:var(--text-primary); background:var(--glass-bg-strong); }
 
-      @property --gradient-angle {
-        syntax: '<angle>';
-        initial-value: 0deg;
-        inherits: false;
-      }
+    /* Hero */
+    .ea-hero { position:relative; min-height:100vh; display:flex; align-items:center; justify-content:center; text-align:center; padding:var(--space-24) var(--space-8); background:var(--gradient-hero); overflow:hidden; }
+    .ea-hero-grid { position:absolute; inset:0; background-image:linear-gradient(rgba(255,255,255,0.02) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.02) 1px,transparent 1px); background-size:60px 60px; }
+    .ea-hero-orb { position:absolute; border-radius:50%; pointer-events:none; }
+    .ea-hero-orb-1 { width:500px; height:500px; background:radial-gradient(circle,rgba(6,182,212,0.2),transparent 70%); top:-10%; right:-5%; animation:float-slow 20s ease-in-out infinite, orb-pulse 8s ease-in-out infinite; }
+    .ea-hero-orb-2 { width:400px; height:400px; background:radial-gradient(circle,rgba(139,92,246,0.15),transparent 70%); bottom:-5%; left:-5%; animation:float-slow 25s ease-in-out infinite reverse, orb-pulse 10s ease-in-out infinite 2s; }
+    .ea-hero-orb-3 { width:300px; height:300px; background:radial-gradient(circle,rgba(16,185,129,0.12),transparent 70%); top:30%; left:15%; animation:float-slow 18s ease-in-out infinite 3s, orb-pulse 12s ease-in-out infinite 4s; }
+    .ea-hero-content { position:relative; z-index:2; max-width:800px; }
+    .ea-hero-badge { display:inline-flex; align-items:center; gap:var(--space-2); padding:var(--space-2) var(--space-4); background:var(--glass-bg-strong); border:1px solid var(--glass-border-strong); border-radius:var(--radius-full); font-size:0.8125rem; font-weight:600; color:var(--wc-cyan); margin-bottom:var(--space-8); animation:fadeInDown 0.8s ease-out; }
+    .ea-hero-badge-dot { width:8px; height:8px; border-radius:50%; background:var(--wc-cyan); box-shadow:0 0 8px var(--wc-cyan); }
+    .ea-hero-title { font-size:clamp(2.5rem,7vw,4.5rem); font-weight:800; letter-spacing:-0.04em; line-height:1.15; margin-bottom:var(--space-6); animation:fadeInUp 1s ease-out 0.2s both; }
+    .ea-hero-title .gradient-text { background:var(--gradient-cyan-purple); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+    .ea-hero-subtitle { font-size:clamp(1.125rem,2.5vw,1.5rem); color:var(--text-secondary); font-weight:400; letter-spacing:-0.01em; margin-bottom:var(--space-6); animation:fadeInUp 1s ease-out 0.4s both; }
+    .ea-hero-description { font-size:1.0625rem; color:var(--text-muted); line-height:1.8; max-width:600px; margin:0 auto; animation:fadeInUp 1s ease-out 0.6s both; }
+    .ea-hero-scroll { position:absolute; bottom:var(--space-8); left:50%; transform:translateX(-50%); display:flex; flex-direction:column; align-items:center; gap:var(--space-2); color:var(--text-muted); font-size:0.75rem; font-weight:500; letter-spacing:0.05em; text-transform:uppercase; animation:scroll-fade 2s ease-in-out infinite; }
+    .ea-hero-scroll-line { width:1px; height:24px; background:linear-gradient(to bottom,var(--text-muted),transparent); }
 
-      :root {
-        --wc-accent-h: 250;
-        --wc-accent-s: 70%;
-        --wc-accent-l: 60%;
-        --wc-accent: hsl(var(--wc-accent-h), var(--wc-accent-s), var(--wc-accent-l));
-        --wc-cyan: #06b6d4;
-        --wc-pink: #ec4899;
-        --wc-green: #10b981;
-        --wc-amber: #f59e0b;
-        --wc-red: #ef4444;
-        --wc-electric: #3b82f6;
+    /* Sections */
+    .ea-section { position:relative; }
+    .ea-section-inner { max-width:1200px; margin:0 auto; padding:var(--space-24) var(--space-8); }
+    .ea-section-header { text-align:center; margin-bottom:var(--space-16); }
+    .ea-section-label { display:inline-block; font-size:0.75rem; font-weight:700; text-transform:uppercase; letter-spacing:0.1em; padding:var(--space-1) var(--space-4); border-radius:var(--radius-full); margin-bottom:var(--space-4); background:rgba(102,126,234,0.08); color:var(--wc-accent); border:1px solid rgba(102,126,234,0.15); }
+    .ea-section-title { font-size:clamp(2rem,5vw,3rem); margin-bottom:var(--space-4); }
+    .ea-section-description { font-size:1.0625rem; color:var(--text-secondary); max-width:700px; margin:0 auto; line-height:1.8; }
 
-        --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        --gradient-hero: linear-gradient(135deg, #0a0a1a 0%, #0f1030 40%, #0a0a2e 100%);
-        --gradient-cyan-purple: linear-gradient(135deg, #06b6d4, #8b5cf6);
-        --gradient-pink-orange: linear-gradient(135deg, #ec4899, #f97316);
-        --gradient-green-cyan: linear-gradient(135deg, #10b981, #06b6d4);
+    /* Cards */
+    .ea-card { background:var(--surface-1); border:1px solid var(--surface-3); border-radius:var(--radius-xl); padding:var(--space-8) var(--space-6); transition:all 0.5s cubic-bezier(0.22,1,0.36,1); position:relative; overflow:hidden; }
+    .ea-card::before { content:''; position:absolute; inset:0; border-radius:inherit; padding:1.5px; background:conic-gradient(from var(--gradient-angle),#667eea,#764ba2,#f093fb,#06b6d4,#667eea); -webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0); -webkit-mask-composite:xor; mask-composite:exclude; opacity:0; transition:opacity 0.5s ease; pointer-events:none; animation:border-rotate 4s linear infinite; }
+    .ea-card::after { content:''; position:absolute; width:250px; height:250px; border-radius:50%; background:radial-gradient(circle,rgba(102,126,234,0.1),transparent 70%); opacity:0; transition:opacity 0.5s ease; pointer-events:none; top:var(--mouse-y,50%); left:var(--mouse-x,50%); transform:translate(-50%,-50%); }
+    .ea-card:hover::before { opacity:1; }
+    .ea-card:hover::after { opacity:1; }
+    .ea-card:hover { transform:translateY(-6px); box-shadow:var(--shadow-xl),var(--glow-subtle); background:var(--surface-2); }
 
-        --font-heading: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-        --font-body: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-        --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+    .ea-card-icon { width:64px; height:64px; border-radius:var(--radius-xl); display:flex; align-items:center; justify-content:center; font-size:1.5rem; margin-bottom:var(--space-5); position:relative; z-index:1; }
+    .ea-card-title { font-size:1.25rem; font-weight:700; margin-bottom:var(--space-3); color:var(--text-primary); position:relative; z-index:1; }
+    .ea-card-desc { font-size:0.9375rem; color:var(--text-secondary); line-height:1.7; position:relative; z-index:1; }
 
-        --space-1: 0.25rem; --space-2: 0.5rem; --space-3: 0.75rem;
-        --space-4: 1rem; --space-5: 1.25rem; --space-6: 1.5rem;
-        --space-8: 2rem; --space-10: 2.5rem; --space-12: 3rem;
-        --space-16: 4rem; --space-20: 5rem; --space-24: 6rem;
+    /* TypeScript Section */
+    .ea-ts-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:var(--space-6); }
+    .ea-ts-config { background:var(--surface-1); border:1px solid var(--surface-3); border-radius:var(--radius-xl); padding:var(--space-6); }
+    .ea-ts-config-title { font-size:0.875rem; font-weight:700; color:var(--wc-cyan); text-transform:uppercase; letter-spacing:0.05em; margin-bottom:var(--space-4); display:flex; align-items:center; gap:var(--space-2); }
+    .ea-ts-rule { display:flex; align-items:flex-start; gap:var(--space-3); padding:var(--space-3) 0; border-bottom:1px solid rgba(255,255,255,0.04); }
+    .ea-ts-rule:last-child { border-bottom:none; }
+    .ea-ts-rule i { color:var(--wc-green); margin-top:0.2em; flex-shrink:0; }
+    .ea-ts-rule-text { font-size:0.875rem; color:var(--text-secondary); line-height:1.6; }
+    .ea-ts-rule-text code { color:var(--wc-cyan); background:rgba(6,182,212,0.08); padding:0.1em 0.4em; border-radius:4px; font-size:0.8125rem; }
+    .ea-ts-comparison { display:grid; grid-template-columns:1fr 1fr; gap:var(--space-6); margin-top:var(--space-8); }
+    .ea-ts-example { background:var(--surface-1); border-radius:var(--radius-lg); overflow:hidden; border:1px solid var(--surface-3); }
+    .ea-ts-example-header { padding:var(--space-3) var(--space-4); font-size:0.8125rem; font-weight:700; display:flex; align-items:center; gap:var(--space-2); }
+    .ea-ts-example-bad .ea-ts-example-header { background:rgba(239,68,68,0.08); color:var(--wc-red); border-bottom:1px solid rgba(239,68,68,0.15); }
+    .ea-ts-example-good .ea-ts-example-header { background:rgba(16,185,129,0.08); color:var(--wc-green); border-bottom:1px solid rgba(16,185,129,0.15); }
+    .ea-ts-example pre { padding:var(--space-4); font-size:0.8125rem; line-height:1.7; color:#d6deeb; white-space:pre; overflow-x:auto; margin:0; }
 
-        --radius-sm: 0.5rem; --radius-md: 0.75rem; --radius-lg: 1rem;
-        --radius-xl: 1.5rem; --radius-2xl: 2rem; --radius-full: 9999px;
+    /* CEM Pipeline */
+    .ea-pipeline { display:flex; align-items:center; justify-content:center; gap:var(--space-4); flex-wrap:wrap; padding:var(--space-8) 0; }
+    .ea-pipeline-step { display:flex; flex-direction:column; align-items:center; gap:var(--space-2); text-align:center; min-width:120px; }
+    .ea-pipeline-icon { width:72px; height:72px; border-radius:var(--radius-xl); display:flex; align-items:center; justify-content:center; font-size:1.75rem; transition:all 0.3s ease; }
+    .ea-pipeline-icon:hover { transform:scale(1.1); }
+    .ea-pipeline-label { font-size:0.875rem; font-weight:700; color:var(--text-primary); }
+    .ea-pipeline-sub { font-size:0.75rem; color:var(--text-muted); }
+    .ea-pipeline-arrow { font-size:1.25rem; color:var(--text-muted); }
+    .ea-pipeline-outputs { display:grid; grid-template-columns:repeat(4,1fr); gap:var(--space-4); margin-top:var(--space-8); }
+    .ea-pipeline-output { background:var(--surface-1); border:1px solid var(--surface-3); border-radius:var(--radius-lg); padding:var(--space-5); text-align:center; transition:all 0.3s ease; }
+    .ea-pipeline-output:hover { background:var(--surface-2); transform:translateY(-4px); }
+    .ea-pipeline-output-icon { font-size:1.5rem; margin-bottom:var(--space-3); }
+    .ea-pipeline-output-title { font-size:0.9375rem; font-weight:700; color:var(--text-primary); margin-bottom:var(--space-1); }
+    .ea-pipeline-output-desc { font-size:0.8125rem; color:var(--text-muted); line-height:1.5; }
 
-        --shadow-sm: 0 2px 8px rgba(0,0,0,0.3);
-        --shadow-md: 0 4px 16px rgba(0,0,0,0.4);
-        --shadow-lg: 0 8px 32px rgba(0,0,0,0.5);
-        --shadow-xl: 0 16px 64px rgba(0,0,0,0.6);
+    /* Token Tiers */
+    .ea-tiers { display:flex; flex-direction:column; gap:var(--space-6); }
+    .ea-tier { display:grid; grid-template-columns:200px 1fr; gap:var(--space-6); align-items:start; padding:var(--space-6); background:var(--surface-1); border:1px solid var(--surface-3); border-radius:var(--radius-xl); transition:all 0.3s ease; }
+    .ea-tier:hover { background:var(--surface-2); border-color:var(--glass-border-strong); }
+    .ea-tier-label { display:flex; flex-direction:column; align-items:center; text-align:center; gap:var(--space-2); }
+    .ea-tier-icon { width:64px; height:64px; border-radius:var(--radius-xl); display:flex; align-items:center; justify-content:center; font-size:1.5rem; }
+    .ea-tier-name { font-size:1.125rem; font-weight:700; color:var(--text-primary); }
+    .ea-tier-tag { font-size:0.6875rem; font-weight:600; text-transform:uppercase; letter-spacing:0.05em; padding:var(--space-1) var(--space-3); border-radius:var(--radius-full); }
+    .ea-tier-content { display:flex; flex-direction:column; gap:var(--space-3); }
+    .ea-tier-desc { font-size:0.9375rem; color:var(--text-secondary); line-height:1.7; }
+    .ea-tier-examples { display:flex; flex-wrap:wrap; gap:var(--space-2); }
+    .ea-tier-example { font-family:var(--font-mono); font-size:0.75rem; padding:var(--space-1) var(--space-3); border-radius:var(--radius-sm); background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.06); color:var(--text-secondary); }
+    .ea-tier-arrow { display:flex; justify-content:center; padding:var(--space-2) 0; color:var(--text-muted); font-size:1.25rem; }
 
-        --glass-bg: rgba(255,255,255,0.03);
-        --glass-bg-strong: rgba(255,255,255,0.06);
-        --glass-border: rgba(255,255,255,0.06);
-        --glass-border-strong: rgba(255,255,255,0.12);
+    /* Quality */
+    .ea-quality-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:var(--space-6); }
+    .ea-quality-card { background:var(--surface-1); border:1px solid var(--surface-3); border-radius:var(--radius-xl); padding:var(--space-6); text-align:center; transition:all 0.3s ease; }
+    .ea-quality-card:hover { background:var(--surface-2); transform:translateY(-4px); }
+    .ea-quality-icon { width:56px; height:56px; border-radius:var(--radius-lg); display:flex; align-items:center; justify-content:center; font-size:1.25rem; margin:0 auto var(--space-4); }
+    .ea-quality-title { font-size:1rem; font-weight:700; color:var(--text-primary); margin-bottom:var(--space-2); }
+    .ea-quality-tool { font-family:var(--font-mono); font-size:0.75rem; padding:var(--space-1) var(--space-3); border-radius:var(--radius-full); background:rgba(255,255,255,0.04); color:var(--text-muted); display:inline-block; margin-bottom:var(--space-3); }
+    .ea-quality-desc { font-size:0.875rem; color:var(--text-secondary); line-height:1.6; }
 
-        --glow-primary: 0 0 50px rgba(102,126,234,0.25);
-        --glow-subtle: 0 0 20px rgba(102,126,234,0.15);
+    /* Stats */
+    .ea-stats { display:grid; grid-template-columns:repeat(4,1fr); gap:var(--space-6); margin-top:var(--space-12); }
+    .ea-stat { text-align:center; }
+    .ea-stat-value { font-size:2.5rem; font-weight:800; letter-spacing:-0.03em; margin-bottom:var(--space-1); }
+    .ea-stat-label { font-size:0.875rem; color:var(--text-secondary); font-weight:500; }
 
-        --surface-0: #0a0a14; --surface-1: #111122;
-        --surface-2: #1a1a32; --surface-3: #252545;
-        --text-primary: #eaeaf4; --text-secondary: #a8a8c8; --text-muted: #6868a0;
-      }
+    /* Footer CTA */
+    .ea-footer-cta { border-top:1px solid var(--surface-3); }
+    .ea-footer-cta-inner { max-width:800px; margin:0 auto; padding:var(--space-24) var(--space-8); text-align:center; }
+    .ea-footer-cta-inner h2 { font-size:clamp(1.75rem,4vw,2.5rem); margin-bottom:var(--space-4); }
+    .ea-footer-cta-inner p { font-size:1.0625rem; color:var(--text-secondary); line-height:1.8; margin-bottom:var(--space-8); }
+    .ea-footer-cta-buttons { display:flex; gap:var(--space-4); justify-content:center; flex-wrap:wrap; }
+    .ea-btn { display:inline-flex; align-items:center; gap:var(--space-2); padding:var(--space-3) var(--space-6); border-radius:var(--radius-full); font-weight:600; font-size:0.9375rem; transition:all 0.3s ease; text-decoration:none; }
+    .ea-btn-solid { background:var(--gradient-primary); color:white; border:none; box-shadow:var(--shadow-md), var(--glow-subtle); }
+    .ea-btn-solid:hover { transform:translateY(-2px); box-shadow:var(--shadow-lg), var(--glow-primary); color:white; }
+    .ea-btn-ghost { background:var(--glass-bg); color:var(--text-secondary); border:1px solid var(--glass-border-strong); }
+    .ea-btn-ghost:hover { background:var(--glass-bg-strong); color:var(--text-primary); transform:translateY(-2px); }
+    .ea-btn-arrow { transition:transform 0.2s ease; }
+    .ea-btn:hover .ea-btn-arrow { transform:translateX(4px); }
 
-      *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    /* Color helpers */
+    .icon-cyan { background:linear-gradient(135deg,rgba(6,182,212,0.15),rgba(6,182,212,0.05)); border:1px solid rgba(6,182,212,0.2); color:var(--wc-cyan); }
+    .icon-green { background:linear-gradient(135deg,rgba(16,185,129,0.15),rgba(16,185,129,0.05)); border:1px solid rgba(16,185,129,0.2); color:var(--wc-green); }
+    .icon-accent { background:linear-gradient(135deg,rgba(139,92,246,0.15),rgba(139,92,246,0.05)); border:1px solid rgba(139,92,246,0.2); color:var(--wc-accent); }
+    .icon-pink { background:linear-gradient(135deg,rgba(236,72,153,0.15),rgba(236,72,153,0.05)); border:1px solid rgba(236,72,153,0.2); color:var(--wc-pink); }
+    .icon-amber { background:linear-gradient(135deg,rgba(245,158,11,0.15),rgba(245,158,11,0.05)); border:1px solid rgba(245,158,11,0.2); color:var(--wc-amber); }
+    .icon-electric { background:linear-gradient(135deg,rgba(59,130,246,0.15),rgba(59,130,246,0.05)); border:1px solid rgba(59,130,246,0.2); color:var(--wc-electric); }
+    .tag-cyan { background:rgba(6,182,212,0.1); color:var(--wc-cyan); border:1px solid rgba(6,182,212,0.2); }
+    .tag-green { background:rgba(16,185,129,0.1); color:var(--wc-green); border:1px solid rgba(16,185,129,0.2); }
+    .tag-accent { background:rgba(139,92,246,0.1); color:var(--wc-accent); border:1px solid rgba(139,92,246,0.2); }
 
-      body {
-        font-family: var(--font-body); line-height: 1.6;
-        -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;
-        background: var(--surface-0); color: var(--text-primary);
-        scroll-behavior: smooth; overflow-x: hidden;
-      }
+    /* Responsive */
+    @media (max-width:1100px) {
+      .ea-ts-grid { grid-template-columns:1fr; }
+      .ea-ts-comparison { grid-template-columns:1fr; }
+      .ea-pipeline-outputs { grid-template-columns:repeat(2,1fr); }
+      .ea-tier { grid-template-columns:1fr; text-align:center; }
+      .ea-quality-grid { grid-template-columns:1fr; }
+      .ea-stats { grid-template-columns:repeat(2,1fr); }
+    }
 
-      h1,h2,h3,h4,h5,h6 {
-        font-family: var(--font-heading); font-weight: 700;
-        letter-spacing: -0.025em; line-height: 1.15;
-      }
-      code, pre { font-family: var(--font-mono); }
-      a { color: var(--wc-accent); text-decoration: none; transition: color 0.2s ease; }
-      a:hover { color: hsl(var(--wc-accent-h), var(--wc-accent-s), 75%); }
+    @media (max-width:768px) {
+      .ea-topbar { padding:var(--space-3) var(--space-4); }
+      .ea-topbar-title { display:none; }
+      .ea-hero { min-height:auto; padding:calc(var(--space-24) + var(--space-8)) var(--space-4) var(--space-16); }
+      .ea-hero-scroll { display:none; }
+      .ea-section-inner { padding:var(--space-16) var(--space-4); }
+      .ea-pipeline { flex-direction:column; }
+      .ea-pipeline-arrow { transform:rotate(90deg); }
+      .ea-pipeline-outputs { grid-template-columns:1fr; }
+      .ea-stats { grid-template-columns:1fr; gap:var(--space-4); }
+      .ea-footer-cta-buttons { flex-direction:column; align-items:stretch; }
+      .ea-btn { width:100%; justify-content:center; }
+    }
 
-      /* Keyframes */
-      @keyframes fadeInUp { from { opacity:0; transform:translateY(40px); } to { opacity:1; transform:translateY(0); } }
-      @keyframes fadeInDown { from { opacity:0; transform:translateY(-20px); } to { opacity:1; transform:translateY(0); } }
-      @keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
-      @keyframes float-slow { 0%,100% { transform:translate(0,0) scale(1); } 25% { transform:translate(30px,-20px) scale(1.05); } 50% { transform:translate(-10px,-35px) scale(0.97); } 75% { transform:translate(-25px,-10px) scale(1.02); } }
-      @keyframes orb-pulse { 0%,100% { opacity:0.3; filter:blur(100px); } 50% { opacity:0.5; filter:blur(120px); } }
-      @keyframes border-rotate { 0% { --gradient-angle:0deg; } 100% { --gradient-angle:360deg; } }
-      @keyframes scroll-fade { 0% { opacity:1; transform:translateX(-50%) translateY(0); } 100% { opacity:0; transform:translateX(-50%) translateY(12px); } }
-      @keyframes particle-drift { 0% { background-position: 0 0, 200px 200px, 400px 100px; } 100% { background-position: 800px 800px, 1000px 1000px, 1200px 900px; } }
+    @media (prefers-reduced-motion:reduce) {
+      .ea-hero-orb { animation:none !important; opacity:0.15; }
+    }
 
-      /* Scroll Reveal */
-      .scroll-reveal { opacity:0; transform:translateY(40px); transition: opacity 0.8s cubic-bezier(0.22,1,0.36,1), transform 0.8s cubic-bezier(0.22,1,0.36,1), filter 0.8s cubic-bezier(0.22,1,0.36,1); filter:blur(4px); }
-      .scroll-reveal.is-visible { opacity:1; transform:translateY(0); filter:blur(0); }
-      .scroll-reveal-delay-1 { transition-delay:0.1s; } .scroll-reveal-delay-2 { transition-delay:0.2s; }
-      .scroll-reveal-delay-3 { transition-delay:0.3s; } .scroll-reveal-delay-4 { transition-delay:0.4s; }
-      .scroll-reveal-delay-5 { transition-delay:0.5s; } .scroll-reveal-delay-6 { transition-delay:0.6s; }
+    .ea-btn:focus-visible, .ea-back-link:focus-visible, .ea-topbar-link:focus-visible {
+      outline:3px solid var(--wc-accent); outline-offset:3px;
+    }
+  </style>
 
-      /* Top Navigation */
-      .ea-topbar { position:fixed; top:0; left:0; right:0; z-index:100; display:flex; align-items:center; justify-content:space-between; padding:var(--space-3) var(--space-8); background:rgba(10,10,20,0.85); backdrop-filter:blur(16px) saturate(180%); -webkit-backdrop-filter:blur(16px) saturate(180%); border-bottom:1px solid rgba(255,255,255,0.06); }
-      .ea-topbar-left { display:flex; align-items:center; gap:var(--space-4); }
-      .ea-back-link { display:inline-flex; align-items:center; gap:var(--space-2); font-size:0.875rem; font-weight:600; color:var(--text-secondary); transition:all 0.2s ease; padding:var(--space-2) var(--space-3); border-radius:var(--radius-md); }
-      .ea-back-link:hover { color:var(--text-primary); background:var(--glass-bg-strong); }
-      .ea-topbar-title { font-size:0.875rem; font-weight:700; color:var(--text-primary); }
-      .ea-topbar-right { display:flex; align-items:center; gap:var(--space-4); }
-      .ea-topbar-link { font-size:0.8125rem; font-weight:500; color:var(--text-secondary); display:inline-flex; align-items:center; gap:var(--space-2); padding:var(--space-2) var(--space-3); border-radius:var(--radius-md); transition:all 0.2s ease; }
-      .ea-topbar-link:hover { color:var(--text-primary); background:var(--glass-bg-strong); }
+  <nav class="ea-topbar" aria-label="Page navigation">
+    <div class="ea-topbar-left">
+      <a href="/" class="ea-back-link" aria-label="Back to WC-2026 Dashboard">
+        <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
+        Dashboard
+      </a>
+      <span class="ea-topbar-title" aria-hidden="true">|</span>
+      <span class="ea-topbar-title">Enterprise Architecture</span>
+    </div>
+    <div class="ea-topbar-right">
+      <a href="/pre-planning/architecture/" class="ea-topbar-link">
+        <i class="fa-solid fa-book" aria-hidden="true"></i>
+        Full Docs
+      </a>
+      <a href="/design-tokens/overview/" class="ea-topbar-link">
+        <i class="fa-solid fa-palette" aria-hidden="true"></i>
+        Design Tokens
+      </a>
+    </div>
+  </nav>
 
-      /* Hero */
-      .ea-hero { position:relative; min-height:100vh; display:flex; align-items:center; justify-content:center; text-align:center; padding:var(--space-24) var(--space-8); background:var(--gradient-hero); overflow:hidden; }
-      .ea-hero-grid { position:absolute; inset:0; background-image:linear-gradient(rgba(255,255,255,0.02) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.02) 1px,transparent 1px); background-size:60px 60px; }
-      .ea-hero-orb { position:absolute; border-radius:50%; pointer-events:none; }
-      .ea-hero-orb-1 { width:500px; height:500px; background:radial-gradient(circle,rgba(6,182,212,0.2),transparent 70%); top:-10%; right:-5%; animation:float-slow 20s ease-in-out infinite, orb-pulse 8s ease-in-out infinite; }
-      .ea-hero-orb-2 { width:400px; height:400px; background:radial-gradient(circle,rgba(139,92,246,0.15),transparent 70%); bottom:-5%; left:-5%; animation:float-slow 25s ease-in-out infinite reverse, orb-pulse 10s ease-in-out infinite 2s; }
-      .ea-hero-orb-3 { width:300px; height:300px; background:radial-gradient(circle,rgba(16,185,129,0.12),transparent 70%); top:30%; left:15%; animation:float-slow 18s ease-in-out infinite 3s, orb-pulse 12s ease-in-out infinite 4s; }
-      .ea-hero-content { position:relative; z-index:2; max-width:800px; }
-      .ea-hero-badge { display:inline-flex; align-items:center; gap:var(--space-2); padding:var(--space-2) var(--space-4); background:var(--glass-bg-strong); border:1px solid var(--glass-border-strong); border-radius:var(--radius-full); font-size:0.8125rem; font-weight:600; color:var(--wc-cyan); margin-bottom:var(--space-8); animation:fadeInDown 0.8s ease-out; }
-      .ea-hero-badge-dot { width:8px; height:8px; border-radius:50%; background:var(--wc-cyan); box-shadow:0 0 8px var(--wc-cyan); }
-      .ea-hero-title { font-size:clamp(2.5rem,7vw,4.5rem); font-weight:800; letter-spacing:-0.04em; line-height:1.15; margin-bottom:var(--space-6); animation:fadeInUp 1s ease-out 0.2s both; }
-      .ea-hero-title .gradient-text { background:var(--gradient-cyan-purple); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
-      .ea-hero-subtitle { font-size:clamp(1.125rem,2.5vw,1.5rem); color:var(--text-secondary); font-weight:400; letter-spacing:-0.01em; margin-bottom:var(--space-6); animation:fadeInUp 1s ease-out 0.4s both; }
-      .ea-hero-description { font-size:1.0625rem; color:var(--text-muted); line-height:1.8; max-width:600px; margin:0 auto; animation:fadeInUp 1s ease-out 0.6s both; }
-      .ea-hero-scroll { position:absolute; bottom:var(--space-8); left:50%; transform:translateX(-50%); display:flex; flex-direction:column; align-items:center; gap:var(--space-2); color:var(--text-muted); font-size:0.75rem; font-weight:500; letter-spacing:0.05em; text-transform:uppercase; animation:scroll-fade 2s ease-in-out infinite; }
-      .ea-hero-scroll-line { width:1px; height:24px; background:linear-gradient(to bottom,var(--text-muted),transparent); }
+  <main id="main-content">
+    <!-- SECTION 1: HERO -->
+    <section class="ea-hero" aria-label="Enterprise Architecture">
+      <div class="ea-hero-grid" aria-hidden="true"></div>
+      <div class="ea-hero-orb ea-hero-orb-1" aria-hidden="true"></div>
+      <div class="ea-hero-orb ea-hero-orb-2" aria-hidden="true"></div>
+      <div class="ea-hero-orb ea-hero-orb-3" aria-hidden="true"></div>
 
-      /* Sections */
-      .ea-section { position:relative; }
-      .ea-section-inner { max-width:1200px; margin:0 auto; padding:var(--space-24) var(--space-8); }
-      .ea-section-header { text-align:center; margin-bottom:var(--space-16); }
-      .ea-section-label { display:inline-block; font-size:0.75rem; font-weight:700; text-transform:uppercase; letter-spacing:0.1em; padding:var(--space-1) var(--space-4); border-radius:var(--radius-full); margin-bottom:var(--space-4); background:rgba(102,126,234,0.08); color:var(--wc-accent); border:1px solid rgba(102,126,234,0.15); }
-      .ea-section-title { font-size:clamp(2rem,5vw,3rem); margin-bottom:var(--space-4); }
-      .ea-section-description { font-size:1.0625rem; color:var(--text-secondary); max-width:700px; margin:0 auto; line-height:1.8; }
-
-      /* Cards */
-      .ea-card { background:var(--surface-1); border:1px solid var(--surface-3); border-radius:var(--radius-xl); padding:var(--space-8) var(--space-6); transition:all 0.5s cubic-bezier(0.22,1,0.36,1); position:relative; overflow:hidden; }
-      .ea-card::before { content:''; position:absolute; inset:0; border-radius:inherit; padding:1.5px; background:conic-gradient(from var(--gradient-angle),#667eea,#764ba2,#f093fb,#06b6d4,#667eea); -webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0); -webkit-mask-composite:xor; mask-composite:exclude; opacity:0; transition:opacity 0.5s ease; pointer-events:none; animation:border-rotate 4s linear infinite; }
-      .ea-card::after { content:''; position:absolute; width:250px; height:250px; border-radius:50%; background:radial-gradient(circle,rgba(102,126,234,0.1),transparent 70%); opacity:0; transition:opacity 0.5s ease; pointer-events:none; top:var(--mouse-y,50%); left:var(--mouse-x,50%); transform:translate(-50%,-50%); }
-      .ea-card:hover::before { opacity:1; }
-      .ea-card:hover::after { opacity:1; }
-      .ea-card:hover { transform:translateY(-6px); box-shadow:var(--shadow-xl),var(--glow-subtle); background:var(--surface-2); }
-
-      .ea-card-icon { width:64px; height:64px; border-radius:var(--radius-xl); display:flex; align-items:center; justify-content:center; font-size:1.5rem; margin-bottom:var(--space-5); position:relative; z-index:1; }
-      .ea-card-title { font-size:1.25rem; font-weight:700; margin-bottom:var(--space-3); color:var(--text-primary); position:relative; z-index:1; }
-      .ea-card-desc { font-size:0.9375rem; color:var(--text-secondary); line-height:1.7; position:relative; z-index:1; }
-
-      /* TypeScript Section */
-      .ea-ts-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:var(--space-6); }
-      .ea-ts-config { background:var(--surface-1); border:1px solid var(--surface-3); border-radius:var(--radius-xl); padding:var(--space-6); }
-      .ea-ts-config-title { font-size:0.875rem; font-weight:700; color:var(--wc-cyan); text-transform:uppercase; letter-spacing:0.05em; margin-bottom:var(--space-4); display:flex; align-items:center; gap:var(--space-2); }
-      .ea-ts-rule { display:flex; align-items:flex-start; gap:var(--space-3); padding:var(--space-3) 0; border-bottom:1px solid rgba(255,255,255,0.04); }
-      .ea-ts-rule:last-child { border-bottom:none; }
-      .ea-ts-rule i { color:var(--wc-green); margin-top:0.2em; flex-shrink:0; }
-      .ea-ts-rule-text { font-size:0.875rem; color:var(--text-secondary); line-height:1.6; }
-      .ea-ts-rule-text code { color:var(--wc-cyan); background:rgba(6,182,212,0.08); padding:0.1em 0.4em; border-radius:4px; font-size:0.8125rem; }
-      .ea-ts-comparison { display:grid; grid-template-columns:1fr 1fr; gap:var(--space-6); margin-top:var(--space-8); }
-      .ea-ts-example { background:var(--surface-1); border-radius:var(--radius-lg); overflow:hidden; border:1px solid var(--surface-3); }
-      .ea-ts-example-header { padding:var(--space-3) var(--space-4); font-size:0.8125rem; font-weight:700; display:flex; align-items:center; gap:var(--space-2); }
-      .ea-ts-example-bad .ea-ts-example-header { background:rgba(239,68,68,0.08); color:var(--wc-red); border-bottom:1px solid rgba(239,68,68,0.15); }
-      .ea-ts-example-good .ea-ts-example-header { background:rgba(16,185,129,0.08); color:var(--wc-green); border-bottom:1px solid rgba(16,185,129,0.15); }
-      .ea-ts-example pre { padding:var(--space-4); font-size:0.8125rem; line-height:1.7; color:#d6deeb; white-space:pre; overflow-x:auto; margin:0; }
-
-      /* CEM Pipeline */
-      .ea-pipeline { display:flex; align-items:center; justify-content:center; gap:var(--space-4); flex-wrap:wrap; padding:var(--space-8) 0; }
-      .ea-pipeline-step { display:flex; flex-direction:column; align-items:center; gap:var(--space-2); text-align:center; min-width:120px; }
-      .ea-pipeline-icon { width:72px; height:72px; border-radius:var(--radius-xl); display:flex; align-items:center; justify-content:center; font-size:1.75rem; transition:all 0.3s ease; }
-      .ea-pipeline-icon:hover { transform:scale(1.1); }
-      .ea-pipeline-label { font-size:0.875rem; font-weight:700; color:var(--text-primary); }
-      .ea-pipeline-sub { font-size:0.75rem; color:var(--text-muted); }
-      .ea-pipeline-arrow { font-size:1.25rem; color:var(--text-muted); }
-      .ea-pipeline-outputs { display:grid; grid-template-columns:repeat(4,1fr); gap:var(--space-4); margin-top:var(--space-8); }
-      .ea-pipeline-output { background:var(--surface-1); border:1px solid var(--surface-3); border-radius:var(--radius-lg); padding:var(--space-5); text-align:center; transition:all 0.3s ease; }
-      .ea-pipeline-output:hover { background:var(--surface-2); transform:translateY(-4px); }
-      .ea-pipeline-output-icon { font-size:1.5rem; margin-bottom:var(--space-3); }
-      .ea-pipeline-output-title { font-size:0.9375rem; font-weight:700; color:var(--text-primary); margin-bottom:var(--space-1); }
-      .ea-pipeline-output-desc { font-size:0.8125rem; color:var(--text-muted); line-height:1.5; }
-
-      /* Token Tiers */
-      .ea-tiers { display:flex; flex-direction:column; gap:var(--space-6); }
-      .ea-tier { display:grid; grid-template-columns:200px 1fr; gap:var(--space-6); align-items:start; padding:var(--space-6); background:var(--surface-1); border:1px solid var(--surface-3); border-radius:var(--radius-xl); transition:all 0.3s ease; }
-      .ea-tier:hover { background:var(--surface-2); border-color:var(--glass-border-strong); }
-      .ea-tier-label { display:flex; flex-direction:column; align-items:center; text-align:center; gap:var(--space-2); }
-      .ea-tier-icon { width:64px; height:64px; border-radius:var(--radius-xl); display:flex; align-items:center; justify-content:center; font-size:1.5rem; }
-      .ea-tier-name { font-size:1.125rem; font-weight:700; color:var(--text-primary); }
-      .ea-tier-tag { font-size:0.6875rem; font-weight:600; text-transform:uppercase; letter-spacing:0.05em; padding:var(--space-1) var(--space-3); border-radius:var(--radius-full); }
-      .ea-tier-content { display:flex; flex-direction:column; gap:var(--space-3); }
-      .ea-tier-desc { font-size:0.9375rem; color:var(--text-secondary); line-height:1.7; }
-      .ea-tier-examples { display:flex; flex-wrap:wrap; gap:var(--space-2); }
-      .ea-tier-example { font-family:var(--font-mono); font-size:0.75rem; padding:var(--space-1) var(--space-3); border-radius:var(--radius-sm); background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.06); color:var(--text-secondary); }
-      .ea-tier-arrow { display:flex; justify-content:center; padding:var(--space-2) 0; color:var(--text-muted); font-size:1.25rem; }
-
-      /* Quality */
-      .ea-quality-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:var(--space-6); }
-      .ea-quality-card { background:var(--surface-1); border:1px solid var(--surface-3); border-radius:var(--radius-xl); padding:var(--space-6); text-align:center; transition:all 0.3s ease; }
-      .ea-quality-card:hover { background:var(--surface-2); transform:translateY(-4px); }
-      .ea-quality-icon { width:56px; height:56px; border-radius:var(--radius-lg); display:flex; align-items:center; justify-content:center; font-size:1.25rem; margin:0 auto var(--space-4); }
-      .ea-quality-title { font-size:1rem; font-weight:700; color:var(--text-primary); margin-bottom:var(--space-2); }
-      .ea-quality-tool { font-family:var(--font-mono); font-size:0.75rem; padding:var(--space-1) var(--space-3); border-radius:var(--radius-full); background:rgba(255,255,255,0.04); color:var(--text-muted); display:inline-block; margin-bottom:var(--space-3); }
-      .ea-quality-desc { font-size:0.875rem; color:var(--text-secondary); line-height:1.6; }
-
-      /* Stats */
-      .ea-stats { display:grid; grid-template-columns:repeat(4,1fr); gap:var(--space-6); margin-top:var(--space-12); }
-      .ea-stat { text-align:center; }
-      .ea-stat-value { font-size:2.5rem; font-weight:800; letter-spacing:-0.03em; margin-bottom:var(--space-1); }
-      .ea-stat-label { font-size:0.875rem; color:var(--text-secondary); font-weight:500; }
-
-      /* Footer CTA */
-      .ea-footer-cta { border-top:1px solid var(--surface-3); }
-      .ea-footer-cta-inner { max-width:800px; margin:0 auto; padding:var(--space-24) var(--space-8); text-align:center; }
-      .ea-footer-cta-inner h2 { font-size:clamp(1.75rem,4vw,2.5rem); margin-bottom:var(--space-4); }
-      .ea-footer-cta-inner p { font-size:1.0625rem; color:var(--text-secondary); line-height:1.8; margin-bottom:var(--space-8); }
-      .ea-footer-cta-buttons { display:flex; gap:var(--space-4); justify-content:center; flex-wrap:wrap; }
-      .ea-btn { display:inline-flex; align-items:center; gap:var(--space-2); padding:var(--space-3) var(--space-6); border-radius:var(--radius-full); font-weight:600; font-size:0.9375rem; transition:all 0.3s ease; text-decoration:none; }
-      .ea-btn-solid { background:var(--gradient-primary); color:white; border:none; box-shadow:var(--shadow-md), var(--glow-subtle); }
-      .ea-btn-solid:hover { transform:translateY(-2px); box-shadow:var(--shadow-lg), var(--glow-primary); color:white; }
-      .ea-btn-ghost { background:var(--glass-bg); color:var(--text-secondary); border:1px solid var(--glass-border-strong); }
-      .ea-btn-ghost:hover { background:var(--glass-bg-strong); color:var(--text-primary); transform:translateY(-2px); }
-      .ea-btn-arrow { transition:transform 0.2s ease; }
-      .ea-btn:hover .ea-btn-arrow { transform:translateX(4px); }
-
-      /* Color helpers */
-      .icon-cyan { background:linear-gradient(135deg,rgba(6,182,212,0.15),rgba(6,182,212,0.05)); border:1px solid rgba(6,182,212,0.2); color:var(--wc-cyan); }
-      .icon-green { background:linear-gradient(135deg,rgba(16,185,129,0.15),rgba(16,185,129,0.05)); border:1px solid rgba(16,185,129,0.2); color:var(--wc-green); }
-      .icon-accent { background:linear-gradient(135deg,rgba(139,92,246,0.15),rgba(139,92,246,0.05)); border:1px solid rgba(139,92,246,0.2); color:var(--wc-accent); }
-      .icon-pink { background:linear-gradient(135deg,rgba(236,72,153,0.15),rgba(236,72,153,0.05)); border:1px solid rgba(236,72,153,0.2); color:var(--wc-pink); }
-      .icon-amber { background:linear-gradient(135deg,rgba(245,158,11,0.15),rgba(245,158,11,0.05)); border:1px solid rgba(245,158,11,0.2); color:var(--wc-amber); }
-      .icon-electric { background:linear-gradient(135deg,rgba(59,130,246,0.15),rgba(59,130,246,0.05)); border:1px solid rgba(59,130,246,0.2); color:var(--wc-electric); }
-      .tag-cyan { background:rgba(6,182,212,0.1); color:var(--wc-cyan); border:1px solid rgba(6,182,212,0.2); }
-      .tag-green { background:rgba(16,185,129,0.1); color:var(--wc-green); border:1px solid rgba(16,185,129,0.2); }
-      .tag-accent { background:rgba(139,92,246,0.1); color:var(--wc-accent); border:1px solid rgba(139,92,246,0.2); }
-
-      /* Responsive */
-      @media (max-width:1100px) {
-        .ea-ts-grid { grid-template-columns:1fr; }
-        .ea-ts-comparison { grid-template-columns:1fr; }
-        .ea-pipeline-outputs { grid-template-columns:repeat(2,1fr); }
-        .ea-tier { grid-template-columns:1fr; text-align:center; }
-        .ea-quality-grid { grid-template-columns:1fr; }
-        .ea-stats { grid-template-columns:repeat(2,1fr); }
-      }
-
-      @media (max-width:768px) {
-        .ea-topbar { padding:var(--space-3) var(--space-4); }
-        .ea-topbar-title { display:none; }
-        .ea-hero { min-height:auto; padding:calc(var(--space-24) + var(--space-8)) var(--space-4) var(--space-16); }
-        .ea-hero-scroll { display:none; }
-        .ea-section-inner { padding:var(--space-16) var(--space-4); }
-        .ea-pipeline { flex-direction:column; }
-        .ea-pipeline-arrow { transform:rotate(90deg); }
-        .ea-pipeline-outputs { grid-template-columns:1fr; }
-        .ea-stats { grid-template-columns:1fr; gap:var(--space-4); }
-        .ea-footer-cta-buttons { flex-direction:column; align-items:stretch; }
-        .ea-btn { width:100%; justify-content:center; }
-      }
-
-      @media (prefers-reduced-motion:reduce) {
-        *,*::before,*::after { animation-duration:0.01ms !important; animation-iteration-count:1 !important; transition-duration:0.01ms !important; scroll-behavior:auto !important; }
-        .scroll-reveal { opacity:1; transform:none; filter:none; transition:none; }
-        .ea-hero-orb { animation:none !important; opacity:0.15; }
-      }
-
-      .ea-btn:focus-visible, .ea-back-link:focus-visible, .ea-topbar-link:focus-visible {
-        outline:3px solid var(--wc-accent); outline-offset:3px;
-      }
-    </style>
-  </head>
-
-  <body>
-    <nav class="ea-topbar" aria-label="Page navigation">
-      <div class="ea-topbar-left">
-        <a href="/" class="ea-back-link" aria-label="Back to WC-2026 Dashboard">
-          <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
-          Dashboard
-        </a>
-        <span class="ea-topbar-title" aria-hidden="true">|</span>
-        <span class="ea-topbar-title">Enterprise Architecture</span>
+      <div class="ea-hero-content">
+        <div class="ea-hero-badge">
+          <span class="ea-hero-badge-dot" aria-hidden="true"></span>
+          Enterprise Grade
+        </div>
+        <h1 class="ea-hero-title">Enterprise<br /><span class="gradient-text">by Default</span></h1>
+        <p class="ea-hero-subtitle">TypeScript-first. CEM-driven. Token-powered.</p>
+        <p class="ea-hero-description">
+          Not enterprise as an afterthought. Every architectural choice --
+          from strict TypeScript to W3C design tokens to the Custom Elements Manifest pipeline --
+          was made to serve teams building at scale.
+        </p>
       </div>
-      <div class="ea-topbar-right">
-        <a href="/pre-planning/architecture/" class="ea-topbar-link">
-          <i class="fa-solid fa-book" aria-hidden="true"></i>
-          Full Docs
-        </a>
-        <a href="/design-tokens/overview/" class="ea-topbar-link">
-          <i class="fa-solid fa-palette" aria-hidden="true"></i>
-          Design Tokens
-        </a>
+
+      <div class="mouse-scroll-wrap mouse-scroll-wrap--absolute" aria-hidden="true">
+        <div class="mouse-scroll-body"><div class="mouse-scroll-wheel"></div></div>
+        <span class="mouse-scroll-label">Scroll</span>
       </div>
-    </nav>
+    </section>
 
-    <main id="main-content">
-      <!-- SECTION 1: HERO -->
-      <section class="ea-hero" aria-label="Enterprise Architecture">
-        <div class="ea-hero-grid" aria-hidden="true"></div>
-        <div class="ea-hero-orb ea-hero-orb-1" aria-hidden="true"></div>
-        <div class="ea-hero-orb ea-hero-orb-2" aria-hidden="true"></div>
-        <div class="ea-hero-orb ea-hero-orb-3" aria-hidden="true"></div>
-
-        <div class="ea-hero-content">
-          <div class="ea-hero-badge">
-            <span class="ea-hero-badge-dot" aria-hidden="true"></span>
-            Enterprise Grade
-          </div>
-          <h1 class="ea-hero-title">Enterprise<br /><span class="gradient-text">by Default</span></h1>
-          <p class="ea-hero-subtitle">TypeScript-first. CEM-driven. Token-powered.</p>
-          <p class="ea-hero-description">
-            Not enterprise as an afterthought. Every architectural choice --
-            from strict TypeScript to W3C design tokens to the Custom Elements Manifest pipeline --
-            was made to serve teams building at scale.
+    <!-- SECTION 2: TYPESCRIPT STRATEGY -->
+    <section class="ea-section" aria-label="TypeScript strategy">
+      <div class="ea-section-inner">
+        <div class="ea-section-header scroll-reveal">
+          <span class="ea-section-label">Type Safety</span>
+          <h2 class="ea-section-title">100% TypeScript. Zero Exceptions.</h2>
+          <p class="ea-section-description">
+            Strict mode is not optional. Every component, every utility, every test
+            is fully typed. The compiler catches bugs before they reach production.
           </p>
         </div>
 
-        <div class="ea-hero-scroll" aria-hidden="true">
-          <span>Explore</span>
-          <div class="ea-hero-scroll-line"></div>
+        <div class="ea-ts-grid">
+          <div class="ea-ts-config scroll-reveal scroll-reveal-delay-1">
+            <div class="ea-ts-config-title">
+              <i class="fa-solid fa-shield-halved" aria-hidden="true"></i>
+              tsconfig.json Rules
+            </div>
+            <div class="ea-ts-rule"><i class="fa-solid fa-check" aria-hidden="true"></i><div class="ea-ts-rule-text"><code>"strict": true</code> -- all strict checks enabled</div></div>
+            <div class="ea-ts-rule"><i class="fa-solid fa-check" aria-hidden="true"></i><div class="ea-ts-rule-text"><code>"noUncheckedIndexedAccess": true</code> -- arrays can be undefined</div></div>
+            <div class="ea-ts-rule"><i class="fa-solid fa-check" aria-hidden="true"></i><div class="ea-ts-rule-text"><code>"noImplicitOverride": true</code> -- explicit override keyword</div></div>
+            <div class="ea-ts-rule"><i class="fa-solid fa-check" aria-hidden="true"></i><div class="ea-ts-rule-text"><code>"exactOptionalPropertyTypes": true</code> -- undefined vs missing</div></div>
+            <div class="ea-ts-rule"><i class="fa-solid fa-check" aria-hidden="true"></i><div class="ea-ts-rule-text"><code>"useDefineForClassFields": true</code> -- Lit 3.x class fields</div></div>
+            <div class="ea-ts-rule"><i class="fa-solid fa-check" aria-hidden="true"></i><div class="ea-ts-rule-text">Zero <code>any</code> types in the entire codebase</div></div>
+          </div>
+
+          <div class="ea-ts-config scroll-reveal scroll-reveal-delay-2">
+            <div class="ea-ts-config-title">
+              <i class="fa-solid fa-bolt" aria-hidden="true"></i>
+              What This Buys You
+            </div>
+            <div class="ea-ts-rule"><i class="fa-solid fa-check" aria-hidden="true"></i><div class="ea-ts-rule-text">IDE autocomplete for every property, event, slot, and CSS variable</div></div>
+            <div class="ea-ts-rule"><i class="fa-solid fa-check" aria-hidden="true"></i><div class="ea-ts-rule-text">Compile-time detection of property type mismatches in TWIG templates</div></div>
+            <div class="ea-ts-rule"><i class="fa-solid fa-check" aria-hidden="true"></i><div class="ea-ts-rule-text">Refactoring confidence -- rename a property, find every usage instantly</div></div>
+            <div class="ea-ts-rule"><i class="fa-solid fa-check" aria-hidden="true"></i><div class="ea-ts-rule-text">CEM generates accurate API docs from TypeScript type annotations</div></div>
+            <div class="ea-ts-rule"><i class="fa-solid fa-check" aria-hidden="true"></i><div class="ea-ts-rule-text">Storybook controls auto-generated from typed properties</div></div>
+            <div class="ea-ts-rule"><i class="fa-solid fa-check" aria-hidden="true"></i><div class="ea-ts-rule-text">New team members productive in hours, not weeks</div></div>
+          </div>
         </div>
-      </section>
 
-      <!-- SECTION 2: TYPESCRIPT STRATEGY -->
-      <section class="ea-section" aria-label="TypeScript strategy">
-        <div class="ea-section-inner">
-          <div class="ea-section-header scroll-reveal">
-            <span class="ea-section-label">Type Safety</span>
-            <h2 class="ea-section-title">100% TypeScript. Zero Exceptions.</h2>
-            <p class="ea-section-description">
-              Strict mode is not optional. Every component, every utility, every test
-              is fully typed. The compiler catches bugs before they reach production.
-            </p>
-          </div>
-
-          <div class="ea-ts-grid">
-            <div class="ea-ts-config scroll-reveal scroll-reveal-delay-1">
-              <div class="ea-ts-config-title">
-                <i class="fa-solid fa-shield-halved" aria-hidden="true"></i>
-                tsconfig.json Rules
-              </div>
-              <div class="ea-ts-rule"><i class="fa-solid fa-check" aria-hidden="true"></i><div class="ea-ts-rule-text"><code>"strict": true</code> -- all strict checks enabled</div></div>
-              <div class="ea-ts-rule"><i class="fa-solid fa-check" aria-hidden="true"></i><div class="ea-ts-rule-text"><code>"noUncheckedIndexedAccess": true</code> -- arrays can be undefined</div></div>
-              <div class="ea-ts-rule"><i class="fa-solid fa-check" aria-hidden="true"></i><div class="ea-ts-rule-text"><code>"noImplicitOverride": true</code> -- explicit override keyword</div></div>
-              <div class="ea-ts-rule"><i class="fa-solid fa-check" aria-hidden="true"></i><div class="ea-ts-rule-text"><code>"exactOptionalPropertyTypes": true</code> -- undefined vs missing</div></div>
-              <div class="ea-ts-rule"><i class="fa-solid fa-check" aria-hidden="true"></i><div class="ea-ts-rule-text"><code>"useDefineForClassFields": true</code> -- Lit 3.x class fields</div></div>
-              <div class="ea-ts-rule"><i class="fa-solid fa-check" aria-hidden="true"></i><div class="ea-ts-rule-text">Zero <code>any</code> types in the entire codebase</div></div>
+        <div class="ea-ts-comparison scroll-reveal scroll-reveal-delay-3">
+          <div class="ea-ts-example ea-ts-example-bad">
+            <div class="ea-ts-example-header">
+              <i class="fa-solid fa-circle-xmark" aria-hidden="true"></i>
+              Typical Approach
             </div>
-
-            <div class="ea-ts-config scroll-reveal scroll-reveal-delay-2">
-              <div class="ea-ts-config-title">
-                <i class="fa-solid fa-bolt" aria-hidden="true"></i>
-                What This Buys You
-              </div>
-              <div class="ea-ts-rule"><i class="fa-solid fa-check" aria-hidden="true"></i><div class="ea-ts-rule-text">IDE autocomplete for every property, event, slot, and CSS variable</div></div>
-              <div class="ea-ts-rule"><i class="fa-solid fa-check" aria-hidden="true"></i><div class="ea-ts-rule-text">Compile-time detection of property type mismatches in TWIG templates</div></div>
-              <div class="ea-ts-rule"><i class="fa-solid fa-check" aria-hidden="true"></i><div class="ea-ts-rule-text">Refactoring confidence -- rename a property, find every usage instantly</div></div>
-              <div class="ea-ts-rule"><i class="fa-solid fa-check" aria-hidden="true"></i><div class="ea-ts-rule-text">CEM generates accurate API docs from TypeScript type annotations</div></div>
-              <div class="ea-ts-rule"><i class="fa-solid fa-check" aria-hidden="true"></i><div class="ea-ts-rule-text">Storybook controls auto-generated from typed properties</div></div>
-              <div class="ea-ts-rule"><i class="fa-solid fa-check" aria-hidden="true"></i><div class="ea-ts-rule-text">New team members productive in hours, not weeks</div></div>
-            </div>
-          </div>
-
-          <div class="ea-ts-comparison scroll-reveal scroll-reveal-delay-3">
-            <div class="ea-ts-example ea-ts-example-bad">
-              <div class="ea-ts-example-header">
-                <i class="fa-solid fa-circle-xmark" aria-hidden="true"></i>
-                Typical Approach
-              </div>
-              <pre><span style="color:#c792ea">class</span> <span style="color:#ffcb6b">MyButton</span> <span style="color:#c792ea">extends</span> <span style="color:#ffcb6b">LitElement</span> &#123;
+            <pre><span style="color:#c792ea">class</span> <span style="color:#ffcb6b">MyButton</span> <span style="color:#c792ea">extends</span> <span style="color:#ffcb6b">LitElement</span> &#123;
   <span style="color:#82aaff">@property</span>()
   <span style="color:#f78c6c">variant</span>: <span style="color:#c792ea">any</span>;  <span style="color:#546e7a">// What values?</span>
 
@@ -406,14 +294,14 @@
     <span style="color:#c792ea">this</span>.<span style="color:#82aaff">dispatchEvent</span>(<span style="color:#c792ea">new</span> <span style="color:#ffcb6b">CustomEvent</span>(<span style="color:#c3e88d">'click'</span>));
   &#125;
 &#125;</pre>
-            </div>
+          </div>
 
-            <div class="ea-ts-example ea-ts-example-good">
-              <div class="ea-ts-example-header">
-                <i class="fa-solid fa-circle-check" aria-hidden="true"></i>
-                WC-2026 Approach
-              </div>
-              <pre><span style="color:#c792ea">type</span> <span style="color:#ffcb6b">ButtonVariant</span> = <span style="color:#c3e88d">'primary'</span> | <span style="color:#c3e88d">'secondary'</span> | <span style="color:#c3e88d">'danger'</span>;
+          <div class="ea-ts-example ea-ts-example-good">
+            <div class="ea-ts-example-header">
+              <i class="fa-solid fa-circle-check" aria-hidden="true"></i>
+              WC-2026 Approach
+            </div>
+            <pre><span style="color:#c792ea">type</span> <span style="color:#ffcb6b">ButtonVariant</span> = <span style="color:#c3e88d">'primary'</span> | <span style="color:#c3e88d">'secondary'</span> | <span style="color:#c3e88d">'danger'</span>;
 <span style="color:#c792ea">type</span> <span style="color:#ffcb6b">ButtonSize</span> = <span style="color:#c3e88d">'sm'</span> | <span style="color:#c3e88d">'md'</span> | <span style="color:#c3e88d">'lg'</span>;
 
 <span style="color:#c792ea">class</span> <span style="color:#ffcb6b">WcButton</span> <span style="color:#c792ea">extends</span> <span style="color:#ffcb6b">LitElement</span> &#123;
@@ -425,348 +313,347 @@
   <span style="color:#82aaff">@property</span>(&#123; <span style="color:#f78c6c">reflect</span>: <span style="color:#ff5370">true</span> &#125;)
   <span style="color:#f78c6c">size</span>: <span style="color:#ffcb6b">ButtonSize</span> = <span style="color:#c3e88d">'md'</span>;
 &#125;</pre>
-            </div>
           </div>
         </div>
-      </section>
+      </div>
+    </section>
 
-      <!-- SECTION 3: CEM PIPELINE -->
-      <section class="ea-section" style="background:var(--surface-1); border-top:1px solid var(--surface-3); border-bottom:1px solid var(--surface-3);" aria-label="CEM pipeline">
-        <div class="ea-section-inner">
-          <div class="ea-section-header scroll-reveal">
-            <span class="ea-section-label">Single Source of Truth</span>
-            <h2 class="ea-section-title">The CEM Pipeline</h2>
-            <p class="ea-section-description">
-              Write JSDoc once. The Custom Elements Manifest generates everything else --
-              Storybook controls, API docs, IDE hints, and Drupal tooling.
-            </p>
-          </div>
-
-          <div class="ea-pipeline scroll-reveal scroll-reveal-delay-1">
-            <div class="ea-pipeline-step">
-              <div class="ea-pipeline-icon icon-cyan"><i class="fa-solid fa-code" aria-hidden="true"></i></div>
-              <div class="ea-pipeline-label">JSDoc</div>
-              <div class="ea-pipeline-sub">Annotations</div>
-            </div>
-            <div class="ea-pipeline-arrow" aria-hidden="true"><i class="fa-solid fa-chevron-right"></i></div>
-            <div class="ea-pipeline-step">
-              <div class="ea-pipeline-icon icon-accent"><i class="fa-solid fa-gears" aria-hidden="true"></i></div>
-              <div class="ea-pipeline-label">CEM Analyzer</div>
-              <div class="ea-pipeline-sub">Build Step</div>
-            </div>
-            <div class="ea-pipeline-arrow" aria-hidden="true"><i class="fa-solid fa-chevron-right"></i></div>
-            <div class="ea-pipeline-step">
-              <div class="ea-pipeline-icon icon-green"><i class="fa-solid fa-file-code" aria-hidden="true"></i></div>
-              <div class="ea-pipeline-label">CEM JSON</div>
-              <div class="ea-pipeline-sub">Manifest</div>
-            </div>
-            <div class="ea-pipeline-arrow" aria-hidden="true"><i class="fa-solid fa-chevron-right"></i></div>
-            <div class="ea-pipeline-step">
-              <div class="ea-pipeline-icon icon-pink"><i class="fa-solid fa-arrows-split-up-and-left" aria-hidden="true"></i></div>
-              <div class="ea-pipeline-label">Consumers</div>
-              <div class="ea-pipeline-sub">4 Outputs</div>
-            </div>
-          </div>
-
-          <div class="ea-pipeline-outputs scroll-reveal scroll-reveal-delay-2">
-            <div class="ea-pipeline-output">
-              <div class="ea-pipeline-output-icon" style="color:var(--wc-pink);">
-                <i class="fa-solid fa-book-open" aria-hidden="true"></i>
-              </div>
-              <div class="ea-pipeline-output-title">Storybook</div>
-              <div class="ea-pipeline-output-desc">Auto-generated controls, args, and argTypes via @wc-toolkit</div>
-            </div>
-            <div class="ea-pipeline-output">
-              <div class="ea-pipeline-output-icon" style="color:var(--wc-cyan);">
-                <i class="fa-solid fa-file-lines" aria-hidden="true"></i>
-              </div>
-              <div class="ea-pipeline-output-title">Starlight Docs</div>
-              <div class="ea-pipeline-output-desc">API reference pages with properties, events, slots, CSS parts</div>
-            </div>
-            <div class="ea-pipeline-output">
-              <div class="ea-pipeline-output-icon" style="color:var(--wc-green);">
-                <i class="fa-solid fa-laptop-code" aria-hidden="true"></i>
-              </div>
-              <div class="ea-pipeline-output-title">IDE IntelliSense</div>
-              <div class="ea-pipeline-output-desc">VS Code autocomplete for custom elements in HTML and TWIG</div>
-            </div>
-            <div class="ea-pipeline-output">
-              <div class="ea-pipeline-output-icon" style="color:var(--wc-amber);">
-                <i class="fa-brands fa-drupal" aria-hidden="true"></i>
-              </div>
-              <div class="ea-pipeline-output-title">Drupal Tooling</div>
-              <div class="ea-pipeline-output-desc">Auto-generated .libraries.yml and TWIG template stubs</div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- SECTION 4: THREE-TIER TOKENS -->
-      <section class="ea-section" aria-label="Design token architecture">
-        <div class="ea-section-inner">
-          <div class="ea-section-header scroll-reveal">
-            <span class="ea-section-label">Design Tokens</span>
-            <h2 class="ea-section-title">Three-Tier Token Architecture</h2>
-            <p class="ea-section-description">
-              W3C DTCG-compliant design tokens flow from global primitives through
-              brand decisions to component-specific values. Change one tier,
-              everything downstream updates.
-            </p>
-          </div>
-
-          <div class="ea-tiers">
-            <div class="ea-tier scroll-reveal scroll-reveal-delay-1">
-              <div class="ea-tier-label">
-                <div class="ea-tier-icon icon-cyan"><i class="fa-solid fa-globe" aria-hidden="true"></i></div>
-                <div class="ea-tier-name">Global</div>
-                <div class="ea-tier-tag tag-cyan">Tier 1</div>
-              </div>
-              <div class="ea-tier-content">
-                <div class="ea-tier-desc">
-                  Raw design primitives. Color scales, spacing values, font stacks, shadow definitions.
-                  These are the atomic values that never reference other tokens.
-                </div>
-                <div class="ea-tier-examples">
-                  <span class="ea-tier-example">--wc-color-blue-500</span>
-                  <span class="ea-tier-example">--wc-space-4</span>
-                  <span class="ea-tier-example">--wc-font-sans</span>
-                  <span class="ea-tier-example">--wc-shadow-md</span>
-                </div>
-              </div>
-            </div>
-
-            <div class="ea-tier-arrow scroll-reveal" aria-hidden="true"><i class="fa-solid fa-arrow-down"></i></div>
-
-            <div class="ea-tier scroll-reveal scroll-reveal-delay-2">
-              <div class="ea-tier-label">
-                <div class="ea-tier-icon icon-accent"><i class="fa-solid fa-paintbrush" aria-hidden="true"></i></div>
-                <div class="ea-tier-name">Brand</div>
-                <div class="ea-tier-tag tag-accent">Tier 2</div>
-              </div>
-              <div class="ea-tier-content">
-                <div class="ea-tier-desc">
-                  Semantic decisions. Maps global tokens to brand intent. "Primary" means
-                  blue-500 for Brand A but green-600 for Brand B. Theme switching happens here.
-                </div>
-                <div class="ea-tier-examples">
-                  <span class="ea-tier-example">--wc-brand-primary</span>
-                  <span class="ea-tier-example">--wc-brand-surface</span>
-                  <span class="ea-tier-example">--wc-brand-text</span>
-                  <span class="ea-tier-example">--wc-brand-border</span>
-                </div>
-              </div>
-            </div>
-
-            <div class="ea-tier-arrow scroll-reveal" aria-hidden="true"><i class="fa-solid fa-arrow-down"></i></div>
-
-            <div class="ea-tier scroll-reveal scroll-reveal-delay-3">
-              <div class="ea-tier-label">
-                <div class="ea-tier-icon icon-green"><i class="fa-solid fa-puzzle-piece" aria-hidden="true"></i></div>
-                <div class="ea-tier-name">Component</div>
-                <div class="ea-tier-tag tag-green">Tier 3</div>
-              </div>
-              <div class="ea-tier-content">
-                <div class="ea-tier-desc">
-                  Component-specific overrides. Each component exposes CSS custom properties
-                  that map to brand tokens by default but can be overridden per-instance.
-                </div>
-                <div class="ea-tier-examples">
-                  <span class="ea-tier-example">--wc-button-bg</span>
-                  <span class="ea-tier-example">--wc-card-padding</span>
-                  <span class="ea-tier-example">--wc-input-border</span>
-                  <span class="ea-tier-example">--wc-modal-overlay</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- SECTION 5: QUALITY AUTOMATION -->
-      <section class="ea-section" style="background:var(--surface-1); border-top:1px solid var(--surface-3); border-bottom:1px solid var(--surface-3);" aria-label="Quality automation">
-        <div class="ea-section-inner">
-          <div class="ea-section-header scroll-reveal">
-            <span class="ea-section-label">Quality</span>
-            <h2 class="ea-section-title">Automated at Every Layer</h2>
-            <p class="ea-section-description">
-              Six quality gates that run on every commit. No component ships
-              without passing all of them.
-            </p>
-          </div>
-
-          <div class="ea-quality-grid">
-            <div class="ea-quality-card scroll-reveal scroll-reveal-delay-1">
-              <div class="ea-quality-icon icon-cyan"><i class="fa-solid fa-vial" aria-hidden="true"></i></div>
-              <div class="ea-quality-title">Unit Tests</div>
-              <div class="ea-quality-tool">Vitest 4.x</div>
-              <div class="ea-quality-desc">Property validation, event dispatching, state transitions. 2-10x faster than Jest.</div>
-            </div>
-
-            <div class="ea-quality-card scroll-reveal scroll-reveal-delay-2">
-              <div class="ea-quality-icon icon-green"><i class="fa-solid fa-browser" aria-hidden="true"></i></div>
-              <div class="ea-quality-title">Component Tests</div>
-              <div class="ea-quality-tool">Web Test Runner</div>
-              <div class="ea-quality-desc">Real browser rendering. Shadow DOM traversal, slot projection, CSS custom property verification.</div>
-            </div>
-
-            <div class="ea-quality-card scroll-reveal scroll-reveal-delay-3">
-              <div class="ea-quality-icon icon-electric"><i class="fa-solid fa-display" aria-hidden="true"></i></div>
-              <div class="ea-quality-title">Integration Tests</div>
-              <div class="ea-quality-tool">Playwright</div>
-              <div class="ea-quality-desc">Cross-browser testing across Chrome, Firefox, Safari. Keyboard navigation, screen reader flows.</div>
-            </div>
-
-            <div class="ea-quality-card scroll-reveal scroll-reveal-delay-4">
-              <div class="ea-quality-icon icon-pink"><i class="fa-solid fa-universal-access" aria-hidden="true"></i></div>
-              <div class="ea-quality-title">Accessibility</div>
-              <div class="ea-quality-tool">axe-core + Storybook a11y</div>
-              <div class="ea-quality-desc">Every story checked for WCAG violations. Color contrast, ARIA, focus management, keyboard traps.</div>
-            </div>
-
-            <div class="ea-quality-card scroll-reveal scroll-reveal-delay-5">
-              <div class="ea-quality-icon icon-amber"><i class="fa-solid fa-eye" aria-hidden="true"></i></div>
-              <div class="ea-quality-title">Visual Regression</div>
-              <div class="ea-quality-tool">Chromatic</div>
-              <div class="ea-quality-desc">Pixel-level screenshot comparison. Catch unintended visual changes before they merge.</div>
-            </div>
-
-            <div class="ea-quality-card scroll-reveal scroll-reveal-delay-6">
-              <div class="ea-quality-icon icon-accent"><i class="fa-solid fa-spell-check" aria-hidden="true"></i></div>
-              <div class="ea-quality-title">Static Analysis</div>
-              <div class="ea-quality-tool">ESLint + lit-analyzer</div>
-              <div class="ea-quality-desc">Lit-specific linting rules. Template type-checking, unused property detection, deprecation warnings.</div>
-            </div>
-          </div>
-
-          <div class="ea-stats scroll-reveal scroll-reveal-delay-3">
-            <div class="ea-stat">
-              <div class="ea-stat-value" style="background:var(--gradient-cyan-purple);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">100%</div>
-              <div class="ea-stat-label">TypeScript Coverage</div>
-            </div>
-            <div class="ea-stat">
-              <div class="ea-stat-value" style="background:var(--gradient-green-cyan);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">6</div>
-              <div class="ea-stat-label">Quality Gates</div>
-            </div>
-            <div class="ea-stat">
-              <div class="ea-stat-value" style="background:var(--gradient-pink-orange);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">0</div>
-              <div class="ea-stat-label">Manual Steps to Ship</div>
-            </div>
-            <div class="ea-stat">
-              <div class="ea-stat-value" style="background:linear-gradient(135deg,var(--wc-amber),var(--wc-green));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">&lt;2s</div>
-              <div class="ea-stat-label">Full Library Build</div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- SECTION 6: DOCUMENTATION STRATEGY -->
-      <section class="ea-section" aria-label="Documentation strategy">
-        <div class="ea-section-inner">
-          <div class="ea-section-header scroll-reveal">
-            <span class="ea-section-label">Documentation</span>
-            <h2 class="ea-section-title">Write Once, Publish Everywhere</h2>
-            <p class="ea-section-description">
-              JSDoc annotations in your component source are the single input.
-              Four documentation outputs are generated automatically -- no manual sync,
-              no stale docs, no drift.
-            </p>
-          </div>
-
-          <div class="ea-quality-grid">
-            <div class="ea-card scroll-reveal scroll-reveal-delay-1">
-              <div class="ea-card-icon icon-pink" aria-hidden="true"><i class="fa-solid fa-book-open"></i></div>
-              <div class="ea-card-title">Storybook Autodocs</div>
-              <div class="ea-card-desc">
-                Every component automatically gets a docs page with live examples,
-                property tables, event documentation, and slot descriptions.
-                Zero manual configuration via @wc-toolkit/storybook-helpers.
-              </div>
-            </div>
-
-            <div class="ea-card scroll-reveal scroll-reveal-delay-2">
-              <div class="ea-card-icon icon-cyan" aria-hidden="true"><i class="fa-solid fa-file-lines"></i></div>
-              <div class="ea-card-title">Starlight API Reference</div>
-              <div class="ea-card-desc">
-                Static HTML API reference pages generated from the CEM.
-                Searchable, linkable, and indexed by Pagefind.
-                Ships with zero JavaScript overhead.
-              </div>
-            </div>
-
-            <div class="ea-card scroll-reveal scroll-reveal-delay-3">
-              <div class="ea-card-icon icon-green" aria-hidden="true"><i class="fa-solid fa-laptop-code"></i></div>
-              <div class="ea-card-title">IDE IntelliSense</div>
-              <div class="ea-card-desc">
-                VS Code, WebStorm, and Neovim get full autocomplete for custom elements
-                in HTML files. Property types, event names, slot names, and CSS custom properties --
-                all from the CEM.
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- FOOTER CTA -->
-      <section class="ea-footer-cta" aria-label="Next steps">
-        <div class="ea-footer-cta-inner scroll-reveal">
-          <h2>Ready to Build at Scale?</h2>
-          <p>
-            Explore the full documentation for TypeScript patterns,
-            token architecture details, and quality automation configuration.
+    <!-- SECTION 3: CEM PIPELINE -->
+    <section class="ea-section" style="background:var(--surface-1); border-top:1px solid var(--surface-3); border-bottom:1px solid var(--surface-3);" aria-label="CEM pipeline">
+      <div class="ea-section-inner">
+        <div class="ea-section-header scroll-reveal">
+          <span class="ea-section-label">Single Source of Truth</span>
+          <h2 class="ea-section-title">The CEM Pipeline</h2>
+          <p class="ea-section-description">
+            Write JSDoc once. The Custom Elements Manifest generates everything else --
+            Storybook controls, API docs, IDE hints, and Drupal tooling.
           </p>
-          <div class="ea-footer-cta-buttons">
-            <a href="/pre-planning/architecture/" class="ea-btn ea-btn-solid">
-              Architecture Docs
-              <span class="ea-btn-arrow" aria-hidden="true">&rarr;</span>
-            </a>
-            <a href="/design-tokens/overview/" class="ea-btn ea-btn-ghost">
-              Design Tokens
-              <span class="ea-btn-arrow" aria-hidden="true">&rarr;</span>
-            </a>
-            <a href="/" class="ea-btn ea-btn-ghost">
-              Back to Dashboard
-              <span class="ea-btn-arrow" aria-hidden="true">&rarr;</span>
-            </a>
+        </div>
+
+        <div class="ea-pipeline scroll-reveal scroll-reveal-delay-1">
+          <div class="ea-pipeline-step">
+            <div class="ea-pipeline-icon icon-cyan"><i class="fa-solid fa-code" aria-hidden="true"></i></div>
+            <div class="ea-pipeline-label">JSDoc</div>
+            <div class="ea-pipeline-sub">Annotations</div>
+          </div>
+          <div class="ea-pipeline-arrow" aria-hidden="true"><i class="fa-solid fa-chevron-right"></i></div>
+          <div class="ea-pipeline-step">
+            <div class="ea-pipeline-icon icon-accent"><i class="fa-solid fa-gears" aria-hidden="true"></i></div>
+            <div class="ea-pipeline-label">CEM Analyzer</div>
+            <div class="ea-pipeline-sub">Build Step</div>
+          </div>
+          <div class="ea-pipeline-arrow" aria-hidden="true"><i class="fa-solid fa-chevron-right"></i></div>
+          <div class="ea-pipeline-step">
+            <div class="ea-pipeline-icon icon-green"><i class="fa-solid fa-file-code" aria-hidden="true"></i></div>
+            <div class="ea-pipeline-label">CEM JSON</div>
+            <div class="ea-pipeline-sub">Manifest</div>
+          </div>
+          <div class="ea-pipeline-arrow" aria-hidden="true"><i class="fa-solid fa-chevron-right"></i></div>
+          <div class="ea-pipeline-step">
+            <div class="ea-pipeline-icon icon-pink"><i class="fa-solid fa-arrows-split-up-and-left" aria-hidden="true"></i></div>
+            <div class="ea-pipeline-label">Consumers</div>
+            <div class="ea-pipeline-sub">4 Outputs</div>
           </div>
         </div>
-      </section>
-    </main>
 
-    <script is:inline>
-      (function () {
-        var prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        <div class="ea-pipeline-outputs scroll-reveal scroll-reveal-delay-2">
+          <div class="ea-pipeline-output">
+            <div class="ea-pipeline-output-icon" style="color:var(--wc-pink);">
+              <i class="fa-solid fa-book-open" aria-hidden="true"></i>
+            </div>
+            <div class="ea-pipeline-output-title">Storybook</div>
+            <div class="ea-pipeline-output-desc">Auto-generated controls, args, and argTypes via @wc-toolkit</div>
+          </div>
+          <div class="ea-pipeline-output">
+            <div class="ea-pipeline-output-icon" style="color:var(--wc-cyan);">
+              <i class="fa-solid fa-file-lines" aria-hidden="true"></i>
+            </div>
+            <div class="ea-pipeline-output-title">Starlight Docs</div>
+            <div class="ea-pipeline-output-desc">API reference pages with properties, events, slots, CSS parts</div>
+          </div>
+          <div class="ea-pipeline-output">
+            <div class="ea-pipeline-output-icon" style="color:var(--wc-green);">
+              <i class="fa-solid fa-laptop-code" aria-hidden="true"></i>
+            </div>
+            <div class="ea-pipeline-output-title">IDE IntelliSense</div>
+            <div class="ea-pipeline-output-desc">VS Code autocomplete for custom elements in HTML and TWIG</div>
+          </div>
+          <div class="ea-pipeline-output">
+            <div class="ea-pipeline-output-icon" style="color:var(--wc-amber);">
+              <i class="fa-brands fa-drupal" aria-hidden="true"></i>
+            </div>
+            <div class="ea-pipeline-output-title">Drupal Tooling</div>
+            <div class="ea-pipeline-output-desc">Auto-generated .libraries.yml and TWIG template stubs</div>
+          </div>
+        </div>
+      </div>
+    </section>
 
-        if (prefersReduced) {
-          document.querySelectorAll('.scroll-reveal').forEach(function (el) {
-            el.classList.add('is-visible');
-          });
-          return;
-        }
+    <!-- SECTION 4: THREE-TIER TOKENS -->
+    <section class="ea-section" aria-label="Design token architecture">
+      <div class="ea-section-inner">
+        <div class="ea-section-header scroll-reveal">
+          <span class="ea-section-label">Design Tokens</span>
+          <h2 class="ea-section-title">Three-Tier Token Architecture</h2>
+          <p class="ea-section-description">
+            W3C DTCG-compliant design tokens flow from global primitives through
+            brand decisions to component-specific values. Change one tier,
+            everything downstream updates.
+          </p>
+        </div>
 
-        var observer = new IntersectionObserver(
-          function (entries) {
-            entries.forEach(function (entry) {
-              if (entry.isIntersecting) {
-                entry.target.classList.add('is-visible');
-                observer.unobserve(entry.target);
-              }
-            });
-          },
-          { threshold: 0.1, rootMargin: '0px 0px -60px 0px' }
-        );
+        <div class="ea-tiers">
+          <div class="ea-tier scroll-reveal scroll-reveal-delay-1">
+            <div class="ea-tier-label">
+              <div class="ea-tier-icon icon-cyan"><i class="fa-solid fa-globe" aria-hidden="true"></i></div>
+              <div class="ea-tier-name">Global</div>
+              <div class="ea-tier-tag tag-cyan">Tier 1</div>
+            </div>
+            <div class="ea-tier-content">
+              <div class="ea-tier-desc">
+                Raw design primitives. Color scales, spacing values, font stacks, shadow definitions.
+                These are the atomic values that never reference other tokens.
+              </div>
+              <div class="ea-tier-examples">
+                <span class="ea-tier-example">--wc-color-blue-500</span>
+                <span class="ea-tier-example">--wc-space-4</span>
+                <span class="ea-tier-example">--wc-font-sans</span>
+                <span class="ea-tier-example">--wc-shadow-md</span>
+              </div>
+            </div>
+          </div>
 
+          <div class="ea-tier-arrow scroll-reveal" aria-hidden="true"><i class="fa-solid fa-arrow-down"></i></div>
+
+          <div class="ea-tier scroll-reveal scroll-reveal-delay-2">
+            <div class="ea-tier-label">
+              <div class="ea-tier-icon icon-accent"><i class="fa-solid fa-paintbrush" aria-hidden="true"></i></div>
+              <div class="ea-tier-name">Brand</div>
+              <div class="ea-tier-tag tag-accent">Tier 2</div>
+            </div>
+            <div class="ea-tier-content">
+              <div class="ea-tier-desc">
+                Semantic decisions. Maps global tokens to brand intent. "Primary" means
+                blue-500 for Brand A but green-600 for Brand B. Theme switching happens here.
+              </div>
+              <div class="ea-tier-examples">
+                <span class="ea-tier-example">--wc-brand-primary</span>
+                <span class="ea-tier-example">--wc-brand-surface</span>
+                <span class="ea-tier-example">--wc-brand-text</span>
+                <span class="ea-tier-example">--wc-brand-border</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="ea-tier-arrow scroll-reveal" aria-hidden="true"><i class="fa-solid fa-arrow-down"></i></div>
+
+          <div class="ea-tier scroll-reveal scroll-reveal-delay-3">
+            <div class="ea-tier-label">
+              <div class="ea-tier-icon icon-green"><i class="fa-solid fa-puzzle-piece" aria-hidden="true"></i></div>
+              <div class="ea-tier-name">Component</div>
+              <div class="ea-tier-tag tag-green">Tier 3</div>
+            </div>
+            <div class="ea-tier-content">
+              <div class="ea-tier-desc">
+                Component-specific overrides. Each component exposes CSS custom properties
+                that map to brand tokens by default but can be overridden per-instance.
+              </div>
+              <div class="ea-tier-examples">
+                <span class="ea-tier-example">--wc-button-bg</span>
+                <span class="ea-tier-example">--wc-card-padding</span>
+                <span class="ea-tier-example">--wc-input-border</span>
+                <span class="ea-tier-example">--wc-modal-overlay</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 5: QUALITY AUTOMATION -->
+    <section class="ea-section" style="background:var(--surface-1); border-top:1px solid var(--surface-3); border-bottom:1px solid var(--surface-3);" aria-label="Quality automation">
+      <div class="ea-section-inner">
+        <div class="ea-section-header scroll-reveal">
+          <span class="ea-section-label">Quality</span>
+          <h2 class="ea-section-title">Automated at Every Layer</h2>
+          <p class="ea-section-description">
+            Six quality gates that run on every commit. No component ships
+            without passing all of them.
+          </p>
+        </div>
+
+        <div class="ea-quality-grid">
+          <div class="ea-quality-card scroll-reveal scroll-reveal-delay-1">
+            <div class="ea-quality-icon icon-cyan"><i class="fa-solid fa-vial" aria-hidden="true"></i></div>
+            <div class="ea-quality-title">Unit Tests</div>
+            <div class="ea-quality-tool">Vitest 4.x</div>
+            <div class="ea-quality-desc">Property validation, event dispatching, state transitions. 2-10x faster than Jest.</div>
+          </div>
+
+          <div class="ea-quality-card scroll-reveal scroll-reveal-delay-2">
+            <div class="ea-quality-icon icon-green"><i class="fa-solid fa-browser" aria-hidden="true"></i></div>
+            <div class="ea-quality-title">Component Tests</div>
+            <div class="ea-quality-tool">Web Test Runner</div>
+            <div class="ea-quality-desc">Real browser rendering. Shadow DOM traversal, slot projection, CSS custom property verification.</div>
+          </div>
+
+          <div class="ea-quality-card scroll-reveal scroll-reveal-delay-3">
+            <div class="ea-quality-icon icon-electric"><i class="fa-solid fa-display" aria-hidden="true"></i></div>
+            <div class="ea-quality-title">Integration Tests</div>
+            <div class="ea-quality-tool">Playwright</div>
+            <div class="ea-quality-desc">Cross-browser testing across Chrome, Firefox, Safari. Keyboard navigation, screen reader flows.</div>
+          </div>
+
+          <div class="ea-quality-card scroll-reveal scroll-reveal-delay-4">
+            <div class="ea-quality-icon icon-pink"><i class="fa-solid fa-universal-access" aria-hidden="true"></i></div>
+            <div class="ea-quality-title">Accessibility</div>
+            <div class="ea-quality-tool">axe-core + Storybook a11y</div>
+            <div class="ea-quality-desc">Every story checked for WCAG violations. Color contrast, ARIA, focus management, keyboard traps.</div>
+          </div>
+
+          <div class="ea-quality-card scroll-reveal scroll-reveal-delay-5">
+            <div class="ea-quality-icon icon-amber"><i class="fa-solid fa-eye" aria-hidden="true"></i></div>
+            <div class="ea-quality-title">Visual Regression</div>
+            <div class="ea-quality-tool">Chromatic</div>
+            <div class="ea-quality-desc">Pixel-level screenshot comparison. Catch unintended visual changes before they merge.</div>
+          </div>
+
+          <div class="ea-quality-card scroll-reveal scroll-reveal-delay-6">
+            <div class="ea-quality-icon icon-accent"><i class="fa-solid fa-spell-check" aria-hidden="true"></i></div>
+            <div class="ea-quality-title">Static Analysis</div>
+            <div class="ea-quality-tool">ESLint + lit-analyzer</div>
+            <div class="ea-quality-desc">Lit-specific linting rules. Template type-checking, unused property detection, deprecation warnings.</div>
+          </div>
+        </div>
+
+        <div class="ea-stats scroll-reveal scroll-reveal-delay-3">
+          <div class="ea-stat">
+            <div class="ea-stat-value" style="background:var(--gradient-cyan-purple);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">100%</div>
+            <div class="ea-stat-label">TypeScript Coverage</div>
+          </div>
+          <div class="ea-stat">
+            <div class="ea-stat-value" style="background:var(--gradient-green-cyan);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">6</div>
+            <div class="ea-stat-label">Quality Gates</div>
+          </div>
+          <div class="ea-stat">
+            <div class="ea-stat-value" style="background:var(--gradient-pink-orange);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">0</div>
+            <div class="ea-stat-label">Manual Steps to Ship</div>
+          </div>
+          <div class="ea-stat">
+            <div class="ea-stat-value" style="background:linear-gradient(135deg,var(--wc-amber),var(--wc-green));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">&lt;2s</div>
+            <div class="ea-stat-label">Full Library Build</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 6: DOCUMENTATION STRATEGY -->
+    <section class="ea-section" aria-label="Documentation strategy">
+      <div class="ea-section-inner">
+        <div class="ea-section-header scroll-reveal">
+          <span class="ea-section-label">Documentation</span>
+          <h2 class="ea-section-title">Write Once, Publish Everywhere</h2>
+          <p class="ea-section-description">
+            JSDoc annotations in your component source are the single input.
+            Four documentation outputs are generated automatically -- no manual sync,
+            no stale docs, no drift.
+          </p>
+        </div>
+
+        <div class="ea-quality-grid">
+          <div class="ea-card scroll-reveal scroll-reveal-delay-1">
+            <div class="ea-card-icon icon-pink" aria-hidden="true"><i class="fa-solid fa-book-open"></i></div>
+            <div class="ea-card-title">Storybook Autodocs</div>
+            <div class="ea-card-desc">
+              Every component automatically gets a docs page with live examples,
+              property tables, event documentation, and slot descriptions.
+              Zero manual configuration via @wc-toolkit/storybook-helpers.
+            </div>
+          </div>
+
+          <div class="ea-card scroll-reveal scroll-reveal-delay-2">
+            <div class="ea-card-icon icon-cyan" aria-hidden="true"><i class="fa-solid fa-file-lines"></i></div>
+            <div class="ea-card-title">Starlight API Reference</div>
+            <div class="ea-card-desc">
+              Static HTML API reference pages generated from the CEM.
+              Searchable, linkable, and indexed by Pagefind.
+              Ships with zero JavaScript overhead.
+            </div>
+          </div>
+
+          <div class="ea-card scroll-reveal scroll-reveal-delay-3">
+            <div class="ea-card-icon icon-green" aria-hidden="true"><i class="fa-solid fa-laptop-code"></i></div>
+            <div class="ea-card-title">IDE IntelliSense</div>
+            <div class="ea-card-desc">
+              VS Code, WebStorm, and Neovim get full autocomplete for custom elements
+              in HTML files. Property types, event names, slot names, and CSS custom properties --
+              all from the CEM.
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FOOTER CTA -->
+    <section class="ea-footer-cta" aria-label="Next steps">
+      <div class="ea-footer-cta-inner scroll-reveal">
+        <h2>Ready to Build at Scale?</h2>
+        <p>
+          Explore the full documentation for TypeScript patterns,
+          token architecture details, and quality automation configuration.
+        </p>
+        <div class="ea-footer-cta-buttons">
+          <a href="/pre-planning/architecture/" class="ea-btn ea-btn-solid">
+            Architecture Docs
+            <span class="ea-btn-arrow" aria-hidden="true">&rarr;</span>
+          </a>
+          <a href="/design-tokens/overview/" class="ea-btn ea-btn-ghost">
+            Design Tokens
+            <span class="ea-btn-arrow" aria-hidden="true">&rarr;</span>
+          </a>
+          <a href="/" class="ea-btn ea-btn-ghost">
+            Back to Dashboard
+            <span class="ea-btn-arrow" aria-hidden="true">&rarr;</span>
+          </a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script is:inline slot="scripts">
+    (function () {
+      var prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      if (prefersReduced) {
         document.querySelectorAll('.scroll-reveal').forEach(function (el) {
-          observer.observe(el);
+          el.classList.add('is-visible');
         });
+        return;
+      }
 
-        document.querySelectorAll('.ea-card, .ea-quality-card').forEach(function (card) {
-          card.addEventListener('mousemove', function (e) {
-            var rect = card.getBoundingClientRect();
-            card.style.setProperty('--mouse-x', (e.clientX - rect.left) + 'px');
-            card.style.setProperty('--mouse-y', (e.clientY - rect.top) + 'px');
+      var observer = new IntersectionObserver(
+        function (entries) {
+          entries.forEach(function (entry) {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('is-visible');
+              observer.unobserve(entry.target);
+            }
           });
+        },
+        { threshold: 0.1, rootMargin: '0px 0px -60px 0px' }
+      );
+
+      document.querySelectorAll('.scroll-reveal').forEach(function (el) {
+        observer.observe(el);
+      });
+
+      document.querySelectorAll('.ea-card, .ea-quality-card').forEach(function (card) {
+        card.addEventListener('mousemove', function (e) {
+          var rect = card.getBoundingClientRect();
+          card.style.setProperty('--mouse-x', (e.clientX - rect.left) + 'px');
+          card.style.setProperty('--mouse-y', (e.clientY - rect.top) + 'px');
         });
-      })();
-    </script>
-  </body>
-</html>
+      });
+    })();
+  </script>
+</ShowcaseLayout>

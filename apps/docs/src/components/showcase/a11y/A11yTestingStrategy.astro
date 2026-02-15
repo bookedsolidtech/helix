@@ -1,0 +1,282 @@
+---
+/**
+ * A11yTestingStrategy — 4-level testing strategy / visual testing pyramid.
+ *
+ * Shows the four levels of accessibility testing: automated, semi-automated,
+ * manual expert review, and real user testing with disabilities.
+ */
+---
+
+<style is:inline>
+  /* --- 4-Level Testing Strategy (Pyramid) --- */
+  .ha-pyramid-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-4);
+    max-width: 900px;
+    margin: 0 auto;
+  }
+
+  .ha-pyramid-level {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: var(--space-6);
+    align-items: center;
+    padding: var(--space-6) var(--space-8);
+    border-radius: var(--radius-2xl);
+    background: var(--surface-1);
+    border: 1px solid var(--surface-3);
+    transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .ha-pyramid-level::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1.5px;
+    background: conic-gradient(from var(--gradient-angle), #10b981, #14b8a6, #06b6d4, #10b981);
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+    pointer-events: none;
+    animation: border-rotate 4s linear infinite;
+  }
+
+  .ha-pyramid-level:hover::before { opacity: 1; }
+  .ha-pyramid-level:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-lg), var(--glow-health);
+    background: var(--surface-2);
+  }
+
+  .ha-pyramid-icon {
+    width: 72px;
+    height: 72px;
+    border-radius: var(--radius-xl);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.75rem;
+    flex-shrink: 0;
+  }
+
+  .ha-pyramid-icon-1 {
+    background: linear-gradient(135deg, rgba(6, 182, 212, 0.15), rgba(6, 182, 212, 0.05));
+    border: 1px solid rgba(6, 182, 212, 0.2);
+    color: var(--wc-cyan);
+  }
+
+  .ha-pyramid-icon-2 {
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.15), rgba(16, 185, 129, 0.05));
+    border: 1px solid rgba(16, 185, 129, 0.2);
+    color: var(--wc-green);
+  }
+
+  .ha-pyramid-icon-3 {
+    background: linear-gradient(135deg, rgba(245, 158, 11, 0.15), rgba(245, 158, 11, 0.05));
+    border: 1px solid rgba(245, 158, 11, 0.2);
+    color: var(--wc-amber);
+  }
+
+  .ha-pyramid-icon-4 {
+    background: linear-gradient(135deg, rgba(236, 72, 153, 0.15), rgba(236, 72, 153, 0.05));
+    border: 1px solid rgba(236, 72, 153, 0.2);
+    color: var(--wc-pink);
+  }
+
+  .ha-pyramid-content {
+    min-width: 0;
+  }
+
+  .ha-pyramid-level-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-1) var(--space-3);
+    border-radius: var(--radius-full);
+    font-size: 0.6875rem;
+    font-weight: 700;
+    font-family: var(--font-mono);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: var(--space-2);
+  }
+
+  .ha-pyramid-level-badge-1 {
+    background: rgba(6, 182, 212, 0.1);
+    color: var(--wc-cyan);
+    border: 1px solid rgba(6, 182, 212, 0.2);
+  }
+
+  .ha-pyramid-level-badge-2 {
+    background: rgba(16, 185, 129, 0.1);
+    color: var(--wc-green);
+    border: 1px solid rgba(16, 185, 129, 0.2);
+  }
+
+  .ha-pyramid-level-badge-3 {
+    background: rgba(245, 158, 11, 0.1);
+    color: var(--wc-amber);
+    border: 1px solid rgba(245, 158, 11, 0.2);
+  }
+
+  .ha-pyramid-level-badge-4 {
+    background: rgba(236, 72, 153, 0.1);
+    color: var(--wc-pink);
+    border: 1px solid rgba(236, 72, 153, 0.2);
+  }
+
+  .ha-pyramid-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin-bottom: var(--space-2);
+    color: var(--text-primary);
+  }
+
+  .ha-pyramid-desc {
+    font-size: 0.9375rem;
+    color: var(--text-secondary);
+    line-height: 1.65;
+    margin-bottom: var(--space-3);
+  }
+
+  .ha-pyramid-tools {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+  }
+
+  .ha-pyramid-tool {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-1) var(--space-3);
+    border-radius: var(--radius-full);
+    font-size: 0.75rem;
+    font-weight: 500;
+    background: var(--glass-bg-strong);
+    border: 1px solid var(--glass-border);
+    color: var(--text-secondary);
+  }
+
+  .ha-pyramid-coverage {
+    font-size: 0.75rem;
+    font-weight: 700;
+    font-family: var(--font-mono);
+    padding: var(--space-1) var(--space-3);
+    border-radius: var(--radius-full);
+    background: rgba(16, 185, 129, 0.1);
+    color: var(--wc-green);
+    border: 1px solid rgba(16, 185, 129, 0.15);
+    white-space: nowrap;
+  }
+</style>
+
+<section class="ha-section" aria-label="4-level testing strategy">
+  <div class="ha-section-inner">
+    <div class="ha-section-header scroll-reveal">
+      <span class="ha-section-label">Testing Strategy</span>
+      <h2 class="ha-section-title">Four Levels of Assurance</h2>
+      <p class="ha-section-description">
+        Automated tools catch roughly 30% of accessibility issues. That is why
+        WC-2026 uses a four-level testing strategy -- from CI pipelines to real
+        users with disabilities.
+      </p>
+    </div>
+
+    <div class="ha-pyramid-grid">
+      <!-- Level 1: Automated -->
+      <div class="ha-pyramid-level scroll-reveal scroll-reveal-delay-1">
+        <div class="ha-pyramid-icon ha-pyramid-icon-1" aria-hidden="true">
+          <i class="fa-solid fa-robot"></i>
+        </div>
+        <div class="ha-pyramid-content">
+          <span class="ha-pyramid-level-badge ha-pyramid-level-badge-1">Level 1 -- Automated</span>
+          <div class="ha-pyramid-title">Automated Testing</div>
+          <p class="ha-pyramid-desc">
+            axe-core runs in every unit test and every Storybook story. Catches color contrast
+            failures, missing ARIA labels, invalid roles, and structural issues automatically
+            on every commit.
+          </p>
+          <div class="ha-pyramid-tools">
+            <span class="ha-pyramid-tool"><i class="fa-solid fa-vial" aria-hidden="true"></i> axe-core</span>
+            <span class="ha-pyramid-tool"><i class="fa-solid fa-code" aria-hidden="true"></i> ESLint a11y</span>
+            <span class="ha-pyramid-tool"><i class="fa-solid fa-terminal" aria-hidden="true"></i> Vitest</span>
+            <span class="ha-pyramid-coverage">~30% issues caught</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Level 2: Semi-automated -->
+      <div class="ha-pyramid-level scroll-reveal scroll-reveal-delay-2">
+        <div class="ha-pyramid-icon ha-pyramid-icon-2" aria-hidden="true">
+          <i class="fa-solid fa-eye"></i>
+        </div>
+        <div class="ha-pyramid-content">
+          <span class="ha-pyramid-level-badge ha-pyramid-level-badge-2">Level 2 -- Semi-automated</span>
+          <div class="ha-pyramid-title">Interactive Validation</div>
+          <p class="ha-pyramid-desc">
+            Storybook accessibility addon provides real-time a11y feedback during development.
+            Tab-order visualization, keyboard interaction testing, and ARIA inspector
+            integrated into the component playground.
+          </p>
+          <div class="ha-pyramid-tools">
+            <span class="ha-pyramid-tool"><i class="fa-solid fa-book-open" aria-hidden="true"></i> Storybook a11y addon</span>
+            <span class="ha-pyramid-tool"><i class="fa-solid fa-keyboard" aria-hidden="true"></i> Keyboard testing</span>
+            <span class="ha-pyramid-tool"><i class="fa-solid fa-palette" aria-hidden="true"></i> Chromatic</span>
+            <span class="ha-pyramid-coverage">~55% issues caught</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Level 3: Manual -->
+      <div class="ha-pyramid-level scroll-reveal scroll-reveal-delay-3">
+        <div class="ha-pyramid-icon ha-pyramid-icon-3" aria-hidden="true">
+          <i class="fa-solid fa-hand"></i>
+        </div>
+        <div class="ha-pyramid-content">
+          <span class="ha-pyramid-level-badge ha-pyramid-level-badge-3">Level 3 -- Manual Expert</span>
+          <div class="ha-pyramid-title">Screen Reader & Cognitive Review</div>
+          <p class="ha-pyramid-desc">
+            Expert manual testing with JAWS, NVDA, and VoiceOver. Cognitive load assessment
+            ensures components do not overwhelm users. Reading order, announcement quality,
+            and interaction patterns verified by accessibility specialists.
+          </p>
+          <div class="ha-pyramid-tools">
+            <span class="ha-pyramid-tool"><i class="fa-solid fa-volume-high" aria-hidden="true"></i> JAWS / NVDA</span>
+            <span class="ha-pyramid-tool"><i class="fa-brands fa-apple" aria-hidden="true"></i> VoiceOver</span>
+            <span class="ha-pyramid-tool"><i class="fa-solid fa-brain" aria-hidden="true"></i> Cognitive review</span>
+            <span class="ha-pyramid-coverage">~85% issues caught</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Level 4: User testing -->
+      <div class="ha-pyramid-level scroll-reveal scroll-reveal-delay-4">
+        <div class="ha-pyramid-icon ha-pyramid-icon-4" aria-hidden="true">
+          <i class="fa-solid fa-users"></i>
+        </div>
+        <div class="ha-pyramid-content">
+          <span class="ha-pyramid-level-badge ha-pyramid-level-badge-4">Level 4 -- User Testing</span>
+          <div class="ha-pyramid-title">Real Users with Disabilities</div>
+          <p class="ha-pyramid-desc">
+            The ultimate validation. Real users with visual, motor, cognitive, and auditory
+            disabilities test critical workflows. Their feedback shapes component design
+            decisions. Nothing replaces lived experience.
+          </p>
+          <div class="ha-pyramid-tools">
+            <span class="ha-pyramid-tool"><i class="fa-solid fa-universal-access" aria-hidden="true"></i> Usability testing</span>
+            <span class="ha-pyramid-tool"><i class="fa-solid fa-comments" aria-hidden="true"></i> Feedback sessions</span>
+            <span class="ha-pyramid-tool"><i class="fa-solid fa-clipboard-check" aria-hidden="true"></i> Task completion</span>
+            <span class="ha-pyramid-coverage">~98% issues caught</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
