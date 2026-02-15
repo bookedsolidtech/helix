@@ -84,7 +84,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               </SidebarLink>
             </nav>
 
-            <div className="flex flex-col gap-2 mt-auto">
+            <hr className="border-border" />
+
+            <div className="flex flex-col gap-2">
               <a
                 href={STORYBOOK_URL}
                 target="_blank"
