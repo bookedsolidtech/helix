@@ -3083,11 +3083,15 @@ starlight-theme-select button:hover {
 @media (max-width: 768px) {
   .hero-section {
     min-height: auto;
-    padding: calc(300px + var(--space-8)) var(--space-4) var(--space-12) !important;
+    margin-top: 0 !important;
+    padding-top: calc(var(--sl-nav-height) + var(--space-16)) !important;
+    padding-bottom: var(--space-12) !important;
+    padding-left: var(--space-4) !important;
+    padding-right: var(--space-4) !important;
   }
 
   .hero-content {
-    padding: var(--space-12) var(--space-4) var(--space-8);
+    padding: var(--space-8) var(--space-4) var(--space-8);
   }
 
   .hero-cta {
