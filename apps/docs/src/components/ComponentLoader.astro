@@ -11,29 +11,29 @@
 
 <script>
   import {
-    WcButton,
-    WcCard,
-    WcTextInput,
-    WcCheckbox,
-    WcSelect,
-    WcRadioGroup,
-    WcRadio,
-    WcAlert,
-    WcTextarea,
-    WcBadge,
-    WcSwitch,
-    WcContainer,
-    WcForm,
-    WcProse,
+    HelixButton,
+    HelixCard,
+    HelixTextInput,
+    HelixCheckbox,
+    HelixSelect,
+    HelixRadioGroup,
+    HelixRadio,
+    HelixAlert,
+    HelixTextarea,
+    HelixBadge,
+    HelixSwitch,
+    HelixContainer,
+    HelixForm,
+    HelixProse,
   } from '@helix/library';
 
   // Verify registration (dev-only; removed by minifier in production)
   if (import.meta.env.DEV) {
     const expected = [
-      'wc-button', 'wc-card', 'wc-text-input', 'wc-checkbox',
-      'wc-select', 'wc-radio-group', 'wc-radio', 'wc-alert',
-      'wc-textarea', 'wc-badge', 'wc-switch', 'wc-container',
-      'wc-form', 'wc-prose',
+      'hx-button', 'hx-card', 'hx-text-input', 'hx-checkbox',
+      'hx-select', 'hx-radio-group', 'hx-radio', 'hx-alert',
+      'hx-textarea', 'hx-badge', 'hx-switch', 'hx-container',
+      'hx-form', 'hx-prose',
     ];
     const missing = expected.filter((tag) => !customElements.get(tag));
     if (missing.length) {
