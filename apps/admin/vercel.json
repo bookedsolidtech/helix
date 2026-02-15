@@ -1,4 +1,5 @@
 {
+  "buildCommand": "cd ../.. && npm run build --workspace=apps/admin",
   "installCommand": "npm install",
   "ignoreCommand": "bash -c 'if [[ \"$VERCEL_GIT_COMMIT_REF\" != \"main\" ]] ; then exit 1; else git diff HEAD^ HEAD --quiet apps/admin || exit 1; fi'",
   "headers": [
