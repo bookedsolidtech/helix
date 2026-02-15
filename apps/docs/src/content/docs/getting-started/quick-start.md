@@ -1,9 +1,9 @@
 ---
 title: Quick Start
-description: Get up and running with WC-2026 web components in minutes
+description: Get up and running with HELIX web components in minutes
 ---
 
-This guide walks you through creating your first WC-2026 component and using it in a page.
+This guide walks you through creating your first HELIX component and using it in a page.
 
 ## Start the Dev Environment
 
@@ -16,10 +16,10 @@ The documentation site will be available at `http://localhost:4321`.
 
 ## Using Components
 
-WC-2026 components are standard Web Components. They work in any HTML page:
+HELIX components are standard Web Components. They work in any HTML page:
 
 ```html
-<script type="module" src="@wc-2026/library"></script>
+<script type="module" src="@helix/library"></script>
 
 <wc-card variant="elevated">
   <wc-heading level="2">Patient Resources</wc-heading>

@@ -54,21 +54,21 @@ The two systems are complementary, not redundant. Storybook answers "what does t
 
 ### Framework Evaluation
 
-| Criterion | Starlight (Astro) | Docusaurus | VitePress |
-|---|---|---|---|
-| **Build framework** | Astro 5.x (multi-framework islands) | React (hard dependency) | Vue (hard dependency) |
-| **Framework lock-in** | None -- supports React, Vue, Svelte, Solid, Lit, or plain HTML | React required for all customization | Vue required for customization |
-| **Output** | Static HTML with zero-JS by default; islands hydrate on demand | Client-side React app with SSR | Vue SPA with SSR |
-| **Web Component support** | Native -- Astro renders custom elements with zero config | Requires MDX plugin configuration | Requires custom container plugin |
-| **Search** | Pagefind built-in (zero-config, static, no external service) | Algolia DocSearch (requires approval or Algolia account) | MiniSearch (client-side, limited) |
-| **Performance** | Lighthouse 100/100 typical; zero JS shipped for pure docs pages | React runtime (~40KB min) shipped on every page | Vue runtime (~30KB min) shipped on every page |
-| **MDX support** | Native with Astro MDX integration | Native | Markdown only (Vue components in markdown, not MDX) |
-| **Code highlighting** | Expressive Code (Shiki-based) with text markers, line highlighting, word wrap, diff highlighting | Prism (lighter) or Shiki | Shiki |
-| **Versioning** | Community plugin (`starlight-versions`) + URL-based strategy | Built-in versioning (mature) | No built-in versioning |
-| **i18n** | Built-in with route-based localization | Built-in | Built-in |
-| **Enterprise adoption** | Cloudflare, Google, Microsoft, Netlify, OpenAI, WPEngine | Meta, Stripe, Algolia | Vue ecosystem projects |
-| **Maintenance burden** | Depends only on Astro (same team builds Starlight) | Depends on React + Docusaurus + Infima (different Meta teams) | Depends on Vue + VitePress |
-| **Tailwind CSS** | One-line CLI integration | Complex integration (Infima conflicts) | Possible but not native |
+| Criterion                 | Starlight (Astro)                                                                                | Docusaurus                                                    | VitePress                                           |
+| ------------------------- | ------------------------------------------------------------------------------------------------ | ------------------------------------------------------------- | --------------------------------------------------- |
+| **Build framework**       | Astro 5.x (multi-framework islands)                                                              | React (hard dependency)                                       | Vue (hard dependency)                               |
+| **Framework lock-in**     | None -- supports React, Vue, Svelte, Solid, Lit, or plain HTML                                   | React required for all customization                          | Vue required for customization                      |
+| **Output**                | Static HTML with zero-JS by default; islands hydrate on demand                                   | Client-side React app with SSR                                | Vue SPA with SSR                                    |
+| **Web Component support** | Native -- Astro renders custom elements with zero config                                         | Requires MDX plugin configuration                             | Requires custom container plugin                    |
+| **Search**                | Pagefind built-in (zero-config, static, no external service)                                     | Algolia DocSearch (requires approval or Algolia account)      | MiniSearch (client-side, limited)                   |
+| **Performance**           | Lighthouse 100/100 typical; zero JS shipped for pure docs pages                                  | React runtime (~40KB min) shipped on every page               | Vue runtime (~30KB min) shipped on every page       |
+| **MDX support**           | Native with Astro MDX integration                                                                | Native                                                        | Markdown only (Vue components in markdown, not MDX) |
+| **Code highlighting**     | Expressive Code (Shiki-based) with text markers, line highlighting, word wrap, diff highlighting | Prism (lighter) or Shiki                                      | Shiki                                               |
+| **Versioning**            | Community plugin (`starlight-versions`) + URL-based strategy                                     | Built-in versioning (mature)                                  | No built-in versioning                              |
+| **i18n**                  | Built-in with route-based localization                                                           | Built-in                                                      | Built-in                                            |
+| **Enterprise adoption**   | Cloudflare, Google, Microsoft, Netlify, OpenAI, WPEngine                                         | Meta, Stripe, Algolia                                         | Vue ecosystem projects                              |
+| **Maintenance burden**    | Depends only on Astro (same team builds Starlight)                                               | Depends on React + Docusaurus + Infima (different Meta teams) | Depends on Vue + VitePress                          |
+| **Tailwind CSS**          | One-line CLI integration                                                                         | Complex integration (Infima conflicts)                        | Possible but not native                             |
 
 ### Decision: Starlight
 
@@ -84,17 +84,17 @@ The Astro 5.x Content Layer API (stable since late 2024) provides typed content 
 
 Features relevant to this project, drawn from Starlight 0.32 through 0.37:
 
-| Feature | Version | Relevance |
-|---|---|---|
-| **Route data middleware** | 0.32 | Custom logic per page render (inject CEM data, compute navigation) |
-| **Multisite Pagefind search** | 0.32 | Unified search across Starlight + Storybook |
-| **Plugin i18n APIs** | 0.32 | Plugins can access Starlight's translation system |
-| **Icons in asides** | 0.35 | Visual callouts for Drupal-specific warnings |
-| **Sidebar link attributes** | 0.35 | Badge component status (stable/beta/deprecated) in nav |
-| **Slug processing customization** | 0.35 | Map CEM module paths to documentation URLs |
-| **Markdown processing in non-docs collections** | 0.37 | Process CEM descriptions as markdown in API pages |
-| **CSS cascade layers** | 0.36 | Clean style precedence for custom components |
-| **Automatic heading anchor links** | 0.34 | Deep linking into API reference sections |
+| Feature                                         | Version | Relevance                                                          |
+| ----------------------------------------------- | ------- | ------------------------------------------------------------------ |
+| **Route data middleware**                       | 0.32    | Custom logic per page render (inject CEM data, compute navigation) |
+| **Multisite Pagefind search**                   | 0.32    | Unified search across Starlight + Storybook                        |
+| **Plugin i18n APIs**                            | 0.32    | Plugins can access Starlight's translation system                  |
+| **Icons in asides**                             | 0.35    | Visual callouts for Drupal-specific warnings                       |
+| **Sidebar link attributes**                     | 0.35    | Badge component status (stable/beta/deprecated) in nav             |
+| **Slug processing customization**               | 0.35    | Map CEM module paths to documentation URLs                         |
+| **Markdown processing in non-docs collections** | 0.37    | Process CEM descriptions as markdown in API pages                  |
+| **CSS cascade layers**                          | 0.36    | Clean style precedence for custom components                       |
+| **Automatic heading anchor links**              | 0.34    | Deep linking into API reference sections                           |
 
 ---
 
@@ -104,33 +104,33 @@ Features relevant to this project, drawn from Starlight 0.32 through 0.37:
 
 The fundamental question: what lives in Storybook vs. what lives in Starlight?
 
-| Content Type | Storybook | Starlight | Rationale |
-|---|---|---|---|
-| **Interactive component demos** | Primary | Embedded via iframe | Storybook's controls, actions, and viewport tooling are purpose-built |
-| **Component API tables** (attributes, events, slots, CSS props) | Autodocs (from CEM) | Auto-generated reference pages (from CEM) | Both source from CEM; Storybook shows inline, Starlight shows comprehensive |
-| **Visual regression testing** | Primary (Chromatic) | -- | Testing is a Storybook concern |
-| **Accessibility audit panel** | Primary (addon-a11y) | Accessibility guides (prose) | Storybook runs axe; Starlight documents the standards |
-| **Getting started guide** | -- | Primary | Prose-heavy, multi-step, audience-specific |
-| **Architecture overview** | -- | Primary | Diagrams, decision logs, system boundaries |
-| **Drupal integration guide** | Component-level TWIG examples | Comprehensive integration tutorial | Storybook shows per-component; Starlight shows end-to-end |
-| **Design token documentation** | Token addon (visual swatches) | Token architecture guide (prose + theory) | Storybook shows values; Starlight explains the system |
-| **Theming guide** | Theme switcher toolbar | Step-by-step theming tutorial | Storybook previews themes; Starlight teaches how to create them |
-| **Contributing guide** | -- | Primary | Process documentation, code standards, PR workflow |
-| **Changelog / Release notes** | -- | Primary (starlight-changelog plugin) | Starlight integrates with Git tags and npm versions |
-| **Migration guides** | -- | Primary | Version-to-version upgrade instructions |
-| **FAQ** | -- | Primary | Common questions and troubleshooting |
+| Content Type                                                    | Storybook                     | Starlight                                 | Rationale                                                                   |
+| --------------------------------------------------------------- | ----------------------------- | ----------------------------------------- | --------------------------------------------------------------------------- |
+| **Interactive component demos**                                 | Primary                       | Embedded via iframe                       | Storybook's controls, actions, and viewport tooling are purpose-built       |
+| **Component API tables** (attributes, events, slots, CSS props) | Autodocs (from CEM)           | Auto-generated reference pages (from CEM) | Both source from CEM; Storybook shows inline, Starlight shows comprehensive |
+| **Visual regression testing**                                   | Primary (Chromatic)           | --                                        | Testing is a Storybook concern                                              |
+| **Accessibility audit panel**                                   | Primary (addon-a11y)          | Accessibility guides (prose)              | Storybook runs axe; Starlight documents the standards                       |
+| **Getting started guide**                                       | --                            | Primary                                   | Prose-heavy, multi-step, audience-specific                                  |
+| **Architecture overview**                                       | --                            | Primary                                   | Diagrams, decision logs, system boundaries                                  |
+| **Drupal integration guide**                                    | Component-level TWIG examples | Comprehensive integration tutorial        | Storybook shows per-component; Starlight shows end-to-end                   |
+| **Design token documentation**                                  | Token addon (visual swatches) | Token architecture guide (prose + theory) | Storybook shows values; Starlight explains the system                       |
+| **Theming guide**                                               | Theme switcher toolbar        | Step-by-step theming tutorial             | Storybook previews themes; Starlight teaches how to create them             |
+| **Contributing guide**                                          | --                            | Primary                                   | Process documentation, code standards, PR workflow                          |
+| **Changelog / Release notes**                                   | --                            | Primary (starlight-changelog plugin)      | Starlight integrates with Git tags and npm versions                         |
+| **Migration guides**                                            | --                            | Primary                                   | Version-to-version upgrade instructions                                     |
+| **FAQ**                                                         | --                            | Primary                                   | Common questions and troubleshooting                                        |
 
 ### Single Source of Truth Principle
 
 Documentation content must not be duplicated across systems. Each piece of information has exactly one authoritative source:
 
-| Information | Source of Truth | Consumed By |
-|---|---|---|
-| Component API (attributes, events, slots, CSS) | `custom-elements.json` (CEM) | Storybook autodocs, Starlight API pages, IDE extensions |
-| Design token values | `tokens/*.tokens.json` (DTCG) | Storybook token addon, Starlight token pages, CSS output |
-| Component usage guidelines | Storybook MDX stories | Starlight embeds Storybook iframes |
-| Integration patterns | Starlight markdown pages | Referenced from Storybook via links |
-| Architecture decisions | Starlight markdown pages | Standalone |
+| Information                                    | Source of Truth               | Consumed By                                              |
+| ---------------------------------------------- | ----------------------------- | -------------------------------------------------------- |
+| Component API (attributes, events, slots, CSS) | `custom-elements.json` (CEM)  | Storybook autodocs, Starlight API pages, IDE extensions  |
+| Design token values                            | `tokens/*.tokens.json` (DTCG) | Storybook token addon, Starlight token pages, CSS output |
+| Component usage guidelines                     | Storybook MDX stories         | Starlight embeds Storybook iframes                       |
+| Integration patterns                           | Starlight markdown pages      | Referenced from Storybook via links                      |
+| Architecture decisions                         | Starlight markdown pages      | Standalone                                               |
 
 When Storybook and Starlight both need the same component demo, Starlight embeds the Storybook story via iframe rather than duplicating the demo code. When Starlight needs API data, it reads the CEM JSON directly rather than maintaining a parallel data source.
 
@@ -272,7 +272,7 @@ Each component page in `/components/` combines auto-generated API data with hand
 ### Directory Structure in the Monorepo
 
 ```
-wc-2026/
+helix/
 |
 +-- packages/
 |   +-- wc-library/                   # Component library (source of truth)
@@ -353,14 +353,20 @@ export default defineConfig({
           label: 'Component Builders',
           collapsed: true,
           items: [
-            { label: 'Creating a Component', slug: 'guides/component-builders/creating-a-component' },
+            {
+              label: 'Creating a Component',
+              slug: 'guides/component-builders/creating-a-component',
+            },
             { label: 'Reactive Properties', slug: 'guides/component-builders/reactive-properties' },
             { label: 'Event System', slug: 'guides/component-builders/event-system' },
             { label: 'Slot Composition', slug: 'guides/component-builders/slot-composition' },
             { label: 'Controllers', slug: 'guides/component-builders/controllers' },
             { label: 'Styling Guide', slug: 'guides/component-builders/styling-guide' },
             { label: 'Testing', slug: 'guides/component-builders/testing' },
-            { label: 'Accessibility Checklist', slug: 'guides/component-builders/accessibility-checklist' },
+            {
+              label: 'Accessibility Checklist',
+              slug: 'guides/component-builders/accessibility-checklist',
+            },
             { label: 'JSDoc Requirements', slug: 'guides/component-builders/jsdoc-requirements' },
             { label: 'Storybook Stories', slug: 'guides/component-builders/storybook-stories' },
           ],
@@ -487,37 +493,49 @@ const components = defineCollection({
     description: z.string(),
     modulePath: z.string(),
     category: z.enum(['atoms', 'molecules', 'organisms', 'templates']),
-    attributes: z.array(z.object({
-      name: z.string(),
-      type: z.string(),
-      default: z.string().optional(),
-      description: z.string(),
-    })),
-    properties: z.array(z.object({
-      name: z.string(),
-      type: z.string(),
-      default: z.string().optional(),
-      description: z.string(),
-      attribute: z.string().optional(),
-    })),
-    events: z.array(z.object({
-      name: z.string(),
-      type: z.string(),
-      description: z.string(),
-    })),
-    slots: z.array(z.object({
-      name: z.string(),
-      description: z.string(),
-    })),
-    cssProperties: z.array(z.object({
-      name: z.string(),
-      default: z.string().optional(),
-      description: z.string(),
-    })),
-    cssParts: z.array(z.object({
-      name: z.string(),
-      description: z.string(),
-    })),
+    attributes: z.array(
+      z.object({
+        name: z.string(),
+        type: z.string(),
+        default: z.string().optional(),
+        description: z.string(),
+      }),
+    ),
+    properties: z.array(
+      z.object({
+        name: z.string(),
+        type: z.string(),
+        default: z.string().optional(),
+        description: z.string(),
+        attribute: z.string().optional(),
+      }),
+    ),
+    events: z.array(
+      z.object({
+        name: z.string(),
+        type: z.string(),
+        description: z.string(),
+      }),
+    ),
+    slots: z.array(
+      z.object({
+        name: z.string(),
+        description: z.string(),
+      }),
+    ),
+    cssProperties: z.array(
+      z.object({
+        name: z.string(),
+        default: z.string().optional(),
+        description: z.string(),
+      }),
+    ),
+    cssParts: z.array(
+      z.object({
+        name: z.string(),
+        description: z.string(),
+      }),
+    ),
   }),
 });
 
@@ -629,11 +647,13 @@ export function cemLoader(options: CemLoaderOptions): Loader {
               name: slot.name ?? '(default)',
               description: slot.description ?? '',
             })),
-            cssProperties: (declaration.cssProperties ?? []).map((prop: Record<string, unknown>) => ({
-              name: prop.name,
-              default: prop.default,
-              description: prop.description ?? '',
-            })),
+            cssProperties: (declaration.cssProperties ?? []).map(
+              (prop: Record<string, unknown>) => ({
+                name: prop.name,
+                default: prop.default,
+                description: prop.description ?? '',
+              }),
+            ),
             cssParts: (declaration.cssParts ?? []).map((part: Record<string, unknown>) => ({
               name: part.name,
               description: part.description ?? '',
@@ -992,12 +1012,12 @@ const iframeUrl = `${baseUrl}/iframe.html?id=${story}&viewMode=${viewMode}${pane
 
 Navigation between the two systems uses consistent, predictable URL patterns:
 
-| From | To | Link Pattern |
-|---|---|---|
-| Starlight component page | Storybook story | `[Open in Storybook](/storybook/?path=/story/{story-id})` |
+| From                        | To                          | Link Pattern                                                                             |
+| --------------------------- | --------------------------- | ---------------------------------------------------------------------------------------- |
+| Starlight component page    | Storybook story             | `[Open in Storybook](/storybook/?path=/story/{story-id})`                                |
 | Storybook story description | Starlight integration guide | `[Drupal Integration Guide](https://docs.example.com/guides/drupal-teams/twig-patterns)` |
-| Storybook component docs | Starlight component page | `[Full documentation](https://docs.example.com/components/{category}/{name})` |
-| Starlight getting started | Storybook playground | `[Interactive Playground](/storybook/?path=/docs/getting-started--docs)` |
+| Storybook component docs    | Starlight component page    | `[Full documentation](https://docs.example.com/components/{category}/{name})`            |
+| Starlight getting started   | Storybook playground        | `[Interactive Playground](/storybook/?path=/docs/getting-started--docs)`                 |
 
 Links from Starlight to Storybook use relative paths (both are co-deployed under the same domain). Links from Storybook to Starlight use absolute URLs (Storybook has its own `<base>` tag behavior).
 
@@ -1088,11 +1108,11 @@ Search results display a badge indicating whether the result is from "Docs" or "
 
 ### Search Experience
 
-| User Action | Result |
-|---|---|
+| User Action                | Result                                                                                                                    |
+| -------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
 | Types "card" in search bar | Shows: Content Card (API reference), Content Card stories (Storybook), Card Grid component, "Using Cards in Drupal" guide |
-| Types "dark mode" | Shows: Dark Mode architecture guide, Theming guide, Dark mode Storybook stories |
-| Types "TWIG" | Shows: TWIG Patterns guide, per-component Drupal integration sections, SDC Wrapping guide |
+| Types "dark mode"          | Shows: Dark Mode architecture guide, Theming guide, Dark mode Storybook stories                                           |
+| Types "TWIG"               | Shows: TWIG Patterns guide, per-component Drupal integration sections, SDC Wrapping guide                                 |
 
 ### Alternative: Algolia DocSearch
 
@@ -1125,8 +1145,8 @@ Starlight supports both standard Markdown and MDX. MDX is used for documentation
 
 ```mdx
 ---
-title: "TWIG Patterns"
-description: "How to use Healthcare Design System components in Drupal TWIG templates"
+title: 'TWIG Patterns'
+description: 'How to use Healthcare Design System components in Drupal TWIG templates'
 ---
 
 import { Aside, Tabs, TabItem, Code } from '@astrojs/starlight/components';
@@ -1139,9 +1159,8 @@ This guide shows how to map Drupal content fields to Web Component attributes
 in your TWIG templates.
 
 <Aside type="tip" title="Prerequisites">
-  Before starting, ensure you have completed the
-  [Drupal Setup](/guides/drupal-teams/drupal-setup/) guide and attached the
-  `wc-library` Drupal library to your theme.
+  Before starting, ensure you have completed the [Drupal Setup](/guides/drupal-teams/drupal-setup/)
+  guide and attached the `wc-library` Drupal library to your theme.
 </Aside>
 
 ## Content Card
@@ -1156,7 +1175,7 @@ teaser view mode.
 ### TWIG Template
 
 <TwigExample file="node--article--teaser.html.twig">
-{`<wc-content-card
+  {`<wc-content-card
   heading="{{ label[0]['#title'] | default(node.label) }}"
   summary="{{ content.field_summary|render|striptags|trim }}"
   category="{{ node.field_category.entity.label }}"
@@ -1174,16 +1193,15 @@ teaser view mode.
 
 ### Field Mapping
 
-| WC Attribute | Drupal Field | TWIG Expression |
-|---|---|---|
-| `heading` | Node title | `{{ label[0]['#title'] }}` |
-| `summary` | field_summary | `{{ content.field_summary\|render\|striptags\|trim }}` |
-| `category` | field_category | `{{ node.field_category.entity.label }}` |
+| WC Attribute | Drupal Field   | TWIG Expression                                        |
+| ------------ | -------------- | ------------------------------------------------------ |
+| `heading`    | Node title     | `{{ label[0]['#title'] }}`                             |
+| `summary`    | field_summary  | `{{ content.field_summary\|render\|striptags\|trim }}` |
+| `category`   | field_category | `{{ node.field_category.entity.label }}`               |
 
 <Aside type="caution" title="String Escaping">
-  Always use Drupal's `|escape` filter or Twig auto-escaping when passing
-  user-generated content to component attributes. Web Components do not
-  sanitize attribute values.
+  Always use Drupal's `|escape` filter or Twig auto-escaping when passing user-generated content to
+  component attributes. Web Components do not sanitize attribute values.
 </Aside>
 ```
 
@@ -1198,9 +1216,10 @@ Starlight uses Expressive Code (Shiki-based) for code blocks. It provides featur
 import { LitElement, html } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 
-@customElement('wc-button')  // highlighted
-export class WcButton extends LitElement {  // highlighted
-  @property({ type: String }) variant = 'primary';  // highlighted
+@customElement('wc-button') // highlighted
+export class WcButton extends LitElement {
+  // highlighted
+  @property({ type: String }) variant = 'primary'; // highlighted
 }
 ```
 ````
@@ -1222,7 +1241,7 @@ button {
 ````markdown
 ```typescript title="wc-button.ts"
 @customElement('wc-button')
-export class WcButton extends LitElement { }
+export class WcButton extends LitElement {}
 ```
 ````
 
@@ -1307,19 +1326,18 @@ Starlight's `<Aside>` component supports custom types. We use consistent callout
 
 ```mdx
 <Aside type="tip" title="Drupal 11+">
-  This pattern requires Drupal 11 or Drupal 10.3+ with the Single Directory
-  Components (SDC) module enabled.
+  This pattern requires Drupal 11 or Drupal 10.3+ with the Single Directory Components (SDC) module
+  enabled.
 </Aside>
 
 <Aside type="caution" title="Drupal Cache">
-  When using dynamic Web Component attributes in TWIG, ensure the render array
-  includes appropriate cache contexts. Without them, Drupal's page cache will
-  serve stale component attributes.
+  When using dynamic Web Component attributes in TWIG, ensure the render array includes appropriate
+  cache contexts. Without them, Drupal's page cache will serve stale component attributes.
 </Aside>
 
 <Aside type="danger" title="Security">
-  Never pass unsanitized user input directly to Web Component attributes.
-  Use Drupal's `|escape` filter or Twig auto-escaping to prevent XSS.
+  Never pass unsanitized user input directly to Web Component attributes. Use Drupal's `|escape`
+  filter or Twig auto-escaping to prevent XSS.
 </Aside>
 ```
 
@@ -1397,13 +1415,13 @@ const versions = [
 
 ### What Gets Versioned
 
-| Content | Versioned? | Rationale |
-|---|---|---|
-| Component API reference | Yes | API changes per library version |
-| Guides (component building, Drupal, design) | Yes | Patterns may change between versions |
-| Architecture decisions | No (latest only) | ADRs are chronological, not version-specific |
-| Changelog | No (latest only) | The changelog covers all versions |
-| Contributing guide | No (latest only) | Process applies to current development |
+| Content                                     | Versioned?       | Rationale                                    |
+| ------------------------------------------- | ---------------- | -------------------------------------------- |
+| Component API reference                     | Yes              | API changes per library version              |
+| Guides (component building, Drupal, design) | Yes              | Patterns may change between versions         |
+| Architecture decisions                      | No (latest only) | ADRs are chronological, not version-specific |
+| Changelog                                   | No (latest only) | The changelog covers all versions            |
+| Contributing guide                          | No (latest only) | Process applies to current development       |
 
 ---
 
@@ -1512,12 +1530,12 @@ jobs:
 
 ### Hosting Strategy
 
-| Option | Pros | Cons | Recommendation |
-|---|---|---|---|
-| **Cloudflare Pages** | Free for open-source, global CDN, preview deployments, Wrangler CLI | 500 builds/month on free tier | Recommended for enterprise |
-| **Vercel** | Excellent Astro support, preview deployments, analytics | Usage limits on free tier, commercial pricing | Good alternative |
-| **Netlify** | Good Astro support, preview deployments, forms | Build minutes limited on free tier | Viable |
-| **GitHub Pages** | Free, integrated with repo | No preview deployments, single branch | Not recommended |
+| Option               | Pros                                                                | Cons                                          | Recommendation             |
+| -------------------- | ------------------------------------------------------------------- | --------------------------------------------- | -------------------------- |
+| **Cloudflare Pages** | Free for open-source, global CDN, preview deployments, Wrangler CLI | 500 builds/month on free tier                 | Recommended for enterprise |
+| **Vercel**           | Excellent Astro support, preview deployments, analytics             | Usage limits on free tier, commercial pricing | Good alternative           |
+| **Netlify**          | Good Astro support, preview deployments, forms                      | Build minutes limited on free tier            | Viable                     |
+| **GitHub Pages**     | Free, integrated with repo                                          | No preview deployments, single branch         | Not recommended            |
 
 **Recommendation: Cloudflare Pages**. Cloudflare Pages provides unlimited bandwidth, a global CDN, and preview deployments for every pull request. The Wrangler CLI integrates cleanly into GitHub Actions. For an enterprise environment where the documentation site may receive significant traffic, Cloudflare's infrastructure is appropriate.
 
@@ -1566,10 +1584,7 @@ The docs app is part of the existing monorepo workspace, configured via the root
 ```json
 // root package.json
 {
-  "workspaces": [
-    "packages/*",
-    "apps/*"
-  ]
+  "workspaces": ["packages/*", "apps/*"]
 }
 ```
 
@@ -1622,70 +1637,70 @@ The docs app has a **build-time dependency** on both the library and Storybook, 
 
 ### Phase 1: Foundation (Week 1)
 
-| Task | Deliverable |
-|---|---|
-| Initialize Astro/Starlight in `apps/docs/` | Working local dev server |
-| Configure sidebar navigation (audience-segmented) | All sections visible in navigation |
-| Set up custom CSS (match library branding) | Consistent visual identity |
-| Create `StorybookEmbed.astro` component | Iframe-based Storybook embedding |
-| Write Getting Started pages (overview, installation, quick start) | First usable content |
+| Task                                                              | Deliverable                        |
+| ----------------------------------------------------------------- | ---------------------------------- |
+| Initialize Astro/Starlight in `apps/docs/`                        | Working local dev server           |
+| Configure sidebar navigation (audience-segmented)                 | All sections visible in navigation |
+| Set up custom CSS (match library branding)                        | Consistent visual identity         |
+| Create `StorybookEmbed.astro` component                           | Iframe-based Storybook embedding   |
+| Write Getting Started pages (overview, installation, quick start) | First usable content               |
 
 ### Phase 2: CEM Integration (Week 2)
 
-| Task | Deliverable |
-|---|---|
-| Build `cemLoader` content collection loader | CEM data available in Astro |
-| Build `ApiTable.astro` component | Automated API reference tables |
-| Create `generate-component-pages.ts` script | Component MDX pages generated from CEM |
-| Verify API tables match Storybook autodocs | Consistency validated |
-| Build `TwigExample.astro` component | TWIG code examples with Drupal branding |
+| Task                                        | Deliverable                             |
+| ------------------------------------------- | --------------------------------------- |
+| Build `cemLoader` content collection loader | CEM data available in Astro             |
+| Build `ApiTable.astro` component            | Automated API reference tables          |
+| Create `generate-component-pages.ts` script | Component MDX pages generated from CEM  |
+| Verify API tables match Storybook autodocs  | Consistency validated                   |
+| Build `TwigExample.astro` component         | TWIG code examples with Drupal branding |
 
 ### Phase 3: Content Authoring (Weeks 3-4)
 
-| Task | Deliverable |
-|---|---|
-| Write Component Builders guide (all 10 pages) | Complete contributor documentation |
-| Write Drupal Teams guide (all 9 pages) | Complete integration documentation |
-| Write Designers guide (all 8 pages) | Complete design system documentation |
-| Write Architecture section (overview + initial ADRs) | Architecture documentation |
-| Create Contributing guide (code of conduct, PR guide, release process) | Contribution documentation |
+| Task                                                                   | Deliverable                          |
+| ---------------------------------------------------------------------- | ------------------------------------ |
+| Write Component Builders guide (all 10 pages)                          | Complete contributor documentation   |
+| Write Drupal Teams guide (all 9 pages)                                 | Complete integration documentation   |
+| Write Designers guide (all 8 pages)                                    | Complete design system documentation |
+| Write Architecture section (overview + initial ADRs)                   | Architecture documentation           |
+| Create Contributing guide (code of conduct, PR guide, release process) | Contribution documentation           |
 
 ### Phase 4: Search & Deploy (Week 5)
 
-| Task | Deliverable |
-|---|---|
+| Task                                                   | Deliverable                        |
+| ------------------------------------------------------ | ---------------------------------- |
 | Configure Pagefind cross-site search (Storybook merge) | Unified search across both systems |
-| Set up CI pipeline (GitHub Actions) | Automated builds on push/PR |
-| Configure Cloudflare Pages deployment | Production deployment working |
-| Set up preview deployments for PRs | PR review workflow |
-| Set up version selector (initial version) | Version navigation |
+| Set up CI pipeline (GitHub Actions)                    | Automated builds on push/PR        |
+| Configure Cloudflare Pages deployment                  | Production deployment working      |
+| Set up preview deployments for PRs                     | PR review workflow                 |
+| Set up version selector (initial version)              | Version navigation                 |
 
 ### Phase 5: Polish (Week 6)
 
-| Task | Deliverable |
-|---|---|
-| Full accessibility audit of documentation site | WCAG 2.1 AA compliance |
-| Performance audit (Lighthouse, Core Web Vitals) | Performance baseline established |
-| Cross-browser testing of embedded Storybook iframes | Embed reliability verified |
-| Token documentation pages (colors, spacing, typography) | Token reference complete |
-| Changelog integration (starlight-changelog plugin) | Release notes automated |
+| Task                                                    | Deliverable                      |
+| ------------------------------------------------------- | -------------------------------- |
+| Full accessibility audit of documentation site          | WCAG 2.1 AA compliance           |
+| Performance audit (Lighthouse, Core Web Vitals)         | Performance baseline established |
+| Cross-browser testing of embedded Storybook iframes     | Embed reliability verified       |
+| Token documentation pages (colors, spacing, typography) | Token reference complete         |
+| Changelog integration (starlight-changelog plugin)      | Release notes automated          |
 
 ---
 
 ## 14. Technology Decision Log
 
-| Decision | Choice | Alternatives Considered | Rationale |
-|---|---|---|---|
-| **Documentation framework** | Astro/Starlight | Docusaurus, VitePress, 11ty | Zero framework lock-in; native Web Component support; Pagefind built-in; Lit components render natively; enterprise adoption (Cloudflare, Google, Microsoft) |
-| **Search engine** | Pagefind (built-in) | Algolia DocSearch, Meilisearch, Typesense | Zero external dependency; static index; no API keys; supports multi-site merge for Storybook integration; free |
-| **Content format** | MDX (Markdown + components) | Markdown only, Markdoc | MDX enables embedding Astro components (StorybookEmbed, ApiTable) directly in documentation; Starlight supports both |
-| **Code highlighting** | Expressive Code (Shiki) | Prism, highlight.js | Shiki provides VS Code-quality highlighting; Expressive Code adds line markers, diff highlighting, file names; built into Starlight |
-| **CEM integration** | Custom Astro content loader | Manual documentation, 11ty plugin, api-viewer-element | Content Layer API (Astro 5) provides Zod-validated typed data; same CEM feeds both Storybook and Starlight; no duplication |
-| **Storybook integration** | iframe embeds + cross-linking | Duplicate demos, screenshots, no integration | iframes provide live, interactive demos without duplicating story code; Storybook controls work inside the embed |
-| **Cross-site search** | Pagefind `mergeIndex` | Separate search per site, Algolia multi-index | Single search bar returns results from both docs and Storybook; zero-config; no external service |
-| **Hosting** | Cloudflare Pages | Vercel, Netlify, GitHub Pages | Unlimited bandwidth, global CDN, preview deployments, Wrangler CLI, free for projects |
-| **Versioning** | URL-based with branch snapshots | Docusaurus-style built-in, starlight-versions plugin | Simple, explicit, works with any CI/CD; no plugin dependency; enterprise teams understand branch-based snapshots |
-| **TWIG highlighting** | Shiki `twig` grammar | Prism twig, highlight.js | Shiki supports TWIG via TextMate grammar; consistent with Expressive Code; accurate syntax highlighting |
+| Decision                    | Choice                          | Alternatives Considered                               | Rationale                                                                                                                                                    |
+| --------------------------- | ------------------------------- | ----------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Documentation framework** | Astro/Starlight                 | Docusaurus, VitePress, 11ty                           | Zero framework lock-in; native Web Component support; Pagefind built-in; Lit components render natively; enterprise adoption (Cloudflare, Google, Microsoft) |
+| **Search engine**           | Pagefind (built-in)             | Algolia DocSearch, Meilisearch, Typesense             | Zero external dependency; static index; no API keys; supports multi-site merge for Storybook integration; free                                               |
+| **Content format**          | MDX (Markdown + components)     | Markdown only, Markdoc                                | MDX enables embedding Astro components (StorybookEmbed, ApiTable) directly in documentation; Starlight supports both                                         |
+| **Code highlighting**       | Expressive Code (Shiki)         | Prism, highlight.js                                   | Shiki provides VS Code-quality highlighting; Expressive Code adds line markers, diff highlighting, file names; built into Starlight                          |
+| **CEM integration**         | Custom Astro content loader     | Manual documentation, 11ty plugin, api-viewer-element | Content Layer API (Astro 5) provides Zod-validated typed data; same CEM feeds both Storybook and Starlight; no duplication                                   |
+| **Storybook integration**   | iframe embeds + cross-linking   | Duplicate demos, screenshots, no integration          | iframes provide live, interactive demos without duplicating story code; Storybook controls work inside the embed                                             |
+| **Cross-site search**       | Pagefind `mergeIndex`           | Separate search per site, Algolia multi-index         | Single search bar returns results from both docs and Storybook; zero-config; no external service                                                             |
+| **Hosting**                 | Cloudflare Pages                | Vercel, Netlify, GitHub Pages                         | Unlimited bandwidth, global CDN, preview deployments, Wrangler CLI, free for projects                                                                        |
+| **Versioning**              | URL-based with branch snapshots | Docusaurus-style built-in, starlight-versions plugin  | Simple, explicit, works with any CI/CD; no plugin dependency; enterprise teams understand branch-based snapshots                                             |
+| **TWIG highlighting**       | Shiki `twig` grammar            | Prism twig, highlight.js                              | Shiki supports TWIG via TextMate grammar; consistent with Expressive Code; accurate syntax highlighting                                                      |
 
 ---
 
@@ -1694,7 +1709,7 @@ The docs app has a **build-time dependency** on both the library and Storybook, 
 With the documentation hub added, the complete monorepo structure:
 
 ```
-wc-2026/
+helix/
 |
 +-- turbo.json
 +-- package.json
@@ -1750,6 +1765,7 @@ wc-2026/
 This architecture was informed by the following sources, accessed February 2026:
 
 **Astro & Starlight:**
+
 - [Starlight Documentation](https://starlight.astro.build/)
 - [Starlight 0.32 Release -- Route Data Middleware, Multisite Search](https://astro.build/blog/starlight-032/)
 - [Astro 5 Content Collections](https://docs.astro.build/en/guides/content-collections/)
@@ -1759,39 +1775,46 @@ This architecture was informed by the following sources, accessed February 2026:
 - [Starlight GitHub Repository](https://github.com/withastro/starlight)
 
 **Framework Comparison:**
+
 - [Starlight vs. Docusaurus for Building Documentation (LogRocket)](https://blog.logrocket.com/starlight-vs-docusaurus-building-documentation/)
 - [Comparing Docusaurus and Starlight (Distr)](https://distr.sh/blog/distr-docs/)
 - [Choosing the Perfect Documentation Site (Movin Silva)](https://medium.com/@movin_silva/choosing-the-perfect-documentation-site-caf86a9a9e30)
 
 **Search:**
+
 - [Starlight Site Search Documentation](https://starlight.astro.build/guides/site-search/)
 - [Pagefind Multi-Site Search Documentation](https://pagefind.app/docs/multisite/)
 - [Hooking Up Search Results from Starlight in Other Sites (macwright.com)](https://macwright.com/2024/04/03/starlight-search-everywhere)
 - [Starlight Configuration Reference -- Pagefind](https://starlight.astro.build/reference/configuration/)
 
 **Custom Elements Manifest:**
+
 - [Custom Elements Manifest Specification](https://github.com/webcomponents/custom-elements-manifest)
 - [The Killer Feature of Web Components (Dave Rupert, 2025)](https://daverupert.com/2025/10/custom-elements-manifest-killer-feature)
 - [CEM Analyzer Getting Started](https://custom-elements-manifest.open-wc.org/analyzer/getting-started/)
 - [API Viewer Element (Open WC)](https://github.com/open-wc/api-viewer-element)
 
 **Storybook Integration:**
+
 - [How to Build Docs with Storybook and Astro (Frontend Weekly)](https://medium.com/front-end-weekly/how-to-build-awsm-docs-with-storybook-and-astro-07375167a6b2)
 - [Taking Starlight for a Spin: Design System Documentation (Adam Sedwick)](https://www.blind3y3design.com/writing/2024/starlight-design-system-docs/)
 - [Storybook Embed Documentation](https://storybook.js.org/docs/sharing/embed)
 - [Astro UXDS Web Components -- Storybook Showcase](https://storybook.js.org/showcase/rocketcom-astro-uxds/)
 
 **Versioning:**
+
 - [Versioned Documentation Support Discussion (Starlight #957)](https://github.com/withastro/starlight/discussions/957)
 - [Versioned Documentation with Starlight & Vercel (webpro.nl)](https://webpro.nl/scraps/versioned-docs-with-starlight-and-vercel)
 - [Starlight Versions Plugin](https://starlight-versions.vercel.app/getting-started/)
 
 **Code Highlighting:**
+
 - [Starlight Code Component Documentation](https://starlight.astro.build/components/code/)
 - [Expressive Code Documentation](https://expressive-code.com/key-features/code-component/)
 - [Shiki Languages](https://shiki.style/languages)
 
 **Content Authoring:**
+
 - [Starlight Authoring Content in Markdown](https://starlight.astro.build/guides/authoring-content/)
 - [Starlight Using Components](https://starlight.astro.build/components/using-components/)
 - [Starlight Plugins and Integrations](https://starlight.astro.build/resources/plugins/)

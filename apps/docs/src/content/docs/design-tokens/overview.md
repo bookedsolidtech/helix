@@ -1,9 +1,9 @@
 ---
 title: Design Tokens Overview
-description: Three-tier W3C DTCG-compliant design token system for WC-2026
+description: Three-tier W3C DTCG-compliant design token system for HELIX
 ---
 
-WC-2026 uses a **three-tier design token system** compliant with the [W3C Design Token Community Group (DTCG)](https://tr.designtokens.org/format/) specification. Tokens are generated using **Terrazzo** for multi-platform output.
+HELIX uses a **three-tier design token system** compliant with the [W3C Design Token Community Group (DTCG)](https://tr.designtokens.org/format/) specification. Tokens are generated using **Terrazzo** for multi-platform output.
 
 ## Three-Tier Architecture
 
@@ -25,18 +25,18 @@ WC-2026 uses a **three-tier design token system** compliant with the [W3C Design
 
 ## Token Categories
 
-| Category | Example | Purpose |
-|----------|---------|---------|
-| **Color** | `--wc-color-primary` | Brand colors, status colors, surfaces |
-| **Typography** | `--wc-font-size-lg` | Font families, sizes, weights, line heights |
-| **Spacing** | `--wc-space-md` | Padding, margins, gaps |
-| **Border** | `--wc-border-radius-md` | Border widths, radii, styles |
-| **Shadow** | `--wc-shadow-elevated` | Box shadows for elevation |
-| **Motion** | `--wc-duration-fast` | Transition durations and easing |
+| Category       | Example                 | Purpose                                     |
+| -------------- | ----------------------- | ------------------------------------------- |
+| **Color**      | `--wc-color-primary`    | Brand colors, status colors, surfaces       |
+| **Typography** | `--wc-font-size-lg`     | Font families, sizes, weights, line heights |
+| **Spacing**    | `--wc-space-md`         | Padding, margins, gaps                      |
+| **Border**     | `--wc-border-radius-md` | Border widths, radii, styles                |
+| **Shadow**     | `--wc-shadow-elevated`  | Box shadows for elevation                   |
+| **Motion**     | `--wc-duration-fast`    | Transition durations and easing             |
 
 ## Theme Support
 
-WC-2026 ships with three themes:
+HELIX ships with three themes:
 
 1. **Light** - Default theme for standard usage
 2. **Dark** - Dark mode with appropriate contrast

@@ -1,6 +1,6 @@
 ---
 title: Troubleshooting
-description: Common issues and solutions for WC-2026 Drupal integration
+description: Common issues and solutions for HELIX Drupal integration
 ---
 
 ## Common Issues
@@ -10,11 +10,13 @@ description: Common issues and solutions for WC-2026 Drupal integration
 **Symptom**: Raw HTML tags visible instead of styled components.
 
 **Causes**:
+
 1. Library not loaded - Check browser console for 404 errors
 2. JavaScript module not supported - Ensure `type="module"` on script tag
 3. Cache issue - Clear Drupal cache: `drush cr`
 
 **Solution**:
+
 ```bash
 # Clear all caches
 drush cr
@@ -65,7 +67,7 @@ Drupal.behaviors.wcInit = {
     customElements.whenDefined('wc-card').then(() => {
       // Components are ready
     });
-  }
+  },
 };
 ```
 
@@ -83,4 +85,4 @@ Content-Security-Policy: script-src 'self' https://cdn.jsdelivr.net;
 
 - Check the [Drupal Integration Guide](/pre-planning/drupal-guide/) for comprehensive documentation
 - Review the [Component API](/components/api/) for correct attribute usage
-- File an issue on [GitHub](https://github.com/himerus/wc-2026/issues)
+- File an issue on [GitHub](https://github.com/himerus/helix/issues)

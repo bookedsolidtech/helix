@@ -1,9 +1,9 @@
 ---
 title: TWIG Patterns
-description: How to use WC-2026 components in Drupal TWIG templates
+description: How to use HELIX components in Drupal TWIG templates
 ---
 
-WC-2026 components work naturally in Drupal TWIG templates. This guide covers common patterns for mapping Drupal fields to component attributes.
+HELIX components work naturally in Drupal TWIG templates. This guide covers common patterns for mapping Drupal fields to component attributes.
 
 ## Basic Usage
 
@@ -27,13 +27,13 @@ WC-2026 components work naturally in Drupal TWIG templates. This guide covers co
 
 ## Field Mapping
 
-| Drupal Field | Component Attribute | Example |
-|-------------|-------------------|---------|
-| Text (plain) | String attribute | `variant="{{ field_variant }}"` |
-| Boolean | Boolean attribute | `{% if field_featured %}featured{% endif %}` |
-| Link | href attribute | `href="{{ field_link.0.url }}"` |
-| Entity reference | Nested component | Loop with `{% for item in items %}` |
-| Image | src attribute | `src="{{ file_url(field_image.entity.uri.value) }}"` |
+| Drupal Field     | Component Attribute | Example                                              |
+| ---------------- | ------------------- | ---------------------------------------------------- |
+| Text (plain)     | String attribute    | `variant="{{ field_variant }}"`                      |
+| Boolean          | Boolean attribute   | `{% if field_featured %}featured{% endif %}`         |
+| Link             | href attribute      | `href="{{ field_link.0.url }}"`                      |
+| Entity reference | Nested component    | Loop with `{% for item in items %}`                  |
+| Image            | src attribute       | `src="{{ file_url(field_image.entity.uri.value) }}"` |
 
 ## Conditional Rendering
 

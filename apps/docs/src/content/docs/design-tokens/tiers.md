@@ -1,6 +1,6 @@
 ---
 title: Token Tiers
-description: Understanding the three-tier design token hierarchy in WC-2026
+description: Understanding the three-tier design token hierarchy in HELIX
 ---
 
 The three-tier system ensures flexibility, consistency, and maintainability across the entire component library.

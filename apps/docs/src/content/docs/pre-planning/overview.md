@@ -1,6 +1,6 @@
 ---
 title: Planning & Discovery Overview
-description: Complete build plan and documentation index for the WC-2026 healthcare web component library
+description: Complete build plan and documentation index for the HELIX healthcare web component library
 ---
 
 ## Complete Build Plan & Documentation
@@ -14,7 +14,7 @@ description: Complete build plan and documentation index for the WC-2026 healthc
 
 ## Executive Summary
 
-This build plan documents the architecture, implementation strategy, and comprehensive documentation system for **WC-2026**, an enterprise-grade Web Component library designed for healthcare organizations' public-facing content hubs. The library integrates seamlessly with Drupal CMS while maintaining complete framework independence.
+This build plan documents the architecture, implementation strategy, and comprehensive documentation system for **HELIX**, an enterprise-grade Web Component library designed for healthcare organizations' public-facing content hubs. The library integrates seamlessly with Drupal CMS while maintaining complete framework independence.
 
 ### Key Differentiators
 
@@ -80,9 +80,11 @@ This build plan consists of 6 comprehensive documents organized by domain:
 ### Core Architecture Documents
 
 #### [02. Architecture & System Design](./02-architecture-and-system-design.md)
+
 **Author**: Principal Engineer
 **Size**: ~900 lines
 **Covers**:
+
 - Overall system architecture (npm workspaces + Turborepo monorepo)
 - Latest Lit + Storybook integration patterns (2025-2026)
 - Drupal integration architecture (npm + CDN delivery)
@@ -92,6 +94,7 @@ This build plan consists of 6 comprehensive documents organized by domain:
 - Technology decision log
 
 **Key Decisions**:
+
 - Storybook 10.x with `@storybook/web-components-vite`
 - Custom Elements Manifest (CEM) as machine-readable API contract
 - Vitest 4.x with Browser Mode (Playwright provider)
@@ -99,9 +102,11 @@ This build plan consists of 6 comprehensive documents organized by domain:
 - Zero Drupal coupling (clean separation boundary)
 
 #### [03. Component Architecture & Storybook Integration](../docs/03-component-architecture-storybook-integration.md)
+
 **Author**: Senior Frontend Engineer
 **Size**: 2,183 lines
 **Covers**:
+
 - Lit 3.x component architecture patterns
 - Component library structure (40+ components)
 - Storybook story configuration and variants
@@ -112,6 +117,7 @@ This build plan consists of 6 comprehensive documents organized by domain:
 - Architecture decision records
 
 **Key Patterns**:
+
 - Reactive Controllers over mixins
 - Form-associated custom elements (ElementInternals)
 - Context Protocol for theme/i18n
@@ -119,9 +125,11 @@ This build plan consists of 6 comprehensive documents organized by domain:
 - Shadow DOM vs. Light DOM decision matrix
 
 #### [03. Design System & Token Architecture](../docs/03-design-system-token-architecture.md)
+
 **Author**: Design System Developer
 **Size**: 2,063 lines
 **Covers**:
+
 - W3C DTCG 2025.10 compliant 3-tier token system
 - Light/dark/high-contrast mode architecture
 - CSS architecture for Shadow DOM components
@@ -132,6 +140,7 @@ This build plan consists of 6 comprehensive documents organized by domain:
 - 4-phase implementation roadmap
 
 **Key Technologies**:
+
 - Terrazzo (successor to Cobalt UI) for token generation
 - OKLCH color space for perceptual consistency
 - CSS custom properties for theme switching
@@ -140,9 +149,11 @@ This build plan consists of 6 comprehensive documents organized by domain:
 ### Documentation & Integration Guides
 
 #### [04. Documentation Hub Architecture](./04-documentation-hub-architecture.md)
+
 **Author**: Principal Engineer
 **Size**: ~1,200 lines
 **Covers**:
+
 - Astro/Starlight vs. alternatives (rationale)
 - Two-system strategy (Storybook + Starlight)
 - Site information architecture (3 audience types)
@@ -154,6 +165,7 @@ This build plan consists of 6 comprehensive documents organized by domain:
 - Monorepo integration
 
 **Key Decisions**:
+
 - Astro 5.x + Starlight for documentation hub
 - Pagefind for unified cross-system search
 - CEM as single source of truth (feeds both systems)
@@ -161,14 +173,17 @@ This build plan consists of 6 comprehensive documents organized by domain:
 - Cloudflare Pages for hosting
 
 **Audience Segmentation**:
+
 - **Component Builders**: 10 guide pages
 - **Drupal Teams**: 9 guide pages
 - **Designers**: 8 guide pages
 
 #### [05. Component Building Guide](./05-component-building-guide.md)
+
 **Author**: Senior Frontend Engineer
 **Size**: 2,238 lines / ~82KB
 **Covers**:
+
 - Drupal-friendly component patterns (attributes, slots, events)
 - Data structure patterns (flat attributes, JSON handling)
 - 12 complete component specifications with TWIG examples:
@@ -188,9 +203,11 @@ This build plan consists of 6 comprehensive documents organized by domain:
 **Key Value**: Teaches component builders how to create components that minimize Drupal integration effort
 
 #### [06. Drupal Integration Guide](./06-drupal-integration-guide.md)
+
 **Author**: Design System Developer
 **Size**: ~2,100 lines
 **Covers**:
+
 - Library installation (3 methods: npm, CDN, module wrapper)
 - TWIG integration patterns (7 patterns)
 - Node templates (article teaser, article full, landing page, Layout Builder)
@@ -215,16 +232,16 @@ This build plan consists of 6 comprehensive documents organized by domain:
 
 ### Core Technologies
 
-| Technology | Version | Purpose |
-|------------|---------|---------|
-| **Lit** | 3.x | Web Component framework (5KB runtime) |
-| **TypeScript** | 5.x | Type safety, JSDoc documentation |
-| **Storybook** | 10.x | Component playground, design system |
-| **Vitest** | 4.x | Testing framework (Browser Mode) |
-| **Astro** | 5.x | Documentation site generator |
-| **Starlight** | 0.32+ | Documentation theme |
-| **Terrazzo** | Latest | Design token build tool (W3C DTCG) |
-| **npm** | 10.x | Monorepo package manager |
+| Technology     | Version | Purpose                               |
+| -------------- | ------- | ------------------------------------- |
+| **Lit**        | 3.x     | Web Component framework (5KB runtime) |
+| **TypeScript** | 5.x     | Type safety, JSDoc documentation      |
+| **Storybook**  | 10.x    | Component playground, design system   |
+| **Vitest**     | 4.x     | Testing framework (Browser Mode)      |
+| **Astro**      | 5.x     | Documentation site generator          |
+| **Starlight**  | 0.32+   | Documentation theme                   |
+| **Terrazzo**   | Latest  | Design token build tool (W3C DTCG)    |
+| **npm**        | 10.x    | Monorepo package manager              |
 
 ### Supporting Tools
 
@@ -248,7 +265,7 @@ This build plan consists of 6 comprehensive documents organized by domain:
 ### System Components
 
 ```
-wc-2026/
+helix/
 ├── packages/
 │   └── wc-library/           # Standalone Web Component library (npm package)
 │       ├── src/
@@ -321,11 +338,13 @@ Drupal libraries.yml (asset loading)
 ### Token Hierarchy
 
 **Tier 1: Primitives (Base)** - Private, not exported
+
 - Raw color palettes (OKLCH)
 - Base spacing scale (4px grid)
 - Base typography scale (Major Third 1.250)
 
 **Tier 2: Semantic (Decision)** - Public API
+
 - Surface colors (`--hds-surface-primary`, `--hds-surface-secondary`)
 - Text colors (`--hds-text-primary`, `--hds-text-secondary`)
 - Interactive colors (`--hds-interactive-primary-default`)
@@ -334,6 +353,7 @@ Drupal libraries.yml (asset loading)
 - Typography composites (`--hds-type-heading-1`, `--hds-type-body-md`)
 
 **Tier 3: Component** - Component-specific overrides
+
 - Button tokens (`--wc-button-background`, `--wc-button-text`)
 - Card tokens (`--wc-card-background`, `--wc-card-border`)
 - Three-level fallback chain: component → semantic → hardcoded
@@ -354,29 +374,33 @@ Mode switching via `data-theme` attribute + CSS custom properties (zero JavaScri
 ### Atomic Design Hierarchy
 
 **Atoms** (16 components)
+
 - Buttons, inputs, icons, badges, avatars, spinners
 
 **Molecules** (14 components)
+
 - Cards, alerts, breadcrumbs, pagination, search bars
 
 **Organisms** (11 components)
+
 - Headers, navigation, footers, sidebars, hero banners
 
 **Templates** (3 layouts)
+
 - Article layout, landing page layout, search results layout
 
 ### Example Components for Healthcare Content Hub
 
-| Component | Purpose | Drupal Mapping |
-|-----------|---------|----------------|
-| `wc-content-card` | Article teaser | `node--article--teaser.html.twig` |
-| `wc-article-header` | Article hero | `node--article--full.html.twig` (header region) |
-| `wc-media` | Image/video/audio | `field--field-media-*.html.twig` |
-| `wc-nav` | Primary navigation | `menu--main.html.twig` |
-| `wc-text-input` | Form field | `form-element.html.twig` (override) |
-| `wc-alert` | Status messages | `status-messages.html.twig` |
-| `wc-accordion` | FAQ | Paragraph type `paragraph--faq.html.twig` |
-| `wc-hero-banner` | Landing page hero | Paragraph type `paragraph--hero.html.twig` |
+| Component           | Purpose            | Drupal Mapping                                  |
+| ------------------- | ------------------ | ----------------------------------------------- |
+| `wc-content-card`   | Article teaser     | `node--article--teaser.html.twig`               |
+| `wc-article-header` | Article hero       | `node--article--full.html.twig` (header region) |
+| `wc-media`          | Image/video/audio  | `field--field-media-*.html.twig`                |
+| `wc-nav`            | Primary navigation | `menu--main.html.twig`                          |
+| `wc-text-input`     | Form field         | `form-element.html.twig` (override)             |
+| `wc-alert`          | Status messages    | `status-messages.html.twig`                     |
+| `wc-accordion`      | FAQ                | Paragraph type `paragraph--faq.html.twig`       |
+| `wc-hero-banner`    | Landing page hero  | Paragraph type `paragraph--hero.html.twig`      |
 
 ---
 
@@ -385,15 +409,18 @@ Mode switching via `data-theme` attribute + CSS custom properties (zero JavaScri
 ### Test Pyramid (Vitest 4.x)
 
 **60% Unit Tests** (Node environment)
+
 - Component logic, utilities, helpers
 - Fast execution, high coverage
 
 **30% Integration Tests** (Browser Mode - Playwright)
+
 - Component rendering, user interaction
 - Accessibility tests (`expect(el).to.be.accessible()`)
 - Real browser environment
 
 **10% E2E Tests** (Playwright)
+
 - Full user flows, cross-component interactions
 - Visual regression (Chromatic)
 
@@ -434,9 +461,11 @@ Mode switching via `data-theme` attribute + CSS custom properties (zero JavaScri
 ### Dual System Approach
 
 #### Storybook = Design System
+
 **URL**: `/storybook/`
 **Purpose**: Interactive component playground
 **Features**:
+
 - Live component demos with controls
 - Visual regression testing
 - Accessibility testing (addon-a11y)
@@ -446,9 +475,11 @@ Mode switching via `data-theme` attribute + CSS custom properties (zero JavaScri
 **Primary Audience**: Designers, component builders, QA
 
 #### Starlight = Documentation Hub
+
 **URL**: `/` (root)
 **Purpose**: Comprehensive guides and tutorials
 **Features**:
+
 - Getting started guides
 - Architecture documentation
 - Component Building Guide
@@ -473,6 +504,7 @@ Mode switching via `data-theme` attribute + CSS custom properties (zero JavaScri
 ### Phase 1: Foundation (Weeks 1-2)
 
 **Week 1**: Project scaffolding
+
 - [x] npm workspaces + Turborepo monorepo setup
 - [x] TypeScript configuration (strict mode)
 - [x] Lit library package structure
@@ -481,6 +513,7 @@ Mode switching via `data-theme` attribute + CSS custom properties (zero JavaScri
 - [ ] CI/CD pipeline setup (GitHub Actions)
 
 **Week 2**: Design token system
+
 - [ ] Terrazzo configuration
 - [ ] 3-tier token JSON definitions (light/dark/high-contrast)
 - [ ] Token build pipeline
@@ -490,21 +523,25 @@ Mode switching via `data-theme` attribute + CSS custom properties (zero JavaScri
 ### Phase 2: Core Components (Weeks 3-6)
 
 **Week 3**: Atoms
+
 - [ ] Button, Link, Badge, Icon
 - [ ] Text Input, Textarea, Checkbox, Radio
 - [ ] Avatar, Spinner, Divider
 
 **Week 4**: Molecules
+
 - [ ] Content Card, Alert, Breadcrumb
 - [ ] Pagination, Search Bar
 - [ ] Form components (Select, Radio Group)
 
 **Week 5**: Organisms
+
 - [ ] Navigation, Header, Footer
 - [ ] Hero Banner, Accordion
 - [ ] Article Header, Media Component
 
 **Week 6**: Templates
+
 - [ ] Article Layout, Landing Page Layout
 - [ ] Search Results Layout
 
@@ -530,6 +567,7 @@ Mode switching via `data-theme` attribute + CSS custom properties (zero JavaScri
 ### Phase 5: Documentation Hub (Weeks 9-10)
 
 **Week 9**: Starlight setup
+
 - [ ] Astro 5.x installation
 - [ ] Starlight configuration
 - [ ] Site information architecture
@@ -538,6 +576,7 @@ Mode switching via `data-theme` attribute + CSS custom properties (zero JavaScri
 - [ ] Pagefind search integration
 
 **Week 10**: Content authoring
+
 - [ ] Component Building Guide migration
 - [ ] Drupal Integration Guide migration
 - [ ] Getting started tutorials
@@ -548,6 +587,7 @@ Mode switching via `data-theme` attribute + CSS custom properties (zero JavaScri
 ### Phase 6: Drupal Integration & Polish (Weeks 11-12)
 
 **Week 11**: Drupal integration testing
+
 - [ ] Test Drupal site setup (Drupal 10.3+)
 - [ ] npm package integration
 - [ ] TWIG template creation for key components
@@ -556,6 +596,7 @@ Mode switching via `data-theme` attribute + CSS custom properties (zero JavaScri
 - [ ] Accessibility testing in Drupal context
 
 **Week 12**: Polish & launch prep
+
 - [ ] Final accessibility audit (screen readers)
 - [ ] Performance optimization
 - [ ] Documentation review and polish
@@ -617,28 +658,29 @@ Mode switching via `data-theme` attribute + CSS custom properties (zero JavaScri
 
 ### Technical Risks
 
-| Risk | Impact | Mitigation |
-|------|--------|------------|
-| **Storybook 10.x** | Low | Now running Storybook 10.2.8 with CSF Factories support |
-| **Drupal SSR complexity** | Low | Skip SSR initially (progressive enhancement) |
-| **Browser compatibility** | Medium | Target modern evergreen browsers (Chrome 90+, Firefox 88+, Safari 14+) |
-| **Design token tooling maturity** | Low | Terrazzo is production-ready (Cobalt UI successor) |
-| **Healthcare compliance changes** | High | Monitor WCAG 2.2/3.0 developments, build for AAA |
+| Risk                              | Impact | Mitigation                                                             |
+| --------------------------------- | ------ | ---------------------------------------------------------------------- |
+| **Storybook 10.x**                | Low    | Now running Storybook 10.2.8 with CSF Factories support                |
+| **Drupal SSR complexity**         | Low    | Skip SSR initially (progressive enhancement)                           |
+| **Browser compatibility**         | Medium | Target modern evergreen browsers (Chrome 90+, Firefox 88+, Safari 14+) |
+| **Design token tooling maturity** | Low    | Terrazzo is production-ready (Cobalt UI successor)                     |
+| **Healthcare compliance changes** | High   | Monitor WCAG 2.2/3.0 developments, build for AAA                       |
 
 ### Project Risks
 
-| Risk | Impact | Mitigation |
-|------|--------|------------|
-| **Timeline pressure** | High | Prioritize Phase 1-3, defer advanced features |
-| **Scope creep** | Medium | Lock component list to 40 components, defer others |
-| **Stakeholder alignment** | Medium | Documentation serves multiple audiences clearly |
-| **Team onboarding** | Medium | Prioritize architecture documents and getting started guides |
+| Risk                      | Impact | Mitigation                                                   |
+| ------------------------- | ------ | ------------------------------------------------------------ |
+| **Timeline pressure**     | High   | Prioritize Phase 1-3, defer advanced features                |
+| **Scope creep**           | Medium | Lock component list to 40 components, defer others           |
+| **Stakeholder alignment** | Medium | Documentation serves multiple audiences clearly              |
+| **Team onboarding**       | Medium | Prioritize architecture documents and getting started guides |
 
 ---
 
 ## Success Metrics
 
 ### Project Success
+
 - [ ] Library published to npm (v1.0.0)
 - [ ] 40+ components with 100% JSDoc coverage
 - [ ] 80%+ test coverage
@@ -651,6 +693,7 @@ Mode switching via `data-theme` attribute + CSS custom properties (zero JavaScri
 ## Resources & References
 
 ### Official Documentation
+
 - [Lit 3.x Documentation](https://lit.dev)
 - [Storybook 10.x Documentation](https://storybook.js.org)
 - [Astro 5.x Documentation](https://astro.build)
@@ -658,16 +701,19 @@ Mode switching via `data-theme` attribute + CSS custom properties (zero JavaScri
 - [Drupal 10.3+ Documentation](https://drupal.org)
 
 ### Specifications
+
 - [W3C Design Token Community Group (DTCG) Spec 2025.10](https://tr.designtokens.org/format/)
 - [WCAG 2.1 Specification](https://www.w3.org/TR/WCAG21/)
 - [Custom Elements Specification](https://html.spec.whatwg.org/multipage/custom-elements.html)
 - [Shadow DOM Specification](https://dom.spec.whatwg.org/#shadow-trees)
 
 ### Healthcare Compliance
+
 - [HHS Accessibility Mandate (May 2026)](https://www.hhs.gov/civil-rights/for-providers/compliance-enforcement/digital-accessibility/)
 - [European Accessibility Act (EAA) June 2025](https://ec.europa.eu/social/main.jsp?catId=1202)
 
 ### Build Plan Documents
+
 1. [Architecture & System Design](./02-architecture-and-system-design.md) - Principal Engineer
 2. [Component Architecture & Storybook Integration](../docs/03-component-architecture-storybook-integration.md) - Senior Frontend Engineer
 3. [Design System & Token Architecture](../docs/03-design-system-token-architecture.md) - Design System Developer
@@ -680,6 +726,7 @@ Mode switching via `data-theme` attribute + CSS custom properties (zero JavaScri
 ## Next Steps
 
 ### Immediate
+
 1. **Review all 6 documents** - familiarize with every architectural decision
 2. **Initialize Git repository** - version control for all documents
 3. **Set up npm workspace** - monorepo structure
@@ -688,6 +735,7 @@ Mode switching via `data-theme` attribute + CSS custom properties (zero JavaScri
 6. **Create first component** - `wc-button` as proof of concept
 
 ### Long-Term (Weeks 2-12)
+
 - Follow implementation roadmap (6 phases)
 - Iterate on documentation based on feedback
 - Build community around the library
@@ -704,9 +752,9 @@ Mode switching via `data-theme` attribute + CSS custom properties (zero JavaScri
 
 ## Document Change Log
 
-| Date | Version | Changes | Author |
-|------|---------|---------|--------|
-| 2026-02-13 | 1.0 | Initial comprehensive build plan created | Tech Lead Team |
+| Date       | Version | Changes                                  | Author         |
+| ---------- | ------- | ---------------------------------------- | -------------- |
+| 2026-02-13 | 1.0     | Initial comprehensive build plan created | Tech Lead Team |
 
 ---
 

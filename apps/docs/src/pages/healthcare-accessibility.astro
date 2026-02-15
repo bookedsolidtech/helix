@@ -3,7 +3,7 @@
  * Healthcare Accessibility - Full visual experience page.
  *
  * This is a standalone Astro page (not Starlight content) that provides
- * an immersive visual walkthrough of the WC-2026 accessibility compliance
+ * an immersive visual walkthrough of the HELIX accessibility compliance
  * strategy for healthcare web components.
  *
  * Sections:
@@ -11,7 +11,7 @@
  * 2. Compliance Landscape - Timeline & competitive positioning
  * 3. 4-Level Testing Strategy - Visual testing pyramid
  * 4. Component A11y Checklist - What every component guarantees
- * 5. Before/After Comparison - Typical vs WC-2026
+ * 5. Before/After Comparison - Typical vs HELIX
  * 6. WCAG Success Criteria Coverage - POUR matrix
  * 7. The Business Case - Stats & numbers
  */
@@ -37,7 +37,7 @@ const codeBadButton = `<span class="cmt">&lt;!-- Typical component library --&gt
 <span class="cmt">&lt;!-- No loading state --&gt;</span>
 <span class="cmt">&lt;!-- Color-only disabled state --&gt;</span>`;
 
-const codeGoodButton = `<span class="cmt">&lt;!-- WC-2026 component --&gt;</span>
+const codeGoodButton = `<span class="cmt">&lt;!-- HELIX component --&gt;</span>
 &lt;<span class="tag">wc-button</span>
   <span class="prop-hl">variant</span>=<span class="val">"primary"</span>
   <span class="prop-hl">type</span>=<span class="val">"submit"</span>
@@ -725,7 +725,7 @@ const codeGoodContrast = `<span class="tag">:host</span> {
   <!-- Top Navigation Bar -->
   <nav class="ha-topbar" aria-label="Page navigation">
     <div class="ha-topbar-left">
-      <a href="/" class="ha-back-link" aria-label="Back to WC-2026 Dashboard">
+      <a href="/" class="ha-back-link" aria-label="Back to HELIX Dashboard">
         <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
         Dashboard
       </a>
@@ -764,7 +764,7 @@ const codeGoodContrast = `<span class="tag">:host</span> {
 
         <p class="ha-hero-description">
           The HHS final rule mandates WCAG 2.1 Level AA compliance for all healthcare
-          organizations receiving federal funding. WC-2026 does not just meet the bar --
+          organizations receiving federal funding. HELIX does not just meet the bar --
           every component is built to <strong>exceed</strong> it, targeting WCAG 2.2 AAA
           for critical interactions. Compliance is the floor, not the ceiling.
         </p>

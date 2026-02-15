@@ -5,13 +5,19 @@ export default defineConfig({
   build: {
     lib: {
       entry: {
-        'index': resolve(__dirname, 'src/index.ts'),
+        index: resolve(__dirname, 'src/index.ts'),
         'components/hx-button/index': resolve(__dirname, 'src/components/hx-button/index.ts'),
         'components/hx-card/index': resolve(__dirname, 'src/components/hx-card/index.ts'),
-        'components/hx-text-input/index': resolve(__dirname, 'src/components/hx-text-input/index.ts'),
+        'components/hx-text-input/index': resolve(
+          __dirname,
+          'src/components/hx-text-input/index.ts',
+        ),
         'components/hx-checkbox/index': resolve(__dirname, 'src/components/hx-checkbox/index.ts'),
         'components/hx-select/index': resolve(__dirname, 'src/components/hx-select/index.ts'),
-        'components/hx-radio-group/index': resolve(__dirname, 'src/components/hx-radio-group/index.ts'),
+        'components/hx-radio-group/index': resolve(
+          __dirname,
+          'src/components/hx-radio-group/index.ts',
+        ),
         'components/hx-alert/index': resolve(__dirname, 'src/components/hx-alert/index.ts'),
         'components/hx-textarea/index': resolve(__dirname, 'src/components/hx-textarea/index.ts'),
         'components/hx-badge/index': resolve(__dirname, 'src/components/hx-badge/index.ts'),
@@ -23,8 +29,8 @@ export default defineConfig({
     },
     outDir: 'dist',
     rollupOptions: {
-      // Externalize Lit so consumers provide their own copy
-      external: [/^lit/, /^@lit/],
+      // Externalize Lit and workspace dependencies
+      external: [/^lit/, /^@lit/, /^@helix\/tokens/],
       output: {
         // Place entry points at their expected paths
         entryFileNames: '[name].js',

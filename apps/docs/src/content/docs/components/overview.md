@@ -1,9 +1,9 @@
 ---
 title: Components Overview
-description: Overview of the WC-2026 healthcare web component library
+description: Overview of the HELIX healthcare web component library
 ---
 
-The WC-2026 component library provides **40+ planned Web Components** built with Lit 3.x and TypeScript, designed for healthcare content hubs. Three components (`wc-button`, `wc-card`, `wc-text-input`) are implemented as working prototypes in Phase 0.
+The HELIX component library provides **40+ planned Web Components** built with Lit 3.x and TypeScript, designed for healthcare content hubs. Three components (`wc-button`, `wc-card`, `wc-text-input`) are implemented as working prototypes in Phase 0.
 
 ## Component Categories
 
@@ -59,12 +59,12 @@ Site navigation and wayfinding:
 
 ## Component Status
 
-| Status | Meaning |
-|--------|---------|
-| Planned | Architecture defined, not yet implemented |
-| In Development | Active implementation |
-| Beta | Feature complete, testing in progress |
-| Stable | Production ready |
+| Status         | Meaning                                   |
+| -------------- | ----------------------------------------- |
+| Planned        | Architecture defined, not yet implemented |
+| In Development | Active implementation                     |
+| Beta           | Feature complete, testing in progress     |
+| Stable         | Production ready                          |
 
 All components are currently in **Planned** status. Implementation begins in Phase 2.
 

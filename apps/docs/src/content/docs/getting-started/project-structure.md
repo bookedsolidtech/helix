@@ -1,14 +1,14 @@
 ---
 title: Project Structure
-description: Understanding the WC-2026 monorepo structure and organization
+description: Understanding the HELIX monorepo structure and organization
 ---
 
-WC-2026 is organized as a **Turborepo monorepo** with npm workspaces. This structure enables independent versioning, shared tooling, and efficient builds.
+HELIX is organized as a **Turborepo monorepo** with npm workspaces. This structure enables independent versioning, shared tooling, and efficient builds.
 
 ## Directory Layout
 
 ```
-wc-2026/
+helix/
 ├── package.json              # Root: Turborepo + npm workspaces
 ├── turbo.json                # Turborepo task configuration
 ├── tsconfig.base.json        # Shared TypeScript config
@@ -32,12 +32,12 @@ wc-2026/
 
 ## Key Configuration Files
 
-| File | Purpose |
-|------|---------|
-| `turbo.json` | Defines build tasks, dependencies, and caching |
-| `tsconfig.base.json` | Shared TypeScript strict mode settings |
-| `.nvmrc` | Pins Node.js to version 20.x |
-| `apps/docs/astro.config.mjs` | Starlight sidebar, theme, and plugins |
+| File                         | Purpose                                        |
+| ---------------------------- | ---------------------------------------------- |
+| `turbo.json`                 | Defines build tasks, dependencies, and caching |
+| `tsconfig.base.json`         | Shared TypeScript strict mode settings         |
+| `.nvmrc`                     | Pins Node.js to version 20.x                   |
+| `apps/docs/astro.config.mjs` | Starlight sidebar, theme, and plugins          |
 
 ## Turborepo Commands
 

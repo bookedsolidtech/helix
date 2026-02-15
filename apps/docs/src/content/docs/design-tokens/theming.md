@@ -1,9 +1,9 @@
 ---
 title: Theming
-description: How to apply and create themes with WC-2026 design tokens
+description: How to apply and create themes with HELIX design tokens
 ---
 
-WC-2026 supports multiple themes through the design token system. Themes are applied by swapping Alias token values while keeping Component tokens unchanged.
+HELIX supports multiple themes through the design token system. Themes are applied by swapping Alias token values while keeping Component tokens unchanged.
 
 ## Built-in Themes
 
@@ -20,7 +20,7 @@ WC-2026 supports multiple themes through the design token system. Themes are app
 ### Dark Theme
 
 ```css
-[data-theme="dark"] {
+[data-theme='dark'] {
   --wc-color-primary: var(--wc-blue-400);
   --wc-color-surface: var(--wc-gray-900);
   --wc-color-text-primary: var(--wc-gray-50);
@@ -30,7 +30,7 @@ WC-2026 supports multiple themes through the design token system. Themes are app
 ### High Contrast Theme
 
 ```css
-[data-theme="high-contrast"] {
+[data-theme='high-contrast'] {
   --wc-color-primary: var(--wc-blue-900);
   --wc-color-surface: var(--wc-white);
   --wc-color-text-primary: var(--wc-black);
@@ -42,7 +42,7 @@ WC-2026 supports multiple themes through the design token system. Themes are app
 Themes are applied via a `data-theme` attribute on the document root:
 
 ```html
-<html data-theme="dark">
+<html data-theme="dark"></html>
 ```
 
 Components automatically respond to theme changes through CSS custom property inheritance.
@@ -50,6 +50,7 @@ Components automatically respond to theme changes through CSS custom property in
 ## Healthcare Compliance
 
 The High Contrast theme meets **WCAG 2.1 AAA** requirements:
+
 - Minimum 7:1 contrast ratio for text
 - Minimum 4.5:1 contrast ratio for UI components
 - Enhanced focus indicators

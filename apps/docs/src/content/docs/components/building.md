@@ -1,13 +1,13 @@
 ---
 title: Building Components
-description: How to build new web components for the WC-2026 library
+description: How to build new web components for the HELIX library
 ---
 
-This guide covers the end-to-end process for creating production-quality Lit 3.x components for the WC-2026 library.
+This guide covers the end-to-end process for creating production-quality Lit 3.x components for the HELIX library.
 
 ## Component Template
 
-Every WC-2026 component follows this structure:
+Every HELIX component follows this structure:
 
 ```typescript
 import { LitElement, html, css } from 'lit';

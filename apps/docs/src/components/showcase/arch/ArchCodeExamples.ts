@@ -102,7 +102,7 @@ export const codeExampleButton = `&lt;<span class="tag">wc-button</span>
 export const codeLoadingSingleBundle = `<span class="cmt"># Single bundle - every component in one file</span>
 <span class="var">wc_2026</span>:
   <span class="prop-hl">js</span>:
-    <span class="str">dist/wc-2026.bundle.js</span>: <span class="val">{ minified: true }</span>
+    <span class="str">dist/helix.bundle.js</span>: <span class="val">{ minified: true }</span>
   <span class="kw">dependencies</span>:
     - <span class="attr">core/drupal</span>
     - <span class="attr">core/once</span>`;

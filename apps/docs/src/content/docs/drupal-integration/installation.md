@@ -1,6 +1,6 @@
 ---
 title: Drupal Installation
-description: How to install WC-2026 web components in your Drupal project
+description: How to install HELIX web components in your Drupal project
 ---
 
 ## Method 1: CDN (Quickest)
@@ -10,12 +10,12 @@ Add the library via CDN in your theme's `.info.yml`:
 ```yaml
 # mytheme.info.yml
 libraries:
-  - mytheme/wc-2026
+  - mytheme/helix
 
 # mytheme.libraries.yml
-wc-2026:
+helix:
   js:
-    https://cdn.jsdelivr.net/npm/@wc-2026/library@latest/dist/wc-2026.bundled.js:
+    https://cdn.jsdelivr.net/npm/@helix/library@latest/dist/helix.bundled.js:
       type: external
       attributes:
         type: module
@@ -27,14 +27,14 @@ Install via npm and include in your theme's build process:
 
 ```bash
 cd web/themes/custom/mytheme
-npm install @wc-2026/library
+npm install @helix/library
 ```
 
 Then import in your theme's JavaScript:
 
 ```javascript
 // mytheme.js
-import '@wc-2026/library';
+import '@helix/library';
 ```
 
 ## Method 3: Drupal Library (Enterprise)
@@ -46,7 +46,7 @@ Create a custom module that provides the library:
 components:
   version: 0.0.1
   js:
-    /libraries/wc-2026/dist/wc-2026.bundled.js:
+    /libraries/helix/dist/helix.bundled.js:
       type: module
       preprocess: false
   dependencies:

@@ -1,9 +1,9 @@
 ---
 title: Testing Strategy
-description: Enterprise testing approach with Vitest 4.x, Chromatic, and axe-core for WC-2026
+description: Enterprise testing approach with Vitest 4.x, Chromatic, and axe-core for HELIX
 ---
 
-WC-2026 follows a comprehensive testing strategy designed for enterprise healthcare compliance.
+HELIX follows a comprehensive testing strategy designed for enterprise healthcare compliance.
 
 ## Testing Pyramid
 
@@ -51,11 +51,11 @@ WC-2026 follows a comprehensive testing strategy designed for enterprise healthc
 
 ## Coverage Targets
 
-| Category | Target |
-|----------|--------|
-| Unit tests | >90% line coverage |
-| Accessibility | 100% axe-core pass |
+| Category          | Target                 |
+| ----------------- | ---------------------- |
+| Unit tests        | >90% line coverage     |
+| Accessibility     | 100% axe-core pass     |
 | Visual regression | All component variants |
-| Integration | Critical user flows |
+| Integration       | Critical user flows    |
 
 See the [Pre-Planning Component Architecture](/pre-planning/components/) for detailed testing patterns.

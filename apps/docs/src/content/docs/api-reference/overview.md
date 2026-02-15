@@ -1,9 +1,9 @@
 ---
 title: API Reference
-description: Complete API reference for WC-2026 web components
+description: Complete API reference for HELIX web components
 ---
 
-The WC-2026 API reference is auto-generated from the **Custom Elements Manifest** (CEM), which serves as the single source of truth for all component APIs.
+The HELIX API reference is auto-generated from the **Custom Elements Manifest** (CEM), which serves as the single source of truth for all component APIs.
 
 ## Custom Elements Manifest
 
@@ -13,15 +13,15 @@ The CEM is generated from JSDoc comments in component source code using the `@cu
 
 Each component's API reference includes:
 
-| Section | Description |
-|---------|-------------|
-| **Properties** | All `@property()` decorated fields with types and defaults |
-| **Attributes** | HTML attributes with reflection behavior |
-| **Methods** | Public methods available on the element |
-| **Events** | Custom events dispatched by the component |
-| **Slots** | Named and default slots for content projection |
-| **CSS Parts** | Shadow DOM parts exposed for external styling |
-| **CSS Properties** | CSS custom properties for theming |
+| Section            | Description                                                |
+| ------------------ | ---------------------------------------------------------- |
+| **Properties**     | All `@property()` decorated fields with types and defaults |
+| **Attributes**     | HTML attributes with reflection behavior                   |
+| **Methods**        | Public methods available on the element                    |
+| **Events**         | Custom events dispatched by the component                  |
+| **Slots**          | Named and default slots for content projection             |
+| **CSS Parts**      | Shadow DOM parts exposed for external styling              |
+| **CSS Properties** | CSS custom properties for theming                          |
 
 ## Example Entry
 

@@ -1,9 +1,9 @@
 ---
 title: Architecture Overview
-description: High-level system architecture for the WC-2026 healthcare web component library
+description: High-level system architecture for the HELIX healthcare web component library
 ---
 
-WC-2026 follows a **layered architecture** designed for enterprise healthcare organizations. The system prioritizes accessibility, performance, and Drupal CMS integration.
+HELIX follows a **layered architecture** designed for enterprise healthcare organizations. The system prioritizes accessibility, performance, and Drupal CMS integration.
 
 ## System Layers
 

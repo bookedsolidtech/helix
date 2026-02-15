@@ -1,12 +1,12 @@
 ---
 /**
- * Comparison - Visual before/after table showing WC-2026 advantages.
+ * Comparison - Visual before/after table showing HELIX advantages.
  *
  * Features:
- * - Three-column comparison grid (feature, traditional, WC-2026)
+ * - Three-column comparison grid (feature, traditional, HELIX)
  * - Color-coded cells (green checks, muted X marks, amber partial)
  * - Row hover highlight
- * - Gradient accent on WC-2026 column header
+ * - Gradient accent on HELIX column header
  * - Responsive: collapses to stacked layout on mobile with labels
  * - Scroll-reveal animation
  */
@@ -98,7 +98,7 @@ function getTypeClass(type: string): string {
   <div class="comparison-inner">
     <div class="section-header scroll-reveal">
       <span class="section-label">Comparison</span>
-      <h2 class="section-title">Traditional vs. WC-2026</h2>
+      <h2 class="section-title">Traditional vs. HELIX</h2>
       <p class="section-description">
         See how a purpose-built healthcare component library compares
         to traditional approaches.
@@ -109,7 +109,7 @@ function getTypeClass(type: string): string {
       <div class="comparison-header" role="row">
         <div class="comparison-header-cell" role="columnheader">Feature</div>
         <div class="comparison-header-cell traditional" role="columnheader">Traditional</div>
-        <div class="comparison-header-cell wc-2026" role="columnheader">WC-2026</div>
+        <div class="comparison-header-cell helix" role="columnheader">HELIX</div>
       </div>
       {rows.map((row) => (
         <div class="comparison-row" role="row">

@@ -1,6 +1,6 @@
 ---
 title: Installation
-description: How to install and set up the WC-2026 healthcare web component library
+description: How to install and set up the HELIX healthcare web component library
 ---
 
 ## Prerequisites
@@ -13,8 +13,8 @@ description: How to install and set up the WC-2026 healthcare web component libr
 
 ```bash
 # Clone the repository
-git clone https://github.com/himerus/wc-2026.git
-cd wc-2026
+git clone https://github.com/himerus/helix.git
+cd helix
 
 # Use the correct Node version
 nvm use
@@ -28,13 +28,13 @@ turbo run dev --filter=docs
 
 ## Monorepo Structure
 
-WC-2026 uses **Turborepo** with **npm workspaces** for build orchestration:
+HELIX uses **Turborepo** with **npm workspaces** for build orchestration:
 
-| Package | Description | Status |
-|---------|-------------|--------|
-| `apps/docs` | Astro/Starlight documentation hub | Active |
-| `apps/storybook` | Storybook component playground | Phase 3 |
-| `packages/wc-library` | Lit 3.x component library | Phase 2 |
+| Package               | Description                       | Status  |
+| --------------------- | --------------------------------- | ------- |
+| `apps/docs`           | Astro/Starlight documentation hub | Active  |
+| `apps/storybook`      | Storybook component playground    | Phase 3 |
+| `packages/wc-library` | Lit 3.x component library         | Phase 2 |
 
 ## Next Steps
 

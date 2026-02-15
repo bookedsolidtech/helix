@@ -1,6 +1,6 @@
 ---
-title: "ADR-002: Drupal Component Loading Strategy"
-description: "Architecture decision for how Web Components are loaded into Drupal: bundled package vs individual libraries vs smart groups"
+title: 'ADR-002: Drupal Component Loading Strategy'
+description: 'Architecture decision for how Web Components are loaded into Drupal: bundled package vs individual libraries vs smart groups'
 sidebar:
   order: 2
   badge:
@@ -15,7 +15,7 @@ sidebar:
 > **Depends On**: ADR-001 (Hybrid Property/Slot Integration Strategy)
 > **Last Reviewed**: 2026-02-13
 
-This document records the second critical architectural decision for the WC-2026 project: **how Web Component JavaScript physically loads into Drupal pages**. ADR-001 established *what data flows between components and Drupal* (hybrid slots + properties). This ADR establishes *how the browser receives the component code in the first place*. The wrong choice here creates a permanent performance tax on every page load. The right choice gives Drupal teams surgical control over their JavaScript budget.
+This document records the second critical architectural decision for the HELIX project: **how Web Component JavaScript physically loads into Drupal pages**. ADR-001 established _what data flows between components and Drupal_ (hybrid slots + properties). This ADR establishes _how the browser receives the component code in the first place_. The wrong choice here creates a permanent performance tax on every page load. The right choice gives Drupal teams surgical control over their JavaScript budget.
 
 ---
 
@@ -47,33 +47,33 @@ This decision has downstream consequences for:
 
 ## Current State: Build Output Analysis
 
-The WC-2026 library currently builds with Vite in library mode, externalizing Lit so consumers provide their own copy. The build produces a single `dist/index.js` entry point plus per-component entry points via the `exports` map in `package.json`.
+The HELIX library currently builds with Vite in library mode, externalizing Lit so consumers provide their own copy. The build produces a single `dist/index.js` entry point plus per-component entry points via the `exports` map in `package.json`.
 
 ### Measured Bundle Sizes (Current 3 Components)
 
-| Artifact | Raw Size | Gzipped | Brotli |
-|----------|----------|---------|--------|
-| `dist/index.js` (3 components, Lit externalized) | 24.1 KB | ~7.2 KB | ~6.1 KB |
+| Artifact                                         | Raw Size | Gzipped | Brotli  |
+| ------------------------------------------------ | -------- | ------- | ------- |
+| `dist/index.js` (3 components, Lit externalized) | 24.1 KB  | ~7.2 KB | ~6.1 KB |
 | Lit core (lit + lit/decorators + lit/directives) | ~16.8 KB | ~7.0 KB | ~5.8 KB |
-| `wc-button` (component + styles) | ~4.8 KB | ~1.6 KB | ~1.3 KB |
-| `wc-card` (component + styles) | ~5.2 KB | ~1.7 KB | ~1.4 KB |
-| `wc-text-input` (component + styles) | ~8.4 KB | ~2.5 KB | ~2.1 KB |
-| Design tokens CSS | ~2.1 KB | ~0.6 KB | ~0.5 KB |
+| `wc-button` (component + styles)                 | ~4.8 KB  | ~1.6 KB | ~1.3 KB |
+| `wc-card` (component + styles)                   | ~5.2 KB  | ~1.7 KB | ~1.4 KB |
+| `wc-text-input` (component + styles)             | ~8.4 KB  | ~2.5 KB | ~2.1 KB |
+| Design tokens CSS                                | ~2.1 KB  | ~0.6 KB | ~0.5 KB |
 
 ### Projected Bundle Sizes (Full 44 Components)
 
 Based on measured per-component averages and the component inventory from ADR-001:
 
-| Component Category | Count | Avg Size (Raw) | Total (Raw) | Total (Brotli) |
-|-------------------|-------|----------------|-------------|-----------------|
-| Atoms (property-driven, simple) | 14 | ~4.2 KB | ~58.8 KB | ~15.4 KB |
-| Molecules (hybrid, moderate) | 9 | ~6.5 KB | ~58.5 KB | ~16.2 KB |
-| Organisms (slot-heavy, complex) | 15 | ~8.8 KB | ~132.0 KB | ~35.6 KB |
-| Templates (slot-only, CSS-heavy) | 4 | ~5.0 KB | ~20.0 KB | ~5.4 KB |
-| Infrastructure | 2 | ~3.5 KB | ~7.0 KB | ~1.9 KB |
-| **Total (all components)** | **44** | **~6.3 KB** | **~276.3 KB** | **~74.5 KB** |
-| **+ Lit runtime** | | | **+16.8 KB** | **+5.8 KB** |
-| **Grand Total** | | | **~293.1 KB** | **~80.3 KB** |
+| Component Category               | Count  | Avg Size (Raw) | Total (Raw)   | Total (Brotli) |
+| -------------------------------- | ------ | -------------- | ------------- | -------------- |
+| Atoms (property-driven, simple)  | 14     | ~4.2 KB        | ~58.8 KB      | ~15.4 KB       |
+| Molecules (hybrid, moderate)     | 9      | ~6.5 KB        | ~58.5 KB      | ~16.2 KB       |
+| Organisms (slot-heavy, complex)  | 15     | ~8.8 KB        | ~132.0 KB     | ~35.6 KB       |
+| Templates (slot-only, CSS-heavy) | 4      | ~5.0 KB        | ~20.0 KB      | ~5.4 KB        |
+| Infrastructure                   | 2      | ~3.5 KB        | ~7.0 KB       | ~1.9 KB        |
+| **Total (all components)**       | **44** | **~6.3 KB**    | **~276.3 KB** | **~74.5 KB**   |
+| **+ Lit runtime**                |        |                | **+16.8 KB**  | **+5.8 KB**    |
+| **Grand Total**                  |        |                | **~293.1 KB** | **~80.3 KB**   |
 
 The Lit runtime (~16.8 KB raw, ~5.8 KB Brotli) loads exactly once regardless of how many components are used. It is a shared dependency, not duplicated per component. This fact is critical to the loading strategy analysis.
 
@@ -92,9 +92,9 @@ wc_2026:
   version: VERSION
   css:
     theme:
-      vendor/wc-2026/tokens.css: { minified: true }
+      vendor/helix/tokens.css: { minified: true }
   js:
-    vendor/wc-2026/index.js:
+    vendor/helix/index.js:
       type: module
       minified: true
       preprocess: false
@@ -116,35 +116,35 @@ The simplest possible integration. One library definition, one `attach_library()
 
 ### Performance Profile
 
-| Metric | Impact | Notes |
-|--------|--------|-------|
-| **First page load** | ~80 KB Brotli (all components + Lit) | Every visitor downloads all 44 components |
-| **Parse + compile time** | ~45-65ms on mid-range mobile | V8 compiles all 44 `customElements.define()` calls |
-| **Registration cost** | 44 x `customElements.define()` | Each call modifies the global registry; ~0.3-0.5ms per call on mobile |
-| **Subsequent pages** | 0 KB (browser-cached) | Same URL, same cache entry |
-| **Cache invalidation** | Monolithic | ANY component change invalidates the ENTIRE cached bundle |
-| **TBT contribution** | ~35-55ms | All parse + registration happens in one task |
+| Metric                   | Impact                               | Notes                                                                 |
+| ------------------------ | ------------------------------------ | --------------------------------------------------------------------- |
+| **First page load**      | ~80 KB Brotli (all components + Lit) | Every visitor downloads all 44 components                             |
+| **Parse + compile time** | ~45-65ms on mid-range mobile         | V8 compiles all 44 `customElements.define()` calls                    |
+| **Registration cost**    | 44 x `customElements.define()`       | Each call modifies the global registry; ~0.3-0.5ms per call on mobile |
+| **Subsequent pages**     | 0 KB (browser-cached)                | Same URL, same cache entry                                            |
+| **Cache invalidation**   | Monolithic                           | ANY component change invalidates the ENTIRE cached bundle             |
+| **TBT contribution**     | ~35-55ms                             | All parse + registration happens in one task                          |
 
 ### Strengths
 
-| Strength | Explanation |
-|----------|-------------|
-| **Zero configuration** | One library entry, one script tag. No per-component setup. |
-| **Guaranteed availability** | Any template can use any component without worrying about library attachment. No "component not defined" errors. |
-| **Simple mental model** | Drupal developers do not need to know which components require which libraries. |
-| **No dependency management** | No need to declare inter-component dependencies (e.g., card depends on button). |
-| **Works with CDN** | One URL to cache at the edge. Simple cache key. |
+| Strength                     | Explanation                                                                                                      |
+| ---------------------------- | ---------------------------------------------------------------------------------------------------------------- |
+| **Zero configuration**       | One library entry, one script tag. No per-component setup.                                                       |
+| **Guaranteed availability**  | Any template can use any component without worrying about library attachment. No "component not defined" errors. |
+| **Simple mental model**      | Drupal developers do not need to know which components require which libraries.                                  |
+| **No dependency management** | No need to declare inter-component dependencies (e.g., card depends on button).                                  |
+| **Works with CDN**           | One URL to cache at the edge. Simple cache key.                                                                  |
 
 ### Weaknesses
 
-| Weakness | Explanation |
-|----------|-------------|
-| **Payload waste** | A page using only `<wc-button>` downloads code for 43 unused components. |
-| **Registration waste** | `customElements.define()` is called for all 44 elements. The browser allocates memory for each constructor, even for elements not present in the DOM. |
-| **Cache fragility** | Updating a single component (e.g., fixing a tooltip bug) invalidates the entire bundle cache for every visitor. |
+| Weakness                         | Explanation                                                                                                                                                         |
+| -------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Payload waste**                | A page using only `<wc-button>` downloads code for 43 unused components.                                                                                            |
+| **Registration waste**           | `customElements.define()` is called for all 44 elements. The browser allocates memory for each constructor, even for elements not present in the DOM.               |
+| **Cache fragility**              | Updating a single component (e.g., fixing a tooltip bug) invalidates the entire bundle cache for every visitor.                                                     |
 | **Violates performance budgets** | 80 KB Brotli JS on every page exceeds the <100 KB total JS budget for healthcare pages with additional Drupal JS, admin toolbar scripts, and third-party analytics. |
-| **Scaling penalty** | Every new component added to the library increases the bundle size for ALL pages, including pages that do not use the new component. |
-| **Core Web Vitals risk** | The monolithic parse task can push TBT above thresholds on low-powered devices common in healthcare waiting rooms and elder care settings. |
+| **Scaling penalty**              | Every new component added to the library increases the bundle size for ALL pages, including pages that do not use the new component.                                |
+| **Core Web Vitals risk**         | The monolithic parse task can push TBT above thresholds on low-powered devices common in healthcare waiting rooms and elder care settings.                          |
 
 ---
 
@@ -162,9 +162,9 @@ wc_2026.runtime:
   version: VERSION
   css:
     theme:
-      vendor/wc-2026/tokens.css: { minified: true }
+      vendor/helix/tokens.css: { minified: true }
   js:
-    vendor/wc-2026/lit-runtime.js:
+    vendor/helix/lit-runtime.js:
       type: module
       minified: true
       preprocess: false
@@ -173,7 +173,7 @@ wc_2026.runtime:
 wc_2026.button:
   version: VERSION
   js:
-    vendor/wc-2026/components/wc-button/index.js:
+    vendor/helix/components/wc-button/index.js:
       type: module
       minified: true
       preprocess: false
@@ -183,18 +183,18 @@ wc_2026.button:
 wc_2026.card:
   version: VERSION
   js:
-    vendor/wc-2026/components/wc-card/index.js:
+    vendor/helix/components/wc-card/index.js:
       type: module
       minified: true
       preprocess: false
   dependencies:
     - mytheme/wc_2026.runtime
-    - mytheme/wc_2026.button  # Card's actions slot often contains buttons
+    - mytheme/wc_2026.button # Card's actions slot often contains buttons
 
 wc_2026.text_input:
   version: VERSION
   js:
-    vendor/wc-2026/components/wc-text-input/index.js:
+    vendor/helix/components/wc-text-input/index.js:
       type: module
       minified: true
       preprocess: false
@@ -204,7 +204,7 @@ wc_2026.text_input:
 wc_2026.accordion:
   version: VERSION
   js:
-    vendor/wc-2026/components/wc-accordion/index.js:
+    vendor/helix/components/wc-accordion/index.js:
       type: module
       minified: true
       preprocess: false
@@ -215,7 +215,7 @@ wc_2026.accordion:
 wc_2026.accordion_item:
   version: VERSION
   js:
-    vendor/wc-2026/components/wc-accordion-item/index.js:
+    vendor/helix/components/wc-accordion-item/index.js:
       type: module
       minified: true
       preprocess: false
@@ -225,29 +225,29 @@ wc_2026.accordion_item:
 wc_2026.hero_banner:
   version: VERSION
   js:
-    vendor/wc-2026/components/wc-hero-banner/index.js:
+    vendor/helix/components/wc-hero-banner/index.js:
       type: module
       minified: true
       preprocess: false
   dependencies:
     - mytheme/wc_2026.runtime
-    - mytheme/wc_2026.button  # Hero CTA often uses wc-button
+    - mytheme/wc_2026.button # Hero CTA often uses wc-button
 
 wc_2026.modal:
   version: VERSION
   js:
-    vendor/wc-2026/components/wc-modal/index.js:
+    vendor/helix/components/wc-modal/index.js:
       type: module
       minified: true
       preprocess: false
   dependencies:
     - mytheme/wc_2026.runtime
-    - mytheme/wc_2026.button  # Modal footer actions use buttons
+    - mytheme/wc_2026.button # Modal footer actions use buttons
 
 wc_2026.nav_primary:
   version: VERSION
   js:
-    vendor/wc-2026/components/wc-nav-primary/index.js:
+    vendor/helix/components/wc-nav-primary/index.js:
       type: module
       minified: true
       preprocess: false
@@ -288,13 +288,13 @@ For content types that always use specific components, preprocess functions auto
 
 /**
  * @file
- * Theme preprocess functions for WC-2026 component library attachment.
+ * Theme preprocess functions for HELIX component library attachment.
  */
 
 /**
  * Implements hook_preprocess_node().
  *
- * Attaches WC-2026 component libraries based on content type and view mode.
+ * Attaches HELIX component libraries based on content type and view mode.
  */
 function mytheme_preprocess_node(array &$variables): void {
   $node = $variables['node'];
@@ -334,7 +334,7 @@ function mytheme_preprocess_node(array &$variables): void {
 /**
  * Implements hook_preprocess_paragraph().
  *
- * Attaches WC-2026 component libraries based on paragraph type.
+ * Attaches HELIX component libraries based on paragraph type.
  * This is how Paragraphs module integrates with per-component loading.
  */
 function mytheme_preprocess_paragraph(array &$variables): void {
@@ -369,7 +369,7 @@ function mytheme_preprocess_paragraph(array &$variables): void {
 /**
  * Implements hook_preprocess_block().
  *
- * Attaches WC-2026 component libraries for specific block types.
+ * Attaches HELIX component libraries for specific block types.
  */
 function mytheme_preprocess_block(array &$variables): void {
   $plugin_id = $variables['plugin_id'] ?? '';
@@ -391,7 +391,7 @@ function mytheme_preprocess_block(array &$variables): void {
 /**
  * Implements hook_preprocess_page().
  *
- * Attaches page-level WC-2026 component libraries (header, footer, layout).
+ * Attaches page-level HELIX component libraries (header, footer, layout).
  */
 function mytheme_preprocess_page(array &$variables): void {
   // Page-level components are always needed
@@ -403,37 +403,37 @@ function mytheme_preprocess_page(array &$variables): void {
 
 ### Performance Profile
 
-| Metric | Impact | Notes |
-|--------|--------|-------|
-| **First page load (typical)** | ~20-35 KB Brotli | Lit runtime + 3-8 components actually used |
-| **First page load (worst case)** | ~55 KB Brotli | Complex landing page with 15+ components |
-| **Parse + compile time** | ~12-25ms on mid-range mobile | Only parses components present on the page |
-| **Registration cost** | 3-8 x `customElements.define()` | Only registers what is needed |
-| **Subsequent pages** | 0-5 KB Brotli | Only new components not seen before |
-| **Cache invalidation** | Per-component | Fixing `wc-tooltip` only invalidates the tooltip cache entry |
-| **TBT contribution** | ~8-20ms | Smaller, faster parse tasks |
+| Metric                           | Impact                          | Notes                                                        |
+| -------------------------------- | ------------------------------- | ------------------------------------------------------------ |
+| **First page load (typical)**    | ~20-35 KB Brotli                | Lit runtime + 3-8 components actually used                   |
+| **First page load (worst case)** | ~55 KB Brotli                   | Complex landing page with 15+ components                     |
+| **Parse + compile time**         | ~12-25ms on mid-range mobile    | Only parses components present on the page                   |
+| **Registration cost**            | 3-8 x `customElements.define()` | Only registers what is needed                                |
+| **Subsequent pages**             | 0-5 KB Brotli                   | Only new components not seen before                          |
+| **Cache invalidation**           | Per-component                   | Fixing `wc-tooltip` only invalidates the tooltip cache entry |
+| **TBT contribution**             | ~8-20ms                         | Smaller, faster parse tasks                                  |
 
 ### Strengths
 
-| Strength | Explanation |
-|----------|-------------|
-| **Minimum viable payload** | Each page downloads only the JavaScript for components it actually renders. A simple article teaser page might load 15 KB Brotli instead of 80 KB. |
-| **Granular cache invalidation** | Updating `wc-tooltip` does not invalidate the cached `wc-button`, `wc-card`, or any other component. Visitors who already have most components cached download only the delta. |
-| **Drupal-native pattern** | This is exactly how Drupal's library system is designed to work. jQuery UI, CKEditor, Views, and every core module use per-feature library definitions with dependency chains. Drupal developers already know this pattern. |
-| **Drupal aggregation handles combining** | When Drupal's CSS/JS aggregation is enabled (standard for production), it combines the per-component files into optimized aggregates. The logical separation in `libraries.yml` does not mean 44 HTTP requests. |
-| **Dependency deduplication** | Drupal's library system automatically deduplicates. If both `wc_2026.card` and `wc_2026.modal` depend on `wc_2026.button`, the button code loads exactly once. This is resolved at the server level before HTML is rendered. |
-| **HTTP/2 multiplexing** | On HTTP/2 (standard on any modern hosting), multiple small files load in parallel over a single connection. The overhead of additional requests is negligible compared to the savings from not transferring unused code. |
-| **Scales linearly** | Adding the 45th component has zero impact on pages that do not use it. The library grows without degrading existing pages. |
+| Strength                                 | Explanation                                                                                                                                                                                                                  |
+| ---------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Minimum viable payload**               | Each page downloads only the JavaScript for components it actually renders. A simple article teaser page might load 15 KB Brotli instead of 80 KB.                                                                           |
+| **Granular cache invalidation**          | Updating `wc-tooltip` does not invalidate the cached `wc-button`, `wc-card`, or any other component. Visitors who already have most components cached download only the delta.                                               |
+| **Drupal-native pattern**                | This is exactly how Drupal's library system is designed to work. jQuery UI, CKEditor, Views, and every core module use per-feature library definitions with dependency chains. Drupal developers already know this pattern.  |
+| **Drupal aggregation handles combining** | When Drupal's CSS/JS aggregation is enabled (standard for production), it combines the per-component files into optimized aggregates. The logical separation in `libraries.yml` does not mean 44 HTTP requests.              |
+| **Dependency deduplication**             | Drupal's library system automatically deduplicates. If both `wc_2026.card` and `wc_2026.modal` depend on `wc_2026.button`, the button code loads exactly once. This is resolved at the server level before HTML is rendered. |
+| **HTTP/2 multiplexing**                  | On HTTP/2 (standard on any modern hosting), multiple small files load in parallel over a single connection. The overhead of additional requests is negligible compared to the savings from not transferring unused code.     |
+| **Scales linearly**                      | Adding the 45th component has zero impact on pages that do not use it. The library grows without degrading existing pages.                                                                                                   |
 
 ### Weaknesses
 
-| Weakness | Explanation |
-|----------|-------------|
-| **More setup per component** | Each component requires a `libraries.yml` entry with dependencies. For 44 components, that is 44 library definitions. |
-| **Preprocess boilerplate** | Content type and paragraph type mappings require PHP preprocess functions. This is standard Drupal practice but adds code that must be maintained. |
-| **Risk of missing libraries** | If a TWIG template uses `<wc-card>` without attaching `wc_2026.card`, the element renders as an empty unknown element. No JavaScript error, just silent failure. |
-| **Per-component build output required** | The Vite build must produce individual entry points per component, not just the monolithic `index.js`. Requires build configuration changes. |
-| **Dependency graph complexity** | The library dependency chain must be manually maintained. If `wc-card` starts using `wc-badge` internally, the `wc_2026.card` library must add `wc_2026.badge` as a dependency. |
+| Weakness                                | Explanation                                                                                                                                                                     |
+| --------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **More setup per component**            | Each component requires a `libraries.yml` entry with dependencies. For 44 components, that is 44 library definitions.                                                           |
+| **Preprocess boilerplate**              | Content type and paragraph type mappings require PHP preprocess functions. This is standard Drupal practice but adds code that must be maintained.                              |
+| **Risk of missing libraries**           | If a TWIG template uses `<wc-card>` without attaching `wc_2026.card`, the element renders as an empty unknown element. No JavaScript error, just silent failure.                |
+| **Per-component build output required** | The Vite build must produce individual entry points per component, not just the monolithic `index.js`. Requires build configuration changes.                                    |
+| **Dependency graph complexity**         | The library dependency chain must be manually maintained. If `wc-card` starts using `wc-badge` internally, the `wc_2026.card` library must add `wc_2026.badge` as a dependency. |
 
 ---
 
@@ -451,9 +451,9 @@ wc_2026.runtime:
   version: VERSION
   css:
     theme:
-      vendor/wc-2026/tokens.css: { minified: true }
+      vendor/helix/tokens.css: { minified: true }
   js:
-    vendor/wc-2026/lit-runtime.js:
+    vendor/helix/lit-runtime.js:
       type: module
       minified: true
       preprocess: false
@@ -465,7 +465,7 @@ wc_2026.runtime:
 wc_2026.core:
   version: VERSION
   js:
-    vendor/wc-2026/groups/core.js:
+    vendor/helix/groups/core.js:
       type: module
       minified: true
       preprocess: false
@@ -479,13 +479,13 @@ wc_2026.core:
 wc_2026.forms:
   version: VERSION
   js:
-    vendor/wc-2026/groups/forms.js:
+    vendor/helix/groups/forms.js:
       type: module
       minified: true
       preprocess: false
   dependencies:
     - mytheme/wc_2026.runtime
-    - mytheme/wc_2026.core  # Form fields use buttons, icons
+    - mytheme/wc_2026.core # Form fields use buttons, icons
 
 # ─── Group: Navigation ─── (6 components, ~18 KB Brotli)
 # Navigation and wayfinding components.
@@ -494,13 +494,13 @@ wc_2026.forms:
 wc_2026.navigation:
   version: VERSION
   js:
-    vendor/wc-2026/groups/navigation.js:
+    vendor/helix/groups/navigation.js:
       type: module
       minified: true
       preprocess: false
   dependencies:
     - mytheme/wc_2026.runtime
-    - mytheme/wc_2026.core  # Nav uses buttons, icons
+    - mytheme/wc_2026.core # Nav uses buttons, icons
 
 # ─── Group: Content ─── (9 components, ~28 KB Brotli)
 # Content display and interaction components.
@@ -510,13 +510,13 @@ wc_2026.navigation:
 wc_2026.content:
   version: VERSION
   js:
-    vendor/wc-2026/groups/content.js:
+    vendor/helix/groups/content.js:
       type: module
       minified: true
       preprocess: false
   dependencies:
     - mytheme/wc_2026.runtime
-    - mytheme/wc_2026.core  # Cards use buttons, badges
+    - mytheme/wc_2026.core # Cards use buttons, badges
 
 # ─── Group: Interactive ─── (7 components, ~20 KB Brotli)
 # Components with complex interaction patterns.
@@ -525,13 +525,13 @@ wc_2026.content:
 wc_2026.interactive:
   version: VERSION
   js:
-    vendor/wc-2026/groups/interactive.js:
+    vendor/helix/groups/interactive.js:
       type: module
       minified: true
       preprocess: false
   dependencies:
     - mytheme/wc_2026.runtime
-    - mytheme/wc_2026.core  # Modals use buttons
+    - mytheme/wc_2026.core # Modals use buttons
 
 # ─── Group: Layout ─── (5 components, ~12 KB Brotli)
 # Page-level layout containers.
@@ -540,7 +540,7 @@ wc_2026.interactive:
 wc_2026.layout:
   version: VERSION
   js:
-    vendor/wc-2026/groups/layout.js:
+    vendor/helix/groups/layout.js:
       type: module
       minified: true
       preprocess: false
@@ -553,7 +553,7 @@ wc_2026.form_complete:
   version: VERSION
   dependencies:
     - mytheme/wc_2026.forms
-    - mytheme/wc_2026.interactive  # Tabs for multi-step forms
+    - mytheme/wc_2026.interactive # Tabs for multi-step forms
     - mytheme/wc_2026.core
 ```
 
@@ -639,34 +639,34 @@ function mytheme_preprocess_paragraph(array &$variables): void {
 
 ### Performance Profile
 
-| Metric | Impact | Notes |
-|--------|--------|-------|
-| **First page load (typical)** | ~35-50 KB Brotli | Runtime + 2-3 groups (core is almost always loaded) |
-| **First page load (worst case)** | ~70 KB Brotli | Landing page with all groups |
-| **Parse + compile time** | ~20-35ms on mid-range mobile | Parses components in loaded groups |
-| **Registration cost** | 8-25 x `customElements.define()` | Registers all components in each loaded group |
-| **Subsequent pages** | 0-15 KB Brotli | Only groups not yet cached |
-| **Cache invalidation** | Per-group | Fixing `wc-tooltip` invalidates the entire `core` group |
-| **TBT contribution** | ~15-30ms | Medium parse tasks |
+| Metric                           | Impact                           | Notes                                                   |
+| -------------------------------- | -------------------------------- | ------------------------------------------------------- |
+| **First page load (typical)**    | ~35-50 KB Brotli                 | Runtime + 2-3 groups (core is almost always loaded)     |
+| **First page load (worst case)** | ~70 KB Brotli                    | Landing page with all groups                            |
+| **Parse + compile time**         | ~20-35ms on mid-range mobile     | Parses components in loaded groups                      |
+| **Registration cost**            | 8-25 x `customElements.define()` | Registers all components in each loaded group           |
+| **Subsequent pages**             | 0-15 KB Brotli                   | Only groups not yet cached                              |
+| **Cache invalidation**           | Per-group                        | Fixing `wc-tooltip` invalidates the entire `core` group |
+| **TBT contribution**             | ~15-30ms                         | Medium parse tasks                                      |
 
 ### Strengths
 
-| Strength | Explanation |
-|----------|-------------|
-| **Reduced configuration** | 6-8 group libraries instead of 44 individual libraries. Preprocess mappings are simpler. |
-| **Logical developer model** | "This page has a form, so I load the forms group" is a natural mental model. |
+| Strength                        | Explanation                                                                                                  |
+| ------------------------------- | ------------------------------------------------------------------------------------------------------------ |
+| **Reduced configuration**       | 6-8 group libraries instead of 44 individual libraries. Preprocess mappings are simpler.                     |
+| **Logical developer model**     | "This page has a form, so I load the forms group" is a natural mental model.                                 |
 | **Good HTTP/2 characteristics** | Small number of group files still benefits from multiplexing without the overhead of 44 individual requests. |
-| **Reasonable performance** | Typically loads 2-3 groups (~35-50 KB Brotli) vs the full bundle's ~80 KB. Meaningful savings. |
+| **Reasonable performance**      | Typically loads 2-3 groups (~35-50 KB Brotli) vs the full bundle's ~80 KB. Meaningful savings.               |
 
 ### Weaknesses
 
-| Weakness | Explanation |
-|----------|-------------|
-| **Intra-group waste** | Loading the `content` group for `<wc-content-card>` also loads `<wc-media-gallery>`, `<wc-table>`, and 7 other components the page may not use. |
-| **Group boundary decisions are permanent** | If a component is in the wrong group, moving it is a breaking change for every `libraries.yml` consumer. |
-| **Cache invalidation is coarser** | A bug fix in `wc-tooltip` invalidates the entire `core` group cache for all visitors. |
-| **Group composition disputes** | Where does `wc-alert` belong? Content? Interactive? Core? These debates are bikeshedding that Strategy B eliminates entirely. |
-| **Still registers unused elements** | Loading the `forms` group on a page with only `<wc-text-input>` still registers `wc-textarea`, `wc-select`, `wc-checkbox`, `wc-radio`, `wc-toggle`, and `wc-form-field`. |
+| Weakness                                   | Explanation                                                                                                                                                              |
+| ------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Intra-group waste**                      | Loading the `content` group for `<wc-content-card>` also loads `<wc-media-gallery>`, `<wc-table>`, and 7 other components the page may not use.                          |
+| **Group boundary decisions are permanent** | If a component is in the wrong group, moving it is a breaking change for every `libraries.yml` consumer.                                                                 |
+| **Cache invalidation is coarser**          | A bug fix in `wc-tooltip` invalidates the entire `core` group cache for all visitors.                                                                                    |
+| **Group composition disputes**             | Where does `wc-alert` belong? Content? Interactive? Core? These debates are bikeshedding that Strategy B eliminates entirely.                                            |
+| **Still registers unused elements**        | Loading the `forms` group on a page with only `<wc-text-input>` still registers `wc-textarea`, `wc-select`, `wc-checkbox`, `wc-radio`, `wc-toggle`, and `wc-form-field`. |
 
 ---
 
@@ -682,19 +682,19 @@ function mytheme_preprocess_paragraph(array &$variables): void {
 
 ### Matrix
 
-| Dimension | Strategy A (Bundle) | Strategy B (Per-Component) | Strategy C (Groups) | Weight |
-|-----------|:---:|:---:|:---:|:---:|
-| **1. Initial Page Load Performance** | 2 | 5 | 3 | Critical |
-| **2. Core Web Vitals Impact** | 2 | 5 | 4 | Critical |
-| **3. Cache Efficiency** | 2 | 5 | 3 | High |
-| **4. Drupal Developer Experience** | 5 | 3 | 4 | High |
-| **5. Configuration Complexity** | 5 | 2 | 4 | Medium |
-| **6. Scalability (44 -> 100+ components)** | 1 | 5 | 3 | High |
-| **7. CDN & Edge Caching** | 4 | 4 | 4 | Medium |
-| **8. Progressive Enhancement** | 2 | 4 | 3 | High |
-| **9. Drupal Aggregation Compatibility** | 5 | 5 | 5 | Medium |
-| **10. Maintenance Burden** | 5 | 3 | 4 | Medium |
-| **Weighted Score** | **2.8** | **4.3** | **3.6** | |
+| Dimension                                  | Strategy A (Bundle) | Strategy B (Per-Component) | Strategy C (Groups) |  Weight  |
+| ------------------------------------------ | :-----------------: | :------------------------: | :-----------------: | :------: |
+| **1. Initial Page Load Performance**       |          2          |             5              |          3          | Critical |
+| **2. Core Web Vitals Impact**              |          2          |             5              |          4          | Critical |
+| **3. Cache Efficiency**                    |          2          |             5              |          3          |   High   |
+| **4. Drupal Developer Experience**         |          5          |             3              |          4          |   High   |
+| **5. Configuration Complexity**            |          5          |             2              |          4          |  Medium  |
+| **6. Scalability (44 -> 100+ components)** |          1          |             5              |          3          |   High   |
+| **7. CDN & Edge Caching**                  |          4          |             4              |          4          |  Medium  |
+| **8. Progressive Enhancement**             |          2          |             4              |          3          |   High   |
+| **9. Drupal Aggregation Compatibility**    |          5          |             5              |          5          |  Medium  |
+| **10. Maintenance Burden**                 |          5          |             3              |          4          |  Medium  |
+| **Weighted Score**                         |       **2.8**       |          **4.3**           |       **3.6**       |          |
 
 ### Dimension Analysis
 
@@ -800,8 +800,8 @@ SAP's enterprise Web Component library uses per-component ES module imports. The
 
 ```javascript
 // SAP's approach: explicit per-component registration
-import "@ui5/webcomponents/dist/Button.js";
-import "@ui5/webcomponents/dist/Card.js";
+import '@ui5/webcomponents/dist/Button.js';
+import '@ui5/webcomponents/dist/Card.js';
 ```
 
 They provide bundle analysis tooling that flags unused component imports.
@@ -858,23 +858,23 @@ import '@carbon/web-components/es/components/tile/index.js';
 
 Based on healthcare site performance requirements and Core Web Vitals thresholds:
 
-| Metric | Budget | Rationale |
-|--------|--------|-----------|
-| **Total JS per page** | < 100 KB (Brotli) | Leaves room for Drupal core JS (~15 KB), admin toolbar (~8 KB), analytics (~5 KB), and other contrib module JS (~10 KB) within a ~140 KB total JS budget |
-| **WC library JS per page** | < 50 KB (Brotli) | Component library should use at most 50% of the JS budget |
-| **TBT contribution (WC library)** | < 50ms | Components must not be the primary TBT contributor |
-| **Custom element registration** | < 15ms total | Registration should complete before LCP |
-| **Lit runtime** | ~5.8 KB (Brotli) | Fixed cost, loaded once, cached indefinitely |
-| **Design tokens CSS** | ~0.5 KB (Brotli) | Fixed cost, loaded once |
-| **Per-component average** | ~1.5 KB (Brotli) | Target for individual component code |
+| Metric                            | Budget            | Rationale                                                                                                                                                |
+| --------------------------------- | ----------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Total JS per page**             | < 100 KB (Brotli) | Leaves room for Drupal core JS (~15 KB), admin toolbar (~8 KB), analytics (~5 KB), and other contrib module JS (~10 KB) within a ~140 KB total JS budget |
+| **WC library JS per page**        | < 50 KB (Brotli)  | Component library should use at most 50% of the JS budget                                                                                                |
+| **TBT contribution (WC library)** | < 50ms            | Components must not be the primary TBT contributor                                                                                                       |
+| **Custom element registration**   | < 15ms total      | Registration should complete before LCP                                                                                                                  |
+| **Lit runtime**                   | ~5.8 KB (Brotli)  | Fixed cost, loaded once, cached indefinitely                                                                                                             |
+| **Design tokens CSS**             | ~0.5 KB (Brotli)  | Fixed cost, loaded once                                                                                                                                  |
+| **Per-component average**         | ~1.5 KB (Brotli)  | Target for individual component code                                                                                                                     |
 
 ### Budget Compliance by Strategy
 
-| Strategy | Typical Page JS | Budget (< 50 KB) | Worst Case JS | Budget (< 100 KB total) |
-|----------|----------------|:-:|----------------|:-:|
-| **A: Single Bundle** | 80.3 KB | FAIL | 80.3 KB + Drupal JS | FAIL |
-| **B: Per-Component** | 14-35 KB | PASS | 55 KB | PASS |
-| **C: Groups** | 35-50 KB | BORDERLINE | 70 KB | PASS |
+| Strategy             | Typical Page JS | Budget (< 50 KB) | Worst Case JS       | Budget (< 100 KB total) |
+| -------------------- | --------------- | :--------------: | ------------------- | :---------------------: |
+| **A: Single Bundle** | 80.3 KB         |       FAIL       | 80.3 KB + Drupal JS |          FAIL           |
+| **B: Per-Component** | 14-35 KB        |       PASS       | 55 KB               |          PASS           |
+| **C: Groups**        | 35-50 KB        |    BORDERLINE    | 70 KB               |          PASS           |
 
 Strategy A fails the performance budget on every page. Strategy C passes but consumes most of the budget, leaving little room for other JavaScript. Strategy B consistently stays within budget with substantial headroom.
 
@@ -893,13 +893,13 @@ A frequently misunderstood detail: `customElements.define()` has a real cost eve
 
 ### Measured Cost Per Registration
 
-| Environment | Cost per `customElements.define()` | 44 Registrations |
-|-------------|------------------------------------|----|
-| Chrome (desktop, M2 MacBook) | ~0.08ms | ~3.5ms |
-| Chrome (Galaxy S21) | ~0.3ms | ~13ms |
-| Chrome (Galaxy A13, mid-range) | ~0.8ms | ~35ms |
-| Safari (iPhone 13) | ~0.15ms | ~6.5ms |
-| Firefox (desktop) | ~0.12ms | ~5.3ms |
+| Environment                    | Cost per `customElements.define()` | 44 Registrations |
+| ------------------------------ | ---------------------------------- | ---------------- |
+| Chrome (desktop, M2 MacBook)   | ~0.08ms                            | ~3.5ms           |
+| Chrome (Galaxy S21)            | ~0.3ms                             | ~13ms            |
+| Chrome (Galaxy A13, mid-range) | ~0.8ms                             | ~35ms            |
+| Safari (iPhone 13)             | ~0.15ms                            | ~6.5ms           |
+| Firefox (desktop)              | ~0.12ms                            | ~5.3ms           |
 
 On mid-range Android devices (common in healthcare environments -- kiosks, waiting room tablets), registering all 44 components takes ~35ms. This is a significant chunk of the 50ms TBT budget allocated to the component library. With Strategy B, registering only the 3-8 components on a typical page takes 2-7ms on the same device.
 
@@ -921,7 +921,7 @@ Drupal serves pre-built JavaScript files. There is no build step at deployment t
 2. **Aggregation** -- Drupal combines attached libraries into aggregated files
 3. **Serving** -- The browser receives the aggregated files
 
-Tree-shaking happened at WC-2026 build time (when Vite produced the per-component entry points), not at Drupal deployment time. This means:
+Tree-shaking happened at HELIX build time (when Vite produced the per-component entry points), not at Drupal deployment time. This means:
 
 - **Strategy A** ships a pre-built bundle with all 44 components. Drupal cannot remove unused components from it.
 - **Strategy B** ships individual pre-built component files. Drupal's library system acts as a manual tree-shaker -- only the declared components are included.
@@ -937,19 +937,19 @@ The historical argument for bundling ("fewer HTTP requests = faster") was valid 
 
 ### HTTP/2 Characteristics
 
-| Feature | Impact on Loading Strategy |
-|---------|---------------------------|
-| **Multiplexing** | Multiple files download in parallel over a single TCP connection. 10 small files load nearly as fast as 1 combined file of the same total size. |
-| **Header compression (HPACK)** | Repeated headers (Content-Type, Cache-Control) are compressed. The overhead of additional requests is measured in bytes, not kilobytes. |
-| **Server push** (deprecated but illustrative) | The server can proactively send resources the client will need. |
-| **Stream prioritization** | The browser can prioritize critical resources (hero, navigation) over less critical ones (footer, sidebar). |
+| Feature                                       | Impact on Loading Strategy                                                                                                                      |
+| --------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Multiplexing**                              | Multiple files download in parallel over a single TCP connection. 10 small files load nearly as fast as 1 combined file of the same total size. |
+| **Header compression (HPACK)**                | Repeated headers (Content-Type, Cache-Control) are compressed. The overhead of additional requests is measured in bytes, not kilobytes.         |
+| **Server push** (deprecated but illustrative) | The server can proactively send resources the client will need.                                                                                 |
+| **Stream prioritization**                     | The browser can prioritize critical resources (hero, navigation) over less critical ones (footer, sidebar).                                     |
 
 ### Practical Impact
 
-| Scenario | HTTP/1.1 | HTTP/2 |
-|----------|----------|--------|
+| Scenario                     | HTTP/1.1                                    | HTTP/2                                       |
+| ---------------------------- | ------------------------------------------- | -------------------------------------------- |
 | 8 component files, 3 KB each | 8 sequential requests (~800ms on 100ms RTT) | 8 parallel streams (~100-150ms on 100ms RTT) |
-| 1 bundle file, 24 KB | 1 request (~120ms on 100ms RTT) | 1 request (~120ms on 100ms RTT) |
+| 1 bundle file, 24 KB         | 1 request (~120ms on 100ms RTT)             | 1 request (~120ms on 100ms RTT)              |
 
 Under HTTP/2, the per-component approach (Strategy B) has negligible network overhead compared to the bundle approach (Strategy A). The savings from not transferring unused bytes far outweigh the minimal per-request overhead.
 
@@ -999,7 +999,7 @@ The result: a page using `wc-card`, `wc-button`, and `wc-hero-banner` might prod
 ### Strategy A: Monolithic Cache
 
 ```
-Cache Entry: /assets/js/wc-2026.abc123.js (80 KB Brotli)
+Cache Entry: /assets/js/helix.abc123.js (80 KB Brotli)
   - Cache key: Content hash of entire bundle
   - Invalidates: When ANY of 44 components changes
   - CDN TTL: 1 year (immutable, hash-versioned)
@@ -1137,18 +1137,15 @@ import { resolve } from 'path';
 import { readdirSync } from 'fs';
 
 // Dynamically discover all component entry points
-const componentDirs = readdirSync(
-  resolve(__dirname, 'src/components'),
-  { withFileTypes: true }
-)
-  .filter(dirent => dirent.isDirectory())
-  .map(dirent => dirent.name);
+const componentDirs = readdirSync(resolve(__dirname, 'src/components'), { withFileTypes: true })
+  .filter((dirent) => dirent.isDirectory())
+  .map((dirent) => dirent.name);
 
 const componentEntries = Object.fromEntries(
-  componentDirs.map(name => [
+  componentDirs.map((name) => [
     `components/${name}/index`,
     resolve(__dirname, `src/components/${name}/index.ts`),
-  ])
+  ]),
 );
 
 export default defineConfig({
@@ -1253,9 +1250,9 @@ wc_2026.runtime:
   version: VERSION
   css:
     theme:
-      vendor/wc-2026/tokens.css: { minified: true }
+      vendor/helix/tokens.css: { minified: true }
   js:
-    vendor/wc-2026/lit-runtime.js:
+    vendor/helix/lit-runtime.js:
       type: module
       minified: true
       preprocess: false
@@ -1266,7 +1263,7 @@ wc_2026.runtime:
 wc_2026.button:
   version: VERSION
   js:
-    vendor/wc-2026/components/wc-button/index.js:
+    vendor/helix/components/wc-button/index.js:
       type: module
       minified: true
       preprocess: false
@@ -1276,7 +1273,7 @@ wc_2026.button:
 wc_2026.card:
   version: VERSION
   js:
-    vendor/wc-2026/components/wc-card/index.js:
+    vendor/helix/components/wc-card/index.js:
       type: module
       minified: true
       preprocess: false
@@ -1286,7 +1283,7 @@ wc_2026.card:
 wc_2026.text_input:
   version: VERSION
   js:
-    vendor/wc-2026/components/wc-text-input/index.js:
+    vendor/helix/components/wc-text-input/index.js:
       type: module
       minified: true
       preprocess: false
@@ -1296,7 +1293,7 @@ wc_2026.text_input:
 wc_2026.icon:
   version: VERSION
   js:
-    vendor/wc-2026/components/wc-icon/index.js:
+    vendor/helix/components/wc-icon/index.js:
       type: module
       minified: true
       preprocess: false
@@ -1306,7 +1303,7 @@ wc_2026.icon:
 wc_2026.badge:
   version: VERSION
   js:
-    vendor/wc-2026/components/wc-badge/index.js:
+    vendor/helix/components/wc-badge/index.js:
       type: module
       minified: true
       preprocess: false
@@ -1316,7 +1313,7 @@ wc_2026.badge:
 wc_2026.hero_banner:
   version: VERSION
   js:
-    vendor/wc-2026/components/wc-hero-banner/index.js:
+    vendor/helix/components/wc-hero-banner/index.js:
       type: module
       minified: true
       preprocess: false
@@ -1327,7 +1324,7 @@ wc_2026.hero_banner:
 wc_2026.modal:
   version: VERSION
   js:
-    vendor/wc-2026/components/wc-modal/index.js:
+    vendor/helix/components/wc-modal/index.js:
       type: module
       minified: true
       preprocess: false
@@ -1338,7 +1335,7 @@ wc_2026.modal:
 wc_2026.accordion:
   version: VERSION
   js:
-    vendor/wc-2026/components/wc-accordion/index.js:
+    vendor/helix/components/wc-accordion/index.js:
       type: module
       minified: true
       preprocess: false
@@ -1349,7 +1346,7 @@ wc_2026.accordion:
 wc_2026.accordion_item:
   version: VERSION
   js:
-    vendor/wc-2026/components/wc-accordion-item/index.js:
+    vendor/helix/components/wc-accordion-item/index.js:
       type: module
       minified: true
       preprocess: false
@@ -1359,7 +1356,7 @@ wc_2026.accordion_item:
 wc_2026.tabs:
   version: VERSION
   js:
-    vendor/wc-2026/components/wc-tabs/index.js:
+    vendor/helix/components/wc-tabs/index.js:
       type: module
       minified: true
       preprocess: false
@@ -1370,7 +1367,7 @@ wc_2026.tabs:
 wc_2026.tab_item:
   version: VERSION
   js:
-    vendor/wc-2026/components/wc-tab-item/index.js:
+    vendor/helix/components/wc-tab-item/index.js:
       type: module
       minified: true
       preprocess: false
@@ -1406,7 +1403,7 @@ wc_2026.group_forms:
     - mytheme/wc_2026.radio
     - mytheme/wc_2026.toggle
     - mytheme/wc_2026.form_field
-    - mytheme/wc_2026.group_core  # Form fields often include buttons, icons
+    - mytheme/wc_2026.group_core # Form fields often include buttons, icons
 
 wc_2026.group_content:
   version: VERSION
@@ -1530,18 +1527,16 @@ The per-component `libraries.yml` configuration can be partially automated by re
 import { readFileSync, writeFileSync } from 'fs';
 import { resolve } from 'path';
 
-const cem = JSON.parse(
-  readFileSync(resolve('packages/wc-library/custom-elements.json'), 'utf-8')
-);
+const cem = JSON.parse(readFileSync(resolve('packages/wc-library/custom-elements.json'), 'utf-8'));
 
 const libraries = {};
 
 // Runtime library (always the same)
 libraries['wc_2026.runtime'] = {
   version: 'VERSION',
-  css: { theme: { 'vendor/wc-2026/tokens.css': { minified: true } } },
+  css: { theme: { 'vendor/helix/tokens.css': { minified: true } } },
   js: {
-    'vendor/wc-2026/lit-runtime.js': {
+    'vendor/helix/lit-runtime.js': {
       type: 'module',
       minified: true,
       preprocess: false,
@@ -1553,11 +1548,9 @@ libraries['wc_2026.runtime'] = {
 for (const module of cem.modules) {
   for (const declaration of module.declarations ?? []) {
     if (declaration.tagName) {
-      const tagName = declaration.tagName;           // e.g., 'wc-button'
+      const tagName = declaration.tagName; // e.g., 'wc-button'
       const libraryName = tagName.replace(/-/g, '_'); // e.g., 'wc_button'
-      const componentPath = module.path
-        .replace('src/', 'vendor/wc-2026/')
-        .replace('.ts', '.js');
+      const componentPath = module.path.replace('src/', 'vendor/helix/').replace('.ts', '.js');
 
       libraries[`wc_2026.${libraryName}`] = {
         version: 'VERSION',
@@ -1577,10 +1570,7 @@ for (const module of cem.modules) {
 }
 
 // Output as YAML-compatible JSON (for manual conversion to .libraries.yml)
-writeFileSync(
-  'tools/drupal/generated-libraries.json',
-  JSON.stringify(libraries, null, 2)
-);
+writeFileSync('tools/drupal/generated-libraries.json', JSON.stringify(libraries, null, 2));
 
 console.log(`Generated ${Object.keys(libraries).length} library definitions.`);
 ```
@@ -1633,13 +1623,14 @@ This script generates the base library definitions. Inter-component dependencies
 
 **Status**: Accepted
 
-**Context**: WC-2026 is a 44-component Web Component library built with Lit 3.x that must integrate with Drupal CMS as its primary consumer. ADR-001 established a hybrid property/slot integration strategy. This ADR addresses the next critical question: how the component JavaScript physically loads into Drupal pages. The library targets enterprise healthcare organizations where Core Web Vitals compliance is a legal requirement (HHS WCAG mandate, May 2026) and users frequently access sites on mid-range mobile devices in clinical settings.
+**Context**: HELIX is a 44-component Web Component library built with Lit 3.x that must integrate with Drupal CMS as its primary consumer. ADR-001 established a hybrid property/slot integration strategy. This ADR addresses the next critical question: how the component JavaScript physically loads into Drupal pages. The library targets enterprise healthcare organizations where Core Web Vitals compliance is a legal requirement (HHS WCAG mandate, May 2026) and users frequently access sites on mid-range mobile devices in clinical settings.
 
 **Decision**: Adopt per-component Drupal library definitions as the atomic loading unit, with convenience group libraries layered on top as pure dependency aggregators. Each component has its own entry in `libraries.yml` with explicit dependencies. Groups contain no JavaScript -- they are dependency lists that combine related components for common usage patterns.
 
 **Consequences**:
 
-*Positive:*
+_Positive:_
+
 - Pages load only the JavaScript for components they actually render (14-35 KB Brotli typical vs 80 KB for full bundle)
 - Cache invalidation is per-component: updating one component does not invalidate cache entries for the other 43
 - The strategy scales linearly: adding the 45th component has zero impact on pages that do not use it
@@ -1649,14 +1640,16 @@ This script generates the base library definitions. Inter-component dependencies
 - Full bundle (`wc_2026.all`) remains available for development environments
 - Aligns with how every major WC library handles loading (Shoelace, SAP UI5, Spectrum, FAST, Carbon)
 
-*Negative:*
+_Negative:_
+
 - 44 library definitions in `libraries.yml` (mitigated by CEM-based generation)
 - PHP preprocess functions required for automated library attachment (standard Drupal practice)
 - Forgotten library attachment causes silent failure (custom element renders as empty unknown element)
 - Inter-component dependency graph must be manually maintained
 - Build configuration must produce per-component entry points (requires Vite config update)
 
-*Mitigations:*
+_Mitigations:_
+
 - `libraries.yml` generator script reads the CEM and produces base definitions automatically
 - Convenience groups reduce the number of libraries Drupal developers need to remember (6 groups vs 44 components)
 - FOUC prevention CSS hides undefined elements, making forgotten library attachments visually obvious during development
@@ -1676,19 +1669,19 @@ This script generates the base library definitions. Inter-component dependencies
 
 ## Appendix A: Complete Performance Comparison Table
 
-| Metric | Strategy A (Bundle) | Strategy B (Per-Component) | Strategy C (Groups) | B+C (Recommended) |
-|--------|:---:|:---:|:---:|:---:|
-| **Typical page JS (Brotli)** | 80.3 KB | 14-35 KB | 35-50 KB | 14-35 KB |
-| **Worst case page JS (Brotli)** | 80.3 KB | 55 KB | 70 KB | 55 KB |
-| **TBT contribution (mobile)** | 35-55ms | 8-20ms | 15-30ms | 8-20ms |
-| **customElements.define() calls** | 44 | 3-8 | 8-25 | 3-8 |
-| **Registration time (Galaxy A13)** | ~35ms | ~2-7ms | ~7-20ms | ~2-7ms |
-| **Cache entries** | 1 | 46 | 8 | 46 + 6 groups |
-| **Cache hit rate (returning)** | ~60-70% | >95% | ~80-90% | >95% |
-| **Update re-download** | 80.3 KB | 1-3 KB | 12-25 KB | 1-3 KB |
-| **libraries.yml entries** | 1 | 44 | 6-8 | 44 + 6 groups |
-| **Preprocess complexity** | None | High | Medium | Medium (use groups) |
-| **Performance budget** | FAIL | PASS | BORDERLINE | PASS |
+| Metric                             | Strategy A (Bundle) | Strategy B (Per-Component) | Strategy C (Groups) |  B+C (Recommended)  |
+| ---------------------------------- | :-----------------: | :------------------------: | :-----------------: | :-----------------: |
+| **Typical page JS (Brotli)**       |       80.3 KB       |          14-35 KB          |      35-50 KB       |      14-35 KB       |
+| **Worst case page JS (Brotli)**    |       80.3 KB       |           55 KB            |        70 KB        |        55 KB        |
+| **TBT contribution (mobile)**      |       35-55ms       |           8-20ms           |       15-30ms       |       8-20ms        |
+| **customElements.define() calls**  |         44          |            3-8             |        8-25         |         3-8         |
+| **Registration time (Galaxy A13)** |        ~35ms        |           ~2-7ms           |       ~7-20ms       |       ~2-7ms        |
+| **Cache entries**                  |          1          |             46             |          8          |    46 + 6 groups    |
+| **Cache hit rate (returning)**     |       ~60-70%       |            >95%            |       ~80-90%       |        >95%         |
+| **Update re-download**             |       80.3 KB       |           1-3 KB           |      12-25 KB       |       1-3 KB        |
+| **libraries.yml entries**          |          1          |             44             |         6-8         |    44 + 6 groups    |
+| **Preprocess complexity**          |        None         |            High            |       Medium        | Medium (use groups) |
+| **Performance budget**             |        FAIL         |            PASS            |     BORDERLINE      |        PASS         |
 
 ---
 
@@ -1696,18 +1689,18 @@ This script generates the base library definitions. Inter-component dependencies
 
 How each loading strategy interacts with major Drupal contributed modules:
 
-| Drupal Module | Strategy A Impact | Strategy B Impact | Recommended Approach |
-|--------------|-------------------|-------------------|---------------------|
-| **Paragraphs** | No change needed | `hook_preprocess_paragraph()` attaches libraries per paragraph type | Use groups for complex paragraphs, individual for simple ones |
-| **Layout Builder** | No change needed | Section templates and custom blocks attach their own libraries | Attach in block template or custom block plugin |
-| **Views** | No change needed | Views row templates attach component libraries | Attach in `views-view-unformatted.html.twig` or row template |
-| **Webform** | No change needed | Form page template attaches `wc_2026.group_forms` | Group loading is appropriate for form pages |
-| **Metatag** | No impact | No impact | N/A |
-| **Media** | No impact (media goes in slots) | No impact (media goes in slots) | N/A |
-| **Search API** | No change needed | Search results template attaches needed components | Attach `wc_2026.card` in search results template |
-| **Commerce** | No change needed | Product display templates attach needed components | Attach per-component in product templates |
-| **BigPipe** | Compatible | Compatible -- libraries attached per placeholder | BigPipe streams library tags with their placeholders |
-| **Aggregation** | One file | Combines per-page into 2-4 files | Drupal handles combining automatically |
+| Drupal Module      | Strategy A Impact               | Strategy B Impact                                                   | Recommended Approach                                          |
+| ------------------ | ------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------- |
+| **Paragraphs**     | No change needed                | `hook_preprocess_paragraph()` attaches libraries per paragraph type | Use groups for complex paragraphs, individual for simple ones |
+| **Layout Builder** | No change needed                | Section templates and custom blocks attach their own libraries      | Attach in block template or custom block plugin               |
+| **Views**          | No change needed                | Views row templates attach component libraries                      | Attach in `views-view-unformatted.html.twig` or row template  |
+| **Webform**        | No change needed                | Form page template attaches `wc_2026.group_forms`                   | Group loading is appropriate for form pages                   |
+| **Metatag**        | No impact                       | No impact                                                           | N/A                                                           |
+| **Media**          | No impact (media goes in slots) | No impact (media goes in slots)                                     | N/A                                                           |
+| **Search API**     | No change needed                | Search results template attaches needed components                  | Attach `wc_2026.card` in search results template              |
+| **Commerce**       | No change needed                | Product display templates attach needed components                  | Attach per-component in product templates                     |
+| **BigPipe**        | Compatible                      | Compatible -- libraries attached per placeholder                    | BigPipe streams library tags with their placeholders          |
+| **Aggregation**    | One file                        | Combines per-page into 2-4 files                                    | Drupal handles combining automatically                        |
 
 ---
 
@@ -1732,24 +1725,28 @@ After implementing the recommended strategy, validate with:
 ## Appendix D: Quick Reference for Drupal Developers
 
 **Loading a single component:**
+
 ```twig
 {{ attach_library('mytheme/wc_2026.button') }}
 <wc-button variant="primary">Click</wc-button>
 ```
 
 **Loading a group:**
+
 ```twig
 {{ attach_library('mytheme/wc_2026.group_forms') }}
 {# All form components + core components now available #}
 ```
 
 **Loading everything (development ONLY):**
+
 ```twig
 {{ attach_library('mytheme/wc_2026.all') }}
 {# Every component available. Do NOT use in production. #}
 ```
 
 **Rule of thumb:**
+
 - Template uses 1-2 components? Attach them individually.
 - Template uses 3+ components from the same category? Attach the group.
 - Building/debugging? Use `wc_2026.all` temporarily, then switch to specific libraries before committing.

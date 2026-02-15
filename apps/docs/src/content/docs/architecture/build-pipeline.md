@@ -1,9 +1,9 @@
 ---
 title: Build Pipeline
-description: Turborepo build orchestration and CI/CD pipeline for WC-2026
+description: Turborepo build orchestration and CI/CD pipeline for HELIX
 ---
 
-The WC-2026 build pipeline uses **Turborepo** for local development and CI/CD, ensuring fast, reproducible builds.
+The HELIX build pipeline uses **Turborepo** for local development and CI/CD, ensuring fast, reproducible builds.
 
 ## Local Development
 

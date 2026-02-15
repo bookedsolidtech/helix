@@ -1,9 +1,9 @@
 ---
 title: Drupal Behaviors
-description: Using Drupal Behaviors with WC-2026 web components
+description: Using Drupal Behaviors with HELIX web components
 ---
 
-Drupal Behaviors provide lifecycle hooks for initializing JavaScript on page load, AJAX responses, and BigPipe streaming. WC-2026 components integrate cleanly with this system.
+Drupal Behaviors provide lifecycle hooks for initializing JavaScript on page load, AJAX responses, and BigPipe streaming. HELIX components integrate cleanly with this system.
 
 ## Basic Behavior
 
@@ -13,7 +13,7 @@ Drupal Behaviors provide lifecycle hooks for initializing JavaScript on page loa
 
   Drupal.behaviors.wcComponents = {
     attach(context) {
-      // Initialize any WC-2026 components in the context
+      // Initialize any HELIX components in the context
       const cards = context.querySelectorAll('wc-card:not([data-initialized])');
       cards.forEach((card) => {
         card.setAttribute('data-initialized', 'true');
@@ -39,7 +39,7 @@ Drupal Behaviors provide lifecycle hooks for initializing JavaScript on page loa
 ```javascript
 Drupal.behaviors.wcEvents = {
   attach(context) {
-    // Listen for WC-2026 custom events
+    // Listen for HELIX custom events
     context.querySelectorAll('wc-accordion').forEach((accordion) => {
       accordion.addEventListener('wc-toggle', (e) => {
         // Track analytics
@@ -57,7 +57,7 @@ Drupal.behaviors.wcEvents = {
 
 ## AJAX Integration
 
-WC-2026 components work with Drupal AJAX automatically because:
+HELIX components work with Drupal AJAX automatically because:
 
 1. Components use standard HTML tags (no framework dependency)
 2. `Drupal.behaviors.attach()` re-runs on AJAX-loaded content

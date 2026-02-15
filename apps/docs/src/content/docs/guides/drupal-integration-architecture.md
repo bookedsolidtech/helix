@@ -1,6 +1,6 @@
 ---
 title: Drupal Integration Architecture
-description: "Architecture decision record: Component control vs Drupal control strategy for the WC-2026 library"
+description: 'Architecture decision record: Component control vs Drupal control strategy for the HELIX library'
 ---
 
 > **ADR Status**: Accepted
@@ -9,13 +9,13 @@ description: "Architecture decision record: Component control vs Drupal control 
 > **Supersedes**: None
 > **Last Reviewed**: 2026-02-13
 
-This document records the single most consequential architectural decision for the WC-2026 project: **where control lives between the Web Component library and the Drupal CMS that consumes it**. Every component API, every TWIG template pattern, every testing strategy, and every future portability story flows from this decision. Getting it wrong means rewriting the library. Getting it right means the Drupal team integrates in hours instead of weeks.
+This document records the single most consequential architectural decision for the HELIX project: **where control lives between the Web Component library and the Drupal CMS that consumes it**. Every component API, every TWIG template pattern, every testing strategy, and every future portability story flows from this decision. Getting it wrong means rewriting the library. Getting it right means the Drupal team integrates in hours instead of weeks.
 
 ---
 
 ## The Fundamental Question
 
-When a Drupal site renders a page that contains WC-2026 components, two systems collaborate to produce the final HTML. The question is: **which system is authoritative over content and layout?**
+When a Drupal site renders a page that contains HELIX components, two systems collaborate to produce the final HTML. The question is: **which system is authoritative over content and layout?**
 
 ```
                     THE CONTROL SPECTRUM
@@ -59,25 +59,25 @@ The component receives scalar values and renders its own internal structure. Dru
 
 ### Strengths
 
-| Strength | Explanation |
-|----------|-------------|
-| **Rendering consistency** | The component always renders identically regardless of which CMS passes the data. No risk of Drupal themer accidentally breaking the card layout. |
-| **Portability** | The same `<wc-content-card>` works in Drupal, React, Vue, static HTML, or any other system that can set HTML attributes. |
-| **Encapsulated logic** | Date formatting, truncation, conditional rendering, responsive behavior -- all live inside the component. One source of truth. |
-| **Simpler TWIG templates** | The Drupal template is a flat attribute mapping. No complex nesting, no slot management, no wrapper divs. |
-| **Easier automated testing** | Pass properties, assert rendered output. No need to simulate slotted content from an external template engine. |
-| **Storybook parity** | Storybook stories match production exactly because both pass the same properties. |
+| Strength                     | Explanation                                                                                                                                       |
+| ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Rendering consistency**    | The component always renders identically regardless of which CMS passes the data. No risk of Drupal themer accidentally breaking the card layout. |
+| **Portability**              | The same `<wc-content-card>` works in Drupal, React, Vue, static HTML, or any other system that can set HTML attributes.                          |
+| **Encapsulated logic**       | Date formatting, truncation, conditional rendering, responsive behavior -- all live inside the component. One source of truth.                    |
+| **Simpler TWIG templates**   | The Drupal template is a flat attribute mapping. No complex nesting, no slot management, no wrapper divs.                                         |
+| **Easier automated testing** | Pass properties, assert rendered output. No need to simulate slotted content from an external template engine.                                    |
+| **Storybook parity**         | Storybook stories match production exactly because both pass the same properties.                                                                 |
 
 ### Weaknesses
 
-| Weakness | Explanation |
-|----------|-------------|
-| **Drupal module incompatibility** | Drupal's Paragraphs, Layout Builder, Media, and Views all output rendered HTML fragments. A property-driven component cannot accept those fragments -- it needs raw data extracted from them. This breaks Drupal's rendering pipeline. |
-| **Content editor blindness** | In Drupal's admin UI, editors work with fields that produce rendered HTML. If the component ignores that HTML and re-renders from scalar data, editors cannot preview what the component will look like without visiting the front end. |
-| **Attribute explosion** | Complex content (author with name, avatar, bio, and link) requires many attributes: `author-name`, `author-avatar`, `author-bio`, `author-url`. This becomes unwieldy at 15+ attributes. |
-| **Drupal field formatter bypass** | Drupal field formatters (image styles, text formats, link renderers) produce HTML. A property-driven component that takes `hero-image-src` bypasses the image style system entirely -- the TWIG template must manually extract the raw URL. |
-| **Drupal render cache invalidation** | Drupal's render cache works at the field level. Bypassing field rendering to extract raw values can break cache invalidation and lead to stale content. |
-| **JSON serialization burden** | For structured data (navigation trees, author objects, tag lists), the Drupal theme must serialize data to JSON attributes, requiring preprocess hooks or custom TWIG extensions -- work that Drupal's rendering pipeline already handles. |
+| Weakness                             | Explanation                                                                                                                                                                                                                                 |
+| ------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Drupal module incompatibility**    | Drupal's Paragraphs, Layout Builder, Media, and Views all output rendered HTML fragments. A property-driven component cannot accept those fragments -- it needs raw data extracted from them. This breaks Drupal's rendering pipeline.      |
+| **Content editor blindness**         | In Drupal's admin UI, editors work with fields that produce rendered HTML. If the component ignores that HTML and re-renders from scalar data, editors cannot preview what the component will look like without visiting the front end.     |
+| **Attribute explosion**              | Complex content (author with name, avatar, bio, and link) requires many attributes: `author-name`, `author-avatar`, `author-bio`, `author-url`. This becomes unwieldy at 15+ attributes.                                                    |
+| **Drupal field formatter bypass**    | Drupal field formatters (image styles, text formats, link renderers) produce HTML. A property-driven component that takes `hero-image-src` bypasses the image style system entirely -- the TWIG template must manually extract the raw URL. |
+| **Drupal render cache invalidation** | Drupal's render cache works at the field level. Bypassing field rendering to extract raw values can break cache invalidation and lead to stale content.                                                                                     |
+| **JSON serialization burden**        | For structured data (navigation trees, author objects, tag lists), the Drupal theme must serialize data to JSON attributes, requiring preprocess hooks or custom TWIG extensions -- work that Drupal's rendering pipeline already handles.  |
 
 ### When Strategy A Breaks Down: A Real Example
 
@@ -85,9 +85,23 @@ Consider a Drupal site using the Media module with responsive image styles. Drup
 
 ```html
 <picture>
-  <source srcset="/files/styles/hero_wide/anxiety.webp" media="(min-width: 1200px)" type="image/webp">
-  <source srcset="/files/styles/hero_medium/anxiety.webp" media="(min-width: 768px)" type="image/webp">
-  <img src="/files/styles/hero_small/anxiety.jpg" alt="Therapist with patient" loading="lazy" width="800" height="450">
+  <source
+    srcset="/files/styles/hero_wide/anxiety.webp"
+    media="(min-width: 1200px)"
+    type="image/webp"
+  />
+  <source
+    srcset="/files/styles/hero_medium/anxiety.webp"
+    media="(min-width: 768px)"
+    type="image/webp"
+  />
+  <img
+    src="/files/styles/hero_small/anxiety.jpg"
+    alt="Therapist with patient"
+    loading="lazy"
+    width="800"
+    height="450"
+  />
 </picture>
 ```
 
@@ -143,25 +157,25 @@ In this approach, the Web Component provides structural scaffolding and styling 
 
 ### Strengths
 
-| Strength | Explanation |
-|----------|-------------|
-| **Full Drupal module compatibility** | Layout Builder, Paragraphs, Media, Views, Webform -- all output HTML. Slots accept HTML. There is no impedance mismatch. |
-| **Preserves Drupal's rendering pipeline** | Field formatters, image styles, text formats, entity rendering, render caching -- all work as Drupal intends. Nothing is bypassed. |
-| **Content editor experience** | Editors see the actual rendered content in Drupal's admin because the content goes through normal field rendering. Layout Builder preview works because the slotted content is real Drupal output. |
-| **Drupal cache compatibility** | Drupal's render cache and cache tags work correctly because fields render through the standard pipeline. Cache invalidation works as expected. |
-| **Reduced attribute count** | Complex content areas (author bios, media, tag lists) are handled by slots instead of 10+ attributes. The component's attribute API stays lean. |
-| **Progressive enhancement** | Before JavaScript loads, slotted content is visible in the light DOM as plain HTML. Users see real content immediately. |
+| Strength                                  | Explanation                                                                                                                                                                                        |
+| ----------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Full Drupal module compatibility**      | Layout Builder, Paragraphs, Media, Views, Webform -- all output HTML. Slots accept HTML. There is no impedance mismatch.                                                                           |
+| **Preserves Drupal's rendering pipeline** | Field formatters, image styles, text formats, entity rendering, render caching -- all work as Drupal intends. Nothing is bypassed.                                                                 |
+| **Content editor experience**             | Editors see the actual rendered content in Drupal's admin because the content goes through normal field rendering. Layout Builder preview works because the slotted content is real Drupal output. |
+| **Drupal cache compatibility**            | Drupal's render cache and cache tags work correctly because fields render through the standard pipeline. Cache invalidation works as expected.                                                     |
+| **Reduced attribute count**               | Complex content areas (author bios, media, tag lists) are handled by slots instead of 10+ attributes. The component's attribute API stays lean.                                                    |
+| **Progressive enhancement**               | Before JavaScript loads, slotted content is visible in the light DOM as plain HTML. Users see real content immediately.                                                                            |
 
 ### Weaknesses
 
-| Weakness | Explanation |
-|----------|-------------|
-| **Less portable** | The component's rendering depends on what Drupal puts in the slots. In Storybook, you must simulate Drupal's output. In React, you must compose JSX children. The component is not self-contained. |
-| **Inconsistency risk** | Different Drupal sites (or different templates on the same site) can put different HTML structures into the same slot. The component cannot guarantee visual consistency without CSS defensive strategies. |
-| **Thinner components** | Components do less work. They are primarily CSS containers with slot projection. This can feel like the component library adds less value. |
-| **More complex TWIG templates** | Slot management requires wrapper elements (`<div slot="media">`), conditional checks for empty fields, and knowledge of which slots the component exposes. |
-| **Harder to test in isolation** | Testing requires providing realistic slotted content that mimics Drupal's output. Unit tests must compose light DOM children. |
-| **Slot naming contract** | The component and every Drupal template must agree on slot names. Renaming a slot is a breaking change across all consuming templates. |
+| Weakness                        | Explanation                                                                                                                                                                                                |
+| ------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Less portable**               | The component's rendering depends on what Drupal puts in the slots. In Storybook, you must simulate Drupal's output. In React, you must compose JSX children. The component is not self-contained.         |
+| **Inconsistency risk**          | Different Drupal sites (or different templates on the same site) can put different HTML structures into the same slot. The component cannot guarantee visual consistency without CSS defensive strategies. |
+| **Thinner components**          | Components do less work. They are primarily CSS containers with slot projection. This can feel like the component library adds less value.                                                                 |
+| **More complex TWIG templates** | Slot management requires wrapper elements (`<div slot="media">`), conditional checks for empty fields, and knowledge of which slots the component exposes.                                                 |
+| **Harder to test in isolation** | Testing requires providing realistic slotted content that mimics Drupal's output. Unit tests must compose light DOM children.                                                                              |
+| **Slot naming contract**        | The component and every Drupal template must agree on slot names. Renaming a slot is a breaking change across all consuming templates.                                                                     |
 
 ---
 
@@ -225,17 +239,17 @@ The following matrix evaluates each strategy across the eight dimensions that ma
 
 ### Matrix
 
-| Dimension | Strategy A (Property) | Strategy B (Slot) | Strategy C (Hybrid) | Weight |
-|-----------|:----:|:----:|:----:|:----:|
-| **1. Drupal Module Compatibility** | 2 | 5 | 5 | Critical |
-| **2. Content Editor Experience** | 2 | 5 | 4 | High |
-| **3. Developer Experience (TWIG)** | 4 | 3 | 4 | High |
-| **4. Portability** | 5 | 2 | 4 | Medium |
-| **5. Long-term Viability** | 4 | 3 | 5 | Medium |
-| **6. Accessibility** | 4 | 3 | 5 | Critical |
-| **7. Performance** | 3 | 4 | 4 | High |
-| **8. Testing** | 5 | 3 | 4 | Medium |
-| **Weighted Score** | **2.9** | **3.6** | **4.4** | |
+| Dimension                          | Strategy A (Property) | Strategy B (Slot) | Strategy C (Hybrid) |  Weight  |
+| ---------------------------------- | :-------------------: | :---------------: | :-----------------: | :------: |
+| **1. Drupal Module Compatibility** |           2           |         5         |          5          | Critical |
+| **2. Content Editor Experience**   |           2           |         5         |          4          |   High   |
+| **3. Developer Experience (TWIG)** |           4           |         3         |          4          |   High   |
+| **4. Portability**                 |           5           |         2         |          4          |  Medium  |
+| **5. Long-term Viability**         |           4           |         3         |          5          |  Medium  |
+| **6. Accessibility**               |           4           |         3         |          5          | Critical |
+| **7. Performance**                 |           3           |         4         |          4          |   High   |
+| **8. Testing**                     |           5           |         3         |          4          |  Medium  |
+| **Weighted Score**                 |        **2.9**        |      **3.6**      |       **4.4**       |          |
 
 ### Dimension Analysis
 
@@ -311,80 +325,80 @@ The following table assigns each of the 40+ planned components to a strategy bas
 
 ### Classification Legend
 
-| Strategy | Shorthand | Meaning |
-|----------|-----------|---------|
-| Property-Driven | **P** | Component accepts data via attributes/properties. Owns all rendering. |
-| Slot-Driven | **S** | Component provides structure via slots. Drupal owns content rendering. |
-| Hybrid | **H** | Properties for configuration + scalar data. Slots for rendered content areas. |
+| Strategy        | Shorthand | Meaning                                                                       |
+| --------------- | --------- | ----------------------------------------------------------------------------- |
+| Property-Driven | **P**     | Component accepts data via attributes/properties. Owns all rendering.         |
+| Slot-Driven     | **S**     | Component provides structure via slots. Drupal owns content rendering.        |
+| Hybrid          | **H**     | Properties for configuration + scalar data. Slots for rendered content areas. |
 
 ### Atoms
 
-| Component | Strategy | Rationale |
-|-----------|:--------:|-----------|
-| `wc-button` | **P** | Self-contained. Properties: `variant`, `size`, `href`, `disabled`, `type`, `loading`. Default slot for button label text. No Drupal field rendering needed. |
-| `wc-icon` | **P** | Pure data-driven. Properties: `name`, `size`, `label`. No content to slot. SVG rendered internally from icon name. |
-| `wc-badge` | **P** | Tiny, self-contained. Properties: `variant`, `size`. Default slot for badge text (a single string). |
-| `wc-tag` | **P** | Minimal. Properties: `variant`, `removable`, `href`. Default slot for tag label. |
-| `wc-avatar` | **P** | Image display. Properties: `src`, `alt`, `size`, `initials`. No Drupal field rendering complexity. |
-| `wc-spinner` | **P** | No content. Properties: `size`, `label` (for screen readers). Pure visual indicator. |
-| `wc-tooltip` | **P** | Properties: `content`, `position`, `trigger`. Default slot for the trigger element. Tooltip content is a simple string. |
-| `wc-sr-only` | **P** | Screen-reader-only text. Default slot for text content. No visual rendering. |
-| `wc-toggle` | **H** | Form-associated via ElementInternals. Properties: `name`, `checked`, `disabled`, `value`. Slot for label text so Drupal's Form API can render labels with translation and token replacement. |
-| `wc-checkbox` | **H** | Form-associated. Properties: `name`, `checked`, `disabled`, `value`, `required`. Slots: `label`, `help`. Drupal's Form API renders label HTML with required indicators and help text. |
-| `wc-radio` | **H** | Form-associated. Properties: `name`, `value`, `checked`, `disabled`. Slot for label. Same reasoning as checkbox. |
-| `wc-text-input` | **H** | Form-associated. Properties: `name`, `type`, `value`, `required`, `pattern`, `min`, `max`, `error-message`. Slots: `label`, `help`, `prefix`, `suffix`. Labels and help text come from Drupal's Form API. |
-| `wc-textarea` | **H** | Form-associated. Properties: `name`, `value`, `required`, `rows`, `maxlength`. Slots: `label`, `help`. Same pattern as text-input. |
-| `wc-select` | **H** | Form-associated. Properties: `name`, `value`, `required`, `multiple`. Slots: `label`, `help`. Options passed as JSON property or `<option>` slot children (Drupal's Form API renders `<option>` elements natively). |
+| Component       | Strategy | Rationale                                                                                                                                                                                                           |
+| --------------- | :------: | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `wc-button`     |  **P**   | Self-contained. Properties: `variant`, `size`, `href`, `disabled`, `type`, `loading`. Default slot for button label text. No Drupal field rendering needed.                                                         |
+| `wc-icon`       |  **P**   | Pure data-driven. Properties: `name`, `size`, `label`. No content to slot. SVG rendered internally from icon name.                                                                                                  |
+| `wc-badge`      |  **P**   | Tiny, self-contained. Properties: `variant`, `size`. Default slot for badge text (a single string).                                                                                                                 |
+| `wc-tag`        |  **P**   | Minimal. Properties: `variant`, `removable`, `href`. Default slot for tag label.                                                                                                                                    |
+| `wc-avatar`     |  **P**   | Image display. Properties: `src`, `alt`, `size`, `initials`. No Drupal field rendering complexity.                                                                                                                  |
+| `wc-spinner`    |  **P**   | No content. Properties: `size`, `label` (for screen readers). Pure visual indicator.                                                                                                                                |
+| `wc-tooltip`    |  **P**   | Properties: `content`, `position`, `trigger`. Default slot for the trigger element. Tooltip content is a simple string.                                                                                             |
+| `wc-sr-only`    |  **P**   | Screen-reader-only text. Default slot for text content. No visual rendering.                                                                                                                                        |
+| `wc-toggle`     |  **H**   | Form-associated via ElementInternals. Properties: `name`, `checked`, `disabled`, `value`. Slot for label text so Drupal's Form API can render labels with translation and token replacement.                        |
+| `wc-checkbox`   |  **H**   | Form-associated. Properties: `name`, `checked`, `disabled`, `value`, `required`. Slots: `label`, `help`. Drupal's Form API renders label HTML with required indicators and help text.                               |
+| `wc-radio`      |  **H**   | Form-associated. Properties: `name`, `value`, `checked`, `disabled`. Slot for label. Same reasoning as checkbox.                                                                                                    |
+| `wc-text-input` |  **H**   | Form-associated. Properties: `name`, `type`, `value`, `required`, `pattern`, `min`, `max`, `error-message`. Slots: `label`, `help`, `prefix`, `suffix`. Labels and help text come from Drupal's Form API.           |
+| `wc-textarea`   |  **H**   | Form-associated. Properties: `name`, `value`, `required`, `rows`, `maxlength`. Slots: `label`, `help`. Same pattern as text-input.                                                                                  |
+| `wc-select`     |  **H**   | Form-associated. Properties: `name`, `value`, `required`, `multiple`. Slots: `label`, `help`. Options passed as JSON property or `<option>` slot children (Drupal's Form API renders `<option>` elements natively). |
 
 ### Molecules
 
-| Component | Strategy | Rationale |
-|-----------|:--------:|-----------|
-| `wc-search-bar` | **H** | Properties: `placeholder`, `action`, `method`, `value`. Slot: `submit-button` (so Drupal can render a translated submit button). Drupal Search API forms need form-associated behavior. |
-| `wc-form-field` | **H** | Wrapper molecule. Properties: `error`, `required-indicator`. Slots: `label`, `input`, `help`, `error-message`. Drupal's Form API renders each of these as separate render elements. |
-| `wc-breadcrumb` | **H** | Properties: `separator`, `aria-label`. Slot: default slot accepts `<a>` elements. Drupal's breadcrumb block renders a list of links. The component provides structure and styling; Drupal provides the link list. Could also accept `items` as JSON property for non-Drupal consumers. |
-| `wc-pagination` | **H** | Properties: `current-page`, `total-pages`, `base-url`. Drupal's Views pager already renders pagination HTML, but the component can also render from properties for standalone use. Hybrid gives flexibility. |
-| `wc-media-object` | **S** | Content-rich. Slots: `media`, `body`. Drupal renders the image (with image styles) and the text content. Component provides the side-by-side layout. |
-| `wc-alert` | **H** | Properties: `variant` (info, warning, danger, success), `dismissible`, `role` (alert, status). Slot: default slot for alert message content. Drupal renders the message HTML (which may contain links, formatted text). |
-| `wc-accordion-item` | **H** | Properties: `expanded`, `disabled`, `heading-level`. Slots: `heading` (Drupal renders the heading text with configured text format), default slot for panel content. The component handles expand/collapse behavior and ARIA. |
-| `wc-tab-item` | **H** | Properties: `label`, `selected`, `disabled`. Slot: default for tab panel content. The label is a simple string (property), the content is Drupal-rendered HTML (slot). |
-| `wc-dropdown-menu` | **H** | Properties: `align`, `trigger-label`. Slots: `trigger` (button or link), default (menu items). Drupal renders menu items. Component handles positioning and keyboard navigation. |
+| Component           | Strategy | Rationale                                                                                                                                                                                                                                                                              |
+| ------------------- | :------: | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `wc-search-bar`     |  **H**   | Properties: `placeholder`, `action`, `method`, `value`. Slot: `submit-button` (so Drupal can render a translated submit button). Drupal Search API forms need form-associated behavior.                                                                                                |
+| `wc-form-field`     |  **H**   | Wrapper molecule. Properties: `error`, `required-indicator`. Slots: `label`, `input`, `help`, `error-message`. Drupal's Form API renders each of these as separate render elements.                                                                                                    |
+| `wc-breadcrumb`     |  **H**   | Properties: `separator`, `aria-label`. Slot: default slot accepts `<a>` elements. Drupal's breadcrumb block renders a list of links. The component provides structure and styling; Drupal provides the link list. Could also accept `items` as JSON property for non-Drupal consumers. |
+| `wc-pagination`     |  **H**   | Properties: `current-page`, `total-pages`, `base-url`. Drupal's Views pager already renders pagination HTML, but the component can also render from properties for standalone use. Hybrid gives flexibility.                                                                           |
+| `wc-media-object`   |  **S**   | Content-rich. Slots: `media`, `body`. Drupal renders the image (with image styles) and the text content. Component provides the side-by-side layout.                                                                                                                                   |
+| `wc-alert`          |  **H**   | Properties: `variant` (info, warning, danger, success), `dismissible`, `role` (alert, status). Slot: default slot for alert message content. Drupal renders the message HTML (which may contain links, formatted text).                                                                |
+| `wc-accordion-item` |  **H**   | Properties: `expanded`, `disabled`, `heading-level`. Slots: `heading` (Drupal renders the heading text with configured text format), default slot for panel content. The component handles expand/collapse behavior and ARIA.                                                          |
+| `wc-tab-item`       |  **H**   | Properties: `label`, `selected`, `disabled`. Slot: default for tab panel content. The label is a simple string (property), the content is Drupal-rendered HTML (slot).                                                                                                                 |
+| `wc-dropdown-menu`  |  **H**   | Properties: `align`, `trigger-label`. Slots: `trigger` (button or link), default (menu items). Drupal renders menu items. Component handles positioning and keyboard navigation.                                                                                                       |
 
 ### Organisms
 
-| Component | Strategy | Rationale |
-|-----------|:--------:|-----------|
-| `wc-content-card` | **H** | Properties: `heading`, `href`, `variant`, `publish-date`, `read-time`, `category`. Slots: `media` (Drupal responsive image), `actions` (Drupal CTA links), `meta` (Drupal tags/dates), default (body content). Scalar metadata as properties for Storybook testability. Rich content areas as slots for Drupal compatibility. **This is the canonical hybrid example.** |
-| `wc-article-layout` | **S** | Pure structural organism. Properties: `has-sidebar` (auto-detected via slotchange). Slots: `hero`, `breadcrumb`, `author`, `sidebar`, `footer`, default. All content comes from Drupal's node full view mode. |
-| `wc-header` | **S** | Site header. Properties: `sticky`, `transparent`. Slots: `logo`, `navigation`, `search`, `utility`, `mobile-trigger`. Every slot receives Drupal block output. |
-| `wc-footer` | **S** | Site footer. Properties: none needed. Slots: `branding`, `navigation`, `social`, `legal`. All content from Drupal footer blocks. |
-| `wc-nav-primary` | **H** | Properties: `items` (JSON menu tree from Drupal preprocess). **This is a justified JSON attribute** -- Drupal's menu system produces a tree structure that cannot be expressed as flat attributes. Component handles mega-menu rendering, keyboard navigation, ARIA. Alternative: Slot-driven with `<ul>` list structure from Drupal's menu block rendering. Both approaches are valid; JSON property gives the component more rendering control for complex mega-menu layouts. |
-| `wc-nav-mobile` | **H** | Same approach as `wc-nav-primary`. Properties: `items` (JSON), `open`. Component handles drawer animation, focus trapping, touch gestures. |
-| `wc-hero-banner` | **H** | Properties: `heading`, `subheading`, `variant`, `overlay-opacity`. Slots: `media` (Drupal responsive image or video), `cta` (Drupal CTA buttons). Heading text as property for SEO (component controls `<h1>` rendering). Media as slot for Drupal's image styles. |
-| `wc-card-grid` | **H** | Properties: `columns`, `gap`, `variant`. Slot: default (receives multiple `<wc-content-card>` elements). Component provides CSS Grid layout. Drupal Views renders the card instances. |
-| `wc-form` | **H** | Properties: `action`, `method`, `novalidate`. Slot: default (form fields). Drupal's Form API renders form elements. Component provides form-level validation orchestration, submit handling, and error summary. Form-associated child components (`wc-text-input`, etc.) participate via `ElementInternals`. |
-| `wc-accordion` | **S** | Group container. Properties: `allow-multiple`, `heading-level`. Slot: default (receives `<wc-accordion-item>` children). Component manages group behavior (single-open vs multi-open). Drupal renders accordion items via Paragraphs. |
-| `wc-tabs` | **S** | Group container. Properties: `selected-index`, `variant`. Slot: default (receives `<wc-tab-item>` children). Component manages tab selection, ARIA tablist, keyboard navigation. Drupal renders tab content via Paragraphs. |
-| `wc-modal` | **S** | Overlay container. Properties: `open`, `heading`, `size`. Slots: `trigger`, default (modal body), `footer` (action buttons). Drupal renders modal content. Component handles overlay, focus trap, escape key, scroll lock, ARIA. |
-| `wc-media-gallery` | **H** | Properties: `columns`, `lightbox`. Slot: default (receives `<figure>` or `<img>` elements). Drupal Media module renders images with appropriate styles. Component provides grid layout and optional lightbox behavior. |
-| `wc-table` | **H** | Properties: `sortable`, `striped`, `caption`. Slot: default (receives a `<table>` element). Drupal renders the table HTML. Component enhances with sorting, sticky headers, responsive scrolling. **Important**: The component wraps Drupal's table output rather than re-rendering from JSON data. This preserves Drupal's Table field formatter output. |
-| `wc-sidebar` | **S** | Pure container. Properties: `sticky`. Slot: default (receives Drupal block output). Component provides sticky positioning and spacing. |
+| Component           | Strategy | Rationale                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
+| ------------------- | :------: | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `wc-content-card`   |  **H**   | Properties: `heading`, `href`, `variant`, `publish-date`, `read-time`, `category`. Slots: `media` (Drupal responsive image), `actions` (Drupal CTA links), `meta` (Drupal tags/dates), default (body content). Scalar metadata as properties for Storybook testability. Rich content areas as slots for Drupal compatibility. **This is the canonical hybrid example.**                                                                                                         |
+| `wc-article-layout` |  **S**   | Pure structural organism. Properties: `has-sidebar` (auto-detected via slotchange). Slots: `hero`, `breadcrumb`, `author`, `sidebar`, `footer`, default. All content comes from Drupal's node full view mode.                                                                                                                                                                                                                                                                   |
+| `wc-header`         |  **S**   | Site header. Properties: `sticky`, `transparent`. Slots: `logo`, `navigation`, `search`, `utility`, `mobile-trigger`. Every slot receives Drupal block output.                                                                                                                                                                                                                                                                                                                  |
+| `wc-footer`         |  **S**   | Site footer. Properties: none needed. Slots: `branding`, `navigation`, `social`, `legal`. All content from Drupal footer blocks.                                                                                                                                                                                                                                                                                                                                                |
+| `wc-nav-primary`    |  **H**   | Properties: `items` (JSON menu tree from Drupal preprocess). **This is a justified JSON attribute** -- Drupal's menu system produces a tree structure that cannot be expressed as flat attributes. Component handles mega-menu rendering, keyboard navigation, ARIA. Alternative: Slot-driven with `<ul>` list structure from Drupal's menu block rendering. Both approaches are valid; JSON property gives the component more rendering control for complex mega-menu layouts. |
+| `wc-nav-mobile`     |  **H**   | Same approach as `wc-nav-primary`. Properties: `items` (JSON), `open`. Component handles drawer animation, focus trapping, touch gestures.                                                                                                                                                                                                                                                                                                                                      |
+| `wc-hero-banner`    |  **H**   | Properties: `heading`, `subheading`, `variant`, `overlay-opacity`. Slots: `media` (Drupal responsive image or video), `cta` (Drupal CTA buttons). Heading text as property for SEO (component controls `<h1>` rendering). Media as slot for Drupal's image styles.                                                                                                                                                                                                              |
+| `wc-card-grid`      |  **H**   | Properties: `columns`, `gap`, `variant`. Slot: default (receives multiple `<wc-content-card>` elements). Component provides CSS Grid layout. Drupal Views renders the card instances.                                                                                                                                                                                                                                                                                           |
+| `wc-form`           |  **H**   | Properties: `action`, `method`, `novalidate`. Slot: default (form fields). Drupal's Form API renders form elements. Component provides form-level validation orchestration, submit handling, and error summary. Form-associated child components (`wc-text-input`, etc.) participate via `ElementInternals`.                                                                                                                                                                    |
+| `wc-accordion`      |  **S**   | Group container. Properties: `allow-multiple`, `heading-level`. Slot: default (receives `<wc-accordion-item>` children). Component manages group behavior (single-open vs multi-open). Drupal renders accordion items via Paragraphs.                                                                                                                                                                                                                                           |
+| `wc-tabs`           |  **S**   | Group container. Properties: `selected-index`, `variant`. Slot: default (receives `<wc-tab-item>` children). Component manages tab selection, ARIA tablist, keyboard navigation. Drupal renders tab content via Paragraphs.                                                                                                                                                                                                                                                     |
+| `wc-modal`          |  **S**   | Overlay container. Properties: `open`, `heading`, `size`. Slots: `trigger`, default (modal body), `footer` (action buttons). Drupal renders modal content. Component handles overlay, focus trap, escape key, scroll lock, ARIA.                                                                                                                                                                                                                                                |
+| `wc-media-gallery`  |  **H**   | Properties: `columns`, `lightbox`. Slot: default (receives `<figure>` or `<img>` elements). Drupal Media module renders images with appropriate styles. Component provides grid layout and optional lightbox behavior.                                                                                                                                                                                                                                                          |
+| `wc-table`          |  **H**   | Properties: `sortable`, `striped`, `caption`. Slot: default (receives a `<table>` element). Drupal renders the table HTML. Component enhances with sorting, sticky headers, responsive scrolling. **Important**: The component wraps Drupal's table output rather than re-rendering from JSON data. This preserves Drupal's Table field formatter output.                                                                                                                       |
+| `wc-sidebar`        |  **S**   | Pure container. Properties: `sticky`. Slot: default (receives Drupal block output). Component provides sticky positioning and spacing.                                                                                                                                                                                                                                                                                                                                          |
 
 ### Templates (Page-Level Layouts)
 
-| Component | Strategy | Rationale |
-|-----------|:--------:|-----------|
-| `wc-page-layout` | **S** | Properties: `variant` (default, full-width, narrow). Slots: `header`, `main`, `sidebar`, `footer`. Pure CSS Grid layout container. Drupal fills regions with block output. |
-| `wc-article-page` | **S** | Properties: `has-sidebar`. Slots: `hero`, `breadcrumb`, `title`, `meta`, `content`, `sidebar`, `related`. Drupal's node full view mode renders all content. |
-| `wc-landing-page` | **S** | Properties: `variant`. Slots: `hero`, `sections`, `cta`. Drupal Paragraphs or Layout Builder renders sections. |
-| `wc-search-results-page` | **S** | Properties: `total-results`, `query`. Slots: `search-form`, `facets`, `results`, `pager`. Drupal Search API renders all content. Component provides layout structure. |
+| Component                | Strategy | Rationale                                                                                                                                                                  |
+| ------------------------ | :------: | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `wc-page-layout`         |  **S**   | Properties: `variant` (default, full-width, narrow). Slots: `header`, `main`, `sidebar`, `footer`. Pure CSS Grid layout container. Drupal fills regions with block output. |
+| `wc-article-page`        |  **S**   | Properties: `has-sidebar`. Slots: `hero`, `breadcrumb`, `title`, `meta`, `content`, `sidebar`, `related`. Drupal's node full view mode renders all content.                |
+| `wc-landing-page`        |  **S**   | Properties: `variant`. Slots: `hero`, `sections`, `cta`. Drupal Paragraphs or Layout Builder renders sections.                                                             |
+| `wc-search-results-page` |  **S**   | Properties: `total-results`, `query`. Slots: `search-form`, `facets`, `results`, `pager`. Drupal Search API renders all content. Component provides layout structure.      |
 
 ### Infrastructure Components
 
-| Component | Strategy | Rationale |
-|-----------|:--------:|-----------|
-| `wc-theme-provider` | **P** | Properties: `mode`, `scale`, `locale`. Slot: default (all themed content). Uses Lit Context Protocol to share theme state. No Drupal content rendering. |
-| `wc-prose` | **S** | Light DOM component (no Shadow DOM). Slot: default. Wraps Drupal CKEditor content with typography styles. Must use light DOM so Drupal's text format CSS applies. |
+| Component           | Strategy | Rationale                                                                                                                                                         |
+| ------------------- | :------: | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `wc-theme-provider` |  **P**   | Properties: `mode`, `scale`, `locale`. Slot: default (all themed content). Uses Lit Context Protocol to share theme state. No Drupal content rendering.           |
+| `wc-prose`          |  **S**   | Light DOM component (no Shadow DOM). Slot: default. Wraps Drupal CKEditor content with typography styles. Must use light DOM so Drupal's text format CSS applies. |
 
 ---
 
@@ -599,47 +613,47 @@ This section maps each major Drupal module to its integration surface with each 
 
 ### Layout Builder
 
-| Concern | Property-Driven | Slot-Driven | Hybrid |
-|---------|:-:|:-:|:-:|
-| Section templates | Requires custom blocks that extract data | Section slots accept `{{ content.region }}` directly | Sections are slot-driven; blocks inside can be either |
-| Block preview in admin | No preview (data extracted server-side, rendered client-side) | Full preview (Drupal renders content, component wraps it) | Content blocks preview correctly (slot-driven) |
-| Custom blocks | Must serialize all data as attributes via render arrays | Render array output goes into slots naturally | Configuration as properties, content output as slots |
-| Inline editing | Not possible (component re-renders from properties) | Limited (depends on Drupal's inline editing support) | Same as slot-driven for content areas |
+| Concern                |                        Property-Driven                        |                        Slot-Driven                        |                        Hybrid                         |
+| ---------------------- | :-----------------------------------------------------------: | :-------------------------------------------------------: | :---------------------------------------------------: |
+| Section templates      |           Requires custom blocks that extract data            |   Section slots accept `{{ content.region }}` directly    | Sections are slot-driven; blocks inside can be either |
+| Block preview in admin | No preview (data extracted server-side, rendered client-side) | Full preview (Drupal renders content, component wraps it) |    Content blocks preview correctly (slot-driven)     |
+| Custom blocks          |    Must serialize all data as attributes via render arrays    |       Render array output goes into slots naturally       | Configuration as properties, content output as slots  |
+| Inline editing         |      Not possible (component re-renders from properties)      |   Limited (depends on Drupal's inline editing support)    |         Same as slot-driven for content areas         |
 
 ### Paragraphs
 
-| Concern | Property-Driven | Slot-Driven | Hybrid |
-|---------|:-:|:-:|:-:|
+| Concern                |                                     Property-Driven                                     |                             Slot-Driven                              |                                  Hybrid                                  |
+| ---------------------- | :-------------------------------------------------------------------------------------: | :------------------------------------------------------------------: | :----------------------------------------------------------------------: |
 | Paragraph type mapping | Each paragraph type requires a TWIG template that extracts field values into attributes | Paragraph renders normally; output goes into parent component's slot | Paragraph configuration as parent properties; paragraph content as slots |
-| Nested paragraphs | Each nesting level requires data extraction and serialization | Nested HTML renders naturally through slots | Same as slot-driven for nesting |
-| Paragraph preview | Not visible in admin (rendered client-side) | Visible in admin (Drupal renders the paragraph) | Visible for slot-driven content |
+| Nested paragraphs      |              Each nesting level requires data extraction and serialization              |             Nested HTML renders naturally through slots              |                     Same as slot-driven for nesting                      |
+| Paragraph preview      |                       Not visible in admin (rendered client-side)                       |           Visible in admin (Drupal renders the paragraph)            |                     Visible for slot-driven content                      |
 
 ### Media Module
 
-| Concern | Property-Driven | Slot-Driven | Hybrid |
-|---------|:-:|:-:|:-:|
+| Concern           |                    Property-Driven                     |                       Slot-Driven                       |                       Hybrid                        |
+| ----------------- | :----------------------------------------------------: | :-----------------------------------------------------: | :-------------------------------------------------: |
 | Responsive images | Must extract single URL; loses responsive image styles | `<picture>` element from Drupal goes directly into slot | Slot for media preserves all responsive image magic |
-| Video embeds | Must extract embed URL; loses oEmbed formatting | Drupal's Media oEmbed output goes into slot | Slot approach preserves oEmbed |
-| Image styles | Must know the image style URL pattern; fragile | Drupal's image style system renders the correct URL | Slot approach preserves image style chain |
-| Focal point | Not available (raw URL has no focal point data) | Drupal's focal point module renders the cropped image | Slot approach preserves focal point |
+| Video embeds      |    Must extract embed URL; loses oEmbed formatting     |       Drupal's Media oEmbed output goes into slot       |           Slot approach preserves oEmbed            |
+| Image styles      |     Must know the image style URL pattern; fragile     |   Drupal's image style system renders the correct URL   |      Slot approach preserves image style chain      |
+| Focal point       |    Not available (raw URL has no focal point data)     |  Drupal's focal point module renders the cropped image  |         Slot approach preserves focal point         |
 
 ### Views
 
-| Concern | Property-Driven | Slot-Driven | Hybrid |
-|---------|:-:|:-:|:-:|
-| Row rendering | Each row's template must extract entity data into component attributes | View row output goes into component slots | Rows as composed components in grid slot |
-| Exposed filters | Must serialize filter state as component properties | Filter form renders normally above the view; no component involvement | Not a component concern |
-| Pager | Must extract pager data (current page, total) into component properties | Drupal's pager output goes into a pagination slot | Hybrid: properties for page data, slot for pager links |
-| AJAX paging | Requires component to manage AJAX state | Drupal AJAX replaces content; behaviors re-attach | Same as slot-driven |
+| Concern         |                             Property-Driven                             |                              Slot-Driven                              |                         Hybrid                         |
+| --------------- | :---------------------------------------------------------------------: | :-------------------------------------------------------------------: | :----------------------------------------------------: |
+| Row rendering   | Each row's template must extract entity data into component attributes  |               View row output goes into component slots               |        Rows as composed components in grid slot        |
+| Exposed filters |           Must serialize filter state as component properties           | Filter form renders normally above the view; no component involvement |                Not a component concern                 |
+| Pager           | Must extract pager data (current page, total) into component properties |           Drupal's pager output goes into a pagination slot           | Hybrid: properties for page data, slot for pager links |
+| AJAX paging     |                 Requires component to manage AJAX state                 |           Drupal AJAX replaces content; behaviors re-attach           |                  Same as slot-driven                   |
 
 ### Webform
 
-| Concern | Property-Driven | Slot-Driven | Hybrid |
-|---------|:-:|:-:|:-:|
-| Form rendering | Impractical -- Webform has hundreds of element types | Webform output goes into `<wc-form>` default slot | Form wrapper is slot-driven; individual elements use ElementInternals |
-| Conditional logic | Must duplicate Webform's conditional logic in JS | Webform handles conditionals server-side; component wraps output | Same as slot-driven |
-| Multi-step forms | Must manage step state in component | Webform manages steps; each step's output goes into form slot | Same as slot-driven |
-| File uploads | Must build upload UI in component | Webform's file upload element renders normally | Same as slot-driven |
+| Concern           |                   Property-Driven                    |                           Slot-Driven                            |                                Hybrid                                 |
+| ----------------- | :--------------------------------------------------: | :--------------------------------------------------------------: | :-------------------------------------------------------------------: |
+| Form rendering    | Impractical -- Webform has hundreds of element types |        Webform output goes into `<wc-form>` default slot         | Form wrapper is slot-driven; individual elements use ElementInternals |
+| Conditional logic |   Must duplicate Webform's conditional logic in JS   | Webform handles conditionals server-side; component wraps output |                          Same as slot-driven                          |
+| Multi-step forms  |         Must manage step state in component          |  Webform manages steps; each step's output goes into form slot   |                          Same as slot-driven                          |
+| File uploads      |          Must build upload UI in component           |          Webform's file upload element renders normally          |                          Same as slot-driven                          |
 
 ---
 
@@ -726,7 +740,10 @@ it('renders article layout with all slots', async () => {
   const el = await fixture<WcArticleLayout>(html`
     <wc-article-layout>
       <nav slot="breadcrumb" aria-label="Breadcrumb">
-        <ol><li><a href="/">Home</a></li><li>Article</li></ol>
+        <ol>
+          <li><a href="/">Home</a></li>
+          <li>Article</li>
+        </ol>
       </nav>
       <div slot="hero">
         <picture>
@@ -827,13 +844,14 @@ The library ships as a framework-agnostic Web Component package. It works in Sto
 
 **Status**: Accepted
 
-**Context**: WC-2026 is a Web Component library that must integrate with Drupal CMS as its primary consumer while remaining framework-agnostic. The fundamental architectural question is whether components should accept data via properties (component controls rendering) or via slots (Drupal controls rendering). The library targets enterprise healthcare organizations that rely on Drupal's content management modules (Paragraphs, Layout Builder, Media, Views, Webform).
+**Context**: HELIX is a Web Component library that must integrate with Drupal CMS as its primary consumer while remaining framework-agnostic. The fundamental architectural question is whether components should accept data via properties (component controls rendering) or via slots (Drupal controls rendering). The library targets enterprise healthcare organizations that rely on Drupal's content management modules (Paragraphs, Layout Builder, Media, Views, Webform).
 
 **Decision**: Adopt a hybrid strategy where each component's API is determined by its position in the atomic design hierarchy and its content complexity. Atoms use properties. Form elements use properties + slots (ElementInternals). Molecules use a balanced mix. Organisms use slots for content and properties for configuration. Templates are slot-only.
 
 **Consequences**:
 
-*Positive:*
+_Positive:_
+
 - Full compatibility with all Drupal modules (Paragraphs, Layout Builder, Media, Views, Webform)
 - Content editors see real previews in Drupal admin
 - Drupal's render cache, field formatters, and image styles work correctly
@@ -842,14 +860,16 @@ The library ships as a framework-agnostic Web Component package. It works in Sto
 - Clear, teachable classification rules (atoms = properties, organisms = slots)
 - Migration path exists in both directions (more properties or more slots) without breaking changes
 
-*Negative:*
+_Negative:_
+
 - Organisms are harder to test in isolation (must compose slot content)
 - Storybook stories for organisms require simulated Drupal output
 - Slot naming becomes a stable contract that cannot change without breaking Drupal templates
 - Developers must learn both property and slot patterns (training investment)
 - Inconsistency risk in slotted content (different templates may structure slots differently)
 
-*Mitigations:*
+_Mitigations:_
+
 - Storybook stories serve as slot content documentation and contract tests
 - Custom Elements Manifest documents all slots, properties, and events
 - Slot fallback content ensures components work without any slotted content

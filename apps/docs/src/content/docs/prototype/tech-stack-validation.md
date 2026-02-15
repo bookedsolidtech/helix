@@ -1,6 +1,6 @@
 ---
 title: Tech Stack Validation
-description: Validating core technology choices for the WC-2026 component library
+description: Validating core technology choices for the HELIX component library
 ---
 
 > **Status**: In Progress
@@ -14,14 +14,14 @@ Each technology choice was evaluated against alternatives. This document capture
 
 ### Component Framework: Lit 3.x
 
-| Criteria | Lit 3.x | Stencil | Fast | Vanilla |
-|----------|---------|---------|------|---------|
-| Bundle size | 5KB | 14KB | 8KB | 0KB |
-| TypeScript | Native | Native | Native | Manual |
-| Drupal compat | Excellent | Good | Good | Excellent |
-| SSR support | Yes | Yes | No | Yes |
-| Community | Large | Medium | Small | N/A |
-| Storybook | Native | Plugin | Plugin | Manual |
+| Criteria      | Lit 3.x   | Stencil | Fast   | Vanilla   |
+| ------------- | --------- | ------- | ------ | --------- |
+| Bundle size   | 5KB       | 14KB    | 8KB    | 0KB       |
+| TypeScript    | Native    | Native  | Native | Manual    |
+| Drupal compat | Excellent | Good    | Good   | Excellent |
+| SSR support   | Yes       | Yes     | No     | Yes       |
+| Community     | Large     | Medium  | Small  | N/A       |
+| Storybook     | Native    | Plugin  | Plugin | Manual    |
 
 **Decision**: Lit 3.x - best balance of size, DX, and Drupal compatibility.
 
@@ -29,12 +29,12 @@ Each technology choice was evaluated against alternatives. This document capture
 
 ### Design Tokens: Terrazzo + W3C DTCG
 
-| Criteria | Terrazzo | Style Dictionary | Theo |
-|----------|----------|------------------|------|
-| W3C DTCG spec | Native | Plugin | No |
-| Output formats | CSS, JS, SCSS | CSS, JS, SCSS+ | CSS, JS |
-| Type safety | Yes | Partial | No |
-| Active dev | Yes | Yes | Archived |
+| Criteria       | Terrazzo      | Style Dictionary | Theo     |
+| -------------- | ------------- | ---------------- | -------- |
+| W3C DTCG spec  | Native        | Plugin           | No       |
+| Output formats | CSS, JS, SCSS | CSS, JS, SCSS+   | CSS, JS  |
+| Type safety    | Yes           | Partial          | No       |
+| Active dev     | Yes           | Yes              | Archived |
 
 **Decision**: Terrazzo - native DTCG support, successor to Cobalt UI.
 
@@ -42,12 +42,12 @@ Each technology choice was evaluated against alternatives. This document capture
 
 ### Testing: Vitest 4.x Browser Mode
 
-| Criteria | Vitest Browser | Jest + JSDOM | Web Test Runner |
-|----------|---------------|--------------|-----------------|
-| Real browser | Yes | No | Yes |
-| Speed | Fast (2-10x) | Slow | Medium |
-| Storybook | Native (v10) | Plugin | Manual |
-| Watch mode | Yes | Yes | Yes |
+| Criteria     | Vitest Browser | Jest + JSDOM | Web Test Runner |
+| ------------ | -------------- | ------------ | --------------- |
+| Real browser | Yes            | No           | Yes             |
+| Speed        | Fast (2-10x)   | Slow         | Medium          |
+| Storybook    | Native (v10)   | Plugin       | Manual          |
+| Watch mode   | Yes            | Yes          | Yes             |
 
 **Decision**: Vitest 4.x - real browser testing, native Storybook 10.x integration.
 
@@ -56,6 +56,7 @@ Each technology choice was evaluated against alternatives. This document capture
 ### Documentation: Astro/Starlight + Storybook
 
 **Dual system approach**:
+
 - **Storybook**: Interactive design system (component playground, visual testing)
 - **Astro/Starlight**: Comprehensive guides (architecture, integration, tutorials)
 
@@ -65,12 +66,12 @@ Each technology choice was evaluated against alternatives. This document capture
 
 ### Build Tool: Vite Library Mode
 
-| Criteria | Vite | Rollup | esbuild |
-|----------|------|--------|---------|
-| Dev server | Built-in | Manual | Manual |
-| Library mode | Native | Native | Limited |
-| Storybook | Native | Plugin | Plugin |
-| Tree-shaking | Yes | Yes | Partial |
+| Criteria     | Vite     | Rollup | esbuild |
+| ------------ | -------- | ------ | ------- |
+| Dev server   | Built-in | Manual | Manual  |
+| Library mode | Native   | Native | Limited |
+| Storybook    | Native   | Plugin | Plugin  |
+| Tree-shaking | Yes      | Yes    | Partial |
 
 **Decision**: Vite - native library mode, powers both Storybook and component build.
 

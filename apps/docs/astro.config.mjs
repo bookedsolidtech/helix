@@ -39,11 +39,11 @@ export default defineConfig({
         Header: './src/components/Header.astro',
         SkipLink: './src/components/SkipLink.astro',
       },
-      title: 'WC-2026',
-      description: 'Enterprise Healthcare Web Components - Production-ready Lit components for Drupal CMS',
+      title: 'HELIX',
+      description: 'Healthcare Elements Library for Interactive eXperiences - Enterprise Web Components for Drupal CMS',
       logo: {
-        light: './src/assets/logos/wc-2026-light.svg',
-        dark: './src/assets/logos/wc-2026-dark.svg',
+        light: './src/assets/logos/helix-light.svg',
+        dark: './src/assets/logos/helix-dark.svg',
         replacesTitle: false,
       },
       social: [
@@ -183,9 +183,9 @@ export default defineConfig({
           badge: { text: 'Live', variant: 'success' },
           items: [
             { label: 'Overview', slug: 'component-library/overview' },
-            { label: 'wc-button', slug: 'component-library/wc-button' },
-            { label: 'wc-card', slug: 'component-library/wc-card' },
-            { label: 'wc-text-input', slug: 'component-library/wc-text-input' },
+            { label: 'hx-button', slug: 'component-library/hx-button' },
+            { label: 'hx-card', slug: 'component-library/hx-card' },
+            { label: 'hx-text-input', slug: 'component-library/hx-text-input' },
           ],
         },
         {

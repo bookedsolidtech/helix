@@ -5,7 +5,7 @@ description: Lit 3.x component architecture, Storybook 10.x integration, and ent
 
 > **Section Owner**: Senior Frontend Engineer
 > **Last Updated**: 2026-02-13
-> This section documents the component architecture, design patterns, and implementation strategy for the WC-2026 enterprise web component library.
+> This section documents the component architecture, design patterns, and implementation strategy for the HELIX enterprise web component library.
 
 ---
 
@@ -190,7 +190,7 @@ export class IntersectionController implements ReactiveController {
 
   constructor(
     host: ReactiveControllerHost & HTMLElement,
-    options: IntersectionObserverInit = { threshold: 0.1 }
+    options: IntersectionObserverInit = { threshold: 0.1 },
   ) {
     this.host = host;
     this._options = options;
@@ -213,14 +213,14 @@ export class IntersectionController implements ReactiveController {
 
 **Controllers we will build for this project:**
 
-| Controller | Purpose | Used By |
-|---|---|---|
-| `IntersectionController` | Lazy loading, scroll-triggered animations | Cards, media, images |
-| `ReducedMotionController` | Accessibility: respect `prefers-reduced-motion` | All animated components |
-| `FormValidationController` | Shared validation logic with `ElementInternals` | All form components |
-| `MediaQueryController` | Responsive behavior without CSS-only solutions | Navigation, layouts |
-| `FocusTrapController` | Modal/dialog focus management | Modals, menus, drawers |
-| `AnnounceController` | Screen reader live region announcements | Forms, notifications |
+| Controller                 | Purpose                                         | Used By                 |
+| -------------------------- | ----------------------------------------------- | ----------------------- |
+| `IntersectionController`   | Lazy loading, scroll-triggered animations       | Cards, media, images    |
+| `ReducedMotionController`  | Accessibility: respect `prefers-reduced-motion` | All animated components |
+| `FormValidationController` | Shared validation logic with `ElementInternals` | All form components     |
+| `MediaQueryController`     | Responsive behavior without CSS-only solutions  | Navigation, layouts     |
+| `FocusTrapController`      | Modal/dialog focus management                   | Modals, menus, drawers  |
+| `AnnounceController`       | Screen reader live region announcements         | Forms, notifications    |
 
 ### 3.1.5 Context Protocol for Shared State
 
@@ -280,11 +280,11 @@ theme?: WcTheme;
 
 **When to use Context vs. Properties vs. Events:**
 
-| Mechanism | Use When | Healthcare Example |
-|---|---|---|
-| **Properties** | Direct parent-child data binding | Card receiving `heading` from TWIG |
-| **Context** | Data needed by many descendants, set once at top | Theme mode, locale, analytics config |
-| **Events** | Child communicates upward to unknown ancestors | Card click, form submission, navigation |
+| Mechanism      | Use When                                         | Healthcare Example                      |
+| -------------- | ------------------------------------------------ | --------------------------------------- |
+| **Properties** | Direct parent-child data binding                 | Card receiving `heading` from TWIG      |
+| **Context**    | Data needed by many descendants, set once at top | Theme mode, locale, analytics config    |
+| **Events**     | Child communicates upward to unknown ancestors   | Card click, form submission, navigation |
 
 ### 3.1.6 Event System Architecture
 
@@ -385,6 +385,7 @@ private _handleKeydown(e: KeyboardEvent): void {
 ```
 
 **Event naming conventions:**
+
 - Prefix all events with `wc-` to prevent collision with native events and other libraries
 - Use kebab-case: `wc-card-click`, `wc-form-submit`, `wc-nav-toggle`
 - Always set `composed: true` so events cross shadow DOM boundaries (required for Drupal event listeners)
@@ -444,11 +445,13 @@ export class WcArticleLayout extends LitElement {
             <slot></slot>
           </div>
         </article>
-        ${this.hasSidebar ? html`
-          <aside class="layout__sidebar">
-            <slot name="sidebar"></slot>
-          </aside>
-        ` : nothing}
+        ${this.hasSidebar
+          ? html`
+              <aside class="layout__sidebar">
+                <slot name="sidebar"></slot>
+              </aside>
+            `
+          : nothing}
       </div>
       <slot name="footer"></slot>
     `;
@@ -478,11 +481,11 @@ private _onSlotChange = (e: Event): void => {
 
 Not every component needs Shadow DOM. The decision matrix:
 
-| Use Shadow DOM | Use Light DOM | Rationale |
-|---|---|---|
-| Design system primitives (buttons, cards, inputs) | Layout wrappers | Encapsulation protects internal styles |
-| Components with complex internal structure | Simple text formatting components | Prevents Drupal theme CSS bleed |
-| Components with internal state/logic | Components that primarily pass through content | Shadow DOM provides clean internal API |
+| Use Shadow DOM                                    | Use Light DOM                                  | Rationale                              |
+| ------------------------------------------------- | ---------------------------------------------- | -------------------------------------- |
+| Design system primitives (buttons, cards, inputs) | Layout wrappers                                | Encapsulation protects internal styles |
+| Components with complex internal structure        | Simple text formatting components              | Prevents Drupal theme CSS bleed        |
+| Components with internal state/logic              | Components that primarily pass through content | Shadow DOM provides clean internal API |
 
 **Light DOM opt-in (when needed):**
 
@@ -542,9 +545,15 @@ export class WcTextInput extends LitElement {
   }
 
   /** Allow the form to read this component's value. */
-  get form(): HTMLFormElement | null { return this._internals.form; }
-  get validity(): ValidityState { return this._internals.validity; }
-  get validationMessage(): string { return this._internals.validationMessage; }
+  get form(): HTMLFormElement | null {
+    return this._internals.form;
+  }
+  get validity(): ValidityState {
+    return this._internals.validity;
+  }
+  get validationMessage(): string {
+    return this._internals.validationMessage;
+  }
 
   private _updateFormValue(): void {
     this._internals.setFormValue(this.value);
@@ -555,7 +564,7 @@ export class WcTextInput extends LitElement {
       this._internals.setValidity(
         { valueMissing: true },
         this.errorMessage || `${this.label} is required`,
-        this._input
+        this._input,
       );
       this._invalid = true;
     } else {
@@ -569,21 +578,25 @@ export class WcTextInput extends LitElement {
     this.value = target.value;
     this._updateFormValue();
     this._validate();
-    this.dispatchEvent(new CustomEvent('wc-input', {
-      bubbles: true,
-      composed: true,
-      detail: { value: this.value, name: this.name },
-    }));
+    this.dispatchEvent(
+      new CustomEvent('wc-input', {
+        bubbles: true,
+        composed: true,
+        detail: { value: this.value, name: this.name },
+      }),
+    );
   }
 
   private _onBlur(): void {
     this._touched = true;
     this._validate();
-    this.dispatchEvent(new CustomEvent('wc-change', {
-      bubbles: true,
-      composed: true,
-      detail: { value: this.value, name: this.name },
-    }));
+    this.dispatchEvent(
+      new CustomEvent('wc-change', {
+        bubbles: true,
+        composed: true,
+        detail: { value: this.value, name: this.name },
+      }),
+    );
   }
 
   updated(changedProperties: Map<string, unknown>): void {
@@ -602,11 +615,13 @@ export class WcTextInput extends LitElement {
       <div class="field ${showError ? 'field--error' : ''}">
         <label for=${inputId} class="field__label">
           ${this.label}
-          ${this.required ? html`<span class="field__required" aria-hidden="true">*</span>` : nothing}
+          ${this.required
+            ? html`<span class="field__required" aria-hidden="true">*</span>`
+            : nothing}
         </label>
-        ${this.helpText ? html`
-          <div id=${helpId} class="field__help">${this.helpText}</div>
-        ` : nothing}
+        ${this.helpText
+          ? html` <div id=${helpId} class="field__help">${this.helpText}</div> `
+          : nothing}
         <input
           id=${inputId}
           type=${this.type}
@@ -614,18 +629,19 @@ export class WcTextInput extends LitElement {
           .value=${this.value}
           ?required=${this.required}
           aria-invalid=${showError ? 'true' : 'false'}
-          aria-describedby=${[
-            this.helpText ? helpId : '',
-            showError ? errorId : '',
-          ].filter(Boolean).join(' ') || nothing}
+          aria-describedby=${[this.helpText ? helpId : '', showError ? errorId : '']
+            .filter(Boolean)
+            .join(' ') || nothing}
           @input=${this._onInput}
           @blur=${this._onBlur}
         />
-        ${showError ? html`
-          <div id=${errorId} class="field__error" role="alert">
-            ${this._internals.validationMessage}
-          </div>
-        ` : nothing}
+        ${showError
+          ? html`
+              <div id=${errorId} class="field__error" role="alert">
+                ${this._internals.validationMessage}
+              </div>
+            `
+          : nothing}
       </div>
     `;
   }
@@ -754,17 +770,17 @@ src/
 
 ### 3.2.2 Naming Conventions
 
-| Entity | Convention | Example |
-|---|---|---|
-| Custom element tag | `wc-[name]` (kebab-case, `wc` prefix) | `wc-content-card` |
-| TypeScript class | `Wc[Name]` (PascalCase with `Wc` prefix) | `WcContentCard` |
-| File names | `wc-[name].ts` (match tag name) | `wc-content-card.ts` |
-| CSS custom properties | `--wc-[component]-[property]` | `--wc-card-radius` |
-| CSS parts | Descriptive, no prefix needed | `card`, `header`, `body` |
-| Events | `wc-[component]-[action]` | `wc-card-click` |
-| Slots | Semantic name or empty for default | `media`, `actions`, (default) |
-| Controllers | `[Name]Controller` | `IntersectionController` |
-| Contexts | `[name]Context` | `themeContext` |
+| Entity                | Convention                               | Example                       |
+| --------------------- | ---------------------------------------- | ----------------------------- |
+| Custom element tag    | `wc-[name]` (kebab-case, `wc` prefix)    | `wc-content-card`             |
+| TypeScript class      | `Wc[Name]` (PascalCase with `Wc` prefix) | `WcContentCard`               |
+| File names            | `wc-[name].ts` (match tag name)          | `wc-content-card.ts`          |
+| CSS custom properties | `--wc-[component]-[property]`            | `--wc-card-radius`            |
+| CSS parts             | Descriptive, no prefix needed            | `card`, `header`, `body`      |
+| Events                | `wc-[component]-[action]`                | `wc-card-click`               |
+| Slots                 | Semantic name or empty for default       | `media`, `actions`, (default) |
+| Controllers           | `[Name]Controller`                       | `IntersectionController`      |
+| Contexts              | `[name]Context`                          | `themeContext`                |
 
 ### 3.2.3 Healthcare Content Hub Component Inventory
 
@@ -772,44 +788,44 @@ These components are designed specifically for the healthcare content hub use ca
 
 **Content Discovery Components:**
 
-| Component | Drupal Mapping | Purpose |
-|---|---|---|
-| `wc-content-card` | Node teaser view mode | Blog/article preview card |
-| `wc-card-grid` | Views block output | Responsive grid of content cards |
-| `wc-hero-banner` | Paragraph: Hero | Full-width hero with CTA |
-| `wc-search-bar` | Search API form | Site search with autocomplete |
-| `wc-breadcrumb` | System breadcrumb block | Navigation breadcrumbs |
-| `wc-pagination` | Views pager | Page navigation for lists |
+| Component         | Drupal Mapping          | Purpose                          |
+| ----------------- | ----------------------- | -------------------------------- |
+| `wc-content-card` | Node teaser view mode   | Blog/article preview card        |
+| `wc-card-grid`    | Views block output      | Responsive grid of content cards |
+| `wc-hero-banner`  | Paragraph: Hero         | Full-width hero with CTA         |
+| `wc-search-bar`   | Search API form         | Site search with autocomplete    |
+| `wc-breadcrumb`   | System breadcrumb block | Navigation breadcrumbs           |
+| `wc-pagination`   | Views pager             | Page navigation for lists        |
 
 **Content Consumption Components:**
 
-| Component | Drupal Mapping | Purpose |
-|---|---|---|
-| `wc-article-layout` | Node full view mode | Long-form article structure |
-| `wc-accordion` | Paragraph: FAQ | Expandable FAQ sections |
-| `wc-tabs` | Paragraph: Tabbed Content | Tabbed information panels |
-| `wc-table` | Field: Table | Accessible data tables |
-| `wc-media-gallery` | Paragraph: Gallery | Image/video galleries |
+| Component           | Drupal Mapping            | Purpose                     |
+| ------------------- | ------------------------- | --------------------------- |
+| `wc-article-layout` | Node full view mode       | Long-form article structure |
+| `wc-accordion`      | Paragraph: FAQ            | Expandable FAQ sections     |
+| `wc-tabs`           | Paragraph: Tabbed Content | Tabbed information panels   |
+| `wc-table`          | Field: Table              | Accessible data tables      |
+| `wc-media-gallery`  | Paragraph: Gallery        | Image/video galleries       |
 
 **Navigation Components:**
 
-| Component | Drupal Mapping | Purpose |
-|---|---|---|
-| `wc-header` | Header block region | Site header |
-| `wc-nav-primary` | Main menu block | Desktop navigation |
-| `wc-nav-mobile` | Main menu block (mobile) | Mobile navigation drawer |
-| `wc-footer` | Footer block region | Site footer |
+| Component        | Drupal Mapping           | Purpose                  |
+| ---------------- | ------------------------ | ------------------------ |
+| `wc-header`      | Header block region      | Site header              |
+| `wc-nav-primary` | Main menu block          | Desktop navigation       |
+| `wc-nav-mobile`  | Main menu block (mobile) | Mobile navigation drawer |
+| `wc-footer`      | Footer block region      | Site footer              |
 
 **Form Components (Accessibility-Critical):**
 
-| Component | Drupal Mapping | Purpose |
-|---|---|---|
-| `wc-text-input` | Form API: textfield | Text input with validation |
-| `wc-textarea` | Form API: textarea | Multi-line text input |
-| `wc-select` | Form API: select | Dropdown selection |
-| `wc-checkbox` | Form API: checkbox | Checkbox with label |
-| `wc-radio` | Form API: radios | Radio button group |
-| `wc-form` | Webform / Form API | Form wrapper with submit handling |
+| Component       | Drupal Mapping      | Purpose                           |
+| --------------- | ------------------- | --------------------------------- |
+| `wc-text-input` | Form API: textfield | Text input with validation        |
+| `wc-textarea`   | Form API: textarea  | Multi-line text input             |
+| `wc-select`     | Form API: select    | Dropdown selection                |
+| `wc-checkbox`   | Form API: checkbox  | Checkbox with label               |
+| `wc-radio`      | Form API: radios    | Radio button group                |
+| `wc-form`       | Webform / Form API  | Form wrapper with submit handling |
 
 ---
 
@@ -827,18 +843,18 @@ import type { StorybookConfig } from '@storybook/web-components-vite';
 const config: StorybookConfig = {
   stories: ['../src/**/*.stories.ts'],
   addons: [
-    '@storybook/addon-essentials',    // Controls, actions, viewport, backgrounds
-    '@storybook/addon-a11y',          // axe-core accessibility audit per story
-    '@storybook/addon-links',         // Cross-story navigation
-    '@storybook/addon-designs',       // Figma embed integration
-    '@storybook/addon-interactions',  // Play function testing
+    '@storybook/addon-essentials', // Controls, actions, viewport, backgrounds
+    '@storybook/addon-a11y', // axe-core accessibility audit per story
+    '@storybook/addon-links', // Cross-story navigation
+    '@storybook/addon-designs', // Figma embed integration
+    '@storybook/addon-interactions', // Play function testing
   ],
   framework: {
     name: '@storybook/web-components-vite',
     options: {},
   },
   docs: {
-    autodocs: true,                   // Auto-generate docs from CEM
+    autodocs: true, // Auto-generate docs from CEM
   },
 };
 
@@ -966,8 +982,7 @@ import type { Meta, StoryObj } from '@storybook/web-components';
 import { getWcStorybookHelpers } from 'wc-storybook-helpers';
 import './wc-content-card.js';
 
-const { events, args, argTypes, template } =
-  getWcStorybookHelpers('wc-content-card');
+const { events, args, argTypes, template } = getWcStorybookHelpers('wc-content-card');
 
 const meta: Meta = {
   title: 'Organisms/Content Card',
@@ -975,7 +990,8 @@ const meta: Meta = {
   args: {
     ...args,
     heading: 'Understanding Anxiety: A Patient Guide',
-    summary: 'Learn about the symptoms, causes, and evidence-based treatments for anxiety disorders.',
+    summary:
+      'Learn about the symptoms, causes, and evidence-based treatments for anxiety disorders.',
     category: 'Mental Health',
     href: '/articles/understanding-anxiety',
     publishDate: '2026-02-10',
@@ -1017,7 +1033,8 @@ export const Featured: Story = {
   args: {
     variant: 'featured',
     heading: 'New Telehealth Services Now Available',
-    summary: 'We are expanding our virtual care options to serve you better, including mental health counseling and specialist consultations.',
+    summary:
+      'We are expanding our virtual care options to serve you better, including mental health counseling and specialist consultations.',
     category: 'Announcements',
   },
 };
@@ -1117,6 +1134,7 @@ export const CardGrid: Story = {
 Each component has multiple documentation surfaces:
 
 **Auto-generated (from CEM + JSDoc):**
+
 - Props/attributes table with types, defaults, and descriptions
 - Events table
 - Slots table
@@ -1125,6 +1143,7 @@ Each component has multiple documentation surfaces:
 - Source code snippets
 
 **Hand-written (in stories file or MDX):**
+
 - Usage guidelines and when to use vs. not use
 - Drupal integration examples (TWIG templates)
 - Accessibility notes specific to the component
@@ -1149,12 +1168,14 @@ and sidebar widgets.
 ## Usage Guidelines
 
 ### When to Use
+
 - Article listing pages (blog index, category pages)
 - Search result items
 - Related content sections in article sidebars
 - Editorial pick sections on landing pages
 
 ### When NOT to Use
+
 - Navigational links (use `wc-nav-*` components)
 - Alert/notification content (use `wc-alert`)
 - Promotional banners (use `wc-hero-banner`)
@@ -1190,35 +1211,35 @@ In your Drupal theme, override the node teaser template:
     </div>
   {% endif %}
 
-  {% if content.field_tags|render|trim is not empty %}
-    <div slot="actions">
-      {{ content.field_tags }}
-    </div>
-  {% endif %}
+{% if content.field_tags|render|trim is not empty %}
+<div slot="actions">
+{{ content.field_tags }}
+</div>
+{% endif %}
 </wc-content-card>
 `} />
 
 ## Accessibility Checklist
 
-| Requirement | Implementation | WCAG |
-|---|---|---|
-| Card heading is semantic | Uses `<h3>` inside shadow DOM | 1.3.1 |
+| Requirement                             | Implementation                         | WCAG  |
+| --------------------------------------- | -------------------------------------- | ----- |
+| Card heading is semantic                | Uses `<h3>` inside shadow DOM          | 1.3.1 |
 | Interactive card is keyboard accessible | `tabindex="0"`, Enter/Space activation | 2.1.1 |
-| Focus indicator visible | Custom focus ring via `:focus-visible` | 2.4.7 |
-| Color is not sole indicator | Category uses text + optional color | 1.4.1 |
-| Link purpose clear from context | Heading text describes destination | 2.4.4 |
-| Images have appropriate alt text | Consumer responsibility via slot | 1.1.1 |
+| Focus indicator visible                 | Custom focus ring via `:focus-visible` | 2.4.7 |
+| Color is not sole indicator             | Category uses text + optional color    | 1.4.1 |
+| Link purpose clear from context         | Heading text describes destination     | 2.4.4 |
+| Images have appropriate alt text        | Consumer responsibility via slot       | 1.1.1 |
 ```
 
 ### 3.3.5 Storybook Add-ons for Healthcare Context
 
-| Add-on | Purpose | Healthcare Relevance |
-|---|---|---|
-| `@storybook/addon-a11y` | axe-core accessibility audit | WCAG 2.1 AA compliance is mandatory for healthcare |
-| `@storybook/addon-viewport` | Responsive testing | Patients access on mobile, tablet, desktop |
-| `@storybook/addon-interactions` | Play function test execution | Verify keyboard navigation, form flows |
-| `@storybook/addon-designs` | Figma frame embedding | Design review in context |
-| `@storybook/addon-links` | Cross-story navigation | Link related components (card -> card grid) |
+| Add-on                          | Purpose                      | Healthcare Relevance                               |
+| ------------------------------- | ---------------------------- | -------------------------------------------------- |
+| `@storybook/addon-a11y`         | axe-core accessibility audit | WCAG 2.1 AA compliance is mandatory for healthcare |
+| `@storybook/addon-viewport`     | Responsive testing           | Patients access on mobile, tablet, desktop         |
+| `@storybook/addon-interactions` | Play function test execution | Verify keyboard navigation, form flows             |
+| `@storybook/addon-designs`      | Figma frame embedding        | Design review in context                           |
+| `@storybook/addon-links`        | Cross-story navigation       | Link related components (card -> card grid)        |
 
 ---
 
@@ -1269,13 +1290,13 @@ In your Drupal theme, override the node teaser template:
           "no-unknown-property": "error",
           "no-unknown-event": "error",
           "no-unknown-slot": "error",
-          "no-invalid-css": "warning"
-        }
-      }
-    ]
+          "no-invalid-css": "warning",
+        },
+      },
+    ],
   },
   "include": ["src/**/*.ts"],
-  "exclude": ["src/**/*.test.ts", "src/**/*.stories.ts"]
+  "exclude": ["src/**/*.test.ts", "src/**/*.stories.ts"],
 }
 ```
 
@@ -1291,14 +1312,14 @@ Every public API surface must have JSDoc documentation. The CEM analyzer extract
 
 **Required JSDoc tags by entity:**
 
-| Entity | Required Tags | Example |
-|---|---|---|
-| Component class | `@element`, `@slot`, `@csspart`, `@cssprop`, `@fires` | See section 3.1.3 |
-| Public property | Description, Drupal field mapping | `/** The card heading. Maps to node.title */` |
-| Public method | `@param`, `@returns` | Standard JSDoc |
-| Custom event | `@fires` on class, interface for detail | See section 3.1.6 |
-| Controller | Class description, public property/method docs | See section 3.1.4 |
-| Type/Interface | Description of each property | Standard JSDoc |
+| Entity          | Required Tags                                         | Example                                       |
+| --------------- | ----------------------------------------------------- | --------------------------------------------- |
+| Component class | `@element`, `@slot`, `@csspart`, `@cssprop`, `@fires` | See section 3.1.3                             |
+| Public property | Description, Drupal field mapping                     | `/** The card heading. Maps to node.title */` |
+| Public method   | `@param`, `@returns`                                  | Standard JSDoc                                |
+| Custom event    | `@fires` on class, interface for detail               | See section 3.1.6                             |
+| Controller      | Class description, public property/method docs        | See section 3.1.4                             |
+| Type/Interface  | Description of each property                          | Standard JSDoc                                |
 
 **Enforcement:**
 
@@ -1314,7 +1335,7 @@ Every public API surface must have JSDoc documentation. The CEM analyzer extract
 
 The library ships TypeScript declarations so that TypeScript-based consumers get full type safety.
 
-```typescript
+````typescript
 // src/types/events.ts
 
 /**
@@ -1361,7 +1382,7 @@ export interface WcEventDetailMap {
  * Type-safe custom event helper.
  */
 export type WcEvent<T extends WcEventName> = CustomEvent<WcEventDetailMap[T]>;
-```
+````
 
 **Global type augmentation for HTML element references:**
 
@@ -1388,11 +1409,11 @@ This enables `document.querySelector('wc-content-card')` to return the correct t
 
 Drupal integration documentation exists in **three places**, each serving a different audience:
 
-| Location | Audience | Content |
-|---|---|---|
-| **Storybook MDX pages** | Frontend developers, Drupal themers | TWIG template examples, prop mapping tables |
-| **`drupal/` directory in repo** | Drupal site builders | Reference TWIG templates, library definitions, README |
-| **Custom Elements Manifest** | IDEs, tooling, automated docs | Machine-readable API surface |
+| Location                        | Audience                            | Content                                               |
+| ------------------------------- | ----------------------------------- | ----------------------------------------------------- |
+| **Storybook MDX pages**         | Frontend developers, Drupal themers | TWIG template examples, prop mapping tables           |
+| **`drupal/` directory in repo** | Drupal site builders                | Reference TWIG templates, library definitions, README |
+| **Custom Elements Manifest**    | IDEs, tooling, automated docs       | Machine-readable API surface                          |
 
 ### 3.5.2 Prop Mapping Strategy (Web Component Attributes <-> Drupal Field Data)
 
@@ -1401,15 +1422,15 @@ Every component includes a **Drupal Integration** section in its Storybook docum
 ```markdown
 ## Drupal Prop Mapping
 
-| WC Attribute    | Type   | Drupal Source                          | TWIG Expression                                    |
-|-----------------|--------|----------------------------------------|----------------------------------------------------|
-| `heading`       | String | Node title                             | `{{ label[0]['#title'] \| default(node.label) }}`   |
-| `summary`       | String | field_summary (Plain text)             | `{{ content.field_summary\|render\|striptags\|trim }}` |
-| `category`      | String | field_category (Term reference)        | `{{ node.field_category.entity.label }}`            |
-| `href`          | String | Node canonical URL                     | `{{ url }}`                                         |
-| `publish-date`  | String | Node created date (ISO 8601)           | `{{ node.createdtime\|date('c') }}`                 |
-| `read-time`     | Number | field_read_time (Integer)              | `{{ content.field_read_time\|render\|striptags }}`  |
-| `variant`       | String | Derived from view mode or is_promoted  | `{{ is_promoted ? 'featured' : 'default' }}`        |
+| WC Attribute   | Type   | Drupal Source                         | TWIG Expression                                        |
+| -------------- | ------ | ------------------------------------- | ------------------------------------------------------ |
+| `heading`      | String | Node title                            | `{{ label[0]['#title'] \| default(node.label) }}`      |
+| `summary`      | String | field_summary (Plain text)            | `{{ content.field_summary\|render\|striptags\|trim }}` |
+| `category`     | String | field_category (Term reference)       | `{{ node.field_category.entity.label }}`               |
+| `href`         | String | Node canonical URL                    | `{{ url }}`                                            |
+| `publish-date` | String | Node created date (ISO 8601)          | `{{ node.createdtime\|date('c') }}`                    |
+| `read-time`    | Number | field_read_time (Integer)             | `{{ content.field_read_time\|render\|striptags }}`     |
+| `variant`      | String | Derived from view mode or is_promoted | `{{ is_promoted ? 'featured' : 'default' }}`           |
 ```
 
 ### 3.5.3 Reference TWIG Templates
@@ -1621,9 +1642,7 @@ import { esbuildPlugin } from '@web/dev-server-esbuild';
 export default {
   files: 'src/**/*.test.ts',
   nodeResolve: true,
-  plugins: [
-    esbuildPlugin({ ts: true, target: 'auto' }),
-  ],
+  plugins: [esbuildPlugin({ ts: true, target: 'auto' })],
   browsers: [
     playwrightLauncher({ product: 'chromium' }),
     playwrightLauncher({ product: 'firefox' }),
@@ -1711,10 +1730,7 @@ describe('wc-content-card', () => {
 
   it('fires wc-card-click on click', async () => {
     const el = await fixture<WcContentCard>(html`
-      <wc-content-card
-        heading="Click Test"
-        href="/test"
-      ></wc-content-card>
+      <wc-content-card heading="Click Test" href="/test"></wc-content-card>
     `);
 
     const listener = oneEvent(el, 'wc-card-click');
@@ -1825,17 +1841,13 @@ class TestHost extends LitElement {
 
 describe('IntersectionController', () => {
   it('initializes with isVisible=false', async () => {
-    const el = await fixture<TestHost>(html`
-      <test-intersection-host></test-intersection-host>
-    `);
+    const el = await fixture<TestHost>(html` <test-intersection-host></test-intersection-host> `);
 
     expect(el.intersection.isVisible).to.be.false;
   });
 
   it('cleans up observer on disconnect', async () => {
-    const el = await fixture<TestHost>(html`
-      <test-intersection-host></test-intersection-host>
-    `);
+    const el = await fixture<TestHost>(html` <test-intersection-host></test-intersection-host> `);
 
     el.remove();
     // Verify no errors occur after disconnect
@@ -1860,12 +1872,14 @@ describe('IntersectionController', () => {
 ```
 
 **What gets tested:**
+
 - Every story in every theme (light, dark, high-contrast)
 - Every viewport size (mobile, tablet, desktop)
 - Every variant of every component
 - Hover/focus/active states via play functions
 
 **Workflow:**
+
 1. Developer creates/modifies a component
 2. PR triggers Chromatic build
 3. Chromatic captures screenshots of all affected stories
@@ -1900,15 +1914,15 @@ Accessibility testing happens at three levels:
 
 **Healthcare-specific accessibility requirements:**
 
-| Requirement | Standard | Our Approach |
-|---|---|---|
-| Form error identification | WCAG 3.3.1 | `role="alert"` on error messages, `aria-invalid` on inputs |
-| Labels and instructions | WCAG 3.3.2 | Every input has visible label + `help-text` attribute |
-| Error suggestion | WCAG 3.3.3 | Error messages describe how to fix, not just what's wrong |
-| Error prevention | WCAG 3.3.4 | Confirmation dialogs on destructive actions |
-| Consistent navigation | WCAG 3.2.3 | Navigation components render identically across pages |
-| Focus visible | WCAG 2.4.7 | Custom focus ring on all interactive elements, 3:1 contrast ratio |
-| Target size | WCAG 2.5.8 | Minimum 44x44px touch targets on all interactive elements |
+| Requirement               | Standard   | Our Approach                                                      |
+| ------------------------- | ---------- | ----------------------------------------------------------------- |
+| Form error identification | WCAG 3.3.1 | `role="alert"` on error messages, `aria-invalid` on inputs        |
+| Labels and instructions   | WCAG 3.3.2 | Every input has visible label + `help-text` attribute             |
+| Error suggestion          | WCAG 3.3.3 | Error messages describe how to fix, not just what's wrong         |
+| Error prevention          | WCAG 3.3.4 | Confirmation dialogs on destructive actions                       |
+| Consistent navigation     | WCAG 3.2.3 | Navigation components render identically across pages             |
+| Focus visible             | WCAG 2.4.7 | Custom focus ring on all interactive elements, 3:1 contrast ratio |
+| Target size               | WCAG 2.5.8 | Minimum 44x44px touch targets on all interactive elements         |
 
 ### 3.6.7 Test Script Configuration
 
@@ -1939,7 +1953,7 @@ Design tokens are defined as CSS custom properties, organized by category. They 
 /* src/styles/themes/light.css */
 
 :root,
-[data-theme="light"] {
+[data-theme='light'] {
   /* ── Color Tokens ────────────────────────────────────── */
   --wc-color-primary: #1e40af;
   --wc-color-primary-hover: #1e3a8a;
@@ -2013,7 +2027,7 @@ Design tokens are defined as CSS custom properties, organized by category. They 
 ```css
 /* src/styles/themes/dark.css */
 
-[data-theme="dark"] {
+[data-theme='dark'] {
   --wc-color-primary: #60a5fa;
   --wc-color-primary-hover: #93bbfd;
   --wc-color-primary-active: #3b82f6;
@@ -2043,7 +2057,7 @@ Design tokens are defined as CSS custom properties, organized by category. They 
 ```css
 /* src/styles/themes/high-contrast.css */
 
-[data-theme="high-contrast"] {
+[data-theme='high-contrast'] {
   --wc-color-primary: #ffffff;
   --wc-color-on-primary: #000000;
 
@@ -2123,7 +2137,7 @@ CSS Shadow Parts expose internal elements for targeted styling by consumers, pro
 /* In the consuming Drupal theme's CSS */
 
 /* Style the card header area differently for featured content */
-wc-content-card[variant="featured"]::part(header) {
+wc-content-card[variant='featured']::part(header) {
   min-height: 200px;
   background: linear-gradient(135deg, var(--wc-color-primary), var(--wc-color-secondary));
 }
@@ -2138,7 +2152,7 @@ wc-content-card[variant="featured"]::part(header) {
 
 ## Summary: Architecture Highlights
 
-The following architectural decisions define the WC-2026 component library:
+The following architectural decisions define the HELIX component library:
 
 1. **Custom Elements Manifest as the single source of truth**: One `cem analyze` command generates the JSON that powers Storybook controls, IDE autocomplete, Drupal documentation, and API reference. This eliminates documentation drift.
 

@@ -1,9 +1,9 @@
 ---
 title: Drupal Integration Overview
-description: How WC-2026 web components integrate with Drupal CMS
+description: How HELIX web components integrate with Drupal CMS
 ---
 
-WC-2026 components are designed for **zero-coupling** Drupal integration. The library works with Drupal 10/11 without requiring custom modules or PHP changes.
+HELIX components are designed for **zero-coupling** Drupal integration. The library works with Drupal 10/11 without requiring custom modules or PHP changes.
 
 ## Integration Architecture
 
@@ -13,23 +13,23 @@ WC-2026 components are designed for **zero-coupling** Drupal integration. The li
 │  Content types, fields, views, blocks   │
 ├─────────────────────────────────────────┤
 │            TWIG Templates               │
-│  Render content using WC-2026 tags      │
+│  Render content using HELIX tags      │
 ├─────────────────────────────────────────┤
 │         Drupal Behaviors                │
 │  Initialize components, handle events   │
 ├─────────────────────────────────────────┤
-│            WC-2026 Library              │
+│            HELIX Library              │
 │  CDN or npm distribution, auto-upgrade  │
 └─────────────────────────────────────────┘
 ```
 
 ## Integration Methods
 
-| Method | Best For | Setup Time |
-|--------|----------|------------|
-| **CDN** | Quick prototyping, small sites | Minutes |
-| **npm** | Custom themes, full control | Hours |
-| **Module** | Enterprise, multi-site | Days |
+| Method     | Best For                       | Setup Time |
+| ---------- | ------------------------------ | ---------- |
+| **CDN**    | Quick prototyping, small sites | Minutes    |
+| **npm**    | Custom themes, full control    | Hours      |
+| **Module** | Enterprise, multi-site         | Days       |
 
 ## Key Benefits
 
@@ -45,6 +45,6 @@ For the complete Drupal integration specification (98,000+ words), see the [Pre-
 
 ## Next Steps
 
-- [Installation](/drupal-integration/installation/) - Add WC-2026 to your Drupal site
+- [Installation](/drupal-integration/installation/) - Add HELIX to your Drupal site
 - [TWIG Patterns](/drupal-integration/twig/) - Template examples
 - [Behaviors](/drupal-integration/behaviors/) - JavaScript integration

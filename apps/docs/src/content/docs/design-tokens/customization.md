@@ -1,9 +1,9 @@
 ---
 title: Customization
-description: How to customize WC-2026 design tokens for your brand
+description: How to customize HELIX design tokens for your brand
 ---
 
-WC-2026 is designed for easy brand customization. Override tokens at any tier to match your organization's visual identity.
+HELIX is designed for easy brand customization. Override tokens at any tier to match your organization's visual identity.
 
 ## Quick Customization
 

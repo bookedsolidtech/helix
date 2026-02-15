@@ -1,6 +1,6 @@
 ---
 title: Rapid Prototype
-description: Building the first proof-of-concept components to validate the WC-2026 architecture
+description: Building the first proof-of-concept components to validate the HELIX architecture
 ---
 
 > **Status**: In Progress
@@ -26,6 +26,7 @@ The rapid prototype focuses on building a **thin vertical slice** through the en
 The simplest interactive component - validates the core authoring pattern.
 
 **Validates:**
+
 - Lit 3.x component authoring with TypeScript
 - CSS custom properties for theming
 - Slot-based content projection
@@ -39,6 +40,7 @@ The simplest interactive component - validates the core authoring pattern.
 A complex content component - validates composition patterns.
 
 **Validates:**
+
 - Multi-slot composition (image, heading, body, footer)
 - Responsive layout with container queries
 - Design token consumption
@@ -51,6 +53,7 @@ A complex content component - validates composition patterns.
 A form component - validates form integration.
 
 **Validates:**
+
 - Form-associated custom elements (ElementInternals)
 - Validation states and error messaging
 - Label association and accessibility

@@ -1,21 +1,21 @@
 ---
 title: Component API
-description: API conventions and patterns for WC-2026 web components
+description: API conventions and patterns for HELIX web components
 ---
 
-All WC-2026 components follow consistent API conventions for predictable usage and Drupal integration.
+All HELIX components follow consistent API conventions for predictable usage and Drupal integration.
 
 ## Naming Conventions
 
-| Type | Convention | Example |
-|------|-----------|---------|
-| Tag name | `wc-` prefix, kebab-case | `wc-card`, `wc-button` |
-| Properties | camelCase | `variant`, `disabled` |
-| Attributes | kebab-case (auto-reflected) | `variant`, `disabled` |
-| Events | `wc-` prefix | `wc-click`, `wc-change` |
-| CSS Parts | kebab-case | `container`, `header-text` |
-| CSS Custom Properties | `--wc-` prefix | `--wc-card-padding` |
-| Slots | kebab-case | `header`, `actions` |
+| Type                  | Convention                  | Example                    |
+| --------------------- | --------------------------- | -------------------------- |
+| Tag name              | `wc-` prefix, kebab-case    | `wc-card`, `wc-button`     |
+| Properties            | camelCase                   | `variant`, `disabled`      |
+| Attributes            | kebab-case (auto-reflected) | `variant`, `disabled`      |
+| Events                | `wc-` prefix                | `wc-click`, `wc-change`    |
+| CSS Parts             | kebab-case                  | `container`, `header-text` |
+| CSS Custom Properties | `--wc-` prefix              | `--wc-card-padding`        |
+| Slots                 | kebab-case                  | `header`, `actions`        |
 
 ## Property Types
 
@@ -44,11 +44,13 @@ items: ItemData[] = [];
 All custom events follow this pattern:
 
 ```typescript
-this.dispatchEvent(new CustomEvent('wc-change', {
-  detail: { value: this.value },
-  bubbles: true,
-  composed: true,
-}));
+this.dispatchEvent(
+  new CustomEvent('wc-change', {
+    detail: { value: this.value },
+    bubbles: true,
+    composed: true,
+  }),
+);
 ```
 
 ## Custom Elements Manifest
