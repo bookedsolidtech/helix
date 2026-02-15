@@ -1,6 +1,6 @@
 {
   "buildCommand": "cd ../.. && npx turbo build --filter=@helix/admin",
-  "installCommand": "npm ci --include=optional",
+  "installCommand": "cd ../.. && npm ci",
   "framework": "nextjs",
   "headers": [
     {
