@@ -2,7 +2,7 @@
   "name": "@wc-2026/admin",
   "version": "0.0.1",
   "private": true,
-  "description": "Admin Dashboard — WC-2026 Component Library",
+  "description": "Panopticon Platform — WC-2026 Component Library",
   "scripts": {
     "dev": "next dev --port 3159 --turbopack",
     "build": "next build",

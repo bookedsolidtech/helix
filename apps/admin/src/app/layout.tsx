@@ -1,5 +1,5 @@
-import type { Metadata } from "next";
-import Link from "next/link";
+import type { Metadata } from 'next';
+import Link from 'next/link';
 import {
   LayoutDashboard,
   Activity,
@@ -9,12 +9,13 @@ import {
   Component,
   Boxes,
   ExternalLink,
-} from "lucide-react";
-import "./globals.css";
+} from 'lucide-react';
+import './globals.css';
 
 export const metadata: Metadata = {
-  title: "Admin Dashboard — WC-2026 Component Library",
-  description: "Internal admin dashboard for WC-2026 component library health, CEM pipeline, and development lifecycle.",
+  title: 'Panopticon Platform — WC-2026 Component Library',
+  description:
+    'Panopticon Platform: Internal dashboard for WC-2026 component library health, CEM pipeline, and development lifecycle.',
 };
 
 function SidebarLink({
@@ -37,11 +38,7 @@ function SidebarLink({
   );
 }
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className="dark">
       <body className="antialiased">
@@ -50,47 +47,31 @@ export default function RootLayout({
           <aside className="sticky top-0 h-screen w-64 border-r border-border bg-sidebar p-4 flex flex-col gap-6 shrink-0 overflow-y-auto">
             <div className="px-3 py-2">
               <h1 className="text-lg font-bold text-foreground tracking-tight">
-                Admin Dashboard
+                Panopticon Platform
               </h1>
               <p className="text-xs text-muted-foreground">WC-2026 Component Library</p>
             </div>
 
             <nav className="flex flex-col gap-1">
-              <SidebarLink
-                href="/"
-                icon={<LayoutDashboard className="w-4 h-4" />}
-              >
+              <SidebarLink href="/" icon={<LayoutDashboard className="w-4 h-4" />}>
                 Dashboard
               </SidebarLink>
 
-              <SidebarLink
-                href="/components"
-                icon={<Boxes className="w-4 h-4" />}
-              >
+              <SidebarLink href="/components" icon={<Boxes className="w-4 h-4" />}>
                 Components
               </SidebarLink>
 
-              <SidebarLink
-                href="/tests"
-                icon={<FileCheck2 className="w-4 h-4" />}
-              >
+              <SidebarLink href="/tests" icon={<FileCheck2 className="w-4 h-4" />}>
                 Tests
               </SidebarLink>
 
-              <SidebarLink
-                href="/tokens"
-                icon={<Palette className="w-4 h-4" />}
-              >
+              <SidebarLink href="/tokens" icon={<Palette className="w-4 h-4" />}>
                 Tokens
               </SidebarLink>
 
-              <SidebarLink
-                href="/pipeline"
-                icon={<Activity className="w-4 h-4" />}
-              >
+              <SidebarLink href="/pipeline" icon={<Activity className="w-4 h-4" />}>
                 Pipeline
               </SidebarLink>
-
             </nav>
 
             <div className="rounded-lg border border-border bg-card p-3">
@@ -118,14 +99,11 @@ export default function RootLayout({
                 </a>
               </div>
             </div>
-
           </aside>
 
           {/* Main content */}
           <main className="flex-1 overflow-auto">
-            <div className="p-8 max-w-7xl mx-auto">
-              {children}
-            </div>
+            <div className="p-8 max-w-7xl mx-auto">{children}</div>
           </main>
         </div>
       </body>
