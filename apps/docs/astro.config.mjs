@@ -39,12 +39,12 @@ export default defineConfig({
         Header: './src/components/Header.astro',
         SkipLink: './src/components/SkipLink.astro',
       },
-      title: 'HELIX',
+      title: 'HELiX',
       description: 'Healthcare Elements Library for Interactive eXperiences - Enterprise Web Components for Drupal CMS',
       logo: {
-        light: './src/assets/logos/helix-light.svg',
-        dark: './src/assets/logos/helix-dark.svg',
-        replacesTitle: false,
+        light: './src/assets/logos/helix-logo-light.svg',
+        dark: './src/assets/logos/helix-logo-dark.svg',
+        replacesTitle: true,
       },
       social: [
         {
