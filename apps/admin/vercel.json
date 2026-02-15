@@ -1,5 +1,5 @@
 {
-  "buildCommand": "cd ../.. && npm run build --workspace=apps/admin",
+  "buildCommand": "cd ../.. && npx turbo build --filter=@helix/admin",
   "installCommand": "npm install",
   "headers": [
     {
