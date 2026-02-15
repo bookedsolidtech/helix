@@ -1,0 +1,17 @@
+{
+  "buildCommand": "cd ../.. && npm run build --workspace=apps/docs",
+  "outputDirectory": "dist",
+  "installCommand": "npm install",
+  "ignoreCommand": "bash -c 'if [[ \"$VERCEL_GIT_COMMIT_REF\" != \"main\" ]] ; then exit 1; else git diff HEAD^ HEAD --quiet apps/docs apps/storybook packages/wc-library || exit 1; fi'",
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex, nofollow"
+        }
+      ]
+    }
+  ]
+}

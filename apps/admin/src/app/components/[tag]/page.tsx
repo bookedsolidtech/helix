@@ -1,22 +1,29 @@
-import { notFound } from "next/navigation";
-import Link from "next/link";
-import { getComponentData, getAllComponentNames } from "@/lib/cem-parser";
-import { validateComponent } from "@/lib/cem-validator";
-import { analyzeJsDoc, detectDrift } from "@/lib/jsdoc-analyzer";
-import { scoreComponent } from "@/lib/health-scorer";
-import { getSourceInfo } from "@/lib/source-analyzer";
-import { getTestResultsForComponent } from "@/lib/test-results-reader";
-import { analyzeAccessibility } from "@/lib/a11y-analyzer";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table";
-import { HealthRadar } from "@/components/dashboard/HealthRadar";
-import { CemMatrix } from "@/components/dashboard/CemMatrix";
-import { ScoreBar } from "@/components/dashboard/ScoreBadge";
-import { SplitButtonDropdown } from "@/components/dashboard/SplitButtonDropdown";
-import { Breadcrumb } from "@/components/dashboard/Breadcrumb";
-import { getComponentBreadcrumbs } from "@/lib/breadcrumb-utils";
-import { cn } from "@/lib/utils";
+import { notFound } from 'next/navigation';
+import { getComponentData, getAllComponentNames } from '@/lib/cem-parser';
+import { validateComponent } from '@/lib/cem-validator';
+import { analyzeJsDoc, detectDrift } from '@/lib/jsdoc-analyzer';
+import { scoreComponent } from '@/lib/health-scorer';
+import { getSourceInfo } from '@/lib/source-analyzer';
+import { getTestResultsForComponent } from '@/lib/test-results-reader';
+import { analyzeAccessibility } from '@/lib/a11y-analyzer';
+import { getStorybookUrl, getDocsUrl } from '@/lib/env';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import {
+  Table,
+  TableHeader,
+  TableBody,
+  TableRow,
+  TableHead,
+  TableCell,
+} from '@/components/ui/table';
+import { HealthRadar } from '@/components/dashboard/HealthRadar';
+import { CemMatrix } from '@/components/dashboard/CemMatrix';
+import { ScoreBar } from '@/components/dashboard/ScoreBadge';
+import { SplitButtonDropdown } from '@/components/dashboard/SplitButtonDropdown';
+import { Breadcrumb } from '@/components/dashboard/Breadcrumb';
+import { getComponentBreadcrumbs } from '@/lib/breadcrumb-utils';
+import { cn } from '@/lib/utils';
 
 export function generateStaticParams() {
   return getAllComponentNames().map((tag) => ({ tag }));
@@ -57,18 +64,24 @@ export default async function ComponentDetailPage({
           </div>
           <div className="flex items-center gap-4">
             <SplitButtonDropdown
-              storybookUrl={`http://localhost:3151/?path=/story/components-${tag}--default`}
-              docsUrl={`http://localhost:3150/component-library/${tag}/`}
+              storybookUrl={getStorybookUrl(tag, 'default')}
+              docsUrl={getDocsUrl(tag)}
             />
             {health && (
-              <div className={cn(
-                "flex items-center justify-center w-16 h-16 rounded-xl border text-2xl font-bold",
-                health.grade === "A" ? "text-emerald-400 bg-emerald-400/10 border-emerald-400/30" :
-                health.grade === "B" ? "text-blue-400 bg-blue-400/10 border-blue-400/30" :
-                health.grade === "C" ? "text-amber-400 bg-amber-400/10 border-amber-400/30" :
-                health.grade === "D" ? "text-orange-400 bg-orange-400/10 border-orange-400/30" :
-                "text-red-400 bg-red-400/10 border-red-400/30"
-              )}>
+              <div
+                className={cn(
+                  'flex items-center justify-center w-16 h-16 rounded-xl border text-2xl font-bold',
+                  health.grade === 'A'
+                    ? 'text-emerald-400 bg-emerald-400/10 border-emerald-400/30'
+                    : health.grade === 'B'
+                      ? 'text-blue-400 bg-blue-400/10 border-blue-400/30'
+                      : health.grade === 'C'
+                        ? 'text-amber-400 bg-amber-400/10 border-amber-400/30'
+                        : health.grade === 'D'
+                          ? 'text-orange-400 bg-orange-400/10 border-orange-400/30'
+                          : 'text-red-400 bg-red-400/10 border-red-400/30',
+                )}
+              >
                 {health.grade}
               </div>
             )}
@@ -93,7 +106,9 @@ export default async function ComponentDetailPage({
             <CardHeader>
               <CardTitle>Health Score: {health.overallScore}/100</CardTitle>
               <CardDescription>
-                {health.dimensions.length} dimensions: {health.confidenceSummary.verified} verified, {health.confidenceSummary.heuristic} heuristic, {health.confidenceSummary.untested} untested
+                {health.dimensions.length} dimensions: {health.confidenceSummary.verified} verified,{' '}
+                {health.confidenceSummary.heuristic} heuristic, {health.confidenceSummary.untested}{' '}
+                untested
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -101,10 +116,7 @@ export default async function ComponentDetailPage({
               <div className="mt-4 space-y-2">
                 {health.dimensions.map((d) => (
                   <div key={d.name} className="flex items-center justify-between text-sm">
-                    <span className={cn(
-                      "flex items-center gap-1.5",
-                      !d.measured && "opacity-50"
-                    )}>
+                    <span className={cn('flex items-center gap-1.5', !d.measured && 'opacity-50')}>
                       <ConfidenceIcon confidence={d.confidence} />
                       <span className="text-muted-foreground">{d.name}</span>
                       {!d.measured && (
@@ -118,7 +130,7 @@ export default async function ComponentDetailPage({
                         {d.methodology}
                       </span>
                       <span className="font-mono tabular-nums text-xs min-w-[3rem] text-right">
-                        {d.measured ? `${d.score}%` : "\u2014"}
+                        {d.measured ? `${d.score}%` : '\u2014'}
                       </span>
                     </span>
                   </div>
@@ -151,17 +163,32 @@ export default async function ComponentDetailPage({
               <CardDescription>Source file: {jsDoc.sourceFile}</CardDescription>
             </CardHeader>
             <CardContent className="space-y-3">
-              <ScoreBar score={jsDoc.propertyDocs > 0 ? 100 : 0} label={`Properties (${jsDoc.propertyDocs} documented)`} />
-              <ScoreBar score={jsDoc.eventDocs > 0 ? 100 : 0} label={`Events (${jsDoc.eventDocs} documented)`} />
-              <ScoreBar score={jsDoc.slotDocs > 0 ? 100 : 0} label={`Slots (${jsDoc.slotDocs} documented)`} />
-              <ScoreBar score={jsDoc.cssPropDocs > 0 ? 100 : 0} label={`CSS Properties (${jsDoc.cssPropDocs} documented)`} />
-              <ScoreBar score={jsDoc.cssPartDocs > 0 ? 100 : 0} label={`CSS Parts (${jsDoc.cssPartDocs} documented)`} />
+              <ScoreBar
+                score={jsDoc.propertyDocs > 0 ? 100 : 0}
+                label={`Properties (${jsDoc.propertyDocs} documented)`}
+              />
+              <ScoreBar
+                score={jsDoc.eventDocs > 0 ? 100 : 0}
+                label={`Events (${jsDoc.eventDocs} documented)`}
+              />
+              <ScoreBar
+                score={jsDoc.slotDocs > 0 ? 100 : 0}
+                label={`Slots (${jsDoc.slotDocs} documented)`}
+              />
+              <ScoreBar
+                score={jsDoc.cssPropDocs > 0 ? 100 : 0}
+                label={`CSS Properties (${jsDoc.cssPropDocs} documented)`}
+              />
+              <ScoreBar
+                score={jsDoc.cssPartDocs > 0 ? 100 : 0}
+                label={`CSS Parts (${jsDoc.cssPartDocs} documented)`}
+              />
               <div className="flex gap-2 pt-2">
-                <Badge variant={jsDoc.classDescription ? "success" : "warning"}>
-                  {jsDoc.classDescription ? "Has Description" : "Missing Description"}
+                <Badge variant={jsDoc.classDescription ? 'success' : 'warning'}>
+                  {jsDoc.classDescription ? 'Has Description' : 'Missing Description'}
                 </Badge>
-                <Badge variant={jsDoc.classSummary ? "success" : "warning"}>
-                  {jsDoc.classSummary ? "Has Summary" : "Missing Summary"}
+                <Badge variant={jsDoc.classSummary ? 'success' : 'warning'}>
+                  {jsDoc.classSummary ? 'Has Summary' : 'Missing Summary'}
                 </Badge>
               </div>
             </CardContent>
@@ -174,12 +201,18 @@ export default async function ComponentDetailPage({
               <CardTitle>
                 Drift Detection
                 {drift.hasDrift ? (
-                  <Badge variant="warning" className="ml-2">{drift.driftCount} issues</Badge>
+                  <Badge variant="warning" className="ml-2">
+                    {drift.driftCount} issues
+                  </Badge>
                 ) : (
-                  <Badge variant="success" className="ml-2">In Sync</Badge>
+                  <Badge variant="success" className="ml-2">
+                    In Sync
+                  </Badge>
                 )}
               </CardTitle>
-              <CardDescription>Comparing JSDoc source annotations against CEM output</CardDescription>
+              <CardDescription>
+                Comparing JSDoc source annotations against CEM output
+              </CardDescription>
             </CardHeader>
             <CardContent>
               {drift.driftItems.length === 0 ? (
@@ -234,10 +267,10 @@ export default async function ComponentDetailPage({
             <CardTitle>
               Test Coverage: {testResults.passRate}%
               <Badge
-                variant={testResults.failed === 0 ? "success" : "destructive"}
+                variant={testResults.failed === 0 ? 'success' : 'destructive'}
                 className="ml-2"
               >
-                {testResults.failed === 0 ? "All Passing" : `${testResults.failed} Failed`}
+                {testResults.failed === 0 ? 'All Passing' : `${testResults.failed} Failed`}
               </Badge>
             </CardTitle>
             <CardDescription>
@@ -258,9 +291,9 @@ export default async function ComponentDetailPage({
                 {testResults.tests.map((test) => (
                   <TableRow key={test.fullName}>
                     <TableCell>
-                      {test.status === "pass" ? (
+                      {test.status === 'pass' ? (
                         <span className="text-emerald-400">&#10003;</span>
-                      ) : test.status === "fail" ? (
+                      ) : test.status === 'fail' ? (
                         <span className="text-red-400">&#10007;</span>
                       ) : (
                         <span className="text-amber-400">&mdash;</span>
@@ -268,7 +301,9 @@ export default async function ComponentDetailPage({
                     </TableCell>
                     <TableCell className="text-xs">{test.name}</TableCell>
                     <TableCell>
-                      <Badge variant="outline" className="text-[10px]">{test.suite}</Badge>
+                      <Badge variant="outline" className="text-[10px]">
+                        {test.suite}
+                      </Badge>
                     </TableCell>
                     <TableCell className="text-right font-mono text-xs tabular-nums">
                       {test.duration}ms
@@ -287,11 +322,8 @@ export default async function ComponentDetailPage({
           <CardHeader>
             <CardTitle>
               Accessibility: {a11y.score}%
-              <Badge
-                variant={a11y.hasAxeResults ? "success" : "warning"}
-                className="ml-2"
-              >
-                {a11y.hasAxeResults ? "axe-core verified" : "Static analysis only"}
+              <Badge variant={a11y.hasAxeResults ? 'success' : 'warning'} className="ml-2">
+                {a11y.hasAxeResults ? 'axe-core verified' : 'Static analysis only'}
               </Badge>
             </CardTitle>
             <CardDescription>
@@ -324,7 +356,9 @@ export default async function ComponentDetailPage({
             {!a11y.hasAxeResults && (
               <div className="mt-4 p-3 rounded-lg border border-amber-500/20 bg-amber-500/5">
                 <p className="text-xs text-amber-400">
-                  Static analysis only. Run <code className="bg-amber-500/10 px-1 rounded">npm run test:library</code> to generate axe-core runtime results for verified scoring.
+                  Static analysis only. Run{' '}
+                  <code className="bg-amber-500/10 px-1 rounded">npm run test:library</code> to
+                  generate axe-core runtime results for verified scoring.
                 </p>
               </div>
             )}
@@ -351,13 +385,13 @@ export default async function ComponentDetailPage({
               <div>
                 <span className="text-muted-foreground">Modified</span>
                 <p className="font-mono text-xs">
-                  {source.lastModified?.toLocaleDateString() ?? "\u2014"}
+                  {source.lastModified?.toLocaleDateString() ?? '\u2014'}
                 </p>
               </div>
               <div className="flex gap-2 items-start">
-                <Badge variant={source.hasStyles ? "success" : "outline"}>Styles</Badge>
-                <Badge variant={source.hasStories ? "success" : "outline"}>Stories</Badge>
-                <Badge variant={source.hasIndex ? "success" : "outline"}>Index</Badge>
+                <Badge variant={source.hasStyles ? 'success' : 'outline'}>Styles</Badge>
+                <Badge variant={source.hasStories ? 'success' : 'outline'}>Stories</Badge>
+                <Badge variant={source.hasIndex ? 'success' : 'outline'}>Index</Badge>
               </div>
             </div>
           </CardContent>
@@ -512,7 +546,6 @@ export default async function ComponentDetailPage({
           </CardContent>
         </Card>
       )}
-
     </div>
   );
 }
@@ -528,32 +561,59 @@ function MiniStat({ label, value }: { label: string; value: number }) {
   );
 }
 
-function ConfidenceIcon({ confidence }: { confidence: "verified" | "heuristic" | "untested" }) {
-  if (confidence === "verified") {
+function ConfidenceIcon({ confidence }: { confidence: 'verified' | 'heuristic' | 'untested' }) {
+  if (confidence === 'verified') {
     return (
-      <span className="inline-flex items-center justify-center w-4 h-4 rounded-full bg-emerald-500/20 text-emerald-400" title="Verified: real runtime/build data">
+      <span
+        className="inline-flex items-center justify-center w-4 h-4 rounded-full bg-emerald-500/20 text-emerald-400"
+        title="Verified: real runtime/build data"
+      >
         <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
-          <path d="M2 5L4.5 7.5L8 3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+          <path
+            d="M2 5L4.5 7.5L8 3"
+            stroke="currentColor"
+            strokeWidth="1.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
         </svg>
       </span>
     );
   }
-  if (confidence === "heuristic") {
+  if (confidence === 'heuristic') {
     return (
-      <span className="inline-flex items-center justify-center w-4 h-4 rounded-full bg-amber-500/20 text-amber-400" title="Heuristic: static analysis">
+      <span
+        className="inline-flex items-center justify-center w-4 h-4 rounded-full bg-amber-500/20 text-amber-400"
+        title="Heuristic: static analysis"
+      >
         <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
-          <path d="M1 5H9" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
-          <path d="M1 3H9" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeDasharray="2 2"/>
-          <path d="M1 7H9" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeDasharray="2 2"/>
+          <path d="M1 5H9" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+          <path
+            d="M1 3H9"
+            stroke="currentColor"
+            strokeWidth="1"
+            strokeLinecap="round"
+            strokeDasharray="2 2"
+          />
+          <path
+            d="M1 7H9"
+            stroke="currentColor"
+            strokeWidth="1"
+            strokeLinecap="round"
+            strokeDasharray="2 2"
+          />
         </svg>
       </span>
     );
   }
   return (
-    <span className="inline-flex items-center justify-center w-4 h-4 rounded-full bg-red-500/20 text-red-400" title="Untested: no data">
+    <span
+      className="inline-flex items-center justify-center w-4 h-4 rounded-full bg-red-500/20 text-red-400"
+      title="Untested: no data"
+    >
       <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
-        <path d="M5 2V6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
-        <circle cx="5" cy="8" r="0.75" fill="currentColor"/>
+        <path d="M5 2V6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+        <circle cx="5" cy="8" r="0.75" fill="currentColor" />
       </svg>
     </span>
   );

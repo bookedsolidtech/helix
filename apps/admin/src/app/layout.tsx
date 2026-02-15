@@ -11,12 +11,17 @@ import {
   ExternalLink,
   Map,
 } from 'lucide-react';
+import { DOCS_URL, STORYBOOK_URL } from '@/lib/env';
 import './globals.css';
 
 export const metadata: Metadata = {
   title: 'Panopticon Platform — WC-2026 Component Library',
   description:
     'Panopticon Platform: Internal dashboard for WC-2026 component library health, CEM pipeline, and development lifecycle.',
+  robots: {
+    index: false,
+    follow: false,
+  },
 };
 
 function SidebarLink({
@@ -83,7 +88,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               <p className="text-xs font-medium text-foreground mb-2">Quick Links</p>
               <div className="flex flex-col gap-1.5 text-xs">
                 <a
-                  href="http://localhost:3151"
+                  href={STORYBOOK_URL}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors"
@@ -93,7 +98,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                   <ExternalLink className="w-3 h-3 ml-auto opacity-50" />
                 </a>
                 <a
-                  href="http://localhost:3150"
+                  href={DOCS_URL}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors"

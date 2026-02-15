@@ -1,0 +1,15 @@
+{
+  "installCommand": "npm install",
+  "ignoreCommand": "bash -c 'if [[ \"$VERCEL_GIT_COMMIT_REF\" != \"main\" ]] ; then exit 1; else git diff HEAD^ HEAD --quiet apps/admin || exit 1; fi'",
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex, nofollow"
+        }
+      ]
+    }
+  ]
+}
