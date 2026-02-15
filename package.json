@@ -31,7 +31,7 @@
     "test:library": "turbo test --filter=@helix/library",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "prepare": "husky"
+    "prepare": "node -e \"try { require('husky').install() } catch (e) {}\""
   },
   "lint-staged": {
     "*.{ts,tsx,js,jsx}": [
