@@ -1,4 +1,4 @@
-import Link from "next/link";
+import Link from 'next/link';
 import {
   ChevronRight,
   Home,
@@ -8,9 +8,9 @@ import {
   Activity,
   ShieldCheck,
   Component,
-} from "lucide-react";
-import { cn } from "@/lib/utils";
-import type { BreadcrumbIconType } from "@/lib/breadcrumb-utils";
+} from 'lucide-react';
+import { cn } from '@/lib/utils';
+import type { BreadcrumbIconType } from '@/lib/breadcrumb-utils';
 
 export interface BreadcrumbItem {
   label: string;
@@ -29,22 +29,22 @@ export interface BreadcrumbProps {
 function getIconComponent(iconType?: BreadcrumbIconType): React.ReactNode {
   if (!iconType) return null;
 
-  const iconProps = { className: "w-4 h-4" };
+  const iconProps = { className: 'w-4 h-4' };
 
   switch (iconType) {
-    case "home":
+    case 'home':
       return <Home {...iconProps} />;
-    case "components":
+    case 'components':
       return <Boxes {...iconProps} />;
-    case "tests":
+    case 'tests':
       return <FileCheck2 {...iconProps} />;
-    case "tokens":
+    case 'tokens':
       return <Palette {...iconProps} />;
-    case "pipeline":
+    case 'pipeline':
       return <Activity {...iconProps} />;
-    case "architecture":
+    case 'architecture':
       return <ShieldCheck {...iconProps} />;
-    case "component-tag":
+    case 'component-tag':
       return <Component {...iconProps} />;
     default:
       return null;
@@ -84,10 +84,10 @@ export function Breadcrumb({ items }: BreadcrumbProps) {
               )}
               {hasHref ? (
                 <Link
-                  href={item.href!}
+                  href={item.href ?? '#'}
                   className={cn(
-                    "flex items-center gap-1.5 transition-colors hover:text-foreground",
-                    isLast ? "text-foreground font-medium" : "text-muted-foreground"
+                    'flex items-center gap-1.5 transition-colors hover:text-foreground',
+                    isLast ? 'text-foreground font-medium' : 'text-muted-foreground',
                   )}
                 >
                   {icon}
@@ -96,7 +96,7 @@ export function Breadcrumb({ items }: BreadcrumbProps) {
               ) : (
                 <span
                   className="flex items-center gap-1.5 text-muted-foreground"
-                  aria-current={isLast ? "page" : undefined}
+                  aria-current={isLast ? 'page' : undefined}
                 >
                   {icon}
                   {item.label}

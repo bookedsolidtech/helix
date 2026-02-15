@@ -1,4 +1,4 @@
-import tokensJson from './tokens.json' with { type: 'json' };
+import tokensJson from './tokens.json';
 import type { TokenDefinition, TokenEntry } from './types.js';
 
 export type { TokenDefinition, TokenEntry } from './types.js';
@@ -7,10 +7,7 @@ function isTokenDefinition(obj: unknown): obj is TokenDefinition {
   return typeof obj === 'object' && obj !== null && 'value' in obj;
 }
 
-function flattenTokens(
-  obj: Record<string, unknown>,
-  prefix: string[] = [],
-): TokenEntry[] {
+function flattenTokens(obj: Record<string, unknown>, prefix: string[] = []): TokenEntry[] {
   const entries: TokenEntry[] = [];
 
   for (const [key, val] of Object.entries(obj)) {
@@ -58,5 +55,5 @@ export const tokensByCategory: Record<string, TokenEntry[]> = groupBy(tokenEntri
 
 /** Quick lookup: token name -> value */
 export const tokenMap: Record<string, string> = Object.fromEntries(
-  tokenEntries.map(t => [t.name, t.value]),
+  tokenEntries.map((t) => [t.name, t.value]),
 );

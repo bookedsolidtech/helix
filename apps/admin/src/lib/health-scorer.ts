@@ -3,19 +3,19 @@
  * Calculates health from 12 dimensions with confidence tracking.
  * Every dimension reports verified, traceable data — or says NOT TESTED.
  */
-import { existsSync } from "node:fs";
-import { resolve } from "node:path";
-import { validateComponent } from "./cem-validator";
-import { getComponentDirectory } from "./cem-parser";
-import { analyzeJsDoc } from "./jsdoc-analyzer";
-import { getTestResultsForComponent, getCoverageForComponent } from "./test-results-reader";
-import { analyzeTypeSafety } from "./type-safety-analyzer";
-import { analyzeAccessibility } from "./a11y-analyzer";
-import { analyzeBundleSize } from "./bundle-analyzer";
-import { analyzeTokenCompliance } from "./token-compliance-analyzer";
-import { analyzeStoryCoverage } from "./story-coverage-analyzer";
-import { analyzeDrupalReadiness } from "./drupal-readiness-analyzer";
-import { analyzeVrt, analyzeCrossBrowser } from "./vrt-analyzer";
+import { existsSync } from 'node:fs';
+import { resolve } from 'node:path';
+import { validateComponent } from './cem-validator';
+import { getComponentDirectory } from './cem-parser';
+import { analyzeJsDoc } from './jsdoc-analyzer';
+import { getTestResultsForComponent, getCoverageForComponent } from './test-results-reader';
+import { analyzeTypeSafety } from './type-safety-analyzer';
+import { analyzeAccessibility } from './a11y-analyzer';
+import { analyzeBundleSize } from './bundle-analyzer';
+import { analyzeTokenCompliance } from './token-compliance-analyzer';
+import { analyzeStoryCoverage } from './story-coverage-analyzer';
+import { analyzeDrupalReadiness } from './drupal-readiness-analyzer';
+import { analyzeVrt, analyzeCrossBrowser } from './vrt-analyzer';
 
 export interface HealthDimension {
   name: string;
@@ -24,7 +24,7 @@ export interface HealthDimension {
   maxScore: 100;
   measured: boolean;
   phase: string;
-  confidence: "verified" | "heuristic" | "untested";
+  confidence: 'verified' | 'heuristic' | 'untested';
   methodology: string;
 }
 
@@ -33,7 +33,7 @@ export interface ComponentHealth {
   className: string;
   overallScore: number;
   maxPossibleScore: number;
-  grade: "A" | "B" | "C" | "D" | "F";
+  grade: 'A' | 'B' | 'C' | 'D' | 'F';
   dimensions: HealthDimension[];
   cemCompleteness: number;
   jsDocCoverage: number;
@@ -47,11 +47,11 @@ export interface ComponentHealth {
 }
 
 function _getLibraryRoot(): string {
-  return resolve(process.cwd(), "../../packages/hx-library");
+  return resolve(process.cwd(), '../../packages/hx-library');
 }
 
 function hasDocsPage(tagName: string): boolean {
-  const docsRoot = resolve(process.cwd(), "../docs");
+  const docsRoot = resolve(process.cwd(), '../docs');
   const docsPath = resolve(docsRoot, `src/content/docs/component-library/${tagName}.mdx`);
   return existsSync(docsPath);
 }
@@ -127,23 +127,15 @@ interface DimensionClassification {
 
 const DIMENSION_CLASSIFICATION: DimensionClassification = {
   critical: [
-    "API Documentation",
-    "CEM Completeness",
-    "Test Coverage",
-    "Accessibility",
-    "Type Safety",
-    "Docs Coverage",
+    'API Documentation',
+    'CEM Completeness',
+    'Test Coverage',
+    'Accessibility',
+    'Type Safety',
+    'Docs Coverage',
   ],
-  important: [
-    "Story Coverage",
-    "Bundle Size",
-    "Token Compliance",
-  ],
-  advanced: [
-    "Visual Regression",
-    "Cross-Browser",
-    "Drupal Readiness",
-  ],
+  important: ['Story Coverage', 'Bundle Size', 'Token Compliance'],
+  advanced: ['Visual Regression', 'Cross-Browser', 'Drupal Readiness'],
 };
 
 interface GradeConstraints {
@@ -152,7 +144,7 @@ interface GradeConstraints {
   maxUntestedCritical: number;
 }
 
-const GRADE_THRESHOLDS: Record<"A" | "B" | "C" | "D", GradeConstraints> = {
+const GRADE_THRESHOLDS: Record<'A' | 'B' | 'C' | 'D', GradeConstraints> = {
   A: { minWeightedScore: 90, minCriticalScore: 80, maxUntestedCritical: 0 },
   B: { minWeightedScore: 80, minCriticalScore: 70, maxUntestedCritical: 1 },
   C: { minWeightedScore: 70, minCriticalScore: 60, maxUntestedCritical: 2 },
@@ -161,21 +153,21 @@ const GRADE_THRESHOLDS: Record<"A" | "B" | "C" | "D", GradeConstraints> = {
 
 function calculateGrade(
   weightedScore: number,
-  dimensions: HealthDimension[]
-): "A" | "B" | "C" | "D" | "F" {
+  dimensions: HealthDimension[],
+): 'A' | 'B' | 'C' | 'D' | 'F' {
   // Extract critical dimensions
   const criticalDimensions = dimensions.filter((d) =>
-    DIMENSION_CLASSIFICATION.critical.includes(d.name)
+    DIMENSION_CLASSIFICATION.critical.includes(d.name),
   );
 
   // Count untested critical dimensions
   const untestedCriticalCount = criticalDimensions.filter(
-    (d) => !d.measured || d.score === null
+    (d) => !d.measured || d.score === null,
   ).length;
 
-  // Get critical dimension scores (treat untested as 0)
-  const criticalScores = criticalDimensions.map((d) =>
-    d.measured && d.score !== null ? d.score : 0
+  // Get critical dimension scores (treat untested as 0) - reserved for future penalty logic
+  const _criticalScores = criticalDimensions.map((d) =>
+    d.measured && d.score !== null ? d.score : 0,
   );
 
   // Get ONLY the measured critical dimensions (for penalty checks)
@@ -195,15 +187,15 @@ function calculateGrade(
       weightedScore >= GRADE_THRESHOLDS.C.minWeightedScore &&
       untestedCriticalCount <= GRADE_THRESHOLDS.C.maxUntestedCritical
     ) {
-      return "C";
+      return 'C';
     }
     if (
       weightedScore >= GRADE_THRESHOLDS.D.minWeightedScore &&
       untestedCriticalCount <= GRADE_THRESHOLDS.D.maxUntestedCritical
     ) {
-      return "D";
+      return 'D';
     }
-    return "F";
+    return 'F';
   }
 
   // PENALTY: <50% on any critical dimension → grade capped at D
@@ -212,13 +204,13 @@ function calculateGrade(
       weightedScore >= GRADE_THRESHOLDS.D.minWeightedScore &&
       untestedCriticalCount <= GRADE_THRESHOLDS.D.maxUntestedCritical
     ) {
-      return "D";
+      return 'D';
     }
-    return "F";
+    return 'F';
   }
 
   // Check grade thresholds in descending order (A → B → C → D)
-  for (const grade of ["A", "B", "C", "D"] as const) {
+  for (const grade of ['A', 'B', 'C', 'D'] as const) {
     const constraints = GRADE_THRESHOLDS[grade];
 
     // Check if weighted score meets minimum
@@ -229,7 +221,7 @@ function calculateGrade(
     // Check if all MEASURED critical dimensions meet minimum threshold
     // Unmeasured dimensions are handled by the untestedCriticalCount check
     const allCriticalsMeetThreshold = measuredCriticalScores.every(
-      (score) => score >= constraints.minCriticalScore
+      (score) => score >= constraints.minCriticalScore,
     );
     if (!allCriticalsMeetThreshold) {
       continue;
@@ -245,7 +237,7 @@ function calculateGrade(
   }
 
   // Failed all grade thresholds → F
-  return "F";
+  return 'F';
 }
 
 export function scoreComponent(tagName: string): ComponentHealth | null {
@@ -255,8 +247,9 @@ export function scoreComponent(tagName: string): ComponentHealth | null {
   const dir = getComponentDirectory(tagName);
   const jsDoc = analyzeJsDoc(tagName);
   const docs = hasDocsPage(tagName);
-  const testSummary = getTestResultsForComponent(tagName)
-    ?? (dir !== tagName ? getTestResultsForComponent(dir) : null);
+  const testSummary =
+    getTestResultsForComponent(tagName) ??
+    (dir !== tagName ? getTestResultsForComponent(dir) : null);
   const coverage = getCoverageForComponent(tagName);
   const typeSafety = analyzeTypeSafety(tagName);
   const a11y = analyzeAccessibility(tagName);
@@ -269,147 +262,146 @@ export function scoreComponent(tagName: string): ComponentHealth | null {
 
   // Test Coverage: blended score (60% code coverage + 40% pass rate)
   let testScore: number | null = null;
-  let testConfidence: "verified" | "heuristic" | "untested" = "untested";
+  let testConfidence: 'verified' | 'heuristic' | 'untested' = 'untested';
   if (testSummary) {
     if (coverage) {
       testScore = Math.round(coverage.lineCoverage * 0.6 + testSummary.passRate * 0.4);
-      testConfidence = "verified";
+      testConfidence = 'verified';
     } else {
       testScore = testSummary.passRate;
-      testConfidence = "heuristic";
+      testConfidence = 'heuristic';
     }
   }
 
   const dimensions: HealthDimension[] = [
     {
-      name: "API Documentation",
+      name: 'API Documentation',
       weight: 15,
       score: jsDoc?.coveragePercent ?? 0,
       maxScore: 100,
       measured: jsDoc !== null,
-      phase: "Phase 1",
-      confidence: jsDoc ? "verified" : "untested",
-      methodology: "JSDoc source parsing",
+      phase: 'Phase 1',
+      confidence: jsDoc ? 'verified' : 'untested',
+      methodology: 'JSDoc source parsing',
     },
     {
-      name: "CEM Completeness",
+      name: 'CEM Completeness',
       weight: 15,
       score: validation.overallCompleteness,
       maxScore: 100,
       measured: true,
-      phase: "Phase 1",
-      confidence: "verified",
-      methodology: "CEM field validation",
+      phase: 'Phase 1',
+      confidence: 'verified',
+      methodology: 'CEM field validation',
     },
     {
-      name: "Story Coverage",
+      name: 'Story Coverage',
       weight: 10,
       score: storyCoverage?.score ?? 0,
       maxScore: 100,
       measured: storyCoverage !== null,
-      phase: "Phase 1",
-      confidence: storyCoverage && storyCoverage.storyCount > 0 ? "verified" : "untested",
-      methodology: "Story count vs variant analysis",
+      phase: 'Phase 1',
+      confidence: storyCoverage && storyCoverage.storyCount > 0 ? 'verified' : 'untested',
+      methodology: 'Story count vs variant analysis',
     },
     {
-      name: "Docs Coverage",
+      name: 'Docs Coverage',
       weight: 5,
       score: docs ? 100 : 0,
       maxScore: 100,
       measured: true,
-      phase: "Phase 1",
-      confidence: "verified",
-      methodology: "Docs page existence",
+      phase: 'Phase 1',
+      confidence: 'verified',
+      methodology: 'Docs page existence',
     },
     {
-      name: "Type Safety",
+      name: 'Type Safety',
       weight: 10,
       score: typeSafety?.score ?? null,
       maxScore: 100,
       measured: typeSafety !== null,
-      phase: typeSafety ? "Phase 2" : "Future",
+      phase: typeSafety ? 'Phase 2' : 'Future',
       confidence: typeSafety
-        ? (typeSafety.tscClean !== undefined ? "verified" : "heuristic")
-        : "untested",
-      methodology: typeSafety?.tscClean !== undefined
-        ? "TypeScript compiler output + static analysis"
-        : "Static pattern analysis",
+        ? typeSafety.tscClean !== undefined
+          ? 'verified'
+          : 'heuristic'
+        : 'untested',
+      methodology:
+        typeSafety?.tscClean !== undefined
+          ? 'TypeScript compiler output + static analysis'
+          : 'Static pattern analysis',
     },
     {
-      name: "Test Coverage",
+      name: 'Test Coverage',
       weight: 10,
       score: testScore,
       maxScore: 100,
       measured: testSummary !== null,
-      phase: testSummary ? "Phase 2" : "Future",
+      phase: testSummary ? 'Phase 2' : 'Future',
       confidence: testConfidence,
-      methodology: coverage
-        ? "Vitest pass rate + V8 code coverage"
-        : "Vitest pass rate only",
+      methodology: coverage ? 'Vitest pass rate + V8 code coverage' : 'Vitest pass rate only',
     },
     {
-      name: "Accessibility",
+      name: 'Accessibility',
       weight: 10,
       score: a11y?.score ?? null,
       maxScore: 100,
       measured: a11y !== null,
-      phase: a11y ? "Phase 2" : "Future",
-      confidence: a11y
-        ? (a11y.hasAxeResults ? "verified" : "heuristic")
-        : "untested",
+      phase: a11y ? 'Phase 2' : 'Future',
+      confidence: a11y ? (a11y.hasAxeResults ? 'verified' : 'heuristic') : 'untested',
       methodology: a11y?.hasAxeResults
-        ? "axe-core WCAG 2.1 AA runtime audit + static analysis"
-        : "Static pattern analysis (no runtime audit)",
+        ? 'axe-core WCAG 2.1 AA runtime audit + static analysis'
+        : 'Static pattern analysis (no runtime audit)',
     },
     {
-      name: "Bundle Size",
+      name: 'Bundle Size',
       weight: 5,
       score: bundle?.score ?? null,
       maxScore: 100,
       measured: bundle !== null,
-      phase: bundle ? "Phase 2" : "Future",
-      confidence: bundle ? "verified" : "untested",
-      methodology: "Gzip size measurement vs 5KB budget",
+      phase: bundle ? 'Phase 2' : 'Future',
+      confidence: bundle ? 'verified' : 'untested',
+      methodology: 'Gzip size measurement vs 5KB budget',
     },
     {
-      name: "Token Compliance",
+      name: 'Token Compliance',
       weight: 5,
       score: tokenCompliance?.score ?? null,
       maxScore: 100,
       measured: tokenCompliance !== null,
-      phase: tokenCompliance ? "Phase 2" : "Future",
-      confidence: tokenCompliance ? "heuristic" : "untested",
-      methodology: "CSS custom property reference analysis",
+      phase: tokenCompliance ? 'Phase 2' : 'Future',
+      confidence: tokenCompliance ? 'heuristic' : 'untested',
+      methodology: 'CSS custom property reference analysis',
     },
     {
-      name: "Visual Regression",
+      name: 'Visual Regression',
       weight: 5,
       score: vrt?.score ?? null,
       maxScore: 100,
       measured: vrt !== null && vrt.hasBaselines,
-      phase: vrt?.hasBaselines ? "Phase 3" : "Future",
-      confidence: vrt?.browserResults.length ? "verified" : "untested",
-      methodology: "Playwright cross-browser screenshot comparison",
+      phase: vrt?.hasBaselines ? 'Phase 3' : 'Future',
+      confidence: vrt?.browserResults.length ? 'verified' : 'untested',
+      methodology: 'Playwright cross-browser screenshot comparison',
     },
     {
-      name: "Cross-Browser",
+      name: 'Cross-Browser',
       weight: 5,
       score: crossBrowser?.score ?? null,
       maxScore: 100,
       measured: crossBrowser !== null && crossBrowser.browsers.length > 0,
-      phase: crossBrowser?.browsers.length ? "Phase 3" : "Future",
-      confidence: crossBrowser?.browsers.length ? "verified" : "untested",
-      methodology: "Playwright multi-browser test results",
+      phase: crossBrowser?.browsers.length ? 'Phase 3' : 'Future',
+      confidence: crossBrowser?.browsers.length ? 'verified' : 'untested',
+      methodology: 'Playwright multi-browser test results',
     },
     {
-      name: "Drupal Readiness",
+      name: 'Drupal Readiness',
       weight: 5,
       score: drupal?.score ?? null,
       maxScore: 100,
       measured: drupal !== null,
-      phase: drupal ? "Phase 2" : "Future",
-      confidence: drupal ? "heuristic" : "untested",
-      methodology: "Drupal compatibility pattern analysis",
+      phase: drupal ? 'Phase 2' : 'Future',
+      confidence: drupal ? 'heuristic' : 'untested',
+      methodology: 'Drupal compatibility pattern analysis',
     },
   ];
 
@@ -440,9 +432,9 @@ export function scoreComponent(tagName: string): ComponentHealth | null {
   const overallScore = Math.round(weightedScore);
 
   const confidenceSummary = {
-    verified: dimensions.filter((d) => d.confidence === "verified").length,
-    heuristic: dimensions.filter((d) => d.confidence === "heuristic").length,
-    untested: dimensions.filter((d) => d.confidence === "untested").length,
+    verified: dimensions.filter((d) => d.confidence === 'verified').length,
+    heuristic: dimensions.filter((d) => d.confidence === 'heuristic').length,
+    untested: dimensions.filter((d) => d.confidence === 'untested').length,
   };
 
   return {
@@ -461,7 +453,7 @@ export function scoreComponent(tagName: string): ComponentHealth | null {
 }
 
 export async function scoreAllComponents(): Promise<ComponentHealth[]> {
-  const { getAllComponentNames } = await import("./cem-parser");
+  const { getAllComponentNames } = await import('./cem-parser');
   const names = getAllComponentNames();
   const results: ComponentHealth[] = [];
   for (const name of names) {
