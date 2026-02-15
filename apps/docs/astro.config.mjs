@@ -18,6 +18,11 @@ export default defineConfig({
         'lit-element/lit-element.js',
       ],
     },
+    build: {
+      rollupOptions: {
+        external: [/^@helix\/tokens/],
+      },
+    },
   },
   markdown: {
     shikiConfig: {
@@ -41,11 +46,6 @@ export default defineConfig({
       },
       title: 'HELiX',
       description: 'Healthcare Elements Library for Interactive eXperiences - Enterprise Web Components for Drupal CMS',
-      logo: {
-        light: './src/assets/logos/helix-logo-light.svg',
-        dark: './src/assets/logos/helix-logo-dark.svg',
-        replacesTitle: true,
-      },
       social: [
         {
           icon: 'github',
