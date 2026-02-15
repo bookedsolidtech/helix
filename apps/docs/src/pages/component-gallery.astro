@@ -425,6 +425,54 @@ const categories = getUniqueCategories(allComponents);
       100% { opacity: 1; transform: translateY(0); }
     }
 
+    /* --- Fixed utility nav (home + back-to-top) --- */
+    .cg-util-nav {
+      position: fixed;
+      bottom: 1.5rem;
+      left: 1.5rem;
+      z-index: 200;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+    .cg-util-btn {
+      width: 44px;
+      height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--glass-bg-strong, rgba(255,255,255,0.08));
+      border: 1px solid var(--glass-border-strong, rgba(255,255,255,0.1));
+      border-radius: 50%;
+      color: var(--text-secondary, rgba(255,255,255,0.6));
+      font-size: 1rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-decoration: none;
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+    }
+    .cg-util-btn:hover {
+      color: var(--text-primary, #fff);
+      background: rgba(6,182,212,0.15);
+      border-color: rgba(6,182,212,0.3);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 20px rgba(6,182,212,0.2);
+    }
+    .cg-util-btn:focus-visible {
+      outline: 3px solid var(--wc-accent);
+      outline-offset: 3px;
+    }
+    .cg-util-btn--top {
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.3s ease;
+    }
+    .cg-util-btn--top.visible {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
     /* --- Reduced motion --- */
     @media (prefers-reduced-motion: reduce) {
       .cg-orb { animation: none !important; opacity: 0.15; }
@@ -437,7 +485,7 @@ const categories = getUniqueCategories(allComponents);
   <GalleryNav
     items={sorted.map((c, i) => ({
       tagName: c.tagName,
-      label: c.tagName.replace('wc-', ''),
+      label: c.tagName.replace('hx-', ''),
       index: i + 1,
     }))}
   />
@@ -462,5 +510,51 @@ const categories = getUniqueCategories(allComponents);
     ))}
   </main>
 
+  <nav class="cg-util-nav" aria-label="Page utilities">
+    <button
+      class="cg-util-btn cg-util-btn--top"
+      id="back-to-top"
+      aria-label="Back to top"
+      title="Back to top"
+    >
+      <i class="fa-solid fa-chevron-up"></i>
+    </button>
+    <a
+      class="cg-util-btn"
+      href="/"
+      aria-label="Back to home"
+      title="Back to home"
+    >
+      <i class="fa-solid fa-house"></i>
+    </a>
+  </nav>
+
   <GalleryScript slot="scripts" />
+  <script is:inline>
+    (function() {
+      var topBtn = document.getElementById('back-to-top');
+      var container = document.querySelector('.cg-container');
+      var target = container || window;
+
+      function checkScroll() {
+        var scrollY = container ? container.scrollTop : window.scrollY;
+        if (scrollY > window.innerHeight * 0.5) {
+          topBtn.classList.add('visible');
+        } else {
+          topBtn.classList.remove('visible');
+        }
+      }
+
+      target.addEventListener('scroll', checkScroll, { passive: true });
+      checkScroll();
+
+      topBtn.addEventListener('click', function() {
+        if (container) {
+          container.scrollTo({ top: 0, behavior: 'smooth' });
+        } else {
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+      });
+    })();
+  </script>
 </ShowcaseLayout>
