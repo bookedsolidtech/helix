@@ -1,5 +1,5 @@
 {
-  "buildCommand": "cd ../.. && echo '=== WORKSPACE DEBUG ===' && ls -la node_modules/@helix/ && ls -la node_modules/@helix/tokens/ && ls -la packages/hx-tokens/dist/ && echo '=== END DEBUG ===' && npx turbo build --filter=@helix/admin",
+  "buildCommand": "cd ../.. && npx turbo build --filter=@helix/admin --force",
   "installCommand": "cd ../.. && npm ci",
   "framework": "nextjs",
   "headers": [
