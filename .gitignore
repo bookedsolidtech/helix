@@ -6,6 +6,7 @@ node_modules/
 # Build outputs
 dist/
 .astro/
+.next/
 .vercel/
 .netlify/
 
@@ -29,3 +30,6 @@ npm-debug.log*
 
 # Turborepo
 .turbo/
+
+# Test cache
+.cache/
