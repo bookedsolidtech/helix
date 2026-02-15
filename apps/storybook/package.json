@@ -5,7 +5,7 @@
   "description": "Storybook design system playground for WC-2026 components",
   "type": "module",
   "scripts": {
-    "dev": "storybook dev -p 6006 --no-open",
+    "dev": "storybook dev -p 3151 --no-open",
     "build": "storybook build -o dist",
     "clean": "rm -rf dist"
   },
