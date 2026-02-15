@@ -1,5 +1,4 @@
 {
-  "buildCommand": "cd ../.. && npx turbo build --filter=@helix/admin",
   "framework": "nextjs",
   "headers": [
     {
