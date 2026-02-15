@@ -4,7 +4,7 @@ import type { StorybookConfig } from '@storybook/web-components-vite';
 
 const config: StorybookConfig = {
   stories: [
-    '../../../packages/wc-library/src/**/*.stories.@(ts|tsx)',
+    '../../../packages/hx-library/src/**/*.stories.@(ts|tsx)',
     '../stories/**/*.stories.@(ts|tsx)',
   ],
 

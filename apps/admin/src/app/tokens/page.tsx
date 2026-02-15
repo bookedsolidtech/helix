@@ -1,11 +1,11 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { tokenEntries, tokensByCategory, tokenMap } from "@wc-2026/tokens";
+import { tokenEntries, tokensByCategory, tokenMap } from "@helix/tokens";
 import {
   getTokenStats,
   isHexColor,
   resolveTokenRef,
-} from "@wc-2026/tokens/utils";
+} from "@helix/tokens/utils";
 import {
   Hash,
   Layers,
@@ -46,7 +46,7 @@ export default function TokensDashboard() {
         <p className="text-muted-foreground mt-1">
           {allTokens.length} tokens from{" "}
           <code className="text-xs bg-secondary px-1.5 py-0.5 rounded font-mono">
-            @wc-2026/tokens
+            @helix/tokens
           </code>
         </p>
       </div>

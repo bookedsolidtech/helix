@@ -2,9 +2,9 @@
 
 import { useState } from "react";
 import { cn } from "@/lib/utils";
-import { isHexColor, resolveTokenRef } from "@wc-2026/tokens/utils";
-import { tokenMap } from "@wc-2026/tokens";
-import type { TokenEntry } from "@wc-2026/tokens";
+import { isHexColor, resolveTokenRef } from "@helix/tokens/utils";
+import { tokenMap } from "@helix/tokens";
+import type { TokenEntry } from "@helix/tokens";
 
 interface CategoryGroup {
   category: string;

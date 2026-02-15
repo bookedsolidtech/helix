@@ -162,7 +162,7 @@ export interface ManifestStats {
 // ── Implementation ───────────────────────────────────────────────────
 
 function getManifest(): CemManifest {
-  const cemPath = resolve(process.cwd(), "../../packages/wc-library/custom-elements.json");
+  const cemPath = resolve(process.cwd(), "../../packages/hx-library/custom-elements.json");
   const raw = readFileSync(cemPath, "utf-8");
   return JSON.parse(raw) as CemManifest;
 }

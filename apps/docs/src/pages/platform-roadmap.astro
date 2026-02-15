@@ -1,0 +1,298 @@
+---
+/**
+ * Platform Roadmap - Engineering Health Dashboard
+ *
+ * Visualizes all 89 platform issues identified by 13 engineering agents,
+ * categorized by severity with detailed metadata and actionable insights.
+ */
+import ShowcaseLayout from '../layouts/ShowcaseLayout.astro';
+import { readFileSync } from 'fs';
+import { join } from 'path';
+
+interface Issue {
+  id: string;
+  severity: 'critical' | 'high' | 'medium' | 'low';
+  title: string;
+  reporter: string;
+  description: string;
+  impact?: string;
+  recommendation?: string;
+  effort?: string;
+  owner?: string;
+  status: 'not-started' | 'in-progress' | 'blocked' | 'complete';
+  tags: string[];
+  category?: string;
+}
+
+interface PlatformReview {
+  reviewDate: string;
+  status: string;
+  agents: Record<string, {
+    status: string;
+    scope: string;
+    findings: {
+      critical: Array<Omit<Issue, 'severity' | 'reporter' | 'status' | 'tags' | 'category'>>;
+      high: Array<Omit<Issue, 'severity' | 'reporter' | 'status' | 'tags' | 'category'>>;
+      medium: Array<Omit<Issue, 'severity' | 'reporter' | 'status' | 'tags' | 'category'>>;
+      low: Array<Omit<Issue, 'severity' | 'reporter' | 'status' | 'tags' | 'category'>>;
+    };
+  }>;
+  summary: {
+    totalIssues: number;
+    byPriority: {
+      critical: number;
+      high: number;
+      medium: number;
+      low: number;
+    };
+  };
+  productionReadiness: {
+    verdict: string;
+    estimatedEffortToProduction: string;
+  };
+}
+
+function loadPlatformReview(): PlatformReview {
+  const reviewPath = join(process.cwd(), '../../.claude/platform-review-2026-02-15.json');
+  const content = readFileSync(reviewPath, 'utf-8');
+  return JSON.parse(content) as PlatformReview;
+}
+
+function inferCategory(agentName: string, title: string): string {
+  if (agentName.includes('accessibility')) return 'accessibility';
+  if (agentName.includes('performance')) return 'performance';
+  if (agentName.includes('design-system')) return 'design-system';
+  if (agentName.includes('drupal')) return 'drupal';
+  if (agentName.includes('devops')) return 'ci-cd';
+  if (agentName.includes('test-architect') || agentName.includes('qa-engineer')) return 'testing';
+  if (agentName.includes('typescript') || agentName.includes('staff-software')) return 'build-system';
+  if (title.toLowerCase().includes('changesets') || title.toLowerCase().includes('version')) return 'version-management';
+  if (title.toLowerCase().includes('documentation') || title.toLowerCase().includes('onboarding')) return 'documentation';
+  return 'dx';
+}
+
+function transformToIssues(review: PlatformReview): Issue[] {
+  const issues: Issue[] = [];
+  Object.entries(review.agents).forEach(([agentName, agent]) => {
+    const severities: Array<keyof typeof agent.findings> = ['critical', 'high', 'medium', 'low'];
+    severities.forEach((severity) => {
+      agent.findings[severity].forEach((finding) => {
+        const category = inferCategory(agentName, finding.title);
+        issues.push({
+          id: finding.id,
+          severity,
+          title: finding.title,
+          reporter: agentName,
+          description: finding.description,
+          impact: finding.impact,
+          effort: finding.effort,
+          status: 'not-started',
+          tags: [severity, agentName],
+          category,
+        });
+      });
+    });
+  });
+  return issues;
+}
+
+const review = loadPlatformReview();
+const issues = transformToIssues(review);
+---
+
+<ShowcaseLayout
+  title="Platform Roadmap &amp; Health"
+  description="Engineering health dashboard showing 89 issues identified by 13 specialized agents. Track progress from current state to production readiness."
+>
+  <style is:inline>
+    :root {
+      --roadmap-critical: #dc2626;
+      --roadmap-high: #f59e0b;
+      --roadmap-medium: #3b82f6;
+      --roadmap-low: #10b981;
+    }
+
+    /* Topbar */
+    .roadmap-topbar { position:fixed; top:0; left:0; right:0; z-index:100; display:flex; align-items:center; justify-content:space-between; padding:1rem 2rem; background:rgba(10,10,20,0.85); backdrop-filter:blur(16px) saturate(180%); border-bottom:1px solid rgba(255,255,255,0.06); }
+    .roadmap-back-link { display:inline-flex; align-items:center; gap:0.5rem; font-size:0.875rem; font-weight:600; color:rgba(255,255,255,0.6); transition:all 0.2s ease; padding:0.5rem 0.75rem; border-radius:0.5rem; }
+    .roadmap-back-link:hover { color:white; background:rgba(255,255,255,0.08); }
+    .roadmap-topbar-title { font-size:0.875rem; font-weight:700; color:white; }
+
+    /* Hero Section */
+    .roadmap-hero { min-height:60vh; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:8rem 2rem 4rem; background:linear-gradient(180deg, rgba(102,126,234,0.05) 0%, transparent 100%); border-bottom:1px solid rgba(255,255,255,0.06); }
+    .roadmap-hero-badge { display:inline-flex; align-items:center; gap:0.5rem; padding:0.5rem 1rem; border-radius:2rem; background:rgba(102,126,234,0.1); border:1px solid rgba(102,126,234,0.2); font-size:0.75rem; font-weight:600; color:rgba(102,126,234,0.9); text-transform:uppercase; letter-spacing:0.1em; margin-bottom:1.5rem; }
+    .roadmap-hero h1 { font-size:3rem; font-weight:900; color:white; text-align:center; margin-bottom:1rem; letter-spacing:-0.02em; }
+    .roadmap-hero p { font-size:1.125rem; color:rgba(255,255,255,0.7); text-align:center; max-width:600px; margin-bottom:2rem; }
+
+    /* Stats Grid */
+    .roadmap-stats { display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:1.5rem; max-width:1000px; width:100%; margin-top:2rem; }
+    .roadmap-stat { padding:1.5rem; border-radius:1rem; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); text-align:center; }
+    .roadmap-stat-value { font-size:2.5rem; font-weight:900; color:white; margin-bottom:0.25rem; }
+    .roadmap-stat-label { font-size:0.875rem; color:rgba(255,255,255,0.6); text-transform:uppercase; letter-spacing:0.05em; font-weight:600; }
+    .roadmap-stat.critical .roadmap-stat-value { color:var(--roadmap-critical); }
+    .roadmap-stat.high .roadmap-stat-value { color:var(--roadmap-high); }
+    .roadmap-stat.medium .roadmap-stat-value { color:var(--roadmap-medium); }
+    .roadmap-stat.low .roadmap-stat-value { color:var(--roadmap-low); }
+
+    /* Tab Nav */
+    .roadmap-tabs { position:sticky; top:3.9rem; z-index:90; background:rgba(10,10,20,0.92); backdrop-filter:blur(20px); border-bottom:1px solid rgba(255,255,255,0.08); }
+    .roadmap-tabs-inner { display:flex; max-width:1200px; margin:0 auto; padding:0.5rem; gap:0.5rem; }
+    .roadmap-tab { flex:1; padding:0.75rem 1.5rem; border-radius:0.75rem; border:1px solid transparent; background:transparent; color:rgba(255,255,255,0.5); cursor:pointer; transition:all 0.25s ease; font-weight:700; font-size:0.9375rem; text-align:center; }
+    .roadmap-tab:hover { color:rgba(255,255,255,0.8); background:rgba(255,255,255,0.04); }
+    .roadmap-tab.is-active { color:white; border-color:rgba(102,126,234,0.25); box-shadow:0 0 20px rgba(102,126,234,0.08); }
+    .roadmap-tab.is-active.critical { background:rgba(220,38,38,0.1); border-color:rgba(220,38,38,0.25); box-shadow:0 0 20px rgba(220,38,38,0.08); }
+    .roadmap-tab.is-active.high { background:rgba(245,158,11,0.1); border-color:rgba(245,158,11,0.25); box-shadow:0 0 20px rgba(245,158,11,0.08); }
+    .roadmap-tab.is-active.medium { background:rgba(59,130,246,0.1); border-color:rgba(59,130,246,0.25); box-shadow:0 0 20px rgba(59,130,246,0.08); }
+    .roadmap-tab.is-active.low { background:rgba(16,185,129,0.1); border-color:rgba(16,185,129,0.25); box-shadow:0 0 20px rgba(16,185,129,0.08); }
+
+    /* Content */
+    .roadmap-content { max-width:1200px; margin:0 auto; padding:2rem; }
+    .roadmap-tab-panel { display:none; }
+    .roadmap-tab-panel.is-active { display:block; }
+
+    /* Issue Cards */
+    .roadmap-issues { display:grid; gap:1rem; }
+    .roadmap-issue { padding:1.5rem; border-radius:1rem; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); transition:all 0.2s ease; }
+    .roadmap-issue:hover { background:rgba(255,255,255,0.05); border-color:rgba(255,255,255,0.12); }
+    .roadmap-issue-header { display:flex; align-items:flex-start; gap:1rem; margin-bottom:1rem; }
+    .roadmap-issue-severity { flex-shrink:0; padding:0.375rem 0.75rem; border-radius:0.5rem; font-size:0.75rem; font-weight:700; text-transform:uppercase; letter-spacing:0.05em; }
+    .roadmap-issue-severity.critical { background:rgba(220,38,38,0.15); color:#fca5a5; border:1px solid rgba(220,38,38,0.3); }
+    .roadmap-issue-severity.high { background:rgba(245,158,11,0.15); color:#fcd34d; border:1px solid rgba(245,158,11,0.3); }
+    .roadmap-issue-severity.medium { background:rgba(59,130,246,0.15); color:#93c5fd; border:1px solid rgba(59,130,246,0.3); }
+    .roadmap-issue-severity.low { background:rgba(16,185,129,0.15); color:#6ee7b7; border:1px solid rgba(16,185,129,0.3); }
+    .roadmap-issue-title { flex:1; font-size:1.125rem; font-weight:700; color:white; margin-bottom:0.25rem; }
+    .roadmap-issue-meta { font-size:0.875rem; color:rgba(255,255,255,0.5); }
+    .roadmap-issue-description { font-size:0.9375rem; color:rgba(255,255,255,0.7); line-height:1.6; margin-bottom:1rem; }
+    .roadmap-issue-footer { display:flex; gap:1rem; flex-wrap:wrap; }
+    .roadmap-issue-detail { font-size:0.8125rem; color:rgba(255,255,255,0.6); }
+    .roadmap-issue-detail strong { color:rgba(255,255,255,0.9); font-weight:600; }
+
+    @media (max-width: 768px) {
+      .roadmap-hero h1 { font-size:2rem; }
+      .roadmap-stats { grid-template-columns:repeat(2, 1fr); }
+      .roadmap-tabs-inner { flex-wrap:wrap; }
+    }
+  </style>
+
+  <!-- Topbar -->
+  <div class="roadmap-topbar">
+    <a href="/" class="roadmap-back-link">
+      <i class="fa-solid fa-arrow-left"></i>
+      Back to Docs
+    </a>
+    <div class="roadmap-topbar-title">Platform Health Dashboard</div>
+  </div>
+
+  <!-- Hero -->
+  <div class="roadmap-hero">
+    <div class="roadmap-hero-badge">
+      <i class="fa-solid fa-chart-line"></i>
+      Engineering Health Review
+    </div>
+    <h1>Platform Roadmap</h1>
+    <p>
+      Comprehensive review findings from 13 specialized engineering agents,
+      identifying {review.summary.totalIssues} issues across all severity levels.
+    </p>
+
+    <div class="roadmap-stats">
+      <div class="roadmap-stat critical">
+        <div class="roadmap-stat-value">{review.summary.byPriority.critical}</div>
+        <div class="roadmap-stat-label">Critical</div>
+      </div>
+      <div class="roadmap-stat high">
+        <div class="roadmap-stat-value">{review.summary.byPriority.high}</div>
+        <div class="roadmap-stat-label">High Priority</div>
+      </div>
+      <div class="roadmap-stat medium">
+        <div class="roadmap-stat-value">{review.summary.byPriority.medium}</div>
+        <div class="roadmap-stat-label">Medium</div>
+      </div>
+      <div class="roadmap-stat low">
+        <div class="roadmap-stat-value">{review.summary.byPriority.low}</div>
+        <div class="roadmap-stat-label">Low Priority</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tab Navigation -->
+  <div class="roadmap-tabs">
+    <div class="roadmap-tabs-inner">
+      <button class="roadmap-tab critical is-active" data-tab="critical">
+        Critical ({review.summary.byPriority.critical})
+      </button>
+      <button class="roadmap-tab high" data-tab="high">
+        High ({review.summary.byPriority.high})
+      </button>
+      <button class="roadmap-tab medium" data-tab="medium">
+        Medium ({review.summary.byPriority.medium})
+      </button>
+      <button class="roadmap-tab low" data-tab="low">
+        Low ({review.summary.byPriority.low})
+      </button>
+    </div>
+  </div>
+
+  <!-- Tab Content -->
+  <div class="roadmap-content">
+    {['critical', 'high', 'medium', 'low'].map((severity) => (
+      <div class={`roadmap-tab-panel ${severity === 'critical' ? 'is-active' : ''}`} data-panel={severity}>
+        <div class="roadmap-issues">
+          {issues
+            .filter((issue) => issue.severity === severity)
+            .map((issue) => (
+              <div class="roadmap-issue">
+                <div class="roadmap-issue-header">
+                  <span class={`roadmap-issue-severity ${issue.severity}`}>{issue.severity}</span>
+                  <div>
+                    <div class="roadmap-issue-title">{issue.title}</div>
+                    <div class="roadmap-issue-meta">
+                      Reported by: {issue.reporter} • ID: {issue.id}
+                    </div>
+                  </div>
+                </div>
+                <div class="roadmap-issue-description">{issue.description}</div>
+                <div class="roadmap-issue-footer">
+                  {issue.impact && (
+                    <div class="roadmap-issue-detail">
+                      <strong>Impact:</strong> {issue.impact}
+                    </div>
+                  )}
+                  {issue.effort && (
+                    <div class="roadmap-issue-detail">
+                      <strong>Effort:</strong> {issue.effort}
+                    </div>
+                  )}
+                  {issue.category && (
+                    <div class="roadmap-issue-detail">
+                      <strong>Category:</strong> {issue.category}
+                    </div>
+                  )}
+                </div>
+              </div>
+            ))}
+        </div>
+      </div>
+    ))}
+  </div>
+
+  <script>
+    // Tab switching
+    const tabs = document.querySelectorAll('.roadmap-tab');
+    const panels = document.querySelectorAll('.roadmap-tab-panel');
+
+    tabs.forEach((tab) => {
+      tab.addEventListener('click', () => {
+        const targetTab = tab.getAttribute('data-tab');
+
+        // Update active tab
+        tabs.forEach((t) => t.classList.remove('is-active'));
+        tab.classList.add('is-active');
+
+        // Update active panel
+        panels.forEach((p) => p.classList.remove('is-active'));
+        document.querySelector(`[data-panel="${targetTab}"]`)?.classList.add('is-active');
+      });
+    });
+  </script>
+</ShowcaseLayout>

@@ -55,6 +55,15 @@ const showcasePages = [
     color: '#3b82f6',
     tag: 'DX',
   },
+  {
+    href: '/platform-roadmap/',
+    icon: 'fa-solid fa-chart-line',
+    title: 'Platform Roadmap',
+    desc: '89 issues from 13 agent reviews',
+    colorClass: 'sc-red',
+    color: '#ef4444',
+    tag: 'Health',
+  },
 ];
 
 const currentPath = Astro.url.pathname;
@@ -654,6 +663,17 @@ const currentPath = Astro.url.pathname;
     background: rgba(59, 130, 246, 0.12);
     border-color: rgba(59, 130, 246, 0.25);
     box-shadow: 0 0 20px rgba(59, 130, 246, 0.15);
+  }
+
+  .sc-red .showcase-item-icon {
+    color: #ef4444;
+    background: rgba(239, 68, 68, 0.08);
+    border: 1px solid rgba(239, 68, 68, 0.15);
+  }
+  .sc-red:hover .showcase-item-icon {
+    background: rgba(239, 68, 68, 0.12);
+    border-color: rgba(239, 68, 68, 0.25);
+    box-shadow: 0 0 20px rgba(239, 68, 68, 0.15);
   }
 
   /* ==========================================

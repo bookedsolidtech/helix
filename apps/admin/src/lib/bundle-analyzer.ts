@@ -19,7 +19,7 @@ export interface BundleSizeResult {
 const BUDGET_BYTES = 5120; // 5KB gzipped per component
 
 function getLibraryRoot(): string {
-  return resolve(process.cwd(), "../../packages/wc-library");
+  return resolve(process.cwd(), "../../packages/hx-library");
 }
 
 function findComponentChunk(tagName: string): string | null {

@@ -23,7 +23,7 @@ export interface TypeSafetyCheck {
 }
 
 function getLibraryRoot(): string {
-  return resolve(process.cwd(), "../../packages/wc-library");
+  return resolve(process.cwd(), "../../packages/hx-library");
 }
 
 function readSource(tagName: string): string | null {

@@ -20,7 +20,7 @@ export interface SourceInfo {
 }
 
 function getLibraryRoot(): string {
-  return resolve(process.cwd(), "../../packages/wc-library");
+  return resolve(process.cwd(), "../../packages/hx-library");
 }
 
 export function getSourceInfo(tagName: string): SourceInfo {

@@ -320,7 +320,7 @@ export const Welcome: Story = {
               line-height: var(--wc-line-height-relaxed, 1.75);
               overflow-x: auto;
             ">
-              <div><span style="color: var(--wc-color-neutral-400, #adb5bd);">$</span> npm install @wc-2026/library</div>
+              <div><span style="color: var(--wc-color-neutral-400, #adb5bd);">$</span> npm install @helix/library</div>
             </div>
           </div>
         </div>

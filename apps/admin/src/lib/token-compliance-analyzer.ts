@@ -1,7 +1,7 @@
 /**
  * Token Compliance Analyzer.
  * Checks whether component-level CSS custom properties properly
- * reference the main @wc-2026/tokens system.
+ * reference the main @helix/tokens system.
  *
  * Tier 3 (component tokens like --wc-button-bg) should always resolve
  * to a Tier 2/1 system token (--wc-color-primary-500, --wc-space-4, etc.).
@@ -49,7 +49,7 @@ const CSS_NATIVE_VALUES = new Set([
 ]);
 
 function getLibraryRoot(): string {
-  return resolve(process.cwd(), "../../packages/wc-library");
+  return resolve(process.cwd(), "../../packages/hx-library");
 }
 
 function findSystemTokenRef(

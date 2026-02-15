@@ -47,7 +47,7 @@ export interface ComponentHealth {
 }
 
 function _getLibraryRoot(): string {
-  return resolve(process.cwd(), "../../packages/wc-library");
+  return resolve(process.cwd(), "../../packages/hx-library");
 }
 
 function hasDocsPage(tagName: string): boolean {

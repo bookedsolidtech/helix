@@ -2,7 +2,7 @@
 /**
  * Generate Starlight MDX documentation pages from Custom Elements Manifest (CEM).
  *
- * Reads packages/wc-library/custom-elements.json and generates MDX files at
+ * Reads packages/hx-library/custom-elements.json and generates MDX files at
  * apps/docs/src/content/docs/component-library/{tagName}.mdx
  *
  * Usage:
@@ -54,7 +54,7 @@ interface ComponentInfo {
 // ============================================================================
 
 const REPO_ROOT = path.resolve(__dirname, '..');
-const CEM_PATH = path.join(REPO_ROOT, 'packages/wc-library/custom-elements.json');
+const CEM_PATH = path.join(REPO_ROOT, 'packages/hx-library/custom-elements.json');
 const DOCS_DIR = path.join(REPO_ROOT, 'apps/docs/src/content/docs/component-library');
 
 // ============================================================================

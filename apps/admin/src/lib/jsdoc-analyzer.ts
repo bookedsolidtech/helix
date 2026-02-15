@@ -36,7 +36,7 @@ export interface DriftReport {
 }
 
 function getLibraryRoot(): string {
-  return resolve(process.cwd(), "../../packages/wc-library");
+  return resolve(process.cwd(), "../../packages/hx-library");
 }
 
 function readSourceFile(componentTag: string): string | null {

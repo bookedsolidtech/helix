@@ -39,7 +39,7 @@ export interface AllTestResults {
 }
 
 function getTestResultsPath(): string {
-  return resolve(process.cwd(), "../../packages/wc-library/.cache/test-results.json");
+  return resolve(process.cwd(), "../../packages/hx-library/.cache/test-results.json");
 }
 
 function extractComponentName(filePath: string): string {
@@ -195,7 +195,7 @@ interface CoverageSummaryJson {
 }
 
 function getCoverageSummaryPath(): string {
-  return resolve(process.cwd(), "../../packages/wc-library/.cache/coverage/coverage-summary.json");
+  return resolve(process.cwd(), "../../packages/hx-library/.cache/coverage/coverage-summary.json");
 }
 
 export function getCoverageForComponent(tagName: string): ComponentCoverage | null {

@@ -1,9 +1,9 @@
 import { defineConfig, devices } from '@playwright/test';
 
 export default defineConfig({
-  testDir: './packages/wc-library/e2e',
-  outputDir: './packages/wc-library/.cache/vrt-results',
-  snapshotDir: './packages/wc-library/__screenshots__',
+  testDir: './packages/hx-library/e2e',
+  outputDir: './packages/hx-library/.cache/vrt-results',
+  snapshotDir: './packages/hx-library/__screenshots__',
   snapshotPathTemplate: '{snapshotDir}/{testFilePath}/{arg}{ext}',
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
@@ -11,7 +11,7 @@ export default defineConfig({
   workers: process.env.CI ? 1 : undefined,
   reporter: [
     ['list'],
-    ['json', { outputFile: './packages/wc-library/.cache/vrt-results.json' }],
+    ['json', { outputFile: './packages/hx-library/.cache/vrt-results.json' }],
   ],
   use: {
     baseURL: 'http://localhost:3151',

@@ -27,7 +27,7 @@ export interface A11yCheck {
 }
 
 function getLibraryRoot(): string {
-  return resolve(process.cwd(), "../../packages/wc-library");
+  return resolve(process.cwd(), "../../packages/hx-library");
 }
 
 function readComponentFiles(tagName: string): { source: string; styles: string } | null {

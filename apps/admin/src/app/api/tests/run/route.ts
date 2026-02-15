@@ -8,7 +8,7 @@ export const dynamic = "force-dynamic";
  * Spawns vitest and streams results as SSE events.
  */
 export async function POST(): Promise<Response> {
-  const libraryRoot = resolve(process.cwd(), "../../packages/wc-library");
+  const libraryRoot = resolve(process.cwd(), "../../packages/hx-library");
 
   const encoder = new TextEncoder();
   let passedTests = 0;

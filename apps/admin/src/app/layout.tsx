@@ -9,6 +9,7 @@ import {
   Component,
   Boxes,
   ExternalLink,
+  Map,
 } from 'lucide-react';
 import './globals.css';
 
@@ -71,6 +72,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
               <SidebarLink href="/pipeline" icon={<Activity className="w-4 h-4" />}>
                 Pipeline
+              </SidebarLink>
+
+              <SidebarLink href="/roadmap" icon={<Map className="w-4 h-4" />}>
+                Platform Roadmap
               </SidebarLink>
             </nav>
 

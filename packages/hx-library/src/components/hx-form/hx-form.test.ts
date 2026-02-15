@@ -1,0 +1,341 @@
+import { describe, it, expect, afterEach, vi } from 'vitest';
+import { fixture, cleanup, oneEvent, checkA11y } from '../../test-utils.js';
+import type { WcForm } from './hx-form.js';
+import './index.js';
+
+afterEach(cleanup);
+
+describe('hx-form', () => {
+
+  // ─── Rendering (3) ───
+
+  describe('Rendering', () => {
+    it('renders as Light DOM (no shadowRoot)', async () => {
+      const _el = await fixture<WcForm>('<hx-form></hx-form>');
+      expect(el.shadowRoot).toBeNull();
+    });
+
+    it('renders <form> tag when action is set', async () => {
+      const _el = await fixture<WcForm>('<hx-form action="/submit"></hx-form>');
+      const form = el.querySelector('form');
+      expect(form).toBeTruthy();
+      expect(form?.getAttribute('action')).toBe('/submit');
+    });
+
+    it('does not render <form> tag when no action', async () => {
+      const _el = await fixture<WcForm>('<hx-form></hx-form>');
+      const form = el.querySelector('form');
+      expect(form).toBeNull();
+    });
+  });
+
+  // ─── Properties (4) ───
+
+  describe('Properties', () => {
+    it('action property sets form action attribute', async () => {
+      const _el = await fixture<WcForm>('<hx-form action="/api/save"></hx-form>');
+      expect(el.action).toBe('/api/save');
+      const form = el.querySelector('form');
+      expect(form?.getAttribute('action')).toBe('/api/save');
+    });
+
+    it('method property defaults to post', async () => {
+      const _el = await fixture<WcForm>('<hx-form action="/api"></hx-form>');
+      expect(el.method).toBe('post');
+      const form = el.querySelector('form');
+      expect(form?.getAttribute('method')).toBe('post');
+    });
+
+    it('novalidate property sets novalidate attribute on form', async () => {
+      const _el = await fixture<WcForm>('<hx-form action="/api" novalidate></hx-form>');
+      expect(el.novalidate).toBe(true);
+      const form = el.querySelector('form');
+      expect(form?.hasAttribute('novalidate')).toBe(true);
+    });
+
+    it('name property sets name attribute on form', async () => {
+      const _el = await fixture<WcForm>('<hx-form action="/api" name="login-form"></hx-form>');
+      expect(el.name).toBe('login-form');
+      const form = el.querySelector('form');
+      expect(form?.getAttribute('name')).toBe('login-form');
+    });
+  });
+
+  // ─── Events (3) ───
+
+  describe('Events', () => {
+    it('dispatches wc-submit on valid client-side submit', async () => {
+      const _el = await fixture<WcForm>(`
+        <hx-form action="">
+          <form>
+            <input type="text" name="username" value="testuser" />
+            <button type="submit">Submit</button>
+          </form>
+        </hx-form>
+      `);
+
+      const form = el.querySelector('form')!;
+      const eventPromise = oneEvent<CustomEvent>(el, 'hx-submit');
+
+      form.dispatchEvent(new SubmitEvent('submit', { bubbles: true, cancelable: true }));
+      const event = await eventPromise;
+
+      expect(event.detail.valid).toBe(true);
+      expect(event.detail.values).toBeDefined();
+      expect(event.bubbles).toBe(true);
+      expect(event.composed).toBe(true);
+    });
+
+    it('dispatches wc-invalid when validation fails on submit', async () => {
+      const _el = await fixture<WcForm>(`
+        <hx-form action="">
+          <form>
+            <input type="email" name="email" value="not-an-email" required />
+            <button type="submit">Submit</button>
+          </form>
+        </hx-form>
+      `);
+
+      const form = el.querySelector('form')!;
+      // Set a value that will fail email validation
+      const input = el.querySelector('input')!;
+      input.value = '';
+
+      const eventPromise = oneEvent<CustomEvent>(el, 'hx-invalid');
+      form.dispatchEvent(new SubmitEvent('submit', { bubbles: true, cancelable: true }));
+      const event = await eventPromise;
+
+      expect(event.detail.errors).toBeDefined();
+      expect(Array.isArray(event.detail.errors)).toBe(true);
+      expect(event.detail.errors.length).toBeGreaterThan(0);
+    });
+
+    it('dispatches wc-reset when form is reset', async () => {
+      const _el = await fixture<WcForm>(`
+        <hx-form action="">
+          <form>
+            <input type="text" name="field" value="test" />
+            <button type="reset">Reset</button>
+          </form>
+        </hx-form>
+      `);
+
+      const form = el.querySelector('form')!;
+      const eventPromise = oneEvent<CustomEvent>(el, 'hx-reset');
+      form.dispatchEvent(new Event('reset', { bubbles: true }));
+      const event = await eventPromise;
+
+      expect(event).toBeTruthy();
+      expect(event.bubbles).toBe(true);
+      expect(event.composed).toBe(true);
+    });
+  });
+
+  // ─── Form Discovery (3) ───
+
+  describe('Form Discovery', () => {
+    it('getFormElements() returns wc-* form components', async () => {
+      const _el = await fixture<WcForm>(`
+        <hx-form>
+          <hx-text-input name="first" label="First"></hx-text-input>
+          <hx-text-input name="last" label="Last"></hx-text-input>
+        </hx-form>
+      `);
+
+      const elements = el.getFormElements();
+      expect(elements.length).toBe(2);
+      expect(elements[0].tagName.toLowerCase()).toBe('hx-text-input');
+    });
+
+    it('getNativeFormElements() returns native form elements', async () => {
+      const _el = await fixture<WcForm>(`
+        <hx-form>
+          <input type="text" name="username" />
+          <select name="role"><option value="admin">Admin</option></select>
+          <textarea name="bio"></textarea>
+          <button type="submit">Go</button>
+        </hx-form>
+      `);
+
+      const elements = el.getNativeFormElements();
+      expect(elements.length).toBe(4);
+    });
+
+    it('getFormData() returns FormData from child inputs', async () => {
+      const _el = await fixture<WcForm>(`
+        <hx-form>
+          <form>
+            <input type="text" name="username" value="jdoe" />
+            <input type="email" name="email" value="jdoe@example.com" />
+          </form>
+        </hx-form>
+      `);
+
+      const formData = el.getFormData();
+      expect(formData.get('username')).toBe('jdoe');
+      expect(formData.get('email')).toBe('jdoe@example.com');
+    });
+  });
+
+  // ─── Validation (3) ───
+
+  describe('Validation', () => {
+    it('checkValidity() returns false when required field is empty', async () => {
+      const _el = await fixture<WcForm>(`
+        <hx-form>
+          <input type="text" name="required-field" required />
+        </hx-form>
+      `);
+
+      expect(el.checkValidity()).toBe(false);
+    });
+
+    it('checkValidity() returns true when all fields are valid', async () => {
+      const _el = await fixture<WcForm>(`
+        <hx-form>
+          <input type="text" name="field" value="filled" required />
+        </hx-form>
+      `);
+
+      expect(el.checkValidity()).toBe(true);
+    });
+
+    it('reportValidity() triggers validation UI and returns false for invalid', async () => {
+      const _el = await fixture<WcForm>(`
+        <hx-form>
+          <input type="text" name="required-field" required />
+        </hx-form>
+      `);
+
+      expect(el.reportValidity()).toBe(false);
+    });
+  });
+
+  // ─── Scoped Styles (3) ───
+
+  describe('Scoped Styles', () => {
+    it('adopted stylesheet is injected into document', async () => {
+      const _el = await fixture<WcForm>('<hx-form></hx-form>');
+
+      // The AdoptedStylesheetsController should have added a stylesheet
+      const hasFormStyles = document.adoptedStyleSheets.some((sheet) => {
+        try {
+          const rules = Array.from(sheet.cssRules);
+          return rules.some((rule) => rule.cssText.includes('hx-form'));
+        } catch {
+          return false;
+        }
+      });
+      expect(hasFormStyles).toBe(true);
+    });
+
+    it('styles are scoped to wc-form selector', async () => {
+      const _el = await fixture<WcForm>('<hx-form></hx-form>');
+
+      const formSheet = document.adoptedStyleSheets.find((sheet) => {
+        try {
+          const rules = Array.from(sheet.cssRules);
+          return rules.some((rule) => rule.cssText.includes('hx-form'));
+        } catch {
+          return false;
+        }
+      });
+      expect(formSheet).toBeTruthy();
+
+      // Verify all rules target wc-form (scoped)
+      if (formSheet) {
+        const rules = Array.from(formSheet.cssRules);
+        const nonMediaRules = rules.filter(
+          (rule) => !(rule instanceof CSSMediaRule)
+        );
+        for (const rule of nonMediaRules) {
+          if (rule instanceof CSSStyleRule) {
+            expect(rule.selectorText).toContain('hx-form');
+          }
+        }
+      }
+    });
+
+    it('stylesheet is removed on disconnect', async () => {
+      const _el = await fixture<WcForm>('<hx-form></hx-form>');
+
+      const countBefore = document.adoptedStyleSheets.filter((sheet) => {
+        try {
+          const rules = Array.from(sheet.cssRules);
+          return rules.some((rule) => rule.cssText.includes('hx-form'));
+        } catch {
+          return false;
+        }
+      }).length;
+
+      expect(countBefore).toBeGreaterThan(0);
+
+      el.remove();
+
+      const countAfter = document.adoptedStyleSheets.filter((sheet) => {
+        try {
+          const rules = Array.from(sheet.cssRules);
+          return rules.some((rule) => rule.cssText.includes('hx-form'));
+        } catch {
+          return false;
+        }
+      }).length;
+
+      expect(countAfter).toBeLessThan(countBefore);
+    });
+  });
+
+  // ─── Accessibility (3) ───
+
+  describe('Accessibility (axe-core)', () => {
+    it('has no axe violations in default state', async () => {
+      const _el = await fixture<WcForm>(`
+        <hx-form>
+          <form>
+            <div class="form-item">
+              <label for="a11y-name">Name</label>
+              <input type="text" id="a11y-name" name="name" />
+            </div>
+          </form>
+        </hx-form>
+      `);
+      const { violations } = await checkA11y(el);
+      expect(violations).toEqual([]);
+    });
+
+    it('has no axe violations with required fields', async () => {
+      const _el = await fixture<WcForm>(`
+        <hx-form>
+          <form>
+            <div class="form-item">
+              <label for="a11y-email">
+                Email
+                <span class="form-required" aria-hidden="true">*</span>
+              </label>
+              <input type="email" id="a11y-email" name="email" required />
+            </div>
+          </form>
+        </hx-form>
+      `);
+      const { violations } = await checkA11y(el);
+      expect(violations).toEqual([]);
+    });
+
+    it('has no axe violations with error states', async () => {
+      const _el = await fixture<WcForm>(`
+        <hx-form>
+          <form>
+            <div class="form-item error">
+              <label for="a11y-err">Field</label>
+              <input type="text" id="a11y-err" name="field" aria-invalid="true" aria-describedby="a11y-err-msg" />
+              <span id="a11y-err-msg" class="error-message" role="alert">This field has an error.</span>
+            </div>
+          </form>
+        </hx-form>
+      `);
+      const { violations } = await checkA11y(el);
+      expect(violations).toEqual([]);
+    });
+  });
+
+});

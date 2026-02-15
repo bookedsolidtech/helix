@@ -1,4 +1,4 @@
-import '@wc-2026/tokens/tokens.css';
+import '@helix/tokens/tokens.css';
 import type { Preview } from '@storybook/web-components';
 
 const preview: Preview = {

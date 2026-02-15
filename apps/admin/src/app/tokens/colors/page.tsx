@@ -1,10 +1,10 @@
 import { cn } from "@/lib/utils";
-import { tokenEntries, type TokenEntry } from "@wc-2026/tokens";
+import { tokenEntries, type TokenEntry } from "@helix/tokens";
 import {
   getColorSubgroups,
   isHexColor,
   getContrastColor,
-} from "@wc-2026/tokens/utils";
+} from "@helix/tokens/utils";
 import { Breadcrumb } from "@/components/dashboard/Breadcrumb";
 import { getTokenBreadcrumbs } from "@/lib/breadcrumb-utils";
 

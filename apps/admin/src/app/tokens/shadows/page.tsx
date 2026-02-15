@@ -1,5 +1,5 @@
-import { tokenEntries } from "@wc-2026/tokens";
-import { getTokensByPrefix } from "@wc-2026/tokens/utils";
+import { tokenEntries } from "@helix/tokens";
+import { getTokensByPrefix } from "@helix/tokens/utils";
 import { Breadcrumb } from "@/components/dashboard/Breadcrumb";
 import { getTokenBreadcrumbs } from "@/lib/breadcrumb-utils";
 

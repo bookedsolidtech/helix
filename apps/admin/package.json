@@ -1,5 +1,5 @@
 {
-  "name": "@wc-2026/admin",
+  "name": "@helix/admin",
   "version": "0.0.1",
   "private": true,
   "description": "Panopticon Platform — WC-2026 Component Library",
@@ -11,7 +11,7 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@wc-2026/tokens": "*",
+    "@helix/tokens": "*",
     "next": "^15.3.3",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",

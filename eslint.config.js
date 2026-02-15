@@ -18,7 +18,7 @@ export default tseslint.config(
       'apps/admin/.next/**',
       'apps/docs/.astro/**',
       'apps/storybook/dist/**',
-      'packages/wc-library/dist/**',
+      'packages/hx-library/dist/**',
     ],
   },
 
@@ -30,7 +30,7 @@ export default tseslint.config(
 
   // ── Lit-specific rules (for web component source) ───────────────────
   {
-    files: ['packages/wc-library/src/**/*.ts'],
+    files: ['packages/hx-library/src/**/*.ts'],
     plugins: {
       lit,
       wc,

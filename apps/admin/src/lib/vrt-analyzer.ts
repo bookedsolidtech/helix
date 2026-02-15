@@ -39,12 +39,12 @@ function getProjectRoot(): string {
 function getComponentScreenshotsDir(tagName: string): string {
   return resolve(
     getProjectRoot(),
-    `packages/wc-library/src/components/${tagName}/__screenshots__`
+    `packages/hx-library/src/components/${tagName}/__screenshots__`
   );
 }
 
 function getTestResultsPath(): string {
-  return resolve(getProjectRoot(), "packages/wc-library/.cache/test-results.json");
+  return resolve(getProjectRoot(), "packages/hx-library/.cache/test-results.json");
 }
 
 export function analyzeVrt(tagName: string): VrtResult | null {
