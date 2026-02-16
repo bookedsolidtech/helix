@@ -27,38 +27,37 @@ npm install @helix/library
 
 ## Available Components
 
-| Component | Tag | Description |
-|-----------|-----|-------------|
-| [Alert](/component-library/hx-alert/) | `<hx-alert>` | Feedback messages for status, warnings, and errors with ARIA semantics |
-| [Badge](/component-library/hx-badge/) | `<hx-badge>` | Compact status indicators and labels with variant styling |
-| [Button](/component-library/hx-button/) | `<hx-button>` | Interactive buttons with variants, sizes, and states |
-| [Card](/component-library/hx-card/) | `<hx-card>` | Content containers with image, heading, body, footer, and action slots |
-| [Checkbox](/component-library/hx-checkbox/) | `<hx-checkbox>` | Checkbox with label, indeterminate state, validation, and form association |
-| [Container](/component-library/hx-container/) | `<hx-container>` | Responsive layout container with max-width and padding controls |
-| [Form](/component-library/hx-form/) | `<hx-form>` | Form wrapper with validation, submission handling, and field coordination |
-| [Prose](/component-library/hx-prose/) | `<hx-prose>` | Rich text container with typographic styling for long-form content |
-| [Radio](/component-library/hx-radio/) | `<hx-radio>` | Single radio input with label and form association |
-| [Radio Group](/component-library/hx-radio-group/) | `<hx-radio-group>` | Grouped radio inputs with fieldset semantics and shared validation |
-| [Select](/component-library/hx-select/) | `<hx-select>` | Native select wrapper with label, validation, and help text |
-| [Switch](/component-library/hx-switch/) | `<hx-switch>` | Toggle switch for binary on/off settings with label support |
-| [Text Input](/component-library/hx-text-input/) | `<hx-text-input>` | Form-associated text input with label, validation, and help text |
-| [Textarea](/component-library/hx-textarea/) | `<hx-textarea>` | Multi-line text input with label, validation, and character count |
+| Component                                         | Tag                | Description                                                                |
+| ------------------------------------------------- | ------------------ | -------------------------------------------------------------------------- |
+| [Alert](/component-library/hx-alert/)             | `<hx-alert>`       | Feedback messages for status, warnings, and errors with ARIA semantics     |
+| [Badge](/component-library/hx-badge/)             | `<hx-badge>`       | Compact status indicators and labels with variant styling                  |
+| [Button](/component-library/hx-button/)           | `<hx-button>`      | Interactive buttons with variants, sizes, and states                       |
+| [Card](/component-library/hx-card/)               | `<hx-card>`        | Content containers with image, heading, body, footer, and action slots     |
+| [Checkbox](/component-library/hx-checkbox/)       | `<hx-checkbox>`    | Checkbox with label, indeterminate state, validation, and form association |
+| [Container](/component-library/hx-container/)     | `<hx-container>`   | Responsive layout container with max-width and padding controls            |
+| [Form](/component-library/hx-form/)               | `<hx-form>`        | Form wrapper with validation, submission handling, and field coordination  |
+| [Prose](/component-library/hx-prose/)             | `<hx-prose>`       | Rich text container with typographic styling for long-form content         |
+| [Radio](/component-library/hx-radio/)             | `<hx-radio>`       | Single radio input with label and form association                         |
+| [Radio Group](/component-library/hx-radio-group/) | `<hx-radio-group>` | Grouped radio inputs with fieldset semantics and shared validation         |
+| [Select](/component-library/hx-select/)           | `<hx-select>`      | Native select wrapper with label, validation, and help text                |
+| [Switch](/component-library/hx-switch/)           | `<hx-switch>`      | Toggle switch for binary on/off settings with label support                |
+| [Text Input](/component-library/hx-text-input/)   | `<hx-text-input>`  | Form-associated text input with label, validation, and help text           |
+| [Textarea](/component-library/hx-textarea/)       | `<hx-textarea>`    | Multi-line text input with label, validation, and character count          |
 
 ## Live Demo
 
 Components composed together:
 
-<ComponentDemo title="Composed Example" description="Card with form fields, alerts, and interactive controls">
+<ComponentDemo
+  title="Composed Example"
+  description="Card with form fields, alerts, and interactive controls"
+>
   <div style="display: grid; gap: 1rem; max-width: 480px;">
     <hx-alert variant="info">Fill out the form below to get started.</hx-alert>
     <hx-card variant="default" elevation="raised">
       <span slot="heading">Patient Registration</span>
       <div style="display: grid; gap: 0.75rem;">
-        <hx-text-input
-          label="Full name"
-          placeholder="Jane Doe"
-          required
-        ></hx-text-input>
+        <hx-text-input label="Full name" placeholder="Jane Doe" required></hx-text-input>
         <hx-text-input
           label="Email address"
           type="email"
@@ -78,7 +77,9 @@ Components composed together:
         </div>
       </div>
     </hx-card>
-    <hx-alert variant="success" closable>Registration submitted successfully.</hx-alert>
+    <hx-alert variant="success" closable>
+      Registration submitted successfully.
+    </hx-alert>
   </div>
 </ComponentDemo>
 

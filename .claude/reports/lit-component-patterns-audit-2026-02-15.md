@@ -1,4 +1,5 @@
 # Lit 3.x Component Patterns Audit Report
+
 **Date:** February 15, 2026
 **Auditor:** Claude Code (Lit 3.x Specialist)
 **Scope:** All 14 components in packages/wc-library/src/components/
@@ -13,6 +14,7 @@ Conducted comprehensive audit of Lit 3.x best practices, Shadow DOM patterns, re
 **OVERALL ASSESSMENT:** STRONG with critical gaps in lifecycle management and reactive state patterns.
 
 **Component Inventory (14 total):**
+
 - **Form Controls (8):** wc-button, wc-text-input, wc-textarea, wc-checkbox, wc-switch, wc-select, wc-radio-group, wc-radio
 - **Layout/Content (4):** wc-card, wc-container, wc-prose, wc-form
 - **Feedback/Status (2):** wc-alert, wc-badge
@@ -27,15 +29,18 @@ Conducted comprehensive audit of Lit 3.x best practices, Shadow DOM patterns, re
 **Impact:** Memory leaks, broken Lit lifecycle chain, controller failures
 
 #### Current State:
+
 Only **4 of 14 components** correctly implement lifecycle super calls:
 
 **✓ CORRECT:**
+
 - `wc-prose.ts`: Calls `super.connectedCallback()` and `super.updated()`
 - `wc-form.ts`: Calls `super.connectedCallback()` and `super.disconnectedCallback()`
 - `wc-radio-group.ts`: Calls `super.connectedCallback()`, `super.disconnectedCallback()`, `super.updated()`, `super.firstUpdated()`
 - `wc-radio.ts`: Calls `super.connectedCallback()` and `super.updated()`
 
 **✗ MISSING (10 components):**
+
 - `wc-card.ts`: NO lifecycle methods (has slot listeners in render)
 - `wc-button.ts`: NO lifecycle methods
 - `wc-text-input.ts`: NO lifecycle methods
@@ -48,6 +53,7 @@ Only **4 of 14 components** correctly implement lifecycle super calls:
 - `wc-container.ts`: NO lifecycle methods
 
 #### Why This Matters:
+
 ```typescript
 // WRONG - breaks Lit's lifecycle chain
 override connectedCallback(): void {
@@ -62,11 +68,13 @@ override connectedCallback(): void {
 ```
 
 Without `super.connectedCallback()`:
+
 - Lit controllers (e.g., `AdoptedStylesheetsController`) fail to initialize
 - Custom element upgrade timing breaks
 - Parent class lifecycle hooks never execute
 
 #### Recommendation:
+
 **MANDATE:** All lifecycle overrides MUST call `super` as first statement. Create ESLint rule to enforce.
 
 ---
@@ -79,6 +87,7 @@ Without `super.connectedCallback()`:
 #### Violators:
 
 **CRITICAL:**
+
 ```typescript
 // wc-card.ts - Lines 65-70
 private _hasSlotContent: Record<string, boolean> = {
@@ -88,14 +97,17 @@ private _hasSlotContent: Record<string, boolean> = {
   actions: false,
 };
 ```
+
 **Problem:** This is reactive state modified in `_handleSlotChange()` and used in `render()`, but it's NOT decorated with `@state`. Changes trigger manual `this.requestUpdate()` instead of automatic reactivity.
 
 **HIGH:**
+
 ```typescript
 // wc-text-input.ts - Lines 135-136
 private _hasLabelSlot = false;
 private _hasErrorSlot = false;
 ```
+
 **Problem:** Modified in slot handlers, triggers manual `requestUpdate()`, should be `@state`.
 
 ```typescript
@@ -103,9 +115,11 @@ private _hasErrorSlot = false;
 private _hasLabelSlot = false;
 private _hasErrorSlot = false;
 ```
+
 **Problem:** Same issue as wc-text-input.
 
 **✓ CORRECT EXAMPLES:**
+
 ```typescript
 // wc-select.ts - Lines 136-137
 @state() private _hasLabelSlot = false;
@@ -121,6 +135,7 @@ private _hasSlotContent = false;
 #### Performance Impact:
 
 **Without @state:**
+
 ```typescript
 private _hasSlotContent = false; // Treated as internal property
 
@@ -130,6 +145,7 @@ this.requestUpdate(); // MANUAL update required
 ```
 
 **With @state:**
+
 ```typescript
 @state() private _hasSlotContent = false; // Reactive property
 
@@ -138,13 +154,16 @@ this._hasSlotContent = true; // AUTOMATIC update triggered
 ```
 
 Using `@state`:
+
 - Skips attribute parsing overhead
 - Automatic change detection
 - Integrates with Lit's update lifecycle
 - Prevents attribute reflection (private data stays private)
 
 #### Recommendation:
+
 **FIX IMMEDIATELY:**
+
 1. Add `@state()` to all reactive private properties in wc-card, wc-text-input, wc-textarea
 2. Remove manual `this.requestUpdate()` calls in slot handlers
 3. Document pattern: "Use @state for ALL private reactive properties"
@@ -160,19 +179,20 @@ Using `@state`:
 
 #### Current Usage:
 
-| Lifecycle Hook | Usage Count | Components |
-|----------------|-------------|------------|
-| `connectedCallback()` | 4/14 | wc-form, wc-prose, wc-radio-group, wc-radio |
-| `disconnectedCallback()` | 3/14 | wc-form, wc-radio-group, wc-radio |
-| `updated()` | 9/14 | Most form controls |
-| `willUpdate()` | **0/14** | NONE |
-| `firstUpdated()` | 1/14 | wc-radio-group |
+| Lifecycle Hook           | Usage Count | Components                                  |
+| ------------------------ | ----------- | ------------------------------------------- |
+| `connectedCallback()`    | 4/14        | wc-form, wc-prose, wc-radio-group, wc-radio |
+| `disconnectedCallback()` | 3/14        | wc-form, wc-radio-group, wc-radio           |
+| `updated()`              | 9/14        | Most form controls                          |
+| `willUpdate()`           | **0/14**    | NONE                                        |
+| `firstUpdated()`         | 1/14        | wc-radio-group                              |
 
 #### Missing Pattern: willUpdate()
 
 **NO COMPONENT** demonstrates `willUpdate()` for derived value computation. This is a critical Lit 3.x optimization pattern.
 
 **Current Pattern (INEFFICIENT):**
+
 ```typescript
 // wc-alert.ts - Lines 70-83
 private get _isAssertive(): boolean {
@@ -191,6 +211,7 @@ private get _ariaLive(): string {
 ```
 
 **Recommended Pattern (EFFICIENT):**
+
 ```typescript
 @state() private _isAssertive = false;
 @state() private _role: string = 'status';
@@ -208,6 +229,7 @@ override willUpdate(changedProperties: PropertyValues): void {
 ```
 
 #### Recommendation:
+
 1. Refactor wc-alert to use `willUpdate()` for derived ARIA values
 2. Create example component demonstrating `willUpdate()` pattern
 3. Document: "Use `willUpdate()` for derived values, NOT getters in render()"
@@ -222,6 +244,7 @@ override willUpdate(changedProperties: PropertyValues): void {
 #### Three Patterns Observed:
 
 **Pattern A: Inline handlers with manual requestUpdate() (Most Common)**
+
 ```typescript
 // wc-card.ts, wc-badge.ts, wc-text-input.ts, wc-select.ts, wc-checkbox.ts, wc-switch.ts
 private _handleSlotChange(slotName: string) {
@@ -234,6 +257,7 @@ private _handleSlotChange(slotName: string) {
 ```
 
 **Pattern B: Event listener registration**
+
 ```typescript
 // wc-radio-group.ts - Lines 123-129
 override connectedCallback(): void {
@@ -243,6 +267,7 @@ override connectedCallback(): void {
 ```
 
 **Pattern C: No slot detection**
+
 ```typescript
 // wc-button.ts, wc-alert.ts, wc-container.ts, wc-prose.ts, wc-form.ts, wc-radio.ts
 // Just renders <slot></slot> without tracking content
@@ -262,6 +287,7 @@ private _handleSlotChange(e: Event): void {
 ```
 
 #### Recommendation:
+
 Standardize on Pattern A + @state. Remove manual `requestUpdate()` calls.
 
 ---
@@ -295,6 +321,7 @@ export const wcButtonStyles = css`...`; // ✓ Named export
 ```
 
 #### Token Usage: EXEMPLARY
+
 - ✓ All colors use `--wc-color-*` tokens
 - ✓ All spacing uses `--wc-space-*` tokens
 - ✓ All borders use `--wc-border-*` tokens
@@ -303,6 +330,7 @@ export const wcButtonStyles = css`...`; // ✓ Named export
 - ✓ NO hardcoded values
 
 #### File Structure: CORRECT
+
 ```
 wc-button/
   ├── index.ts              # Re-export
@@ -383,14 +411,14 @@ private _updateValidity(): void {
 
 **Status:** CORRECT AND CONSISTENT
 
-| Directive | Usage | Components |
-|-----------|-------|------------|
-| `classMap()` | ✓ | ALL components with conditional classes |
-| `ifDefined()` | ✓ | wc-text-input, wc-textarea, wc-select, wc-switch, wc-checkbox, wc-form |
-| `live()` | ✓ | wc-text-input, wc-textarea, wc-checkbox (form inputs) |
-| `nothing` | ✓ | ALL components for conditional ARIA |
-| `repeat()` | N/A | No list rendering in current components |
-| `guard()` | N/A | No expensive template memoization needed |
+| Directive     | Usage | Components                                                             |
+| ------------- | ----- | ---------------------------------------------------------------------- |
+| `classMap()`  | ✓     | ALL components with conditional classes                                |
+| `ifDefined()` | ✓     | wc-text-input, wc-textarea, wc-select, wc-switch, wc-checkbox, wc-form |
+| `live()`      | ✓     | wc-text-input, wc-textarea, wc-checkbox (form inputs)                  |
+| `nothing`     | ✓     | ALL components for conditional ARIA                                    |
+| `repeat()`    | N/A   | No list rendering in current components                                |
+| `guard()`     | N/A   | No expensive template memoization needed                               |
 
 **FINDING:** Directive usage is mature and follows Lit best practices.
 
@@ -421,23 +449,26 @@ override focus(options?: FocusOptions): void {
 **Status:** EXCELLENT
 
 #### Event Naming: 100% COMPLIANT
+
 All events use `wc-` prefix:
 
-| Component | Events |
-|-----------|--------|
-| wc-button | `wc-click` |
-| wc-text-input | `wc-input`, `wc-change` |
-| wc-textarea | `wc-input`, `wc-change` |
-| wc-checkbox | `wc-change` |
-| wc-switch | `wc-change` |
-| wc-select | `wc-change` |
-| wc-radio-group | `wc-change` |
-| wc-alert | `wc-close`, `wc-after-close` |
-| wc-card | `wc-card-click` |
-| wc-form | `wc-submit`, `wc-invalid`, `wc-reset` |
+| Component      | Events                                |
+| -------------- | ------------------------------------- |
+| wc-button      | `wc-click`                            |
+| wc-text-input  | `wc-input`, `wc-change`               |
+| wc-textarea    | `wc-input`, `wc-change`               |
+| wc-checkbox    | `wc-change`                           |
+| wc-switch      | `wc-change`                           |
+| wc-select      | `wc-change`                           |
+| wc-radio-group | `wc-change`                           |
+| wc-alert       | `wc-close`, `wc-after-close`          |
+| wc-card        | `wc-card-click`                       |
+| wc-form        | `wc-submit`, `wc-invalid`, `wc-reset` |
 
 #### Event Configuration: 100% CORRECT
+
 All events use:
+
 ```typescript
 this.dispatchEvent(
   new CustomEvent('wc-event-name', {
@@ -486,18 +517,21 @@ role="radio" // wc-radio
 ## COMPONENT-SPECIFIC FINDINGS
 
 ### wc-button (Interactive)
+
 - ✓ Form-associated button with submit/reset logic
 - ✓ Prevents event propagation when disabled
 - ✓ Uses `wc-click` instead of native click
 - ✓ ElementInternals integration
 
 ### wc-card (Interactive)
+
 - ✓ `role="link"` when `wc-href` is set
 - ✓ Keyboard navigation (Enter/Space)
 - ✓ Slot detection for conditional rendering
 - **❌ CRITICAL:** `_hasSlotContent` is reactive but NOT `@state`
 
 ### wc-text-input, wc-textarea (Form Controls)
+
 - ✓ Comprehensive form participation
 - ✓ Slot override pattern for Drupal Form API
 - ✓ `live()` directive for form value sync
@@ -506,18 +540,21 @@ role="radio" // wc-radio
 - **❌ HIGH:** Slot tracking without `@state`
 
 ### wc-checkbox, wc-switch (Form Controls)
+
 - ✓ Custom UI wrapping native input (`tabindex="-1"`)
 - ✓ Label click handling
 - ✓ Indeterminate state (wc-checkbox)
 - ✓ Space/Enter keyboard handling
 
 ### wc-select (Form Control)
+
 - ✓ Option cloning from light DOM to shadow DOM
 - ✓ Placeholder as disabled first option
 - ✓ `slotchange`-based option syncing
 - ✓ Correct use of `@state`
 
 ### wc-radio-group, wc-radio (Form Control Pair)
+
 - ✓ Roving tabindex management
 - ✓ Arrow key navigation
 - ✓ `wc-radio-select` internal event
@@ -525,6 +562,7 @@ role="radio" // wc-radio
 - ✓ EXEMPLARY lifecycle super calls
 
 ### wc-alert (Feedback)
+
 - ✓ ARIA live region with variant-based assertiveness
 - ✓ `role="alert"` vs `role="status"`
 - ✓ Inline SVG icons
@@ -532,23 +570,27 @@ role="radio" // wc-radio
 - **⚠ MEDIUM:** Should use `willUpdate()` for derived ARIA values
 
 ### wc-badge (Status Indicator)
+
 - ✓ Dot mode (pulse without content)
 - ✓ Correct use of `@state` for slot detection
 
 ### wc-container (Layout)
+
 - ✓ Two-layer model (outer host + inner wrapper)
 - ✓ Width presets via CSS custom properties
 
 ### wc-prose (Content)
+
 - ✓ Light DOM for CMS content
 - ✓ `AdoptedStylesheetsController`
 - ✓ Dynamic `maxWidth` binding
 - ✓ EXEMPLARY lifecycle super calls
 
 ### wc-form (Form Wrapper)
+
 - ✓ Light DOM for native form participation
 - ✓ Conditional form tag rendering
-- ✓ FormData collection from wc-* and native inputs
+- ✓ FormData collection from wc-\* and native inputs
 - ✓ Client-side validation with `wc-submit`/`wc-invalid` events
 - ✓ EXEMPLARY lifecycle super calls
 
@@ -557,21 +599,25 @@ role="radio" // wc-radio
 ## DOCUMENTATION GAPS IDENTIFIED
 
 ### CRITICAL (Developer Training Required):
+
 1. **Lifecycle super() call mandate** — developers are missing this pattern
 2. **@state vs private property usage guidelines** — inconsistent application
 3. **Slot change handling best practices** — when to use @state
 
 ### HIGH (Pattern Documentation):
+
 4. **willUpdate() use cases and examples** — zero current usage
 5. **When to use connectedCallback vs constructor** — unclear guidance
 6. **Memory cleanup patterns for global listeners** — missing examples
 
 ### MEDIUM (Architectural Guidance):
+
 7. **Form validation patterns and setValidity() anchor usage** — working but undocumented
 8. **Light DOM vs Shadow DOM decision matrix** — when to use each
 9. **AdoptedStylesheetsController usage guide** — advanced pattern
 
 ### LOW (Already Consistent):
+
 10. Event naming conventions (already exemplary)
 11. CSS Parts naming conventions (already consistent)
 12. ARIA pattern recipes per component type (already correct)
@@ -642,6 +688,7 @@ private _handleSlotChange(e: Event): void {
 ### 3. Create "Form Component Recipe"
 
 Boilerplate template with:
+
 - ElementInternals setup
 - Validation pattern with `setValidity()`
 - `formResetCallback`/`formStateRestoreCallback`
@@ -650,22 +697,20 @@ Boilerplate template with:
 ### 4. Create "Light DOM Component Pattern" Guide
 
 When to use:
+
 - CMS content (wc-prose)
 - Native form participation (wc-form)
 - Drupal-rendered markup
 
 Pattern:
+
 ```typescript
 export class WcExample extends LitElement {
   override createRenderRoot(): this {
     return this; // Light DOM
   }
 
-  private _styles = new AdoptedStylesheetsController(
-    this,
-    wcExampleScopedCss,
-    document
-  );
+  private _styles = new AdoptedStylesheetsController(this, wcExampleScopedCss, document);
 }
 ```
 
@@ -685,6 +730,7 @@ this.shadowRoot!.querySelector('.field__input');
 ## COMPLIANCE SCORECARD
 
 ### ✓ PASSING (Exemplary):
+
 - HTMLElementTagNameMap declarations (14/14)
 - CSS architecture (separate files, tokens, `:focus-visible`)
 - Event naming (`wc-` prefix, `bubbles`, `composed`)
@@ -696,12 +742,14 @@ this.shadowRoot!.querySelector('.field__input');
 - CSS Parts architecture
 
 ### ⚠ NEEDS IMPROVEMENT:
+
 - Lifecycle `super()` calls (4/14 with `connectedCallback`)
 - `@state` usage for private reactive properties (inconsistent)
 - `willUpdate()` pattern (0/14 — no examples)
 - `firstUpdated()` pattern (1/14 — underutilized)
 
 ### ❌ CRITICAL GAPS:
+
 - **wc-card.ts**: `_hasSlotContent` reactive without `@state`
 - **wc-text-input.ts**: Slot tracking without `@state`
 - **wc-textarea.ts**: Slot tracking without `@state`
@@ -730,16 +778,19 @@ Critical gaps exist in:
 ## NEXT STEPS FOR CTO REVIEW
 
 ### Immediate Actions (CRITICAL):
+
 1. Fix `@state` usage in wc-card, wc-text-input, wc-textarea
 2. Create ESLint rule to enforce lifecycle `super()` calls
 3. Refactor wc-alert to demonstrate `willUpdate()` pattern
 
 ### Short-term (HIGH):
+
 4. Create component building guide with lifecycle checklist
 5. Document slot detection + `@state` best practice
 6. Add `willUpdate()` example component for derived state pattern
 
 ### Medium-term (MEDIUM):
+
 7. Audit all components for lifecycle consistency
 8. Create comprehensive pattern documentation
 9. Add lifecycle + `@state` tests to component scaffolding
@@ -749,11 +800,13 @@ Critical gaps exist in:
 ## FILES REQUIRING IMMEDIATE ATTENTION
 
 ### CRITICAL:
+
 - `/Volumes/Development/wc-2026/packages/wc-library/src/components/wc-card/wc-card.ts`
   - **Issue:** `_hasSlotContent` reactive without `@state`
   - **Fix:** Add `@state()` decorator, remove manual `requestUpdate()`
 
 ### HIGH:
+
 - `/Volumes/Development/wc-2026/packages/wc-library/src/components/wc-text-input/wc-text-input.ts`
   - **Issue:** `_hasLabelSlot`, `_hasErrorSlot` without `@state`
   - **Fix:** Add `@state()` decorators, remove manual `requestUpdate()`
@@ -763,6 +816,7 @@ Critical gaps exist in:
   - **Fix:** Add `@state()` decorators, remove manual `requestUpdate()`
 
 ### MEDIUM (Pattern Example):
+
 - `/Volumes/Development/wc-2026/packages/wc-library/src/components/wc-alert/wc-alert.ts`
   - **Issue:** Derived ARIA values use getters instead of `willUpdate()`
   - **Fix:** Refactor to demonstrate `willUpdate()` pattern

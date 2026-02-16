@@ -7,7 +7,13 @@
 /* ─── Inline Code ─── */
 
 code {
-  font-family: var(--wc-font-family-mono, 'JetBrains Mono', ui-monospace, 'Cascadia Code', monospace);
+  font-family: var(
+    --wc-font-family-mono,
+    'JetBrains Mono',
+    ui-monospace,
+    'Cascadia Code',
+    monospace
+  );
   font-size: 0.875em;
   font-weight: var(--wc-font-weight-normal, 400);
   background-color: var(--wc-color-surface-sunken, var(--wc-color-neutral-100, #e9ecef));
@@ -24,12 +30,19 @@ pre {
   margin-bottom: var(--wc-space-6, 1.5rem);
   padding: var(--wc-space-4, 1rem) var(--wc-space-5, 1.25rem);
   overflow-x: auto;
-  font-family: var(--wc-font-family-mono, 'JetBrains Mono', ui-monospace, 'Cascadia Code', monospace);
+  font-family: var(
+    --wc-font-family-mono,
+    'JetBrains Mono',
+    ui-monospace,
+    'Cascadia Code',
+    monospace
+  );
   font-size: var(--wc-font-size-sm, 0.875rem);
   line-height: var(--wc-line-height-relaxed, 1.75);
   color: var(--wc-color-neutral-800, #212529);
   background-color: var(--wc-color-surface-sunken, var(--wc-color-neutral-100, #e9ecef));
-  border: var(--wc-border-width-thin, 1px) solid var(--wc-color-border-default, var(--wc-color-neutral-200, #dee2e6));
+  border: var(--wc-border-width-thin, 1px) solid
+    var(--wc-color-border-default, var(--wc-color-neutral-200, #dee2e6));
   border-radius: var(--wc-border-radius-md, 0.375rem);
   -webkit-overflow-scrolling: touch;
   tab-size: 2;
@@ -49,7 +62,13 @@ pre code {
 /* ─── Keyboard Input ─── */
 
 kbd {
-  font-family: var(--wc-font-family-mono, 'JetBrains Mono', ui-monospace, 'Cascadia Code', monospace);
+  font-family: var(
+    --wc-font-family-mono,
+    'JetBrains Mono',
+    ui-monospace,
+    'Cascadia Code',
+    monospace
+  );
   font-size: 0.875em;
   padding: 0.125em var(--wc-space-2, 0.5rem);
   background-color: var(--wc-color-neutral-800, #212529);
@@ -61,7 +80,13 @@ kbd {
 /* ─── Sample Output ─── */
 
 samp {
-  font-family: var(--wc-font-family-mono, 'JetBrains Mono', ui-monospace, 'Cascadia Code', monospace);
+  font-family: var(
+    --wc-font-family-mono,
+    'JetBrains Mono',
+    ui-monospace,
+    'Cascadia Code',
+    monospace
+  );
   font-size: 0.875em;
 }
 

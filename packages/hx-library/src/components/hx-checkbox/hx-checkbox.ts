@@ -130,6 +130,7 @@ export class HelixCheckbox extends LitElement {
   // ─── Lifecycle ───
 
   override updated(changedProperties: Map<string, unknown>): void {
+    super.updated(changedProperties);
     if (changedProperties.has('checked') || changedProperties.has('value')) {
       this._internals.setFormValue(this.checked ? this.value : null);
       this._updateValidity();
@@ -230,7 +231,7 @@ export class HelixCheckbox extends LitElement {
 
   // ─── Render ───
 
-  private _id = `wc-checkbox-${Math.random().toString(36).slice(2, 9)}`;
+  private _id = `hx-checkbox-${Math.random().toString(36).slice(2, 9)}`;
   private _helpTextId = `${this._id}-help`;
   private _errorId = `${this._id}-error`;
   private _labelId = `${this._id}-label`;

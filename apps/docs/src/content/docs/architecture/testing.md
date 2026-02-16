@@ -28,12 +28,63 @@ HELIX follows a comprehensive testing strategy designed for enterprise complianc
 - Reactive property testing
 - Event handling verification
 
-### Visual Regression - Chromatic
+### Visual Regression Testing
 
-- Automated screenshot comparison
-- Cross-browser consistency
-- Theme variation testing (light/dark/high-contrast)
-- Responsive breakpoint verification
+HELIX uses Playwright for visual regression testing to catch unintended UI changes across browsers.
+
+#### Running VRT Locally
+
+```bash
+# Start Storybook (required)
+npm run dev:storybook
+
+# Run VRT tests
+npm run test:vrt
+
+# Generate new baselines after intentional UI changes
+npm run test:vrt:update
+```
+
+#### Browser Coverage
+
+VRT runs against three browsers:
+
+- Chromium (Chrome/Edge)
+- Firefox
+- WebKit (Safari)
+
+#### Updating Baselines
+
+When you intentionally change component appearance:
+
+1. Verify the change is correct in Storybook
+2. Update baselines: `npm run test:vrt:update`
+3. Review the updated screenshots in `packages/hx-library/__screenshots__/`
+4. Commit the updated screenshots with your PR
+
+#### CI Integration
+
+VRT runs automatically on every PR. If tests fail:
+
+1. Check the CI artifacts for diff images showing what changed
+2. If the change is intentional, update baselines locally and push
+3. If the change is a bug, fix the component code
+
+#### Screenshot Storage
+
+- Location: `packages/hx-library/__screenshots__/vrt.spec.ts/`
+- Format: PNG images named `{component}--{variant}.png`
+- One baseline per component variant (shared across browsers)
+- Baselines are committed to git for version control
+
+#### Adding New VRT Tests
+
+To add VRT coverage for a new component or variant:
+
+1. Create the Storybook story first
+2. Add the variant to `COMPONENT_VARIANTS` in `packages/hx-library/e2e/vrt.spec.ts`
+3. Run `npm run test:vrt:update` to generate baselines
+4. Commit the new screenshots
 
 ### Accessibility - axe-core
 

@@ -15,6 +15,7 @@ curl -fsSL https://raw.githubusercontent.com/himerus/wc-2026/main/scripts/check-
 ```
 
 The script checks for:
+
 - ✅ Node.js 20.x (via nvm)
 - ✅ npm 10.x
 - ✅ Git 2.x
@@ -29,6 +30,7 @@ curl -fsSL https://raw.githubusercontent.com/himerus/wc-2026/main/scripts/setup.
 ```
 
 This single command:
+
 1. Clones the repository
 2. Checks out the main branch
 3. Installs Node.js 20.x via nvm
@@ -142,16 +144,19 @@ wc-2026/
 ## 🎯 Where to Start
 
 ### For Documentation Writers
+
 1. Navigate to `apps/docs/src/content/docs/`
 2. Edit markdown/MDX files
 3. Changes hot-reload at `http://localhost:4321`
 
 ### For Component Developers (Phase 2)
+
 1. Navigate to `packages/wc-library/src/components/`
 2. Create new Lit components
 3. Run `npm run dev` to watch and rebuild
 
 ### For Storybook Authors (Phase 3)
+
 1. Navigate to `apps/storybook/stories/`
 2. Create `.stories.ts` files for components
 3. Changes hot-reload at `http://localhost:6006`
@@ -163,12 +168,14 @@ wc-2026/
 ### VS Code (Recommended)
 
 **Required Extensions** (installed automatically via workspace recommendations):
+
 - [Astro](https://marketplace.visualstudio.com/items?itemName=astro-build.astro-vscode)
 - [ESLint](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint)
 - [Prettier](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode)
 - [EditorConfig](https://marketplace.visualstudio.com/items?itemName=EditorConfig.EditorConfig)
 
 **Settings** (`.vscode/settings.json`):
+
 ```json
 {
   "editor.formatOnSave": true,
@@ -211,6 +218,7 @@ All checks should pass before pushing.
 ### Continuous Integration
 
 GitHub Actions runs these checks on every PR:
+
 - Type checking
 - Build verification
 - Lint (when configured)
@@ -299,6 +307,7 @@ git rebase --continue
 ## 🆘 Getting Help
 
 ### Documentation
+
 - [Astro Docs](https://docs.astro.build/)
 - [Starlight Docs](https://starlight.astro.build/)
 - [Turborepo Docs](https://turbo.build/repo/docs)
@@ -306,11 +315,13 @@ git rebase --continue
 - [Storybook Docs](https://storybook.js.org/docs) (Phase 3)
 
 ### Team Communication
+
 - **Slack**: #wc-2026-dev channel
 - **GitHub Discussions**: For general questions
 - **GitHub Issues**: For bugs and feature requests
 
 ### Code Review
+
 - Tag `@frontend-team` for UI/UX changes
 - Tag `@platform-team` for infrastructure changes
 - Tag `@docs-team` for documentation changes
@@ -322,18 +333,22 @@ git rebase --continue
 ### New to the Stack?
 
 **Astro** (2 hours):
+
 - [Astro Tutorial](https://docs.astro.build/en/tutorial/0-introduction/)
 - [Astro in 100 Seconds](https://www.youtube.com/watch?v=dsTXcSeAZq8)
 
 **Lit** (3 hours, Phase 2):
+
 - [Lit Tutorial](https://lit.dev/tutorials/)
 - [Web Components Crash Course](https://www.youtube.com/watch?v=PCWaFLy3VUo)
 
 **Storybook** (2 hours, Phase 3):
+
 - [Storybook Tutorial](https://storybook.js.org/tutorials/)
 - [Storybook in 100 Seconds](https://www.youtube.com/watch?v=gdlTFPebzAU)
 
 **Turborepo** (1 hour):
+
 - [Turborepo Handbook](https://turbo.build/repo/docs/handbook)
 
 ---

@@ -371,6 +371,24 @@ describe('hx-text-input', () => {
       const el = await fixture<WcTextInput>('<hx-text-input required></hx-text-input>');
       expect(el.validity.valueMissing).toBe(true);
     });
+
+    it('reportValidity returns false when required + empty', async () => {
+      const el = await fixture<WcTextInput>('<hx-text-input required></hx-text-input>');
+      expect(el.reportValidity()).toBe(false);
+    });
+
+    it('reportValidity returns true when required + filled', async () => {
+      const el = await fixture<WcTextInput>(
+        '<hx-text-input required value="filled"></hx-text-input>',
+      );
+      expect(el.reportValidity()).toBe(true);
+    });
+
+    it('validationMessage is set when required + empty', async () => {
+      const el = await fixture<WcTextInput>('<hx-text-input required></hx-text-input>');
+      await el.updateComplete;
+      expect(el.validationMessage).toBeTruthy();
+    });
   });
 
   // ─── Methods (2) ───

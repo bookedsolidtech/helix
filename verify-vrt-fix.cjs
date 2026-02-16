@@ -8,10 +8,7 @@ const path = require('node:path');
 const projectRoot = path.resolve(__dirname);
 
 function getComponentScreenshotsDir(tagName) {
-  return path.resolve(
-    projectRoot,
-    `packages/wc-library/src/components/${tagName}/__screenshots__`
-  );
+  return path.resolve(projectRoot, `packages/wc-library/src/components/${tagName}/__screenshots__`);
 }
 
 function countScreenshots(tagName) {
@@ -22,7 +19,7 @@ function countScreenshots(tagName) {
 
   try {
     const files = fs.readdirSync(dir, { recursive: true });
-    return files.filter(f => typeof f === 'string' && f.endsWith('.png')).length;
+    return files.filter((f) => typeof f === 'string' && f.endsWith('.png')).length;
   } catch {
     return 0;
   }
@@ -40,7 +37,7 @@ const components = [
   'wc-text-input',
   'wc-radio-group',
   'wc-button', // No screenshots
-  'wc-card',   // No screenshots
+  'wc-card', // No screenshots
 ];
 
 console.log('VRT Analyzer Fix Verification');
@@ -78,7 +75,7 @@ if (exists) {
 
 console.log('\n3. Summary:');
 console.log('-'.repeat(80));
-const withScreenshots = components.filter(t => countScreenshots(t) > 0);
+const withScreenshots = components.filter((t) => countScreenshots(t) > 0);
 console.log(`Components with screenshots: ${withScreenshots.length}/${components.length}`);
 console.log(`  ${withScreenshots.join(', ')}`);
 console.log(`\nTest results file exists: ${exists ? 'YES' : 'NO'}`);

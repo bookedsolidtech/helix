@@ -27,6 +27,21 @@ export const maxDuration = 300; // 5 minutes max for Vercel
  *   - error:              { type, message }
  */
 export async function POST(): Promise<Response> {
+  // Block test execution in production — tests require Playwright browsers
+  // which aren't available on Vercel. Use pre-computed results instead.
+  if (process.env.NODE_ENV === 'production') {
+    return new Response(
+      JSON.stringify({
+        error:
+          'Test execution is disabled in production. Tests run locally and results are committed.',
+      }),
+      {
+        status: 403,
+        headers: { 'Content-Type': 'application/json' },
+      },
+    );
+  }
+
   const libraryRoot = resolve(process.cwd(), '../../packages/hx-library');
 
   const encoder = new TextEncoder();

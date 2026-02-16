@@ -1,22 +1,25 @@
-import { getManifestStats } from "@/lib/cem-parser";
-import { scoreAllComponents } from "@/lib/health-scorer";
-import { getTestResultsForComponent } from "@/lib/test-results-reader";
-import { ComponentCard } from "@/components/dashboard/ComponentCard";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Breadcrumb } from "@/components/dashboard/Breadcrumb";
-import { getBreadcrumbItems } from "@/lib/breadcrumb-utils";
+import { getManifestStats } from '@/lib/cem-parser';
+import { scoreAllComponents } from '@/lib/health-scorer';
+import { getTestResultsForComponent } from '@/lib/test-results-reader';
+import { ComponentCard } from '@/components/dashboard/ComponentCard';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Breadcrumb } from '@/components/dashboard/Breadcrumb';
+import { getBreadcrumbItems } from '@/lib/breadcrumb-utils';
 
 export default async function ComponentsPage() {
   const stats = getManifestStats();
-  const healthScores = (await scoreAllComponents()).sort((a, b) => a.tagName.localeCompare(b.tagName));
-  const avgHealth = healthScores.length > 0
-    ? Math.round(healthScores.reduce((sum, h) => sum + h.overallScore, 0) / healthScores.length)
-    : 0;
+  const healthScores = (await scoreAllComponents()).sort((a, b) =>
+    a.tagName.localeCompare(b.tagName),
+  );
+  const avgHealth =
+    healthScores.length > 0
+      ? Math.round(healthScores.reduce((sum, h) => sum + h.overallScore, 0) / healthScores.length)
+      : 0;
 
   return (
     <div className="space-y-8">
       <div>
-        <Breadcrumb items={getBreadcrumbItems("/components")} />
+        <Breadcrumb items={getBreadcrumbItems('/components')} />
         <h1 className="text-2xl font-bold tracking-tight">Components</h1>
         <p className="text-muted-foreground mt-1">
           Health scores and API coverage for {stats.totalComponents} components

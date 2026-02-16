@@ -10,10 +10,13 @@ import {
   getTokenStats,
 } from '@helix/tokens/utils';
 
-<Meta title="Design Tokens/Colors" parameters={{ controls: { disable: true }, actions: { disable: true } }} />
+<Meta
+  title="Design Tokens/Colors"
+  parameters={{ controls: { disable: true }, actions: { disable: true } }}
+/>
 
 export const allSubgroups = getColorSubgroups(tokenEntries);
-export const colorStats = getTokenStats(tokenEntries.filter(t => t.category === 'color'));
+export const colorStats = getTokenStats(tokenEntries.filter((t) => t.category === 'color'));
 export const darkSubgroups = getColorSubgroups(darkTokenEntries);
 export const semanticRampNames = ['success', 'warning', 'error', 'info'];
 export const brandRampNames = ['primary', 'secondary', 'accent'];
@@ -25,7 +28,7 @@ export function resolveHex(token) {
 }
 
 export function findSubgroup(label) {
-  return allSubgroups.find(sg => sg.label.toLowerCase() === label.toLowerCase());
+  return allSubgroups.find((sg) => sg.label.toLowerCase() === label.toLowerCase());
 }
 
 export function copyToClipboard(text) {
@@ -33,7 +36,7 @@ export function copyToClipboard(text) {
 }
 
 <style>
-{`
+  {`
   /* ── Reset Storybook overrides ─────────────────────────── */
   .hx-token-colors h2,
   .hx-token-colors h3,
@@ -438,12 +441,13 @@ export function copyToClipboard(text) {
 <div className="hx-token-colors">
 
 {/* ═══ Mini Hero Banner ═══════════════════════════════════ */}
+
 <div className="hx-colors-hero">
   <div className="hx-colors-hero-title">Color Tokens</div>
   <div className="hx-colors-hero-desc">
-    The complete HELIX color system. Every ramp provides 11 stops (50 through 950) across
-    brand, semantic, and neutral palettes, plus surface, text, and border aliases for
-    systematic UI composition.
+    The complete HELIX color system. Every ramp provides 11 stops (50 through 950) across brand,
+    semantic, and neutral palettes, plus surface, text, and border aliases for systematic UI
+    composition.
   </div>
   <div className="hx-colors-hero-badges">
     <span className="hx-colors-badge">{colorStats.total} color tokens</span>
@@ -453,58 +457,59 @@ export function copyToClipboard(text) {
 </div>
 
 {/* ═══ All Palettes ═══════════════════════════════════════ */}
+
 <div className="hx-colors-section">
 
 ## All Color Palettes
 
 <div className="hx-colors-section-desc">
-  Every color ramp in the design system, dynamically rendered from the @helix/tokens package.
-  Click any token name to copy its CSS custom property to the clipboard.
+  Every color ramp in the design system, dynamically rendered from the @helix/tokens package. Click
+  any token name to copy its CSS custom property to the clipboard.
 </div>
 
 {allSubgroups.filter(sg => !['text', 'surface', 'border', 'focus-ring', 'selection'].includes(sg.label.toLowerCase())).map(subgroup => {
-  const firstToken = subgroup.tokens[0];
-  const dotColor = firstToken ? (isHexColor(firstToken.value) ? firstToken.value : resolveTokenRef(firstToken.value, tokenMap)) : '#94A3B8';
-  const mid = Math.floor(subgroup.tokens.length / 2);
-  const midToken = subgroup.tokens[mid];
-  const midColor = midToken ? (isHexColor(midToken.value) ? midToken.value : resolveTokenRef(midToken.value, tokenMap)) : dotColor;
-  return (
-    <div key={subgroup.label} className="hx-colors-subgroup">
-      <div className="hx-colors-subgroup-header">
-        <span className="hx-colors-subgroup-dot" style={{ background: midColor }} />
-        <span className="hx-colors-subgroup-label">{subgroup.label}</span>
-        <span className="hx-colors-subgroup-count">{subgroup.tokens.length} stops</span>
-      </div>
-      <div className="hx-colors-grid">
-        {subgroup.tokens.map(token => {
-          const hex = resolveHex(token);
-          const contrast = isHexColor(hex) ? getContrastColor(hex) : '#000000';
-          return (
-            <div key={token.name} className="hx-colors-swatch">
-              <div className="hx-colors-swatch-preview" style={{ background: `var(${token.name}, ${hex})` }}>
-                <span className="hx-colors-swatch-hex" style={{ color: contrast }}>{hex}</span>
-              </div>
-              <div className="hx-colors-swatch-info">
-                <button
-                  className="hx-colors-swatch-name"
-                  title={`Click to copy: ${token.name}`}
-                  onClick={() => copyToClipboard(token.name)}
-                >
-                  {token.name.replace('--hx-color-', '')}
-                </button>
-                <span className="hx-colors-swatch-value">{token.name}</span>
-              </div>
-            </div>
-          );
-        })}
-      </div>
-    </div>
-  );
+const firstToken = subgroup.tokens[0];
+const dotColor = firstToken ? (isHexColor(firstToken.value) ? firstToken.value : resolveTokenRef(firstToken.value, tokenMap)) : '#94A3B8';
+const mid = Math.floor(subgroup.tokens.length / 2);
+const midToken = subgroup.tokens[mid];
+const midColor = midToken ? (isHexColor(midToken.value) ? midToken.value : resolveTokenRef(midToken.value, tokenMap)) : dotColor;
+return (
+<div key={subgroup.label} className="hx-colors-subgroup">
+<div className="hx-colors-subgroup-header">
+<span className="hx-colors-subgroup-dot" style={{ background: midColor }} />
+<span className="hx-colors-subgroup-label">{subgroup.label}</span>
+<span className="hx-colors-subgroup-count">{subgroup.tokens.length} stops</span>
+</div>
+<div className="hx-colors-grid">
+{subgroup.tokens.map(token => {
+const hex = resolveHex(token);
+const contrast = isHexColor(hex) ? getContrastColor(hex) : '#000000';
+return (
+<div key={token.name} className="hx-colors-swatch">
+<div className="hx-colors-swatch-preview" style={{ background: `var(${token.name}, ${hex})` }}>
+<span className="hx-colors-swatch-hex" style={{ color: contrast }}>{hex}</span>
+</div>
+<div className="hx-colors-swatch-info">
+<button
+className="hx-colors-swatch-name"
+title={`Click to copy: ${token.name}`}
+onClick={() => copyToClipboard(token.name)} >
+{token.name.replace('--hx-color-', '')}
+</button>
+<span className="hx-colors-swatch-value">{token.name}</span>
+</div>
+</div>
+);
+})}
+</div>
+</div>
+);
 })}
 
 </div>
 
 {/* ═══ Brand Colors ═══════════════════════════════════════ */}
+
 <div className="hx-colors-section">
 
 ## Brand Colors
@@ -516,271 +521,269 @@ export function copyToClipboard(text) {
 </div>
 
 {brandRampNames.map(name => {
-  const subgroup = findSubgroup(name);
-  if (!subgroup) return null;
-  const mid = Math.floor(subgroup.tokens.length / 2);
-  const midToken = subgroup.tokens[mid];
-  const midColor = midToken ? (isHexColor(midToken.value) ? midToken.value : resolveTokenRef(midToken.value, tokenMap)) : '#94A3B8';
-  const descriptions = {
-    primary: 'The core brand color for interactive elements, links, focus rings, and primary actions.',
-    secondary: 'Complements the primary palette for secondary actions, accents, and supporting elements.',
-    accent: 'Draws attention to key actions and highlights. Use sparingly for visual focal points.',
-  };
-  return (
-    <div key={subgroup.label} className="hx-colors-subgroup">
-      <div className="hx-colors-subgroup-header">
-        <span className="hx-colors-subgroup-dot" style={{ background: midColor }} />
-        <span className="hx-colors-subgroup-label">{subgroup.label}</span>
-        <span className="hx-colors-subgroup-count">{subgroup.tokens.length} stops</span>
-      </div>
-      <div className="hx-colors-section-desc" style={{ marginBottom: '1rem' }}>
-        {descriptions[name]}
-      </div>
-      <div className="hx-colors-grid">
-        {subgroup.tokens.map(token => {
-          const hex = resolveHex(token);
-          const contrast = isHexColor(hex) ? getContrastColor(hex) : '#000000';
-          return (
-            <div key={token.name} className="hx-colors-swatch">
-              <div className="hx-colors-swatch-preview" style={{ background: `var(${token.name}, ${hex})` }}>
-                <span className="hx-colors-swatch-hex" style={{ color: contrast }}>{hex}</span>
-              </div>
-              <div className="hx-colors-swatch-info">
-                <button
-                  className="hx-colors-swatch-name"
-                  title={`Click to copy: ${token.name}`}
-                  onClick={() => copyToClipboard(token.name)}
-                >
-                  {token.name.replace('--hx-color-', '')}
-                </button>
-                <span className="hx-colors-swatch-value">{token.name}</span>
-              </div>
-            </div>
-          );
-        })}
-      </div>
-    </div>
-  );
+const subgroup = findSubgroup(name);
+if (!subgroup) return null;
+const mid = Math.floor(subgroup.tokens.length / 2);
+const midToken = subgroup.tokens[mid];
+const midColor = midToken ? (isHexColor(midToken.value) ? midToken.value : resolveTokenRef(midToken.value, tokenMap)) : '#94A3B8';
+const descriptions = {
+primary: 'The core brand color for interactive elements, links, focus rings, and primary actions.',
+secondary: 'Complements the primary palette for secondary actions, accents, and supporting elements.',
+accent: 'Draws attention to key actions and highlights. Use sparingly for visual focal points.',
+};
+return (
+<div key={subgroup.label} className="hx-colors-subgroup">
+<div className="hx-colors-subgroup-header">
+<span className="hx-colors-subgroup-dot" style={{ background: midColor }} />
+<span className="hx-colors-subgroup-label">{subgroup.label}</span>
+<span className="hx-colors-subgroup-count">{subgroup.tokens.length} stops</span>
+</div>
+<div className="hx-colors-section-desc" style={{ marginBottom: '1rem' }}>
+{descriptions[name]}
+</div>
+<div className="hx-colors-grid">
+{subgroup.tokens.map(token => {
+const hex = resolveHex(token);
+const contrast = isHexColor(hex) ? getContrastColor(hex) : '#000000';
+return (
+<div key={token.name} className="hx-colors-swatch">
+<div className="hx-colors-swatch-preview" style={{ background: `var(${token.name}, ${hex})` }}>
+<span className="hx-colors-swatch-hex" style={{ color: contrast }}>{hex}</span>
+</div>
+<div className="hx-colors-swatch-info">
+<button
+className="hx-colors-swatch-name"
+title={`Click to copy: ${token.name}`}
+onClick={() => copyToClipboard(token.name)} >
+{token.name.replace('--hx-color-', '')}
+</button>
+<span className="hx-colors-swatch-value">{token.name}</span>
+</div>
+</div>
+);
+})}
+</div>
+</div>
+);
 })}
 
 </div>
 
 {/* ═══ Neutral Palette ════════════════════════════════════ */}
+
 <div className="hx-colors-section">
 
 ## Neutral Palette
 
 <div className="hx-colors-section-desc">
-  Neutrals provide the structural backbone of the UI -- backgrounds, borders, text, and
-  dividers. The scale runs from pure white (0) through gray tones to near-black (950).
-  This is the most heavily used palette in any interface.
+  Neutrals provide the structural backbone of the UI -- backgrounds, borders, text, and dividers.
+  The scale runs from pure white (0) through gray tones to near-black (950). This is the most
+  heavily used palette in any interface.
 </div>
 
 {(() => {
-  const subgroup = findSubgroup('neutral');
-  if (!subgroup) return null;
-  return (
-    <div className="hx-colors-grid">
-      {subgroup.tokens.map(token => {
-        const hex = resolveHex(token);
-        const contrast = isHexColor(hex) ? getContrastColor(hex) : '#000000';
-        return (
-          <div key={token.name} className="hx-colors-swatch">
-            <div className="hx-colors-swatch-preview" style={{ background: `var(${token.name}, ${hex})` }}>
-              <span className="hx-colors-swatch-hex" style={{ color: contrast }}>{hex}</span>
-            </div>
-            <div className="hx-colors-swatch-info">
-              <button
-                className="hx-colors-swatch-name"
-                title={`Click to copy: ${token.name}`}
-                onClick={() => copyToClipboard(token.name)}
-              >
-                {token.name.replace('--hx-color-', '')}
-              </button>
-              <span className="hx-colors-swatch-value">{token.name}</span>
-            </div>
-          </div>
-        );
-      })}
-    </div>
-  );
+const subgroup = findSubgroup('neutral');
+if (!subgroup) return null;
+return (
+<div className="hx-colors-grid">
+{subgroup.tokens.map(token => {
+const hex = resolveHex(token);
+const contrast = isHexColor(hex) ? getContrastColor(hex) : '#000000';
+return (
+<div key={token.name} className="hx-colors-swatch">
+<div className="hx-colors-swatch-preview" style={{ background: `var(${token.name}, ${hex})` }}>
+<span className="hx-colors-swatch-hex" style={{ color: contrast }}>{hex}</span>
+</div>
+<div className="hx-colors-swatch-info">
+<button
+className="hx-colors-swatch-name"
+title={`Click to copy: ${token.name}`}
+onClick={() => copyToClipboard(token.name)} >
+{token.name.replace('--hx-color-', '')}
+</button>
+<span className="hx-colors-swatch-value">{token.name}</span>
+</div>
+</div>
+);
+})}
+</div>
+);
 })()}
 
 </div>
 
 {/* ═══ Semantic Colors ════════════════════════════════════ */}
+
 <div className="hx-colors-section">
 
 ## Semantic Colors
 
 <div className="hx-colors-section-desc">
-  Semantic colors communicate meaning -- success, warning, error, and informational states.
-  Each category includes a full ramp from light tints to dark shades. In healthcare applications,
-  these colors are critical for communicating system state and patient-safety-related information.
+  Semantic colors communicate meaning -- success, warning, error, and informational states. Each
+  category includes a full ramp from light tints to dark shades. In healthcare applications, these
+  colors are critical for communicating system state and patient-safety-related information.
 </div>
 
 {semanticRampNames.map(name => {
-  const subgroup = findSubgroup(name);
-  if (!subgroup) return null;
-  const mid = Math.floor(subgroup.tokens.length / 2);
-  const midToken = subgroup.tokens[mid];
-  const midColor = midToken ? (isHexColor(midToken.value) ? midToken.value : resolveTokenRef(midToken.value, tokenMap)) : '#94A3B8';
-  return (
-    <div key={subgroup.label} className="hx-colors-subgroup">
-      <div className="hx-colors-subgroup-header">
-        <span className="hx-colors-subgroup-dot" style={{ background: midColor }} />
-        <span className="hx-colors-subgroup-label">{subgroup.label}</span>
-        <span className="hx-colors-subgroup-count">{subgroup.tokens.length} stops</span>
-      </div>
-      <div className="hx-colors-grid">
-        {subgroup.tokens.map(token => {
-          const hex = resolveHex(token);
-          const contrast = isHexColor(hex) ? getContrastColor(hex) : '#000000';
-          return (
-            <div key={token.name} className="hx-colors-swatch">
-              <div className="hx-colors-swatch-preview" style={{ background: `var(${token.name}, ${hex})` }}>
-                <span className="hx-colors-swatch-hex" style={{ color: contrast }}>{hex}</span>
-              </div>
-              <div className="hx-colors-swatch-info">
-                <button
-                  className="hx-colors-swatch-name"
-                  title={`Click to copy: ${token.name}`}
-                  onClick={() => copyToClipboard(token.name)}
-                >
-                  {token.name.replace('--hx-color-', '')}
-                </button>
-                <span className="hx-colors-swatch-value">{token.name}</span>
-              </div>
-            </div>
-          );
-        })}
-      </div>
-    </div>
-  );
+const subgroup = findSubgroup(name);
+if (!subgroup) return null;
+const mid = Math.floor(subgroup.tokens.length / 2);
+const midToken = subgroup.tokens[mid];
+const midColor = midToken ? (isHexColor(midToken.value) ? midToken.value : resolveTokenRef(midToken.value, tokenMap)) : '#94A3B8';
+return (
+<div key={subgroup.label} className="hx-colors-subgroup">
+<div className="hx-colors-subgroup-header">
+<span className="hx-colors-subgroup-dot" style={{ background: midColor }} />
+<span className="hx-colors-subgroup-label">{subgroup.label}</span>
+<span className="hx-colors-subgroup-count">{subgroup.tokens.length} stops</span>
+</div>
+<div className="hx-colors-grid">
+{subgroup.tokens.map(token => {
+const hex = resolveHex(token);
+const contrast = isHexColor(hex) ? getContrastColor(hex) : '#000000';
+return (
+<div key={token.name} className="hx-colors-swatch">
+<div className="hx-colors-swatch-preview" style={{ background: `var(${token.name}, ${hex})` }}>
+<span className="hx-colors-swatch-hex" style={{ color: contrast }}>{hex}</span>
+</div>
+<div className="hx-colors-swatch-info">
+<button
+className="hx-colors-swatch-name"
+title={`Click to copy: ${token.name}`}
+onClick={() => copyToClipboard(token.name)} >
+{token.name.replace('--hx-color-', '')}
+</button>
+<span className="hx-colors-swatch-value">{token.name}</span>
+</div>
+</div>
+);
+})}
+</div>
+</div>
+);
 })}
 
 </div>
 
 {/* ═══ Semantic Aliases ═══════════════════════════════════ */}
+
 <div className="hx-colors-section">
 
 ## Semantic Aliases
 
 <div className="hx-colors-section-desc">
   Semantic aliases map to specific use cases: text colors, surface backgrounds, and border
-  treatments. These reference the primitive ramps via CSS custom property references, so
-  overriding a primitive token cascades through the entire system.
+  treatments. These reference the primitive ramps via CSS custom property references, so overriding
+  a primitive token cascades through the entire system.
 </div>
 
 ### Text Colors
 
 {(() => {
-  const textSubgroup = findSubgroup('text');
-  if (!textSubgroup) return null;
-  return (
-    <div className="hx-colors-semantic-grid">
-      {textSubgroup.tokens.map(token => {
-        const resolved = resolveTokenRef(token.value, tokenMap);
-        const hex = isHexColor(resolved) ? resolved : '#94A3B8';
-        return (
-          <div key={token.name} className="hx-colors-semantic-card">
-            <span className="hx-colors-semantic-dot" style={{ background: hex }} />
-            <div>
-              <button
-                className="hx-colors-semantic-label"
-                title={`Click to copy: ${token.name}`}
-                onClick={() => copyToClipboard(token.name)}
-              >
-                {token.name.replace('--hx-color-', '')}
-              </button>
-              <span className="hx-colors-semantic-value">{token.value}</span>
-            </div>
-          </div>
-        );
-      })}
-    </div>
-  );
+const textSubgroup = findSubgroup('text');
+if (!textSubgroup) return null;
+return (
+<div className="hx-colors-semantic-grid">
+{textSubgroup.tokens.map(token => {
+const resolved = resolveTokenRef(token.value, tokenMap);
+const hex = isHexColor(resolved) ? resolved : '#94A3B8';
+return (
+<div key={token.name} className="hx-colors-semantic-card">
+<span className="hx-colors-semantic-dot" style={{ background: hex }} />
+<div>
+<button
+className="hx-colors-semantic-label"
+title={`Click to copy: ${token.name}`}
+onClick={() => copyToClipboard(token.name)} >
+{token.name.replace('--hx-color-', '')}
+</button>
+<span className="hx-colors-semantic-value">{token.value}</span>
+</div>
+</div>
+);
+})}
+</div>
+);
 })()}
 
 ### Surface Colors
 
 {(() => {
-  const surfaceSubgroup = findSubgroup('surface');
-  if (!surfaceSubgroup) return null;
-  return (
-    <div className="hx-colors-semantic-grid">
-      {surfaceSubgroup.tokens.map(token => {
-        const resolved = resolveTokenRef(token.value, tokenMap);
-        const hex = isHexColor(resolved) ? resolved : '#94A3B8';
-        return (
-          <div key={token.name} className="hx-colors-semantic-card">
-            <span className="hx-colors-semantic-dot" style={{ background: hex }} />
-            <div>
-              <button
-                className="hx-colors-semantic-label"
-                title={`Click to copy: ${token.name}`}
-                onClick={() => copyToClipboard(token.name)}
-              >
-                {token.name.replace('--hx-color-', '')}
-              </button>
-              <span className="hx-colors-semantic-value">{token.value}</span>
-            </div>
-          </div>
-        );
-      })}
-    </div>
-  );
+const surfaceSubgroup = findSubgroup('surface');
+if (!surfaceSubgroup) return null;
+return (
+<div className="hx-colors-semantic-grid">
+{surfaceSubgroup.tokens.map(token => {
+const resolved = resolveTokenRef(token.value, tokenMap);
+const hex = isHexColor(resolved) ? resolved : '#94A3B8';
+return (
+<div key={token.name} className="hx-colors-semantic-card">
+<span className="hx-colors-semantic-dot" style={{ background: hex }} />
+<div>
+<button
+className="hx-colors-semantic-label"
+title={`Click to copy: ${token.name}`}
+onClick={() => copyToClipboard(token.name)} >
+{token.name.replace('--hx-color-', '')}
+</button>
+<span className="hx-colors-semantic-value">{token.value}</span>
+</div>
+</div>
+);
+})}
+</div>
+);
 })()}
 
 ### Border Colors
 
 {(() => {
-  const borderSubgroup = findSubgroup('border');
-  if (!borderSubgroup) return null;
-  return (
-    <div className="hx-colors-semantic-grid">
-      {borderSubgroup.tokens.map(token => {
-        const resolved = resolveTokenRef(token.value, tokenMap);
-        const hex = isHexColor(resolved) ? resolved : '#94A3B8';
-        return (
-          <div key={token.name} className="hx-colors-semantic-card">
-            <span className="hx-colors-semantic-dot" style={{ background: hex }} />
-            <div>
-              <button
-                className="hx-colors-semantic-label"
-                title={`Click to copy: ${token.name}`}
-                onClick={() => copyToClipboard(token.name)}
-              >
-                {token.name.replace('--hx-color-', '')}
-              </button>
-              <span className="hx-colors-semantic-value">{token.value}</span>
-            </div>
-          </div>
-        );
-      })}
-    </div>
-  );
+const borderSubgroup = findSubgroup('border');
+if (!borderSubgroup) return null;
+return (
+<div className="hx-colors-semantic-grid">
+{borderSubgroup.tokens.map(token => {
+const resolved = resolveTokenRef(token.value, tokenMap);
+const hex = isHexColor(resolved) ? resolved : '#94A3B8';
+return (
+<div key={token.name} className="hx-colors-semantic-card">
+<span className="hx-colors-semantic-dot" style={{ background: hex }} />
+<div>
+<button
+className="hx-colors-semantic-label"
+title={`Click to copy: ${token.name}`}
+onClick={() => copyToClipboard(token.name)} >
+{token.name.replace('--hx-color-', '')}
+</button>
+<span className="hx-colors-semantic-value">{token.value}</span>
+</div>
+</div>
+);
+})}
+</div>
+);
 })()}
 
 </div>
 
 {/* ═══ Dark Mode Overrides ════════════════════════════════ */}
+
 <div className="hx-colors-section">
 
 ## Dark Mode Overrides
 
 <div className="hx-colors-section-desc">
-  These tokens override light-mode defaults when dark mode is active. They reference the
-  same primitive ramps but remap surface, text, and border aliases for dark backgrounds.
-  The dark theme preview below renders on a dark surface to show the overrides in context.
+  These tokens override light-mode defaults when dark mode is active. They reference the same
+  primitive ramps but remap surface, text, and border aliases for dark backgrounds. The dark theme
+  preview below renders on a dark surface to show the overrides in context.
 </div>
 
 <div className="hx-colors-dark-container">
   {darkSubgroups.length > 0 ? (
-    darkSubgroups.map(subgroup => (
+    darkSubgroups.map((subgroup) => (
       <div key={subgroup.label} className="hx-colors-dark-subgroup">
         <div className="hx-colors-dark-label">{subgroup.label}</div>
-        {subgroup.tokens.map(token => (
+        {subgroup.tokens.map((token) => (
           <div key={token.name} className="hx-colors-dark-row">
             <span className="hx-colors-dark-token">{token.name}</span>
             <span className="hx-colors-dark-value">{token.value}</span>
@@ -796,50 +799,89 @@ export function copyToClipboard(text) {
 </div>
 
 {/* ═══ Usage Guide ════════════════════════════════════════ */}
+
 <div className="hx-colors-section">
 
 ## Usage Guide
 
 <div className="hx-colors-section-desc">
-  Color tokens follow the three-tier cascade: primitive ramps define raw values, semantic
-  aliases provide meaning, and component tokens allow per-component overrides. Always use
-  the semantic or component level in your styles.
+  Color tokens follow the three-tier cascade: primitive ramps define raw values, semantic aliases
+  provide meaning, and component tokens allow per-component overrides. Always use the semantic or
+  component level in your styles.
 </div>
 
 <div className="hx-colors-code-block">
   <span className="hx-colors-code-line">
-    <span className="hx-colors-code-comment">{'/* Semantic level -- preferred for most use cases */'}</span>
+    <span className="hx-colors-code-comment">
+      {'/* Semantic level -- preferred for most use cases */'}
+    </span>
   </span>
   <span className="hx-colors-code-line">
-    <span className="hx-colors-code-prop">{'color'}</span>{': '}<span className="hx-colors-code-fn">{'var'}</span>{'('}<span className="hx-colors-code-value">{'--hx-color-text-primary'}</span>{');'}
+    <span className="hx-colors-code-prop">{'color'}</span>
+    {': '}
+    <span className="hx-colors-code-fn">{'var'}</span>
+    {'('}
+    <span className="hx-colors-code-value">{'--hx-color-text-primary'}</span>
+    {');'}
   </span>
   <span className="hx-colors-code-line">
-    <span className="hx-colors-code-prop">{'background'}</span>{': '}<span className="hx-colors-code-fn">{'var'}</span>{'('}<span className="hx-colors-code-value">{'--hx-color-surface-default'}</span>{');'}
+    <span className="hx-colors-code-prop">{'background'}</span>
+    {': '}
+    <span className="hx-colors-code-fn">{'var'}</span>
+    {'('}
+    <span className="hx-colors-code-value">{'--hx-color-surface-default'}</span>
+    {');'}
   </span>
   <span className="hx-colors-code-line">
-    <span className="hx-colors-code-prop">{'border-color'}</span>{': '}<span className="hx-colors-code-fn">{'var'}</span>{'('}<span className="hx-colors-code-value">{'--hx-color-border-default'}</span>{');'}
+    <span className="hx-colors-code-prop">{'border-color'}</span>
+    {': '}
+    <span className="hx-colors-code-fn">{'var'}</span>
+    {'('}
+    <span className="hx-colors-code-value">{'--hx-color-border-default'}</span>
+    {');'}
   </span>
-  <span className="hx-colors-code-line">{' '}</span>
+  <span className="hx-colors-code-line"> </span>
   <span className="hx-colors-code-line">
-    <span className="hx-colors-code-comment">{'/* Component level -- with semantic fallback */'}</span>
+    <span className="hx-colors-code-comment">
+      {'/* Component level -- with semantic fallback */'}
+    </span>
   </span>
   <span className="hx-colors-code-line">
-    <span className="hx-colors-code-prop">{'--_bg'}</span>{': '}<span className="hx-colors-code-fn">{'var'}</span>{'('}<span className="hx-colors-code-value">{'--hx-button-bg'}</span>{', '}<span className="hx-colors-code-fn">{'var'}</span>{'('}<span className="hx-colors-code-value">{'--hx-color-primary-500'}</span>{'));'}
+    <span className="hx-colors-code-prop">{'--_bg'}</span>
+    {': '}
+    <span className="hx-colors-code-fn">{'var'}</span>
+    {'('}
+    <span className="hx-colors-code-value">{'--hx-button-bg'}</span>
+    {', '}
+    <span className="hx-colors-code-fn">{'var'}</span>
+    {'('}
+    <span className="hx-colors-code-value">{'--hx-color-primary-500'}</span>
+    {'));'}
   </span>
-  <span className="hx-colors-code-line">{' '}</span>
+  <span className="hx-colors-code-line"> </span>
   <span className="hx-colors-code-line">
-    <span className="hx-colors-code-comment">{'/* Primitive level -- use only when building new semantic aliases */'}</span>
+    <span className="hx-colors-code-comment">
+      {'/* Primitive level -- use only when building new semantic aliases */'}
+    </span>
   </span>
   <span className="hx-colors-code-line">
-    <span className="hx-colors-code-prop">{'background'}</span>{': '}<span className="hx-colors-code-fn">{'var'}</span>{'('}<span className="hx-colors-code-value">{'--hx-color-primary-500'}</span>{');'}
+    <span className="hx-colors-code-prop">{'background'}</span>
+    {': '}
+    <span className="hx-colors-code-fn">{'var'}</span>
+    {'('}
+    <span className="hx-colors-code-value">{'--hx-color-primary-500'}</span>
+    {');'}
   </span>
 </div>
 
 <div className="hx-colors-tip">
-  <span className="hx-colors-tip-icon" aria-hidden="true">i</span>
+  <span className="hx-colors-tip-icon" aria-hidden="true">
+    i
+  </span>
   <span className="hx-colors-tip-text">
-    Never hardcode color values. Always use <span className="hx-colors-tip-code">var(--hx-color-*)</span> tokens
-    so that themes, dark mode, and high-contrast mode work automatically across the system.
+    Never hardcode color values. Always use{' '}
+    <span className="hx-colors-tip-code">var(--hx-color-*)</span> tokens so that themes, dark mode,
+    and high-contrast mode work automatically across the system.
   </span>
 </div>
 

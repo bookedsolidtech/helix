@@ -11,15 +11,15 @@
 
 ## Proposed Next 7 (needs recalibration for blog/content context)
 
-| # | Component | Category | Size | Rationale |
-|---|-----------|----------|------|-----------|
-| 1 | `wc-checkbox` | Form Control | S | Boolean form pattern. Consent, preferences, filters. |
-| 2 | `wc-select` | Form Control | L | Controlled vocabularies. Slotted native `<option>` for Drupal compat. |
-| 3 | `wc-radio-group` + `wc-radio` | Form Control | M | Single-selection from visible options. Ships as pair. |
-| 4 | `wc-alert` | Feedback | S | System messages, validation summaries, status communication. |
-| 5 | `wc-textarea` + FormFieldMixin | Form Control | S | Long-form content entry. Triggers shared mixin extraction. |
-| 6 | `wc-badge` | Feedback | S | Notification counts, status indicators, tags. |
-| 7 | `wc-switch` | Form Control | S | Setting toggles. `role="switch"` distinct from checkbox. |
+| #   | Component                      | Category     | Size | Rationale                                                             |
+| --- | ------------------------------ | ------------ | ---- | --------------------------------------------------------------------- |
+| 1   | `wc-checkbox`                  | Form Control | S    | Boolean form pattern. Consent, preferences, filters.                  |
+| 2   | `wc-select`                    | Form Control | L    | Controlled vocabularies. Slotted native `<option>` for Drupal compat. |
+| 3   | `wc-radio-group` + `wc-radio`  | Form Control | M    | Single-selection from visible options. Ships as pair.                 |
+| 4   | `wc-alert`                     | Feedback     | S    | System messages, validation summaries, status communication.          |
+| 5   | `wc-textarea` + FormFieldMixin | Form Control | S    | Long-form content entry. Triggers shared mixin extraction.            |
+| 6   | `wc-badge`                     | Feedback     | S    | Notification counts, status indicators, tags.                         |
+| 7   | `wc-switch`                    | Form Control | S    | Setting toggles. `role="switch"` distinct from checkbox.              |
 
 ## Architecture Decisions
 

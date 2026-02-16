@@ -91,7 +91,7 @@ export class HelixButton extends LitElement {
         bubbles: true,
         composed: true,
         detail: { originalEvent: e },
-      })
+      }),
     );
 
     // Handle form submission/reset if form-associated

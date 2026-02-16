@@ -373,7 +373,7 @@ describe('hx-select', () => {
     });
   });
 
-  // ─── Validation (3) ───
+  // ─── Validation (6) ───
 
   describe('Validation', () => {
     it('checkValidity returns false when required + empty', async () => {
@@ -389,6 +389,22 @@ describe('hx-select', () => {
     it('valueMissing validity flag is set when required + empty', async () => {
       const el = await fixture<WcSelect>('<hx-select required></hx-select>');
       expect(el.validity.valueMissing).toBe(true);
+    });
+
+    it('reportValidity returns false when required + empty', async () => {
+      const el = await fixture<WcSelect>('<hx-select required></hx-select>');
+      expect(el.reportValidity()).toBe(false);
+    });
+
+    it('reportValidity returns true when required + filled', async () => {
+      const el = await fixture<WcSelect>('<hx-select required value="filled"></hx-select>');
+      expect(el.reportValidity()).toBe(true);
+    });
+
+    it('validationMessage is set when required + empty', async () => {
+      const el = await fixture<WcSelect>('<hx-select required></hx-select>');
+      await el.updateComplete;
+      expect(el.validationMessage).toBeTruthy();
     });
   });
 

@@ -151,6 +151,7 @@ export class HelixSelect extends LitElement {
   // ─── Lifecycle ───
 
   override updated(changedProperties: Map<string, unknown>): void {
+    super.updated(changedProperties);
     if (changedProperties.has('value')) {
       this._internals.setFormValue(this.value);
       this._updateValidity();
@@ -193,7 +194,7 @@ export class HelixSelect extends LitElement {
       this._internals.setValidity(
         { valueMissing: true },
         this.error || 'Please select an option.',
-        this._select
+        this._select,
       );
     } else {
       this._internals.setValidity({});
@@ -265,7 +266,7 @@ export class HelixSelect extends LitElement {
         bubbles: true,
         composed: true,
         detail: { value: this.value },
-      })
+      }),
     );
   }
 
@@ -278,7 +279,7 @@ export class HelixSelect extends LitElement {
 
   // ─── Render ───
 
-  private _selectId = `wc-select-${Math.random().toString(36).slice(2, 9)}`;
+  private _selectId = `hx-select-${Math.random().toString(36).slice(2, 9)}`;
   private _helpTextId = `${this._selectId}-help`;
   private _errorId = `${this._selectId}-error`;
 
@@ -297,12 +298,13 @@ export class HelixSelect extends LitElement {
       [`field__select--${this.size}`]: true,
     };
 
-    const describedBy = [
-      hasError || this._hasErrorSlot ? this._errorId : null,
-      this.helpText ? this._helpTextId : null,
-    ]
-      .filter(Boolean)
-      .join(' ') || undefined;
+    const describedBy =
+      [
+        hasError || this._hasErrorSlot ? this._errorId : null,
+        this.helpText ? this._helpTextId : null,
+      ]
+        .filter(Boolean)
+        .join(' ') || undefined;
 
     return html`
       <div part="field" class=${classMap(fieldClasses)}>
@@ -310,7 +312,9 @@ export class HelixSelect extends LitElement {
           ${this.label
             ? html`<label part="label" class="field__label" for=${this._selectId}>
                 ${this.label}
-                ${this.required ? html`<span class="field__required-marker" aria-hidden="true">*</span>` : nothing}
+                ${this.required
+                  ? html`<span class="field__required-marker" aria-hidden="true">*</span>`
+                  : nothing}
               </label>`
             : nothing}
         </slot>
@@ -335,8 +339,20 @@ export class HelixSelect extends LitElement {
           </select>
 
           <span class="field__chevron" aria-hidden="true">
-            <svg width="12" height="8" viewBox="0 0 12 8" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M1 1.5L6 6.5L11 1.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <svg
+              width="12"
+              height="8"
+              viewBox="0 0 12 8"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M1 1.5L6 6.5L11 1.5"
+                stroke="currentColor"
+                stroke-width="1.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
             </svg>
           </span>
         </div>
@@ -345,7 +361,13 @@ export class HelixSelect extends LitElement {
 
         <slot name="error" @slotchange=${this._handleErrorSlotChange}>
           ${hasError
-            ? html`<div part="error" class="field__error" id=${this._errorId} role="alert" aria-live="polite">
+            ? html`<div
+                part="error"
+                class="field__error"
+                id=${this._errorId}
+                role="alert"
+                aria-live="polite"
+              >
                 ${this.error}
               </div>`
             : nothing}

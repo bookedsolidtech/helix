@@ -1,12 +1,8 @@
-import { cn } from "@/lib/utils";
-import { tokenEntries, type TokenEntry } from "@helix/tokens";
-import {
-  getColorSubgroups,
-  isHexColor,
-  getContrastColor,
-} from "@helix/tokens/utils";
-import { Breadcrumb } from "@/components/dashboard/Breadcrumb";
-import { getTokenBreadcrumbs } from "@/lib/breadcrumb-utils";
+import { cn } from '@/lib/utils';
+import { tokenEntries, type TokenEntry } from '@helix/tokens';
+import { getColorSubgroups, isHexColor, getContrastColor } from '@helix/tokens/utils';
+import { Breadcrumb } from '@/components/dashboard/Breadcrumb';
+import { getTokenBreadcrumbs } from '@/lib/breadcrumb-utils';
 
 export default function ColorsPage() {
   const colorSubgroups = getColorSubgroups(tokenEntries);
@@ -14,18 +10,17 @@ export default function ColorsPage() {
   return (
     <div className="space-y-8">
       <div>
-        <Breadcrumb items={getTokenBreadcrumbs("colors")} />
+        <Breadcrumb items={getTokenBreadcrumbs('colors')} />
         <h1 className="text-2xl font-bold tracking-tight">Color Palette</h1>
         <p className="text-muted-foreground text-sm mt-0.5">
-          {tokenEntries.filter((t) => t.category === "color").length} color tokens across {colorSubgroups.length} palettes
+          {tokenEntries.filter((t) => t.category === 'color').length} color tokens across{' '}
+          {colorSubgroups.length} palettes
         </p>
       </div>
 
       {colorSubgroups.map((subgroup) => (
         <section key={subgroup.label}>
-          <h2 className="text-sm font-medium text-muted-foreground mb-3">
-            {subgroup.label}
-          </h2>
+          <h2 className="text-sm font-medium text-muted-foreground mb-3">{subgroup.label}</h2>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 lg:grid-cols-6 gap-3">
             {subgroup.tokens.map((token) => (
               <ColorSwatch key={token.name} token={token} />
@@ -43,8 +38,8 @@ function ColorSwatch({ token }: { token: TokenEntry }) {
     <div className="group">
       <div
         className={cn(
-          "h-16 rounded-lg border border-border mb-2 transition-transform group-hover:scale-105",
-          !isHex && "bg-secondary"
+          'h-16 rounded-lg border border-border mb-2 transition-transform group-hover:scale-105',
+          !isHex && 'bg-secondary',
         )}
         style={isHex ? { backgroundColor: token.value } : undefined}
       >

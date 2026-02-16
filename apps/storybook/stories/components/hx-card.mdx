@@ -1,0 +1,594 @@
+{/* hx-card.mdx — HELIX Card Component Documentation */}
+
+import { Meta } from '@storybook/addon-docs/blocks';
+
+<Meta title="Components/Card/Overview" />
+
+<style>
+  {`
+  .hx-card-docs {
+    max-width: 960px;
+    margin: 0 auto;
+    font-family: var(--hx-font-family-sans, 'Inter', sans-serif);
+    color: var(--hx-color-neutral-800, #1E293B);
+    line-height: var(--hx-line-height-normal, 1.5);
+  }
+
+  .hx-card-docs h2 {
+    font-size: 1.75rem !important;
+    font-weight: 700 !important;
+    color: var(--hx-color-neutral-900, #0F172A) !important;
+    margin: 2rem 0 1rem 0 !important;
+    padding-bottom: 0.5rem !important;
+    border-bottom: 2px solid var(--hx-color-neutral-200, #E2E8F0) !important;
+  }
+
+  .hx-card-docs h3 {
+    font-size: 1.25rem !important;
+    font-weight: 600 !important;
+    color: var(--hx-color-neutral-800, #1E293B) !important;
+    margin: 1.5rem 0 0.75rem 0 !important;
+  }
+
+  .hx-card-docs p {
+    font-size: 1rem !important;
+    line-height: 1.7 !important;
+    margin: 0 0 1rem 0 !important;
+    color: var(--hx-color-neutral-600, #475569) !important;
+  }
+
+  .hx-card-docs code {
+    font-family: var(--hx-font-family-mono, monospace) !important;
+    font-size: 0.875em !important;
+    padding: 0.125rem 0.375rem !important;
+    background: var(--hx-color-neutral-100, #F1F5F9) !important;
+    border-radius: 3px !important;
+    color: var(--hx-color-primary-700, #1E40AF) !important;
+  }
+
+  .hx-card-docs .hero-banner {
+    background: linear-gradient(135deg, var(--hx-color-primary-50, #EFF6FF) 0%, var(--hx-color-neutral-50, #F8FAFC) 100%) !important;
+    border-radius: var(--hx-border-radius-xl, 0.75rem) !important;
+    padding: 2.5rem 2rem !important;
+    margin-bottom: 2.5rem !important;
+    border: 1px solid var(--hx-color-neutral-200, #E2E8F0) !important;
+  }
+
+  .hx-card-docs .hero-title {
+    font-size: 2rem !important;
+    font-weight: 800 !important;
+    color: var(--hx-color-neutral-900, #0F172A) !important;
+    margin: 0 0 0.5rem 0 !important;
+    letter-spacing: -0.025em !important;
+    line-height: 1.2 !important;
+  }
+
+  .hx-card-docs .hero-desc {
+    font-size: 1rem !important;
+    color: var(--hx-color-neutral-500, #64748B) !important;
+    margin: 0 0 1rem 0 !important;
+    line-height: 1.6 !important;
+  }
+
+  .hx-card-docs .info-box {
+    padding: 1.25rem !important;
+    background: var(--hx-color-info-50, #F0F9FF) !important;
+    border-radius: var(--hx-border-radius-md, 0.375rem) !important;
+    border-left: 4px solid var(--hx-color-info-500, #0EA5E9) !important;
+    margin: 1.5rem 0 !important;
+  }
+
+  .hx-card-docs .info-box p {
+    margin: 0 !important;
+    color: var(--hx-color-info-800, #0C4A6E) !important;
+  }
+
+  .hx-card-docs .warning-box {
+    padding: 1.25rem !important;
+    background: var(--hx-color-warning-50, #FFFBEB) !important;
+    border-radius: var(--hx-border-radius-md, 0.375rem) !important;
+    border-left: 4px solid var(--hx-color-warning-500, #F59E0B) !important;
+    margin: 1.5rem 0 !important;
+  }
+
+  .hx-card-docs .warning-box p {
+    margin: 0 !important;
+    color: var(--hx-color-warning-800, #92400E) !important;
+  }
+
+  .hx-card-docs ul {
+    margin: 0 0 1rem 0 !important;
+    padding-left: 1.5rem !important;
+  }
+
+  .hx-card-docs li {
+    margin-bottom: 0.5rem !important;
+    color: var(--hx-color-neutral-600, #475569) !important;
+  }
+
+  .hx-card-docs .code-block {
+    background: var(--hx-color-neutral-800, #1E293B) !important;
+    border-radius: var(--hx-border-radius-lg, 0.5rem) !important;
+    padding: 1.25rem !important;
+    margin: 1.5rem 0 !important;
+    overflow-x: auto !important;
+  }
+
+  .hx-card-docs .code-block code {
+    font-family: var(--hx-font-family-mono, monospace) !important;
+    font-size: 0.875rem !important;
+    line-height: 1.6 !important;
+    color: var(--hx-color-neutral-100, #F1F5F9) !important;
+    background: transparent !important;
+    padding: 0 !important;
+  }
+
+  .hx-card-docs table {
+    width: 100% !important;
+    border-collapse: collapse !important;
+    margin: 1.5rem 0 !important;
+  }
+
+  .hx-card-docs th {
+    background: var(--hx-color-neutral-100, #F1F5F9) !important;
+    padding: 0.75rem 1rem !important;
+    text-align: left !important;
+    font-weight: 600 !important;
+    border: 1px solid var(--hx-color-neutral-200, #E2E8F0) !important;
+  }
+
+  .hx-card-docs td {
+    padding: 0.75rem 1rem !important;
+    border: 1px solid var(--hx-color-neutral-200, #E2E8F0) !important;
+  }
+`}
+</style>
+
+<div className="hx-card-docs">
+
+<div className="hero-banner">
+  <div className="hero-title">hx-card Component</div>
+  <div className="hero-desc">
+    A flexible, accessible container component for grouping related content. The Card component
+    provides slots for headings, body content, images, footers, and action buttons — with built-in
+    support for interactive click behavior when used as a navigation element.
+  </div>
+</div>
+
+## Overview
+
+The `hx-card` component is a foundational layout primitive in the HELIX design system. It provides a structured,
+visually distinct container for presenting related information in clinical dashboards, patient summaries, and
+administrative interfaces.
+
+Cards support three visual variants (`default`, `featured`, `compact`) and three elevation levels (`flat`, `raised`, `floating`).
+When given an `hx-href` attribute, cards become interactive and emit a custom `hx-card-click` event on activation.
+
+### When to Use
+
+- **Patient summaries** — Display patient demographics, vitals, and care team information
+- **Dashboard widgets** — Show department metrics, pending tasks, or system alerts
+- **Content grouping** — Organize related form fields, diagnostic results, or medication lists
+- **Clickable navigation** — Create interactive tiles that navigate to detail pages
+
+### When Not to Use
+
+- **Simple text blocks** — Use semantic HTML (`<article>`, `<section>`) for basic content
+- **Data tables** — Use proper table elements for tabular data
+- **Form containers** — Use `<fieldset>` or `hx-form` for form grouping
+
+## Accessibility
+
+The Card component follows WCAG 2.1 AA guidelines and implements proper ARIA patterns:
+
+- **Keyboard navigation** — When `hx-href` is set, the card is keyboard-focusable (`tabindex="0"`) and activates on Enter/Space
+- **Screen reader support** — Interactive cards have `role="link"` and announce their purpose
+- **Focus visible** — Focus ring is clearly visible for keyboard users
+- **Semantic structure** — Uses proper heading hierarchy and ARIA labels where appropriate
+
+<div className="info-box">
+  <p>
+    <strong>Healthcare Compliance:</strong> When displaying patient information, ensure all card
+    content meets HIPAA visibility requirements. Consider using the <code>featured</code> variant
+    for critical alerts that require immediate attention.
+  </p>
+</div>
+
+## Properties
+
+| Property    | Type                                   | Default     | Description                                                          |
+| ----------- | -------------------------------------- | ----------- | -------------------------------------------------------------------- |
+| `variant`   | `'default' \| 'featured' \| 'compact'` | `'default'` | Visual style variant of the card                                     |
+| `elevation` | `'flat' \| 'raised' \| 'floating'`     | `'flat'`    | Shadow depth of the card                                             |
+| `hx-href`   | `string`                               | `''`        | Optional URL for interactive cards. When set, card becomes clickable |
+
+## Slots
+
+| Slot        | Description                                                                     |
+| ----------- | ------------------------------------------------------------------------------- |
+| `image`     | Optional image at the top of the card (e.g., patient photo, facility thumbnail) |
+| `heading`   | Card title or heading text                                                      |
+| `(default)` | Main body content of the card                                                   |
+| `footer`    | Footer content (timestamps, metadata, secondary info)                           |
+| `actions`   | Action buttons rendered at the bottom of the card                               |
+
+## CSS Custom Properties
+
+Override these tokens to theme the card:
+
+| Property                  | Default                       | Description          |
+| ------------------------- | ----------------------------- | -------------------- |
+| `--hx-card-bg`            | `var(--hx-color-neutral-0)`   | Background color     |
+| `--hx-card-color`         | `var(--hx-color-neutral-800)` | Text color           |
+| `--hx-card-border-color`  | `var(--hx-color-neutral-200)` | Border color         |
+| `--hx-card-border-radius` | `var(--hx-border-radius-lg)`  | Border radius        |
+| `--hx-card-padding`       | `var(--hx-space-6)`           | Internal padding     |
+| `--hx-card-gap`           | `var(--hx-space-4)`           | Gap between sections |
+
+## CSS Parts
+
+Style internal card elements using `::part()`:
+
+| Part      | Description                |
+| --------- | -------------------------- |
+| `card`    | The outer card container   |
+| `image`   | The image slot container   |
+| `heading` | The heading slot container |
+| `body`    | The body slot container    |
+| `footer`  | The footer slot container  |
+| `actions` | The actions slot container |
+
+## Events
+
+| Event           | Detail            | Description                                                                          |
+| --------------- | ----------------- | ------------------------------------------------------------------------------------ |
+| `hx-card-click` | `{ url: string }` | Fired when an interactive card (with `hx-href`) is clicked or activated via keyboard |
+
+## Usage Examples
+
+### Basic Card
+
+```html
+<hx-card>
+  <span slot="heading">Patient Summary</span>
+  <p>Review vitals, lab results, and care plan updates.</p>
+</hx-card>
+```
+
+### Interactive Card
+
+```html
+<hx-card hx-href="https://ehr.example.com/patient/12345" elevation="raised">
+  <span slot="heading">James Wilson</span>
+  <p>MRN: 00-12345 | DOB: 1958-03-22</p>
+</hx-card>
+```
+
+### Full-Featured Card
+
+```html
+<hx-card variant="featured" elevation="raised">
+  <img slot="image" src="/facility-photo.jpg" alt="Main campus entrance" />
+  <span slot="heading">Facility Update</span>
+  <p>The new ambulatory care wing is now open.</p>
+  <span slot="footer">
+    <small>Posted Feb 10, 2026</small>
+  </span>
+  <span slot="actions">
+    <hx-button size="sm">View Floor Plan</hx-button>
+  </span>
+</hx-card>
+```
+
+## Design Guidelines
+
+### Variant Selection
+
+- **Default** — General-purpose cards for standard dashboard content
+- **Featured** — High-priority items, critical alerts, or urgent notifications
+- **Compact** — Dense layouts like sidebars or secondary panels
+
+### Elevation Selection
+
+- **Flat** — Inline content that blends with the page surface
+- **Raised** — Standard elevation for primary dashboard cards
+- **Floating** — High-priority content that appears above the surface (use sparingly)
+
+### Content Guidelines
+
+- Keep heading text concise (1-3 words)
+- Use the footer slot for timestamps and metadata
+- Limit action buttons to 1-3 per card
+- Ensure sufficient color contrast (WCAG AA minimum)
+
+<div className="warning-box">
+  <p>
+    <strong>Performance Note:</strong> When rendering large lists of cards (50+), consider
+    virtualization or pagination to maintain performance. Each card creates a shadow DOM boundary,
+    which can impact rendering time on lower-end devices.
+  </p>
+</div>
+
+## Drupal Integration
+
+The `hx-card` component integrates seamlessly with Drupal 10/11 through Twig templates and Drupal behaviors. This section demonstrates property-driven and slot-driven patterns, CDN loading, and event handling.
+
+### Twig Template Examples
+
+**Property-driven approach (recommended for simple cards):**
+
+```twig
+{# templates/components/card.html.twig #}
+<hx-card
+  variant="{{ variant|default('default') }}"
+  elevation="{{ elevation|default('flat') }}"
+  {% if url %}hx-href="{{ url }}"{% endif %}
+>
+  {% if heading %}
+    <span slot="heading">{{ heading }}</span>
+  {% endif %}
+  {{ content }}
+  {% if footer %}
+    <span slot="footer">{{ footer }}</span>
+  {% endif %}
+</hx-card>
+```
+
+**Slot-driven approach (for complex content with markup):**
+
+```twig
+{# templates/node/node--article--teaser.html.twig #}
+<hx-card variant="featured" elevation="raised">
+  {% if content.field_image|render %}
+    <img
+      slot="image"
+      src="{{ file_url(node.field_image.entity.uri.value) }}"
+      alt="{{ node.field_image.alt }}"
+    />
+  {% endif %}
+
+  <span slot="heading">{{ node.label }}</span>
+
+  <div class="card-body">
+    {{ content.body }}
+  </div>
+
+  <div slot="footer">
+    <small>{{ node.created.value|date('F j, Y') }}</small>
+  </div>
+
+  {% if node.url %}
+    <div slot="actions">
+      <hx-button size="sm" variant="secondary">Read More</hx-button>
+    </div>
+  {% endif %}
+</hx-card>
+```
+
+**Patient Summary Card (Healthcare Use Case):**
+
+```twig
+{# templates/custom/patient-summary-card.html.twig #}
+<hx-card
+  variant="default"
+  elevation="raised"
+  hx-href="/patient/{{ patient.mrn }}"
+>
+  <span slot="heading">{{ patient.last_name }}, {{ patient.first_name }}</span>
+
+  <div class="patient-details">
+    <dl>
+      <dt>MRN:</dt>
+      <dd>{{ patient.mrn }}</dd>
+      <dt>DOB:</dt>
+      <dd>{{ patient.dob|date('m/d/Y') }}</dd>
+      <dt>Department:</dt>
+      <dd>{{ patient.department }}</dd>
+    </dl>
+  </div>
+
+  <span slot="footer">
+    <small>Last visit: {{ patient.last_visit|date('F j, Y') }}</small>
+  </span>
+</hx-card>
+```
+
+### Drupal Behaviors Integration
+
+Use Drupal.behaviors to initialize card event listeners and handle navigation:
+
+```javascript
+/**
+ * @file
+ * hx-card Drupal behavior.
+ */
+
+(function (Drupal, once) {
+  'use strict';
+
+  /**
+   * Attach hx-card event listeners.
+   */
+  Drupal.behaviors.hxCard = {
+    attach: function (context, settings) {
+      // Initialize all interactive cards (with hx-href attribute)
+      once('hx-card-init', 'hx-card[hx-href]', context).forEach((card) => {
+        // Listen for card click events
+        card.addEventListener('hx-card-click', (e) => {
+          const url = e.detail.url;
+
+          // Option 1: Standard navigation
+          window.location.href = url;
+
+          // Option 2: AJAX navigation (for single-page apps)
+          // e.preventDefault();
+          // Drupal.ajax({ url: url }).execute();
+
+          // Option 3: Open in new tab for external links
+          // if (url.startsWith('http')) {
+          //   window.open(url, '_blank');
+          // }
+        });
+
+        // Optional: Track card interactions for analytics
+        card.addEventListener('hx-card-click', (e) => {
+          if (typeof gtag !== 'undefined') {
+            gtag('event', 'card_click', {
+              card_url: e.detail.url,
+              card_variant: card.getAttribute('variant'),
+            });
+          }
+        });
+      });
+
+      // Optional: Add hover effects or data attributes
+      once('hx-card-enhance', 'hx-card', context).forEach((card) => {
+        // Add custom data attributes for theming
+        const variant = card.getAttribute('variant');
+        if (variant === 'featured') {
+          card.dataset.priority = 'high';
+        }
+      });
+    },
+
+    detach: function (context, settings, trigger) {
+      if (trigger === 'unload') {
+        // Clean up event listeners on unload
+        context.querySelectorAll('hx-card').forEach((card) => {
+          card.removeEventListener('hx-card-click', () => {});
+        });
+      }
+    },
+  };
+})(Drupal, once);
+```
+
+### CDN Loading Strategy
+
+Add to `your_theme.libraries.yml`:
+
+```yaml
+# CDN approach (recommended for production)
+helix-components:
+  js:
+    https://cdn.jsdelivr.net/npm/@helix/library@1.0.0/dist/index.js:
+      type: external
+      attributes:
+        type: module
+  version: 1.0.0
+  header: true
+```
+
+For local development with npm-installed components:
+
+```yaml
+# Local approach (for development or private hosting)
+helix-components-local:
+  js:
+    /libraries/helix/dist/index.js:
+      type: file
+      attributes:
+        type: module
+  version: VERSION
+  header: true
+```
+
+Attach the library to your theme or specific pages:
+
+```yaml
+# your_theme.info.yml
+libraries:
+  - your_theme/helix-components
+```
+
+Or conditionally in a template:
+
+```twig
+{{ attach_library('your_theme/helix-components') }}
+```
+
+### Performance Optimization
+
+**Lazy loading for below-the-fold cards:**
+
+```javascript
+(function (Drupal, once) {
+  Drupal.behaviors.hxCardLazy = {
+    attach: function (context) {
+      if ('IntersectionObserver' in window) {
+        const observer = new IntersectionObserver((entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              const card = entry.target;
+              card.setAttribute('elevation', 'raised');
+              observer.unobserve(card);
+            }
+          });
+        });
+
+        once('hx-card-lazy', 'hx-card[data-lazy]', context).forEach((card) => {
+          observer.observe(card);
+        });
+      }
+    },
+  };
+})(Drupal, once);
+```
+
+### Drupal Views Integration
+
+Render cards in Views using custom field formatters or Twig templates:
+
+```twig
+{# views/views-view-unformatted--patient-list.html.twig #}
+<div class="patient-list">
+  {% for row in rows %}
+    <hx-card
+      variant="default"
+      elevation="raised"
+      hx-href="{{ row.content['#row']._entity.toUrl().toString() }}"
+    >
+      <span slot="heading">
+        {{ row.content['#row']._entity.label }}
+      </span>
+      {{ row.content }}
+    </hx-card>
+  {% endfor %}
+</div>
+```
+
+### References
+
+See the [Drupal Integration Guide](#) in the HELIX documentation for comprehensive coverage:
+
+- **ADR-DRUPAL-001**: Property-driven vs slot-driven Twig patterns
+- **ADR-DRUPAL-002**: Event handling and Drupal behaviors best practices
+- **ADR-DRUPAL-003**: Performance optimization for component-heavy pages
+- **ADR-DRUPAL-004**: Accessibility considerations in Drupal context
+
+<div className="info-box">
+  <p>
+    <strong>Enterprise Tip:</strong> For large Drupal sites with 50+ cards per page, consider using
+    Drupal's BigPipe or AJAX to load cards progressively. This prevents render-blocking and improves
+    perceived performance on slower connections.
+  </p>
+</div>
+
+## Related Components
+
+- **hx-button** — Use in the `actions` slot for card actions
+- **hx-badge** — Add status badges to card headings
+- **hx-alert** — Embed alerts inside card body content
+- **hx-container** — Wrap cards in a container for consistent spacing
+
+## Browser Support
+
+HELIX components support all modern browsers:
+
+- Chrome/Edge 90+
+- Firefox 90+
+- Safari 14+
+
+Shadow DOM and Custom Elements are required. No polyfills are provided for IE11.
+
+</div>

@@ -1,7 +1,9 @@
 /**
  * Composite Health Scorer.
- * Calculates health from 12 dimensions with confidence tracking.
+ * Calculates health from 17 dimensions (Phase 0-3) with confidence tracking.
  * Every dimension reports verified, traceable data — or says NOT TESTED.
+ * Phase 0 adds: Code Quality, Lit Best Practices, Security, Maintainability, DX.
+ * Many dimensions now include detailed sub-metrics for drill-down analysis.
  */
 import { existsSync } from 'node:fs';
 import { resolve } from 'node:path';
@@ -16,6 +18,19 @@ import { analyzeTokenCompliance } from './token-compliance-analyzer';
 import { analyzeStoryCoverage } from './story-coverage-analyzer';
 import { analyzeDrupalReadiness } from './drupal-readiness-analyzer';
 import { analyzeVrt, analyzeCrossBrowser } from './vrt-analyzer';
+import { analyzeCodeQuality } from './code-quality-analyzer';
+import { analyzeLitBestPractices } from './lit-best-practices-analyzer';
+import { analyzeSecurity } from './security-analyzer';
+import { analyzeMaintainability } from './maintainability-analyzer';
+import { analyzeDx } from './dx-analyzer';
+
+export interface SubMetric {
+  name: string;
+  score: number;
+  weight: number;
+  passed: boolean;
+  detail: string;
+}
 
 export interface HealthDimension {
   name: string;
@@ -26,6 +41,7 @@ export interface HealthDimension {
   phase: string;
   confidence: 'verified' | 'heuristic' | 'untested';
   methodology: string;
+  subMetrics?: SubMetric[];
 }
 
 export interface ComponentHealth {
@@ -133,9 +149,22 @@ const DIMENSION_CLASSIFICATION: DimensionClassification = {
     'Accessibility',
     'Type Safety',
     'Docs Coverage',
+    'Security', // Phase 0: XSS, injection, secrets
   ],
-  important: ['Story Coverage', 'Bundle Size', 'Token Compliance'],
-  advanced: ['Visual Regression', 'Cross-Browser', 'Drupal Readiness'],
+  important: [
+    'Story Coverage',
+    'Bundle Size',
+    'Token Compliance',
+    'Code Quality', // Phase 0: complexity, duplication
+    'Lit Best Practices', // Phase 0: framework adherence
+    'Maintainability', // Phase 0: file size, test ratio
+  ],
+  advanced: [
+    'Visual Regression',
+    'Cross-Browser',
+    'Drupal Readiness',
+    'Developer Experience', // Phase 0: DX quality
+  ],
 };
 
 interface GradeConstraints {
@@ -260,6 +289,13 @@ export function scoreComponent(tagName: string): ComponentHealth | null {
   const vrt = analyzeVrt(tagName);
   const crossBrowser = analyzeCrossBrowser(tagName);
 
+  // New Phase 0 analyzers
+  const codeQuality = analyzeCodeQuality(tagName);
+  const litBestPractices = analyzeLitBestPractices(tagName);
+  const security = analyzeSecurity(tagName);
+  const maintainability = analyzeMaintainability(tagName);
+  const dx = analyzeDx(tagName);
+
   // Test Coverage: blended score (60% code coverage + 40% pass rate)
   let testScore: number | null = null;
   let testConfidence: 'verified' | 'heuristic' | 'untested' = 'untested';
@@ -330,6 +366,13 @@ export function scoreComponent(tagName: string): ComponentHealth | null {
         typeSafety?.tscClean !== undefined
           ? 'TypeScript compiler output + static analysis'
           : 'Static pattern analysis',
+      subMetrics: typeSafety?.checks.map((c) => ({
+        name: c.name,
+        score: c.passed ? 100 : 0,
+        weight: 1,
+        passed: c.passed,
+        detail: c.detail,
+      })),
     },
     {
       name: 'Test Coverage',
@@ -352,6 +395,13 @@ export function scoreComponent(tagName: string): ComponentHealth | null {
       methodology: a11y?.hasAxeResults
         ? 'axe-core WCAG 2.1 AA runtime audit + static analysis'
         : 'Static pattern analysis (no runtime audit)',
+      subMetrics: a11y?.checks.map((c) => ({
+        name: c.name,
+        score: c.passed ? 100 : 0,
+        weight: c.weight,
+        passed: c.passed,
+        detail: c.detail,
+      })),
     },
     {
       name: 'Bundle Size',
@@ -402,6 +452,61 @@ export function scoreComponent(tagName: string): ComponentHealth | null {
       phase: drupal ? 'Phase 2' : 'Future',
       confidence: drupal ? 'heuristic' : 'untested',
       methodology: 'Drupal compatibility pattern analysis',
+    },
+    {
+      name: 'Code Quality',
+      weight: 5,
+      score: codeQuality?.score ?? null,
+      maxScore: 100,
+      measured: codeQuality !== null,
+      phase: codeQuality ? 'Phase 0' : 'Future',
+      confidence: codeQuality ? 'heuristic' : 'untested',
+      methodology: 'Static code analysis (complexity, duplication, magic numbers)',
+      subMetrics: codeQuality?.subMetrics,
+    },
+    {
+      name: 'Lit Best Practices',
+      weight: 5,
+      score: litBestPractices?.score ?? null,
+      maxScore: 100,
+      measured: litBestPractices !== null,
+      phase: litBestPractices ? 'Phase 0' : 'Future',
+      confidence: litBestPractices ? 'heuristic' : 'untested',
+      methodology: 'Lit framework best practices validation',
+      subMetrics: litBestPractices?.subMetrics,
+    },
+    {
+      name: 'Security',
+      weight: 5,
+      score: security?.score ?? null,
+      maxScore: 100,
+      measured: security !== null,
+      phase: security ? 'Phase 0' : 'Future',
+      confidence: security ? 'heuristic' : 'untested',
+      methodology: 'Security vulnerability scanning (XSS, injection, secrets)',
+      subMetrics: security?.subMetrics,
+    },
+    {
+      name: 'Maintainability',
+      weight: 5,
+      score: maintainability?.score ?? null,
+      maxScore: 100,
+      measured: maintainability !== null,
+      phase: maintainability ? 'Phase 0' : 'Future',
+      confidence: maintainability ? 'heuristic' : 'untested',
+      methodology: 'Maintainability metrics (file size, test ratio, dependencies)',
+      subMetrics: maintainability?.subMetrics,
+    },
+    {
+      name: 'Developer Experience',
+      weight: 5,
+      score: dx?.score ?? null,
+      maxScore: 100,
+      measured: dx !== null,
+      phase: dx ? 'Phase 0' : 'Future',
+      confidence: dx ? 'heuristic' : 'untested',
+      methodology: 'DX quality (Intellisense, error messages, examples)',
+      subMetrics: dx?.subMetrics,
     },
   ];
 

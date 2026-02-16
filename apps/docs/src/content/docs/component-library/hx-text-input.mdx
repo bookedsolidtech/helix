@@ -1,5 +1,5 @@
 ---
-title: "hx-text-input"
+title: 'hx-text-input'
 description: Form-associated text input with label, validation, help text, and prefix/suffix slots
 ---
 
@@ -83,11 +83,7 @@ Non-interactive disabled state.
 
 <ComponentDemo title="Disabled">
   <div style="max-width: 400px;">
-    <hx-text-input
-      label="Read-only field"
-      value="Cannot edit this"
-      disabled
-    ></hx-text-input>
+    <hx-text-input label="Read-only field" value="Cannot edit this" disabled></hx-text-input>
   </div>
 </ComponentDemo>
 
@@ -113,8 +109,16 @@ Multiple states side by side.
 
 <ComponentDemo title="Validation States">
   <div style="display: grid; gap: 1rem; max-width: 400px;">
-    <hx-text-input label="Valid input" value="jane@example.com" help-text="Looks good!"></hx-text-input>
-    <hx-text-input label="Error input" value="bad" error="Too short — minimum 8 characters."></hx-text-input>
+    <hx-text-input
+      label="Valid input"
+      value="jane@example.com"
+      help-text="Looks good!"
+    ></hx-text-input>
+    <hx-text-input
+      label="Error input"
+      value="bad"
+      error="Too short — minimum 8 characters."
+    ></hx-text-input>
     <hx-text-input label="Disabled input" value="locked" disabled></hx-text-input>
   </div>
 </ComponentDemo>

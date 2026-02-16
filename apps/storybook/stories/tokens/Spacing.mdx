@@ -3,7 +3,10 @@
 import { Meta } from '@storybook/addon-docs/blocks';
 import { tokensByCategory } from '@helix/tokens';
 
-<Meta title="Design Tokens/Spacing" parameters={{ controls: { disable: true }, actions: { disable: true } }} />
+<Meta
+  title="Design Tokens/Spacing"
+  parameters={{ controls: { disable: true }, actions: { disable: true } }}
+/>
 
 export const spacingTokens = tokensByCategory['space'] ?? [];
 export const smallSpacingTokens = spacingTokens.filter((t) => {
@@ -12,7 +15,7 @@ export const smallSpacingTokens = spacingTokens.filter((t) => {
 });
 
 <style>
-{`
+  {`
   /* ── Scoped container reset ─────────────────────────── */
   .hx-token-spacing {
     max-width: 960px;
@@ -293,14 +296,24 @@ export const smallSpacingTokens = spacingTokens.filter((t) => {
 <div className="hx-token-spacing">
 
 {/* ═══ Mini Hero Banner ═══════════════════════════════ */}
+
 <div className="hx-spacing-hero">
   <div className="hx-spacing-hero-title">Spacing</div>
   <div className="hx-spacing-hero-desc">
-    A consistent spacing scale used for padding, margins, gaps, and layout composition.
-    Built on a base-4 system that produces harmonious, predictable rhythm across every component.
+    A consistent spacing scale used for padding, margins, gaps, and layout composition. Built on a
+    base-4 system that produces harmonious, predictable rhythm across every component.
   </div>
   <div className="hx-spacing-hero-badge">
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <svg
+      width="14"
+      height="14"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
       <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
     </svg>
     {spacingTokens.length} tokens
@@ -312,9 +325,9 @@ export const smallSpacingTokens = spacingTokens.filter((t) => {
 ## Spacing Scale
 
 <div className="hx-spacing-section-desc">
-  Each row below shows the token name, its resolved value, and a proportional bar visualization.
-  The bar width is driven by the actual CSS custom property, giving an accurate visual representation
-  of relative scale.
+  Each row below shows the token name, its resolved value, and a proportional bar visualization. The
+  bar width is driven by the actual CSS custom property, giving an accurate visual representation of
+  relative scale.
 </div>
 
 <div className="hx-spacing-scale-list">
@@ -338,8 +351,8 @@ export const smallSpacingTokens = spacingTokens.filter((t) => {
 
 <div className="hx-spacing-section-desc">
   Each box below uses its respective spacing token as padding on all sides. The colored area
-  represents the padding region; the white inner square represents the content area.
-  Tokens above 5rem are omitted to keep the grid readable.
+  represents the padding region; the white inner square represents the content area. Tokens above
+  5rem are omitted to keep the grid readable.
 </div>
 
 <div className="hx-spacing-boxes-grid">
@@ -362,33 +375,47 @@ export const smallSpacingTokens = spacingTokens.filter((t) => {
   <div className="hx-spacing-usage-title">Using spacing tokens in CSS</div>
   <div className="hx-spacing-code-block">
     <div className="hx-spacing-code-line">
-      <span className="hx-spacing-code-comment">{'/* Use spacing tokens for consistent layout */'}</span>
+      <span className="hx-spacing-code-comment">
+        {'/* Use spacing tokens for consistent layout */'}
+      </span>
     </div>
     <div className="hx-spacing-code-line">
-      <span className="hx-spacing-code-prop">{'padding'}</span>{': var('}
-      <span className="hx-spacing-code-value">{'--hx-space-4'}</span>{');'}
+      <span className="hx-spacing-code-prop">{'padding'}</span>
+      {': var('}
+      <span className="hx-spacing-code-value">{'--hx-space-4'}</span>
+      {');'}
     </div>
     <div className="hx-spacing-code-line">
-      <span className="hx-spacing-code-prop">{'margin-bottom'}</span>{': var('}
-      <span className="hx-spacing-code-value">{'--hx-space-6'}</span>{');'}
+      <span className="hx-spacing-code-prop">{'margin-bottom'}</span>
+      {': var('}
+      <span className="hx-spacing-code-value">{'--hx-space-6'}</span>
+      {');'}
     </div>
     <div className="hx-spacing-code-line">
-      <span className="hx-spacing-code-prop">{'gap'}</span>{': var('}
-      <span className="hx-spacing-code-value">{'--hx-space-3'}</span>{');'}
+      <span className="hx-spacing-code-prop">{'gap'}</span>
+      {': var('}
+      <span className="hx-spacing-code-value">{'--hx-space-3'}</span>
+      {');'}
     </div>
     <div className="hx-spacing-code-line">&nbsp;</div>
     <div className="hx-spacing-code-line">
-      <span className="hx-spacing-code-comment">{'/* Component-level token with semantic fallback */'}</span>
+      <span className="hx-spacing-code-comment">
+        {'/* Component-level token with semantic fallback */'}
+      </span>
     </div>
     <div className="hx-spacing-code-line">
-      <span className="hx-spacing-code-prop">{'--_padding'}</span>{': var('}
-      <span className="hx-spacing-code-value">{'--hx-card-padding'}</span>{', var('}
-      <span className="hx-spacing-code-value">{'--hx-space-6'}</span>{'));'}
+      <span className="hx-spacing-code-prop">{'--_padding'}</span>
+      {': var('}
+      <span className="hx-spacing-code-value">{'--hx-card-padding'}</span>
+      {', var('}
+      <span className="hx-spacing-code-value">{'--hx-space-6'}</span>
+      {'));'}
     </div>
   </div>
 </div>
 
 {/* ═══ Footer ════════════════════════════════════════ */}
+
 <div className="hx-spacing-footer">
   <div className="hx-spacing-footer-text">
     HELIX Design Tokens &middot; Spacing Scale &middot; {spacingTokens.length} tokens

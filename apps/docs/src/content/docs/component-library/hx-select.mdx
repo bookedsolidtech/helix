@@ -1,5 +1,5 @@
 ---
-title: "hx-select"
+title: 'hx-select'
 description: "A select component that wraps a native select element with the library's form field pattern (label, error, help text). Options are provided via slotted option elements in the light DOM. The component observes slotted options via slotchange and clones them into the shadow DOM select for rendering."
 ---
 
@@ -41,18 +41,11 @@ Required, disabled, and error states.
       <option value="a">Option A</option>
       <option value="b">Option B</option>
     </hx-select>
-    <hx-select
-      label="With error"
-      error="Please select a valid option."
-    >
+    <hx-select label="With error" error="Please select a valid option.">
       <option value="">Invalid</option>
       <option value="valid">Valid option</option>
     </hx-select>
-    <hx-select
-      label="Disabled"
-      disabled
-      value="locked"
-    >
+    <hx-select label="Disabled" disabled value="locked">
       <option value="locked">Locked selection</option>
     </hx-select>
   </div>

@@ -134,7 +134,7 @@ Active development phase following the initial three-commit foundation. Test inf
 
 ### Overview
 
-The documentation site crosses a critical threshold: components now render *live in the browser* within the docs, and API reference tables are auto-generated from the Custom Elements Manifest at build time. This is the CEM-as-single-source-of-truth story made real.
+The documentation site crosses a critical threshold: components now render _live in the browser_ within the docs, and API reference tables are auto-generated from the Custom Elements Manifest at build time. This is the CEM-as-single-source-of-truth story made real.
 
 ### Added
 
@@ -173,7 +173,7 @@ The documentation site crosses a critical threshold: components now render *live
 >
 > The decision to render actual web components inside Astro (which is primarily a static site generator) required solving the island architecture problem: web components need client-side JavaScript, but Astro strips JS by default. The `ComponentLoader.astro` bridge handles this cleanly.
 >
-> What makes this commit significant is not the code volume (994 insertions) but what it *proves*: the JSDoc annotations in component source files feed the CEM analyzer, which generates `custom-elements.json`, which feeds both Storybook autodocs AND the Starlight API tables. Change a `@cssprop` annotation in `wc-button.ts` and it automatically appears in both documentation systems. That's the single-source-of-truth pipeline working end-to-end.
+> What makes this commit significant is not the code volume (994 insertions) but what it _proves_: the JSDoc annotations in component source files feed the CEM analyzer, which generates `custom-elements.json`, which feeds both Storybook autodocs AND the Starlight API tables. Change a `@cssprop` annotation in `wc-button.ts` and it automatically appears in both documentation systems. That's the single-source-of-truth pipeline working end-to-end.
 
 ### Stats
 
@@ -253,7 +253,7 @@ A polish-and-upgrade commit that touches 41 files. The headline change: Storyboo
 
 > The Storybook 8 → 10 jump is the marquee change. Storybook 10 is bleeding-edge (released late 2025 / early 2026), and adopting it for a portfolio project signals awareness of the ecosystem's direction. CSF Factories are the future of story authoring, and having the infrastructure ready — even if the stories haven't been migrated to the new format yet — is the right move.
 >
-> The mobile responsiveness pass is the kind of work that separates "I built a demo" from "I built something I'd show a client." Touch target sizing, responsive grid breakpoints, opacity tuning for readability — these are the details that make a docs site feel *designed* rather than *generated*.
+> The mobile responsiveness pass is the kind of work that separates "I built a demo" from "I built something I'd show a client." Touch target sizing, responsive grid breakpoints, opacity tuning for readability — these are the details that make a docs site feel _designed_ rather than _generated_.
 >
 > The biographical content is a strategic addition for an interview portfolio piece: it transforms the docs site from a technical artifact into a narrative about the person who built it. Whether this belongs in the long-term codebase is a separate question, but for a February 17th interview, it's the right call.
 
@@ -350,12 +350,12 @@ Tier 3 (Component):     Defined inline within each component's styles file
 
 **Public API**:
 
-| Property | Type | Default | Reflected | Description |
-|----------|------|---------|-----------|-------------|
-| `variant` | `'primary' \| 'secondary' \| 'ghost'` | `'primary'` | Yes | Visual style variant |
-| `size` | `'sm' \| 'md' \| 'lg'` | `'md'` | Yes | Button size |
-| `disabled` | `boolean` | `false` | Yes | Disabled state |
-| `type` | `'button' \| 'submit' \| 'reset'` | `'button'` | No | Native button type |
+| Property   | Type                                  | Default     | Reflected | Description          |
+| ---------- | ------------------------------------- | ----------- | --------- | -------------------- |
+| `variant`  | `'primary' \| 'secondary' \| 'ghost'` | `'primary'` | Yes       | Visual style variant |
+| `size`     | `'sm' \| 'md' \| 'lg'`                | `'md'`      | Yes       | Button size          |
+| `disabled` | `boolean`                             | `false`     | Yes       | Disabled state       |
+| `type`     | `'button' \| 'submit' \| 'reset'`     | `'button'`  | No        | Native button type   |
 
 **Slots**: Default slot for label text/content
 
@@ -366,6 +366,7 @@ Tier 3 (Component):     Defined inline within each component's styles file
 **CSS Custom Properties** (7): `--wc-button-bg`, `--wc-button-color`, `--wc-button-border-color`, `--wc-button-border-radius`, `--wc-button-font-family`, `--wc-button-font-weight`, `--wc-button-focus-ring-color`
 
 **Architecture highlights**:
+
 - **Form association** via `static formAssociated = true` and `attachInternals()`. Calls `form.requestSubmit()` for type=submit, `form.reset()` for type=reset.
 - **Lit directive usage**: `classMap()` for conditional CSS classes, `nothing` for conditional attribute removal (not empty strings — the correct Lit pattern)
 - **Focus management**: `:focus-visible` (not `:focus`) for modern keyboard-only focus indication
@@ -384,11 +385,11 @@ Tier 3 (Component):     Defined inline within each component's styles file
 
 **Public API**:
 
-| Property | Type | Default | Reflected | Description |
-|----------|------|---------|-----------|-------------|
-| `variant` | `'default' \| 'featured' \| 'compact'` | `'default'` | Yes | Visual variant |
-| `elevation` | `'flat' \| 'raised' \| 'floating'` | `'flat'` | Yes | Shadow depth |
-| `href` | `string \| undefined` | `undefined` | No | Makes card interactive/clickable |
+| Property    | Type                                   | Default     | Reflected | Description                      |
+| ----------- | -------------------------------------- | ----------- | --------- | -------------------------------- |
+| `variant`   | `'default' \| 'featured' \| 'compact'` | `'default'` | Yes       | Visual variant                   |
+| `elevation` | `'flat' \| 'raised' \| 'floating'`     | `'flat'`    | Yes       | Shadow depth                     |
+| `href`      | `string \| undefined`                  | `undefined` | No        | Makes card interactive/clickable |
 
 **Slots** (5): `image` (top media), `heading` (title), default (body), `footer`, `actions` (with border separator)
 
@@ -399,9 +400,10 @@ Tier 3 (Component):     Defined inline within each component's styles file
 **CSS Custom Properties** (6): `--wc-card-bg`, `--wc-card-color`, `--wc-card-border-color`, `--wc-card-border-radius`, `--wc-card-padding`, `--wc-card-gap`
 
 **Architecture highlights**:
+
 - **Slot change detection**: `_handleSlotChange()` factory function returns event handlers that check `slot.assignedNodes({ flatten: true }).length`, store in `_hasSlotContent` record, and call `requestUpdate()` — used to hide empty slot wrappers via the `hidden` attribute
 - **Interactive mode**: When `href` is set, the card gets `role="link"`, `tabindex="0"`, `aria-label="Navigate to {href}"`, cursor pointer, and Enter/Space keyboard handling. When `href` is absent, none of these are applied (via Lit's `nothing`).
-- **Keyboard handler is correctly placed here** — Unlike the button (where Enter/Space handling on a native `<button>` would be redundant), the card's interactive mode uses a `<div>` with `role="link"`, which *requires* explicit keyboard handling. This was flagged in the Principal Engineer Review.
+- **Keyboard handler is correctly placed here** — Unlike the button (where Enter/Space handling on a native `<button>` would be redundant), the card's interactive mode uses a `<div>` with `role="link"`, which _requires_ explicit keyboard handling. This was flagged in the Principal Engineer Review.
 - **Elevation system**: Three levels map to `box-shadow` values: flat (border only, `0 0 0 1px`), raised (`0 1px 3px`), floating (`0 10px 25px`)
 - **Featured variant**: Left border accent (`3px solid var(--wc-color-primary-500)`) — a common healthcare UI pattern for flagging priority content
 - **`::slotted(img)`** styles in the image section for full-width, object-fit cover images
@@ -418,18 +420,18 @@ Tier 3 (Component):     Defined inline within each component's styles file
 
 **Public API**:
 
-| Property | Type | Default | Reflected | Description |
-|----------|------|---------|-----------|-------------|
-| `label` | `string` | `''` | No | Visible label text |
-| `placeholder` | `string` | `''` | No | Placeholder text |
-| `value` | `string` | `''` | No | Current value |
-| `type` | `'text' \| 'email' \| 'password' \| 'tel' \| 'url' \| 'search' \| 'number'` | `'text'` | No | Input type |
-| `required` | `boolean` | `false` | Yes | Required for form submission |
-| `disabled` | `boolean` | `false` | Yes | Disabled state |
-| `error` | `string` | `''` | No | Error message (triggers error state) |
-| `helpText` | `string` | `''` | No | Help text below input (attribute: `help-text`) |
-| `name` | `string` | `''` | No | Form submission name |
-| `ariaLabel` | `string \| null` | `null` | No | Screen reader label override (attribute: `aria-label`) |
+| Property      | Type                                                                        | Default  | Reflected | Description                                            |
+| ------------- | --------------------------------------------------------------------------- | -------- | --------- | ------------------------------------------------------ |
+| `label`       | `string`                                                                    | `''`     | No        | Visible label text                                     |
+| `placeholder` | `string`                                                                    | `''`     | No        | Placeholder text                                       |
+| `value`       | `string`                                                                    | `''`     | No        | Current value                                          |
+| `type`        | `'text' \| 'email' \| 'password' \| 'tel' \| 'url' \| 'search' \| 'number'` | `'text'` | No        | Input type                                             |
+| `required`    | `boolean`                                                                   | `false`  | Yes       | Required for form submission                           |
+| `disabled`    | `boolean`                                                                   | `false`  | Yes       | Disabled state                                         |
+| `error`       | `string`                                                                    | `''`     | No        | Error message (triggers error state)                   |
+| `helpText`    | `string`                                                                    | `''`     | No        | Help text below input (attribute: `help-text`)         |
+| `name`        | `string`                                                                    | `''`     | No        | Form submission name                                   |
+| `ariaLabel`   | `string \| null`                                                            | `null`   | No        | Screen reader label override (attribute: `aria-label`) |
 
 **Slots** (3): `prefix` (before input, e.g., icon), `suffix` (after input), `help-text` (overrides helpText property)
 
@@ -491,45 +493,45 @@ Tier 3 (Component):     Defined inline within each component's styles file
 
 #### Documentation Sections
 
-| Section | Pages | Content |
-|---------|-------|---------|
-| Phase 0: Prototype | 4 | Overview, rapid prototype guide, tech stack validation, interview prep |
-| Planning & Discovery | 7 | Overview, architecture, components, design system, docs hub, building guide, Drupal guide |
-| Getting Started | 3 | Installation, quick start, project structure |
-| Architecture | 4 | Overview, monorepo, build pipeline, testing |
-| Components | 4 | Overview, building guide, API conventions, examples |
-| Design Tokens | 4 | Overview, tier system, theming, customization |
-| Drupal Integration | 5 | Overview, installation, Twig, behaviors, troubleshooting |
-| Guides | 2 | Drupal Integration Architecture ADR, Component Loading Strategy ADR |
-| API Reference | 1 | Overview (placeholder for CEM-generated content) |
+| Section              | Pages | Content                                                                                   |
+| -------------------- | ----- | ----------------------------------------------------------------------------------------- |
+| Phase 0: Prototype   | 4     | Overview, rapid prototype guide, tech stack validation, interview prep                    |
+| Planning & Discovery | 7     | Overview, architecture, components, design system, docs hub, building guide, Drupal guide |
+| Getting Started      | 3     | Installation, quick start, project structure                                              |
+| Architecture         | 4     | Overview, monorepo, build pipeline, testing                                               |
+| Components           | 4     | Overview, building guide, API conventions, examples                                       |
+| Design Tokens        | 4     | Overview, tier system, theming, customization                                             |
+| Drupal Integration   | 5     | Overview, installation, Twig, behaviors, troubleshooting                                  |
+| Guides               | 2     | Drupal Integration Architecture ADR, Component Loading Strategy ADR                       |
+| API Reference        | 1     | Overview (placeholder for CEM-generated content)                                          |
 
 #### 13 Custom Astro Components
 
-| Component | Lines | Highlights |
-|-----------|-------|------------|
-| `Hero.astro` | 93 | Animated gradient mesh, floating orbs, glassmorphic badge, floating code preview |
-| `StatsBar.astro` | 195 | 5 stat cards with accessible modals (`role="dialog"`, focus trap, ESC key) |
-| `FeatureGrid.astro` | 109 | 4-card grid with conic gradient borders, cursor spotlight effect |
-| `CodeShowcase.astro` | 105 | Split layout with terminal-style Shiki-highlighted code blocks |
-| `TechStack.astro` | 258 | 8 technology cards with SVG logos, version badges, dual navigation links |
-| `Comparison.astro` | 136 | 8-row feature comparison table, color-coded cells, responsive stacking |
-| `DXBanner.astro` | 83 | Pipeline visualization: Clone → Test → Gate → Ship |
-| `QuickLinks.astro` | 103 | 6-card navigation grid, `<nav>` semantics, animated borders |
-| `Roadmap.astro` | 136 | 7-phase vertical timeline, status badges, deliverable pills, date ranges |
-| `CTASection.astro` | 40 | Call-to-action with primary/secondary buttons |
-| `CodeBlock.astro` | 219 | Reusable Shiki code display, macOS window chrome, copy button, line numbers |
-| `Header.astro` | 1,213 | Mega-dropdown navigation, particle canvas, keyboard arrow-key nav, `prefers-reduced-motion` |
-| `PageTitle.astro` | 238 | Copy-to-clipboard source file path pill, toast notification |
+| Component            | Lines | Highlights                                                                                  |
+| -------------------- | ----- | ------------------------------------------------------------------------------------------- |
+| `Hero.astro`         | 93    | Animated gradient mesh, floating orbs, glassmorphic badge, floating code preview            |
+| `StatsBar.astro`     | 195   | 5 stat cards with accessible modals (`role="dialog"`, focus trap, ESC key)                  |
+| `FeatureGrid.astro`  | 109   | 4-card grid with conic gradient borders, cursor spotlight effect                            |
+| `CodeShowcase.astro` | 105   | Split layout with terminal-style Shiki-highlighted code blocks                              |
+| `TechStack.astro`    | 258   | 8 technology cards with SVG logos, version badges, dual navigation links                    |
+| `Comparison.astro`   | 136   | 8-row feature comparison table, color-coded cells, responsive stacking                      |
+| `DXBanner.astro`     | 83    | Pipeline visualization: Clone → Test → Gate → Ship                                          |
+| `QuickLinks.astro`   | 103   | 6-card navigation grid, `<nav>` semantics, animated borders                                 |
+| `Roadmap.astro`      | 136   | 7-phase vertical timeline, status badges, deliverable pills, date ranges                    |
+| `CTASection.astro`   | 40    | Call-to-action with primary/secondary buttons                                               |
+| `CodeBlock.astro`    | 219   | Reusable Shiki code display, macOS window chrome, copy button, line numbers                 |
+| `Header.astro`       | 1,213 | Mega-dropdown navigation, particle canvas, keyboard arrow-key nav, `prefers-reduced-motion` |
+| `PageTitle.astro`    | 238   | Copy-to-clipboard source file path pill, toast notification                                 |
 
 #### 5 Standalone Showcase Pages
 
-| Page | Lines | Theme |
-|------|-------|-------|
-| Enterprise Architecture | 772 | TypeScript strategy, CEM pipeline, 3-tier tokens, quality automation |
-| Tech Stack | 2,680 | Head-to-head comparisons, bundle size visualization, performance benchmarks |
-| Healthcare Accessibility | 2,586 | HHS mandate timeline, 4-level testing pyramid, POUR matrix |
-| Drupal Architecture | 3,803 | Property-vs-slot spectrum, Twig examples, decision matrix |
-| Developer Experience | 1,480 | Tabbed: Onboarding, Quality Pipeline, CI/CD |
+| Page                     | Lines | Theme                                                                       |
+| ------------------------ | ----- | --------------------------------------------------------------------------- |
+| Enterprise Architecture  | 772   | TypeScript strategy, CEM pipeline, 3-tier tokens, quality automation        |
+| Tech Stack               | 2,680 | Head-to-head comparisons, bundle size visualization, performance benchmarks |
+| Healthcare Accessibility | 2,586 | HHS mandate timeline, 4-level testing pyramid, POUR matrix                  |
+| Drupal Architecture      | 3,803 | Property-vs-slot spectrum, Twig examples, decision matrix                   |
+| Developer Experience     | 1,480 | Tabbed: Onboarding, Quality Pipeline, CI/CD                                 |
 
 #### Additional Components
 
@@ -555,15 +557,15 @@ Tier 3 (Component):     Defined inline within each component's styles file
 
 Six comprehensive architectural planning documents in `build-plan/`:
 
-| Document | Lines | Size | Focus |
-|----------|-------|------|-------|
-| `index.md` | 752 | 27KB | Executive summary, roadmap, interview prep |
-| `02-architecture-and-system-design.md` | 1,472 | 54KB | Monorepo, Lit + Storybook integration, testing, tokens |
-| `03-component-architecture-storybook-integration.md` | 2,183 | 73KB | Lit 3.x patterns, 40+ component specs, accessibility |
-| `03-design-system-token-architecture.md` | 2,063 | 68KB | W3C DTCG tokens, 3-tier system, healthcare a11y |
-| `04-documentation-hub-architecture.md` | 1,788 | 67KB | Astro/Starlight strategy, CEM-powered docs |
-| `05-component-building-guide.md` | 2,238 | 80KB | Drupal-friendly patterns, 12 component specs with Twig |
-| `06-drupal-integration-guide.md` | 3,329 | 96KB | Installation, Twig, behaviors, theming, troubleshooting |
+| Document                                             | Lines | Size | Focus                                                   |
+| ---------------------------------------------------- | ----- | ---- | ------------------------------------------------------- |
+| `index.md`                                           | 752   | 27KB | Executive summary, roadmap, interview prep              |
+| `02-architecture-and-system-design.md`               | 1,472 | 54KB | Monorepo, Lit + Storybook integration, testing, tokens  |
+| `03-component-architecture-storybook-integration.md` | 2,183 | 73KB | Lit 3.x patterns, 40+ component specs, accessibility    |
+| `03-design-system-token-architecture.md`             | 2,063 | 68KB | W3C DTCG tokens, 3-tier system, healthcare a11y         |
+| `04-documentation-hub-architecture.md`               | 1,788 | 67KB | Astro/Starlight strategy, CEM-powered docs              |
+| `05-component-building-guide.md`                     | 2,238 | 80KB | Drupal-friendly patterns, 12 component specs with Twig  |
+| `06-drupal-integration-guide.md`                     | 3,329 | 96KB | Installation, Twig, behaviors, theming, troubleshooting |
 
 **Research sources**: 44+ authoritative references (W3C specs, Lit docs, Storybook docs, WCAG, HHS mandate, Drupal core)
 
@@ -595,20 +597,20 @@ Three independent reviews conducted before the first commit:
 
 20 specialized agent definitions for Claude Code:
 
-| Category | Agents |
-|----------|--------|
-| **Leadership** | CTO, VP Engineering, Principal Engineer |
-| **Core** | Lit Specialist, TypeScript Specialist, Storybook Specialist, Drupal Integration Specialist |
-| **Frontend** | Frontend Specialist, Staff Software Engineer, Design System Developer |
-| **Styling** | CSS3 Animation Purist, Design Systems Animator |
-| **Quality** | Code Reviewer (Tier 1), Senior Code Reviewer (Tier 2), Chief Code Reviewer (Tier 3) |
-| **Testing** | Test Architect, QA Engineer Automation |
-| **Perf & A11y** | Accessibility Engineer, Performance Engineer |
-| **Infra** | DevOps Engineer |
+| Category        | Agents                                                                                     |
+| --------------- | ------------------------------------------------------------------------------------------ |
+| **Leadership**  | CTO, VP Engineering, Principal Engineer                                                    |
+| **Core**        | Lit Specialist, TypeScript Specialist, Storybook Specialist, Drupal Integration Specialist |
+| **Frontend**    | Frontend Specialist, Staff Software Engineer, Design System Developer                      |
+| **Styling**     | CSS3 Animation Purist, Design Systems Animator                                             |
+| **Quality**     | Code Reviewer (Tier 1), Senior Code Reviewer (Tier 2), Chief Code Reviewer (Tier 3)        |
+| **Testing**     | Test Architect, QA Engineer Automation                                                     |
+| **Perf & A11y** | Accessibility Engineer, Performance Engineer                                               |
+| **Infra**       | DevOps Engineer                                                                            |
 
 ### Expert Review — Genesis Commit
 
-> 84,315 lines in a single commit is audacious. But examining what's *in* those lines reveals something deliberate: this isn't a monolithic dump of generated code. It's a carefully structured foundation where every piece has a purpose and a relationship to other pieces.
+> 84,315 lines in a single commit is audacious. But examining what's _in_ those lines reveals something deliberate: this isn't a monolithic dump of generated code. It's a carefully structured foundation where every piece has a purpose and a relationship to other pieces.
 >
 > The component code is the proof. `WcTextInput` alone — with its full `ElementInternals` form lifecycle (`formResetCallback`, `formStateRestoreCallback`, `setValidity` with anchor element), the `live()` directive for value binding, the `aria-describedby` construction from filtered ID arrays, the error-takes-precedence-over-helptext logic — this is not code that was scaffolded and left. Every line was considered.
 >
@@ -655,20 +657,20 @@ wc-2026/
 
 ## Technology Versions
 
-| Technology | Version | Status |
-|------------|---------|--------|
-| Lit | 3.3.2 | Active |
-| TypeScript | 5.7.2 | Active (strict mode) |
-| Storybook | 10.2.8 | Active |
-| Vite | 6.2.0 | Active |
-| Vitest | 3.x | Active |
-| Playwright | 1.50.0 | Active |
-| Astro / Starlight | 5.x / 0.37.x | Active |
-| Next.js | 15.x | Active (Admin Dashboard) |
-| Turborepo | 2.3.3 | Active |
-| Node.js | >= 20.0.0 | Required |
-| CEM Analyzer | 0.11.0 | Active |
+| Technology        | Version      | Status                   |
+| ----------------- | ------------ | ------------------------ |
+| Lit               | 3.3.2        | Active                   |
+| TypeScript        | 5.7.2        | Active (strict mode)     |
+| Storybook         | 10.2.8       | Active                   |
+| Vite              | 6.2.0        | Active                   |
+| Vitest            | 3.x          | Active                   |
+| Playwright        | 1.50.0       | Active                   |
+| Astro / Starlight | 5.x / 0.37.x | Active                   |
+| Next.js           | 15.x         | Active (Admin Dashboard) |
+| Turborepo         | 2.3.3        | Active                   |
+| Node.js           | >= 20.0.0    | Required                 |
+| CEM Analyzer      | 0.11.0       | Active                   |
 
 ---
 
-*This changelog was generated by Claude Opus 4.6 after a complete audit of every source file, configuration, planning document, review artifact, and git commit in the wc-2026 repository.*
+_This changelog was generated by Claude Opus 4.6 after a complete audit of every source file, configuration, planning document, review artifact, and git commit in the wc-2026 repository._

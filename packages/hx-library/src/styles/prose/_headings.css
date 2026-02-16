@@ -10,10 +10,22 @@ h3,
 h4,
 h5,
 h6 {
-  font-family: var(--wc-prose-heading-font-family, var(--wc-heading-font-family, var(--wc-font-family-sans, sans-serif)));
-  font-weight: var(--wc-prose-heading-font-weight, var(--wc-heading-font-weight, var(--wc-font-weight-bold, 700)));
-  line-height: var(--wc-prose-heading-line-height, var(--wc-heading-line-height, var(--wc-line-height-tight, 1.25)));
-  letter-spacing: var(--wc-prose-heading-letter-spacing, var(--wc-heading-letter-spacing, var(--wc-letter-spacing-tight, -0.025em)));
+  font-family: var(
+    --wc-prose-heading-font-family,
+    var(--wc-heading-font-family, var(--wc-font-family-sans, sans-serif))
+  );
+  font-weight: var(
+    --wc-prose-heading-font-weight,
+    var(--wc-heading-font-weight, var(--wc-font-weight-bold, 700))
+  );
+  line-height: var(
+    --wc-prose-heading-line-height,
+    var(--wc-heading-line-height, var(--wc-line-height-tight, 1.25))
+  );
+  letter-spacing: var(
+    --wc-prose-heading-letter-spacing,
+    var(--wc-heading-letter-spacing, var(--wc-letter-spacing-tight, -0.025em))
+  );
   color: var(--wc-prose-heading-color, var(--wc-color-neutral-900, #111827));
   margin-top: 0;
   scroll-margin-top: var(--wc-space-8, 2rem);
@@ -28,7 +40,8 @@ h2 {
   font-size: var(--wc-prose-h2-font-size, var(--wc-font-size-3xl, 1.875rem));
   margin-bottom: var(--wc-space-5, 1.25rem);
   padding-bottom: var(--wc-space-3, 0.75rem);
-  border-bottom: var(--wc-border-width-thin, 1px) solid var(--wc-color-border-subtle, var(--wc-color-neutral-100, #e9ecef));
+  border-bottom: var(--wc-border-width-thin, 1px) solid
+    var(--wc-color-border-subtle, var(--wc-color-neutral-100, #e9ecef));
 }
 
 h3 {

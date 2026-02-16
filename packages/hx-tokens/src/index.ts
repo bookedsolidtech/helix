@@ -18,11 +18,11 @@ function flattenTokens(obj: Record<string, unknown>, prefix: string[] = []): Tok
       entries.push({
         name: `--hx-${path.join('-')}`,
         value: def.value,
-        category: path[0],
-        group: path.length > 2 ? path.slice(1, -1).join('-') : path[0],
-        key: path[path.length - 1],
+        category: path[0] ?? '',
+        group: path.length > 2 ? path.slice(1, -1).join('-') : (path[0] ?? ''),
+        key: path[path.length - 1] ?? '',
         path,
-        description: def.description,
+        description: def.description ?? '',
       });
     } else if (typeof val === 'object' && val !== null) {
       entries.push(...flattenTokens(val as Record<string, unknown>, path));

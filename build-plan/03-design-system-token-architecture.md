@@ -77,7 +77,7 @@ Primitive tokens define **what** styles are available. They are raw, context-fre
   "color": {
     "$type": "color",
     "blue": {
-      "50":  { "$value": "oklch(0.97 0.014 240)" },
+      "50": { "$value": "oklch(0.97 0.014 240)" },
       "100": { "$value": "oklch(0.93 0.032 240)" },
       "200": { "$value": "oklch(0.87 0.058 240)" },
       "300": { "$value": "oklch(0.78 0.098 240)" },
@@ -90,8 +90,8 @@ Primitive tokens define **what** styles are available. They are raw, context-fre
       "950": { "$value": "oklch(0.18 0.068 240)" }
     },
     "neutral": {
-      "0":   { "$value": "oklch(1.00 0 0)" },
-      "50":  { "$value": "oklch(0.97 0.002 240)" },
+      "0": { "$value": "oklch(1.00 0 0)" },
+      "50": { "$value": "oklch(0.97 0.002 240)" },
       "100": { "$value": "oklch(0.93 0.004 240)" },
       "200": { "$value": "oklch(0.87 0.006 240)" },
       "300": { "$value": "oklch(0.78 0.008 240)" },
@@ -128,22 +128,22 @@ Primitive tokens define **what** styles are available. They are raw, context-fre
 {
   "spacing": {
     "$type": "dimension",
-    "0":    { "$value": "0" },
-    "px":   { "$value": "1px" },
-    "0.5":  { "$value": "0.125rem" },
-    "1":    { "$value": "0.25rem" },
-    "1.5":  { "$value": "0.375rem" },
-    "2":    { "$value": "0.5rem" },
-    "3":    { "$value": "0.75rem" },
-    "4":    { "$value": "1rem" },
-    "5":    { "$value": "1.25rem" },
-    "6":    { "$value": "1.5rem" },
-    "8":    { "$value": "2rem" },
-    "10":   { "$value": "2.5rem" },
-    "12":   { "$value": "3rem" },
-    "16":   { "$value": "4rem" },
-    "20":   { "$value": "5rem" },
-    "24":   { "$value": "6rem" }
+    "0": { "$value": "0" },
+    "px": { "$value": "1px" },
+    "0.5": { "$value": "0.125rem" },
+    "1": { "$value": "0.25rem" },
+    "1.5": { "$value": "0.375rem" },
+    "2": { "$value": "0.5rem" },
+    "3": { "$value": "0.75rem" },
+    "4": { "$value": "1rem" },
+    "5": { "$value": "1.25rem" },
+    "6": { "$value": "1.5rem" },
+    "8": { "$value": "2rem" },
+    "10": { "$value": "2.5rem" },
+    "12": { "$value": "3rem" },
+    "16": { "$value": "4rem" },
+    "20": { "$value": "5rem" },
+    "24": { "$value": "6rem" }
   }
 }
 ```
@@ -153,37 +153,37 @@ Primitive tokens define **what** styles are available. They are raw, context-fre
 {
   "font-family": {
     "$type": "fontFamily",
-    "sans":  { "$value": ["Inter", "system-ui", "-apple-system", "sans-serif"] },
+    "sans": { "$value": ["Inter", "system-ui", "-apple-system", "sans-serif"] },
     "serif": { "$value": ["Merriweather", "Georgia", "Times New Roman", "serif"] },
-    "mono":  { "$value": ["JetBrains Mono", "Fira Code", "Consolas", "monospace"] }
+    "mono": { "$value": ["JetBrains Mono", "Fira Code", "Consolas", "monospace"] }
   },
   "font-weight": {
     "$type": "fontWeight",
-    "regular":  { "$value": 400 },
-    "medium":   { "$value": 500 },
+    "regular": { "$value": 400 },
+    "medium": { "$value": 500 },
     "semibold": { "$value": 600 },
-    "bold":     { "$value": 700 }
+    "bold": { "$value": 700 }
   },
   "font-size": {
     "$type": "dimension",
     "$description": "Major third type scale (1.250 ratio)",
-    "xs":   { "$value": "0.75rem" },
-    "sm":   { "$value": "0.875rem" },
+    "xs": { "$value": "0.75rem" },
+    "sm": { "$value": "0.875rem" },
     "base": { "$value": "1rem" },
-    "lg":   { "$value": "1.125rem" },
-    "xl":   { "$value": "1.25rem" },
-    "2xl":  { "$value": "1.5rem" },
-    "3xl":  { "$value": "1.875rem" },
-    "4xl":  { "$value": "2.25rem" },
-    "5xl":  { "$value": "3rem" }
+    "lg": { "$value": "1.125rem" },
+    "xl": { "$value": "1.25rem" },
+    "2xl": { "$value": "1.5rem" },
+    "3xl": { "$value": "1.875rem" },
+    "4xl": { "$value": "2.25rem" },
+    "5xl": { "$value": "3rem" }
   },
   "line-height": {
     "$type": "number",
-    "tight":   { "$value": 1.25 },
-    "snug":    { "$value": 1.375 },
-    "normal":  { "$value": 1.5 },
+    "tight": { "$value": 1.25 },
+    "snug": { "$value": 1.375 },
+    "normal": { "$value": 1.5 },
     "relaxed": { "$value": 1.625 },
-    "loose":   { "$value": 2 }
+    "loose": { "$value": 2 }
   }
 }
 ```
@@ -208,7 +208,7 @@ Semantic tokens define **how** primitive values are applied. They carry meaning 
 
     "surface": {
       "$description": "Background surface colors",
-      "primary":   {
+      "primary": {
         "$value": "{color.neutral.0}",
         "$extensions": {
           "mode": {
@@ -230,7 +230,7 @@ Semantic tokens define **how** primitive values are applied. They carry meaning 
           }
         }
       },
-      "elevated":  {
+      "elevated": {
         "$value": "{color.neutral.0}",
         "$extensions": {
           "mode": {
@@ -241,7 +241,7 @@ Semantic tokens define **how** primitive values are applied. They carry meaning 
           }
         }
       },
-      "inverse":   {
+      "inverse": {
         "$value": "{color.neutral.900}",
         "$extensions": {
           "mode": {
@@ -335,10 +335,10 @@ Semantic tokens define **how** primitive values are applied. They carry meaning 
 
     "feedback": {
       "$description": "Status and feedback colors",
-      "success":    { "$value": "{color.green.600}" },
-      "warning":    { "$value": "{color.amber.600}" },
-      "danger":     { "$value": "{color.red.600}" },
-      "info":       { "$value": "{color.blue.500}" }
+      "success": { "$value": "{color.green.600}" },
+      "warning": { "$value": "{color.amber.600}" },
+      "danger": { "$value": "{color.red.600}" },
+      "info": { "$value": "{color.blue.500}" }
     },
 
     "border": {
@@ -381,27 +381,27 @@ Semantic tokens define **how** primitive values are applied. They carry meaning 
     "$type": "dimension",
     "inset": {
       "$description": "Padding inside containers",
-      "xs":  { "$value": "{spacing.1}" },
-      "sm":  { "$value": "{spacing.2}" },
-      "md":  { "$value": "{spacing.4}" },
-      "lg":  { "$value": "{spacing.6}" },
-      "xl":  { "$value": "{spacing.8}" },
+      "xs": { "$value": "{spacing.1}" },
+      "sm": { "$value": "{spacing.2}" },
+      "md": { "$value": "{spacing.4}" },
+      "lg": { "$value": "{spacing.6}" },
+      "xl": { "$value": "{spacing.8}" },
       "2xl": { "$value": "{spacing.12}" }
     },
     "stack": {
       "$description": "Vertical spacing between stacked elements",
-      "xs":  { "$value": "{spacing.1}" },
-      "sm":  { "$value": "{spacing.2}" },
-      "md":  { "$value": "{spacing.4}" },
-      "lg":  { "$value": "{spacing.6}" },
-      "xl":  { "$value": "{spacing.10}" }
+      "xs": { "$value": "{spacing.1}" },
+      "sm": { "$value": "{spacing.2}" },
+      "md": { "$value": "{spacing.4}" },
+      "lg": { "$value": "{spacing.6}" },
+      "xl": { "$value": "{spacing.10}" }
     },
     "inline": {
       "$description": "Horizontal spacing between inline elements",
-      "xs":  { "$value": "{spacing.1}" },
-      "sm":  { "$value": "{spacing.2}" },
-      "md":  { "$value": "{spacing.3}" },
-      "lg":  { "$value": "{spacing.4}" }
+      "xs": { "$value": "{spacing.1}" },
+      "sm": { "$value": "{spacing.2}" },
+      "md": { "$value": "{spacing.3}" },
+      "lg": { "$value": "{spacing.4}" }
     }
   }
 }
@@ -638,18 +638,18 @@ We use a modified **CTI (Category-Type-Item)** naming convention adapted for DTC
 
 **Examples**:
 
-| Token Path | CSS Custom Property | Purpose |
-|---|---|---|
-| `color.surface.primary` | `--color-surface-primary` | Primary background surface |
-| `color.text.secondary` | `--color-text-secondary` | Secondary text color |
+| Token Path                        | CSS Custom Property                 | Purpose                     |
+| --------------------------------- | ----------------------------------- | --------------------------- |
+| `color.surface.primary`           | `--color-surface-primary`           | Primary background surface  |
+| `color.text.secondary`            | `--color-text-secondary`            | Secondary text color        |
 | `color.interactive.primary-hover` | `--color-interactive-primary-hover` | Hovered interactive element |
-| `color.feedback.danger` | `--color-feedback-danger` | Danger/error state |
-| `space.inset.md` | `--space-inset-md` | Medium padding |
-| `space.stack.lg` | `--space-stack-lg` | Large vertical gap |
-| `type.heading.2` | `--type-heading-2-*` | H2 typography composite |
-| `button.primary.bg` | `--button-primary-bg` | Button background |
-| `button.primary.bg-hover` | `--button-primary-bg-hover` | Button hover background |
-| `card.border-radius` | `--card-border-radius` | Card border radius |
+| `color.feedback.danger`           | `--color-feedback-danger`           | Danger/error state          |
+| `space.inset.md`                  | `--space-inset-md`                  | Medium padding              |
+| `space.stack.lg`                  | `--space-stack-lg`                  | Large vertical gap          |
+| `type.heading.2`                  | `--type-heading-2-*`                | H2 typography composite     |
+| `button.primary.bg`               | `--button-primary-bg`               | Button background           |
+| `button.primary.bg-hover`         | `--button-primary-bg-hover`         | Button hover background     |
+| `card.border-radius`              | `--card-border-radius`              | Card border radius          |
 
 ### Naming Rules
 
@@ -668,8 +668,8 @@ All generated CSS custom properties carry a configurable namespace prefix to avo
 ```css
 /* Default namespace: hds (Healthcare Design System) */
 :root {
-  --hds-color-surface-primary: oklch(1.00 0 0);
-  --hds-color-text-primary: oklch(0.20 0.010 240);
+  --hds-color-surface-primary: oklch(1 0 0);
+  --hds-color-text-primary: oklch(0.2 0.01 240);
   --hds-space-inset-md: 1rem;
 }
 
@@ -721,75 +721,77 @@ tokens/*.tokens.json          Source token files (DTCG 2025.10 format)
 
 ```javascript
 // terrazzo.config.js
-import { defineConfig } from "@terrazzo/cli";
-import pluginCSS from "@terrazzo/plugin-css";
-import pluginTS from "@terrazzo/plugin-ts";
-import pluginJSON from "@terrazzo/plugin-json";
+import { defineConfig } from '@terrazzo/cli';
+import pluginCSS from '@terrazzo/plugin-css';
+import pluginTS from '@terrazzo/plugin-ts';
+import pluginJSON from '@terrazzo/plugin-json';
 
 export default defineConfig({
   tokens: [
-    "tokens/primitive/**/*.tokens.json",
-    "tokens/semantic/**/*.tokens.json",
-    "tokens/component/**/*.tokens.json",
+    'tokens/primitive/**/*.tokens.json',
+    'tokens/semantic/**/*.tokens.json',
+    'tokens/component/**/*.tokens.json',
   ],
-  outDir: "dist/",
+  outDir: 'dist/',
   plugins: [
     pluginCSS({
-      filename: "tokens.css",
+      filename: 'tokens.css',
       // Configurable namespace prefix
-      variableName: (id) => `--hds-${id.replace(/\./g, "-")}`,
+      variableName: (id) => `--hds-${id.replace(/\./g, '-')}`,
       // Base selector for default token values
-      baseSelector: ":root",
+      baseSelector: ':root',
       // Enable color-scheme property
-      baseScheme: "light dark",
+      baseScheme: 'light dark',
       // OKLCH with automatic sRGB fallback
       colorDepth: 36,
       // Mode-to-selector mapping for theming
       modeSelectors: [
         {
-          mode: "light",
-          selectors: [
-            '@media (prefers-color-scheme: light)',
-            '[data-theme="light"]',
-          ],
-          scheme: "light",
+          mode: 'light',
+          selectors: ['@media (prefers-color-scheme: light)', '[data-theme="light"]'],
+          scheme: 'light',
         },
         {
-          mode: "dark",
-          selectors: [
-            '@media (prefers-color-scheme: dark)',
-            '[data-theme="dark"]',
-          ],
-          scheme: "dark",
+          mode: 'dark',
+          selectors: ['@media (prefers-color-scheme: dark)', '[data-theme="dark"]'],
+          scheme: 'dark',
         },
         {
-          mode: "high-contrast-light",
+          mode: 'high-contrast-light',
           selectors: [
             '@media (prefers-contrast: more) and (prefers-color-scheme: light)',
             '[data-theme="high-contrast-light"]',
           ],
-          scheme: "light",
+          scheme: 'light',
         },
         {
-          mode: "high-contrast-dark",
+          mode: 'high-contrast-dark',
           selectors: [
             '@media (prefers-contrast: more) and (prefers-color-scheme: dark)',
             '[data-theme="high-contrast-dark"]',
           ],
-          scheme: "dark",
+          scheme: 'dark',
         },
       ],
       // Exclude primitives from CSS output (private)
-      exclude: ["color.blue.*", "color.neutral.*", "color.red.*",
-                "color.green.*", "color.amber.*", "spacing.*",
-                "font-family.*", "font-weight.*", "font-size.*",
-                "line-height.*"],
+      exclude: [
+        'color.blue.*',
+        'color.neutral.*',
+        'color.red.*',
+        'color.green.*',
+        'color.amber.*',
+        'spacing.*',
+        'font-family.*',
+        'font-weight.*',
+        'font-size.*',
+        'line-height.*',
+      ],
     }),
     pluginTS({
-      filename: "tokens.d.ts",
+      filename: 'tokens.d.ts',
     }),
     pluginJSON({
-      filename: "tokens.json",
+      filename: 'tokens.json',
     }),
   ],
 });
@@ -804,22 +806,22 @@ export default defineConfig({
   color-scheme: light dark;
 
   /* Semantic: Surface */
-  --hds-color-surface-primary: oklch(1.00 0 0);
+  --hds-color-surface-primary: oklch(1 0 0);
   --hds-color-surface-secondary: oklch(0.97 0.002 240);
-  --hds-color-surface-elevated: oklch(1.00 0 0);
+  --hds-color-surface-elevated: oklch(1 0 0);
 
   /* Semantic: Text */
-  --hds-color-text-primary: oklch(0.20 0.010 240);
-  --hds-color-text-secondary: oklch(0.42 0.010 240);
-  --hds-color-text-disabled: oklch(0.62 0.010 240);
+  --hds-color-text-primary: oklch(0.2 0.01 240);
+  --hds-color-text-secondary: oklch(0.42 0.01 240);
+  --hds-color-text-disabled: oklch(0.62 0.01 240);
 
   /* Semantic: Interactive */
-  --hds-color-interactive-primary: oklch(0.50 0.172 240);
+  --hds-color-interactive-primary: oklch(0.5 0.172 240);
   --hds-color-interactive-primary-hover: oklch(0.42 0.158 240);
 
   /* Semantic: Feedback */
-  --hds-color-feedback-success: oklch(0.52 0.160 145);
-  --hds-color-feedback-danger: oklch(0.50 0.200 25);
+  --hds-color-feedback-success: oklch(0.52 0.16 145);
+  --hds-color-feedback-danger: oklch(0.5 0.2 25);
 
   /* Semantic: Border */
   --hds-color-border-default: oklch(0.87 0.006 240);
@@ -834,7 +836,7 @@ export default defineConfig({
   /* Component: Button */
   --hds-button-primary-bg: var(--hds-color-interactive-primary);
   --hds-button-primary-bg-hover: var(--hds-color-interactive-primary-hover);
-  --hds-button-primary-text: oklch(1.00 0 0);
+  --hds-button-primary-text: oklch(1 0 0);
   --hds-button-primary-border-radius: 0.5rem;
 
   /* Component: Card */
@@ -847,41 +849,41 @@ export default defineConfig({
 /* Dark mode */
 @media (prefers-color-scheme: dark) {
   :root {
-    --hds-color-surface-primary: oklch(0.20 0.010 240);
-    --hds-color-surface-secondary: oklch(0.26 0.010 240);
+    --hds-color-surface-primary: oklch(0.2 0.01 240);
+    --hds-color-surface-secondary: oklch(0.26 0.01 240);
     --hds-color-text-primary: oklch(0.97 0.002 240);
     --hds-color-text-secondary: oklch(0.78 0.008 240);
     --hds-color-interactive-primary: oklch(0.68 0.142 240);
-    --hds-color-border-default: oklch(0.34 0.010 240);
+    --hds-color-border-default: oklch(0.34 0.01 240);
   }
 }
 
-[data-theme="dark"] {
-  --hds-color-surface-primary: oklch(0.20 0.010 240);
-  --hds-color-surface-secondary: oklch(0.26 0.010 240);
+[data-theme='dark'] {
+  --hds-color-surface-primary: oklch(0.2 0.01 240);
+  --hds-color-surface-secondary: oklch(0.26 0.01 240);
   --hds-color-text-primary: oklch(0.97 0.002 240);
   --hds-color-text-secondary: oklch(0.78 0.008 240);
   --hds-color-interactive-primary: oklch(0.68 0.142 240);
-  --hds-color-border-default: oklch(0.34 0.010 240);
+  --hds-color-border-default: oklch(0.34 0.01 240);
 }
 
 /* High contrast light */
 @media (prefers-contrast: more) and (prefers-color-scheme: light) {
   :root {
-    --hds-color-surface-primary: oklch(1.00 0 0);
-    --hds-color-text-primary: oklch(0.00 0 0);
-    --hds-color-border-default: oklch(0.20 0.010 240);
-    --hds-color-border-strong: oklch(0.00 0 0);
+    --hds-color-surface-primary: oklch(1 0 0);
+    --hds-color-text-primary: oklch(0 0 0);
+    --hds-color-border-default: oklch(0.2 0.01 240);
+    --hds-color-border-strong: oklch(0 0 0);
   }
 }
 
 /* High contrast dark */
 @media (prefers-contrast: more) and (prefers-color-scheme: dark) {
   :root {
-    --hds-color-surface-primary: oklch(0.00 0 0);
-    --hds-color-text-primary: oklch(1.00 0 0);
+    --hds-color-surface-primary: oklch(0 0 0);
+    --hds-color-text-primary: oklch(1 0 0);
     --hds-color-border-default: oklch(0.87 0.006 240);
-    --hds-color-border-strong: oklch(1.00 0 0);
+    --hds-color-border-strong: oklch(1 0 0);
   }
 }
 ```
@@ -940,17 +942,17 @@ Each layer can be overridden by the next. System preference is the default, user
 ```typescript
 // src/theme/theme-manager.ts
 
-export type ThemeMode = "light" | "dark" | "system";
+export type ThemeMode = 'light' | 'dark' | 'system';
 
 export class ThemeManager {
-  private static STORAGE_KEY = "hds-theme-preference";
-  private mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
+  private static STORAGE_KEY = 'hds-theme-preference';
+  private mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
 
   /** Get the resolved theme (never "system") */
-  get resolvedTheme(): "light" | "dark" {
+  get resolvedTheme(): 'light' | 'dark' {
     const preference = this.preference;
-    if (preference === "system") {
-      return this.mediaQuery.matches ? "dark" : "light";
+    if (preference === 'system') {
+      return this.mediaQuery.matches ? 'dark' : 'light';
     }
     return preference;
   }
@@ -958,32 +960,32 @@ export class ThemeManager {
   /** Get the user's explicit preference */
   get preference(): ThemeMode {
     const stored = localStorage.getItem(ThemeManager.STORAGE_KEY);
-    if (stored === "light" || stored === "dark") return stored;
-    return "system";
+    if (stored === 'light' || stored === 'dark') return stored;
+    return 'system';
   }
 
   /** Set theme preference */
   setTheme(mode: ThemeMode): void {
-    if (mode === "system") {
+    if (mode === 'system') {
       localStorage.removeItem(ThemeManager.STORAGE_KEY);
-      document.documentElement.removeAttribute("data-theme");
+      document.documentElement.removeAttribute('data-theme');
     } else {
       localStorage.setItem(ThemeManager.STORAGE_KEY, mode);
-      document.documentElement.setAttribute("data-theme", mode);
+      document.documentElement.setAttribute('data-theme', mode);
     }
     // Dispatch event for Lit components to react
     window.dispatchEvent(
-      new CustomEvent("hds-theme-change", {
+      new CustomEvent('hds-theme-change', {
         detail: { mode, resolved: this.resolvedTheme },
-      })
+      }),
     );
   }
 
   /** Listen for system preference changes */
-  observe(callback: (resolved: "light" | "dark") => void): () => void {
+  observe(callback: (resolved: 'light' | 'dark') => void): () => void {
     const handler = () => callback(this.resolvedTheme);
-    this.mediaQuery.addEventListener("change", handler);
-    return () => this.mediaQuery.removeEventListener("change", handler);
+    this.mediaQuery.addEventListener('change', handler);
+    return () => this.mediaQuery.removeEventListener('change', handler);
   }
 }
 ```
@@ -995,7 +997,7 @@ A critical UX concern: if the page loads with light theme and then switches to d
 ```html
 <!-- Inline in <head> BEFORE any stylesheets -->
 <script>
-  (function() {
+  (function () {
     var stored = localStorage.getItem('hds-theme-preference');
     if (stored === 'dark' || stored === 'light') {
       document.documentElement.setAttribute('data-theme', stored);
@@ -1058,8 +1060,9 @@ The CSS `light-dark()` function (87% browser support as of early 2026) provides 
 :host {
   /* Automatically switches based on color-scheme */
   background: light-dark(
-    var(--hds-color-surface-primary),  /* light value */
-    var(--hds-color-surface-primary)   /* dark value -- same var, different resolved value */
+    var(--hds-color-surface-primary),
+    /* light value */ var(--hds-color-surface-primary)
+      /* dark value -- same var, different resolved value */
   );
 }
 ```
@@ -1086,10 +1089,10 @@ Each Lit component follows this CSS structure:
 
 ```typescript
 // src/components/hds-button/hds-button.ts
-import { LitElement, html, css } from "lit";
-import { customElement, property } from "lit/decorators.js";
+import { LitElement, html, css } from 'lit';
+import { customElement, property } from 'lit/decorators.js';
 
-@customElement("hds-button")
+@customElement('hds-button')
 export class HdsButton extends LitElement {
   static styles = css`
     /* ============================================
@@ -1101,7 +1104,10 @@ export class HdsButton extends LitElement {
     :host {
       /* Explicit declaration of all customizable properties */
       --_bg: var(--hds-button-primary-bg, var(--hds-color-interactive-primary, #2563eb));
-      --_bg-hover: var(--hds-button-primary-bg-hover, var(--hds-color-interactive-primary-hover, #1d4ed8));
+      --_bg-hover: var(
+        --hds-button-primary-bg-hover,
+        var(--hds-color-interactive-primary-hover, #1d4ed8)
+      );
       --_text: var(--hds-button-primary-text, var(--hds-color-text-on-primary, #fff));
       --_radius: var(--hds-button-primary-border-radius, var(--hds-radius-md, 0.5rem));
       --_padding-x: var(--hds-button-primary-padding-x, var(--hds-space-inset-md, 1rem));
@@ -1171,7 +1177,7 @@ export class HdsButton extends LitElement {
     }
   `;
 
-  @property({ type: String }) variant: "primary" | "secondary" | "danger" = "primary";
+  @property({ type: String }) variant: 'primary' | 'secondary' | 'danger' = 'primary';
   @property({ type: Boolean }) disabled = false;
 
   render() {
@@ -1231,7 +1237,7 @@ Common styles are extracted into reusable modules to avoid duplication:
 
 ```typescript
 // src/styles/shared/focus.styles.ts
-import { css } from "lit";
+import { css } from 'lit';
 
 export const focusStyles = css`
   :focus-visible {
@@ -1293,8 +1299,8 @@ For the light DOM (global document), the consuming application can organize our 
 /* Consuming application's global CSS */
 @layer tokens, theme, utilities;
 
-@import url("@hds/tokens/tokens.css") layer(tokens);
-@import url("@hds/tokens/theme-overrides.css") layer(theme);
+@import url('@hds/tokens/tokens.css') layer(tokens);
+@import url('@hds/tokens/theme-overrides.css') layer(theme);
 ```
 
 ---
@@ -1305,17 +1311,17 @@ For the light DOM (global document), the consuming application can organize our 
 
 We use a **Major Third** scale (ratio: 1.250) anchored at 1rem (16px). This ratio provides clear visual hierarchy without extreme size jumps -- appropriate for healthcare content where readability is the priority over dramatic display typography.
 
-| Token | Size (rem) | Size (px) | Use Case |
-|---|---|---|---|
-| `font-size.xs` | 0.75 | 12 | Captions, fine print |
-| `font-size.sm` | 0.875 | 14 | Labels, helper text, metadata |
-| `font-size.base` | 1.0 | 16 | Body text, paragraphs |
-| `font-size.lg` | 1.125 | 18 | Lead paragraphs, emphasized body |
-| `font-size.xl` | 1.25 | 20 | H4, subheadings |
-| `font-size.2xl` | 1.5 | 24 | H3 |
-| `font-size.3xl` | 1.875 | 30 | H2 |
-| `font-size.4xl` | 2.25 | 36 | H1 |
-| `font-size.5xl` | 3.0 | 48 | Display headings (hero) |
+| Token            | Size (rem) | Size (px) | Use Case                         |
+| ---------------- | ---------- | --------- | -------------------------------- |
+| `font-size.xs`   | 0.75       | 12        | Captions, fine print             |
+| `font-size.sm`   | 0.875      | 14        | Labels, helper text, metadata    |
+| `font-size.base` | 1.0        | 16        | Body text, paragraphs            |
+| `font-size.lg`   | 1.125      | 18        | Lead paragraphs, emphasized body |
+| `font-size.xl`   | 1.25       | 20        | H4, subheadings                  |
+| `font-size.2xl`  | 1.5        | 24        | H3                               |
+| `font-size.3xl`  | 1.875      | 30        | H2                               |
+| `font-size.4xl`  | 2.25       | 36        | H1                               |
+| `font-size.5xl`  | 3.0        | 48        | Display headings (hero)          |
 
 ### Fluid Typography with Accessibility Guardrails
 
@@ -1348,25 +1354,24 @@ Web fonts loaded via `@font-face` in the document's light DOM are available insi
 
 /* Inter -- Primary UI font */
 @font-face {
-  font-family: "Inter";
-  src: url("/fonts/inter-variable.woff2") format("woff2-variations");
+  font-family: 'Inter';
+  src: url('/fonts/inter-variable.woff2') format('woff2-variations');
   font-weight: 100 900;
   font-display: swap;
-  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC,
-                 U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329,
-                 U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212,
-                 U+2215, U+FEFF, U+FFFD;
+  unicode-range:
+    U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329,
+    U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
 
 /* Inter Latin Extended -- loaded only if needed */
 @font-face {
-  font-family: "Inter";
-  src: url("/fonts/inter-variable-latin-ext.woff2") format("woff2-variations");
+  font-family: 'Inter';
+  src: url('/fonts/inter-variable-latin-ext.woff2') format('woff2-variations');
   font-weight: 100 900;
   font-display: swap;
-  unicode-range: U+0100-02AF, U+0304, U+0308, U+0329, U+1E00-1E9F,
-                 U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0,
-                 U+2113, U+2C60-2C7F, U+A720-A7FF;
+  unicode-range:
+    U+0100-02AF, U+0304, U+0308, U+0329, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0,
+    U+2113, U+2C60-2C7F, U+A720-A7FF;
 }
 ```
 
@@ -1382,20 +1387,19 @@ Web fonts loaded via `@font-face` in the document's light DOM are available insi
 
 5. **Preload critical fonts**:
    ```html
-   <link rel="preload" href="/fonts/inter-variable.woff2"
-         as="font" type="font/woff2" crossorigin>
+   <link rel="preload" href="/fonts/inter-variable.woff2" as="font" type="font/woff2" crossorigin />
    ```
 
 ### Line Height and Readability
 
 Healthcare content demands generous line height for readability:
 
-| Context | Line Height | Rationale |
-|---|---|---|
-| Body text | 1.5 (24px at 16px) | WCAG 1.4.8 recommends 1.5 for body |
-| Headings | 1.25 | Tighter for visual hierarchy |
-| Small text | 1.5 | Maintains readability at smaller sizes |
-| Inputs/Labels | 1.5 | Consistent with body |
+| Context       | Line Height        | Rationale                              |
+| ------------- | ------------------ | -------------------------------------- |
+| Body text     | 1.5 (24px at 16px) | WCAG 1.4.8 recommends 1.5 for body     |
+| Headings      | 1.25               | Tighter for visual hierarchy           |
+| Small text    | 1.5                | Maintains readability at smaller sizes |
+| Inputs/Labels | 1.5                | Consistent with body                   |
 
 WCAG AAA (Success Criterion 1.4.8) specifies: "Line spacing is at least space-and-a-half within paragraphs." Our default `line-height: 1.5` meets this requirement.
 
@@ -1407,24 +1411,24 @@ WCAG AAA (Success Criterion 1.4.8) specifies: "Line spacing is at least space-an
 
 The spacing system uses a **4px base unit** (0.25rem). This creates a predictable, harmonic rhythm:
 
-| Token | Value | Pixels | Common Use |
-|---|---|---|---|
-| `spacing.0` | 0 | 0 | Reset |
-| `spacing.px` | 1px | 1 | Hairline borders |
-| `spacing.0.5` | 0.125rem | 2 | Tight gaps |
-| `spacing.1` | 0.25rem | 4 | Icon spacing |
-| `spacing.1.5` | 0.375rem | 6 | Small insets |
-| `spacing.2` | 0.5rem | 8 | Compact padding |
-| `spacing.3` | 0.75rem | 12 | Default gap |
-| `spacing.4` | 1rem | 16 | Standard padding |
-| `spacing.5` | 1.25rem | 20 | Comfortable padding |
-| `spacing.6` | 1.5rem | 24 | Card padding |
-| `spacing.8` | 2rem | 32 | Section spacing |
-| `spacing.10` | 2.5rem | 40 | Large gaps |
-| `spacing.12` | 3rem | 48 | Section gaps |
-| `spacing.16` | 4rem | 64 | Page section spacing |
-| `spacing.20` | 5rem | 80 | Major section spacing |
-| `spacing.24` | 6rem | 96 | Hero spacing |
+| Token         | Value    | Pixels | Common Use            |
+| ------------- | -------- | ------ | --------------------- |
+| `spacing.0`   | 0        | 0      | Reset                 |
+| `spacing.px`  | 1px      | 1      | Hairline borders      |
+| `spacing.0.5` | 0.125rem | 2      | Tight gaps            |
+| `spacing.1`   | 0.25rem  | 4      | Icon spacing          |
+| `spacing.1.5` | 0.375rem | 6      | Small insets          |
+| `spacing.2`   | 0.5rem   | 8      | Compact padding       |
+| `spacing.3`   | 0.75rem  | 12     | Default gap           |
+| `spacing.4`   | 1rem     | 16     | Standard padding      |
+| `spacing.5`   | 1.25rem  | 20     | Comfortable padding   |
+| `spacing.6`   | 1.5rem   | 24     | Card padding          |
+| `spacing.8`   | 2rem     | 32     | Section spacing       |
+| `spacing.10`  | 2.5rem   | 40     | Large gaps            |
+| `spacing.12`  | 3rem     | 48     | Section gaps          |
+| `spacing.16`  | 4rem     | 64     | Page section spacing  |
+| `spacing.20`  | 5rem     | 80     | Major section spacing |
+| `spacing.24`  | 6rem     | 96     | Hero spacing          |
 
 ### Semantic Spacing Categories
 
@@ -1481,13 +1485,13 @@ static styles = css`
 
 While components use container queries internally, the consuming application (Drupal theme) may still need viewport breakpoints for page layout:
 
-| Token | Value | Use Case |
-|---|---|---|
-| `breakpoint.sm` | 640px | Mobile landscape |
-| `breakpoint.md` | 768px | Tablet portrait |
-| `breakpoint.lg` | 1024px | Tablet landscape / small desktop |
-| `breakpoint.xl` | 1280px | Desktop |
-| `breakpoint.2xl` | 1536px | Large desktop |
+| Token            | Value  | Use Case                         |
+| ---------------- | ------ | -------------------------------- |
+| `breakpoint.sm`  | 640px  | Mobile landscape                 |
+| `breakpoint.md`  | 768px  | Tablet portrait                  |
+| `breakpoint.lg`  | 1024px | Tablet landscape / small desktop |
+| `breakpoint.xl`  | 1280px | Desktop                          |
+| `breakpoint.2xl` | 1536px | Large desktop                    |
 
 These are exposed as CSS custom properties and TypeScript constants, but are primarily for application-level layout, not component internals.
 
@@ -1497,16 +1501,16 @@ These are exposed as CSS custom properties and TypeScript constants, but are pri
 
 ### WCAG Compliance Targets
 
-| Category | Target Level | Rationale |
-|---|---|---|
-| Color contrast (text) | **AAA (7:1)** | Healthcare users include elderly, low-vision patients |
-| Color contrast (large text) | **AAA (4.5:1)** | Enhanced readability for all heading sizes |
-| Color contrast (non-text) | **AA (3:1)** | UI controls, borders, icons |
-| Focus indicators | **AA (3:1)** against adjacent colors | Keyboard navigation must be visible |
-| Text resizing | **200% zoom** without loss | WCAG 1.4.4 |
-| Text spacing | **Adjustable** | WCAG 1.4.12 |
-| Reduced motion | **Respected** | WCAG 2.3.3 |
-| Target size | **44x44px minimum** | WCAG 2.5.8 (enhanced) |
+| Category                    | Target Level                         | Rationale                                             |
+| --------------------------- | ------------------------------------ | ----------------------------------------------------- |
+| Color contrast (text)       | **AAA (7:1)**                        | Healthcare users include elderly, low-vision patients |
+| Color contrast (large text) | **AAA (4.5:1)**                      | Enhanced readability for all heading sizes            |
+| Color contrast (non-text)   | **AA (3:1)**                         | UI controls, borders, icons                           |
+| Focus indicators            | **AA (3:1)** against adjacent colors | Keyboard navigation must be visible                   |
+| Text resizing               | **200% zoom** without loss           | WCAG 1.4.4                                            |
+| Text spacing                | **Adjustable**                       | WCAG 1.4.12                                           |
+| Reduced motion              | **Respected**                        | WCAG 2.3.3                                            |
+| Target size                 | **44x44px minimum**                  | WCAG 2.5.8 (enhanced)                                 |
 
 ### Color Contrast Enforcement
 
@@ -1617,7 +1621,11 @@ button:focus-visible {
 WCAG 2.5.8 (Target Size Enhanced, Level AAA) requires 44x44px minimum for touch targets. Every interactive component enforces this:
 
 ```css
-button, a, input, select, textarea {
+button,
+a,
+input,
+select,
+textarea {
   min-height: 44px;
   min-width: 44px;
 }
@@ -1631,7 +1639,7 @@ button, a, input, select, textarea {
 }
 
 .icon-button::before {
-  content: "";
+  content: '';
   position: absolute;
   /* Touch target extends beyond visual bounds */
   inset: -10px;
@@ -1695,8 +1703,8 @@ Lit components generate a Custom Elements Manifest (`custom-elements.json`) that
 
 ```javascript
 // .storybook/preview.ts
-import { setCustomElementsManifest } from "@storybook/web-components";
-import manifest from "../custom-elements.json";
+import { setCustomElementsManifest } from '@storybook/web-components';
+import manifest from '../custom-elements.json';
 
 setCustomElementsManifest(manifest);
 
@@ -1709,6 +1717,7 @@ export const parameters = {
 ```
 
 Generate the manifest with:
+
 ```bash
 npx @custom-elements-manifest/analyzer analyze --litelement
 ```
@@ -1727,28 +1736,20 @@ import { DesignTokenDocBlock } from "storybook-design-token";
 # Color Tokens
 
 ## Surface Colors
-<DesignTokenDocBlock
-  categoryName="Surface Colors"
-  viewType="card"
-/>
+
+<DesignTokenDocBlock categoryName="Surface Colors" viewType="card" />
 
 ## Text Colors
-<DesignTokenDocBlock
-  categoryName="Text Colors"
-  viewType="table"
-/>
+
+<DesignTokenDocBlock categoryName="Text Colors" viewType="table" />
 
 ## Interactive Colors
-<DesignTokenDocBlock
-  categoryName="Interactive Colors"
-  viewType="card"
-/>
+
+<DesignTokenDocBlock categoryName="Interactive Colors" viewType="card" />
 
 ## Feedback Colors
-<DesignTokenDocBlock
-  categoryName="Feedback Colors"
-  viewType="card"
-/>
+
+<DesignTokenDocBlock categoryName="Feedback Colors" viewType="card" />
 ```
 
 #### Theme Switcher in Storybook
@@ -1759,16 +1760,16 @@ A custom toolbar addon allows designers and developers to preview components in 
 // .storybook/preview.ts
 export const globalTypes = {
   theme: {
-    name: "Theme",
-    description: "Global theme for components",
-    defaultValue: "light",
+    name: 'Theme',
+    description: 'Global theme for components',
+    defaultValue: 'light',
     toolbar: {
-      icon: "circlehollow",
+      icon: 'circlehollow',
       items: [
-        { value: "light", title: "Light", icon: "sun" },
-        { value: "dark", title: "Dark", icon: "moon" },
-        { value: "high-contrast-light", title: "High Contrast Light", icon: "contrast" },
-        { value: "high-contrast-dark", title: "High Contrast Dark", icon: "contrast" },
+        { value: 'light', title: 'Light', icon: 'sun' },
+        { value: 'dark', title: 'Dark', icon: 'moon' },
+        { value: 'high-contrast-light', title: 'High Contrast Light', icon: 'contrast' },
+        { value: 'high-contrast-dark', title: 'High Contrast Dark', icon: 'contrast' },
       ],
       showName: true,
     },
@@ -1779,7 +1780,7 @@ export const globalTypes = {
 export const decorators = [
   (story: () => unknown, context: { globals: { theme: string } }) => {
     const theme = context.globals.theme;
-    document.documentElement.setAttribute("data-theme", theme);
+    document.documentElement.setAttribute('data-theme', theme);
     return story();
   },
 ];
@@ -1791,21 +1792,21 @@ Every component story includes an accessibility check panel via the `@storybook/
 
 ```typescript
 // src/components/hds-button/hds-button.stories.ts
-import type { Meta, StoryObj } from "@storybook/web-components";
-import { html } from "lit";
-import "./hds-button.js";
+import type { Meta, StoryObj } from '@storybook/web-components';
+import { html } from 'lit';
+import './hds-button.js';
 
 const meta: Meta = {
-  title: "Components/Button",
-  component: "hds-button",
-  tags: ["autodocs"],
+  title: 'Components/Button',
+  component: 'hds-button',
+  tags: ['autodocs'],
   argTypes: {
     variant: {
-      control: "select",
-      options: ["primary", "secondary", "danger"],
+      control: 'select',
+      options: ['primary', 'secondary', 'danger'],
     },
     disabled: {
-      control: "boolean",
+      control: 'boolean',
     },
   },
   parameters: {
@@ -1813,7 +1814,7 @@ const meta: Meta = {
       config: {
         rules: [
           // Enforce AAA contrast for healthcare
-          { id: "color-contrast-enhanced", enabled: true },
+          { id: 'color-contrast-enhanced', enabled: true },
         ],
       },
     },
@@ -1824,7 +1825,7 @@ export default meta;
 type Story = StoryObj;
 
 export const Primary: Story = {
-  args: { variant: "primary" },
+  args: { variant: 'primary' },
   render: (args) => html`
     <hds-button variant=${args.variant} ?disabled=${args.disabled}>
       Schedule Appointment
@@ -1880,8 +1881,8 @@ The Drupal theme can override any semantic or component token by declaring CSS c
 /* mytheme.css */
 :root {
   /* Override primary brand color for this healthcare org */
-  --hds-color-interactive-primary: oklch(0.48 0.14 160);  /* Teal */
-  --hds-color-interactive-primary-hover: oklch(0.40 0.14 160);
+  --hds-color-interactive-primary: oklch(0.48 0.14 160); /* Teal */
+  --hds-color-interactive-primary-hover: oklch(0.4 0.14 160);
 
   /* Override card styling */
   --hds-card-border-radius: 1rem;
@@ -1966,59 +1967,61 @@ slots:
 
 ### Phase 1: Foundation (Weeks 1-2)
 
-| Task | Deliverable |
-|---|---|
-| Set up token file structure | `tokens/primitive/`, `tokens/semantic/`, `tokens/component/` |
-| Configure Terrazzo build pipeline | `terrazzo.config.js`, npm scripts |
-| Define primitive color palette (OKLCH) | Color tokens with AAA contrast verification |
-| Define primitive spacing scale | 4px grid system |
-| Define primitive type scale | Major Third ratio |
-| Generate CSS custom properties | `dist/tokens.css` with light/dark/high-contrast modes |
-| Set up Storybook with token documentation | Token pages, theme switcher |
+| Task                                      | Deliverable                                                  |
+| ----------------------------------------- | ------------------------------------------------------------ |
+| Set up token file structure               | `tokens/primitive/`, `tokens/semantic/`, `tokens/component/` |
+| Configure Terrazzo build pipeline         | `terrazzo.config.js`, npm scripts                            |
+| Define primitive color palette (OKLCH)    | Color tokens with AAA contrast verification                  |
+| Define primitive spacing scale            | 4px grid system                                              |
+| Define primitive type scale               | Major Third ratio                                            |
+| Generate CSS custom properties            | `dist/tokens.css` with light/dark/high-contrast modes        |
+| Set up Storybook with token documentation | Token pages, theme switcher                                  |
 
 ### Phase 2: Core Tokens (Weeks 2-3)
 
-| Task | Deliverable |
-|---|---|
-| Define all semantic color tokens | Surface, text, interactive, feedback, border |
-| Define semantic spacing tokens | Inset, stack, inline categories |
-| Define semantic typography tokens | Heading, body, label composites |
-| Build contrast checking plugin | Automated AAA verification in build |
-| Set up font loading | Variable font, preload, `@font-face` declarations |
-| Document all tokens in Storybook | MDX pages with card/table views |
+| Task                              | Deliverable                                       |
+| --------------------------------- | ------------------------------------------------- |
+| Define all semantic color tokens  | Surface, text, interactive, feedback, border      |
+| Define semantic spacing tokens    | Inset, stack, inline categories                   |
+| Define semantic typography tokens | Heading, body, label composites                   |
+| Build contrast checking plugin    | Automated AAA verification in build               |
+| Set up font loading               | Variable font, preload, `@font-face` declarations |
+| Document all tokens in Storybook  | MDX pages with card/table views                   |
 
 ### Phase 3: Component Tokens (Weeks 3-4)
 
-| Task | Deliverable |
-|---|---|
-| Define button component tokens | All variants (primary, secondary, danger) |
-| Define card component tokens | Surface, border, spacing |
-| Define input component tokens | Field, label, error, helper text |
-| Define alert component tokens | Info, success, warning, error |
-| Verify fallback chains work | Component -> semantic -> hardcoded |
-| Drupal theme integration proof-of-concept | Token override from Drupal CSS |
+| Task                                      | Deliverable                               |
+| ----------------------------------------- | ----------------------------------------- |
+| Define button component tokens            | All variants (primary, secondary, danger) |
+| Define card component tokens              | Surface, border, spacing                  |
+| Define input component tokens             | Field, label, error, helper text          |
+| Define alert component tokens             | Info, success, warning, error             |
+| Verify fallback chains work               | Component -> semantic -> hardcoded        |
+| Drupal theme integration proof-of-concept | Token override from Drupal CSS            |
 
 ### Phase 4: Polish & Documentation (Week 4)
 
-| Task | Deliverable |
-|---|---|
-| Full accessibility audit | WCAG AAA compliance report |
-| Forced colors mode testing | Windows High Contrast Mode verification |
-| Reduced motion testing | All transitions have `prefers-reduced-motion` |
-| Storybook a11y addon configuration | AAA rules enabled |
-| Token versioning setup | Semver, CHANGELOG, npm package |
-| Drupal SDC wrapper templates | Twig templates for all components |
+| Task                               | Deliverable                                   |
+| ---------------------------------- | --------------------------------------------- |
+| Full accessibility audit           | WCAG AAA compliance report                    |
+| Forced colors mode testing         | Windows High Contrast Mode verification       |
+| Reduced motion testing             | All transitions have `prefers-reduced-motion` |
+| Storybook a11y addon configuration | AAA rules enabled                             |
+| Token versioning setup             | Semver, CHANGELOG, npm package                |
+| Drupal SDC wrapper templates       | Twig templates for all components             |
 
 ---
 
 ## References & Sources
 
 ### Specifications
+
 - [W3C Design Tokens Specification 2025.10](https://www.w3.org/community/design-tokens/2025/10/28/design-tokens-specification-reaches-first-stable-version/)
 - [Design Tokens Community Group](https://www.designtokens.org/)
 - [WCAG 2.1 Contrast (Enhanced) - Understanding SC 1.4.6](https://www.w3.org/WAI/WCAG21/Understanding/contrast-enhanced.html)
 
 ### Tooling
+
 - [Terrazzo -- DTCG Token Build Tool](https://terrazzo.app/)
 - [Terrazzo Modes + Theming](https://terrazzo.app/docs/guides/modes/)
 - [Terrazzo CSS Integration](https://terrazzo.app/docs/integrations/css/)
@@ -2026,6 +2029,7 @@ slots:
 - [Style Dictionary Configuration](https://styledictionary.com/reference/config/)
 
 ### Web Components & Lit
+
 - [Lit Component Styles](https://lit.dev/docs/components/styles/)
 - [Lit Cheat Sheet](https://lit.dev/articles/lit-cheat-sheet/)
 - [Web Components: Working With Shadow DOM (Smashing Magazine)](https://www.smashingmagazine.com/2025/07/web-components-working-with-shadow-dom/)
@@ -2033,6 +2037,7 @@ slots:
 - [CSS Container Queries in Web Components (Cory Rylan)](https://coryrylan.com/blog/css-container-queries-in-web-components)
 
 ### Design Token Architecture
+
 - [Design Token-Based UI Architecture (Martin Fowler)](https://martinfowler.com/articles/design-token-based-ui-architecture.html)
 - [Design Tokens -- VA.gov Design System](https://design.va.gov/foundation/design-tokens)
 - [Naming Best Practices (Smashing Magazine)](https://www.smashingmagazine.com/2024/05/naming-best-practices/)
@@ -2040,23 +2045,27 @@ slots:
 - [Design Tokens Explained (Contentful)](https://www.contentful.com/blog/design-token-system/)
 
 ### Theming & Dark Mode
+
 - [CSS light-dark() function (MDN)](https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Values/color_value/light-dark)
 - [Dark Mode 2025: CSS light-dark() Guide](https://medium.com/front-end-weekly/forget-javascript-achieve-dark-mode-effortlessly-with-brand-new-css-function-light-dark-2024-94981c61756b)
 - [Container Style Queries & Scoped CSS Variables 2025](https://johal.in/container-style-queries-scoped-css-variables-2025/)
 
 ### Typography & Accessibility
+
 - [Fluid Type Scale with CSS Clamp (Aleksandr Hovhannisyan)](https://www.aleksandrhovhannisyan.com/blog/fluid-type-scale-with-css-clamp/)
 - [Addressing Accessibility Concerns with Fluid Type (Smashing Magazine)](https://www.smashingmagazine.com/2023/11/addressing-accessibility-concerns-fluid-type/)
 - [Color Contrast Accessibility: WCAG 2025 Guide](https://www.allaccessible.org/blog/color-contrast-accessibility-wcag-guide-2025)
 - [CSS Media Features for Accessibility](https://a11y-blog.dev/en/articles/css-media-features-for-a11y/)
 
 ### Drupal Integration
+
 - [Declarative Shadow DOM and the Future of Drupal Theming](https://john.albin.net/presentations/2025-11-18/declarative-shadow-dom-and-future-drupal-theming)
 - [Drupal Meets Design Systems (Enterprise UI Consistency)](https://medium.com/@drupart-digital/drupal-meets-design-systems-a-new-era-in-enterprise-ui-consistency-86b4cc4a0b8a)
 - [Web Components Drupal Module](https://www.drupal.org/project/webcomponents)
 - [Custom Elements Drupal Module](https://www.drupal.org/project/custom_elements)
 
 ### Storybook
+
 - [Storybook Design Token Addon](https://storybook.js.org/addons/storybook-design-token)
 - [Documenting Web Components with Storybook (James Ives)](https://jamesiv.es/blog/frontend/javascript/2025/02/19/documenting-web-components-with-storybook/)
 - [Custom Elements Manifest (Open WC)](https://custom-elements-manifest.open-wc.org/blog/intro/)

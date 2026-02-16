@@ -1,5 +1,5 @@
-import { cn } from "@/lib/utils";
-import type { ComponentValidation, FieldStatus, SectionValidation } from "@/lib/cem-validator";
+import { cn } from '@/lib/utils';
+import type { ComponentValidation, FieldStatus, SectionValidation } from '@/lib/cem-validator';
 
 interface CemMatrixProps {
   validation: ComponentValidation;
@@ -9,10 +9,10 @@ function StatusDot({ status }: { status: FieldStatus }) {
   return (
     <div
       className={cn(
-        "w-3 h-3 rounded-full",
-        status === "complete" && "bg-emerald-400",
-        status === "partial" && "bg-amber-400",
-        status === "missing" && "bg-red-400"
+        'w-3 h-3 rounded-full',
+        status === 'complete' && 'bg-emerald-400',
+        status === 'partial' && 'bg-amber-400',
+        status === 'missing' && 'bg-red-400',
       )}
       title={status}
     />
@@ -44,12 +44,16 @@ function SectionBlock({ section }: { section: SectionValidation }) {
     <div>
       <div className="flex items-center justify-between mb-2">
         <h4 className="text-sm font-medium">{section.section}</h4>
-        <span className={cn(
-          "text-xs font-mono tabular-nums",
-          section.completeness >= 90 ? "text-emerald-400" :
-          section.completeness >= 70 ? "text-amber-400" :
-          "text-red-400"
-        )}>
+        <span
+          className={cn(
+            'text-xs font-mono tabular-nums',
+            section.completeness >= 90
+              ? 'text-emerald-400'
+              : section.completeness >= 70
+                ? 'text-amber-400'
+                : 'text-red-400',
+          )}
+        >
           {section.completeness}%
         </span>
       </div>

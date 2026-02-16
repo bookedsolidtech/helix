@@ -1,0 +1,832 @@
+{/* BestPractices.mdx — HELIX Drupal Integration Best Practices */}
+
+import { Meta } from '@storybook/addon-docs/blocks';
+
+<Meta title="Drupal/Best Practices" />
+
+<style>
+  {`
+  .drupal-best-practices {
+    max-width: 960px;
+    margin: 0 auto;
+    font-family: var(--hx-font-family-sans, 'Inter', sans-serif);
+    color: var(--hx-color-neutral-800, #1E293B);
+    line-height: var(--hx-line-height-normal, 1.5);
+  }
+
+  .drupal-best-practices h2 {
+    font-size: 1.75rem !important;
+    font-weight: 700 !important;
+    color: var(--hx-color-neutral-900, #0F172A) !important;
+    margin: 2rem 0 1rem 0 !important;
+    padding-bottom: 0.5rem !important;
+    border-bottom: 2px solid var(--hx-color-neutral-200, #E2E8F0) !important;
+  }
+
+  .drupal-best-practices h3 {
+    font-size: 1.25rem !important;
+    font-weight: 600 !important;
+    color: var(--hx-color-neutral-800, #1E293B) !important;
+    margin: 1.5rem 0 0.75rem 0 !important;
+  }
+
+  .drupal-best-practices p {
+    font-size: 1rem !important;
+    line-height: 1.7 !important;
+    margin: 0 0 1rem 0 !important;
+    color: var(--hx-color-neutral-600, #475569) !important;
+  }
+
+  .drupal-best-practices code {
+    font-family: var(--hx-font-family-mono, monospace) !important;
+    font-size: 0.875em !important;
+    padding: 0.125rem 0.375rem !important;
+    background: var(--hx-color-neutral-100, #F1F5F9) !important;
+    border-radius: 3px !important;
+    color: var(--hx-color-primary-700, #1E40AF) !important;
+  }
+
+  .drupal-best-practices .hero-banner {
+    background: linear-gradient(135deg, var(--hx-color-primary-50, #EFF6FF) 0%, var(--hx-color-neutral-50, #F8FAFC) 100%) !important;
+    border-radius: var(--hx-border-radius-xl, 0.75rem) !important;
+    padding: 2.5rem 2rem !important;
+    margin-bottom: 2.5rem !important;
+    border: 1px solid var(--hx-color-neutral-200, #E2E8F0) !important;
+  }
+
+  .drupal-best-practices .hero-title {
+    font-size: 2rem !important;
+    font-weight: 800 !important;
+    color: var(--hx-color-neutral-900, #0F172A) !important;
+    margin: 0 0 0.5rem 0 !important;
+    letter-spacing: -0.025em !important;
+    line-height: 1.2 !important;
+  }
+
+  .drupal-best-practices .hero-desc {
+    font-size: 1rem !important;
+    color: var(--hx-color-neutral-500, #64748B) !important;
+    margin: 0 0 1rem 0 !important;
+    line-height: 1.6 !important;
+  }
+
+  .drupal-best-practices .info-box {
+    padding: 1.25rem !important;
+    background: var(--hx-color-info-50, #F0F9FF) !important;
+    border-radius: var(--hx-border-radius-md, 0.375rem) !important;
+    border-left: 4px solid var(--hx-color-info-500, #0EA5E9) !important;
+    margin: 1.5rem 0 !important;
+  }
+
+  .drupal-best-practices .info-box p {
+    margin: 0 !important;
+    color: var(--hx-color-info-800, #0C4A6E) !important;
+  }
+
+  .drupal-best-practices .warning-box {
+    padding: 1.25rem !important;
+    background: var(--hx-color-warning-50, #FFFBEB) !important;
+    border-radius: var(--hx-border-radius-md, 0.375rem) !important;
+    border-left: 4px solid var(--hx-color-warning-500, #F59E0B) !important;
+    margin: 1.5rem 0 !important;
+  }
+
+  .drupal-best-practices .warning-box p {
+    margin: 0 !important;
+    color: var(--hx-color-warning-800, #92400E) !important;
+  }
+
+  .drupal-best-practices .success-box {
+    padding: 1.25rem !important;
+    background: var(--hx-color-success-50, #F0FDF4) !important;
+    border-radius: var(--hx-border-radius-md, 0.375rem) !important;
+    border-left: 4px solid var(--hx-color-success-500, #10B981) !important;
+    margin: 1.5rem 0 !important;
+  }
+
+  .drupal-best-practices .success-box p {
+    margin: 0 !important;
+    color: var(--hx-color-success-800, #065F46) !important;
+  }
+
+  .drupal-best-practices ul {
+    margin: 0 0 1rem 0 !important;
+    padding-left: 1.5rem !important;
+  }
+
+  .drupal-best-practices li {
+    margin-bottom: 0.5rem !important;
+    color: var(--hx-color-neutral-600, #475569) !important;
+  }
+
+  .drupal-best-practices table {
+    width: 100% !important;
+    border-collapse: collapse !important;
+    margin: 1.5rem 0 !important;
+  }
+
+  .drupal-best-practices th {
+    background: var(--hx-color-neutral-100, #F1F5F9) !important;
+    padding: 0.75rem 1rem !important;
+    text-align: left !important;
+    font-weight: 600 !important;
+    border: 1px solid var(--hx-color-neutral-200, #E2E8F0) !important;
+  }
+
+  .drupal-best-practices td {
+    padding: 0.75rem 1rem !important;
+    border: 1px solid var(--hx-color-neutral-200, #E2E8F0) !important;
+  }
+`}
+</style>
+
+<div className="drupal-best-practices">
+
+<div className="hero-banner">
+  <div className="hero-title">Drupal Integration Best Practices</div>
+  <div className="hero-desc">
+    Comprehensive guidance for integrating HELIX web components into Drupal 10/11 themes and
+    modules. This guide covers CDN loading, Twig patterns, Drupal behaviors, Form API integration,
+    and performance optimization for enterprise healthcare applications.
+  </div>
+</div>
+
+## Overview
+
+HELIX web components are designed to integrate seamlessly with Drupal CMS without requiring custom modules or complex build processes. Components work in standard Twig templates, participate in native form submission, and respond to Drupal's AJAX API.
+
+This guide establishes best practices for:
+
+- Loading components via CDN or local installation
+- Writing property-driven and slot-driven Twig templates
+- Initializing components with Drupal.behaviors
+- Handling custom events in Drupal context
+- Optimizing performance for component-heavy pages
+- Ensuring accessibility in Drupal workflows
+
+## Loading Strategies
+
+### CDN Loading (Recommended for Production)
+
+Load HELIX components from a CDN for automatic caching and global distribution.
+
+**Add to `your_theme.libraries.yml`:**
+
+```yaml
+# CDN approach with version pinning
+helix-components:
+  js:
+    https://cdn.jsdelivr.net/npm/@helix/library@1.0.0/dist/index.js:
+      type: external
+      attributes:
+        type: module
+  version: 1.0.0
+  header: true
+```
+
+**Attach to your theme globally:**
+
+```yaml
+# your_theme.info.yml
+libraries:
+  - your_theme/helix-components
+```
+
+**Or attach conditionally in templates:**
+
+```twig
+{{ attach_library('your_theme/helix-components') }}
+```
+
+<div className="success-box">
+  <p>
+    <strong>Best Practice:</strong> Use CDN loading for production to benefit from browser caching
+    and HTTP/2 multiplexing. Pin to a specific version (e.g., <code>@1.0.0</code>) to prevent
+    breaking changes from auto-updating.
+  </p>
+</div>
+
+### Local Installation (For Development or Private Hosting)
+
+Install HELIX via npm and serve from Drupal's libraries directory.
+
+**Install via npm:**
+
+```bash
+npm install @helix/library
+```
+
+**Copy to Drupal libraries directory:**
+
+```bash
+cp -r node_modules/@helix/library/dist /path/to/drupal/libraries/helix/
+```
+
+**Add to `your_theme.libraries.yml`:**
+
+```yaml
+helix-components-local:
+  js:
+    /libraries/helix/dist/index.js:
+      type: file
+      attributes:
+        type: module
+  version: VERSION
+  header: true
+```
+
+### Per-Component Loading (Tree-Shaking)
+
+For performance-critical pages, load only the components you use.
+
+```yaml
+helix-button:
+  js:
+    https://cdn.jsdelivr.net/npm/@helix/library@1.0.0/dist/hx-button.js:
+      type: external
+      attributes:
+        type: module
+  version: 1.0.0
+
+helix-card:
+  js:
+    https://cdn.jsdelivr.net/npm/@helix/library@1.0.0/dist/hx-card.js:
+      type: external
+      attributes:
+        type: module
+  version: 1.0.0
+```
+
+Attach only what you need:
+
+```twig
+{{ attach_library('your_theme/helix-button') }}
+{{ attach_library('your_theme/helix-card') }}
+```
+
+## Twig Template Patterns
+
+### Property-Driven Pattern
+
+Use component properties for simple, data-driven templates. This is the recommended approach for most use cases.
+
+**When to use:**
+
+- Simple components with few configuration options
+- Data-driven content (node fields, user properties)
+- When you don't need complex HTML inside slots
+
+**Example:**
+
+```twig
+<hx-card
+  variant="{{ node.field_card_variant.value|default('default') }}"
+  elevation="{{ node.field_elevation.value|default('flat') }}"
+  {% if node.url %}hx-href="{{ node.url }}"{% endif %}
+>
+  <span slot="heading">{{ node.label }}</span>
+  {{ content.body }}
+</hx-card>
+```
+
+### Slot-Driven Pattern
+
+Use slots when you need to project complex HTML, multiple elements, or rich content.
+
+**When to use:**
+
+- Complex markup inside component sections
+- Multiple elements in a single slot
+- Rich text fields with embedded media
+- Custom layouts or nested components
+
+**Example:**
+
+```twig
+<hx-card variant="featured">
+  <div slot="image">
+    {{ content.field_image }}
+  </div>
+
+  <div slot="heading">
+    <h3>{{ node.label }}</h3>
+    {% if node.field_badge %}
+      <hx-badge variant="primary">{{ node.field_badge.value }}</hx-badge>
+    {% endif %}
+  </div>
+
+  <div class="card-content">
+    {{ content.body }}
+    {{ content.field_tags }}
+  </div>
+
+  <div slot="footer">
+    <small>{{ node.created.value|date('F j, Y') }}</small>
+    <hx-button size="sm">View Details</hx-button>
+  </div>
+</hx-card>
+```
+
+<div className="info-box">
+  <p>
+    <strong>Reference:</strong> See <strong>ADR-DRUPAL-001</strong> in the HELIX documentation for
+    detailed guidance on choosing between property-driven and slot-driven patterns.
+  </p>
+</div>
+
+## Drupal Behaviors Pattern
+
+Drupal.behaviors is the standard mechanism for initializing JavaScript in Drupal. Use it to set up event listeners, enhance components, and respond to AJAX updates.
+
+### Basic Behavior Template
+
+```javascript
+/**
+ * @file
+ * HELIX components Drupal behavior.
+ */
+
+(function (Drupal, once) {
+  'use strict';
+
+  /**
+   * Initialize HELIX components.
+   */
+  Drupal.behaviors.helixComponents = {
+    attach: function (context, settings) {
+      // Use once() to prevent double-initialization
+      once('helix-init', 'hx-card', context).forEach((card) => {
+        // Set up event listeners
+        card.addEventListener('hx-card-click', (e) => {
+          console.log('Card clicked:', e.detail);
+        });
+      });
+
+      // Initialize other components
+      once('helix-select', 'hx-select', context).forEach((select) => {
+        select.addEventListener('hx-change', (e) => {
+          console.log('Select changed:', e.detail);
+        });
+      });
+    },
+
+    detach: function (context, settings, trigger) {
+      // Clean up on unload
+      if (trigger === 'unload') {
+        context.querySelectorAll('hx-card').forEach((card) => {
+          card.removeEventListener('hx-card-click', () => {});
+        });
+      }
+    },
+  };
+})(Drupal, once);
+```
+
+### Multi-Component Behavior
+
+Handle multiple components in a single behavior file:
+
+```javascript
+(function (Drupal, once) {
+  Drupal.behaviors.helixAll = {
+    attach: function (context) {
+      // Cards
+      once('hx-card', 'hx-card[hx-href]', context).forEach((card) => {
+        card.addEventListener('hx-card-click', handleCardClick);
+      });
+
+      // Selects
+      once('hx-select', 'hx-select', context).forEach((select) => {
+        select.addEventListener('hx-change', handleSelectChange);
+      });
+
+      // Forms
+      once('hx-form', 'hx-form', context).forEach((form) => {
+        form.addEventListener('hx-submit', handleFormSubmit);
+        form.addEventListener('hx-invalid', handleFormInvalid);
+      });
+
+      // Buttons
+      once('hx-button', 'hx-button[data-ajax]', context).forEach((button) => {
+        button.addEventListener('click', handleAjaxButton);
+      });
+    },
+  };
+
+  function handleCardClick(e) {
+    const { url } = e.detail;
+    window.location.href = url;
+  }
+
+  function handleSelectChange(e) {
+    const { value } = e.detail;
+    const select = e.target;
+    const name = select.getAttribute('name');
+
+    console.log(`${name} changed to: ${value}`);
+
+    // Trigger dependent field updates
+    if (name === 'department') {
+      updateSpecialtyOptions(value);
+    }
+  }
+
+  function handleFormSubmit(e) {
+    e.preventDefault();
+    const { formData, values } = e.detail;
+
+    fetch(e.target.getAttribute('action'), {
+      method: 'POST',
+      body: formData,
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.success) {
+          window.location.href = data.redirect;
+        }
+      });
+  }
+
+  function handleFormInvalid(e) {
+    const { field, message } = e.detail;
+    field.setAttribute('error', message);
+    field.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+
+  function handleAjaxButton(e) {
+    const button = e.currentTarget;
+    const url = button.dataset.ajaxUrl;
+
+    // Trigger Drupal AJAX
+    const ajax = Drupal.ajax({ url: url });
+    ajax.execute();
+  }
+
+  function updateSpecialtyOptions(departmentId) {
+    const specialtySelect = document.querySelector('hx-select[name="specialty"]');
+    if (!specialtySelect) return;
+
+    fetch(`/api/specialties/${departmentId}`)
+      .then((response) => response.json())
+      .then((data) => {
+        specialtySelect.innerHTML = '';
+        data.forEach((specialty) => {
+          const option = document.createElement('option');
+          option.value = specialty.id;
+          option.textContent = specialty.name;
+          specialtySelect.appendChild(option);
+        });
+      });
+  }
+})(Drupal, once);
+```
+
+<div className="info-box">
+  <p>
+    <strong>Reference:</strong> See <strong>ADR-DRUPAL-002</strong> for event handling best
+    practices, including custom event naming conventions and cleanup patterns.
+  </p>
+</div>
+
+## Form API Integration
+
+### Using HELIX Components in Drupal Forms
+
+Map Drupal Form API elements to HELIX components using the `#attributes` property.
+
+```php
+function mymodule_patient_intake_form($form, &$form_state) {
+  // Attach HELIX library
+  $form['#attached']['library'][] = 'your_theme/helix-components';
+
+  // Text input
+  $form['patient_name'] = [
+    '#type' => 'textfield',
+    '#title' => t('Patient Name'),
+    '#required' => TRUE,
+    '#attributes' => [
+      'is' => 'hx-text-input',
+      'placeholder' => 'Last, First MI',
+    ],
+  ];
+
+  // Select
+  $form['department'] = [
+    '#type' => 'select',
+    '#title' => t('Department'),
+    '#options' => [
+      'cardiology' => 'Cardiology',
+      'neurology' => 'Neurology',
+      'oncology' => 'Oncology',
+    ],
+    '#required' => TRUE,
+    '#attributes' => [
+      'is' => 'hx-select',
+    ],
+  ];
+
+  // Submit button
+  $form['actions']['submit'] = [
+    '#type' => 'submit',
+    '#value' => t('Submit'),
+    '#attributes' => [
+      'is' => 'hx-button',
+      'variant' => 'primary',
+    ],
+  ];
+
+  return $form;
+}
+```
+
+### AJAX Integration
+
+Use custom events with Drupal's AJAX API:
+
+```php
+$form['department'] = [
+  '#type' => 'select',
+  '#title' => t('Department'),
+  '#options' => $department_options,
+  '#ajax' => [
+    'callback' => '::updateSpecialty',
+    'wrapper' => 'specialty-wrapper',
+    'event' => 'hx-change', // Use custom event
+  ],
+  '#attributes' => [
+    'is' => 'hx-select',
+  ],
+];
+```
+
+## Performance Optimization
+
+### Lazy Loading Components
+
+Load components only when they enter the viewport:
+
+```javascript
+(function (Drupal, once) {
+  Drupal.behaviors.helixLazy = {
+    attach: function (context) {
+      if ('IntersectionObserver' in window) {
+        const observer = new IntersectionObserver((entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              const element = entry.target;
+              element.classList.add('loaded');
+              observer.unobserve(element);
+            }
+          });
+        });
+
+        once('lazy-load', '[data-lazy]', context).forEach((el) => {
+          observer.observe(el);
+        });
+      }
+    },
+  };
+})(Drupal, once);
+```
+
+### BigPipe Integration
+
+Use Drupal's BigPipe to progressively load component-heavy blocks:
+
+```php
+$build['patient_cards'] = [
+  '#lazy_builder' => ['mymodule.lazy_builder:renderPatientCards', []],
+  '#create_placeholder' => TRUE,
+];
+```
+
+### Render Caching
+
+Cache component-rendered blocks to reduce server-side rendering time:
+
+```php
+$build['facility_cards'] = [
+  '#markup' => $this->renderFacilityCards(),
+  '#cache' => [
+    'keys' => ['facility_cards'],
+    'contexts' => ['user'],
+    'max-age' => 3600,
+  ],
+];
+```
+
+<div className="info-box">
+  <p>
+    <strong>Reference:</strong> See <strong>ADR-DRUPAL-003</strong> for comprehensive performance
+    optimization strategies, including HTTP/2 server push, asset aggregation, and lazy loading
+    patterns.
+  </p>
+</div>
+
+## Accessibility in Drupal Context
+
+### Form Validation and Error Handling
+
+Ensure validation errors are announced to screen readers:
+
+```javascript
+function handleFormInvalid(e) {
+  const { field, message } = e.detail;
+
+  // Set error on field
+  field.setAttribute('error', message);
+
+  // Create live region announcement
+  const announcement = document.createElement('div');
+  announcement.setAttribute('role', 'alert');
+  announcement.setAttribute('aria-live', 'assertive');
+  announcement.textContent = `Error: ${message}`;
+  document.body.appendChild(announcement);
+
+  // Remove after announcement
+  setTimeout(() => announcement.remove(), 5000);
+}
+```
+
+### Focus Management
+
+Move focus to the first invalid field on form submission:
+
+```javascript
+form.addEventListener('hx-invalid', (e) => {
+  const { field } = e.detail;
+
+  // Find the first invalid field
+  const firstInvalid = form.querySelector('[error]');
+  if (firstInvalid) {
+    firstInvalid.focus();
+    firstInvalid.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+});
+```
+
+### Keyboard Navigation
+
+Ensure all interactive components are keyboard-accessible:
+
+```javascript
+once('keyboard-init', 'hx-card[hx-href]', context).forEach((card) => {
+  // Cards with hx-href are already keyboard-accessible
+  // But ensure Enter key triggers navigation
+  card.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      card.click();
+    }
+  });
+});
+```
+
+<div className="info-box">
+  <p>
+    <strong>Reference:</strong> See <strong>ADR-DRUPAL-004</strong> for accessibility best
+    practices, including ARIA patterns, focus management, and screen reader compatibility in Drupal
+    workflows.
+  </p>
+</div>
+
+## Common Integration Patterns
+
+### Views Integration
+
+Render HELIX components in Drupal Views:
+
+```twig
+{# views-view-unformatted--patient-list.html.twig #}
+{{ attach_library('your_theme/helix-components') }}
+
+<div class="patient-list">
+  {% for row in rows %}
+    <hx-card
+      variant="default"
+      elevation="raised"
+      hx-href="{{ row.content['#row']._entity.toUrl().toString() }}"
+    >
+      <span slot="heading">{{ row.content['#row'].label }}</span>
+      {{ row.content }}
+    </hx-card>
+  {% endfor %}
+</div>
+```
+
+### Block Templates
+
+Use components in custom block templates:
+
+```twig
+{# block--custom-facility-info.html.twig #}
+{{ attach_library('your_theme/helix-components') }}
+
+<hx-card variant="featured" elevation="floating">
+  <span slot="heading">{{ content.field_title }}</span>
+  <div>
+    {{ content.field_body }}
+  </div>
+  <div slot="footer">
+    <hx-button variant="secondary" size="sm">Learn More</hx-button>
+  </div>
+</hx-card>
+```
+
+### Paragraph Integration
+
+Render paragraphs as HELIX cards:
+
+```twig
+{# paragraph--card.html.twig #}
+<hx-card variant="{{ content.field_variant|render|striptags|trim }}">
+  {% if content.field_image|render %}
+    <img slot="image" src="{{ file_url(paragraph.field_image.entity.uri.value) }}" alt="{{ paragraph.field_image.alt }}">
+  {% endif %}
+  <span slot="heading">{{ content.field_title }}</span>
+  {{ content.field_body }}
+</hx-card>
+```
+
+## Example: Complete Library Definition
+
+Here's a complete `your_theme.libraries.yml` for HELIX integration:
+
+```yaml
+# Global HELIX library (CDN)
+helix-components:
+  js:
+    https://cdn.jsdelivr.net/npm/@helix/library@1.0.0/dist/index.js:
+      type: external
+      attributes:
+        type: module
+  version: 1.0.0
+  header: true
+
+# HELIX behaviors
+helix-behaviors:
+  js:
+    js/helix-behaviors.js: {}
+  dependencies:
+    - core/drupal
+    - core/once
+    - your_theme/helix-components
+
+# HELIX styling overrides
+helix-theme:
+  css:
+    theme:
+      css/helix-theme.css: {}
+  dependencies:
+    - your_theme/helix-components
+```
+
+## Resources and References
+
+### HELIX Documentation
+
+- **Component API Reference**: See individual component MDX docs in Storybook
+- **Design Tokens**: See `@helix/library` token documentation
+- **Accessibility Guide**: WCAG 2.1 AA compliance documentation
+
+### Visual ADRs
+
+Four architectural decision records document Drupal integration patterns:
+
+1. **ADR-DRUPAL-001**: Property-driven vs slot-driven Twig patterns
+   - When to use properties vs slots
+   - Performance implications
+   - Maintainability considerations
+
+2. **ADR-DRUPAL-002**: Event handling and Drupal behaviors
+   - Custom event naming conventions
+   - Cleanup patterns for detach()
+   - AJAX integration strategies
+
+3. **ADR-DRUPAL-003**: Performance optimization
+   - CDN vs local loading trade-offs
+   - Lazy loading techniques
+   - BigPipe and render caching
+
+4. **ADR-DRUPAL-004**: Accessibility in Drupal context
+   - Form validation announcements
+   - Focus management
+   - Keyboard navigation patterns
+
+<div className="success-box">
+  <p>
+    <strong>Next Steps:</strong> Review individual component documentation (hx-card, hx-select,
+    hx-form) for specific Drupal integration examples. See the visual ADRs in the HELIX
+    documentation site for detailed architectural guidance.
+  </p>
+</div>
+
+## Support and Contribution
+
+For questions, issues, or contributions related to Drupal integration:
+
+- **GitHub Issues**: Report bugs or request features
+- **Slack Channel**: Join #helix-drupal for community support
+- **Documentation**: Contribute examples and patterns via pull requests
+
+</div>

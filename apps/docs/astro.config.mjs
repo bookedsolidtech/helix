@@ -40,7 +40,8 @@ export default defineConfig({
         SkipLink: './src/components/SkipLink.astro',
       },
       title: 'HELiX',
-      description: 'HTML Element Library for Interactive eXperiences - Enterprise Web Components for Drupal CMS',
+      description:
+        'HTML Element Library for Interactive eXperiences - Enterprise Web Components for Drupal CMS',
       social: [
         {
           icon: 'github',
@@ -84,7 +85,8 @@ export default defineConfig({
           attrs: {
             rel: 'stylesheet',
             href: 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css',
-            integrity: 'sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg==',
+            integrity:
+              'sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg==',
             crossorigin: 'anonymous',
             referrerpolicy: 'no-referrer',
           },
@@ -235,7 +237,10 @@ export default defineConfig({
                 { label: 'Behaviors', slug: 'drupal-integration/behaviors' },
                 { label: 'Troubleshooting', slug: 'drupal-integration/troubleshooting' },
                 { label: 'Loading Strategy', slug: 'guides/drupal-component-loading-strategy' },
-                { label: 'Integration Architecture', slug: 'guides/drupal-integration-architecture' },
+                {
+                  label: 'Integration Architecture',
+                  slug: 'guides/drupal-integration-architecture',
+                },
               ],
             },
           ],
@@ -282,9 +287,7 @@ export default defineConfig({
         {
           label: 'API Reference',
           collapsed: true,
-          items: [
-            { label: 'Overview', slug: 'api-reference/overview' },
-          ],
+          items: [{ label: 'Overview', slug: 'api-reference/overview' }],
         },
       ],
     }),

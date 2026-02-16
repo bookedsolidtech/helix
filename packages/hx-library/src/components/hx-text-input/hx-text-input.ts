@@ -140,7 +140,7 @@ export class HelixTextInput extends LitElement {
     this._hasLabelSlot = slot.assignedElements().length > 0;
     if (this._hasLabelSlot) {
       const slottedLabel = slot.assignedElements()[0];
-      if (!slottedLabel.id) {
+      if (slottedLabel && !slottedLabel.id) {
         slottedLabel.id = `${this._inputId}-slotted-label`;
       }
     }
@@ -156,6 +156,7 @@ export class HelixTextInput extends LitElement {
   // ─── Lifecycle ───
 
   override updated(changedProperties: Map<string, unknown>): void {
+    super.updated(changedProperties);
     if (changedProperties.has('value')) {
       this._internals.setFormValue(this.value);
       this._updateValidity();
@@ -194,7 +195,7 @@ export class HelixTextInput extends LitElement {
       this._internals.setValidity(
         { valueMissing: true },
         this.error || 'This field is required.',
-        this._input
+        this._input,
       );
     } else {
       this._internals.setValidity({});
@@ -228,7 +229,7 @@ export class HelixTextInput extends LitElement {
         bubbles: true,
         composed: true,
         detail: { value: this.value },
-      })
+      }),
     );
   }
 
@@ -247,7 +248,7 @@ export class HelixTextInput extends LitElement {
         bubbles: true,
         composed: true,
         detail: { value: this.value },
-      })
+      }),
     );
   }
 
@@ -265,7 +266,7 @@ export class HelixTextInput extends LitElement {
 
   // ─── Render ───
 
-  private _inputId = `wc-text-input-${Math.random().toString(36).slice(2, 9)}`;
+  private _inputId = `hx-text-input-${Math.random().toString(36).slice(2, 9)}`;
   private _helpTextId = `${this._inputId}-help`;
   private _errorId = `${this._inputId}-error`;
 
@@ -279,12 +280,10 @@ export class HelixTextInput extends LitElement {
       'field--required': this.required,
     };
 
-    const describedBy = [
-      hasError ? this._errorId : null,
-      this.helpText ? this._helpTextId : null,
-    ]
-      .filter(Boolean)
-      .join(' ') || undefined;
+    const describedBy =
+      [hasError ? this._errorId : null, this.helpText ? this._helpTextId : null]
+        .filter(Boolean)
+        .join(' ') || undefined;
 
     return html`
       <div part="field" class=${classMap(fieldClasses)}>
@@ -319,7 +318,9 @@ export class HelixTextInput extends LitElement {
             ?disabled=${this.disabled}
             name=${ifDefined(this.name || undefined)}
             aria-label=${ifDefined(this.ariaLabel ?? undefined)}
-            aria-labelledby=${ifDefined(this._hasLabelSlot ? `${this._inputId}-slotted-label` : undefined)}
+            aria-labelledby=${ifDefined(
+              this._hasLabelSlot ? `${this._inputId}-slotted-label` : undefined,
+            )}
             aria-invalid=${hasError ? 'true' : nothing}
             aria-describedby=${ifDefined(describedBy)}
             aria-required=${this.required ? 'true' : nothing}
@@ -335,7 +336,13 @@ export class HelixTextInput extends LitElement {
         <slot name="error" @slotchange=${this._handleErrorSlotChange}>
           ${this.error
             ? html`
-                <div part="error" class="field__error" id=${this._errorId} role="alert" aria-live="polite">
+                <div
+                  part="error"
+                  class="field__error"
+                  id=${this._errorId}
+                  role="alert"
+                  aria-live="polite"
+                >
                   ${this.error}
                 </div>
               `

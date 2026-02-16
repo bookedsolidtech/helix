@@ -6,9 +6,17 @@ class WcAdminFab extends HTMLElement {
 
   constructor() {
     super();
-    this.trigger = this.querySelector('.fab-trigger')!;
-    this.panel = this.querySelector('.fab-panel')!;
-    this.nudge = this.querySelector('.fab-nudge')!;
+    const trigger = this.querySelector('.fab-trigger');
+    const panel = this.querySelector('.fab-panel');
+    const nudge = this.querySelector('.fab-nudge');
+
+    if (!trigger || !panel || !nudge) {
+      throw new Error('WcAdminFab: Required elements not found');
+    }
+
+    this.trigger = trigger as HTMLButtonElement;
+    this.panel = panel as HTMLElement;
+    this.nudge = nudge as HTMLElement;
 
     if (this.isAuthenticated()) this.reveal();
 
@@ -40,7 +48,9 @@ class WcAdminFab extends HTMLElement {
       if (!raw) return false;
       const data = JSON.parse(raw);
       return data.authenticated === true;
-    } catch { return false; }
+    } catch {
+      return false;
+    }
   }
 
   reveal() {
@@ -69,7 +79,11 @@ class WcAdminFab extends HTMLElement {
   }
 
   toggle() {
-    this.trigger.getAttribute('aria-expanded') === 'true' ? this.closePanel() : this.openPanel();
+    if (this.trigger.getAttribute('aria-expanded') === 'true') {
+      this.closePanel();
+    } else {
+      this.openPanel();
+    }
   }
 
   openPanel() {

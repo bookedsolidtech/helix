@@ -37,7 +37,7 @@ import { helixSwitchStyles } from './hx-switch.styles.js';
 export class HelixSwitch extends LitElement {
   static override styles = [tokenStyles, helixSwitchStyles];
 
-  // --- Form Association ---
+  // ─── Form Association ───
 
   static formAssociated = true;
 
@@ -48,7 +48,7 @@ export class HelixSwitch extends LitElement {
     this._internals = this.attachInternals();
   }
 
-  // --- Properties ---
+  // ─── Properties ───
 
   /**
    * Whether the switch is toggled on.
@@ -113,9 +113,10 @@ export class HelixSwitch extends LitElement {
   @property({ type: String, attribute: 'help-text' })
   helpText = '';
 
-  // --- Lifecycle ---
+  // ─── Lifecycle ───
 
   override updated(changedProperties: Map<string, unknown>): void {
+    super.updated(changedProperties);
     if (changedProperties.has('checked') || changedProperties.has('value')) {
       this._internals.setFormValue(this.checked ? this.value : null);
       this._updateValidity();
@@ -125,7 +126,7 @@ export class HelixSwitch extends LitElement {
     }
   }
 
-  // --- Form Integration ---
+  // ─── Form Integration ───
 
   /** Returns the associated form element, if any. */
   get form(): HTMLFormElement | null {
@@ -157,13 +158,12 @@ export class HelixSwitch extends LitElement {
       this._internals.setValidity(
         { valueMissing: true },
         this.error || 'This field is required.',
-        this._trackEl ?? undefined
+        this._trackEl ?? undefined,
       );
     } else {
       this._internals.setValidity({});
     }
   }
-
 
   /** Called by the form when it resets. */
   formResetCallback(): void {
@@ -181,14 +181,14 @@ export class HelixSwitch extends LitElement {
 
   @state() private _hasErrorSlot = false;
 
-  // --- Slot Handlers ---
+  // ─── Slot Handlers ───
 
   private _handleErrorSlotChange(e: Event): void {
     const slot = e.target as HTMLSlotElement;
     this._hasErrorSlot = slot.assignedNodes({ flatten: true }).length > 0;
   }
 
-  // --- Event Handling ---
+  // ─── Event Handling ───
 
   private _toggle(): void {
     if (this.disabled) return;
@@ -205,7 +205,7 @@ export class HelixSwitch extends LitElement {
         bubbles: true,
         composed: true,
         detail: { checked: this.checked },
-      })
+      }),
     );
   }
 
@@ -220,16 +220,16 @@ export class HelixSwitch extends LitElement {
     }
   }
 
-  // --- Public Methods ---
+  // ─── Public Methods ───
 
   /** Moves focus to the switch track element. */
   override focus(options?: FocusOptions): void {
     this._trackEl?.focus(options);
   }
 
-  // --- Render ---
+  // ─── Render ───
 
-  private _switchId = `wc-switch-${Math.random().toString(36).slice(2, 9)}`;
+  private _switchId = `hx-switch-${Math.random().toString(36).slice(2, 9)}`;
   private _labelId = `${this._switchId}-label`;
   private _helpTextId = `${this._switchId}-help`;
   private _errorId = `${this._switchId}-error`;
@@ -247,12 +247,13 @@ export class HelixSwitch extends LitElement {
       [`switch--${this.size}`]: true,
     };
 
-    const describedBy = [
-      hasError || this._hasErrorSlot ? this._errorId : null,
-      this.helpText && !hasError ? this._helpTextId : null,
-    ]
-      .filter(Boolean)
-      .join(' ') || undefined;
+    const describedBy =
+      [
+        hasError || this._hasErrorSlot ? this._errorId : null,
+        this.helpText && !hasError ? this._helpTextId : null,
+      ]
+        .filter(Boolean)
+        .join(' ') || undefined;
 
     return html`
       <div part="switch" class=${classMap(containerClasses)}>
@@ -292,7 +293,13 @@ export class HelixSwitch extends LitElement {
 
         <slot name="error" @slotchange=${this._handleErrorSlotChange}>
           ${hasError
-            ? html`<div part="error" class="switch__error" id=${this._errorId} role="alert" aria-live="polite">
+            ? html`<div
+                part="error"
+                class="switch__error"
+                id=${this._errorId}
+                role="alert"
+                aria-live="polite"
+              >
                 ${this.error}
               </div>`
             : nothing}

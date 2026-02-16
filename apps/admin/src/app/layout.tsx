@@ -10,6 +10,7 @@ import {
   Boxes,
   ExternalLink,
   Map,
+  HeartPulse,
 } from 'lucide-react';
 import { DOCS_URL, STORYBOOK_URL } from '@/lib/env';
 import './globals.css';
@@ -69,6 +70,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
               <SidebarLink href="/tests" icon={<FileCheck2 className="w-4 h-4" />}>
                 Verification
+              </SidebarLink>
+
+              <SidebarLink href="/health" icon={<HeartPulse className="w-4 h-4" />}>
+                Health Center
               </SidebarLink>
 
               <SidebarLink href="/tokens" icon={<Palette className="w-4 h-4" />}>

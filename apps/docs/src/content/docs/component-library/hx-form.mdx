@@ -1,5 +1,5 @@
 ---
-title: "hx-form"
+title: 'hx-form'
 description: "A Light DOM form wrapper that styles native HTML form elements and hx-* components with the design system's form styles. When action is set, renders a form wrapper around slotted content. When no action is set (the Drupal pattern), renders only a slot so Drupal can provide its own form tag. Uses adopted stylesheets to inject scoped CSS into the document without Shadow DOM, keeping native form participation and Drupal compatibility."
 ---
 
@@ -18,7 +18,12 @@ A form with multiple field types. The `hx-form` wrapper applies consistent spaci
 <ComponentDemo title="Basic Form">
   <hx-form style="max-width: 480px;">
     <hx-text-input label="Full name" placeholder="Jane Doe" required></hx-text-input>
-    <hx-text-input label="Email" type="email" placeholder="jane@example.com" required></hx-text-input>
+    <hx-text-input
+      label="Email"
+      type="email"
+      placeholder="jane@example.com"
+      required
+    ></hx-text-input>
     <hx-select label="Department" placeholder="Select a department">
       <option value="eng">Engineering</option>
       <option value="design">Design</option>
@@ -27,8 +32,12 @@ A form with multiple field types. The `hx-form` wrapper applies consistent spaci
     <hx-textarea label="Message" placeholder="Tell us more..." rows="3"></hx-textarea>
     <hx-checkbox label="I agree to the terms and conditions" required></hx-checkbox>
     <div style="display: flex; gap: 0.75rem;">
-      <hx-button variant="primary" type="submit">Submit</hx-button>
-      <hx-button variant="secondary" type="reset">Reset</hx-button>
+      <hx-button variant="primary" type="submit">
+        Submit
+      </hx-button>
+      <hx-button variant="secondary" type="reset">
+        Reset
+      </hx-button>
     </div>
   </hx-form>
 </ComponentDemo>
@@ -53,7 +62,9 @@ Fields with error states and help text.
       required
     ></hx-text-input>
     <hx-switch label="Remember me" checked></hx-switch>
-    <hx-button variant="primary" type="submit">Sign In</hx-button>
+    <hx-button variant="primary" type="submit">
+      Sign In
+    </hx-button>
   </hx-form>
 </ComponentDemo>
 

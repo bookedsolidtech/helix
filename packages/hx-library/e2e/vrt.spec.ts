@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 
 /**
- * Visual Regression Tests for WC-2026 Components.
+ * Visual Regression Tests for HELiX (wc-2026) Components.
  * Captures screenshots of each component variant in Storybook
  * and compares against committed baselines.
  *
@@ -18,50 +18,50 @@ interface ComponentVariant {
 }
 
 const COMPONENT_VARIANTS: ComponentVariant[] = [
-  // wc-button
-  { component: 'wc-button', story: 'Primary', id: 'components-wc-button--primary' },
-  { component: 'wc-button', story: 'Secondary', id: 'components-wc-button--secondary' },
-  { component: 'wc-button', story: 'Ghost', id: 'components-wc-button--ghost' },
-  { component: 'wc-button', story: 'Disabled', id: 'components-wc-button--disabled' },
+  // hx-button
+  { component: 'hx-button', story: 'Primary', id: 'components-button--primary' },
+  { component: 'hx-button', story: 'Secondary', id: 'components-button--secondary' },
+  { component: 'hx-button', story: 'Ghost', id: 'components-button--ghost' },
+  { component: 'hx-button', story: 'Disabled', id: 'components-button--disabled' },
 
-  // wc-card
-  { component: 'wc-card', story: 'Default', id: 'components-wc-card--default' },
-  { component: 'wc-card', story: 'Featured', id: 'components-wc-card--featured' },
-  { component: 'wc-card', story: 'Compact', id: 'components-wc-card--compact' },
+  // hx-card
+  { component: 'hx-card', story: 'Default', id: 'components-card--default' },
+  { component: 'hx-card', story: 'VariantFeatured', id: 'components-card--variant-featured' },
+  { component: 'hx-card', story: 'VariantCompact', id: 'components-card--variant-compact' },
 
-  // wc-text-input
-  { component: 'wc-text-input', story: 'Default', id: 'components-wc-text-input--default' },
-  { component: 'wc-text-input', story: 'ErrorState', id: 'components-wc-text-input--error-state' },
-  { component: 'wc-text-input', story: 'Disabled', id: 'components-wc-text-input--disabled' },
+  // hx-text-input
+  { component: 'hx-text-input', story: 'Default', id: 'components-text-input--default' },
+  { component: 'hx-text-input', story: 'WithError', id: 'components-text-input--with-error' },
+  { component: 'hx-text-input', story: 'Disabled', id: 'components-text-input--disabled' },
 
-  // wc-checkbox
-  { component: 'wc-checkbox', story: 'Default', id: 'components-wc-checkbox--default' },
-  { component: 'wc-checkbox', story: 'Checked', id: 'components-wc-checkbox--checked' },
+  // hx-checkbox
+  { component: 'hx-checkbox', story: 'Default', id: 'components-checkbox--default' },
+  { component: 'hx-checkbox', story: 'Checked', id: 'components-checkbox--checked' },
 
-  // wc-select
-  { component: 'wc-select', story: 'Default', id: 'components-wc-select--default' },
+  // hx-select
+  { component: 'hx-select', story: 'Default', id: 'components-select--default' },
 
-  // wc-badge
-  { component: 'wc-badge', story: 'Primary', id: 'components-wc-badge--primary' },
-  { component: 'wc-badge', story: 'Success', id: 'components-wc-badge--success' },
-  { component: 'wc-badge', story: 'Warning', id: 'components-wc-badge--warning' },
-  { component: 'wc-badge', story: 'Error', id: 'components-wc-badge--error' },
+  // hx-badge
+  { component: 'hx-badge', story: 'Primary', id: 'components-badge--primary' },
+  { component: 'hx-badge', story: 'Success', id: 'components-badge--success' },
+  { component: 'hx-badge', story: 'Warning', id: 'components-badge--warning' },
+  { component: 'hx-badge', story: 'Error', id: 'components-badge--error' },
 
-  // wc-radio-group
-  { component: 'wc-radio-group', story: 'Default', id: 'components-wc-radio-group--default' },
+  // hx-radio-group
+  { component: 'hx-radio-group', story: 'Default', id: 'components-radio-group--default' },
 
-  // wc-textarea
-  { component: 'wc-textarea', story: 'Default', id: 'components-wc-textarea--default' },
+  // hx-textarea
+  { component: 'hx-textarea', story: 'Default', id: 'components-textarea--default' },
 
-  // wc-switch
-  { component: 'wc-switch', story: 'Default', id: 'components-wc-switch--default' },
-  { component: 'wc-switch', story: 'Checked', id: 'components-wc-switch--checked' },
+  // hx-switch
+  { component: 'hx-switch', story: 'Default', id: 'components-switch--default' },
+  { component: 'hx-switch', story: 'Checked', id: 'components-switch--checked' },
 
-  // wc-alert
-  { component: 'wc-alert', story: 'Info', id: 'components-wc-alert--info' },
-  { component: 'wc-alert', story: 'Success', id: 'components-wc-alert--success' },
-  { component: 'wc-alert', story: 'Warning', id: 'components-wc-alert--warning' },
-  { component: 'wc-alert', story: 'Error', id: 'components-wc-alert--error' },
+  // hx-alert
+  { component: 'hx-alert', story: 'Info', id: 'components-alert--info' },
+  { component: 'hx-alert', story: 'Success', id: 'components-alert--success' },
+  { component: 'hx-alert', story: 'Warning', id: 'components-alert--warning' },
+  { component: 'hx-alert', story: 'Error', id: 'components-alert--error' },
 ];
 
 for (const variant of COMPONENT_VARIANTS) {
@@ -80,9 +80,9 @@ for (const variant of COMPONENT_VARIANTS) {
     await expect(page).toHaveScreenshot(
       `${variant.component}--${variant.story.toLowerCase()}.png`,
       {
-        maxDiffPixelRatio: 0.01,
+        maxDiffPixelRatio: 0.02, // 2% tolerance for cross-browser font rendering differences
         animations: 'disabled',
-      }
+      },
     );
   });
 }

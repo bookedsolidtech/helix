@@ -133,7 +133,8 @@
 .callout {
   padding: var(--wc-space-4, 1rem) var(--wc-space-5, 1.25rem);
   margin-bottom: var(--wc-space-4, 1rem);
-  border: var(--wc-border-width-thin, 1px) solid var(--wc-color-border-default, var(--wc-color-neutral-200, #dee2e6));
+  border: var(--wc-border-width-thin, 1px) solid
+    var(--wc-color-border-default, var(--wc-color-neutral-200, #dee2e6));
   border-radius: var(--wc-border-radius-md, 0.375rem);
   border-left-width: var(--wc-border-width-thick, 3px);
 }
@@ -157,7 +158,8 @@
 
 .page-break {
   border: 0;
-  border-top: var(--wc-border-width-thin, 1px) dashed var(--wc-color-border-default, var(--wc-color-neutral-200, #dee2e6));
+  border-top: var(--wc-border-width-thin, 1px) dashed
+    var(--wc-color-border-default, var(--wc-color-neutral-200, #dee2e6));
   margin-top: var(--wc-space-8, 2rem);
   margin-bottom: var(--wc-space-8, 2rem);
 }
@@ -165,7 +167,7 @@
 /* ─── Clear Floats ─── */
 
 .clearfix::after {
-  content: "";
+  content: '';
   display: table;
   clear: both;
 }

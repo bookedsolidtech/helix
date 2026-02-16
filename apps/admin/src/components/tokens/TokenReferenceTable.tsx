@@ -1,10 +1,10 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import { cn } from "@/lib/utils";
-import { isHexColor, resolveTokenRef } from "@helix/tokens/utils";
-import { tokenMap } from "@helix/tokens";
-import type { TokenEntry } from "@helix/tokens";
+import { useState } from 'react';
+import { cn } from '@/lib/utils';
+import { isHexColor, resolveTokenRef } from '@helix/tokens/utils';
+import { tokenMap } from '@helix/tokens';
+import type { TokenEntry } from '@helix/tokens';
 
 interface CategoryGroup {
   category: string;
@@ -18,35 +18,35 @@ interface TokenReferenceTableProps {
 }
 
 const categoryLabels: Record<string, string> = {
-  color: "Colors",
-  body: "Body / Root",
-  heading: "Headings",
-  space: "Spacing",
-  font: "Typography",
-  "line-height": "Line Heights",
-  "letter-spacing": "Letter Spacing",
-  border: "Borders",
-  shadow: "Shadows",
-  transition: "Transitions",
-  duration: "Durations",
-  easing: "Easing",
-  focus: "Focus",
-  state: "State Layers",
-  filter: "Filters",
-  transform: "Transforms",
-  container: "Containers",
-  input: "Input Heights",
-  divider: "Dividers",
-  "z-index": "Z-Index",
-  opacity: "Opacity",
-  size: "Sizing",
-  breakpoint: "Breakpoints",
-  "aspect-ratio": "Aspect Ratios",
+  color: 'Colors',
+  body: 'Body / Root',
+  heading: 'Headings',
+  space: 'Spacing',
+  font: 'Typography',
+  'line-height': 'Line Heights',
+  'letter-spacing': 'Letter Spacing',
+  border: 'Borders',
+  shadow: 'Shadows',
+  transition: 'Transitions',
+  duration: 'Durations',
+  easing: 'Easing',
+  focus: 'Focus',
+  state: 'State Layers',
+  filter: 'Filters',
+  transform: 'Transforms',
+  container: 'Containers',
+  input: 'Input Heights',
+  divider: 'Dividers',
+  'z-index': 'Z-Index',
+  opacity: 'Opacity',
+  size: 'Sizing',
+  breakpoint: 'Breakpoints',
+  'aspect-ratio': 'Aspect Ratios',
 };
 
 export function TokenReferenceTable({ groups }: TokenReferenceTableProps) {
   const [expanded, setExpanded] = useState<Set<string>>(new Set());
-  const [search, setSearch] = useState("");
+  const [search, setSearch] = useState('');
 
   const toggle = (category: string) => {
     setExpanded((prev) => {
@@ -72,7 +72,7 @@ export function TokenReferenceTable({ groups }: TokenReferenceTableProps) {
             (t) =>
               t.name.toLowerCase().includes(searchLower) ||
               t.value.toLowerCase().includes(searchLower) ||
-              t.group.toLowerCase().includes(searchLower)
+              t.group.toLowerCase().includes(searchLower),
           ),
         }))
         .filter((g) => g.tokens.length > 0)
@@ -97,9 +97,7 @@ export function TokenReferenceTable({ groups }: TokenReferenceTableProps) {
           className="bg-secondary border border-border rounded-md px-3 py-1.5 text-sm text-foreground placeholder:text-muted-foreground w-64 focus:outline-none focus:ring-1 focus:ring-ring"
         />
         <div className="flex items-center gap-3">
-          <span className="text-xs text-muted-foreground tabular-nums">
-            {totalShown} tokens
-          </span>
+          <span className="text-xs text-muted-foreground tabular-nums">{totalShown} tokens</span>
           <button
             onClick={expandAll}
             className="text-xs text-muted-foreground hover:text-foreground transition-colors"
@@ -138,11 +136,9 @@ export function TokenReferenceTable({ groups }: TokenReferenceTableProps) {
                 className="w-full flex items-center gap-3 px-4 py-3 text-left transition-colors hover:bg-secondary/50"
               >
                 <span className="text-xs text-muted-foreground w-4 shrink-0">
-                  {isOpen ? "\u25BC" : "\u25B6"}
+                  {isOpen ? '\u25BC' : '\u25B6'}
                 </span>
-                <span className="text-sm font-medium text-foreground">
-                  {label}
-                </span>
+                <span className="text-sm font-medium text-foreground">{label}</span>
                 <div className="flex-1" />
                 {group.hasColors && (
                   <div className="flex gap-0.5 shrink-0">
@@ -202,10 +198,10 @@ export function TokenReferenceTable({ groups }: TokenReferenceTableProps) {
                           {/* Value */}
                           <span
                             className={cn(
-                              "font-mono text-xs shrink-0 max-w-64 truncate text-right",
-                              token.value.includes("var(")
-                                ? "text-blue-400"
-                                : "text-muted-foreground"
+                              'font-mono text-xs shrink-0 max-w-64 truncate text-right',
+                              token.value.includes('var(')
+                                ? 'text-blue-400'
+                                : 'text-muted-foreground',
                             )}
                             title={token.value}
                           >

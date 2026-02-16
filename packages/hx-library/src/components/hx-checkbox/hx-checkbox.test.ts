@@ -324,7 +324,7 @@ describe('hx-checkbox', () => {
     });
   });
 
-  // ─── Validation (3) ───
+  // ─── Validation (6) ───
 
   describe('Validation', () => {
     it('checkValidity returns false when required + unchecked', async () => {
@@ -340,6 +340,22 @@ describe('hx-checkbox', () => {
     it('valueMissing validity flag is set when required + unchecked', async () => {
       const el = await fixture<WcCheckbox>('<hx-checkbox required></hx-checkbox>');
       expect(el.validity.valueMissing).toBe(true);
+    });
+
+    it('reportValidity returns false when required + unchecked', async () => {
+      const el = await fixture<WcCheckbox>('<hx-checkbox required></hx-checkbox>');
+      expect(el.reportValidity()).toBe(false);
+    });
+
+    it('reportValidity returns true when required + checked', async () => {
+      const el = await fixture<WcCheckbox>('<hx-checkbox required checked></hx-checkbox>');
+      expect(el.reportValidity()).toBe(true);
+    });
+
+    it('validationMessage is set when required + unchecked', async () => {
+      const el = await fixture<WcCheckbox>('<hx-checkbox required></hx-checkbox>');
+      await el.updateComplete;
+      expect(el.validationMessage).toBeTruthy();
     });
   });
 
@@ -386,6 +402,18 @@ describe('hx-checkbox', () => {
       control.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
       await el.updateComplete;
       expect(el.checked).toBe(false);
+    });
+  });
+
+  // ─── Methods (1) ───
+
+  describe('Methods', () => {
+    it('focus() moves focus to input element', async () => {
+      const el = await fixture<WcCheckbox>('<hx-checkbox label="Test"></hx-checkbox>');
+      el.focus();
+      await new Promise((r) => setTimeout(r, 50));
+      const input = shadowQuery<HTMLInputElement>(el, 'input')!;
+      expect(el.shadowRoot?.activeElement).toBe(input);
     });
   });
 

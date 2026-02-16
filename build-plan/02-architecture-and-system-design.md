@@ -88,12 +88,12 @@ The architecture prioritizes:
 
 ### Architectural Principles
 
-| Principle | Rationale |
-|-----------|-----------|
-| **Library has zero consumer knowledge** | The WC package never imports Drupal, Storybook, or any consumer framework. It is a pure Web Components package. |
-| **Storybook is a dev dependency only** | Storybook consumes the library. It is never shipped to production. |
-| **Tokens pierce Shadow DOM by design** | CSS custom properties inherit through Shadow DOM boundaries, making them the only viable theming mechanism for encapsulated components. |
-| **ES modules as distribution format** | Standard ES2021 modules -- no CommonJS, no UMD. Modern Drupal (10.3+) and all evergreen browsers support ES modules natively. |
+| Principle                                    | Rationale                                                                                                                                     |
+| -------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Library has zero consumer knowledge**      | The WC package never imports Drupal, Storybook, or any consumer framework. It is a pure Web Components package.                               |
+| **Storybook is a dev dependency only**       | Storybook consumes the library. It is never shipped to production.                                                                            |
+| **Tokens pierce Shadow DOM by design**       | CSS custom properties inherit through Shadow DOM boundaries, making them the only viable theming mechanism for encapsulated components.       |
+| **ES modules as distribution format**        | Standard ES2021 modules -- no CommonJS, no UMD. Modern Drupal (10.3+) and all evergreen browsers support ES modules natively.                 |
 | **Custom Elements Manifest as the contract** | The `custom-elements.json` file is the machine-readable API contract between the library and all consumers (Storybook, IDEs, Drupal tooling). |
 
 ---
@@ -203,10 +203,7 @@ Workspaces are defined in the root `package.json` via the `"workspaces"` field. 
 ```json
 // package.json (workspaces field)
 {
-  "workspaces": [
-    "packages/*",
-    "apps/*"
-  ]
+  "workspaces": ["packages/*", "apps/*"]
 }
 ```
 
@@ -253,10 +250,7 @@ Workspaces are defined in the root `package.json` via the `"workspaces"` field. 
     },
     "./styles/tokens.css": "./dist/styles/tokens.css"
   },
-  "files": [
-    "dist/",
-    "custom-elements.json"
-  ],
+  "files": ["dist/", "custom-elements.json"],
   "customElements": "custom-elements.json",
   "scripts": {
     "build": "tsc && npm run build:tokens",
@@ -333,12 +327,12 @@ The library ships plain ES modules. The consumer (Drupal, Storybook, or any app)
 
 **Critical settings explained:**
 
-| Setting | Value | Why |
-|---------|-------|-----|
-| `target` | `es2021` | Lit's recommended compile target. Supported by all evergreen browsers. |
-| `experimentalDecorators` | `true` | Lit recommends experimental decorators over TC39 standard decorators for now (Lit 3.x). Standard decorators support is in progress but experimental produces more optimal output today. |
-| `useDefineForClassFields` | `false` | **Required** by Lit's decorator system. Without this, reactive properties will silently fail because TypeScript's class field emit would shadow Lit's accessors. This is the single most common misconfiguration in Lit+TS projects. |
-| `declaration` + `declarationMap` | `true` | Generates `.d.ts` files and source maps so consumers get full IntelliSense and "Go to Definition" navigates to the original `.ts` source. |
+| Setting                          | Value    | Why                                                                                                                                                                                                                                  |
+| -------------------------------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `target`                         | `es2021` | Lit's recommended compile target. Supported by all evergreen browsers.                                                                                                                                                               |
+| `experimentalDecorators`         | `true`   | Lit recommends experimental decorators over TC39 standard decorators for now (Lit 3.x). Standard decorators support is in progress but experimental produces more optimal output today.                                              |
+| `useDefineForClassFields`        | `false`  | **Required** by Lit's decorator system. Without this, reactive properties will silently fail because TypeScript's class field emit would shadow Lit's accessors. This is the single most common misconfiguration in Lit+TS projects. |
+| `declaration` + `declarationMap` | `true`   | Generates `.d.ts` files and source maps so consumers get full IntelliSense and "Go to Definition" navigates to the original `.ts` source.                                                                                            |
 
 ### Build Sequence
 
@@ -375,13 +369,13 @@ Production:   Vite build (Rollup) --> static HTML/JS/CSS --> deploy to hosting
 
 **Key Storybook 10 features relevant to this project:**
 
-| Feature | Benefit |
-|---------|---------|
-| **Built-in Vitest integration** | Component tests run directly inside Storybook; no separate test infrastructure needed for story-level tests |
-| **Autodocs from CEM** | Automatic API documentation generated from the Custom Elements Manifest -- attributes, properties, events, slots, CSS custom properties all documented without manual effort |
-| **48% leaner install** | Flatter dependency structure reduces `node_modules` bloat, meaningful for CI cache sizes |
-| **Storybook Tags** | Organize components by status (stable, beta, deprecated) in the sidebar |
-| **Accessibility testing built-in** | Axe-based a11y checks run as part of the testing suite, critical for healthcare compliance |
+| Feature                            | Benefit                                                                                                                                                                      |
+| ---------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Built-in Vitest integration**    | Component tests run directly inside Storybook; no separate test infrastructure needed for story-level tests                                                                  |
+| **Autodocs from CEM**              | Automatic API documentation generated from the Custom Elements Manifest -- attributes, properties, events, slots, CSS custom properties all documented without manual effort |
+| **48% leaner install**             | Flatter dependency structure reduces `node_modules` bloat, meaningful for CI cache sizes                                                                                     |
+| **Storybook Tags**                 | Organize components by status (stable, beta, deprecated) in the sidebar                                                                                                      |
+| **Accessibility testing built-in** | Axe-based a11y checks run as part of the testing suite, critical for healthcare compliance                                                                                   |
 
 ### Storybook Configuration
 
@@ -392,11 +386,7 @@ import type { StorybookConfig } from '@storybook/web-components-vite';
 
 const config: StorybookConfig = {
   stories: ['../stories/**/*.mdx', '../stories/**/*.stories.@(js|ts)'],
-  addons: [
-    '@storybook/addon-essentials',
-    '@storybook/addon-a11y',
-    '@storybook/addon-links',
-  ],
+  addons: ['@storybook/addon-essentials', '@storybook/addon-a11y', '@storybook/addon-links'],
   framework: {
     name: '@storybook/web-components-vite',
     options: {},
@@ -488,7 +478,7 @@ export const WithImage: Story = {
       html`
         <img slot="image" src="/placeholder-health.jpg" alt="Health resource" />
         <p>Access our comprehensive health resource library.</p>
-      `
+      `,
     ),
 };
 
@@ -496,9 +486,7 @@ export const DarkMode: Story = {
   args: {
     heading: 'Dark Mode Card',
   },
-  decorators: [
-    (story) => html`<div data-theme="dark">${story()}</div>`,
-  ],
+  decorators: [(story) => html`<div data-theme="dark">${story()}</div>`],
 };
 ```
 
@@ -751,8 +739,7 @@ export default {
           filter: (token) => {
             // Only export Tier 2 (semantic) and Tier 3 (component) tokens
             // Tier 1 (option/base) tokens remain private
-            return token.filePath.includes('semantic') ||
-                   token.filePath.includes('component');
+            return token.filePath.includes('semantic') || token.filePath.includes('component');
           },
           options: {
             outputReferences: true, // Preserve token references in output
@@ -1020,14 +1007,14 @@ The client team can override any token at the Drupal theme level without modifyi
 /* mytheme/css/token-overrides.css */
 :root {
   /* Override brand colors */
-  --org-color-accent: #0e7c61;  /* Healthcare green */
+  --org-color-accent: #0e7c61; /* Healthcare green */
   --org-color-error: #b91c1c;
 
   /* Override spacing for their density preference */
   --org-spacing-md: 1.25rem;
 
   /* Override specific component tokens */
-  --org-card-radius: 0.25rem;  /* Sharper corners */
+  --org-card-radius: 0.25rem; /* Sharper corners */
 }
 ```
 
@@ -1060,14 +1047,14 @@ This works because CSS custom properties cascade from the document root through 
 
 **Rationale**:
 
-| Factor | @web/test-runner | Vitest Browser Mode |
-|--------|-----------------|-------------------|
-| **Industry momentum** | Stable but stagnant (Open WC project) | Vitest 4 marked Browser Mode stable; rapidly growing adoption |
-| **Lit support** | Native, purpose-built for WC | Community package available; Vitest 4 added Lit to supported frameworks |
-| **Performance** | Good (real browser) | 2-10x faster than Jest; real browser via Playwright |
-| **Storybook integration** | None | Storybook 10 has native Vitest integration ("Storybook Test") |
-| **Ecosystem alignment** | Separate toolchain | Same test runner for unit + browser + Storybook tests |
-| **DX** | Good | Excellent (watch mode, inline snapshots, TypeScript native) |
+| Factor                    | @web/test-runner                      | Vitest Browser Mode                                                     |
+| ------------------------- | ------------------------------------- | ----------------------------------------------------------------------- |
+| **Industry momentum**     | Stable but stagnant (Open WC project) | Vitest 4 marked Browser Mode stable; rapidly growing adoption           |
+| **Lit support**           | Native, purpose-built for WC          | Community package available; Vitest 4 added Lit to supported frameworks |
+| **Performance**           | Good (real browser)                   | 2-10x faster than Jest; real browser via Playwright                     |
+| **Storybook integration** | None                                  | Storybook 10 has native Vitest integration ("Storybook Test")           |
+| **Ecosystem alignment**   | Separate toolchain                    | Same test runner for unit + browser + Storybook tests                   |
+| **DX**                    | Good                                  | Excellent (watch mode, inline snapshots, TypeScript native)             |
 
 The decisive factor is **Storybook 10's native Vitest integration**. Using Vitest for component tests means the same test runner powers both standalone component tests and Storybook interaction/a11y tests. One test runner, one configuration, one mental model.
 
@@ -1202,9 +1189,7 @@ export default defineConfig({
     browser: {
       enabled: true,
       provider: 'playwright',
-      instances: [
-        { browser: 'chromium' },
-      ],
+      instances: [{ browser: 'chromium' }],
     },
   },
 });
@@ -1246,14 +1231,14 @@ Starting May 2026, healthcare websites in the US will be required to meet WCAG A
 
 Every component in the library must implement:
 
-| Requirement | Implementation |
-|-------------|---------------|
+| Requirement             | Implementation                                                                                                                         |
+| ----------------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
 | **Keyboard navigation** | All interactive elements reachable via Tab; custom keyboard handlers for complex widgets (arrow keys in menus, Escape to close modals) |
-| **ARIA attributes** | Correct `role`, `aria-label`, `aria-expanded`, `aria-describedby` on all interactive elements |
-| **Focus management** | Visible focus indicators via `:focus-visible`; focus trap in modals; focus restoration on close |
-| **Color contrast** | All text meets 4.5:1 ratio (AA normal text) or 3:1 (AA large text); enforced at the token level |
-| **Motion** | Respect `prefers-reduced-motion` media query; no auto-playing animations |
-| **Text scaling** | All text uses relative units (`rem`); components reflow correctly at 200% zoom |
+| **ARIA attributes**     | Correct `role`, `aria-label`, `aria-expanded`, `aria-describedby` on all interactive elements                                          |
+| **Focus management**    | Visible focus indicators via `:focus-visible`; focus trap in modals; focus restoration on close                                        |
+| **Color contrast**      | All text meets 4.5:1 ratio (AA normal text) or 3:1 (AA large text); enforced at the token level                                        |
+| **Motion**              | Respect `prefers-reduced-motion` media query; no auto-playing animations                                                               |
+| **Text scaling**        | All text uses relative units (`rem`); components reflow correctly at 200% zoom                                                         |
 
 ### A11y in the Token System
 
@@ -1374,49 +1359,49 @@ jobs:
 
 ## 12. Technology Decision Log
 
-| Decision | Choice | Alternatives Considered | Rationale |
-|----------|--------|------------------------|-----------|
-| **Component framework** | Lit 3.x | Stencil, FAST, Vanilla WC | Lit is the most widely adopted WC library, backed by Google, smallest runtime (~5KB), strongest TypeScript support, and the CEM ecosystem is built around it |
-| **Package manager** | npm | pnpm, yarn, bun | npm ships with Node.js (zero additional setup); npm workspaces provide workspace linking; widely understood across enterprise teams |
-| **Monorepo tool** | npm workspaces + Turborepo | Nx, Lerna, pnpm workspaces | npm workspaces handle dependency resolution and workspace linking. Turborepo adds intelligent caching, parallel task execution, and dependency-aware build orchestration. Together they provide a robust, well-supported monorepo foundation. |
-| **Storybook framework** | `@storybook/web-components-vite` (9.x) | Webpack variant, Rsbuild | Vite is the standard for new projects; fastest dev server; Storybook 10 has strongest Vite integration |
-| **Storybook helpers** | `@wc-toolkit/storybook-helpers` | Manual argTypes, custom helpers | Eliminates hundreds of lines of boilerplate; two-way binding; maintained by the WC community |
-| **Build tool (library)** | `tsc` only (no bundler) | Rollup, Vite lib mode, esbuild | Lit's official guidance: do not bundle libraries. Plain `tsc` output is the cleanest distribution format. |
-| **Build tool (Storybook)** | Vite (built into Storybook) | Webpack | Default for Storybook 10; faster builds and HMR |
-| **Test runner** | Vitest 4.x (Browser Mode) | @web/test-runner, Jest, Playwright CT | Unified test runner for unit + browser + Storybook tests; 2-10x faster than Jest; Storybook 10 native integration; Browser Mode stable since Vitest 4 |
-| **Browser provider (tests)** | Playwright | WebDriverIO | Parallel execution support; richer API; industry standard |
-| **Design tokens format** | DTCG (W3C 2025.10 stable) | Style Dictionary legacy format | Standards-aligned; future-proof; supported by Style Dictionary 4, Tokens Studio, Figma |
-| **Token build tool** | Style Dictionary 4.x | Theo, custom scripts | Industry standard; DTCG support; multi-platform output; extensible |
-| **Token distribution** | CSS custom properties | Sass variables, JS objects | Only mechanism that penetrates Shadow DOM; runtime-swappable for theming; zero JS overhead |
-| **CEM analyzer** | `@custom-elements-manifest/analyzer` | Manual JSON, Stencil docs | Community standard; Lit plugin built-in; feeds Storybook, VS Code, JetBrains |
-| **Decorator style (Lit)** | Experimental decorators | TC39 standard decorators | Lit team recommends experimental for now; produces more optimal output; standard decorator support in Lit still experimental |
-| **TypeScript target** | ES2021 | ES2022, ESNext | Lit's recommended target; covers all evergreen browsers; avoids `useDefineForClassFields` issues at higher targets |
-| **Accessibility standard** | WCAG 2.1 AA | WCAG 2.2 AA | 2.1 AA is the current legal floor for healthcare (HHS mandate, EAA); 2.2 AA aspirational for future iteration |
-| **Drupal delivery** | npm package (primary), CDN (secondary) | CDN-only, vendor directory | npm gives version pinning and integrity checking; CDN for rapid prototyping; avoid Drupal vendor dir pattern |
+| Decision                     | Choice                                 | Alternatives Considered               | Rationale                                                                                                                                                                                                                                     |
+| ---------------------------- | -------------------------------------- | ------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Component framework**      | Lit 3.x                                | Stencil, FAST, Vanilla WC             | Lit is the most widely adopted WC library, backed by Google, smallest runtime (~5KB), strongest TypeScript support, and the CEM ecosystem is built around it                                                                                  |
+| **Package manager**          | npm                                    | pnpm, yarn, bun                       | npm ships with Node.js (zero additional setup); npm workspaces provide workspace linking; widely understood across enterprise teams                                                                                                           |
+| **Monorepo tool**            | npm workspaces + Turborepo             | Nx, Lerna, pnpm workspaces            | npm workspaces handle dependency resolution and workspace linking. Turborepo adds intelligent caching, parallel task execution, and dependency-aware build orchestration. Together they provide a robust, well-supported monorepo foundation. |
+| **Storybook framework**      | `@storybook/web-components-vite` (9.x) | Webpack variant, Rsbuild              | Vite is the standard for new projects; fastest dev server; Storybook 10 has strongest Vite integration                                                                                                                                        |
+| **Storybook helpers**        | `@wc-toolkit/storybook-helpers`        | Manual argTypes, custom helpers       | Eliminates hundreds of lines of boilerplate; two-way binding; maintained by the WC community                                                                                                                                                  |
+| **Build tool (library)**     | `tsc` only (no bundler)                | Rollup, Vite lib mode, esbuild        | Lit's official guidance: do not bundle libraries. Plain `tsc` output is the cleanest distribution format.                                                                                                                                     |
+| **Build tool (Storybook)**   | Vite (built into Storybook)            | Webpack                               | Default for Storybook 10; faster builds and HMR                                                                                                                                                                                               |
+| **Test runner**              | Vitest 4.x (Browser Mode)              | @web/test-runner, Jest, Playwright CT | Unified test runner for unit + browser + Storybook tests; 2-10x faster than Jest; Storybook 10 native integration; Browser Mode stable since Vitest 4                                                                                         |
+| **Browser provider (tests)** | Playwright                             | WebDriverIO                           | Parallel execution support; richer API; industry standard                                                                                                                                                                                     |
+| **Design tokens format**     | DTCG (W3C 2025.10 stable)              | Style Dictionary legacy format        | Standards-aligned; future-proof; supported by Style Dictionary 4, Tokens Studio, Figma                                                                                                                                                        |
+| **Token build tool**         | Style Dictionary 4.x                   | Theo, custom scripts                  | Industry standard; DTCG support; multi-platform output; extensible                                                                                                                                                                            |
+| **Token distribution**       | CSS custom properties                  | Sass variables, JS objects            | Only mechanism that penetrates Shadow DOM; runtime-swappable for theming; zero JS overhead                                                                                                                                                    |
+| **CEM analyzer**             | `@custom-elements-manifest/analyzer`   | Manual JSON, Stencil docs             | Community standard; Lit plugin built-in; feeds Storybook, VS Code, JetBrains                                                                                                                                                                  |
+| **Decorator style (Lit)**    | Experimental decorators                | TC39 standard decorators              | Lit team recommends experimental for now; produces more optimal output; standard decorator support in Lit still experimental                                                                                                                  |
+| **TypeScript target**        | ES2021                                 | ES2022, ESNext                        | Lit's recommended target; covers all evergreen browsers; avoids `useDefineForClassFields` issues at higher targets                                                                                                                            |
+| **Accessibility standard**   | WCAG 2.1 AA                            | WCAG 2.2 AA                           | 2.1 AA is the current legal floor for healthcare (HHS mandate, EAA); 2.2 AA aspirational for future iteration                                                                                                                                 |
+| **Drupal delivery**          | npm package (primary), CDN (secondary) | CDN-only, vendor directory            | npm gives version pinning and integrity checking; CDN for rapid prototyping; avoid Drupal vendor dir pattern                                                                                                                                  |
 
 ---
 
 ## Appendix A: Key Dependencies (Version Matrix)
 
-| Package | Version | Purpose |
-|---------|---------|---------|
-| `lit` | ^4.1.0 | Web Component framework |
-| `typescript` | ^5.7.0 | Language compiler |
-| `@storybook/web-components-vite` | ^9.1.0 | Storybook framework |
-| `@storybook/addon-essentials` | ^9.1.0 | Core Storybook addons |
-| `@storybook/addon-a11y` | ^9.1.0 | Accessibility testing |
-| `@wc-toolkit/storybook-helpers` | ^2.0.0 | CEM-to-Storybook automation |
-| `@custom-elements-manifest/analyzer` | ^0.10.0 | API manifest generation |
-| `style-dictionary` | ^4.3.0 | Design token build |
-| `vitest` | ^4.0.0 | Test runner |
-| `@vitest/browser` | ^4.0.0 | Browser testing |
-| `playwright` | ^1.50.0 | Browser automation (test provider) |
-| `@open-wc/testing-helpers` | ^4.0.0 | WC test fixtures |
-| `vite` | ^6.0.0 | Dev server + build (via Storybook) |
-| `npm` | ^10.0.0 | Package manager (ships with Node.js) |
-| `turbo` | ^2.0.0 | Monorepo task orchestration |
-| `eslint` | ^9.0.0 | Linting (flat config) |
-| `prettier` | ^3.4.0 | Formatting |
+| Package                              | Version | Purpose                              |
+| ------------------------------------ | ------- | ------------------------------------ |
+| `lit`                                | ^4.1.0  | Web Component framework              |
+| `typescript`                         | ^5.7.0  | Language compiler                    |
+| `@storybook/web-components-vite`     | ^9.1.0  | Storybook framework                  |
+| `@storybook/addon-essentials`        | ^9.1.0  | Core Storybook addons                |
+| `@storybook/addon-a11y`              | ^9.1.0  | Accessibility testing                |
+| `@wc-toolkit/storybook-helpers`      | ^2.0.0  | CEM-to-Storybook automation          |
+| `@custom-elements-manifest/analyzer` | ^0.10.0 | API manifest generation              |
+| `style-dictionary`                   | ^4.3.0  | Design token build                   |
+| `vitest`                             | ^4.0.0  | Test runner                          |
+| `@vitest/browser`                    | ^4.0.0  | Browser testing                      |
+| `playwright`                         | ^1.50.0 | Browser automation (test provider)   |
+| `@open-wc/testing-helpers`           | ^4.0.0  | WC test fixtures                     |
+| `vite`                               | ^6.0.0  | Dev server + build (via Storybook)   |
+| `npm`                                | ^10.0.0 | Package manager (ships with Node.js) |
+| `turbo`                              | ^2.0.0  | Monorepo task orchestration          |
+| `eslint`                             | ^9.0.0  | Linting (flat config)                |
+| `prettier`                           | ^3.4.0  | Formatting                           |
 
 ---
 
@@ -1425,6 +1410,7 @@ jobs:
 This architecture was informed by the following sources, accessed February 2026:
 
 **Lit & Web Components:**
+
 - [Lit Official Documentation -- Building for Production](https://lit.dev/docs/tools/production/)
 - [Lit Official Documentation -- Publishing](https://lit.dev/docs/tools/publishing/)
 - [Lit Official Documentation -- Decorators](https://lit.dev/docs/components/decorators/)
@@ -1432,41 +1418,48 @@ This architecture was informed by the following sources, accessed February 2026:
 - [Web Components 2025: Shadow DOM, Lit 3.0, and Browser Compatibility](https://markaicode.com/web-components-2025-shadow-dom-lit-browser-compatibility/)
 
 **Storybook:**
+
 - [Storybook 10 Official Release](https://storybook.js.org/releases/9.0)
 - [Storybook for Web Components & Vite (9.x docs)](https://storybook.js.org/docs/9/get-started/frameworks/web-components-vite)
 - [Storybook 10 -- Built-in Testing](https://storybook.js.org/blog/storybook-9-beta/)
 - [Storybook Releases Storybook v9 with Improved Testing Support (InfoQ)](https://www.infoq.com/news/2025/07/storybook-v9-released/)
 
 **Custom Elements Manifest:**
+
 - [Custom Elements Manifest -- Getting Started](https://custom-elements-manifest.open-wc.org/analyzer/getting-started/)
 - [The Killer Feature of Web Components (Dave Rupert, 2025)](https://daverupert.com/2025/10/custom-elements-manifest-killer-feature)
 - [Documenting Web Components With Storybook (James Ives, 2025)](https://jamesiv.es/blog/frontend/javascript/2025/02/19/documenting-web-components-with-storybook/)
 - [WC-Toolkit Storybook Helpers](https://wc-toolkit.com/integrations/storybook/)
 
 **Design Tokens:**
+
 - [Design Token-Based UI Architecture (Martin Fowler)](https://martinfowler.com/articles/design-token-based-ui-architecture.html)
 - [W3C DTCG Specification Reaches First Stable Version (2025.10)](https://www.w3.org/community/design-tokens/2025/10/28/design-tokens-specification-reaches-first-stable-version/)
 - [Style Dictionary Documentation](https://styledictionary.com/)
 - [The Developer's Guide to Design Tokens and CSS Variables (Penpot)](https://penpot.app/blog/the-developers-guide-to-design-tokens-and-css-variables/)
 
 **Testing:**
+
 - [Vitest Browser Mode Documentation](https://vitest.dev/guide/browser/)
 - [Vitest in 2026: The New Standard for Modern JavaScript Testing](https://jeffbruchado.com.br/en/blog/vitest-2026-standard-modern-javascript-testing)
 - [Testing Lit with Vitest Browser and Playwright (Comparison)](https://github.com/oscarmarina/lit-vitest-testing-comparison)
 - [Vitest Browser Mode vs Playwright (Epic Web Dev)](https://www.epicweb.dev/vitest-browser-mode-vs-playwright)
 
 **Drupal Integration:**
+
 - [Web Components Module for Drupal](https://www.drupal.org/project/webcomponents)
 - [Adding Assets via libraries.yml (Drupal docs)](https://www.drupal.org/docs/develop/creating-modules/adding-assets-css-js-to-a-drupal-module-via-librariesyml)
 - [Drupal Single Directory Components Documentation](https://www.drupal.org/docs/develop/theming-drupal/using-single-directory-components/quickstart)
 - [Component-Based Design in Drupal (Vardot)](https://www.vardot.com/en-us/ideas/blog/component-based-design-drupal)
 
 **Accessibility & Healthcare:**
+
 - [What WCAG 2.1 AA Means for Healthcare Organizations in 2026 (Pilot Digital)](https://pilotdigital.com/blog/what-wcag-2-1-aa-means-for-healthcare-organizations-in-2026/)
 - [WCAG Standards and Healthcare Websites (Full Media)](https://www.fullmedia.com/wcag-accessibility-for-healthcare-websites/)
 - [2026 ADA Web Accessibility Standards & Requirements](https://www.accessibility.works/blog/wcag-ada-website-compliance-standards-requirements/)
 
 **Monorepo & Tooling:**
+
 - [Web Components Monorepo Starter (Turborepo + Lit + TypeScript)](https://github.com/neoki07/web-components-monorepo-starter)
 - [Complete Monorepo Guide: npm workspaces + Turborepo (2025)](https://jsdev.space/complete-monorepo-guide/)
 - [Structuring a Repository (Turborepo docs)](https://turborepo.dev/docs/crafting-your-repository/structuring-a-repository)

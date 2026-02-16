@@ -265,7 +265,12 @@
       "grade": "D",
       "score": 60,
       "status": "Poor",
-      "gaps": ["missing LICENSE", "missing CONTRIBUTING", "missing SECURITY", "missing CODE_OF_CONDUCT"]
+      "gaps": [
+        "missing LICENSE",
+        "missing CONTRIBUTING",
+        "missing SECURITY",
+        "missing CODE_OF_CONDUCT"
+      ]
     },
     "monorepo_architecture": {
       "grade": "B",
@@ -332,11 +337,7 @@
         "Add changeset configuration for version management"
       ],
       "estimated_effort_hours": 6,
-      "blocker_for": [
-        "external_contributions",
-        "open_source_release",
-        "security_compliance"
-      ]
+      "blocker_for": ["external_contributions", "open_source_release", "security_compliance"]
     },
     "high_priority_1_week": {
       "items": [
@@ -347,10 +348,7 @@
         "Add release process documentation"
       ],
       "estimated_effort_hours": 10,
-      "impact": [
-        "developer_productivity",
-        "contribution_quality"
-      ]
+      "impact": ["developer_productivity", "contribution_quality"]
     },
     "medium_priority_2_weeks": {
       "items": [
@@ -361,9 +359,7 @@
         "Document when to run root vs package commands"
       ],
       "estimated_effort_hours": 6,
-      "impact": [
-        "developer_experience_polish"
-      ]
+      "impact": ["developer_experience_polish"]
     }
   },
   "conclusion": {

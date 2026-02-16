@@ -1,0 +1,86 @@
+# ==============================================================================
+# Code Owners - WC-2026 Enterprise Healthcare Web Component Library
+# ==============================================================================
+# These owners will be requested for review when someone opens a pull request
+# that modifies files in the specified paths.
+#
+# Documentation: https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+# ==============================================================================
+
+# Default owners for everything in the repo
+* @himerus
+
+# ==============================================================================
+# Component Library (@helix/library)
+# ==============================================================================
+
+# All component source code
+/packages/hx-library/src/ @himerus
+
+# Design tokens
+/packages/hx-tokens/ @himerus
+
+# Component tests require review
+/packages/hx-library/src/**/*.test.ts @himerus
+
+# Storybook stories
+/packages/hx-library/src/**/*.stories.ts @himerus
+
+# ==============================================================================
+# Applications
+# ==============================================================================
+
+# Documentation site (Astro/Starlight)
+/apps/docs/ @himerus
+
+# Storybook configuration and preview
+/apps/storybook/ @himerus
+
+# Admin Dashboard
+/apps/admin/ @himerus
+
+# ==============================================================================
+# Build & Configuration
+# ==============================================================================
+
+# CI/CD workflows - require extra scrutiny
+/.github/workflows/ @himerus
+
+# Package manifests - critical for publishing
+/package.json @himerus
+/packages/*/package.json @himerus
+
+# TypeScript configuration
+/tsconfig*.json @himerus
+
+# Build configuration
+/turbo.json @himerus
+/vite.config.ts @himerus
+
+# ==============================================================================
+# Quality & Documentation
+# ==============================================================================
+
+# Build plan and architecture docs
+/build-plan/ @himerus
+
+# README and contributing guides
+/README.md @himerus
+/CLAUDE.md @himerus
+/CONTRIBUTING.md @himerus
+
+# Quality scripts
+/scripts/ @himerus
+
+# Git hooks
+/.husky/ @himerus
+
+# ==============================================================================
+# Special Files
+# ==============================================================================
+
+# EditorConfig - enforces coding standards
+/.editorconfig @himerus
+
+# Custom Elements Manifest - critical for documentation
+/packages/hx-library/custom-elements.json @himerus

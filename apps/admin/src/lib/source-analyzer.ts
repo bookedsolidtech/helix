@@ -2,9 +2,9 @@
  * Source file analyzer.
  * Reads component source files for display and analysis in the admin dashboard.
  */
-import { readFileSync, existsSync, statSync } from "node:fs";
-import { resolve } from "node:path";
-import { getComponentDirectory } from "./cem-parser";
+import { readFileSync, existsSync, statSync } from 'node:fs';
+import { resolve } from 'node:path';
+import { getComponentDirectory } from './cem-parser';
 
 export interface SourceInfo {
   tagName: string;
@@ -20,7 +20,7 @@ export interface SourceInfo {
 }
 
 function getLibraryRoot(): string {
-  return resolve(process.cwd(), "../../packages/hx-library");
+  return resolve(process.cwd(), '../../packages/hx-library');
 }
 
 export function getSourceInfo(tagName: string): SourceInfo {
@@ -30,7 +30,7 @@ export function getSourceInfo(tagName: string): SourceInfo {
   const mainFile = resolve(componentDir, `${tagName}.ts`);
   const stylesFile = resolve(componentDir, `${tagName}.styles.ts`);
   const storiesFile = resolve(componentDir, `${dir}.stories.ts`);
-  const indexFile = resolve(componentDir, "index.ts");
+  const indexFile = resolve(componentDir, 'index.ts');
 
   const fileExists = existsSync(mainFile);
   let lineCount = 0;
@@ -38,8 +38,8 @@ export function getSourceInfo(tagName: string): SourceInfo {
   let lastModified: Date | null = null;
 
   if (fileExists) {
-    const content = readFileSync(mainFile, "utf-8");
-    lineCount = content.split("\n").length;
+    const content = readFileSync(mainFile, 'utf-8');
+    lineCount = content.split('\n').length;
     const stat = statSync(mainFile);
     sizeBytes = stat.size;
     lastModified = stat.mtime;
@@ -64,14 +64,14 @@ export function getSourceContent(tagName: string): string | null {
   const dir = getComponentDirectory(tagName);
   const mainFile = resolve(libRoot, `src/components/${dir}/${tagName}.ts`);
   try {
-    return readFileSync(mainFile, "utf-8");
+    return readFileSync(mainFile, 'utf-8');
   } catch {
     return null;
   }
 }
 
 export async function getAllSourceInfo(): Promise<SourceInfo[]> {
-  const { getAllComponentNames } = await import("./cem-parser");
+  const { getAllComponentNames } = await import('./cem-parser');
   const names = getAllComponentNames();
   return names.map(getSourceInfo);
 }

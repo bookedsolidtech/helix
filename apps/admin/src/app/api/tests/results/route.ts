@@ -1,7 +1,7 @@
-import { NextResponse } from "next/server";
-import { getAllTestResults } from "@/lib/test-results-reader";
+import { NextResponse } from 'next/server';
+import { getAllTestResults } from '@/lib/test-results-reader';
 
-export const dynamic = "force-dynamic";
+export const dynamic = 'force-dynamic';
 
 /**
  * GET /api/tests/results
@@ -11,10 +11,7 @@ export async function GET(): Promise<NextResponse> {
   const results = getAllTestResults();
 
   if (!results) {
-    return NextResponse.json(
-      { error: "No test results found. Run tests first." },
-      { status: 404 }
-    );
+    return NextResponse.json({ error: 'No test results found. Run tests first.' }, { status: 404 });
   }
 
   return NextResponse.json(results);

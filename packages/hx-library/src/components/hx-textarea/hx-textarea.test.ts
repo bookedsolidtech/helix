@@ -374,6 +374,22 @@ describe('hx-textarea', () => {
       const el = await fixture<WcTextarea>('<hx-textarea required></hx-textarea>');
       expect(el.validity.valueMissing).toBe(true);
     });
+
+    it('reportValidity returns false when required + empty', async () => {
+      const el = await fixture<WcTextarea>('<hx-textarea required></hx-textarea>');
+      expect(el.reportValidity()).toBe(false);
+    });
+
+    it('reportValidity returns true when required + filled', async () => {
+      const el = await fixture<WcTextarea>('<hx-textarea required value="filled"></hx-textarea>');
+      expect(el.reportValidity()).toBe(true);
+    });
+
+    it('validationMessage is set when required + empty', async () => {
+      const el = await fixture<WcTextarea>('<hx-textarea required></hx-textarea>');
+      await el.updateComplete;
+      expect(el.validationMessage).toBeTruthy();
+    });
   });
 
   // --- Methods (2) ---

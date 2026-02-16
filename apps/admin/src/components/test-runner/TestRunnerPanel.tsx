@@ -68,7 +68,7 @@ export function TestRunnerPanel({ initialResults }: TestRunnerPanelProps) {
   const flavorRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const startTimeRef = useRef<number>(0);
 
-  const isDev = process.env.NODE_ENV === 'development' || typeof window !== 'undefined';
+  const isDev = process.env.NODE_ENV === 'development';
 
   const runTests = useCallback(async () => {
     setIsRunning(true);

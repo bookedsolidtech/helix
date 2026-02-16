@@ -525,277 +525,6 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/components/hx-card/hx-card.ts",
-      "declarations": [
-        {
-          "kind": "class",
-          "description": "A flexible card component for displaying grouped content.",
-          "name": "HelixCard",
-          "cssProperties": [
-            {
-              "description": "Card background color.",
-              "name": "--hx-card-bg",
-              "default": "var(--hx-color-neutral-0)"
-            },
-            {
-              "description": "Card text color.",
-              "name": "--hx-card-color",
-              "default": "var(--hx-color-neutral-800)"
-            },
-            {
-              "description": "Card border color.",
-              "name": "--hx-card-border-color",
-              "default": "var(--hx-color-neutral-200)"
-            },
-            {
-              "description": "Card border radius.",
-              "name": "--hx-card-border-radius",
-              "default": "var(--hx-border-radius-lg)"
-            },
-            {
-              "description": "Internal padding for card sections.",
-              "name": "--hx-card-padding",
-              "default": "var(--hx-space-6)"
-            },
-            {
-              "description": "Gap between card sections.",
-              "name": "--hx-card-gap",
-              "default": "var(--hx-space-4)"
-            }
-          ],
-          "cssParts": [
-            {
-              "description": "The outer card container element.",
-              "name": "card"
-            },
-            {
-              "description": "The image slot container.",
-              "name": "image"
-            },
-            {
-              "description": "The heading slot container.",
-              "name": "heading"
-            },
-            {
-              "description": "The body slot container.",
-              "name": "body"
-            },
-            {
-              "description": "The footer slot container.",
-              "name": "footer"
-            },
-            {
-              "description": "The actions slot container.",
-              "name": "actions"
-            }
-          ],
-          "slots": [
-            {
-              "description": "Optional image or media content at the top of the card.",
-              "name": "image"
-            },
-            {
-              "description": "The card heading/title content.",
-              "name": "heading"
-            },
-            {
-              "description": "Default slot for the card body content.",
-              "name": ""
-            },
-            {
-              "description": "Optional footer content below the body.",
-              "name": "footer"
-            },
-            {
-              "description": "Optional action buttons, rendered with a top border separator.",
-              "name": "actions"
-            }
-          ],
-          "members": [
-            {
-              "kind": "field",
-              "name": "variant",
-              "type": {
-                "text": "'default' | 'featured' | 'compact'"
-              },
-              "default": "'default'",
-              "description": "Visual style variant of the card.",
-              "attribute": "variant",
-              "reflects": true
-            },
-            {
-              "kind": "field",
-              "name": "elevation",
-              "type": {
-                "text": "'flat' | 'raised' | 'floating'"
-              },
-              "default": "'flat'",
-              "description": "Elevation (shadow depth) of the card.",
-              "attribute": "elevation",
-              "reflects": true
-            },
-            {
-              "kind": "field",
-              "name": "wcHref",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "description": "Optional URL. When set, the card becomes interactive (clickable)\nand navigates to this URL on click.\nUses wc-href to avoid conflicting with the native HTML href attribute.",
-              "attribute": "hx-href"
-            },
-            {
-              "kind": "field",
-              "name": "_hasSlotContent",
-              "type": {
-                "text": "Record<string, boolean>"
-              },
-              "privacy": "private",
-              "default": "{ image: false, heading: false, footer: false, actions: false, }"
-            },
-            {
-              "kind": "method",
-              "name": "_handleSlotChange",
-              "privacy": "private",
-              "parameters": [
-                {
-                  "name": "slotName",
-                  "type": {
-                    "text": "string"
-                  }
-                }
-              ]
-            },
-            {
-              "kind": "method",
-              "name": "_handleClick",
-              "privacy": "private",
-              "return": {
-                "type": {
-                  "text": "void"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "e",
-                  "type": {
-                    "text": "MouseEvent"
-                  }
-                }
-              ]
-            },
-            {
-              "kind": "method",
-              "name": "_handleKeyDown",
-              "privacy": "private",
-              "return": {
-                "type": {
-                  "text": "void"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "e",
-                  "type": {
-                    "text": "KeyboardEvent"
-                  }
-                }
-              ]
-            }
-          ],
-          "events": [
-            {
-              "name": "hx-card-click",
-              "type": {
-                "text": "CustomEvent"
-              },
-              "description": "Dispatched when an interactive card is clicked.\nIncludes the target href in the detail."
-            },
-            {
-              "type": {
-                "text": "CustomEvent<{url: string, originalEvent: MouseEvent}>"
-              },
-              "description": "Dispatched when an interactive card (with wc-href) is clicked.",
-              "name": "wc-card-click"
-            }
-          ],
-          "attributes": [
-            {
-              "name": "variant",
-              "type": {
-                "text": "'default' | 'featured' | 'compact'"
-              },
-              "default": "'default'",
-              "description": "Visual style variant of the card.",
-              "fieldName": "variant",
-              "attribute": "variant"
-            },
-            {
-              "name": "elevation",
-              "type": {
-                "text": "'flat' | 'raised' | 'floating'"
-              },
-              "default": "'flat'",
-              "description": "Elevation (shadow depth) of the card.",
-              "fieldName": "elevation",
-              "attribute": "elevation"
-            },
-            {
-              "name": "hx-href",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "description": "Optional URL. When set, the card becomes interactive (clickable)\nand navigates to this URL on click.\nUses wc-href to avoid conflicting with the native HTML href attribute.",
-              "fieldName": "wcHref",
-              "attribute": "hx-href"
-            }
-          ],
-          "superclass": {
-            "name": "LitElement",
-            "package": "lit"
-          },
-          "tagName": "hx-card",
-          "customElement": true,
-          "summary": "Content container with image, heading, body, footer, and action slots."
-        }
-      ],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "HelixCard",
-          "declaration": {
-            "name": "HelixCard",
-            "module": "src/components/hx-card/hx-card.ts"
-          }
-        },
-        {
-          "kind": "custom-element-definition",
-          "name": "hx-card",
-          "declaration": {
-            "name": "HelixCard",
-            "module": "src/components/hx-card/hx-card.ts"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
-      "path": "src/components/hx-card/index.ts",
-      "declarations": [],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "HelixCard",
-          "declaration": {
-            "name": "HelixCard",
-            "module": "./hx-card.js"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
       "path": "src/components/hx-button/hx-button.ts",
       "declarations": [
         {
@@ -1030,585 +759,6 @@
           "declaration": {
             "name": "HelixButton",
             "module": "./hx-button.js"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
-      "path": "src/components/hx-form/hx-form.ts",
-      "declarations": [
-        {
-          "kind": "class",
-          "description": "A Light DOM form wrapper that styles native HTML form elements and\nwc-* components with the design system's form styles.\n\nWhen `action` is set, renders a `<form>` wrapper around slotted content.\nWhen no `action` is set (the Drupal pattern), renders only a `<slot>`\nso Drupal can provide its own `<form>` tag.\n\nUses adopted stylesheets to inject scoped CSS into the document without\nShadow DOM, keeping native form participation and Drupal compatibility.",
-          "name": "HelixForm",
-          "cssProperties": [
-            {
-              "description": "Gap between form fields.",
-              "name": "--hx-form-gap",
-              "default": "var(--hx-space-4)"
-            },
-            {
-              "description": "Maximum width of the form.",
-              "name": "--hx-form-max-width",
-              "default": "none"
-            },
-            {
-              "description": "Internal padding of the form.",
-              "name": "--hx-form-padding",
-              "default": "0"
-            }
-          ],
-          "slots": [
-            {
-              "description": "Default slot for form fields and controls.",
-              "name": ""
-            }
-          ],
-          "members": [
-            {
-              "kind": "field",
-              "name": "_styles",
-              "privacy": "private",
-              "default": "new AdoptedStylesheetsController(this, helixFormScopedCss, document)"
-            },
-            {
-              "kind": "field",
-              "name": "action",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "description": "The URL to submit the form to. When empty, the form handles\nsubmission client-side only and dispatches `wc-submit`.",
-              "attribute": "action"
-            },
-            {
-              "kind": "field",
-              "name": "method",
-              "type": {
-                "text": "'get' | 'post'"
-              },
-              "default": "'post'",
-              "description": "The HTTP method used when submitting the form.",
-              "attribute": "method"
-            },
-            {
-              "kind": "field",
-              "name": "novalidate",
-              "type": {
-                "text": "boolean"
-              },
-              "default": "false",
-              "description": "When true, disables the browser's built-in constraint validation\non form submission.",
-              "attribute": "novalidate"
-            },
-            {
-              "kind": "field",
-              "name": "name",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "description": "Identifies the form for scripting and form discovery.",
-              "attribute": "name"
-            },
-            {
-              "kind": "method",
-              "name": "checkValidity",
-              "return": {
-                "type": {
-                  "text": "boolean"
-                }
-              },
-              "description": "Checks the validity of all child form elements without showing\nvalidation UI. Returns `true` if all elements are valid."
-            },
-            {
-              "kind": "method",
-              "name": "reportValidity",
-              "return": {
-                "type": {
-                  "text": "boolean"
-                }
-              },
-              "description": "Checks validity and triggers the browser's constraint validation UI\non each invalid element. Returns `true` if all elements are valid."
-            },
-            {
-              "kind": "method",
-              "name": "getFormData",
-              "return": {
-                "type": {
-                  "text": "FormData"
-                }
-              },
-              "description": "Collects form data from all child form elements (native and wc-*).\nReturns a `FormData` object."
-            },
-            {
-              "kind": "method",
-              "name": "getFormElements",
-              "return": {
-                "type": {
-                  "text": "HTMLElement[]"
-                }
-              },
-              "description": "Returns all child wc-* form components (elements whose tag starts\nwith `wc-` and that have a `name` property or a `value` property)."
-            },
-            {
-              "kind": "method",
-              "name": "getNativeFormElements",
-              "return": {
-                "type": {
-                  "text": "Array<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement | HTMLButtonElement>"
-                }
-              },
-              "description": "Returns all native form elements (input, select, textarea, button)\nfound within this component's light DOM."
-            },
-            {
-              "kind": "method",
-              "name": "_getAllValidatableElements",
-              "privacy": "private",
-              "return": {
-                "type": {
-                  "text": "HTMLElement[]"
-                }
-              },
-              "description": "Returns all elements that support constraint validation, including\nboth native form elements and wc-* components with `checkValidity`."
-            },
-            {
-              "kind": "field",
-              "name": "_handleSubmit",
-              "privacy": "private"
-            },
-            {
-              "kind": "field",
-              "name": "_handleReset",
-              "privacy": "private"
-            },
-            {
-              "kind": "method",
-              "name": "_collectValidationErrors",
-              "privacy": "private",
-              "return": {
-                "type": {
-                  "text": "Array<{ name: string; message: string }>"
-                }
-              }
-            }
-          ],
-          "events": [
-            {
-              "type": {
-                "text": "CustomEvent<{valid: boolean, values: Record<string, FormDataEntryValue>}>"
-              },
-              "description": "Dispatched on valid client-side submit when no action is set.",
-              "name": "wc-submit"
-            },
-            {
-              "type": {
-                "text": "CustomEvent<{errors: Array<{name: string, message: string}>}>"
-              },
-              "description": "Dispatched when validation fails on submit.",
-              "name": "wc-invalid"
-            },
-            {
-              "type": {
-                "text": "CustomEvent"
-              },
-              "description": "Dispatched when the form is reset.",
-              "name": "wc-reset"
-            }
-          ],
-          "attributes": [
-            {
-              "name": "action",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "description": "The URL to submit the form to. When empty, the form handles\nsubmission client-side only and dispatches `wc-submit`.",
-              "fieldName": "action",
-              "attribute": "action"
-            },
-            {
-              "name": "method",
-              "type": {
-                "text": "'get' | 'post'"
-              },
-              "default": "'post'",
-              "description": "The HTTP method used when submitting the form.",
-              "fieldName": "method",
-              "attribute": "method"
-            },
-            {
-              "name": "novalidate",
-              "type": {
-                "text": "boolean"
-              },
-              "default": "false",
-              "description": "When true, disables the browser's built-in constraint validation\non form submission.",
-              "fieldName": "novalidate",
-              "attribute": "novalidate"
-            },
-            {
-              "name": "name",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "description": "Identifies the form for scripting and form discovery.",
-              "fieldName": "name",
-              "attribute": "name"
-            }
-          ],
-          "superclass": {
-            "name": "LitElement",
-            "package": "lit"
-          },
-          "tagName": "hx-form",
-          "customElement": true,
-          "summary": "Light DOM form wrapper with scoped styles for native and wc-* form elements."
-        }
-      ],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "HelixForm",
-          "declaration": {
-            "name": "HelixForm",
-            "module": "src/components/hx-form/hx-form.ts"
-          }
-        },
-        {
-          "kind": "custom-element-definition",
-          "name": "hx-form",
-          "declaration": {
-            "name": "HelixForm",
-            "module": "src/components/hx-form/hx-form.ts"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
-      "path": "src/components/hx-form/index.ts",
-      "declarations": [],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "HelixForm",
-          "declaration": {
-            "name": "HelixForm",
-            "module": "./hx-form.js"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
-      "path": "src/components/hx-container/hx-container.ts",
-      "declarations": [
-        {
-          "kind": "class",
-          "description": "A layout container that constrains content width and provides\nconsistent vertical spacing and horizontal gutters.\n\nUses a two-layer model: the outer host spans full width (background,\nvertical padding), while the inner wrapper constrains max-width,\ncenters content, and applies horizontal gutters.",
-          "name": "HelixContainer",
-          "cssProperties": [
-            {
-              "description": "Background color on the outer wrapper.",
-              "name": "--hx-container-bg",
-              "default": "transparent"
-            },
-            {
-              "description": "Horizontal padding on the inner box.",
-              "name": "--hx-container-gutter",
-              "default": "var(--hx-space-6)"
-            },
-            {
-              "description": "Override the max-width set by the width property.",
-              "name": "--hx-container-max-width"
-            },
-            {
-              "description": "Max-width for the content width preset.",
-              "name": "--hx-container-content",
-              "default": "72rem"
-            },
-            {
-              "description": "Max-width for the sm width preset.",
-              "name": "--hx-container-sm",
-              "default": "640px"
-            },
-            {
-              "description": "Max-width for the md width preset.",
-              "name": "--hx-container-md",
-              "default": "768px"
-            },
-            {
-              "description": "Max-width for the lg width preset.",
-              "name": "--hx-container-lg",
-              "default": "1024px"
-            },
-            {
-              "description": "Max-width for the xl width preset.",
-              "name": "--hx-container-xl",
-              "default": "1280px"
-            }
-          ],
-          "cssParts": [
-            {
-              "description": "The inner wrapper that constrains max-width and applies gutters.",
-              "name": "inner"
-            }
-          ],
-          "slots": [
-            {
-              "description": "Default slot for container content.",
-              "name": ""
-            }
-          ],
-          "members": [
-            {
-              "kind": "field",
-              "name": "width",
-              "type": {
-                "text": "'full' | 'content' | 'narrow' | 'sm' | 'md' | 'lg' | 'xl'"
-              },
-              "default": "'content'",
-              "description": "Controls the max-width of the inner content wrapper.",
-              "attribute": "width",
-              "reflects": true
-            },
-            {
-              "kind": "field",
-              "name": "padding",
-              "type": {
-                "text": "'none' | 'sm' | 'md' | 'lg' | 'xl' | '2xl'"
-              },
-              "default": "'none'",
-              "description": "Vertical padding applied to the outer wrapper.",
-              "attribute": "padding",
-              "reflects": true
-            }
-          ],
-          "attributes": [
-            {
-              "name": "width",
-              "type": {
-                "text": "'full' | 'content' | 'narrow' | 'sm' | 'md' | 'lg' | 'xl'"
-              },
-              "default": "'content'",
-              "description": "Controls the max-width of the inner content wrapper.",
-              "fieldName": "width",
-              "attribute": "width"
-            },
-            {
-              "name": "padding",
-              "type": {
-                "text": "'none' | 'sm' | 'md' | 'lg' | 'xl' | '2xl'"
-              },
-              "default": "'none'",
-              "description": "Vertical padding applied to the outer wrapper.",
-              "fieldName": "padding",
-              "attribute": "padding"
-            }
-          ],
-          "superclass": {
-            "name": "LitElement",
-            "package": "lit"
-          },
-          "tagName": "hx-container",
-          "customElement": true,
-          "summary": "Layout primitive for constraining content width with consistent spacing."
-        }
-      ],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "HelixContainer",
-          "declaration": {
-            "name": "HelixContainer",
-            "module": "src/components/hx-container/hx-container.ts"
-          }
-        },
-        {
-          "kind": "custom-element-definition",
-          "name": "hx-container",
-          "declaration": {
-            "name": "HelixContainer",
-            "module": "src/components/hx-container/hx-container.ts"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
-      "path": "src/components/hx-container/index.ts",
-      "declarations": [],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "HelixContainer",
-          "declaration": {
-            "name": "HelixContainer",
-            "module": "./hx-container.js"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
-      "path": "src/components/hx-prose/hx-prose.ts",
-      "declarations": [
-        {
-          "kind": "class",
-          "description": "A Light DOM prose container that applies typographic styles to rich text\ncontent such as CKEditor output, Markdown-rendered HTML, or any structured\nbody copy.\n\nRenders in the Light DOM (no Shadow DOM) so that global and scoped styles\ncan target child elements directly. Uses the AdoptedStylesheetsController\nto inject scoped prose CSS into the document without duplication.",
-          "name": "HelixProse",
-          "cssProperties": [
-            {
-              "description": "Maximum content width.",
-              "name": "--hx-prose-max-width",
-              "default": "720px"
-            },
-            {
-              "description": "Base font size.",
-              "name": "--hx-prose-font-size",
-              "default": "var(--hx-font-size-base)"
-            },
-            {
-              "description": "Base line height.",
-              "name": "--hx-prose-line-height",
-              "default": "var(--hx-line-height-relaxed)"
-            },
-            {
-              "description": "Body text color.",
-              "name": "--hx-prose-color",
-              "default": "var(--hx-color-text)"
-            },
-            {
-              "description": "Heading color.",
-              "name": "--hx-prose-heading-color",
-              "default": "var(--hx-color-text-strong)"
-            },
-            {
-              "description": "Link color.",
-              "name": "--hx-prose-link-color",
-              "default": "var(--hx-color-primary)"
-            }
-          ],
-          "slots": [
-            {
-              "description": "Default slot for rich text content (headings, paragraphs, lists, tables, etc.).",
-              "name": ""
-            }
-          ],
-          "members": [
-            {
-              "kind": "field",
-              "name": "_styles",
-              "privacy": "private",
-              "default": "new AdoptedStylesheetsController(this, helixProseScopedCss, document)"
-            },
-            {
-              "kind": "field",
-              "name": "size",
-              "type": {
-                "text": "'sm' | 'base' | 'lg'"
-              },
-              "default": "'base'",
-              "description": "Typography scale for the prose content.",
-              "attribute": "size",
-              "reflects": true
-            },
-            {
-              "kind": "field",
-              "name": "maxWidth",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "description": "Maximum content width. When set, overrides the --hx-prose-max-width token.\nAccepts any valid CSS width value (e.g., '640px', '80ch', '100%').",
-              "attribute": "max-width",
-              "reflects": true
-            },
-            {
-              "kind": "method",
-              "name": "_applyMaxWidth",
-              "privacy": "private",
-              "return": {
-                "type": {
-                  "text": "void"
-                }
-              }
-            },
-            {
-              "kind": "method",
-              "name": "_applySize",
-              "privacy": "private",
-              "return": {
-                "type": {
-                  "text": "void"
-                }
-              }
-            }
-          ],
-          "attributes": [
-            {
-              "name": "size",
-              "type": {
-                "text": "'sm' | 'base' | 'lg'"
-              },
-              "default": "'base'",
-              "description": "Typography scale for the prose content.",
-              "fieldName": "size",
-              "attribute": "size"
-            },
-            {
-              "name": "max-width",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "description": "Maximum content width. When set, overrides the --hx-prose-max-width token.\nAccepts any valid CSS width value (e.g., '640px', '80ch', '100%').",
-              "fieldName": "maxWidth",
-              "attribute": "max-width"
-            }
-          ],
-          "superclass": {
-            "name": "LitElement",
-            "package": "lit"
-          },
-          "tagName": "hx-prose",
-          "customElement": true,
-          "summary": "Light DOM typography wrapper for rich text and CMS content."
-        }
-      ],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "HelixProse",
-          "declaration": {
-            "name": "HelixProse",
-            "module": "src/components/hx-prose/hx-prose.ts"
-          }
-        },
-        {
-          "kind": "custom-element-definition",
-          "name": "hx-prose",
-          "declaration": {
-            "name": "HelixProse",
-            "module": "src/components/hx-prose/hx-prose.ts"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
-      "path": "src/components/hx-prose/index.ts",
-      "declarations": [],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "HelixProse",
-          "declaration": {
-            "name": "HelixProse",
-            "module": "./hx-prose.js"
           }
         }
       ]
@@ -1986,7 +1136,7 @@
               "kind": "field",
               "name": "_id",
               "privacy": "private",
-              "default": "`wc-checkbox-${Math.random().toString(36).slice(2, 9)}`"
+              "default": "`hx-checkbox-${Math.random().toString(36).slice(2, 9)}`"
             },
             {
               "kind": "field",
@@ -2153,251 +1303,82 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/components/hx-switch/hx-switch.ts",
+      "path": "src/components/hx-prose/hx-prose.ts",
       "declarations": [
         {
           "kind": "class",
-          "description": "A toggle switch component for on/off states.",
-          "name": "HelixSwitch",
+          "description": "A Light DOM prose container that applies typographic styles to rich text\ncontent such as CKEditor output, Markdown-rendered HTML, or any structured\nbody copy.\n\nRenders in the Light DOM (no Shadow DOM) so that global and scoped styles\ncan target child elements directly. Uses the AdoptedStylesheetsController\nto inject scoped prose CSS into the document without duplication.",
+          "name": "HelixProse",
           "cssProperties": [
             {
-              "description": "Track background color.",
-              "name": "--hx-switch-track-bg",
-              "default": "var(--hx-color-neutral-300)"
+              "description": "Maximum content width.",
+              "name": "--hx-prose-max-width",
+              "default": "720px"
             },
             {
-              "description": "Track background when checked.",
-              "name": "--hx-switch-track-checked-bg",
-              "default": "var(--hx-color-primary-500)"
+              "description": "Base font size.",
+              "name": "--hx-prose-font-size",
+              "default": "var(--hx-font-size-base)"
             },
             {
-              "description": "Thumb background color.",
-              "name": "--hx-switch-thumb-bg",
-              "default": "var(--hx-color-neutral-0)"
+              "description": "Base line height.",
+              "name": "--hx-prose-line-height",
+              "default": "var(--hx-line-height-relaxed)"
             },
             {
-              "description": "Thumb box shadow.",
-              "name": "--hx-switch-thumb-shadow",
-              "default": "var(--hx-shadow-sm)"
+              "description": "Body text color.",
+              "name": "--hx-prose-color",
+              "default": "var(--hx-color-text)"
             },
             {
-              "description": "Focus ring color.",
-              "name": "--hx-switch-focus-ring-color",
-              "default": "var(--hx-focus-ring-color)"
+              "description": "Heading color.",
+              "name": "--hx-prose-heading-color",
+              "default": "var(--hx-color-text-strong)"
             },
             {
-              "description": "Label text color.",
-              "name": "--hx-switch-label-color",
-              "default": "var(--hx-color-neutral-700)"
-            },
-            {
-              "description": "Error message color.",
-              "name": "--hx-switch-error-color",
-              "default": "var(--hx-color-error-500)"
-            }
-          ],
-          "cssParts": [
-            {
-              "description": "The switch container (track + thumb wrapper).",
-              "name": "switch"
-            },
-            {
-              "description": "The track background element.",
-              "name": "track"
-            },
-            {
-              "description": "The sliding thumb element.",
-              "name": "thumb"
-            },
-            {
-              "description": "The label text element.",
-              "name": "label"
-            },
-            {
-              "description": "The help text container.",
-              "name": "help-text"
-            },
-            {
-              "description": "The error message container.",
-              "name": "error"
+              "description": "Link color.",
+              "name": "--hx-prose-link-color",
+              "default": "var(--hx-color-primary)"
             }
           ],
           "slots": [
             {
-              "description": "Custom label content (overrides the label property).",
+              "description": "Default slot for rich text content (headings, paragraphs, lists, tables, etc.).",
               "name": ""
-            },
-            {
-              "description": "Custom error content (overrides the error property).",
-              "name": "error"
-            },
-            {
-              "description": "Custom help text content (overrides the helpText property).",
-              "name": "help-text"
             }
           ],
           "members": [
             {
               "kind": "field",
-              "name": "formAssociated",
-              "type": {
-                "text": "boolean"
-              },
-              "static": true,
-              "default": "true"
-            },
-            {
-              "kind": "field",
-              "name": "_internals",
-              "type": {
-                "text": "ElementInternals"
-              },
-              "privacy": "private"
-            },
-            {
-              "kind": "field",
-              "name": "checked",
-              "type": {
-                "text": "boolean"
-              },
-              "default": "false",
-              "description": "Whether the switch is toggled on.",
-              "attribute": "checked",
-              "reflects": true
-            },
-            {
-              "kind": "field",
-              "name": "disabled",
-              "type": {
-                "text": "boolean"
-              },
-              "default": "false",
-              "description": "Whether the switch is disabled.",
-              "attribute": "disabled",
-              "reflects": true
-            },
-            {
-              "kind": "field",
-              "name": "required",
-              "type": {
-                "text": "boolean"
-              },
-              "default": "false",
-              "description": "Whether the switch is required for form submission.",
-              "attribute": "required",
-              "reflects": true
-            },
-            {
-              "kind": "field",
-              "name": "name",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "description": "The name of the switch, used for form submission.",
-              "attribute": "name"
-            },
-            {
-              "kind": "field",
-              "name": "value",
-              "type": {
-                "text": "string"
-              },
-              "default": "'on'",
-              "description": "The value submitted when the switch is checked.",
-              "attribute": "value"
-            },
-            {
-              "kind": "field",
-              "name": "label",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "description": "The visible label text for the switch.",
-              "attribute": "label"
+              "name": "_styles",
+              "privacy": "private",
+              "default": "new AdoptedStylesheetsController(this, helixProseScopedCss, document)"
             },
             {
               "kind": "field",
               "name": "size",
               "type": {
-                "text": "'sm' | 'md' | 'lg'"
+                "text": "'sm' | 'base' | 'lg'"
               },
-              "default": "'md'",
-              "description": "Size variant of the switch.",
-              "attribute": "hx-size",
+              "default": "'base'",
+              "description": "Typography scale for the prose content.",
+              "attribute": "size",
               "reflects": true
             },
             {
               "kind": "field",
-              "name": "error",
+              "name": "maxWidth",
               "type": {
                 "text": "string"
               },
               "default": "''",
-              "description": "Error message to display. When set, the switch enters an error state.",
-              "attribute": "error"
-            },
-            {
-              "kind": "field",
-              "name": "helpText",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "description": "Help text displayed below the switch for guidance.",
-              "attribute": "help-text"
-            },
-            {
-              "kind": "field",
-              "name": "form",
-              "type": {
-                "text": "HTMLFormElement | null"
-              },
-              "description": "Returns the associated form element, if any.",
-              "readonly": true
-            },
-            {
-              "kind": "field",
-              "name": "validationMessage",
-              "type": {
-                "text": "string"
-              },
-              "description": "Returns the validation message.",
-              "readonly": true
-            },
-            {
-              "kind": "field",
-              "name": "validity",
-              "type": {
-                "text": "ValidityState"
-              },
-              "description": "Returns the ValidityState object.",
-              "readonly": true
+              "description": "Maximum content width. When set, overrides the --hx-prose-max-width token.\nAccepts any valid CSS width value (e.g., '640px', '80ch', '100%').",
+              "attribute": "max-width",
+              "reflects": true
             },
             {
               "kind": "method",
-              "name": "checkValidity",
-              "return": {
-                "type": {
-                  "text": "boolean"
-                }
-              },
-              "description": "Checks whether the switch satisfies its constraints."
-            },
-            {
-              "kind": "method",
-              "name": "reportValidity",
-              "return": {
-                "type": {
-                  "text": "boolean"
-                }
-              },
-              "description": "Reports validity and shows the browser's constraint validation UI."
-            },
-            {
-              "kind": "method",
-              "name": "_updateValidity",
+              "name": "_applyMaxWidth",
               "privacy": "private",
               "return": {
                 "type": {
@@ -2407,52 +1388,644 @@
             },
             {
               "kind": "method",
-              "name": "formResetCallback",
+              "name": "_applySize",
+              "privacy": "private",
               "return": {
                 "type": {
                   "text": "void"
                 }
+              }
+            }
+          ],
+          "attributes": [
+            {
+              "name": "size",
+              "type": {
+                "text": "'sm' | 'base' | 'lg'"
               },
-              "description": "Called by the form when it resets."
+              "default": "'base'",
+              "description": "Typography scale for the prose content.",
+              "fieldName": "size",
+              "attribute": "size"
             },
             {
-              "kind": "method",
-              "name": "formStateRestoreCallback",
-              "return": {
-                "type": {
-                  "text": "void"
-                }
+              "name": "max-width",
+              "type": {
+                "text": "string"
               },
-              "parameters": [
-                {
-                  "name": "state",
-                  "type": {
-                    "text": "string"
-                  }
-                }
-              ],
-              "description": "Called when the form restores state (e.g., back/forward navigation)."
+              "default": "''",
+              "description": "Maximum content width. When set, overrides the --hx-prose-max-width token.\nAccepts any valid CSS width value (e.g., '640px', '80ch', '100%').",
+              "fieldName": "maxWidth",
+              "attribute": "max-width"
+            }
+          ],
+          "superclass": {
+            "name": "LitElement",
+            "package": "lit"
+          },
+          "tagName": "hx-prose",
+          "customElement": true,
+          "summary": "Light DOM typography wrapper for rich text and CMS content."
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "HelixProse",
+          "declaration": {
+            "name": "HelixProse",
+            "module": "src/components/hx-prose/hx-prose.ts"
+          }
+        },
+        {
+          "kind": "custom-element-definition",
+          "name": "hx-prose",
+          "declaration": {
+            "name": "HelixProse",
+            "module": "src/components/hx-prose/hx-prose.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/components/hx-prose/index.ts",
+      "declarations": [],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "HelixProse",
+          "declaration": {
+            "name": "HelixProse",
+            "module": "./hx-prose.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/components/hx-form/hx-form.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "A Light DOM form wrapper that styles native HTML form elements and\nwc-* components with the design system's form styles.\n\nWhen `action` is set, renders a `<form>` wrapper around slotted content.\nWhen no `action` is set (the Drupal pattern), renders only a `<slot>`\nso Drupal can provide its own `<form>` tag.\n\nUses adopted stylesheets to inject scoped CSS into the document without\nShadow DOM, keeping native form participation and Drupal compatibility.",
+          "name": "HelixForm",
+          "cssProperties": [
+            {
+              "description": "Gap between form fields.",
+              "name": "--hx-form-gap",
+              "default": "var(--hx-space-4)"
+            },
+            {
+              "description": "Maximum width of the form.",
+              "name": "--hx-form-max-width",
+              "default": "none"
+            },
+            {
+              "description": "Internal padding of the form.",
+              "name": "--hx-form-padding",
+              "default": "0"
+            }
+          ],
+          "slots": [
+            {
+              "description": "Default slot for form fields and controls.",
+              "name": ""
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "_styles",
+              "privacy": "private",
+              "default": "new AdoptedStylesheetsController(this, helixFormScopedCss, document)"
             },
             {
               "kind": "field",
-              "name": "_trackEl",
+              "name": "action",
               "type": {
-                "text": "HTMLButtonElement"
+                "text": "string"
               },
+              "default": "''",
+              "description": "The URL to submit the form to. When empty, the form handles\nsubmission client-side only and dispatches `wc-submit`.",
+              "attribute": "action"
+            },
+            {
+              "kind": "field",
+              "name": "method",
+              "type": {
+                "text": "'get' | 'post'"
+              },
+              "default": "'post'",
+              "description": "The HTTP method used when submitting the form.",
+              "attribute": "method"
+            },
+            {
+              "kind": "field",
+              "name": "novalidate",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "When true, disables the browser's built-in constraint validation\non form submission.",
+              "attribute": "novalidate"
+            },
+            {
+              "kind": "field",
+              "name": "name",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Identifies the form for scripting and form discovery.",
+              "attribute": "name"
+            },
+            {
+              "kind": "method",
+              "name": "checkValidity",
+              "return": {
+                "type": {
+                  "text": "boolean"
+                }
+              },
+              "description": "Checks the validity of all child form elements without showing\nvalidation UI. Returns `true` if all elements are valid."
+            },
+            {
+              "kind": "method",
+              "name": "reportValidity",
+              "return": {
+                "type": {
+                  "text": "boolean"
+                }
+              },
+              "description": "Checks validity and triggers the browser's constraint validation UI\non each invalid element. Returns `true` if all elements are valid."
+            },
+            {
+              "kind": "method",
+              "name": "getFormData",
+              "return": {
+                "type": {
+                  "text": "FormData"
+                }
+              },
+              "description": "Collects form data from all child form elements (native and wc-*).\nReturns a `FormData` object."
+            },
+            {
+              "kind": "method",
+              "name": "getFormElements",
+              "return": {
+                "type": {
+                  "text": "HTMLElement[]"
+                }
+              },
+              "description": "Returns all child wc-* form components (elements whose tag starts\nwith `wc-` and that have a `name` property or a `value` property)."
+            },
+            {
+              "kind": "method",
+              "name": "getNativeFormElements",
+              "return": {
+                "type": {
+                  "text": "Array<\n    HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement | HTMLButtonElement\n  >"
+                }
+              },
+              "description": "Returns all native form elements (input, select, textarea, button)\nfound within this component's light DOM."
+            },
+            {
+              "kind": "method",
+              "name": "_getAllValidatableElements",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "HTMLElement[]"
+                }
+              },
+              "description": "Returns all elements that support constraint validation, including\nboth native form elements and wc-* components with `checkValidity`."
+            },
+            {
+              "kind": "field",
+              "name": "_handleSubmit",
               "privacy": "private"
             },
             {
               "kind": "field",
-              "name": "_hasErrorSlot",
-              "type": {
-                "text": "boolean"
-              },
-              "privacy": "private",
-              "default": "false"
+              "name": "_handleReset",
+              "privacy": "private"
             },
             {
               "kind": "method",
-              "name": "_handleErrorSlotChange",
+              "name": "_collectValidationErrors",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "Array<{ name: string; message: string }>"
+                }
+              }
+            }
+          ],
+          "events": [
+            {
+              "type": {
+                "text": "CustomEvent<{valid: boolean, values: Record<string, FormDataEntryValue>}>"
+              },
+              "description": "Dispatched on valid client-side submit when no action is set.",
+              "name": "wc-submit"
+            },
+            {
+              "type": {
+                "text": "CustomEvent<{errors: Array<{name: string, message: string}>}>"
+              },
+              "description": "Dispatched when validation fails on submit.",
+              "name": "wc-invalid"
+            },
+            {
+              "type": {
+                "text": "CustomEvent"
+              },
+              "description": "Dispatched when the form is reset.",
+              "name": "wc-reset"
+            }
+          ],
+          "attributes": [
+            {
+              "name": "action",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "The URL to submit the form to. When empty, the form handles\nsubmission client-side only and dispatches `wc-submit`.",
+              "fieldName": "action",
+              "attribute": "action"
+            },
+            {
+              "name": "method",
+              "type": {
+                "text": "'get' | 'post'"
+              },
+              "default": "'post'",
+              "description": "The HTTP method used when submitting the form.",
+              "fieldName": "method",
+              "attribute": "method"
+            },
+            {
+              "name": "novalidate",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "When true, disables the browser's built-in constraint validation\non form submission.",
+              "fieldName": "novalidate",
+              "attribute": "novalidate"
+            },
+            {
+              "name": "name",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Identifies the form for scripting and form discovery.",
+              "fieldName": "name",
+              "attribute": "name"
+            }
+          ],
+          "superclass": {
+            "name": "LitElement",
+            "package": "lit"
+          },
+          "tagName": "hx-form",
+          "customElement": true,
+          "summary": "Light DOM form wrapper with scoped styles for native and wc-* form elements."
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "HelixForm",
+          "declaration": {
+            "name": "HelixForm",
+            "module": "src/components/hx-form/hx-form.ts"
+          }
+        },
+        {
+          "kind": "custom-element-definition",
+          "name": "hx-form",
+          "declaration": {
+            "name": "HelixForm",
+            "module": "src/components/hx-form/hx-form.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/components/hx-form/index.ts",
+      "declarations": [],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "HelixForm",
+          "declaration": {
+            "name": "HelixForm",
+            "module": "./hx-form.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/components/hx-container/hx-container.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "A layout container that constrains content width and provides\nconsistent vertical spacing and horizontal gutters.\n\nUses a two-layer model: the outer host spans full width (background,\nvertical padding), while the inner wrapper constrains max-width,\ncenters content, and applies horizontal gutters.",
+          "name": "HelixContainer",
+          "cssProperties": [
+            {
+              "description": "Background color on the outer wrapper.",
+              "name": "--hx-container-bg",
+              "default": "transparent"
+            },
+            {
+              "description": "Horizontal padding on the inner box.",
+              "name": "--hx-container-gutter",
+              "default": "var(--hx-space-6)"
+            },
+            {
+              "description": "Override the max-width set by the width property.",
+              "name": "--hx-container-max-width"
+            },
+            {
+              "description": "Max-width for the content width preset.",
+              "name": "--hx-container-content",
+              "default": "72rem"
+            },
+            {
+              "description": "Max-width for the sm width preset.",
+              "name": "--hx-container-sm",
+              "default": "640px"
+            },
+            {
+              "description": "Max-width for the md width preset.",
+              "name": "--hx-container-md",
+              "default": "768px"
+            },
+            {
+              "description": "Max-width for the lg width preset.",
+              "name": "--hx-container-lg",
+              "default": "1024px"
+            },
+            {
+              "description": "Max-width for the xl width preset.",
+              "name": "--hx-container-xl",
+              "default": "1280px"
+            }
+          ],
+          "cssParts": [
+            {
+              "description": "The inner wrapper that constrains max-width and applies gutters.",
+              "name": "inner"
+            }
+          ],
+          "slots": [
+            {
+              "description": "Default slot for container content.",
+              "name": ""
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "width",
+              "type": {
+                "text": "'full' | 'content' | 'narrow' | 'sm' | 'md' | 'lg' | 'xl'"
+              },
+              "default": "'content'",
+              "description": "Controls the max-width of the inner content wrapper.",
+              "attribute": "width",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "padding",
+              "type": {
+                "text": "'none' | 'sm' | 'md' | 'lg' | 'xl' | '2xl'"
+              },
+              "default": "'none'",
+              "description": "Vertical padding applied to the outer wrapper.",
+              "attribute": "padding",
+              "reflects": true
+            }
+          ],
+          "attributes": [
+            {
+              "name": "width",
+              "type": {
+                "text": "'full' | 'content' | 'narrow' | 'sm' | 'md' | 'lg' | 'xl'"
+              },
+              "default": "'content'",
+              "description": "Controls the max-width of the inner content wrapper.",
+              "fieldName": "width",
+              "attribute": "width"
+            },
+            {
+              "name": "padding",
+              "type": {
+                "text": "'none' | 'sm' | 'md' | 'lg' | 'xl' | '2xl'"
+              },
+              "default": "'none'",
+              "description": "Vertical padding applied to the outer wrapper.",
+              "fieldName": "padding",
+              "attribute": "padding"
+            }
+          ],
+          "superclass": {
+            "name": "LitElement",
+            "package": "lit"
+          },
+          "tagName": "hx-container",
+          "customElement": true,
+          "summary": "Layout primitive for constraining content width with consistent spacing."
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "HelixContainer",
+          "declaration": {
+            "name": "HelixContainer",
+            "module": "src/components/hx-container/hx-container.ts"
+          }
+        },
+        {
+          "kind": "custom-element-definition",
+          "name": "hx-container",
+          "declaration": {
+            "name": "HelixContainer",
+            "module": "src/components/hx-container/hx-container.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/components/hx-container/index.ts",
+      "declarations": [],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "HelixContainer",
+          "declaration": {
+            "name": "HelixContainer",
+            "module": "./hx-container.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/components/hx-card/hx-card.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "A flexible card component for displaying grouped content.",
+          "name": "HelixCard",
+          "cssProperties": [
+            {
+              "description": "Card background color.",
+              "name": "--hx-card-bg",
+              "default": "var(--hx-color-neutral-0)"
+            },
+            {
+              "description": "Card text color.",
+              "name": "--hx-card-color",
+              "default": "var(--hx-color-neutral-800)"
+            },
+            {
+              "description": "Card border color.",
+              "name": "--hx-card-border-color",
+              "default": "var(--hx-color-neutral-200)"
+            },
+            {
+              "description": "Card border radius.",
+              "name": "--hx-card-border-radius",
+              "default": "var(--hx-border-radius-lg)"
+            },
+            {
+              "description": "Internal padding for card sections.",
+              "name": "--hx-card-padding",
+              "default": "var(--hx-space-6)"
+            },
+            {
+              "description": "Gap between card sections.",
+              "name": "--hx-card-gap",
+              "default": "var(--hx-space-4)"
+            }
+          ],
+          "cssParts": [
+            {
+              "description": "The outer card container element.",
+              "name": "card"
+            },
+            {
+              "description": "The image slot container.",
+              "name": "image"
+            },
+            {
+              "description": "The heading slot container.",
+              "name": "heading"
+            },
+            {
+              "description": "The body slot container.",
+              "name": "body"
+            },
+            {
+              "description": "The footer slot container.",
+              "name": "footer"
+            },
+            {
+              "description": "The actions slot container.",
+              "name": "actions"
+            }
+          ],
+          "slots": [
+            {
+              "description": "Optional image or media content at the top of the card.",
+              "name": "image"
+            },
+            {
+              "description": "The card heading/title content.",
+              "name": "heading"
+            },
+            {
+              "description": "Default slot for the card body content.",
+              "name": ""
+            },
+            {
+              "description": "Optional footer content below the body.",
+              "name": "footer"
+            },
+            {
+              "description": "Optional action buttons, rendered with a top border separator.",
+              "name": "actions"
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "variant",
+              "type": {
+                "text": "'default' | 'featured' | 'compact'"
+              },
+              "default": "'default'",
+              "description": "Visual style variant of the card.",
+              "attribute": "variant",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "elevation",
+              "type": {
+                "text": "'flat' | 'raised' | 'floating'"
+              },
+              "default": "'flat'",
+              "description": "Elevation (shadow depth) of the card.",
+              "attribute": "elevation",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "wcHref",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Optional URL. When set, the card becomes interactive (clickable)\nand navigates to this URL on click.\nUses wc-href to avoid conflicting with the native HTML href attribute.",
+              "attribute": "hx-href"
+            },
+            {
+              "kind": "field",
+              "name": "_hasSlotContent",
+              "type": {
+                "text": "Record<string, boolean>"
+              },
+              "privacy": "private",
+              "default": "{ image: false, heading: false, footer: false, actions: false, }"
+            },
+            {
+              "kind": "method",
+              "name": "_handleSlotChange",
+              "privacy": "private",
+              "parameters": [
+                {
+                  "name": "slotName",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "_handleClick",
               "privacy": "private",
               "return": {
                 "type": {
@@ -2463,30 +2036,10 @@
                 {
                   "name": "e",
                   "type": {
-                    "text": "Event"
+                    "text": "MouseEvent"
                   }
                 }
               ]
-            },
-            {
-              "kind": "method",
-              "name": "_toggle",
-              "privacy": "private",
-              "return": {
-                "type": {
-                  "text": "void"
-                }
-              }
-            },
-            {
-              "kind": "method",
-              "name": "_handleClick",
-              "privacy": "private",
-              "return": {
-                "type": {
-                  "text": "void"
-                }
-              }
             },
             {
               "kind": "method",
@@ -2505,191 +2058,95 @@
                   }
                 }
               ]
-            },
-            {
-              "kind": "method",
-              "name": "focus",
-              "return": {
-                "type": {
-                  "text": "void"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "options",
-                  "optional": true,
-                  "type": {
-                    "text": "FocusOptions"
-                  }
-                }
-              ],
-              "description": "Moves focus to the switch track element."
-            },
-            {
-              "kind": "field",
-              "name": "_switchId",
-              "privacy": "private",
-              "default": "`wc-switch-${Math.random().toString(36).slice(2, 9)}`"
-            },
-            {
-              "kind": "field",
-              "name": "_labelId",
-              "privacy": "private",
-              "default": "`${this._switchId}-label`"
-            },
-            {
-              "kind": "field",
-              "name": "_helpTextId",
-              "privacy": "private",
-              "default": "`${this._switchId}-help`"
-            },
-            {
-              "kind": "field",
-              "name": "_errorId",
-              "privacy": "private",
-              "default": "`${this._switchId}-error`"
             }
           ],
           "events": [
             {
-              "name": "hx-change",
+              "name": "hx-card-click",
               "type": {
-                "text": "CustomEvent<{checked: boolean}>"
+                "text": "CustomEvent"
               },
-              "description": "Dispatched when the switch is toggled."
+              "description": "Dispatched when an interactive card is clicked.\nIncludes the target href in the detail."
+            },
+            {
+              "type": {
+                "text": "CustomEvent<{url: string, originalEvent: MouseEvent}>"
+              },
+              "description": "Dispatched when an interactive card (with wc-href) is clicked.",
+              "name": "wc-card-click"
             }
           ],
           "attributes": [
             {
-              "name": "checked",
+              "name": "variant",
               "type": {
-                "text": "boolean"
+                "text": "'default' | 'featured' | 'compact'"
               },
-              "default": "false",
-              "description": "Whether the switch is toggled on.",
-              "fieldName": "checked",
-              "attribute": "checked"
+              "default": "'default'",
+              "description": "Visual style variant of the card.",
+              "fieldName": "variant",
+              "attribute": "variant"
             },
             {
-              "name": "disabled",
+              "name": "elevation",
               "type": {
-                "text": "boolean"
+                "text": "'flat' | 'raised' | 'floating'"
               },
-              "default": "false",
-              "description": "Whether the switch is disabled.",
-              "fieldName": "disabled",
-              "attribute": "disabled"
+              "default": "'flat'",
+              "description": "Elevation (shadow depth) of the card.",
+              "fieldName": "elevation",
+              "attribute": "elevation"
             },
             {
-              "name": "required",
-              "type": {
-                "text": "boolean"
-              },
-              "default": "false",
-              "description": "Whether the switch is required for form submission.",
-              "fieldName": "required",
-              "attribute": "required"
-            },
-            {
-              "name": "name",
+              "name": "hx-href",
               "type": {
                 "text": "string"
               },
               "default": "''",
-              "description": "The name of the switch, used for form submission.",
-              "fieldName": "name",
-              "attribute": "name"
-            },
-            {
-              "name": "value",
-              "type": {
-                "text": "string"
-              },
-              "default": "'on'",
-              "description": "The value submitted when the switch is checked.",
-              "fieldName": "value",
-              "attribute": "value"
-            },
-            {
-              "name": "label",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "description": "The visible label text for the switch.",
-              "fieldName": "label",
-              "attribute": "label"
-            },
-            {
-              "name": "hx-size",
-              "type": {
-                "text": "'sm' | 'md' | 'lg'"
-              },
-              "default": "'md'",
-              "description": "Size variant of the switch.",
-              "fieldName": "size",
-              "attribute": "hx-size"
-            },
-            {
-              "name": "error",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "description": "Error message to display. When set, the switch enters an error state.",
-              "fieldName": "error",
-              "attribute": "error"
-            },
-            {
-              "name": "help-text",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "description": "Help text displayed below the switch for guidance.",
-              "fieldName": "helpText",
-              "attribute": "help-text"
+              "description": "Optional URL. When set, the card becomes interactive (clickable)\nand navigates to this URL on click.\nUses wc-href to avoid conflicting with the native HTML href attribute.",
+              "fieldName": "wcHref",
+              "attribute": "hx-href"
             }
           ],
           "superclass": {
             "name": "LitElement",
             "package": "lit"
           },
-          "tagName": "hx-switch",
+          "tagName": "hx-card",
           "customElement": true,
-          "summary": "Form-associated toggle switch with label, error, and help text."
+          "summary": "Content container with image, heading, body, footer, and action slots."
         }
       ],
       "exports": [
         {
           "kind": "js",
-          "name": "HelixSwitch",
+          "name": "HelixCard",
           "declaration": {
-            "name": "HelixSwitch",
-            "module": "src/components/hx-switch/hx-switch.ts"
+            "name": "HelixCard",
+            "module": "src/components/hx-card/hx-card.ts"
           }
         },
         {
           "kind": "custom-element-definition",
-          "name": "hx-switch",
+          "name": "hx-card",
           "declaration": {
-            "name": "HelixSwitch",
-            "module": "src/components/hx-switch/hx-switch.ts"
+            "name": "HelixCard",
+            "module": "src/components/hx-card/hx-card.ts"
           }
         }
       ]
     },
     {
       "kind": "javascript-module",
-      "path": "src/components/hx-switch/index.ts",
+      "path": "src/components/hx-card/index.ts",
       "declarations": [],
       "exports": [
         {
           "kind": "js",
-          "name": "HelixSwitch",
+          "name": "HelixCard",
           "declaration": {
-            "name": "HelixSwitch",
-            "module": "./hx-switch.js"
+            "name": "HelixCard",
+            "module": "./hx-card.js"
           }
         }
       ]
@@ -3121,7 +2578,7 @@
               "kind": "field",
               "name": "_selectId",
               "privacy": "private",
-              "default": "`wc-select-${Math.random().toString(36).slice(2, 9)}`"
+              "default": "`hx-select-${Math.random().toString(36).slice(2, 9)}`"
             },
             {
               "kind": "field",
@@ -3286,6 +2743,549 @@
           "declaration": {
             "name": "HelixSelect",
             "module": "./hx-select.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/components/hx-switch/hx-switch.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "A toggle switch component for on/off states.",
+          "name": "HelixSwitch",
+          "cssProperties": [
+            {
+              "description": "Track background color.",
+              "name": "--hx-switch-track-bg",
+              "default": "var(--hx-color-neutral-300)"
+            },
+            {
+              "description": "Track background when checked.",
+              "name": "--hx-switch-track-checked-bg",
+              "default": "var(--hx-color-primary-500)"
+            },
+            {
+              "description": "Thumb background color.",
+              "name": "--hx-switch-thumb-bg",
+              "default": "var(--hx-color-neutral-0)"
+            },
+            {
+              "description": "Thumb box shadow.",
+              "name": "--hx-switch-thumb-shadow",
+              "default": "var(--hx-shadow-sm)"
+            },
+            {
+              "description": "Focus ring color.",
+              "name": "--hx-switch-focus-ring-color",
+              "default": "var(--hx-focus-ring-color)"
+            },
+            {
+              "description": "Label text color.",
+              "name": "--hx-switch-label-color",
+              "default": "var(--hx-color-neutral-700)"
+            },
+            {
+              "description": "Error message color.",
+              "name": "--hx-switch-error-color",
+              "default": "var(--hx-color-error-500)"
+            }
+          ],
+          "cssParts": [
+            {
+              "description": "The switch container (track + thumb wrapper).",
+              "name": "switch"
+            },
+            {
+              "description": "The track background element.",
+              "name": "track"
+            },
+            {
+              "description": "The sliding thumb element.",
+              "name": "thumb"
+            },
+            {
+              "description": "The label text element.",
+              "name": "label"
+            },
+            {
+              "description": "The help text container.",
+              "name": "help-text"
+            },
+            {
+              "description": "The error message container.",
+              "name": "error"
+            }
+          ],
+          "slots": [
+            {
+              "description": "Custom label content (overrides the label property).",
+              "name": ""
+            },
+            {
+              "description": "Custom error content (overrides the error property).",
+              "name": "error"
+            },
+            {
+              "description": "Custom help text content (overrides the helpText property).",
+              "name": "help-text"
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "formAssociated",
+              "type": {
+                "text": "boolean"
+              },
+              "static": true,
+              "default": "true"
+            },
+            {
+              "kind": "field",
+              "name": "_internals",
+              "type": {
+                "text": "ElementInternals"
+              },
+              "privacy": "private"
+            },
+            {
+              "kind": "field",
+              "name": "checked",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the switch is toggled on.",
+              "attribute": "checked",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "disabled",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the switch is disabled.",
+              "attribute": "disabled",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "required",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the switch is required for form submission.",
+              "attribute": "required",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "name",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "The name of the switch, used for form submission.",
+              "attribute": "name"
+            },
+            {
+              "kind": "field",
+              "name": "value",
+              "type": {
+                "text": "string"
+              },
+              "default": "'on'",
+              "description": "The value submitted when the switch is checked.",
+              "attribute": "value"
+            },
+            {
+              "kind": "field",
+              "name": "label",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "The visible label text for the switch.",
+              "attribute": "label"
+            },
+            {
+              "kind": "field",
+              "name": "size",
+              "type": {
+                "text": "'sm' | 'md' | 'lg'"
+              },
+              "default": "'md'",
+              "description": "Size variant of the switch.",
+              "attribute": "hx-size",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "error",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Error message to display. When set, the switch enters an error state.",
+              "attribute": "error"
+            },
+            {
+              "kind": "field",
+              "name": "helpText",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Help text displayed below the switch for guidance.",
+              "attribute": "help-text"
+            },
+            {
+              "kind": "field",
+              "name": "form",
+              "type": {
+                "text": "HTMLFormElement | null"
+              },
+              "description": "Returns the associated form element, if any.",
+              "readonly": true
+            },
+            {
+              "kind": "field",
+              "name": "validationMessage",
+              "type": {
+                "text": "string"
+              },
+              "description": "Returns the validation message.",
+              "readonly": true
+            },
+            {
+              "kind": "field",
+              "name": "validity",
+              "type": {
+                "text": "ValidityState"
+              },
+              "description": "Returns the ValidityState object.",
+              "readonly": true
+            },
+            {
+              "kind": "method",
+              "name": "checkValidity",
+              "return": {
+                "type": {
+                  "text": "boolean"
+                }
+              },
+              "description": "Checks whether the switch satisfies its constraints."
+            },
+            {
+              "kind": "method",
+              "name": "reportValidity",
+              "return": {
+                "type": {
+                  "text": "boolean"
+                }
+              },
+              "description": "Reports validity and shows the browser's constraint validation UI."
+            },
+            {
+              "kind": "method",
+              "name": "_updateValidity",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "formResetCallback",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Called by the form when it resets."
+            },
+            {
+              "kind": "method",
+              "name": "formStateRestoreCallback",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "state",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ],
+              "description": "Called when the form restores state (e.g., back/forward navigation)."
+            },
+            {
+              "kind": "field",
+              "name": "_trackEl",
+              "type": {
+                "text": "HTMLButtonElement"
+              },
+              "privacy": "private"
+            },
+            {
+              "kind": "field",
+              "name": "_hasErrorSlot",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "default": "false"
+            },
+            {
+              "kind": "method",
+              "name": "_handleErrorSlotChange",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "e",
+                  "type": {
+                    "text": "Event"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "_toggle",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "_handleClick",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "_handleKeyDown",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "e",
+                  "type": {
+                    "text": "KeyboardEvent"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "focus",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "options",
+                  "optional": true,
+                  "type": {
+                    "text": "FocusOptions"
+                  }
+                }
+              ],
+              "description": "Moves focus to the switch track element."
+            },
+            {
+              "kind": "field",
+              "name": "_switchId",
+              "privacy": "private",
+              "default": "`hx-switch-${Math.random().toString(36).slice(2, 9)}`"
+            },
+            {
+              "kind": "field",
+              "name": "_labelId",
+              "privacy": "private",
+              "default": "`${this._switchId}-label`"
+            },
+            {
+              "kind": "field",
+              "name": "_helpTextId",
+              "privacy": "private",
+              "default": "`${this._switchId}-help`"
+            },
+            {
+              "kind": "field",
+              "name": "_errorId",
+              "privacy": "private",
+              "default": "`${this._switchId}-error`"
+            }
+          ],
+          "events": [
+            {
+              "name": "hx-change",
+              "type": {
+                "text": "CustomEvent<{checked: boolean}>"
+              },
+              "description": "Dispatched when the switch is toggled."
+            }
+          ],
+          "attributes": [
+            {
+              "name": "checked",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the switch is toggled on.",
+              "fieldName": "checked",
+              "attribute": "checked"
+            },
+            {
+              "name": "disabled",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the switch is disabled.",
+              "fieldName": "disabled",
+              "attribute": "disabled"
+            },
+            {
+              "name": "required",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the switch is required for form submission.",
+              "fieldName": "required",
+              "attribute": "required"
+            },
+            {
+              "name": "name",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "The name of the switch, used for form submission.",
+              "fieldName": "name",
+              "attribute": "name"
+            },
+            {
+              "name": "value",
+              "type": {
+                "text": "string"
+              },
+              "default": "'on'",
+              "description": "The value submitted when the switch is checked.",
+              "fieldName": "value",
+              "attribute": "value"
+            },
+            {
+              "name": "label",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "The visible label text for the switch.",
+              "fieldName": "label",
+              "attribute": "label"
+            },
+            {
+              "name": "hx-size",
+              "type": {
+                "text": "'sm' | 'md' | 'lg'"
+              },
+              "default": "'md'",
+              "description": "Size variant of the switch.",
+              "fieldName": "size",
+              "attribute": "hx-size"
+            },
+            {
+              "name": "error",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Error message to display. When set, the switch enters an error state.",
+              "fieldName": "error",
+              "attribute": "error"
+            },
+            {
+              "name": "help-text",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Help text displayed below the switch for guidance.",
+              "fieldName": "helpText",
+              "attribute": "help-text"
+            }
+          ],
+          "superclass": {
+            "name": "LitElement",
+            "package": "lit"
+          },
+          "tagName": "hx-switch",
+          "customElement": true,
+          "summary": "Form-associated toggle switch with label, error, and help text."
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "HelixSwitch",
+          "declaration": {
+            "name": "HelixSwitch",
+            "module": "src/components/hx-switch/hx-switch.ts"
+          }
+        },
+        {
+          "kind": "custom-element-definition",
+          "name": "hx-switch",
+          "declaration": {
+            "name": "HelixSwitch",
+            "module": "src/components/hx-switch/hx-switch.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/components/hx-switch/index.ts",
+      "declarations": [],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "HelixSwitch",
+          "declaration": {
+            "name": "HelixSwitch",
+            "module": "./hx-switch.js"
           }
         }
       ]
@@ -3473,7 +3473,7 @@
               "kind": "field",
               "name": "_groupId",
               "privacy": "private",
-              "default": "`wc-radio-group-${Math.random().toString(36).slice(2, 9)}`"
+              "default": "`hx-radio-group-${Math.random().toString(36).slice(2, 9)}`"
             },
             {
               "kind": "field",
@@ -4406,7 +4406,7 @@
               "kind": "field",
               "name": "_inputId",
               "privacy": "private",
-              "default": "`wc-text-input-${Math.random().toString(36).slice(2, 9)}`"
+              "default": "`hx-text-input-${Math.random().toString(36).slice(2, 9)}`"
             },
             {
               "kind": "field",
@@ -5045,7 +5045,7 @@
               "kind": "field",
               "name": "_textareaId",
               "privacy": "private",
-              "default": "`wc-textarea-${Math.random().toString(36).slice(2, 9)}`"
+              "default": "`hx-textarea-${Math.random().toString(36).slice(2, 9)}`"
             },
             {
               "kind": "field",

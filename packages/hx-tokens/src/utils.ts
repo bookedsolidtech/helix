@@ -2,16 +2,16 @@ import type { TokenEntry } from './types.js';
 
 /** Filter tokens by CSS custom property prefix */
 export function getTokensByPrefix(tokens: TokenEntry[], prefix: string): TokenEntry[] {
-  return tokens.filter(t => t.name.startsWith(prefix));
+  return tokens.filter((t) => t.name.startsWith(prefix));
 }
 
 /** Group color tokens into subgroups (primary, neutral, error, etc.) */
 export function getColorSubgroups(tokens: TokenEntry[]): { label: string; tokens: TokenEntry[] }[] {
-  const colorTokens = tokens.filter(t => t.category === 'color');
+  const colorTokens = tokens.filter((t) => t.category === 'color');
   const subgroupMap = new Map<string, TokenEntry[]>();
 
   for (const token of colorTokens) {
-    const group = token.path[1];
+    const group = token.path[1] ?? 'default';
     const existing = subgroupMap.get(group);
     if (existing) {
       existing.push(token);
@@ -27,7 +27,10 @@ export function getColorSubgroups(tokens: TokenEntry[]): { label: string; tokens
 }
 
 /** Get summary statistics about a token set */
-export function getTokenStats(tokens: TokenEntry[]): { total: number; byCategory: Record<string, number> } {
+export function getTokenStats(tokens: TokenEntry[]): {
+  total: number;
+  byCategory: Record<string, number>;
+} {
   const byCategory: Record<string, number> = {};
   for (const token of tokens) {
     byCategory[token.category] = (byCategory[token.category] ?? 0) + 1;
@@ -41,13 +44,17 @@ export function isHexColor(value: string): boolean {
 }
 
 /** Resolve a token value that may contain var() references to its underlying raw value */
-export function resolveTokenRef(value: string, tokenMap: Record<string, string>, maxDepth = 5): string {
+export function resolveTokenRef(
+  value: string,
+  tokenMap: Record<string, string>,
+  maxDepth = 5,
+): string {
   let resolved = value;
   for (let i = 0; i < maxDepth; i++) {
     const match = resolved.match(/var\((--[\w-]+)(?:,\s*([^)]+))?\)/);
     if (!match) break;
     const [fullMatch, varName, fallback] = match;
-    const replacement = tokenMap[varName] ?? fallback?.trim() ?? fullMatch;
+    const replacement = (varName ? tokenMap[varName] : undefined) ?? fallback?.trim() ?? fullMatch;
     resolved = resolved.replace(fullMatch, replacement);
   }
   return resolved;

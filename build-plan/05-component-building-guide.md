@@ -83,14 +83,14 @@ Drupal TWIG templates pass data to Web Components through HTML attributes. Every
 
 **Naming rules for attributes:**
 
-| Rule | Good | Bad | Reason |
-|---|---|---|---|
-| Use kebab-case | `publish-date` | `publishDate` | HTML attributes are case-insensitive |
-| Prefix ambiguous names | `content-type` | `type` | `type` conflicts with native HTML |
-| Include the data shape | `hero-image-src` | `image` | Clarifies it expects a URL string |
-| Match Drupal field semantics | `author-name` | `author` | Could be a name, ID, or object |
-| Use `-url` suffix for links | `category-url` | `category-link` | Explicit about the value type |
-| Use `-label` suffix for display text | `category-label` | `category` | Distinguishes from machine name |
+| Rule                                 | Good             | Bad             | Reason                               |
+| ------------------------------------ | ---------------- | --------------- | ------------------------------------ |
+| Use kebab-case                       | `publish-date`   | `publishDate`   | HTML attributes are case-insensitive |
+| Prefix ambiguous names               | `content-type`   | `type`          | `type` conflicts with native HTML    |
+| Include the data shape               | `hero-image-src` | `image`         | Clarifies it expects a URL string    |
+| Match Drupal field semantics         | `author-name`    | `author`        | Could be a name, ID, or object       |
+| Use `-url` suffix for links          | `category-url`   | `category-link` | Explicit about the value type        |
+| Use `-label` suffix for display text | `category-label` | `category`      | Distinguishes from machine name      |
 
 **TypeScript property mapping:**
 
@@ -116,32 +116,32 @@ Drupal's field rendering model outputs HTML fragments. Slots are the mechanism f
 
 **When to use an attribute vs. a slot:**
 
-| Data Type | Use | Example |
-|---|---|---|
-| Plain string (title, label) | Attribute | `heading="My Title"` |
-| Number (count, duration) | Attribute | `read-time="8"` |
-| URL | Attribute | `href="/articles/my-article"` |
-| ISO date string | Attribute | `publish-date="2026-02-10T00:00:00Z"` |
-| Boolean flag | Attribute (present/absent) | `featured` |
-| Enum (restricted values) | Attribute | `variant="compact"` |
-| Rendered HTML (body text) | Default slot | `<p>Article body...</p>` |
-| Rendered HTML (specific area) | Named slot | `<img slot="media" ...>` |
-| Drupal field with formatter | Named slot | `<div slot="author">{{ content.field_author }}</div>` |
-| Complex markup (tags, buttons) | Named slot | `<div slot="actions">{{ content.field_tags }}</div>` |
+| Data Type                      | Use                        | Example                                               |
+| ------------------------------ | -------------------------- | ----------------------------------------------------- |
+| Plain string (title, label)    | Attribute                  | `heading="My Title"`                                  |
+| Number (count, duration)       | Attribute                  | `read-time="8"`                                       |
+| URL                            | Attribute                  | `href="/articles/my-article"`                         |
+| ISO date string                | Attribute                  | `publish-date="2026-02-10T00:00:00Z"`                 |
+| Boolean flag                   | Attribute (present/absent) | `featured`                                            |
+| Enum (restricted values)       | Attribute                  | `variant="compact"`                                   |
+| Rendered HTML (body text)      | Default slot               | `<p>Article body...</p>`                              |
+| Rendered HTML (specific area)  | Named slot                 | `<img slot="media" ...>`                              |
+| Drupal field with formatter    | Named slot                 | `<div slot="author">{{ content.field_author }}</div>` |
+| Complex markup (tags, buttons) | Named slot                 | `<div slot="actions">{{ content.field_tags }}</div>`  |
 
 **Named slot naming conventions:**
 
-| Slot Name | Purpose | Drupal Mapping |
-|---|---|---|
-| (default) | Primary content area | `{{ content.body }}` or `{{ content }}` |
-| `media` | Image, video, or audio | `{{ content.field_media }}` |
-| `actions` | CTA buttons, links | Custom TWIG markup |
-| `meta` | Metadata (dates, tags) | `{{ content.field_tags }}` |
-| `header` | Header area content | Custom TWIG markup |
-| `footer` | Footer area content | Custom TWIG markup |
-| `sidebar` | Sidebar content | Block/view content |
-| `breadcrumb` | Breadcrumb navigation | `{{ drupal_block('system_breadcrumb_block') }}` |
-| `icon` | Icon or small graphic | `<chc-icon>` or `<svg>` |
+| Slot Name    | Purpose                | Drupal Mapping                                  |
+| ------------ | ---------------------- | ----------------------------------------------- |
+| (default)    | Primary content area   | `{{ content.body }}` or `{{ content }}`         |
+| `media`      | Image, video, or audio | `{{ content.field_media }}`                     |
+| `actions`    | CTA buttons, links     | Custom TWIG markup                              |
+| `meta`       | Metadata (dates, tags) | `{{ content.field_tags }}`                      |
+| `header`     | Header area content    | Custom TWIG markup                              |
+| `footer`     | Footer area content    | Custom TWIG markup                              |
+| `sidebar`    | Sidebar content        | Block/view content                              |
+| `breadcrumb` | Breadcrumb navigation  | `{{ drupal_block('system_breadcrumb_block') }}` |
+| `icon`       | Icon or small graphic  | `<chc-icon>` or `<svg>`                         |
 
 **Slot fallback content** -- every slot should have meaningful fallback content that renders when the slot is empty:
 
@@ -273,7 +273,7 @@ chc-content-card:not(:defined) {
   overflow: hidden;
 }
 
-chc-content-card:not(:defined) [slot="media"] img {
+chc-content-card:not(:defined) [slot='media'] img {
   width: 100%;
   height: auto;
   display: block;
@@ -320,11 +320,11 @@ HTML attributes are always strings. Lit converts them via the `type` option in `
 
 **Type conversion rules:**
 
-| Lit Property Type | HTML Attribute Value | TWIG Output |
-|---|---|---|
-| `String` | `"value"` | `{{ field_value }}` |
-| `Number` | `"42"` | `{{ field_number }}` |
-| `Boolean` | Present = true, absent = false | `{% if condition %}attribute{% endif %}` |
+| Lit Property Type | HTML Attribute Value           | TWIG Output                              |
+| ----------------- | ------------------------------ | ---------------------------------------- |
+| `String`          | `"value"`                      | `{{ field_value }}`                      |
+| `Number`          | `"42"`                         | `{{ field_number }}`                     |
+| `Boolean`         | Present = true, absent = false | `{% if condition %}attribute{% endif %}` |
 
 ```typescript
 // String: rendered as-is
@@ -485,44 +485,44 @@ This section provides complete implementation guides for 12 components that cove
 
 #### Attribute API
 
-| Attribute | Type | Required | Default | Drupal Source |
-|---|---|---|---|---|
-| `heading` | String | Yes | `''` | `node.label` |
-| `summary` | String | No | `''` | `field_summary` (Plain text) |
-| `href` | String | No | `''` | `{{ url }}` (Node canonical URL) |
-| `publish-date` | String | No | `''` | `node.createdtime\|date('c')` |
-| `author-name` | String | No | `''` | `field_author.entity.field_display_name` |
-| `category` | String | No | `''` | `field_category.entity.label` |
-| `read-time` | Number | No | `0` | `field_read_time` (Integer) |
-| `variant` | String | No | `'default'` | Derived from view mode or `is_promoted` |
-| `hero-image-src` | String | No | `''` | `field_media.entity.field_media_image.entity.uri.url` |
-| `hero-image-alt` | String | No | `''` | `field_media.entity.field_media_image.alt` |
+| Attribute        | Type   | Required | Default     | Drupal Source                                         |
+| ---------------- | ------ | -------- | ----------- | ----------------------------------------------------- |
+| `heading`        | String | Yes      | `''`        | `node.label`                                          |
+| `summary`        | String | No       | `''`        | `field_summary` (Plain text)                          |
+| `href`           | String | No       | `''`        | `{{ url }}` (Node canonical URL)                      |
+| `publish-date`   | String | No       | `''`        | `node.createdtime\|date('c')`                         |
+| `author-name`    | String | No       | `''`        | `field_author.entity.field_display_name`              |
+| `category`       | String | No       | `''`        | `field_category.entity.label`                         |
+| `read-time`      | Number | No       | `0`         | `field_read_time` (Integer)                           |
+| `variant`        | String | No       | `'default'` | Derived from view mode or `is_promoted`               |
+| `hero-image-src` | String | No       | `''`        | `field_media.entity.field_media_image.entity.uri.url` |
+| `hero-image-alt` | String | No       | `''`        | `field_media.entity.field_media_image.alt`            |
 
 #### Slot Structure
 
-| Slot | Purpose | Typical Drupal Content |
-|---|---|---|
-| (default) | Additional body content | `{{ content.body }}` |
-| `media` | Hero image or video | `{{ content.field_media }}` |
-| `actions` | CTA buttons, tag links | `{{ content.field_tags }}` |
-| `meta` | Additional metadata | Custom date/author markup |
+| Slot      | Purpose                 | Typical Drupal Content      |
+| --------- | ----------------------- | --------------------------- |
+| (default) | Additional body content | `{{ content.body }}`        |
+| `media`   | Hero image or video     | `{{ content.field_media }}` |
+| `actions` | CTA buttons, tag links  | `{{ content.field_tags }}`  |
+| `meta`    | Additional metadata     | Custom date/author markup   |
 
 #### Events
 
-| Event | Detail Type | When Fired |
-|---|---|---|
+| Event            | Detail Type                                                                  | When Fired                             |
+| ---------------- | ---------------------------------------------------------------------------- | -------------------------------------- |
 | `chc-card-click` | `{ href: string, heading: string, activationMethod: 'click' \| 'keyboard' }` | Card activated by click or Enter/Space |
 
 #### CSS Custom Properties
 
-| Property | Default | Purpose |
-|---|---|---|
-| `--chc-card-radius` | `var(--chc-radius-md)` | Border radius |
-| `--chc-card-padding` | `var(--chc-spacing-lg)` | Internal padding |
-| `--chc-card-bg` | `var(--chc-color-surface)` | Background color |
-| `--chc-card-shadow` | `var(--chc-shadow-sm)` | Box shadow |
-| `--chc-card-hover-shadow` | `var(--chc-shadow-md)` | Hover box shadow |
-| `--chc-card-border-color` | `var(--chc-color-border)` | Border color |
+| Property                  | Default                    | Purpose          |
+| ------------------------- | -------------------------- | ---------------- |
+| `--chc-card-radius`       | `var(--chc-radius-md)`     | Border radius    |
+| `--chc-card-padding`      | `var(--chc-spacing-lg)`    | Internal padding |
+| `--chc-card-bg`           | `var(--chc-color-surface)` | Background color |
+| `--chc-card-shadow`       | `var(--chc-shadow-sm)`     | Box shadow       |
+| `--chc-card-hover-shadow` | `var(--chc-shadow-md)`     | Hover box shadow |
+| `--chc-card-border-color` | `var(--chc-color-border)`  | Border color     |
 
 #### Accessibility
 
@@ -603,40 +603,40 @@ This section provides complete implementation guides for 12 components that cove
 
 #### Attribute API
 
-| Attribute | Type | Required | Default | Drupal Source |
-|---|---|---|---|---|
-| `heading` | String | Yes | `''` | `node.label` |
-| `author-name` | String | No | `''` | `field_author.entity.field_display_name` |
-| `author-avatar` | String | No | `''` | `field_author.entity.user_picture.entity.uri.url` |
-| `publish-date` | String | No | `''` | `node.createdtime\|date('c')` |
-| `updated-date` | String | No | `''` | `node.changedtime\|date('c')` |
-| `read-time` | Number | No | `0` | `field_read_time` (Integer) |
-| `category` | String | No | `''` | `field_category.entity.label` |
-| `category-url` | String | No | `''` | `field_category.entity.url` |
+| Attribute       | Type   | Required | Default | Drupal Source                                     |
+| --------------- | ------ | -------- | ------- | ------------------------------------------------- |
+| `heading`       | String | Yes      | `''`    | `node.label`                                      |
+| `author-name`   | String | No       | `''`    | `field_author.entity.field_display_name`          |
+| `author-avatar` | String | No       | `''`    | `field_author.entity.user_picture.entity.uri.url` |
+| `publish-date`  | String | No       | `''`    | `node.createdtime\|date('c')`                     |
+| `updated-date`  | String | No       | `''`    | `node.changedtime\|date('c')`                     |
+| `read-time`     | Number | No       | `0`     | `field_read_time` (Integer)                       |
+| `category`      | String | No       | `''`    | `field_category.entity.label`                     |
+| `category-url`  | String | No       | `''`    | `field_category.entity.url`                       |
 
 #### Slot Structure
 
-| Slot | Purpose | Typical Drupal Content |
-|---|---|---|
-| `byline` | Custom author/byline markup | Author bio block |
-| `share` | Social share buttons | Share module output |
-| `breadcrumb` | Breadcrumb navigation | System breadcrumb block |
-| `tags` | Taxonomy term links | `{{ content.field_tags }}` |
+| Slot         | Purpose                     | Typical Drupal Content     |
+| ------------ | --------------------------- | -------------------------- |
+| `byline`     | Custom author/byline markup | Author bio block           |
+| `share`      | Social share buttons        | Share module output        |
+| `breadcrumb` | Breadcrumb navigation       | System breadcrumb block    |
+| `tags`       | Taxonomy term links         | `{{ content.field_tags }}` |
 
 #### Events
 
-| Event | Detail Type | When Fired |
-|---|---|---|
+| Event             | Detail Type                         | When Fired                  |
+| ----------------- | ----------------------------------- | --------------------------- |
 | `chc-share-click` | `{ platform: string, url: string }` | Social share button clicked |
 
 #### CSS Custom Properties
 
-| Property | Default | Purpose |
-|---|---|---|
-| `--chc-article-header-bg` | `transparent` | Header background |
-| `--chc-article-header-border` | `var(--chc-color-border)` | Bottom border color |
-| `--chc-article-header-padding` | `var(--chc-spacing-xl)` | Internal padding |
-| `--chc-article-header-max-width` | `720px` | Content max width |
+| Property                         | Default                   | Purpose             |
+| -------------------------------- | ------------------------- | ------------------- |
+| `--chc-article-header-bg`        | `transparent`             | Header background   |
+| `--chc-article-header-border`    | `var(--chc-color-border)` | Bottom border color |
+| `--chc-article-header-padding`   | `var(--chc-spacing-xl)`   | Internal padding    |
+| `--chc-article-header-max-width` | `720px`                   | Content max width   |
 
 #### Accessibility
 
@@ -712,44 +712,44 @@ This section provides complete implementation guides for 12 components that cove
 
 #### Attribute API
 
-| Attribute | Type | Required | Default | Drupal Source |
-|---|---|---|---|---|
-| `type` | String | Yes | `'image'` | Media entity bundle |
-| `src` | String | Yes | `''` | Image style URL or video embed URL |
-| `alt` | String | Cond. | `''` | `field_media_image.alt` (required for images) |
-| `width` | Number | No | `0` | Image intrinsic width |
-| `height` | Number | No | `0` | Image intrinsic height |
-| `srcset` | String | No | `''` | Drupal responsive image srcset |
-| `sizes` | String | No | `''` | Drupal responsive image sizes |
-| `aspect-ratio` | String | No | `''` | Aspect ratio (e.g., `16/9`, `4/3`) |
-| `loading` | String | No | `'lazy'` | `'lazy'` or `'eager'` |
-| `caption` | String | No | `''` | `field_media_image.title` or custom field |
-| `video-provider` | String | No | `''` | `'youtube'`, `'vimeo'`, or `'self'` |
-| `poster` | String | No | `''` | Video poster image URL |
+| Attribute        | Type   | Required | Default   | Drupal Source                                 |
+| ---------------- | ------ | -------- | --------- | --------------------------------------------- |
+| `type`           | String | Yes      | `'image'` | Media entity bundle                           |
+| `src`            | String | Yes      | `''`      | Image style URL or video embed URL            |
+| `alt`            | String | Cond.    | `''`      | `field_media_image.alt` (required for images) |
+| `width`          | Number | No       | `0`       | Image intrinsic width                         |
+| `height`         | Number | No       | `0`       | Image intrinsic height                        |
+| `srcset`         | String | No       | `''`      | Drupal responsive image srcset                |
+| `sizes`          | String | No       | `''`      | Drupal responsive image sizes                 |
+| `aspect-ratio`   | String | No       | `''`      | Aspect ratio (e.g., `16/9`, `4/3`)            |
+| `loading`        | String | No       | `'lazy'`  | `'lazy'` or `'eager'`                         |
+| `caption`        | String | No       | `''`      | `field_media_image.title` or custom field     |
+| `video-provider` | String | No       | `''`      | `'youtube'`, `'vimeo'`, or `'self'`           |
+| `poster`         | String | No       | `''`      | Video poster image URL                        |
 
 #### Slot Structure
 
-| Slot | Purpose | Typical Drupal Content |
-|---|---|---|
-| (default) | Caption or overlay content | `{{ content.field_caption }}` |
-| `fallback` | Content shown while loading or on error | Placeholder markup |
+| Slot       | Purpose                                 | Typical Drupal Content        |
+| ---------- | --------------------------------------- | ----------------------------- |
+| (default)  | Caption or overlay content              | `{{ content.field_caption }}` |
+| `fallback` | Content shown while loading or on error | Placeholder markup            |
 
 #### Events
 
-| Event | Detail Type | When Fired |
-|---|---|---|
-| `chc-media-load` | `{ src: string, type: string }` | Media has loaded |
-| `chc-media-error` | `{ src: string, error: string }` | Media failed to load |
-| `chc-media-play` | `{ src: string }` | Video/audio started playing |
+| Event             | Detail Type                      | When Fired                  |
+| ----------------- | -------------------------------- | --------------------------- |
+| `chc-media-load`  | `{ src: string, type: string }`  | Media has loaded            |
+| `chc-media-error` | `{ src: string, error: string }` | Media failed to load        |
+| `chc-media-play`  | `{ src: string }`                | Video/audio started playing |
 
 #### CSS Custom Properties
 
-| Property | Default | Purpose |
-|---|---|---|
-| `--chc-media-radius` | `var(--chc-radius-md)` | Border radius |
-| `--chc-media-bg` | `var(--chc-color-surface-raised)` | Background (visible during load) |
-| `--chc-media-aspect-ratio` | `auto` | Aspect ratio override |
-| `--chc-media-object-fit` | `cover` | Image object-fit |
+| Property                   | Default                           | Purpose                          |
+| -------------------------- | --------------------------------- | -------------------------------- |
+| `--chc-media-radius`       | `var(--chc-radius-md)`            | Border radius                    |
+| `--chc-media-bg`           | `var(--chc-color-surface-raised)` | Background (visible during load) |
+| `--chc-media-aspect-ratio` | `auto`                            | Aspect ratio override            |
+| `--chc-media-object-fit`   | `cover`                           | Image object-fit                 |
 
 #### Accessibility
 
@@ -817,48 +817,48 @@ This section provides complete implementation guides for 12 components that cove
 
 #### Attribute API
 
-| Attribute | Type | Required | Default | Drupal Source |
-|---|---|---|---|---|
-| `label` | String | Yes | `''` | Form element `#title` |
-| `name` | String | Yes | `''` | Form element `#name` |
-| `value` | String | No | `''` | Form element `#default_value` |
-| `type` | String | No | `'text'` | `'text'`, `'email'`, `'tel'`, `'url'`, `'password'`, `'search'` |
-| `placeholder` | String | No | `''` | Form element `#placeholder` |
-| `required` | Boolean | No | `false` | Form element `#required` |
-| `disabled` | Boolean | No | `false` | Form element `#disabled` |
-| `readonly` | Boolean | No | `false` | Form element `#attributes.readonly` |
-| `error-message` | String | No | `''` | Server-side validation error |
-| `help-text` | String | No | `''` | Form element `#description` |
-| `maxlength` | Number | No | `0` | Form element `#maxlength` |
-| `pattern` | String | No | `''` | Form element `#pattern` |
-| `autocomplete` | String | No | `''` | HTML autocomplete attribute value |
+| Attribute       | Type    | Required | Default  | Drupal Source                                                   |
+| --------------- | ------- | -------- | -------- | --------------------------------------------------------------- |
+| `label`         | String  | Yes      | `''`     | Form element `#title`                                           |
+| `name`          | String  | Yes      | `''`     | Form element `#name`                                            |
+| `value`         | String  | No       | `''`     | Form element `#default_value`                                   |
+| `type`          | String  | No       | `'text'` | `'text'`, `'email'`, `'tel'`, `'url'`, `'password'`, `'search'` |
+| `placeholder`   | String  | No       | `''`     | Form element `#placeholder`                                     |
+| `required`      | Boolean | No       | `false`  | Form element `#required`                                        |
+| `disabled`      | Boolean | No       | `false`  | Form element `#disabled`                                        |
+| `readonly`      | Boolean | No       | `false`  | Form element `#attributes.readonly`                             |
+| `error-message` | String  | No       | `''`     | Server-side validation error                                    |
+| `help-text`     | String  | No       | `''`     | Form element `#description`                                     |
+| `maxlength`     | Number  | No       | `0`      | Form element `#maxlength`                                       |
+| `pattern`       | String  | No       | `''`     | Form element `#pattern`                                         |
+| `autocomplete`  | String  | No       | `''`     | HTML autocomplete attribute value                               |
 
 #### Slot Structure
 
-| Slot | Purpose | Typical Drupal Content |
-|---|---|---|
-| `prefix` | Icon or text before input | Icon markup |
-| `suffix` | Icon or text after input | Character count, clear button |
+| Slot     | Purpose                   | Typical Drupal Content        |
+| -------- | ------------------------- | ----------------------------- |
+| `prefix` | Icon or text before input | Icon markup                   |
+| `suffix` | Icon or text after input  | Character count, clear button |
 
 #### Events
 
-| Event | Detail Type | When Fired |
-|---|---|---|
-| `chc-input` | `{ value: string, name: string }` | On each keystroke |
-| `chc-change` | `{ value: string, name: string }` | On blur when value has changed |
-| `chc-invalid` | `{ value: string, name: string, validity: ValidityState }` | On validation failure |
+| Event         | Detail Type                                                | When Fired                     |
+| ------------- | ---------------------------------------------------------- | ------------------------------ |
+| `chc-input`   | `{ value: string, name: string }`                          | On each keystroke              |
+| `chc-change`  | `{ value: string, name: string }`                          | On blur when value has changed |
+| `chc-invalid` | `{ value: string, name: string, validity: ValidityState }` | On validation failure          |
 
 #### CSS Custom Properties
 
-| Property | Default | Purpose |
-|---|---|---|
-| `--chc-input-border-color` | `var(--chc-color-border)` | Input border |
-| `--chc-input-border-color-focus` | `var(--chc-color-primary)` | Focus border |
-| `--chc-input-border-color-error` | `var(--chc-color-error)` | Error border |
-| `--chc-input-bg` | `var(--chc-color-surface)` | Input background |
-| `--chc-input-radius` | `var(--chc-radius-sm)` | Border radius |
-| `--chc-input-padding` | `var(--chc-spacing-sm) var(--chc-spacing-md)` | Internal padding |
-| `--chc-input-font-size` | `var(--chc-font-size-base)` | Font size |
+| Property                         | Default                                       | Purpose          |
+| -------------------------------- | --------------------------------------------- | ---------------- |
+| `--chc-input-border-color`       | `var(--chc-color-border)`                     | Input border     |
+| `--chc-input-border-color-focus` | `var(--chc-color-primary)`                    | Focus border     |
+| `--chc-input-border-color-error` | `var(--chc-color-error)`                      | Error border     |
+| `--chc-input-bg`                 | `var(--chc-color-surface)`                    | Input background |
+| `--chc-input-radius`             | `var(--chc-radius-sm)`                        | Border radius    |
+| `--chc-input-padding`            | `var(--chc-spacing-sm) var(--chc-spacing-md)` | Internal padding |
+| `--chc-input-font-size`          | `var(--chc-font-size-base)`                   | Font size        |
 
 #### Accessibility (WCAG for Healthcare Forms)
 
@@ -926,26 +926,26 @@ This section provides complete implementation guides for 12 components that cove
 
 #### Attribute API
 
-| Attribute | Type | Required | Default | Drupal Source |
-|---|---|---|---|---|
-| `label` | String | Yes | `''` | Form element `#title` |
-| `name` | String | Yes | `''` | Form element `#name` |
-| `value` | String | No | `''` | Form element `#default_value` |
-| `rows` | Number | No | `4` | Form element `#rows` |
-| `required` | Boolean | No | `false` | Form element `#required` |
-| `disabled` | Boolean | No | `false` | Form element `#disabled` |
-| `maxlength` | Number | No | `0` | Form element `#maxlength` |
-| `error-message` | String | No | `''` | Server-side validation error |
-| `help-text` | String | No | `''` | Form element `#description` |
-| `auto-resize` | Boolean | No | `false` | Auto-grow with content |
-| `show-count` | Boolean | No | `false` | Show character count |
+| Attribute       | Type    | Required | Default | Drupal Source                 |
+| --------------- | ------- | -------- | ------- | ----------------------------- |
+| `label`         | String  | Yes      | `''`    | Form element `#title`         |
+| `name`          | String  | Yes      | `''`    | Form element `#name`          |
+| `value`         | String  | No       | `''`    | Form element `#default_value` |
+| `rows`          | Number  | No       | `4`     | Form element `#rows`          |
+| `required`      | Boolean | No       | `false` | Form element `#required`      |
+| `disabled`      | Boolean | No       | `false` | Form element `#disabled`      |
+| `maxlength`     | Number  | No       | `0`     | Form element `#maxlength`     |
+| `error-message` | String  | No       | `''`    | Server-side validation error  |
+| `help-text`     | String  | No       | `''`    | Form element `#description`   |
+| `auto-resize`   | Boolean | No       | `false` | Auto-grow with content        |
+| `show-count`    | Boolean | No       | `false` | Show character count          |
 
 #### Events
 
-| Event | Detail Type | When Fired |
-|---|---|---|
-| `chc-input` | `{ value: string, name: string, length: number }` | On each input event |
-| `chc-change` | `{ value: string, name: string }` | On blur when value changed |
+| Event        | Detail Type                                       | When Fired                 |
+| ------------ | ------------------------------------------------- | -------------------------- |
+| `chc-input`  | `{ value: string, name: string, length: number }` | On each input event        |
+| `chc-change` | `{ value: string, name: string }`                 | On blur when value changed |
 
 #### Drupal TWIG Template
 
@@ -984,19 +984,19 @@ This section provides complete implementation guides for 12 components that cove
 
 #### Attribute API
 
-| Attribute | Type | Required | Default | Drupal Source |
-|---|---|---|---|---|
-| `label` | String | Yes | `''` | Form element `#title` |
-| `name` | String | Yes | `''` | Form element `#name` |
-| `value` | String | No | `''` | Form element `#default_value` |
-| `options` | Array (JSON) | Yes | `[]` | Form element `#options` (serialized) |
-| `required` | Boolean | No | `false` | Form element `#required` |
-| `disabled` | Boolean | No | `false` | Form element `#disabled` |
-| `multiple` | Boolean | No | `false` | Form element `#multiple` |
-| `placeholder` | String | No | `'Select...'` | Empty option text |
-| `searchable` | Boolean | No | `false` | Enable filter for long lists |
-| `error-message` | String | No | `''` | Server-side validation error |
-| `help-text` | String | No | `''` | Form element `#description` |
+| Attribute       | Type         | Required | Default       | Drupal Source                        |
+| --------------- | ------------ | -------- | ------------- | ------------------------------------ |
+| `label`         | String       | Yes      | `''`          | Form element `#title`                |
+| `name`          | String       | Yes      | `''`          | Form element `#name`                 |
+| `value`         | String       | No       | `''`          | Form element `#default_value`        |
+| `options`       | Array (JSON) | Yes      | `[]`          | Form element `#options` (serialized) |
+| `required`      | Boolean      | No       | `false`       | Form element `#required`             |
+| `disabled`      | Boolean      | No       | `false`       | Form element `#disabled`             |
+| `multiple`      | Boolean      | No       | `false`       | Form element `#multiple`             |
+| `placeholder`   | String       | No       | `'Select...'` | Empty option text                    |
+| `searchable`    | Boolean      | No       | `false`       | Enable filter for long lists         |
+| `error-message` | String       | No       | `''`          | Server-side validation error         |
+| `help-text`     | String       | No       | `''`          | Form element `#description`          |
 
 **Options JSON format:**
 
@@ -1016,8 +1016,8 @@ This section provides complete implementation guides for 12 components that cove
 
 #### Events
 
-| Event | Detail Type | When Fired |
-|---|---|---|
+| Event        | Detail Type                                   | When Fired        |
+| ------------ | --------------------------------------------- | ----------------- |
 | `chc-change` | `{ value: string \| string[], name: string }` | Selection changed |
 
 #### Accessibility
@@ -1079,20 +1079,20 @@ This section provides complete implementation guides for 12 components that cove
 
 #### Attribute API
 
-| Attribute | Type | Required | Default | Drupal Source |
-|---|---|---|---|---|
-| `label` | String | Yes | `''` | Form element `#title` |
-| `name` | String | Yes | `''` | Form element `#name` |
-| `value` | String | No | `'on'` | Form element `#return_value` |
-| `checked` | Boolean | No | `false` | Form element `#default_value` |
-| `required` | Boolean | No | `false` | Form element `#required` |
-| `disabled` | Boolean | No | `false` | Form element `#disabled` |
-| `error-message` | String | No | `''` | Server-side validation error |
+| Attribute       | Type    | Required | Default | Drupal Source                 |
+| --------------- | ------- | -------- | ------- | ----------------------------- |
+| `label`         | String  | Yes      | `''`    | Form element `#title`         |
+| `name`          | String  | Yes      | `''`    | Form element `#name`          |
+| `value`         | String  | No       | `'on'`  | Form element `#return_value`  |
+| `checked`       | Boolean | No       | `false` | Form element `#default_value` |
+| `required`      | Boolean | No       | `false` | Form element `#required`      |
+| `disabled`      | Boolean | No       | `false` | Form element `#disabled`      |
+| `error-message` | String  | No       | `''`    | Server-side validation error  |
 
 #### Events
 
-| Event | Detail Type | When Fired |
-|---|---|---|
+| Event        | Detail Type                                         | When Fired       |
+| ------------ | --------------------------------------------------- | ---------------- |
 | `chc-change` | `{ checked: boolean, value: string, name: string }` | Checkbox toggled |
 
 #### Accessibility
@@ -1129,17 +1129,17 @@ This section provides complete implementation guides for 12 components that cove
 
 #### Attribute API
 
-| Attribute | Type | Required | Default | Drupal Source |
-|---|---|---|---|---|
-| `legend` | String | Yes | `''` | Form element `#title` |
-| `name` | String | Yes | `''` | Form element `#name` |
-| `value` | String | No | `''` | Form element `#default_value` |
-| `options` | Array (JSON) | Yes | `[]` | Form element `#options` (serialized) |
-| `required` | Boolean | No | `false` | Form element `#required` |
-| `disabled` | Boolean | No | `false` | Form element `#disabled` |
-| `orientation` | String | No | `'vertical'` | `'vertical'` or `'horizontal'` |
-| `error-message` | String | No | `''` | Server-side validation error |
-| `help-text` | String | No | `''` | Form element `#description` |
+| Attribute       | Type         | Required | Default      | Drupal Source                        |
+| --------------- | ------------ | -------- | ------------ | ------------------------------------ |
+| `legend`        | String       | Yes      | `''`         | Form element `#title`                |
+| `name`          | String       | Yes      | `''`         | Form element `#name`                 |
+| `value`         | String       | No       | `''`         | Form element `#default_value`        |
+| `options`       | Array (JSON) | Yes      | `[]`         | Form element `#options` (serialized) |
+| `required`      | Boolean      | No       | `false`      | Form element `#required`             |
+| `disabled`      | Boolean      | No       | `false`      | Form element `#disabled`             |
+| `orientation`   | String       | No       | `'vertical'` | `'vertical'` or `'horizontal'`       |
+| `error-message` | String       | No       | `''`         | Server-side validation error         |
+| `help-text`     | String       | No       | `''`         | Form element `#description`          |
 
 **Options JSON format:**
 
@@ -1153,8 +1153,8 @@ This section provides complete implementation guides for 12 components that cove
 
 #### Events
 
-| Event | Detail Type | When Fired |
-|---|---|---|
+| Event        | Detail Type                       | When Fired        |
+| ------------ | --------------------------------- | ----------------- |
 | `chc-change` | `{ value: string, name: string }` | Selection changed |
 
 #### Accessibility
@@ -1196,13 +1196,13 @@ This section provides complete implementation guides for 12 components that cove
 
 #### Attribute API
 
-| Attribute | Type | Required | Default | Drupal Source |
-|---|---|---|---|---|
-| `items` | Array (JSON) | Yes | `[]` | Menu link tree (serialized) |
-| `label` | String | No | `'Main navigation'` | `aria-label` value |
-| `orientation` | String | No | `'horizontal'` | `'horizontal'` or `'vertical'` |
-| `mobile-breakpoint` | String | No | `'768px'` | Breakpoint for mobile drawer |
-| `active-path` | String | No | `''` | Current path for active trail |
+| Attribute           | Type         | Required | Default             | Drupal Source                  |
+| ------------------- | ------------ | -------- | ------------------- | ------------------------------ |
+| `items`             | Array (JSON) | Yes      | `[]`                | Menu link tree (serialized)    |
+| `label`             | String       | No       | `'Main navigation'` | `aria-label` value             |
+| `orientation`       | String       | No       | `'horizontal'`      | `'horizontal'` or `'vertical'` |
+| `mobile-breakpoint` | String       | No       | `'768px'`           | Breakpoint for mobile drawer   |
+| `active-path`       | String       | No       | `''`                | Current path for active trail  |
 
 **Menu items JSON format:**
 
@@ -1232,28 +1232,28 @@ This section provides complete implementation guides for 12 components that cove
 
 #### Slot Structure
 
-| Slot | Purpose | Typical Drupal Content |
-|---|---|---|
-| `logo` | Site logo/branding | Theme logo markup |
-| `actions` | Header action buttons (login, search) | Custom TWIG markup |
-| `mobile-header` | Custom mobile drawer header | Brand/close button |
+| Slot            | Purpose                               | Typical Drupal Content |
+| --------------- | ------------------------------------- | ---------------------- |
+| `logo`          | Site logo/branding                    | Theme logo markup      |
+| `actions`       | Header action buttons (login, search) | Custom TWIG markup     |
+| `mobile-header` | Custom mobile drawer header           | Brand/close button     |
 
 #### Events
 
-| Event | Detail Type | When Fired |
-|---|---|---|
-| `chc-nav-toggle` | `{ open: boolean }` | Mobile menu opened or closed |
-| `chc-nav-click` | `{ href: string, label: string, level: number }` | Nav item clicked |
+| Event            | Detail Type                                      | When Fired                   |
+| ---------------- | ------------------------------------------------ | ---------------------------- |
+| `chc-nav-toggle` | `{ open: boolean }`                              | Mobile menu opened or closed |
+| `chc-nav-click`  | `{ href: string, label: string, level: number }` | Nav item clicked             |
 
 #### CSS Custom Properties
 
-| Property | Default | Purpose |
-|---|---|---|
-| `--chc-nav-bg` | `var(--chc-color-surface)` | Navigation background |
-| `--chc-nav-text` | `var(--chc-color-on-surface)` | Navigation text color |
-| `--chc-nav-active-color` | `var(--chc-color-primary)` | Active item indicator |
-| `--chc-nav-height` | `64px` | Header height |
-| `--chc-nav-mobile-width` | `300px` | Mobile drawer width |
+| Property                 | Default                       | Purpose               |
+| ------------------------ | ----------------------------- | --------------------- |
+| `--chc-nav-bg`           | `var(--chc-color-surface)`    | Navigation background |
+| `--chc-nav-text`         | `var(--chc-color-on-surface)` | Navigation text color |
+| `--chc-nav-active-color` | `var(--chc-color-primary)`    | Active item indicator |
+| `--chc-nav-height`       | `64px`                        | Header height         |
+| `--chc-nav-mobile-width` | `300px`                       | Mobile drawer width   |
 
 #### Accessibility
 
@@ -1357,35 +1357,35 @@ function _mytheme_build_menu_json(array $tree): array {
 
 #### Attribute API
 
-| Attribute | Type | Required | Default | Drupal Source |
-|---|---|---|---|---|
-| `heading` | String | Yes | `''` | `field_hero_heading` |
-| `subheading` | String | No | `''` | `field_hero_subheading` |
-| `bg-image` | String | No | `''` | `field_hero_image.entity.uri.url` |
-| `bg-color` | String | No | `''` | `field_hero_bg_color` (Color field) |
-| `overlay-opacity` | String | No | `'0.5'` | `field_hero_overlay_opacity` |
-| `text-align` | String | No | `'center'` | `'left'`, `'center'`, `'right'` |
-| `min-height` | String | No | `'400px'` | CSS min-height value |
-| `variant` | String | No | `'default'` | `'default'`, `'split'`, `'video'` |
+| Attribute         | Type   | Required | Default     | Drupal Source                       |
+| ----------------- | ------ | -------- | ----------- | ----------------------------------- |
+| `heading`         | String | Yes      | `''`        | `field_hero_heading`                |
+| `subheading`      | String | No       | `''`        | `field_hero_subheading`             |
+| `bg-image`        | String | No       | `''`        | `field_hero_image.entity.uri.url`   |
+| `bg-color`        | String | No       | `''`        | `field_hero_bg_color` (Color field) |
+| `overlay-opacity` | String | No       | `'0.5'`     | `field_hero_overlay_opacity`        |
+| `text-align`      | String | No       | `'center'`  | `'left'`, `'center'`, `'right'`     |
+| `min-height`      | String | No       | `'400px'`   | CSS min-height value                |
+| `variant`         | String | No       | `'default'` | `'default'`, `'split'`, `'video'`   |
 
 #### Slot Structure
 
-| Slot | Purpose | Typical Drupal Content |
-|---|---|---|
-| (default) | Body text / description | `{{ content.field_hero_body }}` |
-| `actions` | CTA buttons | `{{ content.field_hero_cta }}` (Link field) |
-| `media` | Background video or image | `{{ content.field_hero_video }}` |
-| `badge` | Corner badge or label | Custom markup |
+| Slot      | Purpose                   | Typical Drupal Content                      |
+| --------- | ------------------------- | ------------------------------------------- |
+| (default) | Body text / description   | `{{ content.field_hero_body }}`             |
+| `actions` | CTA buttons               | `{{ content.field_hero_cta }}` (Link field) |
+| `media`   | Background video or image | `{{ content.field_hero_video }}`            |
+| `badge`   | Corner badge or label     | Custom markup                               |
 
 #### CSS Custom Properties
 
-| Property | Default | Purpose |
-|---|---|---|
-| `--chc-hero-min-height` | `400px` | Minimum height |
-| `--chc-hero-padding` | `var(--chc-spacing-3xl) var(--chc-spacing-xl)` | Internal padding |
-| `--chc-hero-text-color` | `#ffffff` | Text color over image |
-| `--chc-hero-overlay-color` | `rgba(0,0,0,0.5)` | Image overlay color |
-| `--chc-hero-max-content-width` | `800px` | Content area max width |
+| Property                       | Default                                        | Purpose                |
+| ------------------------------ | ---------------------------------------------- | ---------------------- |
+| `--chc-hero-min-height`        | `400px`                                        | Minimum height         |
+| `--chc-hero-padding`           | `var(--chc-spacing-3xl) var(--chc-spacing-xl)` | Internal padding       |
+| `--chc-hero-text-color`        | `#ffffff`                                      | Text color over image  |
+| `--chc-hero-overlay-color`     | `rgba(0,0,0,0.5)`                              | Image overlay color    |
+| `--chc-hero-max-content-width` | `800px`                                        | Content area max width |
 
 #### Drupal TWIG Template
 
@@ -1451,30 +1451,30 @@ function _mytheme_build_menu_json(array $tree): array {
 
 #### Attribute API (Group)
 
-| Attribute | Type | Required | Default | Description |
-|---|---|---|---|---|
-| `multiple` | Boolean | No | `false` | Allow multiple panels open simultaneously |
-| `heading-level` | Number | No | `3` | Heading level for accordion triggers (2-6) |
+| Attribute       | Type    | Required | Default | Description                                |
+| --------------- | ------- | -------- | ------- | ------------------------------------------ |
+| `multiple`      | Boolean | No       | `false` | Allow multiple panels open simultaneously  |
+| `heading-level` | Number  | No       | `3`     | Heading level for accordion triggers (2-6) |
 
 #### Attribute API (Item -- `chc-accordion-item`)
 
-| Attribute | Type | Required | Default | Drupal Source |
-|---|---|---|---|---|
-| `heading` | String | Yes | `''` | `field_faq_question` |
-| `expanded` | Boolean | No | `false` | Pre-expanded state |
-| `disabled` | Boolean | No | `false` | Prevent interaction |
+| Attribute  | Type    | Required | Default | Drupal Source        |
+| ---------- | ------- | -------- | ------- | -------------------- |
+| `heading`  | String  | Yes      | `''`    | `field_faq_question` |
+| `expanded` | Boolean | No       | `false` | Pre-expanded state   |
+| `disabled` | Boolean | No       | `false` | Prevent interaction  |
 
 #### Slot Structure (Item)
 
-| Slot | Purpose | Typical Drupal Content |
-|---|---|---|
-| (default) | Panel content | `{{ content.field_faq_answer }}` |
-| `icon` | Custom expand/collapse icon | Custom SVG |
+| Slot      | Purpose                     | Typical Drupal Content           |
+| --------- | --------------------------- | -------------------------------- |
+| (default) | Panel content               | `{{ content.field_faq_answer }}` |
+| `icon`    | Custom expand/collapse icon | Custom SVG                       |
 
 #### Events
 
-| Event | Detail Type | When Fired |
-|---|---|---|
+| Event                  | Detail Type                                             | When Fired    |
+| ---------------------- | ------------------------------------------------------- | ------------- |
 | `chc-accordion-toggle` | `{ index: number, expanded: boolean, heading: string }` | Panel toggled |
 
 #### Accessibility
@@ -1523,25 +1523,25 @@ function _mytheme_build_menu_json(array $tree): array {
 
 #### Attribute API
 
-| Attribute | Type | Required | Default | Drupal Source |
-|---|---|---|---|---|
-| `type` | String | Yes | `'info'` | `'info'`, `'success'`, `'warning'`, `'error'` |
-| `heading` | String | No | `''` | Optional alert heading |
-| `dismissible` | Boolean | No | `false` | Show dismiss button |
-| `role-override` | String | No | `''` | Override ARIA role (e.g., `'alert'`, `'status'`) |
-| `icon` | String | No | `''` | Custom icon name (defaults by type) |
+| Attribute       | Type    | Required | Default  | Drupal Source                                    |
+| --------------- | ------- | -------- | -------- | ------------------------------------------------ |
+| `type`          | String  | Yes      | `'info'` | `'info'`, `'success'`, `'warning'`, `'error'`    |
+| `heading`       | String  | No       | `''`     | Optional alert heading                           |
+| `dismissible`   | Boolean | No       | `false`  | Show dismiss button                              |
+| `role-override` | String  | No       | `''`     | Override ARIA role (e.g., `'alert'`, `'status'`) |
+| `icon`          | String  | No       | `''`     | Custom icon name (defaults by type)              |
 
 #### Slot Structure
 
-| Slot | Purpose | Typical Drupal Content |
-|---|---|---|
-| (default) | Alert message content | Drupal status message text |
-| `actions` | Action links/buttons | "Dismiss" or "Learn more" links |
+| Slot      | Purpose               | Typical Drupal Content          |
+| --------- | --------------------- | ------------------------------- |
+| (default) | Alert message content | Drupal status message text      |
+| `actions` | Action links/buttons  | "Dismiss" or "Learn more" links |
 
 #### Events
 
-| Event | Detail Type | When Fired |
-|---|---|---|
+| Event               | Detail Type        | When Fired             |
+| ------------------- | ------------------ | ---------------------- |
 | `chc-alert-dismiss` | `{ type: string }` | Dismiss button clicked |
 
 #### Accessibility
@@ -1790,11 +1790,13 @@ this.dispatchEvent(new Event('click'));
 **Fix**: Always include a typed detail payload with enough context to act.
 
 ```typescript
-this.dispatchEvent(new CustomEvent('chc-card-click', {
-  bubbles: true,
-  composed: true,
-  detail: { href: this.href, heading: this.heading, activationMethod: 'click' },
-}));
+this.dispatchEvent(
+  new CustomEvent('chc-card-click', {
+    bubbles: true,
+    composed: true,
+    detail: { href: this.href, heading: this.heading, activationMethod: 'click' },
+  }),
+);
 ```
 
 ### Anti-Pattern 7: Components That Break Without JavaScript
@@ -2009,17 +2011,17 @@ Every component must expose a documented set of CSS custom properties that allow
 
 Every component must include a "Theming" section in its Storybook MDX documentation page:
 
-```mdx
+````mdx
 ## Theming
 
 ### CSS Custom Properties
 
-| Property | Default | Description |
-|---|---|---|
-| `--chc-card-bg` | `var(--chc-color-surface)` | Card background color |
-| `--chc-card-padding` | `var(--chc-spacing-lg)` | Card internal padding |
-| `--chc-card-radius` | `var(--chc-radius-md)` | Card border radius |
-| `--chc-card-shadow` | `var(--chc-shadow-sm)` | Card elevation shadow |
+| Property             | Default                    | Description           |
+| -------------------- | -------------------------- | --------------------- |
+| `--chc-card-bg`      | `var(--chc-color-surface)` | Card background color |
+| `--chc-card-padding` | `var(--chc-spacing-lg)`    | Card internal padding |
+| `--chc-card-radius`  | `var(--chc-radius-md)`     | Card border radius    |
+| `--chc-card-shadow`  | `var(--chc-shadow-sm)`     | Card elevation shadow |
 
 ### Drupal Theme Override Example
 
@@ -2027,9 +2029,9 @@ Every component must include a "Theming" section in its Storybook MDX documentat
 /* In your Drupal theme's CSS */
 :root {
   /* Override card appearance site-wide */
-  --chc-card-radius: 0;         /* Sharp corners */
-  --chc-card-shadow: none;      /* Flat design */
-  --chc-card-padding: 2rem;     /* More padding */
+  --chc-card-radius: 0; /* Sharp corners */
+  --chc-card-shadow: none; /* Flat design */
+  --chc-card-padding: 2rem; /* More padding */
 }
 
 /* Override for a specific context */
@@ -2037,6 +2039,7 @@ Every component must include a "Theming" section in its Storybook MDX documentat
   --chc-card-padding: 1rem;
 }
 ```
+````
 
 ### 5.8.3 CSS Shadow Parts for Escape-Hatch Styling
 
@@ -2044,13 +2047,13 @@ CSS Shadow Parts (`::part()`) provide targeted styling access to internal compon
 
 **When to use `::part()`:**
 
-| Use Case | Use Part? | Reason |
-|---|---|---|
-| Change background color | No | CSS custom property is sufficient |
-| Change font size | No | CSS custom property is sufficient |
-| Add a pseudo-element (::before) | Yes | Cannot add pseudo-elements via custom properties |
-| Change text-transform | Yes | No custom property covers this |
-| Override display or position | Yes | Structural changes need part access |
+| Use Case                        | Use Part? | Reason                                           |
+| ------------------------------- | --------- | ------------------------------------------------ |
+| Change background color         | No        | CSS custom property is sufficient                |
+| Change font size                | No        | CSS custom property is sufficient                |
+| Add a pseudo-element (::before) | Yes       | Cannot add pseudo-elements via custom properties |
+| Change text-transform           | Yes       | No custom property covers this                   |
+| Override display or position    | Yes       | Structural changes need part access              |
 
 **Exposing parts:**
 
@@ -2082,7 +2085,7 @@ chc-content-card::part(heading) {
   letter-spacing: 0.05em;
 }
 
-chc-content-card[variant="featured"]::part(header) {
+chc-content-card[variant='featured']::part(header) {
   min-height: 200px;
 }
 ```
@@ -2160,7 +2163,10 @@ Every story should include a dark mode variant:
 export const DarkMode: Story = {
   args: { heading: 'Dark Mode Card', summary: 'This card in dark mode.' },
   decorators: [
-    (story) => html`<div data-theme="dark" style="padding: 2rem; background: var(--chc-color-surface);">${story()}</div>`,
+    (story) =>
+      html`<div data-theme="dark" style="padding: 2rem; background: var(--chc-color-surface);">
+        ${story()}
+      </div>`,
   ],
 };
 ```

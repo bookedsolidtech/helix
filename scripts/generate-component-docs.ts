@@ -63,13 +63,8 @@ const DOCS_DIR = path.join(REPO_ROOT, 'apps/docs/src/content/docs/component-libr
 
 function generateMDX(component: ComponentInfo): string {
   const title = component.tagName;
-  const description = component.description || component.summary || `${component.className} component`;
-
-  // Convert tag name to title case for heading
-  const componentName = component.tagName
-    .split('-')
-    .map(part => part.charAt(0).toUpperCase() + part.slice(1))
-    .join(' ');
+  const description =
+    component.description || component.summary || `${component.className} component`;
 
   return `---
 title: "${title}"
@@ -131,7 +126,10 @@ function extractComponentsFromCEM(cemPath: string): ComponentInfo[] {
 // File Writer
 // ============================================================================
 
-function writeComponentDocs(components: ComponentInfo[], options: { dryRun?: boolean; force?: boolean } = {}) {
+function writeComponentDocs(
+  components: ComponentInfo[],
+  options: { dryRun?: boolean; force?: boolean } = {},
+) {
   const { dryRun = false, force = false } = options;
   if (!fs.existsSync(DOCS_DIR)) {
     fs.mkdirSync(DOCS_DIR, { recursive: true });
@@ -150,7 +148,9 @@ function writeComponentDocs(components: ComponentInfo[], options: { dryRun?: boo
     if (dryRun) {
       if (exists && !force) {
         skipped++;
-        console.log(`⏭️  WOULD SKIP: ${component.tagName}.mdx (already exists, use --force to overwrite)`);
+        console.log(
+          `⏭️  WOULD SKIP: ${component.tagName}.mdx (already exists, use --force to overwrite)`,
+        );
       } else if (exists && force) {
         console.log(`⚠️  WOULD UPDATE: ${component.tagName}.mdx`);
       } else {
@@ -162,7 +162,9 @@ function writeComponentDocs(components: ComponentInfo[], options: { dryRun?: boo
     // Skip existing files unless --force is used
     if (exists && !force) {
       skipped++;
-      console.log(`⏭️  Skipped: ${component.tagName}.mdx (already exists, use --force to overwrite)`);
+      console.log(
+        `⏭️  Skipped: ${component.tagName}.mdx (already exists, use --force to overwrite)`,
+      );
       continue;
     }
 

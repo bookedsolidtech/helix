@@ -22,26 +22,26 @@ description: Rapid prototyping phase - validate core technology decisions before
 Phase 0 is about **reducing risk** before committing to a full 40+ component build. By building a small vertical slice (button, card, form field), we validate every layer of the architecture:
 
 - Component authoring (Lit 3.x with TypeScript)
-- Design tokens (Terrazzo + W3C DTCG format) *(planned)*
-- Storybook integration (autodocs, controls, a11y addon) *(complete)*
+- Design tokens (Terrazzo + W3C DTCG format) _(planned)_
+- Storybook integration (autodocs, controls, a11y addon) _(complete)_
 - Documentation generation (CEM → Starlight API pages)
 - Drupal integration (TWIG templates, behaviors)
-- Testing (Vitest browser mode, axe-core) *(planned)*
+- Testing (Vitest browser mode, axe-core) _(planned)_
 - Build & publish (Vite library mode, npm package)
 
 ## Phase 0 Deliverables
 
-| Deliverable | Description | Status |
-|------------|-------------|--------|
-| Monorepo setup | npm workspaces + Turborepo, TypeScript strict, ESLint/Prettier | Complete |
-| `wc-button` component | First proof-of-concept component | Complete |
-| `wc-card` component | Content card with slots and variants | Complete |
-| `wc-text-input` component | Form input with validation and ElementInternals | Complete |
-| Design token pipeline | Terrazzo config → CSS custom properties | Planned |
-| Storybook instance | Stories, autodocs, a11y testing | Complete |
-| Docs site | Astro/Starlight with initial architecture docs | Complete |
-| Vitest testing | Browser-mode unit testing | Planned |
-| Drupal prototype | TWIG template rendering web components | Planned |
+| Deliverable               | Description                                                    | Status   |
+| ------------------------- | -------------------------------------------------------------- | -------- |
+| Monorepo setup            | npm workspaces + Turborepo, TypeScript strict, ESLint/Prettier | Complete |
+| `wc-button` component     | First proof-of-concept component                               | Complete |
+| `wc-card` component       | Content card with slots and variants                           | Complete |
+| `wc-text-input` component | Form input with validation and ElementInternals                | Complete |
+| Design token pipeline     | Terrazzo config → CSS custom properties                        | Planned  |
+| Storybook instance        | Stories, autodocs, a11y testing                                | Complete |
+| Docs site                 | Astro/Starlight with initial architecture docs                 | Complete |
+| Vitest testing            | Browser-mode unit testing                                      | Planned  |
+| Drupal prototype          | TWIG template rendering web components                         | Planned  |
 
 ## Success Criteria
 

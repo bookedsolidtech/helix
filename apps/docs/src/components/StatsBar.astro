@@ -24,54 +24,54 @@ interface Stat {
 
 const stats: Stat[] = [
   {
-    value: '10K+',
-    label: 'Lines Documented',
-    colorClass: 'stat-value-gradient',
-    iconClass: 'fa-solid fa-file-lines',
-    description: 'Comprehensive documentation covering every aspect of the component library.',
-    relevance: 'Complete API documentation, usage examples, and integration guides ensure your team can adopt HELIX components with zero ramp-up time. Every prop, method, event, and CSS custom property is documented with TypeScript types and JSDoc comments.',
-    docsUrl: '/pre-planning/overview/',
-    docsLabel: 'View Documentation Plan'
-  },
-  {
-    value: '40+',
-    label: 'Components Planned',
+    value: '14',
+    label: 'Components Built',
     colorClass: 'stat-value-cyan',
     iconClass: 'fa-solid fa-puzzle-piece',
-    description: 'Production-ready UI components covering enterprise content workflows.',
-    relevance: 'From alerts and buttons to complex data tables and form validation—every component your content platform needs. Each component is built with accessibility, theming, and Drupal integration as first-class concerns.',
-    docsUrl: '/pre-planning/component-inventory/',
-    docsLabel: 'Browse Component List'
+    description: 'Production-ready UI components with full test coverage and CEM documentation.',
+    relevance: 'From alerts and buttons to complex forms and radio groups—each component is enterprise-grade with accessibility, theming, and Drupal integration as first-class concerns. All components are Lit 3.x web components with Shadow DOM encapsulation.',
+    docsUrl: '/component-library/overview/',
+    docsLabel: 'Browse Components'
   },
   {
-    value: 'AAA',
-    label: 'WCAG Target',
-    colorClass: 'stat-value-pink',
-    iconClass: 'fa-solid fa-universal-access',
-    description: 'WCAG 2.1 AAA accessibility compliance for critical enterprise components.',
-    relevance: 'HELIX targets AA minimum with AAA for critical components, ensuring compliance and inclusive user experiences with high contrast ratios, keyboard navigation, and comprehensive screen reader support. Accessibility-first by design, not as an afterthought.',
-    docsUrl: '/pre-planning/design-system/#accessibility',
-    docsLabel: 'Accessibility Standards'
-  },
-  {
-    value: '3-Tier',
-    label: 'Design Tokens',
+    value: '93.38%',
+    label: 'Test Coverage',
     colorClass: 'stat-value-green',
-    iconClass: 'fa-solid fa-layer-group',
-    description: 'W3C Design Token Community Group (DTCG) compliant token architecture.',
-    relevance: 'Primitive → Semantic → Component token hierarchy enables consistent theming, dark mode, and brand customization. Tokens integrate with Figma via Tokens Studio plugin for true design-development sync. Change a primitive color once, update your entire system.',
-    docsUrl: '/design-tokens/overview/',
-    docsLabel: 'Token Architecture Guide'
+    iconClass: 'fa-solid fa-check-circle',
+    description: 'Comprehensive test suite with Vitest browser mode and Playwright.',
+    relevance: 'Enterprise-grade quality with extensive unit and integration tests. Every component interaction, accessibility pattern, and edge case is verified. Tests run in real browsers to catch DOM-specific issues before production.',
+    docsUrl: '/architecture/testing/',
+    docsLabel: 'Testing Strategy'
   },
   {
     value: '100%',
-    label: 'TypeScript',
+    label: 'TypeScript Strict',
     colorClass: 'stat-value-gradient',
     iconClass: 'fa-solid fa-code',
-    description: 'Full TypeScript coverage with strict mode and comprehensive type safety.',
+    description: 'Full TypeScript strict mode with zero any types across the codebase.',
     relevance: 'Enterprise teams demand type safety. Every component, utility, and API is fully typed with JSDoc documentation. Strict mode enabled catches errors at compile-time, not runtime. Your IDE provides intelligent autocomplete for every prop and method.',
     docsUrl: '/architecture/overview/#typescript',
     docsLabel: 'TypeScript Architecture'
+  },
+  {
+    value: 'AA',
+    label: 'WCAG 2.1',
+    colorClass: 'stat-value-pink',
+    iconClass: 'fa-solid fa-universal-access',
+    description: 'WCAG 2.1 AA accessibility compliance across all components.',
+    relevance: 'HELIX ensures AA compliance minimum with AAA for critical components. Every component includes proper ARIA attributes, keyboard navigation, focus management, and screen reader support. Accessibility is verified through automated and manual testing.',
+    docsUrl: '/architecture/accessibility/',
+    docsLabel: 'Accessibility Standards'
+  },
+  {
+    value: '2026-02-16',
+    label: 'Last Updated',
+    colorClass: 'stat-value-gradient',
+    iconClass: 'fa-solid fa-calendar-check',
+    description: 'Documentation and component library last updated February 16, 2026.',
+    relevance: 'Active development with continuous improvements to components, documentation, and tooling. Check the Admin Dashboard for real-time component health metrics, test results, and CEM validation status.',
+    docsUrl: 'http://localhost:3159',
+    docsLabel: 'Admin Dashboard'
   },
 ];
 ---

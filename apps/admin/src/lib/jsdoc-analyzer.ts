@@ -3,9 +3,9 @@
  * Reads component .ts source files and extracts JSDoc coverage.
  * Compares against CEM data to detect drift.
  */
-import { readFileSync } from "node:fs";
-import { resolve } from "node:path";
-import { getComponentData, getComponentDirectory } from "./cem-parser";
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
+import { getComponentData, getComponentDirectory } from './cem-parser';
 
 export interface JsDocCoverage {
   tagName: string;
@@ -22,7 +22,7 @@ export interface JsDocCoverage {
 }
 
 export interface DriftItem {
-  type: "property" | "event" | "slot" | "cssprop" | "csspart";
+  type: 'property' | 'event' | 'slot' | 'cssprop' | 'csspart';
   name: string;
   inJsDoc: boolean;
   inCem: boolean;
@@ -36,7 +36,7 @@ export interface DriftReport {
 }
 
 function getLibraryRoot(): string {
-  return resolve(process.cwd(), "../../packages/hx-library");
+  return resolve(process.cwd(), '../../packages/hx-library');
 }
 
 function readSourceFile(componentTag: string): string | null {
@@ -44,18 +44,21 @@ function readSourceFile(componentTag: string): string | null {
   const dir = getComponentDirectory(componentTag);
   const sourcePath = resolve(libRoot, `src/components/${dir}/${componentTag}.ts`);
   try {
-    return readFileSync(sourcePath, "utf-8");
+    return readFileSync(sourcePath, 'utf-8');
   } catch {
     return null;
   }
 }
 
 function countJsDocTag(source: string, tag: string): string[] {
-  const regex = new RegExp(`@${tag}\\s+(?:\\{[^}]*(?:\\{[^}]*\\}[^}]*)*\\}\\s+)?([\\w-]+|\\[[\\w-]*\\])`, "g");
+  const regex = new RegExp(
+    `@${tag}\\s+(?:\\{[^}]*(?:\\{[^}]*\\}[^}]*)*\\}\\s+)?([\\w-]+|\\[[\\w-]*\\])`,
+    'g',
+  );
   const matches: string[] = [];
   let match;
   while ((match = regex.exec(source)) !== null) {
-    matches.push(match[1].replace(/^\[|\]$/g, ""));
+    matches.push(match[1].replace(/^\[|\]$/g, ''));
   }
   return matches;
 }
@@ -86,14 +89,14 @@ export function analyzeJsDoc(tagName: string): JsDocCoverage | null {
   const jsDocBlocks = (source.match(/\/\*\*[\s\S]*?\*\//g) ?? []).length;
 
   // Count documented items in JSDoc
-  const propertyTags = countJsDocTag(source, "attr");
-  const eventTags = countJsDocTag(source, "fires");
-  const slotTags = countJsDocTag(source, "slot");
+  const propertyTags = countJsDocTag(source, 'attr');
+  const eventTags = countJsDocTag(source, 'fires');
+  const slotTags = countJsDocTag(source, 'slot');
   const cssPropTags = countCssPropTags(source);
-  const cssPartTags = countJsDocTag(source, "csspart");
+  const cssPartTags = countJsDocTag(source, 'csspart');
 
-  const classDescription = hasJsDocTag(source, "tag") || /\/\*\*\s*\n\s*\*\s+\w/.test(source);
-  const classSummary = hasJsDocTag(source, "summary");
+  const classDescription = hasJsDocTag(source, 'tag') || /\/\*\*\s*\n\s*\*\s+\w/.test(source);
+  const classSummary = hasJsDocTag(source, 'summary');
 
   // Calculate coverage against CEM expectations
   const expectedItems =
@@ -113,7 +116,8 @@ export function analyzeJsDoc(tagName: string): JsDocCoverage | null {
     (classDescription ? 1 : 0) +
     (classSummary ? 1 : 0);
 
-  const coveragePercent = expectedItems > 0 ? Math.round((documentedItems / expectedItems) * 100) : 100;
+  const coveragePercent =
+    expectedItems > 0 ? Math.round((documentedItems / expectedItems) * 100) : 100;
 
   return {
     tagName,
@@ -140,23 +144,23 @@ export function detectDrift(tagName: string): DriftReport | null {
   const driftItems: DriftItem[] = [];
 
   // Compare properties
-  const jsDocAttrs = new Set(countJsDocTag(source, "attr"));
+  const jsDocAttrs = new Set(countJsDocTag(source, 'attr'));
   for (const prop of data.properties) {
     if (!jsDocAttrs.has(prop.attribute)) {
-      driftItems.push({ type: "property", name: prop.attribute, inJsDoc: false, inCem: true });
+      driftItems.push({ type: 'property', name: prop.attribute, inJsDoc: false, inCem: true });
     }
   }
   for (const attr of jsDocAttrs) {
     if (!data.properties.some((p) => p.attribute === attr)) {
-      driftItems.push({ type: "property", name: attr, inJsDoc: true, inCem: false });
+      driftItems.push({ type: 'property', name: attr, inJsDoc: true, inCem: false });
     }
   }
 
   // Compare events
-  const jsDocEvents = new Set(countJsDocTag(source, "fires"));
+  const jsDocEvents = new Set(countJsDocTag(source, 'fires'));
   for (const event of data.events) {
     if (!jsDocEvents.has(event.name)) {
-      driftItems.push({ type: "event", name: event.name, inJsDoc: false, inCem: true });
+      driftItems.push({ type: 'event', name: event.name, inJsDoc: false, inCem: true });
     }
   }
 
@@ -164,25 +168,25 @@ export function detectDrift(tagName: string): DriftReport | null {
   const jsDocCssProps = new Set(countCssPropTags(source));
   for (const cssProp of data.cssProperties) {
     if (!jsDocCssProps.has(cssProp.name)) {
-      driftItems.push({ type: "cssprop", name: cssProp.name, inJsDoc: false, inCem: true });
+      driftItems.push({ type: 'cssprop', name: cssProp.name, inJsDoc: false, inCem: true });
     }
   }
 
   // Compare CSS parts
-  const jsDocCssParts = new Set(countJsDocTag(source, "csspart"));
+  const jsDocCssParts = new Set(countJsDocTag(source, 'csspart'));
   for (const cssPart of data.cssParts) {
     if (!jsDocCssParts.has(cssPart.name)) {
-      driftItems.push({ type: "csspart", name: cssPart.name, inJsDoc: false, inCem: true });
+      driftItems.push({ type: 'csspart', name: cssPart.name, inJsDoc: false, inCem: true });
     }
   }
 
   // Compare slots
-  const jsDocSlots = new Set(countJsDocTag(source, "slot"));
+  const jsDocSlots = new Set(countJsDocTag(source, 'slot'));
   // Handle default slot: JSDoc uses empty string or "-"
   for (const slot of data.slots) {
-    const slotName = slot.name === "(default)" ? "" : slot.name;
+    const slotName = slot.name === '(default)' ? '' : slot.name;
     if (slotName && !jsDocSlots.has(slotName)) {
-      driftItems.push({ type: "slot", name: slot.name, inJsDoc: false, inCem: true });
+      driftItems.push({ type: 'slot', name: slot.name, inJsDoc: false, inCem: true });
     }
   }
 
@@ -195,7 +199,7 @@ export function detectDrift(tagName: string): DriftReport | null {
 }
 
 export async function analyzeAllJsDoc(): Promise<JsDocCoverage[]> {
-  const { getAllComponentNames } = await import("./cem-parser");
+  const { getAllComponentNames } = await import('./cem-parser');
   const names = getAllComponentNames();
   const results: JsDocCoverage[] = [];
   for (const name of names) {

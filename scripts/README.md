@@ -71,6 +71,7 @@ Found 14 components in CEM:
 ### Integration
 
 The generated docs leverage the existing `ComponentDoc.astro` component which:
+
 - Reads CEM data and renders summary + API tables
 - Automatically displays properties, events, slots, CSS custom properties, and CSS parts
 - Works seamlessly with Starlight's table of contents

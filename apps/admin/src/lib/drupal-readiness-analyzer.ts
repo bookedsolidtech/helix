@@ -3,9 +3,9 @@
  * Static analysis checklist verifying components work in Drupal's
  * Twig templates, JS lifecycle, and asset loading patterns.
  */
-import { readFileSync } from "node:fs";
-import { resolve } from "node:path";
-import { getComponentDirectory, getComponentData } from "./cem-parser";
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
+import { getComponentDirectory, getComponentData } from './cem-parser';
 
 export interface DrupalReadinessResult {
   tagName: string;
@@ -24,7 +24,7 @@ export interface DrupalCheck {
 }
 
 function getLibraryRoot(): string {
-  return resolve(process.cwd(), "../../packages/hx-library");
+  return resolve(process.cwd(), '../../packages/hx-library');
 }
 
 function readSource(tagName: string): string | null {
@@ -32,7 +32,7 @@ function readSource(tagName: string): string | null {
   const dir = getComponentDirectory(tagName);
   const sourcePath = resolve(libRoot, `src/components/${dir}/${tagName}.ts`);
   try {
-    return readFileSync(sourcePath, "utf-8");
+    return readFileSync(sourcePath, 'utf-8');
   } catch {
     return null;
   }
@@ -46,26 +46,26 @@ export function analyzeDrupalReadiness(tagName: string): DrupalReadinessResult |
   const checks: DrupalCheck[] = [];
 
   // 1. Self-registers via @customElement (no manual registration needed in Drupal)
-  const hasSelfRegister = source.includes("@customElement(");
+  const hasSelfRegister = source.includes('@customElement(');
   checks.push({
-    name: "Self-registration",
+    name: 'Self-registration',
     passed: hasSelfRegister,
     detail: hasSelfRegister
-      ? "Uses @customElement() decorator — auto-registers on import"
-      : "Missing @customElement() — requires manual customElements.define()",
+      ? 'Uses @customElement() decorator — auto-registers on import'
+      : 'Missing @customElement() — requires manual customElements.define()',
     weight: 2,
   });
 
   // 2. No framework-specific dependencies (React, Angular, Vue wrappers)
   const frameworkImports = source.match(
-    /from\s+['"](?:react|@angular|vue|@vue|svelte|@svelte|solid-js)/g
+    /from\s+['"](?:react|@angular|vue|@vue|svelte|@svelte|solid-js)/g,
   );
   checks.push({
-    name: "No framework deps",
+    name: 'No framework deps',
     passed: !frameworkImports,
     detail: frameworkImports
       ? `Framework imports found: ${frameworkImports.length}`
-      : "No React/Angular/Vue/Svelte dependencies",
+      : 'No React/Angular/Vue/Svelte dependencies',
     weight: 2,
   });
 
@@ -74,7 +74,7 @@ export function analyzeDrupalReadiness(tagName: string): DrupalReadinessResult |
   const attributeMapped = data?.properties.filter((p) => p.attribute).length ?? 0;
   const allMapped = propertyCount === 0 || attributeMapped === propertyCount;
   checks.push({
-    name: "Attribute mapping",
+    name: 'Attribute mapping',
     passed: allMapped,
     detail: allMapped
       ? `All ${propertyCount} properties have HTML attributes`
@@ -87,23 +87,23 @@ export function analyzeDrupalReadiness(tagName: string): DrupalReadinessResult |
   const hasImportMeta = source.match(/import\.meta\.(?!url)/);
   const moduleOnly = hasTopLevelAwait || hasImportMeta;
   checks.push({
-    name: "No module-only APIs",
+    name: 'No module-only APIs',
     passed: !moduleOnly,
     detail: moduleOnly
-      ? `Module-only APIs: ${[hasTopLevelAwait && "top-level await", hasImportMeta && "import.meta"].filter(Boolean).join(", ")}`
-      : "No top-level await or non-standard import.meta usage",
+      ? `Module-only APIs: ${[hasTopLevelAwait && 'top-level await', hasImportMeta && 'import.meta'].filter(Boolean).join(', ')}`
+      : 'No top-level await or non-standard import.meta usage',
     weight: 1,
   });
 
   // 5. Events use composed: true (cross Shadow DOM boundary for Drupal behaviors)
   const eventDispatches = [...source.matchAll(/new\s+CustomEvent[^)]+\)/g)];
-  const composedEvents = eventDispatches.filter((e) =>
-    e[0].includes("composed: true") || e[0].includes("composed:true")
+  const composedEvents = eventDispatches.filter(
+    (e) => e[0].includes('composed: true') || e[0].includes('composed:true'),
   );
   const eventsComposed =
     eventDispatches.length === 0 || composedEvents.length === eventDispatches.length;
   checks.push({
-    name: "Composed events",
+    name: 'Composed events',
     passed: eventsComposed,
     detail: eventsComposed
       ? `${eventDispatches.length} event(s) use composed: true`
@@ -113,23 +113,23 @@ export function analyzeDrupalReadiness(tagName: string): DrupalReadinessResult |
 
   // 6. Form components use ElementInternals (native <form> submission)
   const isFormElement =
-    source.includes("formAssociated") ||
-    tagName.includes("input") ||
-    tagName.includes("select") ||
-    tagName.includes("textarea") ||
-    tagName.includes("checkbox") ||
-    tagName.includes("radio") ||
-    tagName.includes("switch");
-  const hasInternals = source.includes("attachInternals");
+    source.includes('formAssociated') ||
+    tagName.includes('input') ||
+    tagName.includes('select') ||
+    tagName.includes('textarea') ||
+    tagName.includes('checkbox') ||
+    tagName.includes('radio') ||
+    tagName.includes('switch');
+  const hasInternals = source.includes('attachInternals');
   const formPassed = !isFormElement || hasInternals;
   checks.push({
-    name: "Form participation",
+    name: 'Form participation',
     passed: formPassed,
     detail: isFormElement
       ? hasInternals
-        ? "ElementInternals form association"
-        : "Form element missing attachInternals()"
-      : "Not a form element (N/A)",
+        ? 'ElementInternals form association'
+        : 'Form element missing attachInternals()'
+      : 'Not a form element (N/A)',
     weight: 2,
   });
 

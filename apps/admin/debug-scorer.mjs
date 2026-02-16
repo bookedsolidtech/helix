@@ -9,7 +9,7 @@ import { resolve } from 'node:path';
 const mockCwd = '/Volumes/Development/wc-2026/apps/admin';
 
 function hasDocsPage(tagName) {
-  const docsRoot = resolve(mockCwd, "../docs");
+  const docsRoot = resolve(mockCwd, '../docs');
   const docsPath = resolve(docsRoot, `src/content/docs/component-library/${tagName}.mdx`);
   console.log(`\nChecking docs for ${tagName}:`);
   console.log(`  docsRoot: ${docsRoot}`);
@@ -31,4 +31,4 @@ for (const component of testComponents) {
 
 console.log('\n' + '='.repeat(60));
 console.log('\nSummary:');
-console.log(`All components have docs: ${testComponents.every(c => hasDocsPage(c))}`);
+console.log(`All components have docs: ${testComponents.every((c) => hasDocsPage(c))}`);

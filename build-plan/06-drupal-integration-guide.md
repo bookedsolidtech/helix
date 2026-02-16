@@ -56,9 +56,9 @@ All components use the `chc-` prefix (Content Hub Components). Every HTML tag st
 
 ```html
 <chc-content-card>
-<chc-button>
-<chc-hero-banner>
-<chc-text-input>
+  <chc-button>
+    <chc-hero-banner> <chc-text-input></chc-text-input></chc-hero-banner></chc-button
+></chc-content-card>
 ```
 
 ### Token Prefix
@@ -121,11 +121,11 @@ hds-components:
 
 **Critical settings explained:**
 
-| Setting | Value | Why |
-|---------|-------|-----|
-| `type: module` | Required | Web Components are distributed as ES modules. Without this, Drupal will try to load them as classic scripts and fail. |
-| `preprocess: false` | Required | Prevents Drupal's asset aggregation from bundling the ES module with other scripts, which would break `import` statements. |
-| `minified: true` | Optimization | Tells Drupal the file is already minified so it does not attempt minification. |
+| Setting             | Value        | Why                                                                                                                        |
+| ------------------- | ------------ | -------------------------------------------------------------------------------------------------------------------------- |
+| `type: module`      | Required     | Web Components are distributed as ES modules. Without this, Drupal will try to load them as classic scripts and fail.      |
+| `preprocess: false` | Required     | Prevents Drupal's asset aggregation from bundling the ES module with other scripts, which would break `import` statements. |
+| `minified: true`    | Optimization | Tells Drupal the file is already minified so it does not attempt minification.                                             |
 
 #### Step 3: Attach the Library
 
@@ -158,6 +158,7 @@ drush cr
 ```
 
 In the browser, open DevTools and verify:
+
 - `tokens.css` is loaded and `:root` contains `--hds-*` custom properties
 - `index.js` is loaded with `type="module"`
 - Custom elements are registered: `document.querySelector('chc-content-card')` returns an element (if one exists on the page)
@@ -179,9 +180,7 @@ If your project uses Composer exclusively for dependency management, use [Asset 
   },
   "extra": {
     "installer-paths": {
-      "web/libraries/{$name}": [
-        "type:npm-asset"
-      ]
+      "web/libraries/{$name}": ["type:npm-asset"]
     }
   }
 }
@@ -1171,10 +1170,10 @@ class ChcContentCardFormatter extends FormatterBase {
 
 **When to use field formatters vs. template overrides:**
 
-| Approach | Use When |
-|----------|----------|
-| Template override | One-off field rendering, simple mapping, team prefers TWIG |
-| Field formatter | Reusable across content types, needs admin configuration, complex data transformation |
+| Approach          | Use When                                                                              |
+| ----------------- | ------------------------------------------------------------------------------------- |
+| Template override | One-off field rendering, simple mapping, team prefers TWIG                            |
+| Field formatter   | Reusable across content types, needs admin configuration, complex data transformation |
 
 ---
 
@@ -1520,23 +1519,12 @@ This means:
 ```html
 <form method="post" action="/contact">
   <!-- This Web Component participates in the form natively -->
-  <chc-text-input
-    name="full_name"
-    label="Full Name"
-    required
-  ></chc-text-input>
+  <chc-text-input name="full_name" label="Full Name" required></chc-text-input>
 
-  <chc-text-input
-    name="email"
-    label="Email"
-    type="email"
-    required
-  ></chc-text-input>
+  <chc-text-input name="email" label="Email" type="email" required></chc-text-input>
 
   <!-- On form submit, FormData contains: full_name=..., email=... -->
-  <chc-button type="submit" variant="primary">
-    Submit
-  </chc-button>
+  <chc-button type="submit" variant="primary"> Submit </chc-button>
 </form>
 ```
 
@@ -1614,7 +1602,6 @@ Drupal behaviors are the standard mechanism for initializing JavaScript in Drupa
       });
     },
   };
-
 })(Drupal, once);
 ```
 
@@ -1670,7 +1657,6 @@ For components that may be added dynamically (AJAX, BigPipe), use event delegati
       });
     },
   };
-
 })(Drupal);
 ```
 
@@ -1711,7 +1697,7 @@ Handle Web Component events that trigger Drupal AJAX operations:
                 headers: {
                   'X-Requested-With': 'XMLHttpRequest',
                 },
-              }
+              },
             );
 
             const data = await response.json();
@@ -1735,7 +1721,6 @@ Handle Web Component events that trigger Drupal AJAX operations:
       });
     },
   };
-
 })(Drupal, once);
 ```
 
@@ -1771,9 +1756,7 @@ Connect the `chc-search-bar` component to Drupal's Search API:
           if (query.length < 3) return;
 
           try {
-            const response = await fetch(
-              `/api/search-suggestions?q=${encodeURIComponent(query)}`
-            );
+            const response = await fetch(`/api/search-suggestions?q=${encodeURIComponent(query)}`);
             const suggestions = await response.json();
 
             // Pass suggestions back to the component
@@ -1785,7 +1768,6 @@ Connect the `chc-search-bar` component to Drupal's Search API:
       });
     },
   };
-
 })(Drupal, once);
 ```
 
@@ -1818,7 +1800,6 @@ However, Drupal behaviors attached to Web Components need re-attachment:
       // No additional initialization needed.
     },
   };
-
 })(Drupal);
 ```
 
@@ -1871,7 +1852,6 @@ Connect Web Component modals with Drupal's dialog system:
       });
     },
   };
-
 })(Drupal, once);
 ```
 
@@ -1896,7 +1876,7 @@ Create a token overrides file in your theme:
    * ============================================ */
 
   /* Primary interactive color (links, primary buttons) */
-  --hds-color-interactive-primary: #0e7c61;        /* Healthcare teal */
+  --hds-color-interactive-primary: #0e7c61; /* Healthcare teal */
   --hds-color-interactive-primary-hover: #0a5e49;
   --hds-color-interactive-primary-active: #084a3a;
 
@@ -1914,7 +1894,7 @@ Create a token overrides file in your theme:
   /* ============================================
    * Spacing Overrides
    * ============================================ */
-  --hds-space-inset-md: 1.25rem;    /* Slightly more generous padding */
+  --hds-space-inset-md: 1.25rem; /* Slightly more generous padding */
 
   /* ============================================
    * Component-Level Overrides
@@ -1925,7 +1905,7 @@ Create a token overrides file in your theme:
   --hds-card-padding: 2rem;
 
   /* Buttons: rounder for this brand */
-  --hds-button-primary-border-radius: 999px;  /* Pill shape */
+  --hds-button-primary-border-radius: 999px; /* Pill shape */
 }
 ```
 
@@ -1949,11 +1929,11 @@ Override dark mode token values for your brand:
 ```css
 /* mytheme/css/dark-mode-overrides.css */
 
-[data-theme="dark"] {
+[data-theme='dark'] {
   /* Brand-specific dark mode adjustments */
-  --hds-color-interactive-primary: #34d399;        /* Lighter teal for dark bg */
+  --hds-color-interactive-primary: #34d399; /* Lighter teal for dark bg */
   --hds-color-interactive-primary-hover: #6ee7b7;
-  --hds-color-surface-primary: #0f172a;            /* Deep navy instead of neutral */
+  --hds-color-surface-primary: #0f172a; /* Deep navy instead of neutral */
   --hds-color-surface-secondary: #1e293b;
 }
 ```
@@ -1996,7 +1976,7 @@ For cases where CSS custom properties do not provide sufficient control, use the
 /* mytheme/css/component-overrides.css */
 
 /* Style the card header area for featured cards */
-chc-content-card[variant="featured"]::part(header) {
+chc-content-card[variant='featured']::part(header) {
   min-height: 200px;
   background: linear-gradient(
     135deg,
@@ -2019,10 +1999,10 @@ chc-content-card[variant="featured"]::part(header) {
 
 **When to use Parts vs. custom properties:**
 
-| Approach | Use When |
-|----------|----------|
-| CSS custom properties | Changing values (colors, spacing, sizes, fonts) |
-| `::part()` | Changing structural CSS (display, grid, flex, text-transform, pseudo-elements) |
+| Approach              | Use When                                                                       |
+| --------------------- | ------------------------------------------------------------------------------ |
+| CSS custom properties | Changing values (colors, spacing, sizes, fonts)                                |
+| `::part()`            | Changing structural CSS (display, grid, flex, text-transform, pseudo-elements) |
 
 **Important**: Only use `::part()` on parts that are explicitly documented in the component's API. The available parts are listed in the Custom Elements Manifest and Storybook documentation.
 
@@ -2200,9 +2180,19 @@ Then use the SDC in other TWIG templates:
 For components that appear above the fold on every page, preload the module:
 
 ```html
-{# In html.html.twig <head> section #}
-<link rel="modulepreload" href="/themes/custom/mytheme/node_modules/@org/wc-library/dist/index.js">
-<link rel="preload" href="/themes/custom/mytheme/node_modules/@org/wc-library/dist/styles/tokens.css" as="style">
+{# In html.html.twig
+<head>
+  section #}
+  <link
+    rel="modulepreload"
+    href="/themes/custom/mytheme/node_modules/@org/wc-library/dist/index.js"
+  />
+  <link
+    rel="preload"
+    href="/themes/custom/mytheme/node_modules/@org/wc-library/dist/styles/tokens.css"
+    as="style"
+  />
+</head>
 ```
 
 #### Per-Component Imports (Tree Shaking)
@@ -2259,11 +2249,7 @@ For components that appear below the fold, use dynamic imports triggered by Inte
    */
   Drupal.behaviors.chcLazyLoad = {
     attach(context) {
-      const lazyComponents = once(
-        'chc-lazy-load',
-        '[data-chc-lazy]',
-        context
-      );
+      const lazyComponents = once('chc-lazy-load', '[data-chc-lazy]', context);
 
       if (!lazyComponents.length) return;
 
@@ -2284,13 +2270,12 @@ For components that appear below the fold, use dynamic imports triggered by Inte
         },
         {
           rootMargin: '200px', // Start loading 200px before viewport
-        }
+        },
       );
 
       lazyComponents.forEach((el) => observer.observe(el));
     },
   };
-
 })(Drupal, once);
 ```
 
@@ -2370,9 +2355,7 @@ const WC_ASSETS = [
 ];
 
 self.addEventListener('install', (event) => {
-  event.waitUntil(
-    caches.open('wc-library-v1').then((cache) => cache.addAll(WC_ASSETS))
-  );
+  event.waitUntil(caches.open('wc-library-v1').then((cache) => cache.addAll(WC_ASSETS)));
 });
 ```
 
@@ -2466,21 +2449,21 @@ This checklist covers Drupal-specific accessibility considerations when integrat
 
 **Possible causes and solutions:**
 
-| Cause | Diagnosis | Solution |
-|-------|-----------|----------|
-| Library not loaded | Check Network tab for 404 on `index.js` | Verify path in `libraries.yml`, run `drush cr` |
-| Missing `type: module` | Console error: "Unexpected token 'export'" | Add `type: module` to the js entry in `libraries.yml` |
-| Wrong `preprocess` setting | ES module bundled with other scripts, syntax error | Set `preprocess: false` on the js entry |
-| Library not attached | No `index.js` request in Network tab | Add `attach_library()` in TWIG or global attachment in `.info.yml` |
-| CORS issue (CDN) | Console error: "CORS policy" | Add CORS headers to CDN, or use self-hosted assets |
-| Module not supported | Older browser (IE11) | Web Components require modern browsers; add polyfills if needed |
+| Cause                      | Diagnosis                                          | Solution                                                           |
+| -------------------------- | -------------------------------------------------- | ------------------------------------------------------------------ |
+| Library not loaded         | Check Network tab for 404 on `index.js`            | Verify path in `libraries.yml`, run `drush cr`                     |
+| Missing `type: module`     | Console error: "Unexpected token 'export'"         | Add `type: module` to the js entry in `libraries.yml`              |
+| Wrong `preprocess` setting | ES module bundled with other scripts, syntax error | Set `preprocess: false` on the js entry                            |
+| Library not attached       | No `index.js` request in Network tab               | Add `attach_library()` in TWIG or global attachment in `.info.yml` |
+| CORS issue (CDN)           | Console error: "CORS policy"                       | Add CORS headers to CDN, or use self-hosted assets                 |
+| Module not supported       | Older browser (IE11)                               | Web Components require modern browsers; add polyfills if needed    |
 
 **Quick diagnostic script:**
 
 ```javascript
 // Paste in DevTools console to check component registration
 const tags = ['chc-content-card', 'chc-button', 'chc-hero-banner'];
-tags.forEach(tag => {
+tags.forEach((tag) => {
   const registered = customElements.get(tag);
   console.log(`${tag}: ${registered ? 'registered' : 'NOT REGISTERED'}`);
 });
@@ -2490,13 +2473,13 @@ tags.forEach(tag => {
 
 **Symptom**: Component attributes show stale data or do not reflect Drupal field values.
 
-| Cause | Diagnosis | Solution |
-|-------|-----------|----------|
-| Drupal render cache | Change not reflected after field edit | Clear cache: `drush cr` or configure cache tags correctly |
-| TWIG auto-escaping | HTML entities in attribute values | This is correct behavior; do not use `|raw` in attributes |
+| Cause                  | Diagnosis                                             | Solution                                                                                      |
+| ---------------------- | ----------------------------------------------------- | --------------------------------------------------------------------------------------------- | ------------------ | ----- | ---------------------------------- | ------ | --------- | -------- |
+| Drupal render cache    | Change not reflected after field edit                 | Clear cache: `drush cr` or configure cache tags correctly                                     |
+| TWIG auto-escaping     | HTML entities in attribute values                     | This is correct behavior; do not use `                                                        | raw` in attributes |
 | Attribute vs. property | Setting a JS property but checking the HTML attribute | Use `reflect: true` on the component property (library concern), or set via attribute in TWIG |
-| Whitespace in value | Leading/trailing spaces from `|render|striptags` | Add `|trim` filter: `{{ content.field_name|render|striptags|trim }}` |
-| Boolean attributes | `attribute="false"` still truthy in HTML | For boolean attributes, conditionally include/exclude: `{% if value %}attribute{% endif %}` |
+| Whitespace in value    | Leading/trailing spaces from `                        | render                                                                                        | striptags`         | Add ` | trim`filter:`{{ content.field_name | render | striptags | trim }}` |
+| Boolean attributes     | `attribute="false"` still truthy in HTML              | For boolean attributes, conditionally include/exclude: `{% if value %}attribute{% endif %}`   |
 
 **Boolean attribute pattern:**
 
@@ -2512,13 +2495,13 @@ tags.forEach(tag => {
 
 **Symptom**: Event listeners attached in Drupal behaviors never trigger.
 
-| Cause | Diagnosis | Solution |
-|-------|-----------|----------|
-| Listener attached before component defined | Race condition on page load | Use `customElements.whenDefined()` or listen on a parent |
-| Behavior context not applied | `once()` filtered out the element | Check that the CSS selector matches, use DevTools to verify |
-| Shadow DOM event not composed | Event does not bubble past shadow boundary | Library bug: event should use `composed: true`. Report to library team. |
-| Event name mismatch | Typo in event name | Check CEM or Storybook docs for exact event name |
-| AJAX content not re-attached | New elements after AJAX lack behaviors | Ensure `Drupal.attachBehaviors()` is called after content insertion |
+| Cause                                      | Diagnosis                                  | Solution                                                                |
+| ------------------------------------------ | ------------------------------------------ | ----------------------------------------------------------------------- |
+| Listener attached before component defined | Race condition on page load                | Use `customElements.whenDefined()` or listen on a parent                |
+| Behavior context not applied               | `once()` filtered out the element          | Check that the CSS selector matches, use DevTools to verify             |
+| Shadow DOM event not composed              | Event does not bubble past shadow boundary | Library bug: event should use `composed: true`. Report to library team. |
+| Event name mismatch                        | Typo in event name                         | Check CEM or Storybook docs for exact event name                        |
+| AJAX content not re-attached               | New elements after AJAX lack behaviors     | Ensure `Drupal.attachBehaviors()` is called after content insertion     |
 
 **Event debugging:**
 
@@ -2530,7 +2513,7 @@ document.addEventListener('chc-form-submit', (e) => console.log('form-submit', e
 // Or listen for ALL events on a specific component
 const card = document.querySelector('chc-content-card');
 const events = ['chc-card-click'];
-events.forEach(name => {
+events.forEach((name) => {
   card.addEventListener(name, (e) => console.log(name, e.detail));
 });
 ```
@@ -2539,14 +2522,14 @@ events.forEach(name => {
 
 **Symptom**: Components appear unstyled or CSS overrides have no effect.
 
-| Cause | Diagnosis | Solution |
-|-------|-----------|----------|
-| Token CSS not loaded | No `--hds-*` properties on `:root` | Verify `hds-tokens` library is attached, check Network tab |
-| CSS load order wrong | Overrides load before tokens | Ensure override library depends on token library in `libraries.yml` |
-| CSS custom properties not inherited | Property defined on wrong element | Set on `:root` or on a parent element of the component |
-| `::part()` on non-existent part | No effect, no error | Check CEM/Storybook for available part names |
-| Drupal CSS aggregation conflict | Aggregated CSS changes load order | Set `preprocess: false` on override stylesheets if order matters |
-| Specificity issue | Token override not taking effect | Check that the selector specificity of your override is sufficient; `:root` should be sufficient for top-level overrides |
+| Cause                               | Diagnosis                          | Solution                                                                                                                 |
+| ----------------------------------- | ---------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| Token CSS not loaded                | No `--hds-*` properties on `:root` | Verify `hds-tokens` library is attached, check Network tab                                                               |
+| CSS load order wrong                | Overrides load before tokens       | Ensure override library depends on token library in `libraries.yml`                                                      |
+| CSS custom properties not inherited | Property defined on wrong element  | Set on `:root` or on a parent element of the component                                                                   |
+| `::part()` on non-existent part     | No effect, no error                | Check CEM/Storybook for available part names                                                                             |
+| Drupal CSS aggregation conflict     | Aggregated CSS changes load order  | Set `preprocess: false` on override stylesheets if order matters                                                         |
+| Specificity issue                   | Token override not taking effect   | Check that the selector specificity of your override is sufficient; `:root` should be sufficient for top-level overrides |
 
 **Token inspection tool:**
 
@@ -2575,14 +2558,16 @@ inspectTokens(document.querySelector('chc-content-card')); // Check component to
 **Solutions:**
 
 1. **Load token CSS in `<head>`** (synchronous, render-blocking):
+
    ```yaml
    hds-tokens:
      css:
        theme:
-         tokens.css: {}  # Loaded in <head> by default
+         tokens.css: {} # Loaded in <head> by default
    ```
 
 2. **Use `:not(:defined)` CSS to hide unregistered elements**:
+
    ```css
    /* mytheme.css */
    chc-content-card:not(:defined),
@@ -2595,6 +2580,7 @@ inspectTokens(document.querySelector('chc-content-card')); // Check component to
    ```
 
 3. **Or use `:not(:defined)` with a placeholder skeleton**:
+
    ```css
    chc-content-card:not(:defined) {
      display: block;
@@ -2605,8 +2591,13 @@ inspectTokens(document.querySelector('chc-content-card')); // Check component to
    }
 
    @keyframes pulse {
-     0%, 100% { opacity: 0.6; }
-     50% { opacity: 1; }
+     0%,
+     100% {
+       opacity: 0.6;
+     }
+     50% {
+       opacity: 1;
+     }
    }
 
    @media (prefers-reduced-motion: reduce) {
@@ -2625,11 +2616,11 @@ inspectTokens(document.querySelector('chc-content-card')); // Check component to
 
 The `@org/wc-library` package follows strict semantic versioning:
 
-| Version Type | Change Examples | Action Required |
-|-------------|----------------|-----------------|
-| **Patch** (1.0.x) | Bug fixes, typo corrections in docs, internal refactoring | Update directly. No template changes needed. |
-| **Minor** (1.x.0) | New components added, new optional attributes on existing components, new token values | Update directly. Review changelog for new features you may want to adopt. |
-| **Major** (x.0.0) | Removed components, renamed attributes, changed event names, removed tokens, changed default behavior | Read migration guide. Plan template updates. Test in staging. |
+| Version Type      | Change Examples                                                                                       | Action Required                                                           |
+| ----------------- | ----------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------- |
+| **Patch** (1.0.x) | Bug fixes, typo corrections in docs, internal refactoring                                             | Update directly. No template changes needed.                              |
+| **Minor** (1.x.0) | New components added, new optional attributes on existing components, new token values                | Update directly. Review changelog for new features you may want to adopt. |
+| **Major** (x.0.0) | Removed components, renamed attributes, changed event names, removed tokens, changed default behavior | Read migration guide. Plan template updates. Test in staging.             |
 
 ### 13.2 Upgrade Workflow
 
@@ -2716,16 +2707,19 @@ This allows patch updates (1.2.1, 1.2.2) but requires explicit action for minor 
 If an upgrade causes issues in production:
 
 1. **Revert the package version**:
+
    ```bash
    npm install @org/wc-library@1.1.0  # Previous version
    ```
 
 2. **Clear all caches**:
+
    ```bash
    drush cr
    ```
 
 3. **Purge CDN cache** (if using CDN delivery):
+
    ```bash
    # Invalidate CDN cache for the WC library path
    aws cloudfront create-invalidation --distribution-id XXXXX \
@@ -2917,7 +2911,7 @@ behaviors:
 
 :root {
   /* Regional Health Partners brand colors */
-  --hds-color-interactive-primary: #0e7c61;          /* Healthcare teal */
+  --hds-color-interactive-primary: #0e7c61; /* Healthcare teal */
   --hds-color-interactive-primary-hover: #0a6650;
   --hds-color-interactive-primary-active: #085340;
   --hds-color-feedback-success: #16a34a;
@@ -3167,7 +3161,6 @@ function rhp_theme_preprocess_node__article__full(array &$variables): void {
       });
     },
   };
-
 })(Drupal, once);
 ```
 
@@ -3197,15 +3190,12 @@ function rhp_theme_preprocess_node__article__full(array &$variables): void {
           // Update toggle button label for accessibility
           toggle.setAttribute(
             'aria-label',
-            next === 'dark'
-              ? Drupal.t('Switch to light mode')
-              : Drupal.t('Switch to dark mode')
+            next === 'dark' ? Drupal.t('Switch to light mode') : Drupal.t('Switch to dark mode'),
           );
         });
       });
     },
   };
-
 })(Drupal, once);
 ```
 
@@ -3239,34 +3229,34 @@ Use this checklist to verify your integration is complete and correct:
 
 This table maps every `chc-content-card` attribute to its Drupal source and TWIG expression. Equivalent tables for each component are available in the Storybook documentation.
 
-| WC Attribute | Type | Drupal Source | TWIG Expression | Required |
-|-------------|------|--------------|-----------------|----------|
-| `heading` | String | Node title | `{{ node.label }}` | Yes |
-| `summary` | String | `field_summary` (Plain text) | `{{ content.field_summary\|render\|striptags\|trim }}` | No |
-| `category` | String | `field_category` (Term reference) | `{{ node.field_category.entity.label }}` | No |
-| `href` | String | Node canonical URL | `{{ path('entity.node.canonical', {'node': node.id}) }}` | No |
-| `publish-date` | String (ISO 8601) | Node created timestamp | `{{ node.getCreatedTime()\|date('c') }}` | No |
-| `read-time` | Number | `field_read_time` (Integer) | `{{ node.field_read_time.value }}` | No |
-| `variant` | String (`default`, `featured`, `compact`) | Derived from promotion status | `{{ node.isPromoted() ? 'featured' : 'default' }}` | No |
+| WC Attribute   | Type                                      | Drupal Source                     | TWIG Expression                                          | Required |
+| -------------- | ----------------------------------------- | --------------------------------- | -------------------------------------------------------- | -------- |
+| `heading`      | String                                    | Node title                        | `{{ node.label }}`                                       | Yes      |
+| `summary`      | String                                    | `field_summary` (Plain text)      | `{{ content.field_summary\|render\|striptags\|trim }}`   | No       |
+| `category`     | String                                    | `field_category` (Term reference) | `{{ node.field_category.entity.label }}`                 | No       |
+| `href`         | String                                    | Node canonical URL                | `{{ path('entity.node.canonical', {'node': node.id}) }}` | No       |
+| `publish-date` | String (ISO 8601)                         | Node created timestamp            | `{{ node.getCreatedTime()\|date('c') }}`                 | No       |
+| `read-time`    | Number                                    | `field_read_time` (Integer)       | `{{ node.field_read_time.value }}`                       | No       |
+| `variant`      | String (`default`, `featured`, `compact`) | Derived from promotion status     | `{{ node.isPromoted() ? 'featured' : 'default' }}`       | No       |
 
 ## Appendix B: Event Reference
 
 All custom events emitted by Web Components. These events use `bubbles: true` and `composed: true`, meaning they cross Shadow DOM boundaries and can be caught at any ancestor level.
 
-| Event Name | Component | Detail Properties | Use Case |
-|-----------|-----------|-------------------|----------|
-| `chc-card-click` | `chc-content-card` | `{ href, heading, keyboard }` | Analytics, navigation |
-| `chc-form-submit` | `chc-form` | `{ formData, valid }` | Form processing |
-| `chc-input` | `chc-text-input` | `{ value, name }` | Real-time validation |
-| `chc-change` | `chc-text-input` | `{ value, name }` | Value change tracking |
-| `chc-search-submit` | `chc-search-bar` | `{ query }` | Search routing |
-| `chc-search-input` | `chc-search-bar` | `{ query }` | Autocomplete |
-| `chc-accordion-toggle` | `chc-accordion` | `{ heading, open }` | Analytics, state tracking |
-| `chc-tab-change` | `chc-tabs` | `{ index, label }` | Analytics, deep linking |
-| `chc-modal-open` | `chc-modal` | `{ id }` | Focus management |
-| `chc-modal-close` | `chc-modal` | `{ id }` | Focus restoration |
-| `chc-nav-toggle` | `chc-nav-mobile` | `{ open }` | Mobile nav state |
-| `chc-page-change` | `chc-pagination` | `{ page }` | AJAX paging |
+| Event Name             | Component          | Detail Properties             | Use Case                  |
+| ---------------------- | ------------------ | ----------------------------- | ------------------------- |
+| `chc-card-click`       | `chc-content-card` | `{ href, heading, keyboard }` | Analytics, navigation     |
+| `chc-form-submit`      | `chc-form`         | `{ formData, valid }`         | Form processing           |
+| `chc-input`            | `chc-text-input`   | `{ value, name }`             | Real-time validation      |
+| `chc-change`           | `chc-text-input`   | `{ value, name }`             | Value change tracking     |
+| `chc-search-submit`    | `chc-search-bar`   | `{ query }`                   | Search routing            |
+| `chc-search-input`     | `chc-search-bar`   | `{ query }`                   | Autocomplete              |
+| `chc-accordion-toggle` | `chc-accordion`    | `{ heading, open }`           | Analytics, state tracking |
+| `chc-tab-change`       | `chc-tabs`         | `{ index, label }`            | Analytics, deep linking   |
+| `chc-modal-open`       | `chc-modal`        | `{ id }`                      | Focus management          |
+| `chc-modal-close`      | `chc-modal`        | `{ id }`                      | Focus restoration         |
+| `chc-nav-toggle`       | `chc-nav-mobile`   | `{ open }`                    | Mobile nav state          |
+| `chc-page-change`      | `chc-pagination`   | `{ page }`                    | AJAX paging               |
 
 ## Appendix C: CSS Custom Property Quick Reference
 
@@ -3304,6 +3294,7 @@ The most commonly overridden tokens for brand customization:
 ## References
 
 ### Drupal Documentation
+
 - [Adding Assets (CSS, JS) to a Drupal Module via libraries.yml](https://www.drupal.org/docs/develop/creating-modules/adding-assets-css-js-to-a-drupal-module-via-librariesyml)
 - [Drupal Single Directory Components (SDC)](https://www.drupal.org/docs/develop/theming-drupal/using-single-directory-components/quickstart)
 - [TWIG Template Reference](https://www.drupal.org/docs/develop/theming-drupal/twig-in-drupal)
@@ -3311,12 +3302,14 @@ The most commonly overridden tokens for brand customization:
 - [Drupal AJAX Framework](https://www.drupal.org/docs/develop/drupal-apis/ajax-api)
 
 ### Web Components & Lit
+
 - [Lit Official Documentation](https://lit.dev/docs/)
 - [Custom Elements Manifest](https://custom-elements-manifest.open-wc.org/)
 - [ElementInternals (MDN)](https://developer.mozilla.org/en-US/docs/Web/API/ElementInternals)
 - [Form-Associated Custom Elements](https://bennypowers.dev/posts/form-associated-custom-elements/)
 
 ### Integration Resources
+
 - [Web Components Drupal Module](https://www.drupal.org/project/webcomponents)
 - [Custom Elements Drupal Module](https://www.drupal.org/project/custom_elements)
 - [Declarative Shadow DOM and the Future of Drupal Theming](https://john.albin.net/presentations/2025-11-18/declarative-shadow-dom-and-future-drupal-theming)
@@ -3324,6 +3317,7 @@ The most commonly overridden tokens for brand customization:
 - [Drupal Meets Design Systems (Enterprise UI Consistency)](https://medium.com/@drupart-digital/drupal-meets-design-systems-a-new-era-in-enterprise-ui-consistency-86b4cc4a0b8a)
 
 ### Accessibility
+
 - [WCAG 2.1 Quick Reference](https://www.w3.org/WAI/WCAG21/quickref/)
 - [ARIA Authoring Practices Guide (APG)](https://www.w3.org/WAI/ARIA/apg/)
 - [What WCAG 2.1 AA Means for Healthcare Organizations in 2026](https://pilotdigital.com/blog/what-wcag-2-1-aa-means-for-healthcare-organizations-in-2026/)

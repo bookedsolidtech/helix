@@ -1,1 +1,8 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+# Run lint-staged for formatting and linting
 npx lint-staged
+
+# Run comprehensive pre-commit quality checks
+bash scripts/pre-commit-check.sh

@@ -1,33 +1,21 @@
-"use client";
+'use client';
 
-import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { cn } from "@/lib/utils";
-import {
-  Palette,
-  Ruler,
-  Type,
-  Square,
-  Cloudy,
-  Zap,
-  LayoutGrid,
-} from "lucide-react";
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import { cn } from '@/lib/utils';
+import { Palette, Ruler, Type, Square, Cloudy, Zap, LayoutGrid } from 'lucide-react';
 
 const tokenNav = [
-  { href: "/tokens", label: "Overview", icon: LayoutGrid },
-  { href: "/tokens/colors", label: "Colors", icon: Palette },
-  { href: "/tokens/spacing", label: "Spacing", icon: Ruler },
-  { href: "/tokens/typography", label: "Typography", icon: Type },
-  { href: "/tokens/borders", label: "Borders", icon: Square },
-  { href: "/tokens/shadows", label: "Shadows", icon: Cloudy },
-  { href: "/tokens/utilities", label: "Utilities", icon: Zap },
+  { href: '/tokens', label: 'Overview', icon: LayoutGrid },
+  { href: '/tokens/colors', label: 'Colors', icon: Palette },
+  { href: '/tokens/spacing', label: 'Spacing', icon: Ruler },
+  { href: '/tokens/typography', label: 'Typography', icon: Type },
+  { href: '/tokens/borders', label: 'Borders', icon: Square },
+  { href: '/tokens/shadows', label: 'Shadows', icon: Cloudy },
+  { href: '/tokens/utilities', label: 'Utilities', icon: Zap },
 ];
 
-export default function TokensLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function TokensLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
 
   return (
@@ -40,10 +28,10 @@ export default function TokensLayout({
               key={item.href}
               href={item.href}
               className={cn(
-                "flex items-center gap-1.5 px-3 py-2 text-xs font-medium rounded-t-md border-b-2 transition-colors shrink-0",
+                'flex items-center gap-1.5 px-3 py-2 text-xs font-medium rounded-t-md border-b-2 transition-colors shrink-0',
                 isActive
-                  ? "border-foreground text-foreground"
-                  : "border-transparent text-muted-foreground hover:text-foreground hover:border-border"
+                  ? 'border-foreground text-foreground'
+                  : 'border-transparent text-muted-foreground hover:text-foreground hover:border-border',
               )}
             >
               <item.icon className="w-3.5 h-3.5" />

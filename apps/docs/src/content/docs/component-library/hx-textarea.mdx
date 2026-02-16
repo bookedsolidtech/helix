@@ -1,5 +1,5 @@
 ---
-title: "hx-textarea"
+title: 'hx-textarea'
 description: A multi-line text area component with label, validation, and form association.
 ---
 
@@ -27,10 +27,30 @@ Different resize behaviors: none, vertical, both, and auto-grow.
 
 <ComponentDemo title="Resize Options">
   <div style="display: grid; gap: 1rem; max-width: 480px;">
-    <hx-textarea label="No resize" placeholder="Cannot be resized" resize="none" rows="2"></hx-textarea>
-    <hx-textarea label="Vertical resize (default)" placeholder="Drag the handle vertically" resize="vertical" rows="2"></hx-textarea>
-    <hx-textarea label="Resize both" placeholder="Drag in any direction" resize="both" rows="2"></hx-textarea>
-    <hx-textarea label="Auto-grow" placeholder="Type to see auto-grow behavior" resize="auto" rows="2"></hx-textarea>
+    <hx-textarea
+      label="No resize"
+      placeholder="Cannot be resized"
+      resize="none"
+      rows="2"
+    ></hx-textarea>
+    <hx-textarea
+      label="Vertical resize (default)"
+      placeholder="Drag the handle vertically"
+      resize="vertical"
+      rows="2"
+    ></hx-textarea>
+    <hx-textarea
+      label="Resize both"
+      placeholder="Drag in any direction"
+      resize="both"
+      rows="2"
+    ></hx-textarea>
+    <hx-textarea
+      label="Auto-grow"
+      placeholder="Type to see auto-grow behavior"
+      resize="auto"
+      rows="2"
+    ></hx-textarea>
   </div>
 </ComponentDemo>
 
@@ -51,11 +71,7 @@ Required, error, disabled, and character count states.
       value="Too short"
       error="Description must be at least 50 characters."
     ></hx-textarea>
-    <hx-textarea
-      label="Disabled"
-      value="This content cannot be edited."
-      disabled
-    ></hx-textarea>
+    <hx-textarea label="Disabled" value="This content cannot be edited." disabled></hx-textarea>
   </div>
 </ComponentDemo>
 

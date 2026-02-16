@@ -19,67 +19,69 @@ if (!fs.existsSync(logosDir)) {
 const logos = [
   {
     name: 'lit.svg',
-    url: 'https://raw.githubusercontent.com/lit/lit.dev/main/packages/lit-dev-content/site/images/flame-favicon.svg'
+    url: 'https://raw.githubusercontent.com/lit/lit.dev/main/packages/lit-dev-content/site/images/flame-favicon.svg',
   },
   {
     name: 'storybook.svg',
-    url: 'https://raw.githubusercontent.com/storybookjs/brand/main/icon/icon-storybook-default.svg'
+    url: 'https://raw.githubusercontent.com/storybookjs/brand/main/icon/icon-storybook-default.svg',
   },
   {
     name: 'vitest.svg',
-    url: 'https://raw.githubusercontent.com/vitest-dev/vitest/main/docs/public/logo.svg'
+    url: 'https://raw.githubusercontent.com/vitest-dev/vitest/main/docs/public/logo.svg',
   },
   {
     name: 'astro.svg',
-    url: 'https://astro.build/assets/press/astro-icon-light.svg'
+    url: 'https://astro.build/assets/press/astro-icon-light.svg',
   },
   {
     name: 'typescript.svg',
-    url: 'https://www.vectorlogo.zone/logos/typescriptlang/typescriptlang-icon.svg'
+    url: 'https://www.vectorlogo.zone/logos/typescriptlang/typescriptlang-icon.svg',
   },
   {
     name: 'drupal.svg',
-    url: 'https://www.vectorlogo.zone/logos/drupal/drupal-icon.svg'
+    url: 'https://www.vectorlogo.zone/logos/drupal/drupal-icon.svg',
   },
   {
     name: 'turborepo.svg',
-    url: 'https://cdn.simpleicons.org/turborepo'
+    url: 'https://cdn.simpleicons.org/turborepo',
   },
   {
     name: 'npm.svg',
-    url: 'https://www.vectorlogo.zone/logos/npmjs/npmjs-icon.svg'
-  }
+    url: 'https://www.vectorlogo.zone/logos/npmjs/npmjs-icon.svg',
+  },
 ];
 
 function downloadFile(url: string, dest: string): Promise<void> {
   return new Promise((resolve, reject) => {
     const file = fs.createWriteStream(dest);
 
-    https.get(url, (response) => {
-      // Handle redirects
-      if (response.statusCode === 301 || response.statusCode === 302) {
-        const redirectUrl = response.headers.location;
-        if (redirectUrl) {
-          downloadFile(redirectUrl, dest).then(resolve).catch(reject);
+    https
+      .get(url, (response) => {
+        // Handle redirects
+        if (response.statusCode === 301 || response.statusCode === 302) {
+          const redirectUrl = response.headers.location;
+          if (redirectUrl) {
+            downloadFile(redirectUrl, dest).then(resolve).catch(reject);
+            return;
+          }
+        }
+
+        if (response.statusCode !== 200) {
+          reject(new Error(`Failed to download ${url}: ${response.statusCode}`));
           return;
         }
-      }
 
-      if (response.statusCode !== 200) {
-        reject(new Error(`Failed to download ${url}: ${response.statusCode}`));
-        return;
-      }
+        response.pipe(file);
 
-      response.pipe(file);
-
-      file.on('finish', () => {
-        file.close();
-        resolve();
+        file.on('finish', () => {
+          file.close();
+          resolve();
+        });
+      })
+      .on('error', (err) => {
+        fs.unlink(dest, () => {});
+        reject(err);
       });
-    }).on('error', (err) => {
-      fs.unlink(dest, () => {});
-      reject(err);
-    });
   });
 }
 

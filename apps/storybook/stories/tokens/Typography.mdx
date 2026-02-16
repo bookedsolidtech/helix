@@ -4,7 +4,10 @@ import { Meta } from '@storybook/addon-docs/blocks';
 import { tokensByCategory } from '@helix/tokens';
 import { getTokensByPrefix, getTokenStats } from '@helix/tokens/utils';
 
-<Meta title="Design Tokens/Typography" parameters={{ controls: { disable: true }, actions: { disable: true } }} />
+<Meta
+  title="Design Tokens/Typography"
+  parameters={{ controls: { disable: true }, actions: { disable: true } }}
+/>
 
 export const fontTokens = tokensByCategory['font'] ?? [];
 export const lineHeightTokens = tokensByCategory['line-height'] ?? [];
@@ -12,9 +15,11 @@ export const letterSpacingTokens = tokensByCategory['letter-spacing'] ?? [];
 export const fontSizeTokens = getTokensByPrefix(fontTokens, '--hx-font-size-');
 export const fontWeightTokens = getTokensByPrefix(fontTokens, '--hx-font-weight-');
 export const fontFamilyTokens = getTokensByPrefix(fontTokens, '--hx-font-family-');
-export const totalTypoTokens = fontTokens.length + lineHeightTokens.length + letterSpacingTokens.length;
+export const totalTypoTokens =
+  fontTokens.length + lineHeightTokens.length + letterSpacingTokens.length;
 export const sampleText = 'The quick brown fox jumps over the lazy dog';
-export const multiLineText = 'Design tokens are the visual design atoms of the design system. They are named entities that store visual design attributes. We use them in place of hard-coded values in order to maintain a scalable and consistent visual system for UI development.';
+export const multiLineText =
+  'Design tokens are the visual design atoms of the design system. They are named entities that store visual design attributes. We use them in place of hard-coded values in order to maintain a scalable and consistent visual system for UI development.';
 export const specimenChars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ abcdefghijklmnopqrstuvwxyz 0123456789';
 
 export function copyToClipboard(text) {
@@ -22,7 +27,7 @@ export function copyToClipboard(text) {
 }
 
 <style>
-{`
+  {`
   /* ── Reset Storybook overrides ─────────────────────────── */
   .hx-token-typography h2,
   .hx-token-typography h3,
@@ -612,12 +617,13 @@ export function copyToClipboard(text) {
 <div className="hx-token-typography">
 
 {/* ═══ Mini Hero Banner ═══════════════════════════════════ */}
+
 <div className="hx-typo-hero">
   <div className="hx-typo-hero-title">Typography Tokens</div>
   <div className="hx-typo-hero-desc">
-    The HELIX type system provides font families, a 10-step size scale, six weight stops,
-    five line-height values, and six letter-spacing values -- all expressed as design tokens
-    for consistent, scalable typography across the platform.
+    The HELIX type system provides font families, a 10-step size scale, six weight stops, five
+    line-height values, and six letter-spacing values -- all expressed as design tokens for
+    consistent, scalable typography across the platform.
   </div>
   <div className="hx-typo-hero-badges">
     <span className="hx-typo-badge">{totalTypoTokens} typography tokens</span>
@@ -628,18 +634,19 @@ export function copyToClipboard(text) {
 </div>
 
 {/* ═══ Type Scale Overview ════════════════════════════════ */}
+
 <div className="hx-typo-section">
 
 ## Type Scale Overview
 
 <div className="hx-typo-section-desc">
-  A progressive size scale from 2xs (0.625rem / 10px) to 5xl (3rem / 48px). All sizes
-  use rem units relative to the document root for accessibility. The scale provides
-  enough range for everything from fine print to display headings.
+  A progressive size scale from 2xs (0.625rem / 10px) to 5xl (3rem / 48px). All sizes use rem units
+  relative to the document root for accessibility. The scale provides enough range for everything
+  from fine print to display headings.
 </div>
 
 <div className="hx-typo-scale-visual">
-  {fontSizeTokens.map(token => (
+  {fontSizeTokens.map((token) => (
     <div key={token.name} className="hx-typo-scale-row">
       <span className="hx-typo-scale-label">{token.key}</span>
       <span className="hx-typo-scale-text" style={{ fontSize: `var(${token.name})` }}>
@@ -652,17 +659,19 @@ export function copyToClipboard(text) {
 </div>
 
 {/* ═══ Font Families ══════════════════════════════════════ */}
+
 <div className="hx-typo-section">
 
 ## Font Families
 
 <div className="hx-typo-section-desc">
-  Three font stacks are defined: a sans-serif stack (Inter) for UI text, a serif stack
-  (Georgia) for editorial content, and a monospace stack (JetBrains Mono) for code and
-  technical labels. Each stack includes system font fallbacks for reliable rendering.
+  Three font stacks are defined: a sans-serif stack (Inter) for UI text, a serif stack (Georgia) for
+  editorial content, and a monospace stack (JetBrains Mono) for code and technical labels. Each
+  stack includes system font fallbacks for reliable rendering.
 </div>
 
 {fontFamilyTokens.map(token => (
+
   <div key={token.name} className="hx-typo-family-card">
     <div className="hx-typo-family-header">
       <button
@@ -692,18 +701,19 @@ export function copyToClipboard(text) {
 </div>
 
 {/* ═══ Font Sizes ═════════════════════════════════════════ */}
+
 <div className="hx-typo-section">
 
 ## Font Sizes
 
 <div className="hx-typo-section-desc">
-  The type scale provides ten sizes ranging from 2xs (0.625rem) to 5xl (3rem). All sizes
-  use rem units relative to the document root, ensuring text scales predictably with user
-  preferences and zoom levels.
+  The type scale provides ten sizes ranging from 2xs (0.625rem) to 5xl (3rem). All sizes use rem
+  units relative to the document root, ensuring text scales predictably with user preferences and
+  zoom levels.
 </div>
 
 <div className="hx-typo-size-list">
-  {fontSizeTokens.map(token => (
+  {fontSizeTokens.map((token) => (
     <div key={token.name} className="hx-typo-size-row">
       <div className="hx-typo-size-meta">
         <button
@@ -725,21 +735,24 @@ export function copyToClipboard(text) {
 </div>
 
 {/* ═══ Font Weights ═══════════════════════════════════════ */}
+
 <div className="hx-typo-section">
 
 ## Font Weights
 
 <div className="hx-typo-section-desc">
-  Six weight stops are available from light (300) to extrabold (800). Inter supports
-  variable weight, so these values render as true optical weights rather than faux bold.
-  Use semibold (600) for UI labels and bold (700) for headings.
+  Six weight stops are available from light (300) to extrabold (800). Inter supports variable
+  weight, so these values render as true optical weights rather than faux bold. Use semibold (600)
+  for UI labels and bold (700) for headings.
 </div>
 
 <div className="hx-typo-weight-grid">
-  {fontWeightTokens.map(token => (
+  {fontWeightTokens.map((token) => (
     <div key={token.name} className="hx-typo-weight-card">
       <div className="hx-typo-weight-specimen">
-        <span className="hx-typo-weight-aa" style={{ fontWeight: `var(${token.name})` }}>Aa</span>
+        <span className="hx-typo-weight-aa" style={{ fontWeight: `var(${token.name})` }}>
+          Aa
+        </span>
       </div>
       <div className="hx-typo-weight-info">
         <div className="hx-typo-weight-label">
@@ -761,18 +774,19 @@ export function copyToClipboard(text) {
 </div>
 
 {/* ═══ Line Heights ═══════════════════════════════════════ */}
+
 <div className="hx-typo-section">
 
 ## Line Heights
 
 <div className="hx-typo-section-desc">
-  Line height controls vertical rhythm. Tighter and tight values are suited to headings,
-  normal to body copy, and relaxed or loose to long-form reading or captions. The values
-  are unitless multipliers applied to the current font size.
+  Line height controls vertical rhythm. Tighter and tight values are suited to headings, normal to
+  body copy, and relaxed or loose to long-form reading or captions. The values are unitless
+  multipliers applied to the current font size.
 </div>
 
 <div className="hx-typo-lh-list">
-  {lineHeightTokens.map(token => (
+  {lineHeightTokens.map((token) => (
     <div key={token.name} className="hx-typo-lh-card">
       <div className="hx-typo-lh-header">
         <button
@@ -794,18 +808,19 @@ export function copyToClipboard(text) {
 </div>
 
 {/* ═══ Letter Spacing ═════════════════════════════════════ */}
+
 <div className="hx-typo-section">
 
 ## Letter Spacing
 
 <div className="hx-typo-section-desc">
-  Letter spacing (tracking) adjusts the space between characters. Tighter values work
-  well for large display text, while wider values improve readability for small caps,
-  labels, and uppercase text. All values use em units for proportional scaling.
+  Letter spacing (tracking) adjusts the space between characters. Tighter values work well for large
+  display text, while wider values improve readability for small caps, labels, and uppercase text.
+  All values use em units for proportional scaling.
 </div>
 
 <div className="hx-typo-ls-list">
-  {letterSpacingTokens.map(token => (
+  {letterSpacingTokens.map((token) => (
     <div key={token.name} className="hx-typo-ls-row">
       <div className="hx-typo-ls-meta">
         <button
@@ -827,14 +842,15 @@ export function copyToClipboard(text) {
 </div>
 
 {/* ═══ Usage Guide ════════════════════════════════════════ */}
+
 <div className="hx-typo-section">
 
 ## Usage Guide
 
 <div className="hx-typo-section-desc">
-  Typography tokens follow the same three-tier cascade as color tokens. Always use the
-  token custom properties rather than hardcoded values so that themes and accessibility
-  settings apply consistently.
+  Typography tokens follow the same three-tier cascade as color tokens. Always use the token custom
+  properties rather than hardcoded values so that themes and accessibility settings apply
+  consistently.
 </div>
 
 <div className="hx-typo-code-block">
@@ -842,52 +858,103 @@ export function copyToClipboard(text) {
     <span className="hx-typo-code-comment">{'/* Body text styles */'}</span>
   </span>
   <span className="hx-typo-code-line">
-    <span className="hx-typo-code-prop">{'font-family'}</span>{': '}<span className="hx-typo-code-fn">{'var'}</span>{'('}<span className="hx-typo-code-value">{'--hx-font-family-sans'}</span>{');'}
+    <span className="hx-typo-code-prop">{'font-family'}</span>
+    {': '}
+    <span className="hx-typo-code-fn">{'var'}</span>
+    {'('}
+    <span className="hx-typo-code-value">{'--hx-font-family-sans'}</span>
+    {');'}
   </span>
   <span className="hx-typo-code-line">
-    <span className="hx-typo-code-prop">{'font-size'}</span>{': '}<span className="hx-typo-code-fn">{'var'}</span>{'('}<span className="hx-typo-code-value">{'--hx-font-size-md'}</span>{');'}
+    <span className="hx-typo-code-prop">{'font-size'}</span>
+    {': '}
+    <span className="hx-typo-code-fn">{'var'}</span>
+    {'('}
+    <span className="hx-typo-code-value">{'--hx-font-size-md'}</span>
+    {');'}
   </span>
   <span className="hx-typo-code-line">
-    <span className="hx-typo-code-prop">{'font-weight'}</span>{': '}<span className="hx-typo-code-fn">{'var'}</span>{'('}<span className="hx-typo-code-value">{'--hx-font-weight-normal'}</span>{');'}
+    <span className="hx-typo-code-prop">{'font-weight'}</span>
+    {': '}
+    <span className="hx-typo-code-fn">{'var'}</span>
+    {'('}
+    <span className="hx-typo-code-value">{'--hx-font-weight-normal'}</span>
+    {');'}
   </span>
   <span className="hx-typo-code-line">
-    <span className="hx-typo-code-prop">{'line-height'}</span>{': '}<span className="hx-typo-code-fn">{'var'}</span>{'('}<span className="hx-typo-code-value">{'--hx-line-height-normal'}</span>{');'}
+    <span className="hx-typo-code-prop">{'line-height'}</span>
+    {': '}
+    <span className="hx-typo-code-fn">{'var'}</span>
+    {'('}
+    <span className="hx-typo-code-value">{'--hx-line-height-normal'}</span>
+    {');'}
   </span>
-  <span className="hx-typo-code-line">{' '}</span>
+  <span className="hx-typo-code-line"> </span>
   <span className="hx-typo-code-line">
     <span className="hx-typo-code-comment">{'/* Heading styles */'}</span>
   </span>
   <span className="hx-typo-code-line">
-    <span className="hx-typo-code-prop">{'font-size'}</span>{': '}<span className="hx-typo-code-fn">{'var'}</span>{'('}<span className="hx-typo-code-value">{'--hx-font-size-3xl'}</span>{');'}
+    <span className="hx-typo-code-prop">{'font-size'}</span>
+    {': '}
+    <span className="hx-typo-code-fn">{'var'}</span>
+    {'('}
+    <span className="hx-typo-code-value">{'--hx-font-size-3xl'}</span>
+    {');'}
   </span>
   <span className="hx-typo-code-line">
-    <span className="hx-typo-code-prop">{'font-weight'}</span>{': '}<span className="hx-typo-code-fn">{'var'}</span>{'('}<span className="hx-typo-code-value">{'--hx-font-weight-bold'}</span>{');'}
+    <span className="hx-typo-code-prop">{'font-weight'}</span>
+    {': '}
+    <span className="hx-typo-code-fn">{'var'}</span>
+    {'('}
+    <span className="hx-typo-code-value">{'--hx-font-weight-bold'}</span>
+    {');'}
   </span>
   <span className="hx-typo-code-line">
-    <span className="hx-typo-code-prop">{'line-height'}</span>{': '}<span className="hx-typo-code-fn">{'var'}</span>{'('}<span className="hx-typo-code-value">{'--hx-line-height-tight'}</span>{');'}
+    <span className="hx-typo-code-prop">{'line-height'}</span>
+    {': '}
+    <span className="hx-typo-code-fn">{'var'}</span>
+    {'('}
+    <span className="hx-typo-code-value">{'--hx-line-height-tight'}</span>
+    {');'}
   </span>
   <span className="hx-typo-code-line">
-    <span className="hx-typo-code-prop">{'letter-spacing'}</span>{': '}<span className="hx-typo-code-fn">{'var'}</span>{'('}<span className="hx-typo-code-value">{'--hx-letter-spacing-tight'}</span>{');'}
+    <span className="hx-typo-code-prop">{'letter-spacing'}</span>
+    {': '}
+    <span className="hx-typo-code-fn">{'var'}</span>
+    {'('}
+    <span className="hx-typo-code-value">{'--hx-letter-spacing-tight'}</span>
+    {');'}
   </span>
-  <span className="hx-typo-code-line">{' '}</span>
+  <span className="hx-typo-code-line"> </span>
   <span className="hx-typo-code-line">
     <span className="hx-typo-code-comment">{'/* Code / technical text */'}</span>
   </span>
   <span className="hx-typo-code-line">
-    <span className="hx-typo-code-prop">{'font-family'}</span>{': '}<span className="hx-typo-code-fn">{'var'}</span>{'('}<span className="hx-typo-code-value">{'--hx-font-family-mono'}</span>{');'}
+    <span className="hx-typo-code-prop">{'font-family'}</span>
+    {': '}
+    <span className="hx-typo-code-fn">{'var'}</span>
+    {'('}
+    <span className="hx-typo-code-value">{'--hx-font-family-mono'}</span>
+    {');'}
   </span>
   <span className="hx-typo-code-line">
-    <span className="hx-typo-code-prop">{'font-size'}</span>{': '}<span className="hx-typo-code-fn">{'var'}</span>{'('}<span className="hx-typo-code-value">{'--hx-font-size-sm'}</span>{');'}
+    <span className="hx-typo-code-prop">{'font-size'}</span>
+    {': '}
+    <span className="hx-typo-code-fn">{'var'}</span>
+    {'('}
+    <span className="hx-typo-code-value">{'--hx-font-size-sm'}</span>
+    {');'}
   </span>
 </div>
 
 <div className="hx-typo-tip">
-  <span className="hx-typo-tip-icon" aria-hidden="true">i</span>
+  <span className="hx-typo-tip-icon" aria-hidden="true">
+    i
+  </span>
   <span className="hx-typo-tip-text">
-    Always use rem-based font size tokens rather than px values. This ensures that text
-    scales correctly when users adjust their browser font size settings -- a critical
-    accessibility requirement in healthcare applications where readability can directly
-    impact patient safety.
+    Always use rem-based font size tokens rather than px values. This ensures that text scales
+    correctly when users adjust their browser font size settings -- a critical accessibility
+    requirement in healthcare applications where readability can directly impact patient safety.
   </span>
 </div>
 

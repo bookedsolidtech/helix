@@ -34,12 +34,15 @@ You are NOT responsible for: payment systems, backend APIs, mobile applications,
 ## Architecture Standards
 
 ### Component Naming
+
 All components use the `wc-` prefix. Events use `wc-` prefix (e.g., `wc-click`). CSS custom properties use `--wc-` prefix.
 
 ### Shadow DOM Policy
+
 All components use Shadow DOM. Mandatory for style encapsulation in enterprise environments where the library coexists with Drupal themes and third-party CSS. No exceptions.
 
 ### Design Token Architecture (3-Tier)
+
 - **Tier 1 — Primitives**: Raw values. Private. Never referenced by consumers.
 - **Tier 2 — Semantic**: Design decisions mapped to primitives. Prefixed `--wc-color-*`, `--wc-space-*`. Public API for theming.
 - **Tier 3 — Component**: Component-specific tokens with semantic fallbacks. Prefixed `--wc-button-*`, `--wc-card-*`.
@@ -47,27 +50,31 @@ All components use Shadow DOM. Mandatory for style encapsulation in enterprise e
 ## Cross-Platform Compatibility
 
 ### Drupal (Primary Consumer)
+
 - CDN (`<script>` tag) or npm (theme build pipeline)
 - Zero-coupling: no custom Drupal modules required
 - Progressive enhancement: content accessible without JavaScript
 - Must work with Drupal 10 and 11
 
 ### React
+
 - Ship `react/` entry point with auto-generated wrappers via `@lit/react`
 
 ### Vue / Angular / Vanilla HTML
+
 - Native web component support. Document consumption patterns per framework.
 
 ## Performance Budgets (CI-Enforced)
 
-| Metric | Budget |
-|--------|--------|
-| Individual component JS (min+gz) | < 5 KB |
-| Full library bundle (min+gz) | < 50 KB |
-| Core Web Vitals LCP (docs site) | < 2.5s |
+| Metric                                       | Budget  |
+| -------------------------------------------- | ------- |
+| Individual component JS (min+gz)             | < 5 KB  |
+| Full library bundle (min+gz)                 | < 50 KB |
+| Core Web Vitals LCP (docs site)              | < 2.5s  |
 | Time to first render (single component, CDN) | < 100ms |
 
 ### Tree-Shaking
+
 - Each component is a separate entry point in package exports
 - `"sideEffects": false` with explicit exceptions for custom element registration
 - Vite library mode with `preserveModules: true` for ESM output
@@ -75,6 +82,7 @@ All components use Shadow DOM. Mandatory for style encapsulation in enterprise e
 ## CI/CD and Release Strategy
 
 ### Pipeline Stages
+
 1. Lint & Format (zero warnings)
 2. Type Check (strict, zero errors)
 3. Unit Tests (Vitest browser mode, 80%+ coverage)
@@ -85,6 +93,7 @@ All components use Shadow DOM. Mandatory for style encapsulation in enterprise e
 8. Docs Build (Astro Starlight)
 
 ### Releases
+
 Strict semver. Changesets for version management. Pre-release channels: `@next` (unstable), `@latest` (stable), `@lts` (enterprise pinned).
 
 ## Security Standards

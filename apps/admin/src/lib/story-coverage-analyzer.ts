@@ -3,9 +3,9 @@
  * Parses story files and counts exported stories against expected component variants.
  * Replaces binary file-exists check with actual story-to-variant ratio.
  */
-import { readFileSync, existsSync } from "node:fs";
-import { resolve } from "node:path";
-import { getComponentDirectory, getComponentData } from "./cem-parser";
+import { readFileSync, existsSync } from 'node:fs';
+import { resolve } from 'node:path';
+import { getComponentDirectory, getComponentData } from './cem-parser';
 
 export interface StoryCoverageResult {
   tagName: string;
@@ -23,20 +23,18 @@ export interface VariantSource {
 }
 
 function getLibraryRoot(): string {
-  return resolve(process.cwd(), "../../packages/hx-library");
+  return resolve(process.cwd(), '../../packages/hx-library');
 }
 
 function countExportedStories(storyContent: string): { count: number; names: string[] } {
   const names: string[] = [];
 
   // Match named exports: export const Primary: Story = ...
-  const namedExports = storyContent.matchAll(
-    /export\s+const\s+(\w+)\s*(?::\s*\w+)?\s*=/g
-  );
+  const namedExports = storyContent.matchAll(/export\s+const\s+(\w+)\s*(?::\s*\w+)?\s*=/g);
   for (const match of namedExports) {
     const name = match[1];
     // Skip meta default export
-    if (name === "default" || name === "meta") continue;
+    if (name === 'default' || name === 'meta') continue;
     names.push(name);
   }
 
@@ -84,13 +82,13 @@ export function analyzeStoryCoverage(tagName: string): StoryCoverageResult | nul
       expectedVariants: 0,
       storyNames: [],
       variantSources: [],
-      detail: "No story file found",
+      detail: 'No story file found',
     };
   }
 
   let content: string;
   try {
-    content = readFileSync(storyPath, "utf-8");
+    content = readFileSync(storyPath, 'utf-8');
   } catch {
     return null;
   }
@@ -100,7 +98,7 @@ export function analyzeStoryCoverage(tagName: string): StoryCoverageResult | nul
   const expectedVariants = calculateExpectedStoryCount(variantSources);
 
   // Score: ratio of actual stories to expected, capped at 100
-  const ratio = expectedVariants > 0 ? count / expectedVariants : (count > 0 ? 1 : 0);
+  const ratio = expectedVariants > 0 ? count / expectedVariants : count > 0 ? 1 : 0;
   const score = Math.min(Math.round(ratio * 100), 100);
 
   const detail = `${count} stories (expected ~${expectedVariants} for ${variantSources.length} variant properties)`;

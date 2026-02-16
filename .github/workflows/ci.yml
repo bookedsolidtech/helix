@@ -47,8 +47,8 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Install Playwright Chromium
-        run: npx playwright install --with-deps chromium
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps chromium firefox webkit
 
       # ---- Quality Checks ----
 
@@ -71,8 +71,28 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: test-results
-          path: packages/wc-library/.cache/test-results.json
+          path: packages/hx-library/.cache/test-results.json
           retention-days: 30
+          if-no-files-found: warn
+
+      # ---- Visual Regression Tests ----
+
+      - name: Build Storybook
+        run: npm run build:storybook
+
+      - name: Serve Storybook and run VRT
+        run: |
+          npx http-server apps/storybook/dist -p 3151 &
+          sleep 5
+          npm run test:vrt
+
+      - name: Upload VRT diff images
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: vrt-diffs
+          path: packages/hx-library/.cache/vrt-results/
+          retention-days: 7
           if-no-files-found: warn
 
       # ---- Build ----
@@ -98,8 +118,8 @@ jobs:
           BUNDLE_BUDGET=51200
 
           # Check individual component entry points
-          for component in wc-button wc-card wc-text-input; do
-            file="packages/wc-library/dist/components/${component}/index.js"
+          for component in hx-button hx-card hx-text-input hx-alert hx-badge hx-checkbox hx-container hx-form hx-prose hx-radio-group hx-select hx-switch hx-textarea; do
+            file="packages/hx-library/dist/components/${component}/index.js"
             if [ -f "$file" ]; then
               raw_size=$(wc -c < "$file" | tr -d ' ')
               gzip_size=$(gzip -c "$file" | wc -c | tr -d ' ')
@@ -120,7 +140,7 @@ jobs:
           echo ""
 
           # Check full bundle
-          full="packages/wc-library/dist/index.js"
+          full="packages/hx-library/dist/index.js"
           if [ -f "$full" ]; then
             raw_size=$(wc -c < "$full" | tr -d ' ')
             gzip_size=$(gzip -c "$full" | wc -c | tr -d ' ')

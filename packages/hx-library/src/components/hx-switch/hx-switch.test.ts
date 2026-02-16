@@ -312,7 +312,7 @@ describe('hx-switch', () => {
     });
   });
 
-  // --- Validation (3) ---
+  // --- Validation (6) ---
 
   describe('Validation', () => {
     it('checkValidity returns false when required + unchecked', async () => {
@@ -328,6 +328,22 @@ describe('hx-switch', () => {
     it('valueMissing validity flag is set when required + unchecked', async () => {
       const el = await fixture<WcSwitch>('<hx-switch required></hx-switch>');
       expect(el.validity.valueMissing).toBe(true);
+    });
+
+    it('reportValidity returns false when required + unchecked', async () => {
+      const el = await fixture<WcSwitch>('<hx-switch required></hx-switch>');
+      expect(el.reportValidity()).toBe(false);
+    });
+
+    it('reportValidity returns true when required + checked', async () => {
+      const el = await fixture<WcSwitch>('<hx-switch required checked></hx-switch>');
+      expect(el.reportValidity()).toBe(true);
+    });
+
+    it('validationMessage is set when required + unchecked', async () => {
+      const el = await fixture<WcSwitch>('<hx-switch required></hx-switch>');
+      await el.updateComplete;
+      expect(el.validationMessage).toBeTruthy();
     });
   });
 
@@ -416,6 +432,18 @@ describe('hx-switch', () => {
     it('sets name property', async () => {
       const el = await fixture<WcSwitch>('<hx-switch name="toggle"></hx-switch>');
       expect(el.name).toBe('toggle');
+    });
+  });
+
+  // --- Methods (1) ---
+
+  describe('Methods', () => {
+    it('focus() moves focus to track button', async () => {
+      const el = await fixture<WcSwitch>('<hx-switch label="Test"></hx-switch>');
+      el.focus();
+      await new Promise((r) => setTimeout(r, 50));
+      const track = shadowQuery<HTMLButtonElement>(el, '.switch__track')!;
+      expect(el.shadowRoot?.activeElement).toBe(track);
     });
   });
 

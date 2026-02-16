@@ -2,9 +2,9 @@
  * Bundle Size Analyzer.
  * Measures per-component output size from the Vite library build.
  */
-import { readFileSync, readdirSync, statSync } from "node:fs";
-import { resolve } from "node:path";
-import { gzipSync } from "node:zlib";
+import { readFileSync, readdirSync, statSync } from 'node:fs';
+import { resolve } from 'node:path';
+import { gzipSync } from 'node:zlib';
 
 export interface BundleSizeResult {
   tagName: string;
@@ -19,15 +19,15 @@ export interface BundleSizeResult {
 const BUDGET_BYTES = 5120; // 5KB gzipped per component
 
 function getLibraryRoot(): string {
-  return resolve(process.cwd(), "../../packages/hx-library");
+  return resolve(process.cwd(), '../../packages/hx-library');
 }
 
 function findComponentChunk(tagName: string): string | null {
-  const distShared = resolve(getLibraryRoot(), "dist/shared");
+  const distShared = resolve(getLibraryRoot(), 'dist/shared');
   try {
     const files = readdirSync(distShared);
     const chunkName = files.find(
-      (f) => f.startsWith(tagName) && f.endsWith(".js") && !f.endsWith(".js.map")
+      (f) => f.startsWith(tagName) && f.endsWith('.js') && !f.endsWith('.js.map'),
     );
     return chunkName ? resolve(distShared, chunkName) : null;
   } catch {
@@ -39,7 +39,7 @@ export function analyzeBundleSize(tagName: string): BundleSizeResult | null {
   const chunkPath = findComponentChunk(tagName);
   if (!chunkPath) return null;
 
-  const content = readFileSync(chunkPath, "utf-8");
+  const content = readFileSync(chunkPath, 'utf-8');
   const rawBytes = statSync(chunkPath).size;
   const gzipBytes = gzipSync(content, { level: 9 }).length;
 

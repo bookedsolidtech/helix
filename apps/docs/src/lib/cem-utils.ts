@@ -150,11 +150,7 @@ export function getComponentData(tagName: string): ComponentData | undefined {
   const properties: ComponentProperty[] = (decl.members ?? [])
     .filter(
       (m) =>
-        m.kind === 'field' &&
-        m.attribute &&
-        m.privacy !== 'private' &&
-        !m.static &&
-        !m.readonly,
+        m.kind === 'field' && m.attribute && m.privacy !== 'private' && !m.static && !m.readonly,
     )
     .map((m) => ({
       name: m.name,
@@ -181,13 +177,11 @@ export function getComponentData(tagName: string): ComponentData | undefined {
     description: p.description ?? '',
   }));
 
-  const cssProperties: ComponentCssProperty[] = (decl.cssProperties ?? []).map(
-    (p) => ({
-      name: p.name,
-      description: p.description ?? '',
-      default: p.default ?? '—',
-    }),
-  );
+  const cssProperties: ComponentCssProperty[] = (decl.cssProperties ?? []).map((p) => ({
+    name: p.name,
+    description: p.description ?? '',
+    default: p.default ?? '—',
+  }));
 
   return {
     tagName: decl.tagName ?? '',

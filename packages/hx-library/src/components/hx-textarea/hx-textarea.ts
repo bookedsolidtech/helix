@@ -42,7 +42,7 @@ import { helixTextareaStyles } from './hx-textarea.styles.js';
 export class HelixTextarea extends LitElement {
   static override styles = [tokenStyles, helixTextareaStyles];
 
-  // --- Form Association ---
+  // ─── Form Association ───
 
   static formAssociated = true;
 
@@ -53,7 +53,7 @@ export class HelixTextarea extends LitElement {
     this._internals = this.attachInternals();
   }
 
-  // --- Properties ---
+  // ─── Properties ───
 
   /**
    * The visible label text for the textarea.
@@ -146,12 +146,12 @@ export class HelixTextarea extends LitElement {
   @property({ type: String, attribute: 'aria-label' })
   override ariaLabel: string | null = null;
 
-  // --- Internal References ---
+  // ─── Internal References ───
 
   @query('.field__textarea')
   private _textarea!: HTMLTextAreaElement;
 
-  // --- Slot Tracking ---
+  // ─── Slot Tracking ───
 
   private _hasLabelSlot = false;
   private _hasErrorSlot = false;
@@ -161,7 +161,7 @@ export class HelixTextarea extends LitElement {
     this._hasLabelSlot = slot.assignedElements().length > 0;
     if (this._hasLabelSlot) {
       const slottedLabel = slot.assignedElements()[0];
-      if (!slottedLabel.id) {
+      if (slottedLabel && !slottedLabel.id) {
         slottedLabel.id = `${this._textareaId}-slotted-label`;
       }
     }
@@ -174,16 +174,17 @@ export class HelixTextarea extends LitElement {
     this.requestUpdate();
   }
 
-  // --- Lifecycle ---
+  // ─── Lifecycle ───
 
   override updated(changedProperties: Map<string, unknown>): void {
+    super.updated(changedProperties);
     if (changedProperties.has('value')) {
       this._internals.setFormValue(this.value);
       this._updateValidity();
     }
   }
 
-  // --- Form Integration ---
+  // ─── Form Integration ───
 
   /** Returns the associated form element, if any. */
   get form(): HTMLFormElement | null {
@@ -215,13 +216,13 @@ export class HelixTextarea extends LitElement {
       this._internals.setValidity(
         { valueMissing: true },
         this.error || 'This field is required.',
-        this._textarea
+        this._textarea,
       );
     } else if (this.maxlength !== undefined && this.value.length > this.maxlength) {
       this._internals.setValidity(
         { tooLong: true },
         this.error || `Value must be ${this.maxlength} characters or fewer.`,
-        this._textarea
+        this._textarea,
       );
     } else {
       this._internals.setValidity({});
@@ -239,7 +240,7 @@ export class HelixTextarea extends LitElement {
     this.value = state;
   }
 
-  // --- Event Handling ---
+  // ─── Event Handling ───
 
   private _handleInput(e: Event): void {
     const target = e.target as HTMLTextAreaElement;
@@ -261,7 +262,7 @@ export class HelixTextarea extends LitElement {
         bubbles: true,
         composed: true,
         detail: { value: this.value },
-      })
+      }),
     );
   }
 
@@ -280,11 +281,11 @@ export class HelixTextarea extends LitElement {
         bubbles: true,
         composed: true,
         detail: { value: this.value },
-      })
+      }),
     );
   }
 
-  // --- Public Methods ---
+  // ─── Public Methods ───
 
   /** Moves focus to the textarea element. */
   override focus(options?: FocusOptions): void {
@@ -296,9 +297,9 @@ export class HelixTextarea extends LitElement {
     this._textarea?.select();
   }
 
-  // --- Render ---
+  // ─── Render ───
 
-  private _textareaId = `wc-textarea-${Math.random().toString(36).slice(2, 9)}`;
+  private _textareaId = `hx-textarea-${Math.random().toString(36).slice(2, 9)}`;
   private _helpTextId = `${this._textareaId}-help`;
   private _errorId = `${this._textareaId}-error`;
 
@@ -306,12 +307,9 @@ export class HelixTextarea extends LitElement {
     if (!this.showCount) return nothing;
 
     const count = this.value.length;
-    const display =
-      this.maxlength !== undefined ? `${count} / ${this.maxlength}` : `${count}`;
+    const display = this.maxlength !== undefined ? `${count} / ${this.maxlength}` : `${count}`;
 
-    return html`
-      <div part="counter" class="field__counter">${display}</div>
-    `;
+    return html` <div part="counter" class="field__counter">${display}</div> `;
   }
 
   override render() {
@@ -324,12 +322,10 @@ export class HelixTextarea extends LitElement {
       'field--required': this.required,
     };
 
-    const describedBy = [
-      hasError ? this._errorId : null,
-      this.helpText ? this._helpTextId : null,
-    ]
-      .filter(Boolean)
-      .join(' ') || undefined;
+    const describedBy =
+      [hasError ? this._errorId : null, this.helpText ? this._helpTextId : null]
+        .filter(Boolean)
+        .join(' ') || undefined;
 
     return html`
       <div part="field" class=${classMap(fieldClasses)}>
@@ -361,7 +357,9 @@ export class HelixTextarea extends LitElement {
             maxlength=${ifDefined(this.maxlength)}
             name=${ifDefined(this.name || undefined)}
             aria-label=${ifDefined(this.ariaLabel ?? undefined)}
-            aria-labelledby=${ifDefined(this._hasLabelSlot ? `${this._textareaId}-slotted-label` : undefined)}
+            aria-labelledby=${ifDefined(
+              this._hasLabelSlot ? `${this._textareaId}-slotted-label` : undefined,
+            )}
             aria-invalid=${hasError ? 'true' : nothing}
             aria-describedby=${ifDefined(describedBy)}
             aria-required=${this.required ? 'true' : nothing}
@@ -375,7 +373,13 @@ export class HelixTextarea extends LitElement {
         <slot name="error" @slotchange=${this._handleErrorSlotChange}>
           ${this.error
             ? html`
-                <div part="error" class="field__error" id=${this._errorId} role="alert" aria-live="polite">
+                <div
+                  part="error"
+                  class="field__error"
+                  id=${this._errorId}
+                  role="alert"
+                  aria-live="polite"
+                >
                   ${this.error}
                 </div>
               `

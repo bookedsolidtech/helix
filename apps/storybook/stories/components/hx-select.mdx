@@ -1,0 +1,781 @@
+{/* hx-select.mdx — HELIX Select Component Documentation */}
+
+import { Meta } from '@storybook/addon-docs/blocks';
+
+<Meta title="Components/Select/Overview" />
+
+<style>
+  {`
+  .hx-select-docs {
+    max-width: 960px;
+    margin: 0 auto;
+    font-family: var(--hx-font-family-sans, 'Inter', sans-serif);
+    color: var(--hx-color-neutral-800, #1E293B);
+    line-height: var(--hx-line-height-normal, 1.5);
+  }
+
+  .hx-select-docs h2 {
+    font-size: 1.75rem !important;
+    font-weight: 700 !important;
+    color: var(--hx-color-neutral-900, #0F172A) !important;
+    margin: 2rem 0 1rem 0 !important;
+    padding-bottom: 0.5rem !important;
+    border-bottom: 2px solid var(--hx-color-neutral-200, #E2E8F0) !important;
+  }
+
+  .hx-select-docs h3 {
+    font-size: 1.25rem !important;
+    font-weight: 600 !important;
+    color: var(--hx-color-neutral-800, #1E293B) !important;
+    margin: 1.5rem 0 0.75rem 0 !important;
+  }
+
+  .hx-select-docs p {
+    font-size: 1rem !important;
+    line-height: 1.7 !important;
+    margin: 0 0 1rem 0 !important;
+    color: var(--hx-color-neutral-600, #475569) !important;
+  }
+
+  .hx-select-docs code {
+    font-family: var(--hx-font-family-mono, monospace) !important;
+    font-size: 0.875em !important;
+    padding: 0.125rem 0.375rem !important;
+    background: var(--hx-color-neutral-100, #F1F5F9) !important;
+    border-radius: 3px !important;
+    color: var(--hx-color-primary-700, #1E40AF) !important;
+  }
+
+  .hx-select-docs .hero-banner {
+    background: linear-gradient(135deg, var(--hx-color-primary-50, #EFF6FF) 0%, var(--hx-color-neutral-50, #F8FAFC) 100%) !important;
+    border-radius: var(--hx-border-radius-xl, 0.75rem) !important;
+    padding: 2.5rem 2rem !important;
+    margin-bottom: 2.5rem !important;
+    border: 1px solid var(--hx-color-neutral-200, #E2E8F0) !important;
+  }
+
+  .hx-select-docs .hero-title {
+    font-size: 2rem !important;
+    font-weight: 800 !important;
+    color: var(--hx-color-neutral-900, #0F172A) !important;
+    margin: 0 0 0.5rem 0 !important;
+    letter-spacing: -0.025em !important;
+    line-height: 1.2 !important;
+  }
+
+  .hx-select-docs .hero-desc {
+    font-size: 1rem !important;
+    color: var(--hx-color-neutral-500, #64748B) !important;
+    margin: 0 0 1rem 0 !important;
+    line-height: 1.6 !important;
+  }
+
+  .hx-select-docs .info-box {
+    padding: 1.25rem !important;
+    background: var(--hx-color-info-50, #F0F9FF) !important;
+    border-radius: var(--hx-border-radius-md, 0.375rem) !important;
+    border-left: 4px solid var(--hx-color-info-500, #0EA5E9) !important;
+    margin: 1.5rem 0 !important;
+  }
+
+  .hx-select-docs .info-box p {
+    margin: 0 !important;
+    color: var(--hx-color-info-800, #0C4A6E) !important;
+  }
+
+  .hx-select-docs .warning-box {
+    padding: 1.25rem !important;
+    background: var(--hx-color-warning-50, #FFFBEB) !important;
+    border-radius: var(--hx-border-radius-md, 0.375rem) !important;
+    border-left: 4px solid var(--hx-color-warning-500, #F59E0B) !important;
+    margin: 1.5rem 0 !important;
+  }
+
+  .hx-select-docs .warning-box p {
+    margin: 0 !important;
+    color: var(--hx-color-warning-800, #92400E) !important;
+  }
+
+  .hx-select-docs ul {
+    margin: 0 0 1rem 0 !important;
+    padding-left: 1.5rem !important;
+  }
+
+  .hx-select-docs li {
+    margin-bottom: 0.5rem !important;
+    color: var(--hx-color-neutral-600, #475569) !important;
+  }
+
+  .hx-select-docs .code-block {
+    background: var(--hx-color-neutral-800, #1E293B) !important;
+    border-radius: var(--hx-border-radius-lg, 0.5rem) !important;
+    padding: 1.25rem !important;
+    margin: 1.5rem 0 !important;
+    overflow-x: auto !important;
+  }
+
+  .hx-select-docs .code-block code {
+    font-family: var(--hx-font-family-mono, monospace) !important;
+    font-size: 0.875rem !important;
+    line-height: 1.6 !important;
+    color: var(--hx-color-neutral-100, #F1F5F9) !important;
+    background: transparent !important;
+    padding: 0 !important;
+  }
+
+  .hx-select-docs table {
+    width: 100% !important;
+    border-collapse: collapse !important;
+    margin: 1.5rem 0 !important;
+  }
+
+  .hx-select-docs th {
+    background: var(--hx-color-neutral-100, #F1F5F9) !important;
+    padding: 0.75rem 1rem !important;
+    text-align: left !important;
+    font-weight: 600 !important;
+    border: 1px solid var(--hx-color-neutral-200, #E2E8F0) !important;
+  }
+
+  .hx-select-docs td {
+    padding: 0.75rem 1rem !important;
+    border: 1px solid var(--hx-color-neutral-200, #E2E8F0) !important;
+  }
+`}
+</style>
+
+<div className="hx-select-docs">
+
+<div className="hero-banner">
+  <div className="hero-title">hx-select Component</div>
+  <div className="hero-desc">
+    An accessible, form-associated select input built with ElementInternals. Supports placeholders,
+    validation, help text, error messages, and full keyboard navigation. Participates in native form
+    submission and integrates seamlessly with healthcare workflow forms.
+  </div>
+</div>
+
+## Overview
+
+The `hx-select` component is a styled wrapper around the native `<select>` element, providing consistent
+visual design and behavior across the HELIX design system. It uses the Form-Associated Custom Elements API
+via ElementInternals, ensuring full compatibility with standard HTML forms and validation.
+
+The component provides three size variants (`sm`, `md`, `lg`), validation states (required, error), and
+helper elements (label, help text, error messages). All interactive states (hover, focus, disabled) are
+fully styled and accessible.
+
+### When to Use
+
+- **Department selection** — Choose departments, wards, or clinical units
+- **Blood type, priority, or status** — Pick from a fixed set of categorical values
+- **Insurance provider selection** — Select from a known list of payers
+- **Medication routes** — Choose administration routes (oral, IV, IM, etc.)
+- **Diagnosis code selection** — Pick ICD-10 codes from a long list
+
+### When Not to Use
+
+- **Free text input** — Use `hx-text-input` for arbitrary text entry
+- **Multi-select** — Use `hx-checkbox` or a custom multi-select component
+- **Very long lists (500+ options)** — Consider an autocomplete or search pattern
+- **Boolean choices** — Use `hx-switch` or `hx-radio-group` for yes/no or on/off
+
+## Accessibility
+
+The Select component follows WCAG 2.1 AA guidelines:
+
+- **Keyboard navigation** — Full support for arrow keys, Enter, Space, Home, End
+- **Screen reader support** — Proper labels, ARIA attributes, and announcements
+- **Focus visible** — Clear focus ring for keyboard users
+- **Error announcements** — Error messages are associated with the select via `aria-describedby`
+- **Required field indicator** — Visual and semantic indication of required fields
+
+<div className="info-box">
+  <p>
+    <strong>Healthcare Compliance:</strong> When collecting patient data (blood type, allergy
+    severity, etc.), always set <code>required="true"</code> and provide clear help text. Use error
+    messages to guide clinicians through validation failures without interrupting critical
+    workflows.
+  </p>
+</div>
+
+## Properties
+
+| Property      | Type                   | Default | Description                                           |
+| ------------- | ---------------------- | ------- | ----------------------------------------------------- |
+| `label`       | `string`               | `''`    | Visible label text for the select                     |
+| `placeholder` | `string`               | `''`    | Placeholder text shown as the first disabled option   |
+| `value`       | `string`               | `''`    | Current value of the select                           |
+| `hx-size`     | `'sm' \| 'md' \| 'lg'` | `'md'`  | Size variant of the select                            |
+| `required`    | `boolean`              | `false` | Whether the select is required for form submission    |
+| `disabled`    | `boolean`              | `false` | Whether the select is disabled                        |
+| `error`       | `string`               | `''`    | Error message to display (puts select in error state) |
+| `help-text`   | `string`               | `''`    | Help text displayed below the select                  |
+| `name`        | `string`               | `''`    | Name attribute for form submission                    |
+
+## Slots
+
+| Slot        | Description                                         |
+| ----------- | --------------------------------------------------- |
+| `(default)` | Slotted `<option>` elements for the select dropdown |
+
+## CSS Custom Properties
+
+Override these tokens to theme the select:
+
+| Property                       | Default                       | Description            |
+| ------------------------------ | ----------------------------- | ---------------------- |
+| `--hx-select-bg`               | `var(--hx-color-neutral-0)`   | Background color       |
+| `--hx-select-color`            | `var(--hx-color-neutral-800)` | Text color             |
+| `--hx-select-border-color`     | `var(--hx-color-neutral-300)` | Border color           |
+| `--hx-select-border-radius`    | `var(--hx-border-radius-md)`  | Border radius          |
+| `--hx-select-font-family`      | `var(--hx-font-family-sans)`  | Font family            |
+| `--hx-select-label-color`      | `var(--hx-color-neutral-700)` | Label text color       |
+| `--hx-select-help-text-color`  | `var(--hx-color-neutral-500)` | Help text color        |
+| `--hx-select-error-color`      | `var(--hx-color-error-600)`   | Error text color       |
+| `--hx-select-focus-ring-color` | `var(--hx-color-primary-500)` | Focus ring color       |
+| `--hx-select-chevron-color`    | `var(--hx-color-neutral-400)` | Dropdown chevron color |
+
+## CSS Parts
+
+Style internal select elements using `::part()`:
+
+| Part             | Description                          |
+| ---------------- | ------------------------------------ |
+| `field`          | The outer field container            |
+| `label`          | The label element                    |
+| `select-wrapper` | The wrapper around the native select |
+| `select`         | The native `<select>` element        |
+| `help-text`      | The help text element                |
+| `error`          | The error message element            |
+
+## Events
+
+| Event       | Detail              | Description                         |
+| ----------- | ------------------- | ----------------------------------- |
+| `hx-change` | `{ value: string }` | Fired when the select value changes |
+
+## Form Participation
+
+The `hx-select` component uses ElementInternals to participate in native form submission:
+
+- **FormData integration** — The `name` and `value` are included in `FormData` on form submit
+- **Validation** — The `required` attribute triggers native HTML5 validation
+- **Reset support** — The select resets to its initial value when the form is reset
+
+<div className="warning-box">
+  <p>
+    <strong>Important:</strong> Always set the <code>name</code> attribute when using{' '}
+    <code>hx-select</code> in forms. Without a name, the value will not be included in form
+    submissions.
+  </p>
+</div>
+
+## Usage Examples
+
+### Basic Select
+
+```html
+<hx-select label="Department" placeholder="Select a department..." name="department">
+  <option value="cardiology">Cardiology</option>
+  <option value="neurology">Neurology</option>
+  <option value="oncology">Oncology</option>
+</hx-select>
+```
+
+### Required with Help Text
+
+```html
+<hx-select
+  label="Blood Type"
+  placeholder="Select blood type..."
+  name="blood-type"
+  required
+  help-text="Verify blood type against lab results before transfusion."
+>
+  <option value="a-pos">A+</option>
+  <option value="a-neg">A-</option>
+  <option value="b-pos">B+</option>
+  <option value="b-neg">B-</option>
+  <option value="o-pos">O+</option>
+  <option value="o-neg">O-</option>
+  <option value="ab-pos">AB+</option>
+  <option value="ab-neg">AB-</option>
+</hx-select>
+```
+
+### Error State
+
+```html
+<hx-select
+  label="Priority Level"
+  placeholder="Select priority..."
+  name="priority"
+  required
+  error="Priority is required for STAT orders."
+>
+  <option value="stat">STAT</option>
+  <option value="urgent">Urgent</option>
+  <option value="routine">Routine</option>
+</hx-select>
+```
+
+### Small Size
+
+```html
+<hx-select label="Ward" placeholder="Select ward..." name="ward" hx-size="sm">
+  <option value="icu">Intensive Care Unit</option>
+  <option value="nicu">Neonatal ICU</option>
+  <option value="er">Emergency Room</option>
+</hx-select>
+```
+
+## Design Guidelines
+
+### Label Guidelines
+
+- Always provide a clear, concise label
+- Use sentence case (e.g., "Primary insurance provider")
+- Avoid redundant text (don't repeat "Select" in the label if the placeholder says "Select...")
+
+### Option Text
+
+- Keep option text short (1-5 words when possible)
+- Use parallel structure (all nouns, all verb phrases, etc.)
+- Alphabetize unless there's a logical order (STAT → Urgent → Routine)
+
+### Placeholder Text
+
+- Use descriptive placeholders ("Select department..." not "Choose one")
+- Avoid placeholder text that duplicates the label
+
+### Validation
+
+- Always set `required` for mandatory fields
+- Provide clear error messages that tell the user how to fix the issue
+- Use `help-text` to provide guidance before errors occur
+
+## Healthcare Use Cases
+
+### ICD-10 Diagnosis Codes
+
+When providing long lists of diagnosis codes, use clear option text that includes both the code and description:
+
+```html
+<hx-select label="Diagnosis Code" name="icd10">
+  <option value="i10">I10 - Essential (primary) hypertension</option>
+  <option value="e11">E11 - Type 2 diabetes mellitus</option>
+  <option value="i21">I21 - Acute myocardial infarction</option>
+</hx-select>
+```
+
+### Priority-Level Color Coding
+
+Use CSS custom properties to visually differentiate priority levels:
+
+```html
+<hx-select
+  label="Order Priority"
+  name="priority"
+  style="--hx-select-border-color: #dc2626; --hx-select-label-color: #991b1b;"
+>
+  <option value="stat">STAT - Immediate</option>
+</hx-select>
+```
+
+## Drupal Integration
+
+The `hx-select` component integrates with Drupal Form API and works in custom Twig templates. This section demonstrates form field mapping, validation error handling, and event-driven workflows.
+
+### Twig Template Examples
+
+**Basic select in custom form template:**
+
+```twig
+{# templates/form/select.html.twig #}
+<hx-select
+  label="{{ element['#title'] }}"
+  name="{{ element['#name'] }}"
+  {% if element['#required'] %}required{% endif %}
+  {% if element['#disabled'] %}disabled{% endif %}
+  {% if element['#description'] %}help-text="{{ element['#description'] }}"{% endif %}
+  {% if element['#errors'] %}error="{{ element['#errors'] }}"{% endif %}
+  value="{{ element['#value']|default('') }}"
+  hx-size="{{ element['#hx_size']|default('md') }}"
+>
+  {% if element['#empty_option'] %}
+    <option value="">{{ element['#empty_option'] }}</option>
+  {% endif %}
+  {% for key, option in element['#options'] %}
+    <option value="{{ key }}" {% if key == element['#value'] %}selected{% endif %}>
+      {{ option }}
+    </option>
+  {% endfor %}
+</hx-select>
+```
+
+**Department selector (Healthcare Use Case):**
+
+```twig
+{# templates/custom/department-select.html.twig #}
+<hx-select
+  label="Department"
+  name="department"
+  placeholder="Select a department..."
+  help-text="Choose the department for this referral."
+  required
+>
+  {% for dept in departments %}
+    <option value="{{ dept.id }}" {% if dept.id == current_dept %}selected{% endif %}>
+      {{ dept.name }}
+    </option>
+  {% endfor %}
+</hx-select>
+```
+
+**ICD-10 diagnosis code selector:**
+
+```twig
+{# templates/custom/icd10-select.html.twig #}
+<hx-select
+  label="Primary Diagnosis"
+  name="icd10_code"
+  placeholder="Select ICD-10 code..."
+  required
+  help-text="Search by code or description."
+  hx-size="lg"
+>
+  {% for code in icd10_codes %}
+    <option value="{{ code.code }}">
+      {{ code.code }} - {{ code.description }}
+    </option>
+  {% endfor %}
+</hx-select>
+```
+
+### Drupal Form API Integration
+
+**Custom form element using hx-select:**
+
+```php
+/**
+ * Custom form with hx-select elements.
+ */
+function mymodule_patient_form($form, &$form_state) {
+  // Department select
+  $form['department'] = [
+    '#type' => 'select',
+    '#title' => t('Department'),
+    '#options' => [
+      'cardiology' => t('Cardiology'),
+      'neurology' => t('Neurology'),
+      'oncology' => t('Oncology'),
+    ],
+    '#required' => TRUE,
+    '#description' => t('Select the admitting department.'),
+    '#attributes' => [
+      'is' => 'hx-select', // Use web component
+      'hx-size' => 'md',
+    ],
+    '#empty_option' => t('- Select department -'),
+  ];
+
+  // Blood type select
+  $form['blood_type'] = [
+    '#type' => 'select',
+    '#title' => t('Blood Type'),
+    '#options' => [
+      'a-pos' => 'A+',
+      'a-neg' => 'A-',
+      'b-pos' => 'B+',
+      'b-neg' => 'B-',
+      'o-pos' => 'O+',
+      'o-neg' => 'O-',
+      'ab-pos' => 'AB+',
+      'ab-neg' => 'AB-',
+    ],
+    '#required' => TRUE,
+    '#attributes' => [
+      'is' => 'hx-select',
+    ],
+  ];
+
+  $form['submit'] = [
+    '#type' => 'submit',
+    '#value' => t('Submit'),
+  ];
+
+  return $form;
+}
+```
+
+**Form validation handler:**
+
+```php
+/**
+ * Validation handler for patient form.
+ */
+function mymodule_patient_form_validate($form, &$form_state) {
+  $department = $form_state->getValue('department');
+
+  // Validate department
+  if (empty($department)) {
+    $form_state->setErrorByName('department', t('Department is required for admissions.'));
+  }
+
+  $blood_type = $form_state->getValue('blood_type');
+
+  // Cross-field validation
+  if ($department === 'oncology' && empty($blood_type)) {
+    $form_state->setErrorByName('blood_type', t('Blood type is required for oncology admissions.'));
+  }
+}
+```
+
+### Drupal Behaviors for Event Handling
+
+```javascript
+/**
+ * @file
+ * hx-select Drupal behavior.
+ */
+
+(function (Drupal, once) {
+  'use strict';
+
+  /**
+   * Attach hx-select event listeners.
+   */
+  Drupal.behaviors.hxSelect = {
+    attach: function (context, settings) {
+      // Initialize all selects
+      once('hx-select-init', 'hx-select', context).forEach((select) => {
+        // Listen for value changes
+        select.addEventListener('hx-change', (e) => {
+          const { value } = e.detail;
+          const name = select.getAttribute('name');
+
+          console.log(`Select ${name} changed to: ${value}`);
+
+          // Example: Conditional field display based on selection
+          if (name === 'department') {
+            handleDepartmentChange(value, context);
+          }
+
+          // Example: Trigger AJAX refresh of dependent field
+          if (name === 'insurance_provider') {
+            refreshPlanOptions(value);
+          }
+        });
+
+        // Optional: Track analytics
+        select.addEventListener('hx-change', (e) => {
+          if (typeof gtag !== 'undefined') {
+            gtag('event', 'select_change', {
+              field_name: select.getAttribute('name'),
+              selected_value: e.detail.value,
+            });
+          }
+        });
+      });
+    },
+
+    detach: function (context, settings, trigger) {
+      if (trigger === 'unload') {
+        context.querySelectorAll('hx-select').forEach((select) => {
+          select.removeEventListener('hx-change', () => {});
+        });
+      }
+    },
+  };
+
+  /**
+   * Handle department selection changes.
+   */
+  function handleDepartmentChange(department, context) {
+    const specialtyField = context.querySelector('[name="specialty"]');
+
+    if (specialtyField) {
+      // Show/hide specialty field based on department
+      if (department === 'cardiology' || department === 'neurology') {
+        specialtyField.closest('.form-item').style.display = 'block';
+      } else {
+        specialtyField.closest('.form-item').style.display = 'none';
+      }
+    }
+  }
+
+  /**
+   * Refresh dependent select options via AJAX.
+   */
+  function refreshPlanOptions(providerId) {
+    const planSelect = document.querySelector('hx-select[name="insurance_plan"]');
+
+    if (!planSelect) return;
+
+    // Show loading state
+    planSelect.setAttribute('disabled', 'true');
+
+    // Fetch updated options
+    fetch(`/api/insurance-plans/${providerId}`)
+      .then((response) => response.json())
+      .then((data) => {
+        // Clear existing options
+        planSelect.innerHTML = '<option value="">- Select plan -</option>';
+
+        // Add new options
+        data.plans.forEach((plan) => {
+          const option = document.createElement('option');
+          option.value = plan.id;
+          option.textContent = plan.name;
+          planSelect.appendChild(option);
+        });
+
+        // Re-enable select
+        planSelect.removeAttribute('disabled');
+      })
+      .catch((error) => {
+        console.error('Failed to load insurance plans:', error);
+        planSelect.removeAttribute('disabled');
+      });
+  }
+})(Drupal, once);
+```
+
+### CDN Loading Strategy
+
+Add to `your_theme.libraries.yml`:
+
+```yaml
+# CDN approach (recommended for production)
+helix-components:
+  js:
+    https://cdn.jsdelivr.net/npm/@helix/library@1.0.0/dist/index.js:
+      type: external
+      attributes:
+        type: module
+  version: 1.0.0
+  header: true
+```
+
+For local development:
+
+```yaml
+# Local approach
+helix-components-local:
+  js:
+    /libraries/helix/dist/index.js:
+      type: file
+      attributes:
+        type: module
+  version: VERSION
+  header: true
+```
+
+Attach to forms:
+
+```php
+function mymodule_form_alter(&$form, \Drupal\Core\Form\FormStateInterface $form_state, $form_id) {
+  // Attach HELIX library to all forms
+  $form['#attached']['library'][] = 'your_theme/helix-components';
+}
+```
+
+### Validation Error Display
+
+**Displaying server-side validation errors:**
+
+```javascript
+(function (Drupal, once) {
+  Drupal.behaviors.hxSelectValidation = {
+    attach: function (context) {
+      // Process server-side validation errors
+      once('hx-select-errors', 'hx-select', context).forEach((select) => {
+        const name = select.getAttribute('name');
+        const errorMessage = drupalSettings.validationErrors?.[name];
+
+        if (errorMessage) {
+          select.setAttribute('error', errorMessage);
+        }
+      });
+
+      // Clear error on user interaction
+      once('hx-select-error-clear', 'hx-select[error]', context).forEach((select) => {
+        select.addEventListener('hx-change', () => {
+          select.removeAttribute('error');
+        });
+      });
+    },
+  };
+})(Drupal, once);
+```
+
+### AJAX Form Integration
+
+**Using hx-select in AJAX-enabled forms:**
+
+```php
+$form['department'] = [
+  '#type' => 'select',
+  '#title' => t('Department'),
+  '#options' => $department_options,
+  '#ajax' => [
+    'callback' => '::updateSpecialtyOptions',
+    'wrapper' => 'specialty-wrapper',
+    'event' => 'hx-change', // Listen for custom event
+  ],
+  '#attributes' => [
+    'is' => 'hx-select',
+  ],
+];
+
+$form['specialty_wrapper'] = [
+  '#type' => 'container',
+  '#attributes' => ['id' => 'specialty-wrapper'],
+];
+
+$form['specialty_wrapper']['specialty'] = [
+  '#type' => 'select',
+  '#title' => t('Specialty'),
+  '#options' => $this->getSpecialtyOptions($form_state->getValue('department')),
+  '#attributes' => [
+    'is' => 'hx-select',
+  ],
+];
+```
+
+### References
+
+See the [Drupal Integration Guide](#) in the HELIX documentation for comprehensive coverage:
+
+- **ADR-DRUPAL-001**: Property-driven vs slot-driven patterns for form elements
+- **ADR-DRUPAL-002**: Event handling in Form API and AJAX contexts
+- **ADR-DRUPAL-003**: Performance optimization for large option lists
+- **ADR-DRUPAL-004**: Accessibility considerations for form validation
+
+<div className="warning-box">
+  <p>
+    <strong>Important:</strong> When using <code>hx-select</code> with Drupal's AJAX API, ensure you listen
+    for the <code>hx-change</code> custom event instead of the native <code>change</code> event. Configure
+    the AJAX callback with <code>'event' => 'hx-change'</code> to ensure proper triggering.
+  </p>
+</div>
+
+## Related Components
+
+- **hx-text-input** — Use for free text entry
+- **hx-radio-group** — Use for 2-5 mutually exclusive options (more visible than select)
+- **hx-checkbox** — Use for multi-select scenarios
+- **hx-form** — Wrap selects in a form for coordinated validation and submission
+
+## Browser Support
+
+HELIX components support all modern browsers:
+
+- Chrome/Edge 90+
+- Firefox 90+
+- Safari 14+
+
+Shadow DOM and Custom Elements are required. No polyfills are provided for IE11.
+
+</div>

@@ -3,8 +3,8 @@
  * Reads Playwright VRT test results and baseline screenshot status
  * for the health scorer's VRT and Cross-Browser dimensions.
  */
-import { existsSync, readFileSync, readdirSync } from "node:fs";
-import { resolve } from "node:path";
+import { existsSync, readFileSync, readdirSync } from 'node:fs';
+import { resolve } from 'node:path';
 
 export interface VrtResult {
   tagName: string;
@@ -33,18 +33,15 @@ export interface CrossBrowserResult {
 }
 
 function getProjectRoot(): string {
-  return resolve(process.cwd(), "../..");
+  return resolve(process.cwd(), '../..');
 }
 
 function getComponentScreenshotsDir(tagName: string): string {
-  return resolve(
-    getProjectRoot(),
-    `packages/hx-library/src/components/${tagName}/__screenshots__`
-  );
+  return resolve(getProjectRoot(), `packages/hx-library/src/components/${tagName}/__screenshots__`);
 }
 
 function getTestResultsPath(): string {
-  return resolve(getProjectRoot(), "packages/hx-library/.cache/test-results.json");
+  return resolve(getProjectRoot(), 'packages/hx-library/.cache/test-results.json');
 }
 
 export function analyzeVrt(tagName: string): VrtResult | null {
@@ -55,9 +52,7 @@ export function analyzeVrt(tagName: string): VrtResult | null {
   if (existsSync(screenshotsDir)) {
     try {
       const files = readdirSync(screenshotsDir, { recursive: true }) as string[];
-      baselineCount = files.filter(
-        (f) => typeof f === "string" && f.endsWith(".png")
-      ).length;
+      baselineCount = files.filter((f) => typeof f === 'string' && f.endsWith('.png')).length;
     } catch {
       // Directory exists but can't read
     }
@@ -78,18 +73,16 @@ export function analyzeVrt(tagName: string): VrtResult | null {
       browserResults: [],
       detail: hasBaselines
         ? `${baselineCount} baseline screenshots (no test results yet)`
-        : "No VRT baselines or results",
+        : 'No VRT baselines or results',
     };
   }
 
   try {
-    const raw = JSON.parse(readFileSync(resultsPath, "utf-8")) as VitestTestResults;
+    const raw = JSON.parse(readFileSync(resultsPath, 'utf-8')) as VitestTestResults;
 
     // Find component test file
     const componentTestFile = `${tagName}.test.ts`;
-    const componentTests = raw.testResults.filter((t) =>
-      t.name.includes(componentTestFile)
-    );
+    const componentTests = raw.testResults.filter((t) => t.name.includes(componentTestFile));
 
     if (componentTests.length === 0) {
       return {
@@ -99,9 +92,7 @@ export function analyzeVrt(tagName: string): VrtResult | null {
         baselineCount,
         regressionCount: 0,
         browserResults: [],
-        detail: hasBaselines
-          ? `${baselineCount} baselines but no test results`
-          : "No VRT data",
+        detail: hasBaselines ? `${baselineCount} baselines but no test results` : 'No VRT data',
       };
     }
 
@@ -112,15 +103,15 @@ export function analyzeVrt(tagName: string): VrtResult | null {
 
     for (const testFile of componentTests) {
       totalTests += testFile.assertionResults.length;
-      passedTests += testFile.assertionResults.filter((a) => a.status === "passed").length;
-      failedTests += testFile.assertionResults.filter((a) => a.status === "failed").length;
+      passedTests += testFile.assertionResults.filter((a) => a.status === 'passed').length;
+      failedTests += testFile.assertionResults.filter((a) => a.status === 'failed').length;
     }
 
     // For browser results, use Chromium (Vitest browser mode default)
     const browserResults: BrowserResult[] = hasBaselines
       ? [
           {
-            browser: "chromium",
+            browser: 'chromium',
             passed: passedTests,
             failed: failedTests,
             total: totalTests,
@@ -146,7 +137,7 @@ export function analyzeVrt(tagName: string): VrtResult | null {
       browserResults,
       detail: hasBaselines
         ? `${baselineCount} screenshots, ${passedTests}/${totalTests} tests pass`
-        : "No VRT data",
+        : 'No VRT data',
     };
   } catch {
     return null;
@@ -161,7 +152,7 @@ export function analyzeCrossBrowser(tagName: string): CrossBrowserResult | null 
       score: 0,
       browsers: [],
       allBrowsersPass: false,
-      detail: "No cross-browser test data",
+      detail: 'No cross-browser test data',
     };
   }
 
@@ -194,7 +185,7 @@ interface VitestTestResults {
     assertionResults: Array<{
       ancestorTitles: string[];
       fullName: string;
-      status: "passed" | "failed" | "pending";
+      status: 'passed' | 'failed' | 'pending';
       title: string;
       duration: number;
       failureMessages: string[];

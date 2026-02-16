@@ -4,13 +4,29 @@ class WcShowcaseDropdown extends HTMLElement {
   canvas: HTMLCanvasElement;
   ctx: CanvasRenderingContext2D | null = null;
   animFrame: number = 0;
-  particles: { x: number; y: number; size: number; vx: number; vy: number; color: string; opacity: number }[] = [];
+  particles: {
+    x: number;
+    y: number;
+    size: number;
+    vx: number;
+    vy: number;
+    color: string;
+    opacity: number;
+  }[] = [];
 
   constructor() {
     super();
-    this.trigger = this.querySelector('.showcase-trigger')!;
-    this.panel = this.querySelector('.showcase-panel')!;
-    this.canvas = this.querySelector('.panel-particles')!;
+    const trigger = this.querySelector('.showcase-trigger');
+    const panel = this.querySelector('.showcase-panel');
+    const canvas = this.querySelector('.panel-particles');
+
+    if (!trigger || !panel || !canvas) {
+      throw new Error('WcShowcaseDropdown: Required elements not found');
+    }
+
+    this.trigger = trigger as HTMLButtonElement;
+    this.panel = panel as HTMLElement;
+    this.canvas = canvas as HTMLCanvasElement;
 
     this.trigger.addEventListener('click', () => this.toggle());
 
@@ -44,22 +60,23 @@ class WcShowcaseDropdown extends HTMLElement {
     const w = this.canvas.width;
     const h = this.canvas.height;
     const colors = [
-      'rgba(6, 182, 212,',   // cyan-500
-      'rgba(16, 185, 129,',  // emerald-500
+      'rgba(6, 182, 212,', // cyan-500
+      'rgba(16, 185, 129,', // emerald-500
       'rgba(102, 126, 234,', // indigo
-      'rgba(20, 184, 166,',  // teal-500
-      'rgba(59, 130, 246,',  // blue-500
+      'rgba(20, 184, 166,', // teal-500
+      'rgba(59, 130, 246,', // blue-500
     ];
     this.particles = [];
     const count = 50;
     for (let i = 0; i < count; i++) {
+      const colorIndex = Math.floor(Math.random() * colors.length);
       this.particles.push({
         x: Math.random() * w,
         y: Math.random() * h,
         size: Math.random() * 2 + 0.8,
         vx: (Math.random() - 0.5) * 0.4,
         vy: (Math.random() - 0.5) * 0.4,
-        color: colors[Math.floor(Math.random() * colors.length)]!,
+        color: colors[colorIndex] ?? colors[0] ?? 'rgba(6, 182, 212,',
         opacity: Math.random() * 0.4 + 0.15,
       });
     }
@@ -91,9 +108,11 @@ class WcShowcaseDropdown extends HTMLElement {
     // Draw molecular connections
     const maxDist = 100;
     for (let i = 0; i < this.particles.length; i++) {
-      const a = this.particles[i]!;
+      const a = this.particles[i];
+      if (!a) continue;
       for (let j = i + 1; j < this.particles.length; j++) {
-        const b = this.particles[j]!;
+        const b = this.particles[j];
+        if (!b) continue;
         const dx = a.x - b.x;
         const dy = a.y - b.y;
         const dist = Math.sqrt(dx * dx + dy * dy);
@@ -134,7 +153,11 @@ class WcShowcaseDropdown extends HTMLElement {
   }
 
   toggle() {
-    this.trigger.getAttribute('aria-expanded') === 'true' ? this.close() : this.open();
+    if (this.trigger.getAttribute('aria-expanded') === 'true') {
+      this.close();
+    } else {
+      this.open();
+    }
   }
 
   open() {

@@ -19,8 +19,6 @@ export default defineConfig({
       headless: true,
       instances: [{ browser: 'chromium' }],
     },
-    setupFiles: [
-      path.join(dirname, '.storybook/vitest.setup.ts'),
-    ],
+    setupFiles: [path.join(dirname, '.storybook/vitest.setup.ts')],
   },
 });

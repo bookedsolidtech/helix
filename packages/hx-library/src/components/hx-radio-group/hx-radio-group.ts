@@ -108,7 +108,7 @@ export class HelixRadioGroup extends LitElement {
 
   // ─── Internal IDs ───
 
-  private _groupId = `wc-radio-group-${Math.random().toString(36).slice(2, 9)}`;
+  private _groupId = `hx-radio-group-${Math.random().toString(36).slice(2, 9)}`;
   private _helpTextId = `${this._groupId}-help`;
   private _errorId = `${this._groupId}-error`;
 
@@ -135,6 +135,7 @@ export class HelixRadioGroup extends LitElement {
   }
 
   override updated(changedProperties: Map<string, unknown>): void {
+    super.updated(changedProperties);
     if (changedProperties.has('value')) {
       this._internals.setFormValue(this.value || null);
       this._syncRadios();
@@ -150,7 +151,8 @@ export class HelixRadioGroup extends LitElement {
     }
   }
 
-  override firstUpdated(): void {
+  override firstUpdated(changedProperties: Map<string, unknown>): void {
+    super.firstUpdated(changedProperties);
     this._syncRadios();
   }
 
@@ -186,7 +188,10 @@ export class HelixRadioGroup extends LitElement {
     if (checkedRadio) {
       checkedRadio.tabIndex = 0;
     } else if (enabledRadios.length > 0) {
-      enabledRadios[0].tabIndex = 0;
+      const firstRadio = enabledRadios[0];
+      if (firstRadio) {
+        firstRadio.tabIndex = 0;
+      }
     }
   }
 
@@ -243,14 +248,16 @@ export class HelixRadioGroup extends LitElement {
     }
 
     const nextRadio = enabledRadios[nextIndex];
-    nextRadio.focus();
-    nextRadio.dispatchEvent(
-      new CustomEvent('hx-radio-select', {
-        bubbles: true,
-        composed: true,
-        detail: { value: nextRadio.value },
-      }),
-    );
+    if (nextRadio) {
+      nextRadio.focus();
+      nextRadio.dispatchEvent(
+        new CustomEvent('hx-radio-select', {
+          bubbles: true,
+          composed: true,
+          detail: { value: nextRadio.value },
+        }),
+      );
+    }
   };
 
   private _handleSlotChange(): void {

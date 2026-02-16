@@ -35,11 +35,13 @@ caption {
 }
 
 thead {
-  border-bottom: var(--wc-border-width-medium, 2px) solid var(--wc-color-border-default, var(--wc-color-neutral-200, #dee2e6));
+  border-bottom: var(--wc-border-width-medium, 2px) solid
+    var(--wc-color-border-default, var(--wc-color-neutral-200, #dee2e6));
 }
 
 tfoot {
-  border-top: var(--wc-border-width-medium, 2px) solid var(--wc-color-border-default, var(--wc-color-neutral-200, #dee2e6));
+  border-top: var(--wc-border-width-medium, 2px) solid
+    var(--wc-color-border-default, var(--wc-color-neutral-200, #dee2e6));
 }
 
 th {
@@ -53,7 +55,8 @@ th {
 
 td {
   padding: var(--wc-space-3, 0.75rem) var(--wc-space-4, 1rem);
-  border-bottom: var(--wc-border-width-thin, 1px) solid var(--wc-color-border-default, var(--wc-color-neutral-200, #dee2e6));
+  border-bottom: var(--wc-border-width-thin, 1px) solid
+    var(--wc-color-border-default, var(--wc-color-neutral-200, #dee2e6));
   vertical-align: top;
 }
 
@@ -71,12 +74,12 @@ tbody tr:hover {
 
 /* ─── Alignment Helpers (CKEditor output) ─── */
 
-th[align="center"],
-td[align="center"] {
+th[align='center'],
+td[align='center'] {
   text-align: center;
 }
 
-th[align="right"],
-td[align="right"] {
+th[align='right'],
+td[align='right'] {
   text-align: right;
 }

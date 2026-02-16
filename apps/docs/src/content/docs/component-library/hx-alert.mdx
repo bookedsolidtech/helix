@@ -1,6 +1,6 @@
 ---
-title: "hx-alert"
-description: "A feedback component for communicating status messages, warnings, and errors. Critical for accessible user notifications."
+title: 'hx-alert'
+description: 'A feedback component for communicating status messages, warnings, and errors. Critical for accessible user notifications.'
 ---
 
 import ComponentLoader from '../../../components/ComponentLoader.astro';
@@ -30,8 +30,12 @@ Alerts with a dismiss button. Click the close icon to hide the alert.
 
 <ComponentDemo title="Closable">
   <div style="display: grid; gap: 0.75rem;">
-    <hx-alert variant="info" closable>This alert can be dismissed by the user.</hx-alert>
-    <hx-alert variant="success" closable>Success! You can close this notification.</hx-alert>
+    <hx-alert variant="info" closable>
+      This alert can be dismissed by the user.
+    </hx-alert>
+    <hx-alert variant="success" closable>
+      Success! You can close this notification.
+    </hx-alert>
   </div>
 </ComponentDemo>
 
@@ -43,7 +47,9 @@ Use the `actions` slot to add action buttons inside the alert.
   <hx-alert variant="warning" closable>
     Your session is about to expire.
     <div slot="actions">
-      <hx-button variant="secondary" size="sm">Extend Session</hx-button>
+      <hx-button variant="secondary" size="sm">
+        Extend Session
+      </hx-button>
     </div>
   </hx-alert>
 </ComponentDemo>

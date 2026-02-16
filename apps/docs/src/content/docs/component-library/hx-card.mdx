@@ -1,5 +1,5 @@
 ---
-title: "hx-card"
+title: 'hx-card'
 description: Flexible card component for displaying grouped content with multiple slots
 ---
 
@@ -59,13 +59,22 @@ All available slots: image, heading, body, footer, and actions.
 
 <ComponentDemo title="Full Slot Usage">
   <hx-card variant="default" elevation="raised">
-    <div slot="image" style="height: 120px; background: linear-gradient(135deg, #6366f1, #8b5cf6); display: flex; align-items: center; justify-content: center; color: white; font-weight: 600;">Image Slot</div>
+    <div
+      slot="image"
+      style="height: 120px; background: linear-gradient(135deg, #6366f1, #8b5cf6); display: flex; align-items: center; justify-content: center; color: white; font-weight: 600;"
+    >
+      Image Slot
+    </div>
     <span slot="heading">Card Title</span>
     <p>This is the default body slot with descriptive content for the card.</p>
     <span slot="footer">Published Feb 2026</span>
     <div slot="actions">
-      <hx-button variant="primary" size="sm">Action</hx-button>
-      <hx-button variant="ghost" size="sm">Cancel</hx-button>
+      <hx-button variant="primary" size="sm">
+        Action
+      </hx-button>
+      <hx-button variant="ghost" size="sm">
+        Cancel
+      </hx-button>
     </div>
   </hx-card>
 </ComponentDemo>
@@ -77,7 +86,9 @@ Card with `hx-href` becomes clickable. Uses the `hx-` prefix to avoid conflictin
 <ComponentDemo title="Interactive Card">
   <hx-card variant="default" elevation="raised" hx-href="https://helix.dev">
     <span slot="heading">Clickable Card</span>
-    <p>This card has a <code>hx-href</code> attribute — click anywhere to navigate.</p>
+    <p>
+      This card has a <code>hx-href</code> attribute — click anywhere to navigate.
+    </p>
   </hx-card>
 </ComponentDemo>
 

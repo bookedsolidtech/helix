@@ -1,15 +1,15 @@
-import { Card, CardContent } from "@/components/ui/card";
-import { tokenEntries, type TokenEntry } from "@helix/tokens";
-import { Breadcrumb } from "@/components/dashboard/Breadcrumb";
-import { getTokenBreadcrumbs } from "@/lib/breadcrumb-utils";
+import { Card, CardContent } from '@/components/ui/card';
+import { tokenEntries, type TokenEntry } from '@helix/tokens';
+import { Breadcrumb } from '@/components/dashboard/Breadcrumb';
+import { getTokenBreadcrumbs } from '@/lib/breadcrumb-utils';
 
 export default function SpacingPage() {
-  const spacingTokens = tokenEntries.filter((t) => t.category === "space");
+  const spacingTokens = tokenEntries.filter((t) => t.category === 'space');
 
   return (
     <div className="space-y-8">
       <div>
-        <Breadcrumb items={getTokenBreadcrumbs("spacing")} />
+        <Breadcrumb items={getTokenBreadcrumbs('spacing')} />
         <h1 className="text-2xl font-bold tracking-tight">Spacing Scale</h1>
         <p className="text-muted-foreground text-sm mt-0.5">
           {spacingTokens.length} spacing tokens from 0 to 4rem
@@ -42,11 +42,11 @@ function SpacingBar({ token }: { token: TokenEntry }) {
       <div className="flex-1 flex items-center gap-3">
         <div
           className="h-4 rounded bg-emerald-400/30 border border-emerald-400/50"
-          style={{ width: `${barWidth}px`, minWidth: token.value === "0" ? "2px" : undefined }}
+          style={{ width: `${barWidth}px`, minWidth: token.value === '0' ? '2px' : undefined }}
         />
         <span className="text-xs text-muted-foreground tabular-nums shrink-0">
           {token.value}
-          {remMatch ? ` (${pxValue}px)` : ""}
+          {remMatch ? ` (${pxValue}px)` : ''}
         </span>
       </div>
     </div>

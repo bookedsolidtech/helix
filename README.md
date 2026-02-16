@@ -2,6 +2,16 @@
 
 **A production-ready Web Component library for healthcare organizations' content hubs, with seamless Drupal integration.**
 
+<!-- Badges -->
+
+![CI Status](https://img.shields.io/github/actions/workflow/status/himerus/wc-2026/ci.yml?branch=main&label=CI&logo=github)
+![TypeScript](https://img.shields.io/badge/TypeScript-5.7.2-blue?logo=typescript)
+![Node Version](https://img.shields.io/badge/node-%3E%3D20.0.0-brightgreen?logo=node.js)
+![Lit](https://img.shields.io/badge/Lit-3.3.2-324FFF?logo=lit)
+![License](https://img.shields.io/badge/license-MIT-blue)
+![WCAG 2.1 AA](https://img.shields.io/badge/WCAG%202.1-AA%20compliant-success)
+![Bundle Size](https://img.shields.io/badge/bundle%20size-%3C50KB%20gzip-success)
+
 ---
 
 ## 🎯 Project Overview
@@ -18,16 +28,16 @@ WC-2026 is an enterprise-grade Web Component library built with **Lit 3.x** and 
 
 ### Tech Stack
 
-| Technology | Version | Purpose |
-|------------|---------|---------|
-| **Lit** | 3.x | Web Component framework |
-| **TypeScript** | 5.x | Type safety, documentation |
-| **Storybook** | 10.x | Component playground & docs |
-| **Astro + Starlight** | 5.x + 0.37.x | Documentation hub |
-| **Vite** | 6.x | Library build (ES modules) |
-| **npm + Turborepo** | npm 10.x, turbo 2.x | Monorepo management |
-| **Vitest** | Planned | Testing (Browser Mode) |
-| **Terrazzo** | Planned | Design token build tool (W3C DTCG) |
+| Technology            | Version             | Purpose                            |
+| --------------------- | ------------------- | ---------------------------------- |
+| **Lit**               | 3.x                 | Web Component framework            |
+| **TypeScript**        | 5.x                 | Type safety, documentation         |
+| **Storybook**         | 10.x                | Component playground & docs        |
+| **Astro + Starlight** | 5.x + 0.37.x        | Documentation hub                  |
+| **Vite**              | 6.x                 | Library build (ES modules)         |
+| **npm + Turborepo**   | npm 10.x, turbo 2.x | Monorepo management                |
+| **Vitest**            | Planned             | Testing (Browser Mode)             |
+| **Terrazzo**          | Planned             | Design token build tool (W3C DTCG) |
 
 ---
 
@@ -38,6 +48,7 @@ WC-2026 is an enterprise-grade Web Component library built with **Lit 3.x** and 
 The complete build plan is organized into 6 comprehensive documents:
 
 #### Core Architecture (Original Documents)
+
 1. **[Architecture & System Design](./build-plan/02-architecture-and-system-design.md)** (~900 lines)
    - System architecture, monorepo strategy
    - Lit + Storybook integration (2025-2026 latest)
@@ -60,6 +71,7 @@ The complete build plan is organized into 6 comprehensive documents:
    - 4-phase implementation roadmap
 
 #### Enhanced Documentation & Integration
+
 4. **[Documentation Hub Architecture](./build-plan/04-documentation-hub-architecture.md)** (~1,200 lines)
    - Astro/Starlight documentation strategy
    - Storybook + Starlight integration
@@ -126,10 +138,12 @@ wc-2026/
 ## 🚀 Quick Start
 
 ### Prerequisites
+
 - Node.js 20+ (npm ships with Node.js)
 - Git
 
 ### Setup
+
 ```bash
 git clone https://github.com/himerus/wc-2026.git
 cd wc-2026
@@ -137,6 +151,7 @@ npm install
 ```
 
 ### Development
+
 ```bash
 # Start everything (library watch + storybook + docs)
 npm run dev
@@ -152,6 +167,7 @@ npm run dev:library
 ```
 
 ### Build
+
 ```bash
 # Build all packages
 npm run build
@@ -166,7 +182,9 @@ npm run type-check
 ```
 
 ### Vercel Deployment
+
 Each app can be deployed independently with its own Vercel project:
+
 - **Storybook**: Root directory `apps/storybook`, build command `npm run build`, output `dist`
 - **Docs site**: Root directory `apps/docs`, build command `npm run build`, output `dist`
 
@@ -175,34 +193,40 @@ Each app can be deployed independently with its own Vercel project:
 ## 📋 Implementation Roadmap
 
 ### Phase 1: Foundation (Weeks 1-2)
+
 - Project scaffolding (npm workspaces + Turborepo, TypeScript)
 - Design token system (Terrazzo, 3-tier tokens)
 
 ### Phase 2: Core Components (Weeks 3-6)
+
 - Atoms (buttons, inputs, badges)
 - Molecules (cards, alerts, breadcrumbs)
 - Organisms (navigation, headers, hero banners)
 - Templates (article, landing page, search results)
 
 ### Phase 3: Storybook Integration (Week 7)
+
 - Storybook 10.x installation
 - CEM analyzer integration
 - Story creation (8 variants per component)
 - Accessibility addon configuration
 
 ### Phase 4: Testing Infrastructure (Week 8)
+
 - Vitest 4.x Browser Mode setup
 - Unit/integration/E2E tests
 - Chromatic visual regression
 - Accessibility test automation
 
 ### Phase 5: Documentation Hub (Weeks 9-10)
+
 - Astro/Starlight setup
 - CEM-powered API page generation
 - Content migration (guides, tutorials)
 - Unified search (Pagefind)
 
 ### Phase 6: Drupal Integration & Polish (Weeks 11-12)
+
 - Test Drupal site setup
 - TWIG template creation
 - JavaScript behaviors
@@ -216,6 +240,7 @@ Each app can be deployed independently with its own Vercel project:
 ## 🎯 Healthcare Compliance
 
 ### WCAG 2.1 AA (Legally Mandated)
+
 - HHS mandate effective **May 2026** (US healthcare)
 - EAA effective June 2025 (EU)
 - Color contrast: 4.5:1 (text), 3:1 (large text)
@@ -224,6 +249,7 @@ Each app can be deployed independently with its own Vercel project:
 - Form accessibility
 
 ### WCAG AAA Targets (Best Practice)
+
 - Color contrast: 7:1 (text), 4.5:1 (large text)
 - 44x44px touch targets
 - Enhanced focus indicators
@@ -235,11 +261,13 @@ Each app can be deployed independently with its own Vercel project:
 ## 🧪 Testing Strategy
 
 ### Test Pyramid (Vitest 4.x)
+
 - **60% Unit Tests**: Component logic, utilities (Node environment)
 - **30% Integration Tests**: Component rendering, interaction (Browser Mode)
 - **10% E2E Tests**: User flows, visual regression (Playwright + Chromatic)
 
 ### 4-Level Accessibility Testing
+
 1. **Author-time**: IDE linting (ts-lit-plugin)
 2. **Story-time**: Storybook addon-a11y (axe-core)
 3. **CI**: Chromatic visual regression + axe tests
@@ -250,7 +278,9 @@ Each app can be deployed independently with its own Vercel project:
 ## 📖 Documentation Strategy
 
 ### Storybook (Design System)
+
 **URL**: `/storybook/`
+
 - Interactive component playground
 - Visual regression testing
 - Accessibility testing (addon-a11y)
@@ -259,7 +289,9 @@ Each app can be deployed independently with its own Vercel project:
 **Audience**: Designers, component builders, QA
 
 ### Starlight (Documentation Hub)
+
 **URL**: `/` (root)
+
 - Comprehensive guides and tutorials
 - Component Building Guide (for front-end devs)
 - Drupal Integration Guide (for Drupal teams)
@@ -269,6 +301,7 @@ Each app can be deployed independently with its own Vercel project:
 **Audience**: Developers, architects, tech leads
 
 ### Single Source of Truth
+
 - **CEM** feeds Storybook autodocs + Starlight API pages
 - **Storybook demos** embedded in Starlight (no duplication)
 - **Token docs** generated from DTCG JSON
@@ -280,20 +313,24 @@ Each app can be deployed independently with its own Vercel project:
 ### 3-Tier Architecture (W3C DTCG Compliant)
 
 **Tier 1: Primitives** (Private)
+
 - Raw color palettes (OKLCH)
 - Base spacing (4px grid)
 - Base typography (Major Third scale)
 
 **Tier 2: Semantic** (Public API)
+
 - Surface, text, interactive, feedback colors
 - Spacing tokens (inset/stack/inline)
 - Typography composites
 
 **Tier 3: Component** (Overrides)
+
 - Component-specific tokens
 - 3-level fallback chain
 
 ### Theme Modes
+
 - Light mode (default)
 - Dark mode
 - High contrast light (WCAG AAA)
@@ -306,17 +343,20 @@ Each app can be deployed independently with its own Vercel project:
 ## 🔌 Drupal Integration
 
 ### Installation Methods
+
 1. **npm package** (recommended for version control)
 2. **CDN delivery** (self-hosted for healthcare production)
 3. **Drupal module wrapper** (optional convenience layer)
 
 ### Integration Points
+
 - TWIG templates (component usage)
 - Drupal behaviors (event handling)
 - Theme CSS (token customization)
 - Field formatters (optional PHP layer)
 
 ### Example: Article Teaser
+
 ```twig
 {# node--article--teaser.html.twig #}
 <wc-card
@@ -349,6 +389,7 @@ Each app can be deployed independently with its own Vercel project:
 7. **Production-Ready Testing** - 60/30/10 pyramid, visual regression, accessibility automation
 
 ### Demo Points
+
 - "I've created a 6-document comprehensive build plan (10,000+ lines)"
 - "Deep research with 44+ authoritative sources"
 - "Architecture decisions documented with rationale"
@@ -362,6 +403,7 @@ Each app can be deployed independently with its own Vercel project:
 ## 📚 Resources
 
 ### Official Documentation
+
 - [Lit 3.x](https://lit.dev)
 - [Storybook 10.x](https://storybook.js.org)
 - [Astro 5.x](https://astro.build)
@@ -369,12 +411,14 @@ Each app can be deployed independently with its own Vercel project:
 - [Drupal 10.3+](https://drupal.org)
 
 ### Specifications
+
 - [W3C DTCG Spec 2025.10](https://tr.designtokens.org/format/)
 - [WCAG 2.1](https://www.w3.org/TR/WCAG21/)
 - [Custom Elements](https://html.spec.whatwg.org/multipage/custom-elements.html)
 - [Shadow DOM](https://dom.spec.whatwg.org/#shadow-trees)
 
 ### Healthcare Compliance
+
 - [HHS Accessibility Mandate (May 2026)](https://www.hhs.gov/civil-rights/for-providers/compliance-enforcement/digital-accessibility/)
 - [European Accessibility Act (June 2025)](https://ec.europa.eu/social/main.jsp?catId=1202)
 
@@ -385,6 +429,7 @@ Each app can be deployed independently with its own Vercel project:
 Phase 0 prototype is complete. Component scaling begins after Monday's interview (Feb 17, 2026).
 
 ### Contribution Guidelines
+
 - Follow TypeScript strict mode
 - 100% JSDoc coverage required
 - All components must pass WCAG 2.1 AA automated tests

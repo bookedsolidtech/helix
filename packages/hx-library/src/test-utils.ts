@@ -30,7 +30,7 @@ export async function fixture<T extends HTMLElement>(html: string): Promise<T> {
  */
 export function shadowQuery<T extends Element = Element>(
   host: HTMLElement,
-  selector: string
+  selector: string,
 ): T | null {
   return host.shadowRoot?.querySelector<T>(selector) ?? null;
 }
@@ -40,7 +40,7 @@ export function shadowQuery<T extends Element = Element>(
  */
 export function shadowQueryAll<T extends Element = Element>(
   host: HTMLElement,
-  selector: string
+  selector: string,
 ): T[] {
   return Array.from(host.shadowRoot?.querySelectorAll<T>(selector) ?? []);
 }
@@ -48,12 +48,11 @@ export function shadowQueryAll<T extends Element = Element>(
 /**
  * Returns a Promise that resolves on the next occurrence of an event on the element.
  */
-export function oneEvent<T extends Event = Event>(
-  el: EventTarget,
-  eventName: string
-): Promise<T> {
+export function oneEvent<T extends Event = Event>(el: EventTarget, eventName: string): Promise<T> {
   return new Promise<T>((resolve) => {
-    el.addEventListener(eventName, ((e: Event) => resolve(e as T)) as EventListener, { once: true });
+    el.addEventListener(eventName, ((e: Event) => resolve(e as T)) as EventListener, {
+      once: true,
+    });
   });
 }
 
@@ -70,7 +69,7 @@ export function cleanup(): void {
  */
 export async function checkA11y(
   el: HTMLElement,
-  options?: { rules?: Record<string, { enabled: boolean }> }
+  options?: { rules?: Record<string, { enabled: boolean }> },
 ): Promise<{ violations: AxeViolation[]; passes: AxePass[] }> {
   const axe = await import('axe-core');
 

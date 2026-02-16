@@ -1,14 +1,14 @@
-import { existsSync } from "node:fs";
-import { resolve } from "node:path";
-import { getAllComponents, getManifestStats } from "@/lib/cem-parser";
-import { analyzeJsDoc, detectDrift } from "@/lib/jsdoc-analyzer";
-import { getSourceInfo } from "@/lib/source-analyzer";
-import { scoreComponent } from "@/lib/health-scorer";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { PipelineFlow, ComponentPipelineRow } from "@/components/dashboard/PipelineFlow";
-import { Breadcrumb } from "@/components/dashboard/Breadcrumb";
-import { getBreadcrumbItems } from "@/lib/breadcrumb-utils";
+import { existsSync } from 'node:fs';
+import { resolve } from 'node:path';
+import { getAllComponents, getManifestStats } from '@/lib/cem-parser';
+import { analyzeJsDoc, detectDrift } from '@/lib/jsdoc-analyzer';
+import { getSourceInfo } from '@/lib/source-analyzer';
+import { scoreComponent } from '@/lib/health-scorer';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { PipelineFlow, ComponentPipelineRow } from '@/components/dashboard/PipelineFlow';
+import { Breadcrumb } from '@/components/dashboard/Breadcrumb';
+import { getBreadcrumbItems } from '@/lib/breadcrumb-utils';
 
 export default function PipelinePage() {
   const stats = getManifestStats();
@@ -26,10 +26,15 @@ export default function PipelinePage() {
       hasJsDoc: jsDoc !== null && jsDoc.coveragePercent > 0,
       inCem: true, // If we got here, it's in the CEM
       hasStory: source.hasStories,
-      hasDocs: existsSync(resolve(process.cwd(), `../../apps/docs/src/content/docs/component-library/${comp.tagName}.mdx`)),
+      hasDocs: existsSync(
+        resolve(
+          process.cwd(),
+          `../../apps/docs/src/content/docs/component-library/${comp.tagName}.mdx`,
+        ),
+      ),
       driftCount: drift?.driftCount ?? 0,
       jsDocCoverage: jsDoc?.coveragePercent ?? 0,
-      grade: (health?.grade ?? "F") as "A" | "B" | "C" | "D" | "F",
+      grade: (health?.grade ?? 'F') as 'A' | 'B' | 'C' | 'D' | 'F',
     };
   });
 
@@ -42,32 +47,39 @@ export default function PipelinePage() {
 
   const pipelineNodes = [
     {
-      label: "JSDoc Source",
-      status: totalWithJsDoc === stats.totalComponents ? "healthy" as const : "warning" as const,
+      label: 'JSDoc Source',
+      status:
+        totalWithJsDoc === stats.totalComponents ? ('healthy' as const) : ('warning' as const),
       count: totalWithJsDoc,
       detail: `${totalWithJsDoc}/${stats.totalComponents} documented`,
     },
     {
-      label: "CEM Analyzer",
-      status: "healthy" as const,
+      label: 'CEM Analyzer',
+      status: 'healthy' as const,
       count: stats.totalComponents,
       detail: `Schema v${stats.schemaVersion}`,
     },
     {
-      label: "custom-elements.json",
-      status: "healthy" as const,
+      label: 'custom-elements.json',
+      status: 'healthy' as const,
       count: stats.totalProperties + stats.totalEvents + stats.totalSlots,
       detail: `${stats.totalProperties} props, ${stats.totalEvents} events`,
     },
     {
-      label: "Storybook",
-      status: totalWithStory === stats.totalComponents ? "healthy" as const : "warning" as const,
+      label: 'Storybook',
+      status:
+        totalWithStory === stats.totalComponents ? ('healthy' as const) : ('warning' as const),
       count: totalWithStory,
       detail: `${totalWithStory}/${stats.totalComponents} stories`,
     },
     {
-      label: "Docs Site",
-      status: totalWithDocs === stats.totalComponents ? "healthy" as const : totalWithDocs > 0 ? "warning" as const : "error" as const,
+      label: 'Docs Site',
+      status:
+        totalWithDocs === stats.totalComponents
+          ? ('healthy' as const)
+          : totalWithDocs > 0
+            ? ('warning' as const)
+            : ('error' as const),
       count: totalWithDocs,
       detail: `${totalWithDocs}/${stats.totalComponents} docs pages`,
     },
@@ -98,7 +110,9 @@ export default function PipelinePage() {
       <Card>
         <CardHeader>
           <CardTitle>Pipeline Flow</CardTitle>
-          <CardDescription>End-to-end data flow from source annotations to consumer applications</CardDescription>
+          <CardDescription>
+            End-to-end data flow from source annotations to consumer applications
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <PipelineFlow nodes={pipelineNodes} />
@@ -111,9 +125,13 @@ export default function PipelinePage() {
           <CardTitle>
             Drift Detection
             {totalWithDrift === 0 ? (
-              <Badge variant="success" className="ml-2">All in sync</Badge>
+              <Badge variant="success" className="ml-2">
+                All in sync
+              </Badge>
             ) : (
-              <Badge variant="warning" className="ml-2">{totalDriftItems} issues across {totalWithDrift} components</Badge>
+              <Badge variant="warning" className="ml-2">
+                {totalDriftItems} issues across {totalWithDrift} components
+              </Badge>
             )}
           </CardTitle>
           <CardDescription>
@@ -170,12 +188,19 @@ export default function PipelinePage() {
           </div>
         </CardContent>
       </Card>
-
     </div>
   );
 }
 
-function StatCard({ label, value, trend }: { label: string; value: string | number; trend?: string }) {
+function StatCard({
+  label,
+  value,
+  trend,
+}: {
+  label: string;
+  value: string | number;
+  trend?: string;
+}) {
   return (
     <Card>
       <CardContent className="pt-6">
