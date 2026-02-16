@@ -17,20 +17,20 @@ function hasDocsPage(tagName) {
 
 // Test all components
 const components = [
-  "wc-alert",
-  "wc-badge",
-  "wc-button",
-  "wc-card",
-  "wc-checkbox",
-  "wc-container",
-  "wc-form",
-  "wc-prose",
-  "wc-radio",
-  "wc-radio-group",
-  "wc-select",
-  "wc-switch",
-  "wc-text-input",
-  "wc-textarea",
+  "hx-alert",
+  "hx-badge",
+  "hx-button",
+  "hx-card",
+  "hx-checkbox",
+  "hx-container",
+  "hx-form",
+  "hx-prose",
+  "hx-radio",
+  "hx-radio-group",
+  "hx-select",
+  "hx-switch",
+  "hx-text-input",
+  "hx-textarea",
 ];
 
 console.log("Current working directory:", process.cwd());

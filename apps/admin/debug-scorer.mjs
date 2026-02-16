@@ -19,7 +19,7 @@ function hasDocsPage(tagName) {
 }
 
 // Test with some components
-const testComponents = ['wc-button', 'wc-card', 'wc-text-input', 'wc-badge', 'wc-select'];
+const testComponents = ['hx-button', 'hx-card', 'hx-text-input', 'hx-badge', 'hx-select'];
 
 console.log('Testing docs detection:\n');
 console.log('='.repeat(60));
