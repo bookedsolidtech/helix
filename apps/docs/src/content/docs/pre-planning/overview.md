@@ -1,12 +1,12 @@
 ---
 title: Planning & Discovery Overview
-description: Complete build plan and documentation index for the HELIX healthcare web component library
+description: Complete build plan and documentation index for the HELIX enterprise web component library
 ---
 
 ## Complete Build Plan & Documentation
 
-**Project**: Healthcare Content Hub Web Component Library
-**Target**: Enterprise healthcare organizations (Drupal integration)
+**Project**: Enterprise Content Platform Web Component Library
+**Target**: Enterprise content organizations (Drupal integration)
 **Tech Stack**: Lit 3.x + Storybook 10.x + Astro/Starlight + TypeScript
 **Purpose**: Implementation roadmap and architecture documentation
 
@@ -14,12 +14,12 @@ description: Complete build plan and documentation index for the HELIX healthcar
 
 ## Executive Summary
 
-This build plan documents the architecture, implementation strategy, and comprehensive documentation system for **HELIX**, an enterprise-grade Web Component library designed for healthcare organizations' public-facing content hubs. The library integrates seamlessly with Drupal CMS while maintaining complete framework independence.
+This build plan documents the architecture, implementation strategy, and comprehensive documentation system for **HELIX**, an enterprise-grade Web Component library designed for organizations' public-facing content platforms. The library integrates seamlessly with Drupal CMS while maintaining complete framework independence.
 
 ### Key Differentiators
 
-1. **Healthcare-First Design**
-   - WCAG 2.1 AA minimum compliance (HHS mandate May 2026)
+1. **Accessibility-First Design**
+   - WCAG 2.1 AA minimum compliance
    - WCAG AAA targets for critical components
    - High contrast mode and reduced motion support
    - Accessible form components with ElementInternals
@@ -54,9 +54,9 @@ This build plan documents the architecture, implementation strategy, and compreh
 ### Primary Objectives
 
 1. **Establish Technical Leadership**: Leverage cutting-edge Web Components, Storybook, and Drupal integration patterns
-2. **Create Production-Ready Library**: Build reusable component library that reduces development time for healthcare content sites
+2. **Create Production-Ready Library**: Build reusable component library that reduces development time for enterprise content sites
 3. **Minimize Integration Friction**: Design components and documentation that make Drupal integration effortless
-4. **Ensure Healthcare Compliance**: Meet WCAG accessibility requirements and industry standards
+4. **Ensure Accessibility Compliance**: Meet WCAG accessibility requirements and industry standards
 5. **Enable Design System Adoption**: Provide comprehensive documentation for multiple stakeholder types
 
 ### Success Criteria
@@ -121,7 +121,7 @@ This build plan consists of 6 comprehensive documents organized by domain:
 - Reactive Controllers over mixins
 - Form-associated custom elements (ElementInternals)
 - Context Protocol for theme/i18n
-- Typed custom events with `WcEventDetailMap`
+- Typed custom events with `HxEventDetailMap`
 - Shadow DOM vs. Light DOM decision matrix
 
 #### [03. Design System & Token Architecture](../docs/03-design-system-token-architecture.md)
@@ -135,7 +135,7 @@ This build plan consists of 6 comprehensive documents organized by domain:
 - CSS architecture for Shadow DOM components
 - Typography system (Major Third scale, fluid type)
 - Spacing & layout system (4px grid, container queries)
-- Healthcare-specific accessibility (WCAG AAA targets)
+- Accessibility-first architecture (WCAG AAA targets)
 - Storybook and Drupal integration strategies
 - 4-phase implementation roadmap
 
@@ -187,12 +187,12 @@ This build plan consists of 6 comprehensive documents organized by domain:
 - Drupal-friendly component patterns (attributes, slots, events)
 - Data structure patterns (flat attributes, JSON handling)
 - 12 complete component specifications with TWIG examples:
-  - `wc-content-card` (article teaser)
-  - `wc-article-header` (hero banner)
-  - `wc-media` (image/video/audio)
-  - Form components (`wc-text-input`, `wc-textarea`, `wc-select`, etc.)
-  - `wc-nav` (navigation with Drupal menu tree)
-  - `wc-hero-banner`, `wc-accordion`, `wc-alert`
+  - `hx-content-card` (article teaser)
+  - `hx-article-header` (hero banner)
+  - `hx-media` (image/video/audio)
+  - Form components (`hx-text-input`, `hx-textarea`, `hx-select`, etc.)
+  - `hx-nav` (navigation with Drupal menu tree)
+  - `hx-hero-banner`, `hx-accordion`, `hx-alert`
 - Testing checklist (40+ items)
 - Anti-patterns to avoid (8 documented patterns)
 - Component lifecycle & Drupal (AJAX, BigPipe, MutationObserver)
@@ -220,7 +220,7 @@ This build plan consists of 6 comprehensive documents organized by domain:
 - Accessibility checklist (30+ items)
 - Troubleshooting (5 common issue categories)
 - Upgrade & maintenance (semver, testing, rollback)
-- Real-world example ("Regional Health Partners" site)
+- Real-world example ("Regional Content Partners" site)
 
 **Target Audience**: Drupal developers integrating the Web Component library
 
@@ -256,7 +256,7 @@ This build plan consists of 6 comprehensive documents organized by domain:
 
 - **Cloudflare Pages**: Documentation + Storybook hosting (recommended)
 - **Alternatives**: Vercel, Netlify, GitHub Pages
-- **CDN**: Self-hosted for healthcare production (jsDelivr for prototyping)
+- **CDN**: Self-hosted for enterprise production (jsDelivr for prototyping)
 
 ---
 
@@ -354,8 +354,8 @@ Drupal libraries.yml (asset loading)
 
 **Tier 3: Component** - Component-specific overrides
 
-- Button tokens (`--wc-button-background`, `--wc-button-text`)
-- Card tokens (`--wc-card-background`, `--wc-card-border`)
+- Button tokens (`--hx-button-background`, `--hx-button-text`)
+- Card tokens (`--hx-card-background`, `--hx-card-border`)
 - Three-level fallback chain: component → semantic → hardcoded
 
 ### Theme Modes
@@ -389,18 +389,18 @@ Mode switching via `data-theme` attribute + CSS custom properties (zero JavaScri
 
 - Article layout, landing page layout, search results layout
 
-### Example Components for Healthcare Content Hub
+### Example Components for Enterprise Content Platform
 
 | Component           | Purpose            | Drupal Mapping                                  |
 | ------------------- | ------------------ | ----------------------------------------------- |
-| `wc-content-card`   | Article teaser     | `node--article--teaser.html.twig`               |
-| `wc-article-header` | Article hero       | `node--article--full.html.twig` (header region) |
-| `wc-media`          | Image/video/audio  | `field--field-media-*.html.twig`                |
-| `wc-nav`            | Primary navigation | `menu--main.html.twig`                          |
-| `wc-text-input`     | Form field         | `form-element.html.twig` (override)             |
-| `wc-alert`          | Status messages    | `status-messages.html.twig`                     |
-| `wc-accordion`      | FAQ                | Paragraph type `paragraph--faq.html.twig`       |
-| `wc-hero-banner`    | Landing page hero  | Paragraph type `paragraph--hero.html.twig`      |
+| `hx-content-card`   | Article teaser     | `node--article--teaser.html.twig`               |
+| `hx-article-header` | Article hero       | `node--article--full.html.twig` (header region) |
+| `hx-media`          | Image/video/audio  | `field--field-media-*.html.twig`                |
+| `hx-nav`            | Primary navigation | `menu--main.html.twig`                          |
+| `hx-text-input`     | Form field         | `form-element.html.twig` (override)             |
+| `hx-alert`          | Status messages    | `status-messages.html.twig`                     |
+| `hx-accordion`      | FAQ                | Paragraph type `paragraph--faq.html.twig`       |
+| `hx-hero-banner`    | Landing page hero  | Paragraph type `paragraph--hero.html.twig`      |
 
 ---
 
@@ -433,11 +433,11 @@ Mode switching via `data-theme` attribute + CSS custom properties (zero JavaScri
 
 ---
 
-## Healthcare Compliance
+## Accessibility Compliance
 
-### WCAG 2.1 AA (Legally Mandated)
+### WCAG 2.1 AA (Baseline Standard)
 
-- HHS mandate effective **May 2026** (US healthcare organizations)
+- Growing regulatory requirements across industries
 - EAA (European Accessibility Act) effective June 2025
 - Color contrast: 4.5:1 for text, 3:1 for large text
 - Keyboard navigation for all interactive elements
@@ -445,7 +445,7 @@ Mode switching via `data-theme` attribute + CSS custom properties (zero JavaScri
 - Focus indicators
 - Form labels and error messages
 
-### WCAG AAA Targets (Healthcare Best Practice)
+### WCAG AAA Targets (Enterprise Best Practice)
 
 - Color contrast: 7:1 for text, 4.5:1 for large text
 - Enhanced focus indicators
@@ -600,7 +600,7 @@ Mode switching via `data-theme` attribute + CSS custom properties (zero JavaScri
 - [ ] Final accessibility audit (screen readers)
 - [ ] Performance optimization
 - [ ] Documentation review and polish
-- [ ] Example project creation ("Regional Health Partners")
+- [ ] Example project creation ("Regional Content Partners")
 - [ ] Version 1.0.0 release
 - [ ] npm package publication
 
@@ -615,8 +615,8 @@ Mode switching via `data-theme` attribute + CSS custom properties (zero JavaScri
    - Eliminates manual documentation drift
    - JSDoc annotations drive 100% documentation coverage
 
-2. **Healthcare Compliance Leadership**
-   - WCAG 2.1 AA legally mandated (HHS May 2026)
+2. **Accessibility-First Leadership**
+   - WCAG 2.1 AA as the baseline standard
    - WCAG AAA targets for competitive advantage
    - 4-level accessibility testing strategy
    - High contrast mode and reduced motion support
@@ -658,13 +658,13 @@ Mode switching via `data-theme` attribute + CSS custom properties (zero JavaScri
 
 ### Technical Risks
 
-| Risk                              | Impact | Mitigation                                                             |
-| --------------------------------- | ------ | ---------------------------------------------------------------------- |
-| **Storybook 10.x**                | Low    | Now running Storybook 10.2.8 with CSF Factories support                |
-| **Drupal SSR complexity**         | Low    | Skip SSR initially (progressive enhancement)                           |
-| **Browser compatibility**         | Medium | Target modern evergreen browsers (Chrome 90+, Firefox 88+, Safari 14+) |
-| **Design token tooling maturity** | Low    | Terrazzo is production-ready (Cobalt UI successor)                     |
-| **Healthcare compliance changes** | High   | Monitor WCAG 2.2/3.0 developments, build for AAA                       |
+| Risk                                 | Impact | Mitigation                                                             |
+| ------------------------------------ | ------ | ---------------------------------------------------------------------- |
+| **Storybook 10.x**                   | Low    | Now running Storybook 10.2.8 with CSF Factories support                |
+| **Drupal SSR complexity**            | Low    | Skip SSR initially (progressive enhancement)                           |
+| **Browser compatibility**            | Medium | Target modern evergreen browsers (Chrome 90+, Firefox 88+, Safari 14+) |
+| **Design token tooling maturity**    | Low    | Terrazzo is production-ready (Cobalt UI successor)                     |
+| **Accessibility compliance changes** | High   | Monitor WCAG 2.2/3.0 developments, build for AAA                       |
 
 ### Project Risks
 
@@ -707,9 +707,9 @@ Mode switching via `data-theme` attribute + CSS custom properties (zero JavaScri
 - [Custom Elements Specification](https://html.spec.whatwg.org/multipage/custom-elements.html)
 - [Shadow DOM Specification](https://dom.spec.whatwg.org/#shadow-trees)
 
-### Healthcare Compliance
+### Accessibility Compliance
 
-- [HHS Accessibility Mandate (May 2026)](https://www.hhs.gov/civil-rights/for-providers/compliance-enforcement/digital-accessibility/)
+- [WCAG 2.1 Specification](https://www.w3.org/TR/WCAG21/)
 - [European Accessibility Act (EAA) June 2025](https://ec.europa.eu/social/main.jsp?catId=1202)
 
 ### Build Plan Documents
@@ -732,7 +732,7 @@ Mode switching via `data-theme` attribute + CSS custom properties (zero JavaScri
 3. **Set up npm workspace** - monorepo structure
 4. **Configure TypeScript** - strict mode, build pipeline
 5. **Generate design tokens** - Terrazzo configuration
-6. **Create first component** - `wc-button` as proof of concept
+6. **Create first component** - `hx-button` as proof of concept
 
 ### Long-Term (Weeks 2-12)
 

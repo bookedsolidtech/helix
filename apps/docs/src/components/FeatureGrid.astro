@@ -23,24 +23,24 @@ interface Feature {
 
 const features: Feature[] = [
   {
-    icon: 'fa-solid fa-heart-pulse',
-    iconClass: 'icon-healthcare',
-    title: 'Healthcare First',
+    icon: 'fa-solid fa-universal-access',
+    iconClass: 'icon-accessibility',
+    title: 'Accessibility First',
     description:
       'WCAG 2.1 AA minimum with AAA targets for critical components. High contrast ratios, reduced motion support, and comprehensive screen reader testing built into every component from day one.',
-    tags: ['WCAG AAA', 'Accessibility', 'HHS 2026 Compliance'],
+    tags: ['WCAG AAA', 'Accessibility', 'Compliance'],
     href: '/healthcare-accessibility/',
-    cta: 'View Compliance Strategy',
+    cta: 'View Accessibility Strategy',
   },
   {
-    icon: 'fa-brands fa-drupal',
+    icon: 'fa-solid fa-scale-balanced',
     iconClass: 'icon-drupal',
-    title: 'Drupal Optimized System Architecture',
+    title: 'Integration Architecture',
     description:
-      'Zero-coupling architecture that provides APIs designed for Drupal field structures. Complete TWIG templates, Drupal Behaviors integration, and minimal team effort for adoption.',
-    tags: ['Framework Agnostic', 'TWIG Templates', 'Zero Coupling'],
-    href: '/system-architecture/',
-    cta: 'View Architecture Decision',
+      'Architecture Decision Records born from 10 years of web component work. Light DOM/Shadow DOM CSS strategy, adopted stylesheets, slot-driven composition, and CMS-first delivery patterns.',
+    tags: ['ADRs', 'Light DOM', 'CSS Strategy'],
+    href: '/helix-adrs/',
+    cta: 'View Architecture Decisions',
   },
   {
     icon: 'fa-solid fa-building',
@@ -71,7 +71,7 @@ const features: Feature[] = [
       <span class="section-label">Why HELIX</span>
       <h2 class="section-title">Built Different, By Design</h2>
       <p class="section-description">
-        Every architectural decision optimized for healthcare compliance,
+        Every architectural decision optimized for accessibility compliance,
         Drupal integration, and enterprise-scale delivery.
       </p>
     </div>

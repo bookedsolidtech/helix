@@ -22,43 +22,71 @@ npm install @helix/library
   import '@helix/library';
 </script>
 
-<wc-button variant="primary">Get Started</wc-button>
+<hx-button variant="primary">Get Started</hx-button>
 ```
 
 ## Available Components
 
 | Component | Tag | Description |
 |-----------|-----|-------------|
-| [Button](/component-library/wc-button/) | `<wc-button>` | Interactive buttons with variants, sizes, and states |
-| [Card](/component-library/wc-card/) | `<wc-card>` | Content containers with image, heading, body, footer, and action slots |
-| [Text Input](/component-library/wc-text-input/) | `<wc-text-input>` | Form-associated text input with label, validation, and help text |
+| [Alert](/component-library/hx-alert/) | `<hx-alert>` | Feedback messages for status, warnings, and errors with ARIA semantics |
+| [Badge](/component-library/hx-badge/) | `<hx-badge>` | Compact status indicators and labels with variant styling |
+| [Button](/component-library/hx-button/) | `<hx-button>` | Interactive buttons with variants, sizes, and states |
+| [Card](/component-library/hx-card/) | `<hx-card>` | Content containers with image, heading, body, footer, and action slots |
+| [Checkbox](/component-library/hx-checkbox/) | `<hx-checkbox>` | Checkbox with label, indeterminate state, validation, and form association |
+| [Container](/component-library/hx-container/) | `<hx-container>` | Responsive layout container with max-width and padding controls |
+| [Form](/component-library/hx-form/) | `<hx-form>` | Form wrapper with validation, submission handling, and field coordination |
+| [Prose](/component-library/hx-prose/) | `<hx-prose>` | Rich text container with typographic styling for long-form content |
+| [Radio](/component-library/hx-radio/) | `<hx-radio>` | Single radio input with label and form association |
+| [Radio Group](/component-library/hx-radio-group/) | `<hx-radio-group>` | Grouped radio inputs with fieldset semantics and shared validation |
+| [Select](/component-library/hx-select/) | `<hx-select>` | Native select wrapper with label, validation, and help text |
+| [Switch](/component-library/hx-switch/) | `<hx-switch>` | Toggle switch for binary on/off settings with label support |
+| [Text Input](/component-library/hx-text-input/) | `<hx-text-input>` | Form-associated text input with label, validation, and help text |
+| [Textarea](/component-library/hx-textarea/) | `<hx-textarea>` | Multi-line text input with label, validation, and character count |
 
 ## Live Demo
 
-All three components composed together:
+Components composed together:
 
-<ComponentDemo title="Composed Example" description="Card containing a form with text input and button">
-  <wc-card variant="default" elevation="raised">
-    <span slot="heading">Contact Us</span>
-    <div>
-      <wc-text-input
-        label="Email address"
-        type="email"
-        placeholder="you@example.com"
-        help-text="We'll never share your email."
-      ></wc-text-input>
-      <div style="margin-top: 1rem; display: flex; gap: 0.5rem;">
-        <wc-button variant="primary">Subscribe</wc-button>
-        <wc-button variant="ghost">Cancel</wc-button>
+<ComponentDemo title="Composed Example" description="Card with form fields, alerts, and interactive controls">
+  <div style="display: grid; gap: 1rem; max-width: 480px;">
+    <hx-alert variant="info">Fill out the form below to get started.</hx-alert>
+    <hx-card variant="default" elevation="raised">
+      <span slot="heading">Patient Registration</span>
+      <div style="display: grid; gap: 0.75rem;">
+        <hx-text-input
+          label="Full name"
+          placeholder="Jane Doe"
+          required
+        ></hx-text-input>
+        <hx-text-input
+          label="Email address"
+          type="email"
+          placeholder="you@example.com"
+          help-text="We'll never share your email."
+        ></hx-text-input>
+        <hx-select label="Department" placeholder="Choose a department">
+          <option value="cardiology">Cardiology</option>
+          <option value="neurology">Neurology</option>
+          <option value="oncology">Oncology</option>
+          <option value="pediatrics">Pediatrics</option>
+        </hx-select>
+        <hx-checkbox label="I agree to the privacy policy" required></hx-checkbox>
+        <div style="display: flex; gap: 0.5rem;">
+          <hx-button variant="primary">Register</hx-button>
+          <hx-button variant="ghost">Cancel</hx-button>
+        </div>
       </div>
-    </div>
-  </wc-card>
+    </hx-card>
+    <hx-alert variant="success" closable>Registration submitted successfully.</hx-alert>
+  </div>
 </ComponentDemo>
 
 ## Key Features
 
 - **Framework-agnostic** — works with React, Vue, Angular, Svelte, or vanilla HTML
 - **Design token-driven** — themed via CSS custom properties
-- **Form-associated** — `<wc-text-input>` and `<wc-button>` participate in native `<form>` elements
+- **Form-associated** — form components participate in native `<form>` elements via ElementInternals
 - **Accessible** — ARIA attributes, keyboard navigation, and focus management built in
 - **Lightweight** — Lit 3.x with zero external dependencies beyond the framework
+- **14 production-ready components** — from layout primitives to full form controls

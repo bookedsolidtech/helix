@@ -13,7 +13,7 @@
  * class MyElement extends LitElement {
  *   private _globalStyles = new AdoptedStylesheetsController(
  *     this,
- *     ':root { --wc-color-primary: #007878; }'
+ *     ':root { --hx-color-primary: #2563EB; }'
  *   );
  * }
  * ```
@@ -59,17 +59,15 @@ export class AdoptedStylesheetsController implements ReactiveController {
 
     // Only add if not already adopted on this root.
     if (!this._root.adoptedStyleSheets.includes(sheet)) {
-      this._root.adoptedStyleSheets = [
-        ...this._root.adoptedStyleSheets,
-        sheet,
-      ];
+      this._root.adoptedStyleSheets = [...this._root.adoptedStyleSheets, sheet];
     }
   }
 
   hostDisconnected(): void {
     if (this._sheet) {
-      this._root.adoptedStyleSheets =
-        this._root.adoptedStyleSheets.filter((s) => s !== this._sheet);
+      this._root.adoptedStyleSheets = this._root.adoptedStyleSheets.filter(
+        (s) => s !== this._sheet,
+      );
     }
   }
 }

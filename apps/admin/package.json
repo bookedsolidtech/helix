@@ -19,7 +19,8 @@
     "clsx": "^2.1.1",
     "tailwind-merge": "^3.3.0",
     "class-variance-authority": "^0.7.1",
-    "lucide-react": "^0.511.0"
+    "lucide-react": "^0.511.0",
+    "shiki": "^3.22.0"
   },
   "devDependencies": {
     "@types/node": "^22.15.0",

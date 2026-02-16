@@ -6,6 +6,7 @@
  * CDN links that were previously copy-pasted across all 8 pages.
  *
  * Imports the 4 shared CSS files so Astro bundles them automatically.
+ * Includes the shared SiteNavbar for consistent navigation across all pages.
  */
 interface Props {
   title: string;
@@ -18,6 +19,7 @@ import '../styles/showcase/tokens.css';
 import '../styles/showcase/base.css';
 import '../styles/showcase/animations.css';
 import '../styles/showcase/utilities.css';
+import SiteNavbar from '../components/SiteNavbar.astro';
 ---
 
 <!doctype html>
@@ -43,6 +45,7 @@ import '../styles/showcase/utilities.css';
     <slot name="head" />
   </head>
   <body>
+    <SiteNavbar />
     <slot />
     <slot name="scripts" />
   </body>

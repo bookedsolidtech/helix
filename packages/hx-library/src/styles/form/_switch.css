@@ -76,18 +76,20 @@
 /* ─── Checked State ─── */
 
 .form-type-switch input[type='checkbox']:checked {
-  background-color: var(--wc-switch-track-checked-bg, var(--wc-color-primary-500, #007878));
+  background-color: var(--wc-switch-track-checked-bg, var(--wc-color-primary-500, #2563eb));
   background-image: none;
 }
 
 .form-type-switch input[type='checkbox']:checked::before {
-  transform: translateY(-50%) translateX(var(--wc-switch-thumb-size-md, var(--wc-size-4-5, 1.125rem)));
+  transform: translateY(-50%)
+    translateX(var(--wc-switch-thumb-size-md, var(--wc-size-4-5, 1.125rem)));
 }
 
 /* ─── Focus State ─── */
 
 .form-type-switch input[type='checkbox']:focus-visible {
-  outline: var(--wc-focus-ring-width, 2px) solid var(--wc-switch-focus-ring-color, var(--wc-focus-ring-color, #007878));
+  outline: var(--wc-focus-ring-width, 2px) solid
+    var(--wc-switch-focus-ring-color, var(--wc-focus-ring-color, #2563eb));
   outline-offset: var(--wc-focus-ring-offset, 2px);
 }
 
@@ -125,7 +127,8 @@
 }
 
 .form-type-switch--sm input[type='checkbox']:checked::before {
-  transform: translateY(-50%) translateX(var(--wc-switch-thumb-size-sm, var(--wc-size-3-5, 0.875rem)));
+  transform: translateY(-50%)
+    translateX(var(--wc-switch-thumb-size-sm, var(--wc-size-3-5, 0.875rem)));
 }
 
 /* Large */
@@ -140,5 +143,6 @@
 }
 
 .form-type-switch--lg input[type='checkbox']:checked::before {
-  transform: translateY(-50%) translateX(var(--wc-switch-thumb-size-lg, var(--wc-size-5-5, 1.375rem)));
+  transform: translateY(-50%)
+    translateX(var(--wc-switch-thumb-size-lg, var(--wc-size-5-5, 1.375rem)));
 }

@@ -40,7 +40,7 @@ export default defineConfig({
         SkipLink: './src/components/SkipLink.astro',
       },
       title: 'HELiX',
-      description: 'Healthcare Elements Library for Interactive eXperiences - Enterprise Web Components for Drupal CMS',
+      description: 'HTML Element Library for Interactive eXperiences - Enterprise Web Components for Drupal CMS',
       social: [
         {
           icon: 'github',
@@ -185,9 +185,20 @@ export default defineConfig({
           badge: { text: 'Live', variant: 'success' },
           items: [
             { label: 'Overview', slug: 'component-library/overview' },
+            { label: 'hx-alert', slug: 'component-library/hx-alert' },
+            { label: 'hx-badge', slug: 'component-library/hx-badge' },
             { label: 'hx-button', slug: 'component-library/hx-button' },
             { label: 'hx-card', slug: 'component-library/hx-card' },
+            { label: 'hx-checkbox', slug: 'component-library/hx-checkbox' },
+            { label: 'hx-container', slug: 'component-library/hx-container' },
+            { label: 'hx-form', slug: 'component-library/hx-form' },
+            { label: 'hx-prose', slug: 'component-library/hx-prose' },
+            { label: 'hx-radio', slug: 'component-library/hx-radio' },
+            { label: 'hx-radio-group', slug: 'component-library/hx-radio-group' },
+            { label: 'hx-select', slug: 'component-library/hx-select' },
+            { label: 'hx-switch', slug: 'component-library/hx-switch' },
             { label: 'hx-text-input', slug: 'component-library/hx-text-input' },
+            { label: 'hx-textarea', slug: 'component-library/hx-textarea' },
           ],
         },
         {

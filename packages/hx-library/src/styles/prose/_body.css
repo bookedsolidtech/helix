@@ -27,7 +27,7 @@ blockquote {
   margin-left: 0;
   margin-right: 0;
   padding: var(--wc-space-4, 1rem) var(--wc-space-6, 1.5rem);
-  border-left: var(--wc-border-width-thick, 3px) solid var(--wc-color-primary-500, #007878);
+  border-left: var(--wc-border-width-thick, 3px) solid var(--wc-color-primary-500, #2563eb);
   background-color: var(--wc-color-surface-raised, var(--wc-color-neutral-50, #f8f9fa));
   border-radius: 0 var(--wc-border-radius-sm, 0.25rem) var(--wc-border-radius-sm, 0.25rem) 0;
   font-style: italic;
@@ -52,14 +52,15 @@ blockquote cite {
 }
 
 blockquote cite::before {
-  content: "\2014\00A0";
+  content: '\2014\00A0';
 }
 
 /* ─── Horizontal Rule ─── */
 
 hr {
   border: 0;
-  border-top: var(--wc-divider-width, var(--wc-border-width-thin, 1px)) solid var(--wc-divider-color, var(--wc-color-border-default, var(--wc-color-neutral-200, #dee2e6)));
+  border-top: var(--wc-divider-width, var(--wc-border-width-thin, 1px)) solid
+    var(--wc-divider-color, var(--wc-color-border-default, var(--wc-color-neutral-200, #dee2e6)));
   margin-top: var(--wc-space-8, 2rem);
   margin-bottom: var(--wc-space-8, 2rem);
 }
@@ -126,12 +127,16 @@ sub {
 /* ─── Links ─── */
 
 a {
-  color: var(--wc-prose-link-color, var(--wc-color-text-link, var(--wc-color-primary-600, #006868)));
+  color: var(
+    --wc-prose-link-color,
+    var(--wc-color-text-link, var(--wc-color-primary-600, #006868))
+  );
   text-decoration: underline;
   text-decoration-color: var(--wc-color-primary-200, #80c2c2);
   text-underline-offset: 0.15em;
-  transition: color var(--wc-transition-fast, 150ms ease),
-              text-decoration-color var(--wc-transition-fast, 150ms ease);
+  transition:
+    color var(--wc-transition-fast, 150ms ease),
+    text-decoration-color var(--wc-transition-fast, 150ms ease);
 }
 
 a:hover {
@@ -148,7 +153,8 @@ a:active {
 }
 
 a:focus-visible {
-  outline: var(--wc-focus-ring-width, 2px) solid var(--wc-focus-ring-color, var(--wc-color-primary-500, #007878));
+  outline: var(--wc-focus-ring-width, 2px) solid
+    var(--wc-focus-ring-color, var(--wc-color-primary-500, #2563eb));
   outline-offset: var(--wc-focus-ring-offset, 2px);
   border-radius: var(--wc-border-radius-sm, 0.25rem);
 }

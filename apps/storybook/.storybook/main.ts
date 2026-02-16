@@ -1,23 +1,24 @@
-import { fileURLToPath } from "node:url";
-import { dirname } from "node:path";
+import { fileURLToPath } from 'node:url';
+import { dirname } from 'node:path';
 import type { StorybookConfig } from '@storybook/web-components-vite';
 
 const config: StorybookConfig = {
   stories: [
     '../../../packages/hx-library/src/**/*.stories.@(ts|tsx)',
     '../stories/**/*.stories.@(ts|tsx)',
+    '../stories/**/*.mdx',
   ],
 
   addons: [
-    getAbsolutePath("@storybook/addon-a11y"),
-    getAbsolutePath("@storybook/addon-docs"),
-    getAbsolutePath("@storybook/addon-vitest"),
-    getAbsolutePath("@storybook/addon-links"),
-    getAbsolutePath("@storybook/addon-themes"),
+    getAbsolutePath('@storybook/addon-a11y'),
+    getAbsolutePath('@storybook/addon-docs'),
+    getAbsolutePath('@storybook/addon-vitest'),
+    getAbsolutePath('@storybook/addon-links'),
+    getAbsolutePath('@storybook/addon-themes'),
   ],
 
   framework: {
-    name: getAbsolutePath("@storybook/web-components-vite"),
+    name: getAbsolutePath('@storybook/web-components-vite'),
     options: {},
   },
 
@@ -28,7 +29,7 @@ const config: StorybookConfig = {
   viteFinal: async (config) => {
     // Ensure Lit and the component library resolve correctly in the monorepo
     return config;
-  }
+  },
 };
 
 export default config;

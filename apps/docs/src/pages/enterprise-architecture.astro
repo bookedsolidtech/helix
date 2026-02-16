@@ -23,7 +23,7 @@ import ShowcaseLayout from '../layouts/ShowcaseLayout.astro';
     :root { --gradient-hero: linear-gradient(135deg, #0a0a1a 0%, #0f1030 40%, #0a0a2e 100%); }
 
     /* Top Navigation */
-    .ea-topbar { position:fixed; top:0; left:0; right:0; z-index:100; display:flex; align-items:center; justify-content:space-between; padding:var(--space-3) var(--space-8); background:rgba(10,10,20,0.85); backdrop-filter:blur(16px) saturate(180%); -webkit-backdrop-filter:blur(16px) saturate(180%); border-bottom:1px solid rgba(255,255,255,0.06); }
+    .ea-topbar { position:fixed; top:3.5rem; left:0; right:0; z-index:90; display:flex; align-items:center; justify-content:space-between; padding:var(--space-3) var(--space-8); background:rgba(10,10,20,0.85); backdrop-filter:blur(16px) saturate(180%); -webkit-backdrop-filter:blur(16px) saturate(180%); border-bottom:1px solid rgba(255,255,255,0.06); }
     .ea-topbar-left { display:flex; align-items:center; gap:var(--space-4); }
     .ea-back-link { display:inline-flex; align-items:center; gap:var(--space-2); font-size:0.875rem; font-weight:600; color:var(--text-secondary); transition:all 0.2s ease; padding:var(--space-2) var(--space-3); border-radius:var(--radius-md); }
     .ea-back-link:hover { color:var(--text-primary); background:var(--glass-bg-strong); }
@@ -33,7 +33,7 @@ import ShowcaseLayout from '../layouts/ShowcaseLayout.astro';
     .ea-topbar-link:hover { color:var(--text-primary); background:var(--glass-bg-strong); }
 
     /* Hero */
-    .ea-hero { position:relative; min-height:100vh; display:flex; align-items:center; justify-content:center; text-align:center; padding:var(--space-24) var(--space-8); background:var(--gradient-hero); overflow:hidden; }
+    .ea-hero { position:relative; min-height:100vh; display:flex; align-items:center; justify-content:center; text-align:center; padding:calc(var(--space-24) + 3.5rem) var(--space-8) var(--space-24); background:var(--gradient-hero); overflow:hidden; }
     .ea-hero-grid { position:absolute; inset:0; background-image:linear-gradient(rgba(255,255,255,0.02) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.02) 1px,transparent 1px); background-size:60px 60px; }
     .ea-hero-orb { position:absolute; border-radius:50%; pointer-events:none; }
     .ea-hero-orb-1 { width:500px; height:500px; background:radial-gradient(circle,rgba(6,182,212,0.2),transparent 70%); top:-10%; right:-5%; animation:float-slow 20s ease-in-out infinite, orb-pulse 8s ease-in-out infinite; }
@@ -304,7 +304,7 @@ import ShowcaseLayout from '../layouts/ShowcaseLayout.astro';
             <pre><span style="color:#c792ea">type</span> <span style="color:#ffcb6b">ButtonVariant</span> = <span style="color:#c3e88d">'primary'</span> | <span style="color:#c3e88d">'secondary'</span> | <span style="color:#c3e88d">'danger'</span>;
 <span style="color:#c792ea">type</span> <span style="color:#ffcb6b">ButtonSize</span> = <span style="color:#c3e88d">'sm'</span> | <span style="color:#c3e88d">'md'</span> | <span style="color:#c3e88d">'lg'</span>;
 
-<span style="color:#c792ea">class</span> <span style="color:#ffcb6b">WcButton</span> <span style="color:#c792ea">extends</span> <span style="color:#ffcb6b">LitElement</span> &#123;
+<span style="color:#c792ea">class</span> <span style="color:#ffcb6b">HxButton</span> <span style="color:#c792ea">extends</span> <span style="color:#ffcb6b">LitElement</span> &#123;
   <span style="color:#546e7a">/** Button visual style */</span>
   <span style="color:#82aaff">@property</span>(&#123; <span style="color:#f78c6c">reflect</span>: <span style="color:#ff5370">true</span> &#125;)
   <span style="color:#f78c6c">variant</span>: <span style="color:#ffcb6b">ButtonVariant</span> = <span style="color:#c3e88d">'primary'</span>;
@@ -415,10 +415,10 @@ import ShowcaseLayout from '../layouts/ShowcaseLayout.astro';
                 These are the atomic values that never reference other tokens.
               </div>
               <div class="ea-tier-examples">
-                <span class="ea-tier-example">--wc-color-blue-500</span>
-                <span class="ea-tier-example">--wc-space-4</span>
-                <span class="ea-tier-example">--wc-font-sans</span>
-                <span class="ea-tier-example">--wc-shadow-md</span>
+                <span class="ea-tier-example">--hx-color-blue-500</span>
+                <span class="ea-tier-example">--hx-space-4</span>
+                <span class="ea-tier-example">--hx-font-sans</span>
+                <span class="ea-tier-example">--hx-shadow-md</span>
               </div>
             </div>
           </div>
@@ -437,10 +437,10 @@ import ShowcaseLayout from '../layouts/ShowcaseLayout.astro';
                 blue-500 for Brand A but green-600 for Brand B. Theme switching happens here.
               </div>
               <div class="ea-tier-examples">
-                <span class="ea-tier-example">--wc-brand-primary</span>
-                <span class="ea-tier-example">--wc-brand-surface</span>
-                <span class="ea-tier-example">--wc-brand-text</span>
-                <span class="ea-tier-example">--wc-brand-border</span>
+                <span class="ea-tier-example">--hx-brand-primary</span>
+                <span class="ea-tier-example">--hx-brand-surface</span>
+                <span class="ea-tier-example">--hx-brand-text</span>
+                <span class="ea-tier-example">--hx-brand-border</span>
               </div>
             </div>
           </div>
@@ -459,10 +459,10 @@ import ShowcaseLayout from '../layouts/ShowcaseLayout.astro';
                 that map to brand tokens by default but can be overridden per-instance.
               </div>
               <div class="ea-tier-examples">
-                <span class="ea-tier-example">--wc-button-bg</span>
-                <span class="ea-tier-example">--wc-card-padding</span>
-                <span class="ea-tier-example">--wc-input-border</span>
-                <span class="ea-tier-example">--wc-modal-overlay</span>
+                <span class="ea-tier-example">--hx-button-bg</span>
+                <span class="ea-tier-example">--hx-card-padding</span>
+                <span class="ea-tier-example">--hx-input-border</span>
+                <span class="ea-tier-example">--hx-modal-overlay</span>
               </div>
             </div>
           </div>

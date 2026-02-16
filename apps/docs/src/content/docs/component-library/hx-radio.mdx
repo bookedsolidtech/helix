@@ -1,19 +1,41 @@
 ---
-title: "wc-radio"
-description: An individual radio button, designed to be used inside a `<wc-radio-group>`.
+title: "hx-radio"
+description: An individual radio button, designed to be used inside a `<hx-radio-group>`.
 ---
 
 import ComponentLoader from '../../../components/ComponentLoader.astro';
+import ComponentDemo from '../../../components/ComponentDemo.astro';
 import ComponentDoc from '../../../components/ComponentDoc.astro';
 
 <ComponentLoader />
 
-<ComponentDoc tagName="wc-radio" section="summary" />
+<ComponentDoc tagName="hx-radio" section="summary" />
 
-## Overview
+## Inside a Radio Group
 
-An individual radio button, designed to be used inside a `<wc-radio-group>`.
+Radio buttons are designed to be used within an `<hx-radio-group>` for proper keyboard navigation and form association.
+
+<ComponentDemo title="Inside a Radio Group">
+  <hx-radio-group label="Select a department" name="dept-demo" value="eng">
+    <hx-radio value="eng" label="Engineering"></hx-radio>
+    <hx-radio value="design" label="Design"></hx-radio>
+    <hx-radio value="product" label="Product"></hx-radio>
+  </hx-radio-group>
+</ComponentDemo>
+
+## States
+
+Individual radio states: default, checked, and disabled.
+
+<ComponentDemo title="States">
+  <div style="display: grid; gap: 0.75rem; max-width: 300px;">
+    <hx-radio value="default" label="Default (unchecked)"></hx-radio>
+    <hx-radio value="checked" label="Checked" checked></hx-radio>
+    <hx-radio value="disabled" label="Disabled" disabled></hx-radio>
+    <hx-radio value="disabled-checked" label="Disabled checked" disabled checked></hx-radio>
+  </div>
+</ComponentDemo>
 
 ## API Reference
 
-<ComponentDoc tagName="wc-radio" section="api" />
+<ComponentDoc tagName="hx-radio" section="api" />

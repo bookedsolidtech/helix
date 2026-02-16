@@ -44,17 +44,25 @@ export const helixSelectStyles = css`
     position: relative;
     display: flex;
     align-items: center;
-    border: var(--hx-border-width-thin, 1px) solid var(--hx-select-border-color, var(--hx-color-neutral-300, #ced4da));
+    border: var(--hx-border-width-thin, 1px) solid
+      var(--hx-select-border-color, var(--hx-color-neutral-300, #ced4da));
     border-radius: var(--hx-select-border-radius, var(--hx-border-radius-md, 0.375rem));
     background-color: var(--hx-select-bg, var(--hx-color-neutral-0, #ffffff));
-    transition: border-color var(--hx-transition-fast, 150ms ease),
-                box-shadow var(--hx-transition-fast, 150ms ease);
+    transition:
+      border-color var(--hx-transition-fast, 150ms ease),
+      box-shadow var(--hx-transition-fast, 150ms ease);
     overflow: hidden;
   }
 
   .field__select-wrapper:focus-within {
-    border-color: var(--hx-select-focus-ring-color, var(--hx-focus-ring-color, #007878));
-    box-shadow: 0 0 0 var(--hx-focus-ring-width, 2px) color-mix(in srgb, var(--hx-select-focus-ring-color, var(--hx-focus-ring-color, #007878)) calc(var(--hx-focus-ring-opacity, 0.25) * 100%), transparent);
+    border-color: var(--hx-select-focus-ring-color, var(--hx-focus-ring-color, #2563eb));
+    box-shadow: 0 0 0 var(--hx-focus-ring-width, 2px)
+      color-mix(
+        in srgb,
+        var(--hx-select-focus-ring-color, var(--hx-focus-ring-color, #2563eb))
+          calc(var(--hx-focus-ring-opacity, 0.25) * 100%),
+        transparent
+      );
   }
 
   /* ─── Error State ─── */
@@ -65,7 +73,13 @@ export const helixSelectStyles = css`
 
   .field--error .field__select-wrapper:focus-within {
     border-color: var(--hx-select-error-color, var(--hx-color-error-500, #dc3545));
-    box-shadow: 0 0 0 var(--hx-focus-ring-width, 2px) color-mix(in srgb, var(--hx-select-error-color, var(--hx-color-error-500, #dc3545)) calc(var(--hx-focus-ring-opacity, 0.25) * 100%), transparent);
+    box-shadow: 0 0 0 var(--hx-focus-ring-width, 2px)
+      color-mix(
+        in srgb,
+        var(--hx-select-error-color, var(--hx-color-error-500, #dc3545))
+          calc(var(--hx-focus-ring-opacity, 0.25) * 100%),
+        transparent
+      );
   }
 
   /* ─── Native Select ─── */
@@ -75,7 +89,8 @@ export const helixSelectStyles = css`
     border: none;
     outline: none;
     background: transparent;
-    padding: var(--hx-space-2, 0.5rem) var(--hx-space-8, 2rem) var(--hx-space-2, 0.5rem) var(--hx-space-3, 0.75rem);
+    padding: var(--hx-space-2, 0.5rem) var(--hx-space-8, 2rem) var(--hx-space-2, 0.5rem)
+      var(--hx-space-3, 0.75rem);
     font-family: inherit;
     font-size: var(--hx-font-size-md, 1rem);
     color: var(--hx-select-color, var(--hx-color-neutral-800, #212529));

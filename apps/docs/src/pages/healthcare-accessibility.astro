@@ -1,10 +1,10 @@
 ---
 /**
- * Healthcare Accessibility - Full visual experience page.
+ * Accessibility Strategy - Full visual experience page.
  *
  * This is a standalone Astro page (not Starlight content) that provides
  * an immersive visual walkthrough of the HELIX accessibility compliance
- * strategy for healthcare web components.
+ * strategy for enterprise web components.
  *
  * Sections:
  * 1. Hero - "Accessibility Is Not Optional"
@@ -77,8 +77,8 @@ const codeGoodContrast = `<span class="tag">:host</span> {
 ---
 
 <ShowcaseLayout
-  title="Healthcare Accessibility Strategy"
-  description="WCAG 2.1 AA compliance strategy for healthcare web components. HHS May 2026 mandate readiness, 4-level testing, and component accessibility guarantees."
+  title="Accessibility Strategy"
+  description="WCAG 2.1 AAA accessibility-first compliance strategy for enterprise web components. 4-level testing, component accessibility guarantees, and WCAG AAA targets."
 >
   <style is:inline>
     /* --- Page-specific token overrides --- */
@@ -110,10 +110,10 @@ const codeGoodContrast = `<span class="tag">:host</span> {
     /* --- Top Navigation Bar --- */
     .ha-topbar {
       position: fixed;
-      top: 0;
+      top: 3.5rem;
       left: 0;
       right: 0;
-      z-index: 100;
+      z-index: 90;
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -190,7 +190,7 @@ const codeGoodContrast = `<span class="tag">:host</span> {
       position: relative;
       overflow: hidden;
       isolation: isolate;
-      padding: var(--space-24) var(--space-8) var(--space-16);
+      padding: calc(var(--space-24) + 3.5rem) var(--space-8) var(--space-16);
     }
 
     .ha-hero::before {
@@ -730,7 +730,7 @@ const codeGoodContrast = `<span class="tag">:host</span> {
         Dashboard
       </a>
       <span class="ha-topbar-title" aria-hidden="true">|</span>
-      <span class="ha-topbar-title">Healthcare Accessibility</span>
+      <span class="ha-topbar-title">Accessibility Strategy</span>
     </div>
     <div class="ha-topbar-right">
       <a href="/pre-planning/components/" class="ha-topbar-link">
@@ -746,7 +746,7 @@ const codeGoodContrast = `<span class="tag">:host</span> {
 
   <main id="main-content">
     <!-- SECTION 1: HERO -->
-    <section class="ha-hero" aria-label="Healthcare Accessibility Strategy">
+    <section class="ha-hero" aria-label="Accessibility Strategy">
       <div class="ha-hero-grid" aria-hidden="true"></div>
       <div class="ha-hero-orb ha-hero-orb-1" aria-hidden="true"></div>
       <div class="ha-hero-orb ha-hero-orb-2" aria-hidden="true"></div>
@@ -755,23 +755,23 @@ const codeGoodContrast = `<span class="tag">:host</span> {
       <div class="ha-hero-content">
         <div class="ha-hero-badge">
           <span class="ha-hero-badge-dot" aria-hidden="true"></span>
-          HHS Mandate Active -- Compliance Required
+          Accessibility First -- WCAG AAA Target
         </div>
 
         <h1 class="ha-hero-title">Accessibility Is<br />Not Optional</h1>
 
-        <p class="ha-hero-subtitle">WCAG 2.1 AA is now legally required for healthcare. We exceed it.</p>
+        <p class="ha-hero-subtitle">WCAG 2.1 AA is the floor. We build for AAA.</p>
 
         <p class="ha-hero-description">
-          The HHS final rule mandates WCAG 2.1 Level AA compliance for all healthcare
-          organizations receiving federal funding. HELIX does not just meet the bar --
+          Accessibility compliance standards continue to tighten globally, with WCAG 2.1 Level AA
+          now the baseline expectation for enterprise organizations. HELIX does not just meet the bar --
           every component is built to <strong>exceed</strong> it, targeting WCAG 2.2 AAA
           for critical interactions. Compliance is the floor, not the ceiling.
         </p>
 
         <div class="ha-hero-deadline">
-          <span class="ha-hero-deadline-label">HHS Compliance Deadline</span>
-          <span class="ha-hero-deadline-date">MAY 2026</span>
+          <span class="ha-hero-deadline-label">Accessibility Standard</span>
+          <span class="ha-hero-deadline-date">WCAG AAA</span>
         </div>
       </div>
 

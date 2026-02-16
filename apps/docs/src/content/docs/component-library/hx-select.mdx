@@ -1,24 +1,84 @@
 ---
-title: "wc-select"
+title: "hx-select"
 description: "A select component that wraps a native select element with the library's form field pattern (label, error, help text). Options are provided via slotted option elements in the light DOM. The component observes slotted options via slotchange and clones them into the shadow DOM select for rendering."
 ---
 
 import ComponentLoader from '../../../components/ComponentLoader.astro';
+import ComponentDemo from '../../../components/ComponentDemo.astro';
 import ComponentDoc from '../../../components/ComponentDoc.astro';
 
 <ComponentLoader />
 
-<ComponentDoc tagName="wc-select" section="summary" />
+<ComponentDoc tagName="hx-select" section="summary" />
 
-## Overview
+## Basic
 
-A select component that wraps a native `<select>` element with the
-library's form field pattern (label, error, help text).
+Select with label and placeholder.
 
-Options are provided via slotted `<option>` elements in the light DOM.
-The component observes slotted options via `slotchange` and clones them
-into the shadow DOM `<select>` for rendering.
+<ComponentDemo title="Basic">
+  <div style="max-width: 400px;">
+    <hx-select label="Department" placeholder="Choose a department">
+      <option value="cardiology">Cardiology</option>
+      <option value="neurology">Neurology</option>
+      <option value="oncology">Oncology</option>
+      <option value="pediatrics">Pediatrics</option>
+    </hx-select>
+  </div>
+</ComponentDemo>
+
+## States
+
+Required, disabled, and error states.
+
+<ComponentDemo title="States">
+  <div style="display: grid; gap: 1rem; max-width: 400px;">
+    <hx-select
+      label="Required field"
+      placeholder="Select an option"
+      required
+      help-text="This selection is required."
+    >
+      <option value="a">Option A</option>
+      <option value="b">Option B</option>
+    </hx-select>
+    <hx-select
+      label="With error"
+      error="Please select a valid option."
+    >
+      <option value="">Invalid</option>
+      <option value="valid">Valid option</option>
+    </hx-select>
+    <hx-select
+      label="Disabled"
+      disabled
+      value="locked"
+    >
+      <option value="locked">Locked selection</option>
+    </hx-select>
+  </div>
+</ComponentDemo>
+
+## Sizes
+
+Small, medium, and large select variants.
+
+<ComponentDemo title="Sizes">
+  <div style="display: grid; gap: 1rem; max-width: 400px;">
+    <hx-select label="Small" hx-size="sm" placeholder="Small select">
+      <option value="1">Option 1</option>
+      <option value="2">Option 2</option>
+    </hx-select>
+    <hx-select label="Medium" hx-size="md" placeholder="Medium select">
+      <option value="1">Option 1</option>
+      <option value="2">Option 2</option>
+    </hx-select>
+    <hx-select label="Large" hx-size="lg" placeholder="Large select">
+      <option value="1">Option 1</option>
+      <option value="2">Option 2</option>
+    </hx-select>
+  </div>
+</ComponentDemo>
 
 ## API Reference
 
-<ComponentDoc tagName="wc-select" section="api" />
+<ComponentDoc tagName="hx-select" section="api" />

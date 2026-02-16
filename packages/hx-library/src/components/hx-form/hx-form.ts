@@ -1,4 +1,4 @@
-import { LitElement, html, nothing } from 'lit';
+import { LitElement, html } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import { AdoptedStylesheetsController } from '../../controllers/adopted-stylesheets.js';
@@ -161,8 +161,8 @@ export class HelixForm extends LitElement {
   getFormElements(): HTMLElement[] {
     return Array.from(
       this.querySelectorAll<HTMLElement>(
-        'wc-text-input, wc-select, wc-checkbox, wc-textarea, wc-radio-group, wc-switch'
-      )
+        'hx-text-input, hx-select, hx-checkbox, hx-textarea, hx-radio-group, hx-switch',
+      ),
     );
   }
 
@@ -170,11 +170,13 @@ export class HelixForm extends LitElement {
    * Returns all native form elements (input, select, textarea, button)
    * found within this component's light DOM.
    */
-  getNativeFormElements(): Array<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement | HTMLButtonElement> {
+  getNativeFormElements(): Array<
+    HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement | HTMLButtonElement
+  > {
     return Array.from(
-      this.querySelectorAll<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement | HTMLButtonElement>(
-        'input, select, textarea, button'
-      )
+      this.querySelectorAll<
+        HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement | HTMLButtonElement
+      >('input, select, textarea, button'),
     );
   }
 
@@ -185,11 +187,11 @@ export class HelixForm extends LitElement {
    * both native form elements and wc-* components with `checkValidity`.
    */
   private _getAllValidatableElements(): HTMLElement[] {
-    const native = Array.from(
-      this.querySelectorAll<HTMLElement>('input, select, textarea')
-    );
+    const native = Array.from(this.querySelectorAll<HTMLElement>('input, select, textarea'));
     const wcElements = this.getFormElements().filter(
-      (el) => 'checkValidity' in el && typeof (el as Record<string, unknown>).checkValidity === 'function'
+      (el) =>
+        'checkValidity' in el &&
+        typeof (el as Record<string, unknown>).checkValidity === 'function',
     );
     return [...native, ...wcElements];
   }
@@ -210,14 +212,14 @@ export class HelixForm extends LitElement {
 
       /**
        * Dispatched when validation fails on submit.
-       * @event wc-invalid
+       * @event hx-invalid
        */
       this.dispatchEvent(
-        new CustomEvent('wc-invalid', {
+        new CustomEvent('hx-invalid', {
           bubbles: true,
           composed: true,
           detail: { errors },
-        })
+        }),
       );
       return;
     }
@@ -230,27 +232,27 @@ export class HelixForm extends LitElement {
 
     /**
      * Dispatched on valid client-side submit.
-     * @event wc-submit
+     * @event hx-submit
      */
     this.dispatchEvent(
-      new CustomEvent('wc-submit', {
+      new CustomEvent('hx-submit', {
         bubbles: true,
         composed: true,
         detail: { valid: true, values },
-      })
+      }),
     );
   };
 
   private _handleReset = (): void => {
     /**
      * Dispatched when the form is reset.
-     * @event wc-reset
+     * @event hx-reset
      */
     this.dispatchEvent(
-      new CustomEvent('wc-reset', {
+      new CustomEvent('hx-reset', {
         bubbles: true,
         composed: true,
-      })
+      }),
     );
   };
 

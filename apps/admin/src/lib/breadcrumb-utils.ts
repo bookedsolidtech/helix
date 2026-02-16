@@ -1,22 +1,23 @@
-import type { BreadcrumbItem } from "@/components/dashboard/Breadcrumb";
+import type { BreadcrumbItem } from '@/components/dashboard/Breadcrumb';
 
 /**
  * Route configuration for breadcrumb generation.
  * Maps route patterns to human-readable labels.
  */
 const ROUTE_LABELS: Record<string, string> = {
-  "/": "Home",
-  "/components": "Components",
-  "/tests": "Test Theater",
-  "/tokens": "Tokens",
-  "/tokens/colors": "Colors",
-  "/tokens/spacing": "Spacing",
-  "/tokens/typography": "Typography",
-  "/tokens/borders": "Borders",
-  "/tokens/shadows": "Shadows",
-  "/tokens/utilities": "Utilities",
-  "/pipeline": "Pipeline",
-  "/architecture": "Architecture",
+  '/': 'Home',
+  '/components': 'Components',
+  '/tests': 'Verification Suite',
+  '/tokens': 'Tokens',
+  '/tokens/colors': 'Colors',
+  '/tokens/spacing': 'Spacing',
+  '/tokens/typography': 'Typography',
+  '/tokens/borders': 'Borders',
+  '/tokens/shadows': 'Shadows',
+  '/tokens/utilities': 'Utilities',
+  '/pipeline': 'Pipeline',
+  '/roadmap': 'Issue Tracker',
+  '/architecture': 'Architecture',
 };
 
 /**
@@ -24,44 +25,47 @@ const ROUTE_LABELS: Record<string, string> = {
  * Used by consumers to determine which icon to render.
  */
 export type BreadcrumbIconType =
-  | "home"
-  | "components"
-  | "tests"
-  | "tokens"
-  | "pipeline"
-  | "architecture"
-  | "component-tag";
+  | 'home'
+  | 'components'
+  | 'tests'
+  | 'tokens'
+  | 'pipeline'
+  | 'roadmap'
+  | 'architecture'
+  | 'component-tag';
 
 /**
  * Maps route patterns to their corresponding icon types.
  */
 function getIconTypeForRoute(
   path: string,
-  isComponentTag: boolean = false
+  isComponentTag: boolean = false,
 ): BreadcrumbIconType | undefined {
   if (isComponentTag) {
-    return "component-tag";
+    return 'component-tag';
   }
 
   switch (path) {
-    case "/":
-      return "home";
-    case "/components":
-      return "components";
-    case "/tests":
-      return "tests";
-    case "/tokens":
-    case "/tokens/colors":
-    case "/tokens/spacing":
-    case "/tokens/typography":
-    case "/tokens/borders":
-    case "/tokens/shadows":
-    case "/tokens/utilities":
-      return "tokens";
-    case "/pipeline":
-      return "pipeline";
-    case "/architecture":
-      return "architecture";
+    case '/':
+      return 'home';
+    case '/components':
+      return 'components';
+    case '/tests':
+      return 'tests';
+    case '/tokens':
+    case '/tokens/colors':
+    case '/tokens/spacing':
+    case '/tokens/typography':
+    case '/tokens/borders':
+    case '/tokens/shadows':
+    case '/tokens/utilities':
+      return 'tokens';
+    case '/pipeline':
+      return 'pipeline';
+    case '/roadmap':
+      return 'pipeline';
+    case '/architecture':
+      return 'architecture';
     default:
       return undefined;
   }
@@ -79,20 +83,20 @@ function capitalize(str: string): string {
  * Handles kebab-case, camelCase, and component tags.
  *
  * @example
- * formatSegment('wc-button') => 'wc-button'
- * formatSegment('test-theater') => 'Test Theater'
+ * formatSegment('hx-button') => 'hx-button'
+ * formatSegment('my-page') => 'My Page'
  */
 function formatSegment(segment: string): string {
-  // If it starts with 'wc-', keep it as-is (component tag)
-  if (segment.startsWith("wc-")) {
+  // If it starts with 'hx-', keep it as-is (component tag)
+  if (segment.startsWith('hx-')) {
     return segment;
   }
 
   // Otherwise, split by hyphens and capitalize
   return segment
-    .split("-")
+    .split('-')
     .map((word) => capitalize(word))
-    .join(" ");
+    .join(' ');
 }
 
 /**
@@ -109,28 +113,25 @@ function formatSegment(segment: string): string {
  * // => [{ label: 'Home', href: '/' }, { label: 'Tokens', href: '/tokens' }, { label: 'Colors' }]
  *
  * // Dynamic route
- * getBreadcrumbItems('/components/wc-button', 'wc-button')
- * // => [{ label: 'Home', href: '/' }, { label: 'Components', href: '/components' }, { label: 'wc-button' }]
+ * getBreadcrumbItems('/components/hx-button', 'hx-button')
+ * // => [{ label: 'Home', href: '/' }, { label: 'Components', href: '/components' }, { label: 'hx-button' }]
  * ```
  */
-export function getBreadcrumbItems(
-  pathname: string,
-  componentTag?: string
-): BreadcrumbItem[] {
+export function getBreadcrumbItems(pathname: string, componentTag?: string): BreadcrumbItem[] {
   // Home page - no breadcrumb needed
-  if (pathname === "/") {
+  if (pathname === '/') {
     return [];
   }
 
   const items: BreadcrumbItem[] = [
-    { label: "Home", href: "/", iconType: getIconTypeForRoute("/") },
+    { label: 'Home', href: '/', iconType: getIconTypeForRoute('/') },
   ];
 
   // Split pathname into segments
-  const segments = pathname.split("/").filter(Boolean);
+  const segments = pathname.split('/').filter(Boolean);
 
   // Build breadcrumb items progressively
-  let currentPath = "";
+  let currentPath = '';
   segments.forEach((segment, index) => {
     currentPath += `/${segment}`;
     const isLast = index === segments.length - 1;
@@ -144,7 +145,7 @@ export function getBreadcrumbItems(
         href: isLast ? undefined : currentPath,
         iconType: getIconTypeForRoute(currentPath),
       });
-    } else if (segment === "[tag]" && componentTag) {
+    } else if (segment === '[tag]' && componentTag) {
       // Handle dynamic component tag route
       items.push({
         label: componentTag,
@@ -167,20 +168,20 @@ export function getBreadcrumbItems(
 /**
  * Generates breadcrumb items for a component detail page.
  *
- * @param componentTag - The component tag name (e.g., 'wc-button')
+ * @param componentTag - The component tag name (e.g., 'hx-button')
  * @returns Array of breadcrumb items
  *
  * @example
  * ```ts
- * getComponentBreadcrumbs('wc-button')
- * // => [{ label: 'Home', href: '/' }, { label: 'Components', href: '/components' }, { label: 'wc-button' }]
+ * getComponentBreadcrumbs('hx-button')
+ * // => [{ label: 'Home', href: '/' }, { label: 'Components', href: '/components' }, { label: 'hx-button' }]
  * ```
  */
 export function getComponentBreadcrumbs(componentTag: string): BreadcrumbItem[] {
   return [
-    { label: "Home", href: "/", iconType: getIconTypeForRoute("/") },
-    { label: "Components", href: "/components", iconType: getIconTypeForRoute("/components") },
-    { label: componentTag, iconType: getIconTypeForRoute("", true) },
+    { label: 'Home', href: '/', iconType: getIconTypeForRoute('/') },
+    { label: 'Components', href: '/components', iconType: getIconTypeForRoute('/components') },
+    { label: componentTag, iconType: getIconTypeForRoute('', true) },
   ];
 }
 
@@ -201,8 +202,8 @@ export function getTokenBreadcrumbs(category: string): BreadcrumbItem[] {
   const tokenPath = `/tokens/${category}`;
 
   return [
-    { label: "Home", href: "/", iconType: getIconTypeForRoute("/") },
-    { label: "Tokens", href: "/tokens", iconType: getIconTypeForRoute("/tokens") },
+    { label: 'Home', href: '/', iconType: getIconTypeForRoute('/') },
+    { label: 'Tokens', href: '/tokens', iconType: getIconTypeForRoute('/tokens') },
     { label, iconType: getIconTypeForRoute(tokenPath) },
   ];
 }

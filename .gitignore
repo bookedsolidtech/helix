@@ -9,6 +9,8 @@ dist/
 .next/
 .vercel/
 .netlify/
+storybook-static/
+*.tsbuildinfo
 
 # Environment
 .env

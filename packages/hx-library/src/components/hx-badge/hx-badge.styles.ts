@@ -10,7 +10,7 @@ export const helixBadgeStyles = css`
     align-items: center;
     justify-content: center;
     border-radius: var(--hx-badge-border-radius, var(--hx-border-radius-md, 0.375rem));
-    background-color: var(--hx-badge-bg, var(--hx-color-primary-500, #007878));
+    background-color: var(--hx-badge-bg, var(--hx-color-primary-500, #2563eb));
     color: var(--hx-badge-color, var(--hx-color-neutral-0, #ffffff));
     font-family: var(--hx-badge-font-family, var(--hx-font-family-sans, sans-serif));
     font-weight: var(--hx-badge-font-weight, var(--hx-font-weight-semibold, 600));
@@ -24,31 +24,34 @@ export const helixBadgeStyles = css`
 
   .badge--sm {
     font-size: var(--hx-badge-font-size, var(--hx-font-size-2xs, 0.625rem));
-    padding: var(--hx-badge-padding-y, var(--hx-space-0-5, 0.125rem)) var(--hx-badge-padding-x, var(--hx-space-1-5, 0.375rem));
+    padding: var(--hx-badge-padding-y, var(--hx-space-0-5, 0.125rem))
+      var(--hx-badge-padding-x, var(--hx-space-1-5, 0.375rem));
   }
 
   .badge--md {
     font-size: var(--hx-badge-font-size, var(--hx-font-size-xs, 0.75rem));
-    padding: var(--hx-badge-padding-y, var(--hx-space-1, 0.25rem)) var(--hx-badge-padding-x, var(--hx-space-2, 0.5rem));
+    padding: var(--hx-badge-padding-y, var(--hx-space-1, 0.25rem))
+      var(--hx-badge-padding-x, var(--hx-space-2, 0.5rem));
   }
 
   .badge--lg {
     font-size: var(--hx-badge-font-size, var(--hx-font-size-sm, 0.875rem));
-    padding: var(--hx-badge-padding-y, var(--hx-space-1, 0.25rem)) var(--hx-badge-padding-x, var(--hx-space-3, 0.75rem));
+    padding: var(--hx-badge-padding-y, var(--hx-space-1, 0.25rem))
+      var(--hx-badge-padding-x, var(--hx-space-3, 0.75rem));
   }
 
   /* ─── Style Variants ─── */
 
   .badge--primary {
-    --hx-badge-bg: var(--hx-color-primary-500, #007878);
+    --hx-badge-bg: var(--hx-color-primary-500, #2563eb);
     --hx-badge-color: var(--hx-color-neutral-0, #ffffff);
-    --hx-badge-pulse-color: var(--hx-color-primary-500, #007878);
+    --hx-badge-pulse-color: var(--hx-color-primary-500, #2563eb);
   }
 
   .badge--success {
-    --hx-badge-bg: var(--hx-color-success-500, #16a34a);
+    --hx-badge-bg: var(--hx-color-success-700, #15803d);
     --hx-badge-color: var(--hx-color-neutral-0, #ffffff);
-    --hx-badge-pulse-color: var(--hx-color-success-500, #16a34a);
+    --hx-badge-pulse-color: var(--hx-color-success-700, #15803d);
   }
 
   .badge--warning {

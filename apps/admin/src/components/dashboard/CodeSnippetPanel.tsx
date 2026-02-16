@@ -83,10 +83,7 @@ function tokenizeTag(tag: string, tokens: Token[]): void {
   // The remainder after tag name, before closing > or />
   const rest = tag.slice(openMatch[0].length);
 
-  // Parse attributes from the rest
-  const _attrPattern = /([\s]+)|([\w-]+(?:=)?)("[^"]*"|'[^']*'|\{[^}]*\})|(\/>|>)/g;
-  // More robust approach: just walk through the rest character by character
-  // matching attribute patterns
+  // Walk through attribute patterns
   const simpleAttrPattern = /(\s+)|([\w@:.-]+)(?:=(["'])([^]*?)\3|=(\{[^}]*\}))?|(\/>|>)/g;
 
   let attrMatch: RegExpExecArray | null;
@@ -181,11 +178,7 @@ function renderTokens(tokens: Token[]): React.ReactNode[] {
 // ── Code Block Component ─────────────────────────────────────────────
 
 function HighlightedCode({ code }: { code: string }) {
-  const _tokens = tokenize(code);
   const lines = code.split('\n');
-  const _lineCount = lines.length;
-
-  // Re-tokenize per line for line-number alignment
   return (
     <div className="flex text-[13px] leading-6">
       {/* Line numbers */}

@@ -1,13 +1,21 @@
 import { defineConfig } from 'vite';
 import { resolve } from 'path';
+import dts from 'vite-plugin-dts';
 
 export default defineConfig({
+  plugins: [
+    dts({
+      include: ['src/**/*.ts'],
+      exclude: ['**/*.test.ts', '**/*.stories.ts'],
+    }),
+  ],
   build: {
     lib: {
       entry: {
         index: resolve(__dirname, 'src/index.ts'),
         'components/hx-button/index': resolve(__dirname, 'src/components/hx-button/index.ts'),
         'components/hx-card/index': resolve(__dirname, 'src/components/hx-card/index.ts'),
+        'components/hx-container/index': resolve(__dirname, 'src/components/hx-container/index.ts'),
         'components/hx-text-input/index': resolve(
           __dirname,
           'src/components/hx-text-input/index.ts',
@@ -39,6 +47,6 @@ export default defineConfig({
       },
     },
     sourcemap: true,
-    minify: false,
+    minify: 'esbuild',
   },
 });

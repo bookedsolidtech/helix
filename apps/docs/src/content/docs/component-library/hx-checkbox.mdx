@@ -1,19 +1,59 @@
 ---
-title: "wc-checkbox"
+title: "hx-checkbox"
 description: A checkbox component with label, validation, and form association.
 ---
 
 import ComponentLoader from '../../../components/ComponentLoader.astro';
+import ComponentDemo from '../../../components/ComponentDemo.astro';
 import ComponentDoc from '../../../components/ComponentDoc.astro';
 
 <ComponentLoader />
 
-<ComponentDoc tagName="wc-checkbox" section="summary" />
+<ComponentDoc tagName="hx-checkbox" section="summary" />
 
-## Overview
+## Basic
 
-A checkbox component with label, validation, and form association.
+Simple checkbox with a label.
+
+<ComponentDemo title="Basic">
+  <div style="display: grid; gap: 0.75rem; max-width: 400px;">
+    <hx-checkbox label="Accept terms and conditions"></hx-checkbox>
+    <hx-checkbox label="Subscribe to newsletter" checked></hx-checkbox>
+  </div>
+</ComponentDemo>
+
+## States
+
+Checked, indeterminate, disabled, and error states.
+
+<ComponentDemo title="States">
+  <div style="display: grid; gap: 0.75rem; max-width: 400px;">
+    <hx-checkbox label="Unchecked"></hx-checkbox>
+    <hx-checkbox label="Checked" checked></hx-checkbox>
+    <hx-checkbox label="Indeterminate (select all)" indeterminate></hx-checkbox>
+    <hx-checkbox label="Disabled" disabled></hx-checkbox>
+    <hx-checkbox label="Disabled checked" disabled checked></hx-checkbox>
+  </div>
+</ComponentDemo>
+
+## Validation
+
+Required checkbox with error and help text.
+
+<ComponentDemo title="Validation">
+  <div style="display: grid; gap: 0.75rem; max-width: 400px;">
+    <hx-checkbox
+      label="I agree to the privacy policy"
+      required
+      help-text="You must accept to continue."
+    ></hx-checkbox>
+    <hx-checkbox
+      label="Accept terms"
+      error="This field is required."
+    ></hx-checkbox>
+  </div>
+</ComponentDemo>
 
 ## API Reference
 
-<ComponentDoc tagName="wc-checkbox" section="api" />
+<ComponentDoc tagName="hx-checkbox" section="api" />

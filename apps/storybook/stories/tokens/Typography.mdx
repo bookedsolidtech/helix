@@ -1,0 +1,896 @@
+{/* Typography.mdx — HELIX Design Token Typography Documentation */}
+
+import { Meta } from '@storybook/addon-docs/blocks';
+import { tokensByCategory } from '@helix/tokens';
+import { getTokensByPrefix, getTokenStats } from '@helix/tokens/utils';
+
+<Meta title="Design Tokens/Typography" parameters={{ controls: { disable: true }, actions: { disable: true } }} />
+
+export const fontTokens = tokensByCategory['font'] ?? [];
+export const lineHeightTokens = tokensByCategory['line-height'] ?? [];
+export const letterSpacingTokens = tokensByCategory['letter-spacing'] ?? [];
+export const fontSizeTokens = getTokensByPrefix(fontTokens, '--hx-font-size-');
+export const fontWeightTokens = getTokensByPrefix(fontTokens, '--hx-font-weight-');
+export const fontFamilyTokens = getTokensByPrefix(fontTokens, '--hx-font-family-');
+export const totalTypoTokens = fontTokens.length + lineHeightTokens.length + letterSpacingTokens.length;
+export const sampleText = 'The quick brown fox jumps over the lazy dog';
+export const multiLineText = 'Design tokens are the visual design atoms of the design system. They are named entities that store visual design attributes. We use them in place of hard-coded values in order to maintain a scalable and consistent visual system for UI development.';
+export const specimenChars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ abcdefghijklmnopqrstuvwxyz 0123456789';
+
+export function copyToClipboard(text) {
+  navigator.clipboard.writeText(text).catch(() => {});
+}
+
+<style>
+{`
+  /* ── Reset Storybook overrides ─────────────────────────── */
+  .hx-token-typography h2,
+  .hx-token-typography h3,
+  .hx-token-typography h4,
+  .hx-token-typography p,
+  .hx-token-typography span,
+  .hx-token-typography div,
+  .hx-token-typography button,
+  .hx-token-typography code {
+    all: unset;
+    box-sizing: border-box;
+  }
+
+  .hx-token-typography button {
+    cursor: pointer;
+  }
+
+  /* ── Page Layout ───────────────────────────────────────── */
+  .hx-token-typography {
+    max-width: 960px;
+    margin: 0 auto;
+    font-family: var(--hx-font-family-sans, 'Inter', sans-serif);
+    color: var(--hx-color-neutral-800, #1E293B);
+    line-height: var(--hx-line-height-normal, 1.5);
+  }
+
+  /* ── Mini Hero Banner ──────────────────────────────────── */
+  .hx-token-typography .hx-typo-hero {
+    display: block !important;
+    background: linear-gradient(135deg, var(--hx-color-primary-50, #EFF6FF) 0%, var(--hx-color-neutral-50, #F8FAFC) 100%) !important;
+    border-radius: var(--hx-border-radius-xl, 0.75rem) !important;
+    padding: 2.5rem 2rem !important;
+    margin-bottom: 2.5rem !important;
+    border: 1px solid var(--hx-color-neutral-200, #E2E8F0) !important;
+  }
+
+  .hx-token-typography .hx-typo-hero-title {
+    display: block !important;
+    font-family: var(--hx-font-family-sans, 'Inter', sans-serif) !important;
+    font-size: 2rem !important;
+    font-weight: 800 !important;
+    color: var(--hx-color-neutral-900, #0F172A) !important;
+    margin: 0 0 0.5rem 0 !important;
+    letter-spacing: -0.025em !important;
+    line-height: 1.2 !important;
+  }
+
+  .hx-token-typography .hx-typo-hero-desc {
+    display: block !important;
+    font-family: var(--hx-font-family-sans, 'Inter', sans-serif) !important;
+    font-size: 1rem !important;
+    color: var(--hx-color-neutral-500, #64748B) !important;
+    margin: 0 0 1rem 0 !important;
+    line-height: 1.6 !important;
+    max-width: 640px !important;
+  }
+
+  .hx-token-typography .hx-typo-hero-badges {
+    display: flex !important;
+    gap: 0.5rem !important;
+    flex-wrap: wrap !important;
+  }
+
+  .hx-token-typography .hx-typo-badge {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 0.375rem !important;
+    padding: 0.25rem 0.75rem !important;
+    font-family: var(--hx-font-family-mono, monospace) !important;
+    font-size: 0.75rem !important;
+    font-weight: 500 !important;
+    color: var(--hx-color-primary-700, #1E40AF) !important;
+    background: var(--hx-color-primary-100, #DBEAFE) !important;
+    border-radius: 9999px !important;
+    line-height: 1.4 !important;
+  }
+
+  .hx-token-typography .hx-typo-badge--neutral {
+    color: var(--hx-color-neutral-600, #475569) !important;
+    background: var(--hx-color-neutral-100, #F1F5F9) !important;
+  }
+
+  /* ── Section Styles ────────────────────────────────────── */
+  .hx-token-typography .hx-typo-section {
+    display: block !important;
+    margin-bottom: 3rem !important;
+  }
+
+  .hx-token-typography .hx-typo-section-desc {
+    display: block !important;
+    font-family: var(--hx-font-family-sans, 'Inter', sans-serif) !important;
+    font-size: 0.875rem !important;
+    color: var(--hx-color-neutral-500, #64748B) !important;
+    margin: 0 0 1.5rem 0 !important;
+    line-height: 1.7 !important;
+    max-width: 720px !important;
+  }
+
+  /* ── Font Family Specimen ──────────────────────────────── */
+  .hx-token-typography .hx-typo-family-card {
+    display: block !important;
+    margin-bottom: 1.5rem !important;
+    border-radius: var(--hx-border-radius-lg, 0.5rem) !important;
+    border: 1px solid var(--hx-color-neutral-200, #E2E8F0) !important;
+    background: var(--hx-color-neutral-0, #fff) !important;
+    overflow: hidden !important;
+    transition: transform 0.2s ease, box-shadow 0.2s ease !important;
+  }
+
+  .hx-token-typography .hx-typo-family-card:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: var(--hx-shadow-md, 0 4px 6px -1px rgb(0 0 0 / 0.1)) !important;
+  }
+
+  .hx-token-typography .hx-typo-family-header {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 0.75rem !important;
+    padding: 1rem 1.25rem !important;
+    background: var(--hx-color-neutral-50, #F8FAFC) !important;
+    border-bottom: 1px solid var(--hx-color-neutral-200, #E2E8F0) !important;
+  }
+
+  .hx-token-typography .hx-typo-family-name {
+    display: block !important;
+    font-family: var(--hx-font-family-mono, monospace) !important;
+    font-size: 0.75rem !important;
+    color: var(--hx-color-neutral-600, #475569) !important;
+    line-height: 1.3 !important;
+    border: none !important;
+    background: none !important;
+    text-align: left !important;
+    padding: 0 !important;
+  }
+
+  .hx-token-typography .hx-typo-family-name:hover {
+    color: var(--hx-color-primary-600, #1D4ED8) !important;
+  }
+
+  .hx-token-typography .hx-typo-family-tag {
+    display: inline-flex !important;
+    padding: 0.125rem 0.5rem !important;
+    background: var(--hx-color-primary-50, #EFF6FF) !important;
+    color: var(--hx-color-primary-700, #1E40AF) !important;
+    border-radius: var(--hx-border-radius-sm, 0.25rem) !important;
+    font-family: var(--hx-font-family-mono, monospace) !important;
+    font-size: 0.625rem !important;
+    font-weight: 500 !important;
+    line-height: 1.6 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.05em !important;
+    flex-shrink: 0 !important;
+  }
+
+  .hx-token-typography .hx-typo-family-specimen {
+    display: block !important;
+    padding: 1.5rem 1.25rem !important;
+  }
+
+  .hx-token-typography .hx-typo-family-big {
+    display: block !important;
+    font-size: 2.5rem !important;
+    font-weight: 400 !important;
+    color: var(--hx-color-neutral-800, #1E293B) !important;
+    line-height: 1.3 !important;
+    margin-bottom: 0.75rem !important;
+    letter-spacing: -0.01em !important;
+  }
+
+  .hx-token-typography .hx-typo-family-sample {
+    display: block !important;
+    font-size: 1rem !important;
+    color: var(--hx-color-neutral-700, #334155) !important;
+    line-height: 1.5 !important;
+    margin-bottom: 0.5rem !important;
+  }
+
+  .hx-token-typography .hx-typo-family-chars {
+    display: block !important;
+    font-size: 0.875rem !important;
+    color: var(--hx-color-neutral-400, #94A3B8) !important;
+    line-height: 1.6 !important;
+    letter-spacing: 0.05em !important;
+  }
+
+  .hx-token-typography .hx-typo-family-stack {
+    display: block !important;
+    font-family: var(--hx-font-family-mono, monospace) !important;
+    font-size: 0.6875rem !important;
+    color: var(--hx-color-neutral-400, #94A3B8) !important;
+    margin-top: 0.75rem !important;
+    line-height: 1.5 !important;
+    word-break: break-all !important;
+  }
+
+  /* ── Font Size Scale ───────────────────────────────────── */
+  .hx-token-typography .hx-typo-size-list {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 0 !important;
+  }
+
+  .hx-token-typography .hx-typo-size-row {
+    display: grid !important;
+    grid-template-columns: 180px 1fr !important;
+    align-items: baseline !important;
+    gap: 16px !important;
+    padding: 14px 0 !important;
+    border-bottom: 1px solid var(--hx-color-neutral-100, #F1F5F9) !important;
+    transition: background 0.15s ease !important;
+  }
+
+  .hx-token-typography .hx-typo-size-row:hover {
+    background: var(--hx-color-neutral-50, #F8FAFC) !important;
+    margin: 0 -12px !important;
+    padding-left: 12px !important;
+    padding-right: 12px !important;
+    border-radius: var(--hx-border-radius-md, 0.375rem) !important;
+  }
+
+  .hx-token-typography .hx-typo-size-meta {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 2px !important;
+  }
+
+  .hx-token-typography .hx-typo-size-token {
+    display: block !important;
+    font-family: var(--hx-font-family-mono, monospace) !important;
+    font-size: 0.6875rem !important;
+    color: var(--hx-color-neutral-600, #475569) !important;
+    line-height: 1.4 !important;
+    border: none !important;
+    background: none !important;
+    text-align: left !important;
+    padding: 0 !important;
+  }
+
+  .hx-token-typography .hx-typo-size-token:hover {
+    color: var(--hx-color-primary-600, #1D4ED8) !important;
+  }
+
+  .hx-token-typography .hx-typo-size-value {
+    display: block !important;
+    font-family: var(--hx-font-family-mono, monospace) !important;
+    font-size: 0.625rem !important;
+    color: var(--hx-color-neutral-400, #94A3B8) !important;
+    line-height: 1.3 !important;
+  }
+
+  .hx-token-typography .hx-typo-size-sample {
+    display: block !important;
+    font-family: var(--hx-font-family-sans, 'Inter', sans-serif) !important;
+    color: var(--hx-color-neutral-800, #1E293B) !important;
+    line-height: var(--hx-line-height-normal, 1.5) !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
+
+  /* ── Font Weight Scale ─────────────────────────────────── */
+  .hx-token-typography .hx-typo-weight-grid {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)) !important;
+    gap: 12px !important;
+  }
+
+  .hx-token-typography .hx-typo-weight-card {
+    display: flex !important;
+    flex-direction: column !important;
+    border-radius: var(--hx-border-radius-lg, 0.5rem) !important;
+    border: 1px solid var(--hx-color-neutral-200, #E2E8F0) !important;
+    background: var(--hx-color-neutral-0, #fff) !important;
+    overflow: hidden !important;
+    transition: transform 0.2s ease, box-shadow 0.2s ease !important;
+  }
+
+  .hx-token-typography .hx-typo-weight-card:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: var(--hx-shadow-md, 0 4px 6px -1px rgb(0 0 0 / 0.1)) !important;
+  }
+
+  .hx-token-typography .hx-typo-weight-specimen {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 1.5rem 1rem !important;
+    background: var(--hx-color-neutral-50, #F8FAFC) !important;
+    border-bottom: 1px solid var(--hx-color-neutral-100, #F1F5F9) !important;
+  }
+
+  .hx-token-typography .hx-typo-weight-aa {
+    display: block !important;
+    font-family: var(--hx-font-family-sans, 'Inter', sans-serif) !important;
+    font-size: 3rem !important;
+    color: var(--hx-color-neutral-800, #1E293B) !important;
+    line-height: 1 !important;
+    letter-spacing: -0.01em !important;
+  }
+
+  .hx-token-typography .hx-typo-weight-info {
+    display: block !important;
+    padding: 10px 14px !important;
+  }
+
+  .hx-token-typography .hx-typo-weight-label {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 0.5rem !important;
+    margin-bottom: 2px !important;
+  }
+
+  .hx-token-typography .hx-typo-weight-name {
+    display: block !important;
+    font-family: var(--hx-font-family-sans, 'Inter', sans-serif) !important;
+    font-size: 0.8125rem !important;
+    font-weight: 600 !important;
+    color: var(--hx-color-neutral-700, #334155) !important;
+    line-height: 1.3 !important;
+    text-transform: capitalize !important;
+  }
+
+  .hx-token-typography .hx-typo-weight-num {
+    display: inline-flex !important;
+    font-family: var(--hx-font-family-mono, monospace) !important;
+    font-size: 0.6875rem !important;
+    color: var(--hx-color-primary-600, #1D4ED8) !important;
+    font-weight: 500 !important;
+    line-height: 1.3 !important;
+  }
+
+  .hx-token-typography .hx-typo-weight-token {
+    display: block !important;
+    font-family: var(--hx-font-family-mono, monospace) !important;
+    font-size: 0.625rem !important;
+    color: var(--hx-color-neutral-400, #94A3B8) !important;
+    line-height: 1.4 !important;
+    border: none !important;
+    background: none !important;
+    text-align: left !important;
+    padding: 0 !important;
+  }
+
+  .hx-token-typography .hx-typo-weight-token:hover {
+    color: var(--hx-color-primary-600, #1D4ED8) !important;
+  }
+
+  /* ── Line Height Cards ─────────────────────────────────── */
+  .hx-token-typography .hx-typo-lh-list {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 1.5rem !important;
+  }
+
+  .hx-token-typography .hx-typo-lh-card {
+    display: block !important;
+    border-radius: var(--hx-border-radius-lg, 0.5rem) !important;
+    border: 1px solid var(--hx-color-neutral-200, #E2E8F0) !important;
+    background: var(--hx-color-neutral-0, #fff) !important;
+    overflow: hidden !important;
+    transition: transform 0.2s ease, box-shadow 0.2s ease !important;
+  }
+
+  .hx-token-typography .hx-typo-lh-card:hover {
+    transform: translateY(-1px) !important;
+    box-shadow: var(--hx-shadow-sm, 0 1px 2px 0 rgb(0 0 0 / 0.05)) !important;
+  }
+
+  .hx-token-typography .hx-typo-lh-header {
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.75rem !important;
+    padding: 0.75rem 1.25rem !important;
+    background: var(--hx-color-neutral-50, #F8FAFC) !important;
+    border-bottom: 1px solid var(--hx-color-neutral-100, #F1F5F9) !important;
+  }
+
+  .hx-token-typography .hx-typo-lh-name {
+    display: block !important;
+    font-family: var(--hx-font-family-mono, monospace) !important;
+    font-size: 0.75rem !important;
+    color: var(--hx-color-neutral-600, #475569) !important;
+    line-height: 1.3 !important;
+    border: none !important;
+    background: none !important;
+    text-align: left !important;
+    padding: 0 !important;
+  }
+
+  .hx-token-typography .hx-typo-lh-name:hover {
+    color: var(--hx-color-primary-600, #1D4ED8) !important;
+  }
+
+  .hx-token-typography .hx-typo-lh-val {
+    display: inline-flex !important;
+    font-family: var(--hx-font-family-mono, monospace) !important;
+    font-size: 0.6875rem !important;
+    color: var(--hx-color-neutral-400, #94A3B8) !important;
+    line-height: 1.3 !important;
+  }
+
+  .hx-token-typography .hx-typo-lh-body {
+    display: block !important;
+    padding: 1rem 1.25rem !important;
+    font-family: var(--hx-font-family-sans, 'Inter', sans-serif) !important;
+    font-size: 1rem !important;
+    color: var(--hx-color-neutral-700, #334155) !important;
+    max-width: 640px !important;
+  }
+
+  /* ── Letter Spacing Rows ───────────────────────────────── */
+  .hx-token-typography .hx-typo-ls-list {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 0 !important;
+  }
+
+  .hx-token-typography .hx-typo-ls-row {
+    display: grid !important;
+    grid-template-columns: 200px 1fr !important;
+    align-items: baseline !important;
+    gap: 16px !important;
+    padding: 14px 0 !important;
+    border-bottom: 1px solid var(--hx-color-neutral-100, #F1F5F9) !important;
+    transition: background 0.15s ease !important;
+  }
+
+  .hx-token-typography .hx-typo-ls-row:hover {
+    background: var(--hx-color-neutral-50, #F8FAFC) !important;
+    margin: 0 -12px !important;
+    padding-left: 12px !important;
+    padding-right: 12px !important;
+    border-radius: var(--hx-border-radius-md, 0.375rem) !important;
+  }
+
+  .hx-token-typography .hx-typo-ls-meta {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 2px !important;
+  }
+
+  .hx-token-typography .hx-typo-ls-token {
+    display: block !important;
+    font-family: var(--hx-font-family-mono, monospace) !important;
+    font-size: 0.6875rem !important;
+    color: var(--hx-color-neutral-600, #475569) !important;
+    line-height: 1.4 !important;
+    border: none !important;
+    background: none !important;
+    text-align: left !important;
+    padding: 0 !important;
+  }
+
+  .hx-token-typography .hx-typo-ls-token:hover {
+    color: var(--hx-color-primary-600, #1D4ED8) !important;
+  }
+
+  .hx-token-typography .hx-typo-ls-value {
+    display: block !important;
+    font-family: var(--hx-font-family-mono, monospace) !important;
+    font-size: 0.625rem !important;
+    color: var(--hx-color-neutral-400, #94A3B8) !important;
+    line-height: 1.3 !important;
+  }
+
+  .hx-token-typography .hx-typo-ls-sample {
+    display: block !important;
+    font-family: var(--hx-font-family-sans, 'Inter', sans-serif) !important;
+    font-size: 1.125rem !important;
+    color: var(--hx-color-neutral-800, #1E293B) !important;
+    line-height: var(--hx-line-height-normal, 1.5) !important;
+    text-transform: uppercase !important;
+  }
+
+  /* ── Usage Guide Code Block ────────────────────────────── */
+  .hx-token-typography .hx-typo-code-block {
+    display: block !important;
+    padding: 1.25rem !important;
+    background: var(--hx-color-neutral-800, #1E293B) !important;
+    border-radius: var(--hx-border-radius-lg, 0.5rem) !important;
+    overflow-x: auto !important;
+    margin-top: 1rem !important;
+  }
+
+  .hx-token-typography .hx-typo-code-line {
+    display: block !important;
+    font-family: var(--hx-font-family-mono, monospace) !important;
+    font-size: 0.75rem !important;
+    line-height: 1.75 !important;
+    color: var(--hx-color-neutral-300, #CBD5E1) !important;
+    white-space: pre !important;
+  }
+
+  .hx-token-typography .hx-typo-code-comment {
+    color: var(--hx-color-neutral-500, #64748B) !important;
+  }
+
+  .hx-token-typography .hx-typo-code-prop {
+    color: var(--hx-color-primary-300, #93C5FD) !important;
+  }
+
+  .hx-token-typography .hx-typo-code-value {
+    color: var(--hx-color-success-400, #4ADE80) !important;
+  }
+
+  .hx-token-typography .hx-typo-code-fn {
+    color: var(--hx-color-accent-400, #FBBF24) !important;
+  }
+
+  /* ── Tip Card ──────────────────────────────────────────── */
+  .hx-token-typography .hx-typo-tip {
+    display: flex !important;
+    gap: 0.75rem !important;
+    padding: 1rem 1.25rem !important;
+    background: var(--hx-color-info-50, #F0F9FF) !important;
+    border-radius: var(--hx-border-radius-md, 0.375rem) !important;
+    border: 1px solid var(--hx-color-info-200, #BAE6FD) !important;
+    margin-top: 1rem !important;
+  }
+
+  .hx-token-typography .hx-typo-tip-icon {
+    display: block !important;
+    flex-shrink: 0 !important;
+    font-size: 1rem !important;
+    line-height: 1.5 !important;
+  }
+
+  .hx-token-typography .hx-typo-tip-text {
+    display: block !important;
+    font-family: var(--hx-font-family-sans, 'Inter', sans-serif) !important;
+    font-size: 0.8125rem !important;
+    color: var(--hx-color-info-800, #0C4A6E) !important;
+    line-height: 1.6 !important;
+  }
+
+  .hx-token-typography .hx-typo-tip-code {
+    display: inline !important;
+    font-family: var(--hx-font-family-mono, monospace) !important;
+    font-size: 0.75rem !important;
+    padding: 0.125rem 0.375rem !important;
+    background: var(--hx-color-info-100, #E0F2FE) !important;
+    border-radius: 3px !important;
+    color: var(--hx-color-info-700, #075985) !important;
+  }
+
+  /* ── Type Scale Visual ─────────────────────────────────── */
+  .hx-token-typography .hx-typo-scale-visual {
+    display: block !important;
+    padding: 2rem 0 !important;
+    border-bottom: 1px solid var(--hx-color-neutral-100, #F1F5F9) !important;
+    margin-bottom: 2rem !important;
+  }
+
+  .hx-token-typography .hx-typo-scale-row {
+    display: flex !important;
+    align-items: baseline !important;
+    gap: 12px !important;
+    padding: 6px 0 !important;
+  }
+
+  .hx-token-typography .hx-typo-scale-label {
+    display: block !important;
+    width: 36px !important;
+    flex-shrink: 0 !important;
+    font-family: var(--hx-font-family-mono, monospace) !important;
+    font-size: 0.625rem !important;
+    color: var(--hx-color-primary-500, #2563EB) !important;
+    font-weight: 600 !important;
+    line-height: 1.3 !important;
+    text-align: right !important;
+  }
+
+  .hx-token-typography .hx-typo-scale-text {
+    display: block !important;
+    font-family: var(--hx-font-family-sans, 'Inter', sans-serif) !important;
+    color: var(--hx-color-neutral-800, #1E293B) !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    line-height: 1.3 !important;
+  }
+`}
+</style>
+
+<div className="hx-token-typography">
+
+{/* ═══ Mini Hero Banner ═══════════════════════════════════ */}
+<div className="hx-typo-hero">
+  <div className="hx-typo-hero-title">Typography Tokens</div>
+  <div className="hx-typo-hero-desc">
+    The HELIX type system provides font families, a 10-step size scale, six weight stops,
+    five line-height values, and six letter-spacing values -- all expressed as design tokens
+    for consistent, scalable typography across the platform.
+  </div>
+  <div className="hx-typo-hero-badges">
+    <span className="hx-typo-badge">{totalTypoTokens} typography tokens</span>
+    <span className="hx-typo-badge hx-typo-badge--neutral">{fontSizeTokens.length} sizes</span>
+    <span className="hx-typo-badge hx-typo-badge--neutral">{fontWeightTokens.length} weights</span>
+    <span className="hx-typo-badge hx-typo-badge--neutral">{fontFamilyTokens.length} families</span>
+  </div>
+</div>
+
+{/* ═══ Type Scale Overview ════════════════════════════════ */}
+<div className="hx-typo-section">
+
+## Type Scale Overview
+
+<div className="hx-typo-section-desc">
+  A progressive size scale from 2xs (0.625rem / 10px) to 5xl (3rem / 48px). All sizes
+  use rem units relative to the document root for accessibility. The scale provides
+  enough range for everything from fine print to display headings.
+</div>
+
+<div className="hx-typo-scale-visual">
+  {fontSizeTokens.map(token => (
+    <div key={token.name} className="hx-typo-scale-row">
+      <span className="hx-typo-scale-label">{token.key}</span>
+      <span className="hx-typo-scale-text" style={{ fontSize: `var(${token.name})` }}>
+        {sampleText}
+      </span>
+    </div>
+  ))}
+</div>
+
+</div>
+
+{/* ═══ Font Families ══════════════════════════════════════ */}
+<div className="hx-typo-section">
+
+## Font Families
+
+<div className="hx-typo-section-desc">
+  Three font stacks are defined: a sans-serif stack (Inter) for UI text, a serif stack
+  (Georgia) for editorial content, and a monospace stack (JetBrains Mono) for code and
+  technical labels. Each stack includes system font fallbacks for reliable rendering.
+</div>
+
+{fontFamilyTokens.map(token => (
+  <div key={token.name} className="hx-typo-family-card">
+    <div className="hx-typo-family-header">
+      <button
+        className="hx-typo-family-name"
+        title={`Click to copy: ${token.name}`}
+        onClick={() => copyToClipboard(token.name)}
+      >
+        {token.name}
+      </button>
+      <span className="hx-typo-family-tag">{token.key}</span>
+    </div>
+    <div className="hx-typo-family-specimen">
+      <span className="hx-typo-family-big" style={{ fontFamily: `var(${token.name})` }}>
+        Aa
+      </span>
+      <span className="hx-typo-family-sample" style={{ fontFamily: `var(${token.name})` }}>
+        {sampleText}
+      </span>
+      <span className="hx-typo-family-chars" style={{ fontFamily: `var(${token.name})` }}>
+        {specimenChars}
+      </span>
+      <span className="hx-typo-family-stack">{token.value}</span>
+    </div>
+  </div>
+))}
+
+</div>
+
+{/* ═══ Font Sizes ═════════════════════════════════════════ */}
+<div className="hx-typo-section">
+
+## Font Sizes
+
+<div className="hx-typo-section-desc">
+  The type scale provides ten sizes ranging from 2xs (0.625rem) to 5xl (3rem). All sizes
+  use rem units relative to the document root, ensuring text scales predictably with user
+  preferences and zoom levels.
+</div>
+
+<div className="hx-typo-size-list">
+  {fontSizeTokens.map(token => (
+    <div key={token.name} className="hx-typo-size-row">
+      <div className="hx-typo-size-meta">
+        <button
+          className="hx-typo-size-token"
+          title={`Click to copy: ${token.name}`}
+          onClick={() => copyToClipboard(token.name)}
+        >
+          {token.name}
+        </button>
+        <span className="hx-typo-size-value">{token.value}</span>
+      </div>
+      <span className="hx-typo-size-sample" style={{ fontSize: `var(${token.name})` }}>
+        {sampleText}
+      </span>
+    </div>
+  ))}
+</div>
+
+</div>
+
+{/* ═══ Font Weights ═══════════════════════════════════════ */}
+<div className="hx-typo-section">
+
+## Font Weights
+
+<div className="hx-typo-section-desc">
+  Six weight stops are available from light (300) to extrabold (800). Inter supports
+  variable weight, so these values render as true optical weights rather than faux bold.
+  Use semibold (600) for UI labels and bold (700) for headings.
+</div>
+
+<div className="hx-typo-weight-grid">
+  {fontWeightTokens.map(token => (
+    <div key={token.name} className="hx-typo-weight-card">
+      <div className="hx-typo-weight-specimen">
+        <span className="hx-typo-weight-aa" style={{ fontWeight: `var(${token.name})` }}>Aa</span>
+      </div>
+      <div className="hx-typo-weight-info">
+        <div className="hx-typo-weight-label">
+          <span className="hx-typo-weight-name">{token.key}</span>
+          <span className="hx-typo-weight-num">{token.value}</span>
+        </div>
+        <button
+          className="hx-typo-weight-token"
+          title={`Click to copy: ${token.name}`}
+          onClick={() => copyToClipboard(token.name)}
+        >
+          {token.name}
+        </button>
+      </div>
+    </div>
+  ))}
+</div>
+
+</div>
+
+{/* ═══ Line Heights ═══════════════════════════════════════ */}
+<div className="hx-typo-section">
+
+## Line Heights
+
+<div className="hx-typo-section-desc">
+  Line height controls vertical rhythm. Tighter and tight values are suited to headings,
+  normal to body copy, and relaxed or loose to long-form reading or captions. The values
+  are unitless multipliers applied to the current font size.
+</div>
+
+<div className="hx-typo-lh-list">
+  {lineHeightTokens.map(token => (
+    <div key={token.name} className="hx-typo-lh-card">
+      <div className="hx-typo-lh-header">
+        <button
+          className="hx-typo-lh-name"
+          title={`Click to copy: ${token.name}`}
+          onClick={() => copyToClipboard(token.name)}
+        >
+          {token.name}
+        </button>
+        <span className="hx-typo-lh-val">({token.value})</span>
+      </div>
+      <div className="hx-typo-lh-body" style={{ lineHeight: `var(${token.name})` }}>
+        {multiLineText}
+      </div>
+    </div>
+  ))}
+</div>
+
+</div>
+
+{/* ═══ Letter Spacing ═════════════════════════════════════ */}
+<div className="hx-typo-section">
+
+## Letter Spacing
+
+<div className="hx-typo-section-desc">
+  Letter spacing (tracking) adjusts the space between characters. Tighter values work
+  well for large display text, while wider values improve readability for small caps,
+  labels, and uppercase text. All values use em units for proportional scaling.
+</div>
+
+<div className="hx-typo-ls-list">
+  {letterSpacingTokens.map(token => (
+    <div key={token.name} className="hx-typo-ls-row">
+      <div className="hx-typo-ls-meta">
+        <button
+          className="hx-typo-ls-token"
+          title={`Click to copy: ${token.name}`}
+          onClick={() => copyToClipboard(token.name)}
+        >
+          {token.name}
+        </button>
+        <span className="hx-typo-ls-value">{token.value}</span>
+      </div>
+      <span className="hx-typo-ls-sample" style={{ letterSpacing: `var(${token.name})` }}>
+        {sampleText}
+      </span>
+    </div>
+  ))}
+</div>
+
+</div>
+
+{/* ═══ Usage Guide ════════════════════════════════════════ */}
+<div className="hx-typo-section">
+
+## Usage Guide
+
+<div className="hx-typo-section-desc">
+  Typography tokens follow the same three-tier cascade as color tokens. Always use the
+  token custom properties rather than hardcoded values so that themes and accessibility
+  settings apply consistently.
+</div>
+
+<div className="hx-typo-code-block">
+  <span className="hx-typo-code-line">
+    <span className="hx-typo-code-comment">{'/* Body text styles */'}</span>
+  </span>
+  <span className="hx-typo-code-line">
+    <span className="hx-typo-code-prop">{'font-family'}</span>{': '}<span className="hx-typo-code-fn">{'var'}</span>{'('}<span className="hx-typo-code-value">{'--hx-font-family-sans'}</span>{');'}
+  </span>
+  <span className="hx-typo-code-line">
+    <span className="hx-typo-code-prop">{'font-size'}</span>{': '}<span className="hx-typo-code-fn">{'var'}</span>{'('}<span className="hx-typo-code-value">{'--hx-font-size-md'}</span>{');'}
+  </span>
+  <span className="hx-typo-code-line">
+    <span className="hx-typo-code-prop">{'font-weight'}</span>{': '}<span className="hx-typo-code-fn">{'var'}</span>{'('}<span className="hx-typo-code-value">{'--hx-font-weight-normal'}</span>{');'}
+  </span>
+  <span className="hx-typo-code-line">
+    <span className="hx-typo-code-prop">{'line-height'}</span>{': '}<span className="hx-typo-code-fn">{'var'}</span>{'('}<span className="hx-typo-code-value">{'--hx-line-height-normal'}</span>{');'}
+  </span>
+  <span className="hx-typo-code-line">{' '}</span>
+  <span className="hx-typo-code-line">
+    <span className="hx-typo-code-comment">{'/* Heading styles */'}</span>
+  </span>
+  <span className="hx-typo-code-line">
+    <span className="hx-typo-code-prop">{'font-size'}</span>{': '}<span className="hx-typo-code-fn">{'var'}</span>{'('}<span className="hx-typo-code-value">{'--hx-font-size-3xl'}</span>{');'}
+  </span>
+  <span className="hx-typo-code-line">
+    <span className="hx-typo-code-prop">{'font-weight'}</span>{': '}<span className="hx-typo-code-fn">{'var'}</span>{'('}<span className="hx-typo-code-value">{'--hx-font-weight-bold'}</span>{');'}
+  </span>
+  <span className="hx-typo-code-line">
+    <span className="hx-typo-code-prop">{'line-height'}</span>{': '}<span className="hx-typo-code-fn">{'var'}</span>{'('}<span className="hx-typo-code-value">{'--hx-line-height-tight'}</span>{');'}
+  </span>
+  <span className="hx-typo-code-line">
+    <span className="hx-typo-code-prop">{'letter-spacing'}</span>{': '}<span className="hx-typo-code-fn">{'var'}</span>{'('}<span className="hx-typo-code-value">{'--hx-letter-spacing-tight'}</span>{');'}
+  </span>
+  <span className="hx-typo-code-line">{' '}</span>
+  <span className="hx-typo-code-line">
+    <span className="hx-typo-code-comment">{'/* Code / technical text */'}</span>
+  </span>
+  <span className="hx-typo-code-line">
+    <span className="hx-typo-code-prop">{'font-family'}</span>{': '}<span className="hx-typo-code-fn">{'var'}</span>{'('}<span className="hx-typo-code-value">{'--hx-font-family-mono'}</span>{');'}
+  </span>
+  <span className="hx-typo-code-line">
+    <span className="hx-typo-code-prop">{'font-size'}</span>{': '}<span className="hx-typo-code-fn">{'var'}</span>{'('}<span className="hx-typo-code-value">{'--hx-font-size-sm'}</span>{');'}
+  </span>
+</div>
+
+<div className="hx-typo-tip">
+  <span className="hx-typo-tip-icon" aria-hidden="true">i</span>
+  <span className="hx-typo-tip-text">
+    Always use rem-based font size tokens rather than px values. This ensures that text
+    scales correctly when users adjust their browser font size settings -- a critical
+    accessibility requirement in healthcare applications where readability can directly
+    impact patient safety.
+  </span>
+</div>
+
+</div>
+
+</div>

@@ -1,5 +1,5 @@
 ---
-title: "wc-card"
+title: "hx-card"
 description: Flexible card component for displaying grouped content with multiple slots
 ---
 
@@ -9,7 +9,7 @@ import ComponentDoc from '../../../components/ComponentDoc.astro';
 
 <ComponentLoader />
 
-<ComponentDoc tagName="wc-card" section="summary" />
+<ComponentDoc tagName="hx-card" section="summary" />
 
 ## Variants
 
@@ -17,18 +17,18 @@ Default, featured, and compact card styles.
 
 <ComponentDemo title="Variants">
   <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1rem;">
-    <wc-card variant="default">
+    <hx-card variant="default">
       <span slot="heading">Default Card</span>
       <p>Standard card for general content display.</p>
-    </wc-card>
-    <wc-card variant="featured">
+    </hx-card>
+    <hx-card variant="featured">
       <span slot="heading">Featured Card</span>
       <p>Highlighted card for important content.</p>
-    </wc-card>
-    <wc-card variant="compact">
+    </hx-card>
+    <hx-card variant="compact">
       <span slot="heading">Compact Card</span>
       <p>Condensed layout for dense UIs.</p>
-    </wc-card>
+    </hx-card>
   </div>
 </ComponentDemo>
 
@@ -38,18 +38,18 @@ Flat, raised, and floating shadow depths.
 
 <ComponentDemo title="Elevations">
   <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1rem;">
-    <wc-card elevation="flat">
+    <hx-card elevation="flat">
       <span slot="heading">Flat</span>
       <p>No shadow — blends into the surface.</p>
-    </wc-card>
-    <wc-card elevation="raised">
+    </hx-card>
+    <hx-card elevation="raised">
       <span slot="heading">Raised</span>
       <p>Subtle shadow for visual separation.</p>
-    </wc-card>
-    <wc-card elevation="floating">
+    </hx-card>
+    <hx-card elevation="floating">
       <span slot="heading">Floating</span>
       <p>Prominent shadow for emphasis.</p>
-    </wc-card>
+    </hx-card>
   </div>
 </ComponentDemo>
 
@@ -58,29 +58,29 @@ Flat, raised, and floating shadow depths.
 All available slots: image, heading, body, footer, and actions.
 
 <ComponentDemo title="Full Slot Usage">
-  <wc-card variant="default" elevation="raised">
+  <hx-card variant="default" elevation="raised">
     <div slot="image" style="height: 120px; background: linear-gradient(135deg, #6366f1, #8b5cf6); display: flex; align-items: center; justify-content: center; color: white; font-weight: 600;">Image Slot</div>
     <span slot="heading">Card Title</span>
     <p>This is the default body slot with descriptive content for the card.</p>
     <span slot="footer">Published Feb 2026</span>
     <div slot="actions">
-      <wc-button variant="primary" size="sm">Action</wc-button>
-      <wc-button variant="ghost" size="sm">Cancel</wc-button>
+      <hx-button variant="primary" size="sm">Action</hx-button>
+      <hx-button variant="ghost" size="sm">Cancel</hx-button>
     </div>
-  </wc-card>
+  </hx-card>
 </ComponentDemo>
 
 ## Interactive Card
 
-Card with `wc-href` becomes clickable. Uses the `wc-` prefix to avoid conflicting with the native HTML `href` attribute.
+Card with `hx-href` becomes clickable. Uses the `hx-` prefix to avoid conflicting with the native HTML `href` attribute.
 
 <ComponentDemo title="Interactive Card">
-  <wc-card variant="default" elevation="raised" wc-href="https://helix.dev">
+  <hx-card variant="default" elevation="raised" hx-href="https://helix.dev">
     <span slot="heading">Clickable Card</span>
-    <p>This card has a <code>wc-href</code> attribute — click anywhere to navigate.</p>
-  </wc-card>
+    <p>This card has a <code>hx-href</code> attribute — click anywhere to navigate.</p>
+  </hx-card>
 </ComponentDemo>
 
 ## API Reference
 
-<ComponentDoc tagName="wc-card" section="api" />
+<ComponentDoc tagName="hx-card" section="api" />

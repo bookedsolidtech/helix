@@ -37,7 +37,7 @@ import DxTab3CiCd from '../components/showcase/dx/DxTab3CiCd.astro';
     /* ==========================================
        TOP NAVIGATION BAR
        ========================================== */
-    .dx-topbar { position:fixed; top:0; left:0; right:0; z-index:100; display:flex; align-items:center; justify-content:space-between; padding:var(--space-3) var(--space-8); background:rgba(10,10,20,0.85); backdrop-filter:blur(16px) saturate(180%); -webkit-backdrop-filter:blur(16px) saturate(180%); border-bottom:1px solid rgba(255,255,255,0.06); }
+    .dx-topbar { position:fixed; top:3.5rem; left:0; right:0; z-index:90; display:flex; align-items:center; justify-content:space-between; padding:var(--space-3) var(--space-8); background:rgba(10,10,20,0.85); backdrop-filter:blur(16px) saturate(180%); -webkit-backdrop-filter:blur(16px) saturate(180%); border-bottom:1px solid rgba(255,255,255,0.06); }
     .dx-topbar-left { display:flex; align-items:center; gap:var(--space-4); }
     .dx-back-link { display:inline-flex; align-items:center; gap:var(--space-2); font-size:0.875rem; font-weight:600; color:var(--text-secondary); transition:all 0.2s ease; padding:var(--space-2) var(--space-3); border-radius:var(--radius-md); }
     .dx-back-link:hover { color:var(--text-primary); background:var(--glass-bg-strong); }
@@ -49,7 +49,7 @@ import DxTab3CiCd from '../components/showcase/dx/DxTab3CiCd.astro';
     /* ==========================================
        STICKY TAB NAV (3-tab content switcher)
        ========================================== */
-    .dx-section-nav { position:sticky; top:3.9rem; z-index:90; background:rgba(10,10,20,0.92); backdrop-filter:blur(20px) saturate(180%); -webkit-backdrop-filter:blur(20px) saturate(180%); border-bottom:1px solid rgba(255,255,255,0.08); }
+    .dx-section-nav { position:sticky; top:7.4rem; z-index:80; background:rgba(10,10,20,0.92); backdrop-filter:blur(20px) saturate(180%); -webkit-backdrop-filter:blur(20px) saturate(180%); border-bottom:1px solid rgba(255,255,255,0.08); }
     .dx-section-nav-inner { display:flex; max-width:1200px; margin:0 auto; padding:0.5rem; gap:0.5rem; }
     .dx-nav-tab { flex:1; display:flex; flex-direction:column; align-items:center; gap:0.25rem; padding:0.75rem 1.5rem; border-radius:0.75rem; border:1px solid transparent; background:transparent; color:rgba(255,255,255,0.45); cursor:pointer; transition:all 0.25s ease; font-family:var(--font-heading); }
     .dx-nav-tab i { font-size:1.25rem; opacity:0.5; transition:all 0.25s ease; }
@@ -77,7 +77,7 @@ import DxTab3CiCd from '../components/showcase/dx/DxTab3CiCd.astro';
     /* ==========================================
        HERO (shared base, color variants per tab)
        ========================================== */
-    .dx-hero { min-height:100vh; min-height:100dvh; display:flex; flex-direction:column; align-items:center; justify-content:center; position:relative; overflow:hidden; isolation:isolate; padding:var(--space-24) var(--space-8) var(--space-16); }
+    .dx-hero { min-height:100vh; min-height:100dvh; display:flex; flex-direction:column; align-items:center; justify-content:center; position:relative; overflow:hidden; isolation:isolate; padding:calc(var(--space-24) + 3.5rem) var(--space-8) var(--space-16); }
     .dx-hero::before { content:''; position:absolute; inset:0; background:var(--gradient-hero); z-index:-3; }
     .dx-hero::after { content:''; position:absolute; inset:0; background-image:radial-gradient(circle at 20% 30%, rgba(6,120,190,0.04) 2px, transparent 2px), radial-gradient(circle at 60% 70%, rgba(102,126,234,0.04) 3px, transparent 3px), radial-gradient(circle at 80% 20%, rgba(236,72,153,0.03) 2px, transparent 2px); background-size:800px 800px; animation:particle-drift 60s linear infinite; opacity:0.6; z-index:-2; }
     .dx-hero-orb { position:absolute; border-radius:50%; filter:blur(100px); opacity:0.3; z-index:-1; pointer-events:none; }

@@ -28,10 +28,10 @@ import { helixCheckboxStyles } from './hx-checkbox.styles.js';
  * @cssprop [--hx-checkbox-size=var(--hx-size-5, 1.25rem)] - Checkbox dimensions.
  * @cssprop [--hx-checkbox-border-color=var(--hx-color-neutral-300, #ced4da)] - Checkbox border color.
  * @cssprop [--hx-checkbox-border-radius=var(--hx-border-radius-sm, 0.25rem)] - Checkbox border radius.
- * @cssprop [--hx-checkbox-checked-bg=var(--hx-color-primary-500, #007878)] - Checked background color.
- * @cssprop [--hx-checkbox-checked-border-color=var(--hx-color-primary-500, #007878)] - Checked border color.
+ * @cssprop [--hx-checkbox-checked-bg=var(--hx-color-primary-500, #2563EB)] - Checked background color.
+ * @cssprop [--hx-checkbox-checked-border-color=var(--hx-color-primary-500, #2563EB)] - Checked border color.
  * @cssprop [--hx-checkbox-checkmark-color=var(--hx-color-neutral-0, #ffffff)] - Checkmark color.
- * @cssprop [--hx-checkbox-focus-ring-color=var(--hx-focus-ring-color, #007878)] - Focus ring color.
+ * @cssprop [--hx-checkbox-focus-ring-color=var(--hx-focus-ring-color, #2563EB)] - Focus ring color.
  * @cssprop [--hx-checkbox-label-color=var(--hx-color-neutral-700, #343a40)] - Label text color.
  * @cssprop [--hx-checkbox-error-color=var(--hx-color-error-500, #dc3545)] - Error state color.
  */
@@ -171,7 +171,7 @@ export class HelixCheckbox extends LitElement {
       this._internals.setValidity(
         { valueMissing: true },
         this.error || 'This field is required.',
-        this._inputEl ?? undefined
+        this._inputEl ?? undefined,
       );
     } else {
       this._internals.setValidity({});
@@ -210,7 +210,7 @@ export class HelixCheckbox extends LitElement {
         bubbles: true,
         composed: true,
         detail: { checked: this.checked, value: this.value },
-      })
+      }),
     );
   }
 
@@ -247,12 +247,13 @@ export class HelixCheckbox extends LitElement {
       'checkbox--required': this.required,
     };
 
-    const describedBy = [
-      hasError || this._hasErrorSlot ? this._errorId : null,
-      this.helpText && !hasError ? this._helpTextId : null,
-    ]
-      .filter(Boolean)
-      .join(' ') || undefined;
+    const describedBy =
+      [
+        hasError || this._hasErrorSlot ? this._errorId : null,
+        this.helpText && !hasError ? this._helpTextId : null,
+      ]
+        .filter(Boolean)
+        .join(' ') || undefined;
 
     return html`
       <div class=${classMap(containerClasses)}>
@@ -271,7 +272,7 @@ export class HelixCheckbox extends LitElement {
             ?disabled=${this.disabled}
             ?required=${this.required}
             name=${ifDefined(this.name || undefined)}
-            value=${this.value}
+            .value=${this.value}
             aria-invalid=${hasError ? 'true' : nothing}
             aria-describedby=${ifDefined(describedBy)}
             aria-labelledby=${this._labelId}
@@ -281,10 +282,18 @@ export class HelixCheckbox extends LitElement {
           />
 
           <span part="checkbox" class="checkbox__box">
-            <svg class="checkbox__icon checkbox__icon--check" viewBox="0 0 16 16" aria-hidden="true">
+            <svg
+              class="checkbox__icon checkbox__icon--check"
+              viewBox="0 0 16 16"
+              aria-hidden="true"
+            >
               <polyline points="3.5 8 6.5 11 12.5 5"></polyline>
             </svg>
-            <svg class="checkbox__icon checkbox__icon--indeterminate" viewBox="0 0 16 16" aria-hidden="true">
+            <svg
+              class="checkbox__icon checkbox__icon--indeterminate"
+              viewBox="0 0 16 16"
+              aria-hidden="true"
+            >
               <line x1="4" y1="8" x2="12" y2="8"></line>
             </svg>
           </span>
@@ -299,7 +308,13 @@ export class HelixCheckbox extends LitElement {
 
         <slot name="error" @slotchange=${this._handleErrorSlotChange}>
           ${hasError
-            ? html`<div part="error" class="checkbox__error" id=${this._errorId} role="alert" aria-live="polite">
+            ? html`<div
+                part="error"
+                class="checkbox__error"
+                id=${this._errorId}
+                role="alert"
+                aria-live="polite"
+              >
                 ${this.error}
               </div>`
             : nothing}

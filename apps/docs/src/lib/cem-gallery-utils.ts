@@ -26,19 +26,19 @@ export interface GalleryStats {
 // ── Category mapping ────────────────────────────────────────────────
 
 const TAG_CATEGORY_MAP: Record<string, GalleryCategory> = {
-  'wc-button': 'actions',
-  'wc-alert': 'feedback',
-  'wc-badge': 'feedback',
-  'wc-card': 'content',
-  'wc-container': 'content',
-  'wc-prose': 'content',
-  'wc-text-input': 'form-controls',
-  'wc-textarea': 'form-controls',
-  'wc-select': 'form-controls',
-  'wc-checkbox': 'form-controls',
-  'wc-radio-group': 'form-controls',
-  'wc-switch': 'form-controls',
-  'wc-form': 'composition',
+  'hx-button': 'actions',
+  'hx-alert': 'feedback',
+  'hx-badge': 'feedback',
+  'hx-card': 'content',
+  'hx-container': 'content',
+  'hx-prose': 'content',
+  'hx-text-input': 'form-controls',
+  'hx-textarea': 'form-controls',
+  'hx-select': 'form-controls',
+  'hx-checkbox': 'form-controls',
+  'hx-radio-group': 'form-controls',
+  'hx-switch': 'form-controls',
+  'hx-form': 'composition',
 };
 
 const CATEGORY_ORDER: GalleryCategory[] = [

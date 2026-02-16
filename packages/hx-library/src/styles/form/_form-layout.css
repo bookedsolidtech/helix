@@ -61,7 +61,7 @@ summary {
 }
 
 summary:focus-visible {
-  outline: var(--wc-focus-ring-width, 2px) solid var(--wc-focus-ring-color, #007878);
+  outline: var(--wc-focus-ring-width, 2px) solid var(--wc-focus-ring-color, #2563eb);
   outline-offset: var(--wc-focus-ring-offset, 2px);
   border-radius: var(--wc-border-radius-sm, 0.25rem);
 }

@@ -22,14 +22,16 @@ input[type='checkbox'] {
   margin: 0;
 
   /* Border and shape */
-  border: var(--wc-border-width-medium, 2px) solid var(--wc-checkbox-border-color, var(--wc-color-neutral-300, #ced4da));
+  border: var(--wc-border-width-medium, 2px) solid
+    var(--wc-checkbox-border-color, var(--wc-color-neutral-300, #ced4da));
   border-radius: var(--wc-checkbox-border-radius, var(--wc-border-radius-sm, 0.25rem));
   background-color: var(--wc-color-neutral-0, #ffffff);
 
   /* Transition */
-  transition: background-color var(--wc-transition-fast, 150ms ease),
-              border-color var(--wc-transition-fast, 150ms ease),
-              box-shadow var(--wc-transition-fast, 150ms ease);
+  transition:
+    background-color var(--wc-transition-fast, 150ms ease),
+    border-color var(--wc-transition-fast, 150ms ease),
+    box-shadow var(--wc-transition-fast, 150ms ease);
 
   cursor: pointer;
   vertical-align: middle;
@@ -38,8 +40,8 @@ input[type='checkbox'] {
 /* ─── Checked State ─── */
 
 input[type='checkbox']:checked {
-  background-color: var(--wc-checkbox-checked-bg, var(--wc-color-primary-500, #007878));
-  border-color: var(--wc-checkbox-checked-border-color, var(--wc-color-primary-500, #007878));
+  background-color: var(--wc-checkbox-checked-bg, var(--wc-color-primary-500, #2563eb));
+  border-color: var(--wc-checkbox-checked-border-color, var(--wc-color-primary-500, #2563eb));
 
   /* Checkmark via encoded SVG */
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none'%3E%3Cpath d='M3.5 8.5L6.5 11.5L12.5 4.5' stroke='%23ffffff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
@@ -51,8 +53,8 @@ input[type='checkbox']:checked {
 /* ─── Indeterminate State ─── */
 
 input[type='checkbox']:indeterminate {
-  background-color: var(--wc-checkbox-checked-bg, var(--wc-color-primary-500, #007878));
-  border-color: var(--wc-checkbox-checked-border-color, var(--wc-color-primary-500, #007878));
+  background-color: var(--wc-checkbox-checked-bg, var(--wc-color-primary-500, #2563eb));
+  border-color: var(--wc-checkbox-checked-border-color, var(--wc-color-primary-500, #2563eb));
 
   /* Dash via encoded SVG */
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none'%3E%3Cpath d='M4 8H12' stroke='%23ffffff' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E");
@@ -64,14 +66,15 @@ input[type='checkbox']:indeterminate {
 /* ─── Focus State ─── */
 
 input[type='checkbox']:focus-visible {
-  outline: var(--wc-focus-ring-width, 2px) solid var(--wc-checkbox-focus-ring-color, var(--wc-focus-ring-color, #007878));
+  outline: var(--wc-focus-ring-width, 2px) solid
+    var(--wc-checkbox-focus-ring-color, var(--wc-focus-ring-color, #2563eb));
   outline-offset: var(--wc-focus-ring-offset, 2px);
 }
 
 /* ─── Hover State ─── */
 
 input[type='checkbox']:hover:not(:disabled) {
-  border-color: var(--wc-color-primary-500, #007878);
+  border-color: var(--wc-color-primary-500, #2563eb);
 }
 
 input[type='checkbox']:checked:hover:not(:disabled) {

@@ -28,7 +28,7 @@ description: Complete system architecture, technology decisions, and infrastruct
 
 ## 1. Executive Summary
 
-This document defines the architecture for an enterprise-grade Web Component library targeting a healthcare organization's public-facing content hub. The system is designed as two independent but complementary artifacts:
+This document defines the architecture for an enterprise-grade Web Component library targeting an organization's public-facing content platform. The system is designed as two independent but complementary artifacts:
 
 1. **`@org/wc-library`** -- A standalone, framework-agnostic Web Component package built with Lit and TypeScript, distributable via npm or CDN
 2. **Storybook** -- A development and documentation environment that consumes the library as a dependency, providing interactive component previews, automated API documentation, and visual testing
@@ -37,7 +37,7 @@ The architecture prioritizes:
 
 - **Framework agnosticism**: Components work in any HTML context (Drupal, React, Vue, static HTML)
 - **Enterprise durability**: Pure TypeScript with 100% JSDoc coverage, zero runtime framework lock-in
-- **Healthcare compliance**: WCAG 2.1 AA baked into component architecture from day one
+- **Accessibility compliance**: WCAG 2.1 AA baked into component architecture from day one
 - **Clean integration boundary**: The WC library has zero knowledge of Drupal; Drupal consumes it as a static asset
 
 ---
@@ -370,7 +370,7 @@ Production:   Vite build (Rollup) --> static HTML/JS/CSS --> deploy to hosting
 | **Autodocs from CEM**              | Automatic API documentation generated from the Custom Elements Manifest -- attributes, properties, events, slots, CSS custom properties all documented without manual effort |
 | **48% leaner install**             | Flatter dependency structure reduces `node_modules` bloat, meaningful for CI cache sizes                                                                                     |
 | **Storybook Tags**                 | Organize components by status (stable, beta, deprecated) in the sidebar                                                                                                      |
-| **Accessibility testing built-in** | Axe-based a11y checks run as part of the testing suite, critical for healthcare compliance                                                                                   |
+| **Accessibility testing built-in** | Axe-based a11y checks run as part of the testing suite, critical for enterprise accessibility compliance                                                                     |
 
 ### Storybook Configuration
 
@@ -464,15 +464,15 @@ export const Default: Story = {};
 
 export const WithImage: Story = {
   args: {
-    heading: 'Health Resources',
+    heading: 'Content Resources',
     variant: 'featured',
   },
   render: (storyArgs) =>
     template(
       storyArgs,
       html`
-        <img slot="image" src="/placeholder-health.jpg" alt="Health resource" />
-        <p>Access our comprehensive health resource library.</p>
+        <img slot="image" src="/placeholder-content.jpg" alt="Content resource" />
+        <p>Access our comprehensive resource library.</p>
       `,
     ),
 };
@@ -872,7 +872,7 @@ https://cdn.jsdelivr.net/npm/@org/wc-library@latest/dist/index.js
 https://cdn.jsdelivr.net/npm/@org/wc-library@latest/dist/styles/tokens.css
 ```
 
-Note: For production healthcare deployments, a self-hosted CDN (e.g., CloudFront) is recommended over public CDNs for security and availability guarantees.
+Note: For production enterprise deployments, a self-hosted CDN (e.g., CloudFront) is recommended over public CDNs for security and availability guarantees.
 
 ### Drupal `libraries.yml` Integration
 
@@ -881,7 +881,7 @@ The client team declares the Web Component library as a Drupal library:
 ```yaml
 # mytheme.libraries.yml
 
-wc-library:
+helix:
   version: VERSION
   css:
     theme:
@@ -901,7 +901,7 @@ wc-library:
 Or, for CDN delivery:
 
 ```yaml
-wc-library-cdn:
+helix-cdn:
   version: VERSION
   css:
     theme:
@@ -923,7 +923,7 @@ Once the library is attached, Web Components work as standard HTML elements in a
 
 ```twig
 {# Attach the library #}
-{{ attach_library('mytheme/wc-library') }}
+{{ attach_library('mytheme/helix') }}
 
 {# Use components as standard HTML elements #}
 <org-card heading="{{ node.label }}" variant="featured">
@@ -979,7 +979,7 @@ props:
       title: Body Content
 libraryOverrides:
   dependencies:
-    - mytheme/wc-library
+    - mytheme/helix
 ```
 
 ```twig
@@ -1002,7 +1002,7 @@ The client team can override any token at the Drupal theme level without modifyi
 /* mytheme/css/token-overrides.css */
 :root {
   /* Override brand colors */
-  --org-color-accent: #0e7c61; /* Healthcare green */
+  --org-color-accent: #0e7c61; /* Brand teal */
   --org-color-error: #b91c1c;
 
   /* Override spacing for their density preference */
@@ -1220,7 +1220,7 @@ export default [
 
 ### Why This Is Non-Negotiable
 
-Starting May 2026, healthcare websites in the US will be required to meet WCAG AA standards under expanded HHS guidance. The European Accessibility Act (EAA) has been enforcing WCAG 2.1 AA compliance since June 2025 with six-figure fines. This is not aspirational -- it is a legal requirement for the client.
+Accessibility requirements are expanding rapidly across industries. The European Accessibility Act (EAA) has been enforcing WCAG 2.1 AA compliance since June 2025 with six-figure fines, and similar regulations are emerging worldwide. This is not aspirational -- it is a baseline requirement for enterprise content platforms.
 
 ### Component-Level A11y Patterns
 
@@ -1371,7 +1371,7 @@ jobs:
 | **CEM analyzer**             | `@custom-elements-manifest/analyzer`   | Manual JSON, Stencil docs             | Community standard; Lit plugin built-in; feeds Storybook, VS Code, JetBrains                                                                                                                                |
 | **Decorator style (Lit)**    | Experimental decorators                | TC39 standard decorators              | Lit team recommends experimental for now; produces more optimal output; standard decorator support in Lit still experimental                                                                                |
 | **TypeScript target**        | ES2021                                 | ES2022, ESNext                        | Lit's recommended target; covers all evergreen browsers; avoids `useDefineForClassFields` issues at higher targets                                                                                          |
-| **Accessibility standard**   | WCAG 2.1 AA                            | WCAG 2.2 AA                           | 2.1 AA is the current legal floor for healthcare (HHS mandate, EAA); 2.2 AA aspirational for future iteration                                                                                               |
+| **Accessibility standard**   | WCAG 2.1 AA                            | WCAG 2.2 AA                           | 2.1 AA is the current baseline for enterprise compliance (EAA and emerging regulations); 2.2 AA aspirational for future iteration                                                                           |
 | **Drupal delivery**          | npm package (primary), CDN (secondary) | CDN-only, vendor directory            | npm gives version pinning and integrity checking; CDN for rapid prototyping; avoid Drupal vendor dir pattern                                                                                                |
 
 ---
@@ -1447,10 +1447,10 @@ This architecture was informed by the following sources, accessed February 2026:
 - [Drupal Single Directory Components Documentation](https://www.drupal.org/docs/develop/theming-drupal/using-single-directory-components/quickstart)
 - [Component-Based Design in Drupal (Vardot)](https://www.vardot.com/en-us/ideas/blog/component-based-design-drupal)
 
-**Accessibility & Healthcare:**
+**Accessibility & Compliance:**
 
-- [What WCAG 2.1 AA Means for Healthcare Organizations in 2026 (Pilot Digital)](https://pilotdigital.com/blog/what-wcag-2-1-aa-means-for-healthcare-organizations-in-2026/)
-- [WCAG Standards and Healthcare Websites (Full Media)](https://www.fullmedia.com/wcag-accessibility-for-healthcare-websites/)
+- [WCAG 2.1 Specification (W3C)](https://www.w3.org/TR/WCAG21/)
+- [European Accessibility Act (EAA)](https://ec.europa.eu/social/main.jsp?catId=1202)
 - [2026 ADA Web Accessibility Standards & Requirements](https://www.accessibility.works/blog/wcag-ada-website-compliance-standards-requirements/)
 
 **Monorepo & Tooling:**

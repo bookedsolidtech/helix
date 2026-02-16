@@ -123,14 +123,14 @@ export class HelixRadioGroup extends LitElement {
 
   override connectedCallback(): void {
     super.connectedCallback();
-    this.addEventListener('wc-radio-select', this._handleRadioSelect as EventListener);
+    this.addEventListener('hx-radio-select', this._handleRadioSelect as EventListener);
     this.addEventListener('keydown', this._handleKeydown);
     this.setAttribute('role', 'radiogroup');
   }
 
   override disconnectedCallback(): void {
     super.disconnectedCallback();
-    this.removeEventListener('wc-radio-select', this._handleRadioSelect as EventListener);
+    this.removeEventListener('hx-radio-select', this._handleRadioSelect as EventListener);
     this.removeEventListener('keydown', this._handleKeydown);
   }
 
@@ -157,7 +157,7 @@ export class HelixRadioGroup extends LitElement {
   // ─── Radio Management ───
 
   private _getRadios(): HelixRadio[] {
-    return Array.from(this.querySelectorAll('wc-radio')) as HelixRadio[];
+    return Array.from(this.querySelectorAll('hx-radio')) as HelixRadio[];
   }
 
   private _getEnabledRadios(): HelixRadio[] {
@@ -214,7 +214,7 @@ export class HelixRadioGroup extends LitElement {
         bubbles: true,
         composed: true,
         detail: { value: this.value },
-      })
+      }),
     );
   };
 
@@ -232,7 +232,7 @@ export class HelixRadioGroup extends LitElement {
     e.preventDefault();
 
     const currentIndex = enabledRadios.findIndex(
-      (radio) => radio === (e.target as Element)?.closest?.('wc-radio') || radio.checked
+      (radio) => radio === (e.target as Element)?.closest?.('hx-radio') || radio.checked,
     );
 
     let nextIndex: number;
@@ -245,11 +245,11 @@ export class HelixRadioGroup extends LitElement {
     const nextRadio = enabledRadios[nextIndex];
     nextRadio.focus();
     nextRadio.dispatchEvent(
-      new CustomEvent('wc-radio-select', {
+      new CustomEvent('hx-radio-select', {
         bubbles: true,
         composed: true,
         detail: { value: nextRadio.value },
-      })
+      }),
     );
   };
 
@@ -289,7 +289,7 @@ export class HelixRadioGroup extends LitElement {
       this._internals.setValidity(
         { valueMissing: true },
         this.error || 'Please select an option.',
-        this._groupEl ?? undefined
+        this._groupEl ?? undefined,
       );
     } else {
       this._internals.setValidity({});
@@ -339,7 +339,13 @@ export class HelixRadioGroup extends LitElement {
 
         <slot name="error" @slotchange=${this._handleErrorSlotChange}>
           ${hasError
-            ? html`<div part="error" class="fieldset__error" id=${this._errorId} role="alert" aria-live="polite">
+            ? html`<div
+                part="error"
+                class="fieldset__error"
+                id=${this._errorId}
+                role="alert"
+                aria-live="polite"
+              >
                 ${this.error}
               </div>`
             : nothing}

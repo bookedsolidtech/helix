@@ -6,30 +6,29 @@ import './index.js';
 afterEach(cleanup);
 
 describe('hx-switch', () => {
-
   // --- Rendering (4) ---
 
   describe('Rendering', () => {
     it('renders with shadow DOM', async () => {
-      const _el = await fixture<WcSwitch>('<hx-switch></hx-switch>');
+      const el = await fixture<WcSwitch>('<hx-switch></hx-switch>');
       expect(el.shadowRoot).toBeTruthy();
     });
 
     it('renders a button with role="switch"', async () => {
-      const _el = await fixture<WcSwitch>('<hx-switch></hx-switch>');
+      const el = await fixture<WcSwitch>('<hx-switch></hx-switch>');
       const track = shadowQuery(el, '[role="switch"]');
       expect(track).toBeTruthy();
       expect(track?.tagName.toLowerCase()).toBe('button');
     });
 
     it('renders thumb inside track', async () => {
-      const _el = await fixture<WcSwitch>('<hx-switch></hx-switch>');
+      const el = await fixture<WcSwitch>('<hx-switch></hx-switch>');
       const thumb = shadowQuery(el, '.switch__thumb');
       expect(thumb).toBeTruthy();
     });
 
     it('exposes "switch" CSS part on container', async () => {
-      const _el = await fixture<WcSwitch>('<hx-switch></hx-switch>');
+      const el = await fixture<WcSwitch>('<hx-switch></hx-switch>');
       const switchPart = shadowQuery(el, '[part="switch"]');
       expect(switchPart).toBeTruthy();
     });
@@ -39,24 +38,24 @@ describe('hx-switch', () => {
 
   describe('Property: checked', () => {
     it('defaults to false', async () => {
-      const _el = await fixture<WcSwitch>('<hx-switch></hx-switch>');
+      const el = await fixture<WcSwitch>('<hx-switch></hx-switch>');
       expect(el.checked).toBe(false);
     });
 
     it('reflects checked attribute', async () => {
-      const _el = await fixture<WcSwitch>('<hx-switch checked></hx-switch>');
+      const el = await fixture<WcSwitch>('<hx-switch checked></hx-switch>');
       expect(el.checked).toBe(true);
       expect(el.hasAttribute('checked')).toBe(true);
     });
 
     it('sets aria-checked="true" when checked', async () => {
-      const _el = await fixture<WcSwitch>('<hx-switch checked></hx-switch>');
+      const el = await fixture<WcSwitch>('<hx-switch checked></hx-switch>');
       const track = shadowQuery(el, '[role="switch"]');
       expect(track?.getAttribute('aria-checked')).toBe('true');
     });
 
     it('sets aria-checked="false" when unchecked', async () => {
-      const _el = await fixture<WcSwitch>('<hx-switch></hx-switch>');
+      const el = await fixture<WcSwitch>('<hx-switch></hx-switch>');
       const track = shadowQuery(el, '[role="switch"]');
       expect(track?.getAttribute('aria-checked')).toBe('false');
     });
@@ -66,18 +65,18 @@ describe('hx-switch', () => {
 
   describe('Property: disabled', () => {
     it('sets disabled on the track button', async () => {
-      const _el = await fixture<WcSwitch>('<hx-switch disabled></hx-switch>');
+      const el = await fixture<WcSwitch>('<hx-switch disabled></hx-switch>');
       const track = shadowQuery<HTMLButtonElement>(el, '.switch__track');
       expect(track?.disabled).toBe(true);
     });
 
     it('reflects disabled attribute on host', async () => {
-      const _el = await fixture<WcSwitch>('<hx-switch disabled></hx-switch>');
+      const el = await fixture<WcSwitch>('<hx-switch disabled></hx-switch>');
       expect(el.hasAttribute('disabled')).toBe(true);
     });
 
     it('does not toggle when disabled', async () => {
-      const _el = await fixture<WcSwitch>('<hx-switch disabled></hx-switch>');
+      const el = await fixture<WcSwitch>('<hx-switch disabled></hx-switch>');
       const track = shadowQuery<HTMLButtonElement>(el, '.switch__track');
       track?.click();
       await el.updateComplete;
@@ -89,14 +88,14 @@ describe('hx-switch', () => {
 
   describe('Property: required', () => {
     it('shows required marker asterisk', async () => {
-      const _el = await fixture<WcSwitch>('<hx-switch label="Accept" required></hx-switch>');
+      const el = await fixture<WcSwitch>('<hx-switch label="Accept" required></hx-switch>');
       const marker = shadowQuery(el, '.switch__required-marker');
       expect(marker).toBeTruthy();
       expect(marker?.textContent).toBe('*');
     });
 
     it('sets aria-required="true" on track', async () => {
-      const _el = await fixture<WcSwitch>('<hx-switch required></hx-switch>');
+      const el = await fixture<WcSwitch>('<hx-switch required></hx-switch>');
       const track = shadowQuery(el, '[role="switch"]');
       expect(track?.getAttribute('aria-required')).toBe('true');
     });
@@ -106,18 +105,18 @@ describe('hx-switch', () => {
 
   describe('Property: size', () => {
     it('defaults to md', async () => {
-      const _el = await fixture<WcSwitch>('<hx-switch></hx-switch>');
+      const el = await fixture<WcSwitch>('<hx-switch></hx-switch>');
       expect(el.size).toBe('md');
     });
 
-    it('reflects wc-size attribute for sm', async () => {
-      const _el = await fixture<WcSwitch>('<hx-switch wc-size="sm"></hx-switch>');
+    it('reflects hx-size attribute for sm', async () => {
+      const el = await fixture<WcSwitch>('<hx-switch hx-size="sm"></hx-switch>');
       expect(el.size).toBe('sm');
       expect(el.getAttribute('hx-size')).toBe('sm');
     });
 
     it('applies size class to container', async () => {
-      const _el = await fixture<WcSwitch>('<hx-switch wc-size="lg"></hx-switch>');
+      const el = await fixture<WcSwitch>('<hx-switch hx-size="lg"></hx-switch>');
       const container = shadowQuery(el, '.switch');
       expect(container?.classList.contains('switch--lg')).toBe(true);
     });
@@ -127,13 +126,13 @@ describe('hx-switch', () => {
 
   describe('Property: label', () => {
     it('renders label text', async () => {
-      const _el = await fixture<WcSwitch>('<hx-switch label="Dark mode"></hx-switch>');
+      const el = await fixture<WcSwitch>('<hx-switch label="Dark mode"></hx-switch>');
       const label = shadowQuery(el, '[part="label"]');
       expect(label?.textContent?.trim()).toContain('Dark mode');
     });
 
     it('label is clickable and toggles switch', async () => {
-      const _el = await fixture<WcSwitch>('<hx-switch label="Toggle me"></hx-switch>');
+      const el = await fixture<WcSwitch>('<hx-switch label="Toggle me"></hx-switch>');
       const label = shadowQuery<HTMLElement>(el, '[part="label"]');
       label?.click();
       await el.updateComplete;
@@ -141,7 +140,7 @@ describe('hx-switch', () => {
     });
 
     it('track has aria-labelledby pointing to label id', async () => {
-      const _el = await fixture<WcSwitch>('<hx-switch label="Notifications"></hx-switch>');
+      const el = await fixture<WcSwitch>('<hx-switch label="Notifications"></hx-switch>');
       const track = shadowQuery(el, '[role="switch"]');
       const label = shadowQuery(el, '[part="label"]');
       expect(track?.getAttribute('aria-labelledby')).toBe(label?.id);
@@ -152,26 +151,26 @@ describe('hx-switch', () => {
 
   describe('Property: error', () => {
     it('renders error message in role="alert" div', async () => {
-      const _el = await fixture<WcSwitch>('<hx-switch error="Must accept terms"></hx-switch>');
+      const el = await fixture<WcSwitch>('<hx-switch error="Must accept terms"></hx-switch>');
       const errorDiv = shadowQuery(el, '[role="alert"]');
       expect(errorDiv).toBeTruthy();
       expect(errorDiv?.textContent?.trim()).toBe('Must accept terms');
     });
 
     it('error div has aria-live="polite"', async () => {
-      const _el = await fixture<WcSwitch>('<hx-switch error="Error"></hx-switch>');
+      const el = await fixture<WcSwitch>('<hx-switch error="Error"></hx-switch>');
       const errorDiv = shadowQuery(el, '.switch__error');
       expect(errorDiv?.getAttribute('aria-live')).toBe('polite');
     });
 
     it('sets aria-invalid="true" on track', async () => {
-      const _el = await fixture<WcSwitch>('<hx-switch error="Error"></hx-switch>');
+      const el = await fixture<WcSwitch>('<hx-switch error="Error"></hx-switch>');
       const track = shadowQuery(el, '[role="switch"]');
       expect(track?.getAttribute('aria-invalid')).toBe('true');
     });
 
     it('error hides help text', async () => {
-      const _el = await fixture<WcSwitch>('<hx-switch error="Error" help-text="Help"></hx-switch>');
+      const el = await fixture<WcSwitch>('<hx-switch error="Error" help-text="Help"></hx-switch>');
       const helpText = shadowQuery(el, '.switch__help-text');
       expect(helpText).toBeNull();
     });
@@ -181,14 +180,14 @@ describe('hx-switch', () => {
 
   describe('Property: helpText', () => {
     it('renders help text below switch', async () => {
-      const _el = await fixture<WcSwitch>('<hx-switch help-text="Toggle to enable"></hx-switch>');
+      const el = await fixture<WcSwitch>('<hx-switch help-text="Toggle to enable"></hx-switch>');
       const helpText = shadowQuery(el, '.switch__help-text');
       expect(helpText).toBeTruthy();
       expect(helpText?.textContent?.trim()).toContain('Toggle to enable');
     });
 
     it('help text hidden when error present', async () => {
-      const _el = await fixture<WcSwitch>('<hx-switch help-text="Help" error="Error"></hx-switch>');
+      const el = await fixture<WcSwitch>('<hx-switch help-text="Help" error="Error"></hx-switch>');
       const helpText = shadowQuery(el, '.switch__help-text');
       expect(helpText).toBeNull();
     });
@@ -198,7 +197,7 @@ describe('hx-switch', () => {
 
   describe('Events', () => {
     it('dispatches wc-change on toggle', async () => {
-      const _el = await fixture<WcSwitch>('<hx-switch></hx-switch>');
+      const el = await fixture<WcSwitch>('<hx-switch></hx-switch>');
       const track = shadowQuery<HTMLElement>(el, '.switch__track');
       const eventPromise = oneEvent<CustomEvent>(el, 'hx-change');
       track?.click();
@@ -207,7 +206,7 @@ describe('hx-switch', () => {
     });
 
     it('hx-change detail.checked reflects new state', async () => {
-      const _el = await fixture<WcSwitch>('<hx-switch></hx-switch>');
+      const el = await fixture<WcSwitch>('<hx-switch></hx-switch>');
       const track = shadowQuery<HTMLElement>(el, '.switch__track');
       const eventPromise = oneEvent<CustomEvent>(el, 'hx-change');
       track?.click();
@@ -216,7 +215,7 @@ describe('hx-switch', () => {
     });
 
     it('hx-change bubbles and is composed', async () => {
-      const _el = await fixture<WcSwitch>('<hx-switch></hx-switch>');
+      const el = await fixture<WcSwitch>('<hx-switch></hx-switch>');
       const track = shadowQuery<HTMLElement>(el, '.switch__track');
       const eventPromise = oneEvent<CustomEvent>(el, 'hx-change');
       track?.click();
@@ -230,14 +229,18 @@ describe('hx-switch', () => {
 
   describe('Slots', () => {
     it('default slot overrides label prop text', async () => {
-      const _el = await fixture<WcSwitch>('<hx-switch label="Prop Label"><strong>Slot Label</strong></hx-switch>');
+      const el = await fixture<WcSwitch>(
+        '<hx-switch label="Prop Label"><strong>Slot Label</strong></hx-switch>',
+      );
       const slotContent = el.querySelector('strong');
       expect(slotContent).toBeTruthy();
       expect(slotContent?.textContent).toBe('Slot Label');
     });
 
     it('help-text slot renders', async () => {
-      const _el = await fixture<WcSwitch>('<hx-switch help-text="default"><em slot="help-text">Custom help</em></hx-switch>');
+      const el = await fixture<WcSwitch>(
+        '<hx-switch help-text="default"><em slot="help-text">Custom help</em></hx-switch>',
+      );
       const helpSlot = el.querySelector('[slot="help-text"]');
       expect(helpSlot).toBeTruthy();
       expect(helpSlot?.textContent).toBe('Custom help');
@@ -248,25 +251,25 @@ describe('hx-switch', () => {
 
   describe('CSS Parts', () => {
     it('track part exposed', async () => {
-      const _el = await fixture<WcSwitch>('<hx-switch></hx-switch>');
+      const el = await fixture<WcSwitch>('<hx-switch></hx-switch>');
       const track = shadowQuery(el, '[part="track"]');
       expect(track).toBeTruthy();
     });
 
     it('thumb part exposed', async () => {
-      const _el = await fixture<WcSwitch>('<hx-switch></hx-switch>');
+      const el = await fixture<WcSwitch>('<hx-switch></hx-switch>');
       const thumb = shadowQuery(el, '[part="thumb"]');
       expect(thumb).toBeTruthy();
     });
 
     it('label part exposed', async () => {
-      const _el = await fixture<WcSwitch>('<hx-switch label="Test"></hx-switch>');
+      const el = await fixture<WcSwitch>('<hx-switch label="Test"></hx-switch>');
       const label = shadowQuery(el, '[part="label"]');
       expect(label).toBeTruthy();
     });
 
     it('error part exposed', async () => {
-      const _el = await fixture<WcSwitch>('<hx-switch error="Error"></hx-switch>');
+      const el = await fixture<WcSwitch>('<hx-switch error="Error"></hx-switch>');
       const error = shadowQuery(el, '[part="error"]');
       expect(error).toBeTruthy();
     });
@@ -281,7 +284,7 @@ describe('hx-switch', () => {
     });
 
     it('has ElementInternals attached', async () => {
-      const _el = await fixture<WcSwitch>('<hx-switch></hx-switch>');
+      const el = await fixture<WcSwitch>('<hx-switch></hx-switch>');
       expect(el.form).toBe(null);
     });
 
@@ -289,20 +292,20 @@ describe('hx-switch', () => {
       const form = document.createElement('form');
       form.innerHTML = '<hx-switch name="toggle"></hx-switch>';
       document.getElementById('test-fixture-container')!.appendChild(form);
-      const _el = form.querySelector('hx-switch') as WcSwitch;
+      const el = form.querySelector('hx-switch') as WcSwitch;
       await el.updateComplete;
       expect(el.form).toBe(form);
     });
 
     it('formResetCallback resets checked to false', async () => {
-      const _el = await fixture<WcSwitch>('<hx-switch checked></hx-switch>');
+      const el = await fixture<WcSwitch>('<hx-switch checked></hx-switch>');
       el.formResetCallback();
       await el.updateComplete;
       expect(el.checked).toBe(false);
     });
 
     it('formStateRestoreCallback restores checked state', async () => {
-      const _el = await fixture<WcSwitch>('<hx-switch></hx-switch>');
+      const el = await fixture<WcSwitch>('<hx-switch></hx-switch>');
       el.formStateRestoreCallback('on');
       await el.updateComplete;
       expect(el.checked).toBe(true);
@@ -313,17 +316,17 @@ describe('hx-switch', () => {
 
   describe('Validation', () => {
     it('checkValidity returns false when required + unchecked', async () => {
-      const _el = await fixture<WcSwitch>('<hx-switch required></hx-switch>');
+      const el = await fixture<WcSwitch>('<hx-switch required></hx-switch>');
       expect(el.checkValidity()).toBe(false);
     });
 
     it('checkValidity returns true when required + checked', async () => {
-      const _el = await fixture<WcSwitch>('<hx-switch required checked></hx-switch>');
+      const el = await fixture<WcSwitch>('<hx-switch required checked></hx-switch>');
       expect(el.checkValidity()).toBe(true);
     });
 
     it('valueMissing validity flag is set when required + unchecked', async () => {
-      const _el = await fixture<WcSwitch>('<hx-switch required></hx-switch>');
+      const el = await fixture<WcSwitch>('<hx-switch required></hx-switch>');
       expect(el.validity.valueMissing).toBe(true);
     });
   });
@@ -332,7 +335,7 @@ describe('hx-switch', () => {
 
   describe('Keyboard', () => {
     it('Space toggles the switch', async () => {
-      const _el = await fixture<WcSwitch>('<hx-switch></hx-switch>');
+      const el = await fixture<WcSwitch>('<hx-switch></hx-switch>');
       const track = shadowQuery<HTMLElement>(el, '.switch__track');
       track?.dispatchEvent(new KeyboardEvent('keydown', { key: ' ', bubbles: true }));
       await el.updateComplete;
@@ -340,7 +343,7 @@ describe('hx-switch', () => {
     });
 
     it('Enter toggles the switch', async () => {
-      const _el = await fixture<WcSwitch>('<hx-switch></hx-switch>');
+      const el = await fixture<WcSwitch>('<hx-switch></hx-switch>');
       const track = shadowQuery<HTMLElement>(el, '.switch__track');
       track?.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
       await el.updateComplete;
@@ -348,7 +351,7 @@ describe('hx-switch', () => {
     });
 
     it('other keys do not toggle', async () => {
-      const _el = await fixture<WcSwitch>('<hx-switch></hx-switch>');
+      const el = await fixture<WcSwitch>('<hx-switch></hx-switch>');
       const track = shadowQuery<HTMLElement>(el, '.switch__track');
       track?.dispatchEvent(new KeyboardEvent('keydown', { key: 'Tab', bubbles: true }));
       await el.updateComplete;
@@ -360,7 +363,7 @@ describe('hx-switch', () => {
 
   describe('Accessibility', () => {
     it('uses role="switch" not role="checkbox"', async () => {
-      const _el = await fixture<WcSwitch>('<hx-switch></hx-switch>');
+      const el = await fixture<WcSwitch>('<hx-switch></hx-switch>');
       const track = shadowQuery(el, '[role="switch"]');
       expect(track).toBeTruthy();
       const checkbox = shadowQuery(el, '[role="checkbox"]');
@@ -368,7 +371,7 @@ describe('hx-switch', () => {
     });
 
     it('aria-checked toggles with checked state', async () => {
-      const _el = await fixture<WcSwitch>('<hx-switch></hx-switch>');
+      const el = await fixture<WcSwitch>('<hx-switch></hx-switch>');
       const track = shadowQuery(el, '[role="switch"]');
       expect(track?.getAttribute('aria-checked')).toBe('false');
       el.checked = true;
@@ -377,7 +380,7 @@ describe('hx-switch', () => {
     });
 
     it('aria-describedby references error ID when error set', async () => {
-      const _el = await fixture<WcSwitch>('<hx-switch error="Bad"></hx-switch>');
+      const el = await fixture<WcSwitch>('<hx-switch error="Bad"></hx-switch>');
       const track = shadowQuery(el, '[role="switch"]');
       const errorDiv = shadowQuery(el, '.switch__error');
       const describedBy = track?.getAttribute('aria-describedby');
@@ -385,7 +388,7 @@ describe('hx-switch', () => {
     });
 
     it('aria-describedby references help text ID when helpText set', async () => {
-      const _el = await fixture<WcSwitch>('<hx-switch help-text="Some help"></hx-switch>');
+      const el = await fixture<WcSwitch>('<hx-switch help-text="Some help"></hx-switch>');
       const track = shadowQuery(el, '[role="switch"]');
       const helpDiv = shadowQuery(el, '.switch__help-text');
       const describedBy = track?.getAttribute('aria-describedby');
@@ -397,12 +400,12 @@ describe('hx-switch', () => {
 
   describe('Property: value', () => {
     it('defaults to "on"', async () => {
-      const _el = await fixture<WcSwitch>('<hx-switch></hx-switch>');
+      const el = await fixture<WcSwitch>('<hx-switch></hx-switch>');
       expect(el.value).toBe('on');
     });
 
     it('accepts custom value attribute', async () => {
-      const _el = await fixture<WcSwitch>('<hx-switch value="yes"></hx-switch>');
+      const el = await fixture<WcSwitch>('<hx-switch value="yes"></hx-switch>');
       expect(el.value).toBe('yes');
     });
   });
@@ -411,7 +414,7 @@ describe('hx-switch', () => {
 
   describe('Property: name', () => {
     it('sets name property', async () => {
-      const _el = await fixture<WcSwitch>('<hx-switch name="toggle"></hx-switch>');
+      const el = await fixture<WcSwitch>('<hx-switch name="toggle"></hx-switch>');
       expect(el.name).toBe('toggle');
     });
   });
@@ -420,19 +423,23 @@ describe('hx-switch', () => {
 
   describe('Accessibility (axe-core)', () => {
     it('has no axe violations in default state', async () => {
-      const _el = await fixture<WcSwitch>('<hx-switch label="Enable notifications"></hx-switch>');
+      const el = await fixture<WcSwitch>('<hx-switch label="Enable notifications"></hx-switch>');
       const { violations } = await checkA11y(el);
       expect(violations).toEqual([]);
     });
 
     it('has no axe violations when checked', async () => {
-      const _el = await fixture<WcSwitch>('<hx-switch label="Enable notifications" checked></hx-switch>');
+      const el = await fixture<WcSwitch>(
+        '<hx-switch label="Enable notifications" checked></hx-switch>',
+      );
       const { violations } = await checkA11y(el);
       expect(violations).toEqual([]);
     });
 
     it('has no axe violations when disabled', async () => {
-      const _el = await fixture<WcSwitch>('<hx-switch label="Enable notifications" disabled></hx-switch>');
+      const el = await fixture<WcSwitch>(
+        '<hx-switch label="Enable notifications" disabled></hx-switch>',
+      );
       const { violations } = await checkA11y(el);
       expect(violations).toEqual([]);
     });

@@ -31,10 +31,10 @@ const DEMO_MAP: Record<string, DemoConfig> = {
     primaryLabel: 'Status Notifications',
     primary: `
       <div style="display:flex;flex-direction:column;gap:0.75rem;">
-        <hx-alert variant="info">Patient records have been updated successfully.</hx-alert>
-        <hx-alert variant="success">Lab results are now available for review.</hx-alert>
-        <hx-alert variant="warning">Medication interaction detected — please review.</hx-alert>
-        <hx-alert variant="error" closable>Critical: Unable to connect to EHR system.</hx-alert>
+        <hx-alert variant="info">Your article has been updated successfully.</hx-alert>
+        <hx-alert variant="success">New content is now available for review.</hx-alert>
+        <hx-alert variant="warning">Scheduled publish date is approaching — please review.</hx-alert>
+        <hx-alert variant="error" closable>Critical: Unable to connect to content API.</hx-alert>
       </div>`,
   },
 
@@ -63,12 +63,12 @@ const DEMO_MAP: Record<string, DemoConfig> = {
     primary: `
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1rem;">
         <hx-card variant="default">
-          <span slot="header">Patient Summary</span>
-          <p>View comprehensive patient demographics, insurance details, and visit history.</p>
+          <span slot="header">Article Summary</span>
+          <p>View article details, author information, and engagement metrics.</p>
         </hx-card>
         <hx-card variant="featured">
-          <span slot="header">Lab Results</span>
-          <p>Most recent lab panel results with trend analysis and reference ranges.</p>
+          <span slot="header">Featured Content</span>
+          <p>Highlighted articles with trending topics and editorial picks.</p>
         </hx-card>
         <hx-card variant="compact" wc-href="#">
           <span slot="header">Quick Link</span>
@@ -97,15 +97,15 @@ const DEMO_MAP: Record<string, DemoConfig> = {
     primaryLabel: 'Rich Text Content',
     primary: `
       <hx-prose>
-        <h3>Clinical Documentation Standards</h3>
-        <p>All clinical documentation must follow <strong>HL7 FHIR R4</strong> standards for structured data exchange. This ensures interoperability across healthcare systems.</p>
+        <h3>Editorial Style Guide</h3>
+        <p>All published content must follow the <strong>enterprise style guide</strong> for consistent voice and formatting. This ensures quality across all content channels.</p>
         <ul>
-          <li>Use standardized terminology (SNOMED CT, ICD-10)</li>
-          <li>Include patient identifiers on every page</li>
-          <li>Document medication reconciliation at every transition of care</li>
+          <li>Use consistent terminology and brand voice</li>
+          <li>Include author attribution on every article</li>
+          <li>Follow the editorial review process before publication</li>
         </ul>
         <blockquote>
-          <p>"Good documentation is the foundation of safe patient care."</p>
+          <p>"Good content is the foundation of great user experiences."</p>
         </blockquote>
       </hx-prose>`,
   },
@@ -114,10 +114,10 @@ const DEMO_MAP: Record<string, DemoConfig> = {
     primaryLabel: 'Input States',
     primary: `
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:1rem;">
-        <hx-text-input label="Patient Email" type="email" placeholder="patient@example.com" help-text="Used for appointment reminders"></hx-text-input>
-        <hx-text-input label="Medical Record #" placeholder="MRN-000000" required></hx-text-input>
+        <hx-text-input label="Email Address" type="email" placeholder="user@example.com" help-text="Used for notifications"></hx-text-input>
+        <hx-text-input label="Article ID" placeholder="ART-000000" required></hx-text-input>
         <hx-text-input label="Password" type="password" placeholder="Enter password" error="Password must be at least 12 characters"></hx-text-input>
-        <hx-text-input label="Search Records" type="search" placeholder="Search by name or MRN" disabled></hx-text-input>
+        <hx-text-input label="Search Articles" type="search" placeholder="Search by title or author" disabled></hx-text-input>
       </div>`,
   },
 
@@ -125,8 +125,8 @@ const DEMO_MAP: Record<string, DemoConfig> = {
     primaryLabel: 'Multi-line Input',
     primary: `
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1rem;">
-        <hx-textarea label="Clinical Notes" placeholder="Enter clinical observations..." rows="4" help-text="Document patient encounter details"></hx-textarea>
-        <hx-textarea label="Discharge Summary" placeholder="Summarize discharge instructions..." rows="4" maxlength="500" show-count></hx-textarea>
+        <hx-textarea label="Article Summary" placeholder="Enter article summary..." rows="4" help-text="Brief description for search results"></hx-textarea>
+        <hx-textarea label="Editor Notes" placeholder="Add editorial notes..." rows="4" maxlength="500" show-count></hx-textarea>
       </div>`,
   },
 
@@ -134,17 +134,17 @@ const DEMO_MAP: Record<string, DemoConfig> = {
     primaryLabel: 'Dropdown Selection',
     primary: `
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:1rem;">
-        <hx-select label="Department" placeholder="Select department" help-text="Primary care department">
-          <option value="cardiology">Cardiology</option>
-          <option value="neurology">Neurology</option>
-          <option value="oncology">Oncology</option>
-          <option value="pediatrics">Pediatrics</option>
-          <option value="radiology">Radiology</option>
+        <hx-select label="Category" placeholder="Select category" help-text="Primary content category">
+          <option value="news">News</option>
+          <option value="guides">Guides</option>
+          <option value="tutorials">Tutorials</option>
+          <option value="opinion">Opinion</option>
+          <option value="reviews">Reviews</option>
         </hx-select>
         <hx-select label="Priority" placeholder="Select priority" error="Priority is required" required>
-          <option value="routine">Routine</option>
-          <option value="urgent">Urgent</option>
-          <option value="stat">STAT</option>
+          <option value="standard">Standard</option>
+          <option value="featured">Featured</option>
+          <option value="breaking">Breaking</option>
         </hx-select>
       </div>`,
   },
@@ -153,9 +153,9 @@ const DEMO_MAP: Record<string, DemoConfig> = {
     primaryLabel: 'Checkbox States',
     primary: `
       <div style="display:flex;flex-direction:column;gap:0.75rem;">
-        <hx-checkbox label="I confirm the patient identity has been verified" checked></hx-checkbox>
-        <hx-checkbox label="Patient has provided informed consent" help-text="Required before procedure"></hx-checkbox>
-        <hx-checkbox label="Allergies have been reviewed" error="This field is required" required></hx-checkbox>
+        <hx-checkbox label="I confirm the content has been reviewed" checked></hx-checkbox>
+        <hx-checkbox label="Author has approved publication" help-text="Required before publishing"></hx-checkbox>
+        <hx-checkbox label="Categories have been assigned" error="This field is required" required></hx-checkbox>
         <hx-checkbox label="Previous acknowledgment (read-only)" checked disabled></hx-checkbox>
       </div>`,
   },
@@ -164,16 +164,16 @@ const DEMO_MAP: Record<string, DemoConfig> = {
     primaryLabel: 'Radio Selection',
     primary: `
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:1.5rem;">
-        <hx-radio-group label="Blood Type" name="blood-type" help-text="From most recent lab panel">
-          <hx-radio value="a-pos" label="A+"></hx-radio>
-          <hx-radio value="b-pos" label="B+"></hx-radio>
-          <hx-radio value="o-pos" label="O+"></hx-radio>
-          <hx-radio value="ab-pos" label="AB+"></hx-radio>
+        <hx-radio-group label="Content Type" name="content-type" help-text="Select the article format">
+          <hx-radio value="article" label="Article"></hx-radio>
+          <hx-radio value="listicle" label="Listicle"></hx-radio>
+          <hx-radio value="interview" label="Interview"></hx-radio>
+          <hx-radio value="review" label="Review"></hx-radio>
         </hx-radio-group>
-        <hx-radio-group label="Visit Type" name="visit-type" orientation="horizontal">
-          <hx-radio value="new" label="New Patient"></hx-radio>
-          <hx-radio value="follow-up" label="Follow-Up"></hx-radio>
-          <hx-radio value="urgent" label="Urgent Care"></hx-radio>
+        <hx-radio-group label="Publish Status" name="publish-status" orientation="horizontal">
+          <hx-radio value="draft" label="Draft"></hx-radio>
+          <hx-radio value="review" label="In Review"></hx-radio>
+          <hx-radio value="published" label="Published"></hx-radio>
         </hx-radio-group>
       </div>`,
   },
@@ -182,33 +182,33 @@ const DEMO_MAP: Record<string, DemoConfig> = {
     primaryLabel: 'Toggle Controls',
     primary: `
       <div style="display:flex;flex-direction:column;gap:1rem;">
-        <hx-switch label="Enable appointment reminders" checked></hx-switch>
-        <hx-switch label="Share records with referring provider" help-text="Patient consent required"></hx-switch>
+        <hx-switch label="Enable email notifications" checked></hx-switch>
+        <hx-switch label="Share article with social channels" help-text="Author approval required"></hx-switch>
         <hx-switch label="High-contrast mode" wc-size="lg"></hx-switch>
         <hx-switch label="Legacy system (locked)" disabled checked></hx-switch>
       </div>`,
   },
 
   'hx-form': {
-    primaryLabel: 'Patient Intake Form',
+    primaryLabel: 'Author Submission Form',
     primary: `
-      <hx-form name="patient-intake">
+      <hx-form name="author-submission">
         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1rem;margin-bottom:1rem;">
-          <hx-text-input label="First Name" name="first-name" placeholder="Jane" required></hx-text-input>
-          <hx-text-input label="Last Name" name="last-name" placeholder="Doe" required></hx-text-input>
-          <hx-text-input label="Date of Birth" name="dob" type="text" placeholder="MM/DD/YYYY" required></hx-text-input>
+          <hx-text-input label="Article Title" name="title" placeholder="Enter title" required></hx-text-input>
+          <hx-text-input label="Author Name" name="author" placeholder="Jane Doe" required></hx-text-input>
+          <hx-text-input label="Publish Date" name="publish-date" type="text" placeholder="MM/DD/YYYY" required></hx-text-input>
         </div>
         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1rem;margin-bottom:1rem;">
-          <hx-select label="Insurance Provider" name="insurance" placeholder="Select provider">
-            <option value="aetna">Aetna</option>
-            <option value="bcbs">Blue Cross Blue Shield</option>
-            <option value="cigna">Cigna</option>
-            <option value="united">UnitedHealthcare</option>
+          <hx-select label="Category" name="category" placeholder="Select category">
+            <option value="news">News</option>
+            <option value="guides">Guides</option>
+            <option value="opinion">Opinion</option>
+            <option value="tutorials">Tutorials</option>
           </hx-select>
-          <hx-text-input label="Policy Number" name="policy" placeholder="POL-000000"></hx-text-input>
+          <hx-text-input label="Tags" name="tags" placeholder="tag1, tag2, tag3"></hx-text-input>
         </div>
-        <hx-checkbox label="I confirm all information is accurate" required style="margin-bottom:1rem;"></hx-checkbox>
-        <hx-button variant="primary" type="submit">Submit Intake Form</hx-button>
+        <hx-checkbox label="I confirm this content is ready for review" required style="margin-bottom:1rem;"></hx-checkbox>
+        <hx-button variant="primary" type="submit">Submit Article</hx-button>
       </hx-form>`,
   },
 };

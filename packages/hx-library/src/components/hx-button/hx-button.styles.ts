@@ -17,16 +17,17 @@ export const helixButtonStyles = css`
     gap: var(--hx-space-2, 0.5rem);
     border: var(--hx-border-width-thin, 1px) solid var(--hx-button-border-color, transparent);
     border-radius: var(--hx-button-border-radius, var(--hx-border-radius-md, 0.375rem));
-    background-color: var(--hx-button-bg, var(--hx-color-primary-500, #007878));
+    background-color: var(--hx-button-bg, var(--hx-color-primary-500, #2563eb));
     color: var(--hx-button-color, var(--hx-color-neutral-0, #ffffff));
     font-family: var(--hx-button-font-family, var(--hx-font-family-sans, sans-serif));
     font-weight: var(--hx-button-font-weight, var(--hx-font-weight-semibold, 600));
     line-height: var(--hx-line-height-tight, 1.25);
     cursor: pointer;
-    transition: background-color var(--hx-transition-fast, 150ms ease),
-                color var(--hx-transition-fast, 150ms ease),
-                border-color var(--hx-transition-fast, 150ms ease),
-                box-shadow var(--hx-transition-fast, 150ms ease);
+    transition:
+      background-color var(--hx-transition-fast, 150ms ease),
+      color var(--hx-transition-fast, 150ms ease),
+      border-color var(--hx-transition-fast, 150ms ease),
+      box-shadow var(--hx-transition-fast, 150ms ease);
     text-decoration: none;
     white-space: nowrap;
     user-select: none;
@@ -34,7 +35,8 @@ export const helixButtonStyles = css`
   }
 
   .button:focus-visible {
-    outline: var(--hx-focus-ring-width, 2px) solid var(--hx-button-focus-ring-color, var(--hx-focus-ring-color, #007878));
+    outline: var(--hx-focus-ring-width, 2px) solid
+      var(--hx-button-focus-ring-color, var(--hx-focus-ring-color, #2563eb));
     outline-offset: var(--hx-focus-ring-offset, 2px);
   }
 
@@ -69,29 +71,29 @@ export const helixButtonStyles = css`
   /* ─── Style Variants ─── */
 
   .button--primary {
-    --hx-button-bg: var(--hx-color-primary-500, #007878);
+    --hx-button-bg: var(--hx-color-primary-500, #2563eb);
     --hx-button-color: var(--hx-color-neutral-0, #ffffff);
     --hx-button-border-color: transparent;
   }
 
   .button--secondary {
     --hx-button-bg: transparent;
-    --hx-button-color: var(--hx-color-primary-500, #007878);
-    --hx-button-border-color: var(--hx-color-primary-500, #007878);
+    --hx-button-color: var(--hx-color-primary-500, #2563eb);
+    --hx-button-border-color: var(--hx-color-primary-500, #2563eb);
   }
 
   .button--secondary:hover {
-    --hx-button-bg: var(--hx-color-primary-50, #e6f3f3);
+    --hx-button-bg: var(--hx-color-primary-50, #eff6ff);
   }
 
   .button--ghost {
     --hx-button-bg: transparent;
-    --hx-button-color: var(--hx-color-primary-500, #007878);
+    --hx-button-color: var(--hx-color-primary-500, #2563eb);
     --hx-button-border-color: transparent;
   }
 
   .button--ghost:hover {
-    --hx-button-bg: var(--hx-color-neutral-100, #e9ecef);
+    --hx-button-bg: var(--hx-color-neutral-100, #f1f5f9);
   }
 
   /* ─── Disabled ─── */

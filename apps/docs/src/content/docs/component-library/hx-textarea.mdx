@@ -1,19 +1,81 @@
 ---
-title: "wc-textarea"
+title: "hx-textarea"
 description: A multi-line text area component with label, validation, and form association.
 ---
 
 import ComponentLoader from '../../../components/ComponentLoader.astro';
+import ComponentDemo from '../../../components/ComponentDemo.astro';
 import ComponentDoc from '../../../components/ComponentDoc.astro';
 
 <ComponentLoader />
 
-<ComponentDoc tagName="wc-textarea" section="summary" />
+<ComponentDoc tagName="hx-textarea" section="summary" />
 
-## Overview
+## Basic
 
-A multi-line text area component with label, validation, and form association.
+Simple textarea with label and placeholder.
+
+<ComponentDemo title="Basic">
+  <div style="max-width: 480px;">
+    <hx-textarea label="Comments" placeholder="Enter your comments here..." rows="3"></hx-textarea>
+  </div>
+</ComponentDemo>
+
+## Resize Options
+
+Different resize behaviors: none, vertical, both, and auto-grow.
+
+<ComponentDemo title="Resize Options">
+  <div style="display: grid; gap: 1rem; max-width: 480px;">
+    <hx-textarea label="No resize" placeholder="Cannot be resized" resize="none" rows="2"></hx-textarea>
+    <hx-textarea label="Vertical resize (default)" placeholder="Drag the handle vertically" resize="vertical" rows="2"></hx-textarea>
+    <hx-textarea label="Resize both" placeholder="Drag in any direction" resize="both" rows="2"></hx-textarea>
+    <hx-textarea label="Auto-grow" placeholder="Type to see auto-grow behavior" resize="auto" rows="2"></hx-textarea>
+  </div>
+</ComponentDemo>
+
+## Validation and States
+
+Required, error, disabled, and character count states.
+
+<ComponentDemo title="Validation and States">
+  <div style="display: grid; gap: 1rem; max-width: 480px;">
+    <hx-textarea
+      label="Required notes"
+      placeholder="This field is required"
+      required
+      help-text="Please provide detailed notes."
+    ></hx-textarea>
+    <hx-textarea
+      label="Error state"
+      value="Too short"
+      error="Description must be at least 50 characters."
+    ></hx-textarea>
+    <hx-textarea
+      label="Disabled"
+      value="This content cannot be edited."
+      disabled
+    ></hx-textarea>
+  </div>
+</ComponentDemo>
+
+## Character Count
+
+Show remaining characters with `maxlength` and `show-count`.
+
+<ComponentDemo title="Character Count">
+  <div style="max-width: 480px;">
+    <hx-textarea
+      label="Short bio"
+      placeholder="Tell us about yourself..."
+      maxlength="200"
+      show-count
+      rows="3"
+      help-text="Keep it brief."
+    ></hx-textarea>
+  </div>
+</ComponentDemo>
 
 ## API Reference
 
-<ComponentDoc tagName="wc-textarea" section="api" />
+<ComponentDoc tagName="hx-textarea" section="api" />

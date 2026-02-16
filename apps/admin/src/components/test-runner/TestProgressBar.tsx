@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import { cn } from "@/lib/utils";
+import { cn } from '@/lib/utils';
 
 interface TestProgressBarProps {
   completed: number;
@@ -22,6 +22,7 @@ export function TestProgressBar({
   const percent = total > 0 ? Math.round((completed / total) * 100) : 0;
   const isDone = !isRunning && completed > 0;
   const hasFailures = failed > 0;
+  const isStarting = isRunning && completed === 0;
 
   return (
     <div className="space-y-2">
@@ -34,38 +35,48 @@ export function TestProgressBar({
             </span>
           )}
           <span className="font-mono tabular-nums text-foreground">
-            {completed}/{total > 0 ? total : "?"} tests
+            {isStarting ? 'Launching browser...' : `${completed}/${total > 0 ? total : '?'} tests`}
           </span>
           {isRunning && (
-            <span className="text-muted-foreground">
+            <span className="text-muted-foreground tabular-nums">
               {(elapsed / 1000).toFixed(1)}s
             </span>
           )}
         </div>
         <div className="flex items-center gap-3 text-xs">
-          {passed > 0 && (
-            <span className="text-emerald-400 font-medium">{passed} passed</span>
+          {isStarting && (
+            <span className="text-blue-400 font-medium">Starting Vitest + Chromium</span>
           )}
-          {failed > 0 && (
-            <span className="text-red-400 font-medium">{failed} failed</span>
-          )}
+          {passed > 0 && <span className="text-emerald-400 font-medium">{passed} passed</span>}
+          {failed > 0 && <span className="text-red-400 font-medium">{failed} failed</span>}
         </div>
       </div>
 
       <div className="h-2 rounded-full bg-secondary overflow-hidden">
-        <div
-          className={cn(
-            "h-full rounded-full transition-all duration-300 ease-out",
-            isRunning
-              ? "bg-blue-500"
-              : isDone && hasFailures
-                ? "bg-red-500"
-                : isDone
-                  ? "bg-emerald-500"
-                  : "bg-secondary"
-          )}
-          style={{ width: `${percent}%` }}
-        />
+        {isStarting ? (
+          <div className="h-full w-full bg-blue-500/30 rounded-full overflow-hidden relative">
+            <div
+              className="absolute inset-0 bg-blue-500 rounded-full"
+              style={{
+                animation: 'indeterminate-bar 1.5s ease-in-out infinite',
+              }}
+            />
+          </div>
+        ) : (
+          <div
+            className={cn(
+              'h-full rounded-full transition-all duration-300 ease-out',
+              isRunning
+                ? 'bg-blue-500'
+                : isDone && hasFailures
+                  ? 'bg-red-500'
+                  : isDone
+                    ? 'bg-emerald-500'
+                    : 'bg-secondary',
+            )}
+            style={{ width: `${percent}%` }}
+          />
+        )}
       </div>
     </div>
   );

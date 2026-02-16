@@ -16,7 +16,7 @@ function flattenTokens(obj: Record<string, unknown>, prefix: string[] = []): Tok
     if (isTokenDefinition(val)) {
       const def = val as TokenDefinition;
       entries.push({
-        name: `--wc-${path.join('-')}`,
+        name: `--hx-${path.join('-')}`,
         value: def.value,
         category: path[0],
         group: path.length > 2 ? path.slice(1, -1).join('-') : path[0],
@@ -47,8 +47,16 @@ function groupBy(entries: TokenEntry[], field: keyof TokenEntry): Record<string,
 /** The raw token JSON source of truth */
 export const tokens = tokensJson;
 
-/** Flattened array of all token entries with metadata */
-export const tokenEntries: TokenEntry[] = flattenTokens(tokensJson);
+/** Light-mode tokens (excludes the "dark" key) */
+const { dark: darkJson, ...lightJson } = tokensJson as Record<string, unknown>;
+
+/** Flattened array of all light-mode token entries with metadata */
+export const tokenEntries: TokenEntry[] = flattenTokens(lightJson);
+
+/** Flattened array of dark-mode override entries */
+export const darkTokenEntries: TokenEntry[] = darkJson
+  ? flattenTokens(darkJson as Record<string, unknown>)
+  : [];
 
 /** Token entries grouped by top-level category */
 export const tokensByCategory: Record<string, TokenEntry[]> = groupBy(tokenEntries, 'category');

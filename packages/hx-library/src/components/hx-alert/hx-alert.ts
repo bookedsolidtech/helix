@@ -85,19 +85,35 @@ export class HelixAlert extends LitElement {
   // ─── Default Icons ───
 
   private _renderInfoIcon() {
-    return html`<svg viewBox="0 0 20 20" aria-hidden="true"><path d="M10 2a8 8 0 100 16 8 8 0 000-16zm.75 4.75a.75.75 0 11-1.5 0 .75.75 0 011.5 0zM9.25 9a.75.75 0 011.5 0v4a.75.75 0 01-1.5 0V9z"/></svg>`;
+    return html`<svg viewBox="0 0 20 20" aria-hidden="true">
+      <path
+        d="M10 2a8 8 0 100 16 8 8 0 000-16zm.75 4.75a.75.75 0 11-1.5 0 .75.75 0 011.5 0zM9.25 9a.75.75 0 011.5 0v4a.75.75 0 01-1.5 0V9z"
+      />
+    </svg>`;
   }
 
   private _renderSuccessIcon() {
-    return html`<svg viewBox="0 0 20 20" aria-hidden="true"><path d="M10 2a8 8 0 100 16 8 8 0 000-16zm3.03 6.28a.75.75 0 00-1.06-1.06L9 10.19 7.78 8.97a.75.75 0 00-1.06 1.06l1.75 1.75a.75.75 0 001.06 0l3.5-3.5z"/></svg>`;
+    return html`<svg viewBox="0 0 20 20" aria-hidden="true">
+      <path
+        d="M10 2a8 8 0 100 16 8 8 0 000-16zm3.03 6.28a.75.75 0 00-1.06-1.06L9 10.19 7.78 8.97a.75.75 0 00-1.06 1.06l1.75 1.75a.75.75 0 001.06 0l3.5-3.5z"
+      />
+    </svg>`;
   }
 
   private _renderWarningIcon() {
-    return html`<svg viewBox="0 0 20 20" aria-hidden="true"><path d="M8.49 2.92a1.75 1.75 0 013.02 0l6.25 10.83A1.75 1.75 0 0116.25 16H3.75a1.75 1.75 0 01-1.51-2.25L8.49 2.92zM10 7a.75.75 0 01.75.75v3a.75.75 0 01-1.5 0v-3A.75.75 0 0110 7zm0 7.5a.75.75 0 100-1.5.75.75 0 000 1.5z"/></svg>`;
+    return html`<svg viewBox="0 0 20 20" aria-hidden="true">
+      <path
+        d="M8.49 2.92a1.75 1.75 0 013.02 0l6.25 10.83A1.75 1.75 0 0116.25 16H3.75a1.75 1.75 0 01-1.51-2.25L8.49 2.92zM10 7a.75.75 0 01.75.75v3a.75.75 0 01-1.5 0v-3A.75.75 0 0110 7zm0 7.5a.75.75 0 100-1.5.75.75 0 000 1.5z"
+      />
+    </svg>`;
   }
 
   private _renderErrorIcon() {
-    return html`<svg viewBox="0 0 20 20" aria-hidden="true"><path d="M10 2a8 8 0 100 16 8 8 0 000-16zm-1.72 5.22a.75.75 0 011.06 0L10 7.94l.66-.72a.75.75 0 111.06 1.06L11.06 9l.66.72a.75.75 0 11-1.06 1.06L10 10.06l-.66.72a.75.75 0 01-1.06-1.06L8.94 9l-.66-.72a.75.75 0 010-1.06z"/></svg>`;
+    return html`<svg viewBox="0 0 20 20" aria-hidden="true">
+      <path
+        d="M10 2a8 8 0 100 16 8 8 0 000-16zm-1.72 5.22a.75.75 0 011.06 0L10 7.94l.66-.72a.75.75 0 111.06 1.06L11.06 9l.66.72a.75.75 0 11-1.06 1.06L10 10.06l-.66.72a.75.75 0 01-1.06-1.06L8.94 9l-.66-.72a.75.75 0 010-1.06z"
+      />
+    </svg>`;
   }
 
   private _renderDefaultIcon() {
@@ -115,7 +131,11 @@ export class HelixAlert extends LitElement {
   }
 
   private _renderCloseIcon() {
-    return html`<svg viewBox="0 0 20 20" aria-hidden="true"><path d="M6.28 5.22a.75.75 0 00-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 101.06 1.06L10 11.06l3.72 3.72a.75.75 0 101.06-1.06L11.06 10l3.72-3.72a.75.75 0 00-1.06-1.06L10 8.94 6.28 5.22z"/></svg>`;
+    return html`<svg viewBox="0 0 20 20" aria-hidden="true">
+      <path
+        d="M6.28 5.22a.75.75 0 00-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 101.06 1.06L10 11.06l3.72 3.72a.75.75 0 101.06-1.06L11.06 10l3.72-3.72a.75.75 0 00-1.06-1.06L10 8.94 6.28 5.22z"
+      />
+    </svg>`;
   }
 
   // ─── Event Handling ───
@@ -132,18 +152,18 @@ export class HelixAlert extends LitElement {
         bubbles: true,
         composed: true,
         detail: { reason: 'user' },
-      })
+      }),
     );
 
     /**
      * Dispatched after the alert is dismissed.
-     * @event wc-after-close
+     * @event hx-after-close
      */
     this.dispatchEvent(
-      new CustomEvent('wc-after-close', {
+      new CustomEvent('hx-after-close', {
         bubbles: true,
         composed: true,
-      })
+      }),
     );
   }
 
@@ -156,12 +176,7 @@ export class HelixAlert extends LitElement {
     };
 
     return html`
-      <div
-        part="alert"
-        class=${classMap(classes)}
-        role=${this._role}
-        aria-live=${this._ariaLive}
-      >
+      <div part="alert" class=${classMap(classes)} role=${this._role} aria-live=${this._ariaLive}>
         <div part="icon" class="alert__icon">
           <slot name="icon">${this._renderDefaultIcon()}</slot>
         </div>

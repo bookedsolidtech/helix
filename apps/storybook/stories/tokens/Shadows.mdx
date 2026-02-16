@@ -1,0 +1,473 @@
+{/* Shadows.mdx — HELIX Design Token: Elevation & Shadows */}
+
+import { Meta } from '@storybook/addon-docs/blocks';
+import { tokensByCategory } from '@helix/tokens';
+
+<Meta title="Design Tokens/Shadows" parameters={{ controls: { disable: true }, actions: { disable: true } }} />
+
+export const shadowTokens = tokensByCategory['shadow'] ?? [];
+
+export const shadowUseCases = {
+  none: 'Flat elements with no visual lift. Used for inline or flush elements.',
+  sm: 'Subtle elevation for cards at rest, input fields, and static containers.',
+  md: 'Moderate depth for dropdowns, popovers, and floating action elements.',
+  lg: 'Prominent elevation for modals, dialogs, and active focus states.',
+  xl: 'High elevation for toast notifications and slide-over panels.',
+  '2xl': 'Maximum depth for full-screen overlays and critical alert dialogs.',
+  inner: 'Inset shadow for pressed states, active inputs, and recessed surfaces.',
+};
+
+<style>
+{`
+  /* ── Scoped container reset ─────────────────────────── */
+  .hx-token-shadows {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 0 1rem 3rem;
+    font-family: var(--hx-font-family-sans, 'Inter', -apple-system, BlinkMacSystemFont, sans-serif);
+    color: var(--hx-color-neutral-800, #1E293B);
+    line-height: 1.5;
+  }
+
+  .hx-token-shadows *,
+  .hx-token-shadows *::before,
+  .hx-token-shadows *::after {
+    box-sizing: border-box;
+  }
+
+  /* Override Storybook aggressive element defaults */
+  .hx-token-shadows h2,
+  .hx-token-shadows h3,
+  .hx-token-shadows p,
+  .hx-token-shadows span,
+  .hx-token-shadows div,
+  .hx-token-shadows code {
+    all: unset;
+    box-sizing: border-box;
+    display: block;
+  }
+
+  .hx-token-shadows span,
+  .hx-token-shadows code {
+    display: inline;
+  }
+
+  /* ── Mini Hero Banner ───────────────────────────────── */
+  .hx-token-shadows .hx-shadows-hero {
+    background: linear-gradient(135deg, var(--hx-color-neutral-100, #F1F5F9) 0%, var(--hx-color-neutral-50, #F8FAFC) 100%) !important;
+    border-radius: 0.75rem !important;
+    padding: 2.5rem 2rem !important;
+    margin-bottom: 2.5rem !important;
+    border: 1px solid var(--hx-color-neutral-200, #E2E8F0) !important;
+    position: relative !important;
+    overflow: hidden !important;
+  }
+
+  .hx-token-shadows .hx-shadows-hero::before {
+    content: '' !important;
+    position: absolute !important;
+    bottom: -40px !important;
+    right: -20px !important;
+    width: 180px !important;
+    height: 180px !important;
+    background: radial-gradient(circle, var(--hx-color-neutral-200, #E2E8F0) 0%, transparent 70%) !important;
+    opacity: 0.6 !important;
+    pointer-events: none !important;
+  }
+
+  .hx-token-shadows .hx-shadows-hero-title {
+    font-family: var(--hx-font-family-sans, 'Inter', sans-serif) !important;
+    font-size: 2rem !important;
+    font-weight: 800 !important;
+    color: var(--hx-color-neutral-900, #0F172A) !important;
+    margin: 0 0 0.5rem 0 !important;
+    letter-spacing: -0.025em !important;
+    line-height: 1.2 !important;
+  }
+
+  .hx-token-shadows .hx-shadows-hero-desc {
+    font-family: var(--hx-font-family-sans, 'Inter', sans-serif) !important;
+    font-size: 1rem !important;
+    color: var(--hx-color-neutral-500, #64748B) !important;
+    margin: 0 0 1rem 0 !important;
+    line-height: 1.6 !important;
+    max-width: 600px !important;
+  }
+
+  .hx-token-shadows .hx-shadows-hero-badge {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 0.375rem !important;
+    background: var(--hx-color-neutral-200, #E2E8F0) !important;
+    color: var(--hx-color-neutral-700, #334155) !important;
+    padding: 4px 12px !important;
+    border-radius: 9999px !important;
+    font-family: var(--hx-font-family-sans, 'Inter', sans-serif) !important;
+    font-size: 0.75rem !important;
+    font-weight: 600 !important;
+    letter-spacing: 0.01em !important;
+  }
+
+  /* ── Section Headings ───────────────────────────────── */
+  .hx-token-shadows .hx-shadows-section-desc {
+    font-family: var(--hx-font-family-sans, 'Inter', sans-serif) !important;
+    font-size: 0.9375rem !important;
+    color: var(--hx-color-neutral-500, #64748B) !important;
+    margin: 0 0 1.5rem 0 !important;
+    line-height: 1.6 !important;
+    max-width: 640px !important;
+  }
+
+  /* ── Elevation Cards Grid ───────────────────────────── */
+  .hx-token-shadows .hx-shadows-elevation-grid {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)) !important;
+    gap: 24px !important;
+    padding: 24px !important;
+    background: var(--hx-color-neutral-50, #F8FAFC) !important;
+    border-radius: 0.75rem !important;
+    border: 1px solid var(--hx-color-neutral-100, #F1F5F9) !important;
+  }
+
+  .hx-token-shadows .hx-shadows-elevation-card {
+    background: var(--hx-color-neutral-0, #FFFFFF) !important;
+    border-radius: 0.75rem !important;
+    padding: 2rem 1.5rem !important;
+    transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.25s ease !important;
+  }
+
+  .hx-token-shadows .hx-shadows-elevation-card:hover {
+    transform: translateY(-3px) !important;
+  }
+
+  .hx-token-shadows .hx-shadows-elevation-card--bordered {
+    border: 1px solid var(--hx-color-neutral-200, #E2E8F0) !important;
+  }
+
+  .hx-token-shadows .hx-shadows-card-name {
+    font-family: var(--hx-font-family-sans, 'Inter', sans-serif) !important;
+    font-size: 1.125rem !important;
+    font-weight: 700 !important;
+    color: var(--hx-color-neutral-800, #1E293B) !important;
+    margin: 0 0 0.375rem 0 !important;
+  }
+
+  .hx-token-shadows .hx-shadows-card-usecase {
+    font-family: var(--hx-font-family-sans, 'Inter', sans-serif) !important;
+    font-size: 0.875rem !important;
+    color: var(--hx-color-neutral-500, #64748B) !important;
+    margin: 0 0 1rem 0 !important;
+    line-height: 1.5 !important;
+  }
+
+  .hx-token-shadows .hx-shadows-card-token-badge {
+    display: inline-block !important;
+    font-family: var(--hx-font-family-mono, 'JetBrains Mono', monospace) !important;
+    font-size: 0.75rem !important;
+    color: var(--hx-color-neutral-600, #475569) !important;
+    padding: 6px 10px !important;
+    background: var(--hx-color-neutral-50, #F8FAFC) !important;
+    border-radius: 0.375rem !important;
+    border: 1px solid var(--hx-color-neutral-200, #E2E8F0) !important;
+    word-break: break-all !important;
+    line-height: 1.4 !important;
+  }
+
+  /* ── Side-by-Side Comparison ────────────────────────── */
+  .hx-token-shadows .hx-shadows-comparison-row {
+    display: flex !important;
+    align-items: flex-start !important;
+    gap: 20px !important;
+    flex-wrap: wrap !important;
+    padding: 32px 24px !important;
+    background: var(--hx-color-neutral-50, #F8FAFC) !important;
+    border-radius: 0.75rem !important;
+    border: 1px solid var(--hx-color-neutral-100, #F1F5F9) !important;
+  }
+
+  .hx-token-shadows .hx-shadows-comparison-item {
+    flex: 0 0 auto !important;
+    text-align: center !important;
+  }
+
+  .hx-token-shadows .hx-shadows-comparison-box {
+    width: 120px !important;
+    height: 90px !important;
+    background: var(--hx-color-neutral-0, #FFFFFF) !important;
+    border-radius: 0.5rem !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    transition: transform 0.2s ease !important;
+  }
+
+  .hx-token-shadows .hx-shadows-comparison-box:hover {
+    transform: scale(1.05) !important;
+  }
+
+  .hx-token-shadows .hx-shadows-comparison-box--bordered {
+    border: 1px solid var(--hx-color-neutral-200, #E2E8F0) !important;
+  }
+
+  .hx-token-shadows .hx-shadows-comparison-label {
+    font-family: var(--hx-font-family-sans, 'Inter', sans-serif) !important;
+    font-size: 0.875rem !important;
+    color: var(--hx-color-neutral-600, #475569) !important;
+    font-weight: 500 !important;
+  }
+
+  .hx-token-shadows .hx-shadows-comparison-name {
+    font-family: var(--hx-font-family-mono, 'JetBrains Mono', monospace) !important;
+    font-size: 0.6875rem !important;
+    color: var(--hx-color-neutral-400, #94A3B8) !important;
+    margin-top: 8px !important;
+  }
+
+  /* ── Interactive Demo ───────────────────────────────── */
+  .hx-token-shadows .hx-shadows-demo-area {
+    padding: 48px 32px !important;
+    background: var(--hx-color-neutral-50, #F8FAFC) !important;
+    border-radius: 0.75rem !important;
+    border: 1px solid var(--hx-color-neutral-100, #F1F5F9) !important;
+    display: flex !important;
+    justify-content: center !important;
+  }
+
+  .hx-token-shadows .hx-shadows-interactive-card {
+    background: var(--hx-color-neutral-0, #FFFFFF) !important;
+    border-radius: 0.75rem !important;
+    padding: 2rem !important;
+    max-width: 380px !important;
+    width: 100% !important;
+    box-shadow: var(--hx-shadow-sm, 0 1px 2px 0 rgb(0 0 0 / 0.05)) !important;
+    transition: box-shadow 0.35s cubic-bezier(0.22, 1, 0.36, 1), transform 0.35s cubic-bezier(0.22, 1, 0.36, 1) !important;
+    cursor: pointer !important;
+  }
+
+  .hx-token-shadows .hx-shadows-interactive-card:hover {
+    box-shadow: var(--hx-shadow-xl, 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1)) !important;
+    transform: translateY(-4px) !important;
+  }
+
+  .hx-token-shadows .hx-shadows-demo-title {
+    font-family: var(--hx-font-family-sans, 'Inter', sans-serif) !important;
+    font-size: 1.125rem !important;
+    font-weight: 700 !important;
+    color: var(--hx-color-neutral-800, #1E293B) !important;
+    margin: 0 0 0.5rem 0 !important;
+  }
+
+  .hx-token-shadows .hx-shadows-demo-body {
+    font-family: var(--hx-font-family-sans, 'Inter', sans-serif) !important;
+    font-size: 0.875rem !important;
+    color: var(--hx-color-neutral-500, #64748B) !important;
+    line-height: 1.6 !important;
+    margin: 0 0 1.25rem 0 !important;
+  }
+
+  .hx-token-shadows .hx-shadows-demo-pills {
+    display: flex !important;
+    gap: 8px !important;
+    flex-wrap: wrap !important;
+  }
+
+  .hx-token-shadows .hx-shadows-demo-pill {
+    display: inline-block !important;
+    padding: 4px 12px !important;
+    border-radius: 9999px !important;
+    font-family: var(--hx-font-family-sans, 'Inter', sans-serif) !important;
+    font-size: 0.75rem !important;
+    font-weight: 500 !important;
+  }
+
+  .hx-token-shadows .hx-shadows-demo-pill--success {
+    background: var(--hx-color-success-100, #DCFCE7) !important;
+    color: var(--hx-color-success-700, #15803D) !important;
+  }
+
+  .hx-token-shadows .hx-shadows-demo-pill--primary {
+    background: var(--hx-color-primary-50, #EFF6FF) !important;
+    color: var(--hx-color-primary-700, #1E40AF) !important;
+  }
+
+  .hx-token-shadows .hx-shadows-demo-hint {
+    font-family: var(--hx-font-family-sans, 'Inter', sans-serif) !important;
+    font-size: 0.8125rem !important;
+    color: var(--hx-color-neutral-400, #94A3B8) !important;
+    text-align: center !important;
+    margin-top: 1rem !important;
+    font-style: italic !important;
+  }
+
+  /* ── Value Reference ────────────────────────────────── */
+  .hx-token-shadows .hx-shadows-ref-table {
+    width: 100% !important;
+    border-collapse: collapse !important;
+  }
+
+  .hx-token-shadows .hx-shadows-ref-row {
+    display: grid !important;
+    grid-template-columns: 180px 1fr !important;
+    gap: 16px !important;
+    padding: 12px 16px !important;
+    align-items: center !important;
+  }
+
+  .hx-token-shadows .hx-shadows-ref-row:not(:last-child) {
+    border-bottom: 1px solid var(--hx-color-neutral-100, #F1F5F9) !important;
+  }
+
+  .hx-token-shadows .hx-shadows-ref-row:hover {
+    background: var(--hx-color-neutral-50, #F8FAFC) !important;
+    border-radius: 0.5rem !important;
+  }
+
+  .hx-token-shadows .hx-shadows-ref-name {
+    font-family: var(--hx-font-family-mono, 'JetBrains Mono', monospace) !important;
+    font-size: 0.8125rem !important;
+    color: var(--hx-color-neutral-700, #334155) !important;
+    font-weight: 500 !important;
+  }
+
+  .hx-token-shadows .hx-shadows-ref-value {
+    font-family: var(--hx-font-family-mono, 'JetBrains Mono', monospace) !important;
+    font-size: 0.75rem !important;
+    color: var(--hx-color-neutral-400, #94A3B8) !important;
+    word-break: break-all !important;
+  }
+
+  /* ── Footer ─────────────────────────────────────────── */
+  .hx-token-shadows .hx-shadows-footer {
+    margin-top: 3rem !important;
+    padding-top: 1.5rem !important;
+    border-top: 1px solid var(--hx-color-neutral-200, #E2E8F0) !important;
+    text-align: center !important;
+  }
+
+  .hx-token-shadows .hx-shadows-footer-text {
+    font-family: var(--hx-font-family-sans, 'Inter', sans-serif) !important;
+    font-size: 0.8125rem !important;
+    color: var(--hx-color-neutral-400, #94A3B8) !important;
+  }
+`}
+</style>
+
+<div className="hx-token-shadows">
+
+{/* ═══ Mini Hero Banner ═══════════════════════════════ */}
+<div className="hx-shadows-hero">
+  <div className="hx-shadows-hero-title">Shadows</div>
+  <div className="hx-shadows-hero-desc">
+    Shadow tokens create visual depth and establish the elevation hierarchy in your UI.
+    The scale progresses from flat to dramatic, with an inner shadow for pressed and inset states.
+  </div>
+  <div className="hx-shadows-hero-badge">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M12 3v18M3 12h18" />
+      <rect x="3" y="3" width="18" height="18" rx="2" />
+    </svg>
+    {shadowTokens.length} tokens
+  </div>
+</div>
+
+{/* ═══ Elevation Scale ═══════════════════════════════ */}
+
+## Elevation Scale
+
+<div className="hx-shadows-section-desc">
+  Each card below is rendered with a different shadow token applied. White cards on a neutral
+  background highlight the progressive depth from flat (none) to maximum elevation (2xl),
+  plus an inset shadow for recessed surfaces.
+</div>
+
+<div className="hx-shadows-elevation-grid">
+  {shadowTokens.map((token) => (
+    <div
+      className={`hx-shadows-elevation-card ${token.key === 'none' ? 'hx-shadows-elevation-card--bordered' : ''}`}
+      key={token.name}
+      style={{ boxShadow: `var(${token.name})` }}
+    >
+      <div className="hx-shadows-card-name">shadow-{token.key}</div>
+      <div className="hx-shadows-card-usecase">
+        {shadowUseCases[token.key] || token.description || 'General purpose shadow.'}
+      </div>
+      <span className="hx-shadows-card-token-badge">{token.name}</span>
+    </div>
+  ))}
+</div>
+
+{/* ═══ Side-by-Side Comparison ═══════════════════════ */}
+
+## Side-by-Side Comparison
+
+<div className="hx-shadows-section-desc">
+  Identical cards rendered with each shadow level, arranged in a compact horizontal strip
+  to highlight the visual progression from no shadow through maximum elevation.
+</div>
+
+<div className="hx-shadows-comparison-row">
+  {shadowTokens.map((token) => (
+    <div className="hx-shadows-comparison-item" key={token.name}>
+      <div
+        className={`hx-shadows-comparison-box ${token.key === 'none' ? 'hx-shadows-comparison-box--bordered' : ''}`}
+        style={{ boxShadow: `var(${token.name})` }}
+      >
+        <span className="hx-shadows-comparison-label">{token.key}</span>
+      </div>
+      <div className="hx-shadows-comparison-name">{token.name}</div>
+    </div>
+  ))}
+</div>
+
+{/* ═══ Interactive Demo ══════════════════════════════ */}
+
+## Interactive Demo
+
+<div className="hx-shadows-section-desc">
+  Hover over the card below to see a smooth elevation transition from shadow-sm to shadow-xl.
+  This demonstrates how shadow tokens can be combined with CSS transitions to create
+  interactive depth cues that guide user attention.
+</div>
+
+<div className="hx-shadows-demo-area">
+  <div className="hx-shadows-interactive-card">
+    <div className="hx-shadows-demo-title">Patient Summary</div>
+    <div className="hx-shadows-demo-body">
+      This card rests at shadow-sm for a subtle lift. On hover, it transitions
+      to shadow-xl with a gentle upward movement, indicating interactivity
+      and drawing focus to the content.
+    </div>
+    <div className="hx-shadows-demo-pills">
+      <span className="hx-shadows-demo-pill hx-shadows-demo-pill--success">Active</span>
+      <span className="hx-shadows-demo-pill hx-shadows-demo-pill--primary">Outpatient</span>
+    </div>
+  </div>
+</div>
+<div className="hx-shadows-demo-hint">Hover over the card to see the shadow transition</div>
+
+{/* ═══ Value Reference ═══════════════════════════════ */}
+
+## Value Reference
+
+<div className="hx-shadows-section-desc">
+  The raw CSS values for each shadow token. These can be inspected in DevTools or referenced
+  when building custom components that need to match the elevation system.
+</div>
+
+<div>
+  {shadowTokens.map((token) => (
+    <div className="hx-shadows-ref-row" key={token.name}>
+      <span className="hx-shadows-ref-name">{token.name}</span>
+      <span className="hx-shadows-ref-value">{token.value}</span>
+    </div>
+  ))}
+</div>
+
+{/* ═══ Footer ════════════════════════════════════════ */}
+<div className="hx-shadows-footer">
+  <div className="hx-shadows-footer-text">
+    HELIX Design Tokens &middot; Elevation &amp; Shadows &middot; {shadowTokens.length} tokens
+  </div>
+</div>
+
+</div>

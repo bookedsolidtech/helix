@@ -327,7 +327,7 @@ export default defineConfig({
     lit(),
 
     starlight({
-      title: 'Healthcare Design System',
+      title: 'HELIX Design System',
       logo: {
         src: './src/assets/logo.svg',
         alt: 'HDS Logo',
@@ -698,15 +698,15 @@ for (const module of manifest.modules ?? []) {
     const categoryDir = join(outputDir, category);
     mkdirSync(categoryDir, { recursive: true });
 
-    // Human-friendly component name: wc-content-card -> Content Card
+    // Human-friendly component name: hx-content-card -> Content Card
     const displayName = tagName
-      .replace(/^wc-/, '')
+      .replace(/^hx-/, '')
       .split('-')
       .map((w: string) => w.charAt(0).toUpperCase() + w.slice(1))
       .join(' ');
 
     const content = generateComponentPage(declaration, displayName, tagName, category);
-    writeFileSync(join(categoryDir, `${tagName.replace('wc-', '')}.mdx`), content);
+    writeFileSync(join(categoryDir, `${tagName.replace('hx-', '')}.mdx`), content);
   }
 }
 
@@ -922,7 +922,7 @@ const data = entry.data;
 The CEM-to-docs pipeline is fully automated. When a developer updates a component's JSDoc, the CEM regenerates, and the next documentation build picks up the changes:
 
 ```
-Developer edits wc-button.ts JSDoc
+Developer edits hx-button.ts JSDoc
         |
         v
 CI runs `cem analyze --litelement`
@@ -1146,7 +1146,7 @@ Starlight supports both standard Markdown and MDX. MDX is used for documentation
 ```mdx
 ---
 title: 'TWIG Patterns'
-description: 'How to use Healthcare Design System components in Drupal TWIG templates'
+description: 'How to use HELIX Design System components in Drupal TWIG templates'
 ---
 
 import { Aside, Tabs, TabItem, Code } from '@astrojs/starlight/components';
@@ -1160,12 +1160,12 @@ in your TWIG templates.
 
 <Aside type="tip" title="Prerequisites">
   Before starting, ensure you have completed the [Drupal Setup](/guides/drupal-teams/drupal-setup/)
-  guide and attached the `wc-library` Drupal library to your theme.
+  guide and attached the `helix` Drupal library to your theme.
 </Aside>
 
 ## Content Card
 
-The `<wc-content-card>` component maps directly to Drupal's article node
+The `<hx-content-card>` component maps directly to Drupal's article node
 teaser view mode.
 
 ### Interactive Demo
@@ -1175,7 +1175,7 @@ teaser view mode.
 ### TWIG Template
 
 <TwigExample file="node--article--teaser.html.twig">
-  {`<wc-content-card
+  {`<hx-content-card
   heading="{{ label[0]['#title'] | default(node.label) }}"
   summary="{{ content.field_summary|render|striptags|trim }}"
   category="{{ node.field_category.entity.label }}"
@@ -1188,7 +1188,7 @@ teaser view mode.
       {{ content.field_media }}
     </div>
   {% endif %}
-</wc-content-card>`}
+</hx-content-card>`}
 </TwigExample>
 
 ### Field Mapping
@@ -1216,8 +1216,8 @@ Starlight uses Expressive Code (Shiki-based) for code blocks. It provides featur
 import { LitElement, html } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 
-@customElement('wc-button') // highlighted
-export class WcButton extends LitElement {
+@customElement('hx-button') // highlighted
+export class HxButton extends LitElement {
   // highlighted
   @property({ type: String }) variant = 'primary'; // highlighted
 }
@@ -1239,9 +1239,9 @@ button {
 **File name and language tabs:**
 
 ````markdown
-```typescript title="wc-button.ts"
-@customElement('wc-button')
-export class WcButton extends LitElement {}
+```typescript title="hx-button.ts"
+@customElement('hx-button')
+export class HxButton extends LitElement {}
 ```
 ````
 
@@ -1252,7 +1252,7 @@ TWIG is supported in Shiki's language grammar registry (used by Expressive Code)
 ````markdown
 ```twig title="node--article--teaser.html.twig"
 {# Content Card Integration #}
-<wc-content-card
+<hx-content-card
   heading="{{ label[0]['#title'] | default(node.label) }}"
   variant="{{ is_promoted ? 'featured' : 'default' }}"
 >
@@ -1261,7 +1261,7 @@ TWIG is supported in Shiki's language grammar registry (used by Expressive Code)
       {{ content.field_media }}
     </div>
   {% endif %}
-</wc-content-card>
+</hx-content-card>
 ```
 ````
 

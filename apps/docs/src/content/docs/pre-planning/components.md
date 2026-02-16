@@ -25,10 +25,10 @@ description: Lit 3.x component architecture, Storybook 10.x integration, and ent
 
 ### 3.1.1 Why Lit for This Project
 
-Lit is the optimal choice for an enterprise healthcare content hub targeting Drupal integration for several reasons:
+Lit is the optimal choice for an enterprise content platform targeting Drupal integration for several reasons:
 
 - **Framework-agnostic**: Lit components are standard Web Components. They work in Drupal TWIG templates, React portals, Angular wrappers, or plain HTML with zero framework coupling.
-- **Lightweight**: The core library is approximately 5KB minified and compressed. For a public-facing healthcare content hub where performance directly impacts user trust and SEO, this matters.
+- **Lightweight**: The core library is approximately 5KB minified and compressed. For a public-facing content platform where performance directly impacts user trust and SEO, this matters.
 - **Google-backed with enterprise adoption**: UI5 Web Components (SAP), Vaadin, and numerous enterprise design systems are built on Lit.
 - **Native browser APIs**: No virtual DOM diffing. Lit touches only the dynamic parts of the UI during updates, yielding predictable performance.
 - **Shadow DOM encapsulation**: Critical when injecting components into a Drupal theme where CSS conflicts are common.
@@ -37,9 +37,9 @@ Lit is the optimal choice for an enterprise healthcare content hub targeting Dru
 
 Every component in this library follows these principles:
 
-1. **Single Responsibility**: Each component does one thing well. A `wc-content-card` renders a content card -- it does not fetch data, manage routing, or handle global state.
+1. **Single Responsibility**: Each component does one thing well. A `hx-content-card` renders a content card -- it does not fetch data, manage routing, or handle global state.
 2. **Composition Over Inheritance**: Use slot-based composition and reactive controllers rather than deep class hierarchies.
-3. **Progressive Enhancement**: Components must render meaningful content even before JavaScript executes (critical for healthcare SEO and accessibility).
+3. **Progressive Enhancement**: Components must render meaningful content even before JavaScript executes (critical for SEO and accessibility).
 4. **Explicit Contracts**: Every public property, event, slot, and CSS custom property is documented in JSDoc, enforced by TypeScript, and surfaced in the Custom Elements Manifest.
 
 ### 3.1.3 Reactive Property Patterns
@@ -51,9 +51,9 @@ import { LitElement, html, css } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 
 /**
- * A content card component for healthcare article previews.
+ * A content card component for article previews.
  *
- * @element wc-content-card
+ * @element hx-content-card
  * @slot - Default slot for card body content
  * @slot media - Slot for hero image or video
  * @slot actions - Slot for CTA buttons
@@ -62,15 +62,15 @@ import { customElement, property, state } from 'lit/decorators.js';
  * @csspart header - The card header area
  * @csspart body - The card body area
  *
- * @cssprop [--wc-card-radius=8px] - Card border radius
- * @cssprop [--wc-card-padding=1.5rem] - Card internal padding
- * @cssprop [--wc-card-bg=var(--wc-surface)] - Card background color
- * @cssprop [--wc-card-shadow=0 2px 8px rgba(0,0,0,0.1)] - Card shadow
+ * @cssprop [--hx-card-radius=8px] - Card border radius
+ * @cssprop [--hx-card-padding=1.5rem] - Card internal padding
+ * @cssprop [--hx-card-bg=var(--hx-surface)] - Card background color
+ * @cssprop [--hx-card-shadow=0 2px 8px rgba(0,0,0,0.1)] - Card shadow
  *
- * @fires wc-card-click - Fired when the card is activated (click or Enter key)
+ * @fires hx-card-click - Fired when the card is activated (click or Enter key)
  */
-@customElement('wc-content-card')
-export class WcContentCard extends LitElement {
+@customElement('hx-content-card')
+export class HxContentCard extends LitElement {
   /**
    * The card's heading text. Required.
    * Maps to Drupal field: `node.title`
@@ -100,7 +100,7 @@ export class WcContentCard extends LitElement {
   publishDate = '';
 
   /**
-   * Content category label (e.g., "Mental Health", "Patient Resources").
+   * Content category label (e.g., "Technology", "Resources").
    * Maps to Drupal field: `node.field_category.name`
    */
   @property({ type: String })
@@ -143,7 +143,7 @@ import { ReactiveController, ReactiveControllerHost } from 'lit';
 
 /**
  * Controller that detects reduced-motion preference and exposes it to the host.
- * Critical for healthcare accessibility -- users with vestibular disorders
+ * Critical for accessibility -- users with vestibular disorders
  * must not be subjected to unexpected motion.
  */
 export class ReducedMotionController implements ReactiveController {
@@ -230,33 +230,33 @@ The `@lit/context` package implements the W3C Community Context Protocol, enabli
 import { createContext } from '@lit/context';
 
 /** Theme context shared across the entire component tree. */
-export interface WcTheme {
+export interface HxTheme {
   mode: 'light' | 'dark' | 'high-contrast';
   scale: 'default' | 'large';
   locale: string;
 }
 
-export const themeContext = createContext<WcTheme>(Symbol('wc-theme'));
+export const themeContext = createContext<HxTheme>(Symbol('hx-theme'));
 ```
 
 ```typescript
 import { LitElement, html } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { provide } from '@lit/context';
-import { themeContext, type WcTheme } from './contexts/theme-context.js';
+import { themeContext, type HxTheme } from './contexts/theme-context.js';
 
 /**
  * Theme provider that wraps the component tree.
  * Placed once in the Drupal theme's page template.
  *
- * @element wc-theme-provider
+ * @element hx-theme-provider
  * @slot - All themed content
  */
-@customElement('wc-theme-provider')
-export class WcThemeProvider extends LitElement {
+@customElement('hx-theme-provider')
+export class HxThemeProvider extends LitElement {
   @provide({ context: themeContext })
   @property({ attribute: false })
-  theme: WcTheme = {
+  theme: HxTheme = {
     mode: 'light',
     scale: 'default',
     locale: 'en-US',
@@ -270,17 +270,17 @@ export class WcThemeProvider extends LitElement {
 
 ```typescript
 import { consume } from '@lit/context';
-import { themeContext, type WcTheme } from './contexts/theme-context.js';
+import { themeContext, type HxTheme } from './contexts/theme-context.js';
 
 // Inside any descendant component:
 @consume({ context: themeContext, subscribe: true })
 @property({ attribute: false })
-theme?: WcTheme;
+theme?: HxTheme;
 ```
 
 **When to use Context vs. Properties vs. Events:**
 
-| Mechanism      | Use When                                         | Healthcare Example                      |
+| Mechanism      | Use When                                         | Example                                 |
 | -------------- | ------------------------------------------------ | --------------------------------------- |
 | **Properties** | Direct parent-child data binding                 | Card receiving `heading` from TWIG      |
 | **Context**    | Data needed by many descendants, set once at top | Theme mode, locale, analytics config    |
@@ -304,11 +304,11 @@ export interface CardClickDetail {
 }
 
 /**
- * Custom event map for wc-content-card.
+ * Custom event map for hx-content-card.
  * Enables type-safe addEventListener in TypeScript consumers.
  */
-export interface WcContentCardEventMap {
-  'wc-card-click': CustomEvent<CardClickDetail>;
+export interface HxContentCardEventMap {
+  'hx-card-click': CustomEvent<CardClickDetail>;
 }
 ```
 
@@ -357,7 +357,7 @@ render() {
 }
 
 private _handleActivate(e: Event): void {
-  this.dispatchEvent(new CustomEvent<CardClickDetail>('wc-card-click', {
+  this.dispatchEvent(new CustomEvent<CardClickDetail>('hx-card-click', {
     bubbles: true,
     composed: true, // Crosses shadow DOM boundaries
     detail: {
@@ -371,7 +371,7 @@ private _handleActivate(e: Event): void {
 private _handleKeydown(e: KeyboardEvent): void {
   if (e.key === 'Enter' || e.key === ' ') {
     e.preventDefault();
-    this.dispatchEvent(new CustomEvent<CardClickDetail>('wc-card-click', {
+    this.dispatchEvent(new CustomEvent<CardClickDetail>('hx-card-click', {
       bubbles: true,
       composed: true,
       detail: {
@@ -386,8 +386,8 @@ private _handleKeydown(e: KeyboardEvent): void {
 
 **Event naming conventions:**
 
-- Prefix all events with `wc-` to prevent collision with native events and other libraries
-- Use kebab-case: `wc-card-click`, `wc-form-submit`, `wc-nav-toggle`
+- Prefix all events with `hx-` to prevent collision with native events and other libraries
+- Use kebab-case: `hx-card-click`, `hx-form-submit`, `hx-nav-toggle`
 - Always set `composed: true` so events cross shadow DOM boundaries (required for Drupal event listeners)
 - Always set `bubbles: true` so events can be caught at any ancestor level
 
@@ -399,9 +399,9 @@ Slots are the primary composition mechanism. They allow Drupal TWIG templates to
 
 ```typescript
 /**
- * Article layout component that structures long-form healthcare content.
+ * Article layout component that structures long-form editorial content.
  *
- * @element wc-article-layout
+ * @element hx-article-layout
  * @slot hero - Full-width hero image or video area
  * @slot breadcrumb - Breadcrumb navigation
  * @slot sidebar - Sidebar content (table of contents, related articles)
@@ -409,24 +409,24 @@ Slots are the primary composition mechanism. They allow Drupal TWIG templates to
  * @slot - Default slot for article body content
  * @slot footer - Article footer (tags, share buttons, related content)
  */
-@customElement('wc-article-layout')
+@customElement('hx-article-layout')
 export class WcArticleLayout extends LitElement {
   static styles = css`
     :host {
       display: block;
-      max-width: var(--wc-article-max-width, 1200px);
+      max-width: var(--hx-article-max-width, 1200px);
       margin: 0 auto;
     }
 
     .layout {
       display: grid;
       grid-template-columns: 1fr;
-      gap: var(--wc-spacing-lg, 2rem);
+      gap: var(--hx-spacing-lg, 2rem);
     }
 
     @media (min-width: 768px) {
       .layout--with-sidebar {
-        grid-template-columns: 1fr var(--wc-sidebar-width, 300px);
+        grid-template-columns: 1fr var(--hx-sidebar-width, 300px);
       }
     }
   `;
@@ -490,8 +490,8 @@ Not every component needs Shadow DOM. The decision matrix:
 **Light DOM opt-in (when needed):**
 
 ```typescript
-@customElement('wc-prose')
-export class WcProse extends LitElement {
+@customElement('hx-prose')
+export class HxProse extends LitElement {
   /** Render to light DOM so Drupal CKEditor content styles apply. */
   protected createRenderRoot(): HTMLElement {
     return this;
@@ -505,22 +505,22 @@ export class WcProse extends LitElement {
 
 ### 3.1.9 Form-Associated Custom Elements
 
-Healthcare forms (patient intake, appointment requests, feedback) require full form participation. Lit components achieve this through the `ElementInternals` API.
+Enterprise forms (contact requests, submissions, feedback) require full form participation. Lit components achieve this through the `ElementInternals` API.
 
 ```typescript
 import { LitElement, html, css } from 'lit';
 import { customElement, property, state, query } from 'lit/decorators.js';
 
 /**
- * Accessible text input for healthcare forms.
+ * Accessible text input for enterprise forms.
  * Fully participates in native <form> elements and FormData.
  *
- * @element wc-text-input
- * @fires wc-input - Fired on each input event with current value
- * @fires wc-change - Fired on blur when value has changed
+ * @element hx-text-input
+ * @fires hx-input - Fired on each input event with current value
+ * @fires hx-change - Fired on blur when value has changed
  */
-@customElement('wc-text-input')
-export class WcTextInput extends LitElement {
+@customElement('hx-text-input')
+export class HxTextInput extends LitElement {
   /** Enable form association. */
   static formAssociated = true;
 
@@ -579,7 +579,7 @@ export class WcTextInput extends LitElement {
     this._updateFormValue();
     this._validate();
     this.dispatchEvent(
-      new CustomEvent('wc-input', {
+      new CustomEvent('hx-input', {
         bubbles: true,
         composed: true,
         detail: { value: this.value, name: this.name },
@@ -591,7 +591,7 @@ export class WcTextInput extends LitElement {
     this._touched = true;
     this._validate();
     this.dispatchEvent(
-      new CustomEvent('wc-change', {
+      new CustomEvent('hx-change', {
         bubbles: true,
         composed: true,
         detail: { value: this.value, name: this.name },
@@ -648,7 +648,7 @@ export class WcTextInput extends LitElement {
 }
 ```
 
-**Key accessibility requirements for healthcare forms (WCAG 2.1 AA minimum):**
+**Key accessibility requirements for forms (WCAG 2.1 AA minimum):**
 
 - Every input must have a visible, programmatically-associated `<label>` (WCAG 1.3.1)
 - Error messages must be announced via `role="alert"` or `aria-live` (WCAG 3.3.1)
@@ -669,59 +669,59 @@ The library follows an adapted Atomic Design methodology. The hierarchy maps dir
 src/
   components/
     atoms/                      # Smallest indivisible UI elements
-      wc-button/
-        wc-button.ts           # Component class
-        wc-button.styles.ts    # Scoped styles
-        wc-button.test.ts      # Unit tests
-        wc-button.stories.ts   # Storybook stories
+      hx-button/
+        hx-button.ts           # Component class
+        hx-button.styles.ts    # Scoped styles
+        hx-button.test.ts      # Unit tests
+        hx-button.stories.ts   # Storybook stories
         index.ts                # Public exports
-      wc-icon/
-      wc-badge/
-      wc-text-input/
-      wc-textarea/
-      wc-select/
-      wc-checkbox/
-      wc-radio/
-      wc-toggle/
-      wc-avatar/
-      wc-spinner/
-      wc-tag/
-      wc-tooltip/
-      wc-sr-only/              # Screen-reader-only text
+      hx-icon/
+      hx-badge/
+      hx-text-input/
+      hx-textarea/
+      hx-select/
+      hx-checkbox/
+      hx-radio/
+      hx-toggle/
+      hx-avatar/
+      hx-spinner/
+      hx-tag/
+      hx-tooltip/
+      hx-sr-only/              # Screen-reader-only text
 
     molecules/                  # Combinations of atoms
-      wc-search-bar/           # Input + button + icon
-      wc-form-field/           # Label + input + help + error
-      wc-breadcrumb/
-      wc-pagination/
-      wc-media-object/         # Image + text layout
-      wc-alert/                # Icon + message + dismiss
-      wc-accordion-item/
-      wc-tab-item/
-      wc-dropdown-menu/
+      hx-search-bar/           # Input + button + icon
+      hx-form-field/           # Label + input + help + error
+      hx-breadcrumb/
+      hx-pagination/
+      hx-media-object/         # Image + text layout
+      hx-alert/                # Icon + message + dismiss
+      hx-accordion-item/
+      hx-tab-item/
+      hx-dropdown-menu/
 
     organisms/                  # Complex, self-contained sections
-      wc-content-card/         # Hero slot + heading + summary + meta
-      wc-article-layout/       # Full article page structure
-      wc-header/               # Site header with nav
-      wc-footer/               # Site footer
-      wc-nav-primary/          # Primary navigation with mega-menu
-      wc-nav-mobile/           # Mobile navigation drawer
-      wc-hero-banner/          # Full-width hero with CTA
-      wc-card-grid/            # Responsive grid of content cards
-      wc-form/                 # Form wrapper with validation
-      wc-accordion/            # Accordion group
-      wc-tabs/                 # Tab group
-      wc-modal/                # Modal dialog
-      wc-media-gallery/        # Image/video gallery
-      wc-table/                # Accessible data table
-      wc-sidebar/              # Sidebar widget area
+      hx-content-card/         # Hero slot + heading + summary + meta
+      hx-article-layout/       # Full article page structure
+      hx-header/               # Site header with nav
+      hx-footer/               # Site footer
+      hx-nav-primary/          # Primary navigation with mega-menu
+      hx-nav-mobile/           # Mobile navigation drawer
+      hx-hero-banner/          # Full-width hero with CTA
+      hx-card-grid/            # Responsive grid of content cards
+      hx-form/                 # Form wrapper with validation
+      hx-accordion/            # Accordion group
+      hx-tabs/                 # Tab group
+      hx-modal/                # Modal dialog
+      hx-media-gallery/        # Image/video gallery
+      hx-table/                # Accessible data table
+      hx-sidebar/              # Sidebar widget area
 
     templates/                  # Page-level layout components
-      wc-page-layout/          # Base page grid (header/main/footer)
-      wc-article-page/         # Article content page layout
-      wc-landing-page/         # Landing page layout
-      wc-search-results-page/  # Search results layout
+      hx-page-layout/          # Base page grid (header/main/footer)
+      hx-article-page/         # Article content page layout
+      hx-landing-page/         # Landing page layout
+      hx-search-results-page/  # Search results layout
 
   controllers/                  # Reactive controllers
     intersection.controller.ts
@@ -772,60 +772,60 @@ src/
 
 | Entity                | Convention                               | Example                       |
 | --------------------- | ---------------------------------------- | ----------------------------- |
-| Custom element tag    | `wc-[name]` (kebab-case, `wc` prefix)    | `wc-content-card`             |
-| TypeScript class      | `Wc[Name]` (PascalCase with `Wc` prefix) | `WcContentCard`               |
-| File names            | `wc-[name].ts` (match tag name)          | `wc-content-card.ts`          |
-| CSS custom properties | `--wc-[component]-[property]`            | `--wc-card-radius`            |
+| Custom element tag    | `hx-[name]` (kebab-case, `wc` prefix)    | `hx-content-card`             |
+| TypeScript class      | `Wc[Name]` (PascalCase with `Wc` prefix) | `HxContentCard`               |
+| File names            | `hx-[name].ts` (match tag name)          | `hx-content-card.ts`          |
+| CSS custom properties | `--hx-[component]-[property]`            | `--hx-card-radius`            |
 | CSS parts             | Descriptive, no prefix needed            | `card`, `header`, `body`      |
-| Events                | `wc-[component]-[action]`                | `wc-card-click`               |
+| Events                | `hx-[component]-[action]`                | `hx-card-click`               |
 | Slots                 | Semantic name or empty for default       | `media`, `actions`, (default) |
 | Controllers           | `[Name]Controller`                       | `IntersectionController`      |
 | Contexts              | `[name]Context`                          | `themeContext`                |
 
-### 3.2.3 Healthcare Content Hub Component Inventory
+### 3.2.3 Enterprise Content Platform Component Inventory
 
-These components are designed specifically for the healthcare content hub use case:
+These components are designed specifically for the enterprise content platform use case:
 
 **Content Discovery Components:**
 
 | Component         | Drupal Mapping          | Purpose                          |
 | ----------------- | ----------------------- | -------------------------------- |
-| `wc-content-card` | Node teaser view mode   | Blog/article preview card        |
-| `wc-card-grid`    | Views block output      | Responsive grid of content cards |
-| `wc-hero-banner`  | Paragraph: Hero         | Full-width hero with CTA         |
-| `wc-search-bar`   | Search API form         | Site search with autocomplete    |
-| `wc-breadcrumb`   | System breadcrumb block | Navigation breadcrumbs           |
-| `wc-pagination`   | Views pager             | Page navigation for lists        |
+| `hx-content-card` | Node teaser view mode   | Blog/article preview card        |
+| `hx-card-grid`    | Views block output      | Responsive grid of content cards |
+| `hx-hero-banner`  | Paragraph: Hero         | Full-width hero with CTA         |
+| `hx-search-bar`   | Search API form         | Site search with autocomplete    |
+| `hx-breadcrumb`   | System breadcrumb block | Navigation breadcrumbs           |
+| `hx-pagination`   | Views pager             | Page navigation for lists        |
 
 **Content Consumption Components:**
 
 | Component           | Drupal Mapping            | Purpose                     |
 | ------------------- | ------------------------- | --------------------------- |
-| `wc-article-layout` | Node full view mode       | Long-form article structure |
-| `wc-accordion`      | Paragraph: FAQ            | Expandable FAQ sections     |
-| `wc-tabs`           | Paragraph: Tabbed Content | Tabbed information panels   |
-| `wc-table`          | Field: Table              | Accessible data tables      |
-| `wc-media-gallery`  | Paragraph: Gallery        | Image/video galleries       |
+| `hx-article-layout` | Node full view mode       | Long-form article structure |
+| `hx-accordion`      | Paragraph: FAQ            | Expandable FAQ sections     |
+| `hx-tabs`           | Paragraph: Tabbed Content | Tabbed information panels   |
+| `hx-table`          | Field: Table              | Accessible data tables      |
+| `hx-media-gallery`  | Paragraph: Gallery        | Image/video galleries       |
 
 **Navigation Components:**
 
 | Component        | Drupal Mapping           | Purpose                  |
 | ---------------- | ------------------------ | ------------------------ |
-| `wc-header`      | Header block region      | Site header              |
-| `wc-nav-primary` | Main menu block          | Desktop navigation       |
-| `wc-nav-mobile`  | Main menu block (mobile) | Mobile navigation drawer |
-| `wc-footer`      | Footer block region      | Site footer              |
+| `hx-header`      | Header block region      | Site header              |
+| `hx-nav-primary` | Main menu block          | Desktop navigation       |
+| `hx-nav-mobile`  | Main menu block (mobile) | Mobile navigation drawer |
+| `hx-footer`      | Footer block region      | Site footer              |
 
 **Form Components (Accessibility-Critical):**
 
 | Component       | Drupal Mapping      | Purpose                           |
 | --------------- | ------------------- | --------------------------------- |
-| `wc-text-input` | Form API: textfield | Text input with validation        |
-| `wc-textarea`   | Form API: textarea  | Multi-line text input             |
-| `wc-select`     | Form API: select    | Dropdown selection                |
-| `wc-checkbox`   | Form API: checkbox  | Checkbox with label               |
-| `wc-radio`      | Form API: radios    | Radio button group                |
-| `wc-form`       | Webform / Form API  | Form wrapper with submit handling |
+| `hx-text-input` | Form API: textfield | Text input with validation        |
+| `hx-textarea`   | Form API: textarea  | Multi-line text input             |
+| `hx-select`     | Form API: select    | Dropdown selection                |
+| `hx-checkbox`   | Form API: checkbox  | Checkbox with label               |
+| `hx-radio`      | Form API: radios    | Radio button group                |
+| `hx-form`       | Webform / Form API  | Form wrapper with submit handling |
 
 ---
 
@@ -879,7 +879,7 @@ import '../src/styles/themes/dark.css';
 const preview: Preview = {
   tags: ['autodocs'],
   parameters: {
-    // Healthcare-specific viewport presets
+    // Content platform viewport presets
     viewport: {
       viewports: {
         mobile: { name: 'Mobile', styles: { width: '375px', height: '812px' } },
@@ -907,11 +907,11 @@ const preview: Preview = {
     (story, context) => {
       const theme = context.globals.theme ?? 'light';
       return `
-        <wc-theme-provider>
+        <hx-theme-provider>
           <div data-theme="${theme}" style="padding: 1rem;">
             ${story()}
           </div>
-        </wc-theme-provider>
+        </hx-theme-provider>
       `;
     },
   ],
@@ -973,27 +973,27 @@ The CEM is regenerated before every Storybook session, ensuring documentation al
 
 ### 3.3.3 Story Structure with wc-storybook-helpers
 
-The `wc-storybook-helpers` package by Burton Smith auto-generates Storybook controls from the Custom Elements Manifest, eliminating manual `argTypes` maintenance.
+The `hx-storybook-helpers` package by Burton Smith auto-generates Storybook controls from the Custom Elements Manifest, eliminating manual `argTypes` maintenance.
 
 ```typescript
-// src/components/organisms/wc-content-card/wc-content-card.stories.ts
+// src/components/organisms/hx-content-card/hx-content-card.stories.ts
 
 import type { Meta, StoryObj } from '@storybook/web-components';
 import { getWcStorybookHelpers } from 'wc-storybook-helpers';
-import './wc-content-card.js';
+import './hx-content-card.js';
 
-const { events, args, argTypes, template } = getWcStorybookHelpers('wc-content-card');
+const { events, args, argTypes, template } = getWcStorybookHelpers('hx-content-card');
 
 const meta: Meta = {
   title: 'Organisms/Content Card',
-  component: 'wc-content-card',
+  component: 'hx-content-card',
   args: {
     ...args,
-    heading: 'Understanding Anxiety: A Patient Guide',
+    heading: 'Getting Started with Web Components',
     summary:
-      'Learn about the symptoms, causes, and evidence-based treatments for anxiety disorders.',
-    category: 'Mental Health',
-    href: '/articles/understanding-anxiety',
+      'Learn about the fundamentals, best practices, and practical patterns for building web components.',
+    category: 'Technology',
+    href: '/articles/getting-started-web-components',
     publishDate: '2026-02-10',
     readTime: 8,
     variant: 'default',
@@ -1004,7 +1004,7 @@ const meta: Meta = {
     docs: {
       description: {
         component: `
-A content card for healthcare article previews. Used in content listing pages,
+A content card for article previews. Used in content listing pages,
 search results, and related content sections.
 
 **Drupal Integration**: Maps to the \`node--article--teaser\` view mode.
@@ -1032,9 +1032,9 @@ export const Default: Story = {};
 export const Featured: Story = {
   args: {
     variant: 'featured',
-    heading: 'New Telehealth Services Now Available',
+    heading: 'Introducing Our New Design System',
     summary:
-      'We are expanding our virtual care options to serve you better, including mental health counseling and specialist consultations.',
+      'We are expanding our component library to serve you better, including accessible forms and responsive layout components.',
     category: 'Announcements',
   },
 };
@@ -1056,7 +1056,7 @@ export const Compact: Story = {
  */
 export const WithImage: Story = {
   render: (renderArgs) => `
-    <wc-content-card
+    <hx-content-card
       heading="${renderArgs.heading}"
       summary="${renderArgs.summary}"
       category="${renderArgs.category}"
@@ -1070,7 +1070,7 @@ export const WithImage: Story = {
         alt=""
         loading="lazy"
       />
-    </wc-content-card>
+    </hx-content-card>
   `,
 };
 
@@ -1095,7 +1095,7 @@ export const MinimalData: Story = {
  */
 export const FocusState: Story = {
   play: async ({ canvasElement }) => {
-    const card = canvasElement.querySelector('wc-content-card');
+    const card = canvasElement.querySelector('hx-content-card');
     card?.focus();
   },
 };
@@ -1105,26 +1105,26 @@ export const FocusState: Story = {
  */
 export const CardGrid: Story = {
   render: () => `
-    <wc-card-grid columns="3">
-      <wc-content-card
-        heading="Understanding Anxiety"
-        summary="Learn about symptoms, causes, and treatments."
-        category="Mental Health"
+    <hx-card-grid columns="3">
+      <hx-content-card
+        heading="Getting Started with Web Components"
+        summary="Learn about fundamentals, best practices, and patterns."
+        category="Technology"
         read-time="8"
-      ></wc-content-card>
-      <wc-content-card
-        heading="Heart Health Basics"
-        summary="Preventive care for cardiovascular wellness."
-        category="Cardiology"
+      ></hx-content-card>
+      <hx-content-card
+        heading="Design Token Architecture"
+        summary="Building scalable theming systems for enterprise."
+        category="Design"
         read-time="5"
-      ></wc-content-card>
-      <wc-content-card
-        heading="Nutrition After 50"
-        summary="Dietary guidelines for healthy aging."
-        category="Nutrition"
+      ></hx-content-card>
+      <hx-content-card
+        heading="Accessibility Best Practices"
+        summary="Guidelines for building inclusive web experiences."
+        category="Accessibility"
         read-time="6"
-      ></wc-content-card>
-    </wc-card-grid>
+      ></hx-content-card>
+    </hx-card-grid>
   `,
 };
 ```
@@ -1152,17 +1152,17 @@ Each component has multiple documentation surfaces:
 **MDX Documentation Page Example:**
 
 ```mdx
-{/* src/components/organisms/wc-content-card/wc-content-card.docs.mdx */}
+{/* src/components/organisms/hx-content-card/hx-content-card.docs.mdx */}
 
 import { Meta, Canvas, Story, Controls, Source } from '@storybook/blocks';
-import * as CardStories from './wc-content-card.stories';
+import * as CardStories from './hx-content-card.stories';
 
 <Meta of={CardStories} />
 
 # Content Card
 
-The content card is the primary content discovery element in the healthcare
-content hub. It renders article previews in listing pages, search results,
+The content card is the primary content discovery element in the enterprise
+content platform. It renders article previews in listing pages, search results,
 and sidebar widgets.
 
 ## Usage Guidelines
@@ -1176,9 +1176,9 @@ and sidebar widgets.
 
 ### When NOT to Use
 
-- Navigational links (use `wc-nav-*` components)
-- Alert/notification content (use `wc-alert`)
-- Promotional banners (use `wc-hero-banner`)
+- Navigational links (use `hx-nav-*` components)
+- Alert/notification content (use `hx-alert`)
+- Promotional banners (use `hx-hero-banner`)
 
 ## Interactive Demo
 
@@ -1196,7 +1196,7 @@ In your Drupal theme, override the node teaser template:
 
 <Source language="twig" code={`
 {# templates/node--article--teaser.html.twig #}
-<wc-content-card
+<hx-content-card
   heading="{{ label[0]['#title'] ?? node.label }}"
   summary="{{ content.field_summary|render|striptags|trim }}"
   category="{{ node.field_category.entity.label }}"
@@ -1212,11 +1212,12 @@ In your Drupal theme, override the node teaser template:
   {% endif %}
 
 {% if content.field_tags|render|trim is not empty %}
+
 <div slot="actions">
 {{ content.field_tags }}
 </div>
 {% endif %}
-</wc-content-card>
+</hx-content-card>
 `} />
 
 ## Accessibility Checklist
@@ -1231,12 +1232,12 @@ In your Drupal theme, override the node teaser template:
 | Images have appropriate alt text        | Consumer responsibility via slot       | 1.1.1 |
 ```
 
-### 3.3.5 Storybook Add-ons for Healthcare Context
+### 3.3.5 Storybook Add-ons for Enterprise Context
 
-| Add-on                          | Purpose                      | Healthcare Relevance                               |
+| Add-on                          | Purpose                      | Enterprise Relevance                               |
 | ------------------------------- | ---------------------------- | -------------------------------------------------- |
-| `@storybook/addon-a11y`         | axe-core accessibility audit | WCAG 2.1 AA compliance is mandatory for healthcare |
-| `@storybook/addon-viewport`     | Responsive testing           | Patients access on mobile, tablet, desktop         |
+| `@storybook/addon-a11y`         | axe-core accessibility audit | WCAG 2.1 AA compliance is mandatory for enterprise |
+| `@storybook/addon-viewport`     | Responsive testing           | Users access on mobile, tablet, desktop            |
 | `@storybook/addon-interactions` | Play function test execution | Verify keyboard navigation, form flows             |
 | `@storybook/addon-designs`      | Figma frame embedding        | Design review in context                           |
 | `@storybook/addon-links`        | Cross-story navigation       | Link related components (card -> card grid)        |
@@ -1304,7 +1305,7 @@ In your Drupal theme, override the node teaser template:
 
 - **`experimentalDecorators: true`** with **`useDefineForClassFields: false`**: Required for Lit's decorator syntax. Standard TC39 decorators with the `accessor` keyword are supported in Lit but produce less optimal compiler output as of 2026. We will migrate to standard decorators when the output matches.
 - **`ts-lit-plugin`**: Provides template-level type checking inside `html` tagged template literals. It validates tag names, attributes, properties, events, and slot names against the Custom Elements Manifest. This catches errors at author time rather than runtime.
-- **Full strict mode**: No exceptions. Healthcare software demands the highest confidence in type safety.
+- **Full strict mode**: No exceptions. Enterprise software demands the highest confidence in type safety.
 
 ### 3.4.2 JSDoc Coverage Requirements
 
@@ -1342,17 +1343,17 @@ The library ships TypeScript declarations so that TypeScript-based consumers get
  * Union of all custom event names emitted by WC components.
  * Useful for creating type-safe event listeners.
  */
-export type WcEventName =
-  | 'wc-card-click'
-  | 'wc-form-submit'
-  | 'wc-nav-toggle'
-  | 'wc-modal-open'
-  | 'wc-modal-close'
-  | 'wc-input'
-  | 'wc-change'
-  | 'wc-search-submit'
-  | 'wc-accordion-toggle'
-  | 'wc-tab-change';
+export type HxEventName =
+  | 'hx-card-click'
+  | 'hx-form-submit'
+  | 'hx-nav-toggle'
+  | 'hx-modal-open'
+  | 'hx-modal-close'
+  | 'hx-input'
+  | 'hx-change'
+  | 'hx-search-submit'
+  | 'hx-accordion-toggle'
+  | 'hx-tab-change';
 
 /**
  * Maps event names to their detail types.
@@ -1360,28 +1361,28 @@ export type WcEventName =
  *
  * @example
  * ```typescript
- * element.addEventListener('wc-card-click', (e: WcEvent<'wc-card-click'>) => {
+ * element.addEventListener('hx-card-click', (e: HxEvent<'hx-card-click'>) => {
  *   console.log(e.detail.href); // fully typed
  * });
  * ```
  */
-export interface WcEventDetailMap {
-  'wc-card-click': CardClickDetail;
-  'wc-form-submit': FormSubmitDetail;
-  'wc-nav-toggle': NavToggleDetail;
-  'wc-modal-open': ModalEventDetail;
-  'wc-modal-close': ModalEventDetail;
-  'wc-input': InputChangeDetail;
-  'wc-change': InputChangeDetail;
-  'wc-search-submit': SearchSubmitDetail;
-  'wc-accordion-toggle': AccordionToggleDetail;
-  'wc-tab-change': TabChangeDetail;
+export interface HxEventDetailMap {
+  'hx-card-click': CardClickDetail;
+  'hx-form-submit': FormSubmitDetail;
+  'hx-nav-toggle': NavToggleDetail;
+  'hx-modal-open': ModalEventDetail;
+  'hx-modal-close': ModalEventDetail;
+  'hx-input': InputChangeDetail;
+  'hx-change': InputChangeDetail;
+  'hx-search-submit': SearchSubmitDetail;
+  'hx-accordion-toggle': AccordionToggleDetail;
+  'hx-tab-change': TabChangeDetail;
 }
 
 /**
  * Type-safe custom event helper.
  */
-export type WcEvent<T extends WcEventName> = CustomEvent<WcEventDetailMap[T]>;
+export type HxEvent<T extends HxEventName> = CustomEvent<HxEventDetailMap[T]>;
 ````
 
 **Global type augmentation for HTML element references:**
@@ -1391,15 +1392,15 @@ export type WcEvent<T extends WcEventName> = CustomEvent<WcEventDetailMap[T]>;
 
 declare global {
   interface HTMLElementTagNameMap {
-    'wc-content-card': import('../components/organisms/wc-content-card/wc-content-card.js').WcContentCard;
-    'wc-button': import('../components/atoms/wc-button/wc-button.js').WcButton;
-    'wc-text-input': import('../components/atoms/wc-text-input/wc-text-input.js').WcTextInput;
+    'hx-content-card': import('../components/organisms/hx-content-card/hx-content-card.js').HxContentCard;
+    'hx-button': import('../components/atoms/hx-button/hx-button.js').HxButton;
+    'hx-text-input': import('../components/atoms/hx-text-input/hx-text-input.js').HxTextInput;
     // ... all components
   }
 }
 ```
 
-This enables `document.querySelector('wc-content-card')` to return the correct type in consuming applications.
+This enables `document.querySelector('hx-content-card')` to return the correct type in consuming applications.
 
 ---
 
@@ -1440,7 +1441,7 @@ The repository includes a `drupal/` directory with reference TWIG templates that
 ```
 drupal/
   README.md                           # Setup instructions
-  wc-components.libraries.yml        # Drupal library definition
+  hx-components.libraries.yml        # Drupal library definition
   templates/
     node--article--teaser.html.twig   # Content card integration
     node--article--full.html.twig     # Article layout integration
@@ -1463,7 +1464,7 @@ drupal/
   Content Card Integration
   ========================
   This template maps Drupal's article node fields to the
-  wc-content-card web component attributes.
+  hx-content-card web component attributes.
 
   Required fields:
     - title (core)
@@ -1486,7 +1487,7 @@ drupal/
 {%- set card_read_time = content.field_read_time|render|striptags|trim -%}
 {%- set card_variant = is_promoted ? 'featured' : 'default' -%}
 
-<wc-content-card
+<hx-content-card
   heading="{{ card_heading }}"
   summary="{{ card_summary }}"
   category="{{ card_category }}"
@@ -1509,18 +1510,18 @@ drupal/
       {{ content.field_tags }}
     </div>
   {% endif %}
-</wc-content-card>
+</hx-content-card>
 ```
 
 ### 3.5.4 Drupal Library Definition
 
 ```yaml
-# drupal/wc-components.libraries.yml
+# drupal/hx-components.libraries.yml
 
-wc-components:
+hx-components:
   version: VERSION
   js:
-    /path/to/dist/wc-components.js:
+    /path/to/dist/hx-components.js:
       type: external
       minified: true
       attributes:
@@ -1537,7 +1538,7 @@ wc-components:
 Web component events cross shadow DOM boundaries (due to `composed: true`) and can be caught by Drupal behaviors.
 
 ```javascript
-// drupal/js/wc-behaviors.js
+// drupal/js/hx-behaviors.js
 
 (function (Drupal) {
   'use strict';
@@ -1547,9 +1548,9 @@ Web component events cross shadow DOM boundaries (due to `composed: true`) and c
    */
   Drupal.behaviors.wcCardTracking = {
     attach(context) {
-      const cards = once('wc-card-tracking', 'wc-content-card', context);
+      const cards = once('hx-card-tracking', 'hx-content-card', context);
       cards.forEach((card) => {
-        card.addEventListener('wc-card-click', (event) => {
+        card.addEventListener('hx-card-click', (event) => {
           const { href, heading, keyboard } = event.detail;
 
           // Google Analytics 4 event
@@ -1577,9 +1578,9 @@ Web component events cross shadow DOM boundaries (due to `composed: true`) and c
    */
   Drupal.behaviors.wcSearch = {
     attach(context) {
-      const searchBars = once('wc-search', 'wc-search-bar', context);
+      const searchBars = once('hx-search', 'hx-search-bar', context);
       searchBars.forEach((searchBar) => {
-        searchBar.addEventListener('wc-search-submit', (event) => {
+        searchBar.addEventListener('hx-search-submit', (event) => {
           const { query } = event.detail;
           // Redirect to Drupal Search API results page
           window.location.href = `/search?keys=${encodeURIComponent(query)}`;
@@ -1669,19 +1670,19 @@ export default {
 ### 3.6.3 Component Unit Test Example
 
 ```typescript
-// src/components/organisms/wc-content-card/wc-content-card.test.ts
+// src/components/organisms/hx-content-card/hx-content-card.test.ts
 
 import { html, fixture, expect, oneEvent } from '@open-wc/testing';
 import { sendKeys } from '@web/test-runner-commands';
-import type { WcContentCard } from './wc-content-card.js';
-import './wc-content-card.js';
+import type { HxContentCard } from './hx-content-card.js';
+import './hx-content-card.js';
 
-describe('wc-content-card', () => {
+describe('hx-content-card', () => {
   // ── Rendering ──────────────────────────────────────────────
 
   it('renders with default properties', async () => {
-    const el = await fixture<WcContentCard>(html`
-      <wc-content-card heading="Test Heading"></wc-content-card>
+    const el = await fixture<HxContentCard>(html`
+      <hx-content-card heading="Test Heading"></hx-content-card>
     `);
 
     expect(el).to.exist;
@@ -1690,8 +1691,8 @@ describe('wc-content-card', () => {
   });
 
   it('renders heading text in shadow DOM', async () => {
-    const el = await fixture<WcContentCard>(html`
-      <wc-content-card heading="My Article"></wc-content-card>
+    const el = await fixture<HxContentCard>(html`
+      <hx-content-card heading="My Article"></hx-content-card>
     `);
 
     const heading = el.shadowRoot?.querySelector('.card__heading');
@@ -1699,8 +1700,8 @@ describe('wc-content-card', () => {
   });
 
   it('does not render summary when empty', async () => {
-    const el = await fixture<WcContentCard>(html`
-      <wc-content-card heading="Title" summary=""></wc-content-card>
+    const el = await fixture<HxContentCard>(html`
+      <hx-content-card heading="Title" summary=""></hx-content-card>
     `);
 
     const summary = el.shadowRoot?.querySelector('.card__summary');
@@ -1708,8 +1709,8 @@ describe('wc-content-card', () => {
   });
 
   it('renders read time when greater than zero', async () => {
-    const el = await fixture<WcContentCard>(html`
-      <wc-content-card heading="Title" read-time="5"></wc-content-card>
+    const el = await fixture<HxContentCard>(html`
+      <hx-content-card heading="Title" read-time="5"></hx-content-card>
     `);
 
     const readTime = el.shadowRoot?.querySelector('.card__read-time');
@@ -1719,8 +1720,8 @@ describe('wc-content-card', () => {
   // ── Variants ───────────────────────────────────────────────
 
   it('reflects variant attribute', async () => {
-    const el = await fixture<WcContentCard>(html`
-      <wc-content-card heading="Title" variant="featured"></wc-content-card>
+    const el = await fixture<HxContentCard>(html`
+      <hx-content-card heading="Title" variant="featured"></hx-content-card>
     `);
 
     expect(el.getAttribute('variant')).to.equal('featured');
@@ -1728,12 +1729,12 @@ describe('wc-content-card', () => {
 
   // ── Events ─────────────────────────────────────────────────
 
-  it('fires wc-card-click on click', async () => {
-    const el = await fixture<WcContentCard>(html`
-      <wc-content-card heading="Click Test" href="/test"></wc-content-card>
+  it('fires hx-card-click on click', async () => {
+    const el = await fixture<HxContentCard>(html`
+      <hx-content-card heading="Click Test" href="/test"></hx-content-card>
     `);
 
-    const listener = oneEvent(el, 'wc-card-click');
+    const listener = oneEvent(el, 'hx-card-click');
     el.click();
     const event = await listener;
 
@@ -1742,15 +1743,15 @@ describe('wc-content-card', () => {
     expect(event.detail.keyboard).to.be.false;
   });
 
-  it('fires wc-card-click with keyboard=true on Enter', async () => {
-    const el = await fixture<WcContentCard>(html`
-      <wc-content-card heading="KB Test" href="/kb"></wc-content-card>
+  it('fires hx-card-click with keyboard=true on Enter', async () => {
+    const el = await fixture<HxContentCard>(html`
+      <hx-content-card heading="KB Test" href="/kb"></hx-content-card>
     `);
 
     const card = el.shadowRoot?.querySelector('[part="card"]') as HTMLElement;
     card.focus();
 
-    const listener = oneEvent(el, 'wc-card-click');
+    const listener = oneEvent(el, 'hx-card-click');
     await sendKeys({ press: 'Enter' });
     const event = await listener;
 
@@ -1758,11 +1759,11 @@ describe('wc-content-card', () => {
   });
 
   it('event is composed (crosses shadow DOM boundary)', async () => {
-    const el = await fixture<WcContentCard>(html`
-      <wc-content-card heading="Composed Test"></wc-content-card>
+    const el = await fixture<HxContentCard>(html`
+      <hx-content-card heading="Composed Test"></hx-content-card>
     `);
 
-    const listener = oneEvent(el, 'wc-card-click');
+    const listener = oneEvent(el, 'hx-card-click');
     el.click();
     const event = await listener;
 
@@ -1773,10 +1774,10 @@ describe('wc-content-card', () => {
   // ── Slots ──────────────────────────────────────────────────
 
   it('renders slotted media content', async () => {
-    const el = await fixture<WcContentCard>(html`
-      <wc-content-card heading="Slot Test">
+    const el = await fixture<HxContentCard>(html`
+      <hx-content-card heading="Slot Test">
         <img slot="media" src="test.jpg" alt="Test" />
-      </wc-content-card>
+      </hx-content-card>
     `);
 
     const slot = el.shadowRoot?.querySelector('slot[name="media"]') as HTMLSlotElement;
@@ -1788,21 +1789,21 @@ describe('wc-content-card', () => {
   // ── Accessibility ──────────────────────────────────────────
 
   it('is accessible with default props', async () => {
-    const el = await fixture<WcContentCard>(html`
-      <wc-content-card
+    const el = await fixture<HxContentCard>(html`
+      <hx-content-card
         heading="Accessible Card"
         summary="This card should pass axe checks."
-        category="Health"
+        category="Technology"
         href="/article"
-      ></wc-content-card>
+      ></hx-content-card>
     `);
 
     await expect(el).to.be.accessible();
   });
 
   it('has role=button when no href is provided', async () => {
-    const el = await fixture<WcContentCard>(html`
-      <wc-content-card heading="No Link"></wc-content-card>
+    const el = await fixture<HxContentCard>(html`
+      <hx-content-card heading="No Link"></hx-content-card>
     `);
 
     const card = el.shadowRoot?.querySelector('[part="card"]');
@@ -1810,8 +1811,8 @@ describe('wc-content-card', () => {
   });
 
   it('has no role when href is provided (native link semantics)', async () => {
-    const el = await fixture<WcContentCard>(html`
-      <wc-content-card heading="With Link" href="/article"></wc-content-card>
+    const el = await fixture<HxContentCard>(html`
+      <hx-content-card heading="With Link" href="/article"></hx-content-card>
     `);
 
     const card = el.shadowRoot?.querySelector('[part="card"]');
@@ -1912,7 +1913,7 @@ Accessibility testing happens at three levels:
 - Color contrast verification at all three theme modes.
 - Focus order verification in complex component compositions.
 
-**Healthcare-specific accessibility requirements:**
+**Enterprise accessibility requirements:**
 
 | Requirement               | Standard   | Our Approach                                                      |
 | ------------------------- | ---------- | ----------------------------------------------------------------- |
@@ -1955,72 +1956,72 @@ Design tokens are defined as CSS custom properties, organized by category. They 
 :root,
 [data-theme='light'] {
   /* ── Color Tokens ────────────────────────────────────── */
-  --wc-color-primary: #1e40af;
-  --wc-color-primary-hover: #1e3a8a;
-  --wc-color-primary-active: #1d4ed8;
-  --wc-color-on-primary: #ffffff;
+  --hx-color-primary: #1e40af;
+  --hx-color-primary-hover: #1e3a8a;
+  --hx-color-primary-active: #1d4ed8;
+  --hx-color-on-primary: #ffffff;
 
-  --wc-color-secondary: #059669;
-  --wc-color-secondary-hover: #047857;
+  --hx-color-secondary: #059669;
+  --hx-color-secondary-hover: #047857;
 
-  --wc-color-surface: #ffffff;
-  --wc-color-surface-raised: #f8fafc;
-  --wc-color-on-surface: #1e293b;
-  --wc-color-on-surface-muted: #64748b;
+  --hx-color-surface: #ffffff;
+  --hx-color-surface-raised: #f8fafc;
+  --hx-color-on-surface: #1e293b;
+  --hx-color-on-surface-muted: #64748b;
 
-  --wc-color-border: #e2e8f0;
-  --wc-color-border-strong: #cbd5e1;
+  --hx-color-border: #e2e8f0;
+  --hx-color-border-strong: #cbd5e1;
 
-  --wc-color-error: #dc2626;
-  --wc-color-warning: #d97706;
-  --wc-color-success: #16a34a;
-  --wc-color-info: #2563eb;
+  --hx-color-error: #dc2626;
+  --hx-color-warning: #d97706;
+  --hx-color-success: #16a34a;
+  --hx-color-info: #2563eb;
 
   /* ── Typography Tokens ───────────────────────────────── */
-  --wc-font-family-body: 'Inter', system-ui, -apple-system, sans-serif;
-  --wc-font-family-heading: 'Inter', system-ui, -apple-system, sans-serif;
+  --hx-font-family-body: 'Inter', system-ui, -apple-system, sans-serif;
+  --hx-font-family-heading: 'Inter', system-ui, -apple-system, sans-serif;
 
-  --wc-font-size-xs: 0.75rem;
-  --wc-font-size-sm: 0.875rem;
-  --wc-font-size-base: 1rem;
-  --wc-font-size-lg: 1.125rem;
-  --wc-font-size-xl: 1.25rem;
-  --wc-font-size-2xl: 1.5rem;
-  --wc-font-size-3xl: 1.875rem;
-  --wc-font-size-4xl: 2.25rem;
+  --hx-font-size-xs: 0.75rem;
+  --hx-font-size-sm: 0.875rem;
+  --hx-font-size-base: 1rem;
+  --hx-font-size-lg: 1.125rem;
+  --hx-font-size-xl: 1.25rem;
+  --hx-font-size-2xl: 1.5rem;
+  --hx-font-size-3xl: 1.875rem;
+  --hx-font-size-4xl: 2.25rem;
 
-  --wc-line-height-tight: 1.25;
-  --wc-line-height-normal: 1.5;
-  --wc-line-height-relaxed: 1.75;
+  --hx-line-height-tight: 1.25;
+  --hx-line-height-normal: 1.5;
+  --hx-line-height-relaxed: 1.75;
 
   /* ── Spacing Tokens ──────────────────────────────────── */
-  --wc-spacing-xs: 0.25rem;
-  --wc-spacing-sm: 0.5rem;
-  --wc-spacing-md: 1rem;
-  --wc-spacing-lg: 1.5rem;
-  --wc-spacing-xl: 2rem;
-  --wc-spacing-2xl: 3rem;
-  --wc-spacing-3xl: 4rem;
+  --hx-spacing-xs: 0.25rem;
+  --hx-spacing-sm: 0.5rem;
+  --hx-spacing-md: 1rem;
+  --hx-spacing-lg: 1.5rem;
+  --hx-spacing-xl: 2rem;
+  --hx-spacing-2xl: 3rem;
+  --hx-spacing-3xl: 4rem;
 
   /* ── Elevation Tokens ────────────────────────────────── */
-  --wc-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
-  --wc-shadow-md: 0 4px 6px rgba(0, 0, 0, 0.07);
-  --wc-shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
+  --hx-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --hx-shadow-md: 0 4px 6px rgba(0, 0, 0, 0.07);
+  --hx-shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
 
   /* ── Border Tokens ───────────────────────────────────── */
-  --wc-radius-sm: 4px;
-  --wc-radius-md: 8px;
-  --wc-radius-lg: 12px;
-  --wc-radius-full: 9999px;
+  --hx-radius-sm: 4px;
+  --hx-radius-md: 8px;
+  --hx-radius-lg: 12px;
+  --hx-radius-full: 9999px;
 
   /* ── Focus Token (critical for a11y) ─────────────────── */
-  --wc-focus-ring: 0 0 0 3px rgba(30, 64, 175, 0.4);
-  --wc-focus-ring-offset: 2px;
+  --hx-focus-ring: 0 0 0 3px rgba(30, 64, 175, 0.4);
+  --hx-focus-ring-offset: 2px;
 
   /* ── Transition Tokens ───────────────────────────────── */
-  --wc-transition-fast: 150ms ease;
-  --wc-transition-normal: 250ms ease;
-  --wc-transition-slow: 350ms ease;
+  --hx-transition-fast: 150ms ease;
+  --hx-transition-normal: 250ms ease;
+  --hx-transition-slow: 350ms ease;
 }
 ```
 
@@ -2028,29 +2029,29 @@ Design tokens are defined as CSS custom properties, organized by category. They 
 /* src/styles/themes/dark.css */
 
 [data-theme='dark'] {
-  --wc-color-primary: #60a5fa;
-  --wc-color-primary-hover: #93bbfd;
-  --wc-color-primary-active: #3b82f6;
-  --wc-color-on-primary: #1e293b;
+  --hx-color-primary: #60a5fa;
+  --hx-color-primary-hover: #93bbfd;
+  --hx-color-primary-active: #3b82f6;
+  --hx-color-on-primary: #1e293b;
 
-  --wc-color-surface: #1e293b;
-  --wc-color-surface-raised: #334155;
-  --wc-color-on-surface: #f1f5f9;
-  --wc-color-on-surface-muted: #94a3b8;
+  --hx-color-surface: #1e293b;
+  --hx-color-surface-raised: #334155;
+  --hx-color-on-surface: #f1f5f9;
+  --hx-color-on-surface-muted: #94a3b8;
 
-  --wc-color-border: #334155;
-  --wc-color-border-strong: #475569;
+  --hx-color-border: #334155;
+  --hx-color-border-strong: #475569;
 
-  --wc-color-error: #f87171;
-  --wc-color-warning: #fbbf24;
-  --wc-color-success: #4ade80;
-  --wc-color-info: #60a5fa;
+  --hx-color-error: #f87171;
+  --hx-color-warning: #fbbf24;
+  --hx-color-success: #4ade80;
+  --hx-color-info: #60a5fa;
 
-  --wc-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
-  --wc-shadow-md: 0 4px 6px rgba(0, 0, 0, 0.4);
-  --wc-shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.5);
+  --hx-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --hx-shadow-md: 0 4px 6px rgba(0, 0, 0, 0.4);
+  --hx-shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.5);
 
-  --wc-focus-ring: 0 0 0 3px rgba(96, 165, 250, 0.4);
+  --hx-focus-ring: 0 0 0 3px rgba(96, 165, 250, 0.4);
 }
 ```
 
@@ -2058,23 +2059,23 @@ Design tokens are defined as CSS custom properties, organized by category. They 
 /* src/styles/themes/high-contrast.css */
 
 [data-theme='high-contrast'] {
-  --wc-color-primary: #ffffff;
-  --wc-color-on-primary: #000000;
+  --hx-color-primary: #ffffff;
+  --hx-color-on-primary: #000000;
 
-  --wc-color-surface: #000000;
-  --wc-color-surface-raised: #1a1a1a;
-  --wc-color-on-surface: #ffffff;
-  --wc-color-on-surface-muted: #e5e5e5;
+  --hx-color-surface: #000000;
+  --hx-color-surface-raised: #1a1a1a;
+  --hx-color-on-surface: #ffffff;
+  --hx-color-on-surface-muted: #e5e5e5;
 
-  --wc-color-border: #ffffff;
-  --wc-color-border-strong: #ffffff;
+  --hx-color-border: #ffffff;
+  --hx-color-border-strong: #ffffff;
 
-  --wc-color-error: #ff6b6b;
-  --wc-color-warning: #ffd93d;
-  --wc-color-success: #6bff6b;
-  --wc-color-info: #6bb5ff;
+  --hx-color-error: #ff6b6b;
+  --hx-color-warning: #ffd93d;
+  --hx-color-success: #6bff6b;
+  --hx-color-info: #6bb5ff;
 
-  --wc-focus-ring: 0 0 0 3px #ffffff;
+  --hx-focus-ring: 0 0 0 3px #ffffff;
 }
 ```
 
@@ -2089,8 +2090,8 @@ import { css } from 'lit';
 export const focusStyles = css`
   :host(:focus-visible) {
     outline: none;
-    box-shadow: var(--wc-focus-ring);
-    outline-offset: var(--wc-focus-ring-offset, 2px);
+    box-shadow: var(--hx-focus-ring);
+    outline-offset: var(--hx-focus-ring-offset, 2px);
   }
 `;
 ```
@@ -2102,21 +2103,21 @@ static styles = [
   css`
     :host {
       display: block;
-      font-family: var(--wc-font-family-body);
-      color: var(--wc-color-on-surface);
+      font-family: var(--hx-font-family-body);
+      color: var(--hx-color-on-surface);
     }
 
     .card {
-      background: var(--wc-card-bg, var(--wc-color-surface));
-      border: 1px solid var(--wc-color-border);
-      border-radius: var(--wc-card-radius, var(--wc-radius-md));
-      padding: var(--wc-card-padding, var(--wc-spacing-lg));
-      box-shadow: var(--wc-card-shadow, var(--wc-shadow-sm));
-      transition: box-shadow var(--wc-transition-fast);
+      background: var(--hx-card-bg, var(--hx-color-surface));
+      border: 1px solid var(--hx-color-border);
+      border-radius: var(--hx-card-radius, var(--hx-radius-md));
+      padding: var(--hx-card-padding, var(--hx-spacing-lg));
+      box-shadow: var(--hx-card-shadow, var(--hx-shadow-sm));
+      transition: box-shadow var(--hx-transition-fast);
     }
 
     .card:hover {
-      box-shadow: var(--wc-shadow-md);
+      box-shadow: var(--hx-shadow-md);
     }
 
     /* Reduced motion support */
@@ -2137,14 +2138,14 @@ CSS Shadow Parts expose internal elements for targeted styling by consumers, pro
 /* In the consuming Drupal theme's CSS */
 
 /* Style the card header area differently for featured content */
-wc-content-card[variant='featured']::part(header) {
+hx-content-card[variant='featured']::part(header) {
   min-height: 200px;
-  background: linear-gradient(135deg, var(--wc-color-primary), var(--wc-color-secondary));
+  background: linear-gradient(135deg, var(--hx-color-primary), var(--hx-color-secondary));
 }
 
 /* Style the card body in a sidebar context */
-.sidebar wc-content-card::part(body) {
-  padding: var(--wc-spacing-sm);
+.sidebar hx-content-card::part(body) {
+  padding: var(--hx-spacing-sm);
 }
 ```
 
@@ -2158,9 +2159,9 @@ The following architectural decisions define the HELIX component library:
 
 2. **Reactive controllers over mixins**: Controllers are composable, testable, and avoid prototype chain pollution. Domain-specific controllers (form validation, screen reader announcements, reduced motion) encapsulate reusable behavior.
 
-3. **Form-associated custom elements with ElementInternals**: Native `<form>` participation without wrapper components or hidden inputs. This provides a clean integration path for healthcare form compliance.
+3. **Form-associated custom elements with ElementInternals**: Native `<form>` participation without wrapper components or hidden inputs. This provides a clean integration path for enterprise form compliance.
 
-4. **Three-layer accessibility strategy**: Author-time (IDE), story-time (Storybook addon), and CI (Chromatic regression) catch accessibility issues before they reach production. Healthcare applications require this level of rigor.
+4. **Three-layer accessibility strategy**: Author-time (IDE), story-time (Storybook addon), and CI (Chromatic regression) catch accessibility issues before they reach production. Enterprise applications require this level of rigor.
 
 5. **Drupal integration is first-class, not an afterthought**: Prop mapping tables, reference TWIG templates, and Drupal behavior examples ship with the component library. The Storybook documentation includes TWIG examples alongside JavaScript examples.
 

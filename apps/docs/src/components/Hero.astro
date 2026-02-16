@@ -5,6 +5,7 @@
  * Features:
  * - Animated gradient mesh background with floating orbs
  * - Grid pattern overlay for depth
+ * - 3D CSS DNA helix animation (DnaHelixLogo component)
  * - Extreme typography with weight contrast (300 to 900)
  * - Gradient text effects on title and subtitle
  * - Glassmorphic status badge with pulse indicator
@@ -13,9 +14,10 @@
  * - Fully responsive (mobile hides code preview)
  * - Respects prefers-reduced-motion
  */
+import DnaHelixLogo from './DnaHelixLogo.astro';
 ---
 
-<section class="hero-section" aria-label="HELIX - Healthcare Elements Library for Interactive eXperiences">
+<section class="hero-section" aria-label="HELIX - HTML Element Library for Interactive eXperiences">
   <!-- Grid pattern for depth -->
   <div class="hero-grid-pattern" aria-hidden="true"></div>
 
@@ -26,70 +28,20 @@
   <div class="hero-orb hero-orb-4" aria-hidden="true"></div>
 
   <div class="hero-content">
-    <!-- Main heading with DNA helix logo -->
+    <!-- Main heading with 3D DNA helix logo -->
     <h1 class="hero-title">
-      <svg class="hero-dna-helix" viewBox="0 0 100 200" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-        <defs>
-          <linearGradient id="dna-gradient-1" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" style="stop-color:#06b6d4;stop-opacity:0.6" />
-            <stop offset="50%" style="stop-color:#8b5cf6;stop-opacity:0.7" />
-            <stop offset="100%" style="stop-color:#ec4899;stop-opacity:0.6" />
-          </linearGradient>
-          <linearGradient id="dna-gradient-2" x1="100%" y1="0%" x2="0%" y2="100%">
-            <stop offset="0%" style="stop-color:#ec4899;stop-opacity:0.6" />
-            <stop offset="50%" style="stop-color:#f97316;stop-opacity:0.7" />
-            <stop offset="100%" style="stop-color:#06b6d4;stop-opacity:0.6" />
-          </linearGradient>
-          <filter id="dna-glow">
-            <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
-            <feMerge>
-              <feMergeNode in="coloredBlur"/>
-              <feMergeNode in="SourceGraphic"/>
-            </feMerge>
-          </filter>
-        </defs>
-
-        <!-- Left strand (helix path) -->
-        <path class="dna-strand dna-strand-left" d="M 25,0 Q 10,25 25,50 T 25,100 T 25,150 T 25,200"
-              stroke="url(#dna-gradient-1)" stroke-width="3" fill="none" filter="url(#dna-glow)" stroke-linecap="round"/>
-
-        <!-- Right strand (helix path) -->
-        <path class="dna-strand dna-strand-right" d="M 75,0 Q 90,25 75,50 T 75,100 T 75,150 T 75,200"
-              stroke="url(#dna-gradient-2)" stroke-width="3" fill="none" filter="url(#dna-glow)" stroke-linecap="round"/>
-
-        <!-- Base pairs (connecting lines) -->
-        <line class="dna-base" x1="25" y1="12.5" x2="75" y2="12.5" stroke="url(#dna-gradient-1)" stroke-width="2" opacity="0.3"/>
-        <line class="dna-base" x1="25" y1="37.5" x2="75" y2="37.5" stroke="url(#dna-gradient-2)" stroke-width="2" opacity="0.3"/>
-        <line class="dna-base" x1="25" y1="62.5" x2="75" y2="62.5" stroke="url(#dna-gradient-1)" stroke-width="2" opacity="0.3"/>
-        <line class="dna-base" x1="25" y1="87.5" x2="75" y2="87.5" stroke="url(#dna-gradient-2)" stroke-width="2" opacity="0.3"/>
-        <line class="dna-base" x1="25" y1="112.5" x2="75" y2="112.5" stroke="url(#dna-gradient-1)" stroke-width="2" opacity="0.3"/>
-        <line class="dna-base" x1="25" y1="137.5" x2="75" y2="137.5" stroke="url(#dna-gradient-2)" stroke-width="2" opacity="0.3"/>
-        <line class="dna-base" x1="25" y1="162.5" x2="75" y2="162.5" stroke="url(#dna-gradient-1)" stroke-width="2" opacity="0.3"/>
-        <line class="dna-base" x1="25" y1="187.5" x2="75" y2="187.5" stroke="url(#dna-gradient-2)" stroke-width="2" opacity="0.3"/>
-
-        <!-- Strand nodes (circles at intersections) -->
-        <circle class="dna-node" cx="25" cy="0" r="4" fill="url(#dna-gradient-1)" filter="url(#dna-glow)"/>
-        <circle class="dna-node" cx="75" cy="0" r="4" fill="url(#dna-gradient-2)" filter="url(#dna-glow)"/>
-        <circle class="dna-node" cx="25" cy="50" r="4" fill="url(#dna-gradient-1)" filter="url(#dna-glow)"/>
-        <circle class="dna-node" cx="75" cy="50" r="4" fill="url(#dna-gradient-2)" filter="url(#dna-glow)"/>
-        <circle class="dna-node" cx="25" cy="100" r="4" fill="url(#dna-gradient-1)" filter="url(#dna-glow)"/>
-        <circle class="dna-node" cx="75" cy="100" r="4" fill="url(#dna-gradient-2)" filter="url(#dna-glow)"/>
-        <circle class="dna-node" cx="25" cy="150" r="4" fill="url(#dna-gradient-1)" filter="url(#dna-glow)"/>
-        <circle class="dna-node" cx="75" cy="150" r="4" fill="url(#dna-gradient-2)" filter="url(#dna-glow)"/>
-        <circle class="dna-node" cx="25" cy="200" r="4" fill="url(#dna-gradient-1)" filter="url(#dna-glow)"/>
-        <circle class="dna-node" cx="75" cy="200" r="4" fill="url(#dna-gradient-2)" filter="url(#dna-glow)"/>
-      </svg>
+      <DnaHelixLogo class="hero-dna-helix dna-transparent" />
       <span class="hero-title-text">HELiX</span>
     </h1>
 
     <!-- Subtitle - light weight contrast -->
-    <p class="hero-subtitle">Healthcare Elements Library for Interactive eXperiences</p>
+    <p class="hero-subtitle">HTML Element Library for Interactive eXperiences</p>
 
     <!-- Description -->
     <p class="hero-description">
       Production-ready Lit&nbsp;3.x components with a three-tier design token system,
       WCAG&nbsp;2.1&nbsp;AAA accessibility, and seamless Drupal&nbsp;CMS integration.
-      Built for healthcare organizations that refuse to compromise.
+      Built for enterprise content platforms that refuse to compromise.
     </p>
 
     <!-- Call to action buttons -->

@@ -1,4 +1,4 @@
-import { describe, it, expect, afterEach, vi } from 'vitest';
+import { describe, it, expect, afterEach } from 'vitest';
 import { fixture, cleanup, oneEvent, checkA11y } from '../../test-utils.js';
 import type { WcForm } from './hx-form.js';
 import './index.js';
@@ -6,24 +6,23 @@ import './index.js';
 afterEach(cleanup);
 
 describe('hx-form', () => {
-
   // ─── Rendering (3) ───
 
   describe('Rendering', () => {
     it('renders as Light DOM (no shadowRoot)', async () => {
-      const _el = await fixture<WcForm>('<hx-form></hx-form>');
+      const el = await fixture<WcForm>('<hx-form></hx-form>');
       expect(el.shadowRoot).toBeNull();
     });
 
     it('renders <form> tag when action is set', async () => {
-      const _el = await fixture<WcForm>('<hx-form action="/submit"></hx-form>');
+      const el = await fixture<WcForm>('<hx-form action="/submit"></hx-form>');
       const form = el.querySelector('form');
       expect(form).toBeTruthy();
       expect(form?.getAttribute('action')).toBe('/submit');
     });
 
     it('does not render <form> tag when no action', async () => {
-      const _el = await fixture<WcForm>('<hx-form></hx-form>');
+      const el = await fixture<WcForm>('<hx-form></hx-form>');
       const form = el.querySelector('form');
       expect(form).toBeNull();
     });
@@ -33,28 +32,28 @@ describe('hx-form', () => {
 
   describe('Properties', () => {
     it('action property sets form action attribute', async () => {
-      const _el = await fixture<WcForm>('<hx-form action="/api/save"></hx-form>');
+      const el = await fixture<WcForm>('<hx-form action="/api/save"></hx-form>');
       expect(el.action).toBe('/api/save');
       const form = el.querySelector('form');
       expect(form?.getAttribute('action')).toBe('/api/save');
     });
 
     it('method property defaults to post', async () => {
-      const _el = await fixture<WcForm>('<hx-form action="/api"></hx-form>');
+      const el = await fixture<WcForm>('<hx-form action="/api"></hx-form>');
       expect(el.method).toBe('post');
       const form = el.querySelector('form');
       expect(form?.getAttribute('method')).toBe('post');
     });
 
     it('novalidate property sets novalidate attribute on form', async () => {
-      const _el = await fixture<WcForm>('<hx-form action="/api" novalidate></hx-form>');
+      const el = await fixture<WcForm>('<hx-form action="/api" novalidate></hx-form>');
       expect(el.novalidate).toBe(true);
       const form = el.querySelector('form');
       expect(form?.hasAttribute('novalidate')).toBe(true);
     });
 
     it('name property sets name attribute on form', async () => {
-      const _el = await fixture<WcForm>('<hx-form action="/api" name="login-form"></hx-form>');
+      const el = await fixture<WcForm>('<hx-form action="/api" name="login-form"></hx-form>');
       expect(el.name).toBe('login-form');
       const form = el.querySelector('form');
       expect(form?.getAttribute('name')).toBe('login-form');
@@ -65,7 +64,7 @@ describe('hx-form', () => {
 
   describe('Events', () => {
     it('dispatches wc-submit on valid client-side submit', async () => {
-      const _el = await fixture<WcForm>(`
+      const el = await fixture<WcForm>(`
         <hx-form action="">
           <form>
             <input type="text" name="username" value="testuser" />
@@ -87,7 +86,7 @@ describe('hx-form', () => {
     });
 
     it('dispatches wc-invalid when validation fails on submit', async () => {
-      const _el = await fixture<WcForm>(`
+      const el = await fixture<WcForm>(`
         <hx-form action="">
           <form>
             <input type="email" name="email" value="not-an-email" required />
@@ -111,7 +110,7 @@ describe('hx-form', () => {
     });
 
     it('dispatches wc-reset when form is reset', async () => {
-      const _el = await fixture<WcForm>(`
+      const el = await fixture<WcForm>(`
         <hx-form action="">
           <form>
             <input type="text" name="field" value="test" />
@@ -135,7 +134,7 @@ describe('hx-form', () => {
 
   describe('Form Discovery', () => {
     it('getFormElements() returns wc-* form components', async () => {
-      const _el = await fixture<WcForm>(`
+      const el = await fixture<WcForm>(`
         <hx-form>
           <hx-text-input name="first" label="First"></hx-text-input>
           <hx-text-input name="last" label="Last"></hx-text-input>
@@ -148,7 +147,7 @@ describe('hx-form', () => {
     });
 
     it('getNativeFormElements() returns native form elements', async () => {
-      const _el = await fixture<WcForm>(`
+      const el = await fixture<WcForm>(`
         <hx-form>
           <input type="text" name="username" />
           <select name="role"><option value="admin">Admin</option></select>
@@ -162,7 +161,7 @@ describe('hx-form', () => {
     });
 
     it('getFormData() returns FormData from child inputs', async () => {
-      const _el = await fixture<WcForm>(`
+      const el = await fixture<WcForm>(`
         <hx-form>
           <form>
             <input type="text" name="username" value="jdoe" />
@@ -181,7 +180,7 @@ describe('hx-form', () => {
 
   describe('Validation', () => {
     it('checkValidity() returns false when required field is empty', async () => {
-      const _el = await fixture<WcForm>(`
+      const el = await fixture<WcForm>(`
         <hx-form>
           <input type="text" name="required-field" required />
         </hx-form>
@@ -191,7 +190,7 @@ describe('hx-form', () => {
     });
 
     it('checkValidity() returns true when all fields are valid', async () => {
-      const _el = await fixture<WcForm>(`
+      const el = await fixture<WcForm>(`
         <hx-form>
           <input type="text" name="field" value="filled" required />
         </hx-form>
@@ -201,7 +200,7 @@ describe('hx-form', () => {
     });
 
     it('reportValidity() triggers validation UI and returns false for invalid', async () => {
-      const _el = await fixture<WcForm>(`
+      const el = await fixture<WcForm>(`
         <hx-form>
           <input type="text" name="required-field" required />
         </hx-form>
@@ -245,9 +244,7 @@ describe('hx-form', () => {
       // Verify all rules target wc-form (scoped)
       if (formSheet) {
         const rules = Array.from(formSheet.cssRules);
-        const nonMediaRules = rules.filter(
-          (rule) => !(rule instanceof CSSMediaRule)
-        );
+        const nonMediaRules = rules.filter((rule) => !(rule instanceof CSSMediaRule));
         for (const rule of nonMediaRules) {
           if (rule instanceof CSSStyleRule) {
             expect(rule.selectorText).toContain('hx-form');
@@ -257,7 +254,7 @@ describe('hx-form', () => {
     });
 
     it('stylesheet is removed on disconnect', async () => {
-      const _el = await fixture<WcForm>('<hx-form></hx-form>');
+      const el = await fixture<WcForm>('<hx-form></hx-form>');
 
       const countBefore = document.adoptedStyleSheets.filter((sheet) => {
         try {
@@ -289,7 +286,7 @@ describe('hx-form', () => {
 
   describe('Accessibility (axe-core)', () => {
     it('has no axe violations in default state', async () => {
-      const _el = await fixture<WcForm>(`
+      const el = await fixture<WcForm>(`
         <hx-form>
           <form>
             <div class="form-item">
@@ -304,7 +301,7 @@ describe('hx-form', () => {
     });
 
     it('has no axe violations with required fields', async () => {
-      const _el = await fixture<WcForm>(`
+      const el = await fixture<WcForm>(`
         <hx-form>
           <form>
             <div class="form-item">
@@ -322,7 +319,7 @@ describe('hx-form', () => {
     });
 
     it('has no axe violations with error states', async () => {
-      const _el = await fixture<WcForm>(`
+      const el = await fixture<WcForm>(`
         <hx-form>
           <form>
             <div class="form-item error">
@@ -337,5 +334,4 @@ describe('hx-form', () => {
       expect(violations).toEqual([]);
     });
   });
-
 });

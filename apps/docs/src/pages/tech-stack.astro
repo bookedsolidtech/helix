@@ -39,10 +39,10 @@ import StackFutureProof from '../components/showcase/stack/StackFutureProof.astr
     /* --- Top Navigation Bar --- */
     .ts-topbar {
       position: fixed;
-      top: 0;
+      top: 3.5rem;
       left: 0;
       right: 0;
-      z-index: 100;
+      z-index: 90;
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -121,7 +121,7 @@ import StackFutureProof from '../components/showcase/stack/StackFutureProof.astr
       position: relative;
       overflow: hidden;
       isolation: isolate;
-      padding: var(--space-24) var(--space-8) var(--space-16);
+      padding: calc(var(--space-24) + 3.5rem) var(--space-8) var(--space-16);
     }
 
     .ts-hero::before {

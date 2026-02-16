@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { getManifestStats } from '@/lib/cem-parser';
 import { scoreAllComponents } from '@/lib/health-scorer';
 import { getAllTestResults } from '@/lib/test-results-reader';
+import { loadIssues } from '@/lib/issues-loader';
 import { tokenEntries, tokensByCategory } from '@helix/tokens';
 import { getTokenStats } from '@helix/tokens/utils';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -18,14 +19,31 @@ import {
   Component,
   BookOpen,
   ExternalLink,
+  AlertTriangle,
+  HeartPulse,
+  CheckCircle2,
+  Eye,
+  Target,
 } from 'lucide-react';
 import { DOCS_URL, STORYBOOK_URL } from '@/lib/env';
+import { TestCategoryDonut } from '@/components/dashboard/TestCategoryDonut';
+import { IssuesSeverityChart } from '@/components/dashboard/IssuesSeverityChart';
+import { ConfidenceBar } from '@/components/dashboard/ConfidenceBar';
+import { GradeDistributionChart } from '@/components/dashboard/GradeDistributionChart';
 
 export default async function DashboardPage() {
   const stats = getManifestStats();
   const healthScores = await scoreAllComponents();
   const testResults = getAllTestResults();
   const tokenStats = getTokenStats(tokenEntries);
+
+  // Load issues data
+  let issuesData: ReturnType<typeof loadIssues> | null = null;
+  try {
+    issuesData = loadIssues();
+  } catch {
+    // Issues file may not exist yet
+  }
 
   healthScores.sort((a, b) => a.tagName.localeCompare(b.tagName));
 
@@ -37,16 +55,39 @@ export default async function DashboardPage() {
     healthScores.length > 0 ? Math.min(...healthScores.map((h) => h.overallScore)) : 0;
   const allGradesA = healthScores.every((h) => h.grade === 'A');
 
+  // Aggregate confidence across all components
+  const totalConfidence = healthScores.reduce(
+    (acc, h) => ({
+      verified: acc.verified + h.confidenceSummary.verified,
+      heuristic: acc.heuristic + h.confidenceSummary.heuristic,
+      untested: acc.untested + h.confidenceSummary.untested,
+    }),
+    { verified: 0, heuristic: 0, untested: 0 },
+  );
+
+  // Grade distribution
+  const gradeDistribution: Record<string, number> = { A: 0, B: 0, C: 0, D: 0, F: 0 };
+  for (const h of healthScores) {
+    gradeDistribution[h.grade] = (gradeDistribution[h.grade] ?? 0) + 1;
+  }
+
+  // Issues summary
+  const issueStats = issuesData?.stats;
+  const issuesSeverityBreakdown = issueStats
+    ? `${issueStats.bySeverity.critical}C ${issueStats.bySeverity.high}H ${issueStats.bySeverity.medium}M ${issueStats.bySeverity.low}L`
+    : 'No data';
+  const resolutionPct = issueStats ? Math.round(issueStats.resolutionRate * 100) : 0;
+
   return (
     <div className="space-y-8">
       {/* Header */}
       <div>
         <h1 className="text-2xl font-bold tracking-tight">Dashboard</h1>
-        <p className="text-muted-foreground mt-1">WC-2026 component library at a glance</p>
+        <p className="text-muted-foreground mt-1">HELIX component library at a glance</p>
       </div>
 
-      {/* Top-level KPIs */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      {/* Top-level KPIs — 6 cards */}
+      <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-4">
         <KpiCard
           icon={<Boxes className="w-4 h-4" />}
           label="Components"
@@ -82,6 +123,29 @@ export default async function DashboardPage() {
           value={stats.totalProperties + stats.totalEvents + stats.totalCssProperties}
           sub={`${stats.totalProperties} props, ${stats.totalEvents} events`}
           status="neutral"
+        />
+        <KpiCard
+          icon={<AlertTriangle className="w-4 h-4" />}
+          label="Issues"
+          value={issueStats?.total ?? 0}
+          sub={issuesSeverityBreakdown}
+          status={
+            issueStats
+              ? issueStats.bySeverity.critical > 0
+                ? 'error'
+                : issueStats.bySeverity.high > 0
+                  ? 'warning'
+                  : 'success'
+              : 'neutral'
+          }
+        />
+        <KpiCard
+          icon={<HeartPulse className="w-4 h-4" />}
+          label="Health Grade"
+          value={avgHealth}
+          sub={allGradesA ? 'All A grades' : `Min: ${minHealth}%`}
+          status={avgHealth >= 90 ? 'success' : avgHealth >= 70 ? 'warning' : 'error'}
+          isPercent
         />
       </div>
 
@@ -172,6 +236,156 @@ export default async function DashboardPage() {
             style={{ color: '#8B5CF6' }}
           />
         </a>
+      </div>
+
+      {/* Two-column analytics row: Test Donut + Issues Summary */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Test Category Donut Card */}
+        <Card className="transition-colors hover:border-emerald-500/20">
+          <CardHeader className="pb-2">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2.5">
+                <span className="text-emerald-400">
+                  <Target className="w-5 h-5" />
+                </span>
+                <div>
+                  <CardTitle className="text-base">Test Coverage by Category</CardTitle>
+                  <p className="text-xs text-muted-foreground">
+                    {testResults
+                      ? `${testResults.byCategory.filter((c) => c.total > 0).length} active categories`
+                      : 'No test data'}
+                  </p>
+                </div>
+              </div>
+              <Link
+                href="/tests"
+                className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors"
+              >
+                View
+                <ArrowRight className="w-3 h-3" />
+              </Link>
+            </div>
+          </CardHeader>
+          <CardContent>
+            {testResults ? (
+              <TestCategoryDonut
+                categories={testResults.byCategory}
+                totalTests={testResults.totalTests}
+                passRate={testResults.passRate}
+              />
+            ) : (
+              <div className="flex items-center justify-center h-48 text-sm text-muted-foreground">
+                Run tests to see category breakdown
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Issues Summary Card */}
+        <Card className="transition-colors hover:border-red-500/20">
+          <CardHeader className="pb-2">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2.5">
+                <span className="text-red-400">
+                  <AlertTriangle className="w-5 h-5" />
+                </span>
+                <div>
+                  <CardTitle className="text-base">Issues Tracker</CardTitle>
+                  <p className="text-xs text-muted-foreground">
+                    {issueStats ? `${resolutionPct}% resolution rate` : 'No issues data'}
+                  </p>
+                </div>
+              </div>
+              <Link
+                href="/roadmap"
+                className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors"
+              >
+                Roadmap
+                <ArrowRight className="w-3 h-3" />
+              </Link>
+            </div>
+          </CardHeader>
+          <CardContent>
+            {issueStats ? (
+              <div className="space-y-4">
+                {/* Resolution rate progress */}
+                <div className="flex items-center gap-3 p-3 rounded-lg bg-white/[0.02] border border-white/[0.04]">
+                  <div className="relative w-12 h-12 shrink-0">
+                    <svg viewBox="0 0 36 36" className="w-12 h-12 -rotate-90">
+                      <circle
+                        cx="18"
+                        cy="18"
+                        r="15.5"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="3"
+                        className="text-secondary"
+                      />
+                      <circle
+                        cx="18"
+                        cy="18"
+                        r="15.5"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="3"
+                        strokeDasharray={`${resolutionPct} ${100 - resolutionPct}`}
+                        strokeLinecap="round"
+                        className={cn(
+                          resolutionPct >= 80
+                            ? 'text-emerald-400'
+                            : resolutionPct >= 50
+                              ? 'text-amber-400'
+                              : 'text-red-400',
+                        )}
+                      />
+                    </svg>
+                    <span className="absolute inset-0 flex items-center justify-center text-[10px] font-bold tabular-nums text-foreground">
+                      {resolutionPct}%
+                    </span>
+                  </div>
+                  <div>
+                    <div className="text-sm font-medium text-foreground">Resolution Rate</div>
+                    <div className="text-xs text-muted-foreground">
+                      {issueStats.resolvedCount} of {issueStats.total} issues resolved
+                    </div>
+                  </div>
+                </div>
+
+                <IssuesSeverityChart
+                  bySeverity={issueStats.bySeverity}
+                  byStatus={issueStats.byStatus}
+                  total={issueStats.total}
+                />
+
+                {/* Category breakdown */}
+                {Object.keys(issueStats.byCategory).length > 0 && (
+                  <div>
+                    <div className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider mb-2">
+                      By Category
+                    </div>
+                    <div className="flex flex-wrap gap-1.5">
+                      {Object.entries(issueStats.byCategory)
+                        .sort(([, a], [, b]) => b - a)
+                        .map(([category, count]) => (
+                          <span
+                            key={category}
+                            className="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-medium bg-white/[0.04] border border-white/[0.06] text-muted-foreground"
+                          >
+                            {category}
+                            <span className="text-foreground tabular-nums">{count}</span>
+                          </span>
+                        ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div className="flex items-center justify-center h-48 text-sm text-muted-foreground">
+                No issues data available
+              </div>
+            )}
+          </CardContent>
+        </Card>
       </div>
 
       {/* Three-column section cards */}
@@ -291,7 +505,7 @@ export default async function DashboardPage() {
                                   : 'text-red-400',
                           )}
                         >
-                          {total > 0 ? `${passRate}%` : '—'}
+                          {total > 0 ? `${passRate}%` : '\u2014'}
                         </span>
                       </div>
                     </div>
@@ -366,9 +580,223 @@ export default async function DashboardPage() {
           </div>
         </SectionCard>
       </div>
+
+      {/* Bottom row: Quality Confidence + Platform Health Pulse */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Quality Confidence Card */}
+        <Card className="transition-colors hover:border-amber-500/20">
+          <CardHeader className="pb-2">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2.5">
+                <span className="text-amber-400">
+                  <Eye className="w-5 h-5" />
+                </span>
+                <div>
+                  <CardTitle className="text-base">Quality Confidence</CardTitle>
+                  <p className="text-xs text-muted-foreground">
+                    Measurement confidence across {healthScores.length * 12} dimension checks
+                  </p>
+                </div>
+              </div>
+              <Link
+                href="/components"
+                className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors"
+              >
+                Details
+                <ArrowRight className="w-3 h-3" />
+              </Link>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              <ConfidenceBar
+                verified={totalConfidence.verified}
+                heuristic={totalConfidence.heuristic}
+                untested={totalConfidence.untested}
+              />
+
+              {/* Per-component confidence breakdown */}
+              <div className="space-y-2">
+                <div className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">
+                  Per Component
+                </div>
+                {healthScores.map((h) => {
+                  const total =
+                    h.confidenceSummary.verified +
+                    h.confidenceSummary.heuristic +
+                    h.confidenceSummary.untested;
+                  const verifiedPct = total > 0 ? (h.confidenceSummary.verified / total) * 100 : 0;
+                  const heuristicPct =
+                    total > 0 ? (h.confidenceSummary.heuristic / total) * 100 : 0;
+
+                  return (
+                    <div key={h.tagName} className="flex items-center gap-3">
+                      <span className="font-mono text-xs text-foreground truncate w-28 shrink-0">
+                        &lt;{h.tagName}&gt;
+                      </span>
+                      <div className="flex-1 h-2 rounded-full overflow-hidden flex bg-secondary">
+                        {verifiedPct > 0 && (
+                          <div
+                            className="h-full bg-emerald-400"
+                            style={{ width: `${verifiedPct}%` }}
+                          />
+                        )}
+                        {heuristicPct > 0 && (
+                          <div
+                            className="h-full bg-amber-400"
+                            style={{ width: `${heuristicPct}%` }}
+                          />
+                        )}
+                      </div>
+                      <span className="text-[10px] text-muted-foreground tabular-nums w-16 text-right shrink-0">
+                        {h.confidenceSummary.verified}/{h.confidenceSummary.heuristic}/
+                        {h.confidenceSummary.untested}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+
+              <div className="text-xs text-muted-foreground pt-2 border-t border-white/[0.06]">
+                <span className="flex items-center gap-1.5">
+                  <CheckCircle2 className="w-3 h-3 text-emerald-400" />
+                  <span>
+                    <span className="text-foreground font-medium">Verified</span> = measured by
+                    automated tooling.{' '}
+                    <span className="text-foreground font-medium">Heuristic</span> = estimated by
+                    pattern analysis. <span className="text-foreground font-medium">Untested</span>{' '}
+                    = not yet measured.
+                  </span>
+                </span>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Platform Health Pulse Card */}
+        <Card className="transition-colors hover:border-blue-500/20">
+          <CardHeader className="pb-2">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2.5">
+                <span className="text-blue-400">
+                  <HeartPulse className="w-5 h-5" />
+                </span>
+                <div>
+                  <CardTitle className="text-base">Platform Health Pulse</CardTitle>
+                  <p className="text-xs text-muted-foreground">
+                    Grade distribution across {healthScores.length} components
+                  </p>
+                </div>
+              </div>
+              <Link
+                href="/components"
+                className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors"
+              >
+                View All
+                <ArrowRight className="w-3 h-3" />
+              </Link>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <GradeDistributionChart distribution={gradeDistribution} avgScore={avgHealth} />
+
+            {/* Per-component dimension heat summary */}
+            <div className="mt-5 space-y-2">
+              <div className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">
+                Component Dimensions
+              </div>
+              {healthScores.map((h) => {
+                return (
+                  <div key={h.tagName} className="flex items-center gap-3">
+                    <span className="font-mono text-xs text-foreground truncate w-28 shrink-0">
+                      &lt;{h.tagName}&gt;
+                    </span>
+                    <div className="flex gap-0.5 flex-1">
+                      {h.dimensions.map((d) => (
+                        <div
+                          key={d.name}
+                          className="h-4 flex-1 rounded-[2px] transition-colors"
+                          style={{
+                            backgroundColor:
+                              !d.measured || d.score === null
+                                ? 'rgba(113,113,122,0.2)'
+                                : d.score >= 90
+                                  ? 'rgba(52,211,153,0.6)'
+                                  : d.score >= 70
+                                    ? 'rgba(251,191,36,0.5)'
+                                    : d.score >= 50
+                                      ? 'rgba(251,146,60,0.5)'
+                                      : 'rgba(248,113,113,0.5)',
+                          }}
+                          title={`${d.name}: ${d.measured && d.score !== null ? `${d.score}%` : 'untested'}`}
+                        />
+                      ))}
+                    </div>
+                    <span
+                      className={cn(
+                        'text-xs font-bold tabular-nums w-6 text-right shrink-0',
+                        h.grade === 'A'
+                          ? 'text-emerald-400'
+                          : h.grade === 'B'
+                            ? 'text-blue-400'
+                            : h.grade === 'C'
+                              ? 'text-amber-400'
+                              : 'text-red-400',
+                      )}
+                    >
+                      {h.grade}
+                    </span>
+                  </div>
+                );
+              })}
+              <div className="flex items-center gap-3 pt-2 text-[10px] text-muted-foreground">
+                <span className="flex items-center gap-1">
+                  <span
+                    className="w-3 h-2 rounded-[1px]"
+                    style={{ backgroundColor: 'rgba(52,211,153,0.6)' }}
+                  />
+                  90+
+                </span>
+                <span className="flex items-center gap-1">
+                  <span
+                    className="w-3 h-2 rounded-[1px]"
+                    style={{ backgroundColor: 'rgba(251,191,36,0.5)' }}
+                  />
+                  70-89
+                </span>
+                <span className="flex items-center gap-1">
+                  <span
+                    className="w-3 h-2 rounded-[1px]"
+                    style={{ backgroundColor: 'rgba(251,146,60,0.5)' }}
+                  />
+                  50-69
+                </span>
+                <span className="flex items-center gap-1">
+                  <span
+                    className="w-3 h-2 rounded-[1px]"
+                    style={{ backgroundColor: 'rgba(248,113,113,0.5)' }}
+                  />
+                  &lt;50
+                </span>
+                <span className="flex items-center gap-1">
+                  <span
+                    className="w-3 h-2 rounded-[1px]"
+                    style={{ backgroundColor: 'rgba(113,113,122,0.2)' }}
+                  />
+                  Untested
+                </span>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 }
+
+/* -------------------------------------------------------------------------- */
+/*  Helper Components                                                         */
+/* -------------------------------------------------------------------------- */
 
 function KpiCard({
   icon,
@@ -376,12 +804,14 @@ function KpiCard({
   value,
   sub,
   status,
+  isPercent,
 }: {
   icon: React.ReactNode;
   label: string;
   value: number;
   sub: string;
   status: 'success' | 'warning' | 'error' | 'neutral';
+  isPercent?: boolean;
 }) {
   return (
     <Card>
@@ -400,6 +830,7 @@ function KpiCard({
           )}
         >
           {value}
+          {isPercent && <span className="text-lg">%</span>}
         </p>
         <p className="text-xs text-muted-foreground mt-1">{sub}</p>
       </CardContent>

@@ -1,4 +1,4 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 
 @theme {
   --color-background: oklch(0.145 0 0);
@@ -42,21 +42,28 @@
 body {
   background-color: var(--color-background);
   color: var(--color-foreground);
-  font-family: system-ui, -apple-system, sans-serif;
+  font-family:
+    system-ui,
+    -apple-system,
+    sans-serif;
 }
 
 @keyframes bar-shimmer {
-  0% { background-position: -200% 0; }
-  100% { background-position: 200% 0; }
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
 }
 
 .bar-pass {
   background: linear-gradient(
     90deg,
     oklch(0.45 0.12 160) 0%,
-    oklch(0.50 0.13 160) 40%,
+    oklch(0.5 0.13 160) 40%,
     oklch(0.58 0.14 160) 50%,
-    oklch(0.50 0.13 160) 60%,
+    oklch(0.5 0.13 160) 60%,
     oklch(0.45 0.12 160) 100%
   );
   background-size: 200% 100%;
@@ -67,9 +74,9 @@ body {
   background: linear-gradient(
     90deg,
     oklch(0.55 0.14 70) 0%,
-    oklch(0.60 0.15 70) 40%,
+    oklch(0.6 0.15 70) 40%,
     oklch(0.68 0.16 70) 50%,
-    oklch(0.60 0.15 70) 60%,
+    oklch(0.6 0.15 70) 60%,
     oklch(0.55 0.14 70) 100%
   );
   background-size: 200% 100%;
@@ -80,11 +87,71 @@ body {
   background: linear-gradient(
     90deg,
     oklch(0.48 0.18 18) 0%,
-    oklch(0.53 0.20 18) 40%,
-    oklch(0.60 0.22 18) 50%,
-    oklch(0.53 0.20 18) 60%,
+    oklch(0.53 0.2 18) 40%,
+    oklch(0.6 0.22 18) 50%,
+    oklch(0.53 0.2 18) 60%,
     oklch(0.48 0.18 18) 100%
   );
   background-size: 200% 100%;
   animation: bar-shimmer 3s ease-in-out infinite;
+}
+
+.bar-coverage {
+  background: linear-gradient(
+    90deg,
+    oklch(0.48 0.12 240) 0%,
+    oklch(0.53 0.13 240) 40%,
+    oklch(0.58 0.14 240) 50%,
+    oklch(0.53 0.13 240) 60%,
+    oklch(0.48 0.12 240) 100%
+  );
+  background-size: 200% 100%;
+  animation: bar-shimmer 3s ease-in-out infinite;
+}
+
+@keyframes indeterminate-bar {
+  0% {
+    transform: translateX(-100%);
+    width: 40%;
+  }
+  50% {
+    transform: translateX(80%);
+    width: 60%;
+  }
+  100% {
+    transform: translateX(250%);
+    width: 40%;
+  }
+}
+
+@keyframes resolved-shimmer {
+  0%,
+  100% {
+    background-position: -200% 0;
+  }
+  50% {
+    background-position: 200% 0;
+  }
+}
+
+.animate-resolved-shimmer {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.08) 50%,
+    transparent 100%
+  );
+  background-size: 200% 100%;
+  animation: resolved-shimmer 3s ease-in-out infinite;
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(2px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }

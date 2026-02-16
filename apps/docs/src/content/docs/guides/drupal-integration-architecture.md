@@ -41,7 +41,7 @@ In this approach, the Web Component accepts data exclusively through HTML attrib
 
 ```twig
 {# Drupal passes flat data. Component does everything else. #}
-<wc-content-card
+<hx-content-card
   heading="{{ node.label }}"
   summary="{{ node.field_summary.value }}"
   category="{{ node.field_category.entity.label }}"
@@ -52,7 +52,7 @@ In this approach, the Web Component accepts data exclusively through HTML attrib
   hero-image-alt="{{ node.field_hero_image.alt }}"
   author-name="{{ node.field_author.entity.field_display_name.value }}"
   variant="{{ node.isPromoted() ? 'featured' : 'default' }}"
-></wc-content-card>
+></hx-content-card>
 ```
 
 The component receives scalar values and renders its own internal structure. Drupal's TWIG template is a thin data-mapping layer.
@@ -62,7 +62,7 @@ The component receives scalar values and renders its own internal structure. Dru
 | Strength                     | Explanation                                                                                                                                       |
 | ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **Rendering consistency**    | The component always renders identically regardless of which CMS passes the data. No risk of Drupal themer accidentally breaking the card layout. |
-| **Portability**              | The same `<wc-content-card>` works in Drupal, React, Vue, static HTML, or any other system that can set HTML attributes.                          |
+| **Portability**              | The same `<hx-content-card>` works in Drupal, React, Vue, static HTML, or any other system that can set HTML attributes.                          |
 | **Encapsulated logic**       | Date formatting, truncation, conditional rendering, responsive behavior -- all live inside the component. One source of truth.                    |
 | **Simpler TWIG templates**   | The Drupal template is a flat attribute mapping. No complex nesting, no slot management, no wrapper divs.                                         |
 | **Easier automated testing** | Pass properties, assert rendered output. No need to simulate slotted content from an external template engine.                                    |
@@ -86,18 +86,18 @@ Consider a Drupal site using the Media module with responsive image styles. Drup
 ```html
 <picture>
   <source
-    srcset="/files/styles/hero_wide/anxiety.webp"
+    srcset="/files/styles/hero_wide/article-hero.webp"
     media="(min-width: 1200px)"
     type="image/webp"
   />
   <source
-    srcset="/files/styles/hero_medium/anxiety.webp"
+    srcset="/files/styles/hero_medium/article-hero.webp"
     media="(min-width: 768px)"
     type="image/webp"
   />
   <img
-    src="/files/styles/hero_small/anxiety.jpg"
-    alt="Therapist with patient"
+    src="/files/styles/hero_small/article-hero.jpg"
+    alt="Author working at a desk"
     loading="lazy"
     width="800"
     height="450"
@@ -117,7 +117,7 @@ In this approach, the Web Component provides structural scaffolding and styling 
 
 ```twig
 {# Drupal renders content normally. Component provides structure and style. #}
-<wc-content-card
+<hx-content-card
   variant="{{ node.isPromoted() ? 'featured' : 'default' }}"
   href="{{ path('entity.node.canonical', {'node': node.id}) }}"
 >
@@ -148,11 +148,11 @@ In this approach, the Web Component provides structural scaffolding and styling 
   {% endif %}
 
   <div slot="actions">
-    <wc-button variant="text" href="{{ path('entity.node.canonical', {'node': node.id}) }}">
+    <hx-button variant="text" href="{{ path('entity.node.canonical', {'node': node.id}) }}">
       {{ 'Read More'|t }}
-    </wc-button>
+    </hx-button>
   </div>
-</wc-content-card>
+</hx-content-card>
 ```
 
 ### Strengths
@@ -213,9 +213,9 @@ TEMPLATES (Slot-Only)
   Pure layout. Zero content knowledge.
 ```
 
-### Why This Works for Healthcare Drupal
+### Why This Works for Enterprise Drupal
 
-Healthcare organizations use Drupal precisely because of its content model. Content types, fields, view modes, Paragraphs, Layout Builder, Media, Views -- these are not optional add-ons. They are the core of how healthcare content teams operate. The hybrid approach respects this reality:
+Enterprise organizations use Drupal precisely because of its content model. Content types, fields, view modes, Paragraphs, Layout Builder, Media, Views -- these are not optional add-ons. They are the core of how enterprise content teams operate. The hybrid approach respects this reality:
 
 1. **Atoms** (buttons, badges, icons) have no Drupal content pipeline dependency. They are self-contained UI primitives. Properties are the natural API.
 
@@ -335,70 +335,70 @@ The following table assigns each of the 40+ planned components to a strategy bas
 
 | Component       | Strategy | Rationale                                                                                                                                                                                                           |
 | --------------- | :------: | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `wc-button`     |  **P**   | Self-contained. Properties: `variant`, `size`, `href`, `disabled`, `type`, `loading`. Default slot for button label text. No Drupal field rendering needed.                                                         |
-| `wc-icon`       |  **P**   | Pure data-driven. Properties: `name`, `size`, `label`. No content to slot. SVG rendered internally from icon name.                                                                                                  |
-| `wc-badge`      |  **P**   | Tiny, self-contained. Properties: `variant`, `size`. Default slot for badge text (a single string).                                                                                                                 |
-| `wc-tag`        |  **P**   | Minimal. Properties: `variant`, `removable`, `href`. Default slot for tag label.                                                                                                                                    |
-| `wc-avatar`     |  **P**   | Image display. Properties: `src`, `alt`, `size`, `initials`. No Drupal field rendering complexity.                                                                                                                  |
-| `wc-spinner`    |  **P**   | No content. Properties: `size`, `label` (for screen readers). Pure visual indicator.                                                                                                                                |
-| `wc-tooltip`    |  **P**   | Properties: `content`, `position`, `trigger`. Default slot for the trigger element. Tooltip content is a simple string.                                                                                             |
-| `wc-sr-only`    |  **P**   | Screen-reader-only text. Default slot for text content. No visual rendering.                                                                                                                                        |
-| `wc-toggle`     |  **H**   | Form-associated via ElementInternals. Properties: `name`, `checked`, `disabled`, `value`. Slot for label text so Drupal's Form API can render labels with translation and token replacement.                        |
-| `wc-checkbox`   |  **H**   | Form-associated. Properties: `name`, `checked`, `disabled`, `value`, `required`. Slots: `label`, `help`. Drupal's Form API renders label HTML with required indicators and help text.                               |
-| `wc-radio`      |  **H**   | Form-associated. Properties: `name`, `value`, `checked`, `disabled`. Slot for label. Same reasoning as checkbox.                                                                                                    |
-| `wc-text-input` |  **H**   | Form-associated. Properties: `name`, `type`, `value`, `required`, `pattern`, `min`, `max`, `error-message`. Slots: `label`, `help`, `prefix`, `suffix`. Labels and help text come from Drupal's Form API.           |
-| `wc-textarea`   |  **H**   | Form-associated. Properties: `name`, `value`, `required`, `rows`, `maxlength`. Slots: `label`, `help`. Same pattern as text-input.                                                                                  |
-| `wc-select`     |  **H**   | Form-associated. Properties: `name`, `value`, `required`, `multiple`. Slots: `label`, `help`. Options passed as JSON property or `<option>` slot children (Drupal's Form API renders `<option>` elements natively). |
+| `hx-button`     |  **P**   | Self-contained. Properties: `variant`, `size`, `href`, `disabled`, `type`, `loading`. Default slot for button label text. No Drupal field rendering needed.                                                         |
+| `hx-icon`       |  **P**   | Pure data-driven. Properties: `name`, `size`, `label`. No content to slot. SVG rendered internally from icon name.                                                                                                  |
+| `hx-badge`      |  **P**   | Tiny, self-contained. Properties: `variant`, `size`. Default slot for badge text (a single string).                                                                                                                 |
+| `hx-tag`        |  **P**   | Minimal. Properties: `variant`, `removable`, `href`. Default slot for tag label.                                                                                                                                    |
+| `hx-avatar`     |  **P**   | Image display. Properties: `src`, `alt`, `size`, `initials`. No Drupal field rendering complexity.                                                                                                                  |
+| `hx-spinner`    |  **P**   | No content. Properties: `size`, `label` (for screen readers). Pure visual indicator.                                                                                                                                |
+| `hx-tooltip`    |  **P**   | Properties: `content`, `position`, `trigger`. Default slot for the trigger element. Tooltip content is a simple string.                                                                                             |
+| `hx-sr-only`    |  **P**   | Screen-reader-only text. Default slot for text content. No visual rendering.                                                                                                                                        |
+| `hx-toggle`     |  **H**   | Form-associated via ElementInternals. Properties: `name`, `checked`, `disabled`, `value`. Slot for label text so Drupal's Form API can render labels with translation and token replacement.                        |
+| `hx-checkbox`   |  **H**   | Form-associated. Properties: `name`, `checked`, `disabled`, `value`, `required`. Slots: `label`, `help`. Drupal's Form API renders label HTML with required indicators and help text.                               |
+| `hx-radio`      |  **H**   | Form-associated. Properties: `name`, `value`, `checked`, `disabled`. Slot for label. Same reasoning as checkbox.                                                                                                    |
+| `hx-text-input` |  **H**   | Form-associated. Properties: `name`, `type`, `value`, `required`, `pattern`, `min`, `max`, `error-message`. Slots: `label`, `help`, `prefix`, `suffix`. Labels and help text come from Drupal's Form API.           |
+| `hx-textarea`   |  **H**   | Form-associated. Properties: `name`, `value`, `required`, `rows`, `maxlength`. Slots: `label`, `help`. Same pattern as text-input.                                                                                  |
+| `hx-select`     |  **H**   | Form-associated. Properties: `name`, `value`, `required`, `multiple`. Slots: `label`, `help`. Options passed as JSON property or `<option>` slot children (Drupal's Form API renders `<option>` elements natively). |
 
 ### Molecules
 
 | Component           | Strategy | Rationale                                                                                                                                                                                                                                                                              |
 | ------------------- | :------: | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `wc-search-bar`     |  **H**   | Properties: `placeholder`, `action`, `method`, `value`. Slot: `submit-button` (so Drupal can render a translated submit button). Drupal Search API forms need form-associated behavior.                                                                                                |
-| `wc-form-field`     |  **H**   | Wrapper molecule. Properties: `error`, `required-indicator`. Slots: `label`, `input`, `help`, `error-message`. Drupal's Form API renders each of these as separate render elements.                                                                                                    |
-| `wc-breadcrumb`     |  **H**   | Properties: `separator`, `aria-label`. Slot: default slot accepts `<a>` elements. Drupal's breadcrumb block renders a list of links. The component provides structure and styling; Drupal provides the link list. Could also accept `items` as JSON property for non-Drupal consumers. |
-| `wc-pagination`     |  **H**   | Properties: `current-page`, `total-pages`, `base-url`. Drupal's Views pager already renders pagination HTML, but the component can also render from properties for standalone use. Hybrid gives flexibility.                                                                           |
-| `wc-media-object`   |  **S**   | Content-rich. Slots: `media`, `body`. Drupal renders the image (with image styles) and the text content. Component provides the side-by-side layout.                                                                                                                                   |
-| `wc-alert`          |  **H**   | Properties: `variant` (info, warning, danger, success), `dismissible`, `role` (alert, status). Slot: default slot for alert message content. Drupal renders the message HTML (which may contain links, formatted text).                                                                |
-| `wc-accordion-item` |  **H**   | Properties: `expanded`, `disabled`, `heading-level`. Slots: `heading` (Drupal renders the heading text with configured text format), default slot for panel content. The component handles expand/collapse behavior and ARIA.                                                          |
-| `wc-tab-item`       |  **H**   | Properties: `label`, `selected`, `disabled`. Slot: default for tab panel content. The label is a simple string (property), the content is Drupal-rendered HTML (slot).                                                                                                                 |
-| `wc-dropdown-menu`  |  **H**   | Properties: `align`, `trigger-label`. Slots: `trigger` (button or link), default (menu items). Drupal renders menu items. Component handles positioning and keyboard navigation.                                                                                                       |
+| `hx-search-bar`     |  **H**   | Properties: `placeholder`, `action`, `method`, `value`. Slot: `submit-button` (so Drupal can render a translated submit button). Drupal Search API forms need form-associated behavior.                                                                                                |
+| `hx-form-field`     |  **H**   | Wrapper molecule. Properties: `error`, `required-indicator`. Slots: `label`, `input`, `help`, `error-message`. Drupal's Form API renders each of these as separate render elements.                                                                                                    |
+| `hx-breadcrumb`     |  **H**   | Properties: `separator`, `aria-label`. Slot: default slot accepts `<a>` elements. Drupal's breadcrumb block renders a list of links. The component provides structure and styling; Drupal provides the link list. Could also accept `items` as JSON property for non-Drupal consumers. |
+| `hx-pagination`     |  **H**   | Properties: `current-page`, `total-pages`, `base-url`. Drupal's Views pager already renders pagination HTML, but the component can also render from properties for standalone use. Hybrid gives flexibility.                                                                           |
+| `hx-media-object`   |  **S**   | Content-rich. Slots: `media`, `body`. Drupal renders the image (with image styles) and the text content. Component provides the side-by-side layout.                                                                                                                                   |
+| `hx-alert`          |  **H**   | Properties: `variant` (info, warning, danger, success), `dismissible`, `role` (alert, status). Slot: default slot for alert message content. Drupal renders the message HTML (which may contain links, formatted text).                                                                |
+| `hx-accordion-item` |  **H**   | Properties: `expanded`, `disabled`, `heading-level`. Slots: `heading` (Drupal renders the heading text with configured text format), default slot for panel content. The component handles expand/collapse behavior and ARIA.                                                          |
+| `hx-tab-item`       |  **H**   | Properties: `label`, `selected`, `disabled`. Slot: default for tab panel content. The label is a simple string (property), the content is Drupal-rendered HTML (slot).                                                                                                                 |
+| `hx-dropdown-menu`  |  **H**   | Properties: `align`, `trigger-label`. Slots: `trigger` (button or link), default (menu items). Drupal renders menu items. Component handles positioning and keyboard navigation.                                                                                                       |
 
 ### Organisms
 
 | Component           | Strategy | Rationale                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
 | ------------------- | :------: | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `wc-content-card`   |  **H**   | Properties: `heading`, `href`, `variant`, `publish-date`, `read-time`, `category`. Slots: `media` (Drupal responsive image), `actions` (Drupal CTA links), `meta` (Drupal tags/dates), default (body content). Scalar metadata as properties for Storybook testability. Rich content areas as slots for Drupal compatibility. **This is the canonical hybrid example.**                                                                                                         |
-| `wc-article-layout` |  **S**   | Pure structural organism. Properties: `has-sidebar` (auto-detected via slotchange). Slots: `hero`, `breadcrumb`, `author`, `sidebar`, `footer`, default. All content comes from Drupal's node full view mode.                                                                                                                                                                                                                                                                   |
-| `wc-header`         |  **S**   | Site header. Properties: `sticky`, `transparent`. Slots: `logo`, `navigation`, `search`, `utility`, `mobile-trigger`. Every slot receives Drupal block output.                                                                                                                                                                                                                                                                                                                  |
-| `wc-footer`         |  **S**   | Site footer. Properties: none needed. Slots: `branding`, `navigation`, `social`, `legal`. All content from Drupal footer blocks.                                                                                                                                                                                                                                                                                                                                                |
-| `wc-nav-primary`    |  **H**   | Properties: `items` (JSON menu tree from Drupal preprocess). **This is a justified JSON attribute** -- Drupal's menu system produces a tree structure that cannot be expressed as flat attributes. Component handles mega-menu rendering, keyboard navigation, ARIA. Alternative: Slot-driven with `<ul>` list structure from Drupal's menu block rendering. Both approaches are valid; JSON property gives the component more rendering control for complex mega-menu layouts. |
-| `wc-nav-mobile`     |  **H**   | Same approach as `wc-nav-primary`. Properties: `items` (JSON), `open`. Component handles drawer animation, focus trapping, touch gestures.                                                                                                                                                                                                                                                                                                                                      |
-| `wc-hero-banner`    |  **H**   | Properties: `heading`, `subheading`, `variant`, `overlay-opacity`. Slots: `media` (Drupal responsive image or video), `cta` (Drupal CTA buttons). Heading text as property for SEO (component controls `<h1>` rendering). Media as slot for Drupal's image styles.                                                                                                                                                                                                              |
-| `wc-card-grid`      |  **H**   | Properties: `columns`, `gap`, `variant`. Slot: default (receives multiple `<wc-content-card>` elements). Component provides CSS Grid layout. Drupal Views renders the card instances.                                                                                                                                                                                                                                                                                           |
-| `wc-form`           |  **H**   | Properties: `action`, `method`, `novalidate`. Slot: default (form fields). Drupal's Form API renders form elements. Component provides form-level validation orchestration, submit handling, and error summary. Form-associated child components (`wc-text-input`, etc.) participate via `ElementInternals`.                                                                                                                                                                    |
-| `wc-accordion`      |  **S**   | Group container. Properties: `allow-multiple`, `heading-level`. Slot: default (receives `<wc-accordion-item>` children). Component manages group behavior (single-open vs multi-open). Drupal renders accordion items via Paragraphs.                                                                                                                                                                                                                                           |
-| `wc-tabs`           |  **S**   | Group container. Properties: `selected-index`, `variant`. Slot: default (receives `<wc-tab-item>` children). Component manages tab selection, ARIA tablist, keyboard navigation. Drupal renders tab content via Paragraphs.                                                                                                                                                                                                                                                     |
-| `wc-modal`          |  **S**   | Overlay container. Properties: `open`, `heading`, `size`. Slots: `trigger`, default (modal body), `footer` (action buttons). Drupal renders modal content. Component handles overlay, focus trap, escape key, scroll lock, ARIA.                                                                                                                                                                                                                                                |
-| `wc-media-gallery`  |  **H**   | Properties: `columns`, `lightbox`. Slot: default (receives `<figure>` or `<img>` elements). Drupal Media module renders images with appropriate styles. Component provides grid layout and optional lightbox behavior.                                                                                                                                                                                                                                                          |
-| `wc-table`          |  **H**   | Properties: `sortable`, `striped`, `caption`. Slot: default (receives a `<table>` element). Drupal renders the table HTML. Component enhances with sorting, sticky headers, responsive scrolling. **Important**: The component wraps Drupal's table output rather than re-rendering from JSON data. This preserves Drupal's Table field formatter output.                                                                                                                       |
-| `wc-sidebar`        |  **S**   | Pure container. Properties: `sticky`. Slot: default (receives Drupal block output). Component provides sticky positioning and spacing.                                                                                                                                                                                                                                                                                                                                          |
+| `hx-content-card`   |  **H**   | Properties: `heading`, `href`, `variant`, `publish-date`, `read-time`, `category`. Slots: `media` (Drupal responsive image), `actions` (Drupal CTA links), `meta` (Drupal tags/dates), default (body content). Scalar metadata as properties for Storybook testability. Rich content areas as slots for Drupal compatibility. **This is the canonical hybrid example.**                                                                                                         |
+| `hx-article-layout` |  **S**   | Pure structural organism. Properties: `has-sidebar` (auto-detected via slotchange). Slots: `hero`, `breadcrumb`, `author`, `sidebar`, `footer`, default. All content comes from Drupal's node full view mode.                                                                                                                                                                                                                                                                   |
+| `hx-header`         |  **S**   | Site header. Properties: `sticky`, `transparent`. Slots: `logo`, `navigation`, `search`, `utility`, `mobile-trigger`. Every slot receives Drupal block output.                                                                                                                                                                                                                                                                                                                  |
+| `hx-footer`         |  **S**   | Site footer. Properties: none needed. Slots: `branding`, `navigation`, `social`, `legal`. All content from Drupal footer blocks.                                                                                                                                                                                                                                                                                                                                                |
+| `hx-nav-primary`    |  **H**   | Properties: `items` (JSON menu tree from Drupal preprocess). **This is a justified JSON attribute** -- Drupal's menu system produces a tree structure that cannot be expressed as flat attributes. Component handles mega-menu rendering, keyboard navigation, ARIA. Alternative: Slot-driven with `<ul>` list structure from Drupal's menu block rendering. Both approaches are valid; JSON property gives the component more rendering control for complex mega-menu layouts. |
+| `hx-nav-mobile`     |  **H**   | Same approach as `hx-nav-primary`. Properties: `items` (JSON), `open`. Component handles drawer animation, focus trapping, touch gestures.                                                                                                                                                                                                                                                                                                                                      |
+| `hx-hero-banner`    |  **H**   | Properties: `heading`, `subheading`, `variant`, `overlay-opacity`. Slots: `media` (Drupal responsive image or video), `cta` (Drupal CTA buttons). Heading text as property for SEO (component controls `<h1>` rendering). Media as slot for Drupal's image styles.                                                                                                                                                                                                              |
+| `hx-card-grid`      |  **H**   | Properties: `columns`, `gap`, `variant`. Slot: default (receives multiple `<hx-content-card>` elements). Component provides CSS Grid layout. Drupal Views renders the card instances.                                                                                                                                                                                                                                                                                           |
+| `hx-form`           |  **H**   | Properties: `action`, `method`, `novalidate`. Slot: default (form fields). Drupal's Form API renders form elements. Component provides form-level validation orchestration, submit handling, and error summary. Form-associated child components (`hx-text-input`, etc.) participate via `ElementInternals`.                                                                                                                                                                    |
+| `hx-accordion`      |  **S**   | Group container. Properties: `allow-multiple`, `heading-level`. Slot: default (receives `<hx-accordion-item>` children). Component manages group behavior (single-open vs multi-open). Drupal renders accordion items via Paragraphs.                                                                                                                                                                                                                                           |
+| `hx-tabs`           |  **S**   | Group container. Properties: `selected-index`, `variant`. Slot: default (receives `<hx-tab-item>` children). Component manages tab selection, ARIA tablist, keyboard navigation. Drupal renders tab content via Paragraphs.                                                                                                                                                                                                                                                     |
+| `hx-modal`          |  **S**   | Overlay container. Properties: `open`, `heading`, `size`. Slots: `trigger`, default (modal body), `footer` (action buttons). Drupal renders modal content. Component handles overlay, focus trap, escape key, scroll lock, ARIA.                                                                                                                                                                                                                                                |
+| `hx-media-gallery`  |  **H**   | Properties: `columns`, `lightbox`. Slot: default (receives `<figure>` or `<img>` elements). Drupal Media module renders images with appropriate styles. Component provides grid layout and optional lightbox behavior.                                                                                                                                                                                                                                                          |
+| `hx-table`          |  **H**   | Properties: `sortable`, `striped`, `caption`. Slot: default (receives a `<table>` element). Drupal renders the table HTML. Component enhances with sorting, sticky headers, responsive scrolling. **Important**: The component wraps Drupal's table output rather than re-rendering from JSON data. This preserves Drupal's Table field formatter output.                                                                                                                       |
+| `hx-sidebar`        |  **S**   | Pure container. Properties: `sticky`. Slot: default (receives Drupal block output). Component provides sticky positioning and spacing.                                                                                                                                                                                                                                                                                                                                          |
 
 ### Templates (Page-Level Layouts)
 
 | Component                | Strategy | Rationale                                                                                                                                                                  |
 | ------------------------ | :------: | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `wc-page-layout`         |  **S**   | Properties: `variant` (default, full-width, narrow). Slots: `header`, `main`, `sidebar`, `footer`. Pure CSS Grid layout container. Drupal fills regions with block output. |
-| `wc-article-page`        |  **S**   | Properties: `has-sidebar`. Slots: `hero`, `breadcrumb`, `title`, `meta`, `content`, `sidebar`, `related`. Drupal's node full view mode renders all content.                |
-| `wc-landing-page`        |  **S**   | Properties: `variant`. Slots: `hero`, `sections`, `cta`. Drupal Paragraphs or Layout Builder renders sections.                                                             |
-| `wc-search-results-page` |  **S**   | Properties: `total-results`, `query`. Slots: `search-form`, `facets`, `results`, `pager`. Drupal Search API renders all content. Component provides layout structure.      |
+| `hx-page-layout`         |  **S**   | Properties: `variant` (default, full-width, narrow). Slots: `header`, `main`, `sidebar`, `footer`. Pure CSS Grid layout container. Drupal fills regions with block output. |
+| `hx-article-page`        |  **S**   | Properties: `has-sidebar`. Slots: `hero`, `breadcrumb`, `title`, `meta`, `content`, `sidebar`, `related`. Drupal's node full view mode renders all content.                |
+| `hx-landing-page`        |  **S**   | Properties: `variant`. Slots: `hero`, `sections`, `cta`. Drupal Paragraphs or Layout Builder renders sections.                                                             |
+| `hx-search-results-page` |  **S**   | Properties: `total-results`, `query`. Slots: `search-form`, `facets`, `results`, `pager`. Drupal Search API renders all content. Component provides layout structure.      |
 
 ### Infrastructure Components
 
 | Component           | Strategy | Rationale                                                                                                                                                         |
 | ------------------- | :------: | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `wc-theme-provider` |  **P**   | Properties: `mode`, `scale`, `locale`. Slot: default (all themed content). Uses Lit Context Protocol to share theme state. No Drupal content rendering.           |
-| `wc-prose`          |  **S**   | Light DOM component (no Shadow DOM). Slot: default. Wraps Drupal CKEditor content with typography styles. Must use light DOM so Drupal's text format CSS applies. |
+| `hx-theme-provider` |  **P**   | Properties: `mode`, `scale`, `locale`. Slot: default (all themed content). Uses Lit Context Protocol to share theme state. No Drupal content rendering.           |
+| `hx-prose`          |  **S**   | Light DOM component (no Shadow DOM). Slot: default. Wraps Drupal CKEditor content with typography styles. Must use light DOM so Drupal's text format CSS applies. |
 
 ---
 
@@ -486,7 +486,7 @@ Slots must render meaningfully when empty. This supports both progressive enhanc
 <slot name="media">
   <!-- Fallback: placeholder when no image is provided -->
   <div class="card__media-placeholder" aria-hidden="true">
-    <wc-icon name="image" size="48"></wc-icon>
+    <hx-icon name="image" size="48"></hx-icon>
   </div>
 </slot>
 ```
@@ -536,8 +536,8 @@ private _handleSlotChange = (e: Event): void => {
 Form components are the canonical hybrid pattern. They use `ElementInternals` for form participation (properties: `name`, `value`, `required`) and slots for Drupal Form API rendering (slots: `label`, `help`, `error`).
 
 ```typescript
-@customElement('wc-text-input')
-export class WcTextInput extends LitElement {
+@customElement('hx-text-input')
+export class HxTextInput extends LitElement {
   static formAssociated = true;
 
   // Properties for form participation
@@ -585,23 +585,23 @@ Every slot, property, event, and CSS custom property must be documented in JSDoc
 
 ```typescript
 /**
- * A content card for healthcare article previews.
+ * A content card for article previews.
  *
  * INTEGRATION STRATEGY: Hybrid (Property + Slot)
  * - Properties: scalar metadata (heading, href, variant, publish-date)
  * - Slots: rendered content (media, actions, meta, body)
  *
- * @element wc-content-card
+ * @element hx-content-card
  *
  * @slot - Default slot for card body content (maps to content.body)
  * @slot media - Hero image or video (maps to content.field_hero_image)
  * @slot actions - CTA buttons/links (maps to custom TWIG)
  * @slot meta - Metadata: tags, dates (maps to content.field_tags)
  *
- * @fires wc-card-click - Card activated (detail: { href, heading, method })
+ * @fires hx-card-click - Card activated (detail: { href, heading, method })
  *
- * @cssprop [--wc-card-radius=8px] - Border radius
- * @cssprop [--wc-card-padding=1.5rem] - Internal padding
+ * @cssprop [--hx-card-radius=8px] - Border radius
+ * @cssprop [--hx-card-padding=1.5rem] - Internal padding
  */
 ```
 
@@ -650,7 +650,7 @@ This section maps each major Drupal module to its integration surface with each 
 
 | Concern           |                   Property-Driven                    |                           Slot-Driven                            |                                Hybrid                                 |
 | ----------------- | :--------------------------------------------------: | :--------------------------------------------------------------: | :-------------------------------------------------------------------: |
-| Form rendering    | Impractical -- Webform has hundreds of element types |        Webform output goes into `<wc-form>` default slot         | Form wrapper is slot-driven; individual elements use ElementInternals |
+| Form rendering    | Impractical -- Webform has hundreds of element types |        Webform output goes into `<hx-form>` default slot         | Form wrapper is slot-driven; individual elements use ElementInternals |
 | Conditional logic |   Must duplicate Webform's conditional logic in JS   | Webform handles conditionals server-side; component wraps output |                          Same as slot-driven                          |
 | Multi-step forms  |         Must manage step state in component          |  Webform manages steps; each step's output goes into form slot   |                          Same as slot-driven                          |
 | File uploads      |          Must build upload UI in component           |          Webform's file upload element renders normally          |                          Same as slot-driven                          |
@@ -696,8 +696,8 @@ This is essentially free. The only cost is the additional shadow DOM tree, which
 ```typescript
 // Clean property-based testing
 it('renders with heading property', async () => {
-  const el = await fixture<WcButton>(html`
-    <wc-button variant="primary" size="lg">Click Me</wc-button>
+  const el = await fixture<HxButton>(html`
+    <hx-button variant="primary" size="lg">Click Me</hx-button>
   `);
   const button = el.shadowRoot?.querySelector('button');
   expect(button?.classList.contains('btn--primary')).toBe(true);
@@ -710,14 +710,14 @@ it('renders with heading property', async () => {
 ```typescript
 // Properties + composed slot content
 it('renders card with slotted media', async () => {
-  const el = await fixture<WcContentCard>(html`
-    <wc-content-card heading="Test Article" variant="featured" href="/test">
+  const el = await fixture<HxContentCard>(html`
+    <hx-content-card heading="Test Article" variant="featured" href="/test">
       <img slot="media" src="/test.jpg" alt="Test image" />
       <p>Article body content</p>
       <div slot="actions">
-        <wc-button variant="text" href="/test">Read More</wc-button>
+        <hx-button variant="text" href="/test">Read More</hx-button>
       </div>
-    </wc-content-card>
+    </hx-content-card>
   `);
 
   // Test properties
@@ -737,8 +737,8 @@ it('renders card with slotted media', async () => {
 ```typescript
 // Compose realistic Drupal-like content
 it('renders article layout with all slots', async () => {
-  const el = await fixture<WcArticleLayout>(html`
-    <wc-article-layout>
+  const el = await fixture<HxArticleLayout>(html`
+    <hx-article-layout>
       <nav slot="breadcrumb" aria-label="Breadcrumb">
         <ol>
           <li><a href="/">Home</a></li>
@@ -758,7 +758,7 @@ it('renders article layout with all slots', async () => {
       <aside slot="sidebar">
         <h2>Related Articles</h2>
       </aside>
-    </wc-article-layout>
+    </hx-article-layout>
   `);
 
   // Verify layout adapts to populated sidebar slot
@@ -806,7 +806,7 @@ render() {
   return html`
     <button class="btn btn--${this.variant}">
       <slot name="icon">
-        ${this.icon ? html`<wc-icon name=${this.icon}></wc-icon>` : nothing}
+        ${this.icon ? html`<hx-icon name=${this.icon}></hx-icon>` : nothing}
       </slot>
       <slot>${this.label}</slot>
     </button>
@@ -832,7 +832,7 @@ Neither migration path requires rewriting existing templates. The hybrid foundat
 
 5. **Templates** (page layouts) are slot-only. They are pure CSS Grid/Flexbox containers. Drupal fills every region.
 
-**The rationale is clear**: Drupal is the primary consumer. Healthcare organizations depend on Drupal's Paragraphs, Layout Builder, Media, Views, and Webform. A strategy that breaks these modules is a non-starter. The hybrid approach preserves full Drupal module compatibility for content-rich components while maintaining clean, portable, testable APIs for simple UI primitives.
+**The rationale is clear**: Drupal is the primary consumer. Enterprise organizations depend on Drupal's Paragraphs, Layout Builder, Media, Views, and Webform. A strategy that breaks these modules is a non-starter. The hybrid approach preserves full Drupal module compatibility for content-rich components while maintaining clean, portable, testable APIs for simple UI primitives.
 
 The library ships as a framework-agnostic Web Component package. It works in Storybook, static HTML, React, Vue, or any system that supports Web Component slots and attributes. The hybrid does not sacrifice portability -- it simply acknowledges that different components have different content complexity, and each deserves the API strategy that best fits its nature.
 
@@ -844,7 +844,7 @@ The library ships as a framework-agnostic Web Component package. It works in Sto
 
 **Status**: Accepted
 
-**Context**: HELIX is a Web Component library that must integrate with Drupal CMS as its primary consumer while remaining framework-agnostic. The fundamental architectural question is whether components should accept data via properties (component controls rendering) or via slots (Drupal controls rendering). The library targets enterprise healthcare organizations that rely on Drupal's content management modules (Paragraphs, Layout Builder, Media, Views, Webform).
+**Context**: HELIX is a Web Component library that must integrate with Drupal CMS as its primary consumer while remaining framework-agnostic. The fundamental architectural question is whether components should accept data via properties (component controls rendering) or via slots (Drupal controls rendering). The library targets enterprise organizations that rely on Drupal's content management modules (Paragraphs, Layout Builder, Media, Views, Webform).
 
 **Decision**: Adopt a hybrid strategy where each component's API is determined by its position in the atomic design hierarchy and its content complexity. Atoms use properties. Form elements use properties + slots (ElementInternals). Molecules use a balanced mix. Organisms use slots for content and properties for configuration. Templates are slot-only.
 
@@ -878,7 +878,7 @@ _Mitigations:_
 
 **Alternatives Considered**:
 
-1. **Strategy A: All Property-Driven** -- Rejected because it breaks Drupal's Paragraphs, Layout Builder, Media, and Views integration. Healthcare organizations depend on these modules. Forcing data extraction from Drupal's rendering pipeline creates a parallel rendering system that duplicates work and breaks cache invalidation.
+1. **Strategy A: All Property-Driven** -- Rejected because it breaks Drupal's Paragraphs, Layout Builder, Media, and Views integration. Enterprise organizations depend on these modules. Forcing data extraction from Drupal's rendering pipeline creates a parallel rendering system that duplicates work and breaks cache invalidation.
 
 2. **Strategy B: All Slot-Driven** -- Rejected because it makes atoms unnecessarily complex (wrapping simple button text in slot elements), reduces portability for simple components, and makes Storybook testing verbose. Atoms have no Drupal rendering dependency and gain nothing from slots.
 
@@ -928,16 +928,16 @@ START: What kind of data does this component receive?
 
 ```twig
 {# Simple: flat attributes, no slots needed #}
-<wc-button variant="primary" size="lg" href="{{ url }}">
+<hx-button variant="primary" size="lg" href="{{ url }}">
   {{ 'Schedule Appointment'|t }}
-</wc-button>
+</hx-button>
 ```
 
 ### Hybrid Organism
 
 ```twig
 {# Properties for config/metadata + Slots for Drupal-rendered content #}
-<wc-content-card
+<hx-content-card
   heading="{{ node.label }}"
   href="{{ path('entity.node.canonical', {'node': node.id}) }}"
   variant="{{ node.isPromoted() ? 'featured' : 'default' }}"
@@ -959,18 +959,18 @@ START: What kind of data does this component receive?
   {% endif %}
 
   <div slot="actions">
-    <wc-button variant="text" href="{{ path('entity.node.canonical', {'node': node.id}) }}">
+    <hx-button variant="text" href="{{ path('entity.node.canonical', {'node': node.id}) }}">
       {{ 'Read More'|t }}
-    </wc-button>
+    </hx-button>
   </div>
-</wc-content-card>
+</hx-content-card>
 ```
 
 ### Slot-Driven Template
 
 ```twig
 {# Pure structural container: all content from Drupal #}
-<wc-page-layout variant="default">
+<hx-page-layout variant="default">
   <header slot="header">
     {{ page.header }}
   </header>
@@ -985,30 +985,30 @@ START: What kind of data does this component receive?
   <footer slot="footer">
     {{ page.footer }}
   </footer>
-</wc-page-layout>
+</hx-page-layout>
 ```
 
 ### Hybrid Form Element
 
 ```twig
 {# ElementInternals properties + Drupal Form API slots #}
-<wc-text-input
-  name="patient_name"
+<hx-text-input
+  name="contact_name"
   type="text"
   required
-  value="{{ form.patient_name['#default_value'] }}"
+  value="{{ form.contact_name['#default_value'] }}"
 >
   <label slot="label">
-    {{ form.patient_name['#title'] }}
-    {% if form.patient_name['#required'] %}
+    {{ form.contact_name['#title'] }}
+    {% if form.contact_name['#required'] %}
       <span class="form-required" aria-hidden="true">*</span>
     {% endif %}
   </label>
-  {% if form.patient_name['#description'] %}
-    <div slot="help">{{ form.patient_name['#description'] }}</div>
+  {% if form.contact_name['#description'] %}
+    <div slot="help">{{ form.contact_name['#description'] }}</div>
   {% endif %}
-  {% if errors.patient_name %}
-    <div slot="error" role="alert">{{ errors.patient_name }}</div>
+  {% if errors.contact_name %}
+    <div slot="error" role="alert">{{ errors.contact_name }}</div>
   {% endif %}
-</wc-text-input>
+</hx-text-input>
 ```

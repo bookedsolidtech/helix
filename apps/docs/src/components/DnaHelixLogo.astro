@@ -1,0 +1,487 @@
+---
+/**
+ * DnaHelixLogo.astro - Pure CSS 3D DNA Double Helix Animation
+ *
+ * A performant, mesmerizing DNA double helix constructed entirely with CSS.
+ * Uses CSS 3D transforms (perspective, rotateY, translateZ) to create a
+ * convincing rotating helix. Each "nucleotide" is a positioned element
+ * that orbits in 3D space, with paired strands 180deg apart and connecting
+ * rungs between them.
+ *
+ * Performance:
+ *   - GPU-accelerated: only `transform` and `opacity` are animated
+ *   - No JavaScript animation dependencies
+ *   - Respects `prefers-reduced-motion: reduce`
+ *   - Uses `will-change: transform` on the rotating container only
+ *
+ * Sizing:
+ *   - Controlled by `--dna-size` custom property (defaults to 100px)
+ *   - Aspect ratio maintained at roughly 1:2 (width:height)
+ *   - Works at hero scale (400px+) and nav/footer scale (32px)
+ *
+ * Brand colors:
+ *   - Cyan #06b6d4 -> Purple #8b5cf6 -> Pink #ec4899
+ *   - Gradient flows along the helix vertical axis
+ */
+
+interface Props {
+  /** CSS size value for width. Height is 2x. Default: "100px" */
+  size?: string;
+  /** Additional CSS class names */
+  class?: string;
+  /** aria-label for accessibility. Defaults to empty (decorative). */
+  label?: string;
+}
+
+const {
+  size,
+  class: className = '',
+  label = '',
+} = Astro.props;
+
+const sizeStyle = size ? `--dna-size: ${size};` : '';
+
+// Generate 20 nucleotide pairs (rungs of the helix ladder).
+// Each pair has two backbone nodes and a connecting rung.
+// The vertical distribution and rotation offset create the helix twist.
+const pairCount = 20;
+const pairs = Array.from({ length: pairCount }, (_, i) => ({
+  index: i,
+  // Each pair is rotated an additional 18deg (360/20) so one full
+  // turn of the helix spans the entire height.
+  rotationDeg: i * 18,
+  // Vertical position as a percentage of container height
+  topPercent: (i / (pairCount - 1)) * 100,
+}));
+---
+
+<div
+  class:list={['dna-helix-logo', className]}
+  style={sizeStyle}
+  role={label ? 'img' : 'presentation'}
+  aria-label={label || undefined}
+  aria-hidden={label ? undefined : 'true'}
+>
+  <!-- Outer glow layer -->
+  <div class="dna-glow"></div>
+
+  <!-- 3D scene: perspective applied here -->
+  <div class="dna-scene">
+    <!-- Rotating container: single transform animation -->
+    <div class="dna-rotator">
+      {pairs.map((pair) => (
+        <div
+          class="dna-pair"
+          style={`--pair-index: ${pair.index}; --pair-rotation: ${pair.rotationDeg}deg; --pair-top: ${pair.topPercent}%;`}
+        >
+          {/* Left backbone node */}
+          <div class="dna-node dna-node-left"></div>
+          {/* Connecting rung */}
+          <div class="dna-rung"></div>
+          {/* Right backbone node (180deg opposite) */}
+          <div class="dna-node dna-node-right"></div>
+        </div>
+      ))}
+    </div>
+  </div>
+
+  <!-- Shimmer overlay that sweeps vertically -->
+  <div class="dna-shimmer"></div>
+</div>
+
+<style>
+  /* ==========================================================
+     DNA HELIX LOGO - CUSTOM PROPERTIES & CONTAINER
+     ========================================================== */
+  .dna-helix-logo {
+    --dna-size: 100px;
+    --dna-width: var(--dna-size);
+    --dna-height: calc(var(--dna-size) * 2.2);
+
+    /* Brand gradient stops */
+    --dna-color-cyan: #06b6d4;
+    --dna-color-purple: #8b5cf6;
+    --dna-color-pink: #ec4899;
+
+    /* Timing */
+    --dna-spin-duration: 6s;
+    --dna-shimmer-duration: 3s;
+
+    /* Node sizing relative to container */
+    --dna-node-size: calc(var(--dna-size) * 0.09);
+    --dna-rung-height: calc(var(--dna-size) * 0.025);
+
+    /* Helix radius: how far nodes extend from center in 3D */
+    --dna-radius: calc(var(--dna-size) * 0.38);
+
+    position: relative;
+    width: var(--dna-width);
+    height: var(--dna-height);
+    flex-shrink: 0;
+    isolation: isolate;
+  }
+
+  /* ==========================================================
+     AMBIENT GLOW
+     Soft radial glow behind the helix for depth.
+     ========================================================== */
+  .dna-glow {
+    position: absolute;
+    inset: -20%;
+    border-radius: 50%;
+    background: radial-gradient(
+      ellipse at center,
+      rgba(139, 92, 246, 0.15) 0%,
+      rgba(6, 182, 212, 0.08) 40%,
+      transparent 70%
+    );
+    pointer-events: none;
+    z-index: 0;
+    animation: dna-glow-pulse var(--dna-spin-duration) ease-in-out infinite;
+  }
+
+  @keyframes dna-glow-pulse {
+    0%, 100% { opacity: 0.6; transform: scale(1); }
+    50% { opacity: 1; transform: scale(1.08); }
+  }
+
+  /* ==========================================================
+     3D SCENE - PERSPECTIVE CONTAINER
+     ========================================================== */
+  .dna-scene {
+    position: absolute;
+    inset: 0;
+    perspective: calc(var(--dna-size) * 4);
+    perspective-origin: 50% 50%;
+    z-index: 1;
+    overflow: visible;
+  }
+
+  /* ==========================================================
+     ROTATOR - THE SINGLE ANIMATED ELEMENT
+     Continuous Y-axis rotation. Everything inside inherits
+     the 3D context via transform-style: preserve-3d.
+     ========================================================== */
+  .dna-rotator {
+    position: absolute;
+    inset: 0;
+    transform-style: preserve-3d;
+    animation: dna-spin var(--dna-spin-duration) linear infinite;
+    will-change: transform;
+  }
+
+  @keyframes dna-spin {
+    from { transform: rotateY(0deg); }
+    to   { transform: rotateY(360deg); }
+  }
+
+  /* ==========================================================
+     NUCLEOTIDE PAIR
+     Each pair is positioned at a vertical offset and rotated
+     around the Y-axis by its helix angle. The two nodes sit
+     at +Z and -Z (front and back of the rotation), creating
+     the double-helix shape.
+     ========================================================== */
+  .dna-pair {
+    position: absolute;
+    top: var(--pair-top);
+    left: 50%;
+    width: 0;
+    height: 0;
+    transform-style: preserve-3d;
+    transform: rotateY(var(--pair-rotation));
+  }
+
+  /* ==========================================================
+     BACKBONE NODES
+     Small circles positioned in 3D space. Left node pushes
+     toward the viewer (+Z), right node pushes away (-Z).
+     Color gradient based on vertical position via --pair-index.
+     ========================================================== */
+  .dna-node {
+    position: absolute;
+    width: var(--dna-node-size);
+    height: var(--dna-node-size);
+    border-radius: 50%;
+    top: calc(var(--dna-node-size) / -2);
+    /* Gradient color by vertical position:
+       Top = cyan, Middle = purple, Bottom = pink */
+    background: var(--dna-color-cyan);
+    box-shadow:
+      0 0 calc(var(--dna-node-size) * 0.8) currentColor,
+      0 0 calc(var(--dna-node-size) * 2) currentColor;
+  }
+
+  .dna-node-left {
+    left: calc(var(--dna-node-size) / -2);
+    transform: translateZ(var(--dna-radius));
+    color: var(--dna-color-cyan);
+  }
+
+  .dna-node-right {
+    left: calc(var(--dna-node-size) / -2);
+    transform: translateZ(calc(var(--dna-radius) * -1));
+    color: var(--dna-color-pink);
+  }
+
+  /* Gradient coloring by position (20 pairs, 0-19) */
+  /* Top third: cyan dominant */
+  .dna-pair:nth-child(-n+7) .dna-node-left {
+    background: var(--dna-color-cyan);
+    color: var(--dna-color-cyan);
+  }
+  .dna-pair:nth-child(-n+7) .dna-node-right {
+    background: var(--dna-color-pink);
+    color: var(--dna-color-pink);
+  }
+
+  /* Middle third: purple dominant */
+  .dna-pair:nth-child(n+8):nth-child(-n+14) .dna-node-left {
+    background: var(--dna-color-purple);
+    color: var(--dna-color-purple);
+  }
+  .dna-pair:nth-child(n+8):nth-child(-n+14) .dna-node-right {
+    background: var(--dna-color-cyan);
+    color: var(--dna-color-cyan);
+  }
+
+  /* Bottom third: pink dominant */
+  .dna-pair:nth-child(n+15) .dna-node-left {
+    background: var(--dna-color-pink);
+    color: var(--dna-color-pink);
+  }
+  .dna-pair:nth-child(n+15) .dna-node-right {
+    background: var(--dna-color-purple);
+    color: var(--dna-color-purple);
+  }
+
+  /* Smoother gradient transitions at boundaries */
+  .dna-pair:nth-child(6) .dna-node-left,
+  .dna-pair:nth-child(7) .dna-node-left {
+    background: linear-gradient(180deg, var(--dna-color-cyan), var(--dna-color-purple));
+    color: var(--dna-color-purple);
+  }
+  .dna-pair:nth-child(13) .dna-node-left,
+  .dna-pair:nth-child(14) .dna-node-left {
+    background: linear-gradient(180deg, var(--dna-color-purple), var(--dna-color-pink));
+    color: var(--dna-color-pink);
+  }
+  .dna-pair:nth-child(6) .dna-node-right,
+  .dna-pair:nth-child(7) .dna-node-right {
+    background: linear-gradient(180deg, var(--dna-color-pink), var(--dna-color-cyan));
+    color: var(--dna-color-cyan);
+  }
+  .dna-pair:nth-child(13) .dna-node-right,
+  .dna-pair:nth-child(14) .dna-node-right {
+    background: linear-gradient(180deg, var(--dna-color-cyan), var(--dna-color-purple));
+    color: var(--dna-color-purple);
+  }
+
+  /* ==========================================================
+     CONNECTING RUNGS
+     Lines between the two backbone nodes of each pair.
+     Rendered as a thin element stretching in Z-space.
+     Using a pseudo-element trick: the rung stretches from
+     -Z to +Z via a rotated/scaled plane.
+     ========================================================== */
+  .dna-rung {
+    position: absolute;
+    top: calc(var(--dna-rung-height) / -2);
+    left: 0;
+    width: 0;
+    height: var(--dna-rung-height);
+    transform-style: preserve-3d;
+  }
+
+  .dna-rung::before {
+    content: '';
+    position: absolute;
+    /* The rung stretches from -radius to +radius in Z */
+    width: calc(var(--dna-radius) * 2);
+    height: 100%;
+    left: calc(var(--dna-radius) * -1);
+    top: 0;
+    /* Lay the rung flat on the XZ plane by rotating around X.
+       Since pairs already rotate around Y, this creates the
+       connecting bar between backbone nodes. */
+    background: linear-gradient(
+      90deg,
+      var(--dna-color-pink) 0%,
+      rgba(139, 92, 246, 0.3) 30%,
+      rgba(139, 92, 246, 0.15) 50%,
+      rgba(139, 92, 246, 0.3) 70%,
+      var(--dna-color-cyan) 100%
+    );
+    border-radius: calc(var(--dna-rung-height) / 2);
+    opacity: 0.4;
+  }
+
+  /* Vary rung opacity to create depth illusion even without Z-sorting */
+  .dna-pair:nth-child(odd) .dna-rung::before {
+    opacity: 0.35;
+  }
+  .dna-pair:nth-child(even) .dna-rung::before {
+    opacity: 0.25;
+  }
+
+  /* ==========================================================
+     SHIMMER OVERLAY
+     A vertical light sweep that adds a glassy, premium feel.
+     Animated with translateY for GPU acceleration.
+     ========================================================== */
+  .dna-shimmer {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    pointer-events: none;
+    overflow: hidden;
+    border-radius: inherit;
+    mask-image: linear-gradient(
+      180deg,
+      transparent 0%,
+      black 10%,
+      black 90%,
+      transparent 100%
+    );
+    -webkit-mask-image: linear-gradient(
+      180deg,
+      transparent 0%,
+      black 10%,
+      black 90%,
+      transparent 100%
+    );
+  }
+
+  .dna-shimmer::before {
+    content: '';
+    position: absolute;
+    left: -10%;
+    width: 120%;
+    height: 30%;
+    background: linear-gradient(
+      180deg,
+      transparent 0%,
+      rgba(255, 255, 255, 0.06) 40%,
+      rgba(255, 255, 255, 0.12) 50%,
+      rgba(255, 255, 255, 0.06) 60%,
+      transparent 100%
+    );
+    animation: dna-shimmer-sweep var(--dna-shimmer-duration) ease-in-out infinite;
+    transform: translateY(-100%);
+  }
+
+  @keyframes dna-shimmer-sweep {
+    0%   { transform: translateY(-100%); }
+    100% { transform: translateY(450%); }
+  }
+
+  /* ==========================================================
+     DEPTH FADING
+     Top and bottom edges fade to transparent to avoid
+     hard clipping and suggest the helix continues.
+     ========================================================== */
+  .dna-scene::before,
+  .dna-scene::after {
+    content: '';
+    position: absolute;
+    left: -20%;
+    width: 140%;
+    height: 12%;
+    z-index: 10;
+    pointer-events: none;
+  }
+
+  .dna-scene::before {
+    top: 0;
+    background: linear-gradient(
+      180deg,
+      rgba(10, 10, 26, 0.95) 0%,
+      rgba(10, 10, 26, 0.6) 40%,
+      transparent 100%
+    );
+  }
+
+  .dna-scene::after {
+    bottom: 0;
+    background: linear-gradient(
+      0deg,
+      rgba(10, 10, 26, 0.95) 0%,
+      rgba(10, 10, 26, 0.6) 40%,
+      transparent 100%
+    );
+  }
+
+  /* Transparent fade variant for light backgrounds.
+     Consumer can add class="dna-helix-logo dna-transparent"
+     to disable the dark edge fades. */
+  .dna-helix-logo.dna-transparent .dna-scene::before,
+  .dna-helix-logo.dna-transparent .dna-scene::after {
+    display: none;
+  }
+
+  /* ==========================================================
+     SIZE VARIANTS
+     ========================================================== */
+
+  /* Small: nav/footer usage (around 32-48px) */
+  .dna-helix-logo.dna-sm {
+    --dna-size: 32px;
+    --dna-spin-duration: 4s;
+    --dna-shimmer-duration: 2s;
+  }
+
+  .dna-helix-logo.dna-sm .dna-glow {
+    display: none;
+  }
+
+  .dna-helix-logo.dna-sm .dna-scene::before,
+  .dna-helix-logo.dna-sm .dna-scene::after {
+    height: 8%;
+  }
+
+  .dna-helix-logo.dna-sm .dna-node {
+    box-shadow:
+      0 0 calc(var(--dna-node-size) * 0.5) currentColor;
+  }
+
+  /* Medium: inline usage (around 64-100px) */
+  .dna-helix-logo.dna-md {
+    --dna-size: 80px;
+  }
+
+  /* Large: hero usage (200px+) */
+  .dna-helix-logo.dna-lg {
+    --dna-size: 200px;
+    --dna-spin-duration: 8s;
+  }
+
+  /* XL: hero centerpiece (300px+) */
+  .dna-helix-logo.dna-xl {
+    --dna-size: 300px;
+    --dna-spin-duration: 10s;
+    --dna-shimmer-duration: 4s;
+  }
+
+  /* ==========================================================
+     PREFERS-REDUCED-MOTION
+     Required for accessibility compliance.
+     Disable all motion. Show a static, slightly rotated helix.
+     ========================================================== */
+  @media (prefers-reduced-motion: reduce) {
+    .dna-rotator {
+      animation: none;
+      transform: rotateY(-20deg);
+    }
+
+    .dna-glow {
+      animation: none;
+      opacity: 0.8;
+    }
+
+    .dna-shimmer::before {
+      animation: none;
+      transform: translateY(150%);
+      opacity: 0.5;
+    }
+  }
+</style>

@@ -22,8 +22,8 @@ HELIX components are standard Web Components. They work in any HTML page:
 <script type="module" src="@helix/library"></script>
 
 <wc-card variant="elevated">
-  <wc-heading level="2">Patient Resources</wc-heading>
-  <wc-text>Find healthcare information and support services.</wc-text>
+  <wc-heading level="2">Featured Articles</wc-heading>
+  <wc-text>Browse our latest content and support resources.</wc-text>
   <wc-button slot="actions" variant="primary">Learn More</wc-button>
 </wc-card>
 ```

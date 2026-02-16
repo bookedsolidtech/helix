@@ -1,20 +1,53 @@
 ---
-title: "wc-alert"
-description: "A feedback component for communicating status messages, warnings, and errors. Critical for healthcare patient safety alerts."
+title: "hx-alert"
+description: "A feedback component for communicating status messages, warnings, and errors. Critical for accessible user notifications."
 ---
 
 import ComponentLoader from '../../../components/ComponentLoader.astro';
+import ComponentDemo from '../../../components/ComponentDemo.astro';
 import ComponentDoc from '../../../components/ComponentDoc.astro';
 
 <ComponentLoader />
 
-<ComponentDoc tagName="wc-alert" section="summary" />
+<ComponentDoc tagName="hx-alert" section="summary" />
 
-## Overview
+## Variants
 
-A feedback component for communicating status messages, warnings, and errors.
-Critical for healthcare patient safety alerts.
+Info, success, warning, and error styles with appropriate ARIA semantics.
+
+<ComponentDemo title="Variants">
+  <div style="display: grid; gap: 0.75rem;">
+    <hx-alert variant="info">This is an informational message.</hx-alert>
+    <hx-alert variant="success">Operation completed successfully.</hx-alert>
+    <hx-alert variant="warning">Please review before proceeding.</hx-alert>
+    <hx-alert variant="error">An error occurred. Please try again.</hx-alert>
+  </div>
+</ComponentDemo>
+
+## Closable
+
+Alerts with a dismiss button. Click the close icon to hide the alert.
+
+<ComponentDemo title="Closable">
+  <div style="display: grid; gap: 0.75rem;">
+    <hx-alert variant="info" closable>This alert can be dismissed by the user.</hx-alert>
+    <hx-alert variant="success" closable>Success! You can close this notification.</hx-alert>
+  </div>
+</ComponentDemo>
+
+## With Actions
+
+Use the `actions` slot to add action buttons inside the alert.
+
+<ComponentDemo title="With Actions">
+  <hx-alert variant="warning" closable>
+    Your session is about to expire.
+    <div slot="actions">
+      <hx-button variant="secondary" size="sm">Extend Session</hx-button>
+    </div>
+  </hx-alert>
+</ComponentDemo>
 
 ## API Reference
 
-<ComponentDoc tagName="wc-alert" section="api" />
+<ComponentDoc tagName="hx-alert" section="api" />

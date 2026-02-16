@@ -16,9 +16,9 @@ description: Technical preparation materials and key talking points for the HELI
 - Eliminates manual documentation drift
 - JSDoc annotations drive 100% documentation coverage
 
-### 2. Healthcare Compliance Leadership
+### 2. Accessibility-First Leadership
 
-- WCAG 2.1 AA legally mandated (HHS May 2026)
+- WCAG 2.1 AA as the baseline standard
 - WCAG AAA targets for competitive advantage
 - 4-level accessibility testing strategy
 - High contrast mode and reduced motion support
@@ -70,11 +70,11 @@ description: Technical preparation materials and key talking points for the HELI
 - CEM as the contract between systems
 - 3-tier design token system aligned with W3C spec
 
-### Healthcare Expertise
+### Accessibility Expertise
 
-- HHS accessibility mandate (May 2026 deadline)
 - WCAG AAA targets, not just AA minimum
 - 4-level accessibility testing strategy catches issues early
+- Enterprise compliance standards baked into every component
 
 ### Drupal Understanding
 

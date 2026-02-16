@@ -6,6 +6,9 @@ import { scoreComponent } from '@/lib/health-scorer';
 import { getSourceInfo } from '@/lib/source-analyzer';
 import { getTestResultsForComponent } from '@/lib/test-results-reader';
 import { analyzeAccessibility } from '@/lib/a11y-analyzer';
+import { generateSnippetsWithOverrides } from '@/lib/snippet-generator';
+import { getOverridesForComponent } from '@/data/snippet-overrides';
+import { highlightCode } from '@/lib/syntax-highlighter';
 import { getStorybookUrl, getDocsUrl } from '@/lib/env';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -22,6 +25,7 @@ import { CemMatrix } from '@/components/dashboard/CemMatrix';
 import { ScoreBar } from '@/components/dashboard/ScoreBadge';
 import { SplitButtonDropdown } from '@/components/dashboard/SplitButtonDropdown';
 import { Breadcrumb } from '@/components/dashboard/Breadcrumb';
+import { CodeSnippets } from '@/components/dashboard/CodeSnippets';
 import { getComponentBreadcrumbs } from '@/lib/breadcrumb-utils';
 import { cn } from '@/lib/utils';
 
@@ -45,6 +49,20 @@ export default async function ComponentDetailPage({
   const source = getSourceInfo(tag);
   const testResults = getTestResultsForComponent(tag);
   const a11y = analyzeAccessibility(tag);
+
+  // Generate CEM-driven code snippets with optional manual overrides
+  const overrides = getOverridesForComponent(tag);
+  const snippetData = generateSnippetsWithOverrides(data, overrides);
+
+  // Server-side syntax highlighting via Shiki
+  const snippetTabs = await Promise.all(
+    snippetData.snippets.map(async (snippet) => ({
+      framework: snippet.framework,
+      label: snippet.label,
+      code: snippet.code,
+      highlightedHtml: await highlightCode(snippet.code, snippet.language),
+    })),
+  );
 
   return (
     <div className="space-y-8">
@@ -97,6 +115,21 @@ export default async function ComponentDetailPage({
         <MiniStat label="CSS Parts" value={data.cssParts.length} />
         <MiniStat label="CSS Props" value={data.cssProperties.length} />
       </div>
+
+      {/* Code Snippets — CEM-driven with framework tabs */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Code Snippets</CardTitle>
+          <CardDescription>
+            Auto-generated from the Custom Elements Manifest.
+            {overrides ? ' Includes curated enterprise examples.' : ''} Switch between frameworks to
+            see idiomatic usage patterns.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <CodeSnippets tabs={snippetTabs} />
+        </CardContent>
+      </Card>
 
       {/* Health + CEM side by side */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

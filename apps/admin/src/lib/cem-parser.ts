@@ -2,8 +2,8 @@
  * CEM (Custom Elements Manifest) parser for the admin dashboard.
  * Reads custom-elements.json from the wc-library package at runtime.
  */
-import { readFileSync } from "node:fs";
-import { resolve } from "node:path";
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
 
 // ── CEM Type Interfaces ──────────────────────────────────────────────
 
@@ -162,8 +162,8 @@ export interface ManifestStats {
 // ── Implementation ───────────────────────────────────────────────────
 
 function getManifest(): CemManifest {
-  const cemPath = resolve(process.cwd(), "../../packages/hx-library/custom-elements.json");
-  const raw = readFileSync(cemPath, "utf-8");
+  const cemPath = resolve(process.cwd(), '../../packages/hx-library/custom-elements.json');
+  const raw = readFileSync(cemPath, 'utf-8');
   return JSON.parse(raw) as CemManifest;
 }
 
@@ -190,72 +190,70 @@ export function getComponentData(tagName: string): ComponentData | undefined {
   const properties: ComponentProperty[] = members
     .filter(
       (m) =>
-        m.kind === "field" &&
-        m.attribute &&
-        m.privacy !== "private" &&
-        !m.static &&
-        !m.readonly
+        m.kind === 'field' && m.attribute && m.privacy !== 'private' && !m.static && !m.readonly,
     )
     .map((m) => ({
       name: m.name,
-      attribute: m.attribute ?? "",
-      type: m.type?.text ?? "unknown",
-      default: m.default ?? "\u2014",
-      description: m.description ?? "",
+      attribute: m.attribute ?? '',
+      type: m.type?.text ?? 'unknown',
+      default: m.default ?? '\u2014',
+      description: m.description ?? '',
       reflects: m.reflects ?? false,
     }));
 
   const methods: ComponentMethod[] = members
-    .filter((m) => m.kind === "method")
+    .filter((m) => m.kind === 'method')
     .map((m) => ({
       name: m.name,
-      description: m.description ?? "",
+      description: m.description ?? '',
       parameters: (m.parameters ?? []).map((p) => ({
         name: p.name,
-        type: p.type?.text ?? "unknown",
+        type: p.type?.text ?? 'unknown',
         optional: p.optional ?? false,
-        description: p.description ?? "",
+        description: p.description ?? '',
       })),
-      returnType: m.return?.type?.text ?? "void",
-      privacy: m.privacy ?? "public",
+      returnType: m.return?.type?.text ?? 'void',
+      privacy: m.privacy ?? 'public',
     }));
 
   const events: ComponentEvent[] = (decl.events ?? []).map((e) => ({
     name: e.name,
-    type: e.type?.text ?? "CustomEvent",
-    description: e.description ?? "",
+    type: e.type?.text ?? 'CustomEvent',
+    description: e.description ?? '',
   }));
 
   const slots: ComponentSlot[] = (decl.slots ?? []).map((s) => ({
-    name: s.name || "(default)",
-    description: s.description ?? "",
+    name: s.name || '(default)',
+    description: s.description ?? '',
   }));
 
   const cssParts: ComponentCssPart[] = (decl.cssParts ?? []).map((p) => ({
     name: p.name,
-    description: p.description ?? "",
+    description: p.description ?? '',
   }));
 
   const cssProperties: ComponentCssProperty[] = (decl.cssProperties ?? []).map((p) => ({
     name: p.name,
-    description: p.description ?? "",
-    default: p.default ?? "\u2014",
+    description: p.description ?? '',
+    default: p.default ?? '\u2014',
   }));
 
   const formAssociated = members.some(
-    (m) => m.name === "formAssociated" && m.static && m.default === "true"
+    (m) => m.name === 'formAssociated' && m.static && m.default === 'true',
   );
 
-  const publicMembers = members.filter((m) => m.privacy !== "private").length;
-  const privateMembers = members.filter((m) => m.privacy === "private").length;
+  const publicMembers = members.filter((m) => m.privacy !== 'private').length;
+  const privateMembers = members.filter((m) => m.privacy === 'private').length;
   const staticMembers = members.filter((m) => m.static).length;
 
   return {
-    tagName: decl.tagName ?? "",
+    tagName: decl.tagName ?? '',
     className: decl.name,
-    description: decl.description ?? "",
-    summary: decl.summary ?? "",
-    superclass: decl.superclass ? `${decl.superclass.name} (${decl.superclass.package})` : "unknown",
+    description: decl.description ?? '',
+    summary: decl.summary ?? '',
+    superclass: decl.superclass
+      ? `${decl.superclass.name} (${decl.superclass.package})`
+      : 'unknown',
     modulePath: mod.path,
     properties,
     methods,
@@ -298,14 +296,14 @@ export function getAllComponentNames(): string[] {
 
 /**
  * Returns the directory name where a component lives based on its CEM module path.
- * For most components this matches the tagName (e.g., wc-button → wc-button).
- * For companion components like wc-radio, the CEM module path reveals it lives
- * inside wc-radio-group/, so this returns "wc-radio-group".
+ * For most components this matches the tagName (e.g., hx-button → hx-button).
+ * For companion components like hx-radio, the CEM module path reveals it lives
+ * inside hx-radio-group/, so this returns "hx-radio-group".
  */
 export function getComponentDirectory(tagName: string): string {
   const found = findDeclaration(tagName);
   if (found) {
-    const match = found.mod.path.match(/components\/(wc-[^/]+)\//);
+    const match = found.mod.path.match(/components\/(hx-[^/]+)\//);
     if (match) return match[1];
   }
   return tagName;

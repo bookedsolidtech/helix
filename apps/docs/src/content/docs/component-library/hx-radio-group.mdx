@@ -1,19 +1,67 @@
 ---
-title: "wc-radio-group"
-description: A form-associated radio group that manages a set of `<wc-radio>` children.
+title: "hx-radio-group"
+description: A form-associated radio group that manages a set of `<hx-radio>` children.
 ---
 
 import ComponentLoader from '../../../components/ComponentLoader.astro';
+import ComponentDemo from '../../../components/ComponentDemo.astro';
 import ComponentDoc from '../../../components/ComponentDoc.astro';
 
 <ComponentLoader />
 
-<ComponentDoc tagName="wc-radio-group" section="summary" />
+<ComponentDoc tagName="hx-radio-group" section="summary" />
 
-## Overview
+## Vertical Orientation
 
-A form-associated radio group that manages a set of `<wc-radio>` children.
+Default vertical layout for radio groups.
+
+<ComponentDemo title="Vertical Orientation">
+  <hx-radio-group label="Notification preference" name="notify" value="email" orientation="vertical" help-text="Choose how you'd like to receive updates.">
+    <hx-radio value="email" label="Email"></hx-radio>
+    <hx-radio value="sms" label="SMS"></hx-radio>
+    <hx-radio value="push" label="Push notification"></hx-radio>
+  </hx-radio-group>
+</ComponentDemo>
+
+## Horizontal Orientation
+
+Horizontal layout for compact radio groups.
+
+<ComponentDemo title="Horizontal Orientation">
+  <hx-radio-group label="Priority level" name="priority" value="medium" orientation="horizontal">
+    <hx-radio value="low" label="Low"></hx-radio>
+    <hx-radio value="medium" label="Medium"></hx-radio>
+    <hx-radio value="high" label="High"></hx-radio>
+  </hx-radio-group>
+</ComponentDemo>
+
+## Validation
+
+Required group with error state.
+
+<ComponentDemo title="Validation">
+  <div style="display: grid; gap: 1rem; max-width: 400px;">
+    <hx-radio-group
+      label="Insurance type"
+      name="insurance"
+      required
+      error="Please select an insurance type."
+    >
+      <hx-radio value="private" label="Private"></hx-radio>
+      <hx-radio value="public" label="Public"></hx-radio>
+      <hx-radio value="none" label="Uninsured"></hx-radio>
+    </hx-radio-group>
+    <hx-radio-group
+      label="Disabled group"
+      name="disabled-group"
+      disabled
+    >
+      <hx-radio value="a" label="Option A"></hx-radio>
+      <hx-radio value="b" label="Option B"></hx-radio>
+    </hx-radio-group>
+  </div>
+</ComponentDemo>
 
 ## API Reference
 
-<ComponentDoc tagName="wc-radio-group" section="api" />
+<ComponentDoc tagName="hx-radio-group" section="api" />

@@ -10,12 +10,14 @@ export const helixCardStyles = css`
     flex-direction: column;
     background-color: var(--hx-card-bg, var(--hx-color-neutral-0, #ffffff));
     color: var(--hx-card-color, var(--hx-color-neutral-800, #212529));
-    border: var(--hx-border-width-thin, 1px) solid var(--hx-card-border-color, var(--hx-color-neutral-200, #dee2e6));
+    border: var(--hx-border-width-thin, 1px) solid
+      var(--hx-card-border-color, var(--hx-color-neutral-200, #dee2e6));
     border-radius: var(--hx-card-border-radius, var(--hx-border-radius-lg, 0.5rem));
     overflow: hidden;
     font-family: var(--hx-font-family-sans, sans-serif);
-    transition: box-shadow var(--hx-transition-normal, 250ms ease),
-                transform var(--hx-transition-normal, 250ms ease);
+    transition:
+      box-shadow var(--hx-transition-normal, 250ms ease),
+      transform var(--hx-transition-normal, 250ms ease);
   }
 
   /* ─── Elevation Variants ─── */
@@ -39,7 +41,7 @@ export const helixCardStyles = css`
   }
 
   .card--featured {
-    border-color: var(--hx-color-primary-500, #007878);
+    border-color: var(--hx-color-primary-500, #2563eb);
     border-width: var(--hx-border-width-medium, 2px);
   }
 
@@ -59,7 +61,7 @@ export const helixCardStyles = css`
   }
 
   .card--interactive:focus-visible {
-    outline: var(--hx-focus-ring-width, 2px) solid var(--hx-focus-ring-color, #007878);
+    outline: var(--hx-focus-ring-width, 2px) solid var(--hx-focus-ring-color, #2563eb);
     outline-offset: var(--hx-focus-ring-offset, 2px);
   }
 
@@ -119,7 +121,8 @@ export const helixCardStyles = css`
     padding-right: var(--hx-card-padding, var(--hx-space-6, 1.5rem));
     padding-bottom: var(--hx-card-padding, var(--hx-space-6, 1.5rem));
     padding-left: var(--hx-card-padding, var(--hx-space-6, 1.5rem));
-    border-top: var(--hx-border-width-thin, 1px) solid var(--hx-card-border-color, var(--hx-color-neutral-200, #dee2e6));
+    border-top: var(--hx-border-width-thin, 1px) solid
+      var(--hx-card-border-color, var(--hx-color-neutral-200, #dee2e6));
     margin-top: auto;
   }
 `;

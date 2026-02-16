@@ -21,7 +21,7 @@ This document records the second critical architectural decision for the HELIX p
 
 ## The Fundamental Question
 
-When a Drupal page needs `<wc-button>`, `<wc-card>`, and `<wc-text-input>`, how does the JavaScript that defines those custom elements arrive in the browser?
+When a Drupal page needs `<hx-button>`, `<hx-card>`, and `<hx-text-input>`, how does the JavaScript that defines those custom elements arrive in the browser?
 
 Three strategies exist, each with fundamentally different performance characteristics, developer ergonomics, and caching behavior.
 
@@ -55,9 +55,9 @@ The HELIX library currently builds with Vite in library mode, externalizing Lit 
 | ------------------------------------------------ | -------- | ------- | ------- |
 | `dist/index.js` (3 components, Lit externalized) | 24.1 KB  | ~7.2 KB | ~6.1 KB |
 | Lit core (lit + lit/decorators + lit/directives) | ~16.8 KB | ~7.0 KB | ~5.8 KB |
-| `wc-button` (component + styles)                 | ~4.8 KB  | ~1.6 KB | ~1.3 KB |
-| `wc-card` (component + styles)                   | ~5.2 KB  | ~1.7 KB | ~1.4 KB |
-| `wc-text-input` (component + styles)             | ~8.4 KB  | ~2.5 KB | ~2.1 KB |
+| `hx-button` (component + styles)                 | ~4.8 KB  | ~1.6 KB | ~1.3 KB |
+| `hx-card` (component + styles)                   | ~5.2 KB  | ~1.7 KB | ~1.4 KB |
+| `hx-text-input` (component + styles)             | ~8.4 KB  | ~2.5 KB | ~2.1 KB |
 | Design tokens CSS                                | ~2.1 KB  | ~0.6 KB | ~0.5 KB |
 
 ### Projected Bundle Sizes (Full 44 Components)
@@ -88,7 +88,7 @@ One `<script type="module">` tag loads the entire library. Every custom element 
 ```yaml
 # mytheme.libraries.yml
 
-wc_2026:
+helix:
   version: VERSION
   css:
     theme:
@@ -102,7 +102,7 @@ wc_2026:
 
 ```twig
 {# page.html.twig or html.html.twig -- loaded globally #}
-{{ attach_library('mytheme/wc_2026') }}
+{{ attach_library('mytheme/helix') }}
 ```
 
 ### Drupal Integration
@@ -139,12 +139,12 @@ The simplest possible integration. One library definition, one `attach_library()
 
 | Weakness                         | Explanation                                                                                                                                                         |
 | -------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Payload waste**                | A page using only `<wc-button>` downloads code for 43 unused components.                                                                                            |
+| **Payload waste**                | A page using only `<hx-button>` downloads code for 43 unused components.                                                                                            |
 | **Registration waste**           | `customElements.define()` is called for all 44 elements. The browser allocates memory for each constructor, even for elements not present in the DOM.               |
 | **Cache fragility**              | Updating a single component (e.g., fixing a tooltip bug) invalidates the entire bundle cache for every visitor.                                                     |
-| **Violates performance budgets** | 80 KB Brotli JS on every page exceeds the <100 KB total JS budget for healthcare pages with additional Drupal JS, admin toolbar scripts, and third-party analytics. |
+| **Violates performance budgets** | 80 KB Brotli JS on every page exceeds the <100 KB total JS budget for enterprise pages with additional Drupal JS, admin toolbar scripts, and third-party analytics. |
 | **Scaling penalty**              | Every new component added to the library increases the bundle size for ALL pages, including pages that do not use the new component.                                |
-| **Core Web Vitals risk**         | The monolithic parse task can push TBT above thresholds on low-powered devices common in healthcare waiting rooms and elder care settings.                          |
+| **Core Web Vitals risk**         | The monolithic parse task can push TBT above thresholds on low-powered devices common in enterprise kiosk and mobile settings.                                      |
 
 ---
 
@@ -158,7 +158,7 @@ Each component has its own Drupal library definition. TWIG templates attach only
 # mytheme.libraries.yml
 
 # Shared runtime -- Lit core + design tokens
-wc_2026.runtime:
+helix.runtime:
   version: VERSION
   css:
     theme:
@@ -170,90 +170,90 @@ wc_2026.runtime:
       preprocess: false
 
 # Per-component libraries
-wc_2026.button:
+helix.button:
   version: VERSION
   js:
-    vendor/helix/components/wc-button/index.js:
+    vendor/helix/components/hx-button/index.js:
       type: module
       minified: true
       preprocess: false
   dependencies:
-    - mytheme/wc_2026.runtime
+    - mytheme/helix.runtime
 
-wc_2026.card:
+helix.card:
   version: VERSION
   js:
-    vendor/helix/components/wc-card/index.js:
+    vendor/helix/components/hx-card/index.js:
       type: module
       minified: true
       preprocess: false
   dependencies:
-    - mytheme/wc_2026.runtime
-    - mytheme/wc_2026.button # Card's actions slot often contains buttons
+    - mytheme/helix.runtime
+    - mytheme/helix.button # Card's actions slot often contains buttons
 
-wc_2026.text_input:
+helix.text_input:
   version: VERSION
   js:
-    vendor/helix/components/wc-text-input/index.js:
+    vendor/helix/components/hx-text-input/index.js:
       type: module
       minified: true
       preprocess: false
   dependencies:
-    - mytheme/wc_2026.runtime
+    - mytheme/helix.runtime
 
-wc_2026.accordion:
+helix.accordion:
   version: VERSION
   js:
-    vendor/helix/components/wc-accordion/index.js:
+    vendor/helix/components/hx-accordion/index.js:
       type: module
       minified: true
       preprocess: false
   dependencies:
-    - mytheme/wc_2026.runtime
-    - mytheme/wc_2026.accordion_item
+    - mytheme/helix.runtime
+    - mytheme/helix.accordion_item
 
-wc_2026.accordion_item:
+helix.accordion_item:
   version: VERSION
   js:
-    vendor/helix/components/wc-accordion-item/index.js:
+    vendor/helix/components/hx-accordion-item/index.js:
       type: module
       minified: true
       preprocess: false
   dependencies:
-    - mytheme/wc_2026.runtime
+    - mytheme/helix.runtime
 
-wc_2026.hero_banner:
+helix.hero_banner:
   version: VERSION
   js:
-    vendor/helix/components/wc-hero-banner/index.js:
+    vendor/helix/components/hx-hero-banner/index.js:
       type: module
       minified: true
       preprocess: false
   dependencies:
-    - mytheme/wc_2026.runtime
-    - mytheme/wc_2026.button # Hero CTA often uses wc-button
+    - mytheme/helix.runtime
+    - mytheme/helix.button # Hero CTA often uses hx-button
 
-wc_2026.modal:
+helix.modal:
   version: VERSION
   js:
-    vendor/helix/components/wc-modal/index.js:
+    vendor/helix/components/hx-modal/index.js:
       type: module
       minified: true
       preprocess: false
   dependencies:
-    - mytheme/wc_2026.runtime
-    - mytheme/wc_2026.button # Modal footer actions use buttons
+    - mytheme/helix.runtime
+    - mytheme/helix.button # Modal footer actions use buttons
 
-wc_2026.nav_primary:
+helix.nav_primary:
   version: VERSION
   js:
-    vendor/helix/components/wc-nav-primary/index.js:
+    vendor/helix/components/hx-nav-primary/index.js:
       type: module
       minified: true
       preprocess: false
   dependencies:
-    - mytheme/wc_2026.runtime
-    - mytheme/wc_2026.button
+    - mytheme/helix.runtime
+    - mytheme/helix.button
 
 # ... (44 total component libraries)
 ```
@@ -264,20 +264,20 @@ Each template attaches only what it needs:
 
 ```twig
 {# node--article--teaser.html.twig #}
-{{ attach_library('mytheme/wc_2026.card') }}
+{{ attach_library('mytheme/helix.card') }}
 
-<wc-card heading="{{ label }}" href="{{ url }}" variant="default" elevation="raised">
+<hx-card heading="{{ label }}" href="{{ url }}" variant="default" elevation="raised">
   {% if content.field_hero_image|render|trim is not empty %}
     <div slot="image">{{ content.field_hero_image }}</div>
   {% endif %}
   {{ content.body }}
   <div slot="actions">
-    <wc-button variant="text" href="{{ url }}">{{ 'Read More'|t }}</wc-button>
+    <hx-button variant="text" href="{{ url }}">{{ 'Read More'|t }}</hx-button>
   </div>
-</wc-card>
+</hx-card>
 ```
 
-Note that attaching `wc_2026.card` automatically loads `wc_2026.button` and `wc_2026.runtime` via the `dependencies` chain. The TWIG developer does not need to know about transitive dependencies.
+Note that attaching `helix.card` automatically loads `helix.button` and `helix.runtime` via the `dependencies` chain. The TWIG developer does not need to know about transitive dependencies.
 
 ### Drupal Integration: Preprocess Functions
 
@@ -303,22 +303,22 @@ function mytheme_preprocess_node(array &$variables): void {
   // Content type -> component library mapping
   $content_type_libraries = [
     'article' => [
-      'teaser' => ['mytheme/wc_2026.card'],
+      'teaser' => ['mytheme/helix.card'],
       'full' => [
-        'mytheme/wc_2026.hero_banner',
-        'mytheme/wc_2026.breadcrumb',
+        'mytheme/helix.hero_banner',
+        'mytheme/helix.breadcrumb',
       ],
     ],
     'provider' => [
-      'teaser' => ['mytheme/wc_2026.card', 'mytheme/wc_2026.avatar'],
+      'teaser' => ['mytheme/helix.card', 'mytheme/helix.avatar'],
       'full' => [
-        'mytheme/wc_2026.hero_banner',
-        'mytheme/wc_2026.tabs',
-        'mytheme/wc_2026.accordion',
+        'mytheme/helix.hero_banner',
+        'mytheme/helix.tabs',
+        'mytheme/helix.accordion',
       ],
     ],
     'landing_page' => [
-      'full' => ['mytheme/wc_2026.hero_banner'],
+      'full' => ['mytheme/helix.hero_banner'],
       // Paragraphs attach their own libraries (see paragraph preprocess)
     ],
   ];
@@ -342,19 +342,19 @@ function mytheme_preprocess_paragraph(array &$variables): void {
 
   // Paragraph type -> component library mapping
   $paragraph_libraries = [
-    'accordion' => ['mytheme/wc_2026.accordion'],
-    'card_grid' => ['mytheme/wc_2026.card_grid', 'mytheme/wc_2026.card'],
-    'hero' => ['mytheme/wc_2026.hero_banner'],
-    'cta_section' => ['mytheme/wc_2026.button'],
-    'tabs' => ['mytheme/wc_2026.tabs'],
-    'media_gallery' => ['mytheme/wc_2026.media_gallery'],
-    'faq' => ['mytheme/wc_2026.accordion'],
+    'accordion' => ['mytheme/helix.accordion'],
+    'card_grid' => ['mytheme/helix.card_grid', 'mytheme/helix.card'],
+    'hero' => ['mytheme/helix.hero_banner'],
+    'cta_section' => ['mytheme/helix.button'],
+    'tabs' => ['mytheme/helix.tabs'],
+    'media_gallery' => ['mytheme/helix.media_gallery'],
+    'faq' => ['mytheme/helix.accordion'],
     'contact_form' => [
-      'mytheme/wc_2026.form',
-      'mytheme/wc_2026.text_input',
-      'mytheme/wc_2026.textarea',
-      'mytheme/wc_2026.select',
-      'mytheme/wc_2026.button',
+      'mytheme/helix.form',
+      'mytheme/helix.text_input',
+      'mytheme/helix.textarea',
+      'mytheme/helix.select',
+      'mytheme/helix.button',
     ],
   ];
 
@@ -376,9 +376,9 @@ function mytheme_preprocess_block(array &$variables): void {
 
   $block_libraries = [
     'system_branding_block' => [],  // No WC components
-    'search_form_block' => ['mytheme/wc_2026.search_bar'],
-    'system_menu_block:main' => ['mytheme/wc_2026.nav_primary'],
-    'system_menu_block:footer' => [],  // Footer uses wc-footer (attached in page)
+    'search_form_block' => ['mytheme/helix.search_bar'],
+    'system_menu_block:main' => ['mytheme/helix.nav_primary'],
+    'system_menu_block:footer' => [],  // Footer uses hx-footer (attached in page)
   ];
 
   if (isset($block_libraries[$plugin_id])) {
@@ -395,9 +395,9 @@ function mytheme_preprocess_block(array &$variables): void {
  */
 function mytheme_preprocess_page(array &$variables): void {
   // Page-level components are always needed
-  $variables['#attached']['library'][] = 'mytheme/wc_2026.header';
-  $variables['#attached']['library'][] = 'mytheme/wc_2026.footer';
-  $variables['#attached']['library'][] = 'mytheme/wc_2026.page_layout';
+  $variables['#attached']['library'][] = 'mytheme/helix.header';
+  $variables['#attached']['library'][] = 'mytheme/helix.footer';
+  $variables['#attached']['library'][] = 'mytheme/helix.page_layout';
 }
 ```
 
@@ -410,30 +410,30 @@ function mytheme_preprocess_page(array &$variables): void {
 | **Parse + compile time**         | ~12-25ms on mid-range mobile    | Only parses components present on the page                   |
 | **Registration cost**            | 3-8 x `customElements.define()` | Only registers what is needed                                |
 | **Subsequent pages**             | 0-5 KB Brotli                   | Only new components not seen before                          |
-| **Cache invalidation**           | Per-component                   | Fixing `wc-tooltip` only invalidates the tooltip cache entry |
+| **Cache invalidation**           | Per-component                   | Fixing `hx-tooltip` only invalidates the tooltip cache entry |
 | **TBT contribution**             | ~8-20ms                         | Smaller, faster parse tasks                                  |
 
 ### Strengths
 
-| Strength                                 | Explanation                                                                                                                                                                                                                  |
-| ---------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Minimum viable payload**               | Each page downloads only the JavaScript for components it actually renders. A simple article teaser page might load 15 KB Brotli instead of 80 KB.                                                                           |
-| **Granular cache invalidation**          | Updating `wc-tooltip` does not invalidate the cached `wc-button`, `wc-card`, or any other component. Visitors who already have most components cached download only the delta.                                               |
-| **Drupal-native pattern**                | This is exactly how Drupal's library system is designed to work. jQuery UI, CKEditor, Views, and every core module use per-feature library definitions with dependency chains. Drupal developers already know this pattern.  |
-| **Drupal aggregation handles combining** | When Drupal's CSS/JS aggregation is enabled (standard for production), it combines the per-component files into optimized aggregates. The logical separation in `libraries.yml` does not mean 44 HTTP requests.              |
-| **Dependency deduplication**             | Drupal's library system automatically deduplicates. If both `wc_2026.card` and `wc_2026.modal` depend on `wc_2026.button`, the button code loads exactly once. This is resolved at the server level before HTML is rendered. |
-| **HTTP/2 multiplexing**                  | On HTTP/2 (standard on any modern hosting), multiple small files load in parallel over a single connection. The overhead of additional requests is negligible compared to the savings from not transferring unused code.     |
-| **Scales linearly**                      | Adding the 45th component has zero impact on pages that do not use it. The library grows without degrading existing pages.                                                                                                   |
+| Strength                                 | Explanation                                                                                                                                                                                                                 |
+| ---------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Minimum viable payload**               | Each page downloads only the JavaScript for components it actually renders. A simple article teaser page might load 15 KB Brotli instead of 80 KB.                                                                          |
+| **Granular cache invalidation**          | Updating `hx-tooltip` does not invalidate the cached `hx-button`, `hx-card`, or any other component. Visitors who already have most components cached download only the delta.                                              |
+| **Drupal-native pattern**                | This is exactly how Drupal's library system is designed to work. jQuery UI, CKEditor, Views, and every core module use per-feature library definitions with dependency chains. Drupal developers already know this pattern. |
+| **Drupal aggregation handles combining** | When Drupal's CSS/JS aggregation is enabled (standard for production), it combines the per-component files into optimized aggregates. The logical separation in `libraries.yml` does not mean 44 HTTP requests.             |
+| **Dependency deduplication**             | Drupal's library system automatically deduplicates. If both `helix.card` and `helix.modal` depend on `helix.button`, the button code loads exactly once. This is resolved at the server level before HTML is rendered.      |
+| **HTTP/2 multiplexing**                  | On HTTP/2 (standard on any modern hosting), multiple small files load in parallel over a single connection. The overhead of additional requests is negligible compared to the savings from not transferring unused code.    |
+| **Scales linearly**                      | Adding the 45th component has zero impact on pages that do not use it. The library grows without degrading existing pages.                                                                                                  |
 
 ### Weaknesses
 
-| Weakness                                | Explanation                                                                                                                                                                     |
-| --------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **More setup per component**            | Each component requires a `libraries.yml` entry with dependencies. For 44 components, that is 44 library definitions.                                                           |
-| **Preprocess boilerplate**              | Content type and paragraph type mappings require PHP preprocess functions. This is standard Drupal practice but adds code that must be maintained.                              |
-| **Risk of missing libraries**           | If a TWIG template uses `<wc-card>` without attaching `wc_2026.card`, the element renders as an empty unknown element. No JavaScript error, just silent failure.                |
-| **Per-component build output required** | The Vite build must produce individual entry points per component, not just the monolithic `index.js`. Requires build configuration changes.                                    |
-| **Dependency graph complexity**         | The library dependency chain must be manually maintained. If `wc-card` starts using `wc-badge` internally, the `wc_2026.card` library must add `wc_2026.badge` as a dependency. |
+| Weakness                                | Explanation                                                                                                                                                                 |
+| --------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **More setup per component**            | Each component requires a `libraries.yml` entry with dependencies. For 44 components, that is 44 library definitions.                                                       |
+| **Preprocess boilerplate**              | Content type and paragraph type mappings require PHP preprocess functions. This is standard Drupal practice but adds code that must be maintained.                          |
+| **Risk of missing libraries**           | If a TWIG template uses `<hx-card>` without attaching `helix.card`, the element renders as an empty unknown element. No JavaScript error, just silent failure.              |
+| **Per-component build output required** | The Vite build must produce individual entry points per component, not just the monolithic `index.js`. Requires build configuration changes.                                |
+| **Dependency graph complexity**         | The library dependency chain must be manually maintained. If `hx-card` starts using `hx-badge` internally, the `helix.card` library must add `helix.badge` as a dependency. |
 
 ---
 
@@ -447,7 +447,7 @@ Components are grouped by usage context. Each group is one Drupal library. Templ
 # mytheme.libraries.yml
 
 # Shared runtime (same as Strategy B)
-wc_2026.runtime:
+helix.runtime:
   version: VERSION
   css:
     theme:
@@ -460,9 +460,9 @@ wc_2026.runtime:
 
 # ─── Group: Core ─── (8 components, ~25 KB Brotli)
 # The most frequently used components. Loaded on nearly every page.
-# wc-button, wc-icon, wc-badge, wc-tag, wc-spinner, wc-sr-only,
-# wc-tooltip, wc-avatar
-wc_2026.core:
+# hx-button, hx-icon, hx-badge, hx-tag, hx-spinner, hx-sr-only,
+# hx-tooltip, hx-avatar
+helix.core:
   version: VERSION
   js:
     vendor/helix/groups/core.js:
@@ -470,13 +470,13 @@ wc_2026.core:
       minified: true
       preprocess: false
   dependencies:
-    - mytheme/wc_2026.runtime
+    - mytheme/helix.runtime
 
 # ─── Group: Forms ─── (7 components, ~22 KB Brotli)
 # All form-associated components.
-# wc-text-input, wc-textarea, wc-select, wc-checkbox, wc-radio,
-# wc-toggle, wc-form-field
-wc_2026.forms:
+# hx-text-input, hx-textarea, hx-select, hx-checkbox, hx-radio,
+# hx-toggle, hx-form-field
+helix.forms:
   version: VERSION
   js:
     vendor/helix/groups/forms.js:
@@ -484,14 +484,14 @@ wc_2026.forms:
       minified: true
       preprocess: false
   dependencies:
-    - mytheme/wc_2026.runtime
-    - mytheme/wc_2026.core # Form fields use buttons, icons
+    - mytheme/helix.runtime
+    - mytheme/helix.core # Form fields use buttons, icons
 
 # ─── Group: Navigation ─── (6 components, ~18 KB Brotli)
 # Navigation and wayfinding components.
-# wc-header, wc-footer, wc-nav-primary, wc-nav-mobile,
-# wc-breadcrumb, wc-sidebar
-wc_2026.navigation:
+# hx-header, hx-footer, hx-nav-primary, hx-nav-mobile,
+# hx-breadcrumb, hx-sidebar
+helix.navigation:
   version: VERSION
   js:
     vendor/helix/groups/navigation.js:
@@ -499,15 +499,15 @@ wc_2026.navigation:
       minified: true
       preprocess: false
   dependencies:
-    - mytheme/wc_2026.runtime
-    - mytheme/wc_2026.core # Nav uses buttons, icons
+    - mytheme/helix.runtime
+    - mytheme/helix.core # Nav uses buttons, icons
 
 # ─── Group: Content ─── (9 components, ~28 KB Brotli)
 # Content display and interaction components.
-# wc-content-card, wc-hero-banner, wc-article-layout,
-# wc-card-grid, wc-media-gallery, wc-media-object,
-# wc-table, wc-alert, wc-prose
-wc_2026.content:
+# hx-content-card, hx-hero-banner, hx-article-layout,
+# hx-card-grid, hx-media-gallery, hx-media-object,
+# hx-table, hx-alert, hx-prose
+helix.content:
   version: VERSION
   js:
     vendor/helix/groups/content.js:
@@ -515,14 +515,14 @@ wc_2026.content:
       minified: true
       preprocess: false
   dependencies:
-    - mytheme/wc_2026.runtime
-    - mytheme/wc_2026.core # Cards use buttons, badges
+    - mytheme/helix.runtime
+    - mytheme/helix.core # Cards use buttons, badges
 
 # ─── Group: Interactive ─── (7 components, ~20 KB Brotli)
 # Components with complex interaction patterns.
-# wc-accordion, wc-accordion-item, wc-tabs, wc-tab-item,
-# wc-modal, wc-dropdown-menu, wc-pagination
-wc_2026.interactive:
+# hx-accordion, hx-accordion-item, hx-tabs, hx-tab-item,
+# hx-modal, hx-dropdown-menu, hx-pagination
+helix.interactive:
   version: VERSION
   js:
     vendor/helix/groups/interactive.js:
@@ -530,14 +530,14 @@ wc_2026.interactive:
       minified: true
       preprocess: false
   dependencies:
-    - mytheme/wc_2026.runtime
-    - mytheme/wc_2026.core # Modals use buttons
+    - mytheme/helix.runtime
+    - mytheme/helix.core # Modals use buttons
 
 # ─── Group: Layout ─── (5 components, ~12 KB Brotli)
 # Page-level layout containers.
-# wc-page-layout, wc-article-page, wc-landing-page,
-# wc-search-results-page, wc-theme-provider
-wc_2026.layout:
+# hx-page-layout, hx-article-page, hx-landing-page,
+# hx-search-results-page, hx-theme-provider
+helix.layout:
   version: VERSION
   js:
     vendor/helix/groups/layout.js:
@@ -545,33 +545,33 @@ wc_2026.layout:
       minified: true
       preprocess: false
   dependencies:
-    - mytheme/wc_2026.runtime
+    - mytheme/helix.runtime
 
 # ─── Group: Form (Complete) ─── (convenience shorthand)
 # Loads forms + core + interactive (for form wizards)
-wc_2026.form_complete:
+helix.form_complete:
   version: VERSION
   dependencies:
-    - mytheme/wc_2026.forms
-    - mytheme/wc_2026.interactive # Tabs for multi-step forms
-    - mytheme/wc_2026.core
+    - mytheme/helix.forms
+    - mytheme/helix.interactive # Tabs for multi-step forms
+    - mytheme/helix.core
 ```
 
 ### Drupal Integration
 
 ```twig
 {# node--article--full.html.twig #}
-{{ attach_library('mytheme/wc_2026.content') }}
-{{ attach_library('mytheme/wc_2026.navigation') }}
+{{ attach_library('mytheme/helix.content') }}
+{{ attach_library('mytheme/helix.navigation') }}
 
-<wc-article-layout>
+<hx-article-layout>
   <nav slot="breadcrumb">{{ content.breadcrumb }}</nav>
   <div slot="hero">{{ content.field_hero_image }}</div>
   <article>{{ content.body }}</article>
   {% if content.sidebar %}
     <aside slot="sidebar">{{ content.sidebar }}</aside>
   {% endif %}
-</wc-article-layout>
+</hx-article-layout>
 ```
 
 ```php
@@ -587,19 +587,19 @@ function mytheme_preprocess_node(array &$variables): void {
   // Simpler mapping: groups instead of individual components
   $content_type_groups = [
     'article' => [
-      'teaser' => ['mytheme/wc_2026.content'],
-      'full' => ['mytheme/wc_2026.content', 'mytheme/wc_2026.navigation'],
+      'teaser' => ['mytheme/helix.content'],
+      'full' => ['mytheme/helix.content', 'mytheme/helix.navigation'],
     ],
     'provider' => [
-      'teaser' => ['mytheme/wc_2026.content'],
+      'teaser' => ['mytheme/helix.content'],
       'full' => [
-        'mytheme/wc_2026.content',
-        'mytheme/wc_2026.interactive',
-        'mytheme/wc_2026.navigation',
+        'mytheme/helix.content',
+        'mytheme/helix.interactive',
+        'mytheme/helix.navigation',
       ],
     ],
     'landing_page' => [
-      'full' => ['mytheme/wc_2026.content', 'mytheme/wc_2026.layout'],
+      'full' => ['mytheme/helix.content', 'mytheme/helix.layout'],
     ],
   ];
 
@@ -618,14 +618,14 @@ function mytheme_preprocess_paragraph(array &$variables): void {
   $paragraph = $variables['paragraph'];
 
   $paragraph_groups = [
-    'accordion' => ['mytheme/wc_2026.interactive'],
-    'card_grid' => ['mytheme/wc_2026.content'],
-    'hero' => ['mytheme/wc_2026.content'],
-    'cta_section' => ['mytheme/wc_2026.core'],
-    'tabs' => ['mytheme/wc_2026.interactive'],
-    'media_gallery' => ['mytheme/wc_2026.content'],
-    'faq' => ['mytheme/wc_2026.interactive'],
-    'contact_form' => ['mytheme/wc_2026.form_complete'],
+    'accordion' => ['mytheme/helix.interactive'],
+    'card_grid' => ['mytheme/helix.content'],
+    'hero' => ['mytheme/helix.content'],
+    'cta_section' => ['mytheme/helix.core'],
+    'tabs' => ['mytheme/helix.interactive'],
+    'media_gallery' => ['mytheme/helix.content'],
+    'faq' => ['mytheme/helix.interactive'],
+    'contact_form' => ['mytheme/helix.form_complete'],
   ];
 
   $bundle = $paragraph->bundle();
@@ -646,7 +646,7 @@ function mytheme_preprocess_paragraph(array &$variables): void {
 | **Parse + compile time**         | ~20-35ms on mid-range mobile     | Parses components in loaded groups                      |
 | **Registration cost**            | 8-25 x `customElements.define()` | Registers all components in each loaded group           |
 | **Subsequent pages**             | 0-15 KB Brotli                   | Only groups not yet cached                              |
-| **Cache invalidation**           | Per-group                        | Fixing `wc-tooltip` invalidates the entire `core` group |
+| **Cache invalidation**           | Per-group                        | Fixing `hx-tooltip` invalidates the entire `core` group |
 | **TBT contribution**             | ~15-30ms                         | Medium parse tasks                                      |
 
 ### Strengths
@@ -662,11 +662,11 @@ function mytheme_preprocess_paragraph(array &$variables): void {
 
 | Weakness                                   | Explanation                                                                                                                                                              |
 | ------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| **Intra-group waste**                      | Loading the `content` group for `<wc-content-card>` also loads `<wc-media-gallery>`, `<wc-table>`, and 7 other components the page may not use.                          |
+| **Intra-group waste**                      | Loading the `content` group for `<hx-content-card>` also loads `<hx-media-gallery>`, `<hx-table>`, and 7 other components the page may not use.                          |
 | **Group boundary decisions are permanent** | If a component is in the wrong group, moving it is a breaking change for every `libraries.yml` consumer.                                                                 |
-| **Cache invalidation is coarser**          | A bug fix in `wc-tooltip` invalidates the entire `core` group cache for all visitors.                                                                                    |
-| **Group composition disputes**             | Where does `wc-alert` belong? Content? Interactive? Core? These debates are bikeshedding that Strategy B eliminates entirely.                                            |
-| **Still registers unused elements**        | Loading the `forms` group on a page with only `<wc-text-input>` still registers `wc-textarea`, `wc-select`, `wc-checkbox`, `wc-radio`, `wc-toggle`, and `wc-form-field`. |
+| **Cache invalidation is coarser**          | A bug fix in `hx-tooltip` invalidates the entire `core` group cache for all visitors.                                                                                    |
+| **Group composition disputes**             | Where does `hx-alert` belong? Content? Interactive? Core? These debates are bikeshedding that Strategy B eliminates entirely.                                            |
+| **Still registers unused elements**        | Loading the `forms` group on a page with only `<hx-text-input>` still registers `hx-textarea`, `hx-select`, `hx-checkbox`, `hx-radio`, `hx-toggle`, and `hx-form-field`. |
 
 ---
 
@@ -700,15 +700,15 @@ function mytheme_preprocess_paragraph(array &$variables): void {
 
 #### 1. Initial Page Load Performance (Critical)
 
-**Strategy A: 2/5** -- Every page pays the full ~80 KB Brotli tax. A homepage with only a hero banner and 3 cards downloads code for modals, tables, form fields, navigation mega-menus, and 35+ other components. On healthcare sites where visitors are often on institutional networks or mobile devices in waiting rooms, this payload is unacceptable. The JavaScript budget for the entire page should be under 100 KB; the component library alone would consume 80% of it.
+**Strategy A: 2/5** -- Every page pays the full ~80 KB Brotli tax. A homepage with only a hero banner and 3 cards downloads code for modals, tables, form fields, navigation mega-menus, and 35+ other components. On enterprise sites where visitors are often on varied networks or mobile devices, this payload is unacceptable. The JavaScript budget for the entire page should be under 100 KB; the component library alone would consume 80% of it.
 
-**Strategy B: 5/5** -- A typical article teaser page loads `wc-card` + `wc-button` + Lit runtime = ~14 KB Brotli. A complex landing page with hero, card grid, accordion, and form loads ~35-45 KB Brotli. The payload scales with actual usage. Pages that use fewer components are faster. This is the mathematically optimal strategy for payload size.
+**Strategy B: 5/5** -- A typical article teaser page loads `hx-card` + `hx-button` + Lit runtime = ~14 KB Brotli. A complex landing page with hero, card grid, accordion, and form loads ~35-45 KB Brotli. The payload scales with actual usage. Pages that use fewer components are faster. This is the mathematically optimal strategy for payload size.
 
 **Strategy C: 3/5** -- A typical page loads 2-3 groups (~35-50 KB Brotli). Better than the full bundle but includes unused components within each group. The `content` group loads 9 components when the page may use only 2. The waste is bounded but real.
 
 #### 2. Core Web Vitals Impact (Critical)
 
-**Strategy A: 2/5** -- The monolithic parse task creates a single long task that blocks the main thread. On mid-range mobile (Samsung Galaxy A series, common in healthcare settings), parsing ~293 KB of raw JavaScript takes 45-65ms. Combined with Drupal's own JavaScript, this can push Total Blocking Time above the 200ms "Good" threshold. Additionally, 44 `customElements.define()` calls execute synchronously, each modifying the browser's custom element registry.
+**Strategy A: 2/5** -- The monolithic parse task creates a single long task that blocks the main thread. On mid-range mobile (Samsung Galaxy A series, common in enterprise settings), parsing ~293 KB of raw JavaScript takes 45-65ms. Combined with Drupal's own JavaScript, this can push Total Blocking Time above the 200ms "Good" threshold. Additionally, 44 `customElements.define()` calls execute synchronously, each modifying the browser's custom element registry.
 
 **Strategy B: 5/5** -- Smaller scripts parse faster. Three component scripts (~15 KB raw each) parse as three short tasks rather than one long task. Each is well under the 50ms Long Task threshold. `customElements.define()` is called only for elements actually on the page. This directly improves INP (Interaction to Next Paint) because the main thread is available sooner after page load.
 
@@ -716,11 +716,11 @@ function mytheme_preprocess_paragraph(array &$variables): void {
 
 #### 3. Cache Efficiency (High)
 
-**Strategy A: 2/5** -- The entire bundle shares a single cache key (the URL or hash). When `wc-tooltip` gets a bug fix, the bundle URL changes (cache busting), and every visitor must re-download all 44 components. For a library with 44 components receiving updates every 2-4 weeks, the cache hit rate is poor. Every release is a cold cache for every visitor.
+**Strategy A: 2/5** -- The entire bundle shares a single cache key (the URL or hash). When `hx-tooltip` gets a bug fix, the bundle URL changes (cache busting), and every visitor must re-download all 44 components. For a library with 44 components receiving updates every 2-4 weeks, the cache hit rate is poor. Every release is a cold cache for every visitor.
 
-**Strategy B: 5/5** -- Each component has its own cache entry. Updating `wc-tooltip` only invalidates the tooltip's cache. Visitors who already have `wc-button`, `wc-card`, and `wc-text-input` cached keep those entries. Over time, returning visitors have most components warm-cached and only download new or updated ones. The Lit runtime is cached separately with a long TTL since it changes infrequently.
+**Strategy B: 5/5** -- Each component has its own cache entry. Updating `hx-tooltip` only invalidates the tooltip's cache. Visitors who already have `hx-button`, `hx-card`, and `hx-text-input` cached keep those entries. Over time, returning visitors have most components warm-cached and only download new or updated ones. The Lit runtime is cached separately with a long TTL since it changes infrequently.
 
-**Strategy C: 3/5** -- Each group has its own cache entry. Updating `wc-tooltip` (in the `core` group) invalidates the entire core group cache. Since `core` is loaded on nearly every page, this is effectively monolithic cache invalidation for the most frequently used components.
+**Strategy C: 3/5** -- Each group has its own cache entry. Updating `hx-tooltip` (in the `core` group) invalidates the entire core group cache. Since `core` is loaded on nearly every page, this is effectively monolithic cache invalidation for the most frequently used components.
 
 #### 4. Drupal Developer Experience (High)
 
@@ -728,13 +728,13 @@ function mytheme_preprocess_paragraph(array &$variables): void {
 
 **Strategy B: 3/5** -- Each template must attach its specific library. Preprocess functions map content types and paragraph types to component libraries. Forgetting to attach a library results in silent failure (the custom element renders as an empty inline element). This requires discipline and documentation. However, Drupal developers are already familiar with this pattern from core and contrib module libraries.
 
-**Strategy C: 4/5** -- Smaller number of groups (6-8) is easier to remember than 44 individual components. Preprocess functions are simpler. The risk of forgetting a library is lower because groups are coarser. "Does this page have a form? Attach `wc_2026.forms`" is straightforward.
+**Strategy C: 4/5** -- Smaller number of groups (6-8) is easier to remember than 44 individual components. Preprocess functions are simpler. The risk of forgetting a library is lower because groups are coarser. "Does this page have a form? Attach `helix.forms`" is straightforward.
 
 #### 5. Configuration Complexity (Medium)
 
 **Strategy A: 5/5** -- One library definition in `libraries.yml`. One line in a TWIG template. Done.
 
-**Strategy B: 2/5** -- 44 library definitions, each with explicit dependencies. A dependency graph must be manually maintained. When `wc-card` starts using `wc-badge` internally, someone must add `mytheme/wc_2026.badge` to `wc_2026.card`'s dependencies. This is error-prone and scales poorly. Automation can help (generating `libraries.yml` from the CEM), but the complexity exists.
+**Strategy B: 2/5** -- 44 library definitions, each with explicit dependencies. A dependency graph must be manually maintained. When `hx-card` starts using `hx-badge` internally, someone must add `mytheme/helix.badge` to `helix.card`'s dependencies. This is error-prone and scales poorly. Automation can help (generating `libraries.yml` from the CEM), but the complexity exists.
 
 **Strategy C: 4/5** -- 6-8 group definitions. Dependencies between groups are stable (forms depends on core, content depends on core). Lower maintenance burden than per-component but higher than monolithic.
 
@@ -856,7 +856,7 @@ import '@carbon/web-components/es/components/tile/index.js';
 
 ## Performance Budget
 
-Based on healthcare site performance requirements and Core Web Vitals thresholds:
+Based on enterprise site performance requirements and Core Web Vitals thresholds:
 
 | Metric                            | Budget            | Rationale                                                                                                                                                |
 | --------------------------------- | ----------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -901,7 +901,7 @@ A frequently misunderstood detail: `customElements.define()` has a real cost eve
 | Safari (iPhone 13)             | ~0.15ms                            | ~6.5ms           |
 | Firefox (desktop)              | ~0.12ms                            | ~5.3ms           |
 
-On mid-range Android devices (common in healthcare environments -- kiosks, waiting room tablets), registering all 44 components takes ~35ms. This is a significant chunk of the 50ms TBT budget allocated to the component library. With Strategy B, registering only the 3-8 components on a typical page takes 2-7ms on the same device.
+On mid-range Android devices (common in enterprise environments -- kiosks, public terminals), registering all 44 components takes ~35ms. This is a significant chunk of the 50ms TBT budget allocated to the component library. With Strategy B, registering only the 3-8 components on a typical page takes 2-7ms on the same device.
 
 ---
 
@@ -966,18 +966,18 @@ Drupal's library dependency system is the key mechanism that makes Strategy B vi
 When a library declares dependencies:
 
 ```yaml
-wc_2026.card:
+helix.card:
   dependencies:
-    - mytheme/wc_2026.runtime
-    - mytheme/wc_2026.button
+    - mytheme/helix.runtime
+    - mytheme/helix.button
 ```
 
 Drupal's asset resolver guarantees:
 
-1. **Transitive resolution** -- If `wc_2026.button` depends on `wc_2026.runtime`, and `wc_2026.card` depends on both, `runtime` loads exactly once.
+1. **Transitive resolution** -- If `helix.button` depends on `helix.runtime`, and `helix.card` depends on both, `runtime` loads exactly once.
 2. **Load order** -- Dependencies load before dependents. `runtime` always loads before `button`, which loads before `card`.
-3. **Deduplication** -- If both `wc_2026.card` and `wc_2026.modal` are attached to the same page and both depend on `wc_2026.button`, button code appears once in the aggregated output.
-4. **Cross-module deduplication** -- If a Drupal module also depends on `mytheme/wc_2026.runtime`, the runtime is still loaded only once.
+3. **Deduplication** -- If both `helix.card` and `helix.modal` are attached to the same page and both depend on `helix.button`, button code appears once in the aggregated output.
+4. **Cross-module deduplication** -- If a Drupal module also depends on `mytheme/helix.runtime`, the runtime is still loaded only once.
 
 ### Aggregation in Production
 
@@ -990,7 +990,7 @@ With CSS/JS aggregation enabled (standard for production Drupal), the resolver:
 5. Combines into aggregated files (typically 2-4 per page)
 6. Generates a hash-based filename for cache busting
 
-The result: a page using `wc-card`, `wc-button`, and `wc-hero-banner` might produce a single aggregated JS file containing exactly those three components plus the shared Lit runtime. This is functionally equivalent to a custom bundle built specifically for that page.
+The result: a page using `hx-card`, `hx-button`, and `hx-hero-banner` might produce a single aggregated JS file containing exactly those three components plus the shared Lit runtime. This is functionally equivalent to a custom bundle built specifically for that page.
 
 ---
 
@@ -1011,9 +1011,9 @@ Cache Entry: /assets/js/helix.abc123.js (80 KB Brotli)
 ### Strategy B: Per-Component Cache
 
 ```
-Cache Entry: /assets/js/wc-button.def456.js (1.3 KB Brotli)
+Cache Entry: /assets/js/hx-button.def456.js (1.3 KB Brotli)
   - Cache key: Content hash of button component
-  - Invalidates: Only when wc-button changes
+  - Invalidates: Only when hx-button changes
   - CDN TTL: 1 year (immutable, hash-versioned)
   - Browser cache: Until button hash changes
   - Update frequency: Every 2-6 months (component-specific)
@@ -1033,7 +1033,7 @@ Cache hit rate for returning visitors: >95% (most components unchanged)
 ### Strategy C: Group Cache
 
 ```
-Cache Entry: /assets/js/wc-core.jkl012.js (25 KB Brotli)
+Cache Entry: /assets/js/hx-core.jkl012.js (25 KB Brotli)
   - Cache key: Content hash of 8 core components
   - Invalidates: When ANY of 8 core components changes
   - CDN TTL: 1 year
@@ -1073,7 +1073,7 @@ All three strategies benefit from the same CSS-level FOUC prevention technique:
      background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
      background-size: 200% 100%;
      animation: skeleton 1.5s ease-in-out infinite;
-     border-radius: var(--wc-border-radius-md, 0.375rem); */
+     border-radius: var(--hx-border-radius-md, 0.375rem); */
 }
 
 /* Components become visible once JavaScript defines them */
@@ -1086,7 +1086,7 @@ All three strategies benefit from the same CSS-level FOUC prevention technique:
 
 **Strategy A**: All 44 components are undefined until the full bundle loads and parses. On a slow connection, the entire page content inside custom elements is hidden (or shows skeleton) for 2-5 seconds.
 
-**Strategy B**: Components define independently as their individual scripts load. Critical above-the-fold components (`wc-header`, `wc-hero-banner`) can use `<link rel="modulepreload">` to register first. Below-the-fold components (`wc-footer`, `wc-sidebar`) define later, after the viewport is already interactive. The user sees a progressive reveal that matches their scroll behavior.
+**Strategy B**: Components define independently as their individual scripts load. Critical above-the-fold components (`hx-header`, `hx-hero-banner`) can use `<link rel="modulepreload">` to register first. Below-the-fold components (`hx-footer`, `hx-sidebar`) define later, after the viewport is already interactive. The user sees a progressive reveal that matches their scroll behavior.
 
 **Strategy C**: Groups define as their group scripts load. The `core` group registers first (as a dependency of other groups), making buttons and icons visible. Then content components appear, then interactive widgets. The reveal is chunkier than Strategy B but more progressive than Strategy A.
 
@@ -1095,8 +1095,8 @@ All three strategies benefit from the same CSS-level FOUC prevention technique:
 ```twig
 {# html.html.twig -- preload critical component scripts #}
 <link rel="modulepreload" href="/assets/js/lit-runtime.js">
-<link rel="modulepreload" href="/assets/js/wc-header.js">
-<link rel="modulepreload" href="/assets/js/wc-nav-primary.js">
+<link rel="modulepreload" href="/assets/js/hx-header.js">
+<link rel="modulepreload" href="/assets/js/hx-nav-primary.js">
 {# Below-the-fold components load naturally via script tags #}
 ```
 
@@ -1216,14 +1216,14 @@ Group entry points would be thin files that re-export their constituent componen
 
 ```typescript
 // src/groups/core.ts
-export { WcButton } from '../components/wc-button/index.js';
-export { WcIcon } from '../components/wc-icon/index.js';
-export { WcBadge } from '../components/wc-badge/index.js';
-export { WcTag } from '../components/wc-tag/index.js';
-export { WcSpinner } from '../components/wc-spinner/index.js';
-export { WcSrOnly } from '../components/wc-sr-only/index.js';
-export { WcTooltip } from '../components/wc-tooltip/index.js';
-export { WcAvatar } from '../components/wc-avatar/index.js';
+export { HxButton } from '../components/hx-button/index.js';
+export { HxIcon } from '../components/hx-icon/index.js';
+export { HxBadge } from '../components/hx-badge/index.js';
+export { HxTag } from '../components/hx-tag/index.js';
+export { HxSpinner } from '../components/hx-spinner/index.js';
+export { HxSrOnly } from '../components/hx-sr-only/index.js';
+export { HxTooltip } from '../components/hx-tooltip/index.js';
+export { HxAvatar } from '../components/hx-avatar/index.js';
 ```
 
 ---
@@ -1246,7 +1246,7 @@ Adopt **Strategy B as the atomic loading unit** with **Strategy C convenience gr
 
 # ─── Runtime (always loaded) ───
 
-wc_2026.runtime:
+helix.runtime:
   version: VERSION
   css:
     theme:
@@ -1260,119 +1260,119 @@ wc_2026.runtime:
 # ─── Per-Component Libraries (44 total) ───
 # These are the atomic units. Each attaches exactly one component.
 
-wc_2026.button:
+helix.button:
   version: VERSION
   js:
-    vendor/helix/components/wc-button/index.js:
+    vendor/helix/components/hx-button/index.js:
       type: module
       minified: true
       preprocess: false
   dependencies:
-    - mytheme/wc_2026.runtime
+    - mytheme/helix.runtime
 
-wc_2026.card:
+helix.card:
   version: VERSION
   js:
-    vendor/helix/components/wc-card/index.js:
+    vendor/helix/components/hx-card/index.js:
       type: module
       minified: true
       preprocess: false
   dependencies:
-    - mytheme/wc_2026.runtime
+    - mytheme/helix.runtime
 
-wc_2026.text_input:
+helix.text_input:
   version: VERSION
   js:
-    vendor/helix/components/wc-text-input/index.js:
+    vendor/helix/components/hx-text-input/index.js:
       type: module
       minified: true
       preprocess: false
   dependencies:
-    - mytheme/wc_2026.runtime
+    - mytheme/helix.runtime
 
-wc_2026.icon:
+helix.icon:
   version: VERSION
   js:
-    vendor/helix/components/wc-icon/index.js:
+    vendor/helix/components/hx-icon/index.js:
       type: module
       minified: true
       preprocess: false
   dependencies:
-    - mytheme/wc_2026.runtime
+    - mytheme/helix.runtime
 
-wc_2026.badge:
+helix.badge:
   version: VERSION
   js:
-    vendor/helix/components/wc-badge/index.js:
+    vendor/helix/components/hx-badge/index.js:
       type: module
       minified: true
       preprocess: false
   dependencies:
-    - mytheme/wc_2026.runtime
+    - mytheme/helix.runtime
 
-wc_2026.hero_banner:
+helix.hero_banner:
   version: VERSION
   js:
-    vendor/helix/components/wc-hero-banner/index.js:
+    vendor/helix/components/hx-hero-banner/index.js:
       type: module
       minified: true
       preprocess: false
   dependencies:
-    - mytheme/wc_2026.runtime
-    - mytheme/wc_2026.button
+    - mytheme/helix.runtime
+    - mytheme/helix.button
 
-wc_2026.modal:
+helix.modal:
   version: VERSION
   js:
-    vendor/helix/components/wc-modal/index.js:
+    vendor/helix/components/hx-modal/index.js:
       type: module
       minified: true
       preprocess: false
   dependencies:
-    - mytheme/wc_2026.runtime
-    - mytheme/wc_2026.button
+    - mytheme/helix.runtime
+    - mytheme/helix.button
 
-wc_2026.accordion:
+helix.accordion:
   version: VERSION
   js:
-    vendor/helix/components/wc-accordion/index.js:
+    vendor/helix/components/hx-accordion/index.js:
       type: module
       minified: true
       preprocess: false
   dependencies:
-    - mytheme/wc_2026.runtime
-    - mytheme/wc_2026.accordion_item
+    - mytheme/helix.runtime
+    - mytheme/helix.accordion_item
 
-wc_2026.accordion_item:
+helix.accordion_item:
   version: VERSION
   js:
-    vendor/helix/components/wc-accordion-item/index.js:
+    vendor/helix/components/hx-accordion-item/index.js:
       type: module
       minified: true
       preprocess: false
   dependencies:
-    - mytheme/wc_2026.runtime
+    - mytheme/helix.runtime
 
-wc_2026.tabs:
+helix.tabs:
   version: VERSION
   js:
-    vendor/helix/components/wc-tabs/index.js:
+    vendor/helix/components/hx-tabs/index.js:
       type: module
       minified: true
       preprocess: false
   dependencies:
-    - mytheme/wc_2026.runtime
-    - mytheme/wc_2026.tab_item
+    - mytheme/helix.runtime
+    - mytheme/helix.tab_item
 
-wc_2026.tab_item:
+helix.tab_item:
   version: VERSION
   js:
-    vendor/helix/components/wc-tab-item/index.js:
+    vendor/helix/components/hx-tab-item/index.js:
       type: module
       minified: true
       preprocess: false
   dependencies:
-    - mytheme/wc_2026.runtime
+    - mytheme/helix.runtime
 
 # ... (remaining per-component libraries follow the same pattern)
 
@@ -1381,81 +1381,81 @@ wc_2026.tab_item:
 # They are pure dependency aggregators.
 # Use these when you know a page needs multiple related components.
 
-wc_2026.group_core:
+helix.group_core:
   version: VERSION
   dependencies:
-    - mytheme/wc_2026.button
-    - mytheme/wc_2026.icon
-    - mytheme/wc_2026.badge
-    - mytheme/wc_2026.tag
-    - mytheme/wc_2026.spinner
-    - mytheme/wc_2026.sr_only
-    - mytheme/wc_2026.tooltip
-    - mytheme/wc_2026.avatar
+    - mytheme/helix.button
+    - mytheme/helix.icon
+    - mytheme/helix.badge
+    - mytheme/helix.tag
+    - mytheme/helix.spinner
+    - mytheme/helix.sr_only
+    - mytheme/helix.tooltip
+    - mytheme/helix.avatar
 
-wc_2026.group_forms:
+helix.group_forms:
   version: VERSION
   dependencies:
-    - mytheme/wc_2026.text_input
-    - mytheme/wc_2026.textarea
-    - mytheme/wc_2026.select
-    - mytheme/wc_2026.checkbox
-    - mytheme/wc_2026.radio
-    - mytheme/wc_2026.toggle
-    - mytheme/wc_2026.form_field
-    - mytheme/wc_2026.group_core # Form fields often include buttons, icons
+    - mytheme/helix.text_input
+    - mytheme/helix.textarea
+    - mytheme/helix.select
+    - mytheme/helix.checkbox
+    - mytheme/helix.radio
+    - mytheme/helix.toggle
+    - mytheme/helix.form_field
+    - mytheme/helix.group_core # Form fields often include buttons, icons
 
-wc_2026.group_content:
+helix.group_content:
   version: VERSION
   dependencies:
-    - mytheme/wc_2026.card
-    - mytheme/wc_2026.hero_banner
-    - mytheme/wc_2026.article_layout
-    - mytheme/wc_2026.card_grid
-    - mytheme/wc_2026.media_gallery
-    - mytheme/wc_2026.media_object
-    - mytheme/wc_2026.table
-    - mytheme/wc_2026.alert
-    - mytheme/wc_2026.prose
+    - mytheme/helix.card
+    - mytheme/helix.hero_banner
+    - mytheme/helix.article_layout
+    - mytheme/helix.card_grid
+    - mytheme/helix.media_gallery
+    - mytheme/helix.media_object
+    - mytheme/helix.table
+    - mytheme/helix.alert
+    - mytheme/helix.prose
 
-wc_2026.group_interactive:
+helix.group_interactive:
   version: VERSION
   dependencies:
-    - mytheme/wc_2026.accordion
-    - mytheme/wc_2026.tabs
-    - mytheme/wc_2026.modal
-    - mytheme/wc_2026.dropdown_menu
-    - mytheme/wc_2026.pagination
+    - mytheme/helix.accordion
+    - mytheme/helix.tabs
+    - mytheme/helix.modal
+    - mytheme/helix.dropdown_menu
+    - mytheme/helix.pagination
 
-wc_2026.group_navigation:
+helix.group_navigation:
   version: VERSION
   dependencies:
-    - mytheme/wc_2026.header
-    - mytheme/wc_2026.footer
-    - mytheme/wc_2026.nav_primary
-    - mytheme/wc_2026.nav_mobile
-    - mytheme/wc_2026.breadcrumb
-    - mytheme/wc_2026.sidebar
+    - mytheme/helix.header
+    - mytheme/helix.footer
+    - mytheme/helix.nav_primary
+    - mytheme/helix.nav_mobile
+    - mytheme/helix.breadcrumb
+    - mytheme/helix.sidebar
 
-wc_2026.group_layout:
+helix.group_layout:
   version: VERSION
   dependencies:
-    - mytheme/wc_2026.page_layout
-    - mytheme/wc_2026.article_page
-    - mytheme/wc_2026.landing_page
-    - mytheme/wc_2026.search_results_page
-    - mytheme/wc_2026.theme_provider
+    - mytheme/helix.page_layout
+    - mytheme/helix.article_page
+    - mytheme/helix.landing_page
+    - mytheme/helix.search_results_page
+    - mytheme/helix.theme_provider
 
 # ─── Full Bundle (prototyping / dev only) ───
-wc_2026.all:
+helix.all:
   version: VERSION
   dependencies:
-    - mytheme/wc_2026.group_core
-    - mytheme/wc_2026.group_forms
-    - mytheme/wc_2026.group_content
-    - mytheme/wc_2026.group_interactive
-    - mytheme/wc_2026.group_navigation
-    - mytheme/wc_2026.group_layout
+    - mytheme/helix.group_core
+    - mytheme/helix.group_forms
+    - mytheme/helix.group_content
+    - mytheme/helix.group_interactive
+    - mytheme/helix.group_navigation
+    - mytheme/helix.group_layout
 ```
 
 ### Why This Combination Works
@@ -1464,24 +1464,24 @@ wc_2026.all:
 
 2. **Convenience when appropriate**: Preprocess functions for paragraph types and content types can attach groups for simpler configuration.
 
-3. **Drupal deduplicates everything**: If a page attaches both `wc_2026.card` (individually) and `wc_2026.group_content` (which includes card), Drupal loads card code exactly once.
+3. **Drupal deduplicates everything**: If a page attaches both `helix.card` (individually) and `helix.group_content` (which includes card), Drupal loads card code exactly once.
 
 4. **Groups add zero overhead**: Convenience groups contain no JavaScript of their own. They are pure `dependencies` lists. An unused group costs nothing.
 
-5. **Full bundle available for development**: Attaching `wc_2026.all` during development eliminates "component not defined" errors. Switch to per-component/group loading for production.
+5. **Full bundle available for development**: Attaching `helix.all` during development eliminates "component not defined" errors. Switch to per-component/group loading for production.
 
 ### Usage Examples
 
 ```twig
 {# Precise: attach exactly what this template needs #}
-{{ attach_library('mytheme/wc_2026.card') }}
-{{ attach_library('mytheme/wc_2026.button') }}
+{{ attach_library('mytheme/helix.card') }}
+{{ attach_library('mytheme/helix.button') }}
 
 {# Convenient: attach a group when multiple related components are needed #}
-{{ attach_library('mytheme/wc_2026.group_forms') }}
+{{ attach_library('mytheme/helix.group_forms') }}
 
 {# Development: load everything (never use in production) #}
-{# {{ attach_library('mytheme/wc_2026.all') }} #}
+{# {{ attach_library('mytheme/helix.all') }} #}
 ```
 
 ```php
@@ -1496,13 +1496,13 @@ function mytheme_preprocess_paragraph(array &$variables): void {
 
   $paragraph_libraries = [
     // Simple paragraphs: attach individual components
-    'cta_button' => ['mytheme/wc_2026.button'],
-    'pull_quote' => ['mytheme/wc_2026.alert'],
+    'cta_button' => ['mytheme/helix.button'],
+    'pull_quote' => ['mytheme/helix.alert'],
 
     // Complex paragraphs: attach groups
-    'contact_form' => ['mytheme/wc_2026.group_forms'],
-    'faq_section' => ['mytheme/wc_2026.group_interactive'],
-    'card_grid' => ['mytheme/wc_2026.group_content'],
+    'contact_form' => ['mytheme/helix.group_forms'],
+    'faq_section' => ['mytheme/helix.group_interactive'],
+    'card_grid' => ['mytheme/helix.group_content'],
   ];
 
   $bundle = $paragraph->bundle();
@@ -1532,7 +1532,7 @@ const cem = JSON.parse(readFileSync(resolve('packages/wc-library/custom-elements
 const libraries = {};
 
 // Runtime library (always the same)
-libraries['wc_2026.runtime'] = {
+libraries['helix.runtime'] = {
   version: 'VERSION',
   css: { theme: { 'vendor/helix/tokens.css': { minified: true } } },
   js: {
@@ -1548,11 +1548,11 @@ libraries['wc_2026.runtime'] = {
 for (const module of cem.modules) {
   for (const declaration of module.declarations ?? []) {
     if (declaration.tagName) {
-      const tagName = declaration.tagName; // e.g., 'wc-button'
-      const libraryName = tagName.replace(/-/g, '_'); // e.g., 'wc_button'
+      const tagName = declaration.tagName; // e.g., 'hx-button'
+      const libraryName = tagName.replace(/-/g, '_'); // e.g., 'hx_button'
       const componentPath = module.path.replace('src/', 'vendor/helix/').replace('.ts', '.js');
 
-      libraries[`wc_2026.${libraryName}`] = {
+      libraries[`helix.${libraryName}`] = {
         version: 'VERSION',
         js: {
           [componentPath]: {
@@ -1561,7 +1561,7 @@ for (const module of cem.modules) {
             preprocess: false,
           },
         },
-        dependencies: ['mytheme/wc_2026.runtime'],
+        dependencies: ['mytheme/helix.runtime'],
         // Note: inter-component dependencies must be added manually
         // or detected via import analysis
       };
@@ -1593,7 +1593,7 @@ This script generates the base library definitions. Inter-component dependencies
 1. Generate initial `libraries.yml` from CEM
 2. Add inter-component dependencies manually
 3. Create convenience group definitions
-4. Create `wc_2026.all` development bundle
+4. Create `helix.all` development bundle
 
 ### Phase 3: Preprocess Functions (Week 2)
 
@@ -1623,7 +1623,7 @@ This script generates the base library definitions. Inter-component dependencies
 
 **Status**: Accepted
 
-**Context**: HELIX is a 44-component Web Component library built with Lit 3.x that must integrate with Drupal CMS as its primary consumer. ADR-001 established a hybrid property/slot integration strategy. This ADR addresses the next critical question: how the component JavaScript physically loads into Drupal pages. The library targets enterprise healthcare organizations where Core Web Vitals compliance is a legal requirement (HHS WCAG mandate, May 2026) and users frequently access sites on mid-range mobile devices in clinical settings.
+**Context**: HELIX is a 44-component Web Component library built with Lit 3.x that must integrate with Drupal CMS as its primary consumer. ADR-001 established a hybrid property/slot integration strategy. This ADR addresses the next critical question: how the component JavaScript physically loads into Drupal pages. The library targets enterprise organizations where Core Web Vitals compliance is essential and users frequently access sites on mid-range mobile devices.
 
 **Decision**: Adopt per-component Drupal library definitions as the atomic loading unit, with convenience group libraries layered on top as pure dependency aggregators. Each component has its own entry in `libraries.yml` with explicit dependencies. Groups contain no JavaScript -- they are dependency lists that combine related components for common usage patterns.
 
@@ -1637,7 +1637,7 @@ _Positive:_
 - Follows the Drupal-native library pattern used by core and every major contrib module
 - Performance budget compliance: stays well within the < 50 KB WC JS per-page target
 - Convenience groups provide simpler DX for common patterns without sacrificing per-component granularity
-- Full bundle (`wc_2026.all`) remains available for development environments
+- Full bundle (`helix.all`) remains available for development environments
 - Aligns with how every major WC library handles loading (Shoelace, SAP UI5, Spectrum, FAST, Carbon)
 
 _Negative:_
@@ -1653,7 +1653,7 @@ _Mitigations:_
 - `libraries.yml` generator script reads the CEM and produces base definitions automatically
 - Convenience groups reduce the number of libraries Drupal developers need to remember (6 groups vs 44 components)
 - FOUC prevention CSS hides undefined elements, making forgotten library attachments visually obvious during development
-- `wc_2026.all` library available during development eliminates "component not defined" errors
+- `helix.all` library available during development eliminates "component not defined" errors
 - Drupal's library dependency system handles deduplication and load ordering automatically
 - Documentation includes complete preprocess function examples for content types, paragraph types, and blocks
 
@@ -1694,10 +1694,10 @@ How each loading strategy interacts with major Drupal contributed modules:
 | **Paragraphs**     | No change needed                | `hook_preprocess_paragraph()` attaches libraries per paragraph type | Use groups for complex paragraphs, individual for simple ones |
 | **Layout Builder** | No change needed                | Section templates and custom blocks attach their own libraries      | Attach in block template or custom block plugin               |
 | **Views**          | No change needed                | Views row templates attach component libraries                      | Attach in `views-view-unformatted.html.twig` or row template  |
-| **Webform**        | No change needed                | Form page template attaches `wc_2026.group_forms`                   | Group loading is appropriate for form pages                   |
+| **Webform**        | No change needed                | Form page template attaches `helix.group_forms`                     | Group loading is appropriate for form pages                   |
 | **Metatag**        | No impact                       | No impact                                                           | N/A                                                           |
 | **Media**          | No impact (media goes in slots) | No impact (media goes in slots)                                     | N/A                                                           |
-| **Search API**     | No change needed                | Search results template attaches needed components                  | Attach `wc_2026.card` in search results template              |
+| **Search API**     | No change needed                | Search results template attaches needed components                  | Attach `helix.card` in search results template                |
 | **Commerce**       | No change needed                | Product display templates attach needed components                  | Attach per-component in product templates                     |
 | **BigPipe**        | Compatible                      | Compatible -- libraries attached per placeholder                    | BigPipe streams library tags with their placeholders          |
 | **Aggregation**    | One file                        | Combines per-page into 2-4 files                                    | Drupal handles combining automatically                        |
@@ -1714,9 +1714,9 @@ After implementing the recommended strategy, validate with:
 - [ ] **Total page JS** < 100 KB Brotli (including Drupal core + contrib)
 - [ ] **FOUC duration** < 500ms on 3G simulation
 - [ ] **LCP** < 2.5s on article pages
-- [ ] **Cache validation**: Update `wc-tooltip`, confirm only tooltip cache entry invalidates
+- [ ] **Cache validation**: Update `hx-tooltip`, confirm only tooltip cache entry invalidates
 - [ ] **Drupal aggregation**: Confirm production mode combines component files (not 44 requests)
-- [ ] **Dependency deduplication**: Confirm `wc-button` loads once when both `wc-card` and `wc-modal` are on the page
+- [ ] **Dependency deduplication**: Confirm `hx-button` loads once when both `hx-card` and `hx-modal` are on the page
 - [ ] **BigPipe compatibility**: Confirm libraries load correctly with BigPipe enabled
 - [ ] **Admin toolbar**: Confirm component libraries do not conflict with Drupal's admin JS
 
@@ -1727,21 +1727,21 @@ After implementing the recommended strategy, validate with:
 **Loading a single component:**
 
 ```twig
-{{ attach_library('mytheme/wc_2026.button') }}
-<wc-button variant="primary">Click</wc-button>
+{{ attach_library('mytheme/helix.button') }}
+<hx-button variant="primary">Click</hx-button>
 ```
 
 **Loading a group:**
 
 ```twig
-{{ attach_library('mytheme/wc_2026.group_forms') }}
+{{ attach_library('mytheme/helix.group_forms') }}
 {# All form components + core components now available #}
 ```
 
 **Loading everything (development ONLY):**
 
 ```twig
-{{ attach_library('mytheme/wc_2026.all') }}
+{{ attach_library('mytheme/helix.all') }}
 {# Every component available. Do NOT use in production. #}
 ```
 
@@ -1749,4 +1749,4 @@ After implementing the recommended strategy, validate with:
 
 - Template uses 1-2 components? Attach them individually.
 - Template uses 3+ components from the same category? Attach the group.
-- Building/debugging? Use `wc_2026.all` temporarily, then switch to specific libraries before committing.
+- Building/debugging? Use `helix.all` temporarily, then switch to specific libraries before committing.

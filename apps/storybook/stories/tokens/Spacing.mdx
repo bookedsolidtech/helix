@@ -1,0 +1,398 @@
+{/* Spacing.mdx — HELIX Design Token: Spacing Scale */}
+
+import { Meta } from '@storybook/addon-docs/blocks';
+import { tokensByCategory } from '@helix/tokens';
+
+<Meta title="Design Tokens/Spacing" parameters={{ controls: { disable: true }, actions: { disable: true } }} />
+
+export const spacingTokens = tokensByCategory['space'] ?? [];
+export const smallSpacingTokens = spacingTokens.filter((t) => {
+  const num = parseFloat(t.value);
+  return !isNaN(num) && num <= 5;
+});
+
+<style>
+{`
+  /* ── Scoped container reset ─────────────────────────── */
+  .hx-token-spacing {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 0 1rem 3rem;
+    font-family: var(--hx-font-family-sans, 'Inter', -apple-system, BlinkMacSystemFont, sans-serif);
+    color: var(--hx-color-neutral-800, #1E293B);
+    line-height: 1.5;
+  }
+
+  .hx-token-spacing *,
+  .hx-token-spacing *::before,
+  .hx-token-spacing *::after {
+    box-sizing: border-box;
+  }
+
+  /* Override Storybook aggressive element defaults */
+  .hx-token-spacing h2,
+  .hx-token-spacing h3,
+  .hx-token-spacing p,
+  .hx-token-spacing span,
+  .hx-token-spacing div,
+  .hx-token-spacing code {
+    all: unset;
+    box-sizing: border-box;
+    display: block;
+  }
+
+  .hx-token-spacing span,
+  .hx-token-spacing code {
+    display: inline;
+  }
+
+  /* ── Mini Hero Banner ───────────────────────────────── */
+  .hx-token-spacing .hx-spacing-hero {
+    background: linear-gradient(135deg, var(--hx-color-primary-50, #EFF6FF) 0%, var(--hx-color-neutral-50, #F8FAFC) 100%) !important;
+    border-radius: 0.75rem !important;
+    padding: 2.5rem 2rem !important;
+    margin-bottom: 2.5rem !important;
+    border: 1px solid var(--hx-color-primary-100, #DBEAFE) !important;
+    position: relative !important;
+    overflow: hidden !important;
+  }
+
+  .hx-token-spacing .hx-spacing-hero::before {
+    content: '' !important;
+    position: absolute !important;
+    top: -60px !important;
+    right: -40px !important;
+    width: 200px !important;
+    height: 200px !important;
+    background: radial-gradient(circle, var(--hx-color-primary-100, #DBEAFE) 0%, transparent 70%) !important;
+    opacity: 0.5 !important;
+    pointer-events: none !important;
+  }
+
+  .hx-token-spacing .hx-spacing-hero-title {
+    font-family: var(--hx-font-family-sans, 'Inter', sans-serif) !important;
+    font-size: 2rem !important;
+    font-weight: 800 !important;
+    color: var(--hx-color-neutral-900, #0F172A) !important;
+    margin: 0 0 0.5rem 0 !important;
+    letter-spacing: -0.025em !important;
+    line-height: 1.2 !important;
+  }
+
+  .hx-token-spacing .hx-spacing-hero-desc {
+    font-family: var(--hx-font-family-sans, 'Inter', sans-serif) !important;
+    font-size: 1rem !important;
+    color: var(--hx-color-neutral-500, #64748B) !important;
+    margin: 0 0 1rem 0 !important;
+    line-height: 1.6 !important;
+    max-width: 600px !important;
+  }
+
+  .hx-token-spacing .hx-spacing-hero-badge {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 0.375rem !important;
+    background: var(--hx-color-primary-100, #DBEAFE) !important;
+    color: var(--hx-color-primary-700, #1E40AF) !important;
+    padding: 4px 12px !important;
+    border-radius: 9999px !important;
+    font-family: var(--hx-font-family-sans, 'Inter', sans-serif) !important;
+    font-size: 0.75rem !important;
+    font-weight: 600 !important;
+    letter-spacing: 0.01em !important;
+  }
+
+  /* ── Section Headings ───────────────────────────────── */
+  .hx-token-spacing .hx-spacing-section-title {
+    font-family: var(--hx-font-family-sans, 'Inter', sans-serif) !important;
+    font-size: 1.5rem !important;
+    font-weight: 700 !important;
+    color: var(--hx-color-neutral-900, #0F172A) !important;
+    margin: 2.5rem 0 0.5rem 0 !important;
+    letter-spacing: -0.02em !important;
+    line-height: 1.3 !important;
+  }
+
+  .hx-token-spacing .hx-spacing-section-desc {
+    font-family: var(--hx-font-family-sans, 'Inter', sans-serif) !important;
+    font-size: 0.9375rem !important;
+    color: var(--hx-color-neutral-500, #64748B) !important;
+    margin: 0 0 1.5rem 0 !important;
+    line-height: 1.6 !important;
+    max-width: 640px !important;
+  }
+
+  /* ── Scale Row ──────────────────────────────────────── */
+  .hx-token-spacing .hx-spacing-scale-list {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 2px !important;
+  }
+
+  .hx-token-spacing .hx-spacing-scale-row {
+    display: grid !important;
+    grid-template-columns: 180px 72px 1fr !important;
+    align-items: center !important;
+    gap: 16px !important;
+    padding: 10px 16px !important;
+    border-radius: 0.5rem !important;
+    transition: background 0.15s ease !important;
+  }
+
+  .hx-token-spacing .hx-spacing-scale-row:hover {
+    background: var(--hx-color-neutral-50, #F8FAFC) !important;
+  }
+
+  .hx-token-spacing .hx-spacing-scale-row:not(:last-child) {
+    border-bottom: 1px solid var(--hx-color-neutral-100, #F1F5F9) !important;
+  }
+
+  .hx-token-spacing .hx-spacing-token-name {
+    font-family: var(--hx-font-family-mono, 'JetBrains Mono', monospace) !important;
+    font-size: 0.8125rem !important;
+    color: var(--hx-color-neutral-700, #334155) !important;
+    font-weight: 500 !important;
+    white-space: nowrap !important;
+  }
+
+  .hx-token-spacing .hx-spacing-token-value {
+    font-family: var(--hx-font-family-mono, 'JetBrains Mono', monospace) !important;
+    font-size: 0.75rem !important;
+    color: var(--hx-color-neutral-400, #94A3B8) !important;
+    text-align: right !important;
+    white-space: nowrap !important;
+  }
+
+  .hx-token-spacing .hx-spacing-bar-track {
+    height: 28px !important;
+    background: var(--hx-color-neutral-50, #F8FAFC) !important;
+    border-radius: 0.375rem !important;
+    overflow: hidden !important;
+    border: 1px solid var(--hx-color-neutral-100, #F1F5F9) !important;
+  }
+
+  .hx-token-spacing .hx-spacing-bar {
+    height: 100% !important;
+    background: linear-gradient(90deg, var(--hx-color-primary-400, #60A5FA), var(--hx-color-secondary-400, #22D3EE)) !important;
+    border-radius: 0.375rem !important;
+    transition: width 0.4s cubic-bezier(0.22, 1, 0.36, 1) !important;
+    min-width: 2px !important;
+  }
+
+  /* ── Padding Boxes Grid ─────────────────────────────── */
+  .hx-token-spacing .hx-spacing-boxes-grid {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)) !important;
+    gap: 20px !important;
+  }
+
+  .hx-token-spacing .hx-spacing-box-item {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    gap: 10px !important;
+    transition: transform 0.2s ease !important;
+  }
+
+  .hx-token-spacing .hx-spacing-box-item:hover {
+    transform: translateY(-2px) !important;
+  }
+
+  .hx-token-spacing .hx-spacing-box-outer {
+    display: inline-flex !important;
+    background: linear-gradient(135deg, var(--hx-color-primary-50, #EFF6FF) 0%, var(--hx-color-primary-100, #DBEAFE) 100%) !important;
+    border-radius: 0.5rem !important;
+    border: 1px solid var(--hx-color-primary-200, #BFDBFE) !important;
+  }
+
+  .hx-token-spacing .hx-spacing-box-inner {
+    width: 40px !important;
+    height: 40px !important;
+    background: var(--hx-color-neutral-0, #FFFFFF) !important;
+    border-radius: 0.25rem !important;
+    border: 1px dashed var(--hx-color-neutral-300, #CBD5E1) !important;
+    flex-shrink: 0 !important;
+  }
+
+  .hx-token-spacing .hx-spacing-box-label {
+    font-family: var(--hx-font-family-mono, 'JetBrains Mono', monospace) !important;
+    font-size: 0.75rem !important;
+    font-weight: 600 !important;
+    color: var(--hx-color-neutral-700, #334155) !important;
+    text-align: center !important;
+  }
+
+  .hx-token-spacing .hx-spacing-box-value {
+    font-family: var(--hx-font-family-mono, 'JetBrains Mono', monospace) !important;
+    font-size: 0.6875rem !important;
+    color: var(--hx-color-neutral-400, #94A3B8) !important;
+    text-align: center !important;
+    margin-top: -6px !important;
+  }
+
+  /* ── Usage Card ─────────────────────────────────────── */
+  .hx-token-spacing .hx-spacing-usage-card {
+    background: var(--hx-color-neutral-0, #FFFFFF) !important;
+    border: 1px solid var(--hx-color-neutral-200, #E2E8F0) !important;
+    border-radius: 0.75rem !important;
+    padding: 1.5rem !important;
+    box-shadow: var(--hx-shadow-sm, 0 1px 2px 0 rgb(0 0 0 / 0.05)) !important;
+  }
+
+  .hx-token-spacing .hx-spacing-usage-title {
+    font-family: var(--hx-font-family-sans, 'Inter', sans-serif) !important;
+    font-size: 1rem !important;
+    font-weight: 600 !important;
+    color: var(--hx-color-neutral-800, #1E293B) !important;
+    margin: 0 0 0.75rem 0 !important;
+  }
+
+  .hx-token-spacing .hx-spacing-code-block {
+    background: var(--hx-color-neutral-900, #0F172A) !important;
+    border-radius: 0.5rem !important;
+    padding: 1rem 1.25rem !important;
+    overflow-x: auto !important;
+  }
+
+  .hx-token-spacing .hx-spacing-code-line {
+    font-family: var(--hx-font-family-mono, 'JetBrains Mono', monospace) !important;
+    font-size: 0.8125rem !important;
+    line-height: 1.7 !important;
+    color: var(--hx-color-neutral-300, #CBD5E1) !important;
+    white-space: pre !important;
+  }
+
+  .hx-token-spacing .hx-spacing-code-comment {
+    color: var(--hx-color-neutral-500, #64748B) !important;
+  }
+
+  .hx-token-spacing .hx-spacing-code-prop {
+    color: var(--hx-color-secondary-400, #22D3EE) !important;
+  }
+
+  .hx-token-spacing .hx-spacing-code-value {
+    color: var(--hx-color-accent-400, #FBBF24) !important;
+  }
+
+  /* ── Footer ─────────────────────────────────────────── */
+  .hx-token-spacing .hx-spacing-footer {
+    margin-top: 3rem !important;
+    padding-top: 1.5rem !important;
+    border-top: 1px solid var(--hx-color-neutral-200, #E2E8F0) !important;
+    text-align: center !important;
+  }
+
+  .hx-token-spacing .hx-spacing-footer-text {
+    font-family: var(--hx-font-family-sans, 'Inter', sans-serif) !important;
+    font-size: 0.8125rem !important;
+    color: var(--hx-color-neutral-400, #94A3B8) !important;
+  }
+`}
+</style>
+
+<div className="hx-token-spacing">
+
+{/* ═══ Mini Hero Banner ═══════════════════════════════ */}
+<div className="hx-spacing-hero">
+  <div className="hx-spacing-hero-title">Spacing</div>
+  <div className="hx-spacing-hero-desc">
+    A consistent spacing scale used for padding, margins, gaps, and layout composition.
+    Built on a base-4 system that produces harmonious, predictable rhythm across every component.
+  </div>
+  <div className="hx-spacing-hero-badge">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
+    </svg>
+    {spacingTokens.length} tokens
+  </div>
+</div>
+
+{/* ═══ Spacing Scale ═════════════════════════════════ */}
+
+## Spacing Scale
+
+<div className="hx-spacing-section-desc">
+  Each row below shows the token name, its resolved value, and a proportional bar visualization.
+  The bar width is driven by the actual CSS custom property, giving an accurate visual representation
+  of relative scale.
+</div>
+
+<div className="hx-spacing-scale-list">
+  {spacingTokens.map((token) => (
+    <div className="hx-spacing-scale-row" key={token.name}>
+      <span className="hx-spacing-token-name">{token.name}</span>
+      <span className="hx-spacing-token-value">{token.value}</span>
+      <div className="hx-spacing-bar-track">
+        <div
+          className="hx-spacing-bar"
+          style={{ width: token.value === '0' ? '2px' : `var(${token.name})` }}
+        />
+      </div>
+    </div>
+  ))}
+</div>
+
+{/* ═══ Spacing as Padding ════════════════════════════ */}
+
+## Spacing as Padding
+
+<div className="hx-spacing-section-desc">
+  Each box below uses its respective spacing token as padding on all sides. The colored area
+  represents the padding region; the white inner square represents the content area.
+  Tokens above 5rem are omitted to keep the grid readable.
+</div>
+
+<div className="hx-spacing-boxes-grid">
+  {smallSpacingTokens.map((token) => (
+    <div className="hx-spacing-box-item" key={token.name}>
+      <div className="hx-spacing-box-outer" style={{ padding: `var(${token.name})` }}>
+        <div className="hx-spacing-box-inner" />
+      </div>
+      <div className="hx-spacing-box-label">{token.key}</div>
+      <div className="hx-spacing-box-value">{token.value}</div>
+    </div>
+  ))}
+</div>
+
+{/* ═══ Usage ═════════════════════════════════════════ */}
+
+## Usage
+
+<div className="hx-spacing-usage-card">
+  <div className="hx-spacing-usage-title">Using spacing tokens in CSS</div>
+  <div className="hx-spacing-code-block">
+    <div className="hx-spacing-code-line">
+      <span className="hx-spacing-code-comment">{'/* Use spacing tokens for consistent layout */'}</span>
+    </div>
+    <div className="hx-spacing-code-line">
+      <span className="hx-spacing-code-prop">{'padding'}</span>{': var('}
+      <span className="hx-spacing-code-value">{'--hx-space-4'}</span>{');'}
+    </div>
+    <div className="hx-spacing-code-line">
+      <span className="hx-spacing-code-prop">{'margin-bottom'}</span>{': var('}
+      <span className="hx-spacing-code-value">{'--hx-space-6'}</span>{');'}
+    </div>
+    <div className="hx-spacing-code-line">
+      <span className="hx-spacing-code-prop">{'gap'}</span>{': var('}
+      <span className="hx-spacing-code-value">{'--hx-space-3'}</span>{');'}
+    </div>
+    <div className="hx-spacing-code-line">&nbsp;</div>
+    <div className="hx-spacing-code-line">
+      <span className="hx-spacing-code-comment">{'/* Component-level token with semantic fallback */'}</span>
+    </div>
+    <div className="hx-spacing-code-line">
+      <span className="hx-spacing-code-prop">{'--_padding'}</span>{': var('}
+      <span className="hx-spacing-code-value">{'--hx-card-padding'}</span>{', var('}
+      <span className="hx-spacing-code-value">{'--hx-space-6'}</span>{'));'}
+    </div>
+  </div>
+</div>
+
+{/* ═══ Footer ════════════════════════════════════════ */}
+<div className="hx-spacing-footer">
+  <div className="hx-spacing-footer-text">
+    HELIX Design Tokens &middot; Spacing Scale &middot; {spacingTokens.length} tokens
+  </div>
+</div>
+
+</div>

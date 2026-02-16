@@ -1,9 +1,9 @@
 ---
 title: Architecture Overview
-description: High-level system architecture for the HELIX healthcare web component library
+description: High-level system architecture for the HELIX enterprise web component library
 ---
 
-HELIX follows a **layered architecture** designed for enterprise healthcare organizations. The system prioritizes accessibility, performance, and Drupal CMS integration.
+HELIX follows a **layered architecture** designed for enterprise content organizations. The system prioritizes accessibility, performance, and Drupal CMS integration.
 
 ## System Layers
 
@@ -29,7 +29,7 @@ HELIX follows a **layered architecture** designed for enterprise healthcare orga
 2. **Three-tier tokens** - Global, Alias, Component tiers for maximum flexibility
 3. **Dual documentation** - Storybook for playground, Starlight for guides
 4. **Turborepo monorepo** - Efficient builds with intelligent caching
-5. **WCAG 2.1 AA baseline** - Healthcare compliance as a first-class requirement
+5. **WCAG 2.1 AA baseline** - Accessibility compliance as a first-class requirement
 
 ## Detailed Documentation
 

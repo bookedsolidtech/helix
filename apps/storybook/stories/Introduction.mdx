@@ -1,0 +1,1302 @@
+{/* Introduction.mdx — HELIX Storybook Welcome Page */}
+
+import { Meta } from '@storybook/addon-docs/blocks';
+
+<Meta title="Welcome Center/Introduction" />
+
+<style>
+{`
+  /* Override Storybook docs defaults that crush our hero */
+  .sbdocs-wrapper {
+    padding: 0 !important;
+  }
+
+  /* Prevent Storybook from overriding hero element styles */
+  .hx-intro-hero h1,
+  .hx-intro-hero p,
+  .hx-intro-hero a,
+  .hx-intro-hero span,
+  .hx-intro-hero div {
+    all: unset;
+    box-sizing: border-box;
+  }
+
+  .hx-intro-hero a {
+    cursor: pointer;
+  }
+
+  /* ── Keyframe Animations ──────────────────────────────── */
+
+  @keyframes helixShimmerFlow {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 200% 50%; }
+  }
+
+  @keyframes helixDnaRotate {
+    0% { transform: rotateY(0deg); }
+    100% { transform: rotateY(360deg); }
+  }
+
+  @keyframes helixDnaBreathe {
+    0%, 100% { opacity: 0.15; }
+    50% { opacity: 0.4; }
+  }
+
+  @keyframes helixOrbDrift1 {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    33% { transform: translate(30px, -20px) scale(1.1); }
+    66% { transform: translate(-20px, 15px) scale(0.9); }
+  }
+
+  @keyframes helixOrbDrift2 {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    33% { transform: translate(-25px, 25px) scale(0.95); }
+    66% { transform: translate(35px, -10px) scale(1.05); }
+  }
+
+  @keyframes helixOrbDrift3 {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    33% { transform: translate(15px, 30px) scale(1.08); }
+    66% { transform: translate(-30px, -20px) scale(0.92); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .hx-intro-shimmer-text,
+    .hx-intro-dna-rotator,
+    .hx-intro-dna-container,
+    .hx-intro-orb {
+      animation: none !important;
+    }
+    .hx-intro-shimmer-text {
+      background-position: 0% 50% !important;
+    }
+    .hx-intro-dna-container {
+      opacity: 0.25 !important;
+    }
+    .hx-intro-dna-rotator {
+      animation: none !important;
+      transform: rotateY(-20deg) !important;
+    }
+  }
+
+  /* ── Page Wrapper ─────────────────────────────────────── */
+
+  .hx-intro-page {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: var(--hx-space-8, 2rem) var(--hx-space-6, 1.5rem);
+    font-family: var(--hx-font-family-sans, sans-serif);
+    color: var(--hx-color-neutral-800, #212529);
+    line-height: var(--hx-line-height-normal, 1.5);
+  }
+
+  /* ── Hero Banner ──────────────────────────────────────── */
+
+  .hx-intro-hero {
+    position: relative !important;
+    overflow: hidden !important;
+    text-align: center !important;
+    padding: 5rem 2rem 4rem !important;
+    margin-bottom: 3rem !important;
+    border-radius: 0.75rem !important;
+    background: linear-gradient(135deg, #0a0e27 0%, #1a1040 30%, #0d1933 60%, #0a0e27 100%) !important;
+    display: block !important;
+  }
+
+  /* Grid pattern overlay */
+  .hx-intro-hero .hx-intro-grid-overlay {
+    position: absolute !important;
+    inset: 0 !important;
+    background-image:
+      linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px) !important;
+    background-size: 40px 40px !important;
+    pointer-events: none !important;
+  }
+
+  /* Floating ambient orbs */
+  .hx-intro-hero .hx-intro-orb {
+    position: absolute !important;
+    border-radius: 50% !important;
+    pointer-events: none !important;
+    display: block !important;
+  }
+
+  .hx-intro-hero .hx-intro-orb--cyan {
+    top: 10% !important;
+    left: 15% !important;
+    width: 200px !important;
+    height: 200px !important;
+    background: radial-gradient(circle, rgba(6,182,212,0.15) 0%, transparent 70%) !important;
+    filter: blur(40px) !important;
+    animation: helixOrbDrift1 12s ease-in-out infinite;
+  }
+
+  .hx-intro-hero .hx-intro-orb--purple {
+    bottom: 15% !important;
+    right: 10% !important;
+    width: 250px !important;
+    height: 250px !important;
+    background: radial-gradient(circle, rgba(139,92,246,0.12) 0%, transparent 70%) !important;
+    filter: blur(50px) !important;
+    animation: helixOrbDrift2 15s ease-in-out infinite;
+  }
+
+  .hx-intro-hero .hx-intro-orb--pink {
+    top: 40% !important;
+    right: 30% !important;
+    width: 180px !important;
+    height: 180px !important;
+    background: radial-gradient(circle, rgba(236,72,153,0.1) 0%, transparent 70%) !important;
+    filter: blur(45px) !important;
+    animation: helixOrbDrift3 10s ease-in-out infinite;
+  }
+
+  /* Central ambient glow */
+  .hx-intro-hero .hx-intro-ambient-glow {
+    position: absolute !important;
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) !important;
+    width: 400px !important;
+    height: 400px !important;
+    border-radius: 50% !important;
+    background: radial-gradient(ellipse at center, rgba(139,92,246,0.15) 0%, rgba(6,182,212,0.08) 40%, transparent 70%) !important;
+    pointer-events: none !important;
+    z-index: 0 !important;
+  }
+
+  /* 3D DNA Helix container */
+  .hx-intro-hero .hx-intro-dna-container {
+    position: absolute !important;
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) scale(2.5) rotate(30deg) !important;
+    pointer-events: none !important;
+    animation: helixDnaBreathe 8s ease-in-out infinite;
+    z-index: 0 !important;
+    display: block !important;
+  }
+
+  .hx-intro-hero .hx-intro-dna-perspective {
+    perspective: 400px !important;
+    perspective-origin: 50% 50% !important;
+    width: 100px !important;
+    height: 220px !important;
+    position: relative !important;
+    overflow: visible !important;
+    display: block !important;
+  }
+
+  .hx-intro-hero .hx-intro-dna-rotator {
+    position: absolute !important;
+    inset: 0 !important;
+    transform-style: preserve-3d !important;
+    animation: helixDnaRotate 20s linear infinite;
+    will-change: transform;
+    display: block !important;
+  }
+
+  /* DNA pair base */
+  .hx-intro-hero .hx-intro-dna-pair {
+    position: absolute !important;
+    left: 50% !important;
+    width: 0 !important;
+    height: 0 !important;
+    transform-style: preserve-3d !important;
+    display: block !important;
+  }
+
+  /* DNA pair positions (top %) */
+  .hx-intro-hero .hx-intro-dna-pair--0  { top: 0% !important;      transform: rotateY(0deg) !important; }
+  .hx-intro-hero .hx-intro-dna-pair--1  { top: 5.26% !important;   transform: rotateY(18deg) !important; }
+  .hx-intro-hero .hx-intro-dna-pair--2  { top: 10.53% !important;  transform: rotateY(36deg) !important; }
+  .hx-intro-hero .hx-intro-dna-pair--3  { top: 15.79% !important;  transform: rotateY(54deg) !important; }
+  .hx-intro-hero .hx-intro-dna-pair--4  { top: 21.05% !important;  transform: rotateY(72deg) !important; }
+  .hx-intro-hero .hx-intro-dna-pair--5  { top: 26.32% !important;  transform: rotateY(90deg) !important; }
+  .hx-intro-hero .hx-intro-dna-pair--6  { top: 31.58% !important;  transform: rotateY(108deg) !important; }
+  .hx-intro-hero .hx-intro-dna-pair--7  { top: 36.84% !important;  transform: rotateY(126deg) !important; }
+  .hx-intro-hero .hx-intro-dna-pair--8  { top: 42.11% !important;  transform: rotateY(144deg) !important; }
+  .hx-intro-hero .hx-intro-dna-pair--9  { top: 47.37% !important;  transform: rotateY(162deg) !important; }
+  .hx-intro-hero .hx-intro-dna-pair--10 { top: 52.63% !important;  transform: rotateY(180deg) !important; }
+  .hx-intro-hero .hx-intro-dna-pair--11 { top: 57.89% !important;  transform: rotateY(198deg) !important; }
+  .hx-intro-hero .hx-intro-dna-pair--12 { top: 63.16% !important;  transform: rotateY(216deg) !important; }
+  .hx-intro-hero .hx-intro-dna-pair--13 { top: 68.42% !important;  transform: rotateY(234deg) !important; }
+  .hx-intro-hero .hx-intro-dna-pair--14 { top: 73.68% !important;  transform: rotateY(252deg) !important; }
+  .hx-intro-hero .hx-intro-dna-pair--15 { top: 78.95% !important;  transform: rotateY(270deg) !important; }
+  .hx-intro-hero .hx-intro-dna-pair--16 { top: 84.21% !important;  transform: rotateY(288deg) !important; }
+  .hx-intro-hero .hx-intro-dna-pair--17 { top: 89.47% !important;  transform: rotateY(306deg) !important; }
+  .hx-intro-hero .hx-intro-dna-pair--18 { top: 94.74% !important;  transform: rotateY(324deg) !important; }
+  .hx-intro-hero .hx-intro-dna-pair--19 { top: 100% !important;    transform: rotateY(342deg) !important; }
+
+  /* DNA node (sphere) base */
+  .hx-intro-hero .hx-intro-dna-node {
+    position: absolute !important;
+    width: 9px !important;
+    height: 9px !important;
+    border-radius: 50% !important;
+    top: -4.5px !important;
+    left: -4.5px !important;
+    display: block !important;
+  }
+
+  .hx-intro-hero .hx-intro-dna-node--front {
+    transform: translateZ(38px) !important;
+  }
+
+  .hx-intro-hero .hx-intro-dna-node--back {
+    transform: translateZ(-38px) !important;
+  }
+
+  /* DNA node color variants */
+  .hx-intro-hero .hx-intro-dna-node--cyan {
+    background: #06b6d4 !important;
+    box-shadow: 0 0 7.2px #06b6d4, 0 0 18px #06b6d4 !important;
+  }
+
+  .hx-intro-hero .hx-intro-dna-node--purple {
+    background: #8b5cf6 !important;
+    box-shadow: 0 0 7.2px #8b5cf6, 0 0 18px #8b5cf6 !important;
+  }
+
+  .hx-intro-hero .hx-intro-dna-node--pink {
+    background: #ec4899 !important;
+    box-shadow: 0 0 7.2px #ec4899, 0 0 18px #ec4899 !important;
+  }
+
+  /* DNA rung (connector bar) base */
+  .hx-intro-hero .hx-intro-dna-rung {
+    position: absolute !important;
+    width: 76px !important;
+    height: 2.5px !important;
+    left: -38px !important;
+    top: -1.25px !important;
+    border-radius: 1.25px !important;
+    display: block !important;
+  }
+
+  /* Rung color variants */
+  .hx-intro-hero .hx-intro-dna-rung--cyan-pink {
+    background: linear-gradient(90deg, #ec4899 0%, rgba(139,92,246,0.3) 30%, rgba(139,92,246,0.15) 50%, rgba(139,92,246,0.3) 70%, #06b6d4 100%) !important;
+  }
+
+  .hx-intro-hero .hx-intro-dna-rung--purple-cyan {
+    background: linear-gradient(90deg, #06b6d4 0%, rgba(139,92,246,0.3) 30%, rgba(139,92,246,0.15) 50%, rgba(139,92,246,0.3) 70%, #8b5cf6 100%) !important;
+  }
+
+  .hx-intro-hero .hx-intro-dna-rung--pink-purple {
+    background: linear-gradient(90deg, #8b5cf6 0%, rgba(139,92,246,0.3) 30%, rgba(139,92,246,0.15) 50%, rgba(139,92,246,0.3) 70%, #ec4899 100%) !important;
+  }
+
+  /* Rung opacity variants */
+  .hx-intro-hero .hx-intro-dna-rung--dim {
+    opacity: 0.25 !important;
+  }
+
+  .hx-intro-hero .hx-intro-dna-rung--bright {
+    opacity: 0.35 !important;
+  }
+
+  /* Edge fading overlays — hidden; hero overflow:hidden clips the helix naturally */
+  .hx-intro-hero .hx-intro-edge-fade {
+    display: none !important;
+  }
+
+  /* Hero text content */
+  .hx-intro-hero .hx-intro-hero-content {
+    position: relative !important;
+    z-index: 1 !important;
+    display: block !important;
+    text-align: center !important;
+  }
+
+  /* HELiX shimmer title — !important needed to override Storybook h1 defaults */
+  .hx-intro-hero .hx-intro-shimmer-text {
+    display: block !important;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif !important;
+    font-size: clamp(4.5rem, 16vw, 10rem) !important;
+    font-weight: 900 !important;
+    letter-spacing: -0.06em !important;
+    line-height: 0.92 !important;
+    margin: 0 0 1.5rem 0 !important;
+    padding: 0 !important;
+    border: none !important;
+    background: linear-gradient(135deg, #06b6d4 0%, #8b5cf6 25%, #ec4899 50%, #f97316 75%, #06b6d4 100%) !important;
+    background-size: 200% 200% !important;
+    -webkit-background-clip: text !important;
+    background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+    color: transparent !important;
+    animation: helixShimmerFlow 8s ease-in-out infinite;
+    filter: drop-shadow(0 0 40px rgba(139, 92, 246, 0.4)) drop-shadow(0 0 80px rgba(6, 182, 212, 0.3));
+    text-align: center !important;
+  }
+
+  /* Hero subtitle — override Storybook p defaults */
+  .hx-intro-hero .hx-intro-hero-subtitle {
+    display: block !important;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif !important;
+    font-size: 1.4rem !important;
+    color: rgba(255,255,255,0.75) !important;
+    margin: 0 0 1.25rem 0 !important;
+    font-weight: 500 !important;
+    letter-spacing: 0.01em !important;
+    text-align: center !important;
+    white-space: normal !important;
+    word-wrap: break-word !important;
+  }
+
+  .hx-intro-hero .hx-intro-hero-subtitle b {
+    color: rgba(255,255,255,0.95) !important;
+    font-weight: 700 !important;
+    display: inline !important;
+  }
+
+  /* Hero description — override Storybook p defaults */
+  .hx-intro-hero .hx-intro-hero-desc {
+    display: block !important;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif !important;
+    font-size: 0.95rem !important;
+    color: rgba(255,255,255,0.45) !important;
+    margin: 0 auto !important;
+    max-width: 640px !important;
+    line-height: 1.7 !important;
+    font-weight: 400 !important;
+    text-align: center !important;
+    white-space: normal !important;
+    word-wrap: break-word !important;
+  }
+
+  /* ── Hero CTA Buttons ─────────────────────────────────── */
+
+  .hx-intro-hero .hx-intro-cta-row {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 1rem !important;
+    margin-top: 2.5rem !important;
+    flex-wrap: wrap !important;
+  }
+
+  .hx-intro-hero a.hx-intro-btn {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 0.5rem !important;
+    padding: 0.875rem 1.75rem !important;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif !important;
+    font-size: 0.9375rem !important;
+    font-weight: 600 !important;
+    text-decoration: none !important;
+    border-radius: 0.875rem !important;
+    transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1) !important;
+    cursor: pointer !important;
+    border: none !important;
+    position: relative !important;
+    overflow: hidden !important;
+    white-space: nowrap !important;
+    min-height: 48px !important;
+    letter-spacing: 0.01em !important;
+    line-height: 1.2 !important;
+  }
+
+  .hx-intro-hero a.hx-intro-btn.hx-intro-btn--primary {
+    background: white !important;
+    color: #1a1040 !important;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.12) !important;
+  }
+
+  .hx-intro-hero a.hx-intro-btn.hx-intro-btn--primary:hover {
+    transform: translateY(-3px) !important;
+    box-shadow: 0 16px 48px rgba(0,0,0,0.2), 0 0 40px rgba(255,255,255,0.1) !important;
+    color: #1a1040 !important;
+    text-decoration: none !important;
+  }
+
+  .hx-intro-hero a.hx-intro-btn.hx-intro-btn--secondary {
+    background: rgba(255,255,255,0.05) !important;
+    color: white !important;
+    border: 1.5px solid rgba(255,255,255,0.15) !important;
+    backdrop-filter: blur(10px) !important;
+    -webkit-backdrop-filter: blur(10px) !important;
+  }
+
+  .hx-intro-hero a.hx-intro-btn.hx-intro-btn--secondary:hover {
+    background: rgba(255,255,255,0.1) !important;
+    border-color: rgba(255,255,255,0.3) !important;
+    transform: translateY(-3px) !important;
+    box-shadow: 0 0 30px rgba(255,255,255,0.06) !important;
+    color: white !important;
+    text-decoration: none !important;
+  }
+
+  .hx-intro-hero .hx-intro-btn-arrow {
+    font-size: 1.1em !important;
+    transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1) !important;
+  }
+
+  .hx-intro-hero a.hx-intro-btn:hover .hx-intro-btn-arrow {
+    transform: translateX(3px) !important;
+  }
+
+  /* ── Feature Chips ────────────────────────────────────── */
+
+  .hx-intro-hero .hx-intro-chips-row {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 0.75rem !important;
+    margin-top: 1.5rem !important;
+    flex-wrap: wrap !important;
+  }
+
+  .hx-intro-hero .hx-intro-chip {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 0.4rem !important;
+    padding: 0.3rem 0.75rem !important;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif !important;
+    font-size: 0.6875rem !important;
+    font-weight: 500 !important;
+    color: rgba(255,255,255,0.5) !important;
+    background: rgba(255,255,255,0.04) !important;
+    border: 1px solid rgba(255,255,255,0.08) !important;
+    border-radius: 9999px !important;
+    letter-spacing: 0.04em !important;
+    text-transform: uppercase !important;
+  }
+
+  .hx-intro-hero .hx-intro-chip-dot {
+    width: 5px !important;
+    height: 5px !important;
+    border-radius: 50% !important;
+    flex-shrink: 0 !important;
+  }
+
+  .hx-intro-chip-dot--cyan { background: #06b6d4 !important; box-shadow: 0 0 6px rgba(6,182,212,0.6) !important; }
+  .hx-intro-chip-dot--green { background: #10b981 !important; box-shadow: 0 0 6px rgba(16,185,129,0.6) !important; }
+  .hx-intro-chip-dot--purple { background: #8b5cf6 !important; box-shadow: 0 0 6px rgba(139,92,246,0.6) !important; }
+`}
+</style>
+
+<div className="hx-intro-page">
+
+{/* ═══ Hero ═══════════════════════════════════════════════ */}
+<div className="hx-intro-hero">
+
+{/* Grid pattern overlay */}
+<div className="hx-intro-grid-overlay"></div>
+
+{/* Floating ambient orbs */}
+<div className="hx-intro-orb hx-intro-orb--cyan"></div>
+<div className="hx-intro-orb hx-intro-orb--purple"></div>
+<div className="hx-intro-orb hx-intro-orb--pink"></div>
+
+{/* Ambient glow */}
+<div className="hx-intro-ambient-glow"></div>
+
+{/* 3D DNA Helix (behind text) */}
+<div className="hx-intro-dna-container">
+  <div className="hx-intro-dna-perspective">
+    <div className="hx-intro-dna-rotator">
+
+{/* ── DNA Pair 0: top=0%, rotation=0deg, left=cyan, right=pink, rung opacity=bright ── */}
+<div className="hx-intro-dna-pair hx-intro-dna-pair--0">
+  <div className="hx-intro-dna-node hx-intro-dna-node--cyan hx-intro-dna-node--front"></div>
+  <div className="hx-intro-dna-rung hx-intro-dna-rung--cyan-pink hx-intro-dna-rung--bright"></div>
+  <div className="hx-intro-dna-node hx-intro-dna-node--pink hx-intro-dna-node--back"></div>
+</div>
+
+{/* ── DNA Pair 1: top=5.26%, rotation=18deg, left=cyan, right=pink, rung opacity=dim ── */}
+<div className="hx-intro-dna-pair hx-intro-dna-pair--1">
+  <div className="hx-intro-dna-node hx-intro-dna-node--cyan hx-intro-dna-node--front"></div>
+  <div className="hx-intro-dna-rung hx-intro-dna-rung--cyan-pink hx-intro-dna-rung--dim"></div>
+  <div className="hx-intro-dna-node hx-intro-dna-node--pink hx-intro-dna-node--back"></div>
+</div>
+
+{/* ── DNA Pair 2: top=10.53%, rotation=36deg, left=cyan, right=pink, rung opacity=bright ── */}
+<div className="hx-intro-dna-pair hx-intro-dna-pair--2">
+  <div className="hx-intro-dna-node hx-intro-dna-node--cyan hx-intro-dna-node--front"></div>
+  <div className="hx-intro-dna-rung hx-intro-dna-rung--cyan-pink hx-intro-dna-rung--bright"></div>
+  <div className="hx-intro-dna-node hx-intro-dna-node--pink hx-intro-dna-node--back"></div>
+</div>
+
+{/* ── DNA Pair 3: top=15.79%, rotation=54deg, left=cyan, right=pink, rung opacity=dim ── */}
+<div className="hx-intro-dna-pair hx-intro-dna-pair--3">
+  <div className="hx-intro-dna-node hx-intro-dna-node--cyan hx-intro-dna-node--front"></div>
+  <div className="hx-intro-dna-rung hx-intro-dna-rung--cyan-pink hx-intro-dna-rung--dim"></div>
+  <div className="hx-intro-dna-node hx-intro-dna-node--pink hx-intro-dna-node--back"></div>
+</div>
+
+{/* ── DNA Pair 4: top=21.05%, rotation=72deg, left=cyan, right=pink, rung opacity=bright ── */}
+<div className="hx-intro-dna-pair hx-intro-dna-pair--4">
+  <div className="hx-intro-dna-node hx-intro-dna-node--cyan hx-intro-dna-node--front"></div>
+  <div className="hx-intro-dna-rung hx-intro-dna-rung--cyan-pink hx-intro-dna-rung--bright"></div>
+  <div className="hx-intro-dna-node hx-intro-dna-node--pink hx-intro-dna-node--back"></div>
+</div>
+
+{/* ── DNA Pair 5: top=26.32%, rotation=90deg, left=cyan, right=pink, rung opacity=dim ── */}
+<div className="hx-intro-dna-pair hx-intro-dna-pair--5">
+  <div className="hx-intro-dna-node hx-intro-dna-node--cyan hx-intro-dna-node--front"></div>
+  <div className="hx-intro-dna-rung hx-intro-dna-rung--cyan-pink hx-intro-dna-rung--dim"></div>
+  <div className="hx-intro-dna-node hx-intro-dna-node--pink hx-intro-dna-node--back"></div>
+</div>
+
+{/* ── DNA Pair 6: top=31.58%, rotation=108deg, left=cyan, right=pink, rung opacity=bright ── */}
+<div className="hx-intro-dna-pair hx-intro-dna-pair--6">
+  <div className="hx-intro-dna-node hx-intro-dna-node--cyan hx-intro-dna-node--front"></div>
+  <div className="hx-intro-dna-rung hx-intro-dna-rung--cyan-pink hx-intro-dna-rung--bright"></div>
+  <div className="hx-intro-dna-node hx-intro-dna-node--pink hx-intro-dna-node--back"></div>
+</div>
+
+{/* ── DNA Pair 7: top=36.84%, rotation=126deg, left=purple, right=cyan, rung opacity=dim ── */}
+<div className="hx-intro-dna-pair hx-intro-dna-pair--7">
+  <div className="hx-intro-dna-node hx-intro-dna-node--purple hx-intro-dna-node--front"></div>
+  <div className="hx-intro-dna-rung hx-intro-dna-rung--purple-cyan hx-intro-dna-rung--dim"></div>
+  <div className="hx-intro-dna-node hx-intro-dna-node--cyan hx-intro-dna-node--back"></div>
+</div>
+
+{/* ── DNA Pair 8: top=42.11%, rotation=144deg, left=purple, right=cyan, rung opacity=bright ── */}
+<div className="hx-intro-dna-pair hx-intro-dna-pair--8">
+  <div className="hx-intro-dna-node hx-intro-dna-node--purple hx-intro-dna-node--front"></div>
+  <div className="hx-intro-dna-rung hx-intro-dna-rung--purple-cyan hx-intro-dna-rung--bright"></div>
+  <div className="hx-intro-dna-node hx-intro-dna-node--cyan hx-intro-dna-node--back"></div>
+</div>
+
+{/* ── DNA Pair 9: top=47.37%, rotation=162deg, left=purple, right=cyan, rung opacity=dim ── */}
+<div className="hx-intro-dna-pair hx-intro-dna-pair--9">
+  <div className="hx-intro-dna-node hx-intro-dna-node--purple hx-intro-dna-node--front"></div>
+  <div className="hx-intro-dna-rung hx-intro-dna-rung--purple-cyan hx-intro-dna-rung--dim"></div>
+  <div className="hx-intro-dna-node hx-intro-dna-node--cyan hx-intro-dna-node--back"></div>
+</div>
+
+{/* ── DNA Pair 10: top=52.63%, rotation=180deg, left=purple, right=cyan, rung opacity=bright ── */}
+<div className="hx-intro-dna-pair hx-intro-dna-pair--10">
+  <div className="hx-intro-dna-node hx-intro-dna-node--purple hx-intro-dna-node--front"></div>
+  <div className="hx-intro-dna-rung hx-intro-dna-rung--purple-cyan hx-intro-dna-rung--bright"></div>
+  <div className="hx-intro-dna-node hx-intro-dna-node--cyan hx-intro-dna-node--back"></div>
+</div>
+
+{/* ── DNA Pair 11: top=57.89%, rotation=198deg, left=purple, right=cyan, rung opacity=dim ── */}
+<div className="hx-intro-dna-pair hx-intro-dna-pair--11">
+  <div className="hx-intro-dna-node hx-intro-dna-node--purple hx-intro-dna-node--front"></div>
+  <div className="hx-intro-dna-rung hx-intro-dna-rung--purple-cyan hx-intro-dna-rung--dim"></div>
+  <div className="hx-intro-dna-node hx-intro-dna-node--cyan hx-intro-dna-node--back"></div>
+</div>
+
+{/* ── DNA Pair 12: top=63.16%, rotation=216deg, left=purple, right=cyan, rung opacity=bright ── */}
+<div className="hx-intro-dna-pair hx-intro-dna-pair--12">
+  <div className="hx-intro-dna-node hx-intro-dna-node--purple hx-intro-dna-node--front"></div>
+  <div className="hx-intro-dna-rung hx-intro-dna-rung--purple-cyan hx-intro-dna-rung--bright"></div>
+  <div className="hx-intro-dna-node hx-intro-dna-node--cyan hx-intro-dna-node--back"></div>
+</div>
+
+{/* ── DNA Pair 13: top=68.42%, rotation=234deg, left=purple, right=cyan, rung opacity=dim ── */}
+<div className="hx-intro-dna-pair hx-intro-dna-pair--13">
+  <div className="hx-intro-dna-node hx-intro-dna-node--purple hx-intro-dna-node--front"></div>
+  <div className="hx-intro-dna-rung hx-intro-dna-rung--purple-cyan hx-intro-dna-rung--dim"></div>
+  <div className="hx-intro-dna-node hx-intro-dna-node--cyan hx-intro-dna-node--back"></div>
+</div>
+
+{/* ── DNA Pair 14: top=73.68%, rotation=252deg, left=pink, right=purple, rung opacity=bright ── */}
+<div className="hx-intro-dna-pair hx-intro-dna-pair--14">
+  <div className="hx-intro-dna-node hx-intro-dna-node--pink hx-intro-dna-node--front"></div>
+  <div className="hx-intro-dna-rung hx-intro-dna-rung--pink-purple hx-intro-dna-rung--bright"></div>
+  <div className="hx-intro-dna-node hx-intro-dna-node--purple hx-intro-dna-node--back"></div>
+</div>
+
+{/* ── DNA Pair 15: top=78.95%, rotation=270deg, left=pink, right=purple, rung opacity=dim ── */}
+<div className="hx-intro-dna-pair hx-intro-dna-pair--15">
+  <div className="hx-intro-dna-node hx-intro-dna-node--pink hx-intro-dna-node--front"></div>
+  <div className="hx-intro-dna-rung hx-intro-dna-rung--pink-purple hx-intro-dna-rung--dim"></div>
+  <div className="hx-intro-dna-node hx-intro-dna-node--purple hx-intro-dna-node--back"></div>
+</div>
+
+{/* ── DNA Pair 16: top=84.21%, rotation=288deg, left=pink, right=purple, rung opacity=bright ── */}
+<div className="hx-intro-dna-pair hx-intro-dna-pair--16">
+  <div className="hx-intro-dna-node hx-intro-dna-node--pink hx-intro-dna-node--front"></div>
+  <div className="hx-intro-dna-rung hx-intro-dna-rung--pink-purple hx-intro-dna-rung--bright"></div>
+  <div className="hx-intro-dna-node hx-intro-dna-node--purple hx-intro-dna-node--back"></div>
+</div>
+
+{/* ── DNA Pair 17: top=89.47%, rotation=306deg, left=pink, right=purple, rung opacity=dim ── */}
+<div className="hx-intro-dna-pair hx-intro-dna-pair--17">
+  <div className="hx-intro-dna-node hx-intro-dna-node--pink hx-intro-dna-node--front"></div>
+  <div className="hx-intro-dna-rung hx-intro-dna-rung--pink-purple hx-intro-dna-rung--dim"></div>
+  <div className="hx-intro-dna-node hx-intro-dna-node--purple hx-intro-dna-node--back"></div>
+</div>
+
+{/* ── DNA Pair 18: top=94.74%, rotation=324deg, left=pink, right=purple, rung opacity=bright ── */}
+<div className="hx-intro-dna-pair hx-intro-dna-pair--18">
+  <div className="hx-intro-dna-node hx-intro-dna-node--pink hx-intro-dna-node--front"></div>
+  <div className="hx-intro-dna-rung hx-intro-dna-rung--pink-purple hx-intro-dna-rung--bright"></div>
+  <div className="hx-intro-dna-node hx-intro-dna-node--purple hx-intro-dna-node--back"></div>
+</div>
+
+{/* ── DNA Pair 19: top=100%, rotation=342deg, left=pink, right=purple, rung opacity=dim ── */}
+<div className="hx-intro-dna-pair hx-intro-dna-pair--19">
+  <div className="hx-intro-dna-node hx-intro-dna-node--pink hx-intro-dna-node--front"></div>
+  <div className="hx-intro-dna-rung hx-intro-dna-rung--pink-purple hx-intro-dna-rung--dim"></div>
+  <div className="hx-intro-dna-node hx-intro-dna-node--purple hx-intro-dna-node--back"></div>
+</div>
+
+    </div>
+
+{/* Edge fading top */}
+<div className="hx-intro-edge-fade hx-intro-edge-fade--top"></div>
+
+{/* Edge fading bottom */}
+<div className="hx-intro-edge-fade hx-intro-edge-fade--bottom"></div>
+
+  </div>
+</div>
+
+{/* Text content (above helix) */}
+<div className="hx-intro-hero-content">
+  <h1 className="hx-intro-shimmer-text">
+    HELiX
+  </h1>
+  <p className="hx-intro-hero-subtitle">
+    <b>H</b>TML <b>E</b>lement <b>L</b>ibrary for <b>I</b>nteractive e<b>X</b>periences
+  </p>
+  <p className="hx-intro-hero-desc">
+    Production-ready Lit 3.x web components with a three-tier design token system,
+    WCAG 2.1 AA accessibility, and seamless CMS integration.
+    Built for enterprise organizations that refuse to compromise.
+  </p>
+
+  {/* CTA Buttons */}
+  <div className="hx-intro-cta-row">
+    <a href="http://localhost:3150" target="_blank" rel="noopener noreferrer" className="hx-intro-btn hx-intro-btn--primary">
+      Documentation <span className="hx-intro-btn-arrow" aria-hidden="true">&rarr;</span>
+    </a>
+    <a href="http://localhost:3159" target="_blank" rel="noopener noreferrer" className="hx-intro-btn hx-intro-btn--secondary">
+      Admin Dashboard <span className="hx-intro-btn-arrow" aria-hidden="true">&rarr;</span>
+    </a>
+  </div>
+
+  {/* Feature Chips */}
+  <div className="hx-intro-chips-row">
+    <span className="hx-intro-chip">
+      <span className="hx-intro-chip-dot hx-intro-chip-dot--cyan"></span>
+      Lit 3.x
+    </span>
+    <span className="hx-intro-chip">
+      <span className="hx-intro-chip-dot hx-intro-chip-dot--green"></span>
+      WCAG 2.1 AA
+    </span>
+    <span className="hx-intro-chip">
+      <span className="hx-intro-chip-dot hx-intro-chip-dot--purple"></span>
+      TypeScript Strict
+    </span>
+  </div>
+</div>
+
+</div>
+
+{/* ═══ Welcome ═══════════════════════════════════════════ */}
+<section style={{ marginBottom: 'var(--hx-space-12, 3rem)' }}>
+## Welcome to HELIX Storybook
+  <p style={{
+    fontSize: 'var(--hx-font-size-md, 1rem)',
+    color: 'var(--hx-color-neutral-600, #495057)',
+    margin: '0 0 var(--hx-space-4, 1rem) 0',
+    maxWidth: '720px',
+    lineHeight: 'var(--hx-line-height-relaxed, 1.75)'
+  }}>
+    This is the interactive component playground for the HELIX design system.
+    Here you can browse every component, manipulate its properties in real time,
+    inspect accessibility audits, and review auto-generated API documentation.
+  </p>
+  <p style={{
+    fontSize: 'var(--hx-font-size-md, 1rem)',
+    color: 'var(--hx-color-neutral-600, #495057)',
+    margin: '0 0 var(--hx-space-4, 1rem) 0',
+    maxWidth: '720px',
+    lineHeight: 'var(--hx-line-height-relaxed, 1.75)'
+  }}>
+    HELIX &mdash; <b>H</b>TML <b>E</b>lement <b>L</b>ibrary for <b>I</b>nteractive e<b>X</b>periences &mdash;
+    is built on Lit 3.x with Shadow DOM encapsulation and TypeScript strict mode.
+    Every component is framework-agnostic and works in any stack without configuration.
+  </p>
+</section>
+
+{/* ═══ Navigating This Storybook ════════════════════════ */}
+<section style={{ marginBottom: 'var(--hx-space-12, 3rem)' }}>
+## Navigating This Storybook
+
+  <div style={{
+    display: 'flex',
+    flexDirection: 'column',
+    gap: 'var(--hx-space-6, 1.5rem)',
+    maxWidth: '720px'
+  }}>
+
+{/* Sidebar Navigation */}
+<div style={{
+  padding: 'var(--hx-space-6, 1.5rem)',
+  background: 'var(--hx-color-neutral-0, #ffffff)',
+  borderRadius: 'var(--hx-border-radius-lg, 0.5rem)',
+  border: 'var(--hx-border-width-thin, 1px) solid var(--hx-color-neutral-200, #dee2e6)'
+}}>
+  <h3 id="sidebar-navigation" style={{
+    fontSize: 'var(--hx-font-size-lg, 1.125rem)',
+    fontWeight: 'var(--hx-font-weight-semibold, 600)',
+    color: 'var(--hx-color-neutral-800, #212529)',
+    margin: '0 0 var(--hx-space-3, 0.75rem) 0',
+    display: 'flex',
+    alignItems: 'center',
+    gap: 'var(--hx-space-3, 0.75rem)'
+  }}>
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
+      <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
+      <line x1="9" y1="8" x2="16" y2="8" />
+      <line x1="9" y1="12" x2="14" y2="12" />
+    </svg>
+    Sidebar Navigation
+  </h3>
+  <ul style={{
+    margin: 0,
+    padding: '0 0 0 var(--hx-space-5, 1.25rem)',
+    fontSize: 'var(--hx-font-size-sm, 0.875rem)',
+    color: 'var(--hx-color-neutral-600, #495057)',
+    lineHeight: 'var(--hx-line-height-relaxed, 1.75)',
+    display: 'flex',
+    flexDirection: 'column',
+    gap: 'var(--hx-space-2, 0.5rem)'
+  }}>
+    <li>Components are organized by category in the left sidebar.</li>
+    <li>Each component has multiple stories showing different states and variants.</li>
+    <li>The <strong>Docs</strong> tab on any component shows auto-generated API documentation from the Custom Elements Manifest (CEM), including properties, events, slots, CSS custom properties, and CSS parts.</li>
+  </ul>
+</div>
+
+{/* Controls Panel */}
+<div style={{
+  padding: 'var(--hx-space-6, 1.5rem)',
+  background: 'var(--hx-color-neutral-0, #ffffff)',
+  borderRadius: 'var(--hx-border-radius-lg, 0.5rem)',
+  border: 'var(--hx-border-width-thin, 1px) solid var(--hx-color-neutral-200, #dee2e6)'
+}}>
+  <h3 id="controls-panel" style={{
+    fontSize: 'var(--hx-font-size-lg, 1.125rem)',
+    fontWeight: 'var(--hx-font-weight-semibold, 600)',
+    color: 'var(--hx-color-neutral-800, #212529)',
+    margin: '0 0 var(--hx-space-3, 0.75rem) 0',
+    display: 'flex',
+    alignItems: 'center',
+    gap: 'var(--hx-space-3, 0.75rem)'
+  }}>
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M4 2 2 22l10-4 10 4L20 2z" />
+      <path d="M7 8h10" />
+      <path d="M8 12h8" />
+      <path d="M9 16h6" />
+    </svg>
+    Controls Panel
+  </h3>
+  <ul style={{
+    margin: 0,
+    padding: '0 0 0 var(--hx-space-5, 1.25rem)',
+    fontSize: 'var(--hx-font-size-sm, 0.875rem)',
+    color: 'var(--hx-color-neutral-600, #495057)',
+    lineHeight: 'var(--hx-line-height-relaxed, 1.75)',
+    display: 'flex',
+    flexDirection: 'column',
+    gap: 'var(--hx-space-2, 0.5rem)'
+  }}>
+    <li>Every component story has interactive controls at the bottom of the canvas.</li>
+    <li>Controls are auto-generated from component properties defined in the CEM.</li>
+    <li>Change props in real time to see how components respond &mdash; boolean props get toggles, enums get dropdowns, strings get text inputs.</li>
+  </ul>
+</div>
+
+{/* Actions Panel */}
+<div style={{
+  padding: 'var(--hx-space-6, 1.5rem)',
+  background: 'var(--hx-color-neutral-0, #ffffff)',
+  borderRadius: 'var(--hx-border-radius-lg, 0.5rem)',
+  border: 'var(--hx-border-width-thin, 1px) solid var(--hx-color-neutral-200, #dee2e6)'
+}}>
+  <h3 id="actions-panel" style={{
+    fontSize: 'var(--hx-font-size-lg, 1.125rem)',
+    fontWeight: 'var(--hx-font-weight-semibold, 600)',
+    color: 'var(--hx-color-neutral-800, #212529)',
+    margin: '0 0 var(--hx-space-3, 0.75rem) 0',
+    display: 'flex',
+    alignItems: 'center',
+    gap: 'var(--hx-space-3, 0.75rem)'
+  }}>
+    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--hx-color-primary-500)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z" />
+      <path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z" />
+      <path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0" />
+      <path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5" />
+    </svg>
+    Actions Panel
+  </h3>
+  <ul style={{
+    margin: 0,
+    padding: '0 0 0 var(--hx-space-5, 1.25rem)',
+    fontSize: 'var(--hx-font-size-sm, 0.875rem)',
+    color: 'var(--hx-color-neutral-600, #495057)',
+    lineHeight: 'var(--hx-line-height-relaxed, 1.75)',
+    display: 'flex',
+    flexDirection: 'column',
+    gap: 'var(--hx-space-2, 0.5rem)'
+  }}>
+    <li>Shows events fired by components in real time.</li>
+    <li>Click a button and see the <code style={{ fontFamily: 'var(--hx-font-family-mono, monospace)', fontSize: 'var(--hx-font-size-xs, 0.75rem)', padding: '0.1em 0.4em', background: 'var(--hx-color-neutral-100, #e9ecef)', borderRadius: 'var(--hx-border-radius-sm, 0.25rem)' }}>hx-click</code> event logged with its payload.</li>
+    <li>Useful for understanding the event API before integrating a component.</li>
+  </ul>
+</div>
+
+{/* Accessibility Tab */}
+<div style={{
+  padding: 'var(--hx-space-6, 1.5rem)',
+  background: 'var(--hx-color-neutral-0, #ffffff)',
+  borderRadius: 'var(--hx-border-radius-lg, 0.5rem)',
+  border: 'var(--hx-border-width-thin, 1px) solid var(--hx-color-neutral-200, #dee2e6)'
+}}>
+  <h3 id="accessibility-tab" style={{
+    fontSize: 'var(--hx-font-size-lg, 1.125rem)',
+    fontWeight: 'var(--hx-font-weight-semibold, 600)',
+    color: 'var(--hx-color-neutral-800, #212529)',
+    margin: '0 0 var(--hx-space-3, 0.75rem) 0',
+    display: 'flex',
+    alignItems: 'center',
+    gap: 'var(--hx-space-3, 0.75rem)'
+  }}>
+    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--hx-color-primary-600)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+      <path d="m9 12 2 2 4-4" />
+    </svg>
+    Accessibility Tab
+  </h3>
+  <ul style={{
+    margin: 0,
+    padding: '0 0 0 var(--hx-space-5, 1.25rem)',
+    fontSize: 'var(--hx-font-size-sm, 0.875rem)',
+    color: 'var(--hx-color-neutral-600, #495057)',
+    lineHeight: 'var(--hx-line-height-relaxed, 1.75)',
+    display: 'flex',
+    flexDirection: 'column',
+    gap: 'var(--hx-space-2, 0.5rem)'
+  }}>
+    <li>Every story is automatically audited by axe-core via the Accessibility addon.</li>
+    <li>Violations are flagged with severity levels (critical, serious, moderate, minor).</li>
+    <li>HELIX targets WCAG 2.1 AA compliance &mdash; a non-negotiable requirement for enterprise healthcare.</li>
+  </ul>
+</div>
+
+  </div>
+</section>
+
+{/* ═══ Component Architecture ═══════════════════════════ */}
+<section style={{ marginBottom: 'var(--hx-space-12, 3rem)' }}>
+## Component Architecture
+  <p style={{
+    fontSize: 'var(--hx-font-size-sm, 0.875rem)',
+    color: 'var(--hx-color-neutral-500, #6c757d)',
+    margin: '0 0 var(--hx-space-6, 1.5rem) 0',
+    maxWidth: '720px',
+    lineHeight: 'var(--hx-line-height-relaxed, 1.75)'
+  }}>
+    Each component in the sidebar uses a three-tier token architecture.
+    You can override tokens at any level to theme components &mdash; consumers
+    set values at the semantic level, and components resolve them internally
+    with semantic fallbacks.
+  </p>
+
+{/* Three-tier diagram */}
+<div style={{
+  display: 'flex',
+  flexDirection: 'column',
+  gap: 'var(--hx-space-3, 0.75rem)',
+  maxWidth: '640px'
+}}>
+
+{/* Tier 1: Primitive */}
+<div style={{
+  display: 'flex',
+  alignItems: 'center',
+  gap: 'var(--hx-space-4, 1rem)',
+  padding: 'var(--hx-space-4, 1rem) var(--hx-space-5, 1.25rem)',
+  background: 'var(--hx-color-primary-50, #e6f3f3)',
+  borderRadius: 'var(--hx-border-radius-lg, 0.5rem)',
+  border: 'var(--hx-border-width-thin, 1px) solid var(--hx-color-primary-200, #80c2c2)'
+}}>
+  <div style={{
+    flexShrink: 0,
+    width: '32px',
+    height: '32px',
+    borderRadius: 'var(--hx-border-radius-full, 9999px)',
+    background: 'var(--hx-color-primary-500, #007878)',
+    color: 'var(--hx-color-neutral-0, #ffffff)',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    fontSize: 'var(--hx-font-size-sm, 0.875rem)',
+    fontWeight: 'var(--hx-font-weight-bold, 700)'
+  }}>
+    1
+  </div>
+  <div>
+    <div style={{
+      fontSize: 'var(--hx-font-size-sm, 0.875rem)',
+      fontWeight: 'var(--hx-font-weight-semibold, 600)',
+      color: 'var(--hx-color-primary-800, #003c3c)'
+    }}>
+      Primitive
+    </div>
+    <div style={{
+      fontFamily: 'var(--hx-font-family-mono, monospace)',
+      fontSize: 'var(--hx-font-size-xs, 0.75rem)',
+      color: 'var(--hx-color-primary-600, #006868)',
+      marginTop: 'var(--hx-space-1, 0.25rem)'
+    }}>
+      #007878, 0.5rem, 600
+    </div>
+  </div>
+</div>
+
+{/* Arrow */}
+<div style={{
+  textAlign: 'center',
+  color: 'var(--hx-color-neutral-300, #ced4da)',
+  fontSize: 'var(--hx-font-size-xl, 1.25rem)',
+  lineHeight: 1,
+  margin: 'calc(var(--hx-space-1, 0.25rem) * -1) 0',
+  paddingLeft: 'var(--hx-space-5, 1.25rem)'
+}}>
+  &#8595;
+</div>
+
+{/* Tier 2: Semantic */}
+<div style={{
+  display: 'flex',
+  alignItems: 'center',
+  gap: 'var(--hx-space-4, 1rem)',
+  padding: 'var(--hx-space-4, 1rem) var(--hx-space-5, 1.25rem)',
+  background: 'var(--hx-color-neutral-50, #f8f9fa)',
+  borderRadius: 'var(--hx-border-radius-lg, 0.5rem)',
+  border: 'var(--hx-border-width-thin, 1px) solid var(--hx-color-neutral-200, #dee2e6)'
+}}>
+  <div style={{
+    flexShrink: 0,
+    width: '32px',
+    height: '32px',
+    borderRadius: 'var(--hx-border-radius-full, 9999px)',
+    background: 'var(--hx-color-neutral-600, #495057)',
+    color: 'var(--hx-color-neutral-0, #ffffff)',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    fontSize: 'var(--hx-font-size-sm, 0.875rem)',
+    fontWeight: 'var(--hx-font-weight-bold, 700)'
+  }}>
+    2
+  </div>
+  <div>
+    <div style={{
+      fontSize: 'var(--hx-font-size-sm, 0.875rem)',
+      fontWeight: 'var(--hx-font-weight-semibold, 600)',
+      color: 'var(--hx-color-neutral-800, #212529)'
+    }}>
+      Semantic
+    </div>
+    <div style={{
+      fontFamily: 'var(--hx-font-family-mono, monospace)',
+      fontSize: 'var(--hx-font-size-xs, 0.75rem)',
+      color: 'var(--hx-color-neutral-500, #6c757d)',
+      marginTop: 'var(--hx-space-1, 0.25rem)'
+    }}>
+      --hx-color-primary, --hx-space-md
+    </div>
+  </div>
+</div>
+
+{/* Arrow */}
+<div style={{
+  textAlign: 'center',
+  color: 'var(--hx-color-neutral-300, #ced4da)',
+  fontSize: 'var(--hx-font-size-xl, 1.25rem)',
+  lineHeight: 1,
+  margin: 'calc(var(--hx-space-1, 0.25rem) * -1) 0',
+  paddingLeft: 'var(--hx-space-5, 1.25rem)'
+}}>
+  &#8595;
+</div>
+
+{/* Tier 3: Component */}
+<div style={{
+  display: 'flex',
+  alignItems: 'center',
+  gap: 'var(--hx-space-4, 1rem)',
+  padding: 'var(--hx-space-4, 1rem) var(--hx-space-5, 1.25rem)',
+  background: 'var(--hx-color-neutral-0, #ffffff)',
+  borderRadius: 'var(--hx-border-radius-lg, 0.5rem)',
+  border: 'var(--hx-border-width-medium, 2px) solid var(--hx-color-primary-300, #4da9a9)'
+}}>
+  <div style={{
+    flexShrink: 0,
+    width: '32px',
+    height: '32px',
+    borderRadius: 'var(--hx-border-radius-full, 9999px)',
+    background: 'var(--hx-color-primary-400, #269191)',
+    color: 'var(--hx-color-neutral-0, #ffffff)',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    fontSize: 'var(--hx-font-size-sm, 0.875rem)',
+    fontWeight: 'var(--hx-font-weight-bold, 700)'
+  }}>
+    3
+  </div>
+  <div>
+    <div style={{
+      fontSize: 'var(--hx-font-size-sm, 0.875rem)',
+      fontWeight: 'var(--hx-font-weight-semibold, 600)',
+      color: 'var(--hx-color-neutral-800, #212529)'
+    }}>
+      Component
+    </div>
+    <div style={{
+      fontFamily: 'var(--hx-font-family-mono, monospace)',
+      fontSize: 'var(--hx-font-size-xs, 0.75rem)',
+      color: 'var(--hx-color-neutral-500, #6c757d)',
+      marginTop: 'var(--hx-space-1, 0.25rem)'
+    }}>
+      --hx-button-bg, --hx-card-padding
+    </div>
+  </div>
+</div>
+
+</div>
+
+{/* Usage example */}
+<div style={{
+  marginTop: 'var(--hx-space-6, 1.5rem)',
+  padding: 'var(--hx-space-5, 1.25rem)',
+  background: 'var(--hx-color-neutral-800, #212529)',
+  borderRadius: 'var(--hx-border-radius-lg, 0.5rem)',
+  maxWidth: '640px',
+  overflowX: 'auto'
+}}>
+  <div style={{
+    fontFamily: 'var(--hx-font-family-mono, monospace)',
+    fontSize: 'var(--hx-font-size-xs, 0.75rem)',
+    lineHeight: 'var(--hx-line-height-relaxed, 1.75)',
+    color: 'var(--hx-color-neutral-300, #ced4da)'
+  }}>
+    <div>
+      <span style={{ color: 'var(--hx-color-neutral-500, #6c757d)' }}>{'/* Component-level token with semantic fallback */'}</span>
+    </div>
+    <div><span style={{ color: 'var(--hx-color-primary-300, #4da9a9)' }}>:host</span> {'{'}</div>
+    <div>
+      &nbsp;&nbsp;<span style={{ color: 'var(--hx-color-neutral-400, #adb5bd)' }}>--_bg</span>:
+      {' '}<span style={{ color: 'var(--hx-color-warning-500, #ffc107)' }}>var</span>(<span style={{ color: 'var(--hx-color-neutral-200, #dee2e6)' }}>--hx-button-bg</span>, <span style={{ color: 'var(--hx-color-warning-500, #ffc107)' }}>var</span>(<span style={{ color: 'var(--hx-color-neutral-200, #dee2e6)' }}>--hx-color-primary</span>));
+    </div>
+    <div>{'}'}</div>
+  </div>
+</div>
+
+</section>
+
+{/* ═══ Quick Links ══════════════════════════════════════ */}
+<section style={{ marginBottom: 'var(--hx-space-12, 3rem)' }}>
+## Quick Links
+
+  <div style={{
+    display: 'grid',
+    gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
+    gap: 'var(--hx-space-6, 1.5rem)'
+  }}>
+
+{/* Design Tokens card */}
+<div style={{
+  padding: 'var(--hx-space-6, 1.5rem)',
+  background: 'var(--hx-color-neutral-0, #ffffff)',
+  borderRadius: 'var(--hx-border-radius-lg, 0.5rem)',
+  border: 'var(--hx-border-width-thin, 1px) solid var(--hx-color-neutral-200, #dee2e6)',
+  boxShadow: 'var(--hx-shadow-sm, 0 1px 2px 0 rgb(0 0 0 / 0.05))'
+}}>
+  <div style={{ marginBottom: 'var(--hx-space-3, 0.75rem)' }}>
+    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--hx-color-primary-500)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="13.5" cy="6.5" r="2.5" />
+      <circle cx="19" cy="13" r="2.5" />
+      <circle cx="16" cy="20" r="2.5" />
+      <circle cx="7.5" cy="20" r="2.5" />
+      <circle cx="5" cy="13" r="2.5" />
+      <circle cx="12" cy="12" r="3" />
+    </svg>
+  </div>
+  <h3 id="design-tokens" style={{
+    fontSize: 'var(--hx-font-size-lg, 1.125rem)',
+    fontWeight: 'var(--hx-font-weight-semibold, 600)',
+    color: 'var(--hx-color-neutral-800, #212529)',
+    margin: '0 0 var(--hx-space-2, 0.5rem) 0'
+  }}>
+    Design Tokens
+  </h3>
+  <p style={{
+    fontSize: 'var(--hx-font-size-sm, 0.875rem)',
+    color: 'var(--hx-color-neutral-500, #6c757d)',
+    margin: '0 0 var(--hx-space-3, 0.75rem) 0',
+    lineHeight: 'var(--hx-line-height-relaxed, 1.75)'
+  }}>
+    Explore the complete token system: colors, spacing, typography, borders, and shadows.
+  </p>
+  <p style={{
+    fontSize: 'var(--hx-font-size-xs, 0.75rem)',
+    color: 'var(--hx-color-primary-600, #006868)',
+    margin: 0,
+    fontWeight: 'var(--hx-font-weight-medium, 500)'
+  }}>
+    Browse Design Tokens in the sidebar
+  </p>
+</div>
+
+{/* Component API card */}
+<div style={{
+  padding: 'var(--hx-space-6, 1.5rem)',
+  background: 'var(--hx-color-neutral-0, #ffffff)',
+  borderRadius: 'var(--hx-border-radius-lg, 0.5rem)',
+  border: 'var(--hx-border-width-thin, 1px) solid var(--hx-color-neutral-200, #dee2e6)',
+  boxShadow: 'var(--hx-shadow-sm, 0 1px 2px 0 rgb(0 0 0 / 0.05))'
+}}>
+  <div style={{ marginBottom: 'var(--hx-space-3, 0.75rem)' }}>
+    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--hx-color-primary-500)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="3" y="3" width="7" height="7" rx="1" />
+      <rect x="14" y="3" width="7" height="7" rx="1" />
+      <rect x="3" y="14" width="7" height="7" rx="1" />
+      <rect x="14" y="14" width="7" height="7" rx="1" />
+    </svg>
+  </div>
+  <h3 id="component-api" style={{
+    fontSize: 'var(--hx-font-size-lg, 1.125rem)',
+    fontWeight: 'var(--hx-font-weight-semibold, 600)',
+    color: 'var(--hx-color-neutral-800, #212529)',
+    margin: '0 0 var(--hx-space-2, 0.5rem) 0'
+  }}>
+    Component API
+  </h3>
+  <p style={{
+    fontSize: 'var(--hx-font-size-sm, 0.875rem)',
+    color: 'var(--hx-color-neutral-500, #6c757d)',
+    margin: '0 0 var(--hx-space-3, 0.75rem) 0',
+    lineHeight: 'var(--hx-line-height-relaxed, 1.75)'
+  }}>
+    Each component's Docs tab shows the full API: properties, events, CSS custom properties, CSS parts, and slots.
+  </p>
+  <p style={{
+    fontSize: 'var(--hx-font-size-xs, 0.75rem)',
+    color: 'var(--hx-color-primary-600, #006868)',
+    margin: 0,
+    fontWeight: 'var(--hx-font-weight-medium, 500)'
+  }}>
+    Select any component, then click the Docs tab
+  </p>
+</div>
+
+{/* Platform Documentation card */}
+<div style={{
+  padding: 'var(--hx-space-6, 1.5rem)',
+  background: 'var(--hx-color-neutral-0, #ffffff)',
+  borderRadius: 'var(--hx-border-radius-lg, 0.5rem)',
+  border: 'var(--hx-border-width-thin, 1px) solid var(--hx-color-neutral-200, #dee2e6)',
+  boxShadow: 'var(--hx-shadow-sm, 0 1px 2px 0 rgb(0 0 0 / 0.05))'
+}}>
+  <div style={{ marginBottom: 'var(--hx-space-3, 0.75rem)' }}>
+    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--hx-color-primary-500)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z" />
+      <path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z" />
+      <path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0" />
+      <path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5" />
+    </svg>
+  </div>
+  <h3 id="platform-documentation" style={{
+    fontSize: 'var(--hx-font-size-lg, 1.125rem)',
+    fontWeight: 'var(--hx-font-weight-semibold, 600)',
+    color: 'var(--hx-color-neutral-800, #212529)',
+    margin: '0 0 var(--hx-space-2, 0.5rem) 0'
+  }}>
+    Platform Documentation
+  </h3>
+  <p style={{
+    fontSize: 'var(--hx-font-size-sm, 0.875rem)',
+    color: 'var(--hx-color-neutral-500, #6c757d)',
+    margin: '0 0 var(--hx-space-3, 0.75rem) 0',
+    lineHeight: 'var(--hx-line-height-relaxed, 1.75)'
+  }}>
+    Full architecture docs, integration guides, and architecture decision records.
+  </p>
+  <p style={{
+    fontSize: 'var(--hx-font-size-xs, 0.75rem)',
+    color: 'var(--hx-color-primary-600, #006868)',
+    margin: 0,
+    fontWeight: 'var(--hx-font-weight-medium, 500)'
+  }}>
+    Available at the Documentation site
+  </p>
+</div>
+
+{/* Admin Dashboard card */}
+<div style={{
+  padding: 'var(--hx-space-6, 1.5rem)',
+  background: 'var(--hx-color-neutral-0, #ffffff)',
+  borderRadius: 'var(--hx-border-radius-lg, 0.5rem)',
+  border: 'var(--hx-border-width-thin, 1px) solid var(--hx-color-neutral-200, #dee2e6)',
+  boxShadow: 'var(--hx-shadow-sm, 0 1px 2px 0 rgb(0 0 0 / 0.05))'
+}}>
+  <div style={{ marginBottom: 'var(--hx-space-3, 0.75rem)' }}>
+    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--hx-color-primary-600)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+      <path d="m9 12 2 2 4-4" />
+    </svg>
+  </div>
+  <h3 id="admin-dashboard" style={{
+    fontSize: 'var(--hx-font-size-lg, 1.125rem)',
+    fontWeight: 'var(--hx-font-weight-semibold, 600)',
+    color: 'var(--hx-color-neutral-800, #212529)',
+    margin: '0 0 var(--hx-space-2, 0.5rem) 0'
+  }}>
+    Admin Dashboard
+  </h3>
+  <p style={{
+    fontSize: 'var(--hx-font-size-sm, 0.875rem)',
+    color: 'var(--hx-color-neutral-500, #6c757d)',
+    margin: '0 0 var(--hx-space-3, 0.75rem) 0',
+    lineHeight: 'var(--hx-line-height-relaxed, 1.75)'
+  }}>
+    Component health scores, test results, and platform roadmap.
+  </p>
+  <p style={{
+    fontSize: 'var(--hx-font-size-xs, 0.75rem)',
+    color: 'var(--hx-color-primary-600, #006868)',
+    margin: 0,
+    fontWeight: 'var(--hx-font-weight-medium, 500)'
+  }}>
+    Available at the Panopticon admin portal
+  </p>
+</div>
+
+  </div>
+</section>
+
+{/* ═══ Footer ═════════════════════════════════════════════ */}
+<footer style={{
+  paddingTop: 'var(--hx-space-8, 2rem)',
+  borderTop: 'var(--hx-border-width-thin, 1px) solid var(--hx-color-neutral-200, #dee2e6)',
+  textAlign: 'center'
+}}>
+  <p style={{
+    fontSize: 'var(--hx-font-size-sm, 0.875rem)',
+    color: 'var(--hx-color-neutral-400, #adb5bd)',
+    margin: 0
+  }}>
+    HELIX Design System &middot; Storybook 10 &middot; Enterprise Web Components
+  </p>
+</footer>
+
+</div>

@@ -1,19 +1,66 @@
 ---
-title: "wc-badge"
+title: "hx-badge"
 description: A small status indicator for notifications, counts, and labels.
 ---
 
 import ComponentLoader from '../../../components/ComponentLoader.astro';
+import ComponentDemo from '../../../components/ComponentDemo.astro';
 import ComponentDoc from '../../../components/ComponentDoc.astro';
 
 <ComponentLoader />
 
-<ComponentDoc tagName="wc-badge" section="summary" />
+<ComponentDoc tagName="hx-badge" section="summary" />
 
-## Overview
+## Variants
 
-A small status indicator for notifications, counts, and labels.
+Visual styles for different semantic contexts.
+
+<ComponentDemo title="Variants">
+  <div style="display: flex; gap: 0.75rem; flex-wrap: wrap; align-items: center;">
+    <hx-badge variant="primary">Primary</hx-badge>
+    <hx-badge variant="success">Success</hx-badge>
+    <hx-badge variant="warning">Warning</hx-badge>
+    <hx-badge variant="error">Error</hx-badge>
+    <hx-badge variant="neutral">Neutral</hx-badge>
+  </div>
+</ComponentDemo>
+
+## Sizes
+
+Small, medium, and large badge sizes.
+
+<ComponentDemo title="Sizes">
+  <div style="display: flex; gap: 0.75rem; flex-wrap: wrap; align-items: center;">
+    <hx-badge hx-size="sm">Small</hx-badge>
+    <hx-badge hx-size="md">Medium</hx-badge>
+    <hx-badge hx-size="lg">Large</hx-badge>
+  </div>
+</ComponentDemo>
+
+## Pill Shape
+
+Fully rounded pill badges.
+
+<ComponentDemo title="Pill Shape">
+  <div style="display: flex; gap: 0.75rem; flex-wrap: wrap; align-items: center;">
+    <hx-badge variant="primary" pill>Primary</hx-badge>
+    <hx-badge variant="success" pill>Active</hx-badge>
+    <hx-badge variant="error" pill>Critical</hx-badge>
+  </div>
+</ComponentDemo>
+
+## Pulse Animation
+
+Animated pulse effect for attention-demanding indicators.
+
+<ComponentDemo title="Pulse Animation">
+  <div style="display: flex; gap: 0.75rem; flex-wrap: wrap; align-items: center;">
+    <hx-badge variant="error" pulse>3</hx-badge>
+    <hx-badge variant="success" pulse>Live</hx-badge>
+    <hx-badge variant="warning" pulse pill>Alert</hx-badge>
+  </div>
+</ComponentDemo>
 
 ## API Reference
 
-<ComponentDoc tagName="wc-badge" section="api" />
+<ComponentDoc tagName="hx-badge" section="api" />

@@ -12,13 +12,15 @@ The `Breadcrumb` component provides hierarchical navigation for the Admin Dashbo
 ### Manual Breadcrumb Items
 
 ```tsx
-import { Breadcrumb } from "@/components/dashboard/Breadcrumb";
+import { Breadcrumb } from '@/components/dashboard/Breadcrumb';
 
-<Breadcrumb items={[
-  { label: 'Home', href: '/' },
-  { label: 'Components', href: '/components' },
-  { label: 'wc-button' } // Current page (no href)
-]} />
+<Breadcrumb
+  items={[
+    { label: 'Home', href: '/' },
+    { label: 'Components', href: '/components' },
+    { label: 'hx-button' }, // Current page (no href)
+  ]}
+/>;
 ```
 
 ### Using Utility Functions
@@ -26,8 +28,8 @@ import { Breadcrumb } from "@/components/dashboard/Breadcrumb";
 #### Component Detail Pages
 
 ```tsx
-import { Breadcrumb } from "@/components/dashboard/Breadcrumb";
-import { getComponentBreadcrumbs } from "@/lib/breadcrumb-utils";
+import { Breadcrumb } from '@/components/dashboard/Breadcrumb';
+import { getComponentBreadcrumbs } from '@/lib/breadcrumb-utils';
 
 export default function ComponentDetailPage({ params }) {
   const { tag } = await params;
@@ -41,18 +43,18 @@ export default function ComponentDetailPage({ params }) {
 }
 ```
 
-**Output**: Home / Components / wc-button
+**Output**: Home / Components / hx-button
 
 #### Token Sub-Pages
 
 ```tsx
-import { Breadcrumb } from "@/components/dashboard/Breadcrumb";
-import { getTokenBreadcrumbs } from "@/lib/breadcrumb-utils";
+import { Breadcrumb } from '@/components/dashboard/Breadcrumb';
+import { getTokenBreadcrumbs } from '@/lib/breadcrumb-utils';
 
 export default function ColorsPage() {
   return (
     <div>
-      <Breadcrumb items={getTokenBreadcrumbs("colors")} />
+      <Breadcrumb items={getTokenBreadcrumbs('colors')} />
       {/* Rest of page */}
     </div>
   );
@@ -64,13 +66,13 @@ export default function ColorsPage() {
 #### Generic Routes
 
 ```tsx
-import { Breadcrumb } from "@/components/dashboard/Breadcrumb";
-import { getBreadcrumbItems } from "@/lib/breadcrumb-utils";
+import { Breadcrumb } from '@/components/dashboard/Breadcrumb';
+import { getBreadcrumbItems } from '@/lib/breadcrumb-utils';
 
 export default function ComponentsPage() {
   return (
     <div>
-      <Breadcrumb items={getBreadcrumbItems("/components")} />
+      <Breadcrumb items={getBreadcrumbItems('/components')} />
       {/* Rest of page */}
     </div>
   );
@@ -83,7 +85,7 @@ export default function ComponentsPage() {
 
 - **Home page** (`/`): No breadcrumb is rendered
 - **Top-level pages** (e.g., `/components`, `/tests`): Shows "Home / {Page Name}"
-- **Component detail** (e.g., `/components/wc-badge`): Shows "Home / Components / wc-badge"
+- **Component detail** (e.g., `/components/hx-badge`): Shows "Home / Components / hx-badge"
 - **Token sub-pages** (e.g., `/tokens/colors`): Shows "Home / Tokens / Colors"
 
 ## Accessibility
@@ -106,18 +108,18 @@ Supported routes are defined in `/apps/admin/src/lib/breadcrumb-utils.ts`:
 
 ```typescript
 const ROUTE_LABELS: Record<string, string> = {
-  "/": "Home",
-  "/components": "Components",
-  "/tests": "Test Theater",
-  "/tokens": "Tokens",
-  "/tokens/colors": "Colors",
-  "/tokens/spacing": "Spacing",
-  "/tokens/typography": "Typography",
-  "/tokens/borders": "Borders",
-  "/tokens/shadows": "Shadows",
-  "/tokens/utilities": "Utilities",
-  "/pipeline": "Pipeline",
-  "/architecture": "Architecture",
+  '/': 'Home',
+  '/components': 'Components',
+  '/tests': 'Test Theater',
+  '/tokens': 'Tokens',
+  '/tokens/colors': 'Colors',
+  '/tokens/spacing': 'Spacing',
+  '/tokens/typography': 'Typography',
+  '/tokens/borders': 'Borders',
+  '/tokens/shadows': 'Shadows',
+  '/tokens/utilities': 'Utilities',
+  '/pipeline': 'Pipeline',
+  '/architecture': 'Architecture',
 };
 ```
 
@@ -141,14 +143,14 @@ To add new routes, update this configuration.
 ### Adding to a New Page
 
 ```tsx
-import { Breadcrumb } from "@/components/dashboard/Breadcrumb";
-import { getBreadcrumbItems } from "@/lib/breadcrumb-utils";
+import { Breadcrumb } from '@/components/dashboard/Breadcrumb';
+import { getBreadcrumbItems } from '@/lib/breadcrumb-utils';
 
 export default function MyNewPage() {
   return (
     <div className="space-y-8">
       <div>
-        <Breadcrumb items={getBreadcrumbItems("/my-route")} />
+        <Breadcrumb items={getBreadcrumbItems('/my-route')} />
         <h1 className="text-2xl font-bold tracking-tight">My Page Title</h1>
         <p className="text-muted-foreground mt-1">Page description</p>
       </div>
@@ -174,6 +176,6 @@ export interface BreadcrumbProps {
 ## Notes
 
 - The breadcrumb automatically hides if there's only one item (just Home)
-- Component tags (starting with `wc-`) are preserved as-is
+- Component tags (starting with `hx-`) are preserved as-is
 - Other segments are automatically formatted (kebab-case to Title Case)
 - The last item in the breadcrumb is always the current page and is non-interactive

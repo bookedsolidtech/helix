@@ -59,7 +59,7 @@ function getIconComponent(iconType?: BreadcrumbIconType): React.ReactNode {
  * <Breadcrumb items={[
  *   { label: 'Home', href: '/', iconType: 'home' },
  *   { label: 'Components', href: '/components', iconType: 'components' },
- *   { label: 'wc-button', iconType: 'component-tag' } // Current page, no href
+ *   { label: 'hx-button', iconType: 'component-tag' } // Current page, no href
  * ]} />
  * ```
  */

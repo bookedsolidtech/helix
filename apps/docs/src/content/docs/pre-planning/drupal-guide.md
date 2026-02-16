@@ -55,18 +55,18 @@ The Web Component library has **zero knowledge of Drupal**. It is a standalone p
 
 ### Component Prefix
 
-All components use the `wc-` prefix (Web Components). Every HTML tag starts with `wc-`:
+All components use the `hx-` prefix (HELIX). Every HTML tag starts with `hx-`:
 
 ```html
-<wc-content-card>
-  <wc-button>
-    <wc-hero-banner> <wc-text-input></wc-text-input></wc-hero-banner></wc-button
-></wc-content-card>
+<hx-content-card>
+  <hx-button>
+    <hx-hero-banner> <hx-text-input></hx-text-input></hx-hero-banner></hx-button
+></hx-content-card>
 ```
 
 ### Token Prefix
 
-All CSS custom properties use the `--hds-` prefix (Healthcare Design System) for semantic and component tokens:
+All CSS custom properties use the `--hds-` prefix (HELIX Design System) for semantic and component tokens:
 
 ```css
 --hds-color-surface-primary
@@ -138,7 +138,7 @@ Attach the library globally in your theme's `.info.yml`:
 
 ```yaml
 # mytheme.info.yml
-name: My Healthcare Theme
+name: My Enterprise Theme
 type: theme
 base theme: false
 core_version_requirement: ^10.3 || ^11
@@ -166,7 +166,7 @@ In the browser, open DevTools and verify:
 
 - `tokens.css` is loaded and `:root` contains `--hds-*` custom properties
 - `index.js` is loaded with `type="module"`
-- Custom elements are registered: `document.querySelector('wc-content-card')` returns an element (if one exists on the page)
+- Custom elements are registered: `document.querySelector('hx-content-card')` returns an element (if one exists on the page)
 
 #### Alternative: Composer + Asset Packagist
 
@@ -209,7 +209,7 @@ For prototyping, proof-of-concept work, or environments without a Node.js build 
 
 #### Self-Hosted CDN (Recommended for Production)
 
-For healthcare deployments, self-host the assets on your own CDN (e.g., CloudFront, Akamai) for security and availability guarantees:
+For enterprise deployments, self-host the assets on your own CDN (e.g., CloudFront, Akamai) for security and availability guarantees:
 
 ```yaml
 # mytheme.libraries.yml
@@ -218,14 +218,14 @@ hds-tokens-cdn:
   version: VERSION
   css:
     theme:
-      https://cdn.yourhealthcare.org/wc-library/1.0.0/styles/tokens.css:
+      https://cdn.yourorganization.com/wc-library/1.0.0/styles/tokens.css:
         type: external
         minified: true
 
 hds-components-cdn:
   version: VERSION
   js:
-    https://cdn.yourhealthcare.org/wc-library/1.0.0/index.js:
+    https://cdn.yourorganization.com/wc-library/1.0.0/index.js:
       type: external
       attributes:
         type: module
@@ -282,23 +282,23 @@ For organizations that prefer Drupal-native package management, wrap the library
 #### Module Structure
 
 ```
-modules/custom/wc_components/
-  wc_components.info.yml
-  wc_components.libraries.yml
-  wc_components.module
+modules/custom/helix_components/
+  helix_components.info.yml
+  helix_components.libraries.yml
+  helix_components.module
   dist/
     index.js                    # Copied from @org/wc-library/dist
     styles/
       tokens.css                # Copied from @org/wc-library/dist/styles
   config/
     install/
-      wc_components.settings.yml
+      helix_components.settings.yml
 ```
 
 #### Module Definition
 
 ```yaml
-# wc_components.info.yml
+# helix_components.info.yml
 name: 'WC Web Components'
 type: module
 description: 'Provides the WC Web Component library'
@@ -309,8 +309,8 @@ core_version_requirement: ^10.3 || ^11
 #### Module Libraries
 
 ```yaml
-# wc_components.libraries.yml
-wc-tokens:
+# helix_components.libraries.yml
+helix-tokens:
   version: VERSION
   css:
     theme:
@@ -318,7 +318,7 @@ wc-tokens:
         minified: true
         preprocess: false
 
-wc-components:
+helix-components:
   version: VERSION
   js:
     dist/index.js:
@@ -326,25 +326,25 @@ wc-components:
       minified: true
       preprocess: false
   dependencies:
-    - wc_components/wc-tokens
+    - helix_components/helix-tokens
 ```
 
 #### Module Hook Implementation
 
 ```php
 <?php
-// wc_components.module
+// helix_components.module
 
 /**
  * Implements hook_page_attachments().
  *
  * Attach the Web Component library globally.
  */
-function wc_components_page_attachments(array &$attachments): void {
-  $config = \Drupal::config('wc_components.settings');
+function helix_components_page_attachments(array &$attachments): void {
+  $config = \Drupal::config('helix_components.settings');
 
   if ($config->get('load_globally')) {
-    $attachments['#attached']['library'][] = 'wc_components/wc-components';
+    $attachments['#attached']['library'][] = 'helix_components/helix-components';
   }
 }
 
@@ -353,18 +353,18 @@ function wc_components_page_attachments(array &$attachments): void {
  *
  * Allow CDN override via module settings.
  */
-function wc_components_library_info_alter(array &$libraries, string $extension): void {
-  if ($extension !== 'wc_components') {
+function helix_components_library_info_alter(array &$libraries, string $extension): void {
+  if ($extension !== 'helix_components') {
     return;
   }
 
-  $config = \Drupal::config('wc_components.settings');
+  $config = \Drupal::config('helix_components.settings');
   $cdn_url = $config->get('cdn_url');
 
-  if ($cdn_url && isset($libraries['wc-components'])) {
+  if ($cdn_url && isset($libraries['helix-components'])) {
     // Replace local paths with CDN URLs
     $version = $config->get('version') ?? '1.0.0';
-    $libraries['wc-components']['js'] = [
+    $libraries['helix-components']['js'] = [
       "{$cdn_url}/{$version}/index.js" => [
         'type' => 'external',
         'attributes' => ['type' => 'module', 'crossorigin' => 'anonymous'],
@@ -386,17 +386,17 @@ Web Components are standard HTML elements. Use them in TWIG exactly as you would
 
 ```twig
 {# Basic button #}
-<wc-button variant="primary">
+<hx-button variant="primary">
   Schedule Appointment
-</wc-button>
+</hx-button>
 
 {# Badge with dynamic content #}
-<wc-badge variant="success">
+<hx-badge variant="success">
   {{ 'Published'|t }}
-</wc-badge>
+</hx-badge>
 
 {# Icon with attribute #}
-<wc-icon name="calendar" size="24"></wc-icon>
+<hx-icon name="calendar" size="24"></hx-icon>
 ```
 
 ### 3.2 Attribute Binding with TWIG Variables
@@ -405,7 +405,7 @@ Map Drupal variables to component attributes:
 
 ```twig
 {# Map node data to component attributes #}
-<wc-content-card
+<hx-content-card
   heading="{{ node.label }}"
   summary="{{ node.field_summary.value }}"
   category="{{ node.field_category.entity.label }}"
@@ -415,7 +415,7 @@ Map Drupal variables to component attributes:
   variant="{{ node.isPromoted() ? 'featured' : 'default' }}"
 >
   {{ content.body }}
-</wc-content-card>
+</hx-content-card>
 ```
 
 **Important TWIG escaping note**: TWIG auto-escapes variables by default, which is correct for HTML attribute values. Do not use `|raw` in attribute values -- it introduces XSS vulnerabilities.
@@ -425,7 +425,7 @@ Map Drupal variables to component attributes:
 Slots are the primary mechanism for injecting Drupal-rendered content into Web Components. Named slots use the `slot` attribute on child elements:
 
 ```twig
-<wc-article-layout has-sidebar>
+<hx-article-layout has-sidebar>
   {# Named slot: breadcrumb #}
   <nav slot="breadcrumb" aria-label="Breadcrumb">
     {{ drupal_block('system_breadcrumb_block') }}
@@ -461,7 +461,7 @@ Slots are the primary mechanism for injecting Drupal-rendered content into Web C
   <div slot="footer">
     {{ content.field_tags }}
   </div>
-</wc-article-layout>
+</hx-article-layout>
 ```
 
 ### 3.4 Conditional Rendering
@@ -471,27 +471,27 @@ Show or hide components based on Drupal data:
 ```twig
 {# Only render the hero banner if a hero image exists #}
 {% if node.field_hero_image.entity %}
-  <wc-hero-banner
+  <hx-hero-banner
     heading="{{ node.label }}"
     subheading="{{ node.field_subtitle.value }}"
     image-src="{{ file_url(node.field_hero_image.entity.fileuri) }}"
     image-alt="{{ node.field_hero_image.alt }}"
   >
     {% if node.field_cta_text.value %}
-      <wc-button slot="cta" variant="primary" href="{{ node.field_cta_url.0.url }}">
+      <hx-button slot="cta" variant="primary" href="{{ node.field_cta_url.0.url }}">
         {{ node.field_cta_text.value }}
-      </wc-button>
+      </hx-button>
     {% endif %}
-  </wc-hero-banner>
+  </hx-hero-banner>
 {% endif %}
 
 {# Conditionally apply variants #}
-<wc-alert
+<hx-alert
   variant="{{ node.field_urgency.value == 'high' ? 'danger' : 'info' }}"
   {% if node.field_dismissible.value %}dismissible{% endif %}
 >
   {{ content.field_alert_message }}
-</wc-alert>
+</hx-alert>
 ```
 
 ### 3.5 Loops -- Rendering Multiple Instances from Entities
@@ -501,19 +501,19 @@ Render collections of components from Drupal entity references or Views results:
 ```twig
 {# Render a card grid from a multi-value entity reference field #}
 {% if node.field_related_articles|length > 0 %}
-  <wc-card-grid columns="3" gap="lg">
+  <hx-card-grid columns="3" gap="lg">
     {% for item in node.field_related_articles %}
       {% set related = item.entity %}
-      <wc-content-card
+      <hx-content-card
         heading="{{ related.label }}"
         summary="{{ related.field_summary.value|length > 150 ? related.field_summary.value|slice(0, 150) ~ '...' : related.field_summary.value }}"
         category="{{ related.field_category.entity.label }}"
         href="{{ path('entity.node.canonical', {'node': related.id}) }}"
         publish-date="{{ related.getCreatedTime()|date('c') }}"
         variant="compact"
-      ></wc-content-card>
+      ></hx-content-card>
     {% endfor %}
-  </wc-card-grid>
+  </hx-card-grid>
 {% endif %}
 ```
 
@@ -565,7 +565,7 @@ Then the TWIG template becomes clean:
 {# node--article--teaser.html.twig #}
 {{ attach_library('mytheme/hds-components') }}
 
-<wc-content-card
+<hx-content-card
   heading="{{ wc_card.heading }}"
   summary="{{ wc_card.summary }}"
   category="{{ wc_card.category }}"
@@ -583,7 +583,7 @@ Then the TWIG template becomes clean:
       decoding="async"
     />
   {% endif %}
-</wc-content-card>
+</hx-content-card>
 ```
 
 ### 3.7 Render Arrays -- Using `#type = 'html_tag'`
@@ -596,7 +596,7 @@ For programmatic component rendering in PHP (e.g., custom blocks, form elements)
 // Build a content card as a render array
 $build['card'] = [
   '#type' => 'html_tag',
-  '#tag' => 'wc-content-card',
+  '#tag' => 'hx-content-card',
   '#attributes' => [
     'heading' => $node->label(),
     'summary' => $node->get('field_summary')->value,
@@ -629,7 +629,7 @@ $build['card'] = [
 
 ### 4.1 Article Teaser (`node--article--teaser.html.twig`)
 
-This is the most common integration point. The article teaser maps Drupal's article content type to the `wc-content-card` component.
+This is the most common integration point. The article teaser maps Drupal's article content type to the `hx-content-card` component.
 
 ```twig
 {#
@@ -637,7 +637,7 @@ This is the most common integration point. The article teaser maps Drupal's arti
  * @file
  * Theme override for article nodes in teaser view mode.
  *
- * Maps Drupal article fields to the wc-content-card Web Component.
+ * Maps Drupal article fields to the hx-content-card Web Component.
  *
  * Required fields:
  *   - title (core)
@@ -665,7 +665,7 @@ This is the most common integration point. The article teaser maps Drupal's arti
 {%- set card_variant = is_promoted ? 'featured' : 'default' -%}
 
 {# ---- Component output ---- #}
-<wc-content-card
+<hx-content-card
   heading="{{ card_heading }}"
   summary="{{ card_summary }}"
   category="{{ card_category }}"
@@ -688,7 +688,7 @@ This is the most common integration point. The article teaser maps Drupal's arti
       {{ content.field_tags }}
     </div>
   {% endif %}
-</wc-content-card>
+</hx-content-card>
 ```
 
 **Responsive image handling**: If `field_media` is configured with a responsive image style in Drupal, the rendered output will include `<picture>` with `<source>` elements and proper `srcset` attributes. This works correctly inside the `slot="media"` -- the browser handles responsive image selection regardless of Shadow DOM boundaries.
@@ -703,7 +703,7 @@ The full article view uses multiple Web Components for the page layout:
  * @file
  * Theme override for article nodes in full view mode.
  *
- * Uses wc-article-layout for page structure, with named slots
+ * Uses hx-article-layout for page structure, with named slots
  * for hero, breadcrumb, author, sidebar, and footer content.
  */
 #}
@@ -712,18 +712,18 @@ The full article view uses multiple Web Components for the page layout:
 
 {# ---- Hero Section ---- #}
 {% if content.field_hero_image|render|trim is not empty %}
-  <wc-hero-banner
+  <hx-hero-banner
     heading="{{ label[0]['#title']|default(node.label) }}"
     subheading="{{ content.field_subtitle|render|striptags|trim }}"
   >
     <div slot="media">
       {{ content.field_hero_image }}
     </div>
-  </wc-hero-banner>
+  </hx-hero-banner>
 {% endif %}
 
 {# ---- Article Layout ---- #}
-<wc-article-layout
+<hx-article-layout
   has-sidebar="{{ content.field_related_articles|render|trim is not empty ? 'true' : '' }}"
 >
   {# Breadcrumb slot #}
@@ -735,14 +735,14 @@ The full article view uses multiple Web Components for the page layout:
   {% if content.field_author|render|trim is not empty %}
     <div slot="author">
       {% set author = node.field_author.entity %}
-      <wc-media-object>
+      <hx-media-object>
         {% if author.field_avatar.entity %}
-          <wc-avatar
+          <hx-avatar
             slot="media"
             src="{{ file_url(author.field_avatar.entity.fileuri) }}"
             alt="{{ author.label }}"
             size="md"
-          ></wc-avatar>
+          ></hx-avatar>
         {% endif %}
         <div>
           <strong>{{ author.label }}</strong>
@@ -753,7 +753,7 @@ The full article view uses multiple Web Components for the page layout:
             <span>&middot; {{ node.field_read_time.value }} {{ 'min read'|t }}</span>
           {% endif %}
         </div>
-      </wc-media-object>
+      </hx-media-object>
     </div>
   {% endif %}
 
@@ -763,13 +763,13 @@ The full article view uses multiple Web Components for the page layout:
 
     {# Inline components for rich content sections #}
     {% if content.field_faq|render|trim is not empty %}
-      <wc-accordion>
+      <hx-accordion>
         {% for item in node.field_faq %}
-          <wc-accordion-item heading="{{ item.field_question.value }}">
+          <hx-accordion-item heading="{{ item.field_question.value }}">
             {{ item.field_answer.value|raw }}
-          </wc-accordion-item>
+          </hx-accordion-item>
         {% endfor %}
-      </wc-accordion>
+      </hx-accordion>
     {% endif %}
   </div>
 
@@ -779,11 +779,11 @@ The full article view uses multiple Web Components for the page layout:
       <h3>{{ 'Related Articles'|t }}</h3>
       {% for item in node.field_related_articles %}
         {% set related = item.entity %}
-        <wc-content-card
+        <hx-content-card
           heading="{{ related.label }}"
           href="{{ path('entity.node.canonical', {'node': related.id}) }}"
           variant="compact"
-        ></wc-content-card>
+        ></hx-content-card>
       {% endfor %}
     </div>
   {% endif %}
@@ -796,7 +796,7 @@ The full article view uses multiple Web Components for the page layout:
       </div>
     {% endif %}
   </div>
-</wc-article-layout>
+</hx-article-layout>
 ```
 
 ### 4.3 Landing Page with Paragraphs (`node--landing-page--full.html.twig`)
@@ -816,7 +816,7 @@ Landing pages use Drupal Paragraphs with dynamic component selection based on pa
 
 {{ attach_library('mytheme/hds-components') }}
 
-<wc-page-layout>
+<hx-page-layout>
   {# Hero section from landing page fields #}
   {% if content.field_hero|render|trim is not empty %}
     <div slot="hero">
@@ -826,14 +826,14 @@ Landing pages use Drupal Paragraphs with dynamic component selection based on pa
 
   {# Main content: iterate over paragraph items #}
   {{ content.field_sections }}
-</wc-page-layout>
+</hx-page-layout>
 ```
 
 Then create paragraph-specific templates that map to Web Components:
 
 ```twig
 {# paragraph--hero-banner.html.twig #}
-<wc-hero-banner
+<hx-hero-banner
   heading="{{ content.field_heading|render|striptags|trim }}"
   subheading="{{ content.field_subheading|render|striptags|trim }}"
   alignment="{{ content.field_alignment|render|striptags|trim|default('center') }}"
@@ -849,17 +849,17 @@ Then create paragraph-specific templates that map to Web Components:
       {{ content.field_cta }}
     </div>
   {% endif %}
-</wc-hero-banner>
+</hx-hero-banner>
 ```
 
 ```twig
 {# paragraph--card-grid.html.twig #}
 {% set columns = content.field_columns|render|striptags|trim|default('3') %}
 
-<wc-card-grid columns="{{ columns }}" gap="lg">
+<hx-card-grid columns="{{ columns }}" gap="lg">
   {% for item in paragraph.field_cards %}
     {% set card = item.entity %}
-    <wc-content-card
+    <hx-content-card
       heading="{{ card.field_heading.value }}"
       summary="{{ card.field_summary.value }}"
       href="{{ card.field_link.0.url }}"
@@ -873,33 +873,33 @@ Then create paragraph-specific templates that map to Web Components:
           loading="lazy"
         />
       {% endif %}
-    </wc-content-card>
+    </hx-content-card>
   {% endfor %}
-</wc-card-grid>
+</hx-card-grid>
 ```
 
 ```twig
 {# paragraph--faq-accordion.html.twig #}
-<wc-accordion>
+<hx-accordion>
   {% for item in paragraph.field_faq_items %}
     {% set faq = item.entity %}
-    <wc-accordion-item heading="{{ faq.field_question.value }}">
+    <hx-accordion-item heading="{{ faq.field_question.value }}">
       {{ faq.field_answer.value|raw }}
-    </wc-accordion-item>
+    </hx-accordion-item>
   {% endfor %}
-</wc-accordion>
+</hx-accordion>
 ```
 
 ```twig
 {# paragraph--tabbed-content.html.twig #}
-<wc-tabs>
+<hx-tabs>
   {% for item in paragraph.field_tabs %}
     {% set tab = item.entity %}
-    <wc-tab-item label="{{ tab.field_tab_label.value }}">
+    <hx-tab-item label="{{ tab.field_tab_label.value }}">
       {{ tab.field_tab_content.value|raw }}
-    </wc-tab-item>
+    </hx-tab-item>
   {% endfor %}
-</wc-tabs>
+</hx-tabs>
 ```
 
 ### 4.4 Layout Builder Integration
@@ -908,14 +908,14 @@ If your site uses Drupal's Layout Builder, Web Components can be used within lay
 
 ```twig
 {# layout--twocol-section.html.twig -- Layout Builder section override #}
-<wc-page-layout>
+<hx-page-layout>
   <div slot="main">
     {{ content.first }}
   </div>
   <div slot="sidebar">
     {{ content.second }}
   </div>
-</wc-page-layout>
+</hx-page-layout>
 ```
 
 For custom Layout Builder blocks:
@@ -940,7 +940,7 @@ class FeaturedContentBlock extends BlockBase {
   public function build(): array {
     return [
       '#type' => 'html_tag',
-      '#tag' => 'wc-card-grid',
+      '#tag' => 'hx-card-grid',
       '#attributes' => [
         'columns' => '3',
         'gap' => 'lg',
@@ -976,9 +976,9 @@ Override field templates to wrap field values in Web Components:
  */
 #}
 {% for item in items %}
-  <wc-badge variant="default" size="sm">
+  <hx-badge variant="default" size="sm">
     {{ item.content }}
-  </wc-badge>
+  </hx-badge>
 {% endfor %}
 ```
 
@@ -991,9 +991,9 @@ Override field templates to wrap field values in Web Components:
 #}
 <div class="tag-list" style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
   {% for item in items %}
-    <wc-tag>
+    <hx-tag>
       {{ item.content }}
-    </wc-tag>
+    </hx-tag>
   {% endfor %}
 </div>
 ```
@@ -1010,19 +1010,19 @@ For multi-value fields, loop over items and render each as a component:
  */
 #}
 {% if items|length > 0 %}
-  <wc-card-grid columns="{{ items|length >= 3 ? '3' : items|length }}" gap="md">
+  <hx-card-grid columns="{{ items|length >= 3 ? '3' : items|length }}" gap="md">
     {% for item in items %}
       {% set testimonial = item.content['#paragraph'] %}
-      <wc-content-card variant="default">
+      <hx-content-card variant="default">
         <blockquote>
           {{ testimonial.field_quote.value }}
         </blockquote>
         <div slot="actions">
           <cite>{{ testimonial.field_author_name.value }}</cite>
         </div>
-      </wc-content-card>
+      </hx-content-card>
     {% endfor %}
-  </wc-card-grid>
+  </hx-card-grid>
 {% endif %}
 ```
 
@@ -1137,7 +1137,7 @@ class WcContentCardFormatter extends FormatterBase {
 
       $elements[$delta] = [
         '#type' => 'html_tag',
-        '#tag' => 'wc-content-card',
+        '#tag' => 'hx-content-card',
         '#attributes' => $attributes,
         '#attached' => [
           'library' => ['mytheme/hds-components'],
@@ -1186,7 +1186,7 @@ class WcContentCardFormatter extends FormatterBase {
 
 ### 6.1 Custom Views Templates -- Card Grid
 
-Override the Views unformatted output to render results as a `wc-card-grid`:
+Override the Views unformatted output to render results as a `hx-card-grid`:
 
 ```twig
 {# views-view-unformatted--latest-articles.html.twig #}
@@ -1199,15 +1199,15 @@ Override the Views unformatted output to render results as a `wc-card-grid`:
 {{ attach_library('mytheme/hds-components') }}
 
 {% if rows|length > 0 %}
-  <wc-card-grid columns="3" gap="lg">
+  <hx-card-grid columns="3" gap="lg">
     {% for row in rows %}
       {{ row.content }}
     {% endfor %}
-  </wc-card-grid>
+  </hx-card-grid>
 {% else %}
-  <wc-alert variant="info">
+  <hx-alert variant="info">
     {{ 'No articles found.'|t }}
-  </wc-alert>
+  </hx-alert>
 {% endif %}
 ```
 
@@ -1217,7 +1217,7 @@ Then override the row template to render each result as a content card:
 {# views-view-fields--latest-articles.html.twig #}
 {#
 /**
- * Renders a single view row as a wc-content-card.
+ * Renders a single view row as a hx-content-card.
  *
  * Available fields (configured in the Views UI):
  *   - fields.title
@@ -1230,7 +1230,7 @@ Then override the row template to render each result as a content card:
  */
 #}
 
-<wc-content-card
+<hx-content-card
   heading="{{ fields.title.content|striptags|trim }}"
   summary="{{ fields.field_summary.content|striptags|trim }}"
   category="{{ fields.field_category.content|striptags|trim }}"
@@ -1243,7 +1243,7 @@ Then override the row template to render each result as a content card:
       {{ fields.field_media.content }}
     </div>
   {% endif %}
-</wc-content-card>
+</hx-content-card>
 ```
 
 ### 6.2 Views Field Rewrite
@@ -1257,30 +1257,30 @@ In the Views UI:
 3. On the last field, use "Rewrite results" with this custom text:
 
 ```html
-<wc-content-card
+<hx-content-card
   heading="{{ title }}"
   summary="{{ field_summary }}"
   category="{{ field_category }}"
   href="{{ view_node }}"
   publish-date="{{ created }}"
 >
-</wc-content-card>
+</hx-content-card>
 ```
 
 **Limitation**: Views field rewrite cannot handle conditional slot content (e.g., only showing an image if one exists). For conditional logic, use a custom Views row template instead.
 
 ### 6.3 Views Pager Integration
 
-Override the Views pager to use the `wc-pagination` component:
+Override the Views pager to use the `hx-pagination` component:
 
 ```twig
 {# views-mini-pager.html.twig #}
 {% if items.previous or items.next %}
-  <wc-pagination
+  <hx-pagination
     current-page="{{ items.current }}"
     {% if items.previous %}previous-url="{{ items.previous.url }}"{% endif %}
     {% if items.next %}next-url="{{ items.next.url }}"{% endif %}
-  ></wc-pagination>
+  ></hx-pagination>
 {% endif %}
 ```
 
@@ -1298,7 +1298,7 @@ use Drupal\views\Plugin\views\style\StylePluginBase;
 use Drupal\Core\Form\FormStateInterface;
 
 /**
- * Views style plugin that renders results in a wc-card-grid.
+ * Views style plugin that renders results in a hx-card-grid.
  *
  * @ViewsStyle(
  *   id = "wc_card_grid",
@@ -1366,17 +1366,17 @@ class WcCardGrid extends StylePluginBase {
 With the corresponding TWIG template:
 
 ```twig
-{# views-view-wc-card-grid.html.twig #}
+{# views-view-hx-card-grid.html.twig #}
 {{ attach_library('mytheme/hds-components') }}
 
-<wc-card-grid
+<hx-card-grid
   columns="{{ options.columns }}"
   gap="{{ options.gap }}"
 >
   {% for row in rows %}
     {{ row.content }}
   {% endfor %}
-</wc-card-grid>
+</hx-card-grid>
 ```
 
 ---
@@ -1398,7 +1398,7 @@ function mytheme_contact_form(array &$form, FormStateInterface $form_state): arr
 
   $form['name'] = [
     '#type' => 'html_tag',
-    '#tag' => 'wc-text-input',
+    '#tag' => 'hx-text-input',
     '#attributes' => [
       'name' => 'name',
       'label' => t('Full Name'),
@@ -1410,7 +1410,7 @@ function mytheme_contact_form(array &$form, FormStateInterface $form_state): arr
 
   $form['email'] = [
     '#type' => 'html_tag',
-    '#tag' => 'wc-text-input',
+    '#tag' => 'hx-text-input',
     '#attributes' => [
       'name' => 'email',
       'label' => t('Email Address'),
@@ -1422,7 +1422,7 @@ function mytheme_contact_form(array &$form, FormStateInterface $form_state): arr
 
   $form['phone'] = [
     '#type' => 'html_tag',
-    '#tag' => 'wc-text-input',
+    '#tag' => 'hx-text-input',
     '#attributes' => [
       'name' => 'phone',
       'label' => t('Phone Number'),
@@ -1433,7 +1433,7 @@ function mytheme_contact_form(array &$form, FormStateInterface $form_state): arr
 
   $form['message'] = [
     '#type' => 'html_tag',
-    '#tag' => 'wc-textarea',
+    '#tag' => 'hx-textarea',
     '#attributes' => [
       'name' => 'message',
       'label' => t('Your Message'),
@@ -1445,7 +1445,7 @@ function mytheme_contact_form(array &$form, FormStateInterface $form_state): arr
 
   $form['submit'] = [
     '#type' => 'html_tag',
-    '#tag' => 'wc-button',
+    '#tag' => 'hx-button',
     '#attributes' => [
       'type' => 'submit',
       'variant' => 'primary',
@@ -1476,7 +1476,7 @@ function mytheme_form_user_login_form_alter(array &$form, FormStateInterface $fo
   // Replace username field
   $form['name']['#theme_wrappers'] = [];
   $form['name']['#type'] = 'html_tag';
-  $form['name']['#tag'] = 'wc-text-input';
+  $form['name']['#tag'] = 'hx-text-input';
   $form['name']['#attributes'] = [
     'name' => 'name',
     'label' => t('Username'),
@@ -1487,7 +1487,7 @@ function mytheme_form_user_login_form_alter(array &$form, FormStateInterface $fo
   // Replace password field
   $form['pass']['#theme_wrappers'] = [];
   $form['pass']['#type'] = 'html_tag';
-  $form['pass']['#tag'] = 'wc-text-input';
+  $form['pass']['#tag'] = 'hx-text-input';
   $form['pass']['#attributes'] = [
     'name' => 'pass',
     'label' => t('Password'),
@@ -1498,7 +1498,7 @@ function mytheme_form_user_login_form_alter(array &$form, FormStateInterface $fo
 
   // Replace submit button
   $form['actions']['submit']['#type'] = 'html_tag';
-  $form['actions']['submit']['#tag'] = 'wc-button';
+  $form['actions']['submit']['#tag'] = 'hx-button';
   $form['actions']['submit']['#attributes'] = [
     'type' => 'submit',
     'variant' => 'primary',
@@ -1509,7 +1509,7 @@ function mytheme_form_user_login_form_alter(array &$form, FormStateInterface $fo
 
 ### 7.3 Form-Associated Custom Elements
 
-The `wc-text-input`, `wc-textarea`, `wc-select`, `wc-checkbox`, and `wc-radio` components are **form-associated custom elements**. They use the `ElementInternals` API to participate natively in HTML forms.
+The `hx-text-input`, `hx-textarea`, `hx-select`, `hx-checkbox`, and `hx-radio` components are **form-associated custom elements**. They use the `ElementInternals` API to participate natively in HTML forms.
 
 This means:
 
@@ -1524,12 +1524,12 @@ This means:
 ```html
 <form method="post" action="/contact">
   <!-- This Web Component participates in the form natively -->
-  <wc-text-input name="full_name" label="Full Name" required></wc-text-input>
+  <hx-text-input name="full_name" label="Full Name" required></hx-text-input>
 
-  <wc-text-input name="email" label="Email" type="email" required></wc-text-input>
+  <hx-text-input name="email" label="Email" type="email" required></hx-text-input>
 
   <!-- On form submit, FormData contains: full_name=..., email=... -->
-  <wc-button type="submit" variant="primary"> Submit </wc-button>
+  <hx-button type="submit" variant="primary"> Submit </hx-button>
 </form>
 ```
 
@@ -1552,7 +1552,7 @@ function mytheme_form_alter(array &$form, FormStateInterface $form_state): void 
     $errors = $form_state->getErrors();
     foreach ($errors as $field_name => $message) {
       // Set error attributes on the corresponding Web Component
-      if (isset($form[$field_name]) && $form[$field_name]['#tag'] ?? '' === 'wc-text-input') {
+      if (isset($form[$field_name]) && $form[$field_name]['#tag'] ?? '' === 'hx-text-input') {
         $form[$field_name]['#attributes']['error-message'] = (string) $message;
       }
     }
@@ -1582,12 +1582,12 @@ Drupal behaviors are the standard mechanism for initializing JavaScript in Drupa
    *
    * @type {Drupal~behavior}
    */
-  Drupal.behaviors.wcCardAnalytics = {
+  Drupal.behaviors.hxCardAnalytics = {
     attach(context) {
-      const cards = once('wc-card-analytics', 'wc-content-card', context);
+      const cards = once('hx-card-analytics', 'hx-content-card', context);
 
       cards.forEach((card) => {
-        card.addEventListener('wc-card-click', (event) => {
+        card.addEventListener('hx-card-click', (event) => {
           const { href, heading, keyboard } = event.detail;
 
           // Google Analytics 4
@@ -1614,10 +1614,10 @@ Register this behavior as a Drupal library:
 
 ```yaml
 # mytheme.libraries.yml
-wc-behaviors:
+helix-behaviors:
   version: VERSION
   js:
-    js/wc-behaviors.js: {}
+    js/helix-behaviors.js: {}
   dependencies:
     - core/drupal
     - core/once
@@ -1640,16 +1640,16 @@ For components that may be added dynamically (AJAX, BigPipe), use event delegati
    *
    * @type {Drupal~behavior}
    */
-  Drupal.behaviors.wcAccordionTracking = {
+  Drupal.behaviors.hxAccordionTracking = {
     attach(context) {
       // Attach once to the document body, not individual components
-      const containers = once('wc-accordion-delegate', 'body', context);
+      const containers = once('hx-accordion-delegate', 'body', context);
 
       containers.forEach((body) => {
-        body.addEventListener('wc-accordion-toggle', (event) => {
+        body.addEventListener('hx-accordion-toggle', (event) => {
           // event.composed is true, so it crosses shadow DOM boundaries
           const detail = event.detail;
-          const accordion = event.target.closest('wc-accordion');
+          const accordion = event.target.closest('hx-accordion');
 
           if (typeof gtag === 'function') {
             gtag('event', 'accordion_toggle', {
@@ -1678,12 +1678,12 @@ Handle Web Component events that trigger Drupal AJAX operations:
    *
    * @type {Drupal~behavior}
    */
-  Drupal.behaviors.wcPaginationAjax = {
+  Drupal.behaviors.hxPaginationAjax = {
     attach(context) {
-      const pagers = once('wc-pagination-ajax', 'wc-pagination', context);
+      const pagers = once('hx-pagination-ajax', 'hx-pagination', context);
 
       pagers.forEach((pager) => {
-        pager.addEventListener('wc-page-change', async (event) => {
+        pager.addEventListener('hx-page-change', async (event) => {
           const { page } = event.detail;
           const targetSelector = pager.dataset.ajaxTarget;
           const viewName = pager.dataset.viewName;
@@ -1731,7 +1731,7 @@ Handle Web Component events that trigger Drupal AJAX operations:
 
 ### 8.4 Search Bar Integration
 
-Connect the `wc-search-bar` component to Drupal's Search API:
+Connect the `hx-search-bar` component to Drupal's Search API:
 
 ```javascript
 (function (Drupal, once) {
@@ -1742,13 +1742,13 @@ Connect the `wc-search-bar` component to Drupal's Search API:
    *
    * @type {Drupal~behavior}
    */
-  Drupal.behaviors.wcSearch = {
+  Drupal.behaviors.hxSearch = {
     attach(context) {
-      const searchBars = once('wc-search', 'wc-search-bar', context);
+      const searchBars = once('hx-search', 'hx-search-bar', context);
 
       searchBars.forEach((searchBar) => {
         // Handle search submission
-        searchBar.addEventListener('wc-search-submit', (event) => {
+        searchBar.addEventListener('hx-search-submit', (event) => {
           const { query } = event.detail;
           if (query.trim()) {
             window.location.href = `/search?keys=${encodeURIComponent(query)}`;
@@ -1756,7 +1756,7 @@ Connect the `wc-search-bar` component to Drupal's Search API:
         });
 
         // Handle autocomplete requests (if the component supports it)
-        searchBar.addEventListener('wc-search-input', async (event) => {
+        searchBar.addEventListener('hx-search-input', async (event) => {
           const { query } = event.detail;
           if (query.length < 3) return;
 
@@ -1791,7 +1791,7 @@ However, Drupal behaviors attached to Web Components need re-attachment:
    *
    * @type {Drupal~behavior}
    */
-  Drupal.behaviors.wcBigPipeHandler = {
+  Drupal.behaviors.hxBigPipeHandler = {
     attach(context) {
       // This behavior automatically runs when BigPipe delivers content
       // because Drupal calls attachBehaviors() on each BigPipe placeholder
@@ -1821,9 +1821,9 @@ Connect Web Component modals with Drupal's dialog system:
    *
    * @type {Drupal~behavior}
    */
-  Drupal.behaviors.wcModals = {
+  Drupal.behaviors.hxModals = {
     attach(context) {
-      const triggers = once('wc-modal-trigger', '[data-wc-modal-target]', context);
+      const triggers = once('hx-modal-trigger', '[data-hx-modal-target]', context);
 
       triggers.forEach((trigger) => {
         trigger.addEventListener('click', (event) => {
@@ -1831,16 +1831,16 @@ Connect Web Component modals with Drupal's dialog system:
           const modalId = trigger.dataset.wcModalTarget;
           const modal = document.getElementById(modalId);
 
-          if (modal && modal.tagName === 'WC-MODAL') {
+          if (modal && modal.tagName === 'HX-MODAL') {
             modal.setAttribute('open', '');
           }
         });
       });
 
       // Listen for modal close events
-      const modals = once('wc-modal-events', 'wc-modal', context);
+      const modals = once('hx-modal-events', 'hx-modal', context);
       modals.forEach((modal) => {
-        modal.addEventListener('wc-modal-close', () => {
+        modal.addEventListener('hx-modal-close', () => {
           // Return focus to the trigger element
           const triggerId = modal.dataset.triggeredBy;
           if (triggerId) {
@@ -1877,11 +1877,11 @@ Create a token overrides file in your theme:
   /* ============================================
    * Brand Color Overrides
    * Override the semantic tokens to match your
-   * healthcare organization's brand colors.
+   * organization's brand colors.
    * ============================================ */
 
   /* Primary interactive color (links, primary buttons) */
-  --hds-color-interactive-primary: #0e7c61; /* Healthcare teal */
+  --hds-color-interactive-primary: #0e7c61; /* Brand teal */
   --hds-color-interactive-primary-hover: #0a5e49;
   --hds-color-interactive-primary-active: #084a3a;
 
@@ -1981,7 +1981,7 @@ For cases where CSS custom properties do not provide sufficient control, use the
 /* mytheme/css/component-overrides.css */
 
 /* Style the card header area for featured cards */
-wc-content-card[variant='featured']::part(header) {
+hx-content-card[variant='featured']::part(header) {
   min-height: 200px;
   background: linear-gradient(
     135deg,
@@ -1991,12 +1991,12 @@ wc-content-card[variant='featured']::part(header) {
 }
 
 /* Style the card body in sidebar contexts */
-.sidebar wc-content-card::part(body) {
+.sidebar hx-content-card::part(body) {
   padding: var(--hds-space-inset-sm);
 }
 
 /* Override button label styling for a specific page */
-.hero-section wc-button::part(label) {
+.hero-section hx-button::part(label) {
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
@@ -2097,7 +2097,7 @@ themes/custom/mytheme/components/
 ```yaml
 # content-card.component.yml
 name: Content Card
-description: 'Healthcare content card backed by the wc-content-card Web Component'
+description: 'Enterprise content card backed by the hx-content-card Web Component'
 status: stable
 props:
   type: object
@@ -2144,7 +2144,7 @@ libraryOverrides:
 
 ```twig
 {# content-card.twig #}
-<wc-content-card
+<hx-content-card
   heading="{{ heading }}"
   {% if summary %}summary="{{ summary }}"{% endif %}
   {% if category %}category="{{ category }}"{% endif %}
@@ -2158,7 +2158,7 @@ libraryOverrides:
   {% endif %}
 
   {{ children }}
-</wc-content-card>
+</hx-content-card>
 ```
 
 Then use the SDC in other TWIG templates:
@@ -2252,9 +2252,9 @@ For components that appear below the fold, use dynamic imports triggered by Inte
    *
    * @type {Drupal~behavior}
    */
-  Drupal.behaviors.wcLazyLoad = {
+  Drupal.behaviors.hxLazyLoad = {
     attach(context) {
-      const lazyComponents = once('wc-lazy-load', '[data-wc-lazy]', context);
+      const lazyComponents = once('hx-lazy-load', '[data-hx-lazy]', context);
 
       if (!lazyComponents.length) return;
 
@@ -2288,8 +2288,8 @@ Usage in TWIG:
 
 ```twig
 {# Lazy-load the media gallery component #}
-<wc-media-gallery
-  data-wc-lazy="/themes/custom/mytheme/node_modules/@org/wc-library/dist/components/media-gallery/index.js"
+<hx-media-gallery
+  data-hx-lazy="/themes/custom/mytheme/node_modules/@org/wc-library/dist/components/media-gallery/index.js"
 >
   {# Fallback content shown before component loads #}
   <div class="gallery-fallback">
@@ -2297,7 +2297,7 @@ Usage in TWIG:
       <img src="{{ image.url }}" alt="{{ image.alt }}" loading="lazy" />
     {% endfor %}
   </div>
-</wc-media-gallery>
+</hx-media-gallery>
 ```
 
 ### 10.4 Caching Strategies
@@ -2335,7 +2335,7 @@ Web Components render client-side, so they do not affect Drupal's render cache f
 // add appropriate cache metadata:
 $build['card'] = [
   '#type' => 'html_tag',
-  '#tag' => 'wc-content-card',
+  '#tag' => 'hx-content-card',
   '#attributes' => [
     'heading' => $node->label(),
     // ... other attributes
@@ -2414,7 +2414,7 @@ This checklist covers Drupal-specific accessibility considerations when integrat
 
 ### Form Accessibility
 
-- [ ] Every `wc-text-input` has a visible, non-empty `label` attribute
+- [ ] Every `hx-text-input` has a visible, non-empty `label` attribute
 - [ ] Required fields have `required` attribute (not just visual indicator)
 - [ ] Error messages use `error-message` attribute (renders `role="alert"`)
 - [ ] Help text uses `help-text` attribute (connected via `aria-describedby`)
@@ -2450,7 +2450,7 @@ This checklist covers Drupal-specific accessibility considerations when integrat
 
 ### 12.1 Components Not Rendering
 
-**Symptom**: The page shows the raw HTML tags (e.g., `<wc-content-card>`) instead of rendered components.
+**Symptom**: The page shows the raw HTML tags (e.g., `<hx-content-card>`) instead of rendered components.
 
 **Possible causes and solutions:**
 
@@ -2467,7 +2467,7 @@ This checklist covers Drupal-specific accessibility considerations when integrat
 
 ```javascript
 // Paste in DevTools console to check component registration
-const tags = ['wc-content-card', 'wc-button', 'wc-hero-banner'];
+const tags = ['hx-content-card', 'hx-button', 'hx-hero-banner'];
 tags.forEach((tag) => {
   const registered = customElements.get(tag);
   console.log(`${tag}: ${registered ? 'registered' : 'NOT REGISTERED'}`);
@@ -2489,11 +2489,11 @@ tags.forEach((tag) => {
 **Boolean attribute pattern:**
 
 ```twig
-{# WRONG: <wc-button disabled="false"> -- "false" is truthy in HTML #}
-<wc-button {{ is_disabled ? 'disabled' : '' }}>
+{# WRONG: <hx-button disabled="false"> -- "false" is truthy in HTML #}
+<hx-button {{ is_disabled ? 'disabled' : '' }}>
 
 {# RIGHT: attribute present = true, absent = false #}
-<wc-button {% if is_disabled %}disabled{% endif %}>
+<hx-button {% if is_disabled %}disabled{% endif %}>
 ```
 
 ### 12.3 Events Not Firing
@@ -2512,12 +2512,12 @@ tags.forEach((tag) => {
 
 ```javascript
 // Temporarily log all custom events from Web Components
-document.addEventListener('wc-card-click', (e) => console.log('card-click', e.detail));
-document.addEventListener('wc-form-submit', (e) => console.log('form-submit', e.detail));
+document.addEventListener('hx-card-click', (e) => console.log('card-click', e.detail));
+document.addEventListener('hx-form-submit', (e) => console.log('form-submit', e.detail));
 
 // Or listen for ALL events on a specific component
-const card = document.querySelector('wc-content-card');
-const events = ['wc-card-click'];
+const card = document.querySelector('hx-content-card');
+const events = ['hx-card-click'];
 events.forEach((name) => {
   card.addEventListener(name, (e) => console.log(name, e.detail));
 });
@@ -2553,7 +2553,7 @@ function inspectTokens(element) {
 
 // Usage
 inspectTokens(document.documentElement); // Check :root tokens
-inspectTokens(document.querySelector('wc-content-card')); // Check component tokens
+inspectTokens(document.querySelector('hx-content-card')); // Check component tokens
 ```
 
 ### 12.5 Flash of Unstyled Content (FOUC)
@@ -2575,9 +2575,9 @@ inspectTokens(document.querySelector('wc-content-card')); // Check component tok
 
    ```css
    /* mytheme.css */
-   wc-content-card:not(:defined),
-   wc-hero-banner:not(:defined),
-   wc-button:not(:defined) {
+   hx-content-card:not(:defined),
+   hx-hero-banner:not(:defined),
+   hx-button:not(:defined) {
      /* Hide component until registered and rendered */
      opacity: 0;
      visibility: hidden;
@@ -2587,7 +2587,7 @@ inspectTokens(document.querySelector('wc-content-card')); // Check component tok
 3. **Or use `:not(:defined)` with a placeholder skeleton**:
 
    ```css
-   wc-content-card:not(:defined) {
+   hx-content-card:not(:defined) {
      display: block;
      min-height: 200px;
      background: var(--hds-color-surface-secondary);
@@ -2606,7 +2606,7 @@ inspectTokens(document.querySelector('wc-content-card')); // Check component tok
    }
 
    @media (prefers-reduced-motion: reduce) {
-     wc-content-card:not(:defined) {
+     hx-content-card:not(:defined) {
        animation: none;
        opacity: 0.8;
      }
@@ -2679,10 +2679,10 @@ For major version upgrades, the migration guide will list all breaking changes. 
 
 ```twig
 {# Before (v1) #}
-<wc-content-card title="{{ node.label }}">
+<hx-content-card title="{{ node.label }}">
 
 {# After (v2) -- attribute renamed #}
-<wc-content-card heading="{{ node.label }}">
+<hx-content-card heading="{{ node.label }}">
 ```
 
 ### 13.3 Version Pinning Strategy
@@ -2697,7 +2697,7 @@ For major version upgrades, the migration guide will list all breaking changes. 
 }
 ```
 
-This allows patch updates (1.2.1, 1.2.2) but requires explicit action for minor updates (1.3.0). For critical healthcare environments, exact pinning may be preferred:
+This allows patch updates (1.2.1, 1.2.2) but requires explicit action for minor updates (1.3.0). For critical enterprise environments, exact pinning may be preferred:
 
 ```json
 {
@@ -2743,7 +2743,7 @@ If an upgrade causes issues in production:
 Set up monitoring for Web Component-related issues in production:
 
 ```javascript
-// mytheme/js/wc-error-monitoring.js
+// mytheme/js/helix-error-monitoring.js
 
 (function () {
   'use strict';
@@ -2788,16 +2788,16 @@ Set up monitoring for Web Component-related issues in production:
 
 ## 14. Real-World Example Project
 
-### "Regional Health Partners" -- A Complete Integration
+### "Regional Content Partners" -- A Complete Integration
 
-This section provides a complete, working example of a healthcare blog site integrating the `@org/wc-library` Web Component library with Drupal.
+This section provides a complete, working example of an enterprise blog site integrating the `@org/wc-library` Web Component library with Drupal.
 
 ### 14.1 Site Overview
 
 - **Content types**: Article, Author, Category (taxonomy)
 - **Views**: Latest Articles (listing page), Related Articles (sidebar block)
-- **Theme**: Custom theme `rhp_theme` (Regional Health Partners)
-- **Components used**: `wc-content-card`, `wc-card-grid`, `wc-hero-banner`, `wc-article-layout`, `wc-breadcrumb`, `wc-pagination`, `wc-button`, `wc-badge`, `wc-avatar`, `wc-accordion`, `wc-search-bar`
+- **Theme**: Custom theme `rhp_theme` (Regional Content Partners)
+- **Components used**: `hx-content-card`, `hx-card-grid`, `hx-hero-banner`, `hx-article-layout`, `hx-breadcrumb`, `hx-pagination`, `hx-button`, `hx-badge`, `hx-avatar`, `hx-accordion`, `hx-search-bar`
 
 ### 14.2 Theme File Structure
 
@@ -2816,12 +2816,12 @@ themes/custom/rhp_theme/
     component-overrides.css               # Per-component overrides
     utilities.css                           # Utility classes for layout
   js/
-    wc-behaviors.js                       # Event handling behaviors
-    wc-theme-toggle.js                    # Theme toggle behavior
+    helix-behaviors.js                       # Event handling behaviors
+    helix-theme-toggle.js                    # Theme toggle behavior
   templates/
     html.html.twig                         # HTML wrapper with theme flash prevention
     page.html.twig                         # Page layout
-    node--article--teaser.html.twig        # Article teaser -> wc-content-card
+    node--article--teaser.html.twig        # Article teaser -> hx-content-card
     node--article--full.html.twig          # Article full -> wc-article-layout
     field--node--field-category.html.twig  # Category field -> wc-badge
     field--node--field-tags.html.twig      # Tags field -> wc-tag
@@ -2839,9 +2839,9 @@ themes/custom/rhp_theme/
 #### `rhp_theme.info.yml`
 
 ```yaml
-name: 'Regional Health Partners'
+name: 'Regional Content Partners'
 type: theme
-description: 'Healthcare content hub theme using WC Web Components'
+description: 'Enterprise content platform theme using WC Web Components'
 core_version_requirement: ^10.3 || ^11
 base theme: false
 
@@ -2901,8 +2901,8 @@ token-overrides:
 behaviors:
   version: VERSION
   js:
-    js/wc-behaviors.js: {}
-    js/wc-theme-toggle.js: {}
+    js/helix-behaviors.js: {}
+    js/helix-theme-toggle.js: {}
   dependencies:
     - core/drupal
     - core/once
@@ -2915,8 +2915,8 @@ behaviors:
 /* css/token-overrides.css */
 
 :root {
-  /* Regional Health Partners brand colors */
-  --hds-color-interactive-primary: #0e7c61; /* Healthcare teal */
+  /* Regional Content Partners brand colors */
+  --hds-color-interactive-primary: #0e7c61; /* Brand teal */
   --hds-color-interactive-primary-hover: #0a6650;
   --hds-color-interactive-primary-active: #085340;
   --hds-color-feedback-success: #16a34a;
@@ -3000,7 +3000,7 @@ function rhp_theme_preprocess_node__article__full(array &$variables): void {
 ```twig
 {{ attach_library('rhp_theme/hds-components') }}
 
-<wc-content-card
+<hx-content-card
   heading="{{ wc.heading }}"
   summary="{{ wc.summary }}"
   category="{{ wc.category }}"
@@ -3014,7 +3014,7 @@ function rhp_theme_preprocess_node__article__full(array &$variables): void {
       {{ content.field_media }}
     </div>
   {% endif %}
-</wc-content-card>
+</hx-content-card>
 ```
 
 #### `node--article--full.html.twig`
@@ -3024,16 +3024,16 @@ function rhp_theme_preprocess_node__article__full(array &$variables): void {
 
 {# Hero #}
 {% if content.field_hero_image|render|trim is not empty %}
-  <wc-hero-banner
+  <hx-hero-banner
     heading="{{ wc.heading }}"
     subheading="{{ wc.subtitle }}"
   >
     <div slot="media">{{ content.field_hero_image }}</div>
-  </wc-hero-banner>
+  </hx-hero-banner>
 {% endif %}
 
 {# Article layout #}
-<wc-article-layout {% if wc.has_sidebar %}has-sidebar{% endif %}>
+<hx-article-layout {% if wc.has_sidebar %}has-sidebar{% endif %}>
   {# Breadcrumb #}
   <nav slot="breadcrumb" aria-label="{{ 'Breadcrumb'|t }}">
     {{ drupal_block('system_breadcrumb_block') }}
@@ -3042,14 +3042,14 @@ function rhp_theme_preprocess_node__article__full(array &$variables): void {
   {# Author #}
   {% if wc.author is defined %}
     <div slot="author">
-      <wc-media-object>
+      <hx-media-object>
         {% if wc.author.avatar_url is defined %}
-          <wc-avatar
+          <hx-avatar
             slot="media"
             src="{{ wc.author.avatar_url }}"
             alt="{{ wc.author.name }}"
             size="md"
-          ></wc-avatar>
+          ></hx-avatar>
         {% endif %}
         <div>
           <strong>{{ wc.author.name }}</strong>
@@ -3058,7 +3058,7 @@ function rhp_theme_preprocess_node__article__full(array &$variables): void {
             <span>&middot; {{ wc.read_time }} {{ 'min read'|t }}</span>
           {% endif %}
         </div>
-      </wc-media-object>
+      </hx-media-object>
     </div>
   {% endif %}
 
@@ -3077,7 +3077,7 @@ function rhp_theme_preprocess_node__article__full(array &$variables): void {
   <div slot="footer">
     {{ content.field_tags }}
   </div>
-</wc-article-layout>
+</hx-article-layout>
 ```
 
 #### `views-view-unformatted--latest-articles.html.twig`
@@ -3086,11 +3086,11 @@ function rhp_theme_preprocess_node__article__full(array &$variables): void {
 {{ attach_library('rhp_theme/hds-components') }}
 
 {% if rows|length > 0 %}
-  <wc-card-grid columns="3" gap="lg">
+  <hx-card-grid columns="3" gap="lg">
     {% for row in rows %}
       {{ row.content }}
     {% endfor %}
-  </wc-card-grid>
+  </hx-card-grid>
 {% endif %}
 ```
 
@@ -3099,7 +3099,7 @@ function rhp_theme_preprocess_node__article__full(array &$variables): void {
 ```javascript
 /**
  * @file
- * Regional Health Partners -- WC component behaviors.
+ * Regional Content Partners -- WC component behaviors.
  */
 
 (function (Drupal, once) {
@@ -3110,10 +3110,10 @@ function rhp_theme_preprocess_node__article__full(array &$variables): void {
    */
   Drupal.behaviors.rhpCardAnalytics = {
     attach(context) {
-      const cards = once('rhp-card-analytics', 'wc-content-card', context);
+      const cards = once('rhp-card-analytics', 'hx-content-card', context);
 
       cards.forEach((card) => {
-        card.addEventListener('wc-card-click', (event) => {
+        card.addEventListener('hx-card-click', (event) => {
           const { href, heading, keyboard } = event.detail;
 
           if (typeof gtag === 'function') {
@@ -3134,10 +3134,10 @@ function rhp_theme_preprocess_node__article__full(array &$variables): void {
    */
   Drupal.behaviors.rhpSearch = {
     attach(context) {
-      const searchBars = once('rhp-search', 'wc-search-bar', context);
+      const searchBars = once('rhp-search', 'hx-search-bar', context);
 
       searchBars.forEach((searchBar) => {
-        searchBar.addEventListener('wc-search-submit', (event) => {
+        searchBar.addEventListener('hx-search-submit', (event) => {
           const { query } = event.detail;
           if (query.trim()) {
             window.location.href = `/search?keys=${encodeURIComponent(query)}`;
@@ -3152,10 +3152,10 @@ function rhp_theme_preprocess_node__article__full(array &$variables): void {
    */
   Drupal.behaviors.rhpAccordionTracking = {
     attach(context) {
-      const accordions = once('rhp-accordion', 'wc-accordion', context);
+      const accordions = once('rhp-accordion', 'hx-accordion', context);
 
       accordions.forEach((accordion) => {
-        accordion.addEventListener('wc-accordion-toggle', (event) => {
+        accordion.addEventListener('hx-accordion-toggle', (event) => {
           if (typeof gtag === 'function') {
             gtag('event', 'faq_toggle', {
               question: event.detail.heading,
@@ -3216,7 +3216,7 @@ Use this checklist to verify your integration is complete and correct:
 - [ ] Token CSS loads in `<head>` (verify with DevTools Elements tab)
 - [ ] `:root` has `--hds-*` custom properties (verify with DevTools Computed tab)
 - [ ] Component JS loads with `type="module"` attribute (verify in Network tab)
-- [ ] Custom elements are registered (verify with `customElements.get('wc-content-card')` in console)
+- [ ] Custom elements are registered (verify with `customElements.get('hx-content-card')` in console)
 - [ ] Components render correctly on article teaser pages
 - [ ] Components render correctly on article full-view pages
 - [ ] Token overrides (brand colors, typography) are applied
@@ -3232,7 +3232,7 @@ Use this checklist to verify your integration is complete and correct:
 
 ## Appendix A: Complete Attribute-to-Field Mapping Table
 
-This table maps every `wc-content-card` attribute to its Drupal source and TWIG expression. Equivalent tables for each component are available in the Storybook documentation.
+This table maps every `hx-content-card` attribute to its Drupal source and TWIG expression. Equivalent tables for each component are available in the Storybook documentation.
 
 | WC Attribute   | Type                                      | Drupal Source                     | TWIG Expression                                          | Required |
 | -------------- | ----------------------------------------- | --------------------------------- | -------------------------------------------------------- | -------- |
@@ -3250,18 +3250,18 @@ All custom events emitted by Web Components. These events use `bubbles: true` an
 
 | Event Name            | Component         | Detail Properties             | Use Case                  |
 | --------------------- | ----------------- | ----------------------------- | ------------------------- |
-| `wc-card-click`       | `wc-content-card` | `{ href, heading, keyboard }` | Analytics, navigation     |
-| `wc-form-submit`      | `wc-form`         | `{ formData, valid }`         | Form processing           |
-| `wc-input`            | `wc-text-input`   | `{ value, name }`             | Real-time validation      |
-| `wc-change`           | `wc-text-input`   | `{ value, name }`             | Value change tracking     |
-| `wc-search-submit`    | `wc-search-bar`   | `{ query }`                   | Search routing            |
-| `wc-search-input`     | `wc-search-bar`   | `{ query }`                   | Autocomplete              |
-| `wc-accordion-toggle` | `wc-accordion`    | `{ heading, open }`           | Analytics, state tracking |
-| `wc-tab-change`       | `wc-tabs`         | `{ index, label }`            | Analytics, deep linking   |
-| `wc-modal-open`       | `wc-modal`        | `{ id }`                      | Focus management          |
-| `wc-modal-close`      | `wc-modal`        | `{ id }`                      | Focus restoration         |
-| `wc-nav-toggle`       | `wc-nav-mobile`   | `{ open }`                    | Mobile nav state          |
-| `wc-page-change`      | `wc-pagination`   | `{ page }`                    | AJAX paging               |
+| `hx-card-click`       | `hx-content-card` | `{ href, heading, keyboard }` | Analytics, navigation     |
+| `hx-form-submit`      | `hx-form`         | `{ formData, valid }`         | Form processing           |
+| `hx-input`            | `hx-text-input`   | `{ value, name }`             | Real-time validation      |
+| `hx-change`           | `hx-text-input`   | `{ value, name }`             | Value change tracking     |
+| `hx-search-submit`    | `hx-search-bar`   | `{ query }`                   | Search routing            |
+| `hx-search-input`     | `hx-search-bar`   | `{ query }`                   | Autocomplete              |
+| `hx-accordion-toggle` | `hx-accordion`    | `{ heading, open }`           | Analytics, state tracking |
+| `hx-tab-change`       | `hx-tabs`         | `{ index, label }`            | Analytics, deep linking   |
+| `hx-modal-open`       | `hx-modal`        | `{ id }`                      | Focus management          |
+| `hx-modal-close`      | `hx-modal`        | `{ id }`                      | Focus restoration         |
+| `hx-nav-toggle`       | `hx-nav-mobile`   | `{ open }`                    | Mobile nav state          |
+| `hx-page-change`      | `hx-pagination`   | `{ page }`                    | AJAX paging               |
 
 ## Appendix C: CSS Custom Property Quick Reference
 
@@ -3325,4 +3325,4 @@ The most commonly overridden tokens for brand customization:
 
 - [WCAG 2.1 Quick Reference](https://www.w3.org/WAI/WCAG21/quickref/)
 - [ARIA Authoring Practices Guide (APG)](https://www.w3.org/WAI/ARIA/apg/)
-- [What WCAG 2.1 AA Means for Healthcare Organizations in 2026](https://pilotdigital.com/blog/what-wcag-2-1-aa-means-for-healthcare-organizations-in-2026/)
+- [European Accessibility Act (EAA)](https://ec.europa.eu/social/main.jsp?catId=1202)

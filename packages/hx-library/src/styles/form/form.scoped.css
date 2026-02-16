@@ -1,14 +1,13 @@
 /* ==========================================================================
  * form.scoped.css — Scoped barrel file
  *
- * Contains all form styles with every selector prefixed by `wc-form` to
- * prevent leaking outside the <wc-form> Light DOM wrapper.
+ * Contains all form styles with every selector prefixed by `hx-form` to
+ * prevent leaking outside the <hx-form> Light DOM wrapper.
  *
  * IMPORTANT: This file does NOT use @import because CSS imports cannot
  * add scope prefixes. All styles are written inline.
  * ==========================================================================
  */
-
 
 /* ==========================================================================
  * FIELD (_field.css scoped)
@@ -16,20 +15,20 @@
 
 /* ─── Field Container ─── */
 
-wc-form .form-item {
+hx-form .form-item {
   display: flex;
   flex-direction: column;
   gap: var(--wc-space-1, 0.25rem);
   font-family: var(--wc-input-font-family, var(--wc-font-family-sans, sans-serif));
 }
 
-wc-form .form-item + .form-item {
+hx-form .form-item + .form-item {
   margin-top: var(--wc-space-4, 1rem);
 }
 
 /* ─── Label ─── */
 
-wc-form label {
+hx-form label {
   display: flex;
   align-items: baseline;
   gap: var(--wc-space-1, 0.25rem);
@@ -41,14 +40,14 @@ wc-form label {
 
 /* ─── Required Marker ─── */
 
-wc-form .form-required {
+hx-form .form-required {
   color: var(--wc-input-error-color, var(--wc-color-error-500, #dc3545));
   font-weight: var(--wc-font-weight-bold, 700);
 }
 
 /* ─── Description / Help Text ─── */
 
-wc-form .description {
+hx-form .description {
   font-size: var(--wc-font-size-xs, 0.75rem);
   color: var(--wc-color-neutral-500, #6c757d);
   line-height: var(--wc-line-height-normal, 1.5);
@@ -56,27 +55,27 @@ wc-form .description {
 
 /* ─── Box Sizing Reset ─── */
 
-wc-form .form-item *,
-wc-form .form-item *::before,
-wc-form .form-item *::after {
+hx-form .form-item *,
+hx-form .form-item *::before,
+hx-form .form-item *::after {
   box-sizing: border-box;
 }
-
 
 /* ==========================================================================
  * TEXT INPUT (_text-input.css scoped)
  * ========================================================================== */
 
-wc-form input[type='text'],
-wc-form input[type='email'],
-wc-form input[type='password'],
-wc-form input[type='tel'],
-wc-form input[type='url'],
-wc-form input[type='search'],
-wc-form input[type='number'] {
+hx-form input[type='text'],
+hx-form input[type='email'],
+hx-form input[type='password'],
+hx-form input[type='tel'],
+hx-form input[type='url'],
+hx-form input[type='search'],
+hx-form input[type='number'] {
   display: block;
   width: 100%;
-  border: var(--wc-border-width-thin, 1px) solid var(--wc-input-border-color, var(--wc-color-neutral-300, #ced4da));
+  border: var(--wc-border-width-thin, 1px) solid
+    var(--wc-input-border-color, var(--wc-color-neutral-300, #ced4da));
   border-radius: var(--wc-input-border-radius, var(--wc-border-radius-md, 0.375rem));
   background-color: var(--wc-input-bg, var(--wc-color-neutral-0, #ffffff));
   padding: var(--wc-space-2, 0.5rem) var(--wc-space-3, 0.75rem);
@@ -85,45 +84,52 @@ wc-form input[type='number'] {
   color: var(--wc-input-color, var(--wc-color-neutral-800, #212529));
   line-height: var(--wc-line-height-normal, 1.5);
   min-height: var(--wc-size-10, 2.5rem);
-  transition: border-color var(--wc-transition-fast, 150ms ease),
-              box-shadow var(--wc-transition-fast, 150ms ease);
+  transition:
+    border-color var(--wc-transition-fast, 150ms ease),
+    box-shadow var(--wc-transition-fast, 150ms ease);
 }
 
 /* ─── Placeholder ─── */
 
-wc-form input[type='text']::placeholder,
-wc-form input[type='email']::placeholder,
-wc-form input[type='password']::placeholder,
-wc-form input[type='tel']::placeholder,
-wc-form input[type='url']::placeholder,
-wc-form input[type='search']::placeholder,
-wc-form input[type='number']::placeholder {
+hx-form input[type='text']::placeholder,
+hx-form input[type='email']::placeholder,
+hx-form input[type='password']::placeholder,
+hx-form input[type='tel']::placeholder,
+hx-form input[type='url']::placeholder,
+hx-form input[type='search']::placeholder,
+hx-form input[type='number']::placeholder {
   color: var(--wc-color-neutral-400, #adb5bd);
 }
 
 /* ─── Focus State ─── */
 
-wc-form input[type='text']:focus,
-wc-form input[type='email']:focus,
-wc-form input[type='password']:focus,
-wc-form input[type='tel']:focus,
-wc-form input[type='url']:focus,
-wc-form input[type='search']:focus,
-wc-form input[type='number']:focus {
+hx-form input[type='text']:focus,
+hx-form input[type='email']:focus,
+hx-form input[type='password']:focus,
+hx-form input[type='tel']:focus,
+hx-form input[type='url']:focus,
+hx-form input[type='search']:focus,
+hx-form input[type='number']:focus {
   outline: none;
-  border-color: var(--wc-input-focus-ring-color, var(--wc-focus-ring-color, #007878));
-  box-shadow: 0 0 0 var(--wc-focus-ring-width, 2px) color-mix(in srgb, var(--wc-input-focus-ring-color, var(--wc-focus-ring-color, #007878)) calc(var(--wc-focus-ring-opacity, 0.25) * 100%), transparent);
+  border-color: var(--wc-input-focus-ring-color, var(--wc-focus-ring-color, #2563eb));
+  box-shadow: 0 0 0 var(--wc-focus-ring-width, 2px)
+    color-mix(
+      in srgb,
+      var(--wc-input-focus-ring-color, var(--wc-focus-ring-color, #2563eb))
+        calc(var(--wc-focus-ring-opacity, 0.25) * 100%),
+      transparent
+    );
 }
 
 /* ─── Disabled State ─── */
 
-wc-form input[type='text']:disabled,
-wc-form input[type='email']:disabled,
-wc-form input[type='password']:disabled,
-wc-form input[type='tel']:disabled,
-wc-form input[type='url']:disabled,
-wc-form input[type='search']:disabled,
-wc-form input[type='number']:disabled {
+hx-form input[type='text']:disabled,
+hx-form input[type='email']:disabled,
+hx-form input[type='password']:disabled,
+hx-form input[type='tel']:disabled,
+hx-form input[type='url']:disabled,
+hx-form input[type='search']:disabled,
+hx-form input[type='number']:disabled {
   opacity: var(--wc-opacity-disabled, 0.5);
   cursor: not-allowed;
   pointer-events: none;
@@ -131,46 +137,46 @@ wc-form input[type='number']:disabled {
 
 /* ─── Read-Only State ─── */
 
-wc-form input[type='text']:read-only,
-wc-form input[type='email']:read-only,
-wc-form input[type='password']:read-only,
-wc-form input[type='tel']:read-only,
-wc-form input[type='url']:read-only,
-wc-form input[type='search']:read-only,
-wc-form input[type='number']:read-only {
+hx-form input[type='text']:read-only,
+hx-form input[type='email']:read-only,
+hx-form input[type='password']:read-only,
+hx-form input[type='tel']:read-only,
+hx-form input[type='url']:read-only,
+hx-form input[type='search']:read-only,
+hx-form input[type='number']:read-only {
   background-color: var(--wc-color-neutral-100, #e9ecef);
 }
 
 /* ─── Remove browser search decorations ─── */
 
-wc-form input[type='search']::-webkit-search-decoration,
-wc-form input[type='search']::-webkit-search-cancel-button,
-wc-form input[type='search']::-webkit-search-results-button,
-wc-form input[type='search']::-webkit-search-results-decoration {
+hx-form input[type='search']::-webkit-search-decoration,
+hx-form input[type='search']::-webkit-search-cancel-button,
+hx-form input[type='search']::-webkit-search-results-button,
+hx-form input[type='search']::-webkit-search-results-decoration {
   -webkit-appearance: none;
 }
 
 /* ─── Remove number input spinners ─── */
 
-wc-form input[type='number']::-webkit-inner-spin-button,
-wc-form input[type='number']::-webkit-outer-spin-button {
+hx-form input[type='number']::-webkit-inner-spin-button,
+hx-form input[type='number']::-webkit-outer-spin-button {
   -webkit-appearance: none;
   margin: 0;
 }
 
-wc-form input[type='number'] {
+hx-form input[type='number'] {
   -moz-appearance: textfield;
 }
-
 
 /* ==========================================================================
  * TEXTAREA (_textarea.css scoped)
  * ========================================================================== */
 
-wc-form textarea {
+hx-form textarea {
   display: block;
   width: 100%;
-  border: var(--wc-border-width-thin, 1px) solid var(--wc-input-border-color, var(--wc-color-neutral-300, #ced4da));
+  border: var(--wc-border-width-thin, 1px) solid
+    var(--wc-input-border-color, var(--wc-color-neutral-300, #ced4da));
   border-radius: var(--wc-input-border-radius, var(--wc-border-radius-md, 0.375rem));
   background-color: var(--wc-input-bg, var(--wc-color-neutral-0, #ffffff));
   padding: var(--wc-space-2, 0.5rem) var(--wc-space-3, 0.75rem);
@@ -180,50 +186,59 @@ wc-form textarea {
   line-height: var(--wc-line-height-normal, 1.5);
   min-height: var(--wc-textarea-min-height, var(--wc-size-20, 5rem));
   resize: vertical;
-  transition: border-color var(--wc-transition-fast, 150ms ease),
-              box-shadow var(--wc-transition-fast, 150ms ease);
+  transition:
+    border-color var(--wc-transition-fast, 150ms ease),
+    box-shadow var(--wc-transition-fast, 150ms ease);
 }
 
-wc-form textarea::placeholder {
+hx-form textarea::placeholder {
   color: var(--wc-color-neutral-400, #adb5bd);
 }
 
-wc-form textarea:focus {
+hx-form textarea:focus {
   outline: none;
-  border-color: var(--wc-input-focus-ring-color, var(--wc-focus-ring-color, #007878));
-  box-shadow: 0 0 0 var(--wc-focus-ring-width, 2px) color-mix(in srgb, var(--wc-input-focus-ring-color, var(--wc-focus-ring-color, #007878)) calc(var(--wc-focus-ring-opacity, 0.25) * 100%), transparent);
+  border-color: var(--wc-input-focus-ring-color, var(--wc-focus-ring-color, #2563eb));
+  box-shadow: 0 0 0 var(--wc-focus-ring-width, 2px)
+    color-mix(
+      in srgb,
+      var(--wc-input-focus-ring-color, var(--wc-focus-ring-color, #2563eb))
+        calc(var(--wc-focus-ring-opacity, 0.25) * 100%),
+      transparent
+    );
 }
 
-wc-form textarea:disabled {
+hx-form textarea:disabled {
   opacity: var(--wc-opacity-disabled, 0.5);
   cursor: not-allowed;
   pointer-events: none;
 }
 
-wc-form textarea:read-only {
+hx-form textarea:read-only {
   background-color: var(--wc-color-neutral-100, #e9ecef);
 }
-
 
 /* ==========================================================================
  * SELECT (_select.css scoped)
  * ========================================================================== */
 
-wc-form select {
+hx-form select {
   display: block;
   width: 100%;
-  border: var(--wc-border-width-thin, 1px) solid var(--wc-select-border-color, var(--wc-color-neutral-300, #ced4da));
+  border: var(--wc-border-width-thin, 1px) solid
+    var(--wc-select-border-color, var(--wc-color-neutral-300, #ced4da));
   border-radius: var(--wc-select-border-radius, var(--wc-border-radius-md, 0.375rem));
   background-color: var(--wc-select-bg, var(--wc-color-neutral-0, #ffffff));
-  padding: var(--wc-space-2, 0.5rem) var(--wc-space-8, 2rem) var(--wc-space-2, 0.5rem) var(--wc-space-3, 0.75rem);
+  padding: var(--wc-space-2, 0.5rem) var(--wc-space-8, 2rem) var(--wc-space-2, 0.5rem)
+    var(--wc-space-3, 0.75rem);
   font-family: var(--wc-select-font-family, var(--wc-font-family-sans, sans-serif));
   font-size: var(--wc-font-size-md, 1rem);
   color: var(--wc-select-color, var(--wc-color-neutral-800, #212529));
   line-height: var(--wc-line-height-normal, 1.5);
   min-height: var(--wc-input-height-md, var(--wc-size-10, 2.5rem));
   cursor: pointer;
-  transition: border-color var(--wc-transition-fast, 150ms ease),
-              box-shadow var(--wc-transition-fast, 150ms ease);
+  transition:
+    border-color var(--wc-transition-fast, 150ms ease),
+    box-shadow var(--wc-transition-fast, 150ms ease);
   appearance: none;
   -webkit-appearance: none;
   -moz-appearance: none;
@@ -233,38 +248,43 @@ wc-form select {
   background-size: 12px 8px;
 }
 
-wc-form select:focus {
+hx-form select:focus {
   outline: none;
-  border-color: var(--wc-select-focus-ring-color, var(--wc-focus-ring-color, #007878));
-  box-shadow: 0 0 0 var(--wc-focus-ring-width, 2px) color-mix(in srgb, var(--wc-select-focus-ring-color, var(--wc-focus-ring-color, #007878)) calc(var(--wc-focus-ring-opacity, 0.25) * 100%), transparent);
+  border-color: var(--wc-select-focus-ring-color, var(--wc-focus-ring-color, #2563eb));
+  box-shadow: 0 0 0 var(--wc-focus-ring-width, 2px)
+    color-mix(
+      in srgb,
+      var(--wc-select-focus-ring-color, var(--wc-focus-ring-color, #2563eb))
+        calc(var(--wc-focus-ring-opacity, 0.25) * 100%),
+      transparent
+    );
 }
 
-wc-form select:disabled {
+hx-form select:disabled {
   opacity: var(--wc-opacity-disabled, 0.5);
   cursor: not-allowed;
   pointer-events: none;
 }
 
-wc-form select[multiple] {
+hx-form select[multiple] {
   min-height: var(--wc-size-20, 5rem);
   padding-right: var(--wc-space-3, 0.75rem);
   background-image: none;
 }
 
-wc-form select[multiple] option {
+hx-form select[multiple] option {
   padding: var(--wc-space-1, 0.25rem) var(--wc-space-2, 0.5rem);
 }
 
-wc-form select::-ms-expand {
+hx-form select::-ms-expand {
   display: none;
 }
-
 
 /* ==========================================================================
  * CHECKBOX (_checkbox.css scoped)
  * ========================================================================== */
 
-wc-form input[type='checkbox'] {
+hx-form input[type='checkbox'] {
   appearance: none;
   -webkit-appearance: none;
   -moz-appearance: none;
@@ -275,62 +295,65 @@ wc-form input[type='checkbox'] {
   width: var(--wc-checkbox-size, var(--wc-size-5, 1.25rem));
   height: var(--wc-checkbox-size, var(--wc-size-5, 1.25rem));
   margin: 0;
-  border: var(--wc-border-width-medium, 2px) solid var(--wc-checkbox-border-color, var(--wc-color-neutral-300, #ced4da));
+  border: var(--wc-border-width-medium, 2px) solid
+    var(--wc-checkbox-border-color, var(--wc-color-neutral-300, #ced4da));
   border-radius: var(--wc-checkbox-border-radius, var(--wc-border-radius-sm, 0.25rem));
   background-color: var(--wc-color-neutral-0, #ffffff);
-  transition: background-color var(--wc-transition-fast, 150ms ease),
-              border-color var(--wc-transition-fast, 150ms ease),
-              box-shadow var(--wc-transition-fast, 150ms ease);
+  transition:
+    background-color var(--wc-transition-fast, 150ms ease),
+    border-color var(--wc-transition-fast, 150ms ease),
+    box-shadow var(--wc-transition-fast, 150ms ease);
   cursor: pointer;
   vertical-align: middle;
 }
 
-wc-form input[type='checkbox']:checked {
-  background-color: var(--wc-checkbox-checked-bg, var(--wc-color-primary-500, #007878));
-  border-color: var(--wc-checkbox-checked-border-color, var(--wc-color-primary-500, #007878));
+hx-form input[type='checkbox']:checked {
+  background-color: var(--wc-checkbox-checked-bg, var(--wc-color-primary-500, #2563eb));
+  border-color: var(--wc-checkbox-checked-border-color, var(--wc-color-primary-500, #2563eb));
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none'%3E%3Cpath d='M3.5 8.5L6.5 11.5L12.5 4.5' stroke='%23ffffff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: center;
   background-size: 100%;
 }
 
-wc-form input[type='checkbox']:indeterminate {
-  background-color: var(--wc-checkbox-checked-bg, var(--wc-color-primary-500, #007878));
-  border-color: var(--wc-checkbox-checked-border-color, var(--wc-color-primary-500, #007878));
+hx-form input[type='checkbox']:indeterminate {
+  background-color: var(--wc-checkbox-checked-bg, var(--wc-color-primary-500, #2563eb));
+  border-color: var(--wc-checkbox-checked-border-color, var(--wc-color-primary-500, #2563eb));
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none'%3E%3Cpath d='M4 8H12' stroke='%23ffffff' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: center;
   background-size: 100%;
 }
 
-wc-form input[type='checkbox']:focus-visible {
-  outline: var(--wc-focus-ring-width, 2px) solid var(--wc-checkbox-focus-ring-color, var(--wc-focus-ring-color, #007878));
+hx-form input[type='checkbox']:focus-visible {
+  outline: var(--wc-focus-ring-width, 2px) solid
+    var(--wc-checkbox-focus-ring-color, var(--wc-focus-ring-color, #2563eb));
   outline-offset: var(--wc-focus-ring-offset, 2px);
 }
 
-wc-form input[type='checkbox']:hover:not(:disabled) {
-  border-color: var(--wc-color-primary-500, #007878);
+hx-form input[type='checkbox']:hover:not(:disabled) {
+  border-color: var(--wc-color-primary-500, #2563eb);
 }
 
-wc-form input[type='checkbox']:checked:hover:not(:disabled) {
+hx-form input[type='checkbox']:checked:hover:not(:disabled) {
   filter: brightness(var(--wc-filter-brightness-hover, 0.9));
 }
 
-wc-form input[type='checkbox']:disabled {
+hx-form input[type='checkbox']:disabled {
   opacity: var(--wc-opacity-disabled, 0.5);
   cursor: not-allowed;
   pointer-events: none;
 }
 
-wc-form .form-type-checkbox,
-wc-form .form-type-checkbox-toggle {
+hx-form .form-type-checkbox,
+hx-form .form-type-checkbox-toggle {
   display: flex;
   align-items: flex-start;
   gap: var(--wc-space-2, 0.5rem);
 }
 
-wc-form .form-type-checkbox label,
-wc-form .form-type-checkbox-toggle label {
+hx-form .form-type-checkbox label,
+hx-form .form-type-checkbox-toggle label {
   font-size: var(--wc-font-size-sm, 0.875rem);
   font-weight: var(--wc-font-weight-medium, 500);
   color: var(--wc-checkbox-label-color, var(--wc-color-neutral-700, #343a40));
@@ -340,12 +363,11 @@ wc-form .form-type-checkbox-toggle label {
   -webkit-user-select: none;
 }
 
-
 /* ==========================================================================
  * RADIO (_radio.css scoped)
  * ========================================================================== */
 
-wc-form input[type='radio'] {
+hx-form input[type='radio'] {
   appearance: none;
   -webkit-appearance: none;
   -moz-appearance: none;
@@ -356,44 +378,48 @@ wc-form input[type='radio'] {
   width: var(--wc-radio-size, var(--wc-size-5, 1.25rem));
   height: var(--wc-radio-size, var(--wc-size-5, 1.25rem));
   margin: 0;
-  border: var(--wc-border-width-medium, 2px) solid var(--wc-radio-border-color, var(--wc-color-neutral-300, #ced4da));
+  border: var(--wc-border-width-medium, 2px) solid
+    var(--wc-radio-border-color, var(--wc-color-neutral-300, #ced4da));
   border-radius: var(--wc-border-radius-full, 9999px);
   background-color: var(--wc-color-neutral-0, #ffffff);
-  transition: border-color var(--wc-transition-fast, 150ms ease),
-              background-color var(--wc-transition-fast, 150ms ease),
-              box-shadow var(--wc-transition-fast, 150ms ease);
+  transition:
+    border-color var(--wc-transition-fast, 150ms ease),
+    background-color var(--wc-transition-fast, 150ms ease),
+    box-shadow var(--wc-transition-fast, 150ms ease);
   cursor: pointer;
   vertical-align: middle;
 }
 
-wc-form input[type='radio']:checked {
-  border-color: var(--wc-radio-checked-border-color, var(--wc-color-primary-500, #007878));
-  background-color: var(--wc-radio-checked-bg, var(--wc-color-primary-500, #007878));
-  box-shadow: inset 0 0 0 calc(var(--wc-radio-size, var(--wc-size-5, 1.25rem)) * 0.3) var(--wc-radio-dot-color, var(--wc-color-neutral-0, #ffffff));
+hx-form input[type='radio']:checked {
+  border-color: var(--wc-radio-checked-border-color, var(--wc-color-primary-500, #2563eb));
+  background-color: var(--wc-radio-checked-bg, var(--wc-color-primary-500, #2563eb));
+  box-shadow: inset 0 0 0 calc(var(--wc-radio-size, var(--wc-size-5, 1.25rem)) * 0.3)
+    var(--wc-radio-dot-color, var(--wc-color-neutral-0, #ffffff));
 }
 
-wc-form input[type='radio']:focus-visible {
-  outline: var(--wc-focus-ring-width, 2px) solid var(--wc-radio-focus-ring-color, var(--wc-focus-ring-color, #007878));
+hx-form input[type='radio']:focus-visible {
+  outline: var(--wc-focus-ring-width, 2px) solid
+    var(--wc-radio-focus-ring-color, var(--wc-focus-ring-color, #2563eb));
   outline-offset: var(--wc-focus-ring-offset, 2px);
 }
 
-wc-form input[type='radio']:hover:not(:disabled):not(:checked) {
+hx-form input[type='radio']:hover:not(:disabled):not(:checked) {
   border-color: var(--wc-color-neutral-400, #adb5bd);
 }
 
-wc-form input[type='radio']:disabled {
+hx-form input[type='radio']:disabled {
   opacity: var(--wc-opacity-disabled, 0.5);
   cursor: not-allowed;
   pointer-events: none;
 }
 
-wc-form .form-type-radio {
+hx-form .form-type-radio {
   display: inline-flex;
   align-items: center;
   gap: var(--wc-space-2, 0.5rem);
 }
 
-wc-form .form-type-radio label {
+hx-form .form-type-radio label {
   font-size: var(--wc-font-size-md, 1rem);
   color: var(--wc-radio-label-color, var(--wc-color-neutral-700, #343a40));
   line-height: var(--wc-line-height-normal, 1.5);
@@ -402,36 +428,35 @@ wc-form .form-type-radio label {
   -webkit-user-select: none;
 }
 
-wc-form .form-radios {
+hx-form .form-radios {
   display: flex;
   flex-direction: column;
   gap: var(--wc-radio-group-gap, var(--wc-space-3, 0.75rem));
 }
 
-wc-form .form-radios--horizontal {
+hx-form .form-radios--horizontal {
   flex-direction: row;
   flex-wrap: wrap;
 }
-
 
 /* ==========================================================================
  * SWITCH (_switch.css scoped)
  * ========================================================================== */
 
-wc-form .form-type-switch {
+hx-form .form-type-switch {
   display: flex;
   flex-direction: column;
   gap: var(--wc-space-1, 0.25rem);
   font-family: var(--wc-font-family-sans, sans-serif);
 }
 
-wc-form .form-type-switch .switch__control-row {
+hx-form .form-type-switch .switch__control-row {
   display: flex;
   align-items: center;
   gap: var(--wc-space-2, 0.5rem);
 }
 
-wc-form .form-type-switch input[type='checkbox'] {
+hx-form .form-type-switch input[type='checkbox'] {
   appearance: none;
   -webkit-appearance: none;
   -moz-appearance: none;
@@ -450,7 +475,7 @@ wc-form .form-type-switch input[type='checkbox'] {
   background-image: none;
 }
 
-wc-form .form-type-switch input[type='checkbox']::before {
+hx-form .form-type-switch input[type='checkbox']::before {
   content: '';
   position: absolute;
   top: 50%;
@@ -464,27 +489,29 @@ wc-form .form-type-switch input[type='checkbox']::before {
   transition: transform var(--wc-transition-fast, 150ms ease);
 }
 
-wc-form .form-type-switch input[type='checkbox']:checked {
-  background-color: var(--wc-switch-track-checked-bg, var(--wc-color-primary-500, #007878));
+hx-form .form-type-switch input[type='checkbox']:checked {
+  background-color: var(--wc-switch-track-checked-bg, var(--wc-color-primary-500, #2563eb));
   background-image: none;
 }
 
-wc-form .form-type-switch input[type='checkbox']:checked::before {
-  transform: translateY(-50%) translateX(var(--wc-switch-thumb-size-md, var(--wc-size-4-5, 1.125rem)));
+hx-form .form-type-switch input[type='checkbox']:checked::before {
+  transform: translateY(-50%)
+    translateX(var(--wc-switch-thumb-size-md, var(--wc-size-4-5, 1.125rem)));
 }
 
-wc-form .form-type-switch input[type='checkbox']:focus-visible {
-  outline: var(--wc-focus-ring-width, 2px) solid var(--wc-switch-focus-ring-color, var(--wc-focus-ring-color, #007878));
+hx-form .form-type-switch input[type='checkbox']:focus-visible {
+  outline: var(--wc-focus-ring-width, 2px) solid
+    var(--wc-switch-focus-ring-color, var(--wc-focus-ring-color, #2563eb));
   outline-offset: var(--wc-focus-ring-offset, 2px);
 }
 
-wc-form .form-type-switch input[type='checkbox']:disabled {
+hx-form .form-type-switch input[type='checkbox']:disabled {
   opacity: var(--wc-opacity-disabled, 0.5);
   cursor: not-allowed;
   pointer-events: none;
 }
 
-wc-form .form-type-switch label {
+hx-form .form-type-switch label {
   font-size: var(--wc-font-size-sm, 0.875rem);
   font-weight: var(--wc-font-weight-medium, 500);
   color: var(--wc-switch-label-color, var(--wc-color-neutral-700, #343a40));
@@ -495,35 +522,36 @@ wc-form .form-type-switch label {
 }
 
 /* Small */
-wc-form .form-type-switch--sm input[type='checkbox'] {
+hx-form .form-type-switch--sm input[type='checkbox'] {
   width: var(--wc-switch-track-width-sm, var(--wc-size-8, 2rem));
   height: var(--wc-switch-track-height-sm, var(--wc-size-4-5, 1.125rem));
 }
 
-wc-form .form-type-switch--sm input[type='checkbox']::before {
+hx-form .form-type-switch--sm input[type='checkbox']::before {
   width: var(--wc-switch-thumb-size-sm, var(--wc-size-3-5, 0.875rem));
   height: var(--wc-switch-thumb-size-sm, var(--wc-size-3-5, 0.875rem));
 }
 
-wc-form .form-type-switch--sm input[type='checkbox']:checked::before {
-  transform: translateY(-50%) translateX(var(--wc-switch-thumb-size-sm, var(--wc-size-3-5, 0.875rem)));
+hx-form .form-type-switch--sm input[type='checkbox']:checked::before {
+  transform: translateY(-50%)
+    translateX(var(--wc-switch-thumb-size-sm, var(--wc-size-3-5, 0.875rem)));
 }
 
 /* Large */
-wc-form .form-type-switch--lg input[type='checkbox'] {
+hx-form .form-type-switch--lg input[type='checkbox'] {
   width: var(--wc-switch-track-width-lg, var(--wc-size-12, 3rem));
   height: var(--wc-switch-track-height-lg, var(--wc-size-6-5, 1.625rem));
 }
 
-wc-form .form-type-switch--lg input[type='checkbox']::before {
+hx-form .form-type-switch--lg input[type='checkbox']::before {
   width: var(--wc-switch-thumb-size-lg, var(--wc-size-5-5, 1.375rem));
   height: var(--wc-switch-thumb-size-lg, var(--wc-size-5-5, 1.375rem));
 }
 
-wc-form .form-type-switch--lg input[type='checkbox']:checked::before {
-  transform: translateY(-50%) translateX(var(--wc-switch-thumb-size-lg, var(--wc-size-5-5, 1.375rem)));
+hx-form .form-type-switch--lg input[type='checkbox']:checked::before {
+  transform: translateY(-50%)
+    translateX(var(--wc-switch-thumb-size-lg, var(--wc-size-5-5, 1.375rem)));
 }
-
 
 /* ==========================================================================
  * FORM LAYOUT (_form-layout.css scoped)
@@ -531,7 +559,7 @@ wc-form .form-type-switch--lg input[type='checkbox']:checked::before {
 
 /* ─── Form Root ─── */
 
-wc-form form {
+hx-form form {
   display: flex;
   flex-direction: column;
   gap: var(--wc-space-4, 1rem);
@@ -540,7 +568,7 @@ wc-form form {
 
 /* ─── Fieldset ─── */
 
-wc-form fieldset {
+hx-form fieldset {
   border: var(--wc-border-width-thin, 1px) solid var(--wc-color-neutral-200, #dee2e6);
   border-radius: var(--wc-border-radius-md, 0.375rem);
   padding: var(--wc-space-4, 1rem) var(--wc-space-4, 1rem) var(--wc-space-4, 1rem);
@@ -552,7 +580,7 @@ wc-form fieldset {
 
 /* ─── Legend ─── */
 
-wc-form legend {
+hx-form legend {
   display: flex;
   align-items: baseline;
   gap: var(--wc-space-1, 0.25rem);
@@ -565,14 +593,14 @@ wc-form legend {
 
 /* ─── Details / Collapsible Fieldset (Drupal) ─── */
 
-wc-form details {
+hx-form details {
   border: var(--wc-border-width-thin, 1px) solid var(--wc-color-neutral-200, #dee2e6);
   border-radius: var(--wc-border-radius-md, 0.375rem);
   padding: var(--wc-space-4, 1rem);
   margin: 0;
 }
 
-wc-form summary {
+hx-form summary {
   font-size: var(--wc-font-size-sm, 0.875rem);
   font-weight: var(--wc-font-weight-semibold, 600);
   color: var(--wc-color-neutral-700, #343a40);
@@ -583,88 +611,87 @@ wc-form summary {
   -webkit-user-select: none;
 }
 
-wc-form summary:focus-visible {
-  outline: var(--wc-focus-ring-width, 2px) solid var(--wc-focus-ring-color, #007878);
+hx-form summary:focus-visible {
+  outline: var(--wc-focus-ring-width, 2px) solid var(--wc-focus-ring-color, #2563eb);
   outline-offset: var(--wc-focus-ring-offset, 2px);
   border-radius: var(--wc-border-radius-sm, 0.25rem);
 }
 
 /* ─── Form Actions (button group) ─── */
 
-wc-form .form-actions {
+hx-form .form-actions {
   display: flex;
   align-items: center;
   gap: var(--wc-space-3, 0.75rem);
   padding-top: var(--wc-space-4, 1rem);
 }
 
-wc-form .form-actions--end {
+hx-form .form-actions--end {
   justify-content: flex-end;
 }
 
-wc-form .form-actions--between {
+hx-form .form-actions--between {
   justify-content: space-between;
 }
 
 /* ─── Multi-Column Layout ─── */
 
-wc-form .form-columns {
+hx-form .form-columns {
   display: grid;
   gap: var(--wc-space-4, 1rem);
 }
 
-wc-form .form-columns--2 {
+hx-form .form-columns--2 {
   grid-template-columns: repeat(2, 1fr);
 }
 
-wc-form .form-columns--3 {
+hx-form .form-columns--3 {
   grid-template-columns: repeat(3, 1fr);
 }
 
-wc-form .form-columns--4 {
+hx-form .form-columns--4 {
   grid-template-columns: repeat(4, 1fr);
 }
 
 @media (max-width: 640px) {
-  wc-form .form-columns--2,
-  wc-form .form-columns--3,
-  wc-form .form-columns--4 {
+  hx-form .form-columns--2,
+  hx-form .form-columns--3,
+  hx-form .form-columns--4 {
     grid-template-columns: 1fr;
   }
 }
 
 /* ─── Full-Width Form Item (spans all columns) ─── */
 
-wc-form .form-item--full {
+hx-form .form-item--full {
   grid-column: 1 / -1;
 }
 
 /* ─── Inline Form Layout ─── */
 
-wc-form .form-inline {
+hx-form .form-inline {
   display: flex;
   flex-wrap: wrap;
   align-items: flex-end;
   gap: var(--wc-space-3, 0.75rem);
 }
 
-wc-form .form-inline .form-item {
+hx-form .form-inline .form-item {
   flex: 1;
   min-width: 0;
 }
 
-wc-form .form-inline .form-item + .form-item {
+hx-form .form-inline .form-item + .form-item {
   margin-top: 0;
 }
 
 /* ─── Form Divider ─── */
 
-wc-form .form-divider {
+hx-form .form-divider {
   border: none;
   border-top: var(--wc-border-width-thin, 1px) solid var(--wc-color-neutral-200, #dee2e6);
   margin: var(--wc-space-2, 0.5rem) 0;
 }
-
 
 /* ==========================================================================
  * VALIDATION (_validation.css scoped)
@@ -672,99 +699,105 @@ wc-form .form-divider {
 
 /* ─── Error State on Field Wrapper ─── */
 
-wc-form .form-item.error label,
-wc-form .form-item.has-error label,
-wc-form .form-item--error label {
+hx-form .form-item.error label,
+hx-form .form-item.has-error label,
+hx-form .form-item--error label {
   color: var(--wc-input-error-color, var(--wc-color-error-500, #dc3545));
 }
 
-wc-form .form-item.error input[type='text'],
-wc-form .form-item.error input[type='email'],
-wc-form .form-item.error input[type='password'],
-wc-form .form-item.error input[type='tel'],
-wc-form .form-item.error input[type='url'],
-wc-form .form-item.error input[type='search'],
-wc-form .form-item.error input[type='number'],
-wc-form .form-item.error textarea,
-wc-form .form-item.error select,
-wc-form .form-item.has-error input[type='text'],
-wc-form .form-item.has-error input[type='email'],
-wc-form .form-item.has-error input[type='password'],
-wc-form .form-item.has-error input[type='tel'],
-wc-form .form-item.has-error input[type='url'],
-wc-form .form-item.has-error input[type='search'],
-wc-form .form-item.has-error input[type='number'],
-wc-form .form-item.has-error textarea,
-wc-form .form-item.has-error select,
-wc-form .form-item--error input[type='text'],
-wc-form .form-item--error input[type='email'],
-wc-form .form-item--error input[type='password'],
-wc-form .form-item--error input[type='tel'],
-wc-form .form-item--error input[type='url'],
-wc-form .form-item--error input[type='search'],
-wc-form .form-item--error input[type='number'],
-wc-form .form-item--error textarea,
-wc-form .form-item--error select {
+hx-form .form-item.error input[type='text'],
+hx-form .form-item.error input[type='email'],
+hx-form .form-item.error input[type='password'],
+hx-form .form-item.error input[type='tel'],
+hx-form .form-item.error input[type='url'],
+hx-form .form-item.error input[type='search'],
+hx-form .form-item.error input[type='number'],
+hx-form .form-item.error textarea,
+hx-form .form-item.error select,
+hx-form .form-item.has-error input[type='text'],
+hx-form .form-item.has-error input[type='email'],
+hx-form .form-item.has-error input[type='password'],
+hx-form .form-item.has-error input[type='tel'],
+hx-form .form-item.has-error input[type='url'],
+hx-form .form-item.has-error input[type='search'],
+hx-form .form-item.has-error input[type='number'],
+hx-form .form-item.has-error textarea,
+hx-form .form-item.has-error select,
+hx-form .form-item--error input[type='text'],
+hx-form .form-item--error input[type='email'],
+hx-form .form-item--error input[type='password'],
+hx-form .form-item--error input[type='tel'],
+hx-form .form-item--error input[type='url'],
+hx-form .form-item--error input[type='search'],
+hx-form .form-item--error input[type='number'],
+hx-form .form-item--error textarea,
+hx-form .form-item--error select {
   border-color: var(--wc-input-error-color, var(--wc-color-error-500, #dc3545));
 }
 
-wc-form .form-item.error input[type='text']:focus,
-wc-form .form-item.error input[type='email']:focus,
-wc-form .form-item.error input[type='password']:focus,
-wc-form .form-item.error input[type='tel']:focus,
-wc-form .form-item.error input[type='url']:focus,
-wc-form .form-item.error input[type='search']:focus,
-wc-form .form-item.error input[type='number']:focus,
-wc-form .form-item.error textarea:focus,
-wc-form .form-item.error select:focus,
-wc-form .form-item.has-error input[type='text']:focus,
-wc-form .form-item.has-error input[type='email']:focus,
-wc-form .form-item.has-error input[type='password']:focus,
-wc-form .form-item.has-error input[type='tel']:focus,
-wc-form .form-item.has-error input[type='url']:focus,
-wc-form .form-item.has-error input[type='search']:focus,
-wc-form .form-item.has-error input[type='number']:focus,
-wc-form .form-item.has-error textarea:focus,
-wc-form .form-item.has-error select:focus,
-wc-form .form-item--error input[type='text']:focus,
-wc-form .form-item--error input[type='email']:focus,
-wc-form .form-item--error input[type='password']:focus,
-wc-form .form-item--error input[type='tel']:focus,
-wc-form .form-item--error input[type='url']:focus,
-wc-form .form-item--error input[type='search']:focus,
-wc-form .form-item--error input[type='number']:focus,
-wc-form .form-item--error textarea:focus,
-wc-form .form-item--error select:focus {
+hx-form .form-item.error input[type='text']:focus,
+hx-form .form-item.error input[type='email']:focus,
+hx-form .form-item.error input[type='password']:focus,
+hx-form .form-item.error input[type='tel']:focus,
+hx-form .form-item.error input[type='url']:focus,
+hx-form .form-item.error input[type='search']:focus,
+hx-form .form-item.error input[type='number']:focus,
+hx-form .form-item.error textarea:focus,
+hx-form .form-item.error select:focus,
+hx-form .form-item.has-error input[type='text']:focus,
+hx-form .form-item.has-error input[type='email']:focus,
+hx-form .form-item.has-error input[type='password']:focus,
+hx-form .form-item.has-error input[type='tel']:focus,
+hx-form .form-item.has-error input[type='url']:focus,
+hx-form .form-item.has-error input[type='search']:focus,
+hx-form .form-item.has-error input[type='number']:focus,
+hx-form .form-item.has-error textarea:focus,
+hx-form .form-item.has-error select:focus,
+hx-form .form-item--error input[type='text']:focus,
+hx-form .form-item--error input[type='email']:focus,
+hx-form .form-item--error input[type='password']:focus,
+hx-form .form-item--error input[type='tel']:focus,
+hx-form .form-item--error input[type='url']:focus,
+hx-form .form-item--error input[type='search']:focus,
+hx-form .form-item--error input[type='number']:focus,
+hx-form .form-item--error textarea:focus,
+hx-form .form-item--error select:focus {
   border-color: var(--wc-input-error-color, var(--wc-color-error-500, #dc3545));
-  box-shadow: 0 0 0 var(--wc-focus-ring-width, 2px) color-mix(in srgb, var(--wc-input-error-color, var(--wc-color-error-500, #dc3545)) calc(var(--wc-focus-ring-opacity, 0.25) * 100%), transparent);
+  box-shadow: 0 0 0 var(--wc-focus-ring-width, 2px)
+    color-mix(
+      in srgb,
+      var(--wc-input-error-color, var(--wc-color-error-500, #dc3545))
+        calc(var(--wc-focus-ring-opacity, 0.25) * 100%),
+      transparent
+    );
 }
 
 /* ─── Error State on Checkbox/Radio ─── */
 
-wc-form .form-item.error input[type='checkbox'],
-wc-form .form-item.has-error input[type='checkbox'],
-wc-form .form-item--error input[type='checkbox'] {
+hx-form .form-item.error input[type='checkbox'],
+hx-form .form-item.has-error input[type='checkbox'],
+hx-form .form-item--error input[type='checkbox'] {
   border-color: var(--wc-checkbox-error-color, var(--wc-color-error-500, #dc3545));
 }
 
-wc-form .form-item.error input[type='checkbox']:checked,
-wc-form .form-item.has-error input[type='checkbox']:checked,
-wc-form .form-item--error input[type='checkbox']:checked {
+hx-form .form-item.error input[type='checkbox']:checked,
+hx-form .form-item.has-error input[type='checkbox']:checked,
+hx-form .form-item--error input[type='checkbox']:checked {
   background-color: var(--wc-checkbox-error-color, var(--wc-color-error-500, #dc3545));
   border-color: var(--wc-checkbox-error-color, var(--wc-color-error-500, #dc3545));
 }
 
-wc-form .form-item.error input[type='radio'],
-wc-form .form-item.has-error input[type='radio'],
-wc-form .form-item--error input[type='radio'] {
+hx-form .form-item.error input[type='radio'],
+hx-form .form-item.has-error input[type='radio'],
+hx-form .form-item--error input[type='radio'] {
   border-color: var(--wc-color-error-500, #dc3545);
 }
 
 /* ─── Inline Error Message ─── */
 
-wc-form .form-item__error-message,
-wc-form .form-item .error-message,
-wc-form .error-message {
+hx-form .form-item__error-message,
+hx-form .form-item .error-message,
+hx-form .error-message {
   font-size: var(--wc-font-size-xs, 0.75rem);
   color: var(--wc-input-error-color, var(--wc-color-error-500, #dc3545));
   line-height: var(--wc-line-height-normal, 1.5);
@@ -772,78 +805,83 @@ wc-form .error-message {
 
 /* ─── Success State on Field Wrapper ─── */
 
-wc-form .form-item.success label,
-wc-form .form-item.has-success label,
-wc-form .form-item--success label {
+hx-form .form-item.success label,
+hx-form .form-item.has-success label,
+hx-form .form-item--success label {
   color: var(--wc-color-success-500, #198754);
 }
 
-wc-form .form-item.success input[type='text'],
-wc-form .form-item.success input[type='email'],
-wc-form .form-item.success input[type='password'],
-wc-form .form-item.success input[type='tel'],
-wc-form .form-item.success input[type='url'],
-wc-form .form-item.success input[type='search'],
-wc-form .form-item.success input[type='number'],
-wc-form .form-item.success textarea,
-wc-form .form-item.success select,
-wc-form .form-item.has-success input[type='text'],
-wc-form .form-item.has-success input[type='email'],
-wc-form .form-item.has-success input[type='password'],
-wc-form .form-item.has-success input[type='tel'],
-wc-form .form-item.has-success input[type='url'],
-wc-form .form-item.has-success input[type='search'],
-wc-form .form-item.has-success input[type='number'],
-wc-form .form-item.has-success textarea,
-wc-form .form-item.has-success select,
-wc-form .form-item--success input[type='text'],
-wc-form .form-item--success input[type='email'],
-wc-form .form-item--success input[type='password'],
-wc-form .form-item--success input[type='tel'],
-wc-form .form-item--success input[type='url'],
-wc-form .form-item--success input[type='search'],
-wc-form .form-item--success input[type='number'],
-wc-form .form-item--success textarea,
-wc-form .form-item--success select {
+hx-form .form-item.success input[type='text'],
+hx-form .form-item.success input[type='email'],
+hx-form .form-item.success input[type='password'],
+hx-form .form-item.success input[type='tel'],
+hx-form .form-item.success input[type='url'],
+hx-form .form-item.success input[type='search'],
+hx-form .form-item.success input[type='number'],
+hx-form .form-item.success textarea,
+hx-form .form-item.success select,
+hx-form .form-item.has-success input[type='text'],
+hx-form .form-item.has-success input[type='email'],
+hx-form .form-item.has-success input[type='password'],
+hx-form .form-item.has-success input[type='tel'],
+hx-form .form-item.has-success input[type='url'],
+hx-form .form-item.has-success input[type='search'],
+hx-form .form-item.has-success input[type='number'],
+hx-form .form-item.has-success textarea,
+hx-form .form-item.has-success select,
+hx-form .form-item--success input[type='text'],
+hx-form .form-item--success input[type='email'],
+hx-form .form-item--success input[type='password'],
+hx-form .form-item--success input[type='tel'],
+hx-form .form-item--success input[type='url'],
+hx-form .form-item--success input[type='search'],
+hx-form .form-item--success input[type='number'],
+hx-form .form-item--success textarea,
+hx-form .form-item--success select {
   border-color: var(--wc-color-success-500, #198754);
 }
 
-wc-form .form-item.success input[type='text']:focus,
-wc-form .form-item.success input[type='email']:focus,
-wc-form .form-item.success input[type='password']:focus,
-wc-form .form-item.success input[type='tel']:focus,
-wc-form .form-item.success input[type='url']:focus,
-wc-form .form-item.success input[type='search']:focus,
-wc-form .form-item.success input[type='number']:focus,
-wc-form .form-item.success textarea:focus,
-wc-form .form-item.success select:focus,
-wc-form .form-item.has-success input[type='text']:focus,
-wc-form .form-item.has-success input[type='email']:focus,
-wc-form .form-item.has-success input[type='password']:focus,
-wc-form .form-item.has-success input[type='tel']:focus,
-wc-form .form-item.has-success input[type='url']:focus,
-wc-form .form-item.has-success input[type='search']:focus,
-wc-form .form-item.has-success input[type='number']:focus,
-wc-form .form-item.has-success textarea:focus,
-wc-form .form-item.has-success select:focus,
-wc-form .form-item--success input[type='text']:focus,
-wc-form .form-item--success input[type='email']:focus,
-wc-form .form-item--success input[type='password']:focus,
-wc-form .form-item--success input[type='tel']:focus,
-wc-form .form-item--success input[type='url']:focus,
-wc-form .form-item--success input[type='search']:focus,
-wc-form .form-item--success input[type='number']:focus,
-wc-form .form-item--success textarea:focus,
-wc-form .form-item--success select:focus {
+hx-form .form-item.success input[type='text']:focus,
+hx-form .form-item.success input[type='email']:focus,
+hx-form .form-item.success input[type='password']:focus,
+hx-form .form-item.success input[type='tel']:focus,
+hx-form .form-item.success input[type='url']:focus,
+hx-form .form-item.success input[type='search']:focus,
+hx-form .form-item.success input[type='number']:focus,
+hx-form .form-item.success textarea:focus,
+hx-form .form-item.success select:focus,
+hx-form .form-item.has-success input[type='text']:focus,
+hx-form .form-item.has-success input[type='email']:focus,
+hx-form .form-item.has-success input[type='password']:focus,
+hx-form .form-item.has-success input[type='tel']:focus,
+hx-form .form-item.has-success input[type='url']:focus,
+hx-form .form-item.has-success input[type='search']:focus,
+hx-form .form-item.has-success input[type='number']:focus,
+hx-form .form-item.has-success textarea:focus,
+hx-form .form-item.has-success select:focus,
+hx-form .form-item--success input[type='text']:focus,
+hx-form .form-item--success input[type='email']:focus,
+hx-form .form-item--success input[type='password']:focus,
+hx-form .form-item--success input[type='tel']:focus,
+hx-form .form-item--success input[type='url']:focus,
+hx-form .form-item--success input[type='search']:focus,
+hx-form .form-item--success input[type='number']:focus,
+hx-form .form-item--success textarea:focus,
+hx-form .form-item--success select:focus {
   border-color: var(--wc-color-success-500, #198754);
-  box-shadow: 0 0 0 var(--wc-focus-ring-width, 2px) color-mix(in srgb, var(--wc-color-success-500, #198754) calc(var(--wc-focus-ring-opacity, 0.25) * 100%), transparent);
+  box-shadow: 0 0 0 var(--wc-focus-ring-width, 2px)
+    color-mix(
+      in srgb,
+      var(--wc-color-success-500, #198754) calc(var(--wc-focus-ring-opacity, 0.25) * 100%),
+      transparent
+    );
 }
 
 /* ─── Inline Success Message ─── */
 
-wc-form .form-item__success-message,
-wc-form .form-item .success-message,
-wc-form .success-message {
+hx-form .form-item__success-message,
+hx-form .form-item .success-message,
+hx-form .success-message {
   font-size: var(--wc-font-size-xs, 0.75rem);
   color: var(--wc-color-success-500, #198754);
   line-height: var(--wc-line-height-normal, 1.5);
@@ -851,8 +889,9 @@ wc-form .success-message {
 
 /* ─── Drupal System Messages ─── */
 
-wc-form .messages--error {
-  border: var(--wc-border-width-thin, 1px) solid var(--wc-input-error-color, var(--wc-color-error-500, #dc3545));
+hx-form .messages--error {
+  border: var(--wc-border-width-thin, 1px) solid
+    var(--wc-input-error-color, var(--wc-color-error-500, #dc3545));
   border-radius: var(--wc-border-radius-md, 0.375rem);
   background-color: var(--wc-color-error-50, #fef2f2);
   color: var(--wc-input-error-color, var(--wc-color-error-500, #dc3545));
@@ -861,7 +900,7 @@ wc-form .messages--error {
   line-height: var(--wc-line-height-normal, 1.5);
 }
 
-wc-form .messages--status {
+hx-form .messages--status {
   border: var(--wc-border-width-thin, 1px) solid var(--wc-color-success-500, #198754);
   border-radius: var(--wc-border-radius-md, 0.375rem);
   background-color: var(--wc-color-success-50, #f0fdf4);
@@ -871,7 +910,7 @@ wc-form .messages--status {
   line-height: var(--wc-line-height-normal, 1.5);
 }
 
-wc-form .messages--warning {
+hx-form .messages--warning {
   border: var(--wc-border-width-thin, 1px) solid var(--wc-color-warning-500, #ffc107);
   border-radius: var(--wc-border-radius-md, 0.375rem);
   background-color: var(--wc-color-warning-50, #fffbeb);

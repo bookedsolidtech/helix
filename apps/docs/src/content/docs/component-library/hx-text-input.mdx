@@ -1,5 +1,5 @@
 ---
-title: "wc-text-input"
+title: "hx-text-input"
 description: Form-associated text input with label, validation, help text, and prefix/suffix slots
 ---
 
@@ -9,14 +9,14 @@ import ComponentDoc from '../../../components/ComponentDoc.astro';
 
 <ComponentLoader />
 
-<ComponentDoc tagName="wc-text-input" section="summary" />
+<ComponentDoc tagName="hx-text-input" section="summary" />
 
 ## Basic
 
 Simple text input with label.
 
 <ComponentDemo title="Basic">
-  <wc-text-input label="Full name" placeholder="Jane Doe"></wc-text-input>
+  <hx-text-input label="Full name" placeholder="Jane Doe"></hx-text-input>
 </ComponentDemo>
 
 ## Input Types
@@ -25,11 +25,11 @@ Different native input types.
 
 <ComponentDemo title="Input Types">
   <div style="display: grid; gap: 1rem; max-width: 400px;">
-    <wc-text-input label="Email" type="email" placeholder="you@example.com"></wc-text-input>
-    <wc-text-input label="Password" type="password" placeholder="Enter password"></wc-text-input>
-    <wc-text-input label="Phone" type="tel" placeholder="(555) 123-4567"></wc-text-input>
-    <wc-text-input label="Search" type="search" placeholder="Search..."></wc-text-input>
-    <wc-text-input label="Number" type="number" placeholder="0"></wc-text-input>
+    <hx-text-input label="Email" type="email" placeholder="you@example.com"></hx-text-input>
+    <hx-text-input label="Password" type="password" placeholder="Enter password"></hx-text-input>
+    <hx-text-input label="Phone" type="tel" placeholder="(555) 123-4567"></hx-text-input>
+    <hx-text-input label="Search" type="search" placeholder="Search..."></hx-text-input>
+    <hx-text-input label="Number" type="number" placeholder="0"></hx-text-input>
   </div>
 </ComponentDemo>
 
@@ -39,11 +39,11 @@ Guidance text below the input.
 
 <ComponentDemo title="Help Text">
   <div style="max-width: 400px;">
-    <wc-text-input
+    <hx-text-input
       label="Username"
       placeholder="johndoe"
       help-text="Choose a unique username. Letters, numbers, and underscores only."
-    ></wc-text-input>
+    ></hx-text-input>
   </div>
 </ComponentDemo>
 
@@ -53,12 +53,12 @@ Input with error message displayed.
 
 <ComponentDemo title="Error State">
   <div style="max-width: 400px;">
-    <wc-text-input
+    <hx-text-input
       label="Email address"
       type="email"
       value="not-an-email"
       error="Please enter a valid email address."
-    ></wc-text-input>
+    ></hx-text-input>
   </div>
 </ComponentDemo>
 
@@ -68,12 +68,12 @@ Required field indicator.
 
 <ComponentDemo title="Required">
   <div style="max-width: 400px;">
-    <wc-text-input
-      label="Patient ID"
+    <hx-text-input
+      label="Account ID"
       required
-      placeholder="Enter patient ID"
+      placeholder="Enter account ID"
       help-text="This field is required."
-    ></wc-text-input>
+    ></hx-text-input>
   </div>
 </ComponentDemo>
 
@@ -83,11 +83,11 @@ Non-interactive disabled state.
 
 <ComponentDemo title="Disabled">
   <div style="max-width: 400px;">
-    <wc-text-input
+    <hx-text-input
       label="Read-only field"
       value="Cannot edit this"
       disabled
-    ></wc-text-input>
+    ></hx-text-input>
   </div>
 </ComponentDemo>
 
@@ -97,13 +97,13 @@ Content before and after the input.
 
 <ComponentDemo title="Prefix & Suffix Slots">
   <div style="display: grid; gap: 1rem; max-width: 400px;">
-    <wc-text-input label="Website" placeholder="example.com">
+    <hx-text-input label="Website" placeholder="example.com">
       <span slot="prefix">https://</span>
-    </wc-text-input>
-    <wc-text-input label="Price" type="number" placeholder="0.00">
+    </hx-text-input>
+    <hx-text-input label="Price" type="number" placeholder="0.00">
       <span slot="prefix">$</span>
       <span slot="suffix">USD</span>
-    </wc-text-input>
+    </hx-text-input>
   </div>
 </ComponentDemo>
 
@@ -113,12 +113,12 @@ Multiple states side by side.
 
 <ComponentDemo title="Validation States">
   <div style="display: grid; gap: 1rem; max-width: 400px;">
-    <wc-text-input label="Valid input" value="jane@example.com" help-text="Looks good!"></wc-text-input>
-    <wc-text-input label="Error input" value="bad" error="Too short — minimum 8 characters."></wc-text-input>
-    <wc-text-input label="Disabled input" value="locked" disabled></wc-text-input>
+    <hx-text-input label="Valid input" value="jane@example.com" help-text="Looks good!"></hx-text-input>
+    <hx-text-input label="Error input" value="bad" error="Too short — minimum 8 characters."></hx-text-input>
+    <hx-text-input label="Disabled input" value="locked" disabled></hx-text-input>
   </div>
 </ComponentDemo>
 
 ## API Reference
 
-<ComponentDoc tagName="wc-text-input" section="api" />
+<ComponentDoc tagName="hx-text-input" section="api" />

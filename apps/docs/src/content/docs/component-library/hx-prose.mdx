@@ -1,25 +1,58 @@
 ---
-title: "wc-prose"
+title: "hx-prose"
 description: "A Light DOM prose container that applies typographic styles to rich text content such as CKEditor output, Markdown-rendered HTML, or any structured body copy. Renders in the Light DOM (no Shadow DOM) so that global and scoped styles can target child elements directly. Uses the AdoptedStylesheetsController to inject scoped prose CSS into the document without duplication."
 ---
 
 import ComponentLoader from '../../../components/ComponentLoader.astro';
+import ComponentDemo from '../../../components/ComponentDemo.astro';
 import ComponentDoc from '../../../components/ComponentDoc.astro';
 
 <ComponentLoader />
 
-<ComponentDoc tagName="wc-prose" section="summary" />
+<ComponentDoc tagName="hx-prose" section="summary" />
 
-## Overview
+## Rich Content
 
-A Light DOM prose container that applies typographic styles to rich text
-content such as CKEditor output, Markdown-rendered HTML, or any structured
-body copy.
+Prose container with headings, paragraphs, lists, and inline formatting.
 
-Renders in the Light DOM (no Shadow DOM) so that global and scoped styles
-can target child elements directly. Uses the AdoptedStylesheetsController
-to inject scoped prose CSS into the document without duplication.
+<ComponentDemo title="Rich Content">
+  <hx-prose>
+    <h2>Patient Care Guidelines</h2>
+    <p>Effective patient care requires a <strong>systematic approach</strong> to assessment, planning, and intervention. The following guidelines ensure <em>consistent quality</em> across all departments.</p>
+    <h3>Key Principles</h3>
+    <ul>
+      <li>Patient safety is the top priority</li>
+      <li>Evidence-based practice guides all decisions</li>
+      <li>Clear documentation supports continuity of care</li>
+    </ul>
+    <p>For more information, refer to the <a href="#">clinical protocols handbook</a>.</p>
+    <blockquote>
+      <p>"Quality is never an accident; it is always the result of intelligent effort." — John Ruskin</p>
+    </blockquote>
+  </hx-prose>
+</ComponentDemo>
+
+## Typography Scale
+
+Small, base, and large sizes for different content contexts.
+
+<ComponentDemo title="Typography Scale">
+  <div style="display: grid; gap: 1.5rem;">
+    <hx-prose size="sm">
+      <h3>Small Prose</h3>
+      <p>Compact typography for dense interfaces like sidebars and footnotes. Uses a reduced font size and tighter line height.</p>
+    </hx-prose>
+    <hx-prose size="base">
+      <h3>Base Prose</h3>
+      <p>Default typography scale for standard body content. Balanced readability for the majority of content areas.</p>
+    </hx-prose>
+    <hx-prose size="lg">
+      <h3>Large Prose</h3>
+      <p>Expanded typography for featured content and landing pages. Generous sizing for maximum readability.</p>
+    </hx-prose>
+  </div>
+</ComponentDemo>
 
 ## API Reference
 
-<ComponentDoc tagName="wc-prose" section="api" />
+<ComponentDoc tagName="hx-prose" section="api" />

@@ -1,0 +1,1044 @@
+---
+/**
+ * Token Explorer -- Interactive Design Token Reference
+ *
+ * Imports live token data from @helix/tokens and renders an interactive
+ * reference page with color swatches, spacing visualization, typography
+ * specimens, shadow cards, border previews, motion tokens, and dark mode
+ * override tables.
+ *
+ * Uses ShowcaseLayout for consistent dark-theme aesthetic.
+ */
+import ShowcaseLayout from '../layouts/ShowcaseLayout.astro';
+import { tokenEntries, tokensByCategory, tokenMap, darkTokenEntries } from '@helix/tokens';
+import { getTokenStats, getColorSubgroups, isHexColor, resolveTokenRef, getContrastColor } from '@helix/tokens/utils';
+
+const stats = getTokenStats(tokenEntries);
+const colorSubgroups = getColorSubgroups(tokenEntries);
+const tabs = [
+  { id: 'colors', label: 'Colors', icon: 'fa-palette' },
+  { id: 'spacing', label: 'Spacing', icon: 'fa-arrows-left-right' },
+  { id: 'typography', label: 'Typography', icon: 'fa-font' },
+  { id: 'shadows', label: 'Shadows', icon: 'fa-moon' },
+  { id: 'borders', label: 'Borders', icon: 'fa-border-top-left' },
+  { id: 'motion', label: 'Motion', icon: 'fa-shuffle' },
+  { id: 'darkmode', label: 'Dark Mode', icon: 'fa-circle-half-stroke' },
+];
+
+// HEX to RGBA conversion helper
+function hexToRgba(hex: string): string {
+  const clean = hex.replace('#', '');
+  const r = parseInt(clean.substring(0, 2), 16);
+  const g = parseInt(clean.substring(2, 4), 16);
+  const b = parseInt(clean.substring(4, 6), 16);
+  return `rgba(${r}, ${g}, ${b}, 1)`;
+}
+
+// Pre-resolve color values for swatches
+const colorSwatchData = colorSubgroups.map(group => ({
+  label: group.label,
+  tokens: group.tokens.map(t => {
+    const resolved = resolveTokenRef(t.value, tokenMap);
+    const hex = isHexColor(resolved) ? resolved : null;
+    const contrast = hex ? getContrastColor(hex) : '#ffffff';
+    const rgba = hex ? hexToRgba(hex) : null;
+    const tokenPath = t.path.join('.');
+    return { name: t.name, value: t.value, resolved, hex, contrast, key: t.key, rgba, tokenPath };
+  }),
+}));
+
+// Spacing tokens
+const spaceTokens = (tokensByCategory['space'] ?? []).filter(t => t.key !== '0' && t.key !== 'px');
+
+// Font tokens
+const fontFamilyTokens = (tokensByCategory['font'] ?? []).filter(t => t.group === 'family');
+const fontSizeTokens = (tokensByCategory['font'] ?? []).filter(t => t.group === 'size');
+const fontWeightTokens = (tokensByCategory['font'] ?? []).filter(t => t.group === 'weight');
+const lineHeightTokens = tokensByCategory['line-height'] ?? [];
+const letterSpacingTokens = tokensByCategory['letter-spacing'] ?? [];
+
+// Shadow tokens
+const shadowTokens = (tokensByCategory['shadow'] ?? []).filter(t => t.key !== 'none');
+
+// Border tokens
+const borderRadiusTokens = (tokensByCategory['border'] ?? []).filter(t => t.group === 'radius');
+const borderWidthTokens = (tokensByCategory['border'] ?? []).filter(t => t.group === 'width');
+
+// Motion tokens
+const durationTokens = tokensByCategory['duration'] ?? [];
+const easingTokens = tokensByCategory['easing'] ?? [];
+const transitionTokens = tokensByCategory['transition'] ?? [];
+---
+
+<ShowcaseLayout
+  title="Token Explorer"
+  description="Interactive design token reference for the HELIX design system"
+>
+  <style is:inline>
+    /* ============================================
+       TOKEN EXPLORER -- page-specific styles
+       ============================================ */
+
+    /* --- Top navigation --- */
+    .te-topbar {
+      position: fixed; top: 3.5rem; left: 0; right: 0; z-index: 90;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: var(--space-3) var(--space-8);
+      background: rgba(10, 10, 20, 0.85);
+      backdrop-filter: blur(16px) saturate(180%);
+      -webkit-backdrop-filter: blur(16px) saturate(180%);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    }
+    .te-topbar-left { display: flex; align-items: center; gap: var(--space-4); }
+    .te-back-link {
+      display: inline-flex; align-items: center; gap: var(--space-2);
+      font-size: 0.875rem; font-weight: 600; color: var(--text-secondary);
+      transition: all 0.2s ease; padding: var(--space-2) var(--space-3);
+      border-radius: var(--radius-md);
+    }
+    .te-back-link:hover { color: var(--text-primary); background: var(--glass-bg-strong); }
+    .te-topbar-title { font-size: 0.875rem; font-weight: 700; color: var(--text-primary); }
+
+    /* --- Hero --- */
+    .te-hero {
+      position: relative; min-height: 60vh;
+      display: flex; align-items: center; justify-content: center;
+      text-align: center;
+      padding: calc(var(--space-24) + 3.5rem) var(--space-8) var(--space-16);
+      background: linear-gradient(135deg, #0a0a1a 0%, #1a0a30 40%, #0a1a2e 100%);
+      overflow: hidden;
+    }
+    .te-hero-grid {
+      position: absolute; inset: 0;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+      background-size: 60px 60px;
+    }
+    .te-hero-orb { position: absolute; border-radius: 50%; pointer-events: none; }
+    .te-hero-orb-1 {
+      width: 500px; height: 500px;
+      background: radial-gradient(circle, rgba(139, 92, 246, 0.2), transparent 70%);
+      top: -15%; right: -10%;
+      animation: float-slow 20s ease-in-out infinite, orb-pulse 8s ease-in-out infinite;
+    }
+    .te-hero-orb-2 {
+      width: 400px; height: 400px;
+      background: radial-gradient(circle, rgba(6, 182, 212, 0.15), transparent 70%);
+      bottom: -10%; left: -8%;
+      animation: float-slow 25s ease-in-out infinite reverse, orb-pulse 10s ease-in-out infinite 2s;
+    }
+    .te-hero-content { position: relative; z-index: 2; max-width: 800px; }
+    .te-hero-badge {
+      display: inline-flex; align-items: center; gap: var(--space-2);
+      padding: var(--space-2) var(--space-4);
+      background: var(--glass-bg-strong); border: 1px solid var(--glass-border-strong);
+      border-radius: var(--radius-full);
+      font-size: 0.8125rem; font-weight: 600; color: var(--wc-cyan);
+      margin-bottom: var(--space-6); animation: fadeInDown 0.8s ease-out;
+    }
+    .te-hero-badge-dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: var(--wc-cyan); box-shadow: 0 0 8px var(--wc-cyan);
+    }
+    .te-hero-title {
+      font-size: clamp(2.5rem, 6vw, 4rem); font-weight: 800;
+      letter-spacing: -0.04em; line-height: 1.1;
+      margin-bottom: var(--space-6); animation: fadeInUp 1s ease-out 0.2s both;
+    }
+    .te-hero-subtitle {
+      font-size: clamp(1rem, 2vw, 1.25rem); color: var(--text-secondary);
+      font-weight: 400; line-height: 1.7; max-width: 600px; margin: 0 auto;
+      animation: fadeInUp 1s ease-out 0.4s both;
+    }
+    .gradient-text {
+      background: linear-gradient(135deg, #8b5cf6, #06b6d4);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    }
+
+    /* --- Stats row --- */
+    .te-stats {
+      display: flex; flex-wrap: wrap; justify-content: center; gap: var(--space-4);
+      margin-top: var(--space-8); animation: fadeInUp 1s ease-out 0.6s both;
+    }
+    .te-stat {
+      display: flex; flex-direction: column; align-items: center;
+      padding: var(--space-4) var(--space-6);
+      background: var(--glass-bg); border: 1px solid var(--glass-border);
+      border-radius: var(--radius-lg); min-width: 120px;
+    }
+    .te-stat-value {
+      font-size: 1.75rem; font-weight: 800;
+      background: linear-gradient(135deg, var(--wc-cyan), var(--wc-accent));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    }
+    .te-stat-label { font-size: 0.75rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; margin-top: var(--space-1); }
+
+    /* --- Tab navigation --- */
+    .te-tabs-section {
+      position: sticky; top: calc(3.5rem + 3rem); z-index: 80;
+      background: rgba(10, 10, 20, 0.92);
+      backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      padding: var(--space-3) var(--space-8);
+    }
+    .te-tabs {
+      display: flex; gap: var(--space-2); max-width: 1200px;
+      margin: 0 auto; overflow-x: auto;
+      scrollbar-width: none; -ms-overflow-style: none;
+    }
+    .te-tabs::-webkit-scrollbar { display: none; }
+    .te-tab {
+      display: inline-flex; align-items: center; gap: var(--space-2);
+      padding: var(--space-2) var(--space-4); border-radius: var(--radius-md);
+      font-size: 0.8125rem; font-weight: 600; color: var(--text-muted);
+      cursor: pointer; white-space: nowrap; transition: all 0.2s ease;
+      border: 1px solid transparent; background: transparent;
+      font-family: var(--font-body);
+    }
+    .te-tab:hover { color: var(--text-secondary); background: var(--glass-bg); }
+    .te-tab.active {
+      color: var(--wc-cyan); background: rgba(6, 182, 212, 0.08);
+      border-color: rgba(6, 182, 212, 0.2);
+    }
+
+    /* --- Content panels --- */
+    .te-content { max-width: 1200px; margin: 0 auto; padding: var(--space-12) var(--space-8) var(--space-24); }
+    .te-panel { display: none; }
+    .te-panel.active { display: block; }
+    .te-panel-title {
+      font-size: clamp(1.5rem, 3vw, 2rem); font-weight: 800;
+      letter-spacing: -0.02em; margin-bottom: var(--space-2);
+    }
+    .te-panel-desc { font-size: 0.9375rem; color: var(--text-secondary); line-height: 1.7; margin-bottom: var(--space-8); }
+
+    /* --- Color swatches (premium cards) --- */
+    .te-color-group { margin-bottom: var(--space-12); }
+    .te-color-group-label {
+      font-size: 1.0625rem; font-weight: 700; color: var(--text-primary);
+      margin-bottom: var(--space-5); text-transform: capitalize;
+      display: flex; align-items: center; gap: var(--space-2);
+    }
+    .te-color-ramp {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: var(--space-4);
+    }
+
+    /* --- Individual swatch card --- */
+    .te-swatch {
+      display: flex; flex-direction: column;
+      min-width: 0; border-radius: var(--radius-lg);
+      background: rgba(255, 255, 255, 0.025);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      overflow: hidden; cursor: default;
+      transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1),
+                  box-shadow 0.25s cubic-bezier(0.22, 1, 0.36, 1),
+                  border-color 0.25s ease;
+    }
+    .te-swatch:hover {
+      transform: translateY(-3px) scale(1.015);
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.35), 0 0 0 1px rgba(255, 255, 255, 0.06);
+      border-color: rgba(255, 255, 255, 0.1);
+    }
+
+    /* Large color preview area */
+    .te-swatch-preview {
+      position: relative; height: 88px; width: 100%;
+      display: flex; align-items: center; justify-content: center;
+      font-family: var(--font-mono); font-weight: 700; font-size: 0.8125rem;
+      letter-spacing: 0.02em;
+      transition: height 0.25s ease;
+    }
+    .te-swatch:hover .te-swatch-preview { height: 92px; }
+    .te-swatch-preview-label {
+      position: absolute; top: var(--space-2); left: var(--space-2);
+      font-size: 0.6875rem; font-weight: 700; opacity: 0.7;
+      font-family: var(--font-mono);
+    }
+
+    /* Reference swatch (non-hex, var() values) */
+    .te-swatch-ref-preview {
+      height: 88px; width: 100%;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      background: var(--surface-1); gap: var(--space-1);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+    }
+    .te-swatch-ref-icon {
+      font-size: 1.25rem; color: var(--text-muted); opacity: 0.5;
+    }
+    .te-swatch-ref-val {
+      font-size: 0.625rem; font-weight: 500; font-family: var(--font-mono);
+      color: var(--text-muted); text-align: center; padding: 0 var(--space-2);
+      word-break: break-all; line-height: 1.3;
+    }
+
+    /* Copyable values area below swatch */
+    .te-swatch-details {
+      display: flex; flex-direction: column; gap: 0;
+      padding: var(--space-1) 0;
+    }
+
+    /* Each copyable row */
+    .te-copy-row {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 4px var(--space-3); gap: var(--space-2);
+      cursor: pointer; position: relative;
+      transition: background 0.15s ease;
+      min-height: 26px;
+    }
+    .te-copy-row:hover {
+      background: rgba(255, 255, 255, 0.04);
+    }
+    .te-copy-row-label {
+      font-size: 0.5625rem; font-weight: 600; text-transform: uppercase;
+      letter-spacing: 0.06em; color: var(--text-muted); opacity: 0.6;
+      flex-shrink: 0; width: 32px;
+    }
+    .te-copy-row-value {
+      font-size: 0.6875rem; font-weight: 500; font-family: var(--font-mono);
+      color: var(--text-secondary); white-space: nowrap; overflow: hidden;
+      text-overflow: ellipsis; flex: 1; text-align: right;
+      transition: color 0.15s ease;
+    }
+    .te-copy-row:hover .te-copy-row-value {
+      color: var(--text-primary);
+    }
+    .te-copy-row-icon {
+      flex-shrink: 0; font-size: 0.625rem; color: var(--text-muted);
+      opacity: 0; transition: opacity 0.15s ease, transform 0.15s ease;
+      width: 14px; text-align: center;
+    }
+    .te-copy-row:hover .te-copy-row-icon {
+      opacity: 0.6;
+    }
+
+    /* Hover tooltip showing full value */
+    .te-copy-row::after {
+      content: attr(data-copy);
+      position: absolute; bottom: 100%; right: 0;
+      padding: 5px 10px; border-radius: 6px;
+      background: rgba(15, 23, 42, 0.95); border: 1px solid rgba(6, 182, 212, 0.3);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+      font-family: var(--font-mono); font-size: 0.6875rem; font-weight: 500;
+      color: var(--text-primary); white-space: nowrap;
+      pointer-events: none; opacity: 0; transform: translateY(4px);
+      transition: opacity 0.15s ease, transform 0.15s ease;
+      z-index: 20;
+    }
+    .te-copy-row:hover::after {
+      opacity: 1; transform: translateY(-2px);
+    }
+
+    /* Copied feedback state */
+    .te-copy-row.copied .te-copy-row-value {
+      color: var(--wc-cyan);
+    }
+    .te-copy-row.copied .te-copy-row-icon {
+      opacity: 1; color: var(--wc-cyan);
+      transform: scale(1.2);
+    }
+    .te-copy-row.copied {
+      background: rgba(6, 182, 212, 0.06);
+    }
+    .te-copy-row.copied::after {
+      content: 'Copied!';
+      color: var(--wc-cyan); border-color: rgba(6, 182, 212, 0.5);
+    }
+
+    /* Divider between preview and details */
+    .te-swatch-divider {
+      height: 1px; background: rgba(255, 255, 255, 0.05);
+      margin: 0;
+    }
+
+    /* --- Spacing visualization --- */
+    .te-space-list { display: flex; flex-direction: column; gap: var(--space-3); }
+    .te-space-row {
+      display: grid; grid-template-columns: 160px 1fr 100px; gap: var(--space-4);
+      align-items: center; padding: var(--space-2) 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+    }
+    .te-space-name { font-size: 0.8125rem; font-weight: 600; color: var(--text-primary); font-family: var(--font-mono); }
+    .te-space-bar-wrap { position: relative; height: 28px; background: var(--surface-1); border-radius: var(--radius-sm); overflow: hidden; }
+    .te-space-bar {
+      height: 100%; border-radius: var(--radius-sm);
+      background: linear-gradient(90deg, rgba(6, 182, 212, 0.6), rgba(139, 92, 246, 0.6));
+      transition: width 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .te-space-val { font-size: 0.8125rem; font-weight: 600; color: var(--text-muted); font-family: var(--font-mono); text-align: right; }
+
+    /* --- Typography specimens --- */
+    .te-type-section { margin-bottom: var(--space-10); }
+    .te-type-section-title {
+      font-size: 0.875rem; font-weight: 700; color: var(--wc-cyan);
+      text-transform: uppercase; letter-spacing: 0.05em;
+      margin-bottom: var(--space-4); display: flex; align-items: center; gap: var(--space-2);
+    }
+    .te-type-specimen {
+      display: grid; grid-template-columns: 180px 1fr; gap: var(--space-4);
+      align-items: baseline; padding: var(--space-3) 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+    }
+    .te-type-meta {
+      display: flex; flex-direction: column; gap: 2px;
+    }
+    .te-type-name { font-size: 0.8125rem; font-weight: 600; color: var(--text-primary); font-family: var(--font-mono); }
+    .te-type-value { font-size: 0.6875rem; color: var(--text-muted); font-family: var(--font-mono); }
+    .te-type-sample { color: var(--text-primary); line-height: 1.4; }
+    .te-type-weight-row {
+      display: flex; gap: var(--space-6); flex-wrap: wrap;
+      padding: var(--space-3) 0; border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+    }
+    .te-type-weight-item { display: flex; flex-direction: column; gap: 2px; min-width: 140px; }
+    .te-type-weight-sample { font-size: 1.25rem; color: var(--text-primary); }
+    .te-type-weight-label { font-size: 0.75rem; color: var(--text-muted); font-family: var(--font-mono); }
+
+    /* --- Shadow cards --- */
+    .te-shadow-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: var(--space-6); }
+    .te-shadow-card {
+      background: var(--surface-1); border: 1px solid var(--surface-3);
+      border-radius: var(--radius-xl); padding: var(--space-8) var(--space-6);
+      text-align: center; transition: transform 0.3s ease;
+    }
+    .te-shadow-card:hover { transform: translateY(-4px); }
+    .te-shadow-label { font-size: 0.875rem; font-weight: 700; color: var(--text-primary); margin-bottom: var(--space-2); font-family: var(--font-mono); }
+    .te-shadow-value { font-size: 0.6875rem; color: var(--text-muted); font-family: var(--font-mono); word-break: break-all; }
+
+    /* --- Border previews --- */
+    .te-border-section { margin-bottom: var(--space-10); }
+    .te-border-grid { display: flex; flex-wrap: wrap; gap: var(--space-6); }
+    .te-border-item { display: flex; flex-direction: column; align-items: center; gap: var(--space-2); }
+    .te-border-shape {
+      width: 72px; height: 72px; background: var(--glass-bg-strong);
+      border: 2px solid rgba(6, 182, 212, 0.4);
+      display: flex; align-items: center; justify-content: center;
+      transition: border-color 0.2s ease;
+    }
+    .te-border-shape:hover { border-color: var(--wc-cyan); }
+    .te-border-name { font-size: 0.75rem; font-weight: 600; color: var(--text-secondary); font-family: var(--font-mono); }
+    .te-border-val { font-size: 0.6875rem; color: var(--text-muted); font-family: var(--font-mono); }
+
+    .te-width-grid { display: flex; flex-wrap: wrap; gap: var(--space-8); align-items: flex-end; }
+    .te-width-item { display: flex; flex-direction: column; align-items: center; gap: var(--space-2); }
+    .te-width-bar { width: 80px; background: var(--wc-cyan); border-radius: 2px; }
+
+    /* --- Motion tokens --- */
+    .te-motion-section { margin-bottom: var(--space-10); }
+    .te-motion-list { display: flex; flex-direction: column; gap: var(--space-3); }
+    .te-motion-row {
+      display: grid; grid-template-columns: 200px 1fr 120px; gap: var(--space-4);
+      align-items: center; padding: var(--space-3) var(--space-4);
+      background: var(--surface-1); border: 1px solid var(--surface-3);
+      border-radius: var(--radius-md);
+    }
+    .te-motion-name { font-size: 0.8125rem; font-weight: 600; color: var(--text-primary); font-family: var(--font-mono); }
+    .te-motion-demo { position: relative; height: 4px; background: var(--surface-3); border-radius: 2px; overflow: visible; }
+    .te-motion-dot {
+      position: absolute; top: -6px; left: 0;
+      width: 16px; height: 16px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--wc-cyan), var(--wc-accent));
+      box-shadow: 0 0 8px rgba(6, 182, 212, 0.4);
+    }
+    .te-motion-row:hover .te-motion-dot {
+      animation: motionSlide var(--dur, 300ms) var(--ease, ease) forwards;
+    }
+    @keyframes motionSlide {
+      0% { left: 0; }
+      100% { left: calc(100% - 16px); }
+    }
+    .te-motion-val { font-size: 0.8125rem; color: var(--text-muted); font-family: var(--font-mono); text-align: right; }
+
+    .te-easing-visual {
+      position: relative; height: 60px; background: var(--surface-1);
+      border: 1px solid var(--surface-3); border-radius: var(--radius-md);
+      overflow: hidden; margin-top: var(--space-2);
+    }
+    .te-easing-curve {
+      position: absolute; bottom: 0; left: 0; width: 100%; height: 100%;
+    }
+
+    /* --- Dark mode table --- */
+    .te-dark-table {
+      width: 100%; border-collapse: collapse;
+      font-size: 0.8125rem; font-family: var(--font-mono);
+    }
+    .te-dark-table thead th {
+      text-align: left; padding: var(--space-3) var(--space-4);
+      font-weight: 700; color: var(--wc-cyan);
+      border-bottom: 2px solid rgba(6, 182, 212, 0.2);
+      font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em;
+    }
+    .te-dark-table tbody td {
+      padding: var(--space-2) var(--space-4);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+      color: var(--text-secondary);
+    }
+    .te-dark-table tbody tr:hover { background: var(--glass-bg); }
+    .te-dark-swatch-inline {
+      display: inline-block; width: 14px; height: 14px;
+      border-radius: 3px; vertical-align: middle; margin-right: var(--space-1);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    /* --- Responsive --- */
+    @media (max-width: 768px) {
+      .te-topbar { padding: var(--space-2) var(--space-4); }
+      .te-hero { min-height: 50vh; padding-top: calc(var(--space-16) + 3.5rem); }
+      .te-stats { gap: var(--space-2); }
+      .te-stat { min-width: 90px; padding: var(--space-3) var(--space-4); }
+      .te-stat-value { font-size: 1.25rem; }
+      .te-content { padding: var(--space-8) var(--space-4) var(--space-16); }
+      .te-space-row { grid-template-columns: 130px 1fr 70px; gap: var(--space-2); }
+      .te-type-specimen { grid-template-columns: 1fr; }
+      .te-motion-row { grid-template-columns: 1fr; gap: var(--space-2); }
+      .te-color-ramp { gap: var(--space-3); grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); }
+      .te-swatch-preview, .te-swatch-ref-preview { height: 72px; }
+      .te-copy-row-value { font-size: 0.625rem; }
+      .te-dark-table { font-size: 0.75rem; }
+      .te-dark-table thead th, .te-dark-table tbody td { padding: var(--space-2); }
+    }
+  </style>
+
+  <!-- Top Navigation -->
+  <nav class="te-topbar">
+    <div class="te-topbar-left">
+      <a href="/" class="te-back-link">
+        <i class="fa-solid fa-arrow-left"></i> Home
+      </a>
+      <span class="te-topbar-title">Token Explorer</span>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <section class="te-hero">
+    <div class="te-hero-grid"></div>
+    <div class="te-hero-orb te-hero-orb-1"></div>
+    <div class="te-hero-orb te-hero-orb-2"></div>
+    <div class="te-hero-content">
+      <div class="te-hero-badge">
+        <span class="te-hero-badge-dot"></span>
+        Design Tokens
+      </div>
+      <h1 class="te-hero-title">
+        <span class="gradient-text">Token Explorer</span>
+      </h1>
+      <p class="te-hero-subtitle">
+        Interactive reference for every design token in the HELIX system.
+        All values are live from <code style="color: var(--wc-cyan); background: rgba(6,182,212,0.08); padding: 0.1em 0.4em; border-radius: 4px; font-size: 0.9em;">@helix/tokens</code>.
+      </p>
+
+      <div class="te-stats">
+        <div class="te-stat">
+          <span class="te-stat-value">{stats.total}</span>
+          <span class="te-stat-label">Total Tokens</span>
+        </div>
+        <div class="te-stat">
+          <span class="te-stat-value">{Object.keys(stats.byCategory).length}</span>
+          <span class="te-stat-label">Categories</span>
+        </div>
+        <div class="te-stat">
+          <span class="te-stat-value">{colorSubgroups.length}</span>
+          <span class="te-stat-label">Color Ramps</span>
+        </div>
+        <div class="te-stat">
+          <span class="te-stat-value">{darkTokenEntries.length}</span>
+          <span class="te-stat-label">Dark Overrides</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Tab Navigation -->
+  <div class="te-tabs-section">
+    <div class="te-tabs" role="tablist">
+      {tabs.map((tab, i) => (
+        <button
+          class={`te-tab${i === 0 ? ' active' : ''}`}
+          role="tab"
+          aria-selected={i === 0 ? 'true' : 'false'}
+          aria-controls={`panel-${tab.id}`}
+          data-tab={tab.id}
+        >
+          <i class={`fa-solid ${tab.icon}`}></i>
+          {tab.label}
+        </button>
+      ))}
+    </div>
+  </div>
+
+  <!-- Content Panels -->
+  <div class="te-content">
+
+    <!-- ===== COLORS ===== -->
+    <div class={`te-panel active`} id="panel-colors" role="tabpanel">
+      <h2 class="te-panel-title"><span class="gradient-text">Color System</span></h2>
+      <p class="te-panel-desc">
+        8 color ramps (primary, secondary, accent, neutral, success, warning, error, info) with
+        50-950 shades each, plus semantic tokens for text, surface, border, focus, and selection.
+      </p>
+
+      {colorSwatchData.map(group => (
+        <div class="te-color-group">
+          <div class="te-color-group-label">
+            <i class="fa-solid fa-circle" style={
+              group.tokens[0]?.hex
+                ? `color: ${group.tokens[0].hex}; font-size: 0.625rem;`
+                : 'color: var(--text-muted); font-size: 0.625rem;'
+            }></i>
+            {group.label}
+            <span style="font-size: 0.75rem; color: var(--text-muted); font-weight: 400;">
+              ({group.tokens.length} tokens)
+            </span>
+          </div>
+          <div class="te-color-ramp">
+            {group.tokens.map(t => (
+              <div class="te-swatch" title={`${t.name}: ${t.resolved}`}>
+                {t.hex ? (
+                  <Fragment>
+                    <div
+                      class="te-swatch-preview"
+                      style={`background: ${t.hex}; color: ${t.contrast};`}
+                    >
+                      <span class="te-swatch-preview-label" style={`color: ${t.contrast};`}>{t.key}</span>
+                      {t.hex.toUpperCase()}
+                    </div>
+                    <div class="te-swatch-divider"></div>
+                    <div class="te-swatch-details">
+                      <div class="te-copy-row" data-copy={t.tokenPath} title={`Copy token path: ${t.tokenPath}`}>
+                        <span class="te-copy-row-label">TKN</span>
+                        <span class="te-copy-row-value">{t.tokenPath}</span>
+                        <i class="fa-solid fa-copy te-copy-row-icon"></i>
+                      </div>
+                      <div class="te-copy-row" data-copy={t.name} title={`Copy CSS variable: ${t.name}`}>
+                        <span class="te-copy-row-label">CSS</span>
+                        <span class="te-copy-row-value">{t.name}</span>
+                        <i class="fa-solid fa-copy te-copy-row-icon"></i>
+                      </div>
+                      <div class="te-copy-row" data-copy={t.hex.toUpperCase()} title={`Copy HEX: ${t.hex.toUpperCase()}`}>
+                        <span class="te-copy-row-label">HEX</span>
+                        <span class="te-copy-row-value">{t.hex.toUpperCase()}</span>
+                        <i class="fa-solid fa-copy te-copy-row-icon"></i>
+                      </div>
+                      <div class="te-copy-row" data-copy={t.rgba} title={`Copy RGBA: ${t.rgba}`}>
+                        <span class="te-copy-row-label">RGB</span>
+                        <span class="te-copy-row-value">{t.rgba}</span>
+                        <i class="fa-solid fa-copy te-copy-row-icon"></i>
+                      </div>
+                    </div>
+                  </Fragment>
+                ) : (
+                  <Fragment>
+                    <div class="te-swatch-ref-preview">
+                      <i class="fa-solid fa-link te-swatch-ref-icon"></i>
+                      <span class="te-swatch-ref-val">{t.value.replace(/var\(--hx-/g, '').replace(/\)/g, '')}</span>
+                    </div>
+                    <div class="te-swatch-divider"></div>
+                    <div class="te-swatch-details">
+                      <div class="te-copy-row" data-copy={t.tokenPath} title={`Copy token path: ${t.tokenPath}`}>
+                        <span class="te-copy-row-label">TKN</span>
+                        <span class="te-copy-row-value">{t.tokenPath}</span>
+                        <i class="fa-solid fa-copy te-copy-row-icon"></i>
+                      </div>
+                      <div class="te-copy-row" data-copy={t.name} title={`Copy CSS variable: ${t.name}`}>
+                        <span class="te-copy-row-label">CSS</span>
+                        <span class="te-copy-row-value">{t.name}</span>
+                        <i class="fa-solid fa-copy te-copy-row-icon"></i>
+                      </div>
+                      <div class="te-copy-row" data-copy={t.value} title={`Copy value: ${t.value}`}>
+                        <span class="te-copy-row-label">VAL</span>
+                        <span class="te-copy-row-value">{t.value}</span>
+                        <i class="fa-solid fa-copy te-copy-row-icon"></i>
+                      </div>
+                    </div>
+                  </Fragment>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      ))}
+    </div>
+
+    <!-- ===== SPACING ===== -->
+    <div class="te-panel" id="panel-spacing" role="tabpanel">
+      <h2 class="te-panel-title"><span class="gradient-text">Spacing Scale</span></h2>
+      <p class="te-panel-desc">
+        {(tokensByCategory['space'] ?? []).length} spacing tokens from 0 to 16rem, providing
+        a consistent spatial rhythm across all components.
+      </p>
+
+      <div class="te-space-list">
+        {spaceTokens.map(t => {
+          const numericValue = parseFloat(t.value);
+          const unit = t.value.replace(String(numericValue), '');
+          const maxRem = 16;
+          const remValue = unit === 'rem' ? numericValue : numericValue / 16;
+          const pct = Math.min((remValue / maxRem) * 100, 100);
+          return (
+            <div class="te-space-row">
+              <span class="te-space-name">{t.name.replace('--hx-', '')}</span>
+              <div class="te-space-bar-wrap">
+                <div class="te-space-bar" style={`width: ${pct}%;`}></div>
+              </div>
+              <span class="te-space-val">{t.value}</span>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+
+    <!-- ===== TYPOGRAPHY ===== -->
+    <div class="te-panel" id="panel-typography" role="tabpanel">
+      <h2 class="te-panel-title"><span class="gradient-text">Typography</span></h2>
+      <p class="te-panel-desc">
+        Font families, size scale, weight scale, line heights, and letter spacing tokens.
+      </p>
+
+      <!-- Font Families -->
+      <div class="te-type-section">
+        <div class="te-type-section-title">
+          <i class="fa-solid fa-font"></i> Font Families
+        </div>
+        {fontFamilyTokens.map(t => (
+          <div class="te-type-specimen">
+            <div class="te-type-meta">
+              <span class="te-type-name">{t.key}</span>
+              <span class="te-type-value">{t.name}</span>
+            </div>
+            <span class="te-type-sample" style={`font-family: ${t.value}; font-size: 1.125rem;`}>
+              The quick brown fox jumps over the lazy dog
+            </span>
+          </div>
+        ))}
+      </div>
+
+      <!-- Font Sizes -->
+      <div class="te-type-section">
+        <div class="te-type-section-title">
+          <i class="fa-solid fa-text-height"></i> Font Sizes
+        </div>
+        {fontSizeTokens.map(t => (
+          <div class="te-type-specimen">
+            <div class="te-type-meta">
+              <span class="te-type-name">{t.key}</span>
+              <span class="te-type-value">{t.value}</span>
+            </div>
+            <span class="te-type-sample" style={`font-size: ${t.value};`}>
+              HELIX Design System
+            </span>
+          </div>
+        ))}
+      </div>
+
+      <!-- Font Weights -->
+      <div class="te-type-section">
+        <div class="te-type-section-title">
+          <i class="fa-solid fa-bold"></i> Font Weights
+        </div>
+        <div class="te-type-weight-row">
+          {fontWeightTokens.map(t => (
+            <div class="te-type-weight-item">
+              <span class="te-type-weight-sample" style={`font-weight: ${t.value};`}>Aa</span>
+              <span class="te-type-weight-label">{t.key} ({t.value})</span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <!-- Line Heights -->
+      <div class="te-type-section">
+        <div class="te-type-section-title">
+          <i class="fa-solid fa-text-height"></i> Line Heights
+        </div>
+        {lineHeightTokens.map(t => (
+          <div class="te-type-specimen">
+            <div class="te-type-meta">
+              <span class="te-type-name">{t.key}</span>
+              <span class="te-type-value">{t.value}</span>
+            </div>
+            <span class="te-type-sample" style={`line-height: ${t.value}; font-size: 0.9375rem;`}>
+              Line height specimen text. This demonstrates the vertical rhythm
+              when multiple lines wrap within a paragraph.
+            </span>
+          </div>
+        ))}
+      </div>
+
+      <!-- Letter Spacing -->
+      <div class="te-type-section">
+        <div class="te-type-section-title">
+          <i class="fa-solid fa-text-width"></i> Letter Spacing
+        </div>
+        {letterSpacingTokens.map(t => (
+          <div class="te-type-specimen">
+            <div class="te-type-meta">
+              <span class="te-type-name">{t.key}</span>
+              <span class="te-type-value">{t.value}</span>
+            </div>
+            <span class="te-type-sample" style={`letter-spacing: ${t.value}; font-size: 1rem;`}>
+              HELIX DESIGN SYSTEM
+            </span>
+          </div>
+        ))}
+      </div>
+    </div>
+
+    <!-- ===== SHADOWS ===== -->
+    <div class="te-panel" id="panel-shadows" role="tabpanel">
+      <h2 class="te-panel-title"><span class="gradient-text">Shadow Elevation</span></h2>
+      <p class="te-panel-desc">
+        {(tokensByCategory['shadow'] ?? []).length} shadow tokens for progressive elevation,
+        from subtle surface lift to dramatic depth.
+      </p>
+
+      <div class="te-shadow-grid">
+        {shadowTokens.map(t => (
+          <div class="te-shadow-card" style={`box-shadow: ${t.value};`}>
+            <div class="te-shadow-label">{t.key}</div>
+            <div class="te-shadow-value">{t.name}</div>
+          </div>
+        ))}
+      </div>
+    </div>
+
+    <!-- ===== BORDERS ===== -->
+    <div class="te-panel" id="panel-borders" role="tabpanel">
+      <h2 class="te-panel-title"><span class="gradient-text">Borders</span></h2>
+      <p class="te-panel-desc">
+        Border radius tokens for shape language and border width tokens for line weight.
+      </p>
+
+      <!-- Border Radius -->
+      <div class="te-border-section">
+        <div class="te-type-section-title">
+          <i class="fa-solid fa-border-top-left"></i> Border Radius
+        </div>
+        <div class="te-border-grid">
+          {borderRadiusTokens.map(t => (
+            <div class="te-border-item">
+              <div class="te-border-shape" style={`border-radius: ${t.value};`}></div>
+              <span class="te-border-name">{t.key}</span>
+              <span class="te-border-val">{t.value}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <!-- Border Width -->
+      <div class="te-border-section">
+        <div class="te-type-section-title">
+          <i class="fa-solid fa-grip-lines"></i> Border Width
+        </div>
+        <div class="te-width-grid">
+          {borderWidthTokens.map(t => {
+            const px = parseInt(t.value, 10);
+            return (
+              <div class="te-width-item">
+                <div class="te-width-bar" style={`height: ${px * 4}px;`}></div>
+                <span class="te-border-name">{t.key}</span>
+                <span class="te-border-val">{t.value}</span>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== MOTION ===== -->
+    <div class="te-panel" id="panel-motion" role="tabpanel">
+      <h2 class="te-panel-title"><span class="gradient-text">Motion</span></h2>
+      <p class="te-panel-desc">
+        Duration, easing, and transition tokens. Hover over each row to see the timing in action.
+      </p>
+
+      <!-- Durations -->
+      <div class="te-motion-section">
+        <div class="te-type-section-title">
+          <i class="fa-solid fa-clock"></i> Duration
+        </div>
+        <div class="te-motion-list">
+          {durationTokens.map(t => (
+            <div class="te-motion-row" style={`--dur: ${t.value === '0ms' ? '1ms' : t.value}; --ease: ease;`}>
+              <span class="te-motion-name">{t.key}</span>
+              <div class="te-motion-demo">
+                <div class="te-motion-dot"></div>
+              </div>
+              <span class="te-motion-val">{t.value}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <!-- Easings -->
+      <div class="te-motion-section">
+        <div class="te-type-section-title">
+          <i class="fa-solid fa-bezier-curve"></i> Easing
+        </div>
+        <div class="te-motion-list">
+          {easingTokens.map(t => (
+            <div class="te-motion-row" style={`--dur: 600ms; --ease: ${t.value};`}>
+              <span class="te-motion-name">{t.key}</span>
+              <div class="te-motion-demo">
+                <div class="te-motion-dot"></div>
+              </div>
+              <span class="te-motion-val" style="font-size: 0.6875rem;">{t.value}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <!-- Transitions -->
+      <div class="te-motion-section">
+        <div class="te-type-section-title">
+          <i class="fa-solid fa-shuffle"></i> Transition Shorthands
+        </div>
+        <div class="te-motion-list">
+          {transitionTokens.map(t => {
+            const parts = t.value.split(' ');
+            const dur = parts[0] || '250ms';
+            const ease = parts[1] || 'ease';
+            return (
+              <div class="te-motion-row" style={`--dur: ${dur}; --ease: ${ease};`}>
+                <span class="te-motion-name">{t.key}</span>
+                <div class="te-motion-demo">
+                  <div class="te-motion-dot"></div>
+                </div>
+                <span class="te-motion-val">{t.value}</span>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== DARK MODE ===== -->
+    <div class="te-panel" id="panel-darkmode" role="tabpanel">
+      <h2 class="te-panel-title"><span class="gradient-text">Dark Mode Overrides</span></h2>
+      <p class="te-panel-desc">
+        {darkTokenEntries.length} tokens are overridden in dark mode. These are applied via
+        <code style="color: var(--wc-cyan); background: rgba(6,182,212,0.08); padding: 0.1em 0.4em; border-radius: 4px;">[data-theme="dark"]</code>
+        or <code style="color: var(--wc-cyan); background: rgba(6,182,212,0.08); padding: 0.1em 0.4em; border-radius: 4px;">@media (prefers-color-scheme: dark)</code>.
+      </p>
+
+      <div style="overflow-x: auto;">
+        <table class="te-dark-table">
+          <thead>
+            <tr>
+              <th>Token</th>
+              <th>Dark Value</th>
+              <th>Resolved</th>
+            </tr>
+          </thead>
+          <tbody>
+            {darkTokenEntries.map(t => {
+              const resolved = resolveTokenRef(t.value, tokenMap);
+              const hex = isHexColor(resolved) ? resolved : null;
+              return (
+                <tr>
+                  <td>{t.name}</td>
+                  <td>{t.value}</td>
+                  <td>
+                    {hex && (
+                      <span
+                        class="te-dark-swatch-inline"
+                        style={`background: ${hex};`}
+                      ></span>
+                    )}
+                    {resolved}
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+
+  <script is:inline>
+    (function() {
+      /* --- Tab switching --- */
+      var tabs = document.querySelectorAll('.te-tab');
+      var panels = document.querySelectorAll('.te-panel');
+
+      tabs.forEach(function(tab) {
+        tab.addEventListener('click', function() {
+          var targetId = tab.getAttribute('data-tab');
+
+          tabs.forEach(function(t) {
+            t.classList.remove('active');
+            t.setAttribute('aria-selected', 'false');
+          });
+          panels.forEach(function(p) {
+            p.classList.remove('active');
+          });
+
+          tab.classList.add('active');
+          tab.setAttribute('aria-selected', 'true');
+
+          var panel = document.getElementById('panel-' + targetId);
+          if (panel) {
+            panel.classList.add('active');
+          }
+        });
+      });
+
+      /* --- Click-to-copy for color swatch values --- */
+      var copyRows = document.querySelectorAll('.te-copy-row[data-copy]');
+      copyRows.forEach(function(row) {
+        row.addEventListener('click', function(e) {
+          e.stopPropagation();
+          var value = row.getAttribute('data-copy');
+          if (!value) return;
+
+          var icon = row.querySelector('.te-copy-row-icon');
+
+          navigator.clipboard.writeText(value).then(function() {
+            /* Switch icon to checkmark and add copied class */
+            row.classList.add('copied');
+            if (icon) {
+              icon.classList.remove('fa-copy');
+              icon.classList.add('fa-check');
+            }
+
+            /* Revert after 1.5s */
+            setTimeout(function() {
+              row.classList.remove('copied');
+              if (icon) {
+                icon.classList.remove('fa-check');
+                icon.classList.add('fa-copy');
+              }
+            }, 1500);
+          }).catch(function() {
+            /* Fallback for older browsers / insecure contexts */
+            var textArea = document.createElement('textarea');
+            textArea.value = value;
+            textArea.style.position = 'fixed';
+            textArea.style.left = '-9999px';
+            textArea.style.opacity = '0';
+            document.body.appendChild(textArea);
+            textArea.select();
+            try {
+              document.execCommand('copy');
+              row.classList.add('copied');
+              if (icon) {
+                icon.classList.remove('fa-copy');
+                icon.classList.add('fa-check');
+              }
+              setTimeout(function() {
+                row.classList.remove('copied');
+                if (icon) {
+                  icon.classList.remove('fa-check');
+                  icon.classList.add('fa-copy');
+                }
+              }, 1500);
+            } catch (err) {
+              /* silently fail */
+            }
+            document.body.removeChild(textArea);
+          });
+        });
+      });
+    })();
+  </script>
+</ShowcaseLayout>

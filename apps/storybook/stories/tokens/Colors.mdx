@@ -1,0 +1,848 @@
+{/* Colors.mdx — HELIX Design Token Colors Documentation */}
+
+import { Meta } from '@storybook/addon-docs/blocks';
+import { tokenEntries, tokenMap, darkTokenEntries } from '@helix/tokens';
+import {
+  getColorSubgroups,
+  isHexColor,
+  getContrastColor,
+  resolveTokenRef,
+  getTokenStats,
+} from '@helix/tokens/utils';
+
+<Meta title="Design Tokens/Colors" parameters={{ controls: { disable: true }, actions: { disable: true } }} />
+
+export const allSubgroups = getColorSubgroups(tokenEntries);
+export const colorStats = getTokenStats(tokenEntries.filter(t => t.category === 'color'));
+export const darkSubgroups = getColorSubgroups(darkTokenEntries);
+export const semanticRampNames = ['success', 'warning', 'error', 'info'];
+export const brandRampNames = ['primary', 'secondary', 'accent'];
+
+export function resolveHex(token) {
+  const raw = token.value;
+  if (isHexColor(raw)) return raw;
+  return resolveTokenRef(raw, tokenMap);
+}
+
+export function findSubgroup(label) {
+  return allSubgroups.find(sg => sg.label.toLowerCase() === label.toLowerCase());
+}
+
+export function copyToClipboard(text) {
+  navigator.clipboard.writeText(text).catch(() => {});
+}
+
+<style>
+{`
+  /* ── Reset Storybook overrides ─────────────────────────── */
+  .hx-token-colors h2,
+  .hx-token-colors h3,
+  .hx-token-colors h4,
+  .hx-token-colors p,
+  .hx-token-colors span,
+  .hx-token-colors div,
+  .hx-token-colors button,
+  .hx-token-colors code {
+    all: unset;
+    box-sizing: border-box;
+  }
+
+  .hx-token-colors button {
+    cursor: pointer;
+  }
+
+  /* ── Page Layout ───────────────────────────────────────── */
+  .hx-token-colors {
+    max-width: 960px;
+    margin: 0 auto;
+    font-family: var(--hx-font-family-sans, 'Inter', sans-serif);
+    color: var(--hx-color-neutral-800, #1E293B);
+    line-height: var(--hx-line-height-normal, 1.5);
+  }
+
+  /* ── Mini Hero Banner ──────────────────────────────────── */
+  .hx-token-colors .hx-colors-hero {
+    display: block !important;
+    background: linear-gradient(135deg, var(--hx-color-primary-50, #EFF6FF) 0%, var(--hx-color-neutral-50, #F8FAFC) 100%) !important;
+    border-radius: var(--hx-border-radius-xl, 0.75rem) !important;
+    padding: 2.5rem 2rem !important;
+    margin-bottom: 2.5rem !important;
+    border: 1px solid var(--hx-color-neutral-200, #E2E8F0) !important;
+  }
+
+  .hx-token-colors .hx-colors-hero-title {
+    display: block !important;
+    font-family: var(--hx-font-family-sans, 'Inter', sans-serif) !important;
+    font-size: 2rem !important;
+    font-weight: 800 !important;
+    color: var(--hx-color-neutral-900, #0F172A) !important;
+    margin: 0 0 0.5rem 0 !important;
+    letter-spacing: -0.025em !important;
+    line-height: 1.2 !important;
+  }
+
+  .hx-token-colors .hx-colors-hero-desc {
+    display: block !important;
+    font-family: var(--hx-font-family-sans, 'Inter', sans-serif) !important;
+    font-size: 1rem !important;
+    color: var(--hx-color-neutral-500, #64748B) !important;
+    margin: 0 0 1rem 0 !important;
+    line-height: 1.6 !important;
+    max-width: 640px !important;
+  }
+
+  .hx-token-colors .hx-colors-hero-badges {
+    display: flex !important;
+    gap: 0.5rem !important;
+    flex-wrap: wrap !important;
+  }
+
+  .hx-token-colors .hx-colors-badge {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 0.375rem !important;
+    padding: 0.25rem 0.75rem !important;
+    font-family: var(--hx-font-family-mono, monospace) !important;
+    font-size: 0.75rem !important;
+    font-weight: 500 !important;
+    color: var(--hx-color-primary-700, #1E40AF) !important;
+    background: var(--hx-color-primary-100, #DBEAFE) !important;
+    border-radius: 9999px !important;
+    line-height: 1.4 !important;
+  }
+
+  .hx-token-colors .hx-colors-badge--neutral {
+    color: var(--hx-color-neutral-600, #475569) !important;
+    background: var(--hx-color-neutral-100, #F1F5F9) !important;
+  }
+
+  /* ── Section Styles ────────────────────────────────────── */
+  .hx-token-colors .hx-colors-section {
+    display: block !important;
+    margin-bottom: 3rem !important;
+  }
+
+  .hx-token-colors .hx-colors-section-desc {
+    display: block !important;
+    font-family: var(--hx-font-family-sans, 'Inter', sans-serif) !important;
+    font-size: 0.875rem !important;
+    color: var(--hx-color-neutral-500, #64748B) !important;
+    margin: 0 0 1.5rem 0 !important;
+    line-height: 1.7 !important;
+    max-width: 720px !important;
+  }
+
+  /* ── Subgroup Header ───────────────────────────────────── */
+  .hx-token-colors .hx-colors-subgroup {
+    display: block !important;
+    margin-bottom: 2rem !important;
+  }
+
+  .hx-token-colors .hx-colors-subgroup-header {
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.5rem !important;
+    margin-bottom: 1rem !important;
+  }
+
+  .hx-token-colors .hx-colors-subgroup-dot {
+    display: block !important;
+    width: 12px !important;
+    height: 12px !important;
+    border-radius: 50% !important;
+    flex-shrink: 0 !important;
+    border: 2px solid rgba(255,255,255,0.8) !important;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.15) !important;
+  }
+
+  .hx-token-colors .hx-colors-subgroup-label {
+    display: block !important;
+    font-family: var(--hx-font-family-sans, 'Inter', sans-serif) !important;
+    font-size: 1rem !important;
+    font-weight: 600 !important;
+    color: var(--hx-color-neutral-700, #334155) !important;
+    line-height: 1.3 !important;
+  }
+
+  .hx-token-colors .hx-colors-subgroup-count {
+    display: inline-flex !important;
+    font-family: var(--hx-font-family-mono, monospace) !important;
+    font-size: 0.6875rem !important;
+    color: var(--hx-color-neutral-400, #94A3B8) !important;
+    line-height: 1.3 !important;
+  }
+
+  /* ── Swatch Grid ───────────────────────────────────────── */
+  .hx-token-colors .hx-colors-grid {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)) !important;
+    gap: 12px !important;
+  }
+
+  /* ── Swatch Card ───────────────────────────────────────── */
+  .hx-token-colors .hx-colors-swatch {
+    display: flex !important;
+    flex-direction: column !important;
+    border-radius: var(--hx-border-radius-lg, 0.5rem) !important;
+    overflow: hidden !important;
+    border: 1px solid var(--hx-color-neutral-200, #E2E8F0) !important;
+    background: var(--hx-color-neutral-0, #fff) !important;
+    transition: transform 0.2s ease, box-shadow 0.2s ease !important;
+  }
+
+  .hx-token-colors .hx-colors-swatch:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: var(--hx-shadow-md, 0 4px 6px -1px rgb(0 0 0 / 0.1)) !important;
+  }
+
+  .hx-token-colors .hx-colors-swatch-preview {
+    display: flex !important;
+    align-items: flex-end !important;
+    justify-content: flex-end !important;
+    width: 100% !important;
+    height: 80px !important;
+    padding: 6px 8px !important;
+  }
+
+  .hx-token-colors .hx-colors-swatch-hex {
+    display: block !important;
+    font-family: var(--hx-font-family-mono, monospace) !important;
+    font-size: 0.6875rem !important;
+    opacity: 0.9 !important;
+    line-height: 1.2 !important;
+  }
+
+  .hx-token-colors .hx-colors-swatch-info {
+    display: block !important;
+    padding: 8px 10px !important;
+  }
+
+  .hx-token-colors .hx-colors-swatch-name {
+    display: block !important;
+    font-family: var(--hx-font-family-mono, monospace) !important;
+    font-size: 0.6875rem !important;
+    color: var(--hx-color-neutral-600, #475569) !important;
+    line-height: 1.5 !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    padding: 2px 0 !important;
+    border: none !important;
+    background: none !important;
+    text-align: left !important;
+    width: 100% !important;
+  }
+
+  .hx-token-colors .hx-colors-swatch-name:hover {
+    color: var(--hx-color-primary-600, #1D4ED8) !important;
+  }
+
+  .hx-token-colors .hx-colors-swatch-name:active {
+    color: var(--hx-color-primary-800, #1E3A8A) !important;
+  }
+
+  .hx-token-colors .hx-colors-swatch-value {
+    display: block !important;
+    font-family: var(--hx-font-family-mono, monospace) !important;
+    font-size: 0.625rem !important;
+    color: var(--hx-color-neutral-400, #94A3B8) !important;
+    line-height: 1.4 !important;
+  }
+
+  /* ── Semantic Token Row ────────────────────────────────── */
+  .hx-token-colors .hx-colors-semantic-grid {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)) !important;
+    gap: 12px !important;
+    margin-bottom: 1.5rem !important;
+  }
+
+  .hx-token-colors .hx-colors-semantic-card {
+    display: flex !important;
+    align-items: center !important;
+    gap: 12px !important;
+    padding: 12px 14px !important;
+    border-radius: var(--hx-border-radius-md, 0.375rem) !important;
+    border: 1px solid var(--hx-color-neutral-200, #E2E8F0) !important;
+    background: var(--hx-color-neutral-0, #fff) !important;
+    transition: transform 0.2s ease, box-shadow 0.2s ease !important;
+  }
+
+  .hx-token-colors .hx-colors-semantic-card:hover {
+    transform: translateY(-1px) !important;
+    box-shadow: var(--hx-shadow-sm, 0 1px 2px 0 rgb(0 0 0 / 0.05)) !important;
+  }
+
+  .hx-token-colors .hx-colors-semantic-dot {
+    display: block !important;
+    width: 32px !important;
+    height: 32px !important;
+    border-radius: var(--hx-border-radius-md, 0.375rem) !important;
+    flex-shrink: 0 !important;
+    border: 1px solid var(--hx-color-neutral-200, #E2E8F0) !important;
+  }
+
+  .hx-token-colors .hx-colors-semantic-label {
+    display: block !important;
+    font-family: var(--hx-font-family-mono, monospace) !important;
+    font-size: 0.6875rem !important;
+    color: var(--hx-color-neutral-600, #475569) !important;
+    line-height: 1.4 !important;
+  }
+
+  .hx-token-colors .hx-colors-semantic-value {
+    display: block !important;
+    font-family: var(--hx-font-family-mono, monospace) !important;
+    font-size: 0.625rem !important;
+    color: var(--hx-color-neutral-400, #94A3B8) !important;
+    line-height: 1.3 !important;
+  }
+
+  /* ── Dark Mode Section ─────────────────────────────────── */
+  .hx-token-colors .hx-colors-dark-container {
+    display: block !important;
+    background: var(--hx-color-neutral-900, #0F172A) !important;
+    border-radius: var(--hx-border-radius-lg, 0.5rem) !important;
+    padding: 2rem !important;
+    border: 1px solid var(--hx-color-neutral-700, #334155) !important;
+  }
+
+  .hx-token-colors .hx-colors-dark-subgroup {
+    display: block !important;
+    margin-bottom: 1.5rem !important;
+  }
+
+  .hx-token-colors .hx-colors-dark-subgroup:last-child {
+    margin-bottom: 0 !important;
+  }
+
+  .hx-token-colors .hx-colors-dark-label {
+    display: block !important;
+    font-family: var(--hx-font-family-sans, 'Inter', sans-serif) !important;
+    font-size: 0.875rem !important;
+    font-weight: 600 !important;
+    color: var(--hx-color-neutral-200, #E2E8F0) !important;
+    margin-bottom: 0.75rem !important;
+    line-height: 1.3 !important;
+  }
+
+  .hx-token-colors .hx-colors-dark-row {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    align-items: center !important;
+    gap: 16px !important;
+    padding: 8px 12px !important;
+    background: var(--hx-color-neutral-800, #1E293B) !important;
+    border-radius: var(--hx-border-radius-md, 0.375rem) !important;
+    margin-bottom: 4px !important;
+  }
+
+  .hx-token-colors .hx-colors-dark-token {
+    display: block !important;
+    font-family: var(--hx-font-family-mono, monospace) !important;
+    font-size: 0.6875rem !important;
+    color: var(--hx-color-neutral-300, #CBD5E1) !important;
+    line-height: 1.4 !important;
+  }
+
+  .hx-token-colors .hx-colors-dark-value {
+    display: block !important;
+    font-family: var(--hx-font-family-mono, monospace) !important;
+    font-size: 0.6875rem !important;
+    color: var(--hx-color-neutral-400, #94A3B8) !important;
+    text-align: right !important;
+    line-height: 1.4 !important;
+  }
+
+  .hx-token-colors .hx-colors-dark-empty {
+    display: block !important;
+    font-family: var(--hx-font-family-sans, 'Inter', sans-serif) !important;
+    font-size: 0.875rem !important;
+    color: var(--hx-color-neutral-400, #94A3B8) !important;
+    line-height: 1.5 !important;
+  }
+
+  /* ── Usage Guide Code Block ────────────────────────────── */
+  .hx-token-colors .hx-colors-code-block {
+    display: block !important;
+    padding: 1.25rem !important;
+    background: var(--hx-color-neutral-800, #1E293B) !important;
+    border-radius: var(--hx-border-radius-lg, 0.5rem) !important;
+    overflow-x: auto !important;
+    margin-top: 1rem !important;
+  }
+
+  .hx-token-colors .hx-colors-code-line {
+    display: block !important;
+    font-family: var(--hx-font-family-mono, monospace) !important;
+    font-size: 0.75rem !important;
+    line-height: 1.75 !important;
+    color: var(--hx-color-neutral-300, #CBD5E1) !important;
+    white-space: pre !important;
+  }
+
+  .hx-token-colors .hx-colors-code-comment {
+    color: var(--hx-color-neutral-500, #64748B) !important;
+  }
+
+  .hx-token-colors .hx-colors-code-prop {
+    color: var(--hx-color-primary-300, #93C5FD) !important;
+  }
+
+  .hx-token-colors .hx-colors-code-value {
+    color: var(--hx-color-success-400, #4ADE80) !important;
+  }
+
+  .hx-token-colors .hx-colors-code-fn {
+    color: var(--hx-color-accent-400, #FBBF24) !important;
+  }
+
+  /* ── Usage Tip Card ────────────────────────────────────── */
+  .hx-token-colors .hx-colors-tip {
+    display: flex !important;
+    gap: 0.75rem !important;
+    padding: 1rem 1.25rem !important;
+    background: var(--hx-color-info-50, #F0F9FF) !important;
+    border-radius: var(--hx-border-radius-md, 0.375rem) !important;
+    border: 1px solid var(--hx-color-info-200, #BAE6FD) !important;
+    margin-top: 1rem !important;
+  }
+
+  .hx-token-colors .hx-colors-tip-icon {
+    display: block !important;
+    flex-shrink: 0 !important;
+    font-size: 1rem !important;
+    line-height: 1.5 !important;
+  }
+
+  .hx-token-colors .hx-colors-tip-text {
+    display: block !important;
+    font-family: var(--hx-font-family-sans, 'Inter', sans-serif) !important;
+    font-size: 0.8125rem !important;
+    color: var(--hx-color-info-800, #0C4A6E) !important;
+    line-height: 1.6 !important;
+  }
+
+  .hx-token-colors .hx-colors-tip-code {
+    display: inline !important;
+    font-family: var(--hx-font-family-mono, monospace) !important;
+    font-size: 0.75rem !important;
+    padding: 0.125rem 0.375rem !important;
+    background: var(--hx-color-info-100, #E0F2FE) !important;
+    border-radius: 3px !important;
+    color: var(--hx-color-info-700, #075985) !important;
+  }
+`}
+</style>
+
+<div className="hx-token-colors">
+
+{/* ═══ Mini Hero Banner ═══════════════════════════════════ */}
+<div className="hx-colors-hero">
+  <div className="hx-colors-hero-title">Color Tokens</div>
+  <div className="hx-colors-hero-desc">
+    The complete HELIX color system. Every ramp provides 11 stops (50 through 950) across
+    brand, semantic, and neutral palettes, plus surface, text, and border aliases for
+    systematic UI composition.
+  </div>
+  <div className="hx-colors-hero-badges">
+    <span className="hx-colors-badge">{colorStats.total} color tokens</span>
+    <span className="hx-colors-badge hx-colors-badge--neutral">{allSubgroups.length} palettes</span>
+    <span className="hx-colors-badge hx-colors-badge--neutral">Light + Dark</span>
+  </div>
+</div>
+
+{/* ═══ All Palettes ═══════════════════════════════════════ */}
+<div className="hx-colors-section">
+
+## All Color Palettes
+
+<div className="hx-colors-section-desc">
+  Every color ramp in the design system, dynamically rendered from the @helix/tokens package.
+  Click any token name to copy its CSS custom property to the clipboard.
+</div>
+
+{allSubgroups.filter(sg => !['text', 'surface', 'border', 'focus-ring', 'selection'].includes(sg.label.toLowerCase())).map(subgroup => {
+  const firstToken = subgroup.tokens[0];
+  const dotColor = firstToken ? (isHexColor(firstToken.value) ? firstToken.value : resolveTokenRef(firstToken.value, tokenMap)) : '#94A3B8';
+  const mid = Math.floor(subgroup.tokens.length / 2);
+  const midToken = subgroup.tokens[mid];
+  const midColor = midToken ? (isHexColor(midToken.value) ? midToken.value : resolveTokenRef(midToken.value, tokenMap)) : dotColor;
+  return (
+    <div key={subgroup.label} className="hx-colors-subgroup">
+      <div className="hx-colors-subgroup-header">
+        <span className="hx-colors-subgroup-dot" style={{ background: midColor }} />
+        <span className="hx-colors-subgroup-label">{subgroup.label}</span>
+        <span className="hx-colors-subgroup-count">{subgroup.tokens.length} stops</span>
+      </div>
+      <div className="hx-colors-grid">
+        {subgroup.tokens.map(token => {
+          const hex = resolveHex(token);
+          const contrast = isHexColor(hex) ? getContrastColor(hex) : '#000000';
+          return (
+            <div key={token.name} className="hx-colors-swatch">
+              <div className="hx-colors-swatch-preview" style={{ background: `var(${token.name}, ${hex})` }}>
+                <span className="hx-colors-swatch-hex" style={{ color: contrast }}>{hex}</span>
+              </div>
+              <div className="hx-colors-swatch-info">
+                <button
+                  className="hx-colors-swatch-name"
+                  title={`Click to copy: ${token.name}`}
+                  onClick={() => copyToClipboard(token.name)}
+                >
+                  {token.name.replace('--hx-color-', '')}
+                </button>
+                <span className="hx-colors-swatch-value">{token.name}</span>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+})}
+
+</div>
+
+{/* ═══ Brand Colors ═══════════════════════════════════════ */}
+<div className="hx-colors-section">
+
+## Brand Colors
+
+<div className="hx-colors-section-desc">
+  The primary, secondary, and accent palettes define the core visual identity of the design system.
+  Primary is used for interactive elements and key affordances. Secondary complements the primary
+  for supporting UI. Accent draws attention to focal points and should be used sparingly.
+</div>
+
+{brandRampNames.map(name => {
+  const subgroup = findSubgroup(name);
+  if (!subgroup) return null;
+  const mid = Math.floor(subgroup.tokens.length / 2);
+  const midToken = subgroup.tokens[mid];
+  const midColor = midToken ? (isHexColor(midToken.value) ? midToken.value : resolveTokenRef(midToken.value, tokenMap)) : '#94A3B8';
+  const descriptions = {
+    primary: 'The core brand color for interactive elements, links, focus rings, and primary actions.',
+    secondary: 'Complements the primary palette for secondary actions, accents, and supporting elements.',
+    accent: 'Draws attention to key actions and highlights. Use sparingly for visual focal points.',
+  };
+  return (
+    <div key={subgroup.label} className="hx-colors-subgroup">
+      <div className="hx-colors-subgroup-header">
+        <span className="hx-colors-subgroup-dot" style={{ background: midColor }} />
+        <span className="hx-colors-subgroup-label">{subgroup.label}</span>
+        <span className="hx-colors-subgroup-count">{subgroup.tokens.length} stops</span>
+      </div>
+      <div className="hx-colors-section-desc" style={{ marginBottom: '1rem' }}>
+        {descriptions[name]}
+      </div>
+      <div className="hx-colors-grid">
+        {subgroup.tokens.map(token => {
+          const hex = resolveHex(token);
+          const contrast = isHexColor(hex) ? getContrastColor(hex) : '#000000';
+          return (
+            <div key={token.name} className="hx-colors-swatch">
+              <div className="hx-colors-swatch-preview" style={{ background: `var(${token.name}, ${hex})` }}>
+                <span className="hx-colors-swatch-hex" style={{ color: contrast }}>{hex}</span>
+              </div>
+              <div className="hx-colors-swatch-info">
+                <button
+                  className="hx-colors-swatch-name"
+                  title={`Click to copy: ${token.name}`}
+                  onClick={() => copyToClipboard(token.name)}
+                >
+                  {token.name.replace('--hx-color-', '')}
+                </button>
+                <span className="hx-colors-swatch-value">{token.name}</span>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+})}
+
+</div>
+
+{/* ═══ Neutral Palette ════════════════════════════════════ */}
+<div className="hx-colors-section">
+
+## Neutral Palette
+
+<div className="hx-colors-section-desc">
+  Neutrals provide the structural backbone of the UI -- backgrounds, borders, text, and
+  dividers. The scale runs from pure white (0) through gray tones to near-black (950).
+  This is the most heavily used palette in any interface.
+</div>
+
+{(() => {
+  const subgroup = findSubgroup('neutral');
+  if (!subgroup) return null;
+  return (
+    <div className="hx-colors-grid">
+      {subgroup.tokens.map(token => {
+        const hex = resolveHex(token);
+        const contrast = isHexColor(hex) ? getContrastColor(hex) : '#000000';
+        return (
+          <div key={token.name} className="hx-colors-swatch">
+            <div className="hx-colors-swatch-preview" style={{ background: `var(${token.name}, ${hex})` }}>
+              <span className="hx-colors-swatch-hex" style={{ color: contrast }}>{hex}</span>
+            </div>
+            <div className="hx-colors-swatch-info">
+              <button
+                className="hx-colors-swatch-name"
+                title={`Click to copy: ${token.name}`}
+                onClick={() => copyToClipboard(token.name)}
+              >
+                {token.name.replace('--hx-color-', '')}
+              </button>
+              <span className="hx-colors-swatch-value">{token.name}</span>
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+})()}
+
+</div>
+
+{/* ═══ Semantic Colors ════════════════════════════════════ */}
+<div className="hx-colors-section">
+
+## Semantic Colors
+
+<div className="hx-colors-section-desc">
+  Semantic colors communicate meaning -- success, warning, error, and informational states.
+  Each category includes a full ramp from light tints to dark shades. In healthcare applications,
+  these colors are critical for communicating system state and patient-safety-related information.
+</div>
+
+{semanticRampNames.map(name => {
+  const subgroup = findSubgroup(name);
+  if (!subgroup) return null;
+  const mid = Math.floor(subgroup.tokens.length / 2);
+  const midToken = subgroup.tokens[mid];
+  const midColor = midToken ? (isHexColor(midToken.value) ? midToken.value : resolveTokenRef(midToken.value, tokenMap)) : '#94A3B8';
+  return (
+    <div key={subgroup.label} className="hx-colors-subgroup">
+      <div className="hx-colors-subgroup-header">
+        <span className="hx-colors-subgroup-dot" style={{ background: midColor }} />
+        <span className="hx-colors-subgroup-label">{subgroup.label}</span>
+        <span className="hx-colors-subgroup-count">{subgroup.tokens.length} stops</span>
+      </div>
+      <div className="hx-colors-grid">
+        {subgroup.tokens.map(token => {
+          const hex = resolveHex(token);
+          const contrast = isHexColor(hex) ? getContrastColor(hex) : '#000000';
+          return (
+            <div key={token.name} className="hx-colors-swatch">
+              <div className="hx-colors-swatch-preview" style={{ background: `var(${token.name}, ${hex})` }}>
+                <span className="hx-colors-swatch-hex" style={{ color: contrast }}>{hex}</span>
+              </div>
+              <div className="hx-colors-swatch-info">
+                <button
+                  className="hx-colors-swatch-name"
+                  title={`Click to copy: ${token.name}`}
+                  onClick={() => copyToClipboard(token.name)}
+                >
+                  {token.name.replace('--hx-color-', '')}
+                </button>
+                <span className="hx-colors-swatch-value">{token.name}</span>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+})}
+
+</div>
+
+{/* ═══ Semantic Aliases ═══════════════════════════════════ */}
+<div className="hx-colors-section">
+
+## Semantic Aliases
+
+<div className="hx-colors-section-desc">
+  Semantic aliases map to specific use cases: text colors, surface backgrounds, and border
+  treatments. These reference the primitive ramps via CSS custom property references, so
+  overriding a primitive token cascades through the entire system.
+</div>
+
+### Text Colors
+
+{(() => {
+  const textSubgroup = findSubgroup('text');
+  if (!textSubgroup) return null;
+  return (
+    <div className="hx-colors-semantic-grid">
+      {textSubgroup.tokens.map(token => {
+        const resolved = resolveTokenRef(token.value, tokenMap);
+        const hex = isHexColor(resolved) ? resolved : '#94A3B8';
+        return (
+          <div key={token.name} className="hx-colors-semantic-card">
+            <span className="hx-colors-semantic-dot" style={{ background: hex }} />
+            <div>
+              <button
+                className="hx-colors-semantic-label"
+                title={`Click to copy: ${token.name}`}
+                onClick={() => copyToClipboard(token.name)}
+              >
+                {token.name.replace('--hx-color-', '')}
+              </button>
+              <span className="hx-colors-semantic-value">{token.value}</span>
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+})()}
+
+### Surface Colors
+
+{(() => {
+  const surfaceSubgroup = findSubgroup('surface');
+  if (!surfaceSubgroup) return null;
+  return (
+    <div className="hx-colors-semantic-grid">
+      {surfaceSubgroup.tokens.map(token => {
+        const resolved = resolveTokenRef(token.value, tokenMap);
+        const hex = isHexColor(resolved) ? resolved : '#94A3B8';
+        return (
+          <div key={token.name} className="hx-colors-semantic-card">
+            <span className="hx-colors-semantic-dot" style={{ background: hex }} />
+            <div>
+              <button
+                className="hx-colors-semantic-label"
+                title={`Click to copy: ${token.name}`}
+                onClick={() => copyToClipboard(token.name)}
+              >
+                {token.name.replace('--hx-color-', '')}
+              </button>
+              <span className="hx-colors-semantic-value">{token.value}</span>
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+})()}
+
+### Border Colors
+
+{(() => {
+  const borderSubgroup = findSubgroup('border');
+  if (!borderSubgroup) return null;
+  return (
+    <div className="hx-colors-semantic-grid">
+      {borderSubgroup.tokens.map(token => {
+        const resolved = resolveTokenRef(token.value, tokenMap);
+        const hex = isHexColor(resolved) ? resolved : '#94A3B8';
+        return (
+          <div key={token.name} className="hx-colors-semantic-card">
+            <span className="hx-colors-semantic-dot" style={{ background: hex }} />
+            <div>
+              <button
+                className="hx-colors-semantic-label"
+                title={`Click to copy: ${token.name}`}
+                onClick={() => copyToClipboard(token.name)}
+              >
+                {token.name.replace('--hx-color-', '')}
+              </button>
+              <span className="hx-colors-semantic-value">{token.value}</span>
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+})()}
+
+</div>
+
+{/* ═══ Dark Mode Overrides ════════════════════════════════ */}
+<div className="hx-colors-section">
+
+## Dark Mode Overrides
+
+<div className="hx-colors-section-desc">
+  These tokens override light-mode defaults when dark mode is active. They reference the
+  same primitive ramps but remap surface, text, and border aliases for dark backgrounds.
+  The dark theme preview below renders on a dark surface to show the overrides in context.
+</div>
+
+<div className="hx-colors-dark-container">
+  {darkSubgroups.length > 0 ? (
+    darkSubgroups.map(subgroup => (
+      <div key={subgroup.label} className="hx-colors-dark-subgroup">
+        <div className="hx-colors-dark-label">{subgroup.label}</div>
+        {subgroup.tokens.map(token => (
+          <div key={token.name} className="hx-colors-dark-row">
+            <span className="hx-colors-dark-token">{token.name}</span>
+            <span className="hx-colors-dark-value">{token.value}</span>
+          </div>
+        ))}
+      </div>
+    ))
+  ) : (
+    <div className="hx-colors-dark-empty">No dark mode overrides defined.</div>
+  )}
+</div>
+
+</div>
+
+{/* ═══ Usage Guide ════════════════════════════════════════ */}
+<div className="hx-colors-section">
+
+## Usage Guide
+
+<div className="hx-colors-section-desc">
+  Color tokens follow the three-tier cascade: primitive ramps define raw values, semantic
+  aliases provide meaning, and component tokens allow per-component overrides. Always use
+  the semantic or component level in your styles.
+</div>
+
+<div className="hx-colors-code-block">
+  <span className="hx-colors-code-line">
+    <span className="hx-colors-code-comment">{'/* Semantic level -- preferred for most use cases */'}</span>
+  </span>
+  <span className="hx-colors-code-line">
+    <span className="hx-colors-code-prop">{'color'}</span>{': '}<span className="hx-colors-code-fn">{'var'}</span>{'('}<span className="hx-colors-code-value">{'--hx-color-text-primary'}</span>{');'}
+  </span>
+  <span className="hx-colors-code-line">
+    <span className="hx-colors-code-prop">{'background'}</span>{': '}<span className="hx-colors-code-fn">{'var'}</span>{'('}<span className="hx-colors-code-value">{'--hx-color-surface-default'}</span>{');'}
+  </span>
+  <span className="hx-colors-code-line">
+    <span className="hx-colors-code-prop">{'border-color'}</span>{': '}<span className="hx-colors-code-fn">{'var'}</span>{'('}<span className="hx-colors-code-value">{'--hx-color-border-default'}</span>{');'}
+  </span>
+  <span className="hx-colors-code-line">{' '}</span>
+  <span className="hx-colors-code-line">
+    <span className="hx-colors-code-comment">{'/* Component level -- with semantic fallback */'}</span>
+  </span>
+  <span className="hx-colors-code-line">
+    <span className="hx-colors-code-prop">{'--_bg'}</span>{': '}<span className="hx-colors-code-fn">{'var'}</span>{'('}<span className="hx-colors-code-value">{'--hx-button-bg'}</span>{', '}<span className="hx-colors-code-fn">{'var'}</span>{'('}<span className="hx-colors-code-value">{'--hx-color-primary-500'}</span>{'));'}
+  </span>
+  <span className="hx-colors-code-line">{' '}</span>
+  <span className="hx-colors-code-line">
+    <span className="hx-colors-code-comment">{'/* Primitive level -- use only when building new semantic aliases */'}</span>
+  </span>
+  <span className="hx-colors-code-line">
+    <span className="hx-colors-code-prop">{'background'}</span>{': '}<span className="hx-colors-code-fn">{'var'}</span>{'('}<span className="hx-colors-code-value">{'--hx-color-primary-500'}</span>{');'}
+  </span>
+</div>
+
+<div className="hx-colors-tip">
+  <span className="hx-colors-tip-icon" aria-hidden="true">i</span>
+  <span className="hx-colors-tip-text">
+    Never hardcode color values. Always use <span className="hx-colors-tip-code">var(--hx-color-*)</span> tokens
+    so that themes, dark mode, and high-contrast mode work automatically across the system.
+  </span>
+</div>
+
+</div>
+
+</div>

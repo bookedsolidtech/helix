@@ -11,10 +11,10 @@ Drupal Behaviors provide lifecycle hooks for initializing JavaScript on page loa
 (function (Drupal) {
   'use strict';
 
-  Drupal.behaviors.wcComponents = {
+  Drupal.behaviors.hxComponents = {
     attach(context) {
       // Initialize any HELIX components in the context
-      const cards = context.querySelectorAll('wc-card:not([data-initialized])');
+      const cards = context.querySelectorAll('hx-card:not([data-initialized])');
       cards.forEach((card) => {
         card.setAttribute('data-initialized', 'true');
         // Additional initialization if needed
@@ -24,7 +24,7 @@ Drupal Behaviors provide lifecycle hooks for initializing JavaScript on page loa
     detach(context, settings, trigger) {
       if (trigger === 'unload') {
         // Cleanup when elements are removed
-        const cards = context.querySelectorAll('wc-card[data-initialized]');
+        const cards = context.querySelectorAll('hx-card[data-initialized]');
         cards.forEach((card) => {
           card.removeAttribute('data-initialized');
         });
@@ -37,11 +37,11 @@ Drupal Behaviors provide lifecycle hooks for initializing JavaScript on page loa
 ## Event Handling
 
 ```javascript
-Drupal.behaviors.wcEvents = {
+Drupal.behaviors.hxEvents = {
   attach(context) {
     // Listen for HELIX custom events
-    context.querySelectorAll('wc-accordion').forEach((accordion) => {
-      accordion.addEventListener('wc-toggle', (e) => {
+    context.querySelectorAll('hx-accordion').forEach((accordion) => {
+      accordion.addEventListener('hx-toggle', (e) => {
         // Track analytics
         if (typeof gtag !== 'undefined') {
           gtag('event', 'accordion_toggle', {

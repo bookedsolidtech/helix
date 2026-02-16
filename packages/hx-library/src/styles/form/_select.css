@@ -9,18 +9,21 @@
 select {
   display: block;
   width: 100%;
-  border: var(--wc-border-width-thin, 1px) solid var(--wc-select-border-color, var(--wc-color-neutral-300, #ced4da));
+  border: var(--wc-border-width-thin, 1px) solid
+    var(--wc-select-border-color, var(--wc-color-neutral-300, #ced4da));
   border-radius: var(--wc-select-border-radius, var(--wc-border-radius-md, 0.375rem));
   background-color: var(--wc-select-bg, var(--wc-color-neutral-0, #ffffff));
-  padding: var(--wc-space-2, 0.5rem) var(--wc-space-8, 2rem) var(--wc-space-2, 0.5rem) var(--wc-space-3, 0.75rem);
+  padding: var(--wc-space-2, 0.5rem) var(--wc-space-8, 2rem) var(--wc-space-2, 0.5rem)
+    var(--wc-space-3, 0.75rem);
   font-family: var(--wc-select-font-family, var(--wc-font-family-sans, sans-serif));
   font-size: var(--wc-font-size-md, 1rem);
   color: var(--wc-select-color, var(--wc-color-neutral-800, #212529));
   line-height: var(--wc-line-height-normal, 1.5);
   min-height: var(--wc-input-height-md, var(--wc-size-10, 2.5rem));
   cursor: pointer;
-  transition: border-color var(--wc-transition-fast, 150ms ease),
-              box-shadow var(--wc-transition-fast, 150ms ease);
+  transition:
+    border-color var(--wc-transition-fast, 150ms ease),
+    box-shadow var(--wc-transition-fast, 150ms ease);
 
   /* Remove native appearance */
   appearance: none;
@@ -38,8 +41,14 @@ select {
 
 select:focus {
   outline: none;
-  border-color: var(--wc-select-focus-ring-color, var(--wc-focus-ring-color, #007878));
-  box-shadow: 0 0 0 var(--wc-focus-ring-width, 2px) color-mix(in srgb, var(--wc-select-focus-ring-color, var(--wc-focus-ring-color, #007878)) calc(var(--wc-focus-ring-opacity, 0.25) * 100%), transparent);
+  border-color: var(--wc-select-focus-ring-color, var(--wc-focus-ring-color, #2563eb));
+  box-shadow: 0 0 0 var(--wc-focus-ring-width, 2px)
+    color-mix(
+      in srgb,
+      var(--wc-select-focus-ring-color, var(--wc-focus-ring-color, #2563eb))
+        calc(var(--wc-focus-ring-opacity, 0.25) * 100%),
+      transparent
+    );
 }
 
 /* ─── Disabled State ─── */

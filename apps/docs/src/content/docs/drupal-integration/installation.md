@@ -42,7 +42,7 @@ import '@helix/library';
 Create a custom module that provides the library:
 
 ```yaml
-# wc_2026.libraries.yml
+# helix.libraries.yml
 components:
   version: 0.0.1
   js:
@@ -59,7 +59,7 @@ After installation, verify components render:
 
 ```html
 <!-- Add to any TWIG template -->
-<wc-button variant="primary">Test Button</wc-button>
+<hx-button variant="primary">Test Button</hx-button>
 ```
 
 If the button renders with proper styling, the installation is complete.

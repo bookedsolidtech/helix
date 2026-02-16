@@ -1,19 +1,54 @@
 ---
-title: "wc-switch"
+title: "hx-switch"
 description: A toggle switch component for on/off states.
 ---
 
 import ComponentLoader from '../../../components/ComponentLoader.astro';
+import ComponentDemo from '../../../components/ComponentDemo.astro';
 import ComponentDoc from '../../../components/ComponentDoc.astro';
 
 <ComponentLoader />
 
-<ComponentDoc tagName="wc-switch" section="summary" />
+<ComponentDoc tagName="hx-switch" section="summary" />
 
-## Overview
+## Basic
 
-A toggle switch component for on/off states.
+Simple toggle switches with labels.
+
+<ComponentDemo title="Basic">
+  <div style="display: grid; gap: 0.75rem; max-width: 400px;">
+    <hx-switch label="Enable notifications"></hx-switch>
+    <hx-switch label="Dark mode" checked></hx-switch>
+  </div>
+</ComponentDemo>
+
+## States
+
+Off, on, disabled, and error states.
+
+<ComponentDemo title="States">
+  <div style="display: grid; gap: 0.75rem; max-width: 400px;">
+    <hx-switch label="Off (default)"></hx-switch>
+    <hx-switch label="On" checked></hx-switch>
+    <hx-switch label="Disabled off" disabled></hx-switch>
+    <hx-switch label="Disabled on" disabled checked></hx-switch>
+    <hx-switch label="Required" required help-text="This setting must be enabled."></hx-switch>
+    <hx-switch label="Error state" error="This field is required." checked></hx-switch>
+  </div>
+</ComponentDemo>
+
+## Sizes
+
+Small, medium, and large switch sizes.
+
+<ComponentDemo title="Sizes">
+  <div style="display: flex; gap: 1.5rem; flex-wrap: wrap; align-items: center;">
+    <hx-switch label="Small" hx-size="sm" checked></hx-switch>
+    <hx-switch label="Medium" hx-size="md" checked></hx-switch>
+    <hx-switch label="Large" hx-size="lg" checked></hx-switch>
+  </div>
+</ComponentDemo>
 
 ## API Reference
 
-<ComponentDoc tagName="wc-switch" section="api" />
+<ComponentDoc tagName="hx-switch" section="api" />

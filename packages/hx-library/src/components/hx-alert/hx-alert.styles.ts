@@ -79,8 +79,9 @@ export const helixAlertStyles = css`
     cursor: pointer;
     font-size: var(--hx-font-size-md, 1rem);
     line-height: 1;
-    transition: background-color var(--hx-transition-fast, 150ms ease),
-                opacity var(--hx-transition-fast, 150ms ease);
+    transition:
+      background-color var(--hx-transition-fast, 150ms ease),
+      opacity var(--hx-transition-fast, 150ms ease);
     opacity: 0.7;
   }
 
@@ -90,8 +91,7 @@ export const helixAlertStyles = css`
   }
 
   .alert__close-button:focus-visible {
-    outline: var(--hx-focus-ring-width, 2px) solid
-      var(--hx-focus-ring-color, #007878);
+    outline: var(--hx-focus-ring-width, 2px) solid var(--hx-focus-ring-color, #2563eb);
     outline-offset: var(--hx-focus-ring-offset, 2px);
     opacity: 1;
   }

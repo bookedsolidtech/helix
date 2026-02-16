@@ -49,12 +49,14 @@ export const helixRadioStyles = css`
     justify-content: center;
     width: var(--hx-radio-size, var(--hx-size-5, 1.25rem));
     height: var(--hx-radio-size, var(--hx-size-5, 1.25rem));
-    border: var(--hx-border-width-medium, 2px) solid var(--hx-radio-border-color, var(--hx-color-neutral-300, #ced4da));
+    border: var(--hx-border-width-medium, 2px) solid
+      var(--hx-radio-border-color, var(--hx-color-neutral-300, #ced4da));
     border-radius: var(--hx-border-radius-full, 9999px);
     background-color: var(--hx-color-neutral-0, #ffffff);
-    transition: border-color var(--hx-transition-fast, 150ms ease),
-                background-color var(--hx-transition-fast, 150ms ease),
-                box-shadow var(--hx-transition-fast, 150ms ease);
+    transition:
+      border-color var(--hx-transition-fast, 150ms ease),
+      background-color var(--hx-transition-fast, 150ms ease),
+      box-shadow var(--hx-transition-fast, 150ms ease);
     flex-shrink: 0;
   }
 
@@ -65,15 +67,16 @@ export const helixRadioStyles = css`
     height: 0;
     border-radius: var(--hx-border-radius-full, 9999px);
     background-color: var(--hx-radio-dot-color, var(--hx-color-neutral-0, #ffffff));
-    transition: width var(--hx-transition-fast, 150ms ease),
-                height var(--hx-transition-fast, 150ms ease);
+    transition:
+      width var(--hx-transition-fast, 150ms ease),
+      height var(--hx-transition-fast, 150ms ease);
   }
 
   /* ─── Checked State ─── */
 
   .radio--checked .radio__control {
-    border-color: var(--hx-radio-checked-border-color, var(--hx-color-primary-500, #007878));
-    background-color: var(--hx-radio-checked-bg, var(--hx-color-primary-500, #007878));
+    border-color: var(--hx-radio-checked-border-color, var(--hx-color-primary-500, #2563eb));
+    background-color: var(--hx-radio-checked-bg, var(--hx-color-primary-500, #2563eb));
   }
 
   .radio--checked .radio__dot {
@@ -84,7 +87,8 @@ export const helixRadioStyles = css`
   /* ─── Focus State ─── */
 
   .radio__input:focus-visible ~ .radio__control {
-    outline: var(--hx-focus-ring-width, 2px) solid var(--hx-radio-focus-ring-color, var(--hx-focus-ring-color, #007878));
+    outline: var(--hx-focus-ring-width, 2px) solid
+      var(--hx-radio-focus-ring-color, var(--hx-focus-ring-color, #2563eb));
     outline-offset: var(--hx-focus-ring-offset, 2px);
   }
 

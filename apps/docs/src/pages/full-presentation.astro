@@ -23,7 +23,7 @@ import ShowcaseLayout from '../layouts/ShowcaseLayout.astro';
 
 <ShowcaseLayout
   title="Full Presentation"
-  description="The complete 30-minute presentation: HELIX enterprise web components for healthcare. Architecture, stack, compliance, timeline, and the ask."
+  description="The complete 30-minute presentation: HELIX enterprise web components. Architecture, stack, compliance, timeline, and the ask."
 >
     <style is:inline>
       /* ============================================
@@ -116,7 +116,7 @@ import ShowcaseLayout from '../layouts/ShowcaseLayout.astro';
         justify-content: center;
         position: relative;
         overflow: hidden;
-        padding: 4rem 2rem;
+        padding: 5.5rem 2rem 4rem;
       }
 
       @media (min-width: 1025px) {
@@ -445,7 +445,7 @@ import ShowcaseLayout from '../layouts/ShowcaseLayout.astro';
           </div>
           <h1 style="font-size:clamp(2.5rem,7vw,5rem);font-weight:900;letter-spacing:-0.05em;line-height:1.05;margin-bottom:1.5rem;animation:fadeInUp 0.8s ease-out 0.15s both;">
             HELIX<br/>
-            <span class="gradient-text">Enterprise Web Components<br/>for Healthcare</span>
+            <span class="gradient-text">Enterprise Web Components</span>
           </h1>
           <p style="font-size:clamp(1.125rem,2.5vw,1.375rem);color:var(--text-secondary);margin-bottom:1rem;animation:fadeInUp 0.8s ease-out 0.3s both;">
             A complete architecture for building, documenting, and delivering<br/>
@@ -469,7 +469,7 @@ import ShowcaseLayout from '../layouts/ShowcaseLayout.astro';
             <div class="fp-slide-num num-red" aria-hidden="true">2</div>
             <span class="fp-slide-label label-red">The Problem</span>
             <h2 class="fp-slide-title">Why Current Approaches Fail</h2>
-            <p class="fp-slide-desc">Healthcare organizations face compounding technical debt and compliance risk from fragmented frontend approaches.</p>
+            <p class="fp-slide-desc">Enterprise organizations face compounding technical debt and compliance risk from fragmented frontend approaches.</p>
           </div>
 
           <div class="fp-grid-3 scroll-reveal scroll-reveal-delay-1">
@@ -481,7 +481,7 @@ import ShowcaseLayout from '../layouts/ShowcaseLayout.astro';
             <div class="fp-card">
               <div class="fp-card-icon icon-amber" aria-hidden="true"><i class="fa-solid fa-triangle-exclamation"></i></div>
               <div class="fp-card-title">Accessibility Gaps</div>
-              <div class="fp-card-desc">WCAG compliance treated as an afterthought. HHS Section 508 mandate (May 2026) approaching. Retrofit costs 10x more than building it in. Litigation risk.</div>
+              <div class="fp-card-desc">WCAG compliance treated as an afterthought. Accessibility regulations tightening globally. Retrofit costs 10x more than building it in. Litigation risk.</div>
             </div>
             <div class="fp-card">
               <div class="fp-card-icon icon-pink" aria-hidden="true"><i class="fa-solid fa-lock"></i></div>
@@ -497,7 +497,7 @@ import ShowcaseLayout from '../layouts/ShowcaseLayout.astro';
             </div>
             <div class="fp-stat">
               <div class="fp-stat-value" style="color:var(--wc-amber);">May '26</div>
-              <div class="fp-stat-label">HHS mandate<br/>compliance deadline</div>
+              <div class="fp-stat-label">Accessibility<br/>compliance target</div>
             </div>
             <div class="fp-stat">
               <div class="fp-stat-value" style="color:var(--wc-pink);">3-5x</div>
@@ -580,8 +580,8 @@ import ShowcaseLayout from '../layouts/ShowcaseLayout.astro';
               <div class="fp-card-title">Raw Values</div>
               <div class="fp-card-desc">Color scales, spacing, font stacks. Never referenced directly by consumers.</div>
               <div style="margin-top:0.75rem;display:flex;flex-wrap:wrap;gap:0.375rem;">
-                <code style="font-size:0.6875rem;padding:0.125rem 0.5rem;background:rgba(6,182,212,0.08);border:1px solid rgba(6,182,212,0.15);border-radius:4px;color:var(--wc-cyan);">--wc-blue-500</code>
-                <code style="font-size:0.6875rem;padding:0.125rem 0.5rem;background:rgba(6,182,212,0.08);border:1px solid rgba(6,182,212,0.15);border-radius:4px;color:var(--wc-cyan);">--wc-space-4</code>
+                <code style="font-size:0.6875rem;padding:0.125rem 0.5rem;background:rgba(6,182,212,0.08);border:1px solid rgba(6,182,212,0.15);border-radius:4px;color:var(--wc-cyan);">--hx-blue-500</code>
+                <code style="font-size:0.6875rem;padding:0.125rem 0.5rem;background:rgba(6,182,212,0.08);border:1px solid rgba(6,182,212,0.15);border-radius:4px;color:var(--wc-cyan);">--hx-space-4</code>
               </div>
             </div>
             <div class="fp-card" style="border-top:3px solid var(--wc-accent);">
@@ -589,8 +589,8 @@ import ShowcaseLayout from '../layouts/ShowcaseLayout.astro';
               <div class="fp-card-title">Brand Decisions</div>
               <div class="fp-card-desc">Maps primitives to intent. Theme switching happens here. Public API.</div>
               <div style="margin-top:0.75rem;display:flex;flex-wrap:wrap;gap:0.375rem;">
-                <code style="font-size:0.6875rem;padding:0.125rem 0.5rem;background:rgba(139,92,246,0.08);border:1px solid rgba(139,92,246,0.15);border-radius:4px;color:var(--wc-accent);">--wc-brand-primary</code>
-                <code style="font-size:0.6875rem;padding:0.125rem 0.5rem;background:rgba(139,92,246,0.08);border:1px solid rgba(139,92,246,0.15);border-radius:4px;color:var(--wc-accent);">--wc-brand-surface</code>
+                <code style="font-size:0.6875rem;padding:0.125rem 0.5rem;background:rgba(139,92,246,0.08);border:1px solid rgba(139,92,246,0.15);border-radius:4px;color:var(--wc-accent);">--hx-brand-primary</code>
+                <code style="font-size:0.6875rem;padding:0.125rem 0.5rem;background:rgba(139,92,246,0.08);border:1px solid rgba(139,92,246,0.15);border-radius:4px;color:var(--wc-accent);">--hx-brand-surface</code>
               </div>
             </div>
             <div class="fp-card" style="border-top:3px solid var(--wc-green);">
@@ -598,8 +598,8 @@ import ShowcaseLayout from '../layouts/ShowcaseLayout.astro';
               <div class="fp-card-title">Per-Component</div>
               <div class="fp-card-desc">Override points for fine-grained customization. Defaults to semantic tokens.</div>
               <div style="margin-top:0.75rem;display:flex;flex-wrap:wrap;gap:0.375rem;">
-                <code style="font-size:0.6875rem;padding:0.125rem 0.5rem;background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.15);border-radius:4px;color:var(--wc-green);">--wc-button-bg</code>
-                <code style="font-size:0.6875rem;padding:0.125rem 0.5rem;background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.15);border-radius:4px;color:var(--wc-green);">--wc-card-padding</code>
+                <code style="font-size:0.6875rem;padding:0.125rem 0.5rem;background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.15);border-radius:4px;color:var(--wc-green);">--hx-button-bg</code>
+                <code style="font-size:0.6875rem;padding:0.125rem 0.5rem;background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.15);border-radius:4px;color:var(--wc-green);">--hx-card-padding</code>
               </div>
             </div>
           </div>
@@ -791,9 +791,9 @@ import ShowcaseLayout from '../layouts/ShowcaseLayout.astro';
 
           <div class="scroll-reveal scroll-reveal-delay-2" style="margin-top:2rem;padding:1.25rem;background:var(--glass-bg);border:1px solid rgba(16,185,129,0.2);border-radius:var(--radius-xl);text-align:center;">
             <div style="display:flex;align-items:center;justify-content:center;gap:0.75rem;flex-wrap:wrap;">
-              <span style="font-size:0.875rem;font-weight:700;color:var(--wc-green);"><i class="fa-solid fa-shield-halved" aria-hidden="true" style="margin-right:0.375rem;"></i>HHS Section 508 Mandate</span>
+              <span style="font-size:0.875rem;font-weight:700;color:var(--wc-green);"><i class="fa-solid fa-shield-halved" aria-hidden="true" style="margin-right:0.375rem;"></i>WCAG AAA Accessibility Target</span>
               <span style="font-size:0.8125rem;color:var(--text-muted);">&mdash;</span>
-              <span style="font-size:0.875rem;color:var(--text-secondary);">May 2026 compliance deadline. This architecture is ready <strong style="color:var(--wc-green);">today</strong>.</span>
+              <span style="font-size:0.875rem;color:var(--text-secondary);">Exceeding AA compliance standards. This architecture is ready <strong style="color:var(--wc-green);">today</strong>.</span>
             </div>
           </div>
         </div>
@@ -974,7 +974,7 @@ import ShowcaseLayout from '../layouts/ShowcaseLayout.astro';
             </h2>
             <p style="font-size:1.125rem;color:var(--text-secondary);max-width:700px;margin:0 auto 3rem;line-height:1.8;">
               I am looking for a tech lead role where I can architect, build, and deliver
-              an enterprise web component library for a healthcare organization.
+              an enterprise web component library for a content-driven organization.
               This documentation system is not a proposal -- it is a working prototype
               of how I lead and execute.
             </p>

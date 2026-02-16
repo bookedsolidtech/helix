@@ -1,6 +1,6 @@
 ---
 title: Installation
-description: How to install and set up the HELIX healthcare web component library
+description: How to install and set up the HELIX enterprise web component library
 ---
 
 ## Prerequisites

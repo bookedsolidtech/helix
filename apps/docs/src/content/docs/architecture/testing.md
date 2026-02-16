@@ -3,7 +3,7 @@ title: Testing Strategy
 description: Enterprise testing approach with Vitest 4.x, Chromatic, and axe-core for HELIX
 ---
 
-HELIX follows a comprehensive testing strategy designed for enterprise healthcare compliance.
+HELIX follows a comprehensive testing strategy designed for enterprise compliance.
 
 ## Testing Pyramid
 

@@ -1,6 +1,6 @@
 ---
 title: Component Examples
-description: Working examples of HELIX healthcare web components
+description: Working examples of HELIX enterprise web components
 ---
 
 Live component examples will be available once the component library is implemented in Phase 2. Below are usage patterns from the specification.
@@ -8,56 +8,56 @@ Live component examples will be available once the component library is implemen
 ## Card Component
 
 ```html
-<wc-card variant="elevated">
-  <wc-heading level="3" slot="header"> Patient Resources </wc-heading>
-  <wc-text> Access healthcare information, appointment scheduling, and support services. </wc-text>
-  <wc-button slot="actions" variant="primary"> Learn More </wc-button>
-</wc-card>
+<hx-card variant="elevated">
+  <hx-heading level="3" slot="header"> Featured Resources </hx-heading>
+  <hx-text> Access our latest articles, resources, and support services. </hx-text>
+  <hx-button slot="actions" variant="primary"> Learn More </hx-button>
+</hx-card>
 ```
 
 ## Alert Component
 
 ```html
-<wc-alert variant="info" dismissible>
-  <wc-icon name="info-circle" slot="icon"></wc-icon>
-  New flu vaccines are now available at all locations.
-</wc-alert>
+<hx-alert variant="info" dismissible>
+  <hx-icon name="info-circle" slot="icon"></hx-icon>
+  New content updates are now available across all sections.
+</hx-alert>
 
-<wc-alert variant="warning">
-  <wc-icon name="alert-triangle" slot="icon"></wc-icon>
-  This facility is currently at capacity. Please check back later.
-</wc-alert>
+<hx-alert variant="warning">
+  <hx-icon name="alert-triangle" slot="icon"></hx-icon>
+  This service is currently undergoing maintenance. Please check back later.
+</hx-alert>
 ```
 
 ## Accordion Component
 
 ```html
-<wc-accordion>
-  <wc-accordion-item heading="What insurance do you accept?">
-    We accept Medicare, Medicaid, and most major private insurance plans.
-  </wc-accordion-item>
-  <wc-accordion-item heading="How do I schedule an appointment?">
-    Call our scheduling line or use the online patient portal.
-  </wc-accordion-item>
-</wc-accordion>
+<hx-accordion>
+  <hx-accordion-item heading="What subscription plans do you offer?">
+    We offer Free, Professional, and Enterprise plans to fit your needs.
+  </hx-accordion-item>
+  <hx-accordion-item heading="How do I contact support?">
+    Contact our support team or use the online user portal.
+  </hx-accordion-item>
+</hx-accordion>
 ```
 
 ## Form Components
 
 ```html
 <form>
-  <wc-input label="Full Name" required error-message="Please enter your name"></wc-input>
+  <hx-input label="Full Name" required error-message="Please enter your name"></hx-input>
 
-  <wc-select label="Department" required>
-    <option value="">Select a department</option>
-    <option value="primary">Primary Care</option>
-    <option value="cardiology">Cardiology</option>
-    <option value="oncology">Oncology</option>
-  </wc-select>
+  <hx-select label="Category" required>
+    <option value="">Select a category</option>
+    <option value="general">General Inquiry</option>
+    <option value="support">Technical Support</option>
+    <option value="feedback">Feedback</option>
+  </hx-select>
 
-  <wc-textarea label="Additional Notes" rows="4" maxlength="500"></wc-textarea>
+  <hx-textarea label="Additional Notes" rows="4" maxlength="500"></hx-textarea>
 
-  <wc-button type="submit" variant="primary"> Submit Request </wc-button>
+  <hx-button type="submit" variant="primary"> Submit Request </hx-button>
 </form>
 ```
 
@@ -65,18 +65,18 @@ Live component examples will be available once the component library is implemen
 
 ```twig
 {# Drupal template using HELIX components #}
-<wc-card variant="{{ content.field_card_variant.0['#markup'] }}">
-  <wc-heading level="3" slot="header">
+<hx-card variant="{{ content.field_card_variant.0['#markup'] }}">
+  <hx-heading level="3" slot="header">
     {{ content.field_title }}
-  </wc-heading>
+  </hx-heading>
   {{ content.field_body }}
   {% if content.field_cta_url %}
-    <wc-button slot="actions" variant="primary"
+    <hx-button slot="actions" variant="primary"
       href="{{ content.field_cta_url.0['#url'] }}">
       {{ content.field_cta_text }}
-    </wc-button>
+    </hx-button>
   {% endif %}
-</wc-card>
+</hx-card>
 ```
 
 ## Next Steps

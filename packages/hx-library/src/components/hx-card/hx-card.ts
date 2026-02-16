@@ -85,14 +85,14 @@ export class HelixCard extends LitElement {
     /**
      * Dispatched when an interactive card is clicked.
      * Includes the target href in the detail.
-     * @event wc-card-click
+     * @event hx-card-click
      */
     this.dispatchEvent(
-      new CustomEvent('wc-card-click', {
+      new CustomEvent('hx-card-click', {
         bubbles: true,
         composed: true,
         detail: { url: this.wcHref, originalEvent: e },
-      })
+      }),
     );
   }
 

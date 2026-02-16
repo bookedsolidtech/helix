@@ -57,7 +57,7 @@ function hasDocsPage(tagName: string): boolean {
 }
 
 /**
- * Enterprise Healthcare Quality Gate Algorithm
+ * Enterprise Quality Gate Algorithm
  *
  * This algorithm implements a rigorous, multi-tier grading system that prevents
  * components from achieving high grades through weighted averaging alone.
@@ -68,7 +68,7 @@ function hasDocsPage(tagName: string): boolean {
  * - Untested critical dimensions are treated as 0%, not ignored
  * - No gaming the system: comprehensive excellence is the only path to A/B grades
  *
- * CRITICAL DIMENSIONS (must-pass for enterprise healthcare):
+ * CRITICAL DIMENSIONS (must-pass for enterprise):
  * - API Documentation (JSDoc)
  * - CEM Completeness
  * - Test Coverage
@@ -108,7 +108,7 @@ function hasDocsPage(tagName: string): boolean {
  *   - ALL critical dimensions ≥50%
  *   - At most 3 critical dimensions untested
  *
- * F (<60): Does not meet enterprise healthcare quality standards
+ * F (<60): Does not meet enterprise quality standards
  *   - Weighted score <60, OR
  *   - Any critical dimension <50%, OR
  *   - More than 3 critical dimensions untested

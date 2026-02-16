@@ -1,16 +1,16 @@
 import { addons } from 'storybook/manager-api';
 import { create } from 'storybook/theming';
 
-const wcTheme = create({
+const helixTheme = create({
   base: 'light',
 
   // Brand
-  brandTitle: 'WC-2026 Design System',
+  brandTitle: 'HELIX Design System',
   brandUrl: '/',
 
   // Colors
-  colorPrimary: '#007878',
-  colorSecondary: '#007878',
+  colorPrimary: '#2563EB',
+  colorSecondary: '#8b5cf6',
 
   // UI
   appBg: '#f8f9fa',
@@ -24,10 +24,10 @@ const wcTheme = create({
 
   // Toolbar
   barTextColor: '#6c757d',
-  barSelectedColor: '#007878',
+  barSelectedColor: '#2563EB',
   barBg: '#ffffff',
 });
 
 addons.setConfig({
-  theme: wcTheme,
+  theme: helixTheme,
 });

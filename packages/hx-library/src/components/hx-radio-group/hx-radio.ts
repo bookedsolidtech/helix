@@ -18,10 +18,10 @@ import { helixRadioStyles } from './hx-radio.styles.js';
  *
  * @cssprop [--hx-radio-size=var(--hx-size-5, 1.25rem)] - Radio circle size.
  * @cssprop [--hx-radio-border-color=var(--hx-color-neutral-300, #ced4da)] - Radio border color.
- * @cssprop [--hx-radio-checked-bg=var(--hx-color-primary-500, #007878)] - Checked background color.
- * @cssprop [--hx-radio-checked-border-color=var(--hx-color-primary-500, #007878)] - Checked border color.
+ * @cssprop [--hx-radio-checked-bg=var(--hx-color-primary-500, #2563EB)] - Checked background color.
+ * @cssprop [--hx-radio-checked-border-color=var(--hx-color-primary-500, #2563EB)] - Checked border color.
  * @cssprop [--hx-radio-dot-color=var(--hx-color-neutral-0, #ffffff)] - Inner dot color when checked.
- * @cssprop [--hx-radio-focus-ring-color=var(--hx-focus-ring-color, #007878)] - Focus ring color.
+ * @cssprop [--hx-radio-focus-ring-color=var(--hx-focus-ring-color, #2563EB)] - Focus ring color.
  * @cssprop [--hx-radio-label-color=var(--hx-color-neutral-700, #343a40)] - Label text color.
  */
 @customElement('hx-radio')
@@ -91,11 +91,11 @@ export class HelixRadio extends LitElement {
      * @internal
      */
     this.dispatchEvent(
-      new CustomEvent('wc-radio-select', {
+      new CustomEvent('hx-radio-select', {
         bubbles: true,
         composed: true,
         detail: { value: this.value },
-      })
+      }),
     );
   }
 

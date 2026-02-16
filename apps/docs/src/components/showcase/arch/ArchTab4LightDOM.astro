@@ -6,8 +6,8 @@
  * - Hero section — "Rendering Without Walls"
  * - The Spectrum — Shadow DOM vs Light DOM decision
  * - The Controller — AdoptedStylesheetsController flow
- * - CMS Content — The WYSIWYG problem and wc-prose
- * - Drupal Forms — wc-form dual-mode pattern
+ * - CMS Content — The WYSIWYG problem and hx-prose
+ * - Drupal Forms — hx-form dual-mode pattern
  * - System Architecture — full diagram
  * - Recommendation — decision matrix
  */
@@ -82,14 +82,14 @@ import {
             controls</strong> with predictable internal markup.
           </p>
           <div class="da-lightdom-choice-tags">
-            <span class="da-lightdom-tag da-lightdom-tag-cyan">wc-button</span>
-            <span class="da-lightdom-tag da-lightdom-tag-cyan">wc-text-input</span>
-            <span class="da-lightdom-tag da-lightdom-tag-cyan">wc-card</span>
-            <span class="da-lightdom-tag da-lightdom-tag-cyan">wc-badge</span>
-            <span class="da-lightdom-tag da-lightdom-tag-cyan">wc-alert</span>
-            <span class="da-lightdom-tag da-lightdom-tag-cyan">wc-select</span>
-            <span class="da-lightdom-tag da-lightdom-tag-cyan">wc-checkbox</span>
-            <span class="da-lightdom-tag da-lightdom-tag-cyan">wc-switch</span>
+            <span class="da-lightdom-tag da-lightdom-tag-cyan">hx-button</span>
+            <span class="da-lightdom-tag da-lightdom-tag-cyan">hx-text-input</span>
+            <span class="da-lightdom-tag da-lightdom-tag-cyan">hx-card</span>
+            <span class="da-lightdom-tag da-lightdom-tag-cyan">hx-badge</span>
+            <span class="da-lightdom-tag da-lightdom-tag-cyan">hx-alert</span>
+            <span class="da-lightdom-tag da-lightdom-tag-cyan">hx-select</span>
+            <span class="da-lightdom-tag da-lightdom-tag-cyan">hx-checkbox</span>
+            <span class="da-lightdom-tag da-lightdom-tag-cyan">hx-switch</span>
           </div>
           <div class="da-lightdom-choice-when">
             <strong>Use when:</strong>
@@ -115,9 +115,9 @@ import {
             CSS must reach deeply nested children.
           </p>
           <div class="da-lightdom-choice-tags">
-            <span class="da-lightdom-tag da-lightdom-tag-amber">wc-prose</span>
-            <span class="da-lightdom-tag da-lightdom-tag-amber">wc-form</span>
-            <span class="da-lightdom-tag da-lightdom-tag-amber">wc-container</span>
+            <span class="da-lightdom-tag da-lightdom-tag-amber">hx-prose</span>
+            <span class="da-lightdom-tag da-lightdom-tag-amber">hx-form</span>
+            <span class="da-lightdom-tag da-lightdom-tag-amber">hx-container</span>
           </div>
           <div class="da-lightdom-choice-when">
             <strong>Use when:</strong>
@@ -186,7 +186,7 @@ import {
               <span class="da-code-dot"></span>
               <span class="da-code-dot"></span>
               <span class="da-code-dot"></span>
-              <span class="da-code-filename">wc-prose.ts</span>
+              <span class="da-code-filename">hx-prose.ts</span>
             </div>
             <div class="da-code-body"><pre set:html={codeAdoptedController} /></div>
           </div>
@@ -211,14 +211,14 @@ import {
           <i class="fa-solid fa-clone" aria-hidden="true"></i>
           <div>
             <strong>No Duplication</strong>
-            <p>Global cache keyed by CSS text &mdash; 100 instances of <code>wc-prose</code> create only one <code>CSSStyleSheet</code>.</p>
+            <p>Global cache keyed by CSS text &mdash; 100 instances of <code>hx-prose</code> create only one <code>CSSStyleSheet</code>.</p>
           </div>
         </div>
         <div class="da-adopted-benefit">
           <i class="fa-solid fa-crosshairs" aria-hidden="true"></i>
           <div>
             <strong>Scoped Selectors</strong>
-            <p>All rules are tag-qualified: <code>wc-prose h2</code>, <code>wc-form label</code>. No risk of global style leaks.</p>
+            <p>All rules are tag-qualified: <code>hx-prose h2</code>, <code>hx-form label</code>. No risk of global style leaks.</p>
           </div>
         </div>
         <div class="da-adopted-benefit">
@@ -276,7 +276,7 @@ import {
           </div>
         </div>
         <div>
-          <span class="da-code-label da-code-label-twig">Wrapped in wc-prose</span>
+          <span class="da-code-label da-code-label-twig">Wrapped in hx-prose</span>
           <div class="da-code-block">
             <div class="da-code-titlebar">
               <span class="da-code-dot"></span>
@@ -357,7 +357,7 @@ import {
         <p class="da-section-description">
           Drupal's Form API generates the <code>&lt;form&gt;</code> tag, CSRF tokens,
           AJAX wrappers, and submission handlers. A Shadow DOM component cannot wrap
-          this without breaking form participation. <code>wc-form</code> solves this
+          this without breaking form participation. <code>hx-form</code> solves this
           with a dual-mode pattern.
         </p>
       </div>
@@ -375,8 +375,8 @@ import {
             </div>
           </div>
           <p class="da-form-mode-desc">
-            When <code>action</code> is set, <code>wc-form</code> renders a native
-            <code>&lt;form&gt;</code> element. Client-side validation, <code>wc-submit</code>
+            When <code>action</code> is set, <code>hx-form</code> renders a native
+            <code>&lt;form&gt;</code> element. Client-side validation, <code>hx-submit</code>
             events, and direct HTTP submission all work out of the box.
           </p>
           <div class="da-code-block" style="margin-top: var(--space-4);">
@@ -401,7 +401,7 @@ import {
             </div>
           </div>
           <p class="da-form-mode-desc">
-            When no <code>action</code> is set, <code>wc-form</code> renders only a
+            When no <code>action</code> is set, <code>hx-form</code> renders only a
             <code>&lt;slot&gt;</code>. Drupal provides its own <code>&lt;form&gt;</code>
             tag with CSRF tokens and AJAX handlers. The component only injects styling.
           </p>
@@ -459,7 +459,7 @@ import {
             <span class="da-code-dot"></span>
             <span class="da-code-dot"></span>
             <span class="da-code-dot"></span>
-            <span class="da-code-filename">wc-text-input.ts</span>
+            <span class="da-code-filename">hx-text-input.ts</span>
           </div>
           <div class="da-code-body"><pre set:html={codeFormInternals} /></div>
         </div>
@@ -485,7 +485,7 @@ import {
           <i class="fa-brands fa-drupal" aria-hidden="true"></i>
           <div>
             <strong>Drupal Compatible</strong>
-            <p>Drupal behaviors, AJAX handlers, and Form API validation work with wc-* form controls without modification.</p>
+            <p>Drupal behaviors, AJAX handlers, and Form API validation work with hx-* form controls without modification.</p>
           </div>
         </div>
       </div>
@@ -539,16 +539,16 @@ import {
               <div class="da-arch-branch-section">
                 <div class="da-arch-branch-label">Components</div>
                 <div class="da-arch-branch-tags">
-                  <span>wc-button</span>
-                  <span>wc-card</span>
-                  <span>wc-text-input</span>
-                  <span>wc-select</span>
-                  <span>wc-checkbox</span>
-                  <span>wc-badge</span>
-                  <span>wc-alert</span>
-                  <span>wc-switch</span>
-                  <span>wc-radio-group</span>
-                  <span>wc-textarea</span>
+                  <span>hx-button</span>
+                  <span>hx-card</span>
+                  <span>hx-text-input</span>
+                  <span>hx-select</span>
+                  <span>hx-checkbox</span>
+                  <span>hx-badge</span>
+                  <span>hx-alert</span>
+                  <span>hx-switch</span>
+                  <span>hx-radio-group</span>
+                  <span>hx-textarea</span>
                 </div>
               </div>
             </div>
@@ -577,9 +577,9 @@ import {
               <div class="da-arch-branch-section">
                 <div class="da-arch-branch-label">Components</div>
                 <div class="da-arch-branch-tags">
-                  <span>wc-prose</span>
-                  <span>wc-form</span>
-                  <span>wc-container</span>
+                  <span>hx-prose</span>
+                  <span>hx-form</span>
+                  <span>hx-container</span>
                 </div>
               </div>
             </div>

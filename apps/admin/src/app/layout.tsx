@@ -15,9 +15,9 @@ import { DOCS_URL, STORYBOOK_URL } from '@/lib/env';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'Panopticon Platform — WC-2026 Component Library',
+  title: 'Panopticon Platform — HELIX Component Library',
   description:
-    'Panopticon Platform: Internal dashboard for WC-2026 component library health, CEM pipeline, and development lifecycle.',
+    'Panopticon Platform: Internal dashboard for HELIX component library health, CEM pipeline, and development lifecycle.',
   robots: {
     index: false,
     follow: false,
@@ -55,7 +55,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               <h1 className="text-lg font-bold text-foreground tracking-tight">
                 Panopticon Platform
               </h1>
-              <p className="text-xs text-muted-foreground">WC-2026 Component Library</p>
+              <p className="text-xs text-muted-foreground">HELIX Component Library</p>
             </div>
 
             <nav className="flex flex-col gap-1">
@@ -68,7 +68,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               </SidebarLink>
 
               <SidebarLink href="/tests" icon={<FileCheck2 className="w-4 h-4" />}>
-                Tests
+                Verification
               </SidebarLink>
 
               <SidebarLink href="/tokens" icon={<Palette className="w-4 h-4" />}>

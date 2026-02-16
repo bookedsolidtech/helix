@@ -48,12 +48,13 @@ export const helixSwitchStyles = css`
   }
 
   .switch__track:focus-visible {
-    outline: var(--hx-focus-ring-width, 2px) solid var(--hx-switch-focus-ring-color, var(--hx-focus-ring-color, #007878));
+    outline: var(--hx-focus-ring-width, 2px) solid
+      var(--hx-switch-focus-ring-color, var(--hx-focus-ring-color, #2563eb));
     outline-offset: var(--hx-focus-ring-offset, 2px);
   }
 
   .switch--checked .switch__track {
-    background-color: var(--hx-switch-track-checked-bg, var(--hx-color-primary-500, #007878));
+    background-color: var(--hx-switch-track-checked-bg, var(--hx-color-primary-500, #2563eb));
   }
 
   /* --- Thumb --- */
@@ -82,7 +83,8 @@ export const helixSwitchStyles = css`
   }
 
   .switch--sm.switch--checked .switch__thumb {
-    transform: translateY(-50%) translateX(var(--hx-switch-thumb-size-sm, var(--hx-size-3-5, 0.875rem)));
+    transform: translateY(-50%)
+      translateX(var(--hx-switch-thumb-size-sm, var(--hx-size-3-5, 0.875rem)));
   }
 
   /* --- Size: md (track 40x22, thumb 18px) --- */
@@ -101,7 +103,8 @@ export const helixSwitchStyles = css`
   }
 
   .switch--md.switch--checked .switch__thumb {
-    transform: translateY(-50%) translateX(var(--hx-switch-thumb-size-md, var(--hx-size-4-5, 1.125rem)));
+    transform: translateY(-50%)
+      translateX(var(--hx-switch-thumb-size-md, var(--hx-size-4-5, 1.125rem)));
   }
 
   /* --- Size: lg (track 48x26, thumb 22px) --- */
@@ -120,7 +123,8 @@ export const helixSwitchStyles = css`
   }
 
   .switch--lg.switch--checked .switch__thumb {
-    transform: translateY(-50%) translateX(var(--hx-switch-thumb-size-lg, var(--hx-size-5-5, 1.375rem)));
+    transform: translateY(-50%)
+      translateX(var(--hx-switch-thumb-size-lg, var(--hx-size-5-5, 1.375rem)));
   }
 
   /* --- Label --- */
