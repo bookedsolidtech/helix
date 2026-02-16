@@ -474,6 +474,7 @@ const mid = Math.floor(subgroup.tokens.length / 2);
 const midToken = subgroup.tokens[mid];
 const midColor = midToken ? (isHexColor(midToken.value) ? midToken.value : resolveTokenRef(midToken.value, tokenMap)) : dotColor;
 return (
+
 <div key={subgroup.label} className="hx-colors-subgroup">
 <div className="hx-colors-subgroup-header">
 <span className="hx-colors-subgroup-dot" style={{ background: midColor }} />
@@ -532,6 +533,7 @@ secondary: 'Complements the primary palette for secondary actions, accents, and 
 accent: 'Draws attention to key actions and highlights. Use sparingly for visual focal points.',
 };
 return (
+
 <div key={subgroup.label} className="hx-colors-subgroup">
 <div className="hx-colors-subgroup-header">
 <span className="hx-colors-subgroup-dot" style={{ background: midColor }} />
@@ -585,6 +587,7 @@ onClick={() => copyToClipboard(token.name)} >
 const subgroup = findSubgroup('neutral');
 if (!subgroup) return null;
 return (
+
 <div className="hx-colors-grid">
 {subgroup.tokens.map(token => {
 const hex = resolveHex(token);
@@ -631,6 +634,7 @@ const mid = Math.floor(subgroup.tokens.length / 2);
 const midToken = subgroup.tokens[mid];
 const midColor = midToken ? (isHexColor(midToken.value) ? midToken.value : resolveTokenRef(midToken.value, tokenMap)) : '#94A3B8';
 return (
+
 <div key={subgroup.label} className="hx-colors-subgroup">
 <div className="hx-colors-subgroup-header">
 <span className="hx-colors-subgroup-dot" style={{ background: midColor }} />
@@ -683,6 +687,7 @@ onClick={() => copyToClipboard(token.name)} >
 const textSubgroup = findSubgroup('text');
 if (!textSubgroup) return null;
 return (
+
 <div className="hx-colors-semantic-grid">
 {textSubgroup.tokens.map(token => {
 const resolved = resolveTokenRef(token.value, tokenMap);
@@ -712,6 +717,7 @@ onClick={() => copyToClipboard(token.name)} >
 const surfaceSubgroup = findSubgroup('surface');
 if (!surfaceSubgroup) return null;
 return (
+
 <div className="hx-colors-semantic-grid">
 {surfaceSubgroup.tokens.map(token => {
 const resolved = resolveTokenRef(token.value, tokenMap);
@@ -741,6 +747,7 @@ onClick={() => copyToClipboard(token.name)} >
 const borderSubgroup = findSubgroup('border');
 if (!borderSubgroup) return null;
 return (
+
 <div className="hx-colors-semantic-grid">
 {borderSubgroup.tokens.map(token => {
 const resolved = resolveTokenRef(token.value, tokenMap);

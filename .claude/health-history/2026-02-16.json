@@ -1,6 +1,6 @@
 {
   "date": "2026-02-16",
-  "timestamp": 1771254206604,
+  "timestamp": 1771254703210,
   "components": [
     {
       "tagName": "hx-alert",
@@ -5433,7 +5433,7 @@
         {
           "name": "Maintainability",
           "weight": 5,
-          "score": 91,
+          "score": 89,
           "maxScore": 100,
           "measured": true,
           "phase": "Phase 0",
@@ -5445,14 +5445,14 @@
               "score": 100,
               "weight": 20,
               "passed": true,
-              "detail": "372 lines (under 500)"
+              "detail": "393 lines (under 500)"
             },
             {
               "name": "Test-to-Code Ratio",
-              "score": 87,
+              "score": 81,
               "weight": 25,
               "passed": false,
-              "detail": "405 test lines / 312 code lines = 1.30x ratio"
+              "detail": "405 test lines / 333 code lines = 1.22x ratio"
             },
             {
               "name": "No Circular Dependencies",
@@ -5513,7 +5513,7 @@
               "score": 80,
               "weight": 10,
               "passed": true,
-              "detail": "11.2 KB source file (fast rebuild)"
+              "detail": "11.6 KB source file (fast rebuild)"
             },
             {
               "name": "Clear Examples",
@@ -5936,7 +5936,7 @@
         {
           "name": "Maintainability",
           "weight": 5,
-          "score": 94,
+          "score": 93,
           "maxScore": 100,
           "measured": true,
           "phase": "Phase 0",
@@ -5948,14 +5948,14 @@
               "score": 100,
               "weight": 20,
               "passed": true,
-              "detail": "319 lines (under 500)"
+              "detail": "325 lines (under 500)"
             },
             {
               "name": "Test-to-Code Ratio",
-              "score": 98,
+              "score": 95,
               "weight": 25,
               "passed": false,
-              "detail": "396 test lines / 270 code lines = 1.47x ratio"
+              "detail": "396 test lines / 277 code lines = 1.43x ratio"
             },
             {
               "name": "No Circular Dependencies",
@@ -6016,7 +6016,7 @@
               "score": 100,
               "weight": 10,
               "passed": true,
-              "detail": "9.0 KB source file (fast rebuild)"
+              "detail": "9.1 KB source file (fast rebuild)"
             },
             {
               "name": "Clear Examples",
@@ -6439,7 +6439,7 @@
         {
           "name": "Maintainability",
           "weight": 5,
-          "score": 91,
+          "score": 90,
           "maxScore": 100,
           "measured": true,
           "phase": "Phase 0",
@@ -6451,14 +6451,14 @@
               "score": 100,
               "weight": 20,
               "passed": true,
-              "detail": "363 lines (under 500)"
+              "detail": "369 lines (under 500)"
             },
             {
               "name": "Test-to-Code Ratio",
-              "score": 86,
+              "score": 84,
               "weight": 25,
               "passed": false,
-              "detail": "397 test lines / 309 code lines = 1.28x ratio"
+              "detail": "397 test lines / 315 code lines = 1.26x ratio"
             },
             {
               "name": "No Circular Dependencies",
@@ -6519,7 +6519,7 @@
               "score": 80,
               "weight": 10,
               "passed": true,
-              "detail": "10.5 KB source file (fast rebuild)"
+              "detail": "10.6 KB source file (fast rebuild)"
             },
             {
               "name": "Clear Examples",
@@ -6954,14 +6954,14 @@
               "score": 100,
               "weight": 20,
               "passed": true,
-              "detail": "403 lines (under 500)"
+              "detail": "406 lines (under 500)"
             },
             {
               "name": "Test-to-Code Ratio",
-              "score": 85,
+              "score": 84,
               "weight": 25,
               "passed": false,
-              "detail": "438 test lines / 343 code lines = 1.28x ratio"
+              "detail": "438 test lines / 346 code lines = 1.27x ratio"
             },
             {
               "name": "No Circular Dependencies",
@@ -7022,7 +7022,7 @@
               "score": 80,
               "weight": 10,
               "passed": true,
-              "detail": "11.7 KB source file (fast rebuild)"
+              "detail": "11.8 KB source file (fast rebuild)"
             },
             {
               "name": "Clear Examples",
