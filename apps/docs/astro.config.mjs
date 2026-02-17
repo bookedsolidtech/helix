@@ -220,25 +220,46 @@ export default defineConfig({
                   collapsed: true,
                   items: [
                     { label: 'Twig Templates', slug: 'drupal-integration/twig/fundamentals' },
-                    { label: 'Properties & Attributes', slug: 'drupal-integration/twig/properties' },
+                    {
+                      label: 'Properties & Attributes',
+                      slug: 'drupal-integration/twig/properties',
+                    },
                     { label: 'Slots in Twig', slug: 'drupal-integration/twig/slots' },
-                    { label: 'Drupal Behaviors', slug: 'drupal-integration/behaviors/fundamentals' },
-                    { label: 'Per-Component Loading', slug: 'drupal-integration/per-component-loading' },
+                    {
+                      label: 'Drupal Behaviors',
+                      slug: 'drupal-integration/behaviors/fundamentals',
+                    },
+                    {
+                      label: 'Per-Component Loading',
+                      slug: 'drupal-integration/per-component-loading',
+                    },
                   ],
                 },
                 {
                   label: 'Fundamentals',
                   collapsed: true,
                   items: [
-                    { label: 'Your First Component', slug: 'components/fundamentals/first-component' },
-                    { label: 'Reactive Properties', slug: 'components/fundamentals/reactive-properties' },
-                    { label: 'Properties vs Attributes', slug: 'components/fundamentals/properties-vs-attributes' },
+                    {
+                      label: 'Your First Component',
+                      slug: 'components/fundamentals/first-component',
+                    },
+                    {
+                      label: 'Reactive Properties',
+                      slug: 'components/fundamentals/reactive-properties',
+                    },
+                    {
+                      label: 'Properties vs Attributes',
+                      slug: 'components/fundamentals/properties-vs-attributes',
+                    },
                     { label: 'The Update Cycle', slug: 'components/fundamentals/update-cycle' },
                     { label: 'Lifecycle', slug: 'components/fundamentals/lifecycle' },
                     { label: 'Template Syntax', slug: 'components/fundamentals/template-syntax' },
                     { label: 'Decorators', slug: 'components/fundamentals/decorators' },
                     { label: 'Built-in Directives', slug: 'components/fundamentals/directives' },
-                    { label: 'Custom Directives', slug: 'components/fundamentals/custom-directives' },
+                    {
+                      label: 'Custom Directives',
+                      slug: 'components/fundamentals/custom-directives',
+                    },
                   ],
                 },
                 {
@@ -248,7 +269,10 @@ export default defineConfig({
                     { label: 'Architecture', slug: 'components/shadow-dom/architecture' },
                     { label: 'Open vs Closed', slug: 'components/shadow-dom/open-closed' },
                     { label: 'Slots', slug: 'components/shadow-dom/slots' },
-                    { label: 'Advanced Slot Patterns', slug: 'components/shadow-dom/advanced-slots' },
+                    {
+                      label: 'Advanced Slot Patterns',
+                      slug: 'components/shadow-dom/advanced-slots',
+                    },
                     { label: 'CSS Parts', slug: 'components/shadow-dom/parts' },
                     { label: 'Part Forwarding', slug: 'components/shadow-dom/part-forwarding' },
                     { label: 'Events', slug: 'components/shadow-dom/events' },
@@ -261,7 +285,10 @@ export default defineConfig({
                     { label: 'Fundamentals', slug: 'components/styling/fundamentals' },
                     { label: 'Design Tokens', slug: 'components/styling/tokens' },
                     { label: 'Theming', slug: 'components/styling/theming' },
-                    { label: 'Constructable Stylesheets', slug: 'components/styling/constructable-stylesheets' },
+                    {
+                      label: 'Constructable Stylesheets',
+                      slug: 'components/styling/constructable-stylesheets',
+                    },
                     { label: 'Responsive Components', slug: 'components/styling/responsive' },
                     { label: 'Dark Mode', slug: 'components/styling/dark-mode' },
                     { label: 'Animations & Transitions', slug: 'components/styling/animations' },
@@ -306,7 +333,10 @@ export default defineConfig({
                   label: 'Advanced',
                   collapsed: true,
                   items: [
-                    { label: 'Composition Patterns', slug: 'components/advanced/composition-patterns' },
+                    {
+                      label: 'Composition Patterns',
+                      slug: 'components/advanced/composition-patterns',
+                    },
                     { label: 'Reactive Controllers', slug: 'components/advanced/controllers' },
                     { label: 'State Management', slug: 'components/advanced/state-management' },
                     { label: 'Mixins', slug: 'components/advanced/mixins' },
@@ -344,7 +374,10 @@ export default defineConfig({
                     { label: 'WCAG 2.1 AA', slug: 'components/accessibility/wcag' },
                     { label: 'ARIA Patterns', slug: 'components/accessibility/aria' },
                     { label: 'Keyboard Navigation', slug: 'components/accessibility/keyboard' },
-                    { label: 'Focus Management', slug: 'components/accessibility/focus-management' },
+                    {
+                      label: 'Focus Management',
+                      slug: 'components/accessibility/focus-management',
+                    },
                     { label: 'Screen Readers', slug: 'components/accessibility/screen-readers' },
                     { label: 'Accessibility Testing', slug: 'components/accessibility/testing' },
                   ],
@@ -353,9 +386,18 @@ export default defineConfig({
                   label: 'Documentation',
                   collapsed: true,
                   items: [
-                    { label: 'Writing Storybook Stories', slug: 'components/documentation/storybook' },
-                    { label: 'Storybook Interaction Tests', slug: 'components/documentation/storybook-interaction' },
-                    { label: 'Custom Elements Manifest', slug: 'components/documentation/cem-fundamentals' },
+                    {
+                      label: 'Writing Storybook Stories',
+                      slug: 'components/documentation/storybook',
+                    },
+                    {
+                      label: 'Storybook Interaction Tests',
+                      slug: 'components/documentation/storybook-interaction',
+                    },
+                    {
+                      label: 'Custom Elements Manifest',
+                      slug: 'components/documentation/cem-fundamentals',
+                    },
                     { label: 'JSDoc for Components', slug: 'components/documentation/jsdoc' },
                   ],
                 },
@@ -364,7 +406,10 @@ export default defineConfig({
                   collapsed: true,
                   items: [
                     { label: 'Packaging for npm', slug: 'components/distribution/packaging' },
-                    { label: 'Versioning & Changelogs', slug: 'components/distribution/versioning' },
+                    {
+                      label: 'Versioning & Changelogs',
+                      slug: 'components/distribution/versioning',
+                    },
                     { label: 'CDN Distribution', slug: 'components/distribution/cdn' },
                   ],
                 },
@@ -415,7 +460,10 @@ export default defineConfig({
                     { label: 'Fundamentals', slug: 'drupal-integration/behaviors/fundamentals' },
                     { label: 'Patterns', slug: 'drupal-integration/behaviors/patterns' },
                     { label: 'Once API', slug: 'drupal-integration/behaviors/once-api' },
-                    { label: 'With Web Components', slug: 'drupal-integration/behaviors/web-components' },
+                    {
+                      label: 'With Web Components',
+                      slug: 'drupal-integration/behaviors/web-components',
+                    },
                   ],
                 },
                 {
@@ -432,10 +480,16 @@ export default defineConfig({
                   items: [
                     { label: 'Overview', slug: 'drupal-integration/performance/overview' },
                     { label: 'Lazy Loading', slug: 'drupal-integration/performance/lazy-loading' },
-                    { label: 'Per-Component Loading', slug: 'drupal-integration/per-component-loading' },
+                    {
+                      label: 'Per-Component Loading',
+                      slug: 'drupal-integration/per-component-loading',
+                    },
                   ],
                 },
-                { label: 'Troubleshooting', slug: 'drupal-integration/troubleshooting/common-issues' },
+                {
+                  label: 'Troubleshooting',
+                  slug: 'drupal-integration/troubleshooting/common-issues',
+                },
               ],
             },
           ],
