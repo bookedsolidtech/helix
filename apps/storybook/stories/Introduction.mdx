@@ -696,7 +696,7 @@ import { Meta } from '@storybook/addon-docs/blocks';
 
 <div className="hx-intro-cta-row">
   <a
-    href="http://localhost:3150"
+    href={import.meta.env.HELIX_DOCS_URL}
     target="_blank"
     rel="noopener noreferrer"
     className="hx-intro-btn hx-intro-btn--primary"
@@ -707,7 +707,7 @@ import { Meta } from '@storybook/addon-docs/blocks';
     </span>
   </a>
   <a
-    href="http://localhost:3159"
+    href={import.meta.env.HELIX_ADMIN_URL}
     target="_blank"
     rel="noopener noreferrer"
     className="hx-intro-btn hx-intro-btn--secondary"

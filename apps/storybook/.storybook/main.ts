@@ -27,7 +27,15 @@ const config: StorybookConfig = {
   },
 
   viteFinal: async (config) => {
-    // Ensure Lit and the component library resolve correctly in the monorepo
+    config.define = {
+      ...config.define,
+      'import.meta.env.HELIX_DOCS_URL': JSON.stringify(
+        process.env.NEXT_PUBLIC_HELIX_DOCS_URL ?? 'http://localhost:3150',
+      ),
+      'import.meta.env.HELIX_ADMIN_URL': JSON.stringify(
+        process.env.NEXT_PUBLIC_HELIX_ADMIN_URL ?? 'http://localhost:3159',
+      ),
+    };
     return config;
   },
 };
