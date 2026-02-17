@@ -15,6 +15,8 @@
  * - Respects prefers-reduced-motion
  */
 import DnaHelixLogo from './DnaHelixLogo.astro';
+
+const storybookUrl = import.meta.env.HELIX_STORYBOOK_URL ?? 'http://localhost:3151';
 ---
 
 <section class="hero-section" aria-label="HELIX - HTML Element Library for Interactive eXperiences">
@@ -47,11 +49,11 @@ import DnaHelixLogo from './DnaHelixLogo.astro';
     <!-- Call to action buttons -->
     <div class="hero-cta">
       <a href="/getting-started/installation/" class="btn btn-primary">
-        Get Started
+        View Documentation
         <span class="btn-arrow" aria-hidden="true">&rarr;</span>
       </a>
-      <a href="/pre-planning/overview/" class="btn btn-secondary">
-        View Architecture
+      <a href={storybookUrl} class="btn btn-secondary" target="_blank" rel="noopener noreferrer">
+        View Storybook
         <span class="btn-arrow" aria-hidden="true">&rarr;</span>
       </a>
     </div>

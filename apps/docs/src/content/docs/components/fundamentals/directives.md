@@ -1,311 +1,146 @@
 ---
-title: Built-in Directives Catalog
-description: Comprehensive guide to Lit's built-in directives including classMap, styleMap, ifDefined, live, repeat, map, range, when, choose, cache, and guard — declarative tools for efficient template rendering.
-sidebar:
-  order: 6
+title: Built-in Directives
+description: Complete reference for Lit's built-in template directives.
 ---
 
-Directives are specialized functions that customize how Lit renders template expressions. Unlike ordinary values that simply render to the DOM, directives control rendering behavior, manage DOM updates, optimize performance, and provide declarative patterns for common template operations.
+# Built-in Directives
 
-Lit's built-in directives solve specific rendering challenges: managing CSS classes, synchronizing form inputs, rendering conditional content, iterating over lists, caching expensive computations, and more. Each directive is tree-shakeable—only the directives you import are included in your bundle.
+Directives are functions that customize how Lit renders a specific binding point in a template. Unlike ordinary values, directives can maintain state between renders, access the DOM directly, and control update behavior. Every built-in directive is tree-shakeable — import only what you use.
 
-This guide covers all built-in Lit directives, their use cases, performance characteristics, and practical examples from the hx-2026 component library.
-
-## What Are Directives?
-
-Directives are functions that return special objects implementing Lit's `Directive` interface. They execute during the template rendering cycle and can:
-
-- **Control DOM updates**: Decide when and how to update elements
-- **Manage state**: Maintain state across renders
-- **Access the DOM**: Read and manipulate rendered elements
-- **Optimize performance**: Prevent unnecessary work through caching and diffing
-
-### Importing Directives
-
-Each directive is a separate module within the `lit/directives` package. Import only what you need:
-
-```typescript
-import { classMap } from 'lit/directives/class-map.js';
-import { styleMap } from 'lit/directives/style-map.js';
-import { ifDefined } from 'lit/directives/if-defined.js';
-```
-
-Directives are used directly in template expressions:
-
-```typescript
-import { html } from 'lit';
-import { classMap } from 'lit/directives/class-map.js';
-
-render() {
-  const classes = { active: this.active, disabled: this.disabled };
-  return html`<div class=${classMap(classes)}>Content</div>`;
-}
-```
-
-## Directive Categories
-
-Lit's built-in directives fall into seven categories:
-
-| Category           | Directives                                   | Purpose                                        |
-| ------------------ | -------------------------------------------- | ---------------------------------------------- |
-| **Styling**        | `classMap`, `styleMap`                       | Dynamic CSS classes and inline styles          |
-| **Attributes**     | `ifDefined`, `live`                          | Conditional attributes and DOM synchronization |
-| **Lists**          | `repeat`, `map`, `range`, `join`             | Efficient iteration and list rendering         |
-| **Conditionals**   | `when`, `choose`                             | Lazy conditional rendering                     |
-| **Caching**        | `cache`, `guard`                             | Template caching and performance optimization  |
-| **Special Values** | `unsafeHTML`, `unsafeSVG`, `templateContent` | Parsing HTML/SVG and embedding templates       |
-| **DOM References** | `ref`, `createRef`                           | Imperative element access                      |
-| **Async**          | `until`, `asyncAppend`, `asyncReplace`       | Asynchronous content rendering                 |
+This reference covers every built-in directive grouped by purpose. For each directive you will find: the import path, the full signature, when to use it (and when not to), and a concrete example from a healthcare component context.
 
 ---
 
-## Styling Directives
+## Class and Style Directives
 
-### classMap
+### `classMap`
 
-The `classMap` directive dynamically applies CSS classes based on an object where keys are class names and values are booleans. Classes with truthy values are applied; falsy values are removed.
+**Import:** `import { classMap } from 'lit/directives/class-map.js';`
 
-#### Syntax
+**Signature:**
 
 ```typescript
+classMap(classInfo: { [name: string]: string | boolean | number | undefined | null }): DirectiveResult
+```
+
+Applies CSS classes from an object. Keys with truthy values are added; keys with falsy values are removed. Uses `classList.add()` / `classList.remove()` internally — only the changed entries are touched.
+
+**Use when:** A component has multiple state-driven CSS classes that come and go independently.
+
+**Do not use when:** Only one class is toggled — a ternary is cleaner. Or when the class attribute has both static and directive parts — `classMap` must be the sole binding on the `class` attribute (though you can include static classes as `true` keys in the object).
+
+**Rules:**
+
+- Must be used as the entire `class=${...}` binding.
+- Static classes should be included in the object as `{ 'static-class': true, 'dynamic': condition }`.
+
+**Example:**
+
+```typescript
+import { LitElement, html } from 'lit';
+import { customElement, property } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 
-const classes = {
-  'class-name': boolean,
-  'another-class': boolean,
-};
-
-html`<div class=${classMap(classes)}></div>`;
-```
-
-#### Example: hx-button Component
-
-The `hx-button` component uses `classMap` to apply variant, size, and state classes:
-
-```typescript
-// packages/hx-library/src/components/hx-button/hx-button.ts
-import { classMap } from 'lit/directives/class-map.js';
-
-override render() {
-  const classes = {
-    button: true,
-    [`button--${this.variant}`]: true,
-    [`button--${this.size}`]: true,
-    'button--loading': this.loading,
-    'button--disabled': this.disabled,
-  };
-
-  return html`
-    <button part="button" class=${classMap(classes)}>
-      <slot></slot>
-    </button>
-  `;
-}
-```
-
-**Output examples:**
-
-```html
-<!-- Default -->
-<button class="button button--primary button--medium">Click me</button>
-
-<!-- With loading state -->
-<button class="button button--primary button--medium button--loading">Saving...</button>
-
-<!-- Disabled -->
-<button class="button button--secondary button--small button--disabled">Cancel</button>
-```
-
-#### Combining with Static Classes
-
-The `classMap` directive must be the **only** expression in the `class` attribute, but you can combine it with static classes using multiple approaches:
-
-**Option 1: Include static classes in the map:**
-
-```typescript
-const classes = {
-  'static-class': true, // Always applied
-  'dynamic-class': this.condition,
-};
-
-html`<div class=${classMap(classes)}></div>`;
-```
-
-**Option 2: Use string concatenation:**
-
-```typescript
-html`<div class="static-class ${classMap({ 'dynamic-class': this.condition })}"></div>`;
-```
-
-#### Performance Characteristics
-
-`classMap` uses the native `classList` API for efficient class management:
-
-- **Adds classes** when values become truthy
-- **Removes classes** when values become falsy
-- **Only updates changed classes** (doesn't replace entire class list)
-- **Maintains static classes** not managed by the directive
-
-#### When to Use
-
-Use `classMap` when:
-
-- Component has multiple state-dependent classes
-- Classes change based on reactive properties
-- You need readable, maintainable class logic
-- You want to avoid manual string concatenation
-
-**Don't use** for:
-
-- Single static class: `html`<div class="static">\`` is cleaner
-- Simple ternary: `html`<div class="${this.active ? 'active' : ''}">\`` is simpler
-
----
-
-### styleMap
-
-The `styleMap` directive applies inline styles dynamically through an object interface. Style properties with `undefined` or `null` values are removed from the element.
-
-#### Syntax
-
-```typescript
-import { styleMap } from 'lit/directives/style-map.js';
-
-const styles = {
-  color: 'red',
-  fontSize: '16px',
-  '--custom-prop': 'value',
-};
-
-html`<div style=${styleMap(styles)}></div>`;
-```
-
-#### CSS Property Formats
-
-`styleMap` accepts three property name formats:
-
-**Camel-case (recommended):**
-
-```typescript
-const styles = {
-  backgroundColor: 'blue',
-  fontSize: '14px',
-  fontWeight: 'bold',
-};
-```
-
-**Dash-case (quoted):**
-
-```typescript
-const styles = {
-  'background-color': 'blue',
-  'font-size': '14px',
-  'font-weight': 'bold',
-};
-```
-
-**CSS custom properties:**
-
-```typescript
-const styles = {
-  '--hx-color-primary': '#007bff',
-  '--hx-spacing-md': '16px',
-};
-```
-
-#### Example: Dynamic Progress Bar
-
-```typescript
-@customElement('hx-progress')
-class HxProgress extends LitElement {
-  @property({ type: Number })
-  value = 0;
-
-  @property({ type: String })
-  color = 'var(--hx-color-primary)';
+@customElement('hx-button')
+export class HxButton extends LitElement {
+  @property({ type: String, reflect: true }) variant: 'primary' | 'secondary' | 'ghost' = 'primary';
+  @property({ type: String, reflect: true, attribute: 'hx-size' }) size: 'sm' | 'md' | 'lg' = 'md';
+  @property({ type: Boolean, reflect: true }) disabled = false;
+  @property({ type: Boolean }) loading = false;
 
   override render() {
-    const styles = {
-      width: `${this.value}%`,
-      backgroundColor: this.color,
-      transition: 'width 0.3s ease',
-    };
-
     return html`
-      <div class="progress">
-        <div class="progress__bar" style=${styleMap(styles)}></div>
-      </div>
+      <button
+        part="button"
+        class=${classMap({
+          button: true, // Always applied
+          [`button--${this.variant}`]: true, // Variant class always present
+          [`button--${this.size}`]: true, // Size class always present
+          'button--loading': this.loading, // Added when loading
+          'button--disabled': this.disabled, // Added when disabled
+        })}
+        ?disabled=${this.disabled}
+      >
+        <slot></slot>
+      </button>
     `;
   }
 }
 ```
 
-#### Removing Styles
+The output element's class list is updated efficiently on each render: only the classes that actually changed are touched. Lit does not replace the entire `className` string.
 
-Set properties to `undefined` or `null` to remove them:
+---
+
+### `styleMap`
+
+**Import:** `import { styleMap } from 'lit/directives/style-map.js';`
+
+**Signature:**
 
 ```typescript
-const styles = {
-  color: this.error ? 'red' : undefined, // Removes 'color' when no error
-  fontWeight: this.bold ? 'bold' : null, // Removes 'font-weight' when not bold
-};
+styleMap(styleInfo: { [name: string]: string | number | undefined | null }): DirectiveResult
 ```
 
-#### Performance and Best Practices
+Applies inline styles from an object. Keys with `undefined` or `null` values are removed from the element's style. Accepts camelCase property names (`backgroundColor`), dash-case (`'background-color'`), and CSS custom properties (`'--hx-color-primary'`).
 
-**Rule:** `styleMap` must be the **only** expression in the `style` attribute.
+**Use when:** Styles must be computed at runtime from reactive state (position, dynamic colors, CSS custom property overrides).
 
-```typescript
-// ✓ Correct
-html`<div style=${styleMap(styles)}></div>`;
+**Do not use when:** The styles belong in the component stylesheet. Inline styles have higher specificity and make theming harder.
 
-// ✗ Wrong: multiple expressions
-html`<div style="color: red; ${styleMap(styles)}"></div>`;
-```
+**Rules:**
 
-**When to use `styleMap`:**
+- Must be the sole binding on the `style` attribute.
+- All values must be strings, numbers, `null`, or `undefined`. Objects are not accepted.
 
-- Styles computed from reactive properties
-- Multiple related style properties
-- Dynamic theming or customization
-- CSS custom properties need runtime updates
-
-**When to avoid:**
-
-- Prefer CSS classes for static styles
-- Use design tokens instead of hardcoded values
-- Avoid for styles that should be in component stylesheets
-
-#### Example: Dynamic Tooltip Positioning
+**Example: Dynamic tooltip positioning**
 
 ```typescript
+import { LitElement, html } from 'lit';
+import { customElement, state } from 'lit/decorators.js';
+import { styleMap } from 'lit/directives/style-map.js';
+
 @customElement('hx-tooltip')
-class HxTooltip extends LitElement {
-  @state()
-  private _position = { top: 0, left: 0 };
+export class HxTooltip extends LitElement {
+  @state() private _top = 0;
+  @state() private _left = 0;
+  @state() private _visible = false;
 
   override render() {
-    const styles = {
-      position: 'absolute',
-      top: `${this._position.top}px`,
-      left: `${this._position.left}px`,
-      zIndex: '1000',
-    };
-
     return html`
-      <div class="tooltip" style=${styleMap(styles)}>
+      <div
+        class="tooltip"
+        style=${styleMap({
+          position: 'absolute',
+          top: `${this._top}px`,
+          left: `${this._left}px`,
+          // Null removes the property entirely when tooltip is hidden
+          opacity: this._visible ? '1' : null,
+          pointerEvents: this._visible ? 'auto' : null,
+        })}
+        role="tooltip"
+      >
         <slot></slot>
       </div>
     `;
   }
+}
+```
 
-  private _updatePosition(targetEl: HTMLElement): void {
-    const rect = targetEl.getBoundingClientRect();
-    this._position = {
-      top: rect.bottom + 8,
-      left: rect.left + rect.width / 2,
-    };
-  }
+**Example: Overriding component design tokens at runtime**
+
+```typescript
+override render() {
+  // Consumer-provided brand color applied via token override
+  const styles = this.brandColor
+    ? { '--hx-color-primary-500': this.brandColor }
+    : {};
+
+  return html`
+    <div style=${styleMap(styles)}>
+      <hx-button>Book Appointment</hx-button>
+    </div>
+  `;
 }
 ```
 
@@ -313,493 +148,322 @@ class HxTooltip extends LitElement {
 
 ## Attribute Directives
 
-### ifDefined
+### `ifDefined`
 
-The `ifDefined` directive conditionally sets an attribute based on whether a value is defined. If the value is `undefined`, the attribute is removed; otherwise, it's set to the value.
+**Import:** `import { ifDefined } from 'lit/directives/if-defined.js';`
 
-#### Syntax
+**Signature:**
 
 ```typescript
+ifDefined(value: unknown | undefined): unknown | typeof nothing
+```
+
+Sets an attribute to the given value when the value is not `undefined`. When the value is `undefined`, the attribute is removed entirely. `null` is treated as a value (not removal) — use `|| undefined` to coerce empty strings and null to `undefined`.
+
+**Use when:** An attribute should be absent from the DOM when a value is not provided. The difference between absent and empty string matters for HTML semantics (`name`, `placeholder`, `href`, `aria-*` attributes).
+
+**Do not use with boolean attributes** — those use the `?attr=${condition}` binding.
+
+**Example:**
+
+```typescript
+import { LitElement, html } from 'lit';
+import { customElement, property } from 'lit/decorators.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
 
-html`<input name=${ifDefined(this.name || undefined)} />`;
-```
+@customElement('hx-text-input')
+export class HxTextInput extends LitElement {
+  @property({ type: String }) label = '';
+  @property({ type: String }) name = '';
+  @property({ type: String }) placeholder = '';
+  @property({ type: String }) pattern = '';
+  @property({ type: String }) ariaDescribedby = '';
 
-#### Use Case: Optional Attributes
-
-HTML attributes should be omitted entirely when not needed, not set to empty strings or `"undefined"`:
-
-```typescript
-// ✗ Wrong: Sets invalid href
-html`<a href=${this.url}>Link</a>`;
-// Output when url is undefined: <a href="undefined">Link</a>
-
-// ✓ Correct: Removes href when undefined
-html`<a href=${ifDefined(this.url)}>Link</a>`;
-// Output when url is undefined: <a>Link</a>
-```
-
-#### Example: hx-text-input Component
-
-The `hx-text-input` component uses `ifDefined` for optional form attributes:
-
-```typescript
-// packages/hx-library/src/components/hx-text-input/hx-text-input.ts
-override render() {
-  return html`
-    <input
-      part="input"
-      type=${this.type}
-      name=${ifDefined(this.name || undefined)}
-      placeholder=${ifDefined(this.placeholder || undefined)}
-      aria-label=${ifDefined(this.ariaLabel ?? undefined)}
-      aria-describedby=${ifDefined(this._describedBy || undefined)}
-    />
-  `;
+  override render() {
+    return html`
+      <div class="field">
+        <label>${this.label}</label>
+        <input
+          name=${ifDefined(this.name || undefined)}
+          placeholder=${ifDefined(this.placeholder || undefined)}
+          pattern=${ifDefined(this.pattern || undefined)}
+          aria-describedby=${ifDefined(this.ariaDescribedby || undefined)}
+        />
+      </div>
+    `;
+  }
 }
 ```
 
-**Behavior:**
+Without `ifDefined`, an empty `name=""` or missing `name` would render as `name="undefined"` if you interpolate an undefined variable directly.
 
-- If `name` is `""` or `undefined`, no `name` attribute renders
-- If `name` is `"email"`, renders `name="email"`
-
-#### Common Pattern: Coalescing to Undefined
-
-Use logical OR to coerce empty strings to `undefined`:
+**Coercion patterns:**
 
 ```typescript
-// Empty string becomes undefined
+// || undefined: empty string and null both become undefined (attribute removed)
 name=${ifDefined(this.name || undefined)}
 
-// Nullish coalescing (only null/undefined)
+// ?? undefined: only null/undefined become undefined (empty string is kept)
 aria-label=${ifDefined(this.ariaLabel ?? undefined)}
+
+// Direct undefined check
+href=${ifDefined(this.url !== null ? this.url : undefined)}
 ```
-
-#### Combining with Boolean Attributes
-
-Don't use `ifDefined` with boolean attributes—use the `?` prefix instead:
-
-```typescript
-// ✗ Wrong: ifDefined not needed for boolean
-?disabled=${ifDefined(this.disabled)}
-
-// ✓ Correct: Boolean attribute binding
-?disabled=${this.disabled}
-```
-
-#### When to Use
-
-Use `ifDefined` when:
-
-- Attribute should be absent (not empty) when value is missing
-- Form fields have optional `name`, `placeholder`, `pattern` attributes
-- Links have optional `href`, `target`, `rel` attributes
-- ARIA attributes should only exist when meaningful
 
 ---
 
-### live
+### `live`
 
-The `live` directive ensures property bindings update based on the **live DOM value** rather than the last rendered value. This is critical for form inputs where external code may modify values directly.
+**Import:** `import { live } from 'lit/directives/live.js';`
 
-#### The Problem: Desynchronization
-
-Lit's default behavior compares new property values against the **last set value**, not the actual DOM value. If something modifies the DOM directly (user input, browser autocomplete, external scripts), Lit may not detect changes:
+**Signature:**
 
 ```typescript
-// Without live directive
-html`<input .value=${this.value} />`;
-
-// User types "hello" → Lit doesn't know about change
-// Component sets value to "hello" → Lit thinks no update needed
-// Result: Input value doesn't update!
+live(value: unknown): DirectiveResult
 ```
 
-#### Syntax
+Compares the binding value against the **live DOM property value** rather than the previous value Lit rendered. Forces a DOM update when the live value and the new value differ, even if Lit thinks nothing changed.
+
+**Use when:** Form inputs where the user (or browser autocomplete, or external code) may have changed the DOM value outside of Lit's reactive system. Without `live`, Lit may skip updating an input because it thinks the value already matches — but it's comparing against its cached last-rendered value, not the actual DOM.
+
+**Required for:** `.value` on text inputs, `.checked` on checkboxes, `.value` on selects, `.indeterminate` on checkboxes.
+
+**Do not use for:** Non-form elements, or elements that are not modified outside of Lit's control. The additional DOM read on every render has a small but nonzero cost.
+
+**Why it matters:**
 
 ```typescript
+// Without live: bug scenario
+// 1. User types "hello" into input (Lit doesn't know about it)
+// 2. Component sets this.value = "hello" (same string)
+// 3. Lit compares "hello" (new) === "hello" (previous rendered value)
+// 4. Lit skips the DOM update
+// 5. If the user had typed "hello " (with a trailing space), their edit is lost
+
+// With live: correct behavior
+// 3. Lit compares "hello" (new) against input.value (actual live DOM: "hello ")
+// 4. They differ → Lit updates the DOM → user's edit is corrected
+```
+
+**Example:**
+
+```typescript
+import { LitElement, html } from 'lit';
+import { customElement, property } from 'lit/decorators.js';
 import { live } from 'lit/directives/live.js';
 
-html`<input .value=${live(this.value)} />`;
+@customElement('hx-checkbox')
+export class HxCheckbox extends LitElement {
+  @property({ type: Boolean }) checked = false;
+  @property({ type: Boolean }) indeterminate = false;
+  @property({ type: Boolean, reflect: true }) disabled = false;
+
+  private _handleChange(e: Event) {
+    const input = e.target as HTMLInputElement;
+    this.checked = input.checked;
+    this.indeterminate = false;
+    this.dispatchEvent(
+      new CustomEvent('hx-change', {
+        bubbles: true,
+        composed: true,
+        detail: { checked: this.checked },
+      }),
+    );
+  }
+
+  override render() {
+    return html`
+      <label class="checkbox">
+        <input
+          type="checkbox"
+          .checked=${live(this.checked)}
+          .indeterminate=${live(this.indeterminate)}
+          ?disabled=${this.disabled}
+          @change=${this._handleChange}
+        />
+        <slot></slot>
+      </label>
+    `;
+  }
+}
 ```
 
-The `live` directive:
-
-1. Reads the **current DOM property value**
-2. Compares it to the new value
-3. Only updates if they differ
-
-#### Example: hx-text-input Component
-
-All form inputs in hx-2026 use `live` for proper synchronization:
+**Type matching matters:** `live` uses strict equality. If the DOM property is a string and your value is a number, they will never match:
 
 ```typescript
-// packages/hx-library/src/components/hx-text-input/hx-text-input.ts
-import { live } from 'lit/directives/live.js';
+// WRONG — number vs string mismatch, always updates the DOM
+.value=${live(this.count)}        // count: number, input.value: string
 
-override render() {
-  return html`
-    <input
-      part="input"
-      .value=${live(this.value)}
-      @input=${this._handleInput}
-    />
-  `;
-}
-
-private _handleInput(e: Event): void {
-  const input = e.target as HTMLInputElement;
-  this.value = input.value; // Updates property
-}
-```
-
-**Flow:**
-
-1. User types "a" → `input` event fires
-2. `_handleInput` sets `this.value = "a"`
-3. Component re-renders with `.value=${live("a")}`
-4. `live` checks actual DOM value (already "a")
-5. `live` sees they match, skips update
-6. No cursor position issues
-
-#### When to Use
-
-Use `live` for:
-
-- **Text inputs**: `<input type="text">`, `<input type="email">`, `<textarea>`
-- **Checkboxes/radios**: `.checked` property bindings
-- **Select menus**: `.value` property bindings
-- **contenteditable elements**: Any element with `contenteditable="true"`
-
-**Required for:**
-
-- Two-way binding patterns
-- Form inputs with `@input` or `@change` handlers
-- Any scenario where DOM values change outside Lit's control
-
-#### Performance Considerations
-
-`live` performs a DOM read on every render, which has a small performance cost. However, this cost is negligible for form inputs and prevents serious bugs.
-
-**Warning:** `live` uses strict equality (`===`). If you convert types in event handlers, ensure consistency:
-
-```typescript
-// ✓ Correct: Both strings
+// CORRECT — both strings
 .value=${live(String(this.count))}
-
-// ✗ Wrong: Type mismatch (number vs. string)
-.value=${live(this.count)} // count is number, DOM value is string
-```
-
-#### Example: hx-checkbox Component
-
-```typescript
-// packages/hx-library/src/components/hx-checkbox/hx-checkbox.ts
-override render() {
-  return html`
-    <input
-      type="checkbox"
-      .checked=${live(this.checked)}
-      .indeterminate=${live(this.indeterminate)}
-      @change=${this._handleChange}
-    />
-  `;
-}
 ```
 
 ---
 
 ## List Rendering Directives
 
-### repeat
+### `repeat`
 
-The `repeat` directive renders iterables with optional keying for DOM stability. When items reorder or update, `repeat` maintains the association between data and DOM nodes, preserving element state and improving performance.
+**Import:** `import { repeat } from 'lit/directives/repeat.js';`
 
-#### Syntax
+**Signature:**
 
 ```typescript
+repeat<T>(
+  items: Iterable<T>,
+  keyFnOrTemplate: KeyFn<T> | ItemTemplate<T>,
+  template?: ItemTemplate<T>
+): DirectiveResult
+
+type KeyFn<T> = (item: T, index: number) => unknown
+type ItemTemplate<T> = (item: T, index: number) => unknown
+```
+
+Renders an iterable with optional keying for DOM stability. When provided with a key function, `repeat` associates each item with its rendered DOM node by key. On subsequent renders, if items reorder, the associated DOM nodes are physically moved rather than destroyed and recreated.
+
+**Use when:**
+
+- Items frequently reorder (sorting, drag-and-drop).
+- Items contain stateful elements (form inputs, focused elements, video/audio players, custom components with internal state).
+
+**Do not use when:**
+
+- The list is static or append-only — `map` is faster and lighter.
+- Items never reorder — plain `Array.map()` works just as well.
+
+**Key function requirements:** Keys must be unique across the list, stable (same item → same key across renders), and primitive (string, number, or symbol).
+
+**Example:**
+
+```typescript
+import { LitElement, html } from 'lit';
+import { customElement, property } from 'lit/decorators.js';
 import { repeat } from 'lit/directives/repeat.js';
 
-html`
-  ${repeat(
-    items, // Iterable data
-    (item) => item.id, // Key function (optional)
-    (item, index) => template, // Template function
-  )}
-`;
-```
+interface Appointment {
+  id: string;
+  patient: string;
+  time: string;
+  status: 'scheduled' | 'in-progress' | 'complete';
+}
 
-#### Without Keys (Simple Iteration)
+@customElement('hx-appointment-list')
+export class HxAppointmentList extends LitElement {
+  @property({ type: Array }) appointments: Appointment[] = [];
 
-If you omit the key function, `repeat` behaves like `map`:
-
-```typescript
-html`
-  <ul>
-    ${repeat(this.items, (item) => html`<li>${item.name}</li>`)}
-  </ul>
-`;
-```
-
-#### With Keys (DOM Stability)
-
-Provide a key function to maintain DOM node identity across reorders:
-
-```typescript
-html`
-  <ul>
-    ${repeat(
-      this.items,
-      (item) => item.id, // Unique key
-      (item) => html`<li>${item.name}</li>`,
-    )}
-  </ul>
-`;
-```
-
-**What keys do:**
-
-- **Preserve DOM nodes**: When item with `id: 5` moves from index 2 to index 0, its DOM node physically moves
-- **Maintain state**: Input focus, scroll position, and component state persist
-- **Improve performance**: Lit reorders existing nodes instead of destroying and recreating
-
-#### Example: Sortable Task List
-
-```typescript
-@customElement('hx-task-list')
-class HxTaskList extends LitElement {
-  @property({ type: Array })
-  tasks: Array<{ id: string; title: string; completed: boolean }> = [];
+  private _sortByTime() {
+    this.appointments = [...this.appointments].sort((a, b) => a.time.localeCompare(b.time));
+  }
 
   override render() {
     return html`
+      <button @click=${this._sortByTime}>Sort by time</button>
+
       <ul>
         ${repeat(
-          this.tasks,
-          (task) => task.id,
-          (task) => html`
+          this.appointments,
+          // Key function — stable, unique, primitive
+          (appt) => appt.id,
+          // Template function
+          (appt, index) => html`
             <li>
-              <input
-                type="checkbox"
-                .checked=${task.completed}
-                @change=${(e: Event) => this._toggleTask(task.id, e)}
-              />
-              <span>${task.title}</span>
+              <span class="index">${index + 1}.</span>
+              <hx-appointment-card
+                patient=${appt.patient}
+                time=${appt.time}
+                status=${appt.status}
+              ></hx-appointment-card>
             </li>
           `,
         )}
       </ul>
     `;
   }
-
-  private _toggleTask(id: string, e: Event): void {
-    const checked = (e.target as HTMLInputElement).checked;
-    this.tasks = this.tasks.map((t) => (t.id === id ? { ...t, completed: checked } : t));
-  }
 }
 ```
 
-**Why this works:**
-
-When tasks reorder (e.g., by completed status), the checkbox elements move with their data. Checked state persists because the same `<input>` element is reused.
-
-#### Key Function Requirements
-
-Keys must be:
-
-- **Unique**: No two items should share the same key
-- **Stable**: Same item should always return the same key
-- **Primitive**: Strings, numbers, or symbols (not objects)
-
-```typescript
-// ✓ Good keys
-(item) => item.id
-(item) => item.uuid
-(item) => `${item.type}-${item.id}`
-
-// ✗ Bad keys
-(item) => item              // Object reference (not primitive)
-(item) => Math.random()     // Not stable
-(item) => item.name         // Not unique
-```
-
-#### Using Index as Parameter
-
-The template function receives both item and index:
-
-```typescript
-${repeat(
-  this.items,
-  (item) => item.id,
-  (item, index) => html`
-    <li>
-      <span class="index">${index + 1}.</span>
-      <span class="name">${item.name}</span>
-    </li>
-  `
-)}
-```
-
-#### Performance: repeat vs. map
-
-| Scenario                        | Use `repeat` | Use `map`      |
-| ------------------------------- | ------------ | -------------- |
-| Items frequently reorder        | Yes          | No             |
-| Items contain stateful elements | Yes          | No             |
-| Simple static lists             | No           | Yes            |
-| List never changes order        | No           | Yes            |
-| Performance critical            | Depends      | Usually faster |
-
-**map is lighter and faster** when you don't need DOM stability. Use `repeat` only when keying provides value.
+When the user clicks "Sort by time", Lit moves the existing `<hx-appointment-card>` elements into the new order rather than destroying and recreating them. Any internal state in those components (expanded details, in-progress edits) is preserved.
 
 ---
 
-### map
+### `map`
 
-The `map` directive transforms iterables into template results. It's simpler and faster than `repeat` but doesn't provide DOM stability across data changes.
+**Import:** `import { map } from 'lit/directives/map.js';`
 
-#### Syntax
+**Signature:**
 
 ```typescript
+map<T>(items: Iterable<T> | undefined, f: (value: T, index: number) => unknown): Iterable<unknown>
+```
+
+Transforms any iterable into a sequence of template results. Accepts `undefined` gracefully (renders nothing). Lighter than `repeat` because it does not maintain key-to-node associations.
+
+**Use when:** The list order is stable, items don't contain stateful elements, and you're working with non-array iterables (Set, Map, generator functions).
+
+**Example:**
+
+```typescript
+import { LitElement, html } from 'lit';
+import { customElement, property } from 'lit/decorators.js';
 import { map } from 'lit/directives/map.js';
 
-html` ${map(items, (item, index) => template)} `;
-```
-
-#### Example: Simple List
-
-```typescript
-@customElement('hx-menu')
-class HxMenu extends LitElement {
-  @property({ type: Array })
-  items: Array<{ label: string; href: string }> = [];
+@customElement('hx-role-badges')
+export class HxRoleBadges extends LitElement {
+  // Set: no duplicates, order not guaranteed
+  @property({ type: Object }) roles: Set<string> = new Set();
 
   override render() {
     return html`
-      <nav>${map(this.items, (item) => html`<a href=${item.href}>${item.label}</a>`)}</nav>
+      <div class="badges">
+        ${map(this.roles, (role) => html`<span class="badge">${role}</span>`)}
+      </div>
     `;
   }
 }
 ```
 
-#### Comparison with Array.map()
-
-The `map` directive is nearly identical to JavaScript's `Array.prototype.map()`:
-
-```typescript
-// Using map directive
-${map(items, (item) => html`<li>${item}</li>`)}
-
-// Using Array.map (equivalent)
-${items.map(item => html`<li>${item}</li>`)}
-```
-
-**Why use the directive?**
-
-- **Works with iterables**: Not just arrays (Sets, Maps, generators)
-- **Consistent API**: Matches other Lit directives
-- **Explicit intent**: Signals template transformation
-
-#### Example: Rendering a Set
-
-```typescript
-@property({ type: Object })
-tags = new Set(['urgent', 'bug', 'frontend']);
-
-override render() {
-  return html`
-    <div class="tags">
-      ${map(this.tags, (tag) => html`<span class="tag">${tag}</span>`)}
-    </div>
-  `;
-}
-```
-
-#### When to Use
-
-Use `map` when:
-
-- Rendering static or append-only lists
-- List order never changes
-- Items don't contain stateful elements (inputs, custom components with internal state)
-- Performance is critical (lighter than `repeat`)
-
-Use `repeat` when:
-
-- List items reorder frequently
-- Items contain form inputs or stateful components
-- You need to preserve DOM element identity
+`Array.prototype.map()` is equivalent for arrays, but `map` works with any iterable and handles `undefined` without an explicit check.
 
 ---
 
-### range
+### `range`
 
-The `range` directive generates numeric sequences for iteration, similar to Python's `range()` function.
+**Import:** `import { range } from 'lit/directives/range.js';`
 
-#### Syntax
+**Signature:**
 
 ```typescript
+range(end: number): Iterable<number>
+range(start: number, end: number): Iterable<number>
+range(start: number, end: number, step: number): Iterable<number>
+```
+
+Generates a lazy numeric sequence, similar to Python's `range()`. Returns an iterable of numbers from `start` (inclusive) to `end` (exclusive) with the given `step`.
+
+**Use when:** You need to render a fixed number of items or a sequence of page numbers without manually constructing an array.
+
+**Example: Star rating display**
+
+```typescript
+import { LitElement, html } from 'lit';
+import { customElement, property } from 'lit/decorators.js';
+import { map } from 'lit/directives/map.js';
 import { range } from 'lit/directives/range.js';
+import { classMap } from 'lit/directives/class-map.js';
 
-// range(end)
-range(5); // → [0, 1, 2, 3, 4]
-
-// range(start, end)
-range(2, 6); // → [2, 3, 4, 5]
-
-// range(start, end, step)
-range(0, 10, 2); // → [0, 2, 4, 6, 8]
-```
-
-#### Example: Pagination
-
-```typescript
-@customElement('hx-pagination')
-class HxPagination extends LitElement {
-  @property({ type: Number })
-  total = 10;
-
-  @property({ type: Number })
-  current = 1;
+@customElement('hx-star-rating')
+export class HxStarRating extends LitElement {
+  @property({ type: Number }) value = 0;
+  @property({ type: Number }) max = 5;
 
   override render() {
     return html`
-      <nav class="pagination">
-        ${map(
-          range(1, this.total + 1),
-          (page) => html`
-            <button
-              class=${classMap({ active: page === this.current })}
-              @click=${() => this._goToPage(page)}
-            >
-              ${page}
-            </button>
-          `,
-        )}
-      </nav>
-    `;
-  }
-}
-```
-
-#### Example: Star Rating
-
-```typescript
-@customElement('hx-rating')
-class HxRating extends LitElement {
-  @property({ type: Number })
-  value = 0;
-
-  @property({ type: Number })
-  max = 5;
-
-  override render() {
-    return html`
-      <div class="rating">
+      <div class="rating" role="img" aria-label="${this.value} out of ${this.max} stars">
         ${map(
           range(this.max),
-          (i) => html` <span class=${classMap({ filled: i < this.value })}>★</span> `,
+          (i) => html`
+            <span class=${classMap({ star: true, 'star--filled': i < this.value })}> ★ </span>
+          `,
         )}
       </div>
     `;
@@ -807,1252 +471,733 @@ class HxRating extends LitElement {
 }
 ```
 
-#### Use Cases
-
-- Generating numbered lists
-- Rendering pagination controls
-- Creating grid layouts with fixed dimensions
-- Iterating a specific number of times
-
----
-
-### join
-
-The `join` directive interleaves iterable values with separator content, similar to `Array.join()` but for templates.
-
-#### Syntax
-
-```typescript
-import { join } from 'lit/directives/join.js';
-
-// Static separator
-html`${join(items, html`<hr />`)}`;
-
-// Function separator (receives item index)
-html`${join(items, (index) => html`<span class="sep">${index}</span>`)}`;
-```
-
-#### Example: Breadcrumbs
-
-```typescript
-@customElement('hx-breadcrumbs')
-class HxBreadcrumbs extends LitElement {
-  @property({ type: Array })
-  items: Array<{ label: string; href: string }> = [];
-
-  override render() {
-    return html`
-      <nav class="breadcrumbs">
-        ${join(
-          map(this.items, (item) => html`<a href=${item.href}>${item.label}</a>`),
-          html`<span class="separator">/</span>`,
-        )}
-      </nav>
-    `;
-  }
-}
-```
-
-**Output:**
-
-```html
-<nav class="breadcrumbs">
-  <a href="/home">Home</a>
-  <span class="separator">/</span>
-  <a href="/products">Products</a>
-  <span class="separator">/</span>
-  <a href="/shoes">Shoes</a>
-</nav>
-```
-
-#### Example: Tag List with Commas
+**Example: Pagination controls**
 
 ```typescript
 override render() {
-  const tags = ['JavaScript', 'Lit', 'Web Components'];
-
   return html`
-    <div class="tags">
-      ${join(
-        tags.map(tag => html`<span class="tag">${tag}</span>`),
-        html`, `
+    <nav class="pagination">
+      ${map(
+        range(1, this.totalPages + 1),
+        (page) => html`
+          <button
+            class=${classMap({ 'page-btn': true, 'page-btn--active': page === this.currentPage })}
+            aria-current=${page === this.currentPage ? 'page' : nothing}
+            @click=${() => { this.currentPage = page; }}
+          >
+            ${page}
+          </button>
+        `,
       )}
-    </div>
+    </nav>
   `;
 }
 ```
 
-**Output:**
+---
 
+### `join`
+
+**Import:** `import { join } from 'lit/directives/join.js';`
+
+**Signature:**
+
+```typescript
+join<T>(
+  items: Iterable<T> | undefined,
+  joiner: TemplateResult | ((index: number) => unknown)
+): Iterable<T | TemplateResult>
 ```
-JavaScript, Lit, Web Components
+
+Interleaves an iterable of template results with a separator. The separator can be a static template or a function that receives the item index (the separator before item `n` receives index `n - 1`).
+
+**Use when:** You need visible separators between rendered items — breadcrumbs, tag lists with commas, pipeline stages with arrows.
+
+**Example: Breadcrumb navigation**
+
+```typescript
+import { LitElement, html } from 'lit';
+import { customElement, property } from 'lit/decorators.js';
+import { map } from 'lit/directives/map.js';
+import { join } from 'lit/directives/join.js';
+
+interface Crumb {
+  label: string;
+  href: string;
+}
+
+@customElement('hx-breadcrumbs')
+export class HxBreadcrumbs extends LitElement {
+  @property({ type: Array }) crumbs: Crumb[] = [];
+
+  override render() {
+    const lastIndex = this.crumbs.length - 1;
+
+    return html`
+      <nav aria-label="Breadcrumb">
+        <ol class="breadcrumbs">
+          ${join(
+            map(
+              this.crumbs,
+              (crumb, i) => html`
+                <li>
+                  ${i < lastIndex
+                    ? html`<a href=${crumb.href}>${crumb.label}</a>`
+                    : html`<span aria-current="page">${crumb.label}</span>`}
+                </li>
+              `,
+            ),
+            html`<li class="separator" aria-hidden="true">/</li>`,
+          )}
+        </ol>
+      </nav>
+    `;
+  }
+}
 ```
 
 ---
 
 ## Conditional Rendering Directives
 
-### when
+### `when`
 
-The `when` directive renders one of two templates based on a condition. Unlike ternary operators, `when` evaluates templates **lazily**—the non-selected branch never executes.
+**Import:** `import { when } from 'lit/directives/when.js';`
 
-#### Syntax
+**Signature:**
 
 ```typescript
-import { when } from 'lit/directives/when.js';
-
-html`
-  ${when(
-    condition,
-    () => trueTemplate,
-    () => falseTemplate, // Optional
-  )}
-`;
+when<T, F>(
+  condition: boolean,
+  trueCase: () => T,
+  falseCase?: () => F
+): T | F | undefined
 ```
 
-#### Example: Lazy Loading Indicator
+Lazily renders one of two template branches. Unlike a ternary expression, the non-selected branch **never evaluates**. Both branch factories are functions — they are called only if selected.
+
+**Use when:** One or both branches are expensive to compute (involve method calls, sorting, filtering), and you want to avoid evaluating the unused branch on every render.
+
+**Use a ternary instead when:** Both branches are cheap (inline `html` snippets without method calls) — the syntax is more readable.
+
+**Example:**
 
 ```typescript
-@customElement('hx-data-table')
-class HxDataTable extends LitElement {
-  @state()
-  private _loading = false;
+import { LitElement, html, nothing } from 'lit';
+import { customElement, property, state } from 'lit/decorators.js';
+import { when } from 'lit/directives/when.js';
 
-  @state()
-  private _data: any[] = [];
+@customElement('hx-lab-results')
+export class HxLabResults extends LitElement {
+  @state() private _loading = false;
+  @state() private _error: Error | null = null;
+  @property({ type: Array }) results: LabResult[] = [];
 
   override render() {
     return html`
       ${when(
         this._loading,
+        // Only runs when loading is true
         () => html`
-          <div class="loading">
+          <div class="loading" role="status">
             <hx-spinner></hx-spinner>
-            <p>Loading data...</p>
+            <p>Retrieving lab results...</p>
           </div>
         `,
-        () => html`
-          <table>
-            ${map(this._data, (row) => this._renderRow(row))}
-          </table>
-        `,
+        // Only runs when loading is false
+        () =>
+          when(
+            this._error !== null,
+            () => html`
+              <div class="error" role="alert">
+                <p>Failed to load results: ${this._error!.message}</p>
+                <hx-button @click=${this._retry}>Retry</hx-button>
+              </div>
+            `,
+            () => this._renderResults(), // Expensive table render — skipped when in error
+          ),
       )}
     `;
+  }
+
+  private _renderResults() {
+    // Complex rendering — only called when not loading and no error
+    return html`
+      <table>
+        ${this.results.map(
+          (r) =>
+            html`<tr>
+              <td>${r.name}</td>
+              <td>${r.value}</td>
+            </tr>`,
+        )}
+      </table>
+    `;
+  }
+
+  private _retry() {
+    /* ... */
   }
 }
 ```
 
-#### Lazy Evaluation Benefits
-
-The key advantage of `when` is that unused branches **never execute**:
-
-```typescript
-// ✓ Lazy: _renderExpensiveView() only runs when condition is true
-${when(
-  this.showExpensiveView,
-  () => this._renderExpensiveView(),
-  () => html`<p>Simple view</p>`
-)}
-
-// ✗ Eager: Both branches execute every render
-${this.showExpensiveView
-  ? this._renderExpensiveView()
-  : html`<p>Simple view</p>`
-}
-```
-
-#### When to Use vs. Ternary
-
-**Use `when` for:**
-
-- Expensive template computations
-- Templates that shouldn't execute unless needed
-- Cleaner syntax than nested ternaries
-
-**Use ternary for:**
-
-- Simple, cheap expressions
-- Inline value selection
-- When both branches are already computed
-
-```typescript
-// Simple value: ternary is fine
-html`<p>${this.active ? 'Active' : 'Inactive'}</p>`
-
-// Complex template: use when
-${when(
-  this.showDetails,
-  () => this._renderDetailedView(),
-  () => html`<button @click=${this._showDetails}>Show Details</button>`
-)}
-```
-
 ---
 
-### choose
+### `choose`
 
-The `choose` directive selects a template from multiple options based on value matching, similar to a `switch` statement.
+**Import:** `import { choose } from 'lit/directives/choose.js';`
 
-#### Syntax
+**Signature:**
 
 ```typescript
+choose<T, V>(
+  value: T,
+  cases: Array<[T, () => V]>,
+  defaultCase?: () => V
+): V | undefined
+```
+
+Selects a rendering function based on value matching using strict equality (`===`). Analogous to a `switch` statement. Like `when`, the selected function is called lazily; the others are not evaluated.
+
+**Use when:** A single value determines which of three or more distinct templates to render. Cleaner than chained ternaries.
+
+**Use `when` instead when:** There are only two cases.
+
+**Use `if/else` instead when:** The condition involves non-equality comparisons or complex boolean logic.
+
+**Example: Appointment status display**
+
+```typescript
+import { LitElement, html } from 'lit';
+import { customElement, property } from 'lit/decorators.js';
 import { choose } from 'lit/directives/choose.js';
 
-html`
-  ${choose(
-    value,
-    [
-      [caseValue1, () => template1],
-      [caseValue2, () => template2],
-    ],
-    () => defaultTemplate,
-  )}
-`;
-```
+type AppointmentStatus = 'scheduled' | 'in-progress' | 'complete' | 'cancelled' | 'no-show';
 
-#### Example: View Mode Switcher
-
-```typescript
-@customElement('hx-product-grid')
-class HxProductGrid extends LitElement {
-  @property({ type: String })
-  viewMode: 'grid' | 'list' | 'compact' = 'grid';
-
-  @property({ type: Array })
-  products: Product[] = [];
+@customElement('hx-appointment-status')
+export class HxAppointmentStatus extends LitElement {
+  @property({ type: String }) status: AppointmentStatus = 'scheduled';
+  @property({ type: String }) patientName = '';
 
   override render() {
     return html`
-      <div class="controls">
-        <button @click=${() => (this.viewMode = 'grid')}>Grid</button>
-        <button @click=${() => (this.viewMode = 'list')}>List</button>
-        <button @click=${() => (this.viewMode = 'compact')}>Compact</button>
-      </div>
+      <div class="status-card">
+        <p class="patient">${this.patientName}</p>
 
-      ${choose(
-        this.viewMode,
-        [
-          ['grid', () => this._renderGrid()],
-          ['list', () => this._renderList()],
-          ['compact', () => this._renderCompact()],
-        ],
-        () => html`<p>Unknown view mode</p>`,
+        ${choose<AppointmentStatus, unknown>(
+          this.status,
+          [
+            [
+              'scheduled',
+              () => html`
+                <span class="badge badge--info">Scheduled</span>
+                <hx-button variant="primary" hx-size="sm">Check In</hx-button>
+              `,
+            ],
+            [
+              'in-progress',
+              () => html`
+                <span class="badge badge--warning">In Progress</span>
+                <hx-button variant="secondary" hx-size="sm">Complete</hx-button>
+              `,
+            ],
+            ['complete', () => html` <span class="badge badge--success">Complete</span> `],
+            ['cancelled', () => html` <span class="badge badge--error">Cancelled</span> `],
+            [
+              'no-show',
+              () => html`
+                <span class="badge badge--error">No Show</span>
+                <hx-button variant="ghost" hx-size="sm">Reschedule</hx-button>
+              `,
+            ],
+          ],
+          // Default case — renders if status doesn't match any case
+          () => html`<span class="badge">Unknown</span>`,
+        )}
+      </div>
+    `;
+  }
+}
+```
+
+---
+
+## Caching and Identity Directives
+
+### `cache`
+
+**Import:** `import { cache } from 'lit/directives/cache.js';`
+
+**Signature:**
+
+```typescript
+cache(value: TemplateResult | typeof nothing): DirectiveResult
+```
+
+Caches the DOM tree for a template result when it is switched out. When the same template result type returns, the cached DOM is restored rather than recreated.
+
+**Use when:** The user switches frequently between expensive views and the views contain stateful content (form inputs, video players, components with internal state) that must be preserved across switches.
+
+**Do not use when:**
+
+- There are many possible templates — each is kept in memory simultaneously.
+- Templates are cheap to render — the memory cost is not worth it.
+- Stale state in cached views would cause confusion.
+
+**Example: Clinical note editor with preview**
+
+```typescript
+import { LitElement, html } from 'lit';
+import { customElement, property } from 'lit/decorators.js';
+import { cache } from 'lit/directives/cache.js';
+import { choose } from 'lit/directives/choose.js';
+
+@customElement('hx-note-editor')
+export class HxNoteEditor extends LitElement {
+  @property({ type: String }) activeTab: 'compose' | 'preview' | 'history' = 'compose';
+
+  override render() {
+    return html`
+      <nav class="tabs">
+        <button
+          @click=${() => {
+            this.activeTab = 'compose';
+          }}
+        >
+          Compose
+        </button>
+        <button
+          @click=${() => {
+            this.activeTab = 'preview';
+          }}
+        >
+          Preview
+        </button>
+        <button
+          @click=${() => {
+            this.activeTab = 'history';
+          }}
+        >
+          History
+        </button>
+      </nav>
+
+      ${cache(
+        choose(this.activeTab, [
+          ['compose', () => this._renderCompose()],
+          ['preview', () => this._renderPreview()],
+          ['history', () => this._renderHistory()],
+        ]),
       )}
     `;
   }
 
-  private _renderGrid() {
-    return html`
-      <div class="grid">
-        ${map(
-          this.products,
-          (p) => html`
-            <hx-card>
-              <img slot="image" src=${p.image} alt=${p.name} />
-              <h3 slot="heading">${p.name}</h3>
-              <p>${p.price}</p>
-            </hx-card>
-          `,
-        )}
-      </div>
-    `;
+  private _renderCompose() {
+    // Rich text editor with significant internal state
+    return html`<hx-rich-text-editor></hx-rich-text-editor>`;
   }
 
-  private _renderList() {
-    return html`
-      <ul class="list">
-        ${map(this.products, (p) => html` <li><strong>${p.name}</strong> - ${p.price}</li> `)}
-      </ul>
-    `;
+  private _renderPreview() {
+    return html`<div class="preview"><slot name="preview"></slot></div>`;
   }
 
-  private _renderCompact() {
-    return html`
-      <div class="compact">${map(this.products, (p) => html`<span>${p.name}</span>`)}</div>
-    `;
+  private _renderHistory() {
+    return html`<hx-revision-list></hx-revision-list>`;
   }
 }
 ```
 
-#### Matching Behavior
-
-`choose` uses **strict equality** (`===`) for matching:
-
-```typescript
-// ✓ Matches: both numbers
-choose(this.count, [
-  [0, () => html`None`],
-  [1, () => html`One`],
-]);
-
-// ✗ Doesn't match: '0' (string) !== 0 (number)
-choose('0', [
-  [0, () => html`Zero`], // Won't match
-]);
-```
-
-#### When to Use vs. if/else
-
-**Use `choose` for:**
-
-- Multiple distinct cases (3+)
-- Value-based routing between templates
-- Cleaner than chained ternaries
-
-**Use if/else for:**
-
-- Two cases (ternary is simpler)
-- Complex boolean conditions
-- When you need non-equality comparisons
+When the user navigates from "Compose" to "Preview" and back, the rich text editor's DOM (cursor position, selection, undo history) is preserved in memory and swapped back in.
 
 ---
 
-## Caching and Performance Directives
+### `guard`
 
-### cache
+**Import:** `import { guard } from 'lit/directives/guard.js';`
 
-The `cache` directive preserves DOM nodes for templates that aren't currently rendered. When switching between templates, previously rendered DOM is restored instead of recreated.
-
-#### Syntax
+**Signature:**
 
 ```typescript
-import { cache } from 'lit/directives/cache.js';
-
-html` ${cache(this.view === 'view1' ? template1 : template2)} `;
+guard(dependencies: unknown[], valueFn: () => unknown): DirectiveResult
 ```
 
-#### Example: Tab Panel
+Only re-evaluates `valueFn` when one or more items in `dependencies` change identity (strict inequality). Prevents expensive computations from running on every render when their inputs haven't changed.
+
+**Use when:** The template function is expensive (parsing, sorting, filtering large datasets, external library calls) and its dependencies change infrequently.
+
+**Do not use when:** The template is cheap, or dependencies change on every render anyway.
+
+**Requires immutable updates:** `guard` uses `===` for dependency comparison. If you mutate an array in-place, its identity stays the same and the guard never triggers.
+
+**Example:**
 
 ```typescript
-@customElement('hx-tabs')
-class HxTabs extends LitElement {
-  @property({ type: String })
-  activeTab = 'details';
-
-  override render() {
-    return html`
-      <div class="tabs">
-        <button @click=${() => (this.activeTab = 'details')}>Details</button>
-        <button @click=${() => (this.activeTab = 'reviews')}>Reviews</button>
-        <button @click=${() => (this.activeTab = 'specs')}>Specs</button>
-      </div>
-
-      <div class="panels">
-        ${cache(
-          choose(this.activeTab, [
-            ['details', () => this._renderDetails()],
-            ['reviews', () => this._renderReviews()],
-            ['specs', () => this._renderSpecs()],
-          ]),
-        )}
-      </div>
-    `;
-  }
-}
-```
-
-**Without `cache`:**
-
-- Switch to "Reviews" → Destroys "Details" DOM, creates "Reviews" DOM
-- Switch back to "Details" → Destroys "Reviews" DOM, recreates "Details" DOM
-
-**With `cache`:**
-
-- Switch to "Reviews" → Hides "Details" DOM (preserved in memory), shows "Reviews" DOM
-- Switch back to "Details" → Shows existing "Details" DOM (input state, scroll position intact)
-
-#### Memory vs. Performance Trade-off
-
-`cache` uses more memory to improve perceived performance:
-
-- **Memory cost**: Each cached template stores its DOM tree
-- **Performance benefit**: No re-rendering expensive templates
-- **State preservation**: Form inputs, scroll positions, component state persist
-
-**When to use:**
-
-- Switching between large/expensive templates
-- Templates contain stateful content (forms, videos, iframes)
-- User switches frequently between views
-
-**When to avoid:**
-
-- Many possible templates (high memory usage)
-- Templates are cheap to re-render
-- No meaningful state to preserve
-
-#### Combining with choose
-
-`cache` pairs perfectly with `choose` for multi-view components:
-
-```typescript
-${cache(choose(this.mode, [
-  ['edit', () => this._renderEditMode()],
-  ['preview', () => this._renderPreviewMode()],
-  ['publish', () => this._renderPublishMode()],
-]))}
-```
-
----
-
-### guard
-
-The `guard` directive re-evaluates a template only when one or more dependencies change identity. This optimizes expensive computations by skipping unnecessary work.
-
-#### Syntax
-
-```typescript
+import { LitElement, html } from 'lit';
+import { customElement, property } from 'lit/decorators.js';
 import { guard } from 'lit/directives/guard.js';
+import { unsafeHTML } from 'lit/directives/unsafe-html.js';
+import DOMPurify from 'dompurify';
+import { marked } from 'marked';
 
-html` ${guard([dep1, dep2], () => expensiveTemplate())} `;
-```
+@customElement('hx-clinical-note')
+export class HxClinicalNote extends LitElement {
+  @property({ type: String }) markdown = '';
 
-The template function only runs when dependencies change (using strict inequality `!==`).
-
-#### Example: Expensive Markdown Rendering
-
-```typescript
-@customElement('hx-markdown-viewer')
-class HxMarkdownViewer extends LitElement {
-  @property({ type: String })
-  markdown = '';
+  // The note may change — but locale affects display of dates in the rendered output
+  @property({ type: String }) locale = 'en-US';
 
   override render() {
     return html`
-      <div class="markdown">${guard([this.markdown], () => this._renderMarkdown())}</div>
+      <article class="note">
+        ${guard(
+          // Dependencies: re-render only when markdown OR locale changes
+          [this.markdown, this.locale],
+          () => {
+            // Expensive: parse Markdown, then sanitize HTML
+            const raw = marked.parse(this.markdown) as string;
+            const safe = DOMPurify.sanitize(raw);
+            return unsafeHTML(safe);
+          },
+        )}
+      </article>
     `;
   }
-
-  private _renderMarkdown() {
-    // Expensive: parses markdown and sanitizes HTML
-    const html = marked.parse(this.markdown);
-    const sanitized = DOMPurify.sanitize(html);
-    return unsafeHTML(sanitized);
-  }
 }
 ```
-
-**Without `guard`:**
-
-`_renderMarkdown()` runs on **every render**, even when `markdown` hasn't changed.
-
-**With `guard`:**
-
-`_renderMarkdown()` only runs when `this.markdown` changes.
-
-#### Immutability Pattern
-
-`guard` works best with immutable data patterns:
-
-```typescript
-@property({ type: Array })
-items: Item[] = [];
-
-override render() {
-  return html`
-    ${guard([this.items], () => this._renderExpensiveList())}
-  `;
-}
-
-addItem(item: Item) {
-  // ✓ Correct: Creates new array (identity changes)
-  this.items = [...this.items, item];
-}
-
-updateItem(index: number, item: Item) {
-  // ✗ Wrong: Mutates array (identity unchanged, guard won't trigger)
-  this.items[index] = item;
-  this.requestUpdate('items');
-}
-```
-
-#### Multiple Dependencies
-
-Track multiple dependencies:
-
-```typescript
-${guard([this.data, this.sortOrder, this.filters], () => (
-  this._renderFilteredSortedData()
-))}
-```
-
-The template re-renders only when **any** dependency changes identity.
-
-#### When to Use
-
-Use `guard` when:
-
-- Template computation is expensive (parsing, sorting, filtering large datasets)
-- Dependencies change infrequently
-- You follow immutable data patterns
-- Profiling shows rendering bottlenecks
-
-**Don't use** for:
-
-- Simple templates (overhead outweighs benefit)
-- Mutable data patterns
-- When dependencies change on every render anyway
 
 ---
 
-### keyed
+### `keyed`
 
-The `keyed` directive forces complete re-rendering of a template when its key changes. It destroys the old DOM and creates fresh instances, opposite of `cache` which preserves DOM.
+**Import:** `import { keyed } from 'lit/directives/keyed.js';`
 
-#### Syntax
+**Signature:**
 
 ```typescript
+keyed(key: unknown, value: unknown): DirectiveResult
+```
+
+Forces complete destruction and recreation of the template's DOM when the `key` changes. The opposite of `cache` — instead of preserving DOM across template changes, `keyed` destroys DOM when data changes.
+
+**Use when:** Switching between distinct data entities and you want all prior state (form validation, scroll position, third-party library state) completely discarded.
+
+**Do not use for:** Performance optimization — `keyed` is expensive. It is a correctness tool for stateful resets.
+
+**Example: Multi-patient form — ensure form resets when patient changes**
+
+```typescript
+import { LitElement, html } from 'lit';
+import { customElement, property } from 'lit/decorators.js';
 import { keyed } from 'lit/directives/keyed.js';
 
-html` ${keyed(uniqueKey, () => template)} `;
-```
+interface Patient {
+  id: string;
+  name: string;
+  dob: string;
+}
 
-#### Example: Resetting Form on User Change
-
-When editing different users, you want form inputs to reset completely:
-
-```typescript
-@customElement('hx-user-editor')
-class HxUserEditor extends LitElement {
-  @property({ type: Object })
-  user: { id: string; name: string; email: string } | null = null;
+@customElement('hx-patient-intake-form')
+export class HxPatientIntakeForm extends LitElement {
+  @property({ type: Object }) patient: Patient | null = null;
 
   override render() {
+    if (!this.patient) {
+      return html`<p>No patient selected.</p>`;
+    }
+
     return html`
-      <div class="editor">
-        <h2>Editing User</h2>
+      <section>
+        <h2>Intake — ${this.patient.name}</h2>
+
         ${keyed(
-          this.user?.id ?? 'no-user',
-          () => html`
+          // Key by patient ID — new patient = entire form discarded and recreated
+          this.patient.id,
+          html`
             <form>
-              <input type="text" name="name" .value=${this.user?.name ?? ''} placeholder="Name" />
-              <input
-                type="email"
-                name="email"
-                .value=${this.user?.email ?? ''}
-                placeholder="Email"
-              />
-              <button type="submit">Save</button>
+              <hx-text-input label="Chief Complaint" name="complaint"></hx-text-input>
+              <hx-text-input label="Allergies" name="allergies"></hx-text-input>
+              <hx-textarea label="Current Medications" name="medications"></hx-textarea>
+              <hx-button type="submit">Save Intake</hx-button>
             </form>
           `,
         )}
-      </div>
+      </section>
     `;
   }
 }
 ```
 
-**Without `keyed`:**
-
-- Switch from User A to User B
-- Lit updates `.value` properties
-- But input validation state, focus, selection persist
-- Can cause bugs with dirty form tracking
-
-**With `keyed`:**
-
-- Switch from User A to User B
-- Entire form DOM is destroyed
-- New form created from scratch
-- All state completely reset (validation, focus, dirty flags)
-
-#### Example: Video Player Reset
-
-When changing videos, you want the player to completely reset:
-
-```typescript
-@customElement('hx-video-player')
-class HxVideoPlayer extends LitElement {
-  @property({ type: String })
-  videoUrl = '';
-
-  override render() {
-    return html`
-      <div class="player">
-        ${keyed(
-          this.videoUrl,
-          () => html`
-            <video controls autoplay>
-              <source src=${this.videoUrl} type="video/mp4" />
-            </video>
-          `,
-        )}
-      </div>
-    `;
-  }
-}
-```
-
-**Why `keyed` helps:**
-
-- Changing `videoUrl` destroys the `<video>` element
-- New `<video>` element created with new source
-- Ensures video loads from beginning, not current position
-- Resets all video state (volume, playback rate, captions)
-
-#### Example: Third-Party Component Reset
-
-When integrating third-party components that maintain internal state:
-
-```typescript
-import 'third-party-date-picker';
-
-@customElement('hx-booking-form')
-class HxBookingForm extends LitElement {
-  @property({ type: String })
-  bookingId = '';
-
-  override render() {
-    return html`
-      <div class="form">
-        ${keyed(this.bookingId, () => html` <third-party-date-picker></third-party-date-picker> `)}
-      </div>
-    `;
-  }
-}
-```
-
-**Use case:**
-
-- Third-party component has internal state that doesn't reset via properties
-- `keyed` forces component recreation, ensuring clean state
-
-#### Keyed vs. Cache
-
-These directives have opposite purposes:
-
-| Directive | Behavior                          | Use Case                    |
-| --------- | --------------------------------- | --------------------------- |
-| `keyed`   | **Destroys** DOM when key changes | Reset stateful components   |
-| `cache`   | **Preserves** DOM when switching  | Maintain state across views |
-
-```typescript
-// cache: Keep form state when switching tabs
-${cache(choose(this.tab, [
-  ['profile', () => html`<profile-form></profile-form>`],
-  ['settings', () => html`<settings-form></settings-form>`],
-]))}
-
-// keyed: Reset form when user changes
-${keyed(this.userId, () => html`<user-form></user-form>`)}
-```
-
-#### When to Use
-
-Use `keyed` when:
-
-- Resetting complex stateful components
-- Switching between distinct data entities (users, documents)
-- Forcing third-party components to re-initialize
-- Clearing form inputs without manual reset logic
-- Reloading media elements (video, audio, iframe)
-- Ensuring clean slate for components with hidden state
-
-**Don't use** for:
-
-- Simple property updates (use reactive properties)
-- Preserving state across changes (use `cache`)
-- Performance optimization (it destroys and recreates DOM)
-- Static content
-
-#### Performance Cost
-
-`keyed` is expensive:
-
-- **High**: Destroys entire DOM subtree
-- **High**: Creates new DOM from scratch
-- **High**: Loses all element state
-- **High**: Re-runs connectedCallback, constructor, etc.
-
-Use sparingly, only when complete reset is required.
-
-#### Example: Dialog Reset
-
-```typescript
-@customElement('hx-dialog-manager')
-class HxDialogManager extends LitElement {
-  @property({ type: String })
-  dialogId = '';
-
-  override render() {
-    return html`
-      ${keyed(
-        this.dialogId,
-        () => html`
-          <hx-dialog>
-            <h2 slot="header">Dialog ${this.dialogId}</h2>
-            <form>
-              <!-- Complex form with validation, state machine, etc. -->
-            </form>
-          </hx-dialog>
-        `,
-      )}
-    `;
-  }
-}
-```
-
-Each new `dialogId` creates a completely fresh dialog instance.
+Without `keyed`, switching from Patient A to Patient B would update the `patient` property and re-render the form fields — but the inputs' previous values, validation state, and focus position would persist because Lit reuses the existing DOM nodes. `keyed` guarantees a clean slate.
 
 ---
 
-## Special Value Directives
+## Async Directives
 
-### unsafeHTML
+### `until`
 
-The `unsafeHTML` directive parses and renders HTML strings as markup. This is **dangerous** and should only be used with trusted, developer-controlled content.
+**Import:** `import { until } from 'lit/directives/until.js';`
 
-#### Syntax
-
-```typescript
-import { unsafeHTML } from 'lit/directives/unsafe-html.js';
-
-html`<div>${unsafeHTML(this.trustedHTML)}</div>`;
-```
-
-#### Security Warning
-
-**NEVER** use `unsafeHTML` with user-provided content. It opens the door to XSS (cross-site scripting) attacks:
+**Signature:**
 
 ```typescript
-// ✗ DANGEROUS: XSS vulnerability
-const userInput = '<script>alert("XSS")</script>';
-html`<div>${unsafeHTML(userInput)}</div>`;
-// Result: Script executes!
+until(...values: unknown[]): DirectiveResult
 ```
 
-#### Safe Usage Pattern
+Accepts one or more values or Promises ordered by priority (highest first). Renders the first value immediately available. When Promises resolve, updates to show the resolved value. Renders fallback content while waiting.
 
-Only use with content you control or sanitize through a trusted library like DOMPurify:
+**Use when:** Fetching async data and you want to render a loading state while waiting, then the real content when ready.
+
+**Do not use when:** You can use an `@state()` property with async loading — that pattern (set `_loading = true`, fetch, set `_data`, set `_loading = false`) gives you more control over error states and is easier to test.
+
+**Example:**
 
 ```typescript
-import DOMPurify from 'dompurify';
-import { unsafeHTML } from 'lit/directives/unsafe-html.js';
-
-@customElement('hx-content')
-class HxContent extends LitElement {
-  @property({ type: String })
-  rawHTML = '';
-
-  override render() {
-    // Sanitize before rendering
-    const sanitized = DOMPurify.sanitize(this.rawHTML);
-    return html`<div>${unsafeHTML(sanitized)}</div>`;
-  }
-}
-```
-
-#### When to Use
-
-Valid use cases:
-
-- Rendering CMS content (sanitized)
-- Displaying markdown-converted HTML (sanitized)
-- Embedding SVG or HTML from trusted sources
-- Developer-controlled HTML snippets
-
-**Prefer alternatives:**
-
-- Use Lit templates instead of HTML strings
-- Use `lit-html` to render dynamic templates
-- Use `unsafeSVG` specifically for SVG content
-
----
-
-### unsafeSVG
-
-The `unsafeSVG` directive parses and renders SVG strings as markup. Like `unsafeHTML`, it's unsafe with untrusted content.
-
-#### Syntax
-
-```typescript
-import { unsafeSVG } from 'lit/directives/unsafe-svg.js';
-
-html`<div>${unsafeSVG(this.svgString)}</div>`;
-```
-
-#### Example: Dynamic SVG Icons
-
-```typescript
-@customElement('hx-icon')
-class HxIcon extends LitElement {
-  @property({ type: String })
-  name = '';
-
-  private _icons: Record<string, string> = {
-    check:
-      '<svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>',
-    close:
-      '<svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>',
-  };
-
-  override render() {
-    const svg = this._icons[this.name] || '';
-    return html`<div class="icon">${unsafeSVG(svg)}</div>`;
-  }
-}
-```
-
-#### Security Considerations
-
-Same security rules as `unsafeHTML`:
-
-- Only use with trusted, developer-controlled SVG
-- Never render user-provided SVG without sanitization
-- Prefer loading SVG as external files or components
-
-### templateContent
-
-The `templateContent` directive renders the content of HTML `<template>` elements into the DOM. This is useful for embedding static HTML templates that are defined in the document.
-
-#### Syntax
-
-```typescript
-import { templateContent } from 'lit/directives/template-content.js';
-
-const templateEl = document.querySelector<HTMLTemplateElement>('#my-template');
-html`${templateContent(templateEl)}`;
-```
-
-#### Example: Embedding Template Elements
-
-```typescript
-@customElement('hx-template-loader')
-class HxTemplateLoader extends LitElement {
-  @property({ type: String })
-  templateId = '';
-
-  override render() {
-    const template = document.getElementById(this.templateId) as HTMLTemplateElement;
-
-    if (!template) {
-      return html`<p>Template not found: ${this.templateId}</p>`;
-    }
-
-    return html` <div class="template-container">${templateContent(template)}</div> `;
-  }
-}
-```
-
-**HTML usage:**
-
-```html
-<template id="user-card-template">
-  <div class="user-card">
-    <h3>Default User</h3>
-    <p>This is template content</p>
-  </div>
-</template>
-
-<hx-template-loader template-id="user-card-template"></hx-template-loader>
-```
-
-#### Security Considerations
-
-**CRITICAL**: Only use `templateContent` with developer-controlled templates. Never use it with user-provided content, as it can lead to XSS vulnerabilities similar to `unsafeHTML`.
-
-```typescript
-// ✓ Safe: Developer-controlled template
-const template = document.getElementById('known-template');
-html`${templateContent(template)}`;
-
-// ✗ DANGEROUS: User-controlled template ID
-const userTemplateId = getUserInput(); // Could reference malicious template
-const template = document.getElementById(userTemplateId);
-html`${templateContent(template)}`; // XSS risk!
-```
-
-#### When to Use
-
-Valid use cases:
-
-- Embedding static HTML defined in index.html
-- Server-rendered templates loaded once
-- Reusable HTML snippets that don't need JavaScript logic
-- Integration with server-side template systems
-
-**Prefer alternatives:**
-
-- Use Lit templates for dynamic content
-- Use Web Components for reusable UI patterns
-- Avoid for content that needs reactivity
-
----
-
-## DOM Reference Directives
-
-### ref
-
-The `ref` directive provides imperative access to rendered DOM elements. It's an alternative to `@query()` decorators for functional or dynamic element access.
-
-#### Syntax with createRef
-
-```typescript
-import { ref, createRef, Ref } from 'lit/directives/ref.js';
-
-class MyElement extends LitElement {
-  private _inputRef: Ref<HTMLInputElement> = createRef();
-
-  override render() {
-    return html`<input ${ref(this._inputRef)} />`;
-  }
-
-  focus() {
-    this._inputRef.value?.focus();
-  }
-}
-```
-
-#### Accessing Referenced Elements
-
-The `Ref` object has a `value` property that holds the element reference (or `undefined` if not yet rendered):
-
-```typescript
-private _buttonRef: Ref<HTMLButtonElement> = createRef();
-
-override render() {
-  return html`<button ${ref(this._buttonRef)}>Click</button>`;
-}
-
-override firstUpdated() {
-  // Access element after first render
-  if (this._buttonRef.value) {
-    this._buttonRef.value.addEventListener('special-event', this._handler);
-  }
-}
-```
-
-#### Callback Syntax
-
-For more control, use a callback function instead of `createRef()`:
-
-```typescript
-override render() {
-  return html`
-    <input ${ref((el?: Element) => {
-      if (el) {
-        // Element rendered or moved
-        (el as HTMLInputElement).focus();
-        console.log('Input element:', el);
-      } else {
-        // Element removed from DOM
-        console.log('Input removed');
-      }
-    })}>
-  `;
-}
-```
-
-**Callback behavior:**
-
-- Called with element when it renders
-- Called with element when it moves in DOM
-- Called with `undefined` when element is removed
-
-#### Example: Canvas Drawing Context
-
-```typescript
-@customElement('hx-canvas')
-class HxCanvas extends LitElement {
-  private _canvasRef: Ref<HTMLCanvasElement> = createRef();
-
-  override render() {
-    return html`<canvas ${ref(this._canvasRef)} width="400" height="300"></canvas>`;
-  }
-
-  override firstUpdated() {
-    const canvas = this._canvasRef.value;
-    if (canvas) {
-      const ctx = canvas.getContext('2d');
-      if (ctx) {
-        this._drawContent(ctx);
-      }
-    }
-  }
-
-  private _drawContent(ctx: CanvasRenderingContext2D): void {
-    ctx.fillStyle = 'blue';
-    ctx.fillRect(10, 10, 100, 100);
-  }
-}
-```
-
-#### Example: Measuring Element Dimensions
-
-```typescript
-@customElement('hx-resizable')
-class HxResizable extends LitElement {
-  private _containerRef: Ref<HTMLDivElement> = createRef();
-
-  @state()
-  private _dimensions = { width: 0, height: 0 };
-
-  override render() {
-    return html`
-      <div ${ref(this._containerRef)} class="container">
-        <p>Width: ${this._dimensions.width}px</p>
-        <p>Height: ${this._dimensions.height}px</p>
-        <slot></slot>
-      </div>
-    `;
-  }
-
-  override updated() {
-    if (this._containerRef.value) {
-      const { width, height } = this._containerRef.value.getBoundingClientRect();
-      this._dimensions = { width, height };
-    }
-  }
-}
-```
-
-#### When to Use vs. @query
-
-**Use `ref` for:**
-
-- Dynamic element references that may or may not exist
-- Conditional elements (rendered based on state)
-- Multiple elements with same selector
-- Functional component patterns
-- Elements created in repeated templates
-- When you need lifecycle hooks (element added/removed)
-
-**Use `@query` for:**
-
-- Static element references that always exist
-- Class-based components with fixed structure
-- When decorator syntax is preferred
-- Single element per unique selector
-- Simpler syntax for straightforward cases
-
-#### Example: Multiple Dynamic Refs
-
-````typescript
-@customElement('hx-image-gallery')
-class HxImageGallery extends LitElement {
-  @property({ type: Array })
-  images: string[] = [];
-
-  private _imageRefs = new Map<string, HTMLImageElement>();
-
-  override render() {
-    return html`
-      <div class="gallery">
-        ${this.images.map((src) => html`
-          <img
-            src=${src}
-            ${ref((el?: Element) => {
-              if (el) {
-                this._imageRefs.set(src, el as HTMLImageElement);
-              } else {
-                this._imageRefs.delete(src);
-              }
-            })}
-          >
-        `)}
-      </div>
-    `;
-  }
-
-  getImageElement(src: string): HTMLImageElement | undefined {
-    return this._imageRefs.get(src);
-  }
-}
-
----
-
-## Asynchronous Directives
-
-### until
-
-The `until` directive displays fallback content while waiting for Promises to resolve, then renders the resolved value.
-
-#### Syntax
-
-```typescript
+import { LitElement, html } from 'lit';
+import { customElement, property } from 'lit/decorators.js';
 import { until } from 'lit/directives/until.js';
 
-html`
-  ${until(
-    fetch('/api/data').then(r => r.json()).then(data => html`<div>${data}</div>`),
-    html`<div>Loading...</div>`
-  )}
-`;
-````
+interface Provider {
+  id: string;
+  name: string;
+  specialty: string;
+}
 
-#### Example: Async Data Loading
+@customElement('hx-provider-card')
+export class HxProviderCard extends LitElement {
+  @property({ type: String }) providerId = '';
 
-```typescript
-@customElement('hx-user-profile')
-class HxUserProfile extends LitElement {
-  @property({ type: String })
-  userId = '';
+  private _fetchProvider(id: string): Promise<unknown> {
+    return fetch(`/api/providers/${id}`)
+      .then((r) => {
+        if (!r.ok) throw new Error(`HTTP ${r.status}`);
+        return r.json();
+      })
+      .then(
+        (p: Provider) => html`
+          <div class="provider">
+            <h3>${p.name}</h3>
+            <p>${p.specialty}</p>
+          </div>
+        `,
+      )
+      .catch(
+        () => html` <div class="error" role="alert">Failed to load provider information.</div> `,
+      );
+  }
 
   override render() {
     return html`
-      <div class="profile">${until(this._loadUser(), html`<hx-spinner></hx-spinner>`)}</div>
-    `;
-  }
-
-  private async _loadUser() {
-    const response = await fetch(`/api/users/${this.userId}`);
-    const user = await response.json();
-
-    return html`
-      <img src=${user.avatar} alt=${user.name} />
-      <h2>${user.name}</h2>
-      <p>${user.bio}</p>
+      <div class="card">
+        ${until(
+          // Priority 1: Resolved template (shown when fetch completes)
+          this.providerId ? this._fetchProvider(this.providerId) : undefined,
+          // Priority 2: Fallback (shown immediately while fetching)
+          html`<hx-spinner aria-label="Loading provider..."></hx-spinner>`,
+        )}
+      </div>
     `;
   }
 }
 ```
 
-**Rendering sequence:**
-
-1. Initial render: Shows spinner (fallback)
-2. Promise resolves: Shows user profile
-3. `userId` changes: Shows spinner again, then new profile
-
-#### Multiple Fallbacks (Priority-based)
-
-You can provide multiple arguments with decreasing priority:
+**Multiple priorities:**
 
 ```typescript
-html`
-  ${until(
-    slowPromise, // Priority 1: Show when resolved
-    fastPromise, // Priority 2: Show when resolved
-    html`Loading...`, // Priority 3: Show immediately
-  )}
-`;
+// Fast placeholder (resolves in <100ms), then full content
+${until(
+  this._fetchFullContent(),   // Priority 1: Full content (slow)
+  this._fetchSummary(),       // Priority 2: Summary (fast)
+  html`<div>Loading...</div>` // Priority 3: Immediate fallback
+)}
 ```
 
 ---
 
-### asyncAppend and asyncReplace
+### `asyncAppend`
 
-These directives handle async iterables (generators, async iterators):
+**Import:** `import { asyncAppend } from 'lit/directives/async-append.js';`
 
-- **asyncAppend**: Accumulates values (appends each yielded value)
-- **asyncReplace**: Shows only the latest value (replaces previous value)
-
-#### Example: Real-time Log Stream
+**Signature:**
 
 ```typescript
+asyncAppend<T>(
+  value: AsyncIterable<T>,
+  mapper?: (v: T, index?: number) => unknown
+): DirectiveResult
+```
+
+Renders an async iterable by appending each yielded value to the DOM. Previously rendered values accumulate — they are not replaced.
+
+**Use when:** Streaming data arrives incrementally and all of it should be visible (log streams, chat messages, test output).
+
+**Example: Real-time vital signs log**
+
+```typescript
+import { LitElement, html } from 'lit';
+import { customElement, property } from 'lit/decorators.js';
 import { asyncAppend } from 'lit/directives/async-append.js';
 
-@customElement('hx-log-viewer')
-class HxLogViewer extends LitElement {
-  override render() {
-    return html`
-      <ul>
-        ${asyncAppend(this._streamLogs(), (log) => html`<li>${log}</li>`)}
-      </ul>
-    `;
-  }
+@customElement('hx-vitals-stream')
+export class HxVitalsStream extends LitElement {
+  @property({ type: String }) patientId = '';
 
-  private async *_streamLogs() {
-    const response = await fetch('/api/logs/stream');
-    const reader = response.body?.getReader();
-    if (!reader) return;
+  private async *_streamVitals(): AsyncIterable<string> {
+    const url = `/api/patients/${this.patientId}/vitals/stream`;
+    const response = await fetch(url);
+    const reader = response.body!.getReader();
+    const decoder = new TextDecoder();
 
     while (true) {
       const { done, value } = await reader.read();
       if (done) break;
-      yield new TextDecoder().decode(value);
+      yield decoder.decode(value);
     }
+  }
+
+  override render() {
+    return html`
+      <div class="vitals-log" role="log" aria-live="polite">
+        ${asyncAppend(this._streamVitals(), (reading) => html`<p class="reading">${reading}</p>`)}
+      </div>
+    `;
   }
 }
 ```
 
 ---
 
-## Performance Best Practices
+### `asyncReplace`
 
-### Bundle Size Optimization
+**Import:** `import { asyncReplace } from 'lit/directives/async-replace.js';`
 
-Import only the directives you use:
+**Signature:**
 
 ```typescript
-// ✓ Good: Tree-shakeable
-import { classMap } from 'lit/directives/class-map.js';
-import { repeat } from 'lit/directives/repeat.js';
-
-// ✗ Bad: Imports all directives
-import * as directives from 'lit/directives.js';
+asyncReplace<T>(
+  value: AsyncIterable<T>,
+  mapper?: (v: T, index?: number) => unknown
+): DirectiveResult
 ```
 
-### Avoid Overuse
+Renders an async iterable by replacing the rendered value with each new yielded value. Only the most recent value is visible.
 
-Don't use directives where simple expressions suffice:
+**Use when:** A stream of values represents the "current state" and old values are no longer relevant (live price feeds, real-time sensor readings, live status indicators).
 
-```typescript
-// ✗ Overkill: Simple ternary is cleaner
-${when(this.show, () => html`<div>Content</div>`)}
-
-// ✓ Better: Use ternary
-${this.show ? html`<div>Content</div>` : nothing}
-```
-
-### Combine Directives Wisely
-
-Some directives work well together:
+**Example: Live heart rate monitor**
 
 ```typescript
-// cache + choose: Preserve DOM when switching views
-${cache(choose(this.view, [...]))}
+import { LitElement, html } from 'lit';
+import { customElement, property } from 'lit/decorators.js';
+import { asyncReplace } from 'lit/directives/async-replace.js';
 
-// guard + repeat: Optimize expensive lists
-${guard([this.items], () => repeat(this.items, ...))}
+@customElement('hx-heart-rate-monitor')
+export class HxHeartRateMonitor extends LitElement {
+  @property({ type: String }) deviceId = '';
 
-// when + until: Lazy async rendering
-${when(this.enabled, () => until(this._load(), html`Loading...`))}
-```
+  private async *_streamHeartRate(): AsyncIterable<number> {
+    // Simulated WebSocket or Server-Sent Events stream
+    while (true) {
+      const reading = await this._pollDevice();
+      yield reading;
+      await new Promise((r) => setTimeout(r, 1000));
+    }
+  }
 
-### Use map for Simple Lists
+  private async _pollDevice(): Promise<number> {
+    const r = await fetch(`/api/devices/${this.deviceId}/bpm`);
+    const data = (await r.json()) as { bpm: number };
+    return data.bpm;
+  }
 
-`repeat` has overhead—use `map` or plain `Array.map()` for simple lists:
-
-```typescript
-// ✓ Fast: No keying needed
-${this.items.map(item => html`<li>${item}</li>`)}
-
-// ✗ Slower: Unnecessary keying
-${repeat(this.items, item => item, item => html`<li>${item}</li>`)}
+  override render() {
+    return html`
+      <div class="monitor">
+        <span class="label">Heart Rate</span>
+        <span class="value">
+          ${asyncReplace(
+            this._streamHeartRate(),
+            (bpm) => html`${bpm} <abbr title="beats per minute">bpm</abbr>`,
+          )}
+        </span>
+      </div>
+    `;
+  }
+}
 ```
 
 ---
 
-## Summary
+## Directive Comparison Tables
 
-| Directive    | Use For                | Avoid For             |
-| ------------ | ---------------------- | --------------------- |
-| `classMap`   | Dynamic CSS classes    | Single static class   |
-| `styleMap`   | Dynamic inline styles  | Styles in stylesheets |
-| `ifDefined`  | Optional attributes    | Boolean attributes    |
-| `live`       | Form input bindings    | Non-input elements    |
-| `repeat`     | Reorderable lists      | Static lists          |
-| `map`        | Simple iterations      | Lists that reorder    |
-| `range`      | Numeric sequences      | Arbitrary iterables   |
-| `when`       | Expensive conditionals | Simple ternaries      |
-| `choose`     | Multi-case routing     | Two cases             |
-| `cache`      | View switching         | Many possible views   |
-| `guard`      | Expensive computations | Simple templates      |
-| `unsafeHTML` | Sanitized HTML         | User input            |
-| `ref`        | Dynamic elements       | Static elements       |
-| `until`      | Async content          | Synchronous data      |
+### Choosing a List Directive
 
-Directives are powerful tools for solving specific rendering challenges. Choose the right directive for your use case, avoid overuse, and leverage tree-shaking to keep bundle sizes small. When in doubt, start with simple expressions and add directives only when they provide clear value.
+| Scenario                                 | Directive                   |
+| ---------------------------------------- | --------------------------- |
+| Static list, never reorders              | `Array.map()` or `map`      |
+| Non-array iterable (Set, Map, generator) | `map`                       |
+| List that reorders; items have state     | `repeat` with key function  |
+| Numeric sequence (pagination, stars)     | `range` combined with `map` |
+| Items need separator (breadcrumbs, tags) | `join`                      |
+
+### Choosing a Conditional Directive
+
+| Scenario                                 | Directive                           |
+| ---------------------------------------- | ----------------------------------- |
+| Two branches, both cheap                 | Ternary `condition ? a : b`         |
+| Two branches, one or both expensive      | `when`                              |
+| Three or more branches on a single value | `choose`                            |
+| Render nothing conditionally             | `condition ? html\`...\` : nothing` |
+
+### Choosing a Caching/Identity Directive
+
+| Scenario                                       | Directive |
+| ---------------------------------------------- | --------- |
+| Preserve DOM and state across view switches    | `cache`   |
+| Skip expensive computation when deps unchanged | `guard`   |
+| Discard all state when data entity changes     | `keyed`   |
+
+### Choosing an Async Directive
+
+| Scenario                                      | Directive      |
+| --------------------------------------------- | -------------- |
+| Show fallback until one-shot Promise resolves | `until`        |
+| Accumulate all values from stream             | `asyncAppend`  |
+| Show only the latest value from stream        | `asyncReplace` |
+
+---
+
+## Import Quick Reference
+
+```typescript
+import { classMap } from 'lit/directives/class-map.js';
+import { styleMap } from 'lit/directives/style-map.js';
+import { ifDefined } from 'lit/directives/if-defined.js';
+import { live } from 'lit/directives/live.js';
+import { repeat } from 'lit/directives/repeat.js';
+import { map } from 'lit/directives/map.js';
+import { range } from 'lit/directives/range.js';
+import { join } from 'lit/directives/join.js';
+import { when } from 'lit/directives/when.js';
+import { choose } from 'lit/directives/choose.js';
+import { cache } from 'lit/directives/cache.js';
+import { guard } from 'lit/directives/guard.js';
+import { keyed } from 'lit/directives/keyed.js';
+import { until } from 'lit/directives/until.js';
+import { asyncAppend } from 'lit/directives/async-append.js';
+import { asyncReplace } from 'lit/directives/async-replace.js';
+import { unsafeHTML } from 'lit/directives/unsafe-html.js';
+import { unsafeSVG } from 'lit/directives/unsafe-svg.js';
+import { ref, createRef } from 'lit/directives/ref.js';
+```
+
+All directives are individually tree-shakeable. Only imported directives are included in the bundle.
+
+---
 
 ## References
 
 - [Lit Directives Documentation](https://lit.dev/docs/templates/directives/)
 - [Lit List Rendering](https://lit.dev/docs/templates/lists/)
 - [Lit Conditional Rendering](https://lit.dev/docs/templates/conditionals/)
-- [Custom Directives API](https://lit.dev/docs/templates/custom-directives/)
-
-## Related Documentation
-
-- [Template Syntax Guide](/components/fundamentals/template-syntax)
-- [Decorators Reference](/components/fundamentals/decorators)
-- [Component Performance Optimization](/components/fundamentals/performance)
+- [Custom Directives](/components/fundamentals/custom-directives/) — Building your own directives
+- [Template Syntax Guide](/components/fundamentals/template-syntax/) — Full template binding reference

@@ -525,6 +525,277 @@
     },
     {
       "kind": "javascript-module",
+      "path": "src/components/hx-card/hx-card.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "A flexible card component for displaying grouped content.",
+          "name": "HelixCard",
+          "cssProperties": [
+            {
+              "description": "Card background color.",
+              "name": "--hx-card-bg",
+              "default": "var(--hx-color-neutral-0)"
+            },
+            {
+              "description": "Card text color.",
+              "name": "--hx-card-color",
+              "default": "var(--hx-color-neutral-800)"
+            },
+            {
+              "description": "Card border color.",
+              "name": "--hx-card-border-color",
+              "default": "var(--hx-color-neutral-200)"
+            },
+            {
+              "description": "Card border radius.",
+              "name": "--hx-card-border-radius",
+              "default": "var(--hx-border-radius-lg)"
+            },
+            {
+              "description": "Internal padding for card sections.",
+              "name": "--hx-card-padding",
+              "default": "var(--hx-space-6)"
+            },
+            {
+              "description": "Gap between card sections.",
+              "name": "--hx-card-gap",
+              "default": "var(--hx-space-4)"
+            }
+          ],
+          "cssParts": [
+            {
+              "description": "The outer card container element.",
+              "name": "card"
+            },
+            {
+              "description": "The image slot container.",
+              "name": "image"
+            },
+            {
+              "description": "The heading slot container.",
+              "name": "heading"
+            },
+            {
+              "description": "The body slot container.",
+              "name": "body"
+            },
+            {
+              "description": "The footer slot container.",
+              "name": "footer"
+            },
+            {
+              "description": "The actions slot container.",
+              "name": "actions"
+            }
+          ],
+          "slots": [
+            {
+              "description": "Optional image or media content at the top of the card.",
+              "name": "image"
+            },
+            {
+              "description": "The card heading/title content.",
+              "name": "heading"
+            },
+            {
+              "description": "Default slot for the card body content.",
+              "name": ""
+            },
+            {
+              "description": "Optional footer content below the body.",
+              "name": "footer"
+            },
+            {
+              "description": "Optional action buttons, rendered with a top border separator.",
+              "name": "actions"
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "variant",
+              "type": {
+                "text": "'default' | 'featured' | 'compact'"
+              },
+              "default": "'default'",
+              "description": "Visual style variant of the card.",
+              "attribute": "variant",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "elevation",
+              "type": {
+                "text": "'flat' | 'raised' | 'floating'"
+              },
+              "default": "'flat'",
+              "description": "Elevation (shadow depth) of the card.",
+              "attribute": "elevation",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "wcHref",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Optional URL. When set, the card becomes interactive (clickable)\nand navigates to this URL on click.\nUses wc-href to avoid conflicting with the native HTML href attribute.",
+              "attribute": "hx-href"
+            },
+            {
+              "kind": "field",
+              "name": "_hasSlotContent",
+              "type": {
+                "text": "Record<string, boolean>"
+              },
+              "privacy": "private",
+              "default": "{ image: false, heading: false, footer: false, actions: false, }"
+            },
+            {
+              "kind": "method",
+              "name": "_handleSlotChange",
+              "privacy": "private",
+              "parameters": [
+                {
+                  "name": "slotName",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "_handleClick",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "e",
+                  "type": {
+                    "text": "MouseEvent"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "_handleKeyDown",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "e",
+                  "type": {
+                    "text": "KeyboardEvent"
+                  }
+                }
+              ]
+            }
+          ],
+          "events": [
+            {
+              "name": "hx-card-click",
+              "type": {
+                "text": "CustomEvent"
+              },
+              "description": "Dispatched when an interactive card is clicked.\nIncludes the target href in the detail."
+            },
+            {
+              "type": {
+                "text": "CustomEvent<{url: string, originalEvent: MouseEvent}>"
+              },
+              "description": "Dispatched when an interactive card (with wc-href) is clicked.",
+              "name": "wc-card-click"
+            }
+          ],
+          "attributes": [
+            {
+              "name": "variant",
+              "type": {
+                "text": "'default' | 'featured' | 'compact'"
+              },
+              "default": "'default'",
+              "description": "Visual style variant of the card.",
+              "fieldName": "variant",
+              "attribute": "variant"
+            },
+            {
+              "name": "elevation",
+              "type": {
+                "text": "'flat' | 'raised' | 'floating'"
+              },
+              "default": "'flat'",
+              "description": "Elevation (shadow depth) of the card.",
+              "fieldName": "elevation",
+              "attribute": "elevation"
+            },
+            {
+              "name": "hx-href",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Optional URL. When set, the card becomes interactive (clickable)\nand navigates to this URL on click.\nUses wc-href to avoid conflicting with the native HTML href attribute.",
+              "fieldName": "wcHref",
+              "attribute": "hx-href"
+            }
+          ],
+          "superclass": {
+            "name": "LitElement",
+            "package": "lit"
+          },
+          "tagName": "hx-card",
+          "customElement": true,
+          "summary": "Content container with image, heading, body, footer, and action slots."
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "HelixCard",
+          "declaration": {
+            "name": "HelixCard",
+            "module": "src/components/hx-card/hx-card.ts"
+          }
+        },
+        {
+          "kind": "custom-element-definition",
+          "name": "hx-card",
+          "declaration": {
+            "name": "HelixCard",
+            "module": "src/components/hx-card/hx-card.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/components/hx-card/index.ts",
+      "declarations": [],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "HelixCard",
+          "declaration": {
+            "name": "HelixCard",
+            "module": "./hx-card.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
       "path": "src/components/hx-button/hx-button.ts",
       "declarations": [
         {
@@ -759,705 +1030,6 @@
           "declaration": {
             "name": "HelixButton",
             "module": "./hx-button.js"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
-      "path": "src/components/hx-checkbox/hx-checkbox.ts",
-      "declarations": [
-        {
-          "kind": "class",
-          "description": "A checkbox component with label, validation, and form association.",
-          "name": "HelixCheckbox",
-          "cssProperties": [
-            {
-              "description": "Checkbox dimensions.",
-              "name": "--hx-checkbox-size",
-              "default": "var(--hx-size-5, 1.25rem)"
-            },
-            {
-              "description": "Checkbox border color.",
-              "name": "--hx-checkbox-border-color",
-              "default": "var(--hx-color-neutral-300, #ced4da)"
-            },
-            {
-              "description": "Checkbox border radius.",
-              "name": "--hx-checkbox-border-radius",
-              "default": "var(--hx-border-radius-sm, 0.25rem)"
-            },
-            {
-              "description": "Checked background color.",
-              "name": "--hx-checkbox-checked-bg",
-              "default": "var(--hx-color-primary-500, #2563EB)"
-            },
-            {
-              "description": "Checked border color.",
-              "name": "--hx-checkbox-checked-border-color",
-              "default": "var(--hx-color-primary-500, #2563EB)"
-            },
-            {
-              "description": "Checkmark color.",
-              "name": "--hx-checkbox-checkmark-color",
-              "default": "var(--hx-color-neutral-0, #ffffff)"
-            },
-            {
-              "description": "Focus ring color.",
-              "name": "--hx-checkbox-focus-ring-color",
-              "default": "var(--hx-focus-ring-color, #2563EB)"
-            },
-            {
-              "description": "Label text color.",
-              "name": "--hx-checkbox-label-color",
-              "default": "var(--hx-color-neutral-700, #343a40)"
-            },
-            {
-              "description": "Error state color.",
-              "name": "--hx-checkbox-error-color",
-              "default": "var(--hx-color-error-500, #dc3545)"
-            }
-          ],
-          "cssParts": [
-            {
-              "description": "The visual checkbox element.",
-              "name": "checkbox"
-            },
-            {
-              "description": "The label element.",
-              "name": "label"
-            },
-            {
-              "description": "The help text container.",
-              "name": "help-text"
-            },
-            {
-              "description": "The error message container.",
-              "name": "error"
-            },
-            {
-              "description": "The wrapper around checkbox and label.",
-              "name": "control"
-            }
-          ],
-          "slots": [
-            {
-              "description": "Custom label content (overrides the label property).",
-              "name": ""
-            },
-            {
-              "description": "Custom error content (overrides the error property).",
-              "name": "error"
-            },
-            {
-              "description": "Custom help text content (overrides the helpText property).",
-              "name": "help-text"
-            }
-          ],
-          "members": [
-            {
-              "kind": "field",
-              "name": "formAssociated",
-              "type": {
-                "text": "boolean"
-              },
-              "static": true,
-              "default": "true"
-            },
-            {
-              "kind": "field",
-              "name": "_internals",
-              "type": {
-                "text": "ElementInternals"
-              },
-              "privacy": "private"
-            },
-            {
-              "kind": "field",
-              "name": "checked",
-              "type": {
-                "text": "boolean"
-              },
-              "default": "false",
-              "description": "Whether the checkbox is checked.",
-              "attribute": "checked",
-              "reflects": true
-            },
-            {
-              "kind": "field",
-              "name": "indeterminate",
-              "type": {
-                "text": "boolean"
-              },
-              "default": "false",
-              "description": "Whether the checkbox is in an indeterminate state (e.g., for \"select all\" patterns).",
-              "attribute": "indeterminate"
-            },
-            {
-              "kind": "field",
-              "name": "disabled",
-              "type": {
-                "text": "boolean"
-              },
-              "default": "false",
-              "description": "Whether the checkbox is disabled.",
-              "attribute": "disabled",
-              "reflects": true
-            },
-            {
-              "kind": "field",
-              "name": "required",
-              "type": {
-                "text": "boolean"
-              },
-              "default": "false",
-              "description": "Whether the checkbox is required for form submission.",
-              "attribute": "required",
-              "reflects": true
-            },
-            {
-              "kind": "field",
-              "name": "name",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "description": "The name of the checkbox, used for form submission.",
-              "attribute": "name"
-            },
-            {
-              "kind": "field",
-              "name": "value",
-              "type": {
-                "text": "string"
-              },
-              "default": "'on'",
-              "description": "The value submitted when the checkbox is checked.",
-              "attribute": "value"
-            },
-            {
-              "kind": "field",
-              "name": "label",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "description": "The visible label text for the checkbox.",
-              "attribute": "label"
-            },
-            {
-              "kind": "field",
-              "name": "error",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "description": "Error message to display. When set, the checkbox enters an error state.",
-              "attribute": "error"
-            },
-            {
-              "kind": "field",
-              "name": "helpText",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "description": "Help text displayed below the checkbox for guidance.",
-              "attribute": "help-text"
-            },
-            {
-              "kind": "field",
-              "name": "_inputEl",
-              "type": {
-                "text": "HTMLInputElement"
-              },
-              "privacy": "private"
-            },
-            {
-              "kind": "field",
-              "name": "_hasErrorSlot",
-              "type": {
-                "text": "boolean"
-              },
-              "privacy": "private",
-              "default": "false"
-            },
-            {
-              "kind": "method",
-              "name": "_handleErrorSlotChange",
-              "privacy": "private",
-              "return": {
-                "type": {
-                  "text": "void"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "e",
-                  "type": {
-                    "text": "Event"
-                  }
-                }
-              ]
-            },
-            {
-              "kind": "field",
-              "name": "form",
-              "type": {
-                "text": "HTMLFormElement | null"
-              },
-              "description": "Returns the associated form element, if any.",
-              "readonly": true
-            },
-            {
-              "kind": "field",
-              "name": "validationMessage",
-              "type": {
-                "text": "string"
-              },
-              "description": "Returns the validation message.",
-              "readonly": true
-            },
-            {
-              "kind": "field",
-              "name": "validity",
-              "type": {
-                "text": "ValidityState"
-              },
-              "description": "Returns the ValidityState object.",
-              "readonly": true
-            },
-            {
-              "kind": "method",
-              "name": "checkValidity",
-              "return": {
-                "type": {
-                  "text": "boolean"
-                }
-              },
-              "description": "Checks whether the checkbox satisfies its constraints."
-            },
-            {
-              "kind": "method",
-              "name": "reportValidity",
-              "return": {
-                "type": {
-                  "text": "boolean"
-                }
-              },
-              "description": "Reports validity and shows the browser's constraint validation UI."
-            },
-            {
-              "kind": "method",
-              "name": "_updateValidity",
-              "privacy": "private",
-              "return": {
-                "type": {
-                  "text": "void"
-                }
-              }
-            },
-            {
-              "kind": "method",
-              "name": "formResetCallback",
-              "return": {
-                "type": {
-                  "text": "void"
-                }
-              },
-              "description": "Called by the form when it resets."
-            },
-            {
-              "kind": "method",
-              "name": "formStateRestoreCallback",
-              "return": {
-                "type": {
-                  "text": "void"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "state",
-                  "type": {
-                    "text": "string"
-                  }
-                }
-              ],
-              "description": "Called when the form restores state (e.g., back/forward navigation)."
-            },
-            {
-              "kind": "method",
-              "name": "_handleChange",
-              "privacy": "private",
-              "return": {
-                "type": {
-                  "text": "void"
-                }
-              }
-            },
-            {
-              "kind": "method",
-              "name": "_handleKeyDown",
-              "privacy": "private",
-              "return": {
-                "type": {
-                  "text": "void"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "e",
-                  "type": {
-                    "text": "KeyboardEvent"
-                  }
-                }
-              ]
-            },
-            {
-              "kind": "method",
-              "name": "focus",
-              "return": {
-                "type": {
-                  "text": "void"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "options",
-                  "optional": true,
-                  "type": {
-                    "text": "FocusOptions"
-                  }
-                }
-              ],
-              "description": "Moves focus to the checkbox input element."
-            },
-            {
-              "kind": "field",
-              "name": "_id",
-              "privacy": "private",
-              "default": "`hx-checkbox-${Math.random().toString(36).slice(2, 9)}`"
-            },
-            {
-              "kind": "field",
-              "name": "_helpTextId",
-              "privacy": "private",
-              "default": "`${this._id}-help`"
-            },
-            {
-              "kind": "field",
-              "name": "_errorId",
-              "privacy": "private",
-              "default": "`${this._id}-error`"
-            },
-            {
-              "kind": "field",
-              "name": "_labelId",
-              "privacy": "private",
-              "default": "`${this._id}-label`"
-            }
-          ],
-          "events": [
-            {
-              "name": "hx-change",
-              "type": {
-                "text": "CustomEvent<{checked: boolean, value: string}>"
-              },
-              "description": "Dispatched when the checkbox is toggled."
-            }
-          ],
-          "attributes": [
-            {
-              "name": "checked",
-              "type": {
-                "text": "boolean"
-              },
-              "default": "false",
-              "description": "Whether the checkbox is checked.",
-              "fieldName": "checked",
-              "attribute": "checked"
-            },
-            {
-              "name": "indeterminate",
-              "type": {
-                "text": "boolean"
-              },
-              "default": "false",
-              "description": "Whether the checkbox is in an indeterminate state (e.g., for \"select all\" patterns).",
-              "fieldName": "indeterminate",
-              "attribute": "indeterminate"
-            },
-            {
-              "name": "disabled",
-              "type": {
-                "text": "boolean"
-              },
-              "default": "false",
-              "description": "Whether the checkbox is disabled.",
-              "fieldName": "disabled",
-              "attribute": "disabled"
-            },
-            {
-              "name": "required",
-              "type": {
-                "text": "boolean"
-              },
-              "default": "false",
-              "description": "Whether the checkbox is required for form submission.",
-              "fieldName": "required",
-              "attribute": "required"
-            },
-            {
-              "name": "name",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "description": "The name of the checkbox, used for form submission.",
-              "fieldName": "name",
-              "attribute": "name"
-            },
-            {
-              "name": "value",
-              "type": {
-                "text": "string"
-              },
-              "default": "'on'",
-              "description": "The value submitted when the checkbox is checked.",
-              "fieldName": "value",
-              "attribute": "value"
-            },
-            {
-              "name": "label",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "description": "The visible label text for the checkbox.",
-              "fieldName": "label",
-              "attribute": "label"
-            },
-            {
-              "name": "error",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "description": "Error message to display. When set, the checkbox enters an error state.",
-              "fieldName": "error",
-              "attribute": "error"
-            },
-            {
-              "name": "help-text",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "description": "Help text displayed below the checkbox for guidance.",
-              "fieldName": "helpText",
-              "attribute": "help-text"
-            }
-          ],
-          "superclass": {
-            "name": "LitElement",
-            "package": "lit"
-          },
-          "tagName": "hx-checkbox",
-          "customElement": true,
-          "summary": "Form-associated checkbox with built-in label, error, and help text."
-        }
-      ],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "HelixCheckbox",
-          "declaration": {
-            "name": "HelixCheckbox",
-            "module": "src/components/hx-checkbox/hx-checkbox.ts"
-          }
-        },
-        {
-          "kind": "custom-element-definition",
-          "name": "hx-checkbox",
-          "declaration": {
-            "name": "HelixCheckbox",
-            "module": "src/components/hx-checkbox/hx-checkbox.ts"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
-      "path": "src/components/hx-checkbox/index.ts",
-      "declarations": [],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "HelixCheckbox",
-          "declaration": {
-            "name": "HelixCheckbox",
-            "module": "./hx-checkbox.js"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
-      "path": "src/components/hx-prose/hx-prose.ts",
-      "declarations": [
-        {
-          "kind": "class",
-          "description": "A Light DOM prose container that applies typographic styles to rich text\ncontent such as CKEditor output, Markdown-rendered HTML, or any structured\nbody copy.\n\nRenders in the Light DOM (no Shadow DOM) so that global and scoped styles\ncan target child elements directly. Uses the AdoptedStylesheetsController\nto inject scoped prose CSS into the document without duplication.",
-          "name": "HelixProse",
-          "cssProperties": [
-            {
-              "description": "Maximum content width.",
-              "name": "--hx-prose-max-width",
-              "default": "720px"
-            },
-            {
-              "description": "Base font size.",
-              "name": "--hx-prose-font-size",
-              "default": "var(--hx-font-size-base)"
-            },
-            {
-              "description": "Base line height.",
-              "name": "--hx-prose-line-height",
-              "default": "var(--hx-line-height-relaxed)"
-            },
-            {
-              "description": "Body text color.",
-              "name": "--hx-prose-color",
-              "default": "var(--hx-color-text)"
-            },
-            {
-              "description": "Heading color.",
-              "name": "--hx-prose-heading-color",
-              "default": "var(--hx-color-text-strong)"
-            },
-            {
-              "description": "Link color.",
-              "name": "--hx-prose-link-color",
-              "default": "var(--hx-color-primary)"
-            }
-          ],
-          "slots": [
-            {
-              "description": "Default slot for rich text content (headings, paragraphs, lists, tables, etc.).",
-              "name": ""
-            }
-          ],
-          "members": [
-            {
-              "kind": "field",
-              "name": "_styles",
-              "privacy": "private",
-              "default": "new AdoptedStylesheetsController(this, helixProseScopedCss, document)"
-            },
-            {
-              "kind": "field",
-              "name": "size",
-              "type": {
-                "text": "'sm' | 'base' | 'lg'"
-              },
-              "default": "'base'",
-              "description": "Typography scale for the prose content.",
-              "attribute": "size",
-              "reflects": true
-            },
-            {
-              "kind": "field",
-              "name": "maxWidth",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "description": "Maximum content width. When set, overrides the --hx-prose-max-width token.\nAccepts any valid CSS width value (e.g., '640px', '80ch', '100%').",
-              "attribute": "max-width",
-              "reflects": true
-            },
-            {
-              "kind": "method",
-              "name": "_applyMaxWidth",
-              "privacy": "private",
-              "return": {
-                "type": {
-                  "text": "void"
-                }
-              }
-            },
-            {
-              "kind": "method",
-              "name": "_applySize",
-              "privacy": "private",
-              "return": {
-                "type": {
-                  "text": "void"
-                }
-              }
-            }
-          ],
-          "attributes": [
-            {
-              "name": "size",
-              "type": {
-                "text": "'sm' | 'base' | 'lg'"
-              },
-              "default": "'base'",
-              "description": "Typography scale for the prose content.",
-              "fieldName": "size",
-              "attribute": "size"
-            },
-            {
-              "name": "max-width",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "description": "Maximum content width. When set, overrides the --hx-prose-max-width token.\nAccepts any valid CSS width value (e.g., '640px', '80ch', '100%').",
-              "fieldName": "maxWidth",
-              "attribute": "max-width"
-            }
-          ],
-          "superclass": {
-            "name": "LitElement",
-            "package": "lit"
-          },
-          "tagName": "hx-prose",
-          "customElement": true,
-          "summary": "Light DOM typography wrapper for rich text and CMS content."
-        }
-      ],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "HelixProse",
-          "declaration": {
-            "name": "HelixProse",
-            "module": "src/components/hx-prose/hx-prose.ts"
-          }
-        },
-        {
-          "kind": "custom-element-definition",
-          "name": "hx-prose",
-          "declaration": {
-            "name": "HelixProse",
-            "module": "src/components/hx-prose/hx-prose.ts"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
-      "path": "src/components/hx-prose/index.ts",
-      "declarations": [],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "HelixProse",
-          "declaration": {
-            "name": "HelixProse",
-            "module": "./hx-prose.js"
           }
         }
       ]
@@ -1882,150 +1454,467 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/components/hx-card/hx-card.ts",
+      "path": "src/components/hx-prose/hx-prose.ts",
       "declarations": [
         {
           "kind": "class",
-          "description": "A flexible card component for displaying grouped content.",
-          "name": "HelixCard",
+          "description": "A Light DOM prose container that applies typographic styles to rich text\ncontent such as CKEditor output, Markdown-rendered HTML, or any structured\nbody copy.\n\nRenders in the Light DOM (no Shadow DOM) so that global and scoped styles\ncan target child elements directly. Uses the AdoptedStylesheetsController\nto inject scoped prose CSS into the document without duplication.",
+          "name": "HelixProse",
           "cssProperties": [
             {
-              "description": "Card background color.",
-              "name": "--hx-card-bg",
-              "default": "var(--hx-color-neutral-0)"
+              "description": "Maximum content width.",
+              "name": "--hx-prose-max-width",
+              "default": "720px"
             },
             {
-              "description": "Card text color.",
-              "name": "--hx-card-color",
-              "default": "var(--hx-color-neutral-800)"
+              "description": "Base font size.",
+              "name": "--hx-prose-font-size",
+              "default": "var(--hx-font-size-base)"
             },
             {
-              "description": "Card border color.",
-              "name": "--hx-card-border-color",
-              "default": "var(--hx-color-neutral-200)"
+              "description": "Base line height.",
+              "name": "--hx-prose-line-height",
+              "default": "var(--hx-line-height-relaxed)"
             },
             {
-              "description": "Card border radius.",
-              "name": "--hx-card-border-radius",
-              "default": "var(--hx-border-radius-lg)"
+              "description": "Body text color.",
+              "name": "--hx-prose-color",
+              "default": "var(--hx-color-text)"
             },
             {
-              "description": "Internal padding for card sections.",
-              "name": "--hx-card-padding",
-              "default": "var(--hx-space-6)"
+              "description": "Heading color.",
+              "name": "--hx-prose-heading-color",
+              "default": "var(--hx-color-text-strong)"
             },
             {
-              "description": "Gap between card sections.",
-              "name": "--hx-card-gap",
-              "default": "var(--hx-space-4)"
-            }
-          ],
-          "cssParts": [
-            {
-              "description": "The outer card container element.",
-              "name": "card"
-            },
-            {
-              "description": "The image slot container.",
-              "name": "image"
-            },
-            {
-              "description": "The heading slot container.",
-              "name": "heading"
-            },
-            {
-              "description": "The body slot container.",
-              "name": "body"
-            },
-            {
-              "description": "The footer slot container.",
-              "name": "footer"
-            },
-            {
-              "description": "The actions slot container.",
-              "name": "actions"
+              "description": "Link color.",
+              "name": "--hx-prose-link-color",
+              "default": "var(--hx-color-primary)"
             }
           ],
           "slots": [
             {
-              "description": "Optional image or media content at the top of the card.",
-              "name": "image"
-            },
-            {
-              "description": "The card heading/title content.",
-              "name": "heading"
-            },
-            {
-              "description": "Default slot for the card body content.",
+              "description": "Default slot for rich text content (headings, paragraphs, lists, tables, etc.).",
               "name": ""
-            },
-            {
-              "description": "Optional footer content below the body.",
-              "name": "footer"
-            },
-            {
-              "description": "Optional action buttons, rendered with a top border separator.",
-              "name": "actions"
             }
           ],
           "members": [
             {
               "kind": "field",
-              "name": "variant",
+              "name": "_styles",
+              "privacy": "private",
+              "default": "new AdoptedStylesheetsController(this, helixProseScopedCss, document)"
+            },
+            {
+              "kind": "field",
+              "name": "size",
               "type": {
-                "text": "'default' | 'featured' | 'compact'"
+                "text": "'sm' | 'base' | 'lg'"
               },
-              "default": "'default'",
-              "description": "Visual style variant of the card.",
-              "attribute": "variant",
+              "default": "'base'",
+              "description": "Typography scale for the prose content.",
+              "attribute": "size",
               "reflects": true
             },
             {
               "kind": "field",
-              "name": "elevation",
-              "type": {
-                "text": "'flat' | 'raised' | 'floating'"
-              },
-              "default": "'flat'",
-              "description": "Elevation (shadow depth) of the card.",
-              "attribute": "elevation",
-              "reflects": true
-            },
-            {
-              "kind": "field",
-              "name": "wcHref",
+              "name": "maxWidth",
               "type": {
                 "text": "string"
               },
               "default": "''",
-              "description": "Optional URL. When set, the card becomes interactive (clickable)\nand navigates to this URL on click.\nUses wc-href to avoid conflicting with the native HTML href attribute.",
-              "attribute": "hx-href"
-            },
-            {
-              "kind": "field",
-              "name": "_hasSlotContent",
-              "type": {
-                "text": "Record<string, boolean>"
-              },
-              "privacy": "private",
-              "default": "{ image: false, heading: false, footer: false, actions: false, }"
+              "description": "Maximum content width. When set, overrides the --hx-prose-max-width token.\nAccepts any valid CSS width value (e.g., '640px', '80ch', '100%').",
+              "attribute": "max-width",
+              "reflects": true
             },
             {
               "kind": "method",
-              "name": "_handleSlotChange",
+              "name": "_applyMaxWidth",
               "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "_applySize",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              }
+            }
+          ],
+          "attributes": [
+            {
+              "name": "size",
+              "type": {
+                "text": "'sm' | 'base' | 'lg'"
+              },
+              "default": "'base'",
+              "description": "Typography scale for the prose content.",
+              "fieldName": "size",
+              "attribute": "size"
+            },
+            {
+              "name": "max-width",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Maximum content width. When set, overrides the --hx-prose-max-width token.\nAccepts any valid CSS width value (e.g., '640px', '80ch', '100%').",
+              "fieldName": "maxWidth",
+              "attribute": "max-width"
+            }
+          ],
+          "superclass": {
+            "name": "LitElement",
+            "package": "lit"
+          },
+          "tagName": "hx-prose",
+          "customElement": true,
+          "summary": "Light DOM typography wrapper for rich text and CMS content."
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "HelixProse",
+          "declaration": {
+            "name": "HelixProse",
+            "module": "src/components/hx-prose/hx-prose.ts"
+          }
+        },
+        {
+          "kind": "custom-element-definition",
+          "name": "hx-prose",
+          "declaration": {
+            "name": "HelixProse",
+            "module": "src/components/hx-prose/hx-prose.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/components/hx-prose/index.ts",
+      "declarations": [],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "HelixProse",
+          "declaration": {
+            "name": "HelixProse",
+            "module": "./hx-prose.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/components/hx-switch/hx-switch.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "A toggle switch component for on/off states.",
+          "name": "HelixSwitch",
+          "cssProperties": [
+            {
+              "description": "Track background color.",
+              "name": "--hx-switch-track-bg",
+              "default": "var(--hx-color-neutral-300)"
+            },
+            {
+              "description": "Track background when checked.",
+              "name": "--hx-switch-track-checked-bg",
+              "default": "var(--hx-color-primary-500)"
+            },
+            {
+              "description": "Thumb background color.",
+              "name": "--hx-switch-thumb-bg",
+              "default": "var(--hx-color-neutral-0)"
+            },
+            {
+              "description": "Thumb box shadow.",
+              "name": "--hx-switch-thumb-shadow",
+              "default": "var(--hx-shadow-sm)"
+            },
+            {
+              "description": "Focus ring color.",
+              "name": "--hx-switch-focus-ring-color",
+              "default": "var(--hx-focus-ring-color)"
+            },
+            {
+              "description": "Label text color.",
+              "name": "--hx-switch-label-color",
+              "default": "var(--hx-color-neutral-700)"
+            },
+            {
+              "description": "Error message color.",
+              "name": "--hx-switch-error-color",
+              "default": "var(--hx-color-error-500)"
+            }
+          ],
+          "cssParts": [
+            {
+              "description": "The switch container (track + thumb wrapper).",
+              "name": "switch"
+            },
+            {
+              "description": "The track background element.",
+              "name": "track"
+            },
+            {
+              "description": "The sliding thumb element.",
+              "name": "thumb"
+            },
+            {
+              "description": "The label text element.",
+              "name": "label"
+            },
+            {
+              "description": "The help text container.",
+              "name": "help-text"
+            },
+            {
+              "description": "The error message container.",
+              "name": "error"
+            }
+          ],
+          "slots": [
+            {
+              "description": "Custom label content (overrides the label property).",
+              "name": ""
+            },
+            {
+              "description": "Custom error content (overrides the error property).",
+              "name": "error"
+            },
+            {
+              "description": "Custom help text content (overrides the helpText property).",
+              "name": "help-text"
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "formAssociated",
+              "type": {
+                "text": "boolean"
+              },
+              "static": true,
+              "default": "true"
+            },
+            {
+              "kind": "field",
+              "name": "_internals",
+              "type": {
+                "text": "ElementInternals"
+              },
+              "privacy": "private"
+            },
+            {
+              "kind": "field",
+              "name": "checked",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the switch is toggled on.",
+              "attribute": "checked",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "disabled",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the switch is disabled.",
+              "attribute": "disabled",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "required",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the switch is required for form submission.",
+              "attribute": "required",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "name",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "The name of the switch, used for form submission.",
+              "attribute": "name"
+            },
+            {
+              "kind": "field",
+              "name": "value",
+              "type": {
+                "text": "string"
+              },
+              "default": "'on'",
+              "description": "The value submitted when the switch is checked.",
+              "attribute": "value"
+            },
+            {
+              "kind": "field",
+              "name": "label",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "The visible label text for the switch.",
+              "attribute": "label"
+            },
+            {
+              "kind": "field",
+              "name": "size",
+              "type": {
+                "text": "'sm' | 'md' | 'lg'"
+              },
+              "default": "'md'",
+              "description": "Size variant of the switch.",
+              "attribute": "hx-size",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "error",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Error message to display. When set, the switch enters an error state.",
+              "attribute": "error"
+            },
+            {
+              "kind": "field",
+              "name": "helpText",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Help text displayed below the switch for guidance.",
+              "attribute": "help-text"
+            },
+            {
+              "kind": "field",
+              "name": "form",
+              "type": {
+                "text": "HTMLFormElement | null"
+              },
+              "description": "Returns the associated form element, if any.",
+              "readonly": true
+            },
+            {
+              "kind": "field",
+              "name": "validationMessage",
+              "type": {
+                "text": "string"
+              },
+              "description": "Returns the validation message.",
+              "readonly": true
+            },
+            {
+              "kind": "field",
+              "name": "validity",
+              "type": {
+                "text": "ValidityState"
+              },
+              "description": "Returns the ValidityState object.",
+              "readonly": true
+            },
+            {
+              "kind": "method",
+              "name": "checkValidity",
+              "return": {
+                "type": {
+                  "text": "boolean"
+                }
+              },
+              "description": "Checks whether the switch satisfies its constraints."
+            },
+            {
+              "kind": "method",
+              "name": "reportValidity",
+              "return": {
+                "type": {
+                  "text": "boolean"
+                }
+              },
+              "description": "Reports validity and shows the browser's constraint validation UI."
+            },
+            {
+              "kind": "method",
+              "name": "_updateValidity",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "formResetCallback",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Called by the form when it resets."
+            },
+            {
+              "kind": "method",
+              "name": "formStateRestoreCallback",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
               "parameters": [
                 {
-                  "name": "slotName",
+                  "name": "state",
                   "type": {
                     "text": "string"
                   }
                 }
-              ]
+              ],
+              "description": "Called when the form restores state (e.g., back/forward navigation)."
+            },
+            {
+              "kind": "field",
+              "name": "_trackEl",
+              "type": {
+                "text": "HTMLButtonElement"
+              },
+              "privacy": "private"
+            },
+            {
+              "kind": "field",
+              "name": "_hasErrorSlot",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "default": "false"
             },
             {
               "kind": "method",
-              "name": "_handleClick",
+              "name": "_handleErrorSlotChange",
               "privacy": "private",
               "return": {
                 "type": {
@@ -2036,10 +1925,30 @@
                 {
                   "name": "e",
                   "type": {
-                    "text": "MouseEvent"
+                    "text": "Event"
                   }
                 }
               ]
+            },
+            {
+              "kind": "method",
+              "name": "_toggle",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "_handleClick",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              }
             },
             {
               "kind": "method",
@@ -2058,95 +1967,191 @@
                   }
                 }
               ]
+            },
+            {
+              "kind": "method",
+              "name": "focus",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "options",
+                  "optional": true,
+                  "type": {
+                    "text": "FocusOptions"
+                  }
+                }
+              ],
+              "description": "Moves focus to the switch track element."
+            },
+            {
+              "kind": "field",
+              "name": "_switchId",
+              "privacy": "private",
+              "default": "`hx-switch-${Math.random().toString(36).slice(2, 9)}`"
+            },
+            {
+              "kind": "field",
+              "name": "_labelId",
+              "privacy": "private",
+              "default": "`${this._switchId}-label`"
+            },
+            {
+              "kind": "field",
+              "name": "_helpTextId",
+              "privacy": "private",
+              "default": "`${this._switchId}-help`"
+            },
+            {
+              "kind": "field",
+              "name": "_errorId",
+              "privacy": "private",
+              "default": "`${this._switchId}-error`"
             }
           ],
           "events": [
             {
-              "name": "hx-card-click",
+              "name": "hx-change",
               "type": {
-                "text": "CustomEvent"
+                "text": "CustomEvent<{checked: boolean}>"
               },
-              "description": "Dispatched when an interactive card is clicked.\nIncludes the target href in the detail."
-            },
-            {
-              "type": {
-                "text": "CustomEvent<{url: string, originalEvent: MouseEvent}>"
-              },
-              "description": "Dispatched when an interactive card (with wc-href) is clicked.",
-              "name": "wc-card-click"
+              "description": "Dispatched when the switch is toggled."
             }
           ],
           "attributes": [
             {
-              "name": "variant",
+              "name": "checked",
               "type": {
-                "text": "'default' | 'featured' | 'compact'"
+                "text": "boolean"
               },
-              "default": "'default'",
-              "description": "Visual style variant of the card.",
-              "fieldName": "variant",
-              "attribute": "variant"
+              "default": "false",
+              "description": "Whether the switch is toggled on.",
+              "fieldName": "checked",
+              "attribute": "checked"
             },
             {
-              "name": "elevation",
+              "name": "disabled",
               "type": {
-                "text": "'flat' | 'raised' | 'floating'"
+                "text": "boolean"
               },
-              "default": "'flat'",
-              "description": "Elevation (shadow depth) of the card.",
-              "fieldName": "elevation",
-              "attribute": "elevation"
+              "default": "false",
+              "description": "Whether the switch is disabled.",
+              "fieldName": "disabled",
+              "attribute": "disabled"
             },
             {
-              "name": "hx-href",
+              "name": "required",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the switch is required for form submission.",
+              "fieldName": "required",
+              "attribute": "required"
+            },
+            {
+              "name": "name",
               "type": {
                 "text": "string"
               },
               "default": "''",
-              "description": "Optional URL. When set, the card becomes interactive (clickable)\nand navigates to this URL on click.\nUses wc-href to avoid conflicting with the native HTML href attribute.",
-              "fieldName": "wcHref",
-              "attribute": "hx-href"
+              "description": "The name of the switch, used for form submission.",
+              "fieldName": "name",
+              "attribute": "name"
+            },
+            {
+              "name": "value",
+              "type": {
+                "text": "string"
+              },
+              "default": "'on'",
+              "description": "The value submitted when the switch is checked.",
+              "fieldName": "value",
+              "attribute": "value"
+            },
+            {
+              "name": "label",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "The visible label text for the switch.",
+              "fieldName": "label",
+              "attribute": "label"
+            },
+            {
+              "name": "hx-size",
+              "type": {
+                "text": "'sm' | 'md' | 'lg'"
+              },
+              "default": "'md'",
+              "description": "Size variant of the switch.",
+              "fieldName": "size",
+              "attribute": "hx-size"
+            },
+            {
+              "name": "error",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Error message to display. When set, the switch enters an error state.",
+              "fieldName": "error",
+              "attribute": "error"
+            },
+            {
+              "name": "help-text",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Help text displayed below the switch for guidance.",
+              "fieldName": "helpText",
+              "attribute": "help-text"
             }
           ],
           "superclass": {
             "name": "LitElement",
             "package": "lit"
           },
-          "tagName": "hx-card",
+          "tagName": "hx-switch",
           "customElement": true,
-          "summary": "Content container with image, heading, body, footer, and action slots."
+          "summary": "Form-associated toggle switch with label, error, and help text."
         }
       ],
       "exports": [
         {
           "kind": "js",
-          "name": "HelixCard",
+          "name": "HelixSwitch",
           "declaration": {
-            "name": "HelixCard",
-            "module": "src/components/hx-card/hx-card.ts"
+            "name": "HelixSwitch",
+            "module": "src/components/hx-switch/hx-switch.ts"
           }
         },
         {
           "kind": "custom-element-definition",
-          "name": "hx-card",
+          "name": "hx-switch",
           "declaration": {
-            "name": "HelixCard",
-            "module": "src/components/hx-card/hx-card.ts"
+            "name": "HelixSwitch",
+            "module": "src/components/hx-switch/hx-switch.ts"
           }
         }
       ]
     },
     {
       "kind": "javascript-module",
-      "path": "src/components/hx-card/index.ts",
+      "path": "src/components/hx-switch/index.ts",
       "declarations": [],
       "exports": [
         {
           "kind": "js",
-          "name": "HelixCard",
+          "name": "HelixSwitch",
           "declaration": {
-            "name": "HelixCard",
-            "module": "./hx-card.js"
+            "name": "HelixSwitch",
+            "module": "./hx-switch.js"
           }
         }
       ]
@@ -2743,549 +2748,6 @@
           "declaration": {
             "name": "HelixSelect",
             "module": "./hx-select.js"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
-      "path": "src/components/hx-switch/hx-switch.ts",
-      "declarations": [
-        {
-          "kind": "class",
-          "description": "A toggle switch component for on/off states.",
-          "name": "HelixSwitch",
-          "cssProperties": [
-            {
-              "description": "Track background color.",
-              "name": "--hx-switch-track-bg",
-              "default": "var(--hx-color-neutral-300)"
-            },
-            {
-              "description": "Track background when checked.",
-              "name": "--hx-switch-track-checked-bg",
-              "default": "var(--hx-color-primary-500)"
-            },
-            {
-              "description": "Thumb background color.",
-              "name": "--hx-switch-thumb-bg",
-              "default": "var(--hx-color-neutral-0)"
-            },
-            {
-              "description": "Thumb box shadow.",
-              "name": "--hx-switch-thumb-shadow",
-              "default": "var(--hx-shadow-sm)"
-            },
-            {
-              "description": "Focus ring color.",
-              "name": "--hx-switch-focus-ring-color",
-              "default": "var(--hx-focus-ring-color)"
-            },
-            {
-              "description": "Label text color.",
-              "name": "--hx-switch-label-color",
-              "default": "var(--hx-color-neutral-700)"
-            },
-            {
-              "description": "Error message color.",
-              "name": "--hx-switch-error-color",
-              "default": "var(--hx-color-error-500)"
-            }
-          ],
-          "cssParts": [
-            {
-              "description": "The switch container (track + thumb wrapper).",
-              "name": "switch"
-            },
-            {
-              "description": "The track background element.",
-              "name": "track"
-            },
-            {
-              "description": "The sliding thumb element.",
-              "name": "thumb"
-            },
-            {
-              "description": "The label text element.",
-              "name": "label"
-            },
-            {
-              "description": "The help text container.",
-              "name": "help-text"
-            },
-            {
-              "description": "The error message container.",
-              "name": "error"
-            }
-          ],
-          "slots": [
-            {
-              "description": "Custom label content (overrides the label property).",
-              "name": ""
-            },
-            {
-              "description": "Custom error content (overrides the error property).",
-              "name": "error"
-            },
-            {
-              "description": "Custom help text content (overrides the helpText property).",
-              "name": "help-text"
-            }
-          ],
-          "members": [
-            {
-              "kind": "field",
-              "name": "formAssociated",
-              "type": {
-                "text": "boolean"
-              },
-              "static": true,
-              "default": "true"
-            },
-            {
-              "kind": "field",
-              "name": "_internals",
-              "type": {
-                "text": "ElementInternals"
-              },
-              "privacy": "private"
-            },
-            {
-              "kind": "field",
-              "name": "checked",
-              "type": {
-                "text": "boolean"
-              },
-              "default": "false",
-              "description": "Whether the switch is toggled on.",
-              "attribute": "checked",
-              "reflects": true
-            },
-            {
-              "kind": "field",
-              "name": "disabled",
-              "type": {
-                "text": "boolean"
-              },
-              "default": "false",
-              "description": "Whether the switch is disabled.",
-              "attribute": "disabled",
-              "reflects": true
-            },
-            {
-              "kind": "field",
-              "name": "required",
-              "type": {
-                "text": "boolean"
-              },
-              "default": "false",
-              "description": "Whether the switch is required for form submission.",
-              "attribute": "required",
-              "reflects": true
-            },
-            {
-              "kind": "field",
-              "name": "name",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "description": "The name of the switch, used for form submission.",
-              "attribute": "name"
-            },
-            {
-              "kind": "field",
-              "name": "value",
-              "type": {
-                "text": "string"
-              },
-              "default": "'on'",
-              "description": "The value submitted when the switch is checked.",
-              "attribute": "value"
-            },
-            {
-              "kind": "field",
-              "name": "label",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "description": "The visible label text for the switch.",
-              "attribute": "label"
-            },
-            {
-              "kind": "field",
-              "name": "size",
-              "type": {
-                "text": "'sm' | 'md' | 'lg'"
-              },
-              "default": "'md'",
-              "description": "Size variant of the switch.",
-              "attribute": "hx-size",
-              "reflects": true
-            },
-            {
-              "kind": "field",
-              "name": "error",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "description": "Error message to display. When set, the switch enters an error state.",
-              "attribute": "error"
-            },
-            {
-              "kind": "field",
-              "name": "helpText",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "description": "Help text displayed below the switch for guidance.",
-              "attribute": "help-text"
-            },
-            {
-              "kind": "field",
-              "name": "form",
-              "type": {
-                "text": "HTMLFormElement | null"
-              },
-              "description": "Returns the associated form element, if any.",
-              "readonly": true
-            },
-            {
-              "kind": "field",
-              "name": "validationMessage",
-              "type": {
-                "text": "string"
-              },
-              "description": "Returns the validation message.",
-              "readonly": true
-            },
-            {
-              "kind": "field",
-              "name": "validity",
-              "type": {
-                "text": "ValidityState"
-              },
-              "description": "Returns the ValidityState object.",
-              "readonly": true
-            },
-            {
-              "kind": "method",
-              "name": "checkValidity",
-              "return": {
-                "type": {
-                  "text": "boolean"
-                }
-              },
-              "description": "Checks whether the switch satisfies its constraints."
-            },
-            {
-              "kind": "method",
-              "name": "reportValidity",
-              "return": {
-                "type": {
-                  "text": "boolean"
-                }
-              },
-              "description": "Reports validity and shows the browser's constraint validation UI."
-            },
-            {
-              "kind": "method",
-              "name": "_updateValidity",
-              "privacy": "private",
-              "return": {
-                "type": {
-                  "text": "void"
-                }
-              }
-            },
-            {
-              "kind": "method",
-              "name": "formResetCallback",
-              "return": {
-                "type": {
-                  "text": "void"
-                }
-              },
-              "description": "Called by the form when it resets."
-            },
-            {
-              "kind": "method",
-              "name": "formStateRestoreCallback",
-              "return": {
-                "type": {
-                  "text": "void"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "state",
-                  "type": {
-                    "text": "string"
-                  }
-                }
-              ],
-              "description": "Called when the form restores state (e.g., back/forward navigation)."
-            },
-            {
-              "kind": "field",
-              "name": "_trackEl",
-              "type": {
-                "text": "HTMLButtonElement"
-              },
-              "privacy": "private"
-            },
-            {
-              "kind": "field",
-              "name": "_hasErrorSlot",
-              "type": {
-                "text": "boolean"
-              },
-              "privacy": "private",
-              "default": "false"
-            },
-            {
-              "kind": "method",
-              "name": "_handleErrorSlotChange",
-              "privacy": "private",
-              "return": {
-                "type": {
-                  "text": "void"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "e",
-                  "type": {
-                    "text": "Event"
-                  }
-                }
-              ]
-            },
-            {
-              "kind": "method",
-              "name": "_toggle",
-              "privacy": "private",
-              "return": {
-                "type": {
-                  "text": "void"
-                }
-              }
-            },
-            {
-              "kind": "method",
-              "name": "_handleClick",
-              "privacy": "private",
-              "return": {
-                "type": {
-                  "text": "void"
-                }
-              }
-            },
-            {
-              "kind": "method",
-              "name": "_handleKeyDown",
-              "privacy": "private",
-              "return": {
-                "type": {
-                  "text": "void"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "e",
-                  "type": {
-                    "text": "KeyboardEvent"
-                  }
-                }
-              ]
-            },
-            {
-              "kind": "method",
-              "name": "focus",
-              "return": {
-                "type": {
-                  "text": "void"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "options",
-                  "optional": true,
-                  "type": {
-                    "text": "FocusOptions"
-                  }
-                }
-              ],
-              "description": "Moves focus to the switch track element."
-            },
-            {
-              "kind": "field",
-              "name": "_switchId",
-              "privacy": "private",
-              "default": "`hx-switch-${Math.random().toString(36).slice(2, 9)}`"
-            },
-            {
-              "kind": "field",
-              "name": "_labelId",
-              "privacy": "private",
-              "default": "`${this._switchId}-label`"
-            },
-            {
-              "kind": "field",
-              "name": "_helpTextId",
-              "privacy": "private",
-              "default": "`${this._switchId}-help`"
-            },
-            {
-              "kind": "field",
-              "name": "_errorId",
-              "privacy": "private",
-              "default": "`${this._switchId}-error`"
-            }
-          ],
-          "events": [
-            {
-              "name": "hx-change",
-              "type": {
-                "text": "CustomEvent<{checked: boolean}>"
-              },
-              "description": "Dispatched when the switch is toggled."
-            }
-          ],
-          "attributes": [
-            {
-              "name": "checked",
-              "type": {
-                "text": "boolean"
-              },
-              "default": "false",
-              "description": "Whether the switch is toggled on.",
-              "fieldName": "checked",
-              "attribute": "checked"
-            },
-            {
-              "name": "disabled",
-              "type": {
-                "text": "boolean"
-              },
-              "default": "false",
-              "description": "Whether the switch is disabled.",
-              "fieldName": "disabled",
-              "attribute": "disabled"
-            },
-            {
-              "name": "required",
-              "type": {
-                "text": "boolean"
-              },
-              "default": "false",
-              "description": "Whether the switch is required for form submission.",
-              "fieldName": "required",
-              "attribute": "required"
-            },
-            {
-              "name": "name",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "description": "The name of the switch, used for form submission.",
-              "fieldName": "name",
-              "attribute": "name"
-            },
-            {
-              "name": "value",
-              "type": {
-                "text": "string"
-              },
-              "default": "'on'",
-              "description": "The value submitted when the switch is checked.",
-              "fieldName": "value",
-              "attribute": "value"
-            },
-            {
-              "name": "label",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "description": "The visible label text for the switch.",
-              "fieldName": "label",
-              "attribute": "label"
-            },
-            {
-              "name": "hx-size",
-              "type": {
-                "text": "'sm' | 'md' | 'lg'"
-              },
-              "default": "'md'",
-              "description": "Size variant of the switch.",
-              "fieldName": "size",
-              "attribute": "hx-size"
-            },
-            {
-              "name": "error",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "description": "Error message to display. When set, the switch enters an error state.",
-              "fieldName": "error",
-              "attribute": "error"
-            },
-            {
-              "name": "help-text",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "description": "Help text displayed below the switch for guidance.",
-              "fieldName": "helpText",
-              "attribute": "help-text"
-            }
-          ],
-          "superclass": {
-            "name": "LitElement",
-            "package": "lit"
-          },
-          "tagName": "hx-switch",
-          "customElement": true,
-          "summary": "Form-associated toggle switch with label, error, and help text."
-        }
-      ],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "HelixSwitch",
-          "declaration": {
-            "name": "HelixSwitch",
-            "module": "src/components/hx-switch/hx-switch.ts"
-          }
-        },
-        {
-          "kind": "custom-element-definition",
-          "name": "hx-switch",
-          "declaration": {
-            "name": "HelixSwitch",
-            "module": "src/components/hx-switch/hx-switch.ts"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
-      "path": "src/components/hx-switch/index.ts",
-      "declarations": [],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "HelixSwitch",
-          "declaration": {
-            "name": "HelixSwitch",
-            "module": "./hx-switch.js"
           }
         }
       ]
@@ -3970,6 +3432,544 @@
           "declaration": {
             "name": "HelixRadio",
             "module": "./hx-radio.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/components/hx-checkbox/hx-checkbox.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "A checkbox component with label, validation, and form association.",
+          "name": "HelixCheckbox",
+          "cssProperties": [
+            {
+              "description": "Checkbox dimensions.",
+              "name": "--hx-checkbox-size",
+              "default": "var(--hx-size-5, 1.25rem)"
+            },
+            {
+              "description": "Checkbox border color.",
+              "name": "--hx-checkbox-border-color",
+              "default": "var(--hx-color-neutral-300, #ced4da)"
+            },
+            {
+              "description": "Checkbox border radius.",
+              "name": "--hx-checkbox-border-radius",
+              "default": "var(--hx-border-radius-sm, 0.25rem)"
+            },
+            {
+              "description": "Checked background color.",
+              "name": "--hx-checkbox-checked-bg",
+              "default": "var(--hx-color-primary-500, #2563EB)"
+            },
+            {
+              "description": "Checked border color.",
+              "name": "--hx-checkbox-checked-border-color",
+              "default": "var(--hx-color-primary-500, #2563EB)"
+            },
+            {
+              "description": "Checkmark color.",
+              "name": "--hx-checkbox-checkmark-color",
+              "default": "var(--hx-color-neutral-0, #ffffff)"
+            },
+            {
+              "description": "Focus ring color.",
+              "name": "--hx-checkbox-focus-ring-color",
+              "default": "var(--hx-focus-ring-color, #2563EB)"
+            },
+            {
+              "description": "Label text color.",
+              "name": "--hx-checkbox-label-color",
+              "default": "var(--hx-color-neutral-700, #343a40)"
+            },
+            {
+              "description": "Error state color.",
+              "name": "--hx-checkbox-error-color",
+              "default": "var(--hx-color-error-500, #dc3545)"
+            }
+          ],
+          "cssParts": [
+            {
+              "description": "The visual checkbox element.",
+              "name": "checkbox"
+            },
+            {
+              "description": "The label element.",
+              "name": "label"
+            },
+            {
+              "description": "The help text container.",
+              "name": "help-text"
+            },
+            {
+              "description": "The error message container.",
+              "name": "error"
+            },
+            {
+              "description": "The wrapper around checkbox and label.",
+              "name": "control"
+            }
+          ],
+          "slots": [
+            {
+              "description": "Custom label content (overrides the label property).",
+              "name": ""
+            },
+            {
+              "description": "Custom error content (overrides the error property).",
+              "name": "error"
+            },
+            {
+              "description": "Custom help text content (overrides the helpText property).",
+              "name": "help-text"
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "formAssociated",
+              "type": {
+                "text": "boolean"
+              },
+              "static": true,
+              "default": "true"
+            },
+            {
+              "kind": "field",
+              "name": "_internals",
+              "type": {
+                "text": "ElementInternals"
+              },
+              "privacy": "private"
+            },
+            {
+              "kind": "field",
+              "name": "checked",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the checkbox is checked.",
+              "attribute": "checked",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "indeterminate",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the checkbox is in an indeterminate state (e.g., for \"select all\" patterns).",
+              "attribute": "indeterminate"
+            },
+            {
+              "kind": "field",
+              "name": "disabled",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the checkbox is disabled.",
+              "attribute": "disabled",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "required",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the checkbox is required for form submission.",
+              "attribute": "required",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "name",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "The name of the checkbox, used for form submission.",
+              "attribute": "name"
+            },
+            {
+              "kind": "field",
+              "name": "value",
+              "type": {
+                "text": "string"
+              },
+              "default": "'on'",
+              "description": "The value submitted when the checkbox is checked.",
+              "attribute": "value"
+            },
+            {
+              "kind": "field",
+              "name": "label",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "The visible label text for the checkbox.",
+              "attribute": "label"
+            },
+            {
+              "kind": "field",
+              "name": "error",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Error message to display. When set, the checkbox enters an error state.",
+              "attribute": "error"
+            },
+            {
+              "kind": "field",
+              "name": "helpText",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Help text displayed below the checkbox for guidance.",
+              "attribute": "help-text"
+            },
+            {
+              "kind": "field",
+              "name": "_inputEl",
+              "type": {
+                "text": "HTMLInputElement"
+              },
+              "privacy": "private"
+            },
+            {
+              "kind": "field",
+              "name": "_hasErrorSlot",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "default": "false"
+            },
+            {
+              "kind": "method",
+              "name": "_handleErrorSlotChange",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "e",
+                  "type": {
+                    "text": "Event"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "field",
+              "name": "form",
+              "type": {
+                "text": "HTMLFormElement | null"
+              },
+              "description": "Returns the associated form element, if any.",
+              "readonly": true
+            },
+            {
+              "kind": "field",
+              "name": "validationMessage",
+              "type": {
+                "text": "string"
+              },
+              "description": "Returns the validation message.",
+              "readonly": true
+            },
+            {
+              "kind": "field",
+              "name": "validity",
+              "type": {
+                "text": "ValidityState"
+              },
+              "description": "Returns the ValidityState object.",
+              "readonly": true
+            },
+            {
+              "kind": "method",
+              "name": "checkValidity",
+              "return": {
+                "type": {
+                  "text": "boolean"
+                }
+              },
+              "description": "Checks whether the checkbox satisfies its constraints."
+            },
+            {
+              "kind": "method",
+              "name": "reportValidity",
+              "return": {
+                "type": {
+                  "text": "boolean"
+                }
+              },
+              "description": "Reports validity and shows the browser's constraint validation UI."
+            },
+            {
+              "kind": "method",
+              "name": "_updateValidity",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "formResetCallback",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Called by the form when it resets."
+            },
+            {
+              "kind": "method",
+              "name": "formStateRestoreCallback",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "state",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ],
+              "description": "Called when the form restores state (e.g., back/forward navigation)."
+            },
+            {
+              "kind": "method",
+              "name": "_handleChange",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "_handleKeyDown",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "e",
+                  "type": {
+                    "text": "KeyboardEvent"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "focus",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "options",
+                  "optional": true,
+                  "type": {
+                    "text": "FocusOptions"
+                  }
+                }
+              ],
+              "description": "Moves focus to the checkbox input element."
+            },
+            {
+              "kind": "field",
+              "name": "_id",
+              "privacy": "private",
+              "default": "`hx-checkbox-${Math.random().toString(36).slice(2, 9)}`"
+            },
+            {
+              "kind": "field",
+              "name": "_helpTextId",
+              "privacy": "private",
+              "default": "`${this._id}-help`"
+            },
+            {
+              "kind": "field",
+              "name": "_errorId",
+              "privacy": "private",
+              "default": "`${this._id}-error`"
+            },
+            {
+              "kind": "field",
+              "name": "_labelId",
+              "privacy": "private",
+              "default": "`${this._id}-label`"
+            }
+          ],
+          "events": [
+            {
+              "name": "hx-change",
+              "type": {
+                "text": "CustomEvent<{checked: boolean, value: string}>"
+              },
+              "description": "Dispatched when the checkbox is toggled."
+            }
+          ],
+          "attributes": [
+            {
+              "name": "checked",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the checkbox is checked.",
+              "fieldName": "checked",
+              "attribute": "checked"
+            },
+            {
+              "name": "indeterminate",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the checkbox is in an indeterminate state (e.g., for \"select all\" patterns).",
+              "fieldName": "indeterminate",
+              "attribute": "indeterminate"
+            },
+            {
+              "name": "disabled",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the checkbox is disabled.",
+              "fieldName": "disabled",
+              "attribute": "disabled"
+            },
+            {
+              "name": "required",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the checkbox is required for form submission.",
+              "fieldName": "required",
+              "attribute": "required"
+            },
+            {
+              "name": "name",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "The name of the checkbox, used for form submission.",
+              "fieldName": "name",
+              "attribute": "name"
+            },
+            {
+              "name": "value",
+              "type": {
+                "text": "string"
+              },
+              "default": "'on'",
+              "description": "The value submitted when the checkbox is checked.",
+              "fieldName": "value",
+              "attribute": "value"
+            },
+            {
+              "name": "label",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "The visible label text for the checkbox.",
+              "fieldName": "label",
+              "attribute": "label"
+            },
+            {
+              "name": "error",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Error message to display. When set, the checkbox enters an error state.",
+              "fieldName": "error",
+              "attribute": "error"
+            },
+            {
+              "name": "help-text",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Help text displayed below the checkbox for guidance.",
+              "fieldName": "helpText",
+              "attribute": "help-text"
+            }
+          ],
+          "superclass": {
+            "name": "LitElement",
+            "package": "lit"
+          },
+          "tagName": "hx-checkbox",
+          "customElement": true,
+          "summary": "Form-associated checkbox with built-in label, error, and help text."
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "HelixCheckbox",
+          "declaration": {
+            "name": "HelixCheckbox",
+            "module": "src/components/hx-checkbox/hx-checkbox.ts"
+          }
+        },
+        {
+          "kind": "custom-element-definition",
+          "name": "hx-checkbox",
+          "declaration": {
+            "name": "HelixCheckbox",
+            "module": "src/components/hx-checkbox/hx-checkbox.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/components/hx-checkbox/index.ts",
+      "declarations": [],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "HelixCheckbox",
+          "declaration": {
+            "name": "HelixCheckbox",
+            "module": "./hx-checkbox.js"
           }
         }
       ]

@@ -7,25 +7,35 @@ const filePath = `apps/docs/src/content/docs/${route.entry.id}`;
 
 <div class="page-title-wrapper">
   <h1 id={PAGE_TITLE_ID}>{title}</h1>
-  <div class="source-path" id="source-path-pill" onclick={`
-    (function(el) {
-      var path = '${filePath}';
-      var toast = document.getElementById('copy-toast');
-      var toastPath = document.getElementById('copy-toast-path');
+  <div class="page-title-pills">
+    <div class="source-path" id="source-path-pill" onclick={`
+      (function(el) {
+        var path = '${filePath}';
+        var toast = document.getElementById('copy-toast');
+        var toastPath = document.getElementById('copy-toast-path');
 
-      function showSuccess() {
-        el.classList.add('copied');
-        if (toast) {
-          if (toastPath) toastPath.textContent = path;
-          toast.classList.add('visible');
-          setTimeout(function() { toast.classList.remove('visible'); }, 2500);
+        function showSuccess() {
+          el.classList.add('copied');
+          if (toast) {
+            if (toastPath) toastPath.textContent = path;
+            toast.classList.add('visible');
+            setTimeout(function() { toast.classList.remove('visible'); }, 2500);
+          }
+          setTimeout(function() { el.classList.remove('copied'); }, 3000);
         }
-        setTimeout(function() { el.classList.remove('copied'); }, 3000);
-      }
 
-      if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(path).then(showSuccess).catch(function() {
-          /* fallback */
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(path).then(showSuccess).catch(function() {
+            var ta = document.createElement('textarea');
+            ta.value = path;
+            ta.style.cssText = 'position:fixed;opacity:0;left:-9999px';
+            document.body.appendChild(ta);
+            ta.select();
+            document.execCommand('copy');
+            document.body.removeChild(ta);
+            showSuccess();
+          });
+        } else {
           var ta = document.createElement('textarea');
           ta.value = path;
           ta.style.cssText = 'position:fixed;opacity:0;left:-9999px';
@@ -34,23 +44,18 @@ const filePath = `apps/docs/src/content/docs/${route.entry.id}`;
           document.execCommand('copy');
           document.body.removeChild(ta);
           showSuccess();
-        });
-      } else {
-        var ta = document.createElement('textarea');
-        ta.value = path;
-        ta.style.cssText = 'position:fixed;opacity:0;left:-9999px';
-        document.body.appendChild(ta);
-        ta.select();
-        document.execCommand('copy');
-        document.body.removeChild(ta);
-        showSuccess();
-      }
-    })(this)
-  `}>
-    <i class="fa-regular fa-copy source-copy-icon"></i>
-    <i class="fa-solid fa-check source-check-icon"></i>
-    <code class="path-text">{filePath}</code>
-    <span class="copy-label">Click to copy</span>
+        }
+      })(this)
+    `}>
+      <i class="fa-regular fa-copy source-copy-icon"></i>
+      <i class="fa-solid fa-check source-check-icon"></i>
+      <code class="path-text">{filePath}</code>
+      <span class="copy-label">Click to copy</span>
+    </div>
+    <button class="print-btn" onclick="window.print()" title="Print this page" aria-label="Print this page">
+      <i class="fa-solid fa-print"></i>
+      <span class="print-label">Print</span>
+    </button>
   </div>
 </div>
 
@@ -77,12 +82,66 @@ const filePath = `apps/docs/src/content/docs/${route.entry.id}`;
     color: var(--sl-color-white);
   }
 
+  .page-title-pills {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+    flex-wrap: wrap;
+  }
+
+  /* ===== Print button ===== */
+  .print-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.3rem 0.65rem;
+    background: var(--sl-color-gray-6, #1e1e2e);
+    border: 1px solid var(--sl-color-gray-5, #2e2e3e);
+    border-radius: 0.375rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    user-select: none;
+    -webkit-user-select: none;
+    font-family: inherit;
+    line-height: 1.2;
+  }
+
+  .print-btn:hover {
+    border-color: var(--sl-color-accent, #6c63ff);
+    background: var(--sl-color-gray-5, #2e2e3e);
+  }
+
+  .print-btn:active {
+    transform: scale(0.97);
+  }
+
+  .print-btn i {
+    font-size: 0.7rem;
+    color: var(--sl-color-gray-3, #8e8ea0);
+    transition: color 0.2s ease;
+  }
+
+  .print-btn:hover i {
+    color: var(--sl-color-accent, #6c63ff);
+  }
+
+  .print-btn .print-label {
+    font-size: 0.7rem;
+    color: var(--sl-color-gray-3, #8e8ea0);
+    transition: color 0.2s ease;
+  }
+
+  .print-btn:hover .print-label {
+    color: var(--sl-color-gray-2, #c0c0d0);
+  }
+
   /* The entire path pill is the click target */
   .source-path {
     display: inline-flex;
     align-items: center;
     gap: 0.4rem;
-    margin-top: 0.5rem;
     padding: 0.3rem 0.65rem;
     background: var(--sl-color-gray-6, #1e1e2e);
     border: 1px solid var(--sl-color-gray-5, #2e2e3e);
@@ -238,6 +297,10 @@ const filePath = `apps/docs/src/content/docs/${route.entry.id}`;
 
   /* ===== Mobile responsive ===== */
   @media (max-width: 768px) {
+    .page-title-pills {
+      gap: 0.4rem;
+    }
+
     .source-path {
       max-width: 100%;
       min-height: 44px;
@@ -248,8 +311,13 @@ const filePath = `apps/docs/src/content/docs/${route.entry.id}`;
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
-      max-width: calc(100vw - 8rem);
+      max-width: calc(100vw - 12rem);
       font-size: 0.625rem;
+    }
+
+    .print-btn {
+      min-height: 44px;
+      padding: 0.5rem 0.75rem;
     }
 
     .copy-toast {
@@ -261,6 +329,13 @@ const filePath = `apps/docs/src/content/docs/${route.entry.id}`;
 
     .copy-toast.visible {
       transform: translateY(0);
+    }
+  }
+
+  /* ===== Hide print button when printing ===== */
+  @media print {
+    .print-btn {
+      display: none !important;
     }
   }
 </style>
