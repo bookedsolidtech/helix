@@ -18,6 +18,11 @@
             "type": "command",
             "command": "npm run hooks:test-coverage-gate",
             "timeout": 3000
+          },
+          {
+            "type": "command",
+            "command": "npm run hooks:bundle-size-guard",
+            "timeout": 3000
           }
         ]
       }

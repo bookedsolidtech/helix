@@ -91,31 +91,14 @@ if [ -n "$STAGED_COMPONENT_FILES" ]; then
 fi
 
 # ==============================================================================
-# Gate 3: Bundle Size Check (if build files changed)
+# Gate 3: Bundle Size Guard (H04)
 # ==============================================================================
-if echo "$STAGED_COMPONENT_FILES" | grep -qE '\.(ts|tsx)$' && [ -n "$STAGED_COMPONENT_FILES" ]; then
-  echo "📦 Gate 3: Checking bundle size impact..."
-
-  # Build the library to check bundle size
-  if npm run build:library --silent 2>&1 | grep -v "VITE"; then
-    # Check if dist files exist
-    if [ -f "packages/hx-library/dist/index.js" ]; then
-      BUNDLE_SIZE=$(gzip -c packages/hx-library/dist/index.js | wc -c | tr -d ' ')
-      BUNDLE_KB=$(echo "scale=2; $BUNDLE_SIZE / 1024" | bc)
-      BUDGET_KB=50
-      BUDGET_BYTES=51200
-
-      if [ "$BUNDLE_SIZE" -gt "$BUDGET_BYTES" ]; then
-        echo "❌ Bundle size ${BUNDLE_KB}KB exceeds ${BUDGET_KB}KB budget"
-        FAILED=1
-      else
-        echo "✅ Bundle size ${BUNDLE_KB}KB (budget: ${BUDGET_KB}KB)"
-      fi
-    else
-      echo "⚠️  No bundle found, skipping size check"
-    fi
+if [ -n "$STAGED_COMPONENT_FILES" ]; then
+  echo "📦 Gate 3: Bundle size guard check..."
+  if npm run hooks:bundle-size-guard --silent; then
+    echo "✅ Bundle size check passed"
   else
-    echo "⚠️  Build failed, cannot check bundle size"
+    echo "❌ Bundle size check failed"
     FAILED=1
   fi
   echo ""

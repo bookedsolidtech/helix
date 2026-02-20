@@ -14,13 +14,13 @@ This directory contains Git hooks that enforce TypeScript strict mode compliance
 - **type-check-strict.ts** (H01) - Comprehensive TypeScript strict mode enforcement
 - **no-hardcoded-values.ts** (H02) - Prevent hardcoded design values, enforce design tokens
 - **test-coverage-gate.ts** (H03) - Enforce 80%+ test coverage on component files
+- **bundle-size-guard.ts** (H04) - Enforce per-component (<5KB) and total bundle (<50KB) size limits
 
 ### 🚧 Planned
 
-1. **bundle-size-guard.ts** (H04) - Enforce per-component and total bundle size limits
-2. **cem-accuracy-check.ts** (H05) - Validate Custom Elements Manifest accuracy
-3. **a11y-regression-guard.ts** (H06) - Prevent accessibility regressions
-4. **event-type-safety.ts** (H07) - Enforce `CustomEvent<DetailType>` with interfaces
+1. **cem-accuracy-check.ts** (H05) - Validate Custom Elements Manifest accuracy
+2. **a11y-regression-guard.ts** (H06) - Prevent accessibility regressions
+3. **event-type-safety.ts** (H07) - Enforce `CustomEvent<DetailType>` with interfaces
 
 ## Hook Execution Order
 
@@ -54,6 +54,12 @@ git commit
        ├─ Branch coverage (80%+ required)
        ├─ Function coverage (80%+ required)
        └─ Statement coverage (80%+ required)
+  │
+  └─ bundle-size-guard (H04)
+       ├─ Per-component size (<5KB min+gz)
+       ├─ Full bundle size (<50KB min+gz)
+       ├─ Build artifact validation
+       └─ Performance budget enforcement
      |
      v
 [Type Check] - npm run type-check
@@ -89,6 +95,10 @@ npm run hooks:no-hardcoded-values
 # Run test-coverage-gate check (H03)
 tsx scripts/hooks/test-coverage-gate.ts
 npm run hooks:test-coverage-gate
+
+# Run bundle-size-guard check (H04)
+tsx scripts/hooks/bundle-size-guard.ts
+npm run hooks:bundle-size-guard
 
 # Example hook (reference implementation)
 tsx scripts/hooks/example-no-any-types.ts
@@ -240,11 +250,11 @@ tsx scripts/hooks/example-no-any-types.ts --files "src/**/*.ts"
 | type-check-strict (H01)     | <3s      | 3s      | ✅ Implemented |
 | no-hardcoded-values (H02)   | <2s      | 2s      | ✅ Implemented |
 | test-coverage-gate (H03)    | <3s      | 3s      | ✅ Implemented |
-| bundle-size-guard (H04)     | <2s      | 5s      | 🚧 Planned     |
+| bundle-size-guard (H04)     | <3s      | 3s      | ✅ Implemented |
 | cem-accuracy-check (H05)    | <3s      | 10s     | 🚧 Planned     |
 | a11y-regression-guard (H06) | <5s      | 15s     | 🚧 Planned     |
 | event-type-safety (H07)     | <2s      | 5s      | 🚧 Planned     |
-| **Total**                   | **<20s** | **43s** | -              |
+| **Total**                   | **<20s** | **41s** | -              |
 
 ### Optimization Strategies
 

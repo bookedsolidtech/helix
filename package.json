@@ -41,6 +41,7 @@
     "hooks:type-check-strict": "tsx scripts/hooks/type-check-strict.ts",
     "hooks:no-hardcoded-values": "tsx scripts/hooks/no-hardcoded-values.ts",
     "hooks:test-coverage-gate": "tsx scripts/hooks/test-coverage-gate.ts",
+    "hooks:bundle-size-guard": "tsx scripts/hooks/bundle-size-guard.ts",
     "changeset": "changeset",
     "changeset:version": "changeset version",
     "changeset:publish": "changeset publish",
