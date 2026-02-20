@@ -41,6 +41,20 @@ if [ -n "$STAGED_TS_FILES" ]; then
 fi
 
 # ==============================================================================
+# Gate 1.5: No Hardcoded Values (for staged component files)
+# ==============================================================================
+if [ -n "$STAGED_COMPONENT_FILES" ] || [ -n "$STAGED_TS_FILES" ]; then
+  echo "🎨 Gate 1.5: Design token compliance check..."
+  if npm run hooks:no-hardcoded-values --silent; then
+    echo "✅ No hardcoded values check passed"
+  else
+    echo "❌ No hardcoded values check failed"
+    FAILED=1
+  fi
+  echo ""
+fi
+
+# ==============================================================================
 # Gate 2: Test Modified Components
 # ==============================================================================
 if [ -n "$STAGED_COMPONENT_FILES" ]; then

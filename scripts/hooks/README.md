@@ -12,14 +12,15 @@ This directory contains Git hooks that enforce TypeScript strict mode compliance
 
 - **example-no-any-types.ts** - Example implementation showing the pattern
 - **type-check-strict.ts** (H01) - Comprehensive TypeScript strict mode enforcement
+- **no-hardcoded-values.ts** (H02) - Prevent hardcoded design values, enforce design tokens
 
 ### 🚧 Planned
 
-1. **event-type-safety.ts** - Enforce `CustomEvent<DetailType>` with interfaces
-2. **jsdoc-coverage.ts** - Require JSDoc on all public APIs
-3. **cem-type-sync.ts** - Auto-sync CEM when component types change
-4. **declaration-completeness.ts** - Verify `.d.ts` generation
-5. **generic-patterns.ts** - Enforce proper generic patterns
+1. **event-type-safety.ts** (H03) - Enforce `CustomEvent<DetailType>` with interfaces
+2. **jsdoc-coverage.ts** (H04) - Require JSDoc on all public APIs
+3. **cem-type-sync.ts** (H05) - Auto-sync CEM when component types change
+4. **declaration-completeness.ts** (H06) - Verify `.d.ts` generation
+5. **generic-patterns.ts** (H07) - Enforce proper generic patterns
 
 ## Hook Execution Order
 
@@ -34,12 +35,19 @@ git commit
      |
      v
 [TypeScript Hooks] - Sequential execution
-  └─ type-check-strict (H01)
-       ├─ Explicit any detection
-       ├─ @ts-ignore validation
-       ├─ Non-null assertion checks
-       ├─ Return type enforcement
-       └─ Parameter type enforcement
+  ├─ type-check-strict (H01)
+  │    ├─ Explicit any detection
+  │    ├─ @ts-ignore validation
+  │    ├─ Non-null assertion checks
+  │    ├─ Return type enforcement
+  │    └─ Parameter type enforcement
+  │
+  └─ no-hardcoded-values (H02)
+       ├─ Hex color detection
+       ├─ Hardcoded spacing/sizing
+       ├─ Font-family strings
+       ├─ Z-index scale validation
+       └─ Raw color keywords
      |
      v
 [Type Check] - npm run type-check
@@ -64,11 +72,13 @@ git commit
 ### Run Individual Hook
 
 ```bash
-# Run single hook
+# Run TypeScript strict check (H01)
 tsx scripts/hooks/type-check-strict.ts
-
-# Or via npm script
 npm run hooks:type-check-strict
+
+# Run no-hardcoded-values check (H02)
+tsx scripts/hooks/no-hardcoded-values.ts
+npm run hooks:no-hardcoded-values
 
 # Example hook (reference implementation)
 tsx scripts/hooks/example-no-any-types.ts
@@ -215,15 +225,16 @@ tsx scripts/hooks/example-no-any-types.ts --files "src/**/*.ts"
 
 ### Target Execution Times
 
-| Hook                     | Target   | Timeout | Status         |
-| ------------------------ | -------- | ------- | -------------- |
-| type-check-strict (H01)  | <3s      | 3s      | ✅ Implemented |
-| event-type-safety        | <2s      | 5s      | 🚧 Planned     |
-| jsdoc-coverage           | <3s      | 10s     | 🚧 Planned     |
-| cem-type-sync            | <5s      | 15s     | 🚧 Planned     |
-| declaration-completeness | <10s     | 30s     | 🚧 Planned     |
-| generic-patterns         | <2s      | 5s      | 🚧 Planned     |
-| **Total**                | **<25s** | **60s** | -              |
+| Hook                           | Target   | Timeout | Status         |
+| ------------------------------ | -------- | ------- | -------------- |
+| type-check-strict (H01)        | <3s      | 3s      | ✅ Implemented |
+| no-hardcoded-values (H02)      | <2s      | 2s      | ✅ Implemented |
+| event-type-safety (H03)        | <2s      | 5s      | 🚧 Planned     |
+| jsdoc-coverage (H04)           | <3s      | 10s     | 🚧 Planned     |
+| cem-type-sync (H05)            | <5s      | 15s     | 🚧 Planned     |
+| declaration-completeness (H06) | <10s     | 30s     | 🚧 Planned     |
+| generic-patterns (H07)         | <2s      | 5s      | 🚧 Planned     |
+| **Total**                      | **<27s** | **72s** | -              |
 
 ### Optimization Strategies
 
