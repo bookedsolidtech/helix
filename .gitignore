@@ -37,3 +37,4 @@ npm-debug.log*
 .cache/
 !packages/hx-library/.cache/
 !packages/hx-library/.cache/test-results.json
+scripts/coverage/
