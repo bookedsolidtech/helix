@@ -16,11 +16,11 @@ This directory contains Git hooks that enforce TypeScript strict mode compliance
 - **test-coverage-gate.ts** (H03) - Enforce 80%+ test coverage on component files
 - **bundle-size-guard.ts** (H04) - Enforce per-component (<5KB) and total bundle (<50KB) size limits
 - **cem-accuracy-check.ts** (H05) - Validate Custom Elements Manifest accuracy
+- **a11y-regression-guard.ts** (H06) - Prevent accessibility regressions
 
 ### [Planned]
 
-1. **a11y-regression-guard.ts** (H06) - Prevent accessibility regressions
-2. **event-type-safety.ts** (H07) - Enforce `CustomEvent<DetailType>` with interfaces
+1. **event-type-safety.ts** (H07) - Enforce `CustomEvent<DetailType>` with interfaces
 
 ## Hook Execution Order
 
@@ -60,6 +60,20 @@ git commit
        ├─ Full bundle size (<50KB min+gz)
        ├─ Build artifact validation
        └─ Performance budget enforcement
+  │
+  └─ cem-accuracy-check (H05)
+       ├─ CEM vs source validation
+       ├─ Properties, events, slots, CSS parts
+       ├─ Multi-source event detection
+       └─ Completeness verification
+  │
+  └─ a11y-regression-guard (H06)
+       ├─ Invalid ARIA attributes
+       ├─ Invalid role attributes
+       ├─ Missing alt text
+       ├─ Keyboard navigation
+       ├─ Heading hierarchy
+       └─ ARIA reference validation
      |
      v
 [Type Check] - npm run type-check
@@ -99,6 +113,14 @@ npm run hooks:test-coverage-gate
 # Run bundle-size-guard check (H04)
 tsx scripts/hooks/bundle-size-guard.ts
 npm run hooks:bundle-size-guard
+
+# Run cem-accuracy-check (H05)
+tsx scripts/hooks/cem-accuracy-check.ts
+npm run hooks:cem-accuracy-check
+
+# Run a11y-regression-guard (H06)
+tsx scripts/hooks/a11y-regression-guard.ts
+npm run hooks:a11y-regression-guard
 
 # Example hook (reference implementation)
 tsx scripts/hooks/example-no-any-types.ts
@@ -252,9 +274,9 @@ tsx scripts/hooks/example-no-any-types.ts --files "src/**/*.ts"
 | test-coverage-gate (H03)    | <3s      | 3s      | [Implemented] |
 | bundle-size-guard (H04)     | <3s      | 3s      | [Implemented] |
 | cem-accuracy-check (H05)    | <5s      | 5s      | [Implemented] |
-| a11y-regression-guard (H06) | <5s      | 15s     | [Planned]     |
-| event-type-safety (H07)     | <2s      | 5s      | 🚧 Planned    |
-| **Total**                   | **<20s** | **41s** | -             |
+| a11y-regression-guard (H06) | <5s      | 5s      | [Implemented] |
+| event-type-safety (H07)     | <2s      | 5s      | [Planned]     |
+| **Total**                   | **<23s** | **31s** | -             |
 
 ### Optimization Strategies
 

@@ -42,6 +42,8 @@
     "hooks:no-hardcoded-values": "tsx scripts/hooks/no-hardcoded-values.ts",
     "hooks:test-coverage-gate": "tsx scripts/hooks/test-coverage-gate.ts",
     "hooks:bundle-size-guard": "tsx scripts/hooks/bundle-size-guard.ts",
+    "hooks:cem-accuracy-check": "tsx scripts/hooks/cem-accuracy-check.ts",
+    "hooks:a11y-regression-guard": "tsx scripts/hooks/a11y-regression-guard.ts",
     "changeset": "changeset",
     "changeset:version": "changeset version",
     "changeset:publish": "changeset publish",
