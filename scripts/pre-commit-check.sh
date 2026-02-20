@@ -27,14 +27,14 @@ fi
 FAILED=0
 
 # ==============================================================================
-# Gate 1: Type Check (for staged TypeScript files)
+# Gate 1: TypeScript Strict Mode (for staged TypeScript files)
 # ==============================================================================
 if [ -n "$STAGED_TS_FILES" ]; then
-  echo "📘 Gate 1: Type checking staged TypeScript files..."
-  if npm run type-check --silent; then
-    echo "✅ Type check passed"
+  echo "📘 Gate 1: TypeScript strict mode compliance check..."
+  if npm run hooks:type-check-strict --silent; then
+    echo "✅ TypeScript strict check passed"
   else
-    echo "❌ Type check failed"
+    echo "❌ TypeScript strict check failed"
     FAILED=1
   fi
   echo ""

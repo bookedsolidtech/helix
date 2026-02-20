@@ -11,15 +11,15 @@ This directory contains Git hooks that enforce TypeScript strict mode compliance
 ### ✅ Implemented
 
 - **example-no-any-types.ts** - Example implementation showing the pattern
+- **type-check-strict.ts** (H01) - Comprehensive TypeScript strict mode enforcement
 
 ### 🚧 Planned
 
-1. **no-any-types.ts** - Prevent `any` types (explicit and implicit)
-2. **event-type-safety.ts** - Enforce `CustomEvent<DetailType>` with interfaces
-3. **jsdoc-coverage.ts** - Require JSDoc on all public APIs
-4. **cem-type-sync.ts** - Auto-sync CEM when component types change
-5. **declaration-completeness.ts** - Verify `.d.ts` generation
-6. **generic-patterns.ts** - Enforce proper generic patterns
+1. **event-type-safety.ts** - Enforce `CustomEvent<DetailType>` with interfaces
+2. **jsdoc-coverage.ts** - Require JSDoc on all public APIs
+3. **cem-type-sync.ts** - Auto-sync CEM when component types change
+4. **declaration-completeness.ts** - Verify `.d.ts` generation
+5. **generic-patterns.ts** - Enforce proper generic patterns
 
 ## Hook Execution Order
 
@@ -33,11 +33,13 @@ git commit
 [lint-staged] - Format & lint
      |
      v
-[TypeScript Hooks] - Parallel execution
-  ├─ no-any-types
-  ├─ event-type-safety
-  ├─ jsdoc-coverage
-  └─ generic-patterns
+[TypeScript Hooks] - Sequential execution
+  └─ type-check-strict (H01)
+       ├─ Explicit any detection
+       ├─ @ts-ignore validation
+       ├─ Non-null assertion checks
+       ├─ Return type enforcement
+       └─ Parameter type enforcement
      |
      v
 [Type Check] - npm run type-check
@@ -63,10 +65,13 @@ git commit
 
 ```bash
 # Run single hook
-tsx scripts/hooks/example-no-any-types.ts
+tsx scripts/hooks/type-check-strict.ts
 
-# Or via npm script (once implemented)
-npm run hooks:no-any-types
+# Or via npm script
+npm run hooks:type-check-strict
+
+# Example hook (reference implementation)
+tsx scripts/hooks/example-no-any-types.ts
 ```
 
 ### Run All Hooks
@@ -210,15 +215,15 @@ tsx scripts/hooks/example-no-any-types.ts --files "src/**/*.ts"
 
 ### Target Execution Times
 
-| Hook                     | Target   | Timeout |
-| ------------------------ | -------- | ------- |
-| no-any-types             | <2s      | 5s      |
-| event-type-safety        | <2s      | 5s      |
-| jsdoc-coverage           | <3s      | 10s     |
-| cem-type-sync            | <5s      | 15s     |
-| declaration-completeness | <10s     | 30s     |
-| generic-patterns         | <2s      | 5s      |
-| **Total**                | **<25s** | **60s** |
+| Hook                     | Target   | Timeout | Status         |
+| ------------------------ | -------- | ------- | -------------- |
+| type-check-strict (H01)  | <3s      | 3s      | ✅ Implemented |
+| event-type-safety        | <2s      | 5s      | 🚧 Planned     |
+| jsdoc-coverage           | <3s      | 10s     | 🚧 Planned     |
+| cem-type-sync            | <5s      | 15s     | 🚧 Planned     |
+| declaration-completeness | <10s     | 30s     | 🚧 Planned     |
+| generic-patterns         | <2s      | 5s      | 🚧 Planned     |
+| **Total**                | **<25s** | **60s** | -              |
 
 ### Optimization Strategies
 

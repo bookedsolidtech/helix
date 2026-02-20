@@ -38,6 +38,7 @@
     "format:all": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md,css,html,astro}\"",
     "pre-commit-check": "bash scripts/pre-commit-check.sh",
     "pre-push-check": "bash scripts/pre-push-check.sh",
+    "hooks:type-check-strict": "tsx scripts/hooks/type-check-strict.ts",
     "changeset": "changeset",
     "changeset:version": "changeset version",
     "changeset:publish": "changeset publish",
@@ -62,6 +63,7 @@
     "husky": "^9.0.0",
     "lint-staged": "^15.0.0",
     "prettier": "^3.0.0",
+    "ts-morph": "^27.0.2",
     "turbo": "^2.3.3",
     "typescript": "^5.7.2",
     "typescript-eslint": "^8.0.0"
