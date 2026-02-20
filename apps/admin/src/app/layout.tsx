@@ -11,6 +11,7 @@ import {
   ExternalLink,
   Map,
   HeartPulse,
+  GitBranch,
 } from 'lucide-react';
 import { DOCS_URL, STORYBOOK_URL } from '@/lib/env';
 import './globals.css';
@@ -86,6 +87,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
               <SidebarLink href="/roadmap" icon={<Map className="w-4 h-4" />}>
                 Platform Roadmap
+              </SidebarLink>
+
+              <SidebarLink href="/hooks" icon={<GitBranch className="w-4 h-4" />}>
+                Hooks & MCP
               </SidebarLink>
             </nav>
 

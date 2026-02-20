@@ -18,6 +18,7 @@ const ROUTE_LABELS: Record<string, string> = {
   '/pipeline': 'Pipeline',
   '/roadmap': 'Issue Tracker',
   '/architecture': 'Architecture',
+  '/hooks': 'Hooks & MCP Servers',
 };
 
 /**
@@ -32,6 +33,7 @@ export type BreadcrumbIconType =
   | 'pipeline'
   | 'roadmap'
   | 'architecture'
+  | 'hooks'
   | 'component-tag';
 
 /**
@@ -66,6 +68,8 @@ function getIconTypeForRoute(
       return 'pipeline';
     case '/architecture':
       return 'architecture';
+    case '/hooks':
+      return 'hooks';
     default:
       return undefined;
   }
