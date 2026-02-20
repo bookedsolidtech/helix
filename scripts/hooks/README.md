@@ -13,14 +13,14 @@ This directory contains Git hooks that enforce TypeScript strict mode compliance
 - **example-no-any-types.ts** - Example implementation showing the pattern
 - **type-check-strict.ts** (H01) - Comprehensive TypeScript strict mode enforcement
 - **no-hardcoded-values.ts** (H02) - Prevent hardcoded design values, enforce design tokens
+- **test-coverage-gate.ts** (H03) - Enforce 80%+ test coverage on component files
 
 ### 🚧 Planned
 
-1. **event-type-safety.ts** (H03) - Enforce `CustomEvent<DetailType>` with interfaces
-2. **jsdoc-coverage.ts** (H04) - Require JSDoc on all public APIs
-3. **cem-type-sync.ts** (H05) - Auto-sync CEM when component types change
-4. **declaration-completeness.ts** (H06) - Verify `.d.ts` generation
-5. **generic-patterns.ts** (H07) - Enforce proper generic patterns
+1. **bundle-size-guard.ts** (H04) - Enforce per-component and total bundle size limits
+2. **cem-accuracy-check.ts** (H05) - Validate Custom Elements Manifest accuracy
+3. **a11y-regression-guard.ts** (H06) - Prevent accessibility regressions
+4. **event-type-safety.ts** (H07) - Enforce `CustomEvent<DetailType>` with interfaces
 
 ## Hook Execution Order
 
@@ -48,6 +48,12 @@ git commit
        ├─ Font-family strings
        ├─ Z-index scale validation
        └─ Raw color keywords
+  │
+  └─ test-coverage-gate (H03)
+       ├─ Line coverage (80%+ required)
+       ├─ Branch coverage (80%+ required)
+       ├─ Function coverage (80%+ required)
+       └─ Statement coverage (80%+ required)
      |
      v
 [Type Check] - npm run type-check
@@ -79,6 +85,10 @@ npm run hooks:type-check-strict
 # Run no-hardcoded-values check (H02)
 tsx scripts/hooks/no-hardcoded-values.ts
 npm run hooks:no-hardcoded-values
+
+# Run test-coverage-gate check (H03)
+tsx scripts/hooks/test-coverage-gate.ts
+npm run hooks:test-coverage-gate
 
 # Example hook (reference implementation)
 tsx scripts/hooks/example-no-any-types.ts
@@ -225,16 +235,16 @@ tsx scripts/hooks/example-no-any-types.ts --files "src/**/*.ts"
 
 ### Target Execution Times
 
-| Hook                           | Target   | Timeout | Status         |
-| ------------------------------ | -------- | ------- | -------------- |
-| type-check-strict (H01)        | <3s      | 3s      | ✅ Implemented |
-| no-hardcoded-values (H02)      | <2s      | 2s      | ✅ Implemented |
-| event-type-safety (H03)        | <2s      | 5s      | 🚧 Planned     |
-| jsdoc-coverage (H04)           | <3s      | 10s     | 🚧 Planned     |
-| cem-type-sync (H05)            | <5s      | 15s     | 🚧 Planned     |
-| declaration-completeness (H06) | <10s     | 30s     | 🚧 Planned     |
-| generic-patterns (H07)         | <2s      | 5s      | 🚧 Planned     |
-| **Total**                      | **<27s** | **72s** | -              |
+| Hook                        | Target   | Timeout | Status         |
+| --------------------------- | -------- | ------- | -------------- |
+| type-check-strict (H01)     | <3s      | 3s      | ✅ Implemented |
+| no-hardcoded-values (H02)   | <2s      | 2s      | ✅ Implemented |
+| test-coverage-gate (H03)    | <3s      | 3s      | ✅ Implemented |
+| bundle-size-guard (H04)     | <2s      | 5s      | 🚧 Planned     |
+| cem-accuracy-check (H05)    | <3s      | 10s     | 🚧 Planned     |
+| a11y-regression-guard (H06) | <5s      | 15s     | 🚧 Planned     |
+| event-type-safety (H07)     | <2s      | 5s      | 🚧 Planned     |
+| **Total**                   | **<20s** | **43s** | -              |
 
 ### Optimization Strategies
 

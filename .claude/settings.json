@@ -13,6 +13,11 @@
             "type": "command",
             "command": "npm run hooks:no-hardcoded-values",
             "timeout": 2000
+          },
+          {
+            "type": "command",
+            "command": "npm run hooks:test-coverage-gate",
+            "timeout": 3000
           }
         ]
       }

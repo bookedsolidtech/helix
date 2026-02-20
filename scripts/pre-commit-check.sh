@@ -55,14 +55,28 @@ if [ -n "$STAGED_COMPONENT_FILES" ] || [ -n "$STAGED_TS_FILES" ]; then
 fi
 
 # ==============================================================================
-# Gate 2: Test Modified Components
+# Gate 2: Test Coverage Gate
+# ==============================================================================
+if [ -n "$STAGED_COMPONENT_FILES" ]; then
+  echo "📊 Gate 2: Test coverage verification..."
+  if npm run hooks:test-coverage-gate --silent; then
+    echo "✅ Test coverage check passed"
+  else
+    echo "❌ Test coverage check failed"
+    FAILED=1
+  fi
+  echo ""
+fi
+
+# ==============================================================================
+# Gate 2.5: Test Modified Components
 # ==============================================================================
 if [ -n "$STAGED_COMPONENT_FILES" ]; then
   # Extract unique component names (e.g., hx-button, hx-card)
   COMPONENTS=$(echo "$STAGED_COMPONENT_FILES" | sed -E 's|.*components/([^/]+)/.*|\1|' | sort -u)
 
   if [ -n "$COMPONENTS" ]; then
-    echo "🧪 Gate 2: Testing modified components..."
+    echo "🧪 Gate 2.5: Testing modified components..."
     echo "Modified components: $(echo $COMPONENTS | tr '\n' ' ')"
 
     # Run tests for the library (targeted testing)
