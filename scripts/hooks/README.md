@@ -8,19 +8,19 @@ This directory contains Git hooks that enforce TypeScript strict mode compliance
 
 ## Available Hooks
 
-### ✅ Implemented
+### [Implemented]
 
 - **example-no-any-types.ts** - Example implementation showing the pattern
 - **type-check-strict.ts** (H01) - Comprehensive TypeScript strict mode enforcement
 - **no-hardcoded-values.ts** (H02) - Prevent hardcoded design values, enforce design tokens
 - **test-coverage-gate.ts** (H03) - Enforce 80%+ test coverage on component files
 - **bundle-size-guard.ts** (H04) - Enforce per-component (<5KB) and total bundle (<50KB) size limits
+- **cem-accuracy-check.ts** (H05) - Validate Custom Elements Manifest accuracy
 
-### 🚧 Planned
+### [Planned]
 
-1. **cem-accuracy-check.ts** (H05) - Validate Custom Elements Manifest accuracy
-2. **a11y-regression-guard.ts** (H06) - Prevent accessibility regressions
-3. **event-type-safety.ts** (H07) - Enforce `CustomEvent<DetailType>` with interfaces
+1. **a11y-regression-guard.ts** (H06) - Prevent accessibility regressions
+2. **event-type-safety.ts** (H07) - Enforce `CustomEvent<DetailType>` with interfaces
 
 ## Hook Execution Order
 
@@ -76,7 +76,7 @@ git commit
 [Tests] - npm run test:library
      |
      v
-✅ Commit allowed
+[PASS] Commit allowed
 ```
 
 ## Usage
@@ -245,16 +245,16 @@ tsx scripts/hooks/example-no-any-types.ts --files "src/**/*.ts"
 
 ### Target Execution Times
 
-| Hook                        | Target   | Timeout | Status         |
-| --------------------------- | -------- | ------- | -------------- |
-| type-check-strict (H01)     | <3s      | 3s      | ✅ Implemented |
-| no-hardcoded-values (H02)   | <2s      | 2s      | ✅ Implemented |
-| test-coverage-gate (H03)    | <3s      | 3s      | ✅ Implemented |
-| bundle-size-guard (H04)     | <3s      | 3s      | ✅ Implemented |
-| cem-accuracy-check (H05)    | <3s      | 10s     | 🚧 Planned     |
-| a11y-regression-guard (H06) | <5s      | 15s     | 🚧 Planned     |
-| event-type-safety (H07)     | <2s      | 5s      | 🚧 Planned     |
-| **Total**                   | **<20s** | **41s** | -              |
+| Hook                        | Target   | Timeout | Status        |
+| --------------------------- | -------- | ------- | ------------- |
+| type-check-strict (H01)     | <3s      | 3s      | [Implemented] |
+| no-hardcoded-values (H02)   | <2s      | 2s      | [Implemented] |
+| test-coverage-gate (H03)    | <3s      | 3s      | [Implemented] |
+| bundle-size-guard (H04)     | <3s      | 3s      | [Implemented] |
+| cem-accuracy-check (H05)    | <5s      | 5s      | [Implemented] |
+| a11y-regression-guard (H06) | <5s      | 15s     | [Planned]     |
+| event-type-safety (H07)     | <2s      | 5s      | 🚧 Planned    |
+| **Total**                   | **<20s** | **41s** | -             |
 
 ### Optimization Strategies
 
