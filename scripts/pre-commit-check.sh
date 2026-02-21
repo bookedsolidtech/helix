@@ -83,6 +83,34 @@ if [ -n "$STAGED_COMPONENT_FILES" ]; then
 fi
 
 # ==============================================================================
+# Gate 1.85: Documentation Completeness (H22)
+# ==============================================================================
+if [ -n "$STAGED_COMPONENT_FILES" ]; then
+  echo "📚 Gate 1.85: Documentation completeness check..."
+  if npm run hooks:documentation-completeness --silent; then
+    echo "✅ Documentation completeness check passed"
+  else
+    echo "❌ Documentation completeness check failed"
+    FAILED=1
+  fi
+  echo ""
+fi
+
+# ==============================================================================
+# Gate 1.86: CSS Part Documentation (H25)
+# ==============================================================================
+if [ -n "$STAGED_COMPONENT_FILES" ]; then
+  echo "🎨 Gate 1.86: CSS part documentation check..."
+  if npm run hooks:css-part-documentation --silent; then
+    echo "✅ CSS part documentation check passed"
+  else
+    echo "❌ CSS part documentation check failed"
+    FAILED=1
+  fi
+  echo ""
+fi
+
+# ==============================================================================
 # Gate 1.9: Component Test Required (H10)
 # ==============================================================================
 if [ -n "$STAGED_COMPONENT_FILES" ]; then
@@ -210,6 +238,20 @@ if [ -n "$STAGED_COMPONENT_FILES" ]; then
     fi
   else
     echo "❌ CEM generation failed"
+    FAILED=1
+  fi
+  echo ""
+fi
+
+# ==============================================================================
+# Gate 4.5: API Breaking Change Detection (H18)
+# ==============================================================================
+if [ -n "$STAGED_COMPONENT_FILES" ]; then
+  echo "🔄 Gate 4.5: API breaking change detection..."
+  if npm run hooks:api-breaking-change-detection --silent; then
+    echo "✅ No breaking API changes detected"
+  else
+    echo "❌ Breaking API changes detected"
     FAILED=1
   fi
   echo ""
