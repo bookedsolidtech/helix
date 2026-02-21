@@ -55,6 +55,20 @@ if [ -n "$STAGED_COMPONENT_FILES" ] || [ -n "$STAGED_TS_FILES" ]; then
 fi
 
 # ==============================================================================
+# Gate 1.8: JSDoc Coverage (H08)
+# ==============================================================================
+if [ -n "$STAGED_COMPONENT_FILES" ]; then
+  echo "📝 Gate 1.8: JSDoc coverage check..."
+  if npm run hooks:jsdoc-coverage --silent; then
+    echo "✅ JSDoc coverage check passed"
+  else
+    echo "❌ JSDoc coverage check failed"
+    FAILED=1
+  fi
+  echo ""
+fi
+
+# ==============================================================================
 # Gate 2: Test Coverage Gate
 # ==============================================================================
 if [ -n "$STAGED_COMPONENT_FILES" ]; then
