@@ -41,7 +41,7 @@ if [ -n "$STAGED_TS_FILES" ]; then
 fi
 
 # ==============================================================================
-# Gate 1.5: No Hardcoded Values (for staged component files)
+# Gate 1.5: No Hardcoded Values (H02)
 # ==============================================================================
 if [ -n "$STAGED_COMPONENT_FILES" ] || [ -n "$STAGED_TS_FILES" ]; then
   echo "🎨 Gate 1.5: Design token compliance check..."
@@ -49,6 +49,34 @@ if [ -n "$STAGED_COMPONENT_FILES" ] || [ -n "$STAGED_TS_FILES" ]; then
     echo "✅ No hardcoded values check passed"
   else
     echo "❌ No hardcoded values check failed"
+    FAILED=1
+  fi
+  echo ""
+fi
+
+# ==============================================================================
+# Gate 1.55: Design Token Enforcement (H13)
+# ==============================================================================
+if [ -n "$STAGED_COMPONENT_FILES" ]; then
+  echo "🎨 Gate 1.55: Design token architecture enforcement..."
+  if npm run hooks:design-token-enforcement --silent; then
+    echo "✅ Design token enforcement passed"
+  else
+    echo "❌ Design token enforcement failed"
+    FAILED=1
+  fi
+  echo ""
+fi
+
+# ==============================================================================
+# Gate 1.6: TypeScript Any Ban (H17)
+# ==============================================================================
+if [ -n "$STAGED_TS_FILES" ]; then
+  echo "🚫 Gate 1.6: TypeScript any ban check..."
+  if npm run hooks:typescript-any-ban --silent; then
+    echo "✅ TypeScript any ban passed"
+  else
+    echo "❌ TypeScript any ban failed"
     FAILED=1
   fi
   echo ""
@@ -105,6 +133,34 @@ if [ -n "$STAGED_COMPONENT_FILES" ]; then
     echo "✅ CSS part documentation check passed"
   else
     echo "❌ CSS part documentation check failed"
+    FAILED=1
+  fi
+  echo ""
+fi
+
+# ==============================================================================
+# Gate 1.87: Shadow DOM Leak Detection (H16)
+# ==============================================================================
+if [ -n "$STAGED_COMPONENT_FILES" ]; then
+  echo "🔒 Gate 1.87: Shadow DOM leak detection..."
+  if npm run hooks:shadow-dom-leak-detection --silent; then
+    echo "✅ Shadow DOM leak detection passed"
+  else
+    echo "❌ Shadow DOM leak detection failed"
+    FAILED=1
+  fi
+  echo ""
+fi
+
+# ==============================================================================
+# Gate 1.88: Animation Budget Check (H20)
+# ==============================================================================
+if [ -n "$STAGED_COMPONENT_FILES" ]; then
+  echo "🎬 Gate 1.88: Animation budget and WCAG compliance..."
+  if npm run hooks:animation-budget-check --silent; then
+    echo "✅ Animation budget check passed"
+  else
+    echo "❌ Animation budget check failed"
     FAILED=1
   fi
   echo ""
@@ -175,6 +231,35 @@ if [ -n "$STAGED_COMPONENT_FILES" ]; then
     echo "✅ Accessibility check passed"
   else
     echo "❌ Accessibility check failed"
+    FAILED=1
+  fi
+  echo ""
+fi
+
+# ==============================================================================
+# Gate 2.3: Dependency Audit (H21)
+# ==============================================================================
+STAGED_PACKAGE_FILES=$(git diff --cached --name-only --diff-filter=ACM | grep -E 'package\.json$' || true)
+if [ -n "$STAGED_PACKAGE_FILES" ]; then
+  echo "🔐 Gate 2.3: Dependency security audit..."
+  if npm run hooks:dependency-audit --silent; then
+    echo "✅ Dependency audit passed"
+  else
+    echo "❌ Dependency audit failed"
+    FAILED=1
+  fi
+  echo ""
+fi
+
+# ==============================================================================
+# Gate 2.4: VRT Critical Paths (H14)
+# ==============================================================================
+if [ -n "$STAGED_COMPONENT_FILES" ]; then
+  echo "📸 Gate 2.4: VRT critical paths validation..."
+  if npm run hooks:vrt-critical-paths --silent; then
+    echo "✅ VRT critical paths check passed"
+  else
+    echo "❌ VRT critical paths check failed"
     FAILED=1
   fi
   echo ""
