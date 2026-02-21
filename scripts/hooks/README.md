@@ -20,9 +20,12 @@ This directory contains Git hooks that enforce TypeScript strict mode compliance
 - **event-type-safety.ts** (H07) - Enforce `CustomEvent<DetailType>` with exported interfaces
 - **jsdoc-coverage.ts** (H08) - Enforce 100% JSDoc coverage on public APIs
 
-### [Planned]
+### [Evaluated & Deferred]
 
-1. **cem-type-sync.ts** (H09) - Sync CEM types with source (may be redundant with H05)
+1. **cem-type-sync.ts** (H09) - Auto-fix CEM drift
+   - **Status**: Deferred - redundant with H05 + manual `npm run cem`
+   - **Rationale**: H05 validates CEM accuracy and reports drift. Auto-fixing in pre-commit hooks is risky and adds minimal value. Developers can run `npm run cem` manually when H05 detects drift.
+   - **Decision**: Skip implementation unless developer experience metrics show clear value
 
 ## Hook Execution Order
 
