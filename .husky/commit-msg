@@ -1,5 +1,5 @@
 #!/usr/bin/env sh
 . "$(dirname -- "$0")/_/husky.sh"
 
-# Validate commit message format
-bash scripts/commit-msg-check.sh "$1"
+# Run commit message convention hook (H11)
+npx tsx scripts/hooks/commit-msg-convention.ts "$1"

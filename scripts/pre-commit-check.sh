@@ -83,6 +83,48 @@ if [ -n "$STAGED_COMPONENT_FILES" ]; then
 fi
 
 # ==============================================================================
+# Gate 1.9: Component Test Required (H10)
+# ==============================================================================
+if [ -n "$STAGED_COMPONENT_FILES" ]; then
+  echo "🧪 Gate 1.9: Component test requirement check..."
+  if npm run hooks:component-test-required --silent; then
+    echo "✅ Component test check passed"
+  else
+    echo "❌ Component test check failed"
+    FAILED=1
+  fi
+  echo ""
+fi
+
+# ==============================================================================
+# Gate 1.10: Storybook Validation (H09)
+# ==============================================================================
+if [ -n "$STAGED_COMPONENT_FILES" ]; then
+  echo "📖 Gate 1.10: Storybook validation check..."
+  if npm run hooks:storybook-validation --silent; then
+    echo "✅ Storybook validation passed"
+  else
+    echo "❌ Storybook validation failed"
+    FAILED=1
+  fi
+  echo ""
+fi
+
+# ==============================================================================
+# Gate 1.11: No Console Logs (H12)
+# ==============================================================================
+if [ -n "$STAGED_TS_FILES" ]; then
+  echo "🚫 Gate 1.11: Console statement check..."
+  if npm run hooks:no-console-logs --silent; then
+    echo "✅ No console logs check passed"
+  else
+    echo "❌ Console logs check failed"
+    FAILED=1
+  fi
+  echo ""
+fi
+
+# ==============================================================================
 # Gate 2: Test Coverage Gate
 # ==============================================================================
 if [ -n "$STAGED_COMPONENT_FILES" ]; then
