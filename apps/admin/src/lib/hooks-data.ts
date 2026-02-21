@@ -10,6 +10,8 @@
 export type Priority = 'P0' | 'P1' | 'P2';
 export type Phase = 1 | 2 | 3 | 4;
 
+export type HookStatus = 'implemented' | 'planned' | 'deferred';
+
 export interface Hook {
   id: string;
   name: string;
@@ -20,6 +22,9 @@ export interface Hook {
   executionBudget: string;
   phase: Phase;
   dependencies?: string[];
+  status: HookStatus;
+  implementedName?: string; // Actual name if different from planned
+  deferredReason?: string; // Reason if deferred
 }
 
 export interface McpServer {
@@ -50,6 +55,8 @@ export interface Metrics {
 
 /**
  * 24 Unique Hooks (P0/P1/P2)
+ *
+ * Status indicates actual implementation vs original plan
  */
 export const hooks: Hook[] = [
   // Phase 1: Foundation (P0 - Critical)
@@ -59,91 +66,103 @@ export const hooks: Hook[] = [
     owner: 'TypeScript Specialist',
     priority: 'P0',
     purpose: 'Run TypeScript strict mode checks before every commit',
-    workflow: 'Pre-commit hook runs `npm run type-check`, blocks commit if errors found',
+    workflow: 'Pre-commit hook validates TypeScript strict mode, explicit types, no any usage',
     executionBudget: '<5s',
     phase: 1,
     dependencies: [],
+    status: 'implemented',
   },
   {
     id: 'H02',
-    name: 'lint-staged',
-    owner: 'Code Reviewer',
+    name: 'no-hardcoded-values',
+    owner: 'Design System Developer',
     priority: 'P0',
-    purpose: 'Run ESLint on staged files only for fast pre-commit validation',
-    workflow: 'Pre-commit hook runs `eslint --fix` on staged files, auto-fixes, re-stages',
-    executionBudget: '<3s',
+    purpose: 'Block hardcoded colors, spacing, and design values in component CSS',
+    workflow: 'Pre-commit hook scans for hex colors, hardcoded px values, enforces design tokens',
+    executionBudget: '<2s',
     phase: 1,
     dependencies: [],
+    status: 'implemented',
+    implementedName: 'no-hardcoded-values',
   },
   {
     id: 'H03',
-    name: 'component-test-required',
+    name: 'test-coverage-gate',
     owner: 'QA Engineer (Automation)',
     priority: 'P0',
-    purpose: 'Prevent commits that add components without corresponding test files',
-    workflow: 'Pre-commit script validates that every new `*.ts` component has a `*.test.ts`',
-    executionBudget: '<1s',
+    purpose: 'Enforce 80%+ test coverage on component files',
+    workflow: 'Pre-commit hook reads Vitest coverage JSON, validates line/branch/function coverage',
+    executionBudget: '<3s',
     phase: 1,
     dependencies: [],
+    status: 'implemented',
+    implementedName: 'test-coverage-gate',
   },
   {
     id: 'H04',
-    name: 'cem-validation',
-    owner: 'Lit Specialist',
-    priority: 'P0',
-    purpose: 'Ensure Custom Elements Manifest stays in sync with component APIs',
-    workflow: 'Pre-push hook runs `npm run cem` and validates no API drift',
-    executionBudget: '<8s',
-    phase: 1,
-    dependencies: ['H01'],
-  },
-
-  // Phase 1: Foundation (P1 - High Priority)
-  {
-    id: 'H05',
     name: 'bundle-size-guard',
     owner: 'Performance Engineer',
     priority: 'P1',
     purpose: 'Block commits that exceed per-component bundle size budget (<5KB gzip)',
-    workflow: 'Pre-push hook builds changed components, measures gzip size, fails if >5KB',
-    executionBudget: '<15s',
+    workflow: 'Pre-commit hook builds changed components, measures gzip size, fails if >5KB',
+    executionBudget: '<3s',
     phase: 1,
     dependencies: [],
+    status: 'implemented',
+  },
+  {
+    id: 'H05',
+    name: 'cem-accuracy-check',
+    owner: 'Lit Specialist',
+    priority: 'P0',
+    purpose: 'Ensure Custom Elements Manifest stays in sync with component APIs',
+    workflow: 'Pre-commit hook compares CEM with source code, validates properties/events/slots',
+    executionBudget: '<5s',
+    phase: 1,
+    dependencies: [],
+    status: 'implemented',
+    implementedName: 'cem-accuracy-check',
   },
   {
     id: 'H06',
-    name: 'accessibility-lint',
+    name: 'a11y-regression-guard',
     owner: 'Accessibility Engineer',
     priority: 'P1',
-    purpose: 'Run automated ARIA/WCAG linting on component files',
-    workflow: 'Pre-commit hook runs `eslint-plugin-jsx-a11y` rules on component changes',
-    executionBudget: '<2s',
+    purpose: 'Prevent accessibility regressions (ARIA, roles, keyboard nav)',
+    workflow: 'Pre-commit hook validates ARIA attributes, role usage, alt text, keyboard patterns',
+    executionBudget: '<5s',
     phase: 1,
-    dependencies: ['H02'],
+    dependencies: [],
+    status: 'implemented',
+    implementedName: 'a11y-regression-guard',
   },
 
   // Phase 2: Core Gates (P0)
   {
     id: 'H07',
-    name: 'test-suite-fast',
-    owner: 'Test Architect',
+    name: 'event-type-safety',
+    owner: 'TypeScript Specialist',
     priority: 'P0',
-    purpose: 'Run affected tests only in pre-push hook for fast feedback',
-    workflow: 'Pre-push hook uses Turborepo cache to run tests for changed packages only',
-    executionBudget: '<30s',
+    purpose: 'Enforce CustomEvent<DetailType> with exported interfaces and hx- prefix',
+    workflow: 'Pre-commit hook validates event typing, naming, and JSDoc @fires tags',
+    executionBudget: '<2s',
     phase: 2,
-    dependencies: ['H03'],
+    dependencies: [],
+    status: 'implemented',
+    implementedName: 'event-type-safety',
   },
   {
     id: 'H08',
-    name: 'coverage-threshold',
-    owner: 'QA Engineer (Automation)',
+    name: 'jsdoc-coverage',
+    owner: 'Storybook Specialist',
     priority: 'P0',
-    purpose: 'Enforce 80%+ test coverage on changed files',
-    workflow: 'Pre-push hook runs coverage check on affected components, blocks if <80%',
-    executionBudget: '<20s',
+    purpose: 'Enforce 100% JSDoc coverage on public component APIs',
+    workflow: 'Pre-commit hook validates @summary, @param, @returns, @fires, @slot tags',
+    executionBudget: '<3s',
     phase: 2,
-    dependencies: ['H07'],
+    dependencies: [],
+    status: 'implemented',
+    implementedName: 'jsdoc-coverage',
   },
   {
     id: 'H09',
@@ -154,18 +173,21 @@ export const hooks: Hook[] = [
     workflow: 'Pre-commit script validates `*.stories.ts` exists for each component',
     executionBudget: '<1s',
     phase: 2,
-    dependencies: ['H03'],
+    dependencies: [],
+    status: 'implemented',
   },
   {
     id: 'H10',
-    name: 'design-token-enforcement',
-    owner: 'Design System Developer',
+    name: 'component-test-required',
+    owner: 'QA Engineer (Automation)',
     priority: 'P0',
-    purpose: 'Block hardcoded colors/spacing values in component CSS',
-    workflow: 'Pre-commit hook runs custom CSS linter to detect hardcoded values',
-    executionBudget: '<2s',
-    phase: 2,
+    purpose: 'Prevent commits that add components without corresponding test files',
+    workflow: 'Pre-commit script validates that every hx-*.ts has hx-*.test.ts',
+    executionBudget: '<1s',
+    phase: 1,
     dependencies: [],
+    status: 'implemented',
+    implementedName: 'component-test-required',
   },
 
   // Phase 2: Core Gates (P1)
@@ -179,6 +201,7 @@ export const hooks: Hook[] = [
     executionBudget: '<0.5s',
     phase: 2,
     dependencies: [],
+    status: 'implemented',
   },
   {
     id: 'H12',
@@ -190,11 +213,25 @@ export const hooks: Hook[] = [
     executionBudget: '<1s',
     phase: 2,
     dependencies: [],
+    status: 'implemented',
+  },
+  {
+    id: 'H13',
+    name: 'design-token-enforcement',
+    owner: 'Design System Developer',
+    priority: 'P0',
+    purpose: 'Block hardcoded colors/spacing values in component CSS',
+    workflow: 'Pre-commit hook runs custom CSS linter to detect hardcoded values',
+    executionBudget: '<2s',
+    phase: 2,
+    dependencies: [],
+    status: 'deferred',
+    deferredReason: 'Redundant with H02 (no-hardcoded-values) which already enforces design tokens',
   },
 
   // Phase 3: Advanced Checks (P1)
   {
-    id: 'H13',
+    id: 'H14',
     name: 'vrt-critical-paths',
     owner: 'QA Engineer (Automation)',
     priority: 'P1',
@@ -203,9 +240,10 @@ export const hooks: Hook[] = [
     executionBudget: '<60s',
     phase: 3,
     dependencies: ['H07'],
+    status: 'planned',
   },
   {
-    id: 'H14',
+    id: 'H15',
     name: 'drupal-compat-check',
     owner: 'Drupal Integration Specialist',
     priority: 'P1',
@@ -214,9 +252,10 @@ export const hooks: Hook[] = [
     executionBudget: '<10s',
     phase: 3,
     dependencies: ['H04'],
+    status: 'planned',
   },
   {
-    id: 'H15',
+    id: 'H16',
     name: 'shadow-dom-leak-detection',
     owner: 'Lit Specialist',
     priority: 'P1',
@@ -225,9 +264,10 @@ export const hooks: Hook[] = [
     executionBudget: '<5s',
     phase: 3,
     dependencies: ['H10'],
+    status: 'planned',
   },
   {
-    id: 'H16',
+    id: 'H17',
     name: 'typescript-any-ban',
     owner: 'TypeScript Specialist',
     priority: 'P1',
@@ -236,9 +276,10 @@ export const hooks: Hook[] = [
     executionBudget: '<1s',
     phase: 3,
     dependencies: ['H01'],
+    status: 'planned',
   },
   {
-    id: 'H17',
+    id: 'H18',
     name: 'api-breaking-change-detection',
     owner: 'Principal Engineer',
     priority: 'P1',
@@ -246,10 +287,11 @@ export const hooks: Hook[] = [
     workflow: 'Pre-push hook compares current CEM with main branch, warns on breaking changes',
     executionBudget: '<5s',
     phase: 3,
-    dependencies: ['H04'],
+    dependencies: ['H05'],
+    status: 'planned',
   },
   {
-    id: 'H18',
+    id: 'H19',
     name: 'lighthouse-performance',
     owner: 'Performance Engineer',
     priority: 'P1',
@@ -258,11 +300,12 @@ export const hooks: Hook[] = [
     executionBudget: '<45s',
     phase: 3,
     dependencies: ['H09'],
+    status: 'planned',
   },
 
   // Phase 3: Advanced Checks (P2)
   {
-    id: 'H19',
+    id: 'H20',
     name: 'animation-budget-check',
     owner: 'CSS3 Animation Purist',
     priority: 'P2',
@@ -271,9 +314,10 @@ export const hooks: Hook[] = [
     executionBudget: '<2s',
     phase: 3,
     dependencies: ['H06'],
+    status: 'planned',
   },
   {
-    id: 'H20',
+    id: 'H21',
     name: 'dependency-audit',
     owner: 'Staff Software Engineer',
     priority: 'P2',
@@ -282,11 +326,12 @@ export const hooks: Hook[] = [
     executionBudget: '<8s',
     phase: 3,
     dependencies: [],
+    status: 'planned',
   },
 
   // Phase 4: Polish & Optimization (P2)
   {
-    id: 'H21',
+    id: 'H22',
     name: 'documentation-completeness',
     owner: 'Technical Writer',
     priority: 'P2',
@@ -294,10 +339,11 @@ export const hooks: Hook[] = [
     workflow: 'Pre-push hook validates JSDoc presence on @property decorators',
     executionBudget: '<3s',
     phase: 4,
-    dependencies: ['H04'],
+    dependencies: ['H05'],
+    status: 'planned',
   },
   {
-    id: 'H22',
+    id: 'H23',
     name: 'semantic-versioning',
     owner: 'DevOps Engineer',
     priority: 'P2',
@@ -305,10 +351,11 @@ export const hooks: Hook[] = [
     workflow: 'Pre-push hook prompts for changeset if public API changes detected',
     executionBudget: '<2s',
     phase: 4,
-    dependencies: ['H17'],
+    dependencies: ['H18'],
+    status: 'planned',
   },
   {
-    id: 'H23',
+    id: 'H24',
     name: 'dead-code-elimination',
     owner: 'Senior Code Reviewer',
     priority: 'P2',
@@ -317,9 +364,10 @@ export const hooks: Hook[] = [
     executionBudget: '<10s',
     phase: 4,
     dependencies: ['H01'],
+    status: 'planned',
   },
   {
-    id: 'H24',
+    id: 'H25',
     name: 'css-part-documentation',
     owner: 'Design System Developer',
     priority: 'P2',
@@ -327,7 +375,8 @@ export const hooks: Hook[] = [
     workflow: 'Pre-push hook extracts ::part() selectors, validates CEM completeness',
     executionBudget: '<3s',
     phase: 4,
-    dependencies: ['H04'],
+    dependencies: ['H05'],
+    status: 'planned',
   },
 ];
 

@@ -17,7 +17,7 @@ import type { Priority, Phase as PhaseType } from '@/lib/hooks-data';
 import { cn } from '@/lib/utils';
 import { HooksFilter } from './HooksFilter';
 
-export function HooksPageClient() {
+export function HooksPageClient(): React.JSX.Element {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedPriority, setSelectedPriority] = useState<Priority | 'all'>('all');
   const [selectedPhase, setSelectedPhase] = useState<PhaseType | 'all'>('all');
@@ -206,6 +206,7 @@ export function HooksPageClient() {
                 <TableHeader>
                   <TableRow>
                     <TableHead className="w-16">ID</TableHead>
+                    <TableHead className="w-28">Status</TableHead>
                     <TableHead className="w-40">Name</TableHead>
                     <TableHead className="w-32">Owner</TableHead>
                     <TableHead className="w-20">Priority</TableHead>
@@ -230,7 +231,32 @@ export function HooksPageClient() {
                           {hook.id}
                         </Badge>
                       </TableCell>
-                      <TableCell className="font-mono text-xs">{hook.name}</TableCell>
+                      <TableCell>
+                        <Badge
+                          variant="outline"
+                          className={cn(
+                            'text-[10px] capitalize',
+                            hook.status === 'implemented' &&
+                              'border-emerald-500/30 text-emerald-400 bg-emerald-500/5',
+                            hook.status === 'planned' &&
+                              'border-blue-500/30 text-blue-400 bg-blue-500/5',
+                            hook.status === 'deferred' &&
+                              'border-gray-500/30 text-gray-400 bg-gray-500/5',
+                          )}
+                        >
+                          {hook.status === 'implemented' && '✅ Implemented'}
+                          {hook.status === 'planned' && '⏳ Planned'}
+                          {hook.status === 'deferred' && '⏸️ Deferred'}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="font-mono text-xs">
+                        {hook.implementedName || hook.name}
+                        {hook.deferredReason && (
+                          <div className="text-[10px] text-gray-500 mt-0.5 max-w-xs">
+                            {hook.deferredReason}
+                          </div>
+                        )}
+                      </TableCell>
                       <TableCell className="text-xs text-muted-foreground">{hook.owner}</TableCell>
                       <TableCell>
                         <Badge

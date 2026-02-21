@@ -19,13 +19,22 @@ import type { Priority } from '@/lib/hooks-data';
 import { cn } from '@/lib/utils';
 import { HooksPageClient } from './components/HooksPageClient';
 
-export default function HooksPage() {
+export default function HooksPage(): React.JSX.Element {
   // Group hooks by priority
   const hooksByPriority = {
     P0: hooks.filter((h) => h.priority === 'P0'),
     P1: hooks.filter((h) => h.priority === 'P1'),
     P2: hooks.filter((h) => h.priority === 'P2'),
   };
+
+  // Group hooks by status
+  const hooksByStatus = {
+    implemented: hooks.filter((h) => h.status === 'implemented'),
+    planned: hooks.filter((h) => h.status === 'planned'),
+    deferred: hooks.filter((h) => h.status === 'deferred'),
+  };
+
+  const implementationPercent = Math.round((hooksByStatus.implemented.length / hooks.length) * 100);
 
   return (
     <div className="space-y-8">
@@ -43,15 +52,30 @@ export default function HooksPage() {
         <Card>
           <CardContent className="pt-5 pb-4">
             <div className="flex items-center gap-2 mb-2">
-              <span className="text-blue-400">
-                <GitBranch className="w-4 h-4" />
+              <span className="text-emerald-400">
+                <CheckCircle2 className="w-4 h-4" />
               </span>
-              <span className="text-xs font-medium text-muted-foreground">Total Hooks</span>
+              <span className="text-xs font-medium text-muted-foreground">Implemented</span>
             </div>
-            <p className="text-3xl font-bold tabular-nums text-blue-400">{hooks.length}</p>
-            <p className="text-xs text-muted-foreground mt-1">
-              {hooksByPriority.P0.length} critical
+            <p className="text-3xl font-bold tabular-nums text-emerald-400">
+              {hooksByStatus.implemented.length}/{hooks.length}
             </p>
+            <p className="text-xs text-muted-foreground mt-1">{implementationPercent}% complete</p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardContent className="pt-5 pb-4">
+            <div className="flex items-center gap-2 mb-2">
+              <span className="text-blue-400">
+                <Clock className="w-4 h-4" />
+              </span>
+              <span className="text-xs font-medium text-muted-foreground">Planned</span>
+            </div>
+            <p className="text-3xl font-bold tabular-nums text-blue-400">
+              {hooksByStatus.planned.length}
+            </p>
+            <p className="text-xs text-muted-foreground mt-1">Phase 3-4 roadmap</p>
           </CardContent>
         </Card>
 
@@ -71,12 +95,12 @@ export default function HooksPage() {
         <Card>
           <CardContent className="pt-5 pb-4">
             <div className="flex items-center gap-2 mb-2">
-              <span className="text-emerald-400">
+              <span className="text-amber-400">
                 <Zap className="w-4 h-4" />
               </span>
               <span className="text-xs font-medium text-muted-foreground">Speedup</span>
             </div>
-            <p className="text-3xl font-bold tabular-nums text-emerald-400">12x</p>
+            <p className="text-3xl font-bold tabular-nums text-amber-400">12x</p>
             <p className="text-xs text-muted-foreground mt-1">{metrics.roi} ROI</p>
           </CardContent>
         </Card>
