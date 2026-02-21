@@ -98,6 +98,10 @@ export default tseslint.config(
     rules: {
       // Stories may use non-null assertions for controls
       '@typescript-eslint/no-non-null-assertion': 'off',
+
+      // Stories use inline <style> tags for demo layouts and CSS custom property showcases
+      // This is intentional and appropriate for documentation purposes
+      'lit/prefer-static-styles': 'off',
     },
   },
 
