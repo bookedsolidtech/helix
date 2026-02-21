@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { Project, SourceFile } from 'ts-morph';
 import {
   validateDocumentationCompleteness,
@@ -1193,7 +1193,7 @@ describe('validateDocumentationCompleteness', () => {
 
   it('should validate complete documentation', async () => {
     const project = createTestProject();
-    const testFile = createTestFile(
+    const _testFile = createTestFile(
       project,
       `
       import { LitElement, property } from 'lit';
@@ -1237,7 +1237,7 @@ describe('validateDocumentationCompleteness', () => {
 
   it('should detect missing JSDoc on class', async () => {
     const project = createTestProject();
-    const testFile = createTestFile(
+    const _testFile = createTestFile(
       project,
       `
       export class TestComponent {}
@@ -1259,7 +1259,7 @@ describe('validateDocumentationCompleteness', () => {
 
   it('should detect missing @param tags', async () => {
     const project = createTestProject();
-    const testFile = createTestFile(
+    const _testFile = createTestFile(
       project,
       `
       /**
@@ -1288,7 +1288,7 @@ describe('validateDocumentationCompleteness', () => {
 
   it('should detect missing @returns tag', async () => {
     const project = createTestProject();
-    const testFile = createTestFile(
+    const _testFile = createTestFile(
       project,
       `
       /**
@@ -1320,7 +1320,7 @@ describe('validateDocumentationCompleteness', () => {
 
   it('should support bail-fast mode', async () => {
     const project = createTestProject();
-    const testFile = createTestFile(
+    const _testFile = createTestFile(
       project,
       `
       export class TestComponent1 {}
@@ -1359,7 +1359,7 @@ describe('validateDocumentationCompleteness', () => {
 
   it('should handle parse errors gracefully', async () => {
     const project = createTestProject();
-    const testFile = createTestFile(
+    const _testFile = createTestFile(
       project,
       `
       export class InvalidSyntax {
@@ -1388,7 +1388,7 @@ describe('validateDocumentationCompleteness', () => {
 
   it('should validate getters and setters', async () => {
     const project = createTestProject();
-    const testFile = createTestFile(
+    const _testFile = createTestFile(
       project,
       `
       import { LitElement } from 'lit';
@@ -1431,7 +1431,7 @@ describe('validateDocumentationCompleteness', () => {
 
   it('should detect missing JSDoc on getters', async () => {
     const project = createTestProject();
-    const testFile = createTestFile(
+    const _testFile = createTestFile(
       project,
       `
       /**
@@ -1457,7 +1457,7 @@ describe('validateDocumentationCompleteness', () => {
 
   it('should detect missing JSDoc on setters', async () => {
     const project = createTestProject();
-    const testFile = createTestFile(
+    const _testFile = createTestFile(
       project,
       `
       /**

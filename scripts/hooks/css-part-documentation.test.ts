@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
+import { describe, it, expect } from 'vitest';
 import { Project, SourceFile } from 'ts-morph';
 import {
   validateCSSPartDocumentationHook,
@@ -11,7 +11,6 @@ import {
   checkPartNamingConvention,
   checkUnusedParts,
   hasApprovalComment,
-  CONFIG,
   type HookDependencies,
   type Violation,
   type CSSPart,
@@ -897,7 +896,6 @@ describe('validateCSSPartDocumentationHook', () => {
   });
 
   it('should handle file parsing errors gracefully', async () => {
-    const project = createMockProject();
     const testFile = 'packages/hx-library/src/components/hx-test/hx-test.ts';
 
     const mockDeps: HookDependencies = {

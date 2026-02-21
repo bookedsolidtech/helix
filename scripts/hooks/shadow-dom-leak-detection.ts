@@ -32,7 +32,6 @@
 
 import {
   Project,
-  SyntaxKind,
   Node,
   SourceFile,
   TaggedTemplateExpression,
@@ -303,7 +302,11 @@ function getFileContext(sourceFile: SourceFile): FileContext {
     fileContextCache.set(filePath, { sourceFile, isLightDOM });
   }
 
-  return fileContextCache.get(filePath)!;
+  const context = fileContextCache.get(filePath);
+  if (!context) {
+    throw new Error(`File context not found for ${filePath}`);
+  }
+  return context;
 }
 
 /**
@@ -669,10 +672,7 @@ export function checkCustomPropertyPrefix(
  *
  * Performance: Uses cached Light DOM detection to avoid O(n²) re-scanning.
  */
-export function checkDOMManipulation(
-  fileContext: FileContext,
-  violations: Violation[],
-): void {
+export function checkDOMManipulation(fileContext: FileContext, violations: Violation[]): void {
   const { sourceFile, isLightDOM } = fileContext;
 
   // Pattern 1: document.querySelector/querySelectorAll
@@ -715,10 +715,7 @@ export function checkDOMManipulation(
       const expr = node.getExpression();
       const name = node.getName();
 
-      if (
-        expr.getText() === 'this' &&
-        (name === 'querySelector' || name === 'querySelectorAll')
-      ) {
+      if (expr.getText() === 'this' && (name === 'querySelector' || name === 'querySelectorAll')) {
         // Skip if approved
         if (hasApprovalComment(node)) {
           return;
@@ -751,10 +748,7 @@ export function checkDOMManipulation(
  *
  * Performance: Uses cached file context and CSS context to avoid O(n²) recomputation.
  */
-export function validateShadowDOMLeaks(
-  fileContext: FileContext,
-  violations: Violation[],
-): void {
+export function validateShadowDOMLeaks(fileContext: FileContext, violations: Violation[]): void {
   const { sourceFile } = fileContext;
 
   // Check for direct DOM manipulation first (applies to all files)

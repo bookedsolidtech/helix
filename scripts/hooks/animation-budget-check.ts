@@ -29,7 +29,7 @@
  */
 
 import { execSync } from 'child_process';
-import { existsSync, readFileSync } from 'fs';
+import { readFileSync } from 'fs';
 
 // ─── Types ────────────────────────────────────────────────────────────────
 
@@ -242,7 +242,8 @@ function checkGpuProperties(
   const lines = cssContent.split('\n');
 
   lines.forEach((line, index) => {
-    const lineOffset = baseOffset + cssContent.split('\n').slice(0, index).join('\n').length + index;
+    const lineOffset =
+      baseOffset + cssContent.split('\n').slice(0, index).join('\n').length + index;
     const { line: lineNumber } = getLineColumn(fullContent, lineOffset);
 
     if (isApproved(fullContent, lineNumber - 1)) {
@@ -292,7 +293,8 @@ function checkAnimationDurations(
   const animationPattern = /animation(?:-duration)?:\s*([^;]+);/gi;
 
   lines.forEach((line, index) => {
-    const lineOffset = baseOffset + cssContent.split('\n').slice(0, index).join('\n').length + index;
+    const lineOffset =
+      baseOffset + cssContent.split('\n').slice(0, index).join('\n').length + index;
     const { line: lineNumber, column: baseColumn } = getLineColumn(fullContent, lineOffset);
 
     // Check if approved
@@ -669,7 +671,8 @@ async function main(): Promise<void> {
 
 // Run if called directly
 const isMainModule =
-  import.meta.url === `file://${process.argv[1]}` || import.meta.url.endsWith(process.argv[1] ?? '');
+  import.meta.url === `file://${process.argv[1]}` ||
+  import.meta.url.endsWith(process.argv[1] ?? '');
 
 if (isMainModule) {
   main().catch((error) => {

@@ -150,11 +150,12 @@ const COMPILED_PATTERNS = {
 function compileGlobPattern(pattern: string): RegExp {
   // Fixed glob-to-regex conversion (Issue #4 from claude-code-guide)
   // Escape special regex characters except * and **
-  let regex = pattern
+  const DOUBLE_STAR_PLACEHOLDER = '§DOUBLESTAR§';
+  const regex = pattern
     .replace(/[.+?^${}()|[\]\\]/g, '\\$&') // Escape special chars
-    .replace(/\*\*/g, '\x00')               // Temporarily replace **
-    .replace(/\*/g, '[^/]*')                // * matches anything except /
-    .replace(/\x00/g, '.*');                // ** matches anything including /
+    .replace(/\*\*/g, DOUBLE_STAR_PLACEHOLDER) // Temporarily replace **
+    .replace(/\*/g, '[^/]*') // * matches anything except /
+    .replace(new RegExp(DOUBLE_STAR_PLACEHOLDER, 'g'), '.*'); // ** matches anything including /
 
   return new RegExp(`^${regex}$`);
 }
@@ -565,10 +566,7 @@ function validateChangesets(stagedChangesets: string[]): Violation[] {
   return violations;
 }
 
-function validateChangesetScope(
-  stagedFiles: string[],
-  changesets: string[],
-): Violation[] {
+function validateChangesetScope(stagedFiles: string[], changesets: string[]): Violation[] {
   // Priority 2: Changeset scope validation (Issue #1.1 from principal-engineer)
   const violations: Violation[] = [];
   const changedPackages = getChangedPackages(stagedFiles);

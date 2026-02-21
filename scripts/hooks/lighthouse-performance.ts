@@ -41,7 +41,7 @@
  */
 
 import { execSync } from 'child_process';
-import { existsSync, readFileSync, statSync } from 'fs';
+import { existsSync, readFileSync } from 'fs';
 import { join, resolve } from 'path';
 import { glob } from 'glob';
 import { gzipSync } from 'zlib';
@@ -58,7 +58,14 @@ interface Violation {
   suggestion: string;
   code?: string;
   severity: 'critical' | 'warning';
-  category?: 'performance' | 'lcp' | 'inp' | 'cls' | 'tbt' | 'bundle-size' | 'component-bundle-size';
+  category?:
+    | 'performance'
+    | 'lcp'
+    | 'inp'
+    | 'cls'
+    | 'tbt'
+    | 'bundle-size'
+    | 'component-bundle-size';
   learnMoreUrl?: string; // Educational resource link
 }
 
@@ -180,7 +187,8 @@ const CONFIG: HookConfig = {
 
   // CLI flags - Auto-detect CI environment
   bailFast: process.argv.includes('--bail-fast'),
-  ciMode: process.argv.includes('--ci') || process.env.CI === 'true' || !!process.env.GITHUB_ACTIONS,
+  ciMode:
+    process.argv.includes('--ci') || process.env.CI === 'true' || !!process.env.GITHUB_ACTIONS,
   skipLighthouse: process.argv.includes('--skip-lighthouse'),
 
   // Cache configuration (matches H21 dependency-audit pattern)
@@ -276,14 +284,23 @@ function hasApprovalComment(filePath: string): boolean {
  * Measures packages/hx-library/dist, NOT apps/storybook/dist
  * Returns both uncompressed and gzipped sizes
  */
-function checkBundleSize(buildDir: string, filePattern?: string): { uncompressed: number; gzipped: number; perComponentSizes: Array<{ file: string; size: number; gzipped: number }> } {
+function checkBundleSize(
+  buildDir: string,
+  filePattern?: string,
+): {
+  uncompressed: number;
+  gzipped: number;
+  perComponentSizes: Array<{ file: string; size: number; gzipped: number }>;
+} {
   const projectRoot = process.cwd();
   const fullBuildPath = resolve(projectRoot, buildDir);
 
   if (!existsSync(fullBuildPath)) {
     // In local dev, missing build is a warning. In CI, it's critical.
     if (CONFIG.ciMode) {
-      throw new Error(`CRITICAL: Build directory not found in CI: ${fullBuildPath}. Run 'npm run build:library' before commit.`);
+      throw new Error(
+        `CRITICAL: Build directory not found in CI: ${fullBuildPath}. Run 'npm run build:library' before commit.`,
+      );
     } else {
       throw new Error(`Build directory not found: ${fullBuildPath}`);
     }
@@ -336,9 +353,11 @@ function checkBundleSize(buildDir: string, filePattern?: string): { uncompressed
 function getLibraryHash(buildDir: string): string {
   try {
     const fullBuildPath = resolve(process.cwd(), buildDir);
-    const jsFiles = glob.sync(`${fullBuildPath}/${CONFIG.componentFilePattern}`, {
-      ignore: ['**/node_modules/**', '**/*.map'],
-    }).sort(); // Sort for consistent hashing
+    const jsFiles = glob
+      .sync(`${fullBuildPath}/${CONFIG.componentFilePattern}`, {
+        ignore: ['**/node_modules/**', '**/*.map'],
+      })
+      .sort(); // Sort for consistent hashing
 
     const hash = createHash('sha256');
     for (const file of jsFiles) {
@@ -385,10 +404,17 @@ function saveLighthouseResultToCache(cacheKey: string, metrics: LighthouseMetric
     }
 
     const cacheFile = join(cacheDir, `${cacheKey}.json`);
-    writeFileSync(cacheFile, JSON.stringify({
-      timestamp: Date.now(),
-      metrics,
-    }, null, 2));
+    writeFileSync(
+      cacheFile,
+      JSON.stringify(
+        {
+          timestamp: Date.now(),
+          metrics,
+        },
+        null,
+        2,
+      ),
+    );
   } catch {
     // Cache write failure is non-critical
   }
@@ -427,11 +453,15 @@ function checkChromeAvailability(): void {
     }
 
     if (!chromeFound) {
-      throw new Error('Chrome/Chromium binary not found. Lighthouse requires Chrome to run performance audits.');
+      throw new Error(
+        'Chrome/Chromium binary not found. Lighthouse requires Chrome to run performance audits.',
+      );
     }
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
-    throw new Error(`Chrome pre-check failed: ${errorMessage}. Install Chrome from https://www.google.com/chrome/`);
+    throw new Error(
+      `Chrome pre-check failed: ${errorMessage}. Install Chrome from https://www.google.com/chrome/`,
+    );
   }
 }
 
@@ -452,11 +482,15 @@ function checkLighthouseAvailability(): void {
     // Verify version is 12.x (pinned)
     const versionMatch = version.match(/(\d+)\./);
     if (versionMatch && parseInt(versionMatch[1]) < 12) {
-      console.warn(`WARNING: Lighthouse version ${version} is outdated. Expected v12.x. Run: npm install lighthouse@~12.8.0`);
+      console.warn(
+        `WARNING: Lighthouse version ${version} is outdated. Expected v12.x. Run: npm install lighthouse@~12.8.0`,
+      );
     }
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
-    throw new Error(`Lighthouse pre-check failed: ${errorMessage}. Install with: npm install lighthouse@~12.8.0`);
+    throw new Error(
+      `Lighthouse pre-check failed: ${errorMessage}. Install with: npm install lighthouse@~12.8.0`,
+    );
   }
 }
 
@@ -472,18 +506,21 @@ async function checkStorybookAvailability(url: string): Promise<void> {
     const httpModule = isHttps ? await import('node:https') : await import('node:http');
 
     await new Promise<void>((resolve, reject) => {
-      const req = httpModule.get({
-        hostname: urlObj.hostname,
-        port: urlObj.port || (isHttps ? 443 : 80),
-        path: urlObj.pathname,
-        timeout: 10000,
-      }, (res) => {
-        if (res.statusCode === 200) {
-          resolve();
-        } else {
-          reject(new Error(`Storybook returned status ${res.statusCode}`));
-        }
-      });
+      const req = httpModule.get(
+        {
+          hostname: urlObj.hostname,
+          port: urlObj.port || (isHttps ? 443 : 80),
+          path: urlObj.pathname,
+          timeout: 10000,
+        },
+        (res) => {
+          if (res.statusCode === 200) {
+            resolve();
+          } else {
+            reject(new Error(`Storybook returned status ${res.statusCode}`));
+          }
+        },
+      );
 
       req.on('error', reject);
       req.on('timeout', () => {
@@ -493,7 +530,9 @@ async function checkStorybookAvailability(url: string): Promise<void> {
     });
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
-    throw new Error(`Storybook not available at ${url}: ${errorMessage}. Start with: npm run dev:storybook`);
+    throw new Error(
+      `Storybook not available at ${url}: ${errorMessage}. Start with: npm run dev:storybook`,
+    );
   }
 }
 
@@ -517,7 +556,7 @@ async function runLighthouse(url: string, deps?: HookDependencies): Promise<Ligh
     await checkStorybookAvailability(url);
   }
 
-  const chromeProcess: any = null;
+  const chromeProcess: unknown = null;
 
   try {
     let output: string;
@@ -541,8 +580,10 @@ async function runLighthouse(url: string, deps?: HookDependencies): Promise<Ligh
           // Exponential backoff: 0ms, 2s, 4s
           if (attempt > 0) {
             const backoffMs = attempt * 2000;
-            console.warn(`Retry attempt ${attempt}/${maxRetries - 1} after ${backoffMs}ms backoff...`);
-            await new Promise(resolve => setTimeout(resolve, backoffMs));
+            console.warn(
+              `Retry attempt ${attempt}/${maxRetries - 1} after ${backoffMs}ms backoff...`,
+            );
+            await new Promise((resolve) => setTimeout(resolve, backoffMs));
           }
 
           output = execSync(lighthouseCmd, {
@@ -577,12 +618,16 @@ async function runLighthouse(url: string, deps?: HookDependencies): Promise<Ligh
     try {
       result = JSON.parse(output) as LighthouseResult;
     } catch (parseError) {
-      throw new Error(`Failed to parse Lighthouse JSON output: ${parseError instanceof Error ? parseError.message : String(parseError)}`);
+      throw new Error(
+        `Failed to parse Lighthouse JSON output: ${parseError instanceof Error ? parseError.message : String(parseError)}`,
+      );
     }
 
     // Validate JSON structure
     if (!result.categories?.performance) {
-      throw new Error('Lighthouse result missing performance category. Output may be corrupted or Lighthouse version incompatible.');
+      throw new Error(
+        'Lighthouse result missing performance category. Output may be corrupted or Lighthouse version incompatible.',
+      );
     }
 
     if (!result.audits) {
@@ -720,8 +765,12 @@ function validatePerformanceBudget(
  * Uses gzipped sizes (matches production CDN delivery)
  */
 function validateBundleSize(
-  bundleData: { uncompressed: number; gzipped: number; perComponentSizes: Array<{ file: string; size: number; gzipped: number }> },
-  budget: PerformanceBudget
+  bundleData: {
+    uncompressed: number;
+    gzipped: number;
+    perComponentSizes: Array<{ file: string; size: number; gzipped: number }>;
+  },
+  budget: PerformanceBudget,
 ): Violation[] {
   const violations: Violation[] = [];
 
@@ -745,7 +794,7 @@ function validateBundleSize(
 
   // Check per-component budget (5KB gzipped per component)
   const oversizedComponents = bundleData.perComponentSizes.filter(
-    comp => comp.gzipped > budget.maxPerComponentBundleSize
+    (comp) => comp.gzipped > budget.maxPerComponentBundleSize,
   );
 
   if (oversizedComponents.length > 0) {

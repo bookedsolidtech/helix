@@ -233,7 +233,7 @@ describe('checkTokenPrefix', () => {
       allTokens: ['--custom-color'],
     };
 
-    checkTokenPrefix(usage, 'test.ts', violations as any);
+    checkTokenPrefix(usage, 'test.ts', violations as Violation[]);
 
     expect(violations).toHaveLength(1);
     expect(violations[0]?.message).toContain('missing required prefix');
@@ -250,7 +250,7 @@ describe('checkTokenPrefix', () => {
       allTokens: ['--hx-color-primary'],
     };
 
-    checkTokenPrefix(usage, 'test.ts', violations as any);
+    checkTokenPrefix(usage, 'test.ts', violations as Violation[]);
 
     expect(violations).toHaveLength(0);
   });
@@ -266,7 +266,7 @@ describe('checkTokenPrefix', () => {
       allTokens: ['--_internal'],
     };
 
-    checkTokenPrefix(usage, 'test.ts', violations as any);
+    checkTokenPrefix(usage, 'test.ts', violations as Violation[]);
 
     expect(violations).toHaveLength(0);
   });
@@ -283,7 +283,7 @@ describe('checkPrimitiveUsage', () => {
       code: 'color: var(--hx-color-neutral-900);',
     };
 
-    checkPrimitiveUsage(usage, 'test.ts', violations as any);
+    checkPrimitiveUsage(usage, 'test.ts', violations as Violation[]);
 
     expect(violations).toHaveLength(1);
     expect(violations[0]?.message).toContain('Primitive token');
@@ -300,7 +300,7 @@ describe('checkPrimitiveUsage', () => {
       code: 'color: var(--hx-color-primary);',
     };
 
-    checkPrimitiveUsage(usage, 'test.ts', violations as any);
+    checkPrimitiveUsage(usage, 'test.ts', violations as Violation[]);
 
     expect(violations).toHaveLength(0);
   });
@@ -315,7 +315,7 @@ describe('checkPrimitiveUsage', () => {
       code: 'background: var(--_bg);',
     };
 
-    checkPrimitiveUsage(usage, 'test.ts', violations as any);
+    checkPrimitiveUsage(usage, 'test.ts', violations as Violation[]);
 
     expect(violations).toHaveLength(0);
   });
@@ -332,7 +332,7 @@ describe('checkComponentFallback', () => {
       code: 'background: var(--hx-button-bg);',
     };
 
-    checkComponentFallback(usage, 'test.ts', violations as any);
+    checkComponentFallback(usage, 'test.ts', violations as Violation[]);
 
     expect(violations).toHaveLength(1);
     expect(violations[0]?.message).toContain('missing semantic fallback');
@@ -349,7 +349,7 @@ describe('checkComponentFallback', () => {
       code: 'background: var(--hx-button-bg, var(--hx-color-primary));',
     };
 
-    checkComponentFallback(usage, 'test.ts', violations as any);
+    checkComponentFallback(usage, 'test.ts', violations as Violation[]);
 
     expect(violations).toHaveLength(0);
   });
@@ -364,7 +364,7 @@ describe('checkComponentFallback', () => {
       code: 'background: var(--hx-button-bg, var(--hx-color-neutral-900));',
     };
 
-    checkComponentFallback(usage, 'test.ts', violations as any);
+    checkComponentFallback(usage, 'test.ts', violations as Violation[]);
 
     expect(violations).toHaveLength(1);
     expect(violations[0]?.message).toContain('not a semantic token');
@@ -380,7 +380,7 @@ describe('checkComponentFallback', () => {
       code: 'color: var(--hx-color-primary);',
     };
 
-    checkComponentFallback(usage, 'test.ts', violations as any);
+    checkComponentFallback(usage, 'test.ts', violations as Violation[]);
 
     expect(violations).toHaveLength(0);
   });
@@ -395,7 +395,7 @@ describe('checkComponentFallback', () => {
       code: 'background: var(--_bg);',
     };
 
-    checkComponentFallback(usage, 'test.ts', violations as any);
+    checkComponentFallback(usage, 'test.ts', violations as Violation[]);
 
     expect(violations).toHaveLength(0);
   });
@@ -743,7 +743,7 @@ describe('checkUnknownToken', () => {
       allTokens: ['--hx-typo-mistake'],
     };
 
-    checkUnknownToken(usage, 'test.ts', violations as any);
+    checkUnknownToken(usage, 'test.ts', violations as Violation[]);
 
     expect(violations).toHaveLength(1);
     expect(violations[0]?.message).toContain('Unknown token');
@@ -761,7 +761,7 @@ describe('checkUnknownToken', () => {
       allTokens: ['--hx-color-text-primary'],
     };
 
-    checkUnknownToken(usage, 'test.ts', violations as any);
+    checkUnknownToken(usage, 'test.ts', violations as Violation[]);
 
     expect(violations).toHaveLength(0);
   });
@@ -779,7 +779,7 @@ describe('checkRecursiveFallbacks', () => {
       allTokens: ['--hx-button-bg', '--hx-color-neutral-900', '--hx-color-primary'],
     };
 
-    checkRecursiveFallbacks(usage, 'test.ts', violations as any);
+    checkRecursiveFallbacks(usage, 'test.ts', violations as Violation[]);
 
     expect(violations).toHaveLength(1);
     expect(violations[0]?.message).toContain('Primitive tokens in middle');
@@ -796,7 +796,7 @@ describe('checkRecursiveFallbacks', () => {
       allTokens: ['--hx-button-bg', '--hx-color-primary-500'],
     };
 
-    checkRecursiveFallbacks(usage, 'test.ts', violations as any);
+    checkRecursiveFallbacks(usage, 'test.ts', violations as Violation[]);
 
     expect(violations).toHaveLength(0);
   });
@@ -812,7 +812,7 @@ describe('checkRecursiveFallbacks', () => {
       allTokens: ['--hx-button-bg', '--hx-color-primary'],
     };
 
-    checkRecursiveFallbacks(usage, 'test.ts', violations as any);
+    checkRecursiveFallbacks(usage, 'test.ts', violations as Violation[]);
 
     expect(violations).toHaveLength(0);
   });

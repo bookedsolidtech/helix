@@ -10,16 +10,16 @@
 
 import { describe, it, expect } from 'vitest';
 import { readFileSync } from 'fs';
-import { join } from 'path';
 
 // Test helpers
 function compileGlobPattern(pattern: string): RegExp {
   // Escape special regex characters except * and **
-  let regex = pattern
+  const DOUBLE_STAR_PLACEHOLDER = '§DOUBLESTAR§';
+  const regex = pattern
     .replace(/[.+?^${}()|[\]\\]/g, '\\$&') // Escape special chars
-    .replace(/\*\*/g, '\x00')               // Temporarily replace **
-    .replace(/\*/g, '[^/]*')                // * matches anything except /
-    .replace(/\x00/g, '.*');                // ** matches anything including /
+    .replace(/\*\*/g, DOUBLE_STAR_PLACEHOLDER) // Temporarily replace **
+    .replace(/\*/g, '[^/]*') // * matches anything except /
+    .replace(new RegExp(DOUBLE_STAR_PLACEHOLDER, 'g'), '.*'); // ** matches anything including /
 
   return new RegExp(`^${regex}$`);
 }
@@ -634,11 +634,7 @@ context about the changes.`;
     });
 
     it('should compile patterns once for reuse', () => {
-      const patterns = [
-        'packages/hx-library/src/**/*.ts',
-        '**/*.test.ts',
-        '**/*.stories.ts',
-      ];
+      const patterns = ['packages/hx-library/src/**/*.ts', '**/*.test.ts', '**/*.stories.ts'];
 
       const start = Date.now();
       const compiled = patterns.map(compileGlobPattern);
@@ -666,7 +662,7 @@ context about the changes.`;
 
   describe('YAML Parsing (yaml library)', () => {
     it('should parse valid YAML frontmatter', () => {
-      const frontmatter = '"@helix/library": minor';
+      const _frontmatter = '"@helix/library": minor';
 
       // Simulate what yaml library would do
       const parsed: Record<string, string> = {
@@ -677,7 +673,7 @@ context about the changes.`;
     });
 
     it('should handle multiple packages in YAML', () => {
-      const frontmatter = `"@helix/library": major
+      const _frontmatter = `"@helix/library": major
 "@helix/tokens": patch`;
 
       const parsed: Record<string, string> = {

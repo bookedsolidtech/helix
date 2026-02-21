@@ -299,8 +299,7 @@ export function checkClassJSDoc(
         line,
         column,
         message: `Class "${className}" missing JSDoc documentation`,
-        suggestion:
-          'Add JSDoc comment describing the component purpose, usage, and public API',
+        suggestion: 'Add JSDoc comment describing the component purpose, usage, and public API',
         code: classDecl.getText().split('\n')[0]?.substring(0, 80),
         severity: 'critical',
       });
@@ -519,7 +518,7 @@ export function checkMethodParams(
   });
 
   for (const param of params) {
-    let paramName = param.getName();
+    const paramName = param.getName();
     // Remove rest operator for comparison (if present in source code)
     if (param.isRestParameter()) {
       // Rest parameter name in AST doesn't include '...'

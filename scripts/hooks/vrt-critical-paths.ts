@@ -36,7 +36,7 @@ import {
 } from 'ts-morph';
 import { execSync } from 'child_process';
 import { existsSync, statSync, readdirSync, readFileSync } from 'fs';
-import { join, dirname, sep as pathSep } from 'path';
+import { join, dirname } from 'path';
 
 // ─── Types ────────────────────────────────────────────────────────────────
 
@@ -200,7 +200,7 @@ function getStagedFiles(): string[] {
       .filter((file) => matchesPatterns(file, CONFIG.includePatterns))
       .filter((file) => !matchesPatterns(file, CONFIG.excludePatterns))
       .filter((file) => existsSync(file));
-  } catch (error) {
+  } catch {
     const errorMessage = error instanceof Error ? error.message : String(error);
     throw new Error(`Failed to get staged files from Git: ${errorMessage}`);
   }
@@ -212,7 +212,7 @@ function getStagedFiles(): string[] {
 function readFile(path: string): string {
   try {
     return readFileSync(path, 'utf-8');
-  } catch (error) {
+  } catch {
     const errorMessage = error instanceof Error ? error.message : String(error);
     throw new Error(`Failed to read file ${path}: ${errorMessage}`);
   }
@@ -232,7 +232,7 @@ function getFileTimestamp(path: string): number {
   try {
     const stats = statSync(path);
     return stats.mtimeMs;
-  } catch (error) {
+  } catch {
     return 0;
   }
 }
@@ -287,10 +287,7 @@ export function extractComponentName(filePath: string): string {
  * - Rationale: If file has changes in git diff, and we detected render() method in AST,
  *   it's safer to require VRT coverage than risk false negatives from fragile parsing
  */
-export function hasRenderChangesInDiff(
-  filePath: string,
-  renderChange: RenderChange,
-): boolean {
+export function hasRenderChangesInDiff(filePath: string, _renderChange: RenderChange): boolean {
   try {
     // Use --numstat for reliable change detection
     // Output format: "added\tdeleted\tfilename"
@@ -327,7 +324,7 @@ export function hasRenderChangesInDiff(
     // This is a conservative approach: we know render() method exists (from AST),
     // and we know file changed (from git diff), so we require VRT coverage
     return addedLines > 0 || removedLines > 0;
-  } catch (error) {
+  } catch {
     // If git diff fails, assume changes exist (conservative approach)
     return true;
   }
@@ -390,9 +387,7 @@ export function extractVRTStories(storyFileContent: string): VRTStory[] {
   const stories: VRTStory[] = [];
 
   // Extract meta object specifically (before "export default meta")
-  const metaMatch = storyFileContent.match(
-    /const\s+meta\s*=\s*\{[\s\S]*?\}\s*satisfies\s+Meta/,
-  );
+  const metaMatch = storyFileContent.match(/const\s+meta\s*=\s*\{[\s\S]*?\}\s*satisfies\s+Meta/);
   const metaBlock = metaMatch ? metaMatch[0] : '';
 
   // Check if meta has tags: ['vrt'] or tags: ['autodocs', 'vrt']
@@ -411,7 +406,8 @@ export function extractVRTStories(storyFileContent: string): VRTStory[] {
   // - Story name (capture group 1)
   // - Story type annotation (: Story or : Story<...>)
   // - Everything until the next export or end of file
-  const storyExportRegex = /export\s+const\s+(\w+):\s*Story(?:<[^>]*>)?\s*=\s*\{([\s\S]*?)(?=export\s+const\s+\w+:|export\s+default|$)/g;
+  const storyExportRegex =
+    /export\s+const\s+(\w+):\s*Story(?:<[^>]*>)?\s*=\s*\{([\s\S]*?)(?=export\s+const\s+\w+:|export\s+default|$)/g;
 
   let match;
   while ((match = storyExportRegex.exec(storyFileContent)) !== null) {
@@ -485,13 +481,13 @@ function buildSnapshotCache(deps: HookDependencies = defaultDeps): SnapshotCache
             }
           }
         }
-      } catch (error) {
+      } catch {
         // Ignore errors during directory traversal
       }
     };
 
     searchDir(snapshotBaseDir);
-  } catch (error) {
+  } catch {
     // Ignore errors during snapshot search
   }
 
@@ -548,10 +544,7 @@ export function isSnapshotFresh(
 /**
  * Get snapshot age in hours
  */
-export function getSnapshotAge(
-  snapshotPath: string,
-  deps: HookDependencies = defaultDeps,
-): number {
+export function getSnapshotAge(snapshotPath: string, deps: HookDependencies = defaultDeps): number {
   const snapshotTime = deps.getFileTimestamp(snapshotPath);
 
   if (snapshotTime === 0) {
@@ -602,7 +595,8 @@ export function validateVRTCoverage(
 
   // Check for approval comment
   const classes = sourceFile.getClasses();
-  if (classes.length > 0 && hasApprovalComment(classes[0]!)) {
+  const firstClass = classes[0];
+  if (firstClass && hasApprovalComment(firstClass)) {
     return;
   }
 
@@ -761,7 +755,7 @@ export async function validateVRTCriticalPaths(
   let stagedFiles: string[];
   try {
     stagedFiles = deps.getStagedFiles();
-  } catch (error) {
+  } catch {
     return {
       passed: false,
       violations: [
@@ -872,7 +866,7 @@ export async function validateVRTCriticalPaths(
         }
         break;
       }
-    } catch (error) {
+    } catch {
       violations.push({
         file: filePath,
         line: 1,
@@ -1011,9 +1005,7 @@ async function main(): Promise<void> {
   console.log('━'.repeat(60));
   console.log('[SUMMARY]');
   console.log(`   Files checked: ${result.stats.filesChecked}`);
-  console.log(
-    `   Components with render changes: ${result.stats.componentsWithRenderChanges}`,
-  );
+  console.log(`   Components with render changes: ${result.stats.componentsWithRenderChanges}`);
   console.log(`   Components with VRT: ${result.stats.componentsWithVRT}`);
   console.log(`   Total violations: ${result.stats.totalViolations}`);
   console.log(`   Critical: ${result.stats.criticalViolations}`);
@@ -1034,7 +1026,7 @@ async function main(): Promise<void> {
     console.log('[FIX] To resolve:');
     console.log('   1. Run VRT tests: npm run test:vrt');
     console.log('   2. Update snapshots: npm run test:vrt -- --update-snapshots');
-    console.log('   3. Add tags: [\'vrt\'] to story meta for critical user paths');
+    console.log("   3. Add tags: ['vrt'] to story meta for critical user paths");
     console.log('   4. Ensure snapshots are newer than component modifications');
     console.log('');
     console.log('[BYPASS] Emergency bypass (NOT recommended):');
@@ -1060,11 +1052,4 @@ if (isMainModule) {
 }
 
 // Export for testing
-export type {
-  Violation,
-  ValidationResult,
-  HookDependencies,
-  RenderChange,
-  VRTStory,
-  SnapshotInfo,
-};
+export type { Violation, ValidationResult, HookDependencies, RenderChange, VRTStory, SnapshotInfo };

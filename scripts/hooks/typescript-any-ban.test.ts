@@ -2,10 +2,10 @@ import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { mkdirSync, writeFileSync, rmSync, existsSync } from 'fs';
 import { join } from 'path';
 import { Project } from 'ts-morph';
-import type { HookDependencies, ValidationResult } from './typescript-any-ban';
+import type { HookDependencies } from './typescript-any-ban';
 
 // Import the validator function
-import { validateTypeScriptAnyBan, checkExplicitAny, checkFunctionType, checkMissingReturnTypes, checkMissingParameterTypes } from './typescript-any-ban';
+import { validateTypeScriptAnyBan } from './typescript-any-ban';
 
 describe('typescript-any-ban (H17)', () => {
   const TMP_DIR = join(process.cwd(), '.tmp-typescript-any-ban-test');
@@ -112,7 +112,7 @@ describe('typescript-any-ban (H17)', () => {
 
       expect(result.passed).toBe(false);
       expect(result.stats.criticalViolations).toBeGreaterThan(0);
-      const anyViolations = result.violations.filter(v => v.message.includes('any'));
+      const anyViolations = result.violations.filter((v) => v.message.includes('any'));
       expect(anyViolations.length).toBeGreaterThan(0);
     });
 

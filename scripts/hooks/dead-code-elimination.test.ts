@@ -1,16 +1,14 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { execSync } from 'child_process';
 import { mkdirSync, writeFileSync, rmSync, existsSync } from 'fs';
-import { join, dirname } from 'path';
-import { fileURLToPath } from 'url';
+import { join } from 'path';
 
 describe('dead-code-elimination (H24)', () => {
   // Find project root by looking for scripts/hooks directory
   // This works whether tests run from project root or scripts/hooks directory
   const cwd = process.cwd();
-  const PROJECT_ROOT = cwd.endsWith('scripts/hooks') || cwd.endsWith('scripts\\hooks')
-    ? join(cwd, '../..')
-    : cwd;
+  const PROJECT_ROOT =
+    cwd.endsWith('scripts/hooks') || cwd.endsWith('scripts\\hooks') ? join(cwd, '../..') : cwd;
   const TMP_DIR = join(PROJECT_ROOT, '.tmp-dead-code-elimination-test');
   const hookScript = join(PROJECT_ROOT, 'scripts/hooks/dead-code-elimination.ts');
 

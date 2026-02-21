@@ -1,14 +1,7 @@
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect } from 'vitest';
 import { Project, SourceFile } from 'ts-morph';
 import {
   validateShadowDOMLeakDetection,
-  checkGlobalSelectors,
-  checkImportantOverrides,
-  checkHostContext,
-  checkSlottedUsage,
-  checkMissingHostWrapper,
-  checkDOMManipulation,
-  checkCustomPropertyPrefix,
   validateShadowDOMLeaks,
 } from './shadow-dom-leak-detection.js';
 import type { Violation, HookDependencies } from './shadow-dom-leak-detection.js';
@@ -72,7 +65,7 @@ function computeLineOffsets(text: string): number[] {
 /**
  * Create CSS context for testing (matches implementation)
  */
-function createCSSContext(cssContent: string): CSSContext {
+function _createCSSContext(cssContent: string): CSSContext {
   return {
     cssContent,
     cssLines: cssContent.split('\n'),
@@ -86,8 +79,9 @@ function createCSSContext(cssContent: string): CSSContext {
 function isLightDOMComponent(sourceFile: SourceFile): boolean {
   let isLightDOM = false;
   sourceFile.forEachDescendant((node) => {
-    if (node.getKind() === 177) { // MethodDeclaration
-      const method = node as any;
+    if (node.getKind() === 177) {
+      // MethodDeclaration
+      const method = node as Record<string, unknown>;
       if (method.getName && method.getName() === 'createRenderRoot') {
         const body = method.getBody && method.getBody();
         if (body) {
@@ -1071,9 +1065,9 @@ describe('shadow-dom-leak-detection (H16)', () => {
       const result = await validateShadowDOMLeakDetection(deps, true);
 
       // Should NOT flag this.querySelector for Light DOM components
-      expect(result.violations.filter((v) => v.message.includes('this.querySelector'))).toHaveLength(
-        0,
-      );
+      expect(
+        result.violations.filter((v) => v.message.includes('this.querySelector')),
+      ).toHaveLength(0);
     });
   });
 });

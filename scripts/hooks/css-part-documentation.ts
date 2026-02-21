@@ -28,16 +28,7 @@
  *   npm run hooks:css-part-documentation
  */
 
-import {
-  Project,
-  Node,
-  SourceFile,
-  ClassDeclaration,
-  JSDoc,
-  TemplateExpression,
-  NoSubstitutionTemplateLiteral,
-  TaggedTemplateExpression,
-} from 'ts-morph';
+import { Project, Node, SourceFile, ClassDeclaration } from 'ts-morph';
 import { execSync } from 'child_process';
 import { existsSync, readFileSync } from 'fs';
 
@@ -553,7 +544,7 @@ export function checkUnusedParts(
       // This is a warning, not critical, as parts might be styled externally
       return;
     }
-  } catch (error) {
+  } catch {
     // If we can't read the styles file, skip this validation
     return;
   }

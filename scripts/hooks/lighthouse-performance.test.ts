@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach } from 'vitest';
 import {
   validateFiles,
   checkBundleSize,
@@ -467,9 +467,9 @@ describe('lighthouse-performance (H19)', () => {
     it('should pass when no files are changed', async () => {
       const deps: HookDependencies = {
         getStagedFiles: () => [],
-        readFile: (path) => '',
-        fileExists: (path) => false,
-        execCommand: (cmd) => '',
+        readFile: (_path) => '',
+        fileExists: (_path) => false,
+        execCommand: (_cmd) => '',
       };
 
       const result = await validateFiles([], deps);
@@ -489,9 +489,9 @@ describe('lighthouse-performance (H19)', () => {
 
       const deps: HookDependencies = {
         getStagedFiles: () => [filePath],
-        readFile: (path) => '',
-        fileExists: (path) => path === filePath,
-        execCommand: (cmd) => '',
+        readFile: (_path) => '',
+        fileExists: (_path) => path === filePath,
+        execCommand: (_cmd) => '',
       };
 
       const result = await validateFiles([filePath], deps);
@@ -504,9 +504,9 @@ describe('lighthouse-performance (H19)', () => {
 
       const deps: HookDependencies = {
         getStagedFiles: () => [filePath],
-        readFile: (path) => 'export class Button {}',
-        fileExists: (path) => false,
-        execCommand: (cmd) => '',
+        readFile: (_path) => 'export class Button {}',
+        fileExists: (_path) => false,
+        execCommand: (_cmd) => '',
       };
 
       const result = await validateFiles([filePath], deps);
@@ -520,9 +520,9 @@ describe('lighthouse-performance (H19)', () => {
 
       const deps: HookDependencies = {
         getStagedFiles: () => [filePath],
-        readFile: (path) => 'export class Button {}',
-        fileExists: (path) => false,
-        execCommand: (cmd) => '',
+        readFile: (_path) => 'export class Button {}',
+        fileExists: (_path) => false,
+        execCommand: (_cmd) => '',
       };
 
       const result = await validateFiles([filePath], deps);
@@ -539,9 +539,9 @@ describe('lighthouse-performance (H19)', () => {
     it('should track execution time', async () => {
       const deps: HookDependencies = {
         getStagedFiles: () => [],
-        readFile: (path) => '',
-        fileExists: (path) => false,
-        execCommand: (cmd) => '',
+        readFile: (_path) => '',
+        fileExists: (_path) => false,
+        execCommand: (_cmd) => '',
       };
 
       const result = await validateFiles([], deps);
@@ -554,9 +554,9 @@ describe('lighthouse-performance (H19)', () => {
 
       const deps: HookDependencies = {
         getStagedFiles: () => [filePath],
-        readFile: (path) => 'export class Button {}',
-        fileExists: (path) => false,
-        execCommand: (cmd) => '',
+        readFile: (_path) => 'export class Button {}',
+        fileExists: (_path) => false,
+        execCommand: (_cmd) => '',
       };
 
       const result = await validateFiles([filePath], deps);
@@ -595,9 +595,9 @@ describe('lighthouse-performance (H19)', () => {
 
       const deps: HookDependencies = {
         getStagedFiles: () => [],
-        readFile: (path) => '',
-        fileExists: (path) => false,
-        execCommand: (cmd, options) => {
+        readFile: (_path) => '',
+        fileExists: (_path) => false,
+        execCommand: (cmd, _options) => {
           if (cmd.includes('lighthouse --version')) {
             return 'lighthouse 12.0.0';
           }
@@ -620,9 +620,9 @@ describe('lighthouse-performance (H19)', () => {
     it('should handle missing Lighthouse', async () => {
       const deps: HookDependencies = {
         getStagedFiles: () => [],
-        readFile: (path) => '',
-        fileExists: (path) => false,
-        execCommand: (cmd) => {
+        readFile: (_path) => '',
+        fileExists: (_path) => false,
+        execCommand: (_cmd) => {
           throw new Error('lighthouse: command not found');
         },
       };
@@ -635,9 +635,9 @@ describe('lighthouse-performance (H19)', () => {
     it('should handle malformed Lighthouse output', async () => {
       const deps: HookDependencies = {
         getStagedFiles: () => [],
-        readFile: (path) => '',
-        fileExists: (path) => false,
-        execCommand: (cmd) => {
+        readFile: (_path) => '',
+        fileExists: (_path) => false,
+        execCommand: (_cmd) => {
           if (cmd.includes('lighthouse --version')) {
             return 'lighthouse 12.0.0';
           }
@@ -653,9 +653,9 @@ describe('lighthouse-performance (H19)', () => {
     it('should handle timeout', async () => {
       const deps: HookDependencies = {
         getStagedFiles: () => [],
-        readFile: (path) => '',
-        fileExists: (path) => false,
-        execCommand: (cmd, options) => {
+        readFile: (_path) => '',
+        fileExists: (_path) => false,
+        execCommand: (_cmd, options) => {
           if (options?.timeout && options.timeout < 1000) {
             throw new Error('Command timed out');
           }

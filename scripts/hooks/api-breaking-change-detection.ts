@@ -45,7 +45,17 @@ interface Violation {
   suggestion: string;
   code?: string;
   severity: 'critical' | 'warning';
-  category?: 'removed-property' | 'removed-method' | 'removed-event' | 'removed-css-part' | 'removed-slot' | 'removed-css-property' | 'removed-component' | 'type-change' | 'signature-change' | 'event-detail-change';
+  category?:
+    | 'removed-property'
+    | 'removed-method'
+    | 'removed-event'
+    | 'removed-css-part'
+    | 'removed-slot'
+    | 'removed-css-property'
+    | 'removed-component'
+    | 'type-change'
+    | 'signature-change'
+    | 'event-detail-change';
 }
 
 interface ValidationResult {
@@ -132,9 +142,7 @@ const CONFIG: HookConfig = {
   cemPath: 'packages/hx-library/custom-elements.json',
 
   // Component file patterns
-  componentPatterns: [
-    'packages/hx-library/src/components/**/*.ts',
-  ],
+  componentPatterns: ['packages/hx-library/src/components/**/*.ts'],
 
   excludePatterns: [
     '**/*.test.ts',
@@ -174,7 +182,7 @@ function globToRegex(pattern: string): RegExp {
  * Check if file matches glob patterns
  */
 function matchesPatterns(file: string, patterns: readonly string[]): boolean {
-  return patterns.some(pattern => globToRegex(pattern).test(file));
+  return patterns.some((pattern) => globToRegex(pattern).test(file));
 }
 
 /**
@@ -190,8 +198,8 @@ function getStagedFiles(): string[] {
     return output
       .trim()
       .split('\n')
-      .filter(f => f.length > 0);
-  } catch (error) {
+      .filter((f) => f.length > 0);
+  } catch {
     return [];
   }
 }
@@ -206,7 +214,7 @@ function getFileFromCommit(filePath: string, commit: string): string | null {
       timeout: CONFIG.timeoutMs,
       maxBuffer: 10 * 1024 * 1024, // 10MB for CEM file
     });
-  } catch (error) {
+  } catch {
     return null; // File didn't exist in previous commit
   }
 }
@@ -233,7 +241,7 @@ function hasApprovalComment(filePath: string): ApprovalInfo | null {
   try {
     const content = readFileSync(filePath, 'utf-8');
     return parseApprovalComment(content);
-  } catch (error) {
+  } catch {
     return null;
   }
 }
@@ -307,7 +315,7 @@ export function parseCEM(cemContent: string): Map<string, ComponentAPI> {
             } else if (member.kind === 'method') {
               // Method - build signature
               const params = member.parameters
-                ? member.parameters.map(p => `${p.name}: ${p.type?.text || 'any'}`).join(', ')
+                ? member.parameters.map((p) => `${p.name}: ${p.type?.text || 'any'}`).join(', ')
                 : '';
               const returnType = member.return?.type?.text || 'void';
               const signature = `(${params}) => ${returnType}`;
@@ -353,7 +361,9 @@ export function parseCEM(cemContent: string): Map<string, ComponentAPI> {
 
     return components;
   } catch (error) {
-    throw new Error(`Failed to parse CEM: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    throw new Error(
+      `Failed to parse CEM: ${error instanceof Error ? error.message : 'Unknown error'}`,
+    );
   }
 }
 
@@ -444,7 +454,12 @@ export function detectBreakingChanges(
     } else {
       // Check for event detail type changes
       const currentDetail = current.events.get(eventName);
-      if (currentDetail && currentDetail !== prevDetail && prevDetail !== 'unknown' && currentDetail !== 'unknown') {
+      if (
+        currentDetail &&
+        currentDetail !== prevDetail &&
+        prevDetail !== 'unknown' &&
+        currentDetail !== 'unknown'
+      ) {
         violations.push({
           file,
           line: 1,
@@ -514,9 +529,10 @@ function isCEMStale(cemPath: string, stagedFiles: string[]): boolean {
   if (!existsSync(cemPath)) return false; // Missing CEM is handled separately
 
   // Check if component files are staged
-  const stagedComponentFiles = stagedFiles.filter(file =>
-    matchesPatterns(file, CONFIG.componentPatterns) &&
-    !matchesPatterns(file, CONFIG.excludePatterns)
+  const stagedComponentFiles = stagedFiles.filter(
+    (file) =>
+      matchesPatterns(file, CONFIG.componentPatterns) &&
+      !matchesPatterns(file, CONFIG.excludePatterns),
   );
 
   if (stagedComponentFiles.length === 0) {
@@ -569,14 +585,16 @@ function validateFiles(stagedFiles: string[]): ValidationResult {
       hook_id: 'H18',
       hook_name: 'api-breaking-change-detection',
       passed: false,
-      violations: [{
-        file: CONFIG.cemPath,
-        line: 1,
-        column: 1,
-        message: 'CEM file not found',
-        suggestion: 'Run `npm run cem` to generate Custom Elements Manifest',
-        severity: 'critical',
-      }],
+      violations: [
+        {
+          file: CONFIG.cemPath,
+          line: 1,
+          column: 1,
+          message: 'CEM file not found',
+          suggestion: 'Run `npm run cem` to generate Custom Elements Manifest',
+          severity: 'critical',
+        },
+      ],
       stats: {
         componentsChecked: 0,
         totalViolations: 1,
@@ -593,14 +611,16 @@ function validateFiles(stagedFiles: string[]): ValidationResult {
       hook_id: 'H18',
       hook_name: 'api-breaking-change-detection',
       passed: false,
-      violations: [{
-        file: CONFIG.cemPath,
-        line: 1,
-        column: 1,
-        message: 'CEM is stale - component files modified after CEM generation',
-        suggestion: 'Run `npm run cem` to regenerate Custom Elements Manifest',
-        severity: 'critical',
-      }],
+      violations: [
+        {
+          file: CONFIG.cemPath,
+          line: 1,
+          column: 1,
+          message: 'CEM is stale - component files modified after CEM generation',
+          suggestion: 'Run `npm run cem` to regenerate Custom Elements Manifest',
+          severity: 'critical',
+        },
+      ],
       stats: {
         componentsChecked: 0,
         totalViolations: 1,
@@ -644,7 +664,7 @@ function validateFiles(stagedFiles: string[]): ValidationResult {
 
     if (!currentAPI) {
       // Component was removed entirely - only report if CEM or component files are staged
-      if (cemStaged || stagedFiles.some(f => f.includes('components'))) {
+      if (cemStaged || stagedFiles.some((f) => f.includes('components'))) {
         // Check for approval comment in the previous component file
         const previousComponentFilePath = existsSync(previousAPI.filePath)
           ? previousAPI.filePath
@@ -668,11 +688,14 @@ function validateFiles(stagedFiles: string[]): ValidationResult {
     }
 
     // Check if component file is in staged files or if CEM is staged
-    const componentFileStaged = cemStaged || stagedFiles.some(file =>
-      matchesPatterns(file, CONFIG.componentPatterns) &&
-      !matchesPatterns(file, CONFIG.excludePatterns) &&
-      file.includes(currentAPI.className.toLowerCase())
-    );
+    const componentFileStaged =
+      cemStaged ||
+      stagedFiles.some(
+        (file) =>
+          matchesPatterns(file, CONFIG.componentPatterns) &&
+          !matchesPatterns(file, CONFIG.excludePatterns) &&
+          file.includes(currentAPI.className.toLowerCase()),
+      );
 
     if (!componentFileStaged) {
       // Component not staged, skip
@@ -706,13 +729,13 @@ function validateFiles(stagedFiles: string[]): ValidationResult {
     componentsChecked.add(tagName);
 
     // Bail fast if enabled and critical violation found
-    if (CONFIG.bailFast && componentViolations.some(v => v.severity === 'critical')) {
+    if (CONFIG.bailFast && componentViolations.some((v) => v.severity === 'critical')) {
       break;
     }
   }
 
-  const criticalViolations = violations.filter(v => v.severity === 'critical').length;
-  const warningViolations = violations.filter(v => v.severity === 'warning').length;
+  const criticalViolations = violations.filter((v) => v.severity === 'critical').length;
+  const warningViolations = violations.filter((v) => v.severity === 'warning').length;
 
   return {
     hook_id: 'H18',
@@ -770,7 +793,9 @@ function formatOutput(result: ValidationResult, jsonMode: boolean): string {
     lines.push('   - Add @breaking-change-approved: TICKET-123 Reason if intentional');
     lines.push('');
     lines.push('🔗 Cross-hook coordination:');
-    lines.push('   - After approval, run semantic-versioning hook (H14) to ensure changeset exists');
+    lines.push(
+      '   - After approval, run semantic-versioning hook (H14) to ensure changeset exists',
+    );
     lines.push('   - Update CEM with `npm run cem` to reflect API changes');
     lines.push('   - Run full pre-commit check with `npm run pre-commit-check`');
     lines.push('');
@@ -805,7 +830,9 @@ function main(): void {
     if (!jsonMode) {
       const duration = Date.now() - startTime;
       const budgetStatus = duration <= CONFIG.performanceBudgetMs ? '✅' : '⚠️';
-      console.log(`⏱️  Execution time: ${duration}ms ${budgetStatus} (budget: <${CONFIG.performanceBudgetMs}ms)`);
+      console.log(
+        `⏱️  Execution time: ${duration}ms ${budgetStatus} (budget: <${CONFIG.performanceBudgetMs}ms)`,
+      );
       console.log('');
     }
 

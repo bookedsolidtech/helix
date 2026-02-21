@@ -42,7 +42,7 @@
 
 import { execSync } from 'child_process';
 import { readFileSync, existsSync, writeFileSync, mkdirSync, realpathSync } from 'fs';
-import { join, dirname } from 'path';
+import { join } from 'path';
 import { glob } from 'glob';
 import { createHash } from 'crypto';
 
@@ -56,7 +56,12 @@ interface Violation {
   suggestion: string;
   code?: string;
   severity: 'critical' | 'warning';
-  category?: 'vulnerability' | 'duplicate' | 'version-range' | 'peer-dependency' | 'workspace-protocol';
+  category?:
+    | 'vulnerability'
+    | 'duplicate'
+    | 'version-range'
+    | 'peer-dependency'
+    | 'workspace-protocol';
 }
 
 interface ValidationResult {
@@ -125,12 +130,7 @@ interface HookConfig {
 const CONFIG: HookConfig = {
   // Files to check
   includePatterns: ['**/package.json'],
-  excludePatterns: [
-    '**/node_modules/**',
-    '**/dist/**',
-    '**/.next/**',
-    '**/.cache/**',
-  ],
+  excludePatterns: ['**/node_modules/**', '**/dist/**', '**/.next/**', '**/.cache/**'],
 
   // Approval mechanism
   // Format: @dependency-approved:package-name TICKET-123 Reason
@@ -219,7 +219,7 @@ function findWorkspacePackages(projectRoot: string): string[] {
     });
 
     return packageJsonFiles.filter((file) => existsSync(file));
-  } catch (error) {
+  } catch {
     return [];
   }
 }
@@ -333,7 +333,7 @@ function getCachedAuditResults(projectRoot: string): Map<string, AuditVulnerabil
  */
 function saveAuditResultsToCache(
   projectRoot: string,
-  vulnerabilities: Map<string, AuditVulnerability>
+  vulnerabilities: Map<string, AuditVulnerability>,
 ): void {
   try {
     mkdirSync(CONFIG.cacheDir, { recursive: true });
@@ -396,8 +396,8 @@ function checkVulnerabilities(
   stats: { vulnerabilities: number },
 ): void {
   // Only run if dependencies or lock file changed
-  const hasDependencyChanges = stagedFiles.some((file) =>
-    file.endsWith('package.json') || file.endsWith('package-lock.json')
+  const hasDependencyChanges = stagedFiles.some(
+    (file) => file.endsWith('package.json') || file.endsWith('package-lock.json'),
   );
 
   if (!hasDependencyChanges) {
@@ -429,9 +429,10 @@ function checkVulnerabilities(
 
       // npm audit v7+ format
       if (auditResult.vulnerabilities) {
-        Object.entries(auditResult.vulnerabilities).forEach(([name, data]: [string, any]) => {
+        Object.entries(auditResult.vulnerabilities).forEach(([name, data]: [string, unknown]) => {
           const vuln = data as AuditVulnerability;
-          vulnerabilityMap!.set(name, vuln);
+          if (!vulnerabilityMap) return;
+          vulnerabilityMap.set(name, vuln);
         });
       }
 
@@ -443,27 +444,30 @@ function checkVulnerabilities(
       if (error && typeof error === 'object' && 'stdout' in error) {
         const errorObj = error as { stdout: string };
         if (errorObj.stdout) {
-        try {
-          const auditResult = JSON.parse(errorObj.stdout);
+          try {
+            const auditResult = JSON.parse(errorObj.stdout);
 
-          // Validate JSON structure before processing
-          if (!isValidAuditJSON(auditResult)) {
-            return; // Invalid audit JSON, skip
+            // Validate JSON structure before processing
+            if (!isValidAuditJSON(auditResult)) {
+              return; // Invalid audit JSON, skip
+            }
+
+            if (auditResult.vulnerabilities) {
+              Object.entries(auditResult.vulnerabilities).forEach(
+                ([name, data]: [string, unknown]) => {
+                  const vuln = data as AuditVulnerability;
+                  if (!vulnerabilityMap) return;
+                  vulnerabilityMap.set(name, vuln);
+                },
+              );
+            }
+
+            // Save to cache only if valid
+            saveAuditResultsToCache(projectRoot, vulnerabilityMap);
+          } catch {
+            // Failed to parse audit output, skip vulnerabilities check
+            return;
           }
-
-          if (auditResult.vulnerabilities) {
-            Object.entries(auditResult.vulnerabilities).forEach(([name, data]: [string, any]) => {
-              const vuln = data as AuditVulnerability;
-              vulnerabilityMap!.set(name, vuln);
-            });
-          }
-
-          // Save to cache only if valid
-          saveAuditResultsToCache(projectRoot, vulnerabilityMap);
-        } catch {
-          // Failed to parse audit output, skip vulnerabilities check
-          return;
-        }
         }
       }
       // npm audit failed without output, skip
@@ -547,7 +551,7 @@ function checkDuplicates(
 
   // Normalize staged files to relative paths
   const normalizedStagedFiles = new Set(
-    Array.from(stagedFiles).map((f) => normalizePath(f, projectRoot))
+    Array.from(stagedFiles).map((f) => normalizePath(f, projectRoot)),
   );
 
   // Collect all dependencies across workspace packages
@@ -570,11 +574,14 @@ function checkDuplicates(
         dependencyMap.set(name, []);
       }
 
-      dependencyMap.get(name)!.push({
-        version,
-        source: pkgPath,
-        isDev: !!pkg.devDependencies?.[name],
-      });
+      const depArray = dependencyMap.get(name);
+      if (depArray) {
+        depArray.push({
+          version,
+          source: pkgPath,
+          isDev: !!pkg.devDependencies?.[name],
+        });
+      }
     });
   }
 
@@ -925,7 +932,9 @@ function formatOutput(result: ValidationResult, jsonMode: boolean): string {
     lines.push('   - Align dependency versions across workspace packages');
     lines.push('   - Pin version ranges (avoid * or ^*)');
     lines.push('   - Use "workspace:*" protocol for internal packages');
-    lines.push('   - For dependency-specific approval: @dependency-approved:package-name TICKET-123 Reason');
+    lines.push(
+      '   - For dependency-specific approval: @dependency-approved:package-name TICKET-123 Reason',
+    );
     lines.push('   - For blanket approval (discouraged): @dependency-approved TICKET-123 Reason');
     lines.push('');
   } else {
@@ -959,7 +968,9 @@ async function main(): Promise<void> {
   if (!jsonMode) {
     console.log(`Execution time: ${duration}ms (budget: <${CONFIG.performanceBudgetMs}ms)`);
     if (duration > CONFIG.performanceBudgetMs) {
-      console.log(`WARNING: Exceeded performance budget by ${duration - CONFIG.performanceBudgetMs}ms`);
+      console.log(
+        `WARNING: Exceeded performance budget by ${duration - CONFIG.performanceBudgetMs}ms`,
+      );
     }
     console.log('');
   }

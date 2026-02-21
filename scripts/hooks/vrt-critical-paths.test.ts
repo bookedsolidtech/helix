@@ -7,8 +7,8 @@
  * - Edge cases and error handling
  */
 
-import { describe, it, expect, beforeEach } from 'vitest';
-import { Project, SourceFile } from 'ts-morph';
+import { describe, it, expect } from 'vitest';
+import { Project } from 'ts-morph';
 import {
   extractRenderChanges,
   extractVRTStories,
@@ -19,10 +19,7 @@ import {
   extractComponentName,
   validateVRTCoverage,
   validateVRTCriticalPaths,
-  hasRenderChangesInDiff,
   type HookDependencies,
-  type RenderChange,
-  type VRTStory,
   type Violation,
 } from './vrt-critical-paths.js';
 
@@ -119,10 +116,10 @@ export const Default: Story = {};
 function createMockDeps(overrides: Partial<HookDependencies> = {}): HookDependencies {
   return {
     getStagedFiles: () => [],
-    readFile: (path: string) => '',
-    fileExists: (path: string) => false,
-    getFileTimestamp: (path: string) => 0,
-    createProject: (configPath: string) =>
+    readFile: (_path: string) => '',
+    fileExists: (_path: string) => false,
+    getFileTimestamp: (_path: string) => 0,
+    createProject: (_configPath: string) =>
       new Project({
         useInMemoryFileSystem: true,
         skipAddingFilesFromTsConfig: true,
@@ -272,7 +269,7 @@ describe('vrt-critical-paths (H14) - Unit Tests', () => {
       const snapshotTime = 2000;
 
       const deps = createMockDeps({
-        getFileTimestamp: (path) => snapshotTime,
+        getFileTimestamp: (_path) => snapshotTime,
       });
 
       const result = isSnapshotFresh('snapshot.png', componentTime, deps);
@@ -285,7 +282,7 @@ describe('vrt-critical-paths (H14) - Unit Tests', () => {
       const snapshotTime = 1000;
 
       const deps = createMockDeps({
-        getFileTimestamp: (path) => snapshotTime,
+        getFileTimestamp: (_path) => snapshotTime,
       });
 
       const result = isSnapshotFresh('snapshot.png', componentTime, deps);
@@ -446,12 +443,12 @@ export const Secondary: Story = {
 
   describe('findSnapshotFiles - Playwright naming', () => {
     it('should match Playwright snapshot naming format', () => {
-      const deps = createMockDeps({
+      const _deps = createMockDeps({
         fileExists: () => true,
       });
 
       // Mock readdirSync to simulate Playwright snapshot structure
-      const mockReaddir = (dir: string) => {
+      const _mockReaddir = (_dir: string) => {
         if (dir.includes('__screenshots__/vrt.spec.ts')) {
           return [
             { name: 'hx-button--primary.png', isFile: () => true, isDirectory: () => false },
@@ -779,8 +776,8 @@ describe('vrt-critical-paths (H14) - Integration Tests', () => {
   describe('Real Codebase Integration', () => {
     it('should detect real hx-button component', async () => {
       const realButtonPath = 'packages/hx-library/src/components/hx-button/hx-button.ts';
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
       const fs = require('fs');
-      const path = require('path');
 
       // Only run if file exists
       if (!fs.existsSync(realButtonPath)) {
@@ -793,6 +790,7 @@ describe('vrt-critical-paths (H14) - Integration Tests', () => {
     });
 
     it('should find real snapshots for hx-button', () => {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
       const fs = require('fs');
       const snapshotDir = 'packages/hx-library/__screenshots__';
 

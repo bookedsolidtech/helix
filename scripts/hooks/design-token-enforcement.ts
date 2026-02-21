@@ -187,7 +187,10 @@ function getStagedFiles(): string[] {
  * Check if a line has an approval comment with ticket ID
  * Format: // @design-token-approved: TICKET-123 Reason
  */
-function hasApprovalComment(lines: string[], lineIndex: number): { approved: boolean; ticket?: string } {
+function hasApprovalComment(
+  lines: string[],
+  lineIndex: number,
+): { approved: boolean; ticket?: string } {
   // Check current line for inline comment
   const currentLine = lines[lineIndex];
   if (currentLine) {
@@ -283,7 +286,8 @@ export function extractTokenUsages(cssContent: string): TokenUsage[] {
 
         // Split on comma to separate token from fallback
         const commaIndex = varContent.indexOf(',');
-        const token = commaIndex >= 0 ? varContent.substring(0, commaIndex).trim() : varContent.trim();
+        const token =
+          commaIndex >= 0 ? varContent.substring(0, commaIndex).trim() : varContent.trim();
         const fallback = commaIndex >= 0 ? varContent.substring(commaIndex + 1).trim() : null;
 
         // Extract ALL tokens from the entire var() expression (for recursive validation)
@@ -509,7 +513,7 @@ export function checkRecursiveFallbacks(
   filePath: string,
   violations: Violation[],
 ): void {
-  const { token, allTokens, fallback, line, column, code } = usage;
+  const { token, allTokens, line, column, code } = usage;
 
   // Skip internal tokens
   if (isInternalToken(token)) {
@@ -544,11 +548,7 @@ export function checkRecursiveFallbacks(
 /**
  * Validate all tokens in a file
  */
-export function validateTokens(
-  filePath: string,
-  content: string,
-  lines: string[],
-): Violation[] {
+export function validateTokens(filePath: string, content: string, _lines: string[]): Violation[] {
   const violations: Violation[] = [];
 
   // Extract CSS content

@@ -37,17 +37,7 @@
  *   npm run hooks:dead-code-elimination
  */
 
-import {
-  Project,
-  SyntaxKind,
-  Node,
-  SourceFile,
-  ExportedDeclarations,
-  ImportDeclaration,
-  FunctionDeclaration,
-  MethodDeclaration,
-  ParameterDeclaration,
-} from 'ts-morph';
+import { Project, Node, SourceFile } from 'ts-morph';
 import { execSync } from 'child_process';
 import { existsSync } from 'fs';
 import { resolve } from 'path';
@@ -62,7 +52,13 @@ interface Violation {
   suggestion: string;
   code?: string;
   severity: 'critical' | 'warning';
-  category?: 'orphaned-import' | 'dead-branch' | 'side-effect-import' | 'namespace-import' | 're-export' | 'dead-conditional';
+  category?:
+    | 'orphaned-import'
+    | 'dead-branch'
+    | 'side-effect-import'
+    | 'namespace-import'
+    | 're-export'
+    | 'dead-conditional';
 }
 
 interface ValidationResult {
@@ -511,7 +507,7 @@ function findUnusedExports(
   violations: Violation[],
   stats: { reExports: number },
 ): number {
-  let count = 0;
+  const count = 0;
 
   // Detect re-exports in index.ts files
   findReExports(sourceFile, violations, stats);
@@ -755,7 +751,9 @@ async function main(): Promise<void> {
   if (!jsonMode) {
     console.log(`⏱️  Execution time: ${duration}ms (budget: <${CONFIG.performanceBudgetMs}ms)`);
     if (duration > CONFIG.performanceBudgetMs) {
-      console.log(`⚠️  WARNING: Exceeded performance budget by ${duration - CONFIG.performanceBudgetMs}ms`);
+      console.log(
+        `⚠️  WARNING: Exceeded performance budget by ${duration - CONFIG.performanceBudgetMs}ms`,
+      );
     }
     console.log('');
   }
