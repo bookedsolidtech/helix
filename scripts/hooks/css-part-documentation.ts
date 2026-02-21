@@ -10,6 +10,9 @@
  * - Orphaned @csspart tags (documented but not in code)
  * - Missing descriptions for CSS parts
  * - Parts defined but not exposed in template
+ * - Dynamic parts in template expressions (part="${this.variant}-button")
+ * - Parts defined but never styled with ::part() selectors (unused parts)
+ * - Invalid part naming (must be lowercase-hyphenated)
  *
  * Allows:
  * - Test files, stories, styles
@@ -36,7 +39,7 @@ import {
   TaggedTemplateExpression,
 } from 'ts-morph';
 import { execSync } from 'child_process';
-import { existsSync } from 'fs';
+import { existsSync, readFileSync } from 'fs';
 
 // ─── Types ────────────────────────────────────────────────────────────────
 
@@ -233,10 +236,17 @@ export function getJSDocCSSPartTags(classDecl: ClassDeclaration): Map<string, st
 
 /**
  * Extract CSS parts from html`...` template literals using AST
+ * Enhanced to handle dynamic template expressions like part="${this.variant}-button"
  */
 export function extractCSSPartsFromTemplate(sourceFile: SourceFile): CSSPart[] {
   const parts: CSSPart[] = [];
-  const partRegex = /part=["']([^"']+)["']/g;
+
+  // Static parts: part="button" or part="button icon"
+  const staticPartRegex = /part=["']([^"'$]+)["']/g;
+
+  // Dynamic parts: part="${expr}-button" or part="container-${expr}"
+  // Extracts the static portion from template expressions
+  const dynamicPartRegex = /part=["']([^"']*\$\{[^}]+\}[^"']*)["']/g;
 
   // Find all tagged template expressions with tag name 'html'
   sourceFile.forEachDescendant((node) => {
@@ -253,15 +263,16 @@ export function extractCSSPartsFromTemplate(sourceFile: SourceFile): CSSPart[] {
           templateText = template.getText();
         }
 
-        // Extract part attributes from template text
+        const { line, column } = sourceFile.getLineAndColumnAtPos(node.getStart());
+
+        // Extract static parts
         let match;
-        while ((match = partRegex.exec(templateText)) !== null) {
+        while ((match = staticPartRegex.exec(templateText)) !== null) {
           const partNames = match[1];
           if (partNames) {
             // Split on whitespace to support space-separated part names
             // e.g., part="button icon" becomes ["button", "icon"]
             const names = partNames.trim().split(/\s+/);
-            const { line, column } = sourceFile.getLineAndColumnAtPos(node.getStart());
 
             for (const partName of names) {
               if (partName) {
@@ -274,11 +285,48 @@ export function extractCSSPartsFromTemplate(sourceFile: SourceFile): CSSPart[] {
             }
           }
         }
+
+        // Extract dynamic parts (e.g., part="${this.variant}-button")
+        staticPartRegex.lastIndex = 0; // Reset regex
+        while ((match = dynamicPartRegex.exec(templateText)) !== null) {
+          const fullMatch = match[1];
+          if (!fullMatch) continue;
+
+          // Extract static portions from dynamic expressions
+          // part="${variant}-button" -> extract "button"
+          // part="container-${state}" -> extract "container"
+          const beforeExpr = fullMatch.split('${')[0];
+          const afterExpr = fullMatch.split('}')[1];
+
+          // Process prefix (before template expression)
+          if (beforeExpr && beforeExpr.trim() && beforeExpr.endsWith('-')) {
+            const prefix = beforeExpr.slice(0, -1); // Remove trailing hyphen
+            if (isValidPartName(prefix)) {
+              parts.push({ name: prefix, line, column });
+            }
+          }
+
+          // Process suffix (after template expression)
+          if (afterExpr && afterExpr.trim() && afterExpr.startsWith('-')) {
+            const suffix = afterExpr.slice(1); // Remove leading hyphen
+            if (isValidPartName(suffix)) {
+              parts.push({ name: suffix, line, column });
+            }
+          }
+        }
       }
     }
   });
 
   return parts;
+}
+
+/**
+ * Helper to validate part name pattern
+ */
+function isValidPartName(name: string): boolean {
+  const validNamePattern = /^[a-z][a-z0-9]*(-[a-z0-9]+)*$/;
+  return validNamePattern.test(name) && name !== 'part';
 }
 
 // ─── Validators ───────────────────────────────────────────────────────────
@@ -412,6 +460,7 @@ export function checkPartDescriptions(
 
 /**
  * Check that CSS part names follow lowercase-hyphenated naming convention
+ * Deduplicates violations by part name to avoid redundant reports
  */
 export function checkPartNamingConvention(
   sourceFile: SourceFile,
@@ -437,6 +486,7 @@ export function checkPartNamingConvention(
   // Must not start or end with hyphen, no consecutive hyphens
   const validNamePattern = /^[a-z][a-z0-9]*(-[a-z0-9]+)*$/;
 
+  // Deduplicate violations by part name (only report once per unique name)
   const seenParts = new Set<string>();
 
   for (const part of codeParts) {
@@ -454,6 +504,90 @@ export function checkPartNamingConvention(
         message: `CSS part name "${part.name}" violates naming convention. Must be lowercase-hyphenated (e.g., "button", "input-wrapper")`,
         suggestion: `Rename to use lowercase letters, numbers, and hyphens only. Examples: "button", "input-wrapper", "icon-container"`,
         code: `part="${part.name}"`,
+        severity: 'warning',
+      });
+    }
+  }
+}
+
+/**
+ * Check for CSS parts defined in template but never styled with ::part()
+ * This helps identify dead code and encourages proper part documentation
+ */
+export function checkUnusedParts(
+  sourceFile: SourceFile,
+  codeParts: CSSPart[],
+  violations: Violation[],
+): void {
+  const classes = sourceFile.getClasses();
+  if (classes.length === 0) {
+    return;
+  }
+
+  const classDecl = classes[0];
+  if (!classDecl) {
+    return;
+  }
+
+  // Check if approved
+  if (hasApprovalComment(classDecl)) {
+    return;
+  }
+
+  // Skip if component has no parts
+  if (codeParts.length === 0) {
+    return;
+  }
+
+  // Find corresponding .styles.ts file
+  const componentFilePath = sourceFile.getFilePath();
+  const stylesFilePath = componentFilePath.replace(/\.ts$/, '.styles.ts');
+
+  // Read styles file if it exists
+  let cssContent = '';
+  try {
+    if (existsSync(stylesFilePath)) {
+      cssContent = readFileSync(stylesFilePath, 'utf-8');
+    } else {
+      // No styles file = no ::part() selectors = all parts unused
+      // This is a warning, not critical, as parts might be styled externally
+      return;
+    }
+  } catch (error) {
+    // If we can't read the styles file, skip this validation
+    return;
+  }
+
+  // Extract all ::part() selectors from CSS
+  const partSelectorRegex = /::part\(([^)]+)\)/g;
+  const usedParts = new Set<string>();
+  let match;
+
+  while ((match = partSelectorRegex.exec(cssContent)) !== null) {
+    const partName = match[1];
+    if (partName) {
+      usedParts.add(partName.trim());
+    }
+  }
+
+  // Check for parts defined but never styled
+  const uniqueCodeParts = new Set(codeParts.map((p) => p.name));
+
+  for (const partName of uniqueCodeParts) {
+    if (!usedParts.has(partName)) {
+      // Find first occurrence for line/column info
+      const firstOccurrence = codeParts.find((p) => p.name === partName);
+      if (!firstOccurrence) {
+        continue;
+      }
+
+      violations.push({
+        file: sourceFile.getFilePath(),
+        line: firstOccurrence.line,
+        column: firstOccurrence.column,
+        message: `CSS part "${partName}" defined but never styled with ::part(${partName})`,
+        suggestion: `Either add ::part(${partName}) styles to ${stylesFilePath.split('/').pop()} or remove the part attribute if not needed for external styling`,
+        code: `part="${partName}"`,
         severity: 'warning',
       });
     }
@@ -496,6 +630,7 @@ export function validateCSSPartDocumentation(
   checkOrphanedPartDocumentation(sourceFile, codeParts, documentedParts, violations);
   checkPartDescriptions(sourceFile, documentedParts, violations);
   checkPartNamingConvention(sourceFile, codeParts, violations);
+  checkUnusedParts(sourceFile, codeParts, violations);
 }
 
 // ─── Default Dependencies ─────────────────────────────────────────────────

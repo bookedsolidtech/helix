@@ -89,6 +89,26 @@ interface LighthouseMetrics {
   tbt: number; // milliseconds
 }
 
+interface LighthouseAudit {
+  numericValue?: number;
+  score?: number;
+}
+
+interface LighthouseResult {
+  categories?: {
+    performance?: {
+      score?: number;
+    };
+  };
+  audits?: {
+    'largest-contentful-paint'?: LighthouseAudit;
+    'interaction-to-next-paint'?: LighthouseAudit;
+    'first-input-delay'?: LighthouseAudit;
+    'cumulative-layout-shift'?: LighthouseAudit;
+    'total-blocking-time'?: LighthouseAudit;
+  };
+}
+
 interface PerformanceBudget {
   minPerformanceScore: number;
   maxLCP: number; // milliseconds
@@ -155,7 +175,7 @@ const CONFIG: HookConfig = {
 
   // Performance budgets
   performanceBudgetMs: 60000, // 60 seconds for overall hook execution
-  lighthouseTimeoutMs: process.env.CI === 'true' ? 90000 : 60000, // 90s CI, 60s local
+  lighthouseTimeoutMs: process.env.CI === 'true' ? 180000 : 60000, // 180s CI (3 min), 60s local
   timeoutMs: 120000, // 2 minutes total timeout
 
   // CLI flags - Auto-detect CI environment
@@ -375,6 +395,47 @@ function saveLighthouseResultToCache(cacheKey: string, metrics: LighthouseMetric
 }
 
 /**
+ * Check if Chrome/Chromium is available
+ */
+function checkChromeAvailability(): void {
+  try {
+    // Try common Chrome binary locations
+    const chromePaths = [
+      'google-chrome',
+      'chrome',
+      'chromium',
+      'chromium-browser',
+      '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
+      'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe',
+      'C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe',
+    ];
+
+    let chromeFound = false;
+
+    for (const chromePath of chromePaths) {
+      try {
+        execSync(`${chromePath} --version 2>/dev/null`, {
+          encoding: 'utf-8',
+          timeout: 5000,
+          stdio: 'pipe',
+        });
+        chromeFound = true;
+        break;
+      } catch {
+        // Continue to next path
+      }
+    }
+
+    if (!chromeFound) {
+      throw new Error('Chrome/Chromium binary not found. Lighthouse requires Chrome to run performance audits.');
+    }
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    throw new Error(`Chrome pre-check failed: ${errorMessage}. Install Chrome from https://www.google.com/chrome/`);
+  }
+}
+
+/**
  * Check if Lighthouse is available
  */
 function checkLighthouseAvailability(): void {
@@ -404,13 +465,16 @@ function checkLighthouseAvailability(): void {
  */
 async function checkStorybookAvailability(url: string): Promise<void> {
   try {
-    const fetch = (await import('node:http')).get;
     const urlObj = new URL(url);
+    const isHttps = urlObj.protocol === 'https:';
+
+    // Import correct module based on protocol
+    const httpModule = isHttps ? await import('node:https') : await import('node:http');
 
     await new Promise<void>((resolve, reject) => {
-      const req = fetch({
+      const req = httpModule.get({
         hostname: urlObj.hostname,
-        port: urlObj.port,
+        port: urlObj.port || (isHttps ? 443 : 80),
         path: urlObj.pathname,
         timeout: 10000,
       }, (res) => {
@@ -448,11 +512,12 @@ async function runLighthouse(url: string, deps?: HookDependencies): Promise<Ligh
 
   // Pre-flight checks (skip in test mode)
   if (!deps) {
+    checkChromeAvailability();
     checkLighthouseAvailability();
     await checkStorybookAvailability(url);
   }
 
-  let chromeProcess: any = null;
+  const chromeProcess: any = null;
 
   try {
     let output: string;
@@ -465,27 +530,41 @@ async function runLighthouse(url: string, deps?: HookDependencies): Promise<Ligh
         timeout: CONFIG.lighthouseTimeoutMs,
       });
     } else {
-      // Production: use real execSync with Chrome cleanup
+      // Production: use real execSync with exponential backoff retry
       const lighthouseCmd = `npx lighthouse ${url} --only-categories=performance --output=json --quiet --chrome-flags="--headless --no-sandbox"`;
 
-      try {
-        output = execSync(lighthouseCmd, {
-          encoding: 'utf-8',
-          timeout: CONFIG.lighthouseTimeoutMs,
-          maxBuffer: 10 * 1024 * 1024, // 10MB for JSON output
-        });
-      } catch (execError) {
-        // Retry once on timeout
-        if (execError instanceof Error && execError.message.includes('timeout')) {
-          console.warn('Lighthouse timeout, retrying once...');
+      const maxRetries = 3;
+      let lastError: Error | null = null;
+
+      for (let attempt = 0; attempt < maxRetries; attempt++) {
+        try {
+          // Exponential backoff: 0ms, 2s, 4s
+          if (attempt > 0) {
+            const backoffMs = attempt * 2000;
+            console.warn(`Retry attempt ${attempt}/${maxRetries - 1} after ${backoffMs}ms backoff...`);
+            await new Promise(resolve => setTimeout(resolve, backoffMs));
+          }
+
           output = execSync(lighthouseCmd, {
             encoding: 'utf-8',
             timeout: CONFIG.lighthouseTimeoutMs,
-            maxBuffer: 10 * 1024 * 1024,
+            maxBuffer: 10 * 1024 * 1024, // 10MB for JSON output
           });
-        } else {
-          throw execError;
+
+          // Success - break retry loop
+          lastError = null;
+          break;
+        } catch (execError) {
+          lastError = execError instanceof Error ? execError : new Error(String(execError));
+
+          if (attempt < maxRetries - 1) {
+            console.warn(`Lighthouse attempt ${attempt + 1} failed: ${lastError.message}`);
+          }
         }
+      }
+
+      if (lastError) {
+        throw new Error(`Lighthouse failed after ${maxRetries} attempts: ${lastError.message}`);
       }
     }
 
@@ -494,9 +573,9 @@ async function runLighthouse(url: string, deps?: HookDependencies): Promise<Ligh
       throw new Error('Lighthouse returned empty output');
     }
 
-    let result: any;
+    let result: LighthouseResult;
     try {
-      result = JSON.parse(output);
+      result = JSON.parse(output) as LighthouseResult;
     } catch (parseError) {
       throw new Error(`Failed to parse Lighthouse JSON output: ${parseError instanceof Error ? parseError.message : String(parseError)}`);
     }
@@ -515,11 +594,11 @@ async function runLighthouse(url: string, deps?: HookDependencies): Promise<Ligh
     const lcp = result.audits?.['largest-contentful-paint']?.numericValue ?? 0;
 
     // INP replaces FID as of March 2024
-    // Note: INP may not be available in all Lighthouse versions, fallback to max-potential-fid
+    // Note: INP may not be available in all Lighthouse versions, fallback to first-input-delay
     let inp = result.audits?.['interaction-to-next-paint']?.numericValue ?? 0;
     if (inp === 0) {
-      // Fallback to FID for older Lighthouse versions
-      inp = result.audits?.['max-potential-fid']?.numericValue ?? 0;
+      // Fallback to FID (first-input-delay) for older Lighthouse versions
+      inp = result.audits?.['first-input-delay']?.numericValue ?? 0;
     }
 
     const cls = result.audits?.['cumulative-layout-shift']?.numericValue ?? 0;
@@ -542,21 +621,14 @@ async function runLighthouse(url: string, deps?: HookDependencies): Promise<Ligh
     throw new Error(`Lighthouse run failed: ${errorMessage}`);
   } finally {
     // Clean up Chrome processes (if any)
+    // Note: Lighthouse automatically cleans up its Chrome instances
+    // DO NOT use pkill - it kills ALL Chrome processes including developer's browser
     if (chromeProcess) {
       try {
         chromeProcess.kill();
       } catch {
         // Ignore cleanup errors
       }
-    }
-
-    // Additional Chrome cleanup for zombie processes
-    try {
-      if (process.platform !== 'win32') {
-        execSync('pkill -f "headless.*chrome" 2>/dev/null || true', { timeout: 5000 });
-      }
-    } catch {
-      // Ignore cleanup errors
     }
   }
 }
@@ -958,6 +1030,7 @@ export {
   getLibraryHash,
   getCachedLighthouseResult,
   saveLighthouseResultToCache,
+  checkChromeAvailability,
   checkLighthouseAvailability,
   checkStorybookAvailability,
 };

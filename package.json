@@ -58,6 +58,8 @@
     "hooks:documentation-completeness": "tsx scripts/hooks/documentation-completeness.ts",
     "hooks:css-part-documentation": "tsx scripts/hooks/css-part-documentation.ts",
     "hooks:lighthouse-performance": "tsx scripts/hooks/lighthouse-performance.ts",
+    "hooks:design-token-enforcement": "tsx scripts/hooks/design-token-enforcement.ts",
+    "hooks:generate-token-registry": "tsx scripts/hooks/generate-token-registry.ts",
     "changeset": "changeset",
     "changeset:version": "changeset version",
     "changeset:publish": "changeset publish",

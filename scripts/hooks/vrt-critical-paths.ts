@@ -91,6 +91,15 @@ interface SnapshotInfo {
   age: number;
 }
 
+/**
+ * P1 FIX: Snapshot search cache to avoid O(n) recursive search per component
+ * Cache persists for entire hook invocation (cleared between commits)
+ */
+interface SnapshotCache {
+  snapshots: Map<string, string[]>; // componentName -> snapshot paths
+  lastBuilt: number;
+}
+
 // ─── Configuration ────────────────────────────────────────────────────────
 
 interface HookConfig {
@@ -270,44 +279,54 @@ export function extractComponentName(filePath: string): string {
 
 /**
  * Check if render() method has actual changes in git diff
- * Parses git diff to find changed line numbers and checks if they overlap with render() method
+ * Uses git diff --numstat for reliable change detection instead of fragile hunk parsing
+ *
+ * P1 FIX: Replaced manual hunk parsing with --numstat for robustness
+ * - Old approach: Regex-based hunk parsing broke on merge commits, multi-line changes
+ * - New approach: Use --numstat to check if file has ANY changes (additions or deletions)
+ * - Rationale: If file has changes in git diff, and we detected render() method in AST,
+ *   it's safer to require VRT coverage than risk false negatives from fragile parsing
  */
 export function hasRenderChangesInDiff(
   filePath: string,
   renderChange: RenderChange,
 ): boolean {
   try {
-    // Get git diff with line numbers
-    const diffOutput = execSync(`git diff --cached -U0 "${filePath}"`, {
+    // Use --numstat for reliable change detection
+    // Output format: "added\tdeleted\tfilename"
+    // Example: "5\t2\tpackages/hx-library/src/components/hx-button/hx-button.ts"
+    const diffOutput = execSync(`git diff --cached --numstat "${filePath}"`, {
       encoding: 'utf-8',
       timeout: 5000,
     });
 
-    if (!diffOutput) {
+    if (!diffOutput.trim()) {
       return false; // No changes in this file
     }
 
-    // Parse diff hunks to extract changed line numbers
-    // Format: @@ -oldStart,oldCount +newStart,newCount @@
-    const hunkRegex = /@@ -\d+(?:,\d+)? \+(\d+)(?:,(\d+))? @@/g;
-    const changedLineRanges: Array<{ start: number; count: number }> = [];
-
-    let hunkMatch;
-    while ((hunkMatch = hunkRegex.exec(diffOutput)) !== null) {
-      const start = parseInt(hunkMatch[1] ?? '0', 10);
-      const count = parseInt(hunkMatch[2] ?? '1', 10);
-      changedLineRanges.push({ start, count });
+    // Parse numstat output
+    const parts = diffOutput.trim().split('\t');
+    if (parts.length < 2) {
+      // Unexpected format, assume changes exist (conservative approach)
+      return true;
     }
 
-    // Check if render() method line is in any changed range
-    for (const range of changedLineRanges) {
-      const rangeEnd = range.start + range.count;
-      if (renderChange.line >= range.start && renderChange.line < rangeEnd) {
-        return true;
-      }
+    const added = parts[0];
+    const removed = parts[1];
+
+    // Check if there are any additions or deletions
+    // Use '-' for binary files or untrackable changes
+    if (added === '-' || removed === '-') {
+      return true; // Binary or complex changes, assume render changed
     }
 
-    return false;
+    const addedLines = parseInt(added ?? '0', 10);
+    const removedLines = parseInt(removed ?? '0', 10);
+
+    // If file has any changes (additions or deletions), require VRT coverage
+    // This is a conservative approach: we know render() method exists (from AST),
+    // and we know file changed (from git diff), so we require VRT coverage
+    return addedLines > 0 || removedLines > 0;
   } catch (error) {
     // If git diff fails, assume changes exist (conservative approach)
     return true;
@@ -361,6 +380,11 @@ export function extractRenderChanges(sourceFile: SourceFile): RenderChange[] {
 /**
  * Extract VRT stories from a Storybook story file
  * VRT stories are tagged with 'vrt' in the meta tags array or individual story tags
+ *
+ * P1 FIX: Replaced fragile brace counting with regex-based extraction
+ * - Old approach: Manual brace depth tracking broke on nested objects, template strings
+ * - New approach: Use regex to match story export patterns directly
+ * - Handles: nested objects, template literals, JSX, multiline stories
  */
 export function extractVRTStories(storyFileContent: string): VRTStory[] {
   const stories: VRTStory[] = [];
@@ -381,77 +405,63 @@ export function extractVRTStories(storyFileContent: string): VRTStory[] {
     });
   }
 
-  // Parse individual story exports
-  // Match story declarations and extract story body up to closing brace
-  const lines = storyFileContent.split('\n');
-  let currentStoryName: string | null = null;
-  let currentStoryBody: string[] = [];
-  let braceDepth = 0;
-  let inStory = false;
+  // P1 FIX: Use regex-based story extraction instead of brace counting
+  // Match story export pattern: export const StoryName: Story = { ... }
+  // This regex captures:
+  // - Story name (capture group 1)
+  // - Story type annotation (: Story or : Story<...>)
+  // - Everything until the next export or end of file
+  const storyExportRegex = /export\s+const\s+(\w+):\s*Story(?:<[^>]*>)?\s*=\s*\{([\s\S]*?)(?=export\s+const\s+\w+:|export\s+default|$)/g;
 
-  for (const line of lines) {
-    // Check for story export start
-    const storyMatch = line.match(/export\s+const\s+(\w+):\s*Story\s*=\s*\{/);
-    if (storyMatch) {
-      currentStoryName = storyMatch[1] ?? null;
-      currentStoryBody = [line];
-      braceDepth = 1;
-      inStory = true;
+  let match;
+  while ((match = storyExportRegex.exec(storyFileContent)) !== null) {
+    const storyName = match[1];
+    const storyBody = match[2];
+
+    if (!storyName || !storyBody) {
       continue;
     }
 
-    if (inStory) {
-      currentStoryBody.push(line);
+    // Check if story has VRT tag
+    const hasStoryVRTTag = /tags:\s*\[[^\]]*['"]vrt['"][^\]]*\]/.test(storyBody);
 
-      // Count braces to find the end of the story object
-      for (const char of line) {
-        if (char === '{') braceDepth++;
-        if (char === '}') braceDepth--;
-      }
-
-      // Story object complete
-      if (braceDepth === 0) {
-        const storyBodyText = currentStoryBody.join('\n');
-        const hasStoryVRTTag = /tags:\s*\[[^\]]*['"]vrt['"][^\]]*\]/.test(storyBodyText);
-
-        if (currentStoryName) {
-          stories.push({
-            name: currentStoryName,
-            hasVRTTag: hasStoryVRTTag || hasMetaVRTTag,
-          });
-        }
-
-        inStory = false;
-        currentStoryName = null;
-        currentStoryBody = [];
-      }
-    }
+    stories.push({
+      name: storyName,
+      hasVRTTag: hasStoryVRTTag || hasMetaVRTTag,
+    });
   }
 
   return stories;
 }
 
 /**
- * Find snapshot files for a component in the Playwright snapshot directory
- * Returns array of snapshot file paths
- *
- * Playwright stores snapshots in: __screenshots__/vrt.spec.ts/
- * Naming format: hx-button--primary.png, hx-button--secondary.png
+ * P1 FIX: Snapshot cache to avoid O(n) recursive search per component
+ * Cache is built once per hook invocation and reused for all components
  */
-export function findSnapshotFiles(
-  componentName: string,
-  deps: HookDependencies = defaultDeps,
-): string[] {
+let snapshotCache: SnapshotCache | null = null;
+
+/**
+ * Build snapshot cache by scanning entire snapshot directory once
+ * Maps component names to their snapshot file paths
+ *
+ * P1 FIX: Cache snapshot search results per hook invocation
+ * - Old approach: Recursive search entire snapshot dir for every component (O(n))
+ * - New approach: Build cache once, reuse for all components (O(1) lookup)
+ */
+function buildSnapshotCache(deps: HookDependencies = defaultDeps): SnapshotCache {
+  const cache: SnapshotCache = {
+    snapshots: new Map(),
+    lastBuilt: Date.now(),
+  };
+
   const snapshotBaseDir = CONFIG.snapshotDir;
 
   if (!deps.fileExists(snapshotBaseDir)) {
-    return [];
+    return cache;
   }
 
-  const snapshots: string[] = [];
-
   try {
-    // Recursively search for snapshot files matching component name
+    // Recursively scan snapshot directory
     const searchDir = (dir: string): void => {
       try {
         const entries = readdirSync(dir, { withFileTypes: true });
@@ -461,15 +471,17 @@ export function findSnapshotFiles(
 
           if (entry.isDirectory()) {
             searchDir(fullPath);
-          } else if (entry.isFile()) {
-            // Match Playwright snapshot naming: hx-button--primary.png
-            // Component name must be at start of filename followed by --
-            const matchesComponent =
-              entry.name.startsWith(`${componentName}--`) ||
-              entry.name === `${componentName}.png`;
-
-            if (matchesComponent && entry.name.endsWith('.png')) {
-              snapshots.push(fullPath);
+          } else if (entry.isFile() && entry.name.endsWith('.png')) {
+            // Extract component name from snapshot filename
+            // Format: hx-button--primary.png or hx-button.png
+            const match = entry.name.match(/^(hx-[a-z-]+?)(?:--|\.).*\.png$/);
+            if (match) {
+              const componentName = match[1];
+              if (componentName) {
+                const existing = cache.snapshots.get(componentName) ?? [];
+                existing.push(fullPath);
+                cache.snapshots.set(componentName, existing);
+              }
             }
           }
         }
@@ -483,7 +495,36 @@ export function findSnapshotFiles(
     // Ignore errors during snapshot search
   }
 
-  return snapshots;
+  return cache;
+}
+
+/**
+ * Find snapshot files for a component in the Playwright snapshot directory
+ * Returns array of snapshot file paths
+ *
+ * Playwright stores snapshots in: __screenshots__/vrt.spec.ts/
+ * Naming format: hx-button--primary.png, hx-button--secondary.png
+ *
+ * P1 FIX: Uses snapshot cache to avoid O(n) recursive search per component
+ */
+export function findSnapshotFiles(
+  componentName: string,
+  deps: HookDependencies = defaultDeps,
+): string[] {
+  // Build cache on first access
+  if (snapshotCache === null) {
+    snapshotCache = buildSnapshotCache(deps);
+  }
+
+  // Return cached snapshots for this component
+  return snapshotCache.snapshots.get(componentName) ?? [];
+}
+
+/**
+ * Clear snapshot cache (used for testing and between hook invocations)
+ */
+export function clearSnapshotCache(): void {
+  snapshotCache = null;
 }
 
 /**
@@ -713,6 +754,9 @@ export async function validateVRTCriticalPaths(
   const violations: Violation[] = [];
   let componentsWithRenderChanges = 0;
   let componentsWithVRT = 0;
+
+  // P1 FIX: Clear snapshot cache at start of validation to ensure fresh data
+  clearSnapshotCache();
 
   let stagedFiles: string[];
   try {
