@@ -17,10 +17,12 @@ This directory contains Git hooks that enforce TypeScript strict mode compliance
 - **bundle-size-guard.ts** (H04) - Enforce per-component (<5KB) and total bundle (<50KB) size limits
 - **cem-accuracy-check.ts** (H05) - Validate Custom Elements Manifest accuracy
 - **a11y-regression-guard.ts** (H06) - Prevent accessibility regressions
+- **event-type-safety.ts** (H07) - Enforce `CustomEvent<DetailType>` with exported interfaces
+- **jsdoc-coverage.ts** (H08) - Enforce 100% JSDoc coverage on public APIs
 
 ### [Planned]
 
-1. **event-type-safety.ts** (H07) - Enforce `CustomEvent<DetailType>` with interfaces
+1. **cem-type-sync.ts** (H09) - Sync CEM types with source (may be redundant with H05)
 
 ## Hook Execution Order
 
@@ -74,6 +76,20 @@ git commit
        ├─ Keyboard navigation
        ├─ Heading hierarchy
        └─ ARIA reference validation
+  │
+  └─ event-type-safety (H07)
+       ├─ Event naming (hx- prefix)
+       ├─ CustomEvent<DetailType> enforcement
+       ├─ No inline types (use interfaces)
+       ├─ Exported detail interfaces
+       └─ JSDoc @fires tag validation
+  │
+  └─ jsdoc-coverage (H08)
+       ├─ Class JSDoc (@summary, @tag)
+       ├─ Property JSDoc (@attr if reflected)
+       ├─ Method JSDoc (@param, @returns)
+       ├─ Event documentation (@fires)
+       └─ 100% coverage requirement
      |
      v
 [Type Check] - npm run type-check
@@ -275,8 +291,9 @@ tsx scripts/hooks/example-no-any-types.ts --files "src/**/*.ts"
 | bundle-size-guard (H04)     | <3s      | 3s      | [Implemented] |
 | cem-accuracy-check (H05)    | <5s      | 5s      | [Implemented] |
 | a11y-regression-guard (H06) | <5s      | 5s      | [Implemented] |
-| event-type-safety (H07)     | <2s      | 5s      | [Planned]     |
-| **Total**                   | **<23s** | **31s** | -             |
+| event-type-safety (H07)     | <2s      | 5s      | [Implemented] |
+| jsdoc-coverage (H08)        | <3s      | 5s      | [Implemented] |
+| **Total**                   | **<28s** | **41s** | -             |
 
 ### Optimization Strategies
 

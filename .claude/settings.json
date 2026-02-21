@@ -33,6 +33,16 @@
             "type": "command",
             "command": "npm run hooks:a11y-regression-guard",
             "timeout": 5000
+          },
+          {
+            "type": "command",
+            "command": "npm run hooks:event-type-safety",
+            "timeout": 5000
+          },
+          {
+            "type": "command",
+            "command": "npm run hooks:jsdoc-coverage",
+            "timeout": 5000
           }
         ]
       }
