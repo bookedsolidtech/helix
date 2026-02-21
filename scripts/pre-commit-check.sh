@@ -55,6 +55,20 @@ if [ -n "$STAGED_COMPONENT_FILES" ] || [ -n "$STAGED_TS_FILES" ]; then
 fi
 
 # ==============================================================================
+# Gate 1.7: Event Type Safety (H07)
+# ==============================================================================
+if [ -n "$STAGED_COMPONENT_FILES" ]; then
+  echo "🎯 Gate 1.7: Event type safety check..."
+  if npm run hooks:event-type-safety --silent; then
+    echo "✅ Event type safety check passed"
+  else
+    echo "❌ Event type safety check failed"
+    FAILED=1
+  fi
+  echo ""
+fi
+
+# ==============================================================================
 # Gate 1.8: JSDoc Coverage (H08)
 # ==============================================================================
 if [ -n "$STAGED_COMPONENT_FILES" ]; then
@@ -77,6 +91,20 @@ if [ -n "$STAGED_COMPONENT_FILES" ]; then
     echo "✅ Test coverage check passed"
   else
     echo "❌ Test coverage check failed"
+    FAILED=1
+  fi
+  echo ""
+fi
+
+# ==============================================================================
+# Gate 2.2: Accessibility Regression Guard (H06)
+# ==============================================================================
+if [ -n "$STAGED_COMPONENT_FILES" ]; then
+  echo "♿ Gate 2.2: Accessibility regression check..."
+  if npm run hooks:a11y-regression-guard --silent; then
+    echo "✅ Accessibility check passed"
+  else
+    echo "❌ Accessibility check failed"
     FAILED=1
   fi
   echo ""
