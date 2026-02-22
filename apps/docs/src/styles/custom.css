@@ -3330,8 +3330,6 @@ starlight-theme-select button:hover {
   .pagination-links,
   .sl-banner,
   footer,
-  .wc-admin-fab,
-  .pin-gate,
   .expressive-code .copy,
   nav[aria-label='Breadcrumb'] {
     display: none !important;

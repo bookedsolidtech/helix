@@ -185,17 +185,3 @@ class WcShowcaseDropdown extends HTMLElement {
 }
 
 customElements.define('wc-showcase-dropdown', WcShowcaseDropdown);
-
-// Logout button -- clears auth and re-shows PIN gate
-const logoutBtn = document.querySelector('.logout-btn');
-if (logoutBtn) {
-  logoutBtn.addEventListener('click', () => {
-    localStorage.removeItem('wc-auth');
-    const gate = document.querySelector('#wc-pin-gate') as HTMLElement | null;
-    if (gate && typeof (gate as unknown as { show: () => void }).show === 'function') {
-      (gate as unknown as { show: () => void }).show();
-    } else {
-      window.location.reload();
-    }
-  });
-}

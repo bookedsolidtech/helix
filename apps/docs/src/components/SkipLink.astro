@@ -2,18 +2,12 @@
 /**
  * SkipLink.astro — Starlight component override
  *
- * Replaces the default SkipLink to inject the PinGate overlay
- * as the first element inside <body>. The original skip-link
- * functionality is preserved below the gate.
+ * Provides skip navigation for accessibility.
  */
-import PinGate from './PinGate.astro';
 import Analytics from '@vercel/analytics/astro';
 
 const PAGE_TITLE_ID = '_top';
 ---
-
-<!-- PIN Gate overlay — renders first in body -->
-<PinGate />
 
 <!-- Vercel Analytics -->
 <Analytics />

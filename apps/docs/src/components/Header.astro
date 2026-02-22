@@ -322,9 +322,6 @@ const currentPath = Astro.url.pathname;
       <ThemeSelect />
       <LanguageSelect />
     </div>
-    <button class="logout-btn" type="button" aria-label="Lock site" title="Lock site">
-      <i class="fa-solid fa-right-from-bracket" aria-hidden="true"></i>
-    </button>
   </div>
 </div>
 
@@ -369,37 +366,6 @@ const currentPath = Astro.url.pathname;
     gap: 1rem;
     align-items: center;
     flex-shrink: 0;
-  }
-
-  .logout-btn {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 28px;
-    height: 28px;
-    border: none;
-    border-radius: 6px;
-    background: transparent;
-    color: var(--sl-color-gray-4);
-    font-size: 0.75rem;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    opacity: 0.4;
-    flex-shrink: 0;
-    /* Expand touch target to 44px minimum on touch devices */
-    position: relative;
-  }
-
-  .logout-btn::after {
-    content: '';
-    position: absolute;
-    inset: -8px;
-  }
-
-  .logout-btn:hover {
-    opacity: 1;
-    color: #ef4444;
-    background: rgba(239, 68, 68, 0.08);
   }
 
   .right-inner {
