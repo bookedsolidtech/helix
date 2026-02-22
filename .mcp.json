@@ -14,6 +14,13 @@
       "env": {
         "DEBUG": "mcp:*"
       }
+    },
+    "health-scorer": {
+      "command": "node",
+      "args": ["/Volumes/Development/wc-2026/apps/mcp-servers/health-scorer/build/index.js"],
+      "env": {
+        "DEBUG": "mcp:*"
+      }
     }
   }
 }
