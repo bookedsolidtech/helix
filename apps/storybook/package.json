@@ -7,6 +7,7 @@
   "scripts": {
     "dev": "storybook dev -p 3151 --no-open",
     "build": "storybook build -o dist",
+    "build-storybook": "storybook build -o dist",
     "clean": "rm -rf dist"
   },
   "dependencies": {
