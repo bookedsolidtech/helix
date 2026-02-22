@@ -30,16 +30,24 @@ const createMockDiagnostic = (config: {
 });
 
 // Mock ts-morph Project
+interface MockDiagnostic {
+  getSourceFile: () => unknown;
+  getStart: () => number;
+  getMessageText: () => { toString: () => string };
+  getCategory: () => unknown;
+  getCode: () => number;
+}
+
 const mockSourceFile = {
-  getPreEmitDiagnostics: vi.fn(() => []),
+  getPreEmitDiagnostics: vi.fn(() => [] as MockDiagnostic[]),
   getFilePath: vi.fn(() => '/test/file.ts'),
   getFullText: vi.fn(() => 'line 1 content\nline 2 content\nline 3 content'),
 };
 
 const mockProject = {
   getSourceFile: vi.fn(() => mockSourceFile),
-  getPreEmitDiagnostics: vi.fn(() => []),
-  getSourceFiles: vi.fn(() => []),
+  getPreEmitDiagnostics: vi.fn(() => [] as MockDiagnostic[]),
+  getSourceFiles: vi.fn(() => [] as (typeof mockSourceFile)[]),
 };
 
 // Mock dependencies BEFORE importing handlers
@@ -62,9 +70,8 @@ vi.mock('ts-morph', () => ({
 }));
 
 // Import after mocking
-const { getDiagnostics, getDiagnosticsForComponent, suggestFix, getStrictModeStatus } = await import(
-  './handlers.js'
-);
+const { getDiagnostics, getDiagnosticsForComponent, suggestFix, getStrictModeStatus } =
+  await import('./handlers.js');
 
 describe('MCP Server: typescript-diagnostics handlers', () => {
   beforeEach(() => {
@@ -217,12 +224,10 @@ describe('MCP Server: typescript-diagnostics handlers', () => {
     describe('Missing file handling', () => {
       it('should throw error when file cannot be loaded', async () => {
         mockFileOps.validatePath.mockReturnValue('/nonexistent/file.ts');
-        mockProject.getSourceFile.mockReturnValue(null);
+        mockProject.getSourceFile.mockReturnValue(null as unknown as typeof mockSourceFile);
 
         await expect(getDiagnostics('/nonexistent/file.ts')).rejects.toThrow(MCPError);
-        await expect(getDiagnostics('/nonexistent/file.ts')).rejects.toThrow(
-          'Could not load file',
-        );
+        await expect(getDiagnostics('/nonexistent/file.ts')).rejects.toThrow('Could not load file');
       });
     });
   });
@@ -236,15 +241,16 @@ describe('MCP Server: typescript-diagnostics handlers', () => {
         mockFileOps.validatePath.mockReturnValue('/test/components/hx-button');
         mockProject.getSourceFiles.mockReturnValue([
           {
-            getPreEmitDiagnostics: () => [
+            getPreEmitDiagnostics: vi.fn(() => [
               createMockDiagnostic({
                 file: '/test/components/hx-button/index.ts',
                 message: 'Component error',
                 category: DiagnosticCategory.Error,
                 code: 2322,
               }),
-            ],
-            getFilePath: () => '/test/components/hx-button/index.ts',
+            ]),
+            getFilePath: vi.fn(() => '/test/components/hx-button/index.ts'),
+            getFullText: vi.fn(() => ''),
           },
         ]);
 
@@ -258,22 +264,26 @@ describe('MCP Server: typescript-diagnostics handlers', () => {
         mockFileOps.validatePath.mockReturnValue('/test/components/hx-button');
         mockProject.getSourceFiles.mockReturnValue([
           {
-            getPreEmitDiagnostics: () => [
+            getPreEmitDiagnostics: vi.fn(() => [
               createMockDiagnostic({
                 message: 'Error in file 1',
                 category: DiagnosticCategory.Error,
                 code: 2322,
               }),
-            ],
+            ]),
+            getFilePath: vi.fn(() => '/test/file1.ts'),
+            getFullText: vi.fn(() => ''),
           },
           {
-            getPreEmitDiagnostics: () => [
+            getPreEmitDiagnostics: vi.fn(() => [
               createMockDiagnostic({
                 message: 'Error in file 2',
                 category: DiagnosticCategory.Error,
                 code: 2345,
               }),
-            ],
+            ]),
+            getFilePath: vi.fn(() => '/test/file2.ts'),
+            getFullText: vi.fn(() => ''),
           },
         ]);
 
@@ -286,7 +296,7 @@ describe('MCP Server: typescript-diagnostics handlers', () => {
         mockFileOps.validatePath.mockReturnValue('/test/components/hx-button');
         mockProject.getSourceFiles.mockReturnValue([
           {
-            getPreEmitDiagnostics: () => [
+            getPreEmitDiagnostics: vi.fn(() => [
               createMockDiagnostic({
                 line: 42,
                 column: 15,
@@ -294,7 +304,9 @@ describe('MCP Server: typescript-diagnostics handlers', () => {
                 category: DiagnosticCategory.Error,
                 code: 2322,
               }),
-            ],
+            ]),
+            getFilePath: vi.fn(() => '/test/file.ts'),
+            getFullText: vi.fn(() => ''),
           },
         ]);
 
@@ -333,16 +345,19 @@ describe('MCP Server: typescript-diagnostics handlers', () => {
         mockFileOps.validatePath.mockReturnValue('/test/components/hx-button');
         mockProject.getSourceFiles.mockReturnValue([
           {
-            getPreEmitDiagnostics: () => [],
-            getFilePath: () => '/test/components/hx-button/index.ts',
+            getPreEmitDiagnostics: vi.fn(() => []),
+            getFilePath: vi.fn(() => '/test/components/hx-button/index.ts'),
+            getFullText: vi.fn(() => ''),
           },
           {
-            getPreEmitDiagnostics: () => [],
-            getFilePath: () => '/test/components/hx-button/styles.ts',
+            getPreEmitDiagnostics: vi.fn(() => []),
+            getFilePath: vi.fn(() => '/test/components/hx-button/styles.ts'),
+            getFullText: vi.fn(() => ''),
           },
           {
-            getPreEmitDiagnostics: () => [],
-            getFilePath: () => '/test/components/hx-button/types.ts',
+            getPreEmitDiagnostics: vi.fn(() => []),
+            getFilePath: vi.fn(() => '/test/components/hx-button/types.ts'),
+            getFullText: vi.fn(() => ''),
           },
         ]);
 
@@ -355,10 +370,14 @@ describe('MCP Server: typescript-diagnostics handlers', () => {
         mockFileOps.validatePath.mockReturnValue('/test/components/hx-button');
         mockProject.getSourceFiles.mockReturnValue([
           {
-            getPreEmitDiagnostics: () => [],
+            getPreEmitDiagnostics: vi.fn(() => []),
+            getFilePath: vi.fn(() => '/test/file1.ts'),
+            getFullText: vi.fn(() => ''),
           },
           {
-            getPreEmitDiagnostics: () => [],
+            getPreEmitDiagnostics: vi.fn(() => []),
+            getFilePath: vi.fn(() => '/test/file2.ts'),
+            getFullText: vi.fn(() => ''),
           },
         ]);
 
@@ -450,7 +469,9 @@ describe('MCP Server: typescript-diagnostics handlers', () => {
         ]);
 
         await expect(suggestFix('/test/file.ts', 10)).rejects.toThrow(MCPError);
-        await expect(suggestFix('/test/file.ts', 10)).rejects.toThrow('No TypeScript errors found at line');
+        await expect(suggestFix('/test/file.ts', 10)).rejects.toThrow(
+          'No TypeScript errors found at line',
+        );
       });
 
       it('should return generic message for unknown error code', async () => {
@@ -509,9 +530,9 @@ describe('MCP Server: typescript-diagnostics handlers', () => {
           getFullText: () => 'line 1\nconst x: string = 42;\nline 3',
         });
         const mockSF = {
-          getPreEmitDiagnostics: () => [mockDiagnostic],
-          getFilePath: () => '/test/file.ts',
-          getFullText: () => 'line 1\nconst x: string = 42;\nline 3',
+          getPreEmitDiagnostics: vi.fn(() => [mockDiagnostic]),
+          getFilePath: vi.fn(() => '/test/file.ts'),
+          getFullText: vi.fn(() => 'line 1\nconst x: string = 42;\nline 3'),
         };
         mockProject.getSourceFile.mockReturnValue(mockSF);
 

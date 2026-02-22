@@ -9,13 +9,13 @@ const mockFileOps = {
 };
 
 const mockGit = {
-  withBranch: vi.fn((branch: string, fn: () => any) => fn()),
+  withBranch: vi.fn(<T>(branch: string, fn: () => T) => fn()),
   getCurrentBranch: vi.fn(() => 'main'),
 };
 
 // Mock file system and dependencies BEFORE importing handlers
 vi.mock('node:fs', () => ({
-  readdirSync: vi.fn(),
+  readdirSync: vi.fn(() => []),
   existsSync: vi.fn(),
   readFileSync: vi.fn(),
 }));
@@ -31,10 +31,15 @@ vi.mock('@helix/mcp-shared', async () => {
 });
 
 // Import after mocking
-const { scoreComponent, scoreAllComponents, getHealthTrend, getHealthDiff } = await import(
-  './handlers.js'
-);
+const { scoreComponent, scoreAllComponents, getHealthTrend, getHealthDiff } =
+  await import('./handlers.js');
 const { readdirSync } = await import('node:fs');
+
+// Type-safe mock helper for readdirSync (cast to accept string[] returns)
+const mockReaddirSync = vi.mocked(readdirSync) as unknown as {
+  mockReturnValue: (value: string[]) => void;
+  mockImplementation: (fn: () => string[]) => void;
+};
 
 describe('MCP Server: health-scorer handlers', () => {
   beforeEach(() => {
@@ -73,12 +78,10 @@ describe('MCP Server: health-scorer handlers', () => {
 
       it('should handle component not in health history', async () => {
         mockFileOps.fileExists.mockReturnValue(true);
-        vi.mocked(readdirSync).mockReturnValue(['2026-02-17.json'] as any);
+        mockReaddirSync.mockReturnValue(['2026-02-17.json']);
         mockFileOps.readJSON.mockReturnValue({
           timestamp: '2026-02-17T00:00:00Z',
-          components: [
-            { tagName: 'hx-card', score: 85, grade: 'B', dimensions: {}, issues: [] },
-          ],
+          components: [{ tagName: 'hx-card', score: 85, grade: 'B', dimensions: {}, issues: [] }],
         });
 
         await expect(scoreComponent('hx-nonexistent')).rejects.toThrow(MCPError);
@@ -89,7 +92,7 @@ describe('MCP Server: health-scorer handlers', () => {
 
       it('should handle empty components array', async () => {
         mockFileOps.fileExists.mockReturnValue(true);
-        vi.mocked(readdirSync).mockReturnValue(['2026-02-17.json'] as any);
+        mockReaddirSync.mockReturnValue(['2026-02-17.json']);
         mockFileOps.readJSON.mockReturnValue({
           timestamp: '2026-02-17T00:00:00Z',
           components: [],
@@ -102,7 +105,7 @@ describe('MCP Server: health-scorer handlers', () => {
 
       it('should handle missing score field with default value', async () => {
         mockFileOps.fileExists.mockReturnValue(true);
-        vi.mocked(readdirSync).mockReturnValue(['2026-02-17.json'] as any);
+        mockReaddirSync.mockReturnValue(['2026-02-17.json']);
         mockFileOps.readJSON.mockReturnValue({
           timestamp: '2026-02-17T00:00:00Z',
           components: [{ tagName: 'hx-button', grade: 'A', dimensions: {}, issues: [] }],
@@ -114,7 +117,7 @@ describe('MCP Server: health-scorer handlers', () => {
 
       it('should handle missing grade field with default value', async () => {
         mockFileOps.fileExists.mockReturnValue(true);
-        vi.mocked(readdirSync).mockReturnValue(['2026-02-17.json'] as any);
+        mockReaddirSync.mockReturnValue(['2026-02-17.json']);
         mockFileOps.readJSON.mockReturnValue({
           timestamp: '2026-02-17T00:00:00Z',
           components: [{ tagName: 'hx-button', score: 95, dimensions: {}, issues: [] }],
@@ -126,7 +129,7 @@ describe('MCP Server: health-scorer handlers', () => {
 
       it('should handle missing dimensions field with default value', async () => {
         mockFileOps.fileExists.mockReturnValue(true);
-        vi.mocked(readdirSync).mockReturnValue(['2026-02-17.json'] as any);
+        mockReaddirSync.mockReturnValue(['2026-02-17.json']);
         mockFileOps.readJSON.mockReturnValue({
           timestamp: '2026-02-17T00:00:00Z',
           components: [{ tagName: 'hx-button', score: 95, grade: 'A', issues: [] }],
@@ -138,7 +141,7 @@ describe('MCP Server: health-scorer handlers', () => {
 
       it('should handle missing issues field with default value', async () => {
         mockFileOps.fileExists.mockReturnValue(true);
-        vi.mocked(readdirSync).mockReturnValue(['2026-02-17.json'] as any);
+        mockReaddirSync.mockReturnValue(['2026-02-17.json']);
         mockFileOps.readJSON.mockReturnValue({
           timestamp: '2026-02-17T00:00:00Z',
           components: [{ tagName: 'hx-button', score: 95, grade: 'A', dimensions: {} }],
@@ -161,7 +164,7 @@ describe('MCP Server: health-scorer handlers', () => {
 
       it('should handle missing components field', async () => {
         mockFileOps.fileExists.mockReturnValue(true);
-        vi.mocked(readdirSync).mockReturnValue(['2026-02-17.json'] as any);
+        mockReaddirSync.mockReturnValue(['2026-02-17.json']);
         mockFileOps.readJSON.mockReturnValue({
           timestamp: '2026-02-17T00:00:00Z',
         });
@@ -173,7 +176,7 @@ describe('MCP Server: health-scorer handlers', () => {
 
       it('should handle empty components array', async () => {
         mockFileOps.fileExists.mockReturnValue(true);
-        vi.mocked(readdirSync).mockReturnValue(['2026-02-17.json'] as any);
+        mockReaddirSync.mockReturnValue(['2026-02-17.json']);
         mockFileOps.readJSON.mockReturnValue({
           timestamp: '2026-02-17T00:00:00Z',
           components: [],
@@ -187,11 +190,11 @@ describe('MCP Server: health-scorer handlers', () => {
     describe('getHealthTrend - CRITICAL: Division by Zero Protection', () => {
       it('should handle division by zero when firstScore is 0', async () => {
         mockFileOps.fileExists.mockReturnValue(true);
-        vi.mocked(readdirSync).mockReturnValue(['2026-02-18.json', '2026-02-17.json'] as any);
+        mockReaddirSync.mockReturnValue(['2026-02-18.json', '2026-02-17.json']);
 
-        let callCount = 0;
+        let _callCount = 0;
         mockFileOps.readJSON.mockImplementation((path: string) => {
-          callCount++;
+          _callCount++;
           if (path.includes('2026-02-17')) {
             return {
               timestamp: '2026-02-17T00:00:00Z',
@@ -214,11 +217,13 @@ describe('MCP Server: health-scorer handlers', () => {
 
       it('should handle both scores being 0', async () => {
         mockFileOps.fileExists.mockReturnValue(true);
-        vi.mocked(readdirSync).mockReturnValue(['2026-02-18.json', '2026-02-17.json'] as any);
+        mockReaddirSync.mockReturnValue(['2026-02-18.json', '2026-02-17.json']);
 
         mockFileOps.readJSON.mockImplementation((path: string) => {
           return {
-            timestamp: path.includes('2026-02-17') ? '2026-02-17T00:00:00Z' : '2026-02-18T00:00:00Z',
+            timestamp: path.includes('2026-02-17')
+              ? '2026-02-17T00:00:00Z'
+              : '2026-02-18T00:00:00Z',
             components: [{ tagName: 'hx-button', score: 0, grade: 'F' }],
           };
         });
@@ -241,16 +246,14 @@ describe('MCP Server: health-scorer handlers', () => {
 
       it('should handle empty health history directory', async () => {
         mockFileOps.fileExists.mockReturnValue(true);
-        vi.mocked(readdirSync).mockReturnValue([]);
+        mockReaddirSync.mockReturnValue([]);
 
-        await expect(getHealthTrend('hx-button')).rejects.toThrow(
-          'No health history files found',
-        );
+        await expect(getHealthTrend('hx-button')).rejects.toThrow('No health history files found');
       });
 
       it('should handle component not in any history files', async () => {
         mockFileOps.fileExists.mockReturnValue(true);
-        vi.mocked(readdirSync).mockReturnValue(['2026-02-17.json', '2026-02-18.json'] as any);
+        mockReaddirSync.mockReturnValue(['2026-02-17.json', '2026-02-18.json']);
         mockFileOps.readJSON.mockReturnValue({
           timestamp: '2026-02-17T00:00:00Z',
           components: [{ tagName: 'hx-card', score: 85, grade: 'B' }],
@@ -263,7 +266,7 @@ describe('MCP Server: health-scorer handlers', () => {
 
       it('should handle trend calculation with 1 data point', async () => {
         mockFileOps.fileExists.mockReturnValue(true);
-        vi.mocked(readdirSync).mockReturnValue(['2026-02-17.json'] as any);
+        mockReaddirSync.mockReturnValue(['2026-02-17.json']);
         mockFileOps.readJSON.mockReturnValue({
           timestamp: '2026-02-17T00:00:00Z',
           components: [{ tagName: 'hx-button', score: 75, grade: 'C' }],
@@ -279,12 +282,12 @@ describe('MCP Server: health-scorer handlers', () => {
 
       it('should handle non-JSON files in history directory', async () => {
         mockFileOps.fileExists.mockReturnValue(true);
-        vi.mocked(readdirSync).mockReturnValue([
+        mockReaddirSync.mockReturnValue([
           '2026-02-18.json',
           '.DS_Store',
           'README.md',
           '2026-02-17.json',
-        ] as any);
+        ] as string[]);
         mockFileOps.readJSON.mockReturnValue({
           timestamp: '2026-02-17T00:00:00Z',
           components: [{ tagName: 'hx-button', score: 75, grade: 'C' }],
@@ -298,13 +301,13 @@ describe('MCP Server: health-scorer handlers', () => {
 
       it('should respect days limit', async () => {
         mockFileOps.fileExists.mockReturnValue(true);
-        vi.mocked(readdirSync).mockReturnValue([
+        mockReaddirSync.mockReturnValue([
           '2026-02-20.json',
           '2026-02-19.json',
           '2026-02-18.json',
           '2026-02-17.json',
           '2026-02-16.json',
-        ] as any);
+        ] as string[]);
         mockFileOps.readJSON.mockReturnValue({
           timestamp: '2026-02-17T00:00:00Z',
           components: [{ tagName: 'hx-button', score: 75, grade: 'C' }],
@@ -321,7 +324,7 @@ describe('MCP Server: health-scorer handlers', () => {
       it('should handle component not existing in base branch', async () => {
         // Current branch has component
         mockFileOps.fileExists.mockReturnValue(true);
-        vi.mocked(readdirSync).mockReturnValue(['2026-02-17.json'] as any);
+        mockReaddirSync.mockReturnValue(['2026-02-17.json']);
 
         let callCount = 0;
         mockFileOps.readJSON.mockImplementation(() => {
@@ -354,7 +357,7 @@ describe('MCP Server: health-scorer handlers', () => {
 
       it('should handle component score regression', async () => {
         mockFileOps.fileExists.mockReturnValue(true);
-        vi.mocked(readdirSync).mockReturnValue(['2026-02-17.json'] as any);
+        mockReaddirSync.mockReturnValue(['2026-02-17.json']);
 
         let callCount = 0;
         mockFileOps.readJSON.mockImplementation(() => {
@@ -383,7 +386,7 @@ describe('MCP Server: health-scorer handlers', () => {
 
       it('should handle no change in score', async () => {
         mockFileOps.fileExists.mockReturnValue(true);
-        vi.mocked(readdirSync).mockReturnValue(['2026-02-17.json'] as any);
+        mockReaddirSync.mockReturnValue(['2026-02-17.json']);
         mockFileOps.readJSON.mockReturnValue({
           timestamp: '2026-02-17T00:00:00Z',
           components: [{ tagName: 'hx-button', score: 85, grade: 'B', dimensions: {} }],
@@ -398,7 +401,7 @@ describe('MCP Server: health-scorer handlers', () => {
 
       it('should detect dimension changes', async () => {
         mockFileOps.fileExists.mockReturnValue(true);
-        vi.mocked(readdirSync).mockReturnValue(['2026-02-17.json'] as any);
+        mockReaddirSync.mockReturnValue(['2026-02-17.json']);
 
         let callCount = 0;
         mockFileOps.readJSON.mockImplementation(() => {
@@ -448,7 +451,7 @@ describe('MCP Server: health-scorer handlers', () => {
 
       it('should round score delta to 1 decimal place', async () => {
         mockFileOps.fileExists.mockReturnValue(true);
-        vi.mocked(readdirSync).mockReturnValue(['2026-02-17.json'] as any);
+        mockReaddirSync.mockReturnValue(['2026-02-17.json']);
 
         let callCount = 0;
         mockFileOps.readJSON.mockImplementation(() => {
@@ -481,7 +484,7 @@ describe('MCP Server: health-scorer handlers', () => {
     describe('scoreComponent', () => {
       it('should return valid health data for real component', async () => {
         mockFileOps.fileExists.mockReturnValue(true);
-        vi.mocked(readdirSync).mockReturnValue(['2026-02-17.json'] as any);
+        mockReaddirSync.mockReturnValue(['2026-02-17.json']);
         mockFileOps.readJSON.mockReturnValue({
           timestamp: '2026-02-17T12:34:56Z',
           components: [
@@ -515,7 +518,7 @@ describe('MCP Server: health-scorer handlers', () => {
 
       it('should return component with issues', async () => {
         mockFileOps.fileExists.mockReturnValue(true);
-        vi.mocked(readdirSync).mockReturnValue(['2026-02-17.json'] as any);
+        mockReaddirSync.mockReturnValue(['2026-02-17.json']);
         mockFileOps.readJSON.mockReturnValue({
           timestamp: '2026-02-17T12:34:56Z',
           components: [
@@ -541,7 +544,7 @@ describe('MCP Server: health-scorer handlers', () => {
     describe('scoreAllComponents', () => {
       it('should return all components', async () => {
         mockFileOps.fileExists.mockReturnValue(true);
-        vi.mocked(readdirSync).mockReturnValue(['2026-02-17.json'] as any);
+        mockReaddirSync.mockReturnValue(['2026-02-17.json']);
         mockFileOps.readJSON.mockReturnValue({
           timestamp: '2026-02-17T12:34:56Z',
           components: [
@@ -572,20 +575,20 @@ describe('MCP Server: health-scorer handlers', () => {
         const result = await scoreAllComponents();
 
         expect(result.length).toBe(3);
-        expect(result[0].tagName).toBe('hx-button');
-        expect(result[1].tagName).toBe('hx-card');
-        expect(result[2].tagName).toBe('hx-text-input');
+        expect(result[0]?.tagName).toBe('hx-button');
+        expect(result[1]?.tagName).toBe('hx-card');
+        expect(result[2]?.tagName).toBe('hx-text-input');
       });
     });
 
     describe('getHealthTrend', () => {
       it('should calculate improving trend', async () => {
         mockFileOps.fileExists.mockReturnValue(true);
-        vi.mocked(readdirSync).mockReturnValue(['2026-02-18.json', '2026-02-17.json'] as any);
+        mockReaddirSync.mockReturnValue(['2026-02-18.json', '2026-02-17.json']);
 
-        let callCount = 0;
+        let _callCount = 0;
         mockFileOps.readJSON.mockImplementation((path: string) => {
-          callCount++;
+          _callCount++;
           if (path.includes('2026-02-17')) {
             return {
               timestamp: '2026-02-17T00:00:00Z',
@@ -604,17 +607,17 @@ describe('MCP Server: health-scorer handlers', () => {
         expect(result.days).toBe(2);
         expect(result.trend).toBe('improving');
         expect(result.changePercent).toBeGreaterThan(5);
-        expect(result.dataPoints[0].date).toBe('2026-02-17');
-        expect(result.dataPoints[1].date).toBe('2026-02-18');
+        expect(result.dataPoints[0]?.date).toBe('2026-02-17');
+        expect(result.dataPoints[1]?.date).toBe('2026-02-18');
       });
 
       it('should calculate declining trend', async () => {
         mockFileOps.fileExists.mockReturnValue(true);
-        vi.mocked(readdirSync).mockReturnValue(['2026-02-18.json', '2026-02-17.json'] as any);
+        mockReaddirSync.mockReturnValue(['2026-02-18.json', '2026-02-17.json']);
 
-        let callCount = 0;
+        let _callCount = 0;
         mockFileOps.readJSON.mockImplementation((path: string) => {
-          callCount++;
+          _callCount++;
           if (path.includes('2026-02-17')) {
             return {
               timestamp: '2026-02-17T00:00:00Z',
@@ -635,7 +638,7 @@ describe('MCP Server: health-scorer handlers', () => {
 
       it('should calculate stable trend', async () => {
         mockFileOps.fileExists.mockReturnValue(true);
-        vi.mocked(readdirSync).mockReturnValue(['2026-02-18.json', '2026-02-17.json'] as any);
+        mockReaddirSync.mockReturnValue(['2026-02-18.json', '2026-02-17.json']);
 
         mockFileOps.readJSON.mockReturnValue({
           timestamp: '2026-02-17T00:00:00Z',
@@ -652,7 +655,7 @@ describe('MCP Server: health-scorer handlers', () => {
     describe('getHealthDiff', () => {
       it('should calculate diff with improvements', async () => {
         mockFileOps.fileExists.mockReturnValue(true);
-        vi.mocked(readdirSync).mockReturnValue(['2026-02-17.json'] as any);
+        mockReaddirSync.mockReturnValue(['2026-02-17.json']);
 
         let callCount = 0;
         mockFileOps.readJSON.mockImplementation(() => {
@@ -687,8 +690,8 @@ describe('MCP Server: health-scorer handlers', () => {
 
         expect(result.improved).toBe(true);
         expect(result.scoreDelta).toBe(15);
-        expect(result.changedDimensions[0].dimension).toBe('accessibility');
-        expect(result.changedDimensions[0].delta).toBe(25);
+        expect(result.changedDimensions[0]?.dimension).toBe('accessibility');
+        expect(result.changedDimensions[0]?.delta).toBe(25);
       });
     });
   });
@@ -711,7 +714,7 @@ describe('MCP Server: health-scorer handlers', () => {
 
     it('should categorize missing component as UserInput', async () => {
       mockFileOps.fileExists.mockReturnValue(true);
-      vi.mocked(readdirSync).mockReturnValue(['2026-02-17.json'] as any);
+      mockReaddirSync.mockReturnValue(['2026-02-17.json']);
       mockFileOps.readJSON.mockReturnValue({
         timestamp: '2026-02-17T00:00:00Z',
         components: [],
@@ -728,7 +731,7 @@ describe('MCP Server: health-scorer handlers', () => {
 
     it('should provide helpful error messages', async () => {
       mockFileOps.fileExists.mockReturnValue(true);
-      vi.mocked(readdirSync).mockReturnValue(['2026-02-17.json'] as any);
+      mockReaddirSync.mockReturnValue(['2026-02-17.json']);
       mockFileOps.readJSON.mockReturnValue({
         timestamp: '2026-02-17T00:00:00Z',
         components: [{ tagName: 'hx-card', score: 85, grade: 'B' }],

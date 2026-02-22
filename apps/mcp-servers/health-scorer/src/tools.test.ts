@@ -11,9 +11,8 @@ vi.mock('./handlers.js', () => ({
   getHealthDiff: vi.fn(),
 }));
 
-const { scoreComponent, scoreAllComponents, getHealthTrend, getHealthDiff } = await import(
-  './handlers.js'
-);
+const { scoreComponent, scoreAllComponents, getHealthTrend, getHealthDiff } =
+  await import('./handlers.js');
 
 describe('Tool Registration - health-scorer', () => {
   let server: Server;
@@ -49,12 +48,14 @@ describe('Tool Registration - health-scorer', () => {
       // @ts-expect-error - internal method
       const response = await server._requestHandlers.get('tools/list')?.(request);
 
-      response.tools.forEach((tool: any) => {
-        expect(tool.name).toBeDefined();
-        expect(tool.description).toBeDefined();
-        expect(tool.inputSchema).toBeDefined();
-        expect(tool.inputSchema.type).toBe('object');
-      });
+      response.tools.forEach(
+        (tool: { name: string; description: string; inputSchema: { type: string } }) => {
+          expect(tool.name).toBeDefined();
+          expect(tool.description).toBeDefined();
+          expect(tool.inputSchema).toBeDefined();
+          expect(tool.inputSchema.type).toBe('object');
+        },
+      );
     });
 
     it('includes correct tool names', async () => {
@@ -66,7 +67,7 @@ describe('Tool Registration - health-scorer', () => {
       // @ts-expect-error - internal method
       const response = await server._requestHandlers.get('tools/list')?.(request);
 
-      const toolNames = response.tools.map((t: any) => t.name);
+      const toolNames = response.tools.map((t: { name: string }) => t.name);
       expect(toolNames).toContain('scoreComponent');
       expect(toolNames).toContain('scoreAllComponents');
       expect(toolNames).toContain('getHealthTrend');
@@ -82,6 +83,7 @@ describe('Tool Registration - health-scorer', () => {
         grade: 'A',
         dimensions: {},
         issues: [],
+        timestamp: '2026-02-21T00:00:00.000Z',
       });
 
       const request = CallToolRequestSchema.parse({
@@ -150,8 +152,22 @@ describe('Tool Registration - health-scorer', () => {
 
     it('returns array data', async () => {
       const mockScores = [
-        { tagName: 'hx-button', score: 100, grade: 'A', dimensions: {}, issues: [] },
-        { tagName: 'hx-card', score: 95, grade: 'A', dimensions: {}, issues: [] },
+        {
+          tagName: 'hx-button',
+          score: 100,
+          grade: 'A' as const,
+          dimensions: {},
+          issues: [],
+          timestamp: '2026-02-21T00:00:00.000Z',
+        },
+        {
+          tagName: 'hx-card',
+          score: 95,
+          grade: 'A' as const,
+          dimensions: {},
+          issues: [],
+          timestamp: '2026-02-21T00:00:00.000Z',
+        },
       ];
       vi.mocked(scoreAllComponents).mockResolvedValue(mockScores);
 
@@ -173,7 +189,13 @@ describe('Tool Registration - health-scorer', () => {
 
   describe('getHealthTrend', () => {
     it('accepts valid arguments with days parameter', async () => {
-      vi.mocked(getHealthTrend).mockResolvedValue([]);
+      vi.mocked(getHealthTrend).mockResolvedValue({
+        tagName: 'hx-button',
+        days: 14,
+        dataPoints: [],
+        trend: 'stable',
+        changePercent: 0,
+      });
 
       const request = CallToolRequestSchema.parse({
         method: 'tools/call',
@@ -190,7 +212,13 @@ describe('Tool Registration - health-scorer', () => {
     });
 
     it('uses default days when not provided', async () => {
-      vi.mocked(getHealthTrend).mockResolvedValue([]);
+      vi.mocked(getHealthTrend).mockResolvedValue({
+        tagName: 'hx-button',
+        days: 7,
+        dataPoints: [],
+        trend: 'stable',
+        changePercent: 0,
+      });
 
       const request = CallToolRequestSchema.parse({
         method: 'tools/call',
@@ -225,12 +253,27 @@ describe('Tool Registration - health-scorer', () => {
   describe('getHealthDiff', () => {
     it('accepts valid arguments with baseBranch', async () => {
       vi.mocked(getHealthDiff).mockResolvedValue({
-        base: { tagName: 'hx-button', score: 90, grade: 'A', dimensions: {}, issues: [] },
-        current: { tagName: 'hx-button', score: 95, grade: 'A', dimensions: {}, issues: [] },
+        tagName: 'hx-button',
+        base: {
+          tagName: 'hx-button',
+          score: 90,
+          grade: 'A',
+          dimensions: {},
+          issues: [],
+          timestamp: '2026-02-20T00:00:00.000Z',
+        },
+        current: {
+          tagName: 'hx-button',
+          score: 95,
+          grade: 'A',
+          dimensions: {},
+          issues: [],
+          timestamp: '2026-02-21T00:00:00.000Z',
+        },
         improved: true,
         regressed: false,
         scoreDelta: 5,
-        dimensionDeltas: {},
+        changedDimensions: [],
       });
 
       const request = CallToolRequestSchema.parse({
@@ -249,12 +292,27 @@ describe('Tool Registration - health-scorer', () => {
 
     it('uses default baseBranch when not provided', async () => {
       vi.mocked(getHealthDiff).mockResolvedValue({
-        base: { tagName: 'hx-button', score: 90, grade: 'A', dimensions: {}, issues: [] },
-        current: { tagName: 'hx-button', score: 90, grade: 'A', dimensions: {}, issues: [] },
+        tagName: 'hx-button',
+        base: {
+          tagName: 'hx-button',
+          score: 90,
+          grade: 'A',
+          dimensions: {},
+          issues: [],
+          timestamp: '2026-02-20T00:00:00.000Z',
+        },
+        current: {
+          tagName: 'hx-button',
+          score: 90,
+          grade: 'A',
+          dimensions: {},
+          issues: [],
+          timestamp: '2026-02-21T00:00:00.000Z',
+        },
         improved: false,
         regressed: false,
         scoreDelta: 0,
-        dimensionDeltas: {},
+        changedDimensions: [],
       });
 
       const request = CallToolRequestSchema.parse({
@@ -273,12 +331,27 @@ describe('Tool Registration - health-scorer', () => {
 
     it('formats improvement message correctly', async () => {
       vi.mocked(getHealthDiff).mockResolvedValue({
-        base: { tagName: 'hx-button', score: 80, grade: 'B', dimensions: {}, issues: [] },
-        current: { tagName: 'hx-button', score: 95, grade: 'A', dimensions: {}, issues: [] },
+        tagName: 'hx-button',
+        base: {
+          tagName: 'hx-button',
+          score: 80,
+          grade: 'B' as const,
+          dimensions: {},
+          issues: [],
+          timestamp: '2026-02-20T00:00:00.000Z',
+        },
+        current: {
+          tagName: 'hx-button',
+          score: 95,
+          grade: 'A' as const,
+          dimensions: {},
+          issues: [],
+          timestamp: '2026-02-21T00:00:00.000Z',
+        },
         improved: true,
         regressed: false,
         scoreDelta: 15,
-        dimensionDeltas: {},
+        changedDimensions: [],
       });
 
       const request = CallToolRequestSchema.parse({
