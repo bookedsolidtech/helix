@@ -1,0 +1,86 @@
+{
+  "schemaVersion": "1.0.0",
+  "readme": "",
+  "modules": [
+    {
+      "kind": "javascript-module",
+      "path": "src/components/hx-button/hx-button.ts",
+      "declarations": [
+        {
+          "tagName": "hx-button",
+          "name": "HxButton",
+          "description": "A fully documented button component",
+          "members": [
+            {
+              "name": "variant",
+              "kind": "field",
+              "type": { "text": "string" },
+              "description": "Button variant (primary, secondary, tertiary)"
+            },
+            {
+              "name": "disabled",
+              "kind": "field",
+              "type": { "text": "boolean" },
+              "description": "Whether the button is disabled"
+            }
+          ],
+          "events": [
+            {
+              "name": "hx-click",
+              "type": { "text": "CustomEvent" },
+              "description": "Fired when button is clicked"
+            }
+          ],
+          "slots": [
+            {
+              "name": "",
+              "description": "Default slot for button content"
+            }
+          ],
+          "cssProperties": [
+            {
+              "name": "--hx-button-bg",
+              "description": "Background color of the button"
+            }
+          ],
+          "cssParts": [
+            {
+              "name": "button",
+              "description": "The internal button element"
+            }
+          ]
+        }
+      ],
+      "exports": []
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/components/hx-card/hx-card.ts",
+      "declarations": [
+        {
+          "tagName": "hx-card",
+          "name": "HxCard",
+          "description": "A card component",
+          "members": [
+            {
+              "name": "elevation",
+              "kind": "field",
+              "type": { "text": "number" },
+              "description": "Card elevation level"
+            }
+          ],
+          "events": [],
+          "slots": [
+            {
+              "name": "",
+              "description": "Default slot"
+            }
+          ],
+          "cssProperties": [],
+          "cssParts": []
+        }
+      ],
+      "exports": []
+    }
+  ]
+}

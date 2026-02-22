@@ -1,0 +1,47 @@
+{
+  "schemaVersion": "1.0.0",
+  "readme": "",
+  "modules": [
+    {
+      "kind": "javascript-module",
+      "path": "src/components/hx-button/hx-button.ts",
+      "declarations": [
+        {
+          "tagName": "hx-button",
+          "name": "HxButton",
+          "members": [
+            {
+              "name": "variant",
+              "kind": "field",
+              "type": { "text": "string" }
+            },
+            {
+              "name": "disabled",
+              "kind": "field",
+              "type": { "text": "boolean" },
+              "description": "Disables the button"
+            }
+          ],
+          "events": [
+            {
+              "name": "hx-click",
+              "type": { "text": "CustomEvent" }
+            }
+          ],
+          "slots": [],
+          "cssProperties": [
+            {
+              "name": "--hx-button-bg"
+            }
+          ],
+          "cssParts": [
+            {
+              "name": "button"
+            }
+          ]
+        }
+      ],
+      "exports": []
+    }
+  ]
+}

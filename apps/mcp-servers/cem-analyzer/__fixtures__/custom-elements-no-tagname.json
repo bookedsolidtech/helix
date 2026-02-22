@@ -1,0 +1,20 @@
+{
+  "schemaVersion": "1.0.0",
+  "readme": "",
+  "modules": [
+    {
+      "kind": "javascript-module",
+      "path": "src/components/hx-button/hx-button.ts",
+      "declarations": [
+        {
+          "name": "HxButton",
+          "description": "Missing tagName - SECURITY VULNERABILITY",
+          "members": [],
+          "events": [],
+          "slots": []
+        }
+      ],
+      "exports": []
+    }
+  ]
+}
