@@ -9,21 +9,21 @@
 select {
   display: block;
   width: 100%;
-  border: var(--wc-border-width-thin, 1px) solid
-    var(--wc-select-border-color, var(--wc-color-neutral-300, #ced4da));
-  border-radius: var(--wc-select-border-radius, var(--wc-border-radius-md, 0.375rem));
-  background-color: var(--wc-select-bg, var(--wc-color-neutral-0, #ffffff));
-  padding: var(--wc-space-2, 0.5rem) var(--wc-space-8, 2rem) var(--wc-space-2, 0.5rem)
-    var(--wc-space-3, 0.75rem);
-  font-family: var(--wc-select-font-family, var(--wc-font-family-sans, sans-serif));
-  font-size: var(--wc-font-size-md, 1rem);
-  color: var(--wc-select-color, var(--wc-color-neutral-800, #212529));
-  line-height: var(--wc-line-height-normal, 1.5);
-  min-height: var(--wc-input-height-md, var(--wc-size-10, 2.5rem));
+  border: var(--hx-border-width-thin, 1px) solid
+    var(--hx-select-border-color, var(--hx-color-neutral-300, #ced4da));
+  border-radius: var(--hx-select-border-radius, var(--hx-border-radius-md, 0.375rem));
+  background-color: var(--hx-select-bg, var(--hx-color-neutral-0, #ffffff));
+  padding: var(--hx-space-2, 0.5rem) var(--hx-space-8, 2rem) var(--hx-space-2, 0.5rem)
+    var(--hx-space-3, 0.75rem);
+  font-family: var(--hx-select-font-family, var(--hx-font-family-sans, sans-serif));
+  font-size: var(--hx-font-size-md, 1rem);
+  color: var(--hx-select-color, var(--hx-color-neutral-800, #212529));
+  line-height: var(--hx-line-height-normal, 1.5);
+  min-height: var(--hx-input-height-md, var(--hx-size-10, 2.5rem));
   cursor: pointer;
   transition:
-    border-color var(--wc-transition-fast, 150ms ease),
-    box-shadow var(--wc-transition-fast, 150ms ease);
+    border-color var(--hx-transition-fast, 150ms ease),
+    box-shadow var(--hx-transition-fast, 150ms ease);
 
   /* Remove native appearance */
   appearance: none;
@@ -33,7 +33,7 @@ select {
   /* Custom chevron via encoded SVG */
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5L6 6.5L11 1.5' stroke='%236c757d' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round' fill='none'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
-  background-position: right var(--wc-space-3, 0.75rem) center;
+  background-position: right var(--hx-space-3, 0.75rem) center;
   background-size: 12px 8px;
 }
 
@@ -41,12 +41,12 @@ select {
 
 select:focus {
   outline: none;
-  border-color: var(--wc-select-focus-ring-color, var(--wc-focus-ring-color, #2563eb));
-  box-shadow: 0 0 0 var(--wc-focus-ring-width, 2px)
+  border-color: var(--hx-select-focus-ring-color, var(--hx-focus-ring-color, #2563eb));
+  box-shadow: 0 0 0 var(--hx-focus-ring-width, 2px)
     color-mix(
       in srgb,
-      var(--wc-select-focus-ring-color, var(--wc-focus-ring-color, #2563eb))
-        calc(var(--wc-focus-ring-opacity, 0.25) * 100%),
+      var(--hx-select-focus-ring-color, var(--hx-focus-ring-color, #2563eb))
+        calc(var(--hx-focus-ring-opacity, 0.25) * 100%),
       transparent
     );
 }
@@ -54,7 +54,7 @@ select:focus {
 /* ─── Disabled State ─── */
 
 select:disabled {
-  opacity: var(--wc-opacity-disabled, 0.5);
+  opacity: var(--hx-opacity-disabled, 0.5);
   cursor: not-allowed;
   pointer-events: none;
 }
@@ -62,13 +62,13 @@ select:disabled {
 /* ─── Multiple Select ─── */
 
 select[multiple] {
-  min-height: var(--wc-size-20, 5rem);
-  padding-right: var(--wc-space-3, 0.75rem);
+  min-height: var(--hx-size-20, 5rem);
+  padding-right: var(--hx-space-3, 0.75rem);
   background-image: none;
 }
 
 select[multiple] option {
-  padding: var(--wc-space-1, 0.25rem) var(--wc-space-2, 0.5rem);
+  padding: var(--hx-space-1, 0.25rem) var(--hx-space-2, 0.5rem);
 }
 
 /* ─── Remove IE arrow ─── */

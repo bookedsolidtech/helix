@@ -18,12 +18,12 @@
 hx-form .form-item {
   display: flex;
   flex-direction: column;
-  gap: var(--wc-space-1, 0.25rem);
-  font-family: var(--wc-input-font-family, var(--wc-font-family-sans, sans-serif));
+  gap: var(--hx-space-1, 0.25rem);
+  font-family: var(--hx-input-font-family, var(--hx-font-family-sans, sans-serif));
 }
 
 hx-form .form-item + .form-item {
-  margin-top: var(--wc-space-4, 1rem);
+  margin-top: var(--hx-space-4, 1rem);
 }
 
 /* ─── Label ─── */
@@ -31,26 +31,26 @@ hx-form .form-item + .form-item {
 hx-form label {
   display: flex;
   align-items: baseline;
-  gap: var(--wc-space-1, 0.25rem);
-  font-size: var(--wc-font-size-sm, 0.875rem);
-  font-weight: var(--wc-font-weight-medium, 500);
-  color: var(--wc-input-label-color, var(--wc-color-neutral-700, #343a40));
-  line-height: var(--wc-line-height-normal, 1.5);
+  gap: var(--hx-space-1, 0.25rem);
+  font-size: var(--hx-font-size-sm, 0.875rem);
+  font-weight: var(--hx-font-weight-medium, 500);
+  color: var(--hx-input-label-color, var(--hx-color-neutral-700, #343a40));
+  line-height: var(--hx-line-height-normal, 1.5);
 }
 
 /* ─── Required Marker ─── */
 
 hx-form .form-required {
-  color: var(--wc-input-error-color, var(--wc-color-error-500, #dc3545));
-  font-weight: var(--wc-font-weight-bold, 700);
+  color: var(--hx-input-error-color, var(--hx-color-error-500, #dc3545));
+  font-weight: var(--hx-font-weight-bold, 700);
 }
 
 /* ─── Description / Help Text ─── */
 
 hx-form .description {
-  font-size: var(--wc-font-size-xs, 0.75rem);
-  color: var(--wc-color-neutral-500, #6c757d);
-  line-height: var(--wc-line-height-normal, 1.5);
+  font-size: var(--hx-font-size-xs, 0.75rem);
+  color: var(--hx-color-neutral-500, #6c757d);
+  line-height: var(--hx-line-height-normal, 1.5);
 }
 
 /* ─── Box Sizing Reset ─── */
@@ -74,19 +74,19 @@ hx-form input[type='search'],
 hx-form input[type='number'] {
   display: block;
   width: 100%;
-  border: var(--wc-border-width-thin, 1px) solid
-    var(--wc-input-border-color, var(--wc-color-neutral-300, #ced4da));
-  border-radius: var(--wc-input-border-radius, var(--wc-border-radius-md, 0.375rem));
-  background-color: var(--wc-input-bg, var(--wc-color-neutral-0, #ffffff));
-  padding: var(--wc-space-2, 0.5rem) var(--wc-space-3, 0.75rem);
-  font-family: var(--wc-input-font-family, var(--wc-font-family-sans, sans-serif));
-  font-size: var(--wc-font-size-md, 1rem);
-  color: var(--wc-input-color, var(--wc-color-neutral-800, #212529));
-  line-height: var(--wc-line-height-normal, 1.5);
-  min-height: var(--wc-size-10, 2.5rem);
+  border: var(--hx-border-width-thin, 1px) solid
+    var(--hx-input-border-color, var(--hx-color-neutral-300, #ced4da));
+  border-radius: var(--hx-input-border-radius, var(--hx-border-radius-md, 0.375rem));
+  background-color: var(--hx-input-bg, var(--hx-color-neutral-0, #ffffff));
+  padding: var(--hx-space-2, 0.5rem) var(--hx-space-3, 0.75rem);
+  font-family: var(--hx-input-font-family, var(--hx-font-family-sans, sans-serif));
+  font-size: var(--hx-font-size-md, 1rem);
+  color: var(--hx-input-color, var(--hx-color-neutral-800, #212529));
+  line-height: var(--hx-line-height-normal, 1.5);
+  min-height: var(--hx-size-10, 2.5rem);
   transition:
-    border-color var(--wc-transition-fast, 150ms ease),
-    box-shadow var(--wc-transition-fast, 150ms ease);
+    border-color var(--hx-transition-fast, 150ms ease),
+    box-shadow var(--hx-transition-fast, 150ms ease);
 }
 
 /* ─── Placeholder ─── */
@@ -98,7 +98,7 @@ hx-form input[type='tel']::placeholder,
 hx-form input[type='url']::placeholder,
 hx-form input[type='search']::placeholder,
 hx-form input[type='number']::placeholder {
-  color: var(--wc-color-neutral-400, #adb5bd);
+  color: var(--hx-color-neutral-400, #adb5bd);
 }
 
 /* ─── Focus State ─── */
@@ -111,12 +111,12 @@ hx-form input[type='url']:focus,
 hx-form input[type='search']:focus,
 hx-form input[type='number']:focus {
   outline: none;
-  border-color: var(--wc-input-focus-ring-color, var(--wc-focus-ring-color, #2563eb));
-  box-shadow: 0 0 0 var(--wc-focus-ring-width, 2px)
+  border-color: var(--hx-input-focus-ring-color, var(--hx-focus-ring-color, #2563eb));
+  box-shadow: 0 0 0 var(--hx-focus-ring-width, 2px)
     color-mix(
       in srgb,
-      var(--wc-input-focus-ring-color, var(--wc-focus-ring-color, #2563eb))
-        calc(var(--wc-focus-ring-opacity, 0.25) * 100%),
+      var(--hx-input-focus-ring-color, var(--hx-focus-ring-color, #2563eb))
+        calc(var(--hx-focus-ring-opacity, 0.25) * 100%),
       transparent
     );
 }
@@ -130,7 +130,7 @@ hx-form input[type='tel']:disabled,
 hx-form input[type='url']:disabled,
 hx-form input[type='search']:disabled,
 hx-form input[type='number']:disabled {
-  opacity: var(--wc-opacity-disabled, 0.5);
+  opacity: var(--hx-opacity-disabled, 0.5);
   cursor: not-allowed;
   pointer-events: none;
 }
@@ -144,7 +144,7 @@ hx-form input[type='tel']:read-only,
 hx-form input[type='url']:read-only,
 hx-form input[type='search']:read-only,
 hx-form input[type='number']:read-only {
-  background-color: var(--wc-color-neutral-100, #e9ecef);
+  background-color: var(--hx-color-neutral-100, #e9ecef);
 }
 
 /* ─── Remove browser search decorations ─── */
@@ -175,46 +175,46 @@ hx-form input[type='number'] {
 hx-form textarea {
   display: block;
   width: 100%;
-  border: var(--wc-border-width-thin, 1px) solid
-    var(--wc-input-border-color, var(--wc-color-neutral-300, #ced4da));
-  border-radius: var(--wc-input-border-radius, var(--wc-border-radius-md, 0.375rem));
-  background-color: var(--wc-input-bg, var(--wc-color-neutral-0, #ffffff));
-  padding: var(--wc-space-2, 0.5rem) var(--wc-space-3, 0.75rem);
-  font-family: var(--wc-input-font-family, var(--wc-font-family-sans, sans-serif));
-  font-size: var(--wc-font-size-md, 1rem);
-  color: var(--wc-input-color, var(--wc-color-neutral-800, #212529));
-  line-height: var(--wc-line-height-normal, 1.5);
-  min-height: var(--wc-textarea-min-height, var(--wc-size-20, 5rem));
+  border: var(--hx-border-width-thin, 1px) solid
+    var(--hx-input-border-color, var(--hx-color-neutral-300, #ced4da));
+  border-radius: var(--hx-input-border-radius, var(--hx-border-radius-md, 0.375rem));
+  background-color: var(--hx-input-bg, var(--hx-color-neutral-0, #ffffff));
+  padding: var(--hx-space-2, 0.5rem) var(--hx-space-3, 0.75rem);
+  font-family: var(--hx-input-font-family, var(--hx-font-family-sans, sans-serif));
+  font-size: var(--hx-font-size-md, 1rem);
+  color: var(--hx-input-color, var(--hx-color-neutral-800, #212529));
+  line-height: var(--hx-line-height-normal, 1.5);
+  min-height: var(--hx-textarea-min-height, var(--hx-size-20, 5rem));
   resize: vertical;
   transition:
-    border-color var(--wc-transition-fast, 150ms ease),
-    box-shadow var(--wc-transition-fast, 150ms ease);
+    border-color var(--hx-transition-fast, 150ms ease),
+    box-shadow var(--hx-transition-fast, 150ms ease);
 }
 
 hx-form textarea::placeholder {
-  color: var(--wc-color-neutral-400, #adb5bd);
+  color: var(--hx-color-neutral-400, #adb5bd);
 }
 
 hx-form textarea:focus {
   outline: none;
-  border-color: var(--wc-input-focus-ring-color, var(--wc-focus-ring-color, #2563eb));
-  box-shadow: 0 0 0 var(--wc-focus-ring-width, 2px)
+  border-color: var(--hx-input-focus-ring-color, var(--hx-focus-ring-color, #2563eb));
+  box-shadow: 0 0 0 var(--hx-focus-ring-width, 2px)
     color-mix(
       in srgb,
-      var(--wc-input-focus-ring-color, var(--wc-focus-ring-color, #2563eb))
-        calc(var(--wc-focus-ring-opacity, 0.25) * 100%),
+      var(--hx-input-focus-ring-color, var(--hx-focus-ring-color, #2563eb))
+        calc(var(--hx-focus-ring-opacity, 0.25) * 100%),
       transparent
     );
 }
 
 hx-form textarea:disabled {
-  opacity: var(--wc-opacity-disabled, 0.5);
+  opacity: var(--hx-opacity-disabled, 0.5);
   cursor: not-allowed;
   pointer-events: none;
 }
 
 hx-form textarea:read-only {
-  background-color: var(--wc-color-neutral-100, #e9ecef);
+  background-color: var(--hx-color-neutral-100, #e9ecef);
 }
 
 /* ==========================================================================
@@ -224,56 +224,56 @@ hx-form textarea:read-only {
 hx-form select {
   display: block;
   width: 100%;
-  border: var(--wc-border-width-thin, 1px) solid
-    var(--wc-select-border-color, var(--wc-color-neutral-300, #ced4da));
-  border-radius: var(--wc-select-border-radius, var(--wc-border-radius-md, 0.375rem));
-  background-color: var(--wc-select-bg, var(--wc-color-neutral-0, #ffffff));
-  padding: var(--wc-space-2, 0.5rem) var(--wc-space-8, 2rem) var(--wc-space-2, 0.5rem)
-    var(--wc-space-3, 0.75rem);
-  font-family: var(--wc-select-font-family, var(--wc-font-family-sans, sans-serif));
-  font-size: var(--wc-font-size-md, 1rem);
-  color: var(--wc-select-color, var(--wc-color-neutral-800, #212529));
-  line-height: var(--wc-line-height-normal, 1.5);
-  min-height: var(--wc-input-height-md, var(--wc-size-10, 2.5rem));
+  border: var(--hx-border-width-thin, 1px) solid
+    var(--hx-select-border-color, var(--hx-color-neutral-300, #ced4da));
+  border-radius: var(--hx-select-border-radius, var(--hx-border-radius-md, 0.375rem));
+  background-color: var(--hx-select-bg, var(--hx-color-neutral-0, #ffffff));
+  padding: var(--hx-space-2, 0.5rem) var(--hx-space-8, 2rem) var(--hx-space-2, 0.5rem)
+    var(--hx-space-3, 0.75rem);
+  font-family: var(--hx-select-font-family, var(--hx-font-family-sans, sans-serif));
+  font-size: var(--hx-font-size-md, 1rem);
+  color: var(--hx-select-color, var(--hx-color-neutral-800, #212529));
+  line-height: var(--hx-line-height-normal, 1.5);
+  min-height: var(--hx-input-height-md, var(--hx-size-10, 2.5rem));
   cursor: pointer;
   transition:
-    border-color var(--wc-transition-fast, 150ms ease),
-    box-shadow var(--wc-transition-fast, 150ms ease);
+    border-color var(--hx-transition-fast, 150ms ease),
+    box-shadow var(--hx-transition-fast, 150ms ease);
   appearance: none;
   -webkit-appearance: none;
   -moz-appearance: none;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5L6 6.5L11 1.5' stroke='%236c757d' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round' fill='none'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
-  background-position: right var(--wc-space-3, 0.75rem) center;
+  background-position: right var(--hx-space-3, 0.75rem) center;
   background-size: 12px 8px;
 }
 
 hx-form select:focus {
   outline: none;
-  border-color: var(--wc-select-focus-ring-color, var(--wc-focus-ring-color, #2563eb));
-  box-shadow: 0 0 0 var(--wc-focus-ring-width, 2px)
+  border-color: var(--hx-select-focus-ring-color, var(--hx-focus-ring-color, #2563eb));
+  box-shadow: 0 0 0 var(--hx-focus-ring-width, 2px)
     color-mix(
       in srgb,
-      var(--wc-select-focus-ring-color, var(--wc-focus-ring-color, #2563eb))
-        calc(var(--wc-focus-ring-opacity, 0.25) * 100%),
+      var(--hx-select-focus-ring-color, var(--hx-focus-ring-color, #2563eb))
+        calc(var(--hx-focus-ring-opacity, 0.25) * 100%),
       transparent
     );
 }
 
 hx-form select:disabled {
-  opacity: var(--wc-opacity-disabled, 0.5);
+  opacity: var(--hx-opacity-disabled, 0.5);
   cursor: not-allowed;
   pointer-events: none;
 }
 
 hx-form select[multiple] {
-  min-height: var(--wc-size-20, 5rem);
-  padding-right: var(--wc-space-3, 0.75rem);
+  min-height: var(--hx-size-20, 5rem);
+  padding-right: var(--hx-space-3, 0.75rem);
   background-image: none;
 }
 
 hx-form select[multiple] option {
-  padding: var(--wc-space-1, 0.25rem) var(--wc-space-2, 0.5rem);
+  padding: var(--hx-space-1, 0.25rem) var(--hx-space-2, 0.5rem);
 }
 
 hx-form select::-ms-expand {
@@ -292,24 +292,24 @@ hx-form input[type='checkbox'] {
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  width: var(--wc-checkbox-size, var(--wc-size-5, 1.25rem));
-  height: var(--wc-checkbox-size, var(--wc-size-5, 1.25rem));
+  width: var(--hx-checkbox-size, var(--hx-size-5, 1.25rem));
+  height: var(--hx-checkbox-size, var(--hx-size-5, 1.25rem));
   margin: 0;
-  border: var(--wc-border-width-medium, 2px) solid
-    var(--wc-checkbox-border-color, var(--wc-color-neutral-300, #ced4da));
-  border-radius: var(--wc-checkbox-border-radius, var(--wc-border-radius-sm, 0.25rem));
-  background-color: var(--wc-color-neutral-0, #ffffff);
+  border: var(--hx-border-width-medium, 2px) solid
+    var(--hx-checkbox-border-color, var(--hx-color-neutral-300, #ced4da));
+  border-radius: var(--hx-checkbox-border-radius, var(--hx-border-radius-sm, 0.25rem));
+  background-color: var(--hx-color-neutral-0, #ffffff);
   transition:
-    background-color var(--wc-transition-fast, 150ms ease),
-    border-color var(--wc-transition-fast, 150ms ease),
-    box-shadow var(--wc-transition-fast, 150ms ease);
+    background-color var(--hx-transition-fast, 150ms ease),
+    border-color var(--hx-transition-fast, 150ms ease),
+    box-shadow var(--hx-transition-fast, 150ms ease);
   cursor: pointer;
   vertical-align: middle;
 }
 
 hx-form input[type='checkbox']:checked {
-  background-color: var(--wc-checkbox-checked-bg, var(--wc-color-primary-500, #2563eb));
-  border-color: var(--wc-checkbox-checked-border-color, var(--wc-color-primary-500, #2563eb));
+  background-color: var(--hx-checkbox-checked-bg, var(--hx-color-primary-500, #2563eb));
+  border-color: var(--hx-checkbox-checked-border-color, var(--hx-color-primary-500, #2563eb));
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none'%3E%3Cpath d='M3.5 8.5L6.5 11.5L12.5 4.5' stroke='%23ffffff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: center;
@@ -317,8 +317,8 @@ hx-form input[type='checkbox']:checked {
 }
 
 hx-form input[type='checkbox']:indeterminate {
-  background-color: var(--wc-checkbox-checked-bg, var(--wc-color-primary-500, #2563eb));
-  border-color: var(--wc-checkbox-checked-border-color, var(--wc-color-primary-500, #2563eb));
+  background-color: var(--hx-checkbox-checked-bg, var(--hx-color-primary-500, #2563eb));
+  border-color: var(--hx-checkbox-checked-border-color, var(--hx-color-primary-500, #2563eb));
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none'%3E%3Cpath d='M4 8H12' stroke='%23ffffff' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: center;
@@ -326,21 +326,21 @@ hx-form input[type='checkbox']:indeterminate {
 }
 
 hx-form input[type='checkbox']:focus-visible {
-  outline: var(--wc-focus-ring-width, 2px) solid
-    var(--wc-checkbox-focus-ring-color, var(--wc-focus-ring-color, #2563eb));
-  outline-offset: var(--wc-focus-ring-offset, 2px);
+  outline: var(--hx-focus-ring-width, 2px) solid
+    var(--hx-checkbox-focus-ring-color, var(--hx-focus-ring-color, #2563eb));
+  outline-offset: var(--hx-focus-ring-offset, 2px);
 }
 
 hx-form input[type='checkbox']:hover:not(:disabled) {
-  border-color: var(--wc-color-primary-500, #2563eb);
+  border-color: var(--hx-color-primary-500, #2563eb);
 }
 
 hx-form input[type='checkbox']:checked:hover:not(:disabled) {
-  filter: brightness(var(--wc-filter-brightness-hover, 0.9));
+  filter: brightness(var(--hx-filter-brightness-hover, 0.9));
 }
 
 hx-form input[type='checkbox']:disabled {
-  opacity: var(--wc-opacity-disabled, 0.5);
+  opacity: var(--hx-opacity-disabled, 0.5);
   cursor: not-allowed;
   pointer-events: none;
 }
@@ -349,15 +349,15 @@ hx-form .form-type-checkbox,
 hx-form .form-type-checkbox-toggle {
   display: flex;
   align-items: flex-start;
-  gap: var(--wc-space-2, 0.5rem);
+  gap: var(--hx-space-2, 0.5rem);
 }
 
 hx-form .form-type-checkbox label,
 hx-form .form-type-checkbox-toggle label {
-  font-size: var(--wc-font-size-sm, 0.875rem);
-  font-weight: var(--wc-font-weight-medium, 500);
-  color: var(--wc-checkbox-label-color, var(--wc-color-neutral-700, #343a40));
-  line-height: var(--wc-line-height-normal, 1.5);
+  font-size: var(--hx-font-size-sm, 0.875rem);
+  font-weight: var(--hx-font-weight-medium, 500);
+  color: var(--hx-checkbox-label-color, var(--hx-color-neutral-700, #343a40));
+  line-height: var(--hx-line-height-normal, 1.5);
   cursor: pointer;
   user-select: none;
   -webkit-user-select: none;
@@ -375,40 +375,40 @@ hx-form input[type='radio'] {
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  width: var(--wc-radio-size, var(--wc-size-5, 1.25rem));
-  height: var(--wc-radio-size, var(--wc-size-5, 1.25rem));
+  width: var(--hx-radio-size, var(--hx-size-5, 1.25rem));
+  height: var(--hx-radio-size, var(--hx-size-5, 1.25rem));
   margin: 0;
-  border: var(--wc-border-width-medium, 2px) solid
-    var(--wc-radio-border-color, var(--wc-color-neutral-300, #ced4da));
-  border-radius: var(--wc-border-radius-full, 9999px);
-  background-color: var(--wc-color-neutral-0, #ffffff);
+  border: var(--hx-border-width-medium, 2px) solid
+    var(--hx-radio-border-color, var(--hx-color-neutral-300, #ced4da));
+  border-radius: var(--hx-border-radius-full, 9999px);
+  background-color: var(--hx-color-neutral-0, #ffffff);
   transition:
-    border-color var(--wc-transition-fast, 150ms ease),
-    background-color var(--wc-transition-fast, 150ms ease),
-    box-shadow var(--wc-transition-fast, 150ms ease);
+    border-color var(--hx-transition-fast, 150ms ease),
+    background-color var(--hx-transition-fast, 150ms ease),
+    box-shadow var(--hx-transition-fast, 150ms ease);
   cursor: pointer;
   vertical-align: middle;
 }
 
 hx-form input[type='radio']:checked {
-  border-color: var(--wc-radio-checked-border-color, var(--wc-color-primary-500, #2563eb));
-  background-color: var(--wc-radio-checked-bg, var(--wc-color-primary-500, #2563eb));
-  box-shadow: inset 0 0 0 calc(var(--wc-radio-size, var(--wc-size-5, 1.25rem)) * 0.3)
-    var(--wc-radio-dot-color, var(--wc-color-neutral-0, #ffffff));
+  border-color: var(--hx-radio-checked-border-color, var(--hx-color-primary-500, #2563eb));
+  background-color: var(--hx-radio-checked-bg, var(--hx-color-primary-500, #2563eb));
+  box-shadow: inset 0 0 0 calc(var(--hx-radio-size, var(--hx-size-5, 1.25rem)) * 0.3)
+    var(--hx-radio-dot-color, var(--hx-color-neutral-0, #ffffff));
 }
 
 hx-form input[type='radio']:focus-visible {
-  outline: var(--wc-focus-ring-width, 2px) solid
-    var(--wc-radio-focus-ring-color, var(--wc-focus-ring-color, #2563eb));
-  outline-offset: var(--wc-focus-ring-offset, 2px);
+  outline: var(--hx-focus-ring-width, 2px) solid
+    var(--hx-radio-focus-ring-color, var(--hx-focus-ring-color, #2563eb));
+  outline-offset: var(--hx-focus-ring-offset, 2px);
 }
 
 hx-form input[type='radio']:hover:not(:disabled):not(:checked) {
-  border-color: var(--wc-color-neutral-400, #adb5bd);
+  border-color: var(--hx-color-neutral-400, #adb5bd);
 }
 
 hx-form input[type='radio']:disabled {
-  opacity: var(--wc-opacity-disabled, 0.5);
+  opacity: var(--hx-opacity-disabled, 0.5);
   cursor: not-allowed;
   pointer-events: none;
 }
@@ -416,13 +416,13 @@ hx-form input[type='radio']:disabled {
 hx-form .form-type-radio {
   display: inline-flex;
   align-items: center;
-  gap: var(--wc-space-2, 0.5rem);
+  gap: var(--hx-space-2, 0.5rem);
 }
 
 hx-form .form-type-radio label {
-  font-size: var(--wc-font-size-md, 1rem);
-  color: var(--wc-radio-label-color, var(--wc-color-neutral-700, #343a40));
-  line-height: var(--wc-line-height-normal, 1.5);
+  font-size: var(--hx-font-size-md, 1rem);
+  color: var(--hx-radio-label-color, var(--hx-color-neutral-700, #343a40));
+  line-height: var(--hx-line-height-normal, 1.5);
   cursor: pointer;
   user-select: none;
   -webkit-user-select: none;
@@ -431,7 +431,7 @@ hx-form .form-type-radio label {
 hx-form .form-radios {
   display: flex;
   flex-direction: column;
-  gap: var(--wc-radio-group-gap, var(--wc-space-3, 0.75rem));
+  gap: var(--hx-radio-group-gap, var(--hx-space-3, 0.75rem));
 }
 
 hx-form .form-radios--horizontal {
@@ -446,14 +446,14 @@ hx-form .form-radios--horizontal {
 hx-form .form-type-switch {
   display: flex;
   flex-direction: column;
-  gap: var(--wc-space-1, 0.25rem);
-  font-family: var(--wc-font-family-sans, sans-serif);
+  gap: var(--hx-space-1, 0.25rem);
+  font-family: var(--hx-font-family-sans, sans-serif);
 }
 
 hx-form .form-type-switch .switch__control-row {
   display: flex;
   align-items: center;
-  gap: var(--wc-space-2, 0.5rem);
+  gap: var(--hx-space-2, 0.5rem);
 }
 
 hx-form .form-type-switch input[type='checkbox'] {
@@ -464,13 +464,13 @@ hx-form .form-type-switch input[type='checkbox'] {
   display: inline-flex;
   align-items: center;
   flex-shrink: 0;
-  width: var(--wc-switch-track-width-md, var(--wc-size-10, 2.5rem));
-  height: var(--wc-switch-track-height-md, var(--wc-size-5-5, 1.375rem));
+  width: var(--hx-switch-track-width-md, var(--hx-size-10, 2.5rem));
+  height: var(--hx-switch-track-height-md, var(--hx-size-5-5, 1.375rem));
   margin: 0;
   border: none;
-  border-radius: var(--wc-border-radius-full, 9999px);
-  background-color: var(--wc-switch-track-bg, var(--wc-color-neutral-300, #ced4da));
-  transition: background-color var(--wc-transition-fast, 150ms ease);
+  border-radius: var(--hx-border-radius-full, 9999px);
+  background-color: var(--hx-switch-track-bg, var(--hx-color-neutral-300, #ced4da));
+  transition: background-color var(--hx-transition-fast, 150ms ease);
   cursor: pointer;
   background-image: none;
 }
@@ -479,43 +479,43 @@ hx-form .form-type-switch input[type='checkbox']::before {
   content: '';
   position: absolute;
   top: 50%;
-  left: var(--wc-switch-thumb-offset, var(--wc-space-0-5, 0.125rem));
+  left: var(--hx-switch-thumb-offset, var(--hx-space-0-5, 0.125rem));
   transform: translateY(-50%);
-  width: var(--wc-switch-thumb-size-md, var(--wc-size-4-5, 1.125rem));
-  height: var(--wc-switch-thumb-size-md, var(--wc-size-4-5, 1.125rem));
-  border-radius: var(--wc-border-radius-full, 9999px);
-  background-color: var(--wc-switch-thumb-bg, var(--wc-color-neutral-0, #ffffff));
-  box-shadow: var(--wc-switch-thumb-shadow, var(--wc-shadow-sm, 0 1px 2px 0 rgb(0 0 0 / 0.05)));
-  transition: transform var(--wc-transition-fast, 150ms ease);
+  width: var(--hx-switch-thumb-size-md, var(--hx-size-4-5, 1.125rem));
+  height: var(--hx-switch-thumb-size-md, var(--hx-size-4-5, 1.125rem));
+  border-radius: var(--hx-border-radius-full, 9999px);
+  background-color: var(--hx-switch-thumb-bg, var(--hx-color-neutral-0, #ffffff));
+  box-shadow: var(--hx-switch-thumb-shadow, var(--hx-shadow-sm, 0 1px 2px 0 rgb(0 0 0 / 0.05)));
+  transition: transform var(--hx-transition-fast, 150ms ease);
 }
 
 hx-form .form-type-switch input[type='checkbox']:checked {
-  background-color: var(--wc-switch-track-checked-bg, var(--wc-color-primary-500, #2563eb));
+  background-color: var(--hx-switch-track-checked-bg, var(--hx-color-primary-500, #2563eb));
   background-image: none;
 }
 
 hx-form .form-type-switch input[type='checkbox']:checked::before {
   transform: translateY(-50%)
-    translateX(var(--wc-switch-thumb-size-md, var(--wc-size-4-5, 1.125rem)));
+    translateX(var(--hx-switch-thumb-size-md, var(--hx-size-4-5, 1.125rem)));
 }
 
 hx-form .form-type-switch input[type='checkbox']:focus-visible {
-  outline: var(--wc-focus-ring-width, 2px) solid
-    var(--wc-switch-focus-ring-color, var(--wc-focus-ring-color, #2563eb));
-  outline-offset: var(--wc-focus-ring-offset, 2px);
+  outline: var(--hx-focus-ring-width, 2px) solid
+    var(--hx-switch-focus-ring-color, var(--hx-focus-ring-color, #2563eb));
+  outline-offset: var(--hx-focus-ring-offset, 2px);
 }
 
 hx-form .form-type-switch input[type='checkbox']:disabled {
-  opacity: var(--wc-opacity-disabled, 0.5);
+  opacity: var(--hx-opacity-disabled, 0.5);
   cursor: not-allowed;
   pointer-events: none;
 }
 
 hx-form .form-type-switch label {
-  font-size: var(--wc-font-size-sm, 0.875rem);
-  font-weight: var(--wc-font-weight-medium, 500);
-  color: var(--wc-switch-label-color, var(--wc-color-neutral-700, #343a40));
-  line-height: var(--wc-line-height-normal, 1.5);
+  font-size: var(--hx-font-size-sm, 0.875rem);
+  font-weight: var(--hx-font-weight-medium, 500);
+  color: var(--hx-switch-label-color, var(--hx-color-neutral-700, #343a40));
+  line-height: var(--hx-line-height-normal, 1.5);
   cursor: pointer;
   user-select: none;
   -webkit-user-select: none;
@@ -523,34 +523,34 @@ hx-form .form-type-switch label {
 
 /* Small */
 hx-form .form-type-switch--sm input[type='checkbox'] {
-  width: var(--wc-switch-track-width-sm, var(--wc-size-8, 2rem));
-  height: var(--wc-switch-track-height-sm, var(--wc-size-4-5, 1.125rem));
+  width: var(--hx-switch-track-width-sm, var(--hx-size-8, 2rem));
+  height: var(--hx-switch-track-height-sm, var(--hx-size-4-5, 1.125rem));
 }
 
 hx-form .form-type-switch--sm input[type='checkbox']::before {
-  width: var(--wc-switch-thumb-size-sm, var(--wc-size-3-5, 0.875rem));
-  height: var(--wc-switch-thumb-size-sm, var(--wc-size-3-5, 0.875rem));
+  width: var(--hx-switch-thumb-size-sm, var(--hx-size-3-5, 0.875rem));
+  height: var(--hx-switch-thumb-size-sm, var(--hx-size-3-5, 0.875rem));
 }
 
 hx-form .form-type-switch--sm input[type='checkbox']:checked::before {
   transform: translateY(-50%)
-    translateX(var(--wc-switch-thumb-size-sm, var(--wc-size-3-5, 0.875rem)));
+    translateX(var(--hx-switch-thumb-size-sm, var(--hx-size-3-5, 0.875rem)));
 }
 
 /* Large */
 hx-form .form-type-switch--lg input[type='checkbox'] {
-  width: var(--wc-switch-track-width-lg, var(--wc-size-12, 3rem));
-  height: var(--wc-switch-track-height-lg, var(--wc-size-6-5, 1.625rem));
+  width: var(--hx-switch-track-width-lg, var(--hx-size-12, 3rem));
+  height: var(--hx-switch-track-height-lg, var(--hx-size-6-5, 1.625rem));
 }
 
 hx-form .form-type-switch--lg input[type='checkbox']::before {
-  width: var(--wc-switch-thumb-size-lg, var(--wc-size-5-5, 1.375rem));
-  height: var(--wc-switch-thumb-size-lg, var(--wc-size-5-5, 1.375rem));
+  width: var(--hx-switch-thumb-size-lg, var(--hx-size-5-5, 1.375rem));
+  height: var(--hx-switch-thumb-size-lg, var(--hx-size-5-5, 1.375rem));
 }
 
 hx-form .form-type-switch--lg input[type='checkbox']:checked::before {
   transform: translateY(-50%)
-    translateX(var(--wc-switch-thumb-size-lg, var(--wc-size-5-5, 1.375rem)));
+    translateX(var(--hx-switch-thumb-size-lg, var(--hx-size-5-5, 1.375rem)));
 }
 
 /* ==========================================================================
@@ -562,20 +562,20 @@ hx-form .form-type-switch--lg input[type='checkbox']:checked::before {
 hx-form form {
   display: flex;
   flex-direction: column;
-  gap: var(--wc-space-4, 1rem);
-  font-family: var(--wc-input-font-family, var(--wc-font-family-sans, sans-serif));
+  gap: var(--hx-space-4, 1rem);
+  font-family: var(--hx-input-font-family, var(--hx-font-family-sans, sans-serif));
 }
 
 /* ─── Fieldset ─── */
 
 hx-form fieldset {
-  border: var(--wc-border-width-thin, 1px) solid var(--wc-color-neutral-200, #dee2e6);
-  border-radius: var(--wc-border-radius-md, 0.375rem);
-  padding: var(--wc-space-4, 1rem) var(--wc-space-4, 1rem) var(--wc-space-4, 1rem);
+  border: var(--hx-border-width-thin, 1px) solid var(--hx-color-neutral-200, #dee2e6);
+  border-radius: var(--hx-border-radius-md, 0.375rem);
+  padding: var(--hx-space-4, 1rem) var(--hx-space-4, 1rem) var(--hx-space-4, 1rem);
   margin: 0;
   display: flex;
   flex-direction: column;
-  gap: var(--wc-space-4, 1rem);
+  gap: var(--hx-space-4, 1rem);
 }
 
 /* ─── Legend ─── */
@@ -583,38 +583,38 @@ hx-form fieldset {
 hx-form legend {
   display: flex;
   align-items: baseline;
-  gap: var(--wc-space-1, 0.25rem);
-  font-size: var(--wc-font-size-sm, 0.875rem);
-  font-weight: var(--wc-font-weight-semibold, 600);
-  color: var(--wc-color-neutral-700, #343a40);
-  line-height: var(--wc-line-height-normal, 1.5);
-  padding: 0 var(--wc-space-1, 0.25rem);
+  gap: var(--hx-space-1, 0.25rem);
+  font-size: var(--hx-font-size-sm, 0.875rem);
+  font-weight: var(--hx-font-weight-semibold, 600);
+  color: var(--hx-color-neutral-700, #343a40);
+  line-height: var(--hx-line-height-normal, 1.5);
+  padding: 0 var(--hx-space-1, 0.25rem);
 }
 
 /* ─── Details / Collapsible Fieldset (Drupal) ─── */
 
 hx-form details {
-  border: var(--wc-border-width-thin, 1px) solid var(--wc-color-neutral-200, #dee2e6);
-  border-radius: var(--wc-border-radius-md, 0.375rem);
-  padding: var(--wc-space-4, 1rem);
+  border: var(--hx-border-width-thin, 1px) solid var(--hx-color-neutral-200, #dee2e6);
+  border-radius: var(--hx-border-radius-md, 0.375rem);
+  padding: var(--hx-space-4, 1rem);
   margin: 0;
 }
 
 hx-form summary {
-  font-size: var(--wc-font-size-sm, 0.875rem);
-  font-weight: var(--wc-font-weight-semibold, 600);
-  color: var(--wc-color-neutral-700, #343a40);
-  line-height: var(--wc-line-height-normal, 1.5);
+  font-size: var(--hx-font-size-sm, 0.875rem);
+  font-weight: var(--hx-font-weight-semibold, 600);
+  color: var(--hx-color-neutral-700, #343a40);
+  line-height: var(--hx-line-height-normal, 1.5);
   cursor: pointer;
-  padding: var(--wc-space-1, 0.25rem) 0;
+  padding: var(--hx-space-1, 0.25rem) 0;
   user-select: none;
   -webkit-user-select: none;
 }
 
 hx-form summary:focus-visible {
-  outline: var(--wc-focus-ring-width, 2px) solid var(--wc-focus-ring-color, #2563eb);
-  outline-offset: var(--wc-focus-ring-offset, 2px);
-  border-radius: var(--wc-border-radius-sm, 0.25rem);
+  outline: var(--hx-focus-ring-width, 2px) solid var(--hx-focus-ring-color, #2563eb);
+  outline-offset: var(--hx-focus-ring-offset, 2px);
+  border-radius: var(--hx-border-radius-sm, 0.25rem);
 }
 
 /* ─── Form Actions (button group) ─── */
@@ -622,8 +622,8 @@ hx-form summary:focus-visible {
 hx-form .form-actions {
   display: flex;
   align-items: center;
-  gap: var(--wc-space-3, 0.75rem);
-  padding-top: var(--wc-space-4, 1rem);
+  gap: var(--hx-space-3, 0.75rem);
+  padding-top: var(--hx-space-4, 1rem);
 }
 
 hx-form .form-actions--end {
@@ -638,7 +638,7 @@ hx-form .form-actions--between {
 
 hx-form .form-columns {
   display: grid;
-  gap: var(--wc-space-4, 1rem);
+  gap: var(--hx-space-4, 1rem);
 }
 
 hx-form .form-columns--2 {
@@ -673,7 +673,7 @@ hx-form .form-inline {
   display: flex;
   flex-wrap: wrap;
   align-items: flex-end;
-  gap: var(--wc-space-3, 0.75rem);
+  gap: var(--hx-space-3, 0.75rem);
 }
 
 hx-form .form-inline .form-item {
@@ -689,8 +689,8 @@ hx-form .form-inline .form-item + .form-item {
 
 hx-form .form-divider {
   border: none;
-  border-top: var(--wc-border-width-thin, 1px) solid var(--wc-color-neutral-200, #dee2e6);
-  margin: var(--wc-space-2, 0.5rem) 0;
+  border-top: var(--hx-border-width-thin, 1px) solid var(--hx-color-neutral-200, #dee2e6);
+  margin: var(--hx-space-2, 0.5rem) 0;
 }
 
 /* ==========================================================================
@@ -702,7 +702,7 @@ hx-form .form-divider {
 hx-form .form-item.error label,
 hx-form .form-item.has-error label,
 hx-form .form-item--error label {
-  color: var(--wc-input-error-color, var(--wc-color-error-500, #dc3545));
+  color: var(--hx-input-error-color, var(--hx-color-error-500, #dc3545));
 }
 
 hx-form .form-item.error input[type='text'],
@@ -732,7 +732,7 @@ hx-form .form-item--error input[type='search'],
 hx-form .form-item--error input[type='number'],
 hx-form .form-item--error textarea,
 hx-form .form-item--error select {
-  border-color: var(--wc-input-error-color, var(--wc-color-error-500, #dc3545));
+  border-color: var(--hx-input-error-color, var(--hx-color-error-500, #dc3545));
 }
 
 hx-form .form-item.error input[type='text']:focus,
@@ -762,12 +762,12 @@ hx-form .form-item--error input[type='search']:focus,
 hx-form .form-item--error input[type='number']:focus,
 hx-form .form-item--error textarea:focus,
 hx-form .form-item--error select:focus {
-  border-color: var(--wc-input-error-color, var(--wc-color-error-500, #dc3545));
-  box-shadow: 0 0 0 var(--wc-focus-ring-width, 2px)
+  border-color: var(--hx-input-error-color, var(--hx-color-error-500, #dc3545));
+  box-shadow: 0 0 0 var(--hx-focus-ring-width, 2px)
     color-mix(
       in srgb,
-      var(--wc-input-error-color, var(--wc-color-error-500, #dc3545))
-        calc(var(--wc-focus-ring-opacity, 0.25) * 100%),
+      var(--hx-input-error-color, var(--hx-color-error-500, #dc3545))
+        calc(var(--hx-focus-ring-opacity, 0.25) * 100%),
       transparent
     );
 }
@@ -777,20 +777,20 @@ hx-form .form-item--error select:focus {
 hx-form .form-item.error input[type='checkbox'],
 hx-form .form-item.has-error input[type='checkbox'],
 hx-form .form-item--error input[type='checkbox'] {
-  border-color: var(--wc-checkbox-error-color, var(--wc-color-error-500, #dc3545));
+  border-color: var(--hx-checkbox-error-color, var(--hx-color-error-500, #dc3545));
 }
 
 hx-form .form-item.error input[type='checkbox']:checked,
 hx-form .form-item.has-error input[type='checkbox']:checked,
 hx-form .form-item--error input[type='checkbox']:checked {
-  background-color: var(--wc-checkbox-error-color, var(--wc-color-error-500, #dc3545));
-  border-color: var(--wc-checkbox-error-color, var(--wc-color-error-500, #dc3545));
+  background-color: var(--hx-checkbox-error-color, var(--hx-color-error-500, #dc3545));
+  border-color: var(--hx-checkbox-error-color, var(--hx-color-error-500, #dc3545));
 }
 
 hx-form .form-item.error input[type='radio'],
 hx-form .form-item.has-error input[type='radio'],
 hx-form .form-item--error input[type='radio'] {
-  border-color: var(--wc-color-error-500, #dc3545);
+  border-color: var(--hx-color-error-500, #dc3545);
 }
 
 /* ─── Inline Error Message ─── */
@@ -798,9 +798,9 @@ hx-form .form-item--error input[type='radio'] {
 hx-form .form-item__error-message,
 hx-form .form-item .error-message,
 hx-form .error-message {
-  font-size: var(--wc-font-size-xs, 0.75rem);
-  color: var(--wc-input-error-color, var(--wc-color-error-500, #dc3545));
-  line-height: var(--wc-line-height-normal, 1.5);
+  font-size: var(--hx-font-size-xs, 0.75rem);
+  color: var(--hx-input-error-color, var(--hx-color-error-500, #dc3545));
+  line-height: var(--hx-line-height-normal, 1.5);
 }
 
 /* ─── Success State on Field Wrapper ─── */
@@ -808,7 +808,7 @@ hx-form .error-message {
 hx-form .form-item.success label,
 hx-form .form-item.has-success label,
 hx-form .form-item--success label {
-  color: var(--wc-color-success-500, #198754);
+  color: var(--hx-color-success-500, #198754);
 }
 
 hx-form .form-item.success input[type='text'],
@@ -838,7 +838,7 @@ hx-form .form-item--success input[type='search'],
 hx-form .form-item--success input[type='number'],
 hx-form .form-item--success textarea,
 hx-form .form-item--success select {
-  border-color: var(--wc-color-success-500, #198754);
+  border-color: var(--hx-color-success-500, #198754);
 }
 
 hx-form .form-item.success input[type='text']:focus,
@@ -868,11 +868,11 @@ hx-form .form-item--success input[type='search']:focus,
 hx-form .form-item--success input[type='number']:focus,
 hx-form .form-item--success textarea:focus,
 hx-form .form-item--success select:focus {
-  border-color: var(--wc-color-success-500, #198754);
-  box-shadow: 0 0 0 var(--wc-focus-ring-width, 2px)
+  border-color: var(--hx-color-success-500, #198754);
+  box-shadow: 0 0 0 var(--hx-focus-ring-width, 2px)
     color-mix(
       in srgb,
-      var(--wc-color-success-500, #198754) calc(var(--wc-focus-ring-opacity, 0.25) * 100%),
+      var(--hx-color-success-500, #198754) calc(var(--hx-focus-ring-opacity, 0.25) * 100%),
       transparent
     );
 }
@@ -882,40 +882,40 @@ hx-form .form-item--success select:focus {
 hx-form .form-item__success-message,
 hx-form .form-item .success-message,
 hx-form .success-message {
-  font-size: var(--wc-font-size-xs, 0.75rem);
-  color: var(--wc-color-success-500, #198754);
-  line-height: var(--wc-line-height-normal, 1.5);
+  font-size: var(--hx-font-size-xs, 0.75rem);
+  color: var(--hx-color-success-500, #198754);
+  line-height: var(--hx-line-height-normal, 1.5);
 }
 
 /* ─── Drupal System Messages ─── */
 
 hx-form .messages--error {
-  border: var(--wc-border-width-thin, 1px) solid
-    var(--wc-input-error-color, var(--wc-color-error-500, #dc3545));
-  border-radius: var(--wc-border-radius-md, 0.375rem);
-  background-color: var(--wc-color-error-50, #fef2f2);
-  color: var(--wc-input-error-color, var(--wc-color-error-500, #dc3545));
-  padding: var(--wc-space-3, 0.75rem) var(--wc-space-4, 1rem);
-  font-size: var(--wc-font-size-sm, 0.875rem);
-  line-height: var(--wc-line-height-normal, 1.5);
+  border: var(--hx-border-width-thin, 1px) solid
+    var(--hx-input-error-color, var(--hx-color-error-500, #dc3545));
+  border-radius: var(--hx-border-radius-md, 0.375rem);
+  background-color: var(--hx-color-error-50, #fef2f2);
+  color: var(--hx-input-error-color, var(--hx-color-error-500, #dc3545));
+  padding: var(--hx-space-3, 0.75rem) var(--hx-space-4, 1rem);
+  font-size: var(--hx-font-size-sm, 0.875rem);
+  line-height: var(--hx-line-height-normal, 1.5);
 }
 
 hx-form .messages--status {
-  border: var(--wc-border-width-thin, 1px) solid var(--wc-color-success-500, #198754);
-  border-radius: var(--wc-border-radius-md, 0.375rem);
-  background-color: var(--wc-color-success-50, #f0fdf4);
-  color: var(--wc-color-success-500, #198754);
-  padding: var(--wc-space-3, 0.75rem) var(--wc-space-4, 1rem);
-  font-size: var(--wc-font-size-sm, 0.875rem);
-  line-height: var(--wc-line-height-normal, 1.5);
+  border: var(--hx-border-width-thin, 1px) solid var(--hx-color-success-500, #198754);
+  border-radius: var(--hx-border-radius-md, 0.375rem);
+  background-color: var(--hx-color-success-50, #f0fdf4);
+  color: var(--hx-color-success-500, #198754);
+  padding: var(--hx-space-3, 0.75rem) var(--hx-space-4, 1rem);
+  font-size: var(--hx-font-size-sm, 0.875rem);
+  line-height: var(--hx-line-height-normal, 1.5);
 }
 
 hx-form .messages--warning {
-  border: var(--wc-border-width-thin, 1px) solid var(--wc-color-warning-500, #ffc107);
-  border-radius: var(--wc-border-radius-md, 0.375rem);
-  background-color: var(--wc-color-warning-50, #fffbeb);
-  color: var(--wc-color-warning-700, #92400e);
-  padding: var(--wc-space-3, 0.75rem) var(--wc-space-4, 1rem);
-  font-size: var(--wc-font-size-sm, 0.875rem);
-  line-height: var(--wc-line-height-normal, 1.5);
+  border: var(--hx-border-width-thin, 1px) solid var(--hx-color-warning-500, #ffc107);
+  border-radius: var(--hx-border-radius-md, 0.375rem);
+  background-color: var(--hx-color-warning-50, #fffbeb);
+  color: var(--hx-color-warning-700, #92400e);
+  padding: var(--hx-space-3, 0.75rem) var(--hx-space-4, 1rem);
+  font-size: var(--hx-font-size-sm, 0.875rem);
+  line-height: var(--hx-line-height-normal, 1.5);
 }

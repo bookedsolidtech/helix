@@ -11,61 +11,61 @@ h4,
 h5,
 h6 {
   font-family: var(
-    --wc-prose-heading-font-family,
-    var(--wc-heading-font-family, var(--wc-font-family-sans, sans-serif))
+    --hx-prose-heading-font-family,
+    var(--hx-heading-font-family, var(--hx-font-family-sans, sans-serif))
   );
   font-weight: var(
-    --wc-prose-heading-font-weight,
-    var(--wc-heading-font-weight, var(--wc-font-weight-bold, 700))
+    --hx-prose-heading-font-weight,
+    var(--hx-heading-font-weight, var(--hx-font-weight-bold, 700))
   );
   line-height: var(
-    --wc-prose-heading-line-height,
-    var(--wc-heading-line-height, var(--wc-line-height-tight, 1.25))
+    --hx-prose-heading-line-height,
+    var(--hx-heading-line-height, var(--hx-line-height-tight, 1.25))
   );
   letter-spacing: var(
-    --wc-prose-heading-letter-spacing,
-    var(--wc-heading-letter-spacing, var(--wc-letter-spacing-tight, -0.025em))
+    --hx-prose-heading-letter-spacing,
+    var(--hx-heading-letter-spacing, var(--hx-letter-spacing-tight, -0.025em))
   );
-  color: var(--wc-prose-heading-color, var(--wc-color-neutral-900, #111827));
+  color: var(--hx-prose-heading-color, var(--hx-color-neutral-900, #111827));
   margin-top: 0;
-  scroll-margin-top: var(--wc-space-8, 2rem);
+  scroll-margin-top: var(--hx-space-8, 2rem);
 }
 
 h1 {
-  font-size: var(--wc-prose-h1-font-size, var(--wc-font-size-4xl, 2.25rem));
-  margin-bottom: var(--wc-space-6, 1.5rem);
+  font-size: var(--hx-prose-h1-font-size, var(--hx-font-size-4xl, 2.25rem));
+  margin-bottom: var(--hx-space-6, 1.5rem);
 }
 
 h2 {
-  font-size: var(--wc-prose-h2-font-size, var(--wc-font-size-3xl, 1.875rem));
-  margin-bottom: var(--wc-space-5, 1.25rem);
-  padding-bottom: var(--wc-space-3, 0.75rem);
-  border-bottom: var(--wc-border-width-thin, 1px) solid
-    var(--wc-color-border-subtle, var(--wc-color-neutral-100, #e9ecef));
+  font-size: var(--hx-prose-h2-font-size, var(--hx-font-size-3xl, 1.875rem));
+  margin-bottom: var(--hx-space-5, 1.25rem);
+  padding-bottom: var(--hx-space-3, 0.75rem);
+  border-bottom: var(--hx-border-width-thin, 1px) solid
+    var(--hx-color-border-subtle, var(--hx-color-neutral-100, #e9ecef));
 }
 
 h3 {
-  font-size: var(--wc-prose-h3-font-size, var(--wc-font-size-2xl, 1.5rem));
-  margin-bottom: var(--wc-space-4, 1rem);
+  font-size: var(--hx-prose-h3-font-size, var(--hx-font-size-2xl, 1.5rem));
+  margin-bottom: var(--hx-space-4, 1rem);
 }
 
 h4 {
-  font-size: var(--wc-prose-h4-font-size, var(--wc-font-size-xl, 1.25rem));
-  margin-bottom: var(--wc-space-3, 0.75rem);
+  font-size: var(--hx-prose-h4-font-size, var(--hx-font-size-xl, 1.25rem));
+  margin-bottom: var(--hx-space-3, 0.75rem);
 }
 
 h5 {
-  font-size: var(--wc-prose-h5-font-size, var(--wc-font-size-lg, 1.125rem));
-  margin-bottom: var(--wc-space-3, 0.75rem);
+  font-size: var(--hx-prose-h5-font-size, var(--hx-font-size-lg, 1.125rem));
+  margin-bottom: var(--hx-space-3, 0.75rem);
 }
 
 h6 {
-  font-size: var(--wc-prose-h6-font-size, var(--wc-font-size-md, 1rem));
-  font-weight: var(--wc-font-weight-semibold, 600);
+  font-size: var(--hx-prose-h6-font-size, var(--hx-font-size-md, 1rem));
+  font-weight: var(--hx-font-weight-semibold, 600);
   text-transform: uppercase;
-  letter-spacing: var(--wc-letter-spacing-wide, 0.025em);
-  margin-bottom: var(--wc-space-3, 0.75rem);
-  color: var(--wc-color-text-secondary, var(--wc-color-neutral-600, #495057));
+  letter-spacing: var(--hx-letter-spacing-wide, 0.025em);
+  margin-bottom: var(--hx-space-3, 0.75rem);
+  color: var(--hx-color-text-secondary, var(--hx-color-neutral-600, #495057));
 }
 
 /* Adjacent heading spacing: tighten space between consecutive headings */
@@ -74,24 +74,24 @@ h2 + h3,
 h3 + h4,
 h4 + h5,
 h5 + h6 {
-  margin-top: var(--wc-space-2, 0.5rem);
+  margin-top: var(--hx-space-2, 0.5rem);
 }
 
 /* Spacing above headings when preceded by content */
 * + h1 {
-  margin-top: var(--wc-space-12, 3rem);
+  margin-top: var(--hx-space-12, 3rem);
 }
 
 * + h2 {
-  margin-top: var(--wc-space-10, 2.5rem);
+  margin-top: var(--hx-space-10, 2.5rem);
 }
 
 * + h3 {
-  margin-top: var(--wc-space-8, 2rem);
+  margin-top: var(--hx-space-8, 2rem);
 }
 
 * + h4,
 * + h5,
 * + h6 {
-  margin-top: var(--wc-space-6, 1.5rem);
+  margin-top: var(--hx-space-6, 1.5rem);
 }

@@ -6,32 +6,32 @@
 
 p {
   margin-top: 0;
-  margin-bottom: var(--wc-space-4, 1rem);
-  font-size: var(--wc-prose-font-size, var(--wc-font-size-md, 1rem));
-  line-height: var(--wc-prose-line-height, var(--wc-line-height-relaxed, 1.75));
-  color: var(--wc-prose-color, var(--wc-color-neutral-700, #343a40));
+  margin-bottom: var(--hx-space-4, 1rem);
+  font-size: var(--hx-prose-font-size, var(--hx-font-size-md, 1rem));
+  line-height: var(--hx-prose-line-height, var(--hx-line-height-relaxed, 1.75));
+  color: var(--hx-prose-color, var(--hx-color-neutral-700, #343a40));
 }
 
 /* Lead paragraph — first paragraph or explicit .lead class */
 p:first-child,
 p.lead {
-  font-size: var(--wc-prose-lead-font-size, var(--wc-font-size-lg, 1.125rem));
-  color: var(--wc-prose-lead-color, var(--wc-color-neutral-600, #495057));
+  font-size: var(--hx-prose-lead-font-size, var(--hx-font-size-lg, 1.125rem));
+  color: var(--hx-prose-lead-color, var(--hx-color-neutral-600, #495057));
 }
 
 /* ─── Blockquote ─── */
 
 blockquote {
   margin-top: 0;
-  margin-bottom: var(--wc-space-6, 1.5rem);
+  margin-bottom: var(--hx-space-6, 1.5rem);
   margin-left: 0;
   margin-right: 0;
-  padding: var(--wc-space-4, 1rem) var(--wc-space-6, 1.5rem);
-  border-left: var(--wc-border-width-thick, 3px) solid var(--wc-color-primary-500, #2563eb);
-  background-color: var(--wc-color-surface-raised, var(--wc-color-neutral-50, #f8f9fa));
-  border-radius: 0 var(--wc-border-radius-sm, 0.25rem) var(--wc-border-radius-sm, 0.25rem) 0;
+  padding: var(--hx-space-4, 1rem) var(--hx-space-6, 1.5rem);
+  border-left: var(--hx-border-width-thick, 3px) solid var(--hx-color-primary-500, #2563eb);
+  background-color: var(--hx-color-surface-raised, var(--hx-color-neutral-50, #f8f9fa));
+  border-radius: 0 var(--hx-border-radius-sm, 0.25rem) var(--hx-border-radius-sm, 0.25rem) 0;
   font-style: italic;
-  color: var(--wc-color-text-secondary, var(--wc-color-neutral-600, #495057));
+  color: var(--hx-color-text-secondary, var(--hx-color-neutral-600, #495057));
 }
 
 blockquote p {
@@ -44,11 +44,11 @@ blockquote p:last-child {
 
 blockquote cite {
   display: block;
-  margin-top: var(--wc-space-2, 0.5rem);
-  font-size: var(--wc-font-size-sm, 0.875rem);
+  margin-top: var(--hx-space-2, 0.5rem);
+  font-size: var(--hx-font-size-sm, 0.875rem);
   font-style: normal;
-  font-weight: var(--wc-font-weight-medium, 500);
-  color: var(--wc-color-text-muted, var(--wc-color-neutral-500, #6c757d));
+  font-weight: var(--hx-font-weight-medium, 500);
+  color: var(--hx-color-text-muted, var(--hx-color-neutral-500, #6c757d));
 }
 
 blockquote cite::before {
@@ -59,18 +59,18 @@ blockquote cite::before {
 
 hr {
   border: 0;
-  border-top: var(--wc-divider-width, var(--wc-border-width-thin, 1px)) solid
-    var(--wc-divider-color, var(--wc-color-border-default, var(--wc-color-neutral-200, #dee2e6)));
-  margin-top: var(--wc-space-8, 2rem);
-  margin-bottom: var(--wc-space-8, 2rem);
+  border-top: var(--hx-divider-width, var(--hx-border-width-thin, 1px)) solid
+    var(--hx-divider-color, var(--hx-color-border-default, var(--hx-color-neutral-200, #dee2e6)));
+  margin-top: var(--hx-space-8, 2rem);
+  margin-bottom: var(--hx-space-8, 2rem);
 }
 
 /* ─── Inline Text Elements ─── */
 
 strong,
 b {
-  font-weight: var(--wc-font-weight-semibold, 600);
-  color: var(--wc-prose-heading-color, var(--wc-color-neutral-900, #111827));
+  font-weight: var(--hx-font-weight-semibold, 600);
+  color: var(--hx-prose-heading-color, var(--hx-color-neutral-900, #111827));
 }
 
 em,
@@ -79,38 +79,38 @@ i {
 }
 
 small {
-  font-size: var(--wc-font-size-sm, 0.875rem);
-  color: var(--wc-color-text-muted, var(--wc-color-neutral-500, #6c757d));
+  font-size: var(--hx-font-size-sm, 0.875rem);
+  color: var(--hx-color-text-muted, var(--hx-color-neutral-500, #6c757d));
 }
 
 mark {
-  background-color: var(--wc-color-warning-100, #fff3cd);
-  color: var(--wc-color-neutral-900, #0d1117);
-  padding: var(--wc-space-0, 0) var(--wc-space-1, 0.25rem);
-  border-radius: var(--wc-border-radius-sm, 0.25rem);
+  background-color: var(--hx-color-warning-100, #fff3cd);
+  color: var(--hx-color-neutral-900, #0d1117);
+  padding: var(--hx-space-0, 0) var(--hx-space-1, 0.25rem);
+  border-radius: var(--hx-border-radius-sm, 0.25rem);
 }
 
 del,
 s {
   text-decoration: line-through;
-  color: var(--wc-color-text-muted, var(--wc-color-neutral-500, #6c757d));
+  color: var(--hx-color-text-muted, var(--hx-color-neutral-500, #6c757d));
 }
 
 ins {
   text-decoration: underline;
-  text-decoration-color: var(--wc-color-success-300, #75b798);
+  text-decoration-color: var(--hx-color-success-300, #75b798);
 }
 
 abbr[title] {
   text-decoration: underline dotted;
-  text-decoration-color: var(--wc-color-text-muted, var(--wc-color-neutral-500, #6c757d));
+  text-decoration-color: var(--hx-color-text-muted, var(--hx-color-neutral-500, #6c757d));
   cursor: help;
   text-underline-offset: 0.15em;
 }
 
 sub,
 sup {
-  font-size: var(--wc-font-size-xs, 0.75rem);
+  font-size: var(--hx-font-size-xs, 0.75rem);
   line-height: 0;
   position: relative;
   vertical-align: baseline;
@@ -128,33 +128,33 @@ sub {
 
 a {
   color: var(
-    --wc-prose-link-color,
-    var(--wc-color-text-link, var(--wc-color-primary-600, #006868))
+    --hx-prose-link-color,
+    var(--hx-color-text-link, var(--hx-color-primary-600, #006868))
   );
   text-decoration: underline;
-  text-decoration-color: var(--wc-color-primary-200, #80c2c2);
+  text-decoration-color: var(--hx-color-primary-200, #80c2c2);
   text-underline-offset: 0.15em;
   transition:
-    color var(--wc-transition-fast, 150ms ease),
-    text-decoration-color var(--wc-transition-fast, 150ms ease);
+    color var(--hx-transition-fast, 150ms ease),
+    text-decoration-color var(--hx-transition-fast, 150ms ease);
 }
 
 a:hover {
-  color: var(--wc-color-text-link-hover, var(--wc-color-primary-700, #005252));
+  color: var(--hx-color-text-link-hover, var(--hx-color-primary-700, #005252));
   text-decoration-color: currentColor;
 }
 
 a:visited {
-  color: var(--wc-color-text-link-visited, var(--wc-color-secondary-600, #4f46e5));
+  color: var(--hx-color-text-link-visited, var(--hx-color-secondary-600, #4f46e5));
 }
 
 a:active {
-  color: var(--wc-color-text-link-active, var(--wc-color-primary-800, #003c3c));
+  color: var(--hx-color-text-link-active, var(--hx-color-primary-800, #003c3c));
 }
 
 a:focus-visible {
-  outline: var(--wc-focus-ring-width, 2px) solid
-    var(--wc-focus-ring-color, var(--wc-color-primary-500, #2563eb));
-  outline-offset: var(--wc-focus-ring-offset, 2px);
-  border-radius: var(--wc-border-radius-sm, 0.25rem);
+  outline: var(--hx-focus-ring-width, 2px) solid
+    var(--hx-focus-ring-color, var(--hx-color-primary-500, #2563eb));
+  outline-offset: var(--hx-focus-ring-offset, 2px);
+  border-radius: var(--hx-border-radius-sm, 0.25rem);
 }

@@ -11,12 +11,12 @@
 .form-item {
   display: flex;
   flex-direction: column;
-  gap: var(--wc-space-1, 0.25rem);
-  font-family: var(--wc-input-font-family, var(--wc-font-family-sans, sans-serif));
+  gap: var(--hx-space-1, 0.25rem);
+  font-family: var(--hx-input-font-family, var(--hx-font-family-sans, sans-serif));
 }
 
 .form-item + .form-item {
-  margin-top: var(--wc-space-4, 1rem);
+  margin-top: var(--hx-space-4, 1rem);
 }
 
 /* ─── Label ─── */
@@ -24,26 +24,26 @@
 label {
   display: flex;
   align-items: baseline;
-  gap: var(--wc-space-1, 0.25rem);
-  font-size: var(--wc-font-size-sm, 0.875rem);
-  font-weight: var(--wc-font-weight-medium, 500);
-  color: var(--wc-input-label-color, var(--wc-color-neutral-700, #343a40));
-  line-height: var(--wc-line-height-normal, 1.5);
+  gap: var(--hx-space-1, 0.25rem);
+  font-size: var(--hx-font-size-sm, 0.875rem);
+  font-weight: var(--hx-font-weight-medium, 500);
+  color: var(--hx-input-label-color, var(--hx-color-neutral-700, #343a40));
+  line-height: var(--hx-line-height-normal, 1.5);
 }
 
 /* ─── Required Marker ─── */
 
 .form-required {
-  color: var(--wc-input-error-color, var(--wc-color-error-500, #dc3545));
-  font-weight: var(--wc-font-weight-bold, 700);
+  color: var(--hx-input-error-color, var(--hx-color-error-500, #dc3545));
+  font-weight: var(--hx-font-weight-bold, 700);
 }
 
 /* ─── Description / Help Text ─── */
 
 .description {
-  font-size: var(--wc-font-size-xs, 0.75rem);
-  color: var(--wc-color-neutral-500, #6c757d);
-  line-height: var(--wc-line-height-normal, 1.5);
+  font-size: var(--hx-font-size-xs, 0.75rem);
+  color: var(--hx-color-neutral-500, #6c757d);
+  line-height: var(--hx-line-height-normal, 1.5);
 }
 
 /* ─── Box Sizing Reset ─── */

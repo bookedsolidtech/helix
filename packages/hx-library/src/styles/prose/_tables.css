@@ -9,10 +9,10 @@ table {
   border-collapse: collapse;
   border-spacing: 0;
   margin-top: 0;
-  margin-bottom: var(--wc-space-6, 1.5rem);
-  font-size: var(--wc-prose-font-size, var(--wc-font-size-md, 1rem));
-  line-height: var(--wc-line-height-normal, 1.5);
-  color: var(--wc-prose-color, var(--wc-color-neutral-700, #343a40));
+  margin-bottom: var(--hx-space-6, 1.5rem);
+  font-size: var(--hx-prose-font-size, var(--hx-font-size-md, 1rem));
+  line-height: var(--hx-line-height-normal, 1.5);
+  color: var(--hx-prose-color, var(--hx-color-neutral-700, #343a40));
   overflow-x: auto;
   display: block;
 }
@@ -25,51 +25,51 @@ table {
 }
 
 caption {
-  padding-top: var(--wc-space-3, 0.75rem);
-  padding-bottom: var(--wc-space-3, 0.75rem);
-  font-size: var(--wc-font-size-sm, 0.875rem);
-  font-weight: var(--wc-font-weight-medium, 500);
-  color: var(--wc-color-text-muted, var(--wc-color-neutral-500, #6c757d));
+  padding-top: var(--hx-space-3, 0.75rem);
+  padding-bottom: var(--hx-space-3, 0.75rem);
+  font-size: var(--hx-font-size-sm, 0.875rem);
+  font-weight: var(--hx-font-weight-medium, 500);
+  color: var(--hx-color-text-muted, var(--hx-color-neutral-500, #6c757d));
   text-align: left;
   caption-side: bottom;
 }
 
 thead {
-  border-bottom: var(--wc-border-width-medium, 2px) solid
-    var(--wc-color-border-default, var(--wc-color-neutral-200, #dee2e6));
+  border-bottom: var(--hx-border-width-medium, 2px) solid
+    var(--hx-color-border-default, var(--hx-color-neutral-200, #dee2e6));
 }
 
 tfoot {
-  border-top: var(--wc-border-width-medium, 2px) solid
-    var(--wc-color-border-default, var(--wc-color-neutral-200, #dee2e6));
+  border-top: var(--hx-border-width-medium, 2px) solid
+    var(--hx-color-border-default, var(--hx-color-neutral-200, #dee2e6));
 }
 
 th {
-  padding: var(--wc-space-3, 0.75rem) var(--wc-space-4, 1rem);
-  font-weight: var(--wc-font-weight-semibold, 600);
-  color: var(--wc-prose-heading-color, var(--wc-color-neutral-900, #111827));
+  padding: var(--hx-space-3, 0.75rem) var(--hx-space-4, 1rem);
+  font-weight: var(--hx-font-weight-semibold, 600);
+  color: var(--hx-prose-heading-color, var(--hx-color-neutral-900, #111827));
   text-align: left;
   white-space: nowrap;
-  background-color: var(--wc-color-surface-raised, var(--wc-color-neutral-50, #f8f9fa));
+  background-color: var(--hx-color-surface-raised, var(--hx-color-neutral-50, #f8f9fa));
 }
 
 td {
-  padding: var(--wc-space-3, 0.75rem) var(--wc-space-4, 1rem);
-  border-bottom: var(--wc-border-width-thin, 1px) solid
-    var(--wc-color-border-default, var(--wc-color-neutral-200, #dee2e6));
+  padding: var(--hx-space-3, 0.75rem) var(--hx-space-4, 1rem);
+  border-bottom: var(--hx-border-width-thin, 1px) solid
+    var(--hx-color-border-default, var(--hx-color-neutral-200, #dee2e6));
   vertical-align: top;
 }
 
 /* ─── Zebra Striping ─── */
 
 tbody tr:nth-child(even) {
-  background-color: var(--wc-color-surface-raised, var(--wc-color-neutral-50, #f8f9fa));
+  background-color: var(--hx-color-surface-raised, var(--hx-color-neutral-50, #f8f9fa));
 }
 
 /* ─── Row Hover ─── */
 
 tbody tr:hover {
-  background-color: var(--wc-color-primary-50, #e6f3f3);
+  background-color: var(--hx-color-primary-50, #e6f3f3);
 }
 
 /* ─── Alignment Helpers (CKEditor output) ─── */

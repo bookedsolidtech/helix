@@ -11,20 +11,20 @@
 form {
   display: flex;
   flex-direction: column;
-  gap: var(--wc-space-4, 1rem);
-  font-family: var(--wc-input-font-family, var(--wc-font-family-sans, sans-serif));
+  gap: var(--hx-space-4, 1rem);
+  font-family: var(--hx-input-font-family, var(--hx-font-family-sans, sans-serif));
 }
 
 /* ─── Fieldset ─── */
 
 fieldset {
-  border: var(--wc-border-width-thin, 1px) solid var(--wc-color-neutral-200, #dee2e6);
-  border-radius: var(--wc-border-radius-md, 0.375rem);
-  padding: var(--wc-space-4, 1rem) var(--wc-space-4, 1rem) var(--wc-space-4, 1rem);
+  border: var(--hx-border-width-thin, 1px) solid var(--hx-color-neutral-200, #dee2e6);
+  border-radius: var(--hx-border-radius-md, 0.375rem);
+  padding: var(--hx-space-4, 1rem) var(--hx-space-4, 1rem) var(--hx-space-4, 1rem);
   margin: 0;
   display: flex;
   flex-direction: column;
-  gap: var(--wc-space-4, 1rem);
+  gap: var(--hx-space-4, 1rem);
 }
 
 /* ─── Legend ─── */
@@ -32,38 +32,38 @@ fieldset {
 legend {
   display: flex;
   align-items: baseline;
-  gap: var(--wc-space-1, 0.25rem);
-  font-size: var(--wc-font-size-sm, 0.875rem);
-  font-weight: var(--wc-font-weight-semibold, 600);
-  color: var(--wc-color-neutral-700, #343a40);
-  line-height: var(--wc-line-height-normal, 1.5);
-  padding: 0 var(--wc-space-1, 0.25rem);
+  gap: var(--hx-space-1, 0.25rem);
+  font-size: var(--hx-font-size-sm, 0.875rem);
+  font-weight: var(--hx-font-weight-semibold, 600);
+  color: var(--hx-color-neutral-700, #343a40);
+  line-height: var(--hx-line-height-normal, 1.5);
+  padding: 0 var(--hx-space-1, 0.25rem);
 }
 
 /* ─── Details / Collapsible Fieldset (Drupal) ─── */
 
 details {
-  border: var(--wc-border-width-thin, 1px) solid var(--wc-color-neutral-200, #dee2e6);
-  border-radius: var(--wc-border-radius-md, 0.375rem);
-  padding: var(--wc-space-4, 1rem);
+  border: var(--hx-border-width-thin, 1px) solid var(--hx-color-neutral-200, #dee2e6);
+  border-radius: var(--hx-border-radius-md, 0.375rem);
+  padding: var(--hx-space-4, 1rem);
   margin: 0;
 }
 
 summary {
-  font-size: var(--wc-font-size-sm, 0.875rem);
-  font-weight: var(--wc-font-weight-semibold, 600);
-  color: var(--wc-color-neutral-700, #343a40);
-  line-height: var(--wc-line-height-normal, 1.5);
+  font-size: var(--hx-font-size-sm, 0.875rem);
+  font-weight: var(--hx-font-weight-semibold, 600);
+  color: var(--hx-color-neutral-700, #343a40);
+  line-height: var(--hx-line-height-normal, 1.5);
   cursor: pointer;
-  padding: var(--wc-space-1, 0.25rem) 0;
+  padding: var(--hx-space-1, 0.25rem) 0;
   user-select: none;
   -webkit-user-select: none;
 }
 
 summary:focus-visible {
-  outline: var(--wc-focus-ring-width, 2px) solid var(--wc-focus-ring-color, #2563eb);
-  outline-offset: var(--wc-focus-ring-offset, 2px);
-  border-radius: var(--wc-border-radius-sm, 0.25rem);
+  outline: var(--hx-focus-ring-width, 2px) solid var(--hx-focus-ring-color, #2563eb);
+  outline-offset: var(--hx-focus-ring-offset, 2px);
+  border-radius: var(--hx-border-radius-sm, 0.25rem);
 }
 
 /* ─── Form Actions (button group) ─── */
@@ -71,8 +71,8 @@ summary:focus-visible {
 .form-actions {
   display: flex;
   align-items: center;
-  gap: var(--wc-space-3, 0.75rem);
-  padding-top: var(--wc-space-4, 1rem);
+  gap: var(--hx-space-3, 0.75rem);
+  padding-top: var(--hx-space-4, 1rem);
 }
 
 .form-actions--end {
@@ -87,7 +87,7 @@ summary:focus-visible {
 
 .form-columns {
   display: grid;
-  gap: var(--wc-space-4, 1rem);
+  gap: var(--hx-space-4, 1rem);
 }
 
 .form-columns--2 {
@@ -123,7 +123,7 @@ summary:focus-visible {
   display: flex;
   flex-wrap: wrap;
   align-items: flex-end;
-  gap: var(--wc-space-3, 0.75rem);
+  gap: var(--hx-space-3, 0.75rem);
 }
 
 .form-inline .form-item {
@@ -139,6 +139,6 @@ summary:focus-visible {
 
 .form-divider {
   border: none;
-  border-top: var(--wc-border-width-thin, 1px) solid var(--wc-color-neutral-200, #dee2e6);
-  margin: var(--wc-space-2, 0.5rem) 0;
+  border-top: var(--hx-border-width-thin, 1px) solid var(--hx-color-neutral-200, #dee2e6);
+  margin: var(--hx-space-2, 0.5rem) 0;
 }

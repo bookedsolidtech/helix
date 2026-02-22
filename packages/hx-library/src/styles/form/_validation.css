@@ -11,7 +11,7 @@
 .form-item.error label,
 .form-item.has-error label,
 .form-item--error label {
-  color: var(--wc-input-error-color, var(--wc-color-error-500, #dc3545));
+  color: var(--hx-input-error-color, var(--hx-color-error-500, #dc3545));
 }
 
 .form-item.error input[type='text'],
@@ -41,7 +41,7 @@
 .form-item--error input[type='number'],
 .form-item--error textarea,
 .form-item--error select {
-  border-color: var(--wc-input-error-color, var(--wc-color-error-500, #dc3545));
+  border-color: var(--hx-input-error-color, var(--hx-color-error-500, #dc3545));
 }
 
 .form-item.error input[type='text']:focus,
@@ -71,12 +71,12 @@
 .form-item--error input[type='number']:focus,
 .form-item--error textarea:focus,
 .form-item--error select:focus {
-  border-color: var(--wc-input-error-color, var(--wc-color-error-500, #dc3545));
-  box-shadow: 0 0 0 var(--wc-focus-ring-width, 2px)
+  border-color: var(--hx-input-error-color, var(--hx-color-error-500, #dc3545));
+  box-shadow: 0 0 0 var(--hx-focus-ring-width, 2px)
     color-mix(
       in srgb,
-      var(--wc-input-error-color, var(--wc-color-error-500, #dc3545))
-        calc(var(--wc-focus-ring-opacity, 0.25) * 100%),
+      var(--hx-input-error-color, var(--hx-color-error-500, #dc3545))
+        calc(var(--hx-focus-ring-opacity, 0.25) * 100%),
       transparent
     );
 }
@@ -86,20 +86,20 @@
 .form-item.error input[type='checkbox'],
 .form-item.has-error input[type='checkbox'],
 .form-item--error input[type='checkbox'] {
-  border-color: var(--wc-checkbox-error-color, var(--wc-color-error-500, #dc3545));
+  border-color: var(--hx-checkbox-error-color, var(--hx-color-error-500, #dc3545));
 }
 
 .form-item.error input[type='checkbox']:checked,
 .form-item.has-error input[type='checkbox']:checked,
 .form-item--error input[type='checkbox']:checked {
-  background-color: var(--wc-checkbox-error-color, var(--wc-color-error-500, #dc3545));
-  border-color: var(--wc-checkbox-error-color, var(--wc-color-error-500, #dc3545));
+  background-color: var(--hx-checkbox-error-color, var(--hx-color-error-500, #dc3545));
+  border-color: var(--hx-checkbox-error-color, var(--hx-color-error-500, #dc3545));
 }
 
 .form-item.error input[type='radio'],
 .form-item.has-error input[type='radio'],
 .form-item--error input[type='radio'] {
-  border-color: var(--wc-color-error-500, #dc3545);
+  border-color: var(--hx-color-error-500, #dc3545);
 }
 
 /* ─── Inline Error Message ─── */
@@ -107,9 +107,9 @@
 .form-item__error-message,
 .form-item .error-message,
 .error-message {
-  font-size: var(--wc-font-size-xs, 0.75rem);
-  color: var(--wc-input-error-color, var(--wc-color-error-500, #dc3545));
-  line-height: var(--wc-line-height-normal, 1.5);
+  font-size: var(--hx-font-size-xs, 0.75rem);
+  color: var(--hx-input-error-color, var(--hx-color-error-500, #dc3545));
+  line-height: var(--hx-line-height-normal, 1.5);
 }
 
 /* ─── Success State on Field Wrapper ─── */
@@ -117,7 +117,7 @@
 .form-item.success label,
 .form-item.has-success label,
 .form-item--success label {
-  color: var(--wc-color-success-500, #198754);
+  color: var(--hx-color-success-500, #198754);
 }
 
 .form-item.success input[type='text'],
@@ -147,7 +147,7 @@
 .form-item--success input[type='number'],
 .form-item--success textarea,
 .form-item--success select {
-  border-color: var(--wc-color-success-500, #198754);
+  border-color: var(--hx-color-success-500, #198754);
 }
 
 .form-item.success input[type='text']:focus,
@@ -177,11 +177,11 @@
 .form-item--success input[type='number']:focus,
 .form-item--success textarea:focus,
 .form-item--success select:focus {
-  border-color: var(--wc-color-success-500, #198754);
-  box-shadow: 0 0 0 var(--wc-focus-ring-width, 2px)
+  border-color: var(--hx-color-success-500, #198754);
+  box-shadow: 0 0 0 var(--hx-focus-ring-width, 2px)
     color-mix(
       in srgb,
-      var(--wc-color-success-500, #198754) calc(var(--wc-focus-ring-opacity, 0.25) * 100%),
+      var(--hx-color-success-500, #198754) calc(var(--hx-focus-ring-opacity, 0.25) * 100%),
       transparent
     );
 }
@@ -191,40 +191,40 @@
 .form-item__success-message,
 .form-item .success-message,
 .success-message {
-  font-size: var(--wc-font-size-xs, 0.75rem);
-  color: var(--wc-color-success-500, #198754);
-  line-height: var(--wc-line-height-normal, 1.5);
+  font-size: var(--hx-font-size-xs, 0.75rem);
+  color: var(--hx-color-success-500, #198754);
+  line-height: var(--hx-line-height-normal, 1.5);
 }
 
 /* ─── Drupal System Messages ─── */
 
 .messages--error {
-  border: var(--wc-border-width-thin, 1px) solid
-    var(--wc-input-error-color, var(--wc-color-error-500, #dc3545));
-  border-radius: var(--wc-border-radius-md, 0.375rem);
-  background-color: var(--wc-color-error-50, #fef2f2);
-  color: var(--wc-input-error-color, var(--wc-color-error-500, #dc3545));
-  padding: var(--wc-space-3, 0.75rem) var(--wc-space-4, 1rem);
-  font-size: var(--wc-font-size-sm, 0.875rem);
-  line-height: var(--wc-line-height-normal, 1.5);
+  border: var(--hx-border-width-thin, 1px) solid
+    var(--hx-input-error-color, var(--hx-color-error-500, #dc3545));
+  border-radius: var(--hx-border-radius-md, 0.375rem);
+  background-color: var(--hx-color-error-50, #fef2f2);
+  color: var(--hx-input-error-color, var(--hx-color-error-500, #dc3545));
+  padding: var(--hx-space-3, 0.75rem) var(--hx-space-4, 1rem);
+  font-size: var(--hx-font-size-sm, 0.875rem);
+  line-height: var(--hx-line-height-normal, 1.5);
 }
 
 .messages--status {
-  border: var(--wc-border-width-thin, 1px) solid var(--wc-color-success-500, #198754);
-  border-radius: var(--wc-border-radius-md, 0.375rem);
-  background-color: var(--wc-color-success-50, #f0fdf4);
-  color: var(--wc-color-success-500, #198754);
-  padding: var(--wc-space-3, 0.75rem) var(--wc-space-4, 1rem);
-  font-size: var(--wc-font-size-sm, 0.875rem);
-  line-height: var(--wc-line-height-normal, 1.5);
+  border: var(--hx-border-width-thin, 1px) solid var(--hx-color-success-500, #198754);
+  border-radius: var(--hx-border-radius-md, 0.375rem);
+  background-color: var(--hx-color-success-50, #f0fdf4);
+  color: var(--hx-color-success-500, #198754);
+  padding: var(--hx-space-3, 0.75rem) var(--hx-space-4, 1rem);
+  font-size: var(--hx-font-size-sm, 0.875rem);
+  line-height: var(--hx-line-height-normal, 1.5);
 }
 
 .messages--warning {
-  border: var(--wc-border-width-thin, 1px) solid var(--wc-color-warning-500, #ffc107);
-  border-radius: var(--wc-border-radius-md, 0.375rem);
-  background-color: var(--wc-color-warning-50, #fffbeb);
-  color: var(--wc-color-warning-700, #92400e);
-  padding: var(--wc-space-3, 0.75rem) var(--wc-space-4, 1rem);
-  font-size: var(--wc-font-size-sm, 0.875rem);
-  line-height: var(--wc-line-height-normal, 1.5);
+  border: var(--hx-border-width-thin, 1px) solid var(--hx-color-warning-500, #ffc107);
+  border-radius: var(--hx-border-radius-md, 0.375rem);
+  background-color: var(--hx-color-warning-50, #fffbeb);
+  color: var(--hx-color-warning-700, #92400e);
+  padding: var(--hx-space-3, 0.75rem) var(--hx-space-4, 1rem);
+  font-size: var(--hx-font-size-sm, 0.875rem);
+  line-height: var(--hx-line-height-normal, 1.5);
 }

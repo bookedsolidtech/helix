@@ -11,14 +11,14 @@
 .form-type-switch {
   display: flex;
   flex-direction: column;
-  gap: var(--wc-space-1, 0.25rem);
-  font-family: var(--wc-font-family-sans, sans-serif);
+  gap: var(--hx-space-1, 0.25rem);
+  font-family: var(--hx-font-family-sans, sans-serif);
 }
 
 .form-type-switch .switch__control-row {
   display: flex;
   align-items: center;
-  gap: var(--wc-space-2, 0.5rem);
+  gap: var(--hx-space-2, 0.5rem);
 }
 
 /* ─── Switch Track ─── */
@@ -34,17 +34,17 @@
   display: inline-flex;
   align-items: center;
   flex-shrink: 0;
-  width: var(--wc-switch-track-width-md, var(--wc-size-10, 2.5rem));
-  height: var(--wc-switch-track-height-md, var(--wc-size-5-5, 1.375rem));
+  width: var(--hx-switch-track-width-md, var(--hx-size-10, 2.5rem));
+  height: var(--hx-switch-track-height-md, var(--hx-size-5-5, 1.375rem));
   margin: 0;
 
   /* Track shape */
   border: none;
-  border-radius: var(--wc-border-radius-full, 9999px);
-  background-color: var(--wc-switch-track-bg, var(--wc-color-neutral-300, #ced4da));
+  border-radius: var(--hx-border-radius-full, 9999px);
+  background-color: var(--hx-switch-track-bg, var(--hx-color-neutral-300, #ced4da));
 
   /* Transition */
-  transition: background-color var(--wc-transition-fast, 150ms ease);
+  transition: background-color var(--hx-transition-fast, 150ms ease);
   cursor: pointer;
 
   /* No background images from checkbox partial */
@@ -57,46 +57,46 @@
   content: '';
   position: absolute;
   top: 50%;
-  left: var(--wc-switch-thumb-offset, var(--wc-space-0-5, 0.125rem));
+  left: var(--hx-switch-thumb-offset, var(--hx-space-0-5, 0.125rem));
   transform: translateY(-50%);
 
   /* Thumb sizing */
-  width: var(--wc-switch-thumb-size-md, var(--wc-size-4-5, 1.125rem));
-  height: var(--wc-switch-thumb-size-md, var(--wc-size-4-5, 1.125rem));
+  width: var(--hx-switch-thumb-size-md, var(--hx-size-4-5, 1.125rem));
+  height: var(--hx-switch-thumb-size-md, var(--hx-size-4-5, 1.125rem));
 
   /* Thumb shape */
-  border-radius: var(--wc-border-radius-full, 9999px);
-  background-color: var(--wc-switch-thumb-bg, var(--wc-color-neutral-0, #ffffff));
-  box-shadow: var(--wc-switch-thumb-shadow, var(--wc-shadow-sm, 0 1px 2px 0 rgb(0 0 0 / 0.05)));
+  border-radius: var(--hx-border-radius-full, 9999px);
+  background-color: var(--hx-switch-thumb-bg, var(--hx-color-neutral-0, #ffffff));
+  box-shadow: var(--hx-switch-thumb-shadow, var(--hx-shadow-sm, 0 1px 2px 0 rgb(0 0 0 / 0.05)));
 
   /* Transition */
-  transition: transform var(--wc-transition-fast, 150ms ease);
+  transition: transform var(--hx-transition-fast, 150ms ease);
 }
 
 /* ─── Checked State ─── */
 
 .form-type-switch input[type='checkbox']:checked {
-  background-color: var(--wc-switch-track-checked-bg, var(--wc-color-primary-500, #2563eb));
+  background-color: var(--hx-switch-track-checked-bg, var(--hx-color-primary-500, #2563eb));
   background-image: none;
 }
 
 .form-type-switch input[type='checkbox']:checked::before {
   transform: translateY(-50%)
-    translateX(var(--wc-switch-thumb-size-md, var(--wc-size-4-5, 1.125rem)));
+    translateX(var(--hx-switch-thumb-size-md, var(--hx-size-4-5, 1.125rem)));
 }
 
 /* ─── Focus State ─── */
 
 .form-type-switch input[type='checkbox']:focus-visible {
-  outline: var(--wc-focus-ring-width, 2px) solid
-    var(--wc-switch-focus-ring-color, var(--wc-focus-ring-color, #2563eb));
-  outline-offset: var(--wc-focus-ring-offset, 2px);
+  outline: var(--hx-focus-ring-width, 2px) solid
+    var(--hx-switch-focus-ring-color, var(--hx-focus-ring-color, #2563eb));
+  outline-offset: var(--hx-focus-ring-offset, 2px);
 }
 
 /* ─── Disabled State ─── */
 
 .form-type-switch input[type='checkbox']:disabled {
-  opacity: var(--wc-opacity-disabled, 0.5);
+  opacity: var(--hx-opacity-disabled, 0.5);
   cursor: not-allowed;
   pointer-events: none;
 }
@@ -104,10 +104,10 @@
 /* ─── Label ─── */
 
 .form-type-switch label {
-  font-size: var(--wc-font-size-sm, 0.875rem);
-  font-weight: var(--wc-font-weight-medium, 500);
-  color: var(--wc-switch-label-color, var(--wc-color-neutral-700, #343a40));
-  line-height: var(--wc-line-height-normal, 1.5);
+  font-size: var(--hx-font-size-sm, 0.875rem);
+  font-weight: var(--hx-font-weight-medium, 500);
+  color: var(--hx-switch-label-color, var(--hx-color-neutral-700, #343a40));
+  line-height: var(--hx-line-height-normal, 1.5);
   cursor: pointer;
   user-select: none;
   -webkit-user-select: none;
@@ -117,32 +117,32 @@
 
 /* Small */
 .form-type-switch--sm input[type='checkbox'] {
-  width: var(--wc-switch-track-width-sm, var(--wc-size-8, 2rem));
-  height: var(--wc-switch-track-height-sm, var(--wc-size-4-5, 1.125rem));
+  width: var(--hx-switch-track-width-sm, var(--hx-size-8, 2rem));
+  height: var(--hx-switch-track-height-sm, var(--hx-size-4-5, 1.125rem));
 }
 
 .form-type-switch--sm input[type='checkbox']::before {
-  width: var(--wc-switch-thumb-size-sm, var(--wc-size-3-5, 0.875rem));
-  height: var(--wc-switch-thumb-size-sm, var(--wc-size-3-5, 0.875rem));
+  width: var(--hx-switch-thumb-size-sm, var(--hx-size-3-5, 0.875rem));
+  height: var(--hx-switch-thumb-size-sm, var(--hx-size-3-5, 0.875rem));
 }
 
 .form-type-switch--sm input[type='checkbox']:checked::before {
   transform: translateY(-50%)
-    translateX(var(--wc-switch-thumb-size-sm, var(--wc-size-3-5, 0.875rem)));
+    translateX(var(--hx-switch-thumb-size-sm, var(--hx-size-3-5, 0.875rem)));
 }
 
 /* Large */
 .form-type-switch--lg input[type='checkbox'] {
-  width: var(--wc-switch-track-width-lg, var(--wc-size-12, 3rem));
-  height: var(--wc-switch-track-height-lg, var(--wc-size-6-5, 1.625rem));
+  width: var(--hx-switch-track-width-lg, var(--hx-size-12, 3rem));
+  height: var(--hx-switch-track-height-lg, var(--hx-size-6-5, 1.625rem));
 }
 
 .form-type-switch--lg input[type='checkbox']::before {
-  width: var(--wc-switch-thumb-size-lg, var(--wc-size-5-5, 1.375rem));
-  height: var(--wc-switch-thumb-size-lg, var(--wc-size-5-5, 1.375rem));
+  width: var(--hx-switch-thumb-size-lg, var(--hx-size-5-5, 1.375rem));
+  height: var(--hx-switch-thumb-size-lg, var(--hx-size-5-5, 1.375rem));
 }
 
 .form-type-switch--lg input[type='checkbox']:checked::before {
   transform: translateY(-50%)
-    translateX(var(--wc-switch-thumb-size-lg, var(--wc-size-5-5, 1.375rem)));
+    translateX(var(--hx-switch-thumb-size-lg, var(--hx-size-5-5, 1.375rem)));
 }
