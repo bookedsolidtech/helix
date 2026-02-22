@@ -1,6 +1,27 @@
 import { CallToolRequestSchema, ListToolsRequestSchema } from '@modelcontextprotocol/sdk/types.js';
 import { Server } from '@modelcontextprotocol/sdk/server/index.js';
+import { z } from 'zod';
+import {
+  TagNameSchema,
+  BranchNameSchema,
+  handleToolError,
+  createSuccessResponse,
+  createErrorResponse,
+} from '@helix/mcp-shared';
 import { parseCem, diffCem, validateCompleteness, listAllComponents } from './handlers.js';
+
+const AnalyzeCEMArgsSchema = z.object({
+  tagName: TagNameSchema,
+});
+
+const DiffCEMArgsSchema = z.object({
+  tagName: TagNameSchema,
+  baseBranch: BranchNameSchema.default('main'),
+});
+
+const ValidateCEMArgsSchema = z.object({
+  tagName: TagNameSchema,
+});
 
 export function registerCemTools(server: Server) {
   // Register tool list
@@ -77,172 +98,80 @@ export function registerCemTools(server: Server) {
 
     try {
       if (name === 'analyzeCEM') {
-        const tagName = (args as Record<string, unknown>).tagName as string;
-
-        if (!tagName || !tagName.startsWith('hx-')) {
-          return {
-            content: [
-              {
-                type: 'text' as const,
-                text: 'Error: tagName must start with hx- prefix',
-              },
-            ],
-            isError: true,
-          };
+        const parseResult = AnalyzeCEMArgsSchema.safeParse(args);
+        if (!parseResult.success) {
+          return createErrorResponse(
+            `Invalid arguments: ${parseResult.error.errors.map((e) => e.message).join(', ')}`,
+          );
         }
+
+        const { tagName } = parseResult.data;
 
         try {
           const analysis = await parseCem(tagName);
-          return {
-            content: [
-              {
-                type: 'text' as const,
-                text: JSON.stringify(analysis, null, 2),
-              },
-            ],
-          };
+          return createSuccessResponse(analysis);
         } catch (error) {
-          return {
-            content: [
-              {
-                type: 'text' as const,
-                text: `Error analyzing CEM: ${
-                  error instanceof Error ? error.message : String(error)
-                }`,
-              },
-            ],
-            isError: true,
-          };
+          return handleToolError(error);
         }
       }
 
       if (name === 'diffCEM') {
-        const tagName = (args as Record<string, unknown>).tagName as string;
-        const baseBranch = ((args as Record<string, unknown>).baseBranch as string) || 'main';
-
-        if (!tagName || !tagName.startsWith('hx-')) {
-          return {
-            content: [
-              {
-                type: 'text' as const,
-                text: 'Error: tagName must start with hx- prefix',
-              },
-            ],
-            isError: true,
-          };
+        const parseResult = DiffCEMArgsSchema.safeParse(args);
+        if (!parseResult.success) {
+          return createErrorResponse(
+            `Invalid arguments: ${parseResult.error.errors.map((e) => e.message).join(', ')}`,
+          );
         }
+
+        const { tagName, baseBranch } = parseResult.data;
 
         try {
           const diff = await diffCem(tagName, baseBranch);
-          return {
-            content: [
-              {
-                type: 'text' as const,
-                text:
-                  diff.breaking.length > 0
-                    ? `⚠️  BREAKING CHANGES DETECTED:\n${JSON.stringify(diff, null, 2)}`
-                    : `✅ No breaking changes.\n${diff.added.length} additions, ${diff.removed.length} removals`,
-              },
-            ],
-          };
+          const message =
+            diff.breaking.length > 0
+              ? `⚠️  BREAKING CHANGES DETECTED:\n${JSON.stringify(diff, null, 2)}`
+              : `✅ No breaking changes.\n${diff.added.length} additions, ${diff.removed.length} removals`;
+          return createSuccessResponse(message);
         } catch (error) {
-          return {
-            content: [
-              {
-                type: 'text' as const,
-                text: `Diff error: ${error instanceof Error ? error.message : String(error)}`,
-              },
-            ],
-            isError: true,
-          };
+          return handleToolError(error);
         }
       }
 
       if (name === 'listComponents') {
         try {
           const components = await listAllComponents();
-          return {
-            content: [
-              {
-                type: 'text' as const,
-                text: `Found ${components.length} components:\n${components.join('\n')}`,
-              },
-            ],
-          };
+          return createSuccessResponse(
+            `Found ${components.length} components:\n${components.join('\n')}`,
+          );
         } catch (error) {
-          return {
-            content: [
-              {
-                type: 'text' as const,
-                text: `Error listing components: ${
-                  error instanceof Error ? error.message : String(error)
-                }`,
-              },
-            ],
-            isError: true,
-          };
+          return handleToolError(error);
         }
       }
 
       if (name === 'validateCEMCompleteness') {
-        const tagName = (args as Record<string, unknown>).tagName as string;
-
-        if (!tagName || !tagName.startsWith('hx-')) {
-          return {
-            content: [
-              {
-                type: 'text' as const,
-                text: 'Error: tagName must start with hx- prefix',
-              },
-            ],
-            isError: true,
-          };
+        const parseResult = ValidateCEMArgsSchema.safeParse(args);
+        if (!parseResult.success) {
+          return createErrorResponse(
+            `Invalid arguments: ${parseResult.error.errors.map((e) => e.message).join(', ')}`,
+          );
         }
+
+        const { tagName } = parseResult.data;
 
         try {
           const validation = await validateCompleteness(tagName);
-          return {
-            content: [
-              {
-                type: 'text' as const,
-                text: validation.isValid
-                  ? `✅ CEM is valid for ${tagName}. Score: ${validation.score}%`
-                  : `❌ CEM validation issues:\n${JSON.stringify(validation.issues, null, 2)}`,
-              },
-            ],
-          };
+          const message = validation.isValid
+            ? `✅ CEM is valid for ${tagName}. Score: ${validation.score}%`
+            : `❌ CEM validation issues:\n${JSON.stringify(validation.issues, null, 2)}`;
+          return createSuccessResponse(message);
         } catch (error) {
-          return {
-            content: [
-              {
-                type: 'text' as const,
-                text: `Validation error: ${error instanceof Error ? error.message : String(error)}`,
-              },
-            ],
-            isError: true,
-          };
+          return handleToolError(error);
         }
       }
 
-      return {
-        content: [
-          {
-            type: 'text' as const,
-            text: `Unknown tool: ${name}`,
-          },
-        ],
-        isError: true,
-      };
+      return createErrorResponse(`Unknown tool: ${name}`);
     } catch (error) {
-      return {
-        content: [
-          {
-            type: 'text' as const,
-            text: `Unexpected error: ${error instanceof Error ? error.message : String(error)}`,
-          },
-        ],
-        isError: true,
-      };
+      return handleToolError(error);
     }
   });
 }

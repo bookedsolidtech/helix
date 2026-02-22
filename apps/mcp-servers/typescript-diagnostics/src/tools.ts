@@ -1,11 +1,33 @@
 import { CallToolRequestSchema, ListToolsRequestSchema } from '@modelcontextprotocol/sdk/types.js';
 import { Server } from '@modelcontextprotocol/sdk/server/index.js';
+import { z } from 'zod';
+import {
+  TagNameSchema,
+  FilePathSchema,
+  LineNumberSchema,
+  handleToolError,
+  createSuccessResponse,
+  createErrorResponse,
+} from '@helix/mcp-shared';
 import {
   getDiagnostics,
   getDiagnosticsForComponent,
   suggestFix,
   getStrictModeStatus,
 } from './handlers.js';
+
+const GetDiagnosticsArgsSchema = z.object({
+  filePath: FilePathSchema.optional(),
+});
+
+const GetDiagnosticsForComponentArgsSchema = z.object({
+  tagName: TagNameSchema,
+});
+
+const SuggestFixArgsSchema = z.object({
+  filePath: FilePathSchema,
+  line: LineNumberSchema,
+});
 
 export function registerTypeScriptTools(server: Server) {
   // Register tool list
@@ -77,159 +99,71 @@ export function registerTypeScriptTools(server: Server) {
 
     try {
       if (name === 'getDiagnostics') {
-        const filePath = (args as Record<string, unknown>).filePath as string | undefined;
+        const parseResult = GetDiagnosticsArgsSchema.safeParse(args);
+        if (!parseResult.success) {
+          return createErrorResponse(
+            `Invalid arguments: ${parseResult.error.errors.map((e) => e.message).join(', ')}`,
+          );
+        }
+
+        const { filePath } = parseResult.data;
 
         try {
           const diagnostics = await getDiagnostics(filePath);
-          return {
-            content: [
-              {
-                type: 'text' as const,
-                text: JSON.stringify(diagnostics, null, 2),
-              },
-            ],
-          };
+          return createSuccessResponse(diagnostics);
         } catch (error) {
-          return {
-            content: [
-              {
-                type: 'text' as const,
-                text: `Error getting diagnostics: ${
-                  error instanceof Error ? error.message : String(error)
-                }`,
-              },
-            ],
-            isError: true,
-          };
+          return handleToolError(error);
         }
       }
 
       if (name === 'getDiagnosticsForComponent') {
-        const tagName = (args as Record<string, unknown>).tagName as string;
-
-        if (!tagName || !tagName.startsWith('hx-')) {
-          return {
-            content: [
-              {
-                type: 'text' as const,
-                text: 'Error: tagName must start with hx- prefix',
-              },
-            ],
-            isError: true,
-          };
+        const parseResult = GetDiagnosticsForComponentArgsSchema.safeParse(args);
+        if (!parseResult.success) {
+          return createErrorResponse(
+            `Invalid arguments: ${parseResult.error.errors.map((e) => e.message).join(', ')}`,
+          );
         }
+
+        const { tagName } = parseResult.data;
 
         try {
           const diagnostics = await getDiagnosticsForComponent(tagName);
-          return {
-            content: [
-              {
-                type: 'text' as const,
-                text: JSON.stringify(diagnostics, null, 2),
-              },
-            ],
-          };
+          return createSuccessResponse(diagnostics);
         } catch (error) {
-          return {
-            content: [
-              {
-                type: 'text' as const,
-                text: `Error getting component diagnostics: ${
-                  error instanceof Error ? error.message : String(error)
-                }`,
-              },
-            ],
-            isError: true,
-          };
+          return handleToolError(error);
         }
       }
 
       if (name === 'suggestFix') {
-        const filePath = (args as Record<string, unknown>).filePath as string;
-        const line = (args as Record<string, unknown>).line as number;
-
-        if (!filePath || !line) {
-          return {
-            content: [
-              {
-                type: 'text' as const,
-                text: 'Error: filePath and line are required',
-              },
-            ],
-            isError: true,
-          };
+        const parseResult = SuggestFixArgsSchema.safeParse(args);
+        if (!parseResult.success) {
+          return createErrorResponse(
+            `Invalid arguments: ${parseResult.error.errors.map((e) => e.message).join(', ')}`,
+          );
         }
+
+        const { filePath, line } = parseResult.data;
 
         try {
           const suggestion = await suggestFix(filePath, line);
-          return {
-            content: [
-              {
-                type: 'text' as const,
-                text: JSON.stringify(suggestion, null, 2),
-              },
-            ],
-          };
+          return createSuccessResponse(suggestion);
         } catch (error) {
-          return {
-            content: [
-              {
-                type: 'text' as const,
-                text: `Error suggesting fix: ${
-                  error instanceof Error ? error.message : String(error)
-                }`,
-              },
-            ],
-            isError: true,
-          };
+          return handleToolError(error);
         }
       }
 
       if (name === 'getStrictModeStatus') {
         try {
           const status = await getStrictModeStatus();
-          return {
-            content: [
-              {
-                type: 'text' as const,
-                text: JSON.stringify(status, null, 2),
-              },
-            ],
-          };
+          return createSuccessResponse(status);
         } catch (error) {
-          return {
-            content: [
-              {
-                type: 'text' as const,
-                text: `Error checking strict mode: ${
-                  error instanceof Error ? error.message : String(error)
-                }`,
-              },
-            ],
-            isError: true,
-          };
+          return handleToolError(error);
         }
       }
 
-      return {
-        content: [
-          {
-            type: 'text' as const,
-            text: `Unknown tool: ${name}`,
-          },
-        ],
-        isError: true,
-      };
+      return createErrorResponse(`Unknown tool: ${name}`);
     } catch (error) {
-      return {
-        content: [
-          {
-            type: 'text' as const,
-            text: `Unexpected error: ${error instanceof Error ? error.message : String(error)}`,
-          },
-        ],
-        isError: true,
-      };
+      return handleToolError(error);
     }
   });
 }

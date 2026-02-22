@@ -13,9 +13,4 @@ export {
   LineNumberSchema,
   DaysSchema,
 } from './validation.js';
-export {
-  createErrorResponse,
-  createSuccessResponse,
-  type MCPResponse,
-  type MCPSuccessResponse,
-} from './mcp-helpers.js';
+export { createErrorResponse, createSuccessResponse } from './mcp-helpers.js';

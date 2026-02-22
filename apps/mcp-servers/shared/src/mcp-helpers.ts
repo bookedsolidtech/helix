@@ -1,31 +1,25 @@
-export interface MCPSuccessResponse {
-  content: Array<{ type: 'text'; text: string }>;
-}
-
-export interface MCPErrorResponse {
-  content: Array<{ type: 'text'; text: string }>;
+export function createErrorResponse(message: string): {
+  content: { type: 'text'; text: string }[];
   isError: true;
-}
-
-export type MCPResponse = MCPSuccessResponse | MCPErrorResponse;
-
-export function createErrorResponse(message: string): MCPErrorResponse {
+} {
   return {
     content: [
       {
-        type: 'text',
+        type: 'text' as const,
         text: message,
       },
     ],
-    isError: true,
+    isError: true as const,
   };
 }
 
-export function createSuccessResponse(data: unknown): MCPSuccessResponse {
+export function createSuccessResponse(data: unknown): {
+  content: { type: 'text'; text: string }[];
+} {
   return {
     content: [
       {
-        type: 'text',
+        type: 'text' as const,
         text: typeof data === 'string' ? data : JSON.stringify(data, null, 2),
       },
     ],
