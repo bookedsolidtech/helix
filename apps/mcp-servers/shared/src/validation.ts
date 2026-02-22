@@ -6,7 +6,7 @@ export const TagNameSchema = z
 
 export const BranchNameSchema = z
   .string()
-  .regex(/^[a-zA-Z0-9/_-]+$/, 'Invalid branch name (alphanumeric, /, -, _ only)');
+  .regex(/^[a-zA-Z0-9/._-]+$/, 'Invalid branch name (alphanumeric, /, -, _, . only)');
 
 export const FilePathSchema = z.string().min(1, 'File path cannot be empty');
 
@@ -16,4 +16,6 @@ export const DaysSchema = z
   .number()
   .int()
   .min(1, 'Days must be positive')
-  .max(365, 'Days cannot exceed 365');
+  .max(365, 'Days cannot exceed 365')
+  .optional()
+  .default(7);
