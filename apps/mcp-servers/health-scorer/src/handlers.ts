@@ -1,10 +1,12 @@
-import { readFileSync, existsSync, readdirSync } from 'node:fs';
+import { readdirSync } from 'node:fs';
 import { resolve, join } from 'node:path';
-import { execSync } from 'node:child_process';
+import { GitOperations, SafeFileOperations, MCPError, ErrorCategory } from '@helix/mcp-shared';
 
-// Import the existing health scorer from admin app
-// We'll use direct file reading to avoid complex imports
-const HEALTH_HISTORY_DIR = resolve(process.cwd(), '../../.claude/health-history');
+const PROJECT_ROOT = resolve(process.cwd(), '../..');
+const HEALTH_HISTORY_DIR = '.claude/health-history';
+
+const git = new GitOperations(PROJECT_ROOT);
+const fileOps = new SafeFileOperations(PROJECT_ROOT);
 
 interface ComponentHealth {
   tagName: string;
@@ -95,24 +97,30 @@ export async function scoreAllComponents(): Promise<ComponentHealth[]> {
 }
 
 export async function getHealthTrend(tagName: string, days: number = 7): Promise<HealthTrend> {
-  if (!existsSync(HEALTH_HISTORY_DIR)) {
-    throw new Error(`Health history directory not found at ${HEALTH_HISTORY_DIR}`);
+  const historyDirPath = resolve(PROJECT_ROOT, HEALTH_HISTORY_DIR);
+
+  if (!fileOps.fileExists(HEALTH_HISTORY_DIR)) {
+    throw new MCPError(
+      'Health history directory not found. Run health scorer first.',
+      ErrorCategory.UserInput,
+    );
   }
 
-  const files = readdirSync(HEALTH_HISTORY_DIR)
+  const files = readdirSync(historyDirPath)
     .filter((f) => f.endsWith('.json'))
     .sort()
     .reverse()
     .slice(0, days);
 
   if (files.length === 0) {
-    throw new Error('No health history files found');
+    throw new MCPError('No health history files found', ErrorCategory.UserInput);
   }
 
   const dataPoints: Array<{ date: string; score: number; grade: string }> = [];
 
   for (const file of files) {
-    const content = readFileSync(join(HEALTH_HISTORY_DIR, file), 'utf-8');
+    const filePath = join(HEALTH_HISTORY_DIR, file);
+    const content = fileOps.readFile(filePath);
     const history = JSON.parse(content);
     const component = history.components?.find((c: { tagName: string }) => c.tagName === tagName);
 
@@ -148,95 +156,68 @@ export async function getHealthTrend(tagName: string, days: number = 7): Promise
 }
 
 export async function getHealthDiff(tagName: string, baseBranch: string): Promise<HealthDiff> {
-  try {
-    // Get current branch name
-    const currentBranch = execSync('git branch --show-current', {
-      encoding: 'utf-8',
-    }).trim();
+  // Get current health score
+  const currentHealth = await scoreComponent(tagName);
 
-    // Get current health score
-    const currentHealth = await scoreComponent(tagName);
-
-    // Stash changes
-    const stashResult = execSync('git stash push -u -m "MCP health-scorer temp stash"', {
-      encoding: 'utf-8',
-    });
-    const hasStash = !stashResult.includes('No local changes');
-
-    // Checkout base branch
-    execSync(`git checkout ${baseBranch}`, { encoding: 'utf-8' });
-
-    // Get base health score
-    let baseHealth: ComponentHealth;
+  // Get base health score
+  const baseHealth = await git.withBranch(baseBranch, async () => {
     try {
-      baseHealth = await scoreComponent(tagName);
+      return await scoreComponent(tagName);
     } catch {
       // Component might not exist in base branch
-      baseHealth = {
+      return {
         tagName,
         score: 0,
-        grade: 'F',
+        grade: 'F' as const,
         dimensions: {},
         issues: ['Component not found in base branch'],
         timestamp: new Date().toISOString(),
       };
     }
+  });
 
-    // Return to current branch
-    execSync(`git checkout ${currentBranch}`, { encoding: 'utf-8' });
+  // Calculate diff
+  const scoreDelta = currentHealth.score - baseHealth.score;
+  const improved = scoreDelta > 0;
+  const regressed = scoreDelta < 0;
 
-    // Restore stashed changes
-    if (hasStash) {
-      execSync('git stash pop', { encoding: 'utf-8' });
+  const changedDimensions: Array<{
+    dimension: string;
+    before: number;
+    after: number;
+    delta: number;
+  }> = [];
+
+  // Compare each dimension
+  const allDimensions = new Set([
+    ...Object.keys(baseHealth.dimensions),
+    ...Object.keys(currentHealth.dimensions),
+  ]);
+
+  for (const dim of allDimensions) {
+    const before = baseHealth.dimensions[dim] || 0;
+    const after = currentHealth.dimensions[dim] || 0;
+    const delta = after - before;
+
+    if (delta !== 0) {
+      changedDimensions.push({
+        dimension: dim,
+        before,
+        after,
+        delta: Math.round(delta * 10) / 10,
+      });
     }
-
-    // Calculate diff
-    const scoreDelta = currentHealth.score - baseHealth.score;
-    const improved = scoreDelta > 0;
-    const regressed = scoreDelta < 0;
-
-    const changedDimensions: Array<{
-      dimension: string;
-      before: number;
-      after: number;
-      delta: number;
-    }> = [];
-
-    // Compare each dimension
-    const allDimensions = new Set([
-      ...Object.keys(baseHealth.dimensions),
-      ...Object.keys(currentHealth.dimensions),
-    ]);
-
-    for (const dim of allDimensions) {
-      const before = baseHealth.dimensions[dim] || 0;
-      const after = currentHealth.dimensions[dim] || 0;
-      const delta = after - before;
-
-      if (delta !== 0) {
-        changedDimensions.push({
-          dimension: dim,
-          before,
-          after,
-          delta: Math.round(delta * 10) / 10,
-        });
-      }
-    }
-
-    return {
-      tagName,
-      base: baseHealth,
-      current: currentHealth,
-      improved,
-      regressed,
-      scoreDelta: Math.round(scoreDelta * 10) / 10,
-      changedDimensions,
-    };
-  } catch (error) {
-    throw new Error(
-      `Health diff failed: ${error instanceof Error ? error.message : String(error)}`,
-    );
   }
+
+  return {
+    tagName,
+    base: baseHealth,
+    current: currentHealth,
+    improved,
+    regressed,
+    scoreDelta: Math.round(scoreDelta * 10) / 10,
+    changedDimensions,
+  };
 }
 
 // Helper function to get latest health history
@@ -250,11 +231,13 @@ function getLatestHealthHistory(): {
     issues: string[];
   }>;
 } | null {
-  if (!existsSync(HEALTH_HISTORY_DIR)) {
+  const historyDirPath = resolve(PROJECT_ROOT, HEALTH_HISTORY_DIR);
+
+  if (!fileOps.fileExists(HEALTH_HISTORY_DIR)) {
     return null;
   }
 
-  const files = readdirSync(HEALTH_HISTORY_DIR)
+  const files = readdirSync(historyDirPath)
     .filter((f) => f.endsWith('.json'))
     .sort()
     .reverse();
@@ -268,6 +251,7 @@ function getLatestHealthHistory(): {
     return null;
   }
 
-  const content = readFileSync(join(HEALTH_HISTORY_DIR, latestFile), 'utf-8');
+  const filePath = join(HEALTH_HISTORY_DIR, latestFile);
+  const content = fileOps.readFile(filePath);
   return JSON.parse(content);
 }

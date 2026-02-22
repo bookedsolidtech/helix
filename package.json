@@ -6,6 +6,7 @@
   "description": "Enterprise Healthcare Web Component Library - Monorepo",
   "workspaces": [
     "apps/*",
+    "apps/mcp-servers/*",
     "packages/*"
   ],
   "scripts": {

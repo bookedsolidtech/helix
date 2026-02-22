@@ -1,9 +1,11 @@
 import { Project, DiagnosticCategory } from 'ts-morph';
-import { readFileSync, existsSync } from 'node:fs';
 import { resolve } from 'node:path';
+import { SafeFileOperations, MCPError, ErrorCategory } from '@helix/mcp-shared';
 
 const PROJECT_ROOT = resolve(process.cwd(), '../..');
 const TSCONFIG_PATH = resolve(PROJECT_ROOT, 'tsconfig.base.json');
+
+const fileOps = new SafeFileOperations(PROJECT_ROOT);
 
 interface TypeScriptDiagnostic {
   file: string;
@@ -53,14 +55,11 @@ export async function getDiagnostics(filePath?: string): Promise<DiagnosticsResu
   let diagnostics;
 
   if (filePath) {
-    const absolutePath = resolve(PROJECT_ROOT, filePath);
-    if (!existsSync(absolutePath)) {
-      throw new Error(`File not found: ${filePath}`);
-    }
+    const absolutePath = fileOps.validatePath(filePath);
 
     const sourceFile = project.getSourceFile(absolutePath);
     if (!sourceFile) {
-      throw new Error(`Could not load file: ${filePath}`);
+      throw new MCPError(`Could not load file: ${filePath}`, ErrorCategory.UserInput);
     }
 
     diagnostics = sourceFile.getPreEmitDiagnostics();
@@ -113,11 +112,7 @@ export async function getDiagnostics(filePath?: string): Promise<DiagnosticsResu
 
 export async function getDiagnosticsForComponent(tagName: string): Promise<DiagnosticsResult> {
   const componentDir = `packages/hx-library/src/components/${tagName}`;
-  const absolutePath = resolve(PROJECT_ROOT, componentDir);
-
-  if (!existsSync(absolutePath)) {
-    throw new Error(`Component directory not found: ${componentDir}`);
-  }
+  const absolutePath = fileOps.validatePath(componentDir);
 
   const project = new Project({
     tsConfigFilePath: TSCONFIG_PATH,
@@ -178,11 +173,7 @@ export async function getDiagnosticsForComponent(tagName: string): Promise<Diagn
 }
 
 export async function suggestFix(filePath: string, line: number): Promise<FixSuggestion> {
-  const absolutePath = resolve(PROJECT_ROOT, filePath);
-
-  if (!existsSync(absolutePath)) {
-    throw new Error(`File not found: ${filePath}`);
-  }
+  const absolutePath = fileOps.validatePath(filePath);
 
   const project = new Project({
     tsConfigFilePath: TSCONFIG_PATH,
@@ -261,11 +252,13 @@ export async function suggestFix(filePath: string, line: number): Promise<FixSug
 }
 
 export async function getStrictModeStatus(): Promise<StrictModeStatus> {
-  if (!existsSync(TSCONFIG_PATH)) {
-    throw new Error(`tsconfig.json not found at ${TSCONFIG_PATH}`);
+  const tsconfigRelative = 'tsconfig.base.json';
+
+  if (!fileOps.fileExists(tsconfigRelative)) {
+    throw new MCPError('tsconfig.base.json not found', ErrorCategory.UserInput);
   }
 
-  const tsconfigContent = readFileSync(TSCONFIG_PATH, 'utf-8');
+  const tsconfigContent = fileOps.readFile(tsconfigRelative);
   const tsconfig = JSON.parse(tsconfigContent);
 
   const compilerOptions = tsconfig.compilerOptions || {};
