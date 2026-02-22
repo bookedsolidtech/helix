@@ -21,6 +21,15 @@
       "env": {
         "DEBUG": "mcp:*"
       }
+    },
+    "typescript-diagnostics": {
+      "command": "node",
+      "args": [
+        "/Volumes/Development/wc-2026/apps/mcp-servers/typescript-diagnostics/build/index.js"
+      ],
+      "env": {
+        "DEBUG": "mcp:*"
+      }
     }
   }
 }

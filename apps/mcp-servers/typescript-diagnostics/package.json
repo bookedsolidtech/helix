@@ -1,0 +1,24 @@
+{
+  "name": "@helix/mcp-typescript-diagnostics",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "bin": {
+    "typescript-diagnostics": "./build/index.js"
+  },
+  "scripts": {
+    "build": "tsc && chmod 755 build/index.js",
+    "dev": "tsc --watch",
+    "test": "vitest",
+    "type-check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.26.0",
+    "ts-morph": "^27.0.2",
+    "typescript": "^5.7.2",
+    "zod": "^3.22.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0"
+  }
+}
