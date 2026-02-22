@@ -13,6 +13,7 @@ describe('GitOperations - Command Injection Protection', () => {
   beforeEach(() => {
     git = new GitOperations(TEST_ROOT);
     vi.clearAllMocks();
+    vi.resetAllMocks();
   });
 
   describe('ANTAGONISTIC: Command Injection Attacks', () => {

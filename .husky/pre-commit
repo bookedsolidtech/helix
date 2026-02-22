@@ -5,4 +5,5 @@
 npx lint-staged
 
 # Run comprehensive pre-commit quality checks
-bash scripts/pre-commit-check.sh
+# Use absolute path to ensure hook works from any directory
+bash "$(dirname "$0")/../scripts/pre-commit-check.sh"

@@ -1,4 +1,5 @@
 import { resolve } from 'node:path';
+import { z } from 'zod';
 import { GitOperations, SafeFileOperations, MCPError, ErrorCategory } from '@helix/mcp-shared';
 
 const PROJECT_ROOT = resolve(process.cwd(), '../..');
@@ -10,57 +11,117 @@ const fileOps = new SafeFileOperations(PROJECT_ROOT);
 interface CemMember {
   name: string;
   kind: string;
-  type?: { text?: string };
-  description?: string;
+  type?: { text?: string | undefined } | undefined;
+  description?: string | undefined;
 }
 
 interface CemEvent {
   name: string;
-  type?: { text?: string };
-  description?: string;
+  type?: { text?: string | undefined } | undefined;
+  description?: string | undefined;
 }
 
 interface CemSlot {
   name: string;
-  description?: string;
+  description?: string | undefined;
 }
 
 interface CemCssProperty {
   name: string;
-  description?: string;
+  description?: string | undefined;
 }
 
 interface CemCssPart {
   name: string;
-  description?: string;
+  description?: string | undefined;
 }
 
 interface CemComponent {
   tagName: string;
   name: string;
-  members?: CemMember[];
-  events?: CemEvent[];
-  slots?: CemSlot[];
-  cssProperties?: CemCssProperty[];
-  cssParts?: CemCssPart[];
-  description?: string;
+  members?: CemMember[] | undefined;
+  events?: CemEvent[] | undefined;
+  slots?: CemSlot[] | undefined;
+  cssProperties?: CemCssProperty[] | undefined;
+  cssParts?: CemCssPart[] | undefined;
+  description?: string | undefined;
 }
+
+// Zod schema for CEM file structure
+const CemMemberSchema = z.object({
+  name: z.string(),
+  kind: z.string(),
+  type: z.object({ text: z.string().optional() }).optional(),
+  description: z.string().optional(),
+});
+
+const CemEventSchema = z.object({
+  name: z.string(),
+  type: z.object({ text: z.string().optional() }).optional(),
+  description: z.string().optional(),
+});
+
+const CemSlotSchema = z.object({
+  name: z.string(),
+  description: z.string().optional(),
+});
+
+const CemCssPropertySchema = z.object({
+  name: z.string(),
+  description: z.string().optional(),
+});
+
+const CemCssPartSchema = z.object({
+  name: z.string(),
+  description: z.string().optional(),
+});
+
+const CemComponentSchema = z.object({
+  tagName: z.string().optional(),
+  name: z.string(),
+  members: z.array(CemMemberSchema).optional(),
+  events: z.array(CemEventSchema).optional(),
+  slots: z.array(CemSlotSchema).optional(),
+  cssProperties: z.array(CemCssPropertySchema).optional(),
+  cssParts: z.array(CemCssPartSchema).optional(),
+  description: z.string().optional(),
+});
+
+const CemSchema = z.object({
+  schemaVersion: z.string().optional(),
+  readme: z.string().optional(),
+  modules: z.array(
+    z.object({
+      kind: z.string().optional(),
+      path: z.string().optional(),
+      declarations: z.array(CemComponentSchema).optional(),
+      exports: z.array(z.any()).optional(),
+    }),
+  ),
+});
 
 export async function parseCem(tagName: string): Promise<CemComponent> {
   if (!fileOps.fileExists(CEM_PATH)) {
     throw new MCPError(`CEM file not found. Run 'npm run cem' first.`, ErrorCategory.UserInput);
   }
 
-  const cemContent = fileOps.readFile(CEM_PATH);
-  const cem = JSON.parse(cemContent);
+  const cem = fileOps.readJSON(CEM_PATH, CemSchema);
 
   const component = cem.modules
-    ?.flatMap((m: { declarations: CemComponent[] }) => m.declarations || [])
-    .find((d: CemComponent) => d.tagName === tagName);
+    ?.flatMap((m) => m.declarations || [])
+    .find((d) => d.tagName === tagName);
 
   if (!component) {
-    throw new Error(
+    throw new MCPError(
       `Component ${tagName} not found in CEM. Available components: ${await listAllComponents().then((c) => c.join(', '))}`,
+      ErrorCategory.UserInput,
+    );
+  }
+
+  if (!component.tagName) {
+    throw new MCPError(
+      `Component ${component.name} found but has no tagName in CEM`,
+      ErrorCategory.System,
     );
   }
 
@@ -90,11 +151,8 @@ export async function diffCem(
       return null;
     }
 
-    const baseContent = fileOps.readFile(CEM_PATH);
-    const baseCem = JSON.parse(baseContent);
-    return baseCem.modules
-      ?.flatMap((m: { declarations: CemComponent[] }) => m.declarations || [])
-      .find((d: CemComponent) => d.tagName === tagName);
+    const baseCem = fileOps.readJSON(CEM_PATH, CemSchema);
+    return baseCem.modules?.flatMap((m) => m.declarations || []).find((d) => d.tagName === tagName);
   });
 
   // Read current CEM
@@ -113,11 +171,11 @@ export async function diffCem(
   }
 
   // Check properties
-  const baseProps = new Set((baseComponent.members || []).map((m: CemMember) => m.name));
+  const baseProps = new Set((baseComponent.members || []).map((m) => m.name));
   const currentProps = new Set(currentComponent.members?.map((m) => m.name) || []);
 
   // Removed properties = BREAKING
-  baseComponent.members?.forEach((m: CemMember) => {
+  baseComponent.members?.forEach((m) => {
     if (!currentProps.has(m.name)) {
       breaking.push(`Property removed: ${m.name}`);
     }
@@ -131,11 +189,11 @@ export async function diffCem(
   });
 
   // Check events
-  const baseEvents = new Set((baseComponent.events || []).map((e: CemEvent) => e.name));
+  const baseEvents = new Set((baseComponent.events || []).map((e) => e.name));
   const currentEvents = new Set(currentComponent.events?.map((e) => e.name) || []);
 
   // Removed events = BREAKING
-  baseComponent.events?.forEach((e: CemEvent) => {
+  baseComponent.events?.forEach((e) => {
     if (!currentEvents.has(e.name)) {
       breaking.push(`Event removed: ${e.name}`);
     }
@@ -149,11 +207,11 @@ export async function diffCem(
   });
 
   // Check slots
-  const baseSlots = new Set((baseComponent.slots || []).map((s: CemSlot) => s.name));
+  const baseSlots = new Set((baseComponent.slots || []).map((s) => s.name));
   const currentSlots = new Set(currentComponent.slots?.map((s) => s.name) || []);
 
   // Removed slots = BREAKING
-  baseComponent.slots?.forEach((s: CemSlot) => {
+  baseComponent.slots?.forEach((s) => {
     if (!currentSlots.has(s.name)) {
       breaking.push(`Slot removed: ${s.name}`);
     }
@@ -174,13 +232,12 @@ export async function listAllComponents(): Promise<string[]> {
     throw new MCPError(`CEM file not found. Run 'npm run cem' first.`, ErrorCategory.UserInput);
   }
 
-  const cemContent = fileOps.readFile(CEM_PATH);
-  const cem = JSON.parse(cemContent);
+  const cem = fileOps.readJSON(CEM_PATH, CemSchema);
 
   const components = cem.modules
-    ?.flatMap((m: { declarations: CemComponent[] }) => m.declarations || [])
-    .filter((d: CemComponent) => d.tagName)
-    .map((d: CemComponent) => d.tagName);
+    ?.flatMap((m) => m.declarations || [])
+    .filter((d): d is CemComponent & { tagName: string } => typeof d.tagName === 'string')
+    .map((d) => d.tagName);
 
   return components || [];
 }

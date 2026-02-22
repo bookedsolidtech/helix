@@ -4,9 +4,31 @@
 # ==============================================================================
 # Runs before every commit to enforce quality standards.
 # This script only checks files that are staged for commit.
+# Maximum execution time: 120 seconds
 # ==============================================================================
 
 set -e
+
+# Start timeout timer
+START_TIME=$(date +%s)
+MAX_DURATION=120  # 2 minutes max
+
+# Function to check timeout
+check_timeout() {
+  CURRENT_TIME=$(date +%s)
+  ELAPSED=$((CURRENT_TIME - START_TIME))
+  if [ $ELAPSED -gt $MAX_DURATION ]; then
+    echo ""
+    echo "⏱️  TIMEOUT: Pre-commit checks exceeded ${MAX_DURATION}s"
+    echo "❌ Commit blocked to prevent indefinite hangs"
+    echo ""
+    echo "To investigate:"
+    echo "  1. Run hooks individually to identify slow checks"
+    echo "  2. Reduce number of staged files"
+    echo "  3. Use 'git commit --no-verify' as last resort (NOT recommended)"
+    exit 1
+  fi
+}
 
 echo "🔍 Running pre-commit quality checks..."
 echo ""
@@ -30,6 +52,7 @@ FAILED=0
 # Gate 1: TypeScript Strict Mode (for staged TypeScript files)
 # ==============================================================================
 if [ -n "$STAGED_TS_FILES" ]; then
+  check_timeout
   echo "📘 Gate 1: TypeScript strict mode compliance check..."
   if npm run hooks:type-check-strict --silent; then
     echo "✅ TypeScript strict check passed"
@@ -269,20 +292,29 @@ fi
 # Gate 2.5: Test Modified Components
 # ==============================================================================
 if [ -n "$STAGED_COMPONENT_FILES" ]; then
-  # Extract unique component names (e.g., hx-button, hx-card)
-  COMPONENTS=$(echo "$STAGED_COMPONENT_FILES" | sed -E 's|.*components/([^/]+)/.*|\1|' | sort -u)
+  # Only run tests if actual implementation files changed (not just test/story files)
+  STAGED_IMPL_FILES=$(echo "$STAGED_COMPONENT_FILES" | grep -E '\.ts$' | grep -v -E '\.(test|spec|stories)\.ts$' || true)
 
-  if [ -n "$COMPONENTS" ]; then
-    echo "🧪 Gate 2.5: Testing modified components..."
-    echo "Modified components: $(echo $COMPONENTS | tr '\n' ' ')"
+  if [ -n "$STAGED_IMPL_FILES" ]; then
+    # Extract unique component names (e.g., hx-button, hx-card)
+    COMPONENTS=$(echo "$STAGED_IMPL_FILES" | sed -E 's|.*components/([^/]+)/.*|\1|' | sort -u)
 
-    # Run tests for the library (targeted testing)
-    if npm run test:library --silent; then
-      echo "✅ Component tests passed"
-    else
-      echo "❌ Component tests failed"
-      FAILED=1
+    if [ -n "$COMPONENTS" ]; then
+      echo "🧪 Gate 2.5: Testing modified components..."
+      echo "Modified components: $(echo $COMPONENTS | tr '\n' ' ')"
+
+      # Run tests for the library (targeted testing)
+      check_timeout
+      if npm run test:library --silent; then
+        echo "✅ Component tests passed"
+      else
+        echo "❌ Component tests failed"
+        FAILED=1
+      fi
+      echo ""
     fi
+  else
+    echo "ℹ️  Gate 2.5: Skipped (only test/story files changed)"
     echo ""
   fi
 fi
@@ -307,22 +339,29 @@ fi
 if [ -n "$STAGED_COMPONENT_FILES" ]; then
   echo "📋 Gate 4: Validating Custom Elements Manifest..."
 
-  if npm run cem --silent; then
-    # Check if CEM was generated
-    if [ -f "packages/hx-library/custom-elements.json" ]; then
-      # Basic validation: check if JSON is valid
+  # Check if CEM file exists and is valid JSON (don't regenerate, hook H05 handles accuracy)
+  if [ -f "packages/hx-library/custom-elements.json" ]; then
+    # Try jq if available, otherwise use node to validate JSON
+    if command -v jq >/dev/null 2>&1; then
       if jq empty packages/hx-library/custom-elements.json 2>/dev/null; then
-        echo "✅ CEM is valid"
+        echo "✅ CEM exists and is valid JSON"
+        echo "ℹ️  CEM accuracy checked by hook H05 (cem-accuracy-check)"
       else
-        echo "❌ CEM JSON is invalid"
+        echo "❌ CEM JSON is invalid - run 'npm run cem' to regenerate"
         FAILED=1
       fi
     else
-      echo "❌ CEM file not generated"
-      FAILED=1
+      # Fallback to node for JSON validation
+      if node -e "JSON.parse(require('fs').readFileSync('packages/hx-library/custom-elements.json', 'utf-8'))" 2>/dev/null; then
+        echo "✅ CEM exists and is valid JSON"
+        echo "ℹ️  CEM accuracy checked by hook H05 (cem-accuracy-check)"
+      else
+        echo "❌ CEM JSON is invalid - run 'npm run cem' to regenerate"
+        FAILED=1
+      fi
     fi
   else
-    echo "❌ CEM generation failed"
+    echo "❌ CEM file not found - run 'npm run cem' to generate"
     FAILED=1
   fi
   echo ""

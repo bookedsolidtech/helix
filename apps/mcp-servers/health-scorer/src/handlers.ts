@@ -1,5 +1,6 @@
 import { readdirSync } from 'node:fs';
 import { resolve, join } from 'node:path';
+import { z } from 'zod';
 import { GitOperations, SafeFileOperations, MCPError, ErrorCategory } from '@helix/mcp-shared';
 
 const PROJECT_ROOT = resolve(process.cwd(), '../..');
@@ -44,13 +45,38 @@ interface HealthDiff {
   }>;
 }
 
+// Zod schema for health history files - allow optional fields but coerce to defaults
+const ComponentHealthSchema = z
+  .object({
+    tagName: z.string(),
+    score: z.number().optional(),
+    grade: z.string().optional(),
+    dimensions: z.record(z.number()).optional(),
+    issues: z.array(z.string()).optional(),
+  })
+  .transform((data) => ({
+    tagName: data.tagName,
+    score: data.score ?? 0,
+    grade: data.grade ?? 'F',
+    dimensions: data.dimensions ?? {},
+    issues: data.issues ?? [],
+  }));
+
+const HealthHistorySchema = z.object({
+  timestamp: z.string(),
+  components: z.array(ComponentHealthSchema),
+});
+
 export async function scoreComponent(tagName: string): Promise<ComponentHealth> {
   // Use the existing health-scorer logic
   // For now, we'll create a simplified version that reads from health history
   const latestHistory = getLatestHealthHistory();
 
   if (!latestHistory) {
-    throw new Error('No health history found. Run health scorer first.');
+    throw new MCPError(
+      'No health history found. Run health scorer first.',
+      ErrorCategory.UserInput,
+    );
   }
 
   const component = latestHistory.components?.find(
@@ -58,7 +84,7 @@ export async function scoreComponent(tagName: string): Promise<ComponentHealth> 
   );
 
   if (!component) {
-    throw new Error(`Component ${tagName} not found in health history`);
+    throw new MCPError(`Component ${tagName} not found in health history`, ErrorCategory.UserInput);
   }
 
   return {
@@ -75,7 +101,10 @@ export async function scoreAllComponents(): Promise<ComponentHealth[]> {
   const latestHistory = getLatestHealthHistory();
 
   if (!latestHistory || !latestHistory.components) {
-    throw new Error('No health history found. Run health scorer first.');
+    throw new MCPError(
+      'No health history found. Run health scorer first.',
+      ErrorCategory.UserInput,
+    );
   }
 
   return latestHistory.components.map(
@@ -120,9 +149,8 @@ export async function getHealthTrend(tagName: string, days: number = 7): Promise
 
   for (const file of files) {
     const filePath = join(HEALTH_HISTORY_DIR, file);
-    const content = fileOps.readFile(filePath);
-    const history = JSON.parse(content);
-    const component = history.components?.find((c: { tagName: string }) => c.tagName === tagName);
+    const history = fileOps.readJSON(filePath, HealthHistorySchema);
+    const component = history.components?.find((c) => c.tagName === tagName);
 
     if (component) {
       dataPoints.push({
@@ -134,13 +162,17 @@ export async function getHealthTrend(tagName: string, days: number = 7): Promise
   }
 
   if (dataPoints.length === 0) {
-    throw new Error(`No history found for ${tagName} in the last ${days} days`);
+    throw new MCPError(
+      `No history found for ${tagName} in the last ${days} days`,
+      ErrorCategory.UserInput,
+    );
   }
 
   // Calculate trend
   const firstScore = dataPoints[dataPoints.length - 1]?.score ?? 0;
   const lastScore = dataPoints[0]?.score ?? 0;
-  const changePercent = ((lastScore - firstScore) / firstScore) * 100;
+  const changePercent =
+    firstScore === 0 ? (lastScore > 0 ? 100 : 0) : ((lastScore - firstScore) / firstScore) * 100;
 
   let trend: 'improving' | 'declining' | 'stable' = 'stable';
   if (changePercent > 5) trend = 'improving';
@@ -252,6 +284,17 @@ function getLatestHealthHistory(): {
   }
 
   const filePath = join(HEALTH_HISTORY_DIR, latestFile);
-  const content = fileOps.readFile(filePath);
-  return JSON.parse(content);
+  const data = fileOps.readJSON(filePath, HealthHistorySchema);
+
+  // Type assertion: after transformation, all fields have defaults
+  return data as {
+    timestamp: string;
+    components: Array<{
+      tagName: string;
+      score: number;
+      grade: string;
+      dimensions: Record<string, number>;
+      issues: string[];
+    }>;
+  };
 }

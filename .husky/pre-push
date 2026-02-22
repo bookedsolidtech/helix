@@ -2,4 +2,5 @@
 . "$(dirname -- "$0")/_/husky.sh"
 
 # Run comprehensive pre-push quality gate
-bash scripts/pre-push-check.sh
+# Use absolute path to ensure hook works from any directory
+bash "$(dirname "$0")/../scripts/pre-push-check.sh"

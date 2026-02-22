@@ -1,5 +1,6 @@
 import { Project, DiagnosticCategory } from 'ts-morph';
 import { resolve } from 'node:path';
+import { z } from 'zod';
 import { SafeFileOperations, MCPError, ErrorCategory } from '@helix/mcp-shared';
 
 const PROJECT_ROOT = resolve(process.cwd(), '../..');
@@ -34,14 +35,14 @@ interface FixSuggestion {
 interface StrictModeStatus {
   enabled: boolean;
   flags: {
-    strict?: boolean;
-    noImplicitAny?: boolean;
-    strictNullChecks?: boolean;
-    strictFunctionTypes?: boolean;
-    strictBindCallApply?: boolean;
-    strictPropertyInitialization?: boolean;
-    noImplicitThis?: boolean;
-    alwaysStrict?: boolean;
+    strict?: boolean | undefined;
+    noImplicitAny?: boolean | undefined;
+    strictNullChecks?: boolean | undefined;
+    strictFunctionTypes?: boolean | undefined;
+    strictBindCallApply?: boolean | undefined;
+    strictPropertyInitialization?: boolean | undefined;
+    noImplicitThis?: boolean | undefined;
+    alwaysStrict?: boolean | undefined;
   };
   missingFlags: string[];
 }
@@ -123,7 +124,10 @@ export async function getDiagnosticsForComponent(tagName: string): Promise<Diagn
   const componentFiles = project.getSourceFiles(`${absolutePath}/**/*.ts`);
 
   if (componentFiles.length === 0) {
-    throw new Error(`No TypeScript files found for component: ${tagName}`);
+    throw new MCPError(
+      `No TypeScript files found for component: ${tagName}`,
+      ErrorCategory.UserInput,
+    );
   }
 
   const errors: TypeScriptDiagnostic[] = [];
@@ -182,7 +186,7 @@ export async function suggestFix(filePath: string, line: number): Promise<FixSug
 
   const sourceFile = project.getSourceFile(absolutePath);
   if (!sourceFile) {
-    throw new Error(`Could not load file: ${filePath}`);
+    throw new MCPError(`Could not load file: ${filePath}`, ErrorCategory.UserInput);
   }
 
   // Get diagnostics at the specific line
@@ -194,12 +198,15 @@ export async function suggestFix(filePath: string, line: number): Promise<FixSug
   });
 
   if (lineDiagnostics.length === 0) {
-    throw new Error(`No TypeScript errors found at line ${line} in ${filePath}`);
+    throw new MCPError(
+      `No TypeScript errors found at line ${line} in ${filePath}`,
+      ErrorCategory.UserInput,
+    );
   }
 
   const diagnostic = lineDiagnostics[0];
   if (!diagnostic) {
-    throw new Error(`Could not retrieve diagnostic at line ${line}`);
+    throw new MCPError(`Could not retrieve diagnostic at line ${line}`, ErrorCategory.System);
   }
 
   const messageText = diagnostic.getMessageText()?.toString() || '';
@@ -251,6 +258,22 @@ export async function suggestFix(filePath: string, line: number): Promise<FixSug
   };
 }
 
+const TsConfigSchema = z.object({
+  compilerOptions: z
+    .object({
+      strict: z.boolean().optional(),
+      noImplicitAny: z.boolean().optional(),
+      strictNullChecks: z.boolean().optional(),
+      strictFunctionTypes: z.boolean().optional(),
+      strictBindCallApply: z.boolean().optional(),
+      strictPropertyInitialization: z.boolean().optional(),
+      noImplicitThis: z.boolean().optional(),
+      alwaysStrict: z.boolean().optional(),
+    })
+    .passthrough()
+    .optional(),
+});
+
 export async function getStrictModeStatus(): Promise<StrictModeStatus> {
   const tsconfigRelative = 'tsconfig.base.json';
 
@@ -258,8 +281,7 @@ export async function getStrictModeStatus(): Promise<StrictModeStatus> {
     throw new MCPError('tsconfig.base.json not found', ErrorCategory.UserInput);
   }
 
-  const tsconfigContent = fileOps.readFile(tsconfigRelative);
-  const tsconfig = JSON.parse(tsconfigContent);
+  const tsconfig = fileOps.readJSON(tsconfigRelative, TsConfigSchema);
 
   const compilerOptions = tsconfig.compilerOptions || {};
 

@@ -7,12 +7,22 @@ export class SafeFileOperations {
   constructor(private allowedRoot: string) {}
 
   validatePath(filePath: string): string {
+    // Block null bytes (classic directory traversal attack)
+    if (filePath.includes('\0')) {
+      throw new MCPError(`Null byte in path: ${filePath}`, ErrorCategory.Security);
+    }
+
     const normalized = normalize(filePath);
     const absolute = resolve(this.allowedRoot, normalized);
     const rel = relative(this.allowedRoot, absolute);
 
-    if (rel.startsWith('..') || rel === '') {
+    // Block path traversal attempts (..) and empty paths (root directory itself)
+    if (rel.startsWith('..')) {
       throw new MCPError(`Path traversal detected: ${filePath}`, ErrorCategory.Security);
+    }
+
+    if (rel === '') {
+      throw new MCPError(`Cannot access root directory: ${filePath}`, ErrorCategory.Security);
     }
 
     return absolute;

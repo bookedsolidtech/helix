@@ -140,17 +140,18 @@ echo ""
 # ==============================================================================
 echo "🔬 Gate 8: Code quality checks..."
 
-# Check for TODO/FIXME in staged files (warning only)
-TODO_COUNT=$(git diff --cached --name-only | xargs grep -n "TODO\|FIXME" 2>/dev/null | wc -l | tr -d ' ')
+# Check for TODO/FIXME in tracked files (warning only)
+# Note: Checks all tracked files, not just staged, since pre-push runs on committed code
+TODO_COUNT=$(git ls-files | xargs grep -n "TODO\|FIXME" 2>/dev/null | wc -l | tr -d ' ')
 if [ "$TODO_COUNT" -gt 0 ]; then
-  echo "  ⚠️  Found $TODO_COUNT TODO/FIXME comments in staged files"
+  echo "  ⚠️  Found $TODO_COUNT TODO/FIXME comments in codebase"
   echo "  Consider resolving these before pushing to production"
 else
-  echo "  ✅ No TODO/FIXME comments in staged files"
+  echo "  ✅ No TODO/FIXME comments in codebase"
 fi
 
 # Check for console.log in production code (warning only)
-CONSOLE_COUNT=$(git diff --cached --name-only | grep -E '\.(ts|tsx|js|jsx)$' | grep -v '\.test\.' | grep -v '\.stories\.' | xargs grep -n "console\.log" 2>/dev/null | wc -l | tr -d ' ')
+CONSOLE_COUNT=$(git ls-files | grep -E '\.(ts|tsx|js|jsx)$' | grep -v '\.test\.' | grep -v '\.stories\.' | xargs grep -n "console\.log" 2>/dev/null | wc -l | tr -d ' ')
 if [ "$CONSOLE_COUNT" -gt 0 ]; then
   echo "  ⚠️  Found $CONSOLE_COUNT console.log statements in production code"
   echo "  Consider removing these before pushing to production"
