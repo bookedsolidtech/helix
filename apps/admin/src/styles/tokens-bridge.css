@@ -1,0 +1,105 @@
+/*
+ * tokens-bridge.css
+ *
+ * Bridges @helix/tokens CSS custom properties (--hx-*) to the Tailwind v4
+ * theme CSS variables (--color-*) used by shadcn/ui components in the admin app.
+ *
+ * All values reference @helix/tokens — no hardcoded colors here.
+ */
+
+@import '@helix/tokens/tokens.css';
+
+/* Map @helix/tokens semantic tokens to Tailwind v4 theme CSS variables */
+:root {
+  /* Surface / Page */
+  --color-background: var(--hx-color-surface-default);
+  --color-foreground: var(--hx-color-text-primary);
+
+  /* Card / Elevated surface */
+  --color-card: var(--hx-color-surface-raised);
+  --color-card-foreground: var(--hx-color-text-primary);
+
+  /* Popover */
+  --color-popover: var(--hx-color-surface-raised);
+  --color-popover-foreground: var(--hx-color-text-primary);
+
+  /* Primary brand color */
+  --color-primary: var(--hx-color-primary-500);
+  --color-primary-foreground: var(--hx-color-text-on-primary);
+
+  /* Secondary */
+  --color-secondary: var(--hx-color-secondary-500);
+  --color-secondary-foreground: var(--hx-color-text-on-secondary);
+
+  /* Muted — maps to the sunken surface (recessed / subdued) */
+  --color-muted: var(--hx-color-surface-sunken);
+  --color-muted-foreground: var(--hx-color-text-muted);
+
+  /* Accent — also maps to sunken surface for consistency */
+  --color-accent: var(--hx-color-surface-sunken);
+  --color-accent-foreground: var(--hx-color-text-primary);
+
+  /* Destructive / Error */
+  --color-destructive: var(--hx-color-error-500);
+  --color-destructive-foreground: var(--hx-color-text-on-error);
+
+  /* Borders and form inputs */
+  --color-border: var(--hx-color-border-default);
+  --color-input: var(--hx-color-border-default);
+
+  /* Focus ring */
+  --color-ring: var(--hx-color-focus-ring);
+
+  /* Border radius */
+  --radius-sm: var(--hx-border-radius-sm);
+  --radius-md: var(--hx-border-radius-md);
+  --radius-lg: var(--hx-border-radius-lg);
+  --radius-xl: var(--hx-border-radius-xl);
+
+  /* Sidebar */
+  --color-sidebar: var(--hx-color-surface-default);
+  --color-sidebar-foreground: var(--hx-color-text-primary);
+  --color-sidebar-primary: var(--hx-color-primary-500);
+  --color-sidebar-primary-foreground: var(--hx-color-text-on-primary);
+  --color-sidebar-accent: var(--hx-color-surface-sunken);
+  --color-sidebar-accent-foreground: var(--hx-color-text-primary);
+  --color-sidebar-border: var(--hx-color-border-default);
+  --color-sidebar-ring: var(--hx-color-focus-ring);
+
+  /* Chart colors — mapped to helix semantic palette */
+  --color-chart-1: var(--hx-color-primary-500);
+  --color-chart-2: var(--hx-color-secondary-500);
+  --color-chart-3: var(--hx-color-info-500);
+  --color-chart-4: var(--hx-color-success-500);
+  --color-chart-5: var(--hx-color-warning-500);
+}
+
+/*
+ * Dark mode: bridge Tailwind's html.dark class to @helix/tokens dark mode variables.
+ *
+ * @helix/tokens ships dark overrides for @media prefers-color-scheme and [data-theme="dark"].
+ * The admin app uses Tailwind's class-based dark mode (html.dark), so we replicate
+ * the same semantic token overrides here for that selector.
+ */
+html.dark {
+  --hx-color-text-primary: var(--hx-color-neutral-100);
+  --hx-color-text-secondary: var(--hx-color-neutral-300);
+  --hx-color-text-muted: var(--hx-color-neutral-400);
+  --hx-color-text-disabled: var(--hx-color-neutral-600);
+  --hx-color-text-inverse: var(--hx-color-neutral-900);
+  --hx-color-text-link: var(--hx-color-primary-400);
+  --hx-color-text-link-hover: var(--hx-color-primary-300);
+  --hx-color-text-link-visited: var(--hx-color-secondary-400);
+  --hx-color-text-link-active: var(--hx-color-primary-200);
+  --hx-color-surface-default: var(--hx-color-neutral-900);
+  --hx-color-surface-raised: var(--hx-color-neutral-800);
+  --hx-color-surface-sunken: var(--hx-color-neutral-950);
+  --hx-color-surface-overlay: rgba(0, 0, 0, 0.85);
+  --hx-color-border-default: var(--hx-color-neutral-700);
+  --hx-color-border-subtle: var(--hx-color-neutral-800);
+  --hx-color-border-strong: var(--hx-color-neutral-500);
+  --hx-color-border-focus: var(--hx-color-primary-400);
+  --hx-color-focus-ring: var(--hx-color-primary-400);
+  --hx-color-selection-bg: var(--hx-color-primary-800);
+  --hx-color-selection-color: var(--hx-color-neutral-100);
+}
