@@ -47,6 +47,9 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Security audit
+        run: npm audit --audit-level=high
+
       - name: Install Playwright browsers
         run: npx playwright install --with-deps chromium firefox webkit
 
