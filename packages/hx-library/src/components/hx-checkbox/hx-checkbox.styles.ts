@@ -60,7 +60,7 @@ export const helixCheckboxStyles = css`
     border: var(--hx-border-width-medium, 2px) solid
       var(--hx-checkbox-border-color, var(--hx-color-neutral-300, #ced4da));
     border-radius: var(--hx-checkbox-border-radius, var(--hx-border-radius-sm, 0.25rem));
-    background-color: var(--hx-color-neutral-0, #ffffff);
+    background-color: var(--hx-checkbox-bg, var(--hx-color-neutral-0, #ffffff));
     transition:
       background-color var(--hx-transition-fast, 150ms ease),
       border-color var(--hx-transition-fast, 150ms ease),
@@ -105,7 +105,7 @@ export const helixCheckboxStyles = css`
   /* ─── Hover ─── */
 
   .checkbox__control:hover .checkbox__box {
-    border-color: var(--hx-color-primary-500, #2563eb);
+    border-color: var(--hx-checkbox-hover-border-color, var(--hx-color-primary-500, #2563eb));
   }
 
   .checkbox--checked .checkbox__control:hover .checkbox__box {
@@ -157,7 +157,7 @@ export const helixCheckboxStyles = css`
 
   .checkbox__help-text {
     font-size: var(--hx-font-size-xs, 0.75rem);
-    color: var(--hx-color-neutral-500, #6c757d);
+    color: var(--hx-checkbox-help-text-color, var(--hx-color-neutral-500, #6c757d));
     line-height: var(--hx-line-height-normal, 1.5);
     padding-left: calc(
       var(--hx-checkbox-size, var(--hx-size-5, 1.25rem)) + var(--hx-space-2, 0.5rem)
