@@ -21,9 +21,9 @@ import { helixFormScopedCss } from './hx-form.styles.js';
  *
  * @slot - Default slot for form fields and controls.
  *
- * @fires {CustomEvent<{valid: boolean, values: Record<string, FormDataEntryValue>}>} wc-submit - Dispatched on valid client-side submit when no action is set.
- * @fires {CustomEvent<{errors: Array<{name: string, message: string}>}>} wc-invalid - Dispatched when validation fails on submit.
- * @fires {CustomEvent} wc-reset - Dispatched when the form is reset.
+ * @fires {CustomEvent<{valid: boolean, values: Record<string, FormDataEntryValue>}>} hx-submit - Dispatched on valid client-side submit when no action is set.
+ * @fires {CustomEvent<{errors: Array<{name: string, message: string}>}>} hx-invalid - Dispatched when validation fails on submit.
+ * @fires {CustomEvent} hx-reset - Dispatched when the form is reset.
  *
  * @cssprop [--hx-form-gap=var(--hx-space-4)] - Gap between form fields.
  * @cssprop [--hx-form-max-width=none] - Maximum width of the form.
@@ -59,8 +59,9 @@ export class HelixForm extends LitElement {
 
   /**
    * The URL to submit the form to. When empty, the form handles
-   * submission client-side only and dispatches `wc-submit`.
+   * submission client-side only and dispatches `hx-submit`.
    * @attr action
+   * @default ''
    */
   @property({ type: String })
   action = '';
@@ -68,6 +69,7 @@ export class HelixForm extends LitElement {
   /**
    * The HTTP method used when submitting the form.
    * @attr method
+   * @default 'post'
    */
   @property({ type: String })
   method: 'get' | 'post' = 'post';
@@ -76,6 +78,7 @@ export class HelixForm extends LitElement {
    * When true, disables the browser's built-in constraint validation
    * on form submission.
    * @attr novalidate
+   * @default false
    */
   @property({ type: Boolean })
   novalidate = false;
@@ -83,6 +86,7 @@ export class HelixForm extends LitElement {
   /**
    * Identifies the form for scripting and form discovery.
    * @attr name
+   * @default ''
    */
   @property({ type: String })
   name = '';

@@ -32,6 +32,7 @@ export class HelixButton extends LitElement {
   /**
    * Visual style variant of the button.
    * @attr variant
+   * @default 'primary'
    */
   @property({ type: String, reflect: true })
   variant: 'primary' | 'secondary' | 'ghost' = 'primary';
@@ -39,6 +40,7 @@ export class HelixButton extends LitElement {
   /**
    * Size of the button.
    * @attr hx-size
+   * @default 'md'
    */
   @property({ type: String, reflect: true, attribute: 'hx-size' })
   size: 'sm' | 'md' | 'lg' = 'md';
@@ -46,6 +48,7 @@ export class HelixButton extends LitElement {
   /**
    * Whether the button is disabled.
    * @attr disabled
+   * @default false
    */
   @property({ type: Boolean, reflect: true })
   disabled = false;
@@ -53,6 +56,7 @@ export class HelixButton extends LitElement {
   /**
    * The type attribute for the underlying button element.
    * @attr type
+   * @default 'button'
    */
   @property({ type: String })
   type: 'button' | 'submit' | 'reset' = 'button';

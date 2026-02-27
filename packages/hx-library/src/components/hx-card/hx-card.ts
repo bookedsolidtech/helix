@@ -17,7 +17,7 @@ import { helixCardStyles } from './hx-card.styles.js';
  * @slot footer - Optional footer content below the body.
  * @slot actions - Optional action buttons, rendered with a top border separator.
  *
- * @fires {CustomEvent<{url: string, originalEvent: MouseEvent}>} wc-card-click - Dispatched when an interactive card (with wc-href) is clicked.
+ * @fires {CustomEvent<{url: string, originalEvent: MouseEvent}>} hx-card-click - Dispatched when an interactive card (with hx-href) is clicked.
  *
  * @csspart card - The outer card container element.
  * @csspart image - The image slot container.
@@ -40,6 +40,7 @@ export class HelixCard extends LitElement {
   /**
    * Visual style variant of the card.
    * @attr variant
+   * @default 'default'
    */
   @property({ type: String, reflect: true })
   variant: 'default' | 'featured' | 'compact' = 'default';
@@ -47,6 +48,7 @@ export class HelixCard extends LitElement {
   /**
    * Elevation (shadow depth) of the card.
    * @attr elevation
+   * @default 'flat'
    */
   @property({ type: String, reflect: true })
   elevation: 'flat' | 'raised' | 'floating' = 'flat';
@@ -54,8 +56,9 @@ export class HelixCard extends LitElement {
   /**
    * Optional URL. When set, the card becomes interactive (clickable)
    * and navigates to this URL on click.
-   * Uses wc-href to avoid conflicting with the native HTML href attribute.
+   * Uses hx-href to avoid conflicting with the native HTML href attribute.
    * @attr hx-href
+   * @default ''
    */
   @property({ type: String, attribute: 'hx-href' })
   wcHref = '';

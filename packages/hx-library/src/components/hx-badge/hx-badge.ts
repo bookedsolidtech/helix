@@ -33,6 +33,7 @@ export class HelixBadge extends LitElement {
   /**
    * Visual style variant of the badge.
    * @attr variant
+   * @default 'primary'
    */
   @property({ type: String, reflect: true })
   variant: 'primary' | 'success' | 'warning' | 'error' | 'neutral' = 'primary';
@@ -40,6 +41,7 @@ export class HelixBadge extends LitElement {
   /**
    * Size of the badge.
    * @attr hx-size
+   * @default 'md'
    */
   @property({ type: String, reflect: true, attribute: 'hx-size' })
   size: 'sm' | 'md' | 'lg' = 'md';
@@ -47,6 +49,7 @@ export class HelixBadge extends LitElement {
   /**
    * Whether the badge uses fully rounded (pill) styling.
    * @attr pill
+   * @default false
    */
   @property({ type: Boolean, reflect: true })
   pill = false;
@@ -54,6 +57,7 @@ export class HelixBadge extends LitElement {
   /**
    * Whether the badge displays an animated pulse for attention.
    * @attr pulse
+   * @default false
    */
   @property({ type: Boolean, reflect: true })
   pulse = false;

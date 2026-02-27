@@ -20,7 +20,7 @@ type AlertVariant = 'info' | 'success' | 'warning' | 'error';
  * @slot actions - Action buttons rendered within the alert.
  *
  * @fires {CustomEvent<{reason: string}>} hx-close - Dispatched when the user dismisses the alert.
- * @fires {CustomEvent} wc-after-close - Dispatched after the alert is dismissed.
+ * @fires {CustomEvent} hx-after-close - Dispatched after the alert is dismissed.
  *
  * @csspart alert - The outer alert container.
  * @csspart icon - The icon container.
@@ -47,6 +47,7 @@ export class HelixAlert extends LitElement {
   /**
    * Visual variant of the alert that determines colors and ARIA semantics.
    * @attr variant
+   * @default 'info'
    */
   @property({ type: String, reflect: true })
   variant: AlertVariant = 'info';
@@ -54,6 +55,7 @@ export class HelixAlert extends LitElement {
   /**
    * Whether the alert can be dismissed by the user.
    * @attr closable
+   * @default false
    */
   @property({ type: Boolean, reflect: true })
   closable = false;
@@ -61,6 +63,7 @@ export class HelixAlert extends LitElement {
   /**
    * Whether the alert is visible. Set to false to hide the alert.
    * @attr open
+   * @default true
    */
   @property({ type: Boolean, reflect: true })
   open = true;

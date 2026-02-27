@@ -55,6 +55,7 @@ export class HelixCheckbox extends LitElement {
   /**
    * Whether the checkbox is checked.
    * @attr checked
+   * @default false
    */
   @property({ type: Boolean, reflect: true })
   checked = false;
@@ -62,6 +63,7 @@ export class HelixCheckbox extends LitElement {
   /**
    * Whether the checkbox is in an indeterminate state (e.g., for "select all" patterns).
    * @attr indeterminate
+   * @default false
    */
   @property({ type: Boolean })
   indeterminate = false;
@@ -69,6 +71,7 @@ export class HelixCheckbox extends LitElement {
   /**
    * Whether the checkbox is disabled.
    * @attr disabled
+   * @default false
    */
   @property({ type: Boolean, reflect: true })
   disabled = false;
@@ -76,6 +79,7 @@ export class HelixCheckbox extends LitElement {
   /**
    * Whether the checkbox is required for form submission.
    * @attr required
+   * @default false
    */
   @property({ type: Boolean, reflect: true })
   required = false;
@@ -83,6 +87,7 @@ export class HelixCheckbox extends LitElement {
   /**
    * The name of the checkbox, used for form submission.
    * @attr name
+   * @default ''
    */
   @property({ type: String })
   name = '';
@@ -90,6 +95,7 @@ export class HelixCheckbox extends LitElement {
   /**
    * The value submitted when the checkbox is checked.
    * @attr value
+   * @default 'on'
    */
   @property({ type: String })
   value = 'on';
@@ -97,6 +103,7 @@ export class HelixCheckbox extends LitElement {
   /**
    * The visible label text for the checkbox.
    * @attr label
+   * @default ''
    */
   @property({ type: String })
   label = '';
@@ -104,6 +111,7 @@ export class HelixCheckbox extends LitElement {
   /**
    * Error message to display. When set, the checkbox enters an error state.
    * @attr error
+   * @default ''
    */
   @property({ type: String })
   error = '';
@@ -111,6 +119,7 @@ export class HelixCheckbox extends LitElement {
   /**
    * Help text displayed below the checkbox for guidance.
    * @attr help-text
+   * @default ''
    */
   @property({ type: String, attribute: 'help-text' })
   helpText = '';

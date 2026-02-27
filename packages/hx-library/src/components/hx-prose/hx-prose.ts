@@ -42,6 +42,7 @@ export class HelixProse extends LitElement {
   /**
    * Typography scale for the prose content.
    * @attr size
+   * @default 'base'
    */
   @property({ type: String, reflect: true })
   size: 'sm' | 'base' | 'lg' = 'base';
@@ -50,6 +51,7 @@ export class HelixProse extends LitElement {
    * Maximum content width. When set, overrides the --hx-prose-max-width token.
    * Accepts any valid CSS width value (e.g., '640px', '80ch', '100%').
    * @attr max-width
+   * @default ''
    */
   @property({ type: String, reflect: true, attribute: 'max-width' })
   maxWidth = '';

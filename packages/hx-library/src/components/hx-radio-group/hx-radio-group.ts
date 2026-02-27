@@ -6,13 +6,13 @@ import { helixRadioGroupStyles } from './hx-radio-group.styles.js';
 import type { HelixRadio } from './hx-radio.js';
 
 /**
- * A form-associated radio group that manages a set of `<wc-radio>` children.
+ * A form-associated radio group that manages a set of `<hx-radio>` children.
  *
  * @summary Form-associated radio group with label, validation, help text, and keyboard navigation.
  *
  * @tag hx-radio-group
  *
- * @slot - `<wc-radio>` elements.
+ * @slot - `<hx-radio>` elements.
  * @slot error - Custom error content (overrides the error property).
  * @slot help-text - Custom help text content (overrides the helpText property).
  *
@@ -48,6 +48,7 @@ export class HelixRadioGroup extends LitElement {
   /**
    * The selected radio's value.
    * @attr value
+   * @default ''
    */
   @property({ type: String })
   value = '';
@@ -55,6 +56,7 @@ export class HelixRadioGroup extends LitElement {
   /**
    * The name used for form submission.
    * @attr name
+   * @default ''
    */
   @property({ type: String })
   name = '';
@@ -62,6 +64,7 @@ export class HelixRadioGroup extends LitElement {
   /**
    * The fieldset legend/label text.
    * @attr label
+   * @default ''
    */
   @property({ type: String })
   label = '';
@@ -69,6 +72,7 @@ export class HelixRadioGroup extends LitElement {
   /**
    * Whether a selection is required for form submission.
    * @attr required
+   * @default false
    */
   @property({ type: Boolean, reflect: true })
   required = false;
@@ -76,6 +80,7 @@ export class HelixRadioGroup extends LitElement {
   /**
    * Whether the entire group is disabled.
    * @attr disabled
+   * @default false
    */
   @property({ type: Boolean, reflect: true })
   disabled = false;
@@ -83,6 +88,7 @@ export class HelixRadioGroup extends LitElement {
   /**
    * Error message to display. When set, the group enters an error state.
    * @attr error
+   * @default ''
    */
   @property({ type: String })
   error = '';
@@ -90,6 +96,7 @@ export class HelixRadioGroup extends LitElement {
   /**
    * Help text displayed below the group for guidance.
    * @attr help-text
+   * @default ''
    */
   @property({ type: String, attribute: 'help-text' })
   helpText = '';
@@ -97,6 +104,7 @@ export class HelixRadioGroup extends LitElement {
   /**
    * Layout orientation of the radio items.
    * @attr orientation
+   * @default 'vertical'
    */
   @property({ type: String, reflect: true })
   orientation: 'vertical' | 'horizontal' = 'vertical';
