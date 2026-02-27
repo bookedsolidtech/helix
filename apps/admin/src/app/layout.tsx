@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { Inter } from 'next/font/google';
 import Link from 'next/link';
 import {
   LayoutDashboard,
@@ -16,6 +17,12 @@ import {
 import { DOCS_URL, STORYBOOK_URL } from '@/lib/env';
 import { Analytics } from '@/components/Analytics';
 import './globals.css';
+
+const inter = Inter({
+  subsets: ['latin'],
+  variable: '--font-sans',
+  display: 'swap',
+});
 
 export const metadata: Metadata = {
   title: 'Panopticon Platform — HELIX Component Library',
@@ -49,7 +56,7 @@ function SidebarLink({
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className="dark">
+    <html lang="en" className={`dark ${inter.variable}`}>
       <body className="antialiased">
         <Analytics />
         <div className="flex min-h-screen">
