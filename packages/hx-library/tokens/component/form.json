@@ -1,0 +1,13 @@
+{
+  "input": {
+    "bg":              { "$value": "{color.surface.default}",  "$type": "color",      "$description": "Input background color" },
+    "border-color":    { "$value": "{color.border.default}",   "$type": "color",      "$description": "Input border color" },
+    "border-radius":   { "$value": "{border.radius.md}",       "$type": "dimension",  "$description": "Input border radius" },
+    "color":           { "$value": "{color.text.primary}",     "$type": "color",      "$description": "Input text color" },
+    "placeholder-color":{ "$value": "{color.text.muted}",      "$type": "color",      "$description": "Input placeholder text color" },
+    "label-color":     { "$value": "{color.neutral.700}",      "$type": "color",      "$description": "Input label text color" },
+    "error-color":     { "$value": "{color.error.500}",        "$type": "color",      "$description": "Input error state color" },
+    "font-family":     { "$value": "{font.family.sans}",       "$type": "fontFamily", "$description": "Input font family" },
+    "focus-ring-color":{ "$value": "{color.primary.500}",      "$type": "color",      "$description": "Input focus ring color" }
+  }
+}

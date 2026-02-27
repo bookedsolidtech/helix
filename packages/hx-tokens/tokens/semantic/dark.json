@@ -1,0 +1,45 @@
+{
+  "dark": {
+    "color": {
+      "text": {
+        "primary":      { "$value": "{color.neutral.100}",   "$type": "color", "$description": "Dark mode default body text" },
+        "secondary":    { "$value": "{color.neutral.300}",   "$type": "color", "$description": "Dark mode secondary text" },
+        "muted":        { "$value": "{color.neutral.400}",   "$type": "color", "$description": "Dark mode muted text" },
+        "disabled":     { "$value": "{color.neutral.600}",   "$type": "color", "$description": "Dark mode disabled text" },
+        "inverse":      { "$value": "{color.neutral.900}",   "$type": "color", "$description": "Dark mode inverted text" },
+        "link":         { "$value": "{color.primary.400}",   "$type": "color", "$description": "Dark mode link text" },
+        "link-hover":   { "$value": "{color.primary.300}",   "$type": "color", "$description": "Dark mode link hover" },
+        "link-visited": { "$value": "{color.secondary.400}", "$type": "color", "$description": "Dark mode visited link" },
+        "link-active":  { "$value": "{color.primary.200}",   "$type": "color", "$description": "Dark mode active link" }
+      },
+      "surface": {
+        "default": { "$value": "{color.neutral.900}", "$type": "color", "$description": "Dark mode page/card background" },
+        "raised":  { "$value": "{color.neutral.800}", "$type": "color", "$description": "Dark mode elevated surface" },
+        "sunken":  { "$value": "{color.neutral.950}", "$type": "color", "$description": "Dark mode recessed surface" },
+        "overlay": { "$value": "rgba(0, 0, 0, 0.85)", "$type": "color", "$description": "Dark mode backdrop overlay" }
+      },
+      "border": {
+        "default": { "$value": "{color.neutral.700}", "$type": "color", "$description": "Dark mode default border" },
+        "subtle":  { "$value": "{color.neutral.800}", "$type": "color", "$description": "Dark mode subtle border" },
+        "strong":  { "$value": "{color.neutral.500}", "$type": "color", "$description": "Dark mode strong border" },
+        "focus":   { "$value": "{color.primary.400}", "$type": "color", "$description": "Dark mode focus border" }
+      },
+      "focus-ring": { "$value": "{color.primary.400}", "$type": "color", "$description": "Dark mode focus ring color" },
+      "selection": {
+        "bg":    { "$value": "{color.primary.800}", "$type": "color", "$description": "Dark mode text selection background" },
+        "color": { "$value": "{color.neutral.100}", "$type": "color", "$description": "Dark mode text selection foreground" }
+      }
+    },
+    "body": {
+      "bg":    { "$value": "{color.neutral.900}", "$type": "color", "$description": "Dark mode body background" },
+      "color": { "$value": "{color.neutral.100}", "$type": "color", "$description": "Dark mode body text" }
+    },
+    "shadow": {
+      "sm":  { "$value": "0 1px 2px 0 rgb(0 0 0 / 0.3)",                                                 "$type": "shadow", "$description": "Dark mode small shadow" },
+      "md":  { "$value": "0 4px 6px -1px rgb(0 0 0 / 0.4), 0 2px 4px -2px rgb(0 0 0 / 0.3)",            "$type": "shadow", "$description": "Dark mode medium shadow" },
+      "lg":  { "$value": "0 10px 15px -3px rgb(0 0 0 / 0.4), 0 4px 6px -4px rgb(0 0 0 / 0.3)",          "$type": "shadow", "$description": "Dark mode large shadow" },
+      "xl":  { "$value": "0 20px 25px -5px rgb(0 0 0 / 0.4), 0 8px 10px -6px rgb(0 0 0 / 0.3)",         "$type": "shadow", "$description": "Dark mode extra-large shadow" },
+      "2xl": { "$value": "0 25px 50px -12px rgb(0 0 0 / 0.5)",                                           "$type": "shadow", "$description": "Dark mode 2xl shadow" }
+    }
+  }
+}

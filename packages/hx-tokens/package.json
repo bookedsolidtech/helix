@@ -35,7 +35,8 @@
     "src/tokens.json"
   ],
   "scripts": {
-    "build": "tsc && npx tsx scripts/generate-css.ts",
+    "build": "tsc && node sd.config.mjs",
+    "build:sd": "node sd.config.mjs",
     "type-check": "tsc --noEmit",
     "clean": "rm -rf dist"
   },
@@ -43,6 +44,7 @@
     "lit": "^3.3.2"
   },
   "devDependencies": {
+    "style-dictionary": "^4.0.0",
     "tsx": "^4.19.0",
     "typescript": "^5.7.2"
   }
