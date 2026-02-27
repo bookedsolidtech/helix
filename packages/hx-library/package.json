@@ -39,7 +39,7 @@
     "clean": "rm -rf dist custom-elements.json"
   },
   "dependencies": {
-    "@helix/tokens": "*",
+    "@helix/tokens": "workspace:*",
     "lit": "^3.3.2"
   },
   "devDependencies": {

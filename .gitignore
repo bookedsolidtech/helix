@@ -3,6 +3,9 @@ node_modules/
 .pnp
 .pnp.js
 
+# Lock files (pnpm is used — npm lock file not committed)
+package-lock.json
+
 # Build outputs
 dist/
 build/

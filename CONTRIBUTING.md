@@ -26,7 +26,7 @@ This project adheres to a code of conduct. By participating, you are expected to
 ### Prerequisites
 
 - **Node.js**: >= 20.0.0
-- **npm**: 10.8.2 (ships with Node.js)
+- **pnpm**: >= 9.0.0 (install via `npm install -g pnpm` or `corepack enable`)
 - **Git**: Latest stable version
 - **IDE**: VSCode recommended (with recommended extensions)
 
@@ -37,11 +37,15 @@ This project adheres to a code of conduct. By participating, you are expected to
 git clone https://github.com/himerus/wc-2026.git
 cd wc-2026
 
+# Install pnpm (if not already installed)
+corepack enable
+# or: npm install -g pnpm
+
 # Install dependencies
-npm install
+pnpm install
 
 # Start development servers
-npm run dev
+pnpm run dev
 ```
 
 This will start:
@@ -69,16 +73,16 @@ Follow the coding standards and conventions outlined in [CLAUDE.md](./CLAUDE.md)
 
 ```bash
 # Type check
-npm run type-check
+pnpm run type-check
 
 # Lint
-npm run lint
+pnpm run lint
 
 # Run tests
-npm run test
+pnpm run test
 
 # Build
-npm run build
+pnpm run build
 ```
 
 ### 4. Commit Your Changes
@@ -246,8 +250,8 @@ git commit -m "docs: add accessibility testing guide"
 1. Ensure all quality gates pass locally
 2. Update documentation (if applicable)
 3. Add/update tests for new functionality
-4. Run full test suite: `npm run test`
-5. Verify build succeeds: `npm run build`
+4. Run full test suite: `pnpm run test`
+5. Verify build succeeds: `pnpm run build`
 
 ### Creating a PR
 
@@ -351,13 +355,13 @@ test('renders with default variant', async () => {
 
 ```bash
 # Run all tests
-npm run test
+pnpm run test
 
 # Run library tests only
-npm run test:library
+pnpm run test:library
 
 # Visual regression tests
-npm run test:vrt
+pnpm run test:vrt
 ```
 
 ## Documentation Requirements

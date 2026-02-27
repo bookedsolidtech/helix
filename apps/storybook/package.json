@@ -11,8 +11,8 @@
     "clean": "rm -rf dist"
   },
   "dependencies": {
-    "@helix/library": "*",
-    "@helix/tokens": "*"
+    "@helix/library": "workspace:*",
+    "@helix/tokens": "workspace:*"
   },
   "devDependencies": {
     "@storybook/addon-a11y": "^10.2.8",
