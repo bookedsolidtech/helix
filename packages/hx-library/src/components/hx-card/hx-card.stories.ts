@@ -1174,3 +1174,51 @@ export const PatientDashboard: Story = {
     </div>
   `,
 };
+
+// ─────────────────────────────────────────────────
+// THEME COMPARISON — Light and Dark side by side
+// ─────────────────────────────────────────────────
+
+export const ThemeComparison: Story = {
+  parameters: {
+    backgrounds: { disable: true },
+  },
+  render: () => html`
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0; min-height: 300px;">
+      <div
+        data-theme="light"
+        style="padding: 2rem; background: #ffffff; display: flex; flex-direction: column; gap: 1rem;"
+      >
+        <p style="margin: 0 0 1rem; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: #6b7280;">
+          Light Theme
+        </p>
+        <hx-card variant="default">
+          <span slot="header">Patient Overview</span>
+          <p>Jane Smith · DOB: 1975-03-12 · MRN: 4829301</p>
+          <span slot="actions"><hx-button hx-size="sm">View Chart</hx-button></span>
+        </hx-card>
+        <hx-card variant="elevated">
+          <span slot="header">Lab Results</span>
+          <p>CBC Panel — All values within normal range.</p>
+        </hx-card>
+      </div>
+      <div
+        data-theme="dark"
+        style="padding: 2rem; background: #1a1a2e; display: flex; flex-direction: column; gap: 1rem;"
+      >
+        <p style="margin: 0 0 1rem; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: #9ca3af;">
+          Dark Theme
+        </p>
+        <hx-card variant="default">
+          <span slot="header">Patient Overview</span>
+          <p>Jane Smith · DOB: 1975-03-12 · MRN: 4829301</p>
+          <span slot="actions"><hx-button hx-size="sm">View Chart</hx-button></span>
+        </hx-card>
+        <hx-card variant="elevated">
+          <span slot="header">Lab Results</span>
+          <p>CBC Panel — All values within normal range.</p>
+        </hx-card>
+      </div>
+    </div>
+  `,
+};

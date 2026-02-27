@@ -1308,3 +1308,51 @@ export const TreatmentPreference: Story = {
     expect(group!.value).toBe('undecided');
   },
 };
+
+// ─────────────────────────────────────────────────
+// THEME COMPARISON — Light and Dark side by side
+// ─────────────────────────────────────────────────
+
+export const ThemeComparison: Story = {
+  parameters: {
+    backgrounds: { disable: true },
+  },
+  render: () => html`
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0; min-height: 200px;">
+      <div
+        data-theme="light"
+        style="padding: 2rem; background: #ffffff; display: flex; flex-direction: column; gap: 1.5rem;"
+      >
+        <p style="margin: 0 0 1rem; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: #6b7280;">
+          Light Theme
+        </p>
+        <hx-radio-group label="Appointment Type" name="appt-light">
+          <hx-radio value="in-person" label="In-Person Visit" checked></hx-radio>
+          <hx-radio value="telehealth" label="Telehealth"></hx-radio>
+          <hx-radio value="phone" label="Phone Consultation"></hx-radio>
+        </hx-radio-group>
+        <hx-radio-group label="Discharge Status" name="discharge-light" disabled>
+          <hx-radio value="ready" label="Ready for Discharge"></hx-radio>
+          <hx-radio value="pending" label="Pending Clearance" checked></hx-radio>
+        </hx-radio-group>
+      </div>
+      <div
+        data-theme="dark"
+        style="padding: 2rem; background: #1a1a2e; display: flex; flex-direction: column; gap: 1.5rem;"
+      >
+        <p style="margin: 0 0 1rem; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: #9ca3af;">
+          Dark Theme
+        </p>
+        <hx-radio-group label="Appointment Type" name="appt-dark">
+          <hx-radio value="in-person" label="In-Person Visit" checked></hx-radio>
+          <hx-radio value="telehealth" label="Telehealth"></hx-radio>
+          <hx-radio value="phone" label="Phone Consultation"></hx-radio>
+        </hx-radio-group>
+        <hx-radio-group label="Discharge Status" name="discharge-dark" disabled>
+          <hx-radio value="ready" label="Ready for Discharge"></hx-radio>
+          <hx-radio value="pending" label="Pending Clearance" checked></hx-radio>
+        </hx-radio-group>
+      </div>
+    </div>
+  `,
+};

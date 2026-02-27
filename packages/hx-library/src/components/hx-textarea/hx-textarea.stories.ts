@@ -1273,3 +1273,75 @@ ALLERGIES:
     </div>
   `,
 };
+
+// ─────────────────────────────────────────────────
+// THEME COMPARISON — Light and Dark side by side
+// ─────────────────────────────────────────────────
+
+export const ThemeComparison: Story = {
+  parameters: {
+    backgrounds: { disable: true },
+  },
+  render: () => html`
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0; min-height: 300px;">
+      <div
+        data-theme="light"
+        style="padding: 2rem; background: #ffffff; display: flex; flex-direction: column; gap: 1rem;"
+      >
+        <p style="margin: 0 0 1rem; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: #6b7280;">
+          Light Theme
+        </p>
+        <hx-textarea
+          label="Clinical Notes"
+          name="notes-light"
+          placeholder="Document patient observations..."
+          rows="4"
+          help-text="Include time, date, and your credentials."
+        ></hx-textarea>
+        <hx-textarea
+          label="Discharge Summary"
+          name="discharge-light"
+          disabled
+          value="Patient discharged in stable condition."
+          rows="3"
+        ></hx-textarea>
+        <hx-textarea
+          label="Allergy Notes"
+          name="allergy-light"
+          error
+          help-text="This field cannot be left blank."
+          rows="2"
+        ></hx-textarea>
+      </div>
+      <div
+        data-theme="dark"
+        style="padding: 2rem; background: #1a1a2e; display: flex; flex-direction: column; gap: 1rem;"
+      >
+        <p style="margin: 0 0 1rem; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: #9ca3af;">
+          Dark Theme
+        </p>
+        <hx-textarea
+          label="Clinical Notes"
+          name="notes-dark"
+          placeholder="Document patient observations..."
+          rows="4"
+          help-text="Include time, date, and your credentials."
+        ></hx-textarea>
+        <hx-textarea
+          label="Discharge Summary"
+          name="discharge-dark"
+          disabled
+          value="Patient discharged in stable condition."
+          rows="3"
+        ></hx-textarea>
+        <hx-textarea
+          label="Allergy Notes"
+          name="allergy-dark"
+          error
+          help-text="This field cannot be left blank."
+          rows="2"
+        ></hx-textarea>
+      </div>
+    </div>
+  `,
+};
