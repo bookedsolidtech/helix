@@ -52,7 +52,7 @@ export const helixRadioStyles = css`
     border: var(--hx-border-width-medium, 2px) solid
       var(--hx-radio-border-color, var(--hx-color-neutral-300, #ced4da));
     border-radius: var(--hx-border-radius-full, 9999px);
-    background-color: var(--hx-color-neutral-0, #ffffff);
+    background-color: var(--hx-radio-bg, var(--hx-color-neutral-0, #ffffff));
     transition:
       border-color var(--hx-transition-fast, 150ms ease),
       background-color var(--hx-transition-fast, 150ms ease),
@@ -95,7 +95,7 @@ export const helixRadioStyles = css`
   /* ─── Hover State ─── */
 
   .radio:not(.radio--disabled):not(.radio--checked):hover .radio__control {
-    border-color: var(--hx-color-neutral-400, #adb5bd);
+    border-color: var(--hx-radio-hover-border-color, var(--hx-color-neutral-400, #adb5bd));
   }
 
   /* ─── Label ─── */

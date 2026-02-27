@@ -102,7 +102,7 @@ export const helixTextareaStyles = css`
   }
 
   .field__textarea::placeholder {
-    color: var(--hx-color-neutral-400, #adb5bd);
+    color: var(--hx-textarea-placeholder-color, var(--hx-color-neutral-400, #adb5bd));
   }
 
   .field__textarea:disabled {
@@ -132,7 +132,7 @@ export const helixTextareaStyles = css`
 
   .field__counter {
     font-size: var(--hx-font-size-xs, 0.75rem);
-    color: var(--hx-color-neutral-500, #6c757d);
+    color: var(--hx-textarea-counter-color, var(--hx-color-neutral-500, #6c757d));
     line-height: var(--hx-line-height-normal, 1.5);
     text-align: right;
   }
@@ -141,7 +141,7 @@ export const helixTextareaStyles = css`
 
   .field__help-text {
     font-size: var(--hx-font-size-xs, 0.75rem);
-    color: var(--hx-color-neutral-500, #6c757d);
+    color: var(--hx-textarea-help-text-color, var(--hx-color-neutral-500, #6c757d));
     line-height: var(--hx-line-height-normal, 1.5);
   }
 

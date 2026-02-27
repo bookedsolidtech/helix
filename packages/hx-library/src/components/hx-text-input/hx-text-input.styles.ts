@@ -92,7 +92,7 @@ export const helixTextInputStyles = css`
     display: flex;
     align-items: center;
     padding: 0 var(--hx-space-3, 0.75rem);
-    color: var(--hx-color-neutral-500, #6c757d);
+    color: var(--hx-input-prefix-color, var(--hx-color-neutral-500, #6c757d));
     flex-shrink: 0;
   }
 
@@ -113,7 +113,7 @@ export const helixTextInputStyles = css`
   }
 
   .field__input::placeholder {
-    color: var(--hx-color-neutral-400, #adb5bd);
+    color: var(--hx-input-placeholder-color, var(--hx-color-neutral-400, #adb5bd));
   }
 
   .field__input:disabled {
@@ -124,7 +124,7 @@ export const helixTextInputStyles = css`
 
   .field__help-text {
     font-size: var(--hx-font-size-xs, 0.75rem);
-    color: var(--hx-color-neutral-500, #6c757d);
+    color: var(--hx-input-help-text-color, var(--hx-color-neutral-500, #6c757d));
     line-height: var(--hx-line-height-normal, 1.5);
   }
 

@@ -41,7 +41,7 @@ export const helixCardStyles = css`
   }
 
   .card--featured {
-    border-color: var(--hx-color-primary-500, #2563eb);
+    border-color: var(--hx-card-featured-border-color, var(--hx-color-primary-500, #2563eb));
     border-width: var(--hx-border-width-medium, 2px);
   }
 
@@ -61,7 +61,8 @@ export const helixCardStyles = css`
   }
 
   .card--interactive:focus-visible {
-    outline: var(--hx-focus-ring-width, 2px) solid var(--hx-focus-ring-color, #2563eb);
+    outline: var(--hx-focus-ring-width, 2px) solid
+      var(--hx-card-focus-ring-color, var(--hx-focus-ring-color, #2563eb));
     outline-offset: var(--hx-focus-ring-offset, 2px);
   }
 
@@ -104,7 +105,7 @@ export const helixCardStyles = css`
     flex: 1;
     font-size: var(--hx-font-size-md, 1rem);
     line-height: var(--hx-line-height-normal, 1.5);
-    color: var(--hx-color-neutral-600, #495057);
+    color: var(--hx-card-body-color, var(--hx-color-neutral-600, #495057));
   }
 
   .card__footer {
