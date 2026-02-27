@@ -14,6 +14,7 @@ import {
   GitBranch,
 } from 'lucide-react';
 import { DOCS_URL, STORYBOOK_URL } from '@/lib/env';
+import { Analytics } from '@/components/Analytics';
 import './globals.css';
 
 export const metadata: Metadata = {
@@ -50,6 +51,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" className="dark">
       <body className="antialiased">
+        <Analytics />
         <div className="flex min-h-screen">
           {/* Sidebar */}
           <aside className="sticky top-0 h-screen w-64 border-r border-border bg-sidebar p-4 flex flex-col gap-6 shrink-0 overflow-y-auto">
