@@ -405,7 +405,9 @@ export const ThemeComparison: Story = {
         data-theme="light"
         style="padding: 2rem; background: #ffffff; display: flex; flex-direction: column; gap: 1rem;"
       >
-        <p style="margin: 0 0 1rem; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: #6b7280;">
+        <p
+          style="margin: 0 0 1rem; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: #6b7280;"
+        >
           Light Theme
         </p>
         <hx-radio-group label="Appointment Type" name="appt-radio-light">
@@ -418,7 +420,9 @@ export const ThemeComparison: Story = {
         data-theme="dark"
         style="padding: 2rem; background: #1a1a2e; display: flex; flex-direction: column; gap: 1rem;"
       >
-        <p style="margin: 0 0 1rem; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: #9ca3af;">
+        <p
+          style="margin: 0 0 1rem; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: #9ca3af;"
+        >
           Dark Theme
         </p>
         <hx-radio-group label="Appointment Type" name="appt-radio-dark">
