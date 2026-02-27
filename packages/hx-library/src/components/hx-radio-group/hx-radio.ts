@@ -5,7 +5,7 @@ import { tokenStyles } from '@helix/tokens/lit';
 import { helixRadioStyles } from './hx-radio.styles.js';
 
 /**
- * An individual radio button, designed to be used inside a `<wc-radio-group>`.
+ * An individual radio button, designed to be used inside a `<hx-radio-group>`.
  *
  * @summary Presentational radio button managed by its parent radio group.
  *
@@ -33,6 +33,7 @@ export class HelixRadio extends LitElement {
   /**
    * The value this radio represents.
    * @attr value
+   * @default ''
    */
   @property({ type: String })
   value = '';
@@ -40,6 +41,7 @@ export class HelixRadio extends LitElement {
   /**
    * Visible label text for the radio.
    * @attr label
+   * @default ''
    */
   @property({ type: String })
   label = '';
@@ -47,6 +49,7 @@ export class HelixRadio extends LitElement {
   /**
    * Whether this radio is disabled.
    * @attr disabled
+   * @default false
    */
   @property({ type: Boolean, reflect: true })
   disabled = false;
@@ -54,6 +57,7 @@ export class HelixRadio extends LitElement {
   /**
    * Whether this radio is checked. Managed by the parent group.
    * @attr checked
+   * @default false
    */
   @property({ type: Boolean, reflect: true })
   checked = false;

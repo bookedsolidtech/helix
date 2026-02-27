@@ -61,6 +61,7 @@ export class HelixSelect extends LitElement {
   /**
    * The visible label text for the select.
    * @attr label
+   * @default ''
    */
   @property({ type: String })
   label = '';
@@ -68,6 +69,7 @@ export class HelixSelect extends LitElement {
   /**
    * Placeholder option text shown as the first disabled option.
    * @attr placeholder
+   * @default ''
    */
   @property({ type: String })
   placeholder = '';
@@ -75,6 +77,7 @@ export class HelixSelect extends LitElement {
   /**
    * The current value of the select.
    * @attr value
+   * @default ''
    */
   @property({ type: String, reflect: true })
   value = '';
@@ -82,6 +85,7 @@ export class HelixSelect extends LitElement {
   /**
    * Whether the select is required for form submission.
    * @attr required
+   * @default false
    */
   @property({ type: Boolean, reflect: true })
   required = false;
@@ -89,6 +93,7 @@ export class HelixSelect extends LitElement {
   /**
    * Whether the select is disabled.
    * @attr disabled
+   * @default false
    */
   @property({ type: Boolean, reflect: true })
   disabled = false;
@@ -96,6 +101,7 @@ export class HelixSelect extends LitElement {
   /**
    * The name of the select, used for form submission.
    * @attr name
+   * @default ''
    */
   @property({ type: String })
   name = '';
@@ -103,6 +109,7 @@ export class HelixSelect extends LitElement {
   /**
    * Error message to display. When set, the select enters an error state.
    * @attr error
+   * @default ''
    */
   @property({ type: String })
   error = '';
@@ -110,6 +117,7 @@ export class HelixSelect extends LitElement {
   /**
    * Help text displayed below the select for guidance.
    * @attr help-text
+   * @default ''
    */
   @property({ type: String, attribute: 'help-text' })
   helpText = '';
@@ -117,6 +125,7 @@ export class HelixSelect extends LitElement {
   /**
    * Size variant of the select.
    * @attr hx-size
+   * @default 'md'
    */
   @property({ type: String, attribute: 'hx-size', reflect: true })
   size: 'sm' | 'md' | 'lg' = 'md';
@@ -124,6 +133,7 @@ export class HelixSelect extends LitElement {
   /**
    * Accessible name for screen readers, if different from the visible label.
    * @attr aria-label
+   * @default null
    */
   @property({ type: String, attribute: 'aria-label' })
   override ariaLabel: string | null = null;

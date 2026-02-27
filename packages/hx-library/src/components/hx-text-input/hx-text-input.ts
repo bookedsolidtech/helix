@@ -58,6 +58,7 @@ export class HelixTextInput extends LitElement {
   /**
    * The visible label text for the input.
    * @attr label
+   * @default ''
    */
   @property({ type: String })
   label = '';
@@ -65,6 +66,7 @@ export class HelixTextInput extends LitElement {
   /**
    * Placeholder text shown when the input is empty.
    * @attr placeholder
+   * @default ''
    */
   @property({ type: String })
   placeholder = '';
@@ -72,6 +74,7 @@ export class HelixTextInput extends LitElement {
   /**
    * The current value of the input.
    * @attr value
+   * @default ''
    */
   @property({ type: String })
   value = '';
@@ -79,6 +82,7 @@ export class HelixTextInput extends LitElement {
   /**
    * The type of the native input element.
    * @attr type
+   * @default 'text'
    */
   @property({ type: String })
   type: 'text' | 'email' | 'password' | 'tel' | 'url' | 'search' | 'number' = 'text';
@@ -86,6 +90,7 @@ export class HelixTextInput extends LitElement {
   /**
    * Whether the input is required for form submission.
    * @attr required
+   * @default false
    */
   @property({ type: Boolean, reflect: true })
   required = false;
@@ -93,6 +98,7 @@ export class HelixTextInput extends LitElement {
   /**
    * Whether the input is disabled.
    * @attr disabled
+   * @default false
    */
   @property({ type: Boolean, reflect: true })
   disabled = false;
@@ -100,6 +106,7 @@ export class HelixTextInput extends LitElement {
   /**
    * Error message to display. When set, the input enters an error state.
    * @attr error
+   * @default ''
    */
   @property({ type: String })
   error = '';
@@ -107,6 +114,7 @@ export class HelixTextInput extends LitElement {
   /**
    * Help text displayed below the input for guidance.
    * @attr help-text
+   * @default ''
    */
   @property({ type: String, attribute: 'help-text' })
   helpText = '';
@@ -114,6 +122,7 @@ export class HelixTextInput extends LitElement {
   /**
    * The name of the input, used for form submission.
    * @attr name
+   * @default ''
    */
   @property({ type: String })
   name = '';
@@ -121,6 +130,7 @@ export class HelixTextInput extends LitElement {
   /**
    * Accessible name for screen readers, if different from the visible label.
    * @attr aria-label
+   * @default null
    */
   @property({ type: String, attribute: 'aria-label' })
   override ariaLabel: string | null = null;

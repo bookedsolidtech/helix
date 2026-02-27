@@ -53,6 +53,7 @@ export class HelixSwitch extends LitElement {
   /**
    * Whether the switch is toggled on.
    * @attr checked
+   * @default false
    */
   @property({ type: Boolean, reflect: true })
   checked = false;
@@ -60,6 +61,7 @@ export class HelixSwitch extends LitElement {
   /**
    * Whether the switch is disabled.
    * @attr disabled
+   * @default false
    */
   @property({ type: Boolean, reflect: true })
   disabled = false;
@@ -67,6 +69,7 @@ export class HelixSwitch extends LitElement {
   /**
    * Whether the switch is required for form submission.
    * @attr required
+   * @default false
    */
   @property({ type: Boolean, reflect: true })
   required = false;
@@ -74,6 +77,7 @@ export class HelixSwitch extends LitElement {
   /**
    * The name of the switch, used for form submission.
    * @attr name
+   * @default ''
    */
   @property({ type: String })
   name = '';
@@ -81,6 +85,7 @@ export class HelixSwitch extends LitElement {
   /**
    * The value submitted when the switch is checked.
    * @attr value
+   * @default 'on'
    */
   @property({ type: String })
   value = 'on';
@@ -88,6 +93,7 @@ export class HelixSwitch extends LitElement {
   /**
    * The visible label text for the switch.
    * @attr label
+   * @default ''
    */
   @property({ type: String })
   label = '';
@@ -95,6 +101,7 @@ export class HelixSwitch extends LitElement {
   /**
    * Size variant of the switch.
    * @attr hx-size
+   * @default 'md'
    */
   @property({ type: String, reflect: true, attribute: 'hx-size' })
   size: 'sm' | 'md' | 'lg' = 'md';
@@ -102,6 +109,7 @@ export class HelixSwitch extends LitElement {
   /**
    * Error message to display. When set, the switch enters an error state.
    * @attr error
+   * @default ''
    */
   @property({ type: String })
   error = '';
@@ -109,6 +117,7 @@ export class HelixSwitch extends LitElement {
   /**
    * Help text displayed below the switch for guidance.
    * @attr help-text
+   * @default ''
    */
   @property({ type: String, attribute: 'help-text' })
   helpText = '';

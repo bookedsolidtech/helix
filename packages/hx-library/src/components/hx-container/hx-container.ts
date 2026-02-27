@@ -36,6 +36,7 @@ export class HelixContainer extends LitElement {
   /**
    * Controls the max-width of the inner content wrapper.
    * @attr width
+   * @default 'content'
    */
   @property({ type: String, reflect: true })
   width: 'full' | 'content' | 'narrow' | 'sm' | 'md' | 'lg' | 'xl' = 'content';
@@ -43,6 +44,7 @@ export class HelixContainer extends LitElement {
   /**
    * Vertical padding applied to the outer wrapper.
    * @attr padding
+   * @default 'none'
    */
   @property({ type: String, reflect: true })
   padding: 'none' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' = 'none';

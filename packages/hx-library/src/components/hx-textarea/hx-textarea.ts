@@ -58,6 +58,7 @@ export class HelixTextarea extends LitElement {
   /**
    * The visible label text for the textarea.
    * @attr label
+   * @default ''
    */
   @property({ type: String })
   label = '';
@@ -65,6 +66,7 @@ export class HelixTextarea extends LitElement {
   /**
    * Placeholder text shown when the textarea is empty.
    * @attr placeholder
+   * @default ''
    */
   @property({ type: String })
   placeholder = '';
@@ -72,6 +74,7 @@ export class HelixTextarea extends LitElement {
   /**
    * The current value of the textarea.
    * @attr value
+   * @default ''
    */
   @property({ type: String })
   value = '';
@@ -79,6 +82,7 @@ export class HelixTextarea extends LitElement {
   /**
    * Whether the textarea is required for form submission.
    * @attr required
+   * @default false
    */
   @property({ type: Boolean, reflect: true })
   required = false;
@@ -86,6 +90,7 @@ export class HelixTextarea extends LitElement {
   /**
    * Whether the textarea is disabled.
    * @attr disabled
+   * @default false
    */
   @property({ type: Boolean, reflect: true })
   disabled = false;
@@ -93,6 +98,7 @@ export class HelixTextarea extends LitElement {
   /**
    * Error message to display. When set, the textarea enters an error state.
    * @attr error
+   * @default ''
    */
   @property({ type: String })
   error = '';
@@ -100,6 +106,7 @@ export class HelixTextarea extends LitElement {
   /**
    * Help text displayed below the textarea for guidance.
    * @attr help-text
+   * @default ''
    */
   @property({ type: String, attribute: 'help-text' })
   helpText = '';
@@ -107,6 +114,7 @@ export class HelixTextarea extends LitElement {
   /**
    * The name of the textarea, used for form submission.
    * @attr name
+   * @default ''
    */
   @property({ type: String })
   name = '';
@@ -114,6 +122,7 @@ export class HelixTextarea extends LitElement {
   /**
    * The number of visible text rows.
    * @attr rows
+   * @default 4
    */
   @property({ type: Number })
   rows = 4;
@@ -121,6 +130,7 @@ export class HelixTextarea extends LitElement {
   /**
    * Maximum number of characters allowed.
    * @attr maxlength
+   * @default undefined
    */
   @property({ type: Number, attribute: 'maxlength' })
   maxlength: number | undefined;
@@ -128,6 +138,7 @@ export class HelixTextarea extends LitElement {
   /**
    * Controls how the textarea can be resized. Use 'auto' for auto-grow behavior.
    * @attr resize
+   * @default 'vertical'
    */
   @property({ type: String, reflect: true })
   resize: 'none' | 'vertical' | 'both' | 'auto' = 'vertical';
@@ -135,6 +146,7 @@ export class HelixTextarea extends LitElement {
   /**
    * Whether to show a character count below the textarea.
    * @attr show-count
+   * @default false
    */
   @property({ type: Boolean, attribute: 'show-count' })
   showCount = false;
@@ -142,6 +154,7 @@ export class HelixTextarea extends LitElement {
   /**
    * Accessible name for screen readers, if different from the visible label.
    * @attr aria-label
+   * @default null
    */
   @property({ type: String, attribute: 'aria-label' })
   override ariaLabel: string | null = null;
