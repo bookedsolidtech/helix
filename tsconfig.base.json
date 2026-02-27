@@ -13,9 +13,18 @@
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "isolatedModules": true,
+    "composite": true,
     "declaration": true,
     "declarationMap": true,
     "sourceMap": true
   },
-  "exclude": ["node_modules", "dist"]
+  "exclude": ["node_modules", "dist"],
+  "references": [
+    { "path": "./packages/hx-tokens" },
+    { "path": "./packages/hx-library" },
+    { "path": "./apps/mcp-servers/shared" },
+    { "path": "./apps/mcp-servers/cem-analyzer" },
+    { "path": "./apps/mcp-servers/health-scorer" },
+    { "path": "./apps/mcp-servers/typescript-diagnostics" }
+  ]
 }
