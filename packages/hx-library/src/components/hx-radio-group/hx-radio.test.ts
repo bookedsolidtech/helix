@@ -143,4 +143,36 @@ describe('hx-radio', () => {
       expect(violations).toEqual([]);
     });
   });
+
+  // ─── Additional ARIA ───
+
+  describe('Additional ARIA', () => {
+    it('sets aria-checked="false" when unchecked', async () => {
+      const el = await fixture<WcRadio>('<hx-radio value="a" label="A"></hx-radio>');
+      expect(el.getAttribute('aria-checked')).toBe('false');
+    });
+
+    it('sets aria-disabled="true" when disabled', async () => {
+      const el = await fixture<WcRadio>('<hx-radio value="a" label="A" disabled></hx-radio>');
+      expect(el.getAttribute('aria-disabled')).toBe('true');
+    });
+
+    it('sets aria-disabled="false" when enabled', async () => {
+      // hx-radio sets aria-disabled="false" (not absent) when disabled changes
+      // The attribute is set on any disabled property change
+      const el = await fixture<WcRadio>('<hx-radio value="a" label="A" disabled></hx-radio>');
+      el.disabled = false;
+      await el.updateComplete;
+      expect(el.getAttribute('aria-disabled')).toBe('false');
+    });
+  });
+
+  // ─── Property: label default ───
+
+  describe('Property: label default', () => {
+    it('label defaults to empty string', async () => {
+      const el = await fixture<WcRadio>('<hx-radio value="a"></hx-radio>');
+      expect(el.label).toBe('');
+    });
+  });
 });

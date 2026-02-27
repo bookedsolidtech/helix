@@ -282,6 +282,44 @@ describe('hx-form', () => {
     });
   });
 
+  // ─── Additional Properties ───
+
+  describe('Additional Properties', () => {
+    it('method="get" renders correct method on form element', async () => {
+      const el = await fixture<WcForm>('<hx-form action="/search" method="get"></hx-form>');
+      expect(el.method).toBe('get');
+      const form = el.querySelector('form');
+      expect(form?.getAttribute('method')).toBe('get');
+    });
+
+    it('getFormData returns empty FormData when no child form', async () => {
+      const el = await fixture<WcForm>('<hx-form></hx-form>');
+      const formData = el.getFormData();
+      expect(formData).toBeInstanceOf(FormData);
+      const entries: string[] = [];
+      formData.forEach((_v, key) => entries.push(key));
+      expect(entries.length).toBe(0);
+    });
+
+    it('novalidate bypasses validation on submit', async () => {
+      const el = await fixture<WcForm>(`
+        <hx-form action="" novalidate>
+          <form>
+            <input type="email" name="email" value="not-valid" required />
+            <button type="submit">Submit</button>
+          </form>
+        </hx-form>
+      `);
+
+      const form = el.querySelector('form')!;
+      const eventPromise = oneEvent<CustomEvent>(el, 'hx-submit');
+      form.dispatchEvent(new SubmitEvent('submit', { bubbles: true, cancelable: true }));
+      const event = await eventPromise;
+      // With novalidate, should dispatch hx-submit (not hx-invalid)
+      expect(event).toBeTruthy();
+    });
+  });
+
   // ─── Accessibility (3) ───
 
   describe('Accessibility (axe-core)', () => {

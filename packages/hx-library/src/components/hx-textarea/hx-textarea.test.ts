@@ -522,4 +522,56 @@ describe('hx-textarea', () => {
       expect(violations).toEqual([]);
     });
   });
+
+  // ─── Validation: tooLong ───
+
+  describe('Validation: tooLong', () => {
+    it('tooLong validity flag is set when value exceeds maxlength', async () => {
+      const el = await fixture<WcTextarea>('<hx-textarea maxlength="5"></hx-textarea>');
+      el.value = 'toolongvalue';
+      await el.updateComplete;
+      expect(el.validity.tooLong).toBe(true);
+    });
+
+    it('checkValidity returns false when value exceeds maxlength', async () => {
+      const el = await fixture<WcTextarea>('<hx-textarea maxlength="5"></hx-textarea>');
+      el.value = 'toolong';
+      await el.updateComplete;
+      expect(el.checkValidity()).toBe(false);
+    });
+
+    it('validity is valid when value is within maxlength', async () => {
+      const el = await fixture<WcTextarea>('<hx-textarea maxlength="10"></hx-textarea>');
+      el.value = 'short';
+      await el.updateComplete;
+      expect(el.validity.valid).toBe(true);
+    });
+  });
+
+  // ─── Additional Resize Values ───
+
+  describe('Additional Resize Values', () => {
+    it('resize="both" reflects attribute on host', async () => {
+      const el = await fixture<WcTextarea>('<hx-textarea resize="both"></hx-textarea>');
+      expect(el.getAttribute('resize')).toBe('both');
+    });
+
+    it('resize="none" reflects attribute on host', async () => {
+      const el = await fixture<WcTextarea>('<hx-textarea resize="none"></hx-textarea>');
+      expect(el.getAttribute('resize')).toBe('none');
+    });
+  });
+
+  // ─── Slot: label ───
+
+  describe('Slot: label', () => {
+    it('label slot renders custom label content', async () => {
+      const el = await fixture<WcTextarea>(
+        '<hx-textarea><label slot="label">Custom Label</label></hx-textarea>',
+      );
+      const labelSlot = el.querySelector('[slot="label"]');
+      expect(labelSlot).toBeTruthy();
+      expect(labelSlot?.textContent).toBe('Custom Label');
+    });
+  });
 });

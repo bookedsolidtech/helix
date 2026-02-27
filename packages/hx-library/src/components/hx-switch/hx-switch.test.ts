@@ -447,6 +447,38 @@ describe('hx-switch', () => {
     });
   });
 
+  // ─── Switch State Classes ───
+
+  describe('Switch State Classes', () => {
+    it('applies switch--checked class when checked', async () => {
+      const el = await fixture<WcSwitch>('<hx-switch checked></hx-switch>');
+      const container = shadowQuery(el, '.switch')!;
+      expect(container.classList.contains('switch--checked')).toBe(true);
+    });
+
+    it('removes switch--checked class when unchecked', async () => {
+      const el = await fixture<WcSwitch>('<hx-switch></hx-switch>');
+      const container = shadowQuery(el, '.switch')!;
+      expect(container.classList.contains('switch--checked')).toBe(false);
+    });
+
+    it('applies switch--error class when error is set', async () => {
+      const el = await fixture<WcSwitch>('<hx-switch error="Required"></hx-switch>');
+      const container = shadowQuery(el, '.switch')!;
+      expect(container.classList.contains('switch--error')).toBe(true);
+    });
+  });
+
+  // ─── Additional CSS Parts ───
+
+  describe('Additional CSS Parts', () => {
+    it('help-text part exposed when helpText is set', async () => {
+      const el = await fixture<WcSwitch>('<hx-switch help-text="Toggle to enable"></hx-switch>');
+      const helpPart = shadowQuery(el, '[part="help-text"]');
+      expect(helpPart).toBeTruthy();
+    });
+  });
+
   // ─── Accessibility (axe-core) ───
 
   describe('Accessibility (axe-core)', () => {
