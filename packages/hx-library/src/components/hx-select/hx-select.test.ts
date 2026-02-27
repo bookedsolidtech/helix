@@ -453,6 +453,34 @@ describe('hx-select', () => {
     });
   });
 
+  // ─── Field State Classes ───
+
+  describe('Field State Classes', () => {
+    it('applies field--error class when error is set', async () => {
+      const el = await fixture<WcSelect>('<hx-select error="Required field"></hx-select>');
+      const field = shadowQuery(el, '.field')!;
+      expect(field.classList.contains('field--error')).toBe(true);
+    });
+
+    it('applies field--disabled class when disabled', async () => {
+      const el = await fixture<WcSelect>('<hx-select disabled></hx-select>');
+      const field = shadowQuery(el, '.field')!;
+      expect(field.classList.contains('field--disabled')).toBe(true);
+    });
+
+    it('applies field--required class when required', async () => {
+      const el = await fixture<WcSelect>('<hx-select required></hx-select>');
+      const field = shadowQuery(el, '.field')!;
+      expect(field.classList.contains('field--required')).toBe(true);
+    });
+
+    it('does not apply field--error class without error', async () => {
+      const el = await fixture<WcSelect>('<hx-select></hx-select>');
+      const field = shadowQuery(el, '.field')!;
+      expect(field.classList.contains('field--error')).toBe(false);
+    });
+  });
+
   // ─── Accessibility (axe-core) ───
 
   describe('Accessibility (axe-core)', () => {

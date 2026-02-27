@@ -1,12 +1,5 @@
 import { describe, it, expect, afterEach } from 'vitest';
-import {
-  fixture,
-  shadowQuery,
-  _shadowQueryAll,
-  oneEvent,
-  cleanup,
-  checkA11y,
-} from '../../test-utils.js';
+import { fixture, shadowQuery, oneEvent, cleanup, checkA11y } from '../../test-utils.js';
 import type { WcRadioGroup } from './hx-radio-group.js';
 import type { WcRadio } from './hx-radio.js';
 import './index.js';
@@ -636,6 +629,62 @@ describe('hx-radio-group', () => {
       const customContent = radio.querySelector('strong');
       expect(customContent).toBeTruthy();
       expect(customContent?.textContent).toBe('Custom Label');
+    });
+  });
+
+  // ─── Additional CSS Parts ───
+
+  describe('Additional CSS Parts', () => {
+    it('exposes "help-text" CSS part when helpText is set', async () => {
+      const el = await fixture<WcRadioGroup>(`
+        <hx-radio-group label="Test" help-text="Select one">
+          <hx-radio value="a" label="A"></hx-radio>
+        </hx-radio-group>
+      `);
+      expect(shadowQuery(el, '[part="help-text"]')).toBeTruthy();
+    });
+  });
+
+  // ─── Additional Keyboard Navigation ───
+
+  describe('Additional Keyboard Navigation', () => {
+    it('ArrowLeft selects previous radio', async () => {
+      const el = await fixture<WcRadioGroup>(`
+        <hx-radio-group label="Test" value="b">
+          <hx-radio value="a" label="A"></hx-radio>
+          <hx-radio value="b" label="B"></hx-radio>
+          <hx-radio value="c" label="C"></hx-radio>
+        </hx-radio-group>
+      `);
+      const radioB = el.querySelector('hx-radio[value="b"]') as WcRadio;
+      radioB.focus();
+      const eventPromise = oneEvent<CustomEvent>(el, 'hx-change');
+      radioB.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowLeft', bubbles: true }));
+      const event = await eventPromise;
+      expect(event.detail.value).toBe('a');
+    });
+  });
+
+  // ─── Additional Validation ───
+
+  describe('Additional Validation', () => {
+    it('reportValidity returns false when required and empty', async () => {
+      const el = await fixture<WcRadioGroup>(`
+        <hx-radio-group label="Test" required>
+          <hx-radio value="a" label="A"></hx-radio>
+        </hx-radio-group>
+      `);
+      expect(el.reportValidity()).toBe(false);
+    });
+
+    it('validationMessage is set when required and empty', async () => {
+      const el = await fixture<WcRadioGroup>(`
+        <hx-radio-group label="Test" required>
+          <hx-radio value="a" label="A"></hx-radio>
+        </hx-radio-group>
+      `);
+      await el.updateComplete;
+      expect(el.validationMessage).toBeTruthy();
     });
   });
 

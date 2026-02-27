@@ -300,4 +300,37 @@ describe('hx-button', () => {
       }
     });
   });
+
+  // ─── Dynamic Property Updates ───
+
+  describe('Dynamic Property Updates', () => {
+    it('updates variant class when property changes', async () => {
+      const el = await fixture<WcButton>('<hx-button variant="primary">Click</hx-button>');
+      const btn = shadowQuery(el, 'button')!;
+      expect(btn.classList.contains('button--primary')).toBe(true);
+      el.variant = 'ghost';
+      await el.updateComplete;
+      expect(btn.classList.contains('button--ghost')).toBe(true);
+      expect(btn.classList.contains('button--primary')).toBe(false);
+    });
+
+    it('updates size class when property changes', async () => {
+      const el = await fixture<WcButton>('<hx-button hx-size="sm">Click</hx-button>');
+      const btn = shadowQuery(el, 'button')!;
+      expect(btn.classList.contains('button--sm')).toBe(true);
+      el.size = 'lg';
+      await el.updateComplete;
+      expect(btn.classList.contains('button--lg')).toBe(true);
+      expect(btn.classList.contains('button--sm')).toBe(false);
+    });
+
+    it('el.form returns the associated form when inside one', async () => {
+      const form = document.createElement('form');
+      form.innerHTML = '<hx-button type="submit">Submit</hx-button>';
+      document.getElementById('test-fixture-container')!.appendChild(form);
+      const el = form.querySelector('hx-button') as WcButton;
+      await el.updateComplete;
+      expect(el.form).toBe(form);
+    });
+  });
 });

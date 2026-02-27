@@ -235,4 +235,26 @@ describe('hx-container', () => {
       expect(inner.hasAttribute('role')).toBe(false);
     });
   });
+
+  // ─── Dynamic Property Updates ───
+
+  describe('Dynamic Property Updates', () => {
+    it('updates width class when property changes', async () => {
+      const el = await fixture<WcContainer>('<hx-container width="content">Content</hx-container>');
+      const inner = shadowQuery(el, '.container__inner')!;
+      expect(inner.classList.contains('container__inner--content')).toBe(true);
+      el.width = 'narrow';
+      await el.updateComplete;
+      expect(inner.classList.contains('container__inner--narrow')).toBe(true);
+      expect(inner.classList.contains('container__inner--content')).toBe(false);
+    });
+
+    it('updates padding attribute when property changes', async () => {
+      const el = await fixture<WcContainer>('<hx-container padding="none">Content</hx-container>');
+      expect(el.getAttribute('padding')).toBe('none');
+      el.padding = 'xl';
+      await el.updateComplete;
+      expect(el.getAttribute('padding')).toBe('xl');
+    });
+  });
 });

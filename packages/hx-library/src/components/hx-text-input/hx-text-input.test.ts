@@ -468,4 +468,70 @@ describe('hx-text-input', () => {
       expect(violations).toEqual([]);
     });
   });
+
+  // ─── Additional Type Variants ───
+
+  describe('Additional Type Variants', () => {
+    it('type="tel" sets correct type on native input', async () => {
+      const el = await fixture<WcTextInput>('<hx-text-input type="tel"></hx-text-input>');
+      const input = shadowQuery<HTMLInputElement>(el, 'input')!;
+      expect(input.getAttribute('type')).toBe('tel');
+    });
+
+    it('type="url" sets correct type on native input', async () => {
+      const el = await fixture<WcTextInput>('<hx-text-input type="url"></hx-text-input>');
+      const input = shadowQuery<HTMLInputElement>(el, 'input')!;
+      expect(input.getAttribute('type')).toBe('url');
+    });
+
+    it('type="search" sets correct type on native input', async () => {
+      const el = await fixture<WcTextInput>('<hx-text-input type="search"></hx-text-input>');
+      const input = shadowQuery<HTMLInputElement>(el, 'input')!;
+      expect(input.getAttribute('type')).toBe('search');
+    });
+  });
+
+  // ─── Field State Classes ───
+
+  describe('Field State Classes', () => {
+    it('applies field--error class when error is set', async () => {
+      const el = await fixture<WcTextInput>('<hx-text-input error="Bad input"></hx-text-input>');
+      const field = shadowQuery(el, '.field')!;
+      expect(field.classList.contains('field--error')).toBe(true);
+    });
+
+    it('does not apply field--error class when no error', async () => {
+      const el = await fixture<WcTextInput>('<hx-text-input></hx-text-input>');
+      const field = shadowQuery(el, '.field')!;
+      expect(field.classList.contains('field--error')).toBe(false);
+    });
+  });
+
+  // ─── Slot: label ───
+
+  describe('Slot: label', () => {
+    it('label slot assigns aria-labelledby to input', async () => {
+      const el = await fixture<WcTextInput>(
+        '<hx-text-input><label slot="label">Custom Label</label></hx-text-input>',
+      );
+      // Wait for slotchange to fire and update
+      await new Promise((r) => setTimeout(r, 50));
+      await el.updateComplete;
+      const input = shadowQuery<HTMLInputElement>(el, 'input')!;
+      expect(input.hasAttribute('aria-labelledby')).toBe(true);
+    });
+  });
+
+  // ─── Slot: error ───
+
+  describe('Slot: error', () => {
+    it('error slot renders custom error content', async () => {
+      const el = await fixture<WcTextInput>(
+        '<hx-text-input><span slot="error">Custom error</span></hx-text-input>',
+      );
+      const errorSlot = el.querySelector('[slot="error"]');
+      expect(errorSlot).toBeTruthy();
+      expect(errorSlot?.textContent).toBe('Custom error');
+    });
+  });
 });

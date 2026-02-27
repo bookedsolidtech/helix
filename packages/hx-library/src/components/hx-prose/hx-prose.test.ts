@@ -141,6 +141,36 @@ describe('hx-prose', () => {
     });
   });
 
+  // ─── Size CSS Property ───
+
+  describe('Size CSS Property', () => {
+    it('size="sm" sets --hx-prose-font-size CSS property', async () => {
+      const el = await fixture<WcProse>('<hx-prose size="sm"><p>Text</p></hx-prose>');
+      const fontSize = el.style.getPropertyValue('--hx-prose-font-size');
+      expect(fontSize).toBeTruthy();
+    });
+
+    it('size="lg" sets --hx-prose-font-size CSS property', async () => {
+      const el = await fixture<WcProse>('<hx-prose size="lg"><p>Text</p></hx-prose>');
+      const fontSize = el.style.getPropertyValue('--hx-prose-font-size');
+      expect(fontSize).toBeTruthy();
+    });
+
+    it('size="base" does not set --hx-prose-font-size CSS property', async () => {
+      const el = await fixture<WcProse>('<hx-prose size="base"><p>Text</p></hx-prose>');
+      const fontSize = el.style.getPropertyValue('--hx-prose-font-size');
+      expect(fontSize).toBe('');
+    });
+
+    it('clearing max-width removes inline style', async () => {
+      const el = await fixture<WcProse>('<hx-prose max-width="600px"><p>Text</p></hx-prose>');
+      expect(el.style.maxWidth).toBe('600px');
+      el.maxWidth = '';
+      await el.updateComplete;
+      expect(el.style.maxWidth).toBe('');
+    });
+  });
+
   // ─── Accessibility (3) ───
 
   describe('Accessibility (axe-core)', () => {

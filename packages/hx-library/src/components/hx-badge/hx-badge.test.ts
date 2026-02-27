@@ -257,4 +257,35 @@ describe('hx-badge', () => {
       }
     });
   });
+
+  // ─── Dynamic Property Toggles ───
+
+  describe('Dynamic Property Toggles', () => {
+    it('pill class added dynamically', async () => {
+      const el = await fixture<WcBadge>('<hx-badge>42</hx-badge>');
+      const badge = shadowQuery(el, 'span')!;
+      expect(badge.classList.contains('badge--pill')).toBe(false);
+      el.pill = true;
+      await el.updateComplete;
+      expect(badge.classList.contains('badge--pill')).toBe(true);
+    });
+
+    it('pill class removed dynamically', async () => {
+      const el = await fixture<WcBadge>('<hx-badge pill>42</hx-badge>');
+      const badge = shadowQuery(el, 'span')!;
+      expect(badge.classList.contains('badge--pill')).toBe(true);
+      el.pill = false;
+      await el.updateComplete;
+      expect(badge.classList.contains('badge--pill')).toBe(false);
+    });
+
+    it('pulse class added dynamically', async () => {
+      const el = await fixture<WcBadge>('<hx-badge>3</hx-badge>');
+      const badge = shadowQuery(el, 'span')!;
+      expect(badge.classList.contains('badge--pulse')).toBe(false);
+      el.pulse = true;
+      await el.updateComplete;
+      expect(badge.classList.contains('badge--pulse')).toBe(true);
+    });
+  });
 });

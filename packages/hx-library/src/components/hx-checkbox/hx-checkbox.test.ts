@@ -450,4 +450,28 @@ describe('hx-checkbox', () => {
       expect(violations).toEqual([]);
     });
   });
+
+  // ─── Property: name ───
+
+  describe('Property: name', () => {
+    it('sets name attribute on native input', async () => {
+      const el = await fixture<WcCheckbox>('<hx-checkbox name="agree"></hx-checkbox>');
+      const input = shadowQuery<HTMLInputElement>(el, 'input')!;
+      expect(input.getAttribute('name')).toBe('agree');
+    });
+  });
+
+  // ─── Form: additional ───
+
+  describe('Form: additional', () => {
+    it('formResetCallback resets indeterminate to false', async () => {
+      const el = await fixture<WcCheckbox>('<hx-checkbox></hx-checkbox>');
+      el.indeterminate = true;
+      await el.updateComplete;
+      expect(el.indeterminate).toBe(true);
+      el.formResetCallback();
+      await el.updateComplete;
+      expect(el.indeterminate).toBe(false);
+    });
+  });
 });

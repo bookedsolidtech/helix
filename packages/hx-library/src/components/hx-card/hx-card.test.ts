@@ -1,13 +1,6 @@
 import { describe, it, expect, afterEach } from 'vitest';
 import { page } from '@vitest/browser/context';
-import {
-  fixture,
-  shadowQuery,
-  _shadowQueryAll,
-  oneEvent,
-  cleanup,
-  checkA11y,
-} from '../../test-utils.js';
+import { fixture, shadowQuery, oneEvent, cleanup, checkA11y } from '../../test-utils.js';
 import type { WcCard } from './hx-card.js';
 import './index.js';
 
@@ -343,6 +336,50 @@ describe('hx-card', () => {
         expect(violations, `variant="${variant}" should have no violations`).toEqual([]);
         el.remove();
       }
+    });
+  });
+
+  // ─── Additional CSS Parts ───
+
+  describe('Additional CSS Parts', () => {
+    it('image part exposed', async () => {
+      const el = await fixture<WcCard>(
+        '<hx-card><img slot="image" src="test.jpg" alt="test" />Body</hx-card>',
+      );
+      const imagePart = shadowQuery(el, '[part="image"]');
+      expect(imagePart).toBeTruthy();
+    });
+
+    it('actions part exposed', async () => {
+      const el = await fixture<WcCard>(
+        '<hx-card><button slot="actions">Act</button>Body</hx-card>',
+      );
+      const actionsPart = shadowQuery(el, '[part="actions"]');
+      expect(actionsPart).toBeTruthy();
+    });
+  });
+
+  // ─── Dynamic Property Updates ───
+
+  describe('Dynamic Property Updates', () => {
+    it('variant reflects to host attribute when changed', async () => {
+      const el = await fixture<WcCard>('<hx-card>Content</hx-card>');
+      expect(el.getAttribute('variant')).toBe('default');
+      el.variant = 'featured';
+      await el.updateComplete;
+      expect(el.getAttribute('variant')).toBe('featured');
+      const card = shadowQuery(el, '.card')!;
+      expect(card.classList.contains('card--featured')).toBe(true);
+    });
+
+    it('elevation reflects to host attribute when changed', async () => {
+      const el = await fixture<WcCard>('<hx-card>Content</hx-card>');
+      expect(el.getAttribute('elevation')).toBe('flat');
+      el.elevation = 'floating';
+      await el.updateComplete;
+      expect(el.getAttribute('elevation')).toBe('floating');
+      const card = shadowQuery(el, '.card')!;
+      expect(card.classList.contains('card--floating')).toBe(true);
     });
   });
 });

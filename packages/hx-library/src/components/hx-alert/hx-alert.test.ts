@@ -1,13 +1,6 @@
 import { describe, it, expect, afterEach } from 'vitest';
 import { page } from '@vitest/browser/context';
-import {
-  fixture,
-  shadowQuery,
-  _shadowQueryAll,
-  oneEvent,
-  cleanup,
-  checkA11y,
-} from '../../test-utils.js';
+import { fixture, shadowQuery, oneEvent, cleanup, checkA11y } from '../../test-utils.js';
 import type { WcAlert } from './hx-alert.js';
 import './index.js';
 
@@ -337,6 +330,52 @@ describe('hx-alert', () => {
       await page.screenshot();
       const { violations } = await checkA11y(el);
       expect(violations).toEqual([]);
+    });
+  });
+
+  // ─── Dynamic Property Updates ───
+
+  describe('Dynamic Property Updates', () => {
+    it('updates variant class when property changes', async () => {
+      const el = await fixture<WcAlert>('<hx-alert variant="info">Test</hx-alert>');
+      el.variant = 'error';
+      await el.updateComplete;
+      const alert = shadowQuery(el, '.alert')!;
+      expect(alert.classList.contains('alert--error')).toBe(true);
+      expect(alert.classList.contains('alert--info')).toBe(false);
+    });
+
+    it('updates role when variant changes to error', async () => {
+      const el = await fixture<WcAlert>('<hx-alert variant="info">Test</hx-alert>');
+      const alert = shadowQuery(el, '.alert')!;
+      expect(alert.getAttribute('role')).toBe('status');
+      el.variant = 'error';
+      await el.updateComplete;
+      expect(alert.getAttribute('role')).toBe('alert');
+    });
+
+    it('updates aria-live to assertive for warning variant', async () => {
+      const el = await fixture<WcAlert>('<hx-alert variant="warning">Warning</hx-alert>');
+      const alert = shadowQuery(el, '.alert')!;
+      expect(alert.getAttribute('aria-live')).toBe('assertive');
+    });
+
+    it('shows close button when closable becomes true', async () => {
+      const el = await fixture<WcAlert>('<hx-alert>Test</hx-alert>');
+      expect(shadowQuery(el, '.alert__close-button')).toBeNull();
+      el.closable = true;
+      await el.updateComplete;
+      expect(shadowQuery(el, '.alert__close-button')).toBeTruthy();
+    });
+
+    it('re-opens alert by setting open to true', async () => {
+      const el = await fixture<WcAlert>('<hx-alert closable>Test</hx-alert>');
+      el.open = false;
+      await el.updateComplete;
+      expect(el.hasAttribute('open')).toBe(false);
+      el.open = true;
+      await el.updateComplete;
+      expect(el.hasAttribute('open')).toBe(true);
     });
   });
 });
