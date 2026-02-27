@@ -1154,3 +1154,57 @@ export const LabResultStatus: Story = {
     await expect(inProgressSpan?.classList.contains('badge--pulse')).toBe(true);
   },
 };
+
+// ─────────────────────────────────────────────────
+// THEME COMPARISON — Light and Dark side by side
+// ─────────────────────────────────────────────────
+
+export const ThemeComparison: Story = {
+  parameters: {
+    backgrounds: { disable: true },
+  },
+  render: () => html`
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0; min-height: 200px;">
+      <div
+        data-theme="light"
+        style="padding: 2rem; background: #ffffff; display: flex; flex-direction: column; gap: 1rem;"
+      >
+        <p style="margin: 0 0 1rem; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: #6b7280;">
+          Light Theme
+        </p>
+        <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center;">
+          <hx-badge variant="primary">Active</hx-badge>
+          <hx-badge variant="success">Stable</hx-badge>
+          <hx-badge variant="warning">Monitoring</hx-badge>
+          <hx-badge variant="error" pulse>Critical</hx-badge>
+          <hx-badge variant="neutral">Discharged</hx-badge>
+        </div>
+        <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center;">
+          <hx-badge variant="primary" pill hx-size="sm">ICU</hx-badge>
+          <hx-badge variant="success" pill hx-size="md">Surgery</hx-badge>
+          <hx-badge variant="warning" pill hx-size="lg">Oncology</hx-badge>
+        </div>
+      </div>
+      <div
+        data-theme="dark"
+        style="padding: 2rem; background: #1a1a2e; display: flex; flex-direction: column; gap: 1rem;"
+      >
+        <p style="margin: 0 0 1rem; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: #9ca3af;">
+          Dark Theme
+        </p>
+        <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center;">
+          <hx-badge variant="primary">Active</hx-badge>
+          <hx-badge variant="success">Stable</hx-badge>
+          <hx-badge variant="warning">Monitoring</hx-badge>
+          <hx-badge variant="error" pulse>Critical</hx-badge>
+          <hx-badge variant="neutral">Discharged</hx-badge>
+        </div>
+        <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center;">
+          <hx-badge variant="primary" pill hx-size="sm">ICU</hx-badge>
+          <hx-badge variant="success" pill hx-size="md">Surgery</hx-badge>
+          <hx-badge variant="warning" pill hx-size="lg">Oncology</hx-badge>
+        </div>
+      </div>
+    </div>
+  `,
+};

@@ -1320,3 +1320,59 @@ export const PriorityLevel: Story = {
     </div>
   `,
 };
+
+// ─────────────────────────────────────────────────
+// THEME COMPARISON — Light and Dark side by side
+// ─────────────────────────────────────────────────
+
+export const ThemeComparison: Story = {
+  parameters: {
+    backgrounds: { disable: true },
+  },
+  render: () => html`
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0; min-height: 200px;">
+      <div
+        data-theme="light"
+        style="padding: 2rem; background: #ffffff; display: flex; flex-direction: column; gap: 1rem;"
+      >
+        <p style="margin: 0 0 1rem; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: #6b7280;">
+          Light Theme
+        </p>
+        <hx-select label="Department" name="dept-light" placeholder="Select department">
+          <option value="cardiology">Cardiology</option>
+          <option value="oncology">Oncology</option>
+          <option value="neurology">Neurology</option>
+        </hx-select>
+        <hx-select label="Priority" name="priority-light" disabled value="routine">
+          <option value="stat">STAT</option>
+          <option value="urgent">Urgent</option>
+          <option value="routine">Routine</option>
+        </hx-select>
+        <hx-select label="Unit" name="unit-light" error help-text="Please select a unit.">
+          <option value="">Select unit</option>
+        </hx-select>
+      </div>
+      <div
+        data-theme="dark"
+        style="padding: 2rem; background: #1a1a2e; display: flex; flex-direction: column; gap: 1rem;"
+      >
+        <p style="margin: 0 0 1rem; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: #9ca3af;">
+          Dark Theme
+        </p>
+        <hx-select label="Department" name="dept-dark" placeholder="Select department">
+          <option value="cardiology">Cardiology</option>
+          <option value="oncology">Oncology</option>
+          <option value="neurology">Neurology</option>
+        </hx-select>
+        <hx-select label="Priority" name="priority-dark" disabled value="routine">
+          <option value="stat">STAT</option>
+          <option value="urgent">Urgent</option>
+          <option value="routine">Routine</option>
+        </hx-select>
+        <hx-select label="Unit" name="unit-dark" error help-text="Please select a unit.">
+          <option value="">Select unit</option>
+        </hx-select>
+      </div>
+    </div>
+  `,
+};

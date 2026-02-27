@@ -2288,3 +2288,51 @@ export const PolicyDocument: Story = {
     </hx-prose>
   `,
 };
+
+// ─────────────────────────────────────────────────
+// THEME COMPARISON — Light and Dark side by side
+// ─────────────────────────────────────────────────
+
+export const ThemeComparison: Story = {
+  parameters: {
+    backgrounds: { disable: true },
+  },
+  render: () => html`
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0; min-height: 200px;">
+      <div
+        data-theme="light"
+        style="padding: 2rem; background: #ffffff;"
+      >
+        <p style="margin: 0 0 1rem; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: #6b7280;">
+          Light Theme
+        </p>
+        <hx-prose>
+          <h2>Patient Care Guidelines</h2>
+          <p>Follow evidence-based protocols for all clinical decisions. Document all interventions in the patient record.</p>
+          <ul>
+            <li>Assess patient every 4 hours</li>
+            <li>Update care plan daily</li>
+            <li>Communicate changes to the care team</li>
+          </ul>
+        </hx-prose>
+      </div>
+      <div
+        data-theme="dark"
+        style="padding: 2rem; background: #1a1a2e;"
+      >
+        <p style="margin: 0 0 1rem; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: #9ca3af;">
+          Dark Theme
+        </p>
+        <hx-prose>
+          <h2>Patient Care Guidelines</h2>
+          <p>Follow evidence-based protocols for all clinical decisions. Document all interventions in the patient record.</p>
+          <ul>
+            <li>Assess patient every 4 hours</li>
+            <li>Update care plan daily</li>
+            <li>Communicate changes to the care team</li>
+          </ul>
+        </hx-prose>
+      </div>
+    </div>
+  `,
+};

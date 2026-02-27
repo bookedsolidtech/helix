@@ -1009,3 +1009,39 @@ export const ClinicalAlerts: Story = {
     </div>
   `,
 };
+
+// ─────────────────────────────────────────────────
+// THEME COMPARISON — Light and Dark side by side
+// ─────────────────────────────────────────────────
+
+export const ThemeComparison: Story = {
+  parameters: {
+    backgrounds: { disable: true },
+  },
+  render: () => html`
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0; min-height: 200px;">
+      <div
+        data-theme="light"
+        style="padding: 2rem; background: #ffffff; display: flex; flex-direction: column; gap: 1rem;"
+      >
+        <p style="margin: 0 0 1rem; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: #6b7280;">
+          Light Theme
+        </p>
+        <hx-switch label="Enable fall risk alerts" name="fall-light" checked help-text="Notify staff when patient is at risk."></hx-switch>
+        <hx-switch label="Do Not Resuscitate" name="dnr-light"></hx-switch>
+        <hx-switch label="Isolation precautions" name="iso-light" disabled checked help-text="Set by infection control."></hx-switch>
+      </div>
+      <div
+        data-theme="dark"
+        style="padding: 2rem; background: #1a1a2e; display: flex; flex-direction: column; gap: 1rem;"
+      >
+        <p style="margin: 0 0 1rem; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: #9ca3af;">
+          Dark Theme
+        </p>
+        <hx-switch label="Enable fall risk alerts" name="fall-dark" checked help-text="Notify staff when patient is at risk."></hx-switch>
+        <hx-switch label="Do Not Resuscitate" name="dnr-dark"></hx-switch>
+        <hx-switch label="Isolation precautions" name="iso-dark" disabled checked help-text="Set by infection control."></hx-switch>
+      </div>
+    </div>
+  `,
+};
