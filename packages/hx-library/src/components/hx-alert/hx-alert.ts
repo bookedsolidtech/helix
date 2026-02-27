@@ -75,16 +75,6 @@ export class HelixAlert extends LitElement {
     return this.variant === 'error' || this.variant === 'warning';
   }
 
-  /** Returns the appropriate ARIA role based on variant. */
-  private get _role(): string {
-    return this._isAssertive ? 'alert' : 'status';
-  }
-
-  /** Returns the appropriate aria-live value based on variant. */
-  private get _ariaLive(): string {
-    return this._isAssertive ? 'assertive' : 'polite';
-  }
-
   // ─── Default Icons ───
 
   private _renderInfoIcon() {
@@ -119,7 +109,56 @@ export class HelixAlert extends LitElement {
     </svg>`;
   }
 
-  private _renderDefaultIcon() {
+  private _renderCloseIcon() {
+    return html`<svg viewBox="0 0 20 20" aria-hidden="true">
+      <path
+        d="M6.28 5.22a.75.75 0 00-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 101.06 1.06L10 11.06l3.72 3.72a.75.75 0 101.06-1.06L11.06 10l3.72-3.72a.75.75 0 00-1.06-1.06L10 8.94 6.28 5.22z"
+      />
+    </svg>`;
+  }
+
+  // ─── Extension API ───
+
+  /**
+   * Override to customize the CSS classes applied to the alert container.
+   * Called during render. Merge with super's result to preserve base styling.
+   * @protected
+   * @since 1.0.0
+   */
+  protected getAlertClasses(): Record<string, boolean> {
+    return {
+      alert: true,
+      [`alert--${this.variant}`]: true,
+    };
+  }
+
+  /**
+   * Override to customize the ARIA role based on variant or custom logic.
+   * Defaults to 'alert' for error/warning variants, 'status' for others.
+   * @protected
+   * @since 1.0.0
+   */
+  protected getAriaRole(): string {
+    return this._isAssertive ? 'alert' : 'status';
+  }
+
+  /**
+   * Override to customize the aria-live value based on variant or custom logic.
+   * Defaults to 'assertive' for error/warning variants, 'polite' for others.
+   * @protected
+   * @since 1.0.0
+   */
+  protected getAriaLive(): string {
+    return this._isAssertive ? 'assertive' : 'polite';
+  }
+
+  /**
+   * Override to customize the default icon rendered for the current variant.
+   * Subclasses can return custom icons or html`${nothing}` to suppress the icon.
+   * @protected
+   * @since 1.0.0
+   */
+  protected renderDefaultIcon(): unknown {
     switch (this.variant) {
       case 'success':
         return this._renderSuccessIcon();
@@ -133,17 +172,32 @@ export class HelixAlert extends LitElement {
     }
   }
 
-  private _renderCloseIcon() {
-    return html`<svg viewBox="0 0 20 20" aria-hidden="true">
-      <path
-        d="M6.28 5.22a.75.75 0 00-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 101.06 1.06L10 11.06l3.72 3.72a.75.75 0 101.06-1.06L11.06 10l3.72-3.72a.75.75 0 00-1.06-1.06L10 8.94 6.28 5.22z"
-      />
-    </svg>`;
+  /**
+   * Override to customize the close button rendered when closable is true.
+   * Return nothing to suppress the close button entirely.
+   * @protected
+   * @since 1.0.0
+   */
+  protected renderCloseButton(): unknown {
+    return html`
+      <button
+        part="close-button"
+        class="alert__close-button"
+        aria-label="Close"
+        @click=${this.handleClose}
+      >
+        ${this._renderCloseIcon()}
+      </button>
+    `;
   }
 
-  // ─── Event Handling ───
-
-  private _handleClose(): void {
+  /**
+   * Handles the close action: sets open to false and dispatches close events.
+   * Override to add custom close behavior (e.g., animation before hiding).
+   * @protected
+   * @since 1.0.0
+   */
+  protected handleClose(): void {
     this.open = false;
 
     /**
@@ -173,15 +227,15 @@ export class HelixAlert extends LitElement {
   // ─── Render ───
 
   override render() {
-    const classes = {
-      alert: true,
-      [`alert--${this.variant}`]: true,
-    };
-
     return html`
-      <div part="alert" class=${classMap(classes)} role=${this._role} aria-live=${this._ariaLive}>
+      <div
+        part="alert"
+        class=${classMap(this.getAlertClasses())}
+        role=${this.getAriaRole()}
+        aria-live=${this.getAriaLive()}
+      >
         <div part="icon" class="alert__icon">
-          <slot name="icon">${this._renderDefaultIcon()}</slot>
+          <slot name="icon">${this.renderDefaultIcon()}</slot>
         </div>
 
         <div part="message" class="alert__message">
@@ -191,18 +245,7 @@ export class HelixAlert extends LitElement {
           </div>
         </div>
 
-        ${this.closable
-          ? html`
-              <button
-                part="close-button"
-                class="alert__close-button"
-                aria-label="Close"
-                @click=${this._handleClose}
-              >
-                ${this._renderCloseIcon()}
-              </button>
-            `
-          : nothing}
+        ${this.closable ? this.renderCloseButton() : nothing}
       </div>
     `;
   }

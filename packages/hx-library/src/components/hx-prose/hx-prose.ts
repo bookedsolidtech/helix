@@ -61,28 +61,47 @@ export class HelixProse extends LitElement {
   override connectedCallback(): void {
     super.connectedCallback();
     this.style.display = 'block';
-    this._applyMaxWidth();
+    this.applyMaxWidth(this.maxWidth);
     this._applySize();
   }
 
   override updated(changedProperties: Map<string, unknown>): void {
     if (changedProperties.has('maxWidth')) {
-      this._applyMaxWidth();
+      this.applyMaxWidth(this.maxWidth);
     }
     if (changedProperties.has('size')) {
       this._applySize();
     }
   }
 
-  // ─── Private ───
+  // ─── Extension API ───
 
-  private _applyMaxWidth(): void {
-    if (this.maxWidth) {
-      this.style.maxWidth = this.maxWidth;
+  /**
+   * Override to customize how the max-width value is applied to the host element.
+   * Called in connectedCallback and whenever the maxWidth property changes.
+   * The default implementation sets this.style.maxWidth directly.
+   * @protected
+   * @since 1.0.0
+   */
+  protected applyMaxWidth(value: string): void {
+    if (value) {
+      this.style.maxWidth = value;
     } else {
       this.style.maxWidth = '';
     }
   }
+
+  /**
+   * Override to customize the content rendered inside the prose container.
+   * Defaults to a single default slot.
+   * @protected
+   * @since 1.0.0
+   */
+  protected renderContent(): unknown {
+    return html`<slot></slot>`;
+  }
+
+  // ─── Private ───
 
   private _applySize(): void {
     const sizeMap: Record<string, string> = {
@@ -102,7 +121,7 @@ export class HelixProse extends LitElement {
   // ─── Render ───
 
   override render() {
-    return html`<slot></slot>`;
+    return this.renderContent();
   }
 }
 

@@ -142,10 +142,10 @@ export class HelixCheckbox extends LitElement {
     super.updated(changedProperties);
     if (changedProperties.has('checked') || changedProperties.has('value')) {
       this._internals.setFormValue(this.checked ? this.value : null);
-      this._updateValidity();
+      this.updateValidity();
     }
     if (changedProperties.has('required')) {
-      this._updateValidity();
+      this.updateValidity();
     }
   }
 
@@ -176,18 +176,6 @@ export class HelixCheckbox extends LitElement {
     return this._internals.reportValidity();
   }
 
-  private _updateValidity(): void {
-    if (this.required && !this.checked) {
-      this._internals.setValidity(
-        { valueMissing: true },
-        this.error || 'This field is required.',
-        this._inputEl ?? undefined,
-      );
-    } else {
-      this._internals.setValidity({});
-    }
-  }
-
   /** Called by the form when it resets. */
   formResetCallback(): void {
     this.checked = false;
@@ -205,11 +193,13 @@ export class HelixCheckbox extends LitElement {
   private _handleChange(): void {
     if (this.disabled) return;
 
+    if (!this.shouldHandleChange(new Event('change'))) return;
+
     this.indeterminate = false;
     this.checked = !this.checked;
 
     this._internals.setFormValue(this.checked ? this.value : null);
-    this._updateValidity();
+    this.updateValidity();
 
     /**
      * Dispatched when the checkbox is toggled.
@@ -238,6 +228,55 @@ export class HelixCheckbox extends LitElement {
     this._inputEl?.focus(options);
   }
 
+  // ─── Extension API ───
+
+  /**
+   * Override to customize the CSS classes applied to the checkbox field wrapper.
+   * Called during render. Merge with super's result to preserve base styling.
+   * @protected
+   * @since 1.0.0
+   */
+  protected getCheckboxClasses(): Record<string, boolean> {
+    const hasError = !!this.error;
+    return {
+      checkbox: true,
+      'checkbox--checked': this.checked,
+      'checkbox--indeterminate': this.indeterminate,
+      'checkbox--error': hasError,
+      'checkbox--disabled': this.disabled,
+      'checkbox--required': this.required,
+    };
+  }
+
+  /**
+   * Override to provide custom validation logic.
+   * Called whenever checked, value, or required changes.
+   * Use this._internals to set validity state.
+   * @protected
+   * @since 1.0.0
+   */
+  protected updateValidity(): void {
+    if (this.required && !this.checked) {
+      this._internals.setValidity(
+        { valueMissing: true },
+        this.error || 'This field is required.',
+        this._inputEl ?? undefined,
+      );
+    } else {
+      this._internals.setValidity({});
+    }
+  }
+
+  /**
+   * Called before the change is processed. Return false to cancel the toggle.
+   * Only invoked when the checkbox is not disabled.
+   * @protected
+   * @since 1.0.0
+   */
+  protected shouldHandleChange(_e: Event): boolean {
+    return true;
+  }
+
   // ─── Render ───
 
   private _id = `hx-checkbox-${Math.random().toString(36).slice(2, 9)}`;
@@ -248,15 +287,6 @@ export class HelixCheckbox extends LitElement {
   override render() {
     const hasError = !!this.error;
 
-    const containerClasses = {
-      checkbox: true,
-      'checkbox--checked': this.checked,
-      'checkbox--indeterminate': this.indeterminate,
-      'checkbox--error': hasError,
-      'checkbox--disabled': this.disabled,
-      'checkbox--required': this.required,
-    };
-
     const describedBy =
       [
         hasError || this._hasErrorSlot ? this._errorId : null,
@@ -266,7 +296,7 @@ export class HelixCheckbox extends LitElement {
         .join(' ') || undefined;
 
     return html`
-      <div class=${classMap(containerClasses)}>
+      <div class=${classMap(this.getCheckboxClasses())}>
         <label
           part="control"
           class="checkbox__control"

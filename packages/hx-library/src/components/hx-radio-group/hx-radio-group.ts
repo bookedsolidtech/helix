@@ -147,7 +147,7 @@ export class HelixRadioGroup extends LitElement {
     if (changedProperties.has('value')) {
       this._internals.setFormValue(this.value || null);
       this._syncRadios();
-      this._updateValidity();
+      this.updateValidity();
     }
     if (changedProperties.has('disabled')) {
       this._syncRadios();
@@ -216,7 +216,7 @@ export class HelixRadioGroup extends LitElement {
     this.value = newValue;
     this._internals.setFormValue(this.value);
     this._syncRadios();
-    this._updateValidity();
+    this.updateValidity();
 
     /**
      * Dispatched when the selected radio changes.
@@ -299,18 +299,6 @@ export class HelixRadioGroup extends LitElement {
     return this._internals.reportValidity();
   }
 
-  private _updateValidity(): void {
-    if (this.required && !this.value) {
-      this._internals.setValidity(
-        { valueMissing: true },
-        this.error || 'Please select an option.',
-        this._groupEl ?? undefined,
-      );
-    } else {
-      this._internals.setValidity({});
-    }
-  }
-
   /** Called by the form when it resets. */
   formResetCallback(): void {
     this.value = '';
@@ -323,20 +311,49 @@ export class HelixRadioGroup extends LitElement {
     this.value = state;
   }
 
-  // ─── Render ───
+  // ─── Extension API ───
 
-  override render() {
+  /**
+   * Override to customize the CSS classes applied to the fieldset wrapper.
+   * Called during render. Merge with super's result to preserve base styling.
+   * @protected
+   * @since 1.0.0
+   */
+  protected getGroupClasses(): Record<string, boolean> {
     const hasError = !!this.error;
-
-    const fieldsetClasses = {
+    return {
       fieldset: true,
       'fieldset--error': hasError,
       'fieldset--disabled': this.disabled,
       'fieldset--required': this.required,
     };
+  }
+
+  /**
+   * Override to provide custom validation logic.
+   * Called whenever value changes. Use this._internals to set validity state.
+   * @protected
+   * @since 1.0.0
+   */
+  protected updateValidity(): void {
+    if (this.required && !this.value) {
+      this._internals.setValidity(
+        { valueMissing: true },
+        this.error || 'Please select an option.',
+        this._groupEl ?? undefined,
+      );
+    } else {
+      this._internals.setValidity({});
+    }
+  }
+
+  // ─── Render ───
+
+  override render() {
+    const hasError = !!this.error;
 
     return html`
-      <fieldset part="fieldset" class=${classMap(fieldsetClasses)}>
+      <fieldset part="fieldset" class=${classMap(this.getGroupClasses())}>
         ${this.label
           ? html`
               <legend part="legend" class="fieldset__legend">

@@ -164,7 +164,7 @@ export class HelixSelect extends LitElement {
     super.updated(changedProperties);
     if (changedProperties.has('value')) {
       this._internals.setFormValue(this.value);
-      this._updateValidity();
+      this.updateValidity();
       // Sync the native select's value after cloned options are in place
       if (this._select && this._select.value !== this.value) {
         this._select.value = this.value;
@@ -197,18 +197,6 @@ export class HelixSelect extends LitElement {
   /** Reports validity and shows the browser's constraint validation UI. */
   reportValidity(): boolean {
     return this._internals.reportValidity();
-  }
-
-  private _updateValidity(): void {
-    if (this.required && !this.value) {
-      this._internals.setValidity(
-        { valueMissing: true },
-        this.error || 'Please select an option.',
-        this._select,
-      );
-    } else {
-      this._internals.setValidity({});
-    }
   }
 
   // Called by the form when it resets
@@ -262,10 +250,12 @@ export class HelixSelect extends LitElement {
   // ─── Event Handling ───
 
   private _handleChange(e: Event): void {
+    if (!this.shouldHandleChange(e)) return;
+
     const target = e.target as HTMLSelectElement;
     this.value = target.value;
     this._internals.setFormValue(this.value);
-    this._updateValidity();
+    this.updateValidity();
 
     /**
      * Dispatched when the selected option changes.
@@ -287,6 +277,51 @@ export class HelixSelect extends LitElement {
     this._select?.focus(options);
   }
 
+  // ─── Extension API ───
+
+  /**
+   * Override to customize the CSS classes applied to the outer field container.
+   * Called during render. Merge with super's result to preserve base styling.
+   * @protected
+   * @since 1.0.0
+   */
+  protected getSelectClasses(): Record<string, boolean> {
+    const hasError = !!this.error;
+    return {
+      field: true,
+      'field--error': hasError,
+      'field--disabled': this.disabled,
+      'field--required': this.required,
+    };
+  }
+
+  /**
+   * Override to provide custom validation logic.
+   * Called whenever value changes. Use this._internals to set validity state.
+   * @protected
+   * @since 1.0.0
+   */
+  protected updateValidity(): void {
+    if (this.required && !this.value) {
+      this._internals.setValidity(
+        { valueMissing: true },
+        this.error || 'Please select an option.',
+        this._select,
+      );
+    } else {
+      this._internals.setValidity({});
+    }
+  }
+
+  /**
+   * Called before the change is processed. Return false to cancel the change.
+   * @protected
+   * @since 1.0.0
+   */
+  protected shouldHandleChange(_e: Event): boolean {
+    return true;
+  }
+
   // ─── Render ───
 
   private _selectId = `hx-select-${Math.random().toString(36).slice(2, 9)}`;
@@ -295,13 +330,6 @@ export class HelixSelect extends LitElement {
 
   override render() {
     const hasError = !!this.error;
-
-    const fieldClasses = {
-      field: true,
-      'field--error': hasError,
-      'field--disabled': this.disabled,
-      'field--required': this.required,
-    };
 
     const selectClasses = {
       field__select: true,
@@ -317,7 +345,7 @@ export class HelixSelect extends LitElement {
         .join(' ') || undefined;
 
     return html`
-      <div part="field" class=${classMap(fieldClasses)}>
+      <div part="field" class=${classMap(this.getSelectClasses())}>
         <slot name="label" @slotchange=${this._handleLabelSlotChange}>
           ${this.label
             ? html`<label part="label" class="field__label" for=${this._selectId}>
