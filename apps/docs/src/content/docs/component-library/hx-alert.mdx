@@ -57,3 +57,181 @@ Use the `actions` slot to add action buttons inside the alert.
 ## API Reference
 
 <ComponentDoc tagName="hx-alert" section="api" />
+
+## Accessibility
+
+`hx-alert` implements the [ARIA alert pattern](https://www.w3.org/WAI/ARIA/apg/patterns/alert/) and the ARIA live region pattern for accessible status announcements.
+
+### ARIA Roles and Attributes
+
+| Variant | Role | `aria-live` | Announcement |
+|---------|------|-------------|--------------|
+| `info` | `status` | `polite` | Announced when user is idle |
+| `success` | `status` | `polite` | Announced when user is idle |
+| `warning` | `alert` | `assertive` | Announced immediately |
+| `error` | `alert` | `assertive` | Announced immediately |
+
+The component automatically selects the correct role and live region based on the `variant` attribute. You do not need to set ARIA attributes manually.
+
+### Keyboard Interaction
+
+| Key | Action |
+|-----|--------|
+| `Tab` | Move focus into the alert (when `closable`) |
+| `Enter` / `Space` | Dismiss the alert (when focused on close button) |
+| `Escape` | No default behavior — handle in containing context |
+
+### Screen Reader Behavior
+
+- **Warning and error** alerts announce immediately via `aria-live="assertive"` — use sparingly to avoid interrupting workflows.
+- **Info and success** alerts announce politely via `aria-live="polite"`.
+- The close button is labeled "Dismiss alert" for screen reader users.
+- When closed, focus is not moved automatically — manage focus in the `hx-after-close` event handler.
+
+### Healthcare Compliance Notes
+
+In healthcare UIs, alert severity must match clinical urgency:
+- Use `error` for critical patient safety issues that require immediate attention.
+- Use `warning` for time-sensitive notices that need prompt action.
+- Use `info` for informational messages that do not require immediate action.
+- Never suppress `error` alerts programmatically without logging.
+
+```html
+<!-- Critical patient safety alert -->
+<hx-alert variant="error">
+  Patient allergy conflict detected — review before administering medication.
+</hx-alert>
+```
+
+## Drupal Integration
+
+### Twig Template
+
+```twig
+{# templates/components/alert.html.twig #}
+<hx-alert
+  variant="{{ variant|default('info') }}"
+  {{ closable ? 'closable' : '' }}
+  {{ not open ? 'open="false"' : '' }}
+>
+  {{ message }}
+  {% if actions %}
+    <div slot="actions">
+      {{ actions }}
+    </div>
+  {% endif %}
+</hx-alert>
+```
+
+### Drupal Messages Integration
+
+```twig
+{# Display Drupal system messages as hx-alerts #}
+{% for type, messages in drupal_messages %}
+  {% set variant = type == 'error' ? 'error' : (type == 'warning' ? 'warning' : (type == 'status' ? 'success' : 'info')) %}
+  {% for message in messages %}
+    <hx-alert variant="{{ variant }}" closable>
+      {{ message }}
+    </hx-alert>
+  {% endfor %}
+{% endfor %}
+```
+
+### Drupal Library
+
+```yaml
+# mymodule.libraries.yml
+mymodule/alert:
+  dependencies:
+    - helix/hx-alert
+```
+
+## Theming
+
+Override CSS custom properties on the host element or in your theme stylesheet.
+
+### Available Tokens
+
+| Token | Default | Description |
+|-------|---------|-------------|
+| `--hx-alert-bg` | `var(--hx-color-info-50)` | Alert background color |
+| `--hx-alert-color` | `var(--hx-color-info-800)` | Alert text color |
+| `--hx-alert-border-color` | `var(--hx-color-info-200)` | Alert border color |
+| `--hx-alert-border-radius` | `var(--hx-border-radius-md)` | Alert border radius |
+| `--hx-alert-border-width` | `var(--hx-border-width-thin)` | Alert border width |
+| `--hx-alert-padding` | `var(--hx-space-4)` | Alert padding |
+| `--hx-alert-gap` | `var(--hx-space-3)` | Gap between alert elements |
+| `--hx-alert-icon-color` | `var(--hx-color-info-500)` | Alert icon color |
+| `--hx-alert-font-family` | `var(--hx-font-family-sans)` | Alert font family |
+
+### Override Example
+
+```css
+/* In your theme stylesheet */
+hx-alert[variant="error"] {
+  --hx-alert-bg: #fff0f0;
+  --hx-alert-border-color: #c00;
+  --hx-alert-icon-color: #c00;
+}
+```
+
+### CSS Parts
+
+Use `::part()` for surgical style overrides that cannot be achieved with tokens:
+
+```css
+hx-alert::part(alert) {
+  border-left: 4px solid var(--hx-color-error-500);
+  border-radius: 0;
+}
+
+hx-alert::part(close-button) {
+  opacity: 0.6;
+}
+```
+
+## Extending
+
+### Listening to Dismiss Events
+
+```javascript
+const alert = document.querySelector('hx-alert');
+
+alert.addEventListener('hx-close', (e) => {
+  console.log('Alert dismissed:', e.detail.reason);
+  // Log the dismissal for audit purposes
+  analytics.track('alert_dismissed', { variant: alert.variant });
+});
+
+alert.addEventListener('hx-after-close', () => {
+  // Restore focus to the trigger element after dismissal
+  triggerButton.focus();
+});
+```
+
+### Programmatic Control
+
+```javascript
+// Show/hide alerts programmatically
+const alert = document.querySelector('hx-alert');
+alert.open = false; // Hide
+alert.open = true;  // Show
+```
+
+### Creating an Alert Manager (Drupal Behavior)
+
+```javascript
+(function (Drupal) {
+  Drupal.behaviors.helixAlerts = {
+    attach(context) {
+      const alerts = context.querySelectorAll('hx-alert[closable]');
+      alerts.forEach((alert) => {
+        alert.addEventListener('hx-after-close', () => {
+          // Remove from DOM after animation completes
+          alert.remove();
+        });
+      });
+    }
+  };
+})(Drupal);
+```
