@@ -7,7 +7,9 @@ Thank you for your interest in contributing to WC-2026, an enterprise healthcare
 - [Code of Conduct](#code-of-conduct)
 - [Getting Started](#getting-started)
 - [Development Workflow](#development-workflow)
+- [AI Agent Workflow](#ai-agent-workflow)
 - [Quality Standards](#quality-standards)
+- [Branch Strategy](#branch-strategy)
 - [Git Workflow](#git-workflow)
 - [Commit Message Guidelines](#commit-message-guidelines)
 - [Pull Request Process](#pull-request-process)
@@ -92,6 +94,35 @@ git add .
 git commit -m "feat(button): add disabled state"
 ```
 
+## AI Agent Workflow
+
+This project uses [Automaker](https://automaker.ai) to autonomously implement backlog features using AI agents. Understanding how agents work helps you review their output effectively.
+
+### How It Works
+
+- Features on the Linear board are picked up by agents in dependency order
+- Agents open PRs against `dev` with the feature ID in the branch name (e.g., `feat/helix-123-button-component`)
+- All agent PRs require human review before merge — no autonomous push to `dev` or beyond
+
+### Reviewing Agent PRs
+
+When reviewing an agent-generated PR:
+
+- Verify the implementation matches the Linear feature description exactly
+- Confirm all 7 quality gates pass in CI
+- Watch for **scope creep** — agents should implement only what the feature specifies
+- Check that no files outside the feature scope were modified
+
+### Escalate vs. Retry
+
+| Situation | Action |
+|-----------|--------|
+| Build or test failure | Comment with the error; agent will retry (up to 3 attempts) |
+| Wrong scope or over-engineering | Comment with specific corrections for agent retry |
+| Fundamental design flaw | Escalate to `principal-engineer` or human contributor |
+| Accessibility violation | Block merge; escalate to `accessibility-engineer` |
+| Security concern | Block merge immediately; contact maintainers |
+
 ## Quality Standards
 
 All code must pass the **7 Quality Gates** before merge:
@@ -129,6 +160,25 @@ Our pre-push hook will:
 - Check for TODO/FIXME (warning only)
 - Check for console.log (warning only)
 
+## Branch Strategy
+
+This repository uses a three-branch promotion flow:
+
+```
+feature/* → dev → staging → main
+```
+
+| Branch | Purpose |
+|--------|---------|
+| `feature/*` | Individual features (agent and human); all PRs target `dev` |
+| `dev` | Active development — the default integration branch |
+| `staging` | QA and integration testing before production release |
+| `main` | Stable, production-ready — never pushed directly |
+
+**Promotion rules:**
+- `dev → staging`: Requires all P1 milestone features merged and CI green
+- `staging → main`: Requires full QA sign-off and zero open blocking issues
+
 ## Git Workflow
 
 ### Branch Naming
@@ -155,13 +205,13 @@ docs/accessibility-guide
 ### Keeping Your Branch Updated
 
 ```bash
-# Update your local main
-git checkout main
-git pull origin main
+# Update your local dev branch
+git checkout dev
+git pull origin dev
 
 # Rebase your feature branch
 git checkout feat/my-feature
-git rebase main
+git rebase dev
 ```
 
 ## Commit Message Guidelines
@@ -172,51 +222,22 @@ We follow [Conventional Commits](https://www.conventionalcommits.org/) specifica
 
 ```
 type(scope?): subject
-
-body?
-
-footer?
 ```
 
-### Types
-
-- `feat`: New feature
-- `fix`: Bug fix
-- `chore`: Maintenance (deps, config, etc.)
-- `docs`: Documentation changes
-- `test`: Test changes
-- `refactor`: Code refactoring
-- `style`: Code style/formatting
-- `perf`: Performance improvements
-- `ci`: CI/CD changes
-- `build`: Build system changes
+Common types: `feat`, `fix`, `chore`, `docs`, `test`, `refactor`, `perf`, `ci`, `build`
 
 ### Examples
 
 ```bash
-# Feature
 git commit -m "feat(button): add disabled state"
-
-# Bug fix
 git commit -m "fix(card): correct elevation shadow calculation"
-
-# Chore
-git commit -m "chore: update Lit to 3.3.2"
-
-# Documentation
 git commit -m "docs: add accessibility testing guide"
-
-# With issue reference
-git commit -m "fix(input): prevent focus loss on validation #123"
 ```
 
 ### Subject Guidelines
 
-- Use imperative mood ("add" not "added" or "adds")
-- Don't capitalize first letter
-- No period at the end
-- Keep under 72 characters
-- Be descriptive and specific
+- Use imperative mood: "add" not "added"
+- No period at the end, keep under 72 characters
 
 ## Pull Request Process
 
@@ -231,7 +252,7 @@ git commit -m "fix(input): prevent focus loss on validation #123"
 ### Creating a PR
 
 1. Push your branch to GitHub
-2. Open a pull request against `main`
+2. Open a pull request against `dev`
 3. Fill out the PR template completely
 4. Link related issues
 5. Request review from appropriate team members
@@ -255,7 +276,7 @@ All PRs must pass:
 1. Automated CI checks (all 7 quality gates)
 2. Matrix tests (Node 18/20/22, Ubuntu/macOS/Windows)
 3. Code review approval
-4. No merge conflicts with `main`
+4. No merge conflicts with `dev`
 
 ### After Approval
 
@@ -335,11 +356,8 @@ npm run test
 # Run library tests only
 npm run test:library
 
-# Watch mode
-npm run test:watch
-
-# With UI
-npm run test:ui
+# Visual regression tests
+npm run test:vrt
 ```
 
 ## Documentation Requirements
@@ -352,23 +370,11 @@ npm run test:ui
 
 ### Storybook Stories
 
-Required for every component:
-
-- Default story
-- All variants
-- All states (disabled, loading, error, etc.)
-- Interactive controls
-- Accessibility documentation
+Required for every component: default story, all variants, all states, interactive controls, and accessibility documentation.
 
 ### Starlight Documentation
 
-Required for new features:
-
-- Component guide page
-- Usage examples
-- API reference (auto-generated from CEM)
-- Accessibility notes
-- Drupal integration examples
+Required for new features: component guide page, usage examples, API reference (auto-generated from CEM), accessibility notes, and Drupal integration examples.
 
 ## Questions or Issues?
 
