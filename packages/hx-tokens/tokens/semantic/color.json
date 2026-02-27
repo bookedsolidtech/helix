@@ -1,0 +1,87 @@
+{
+  "color": {
+    "text": {
+      "primary":      { "$value": "{color.neutral.900}", "$type": "color", "$description": "Default body text color" },
+      "secondary":    { "$value": "{color.neutral.600}", "$type": "color", "$description": "Secondary text, less emphasis" },
+      "muted":        { "$value": "{color.neutral.500}", "$type": "color", "$description": "Muted or placeholder text" },
+      "disabled":     { "$value": "{color.neutral.400}", "$type": "color", "$description": "Text on disabled elements" },
+      "inverse":      { "$value": "{color.neutral.0}",   "$type": "color", "$description": "Text on dark/inverted backgrounds" },
+      "on-primary":   { "$value": "{color.neutral.0}",   "$type": "color", "$description": "Text placed on primary color surfaces" },
+      "on-secondary": { "$value": "{color.neutral.0}",   "$type": "color", "$description": "Text placed on secondary color surfaces" },
+      "on-error":     { "$value": "{color.neutral.0}",   "$type": "color", "$description": "Text placed on error color surfaces" },
+      "on-success":   { "$value": "{color.neutral.0}",   "$type": "color", "$description": "Text placed on success color surfaces" },
+      "on-warning":   { "$value": "{color.neutral.900}", "$type": "color", "$description": "Text placed on warning color surfaces" },
+      "on-info":      { "$value": "{color.neutral.0}",   "$type": "color", "$description": "Text placed on info color surfaces" },
+      "link":         { "$value": "{color.primary.600}", "$type": "color", "$description": "Hyperlink text color" },
+      "link-hover":   { "$value": "{color.primary.700}", "$type": "color", "$description": "Hyperlink hover state" },
+      "link-visited": { "$value": "{color.secondary.600}", "$type": "color", "$description": "Visited hyperlink color" },
+      "link-active":  { "$value": "{color.primary.800}", "$type": "color", "$description": "Hyperlink active/pressed state" }
+    },
+    "surface": {
+      "default": { "$value": "{color.neutral.0}",   "$type": "color", "$description": "Default page/card background" },
+      "raised":  { "$value": "{color.neutral.50}",  "$type": "color", "$description": "Slightly elevated surface (cards, dropdowns)" },
+      "sunken":  { "$value": "{color.neutral.100}", "$type": "color", "$description": "Recessed surface (inputs, wells)" },
+      "overlay": { "$value": "rgba(0, 0, 0, 0.75)", "$type": "color", "$description": "Modal/dialog backdrop overlay" }
+    },
+    "border": {
+      "default": { "$value": "{color.neutral.200}", "$type": "color", "$description": "Default border color" },
+      "subtle":  { "$value": "{color.neutral.100}", "$type": "color", "$description": "Subtle/lightweight border" },
+      "strong":  { "$value": "{color.neutral.400}", "$type": "color", "$description": "High-emphasis border" },
+      "focus":   { "$value": "{color.primary.500}", "$type": "color", "$description": "Focus-state border color" }
+    },
+    "focus-ring": { "$value": "{color.primary.400}", "$type": "color", "$description": "Focus ring / outline color" },
+    "selection": {
+      "bg":    { "$value": "{color.primary.200}", "$type": "color", "$description": "Text selection background" },
+      "color": { "$value": "{color.neutral.900}", "$type": "color", "$description": "Text selection foreground" }
+    }
+  },
+  "body": {
+    "bg":          { "$value": "{color.surface.default}",  "$type": "color",      "$description": "Body background color" },
+    "color":       { "$value": "{color.text.primary}",     "$type": "color",      "$description": "Body text color" },
+    "font-family": { "$value": "{font.family.sans}",       "$type": "fontFamily", "$description": "Body font family" },
+    "font-size":   { "$value": "{font.size.md}",           "$type": "dimension",  "$description": "Body base font size" },
+    "line-height": { "$value": "{line-height.normal}",     "$type": "number",     "$description": "Body line height" }
+  },
+  "heading": {
+    "font-family":    { "$value": "{font.family.sans}",      "$type": "fontFamily", "$description": "Heading font family" },
+    "font-weight":    { "$value": "{font.weight.bold}",      "$type": "fontWeight", "$description": "Heading font weight" },
+    "line-height":    { "$value": "{line-height.tight}",     "$type": "number",     "$description": "Heading line height" },
+    "letter-spacing": { "$value": "{letter-spacing.tight}",  "$type": "dimension",  "$description": "Heading letter spacing" }
+  },
+  "focus": {
+    "ring-color":   { "$value": "{color.primary.400}", "$type": "color",     "$description": "Focus ring color" },
+    "ring-width":   { "$value": "2px",                 "$type": "dimension", "$description": "Focus ring width" },
+    "ring-offset":  { "$value": "2px",                 "$type": "dimension", "$description": "Focus ring offset from element" },
+    "ring-style":   { "$value": "solid",               "$type": "string",    "$description": "Focus ring border style" },
+    "ring-opacity": { "$value": "0.25",                "$type": "number",    "$description": "Focus ring opacity" }
+  },
+  "state": {
+    "hover-opacity":   { "$value": "0.08", "$type": "number", "$description": "Hover state overlay opacity" },
+    "pressed-opacity": { "$value": "0.12", "$type": "number", "$description": "Pressed/active state overlay opacity" },
+    "dragged-opacity": { "$value": "0.16", "$type": "number", "$description": "Dragged state overlay opacity" },
+    "focus-opacity":   { "$value": "0.12", "$type": "number", "$description": "Focus state overlay opacity" }
+  },
+  "filter": {
+    "brightness-hover":    { "$value": "0.9",  "$type": "number",    "$description": "Brightness filter on hover" },
+    "brightness-active":   { "$value": "0.8",  "$type": "number",    "$description": "Brightness filter on active/pressed" },
+    "brightness-disabled": { "$value": "0.6",  "$type": "number",    "$description": "Brightness filter for disabled state" },
+    "blur-sm":             { "$value": "4px",  "$type": "dimension", "$description": "Small blur filter value" },
+    "blur-md":             { "$value": "8px",  "$type": "dimension", "$description": "Medium blur filter value" },
+    "blur-lg":             { "$value": "16px", "$type": "dimension", "$description": "Large blur filter value" }
+  },
+  "transform": {
+    "lift-sm": { "$value": "-1px", "$type": "dimension", "$description": "Small translateY lift on interaction" },
+    "lift-md": { "$value": "-2px", "$type": "dimension", "$description": "Medium translateY lift on interaction" },
+    "lift-lg": { "$value": "-4px", "$type": "dimension", "$description": "Large translateY lift on interaction" }
+  },
+  "divider": {
+    "color":   { "$value": "{color.border.default}", "$type": "color",     "$description": "Divider/separator line color" },
+    "width":   { "$value": "{border.width.thin}",    "$type": "dimension", "$description": "Divider/separator line width" },
+    "spacing": { "$value": "{space.4}",              "$type": "dimension", "$description": "Space around dividers" }
+  },
+  "input": {
+    "height-sm": { "$value": "{size.8}",  "$type": "dimension", "$description": "Small input height" },
+    "height-md": { "$value": "{size.10}", "$type": "dimension", "$description": "Medium input height" },
+    "height-lg": { "$value": "{size.12}", "$type": "dimension", "$description": "Large input height" }
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "card": {
+    "bg":           { "$value": "{color.surface.default}", "$type": "color",     "$description": "Card background color" },
+    "border-color": { "$value": "{color.border.default}",  "$type": "color",     "$description": "Card border color" },
+    "border-radius":{ "$value": "{border.radius.lg}",      "$type": "dimension", "$description": "Card border radius" },
+    "shadow":       { "$value": "{shadow.sm}",             "$type": "shadow",    "$description": "Card box shadow" },
+    "padding":      { "$value": "{space.6}",               "$type": "dimension", "$description": "Card internal padding" }
+  }
+}

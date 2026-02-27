@@ -1,0 +1,11 @@
+{
+  "button": {
+    "bg":           { "$value": "{color.primary.500}",    "$type": "color",      "$description": "Button background color" },
+    "color":        { "$value": "{color.neutral.0}",      "$type": "color",      "$description": "Button text color" },
+    "border-color": { "$value": "transparent",            "$type": "color",      "$description": "Button border color" },
+    "border-radius":{ "$value": "{border.radius.md}",     "$type": "dimension",  "$description": "Button border radius" },
+    "font-family":  { "$value": "{font.family.sans}",     "$type": "fontFamily", "$description": "Button font family" },
+    "font-weight":  { "$value": "{font.weight.semibold}",  "$type": "fontWeight", "$description": "Button font weight" },
+    "focus-ring-color": { "$value": "{color.primary.400}", "$type": "color",    "$description": "Button focus ring color" }
+  }
+}
