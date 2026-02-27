@@ -83,12 +83,17 @@ export class HelixBadge extends LitElement {
     });
   }
 
-  // ─── Render ───
+  // ─── Extension API ───
 
-  override render() {
+  /**
+   * Override to customize the CSS classes applied to the badge element.
+   * Called during render. Merge with super's result to preserve base styling.
+   * @protected
+   * @since 1.0.0
+   */
+  protected getBadgeClasses(): Record<string, boolean> {
     const isDot = !this._hasSlotContent && this.pulse;
-
-    const classes = {
+    return {
       badge: true,
       [`badge--${this.variant}`]: true,
       [`badge--${this.size}`]: true,
@@ -96,10 +101,23 @@ export class HelixBadge extends LitElement {
       'badge--pulse': this.pulse,
       'badge--dot': isDot,
     };
+  }
 
+  /**
+   * Override to customize the content rendered inside the badge span.
+   * @protected
+   * @since 1.0.0
+   */
+  protected renderContent(): unknown {
+    return html`<slot @slotchange=${this._handleSlotChange}></slot>`;
+  }
+
+  // ─── Render ───
+
+  override render() {
     return html`
-      <span part="badge" class=${classMap(classes)}>
-        <slot @slotchange=${this._handleSlotChange}></slot>
+      <span part="badge" class=${classMap(this.getBadgeClasses())}>
+        ${this.renderContent()}
       </span>
     `;
   }

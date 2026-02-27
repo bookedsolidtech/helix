@@ -85,6 +85,8 @@ export class HelixCard extends LitElement {
   private _handleClick(e: MouseEvent): void {
     if (!this.wcHref) return;
 
+    if (!this.shouldHandleClick(e)) return;
+
     /**
      * Dispatched when an interactive card is clicked.
      * Includes the target href in the detail.
@@ -97,6 +99,8 @@ export class HelixCard extends LitElement {
         detail: { url: this.wcHref, originalEvent: e },
       }),
     );
+
+    this.afterClick(e);
   }
 
   private _handleKeyDown(e: KeyboardEvent): void {
@@ -108,47 +112,125 @@ export class HelixCard extends LitElement {
     }
   }
 
-  // ─── Render ───
+  // ─── Extension API ───
 
-  override render() {
+  /**
+   * Override to customize the CSS classes applied to the card container.
+   * Called during render. Merge with super's result to preserve base styling.
+   * @protected
+   * @since 1.0.0
+   */
+  protected getCardClasses(): Record<string, boolean> {
     const isInteractive = !!this.wcHref;
-
-    const classes = {
+    return {
       card: true,
       [`card--${this.variant}`]: true,
       [`card--${this.elevation}`]: true,
       'card--interactive': isInteractive,
     };
+  }
+
+  /**
+   * Override to customize the image slot section rendered at the top of the card.
+   * @protected
+   * @since 1.0.0
+   */
+  protected renderImageSection(): unknown {
+    return html`
+      <div class="card__image" part="image" ?hidden=${!this._hasSlotContent['image']}>
+        <slot name="image" @slotchange=${this._handleSlotChange('image')}></slot>
+      </div>
+    `;
+  }
+
+  /**
+   * Override to customize the heading slot section rendered below the image.
+   * @protected
+   * @since 1.0.0
+   */
+  protected renderHeadingSection(): unknown {
+    return html`
+      <div class="card__heading" part="heading" ?hidden=${!this._hasSlotContent['heading']}>
+        <slot name="heading" @slotchange=${this._handleSlotChange('heading')}></slot>
+      </div>
+    `;
+  }
+
+  /**
+   * Override to customize the body (default slot) section.
+   * @protected
+   * @since 1.0.0
+   */
+  protected renderBodySection(): unknown {
+    return html`
+      <div class="card__body" part="body">
+        <slot></slot>
+      </div>
+    `;
+  }
+
+  /**
+   * Override to customize the footer slot section.
+   * @protected
+   * @since 1.0.0
+   */
+  protected renderFooterSection(): unknown {
+    return html`
+      <div class="card__footer" part="footer" ?hidden=${!this._hasSlotContent['footer']}>
+        <slot name="footer" @slotchange=${this._handleSlotChange('footer')}></slot>
+      </div>
+    `;
+  }
+
+  /**
+   * Override to customize the actions slot section.
+   * @protected
+   * @since 1.0.0
+   */
+  protected renderActionsSection(): unknown {
+    return html`
+      <div class="card__actions" part="actions" ?hidden=${!this._hasSlotContent['actions']}>
+        <slot name="actions" @slotchange=${this._handleSlotChange('actions')}></slot>
+      </div>
+    `;
+  }
+
+  /**
+   * Called before the card click is processed. Return false to cancel navigation.
+   * Only invoked when wcHref is set.
+   * @protected
+   * @since 1.0.0
+   */
+  protected shouldHandleClick(_e: MouseEvent): boolean {
+    return true;
+  }
+
+  /**
+   * Called after the card click is fully processed (event dispatched).
+   * @protected
+   * @since 1.0.0
+   */
+  protected afterClick(_e: MouseEvent): void {
+    // no-op — override to add post-click behavior
+  }
+
+  // ─── Render ───
+
+  override render() {
+    const isInteractive = !!this.wcHref;
 
     return html`
       <div
         part="card"
-        class=${classMap(classes)}
+        class=${classMap(this.getCardClasses())}
         role=${isInteractive ? 'link' : nothing}
         tabindex=${isInteractive ? '0' : nothing}
         aria-label=${isInteractive ? `Navigate to ${this.wcHref}` : nothing}
         @click=${this._handleClick}
         @keydown=${this._handleKeyDown}
       >
-        <div class="card__image" part="image" ?hidden=${!this._hasSlotContent['image']}>
-          <slot name="image" @slotchange=${this._handleSlotChange('image')}></slot>
-        </div>
-
-        <div class="card__heading" part="heading" ?hidden=${!this._hasSlotContent['heading']}>
-          <slot name="heading" @slotchange=${this._handleSlotChange('heading')}></slot>
-        </div>
-
-        <div class="card__body" part="body">
-          <slot></slot>
-        </div>
-
-        <div class="card__footer" part="footer" ?hidden=${!this._hasSlotContent['footer']}>
-          <slot name="footer" @slotchange=${this._handleSlotChange('footer')}></slot>
-        </div>
-
-        <div class="card__actions" part="actions" ?hidden=${!this._hasSlotContent['actions']}>
-          <slot name="actions" @slotchange=${this._handleSlotChange('actions')}></slot>
-        </div>
+        ${this.renderImageSection()} ${this.renderHeadingSection()} ${this.renderBodySection()}
+        ${this.renderFooterSection()} ${this.renderActionsSection()}
       </div>
     `;
   }

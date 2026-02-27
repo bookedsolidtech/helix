@@ -193,7 +193,7 @@ export class HelixTextarea extends LitElement {
     super.updated(changedProperties);
     if (changedProperties.has('value')) {
       this._internals.setFormValue(this.value);
-      this._updateValidity();
+      this.updateValidity();
     }
   }
 
@@ -222,24 +222,6 @@ export class HelixTextarea extends LitElement {
   /** Reports validity and shows the browser's constraint validation UI. */
   reportValidity(): boolean {
     return this._internals.reportValidity();
-  }
-
-  private _updateValidity(): void {
-    if (this.required && !this.value) {
-      this._internals.setValidity(
-        { valueMissing: true },
-        this.error || 'This field is required.',
-        this._textarea,
-      );
-    } else if (this.maxlength !== undefined && this.value.length > this.maxlength) {
-      this._internals.setValidity(
-        { tooLong: true },
-        this.error || `Value must be ${this.maxlength} characters or fewer.`,
-        this._textarea,
-      );
-    } else {
-      this._internals.setValidity({});
-    }
   }
 
   // Called by the form when it resets
@@ -283,7 +265,7 @@ export class HelixTextarea extends LitElement {
     const target = e.target as HTMLTextAreaElement;
     this.value = target.value;
     this._internals.setFormValue(this.value);
-    this._updateValidity();
+    this.updateValidity();
 
     /**
      * Dispatched when the textarea loses focus after its value changed.
@@ -310,6 +292,48 @@ export class HelixTextarea extends LitElement {
     this._textarea?.select();
   }
 
+  // ─── Extension API ───
+
+  /**
+   * Override to customize the CSS classes applied to the outer field container.
+   * Called during render. Merge with super's result to preserve base styling.
+   * @protected
+   * @since 1.0.0
+   */
+  protected getFieldClasses(): Record<string, boolean> {
+    const hasError = !!this.error || this._hasErrorSlot;
+    return {
+      field: true,
+      'field--error': hasError,
+      'field--disabled': this.disabled,
+      'field--required': this.required,
+    };
+  }
+
+  /**
+   * Override to provide custom validation logic.
+   * Called whenever value changes. Use this._internals to set validity state.
+   * @protected
+   * @since 1.0.0
+   */
+  protected updateValidity(): void {
+    if (this.required && !this.value) {
+      this._internals.setValidity(
+        { valueMissing: true },
+        this.error || 'This field is required.',
+        this._textarea,
+      );
+    } else if (this.maxlength !== undefined && this.value.length > this.maxlength) {
+      this._internals.setValidity(
+        { tooLong: true },
+        this.error || `Value must be ${this.maxlength} characters or fewer.`,
+        this._textarea,
+      );
+    } else {
+      this._internals.setValidity({});
+    }
+  }
+
   // ─── Render ───
 
   private _textareaId = `hx-textarea-${Math.random().toString(36).slice(2, 9)}`;
@@ -328,20 +352,13 @@ export class HelixTextarea extends LitElement {
   override render() {
     const hasError = !!this.error || this._hasErrorSlot;
 
-    const fieldClasses = {
-      field: true,
-      'field--error': hasError,
-      'field--disabled': this.disabled,
-      'field--required': this.required,
-    };
-
     const describedBy =
       [hasError ? this._errorId : null, this.helpText ? this._helpTextId : null]
         .filter(Boolean)
         .join(' ') || undefined;
 
     return html`
-      <div part="field" class=${classMap(fieldClasses)}>
+      <div part="field" class=${classMap(this.getFieldClasses())}>
         <div class="field__label-wrapper">
           <slot name="label" @slotchange=${this._handleLabelSlotChange}>
             ${this.label

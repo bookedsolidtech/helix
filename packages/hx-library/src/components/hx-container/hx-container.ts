@@ -49,17 +49,36 @@ export class HelixContainer extends LitElement {
   @property({ type: String, reflect: true })
   padding: 'none' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' = 'none';
 
-  // ─── Render ───
+  // ─── Extension API ───
 
-  override render() {
-    const classes = {
+  /**
+   * Override to customize the CSS classes applied to the inner wrapper element.
+   * Called during render. Merge with super's result to preserve base styling.
+   * @protected
+   * @since 1.0.0
+   */
+  protected getContainerClasses(): Record<string, boolean> {
+    return {
       container__inner: true,
       [`container__inner--${this.width}`]: true,
     };
+  }
 
+  /**
+   * Override to customize the content rendered inside the container.
+   * @protected
+   * @since 1.0.0
+   */
+  protected renderContent(): unknown {
+    return html`<slot></slot>`;
+  }
+
+  // ─── Render ───
+
+  override render() {
     return html`
-      <div part="inner" class=${classMap(classes)}>
-        <slot></slot>
+      <div part="inner" class=${classMap(this.getContainerClasses())}>
+        ${this.renderContent()}
       </div>
     `;
   }

@@ -86,6 +86,12 @@ export class HelixButton extends LitElement {
       return;
     }
 
+    if (!this.shouldHandleClick(e)) {
+      e.preventDefault();
+      e.stopPropagation();
+      return;
+    }
+
     /**
      * Dispatched when the button is clicked.
      * @event hx-click
@@ -104,27 +110,67 @@ export class HelixButton extends LitElement {
     } else if (this.type === 'reset' && this._internals.form) {
       this._internals.form.reset();
     }
+
+    this.afterClick(e);
+  }
+
+  // ─── Extension API ───
+
+  /**
+   * Override to customize the CSS classes applied to the native button element.
+   * Called during render. Merge with super's result to preserve base styling.
+   * @protected
+   * @since 1.0.0
+   */
+  protected getButtonClasses(): Record<string, boolean> {
+    return {
+      button: true,
+      [`button--${this.variant}`]: true,
+      [`button--${this.size}`]: true,
+    };
+  }
+
+  /**
+   * Override to customize the content rendered inside the button.
+   * @protected
+   * @since 1.0.0
+   */
+  protected renderContent(): unknown {
+    return html`<slot></slot>`;
+  }
+
+  /**
+   * Called before the click is processed. Return false to cancel the click.
+   * Only invoked when the button is not disabled.
+   * @protected
+   * @since 1.0.0
+   */
+  protected shouldHandleClick(_e: MouseEvent): boolean {
+    return true;
+  }
+
+  /**
+   * Called after the click is fully processed (event dispatched, form action taken).
+   * @protected
+   * @since 1.0.0
+   */
+  protected afterClick(_e: MouseEvent): void {
+    // no-op — override to add post-click behavior
   }
 
   // ─── Render ───
 
   override render() {
-    const classes = {
-      button: true,
-      [`button--${this.variant}`]: true,
-      [`button--${this.size}`]: true,
-    };
-
     return html`
       <button
         part="button"
-        class=${classMap(classes)}
+        class=${classMap(this.getButtonClasses())}
         ?disabled=${this.disabled}
         type=${this.type}
         aria-disabled=${this.disabled ? 'true' : nothing}
         @click=${this._handleClick}
       >
-        <slot></slot>
+        ${this.renderContent()}
       </button>
     `;
   }

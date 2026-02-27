@@ -279,6 +279,33 @@ export class HelixForm extends LitElement {
     return errors;
   }
 
+  // ─── Extension API ───
+
+  /**
+   * Override to customize the attributes applied to the rendered `<form>` element
+   * when `action` is set. Returns a record of attribute name to value (or undefined
+   * to omit). Subclasses can add enctype, autocomplete, or other native form attrs.
+   * @protected
+   * @since 1.0.0
+   */
+  protected getFormAttributes(): Record<string, string | undefined> {
+    return {
+      action: this.action || undefined,
+      method: this.method,
+      name: this.name || undefined,
+    };
+  }
+
+  /**
+   * Override to customize the content rendered inside the form wrapper.
+   * Defaults to a single default slot.
+   * @protected
+   * @since 1.0.0
+   */
+  protected renderFormContent(): unknown {
+    return html`<slot></slot>`;
+  }
+
   // ─── Render ───
 
   override render() {
@@ -290,12 +317,12 @@ export class HelixForm extends LitElement {
           name=${ifDefined(this.name || undefined)}
           ?novalidate=${this.novalidate}
         >
-          <slot></slot>
+          ${this.renderFormContent()}
         </form>
       `;
     }
 
-    return html`<slot></slot>`;
+    return this.renderFormContent();
   }
 }
 

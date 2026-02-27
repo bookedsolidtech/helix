@@ -128,10 +128,10 @@ export class HelixSwitch extends LitElement {
     super.updated(changedProperties);
     if (changedProperties.has('checked') || changedProperties.has('value')) {
       this._internals.setFormValue(this.checked ? this.value : null);
-      this._updateValidity();
+      this.updateValidity();
     }
     if (changedProperties.has('required')) {
-      this._updateValidity();
+      this.updateValidity();
     }
   }
 
@@ -162,18 +162,6 @@ export class HelixSwitch extends LitElement {
     return this._internals.reportValidity();
   }
 
-  private _updateValidity(): void {
-    if (this.required && !this.checked) {
-      this._internals.setValidity(
-        { valueMissing: true },
-        this.error || 'This field is required.',
-        this._trackEl ?? undefined,
-      );
-    } else {
-      this._internals.setValidity({});
-    }
-  }
-
   /** Called by the form when it resets. */
   formResetCallback(): void {
     this.checked = false;
@@ -201,9 +189,12 @@ export class HelixSwitch extends LitElement {
 
   private _toggle(): void {
     if (this.disabled) return;
+
+    if (!this.shouldHandleChange(new Event('change'))) return;
+
     this.checked = !this.checked;
     this._internals.setFormValue(this.checked ? this.value : null);
-    this._updateValidity();
+    this.updateValidity();
 
     /**
      * Dispatched when the switch is toggled.
@@ -236,6 +227,55 @@ export class HelixSwitch extends LitElement {
     this._trackEl?.focus(options);
   }
 
+  // ─── Extension API ───
+
+  /**
+   * Override to customize the CSS classes applied to the switch container.
+   * Called during render. Merge with super's result to preserve base styling.
+   * @protected
+   * @since 1.0.0
+   */
+  protected getSwitchClasses(): Record<string, boolean> {
+    const hasError = !!this.error;
+    return {
+      switch: true,
+      'switch--checked': this.checked,
+      'switch--disabled': this.disabled,
+      'switch--required': this.required,
+      'switch--error': hasError,
+      [`switch--${this.size}`]: true,
+    };
+  }
+
+  /**
+   * Override to provide custom validation logic.
+   * Called whenever checked, value, or required changes.
+   * Use this._internals to set validity state.
+   * @protected
+   * @since 1.0.0
+   */
+  protected updateValidity(): void {
+    if (this.required && !this.checked) {
+      this._internals.setValidity(
+        { valueMissing: true },
+        this.error || 'This field is required.',
+        this._trackEl ?? undefined,
+      );
+    } else {
+      this._internals.setValidity({});
+    }
+  }
+
+  /**
+   * Called before the toggle is processed. Return false to cancel the change.
+   * Only invoked when the switch is not disabled.
+   * @protected
+   * @since 1.0.0
+   */
+  protected shouldHandleChange(_e: Event): boolean {
+    return true;
+  }
+
   // ─── Render ───
 
   private _switchId = `hx-switch-${Math.random().toString(36).slice(2, 9)}`;
@@ -247,15 +287,6 @@ export class HelixSwitch extends LitElement {
     const hasError = !!this.error;
     const hasLabel = !!this.label;
 
-    const containerClasses = {
-      switch: true,
-      'switch--checked': this.checked,
-      'switch--disabled': this.disabled,
-      'switch--required': this.required,
-      'switch--error': hasError,
-      [`switch--${this.size}`]: true,
-    };
-
     const describedBy =
       [
         hasError || this._hasErrorSlot ? this._errorId : null,
@@ -265,7 +296,7 @@ export class HelixSwitch extends LitElement {
         .join(' ') || undefined;
 
     return html`
-      <div part="switch" class=${classMap(containerClasses)}>
+      <div part="switch" class=${classMap(this.getSwitchClasses())}>
         <div class="switch__control-row">
           <button
             part="track"
