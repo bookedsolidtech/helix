@@ -73,3 +73,168 @@ Small, base, and large sizes for different content contexts.
 ## API Reference
 
 <ComponentDoc tagName="hx-prose" section="api" />
+
+## Accessibility
+
+`hx-prose` is a Light DOM container that applies typographic styles to rich text content. Because it renders in the Light DOM, all content is accessible to screen readers without any Shadow DOM boundary.
+
+### Heading Structure
+
+Always maintain a logical heading hierarchy within `hx-prose` content. The heading order communicates document structure to screen readers:
+
+```html
+<!-- Correct heading hierarchy -->
+<hx-prose>
+  <h1>Clinical Guidelines</h1>
+  <h2>Section 1: Assessment</h2>
+  <h3>1.1 Initial Evaluation</h3>
+  <p>...</p>
+  <h2>Section 2: Treatment</h2>
+</hx-prose>
+```
+
+### Link Accessibility
+
+Ensure links in prose content have descriptive text — avoid "click here" or "read more":
+
+```html
+<hx-prose>
+  <p>
+    Review the
+    <a href="/protocols/2026">2026 Clinical Protocols</a>
+    before administering treatment.
+  </p>
+</hx-prose>
+```
+
+### Tables in Prose
+
+When prose contains tables, include proper table markup for screen readers:
+
+```html
+<hx-prose>
+  <table>
+    <caption>Medication Dosage Reference</caption>
+    <thead>
+      <tr>
+        <th scope="col">Medication</th>
+        <th scope="col">Standard Dose</th>
+        <th scope="col">Max Daily Dose</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Aspirin</td>
+        <td>325mg</td>
+        <td>4g</td>
+      </tr>
+    </tbody>
+  </table>
+</hx-prose>
+```
+
+## Drupal Integration
+
+### Body Field Template
+
+The primary use case for `hx-prose` in Drupal is wrapping CKEditor-rendered body fields:
+
+```twig
+{# templates/field/field--body.html.twig #}
+<hx-prose size="{{ prose_size|default('base') }}">
+  {% for item in items %}
+    {{ item.content }}
+  {% endfor %}
+</hx-prose>
+```
+
+### Text Format Output
+
+```twig
+{# Wrap any Drupal text field with prose styling #}
+{% if content.body %}
+  <hx-prose>
+    {{ content.body }}
+  </hx-prose>
+{% endif %}
+```
+
+### Max Width Override for CMS Content
+
+```twig
+<hx-prose max-width="{{ max_width|default('720px') }}" size="{{ size|default('base') }}">
+  {{ body }}
+</hx-prose>
+```
+
+### Drupal Library
+
+```yaml
+# mymodule.libraries.yml
+mymodule/prose:
+  dependencies:
+    - helix/hx-prose
+```
+
+## Theming
+
+### Available Tokens
+
+| Token | Default | Description |
+|-------|---------|-------------|
+| `--hx-prose-max-width` | `720px` | Maximum content width |
+| `--hx-prose-font-size` | `var(--hx-font-size-base)` | Base font size |
+| `--hx-prose-line-height` | `var(--hx-line-height-relaxed)` | Base line height |
+| `--hx-prose-color` | `var(--hx-color-text)` | Body text color |
+| `--hx-prose-heading-color` | `var(--hx-color-text-strong)` | Heading color |
+| `--hx-prose-link-color` | `var(--hx-color-primary)` | Link color |
+
+### Override Example
+
+```css
+/* Clinical document styling */
+hx-prose.clinical-doc {
+  --hx-prose-font-size: 1rem;
+  --hx-prose-line-height: 1.75;
+  --hx-prose-color: #1a1a2e;
+  --hx-prose-max-width: 80ch;
+}
+
+/* Dark mode prose */
+@media (prefers-color-scheme: dark) {
+  hx-prose {
+    --hx-prose-color: var(--hx-color-neutral-100);
+    --hx-prose-heading-color: var(--hx-color-neutral-0);
+    --hx-prose-link-color: var(--hx-color-primary-300);
+  }
+}
+```
+
+## Extending
+
+### Dynamic Content (CKEditor Integration)
+
+```javascript
+const prose = document.querySelector('hx-prose');
+
+// Update prose content dynamically
+prose.innerHTML = sanitizedHtml;
+
+// Adjust max width based on content type
+if (contentType === 'article') {
+  prose.maxWidth = '72ch';
+  prose.size = 'lg';
+}
+```
+
+### Print Styles
+
+```css
+@media print {
+  hx-prose {
+    --hx-prose-max-width: 100%;
+    --hx-prose-font-size: 11pt;
+    --hx-prose-line-height: 1.5;
+  }
+}
+```

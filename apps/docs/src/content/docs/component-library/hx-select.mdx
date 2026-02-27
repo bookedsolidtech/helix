@@ -75,3 +75,187 @@ Small, medium, and large select variants.
 ## API Reference
 
 <ComponentDoc tagName="hx-select" section="api" />
+
+## Accessibility
+
+`hx-select` wraps a native `<select>` element inside Shadow DOM and uses `ElementInternals` for form participation.
+
+### ARIA Roles and Attributes
+
+- **Role**: `listbox` (native `<select>` element)
+- **Label association**: The visible label is associated with the native select via `for`/`id`
+- **Error state**: Error message is associated via `aria-describedby`
+- **Help text**: Associated via `aria-describedby`
+- **Required**: Sets native `required` attribute on the select
+
+### Keyboard Interaction
+
+| Key | Action |
+|-----|--------|
+| `Tab` | Move focus to select |
+| `Alt + Arrow Down` / `Space` / `Enter` | Open the dropdown |
+| `Arrow Up` / `Arrow Down` | Navigate options |
+| `Enter` / `Space` | Select focused option |
+| `Escape` | Close dropdown without selecting |
+| First letter | Jump to first option starting with that letter |
+
+### Option Groups
+
+Use native `<optgroup>` for grouped options:
+
+```html
+<hx-select label="Specialty" name="specialty">
+  <optgroup label="Surgical">
+    <option value="cardiac-surgery">Cardiac Surgery</option>
+    <option value="neuro-surgery">Neurosurgery</option>
+  </optgroup>
+  <optgroup label="Internal Medicine">
+    <option value="cardiology">Cardiology</option>
+    <option value="endocrinology">Endocrinology</option>
+  </optgroup>
+</hx-select>
+```
+
+## Drupal Integration
+
+### Basic Select Template
+
+```twig
+{# templates/components/select.html.twig #}
+<hx-select
+  name="{{ name }}"
+  label="{{ label }}"
+  placeholder="{{ placeholder|default('') }}"
+  value="{{ value|default('') }}"
+  {{ required ? 'required' : '' }}
+  {{ disabled ? 'disabled' : '' }}
+  {{ error ? 'error="' ~ error ~ '"' : '' }}
+  {{ help_text ? 'help-text="' ~ help_text ~ '"' : '' }}
+  hx-size="{{ size|default('md') }}"
+>
+  {% for option in options %}
+    <option value="{{ option.value }}">{{ option.label }}</option>
+  {% endfor %}
+</hx-select>
+```
+
+### Drupal Form API Select
+
+```twig
+{# templates/form/select.html.twig #}
+<hx-select
+  name="{{ element['#name'] }}"
+  label="{{ element['#title'] }}"
+  value="{{ element['#value'] }}"
+  {{ element['#required'] ? 'required' : '' }}
+  {{ element['#disabled'] ? 'disabled' : '' }}
+  {% if element['#errors'] %}
+    error="{{ element['#errors']|render|striptags }}"
+  {% endif %}
+>
+  {% for value, label in element['#options'] %}
+    <option value="{{ value }}">{{ label }}</option>
+  {% endfor %}
+</hx-select>
+```
+
+### Drupal Library
+
+```yaml
+# mymodule.libraries.yml
+mymodule/select:
+  dependencies:
+    - helix/hx-select
+```
+
+## Theming
+
+### Available Tokens
+
+| Token | Default | Description |
+|-------|---------|-------------|
+| `--hx-select-bg` | `var(--hx-color-neutral-0)` | Select background color |
+| `--hx-select-color` | `var(--hx-color-neutral-800)` | Select text color |
+| `--hx-select-border-color` | `var(--hx-color-neutral-300)` | Select border color |
+| `--hx-select-border-radius` | `var(--hx-border-radius-md)` | Select border radius |
+| `--hx-select-font-family` | `var(--hx-font-family-sans)` | Select font family |
+| `--hx-select-focus-ring-color` | `var(--hx-focus-ring-color)` | Focus ring color |
+| `--hx-select-error-color` | `var(--hx-color-error-500)` | Error state color |
+| `--hx-select-label-color` | `var(--hx-color-neutral-700)` | Label text color |
+| `--hx-select-chevron-color` | `var(--hx-color-neutral-500)` | Chevron indicator color |
+
+### Override Example
+
+```css
+hx-select {
+  --hx-select-border-radius: 0;
+  --hx-select-border-color: var(--brand-color-border);
+  --hx-select-focus-ring-color: var(--brand-color-primary);
+}
+```
+
+### CSS Parts
+
+```css
+hx-select::part(field) {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+
+hx-select::part(select) {
+  font-size: var(--hx-font-size-base);
+}
+
+hx-select::part(label) {
+  font-weight: var(--hx-font-weight-semibold);
+}
+```
+
+## Extending
+
+### Listening to Change Events
+
+```javascript
+const select = document.querySelector('hx-select');
+
+select.addEventListener('hx-change', ({ detail }) => {
+  console.log('Selected value:', detail.value);
+  loadDependentData(detail.value);
+});
+```
+
+### Cascading Selects
+
+```javascript
+const departmentSelect = document.querySelector('#department');
+const specialtySelect = document.querySelector('#specialty');
+
+departmentSelect.addEventListener('hx-change', async ({ detail }) => {
+  specialtySelect.disabled = true;
+
+  const specialties = await fetchSpecialties(detail.value);
+
+  // Clear and repopulate options
+  specialtySelect.innerHTML = '';
+  specialties.forEach(({ value, label }) => {
+    const option = document.createElement('option');
+    option.value = value;
+    option.textContent = label;
+    specialtySelect.appendChild(option);
+  });
+
+  specialtySelect.disabled = false;
+});
+```
+
+### Custom Label Slot (Drupal Form API)
+
+```html
+<hx-select name="facility">
+  <span slot="label">
+    Facility <abbr title="required">*</abbr>
+  </span>
+  <option value="main">Main Campus</option>
+  <option value="north">North Campus</option>
+</hx-select>
+```

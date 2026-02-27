@@ -71,3 +71,173 @@ Fields with error states and help text.
 ## API Reference
 
 <ComponentDoc tagName="hx-form" section="api" />
+
+## Accessibility
+
+`hx-form` is a Light DOM component (no Shadow DOM) that wraps form fields with consistent design system styles.
+
+### ARIA Roles and Attributes
+
+- When `action` is set, `hx-form` renders a native `<form>` element with all native form semantics.
+- Without `action` (Drupal pattern), it renders as a transparent slot wrapper — Drupal provides the `<form>` tag.
+- Error announcements use the native browser constraint validation UI via `reportValidity()`.
+
+### Error Handling and Screen Readers
+
+When form submission fails validation, the component dispatches `hx-invalid` with a list of errors. Surface these errors accessibly:
+
+```javascript
+form.addEventListener('hx-invalid', ({ detail }) => {
+  // Focus the first invalid field
+  const firstError = detail.errors[0];
+  const field = form.querySelector(`[name="${firstError.name}"]`);
+  field?.focus();
+
+  // Announce errors via live region
+  const liveRegion = document.getElementById('form-errors');
+  liveRegion.textContent = `${detail.errors.length} errors found. Please correct them to continue.`;
+});
+```
+
+### Required Fields
+
+Label required fields visibly. The `required` attribute on child form components sets `aria-required` on their inputs automatically.
+
+```html
+<hx-form>
+  <p>Fields marked with * are required.</p>
+  <hx-text-input label="Patient MRN *" name="mrn" required></hx-text-input>
+</hx-form>
+```
+
+## Drupal Integration
+
+### Drupal Pattern (No `action`)
+
+In Drupal, the `<form>` tag is always provided by Drupal's Form API. Use `hx-form` without `action` as a styling wrapper:
+
+```twig
+{# Wrap Drupal form output for consistent styling #}
+<hx-form>
+  <form{{ attributes }}>
+    {{ children }}
+  </form>
+</hx-form>
+```
+
+### Override Drupal's `form.html.twig`
+
+```twig
+{# templates/form/form.html.twig #}
+<hx-form>
+  <form{{ attributes }}>
+    {{ children }}
+  </form>
+</hx-form>
+```
+
+### Drupal Form API — Client-Side Pattern
+
+For decoupled or headless Drupal patterns using `hx-form` with `action`:
+
+```twig
+<hx-form action="{{ form_action }}" method="post">
+  {% for field in fields %}
+    {{ field }}
+  {% endfor %}
+  <hx-button type="submit" variant="primary">{{ submit_label }}</hx-button>
+</hx-form>
+```
+
+### Drupal Library
+
+```yaml
+# mymodule.libraries.yml
+mymodule/form:
+  dependencies:
+    - helix/hx-form
+```
+
+## Theming
+
+### Available Tokens
+
+| Token | Default | Description |
+|-------|---------|-------------|
+| `--hx-form-gap` | `var(--hx-space-4)` | Gap between form fields |
+| `--hx-form-max-width` | `none` | Maximum width of the form |
+| `--hx-form-padding` | `0` | Internal padding of the form |
+
+### Override Example
+
+```css
+/* Compact form layout */
+hx-form.form-compact {
+  --hx-form-gap: var(--hx-space-2);
+}
+
+/* Constrained form width */
+hx-form.form-narrow {
+  --hx-form-max-width: 480px;
+  --hx-form-padding: var(--hx-space-6);
+}
+```
+
+## Extending
+
+### Client-Side Submission
+
+When no `action` is set, handle form submission via the `hx-submit` event:
+
+```javascript
+const form = document.querySelector('hx-form');
+
+form.addEventListener('hx-submit', async ({ detail }) => {
+  const { valid, values } = detail;
+  if (!valid) return;
+
+  try {
+    const response = await fetch('/api/patients', {
+      method: 'POST',
+      body: JSON.stringify(Object.fromEntries(values)),
+      headers: { 'Content-Type': 'application/json' },
+    });
+    if (response.ok) {
+      showSuccess();
+    }
+  } catch (err) {
+    showError(err.message);
+  }
+});
+
+form.addEventListener('hx-invalid', ({ detail }) => {
+  console.warn('Validation errors:', detail.errors);
+});
+```
+
+### Programmatic Validation
+
+```javascript
+const form = document.querySelector('hx-form');
+
+// Check all fields without UI
+const isValid = form.checkValidity();
+
+// Trigger browser validation UI on all invalid fields
+const canSubmit = form.reportValidity();
+
+// Collect form data
+const data = form.getFormData(); // Returns FormData
+```
+
+### Reset Handling
+
+```javascript
+form.addEventListener('hx-reset', () => {
+  console.log('Form was reset');
+  // Clear any custom error state
+  document.querySelectorAll('hx-text-input').forEach((input) => {
+    input.error = '';
+  });
+});
+```

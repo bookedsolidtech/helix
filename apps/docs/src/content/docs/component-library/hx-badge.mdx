@@ -76,3 +76,162 @@ Animated pulse effect for attention-demanding indicators.
 ## API Reference
 
 <ComponentDoc tagName="hx-badge" section="api" />
+
+## Accessibility
+
+`hx-badge` is a presentational component — it has no implicit ARIA role and is not interactive.
+
+### Providing Context for Screen Readers
+
+Badges are visual-only by default. Always pair badge content with accessible context for screen reader users.
+
+**Pattern 1: Visually hidden label**
+
+```html
+<!-- Notification count badge -->
+<button>
+  Messages
+  <hx-badge variant="error" aria-label="3 unread messages">3</hx-badge>
+</button>
+```
+
+**Pattern 2: `aria-describedby`**
+
+```html
+<span id="status-label">Patient Status</span>
+<hx-badge variant="error" aria-describedby="status-label">Critical</hx-badge>
+```
+
+**Pattern 3: Visually hidden text**
+
+```html
+<hx-badge variant="warning">
+  <span class="sr-only">Warning: </span>
+  Pending Review
+</hx-badge>
+```
+
+### Pulse Animation and Motion
+
+The `pulse` animation respects `prefers-reduced-motion`. When reduced motion is enabled, the pulse animation is suppressed. You do not need to handle this manually.
+
+### Healthcare Usage Guidance
+
+- Use `error` variant for critical status only — reserve for patient safety alerts.
+- Always provide text or `aria-label` — never rely on color alone to convey meaning.
+- Do not use pulsing badges in clinical workflows where they may cause alarm fatigue.
+
+## Drupal Integration
+
+### Inline Badge Template
+
+```twig
+{# templates/components/badge.html.twig #}
+<hx-badge
+  variant="{{ variant|default('primary') }}"
+  hx-size="{{ size|default('md') }}"
+  {{ pill ? 'pill' : '' }}
+  {{ pulse ? 'pulse' : '' }}
+>
+  {{ content }}
+</hx-badge>
+```
+
+### Status Badge in a Node Template
+
+```twig
+{# Display patient status as a badge #}
+{% set status_variant = {
+  'active': 'success',
+  'pending': 'warning',
+  'critical': 'error',
+  'inactive': 'neutral'
+} %}
+
+<hx-badge variant="{{ status_variant[node.field_status.value]|default('neutral') }}">
+  {{ node.field_status.value|capitalize }}
+</hx-badge>
+```
+
+### Drupal Library
+
+```yaml
+# mymodule.libraries.yml
+mymodule/badge:
+  dependencies:
+    - helix/hx-badge
+```
+
+## Theming
+
+### Available Tokens
+
+| Token | Default | Description |
+|-------|---------|-------------|
+| `--hx-badge-bg` | `var(--hx-color-primary-500)` | Badge background color |
+| `--hx-badge-color` | `var(--hx-color-neutral-0)` | Badge text color |
+| `--hx-badge-font-size` | *(per size variant)* | Badge font size |
+| `--hx-badge-font-weight` | `var(--hx-font-weight-semibold)` | Badge font weight |
+| `--hx-badge-font-family` | `var(--hx-font-family-sans)` | Badge font family |
+| `--hx-badge-border-radius` | `var(--hx-border-radius-md)` | Badge border radius |
+| `--hx-badge-padding-x` | *(per size variant)* | Horizontal padding |
+| `--hx-badge-padding-y` | *(per size variant)* | Vertical padding |
+| `--hx-badge-dot-size` | `var(--hx-size-2)` | Dot indicator size |
+
+### Override Example
+
+```css
+/* Custom badge color scheme */
+hx-badge[variant="error"] {
+  --hx-badge-bg: #b91c1c;
+  --hx-badge-color: #fff;
+}
+
+/* Outlined badge style */
+hx-badge.badge-outline {
+  --hx-badge-bg: transparent;
+  --hx-badge-color: var(--hx-color-primary-700);
+  outline: 1px solid currentColor;
+}
+```
+
+### CSS Parts
+
+```css
+hx-badge::part(badge) {
+  font-variant-numeric: tabular-nums;
+  min-width: 1.5rem;
+  text-align: center;
+}
+```
+
+## Extending
+
+### Dot Indicator
+
+When the default slot is empty and `pulse` is set, the badge renders as a dot indicator — useful for presence indicators:
+
+```html
+<!-- Online presence indicator -->
+<div style="position: relative; display: inline-block;">
+  <img src="avatar.png" alt="Dr. Smith">
+  <hx-badge
+    variant="success"
+    pulse
+    style="position: absolute; bottom: 0; right: 0;"
+    aria-label="Online"
+  ></hx-badge>
+</div>
+```
+
+### Dynamic Count Badge
+
+```javascript
+const badge = document.querySelector('hx-badge');
+
+function updateUnreadCount(count) {
+  badge.textContent = count > 99 ? '99+' : String(count);
+  badge.setAttribute('aria-label', `${count} unread notifications`);
+  badge.style.display = count === 0 ? 'none' : '';
+}
+```

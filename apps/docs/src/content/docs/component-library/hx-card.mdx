@@ -95,3 +95,171 @@ Card with `hx-href` becomes clickable. Uses the `hx-` prefix to avoid conflictin
 ## API Reference
 
 <ComponentDoc tagName="hx-card" section="api" />
+
+## Accessibility
+
+### ARIA Roles and Attributes
+
+- Static cards (no `hx-href`) have no implicit ARIA role — they are presentational containers.
+- Interactive cards (with `hx-href`) render as a focusable element with `role="link"`, supporting keyboard navigation.
+- Use landmark roles (`<article>`, `<section>`) in the consuming template when cards represent distinct content regions.
+
+### Keyboard Interaction
+
+| Key | Action |
+|-----|--------|
+| `Tab` | Move focus to interactive card (when `hx-href` is set) |
+| `Enter` / `Space` | Navigate to `hx-href` URL (when card is interactive) |
+
+### Best Practices
+
+- Provide meaningful content in the `heading` slot — this becomes the card's primary label.
+- For card grids, wrap in a `<ul>` with `<li>` wrappers to communicate the list structure to screen readers:
+
+```html
+<ul role="list">
+  <li>
+    <hx-card>
+      <span slot="heading">Patient Record</span>
+      <p>Last visit: February 2026</p>
+    </hx-card>
+  </li>
+</ul>
+```
+
+- For clickable cards, ensure the heading text is descriptive enough to distinguish cards in a list.
+
+## Drupal Integration
+
+### Basic Card Template
+
+```twig
+{# templates/components/card.html.twig #}
+<hx-card
+  variant="{{ variant|default('default') }}"
+  elevation="{{ elevation|default('flat') }}"
+  {{ hx_href ? 'hx-href="' ~ hx_href ~ '"' : '' }}
+>
+  {% if image %}
+    <div slot="image">{{ image }}</div>
+  {% endif %}
+  {% if heading %}
+    <span slot="heading">{{ heading }}</span>
+  {% endif %}
+  {{ body }}
+  {% if footer %}
+    <span slot="footer">{{ footer }}</span>
+  {% endif %}
+  {% if actions %}
+    <div slot="actions">{{ actions }}</div>
+  {% endif %}
+</hx-card>
+```
+
+### Content Entity Card
+
+```twig
+{# Display a Drupal node as a card #}
+<hx-card variant="default" elevation="raised" hx-href="{{ node.url }}">
+  {% if node.field_image %}
+    <div slot="image">
+      {{ node.field_image.0 | view }}
+    </div>
+  {% endif %}
+  <span slot="heading">{{ node.title }}</span>
+  <p>{{ node.body.summary }}</p>
+  <span slot="footer">{{ node.created|date('M d, Y') }}</span>
+</hx-card>
+```
+
+### Drupal Library
+
+```yaml
+# mymodule.libraries.yml
+mymodule/card:
+  dependencies:
+    - helix/hx-card
+```
+
+## Theming
+
+### Available Tokens
+
+| Token | Default | Description |
+|-------|---------|-------------|
+| `--hx-card-bg` | `var(--hx-color-neutral-0)` | Card background color |
+| `--hx-card-color` | `var(--hx-color-neutral-800)` | Card text color |
+| `--hx-card-border-color` | `var(--hx-color-neutral-200)` | Card border color |
+| `--hx-card-border-radius` | `var(--hx-border-radius-lg)` | Card border radius |
+| `--hx-card-padding` | `var(--hx-space-6)` | Internal padding |
+| `--hx-card-gap` | `var(--hx-space-4)` | Gap between card sections |
+
+### Override Example
+
+```css
+/* Featured card with brand highlight */
+hx-card[variant="featured"] {
+  --hx-card-border-color: var(--brand-color-primary);
+  --hx-card-bg: var(--brand-color-surface-featured);
+}
+```
+
+### CSS Parts
+
+```css
+/* Style the card container */
+hx-card::part(card) {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+hx-card:hover::part(card) {
+  transform: translateY(-2px);
+}
+
+/* Style individual sections */
+hx-card::part(heading) {
+  font-size: var(--hx-font-size-lg);
+  font-weight: var(--hx-font-weight-bold);
+}
+
+hx-card::part(actions) {
+  background: var(--hx-color-neutral-50);
+}
+```
+
+## Extending
+
+### Listening to Card Click Events
+
+```javascript
+const card = document.querySelector('hx-card[hx-href]');
+
+card.addEventListener('hx-card-click', ({ detail }) => {
+  // Intercept navigation for SPA routing
+  history.pushState(null, '', detail.url);
+  loadPage(detail.url);
+});
+```
+
+### Card Grid Layout Pattern
+
+```html
+<style>
+  .card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: var(--hx-space-6);
+  }
+</style>
+
+<div class="card-grid">
+  <hx-card elevation="raised">
+    <span slot="heading">Patient Summary</span>
+    <p>MRN: 12345678 | DOB: 1985-03-14</p>
+  </hx-card>
+  <hx-card elevation="raised">
+    <span slot="heading">Recent Lab Results</span>
+    <p>Last updated: Feb 27, 2026</p>
+  </hx-card>
+</div>
+```

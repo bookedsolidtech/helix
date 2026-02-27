@@ -54,3 +54,176 @@ Required checkbox with error and help text.
 ## API Reference
 
 <ComponentDoc tagName="hx-checkbox" section="api" />
+
+## Accessibility
+
+`hx-checkbox` uses a native `<input type="checkbox">` inside Shadow DOM and `ElementInternals` for full form participation and ARIA compliance.
+
+### ARIA Roles and Attributes
+
+- **Role**: `checkbox` (native `<input type="checkbox">`)
+- **Checked state**: Reflected via native `checked` attribute
+- **Indeterminate state**: Sets `aria-checked="mixed"` on the input
+- **Error state**: Associates error message via `aria-describedby`
+- **Help text**: Associated via `aria-describedby`
+- **Required**: Sets `aria-required="true"` on the input
+
+### Keyboard Interaction
+
+| Key | Action |
+|-----|--------|
+| `Tab` | Move focus to checkbox |
+| `Space` | Toggle checked state |
+
+### Select All Pattern (Indeterminate)
+
+```html
+<hx-checkbox
+  id="select-all"
+  label="Select all patients"
+  indeterminate
+></hx-checkbox>
+
+<script>
+  const selectAll = document.getElementById('select-all');
+  const checkboxes = document.querySelectorAll('.patient-checkbox');
+
+  selectAll.addEventListener('hx-change', ({ detail }) => {
+    checkboxes.forEach((cb) => (cb.checked = detail.checked));
+    selectAll.indeterminate = false;
+  });
+
+  checkboxes.forEach((cb) => {
+    cb.addEventListener('hx-change', () => {
+      const checked = [...checkboxes].filter((c) => c.checked);
+      selectAll.indeterminate = checked.length > 0 && checked.length < checkboxes.length;
+      selectAll.checked = checked.length === checkboxes.length;
+    });
+  });
+</script>
+```
+
+## Drupal Integration
+
+### Basic Checkbox Template
+
+```twig
+{# templates/components/checkbox.html.twig #}
+<hx-checkbox
+  name="{{ name }}"
+  value="{{ value|default('on') }}"
+  label="{{ label }}"
+  {{ checked ? 'checked' : '' }}
+  {{ disabled ? 'disabled' : '' }}
+  {{ required ? 'required' : '' }}
+  {{ error ? 'error="' ~ error ~ '"' : '' }}
+  {{ help_text ? 'help-text="' ~ help_text ~ '"' : '' }}
+></hx-checkbox>
+```
+
+### Drupal Form API Integration
+
+```twig
+{# In a Drupal form element template #}
+<hx-checkbox
+  name="{{ element['#name'] }}"
+  value="{{ element['#return_value'] }}"
+  label="{{ element['#title'] }}"
+  {{ element['#value'] ? 'checked' : '' }}
+  {{ element['#disabled'] ? 'disabled' : '' }}
+  {{ element['#required'] ? 'required' : '' }}
+  {% if element['#errors'] %}
+    error="{{ element['#errors']|render|striptags }}"
+  {% endif %}
+></hx-checkbox>
+```
+
+### Drupal Library
+
+```yaml
+# mymodule.libraries.yml
+mymodule/checkbox:
+  dependencies:
+    - helix/hx-checkbox
+```
+
+## Theming
+
+### Available Tokens
+
+| Token | Default | Description |
+|-------|---------|-------------|
+| `--hx-checkbox-size` | `var(--hx-size-5)` | Checkbox dimensions |
+| `--hx-checkbox-border-color` | `var(--hx-color-neutral-300)` | Checkbox border color |
+| `--hx-checkbox-border-radius` | `var(--hx-border-radius-sm)` | Checkbox border radius |
+| `--hx-checkbox-checked-bg` | `var(--hx-color-primary-500)` | Checked background color |
+| `--hx-checkbox-checked-border-color` | `var(--hx-color-primary-500)` | Checked border color |
+| `--hx-checkbox-checkmark-color` | `var(--hx-color-neutral-0)` | Checkmark color |
+| `--hx-checkbox-focus-ring-color` | `var(--hx-focus-ring-color)` | Focus ring color |
+| `--hx-checkbox-label-color` | `var(--hx-color-neutral-700)` | Label text color |
+| `--hx-checkbox-error-color` | `var(--hx-color-error-500)` | Error state color |
+
+### Override Example
+
+```css
+/* Brand-specific checkbox styling */
+hx-checkbox {
+  --hx-checkbox-checked-bg: var(--brand-color-primary);
+  --hx-checkbox-checked-border-color: var(--brand-color-primary);
+  --hx-checkbox-border-radius: 2px;
+}
+```
+
+### CSS Parts
+
+```css
+/* Style the visual checkbox element */
+hx-checkbox::part(checkbox) {
+  width: 1.5rem;
+  height: 1.5rem;
+}
+
+/* Style the label */
+hx-checkbox::part(label) {
+  font-size: var(--hx-font-size-sm);
+}
+
+/* Style error messages */
+hx-checkbox::part(error) {
+  font-weight: var(--hx-font-weight-semibold);
+}
+```
+
+## Extending
+
+### Listening to Change Events
+
+```javascript
+const checkbox = document.querySelector('hx-checkbox');
+
+checkbox.addEventListener('hx-change', ({ detail }) => {
+  console.log('Checked:', detail.checked);
+  console.log('Value:', detail.value);
+});
+```
+
+### Custom Label via Slot
+
+```html
+<hx-checkbox name="consent" required>
+  I agree to the
+  <a href="/privacy">Privacy Policy</a>
+  and
+  <a href="/terms">Terms of Service</a>
+</hx-checkbox>
+```
+
+### Programmatic Validation
+
+```javascript
+const checkbox = document.querySelector('hx-checkbox[required]');
+
+if (!checkbox.checkValidity()) {
+  checkbox.error = 'You must accept the terms to continue.';
+}
+```
