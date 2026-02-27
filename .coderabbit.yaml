@@ -1,0 +1,214 @@
+# CodeRabbit Configuration
+# Enterprise Healthcare Web Component Library (wc-2026 / helix)
+# https://docs.coderabbit.ai
+
+language: "en-US"
+
+tone_instructions: >
+  Be professional, precise, and direct. This is an enterprise healthcare design system
+  where quality failures can impact patient care. Hold the bar high. Flag any deviation
+  from established conventions without softening. Praise is not required — correctness is.
+
+reviews:
+  profile: "assertive"
+  request_changes_workflow: true
+  high_level_summary: true
+  high_level_summary_placeholder: "@coderabbitai summary"
+  auto_review:
+    enabled: true
+    drafts: false
+    base_branches:
+      - "main"
+      - "staging"
+      - "dev"
+
+  poem: false
+
+  # Suggest test additions when untested code is detected
+  review_status: true
+
+  # Path-specific instructions
+  path_instructions:
+    # ─────────────────────────────────────────────
+    # Core Component Library
+    # ─────────────────────────────────────────────
+    - path: "packages/hx-library/**"
+      instructions: |
+        This is the core Lit 3.x web component library for enterprise healthcare.
+        Apply the highest quality bar — failures here affect downstream consumers.
+
+        ENFORCE:
+        - No hardcoded color, spacing, or typography values. All visual values must use
+          CSS custom properties with the `--hx-` prefix (e.g., `--hx-color-primary`).
+          Flag any raw hex, rgb(), hsl(), px, rem, em values that aren't design token references.
+        - TypeScript strict mode: zero `any`, zero `@ts-ignore`, zero non-null assertions (`!`).
+        - Shadow DOM encapsulation: styles must not leak outside the component.
+        - All public properties must be reflected in the Custom Elements Manifest (CEM).
+          If new `@property()` decorators are added, flag if `custom-elements.json` is not updated.
+        - Every component change requires corresponding test coverage (`.test.ts` file).
+          Flag PRs that modify component logic without touching the test file.
+        - Accessibility is non-negotiable: ARIA roles, labels, keyboard navigation, and focus
+          management must be present for every interactive component. Flag any interactive
+          element missing `role`, `aria-label`/`aria-labelledby`, or keyboard event handlers.
+        - Component events must use the `hx-` prefix (e.g., `hx-click`, `hx-change`).
+        - CSS parts must be lowercase and hyphenated (e.g., `part="input-wrapper"`).
+        - Tag names must use the `hx-` prefix.
+        - No `console.log` in production component code.
+        - Design token three-tier cascade must be respected:
+          Primitive → Semantic (`--hx-color-*`) → Component (`--hx-button-*`).
+
+    - path: "packages/hx-library/src/components/**"
+      instructions: |
+        Each component directory must follow the canonical file structure:
+          hx-{name}/
+          ├── index.ts              (re-export only)
+          ├── hx-{name}.ts          (component class)
+          ├── hx-{name}.styles.ts   (Lit CSS tagged template)
+          ├── hx-{name}.stories.ts  (Storybook stories)
+          └── hx-{name}.test.ts     (Vitest browser tests)
+
+        Flag any missing files in a new or modified component directory.
+        Flag business logic in `index.ts` (it should only re-export).
+
+    - path: "packages/hx-library/**/*.test.ts"
+      instructions: |
+        Tests use Vitest browser mode with the shared test utilities in `src/test-utils.ts`.
+        Enforce:
+        - Use `fixture`, `shadowQuery`, `oneEvent`, and `cleanup` from test-utils.
+        - Every public property must have at least one test.
+        - Every interactive behavior must be tested (click, keyboard, focus).
+        - Accessibility attributes must be verified in tests (role, aria-label, tabindex).
+        - No skipped tests (`it.skip`, `describe.skip`, `xit`) without an explanation comment.
+        - Minimum 80% coverage is the gate — flag sparse test files.
+
+    - path: "packages/hx-library/**/*.stories.ts"
+      instructions: |
+        Stories use Storybook 10.x with CEM-driven autodocs.
+        Enforce:
+        - Every public property must have a corresponding Storybook control.
+        - All documented variants must have a named story.
+        - Stories must import the component via its package path, not relative paths.
+        - No hardcoded values in story args — use design token references where applicable.
+
+    - path: "packages/hx-tokens/**"
+      instructions: |
+        This is the design token source package. Changes here cascade across the entire system.
+        Flag any:
+        - Removal of an existing token (potential breaking change for consumers).
+        - Token renames (breaking change — must include deprecation path).
+        - Raw values not following the three-tier primitive → semantic → component pattern.
+        - Missing or inconsistent naming: tokens must follow `--hx-{tier}-{category}-{variant}`.
+
+    # ─────────────────────────────────────────────
+    # Admin Dashboard (Next.js 15)
+    # ─────────────────────────────────────────────
+    - path: "apps/admin/**"
+      instructions: |
+        This is a Next.js 15 admin dashboard using the App Router, React Server Components,
+        and Tailwind CSS. It is an internal tool, not consumer-facing.
+
+        Enforce:
+        - Use Tailwind utility classes; no inline styles or external CSS modules unless necessary.
+        - Server Components by default — only add `"use client"` when interactivity is required.
+          Flag `"use client"` additions that could instead be handled server-side.
+        - Use Next.js 15 patterns: `async` server components, `fetch` with `cache` options,
+          `loading.tsx` / `error.tsx` conventions for route segments.
+        - TypeScript strict mode: no `any`, no untyped API responses.
+        - Flag direct DOM manipulation — use React state and refs instead.
+        - No hardcoded API endpoints — use environment variables or config constants.
+        - Accessibility: admin UIs must still be keyboard-navigable. Flag missing ARIA labels
+          on interactive elements.
+
+    - path: "apps/admin/src/lib/health-scorer.ts"
+      instructions: |
+        This is the component health scoring engine. It is the source of truth for component
+        quality metrics displayed in the admin dashboard.
+        Flag any:
+        - Changes to scoring thresholds without a corresponding comment explaining the rationale.
+        - New scoring criteria that lack test coverage.
+        - Removal of existing scoring criteria (potential regression in health reporting).
+
+    # ─────────────────────────────────────────────
+    # Documentation Site (Astro Starlight)
+    # ─────────────────────────────────────────────
+    - path: "apps/docs/**"
+      instructions: |
+        This is the public-facing documentation site built with Astro Starlight.
+        Documentation quality reflects directly on the enterprise credibility of the library.
+
+        Enforce:
+        - Every new component added to `packages/hx-library/` must have a corresponding
+          documentation page. Flag component PRs that lack docs additions.
+        - Code examples must use the `hx-` tag prefix and `--hx-` token references.
+        - Frontmatter must be complete: `title`, `description`, and `sidebar` fields required.
+        - No broken internal links — flag relative links to pages that may not exist.
+        - API tables must stay in sync with the CEM output. Flag docs that document
+          properties/events not present in `custom-elements.json`.
+        - Usage examples must include accessibility context (labels, ARIA, keyboard patterns).
+
+    # ─────────────────────────────────────────────
+    # Storybook
+    # ─────────────────────────────────────────────
+    - path: "apps/storybook/**"
+      instructions: |
+        Storybook configuration and global decorators.
+        Flag any changes to `.storybook/main.ts` that alter the CEM autodocs integration,
+        as this would break property documentation across all components.
+
+    # ─────────────────────────────────────────────
+    # MCP Servers
+    # ─────────────────────────────────────────────
+    - path: "apps/mcp-servers/**"
+      instructions: |
+        These are internal MCP (Model Context Protocol) tooling servers.
+        Enforce TypeScript strict mode and test coverage.
+        Flag any handler that lacks a corresponding test case.
+
+    # ─────────────────────────────────────────────
+    # Build & CI Configuration
+    # ─────────────────────────────────────────────
+    - path: "turbo.json"
+      instructions: |
+        Changes to the Turborepo pipeline affect all build and CI workflows.
+        Flag any removal of quality-gate tasks (type-check, test, lint, build, cem).
+        Additions must include a `dependsOn` declaration to preserve pipeline correctness.
+
+    - path: "scripts/**"
+      instructions: |
+        These are CI/CD and developer tooling scripts.
+        Flag shell scripts that use `--no-verify` or bypass quality gates.
+        Flag scripts that run `git reset --hard` or `git push --force` without
+        an explicit safety comment.
+
+    - path: ".github/**"
+      instructions: |
+        GitHub Actions workflows and repository configuration.
+        Flag any workflow change that removes a required status check.
+        Flag secrets or credentials committed to workflow files.
+        Ensure `npm run type-check` and `npm run test` remain required checks on `main`.
+
+    # ─────────────────────────────────────────────
+    # Package Manifests
+    # ─────────────────────────────────────────────
+    - path: "**/package.json"
+      instructions: |
+        Flag any new dependency additions — justify necessity and check bundle impact.
+        Flag devDependency-to-dependency promotions (increases consumer bundle size).
+        Ensure `peerDependencies` versions are not overly restrictive.
+        Flag version range changes from exact (`1.2.3`) to loose (`^1.0.0`) or vice versa
+        without explanation.
+
+    - path: "tsconfig*.json"
+      instructions: |
+        TypeScript configuration is shared across the monorepo.
+        Flag any weakening of strict mode settings:
+        - `strict: false` — hard reject
+        - `noImplicitAny: false` — hard reject
+        - `skipLibCheck` added without justification
+        Changes must maintain or strengthen type safety.
+
+  # Summarize all changes in the PR description
+  collapse_walkthrough: false
+
+chat:
+  auto_reply: true

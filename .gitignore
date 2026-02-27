@@ -42,3 +42,18 @@ scripts/coverage/
 
 # MCP server test coverage reports
 apps/mcp-servers/*/coverage/
+
+# Automaker / Beads server state (not committed)
+.automaker/
+.beads/
+.workstream-results/
+protoLabs.report.html
+protolab.config
+
+# Worktrees (managed by git, not committed)
+.worktrees/
+
+# Test / VRT artifacts
+test-results/
+apps/*/test-results/
+packages/hx-library/.cache/vrt-results/
