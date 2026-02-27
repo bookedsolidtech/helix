@@ -92,3 +92,168 @@ Full variant × size matrix.
 ## API Reference
 
 <ComponentDoc tagName="hx-button" section="api" />
+
+## Accessibility
+
+`hx-button` renders a native `<button>` element inside Shadow DOM, giving it full browser keyboard support and accessibility out of the box.
+
+### ARIA Roles and Attributes
+
+- **Role**: `button` (native `<button>` element)
+- **Disabled state**: Sets `disabled` on the native button element, preventing focus and interaction
+- **Form participation**: Uses `ElementInternals` for form-associated behavior (supports `type="submit"` and `type="reset"`)
+
+### Keyboard Interaction
+
+| Key | Action |
+|-----|--------|
+| `Tab` | Move focus to button |
+| `Enter` | Activate button |
+| `Space` | Activate button |
+
+### Usage Guidance
+
+- Always provide visible label text as slot content — avoid icon-only buttons without an accessible name.
+- For icon-only buttons, add `aria-label` to the host element:
+
+```html
+<hx-button aria-label="Delete patient record" variant="ghost">
+  <svg><!-- trash icon --></svg>
+</hx-button>
+```
+
+- Use `type="submit"` inside `<hx-form>` or native `<form>` to submit the form.
+- In healthcare UIs, destructive actions should require confirmation — use `type="button"` and handle in JavaScript.
+
+## Drupal Integration
+
+### Basic Twig Template
+
+```twig
+{# templates/components/button.html.twig #}
+<hx-button
+  variant="{{ variant|default('primary') }}"
+  hx-size="{{ size|default('md') }}"
+  type="{{ type|default('button') }}"
+  {{ disabled ? 'disabled' : '' }}
+>
+  {{ label }}
+</hx-button>
+```
+
+### Drupal Form API Link Button
+
+```twig
+{# In a Drupal link template #}
+<hx-button variant="secondary" type="button">
+  <a href="{{ url }}">{{ text }}</a>
+</hx-button>
+```
+
+### Drupal Behavior: Confirm Destructive Actions
+
+```javascript
+(function (Drupal) {
+  Drupal.behaviors.helixButtonConfirm = {
+    attach(context) {
+      context.querySelectorAll('hx-button[data-confirm]').forEach((btn) => {
+        btn.addEventListener('hx-click', (e) => {
+          if (!window.confirm(btn.dataset.confirm)) {
+            e.detail.originalEvent.preventDefault();
+          }
+        });
+      });
+    }
+  };
+})(Drupal);
+```
+
+### Drupal Library
+
+```yaml
+# mymodule.libraries.yml
+mymodule/button:
+  dependencies:
+    - helix/hx-button
+```
+
+## Theming
+
+### Available Tokens
+
+| Token | Default | Description |
+|-------|---------|-------------|
+| `--hx-button-bg` | `var(--hx-color-primary-500)` | Button background color |
+| `--hx-button-color` | `var(--hx-color-neutral-0)` | Button text color |
+| `--hx-button-border-color` | `transparent` | Button border color |
+| `--hx-button-border-radius` | `var(--hx-border-radius-md)` | Button border radius |
+| `--hx-button-font-family` | `var(--hx-font-family-sans)` | Button font family |
+| `--hx-button-font-weight` | `var(--hx-font-weight-semibold)` | Button font weight |
+| `--hx-button-focus-ring-color` | `var(--hx-focus-ring-color)` | Focus ring color |
+
+### Override Example
+
+```css
+/* Brand-specific button theming */
+hx-button[variant="primary"] {
+  --hx-button-bg: var(--brand-color-primary);
+  --hx-button-color: var(--brand-color-on-primary);
+  --hx-button-border-radius: var(--brand-radius-button);
+}
+
+/* Danger button variant via token override */
+hx-button.btn-danger {
+  --hx-button-bg: var(--hx-color-error-500);
+  --hx-button-color: #fff;
+}
+```
+
+### CSS Parts
+
+```css
+/* Target the native button element */
+hx-button::part(button) {
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+```
+
+## Extending
+
+### Listening to Click Events
+
+```javascript
+const btn = document.querySelector('hx-button');
+
+btn.addEventListener('hx-click', ({ detail }) => {
+  console.log('Original event:', detail.originalEvent);
+});
+```
+
+### Form Submission Pattern
+
+```html
+<hx-form action="/api/patients" method="post">
+  <hx-text-input name="mrn" label="Patient MRN" required></hx-text-input>
+  <hx-button type="submit">Save Patient</hx-button>
+  <hx-button type="reset" variant="ghost">Clear</hx-button>
+</hx-form>
+```
+
+### Loading State Pattern
+
+```javascript
+const submitBtn = document.querySelector('hx-button[type="submit"]');
+const form = document.querySelector('hx-form');
+
+form.addEventListener('hx-submit', async ({ detail }) => {
+  submitBtn.disabled = true;
+  submitBtn.textContent = 'Saving…';
+  try {
+    await saveData(detail.values);
+  } finally {
+    submitBtn.disabled = false;
+    submitBtn.textContent = 'Save Patient';
+  }
+});
+```
