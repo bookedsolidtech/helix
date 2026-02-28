@@ -131,7 +131,7 @@ export function analyzeTypeSafety(tagName: string): TypeSafetyResult | null {
     codeOnly.match(/^\s+(?:override\s+)?(?:render|focus|select|check\w+|report\w+)\s*\(/gm) || [];
   const typedMethods =
     codeOnly.match(
-      /^\s+(?:override\s+)?(?:render|focus|select|check\w+|report\w+)\s*\([^)]*\)\s*:\s*\w+/gm,
+      /^\s+(?:override\s+)?(?:render|focus|select|check\w+|report\w+)\s*\([^)]*\)\s*:\s*[\w<>|, [\]]+/gm,
     ) || [];
   const methodsTyped = publicMethods.length === 0 || typedMethods.length >= publicMethods.length;
   checks.push({

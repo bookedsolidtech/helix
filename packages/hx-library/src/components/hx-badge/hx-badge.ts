@@ -1,4 +1,4 @@
-import { LitElement, html } from 'lit';
+import { LitElement, html, type TemplateResult } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { tokenStyles } from '@helix/tokens/lit';
@@ -52,7 +52,7 @@ export class HelixBadge extends LitElement {
    * @default false
    */
   @property({ type: Boolean, reflect: true })
-  pill = false;
+  pill: boolean = false;
 
   /**
    * Whether the badge displays an animated pulse for attention.
@@ -60,7 +60,7 @@ export class HelixBadge extends LitElement {
    * @default false
    */
   @property({ type: Boolean, reflect: true })
-  pulse = false;
+  pulse: boolean = false;
 
   /**
    * Tracks whether the default slot has assigned content.
@@ -114,7 +114,7 @@ export class HelixBadge extends LitElement {
 
   // ─── Render ───
 
-  override render() {
+  override render(): TemplateResult {
     return html`
       <span part="badge" class=${classMap(this.getBadgeClasses())}>
         ${this.renderContent()}

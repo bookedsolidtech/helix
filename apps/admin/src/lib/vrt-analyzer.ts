@@ -5,6 +5,7 @@
  */
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { resolve } from 'node:path';
+import { getComponentDirectory } from './cem-parser';
 
 export interface VrtResult {
   tagName: string;
@@ -37,7 +38,11 @@ function getProjectRoot(): string {
 }
 
 function getComponentScreenshotsDir(tagName: string): string {
-  return resolve(getProjectRoot(), `packages/hx-library/src/components/${tagName}/__screenshots__`);
+  const dir = getComponentDirectory(tagName);
+  return resolve(
+    getProjectRoot(),
+    `packages/hx-library/src/components/${dir}/__screenshots__/${tagName}.test.ts`,
+  );
 }
 
 function getTestResultsPath(): string {

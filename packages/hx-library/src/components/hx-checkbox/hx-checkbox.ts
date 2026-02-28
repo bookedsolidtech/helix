@@ -1,4 +1,4 @@
-import { LitElement, html, nothing } from 'lit';
+import { LitElement, html, nothing, type TemplateResult } from 'lit';
 import { customElement, property, query, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
@@ -58,7 +58,7 @@ export class HelixCheckbox extends LitElement {
    * @default false
    */
   @property({ type: Boolean, reflect: true })
-  checked = false;
+  checked: boolean = false;
 
   /**
    * Whether the checkbox is in an indeterminate state (e.g., for "select all" patterns).
@@ -66,7 +66,7 @@ export class HelixCheckbox extends LitElement {
    * @default false
    */
   @property({ type: Boolean })
-  indeterminate = false;
+  indeterminate: boolean = false;
 
   /**
    * Whether the checkbox is disabled.
@@ -74,7 +74,7 @@ export class HelixCheckbox extends LitElement {
    * @default false
    */
   @property({ type: Boolean, reflect: true })
-  disabled = false;
+  disabled: boolean = false;
 
   /**
    * Whether the checkbox is required for form submission.
@@ -82,7 +82,7 @@ export class HelixCheckbox extends LitElement {
    * @default false
    */
   @property({ type: Boolean, reflect: true })
-  required = false;
+  required: boolean = false;
 
   /**
    * The name of the checkbox, used for form submission.
@@ -284,7 +284,7 @@ export class HelixCheckbox extends LitElement {
   private _errorId = `${this._id}-error`;
   private _labelId = `${this._id}-label`;
 
-  override render() {
+  override render(): TemplateResult {
     const hasError = !!this.error;
 
     const describedBy =

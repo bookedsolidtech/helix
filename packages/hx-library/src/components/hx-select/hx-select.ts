@@ -1,4 +1,4 @@
-import { LitElement, html, nothing } from 'lit';
+import { LitElement, html, nothing, type TemplateResult } from 'lit';
 import { customElement, property, query, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
@@ -88,7 +88,7 @@ export class HelixSelect extends LitElement {
    * @default false
    */
   @property({ type: Boolean, reflect: true })
-  required = false;
+  required: boolean = false;
 
   /**
    * Whether the select is disabled.
@@ -96,7 +96,7 @@ export class HelixSelect extends LitElement {
    * @default false
    */
   @property({ type: Boolean, reflect: true })
-  disabled = false;
+  disabled: boolean = false;
 
   /**
    * The name of the select, used for form submission.
@@ -328,7 +328,7 @@ export class HelixSelect extends LitElement {
   private _helpTextId = `${this._selectId}-help`;
   private _errorId = `${this._selectId}-error`;
 
-  override render() {
+  override render(): TemplateResult {
     const hasError = !!this.error;
 
     const selectClasses = {

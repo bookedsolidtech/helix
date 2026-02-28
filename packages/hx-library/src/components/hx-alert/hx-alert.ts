@@ -1,4 +1,4 @@
-import { LitElement, html, nothing } from 'lit';
+import { LitElement, html, nothing, type TemplateResult } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { tokenStyles } from '@helix/tokens/lit';
@@ -58,7 +58,7 @@ export class HelixAlert extends LitElement {
    * @default false
    */
   @property({ type: Boolean, reflect: true })
-  closable = false;
+  closable: boolean = false;
 
   /**
    * Whether the alert is visible. Set to false to hide the alert.
@@ -66,7 +66,7 @@ export class HelixAlert extends LitElement {
    * @default true
    */
   @property({ type: Boolean, reflect: true })
-  open = true;
+  open: boolean = true;
 
   // ─── Private Helpers ───
 
@@ -205,7 +205,7 @@ export class HelixAlert extends LitElement {
      * @event hx-close
      */
     this.dispatchEvent(
-      new CustomEvent('hx-close', {
+      new CustomEvent<{ reason: string }>('hx-close', {
         bubbles: true,
         composed: true,
         detail: { reason: 'user' },
@@ -217,7 +217,7 @@ export class HelixAlert extends LitElement {
      * @event hx-after-close
      */
     this.dispatchEvent(
-      new CustomEvent('hx-after-close', {
+      new CustomEvent<void>('hx-after-close', {
         bubbles: true,
         composed: true,
       }),
@@ -226,7 +226,7 @@ export class HelixAlert extends LitElement {
 
   // ─── Render ───
 
-  override render() {
+  override render(): TemplateResult {
     return html`
       <div
         part="alert"

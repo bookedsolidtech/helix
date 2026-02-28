@@ -1,4 +1,4 @@
-import { LitElement, html } from 'lit';
+import { LitElement, html, type TemplateResult } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { tokenStyles } from '@helix/tokens/lit';
@@ -52,7 +52,7 @@ export class HelixRadio extends LitElement {
    * @default false
    */
   @property({ type: Boolean, reflect: true })
-  disabled = false;
+  disabled: boolean = false;
 
   /**
    * Whether this radio is checked. Managed by the parent group.
@@ -60,7 +60,7 @@ export class HelixRadio extends LitElement {
    * @default false
    */
   @property({ type: Boolean, reflect: true })
-  checked = false;
+  checked: boolean = false;
 
   // ─── Lifecycle ───
 
@@ -95,7 +95,7 @@ export class HelixRadio extends LitElement {
      * @internal
      */
     this.dispatchEvent(
-      new CustomEvent('hx-radio-select', {
+      new CustomEvent<{ value: string }>('hx-radio-select', {
         bubbles: true,
         composed: true,
         detail: { value: this.value },
@@ -105,7 +105,7 @@ export class HelixRadio extends LitElement {
 
   // ─── Render ───
 
-  override render() {
+  override render(): TemplateResult {
     const classes = {
       radio: true,
       'radio--checked': this.checked,

@@ -1,4 +1,4 @@
-import { LitElement, html } from 'lit';
+import { LitElement, html, type TemplateResult } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { AdoptedStylesheetsController } from '../../controllers/adopted-stylesheets.js';
 import { helixProseScopedCss } from './hx-prose.styles.js';
@@ -54,7 +54,7 @@ export class HelixProse extends LitElement {
    * @default ''
    */
   @property({ type: String, reflect: true, attribute: 'max-width' })
-  maxWidth = '';
+  maxWidth: string = '';
 
   // ─── Lifecycle ───
 
@@ -97,7 +97,7 @@ export class HelixProse extends LitElement {
    * @protected
    * @since 1.0.0
    */
-  protected renderContent(): unknown {
+  protected renderContent(): TemplateResult {
     return html`<slot></slot>`;
   }
 
@@ -120,7 +120,7 @@ export class HelixProse extends LitElement {
 
   // ─── Render ───
 
-  override render() {
+  override render(): TemplateResult {
     return this.renderContent();
   }
 }

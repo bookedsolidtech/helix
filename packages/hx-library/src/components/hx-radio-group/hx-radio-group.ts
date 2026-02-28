@@ -1,4 +1,4 @@
-import { LitElement, html, nothing } from 'lit';
+import { LitElement, html, nothing, type TemplateResult } from 'lit';
 import { customElement, property, query, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { tokenStyles } from '@helix/tokens/lit';
@@ -75,7 +75,7 @@ export class HelixRadioGroup extends LitElement {
    * @default false
    */
   @property({ type: Boolean, reflect: true })
-  required = false;
+  required: boolean = false;
 
   /**
    * Whether the entire group is disabled.
@@ -83,7 +83,7 @@ export class HelixRadioGroup extends LitElement {
    * @default false
    */
   @property({ type: Boolean, reflect: true })
-  disabled = false;
+  disabled: boolean = false;
 
   /**
    * Error message to display. When set, the group enters an error state.
@@ -223,7 +223,7 @@ export class HelixRadioGroup extends LitElement {
      * @event hx-change
      */
     this.dispatchEvent(
-      new CustomEvent('hx-change', {
+      new CustomEvent<{ value: string }>('hx-change', {
         bubbles: true,
         composed: true,
         detail: { value: this.value },
@@ -259,7 +259,7 @@ export class HelixRadioGroup extends LitElement {
     if (nextRadio) {
       nextRadio.focus();
       nextRadio.dispatchEvent(
-        new CustomEvent('hx-radio-select', {
+        new CustomEvent<{ value: string }>('hx-radio-select', {
           bubbles: true,
           composed: true,
           detail: { value: nextRadio.value },
@@ -349,7 +349,7 @@ export class HelixRadioGroup extends LitElement {
 
   // ─── Render ───
 
-  override render() {
+  override render(): TemplateResult {
     const hasError = !!this.error;
 
     return html`

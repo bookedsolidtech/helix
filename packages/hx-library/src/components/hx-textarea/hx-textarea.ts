@@ -1,4 +1,4 @@
-import { LitElement, html, nothing } from 'lit';
+import { LitElement, html, nothing, type TemplateResult } from 'lit';
 import { customElement, property, query } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
@@ -85,7 +85,7 @@ export class HelixTextarea extends LitElement {
    * @default false
    */
   @property({ type: Boolean, reflect: true })
-  required = false;
+  required: boolean = false;
 
   /**
    * Whether the textarea is disabled.
@@ -93,7 +93,7 @@ export class HelixTextarea extends LitElement {
    * @default false
    */
   @property({ type: Boolean, reflect: true })
-  disabled = false;
+  disabled: boolean = false;
 
   /**
    * Error message to display. When set, the textarea enters an error state.
@@ -149,7 +149,7 @@ export class HelixTextarea extends LitElement {
    * @default false
    */
   @property({ type: Boolean, attribute: 'show-count' })
-  showCount = false;
+  showCount: boolean = false;
 
   /**
    * Accessible name for screen readers, if different from the visible label.
@@ -349,7 +349,7 @@ export class HelixTextarea extends LitElement {
     return html` <div part="counter" class="field__counter">${display}</div> `;
   }
 
-  override render() {
+  override render(): TemplateResult {
     const hasError = !!this.error || this._hasErrorSlot;
 
     const describedBy =

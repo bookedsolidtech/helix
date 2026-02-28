@@ -1,4 +1,4 @@
-import { LitElement, html } from 'lit';
+import { LitElement, html, nothing, type TemplateResult } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { tokenStyles } from '@helix/tokens/lit';
@@ -49,6 +49,16 @@ export class HelixContainer extends LitElement {
   @property({ type: String, reflect: true })
   padding: 'none' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' = 'none';
 
+  /**
+   * Optional accessible label for the container region (maps to aria-label).
+   * Use when the container represents a distinct landmark or region that
+   * requires identification for screen reader users.
+   * @attr label
+   * @default ''
+   */
+  @property({ type: String, reflect: true })
+  label: string = '';
+
   // ─── Extension API ───
 
   /**
@@ -75,9 +85,13 @@ export class HelixContainer extends LitElement {
 
   // ─── Render ───
 
-  override render() {
+  override render(): TemplateResult {
     return html`
-      <div part="inner" class=${classMap(this.getContainerClasses())}>
+      <div
+        part="inner"
+        class=${classMap(this.getContainerClasses())}
+        aria-label=${this.label || nothing}
+      >
         ${this.renderContent()}
       </div>
     `;

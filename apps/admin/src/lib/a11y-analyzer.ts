@@ -154,7 +154,11 @@ export function analyzeAccessibility(tagName: string): A11yResult | null {
 
   // 7. Color contrast via design tokens (not hardcoded)
   const hardcodedColors = combined.match(/(?:color|background):\s*#[0-9a-f]{3,8}/gi) || [];
-  const usesTokenColors = combined.includes('--wc-color-') || combined.includes('var(--wc-');
+  const usesTokenColors =
+    combined.includes('--hx-color-') ||
+    combined.includes('var(--hx-') ||
+    combined.includes('--wc-color-') ||
+    combined.includes('var(--wc-');
   checks.push({
     name: 'Token-based colors',
     passed: usesTokenColors && hardcodedColors.length === 0,

@@ -1,4 +1,4 @@
-import { LitElement, html } from 'lit';
+import { LitElement, html, type TemplateResult } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import { AdoptedStylesheetsController } from '../../controllers/adopted-stylesheets.js';
@@ -81,7 +81,7 @@ export class HelixForm extends LitElement {
    * @default false
    */
   @property({ type: Boolean })
-  novalidate = false;
+  novalidate: boolean = false;
 
   /**
    * Identifies the form for scripting and form discovery.
@@ -90,6 +90,16 @@ export class HelixForm extends LitElement {
    */
   @property({ type: String })
   name = '';
+
+  /**
+   * Optional accessible label for the form (maps to aria-label).
+   * Provides a human-readable name for screen readers when a visible
+   * legend or heading is not associated with the form.
+   * @attr label
+   * @default ''
+   */
+  @property({ type: String })
+  label = '';
 
   // ─── Public Methods ───
 
@@ -219,7 +229,7 @@ export class HelixForm extends LitElement {
        * @event hx-invalid
        */
       this.dispatchEvent(
-        new CustomEvent('hx-invalid', {
+        new CustomEvent<{ errors: Array<{ name: string; message: string }> }>('hx-invalid', {
           bubbles: true,
           composed: true,
           detail: { errors },
@@ -239,7 +249,7 @@ export class HelixForm extends LitElement {
      * @event hx-submit
      */
     this.dispatchEvent(
-      new CustomEvent('hx-submit', {
+      new CustomEvent<{ valid: boolean; values: Record<string, FormDataEntryValue> }>('hx-submit', {
         bubbles: true,
         composed: true,
         detail: { valid: true, values },
@@ -253,7 +263,7 @@ export class HelixForm extends LitElement {
      * @event hx-reset
      */
     this.dispatchEvent(
-      new CustomEvent('hx-reset', {
+      new CustomEvent<void>('hx-reset', {
         bubbles: true,
         composed: true,
       }),
@@ -302,19 +312,34 @@ export class HelixForm extends LitElement {
    * @protected
    * @since 1.0.0
    */
-  protected renderFormContent(): unknown {
+  protected renderFormContent(): TemplateResult {
     return html`<slot></slot>`;
   }
 
   // ─── Render ───
 
-  override render() {
+  override updated(changedProperties: Map<string | symbol, unknown>): void {
+    super.updated(changedProperties);
+    // When no action is set, the component renders into its own light DOM root
+    // (this). Apply aria-label directly on the host element so screen readers
+    // announce the form region even without a wrapping <form> element.
+    if (!this.action) {
+      if (this.label) {
+        this.setAttribute('aria-label', this.label);
+      } else {
+        this.removeAttribute('aria-label');
+      }
+    }
+  }
+
+  override render(): TemplateResult {
     if (this.action) {
       return html`
         <form
           action=${this.action}
           method=${this.method}
           name=${ifDefined(this.name || undefined)}
+          aria-label=${ifDefined(this.label || undefined)}
           ?novalidate=${this.novalidate}
         >
           ${this.renderFormContent()}

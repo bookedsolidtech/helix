@@ -1,4 +1,4 @@
-import { LitElement, html, nothing } from 'lit';
+import { LitElement, html, nothing, type TemplateResult } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { tokenStyles } from '@helix/tokens/lit';
@@ -61,7 +61,7 @@ export class HelixCard extends LitElement {
    * @default ''
    */
   @property({ type: String, attribute: 'hx-href' })
-  wcHref = '';
+  wcHref: string = '';
 
   // ─── Slot Detection ───
 
@@ -108,7 +108,7 @@ export class HelixCard extends LitElement {
 
     if (e.key === 'Enter' || e.key === ' ') {
       e.preventDefault();
-      this._handleClick(e as unknown as MouseEvent);
+      this._handleClick(new MouseEvent('click', { bubbles: true, composed: true }));
     }
   }
 
@@ -216,7 +216,7 @@ export class HelixCard extends LitElement {
 
   // ─── Render ───
 
-  override render() {
+  override render(): TemplateResult {
     const isInteractive = !!this.wcHref;
 
     return html`

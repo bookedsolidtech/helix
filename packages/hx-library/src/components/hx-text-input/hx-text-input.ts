@@ -1,4 +1,4 @@
-import { LitElement, html, nothing } from 'lit';
+import { LitElement, html, nothing, type TemplateResult } from 'lit';
 import { customElement, property, query } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
@@ -93,7 +93,7 @@ export class HelixTextInput extends LitElement {
    * @default false
    */
   @property({ type: Boolean, reflect: true })
-  required = false;
+  required: boolean = false;
 
   /**
    * Whether the input is disabled.
@@ -101,7 +101,7 @@ export class HelixTextInput extends LitElement {
    * @default false
    */
   @property({ type: Boolean, reflect: true })
-  disabled = false;
+  disabled: boolean = false;
 
   /**
    * Error message to display. When set, the input enters an error state.
@@ -315,7 +315,7 @@ export class HelixTextInput extends LitElement {
   private _helpTextId = `${this._inputId}-help`;
   private _errorId = `${this._inputId}-error`;
 
-  override render() {
+  override render(): TemplateResult {
     const hasError = !!this.error || this._hasErrorSlot;
 
     const describedBy =

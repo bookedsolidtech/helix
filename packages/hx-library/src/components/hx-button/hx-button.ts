@@ -1,4 +1,4 @@
-import { LitElement, html, nothing } from 'lit';
+import { LitElement, html, nothing, type TemplateResult } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { tokenStyles } from '@helix/tokens/lit';
@@ -51,7 +51,7 @@ export class HelixButton extends LitElement {
    * @default false
    */
   @property({ type: Boolean, reflect: true })
-  disabled = false;
+  disabled: boolean = false;
 
   /**
    * The type attribute for the underlying button element.
@@ -160,7 +160,7 @@ export class HelixButton extends LitElement {
 
   // ─── Render ───
 
-  override render() {
+  override render(): TemplateResult {
     return html`
       <button
         part="button"

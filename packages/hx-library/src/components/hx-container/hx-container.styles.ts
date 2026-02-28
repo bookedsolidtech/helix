@@ -8,6 +8,11 @@ export const helixContainerStyles = css`
     box-sizing: border-box;
   }
 
+  :host(:focus-visible) {
+    outline: 2px solid var(--hx-color-focus-ring, var(--hx-color-primary-500, #3b82f6));
+    outline-offset: 2px;
+  }
+
   /* ─── Vertical Padding Variants ─── */
 
   :host([padding='none']) {
