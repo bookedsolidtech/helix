@@ -1234,25 +1234,61 @@ export const ThemeComparison: Story = {
         data-theme="light"
         style="padding: 2rem; background: #ffffff; display: flex; flex-direction: column; gap: 1rem;"
       >
-        <p style="margin: 0 0 1rem; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: #6b7280;">
+        <p
+          style="margin: 0 0 1rem; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: #6b7280;"
+        >
           Light Theme
         </p>
-        <hx-text-input label="Patient Name" name="name-light" placeholder="Full legal name" required></hx-text-input>
+        <hx-text-input
+          label="Patient Name"
+          name="name-light"
+          placeholder="Full legal name"
+          required
+        ></hx-text-input>
         <hx-text-input label="Date of Birth" name="dob-light" type="date"></hx-text-input>
-        <hx-text-input label="MRN" name="mrn-light" value="4829301" disabled help-text="Assigned by registration."></hx-text-input>
-        <hx-text-input label="Diagnosis Code" name="dx-light" error help-text="Invalid ICD-10 code entered."></hx-text-input>
+        <hx-text-input
+          label="MRN"
+          name="mrn-light"
+          value="4829301"
+          disabled
+          help-text="Assigned by registration."
+        ></hx-text-input>
+        <hx-text-input
+          label="Diagnosis Code"
+          name="dx-light"
+          error
+          help-text="Invalid ICD-10 code entered."
+        ></hx-text-input>
       </div>
       <div
         data-theme="dark"
         style="padding: 2rem; background: #1a1a2e; display: flex; flex-direction: column; gap: 1rem;"
       >
-        <p style="margin: 0 0 1rem; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: #9ca3af;">
+        <p
+          style="margin: 0 0 1rem; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: #9ca3af;"
+        >
           Dark Theme
         </p>
-        <hx-text-input label="Patient Name" name="name-dark" placeholder="Full legal name" required></hx-text-input>
+        <hx-text-input
+          label="Patient Name"
+          name="name-dark"
+          placeholder="Full legal name"
+          required
+        ></hx-text-input>
         <hx-text-input label="Date of Birth" name="dob-dark" type="date"></hx-text-input>
-        <hx-text-input label="MRN" name="mrn-dark" value="4829301" disabled help-text="Assigned by registration."></hx-text-input>
-        <hx-text-input label="Diagnosis Code" name="dx-dark" error help-text="Invalid ICD-10 code entered."></hx-text-input>
+        <hx-text-input
+          label="MRN"
+          name="mrn-dark"
+          value="4829301"
+          disabled
+          help-text="Assigned by registration."
+        ></hx-text-input>
+        <hx-text-input
+          label="Diagnosis Code"
+          name="dx-dark"
+          error
+          help-text="Invalid ICD-10 code entered."
+        ></hx-text-input>
       </div>
     </div>
   `,

@@ -1,7 +1,7 @@
 {
   "config": {
-    "configFile": "/Volumes/Development/helix/.worktrees/feature-phase-1-production-create-starlight/playwright.config.ts",
-    "rootDir": "/Volumes/Development/helix/.worktrees/feature-phase-1-production-create-starlight/packages/hx-library/e2e",
+    "configFile": "/Volumes/Development/helix/.worktrees/feature-phase-1-production-complete-storybook/playwright.config.ts",
+    "rootDir": "/Volumes/Development/helix/.worktrees/feature-phase-1-production-complete-storybook/packages/hx-library/e2e",
     "forbidOnly": false,
     "fullyParallel": true,
     "globalSetup": null,
@@ -14,37 +14,37 @@
     "preserveOutput": "always",
     "projects": [
       {
-        "outputDir": "/Volumes/Development/helix/.worktrees/feature-phase-1-production-create-starlight/packages/hx-library/.cache/vrt-results",
+        "outputDir": "/Volumes/Development/helix/.worktrees/feature-phase-1-production-complete-storybook/packages/hx-library/.cache/vrt-results",
         "repeatEach": 1,
         "retries": 0,
         "metadata": {},
         "id": "chromium",
         "name": "chromium",
-        "testDir": "/Volumes/Development/helix/.worktrees/feature-phase-1-production-create-starlight/packages/hx-library/e2e",
+        "testDir": "/Volumes/Development/helix/.worktrees/feature-phase-1-production-complete-storybook/packages/hx-library/e2e",
         "testIgnore": [],
         "testMatch": ["**/*.@(spec|test).?(c|m)[jt]s?(x)"],
         "timeout": 30000
       },
       {
-        "outputDir": "/Volumes/Development/helix/.worktrees/feature-phase-1-production-create-starlight/packages/hx-library/.cache/vrt-results",
+        "outputDir": "/Volumes/Development/helix/.worktrees/feature-phase-1-production-complete-storybook/packages/hx-library/.cache/vrt-results",
         "repeatEach": 1,
         "retries": 0,
         "metadata": {},
         "id": "firefox",
         "name": "firefox",
-        "testDir": "/Volumes/Development/helix/.worktrees/feature-phase-1-production-create-starlight/packages/hx-library/e2e",
+        "testDir": "/Volumes/Development/helix/.worktrees/feature-phase-1-production-complete-storybook/packages/hx-library/e2e",
         "testIgnore": [],
         "testMatch": ["**/*.@(spec|test).?(c|m)[jt]s?(x)"],
         "timeout": 30000
       },
       {
-        "outputDir": "/Volumes/Development/helix/.worktrees/feature-phase-1-production-create-starlight/packages/hx-library/.cache/vrt-results",
+        "outputDir": "/Volumes/Development/helix/.worktrees/feature-phase-1-production-complete-storybook/packages/hx-library/.cache/vrt-results",
         "repeatEach": 1,
         "retries": 0,
         "metadata": {},
         "id": "webkit",
         "name": "webkit",
-        "testDir": "/Volumes/Development/helix/.worktrees/feature-phase-1-production-create-starlight/packages/hx-library/e2e",
+        "testDir": "/Volumes/Development/helix/.worktrees/feature-phase-1-production-complete-storybook/packages/hx-library/e2e",
         "testIgnore": [],
         "testMatch": ["**/*.@(spec|test).?(c|m)[jt]s?(x)"],
         "timeout": 30000
@@ -81,8 +81,8 @@
     }
   ],
   "stats": {
-    "startTime": "2026-02-27T15:39:50.244Z",
-    "duration": 5.156000000000063,
+    "startTime": "2026-02-27T15:32:34.531Z",
+    "duration": 5.210000000000036,
     "expected": 0,
     "skipped": 0,
     "unexpected": 0,
