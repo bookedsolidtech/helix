@@ -95,3 +95,197 @@ Show remaining characters with `maxlength` and `show-count`.
 ## API Reference
 
 <ComponentDoc tagName="hx-textarea" section="api" />
+
+## Accessibility
+
+`hx-textarea` uses a native `<textarea>` element inside Shadow DOM with `ElementInternals` for full form participation.
+
+### ARIA Roles and Attributes
+
+- **Role**: `textbox` with `aria-multiline="true"` (native `<textarea>`)
+- **Label association**: Visible label linked via `for`/`id`
+- **Error state**: Error message associated via `aria-describedby`
+- **Help text**: Associated via `aria-describedby`
+- **Character count**: Count is associated via `aria-describedby` and updates on input
+- **Required**: Sets native `required` and `aria-required`
+
+### Keyboard Interaction
+
+| Key | Action |
+|-----|--------|
+| `Tab` | Move focus to textarea |
+| *(any character)* | Type text |
+| `Enter` | Insert new line |
+| `Tab` (inside field) | Insert tab character or move focus (browser-dependent) |
+
+### Character Count Accessibility
+
+When `show-count` and `maxlength` are set, the character count is announced to screen readers when focus leaves the field. The count display uses `aria-live="polite"` so it does not interrupt typing.
+
+### Clinical Notes Fields
+
+For clinical documentation (SOAP notes, progress notes), use `resize="vertical"` or `resize="auto"` to accommodate variable-length entries:
+
+```html
+<hx-textarea
+  label="Progress Notes"
+  name="progress_notes"
+  required
+  resize="auto"
+  rows="6"
+  help-text="Document patient status, interventions, and plan."
+></hx-textarea>
+```
+
+## Drupal Integration
+
+### Basic Textarea Template
+
+```twig
+{# templates/components/textarea.html.twig #}
+<hx-textarea
+  name="{{ name }}"
+  label="{{ label }}"
+  value="{{ value|default('') }}"
+  placeholder="{{ placeholder|default('') }}"
+  rows="{{ rows|default(3) }}"
+  resize="{{ resize|default('vertical') }}"
+  {{ required ? 'required' : '' }}
+  {{ disabled ? 'disabled' : '' }}
+  {{ error ? 'error="' ~ error ~ '"' : '' }}
+  {{ help_text ? 'help-text="' ~ help_text ~ '"' : '' }}
+  {{ maxlength ? 'maxlength="' ~ maxlength ~ '"' : '' }}
+  {{ show_count ? 'show-count' : '' }}
+></hx-textarea>
+```
+
+### Drupal Form API Textarea
+
+```twig
+{# templates/form/textarea.html.twig #}
+<hx-textarea
+  name="{{ element['#name'] }}"
+  label="{{ element['#title'] }}"
+  value="{{ element['#value'] }}"
+  rows="{{ element['#rows']|default(5) }}"
+  {{ element['#required'] ? 'required' : '' }}
+  {{ element['#disabled'] ? 'disabled' : '' }}
+  {% if element['#errors'] %}
+    error="{{ element['#errors']|render|striptags }}"
+  {% endif %}
+  {% if element['#description'] %}
+    help-text="{{ element['#description']|render|striptags }}"
+  {% endif %}
+  {% if element['#maxlength'] %}
+    maxlength="{{ element['#maxlength'] }}"
+    show-count
+  {% endif %}
+></hx-textarea>
+```
+
+### Drupal Library
+
+```yaml
+# mymodule.libraries.yml
+mymodule/textarea:
+  dependencies:
+    - helix/hx-textarea
+```
+
+## Theming
+
+### Available Tokens
+
+`hx-textarea` shares its token namespace with `hx-text-input` for visual consistency:
+
+| Token | Default | Description |
+|-------|---------|-------------|
+| `--hx-input-bg` | `var(--hx-color-neutral-0)` | Textarea background color |
+| `--hx-input-color` | `var(--hx-color-neutral-800)` | Textarea text color |
+| `--hx-input-border-color` | `var(--hx-color-neutral-300)` | Textarea border color |
+| `--hx-input-border-radius` | `var(--hx-border-radius-md)` | Textarea border radius |
+| `--hx-input-font-family` | `var(--hx-font-family-sans)` | Textarea font family |
+| `--hx-input-focus-ring-color` | `var(--hx-focus-ring-color)` | Focus ring color |
+| `--hx-input-error-color` | `var(--hx-color-error-500)` | Error state color |
+| `--hx-input-label-color` | `var(--hx-color-neutral-700)` | Label text color |
+
+### Override Example
+
+```css
+/* Monospace font for code/clinical notes */
+hx-textarea.notes-field {
+  --hx-input-font-family: var(--hx-font-family-mono);
+  --hx-input-bg: var(--hx-color-neutral-50);
+}
+
+/* Larger textarea for documentation */
+hx-textarea.documentation-field {
+  --hx-input-border-radius: 0.5rem;
+}
+```
+
+### CSS Parts
+
+```css
+hx-textarea::part(field) {
+  width: 100%;
+}
+
+hx-textarea::part(input) {
+  min-height: 120px;
+  font-size: var(--hx-font-size-base);
+  line-height: 1.6;
+}
+
+hx-textarea::part(label) {
+  font-weight: var(--hx-font-weight-medium);
+}
+```
+
+## Extending
+
+### Listening to Events
+
+```javascript
+const textarea = document.querySelector('hx-textarea');
+
+// Real-time input
+textarea.addEventListener('hx-input', ({ detail }) => {
+  console.log('Current value:', detail.value);
+  autosaveDraft(detail.value);
+});
+
+// On blur
+textarea.addEventListener('hx-change', ({ detail }) => {
+  console.log('Final value:', detail.value);
+});
+```
+
+### Auto-Save Pattern
+
+```javascript
+const textarea = document.querySelector('hx-textarea[name="notes"]');
+let saveTimer;
+
+textarea.addEventListener('hx-input', ({ detail }) => {
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(async () => {
+    await saveDraft({ notes: detail.value });
+    showSavedIndicator();
+  }, 1000);
+});
+```
+
+### Programmatic Control
+
+```javascript
+const textarea = document.querySelector('hx-textarea');
+
+// Focus the textarea
+textarea.focus();
+
+// Validate
+if (!textarea.checkValidity()) {
+  textarea.error = 'Clinical notes are required before discharge.';
+}
+```

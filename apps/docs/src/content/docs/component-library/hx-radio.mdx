@@ -39,3 +39,124 @@ Individual radio states: default, checked, and disabled.
 ## API Reference
 
 <ComponentDoc tagName="hx-radio" section="api" />
+
+## Accessibility
+
+`hx-radio` is a presentational radio button managed by its parent `hx-radio-group`. It should always be used inside `hx-radio-group` for proper accessibility and keyboard navigation.
+
+### ARIA Roles and Attributes
+
+- **Role**: `radio` (via native `<input type="radio">`)
+- **Group semantics**: The parent `hx-radio-group` provides `role="group"` with a `fieldset`/`legend` for proper grouping
+- **Checked state**: Reflected via native `checked` attribute
+- **Disabled state**: Propagated from parent group or set per radio
+
+### Keyboard Interaction
+
+Keyboard navigation is managed by the parent `hx-radio-group`:
+
+| Key | Action |
+|-----|--------|
+| `Tab` | Move focus into the radio group (first/selected radio) |
+| `Arrow Down` / `Arrow Right` | Select next radio in group |
+| `Arrow Up` / `Arrow Left` | Select previous radio in group |
+| `Space` | Select focused radio (same as clicking) |
+
+### Usage Without a Group
+
+While possible to use `hx-radio` standalone, always prefer `hx-radio-group` for:
+- Proper `fieldset`/`legend` grouping
+- Arrow key navigation
+- Form association
+
+## Drupal Integration
+
+### Inside a Radio Group Template
+
+```twig
+{# Individual radio inside hx-radio-group #}
+<hx-radio
+  value="{{ value }}"
+  label="{{ label }}"
+  {{ checked ? 'checked' : '' }}
+  {{ disabled ? 'disabled' : '' }}
+></hx-radio>
+```
+
+### Custom Label Slot
+
+Use the default slot for rich label content in Drupal:
+
+```twig
+<hx-radio value="{{ value }}">
+  {{ label_markup }}
+</hx-radio>
+```
+
+### Drupal Library
+
+```yaml
+# mymodule.libraries.yml
+mymodule/radio:
+  dependencies:
+    - helix/hx-radio-group
+```
+
+## Theming
+
+### Available Tokens
+
+| Token | Default | Description |
+|-------|---------|-------------|
+| `--hx-radio-size` | `var(--hx-size-5)` | Radio circle size |
+| `--hx-radio-border-color` | `var(--hx-color-neutral-300)` | Radio border color |
+| `--hx-radio-checked-bg` | `var(--hx-color-primary-500)` | Checked background color |
+| `--hx-radio-checked-border-color` | `var(--hx-color-primary-500)` | Checked border color |
+| `--hx-radio-dot-color` | `var(--hx-color-neutral-0)` | Inner dot color when checked |
+| `--hx-radio-focus-ring-color` | `var(--hx-focus-ring-color)` | Focus ring color |
+| `--hx-radio-label-color` | `var(--hx-color-neutral-700)` | Label text color |
+
+### Override Example
+
+```css
+hx-radio {
+  --hx-radio-checked-bg: var(--brand-color-primary);
+  --hx-radio-checked-border-color: var(--brand-color-primary);
+}
+```
+
+### CSS Parts
+
+```css
+hx-radio::part(radio) {
+  width: 1.5rem;
+  height: 1.5rem;
+}
+
+hx-radio::part(label) {
+  font-size: var(--hx-font-size-base);
+}
+```
+
+## Extending
+
+### Custom Label Content
+
+Provide rich label content via the default slot:
+
+```html
+<hx-radio-group label="Notification preference" name="notifications">
+  <hx-radio value="email">
+    <strong>Email</strong>
+    <span style="display: block; font-size: 0.875rem; color: #6b7280;">
+      Receive updates in your inbox
+    </span>
+  </hx-radio>
+  <hx-radio value="sms">
+    <strong>SMS</strong>
+    <span style="display: block; font-size: 0.875rem; color: #6b7280;">
+      Receive text message alerts
+    </span>
+  </hx-radio>
+</hx-radio-group>
+```

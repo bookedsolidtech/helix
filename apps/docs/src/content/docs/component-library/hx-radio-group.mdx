@@ -67,3 +67,165 @@ Required group with error state.
 ## API Reference
 
 <ComponentDoc tagName="hx-radio-group" section="api" />
+
+## Accessibility
+
+`hx-radio-group` implements the [ARIA radio group pattern](https://www.w3.org/WAI/ARIA/apg/patterns/radio/). It wraps radio items in a `<fieldset>` with a `<legend>` for proper grouping.
+
+### ARIA Roles and Attributes
+
+- **Group role**: `fieldset` with descriptive `legend` (the `label` attribute)
+- **Individual radios**: Each `hx-radio` renders `role="radio"` via native `<input type="radio">`
+- **Required**: Sets `aria-required` on the group fieldset
+- **Error state**: Associates error message via `aria-describedby` on the fieldset
+- **Help text**: Associated via `aria-describedby`
+
+### Keyboard Interaction
+
+| Key | Action |
+|-----|--------|
+| `Tab` | Move focus into the radio group |
+| `Arrow Down` / `Arrow Right` | Select next radio, skip disabled items |
+| `Arrow Up` / `Arrow Left` | Select previous radio, skip disabled items |
+| `Space` | Select the focused radio |
+| `Tab` (again) | Move focus out of the group |
+
+Arrow key navigation wraps from last to first and first to last within the group.
+
+### Healthcare Compliance Notes
+
+- Always provide a descriptive `label` — it becomes the `<legend>` that announces the group purpose to screen readers.
+- For clinical decision-making (medication selection, diagnosis codes), use clear, unambiguous option labels.
+- When using `orientation="horizontal"`, ensure the options are not too numerous to scan visually.
+
+## Drupal Integration
+
+### Basic Radio Group Template
+
+```twig
+{# templates/components/radio-group.html.twig #}
+<hx-radio-group
+  name="{{ name }}"
+  label="{{ label }}"
+  value="{{ value|default('') }}"
+  {{ required ? 'required' : '' }}
+  {{ disabled ? 'disabled' : '' }}
+  orientation="{{ orientation|default('vertical') }}"
+  {{ error ? 'error="' ~ error ~ '"' : '' }}
+  {{ help_text ? 'help-text="' ~ help_text ~ '"' : '' }}
+>
+  {% for option in options %}
+    <hx-radio
+      value="{{ option.value }}"
+      label="{{ option.label }}"
+      {{ option.disabled ? 'disabled' : '' }}
+    ></hx-radio>
+  {% endfor %}
+</hx-radio-group>
+```
+
+### Drupal Form API Radios
+
+```twig
+{# templates/form/radios.html.twig #}
+<hx-radio-group
+  name="{{ element['#name'] }}"
+  label="{{ element['#title'] }}"
+  value="{{ element['#value'] }}"
+  {{ element['#required'] ? 'required' : '' }}
+  {% if element['#errors'] %}
+    error="{{ element['#errors']|render|striptags }}"
+  {% endif %}
+>
+  {% for key, option in element['#options'] %}
+    <hx-radio
+      value="{{ key }}"
+      label="{{ option }}"
+    ></hx-radio>
+  {% endfor %}
+</hx-radio-group>
+```
+
+### Drupal Library
+
+```yaml
+# mymodule.libraries.yml
+mymodule/radio-group:
+  dependencies:
+    - helix/hx-radio-group
+```
+
+## Theming
+
+### Available Tokens
+
+| Token | Default | Description |
+|-------|---------|-------------|
+| `--hx-radio-group-gap` | `var(--hx-space-3)` | Gap between radio items |
+| `--hx-radio-group-label-color` | `var(--hx-color-neutral-700)` | Label text color |
+| `--hx-radio-group-error-color` | `var(--hx-color-error-500)` | Error message color |
+
+Individual radio styling uses `hx-radio` tokens — see [hx-radio theming](/component-library/hx-radio#theming).
+
+### Override Example
+
+```css
+/* Compact horizontal radio group */
+hx-radio-group[orientation="horizontal"] {
+  --hx-radio-group-gap: var(--hx-space-2);
+}
+
+/* Error color */
+hx-radio-group {
+  --hx-radio-group-error-color: #c00;
+}
+```
+
+### CSS Parts
+
+```css
+hx-radio-group::part(fieldset) {
+  border: none;
+  padding: 0;
+  margin: 0;
+}
+
+hx-radio-group::part(legend) {
+  font-weight: var(--hx-font-weight-semibold);
+  margin-bottom: var(--hx-space-2);
+}
+```
+
+## Extending
+
+### Listening to Change Events
+
+```javascript
+const group = document.querySelector('hx-radio-group');
+
+group.addEventListener('hx-change', ({ detail }) => {
+  console.log('Selected:', detail.value);
+  updateFormState(detail.value);
+});
+```
+
+### Programmatic Selection
+
+```javascript
+const group = document.querySelector('hx-radio-group');
+
+// Set selected value programmatically
+group.value = 'option-2';
+```
+
+### Dynamic Options
+
+```javascript
+const group = document.querySelector('hx-radio-group');
+
+// Add options dynamically
+const newRadio = document.createElement('hx-radio');
+newRadio.value = 'new-option';
+newRadio.label = 'New Option';
+group.appendChild(newRadio);
+```

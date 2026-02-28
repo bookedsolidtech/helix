@@ -82,3 +82,166 @@ Different vertical padding options applied to the outer wrapper.
 ## API Reference
 
 <ComponentDoc tagName="hx-container" section="api" />
+
+## Accessibility
+
+`hx-container` is a structural/layout component with no implicit ARIA role. It is a transparent wrapper that constrains width.
+
+### Landmark Usage
+
+Combine `hx-container` with semantic HTML landmark elements for accessible page structure:
+
+```html
+<!-- Page header section -->
+<header>
+  <hx-container width="content">
+    <nav aria-label="Main navigation">...</nav>
+  </hx-container>
+</header>
+
+<!-- Main content -->
+<main>
+  <hx-container width="content" padding="lg">
+    <h1>Patient Dashboard</h1>
+    ...
+  </hx-container>
+</main>
+
+<!-- Footer -->
+<footer>
+  <hx-container width="full" padding="md">
+    <p>Healthcare Organization © 2026</p>
+  </hx-container>
+</footer>
+```
+
+### Skip Navigation
+
+Ensure skip links target content inside containers:
+
+```html
+<a href="#main-content" class="skip-link">Skip to main content</a>
+
+<hx-container id="main-content" width="content" padding="md" tabindex="-1">
+  ...
+</hx-container>
+```
+
+## Drupal Integration
+
+### Page Section Template
+
+```twig
+{# templates/components/container.html.twig #}
+<hx-container
+  width="{{ width|default('content') }}"
+  padding="{{ padding|default('none') }}"
+  style="{{ bg_color ? '--hx-container-bg: ' ~ bg_color ~ ';' : '' }}"
+>
+  {{ content }}
+</hx-container>
+```
+
+### Section Layout in Drupal
+
+```twig
+{# templates/layout/section.html.twig #}
+<section{{ attributes.addClass('layout-section') }}>
+  <hx-container width="{{ section_width|default('content') }}" padding="lg">
+    {% for region in regions %}
+      {{ region }}
+    {% endfor %}
+  </hx-container>
+</section>
+```
+
+### Drupal Library
+
+```yaml
+# mymodule.libraries.yml
+mymodule/container:
+  dependencies:
+    - helix/hx-container
+```
+
+## Theming
+
+### Available Tokens
+
+| Token | Default | Description |
+|-------|---------|-------------|
+| `--hx-container-bg` | `transparent` | Background color on outer wrapper |
+| `--hx-container-gutter` | `var(--hx-space-6)` | Horizontal padding on inner box |
+| `--hx-container-max-width` | *(unset)* | Override max-width set by `width` property |
+| `--hx-container-content` | `72rem` | Max-width for `content` preset |
+| `--hx-container-sm` | `640px` | Max-width for `sm` preset |
+| `--hx-container-md` | `768px` | Max-width for `md` preset |
+| `--hx-container-lg` | `1024px` | Max-width for `lg` preset |
+| `--hx-container-xl` | `1280px` | Max-width for `xl` preset |
+
+### Override Example
+
+```css
+/* Tighter gutters on mobile */
+@media (max-width: 768px) {
+  hx-container {
+    --hx-container-gutter: var(--hx-space-4);
+  }
+}
+
+/* Full-bleed background section */
+hx-container.hero-section {
+  --hx-container-bg: var(--brand-color-surface-hero);
+}
+
+/* Custom content max-width */
+hx-container.narrow-article {
+  --hx-container-max-width: 65ch;
+}
+```
+
+### CSS Parts
+
+```css
+/* Style the inner content wrapper */
+hx-container::part(inner) {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+```
+
+## Extending
+
+### Two-Layer Architecture
+
+`hx-container` uses a two-layer model:
+- **Outer host element**: spans full viewport width — ideal for background colors and vertical padding
+- **Inner wrapper** (`::part(inner)`): constrains max-width and applies gutters
+
+```html
+<!-- Full-bleed hero section with constrained content -->
+<hx-container
+  width="content"
+  padding="2xl"
+  style="--hx-container-bg: var(--brand-hero-bg);"
+>
+  <h1>Welcome to the Patient Portal</h1>
+  <p>Access your health records, schedule appointments, and more.</p>
+</hx-container>
+```
+
+### Nested Containers
+
+Nest containers for complex layouts:
+
+```html
+<hx-container width="full" padding="lg" style="--hx-container-bg: #f8fafc;">
+  <hx-container width="content">
+    <div class="grid-2-cols">
+      <div>Sidebar</div>
+      <div>Main content</div>
+    </div>
+  </hx-container>
+</hx-container>
+```

@@ -126,3 +126,217 @@ Multiple states side by side.
 ## API Reference
 
 <ComponentDoc tagName="hx-text-input" section="api" />
+
+## Accessibility
+
+`hx-text-input` uses a native `<input>` element inside Shadow DOM with `ElementInternals` for full form participation and ARIA compliance.
+
+### ARIA Roles and Attributes
+
+- **Role**: Depends on `type` (default `textbox`, `type="search"` uses `searchbox`)
+- **Label association**: The visible label is programmatically linked to the input via `for`/`id`
+- **Error state**: Error message is associated via `aria-describedby`
+- **Help text**: Associated via `aria-describedby`
+- **Required**: Sets native `required` and `aria-required` on the input
+- **Accessible name override**: Use `aria-label` attribute for inputs without a visible label
+
+### Keyboard Interaction
+
+| Key | Action |
+|-----|--------|
+| `Tab` | Move focus to input |
+| *(any character)* | Type in input |
+| `Enter` | Submit form (when inside a form) |
+| `Escape` | Clears input (search type only, browser-dependent) |
+
+### Autocomplete and Healthcare Forms
+
+For patient data forms, use `autocomplete` to help users with data entry while respecting privacy:
+
+```html
+<!-- Patient registration form -->
+<hx-text-input
+  label="Date of Birth"
+  type="text"
+  name="dob"
+  placeholder="MM/DD/YYYY"
+  autocomplete="bday"
+></hx-text-input>
+
+<!-- For sensitive fields, disable autocomplete -->
+<hx-text-input
+  label="Medical Record Number"
+  name="mrn"
+  autocomplete="off"
+  required
+></hx-text-input>
+```
+
+### Screen Reader Considerations
+
+- The label is always visible — never use `aria-label` as a substitute for a visible label in healthcare forms where context must be clear.
+- When showing errors, the error message is automatically associated and announced on focus.
+
+## Drupal Integration
+
+### Basic Input Template
+
+```twig
+{# templates/components/text-input.html.twig #}
+<hx-text-input
+  name="{{ name }}"
+  label="{{ label }}"
+  type="{{ type|default('text') }}"
+  value="{{ value|default('') }}"
+  placeholder="{{ placeholder|default('') }}"
+  {{ required ? 'required' : '' }}
+  {{ disabled ? 'disabled' : '' }}
+  {{ error ? 'error="' ~ error ~ '"' : '' }}
+  {{ help_text ? 'help-text="' ~ help_text ~ '"' : '' }}
+></hx-text-input>
+```
+
+### Drupal Form API Textfield
+
+```twig
+{# templates/form/input.html.twig #}
+<hx-text-input
+  name="{{ element['#name'] }}"
+  label="{{ element['#title'] }}"
+  type="{{ element['#type']|default('text') }}"
+  value="{{ element['#value'] }}"
+  {{ element['#required'] ? 'required' : '' }}
+  {{ element['#disabled'] ? 'disabled' : '' }}
+  {% if element['#errors'] %}
+    error="{{ element['#errors']|render|striptags }}"
+  {% endif %}
+  {% if element['#description'] %}
+    help-text="{{ element['#description']|render|striptags }}"
+  {% endif %}
+>
+  {% if element['#field_prefix'] %}
+    <span slot="prefix">{{ element['#field_prefix'] }}</span>
+  {% endif %}
+  {% if element['#field_suffix'] %}
+    <span slot="suffix">{{ element['#field_suffix'] }}</span>
+  {% endif %}
+</hx-text-input>
+```
+
+### Custom Label (Drupal Form API)
+
+```twig
+<hx-text-input name="{{ name }}">
+  <span slot="label">
+    {{ label }}
+    {% if required %}<abbr title="required">*</abbr>{% endif %}
+  </span>
+</hx-text-input>
+```
+
+### Drupal Library
+
+```yaml
+# mymodule.libraries.yml
+mymodule/text-input:
+  dependencies:
+    - helix/hx-text-input
+```
+
+## Theming
+
+### Available Tokens
+
+| Token | Default | Description |
+|-------|---------|-------------|
+| `--hx-input-bg` | `var(--hx-color-neutral-0)` | Input background color |
+| `--hx-input-color` | `var(--hx-color-neutral-800)` | Input text color |
+| `--hx-input-border-color` | `var(--hx-color-neutral-300)` | Input border color |
+| `--hx-input-border-radius` | `var(--hx-border-radius-md)` | Input border radius |
+| `--hx-input-font-family` | `var(--hx-font-family-sans)` | Input font family |
+| `--hx-input-focus-ring-color` | `var(--hx-focus-ring-color)` | Focus ring color |
+| `--hx-input-error-color` | `var(--hx-color-error-500)` | Error state color |
+| `--hx-input-label-color` | `var(--hx-color-neutral-700)` | Label text color |
+
+### Override Example
+
+```css
+/* Brand input styling */
+hx-text-input {
+  --hx-input-border-radius: 0.25rem;
+  --hx-input-border-color: var(--brand-color-border);
+  --hx-input-focus-ring-color: var(--brand-color-primary);
+}
+
+/* Search input */
+hx-text-input[type="search"] {
+  --hx-input-bg: var(--hx-color-neutral-50);
+}
+```
+
+### CSS Parts
+
+```css
+hx-text-input::part(field) {
+  display: grid;
+  grid-template-columns: auto 1fr;
+}
+
+hx-text-input::part(input) {
+  font-size: var(--hx-font-size-base);
+}
+
+hx-text-input::part(label) {
+  font-weight: var(--hx-font-weight-medium);
+}
+
+hx-text-input::part(error) {
+  color: var(--hx-input-error-color);
+  font-size: var(--hx-font-size-sm);
+}
+```
+
+## Extending
+
+### Listening to Events
+
+```javascript
+const input = document.querySelector('hx-text-input');
+
+// Real-time input (every keystroke)
+input.addEventListener('hx-input', ({ detail }) => {
+  console.log('Current value:', detail.value);
+  validateFormat(detail.value);
+});
+
+// Change on blur
+input.addEventListener('hx-change', ({ detail }) => {
+  console.log('Final value:', detail.value);
+  saveToStore(detail.value);
+});
+```
+
+### Programmatic Methods
+
+```javascript
+const input = document.querySelector('hx-text-input');
+
+// Focus and select all text
+input.focus();
+input.select();
+
+// Programmatic validation
+if (!input.checkValidity()) {
+  input.error = 'This field is required.';
+}
+```
+
+### Input with Icon Prefix
+
+```html
+<hx-text-input label="Patient Search" type="search">
+  <span slot="prefix" aria-hidden="true">
+    <svg><!-- search icon --></svg>
+  </span>
+</hx-text-input>
+```

@@ -52,3 +52,173 @@ Small, medium, and large switch sizes.
 ## API Reference
 
 <ComponentDoc tagName="hx-switch" section="api" />
+
+## Accessibility
+
+`hx-switch` uses `role="switch"` (via a `<button>` element) to communicate the toggle state to assistive technologies, complying with the [ARIA switch pattern](https://www.w3.org/WAI/ARIA/apg/patterns/switch/).
+
+### ARIA Roles and Attributes
+
+- **Role**: `switch` (on the internal `<button>` element)
+- **State**: `aria-checked="true|false"` reflects the `checked` property
+- **Label**: The visible `label` prop or slotted content is associated via `aria-labelledby`
+- **Error**: Error message is associated via `aria-describedby`
+- **Help text**: Associated via `aria-describedby`
+
+### Keyboard Interaction
+
+| Key | Action |
+|-----|--------|
+| `Tab` | Move focus to switch |
+| `Space` | Toggle switch on/off |
+| `Enter` | Toggle switch on/off (some browser/AT combinations) |
+
+### When to Use Switch vs Checkbox
+
+- Use `hx-switch` for binary on/off settings that take **immediate effect** (e.g., enable dark mode, toggle feature flag).
+- Use `hx-checkbox` for settings that take effect on **form submission** (e.g., agree to terms, select items).
+- In healthcare, prefer `hx-checkbox` for clinical settings that require explicit confirmation before applying.
+
+### Healthcare Compliance Notes
+
+For switches that control safety-critical settings (e.g., enabling alerts, activating clinical modes):
+- Provide confirmation dialogs before applying the change.
+- Announce the new state clearly via `aria-live` region.
+- Log state changes for audit purposes.
+
+## Drupal Integration
+
+### Basic Switch Template
+
+```twig
+{# templates/components/switch.html.twig #}
+<hx-switch
+  name="{{ name }}"
+  label="{{ label }}"
+  value="{{ value|default('on') }}"
+  {{ checked ? 'checked' : '' }}
+  {{ disabled ? 'disabled' : '' }}
+  {{ required ? 'required' : '' }}
+  hx-size="{{ size|default('md') }}"
+  {{ error ? 'error="' ~ error ~ '"' : '' }}
+  {{ help_text ? 'help-text="' ~ help_text ~ '"' : '' }}
+></hx-switch>
+```
+
+### Drupal Form API Toggle
+
+```twig
+{# In a Drupal form — use as a styled boolean field #}
+<hx-switch
+  name="{{ element['#name'] }}"
+  label="{{ element['#title'] }}"
+  {{ element['#value'] ? 'checked' : '' }}
+  {{ element['#disabled'] ? 'disabled' : '' }}
+></hx-switch>
+```
+
+### Drupal Behavior: Immediate Effect
+
+```javascript
+(function (Drupal) {
+  Drupal.behaviors.helixSwitch = {
+    attach(context) {
+      context.querySelectorAll('hx-switch[data-setting]').forEach((sw) => {
+        sw.addEventListener('hx-change', async ({ detail }) => {
+          const setting = sw.dataset.setting;
+          try {
+            await updateSetting(setting, detail.checked);
+            Drupal.announce(`${sw.label} ${detail.checked ? 'enabled' : 'disabled'}`);
+          } catch (err) {
+            // Revert on failure
+            sw.checked = !detail.checked;
+            Drupal.announce('Failed to update setting. Please try again.');
+          }
+        });
+      });
+    }
+  };
+})(Drupal);
+```
+
+### Drupal Library
+
+```yaml
+# mymodule.libraries.yml
+mymodule/switch:
+  dependencies:
+    - helix/hx-switch
+```
+
+## Theming
+
+### Available Tokens
+
+| Token | Default | Description |
+|-------|---------|-------------|
+| `--hx-switch-track-bg` | `var(--hx-color-neutral-300)` | Track background (off state) |
+| `--hx-switch-track-checked-bg` | `var(--hx-color-primary-500)` | Track background (on state) |
+| `--hx-switch-thumb-bg` | `var(--hx-color-neutral-0)` | Thumb background color |
+| `--hx-switch-thumb-shadow` | `var(--hx-shadow-sm)` | Thumb box shadow |
+| `--hx-switch-focus-ring-color` | `var(--hx-focus-ring-color)` | Focus ring color |
+| `--hx-switch-label-color` | `var(--hx-color-neutral-700)` | Label text color |
+| `--hx-switch-error-color` | `var(--hx-color-error-500)` | Error message color |
+
+### Override Example
+
+```css
+/* Brand switch colors */
+hx-switch {
+  --hx-switch-track-checked-bg: var(--brand-color-success);
+  --hx-switch-thumb-bg: #fff;
+}
+
+/* Danger switch for critical settings */
+hx-switch.danger-switch[checked] {
+  --hx-switch-track-checked-bg: var(--hx-color-error-600);
+}
+```
+
+### CSS Parts
+
+```css
+hx-switch::part(track) {
+  width: 3rem;
+  height: 1.5rem;
+}
+
+hx-switch::part(thumb) {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+hx-switch::part(label) {
+  font-size: var(--hx-font-size-sm);
+  margin-left: var(--hx-space-3);
+}
+```
+
+## Extending
+
+### Listening to Toggle Events
+
+```javascript
+const sw = document.querySelector('hx-switch');
+
+sw.addEventListener('hx-change', ({ detail }) => {
+  console.log('Switch is now:', detail.checked ? 'on' : 'off');
+  applyFeatureFlag(detail.checked);
+});
+```
+
+### With Live Announcement
+
+```javascript
+const sw = document.querySelector('hx-switch[data-feature]');
+const announcer = document.getElementById('sr-announcer');
+
+sw.addEventListener('hx-change', ({ detail }) => {
+  const feature = sw.dataset.feature;
+  announcer.textContent = `${feature} has been ${detail.checked ? 'enabled' : 'disabled'}.`;
+});
+```
