@@ -13,6 +13,12 @@ import {
   Map,
   HeartPulse,
   GitBranch,
+  Eye,
+  Layers,
+  BarChart2,
+  AlertTriangle,
+  TrendingUp,
+  Bell,
 } from 'lucide-react';
 import { DOCS_URL, STORYBOOK_URL } from '@/lib/env';
 import { Analytics } from '@/components/Analytics';
@@ -100,6 +106,39 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
               <SidebarLink href="/hooks" icon={<GitBranch className="w-4 h-4" />}>
                 Hooks & MCP
+              </SidebarLink>
+
+              <div className="px-3 pt-3 pb-1">
+                <p className="text-[10px] uppercase tracking-widest font-semibold text-muted-foreground/60">
+                  Observability
+                </p>
+              </div>
+
+              <SidebarLink href="/observability" icon={<Eye className="w-4 h-4" />}>
+                Hub
+              </SidebarLink>
+
+              <SidebarLink href="/observability/projects" icon={<Layers className="w-4 h-4" />}>
+                Projects
+              </SidebarLink>
+
+              <SidebarLink href="/observability/analytics" icon={<BarChart2 className="w-4 h-4" />}>
+                Analytics
+              </SidebarLink>
+
+              <SidebarLink
+                href="/observability/errors"
+                icon={<AlertTriangle className="w-4 h-4" />}
+              >
+                Errors
+              </SidebarLink>
+
+              <SidebarLink href="/observability/trends" icon={<TrendingUp className="w-4 h-4" />}>
+                Trends
+              </SidebarLink>
+
+              <SidebarLink href="/observability/alerts" icon={<Bell className="w-4 h-4" />}>
+                Alerts
               </SidebarLink>
             </nav>
 
