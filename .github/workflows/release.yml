@@ -1,0 +1,82 @@
+# ============================================================================
+# Release — wc-2026 Enterprise Healthcare Web Component Library
+# ============================================================================
+# Automated release pipeline powered by Changesets.
+#
+# Workflow:
+#   1. On push to main, create/update a "Version Packages" PR that:
+#      - Bumps package versions based on changeset entries
+#      - Generates CHANGELOG.md for each changed package
+#      - Removes consumed changeset files
+#   2. When the "Version Packages" PR is merged, publish to npm registry
+#
+# Version bump documentation:
+#   - patch: Bug fixes, non-breaking changes (0.0.x)
+#   - minor: New features, backwards-compatible additions (0.x.0)
+#   - major: Breaking changes that require consumer updates (x.0.0)
+#
+# Usage:
+#   1. Make changes to packages
+#   2. Run `pnpm changeset` and select affected packages + bump type
+#   3. Commit the generated .changeset/*.md file with your changes
+#   4. On merge to main, this workflow creates the "Version Packages" PR
+#   5. Review and merge the "Version Packages" PR to publish
+# ============================================================================
+
+name: Release
+
+on:
+  push:
+    branches: [main]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  release:
+    name: Release Packages
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'pnpm'
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build packages
+        run: pnpm run build
+
+      - name: Create or update release PR / publish
+        uses: changesets/action@v1
+        with:
+          # When changesets exist: create/update the "Version Packages" PR
+          # When the "Version Packages" PR is merged: publish to npm
+          publish: pnpm run changeset:publish
+          version: pnpm run changeset:version
+          title: 'chore: version packages'
+          commit: 'chore: version packages'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
