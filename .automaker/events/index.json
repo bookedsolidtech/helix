@@ -1,0 +1,375 @@
+{
+  "version": 1,
+  "events": [
+    {
+      "id": "evt-1772331253825-230e6dee",
+      "trigger": "auto_mode_complete",
+      "severity": "high",
+      "timestamp": "2026-03-01T02:14:13.825Z"
+    },
+    {
+      "id": "evt-1772330052495-3646f707",
+      "trigger": "auto_mode_complete",
+      "severity": "high",
+      "timestamp": "2026-03-01T01:54:12.495Z"
+    },
+    {
+      "id": "evt-1772329451816-d0a271e3",
+      "trigger": "auto_mode_complete",
+      "severity": "high",
+      "timestamp": "2026-03-01T01:44:11.816Z"
+    },
+    {
+      "id": "evt-1772326448591-e1e0f73d",
+      "trigger": "auto_mode_complete",
+      "severity": "high",
+      "timestamp": "2026-03-01T00:54:08.591Z"
+    },
+    {
+      "id": "evt-1772316835057-922f85eb",
+      "trigger": "auto_mode_complete",
+      "severity": "high",
+      "timestamp": "2026-02-28T22:13:55.057Z"
+    },
+    {
+      "id": "evt-1772316234404-c483bfa3",
+      "trigger": "auto_mode_complete",
+      "severity": "high",
+      "timestamp": "2026-02-28T22:03:54.404Z"
+    },
+    {
+      "id": "evt-1772315613850-33e04c14",
+      "trigger": "auto_mode_complete",
+      "severity": "high",
+      "timestamp": "2026-02-28T21:53:33.850Z"
+    },
+    {
+      "id": "evt-1772315033300-fae52f58",
+      "trigger": "auto_mode_complete",
+      "severity": "high",
+      "timestamp": "2026-02-28T21:43:53.300Z"
+    },
+    {
+      "id": "evt-1772312029607-87d44dd7",
+      "trigger": "auto_mode_complete",
+      "severity": "high",
+      "timestamp": "2026-02-28T20:53:49.607Z"
+    },
+    {
+      "id": "evt-1772309025938-77f6937d",
+      "trigger": "auto_mode_complete",
+      "severity": "high",
+      "timestamp": "2026-02-28T20:03:45.938Z"
+    },
+    {
+      "id": "evt-1772297764547-a3f9db61",
+      "trigger": "auto_mode_complete",
+      "severity": "high",
+      "timestamp": "2026-02-28T16:56:04.547Z"
+    },
+    {
+      "id": "evt-1772295813515-47fba7fe",
+      "trigger": "auto_mode_complete",
+      "severity": "high",
+      "timestamp": "2026-02-28T16:23:33.515Z"
+    },
+    {
+      "id": "evt-1772293353504-55690bca",
+      "trigger": "auto_mode_complete",
+      "severity": "high",
+      "timestamp": "2026-02-28T15:42:33.504Z"
+    },
+    {
+      "id": "evt-1772292917865-97e78ddc",
+      "trigger": "auto_mode_complete",
+      "severity": "high",
+      "timestamp": "2026-02-28T15:35:17.865Z"
+    },
+    {
+      "id": "evt-1772260984814-db62daec",
+      "trigger": "auto_mode_complete",
+      "severity": "high",
+      "timestamp": "2026-02-28T06:43:04.814Z"
+    },
+    {
+      "id": "evt-1772260778672-34cbea7a",
+      "trigger": "auto_mode_complete",
+      "severity": "high",
+      "timestamp": "2026-02-28T06:39:38.672Z"
+    },
+    {
+      "id": "evt-1772260682874-41ffb299",
+      "trigger": "auto_mode_complete",
+      "severity": "high",
+      "timestamp": "2026-02-28T06:38:02.874Z"
+    },
+    {
+      "id": "evt-1772260090987-89d6e7d0",
+      "trigger": "auto_mode_complete",
+      "severity": "high",
+      "timestamp": "2026-02-28T06:28:10.987Z"
+    },
+    {
+      "id": "evt-1772259621339-5403f349",
+      "trigger": "auto_mode_complete",
+      "severity": "high",
+      "timestamp": "2026-02-28T06:20:21.339Z"
+    },
+    {
+      "id": "evt-1772258617790-856746f4",
+      "trigger": "auto_mode_complete",
+      "severity": "high",
+      "timestamp": "2026-02-28T06:03:37.790Z"
+    },
+    {
+      "id": "evt-1772258550200-4a4be2c8",
+      "trigger": "auto_mode_complete",
+      "severity": "high",
+      "timestamp": "2026-02-28T06:02:30.200Z"
+    },
+    {
+      "id": "evt-1772254324881-18830b63",
+      "trigger": "auto_mode_complete",
+      "severity": "high",
+      "timestamp": "2026-02-28T04:52:04.881Z"
+    },
+    {
+      "id": "evt-1772253121929-0f792876",
+      "trigger": "auto_mode_complete",
+      "severity": "high",
+      "timestamp": "2026-02-28T04:32:01.929Z"
+    },
+    {
+      "id": "evt-1772245269832-7a24e90c",
+      "trigger": "auto_mode_complete",
+      "severity": "high",
+      "timestamp": "2026-02-28T02:21:09.832Z"
+    },
+    {
+      "id": "evt-1772242695951-70bf073c",
+      "trigger": "auto_mode_complete",
+      "severity": "high",
+      "timestamp": "2026-02-28T01:38:15.951Z"
+    },
+    {
+      "id": "evt-1772207760056-99575e14",
+      "trigger": "auto_mode_complete",
+      "severity": "high",
+      "timestamp": "2026-02-27T15:56:00.056Z"
+    },
+    {
+      "id": "evt-1772207611475-343c8ba8",
+      "trigger": "feature_success",
+      "severity": "high",
+      "timestamp": "2026-02-27T15:53:31.475Z",
+      "featureName": "Migrate from npm workspaces to pnpm",
+      "featureId": "helix-pnpm-migration"
+    },
+    {
+      "id": "evt-1772207143091-3471441c",
+      "trigger": "feature_success",
+      "severity": "high",
+      "timestamp": "2026-02-27T15:45:43.091Z",
+      "featureName": "Add Next.js font optimization to apps/admin",
+      "featureId": "helix-nextjs-font"
+    },
+    {
+      "id": "evt-1772171015612-cb637190",
+      "trigger": "feature_success",
+      "severity": "high",
+      "timestamp": "2026-02-27T05:43:35.612Z",
+      "featureName": "Update CONTRIBUTING.md with agent workflow and automation documentation",
+      "featureId": "helix-contributing"
+    },
+    {
+      "id": "evt-1772163735460-bc02f0d4",
+      "trigger": "feature_success",
+      "severity": "high",
+      "timestamp": "2026-02-27T03:42:15.460Z",
+      "featureName": "Optimize turbo.json cache configuration for test results and CEM artifacts",
+      "featureId": "helix-turbo-cache"
+    },
+    {
+      "id": "evt-1772163592023-9004e557",
+      "trigger": "feature_success",
+      "severity": "high",
+      "timestamp": "2026-02-27T03:39:52.023Z",
+      "featureName": "Align shadcn/ui theme with @helix/tokens design tokens",
+      "featureId": "helix-shadcn-tokens"
+    },
+    {
+      "id": "evt-1772162944705-a23cd597",
+      "trigger": "feature_success",
+      "severity": "high",
+      "timestamp": "2026-02-27T03:29:04.705Z",
+      "featureName": "Add remaining shadcn components to apps/admin",
+      "featureId": "helix-shadcn-components"
+    },
+    {
+      "id": "evt-1772162820821-71ed7a64",
+      "trigger": "feature_success",
+      "severity": "high",
+      "timestamp": "2026-02-27T03:27:00.821Z",
+      "featureName": "Add Graphite stacking configuration for PR management",
+      "featureId": "helix-graphite"
+    },
+    {
+      "id": "evt-1772162615612-dd666efc",
+      "trigger": "feature_success",
+      "severity": "high",
+      "timestamp": "2026-02-27T03:23:35.612Z",
+      "featureName": "Integrate CEM analyzer MCP server with health-scorer for component quality reporting",
+      "featureId": "helix-cem-mcp"
+    },
+    {
+      "id": "evt-1772162454462-1586afe2",
+      "trigger": "feature_success",
+      "severity": "high",
+      "timestamp": "2026-02-27T03:20:54.462Z",
+      "featureName": "Add agent-roles.md context file defining specialized agent roles for the WC library",
+      "featureId": "helix-agent-roles"
+    },
+    {
+      "id": "evt-1772162301904-2d34f6dd",
+      "trigger": "feature_success",
+      "severity": "high",
+      "timestamp": "2026-02-27T03:18:21.904Z",
+      "featureName": "Initialize shadcn/ui in apps/admin with components.json and Radix primitives",
+      "featureId": "helix-shadcn-init"
+    },
+    {
+      "id": "evt-1772161990570-7b19e4ca",
+      "trigger": "feature_success",
+      "severity": "high",
+      "timestamp": "2026-02-27T03:13:10.570Z",
+      "featureName": "Add CodeRabbit automated PR review configuration",
+      "featureId": "helix-coderabbit"
+    },
+    {
+      "id": "evt-1772161867845-108e0af6",
+      "trigger": "feature_success",
+      "severity": "high",
+      "timestamp": "2026-02-27T03:11:07.845Z",
+      "featureName": "Add GitHub branch protection rules for main, staging, and dev",
+      "featureId": "helix-branch-protection"
+    },
+    {
+      "id": "evt-1772160595732-1a73b03d",
+      "trigger": "feature_success",
+      "severity": "high",
+      "timestamp": "2026-02-27T02:49:55.732Z",
+      "featureName": "Enable TypeScript strict mode",
+      "featureId": "feature-1772150685981-ziom02txq"
+    },
+    {
+      "id": "evt-1772158053472-ebc94957",
+      "trigger": "project_scaffolded",
+      "severity": "low",
+      "timestamp": "2026-02-27T02:07:33.472Z"
+    },
+    {
+      "id": "evt-1772150710184-7091823e",
+      "trigger": "feature_created",
+      "severity": "medium",
+      "timestamp": "2026-02-27T00:05:10.184Z",
+      "featureName": "Add Claude Agent SDK integration",
+      "featureId": "feature-1772150710182-05u77mph7"
+    },
+    {
+      "id": "evt-1772150707125-0e85c68a",
+      "trigger": "feature_created",
+      "severity": "medium",
+      "timestamp": "2026-02-27T00:05:07.125Z",
+      "featureName": "Set up Discord project channels",
+      "featureId": "feature-1772150707123-eotus52mn"
+    },
+    {
+      "id": "evt-1772150704495-4976fdfe",
+      "trigger": "feature_created",
+      "severity": "medium",
+      "timestamp": "2026-02-27T00:05:04.495Z",
+      "featureName": "Add Umami analytics",
+      "featureId": "feature-1772150704494-c8h3e09wf"
+    },
+    {
+      "id": "evt-1772150701152-0353e99b",
+      "trigger": "feature_created",
+      "severity": "medium",
+      "timestamp": "2026-02-27T00:05:01.153Z",
+      "featureName": "Set up CodeRabbit AI review",
+      "featureId": "feature-1772150701151-d9a9t4i58"
+    },
+    {
+      "id": "evt-1772150698008-0da0cfc4",
+      "trigger": "feature_created",
+      "severity": "medium",
+      "timestamp": "2026-02-27T00:04:58.008Z",
+      "featureName": "Initialize shadcn/ui component library",
+      "featureId": "feature-1772150698007-2a1ysfkbf"
+    },
+    {
+      "id": "evt-1772150694597-c2e4b831",
+      "trigger": "feature_created",
+      "severity": "medium",
+      "timestamp": "2026-02-27T00:04:54.597Z",
+      "featureName": "Configure branch protection for main",
+      "featureId": "feature-1772150694596-1cwzyvalp"
+    },
+    {
+      "id": "evt-1772150691409-7736eb38",
+      "trigger": "feature_created",
+      "severity": "medium",
+      "timestamp": "2026-02-27T00:04:51.409Z",
+      "featureName": "Add CI security audit",
+      "featureId": "feature-1772150691408-l87bnxr7y"
+    },
+    {
+      "id": "evt-1772150688489-a9162450",
+      "trigger": "feature_created",
+      "severity": "medium",
+      "timestamp": "2026-02-27T00:04:48.489Z",
+      "featureName": "Set up composite TypeScript config",
+      "featureId": "feature-1772150688488-hab382aij"
+    },
+    {
+      "id": "evt-1772150685982-bdd59f73",
+      "trigger": "feature_created",
+      "severity": "medium",
+      "timestamp": "2026-02-27T00:04:45.982Z",
+      "featureName": "Enable TypeScript strict mode",
+      "featureId": "feature-1772150685981-ziom02txq"
+    },
+    {
+      "id": "evt-1772150682825-f9d2230d",
+      "trigger": "feature_created",
+      "severity": "medium",
+      "timestamp": "2026-02-27T00:04:42.825Z",
+      "featureName": "Migrate npm to pnpm",
+      "featureId": "feature-1772150682824-dwcsp4580"
+    },
+    {
+      "id": "evt-1772150671727-26b3f86c",
+      "trigger": "feature_created",
+      "severity": "medium",
+      "timestamp": "2026-02-27T00:04:31.727Z",
+      "featureName": "UI & Components",
+      "featureId": "feature-1772150671725-iuv0i99ov"
+    },
+    {
+      "id": "evt-1772150670111-95e2d0a5",
+      "trigger": "feature_created",
+      "severity": "medium",
+      "timestamp": "2026-02-27T00:04:30.111Z",
+      "featureName": "Quality Gates",
+      "featureId": "feature-1772150670110-2k1yqjfd4"
+    },
+    {
+      "id": "evt-1772150668612-af4145a5",
+      "trigger": "feature_created",
+      "severity": "medium",
+      "timestamp": "2026-02-27T00:04:28.612Z",
+      "featureName": "Foundation",
+      "featureId": "feature-1772150668610-fl02lltsq"
+    }
+  ]
+}

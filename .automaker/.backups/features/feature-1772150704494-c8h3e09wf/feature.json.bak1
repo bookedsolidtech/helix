@@ -1,0 +1,67 @@
+{
+  "category": "Uncategorized",
+  "description": "Set up Umami analytics for privacy-friendly traffic tracking in apps/admin (Next.js). Create an Analytics component that conditionally loads the Umami script using environment variables NEXT_PUBLIC_UMAMI_URL and NEXT_PUBLIC_UMAMI_WEBSITE_ID. Add the component to the root layout. Document the env vars in .env.local.example. Register the website at umami.proto-labs.ai.",
+  "title": "Add Umami analytics",
+  "status": "review",
+  "epicId": "epic-helix-automation",
+  "complexity": "small",
+  "priority": 4,
+  "source": "api",
+  "trustTier": 1,
+  "quarantineStatus": "passed",
+  "quarantineId": "e199bfbf-15fd-4a4b-8aeb-c13b18b794ec",
+  "id": "feature-1772150704494-c8h3e09wf",
+  "branchName": "feature/add-umami-analytics",
+  "descriptionHistory": [
+    {
+      "description": "Set up Umami analytics for privacy-friendly traffic tracking in apps/admin (Next.js). Create an Analytics component that conditionally loads the Umami script using environment variables NEXT_PUBLIC_UMAMI_URL and NEXT_PUBLIC_UMAMI_WEBSITE_ID. Add the component to the root layout. Document the env vars in .env.local.example. Register the website at umami.proto-labs.ai.",
+      "timestamp": "2026-02-27T00:05:04.494Z",
+      "source": "initial"
+    }
+  ],
+  "createdAt": "2026-02-27T00:05:04.494Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-02-27T00:05:04.494Z",
+      "reason": "Feature created"
+    },
+    {
+      "from": "backlog",
+      "to": "in_progress",
+      "timestamp": "2026-02-27T03:42:17.623Z"
+    },
+    {
+      "from": "in_progress",
+      "to": "backlog",
+      "timestamp": "2026-02-27T04:41:45.110Z"
+    },
+    {
+      "from": "backlog",
+      "to": "blocked",
+      "timestamp": "2026-02-27T04:42:18.728Z"
+    },
+    {
+      "from": "blocked",
+      "to": "review",
+      "timestamp": "2026-02-27T05:40:10.527Z"
+    }
+  ],
+  "featureType": "code",
+  "updatedAt": "2026-02-27T03:43:29.316Z",
+  "executionHistory": [
+    {
+      "id": "c9f031ed-2787-4d89-bfee-516b9358eedf",
+      "startedAt": "2026-02-27T03:42:17.984Z",
+      "completedAt": "2026-02-27T03:43:23.607Z",
+      "durationMs": 65623,
+      "costUsd": 0,
+      "model": "claude-sonnet-4-6",
+      "success": false,
+      "error": "Agent loop detected (TodoWrite:d120b2ba). Aborting for retry with recovery guidance.",
+      "trigger": "manual"
+    }
+  ],
+  "reviewStartedAt": "2026-02-27T05:40:10.527Z"
+}

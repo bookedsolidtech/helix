@@ -1,0 +1,10 @@
+{
+  "id": "evt-1772150694597-c2e4b831",
+  "trigger": "feature_created",
+  "severity": "medium",
+  "timestamp": "2026-02-27T00:04:54.597Z",
+  "projectPath": "/Volumes/Development/helix",
+  "projectName": "helix",
+  "featureId": "feature-1772150694596-1cwzyvalp",
+  "featureName": "Configure branch protection for main"
+}

@@ -1,0 +1,31 @@
+{
+  "category": "Phase 2: Component Expansion",
+  "description": "**Milestone:** Phase 2: Component Expansion\n\nBuild hx-accordion: collapsible content sections for FAQ, expandable content. Progressive enhancement with <details>/<summary> fallback. Single and multi-expand modes.\n\n**Files to Modify:**\n- packages/hx-library/src/components/hx-accordion/\n\n**Acceptance Criteria:**\n- [ ] Single and multi-expand modes\n- [ ] Animated open/close transitions\n- [ ] Progressive enhancement fallback\n- [ ] Keyboard: Enter/Space to toggle\n- [ ] CSS parts: item, trigger, content, icon\n- [ ] Events: hx-expand, hx-collapse\n- [ ] ARIA: expanded/hidden states\n- [ ] <5KB gzipped\n\n**Complexity:** medium",
+  "title": "Implement hx-accordion component",
+  "status": "backlog",
+  "isEpic": false,
+  "epicId": "feature-1772158053419-7nvwtbujb",
+  "branchName": "feature/phase-2-component-implement-hx",
+  "isFoundation": false,
+  "id": "feature-1772158053421-5xcu69mt2",
+  "descriptionHistory": [
+    {
+      "description": "**Milestone:** Phase 2: Component Expansion\n\nBuild hx-accordion: collapsible content sections for FAQ, expandable content. Progressive enhancement with <details>/<summary> fallback. Single and multi-expand modes.\n\n**Files to Modify:**\n- packages/hx-library/src/components/hx-accordion/\n\n**Acceptance Criteria:**\n- [ ] Single and multi-expand modes\n- [ ] Animated open/close transitions\n- [ ] Progressive enhancement fallback\n- [ ] Keyboard: Enter/Space to toggle\n- [ ] CSS parts: item, trigger, content, icon\n- [ ] Events: hx-expand, hx-collapse\n- [ ] ARIA: expanded/hidden states\n- [ ] <5KB gzipped\n\n**Complexity:** medium",
+      "timestamp": "2026-02-27T02:07:33.421Z",
+      "source": "initial"
+    }
+  ],
+  "createdAt": "2026-02-27T02:07:33.421Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-02-27T02:07:33.421Z",
+      "reason": "Feature created"
+    }
+  ],
+  "featureType": "code",
+  "dependencies": [
+    "feature-1772158053420-xd0whq9jm"
+  ]
+}

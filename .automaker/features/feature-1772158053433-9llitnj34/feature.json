@@ -1,0 +1,31 @@
+{
+  "category": "Epic",
+  "description": "# Phase 5: Enterprise Features\n\nFeatures driving enterprise adoption and commercial viability: white-labeling, theme marketplace, enterprise support, LTS releases, migration tooling. Months 19-24.\n\n## Phases\n1. Build white-labeling toolkit and theme CLI\n2. Establish LTS release process and migration tooling\n3. Launch theme marketplace and enterprise support tiers",
+  "title": "[Epic] Phase 5: Enterprise Features",
+  "status": "blocked",
+  "isEpic": true,
+  "epicColor": "#F97316",
+  "branchName": "epic/phase-5-enterprise-features",
+  "id": "feature-1772158053433-9llitnj34",
+  "descriptionHistory": [
+    {
+      "description": "# Phase 5: Enterprise Features\n\nFeatures driving enterprise adoption and commercial viability: white-labeling, theme marketplace, enterprise support, LTS releases, migration tooling. Months 19-24.\n\n## Phases\n1. Build white-labeling toolkit and theme CLI\n2. Establish LTS release process and migration tooling\n3. Launch theme marketplace and enterprise support tiers",
+      "timestamp": "2026-02-27T02:07:33.434Z",
+      "source": "initial"
+    }
+  ],
+  "createdAt": "2026-02-27T02:07:33.434Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-02-27T02:07:33.434Z",
+      "reason": "Feature created"
+    }
+  ],
+  "featureType": "code",
+  "dependencies": [
+    "feature-1772158053431-4la07hyzj"
+  ],
+  "blockedReason": "Project deactivated \u2014 not managed by this Automaker instance"
+}

@@ -1,0 +1,61 @@
+{
+  "id": "helix-branch-protection",
+  "title": "Add GitHub branch protection rules for main, staging, and dev",
+  "category": "infrastructure",
+  "description": "Add branch protection rules via GitHub API or `.github/` configuration to enforce:\n\n- `main`: Require PR, require all CI checks to pass, no force push, require linear history\n- `staging`: Require PR from `dev` only, require CI checks\n- `dev`: Require PR (from `feature/*`), require CI checks\n\n## What to do\n\n1. Use `gh api` to configure branch protection for `main`, `staging`, and `dev`\n2. Add a `docs/branch-protection.md` documenting what protections are in place and why\n3. Update `CONTRIBUTING.md` with branch workflow instructions for contributors\n\n## Acceptance Criteria\n- Direct pushes to `main` and `staging` are blocked\n- All PRs to `main` require passing CI\n- Branch protection config is documented",
+  "status": "backlog",
+  "priority": 2,
+  "epicId": "epic-helix-foundation",
+  "dependencies": [],
+  "createdAt": "2026-02-26T00:00:00Z",
+  "featureType": "code",
+  "descriptionHistory": [],
+  "statusHistory": [
+    {
+      "from": "backlog",
+      "to": "in_progress",
+      "timestamp": "2026-02-27T03:08:31.111Z"
+    },
+    {
+      "from": "done",
+      "to": "blocked",
+      "timestamp": "2026-02-27T04:41:07.918Z"
+    },
+    {
+      "from": "blocked",
+      "to": "backlog",
+      "timestamp": "2026-02-27T05:41:14.585Z"
+    },
+    {
+      "from": "backlog",
+      "to": "in_progress",
+      "timestamp": "2026-02-27T05:42:06.263Z"
+    },
+    {
+      "from": "in_progress",
+      "to": "blocked",
+      "timestamp": "2026-02-27T05:42:06.287Z"
+    },
+    {
+      "from": "blocked",
+      "to": "backlog",
+      "timestamp": "2026-02-27T05:46:56.427Z"
+    }
+  ],
+  "complexity": "medium",
+  "updatedAt": "2026-02-27T03:11:07.824Z",
+  "costUsd": 0.88364175,
+  "lastSessionId": "3c731b60-f544-404b-8413-6bfc2ab2c53b",
+  "executionHistory": [
+    {
+      "id": "1e44fb02-3907-4074-ae9b-fe9eb4792fb0",
+      "startedAt": "2026-02-27T03:08:31.116Z",
+      "completedAt": "2026-02-27T03:11:07.836Z",
+      "durationMs": 156720,
+      "costUsd": 0.88364175,
+      "model": "claude-sonnet-4-6",
+      "success": true,
+      "trigger": "manual"
+    }
+  ]
+}

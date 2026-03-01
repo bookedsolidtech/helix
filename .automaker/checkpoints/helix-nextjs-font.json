@@ -1,0 +1,17 @@
+{
+  "featureId": "helix-nextjs-font",
+  "projectPath": "/Volumes/Development/helix",
+  "currentState": "EXECUTE",
+  "stateContext": {
+    "retryCount": 0,
+    "planRequired": false,
+    "remediationAttempts": 0,
+    "mergeRetryCount": 0
+  },
+  "completedStates": [
+    "INTAKE"
+  ],
+  "goalGateResults": [],
+  "timestamp": "2026-02-27T15:43:20.966Z",
+  "version": 1
+}

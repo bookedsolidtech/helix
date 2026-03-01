@@ -1,0 +1,26 @@
+{
+  "featureId": "feature-1772150685981-ziom02txq",
+  "projectPath": "/Volumes/Development/helix",
+  "currentState": "ESCALATE",
+  "stateContext": {
+    "retryCount": 0,
+    "planRequired": false,
+    "remediationAttempts": 0,
+    "mergeRetryCount": 0,
+    "escalationReason": "git workflow failed — uncommitted work in worktree at /Volumes/Development/helix/.worktrees/feature-enable-typescript-strict-mode: git workflow failed — uncommitted work in worktree at /Volumes/Development/helix/.worktrees/feature-enable-typescript-strict-mode: Command failed: git add -A -- ':!.automaker/' '.automaker/memory/' '.automaker/skills/'\nfatal: pathspec '.automaker/memory/' did not match any files\n"
+  },
+  "completedStates": [
+    "INTAKE",
+    "EXECUTE"
+  ],
+  "goalGateResults": [
+    {
+      "gateId": "execute-entry",
+      "state": "EXECUTE",
+      "passed": true,
+      "reason": "Feature ready for execution"
+    }
+  ],
+  "timestamp": "2026-02-27T02:49:36.598Z",
+  "version": 1
+}

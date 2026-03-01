@@ -1,0 +1,31 @@
+{
+  "category": "Phase 2: Component Expansion",
+  "description": "**Milestone:** Phase 2: Component Expansion\n\nBuild hx-skeleton: loading placeholder for BigPipe content streaming in Drupal. Text, circular, rectangular variants with pulse animation.\n\n**Files to Modify:**\n- packages/hx-library/src/components/hx-skeleton/\n\n**Acceptance Criteria:**\n- [ ] Text, circular, and rectangular variants\n- [ ] Configurable width, height, border-radius\n- [ ] Pulse animation (CSS-only, no JS)\n- [ ] Wave animation variant\n- [ ] CSS parts: skeleton\n- [ ] ARIA: aria-busy=true, aria-label\n- [ ] <5KB gzipped\n\n**Complexity:** small",
+  "title": "Implement hx-skeleton component",
+  "status": "backlog",
+  "isEpic": false,
+  "epicId": "feature-1772158053419-7nvwtbujb",
+  "branchName": "feature/phase-2-component-implement-hx",
+  "isFoundation": false,
+  "id": "feature-1772158053425-mt2jdp046",
+  "descriptionHistory": [
+    {
+      "description": "**Milestone:** Phase 2: Component Expansion\n\nBuild hx-skeleton: loading placeholder for BigPipe content streaming in Drupal. Text, circular, rectangular variants with pulse animation.\n\n**Files to Modify:**\n- packages/hx-library/src/components/hx-skeleton/\n\n**Acceptance Criteria:**\n- [ ] Text, circular, and rectangular variants\n- [ ] Configurable width, height, border-radius\n- [ ] Pulse animation (CSS-only, no JS)\n- [ ] Wave animation variant\n- [ ] CSS parts: skeleton\n- [ ] ARIA: aria-busy=true, aria-label\n- [ ] <5KB gzipped\n\n**Complexity:** small",
+      "timestamp": "2026-02-27T02:07:33.425Z",
+      "source": "initial"
+    }
+  ],
+  "createdAt": "2026-02-27T02:07:33.425Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-02-27T02:07:33.425Z",
+      "reason": "Feature created"
+    }
+  ],
+  "featureType": "code",
+  "dependencies": [
+    "feature-1772158053424-t0s0s69ek"
+  ]
+}

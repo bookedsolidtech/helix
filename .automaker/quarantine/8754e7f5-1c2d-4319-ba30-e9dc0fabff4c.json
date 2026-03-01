@@ -1,0 +1,12 @@
+{
+  "id": "8754e7f5-1c2d-4319-ba30-e9dc0fabff4c",
+  "source": "api",
+  "trustTier": 1,
+  "submittedAt": "2026-02-27T00:04:51.407Z",
+  "result": "passed",
+  "violations": [],
+  "originalTitle": "Add CI security audit",
+  "originalDescription": "Add a security audit step to the GitHub Actions CI workflow (ci.yml or ci-matrix.yml). Run `npm audit --audit-level=high` (or pnpm audit after migration) to detect vulnerable dependencies. Fail the build on high/critical vulnerabilities. This step should run on every PR and push to main.",
+  "sanitizedTitle": "Add CI security audit",
+  "sanitizedDescription": "Add a security audit step to the GitHub Actions CI workflow (ci.yml or ci-matrix.yml). Run `npm audit --audit-level=high` (or pnpm audit after migration) to detect vulnerable dependencies. Fail the build on high/critical vulnerabilities. This step should run on every PR and push to main."
+}

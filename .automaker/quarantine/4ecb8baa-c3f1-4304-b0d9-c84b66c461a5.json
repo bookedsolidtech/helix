@@ -1,0 +1,12 @@
+{
+  "id": "4ecb8baa-c3f1-4304-b0d9-c84b66c461a5",
+  "source": "api",
+  "trustTier": 1,
+  "submittedAt": "2026-02-27T00:04:30.109Z",
+  "result": "passed",
+  "violations": [],
+  "originalTitle": "Quality Gates",
+  "originalDescription": "CI and repository hardening milestone. Adds security audit to CI pipeline and configures branch protection rules on the main branch.",
+  "sanitizedTitle": "Quality Gates",
+  "sanitizedDescription": "CI and repository hardening milestone. Adds security audit to CI pipeline and configures branch protection rules on the main branch."
+}

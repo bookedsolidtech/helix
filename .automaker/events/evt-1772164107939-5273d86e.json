@@ -1,0 +1,11 @@
+{
+  "id": "evt-1772164107939-5273d86e",
+  "trigger": "feature_error",
+  "severity": "critical",
+  "timestamp": "2026-02-27T03:48:27.939Z",
+  "projectPath": "/Volumes/Development/helix",
+  "projectName": "helix",
+  "featureId": "helix-shadcn-init",
+  "error": "Feature helix-shadcn-init not found",
+  "errorType": "execution"
+}

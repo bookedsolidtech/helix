@@ -1,0 +1,107 @@
+{
+  "category": "Uncategorized",
+  "description": "Add AI agent capability with Claude Agent SDK. **NOTE: Verify the correct package name before installing — `@anthropic-ai/claude-agent-sdk` may not be publicly available. Check npmjs.com first. The standard Anthropic SDK is `@anthropic-ai/sdk`.** If the agent SDK is not available, implement using `@anthropic-ai/sdk` directly with tool-use patterns. Create a new package `packages/agent` with tool definitions and conversation management. Define at least one working agent (e.g., a component health analysis agent). Wire up with existing MCP server infrastructure in apps/mcp-servers/. Document usage in docs/.",
+  "title": "Add Claude Agent SDK integration",
+  "status": "blocked",
+  "epicId": "epic-helix-automation",
+  "complexity": "large",
+  "priority": 4,
+  "source": "api",
+  "trustTier": 1,
+  "quarantineStatus": "passed",
+  "quarantineId": "eb868ddf-cfcc-49b6-9c09-a859680522b2",
+  "id": "feature-1772150710182-05u77mph7",
+  "branchName": "feature/add-claude-agent-sdk-integration",
+  "descriptionHistory": [
+    {
+      "description": "Add AI agent capability with Claude Agent SDK (@anthropic-ai/claude-agent-sdk). Create a new package apps/agent or packages/agent with tool definitions and conversation management. Define at least one working agent (e.g., a content analysis agent). Wire up with existing MCP server infrastructure in apps/mcp-servers/. Document usage in docs/.",
+      "timestamp": "2026-02-27T00:05:10.183Z",
+      "source": "initial"
+    },
+    {
+      "description": "Add AI agent capability with Claude Agent SDK. **NOTE: Verify the correct package name before installing — `@anthropic-ai/claude-agent-sdk` may not be publicly available. Check npmjs.com first. The standard Anthropic SDK is `@anthropic-ai/sdk`.** If the agent SDK is not available, implement using `@anthropic-ai/sdk` directly with tool-use patterns. Create a new package `packages/agent` with tool definitions and conversation management. Define at least one working agent (e.g., a component health analysis agent). Wire up with existing MCP server infrastructure in apps/mcp-servers/. Document usage in docs/.",
+      "timestamp": "2026-02-28T01:13:17.689Z",
+      "source": "edit"
+    }
+  ],
+  "createdAt": "2026-02-27T00:05:10.183Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-02-27T00:05:10.183Z",
+      "reason": "Feature created"
+    },
+    {
+      "from": "backlog",
+      "to": "in_progress",
+      "timestamp": "2026-02-27T03:43:26.354Z"
+    },
+    {
+      "from": "in_progress",
+      "to": "blocked",
+      "timestamp": "2026-02-27T03:44:57.682Z"
+    },
+    {
+      "from": "blocked",
+      "to": "backlog",
+      "timestamp": "2026-02-27T05:53:17.710Z"
+    },
+    {
+      "from": "backlog",
+      "to": "in_progress",
+      "timestamp": "2026-02-27T15:42:47.523Z"
+    },
+    {
+      "from": "in_progress",
+      "to": "blocked",
+      "timestamp": "2026-02-27T15:44:12.379Z"
+    },
+    {
+      "from": "blocked",
+      "to": "backlog",
+      "timestamp": "2026-02-28T01:11:56.202Z"
+    },
+    {
+      "from": "backlog",
+      "to": "in_progress",
+      "timestamp": "2026-02-28T01:16:39.722Z"
+    },
+    {
+      "from": "in_progress",
+      "to": "blocked",
+      "timestamp": "2026-02-28T01:16:56.532Z"
+    },
+    {
+      "from": "blocked",
+      "to": "backlog",
+      "timestamp": "2026-02-28T06:03:09.981Z"
+    },
+    {
+      "from": "backlog",
+      "to": "in_progress",
+      "timestamp": "2026-02-28T06:03:34.813Z"
+    },
+    {
+      "from": "in_progress",
+      "to": "blocked",
+      "timestamp": "2026-02-28T06:03:50.498Z"
+    },
+    {
+      "from": "blocked",
+      "to": "backlog",
+      "timestamp": "2026-02-28T06:19:43.727Z"
+    },
+    {
+      "from": "backlog",
+      "to": "in_progress",
+      "timestamp": "2026-02-28T06:20:18.445Z"
+    },
+    {
+      "from": "in_progress",
+      "to": "blocked",
+      "timestamp": "2026-02-28T06:20:30.919Z"
+    }
+  ],
+  "featureType": "code"
+}

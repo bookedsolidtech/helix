@@ -1,0 +1,11 @@
+{
+  "branch": "feature/add-umami-analytics",
+  "createdAt": "2026-02-27T05:47:17.094Z",
+  "pr": {
+    "number": 5,
+    "url": "https://github.com/clarity-house-press/helix/pull/5",
+    "title": "feat(admin): add Umami analytics with conditional script loading",
+    "state": "MERGED",
+    "createdAt": "2026-02-27T05:40:06Z"
+  }
+}

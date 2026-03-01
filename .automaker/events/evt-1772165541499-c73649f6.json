@@ -1,0 +1,11 @@
+{
+  "id": "evt-1772165541499-c73649f6",
+  "trigger": "feature_error",
+  "severity": "critical",
+  "timestamp": "2026-02-27T04:12:21.499Z",
+  "projectPath": "/Volumes/Development/helix",
+  "projectName": "helix",
+  "featureId": "helix-turbo-cache",
+  "error": "Feature helix-turbo-cache not found",
+  "errorType": "execution"
+}

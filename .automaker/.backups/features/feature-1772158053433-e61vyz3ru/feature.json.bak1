@@ -1,0 +1,31 @@
+{
+  "category": "Phase 4: Observability Platform",
+  "description": "**Milestone:** Phase 4: Observability Platform\n\nUpgrade the admin dashboard to Panopticon v2 with multi-project views, usage analytics, error tracking, version drift detection, and health score trends over time. Alerting when component health drops.\n\n**Files to Modify:**\n- apps/admin/\n\n**Acceptance Criteria:**\n- [ ] Multi-project view (all consumer projects)\n- [ ] Usage analytics (popular/unused components)\n- [ ] Error tracking (render failures, a11y violations)\n- [ ] Version drift detection (old versions in use)\n- [ ] Health score trends (time series charts)\n- [ ] Alerting (email/webhook on health drops)\n\n**Complexity:** large",
+  "title": "Build Panopticon v2 multi-project dashboard",
+  "status": "backlog",
+  "isEpic": false,
+  "epicId": "feature-1772158053431-4la07hyzj",
+  "branchName": "feature/phase-4-observabilit-build-panopticon-v2",
+  "isFoundation": false,
+  "id": "feature-1772158053433-e61vyz3ru",
+  "descriptionHistory": [
+    {
+      "description": "**Milestone:** Phase 4: Observability Platform\n\nUpgrade the admin dashboard to Panopticon v2 with multi-project views, usage analytics, error tracking, version drift detection, and health score trends over time. Alerting when component health drops.\n\n**Files to Modify:**\n- apps/admin/\n\n**Acceptance Criteria:**\n- [ ] Multi-project view (all consumer projects)\n- [ ] Usage analytics (popular/unused components)\n- [ ] Error tracking (render failures, a11y violations)\n- [ ] Version drift detection (old versions in use)\n- [ ] Health score trends (time series charts)\n- [ ] Alerting (email/webhook on health drops)\n\n**Complexity:** large",
+      "timestamp": "2026-02-27T02:07:33.433Z",
+      "source": "initial"
+    }
+  ],
+  "createdAt": "2026-02-27T02:07:33.433Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-02-27T02:07:33.433Z",
+      "reason": "Feature created"
+    }
+  ],
+  "featureType": "code",
+  "dependencies": [
+    "feature-1772158053432-e7793r7kg"
+  ]
+}

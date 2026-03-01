@@ -1,0 +1,31 @@
+{
+  "category": "Uncategorized",
+  "description": "Core infrastructure alignment milestone. Migrates the package manager from npm to pnpm and establishes TypeScript strict mode and composite project references across all packages.",
+  "title": "Foundation",
+  "status": "backlog",
+  "isEpic": true,
+  "priority": 1,
+  "isFoundation": true,
+  "source": "api",
+  "trustTier": 1,
+  "quarantineStatus": "passed",
+  "quarantineId": "ad657d2c-e4e9-412d-a4da-3a453eac10eb",
+  "id": "feature-1772150668610-fl02lltsq",
+  "branchName": "feature/foundation",
+  "descriptionHistory": [
+    {
+      "description": "Core infrastructure alignment milestone. Migrates the package manager from npm to pnpm and establishes TypeScript strict mode and composite project references across all packages.",
+      "timestamp": "2026-02-27T00:04:28.611Z",
+      "source": "initial"
+    }
+  ],
+  "createdAt": "2026-02-27T00:04:28.611Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-02-27T00:04:28.611Z",
+      "reason": "Feature created"
+    }
+  ]
+}

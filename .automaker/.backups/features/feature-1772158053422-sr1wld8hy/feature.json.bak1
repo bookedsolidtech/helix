@@ -1,0 +1,31 @@
+{
+  "category": "Phase 2: Component Expansion",
+  "description": "**Milestone:** Phase 2: Component Expansion\n\nBuild hx-avatar: user/provider profile images with fallback initials and status indicators. Used for healthcare provider profiles.\n\n**Files to Modify:**\n- packages/hx-library/src/components/hx-avatar/\n\n**Acceptance Criteria:**\n- [ ] Image, initials, and icon fallback modes\n- [ ] Sizes: xs, sm, md, lg, xl\n- [ ] Status indicator (online, away, busy, offline)\n- [ ] Shape: circle, square, rounded\n- [ ] CSS parts: image, initials, status\n- [ ] Lazy loading for images\n- [ ] <5KB gzipped\n\n**Complexity:** small",
+  "title": "Implement hx-avatar component",
+  "status": "backlog",
+  "isEpic": false,
+  "epicId": "feature-1772158053419-7nvwtbujb",
+  "branchName": "feature/phase-2-component-implement-hx-avatar",
+  "isFoundation": false,
+  "id": "feature-1772158053422-sr1wld8hy",
+  "descriptionHistory": [
+    {
+      "description": "**Milestone:** Phase 2: Component Expansion\n\nBuild hx-avatar: user/provider profile images with fallback initials and status indicators. Used for healthcare provider profiles.\n\n**Files to Modify:**\n- packages/hx-library/src/components/hx-avatar/\n\n**Acceptance Criteria:**\n- [ ] Image, initials, and icon fallback modes\n- [ ] Sizes: xs, sm, md, lg, xl\n- [ ] Status indicator (online, away, busy, offline)\n- [ ] Shape: circle, square, rounded\n- [ ] CSS parts: image, initials, status\n- [ ] Lazy loading for images\n- [ ] <5KB gzipped\n\n**Complexity:** small",
+      "timestamp": "2026-02-27T02:07:33.422Z",
+      "source": "initial"
+    }
+  ],
+  "createdAt": "2026-02-27T02:07:33.422Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-02-27T02:07:33.422Z",
+      "reason": "Feature created"
+    }
+  ],
+  "featureType": "code",
+  "dependencies": [
+    "feature-1772158053421-ro1jy3vha"
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "version": 1,
+  "projectName": "helix",
+  "projectPath": "/Volumes/Development/helix",
+  "defaultModel": "sonnet",
+  "prBaseBranch": "dev",
+  "initialized": true,
+  "initializedAt": "2026-02-26T00:00:00Z",
+  "worktreePanelVisible": true,
+  "autoMode": {
+    "enabled": false,
+    "disabled_reason": "Project deactivated"
+  },
+  "autoModeEnabled": false
+}

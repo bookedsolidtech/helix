@@ -1,0 +1,56 @@
+{
+  "id": "helix-shadcn-init",
+  "title": "Initialize shadcn/ui in apps/admin with components.json and Radix primitives",
+  "category": "frontend",
+  "description": "The admin app has 4 manually-created UI components (badge, card, table, tabs) but no `components.json` and no formal shadcn/ui setup. This creates inconsistency and makes adding new components manual.\n\n## What to do\n\n1. Run `npx shadcn@latest init` in `apps/admin/` to generate `components.json`\n2. Configure paths to match the existing `src/components/ui/` directory\n3. Set CSS variables mode (to allow token bridging later)\n4. Install required Radix primitive packages and `class-variance-authority` (already present), `clsx`, `tailwind-merge`\n5. Migrate existing 4 components (badge, card, table, tabs) to proper shadcn format if needed\n6. Ensure Tailwind CSS 4 config is compatible with shadcn CSS variable output\n\n## Acceptance Criteria\n- `apps/admin/components.json` exists with correct configuration\n- Existing 4 components are properly registered\n- `npx shadcn add button` works correctly\n- TypeScript types compile without errors",
+  "status": "blocked",
+  "priority": 2,
+  "epicId": "epic-helix-admin-ui",
+  "dependencies": [],
+  "createdAt": "2026-02-26T00:00:00Z",
+  "featureType": "code",
+  "complexity": "medium",
+  "descriptionHistory": [],
+  "statusHistory": [
+    {
+      "from": "backlog",
+      "to": "in_progress",
+      "timestamp": "2026-02-27T03:13:13.521Z"
+    },
+    {
+      "from": "done",
+      "to": "blocked",
+      "timestamp": "2026-02-27T04:48:21.981Z"
+    },
+    {
+      "from": "blocked",
+      "to": "backlog",
+      "timestamp": "2026-02-27T05:41:12.582Z"
+    },
+    {
+      "from": "backlog",
+      "to": "in_progress",
+      "timestamp": "2026-02-27T05:43:37.373Z"
+    },
+    {
+      "from": "in_progress",
+      "to": "blocked",
+      "timestamp": "2026-02-27T05:43:37.399Z"
+    }
+  ],
+  "updatedAt": "2026-02-27T03:18:21.891Z",
+  "costUsd": 1.5702917500000002,
+  "lastSessionId": "83a4694d-991d-48c8-aad7-e7a7e264c378",
+  "executionHistory": [
+    {
+      "id": "3247ceb5-d0ff-44b3-9a61-e470365fd8f8",
+      "startedAt": "2026-02-27T03:13:13.526Z",
+      "completedAt": "2026-02-27T03:18:21.897Z",
+      "durationMs": 308371,
+      "costUsd": 1.5702917500000002,
+      "model": "claude-sonnet-4-6",
+      "success": true,
+      "trigger": "manual"
+    }
+  ]
+}

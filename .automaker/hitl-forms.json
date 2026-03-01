@@ -1,0 +1,130 @@
+[
+  {
+    "title": "Agent blocked: Run health scorer on all 13 components and fix to Grade A",
+    "description": "Failure category: unknown\nRoot cause: Unknown failure type - requires manual investigation\nConfidence: 50%",
+    "steps": [
+      {
+        "title": "How would you like to proceed?",
+        "schema": {
+          "type": "object",
+          "properties": {
+            "resolution": {
+              "type": "string",
+              "title": "Resolution",
+              "oneOf": [
+                {
+                  "const": "retry",
+                  "title": "Retry",
+                  "description": "Reset and re-run the agent"
+                },
+                {
+                  "const": "provide_context",
+                  "title": "Provide context",
+                  "description": "Give the agent additional information"
+                },
+                {
+                  "const": "skip",
+                  "title": "Skip this feature",
+                  "description": "Mark as done without implementing"
+                },
+                {
+                  "const": "close",
+                  "title": "Close as blocked",
+                  "description": "Keep blocked for manual handling"
+                }
+              ]
+            }
+          },
+          "required": [
+            "resolution"
+          ]
+        }
+      },
+      {
+        "title": "Additional context",
+        "description": "Provide additional information for the agent (only required if you selected \"Provide context\")",
+        "schema": {
+          "type": "object",
+          "properties": {
+            "context": {
+              "type": "string",
+              "title": "Context",
+              "description": "Additional information to help the agent proceed"
+            }
+          }
+        }
+      }
+    ],
+    "callerType": "lead_engineer",
+    "featureId": "feature-1772158053417-hoozza85w",
+    "projectPath": "/Volumes/Development/helix",
+    "id": "hitl-62a3730b",
+    "status": "pending",
+    "createdAt": "2026-02-28T16:23:31.734Z",
+    "expiresAt": "2026-02-28T17:23:31.734Z"
+  },
+  {
+    "title": "Agent blocked: Run health scorer on all 13 components and fix to Grade A",
+    "description": "Failure category: unknown\nRoot cause: Unknown failure type - requires manual investigation\nConfidence: 50%",
+    "steps": [
+      {
+        "title": "How would you like to proceed?",
+        "schema": {
+          "type": "object",
+          "properties": {
+            "resolution": {
+              "type": "string",
+              "title": "Resolution",
+              "oneOf": [
+                {
+                  "const": "retry",
+                  "title": "Retry",
+                  "description": "Reset and re-run the agent"
+                },
+                {
+                  "const": "provide_context",
+                  "title": "Provide context",
+                  "description": "Give the agent additional information"
+                },
+                {
+                  "const": "skip",
+                  "title": "Skip this feature",
+                  "description": "Mark as done without implementing"
+                },
+                {
+                  "const": "close",
+                  "title": "Close as blocked",
+                  "description": "Keep blocked for manual handling"
+                }
+              ]
+            }
+          },
+          "required": [
+            "resolution"
+          ]
+        }
+      },
+      {
+        "title": "Additional context",
+        "description": "Provide additional information for the agent (only required if you selected \"Provide context\")",
+        "schema": {
+          "type": "object",
+          "properties": {
+            "context": {
+              "type": "string",
+              "title": "Context",
+              "description": "Additional information to help the agent proceed"
+            }
+          }
+        }
+      }
+    ],
+    "callerType": "lead_engineer",
+    "featureId": "feature-1772158053417-hoozza85w",
+    "projectPath": "/Volumes/Development/helix",
+    "id": "hitl-b0d553ae",
+    "status": "pending",
+    "createdAt": "2026-02-28T16:55:07.463Z",
+    "expiresAt": "2026-02-28T17:55:07.463Z"
+  }
+]

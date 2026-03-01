@@ -1,0 +1,10 @@
+{
+  "id": "evt-1772150704495-4976fdfe",
+  "trigger": "feature_created",
+  "severity": "medium",
+  "timestamp": "2026-02-27T00:05:04.495Z",
+  "projectPath": "/Volumes/Development/helix",
+  "projectName": "helix",
+  "featureId": "feature-1772150704494-c8h3e09wf",
+  "featureName": "Add Umami analytics"
+}

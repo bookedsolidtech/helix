@@ -1,0 +1,11 @@
+{
+  "branch": "feature/phase-1-production-write-missing",
+  "createdAt": "2026-02-27T15:29:15.681Z",
+  "pr": {
+    "number": 7,
+    "url": "https://github.com/clarity-house-press/helix/pull/7",
+    "title": "test(library): expand Vitest browser tests for 80%+ coverage",
+    "state": "MERGED",
+    "createdAt": "2026-02-27T15:18:19Z"
+  }
+}

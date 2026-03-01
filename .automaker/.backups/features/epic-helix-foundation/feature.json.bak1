@@ -1,0 +1,11 @@
+{
+  "id": "epic-helix-foundation",
+  "title": "Foundation — Branch Strategy & Git Workflow",
+  "category": "infrastructure",
+  "description": "Establish a proper multi-branch Git workflow (dev → staging → main) and CI/CD pipeline enforcement. This epic contains all features needed to bring the Helix repository's branch strategy and code review infrastructure up to ProtoLabs standard.",
+  "status": "backlog",
+  "priority": 1,
+  "isEpic": true,
+  "epicColor": "#e11d48",
+  "createdAt": "2026-02-26T00:00:00Z"
+}

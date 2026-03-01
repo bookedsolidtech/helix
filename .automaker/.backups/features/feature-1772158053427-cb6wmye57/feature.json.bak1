@@ -1,0 +1,31 @@
+{
+  "category": "Phase 2: Component Expansion",
+  "description": "**Milestone:** Phase 2: Component Expansion\n\nCreate a Tailwind CSS preset that maps Helix design tokens to Tailwind utility classes. Consumers install the preset and get Helix-aligned colors, spacing, typography, and shadows in their Tailwind projects.\n\n**Files to Modify:**\n- packages/tailwind-preset/\n\n**Acceptance Criteria:**\n- [ ] Tailwind preset package published as @helixds/tailwind-preset\n- [ ] Colors map to --hx-color-* tokens\n- [ ] Spacing maps to --hx-spacing-* tokens\n- [ ] Typography maps to --hx-font-* tokens\n- [ ] Dark mode support via data-theme attribute\n- [ ] Documentation with usage examples\n\n**Complexity:** medium",
+  "title": "Build @helix/tailwind-preset package",
+  "status": "backlog",
+  "isEpic": false,
+  "epicId": "feature-1772158053419-7nvwtbujb",
+  "branchName": "feature/phase-2-component-build-helixtailwind",
+  "isFoundation": false,
+  "id": "feature-1772158053427-cb6wmye57",
+  "descriptionHistory": [
+    {
+      "description": "**Milestone:** Phase 2: Component Expansion\n\nCreate a Tailwind CSS preset that maps Helix design tokens to Tailwind utility classes. Consumers install the preset and get Helix-aligned colors, spacing, typography, and shadows in their Tailwind projects.\n\n**Files to Modify:**\n- packages/tailwind-preset/\n\n**Acceptance Criteria:**\n- [ ] Tailwind preset package published as @helixds/tailwind-preset\n- [ ] Colors map to --hx-color-* tokens\n- [ ] Spacing maps to --hx-spacing-* tokens\n- [ ] Typography maps to --hx-font-* tokens\n- [ ] Dark mode support via data-theme attribute\n- [ ] Documentation with usage examples\n\n**Complexity:** medium",
+      "timestamp": "2026-02-27T02:07:33.427Z",
+      "source": "initial"
+    }
+  ],
+  "createdAt": "2026-02-27T02:07:33.427Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-02-27T02:07:33.427Z",
+      "reason": "Feature created"
+    }
+  ],
+  "featureType": "code",
+  "dependencies": [
+    "feature-1772158053426-16ebayc77"
+  ]
+}

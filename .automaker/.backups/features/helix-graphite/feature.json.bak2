@@ -1,0 +1,72 @@
+{
+  "id": "helix-graphite",
+  "title": "Add Graphite stacking configuration for PR management",
+  "category": "infrastructure",
+  "description": "Configure Graphite CLI for stack-aware PR management to support the dev→staging→main promotion flow.\n\n## What to do\n\n1. Verify Graphite CLI is installed globally or document installation in CONTRIBUTING.md\n2. Initialize Graphite in the repo: `gt init`\n3. Track the main, staging, and dev branches in Graphite trunk config\n4. Add `.graphite_config` or update the existing config if present\n5. Add `docs/graphite-workflow.md` with usage instructions for stacked PRs\n\n## Acceptance Criteria\n- Graphite config exists in the repo\n- `gt log short` shows the correct trunk\n- Workflow documentation covers: creating feature branches, submitting PRs, updating stacks",
+  "status": "backlog",
+  "priority": 3,
+  "epicId": "epic-helix-foundation",
+  "dependencies": [],
+  "createdAt": "2026-02-26T00:00:00Z",
+  "featureType": "code",
+  "descriptionHistory": [],
+  "statusHistory": [
+    {
+      "from": "backlog",
+      "to": "in_progress",
+      "timestamp": "2026-02-27T03:23:38.791Z"
+    },
+    {
+      "from": "done",
+      "to": "blocked",
+      "timestamp": "2026-02-27T04:57:00.898Z"
+    },
+    {
+      "from": "blocked",
+      "to": "backlog",
+      "timestamp": "2026-02-27T05:41:11.789Z"
+    },
+    {
+      "from": "backlog",
+      "to": "in_progress",
+      "timestamp": "2026-02-27T05:43:43.577Z"
+    },
+    {
+      "from": "in_progress",
+      "to": "blocked",
+      "timestamp": "2026-02-27T05:43:43.596Z"
+    },
+    {
+      "from": "blocked",
+      "to": "backlog",
+      "timestamp": "2026-02-27T05:46:57.942Z"
+    }
+  ],
+  "complexity": "medium",
+  "updatedAt": "2026-02-27T03:27:00.805Z",
+  "executionHistory": [
+    {
+      "id": "67456dd2-ba27-4f35-b15a-48fe6c58c499",
+      "startedAt": "2026-02-27T03:23:38.801Z",
+      "completedAt": "2026-02-27T03:25:55.370Z",
+      "durationMs": 136569,
+      "costUsd": 0,
+      "model": "claude-sonnet-4-6",
+      "success": false,
+      "error": "Agent loop detected (TodoWrite:09385c2c). Aborting for retry with recovery guidance.",
+      "trigger": "manual"
+    },
+    {
+      "id": "5c65ef17-ac87-4a6c-8946-dabb1eb79869",
+      "startedAt": "2026-02-27T03:26:00.373Z",
+      "completedAt": "2026-02-27T03:27:00.813Z",
+      "durationMs": 60440,
+      "costUsd": 0.28236025,
+      "model": "claude-sonnet-4-6",
+      "success": true,
+      "trigger": "manual"
+    }
+  ],
+  "costUsd": 0.28236025,
+  "lastSessionId": "dd2ca9ec-408d-4c29-91c9-6b383b338c95"
+}

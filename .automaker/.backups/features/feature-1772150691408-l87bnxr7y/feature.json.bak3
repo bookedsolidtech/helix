@@ -1,0 +1,40 @@
+{
+  "category": "Uncategorized",
+  "description": "Add a security audit step to the GitHub Actions CI workflow (ci.yml or ci-matrix.yml). Run `npm audit --audit-level=high` (or pnpm audit after migration) to detect vulnerable dependencies. Fail the build on high/critical vulnerabilities. This step should run on every PR and push to main.",
+  "title": "Add CI security audit",
+  "status": "in_progress",
+  "epicId": "feature-1772150670110-2k1yqjfd4",
+  "complexity": "small",
+  "priority": 3,
+  "source": "api",
+  "trustTier": 1,
+  "quarantineStatus": "passed",
+  "quarantineId": "8754e7f5-1c2d-4319-ba30-e9dc0fabff4c",
+  "id": "feature-1772150691408-l87bnxr7y",
+  "branchName": "feature/add-ci-security-audit",
+  "descriptionHistory": [
+    {
+      "description": "Add a security audit step to the GitHub Actions CI workflow (ci.yml or ci-matrix.yml). Run `npm audit --audit-level=high` (or pnpm audit after migration) to detect vulnerable dependencies. Fail the build on high/critical vulnerabilities. This step should run on every PR and push to main.",
+      "timestamp": "2026-02-27T00:04:51.408Z",
+      "source": "initial"
+    }
+  ],
+  "createdAt": "2026-02-27T00:04:51.408Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-02-27T00:04:51.408Z",
+      "reason": "Feature created"
+    },
+    {
+      "from": "backlog",
+      "to": "in_progress",
+      "timestamp": "2026-02-27T03:18:24.270Z"
+    }
+  ],
+  "featureType": "code",
+  "updatedAt": "2026-02-27T03:18:26.236Z",
+  "costUsd": 0.31539474999999995,
+  "lastSessionId": "b80e6b76-25db-4c43-bea1-b3d8f228652b"
+}

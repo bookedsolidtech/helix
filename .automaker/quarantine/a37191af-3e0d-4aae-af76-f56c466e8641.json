@@ -1,0 +1,12 @@
+{
+  "id": "a37191af-3e0d-4aae-af76-f56c466e8641",
+  "source": "api",
+  "trustTier": 1,
+  "submittedAt": "2026-02-27T00:05:01.151Z",
+  "result": "passed",
+  "violations": [],
+  "originalTitle": "Set up CodeRabbit AI review",
+  "originalDescription": "Set up CodeRabbit for AI-powered code review. Create .coderabbit.yaml configuration file at the repo root with strict review profile (NOT chill). Configure path-based review instructions for apps/ and packages/. Add CodeRabbit as a required status check in branch protection. PRs must not merge until CodeRabbit review threads are resolved.",
+  "sanitizedTitle": "Set up CodeRabbit AI review",
+  "sanitizedDescription": "Set up CodeRabbit for AI-powered code review. Create .coderabbit.yaml configuration file at the repo root with strict review profile (NOT chill). Configure path-based review instructions for apps/ and packages/. Add CodeRabbit as a required status check in branch protection. PRs must not merge until CodeRabbit review threads are resolved."
+}

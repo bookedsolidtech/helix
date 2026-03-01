@@ -1,0 +1,12 @@
+{
+  "id": "evt-1772161867845-108e0af6",
+  "trigger": "feature_success",
+  "severity": "high",
+  "timestamp": "2026-02-27T03:11:07.845Z",
+  "projectPath": "/Volumes/Development/helix",
+  "projectName": "helix",
+  "featureId": "helix-branch-protection",
+  "featureName": "Add GitHub branch protection rules for main, staging, and dev",
+  "error": "Feature completed in 157s - auto-verified",
+  "passes": true
+}

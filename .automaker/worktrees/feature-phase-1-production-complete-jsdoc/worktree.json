@@ -1,0 +1,11 @@
+{
+  "branch": "feature/phase-1-production-complete-jsdoc",
+  "createdAt": "2026-02-27T07:29:29.736Z",
+  "pr": {
+    "number": 6,
+    "url": "https://github.com/clarity-house-press/helix/pull/6",
+    "title": "feat(library): add comprehensive JSDoc annotations to all 14 components",
+    "state": "MERGED",
+    "createdAt": "2026-02-27T05:55:42Z"
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "category": "Epic",
+  "description": "# Phase 2: Component Expansion\n\nExpand from 13 to 30+ components covering full healthcare content hub needs. Add 12 Tier 1 primitives + 10 Tier 2 composed components. Build @helix/cli, @helix/tailwind-preset. Publish @helix/library@1.0.0 stable. Months 4-8.\n\n## Phases\n1. Implement hx-dialog component\n2. Implement hx-tabs component\n3. Implement hx-accordion component\n4. Implement hx-tooltip component\n5. Implement hx-avatar component\n6. Implement hx-breadcrumb component\n7. Implement hx-pagination component\n8. Implement hx-icon component\n9. Implement hx-progress component\n10. Implement hx-skeleton component\n11. Implement hx-divider component\n12. Implement hx-nav component\n13. Build Drupal SDC auto-generation from CEM\n14. Build @helix/tailwind-preset package\n15. Build @helix/cli tool\n16. Publish @helix/library@1.0.0 stable release",
+  "title": "[Epic] Phase 2: Component Expansion",
+  "status": "backlog",
+  "isEpic": true,
+  "epicColor": "#7C3AED",
+  "branchName": "epic/phase-2-component-expansion",
+  "id": "feature-1772158053419-7nvwtbujb",
+  "descriptionHistory": [
+    {
+      "description": "# Phase 2: Component Expansion\n\nExpand from 13 to 30+ components covering full healthcare content hub needs. Add 12 Tier 1 primitives + 10 Tier 2 composed components. Build @helix/cli, @helix/tailwind-preset. Publish @helix/library@1.0.0 stable. Months 4-8.\n\n## Phases\n1. Implement hx-dialog component\n2. Implement hx-tabs component\n3. Implement hx-accordion component\n4. Implement hx-tooltip component\n5. Implement hx-avatar component\n6. Implement hx-breadcrumb component\n7. Implement hx-pagination component\n8. Implement hx-icon component\n9. Implement hx-progress component\n10. Implement hx-skeleton component\n11. Implement hx-divider component\n12. Implement hx-nav component\n13. Build Drupal SDC auto-generation from CEM\n14. Build @helix/tailwind-preset package\n15. Build @helix/cli tool\n16. Publish @helix/library@1.0.0 stable release",
+      "timestamp": "2026-02-27T02:07:33.419Z",
+      "source": "initial"
+    }
+  ],
+  "createdAt": "2026-02-27T02:07:33.419Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-02-27T02:07:33.419Z",
+      "reason": "Feature created"
+    }
+  ],
+  "featureType": "code",
+  "dependencies": [
+    "feature-1772158053409-kufv8d903"
+  ]
+}

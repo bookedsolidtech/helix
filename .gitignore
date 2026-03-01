@@ -42,3 +42,6 @@ scripts/coverage/
 
 # MCP server test coverage reports
 apps/mcp-servers/*/coverage/
+
+# Worktrees (embedded git repos — never track)
+.worktrees/

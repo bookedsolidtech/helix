@@ -1,0 +1,32 @@
+{
+  "category": "Uncategorized",
+  "description": "Component library milestone. Initializes shadcn/ui with Radix primitives on top of the existing Tailwind 4 setup.",
+  "title": "UI & Components",
+  "status": "backlog",
+  "isEpic": true,
+  "priority": 2,
+  "source": "api",
+  "trustTier": 1,
+  "quarantineStatus": "passed",
+  "quarantineId": "0e06c82c-a512-42ad-9648-5224efd2beb7",
+  "id": "feature-1772150671725-iuv0i99ov",
+  "branchName": "feature/ui-components",
+  "descriptionHistory": [
+    {
+      "description": "Component library milestone. Initializes shadcn/ui with Radix primitives on top of the existing Tailwind 4 setup.",
+      "timestamp": "2026-02-27T00:04:31.726Z",
+      "source": "initial"
+    }
+  ],
+  "createdAt": "2026-02-27T00:04:31.726Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-02-27T00:04:31.726Z",
+      "reason": "Feature created"
+    }
+  ],
+  "featureType": "code",
+  "dependencies": ["feature-1772150670110-2k1yqjfd4"]
+}

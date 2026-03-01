@@ -1,0 +1,10 @@
+{
+  "id": "evt-1772150707125-0e85c68a",
+  "trigger": "feature_created",
+  "severity": "medium",
+  "timestamp": "2026-02-27T00:05:07.125Z",
+  "projectPath": "/Volumes/Development/helix",
+  "projectName": "helix",
+  "featureId": "feature-1772150707123-eotus52mn",
+  "featureName": "Set up Discord project channels"
+}

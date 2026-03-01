@@ -1,0 +1,12 @@
+{
+  "id": "eb868ddf-cfcc-49b6-9c09-a859680522b2",
+  "source": "api",
+  "trustTier": 1,
+  "submittedAt": "2026-02-27T00:05:10.181Z",
+  "result": "passed",
+  "violations": [],
+  "originalTitle": "Add Claude Agent SDK integration",
+  "originalDescription": "Add AI agent capability with Claude Agent SDK (@anthropic-ai/claude-agent-sdk). Create a new package apps/agent or packages/agent with tool definitions and conversation management. Define at least one working agent (e.g., a content analysis agent). Wire up with existing MCP server infrastructure in apps/mcp-servers/. Document usage in docs/.",
+  "sanitizedTitle": "Add Claude Agent SDK integration",
+  "sanitizedDescription": "Add AI agent capability with Claude Agent SDK (@anthropic-ai/claude-agent-sdk). Create a new package apps/agent or packages/agent with tool definitions and conversation management. Define at least one working agent (e.g., a content analysis agent). Wire up with existing MCP server infrastructure in apps/mcp-servers/. Document usage in docs/."
+}

@@ -1,0 +1,451 @@
+{
+  "category": "Phase 1: Production-Grade Foundation",
+  "description": "**Milestone:** Phase 1: Production-Grade Foundation\n\nAdd comprehensive JSDoc annotations to every property, event, slot, CSS part, and CSS custom property on all 13 components. These annotations drive CEM generation which feeds Storybook autodocs, Starlight docs, and framework adapter codegen.\n\n**Files to Modify:**\n- packages/hx-library/src/components/*/hx-*.ts\n\n**Acceptance Criteria:**\n- [ ] Every @property decorated field has JSDoc with description and default\n- [ ] Every event dispatch has @fires JSDoc tag\n- [ ] Every slot has @slot JSDoc tag\n- [ ] Every CSS part has @csspart JSDoc tag\n- [ ] Every CSS custom property has @cssprop JSDoc tag\n- [ ] CEM regeneration produces complete manifest matching public API\n\n**Complexity:** large",
+  "title": "Complete JSDoc annotations on all 13 components",
+  "status": "done",
+  "isEpic": false,
+  "epicId": "feature-1772158053409-kufv8d903",
+  "branchName": "feature/phase-1-production-complete-jsdoc",
+  "isFoundation": false,
+  "id": "feature-1772158053413-6ydn2ia30",
+  "descriptionHistory": [
+    {
+      "description": "**Milestone:** Phase 1: Production-Grade Foundation\n\nAdd comprehensive JSDoc annotations to every property, event, slot, CSS part, and CSS custom property on all 13 components. These annotations drive CEM generation which feeds Storybook autodocs, Starlight docs, and framework adapter codegen.\n\n**Files to Modify:**\n- packages/hx-library/src/components/*/hx-*.ts\n\n**Acceptance Criteria:**\n- [ ] Every @property decorated field has JSDoc with description and default\n- [ ] Every event dispatch has @fires JSDoc tag\n- [ ] Every slot has @slot JSDoc tag\n- [ ] Every CSS part has @csspart JSDoc tag\n- [ ] Every CSS custom property has @cssprop JSDoc tag\n- [ ] CEM regeneration produces complete manifest matching public API\n\n**Complexity:** large",
+      "timestamp": "2026-02-27T02:07:33.413Z",
+      "source": "initial"
+    }
+  ],
+  "createdAt": "2026-02-27T02:07:33.413Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-02-27T02:07:33.413Z",
+      "reason": "Feature created"
+    },
+    {
+      "from": "backlog",
+      "to": "in_progress",
+      "timestamp": "2026-02-27T05:43:49.617Z"
+    },
+    {
+      "from": "in_progress",
+      "to": "blocked",
+      "timestamp": "2026-02-27T05:54:24.132Z",
+      "reason": "git workflow failed — uncommitted work in worktree at /Volumes/Development/helix/.worktrees/feature-phase-1-production-complete-jsdoc: git workflow failed — uncommitted work in worktree at /Volumes/Development/helix/.worktrees/feature-phase-1-production-complete-jsdoc: Command failed: git add -A -- ':!.automaker/' '.automaker/memory/' '.automaker/skills/'\nfatal: pathspec '.automaker/memory/' did not match any files\n"
+    },
+    {
+      "from": "blocked",
+      "to": "backlog",
+      "timestamp": "2026-02-27T05:54:26.199Z"
+    },
+    {
+      "from": "backlog",
+      "to": "blocked",
+      "timestamp": "2026-02-27T05:54:26.207Z"
+    },
+    {
+      "from": "blocked",
+      "to": "backlog",
+      "timestamp": "2026-02-27T05:54:29.203Z"
+    },
+    {
+      "from": "backlog",
+      "to": "in_progress",
+      "timestamp": "2026-02-27T05:54:29.213Z"
+    },
+    {
+      "from": "in_progress",
+      "to": "blocked",
+      "timestamp": "2026-02-27T05:54:30.337Z"
+    },
+    {
+      "from": "blocked",
+      "to": "backlog",
+      "timestamp": "2026-02-27T05:54:32.111Z"
+    },
+    {
+      "from": "backlog",
+      "to": "in_progress",
+      "timestamp": "2026-02-27T05:54:32.121Z"
+    },
+    {
+      "from": "in_progress",
+      "to": "blocked",
+      "timestamp": "2026-02-27T05:54:33.250Z"
+    },
+    {
+      "from": "blocked",
+      "to": "backlog",
+      "timestamp": "2026-02-27T05:54:35.358Z"
+    },
+    {
+      "from": "backlog",
+      "to": "in_progress",
+      "timestamp": "2026-02-27T05:54:35.368Z"
+    },
+    {
+      "from": "in_progress",
+      "to": "blocked",
+      "timestamp": "2026-02-27T05:54:37.137Z"
+    },
+    {
+      "from": "blocked",
+      "to": "backlog",
+      "timestamp": "2026-02-27T05:54:38.383Z"
+    },
+    {
+      "from": "backlog",
+      "to": "in_progress",
+      "timestamp": "2026-02-27T05:54:38.393Z"
+    },
+    {
+      "from": "in_progress",
+      "to": "blocked",
+      "timestamp": "2026-02-27T05:54:39.471Z"
+    },
+    {
+      "from": "blocked",
+      "to": "backlog",
+      "timestamp": "2026-02-27T05:54:41.394Z"
+    },
+    {
+      "from": "backlog",
+      "to": "in_progress",
+      "timestamp": "2026-02-27T05:54:41.405Z"
+    },
+    {
+      "from": "in_progress",
+      "to": "blocked",
+      "timestamp": "2026-02-27T05:54:42.467Z"
+    },
+    {
+      "from": "blocked",
+      "to": "backlog",
+      "timestamp": "2026-02-27T05:54:44.415Z"
+    },
+    {
+      "from": "backlog",
+      "to": "in_progress",
+      "timestamp": "2026-02-27T05:54:44.424Z"
+    },
+    {
+      "from": "in_progress",
+      "to": "blocked",
+      "timestamp": "2026-02-27T05:54:45.801Z"
+    },
+    {
+      "from": "blocked",
+      "to": "backlog",
+      "timestamp": "2026-02-27T05:54:47.548Z"
+    },
+    {
+      "from": "backlog",
+      "to": "in_progress",
+      "timestamp": "2026-02-27T05:54:47.557Z"
+    },
+    {
+      "from": "in_progress",
+      "to": "blocked",
+      "timestamp": "2026-02-27T05:54:48.895Z"
+    },
+    {
+      "from": "blocked",
+      "to": "backlog",
+      "timestamp": "2026-02-27T05:54:50.491Z"
+    },
+    {
+      "from": "backlog",
+      "to": "in_progress",
+      "timestamp": "2026-02-27T05:54:50.501Z"
+    },
+    {
+      "from": "in_progress",
+      "to": "blocked",
+      "timestamp": "2026-02-27T05:54:51.673Z"
+    },
+    {
+      "from": "blocked",
+      "to": "backlog",
+      "timestamp": "2026-02-27T05:54:53.453Z"
+    },
+    {
+      "from": "backlog",
+      "to": "in_progress",
+      "timestamp": "2026-02-27T05:54:53.463Z"
+    },
+    {
+      "from": "in_progress",
+      "to": "blocked",
+      "timestamp": "2026-02-27T05:54:54.707Z"
+    },
+    {
+      "from": "blocked",
+      "to": "backlog",
+      "timestamp": "2026-02-27T05:54:56.550Z"
+    },
+    {
+      "from": "backlog",
+      "to": "in_progress",
+      "timestamp": "2026-02-27T05:54:56.570Z"
+    },
+    {
+      "from": "in_progress",
+      "to": "blocked",
+      "timestamp": "2026-02-27T05:54:57.844Z"
+    },
+    {
+      "from": "blocked",
+      "to": "backlog",
+      "timestamp": "2026-02-27T05:54:59.520Z"
+    },
+    {
+      "from": "backlog",
+      "to": "in_progress",
+      "timestamp": "2026-02-27T05:54:59.530Z"
+    },
+    {
+      "from": "in_progress",
+      "to": "blocked",
+      "timestamp": "2026-02-27T05:55:00.643Z"
+    },
+    {
+      "from": "blocked",
+      "to": "backlog",
+      "timestamp": "2026-02-27T05:55:02.392Z"
+    },
+    {
+      "from": "backlog",
+      "to": "in_progress",
+      "timestamp": "2026-02-27T05:55:02.402Z"
+    },
+    {
+      "from": "in_progress",
+      "to": "blocked",
+      "timestamp": "2026-02-27T05:55:03.580Z"
+    },
+    {
+      "from": "blocked",
+      "to": "backlog",
+      "timestamp": "2026-02-27T05:55:05.237Z"
+    },
+    {
+      "from": "backlog",
+      "to": "in_progress",
+      "timestamp": "2026-02-27T05:55:05.245Z"
+    },
+    {
+      "from": "in_progress",
+      "to": "blocked",
+      "timestamp": "2026-02-27T05:55:06.539Z"
+    },
+    {
+      "from": "blocked",
+      "to": "backlog",
+      "timestamp": "2026-02-27T05:55:08.602Z"
+    },
+    {
+      "from": "backlog",
+      "to": "in_progress",
+      "timestamp": "2026-02-27T05:55:08.610Z"
+    },
+    {
+      "from": "in_progress",
+      "to": "blocked",
+      "timestamp": "2026-02-27T05:55:09.730Z"
+    },
+    {
+      "from": "blocked",
+      "to": "backlog",
+      "timestamp": "2026-02-27T05:55:11.549Z"
+    },
+    {
+      "from": "backlog",
+      "to": "in_progress",
+      "timestamp": "2026-02-27T05:55:11.559Z"
+    },
+    {
+      "from": "in_progress",
+      "to": "blocked",
+      "timestamp": "2026-02-27T05:55:12.730Z"
+    },
+    {
+      "from": "blocked",
+      "to": "backlog",
+      "timestamp": "2026-02-27T05:55:14.666Z"
+    },
+    {
+      "from": "backlog",
+      "to": "in_progress",
+      "timestamp": "2026-02-27T05:55:14.674Z"
+    },
+    {
+      "from": "in_progress",
+      "to": "blocked",
+      "timestamp": "2026-02-27T05:55:15.796Z"
+    },
+    {
+      "from": "blocked",
+      "to": "backlog",
+      "timestamp": "2026-02-27T05:55:18.005Z"
+    },
+    {
+      "from": "backlog",
+      "to": "in_progress",
+      "timestamp": "2026-02-27T05:55:18.017Z"
+    },
+    {
+      "from": "in_progress",
+      "to": "blocked",
+      "timestamp": "2026-02-27T05:55:19.250Z"
+    },
+    {
+      "from": "blocked",
+      "to": "backlog",
+      "timestamp": "2026-02-27T05:55:21.052Z"
+    },
+    {
+      "from": "backlog",
+      "to": "in_progress",
+      "timestamp": "2026-02-27T05:55:21.061Z"
+    },
+    {
+      "from": "in_progress",
+      "to": "blocked",
+      "timestamp": "2026-02-27T05:55:22.465Z"
+    },
+    {
+      "from": "blocked",
+      "to": "backlog",
+      "timestamp": "2026-02-27T05:55:24.162Z"
+    },
+    {
+      "from": "backlog",
+      "to": "in_progress",
+      "timestamp": "2026-02-27T05:55:24.175Z"
+    },
+    {
+      "from": "in_progress",
+      "to": "blocked",
+      "timestamp": "2026-02-27T05:55:25.288Z"
+    },
+    {
+      "from": "blocked",
+      "to": "backlog",
+      "timestamp": "2026-02-27T05:55:27.276Z"
+    },
+    {
+      "from": "backlog",
+      "to": "in_progress",
+      "timestamp": "2026-02-27T05:55:27.286Z"
+    },
+    {
+      "from": "in_progress",
+      "to": "blocked",
+      "timestamp": "2026-02-27T05:55:28.626Z"
+    },
+    {
+      "from": "blocked",
+      "to": "backlog",
+      "timestamp": "2026-02-27T05:55:30.203Z"
+    },
+    {
+      "from": "backlog",
+      "to": "in_progress",
+      "timestamp": "2026-02-27T05:55:30.213Z"
+    },
+    {
+      "from": "in_progress",
+      "to": "blocked",
+      "timestamp": "2026-02-27T05:55:31.684Z"
+    },
+    {
+      "from": "blocked",
+      "to": "backlog",
+      "timestamp": "2026-02-27T05:55:33.175Z"
+    },
+    {
+      "from": "backlog",
+      "to": "in_progress",
+      "timestamp": "2026-02-27T05:55:33.183Z"
+    },
+    {
+      "from": "in_progress",
+      "to": "blocked",
+      "timestamp": "2026-02-27T05:55:34.380Z"
+    },
+    {
+      "from": "blocked",
+      "to": "backlog",
+      "timestamp": "2026-02-27T05:55:36.169Z"
+    },
+    {
+      "from": "backlog",
+      "to": "in_progress",
+      "timestamp": "2026-02-27T05:55:36.180Z"
+    },
+    {
+      "from": "in_progress",
+      "to": "blocked",
+      "timestamp": "2026-02-27T05:55:37.364Z"
+    },
+    {
+      "from": "blocked",
+      "to": "backlog",
+      "timestamp": "2026-02-27T05:55:38.989Z"
+    },
+    {
+      "from": "backlog",
+      "to": "in_progress",
+      "timestamp": "2026-02-27T05:55:38.998Z"
+    },
+    {
+      "from": "in_progress",
+      "to": "blocked",
+      "timestamp": "2026-02-27T05:55:40.886Z"
+    },
+    {
+      "from": "blocked",
+      "to": "backlog",
+      "timestamp": "2026-02-27T05:55:42.166Z"
+    },
+    {
+      "from": "backlog",
+      "to": "in_progress",
+      "timestamp": "2026-02-27T05:55:42.175Z"
+    },
+    {
+      "from": "in_progress",
+      "to": "review",
+      "timestamp": "2026-02-27T05:55:42.777Z"
+    },
+    {
+      "from": "review",
+      "to": "done",
+      "timestamp": "2026-02-27T05:55:51.553Z"
+    },
+    {
+      "from": "done",
+      "to": "blocked",
+      "timestamp": "2026-02-27T06:04:52.887Z"
+    },
+    {
+      "from": "blocked",
+      "to": "done",
+      "timestamp": "2026-02-27T15:20:33.028Z"
+    }
+  ],
+  "featureType": "code",
+  "dependencies": [
+    "feature-1772158053412-2mq2tm39v"
+  ],
+  "priority": 1,
+  "complexity": "medium",
+  "updatedAt": "2026-02-27T05:43:52.415Z",
+  "costUsd": 6.715917749999996,
+  "lastSessionId": "116d0b32-04bc-475f-8c97-20d3a0130eb3",
+  "statusChangeReason": "git workflow failed — uncommitted work in worktree at /Volumes/Development/helix/.worktrees/feature-phase-1-production-complete-jsdoc: git workflow failed — uncommitted work in worktree at /Volumes/Development/helix/.worktrees/feature-phase-1-production-complete-jsdoc: Command failed: git add -A -- ':!.automaker/' '.automaker/memory/' '.automaker/skills/'\nfatal: pathspec '.automaker/memory/' did not match any files\n",
+  "prNumber": 6,
+  "reviewStartedAt": "2026-02-27T05:55:42.777Z",
+  "completedAt": "2026-02-27T05:55:51.553Z"
+}

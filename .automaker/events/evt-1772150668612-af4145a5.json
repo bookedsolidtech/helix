@@ -1,0 +1,10 @@
+{
+  "id": "evt-1772150668612-af4145a5",
+  "trigger": "feature_created",
+  "severity": "medium",
+  "timestamp": "2026-02-27T00:04:28.612Z",
+  "projectPath": "/Volumes/Development/helix",
+  "projectName": "helix",
+  "featureId": "feature-1772150668610-fl02lltsq",
+  "featureName": "Foundation"
+}

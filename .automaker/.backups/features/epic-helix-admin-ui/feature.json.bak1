@@ -1,0 +1,11 @@
+{
+  "id": "epic-helix-admin-ui",
+  "title": "Admin App — UI Completeness",
+  "category": "frontend",
+  "description": "Complete the shadcn/ui setup in the admin app (apps/admin), add a full component library with Radix primitives, and align the theming layer with @helix/tokens so the admin dashboard uses the same design language as the web component library.",
+  "status": "backlog",
+  "priority": 3,
+  "isEpic": true,
+  "epicColor": "#7c3aed",
+  "createdAt": "2026-02-26T00:00:00Z"
+}

@@ -1,0 +1,31 @@
+{
+  "category": "Phase 2: Component Expansion",
+  "description": "**Milestone:** Phase 2: Component Expansion\n\nBuild hx-progress: progress bar for form completion, loading, and upload states. Connect to Drupal AJAX progress events. Determinate and indeterminate modes.\n\n**Files to Modify:**\n- packages/hx-library/src/components/hx-progress/\n\n**Acceptance Criteria:**\n- [ ] Determinate mode (0-100%)\n- [ ] Indeterminate mode (animated)\n- [ ] Label and value display options\n- [ ] Size variants\n- [ ] CSS parts: track, fill, label\n- [ ] ARIA: role=progressbar, aria-valuenow/min/max\n- [ ] <5KB gzipped\n\n**Complexity:** small",
+  "title": "Implement hx-progress component",
+  "status": "backlog",
+  "isEpic": false,
+  "epicId": "feature-1772158053419-7nvwtbujb",
+  "branchName": "feature/phase-2-component-implement-hx",
+  "isFoundation": false,
+  "id": "feature-1772158053424-t0s0s69ek",
+  "descriptionHistory": [
+    {
+      "description": "**Milestone:** Phase 2: Component Expansion\n\nBuild hx-progress: progress bar for form completion, loading, and upload states. Connect to Drupal AJAX progress events. Determinate and indeterminate modes.\n\n**Files to Modify:**\n- packages/hx-library/src/components/hx-progress/\n\n**Acceptance Criteria:**\n- [ ] Determinate mode (0-100%)\n- [ ] Indeterminate mode (animated)\n- [ ] Label and value display options\n- [ ] Size variants\n- [ ] CSS parts: track, fill, label\n- [ ] ARIA: role=progressbar, aria-valuenow/min/max\n- [ ] <5KB gzipped\n\n**Complexity:** small",
+      "timestamp": "2026-02-27T02:07:33.424Z",
+      "source": "initial"
+    }
+  ],
+  "createdAt": "2026-02-27T02:07:33.424Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-02-27T02:07:33.424Z",
+      "reason": "Feature created"
+    }
+  ],
+  "featureType": "code",
+  "dependencies": [
+    "feature-1772158053423-kh0a2514m"
+  ]
+}

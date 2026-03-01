@@ -1,0 +1,31 @@
+{
+  "category": "Phase 2: Component Expansion",
+  "description": "**Milestone:** Phase 2: Component Expansion\n\nBuild hx-icon: SVG icon system with sprite support. Load sprite via Drupal libraries.yml; reference by name. Supports inline SVG and external sprite references.\n\n**Files to Modify:**\n- packages/hx-library/src/components/hx-icon/\n\n**Acceptance Criteria:**\n- [ ] Inline SVG and external sprite reference modes\n- [ ] Configurable sprite URL\n- [ ] Sizes: xs, sm, md, lg, xl\n- [ ] Color inherits from currentColor\n- [ ] CSS parts: svg\n- [ ] Lazy loading for external sprites\n- [ ] ARIA: role=img with aria-label, or aria-hidden for decorative\n- [ ] <5KB gzipped\n\n**Complexity:** medium",
+  "title": "Implement hx-icon component",
+  "status": "backlog",
+  "isEpic": false,
+  "epicId": "feature-1772158053419-7nvwtbujb",
+  "branchName": "feature/phase-2-component-implement-hx-icon",
+  "isFoundation": false,
+  "id": "feature-1772158053423-kh0a2514m",
+  "descriptionHistory": [
+    {
+      "description": "**Milestone:** Phase 2: Component Expansion\n\nBuild hx-icon: SVG icon system with sprite support. Load sprite via Drupal libraries.yml; reference by name. Supports inline SVG and external sprite references.\n\n**Files to Modify:**\n- packages/hx-library/src/components/hx-icon/\n\n**Acceptance Criteria:**\n- [ ] Inline SVG and external sprite reference modes\n- [ ] Configurable sprite URL\n- [ ] Sizes: xs, sm, md, lg, xl\n- [ ] Color inherits from currentColor\n- [ ] CSS parts: svg\n- [ ] Lazy loading for external sprites\n- [ ] ARIA: role=img with aria-label, or aria-hidden for decorative\n- [ ] <5KB gzipped\n\n**Complexity:** medium",
+      "timestamp": "2026-02-27T02:07:33.424Z",
+      "source": "initial"
+    }
+  ],
+  "createdAt": "2026-02-27T02:07:33.424Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-02-27T02:07:33.424Z",
+      "reason": "Feature created"
+    }
+  ],
+  "featureType": "code",
+  "dependencies": [
+    "feature-1772158053423-dfnwwkwg3"
+  ]
+}

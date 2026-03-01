@@ -1,0 +1,12 @@
+{
+  "id": "06acfb6c-2d2e-4a69-bf12-7e472a60f0b2",
+  "source": "api",
+  "trustTier": 1,
+  "submittedAt": "2026-02-27T00:04:54.596Z",
+  "result": "passed",
+  "violations": [],
+  "originalTitle": "Configure branch protection for main",
+  "originalDescription": "Configure branch protection for the main branch using gh CLI or GitHub rulesets API. Requirements: squash-only merges, required status checks (build, test, format, audit), dismiss stale reviews on new commits, require conversation resolution before merge, no bypass allowed. Use `gh api` to apply rulesets programmatically and document the configuration in .github/branch-protection.md.",
+  "sanitizedTitle": "Configure branch protection for main",
+  "sanitizedDescription": "Configure branch protection for the main branch using gh CLI or GitHub rulesets API. Requirements: squash-only merges, required status checks (build, test, format, audit), dismiss stale reviews on new commits, require conversation resolution before merge, no bypass allowed. Use `gh api` to apply rulesets programmatically and document the configuration in .github/branch-protection.md."
+}

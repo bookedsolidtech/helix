@@ -1,0 +1,11 @@
+{
+  "id": "evt-1772164750748-5e51e4da",
+  "trigger": "feature_error",
+  "severity": "critical",
+  "timestamp": "2026-02-27T03:59:10.748Z",
+  "projectPath": "/Volumes/Development/helix",
+  "projectName": "helix",
+  "featureId": "helix-shadcn-components",
+  "error": "Feature helix-shadcn-components not found",
+  "errorType": "execution"
+}

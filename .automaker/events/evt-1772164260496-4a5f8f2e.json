@@ -1,0 +1,11 @@
+{
+  "id": "evt-1772164260496-4a5f8f2e",
+  "trigger": "feature_error",
+  "severity": "critical",
+  "timestamp": "2026-02-27T03:51:00.496Z",
+  "projectPath": "/Volumes/Development/helix",
+  "projectName": "helix",
+  "featureId": "helix-agent-roles",
+  "error": "Feature helix-agent-roles not found",
+  "errorType": "execution"
+}

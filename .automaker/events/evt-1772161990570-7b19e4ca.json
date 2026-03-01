@@ -1,0 +1,12 @@
+{
+  "id": "evt-1772161990570-7b19e4ca",
+  "trigger": "feature_success",
+  "severity": "high",
+  "timestamp": "2026-02-27T03:13:10.570Z",
+  "projectPath": "/Volumes/Development/helix",
+  "projectName": "helix",
+  "featureId": "helix-coderabbit",
+  "featureName": "Add CodeRabbit automated PR review configuration",
+  "error": "Feature completed in 120s - auto-verified",
+  "passes": true
+}

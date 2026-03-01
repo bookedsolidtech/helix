@@ -1,0 +1,12 @@
+{
+  "id": "evt-1772162301904-2d34f6dd",
+  "trigger": "feature_success",
+  "severity": "high",
+  "timestamp": "2026-02-27T03:18:21.904Z",
+  "projectPath": "/Volumes/Development/helix",
+  "projectName": "helix",
+  "featureId": "helix-shadcn-init",
+  "featureName": "Initialize shadcn/ui in apps/admin with components.json and Radix primitives",
+  "error": "Feature completed in 308s - auto-verified",
+  "passes": true
+}

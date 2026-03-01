@@ -1,0 +1,10 @@
+{
+  "id": "evt-1772150691409-7736eb38",
+  "trigger": "feature_created",
+  "severity": "medium",
+  "timestamp": "2026-02-27T00:04:51.409Z",
+  "projectPath": "/Volumes/Development/helix",
+  "projectName": "helix",
+  "featureId": "feature-1772150691408-l87bnxr7y",
+  "featureName": "Add CI security audit"
+}

@@ -1,0 +1,11 @@
+{
+  "id": "epic-helix-pkg-manager",
+  "title": "Package Manager Migration",
+  "category": "infrastructure",
+  "description": "Migrate from npm workspaces to pnpm for better monorepo performance, stricter dependency isolation, and full Turborepo optimization. This epic covers the full migration with CI, documentation, and developer tooling updates.",
+  "status": "backlog",
+  "priority": 2,
+  "isEpic": true,
+  "epicColor": "#d97706",
+  "createdAt": "2026-02-26T00:00:00Z"
+}

@@ -1,0 +1,59 @@
+{
+  "category": "Phase 1: Production-Grade Foundation",
+  "description": "**Milestone:** Phase 1: Production-Grade Foundation\n\nCreate comprehensive Storybook stories for all 13 components covering: all variants/sizes, all states (default, hover, focus, disabled, error), all themes, composition with other components, and responsive behavior. Use CEM-driven autodocs.\n\n**Files to Modify:**\n- packages/hx-library/src/components/*/hx-*.stories.ts\n\n**Acceptance Criteria:**\n- [ ] Every component has stories for all visual variants\n- [ ] State stories: default, hover, focus, active, disabled, error\n- [ ] Theme stories: all available themes demonstrated\n- [ ] Composition stories: common component combinations\n- [ ] Controls for all public properties\n- [ ] CEM-driven autodocs configured\n\n**Complexity:** large",
+  "title": "Complete Storybook stories for all variants and themes",
+  "status": "blocked",
+  "isEpic": false,
+  "epicId": "feature-1772158053409-kufv8d903",
+  "branchName": "feature/phase-1-production-complete-storybook",
+  "isFoundation": false,
+  "id": "feature-1772158053414-is8crqdzi",
+  "descriptionHistory": [
+    {
+      "description": "**Milestone:** Phase 1: Production-Grade Foundation\n\nCreate comprehensive Storybook stories for all 13 components covering: all variants/sizes, all states (default, hover, focus, disabled, error), all themes, composition with other components, and responsive behavior. Use CEM-driven autodocs.\n\n**Files to Modify:**\n- packages/hx-library/src/components/*/hx-*.stories.ts\n\n**Acceptance Criteria:**\n- [ ] Every component has stories for all visual variants\n- [ ] State stories: default, hover, focus, active, disabled, error\n- [ ] Theme stories: all available themes demonstrated\n- [ ] Composition stories: common component combinations\n- [ ] Controls for all public properties\n- [ ] CEM-driven autodocs configured\n\n**Complexity:** large",
+      "timestamp": "2026-02-27T02:07:33.415Z",
+      "source": "initial"
+    }
+  ],
+  "createdAt": "2026-02-27T02:07:33.415Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-02-27T02:07:33.415Z",
+      "reason": "Feature created"
+    },
+    {
+      "from": "backlog",
+      "to": "in_progress",
+      "timestamp": "2026-02-27T15:21:56.420Z"
+    },
+    {
+      "from": "in_progress",
+      "to": "backlog",
+      "timestamp": "2026-02-27T15:29:20.337Z"
+    },
+    {
+      "from": "in_progress",
+      "to": "blocked",
+      "timestamp": "2026-02-27T15:29:32.456Z"
+    }
+  ],
+  "featureType": "code",
+  "complexity": "medium",
+  "updatedAt": "2026-02-27T15:29:32.228Z",
+  "executionHistory": [
+    {
+      "id": "91a39616-be91-4565-979c-95f488b02ab6",
+      "startedAt": "2026-02-27T15:21:56.829Z",
+      "completedAt": "2026-02-27T15:29:26.521Z",
+      "durationMs": 449692,
+      "costUsd": 0,
+      "model": "claude-sonnet-4-6",
+      "success": false,
+      "error": "Agent loop detected (TodoWrite:3d120a3d). Aborting for retry with recovery guidance.",
+      "trigger": "manual"
+    }
+  ],
+  "costUsd": 1.7339087500000003
+}

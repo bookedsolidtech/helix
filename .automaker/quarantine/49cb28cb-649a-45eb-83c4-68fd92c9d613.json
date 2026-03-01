@@ -1,0 +1,12 @@
+{
+  "id": "49cb28cb-649a-45eb-83c4-68fd92c9d613",
+  "source": "api",
+  "trustTier": 1,
+  "submittedAt": "2026-02-27T00:04:45.979Z",
+  "result": "passed",
+  "violations": [],
+  "originalTitle": "Enable TypeScript strict mode",
+  "originalDescription": "Enable strict mode in tsconfig.base.json by setting \"strict\": true in compilerOptions. Fix any resulting type errors across all packages. This catches bugs at compile time and improves overall code quality. Check apps/admin, apps/docs, packages/hx-library, and packages/hx-tokens for type errors.",
+  "sanitizedTitle": "Enable TypeScript strict mode",
+  "sanitizedDescription": "Enable strict mode in tsconfig.base.json by setting \"strict\": true in compilerOptions. Fix any resulting type errors across all packages. This catches bugs at compile time and improves overall code quality. Check apps/admin, apps/docs, packages/hx-library, and packages/hx-tokens for type errors."
+}

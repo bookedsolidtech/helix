@@ -1,0 +1,31 @@
+{
+  "category": "Epic",
+  "description": "# Phase 3: Framework Adapters\n\nMake Helix accessible to React, Vue, and Angular teams via CEM-generated wrappers. No hand-written wrappers \u2014 auto-generate from CEM for zero-maintenance sync. Months 9-12.\n\n## Phases\n1. Build @helix/react package with CEM-generated wrappers\n2. Build @helix/vue package with CEM-generated wrappers\n3. Build @helix/angular package with CEM-generated wrappers\n4. Framework-specific documentation and SSR compatibility guide",
+  "title": "[Epic] Phase 3: Framework Adapters",
+  "status": "blocked",
+  "isEpic": true,
+  "epicColor": "#EC4899",
+  "branchName": "epic/phase-3-framework-adapters",
+  "id": "feature-1772158053429-54yk8n2p7",
+  "descriptionHistory": [
+    {
+      "description": "# Phase 3: Framework Adapters\n\nMake Helix accessible to React, Vue, and Angular teams via CEM-generated wrappers. No hand-written wrappers \u2014 auto-generate from CEM for zero-maintenance sync. Months 9-12.\n\n## Phases\n1. Build @helix/react package with CEM-generated wrappers\n2. Build @helix/vue package with CEM-generated wrappers\n3. Build @helix/angular package with CEM-generated wrappers\n4. Framework-specific documentation and SSR compatibility guide",
+      "timestamp": "2026-02-27T02:07:33.429Z",
+      "source": "initial"
+    }
+  ],
+  "createdAt": "2026-02-27T02:07:33.429Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-02-27T02:07:33.429Z",
+      "reason": "Feature created"
+    }
+  ],
+  "featureType": "code",
+  "dependencies": [
+    "feature-1772158053419-7nvwtbujb"
+  ],
+  "blockedReason": "Project deactivated \u2014 not managed by this Automaker instance"
+}

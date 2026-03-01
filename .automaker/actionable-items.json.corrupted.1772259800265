@@ -1,0 +1,983 @@
+{
+  "version": 1,
+  "items": [
+    {
+      "id": "c3ddfd4a-1537-4fa1-bd7d-b7a791a6aa4a",
+      "actionType": "escalation",
+      "priority": "high",
+      "title": "Escalation: feature_escalated",
+      "message": "lead_engineer_state_machine — high severity",
+      "createdAt": "2026-02-27T00:20:32.986Z",
+      "status": "pending",
+      "actionPayload": {
+        "featureId": "feature-1772150695297-nv90vi173",
+        "escalationSource": "lead_engineer_state_machine",
+        "escalationType": "feature_escalated",
+        "deduplicationKey": "escalate_feature-1772150695297-nv90vi173"
+      },
+      "projectPath": "/Volumes/Development/spring-break-2026",
+      "read": true,
+      "category": "escalations"
+    },
+    {
+      "id": "156c46c8-d031-4270-8a69-fb17d4d41140",
+      "actionType": "escalation",
+      "priority": "high",
+      "title": "Escalation: feature_escalated",
+      "message": "lead_engineer_state_machine — high severity",
+      "createdAt": "2026-02-27T02:37:30.108Z",
+      "status": "pending",
+      "actionPayload": {
+        "featureId": "feature-1772158885199-uud51xckp",
+        "escalationSource": "lead_engineer_state_machine",
+        "escalationType": "feature_escalated",
+        "deduplicationKey": "escalate_feature-1772158885199-uud51xckp"
+      },
+      "projectPath": "/Volumes/Development/booked-solid-software",
+      "read": false,
+      "category": "escalations"
+    },
+    {
+      "id": "31c06db1-6f37-400d-a8ff-2d9d331ec8e1",
+      "actionType": "notification",
+      "priority": "low",
+      "title": "Feature Verified",
+      "message": "\"Enable TypeScript strict mode\" has been verified and is complete.",
+      "createdAt": "2026-02-27T02:49:55.530Z",
+      "status": "pending",
+      "actionPayload": {
+        "featureId": "feature-1772150685981-ziom02txq",
+        "notificationId": "695c1070-93cc-47ca-a1a9-cb105d4ecde0"
+      },
+      "projectPath": "/Volumes/Development/helix",
+      "read": false,
+      "category": "notifications"
+    },
+    {
+      "id": "28a816eb-6c8c-47f0-98e1-5e592d699391",
+      "actionType": "notification",
+      "priority": "low",
+      "title": "Feature Verified",
+      "message": "\"Add GitHub branch protection rules for main, staging, and dev\" has been verified and is complete.",
+      "createdAt": "2026-02-27T03:11:07.837Z",
+      "status": "pending",
+      "actionPayload": {
+        "featureId": "helix-branch-protection",
+        "notificationId": "8ac189e7-bcc1-48df-a77d-ffffaa1a7cc4"
+      },
+      "projectPath": "/Volumes/Development/helix",
+      "read": false,
+      "category": "notifications"
+    },
+    {
+      "id": "d0d0f68f-b4ed-47b5-9382-646f21ee78a1",
+      "actionType": "notification",
+      "priority": "low",
+      "title": "Feature Verified",
+      "message": "\"Add CodeRabbit automated PR review configuration\" has been verified and is complete.",
+      "createdAt": "2026-02-27T03:13:10.563Z",
+      "status": "pending",
+      "actionPayload": {
+        "featureId": "helix-coderabbit",
+        "notificationId": "3a03e218-f847-4e24-b25c-29366528a4e5"
+      },
+      "projectPath": "/Volumes/Development/helix",
+      "read": false,
+      "category": "notifications"
+    },
+    {
+      "id": "96c8dca3-ccfe-4b5a-9cb0-d61d111c8c6f",
+      "actionType": "notification",
+      "priority": "low",
+      "title": "Feature Verified",
+      "message": "\"Initialize shadcn/ui in apps/admin with components.json and Radix primitives\" has been verified and is complete.",
+      "createdAt": "2026-02-27T03:18:21.898Z",
+      "status": "pending",
+      "actionPayload": {
+        "featureId": "helix-shadcn-init",
+        "notificationId": "e968454a-1dd3-4465-91cd-5fde6ec1b1a0"
+      },
+      "projectPath": "/Volumes/Development/helix",
+      "read": false,
+      "category": "notifications"
+    },
+    {
+      "id": "be4b76da-4e9b-469d-8356-3ceb3ed62fca",
+      "actionType": "notification",
+      "priority": "low",
+      "title": "Feature Verified",
+      "message": "\"Add agent-roles.md context file defining specialized agent roles for the WC library\" has been verified and is complete.",
+      "createdAt": "2026-02-27T03:20:54.455Z",
+      "status": "pending",
+      "actionPayload": {
+        "featureId": "helix-agent-roles",
+        "notificationId": "16ae995e-35a5-4535-8334-5045c05e3f97"
+      },
+      "projectPath": "/Volumes/Development/helix",
+      "read": false,
+      "category": "notifications"
+    },
+    {
+      "id": "737913e2-8c23-41e6-8530-81bf8a346604",
+      "actionType": "notification",
+      "priority": "low",
+      "title": "Feature Verified",
+      "message": "\"Integrate CEM analyzer MCP server with health-scorer for component quality reporting\" has been verified and is complete.",
+      "createdAt": "2026-02-27T03:23:35.606Z",
+      "status": "pending",
+      "actionPayload": {
+        "featureId": "helix-cem-mcp",
+        "notificationId": "b55ef94c-1bfb-4866-a2f4-33a7398dc65c"
+      },
+      "projectPath": "/Volumes/Development/helix",
+      "read": false,
+      "category": "notifications"
+    },
+    {
+      "id": "0b9ea2c5-3255-47cf-848b-5c474b374a46",
+      "actionType": "notification",
+      "priority": "low",
+      "title": "Feature Verified",
+      "message": "\"Add Graphite stacking configuration for PR management\" has been verified and is complete.",
+      "createdAt": "2026-02-27T03:27:00.813Z",
+      "status": "pending",
+      "actionPayload": {
+        "featureId": "helix-graphite",
+        "notificationId": "5e9ecc11-6ebe-438e-872d-7ea356796d04"
+      },
+      "projectPath": "/Volumes/Development/helix",
+      "read": false,
+      "category": "notifications"
+    },
+    {
+      "id": "be313ded-5c0f-409f-85df-4ae33aba9dd9",
+      "actionType": "notification",
+      "priority": "low",
+      "title": "Feature Verified",
+      "message": "\"Add remaining shadcn components to apps/admin\" has been verified and is complete.",
+      "createdAt": "2026-02-27T03:29:04.700Z",
+      "status": "pending",
+      "actionPayload": {
+        "featureId": "helix-shadcn-components",
+        "notificationId": "7fb314e9-135f-4ddf-af69-93b2c089de0d"
+      },
+      "projectPath": "/Volumes/Development/helix",
+      "read": false,
+      "category": "notifications"
+    },
+    {
+      "id": "bb92f342-c151-4a42-89c7-4aaac3bd9f62",
+      "actionType": "notification",
+      "priority": "low",
+      "title": "Feature Verified",
+      "message": "\"Align shadcn/ui theme with @helix/tokens design tokens\" has been verified and is complete.",
+      "createdAt": "2026-02-27T03:39:52.017Z",
+      "status": "pending",
+      "actionPayload": {
+        "featureId": "helix-shadcn-tokens",
+        "notificationId": "1f1c8a58-0df8-4e0d-8b0a-11b3f75d516f"
+      },
+      "projectPath": "/Volumes/Development/helix",
+      "read": false,
+      "category": "notifications"
+    },
+    {
+      "id": "f1074b55-1e05-4cdb-8632-cb75f77e388a",
+      "actionType": "notification",
+      "priority": "low",
+      "title": "Feature Verified",
+      "message": "\"Optimize turbo.json cache configuration for test results and CEM artifacts\" has been verified and is complete.",
+      "createdAt": "2026-02-27T03:42:15.453Z",
+      "status": "pending",
+      "actionPayload": {
+        "featureId": "helix-turbo-cache",
+        "notificationId": "f25dbf4d-cbe9-4489-b716-ad10cd3c9e2d"
+      },
+      "projectPath": "/Volumes/Development/helix",
+      "read": false,
+      "category": "notifications"
+    },
+    {
+      "id": "9866c87a-47c9-4d01-9854-bc141d63c7f3",
+      "actionType": "escalation",
+      "priority": "high",
+      "title": "Escalation: feature_escalated",
+      "message": "lead_engineer_state_machine — high severity",
+      "createdAt": "2026-02-27T03:44:57.686Z",
+      "status": "pending",
+      "actionPayload": {
+        "featureId": "feature-1772150710182-05u77mph7",
+        "escalationSource": "lead_engineer_state_machine",
+        "escalationType": "feature_escalated",
+        "deduplicationKey": "escalate_feature-1772150710182-05u77mph7"
+      },
+      "projectPath": "/Volumes/Development/helix",
+      "read": false,
+      "category": "escalations"
+    },
+    {
+      "id": "6bb3eef8-7304-4da9-a5a2-18ec119293b5",
+      "actionType": "escalation",
+      "priority": "high",
+      "title": "Escalation: feature_escalated",
+      "message": "lead_engineer_state_machine — high severity",
+      "createdAt": "2026-02-27T04:33:26.855Z",
+      "status": "pending",
+      "actionPayload": {
+        "featureId": "helix-board-integration",
+        "escalationSource": "lead_engineer_state_machine",
+        "escalationType": "feature_escalated",
+        "deduplicationKey": "escalate_helix-board-integration"
+      },
+      "projectPath": "/Volumes/Development/helix",
+      "read": false,
+      "category": "escalations"
+    },
+    {
+      "id": "4cbcafc4-ea19-4987-a4f4-11989b31f696",
+      "actionType": "escalation",
+      "priority": "high",
+      "title": "Escalation: feature_escalated",
+      "message": "lead_engineer_state_machine — high severity",
+      "createdAt": "2026-02-27T04:41:07.921Z",
+      "status": "pending",
+      "actionPayload": {
+        "featureId": "helix-branch-protection",
+        "escalationSource": "lead_engineer_state_machine",
+        "escalationType": "feature_escalated",
+        "deduplicationKey": "escalate_helix-branch-protection"
+      },
+      "projectPath": "/Volumes/Development/helix",
+      "read": false,
+      "category": "escalations"
+    },
+    {
+      "id": "e9cf02bb-6e9d-4081-8bff-e6d452133786",
+      "actionType": "escalation",
+      "priority": "high",
+      "title": "Escalation: feature_escalated",
+      "message": "lead_engineer_state_machine — high severity",
+      "createdAt": "2026-02-27T04:42:00.857Z",
+      "status": "pending",
+      "actionPayload": {
+        "featureId": "feature-1772158053412-2mq2tm39v",
+        "escalationSource": "lead_engineer_state_machine",
+        "escalationType": "feature_escalated",
+        "deduplicationKey": "escalate_feature-1772158053412-2mq2tm39v"
+      },
+      "projectPath": "/Volumes/Development/helix",
+      "read": false,
+      "category": "escalations"
+    },
+    {
+      "id": "101dab63-b51f-4b3e-ba23-cd792d637a57",
+      "actionType": "escalation",
+      "priority": "high",
+      "title": "Escalation: feature_escalated",
+      "message": "lead_engineer_state_machine — high severity",
+      "createdAt": "2026-02-27T04:42:18.730Z",
+      "status": "pending",
+      "actionPayload": {
+        "featureId": "feature-1772150704494-c8h3e09wf",
+        "escalationSource": "lead_engineer_state_machine",
+        "escalationType": "feature_escalated",
+        "deduplicationKey": "escalate_feature-1772150704494-c8h3e09wf"
+      },
+      "projectPath": "/Volumes/Development/helix",
+      "read": false,
+      "category": "escalations"
+    },
+    {
+      "id": "daf468f4-9820-427f-ac9e-fa5751a5bb4d",
+      "actionType": "escalation",
+      "priority": "high",
+      "title": "Escalation: feature_escalated",
+      "message": "lead_engineer_state_machine — high severity",
+      "createdAt": "2026-02-27T04:43:10.648Z",
+      "status": "pending",
+      "actionPayload": {
+        "featureId": "helix-coderabbit",
+        "escalationSource": "lead_engineer_state_machine",
+        "escalationType": "feature_escalated",
+        "deduplicationKey": "escalate_helix-coderabbit"
+      },
+      "projectPath": "/Volumes/Development/helix",
+      "read": false,
+      "category": "escalations"
+    },
+    {
+      "id": "e8bfbb81-c86c-45df-846e-846e80c9f34d",
+      "actionType": "escalation",
+      "priority": "high",
+      "title": "Escalation: feature_escalated",
+      "message": "lead_engineer_state_machine — high severity",
+      "createdAt": "2026-02-27T04:48:21.984Z",
+      "status": "pending",
+      "actionPayload": {
+        "featureId": "helix-shadcn-init",
+        "escalationSource": "lead_engineer_state_machine",
+        "escalationType": "feature_escalated",
+        "deduplicationKey": "escalate_helix-shadcn-init"
+      },
+      "projectPath": "/Volumes/Development/helix",
+      "read": false,
+      "category": "escalations"
+    },
+    {
+      "id": "994f2570-4fcf-42f1-b444-3c746d97c3a6",
+      "actionType": "escalation",
+      "priority": "high",
+      "title": "Escalation: feature_escalated",
+      "message": "lead_engineer_state_machine — high severity",
+      "createdAt": "2026-02-27T04:50:54.540Z",
+      "status": "pending",
+      "actionPayload": {
+        "featureId": "helix-agent-roles",
+        "escalationSource": "lead_engineer_state_machine",
+        "escalationType": "feature_escalated",
+        "deduplicationKey": "escalate_helix-agent-roles"
+      },
+      "projectPath": "/Volumes/Development/helix",
+      "read": false,
+      "category": "escalations"
+    },
+    {
+      "id": "7e447686-e95d-4392-a364-d5531288c859",
+      "actionType": "escalation",
+      "priority": "high",
+      "title": "Escalation: feature_escalated",
+      "message": "lead_engineer_state_machine — high severity",
+      "createdAt": "2026-02-27T04:53:35.689Z",
+      "status": "pending",
+      "actionPayload": {
+        "featureId": "helix-cem-mcp",
+        "escalationSource": "lead_engineer_state_machine",
+        "escalationType": "feature_escalated",
+        "deduplicationKey": "escalate_helix-cem-mcp"
+      },
+      "projectPath": "/Volumes/Development/helix",
+      "read": false,
+      "category": "escalations"
+    },
+    {
+      "id": "7256b90b-7b7f-430d-893a-34685d7555b4",
+      "actionType": "escalation",
+      "priority": "high",
+      "title": "Escalation: feature_escalated",
+      "message": "lead_engineer_state_machine — high severity",
+      "createdAt": "2026-02-27T04:57:00.902Z",
+      "status": "pending",
+      "actionPayload": {
+        "featureId": "helix-graphite",
+        "escalationSource": "lead_engineer_state_machine",
+        "escalationType": "feature_escalated",
+        "deduplicationKey": "escalate_helix-graphite"
+      },
+      "projectPath": "/Volumes/Development/helix",
+      "read": false,
+      "category": "escalations"
+    },
+    {
+      "id": "ff34344b-5d63-4802-8887-b71946d9a2b0",
+      "actionType": "escalation",
+      "priority": "high",
+      "title": "Escalation: feature_escalated",
+      "message": "lead_engineer_state_machine — high severity",
+      "createdAt": "2026-02-27T04:59:04.799Z",
+      "status": "pending",
+      "actionPayload": {
+        "featureId": "helix-shadcn-components",
+        "escalationSource": "lead_engineer_state_machine",
+        "escalationType": "feature_escalated",
+        "deduplicationKey": "escalate_helix-shadcn-components"
+      },
+      "projectPath": "/Volumes/Development/helix",
+      "read": false,
+      "category": "escalations"
+    },
+    {
+      "id": "d3bf8f46-ca30-45fa-9d3e-75893725bc2c",
+      "actionType": "escalation",
+      "priority": "high",
+      "title": "Escalation: feature_escalated",
+      "message": "lead_engineer_state_machine — high severity",
+      "createdAt": "2026-02-27T05:09:52.100Z",
+      "status": "pending",
+      "actionPayload": {
+        "featureId": "helix-shadcn-tokens",
+        "escalationSource": "lead_engineer_state_machine",
+        "escalationType": "feature_escalated",
+        "deduplicationKey": "escalate_helix-shadcn-tokens"
+      },
+      "projectPath": "/Volumes/Development/helix",
+      "read": false,
+      "category": "escalations"
+    },
+    {
+      "id": "12fc1074-ac93-49cc-8ebc-6236869a450c",
+      "actionType": "escalation",
+      "priority": "high",
+      "title": "Escalation: feature_escalated",
+      "message": "lead_engineer_state_machine — high severity",
+      "createdAt": "2026-02-27T05:12:03.200Z",
+      "status": "pending",
+      "actionPayload": {
+        "featureId": "feature-1772158053412-2mq2tm39v",
+        "escalationSource": "lead_engineer_state_machine",
+        "escalationType": "feature_escalated",
+        "deduplicationKey": "escalate_feature-1772158053412-2mq2tm39v"
+      },
+      "projectPath": "/Volumes/Development/helix",
+      "read": false,
+      "category": "escalations"
+    },
+    {
+      "id": "1878fb66-98d5-4fbd-a5fd-d7c59864bd18",
+      "actionType": "escalation",
+      "priority": "high",
+      "title": "Escalation: feature_escalated",
+      "message": "lead_engineer_state_machine — high severity",
+      "createdAt": "2026-02-27T05:12:15.535Z",
+      "status": "pending",
+      "actionPayload": {
+        "featureId": "helix-turbo-cache",
+        "escalationSource": "lead_engineer_state_machine",
+        "escalationType": "feature_escalated",
+        "deduplicationKey": "escalate_helix-turbo-cache"
+      },
+      "projectPath": "/Volumes/Development/helix",
+      "read": false,
+      "category": "escalations"
+    },
+    {
+      "id": "8dc8153a-4206-4b1d-8f17-0f8264461028",
+      "actionType": "escalation",
+      "priority": "high",
+      "title": "Escalation: feature_escalated",
+      "message": "lead_engineer_state_machine — high severity",
+      "createdAt": "2026-02-27T05:42:06.290Z",
+      "status": "pending",
+      "actionPayload": {
+        "featureId": "helix-branch-protection",
+        "escalationSource": "lead_engineer_state_machine",
+        "escalationType": "feature_escalated",
+        "deduplicationKey": "escalate_helix-branch-protection"
+      },
+      "projectPath": "/Volumes/Development/helix",
+      "read": false,
+      "category": "escalations"
+    },
+    {
+      "id": "d47dcb36-97fb-45ba-83e6-49306a7887fb",
+      "actionType": "escalation",
+      "priority": "high",
+      "title": "Escalation: feature_escalated",
+      "message": "lead_engineer_state_machine — high severity",
+      "createdAt": "2026-02-27T05:42:09.319Z",
+      "status": "pending",
+      "actionPayload": {
+        "featureId": "helix-coderabbit",
+        "escalationSource": "lead_engineer_state_machine",
+        "escalationType": "feature_escalated",
+        "deduplicationKey": "escalate_helix-coderabbit"
+      },
+      "projectPath": "/Volumes/Development/helix",
+      "read": false,
+      "category": "escalations"
+    },
+    {
+      "id": "b6d870f8-0cd0-42b8-863d-407ee8599d56",
+      "actionType": "notification",
+      "priority": "low",
+      "title": "Feature Verified",
+      "message": "\"Update CONTRIBUTING.md with agent workflow and automation documentation\" has been verified and is complete.",
+      "createdAt": "2026-02-27T05:43:35.597Z",
+      "status": "pending",
+      "actionPayload": {
+        "featureId": "helix-contributing",
+        "notificationId": "687e3042-32ee-4f81-aee7-777ba42f08dd"
+      },
+      "projectPath": "/Volumes/Development/helix",
+      "read": false,
+      "category": "notifications"
+    },
+    {
+      "id": "efdef201-b3ef-4f2e-955f-fb81fb4bc31f",
+      "actionType": "escalation",
+      "priority": "high",
+      "title": "Escalation: feature_escalated",
+      "message": "lead_engineer_state_machine — high severity",
+      "createdAt": "2026-02-27T05:43:37.402Z",
+      "status": "pending",
+      "actionPayload": {
+        "featureId": "helix-shadcn-init",
+        "escalationSource": "lead_engineer_state_machine",
+        "escalationType": "feature_escalated",
+        "deduplicationKey": "escalate_helix-shadcn-init"
+      },
+      "projectPath": "/Volumes/Development/helix",
+      "read": false,
+      "category": "escalations"
+    },
+    {
+      "id": "148c637e-75af-4251-9095-70e9d05be721",
+      "actionType": "escalation",
+      "priority": "high",
+      "title": "Escalation: feature_escalated",
+      "message": "lead_engineer_state_machine — high severity",
+      "createdAt": "2026-02-27T05:43:40.675Z",
+      "status": "pending",
+      "actionPayload": {
+        "featureId": "helix-agent-roles",
+        "escalationSource": "lead_engineer_state_machine",
+        "escalationType": "feature_escalated",
+        "deduplicationKey": "escalate_helix-agent-roles"
+      },
+      "projectPath": "/Volumes/Development/helix",
+      "read": false,
+      "category": "escalations"
+    },
+    {
+      "id": "d1686988-ed3b-4772-8bf4-2db4d428629f",
+      "actionType": "escalation",
+      "priority": "high",
+      "title": "Escalation: feature_escalated",
+      "message": "lead_engineer_state_machine — high severity",
+      "createdAt": "2026-02-27T05:43:43.599Z",
+      "status": "pending",
+      "actionPayload": {
+        "featureId": "helix-graphite",
+        "escalationSource": "lead_engineer_state_machine",
+        "escalationType": "feature_escalated",
+        "deduplicationKey": "escalate_helix-graphite"
+      },
+      "projectPath": "/Volumes/Development/helix",
+      "read": false,
+      "category": "escalations"
+    },
+    {
+      "id": "1c0100e5-6052-457b-bd93-f644b9b7fb58",
+      "actionType": "escalation",
+      "priority": "high",
+      "title": "Escalation: feature_escalated",
+      "message": "lead_engineer_state_machine — high severity",
+      "createdAt": "2026-02-27T05:43:46.639Z",
+      "status": "pending",
+      "actionPayload": {
+        "featureId": "helix-turbo-cache",
+        "escalationSource": "lead_engineer_state_machine",
+        "escalationType": "feature_escalated",
+        "deduplicationKey": "escalate_helix-turbo-cache"
+      },
+      "projectPath": "/Volumes/Development/helix",
+      "read": false,
+      "category": "escalations"
+    },
+    {
+      "id": "7e3143ac-87c4-46d9-8d46-1b180672a27c",
+      "actionType": "escalation",
+      "priority": "high",
+      "title": "Escalation: feature_escalated",
+      "message": "lead_engineer_state_machine — high severity",
+      "createdAt": "2026-02-27T05:47:49.481Z",
+      "status": "pending",
+      "actionPayload": {
+        "featureId": "feature-1772158053412-2mq2tm39v",
+        "escalationSource": "lead_engineer_state_machine",
+        "escalationType": "feature_escalated",
+        "deduplicationKey": "escalate_feature-1772158053412-2mq2tm39v"
+      },
+      "projectPath": "/Volumes/Development/helix",
+      "read": false,
+      "category": "escalations"
+    },
+    {
+      "id": "d1f390bb-ed9e-4267-87ea-b162b9141268",
+      "actionType": "escalation",
+      "priority": "high",
+      "title": "Escalation: feature_escalated",
+      "message": "lead_engineer_state_machine — high severity",
+      "createdAt": "2026-02-27T05:54:26.211Z",
+      "status": "pending",
+      "actionPayload": {
+        "featureId": "feature-1772158053413-6ydn2ia30",
+        "escalationSource": "lead_engineer_state_machine",
+        "escalationType": "feature_escalated",
+        "deduplicationKey": "escalate_feature-1772158053413-6ydn2ia30"
+      },
+      "projectPath": "/Volumes/Development/helix",
+      "read": false,
+      "category": "escalations"
+    },
+    {
+      "id": "0ca043ce-6c8e-4746-b8c2-7e877c8dcd34",
+      "actionType": "escalation",
+      "priority": "high",
+      "title": "Escalation: feature_escalated",
+      "message": "lead_engineer_state_machine — high severity",
+      "createdAt": "2026-02-27T06:11:17.698Z",
+      "status": "pending",
+      "actionPayload": {
+        "featureId": "feature-1772158053413-032zxn5r8",
+        "escalationSource": "lead_engineer_state_machine",
+        "escalationType": "feature_escalated",
+        "deduplicationKey": "escalate_feature-1772158053413-032zxn5r8"
+      },
+      "projectPath": "/Volumes/Development/helix",
+      "read": false,
+      "category": "escalations"
+    },
+    {
+      "id": "d6cb7de7-cca0-4b4c-ade8-b12e4c01de76",
+      "actionType": "escalation",
+      "priority": "high",
+      "title": "Escalation: feature_escalated",
+      "message": "lead_engineer_state_machine — high severity",
+      "createdAt": "2026-02-27T06:41:20.123Z",
+      "status": "pending",
+      "actionPayload": {
+        "featureId": "feature-1772158053413-032zxn5r8",
+        "escalationSource": "lead_engineer_state_machine",
+        "escalationType": "feature_escalated",
+        "deduplicationKey": "escalate_feature-1772158053413-032zxn5r8"
+      },
+      "projectPath": "/Volumes/Development/helix",
+      "read": false,
+      "category": "escalations"
+    },
+    {
+      "id": "20d79f9c-5889-4a00-8ba4-11a2341b19fd",
+      "actionType": "escalation",
+      "priority": "high",
+      "title": "Escalation: feature_escalated",
+      "message": "lead_engineer_state_machine — high severity",
+      "createdAt": "2026-02-27T15:25:31.262Z",
+      "status": "pending",
+      "actionPayload": {
+        "featureId": "feature-1772158053414-0x2ikyweo",
+        "escalationSource": "lead_engineer_state_machine",
+        "escalationType": "feature_escalated",
+        "deduplicationKey": "escalate_feature-1772158053414-0x2ikyweo"
+      },
+      "projectPath": "/Volumes/Development/helix",
+      "read": false,
+      "category": "escalations"
+    },
+    {
+      "id": "e0d78b9d-b64a-4326-b0cd-774fa2d69ee1",
+      "actionType": "escalation",
+      "priority": "high",
+      "title": "Escalation: feature_escalated",
+      "message": "lead_engineer_state_machine — high severity",
+      "createdAt": "2026-02-27T15:29:32.459Z",
+      "status": "pending",
+      "actionPayload": {
+        "featureId": "feature-1772158053414-is8crqdzi",
+        "escalationSource": "lead_engineer_state_machine",
+        "escalationType": "feature_escalated",
+        "deduplicationKey": "escalate_feature-1772158053414-is8crqdzi"
+      },
+      "projectPath": "/Volumes/Development/helix",
+      "read": false,
+      "category": "escalations"
+    },
+    {
+      "id": "2833fcdc-aed3-4274-96d5-d7320fa6c7d3",
+      "actionType": "escalation",
+      "priority": "high",
+      "title": "Escalation: feature_escalated",
+      "message": "lead_engineer_state_machine — high severity",
+      "createdAt": "2026-02-27T15:41:11.039Z",
+      "status": "pending",
+      "actionPayload": {
+        "featureId": "feature-1772158053416-aiocuoyp5",
+        "escalationSource": "lead_engineer_state_machine",
+        "escalationType": "feature_escalated",
+        "deduplicationKey": "escalate_feature-1772158053416-aiocuoyp5"
+      },
+      "projectPath": "/Volumes/Development/helix",
+      "read": false,
+      "category": "escalations"
+    },
+    {
+      "id": "9361d7e5-37ff-4183-b91a-e308e8219abb",
+      "actionType": "escalation",
+      "priority": "high",
+      "title": "Escalation: feature_escalated",
+      "message": "lead_engineer_state_machine — high severity",
+      "createdAt": "2026-02-27T15:42:44.637Z",
+      "status": "pending",
+      "actionPayload": {
+        "featureId": "helix-turbo-cache",
+        "escalationSource": "lead_engineer_state_machine",
+        "escalationType": "feature_escalated",
+        "deduplicationKey": "escalate_helix-turbo-cache"
+      },
+      "projectPath": "/Volumes/Development/helix",
+      "read": false,
+      "category": "escalations"
+    },
+    {
+      "id": "98f9c71e-3b3b-47dd-90b6-7d5e3177698f",
+      "actionType": "escalation",
+      "priority": "high",
+      "title": "Escalation: feature_escalated",
+      "message": "lead_engineer_state_machine — high severity",
+      "createdAt": "2026-02-27T15:44:12.382Z",
+      "status": "pending",
+      "actionPayload": {
+        "featureId": "feature-1772150710182-05u77mph7",
+        "escalationSource": "lead_engineer_state_machine",
+        "escalationType": "feature_escalated",
+        "deduplicationKey": "escalate_feature-1772150710182-05u77mph7"
+      },
+      "projectPath": "/Volumes/Development/helix",
+      "read": false,
+      "category": "escalations"
+    },
+    {
+      "id": "3fa1ab47-fa26-4f46-b041-b6544dfbc94c",
+      "actionType": "notification",
+      "priority": "low",
+      "title": "Feature Verified",
+      "message": "\"Add Next.js font optimization to apps/admin\" has been verified and is complete.",
+      "createdAt": "2026-02-27T15:45:43.081Z",
+      "status": "pending",
+      "actionPayload": {
+        "featureId": "helix-nextjs-font",
+        "notificationId": "a7c37f16-689e-476d-b997-2fc91b73fd10"
+      },
+      "projectPath": "/Volumes/Development/helix",
+      "read": false,
+      "category": "notifications"
+    },
+    {
+      "id": "a0a4ff88-566d-4046-9a0c-bb732afa86f2",
+      "actionType": "notification",
+      "priority": "low",
+      "title": "Feature Verified",
+      "message": "\"Migrate from npm workspaces to pnpm\" has been verified and is complete.",
+      "createdAt": "2026-02-27T15:53:31.464Z",
+      "status": "pending",
+      "actionPayload": {
+        "featureId": "helix-pnpm-migration",
+        "notificationId": "1a0a34ea-33b2-42c9-a095-7940d46536b1"
+      },
+      "projectPath": "/Volumes/Development/helix",
+      "read": false,
+      "category": "notifications"
+    },
+    {
+      "id": "6f758725-ba30-4ce4-8965-9f3b28e18e56",
+      "actionType": "escalation",
+      "priority": "high",
+      "title": "Escalation: feature_escalated",
+      "message": "lead_engineer_state_machine — high severity",
+      "createdAt": "2026-02-27T16:04:45.835Z",
+      "status": "pending",
+      "actionPayload": {
+        "featureId": "feature-1772158053414-0x2ikyweo",
+        "escalationSource": "lead_engineer_state_machine",
+        "escalationType": "feature_escalated",
+        "deduplicationKey": "escalate_feature-1772158053414-0x2ikyweo"
+      },
+      "projectPath": "/Volumes/Development/helix",
+      "read": false,
+      "category": "escalations"
+    },
+    {
+      "id": "ceb5f8b3-d836-4841-93aa-c56e60120f8a",
+      "actionType": "escalation",
+      "priority": "high",
+      "title": "Escalation: feature_escalated",
+      "message": "lead_engineer_state_machine — high severity",
+      "createdAt": "2026-02-27T17:03:46.718Z",
+      "status": "pending",
+      "actionPayload": {
+        "featureId": "feature-1772158053416-oswqpf6gs",
+        "escalationSource": "lead_engineer_state_machine",
+        "escalationType": "feature_escalated",
+        "deduplicationKey": "escalate_feature-1772158053416-oswqpf6gs"
+      },
+      "projectPath": "/Volumes/Development/helix",
+      "read": false,
+      "category": "escalations"
+    },
+    {
+      "id": "d056d740-4d86-4fab-a351-f6131d2f2782",
+      "actionType": "escalation",
+      "priority": "high",
+      "title": "Escalation: feature_escalated",
+      "message": "lead_engineer_state_machine — high severity",
+      "createdAt": "2026-02-28T01:16:56.544Z",
+      "status": "pending",
+      "actionPayload": {
+        "featureId": "feature-1772150710182-05u77mph7",
+        "escalationSource": "lead_engineer_state_machine",
+        "escalationType": "feature_escalated",
+        "deduplicationKey": "escalate_feature-1772150710182-05u77mph7"
+      },
+      "projectPath": "/Volumes/Development/helix",
+      "read": false,
+      "category": "escalations"
+    },
+    {
+      "id": "2db8db51-90e3-4638-8bf2-32eb6bb696ce",
+      "actionType": "escalation",
+      "priority": "high",
+      "title": "Escalation: feature_escalated",
+      "message": "lead_engineer_state_machine — high severity",
+      "createdAt": "2026-02-28T01:46:43.928Z",
+      "status": "pending",
+      "actionPayload": {
+        "featureId": "feature-1772158053417-hoozza85w",
+        "escalationSource": "lead_engineer_state_machine",
+        "escalationType": "feature_escalated",
+        "deduplicationKey": "escalate_feature-1772158053417-hoozza85w"
+      },
+      "projectPath": "/Volumes/Development/helix",
+      "read": false,
+      "category": "escalations"
+    },
+    {
+      "id": "1a0a646d-a2e0-4912-b628-54473a20edd1",
+      "actionType": "escalation",
+      "priority": "high",
+      "title": "Escalation: feature_escalated",
+      "message": "lead_engineer_state_machine — high severity",
+      "createdAt": "2026-02-28T02:21:08.333Z",
+      "status": "pending",
+      "actionPayload": {
+        "featureId": "feature-1772158053417-hoozza85w",
+        "escalationSource": "lead_engineer_state_machine",
+        "escalationType": "feature_escalated",
+        "deduplicationKey": "escalate_feature-1772158053417-hoozza85w"
+      },
+      "projectPath": "/Volumes/Development/helix",
+      "read": false,
+      "category": "escalations"
+    },
+    {
+      "id": "051bcad9-fb62-4a33-935a-69b963c78dad",
+      "actionType": "hitl_form",
+      "priority": "high",
+      "title": "Agent blocked: Run health scorer on all 13 components and fix to Grade A",
+      "message": "2 step form from lead_engineer",
+      "createdAt": "2026-02-28T06:03:33.076Z",
+      "expiresAt": "2026-02-28T07:03:33.065Z",
+      "status": "pending",
+      "actionPayload": {
+        "formId": "hitl-e477f856",
+        "featureId": "feature-1772158053417-hoozza85w"
+      },
+      "projectPath": "/Volumes/Development/helix",
+      "read": false,
+      "category": "forms"
+    },
+    {
+      "id": "145ec818-2ee0-44a1-856e-f4220fb63e44",
+      "actionType": "hitl_form",
+      "priority": "high",
+      "title": "Agent blocked: Add Claude Agent SDK integration",
+      "message": "2 step form from lead_engineer",
+      "createdAt": "2026-02-28T06:03:50.507Z",
+      "expiresAt": "2026-02-28T07:03:50.501Z",
+      "status": "pending",
+      "actionPayload": {
+        "formId": "hitl-043010c8",
+        "featureId": "feature-1772150710182-05u77mph7"
+      },
+      "projectPath": "/Volumes/Development/helix",
+      "read": false,
+      "category": "forms"
+    },
+    {
+      "id": "e32964fb-ec84-4e5f-b9eb-f5f5f80c1761",
+      "actionType": "hitl_form",
+      "priority": "high",
+      "title": "Agent blocked: Run health scorer on all 13 components and fix to Grade A",
+      "message": "2 step form from lead_engineer",
+      "createdAt": "2026-02-28T06:08:42.286Z",
+      "expiresAt": "2026-02-28T07:03:33.065Z",
+      "status": "pending",
+      "actionPayload": {
+        "formId": "hitl-e477f856",
+        "featureId": "feature-1772158053417-hoozza85w"
+      },
+      "projectPath": "/Volumes/Development/helix",
+      "read": false,
+      "category": "forms"
+    },
+    {
+      "id": "f81fa6e1-1e4c-44b9-8912-b9063a8d050e",
+      "actionType": "hitl_form",
+      "priority": "high",
+      "title": "Agent blocked: Add Claude Agent SDK integration",
+      "message": "2 step form from lead_engineer",
+      "createdAt": "2026-02-28T06:18:39.771Z",
+      "expiresAt": "2026-02-28T07:03:50.501Z",
+      "status": "pending",
+      "actionPayload": {
+        "formId": "hitl-043010c8",
+        "featureId": "feature-1772150710182-05u77mph7"
+      },
+      "projectPath": "/Volumes/Development/helix",
+      "read": false,
+      "category": "forms"
+    },
+    {
+      "id": "1c7f1605-f558-4080-88b3-63bd2315b304",
+      "actionType": "hitl_form",
+      "priority": "high",
+      "title": "Agent blocked: Run health scorer on all 13 components and fix to Grade A",
+      "message": "2 step form from lead_engineer",
+      "createdAt": "2026-02-28T06:20:16.708Z",
+      "expiresAt": "2026-02-28T07:20:16.707Z",
+      "status": "pending",
+      "actionPayload": {
+        "formId": "hitl-96731a59",
+        "featureId": "feature-1772158053417-hoozza85w"
+      },
+      "projectPath": "/Volumes/Development/helix",
+      "read": false,
+      "category": "forms"
+    },
+    {
+      "id": "f1bcadba-27e8-4697-86bc-61ea06372056",
+      "actionType": "hitl_form",
+      "priority": "high",
+      "title": "Agent blocked: Add Claude Agent SDK integration",
+      "message": "2 step form from lead_engineer",
+      "createdAt": "2026-02-28T06:20:30.924Z",
+      "expiresAt": "2026-02-28T07:20:30.922Z",
+      "status": "pending",
+      "actionPayload": {
+        "formId": "hitl-a9d87dd9",
+        "featureId": "feature-1772150710182-05u77mph7"
+      },
+      "projectPath": "/Volumes/Development/helix",
+      "read": false,
+      "category": "forms"
+    },
+    {
+      "id": "aba47123-a246-47b7-a470-d277d5cdcfe4",
+      "actionType": "hitl_form",
+      "priority": "high",
+      "title": "Agent blocked: Add Claude Agent SDK integration",
+      "message": "2 step form from lead_engineer",
+      "createdAt": "2026-02-28T06:21:47.882Z",
+      "expiresAt": "2026-02-28T07:20:30.922Z",
+      "status": "pending",
+      "actionPayload": {
+        "formId": "hitl-a9d87dd9",
+        "featureId": "feature-1772150710182-05u77mph7"
+      },
+      "projectPath": "/Volumes/Development/helix",
+      "read": false,
+      "category": "forms"
+    }
+  ]
+}ory": "forms"
+    }
+  ]
+}

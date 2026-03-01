@@ -1,0 +1,32 @@
+{
+  "category": "Phase 4: Observability Platform",
+  "description": "**Milestone:** Phase 4: Observability Platform\n\nLightweight, opt-in client-side telemetry SDK that reports component usage, health metrics, and errors to the Supabase backend. Privacy-first: no PII, configurable reporting, easy opt-out.\n\n**Files to Modify:**\n- packages/telemetry/\n\n**Acceptance Criteria:**\n- [ ] Opt-in only, zero data without explicit consent\n- [ ] Reports: component usage counts, render times, error rates\n- [ ] Configurable reporting interval and data scope\n- [ ] Tree-shakable, <2KB gzipped\n- [ ] Works in browser and SSR environments\n- [ ] Published as @helixds/telemetry\n\n**Complexity:** large",
+  "title": "Build @helix/telemetry client SDK",
+  "status": "blocked",
+  "isEpic": false,
+  "epicId": "feature-1772158053431-4la07hyzj",
+  "branchName": "feature/phase-4-observabilit-build-helixtelemetry",
+  "isFoundation": true,
+  "id": "feature-1772158053432-2ejn3j8r5",
+  "descriptionHistory": [
+    {
+      "description": "**Milestone:** Phase 4: Observability Platform\n\nLightweight, opt-in client-side telemetry SDK that reports component usage, health metrics, and errors to the Supabase backend. Privacy-first: no PII, configurable reporting, easy opt-out.\n\n**Files to Modify:**\n- packages/telemetry/\n\n**Acceptance Criteria:**\n- [ ] Opt-in only, zero data without explicit consent\n- [ ] Reports: component usage counts, render times, error rates\n- [ ] Configurable reporting interval and data scope\n- [ ] Tree-shakable, <2KB gzipped\n- [ ] Works in browser and SSR environments\n- [ ] Published as @helixds/telemetry\n\n**Complexity:** large",
+      "timestamp": "2026-02-27T02:07:33.432Z",
+      "source": "initial"
+    }
+  ],
+  "createdAt": "2026-02-27T02:07:33.432Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-02-27T02:07:33.432Z",
+      "reason": "Feature created"
+    }
+  ],
+  "featureType": "code",
+  "dependencies": [
+    "feature-1772158053429-54yk8n2p7"
+  ],
+  "blockedReason": "Project deactivated \u2014 not managed by this Automaker instance"
+}

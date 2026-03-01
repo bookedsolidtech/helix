@@ -1,0 +1,61 @@
+{
+  "id": "helix-turbo-cache",
+  "title": "Optimize turbo.json cache configuration for test results and CEM artifacts",
+  "category": "automation",
+  "description": "The current `turbo.json` may not be fully caching all build and test outputs. Optimize the configuration to maximize cache hits in CI and local development.\n\n## What to do\n\n1. Read the current `turbo.json` configuration\n2. Audit the pipeline tasks: `build`, `test`, `lint`, `type-check`, `cem`, `clean`\n3. Add `outputs` to `test` task (test results JSON at `packages/hx-library/.cache/test-results.json`)\n4. Add `outputs` to `cem` task (`custom-elements.json` in each package)\n5. Ensure `build` task outputs include `dist/**` for all packages\n6. Add `env` arrays to tasks that depend on environment variables\n7. Verify the `dev` task is not cached (should always run)\n8. Verify `clean` task has `cache: false`\n\n## Acceptance Criteria\n- `turbo.json` has explicit `outputs` for build, test, and cem tasks\n- Second run of `turbo build` shows `>>> FULL TURBO` cache hit\n- `turbo test` caches test results correctly\n- No regressions in build or test behavior",
+  "status": "backlog",
+  "priority": 3,
+  "epicId": "epic-helix-automation",
+  "dependencies": [],
+  "createdAt": "2026-02-26T00:00:00Z",
+  "featureType": "code",
+  "descriptionHistory": [],
+  "statusHistory": [
+    {
+      "from": "backlog",
+      "to": "in_progress",
+      "timestamp": "2026-02-27T03:39:54.709Z"
+    },
+    {
+      "from": "done",
+      "to": "blocked",
+      "timestamp": "2026-02-27T05:12:15.532Z"
+    },
+    {
+      "from": "blocked",
+      "to": "backlog",
+      "timestamp": "2026-02-27T05:41:15.395Z"
+    },
+    {
+      "from": "backlog",
+      "to": "in_progress",
+      "timestamp": "2026-02-27T05:43:46.617Z"
+    },
+    {
+      "from": "in_progress",
+      "to": "blocked",
+      "timestamp": "2026-02-27T05:43:46.636Z"
+    },
+    {
+      "from": "blocked",
+      "to": "backlog",
+      "timestamp": "2026-02-27T05:46:59.677Z"
+    }
+  ],
+  "complexity": "medium",
+  "updatedAt": "2026-02-27T03:42:15.445Z",
+  "costUsd": 0.5552572499999999,
+  "lastSessionId": "8a645aae-dda6-4275-a3e2-a42b9f67e864",
+  "executionHistory": [
+    {
+      "id": "471d0e3a-076f-4a37-82b7-e2a9d3eb54bd",
+      "startedAt": "2026-02-27T03:39:54.714Z",
+      "completedAt": "2026-02-27T03:42:15.453Z",
+      "durationMs": 140739,
+      "costUsd": 0.5552572499999999,
+      "model": "claude-sonnet-4-6",
+      "success": true,
+      "trigger": "manual"
+    }
+  ]
+}

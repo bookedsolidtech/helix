@@ -1,0 +1,49 @@
+{
+  "category": "Phase 1: Production-Grade Foundation",
+  "description": "**Milestone:** Phase 1: Production-Grade Foundation\n\nCreate Astro Starlight documentation pages for all 13 components with: overview, API reference (from CEM), usage examples, accessibility guide, Drupal integration, theming guide, and extension guide.\n\n**Files to Modify:**\n- apps/docs/src/content/docs/components/\n\n**Acceptance Criteria:**\n- [ ] Every component has a dedicated Starlight page\n- [ ] API reference auto-generated from CEM data\n- [ ] Usage examples with code snippets\n- [ ] Accessibility section with ARIA patterns and keyboard shortcuts\n- [ ] Drupal integration section with Twig template examples\n- [ ] Theming section showing token override patterns\n\n**Complexity:** large",
+  "title": "Create Starlight documentation pages for all 13 components",
+  "status": "done",
+  "isEpic": false,
+  "epicId": "feature-1772158053409-kufv8d903",
+  "branchName": "feature/phase-1-production-create-starlight",
+  "isFoundation": false,
+  "id": "feature-1772158053415-euod4vlbl",
+  "descriptionHistory": [
+    {
+      "description": "**Milestone:** Phase 1: Production-Grade Foundation\n\nCreate Astro Starlight documentation pages for all 13 components with: overview, API reference (from CEM), usage examples, accessibility guide, Drupal integration, theming guide, and extension guide.\n\n**Files to Modify:**\n- apps/docs/src/content/docs/components/\n\n**Acceptance Criteria:**\n- [ ] Every component has a dedicated Starlight page\n- [ ] API reference auto-generated from CEM data\n- [ ] Usage examples with code snippets\n- [ ] Accessibility section with ARIA patterns and keyboard shortcuts\n- [ ] Drupal integration section with Twig template examples\n- [ ] Theming section showing token override patterns\n\n**Complexity:** large",
+      "timestamp": "2026-02-27T02:07:33.415Z",
+      "source": "initial"
+    }
+  ],
+  "createdAt": "2026-02-27T02:07:33.415Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-02-27T02:07:33.415Z",
+      "reason": "Feature created"
+    },
+    {
+      "from": "backlog",
+      "to": "in_progress",
+      "timestamp": "2026-02-27T15:26:42.471Z"
+    },
+    {
+      "from": "in_progress",
+      "to": "backlog",
+      "timestamp": "2026-02-27T15:29:20.338Z"
+    },
+    {
+      "from": "backlog",
+      "to": "done",
+      "timestamp": "2026-02-27T15:32:24.046Z"
+    }
+  ],
+  "featureType": "code",
+  "dependencies": [],
+  "complexity": "medium",
+  "updatedAt": "2026-02-27T15:26:44.014Z",
+  "completedAt": "2026-02-27T15:32:24.046Z",
+  "costUsd": 5.245678250000002,
+  "lastSessionId": "bed09c42-1493-4268-83a2-93ac9edc4866"
+}

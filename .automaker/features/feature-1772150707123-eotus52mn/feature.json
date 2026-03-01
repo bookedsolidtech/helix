@@ -1,0 +1,33 @@
+{
+  "category": "Uncategorized",
+  "description": "Create a Discord category for the helix project with #general, #updates, and #dev channels. Set up a webhook on the #updates channel for automated notifications. Store channel IDs in protolab.config at the repo root. Document the Discord integration in docs/.",
+  "title": "Set up Discord project channels",
+  "status": "blocked",
+  "epicId": "epic-helix-automation",
+  "complexity": "small",
+  "assignee": "josh",
+  "priority": 2,
+  "source": "api",
+  "trustTier": 1,
+  "quarantineStatus": "passed",
+  "quarantineId": "35cf366c-c8fa-4538-ba0f-ddb1aee7160b",
+  "id": "feature-1772150707123-eotus52mn",
+  "branchName": "feature/set-up-discord-project-channels",
+  "descriptionHistory": [
+    {
+      "description": "Create a Discord category for the helix project with #general, #updates, and #dev channels. Set up a webhook on the #updates channel for automated notifications. Store channel IDs in protolab.config at the repo root. Document the Discord integration in docs/.",
+      "timestamp": "2026-02-27T00:05:07.124Z",
+      "source": "initial"
+    }
+  ],
+  "createdAt": "2026-02-27T00:05:07.124Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-02-27T00:05:07.124Z",
+      "reason": "Feature created"
+    }
+  ],
+  "blockedReason": "Project deactivated \u2014 not managed by this Automaker instance"
+}

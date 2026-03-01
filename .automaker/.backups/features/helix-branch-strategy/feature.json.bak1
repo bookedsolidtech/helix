@@ -1,0 +1,11 @@
+{
+  "id": "helix-branch-strategy",
+  "title": "Add dev + staging branches and update CI to enforce 3-branch workflow",
+  "category": "infrastructure",
+  "description": "Currently helix only has a single `main` branch. This makes it impossible to stage work before releasing and prevents safe AI agent feature work.\n\n## What to do\n\n1. Create `dev` branch from current `main`\n2. Create `staging` branch from `dev`\n3. Update `.github/workflows/ci.yml` to run on push to `main`, `staging`, and `dev` (not just `main`)\n4. Update `.github/workflows/ci-matrix.yml` similarly\n5. Add a `promotion-check.yml` workflow that validates PRs targeting `staging` come only from `dev`, and PRs targeting `main` come only from `staging`\n6. Update `.automaker/settings.json` `prBaseBranch` is already set to `dev`\n7. Update `.automaker/context/CLAUDE.md` to reflect the active branch strategy\n8. Add `docs/branch-strategy.md` documenting the full workflow\n\n## Acceptance Criteria\n- `dev` and `staging` branches exist in the remote\n- CI runs on all three branches\n- `promotion-check.yml` blocks PRs that bypass the dev→staging→main chain\n- Branch strategy is documented",
+  "status": "backlog",
+  "priority": 1,
+  "epicId": "epic-helix-foundation",
+  "dependencies": [],
+  "createdAt": "2026-02-26T00:00:00Z"
+}

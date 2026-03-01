@@ -1,0 +1,31 @@
+{
+  "category": "Phase 2: Component Expansion",
+  "description": "**Milestone:** Phase 2: Component Expansion\n\nBuild hx-breadcrumb: navigation breadcrumb trail for content hierarchy. Override breadcrumb.html.twig in Drupal. ARIA landmark with structured data support.\n\n**Files to Modify:**\n- packages/hx-library/src/components/hx-breadcrumb/\n\n**Acceptance Criteria:**\n- [ ] Separator customization (slot or character)\n- [ ] Max items with collapse behavior\n- [ ] CSS parts: nav, list, item, separator, link\n- [ ] Slots: default (breadcrumb items), separator\n- [ ] ARIA: nav with aria-label=Breadcrumb, aria-current=page for last item\n- [ ] Structured data (JSON-LD) support\n- [ ] <5KB gzipped\n\n**Complexity:** small",
+  "title": "Implement hx-breadcrumb component",
+  "status": "backlog",
+  "isEpic": false,
+  "epicId": "feature-1772158053419-7nvwtbujb",
+  "branchName": "feature/phase-2-component-implement-hx",
+  "isFoundation": false,
+  "id": "feature-1772158053422-1lr1f3czc",
+  "descriptionHistory": [
+    {
+      "description": "**Milestone:** Phase 2: Component Expansion\n\nBuild hx-breadcrumb: navigation breadcrumb trail for content hierarchy. Override breadcrumb.html.twig in Drupal. ARIA landmark with structured data support.\n\n**Files to Modify:**\n- packages/hx-library/src/components/hx-breadcrumb/\n\n**Acceptance Criteria:**\n- [ ] Separator customization (slot or character)\n- [ ] Max items with collapse behavior\n- [ ] CSS parts: nav, list, item, separator, link\n- [ ] Slots: default (breadcrumb items), separator\n- [ ] ARIA: nav with aria-label=Breadcrumb, aria-current=page for last item\n- [ ] Structured data (JSON-LD) support\n- [ ] <5KB gzipped\n\n**Complexity:** small",
+      "timestamp": "2026-02-27T02:07:33.423Z",
+      "source": "initial"
+    }
+  ],
+  "createdAt": "2026-02-27T02:07:33.423Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-02-27T02:07:33.423Z",
+      "reason": "Feature created"
+    }
+  ],
+  "featureType": "code",
+  "dependencies": [
+    "feature-1772158053422-sr1wld8hy"
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "id": "evt-1772163592023-9004e557",
+  "trigger": "feature_success",
+  "severity": "high",
+  "timestamp": "2026-02-27T03:39:52.023Z",
+  "projectPath": "/Volumes/Development/helix",
+  "projectName": "helix",
+  "featureId": "helix-shadcn-tokens",
+  "featureName": "Align shadcn/ui theme with @helix/tokens design tokens",
+  "error": "Feature completed in 316s - auto-verified",
+  "passes": true
+}

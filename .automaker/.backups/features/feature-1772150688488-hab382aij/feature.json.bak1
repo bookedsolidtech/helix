@@ -1,0 +1,53 @@
+{
+  "category": "Uncategorized",
+  "description": "Set up composite TypeScript configuration across the monorepo. Add \"composite\": true to root tsconfig.base.json and add \"references\" array pointing to each package. Create per-package tsconfig.json files with \"composite\": true and \"declarationMap\": true. This enables incremental builds and proper cross-package type checking via Turborepo.",
+  "title": "Set up composite TypeScript config",
+  "status": "review",
+  "epicId": "feature-1772150668610-fl02lltsq",
+  "complexity": "medium",
+  "priority": 2,
+  "source": "api",
+  "trustTier": 1,
+  "quarantineStatus": "passed",
+  "quarantineId": "88526a54-58dd-4638-bc20-33922fe44459",
+  "id": "feature-1772150688488-hab382aij",
+  "branchName": "feature/set-up-composite-typescript-config",
+  "descriptionHistory": [
+    {
+      "description": "Set up composite TypeScript configuration across the monorepo. Add \"composite\": true to root tsconfig.base.json and add \"references\" array pointing to each package. Create per-package tsconfig.json files with \"composite\": true and \"declarationMap\": true. This enables incremental builds and proper cross-package type checking via Turborepo.",
+      "timestamp": "2026-02-27T00:04:48.488Z",
+      "source": "initial"
+    }
+  ],
+  "createdAt": "2026-02-27T00:04:48.488Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-02-27T00:04:48.488Z",
+      "reason": "Feature created"
+    },
+    {
+      "from": "backlog",
+      "to": "in_progress",
+      "timestamp": "2026-02-27T02:49:56.591Z"
+    },
+    {
+      "from": "in_progress",
+      "to": "blocked",
+      "timestamp": "2026-02-27T02:52:23.575Z",
+      "reason": "git workflow failed — uncommitted work in worktree at /Volumes/Development/helix/.worktrees/feature-set-up-composite-typescript-config: git workflow failed — uncommitted work in worktree at /Volumes/Development/helix/.worktrees/feature-set-up-composite-typescript-config: Command failed: git add -A -- ':!.automaker/' '.automaker/memory/' '.automaker/skills/'\nfatal: pathspec '.automaker/memory/' did not match any files\n"
+    },
+    {
+      "from": "blocked",
+      "to": "review",
+      "timestamp": "2026-02-27T02:54:53.708Z"
+    }
+  ],
+  "featureType": "code",
+  "updatedAt": "2026-02-27T02:49:58.236Z",
+  "costUsd": 0.861379,
+  "lastSessionId": "c65c763a-2cb3-491f-911b-bd3dbd1868d7",
+  "statusChangeReason": "git workflow failed — uncommitted work in worktree at /Volumes/Development/helix/.worktrees/feature-set-up-composite-typescript-config: git workflow failed — uncommitted work in worktree at /Volumes/Development/helix/.worktrees/feature-set-up-composite-typescript-config: Command failed: git add -A -- ':!.automaker/' '.automaker/memory/' '.automaker/skills/'\nfatal: pathspec '.automaker/memory/' did not match any files\n",
+  "reviewStartedAt": "2026-02-27T02:54:53.708Z"
+}

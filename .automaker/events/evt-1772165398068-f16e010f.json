@@ -1,0 +1,11 @@
+{
+  "id": "evt-1772165398068-f16e010f",
+  "trigger": "feature_error",
+  "severity": "critical",
+  "timestamp": "2026-02-27T04:09:58.068Z",
+  "projectPath": "/Volumes/Development/helix",
+  "projectName": "helix",
+  "featureId": "helix-shadcn-tokens",
+  "error": "Feature helix-shadcn-tokens not found",
+  "errorType": "execution"
+}

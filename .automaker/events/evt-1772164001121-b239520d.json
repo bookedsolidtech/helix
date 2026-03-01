@@ -1,0 +1,11 @@
+{
+  "id": "evt-1772164001121-b239520d",
+  "trigger": "feature_error",
+  "severity": "critical",
+  "timestamp": "2026-02-27T03:46:41.121Z",
+  "projectPath": "/Volumes/Development/helix",
+  "projectName": "helix",
+  "featureId": "feature-1772150704494-c8h3e09wf",
+  "error": "Feature feature-1772150704494-c8h3e09wf not found",
+  "errorType": "execution"
+}
