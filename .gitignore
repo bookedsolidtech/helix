@@ -63,3 +63,9 @@ apps/mcp-servers/*/coverage/
 .automaker/notifications.json
 .automaker/*.corrupted.*
 .automaker/settings.json.bak*
+.automaker/trajectory/
+.automaker/events/
+.automaker/hitl-forms.json
+.automaker/execution-state.json
+.automaker/actionable-items.json
+.automaker/actionable-items.json.corrupted.*
