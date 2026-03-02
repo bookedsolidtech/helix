@@ -45,3 +45,21 @@ apps/mcp-servers/*/coverage/
 
 # Worktrees (embedded git repos — never track)
 .worktrees/
+
+# protoLabs Studio runtime state (never track)
+.automaker/knowledge.db
+.automaker/knowledge-eval.jsonl
+.automaker/worktrees/
+.automaker/checkpoints/
+.automaker/recovery/
+.automaker/.backups/
+.automaker/ledger/
+.automaker/quarantine/
+.automaker/images/
+.automaker/memory/
+.automaker/notes/
+.automaker/projects/
+.automaker/authority/
+.automaker/notifications.json
+.automaker/*.corrupted.*
+.automaker/settings.json.bak*

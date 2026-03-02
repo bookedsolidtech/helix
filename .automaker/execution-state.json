@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "autoLoopWasRunning": true,
+  "autoLoopWasRunning": false,
   "maxConcurrency": 2,
   "projectPath": "/Volumes/Development/helix",
   "branchName": null,

@@ -1,9 +1,0 @@
-{
-  "id": "evt-1772331253825-230e6dee",
-  "trigger": "auto_mode_complete",
-  "severity": "high",
-  "timestamp": "2026-03-01T02:14:13.825Z",
-  "projectPath": "/Volumes/Development/helix",
-  "projectName": "helix",
-  "error": "No pending features - auto mode idle"
-}
