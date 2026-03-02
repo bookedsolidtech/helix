@@ -1,0 +1,15 @@
+{
+  "featureId": "feature-1772158053433-e61vyz3ru",
+  "domain": "fullstack",
+  "complexity": "medium",
+  "model": "claude-sonnet-4-6",
+  "planSummary": "",
+  "executionSummary": "Max state transitions exceeded",
+  "costUsd": 3.40823275,
+  "durationMs": 1173432,
+  "retryCount": 0,
+  "escalationReason": "Max state transitions exceeded",
+  "verified": false,
+  "timestamp": "2026-03-01T19:48:46.172Z",
+  "attemptNumber": 2
+}

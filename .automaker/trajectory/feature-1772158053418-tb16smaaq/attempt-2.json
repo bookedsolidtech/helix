@@ -1,0 +1,15 @@
+{
+  "featureId": "feature-1772158053418-tb16smaaq",
+  "domain": "fullstack",
+  "complexity": "medium",
+  "model": "claude-sonnet-4-6",
+  "planSummary": "",
+  "executionSummary": "Max state transitions exceeded",
+  "costUsd": 1.03398575,
+  "durationMs": 741075,
+  "retryCount": 0,
+  "escalationReason": "Max state transitions exceeded",
+  "verified": false,
+  "timestamp": "2026-03-01T19:29:11.074Z",
+  "attemptNumber": 2
+}

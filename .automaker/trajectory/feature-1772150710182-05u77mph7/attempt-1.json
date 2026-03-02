@@ -1,0 +1,15 @@
+{
+  "featureId": "feature-1772150710182-05u77mph7",
+  "domain": "fullstack",
+  "complexity": "large",
+  "model": "sonnet",
+  "planSummary": "",
+  "executionSummary": "Plan rejected after 2 retries: Plan too short (<100 chars)",
+  "costUsd": 0,
+  "durationMs": 270166,
+  "retryCount": 0,
+  "escalationReason": "Plan rejected after 2 retries: Plan too short (<100 chars)",
+  "verified": false,
+  "timestamp": "2026-03-01T23:13:07.954Z",
+  "attemptNumber": 1
+}

@@ -6,7 +6,7 @@
   "prBaseBranch": "dev",
   "initialized": true,
   "initializedAt": "2026-02-26T00:00:00Z",
-  "worktreePanelVisible": true,
+  "worktreePanelVisible": false,
   "autoMode": {
     "enabled": false,
     "disabled_reason": "Project deactivated"

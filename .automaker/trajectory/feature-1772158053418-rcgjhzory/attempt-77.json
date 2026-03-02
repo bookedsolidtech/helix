@@ -1,0 +1,15 @@
+{
+  "featureId": "feature-1772158053418-rcgjhzory",
+  "domain": "fullstack",
+  "complexity": "medium",
+  "model": "sonnet",
+  "planSummary": "",
+  "executionSummary": "Unmet dependencies: feature-1772158053418-tb16smaaq",
+  "costUsd": 0,
+  "durationMs": 14,
+  "retryCount": 0,
+  "escalationReason": "Unmet dependencies: feature-1772158053418-tb16smaaq",
+  "verified": false,
+  "timestamp": "2026-03-01T19:23:56.150Z",
+  "attemptNumber": 77
+}
