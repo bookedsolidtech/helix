@@ -46,6 +46,9 @@ apps/mcp-servers/*/coverage/
 # Worktrees (embedded git repos — never track)
 .worktrees/
 
+# Library registry (per-install, not shared)
+apps/admin/src/data/library-registry.json
+
 # protoLabs Studio runtime state (never track)
 .automaker/knowledge.db
 .automaker/knowledge-eval.jsonl
