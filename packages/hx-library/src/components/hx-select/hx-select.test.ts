@@ -414,8 +414,8 @@ describe('hx-select', () => {
     it('label is associated with select via for/id', async () => {
       const el = await fixture<WcSelect>('<hx-select label="Country"></hx-select>');
       const label = shadowQuery<HTMLLabelElement>(el, 'label')!;
-      const select = shadowQuery<HTMLSelectElement>(el, 'select')!;
-      expect(label.getAttribute('for')).toBe(select.id);
+      const trigger = shadowQuery<HTMLButtonElement>(el, '[role="combobox"]')!;
+      expect(label.getAttribute('for')).toBe(trigger.id);
     });
 
     it('aria-describedby references error ID when error set', async () => {
