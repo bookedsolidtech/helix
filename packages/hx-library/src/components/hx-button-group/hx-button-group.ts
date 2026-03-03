@@ -22,6 +22,8 @@ import { helixButtonGroupStyles } from './hx-button-group.styles.js';
 export class HelixButtonGroup extends LitElement {
   static override styles = [tokenStyles, helixButtonGroupStyles];
 
+  private internals: ElementInternals;
+
   /**
    * Layout orientation of the button group.
    * @attr orientation
@@ -36,6 +38,14 @@ export class HelixButtonGroup extends LitElement {
    */
   @property({ type: String, reflect: true, attribute: 'hx-size' })
   size: 'sm' | 'md' | 'lg' = 'md';
+
+  // ─── Constructor ───
+
+  constructor() {
+    super();
+    this.internals = this.attachInternals();
+    this.internals.role = 'group';
+  }
 
   // ─── Lifecycle ───
 
@@ -64,11 +74,7 @@ export class HelixButtonGroup extends LitElement {
 
   override render() {
     return html`
-      <div
-        part="group"
-        class="group group--${this.orientation}"
-        role="group"
-      >
+      <div part="group" class="group group--${this.orientation}">
         <slot @slotchange=${this._handleSlotChange}></slot>
       </div>
     `;
