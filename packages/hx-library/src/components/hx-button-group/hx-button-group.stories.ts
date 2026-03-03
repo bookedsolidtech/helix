@@ -69,9 +69,9 @@ export const Default: Story = {
     const buttons = canvasElement.querySelectorAll('hx-button');
     await expect(buttons.length).toBe(3);
 
-    const groupDiv = group!.shadowRoot!.querySelector('[part="group"]');
+    const groupDiv = group?.shadowRoot?.querySelector('[part="group"]');
     await expect(groupDiv).toBeTruthy();
-    await expect(groupDiv!.getAttribute('role')).toBe('group');
+    await expect(groupDiv?.getAttribute('role')).toBe('group');
   },
 };
 
@@ -256,9 +256,9 @@ export const PatientRecord: Story = {
     await expect(groups.length).toBe(2);
 
     for (const group of groups) {
-      const groupDiv = group.shadowRoot!.querySelector('[part="group"]');
+      const groupDiv = group.shadowRoot?.querySelector('[part="group"]');
       await expect(groupDiv).toBeTruthy();
-      await expect(groupDiv!.getAttribute('role')).toBe('group');
+      await expect(groupDiv?.getAttribute('role')).toBe('group');
     }
   },
 };
