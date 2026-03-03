@@ -189,7 +189,7 @@ describe('hx-button', () => {
     });
   });
 
-  // ─── href mode (3) ───
+  // ─── href mode (4) ───
 
   describe('href mode', () => {
     it('renders <a> element when href is set', async () => {
@@ -210,6 +210,22 @@ describe('hx-button', () => {
       );
       const anchor = shadowQuery<HTMLAnchorElement>(el, 'a')!;
       expect(anchor.getAttribute('target')).toBe('_blank');
+    });
+
+    it('removes href when disabled in anchor mode', async () => {
+      const el = await fixture<WcButton>(
+        '<hx-button href="https://example.com" disabled>Link</hx-button>',
+      );
+      const anchor = shadowQuery<HTMLAnchorElement>(el, 'a')!;
+      expect(anchor.getAttribute('href')).not.toBe('https://example.com');
+      expect(anchor.getAttribute('aria-disabled')).toBe('true');
+      let fired = false;
+      el.addEventListener('hx-click', () => {
+        fired = true;
+      });
+      anchor.click();
+      await new Promise((r) => setTimeout(r, 50));
+      expect(fired).toBe(false);
     });
   });
 

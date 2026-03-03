@@ -146,7 +146,7 @@ export const helixButtonStyles = css`
     width: 1em;
     height: 1em;
     flex-shrink: 0;
-    animation: hx-spin 0.75s linear infinite;
+    animation: hx-spin var(--hx-duration-spinner, 750ms) linear infinite;
   }
 
   @keyframes hx-spin {
@@ -158,7 +158,7 @@ export const helixButtonStyles = css`
   @media (prefers-reduced-motion: reduce) {
     .button__spinner {
       animation: none;
-      opacity: 0.6;
+      opacity: var(--hx-opacity-muted, 0.6);
     }
   }
 

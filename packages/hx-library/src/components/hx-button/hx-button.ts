@@ -144,13 +144,13 @@ export class HelixButton extends LitElement {
       }),
     );
 
-    // Handle form submission/reset if form-associated
-    if (this.type === 'submit' && this._internals.form) {
+    // Handle form submission/reset if form-associated and not in anchor mode
+    if (this.href === undefined && this.type === 'submit' && this._internals.form) {
       if (this.name !== undefined && this.value !== undefined) {
         this._internals.setFormValue(this.value);
       }
       this._internals.form.requestSubmit();
-    } else if (this.type === 'reset' && this._internals.form) {
+    } else if (this.href === undefined && this.type === 'reset' && this._internals.form) {
       this._internals.form.reset();
     }
   }
@@ -216,8 +216,9 @@ export class HelixButton extends LitElement {
         <a
           part="button"
           class=${classMap(classes)}
-          href=${ifDefined(this.href)}
+          href=${this.disabled ? nothing : ifDefined(this.href)}
           target=${ifDefined(this.target)}
+          aria-disabled=${this.disabled ? 'true' : nothing}
           aria-busy=${this.loading ? 'true' : nothing}
           @click=${this._handleClick}
         >
