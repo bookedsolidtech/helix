@@ -6,7 +6,7 @@ export const helixNumberInputStyles = css`
   }
 
   :host([disabled]) {
-    opacity: var(--hx-opacity-disabled, 0.5);
+    opacity: var(--hx-opacity-disabled);
     pointer-events: none;
   }
 
@@ -17,8 +17,8 @@ export const helixNumberInputStyles = css`
   .field {
     display: flex;
     flex-direction: column;
-    gap: var(--hx-space-1, 0.25rem);
-    font-family: var(--hx-number-input-font-family, var(--hx-font-family-sans, sans-serif));
+    gap: var(--hx-space-1);
+    font-family: var(--hx-number-input-font-family, var(--hx-font-family-sans));
   }
 
   /* ─── Label ─── */
@@ -30,16 +30,16 @@ export const helixNumberInputStyles = css`
   .field__label {
     display: flex;
     align-items: baseline;
-    gap: var(--hx-space-1, 0.25rem);
-    font-size: var(--hx-font-size-sm, 0.875rem);
-    font-weight: var(--hx-font-weight-medium, 500);
-    color: var(--hx-number-input-label-color, var(--hx-color-neutral-700, #343a40));
-    line-height: var(--hx-line-height-normal, 1.5);
+    gap: var(--hx-space-1);
+    font-size: var(--hx-font-size-sm);
+    font-weight: var(--hx-font-weight-medium);
+    color: var(--hx-number-input-label-color, var(--hx-color-neutral-700));
+    line-height: var(--hx-line-height-normal);
   }
 
   .field__required-marker {
-    color: var(--hx-number-input-error-color, var(--hx-color-error-500, #dc3545));
-    font-weight: var(--hx-font-weight-bold, 700);
+    color: var(--hx-number-input-error-color, var(--hx-color-error-500));
+    font-weight: var(--hx-font-weight-bold);
   }
 
   /* ─── Input Wrapper ─── */
@@ -47,29 +47,23 @@ export const helixNumberInputStyles = css`
   .field__input-wrapper {
     display: flex;
     align-items: stretch;
-    border: var(--hx-border-width-thin, 1px) solid
-      var(--hx-number-input-border-color, var(--hx-color-neutral-300, #ced4da));
-    border-radius: var(
-      --hx-number-input-border-radius,
-      var(--hx-border-radius-md, 0.375rem)
-    );
-    background-color: var(--hx-number-input-bg, var(--hx-color-neutral-0, #ffffff));
+    border: var(--hx-border-width-thin) solid
+      var(--hx-number-input-border-color, var(--hx-color-neutral-300));
+    border-radius: var(--hx-number-input-border-radius, var(--hx-border-radius-md));
+    background-color: var(--hx-number-input-bg, var(--hx-color-neutral-0));
     transition:
-      border-color var(--hx-transition-fast, 150ms ease),
-      box-shadow var(--hx-transition-fast, 150ms ease);
+      border-color var(--hx-transition-fast),
+      box-shadow var(--hx-transition-fast);
     overflow: hidden;
   }
 
   .field__input-wrapper:focus-within {
-    border-color: var(
-      --hx-number-input-focus-ring-color,
-      var(--hx-focus-ring-color, #2563eb)
-    );
-    box-shadow: 0 0 0 var(--hx-focus-ring-width, 2px)
+    border-color: var(--hx-number-input-focus-ring-color, var(--hx-focus-ring-color));
+    box-shadow: 0 0 0 var(--hx-focus-ring-width)
       color-mix(
         in srgb,
-        var(--hx-number-input-focus-ring-color, var(--hx-focus-ring-color, #2563eb))
-          calc(var(--hx-focus-ring-opacity, 0.25) * 100%),
+        var(--hx-number-input-focus-ring-color, var(--hx-focus-ring-color))
+          calc(var(--hx-focus-ring-opacity) * 100%),
         transparent
       );
   }
@@ -77,22 +71,16 @@ export const helixNumberInputStyles = css`
   /* ─── Error State ─── */
 
   .field--error .field__input-wrapper {
-    border-color: var(
-      --hx-number-input-error-color,
-      var(--hx-color-error-500, #dc3545)
-    );
+    border-color: var(--hx-number-input-error-color, var(--hx-color-error-500));
   }
 
   .field--error .field__input-wrapper:focus-within {
-    border-color: var(
-      --hx-number-input-error-color,
-      var(--hx-color-error-500, #dc3545)
-    );
-    box-shadow: 0 0 0 var(--hx-focus-ring-width, 2px)
+    border-color: var(--hx-number-input-error-color, var(--hx-color-error-500));
+    box-shadow: 0 0 0 var(--hx-focus-ring-width)
       color-mix(
         in srgb,
-        var(--hx-number-input-error-color, var(--hx-color-error-500, #dc3545))
-          calc(var(--hx-focus-ring-opacity, 0.25) * 100%),
+        var(--hx-number-input-error-color, var(--hx-color-error-500))
+          calc(var(--hx-focus-ring-opacity) * 100%),
         transparent
       );
   }
@@ -103,8 +91,8 @@ export const helixNumberInputStyles = css`
   .field__suffix {
     display: flex;
     align-items: center;
-    padding: 0 var(--hx-space-3, 0.75rem);
-    color: var(--hx-color-neutral-500, #6c757d);
+    padding: 0 var(--hx-space-3);
+    color: var(--hx-color-neutral-500);
     flex-shrink: 0;
   }
 
@@ -116,17 +104,17 @@ export const helixNumberInputStyles = css`
     outline: none;
     background: transparent;
     font-family: inherit;
-    color: var(--hx-number-input-color, var(--hx-color-neutral-800, #212529));
-    line-height: var(--hx-line-height-normal, 1.5);
+    color: var(--hx-number-input-color, var(--hx-color-neutral-800));
+    line-height: var(--hx-line-height-normal);
     width: 100%;
     /* Size: md (default) */
-    padding: var(--hx-space-2, 0.5rem) var(--hx-space-3, 0.75rem);
-    font-size: var(--hx-font-size-md, 1rem);
-    min-height: var(--hx-size-10, 2.5rem);
+    padding: var(--hx-space-2) var(--hx-space-3);
+    font-size: var(--hx-font-size-md);
+    min-height: var(--hx-size-10);
   }
 
   .field__input::placeholder {
-    color: var(--hx-color-neutral-400, #adb5bd);
+    color: var(--hx-color-neutral-400);
   }
 
   .field__input:disabled {
@@ -148,15 +136,15 @@ export const helixNumberInputStyles = css`
   /* ─── Size Variants ─── */
 
   .field--sm .field__input {
-    padding: var(--hx-space-1, 0.25rem) var(--hx-space-2, 0.5rem);
-    font-size: var(--hx-font-size-sm, 0.875rem);
-    min-height: var(--hx-size-8, 2rem);
+    padding: var(--hx-space-1) var(--hx-space-2);
+    font-size: var(--hx-font-size-sm);
+    min-height: var(--hx-size-8);
   }
 
   .field--lg .field__input {
-    padding: var(--hx-space-3, 0.75rem) var(--hx-space-4, 1rem);
-    font-size: var(--hx-font-size-lg, 1.125rem);
-    min-height: var(--hx-size-12, 3rem);
+    padding: var(--hx-space-3) var(--hx-space-4);
+    font-size: var(--hx-font-size-lg);
+    min-height: var(--hx-size-12);
   }
 
   /* ─── Stepper ─── */
@@ -165,8 +153,8 @@ export const helixNumberInputStyles = css`
     display: flex;
     flex-direction: column;
     flex-shrink: 0;
-    border-left: var(--hx-border-width-thin, 1px) solid
-      var(--hx-number-input-border-color, var(--hx-color-neutral-300, #ced4da));
+    border-left: var(--hx-border-width-thin) solid
+      var(--hx-number-input-border-color, var(--hx-color-neutral-300));
   }
 
   .field__stepper-btn {
@@ -177,34 +165,34 @@ export const helixNumberInputStyles = css`
     border: none;
     outline: none;
     cursor: pointer;
-    color: var(--hx-color-neutral-600, #495057);
+    color: var(--hx-color-neutral-600);
     padding: 0;
     flex: 1;
-    min-width: var(--hx-size-8, 2rem);
+    min-width: var(--hx-size-8);
     line-height: 1;
-    transition: background-color var(--hx-transition-fast, 150ms ease);
+    transition: background-color var(--hx-transition-fast);
     user-select: none;
     -webkit-user-select: none;
   }
 
   .field__stepper-btn:not(:last-child) {
-    border-bottom: var(--hx-border-width-thin, 1px) solid
-      var(--hx-number-input-border-color, var(--hx-color-neutral-300, #ced4da));
+    border-bottom: var(--hx-border-width-thin) solid
+      var(--hx-number-input-border-color, var(--hx-color-neutral-300));
   }
 
   .field__stepper-btn:hover:not(:disabled) {
-    background-color: var(--hx-color-neutral-50, #f8f9fa);
-    color: var(--hx-color-neutral-800, #212529);
+    background-color: var(--hx-color-neutral-50);
+    color: var(--hx-color-neutral-800);
   }
 
   .field__stepper-btn:focus-visible {
-    outline: var(--hx-focus-ring-width, 2px) solid
-      var(--hx-number-input-focus-ring-color, var(--hx-focus-ring-color, #2563eb));
+    outline: var(--hx-focus-ring-width) solid
+      var(--hx-number-input-focus-ring-color, var(--hx-focus-ring-color));
     outline-offset: -2px;
   }
 
   .field__stepper-btn:disabled {
-    opacity: var(--hx-opacity-disabled, 0.5);
+    opacity: var(--hx-opacity-disabled);
     cursor: not-allowed;
   }
 
@@ -216,26 +204,26 @@ export const helixNumberInputStyles = css`
 
   /* Size sm adjustments for stepper */
   .field--sm .field__stepper-btn {
-    min-width: var(--hx-size-6, 1.5rem);
+    min-width: var(--hx-size-6);
   }
 
   /* Size lg adjustments for stepper */
   .field--lg .field__stepper-btn {
-    min-width: var(--hx-size-10, 2.5rem);
+    min-width: var(--hx-size-10);
   }
 
   /* ─── Help Text & Error Messages ─── */
 
   .field__help-text {
-    font-size: var(--hx-font-size-xs, 0.75rem);
-    color: var(--hx-color-neutral-500, #6c757d);
-    line-height: var(--hx-line-height-normal, 1.5);
+    font-size: var(--hx-font-size-xs);
+    color: var(--hx-color-neutral-500);
+    line-height: var(--hx-line-height-normal);
   }
 
   .field__error {
-    font-size: var(--hx-font-size-xs, 0.75rem);
-    color: var(--hx-number-input-error-color, var(--hx-color-error-500, #dc3545));
-    line-height: var(--hx-line-height-normal, 1.5);
+    font-size: var(--hx-font-size-xs);
+    color: var(--hx-number-input-error-color, var(--hx-color-error-500));
+    line-height: var(--hx-line-height-normal);
   }
 
   /* ─── Reduced Motion ─── */

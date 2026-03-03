@@ -70,7 +70,17 @@ export class HelixNumberInput extends LitElement {
    * The current numeric value of the input. Null when the field is empty.
    * @attr value
    */
-  @property({ type: Number })
+  @property({
+    type: Number,
+    converter: {
+      fromAttribute: (attr: string | null): number | null => {
+        if (attr === null || attr === '') return null;
+        const n = Number(attr);
+        return isNaN(n) ? null : n;
+      },
+      toAttribute: (val: number | null): string | null => (val === null ? null : String(val)),
+    },
+  })
   value: number | null = null;
 
   /**
@@ -159,6 +169,7 @@ export class HelixNumberInput extends LitElement {
 
   @state() private _hasLabelSlot = false;
   @state() private _hasErrorSlot = false;
+  @state() private _hasHelpSlot = false;
 
   /** Timer ID for the long-press initial delay. */
   private _longPressTimer: ReturnType<typeof setTimeout> | null = null;
@@ -187,7 +198,16 @@ export class HelixNumberInput extends LitElement {
 
   private _handleErrorSlotChange(e: Event): void {
     const slot = e.target as HTMLSlotElement;
-    this._hasErrorSlot = slot.assignedElements().length > 0;
+    const assigned = slot.assignedElements();
+    this._hasErrorSlot = assigned.length > 0;
+    if (this._hasErrorSlot && assigned[0]) {
+      if (!assigned[0].id) assigned[0].id = this._errorId;
+    }
+  }
+
+  private _handleHelpSlotChange(e: Event): void {
+    const slot = e.target as HTMLSlotElement;
+    this._hasHelpSlot = slot.assignedElements().length > 0;
   }
 
   // ─── Lifecycle ───
@@ -203,7 +223,8 @@ export class HelixNumberInput extends LitElement {
       changedProperties.has('value') ||
       changedProperties.has('required') ||
       changedProperties.has('min') ||
-      changedProperties.has('max')
+      changedProperties.has('max') ||
+      changedProperties.has('step')
     ) {
       this._syncFormValue();
       this._updateValidity();
@@ -269,6 +290,20 @@ export class HelixNumberInput extends LitElement {
       return;
     }
 
+    if (this.value !== null && this.step && this.step !== 0) {
+      const base = this.min ?? 0;
+      const remainder = Math.abs((this.value - base) % this.step);
+      const epsilon = 1e-9;
+      if (remainder > epsilon && Math.abs(remainder - this.step) > epsilon) {
+        this._internals.setValidity(
+          { stepMismatch: true },
+          `Value must be a multiple of ${this.step}.`,
+          this._input,
+        );
+        return;
+      }
+    }
+
     this._internals.setValidity({});
   }
 
@@ -313,9 +348,7 @@ export class HelixNumberInput extends LitElement {
     if (this.disabled || this.readonly) return;
 
     const current = this.value ?? 0;
-    const next = this._clamp(
-      parseFloat((current + delta * this.step).toFixed(10)),
-    );
+    const next = this._clamp(parseFloat((current + delta * this.step).toFixed(10)));
 
     if (next === this.value) return;
     this.value = next;
@@ -434,12 +467,7 @@ export class HelixNumberInput extends LitElement {
       aria-hidden="true"
       focusable="false"
     >
-      <path
-        d="M6 1v10M1 6h10"
-        stroke="currentColor"
-        stroke-width="1.5"
-        stroke-linecap="round"
-      />
+      <path d="M6 1v10M1 6h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
     </svg>`;
   }
 
@@ -450,12 +478,7 @@ export class HelixNumberInput extends LitElement {
       aria-hidden="true"
       focusable="false"
     >
-      <path
-        d="M1 6h10"
-        stroke="currentColor"
-        stroke-width="1.5"
-        stroke-linecap="round"
-      />
+      <path d="M1 6h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
     </svg>`;
   }
 
@@ -475,7 +498,10 @@ export class HelixNumberInput extends LitElement {
     };
 
     const describedBy =
-      [hasError ? this._errorId : null, this.helpText ? this._helpTextId : null]
+      [
+        hasError ? this._errorId : null,
+        this.helpText || this._hasHelpSlot ? this._helpTextId : null,
+      ]
         .filter(Boolean)
         .join(' ') || undefined;
 
@@ -542,8 +568,7 @@ export class HelixNumberInput extends LitElement {
                     aria-label="Increment"
                     ?disabled=${this.disabled || this.readonly || this._atMax}
                     tabindex="-1"
-                    @pointerdown=${(e: PointerEvent) =>
-                      this._handleStepperPointerDown(e, 1)}
+                    @pointerdown=${(e: PointerEvent) => this._handleStepperPointerDown(e, 1)}
                     @pointerup=${this._handleStepperPointerUp}
                     @pointerleave=${this._handleStepperPointerUp}
                     @pointercancel=${this._handleStepperPointerUp}
@@ -557,8 +582,7 @@ export class HelixNumberInput extends LitElement {
                     aria-label="Decrement"
                     ?disabled=${this.disabled || this.readonly || this._atMin}
                     tabindex="-1"
-                    @pointerdown=${(e: PointerEvent) =>
-                      this._handleStepperPointerDown(e, -1)}
+                    @pointerdown=${(e: PointerEvent) => this._handleStepperPointerDown(e, -1)}
                     @pointerup=${this._handleStepperPointerUp}
                     @pointerleave=${this._handleStepperPointerUp}
                     @pointercancel=${this._handleStepperPointerUp}
@@ -585,13 +609,14 @@ export class HelixNumberInput extends LitElement {
             : nothing}
         </slot>
 
-        ${this.helpText && !hasError
-          ? html`
-              <div part="help-text" class="field__help-text" id=${this._helpTextId}>
-                <slot name="help">${this.helpText}</slot>
-              </div>
-            `
-          : nothing}
+        <div
+          part="help-text"
+          class="field__help-text"
+          id=${this._helpTextId}
+          ?hidden=${hasError || (!this.helpText && !this._hasHelpSlot)}
+        >
+          <slot name="help" @slotchange=${this._handleHelpSlotChange}>${this.helpText}</slot>
+        </div>
       </div>
     `;
   }

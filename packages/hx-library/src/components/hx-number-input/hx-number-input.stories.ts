@@ -150,9 +150,9 @@ const meta = {
     <hx-number-input
       label=${args.label}
       .value=${args.value}
-      min=${args.min}
-      max=${args.max}
-      step=${args.step}
+      .min=${args.min}
+      .max=${args.max}
+      .step=${args.step}
       ?required=${args.required}
       ?disabled=${args.disabled}
       ?readonly=${args.readonly}
@@ -274,8 +274,7 @@ export const WithError: Story = {
   parameters: {
     docs: {
       description: {
-        story:
-          'Shows the error state with a validation message rendered below the input wrapper.',
+        story: 'Shows the error state with a validation message rendered below the input wrapper.',
       },
     },
   },
@@ -304,8 +303,7 @@ export const Disabled: Story = {
   parameters: {
     docs: {
       description: {
-        story:
-          'The disabled state prevents all user interaction and dims the component visually.',
+        story: 'The disabled state prevents all user interaction and dims the component visually.',
       },
     },
   },
@@ -420,8 +418,7 @@ export const WithPrefix: Story = {
   parameters: {
     docs: {
       description: {
-        story:
-          'Uses the prefix slot to display a unit label (mg) to the left of the input field.',
+        story: 'Uses the prefix slot to display a unit label (mg) to the left of the input field.',
       },
     },
   },
@@ -604,12 +601,9 @@ export const WithHelpSlot: Story = {
   name: 'With Help Slot',
   render: () => html`
     <hx-number-input label="Infusion Rate" value="125" name="infusionRate">
-      <div
-        slot="help"
-        style="font-size: 0.75rem; color: var(--hx-color-neutral-500, #6c757d);"
-      >
-        Standard adult maintenance rate is 125 mL/hr. Adjust based on patient weight and
-        clinical status.
+      <div slot="help" style="font-size: 0.75rem; color: var(--hx-color-neutral-500, #6c757d);">
+        Standard adult maintenance rate is 125 mL/hr. Adjust based on patient weight and clinical
+        status.
       </div>
     </hx-number-input>
   `,
@@ -996,7 +990,8 @@ export const DisabledNoInput: Story = {
   parameters: {
     docs: {
       description: {
-        story: 'Verifies that a disabled input cannot be typed into and retains its original value.',
+        story:
+          'Verifies that a disabled input cannot be typed into and retains its original value.',
       },
     },
   },

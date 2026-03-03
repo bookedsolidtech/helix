@@ -1,5 +1,12 @@
 import { describe, it, expect, afterEach } from 'vitest';
-import { fixture, shadowQuery, shadowQueryAll, oneEvent, cleanup, checkA11y } from '../../test-utils.js';
+import {
+  fixture,
+  shadowQuery,
+  shadowQueryAll,
+  oneEvent,
+  cleanup,
+  checkA11y,
+} from '../../test-utils.js';
 import type { HelixNumberInput } from './hx-number-input.js';
 import './index.js';
 
@@ -70,16 +77,12 @@ describe('hx-number-input', () => {
     });
 
     it('accepts a numeric value via attribute', async () => {
-      const el = await fixture<HelixNumberInput>(
-        '<hx-number-input value="42"></hx-number-input>',
-      );
+      const el = await fixture<HelixNumberInput>('<hx-number-input value="42"></hx-number-input>');
       expect(el.value).toBe(42);
     });
 
     it('reflects numeric value on the native input', async () => {
-      const el = await fixture<HelixNumberInput>(
-        '<hx-number-input value="10"></hx-number-input>',
-      );
+      const el = await fixture<HelixNumberInput>('<hx-number-input value="10"></hx-number-input>');
       const input = shadowQuery<HTMLInputElement>(el, 'input')!;
       expect(input.value).toBe('10');
     });
@@ -97,24 +100,18 @@ describe('hx-number-input', () => {
 
   describe('Property: required', () => {
     it('reflects required attribute on host', async () => {
-      const el = await fixture<HelixNumberInput>(
-        '<hx-number-input required></hx-number-input>',
-      );
+      const el = await fixture<HelixNumberInput>('<hx-number-input required></hx-number-input>');
       expect(el.hasAttribute('required')).toBe(true);
     });
 
     it('sets aria-required="true" on native input', async () => {
-      const el = await fixture<HelixNumberInput>(
-        '<hx-number-input required></hx-number-input>',
-      );
+      const el = await fixture<HelixNumberInput>('<hx-number-input required></hx-number-input>');
       const input = shadowQuery<HTMLInputElement>(el, 'input')!;
       expect(input.getAttribute('aria-required')).toBe('true');
     });
 
     it('marks validity as valueMissing when required and no value', async () => {
-      const el = await fixture<HelixNumberInput>(
-        '<hx-number-input required></hx-number-input>',
-      );
+      const el = await fixture<HelixNumberInput>('<hx-number-input required></hx-number-input>');
       expect(el.validity.valueMissing).toBe(true);
     });
   });
@@ -123,24 +120,18 @@ describe('hx-number-input', () => {
 
   describe('Property: disabled', () => {
     it('reflects disabled attribute on host', async () => {
-      const el = await fixture<HelixNumberInput>(
-        '<hx-number-input disabled></hx-number-input>',
-      );
+      const el = await fixture<HelixNumberInput>('<hx-number-input disabled></hx-number-input>');
       expect(el.hasAttribute('disabled')).toBe(true);
     });
 
     it('sets disabled on the native input', async () => {
-      const el = await fixture<HelixNumberInput>(
-        '<hx-number-input disabled></hx-number-input>',
-      );
+      const el = await fixture<HelixNumberInput>('<hx-number-input disabled></hx-number-input>');
       const input = shadowQuery<HTMLInputElement>(el, 'input')!;
       expect(input.disabled).toBe(true);
     });
 
     it('disables stepper increment and decrement buttons', async () => {
-      const el = await fixture<HelixNumberInput>(
-        '<hx-number-input disabled></hx-number-input>',
-      );
+      const el = await fixture<HelixNumberInput>('<hx-number-input disabled></hx-number-input>');
       const increment = shadowQuery<HTMLButtonElement>(el, '[part="increment"]')!;
       const decrement = shadowQuery<HTMLButtonElement>(el, '[part="decrement"]')!;
       expect(increment.disabled).toBe(true);
@@ -152,16 +143,12 @@ describe('hx-number-input', () => {
 
   describe('Property: readonly', () => {
     it('reflects readonly attribute on host', async () => {
-      const el = await fixture<HelixNumberInput>(
-        '<hx-number-input readonly></hx-number-input>',
-      );
+      const el = await fixture<HelixNumberInput>('<hx-number-input readonly></hx-number-input>');
       expect(el.hasAttribute('readonly')).toBe(true);
     });
 
     it('sets readonly on the native input', async () => {
-      const el = await fixture<HelixNumberInput>(
-        '<hx-number-input readonly></hx-number-input>',
-      );
+      const el = await fixture<HelixNumberInput>('<hx-number-input readonly></hx-number-input>');
       const input = shadowQuery<HTMLInputElement>(el, 'input')!;
       expect(input.readOnly).toBe(true);
     });
@@ -171,25 +158,19 @@ describe('hx-number-input', () => {
 
   describe('Property: min/max', () => {
     it('sets min attribute on native input', async () => {
-      const el = await fixture<HelixNumberInput>(
-        '<hx-number-input min="0"></hx-number-input>',
-      );
+      const el = await fixture<HelixNumberInput>('<hx-number-input min="0"></hx-number-input>');
       const input = shadowQuery<HTMLInputElement>(el, 'input')!;
       expect(input.getAttribute('min')).toBe('0');
     });
 
     it('sets max attribute on native input', async () => {
-      const el = await fixture<HelixNumberInput>(
-        '<hx-number-input max="100"></hx-number-input>',
-      );
+      const el = await fixture<HelixNumberInput>('<hx-number-input max="100"></hx-number-input>');
       const input = shadowQuery<HTMLInputElement>(el, 'input')!;
       expect(input.getAttribute('max')).toBe('100');
     });
 
     it('clamps value to min on change event', async () => {
-      const el = await fixture<HelixNumberInput>(
-        '<hx-number-input min="5"></hx-number-input>',
-      );
+      const el = await fixture<HelixNumberInput>('<hx-number-input min="5"></hx-number-input>');
       const input = shadowQuery<HTMLInputElement>(el, 'input')!;
       const eventPromise = oneEvent<CustomEvent<{ value: number | null }>>(el, 'hx-change');
       input.value = '1';
@@ -199,9 +180,7 @@ describe('hx-number-input', () => {
     });
 
     it('clamps value to max on change event', async () => {
-      const el = await fixture<HelixNumberInput>(
-        '<hx-number-input max="10"></hx-number-input>',
-      );
+      const el = await fixture<HelixNumberInput>('<hx-number-input max="10"></hx-number-input>');
       const input = shadowQuery<HTMLInputElement>(el, 'input')!;
       const eventPromise = oneEvent<CustomEvent<{ value: number | null }>>(el, 'hx-change');
       input.value = '50';
@@ -308,9 +287,7 @@ describe('hx-number-input', () => {
     });
 
     it('hides stepper when no-stepper is set', async () => {
-      const el = await fixture<HelixNumberInput>(
-        '<hx-number-input no-stepper></hx-number-input>',
-      );
+      const el = await fixture<HelixNumberInput>('<hx-number-input no-stepper></hx-number-input>');
       const stepper = shadowQuery(el, '[part="stepper"]');
       expect(stepper).toBeNull();
     });
@@ -370,7 +347,7 @@ describe('hx-number-input', () => {
         '<hx-number-input help-text="Some guidance" error="Invalid value"></hx-number-input>',
       );
       const helpText = shadowQuery(el, '.field__help-text');
-      expect(helpText).toBeNull();
+      expect(helpText?.hidden).toBe(true);
     });
   });
 
@@ -378,9 +355,7 @@ describe('hx-number-input', () => {
 
   describe('Stepper buttons', () => {
     it('increment button increases value by step', async () => {
-      const el = await fixture<HelixNumberInput>(
-        '<hx-number-input value="5"></hx-number-input>',
-      );
+      const el = await fixture<HelixNumberInput>('<hx-number-input value="5"></hx-number-input>');
       const increment = shadowQuery<HTMLButtonElement>(el, '[part="increment"]')!;
       const eventPromise = oneEvent<CustomEvent<{ value: number | null }>>(el, 'hx-change');
       increment.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true }));
@@ -389,9 +364,7 @@ describe('hx-number-input', () => {
     });
 
     it('decrement button decreases value by step', async () => {
-      const el = await fixture<HelixNumberInput>(
-        '<hx-number-input value="5"></hx-number-input>',
-      );
+      const el = await fixture<HelixNumberInput>('<hx-number-input value="5"></hx-number-input>');
       const decrement = shadowQuery<HTMLButtonElement>(el, '[part="decrement"]')!;
       const eventPromise = oneEvent<CustomEvent<{ value: number | null }>>(el, 'hx-change');
       decrement.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true }));
@@ -425,9 +398,7 @@ describe('hx-number-input', () => {
 
   describe('Keyboard', () => {
     it('ArrowUp increments value by step', async () => {
-      const el = await fixture<HelixNumberInput>(
-        '<hx-number-input value="10"></hx-number-input>',
-      );
+      const el = await fixture<HelixNumberInput>('<hx-number-input value="10"></hx-number-input>');
       const input = shadowQuery<HTMLInputElement>(el, 'input')!;
       const eventPromise = oneEvent<CustomEvent<{ value: number | null }>>(el, 'hx-change');
       input.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowUp', bubbles: true }));
@@ -436,9 +407,7 @@ describe('hx-number-input', () => {
     });
 
     it('ArrowDown decrements value by step', async () => {
-      const el = await fixture<HelixNumberInput>(
-        '<hx-number-input value="10"></hx-number-input>',
-      );
+      const el = await fixture<HelixNumberInput>('<hx-number-input value="10"></hx-number-input>');
       const input = shadowQuery<HTMLInputElement>(el, 'input')!;
       const eventPromise = oneEvent<CustomEvent<{ value: number | null }>>(el, 'hx-change');
       input.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true }));
@@ -452,7 +421,9 @@ describe('hx-number-input', () => {
       );
       const input = shadowQuery<HTMLInputElement>(el, 'input')!;
       let fired = false;
-      el.addEventListener('hx-change', () => { fired = true; });
+      el.addEventListener('hx-change', () => {
+        fired = true;
+      });
       input.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowUp', bubbles: true }));
       await el.updateComplete;
       expect(fired).toBe(false);
@@ -465,7 +436,9 @@ describe('hx-number-input', () => {
       );
       const input = shadowQuery<HTMLInputElement>(el, 'input')!;
       let fired = false;
-      el.addEventListener('hx-change', () => { fired = true; });
+      el.addEventListener('hx-change', () => {
+        fired = true;
+      });
       input.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true }));
       await el.updateComplete;
       expect(fired).toBe(false);
@@ -564,18 +537,14 @@ describe('hx-number-input', () => {
     });
 
     it('formResetCallback resets value to null', async () => {
-      const el = await fixture<HelixNumberInput>(
-        '<hx-number-input value="42"></hx-number-input>',
-      );
+      const el = await fixture<HelixNumberInput>('<hx-number-input value="42"></hx-number-input>');
       el.formResetCallback();
       await el.updateComplete;
       expect(el.value).toBeNull();
     });
 
     it('checkValidity returns false when required and value is null', async () => {
-      const el = await fixture<HelixNumberInput>(
-        '<hx-number-input required></hx-number-input>',
-      );
+      const el = await fixture<HelixNumberInput>('<hx-number-input required></hx-number-input>');
       expect(el.checkValidity()).toBe(false);
     });
 
@@ -587,9 +556,7 @@ describe('hx-number-input', () => {
     });
 
     it('reportValidity returns false when required and value is null', async () => {
-      const el = await fixture<HelixNumberInput>(
-        '<hx-number-input required></hx-number-input>',
-      );
+      const el = await fixture<HelixNumberInput>('<hx-number-input required></hx-number-input>');
       expect(el.reportValidity()).toBe(false);
     });
 
@@ -601,9 +568,7 @@ describe('hx-number-input', () => {
     });
 
     it('validationMessage is set when required and value is null', async () => {
-      const el = await fixture<HelixNumberInput>(
-        '<hx-number-input required></hx-number-input>',
-      );
+      const el = await fixture<HelixNumberInput>('<hx-number-input required></hx-number-input>');
       await el.updateComplete;
       expect(el.validationMessage).toBeTruthy();
     });
@@ -751,6 +716,27 @@ describe('hx-number-input', () => {
       await el.updateComplete;
       const field = shadowQuery(el, '[part="field"]');
       expect(field?.classList.contains('field--error')).toBe(true);
+    });
+
+    it('slotted help sets aria-describedby without help-text prop', async () => {
+      const el = await fixture<HelixNumberInput>(
+        '<hx-number-input label="Qty"><em slot="help">Enter a number</em></hx-number-input>',
+      );
+      await el.updateComplete;
+      const input = shadowQuery<HTMLInputElement>(el, 'input')!;
+      const describedBy = input.getAttribute('aria-describedby');
+      expect(describedBy).toBeTruthy();
+    });
+
+    it('slotted error sets aria-describedby and aria-invalid without error prop', async () => {
+      const el = await fixture<HelixNumberInput>(
+        '<hx-number-input label="Qty"><span slot="error">Bad value</span></hx-number-input>',
+      );
+      await el.updateComplete;
+      const input = shadowQuery<HTMLInputElement>(el, 'input')!;
+      expect(input.getAttribute('aria-invalid')).toBe('true');
+      const describedBy = input.getAttribute('aria-describedby');
+      expect(describedBy).toBeTruthy();
     });
   });
 
