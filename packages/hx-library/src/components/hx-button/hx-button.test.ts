@@ -232,7 +232,7 @@ describe('hx-button', () => {
   // ─── Events (4) ───
 
   describe('Events', () => {
-    it('dispatches wc-click on click', async () => {
+    it('dispatches hx-click on click', async () => {
       const el = await fixture<WcButton>('<hx-button>Click</hx-button>');
       const btn = shadowQuery<HTMLButtonElement>(el, 'button')!;
       const eventPromise = oneEvent(el, 'hx-click');
@@ -260,7 +260,7 @@ describe('hx-button', () => {
       expect(event.detail.originalEvent).toBeInstanceOf(MouseEvent);
     });
 
-    it('does NOT dispatch wc-click when disabled', async () => {
+    it('does NOT dispatch hx-click when disabled', async () => {
       const el = await fixture<WcButton>('<hx-button disabled>Click</hx-button>');
       const btn = shadowQuery<HTMLButtonElement>(el, 'button')!;
       let fired = false;
