@@ -11,6 +11,7 @@ export { HelixIconButton } from './components/hx-icon-button/index.js';
 export { HelixCard } from './components/hx-card/index.js';
 export { HelixTextInput } from './components/hx-text-input/index.js';
 export { HelixCheckbox } from './components/hx-checkbox/index.js';
+export { HelixCheckboxGroup } from './components/hx-checkbox-group/index.js';
 export { HelixSelect } from './components/hx-select/index.js';
 export { HelixRadioGroup, HelixRadio } from './components/hx-radio-group/index.js';
 export { HelixAlert } from './components/hx-alert/index.js';

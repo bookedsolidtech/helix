@@ -38,6 +38,19 @@ const COMPONENT_VARIANTS: ComponentVariant[] = [
   { component: 'hx-checkbox', story: 'Default', id: 'components-checkbox--default' },
   { component: 'hx-checkbox', story: 'Checked', id: 'components-checkbox--checked' },
 
+  // hx-checkbox-group
+  { component: 'hx-checkbox-group', story: 'Default', id: 'components-checkbox-group--default' },
+  {
+    component: 'hx-checkbox-group',
+    story: 'WithError',
+    id: 'components-checkbox-group--with-error',
+  },
+  {
+    component: 'hx-checkbox-group',
+    story: 'Horizontal',
+    id: 'components-checkbox-group--horizontal',
+  },
+
   // hx-select
   { component: 'hx-select', story: 'Default', id: 'components-select--default' },
 
