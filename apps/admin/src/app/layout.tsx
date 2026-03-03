@@ -12,6 +12,7 @@ import {
   Map,
   HeartPulse,
   GitBranch,
+  Cpu,
 } from 'lucide-react';
 import { DOCS_URL, STORYBOOK_URL } from '@/lib/env';
 import './globals.css';
@@ -91,6 +92,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
               <SidebarLink href="/hooks" icon={<GitBranch className="w-4 h-4" />}>
                 Hooks & MCP
+              </SidebarLink>
+
+              <SidebarLink href="/mcp" icon={<Cpu className="w-4 h-4" />}>
+                MCP Server
               </SidebarLink>
             </nav>
 
