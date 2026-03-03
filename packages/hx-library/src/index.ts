@@ -16,6 +16,7 @@ export { HelixAlert } from './components/hx-alert/index.js';
 export { HelixTextarea } from './components/hx-textarea/index.js';
 export { HelixBadge } from './components/hx-badge/index.js';
 export { HelixSwitch } from './components/hx-switch/index.js';
+export { HelixNumberInput } from './components/hx-number-input/index.js';
 export { HelixContainer } from './components/hx-container/index.js';
 
 // Light DOM wrappers (Drupal integration)
