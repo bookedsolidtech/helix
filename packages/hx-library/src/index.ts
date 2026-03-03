@@ -18,6 +18,7 @@ export { HelixTextarea } from './components/hx-textarea/index.js';
 export { HelixBadge } from './components/hx-badge/index.js';
 export { HelixSwitch } from './components/hx-switch/index.js';
 export { HelixContainer } from './components/hx-container/index.js';
+export { HelixButtonGroup } from './components/hx-button-group/index.js';
 
 // Light DOM wrappers (Drupal integration)
 export { HelixForm } from './components/hx-form/index.js';
