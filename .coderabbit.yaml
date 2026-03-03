@@ -1,0 +1,8 @@
+# CodeRabbit configuration
+# Enable auto-reviews on all PR target branches, not just main
+reviews:
+  auto_review:
+    enabled: true
+    base_branches:
+      - ".*"
+  review_status: true
