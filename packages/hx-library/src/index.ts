@@ -17,6 +17,7 @@ export { HelixAlert } from './components/hx-alert/index.js';
 export { HelixTextarea } from './components/hx-textarea/index.js';
 export { HelixBadge } from './components/hx-badge/index.js';
 export { HelixSwitch } from './components/hx-switch/index.js';
+export { HelixSlider } from './components/hx-slider/index.js';
 export { HelixContainer } from './components/hx-container/index.js';
 export { HelixButtonGroup } from './components/hx-button-group/index.js';
 
