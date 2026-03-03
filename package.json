@@ -103,5 +103,8 @@
   "engines": {
     "node": ">=20.0.0"
   },
-  "packageManager": "npm@10.8.2"
+  "packageManager": "npm@10.8.2",
+  "optionalDependencies": {
+    "lightningcss-darwin-arm64": "^1.31.1"
+  }
 }
