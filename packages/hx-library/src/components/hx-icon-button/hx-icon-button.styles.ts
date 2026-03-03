@@ -7,23 +7,23 @@ export const helixIconButtonStyles = css`
 
   :host([disabled]) {
     pointer-events: none;
-    opacity: var(--hx-opacity-disabled, 0.5);
+    opacity: var(--hx-opacity-disabled);
   }
 
   .button {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    border: var(--hx-border-width-thin, 1px) solid var(--hx-icon-button-border-color, transparent);
-    border-radius: var(--hx-icon-button-border-radius, var(--hx-border-radius-md, 0.375rem));
-    background-color: var(--hx-icon-button-bg, transparent);
-    color: var(--hx-icon-button-color, var(--hx-color-primary-500, #2563eb));
+    border: var(--hx-border-width-thin) solid var(--hx-icon-button-border-color);
+    border-radius: var(--hx-icon-button-border-radius, var(--hx-border-radius-md));
+    background-color: var(--hx-icon-button-bg);
+    color: var(--hx-icon-button-color, var(--hx-color-primary-500));
     cursor: pointer;
     transition:
-      background-color var(--hx-transition-fast, 150ms ease),
-      color var(--hx-transition-fast, 150ms ease),
-      border-color var(--hx-transition-fast, 150ms ease),
-      box-shadow var(--hx-transition-fast, 150ms ease);
+      background-color var(--hx-transition-fast),
+      color var(--hx-transition-fast),
+      border-color var(--hx-transition-fast),
+      box-shadow var(--hx-transition-fast);
     text-decoration: none;
     user-select: none;
     -webkit-user-select: none;
@@ -31,9 +31,9 @@ export const helixIconButtonStyles = css`
   }
 
   .button:focus-visible {
-    outline: var(--hx-focus-ring-width, 2px) solid
-      var(--hx-icon-button-focus-ring-color, var(--hx-focus-ring-color, #2563eb));
-    outline-offset: var(--hx-focus-ring-offset, 2px);
+    outline: var(--hx-focus-ring-width) solid
+      var(--hx-icon-button-focus-ring-color, var(--hx-focus-ring-color));
+    outline-offset: var(--hx-focus-ring-offset);
   }
 
   .button:hover {
@@ -47,72 +47,72 @@ export const helixIconButtonStyles = css`
   /* ─── Size Variants ─── */
 
   .button--sm {
-    padding: var(--hx-space-1, 0.25rem);
-    width: var(--hx-icon-button-size, var(--hx-size-8, 2rem));
-    height: var(--hx-icon-button-size, var(--hx-size-8, 2rem));
-    font-size: var(--hx-font-size-sm, 0.875rem);
+    padding: var(--hx-space-1);
+    width: var(--hx-icon-button-size, var(--hx-size-8));
+    height: var(--hx-icon-button-size, var(--hx-size-8));
+    font-size: var(--hx-font-size-sm);
   }
 
   .button--md {
-    padding: var(--hx-space-2, 0.5rem);
-    width: var(--hx-icon-button-size, var(--hx-size-10, 2.5rem));
-    height: var(--hx-icon-button-size, var(--hx-size-10, 2.5rem));
-    font-size: var(--hx-font-size-md, 1rem);
+    padding: var(--hx-space-2);
+    width: var(--hx-icon-button-size, var(--hx-size-10));
+    height: var(--hx-icon-button-size, var(--hx-size-10));
+    font-size: var(--hx-font-size-md);
   }
 
   .button--lg {
-    padding: var(--hx-space-3, 0.75rem);
-    width: var(--hx-icon-button-size, var(--hx-size-12, 3rem));
-    height: var(--hx-icon-button-size, var(--hx-size-12, 3rem));
-    font-size: var(--hx-font-size-lg, 1.125rem);
+    padding: var(--hx-space-3);
+    width: var(--hx-icon-button-size, var(--hx-size-12));
+    height: var(--hx-icon-button-size, var(--hx-size-12));
+    font-size: var(--hx-font-size-lg);
   }
 
   /* ─── Style Variants ─── */
 
   .button--primary {
-    --hx-icon-button-bg: var(--hx-color-primary-500, #2563eb);
-    --hx-icon-button-color: var(--hx-color-neutral-0, #ffffff);
+    --hx-icon-button-bg: var(--hx-color-primary-500);
+    --hx-icon-button-color: var(--hx-color-neutral-0);
     --hx-icon-button-border-color: transparent;
   }
 
   .button--secondary {
     --hx-icon-button-bg: transparent;
-    --hx-icon-button-color: var(--hx-color-primary-500, #2563eb);
-    --hx-icon-button-border-color: var(--hx-color-primary-500, #2563eb);
+    --hx-icon-button-color: var(--hx-color-primary-500);
+    --hx-icon-button-border-color: var(--hx-color-primary-500);
   }
 
   .button--secondary:hover {
-    --hx-icon-button-bg: var(--hx-color-primary-50, #eff6ff);
+    --hx-icon-button-bg: var(--hx-color-primary-50);
   }
 
   .button--tertiary {
     --hx-icon-button-bg: transparent;
-    --hx-icon-button-color: var(--hx-color-neutral-700, #374151);
-    --hx-icon-button-border-color: var(--hx-color-neutral-300, #d1d5db);
+    --hx-icon-button-color: var(--hx-color-neutral-700);
+    --hx-icon-button-border-color: var(--hx-color-neutral-300);
   }
 
   .button--tertiary:hover {
-    --hx-icon-button-bg: var(--hx-color-neutral-100, #f1f5f9);
+    --hx-icon-button-bg: var(--hx-color-neutral-100);
   }
 
   .button--danger {
-    --hx-icon-button-bg: var(--hx-color-danger-500, #dc2626);
-    --hx-icon-button-color: var(--hx-color-neutral-0, #ffffff);
+    --hx-icon-button-bg: var(--hx-color-danger-500);
+    --hx-icon-button-color: var(--hx-color-neutral-0);
     --hx-icon-button-border-color: transparent;
   }
 
   .button--danger:hover {
-    --hx-icon-button-bg: var(--hx-color-danger-600, #b91c1c);
+    --hx-icon-button-bg: var(--hx-color-danger-600);
   }
 
   .button--ghost {
     --hx-icon-button-bg: transparent;
-    --hx-icon-button-color: var(--hx-color-primary-500, #2563eb);
+    --hx-icon-button-color: var(--hx-color-primary-500);
     --hx-icon-button-border-color: transparent;
   }
 
   .button--ghost:hover {
-    --hx-icon-button-bg: var(--hx-color-neutral-100, #f1f5f9);
+    --hx-icon-button-bg: var(--hx-color-neutral-100);
   }
 
   /* ─── Icon Container ─── */
@@ -131,7 +131,7 @@ export const helixIconButtonStyles = css`
 
   .button[disabled] {
     cursor: not-allowed;
-    opacity: var(--hx-opacity-disabled, 0.5);
+    opacity: var(--hx-opacity-disabled);
   }
 
   /* ─── Reduced Motion ─── */

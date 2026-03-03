@@ -139,11 +139,13 @@ export class HelixIconButton extends LitElement {
       }),
     );
 
-    // Handle form submission/reset if form-associated
-    if (this.type === 'submit' && this._internals.form) {
-      this._internals.form.requestSubmit();
-    } else if (this.type === 'reset' && this._internals.form) {
-      this._internals.form.reset();
+    // Handle form submission/reset if form-associated and not in href/link mode
+    if (!this.href) {
+      if (this.type === 'submit' && this._internals.form) {
+        this._internals.form.requestSubmit();
+      } else if (this.type === 'reset' && this._internals.form) {
+        this._internals.form.reset();
+      }
     }
   }
 
@@ -164,6 +166,10 @@ export class HelixIconButton extends LitElement {
   // ─── Render ───
 
   override render() {
+    if (!this.label) {
+      return nothing;
+    }
+
     if (this.href !== undefined) {
       return html`
         <a

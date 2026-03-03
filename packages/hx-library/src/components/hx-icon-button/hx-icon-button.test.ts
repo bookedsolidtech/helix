@@ -11,42 +11,33 @@ describe('hx-icon-button', () => {
 
   describe('Rendering', () => {
     it('renders with shadow DOM', async () => {
-      const el = await fixture<HelixIconButton>(
-        '<hx-icon-button label="Close"></hx-icon-button>',
-      );
+      const el = await fixture<HelixIconButton>('<hx-icon-button label="Close"></hx-icon-button>');
       expect(el.shadowRoot).toBeTruthy();
     });
 
     it('renders native <button> element by default', async () => {
-      const el = await fixture<HelixIconButton>(
-        '<hx-icon-button label="Close"></hx-icon-button>',
-      );
+      const el = await fixture<HelixIconButton>('<hx-icon-button label="Close"></hx-icon-button>');
       const btn = shadowQuery(el, 'button');
       expect(btn).toBeInstanceOf(HTMLButtonElement);
     });
 
     it('exposes "button" CSS part', async () => {
-      const el = await fixture<HelixIconButton>(
-        '<hx-icon-button label="Close"></hx-icon-button>',
-      );
+      const el = await fixture<HelixIconButton>('<hx-icon-button label="Close"></hx-icon-button>');
       const part = shadowQuery(el, '[part="button"]');
       expect(part).toBeTruthy();
     });
 
     it('exposes "icon" CSS part', async () => {
-      const el = await fixture<HelixIconButton>(
-        '<hx-icon-button label="Close"></hx-icon-button>',
-      );
+      const el = await fixture<HelixIconButton>('<hx-icon-button label="Close"></hx-icon-button>');
       const part = shadowQuery(el, '[part="icon"]');
       expect(part).toBeTruthy();
     });
 
     it('applies default variant=ghost class', async () => {
-      const el = await fixture<HelixIconButton>(
-        '<hx-icon-button label="Close"></hx-icon-button>',
-      );
-      const btn = shadowQuery(el, 'button')!;
-      expect(btn.classList.contains('button--ghost')).toBe(true);
+      const el = await fixture<HelixIconButton>('<hx-icon-button label="Close"></hx-icon-button>');
+      const btn = shadowQuery(el, 'button');
+      expect(btn).toBeTruthy();
+      expect(btn?.classList.contains('button--ghost')).toBe(true);
     });
   });
 
@@ -57,25 +48,25 @@ describe('hx-icon-button', () => {
       const el = await fixture<HelixIconButton>(
         '<hx-icon-button label="Delete record"></hx-icon-button>',
       );
-      const btn = shadowQuery(el, 'button')!;
-      expect(btn.getAttribute('aria-label')).toBe('Delete record');
+      const btn = shadowQuery(el, 'button');
+      expect(btn).toBeTruthy();
+      expect(btn?.getAttribute('aria-label')).toBe('Delete record');
     });
 
     it('sets title attribute on native button from label property', async () => {
       const el = await fixture<HelixIconButton>(
         '<hx-icon-button label="Edit patient"></hx-icon-button>',
       );
-      const btn = shadowQuery(el, 'button')!;
-      expect(btn.getAttribute('title')).toBe('Edit patient');
+      const btn = shadowQuery(el, 'button');
+      expect(btn).toBeTruthy();
+      expect(btn?.getAttribute('title')).toBe('Edit patient');
     });
 
     it('warns via console.warn when label is empty', async () => {
       const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
       const el = await fixture<HelixIconButton>('<hx-icon-button></hx-icon-button>');
       await el.updateComplete;
-      expect(warnSpy).toHaveBeenCalledWith(
-        expect.stringContaining('[hx-icon-button]'),
-      );
+      expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining('[hx-icon-button]'));
       warnSpy.mockRestore();
     });
   });
@@ -94,40 +85,45 @@ describe('hx-icon-button', () => {
       const el = await fixture<HelixIconButton>(
         '<hx-icon-button label="Action" variant="primary"></hx-icon-button>',
       );
-      const btn = shadowQuery(el, 'button')!;
-      expect(btn.classList.contains('button--primary')).toBe(true);
+      const btn = shadowQuery(el, 'button');
+      expect(btn).toBeTruthy();
+      expect(btn?.classList.contains('button--primary')).toBe(true);
     });
 
     it('applies secondary class', async () => {
       const el = await fixture<HelixIconButton>(
         '<hx-icon-button label="Action" variant="secondary"></hx-icon-button>',
       );
-      const btn = shadowQuery(el, 'button')!;
-      expect(btn.classList.contains('button--secondary')).toBe(true);
+      const btn = shadowQuery(el, 'button');
+      expect(btn).toBeTruthy();
+      expect(btn?.classList.contains('button--secondary')).toBe(true);
     });
 
     it('applies tertiary class', async () => {
       const el = await fixture<HelixIconButton>(
         '<hx-icon-button label="Action" variant="tertiary"></hx-icon-button>',
       );
-      const btn = shadowQuery(el, 'button')!;
-      expect(btn.classList.contains('button--tertiary')).toBe(true);
+      const btn = shadowQuery(el, 'button');
+      expect(btn).toBeTruthy();
+      expect(btn?.classList.contains('button--tertiary')).toBe(true);
     });
 
     it('applies danger class', async () => {
       const el = await fixture<HelixIconButton>(
         '<hx-icon-button label="Delete" variant="danger"></hx-icon-button>',
       );
-      const btn = shadowQuery(el, 'button')!;
-      expect(btn.classList.contains('button--danger')).toBe(true);
+      const btn = shadowQuery(el, 'button');
+      expect(btn).toBeTruthy();
+      expect(btn?.classList.contains('button--danger')).toBe(true);
     });
 
     it('applies ghost class (default)', async () => {
       const el = await fixture<HelixIconButton>(
         '<hx-icon-button label="Close" variant="ghost"></hx-icon-button>',
       );
-      const btn = shadowQuery(el, 'button')!;
-      expect(btn.classList.contains('button--ghost')).toBe(true);
+      const btn = shadowQuery(el, 'button');
+      expect(btn).toBeTruthy();
+      expect(btn?.classList.contains('button--ghost')).toBe(true);
     });
   });
 
@@ -138,24 +134,25 @@ describe('hx-icon-button', () => {
       const el = await fixture<HelixIconButton>(
         '<hx-icon-button label="Close" hx-size="sm"></hx-icon-button>',
       );
-      const btn = shadowQuery(el, 'button')!;
-      expect(btn.classList.contains('button--sm')).toBe(true);
+      const btn = shadowQuery(el, 'button');
+      expect(btn).toBeTruthy();
+      expect(btn?.classList.contains('button--sm')).toBe(true);
     });
 
     it('applies md class (default)', async () => {
-      const el = await fixture<HelixIconButton>(
-        '<hx-icon-button label="Close"></hx-icon-button>',
-      );
-      const btn = shadowQuery(el, 'button')!;
-      expect(btn.classList.contains('button--md')).toBe(true);
+      const el = await fixture<HelixIconButton>('<hx-icon-button label="Close"></hx-icon-button>');
+      const btn = shadowQuery(el, 'button');
+      expect(btn).toBeTruthy();
+      expect(btn?.classList.contains('button--md')).toBe(true);
     });
 
     it('applies lg class', async () => {
       const el = await fixture<HelixIconButton>(
         '<hx-icon-button label="Close" hx-size="lg"></hx-icon-button>',
       );
-      const btn = shadowQuery(el, 'button')!;
-      expect(btn.classList.contains('button--lg')).toBe(true);
+      const btn = shadowQuery(el, 'button');
+      expect(btn).toBeTruthy();
+      expect(btn?.classList.contains('button--lg')).toBe(true);
     });
   });
 
@@ -166,24 +163,25 @@ describe('hx-icon-button', () => {
       const el = await fixture<HelixIconButton>(
         '<hx-icon-button label="Close" disabled></hx-icon-button>',
       );
-      const btn = shadowQuery<HTMLButtonElement>(el, 'button')!;
-      expect(btn.disabled).toBe(true);
+      const btn = shadowQuery<HTMLButtonElement>(el, 'button');
+      expect(btn).toBeTruthy();
+      expect(btn?.disabled).toBe(true);
     });
 
     it('sets aria-disabled="true"', async () => {
       const el = await fixture<HelixIconButton>(
         '<hx-icon-button label="Close" disabled></hx-icon-button>',
       );
-      const btn = shadowQuery(el, 'button')!;
-      expect(btn.getAttribute('aria-disabled')).toBe('true');
+      const btn = shadowQuery(el, 'button');
+      expect(btn).toBeTruthy();
+      expect(btn?.getAttribute('aria-disabled')).toBe('true');
     });
 
     it('does not set aria-disabled when enabled', async () => {
-      const el = await fixture<HelixIconButton>(
-        '<hx-icon-button label="Close"></hx-icon-button>',
-      );
-      const btn = shadowQuery(el, 'button')!;
-      expect(btn.hasAttribute('aria-disabled')).toBe(false);
+      const el = await fixture<HelixIconButton>('<hx-icon-button label="Close"></hx-icon-button>');
+      const btn = shadowQuery(el, 'button');
+      expect(btn).toBeTruthy();
+      expect(btn?.hasAttribute('aria-disabled')).toBe(false);
     });
 
     it('host has disabled attribute reflected', async () => {
@@ -198,27 +196,28 @@ describe('hx-icon-button', () => {
 
   describe('Property: type', () => {
     it('defaults to type="button"', async () => {
-      const el = await fixture<HelixIconButton>(
-        '<hx-icon-button label="Close"></hx-icon-button>',
-      );
-      const btn = shadowQuery<HTMLButtonElement>(el, 'button')!;
-      expect(btn.getAttribute('type')).toBe('button');
+      const el = await fixture<HelixIconButton>('<hx-icon-button label="Close"></hx-icon-button>');
+      const btn = shadowQuery<HTMLButtonElement>(el, 'button');
+      expect(btn).toBeTruthy();
+      expect(btn?.getAttribute('type')).toBe('button');
     });
 
     it('sets type="submit" on native button', async () => {
       const el = await fixture<HelixIconButton>(
         '<hx-icon-button label="Submit" type="submit"></hx-icon-button>',
       );
-      const btn = shadowQuery<HTMLButtonElement>(el, 'button')!;
-      expect(btn.getAttribute('type')).toBe('submit');
+      const btn = shadowQuery<HTMLButtonElement>(el, 'button');
+      expect(btn).toBeTruthy();
+      expect(btn?.getAttribute('type')).toBe('submit');
     });
 
     it('sets type="reset" on native button', async () => {
       const el = await fixture<HelixIconButton>(
         '<hx-icon-button label="Reset" type="reset"></hx-icon-button>',
       );
-      const btn = shadowQuery<HTMLButtonElement>(el, 'button')!;
-      expect(btn.getAttribute('type')).toBe('reset');
+      const btn = shadowQuery<HTMLButtonElement>(el, 'button');
+      expect(btn).toBeTruthy();
+      expect(btn?.getAttribute('type')).toBe('reset');
     });
   });
 
@@ -234,9 +233,7 @@ describe('hx-icon-button', () => {
     });
 
     it('renders <button> element when href is not set', async () => {
-      const el = await fixture<HelixIconButton>(
-        '<hx-icon-button label="Close"></hx-icon-button>',
-      );
+      const el = await fixture<HelixIconButton>('<hx-icon-button label="Close"></hx-icon-button>');
       const btn = shadowQuery(el, 'button');
       expect(btn).toBeInstanceOf(HTMLButtonElement);
       expect(shadowQuery(el, 'a')).toBeNull();
@@ -247,35 +244,32 @@ describe('hx-icon-button', () => {
 
   describe('Events', () => {
     it('dispatches hx-click on click', async () => {
-      const el = await fixture<HelixIconButton>(
-        '<hx-icon-button label="Close"></hx-icon-button>',
-      );
-      const btn = shadowQuery<HTMLButtonElement>(el, 'button')!;
+      const el = await fixture<HelixIconButton>('<hx-icon-button label="Close"></hx-icon-button>');
+      const btn = shadowQuery<HTMLButtonElement>(el, 'button');
+      expect(btn).toBeTruthy();
       const eventPromise = oneEvent(el, 'hx-click');
-      btn.click();
+      btn?.click();
       const event = await eventPromise;
       expect(event).toBeTruthy();
     });
 
     it('hx-click bubbles and is composed', async () => {
-      const el = await fixture<HelixIconButton>(
-        '<hx-icon-button label="Close"></hx-icon-button>',
-      );
-      const btn = shadowQuery<HTMLButtonElement>(el, 'button')!;
+      const el = await fixture<HelixIconButton>('<hx-icon-button label="Close"></hx-icon-button>');
+      const btn = shadowQuery<HTMLButtonElement>(el, 'button');
+      expect(btn).toBeTruthy();
       const eventPromise = oneEvent<CustomEvent>(el, 'hx-click');
-      btn.click();
+      btn?.click();
       const event = await eventPromise;
       expect(event.bubbles).toBe(true);
       expect(event.composed).toBe(true);
     });
 
     it('hx-click detail contains originalEvent', async () => {
-      const el = await fixture<HelixIconButton>(
-        '<hx-icon-button label="Close"></hx-icon-button>',
-      );
-      const btn = shadowQuery<HTMLButtonElement>(el, 'button')!;
+      const el = await fixture<HelixIconButton>('<hx-icon-button label="Close"></hx-icon-button>');
+      const btn = shadowQuery<HTMLButtonElement>(el, 'button');
+      expect(btn).toBeTruthy();
       const eventPromise = oneEvent<CustomEvent<{ originalEvent: MouseEvent }>>(el, 'hx-click');
-      btn.click();
+      btn?.click();
       const event = await eventPromise;
       expect(event.detail.originalEvent).toBeInstanceOf(MouseEvent);
     });
@@ -284,12 +278,13 @@ describe('hx-icon-button', () => {
       const el = await fixture<HelixIconButton>(
         '<hx-icon-button label="Close" disabled></hx-icon-button>',
       );
-      const btn = shadowQuery<HTMLButtonElement>(el, 'button')!;
+      const btn = shadowQuery<HTMLButtonElement>(el, 'button');
+      expect(btn).toBeTruthy();
       let fired = false;
       el.addEventListener('hx-click', () => {
         fired = true;
       });
-      btn.click();
+      btn?.click();
       // Give time for any async dispatch
       await new Promise((r) => setTimeout(r, 50));
       expect(fired).toBe(false);
@@ -300,25 +295,21 @@ describe('hx-icon-button', () => {
 
   describe('Keyboard', () => {
     it('Enter activates native button', async () => {
-      const el = await fixture<HelixIconButton>(
-        '<hx-icon-button label="Close"></hx-icon-button>',
-      );
-      const btn = shadowQuery<HTMLButtonElement>(el, 'button')!;
+      const el = await fixture<HelixIconButton>('<hx-icon-button label="Close"></hx-icon-button>');
+      const btn = shadowQuery<HTMLButtonElement>(el, 'button');
+      expect(btn).toBeTruthy();
       const eventPromise = oneEvent<CustomEvent>(el, 'hx-click');
-      btn.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
-      btn.click();
+      btn?.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
       const event = await eventPromise;
       expect(event).toBeTruthy();
     });
 
     it('Space activates native button', async () => {
-      const el = await fixture<HelixIconButton>(
-        '<hx-icon-button label="Close"></hx-icon-button>',
-      );
-      const btn = shadowQuery<HTMLButtonElement>(el, 'button')!;
+      const el = await fixture<HelixIconButton>('<hx-icon-button label="Close"></hx-icon-button>');
+      const btn = shadowQuery<HTMLButtonElement>(el, 'button');
+      expect(btn).toBeTruthy();
       const eventPromise = oneEvent<CustomEvent>(el, 'hx-click');
-      btn.dispatchEvent(new KeyboardEvent('keydown', { key: ' ', bubbles: true }));
-      btn.click();
+      btn?.dispatchEvent(new KeyboardEvent('keydown', { key: ' ', bubbles: true }));
       const event = await eventPromise;
       expect(event).toBeTruthy();
     });
@@ -347,9 +338,7 @@ describe('hx-icon-button', () => {
     });
 
     it('has ElementInternals attached (form getter returns null outside form)', async () => {
-      const el = await fixture<HelixIconButton>(
-        '<hx-icon-button label="Close"></hx-icon-button>',
-      );
+      const el = await fixture<HelixIconButton>('<hx-icon-button label="Close"></hx-icon-button>');
       // ElementInternals is attached in constructor; form is null when not inside a <form>
       expect(el.form).toBe(null);
     });
@@ -357,7 +346,9 @@ describe('hx-icon-button', () => {
     it('calls form.requestSubmit on type=submit click', async () => {
       const form = document.createElement('form');
       form.innerHTML = '<hx-icon-button label="Submit" type="submit"></hx-icon-button>';
-      document.getElementById('test-fixture-container')!.appendChild(form);
+      const container = document.getElementById('test-fixture-container');
+      expect(container).toBeTruthy();
+      container?.appendChild(form);
       const el = form.querySelector('hx-icon-button') as HelixIconButton;
       await el.updateComplete;
 
@@ -367,10 +358,59 @@ describe('hx-icon-button', () => {
         submitted = true;
       });
 
-      const btn = shadowQuery<HTMLButtonElement>(el, 'button')!;
-      btn.click();
+      const btn = shadowQuery<HTMLButtonElement>(el, 'button');
+      expect(btn).toBeTruthy();
+      btn?.click();
       await new Promise((r) => setTimeout(r, 50));
       expect(submitted).toBe(true);
+    });
+
+    it('submits name/value pair with form data', async () => {
+      const form = document.createElement('form');
+      form.innerHTML =
+        '<hx-icon-button label="Submit" type="submit" name="action" value="save"></hx-icon-button>';
+      const container = document.getElementById('test-fixture-container');
+      expect(container).toBeTruthy();
+      container?.appendChild(form);
+      const el = form.querySelector('hx-icon-button') as HelixIconButton;
+      await el.updateComplete;
+
+      let formData: FormData | undefined;
+      form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        formData = new FormData(form);
+      });
+
+      const btn = shadowQuery<HTMLButtonElement>(el, 'button');
+      expect(btn).toBeTruthy();
+      btn?.click();
+      await new Promise((r) => setTimeout(r, 50));
+      expect(formData?.get('action')).toBe('save');
+    });
+
+    it('type=reset triggers form reset', async () => {
+      const form = document.createElement('form');
+      form.innerHTML = `
+        <input type="text" name="username" value="original">
+        <hx-icon-button label="Reset" type="reset"></hx-icon-button>
+      `;
+      const container = document.getElementById('test-fixture-container');
+      expect(container).toBeTruthy();
+      container?.appendChild(form);
+      const el = form.querySelector('hx-icon-button') as HelixIconButton;
+      const input = form.querySelector('input') as HTMLInputElement;
+      await el.updateComplete;
+
+      // Change input value
+      input.value = 'changed';
+      expect(input.value).toBe('changed');
+
+      // Click reset button
+      const btn = shadowQuery<HTMLButtonElement>(el, 'button');
+      expect(btn).toBeTruthy();
+      btn?.click();
+      await new Promise((r) => setTimeout(r, 50));
+      expect(input.value).toBe('original');
     });
   });
 
