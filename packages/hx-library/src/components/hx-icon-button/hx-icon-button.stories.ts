@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/web-components';
 import { html } from 'lit';
+import { ifDefined } from 'lit/directives/if-defined.js';
 import { expect, within, userEvent, fn } from 'storybook/test';
 import './hx-icon-button.js';
 
@@ -196,6 +197,9 @@ const meta = {
       hx-size=${args.size}
       ?disabled=${args.disabled}
       type=${args.type}
+      href=${ifDefined(args.href)}
+      name=${ifDefined(args.name)}
+      value=${ifDefined(args.value)}
     >
       <svg
         xmlns="http://www.w3.org/2000/svg"
@@ -233,19 +237,22 @@ export const Default: Story = {
     const hxIconButton = canvasElement.querySelector('hx-icon-button');
     await expect(hxIconButton).toBeTruthy();
 
-    const innerButton = hxIconButton!.shadowRoot!.querySelector('button');
+    const innerButton = hxIconButton?.shadowRoot?.querySelector('button');
+    if (!innerButton) {
+      throw new Error('Inner button not found');
+    }
     await expect(innerButton).toBeTruthy();
 
     let eventFired = false;
     const handler = () => {
       eventFired = true;
     };
-    hxIconButton!.addEventListener('hx-click', handler);
+    hxIconButton?.addEventListener('hx-click', handler);
 
-    await userEvent.click(innerButton!);
+    await userEvent.click(innerButton);
     await expect(eventFired).toBe(true);
 
-    hxIconButton!.removeEventListener('hx-click', handler);
+    hxIconButton?.removeEventListener('hx-click', handler);
   },
 };
 
@@ -381,21 +388,24 @@ export const Disabled: Story = {
     const hxIconButton = canvasElement.querySelector('hx-icon-button');
     await expect(hxIconButton).toBeTruthy();
 
-    const innerButton = hxIconButton!.shadowRoot!.querySelector('button');
+    const innerButton = hxIconButton?.shadowRoot?.querySelector('button');
+    if (!innerButton) {
+      throw new Error('Inner button not found');
+    }
     await expect(innerButton).toBeTruthy();
-    await expect(innerButton!.disabled).toBe(true);
+    await expect(innerButton.disabled).toBe(true);
 
     let eventFired = false;
     const handler = () => {
       eventFired = true;
     };
-    hxIconButton!.addEventListener('hx-click', handler);
+    hxIconButton?.addEventListener('hx-click', handler);
 
     // Native click on a disabled button must not propagate hx-click
-    innerButton!.click();
+    innerButton.click();
     await expect(eventFired).toBe(false);
 
-    hxIconButton!.removeEventListener('hx-click', handler);
+    hxIconButton?.removeEventListener('hx-click', handler);
   },
 };
 
@@ -457,15 +467,21 @@ export const AllSizes: Story = {
   render: () => html`
     <div style="display: flex; gap: 1.5rem; align-items: center;">
       <div style="display: flex; flex-direction: column; align-items: center; gap: 0.5rem;">
-        <hx-icon-button label="Small close" variant="ghost" hx-size="sm">${iconClose}</hx-icon-button>
+        <hx-icon-button label="Small close" variant="ghost" hx-size="sm"
+          >${iconClose}</hx-icon-button
+        >
         <span style="font-size: 0.75rem; color: #6b7280;">sm</span>
       </div>
       <div style="display: flex; flex-direction: column; align-items: center; gap: 0.5rem;">
-        <hx-icon-button label="Medium close" variant="ghost" hx-size="md">${iconClose}</hx-icon-button>
+        <hx-icon-button label="Medium close" variant="ghost" hx-size="md"
+          >${iconClose}</hx-icon-button
+        >
         <span style="font-size: 0.75rem; color: #6b7280;">md</span>
       </div>
       <div style="display: flex; flex-direction: column; align-items: center; gap: 0.5rem;">
-        <hx-icon-button label="Large close" variant="ghost" hx-size="lg">${iconClose}</hx-icon-button>
+        <hx-icon-button label="Large close" variant="ghost" hx-size="lg"
+          >${iconClose}</hx-icon-button
+        >
         <span style="font-size: 0.75rem; color: #6b7280;">lg</span>
       </div>
     </div>
@@ -696,7 +712,12 @@ export const TableRowActions: Story = {
                   />
                 </svg>
               </hx-icon-button>
-              <hx-icon-button label="Delete John Smith record" variant="danger" hx-size="sm" disabled>
+              <hx-icon-button
+                label="Delete John Smith record"
+                variant="danger"
+                hx-size="sm"
+                disabled
+              >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   width="14"
@@ -801,21 +822,27 @@ export const ClickEvent: Story = {
     await expect(hxIconButton).toBeTruthy();
 
     const eventSpy = fn();
-    hxIconButton!.addEventListener('hx-click', eventSpy);
+    hxIconButton?.addEventListener('hx-click', eventSpy);
 
-    const innerButton = hxIconButton!.shadowRoot!.querySelector('button');
+    const innerButton = hxIconButton?.shadowRoot?.querySelector('button');
+    if (!innerButton) {
+      throw new Error('Inner button not found');
+    }
     await expect(innerButton).toBeTruthy();
-    await userEvent.click(innerButton!);
+    await userEvent.click(innerButton);
 
     await expect(eventSpy).toHaveBeenCalledTimes(1);
 
-    const callArg = eventSpy.mock.calls[0][0] as CustomEvent;
+    const callArg = eventSpy.mock.calls[0]?.[0] as CustomEvent | undefined;
+    if (!callArg) {
+      throw new Error('Event not fired');
+    }
     await expect(callArg.type).toBe('hx-click');
     await expect(callArg.detail.originalEvent).toBeTruthy();
     await expect(callArg.bubbles).toBe(true);
     await expect(callArg.composed).toBe(true);
 
-    hxIconButton!.removeEventListener('hx-click', eventSpy);
+    hxIconButton?.removeEventListener('hx-click', eventSpy);
   },
 };
 
@@ -827,27 +854,30 @@ export const KeyboardActivation: Story = {
     const hxIconButton = canvasElement.querySelector('hx-icon-button');
     await expect(hxIconButton).toBeTruthy();
 
-    const innerButton = hxIconButton!.shadowRoot!.querySelector('button');
+    const innerButton = hxIconButton?.shadowRoot?.querySelector('button');
+    if (!innerButton) {
+      throw new Error('Inner button not found');
+    }
     await expect(innerButton).toBeTruthy();
 
     // Tab to move focus onto the button
     await userEvent.tab();
 
-    const activeEl = hxIconButton!.shadowRoot!.activeElement;
+    const activeEl = hxIconButton?.shadowRoot?.activeElement;
     await expect(activeEl).toBe(innerButton);
 
     // Enter key must fire hx-click
     const enterSpy = fn();
-    hxIconButton!.addEventListener('hx-click', enterSpy);
+    hxIconButton?.addEventListener('hx-click', enterSpy);
     await userEvent.keyboard('{Enter}');
     await expect(enterSpy).toHaveBeenCalledTimes(1);
-    hxIconButton!.removeEventListener('hx-click', enterSpy);
+    hxIconButton?.removeEventListener('hx-click', enterSpy);
 
     // Space key must also fire hx-click
     const spaceSpy = fn();
-    hxIconButton!.addEventListener('hx-click', spaceSpy);
+    hxIconButton?.addEventListener('hx-click', spaceSpy);
     await userEvent.keyboard(' ');
     await expect(spaceSpy).toHaveBeenCalledTimes(1);
-    hxIconButton!.removeEventListener('hx-click', spaceSpy);
+    hxIconButton?.removeEventListener('hx-click', spaceSpy);
   },
 };
