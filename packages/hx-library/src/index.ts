@@ -15,6 +15,7 @@ export { HelixButtonGroup } from './components/hx-button-group/index.js';
 export { HelixCard } from './components/hx-card/index.js';
 export { HelixCheckbox } from './components/hx-checkbox/index.js';
 export { HelixContainer } from './components/hx-container/index.js';
+export { HelixField } from './components/hx-field/index.js';
 export { HelixForm } from './components/hx-form/index.js';
 export { HelixIconButton } from './components/hx-icon-button/index.js';
 export { HelixProse } from './components/hx-prose/index.js';

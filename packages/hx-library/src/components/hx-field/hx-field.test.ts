@@ -1,0 +1,370 @@
+import { describe, it, expect, afterEach } from 'vitest';
+import { fixture, shadowQuery, cleanup, checkA11y } from '../../test-utils.js';
+import type { HelixField } from './hx-field.js';
+import './index.js';
+
+afterEach(cleanup);
+
+describe('hx-field', () => {
+  // ─── Rendering (5) ───
+
+  describe('Rendering', () => {
+    it('renders with shadow DOM', async () => {
+      const el = await fixture<HelixField>('<hx-field></hx-field>');
+      expect(el.shadowRoot).toBeTruthy();
+    });
+
+    it('renders the field container with part="field"', async () => {
+      const el = await fixture<HelixField>('<hx-field></hx-field>');
+      const field = shadowQuery(el, '[part="field"]');
+      expect(field).toBeTruthy();
+    });
+
+    it('renders default slot content (slotted input)', async () => {
+      const el = await fixture<HelixField>(
+        '<hx-field><input type="text" /></hx-field>',
+      );
+      const slottedInput = el.querySelector('input');
+      expect(slottedInput).toBeTruthy();
+    });
+
+    it('does not render a label element when label is empty', async () => {
+      const el = await fixture<HelixField>('<hx-field></hx-field>');
+      const label = shadowQuery(el, 'label');
+      expect(label).toBeNull();
+    });
+
+    it('renders a label element when label property is set', async () => {
+      const el = await fixture<HelixField>('<hx-field label="Full Name"></hx-field>');
+      const label = shadowQuery(el, 'label');
+      expect(label).toBeTruthy();
+    });
+  });
+
+  // ─── Property: label (3) ───
+
+  describe('Property: label', () => {
+    it('renders label text when label property is set', async () => {
+      const el = await fixture<HelixField>('<hx-field label="Email Address"></hx-field>');
+      const label = shadowQuery(el, 'label');
+      expect(label?.textContent?.trim()).toContain('Email Address');
+    });
+
+    it('does not render label element when label is empty string', async () => {
+      const el = await fixture<HelixField>('<hx-field label=""></hx-field>');
+      const label = shadowQuery(el, 'label');
+      expect(label).toBeNull();
+    });
+
+    it('label element has part="label" attribute', async () => {
+      const el = await fixture<HelixField>('<hx-field label="Username"></hx-field>');
+      const label = shadowQuery(el, '[part="label"]');
+      expect(label).toBeTruthy();
+    });
+  });
+
+  // ─── Property: required (6) ───
+
+  describe('Property: required', () => {
+    it('defaults to false', async () => {
+      const el = await fixture<HelixField>('<hx-field></hx-field>');
+      expect(el.required).toBe(false);
+    });
+
+    it('reflects required attribute to host', async () => {
+      const el = await fixture<HelixField>('<hx-field required></hx-field>');
+      expect(el.hasAttribute('required')).toBe(true);
+    });
+
+    it('shows required marker when required=true and label is set', async () => {
+      const el = await fixture<HelixField>('<hx-field label="Name" required></hx-field>');
+      const marker = shadowQuery(el, '.field__required-marker');
+      expect(marker).toBeTruthy();
+      expect(marker?.textContent?.trim()).toBe('*');
+    });
+
+    it('required marker has aria-hidden="true"', async () => {
+      const el = await fixture<HelixField>('<hx-field label="Name" required></hx-field>');
+      const marker = shadowQuery(el, '.field__required-marker');
+      expect(marker?.getAttribute('aria-hidden')).toBe('true');
+    });
+
+    it('required marker has part="required-indicator"', async () => {
+      const el = await fixture<HelixField>('<hx-field label="Name" required></hx-field>');
+      const marker = shadowQuery(el, '[part="required-indicator"]');
+      expect(marker).toBeTruthy();
+    });
+
+    it('does not show required marker when required=false', async () => {
+      const el = await fixture<HelixField>('<hx-field label="Name"></hx-field>');
+      const marker = shadowQuery(el, '.field__required-marker');
+      expect(marker).toBeNull();
+    });
+  });
+
+  // ─── Property: error (5) ───
+
+  describe('Property: error', () => {
+    it('defaults to empty string', async () => {
+      const el = await fixture<HelixField>('<hx-field></hx-field>');
+      expect(el.error).toBe('');
+    });
+
+    it('renders error message container when error is set', async () => {
+      const el = await fixture<HelixField>('<hx-field error="This field is required"></hx-field>');
+      const errorDiv = shadowQuery(el, '[part="error-message"]');
+      expect(errorDiv).toBeTruthy();
+      expect(errorDiv?.textContent?.trim()).toBe('This field is required');
+    });
+
+    it('error container has role="alert" and aria-live="polite"', async () => {
+      const el = await fixture<HelixField>('<hx-field error="Invalid input"></hx-field>');
+      const errorDiv = shadowQuery(el, '[role="alert"]');
+      expect(errorDiv).toBeTruthy();
+      expect(errorDiv?.getAttribute('aria-live')).toBe('polite');
+    });
+
+    it('field container gets field--error class when error is set', async () => {
+      const el = await fixture<HelixField>('<hx-field error="Something went wrong"></hx-field>');
+      const field = shadowQuery(el, '[part="field"]');
+      expect(field?.classList.contains('field--error')).toBe(true);
+    });
+
+    it('hides error message when error is cleared', async () => {
+      const el = await fixture<HelixField>('<hx-field error="Required"></hx-field>');
+      el.error = '';
+      await el.updateComplete;
+      const errorDiv = shadowQuery(el, '[part="error-message"]');
+      expect(errorDiv).toBeNull();
+    });
+  });
+
+  // ─── Property: helpText (4) ───
+
+  describe('Property: helpText', () => {
+    it('defaults to empty string', async () => {
+      const el = await fixture<HelixField>('<hx-field></hx-field>');
+      expect(el.helpText).toBe('');
+    });
+
+    it('renders help text container with part="help-text" when helpText is set', async () => {
+      const el = await fixture<HelixField>(
+        '<hx-field help-text="Enter a valid email address"></hx-field>',
+      );
+      const helpDiv = shadowQuery(el, '[part="help-text"]');
+      expect(helpDiv).toBeTruthy();
+      expect(helpDiv?.textContent?.trim()).toContain('Enter a valid email address');
+    });
+
+    it('help text container is NOT rendered when error is showing', async () => {
+      const el = await fixture<HelixField>(
+        '<hx-field help-text="Some guidance" error="Invalid value"></hx-field>',
+      );
+      const helpDiv = shadowQuery(el, '[part="help-text"]');
+      expect(helpDiv).toBeNull();
+    });
+
+    it('help text is NOT rendered when both helpText and error are empty', async () => {
+      const el = await fixture<HelixField>('<hx-field></hx-field>');
+      const helpDiv = shadowQuery(el, '[part="help-text"]');
+      expect(helpDiv).toBeNull();
+    });
+  });
+
+  // ─── Property: disabled (3) ───
+
+  describe('Property: disabled', () => {
+    it('defaults to false', async () => {
+      const el = await fixture<HelixField>('<hx-field></hx-field>');
+      expect(el.disabled).toBe(false);
+    });
+
+    it('reflects disabled attribute to host', async () => {
+      const el = await fixture<HelixField>('<hx-field disabled></hx-field>');
+      expect(el.hasAttribute('disabled')).toBe(true);
+    });
+
+    it('field container gets field--disabled class when disabled', async () => {
+      const el = await fixture<HelixField>('<hx-field disabled></hx-field>');
+      const field = shadowQuery(el, '[part="field"]');
+      expect(field?.classList.contains('field--disabled')).toBe(true);
+    });
+  });
+
+  // ─── Property: hxSize (4) ───
+
+  describe('Property: hxSize', () => {
+    it('defaults to "md"', async () => {
+      const el = await fixture<HelixField>('<hx-field></hx-field>');
+      expect(el.hxSize).toBe('md');
+    });
+
+    it('applies field--size-sm class for hx-size="sm"', async () => {
+      const el = await fixture<HelixField>('<hx-field hx-size="sm"></hx-field>');
+      const field = shadowQuery(el, '[part="field"]');
+      expect(field?.classList.contains('field--size-sm')).toBe(true);
+    });
+
+    it('applies field--size-md class for hx-size="md"', async () => {
+      const el = await fixture<HelixField>('<hx-field hx-size="md"></hx-field>');
+      const field = shadowQuery(el, '[part="field"]');
+      expect(field?.classList.contains('field--size-md')).toBe(true);
+    });
+
+    it('applies field--size-lg class for hx-size="lg"', async () => {
+      const el = await fixture<HelixField>('<hx-field hx-size="lg"></hx-field>');
+      const field = shadowQuery(el, '[part="field"]');
+      expect(field?.classList.contains('field--size-lg')).toBe(true);
+    });
+  });
+
+  // ─── Slots (5) ───
+
+  describe('Slots', () => {
+    it('default slot renders slotted form control', async () => {
+      const el = await fixture<HelixField>(
+        '<hx-field><input type="text" value="test" /></hx-field>',
+      );
+      const slottedInput = el.querySelector('input');
+      expect(slottedInput).toBeTruthy();
+      expect((slottedInput as HTMLInputElement).value).toBe('test');
+    });
+
+    it('label slot content overrides the label property', async () => {
+      const el = await fixture<HelixField>(
+        '<hx-field label="Fallback"><span slot="label">Custom Label</span></hx-field>',
+      );
+      await el.updateComplete;
+      const slottedLabel = el.querySelector('[slot="label"]');
+      expect(slottedLabel).toBeTruthy();
+      expect(slottedLabel?.textContent).toBe('Custom Label');
+    });
+
+    it('error slot content triggers field--error class on field container', async () => {
+      const el = await fixture<HelixField>(
+        '<hx-field><span slot="error">Custom error</span></hx-field>',
+      );
+      await el.updateComplete;
+      const field = shadowQuery(el, '[part="field"]');
+      expect(field?.classList.contains('field--error')).toBe(true);
+    });
+
+    it('help slot renders content inside help text container', async () => {
+      const el = await fixture<HelixField>(
+        '<hx-field help-text="fallback"><em slot="help">Custom help</em></hx-field>',
+      );
+      const slottedHelp = el.querySelector('[slot="help"]');
+      expect(slottedHelp).toBeTruthy();
+      expect(slottedHelp?.textContent).toBe('Custom help');
+    });
+
+    it('description slot renders content', async () => {
+      const el = await fixture<HelixField>(
+        '<hx-field><p slot="description">Descriptive text</p></hx-field>',
+      );
+      const slottedDesc = el.querySelector('[slot="description"]');
+      expect(slottedDesc).toBeTruthy();
+      expect(slottedDesc?.textContent).toBe('Descriptive text');
+    });
+  });
+
+  // ─── CSS Parts (6) ───
+
+  describe('CSS Parts', () => {
+    it('field part is present on outer container', async () => {
+      const el = await fixture<HelixField>('<hx-field></hx-field>');
+      const field = shadowQuery(el, '[part="field"]');
+      expect(field).toBeTruthy();
+    });
+
+    it('label part is present on label element when label is set', async () => {
+      const el = await fixture<HelixField>('<hx-field label="Test Label"></hx-field>');
+      const label = shadowQuery(el, '[part="label"]');
+      expect(label).toBeTruthy();
+    });
+
+    it('control part is present on the control wrapper', async () => {
+      const el = await fixture<HelixField>('<hx-field></hx-field>');
+      const control = shadowQuery(el, '[part="control"]');
+      expect(control).toBeTruthy();
+    });
+
+    it('help-text part is present when helpText is set', async () => {
+      const el = await fixture<HelixField>('<hx-field help-text="Guidance text"></hx-field>');
+      const helpText = shadowQuery(el, '[part="help-text"]');
+      expect(helpText).toBeTruthy();
+    });
+
+    it('error-message part is present when error is set', async () => {
+      const el = await fixture<HelixField>('<hx-field error="Error occurred"></hx-field>');
+      const errorMsg = shadowQuery(el, '[part="error-message"]');
+      expect(errorMsg).toBeTruthy();
+    });
+
+    it('required-indicator part is present when required is true and label is set', async () => {
+      const el = await fixture<HelixField>('<hx-field label="Name" required></hx-field>');
+      const indicator = shadowQuery(el, '[part="required-indicator"]');
+      expect(indicator).toBeTruthy();
+    });
+  });
+
+  // ─── Property reactivity (3) ───
+
+  describe('Property reactivity', () => {
+    it('updates label text when label property changes programmatically', async () => {
+      const el = await fixture<HelixField>('<hx-field label="Original"></hx-field>');
+      el.label = 'Updated';
+      await el.updateComplete;
+      const label = shadowQuery(el, 'label');
+      expect(label?.textContent?.trim()).toContain('Updated');
+    });
+
+    it('shows error message after error property is set programmatically', async () => {
+      const el = await fixture<HelixField>('<hx-field></hx-field>');
+      el.error = 'Field is required';
+      await el.updateComplete;
+      const errorDiv = shadowQuery(el, '[part="error-message"]');
+      expect(errorDiv?.textContent?.trim()).toBe('Field is required');
+    });
+
+    it('field--required class is applied when required property is set programmatically', async () => {
+      const el = await fixture<HelixField>('<hx-field></hx-field>');
+      el.required = true;
+      await el.updateComplete;
+      const field = shadowQuery(el, '[part="field"]');
+      expect(field?.classList.contains('field--required')).toBe(true);
+    });
+  });
+
+  // ─── Accessibility (axe-core) (4) ───
+
+  describe('Accessibility (axe-core)', () => {
+    it('has no axe violations in default state', async () => {
+      const el = await fixture<HelixField>('<hx-field></hx-field>');
+      const { violations } = await checkA11y(el);
+      expect(violations).toEqual([]);
+    });
+
+    it('has no axe violations with label', async () => {
+      const el = await fixture<HelixField>('<hx-field label="Patient Name"></hx-field>');
+      const { violations } = await checkA11y(el);
+      expect(violations).toEqual([]);
+    });
+
+    it('has no axe violations in error state', async () => {
+      const el = await fixture<HelixField>(
+        '<hx-field label="Date of Birth" error="Please enter a valid date"></hx-field>',
+      );
+      const { violations } = await checkA11y(el);
+      expect(violations).toEqual([]);
+    });
+
+    it('has no axe violations when required', async () => {
+      const el = await fixture<HelixField>(
+        '<hx-field label="Medical Record Number" required></hx-field>',
+      );
+      const { violations } = await checkA11y(el);
+      expect(violations).toEqual([]);
+    });
+  });
+});
