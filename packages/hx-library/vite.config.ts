@@ -31,6 +31,10 @@ export default defineConfig({
         'components/hx-badge/index': resolve(__dirname, 'src/components/hx-badge/index.ts'),
         'components/hx-switch/index': resolve(__dirname, 'src/components/hx-switch/index.ts'),
         'components/hx-slider/index': resolve(__dirname, 'src/components/hx-slider/index.ts'),
+        'components/hx-toggle-button/index': resolve(
+          __dirname,
+          'src/components/hx-toggle-button/index.ts',
+        ),
         'components/hx-form/index': resolve(__dirname, 'src/components/hx-form/index.ts'),
         'components/hx-prose/index': resolve(__dirname, 'src/components/hx-prose/index.ts'),
       },
