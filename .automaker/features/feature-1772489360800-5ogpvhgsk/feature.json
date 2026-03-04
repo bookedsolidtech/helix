@@ -1,0 +1,30 @@
+{
+  "category": "Uncategorized",
+  "description": "## Goal\nReplace the 3 broken custom MCP servers with the local `wc-tools` MCP server at `/Volumes/Development/booked/wc-tools/`. This single server provides comprehensive web component tooling that replaces `cem-analyzer`, `health-scorer`, and `typescript-diagnostics`.\n\n## wc-tools Server Details\n- **Location**: `/Volumes/Development/booked/wc-tools/`\n- **Package**: `wc-tools` v0.1.0\n- **Entry point**: `./build/index.js` (already built and present)\n- **Binary**: `wc-tools`\n- **Purpose**: \"Gives AI agents full situational awareness of any web component library\"\n\n## Integration Steps\n1. Create `mcpwc.config.json` in the helix project root, pointing at helix's component library:\n   ```json\n   {\n     \"cemPath\": \"./packages/hx-library/custom-elements.json\",\n     \"projectRoot\": \"/Volumes/Development/booked/helix\",\n     \"componentPrefix\": \"hx\",\n     \"tsconfigPath\": \"./tsconfig.base.json\"\n   }\n   ```\n2. Add `wc-mcp` entry to `.mcp.json`:\n   ```json\n   \"wc-mcp\": {\n     \"command\": \"node\",\n     \"args\": [\"/Volumes/Development/booked/wc-tools/build/index.js\"],\n     \"env\": {\n       \"MCP_WC_PROJECT_ROOT\": \"/Volumes/Development/booked/helix\"\n     }\n   }\n   ```\n3. Verify the server starts and provides tools (CEM analysis, health scoring, TypeScript diagnostics)\n4. Validate it reads the helix CEM and component structure correctly\n\n## Acceptance Criteria\n- [ ] `wc-mcp` server entry in `.mcp.json` with correct paths\n- [ ] `mcpwc.config.json` configured for helix project\n- [ ] Claude Code can invoke wc-tools MCP tools (CEM query, health check, etc.)\n- [ ] Server correctly identifies all 13 `hx-*` components\n- [ ] Old custom MCP server entries removed (handled by companion ticket)\n\n## Dependencies\n- Depends on: \"Remove broken custom MCP servers\" ticket (clean slate first)\n- Depends on: wc-tools project being built (currently built at `/Volumes/Development/booked/wc-tools/build/index.js`)",
+  "title": "Integrate local wc-tools MCP server for web component support",
+  "status": "backlog",
+  "complexity": "medium",
+  "priority": 1,
+  "source": "api",
+  "trustTier": 1,
+  "quarantineStatus": "passed",
+  "quarantineId": "f4d63b9a-7616-4e8d-a9c3-e53d7bd90b52",
+  "id": "feature-1772489360800-5ogpvhgsk",
+  "branchName": "feature/integrate-local-wc-tools-mcp-server-for",
+  "descriptionHistory": [
+    {
+      "description": "## Goal\nReplace the 3 broken custom MCP servers with the local `wc-tools` MCP server at `/Volumes/Development/booked/wc-tools/`. This single server provides comprehensive web component tooling that replaces `cem-analyzer`, `health-scorer`, and `typescript-diagnostics`.\n\n## wc-tools Server Details\n- **Location**: `/Volumes/Development/booked/wc-tools/`\n- **Package**: `wc-tools` v0.1.0\n- **Entry point**: `./build/index.js` (already built and present)\n- **Binary**: `wc-tools`\n- **Purpose**: \"Gives AI agents full situational awareness of any web component library\"\n\n## Integration Steps\n1. Create `mcpwc.config.json` in the helix project root, pointing at helix's component library:\n   ```json\n   {\n     \"cemPath\": \"./packages/hx-library/custom-elements.json\",\n     \"projectRoot\": \"/Volumes/Development/booked/helix\",\n     \"componentPrefix\": \"hx\",\n     \"tsconfigPath\": \"./tsconfig.base.json\"\n   }\n   ```\n2. Add `wc-mcp` entry to `.mcp.json`:\n   ```json\n   \"wc-mcp\": {\n     \"command\": \"node\",\n     \"args\": [\"/Volumes/Development/booked/wc-tools/build/index.js\"],\n     \"env\": {\n       \"MCP_WC_PROJECT_ROOT\": \"/Volumes/Development/booked/helix\"\n     }\n   }\n   ```\n3. Verify the server starts and provides tools (CEM analysis, health scoring, TypeScript diagnostics)\n4. Validate it reads the helix CEM and component structure correctly\n\n## Acceptance Criteria\n- [ ] `wc-mcp` server entry in `.mcp.json` with correct paths\n- [ ] `mcpwc.config.json` configured for helix project\n- [ ] Claude Code can invoke wc-tools MCP tools (CEM query, health check, etc.)\n- [ ] Server correctly identifies all 13 `hx-*` components\n- [ ] Old custom MCP server entries removed (handled by companion ticket)\n\n## Dependencies\n- Depends on: \"Remove broken custom MCP servers\" ticket (clean slate first)\n- Depends on: wc-tools project being built (currently built at `/Volumes/Development/booked/wc-tools/build/index.js`)",
+      "timestamp": "2026-03-02T22:09:20.801Z",
+      "source": "initial"
+    }
+  ],
+  "createdAt": "2026-03-02T22:09:20.801Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-03-02T22:09:20.801Z",
+      "reason": "Feature created"
+    }
+  ]
+}

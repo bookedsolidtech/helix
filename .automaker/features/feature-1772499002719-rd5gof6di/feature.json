@@ -1,0 +1,29 @@
+{
+  "category": "Authority Ideas",
+  "description": "Build the /libraries page with full CRUD UI and wire up navigation. All data fetching uses the /api/libraries REST endpoints from Phase 2. Deliverables: (1) apps/admin/src/app/libraries/page.tsx — Server component that renders the page shell and a client-rendered LibraryList. Shows library count in header. (2) apps/admin/src/app/libraries/components/LibraryCard.tsx — Client component displaying a single library: name, id badge, source badge (color-coded: local=blue, cdn=purple, npm=green), prefix chip, lastScored date or 'Never scored', componentCount, Edit button, Delete button (disabled/tooltip for hx-library). (3) apps/admin/src/app/libraries/components/LibraryFormModal.tsx — Single modal handles both Add and Edit modes. Fields: name (text), id (text, auto-slugified from name, locked in edit mode), source (select: local/cdn/npm), cemPath (shown only when source=local), packageName (shown when source=cdn|npm), prefix (text with validation hint). Submit calls POST or PATCH. Shows field-level validation errors from API response. (4) apps/admin/src/app/libraries/components/LibraryList.tsx — Client component: fetches GET /api/libraries on mount, renders grid of LibraryCards, floating 'Add Library' button, optimistic UI updates on add/edit/delete, empty state if no entries, error state if fetch fails. (5) Update the admin sidebar/navigation component (identify actual file path in the codebase, likely apps/admin/src/components/Sidebar.tsx or similar) to add a 'Libraries' nav link pointing to /libraries. Use existing nav item styling. All components must use whatever UI component library is already in use (Radix, shadcn, etc.).",
+  "title": "Phase 3: Libraries Management UI, Components & Navigation",
+  "status": "backlog",
+  "workItemState": "planned",
+  "epicId": "feature-1772498927473-b350n8c7v",
+  "projectSlug": "phase-2-universal-web-component-management-health-",
+  "milestoneSlug": "m1-library-registry-foundation",
+  "complexity": "large",
+  "id": "feature-1772499002719-rd5gof6di",
+  "branchName": "feature/phase-3-libraries-management-ui",
+  "descriptionHistory": [
+    {
+      "description": "Build the /libraries page with full CRUD UI and wire up navigation. All data fetching uses the /api/libraries REST endpoints from Phase 2. Deliverables: (1) apps/admin/src/app/libraries/page.tsx — Server component that renders the page shell and a client-rendered LibraryList. Shows library count in header. (2) apps/admin/src/app/libraries/components/LibraryCard.tsx — Client component displaying a single library: name, id badge, source badge (color-coded: local=blue, cdn=purple, npm=green), prefix chip, lastScored date or 'Never scored', componentCount, Edit button, Delete button (disabled/tooltip for hx-library). (3) apps/admin/src/app/libraries/components/LibraryFormModal.tsx — Single modal handles both Add and Edit modes. Fields: name (text), id (text, auto-slugified from name, locked in edit mode), source (select: local/cdn/npm), cemPath (shown only when source=local), packageName (shown when source=cdn|npm), prefix (text with validation hint). Submit calls POST or PATCH. Shows field-level validation errors from API response. (4) apps/admin/src/app/libraries/components/LibraryList.tsx — Client component: fetches GET /api/libraries on mount, renders grid of LibraryCards, floating 'Add Library' button, optimistic UI updates on add/edit/delete, empty state if no entries, error state if fetch fails. (5) Update the admin sidebar/navigation component (identify actual file path in the codebase, likely apps/admin/src/components/Sidebar.tsx or similar) to add a 'Libraries' nav link pointing to /libraries. Use existing nav item styling. All components must use whatever UI component library is already in use (Radix, shadcn, etc.).",
+      "timestamp": "2026-03-03T00:50:02.719Z",
+      "source": "initial"
+    }
+  ],
+  "createdAt": "2026-03-03T00:50:02.719Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-03-03T00:50:02.719Z",
+      "reason": "Feature created"
+    }
+  ]
+}

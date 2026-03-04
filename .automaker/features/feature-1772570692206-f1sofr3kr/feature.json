@@ -1,0 +1,79 @@
+{
+  "category": "Uncategorized",
+  "description": "## Component: hx-tag (NEW)\n**Tier 1 — Universal Foundation | Industry Consensus: 5/6 libraries**\n\nRemovable or static label for categories, filters, and selections. Distinct from badge — tags represent user-applied or filterable labels.\n\n### ADR-001 Classification: Property-Driven (Atomic)\nProperties control variant and removability. Default slot accepts label text.\n\n### API Design\n**Properties:** `variant` (primary|secondary|neutral|outline), `removable` (boolean), `disabled`, `hx-size` (sm|md|lg), `selected` (boolean — for filter tag toggle)\n**Slots:** Default (tag text), `prefix` (icon)\n**CSS Parts:** `tag`, `remove-button`, `prefix`\n**Events:** `hx-remove` (composed: true), `hx-select` (for toggle mode)\n\n### Drupal Integration\n```twig\n{# Taxonomy term tags from Drupal #}\n{% for term in node.field_conditions %}\n  <hx-tag variant=\"secondary\">{{ term.entity.label }}</hx-tag>\n{% endfor %}\n\n{# Removable filter tags #}\n{% for filter in active_filters %}\n  <hx-tag removable variant=\"primary\">{{ filter.label }}</hx-tag>\n{% endfor %}\n```\n\n### Healthcare: Diagnosis tags, allergy labels, active filter display, medication categories\n\n### Acceptance Criteria\n1. Static and removable modes\n2. Selected state for filter toggle behavior\n3. Remove button fires hx-remove event (Drupal behavior handles filter removal)\n4. Works in hx-combobox multi-select display\n5. Icon prefix slot for categorized tags",
+  "title": "T1-20: hx-tag — Removable/Static Label",
+  "status": "review",
+  "complexity": "small",
+  "priority": 2,
+  "source": "api",
+  "trustTier": 1,
+  "quarantineStatus": "passed",
+  "quarantineId": "15234900-9221-45a8-a152-ca5b8c3a5518",
+  "id": "feature-1772570692206-f1sofr3kr",
+  "branchName": "feature/t1-20-hx-tag-removablestatic-label",
+  "descriptionHistory": [
+    {
+      "description": "## Component: hx-tag (NEW)\n**Tier 1 — Universal Foundation | Industry Consensus: 5/6 libraries**\n\nRemovable or static label for categories, filters, and selections. Distinct from badge — tags represent user-applied or filterable labels.\n\n### ADR-001 Classification: Property-Driven (Atomic)\nProperties control variant and removability. Default slot accepts label text.\n\n### API Design\n**Properties:** `variant` (primary|secondary|neutral|outline), `removable` (boolean), `disabled`, `hx-size` (sm|md|lg), `selected` (boolean — for filter tag toggle)\n**Slots:** Default (tag text), `prefix` (icon)\n**CSS Parts:** `tag`, `remove-button`, `prefix`\n**Events:** `hx-remove` (composed: true), `hx-select` (for toggle mode)\n\n### Drupal Integration\n```twig\n{# Taxonomy term tags from Drupal #}\n{% for term in node.field_conditions %}\n  <hx-tag variant=\"secondary\">{{ term.entity.label }}</hx-tag>\n{% endfor %}\n\n{# Removable filter tags #}\n{% for filter in active_filters %}\n  <hx-tag removable variant=\"primary\">{{ filter.label }}</hx-tag>\n{% endfor %}\n```\n\n### Healthcare: Diagnosis tags, allergy labels, active filter display, medication categories\n\n### Acceptance Criteria\n1. Static and removable modes\n2. Selected state for filter toggle behavior\n3. Remove button fires hx-remove event (Drupal behavior handles filter removal)\n4. Works in hx-combobox multi-select display\n5. Icon prefix slot for categorized tags",
+      "timestamp": "2026-03-03T20:44:52.206Z",
+      "source": "initial"
+    }
+  ],
+  "createdAt": "2026-03-03T20:44:52.206Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-03-03T20:44:52.206Z",
+      "reason": "Feature created"
+    },
+    {
+      "from": "backlog",
+      "to": "in_progress",
+      "timestamp": "2026-03-04T05:40:27.574Z"
+    },
+    {
+      "from": "in_progress",
+      "to": "backlog",
+      "timestamp": "2026-03-04T05:44:26.567Z"
+    },
+    {
+      "from": "in_progress",
+      "to": "review",
+      "timestamp": "2026-03-04T06:02:07.799Z"
+    },
+    {
+      "from": "review",
+      "to": "blocked",
+      "timestamp": "2026-03-04T06:11:07.904Z"
+    },
+    {
+      "from": "blocked",
+      "to": "review",
+      "timestamp": "2026-03-04T06:21:05.784Z"
+    }
+  ],
+  "featureType": "code",
+  "updatedAt": "2026-03-04T05:54:00.774Z",
+  "model": "claude-sonnet-4-6",
+  "executionHistory": [
+    {
+      "id": "5165b152-f7e5-422a-b1c5-7585ede227c2",
+      "startedAt": "2026-03-04T05:40:27.945Z",
+      "completedAt": "2026-03-04T05:53:54.852Z",
+      "durationMs": 806907,
+      "costUsd": 0,
+      "model": "claude-sonnet-4-6",
+      "success": false,
+      "error": "Agent loop detected (Bash:2deae414). Aborting for retry with recovery guidance.",
+      "trigger": "manual"
+    }
+  ],
+  "costUsd": 1.6771779999999996,
+  "lastSessionId": "ed592f80-13ff-47df-b290-2b388ec3d077",
+  "prUrl": "https://github.com/bookedsolidtech/helix/pull/44",
+  "prNumber": 44,
+  "prCreatedAt": "2026-03-04T06:02:07.798Z",
+  "reviewStartedAt": "2026-03-04T06:02:07.799Z",
+  "prTrackedSince": "2026-03-04T06:02:07.800Z",
+  "prLastPolledAt": "2026-03-04T15:33:10.149Z"
+}

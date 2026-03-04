@@ -1,0 +1,27 @@
+{
+  "category": "Epic",
+  "description": "# Phase 1: Production-Grade Foundation\n\nTake 13 existing prototype components to enterprise quality (Grade A health scores). Migrate token pipeline to W3C DTCG format. Achieve 80%+ test coverage. Publish @helix/library@0.1.0 to npm. 12 weeks, ~46 engineering days.\n\n## Phases\n1. Migrate tokens to W3C DTCG format via Style Dictionary 4.x\n2. Update all 13 components to consume DTCG-generated tokens\n3. Complete JSDoc annotations on all 13 components\n4. Write missing Vitest browser tests for 80%+ coverage\n5. Add axe-core accessibility tests to all components\n6. Complete Storybook stories for all variants and themes\n7. Create Starlight documentation pages for all 13 components\n8. Establish VRT baselines with Playwright screenshots\n9. Finalize extension API contracts and contract tests\n10. Run health scorer on all 13 components and fix to Grade A\n11. Set up changesets for semantic versioning\n12. Set up npm publishing workflow and publish beta\n13. External testing in Drupal 11 and Next.js 15",
+  "title": "[Epic] Phase 1: Production-Grade Foundation",
+  "status": "blocked",
+  "isEpic": true,
+  "epicColor": "#4F46E5",
+  "branchName": "epic/phase-1-production-grade-foundation",
+  "id": "feature-1772158053409-kufv8d903",
+  "descriptionHistory": [
+    {
+      "description": "# Phase 1: Production-Grade Foundation\n\nTake 13 existing prototype components to enterprise quality (Grade A health scores). Migrate token pipeline to W3C DTCG format. Achieve 80%+ test coverage. Publish @helix/library@0.1.0 to npm. 12 weeks, ~46 engineering days.\n\n## Phases\n1. Migrate tokens to W3C DTCG format via Style Dictionary 4.x\n2. Update all 13 components to consume DTCG-generated tokens\n3. Complete JSDoc annotations on all 13 components\n4. Write missing Vitest browser tests for 80%+ coverage\n5. Add axe-core accessibility tests to all components\n6. Complete Storybook stories for all variants and themes\n7. Create Starlight documentation pages for all 13 components\n8. Establish VRT baselines with Playwright screenshots\n9. Finalize extension API contracts and contract tests\n10. Run health scorer on all 13 components and fix to Grade A\n11. Set up changesets for semantic versioning\n12. Set up npm publishing workflow and publish beta\n13. External testing in Drupal 11 and Next.js 15",
+      "timestamp": "2026-02-27T02:07:33.410Z",
+      "source": "initial"
+    }
+  ],
+  "createdAt": "2026-02-27T02:07:33.410Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-02-27T02:07:33.410Z",
+      "reason": "Feature created"
+    }
+  ],
+  "blockedReason": "Project deactivated \u2014 not managed by this Automaker instance"
+}

@@ -1,0 +1,82 @@
+{
+  "category": "Uncategorized",
+  "description": "## Component: hx-link (NEW)\n**Tier 1 — Universal Foundation | Industry Consensus: 4/6 libraries**\n\nStyled anchor element with inline and standalone variants. Ensures consistent link styling across Drupal-rendered content.\n\n### ADR-001 Classification: Property-Driven (Atomic)\nAtomic component. Properties control visual treatment. Default slot accepts link text.\n\n### API Design\n\n**Properties:**\n- `href`: string (REQUIRED)\n- `target`: _self | _blank | _parent | _top\n- `rel`: string (auto-adds noopener noreferrer when target=_blank)\n- `variant`: default | subtle | primary | danger\n- `inline`: boolean (inline text link vs standalone block link)\n- `external`: boolean (shows external link icon)\n- `disabled`: boolean\n\n**Slots:**\n- Default slot: Link text/content\n- `prefix`: Icon before text\n- `suffix`: Icon after text (auto-populated when external=true)\n\n**CSS Parts:**\n- `link`: The anchor element\n- `external-icon`: External link indicator\n\n### Drupal Integration\n```twig\n{# Inline link in body text #}\n<hx-link href=\"{{ url('entity.node.canonical', {'node': node.id}) }}\">\n  View full patient record\n</hx-link>\n\n{# External link with auto-icon #}\n<hx-link href=\"https://www.cdc.gov/vaccines/\" external target=\"_blank\">\n  CDC Vaccine Information\n</hx-link>\n```\n\nContent lives in default slot — Drupal controls link text. Component handles styling, external indicators, and rel attributes.\n\n### Healthcare Use Cases\n- Patient record cross-references\n- External resource links (CDC, WHO, drug databases)\n- Navigation within clinical workflows\n\n### Acceptance Criteria\n1. Renders semantic `<a>` element (not button styled as link)\n2. Auto-adds rel=\"noopener noreferrer\" when target=\"_blank\"\n3. External variant shows icon suffix\n4. Inline variant integrates with surrounding text (no block display)\n5. Focus ring visible, meets WCAG 2.1 AA contrast\n6. Works inside hx-prose Drupal content",
+  "title": "T1-04: hx-link — Styled Anchor Element",
+  "status": "done",
+  "complexity": "small",
+  "priority": 2,
+  "source": "api",
+  "trustTier": 1,
+  "quarantineStatus": "passed",
+  "quarantineId": "6ed3d5d8-8f12-4d1f-bbfa-9b3c63f6fedf",
+  "id": "feature-1772570521493-kz9eujout",
+  "branchName": "feature/t1-04-hx-link-styled-anchor-element",
+  "descriptionHistory": [
+    {
+      "description": "## Component: hx-link (NEW)\n**Tier 1 — Universal Foundation | Industry Consensus: 4/6 libraries**\n\nStyled anchor element with inline and standalone variants. Ensures consistent link styling across Drupal-rendered content.\n\n### ADR-001 Classification: Property-Driven (Atomic)\nAtomic component. Properties control visual treatment. Default slot accepts link text.\n\n### API Design\n\n**Properties:**\n- `href`: string (REQUIRED)\n- `target`: _self | _blank | _parent | _top\n- `rel`: string (auto-adds noopener noreferrer when target=_blank)\n- `variant`: default | subtle | primary | danger\n- `inline`: boolean (inline text link vs standalone block link)\n- `external`: boolean (shows external link icon)\n- `disabled`: boolean\n\n**Slots:**\n- Default slot: Link text/content\n- `prefix`: Icon before text\n- `suffix`: Icon after text (auto-populated when external=true)\n\n**CSS Parts:**\n- `link`: The anchor element\n- `external-icon`: External link indicator\n\n### Drupal Integration\n```twig\n{# Inline link in body text #}\n<hx-link href=\"{{ url('entity.node.canonical', {'node': node.id}) }}\">\n  View full patient record\n</hx-link>\n\n{# External link with auto-icon #}\n<hx-link href=\"https://www.cdc.gov/vaccines/\" external target=\"_blank\">\n  CDC Vaccine Information\n</hx-link>\n```\n\nContent lives in default slot — Drupal controls link text. Component handles styling, external indicators, and rel attributes.\n\n### Healthcare Use Cases\n- Patient record cross-references\n- External resource links (CDC, WHO, drug databases)\n- Navigation within clinical workflows\n\n### Acceptance Criteria\n1. Renders semantic `<a>` element (not button styled as link)\n2. Auto-adds rel=\"noopener noreferrer\" when target=\"_blank\"\n3. External variant shows icon suffix\n4. Inline variant integrates with surrounding text (no block display)\n5. Focus ring visible, meets WCAG 2.1 AA contrast\n6. Works inside hx-prose Drupal content",
+      "timestamp": "2026-03-03T20:42:01.493Z",
+      "source": "initial"
+    }
+  ],
+  "createdAt": "2026-03-03T20:42:01.493Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-03-03T20:42:01.493Z",
+      "reason": "Feature created"
+    },
+    {
+      "from": "backlog",
+      "to": "in_progress",
+      "timestamp": "2026-03-03T20:55:44.875Z"
+    },
+    {
+      "from": "in_progress",
+      "to": "review",
+      "timestamp": "2026-03-03T23:33:06.050Z"
+    },
+    {
+      "from": "review",
+      "to": "blocked",
+      "timestamp": "2026-03-03T23:41:06.961Z"
+    },
+    {
+      "from": "blocked",
+      "to": "review",
+      "timestamp": "2026-03-04T00:54:51.507Z"
+    },
+    {
+      "from": "review",
+      "to": "backlog",
+      "timestamp": "2026-03-04T00:55:30.575Z"
+    }
+  ],
+  "featureType": "code",
+  "updatedAt": "2026-03-04T00:55:48.538Z",
+  "model": "claude-sonnet-4-6",
+  "costUsd": 17.569217,
+  "lastSessionId": "410940e4-482b-42d8-a627-441222bedb1a",
+  "prUrl": "https://github.com/bookedsolidtech/helix/pull/38",
+  "prNumber": 38,
+  "prCreatedAt": "2026-03-03T23:33:06.049Z",
+  "reviewStartedAt": "2026-03-03T23:33:06.050Z",
+  "prLastPolledAt": "2026-03-04T04:35:22.085Z",
+  "lastReviewFeedback": "coderabbitai: **Actionable comments posted: 4**\n\n<details>\n<summary>🤖 Prompt for all review comments with AI agents</summary>\n\n```\nVerify each finding against the current code and only fix it if needed.\n\nInline comments:\nIn `@packages/hx-library/src/components/hx-link/hx-link.styles.ts`:\n- Around line 28-135: The CSS uses hardcoded fallback values instead of\ntoken-only fallbacks; update all occurrences in the hx-link styles (e.g., in the\n.link rule: gap, color, text-decoration, text-underline-offset, transition\ntiming, border-radius; in\n.link:hover/.link:visited/.link:focus-visible/.link--disabled and variant\nclasses like .link--default, .link--primary, .link--danger; and icon sizes like\n.link__external-icon width/height) to remove literal values and reference only\ndesign tokens (use --hx-* token fallbacks, e.g. replace \"0.25rem\", \"#1d4ed8\",\n\"150ms ease\", \"2px\", \"0.875em\", etc. with appropriate --hx- tokens) ensuring\nevery property uses a token-only fallback pattern.\n\nIn `@packages/hx-library/src/components/hx-link/hx-link.test.ts`:\n- Around line 33-343: Tests currently use unsafe non-null assertions after\nshadowQuery(...) (e.g., shadowQuery<HTMLAnchorElement>(el, 'a')!) which violates\nstrict-TS rules; replace each \"!\" by capturing the possibly-null value (const\nanchor = shadowQuery<...>(...);), assert it exists with\nexpect(anchor).toBeTruthy() or expect(anchor).not.toBeNull(), then narrow/alias\nit for further checks (e.g., const anchorEl = anchor as HTMLAnchorElement)\nbefore accessing attributes or classList; apply this pattern for all shadowQuery\nusages in these HelixLink tests (references: shadowQuery, HelixLink, oneEvent\nassertions and all tests that currently append \"!\" to shadowQuery results).\n\nIn `@packages/hx-library/src/components/hx-link/hx-link.ts`:\n- Around line 101-127: The external-mode logic should always treat the effective\ntarget as _blank when external is true so rel hardening is applied consistently:\nin _computeRel replace the effectiveTarget cal",
+  "prIterationCount": 3,
+  "remediationCycleCount": 3,
+  "workItemState": "blocked",
+  "executionHistory": [
+    {
+      "id": "a2beab8b-ba8d-4d42-adf7-b186b71f7277",
+      "startedAt": "2026-03-04T00:55:30.579Z",
+      "completedAt": "2026-03-04T00:55:48.556Z",
+      "durationMs": 17979,
+      "costUsd": 0.1855569999999993,
+      "model": "claude-sonnet-4-6",
+      "success": true,
+      "trigger": "retry"
+    }
+  ],
+  "error": "PR exceeded 2 review iterations. Escalated to CTO."
+}

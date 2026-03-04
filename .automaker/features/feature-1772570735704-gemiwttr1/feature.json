@@ -1,0 +1,61 @@
+{
+  "category": "Uncategorized",
+  "description": "## Component: hx-progress-bar (NEW)\n**Tier 1 — Universal Foundation | Industry Consensus: 6/6 libraries**\n\nLinear progress indicator showing completion percentage or indeterminate loading state.\n\n### ADR-001 Classification: Property-Driven (Atomic)\nProperties control value and visual state. Optional label slot.\n\n### API Design\n**Properties:** `value` (0-100), `max` (default 100), `indeterminate` (boolean — no known progress), `variant` (primary|success|warning|danger), `label` (accessible label), `show-value` (boolean)\n**Slots:** `label` (custom label content)\n**CSS Parts:** `bar`, `track`, `fill`, `label`, `value`\n\n### Drupal Integration\n```twig\n{# Form completion progress #}\n<hx-progress-bar value=\"{{ completed_steps }}\" max=\"{{ total_steps }}\" show-value>\n  <span slot=\"label\">Intake Progress</span>\n</hx-progress-bar>\n\n{# File upload progress #}\n<hx-progress-bar value=\"{{ upload_percent }}\" variant=\"primary\"></hx-progress-bar>\n```\n\n### Healthcare: Form completion tracking, file upload progress, care plan milestones\n\n### Acceptance Criteria\n1. Determinate mode shows fill based on value/max\n2. Indeterminate mode shows animated loading bar\n3. Value display (percentage or custom)\n4. WCAG 2.1 AA: progressbar role, aria-valuenow/min/max\n5. Smooth fill animation on value change",
+  "title": "T1-25: hx-progress-bar — Linear Progress Indicator",
+  "status": "review",
+  "complexity": "small",
+  "priority": 2,
+  "source": "api",
+  "trustTier": 1,
+  "quarantineStatus": "passed",
+  "quarantineId": "50425e7e-adb5-483e-bb3f-5d3fbad7131d",
+  "id": "feature-1772570735704-gemiwttr1",
+  "branchName": "feature/t1-25-hx-progress-bar-linear-progress",
+  "descriptionHistory": [
+    {
+      "description": "## Component: hx-progress-bar (NEW)\n**Tier 1 — Universal Foundation | Industry Consensus: 6/6 libraries**\n\nLinear progress indicator showing completion percentage or indeterminate loading state.\n\n### ADR-001 Classification: Property-Driven (Atomic)\nProperties control value and visual state. Optional label slot.\n\n### API Design\n**Properties:** `value` (0-100), `max` (default 100), `indeterminate` (boolean — no known progress), `variant` (primary|success|warning|danger), `label` (accessible label), `show-value` (boolean)\n**Slots:** `label` (custom label content)\n**CSS Parts:** `bar`, `track`, `fill`, `label`, `value`\n\n### Drupal Integration\n```twig\n{# Form completion progress #}\n<hx-progress-bar value=\"{{ completed_steps }}\" max=\"{{ total_steps }}\" show-value>\n  <span slot=\"label\">Intake Progress</span>\n</hx-progress-bar>\n\n{# File upload progress #}\n<hx-progress-bar value=\"{{ upload_percent }}\" variant=\"primary\"></hx-progress-bar>\n```\n\n### Healthcare: Form completion tracking, file upload progress, care plan milestones\n\n### Acceptance Criteria\n1. Determinate mode shows fill based on value/max\n2. Indeterminate mode shows animated loading bar\n3. Value display (percentage or custom)\n4. WCAG 2.1 AA: progressbar role, aria-valuenow/min/max\n5. Smooth fill animation on value change",
+      "timestamp": "2026-03-03T20:45:35.704Z",
+      "source": "initial"
+    }
+  ],
+  "createdAt": "2026-03-03T20:45:35.704Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-03-03T20:45:35.704Z",
+      "reason": "Feature created"
+    },
+    {
+      "from": "backlog",
+      "to": "in_progress",
+      "timestamp": "2026-03-04T06:56:59.703Z"
+    },
+    {
+      "from": "in_progress",
+      "to": "review",
+      "timestamp": "2026-03-04T07:07:17.617Z"
+    },
+    {
+      "from": "review",
+      "to": "blocked",
+      "timestamp": "2026-03-04T07:16:17.735Z"
+    },
+    {
+      "from": "blocked",
+      "to": "review",
+      "timestamp": "2026-03-04T13:58:36.789Z"
+    }
+  ],
+  "featureType": "code",
+  "updatedAt": "2026-03-04T06:57:01.176Z",
+  "model": "claude-sonnet-4-6",
+  "costUsd": 3.375411749999999,
+  "lastSessionId": "e463ce54-4299-4538-92ef-b3bafdf07bd5",
+  "prUrl": "https://github.com/bookedsolidtech/helix/pull/49",
+  "prNumber": 49,
+  "prCreatedAt": "2026-03-04T07:07:17.615Z",
+  "reviewStartedAt": "2026-03-04T07:07:17.617Z",
+  "prTrackedSince": "2026-03-04T07:07:17.619Z",
+  "prLastPolledAt": "2026-03-04T15:33:13.323Z"
+}

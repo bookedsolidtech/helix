@@ -1,0 +1,190 @@
+{
+  "category": "Uncategorized",
+  "description": "## Component: hx-tabs (NEW)\n**Tier 1 — Universal Foundation | Industry Consensus: 6/6 libraries**\n\nTabbed interface for organizing content into switchable panels. Composed of hx-tab (trigger) and hx-tab-panel (content) children.\n\n### ADR-001 Classification: Slot-Driven (Composite)\nContainer component. Drupal controls tab labels and panel content via slots. Component provides tab switching behavior and keyboard navigation.\n\n### API Design\n**Properties:** `selected` (index or id of active tab), `orientation` (horizontal|vertical), `activation` (auto|manual — auto activates on focus, manual requires Enter/Space)\n**Slots:** Default (accepts hx-tab and hx-tab-panel children)\n**CSS Parts:** `tabs`, `tab-list`, `tab-panel`, `indicator` (active tab underline)\n**Events:** `hx-tab-change` (composed: true, detail: { index, tab, panel })\n\n### Child Components\n- `hx-tab`: Tab trigger button. Properties: `selected`, `disabled`. Slots: default (label), `icon`.\n- `hx-tab-panel`: Content panel. Slots: default (panel content — Drupal WYSIWYG, views, etc.)\n\n### Drupal Integration\n```twig\n{# Patient record tabs — Drupal controls all panel content #}\n<hx-tabs>\n  <hx-tab>Demographics</hx-tab>\n  <hx-tab>Medical History</hx-tab>\n  <hx-tab>Medications</hx-tab>\n  <hx-tab>Lab Results</hx-tab>\n\n  <hx-tab-panel>\n    {{ content.field_demographics }}\n  </hx-tab-panel>\n  <hx-tab-panel>\n    {{ content.field_medical_history }}\n  </hx-tab-panel>\n  <hx-tab-panel>\n    {{ drupal_view('medications', 'patient_block', node.id) }}\n  </hx-tab-panel>\n  <hx-tab-panel>\n    {{ drupal_view('lab_results', 'patient_block', node.id) }}\n  </hx-tab-panel>\n</hx-tabs>\n```\n\nPanel content is fully slot-driven — each panel can contain Drupal render arrays, Views, Paragraphs, or any CMS content. Component handles tab/panel association by DOM order.\n\n### Healthcare: Patient record sections, department dashboards, form wizard steps\n\n### Acceptance Criteria\n1. Tab/panel association by DOM order (1st tab → 1st panel)\n2. Only active panel visible (others hidden but in DOM)\n3. Keyboard: Arrow keys navigate tabs, Tab moves to panel content\n4. Automatic ARIA: tab/tablist/tabpanel roles, aria-selected, aria-controls\n5. slotchange listener handles dynamic tab addition/removal\n6. Active tab indicator (underline) with smooth animation\n7. Vertical orientation option for side-tab layouts",
+  "title": "T1-16: hx-tabs — Tabbed Content Panels",
+  "status": "review",
+  "complexity": "large",
+  "priority": 2,
+  "source": "api",
+  "trustTier": 1,
+  "quarantineStatus": "passed",
+  "quarantineId": "f6cec9dd-c415-4093-96c5-e44c17f0d64b",
+  "id": "feature-1772570657328-6sjefh2ea",
+  "branchName": "feature/t1-16-hx-tabs-tabbed-content-panels",
+  "descriptionHistory": [
+    {
+      "description": "## Component: hx-tabs (NEW)\n**Tier 1 — Universal Foundation | Industry Consensus: 6/6 libraries**\n\nTabbed interface for organizing content into switchable panels. Composed of hx-tab (trigger) and hx-tab-panel (content) children.\n\n### ADR-001 Classification: Slot-Driven (Composite)\nContainer component. Drupal controls tab labels and panel content via slots. Component provides tab switching behavior and keyboard navigation.\n\n### API Design\n**Properties:** `selected` (index or id of active tab), `orientation` (horizontal|vertical), `activation` (auto|manual — auto activates on focus, manual requires Enter/Space)\n**Slots:** Default (accepts hx-tab and hx-tab-panel children)\n**CSS Parts:** `tabs`, `tab-list`, `tab-panel`, `indicator` (active tab underline)\n**Events:** `hx-tab-change` (composed: true, detail: { index, tab, panel })\n\n### Child Components\n- `hx-tab`: Tab trigger button. Properties: `selected`, `disabled`. Slots: default (label), `icon`.\n- `hx-tab-panel`: Content panel. Slots: default (panel content — Drupal WYSIWYG, views, etc.)\n\n### Drupal Integration\n```twig\n{# Patient record tabs — Drupal controls all panel content #}\n<hx-tabs>\n  <hx-tab>Demographics</hx-tab>\n  <hx-tab>Medical History</hx-tab>\n  <hx-tab>Medications</hx-tab>\n  <hx-tab>Lab Results</hx-tab>\n\n  <hx-tab-panel>\n    {{ content.field_demographics }}\n  </hx-tab-panel>\n  <hx-tab-panel>\n    {{ content.field_medical_history }}\n  </hx-tab-panel>\n  <hx-tab-panel>\n    {{ drupal_view('medications', 'patient_block', node.id) }}\n  </hx-tab-panel>\n  <hx-tab-panel>\n    {{ drupal_view('lab_results', 'patient_block', node.id) }}\n  </hx-tab-panel>\n</hx-tabs>\n```\n\nPanel content is fully slot-driven — each panel can contain Drupal render arrays, Views, Paragraphs, or any CMS content. Component handles tab/panel association by DOM order.\n\n### Healthcare: Patient record sections, department dashboards, form wizard steps\n\n### Acceptance Criteria\n1. Tab/panel association by DOM order (1st tab → 1st panel)\n2. Only active panel visible (others hidden but in DOM)\n3. Keyboard: Arrow keys navigate tabs, Tab moves to panel content\n4. Automatic ARIA: tab/tablist/tabpanel roles, aria-selected, aria-controls\n5. slotchange listener handles dynamic tab addition/removal\n6. Active tab indicator (underline) with smooth animation\n7. Vertical orientation option for side-tab layouts",
+      "timestamp": "2026-03-03T20:44:17.328Z",
+      "source": "initial"
+    }
+  ],
+  "createdAt": "2026-03-03T20:44:17.328Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-03-03T20:44:17.328Z",
+      "reason": "Feature created"
+    },
+    {
+      "from": "backlog",
+      "to": "in_progress",
+      "timestamp": "2026-03-03T23:33:10.128Z"
+    },
+    {
+      "from": "in_progress",
+      "to": "backlog",
+      "timestamp": "2026-03-03T23:36:05.728Z"
+    },
+    {
+      "from": "in_progress",
+      "to": "blocked",
+      "timestamp": "2026-03-03T23:43:05.461Z"
+    },
+    {
+      "from": "blocked",
+      "to": "review",
+      "timestamp": "2026-03-04T00:16:44.474Z"
+    },
+    {
+      "from": "review",
+      "to": "blocked",
+      "timestamp": "2026-03-04T00:23:44.912Z"
+    },
+    {
+      "from": "blocked",
+      "to": "backlog",
+      "timestamp": "2026-03-04T00:26:41.377Z"
+    },
+    {
+      "from": "in_progress",
+      "to": "blocked",
+      "timestamp": "2026-03-04T00:42:16.313Z",
+      "reason": "git workflow failed — uncommitted work in worktree at /Volumes/Development/booked/helix/.worktrees/feature-t1-16-hx-tabs-tabbed-content-panels: git workflow failed — uncommitted work in worktree at /Volumes/Development/booked/helix/.worktrees/feature-t1-16-hx-tabs-tabbed-content-panels: Command failed: gh pr create --base dev --head feature/t1-16-hx-tabs-tabbed-content-panels --title T1-16: hx-tabs — Tabbed Content Panels --body ## Summary\n\n## Component: hx-tabs (NEW)\n**Tier 1 — Universal Foundation | Industry Consensus: 6/6 libraries**\n\nTabbed interface for organizing content into switchable panels. Composed of hx-tab (trigger) and hx-tab-panel (content) children.\n\n### ADR-001 Classification: Slot-Driven (Composite)\nContainer component. Drupal controls tab labels and panel content via slots. Component provides tab switching behavior and keyboard navigation.\n\n### API Design\n**Properties:** `selected` (index or id of active tab), `o...\n\n---\n*Recovered automatically by Automaker post-agent hook*\na pull request for branch \"feature/t1-16-hx-tabs-tabbed-content-panels\" into branch \"dev\" already exists:\nhttps://github.com/bookedsolidtech/helix/pull/41\n | stderr: a pull request for branch \"feature/t1-16-hx-tabs-tabbed-content-panels\" into branch \"dev\" already exists:\nhttps://github.com/bookedsolidtech/helix/pull/41"
+    },
+    {
+      "from": "blocked",
+      "to": "review",
+      "timestamp": "2026-03-04T00:57:50.652Z"
+    },
+    {
+      "from": "review",
+      "to": "backlog",
+      "timestamp": "2026-03-04T00:58:29.792Z"
+    },
+    {
+      "from": "in_progress",
+      "to": "blocked",
+      "timestamp": "2026-03-04T01:07:35.393Z",
+      "reason": "git workflow failed — uncommitted work in worktree at /Volumes/Development/booked/helix/.worktrees/feature-t1-16-hx-tabs-tabbed-content-panels: git workflow failed — uncommitted work in worktree at /Volumes/Development/booked/helix/.worktrees/feature-t1-16-hx-tabs-tabbed-content-panels: Command failed: gh pr create --base dev --head feature/t1-16-hx-tabs-tabbed-content-panels --title T1-16: hx-tabs — Tabbed Content Panels --body ## Summary\n\n## Component: hx-tabs (NEW)\n**Tier 1 — Universal Foundation | Industry Consensus: 6/6 libraries**\n\nTabbed interface for organizing content into switchable panels. Composed of hx-tab (trigger) and hx-tab-panel (content) children.\n\n### ADR-001 Classification: Slot-Driven (Composite)\nContainer component. Drupal controls tab labels and panel content via slots. Component provides tab switching behavior and keyboard navigation.\n\n### API Design\n**Properties:** `selected` (index or id of active tab), `o...\n\n---\n*Recovered automatically by Automaker post-agent hook*\na pull request for branch \"feature/t1-16-hx-tabs-tabbed-content-panels\" into branch \"dev\" already exists:\nhttps://github.com/bookedsolidtech/helix/pull/41\n | stderr: a pull request for branch \"feature/t1-16-hx-tabs-tabbed-content-panels\" into branch \"dev\" already exists:\nhttps://github.com/bookedsolidtech/helix/pull/41"
+    },
+    {
+      "from": "blocked",
+      "to": "review",
+      "timestamp": "2026-03-04T01:18:59.094Z"
+    },
+    {
+      "from": "review",
+      "to": "backlog",
+      "timestamp": "2026-03-04T05:49:01.974Z"
+    },
+    {
+      "from": "backlog",
+      "to": "review",
+      "timestamp": "2026-03-04T05:54:00.215Z"
+    }
+  ],
+  "featureType": "code",
+  "updatedAt": "2026-03-04T00:58:30.660Z",
+  "model": "claude-sonnet-4-6",
+  "costUsd": 16.398419249999996,
+  "lastSessionId": "fa417b15-9713-4c68-b069-0f920a122710",
+  "prUrl": "https://github.com/bookedsolidtech/helix/pull/41",
+  "prNumber": 41,
+  "prCreatedAt": "2026-03-04T00:16:44.474Z",
+  "reviewStartedAt": "2026-03-04T00:16:44.474Z",
+  "prTrackedSince": "2026-03-04T00:16:44.476Z",
+  "prLastPolledAt": "2026-03-04T06:15:36.863Z",
+  "lastReviewFeedback": "coderabbitai: **Actionable comments posted: 9**\n\n<details>\n<summary>🤖 Prompt for all review comments with AI agents</summary>\n\n```\nVerify each finding against the current code and only fix it if needed.\n\nInline comments:\nIn `@packages/hx-library/src/components/hx-tabs/hx-tab.ts`:\n- Around line 65-75: The component currently sets ARIA on the host via\nsetAttribute calls in _syncHostAria called from connectedCallback; refactor to\nuse ElementInternals instead: call this.attachInternals() in the constructor and\nstore the returned internals (e.g., this._internals), then replace setAttribute\nmanipulations in _syncHostAria (and anywhere aria-selected / aria-disabled are\nupdated) with updates to this._internals.ariaSelected and\nthis._internals.ariaDisabled (or use the ARIAMixin API on internals) while\noptionally keeping reflected attributes for backward compatibility; ensure\nconnectedCallback still wires this._handleClick and calls the updated\n_syncHostAria that now updates internals rather than setAttribute.\n\nIn `@packages/hx-library/src/components/hx-tabs/hx-tabs.stories.ts`:\n- Around line 198-199: Replace hardcoded inline visual values in the hx-tabs\nstory templates with token-driven CSS custom properties using the library\nconvention (prefixed with --hx-); specifically, find the inline style attributes\n(e.g., the long style string containing\nmargin/font-size/color/padding/background/border-left) in\npackages/hx-library/src/components/hx-tabs/hx-tabs.stories.ts and swap literal\nvalues like `#6b7280`, `#f3f4f6`, rem/px numbers, and border colors with\ncorresponding --hx- variables (for example --hx-color-muted, --hx-bg-muted,\n--hx-spacing-sm, --hx-font-size-sm, --hx-border-accent); ensure all other\noccurrences listed (ranges 305-310, 335-352, 357-383, 385-433, 443-480, 629-633,\n652-656, 689-763) are updated to use the --hx-* custom properties so the stories\nadhere to the theming contract.\n- Around line 278-284: The play functions are querying a non-existent internal\n<button>",
+  "prIterationCount": 3,
+  "remediationCycleCount": 3,
+  "workItemState": "blocked",
+  "statusChangeReason": "git workflow failed — uncommitted work in worktree at /Volumes/Development/booked/helix/.worktrees/feature-t1-16-hx-tabs-tabbed-content-panels: git workflow failed — uncommitted work in worktree at /Volumes/Development/booked/helix/.worktrees/feature-t1-16-hx-tabs-tabbed-content-panels: Command failed: gh pr create --base dev --head feature/t1-16-hx-tabs-tabbed-content-panels --title T1-16: hx-tabs — Tabbed Content Panels --body ## Summary\n\n## Component: hx-tabs (NEW)\n**Tier 1 — Universal Foundation | Industry Consensus: 6/6 libraries**\n\nTabbed interface for organizing content into switchable panels. Composed of hx-tab (trigger) and hx-tab-panel (content) children.\n\n### ADR-001 Classification: Slot-Driven (Composite)\nContainer component. Drupal controls tab labels and panel content via slots. Component provides tab switching behavior and keyboard navigation.\n\n### API Design\n**Properties:** `selected` (index or id of active tab), `o...\n\n---\n*Recovered automatically by Automaker post-agent hook*\na pull request for branch \"feature/t1-16-hx-tabs-tabbed-content-panels\" into branch \"dev\" already exists:\nhttps://github.com/bookedsolidtech/helix/pull/41\n | stderr: a pull request for branch \"feature/t1-16-hx-tabs-tabbed-content-panels\" into branch \"dev\" already exists:\nhttps://github.com/bookedsolidtech/helix/pull/41",
+  "failureCount": 2,
+  "threadFeedback": [
+    {
+      "threadId": "PRRT_kwDORRAfU85x8NL7",
+      "status": "accepted",
+      "agentReasoning": "Real bug: `_syncHostAria()` at line 75 sets `tabindex` based solely on `this.selected`, ignoring `this.disabled`. A disabled tab that happens to be selected will receive `tabindex=\"0\"`, making it keyboard-focusable. Per ARIA APG, disabled tabs must always have `tabindex=\"-1\"`. This is a genuine accessibility defect.",
+      "resolvedAt": "2026-03-04T01:07:35.397Z"
+    },
+    {
+      "threadId": "PRRT_kwDORRAfU85x8NMB",
+      "status": "denied",
+      "agentReasoning": "`hxTabs!.getAttribute('selected')` at story line 130 is the correct way to test attribute reflection — the `selected` property has `reflect: true`, so the attribute will be `'0'` as a string. This assertion is accurate and appropriate for a play function. No code change warranted.",
+      "resolvedAt": "2026-03-04T01:07:35.397Z"
+    },
+    {
+      "threadId": "PRRT_kwDORRAfU85x8NMG",
+      "status": "denied",
+      "agentReasoning": "Story files use inline styles for demonstration purposes — this is standard Storybook practice. The project's \"no hardcoded values\" rule applies to component implementation files, not to story-level demonstration markup. The hardcoded colors in the ManualActivation info banner are appropriate here.",
+      "resolvedAt": "2026-03-04T01:07:35.397Z"
+    },
+    {
+      "threadId": "PRRT_kwDORRAfU85x8NMO",
+      "status": "denied",
+      "agentReasoning": "The test at line 169 correctly documents the intentional architecture: `hx-tabs` owns ARIA wiring for its children including `role=\"tabpanel\"`. Setting `role=\"tabpanel\"` in `hx-tab-panel.connectedCallback` without `aria-labelledby` would create incomplete ARIA. Both attributes are set together by the parent orchestrator by design, and the JSDoc explicitly documents this. All 89 tests pass confirming correctness.",
+      "resolvedAt": "2026-03-04T01:07:35.397Z"
+    },
+    {
+      "threadId": "PRRT_kwDORRAfU85x8NMQ",
+      "status": "denied",
+      "agentReasoning": "The `await new Promise((r) => setTimeout(r, 50))` pattern is the established way to verify that a negative condition (event not fired) holds across a tick. The `oneEvent` helper cannot be used for \"nothing happened\" tests. This pattern is consistent with other tests in the file (lines 388, 436, 448, etc.) and is acceptable for this use case.",
+      "resolvedAt": "2026-03-04T01:07:35.397Z"
+    },
+    {
+      "threadId": "PRRT_kwDORRAfU85x8NMT",
+      "status": "accepted",
+      "agentReasoning": "`Math.random().toString(36).slice(2, 9)` for ID generation is non-deterministic and produces a 7-char base36 string (~2.8B combinations). While collision probability is low for UI IDs, a sequential counter is more predictable, produces stable output, and avoids any (however theoretical) collision risk. Critical severity confirms this needs addressing.",
+      "resolvedAt": "2026-03-04T01:07:35.397Z"
+    },
+    {
+      "threadId": "PRRT_kwDORRAfU85x8NMU",
+      "status": "accepted",
+      "agentReasoning": "The early `return` after clamping forces a double Lit update cycle: first pass clamps and returns (no DOM sync), second pass does actual work. This causes the Lit dev-mode warning \"scheduled update after update completed\" seen in testing. Removing the early return and using `clampedSelected` for the rest of the method allows syncing to complete in a single pass while still propagating the corrected property value.",
+      "resolvedAt": "2026-03-04T01:07:35.397Z"
+    },
+    {
+      "threadId": "PRRT_kwDORRAfU85x8NMd",
+      "status": "denied",
+      "agentReasoning": "`role=\"tabpanel\"` is intentionally set by the parent `hx-tabs` orchestrator because it must be coordinated with `aria-labelledby`. Setting `role=\"tabpanel\"` in `hx-tab-panel.connectedCallback` without `aria-labelledby` would produce incomplete ARIA. The JSDoc explicitly documents this contract. The architecture is correct for this composite widget pattern.",
+      "resolvedAt": "2026-03-04T01:07:35.397Z"
+    },
+    {
+      "threadId": "PRRT_kwDORRAfU85x8Ych",
+      "status": "denied",
+      "agentReasoning": "Hardcoded fallback values in CSS `var()` calls (e.g., `var(--hx-color-neutral-800, #1e293b)`) are the established pattern used throughout all component styles in this library. They provide resilience when tokens are unavailable and are consistent with `hx-button`, `hx-card`, `hx-text-input`, and all other components. The project rule targets direct hardcoded values, not `var()` fallbacks.",
+      "resolvedAt": "2026-03-04T01:07:35.397Z"
+    },
+    {
+      "threadId": "PRRT_kwDORRAfU85x8Ycm",
+      "status": "denied",
+      "agentReasoning": "`pointer-events: none` at line 10 of `hx-tab.styles.ts` is intentionally partial — it blocks mouse interaction. Keyboard interaction prevention is handled separately via `tabindex=\"-1\"` in `_syncHostAria()`. These two mechanisms are complementary and work correctly together. The `pointer-events: none` CSS rule is correct for its purpose.",
+      "resolvedAt": "2026-03-04T01:07:35.397Z"
+    },
+    {
+      "threadId": "PRRT_kwDORRAfU85x8Ycu",
+      "status": "denied",
+      "agentReasoning": "`font-family: var(--hx-font-family-sans, sans-serif)` at line 7 of `hx-tabs.styles.ts` — `sans-serif` is a CSS generic font family keyword, not a hardcoded value. Using a generic family as a fallback for a custom property token is correct and standard CSS. All other components use this same pattern.",
+      "resolvedAt": "2026-03-04T01:07:35.397Z"
+    },
+    {
+      "threadId": "PRRT_kwDORRAfU85x8Ycw",
+      "status": "accepted",
+      "agentReasoning": "The `@query('.tab-list') private _tabListEl!: HTMLElement` declaration is dead code — `_tabListEl` is never read anywhere in `hx-tabs.ts`. The keyboard handler uses `document.activeElement` and the `_getTabs()` method; the slot change handler calls `_syncTabsAndPanels()`. Per project standards: \"No orphaned code — If it's imported nowhere, it doesn't belong. If it's dead, delete it.\"",
+      "resolvedAt": "2026-03-04T01:07:35.397Z"
+    }
+  ],
+  "remediationHistory": [],
+  "error": "PR exceeded 2 review iterations. Escalated to CTO."
+}

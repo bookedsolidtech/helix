@@ -1,0 +1,91 @@
+{
+  "category": "Uncategorized",
+  "description": "## Component: hx-icon-button (NEW)\n**Tier 1 — Universal Foundation | Industry Consensus: 5/6 libraries**\n\nIcon-only button with mandatory accessible label. Used for toolbar actions, close buttons, and compact UI patterns in healthcare dashboards.\n\n### ADR-001 Classification: Property-Driven (Atomic)\nAtomic component. Properties control behavior and accessibility. Default slot accepts the icon element.\n\n### API Design\n\n**Properties:**\n- `label`: string (REQUIRED — accessible name, renders as aria-label)\n- `variant`: primary | secondary | tertiary | danger | ghost\n- `hx-size`: sm | md | lg\n- `type`: button | submit | reset\n- `disabled`: boolean\n- `href`: string (renders as `<a>`)\n- `name` / `value`: for form submission\n\n**Slots:**\n- Default slot: Icon element (hx-icon, svg, or img)\n\n**CSS Parts:**\n- `button`: The native button/anchor element\n- `icon`: Icon container\n\n**Events:**\n- `hx-click`: Fires on click (composed: true)\n\n### Drupal Integration\n```twig\n{# Close button on dialog/alert #}\n<hx-icon-button label=\"Close\" variant=\"ghost\">\n  <hx-icon name=\"x-mark\"></hx-icon>\n</hx-icon-button>\n\n{# Edit action in data table row #}\n<hx-icon-button label=\"Edit patient {{ patient.label }}\" variant=\"tertiary\">\n  <hx-icon name=\"pencil\"></hx-icon>\n</hx-icon-button>\n```\n\n### Healthcare Use Cases\n- Close/dismiss buttons on alerts and dialogs\n- Table row actions (edit, delete, view)\n- Toolbar buttons in dashboard interfaces\n- Mobile-optimized compact actions\n\n### Acceptance Criteria\n1. `label` property is REQUIRED — console warning if missing\n2. Renders `aria-label` from label property\n3. Tooltip shows label text on hover/focus\n4. All variants match hx-button visual language\n5. Focus ring visible on keyboard navigation\n6. Works with any icon system (slot-based, not icon-name-based)\n7. ElementInternals form participation\n8. Storybook stories for all variants and sizes",
+  "title": "T1-02: hx-icon-button — Icon-Only Action Button",
+  "status": "review",
+  "complexity": "medium",
+  "priority": 2,
+  "source": "api",
+  "trustTier": 1,
+  "quarantineStatus": "passed",
+  "quarantineId": "c3094d0c-1740-4f72-a79f-7499dda05fc2",
+  "id": "feature-1772570504149-ws2hug24n",
+  "branchName": "feature/t1-02-hx-icon-button-icon-only-action",
+  "descriptionHistory": [
+    {
+      "description": "## Component: hx-icon-button (NEW)\n**Tier 1 — Universal Foundation | Industry Consensus: 5/6 libraries**\n\nIcon-only button with mandatory accessible label. Used for toolbar actions, close buttons, and compact UI patterns in healthcare dashboards.\n\n### ADR-001 Classification: Property-Driven (Atomic)\nAtomic component. Properties control behavior and accessibility. Default slot accepts the icon element.\n\n### API Design\n\n**Properties:**\n- `label`: string (REQUIRED — accessible name, renders as aria-label)\n- `variant`: primary | secondary | tertiary | danger | ghost\n- `hx-size`: sm | md | lg\n- `type`: button | submit | reset\n- `disabled`: boolean\n- `href`: string (renders as `<a>`)\n- `name` / `value`: for form submission\n\n**Slots:**\n- Default slot: Icon element (hx-icon, svg, or img)\n\n**CSS Parts:**\n- `button`: The native button/anchor element\n- `icon`: Icon container\n\n**Events:**\n- `hx-click`: Fires on click (composed: true)\n\n### Drupal Integration\n```twig\n{# Close button on dialog/alert #}\n<hx-icon-button label=\"Close\" variant=\"ghost\">\n  <hx-icon name=\"x-mark\"></hx-icon>\n</hx-icon-button>\n\n{# Edit action in data table row #}\n<hx-icon-button label=\"Edit patient {{ patient.label }}\" variant=\"tertiary\">\n  <hx-icon name=\"pencil\"></hx-icon>\n</hx-icon-button>\n```\n\n### Healthcare Use Cases\n- Close/dismiss buttons on alerts and dialogs\n- Table row actions (edit, delete, view)\n- Toolbar buttons in dashboard interfaces\n- Mobile-optimized compact actions\n\n### Acceptance Criteria\n1. `label` property is REQUIRED — console warning if missing\n2. Renders `aria-label` from label property\n3. Tooltip shows label text on hover/focus\n4. All variants match hx-button visual language\n5. Focus ring visible on keyboard navigation\n6. Works with any icon system (slot-based, not icon-name-based)\n7. ElementInternals form participation\n8. Storybook stories for all variants and sizes",
+      "timestamp": "2026-03-03T20:41:44.150Z",
+      "source": "initial"
+    }
+  ],
+  "createdAt": "2026-03-03T20:41:44.150Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-03-03T20:41:44.150Z",
+      "reason": "Feature created"
+    },
+    {
+      "from": "backlog",
+      "to": "in_progress",
+      "timestamp": "2026-03-03T20:42:22.745Z"
+    },
+    {
+      "from": "in_progress",
+      "to": "review",
+      "timestamp": "2026-03-03T20:55:39.719Z"
+    },
+    {
+      "from": "review",
+      "to": "blocked",
+      "timestamp": "2026-03-03T21:02:14.104Z"
+    },
+    {
+      "from": "blocked",
+      "to": "review",
+      "timestamp": "2026-03-04T00:54:39.193Z"
+    },
+    {
+      "from": "review",
+      "to": "backlog",
+      "timestamp": "2026-03-04T00:55:21.241Z"
+    },
+    {
+      "from": "in_progress",
+      "to": "blocked",
+      "timestamp": "2026-03-04T01:02:31.952Z",
+      "reason": "git workflow failed — uncommitted work in worktree at /Volumes/Development/booked/helix/.worktrees/feature-t1-02-hx-icon-button-icon-only-action: git workflow failed — uncommitted work in worktree at /Volumes/Development/booked/helix/.worktrees/feature-t1-02-hx-icon-button-icon-only-action: Command failed: gh pr create --base dev --head feature/t1-02-hx-icon-button-icon-only-action --title T1-02: hx-icon-button — Icon-Only Action Button --body ## Summary\n\n## Component: hx-icon-button (NEW)\n**Tier 1 — Universal Foundation | Industry Consensus: 5/6 libraries**\n\nIcon-only button with mandatory accessible label. Used for toolbar actions, close buttons, and compact UI patterns in healthcare dashboards.\n\n### ADR-001 Classification: Property-Driven (Atomic)\nAtomic component. Properties control behavior and accessibility. Default slot accepts the icon element.\n\n### API Design\n\n**Properties:**\n- `label`: string (REQUIRED — accessible name, renders as aria...\n\n---\n*Recovered automatically by Automaker post-agent hook*\na pull request for branch \"feature/t1-02-hx-icon-button-icon-only-action\" into branch \"dev\" already exists:\nhttps://github.com/bookedsolidtech/helix/pull/27\n | stderr: a pull request for branch \"feature/t1-02-hx-icon-button-icon-only-action\" into branch \"dev\" already exists:\nhttps://github.com/bookedsolidtech/helix/pull/27"
+    },
+    {
+      "from": "blocked",
+      "to": "review",
+      "timestamp": "2026-03-04T01:18:55.360Z"
+    }
+  ],
+  "featureType": "code",
+  "updatedAt": "2026-03-04T00:55:22.343Z",
+  "model": "claude-sonnet-4-6",
+  "costUsd": 6.562254250000001,
+  "lastSessionId": "2f259b74-a1c8-4ad9-b91a-f2d673a8ae4b",
+  "prUrl": "https://github.com/bookedsolidtech/helix/pull/27",
+  "prNumber": 27,
+  "prCreatedAt": "2026-03-03T20:55:39.717Z",
+  "reviewStartedAt": "2026-03-03T20:55:39.719Z",
+  "prTrackedSince": "2026-03-03T20:55:39.722Z",
+  "prLastPolledAt": "2026-03-04T02:01:20.339Z",
+  "lastReviewFeedback": "coderabbitai: **Actionable comments posted: 8**\n\n<details>\n<summary>🤖 Prompt for all review comments with AI agents</summary>\n\n```\nVerify each finding against the current code and only fix it if needed.\n\nInline comments:\nIn `@packages/hx-library/src/components/hx-icon-button/hx-icon-button.stories.ts`:\n- Around line 159-183: The base Storybook render function does not bind the\npublic props href, name, and value from argTypes, so those controls are\nnon-functional; update the base render template (the render function used by the\nstories in hx-icon-button.stories.ts) to spread and pass the component props\n(including href, name, value) from args into the rendered component (or into the\n<a> / <button> branches) so the argTypes controls wire up correctly and work in\nall stories that use the shared render.\n- Around line 236-249: Remove the non-null assertions used in the story\nplay/render code (e.g., hxIconButton!, hxIconButton!.shadowRoot!, innerButton!,\nargs.href!) by adding proper type-narrowing checks or optional chaining: check\nthat hxIconButton and hxIconButton.shadowRoot exist before querying and either\nreturn/throw or fail the test if missing, use const innerButton =\nhxIconButton.shadowRoot?.querySelector('button') and guard with if\n(!innerButton) { /* handle */ } before calling userEvent.click, and validate\nargs.href with if (typeof args.href !== 'string') { /* handle */ } — apply the\nsame pattern across the play functions referenced (including the locations\naround hxIconButton, innerButton, shadowRoot and args.href) so no non-null\nassertions remain.\n\nIn `@packages/hx-library/src/components/hx-icon-button/hx-icon-button.styles.ts`:\n- Around line 17-27: The component styles contain hardcoded fallback literals;\nreplace all literal values in hx-icon-button.styles.ts (e.g., the border\nwidth/solid, border-radius rem value, background-color hex/transparent, color\nhex, transition durations/timing like 150ms ease, and text-decoration) with the\ncorresponding design tokens",
+  "prIterationCount": 2,
+  "remediationCycleCount": 2,
+  "workItemState": "in_progress",
+  "statusChangeReason": "git workflow failed — uncommitted work in worktree at /Volumes/Development/booked/helix/.worktrees/feature-t1-02-hx-icon-button-icon-only-action: git workflow failed — uncommitted work in worktree at /Volumes/Development/booked/helix/.worktrees/feature-t1-02-hx-icon-button-icon-only-action: Command failed: gh pr create --base dev --head feature/t1-02-hx-icon-button-icon-only-action --title T1-02: hx-icon-button — Icon-Only Action Button --body ## Summary\n\n## Component: hx-icon-button (NEW)\n**Tier 1 — Universal Foundation | Industry Consensus: 5/6 libraries**\n\nIcon-only button with mandatory accessible label. Used for toolbar actions, close buttons, and compact UI patterns in healthcare dashboards.\n\n### ADR-001 Classification: Property-Driven (Atomic)\nAtomic component. Properties control behavior and accessibility. Default slot accepts the icon element.\n\n### API Design\n\n**Properties:**\n- `label`: string (REQUIRED — accessible name, renders as aria...\n\n---\n*Recovered automatically by Automaker post-agent hook*\na pull request for branch \"feature/t1-02-hx-icon-button-icon-only-action\" into branch \"dev\" already exists:\nhttps://github.com/bookedsolidtech/helix/pull/27\n | stderr: a pull request for branch \"feature/t1-02-hx-icon-button-icon-only-action\" into branch \"dev\" already exists:\nhttps://github.com/bookedsolidtech/helix/pull/27",
+  "failureCount": 1,
+  "threadFeedback": [
+    {
+      "threadId": "PRRT_kwDORRAfU85x8S2l",
+      "status": "accepted",
+      "agentReasoning": "The test at line 65-71 calls warnSpy.mockRestore() at the end, but if the expect assertion at line 69 throws an error (i.e., the assertion fails), mockRestore() is never called. This leaves console.warn mocked for all subsequent tests in the suite, causing test pollution and unpredictable failures. This is a real bug that can cause intermittent test failures in CI. The fix is minimal and well-justified.",
+      "resolvedAt": "2026-03-04T01:02:31.956Z"
+    }
+  ]
+}

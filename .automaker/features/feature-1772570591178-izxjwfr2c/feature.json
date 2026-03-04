@@ -1,0 +1,127 @@
+{
+  "category": "Uncategorized",
+  "description": "## Component: hx-checkbox-group (NEW)\n**Tier 1 — Universal Foundation | Industry Consensus: 4/6 libraries**\n\nGroups related checkboxes under shared label, validation, and form integration. Multi-value field pattern for Drupal.\n\n### ADR-001 Classification: Hybrid (Form Component)\nContainer component. Properties control group-level validation. Slots accept hx-checkbox children from Drupal TWIG templates.\n\n### API Design\n\n**Properties:**\n- `name`: string (shared name for all children)\n- `label`: string (group label)\n- `required`: boolean (at least one must be checked)\n- `error`: string\n- `orientation`: horizontal | vertical\n\n**Slots:**\n- Default slot: hx-checkbox children\n- `label`: Group label (rich HTML)\n- `help`: Group-level help text\n- `error`: Group-level error\n\n**CSS Parts:** `group`, `label`, `help-text`, `error-message`\n\n**Events:** `hx-change` (composed: true, detail: { values: string[] })\n\n### Drupal Integration\n```twig\n{# Multi-value field from Drupal taxonomy #}\n<hx-checkbox-group name=\"conditions[]\" label=\"Pre-existing Conditions\">\n  {% for term in conditions_vocabulary %}\n    <hx-checkbox\n      value=\"{{ term.tid }}\"\n      {% if term.tid in selected_conditions %}checked{% endif %}\n    >\n      {{ term.name }}\n    </hx-checkbox>\n  {% endfor %}\n  <span slot=\"help\">Select all that apply</span>\n</hx-checkbox-group>\n```\n\nDrupal controls which checkboxes appear (from taxonomy, entity references, etc.). Component handles layout, group validation, and form value collection.\n\n### ElementInternals: Submits array of checked values\n\n### Healthcare Use Cases\n- Pre-existing conditions selection\n- Symptoms checklist\n- Allergy selection\n- Insurance coverage types\n\n### Acceptance Criteria\n1. Groups checkboxes with shared label and validation\n2. Required validation: at least one must be checked\n3. Submits array of values via ElementInternals\n4. Drupal renders checkbox children dynamically from taxonomy\n5. Error state applies to group, not individual checkboxes\n6. WCAG 2.1 AA: group role, describedby for help/error",
+  "title": "T1-10: hx-checkbox-group — Grouped Checkboxes",
+  "status": "review",
+  "complexity": "medium",
+  "priority": 2,
+  "source": "api",
+  "trustTier": 1,
+  "quarantineStatus": "passed",
+  "quarantineId": "c951d92d-f825-4f0b-a3f2-67b7a663784b",
+  "id": "feature-1772570591178-izxjwfr2c",
+  "branchName": "feature/t1-10-hx-checkbox-group-grouped",
+  "descriptionHistory": [
+    {
+      "description": "## Component: hx-checkbox-group (NEW)\n**Tier 1 — Universal Foundation | Industry Consensus: 4/6 libraries**\n\nGroups related checkboxes under shared label, validation, and form integration. Multi-value field pattern for Drupal.\n\n### ADR-001 Classification: Hybrid (Form Component)\nContainer component. Properties control group-level validation. Slots accept hx-checkbox children from Drupal TWIG templates.\n\n### API Design\n\n**Properties:**\n- `name`: string (shared name for all children)\n- `label`: string (group label)\n- `required`: boolean (at least one must be checked)\n- `error`: string\n- `orientation`: horizontal | vertical\n\n**Slots:**\n- Default slot: hx-checkbox children\n- `label`: Group label (rich HTML)\n- `help`: Group-level help text\n- `error`: Group-level error\n\n**CSS Parts:** `group`, `label`, `help-text`, `error-message`\n\n**Events:** `hx-change` (composed: true, detail: { values: string[] })\n\n### Drupal Integration\n```twig\n{# Multi-value field from Drupal taxonomy #}\n<hx-checkbox-group name=\"conditions[]\" label=\"Pre-existing Conditions\">\n  {% for term in conditions_vocabulary %}\n    <hx-checkbox\n      value=\"{{ term.tid }}\"\n      {% if term.tid in selected_conditions %}checked{% endif %}\n    >\n      {{ term.name }}\n    </hx-checkbox>\n  {% endfor %}\n  <span slot=\"help\">Select all that apply</span>\n</hx-checkbox-group>\n```\n\nDrupal controls which checkboxes appear (from taxonomy, entity references, etc.). Component handles layout, group validation, and form value collection.\n\n### ElementInternals: Submits array of checked values\n\n### Healthcare Use Cases\n- Pre-existing conditions selection\n- Symptoms checklist\n- Allergy selection\n- Insurance coverage types\n\n### Acceptance Criteria\n1. Groups checkboxes with shared label and validation\n2. Required validation: at least one must be checked\n3. Submits array of values via ElementInternals\n4. Drupal renders checkbox children dynamically from taxonomy\n5. Error state applies to group, not individual checkboxes\n6. WCAG 2.1 AA: group role, describedby for help/error",
+      "timestamp": "2026-03-03T20:43:11.178Z",
+      "source": "initial"
+    }
+  ],
+  "createdAt": "2026-03-03T20:43:11.178Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-03-03T20:43:11.178Z",
+      "reason": "Feature created"
+    },
+    {
+      "from": "backlog",
+      "to": "in_progress",
+      "timestamp": "2026-03-03T21:49:18.061Z"
+    },
+    {
+      "from": "in_progress",
+      "to": "review",
+      "timestamp": "2026-03-03T22:21:36.655Z"
+    },
+    {
+      "from": "review",
+      "to": "blocked",
+      "timestamp": "2026-03-03T22:29:07.587Z"
+    },
+    {
+      "from": "blocked",
+      "to": "review",
+      "timestamp": "2026-03-04T00:54:43.092Z"
+    },
+    {
+      "from": "review",
+      "to": "backlog",
+      "timestamp": "2026-03-04T00:55:27.662Z"
+    },
+    {
+      "from": "in_progress",
+      "to": "blocked",
+      "timestamp": "2026-03-04T02:01:43.202Z",
+      "reason": "git workflow failed — uncommitted work in worktree at /Volumes/Development/booked/helix/.worktrees/feature-t1-10-hx-checkbox-group-grouped: git workflow failed — uncommitted work in worktree at /Volumes/Development/booked/helix/.worktrees/feature-t1-10-hx-checkbox-group-grouped: Command failed: gh pr create --base dev --head feature/t1-10-hx-checkbox-group-grouped --title T1-10: hx-checkbox-group — Grouped Checkboxes --body ## Summary\n\n## Component: hx-checkbox-group (NEW)\n**Tier 1 — Universal Foundation | Industry Consensus: 4/6 libraries**\n\nGroups related checkboxes under shared label, validation, and form integration. Multi-value field pattern for Drupal.\n\n### ADR-001 Classification: Hybrid (Form Component)\nContainer component. Properties control group-level validation. Slots accept hx-checkbox children from Drupal TWIG templates.\n\n### API Design\n\n**Properties:**\n- `name`: string (shared name for all children)\n- `label`: st...\n\n---\n*Recovered automatically by Automaker post-agent hook*\na pull request for branch \"feature/t1-10-hx-checkbox-group-grouped\" into branch \"dev\" already exists:\nhttps://github.com/bookedsolidtech/helix/pull/33\n | stderr: a pull request for branch \"feature/t1-10-hx-checkbox-group-grouped\" into branch \"dev\" already exists:\nhttps://github.com/bookedsolidtech/helix/pull/33"
+    },
+    {
+      "from": "blocked",
+      "to": "review",
+      "timestamp": "2026-03-04T02:17:08.684Z"
+    },
+    {
+      "from": "review",
+      "to": "backlog",
+      "timestamp": "2026-03-04T05:49:00.743Z"
+    },
+    {
+      "from": "backlog",
+      "to": "review",
+      "timestamp": "2026-03-04T05:54:00.213Z"
+    }
+  ],
+  "featureType": "code",
+  "updatedAt": "2026-03-04T00:55:28.983Z",
+  "model": "claude-sonnet-4-6",
+  "costUsd": 16.20549325,
+  "lastSessionId": "c4c8de32-a44e-4326-adfb-f49456691b03",
+  "prUrl": "https://github.com/bookedsolidtech/helix/pull/33",
+  "prNumber": 33,
+  "prCreatedAt": "2026-03-03T22:21:36.653Z",
+  "reviewStartedAt": "2026-03-03T22:21:36.655Z",
+  "prTrackedSince": "2026-03-03T22:21:36.658Z",
+  "prLastPolledAt": "2026-03-04T06:15:36.149Z",
+  "lastReviewFeedback": "coderabbitai: **Actionable comments posted: 9**\n\n<details>\n<summary>🤖 Prompt for all review comments with AI agents</summary>\n\n```\nVerify each finding against the current code and only fix it if needed.\n\nInline comments:\nIn\n`@packages/hx-library/src/components/hx-checkbox-group/hx-checkbox-group.stories.ts`:\n- Line 279: The play functions use non-null assertions (e.g., passing\ndiabetesCheckbox! into clickCheckbox) which violate strict TypeScript; replace\nthese with proper runtime guards: when you call clickCheckbox or similar helpers\n(reference clickCheckbox and variables like diabetesCheckbox) first query the\nelement, assert its existence with an if-check or throw a descriptive error (or\nuse test helpers like expect(element).toBeInTheDocument()), then call\nclickCheckbox with the validated element; apply the same pattern to the other\noccurrences noted in the file (the other query selector variables referenced at\nlines 285, 362, 644–645, 769–770, 871, 889) so no call sites use the ! non-null\noperator.\n- Around line 18-26: Remove the duplicate argTypes.label entry that overwrites\nthe public property control (the second `argTypes.label` in the CSS Parts\nsection) so the Properties-section definition remains the authoritative one; if\nyou intended to document a CSS part, use a different argType key (e.g., `part: {\n... }`) or merge the parts info without reusing `label`. Also remove all\nnon-null assertions used in the play functions (e.g., `diabetesCheckbox!` and\nsimilar) and either type the variables correctly, use optional chaining (`?.`)\nor null-checks before use so the code compiles under strict TypeScript (update\nthe play functions where variables like diabetesCheckbox, etc., are accessed).\n\nIn\n`@packages/hx-library/src/components/hx-checkbox-group/hx-checkbox-group.styles.ts`:\n- Around line 9-79: The styles contain hardcoded fallback literals (e.g., 0.5,\n0.75rem, `#343a40`, 500, 700) which violates the token-only rule; update the CSS\nin selectors .fieldset, .fieldse",
+  "prIterationCount": 3,
+  "remediationCycleCount": 3,
+  "workItemState": "blocked",
+  "statusChangeReason": "git workflow failed — uncommitted work in worktree at /Volumes/Development/booked/helix/.worktrees/feature-t1-10-hx-checkbox-group-grouped: git workflow failed — uncommitted work in worktree at /Volumes/Development/booked/helix/.worktrees/feature-t1-10-hx-checkbox-group-grouped: Command failed: gh pr create --base dev --head feature/t1-10-hx-checkbox-group-grouped --title T1-10: hx-checkbox-group — Grouped Checkboxes --body ## Summary\n\n## Component: hx-checkbox-group (NEW)\n**Tier 1 — Universal Foundation | Industry Consensus: 4/6 libraries**\n\nGroups related checkboxes under shared label, validation, and form integration. Multi-value field pattern for Drupal.\n\n### ADR-001 Classification: Hybrid (Form Component)\nContainer component. Properties control group-level validation. Slots accept hx-checkbox children from Drupal TWIG templates.\n\n### API Design\n\n**Properties:**\n- `name`: string (shared name for all children)\n- `label`: st...\n\n---\n*Recovered automatically by Automaker post-agent hook*\na pull request for branch \"feature/t1-10-hx-checkbox-group-grouped\" into branch \"dev\" already exists:\nhttps://github.com/bookedsolidtech/helix/pull/33\n | stderr: a pull request for branch \"feature/t1-10-hx-checkbox-group-grouped\" into branch \"dev\" already exists:\nhttps://github.com/bookedsolidtech/helix/pull/33",
+  "failureCount": 1,
+  "threadFeedback": [
+    {
+      "threadId": "PRRT_kwDORRAfU85x7N3H",
+      "status": "denied",
+      "agentReasoning": "The bot flagged non-null assertions (`!`) in hx-checkbox-group.ts. Inspecting the current code, there are zero non-null assertions — all `!` characters are boolean negation operators (`!this.name`, `!(state instanceof FormData)`, `!!this.error`, `!this._hasErrorSlot`). The `@query` field uses `HTMLElement | null = null` with `?? undefined` nullish coalescing, not a `!` assertion. The bot appears to have reviewed an older version of the code before the `_itemsEl!: HTMLElement` was corrected to `_itemsEl: HTMLElement | null = null`. No action needed.",
+      "resolvedAt": "2026-03-04T02:01:43.207Z"
+    },
+    {
+      "threadId": "PRRT_kwDORRAfU85x7N3L",
+      "status": "denied",
+      "agentReasoning": "The bot claims `_syncCheckboxNames()` \"only sets names on children with empty names, leaving existing child hx-checkboxes stale.\" This is factually incorrect. The current implementation at lines 164–169 does `cb.name = this.name` unconditionally for every child — there is no `if (!cb.name)` guard whatsoever. All children are always updated when `this.name` is non-empty. The bot's analysis is based on incorrect assumptions about the code, likely from a different version or hallucinated behavior.",
+      "resolvedAt": "2026-03-04T02:01:43.207Z"
+    },
+    {
+      "threadId": "PRRT_kwDORRAfU85x7N3H",
+      "status": "denied",
+      "agentReasoning": "The bot flagged non-null assertions in hx-checkbox-group.ts, but there are zero `!` non-null assertions in the current file. All `!` characters are boolean negation operators. The @query field had already been changed from `_itemsEl!: HTMLElement` to a nullable type in fea7e3a. No action needed.",
+      "resolvedAt": "2026-03-04T02:01:43.207Z"
+    },
+    {
+      "threadId": "PRRT_kwDORRAfU85x7N3L",
+      "status": "denied",
+      "agentReasoning": "The bot claimed `_syncCheckboxNames()` \"only sets names on children with empty names.\" This is factually incorrect — the current code unconditionally sets `cb.name = this.name` for all children with no guard. The bot analyzed incorrect/stale code.",
+      "resolvedAt": "2026-03-04T02:01:43.207Z"
+    },
+    {
+      "threadId": "PRRT_kwDORRAfU85x7N3X",
+      "status": "accepted",
+      "agentReasoning": "Real accessibility issue: `aria-describedby` needed to only reference `_errorId` when the error div is actually rendered in the shadow DOM. Fixed by using `!!this.error && !this._hasErrorSlot` as the condition (matching exactly when `id=${this._errorId}` is present in the DOM).",
+      "resolvedAt": "2026-03-04T02:01:43.207Z"
+    }
+  ],
+  "remediationHistory": [],
+  "error": "PR exceeded 2 review iterations. Escalated to CTO."
+}
