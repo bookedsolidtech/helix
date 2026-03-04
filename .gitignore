@@ -78,3 +78,6 @@ apps/admin/src/data/library-registry.json
 .automaker/execution-state.json
 .automaker/actionable-items.json
 .automaker/actionable-items.json.corrupted.*
+
+# MCP health scorer output (regenerated on demand)
+packages/.mcp-wc/
