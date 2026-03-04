@@ -3,7 +3,6 @@ import { page } from '@vitest/browser/context';
 import {
   fixture,
   shadowQuery,
-  shadowQueryAll,
   oneEvent,
   cleanup,
   checkA11y,

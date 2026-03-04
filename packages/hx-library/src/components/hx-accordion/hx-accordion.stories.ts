@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/web-components';
 import { html } from 'lit';
-import { expect, userEvent, within } from 'storybook/test';
+import { expect, userEvent } from 'storybook/test';
 import './hx-accordion.js';
 import './hx-accordion-item.js';
 
@@ -342,7 +342,7 @@ export const Controlled: Story = {
       </div>
 
       <hx-accordion id="controlled-accordion" multiple>
-        <hx-accordion-item heading="Allergies & Adverse Reactions" open>
+        <hx-accordion-item heading="Allergies &amp; Adverse Reactions" open>
           <p style="margin: 0;">
             No known drug allergies. Environmental allergen: seasonal pollen (mild). Last reviewed
             2025-11-14.
