@@ -2,7 +2,7 @@
   "category": "Phase 2: Component Expansion",
   "description": "**Milestone:** Phase 2: Component Expansion\n\nCreate a ShadCN-style CLI that lets developers copy individual components into their projects (BYOS path 3). Uses @clack/prompts for interactive UI. Commands: init, add, diff, update.\n\n**Files to Modify:**\n- packages/cli/\n\n**Acceptance Criteria:**\n- [ ] helix init - initialize project with token config\n- [ ] helix add <component> - copy component source into project\n- [ ] helix diff <component> - show diff between local and upstream\n- [ ] helix update <component> - update component preserving local changes\n- [ ] Interactive component selector via @clack/prompts\n- [ ] Respects project tsconfig and import paths\n- [ ] Published as @helixds/cli\n\n**Complexity:** large",
   "title": "Build @helix/cli tool",
-  "status": "backlog",
+  "status": "review",
   "isEpic": false,
   "epicId": "feature-1772158053419-7nvwtbujb",
   "branchName": "feature/phase-2-component-build-helixcli-tool",
@@ -22,6 +22,31 @@
       "to": "backlog",
       "timestamp": "2026-02-27T02:07:33.428Z",
       "reason": "Feature created"
+    },
+    {
+      "from": "backlog",
+      "to": "in_progress",
+      "timestamp": "2026-03-04T20:46:47.871Z"
+    },
+    {
+      "from": "in_progress",
+      "to": "review",
+      "timestamp": "2026-03-04T20:53:41.190Z"
     }
-  ]
+  ],
+  "featureType": "code",
+  "complexity": "medium",
+  "updatedAt": "2026-03-04T20:46:49.700Z",
+  "model": "claude-sonnet-4-6",
+  "costUsd": 1.6030880000000005,
+  "lastSessionId": "508ca094-9d51-40f1-be25-6f1c0d3de4cf",
+  "prUrl": "https://github.com/bookedsolidtech/helix/pull/96",
+  "prNumber": 96,
+  "prCreatedAt": "2026-03-04T20:53:41.189Z",
+  "reviewStartedAt": "2026-03-04T20:53:41.190Z",
+  "prTrackedSince": "2026-03-04T20:53:41.192Z",
+  "prLastPolledAt": "2026-03-04T20:58:25.906Z",
+  "lastReviewFeedback": "coderabbitai: **Actionable comments posted: 7**\n\n<details>\n<summary>🤖 Prompt for all review comments with AI agents</summary>\n\n```\nVerify each finding against the current code and only fix it if needed.\n\nInline comments:\nIn `@packages/cli/src/commands/add.ts`:\n- Around line 9-17: Declare the variable `config` with an explicit `HelixConfig`\ntype to avoid implicit any: change the untyped `let config;` to a typed\ndeclaration matching the return of `readConfig()`. Import or reference the\n`HelixConfig` type from the module that exports it (e.g., where `readConfig` is\ndefined) and use it for `config` so the try/catch block and subsequent uses of\n`config` are type-safe.\n- Around line 96-97: The re-export of getComponentDescription from add.ts\ncreates an indirect dependency; either remove the export and update consumers to\nimport getComponentDescription directly from its original module (registry.js),\nor keep it but add a brief comment above the line exporting\ngetComponentDescription explaining that this re-export intentionally\nconsolidates the public API surface for convenience (and document the canonical\nsource module). Locate the export statement \"export { getComponentDescription }\"\nin add.ts and implement one of those two changes accordingly.\n\nIn `@packages/cli/src/commands/diff.ts`:\n- Around line 55-79: The command currently uses a placeholder flow\n(simulateDelay, spinner.stop, p.log.warn, p.outro) and must be replaced with\nactual upstream fetch and diff logic: call the registry (using config.registry\nand component) to fetch the upstream component source, decide which file(s) to\ncompare (e.g., localDir and target paths built with component), compute a\nunified diff between local content and upstream content (use an existing diff\nutility/import or library rather than simulated output), and surface real\nresults via the spinner and p.log/p.outro; update simulateDelay and the\nhardcoded placeholder messages to proper error handling when the registry is\nunreachable and ensur",
+  "prIterationCount": 1,
+  "remediationCycleCount": 1
 }

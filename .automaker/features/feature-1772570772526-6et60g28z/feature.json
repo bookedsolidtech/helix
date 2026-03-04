@@ -2,7 +2,7 @@
   "category": "Uncategorized",
   "description": "## Component: hx-toggle-button (NEW)\n**Tier 2 — Standard Enterprise | Industry Consensus: 3/6 libraries**\n\nButton with pressed/unpressed toggle state. For toolbar toggles and view switches.\n\n### ADR-001 Classification: Property-Driven (Atomic)\n\n### API Design\n**Properties:** `pressed` (boolean), `variant`, `hx-size`, `disabled`, `name`, `value`\n**Slots:** Default (label), `prefix`, `suffix`\n**CSS Parts:** `button`\n**Events:** `hx-toggle` (composed: true, detail: { pressed })\n\n### Drupal Integration\n```twig\n<hx-toggle-button name=\"view_mode\" value=\"grid\" {% if view == 'grid' %}pressed{% endif %}>\n  <hx-icon slot=\"prefix\" name=\"grid\"></hx-icon>\n  Grid View\n</hx-toggle-button>\n```\n\n### Healthcare: View mode toggles, filter toggles, notification preferences\n### ElementInternals: Submits value when pressed\n\n### Acceptance Criteria\n1. Visual pressed state distinct from unpressed\n2. aria-pressed attribute\n3. Keyboard: Space/Enter toggles\n4. ElementInternals form participation",
   "title": "T2-29: hx-toggle-button — Pressed/Unpressed State",
-  "status": "review",
+  "status": "backlog",
   "complexity": "small",
   "priority": 3,
   "source": "api",
@@ -45,6 +45,11 @@
       "from": "blocked",
       "to": "review",
       "timestamp": "2026-03-04T13:58:43.444Z"
+    },
+    {
+      "from": "review",
+      "to": "backlog",
+      "timestamp": "2026-03-04T17:32:45.234Z"
     }
   ],
   "featureType": "code",

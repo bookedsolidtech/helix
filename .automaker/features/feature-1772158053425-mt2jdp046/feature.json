@@ -2,7 +2,7 @@
   "category": "Phase 2: Component Expansion",
   "description": "**Milestone:** Phase 2: Component Expansion\n\nBuild hx-skeleton: loading placeholder for BigPipe content streaming in Drupal. Text, circular, rectangular variants with pulse animation.\n\n**Files to Modify:**\n- packages/hx-library/src/components/hx-skeleton/\n\n**Acceptance Criteria:**\n- [ ] Text, circular, and rectangular variants\n- [ ] Configurable width, height, border-radius\n- [ ] Pulse animation (CSS-only, no JS)\n- [ ] Wave animation variant\n- [ ] CSS parts: skeleton\n- [ ] ARIA: aria-busy=true, aria-label\n- [ ] <5KB gzipped\n\n**Complexity:** small",
   "title": "Implement hx-skeleton component",
-  "status": "backlog",
+  "status": "review",
   "isEpic": false,
   "epicId": "feature-1772158053419-7nvwtbujb",
   "branchName": "feature/phase-2-component-implement-hx",
@@ -22,6 +22,14 @@
       "to": "backlog",
       "timestamp": "2026-02-27T02:07:33.425Z",
       "reason": "Feature created"
+    },
+    {
+      "from": "backlog",
+      "to": "review",
+      "timestamp": "2026-03-04T19:34:29.789Z"
     }
-  ]
+  ],
+  "featureType": "code",
+  "prNumber": 91,
+  "reviewStartedAt": "2026-03-04T19:34:29.789Z"
 }

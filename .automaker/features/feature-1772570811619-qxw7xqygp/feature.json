@@ -2,7 +2,7 @@
   "category": "Uncategorized",
   "description": "## Component: hx-file-upload (NEW)\n**Tier 2 — Standard Enterprise | Industry Consensus: 3/6 libraries**\n\nFile upload with drag-and-drop zone, file type validation, and progress display.\n\n### ADR-001 Classification: Hybrid (Form Component)\nProperties control file constraints. Slots for custom dropzone content.\n\n### API Design\n**Properties:** `name`, `accept` (MIME types), `max-size` (bytes), `max-files`, `multiple`, `label`, `disabled`, `error`\n**Slots:** Default (dropzone content — CMS can customize instructions), `file-list` (custom file list display)\n**CSS Parts:** `dropzone`, `file-list`, `file-item`, `progress`, `label`\n**Events:** `hx-upload` (files selected), `hx-remove` (file removed), `hx-error` (validation error)\n\n### Drupal Integration\n```twig\n<hx-file-upload name=\"lab_results\" accept=\".pdf,.jpg,.png,.dcm\" max-size=\"10485760\" multiple>\n  <span slot=\"help\">Upload lab results, imaging, or documents (PDF, JPG, PNG, DICOM — max 10MB each)</span>\n</hx-file-upload>\n```\n\nDrupal's file handling manages server-side upload. The component handles client-side UX (drag-drop, validation, preview).\n\n### ElementInternals: Submits FileList\n### Healthcare: Lab results upload, imaging files, insurance documents, consent forms\n\n### Acceptance Criteria\n1. Drag-and-drop zone with visual feedback\n2. Click to browse file picker\n3. Client-side file type and size validation\n4. File list with remove buttons\n5. Progress bar per file during upload\n6. ElementInternals with FileList",
   "title": "T2-34: hx-file-upload — File Upload with Drag-and-Drop",
-  "status": "review",
+  "status": "backlog",
   "complexity": "large",
   "priority": 3,
   "source": "api",
@@ -66,6 +66,11 @@
       "from": "blocked",
       "to": "review",
       "timestamp": "2026-03-04T13:58:53.061Z"
+    },
+    {
+      "from": "review",
+      "to": "backlog",
+      "timestamp": "2026-03-04T17:33:15.216Z"
     }
   ],
   "featureType": "code",
