@@ -6,6 +6,10 @@ node_modules/
 # Build outputs
 dist/
 build/
+
+# Auto-generated files (regenerated at build time, never commit)
+packages/hx-library/src/index.ts
+packages/hx-library/custom-elements.json
 .astro/
 .next/
 .vercel/
@@ -34,11 +38,12 @@ npm-debug.log*
 # Turborepo
 .turbo/
 
-# Test cache (but keep results for Vercel deployment)
+# Test cache (generated, never commit)
 .cache/
-!packages/hx-library/.cache/
-!packages/hx-library/.cache/test-results.json
 scripts/coverage/
+
+# Playwright test artifacts
+packages/hx-library/test-results/
 
 # MCP server test coverage reports
 apps/mcp-servers/*/coverage/
