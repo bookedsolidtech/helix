@@ -119,8 +119,9 @@ export class HelixAvatar extends LitElement {
   // ─── Render ───
 
   override render() {
+    const src = this.src;
     const showSlot = this._hasDefaultSlot;
-    const showImage = !showSlot && !!this.src && !this._imgError;
+    const showImage = !showSlot && !!src && !this._imgError;
     const showInitials = !showSlot && !showImage && !!this.initials.trim();
     const showFallback = !showSlot && !showImage && !showInitials;
 
@@ -144,11 +145,11 @@ export class HelixAvatar extends LitElement {
         aria-label=${showSlot ? nothing : ariaLabel}
       >
         <slot @slotchange=${this._handleSlotChange}></slot>
-        ${showImage
+        ${showImage && src
           ? html`<img
               part="image"
               class="avatar__image"
-              src=${this.src!}
+              src=${src}
               alt=${this.alt}
               loading="lazy"
               @error=${this._handleImgError}

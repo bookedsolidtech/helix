@@ -23,14 +23,14 @@ describe('hx-avatar', () => {
 
     it('applies default size=md class (.avatar--md)', async () => {
       const el = await fixture<HelixAvatar>('<hx-avatar></hx-avatar>');
-      const avatar = shadowQuery(el, '[part="avatar"]')!;
-      expect(avatar.classList.contains('avatar--md')).toBe(true);
+      const avatar = shadowQuery(el, '[part="avatar"]');
+      expect(avatar?.classList.contains('avatar--md')).toBe(true);
     });
 
     it('applies default shape=circle class (.avatar--circle)', async () => {
       const el = await fixture<HelixAvatar>('<hx-avatar></hx-avatar>');
-      const avatar = shadowQuery(el, '[part="avatar"]')!;
-      expect(avatar.classList.contains('avatar--circle')).toBe(true);
+      const avatar = shadowQuery(el, '[part="avatar"]');
+      expect(avatar?.classList.contains('avatar--circle')).toBe(true);
     });
   });
 
@@ -79,32 +79,32 @@ describe('hx-avatar', () => {
   describe('Property: size', () => {
     it('applies xs class', async () => {
       const el = await fixture<HelixAvatar>('<hx-avatar hx-size="xs"></hx-avatar>');
-      const avatar = shadowQuery(el, '[part="avatar"]')!;
-      expect(avatar.classList.contains('avatar--xs')).toBe(true);
+      const avatar = shadowQuery(el, '[part="avatar"]');
+      expect(avatar?.classList.contains('avatar--xs')).toBe(true);
     });
 
     it('applies sm class', async () => {
       const el = await fixture<HelixAvatar>('<hx-avatar hx-size="sm"></hx-avatar>');
-      const avatar = shadowQuery(el, '[part="avatar"]')!;
-      expect(avatar.classList.contains('avatar--sm')).toBe(true);
+      const avatar = shadowQuery(el, '[part="avatar"]');
+      expect(avatar?.classList.contains('avatar--sm')).toBe(true);
     });
 
     it('applies md class (default)', async () => {
       const el = await fixture<HelixAvatar>('<hx-avatar hx-size="md"></hx-avatar>');
-      const avatar = shadowQuery(el, '[part="avatar"]')!;
-      expect(avatar.classList.contains('avatar--md')).toBe(true);
+      const avatar = shadowQuery(el, '[part="avatar"]');
+      expect(avatar?.classList.contains('avatar--md')).toBe(true);
     });
 
     it('applies lg class', async () => {
       const el = await fixture<HelixAvatar>('<hx-avatar hx-size="lg"></hx-avatar>');
-      const avatar = shadowQuery(el, '[part="avatar"]')!;
-      expect(avatar.classList.contains('avatar--lg')).toBe(true);
+      const avatar = shadowQuery(el, '[part="avatar"]');
+      expect(avatar?.classList.contains('avatar--lg')).toBe(true);
     });
 
     it('applies xl class', async () => {
       const el = await fixture<HelixAvatar>('<hx-avatar hx-size="xl"></hx-avatar>');
-      const avatar = shadowQuery(el, '[part="avatar"]')!;
-      expect(avatar.classList.contains('avatar--xl')).toBe(true);
+      const avatar = shadowQuery(el, '[part="avatar"]');
+      expect(avatar?.classList.contains('avatar--xl')).toBe(true);
     });
 
     it('reflects hx-size attribute to host', async () => {
@@ -118,14 +118,14 @@ describe('hx-avatar', () => {
   describe('Property: shape', () => {
     it('applies circle class (default)', async () => {
       const el = await fixture<HelixAvatar>('<hx-avatar></hx-avatar>');
-      const avatar = shadowQuery(el, '[part="avatar"]')!;
-      expect(avatar.classList.contains('avatar--circle')).toBe(true);
+      const avatar = shadowQuery(el, '[part="avatar"]');
+      expect(avatar?.classList.contains('avatar--circle')).toBe(true);
     });
 
     it('applies square class', async () => {
       const el = await fixture<HelixAvatar>('<hx-avatar shape="square"></hx-avatar>');
-      const avatar = shadowQuery(el, '[part="avatar"]')!;
-      expect(avatar.classList.contains('avatar--square')).toBe(true);
+      const avatar = shadowQuery(el, '[part="avatar"]');
+      expect(avatar?.classList.contains('avatar--square')).toBe(true);
     });
 
     it('reflects shape attribute to host', async () => {
@@ -143,8 +143,8 @@ describe('hx-avatar', () => {
       );
       await new Promise((r) => setTimeout(r, 50));
       await el.updateComplete;
-      const avatar = shadowQuery(el, '[part="avatar"]')!;
-      expect(avatar.hasAttribute('role')).toBe(false);
+      const avatar = shadowQuery(el, '[part="avatar"]');
+      expect(avatar?.hasAttribute('role')).toBe(false);
     });
 
     it('default slot: slotted content is rendered', async () => {
