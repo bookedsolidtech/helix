@@ -166,7 +166,7 @@ export class HelixTextInput extends LitElement {
    * Visual size of the input field.
    * @attr hx-size
    */
-  @property({ type: String, attribute: 'hx-size' })
+  @property({ type: String, attribute: 'hx-size', reflect: true })
   hxSize: 'sm' | 'md' | 'lg' = 'md';
 
   // ─── Internal References ───
