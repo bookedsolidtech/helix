@@ -19,6 +19,10 @@ export default tseslint.config(
       'apps/docs/.astro/**',
       'apps/storybook/dist/**',
       'packages/hx-library/dist/**',
+      '.worktrees/**',
+      '.claude/**',
+      'coverage/**',
+      '.automaker/**',
     ],
   },
 

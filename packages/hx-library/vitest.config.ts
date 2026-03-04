@@ -9,6 +9,7 @@ export default defineConfig({
       instances: [{ browser: 'chromium' }],
     },
     include: ['src/components/**/*.test.ts'],
+    exclude: ['.worktrees/**', 'node_modules/**'],
     reporters: ['verbose', 'json'],
     outputFile: { json: '.cache/test-results.json' },
     globals: true,
