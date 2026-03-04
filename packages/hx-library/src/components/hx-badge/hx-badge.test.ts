@@ -1,6 +1,6 @@
 import { describe, it, expect, afterEach } from 'vitest';
 import { page } from '@vitest/browser/context';
-import { fixture, shadowQuery, cleanup, checkA11y } from '../../test-utils.js';
+import { fixture, shadowQuery, cleanup, checkA11y, oneEvent } from '../../test-utils.js';
 import type { WcBadge } from './hx-badge.js';
 import './index.js';
 
@@ -40,7 +40,7 @@ describe('hx-badge', () => {
     });
   });
 
-  // ─── Property: variant (5) ───
+  // ─── Property: variant (8) ───
 
   describe('Property: variant', () => {
     it('reflects variant attr to host', async () => {
@@ -76,6 +76,24 @@ describe('hx-badge', () => {
       const el = await fixture<WcBadge>('<hx-badge variant="neutral">Info</hx-badge>');
       const badge = shadowQuery(el, 'span')!;
       expect(badge.classList.contains('badge--neutral')).toBe(true);
+    });
+
+    it('applies secondary class', async () => {
+      const el = await fixture<WcBadge>('<hx-badge variant="secondary">Tag</hx-badge>');
+      const badge = shadowQuery(el, 'span')!;
+      expect(badge.classList.contains('badge--secondary')).toBe(true);
+    });
+
+    it('applies danger class', async () => {
+      const el = await fixture<WcBadge>('<hx-badge variant="danger">Critical</hx-badge>');
+      const badge = shadowQuery(el, 'span')!;
+      expect(badge.classList.contains('badge--danger')).toBe(true);
+    });
+
+    it('applies info class', async () => {
+      const el = await fixture<WcBadge>('<hx-badge variant="info">Note</hx-badge>');
+      const badge = shadowQuery(el, 'span')!;
+      expect(badge.classList.contains('badge--info')).toBe(true);
     });
   });
 
@@ -143,6 +161,27 @@ describe('hx-badge', () => {
     });
   });
 
+  // ─── Property: removable (3) ───
+
+  describe('Property: removable', () => {
+    it('does not render remove button by default', async () => {
+      const el = await fixture<WcBadge>('<hx-badge>Tag</hx-badge>');
+      const btn = shadowQuery(el, '[part="remove-button"]');
+      expect(btn).toBeNull();
+    });
+
+    it('renders remove button when removable is set', async () => {
+      const el = await fixture<WcBadge>('<hx-badge removable>Tag</hx-badge>');
+      const btn = shadowQuery(el, '[part="remove-button"]');
+      expect(btn).toBeTruthy();
+    });
+
+    it('reflects removable attr to host', async () => {
+      const el = await fixture<WcBadge>('<hx-badge removable>Tag</hx-badge>');
+      expect(el.hasAttribute('removable')).toBe(true);
+    });
+  });
+
   // ─── Dot Indicator (3) ───
 
   describe('Dot Indicator', () => {
@@ -188,7 +227,20 @@ describe('hx-badge', () => {
     });
   });
 
-  // ─── CSS Parts (1) ───
+  // ─── Slots: prefix (1) ───
+
+  describe('Slots: prefix', () => {
+    it('prefix slot renders slotted content', async () => {
+      const el = await fixture<WcBadge>(
+        '<hx-badge><span slot="prefix" class="icon">★</span>Active</hx-badge>',
+      );
+      const icon = el.querySelector('span.icon');
+      expect(icon).toBeTruthy();
+      expect(icon?.textContent).toBe('★');
+    });
+  });
+
+  // ─── CSS Parts (2) ───
 
   describe('CSS Parts', () => {
     it('badge part is accessible for external styling', async () => {
@@ -196,6 +248,29 @@ describe('hx-badge', () => {
       const badge = shadowQuery(el, '[part="badge"]');
       expect(badge).toBeTruthy();
       expect(badge?.getAttribute('part')).toBe('badge');
+    });
+
+    it('remove-button part is accessible for external styling when removable', async () => {
+      const el = await fixture<WcBadge>('<hx-badge removable>Tag</hx-badge>');
+      const btn = shadowQuery(el, '[part="remove-button"]');
+      expect(btn).toBeTruthy();
+      expect(btn?.getAttribute('part')).toBe('remove-button');
+    });
+  });
+
+  // ─── Events: hx-remove (1) ───
+
+  describe('Events: hx-remove', () => {
+    it('dispatches hx-remove when remove button is clicked', async () => {
+      const el = await fixture<WcBadge>('<hx-badge removable>Tag</hx-badge>');
+      const btn = shadowQuery(el, '[part="remove-button"]') as HTMLButtonElement;
+      expect(btn).toBeTruthy();
+      const eventPromise = oneEvent(el, 'hx-remove');
+      btn.click();
+      const event = await eventPromise;
+      expect(event).toBeTruthy();
+      expect(event.bubbles).toBe(true);
+      expect(event.composed).toBe(true);
     });
   });
 
@@ -248,7 +323,16 @@ describe('hx-badge', () => {
     });
 
     it('has no axe violations for all variants', async () => {
-      for (const variant of ['primary', 'success', 'warning', 'error', 'neutral']) {
+      for (const variant of [
+        'primary',
+        'secondary',
+        'success',
+        'warning',
+        'danger',
+        'error',
+        'neutral',
+        'info',
+      ]) {
         const el = await fixture<WcBadge>(`<hx-badge variant="${variant}">Status</hx-badge>`);
         await page.screenshot();
         const { violations } = await checkA11y(el);
