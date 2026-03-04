@@ -68,7 +68,7 @@ describe('hx-number-input', () => {
     });
   });
 
-  // ─── Property: value (4) ───
+  // ─── Property: value (6) ───
 
   describe('Property: value', () => {
     it('is null by default', async () => {
@@ -79,6 +79,11 @@ describe('hx-number-input', () => {
     it('accepts a numeric value via attribute', async () => {
       const el = await fixture<HelixNumberInput>('<hx-number-input value="42"></hx-number-input>');
       expect(el.value).toBe(42);
+    });
+
+    it('converts empty string attribute to null', async () => {
+      const el = await fixture<HelixNumberInput>('<hx-number-input value=""></hx-number-input>');
+      expect(el.value).toBeNull();
     });
 
     it('reflects numeric value on the native input', async () => {
@@ -217,6 +222,20 @@ describe('hx-number-input', () => {
         '<hx-number-input max="10" value="20"></hx-number-input>',
       );
       expect(el.validity.rangeOverflow).toBe(true);
+    });
+
+    it('marks validity as stepMismatch when value does not match step from min', async () => {
+      const el = await fixture<HelixNumberInput>(
+        '<hx-number-input min="0" step="5" value="7"></hx-number-input>',
+      );
+      expect(el.validity.stepMismatch).toBe(true);
+    });
+
+    it('does not mark stepMismatch when value matches step from min', async () => {
+      const el = await fixture<HelixNumberInput>(
+        '<hx-number-input min="0" step="5" value="10"></hx-number-input>',
+      );
+      expect(el.validity.stepMismatch).toBe(false);
     });
   });
 

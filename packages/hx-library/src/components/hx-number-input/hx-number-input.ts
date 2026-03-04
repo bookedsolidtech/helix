@@ -163,7 +163,7 @@ export class HelixNumberInput extends LitElement {
   // ─── Internal References ───
 
   @query('.field__input')
-  private _input!: HTMLInputElement;
+  private _input: HTMLInputElement | null = null;
 
   // ─── Internal State ───
 
@@ -267,7 +267,7 @@ export class HelixNumberInput extends LitElement {
       this._internals.setValidity(
         { valueMissing: true },
         this.error || 'This field is required.',
-        this._input,
+        this._input ?? undefined,
       );
       return;
     }
@@ -276,7 +276,7 @@ export class HelixNumberInput extends LitElement {
       this._internals.setValidity(
         { rangeUnderflow: true },
         `Value must be at least ${this.min}.`,
-        this._input,
+        this._input ?? undefined,
       );
       return;
     }
@@ -285,20 +285,21 @@ export class HelixNumberInput extends LitElement {
       this._internals.setValidity(
         { rangeOverflow: true },
         `Value must be at most ${this.max}.`,
-        this._input,
+        this._input ?? undefined,
       );
       return;
     }
 
     if (this.value !== null && this.step && this.step !== 0) {
-      const base = this.min ?? 0;
-      const remainder = Math.abs((this.value - base) % this.step);
+      const step = this._finite(this.step) ?? 1;
+      const base = this._finite(this.min) ?? 0;
+      const remainder = Math.abs((this.value - base) % step);
       const epsilon = 1e-9;
-      if (remainder > epsilon && Math.abs(remainder - this.step) > epsilon) {
+      if (remainder > epsilon && Math.abs(remainder - step) > epsilon) {
         this._internals.setValidity(
           { stepMismatch: true },
-          `Value must be a multiple of ${this.step}.`,
-          this._input,
+          `Value must be a multiple of ${step}.`,
+          this._input ?? undefined,
         );
         return;
       }
@@ -321,6 +322,10 @@ export class HelixNumberInput extends LitElement {
 
   // ─── Value Parsing ───
 
+  private _finite(value: number | undefined): number | undefined {
+    return Number.isFinite(value) ? value : undefined;
+  }
+
   private _parseInput(raw: string): number | null {
     if (raw === '' || raw === null) return null;
     const parsed = parseFloat(raw);
@@ -329,8 +334,10 @@ export class HelixNumberInput extends LitElement {
 
   private _clamp(v: number): number {
     let result = v;
-    if (this.min !== undefined) result = Math.max(this.min, result);
-    if (this.max !== undefined) result = Math.min(this.max, result);
+    const min = this._finite(this.min);
+    const max = this._finite(this.max);
+    if (min !== undefined) result = Math.max(min, result);
+    if (max !== undefined) result = Math.min(max, result);
     return result;
   }
 
@@ -348,7 +355,8 @@ export class HelixNumberInput extends LitElement {
     if (this.disabled || this.readonly) return;
 
     const current = this.value ?? 0;
-    const next = this._clamp(parseFloat((current + delta * this.step).toFixed(10)));
+    const step = this._finite(this.step) ?? 1;
+    const next = this._clamp(parseFloat((current + delta * step).toFixed(10)));
 
     if (next === this.value) return;
     this.value = next;
@@ -500,7 +508,7 @@ export class HelixNumberInput extends LitElement {
     const describedBy =
       [
         hasError ? this._errorId : null,
-        this.helpText || this._hasHelpSlot ? this._helpTextId : null,
+        !hasError && (this.helpText || this._hasHelpSlot) ? this._helpTextId : null,
       ]
         .filter(Boolean)
         .join(' ') || undefined;

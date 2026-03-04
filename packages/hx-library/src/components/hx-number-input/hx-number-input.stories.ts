@@ -202,10 +202,12 @@ export const Default: Story = {
     },
   },
   play: async ({ canvasElement }) => {
-    const host = canvasElement.querySelector('hx-number-input')!;
+    const host = canvasElement.querySelector('hx-number-input');
+    if (!host) throw new Error('hx-number-input not found');
     await expect(host).toBeTruthy();
 
-    const shadow = within(host.shadowRoot! as unknown as HTMLElement);
+    if (!host.shadowRoot) throw new Error('shadowRoot not available');
+    const shadow = within(host.shadowRoot as unknown as HTMLElement);
     const label = shadow.getByText('Quantity');
     await expect(label).toBeTruthy();
 
@@ -279,8 +281,10 @@ export const WithError: Story = {
     },
   },
   play: async ({ canvasElement }) => {
-    const host = canvasElement.querySelector('hx-number-input')!;
-    const shadow = within(host.shadowRoot! as unknown as HTMLElement);
+    const host = canvasElement.querySelector('hx-number-input');
+    if (!host) throw new Error('hx-number-input not found');
+    if (!host.shadowRoot) throw new Error('shadowRoot not available');
+    const shadow = within(host.shadowRoot as unknown as HTMLElement);
     const errorEl = shadow.getByText('Value is required');
     await expect(errorEl).toBeTruthy();
 
@@ -356,8 +360,10 @@ export const NoStepper: Story = {
     },
   },
   play: async ({ canvasElement }) => {
-    const host = canvasElement.querySelector('hx-number-input')!;
-    const stepper = host.shadowRoot!.querySelector('[part="stepper"]');
+    const host = canvasElement.querySelector('hx-number-input');
+    if (!host) throw new Error('hx-number-input not found');
+    if (!host.shadowRoot) throw new Error('shadowRoot not available');
+    const stepper = host.shadowRoot.querySelector('[part="stepper"]');
     await expect(stepper).toBeNull();
   },
 };
@@ -407,7 +413,7 @@ export const LargeSize: Story = {
 
 export const WithPrefix: Story = {
   render: () => html`
-    <hx-number-input label="Dosage" value="250" min="0" step="10">
+    <hx-number-input label="Dosage" .value=${250} .min=${0} .step=${10}>
       <span
         slot="prefix"
         style="font-size: 0.875rem; color: var(--hx-color-neutral-500, #6c757d); font-weight: 500;"
@@ -432,10 +438,10 @@ export const HealthcareExample: Story = {
   render: () => html`
     <hx-number-input
       label="Dosage"
-      value="250"
-      min="0"
-      max="1000"
-      step="0.5"
+      .value=${250}
+      .min=${0}
+      .max=${1000}
+      .step=${0.5}
       help-text="Enter prescribed dosage amount"
       name="dosage"
       required
@@ -450,7 +456,8 @@ export const HealthcareExample: Story = {
     },
   },
   play: async ({ canvasElement }) => {
-    const host = canvasElement.querySelector('hx-number-input')!;
+    const host = canvasElement.querySelector('hx-number-input');
+    if (!host) throw new Error('hx-number-input not found');
     await expect(host).toBeTruthy();
 
     const input = getNativeInput(canvasElement);
@@ -468,13 +475,13 @@ export const HealthcareExample: Story = {
 export const AllSizes: Story = {
   render: () => html`
     <div style="display: flex; flex-direction: column; gap: 1.5rem; max-width: 480px;">
-      <hx-number-input label="Small (hx-size=sm)" value="1" hx-size="sm"></hx-number-input>
+      <hx-number-input label="Small (hx-size=sm)" .value=${1} hx-size="sm"></hx-number-input>
       <hx-number-input
         label="Medium (hx-size=md, default)"
-        value="2"
+        .value=${2}
         hx-size="md"
       ></hx-number-input>
-      <hx-number-input label="Large (hx-size=lg)" value="3" hx-size="lg"></hx-number-input>
+      <hx-number-input label="Large (hx-size=lg)" .value=${3} hx-size="lg"></hx-number-input>
     </div>
   `,
   parameters: {
@@ -493,46 +500,46 @@ export const AllSizes: Story = {
 export const AllStates: Story = {
   render: () => html`
     <div style="display: flex; flex-direction: column; gap: 1.5rem; max-width: 480px;">
-      <hx-number-input label="Default (empty)" value=""></hx-number-input>
+      <hx-number-input label="Default (empty)" .value=${null}></hx-number-input>
 
-      <hx-number-input label="With Value" value="42"></hx-number-input>
+      <hx-number-input label="With Value" .value=${42}></hx-number-input>
 
       <hx-number-input
         label="Required"
-        value=""
+        .value=${null}
         required
         help-text="This field is mandatory."
       ></hx-number-input>
 
       <hx-number-input
         label="With Help Text"
-        value="10"
+        .value=${10}
         help-text="Enter a value between 1 and 100."
       ></hx-number-input>
 
       <hx-number-input
         label="With Error"
-        value=""
+        .value=${null}
         error="A numeric value is required."
       ></hx-number-input>
 
       <hx-number-input
         label="Disabled"
-        value="99"
+        .value=${99}
         disabled
         help-text="System-calculated, cannot be edited."
       ></hx-number-input>
 
       <hx-number-input
         label="Read-only"
-        value="37"
+        .value=${37}
         readonly
         help-text="Recorded at time of admission."
       ></hx-number-input>
 
       <hx-number-input
         label="No Stepper"
-        value="15"
+        .value=${15}
         no-stepper
         help-text="Stepper buttons are hidden."
       ></hx-number-input>
@@ -554,7 +561,7 @@ export const AllStates: Story = {
 
 export const WithSuffix: Story = {
   render: () => html`
-    <hx-number-input label="Patient Weight" value="72" min="0" step="0.1">
+    <hx-number-input label="Patient Weight" .value=${72} .min=${0} .step=${0.1}>
       <span slot="suffix" style="font-size: 0.75rem; color: var(--hx-color-neutral-500, #6c757d);"
         >kg</span
       >
@@ -573,7 +580,7 @@ export const WithSuffix: Story = {
 export const WithErrorSlot: Story = {
   name: 'With Error Slot (Drupal Form API)',
   render: () => html`
-    <hx-number-input label="Dosage" value="" name="dosage">
+    <hx-number-input label="Dosage" .value=${null} name="dosage">
       <div
         slot="error"
         style="display: flex; align-items: center; gap: 0.25rem; color: var(--hx-color-error-500, #dc3545); font-size: 0.75rem;"
@@ -600,7 +607,7 @@ export const WithErrorSlot: Story = {
 export const WithHelpSlot: Story = {
   name: 'With Help Slot',
   render: () => html`
-    <hx-number-input label="Infusion Rate" value="125" name="infusionRate">
+    <hx-number-input label="Infusion Rate" .value=${125} name="infusionRate">
       <div slot="help" style="font-size: 0.75rem; color: var(--hx-color-neutral-500, #6c757d);">
         Standard adult maintenance rate is 125 mL/hr. Adjust based on patient weight and clinical
         status.
@@ -630,7 +637,7 @@ export const CSSCustomProperties: Story = {
         </h4>
         <hx-number-input
           label="Standard Appearance"
-          value="10"
+          .value=${10}
           help-text="All CSS custom properties at their defaults."
         ></hx-number-input>
       </div>
@@ -641,7 +648,7 @@ export const CSSCustomProperties: Story = {
         </h4>
         <hx-number-input
           label="Dark Background"
-          value="42"
+          .value=${42}
           style="--hx-number-input-bg: #1a1a2e; --hx-number-input-color: #e0e0e0;"
         ></hx-number-input>
       </div>
@@ -652,7 +659,7 @@ export const CSSCustomProperties: Story = {
         </h4>
         <hx-number-input
           label="Custom Border"
-          value="75"
+          .value=${75}
           style="--hx-number-input-border-color: #2563EB; --hx-number-input-border-radius: 9999px;"
         ></hx-number-input>
       </div>
@@ -663,7 +670,7 @@ export const CSSCustomProperties: Story = {
         </h4>
         <hx-number-input
           label="Green Focus Ring"
-          value="50"
+          .value=${50}
           style="--hx-number-input-focus-ring-color: #198754;"
         ></hx-number-input>
       </div>
@@ -674,7 +681,7 @@ export const CSSCustomProperties: Story = {
         </h4>
         <hx-number-input
           label="Custom Error Color"
-          value=""
+          .value=${null}
           error="This field has an error."
           style="--hx-number-input-error-color: #dc6502;"
         ></hx-number-input>
@@ -753,7 +760,7 @@ export const CSSParts: Story = {
         </h4>
         <hx-number-input
           label="Styled via ::part()"
-          value="25"
+          .value=${25}
           help-text="This help text is styled via ::part(help-text)."
         ></hx-number-input>
       </div>
@@ -764,7 +771,7 @@ export const CSSParts: Story = {
         </h4>
         <hx-number-input
           label="With Error Part"
-          value=""
+          .value=${null}
           error="Value must be between 0 and 100."
         ></hx-number-input>
       </div>
@@ -807,7 +814,8 @@ export const TypeAndVerify: Story = {
     await userEvent.type(input, '120');
     await expect(input.value).toBe('120');
 
-    const host = canvasElement.querySelector('hx-number-input')!;
+    const host = canvasElement.querySelector('hx-number-input');
+    if (!host) throw new Error('hx-number-input not found');
     await expect(host.value).toBe(120);
   },
 };
@@ -830,7 +838,8 @@ export const EventVerification: Story = {
     },
   },
   play: async ({ canvasElement }) => {
-    const host = canvasElement.querySelector('hx-number-input')!;
+    const host = canvasElement.querySelector('hx-number-input');
+    if (!host) throw new Error('hx-number-input not found');
     const input = getNativeInput(canvasElement);
 
     let inputEventCount = 0;
@@ -878,11 +887,19 @@ export const StepperInteraction: Story = {
     },
   },
   play: async ({ canvasElement }) => {
-    const host = canvasElement.querySelector('hx-number-input')!;
+    const host = canvasElement.querySelector('hx-number-input');
+    if (!host) throw new Error('hx-number-input not found');
     await expect(host.value).toBe(5);
 
-    const incrementBtn = host.shadowRoot!.querySelector('[part="increment"]') as HTMLButtonElement;
-    const decrementBtn = host.shadowRoot!.querySelector('[part="decrement"]') as HTMLButtonElement;
+    if (!host.shadowRoot) throw new Error('shadowRoot not available');
+    const incrementBtn = host.shadowRoot.querySelector(
+      '[part="increment"]',
+    ) as HTMLButtonElement | null;
+    const decrementBtn = host.shadowRoot.querySelector(
+      '[part="decrement"]',
+    ) as HTMLButtonElement | null;
+    if (!incrementBtn) throw new Error('increment button not found');
+    if (!decrementBtn) throw new Error('decrement button not found');
 
     await expect(incrementBtn).toBeTruthy();
     await expect(decrementBtn).toBeTruthy();
@@ -913,7 +930,8 @@ export const KeyboardArrows: Story = {
     },
   },
   play: async ({ canvasElement }) => {
-    const host = canvasElement.querySelector('hx-number-input')!;
+    const host = canvasElement.querySelector('hx-number-input');
+    if (!host) throw new Error('hx-number-input not found');
     const input = getNativeInput(canvasElement);
 
     input.focus();
@@ -947,10 +965,15 @@ export const MinBoundaryClamping: Story = {
     },
   },
   play: async ({ canvasElement }) => {
-    const host = canvasElement.querySelector('hx-number-input')!;
+    const host = canvasElement.querySelector('hx-number-input');
+    if (!host) throw new Error('hx-number-input not found');
     await expect(host.value).toBe(0);
 
-    const decrementBtn = host.shadowRoot!.querySelector('[part="decrement"]') as HTMLButtonElement;
+    if (!host.shadowRoot) throw new Error('shadowRoot not available');
+    const decrementBtn = host.shadowRoot.querySelector(
+      '[part="decrement"]',
+    ) as HTMLButtonElement | null;
+    if (!decrementBtn) throw new Error('decrement button not found');
     await expect(decrementBtn.disabled).toBe(true);
   },
 };
@@ -972,10 +995,15 @@ export const MaxBoundaryClamping: Story = {
     },
   },
   play: async ({ canvasElement }) => {
-    const host = canvasElement.querySelector('hx-number-input')!;
+    const host = canvasElement.querySelector('hx-number-input');
+    if (!host) throw new Error('hx-number-input not found');
     await expect(host.value).toBe(100);
 
-    const incrementBtn = host.shadowRoot!.querySelector('[part="increment"]') as HTMLButtonElement;
+    if (!host.shadowRoot) throw new Error('shadowRoot not available');
+    const incrementBtn = host.shadowRoot.querySelector(
+      '[part="increment"]',
+    ) as HTMLButtonElement | null;
+    if (!incrementBtn) throw new Error('increment button not found');
     await expect(incrementBtn.disabled).toBe(true);
   },
 };
@@ -996,7 +1024,8 @@ export const DisabledNoInput: Story = {
     },
   },
   play: async ({ canvasElement }) => {
-    const host = canvasElement.querySelector('hx-number-input')!;
+    const host = canvasElement.querySelector('hx-number-input');
+    if (!host) throw new Error('hx-number-input not found');
     const input = getNativeInput(canvasElement);
 
     await expect(input.disabled).toBe(true);
@@ -1019,11 +1048,13 @@ export const FocusManagement: Story = {
     },
   },
   play: async ({ canvasElement }) => {
-    const host = canvasElement.querySelector('hx-number-input')!;
+    const host = canvasElement.querySelector('hx-number-input');
+    if (!host) throw new Error('hx-number-input not found');
     const input = getNativeInput(canvasElement);
 
     host.focus();
-    await expect(host.shadowRoot!.activeElement).toBe(input);
+    if (!host.shadowRoot) throw new Error('shadowRoot not available');
+    await expect(host.shadowRoot.activeElement).toBe(input);
 
     await userEvent.type(input, '55');
     await expect(input.value).toBe('55');
@@ -1098,9 +1129,17 @@ export const InAForm: Story = {
   },
   play: async ({ canvasElement }) => {
     const inputs = canvasElement.querySelectorAll('hx-number-input');
-    const ageInput = inputs[0]!.shadowRoot!.querySelector('input')!;
-    const weightInput = inputs[1]!.shadowRoot!.querySelector('input')!;
-    const dosageInput = inputs[2]!.shadowRoot!.querySelector('input')!;
+    const host0 = inputs[0];
+    const host1 = inputs[1];
+    const host2 = inputs[2];
+    if (!host0 || !host1 || !host2) throw new Error('hx-number-input elements not found');
+    if (!host0.shadowRoot || !host1.shadowRoot || !host2.shadowRoot)
+      throw new Error('shadowRoot not available');
+
+    const ageInput = host0.shadowRoot.querySelector('input');
+    const weightInput = host1.shadowRoot.querySelector('input');
+    const dosageInput = host2.shadowRoot.querySelector('input');
+    if (!ageInput || !weightInput || !dosageInput) throw new Error('input elements not found');
 
     await userEvent.clear(ageInput);
     await userEvent.type(ageInput, '45');
