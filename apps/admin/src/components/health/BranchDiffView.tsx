@@ -36,7 +36,8 @@ function DeltaBadge({ delta }: { delta: number }) {
           : 'border-red-500/30 text-red-400 bg-red-500/10',
       )}
     >
-      {positive ? '+' : ''}{delta}
+      {positive ? '+' : ''}
+      {delta}
     </Badge>
   );
 }
@@ -65,7 +66,8 @@ export function BranchDiffView({ diff }: BranchDiffViewProps) {
                       : 'text-muted-foreground',
                 )}
               >
-                {diff.scoreDelta > 0 ? '+' : ''}{diff.scoreDelta}
+                {diff.scoreDelta > 0 ? '+' : ''}
+                {diff.scoreDelta}
               </span>
             </div>
             <div className="flex flex-col items-center gap-1">

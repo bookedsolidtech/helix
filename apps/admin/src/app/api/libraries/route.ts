@@ -14,7 +14,14 @@ export async function GET(): Promise<NextResponse> {
     return NextResponse.json({ libraries });
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Unknown error occurred';
+<<<<<<< HEAD
     return NextResponse.json({ error: 'Failed to load libraries', detail: message }, { status: 500 });
+=======
+    return NextResponse.json(
+      { error: 'Failed to load libraries', detail: message },
+      { status: 500 },
+    );
+>>>>>>> origin/feature/t1-05-hx-text-input-single-line-text
   }
 }
 

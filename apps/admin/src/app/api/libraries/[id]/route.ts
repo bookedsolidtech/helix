@@ -57,7 +57,14 @@ export async function PATCH(request: Request, { params }: RouteParams): Promise<
     if (message.includes('not found')) {
       return NextResponse.json({ error: message }, { status: 404 });
     }
+<<<<<<< HEAD
     return NextResponse.json({ error: 'Failed to update library', detail: message }, { status: 500 });
+=======
+    return NextResponse.json(
+      { error: 'Failed to update library', detail: message },
+      { status: 500 },
+    );
+>>>>>>> origin/feature/t1-05-hx-text-input-single-line-text
   }
 }
 
@@ -80,6 +87,13 @@ export async function DELETE(_request: Request, { params }: RouteParams): Promis
     if (message.includes('not found')) {
       return NextResponse.json({ error: message }, { status: 404 });
     }
+<<<<<<< HEAD
     return NextResponse.json({ error: 'Failed to delete library', detail: message }, { status: 500 });
+=======
+    return NextResponse.json(
+      { error: 'Failed to delete library', detail: message },
+      { status: 500 },
+    );
+>>>>>>> origin/feature/t1-05-hx-text-input-single-line-text
   }
 }

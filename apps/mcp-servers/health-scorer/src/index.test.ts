@@ -8,7 +8,7 @@ describe('MCP Server Lifecycle - Health Scorer', () => {
     it('creates server with correct metadata', () => {
       const server = new Server(
         { name: '@helix/mcp-health-scorer', version: '0.1.0' },
-        { capabilities: { tools: {} } }
+        { capabilities: { tools: {} } },
       );
       expect(server).toBeDefined();
     });
@@ -16,7 +16,7 @@ describe('MCP Server Lifecycle - Health Scorer', () => {
     it('server has correct name', () => {
       const server = new Server(
         { name: '@helix/mcp-health-scorer', version: '0.1.0' },
-        { capabilities: { tools: {} } }
+        { capabilities: { tools: {} } },
       );
       expect(server).toBeDefined();
       // Server info is accessible via protocol methods
@@ -25,7 +25,7 @@ describe('MCP Server Lifecycle - Health Scorer', () => {
     it('server has correct version', () => {
       const server = new Server(
         { name: '@helix/mcp-health-scorer', version: '0.1.0' },
-        { capabilities: { tools: {} } }
+        { capabilities: { tools: {} } },
       );
       expect(server).toBeDefined();
     });
@@ -35,7 +35,7 @@ describe('MCP Server Lifecycle - Health Scorer', () => {
     it('declares tools capability', () => {
       const server = new Server(
         { name: '@helix/mcp-health-scorer', version: '0.1.0' },
-        { capabilities: { tools: {} } }
+        { capabilities: { tools: {} } },
       );
       expect(server).toBeDefined();
     });
@@ -43,7 +43,7 @@ describe('MCP Server Lifecycle - Health Scorer', () => {
     it('tools are registered successfully', () => {
       const server = new Server(
         { name: '@helix/mcp-health-scorer', version: '0.1.0' },
-        { capabilities: { tools: {} } }
+        { capabilities: { tools: {} } },
       );
       expect(() => registerHealthTools(server)).not.toThrow();
     });
@@ -65,10 +65,7 @@ describe('MCP Server Lifecycle - Health Scorer', () => {
   describe('Error Handling', () => {
     it('handles initialization errors gracefully', () => {
       expect(() => {
-        new Server(
-          { name: '', version: '' },
-          { capabilities: {} }
-        );
+        new Server({ name: '', version: '' }, { capabilities: {} });
       }).not.toThrow();
     });
   });
