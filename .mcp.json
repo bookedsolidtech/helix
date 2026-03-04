@@ -1,8 +1,8 @@
 {
   "mcpServers": {
-    "wc-tools": {
+    "wc-mcp": {
       "command": "node",
-      "args": ["/Volumes/Development/booked/wc-tools/build/index.js"],
+      "args": ["/Volumes/Development/booked/wc-tools/build/src/index.js"],
       "env": {
         "MCP_WC_PROJECT_ROOT": "/Volumes/Development/booked/helix"
       }
