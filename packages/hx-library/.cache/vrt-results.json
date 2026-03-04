@@ -90,9 +90,9 @@
       "specs": [],
       "suites": [
         {
-          "title": "hx-spinner Playwright verification",
+          "title": "hx-spinner verification",
           "file": "hx-spinner-verify.spec.ts",
-          "line": 32,
+          "line": 20,
           "column": 6,
           "specs": [
             {
@@ -111,12 +111,12 @@
                       "workerIndex": 0,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 178,
+                      "duration": 302,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-03-04T07:16:49.483Z",
+                      "startTime": "2026-03-04T18:44:57.980Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -124,13 +124,13 @@
                   "status": "expected"
                 }
               ],
-              "id": "856d293b2e956965f9e2-b6e064e9f4e3a4a73a56",
+              "id": "856d293b2e956965f9e2-736d3e84dad57af852d8",
               "file": "hx-spinner-verify.spec.ts",
-              "line": 105,
+              "line": 26,
               "column": 3
             },
             {
-              "title": "has role=\"status\", aria-label, and aria-live on spinner part",
+              "title": "has role=status on spinner element",
               "ok": true,
               "tags": [],
               "tests": [
@@ -145,12 +145,12 @@
                       "workerIndex": 1,
                       "parallelIndex": 1,
                       "status": "passed",
-                      "duration": 189,
+                      "duration": 298,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-03-04T07:16:49.509Z",
+                      "startTime": "2026-03-04T18:44:57.958Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -158,13 +158,13 @@
                   "status": "expected"
                 }
               ],
-              "id": "856d293b2e956965f9e2-17411897d114b409b33d",
+              "id": "856d293b2e956965f9e2-29ee297c48e25fd5a16a",
               "file": "hx-spinner-verify.spec.ts",
-              "line": 113,
+              "line": 34,
               "column": 3
             },
             {
-              "title": "exposes track and indicator parts",
+              "title": "aria-label defaults to \"Loading\"",
               "ok": true,
               "tags": [],
               "tests": [
@@ -179,12 +179,12 @@
                       "workerIndex": 2,
                       "parallelIndex": 2,
                       "status": "passed",
-                      "duration": 166,
+                      "duration": 297,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-03-04T07:16:49.505Z",
+                      "startTime": "2026-03-04T18:44:57.960Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -192,13 +192,13 @@
                   "status": "expected"
                 }
               ],
-              "id": "856d293b2e956965f9e2-5695eaed473a1c5d271d",
+              "id": "856d293b2e956965f9e2-92309b623fa422c436da",
               "file": "hx-spinner-verify.spec.ts",
-              "line": 128,
+              "line": 43,
               "column": 3
             },
             {
-              "title": "reflects custom label as aria-label",
+              "title": "custom label is set on aria-label",
               "ok": true,
               "tags": [],
               "tests": [
@@ -213,12 +213,12 @@
                       "workerIndex": 3,
                       "parallelIndex": 3,
                       "status": "passed",
-                      "duration": 177,
+                      "duration": 304,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-03-04T07:16:49.498Z",
+                      "startTime": "2026-03-04T18:44:57.969Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -226,13 +226,13 @@
                   "status": "expected"
                 }
               ],
-              "id": "856d293b2e956965f9e2-e3f7e0ef6281e3a1c381",
+              "id": "856d293b2e956965f9e2-d926ae07f3ba01879813",
               "file": "hx-spinner-verify.spec.ts",
-              "line": 140,
+              "line": 52,
               "column": 3
             },
             {
-              "title": "applies size class from hx-size attribute",
+              "title": "exposes spinner, track, and indicator CSS parts",
               "ok": true,
               "tags": [],
               "tests": [
@@ -247,12 +247,12 @@
                       "workerIndex": 4,
                       "parallelIndex": 4,
                       "status": "passed",
-                      "duration": 190,
+                      "duration": 301,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-03-04T07:16:49.475Z",
+                      "startTime": "2026-03-04T18:44:57.946Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -260,13 +260,47 @@
                   "status": "expected"
                 }
               ],
-              "id": "856d293b2e956965f9e2-dfb2b3cc4586745379ae",
+              "id": "856d293b2e956965f9e2-88886545db5ecdf833df",
               "file": "hx-spinner-verify.spec.ts",
-              "line": 148,
+              "line": 61,
               "column": 3
             },
             {
-              "title": "applies neutral variant class",
+              "title": "applies size classes correctly",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 1,
+                      "status": "passed",
+                      "duration": 90,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-03-04T18:44:58.803Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "856d293b2e956965f9e2-9431b98f8f6516097649",
+              "file": "hx-spinner-verify.spec.ts",
+              "line": 75,
+              "column": 3
+            },
+            {
+              "title": "applies variant classes correctly",
               "ok": true,
               "tags": [],
               "tests": [
@@ -281,12 +315,12 @@
                       "workerIndex": 2,
                       "parallelIndex": 2,
                       "status": "passed",
-                      "duration": 80,
+                      "duration": 93,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-03-04T07:16:50.228Z",
+                      "startTime": "2026-03-04T18:44:58.804Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -294,9 +328,9 @@
                   "status": "expected"
                 }
               ],
-              "id": "856d293b2e956965f9e2-7ca455db5b67d1ca46c5",
+              "id": "856d293b2e956965f9e2-eaad8f1a990275ff3e84",
               "file": "hx-spinner-verify.spec.ts",
-              "line": 156,
+              "line": 88,
               "column": 3
             }
           ]
@@ -306,9 +340,9 @@
   ],
   "errors": [],
   "stats": {
-    "startTime": "2026-03-04T07:16:48.831Z",
-    "duration": 1509.321,
-    "expected": 6,
+    "startTime": "2026-03-04T18:44:57.362Z",
+    "duration": 1567.8050000000003,
+    "expected": 7,
     "skipped": 0,
     "unexpected": 0,
     "flaky": 0
