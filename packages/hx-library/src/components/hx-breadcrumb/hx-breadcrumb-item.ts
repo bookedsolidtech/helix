@@ -1,0 +1,69 @@
+import { LitElement, html, nothing } from 'lit';
+import { customElement, property } from 'lit/decorators.js';
+import { tokenStyles } from '@helix/tokens/lit';
+import { helixBreadcrumbItemStyles } from './hx-breadcrumb-item.styles.js';
+
+/**
+ * A single breadcrumb navigation item.
+ *
+ * @summary A navigation item within an hx-breadcrumb component. Renders as a link when `href` is
+ * provided, or as static text for the current page (last item).
+ *
+ * @tag hx-breadcrumb-item
+ *
+ * @slot - The link or page text content.
+ *
+ * @csspart link - The anchor element when href is provided.
+ * @csspart text - The span element when no href (current page).
+ *
+ * @cssprop [--hx-breadcrumb-link-color=var(--hx-color-primary-600)] - Link text color.
+ * @cssprop [--hx-breadcrumb-link-hover-color=var(--hx-color-primary-700)] - Link hover text color.
+ * @cssprop [--hx-breadcrumb-text-color=var(--hx-color-neutral-700)] - Current page text color.
+ * @cssprop [--hx-breadcrumb-separator-content='/'] - Separator character displayed after non-last items.
+ * @cssprop [--hx-breadcrumb-separator-color=var(--hx-color-neutral-400)] - Separator color.
+ * @cssprop [--hx-breadcrumb-separator-gap=var(--hx-space-1)] - Horizontal margin around separator.
+ */
+@customElement('hx-breadcrumb-item')
+export class HelixBreadcrumbItem extends LitElement {
+  static override styles = [tokenStyles, helixBreadcrumbItemStyles];
+
+  override connectedCallback(): void {
+    super.connectedCallback();
+    this.setAttribute('role', 'listitem');
+  }
+
+  /**
+   * The URL for this breadcrumb link. Omit for the current page (last item).
+   * @attr href
+   */
+  @property({ type: String, reflect: true })
+  href: string | undefined = undefined;
+
+  /**
+   * Whether this is the last item in the breadcrumb trail. Set by the parent
+   * hx-breadcrumb component via the `data-bc-last` boolean attribute. When
+   * present the trailing separator is hidden.
+   *
+   * @attr data-bc-last
+   * @internal
+   */
+  @property({ type: Boolean, attribute: 'data-bc-last', reflect: true })
+  dataBcLast = false;
+
+  override render() {
+    return html`
+      ${this.href
+        ? html`<a part="link" href=${this.href}><slot></slot></a>`
+        : html`<span part="text"><slot></slot></span>`}
+      ${!this.dataBcLast
+        ? html`<span class="separator" aria-hidden="true"></span>`
+        : nothing}
+    `;
+  }
+}
+
+declare global {
+  interface HTMLElementTagNameMap {
+    'hx-breadcrumb-item': HelixBreadcrumbItem;
+  }
+}

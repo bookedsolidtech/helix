@@ -10,6 +10,8 @@
 
 export { HelixAlert } from './components/hx-alert/index.js';
 export { HelixBadge } from './components/hx-badge/index.js';
+export { HelixBreadcrumb } from './components/hx-breadcrumb/index.js';
+export { HelixBreadcrumbItem } from './components/hx-breadcrumb/index.js';
 export { HelixButton } from './components/hx-button/index.js';
 export { HelixButtonGroup } from './components/hx-button-group/index.js';
 export { HelixCard } from './components/hx-card/index.js';
