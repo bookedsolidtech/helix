@@ -60,3 +60,10 @@ Input: {
   "block": true,
   "timeout": 120000
 }
+
+🔧 Tool: TaskOutput
+Input: {
+  "task_id": "b1858c1",
+  "block": true,
+  "timeout": 180000
+}
