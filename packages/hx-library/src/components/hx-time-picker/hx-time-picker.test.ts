@@ -794,7 +794,7 @@ describe('hx-time-picker', () => {
     it('focus() moves focus to the native input', async () => {
       const el = await fixture<HelixTimePicker>('<hx-time-picker></hx-time-picker>');
       el.focus();
-      await new Promise<void>((r) => setTimeout(r, 50));
+      await el.updateComplete;
       const input = shadowQuery<HTMLInputElement>(el, 'input')!;
       expect(el.shadowRoot?.activeElement).toBe(input);
     });

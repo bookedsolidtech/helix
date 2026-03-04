@@ -268,10 +268,10 @@ export class HelixTimePicker extends LitElement {
   // ─── Query References ───
 
   @query('.field__input')
-  private _inputEl!: HTMLInputElement;
+  private _inputEl: HTMLInputElement | null = null;
 
   @query('.field__listbox')
-  private _listboxEl!: HTMLUListElement | null;
+  private _listboxEl: HTMLUListElement | null = null;
 
   // ─── Computed Slots ───
 
@@ -313,7 +313,7 @@ export class HelixTimePicker extends LitElement {
   override updated(changed: Map<string, unknown>): void {
     super.updated(changed);
     if (changed.has('value')) {
-      this._internals.setFormValue(this.value);
+      this._internals.setFormValue(this.value || null);
       this._updateValidity();
     }
     // When the listbox opens, scroll the selected (or active) option into view
@@ -354,7 +354,7 @@ export class HelixTimePicker extends LitElement {
       this._internals.setValidity(
         { valueMissing: true },
         this.error || 'Please select a time.',
-        this._inputEl,
+        this._inputEl ?? undefined,
       );
     } else {
       this._internals.setValidity({});
@@ -364,7 +364,7 @@ export class HelixTimePicker extends LitElement {
   formResetCallback(): void {
     this.value = '';
     this._inputDisplayValue = '';
-    this._internals.setFormValue('');
+    this._internals.setFormValue(null);
     this._closeListbox();
   }
 
@@ -456,7 +456,7 @@ export class HelixTimePicker extends LitElement {
     if (!raw) {
       // User cleared the field
       this.value = '';
-      this._internals.setFormValue('');
+      this._internals.setFormValue(null);
       this._updateValidity();
       this._dispatchChange('');
       return;
@@ -498,8 +498,8 @@ export class HelixTimePicker extends LitElement {
         break;
 
       case 'Enter':
-        e.preventDefault();
         if (this._open && this._activeIndex >= 0) {
+          e.preventDefault();
           const slot = this._slots[this._activeIndex];
           if (slot) this._selectSlot(slot);
         }

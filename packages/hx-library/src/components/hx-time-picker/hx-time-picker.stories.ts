@@ -709,7 +709,7 @@ export const FocusManagement: Story = {
     // Programmatically call focus() on the host — delegates to inner input
     host.focus();
 
-    await expect(host.shadowRoot!.activeElement).toBe(input);
+    await expect(host.shadowRoot?.activeElement).toBe(input);
   },
 };
 
