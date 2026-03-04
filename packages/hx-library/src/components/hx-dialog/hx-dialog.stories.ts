@@ -204,7 +204,7 @@ export const NonModal: Story = {
  */
 export const NoBackdropClose: Story = {
   render: () => html`
-    <hx-dialog open modal close-on-backdrop="false" heading="Required: Complete Patient Intake">
+    <hx-dialog open modal .closeOnBackdrop=${false} heading="Required: Complete Patient Intake">
       <p style="margin: 0 0 0.75rem; font-size: 0.875rem;">
         This intake form must be completed before the patient's appointment can be confirmed. You
         cannot dismiss this dialog by clicking outside.
@@ -457,7 +457,8 @@ export const TriggerButton: Story = {
     await expect(dialog).toBeTruthy();
     await expect(dialog?.hasAttribute('open')).toBe(false);
 
-    triggerBtn!.click();
+    if (!triggerBtn) throw new Error('Missing #open-dialog-btn');
+    triggerBtn.click();
 
     // Allow Lit update cycle to complete
     await dialog?.updateComplete;
@@ -544,17 +545,19 @@ export const EventFiring: Story = {
     let openFired = false;
     let closeFired = false;
 
-    dialog!.addEventListener('hx-open', () => {
+    if (!dialog) throw new Error('Missing <hx-dialog>');
+    dialog.addEventListener('hx-open', () => {
       openFired = true;
     });
-    dialog!.addEventListener('hx-close', () => {
+    dialog.addEventListener('hx-close', () => {
       closeFired = true;
     });
 
     // Open the dialog
     const openBtn = canvasElement.querySelector<HTMLButtonElement>('#open-event-btn');
     await expect(openBtn).toBeTruthy();
-    openBtn!.click();
+    if (!openBtn) throw new Error('Missing #open-event-btn');
+    openBtn.click();
 
     await dialog?.updateComplete;
     await expect(openFired).toBe(true);
@@ -563,7 +566,8 @@ export const EventFiring: Story = {
     // Close the dialog
     const closeBtn = canvasElement.querySelector<HTMLButtonElement>('#close-event-btn');
     await expect(closeBtn).toBeTruthy();
-    closeBtn!.click();
+    if (!closeBtn) throw new Error('Missing #close-event-btn');
+    closeBtn.click();
 
     await dialog?.updateComplete;
     await expect(closeFired).toBe(true);
@@ -640,7 +644,7 @@ export const CSSCustomProperties: Story = {
  */
 export const DangerConfirmation: Story = {
   render: () => html`
-    <hx-dialog open modal close-on-backdrop="false" heading="Delete Patient Record">
+    <hx-dialog open modal .closeOnBackdrop=${false} heading="Delete Patient Record">
       <div
         style="display: flex; align-items: flex-start; gap: 0.75rem; padding: 0.75rem; background: #fef2f2; border: 1px solid #fca5a5; border-radius: 0.375rem; margin-bottom: 1rem;"
       >

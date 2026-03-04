@@ -48,7 +48,7 @@ export class HelixDialog extends LitElement {
   // ─── Queries ───
 
   @query('dialog')
-  private _dialogEl!: HTMLDialogElement;
+  private declare _dialogEl: HTMLDialogElement | null;
 
   // ─── Internal state ───
 
@@ -85,7 +85,14 @@ export class HelixDialog extends LitElement {
    * When true, clicking the backdrop closes the dialog.
    * @attr close-on-backdrop
    */
-  @property({ type: Boolean, attribute: 'close-on-backdrop' })
+  @property({
+    attribute: 'close-on-backdrop',
+    reflect: true,
+    converter: {
+      fromAttribute: (value: string | null) => value !== 'false',
+      toAttribute: (value: boolean) => String(value),
+    },
+  })
   closeOnBackdrop = true;
 
   /**
@@ -166,11 +173,21 @@ export class HelixDialog extends LitElement {
     const dialog = this._dialogEl;
     if (!dialog) return;
 
+    const wasOpen = dialog.open;
     if (dialog.open) {
       dialog.close();
     }
 
     this._removeGlobalListeners();
+
+    if (wasOpen) {
+      this.dispatchEvent(
+        new CustomEvent('hx-close', {
+          bubbles: true,
+          composed: true,
+        }),
+      );
+    }
   }
 
   // ─── Event Listeners ───
@@ -316,13 +333,7 @@ export class HelixDialog extends LitElement {
     );
 
     this.open = false;
-
-    this.dispatchEvent(
-      new CustomEvent('hx-close', {
-        bubbles: true,
-        composed: true,
-      }),
-    );
+    // hx-close is dispatched by _closeDialog() which is called via the open property setter
   }
 
   // ─── Slot change handlers ───
@@ -341,7 +352,9 @@ export class HelixDialog extends LitElement {
 
   private _renderHeader() {
     const hasHeading = this.heading.trim().length > 0;
-    if (!hasHeading && !this._hasHeaderSlot) return nothing;
+    const hasHeaderContent =
+      this._hasHeaderSlot || this.querySelector('[slot="header"]') !== null;
+    if (!hasHeading && !hasHeaderContent) return nothing;
 
     return html`
       <div part="header" class="dialog__header">

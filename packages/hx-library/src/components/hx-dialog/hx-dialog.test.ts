@@ -155,6 +155,26 @@ describe('hx-dialog', () => {
       expect(event.bubbles).toBe(true);
       expect(event.composed).toBe(true);
     });
+
+    it('dispatches hx-close when close() is called', async () => {
+      const el = await fixture<HelixDialog>('<hx-dialog open></hx-dialog>');
+      await el.updateComplete;
+      const eventPromise = oneEvent<CustomEvent>(el, 'hx-close');
+      el.close();
+      const event = await eventPromise;
+      expect(event).toBeTruthy();
+      expect(event.bubbles).toBe(true);
+      expect(event.composed).toBe(true);
+    });
+
+    it('dispatches hx-close when open is set to false', async () => {
+      const el = await fixture<HelixDialog>('<hx-dialog open></hx-dialog>');
+      await el.updateComplete;
+      const eventPromise = oneEvent<CustomEvent>(el, 'hx-close');
+      el.open = false;
+      const event = await eventPromise;
+      expect(event).toBeTruthy();
+    });
   });
 
   // ─── Methods (3) ───
