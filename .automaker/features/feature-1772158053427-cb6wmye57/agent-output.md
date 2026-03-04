@@ -134,3 +134,8 @@ Input: {
 Input: {
   "command": "python3 -c \"import time; t=1772657857246/1000; print(time.strftime('%Y-%m-%d %H:%M:%S', time.gmtime(t)))\""
 }
+
+🔧 Tool: Bash
+Input: {
+  "command": "cat /Volumes/Development/booked/helix/.worktrees/feature-phase-2-component-build-helixtailwind/scripts/pre-commit-check.sh"
+}
