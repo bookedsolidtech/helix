@@ -196,6 +196,22 @@ jobs:
           retention-days: 7
           if-no-files-found: warn
 
+  # ── Security Audit ──────────────────────────────────────────────────────
+
+  audit:
+    name: Security Audit
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+      - run: npm ci
+      - name: Security audit
+        run: npm audit --audit-level=high
+
   # ── Aggregate gate (for branch protection) ──────────────────────────────
   # This job depends on all checks and is the single required status check
   # in branch protection. This avoids needing to update branch protection
@@ -205,7 +221,7 @@ jobs:
     name: Quality Gates
     runs-on: ubuntu-latest
     timeout-minutes: 1
-    needs: [lint, format, type-check, test, build, vrt]
+    needs: [lint, format, type-check, test, build, vrt, audit]
     if: always()
     steps:
       - name: Check all gates
@@ -216,13 +232,15 @@ jobs:
           echo "Test:       ${{ needs.test.result }}"
           echo "Build:      ${{ needs.build.result }}"
           echo "VRT:        ${{ needs.vrt.result }}"
+          echo "Audit:      ${{ needs.audit.result }}"
 
           if [[ "${{ needs.lint.result }}" != "success" ]] || \
              [[ "${{ needs.format.result }}" != "success" ]] || \
              [[ "${{ needs.type-check.result }}" != "success" ]] || \
              [[ "${{ needs.test.result }}" != "success" ]] || \
              [[ "${{ needs.build.result }}" != "success" ]] || \
-             [[ "${{ needs.vrt.result }}" != "success" ]]; then
+             [[ "${{ needs.vrt.result }}" != "success" ]] || \
+             [[ "${{ needs.audit.result }}" != "success" ]]; then
             echo "::error::One or more quality gates failed"
             exit 1
           fi
