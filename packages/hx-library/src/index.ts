@@ -20,6 +20,7 @@ export { HelixSwitch } from './components/hx-switch/index.js';
 export { HelixSlider } from './components/hx-slider/index.js';
 export { HelixContainer } from './components/hx-container/index.js';
 export { HelixButtonGroup } from './components/hx-button-group/index.js';
+export { HelixSplitButton, HelixMenuItem } from './components/hx-split-button/index.js';
 
 // Light DOM wrappers (Drupal integration)
 export { HelixForm } from './components/hx-form/index.js';
