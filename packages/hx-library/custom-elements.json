@@ -298,233 +298,6 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/components/hx-badge/hx-badge.ts",
-      "declarations": [
-        {
-          "kind": "class",
-          "description": "A small status indicator for notifications, counts, and labels.",
-          "name": "HelixBadge",
-          "cssProperties": [
-            {
-              "description": "Badge background color.",
-              "name": "--hx-badge-bg",
-              "default": "var(--hx-color-primary-500)"
-            },
-            {
-              "description": "Badge text color.",
-              "name": "--hx-badge-color",
-              "default": "var(--hx-color-neutral-0)"
-            },
-            {
-              "description": "Badge font size (set per size variant).",
-              "name": "--hx-badge-font-size"
-            },
-            {
-              "description": "Badge font weight.",
-              "name": "--hx-badge-font-weight",
-              "default": "var(--hx-font-weight-semibold)"
-            },
-            {
-              "description": "Badge font family.",
-              "name": "--hx-badge-font-family",
-              "default": "var(--hx-font-family-sans)"
-            },
-            {
-              "description": "Badge border radius.",
-              "name": "--hx-badge-border-radius",
-              "default": "var(--hx-border-radius-md)"
-            },
-            {
-              "description": "Badge horizontal padding (set per size variant).",
-              "name": "--hx-badge-padding-x"
-            },
-            {
-              "description": "Badge vertical padding (set per size variant).",
-              "name": "--hx-badge-padding-y"
-            },
-            {
-              "description": "Pulse color matching variant background with reduced opacity.",
-              "name": "--hx-badge-pulse-color"
-            },
-            {
-              "description": "Dot indicator size when rendered without content.",
-              "name": "--hx-badge-dot-size",
-              "default": "var(--hx-size-2)"
-            }
-          ],
-          "cssParts": [
-            {
-              "description": "The badge element.",
-              "name": "badge"
-            }
-          ],
-          "slots": [
-            {
-              "description": "Default slot for badge content (text, number). When empty with pulse enabled, renders as a dot indicator.",
-              "name": ""
-            }
-          ],
-          "members": [
-            {
-              "kind": "field",
-              "name": "variant",
-              "type": {
-                "text": "'primary' | 'success' | 'warning' | 'error' | 'neutral'"
-              },
-              "default": "'primary'",
-              "description": "Visual style variant of the badge.",
-              "attribute": "variant",
-              "reflects": true
-            },
-            {
-              "kind": "field",
-              "name": "size",
-              "type": {
-                "text": "'sm' | 'md' | 'lg'"
-              },
-              "default": "'md'",
-              "description": "Size of the badge.",
-              "attribute": "hx-size",
-              "reflects": true
-            },
-            {
-              "kind": "field",
-              "name": "pill",
-              "type": {
-                "text": "boolean"
-              },
-              "default": "false",
-              "description": "Whether the badge uses fully rounded (pill) styling.",
-              "attribute": "pill",
-              "reflects": true
-            },
-            {
-              "kind": "field",
-              "name": "pulse",
-              "type": {
-                "text": "boolean"
-              },
-              "default": "false",
-              "description": "Whether the badge displays an animated pulse for attention.",
-              "attribute": "pulse",
-              "reflects": true
-            },
-            {
-              "kind": "field",
-              "name": "_hasSlotContent",
-              "type": {
-                "text": "boolean"
-              },
-              "privacy": "private",
-              "default": "false",
-              "description": "Tracks whether the default slot has assigned content."
-            },
-            {
-              "kind": "method",
-              "name": "_handleSlotChange",
-              "privacy": "private",
-              "return": {
-                "type": {
-                  "text": "void"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "e",
-                  "type": {
-                    "text": "Event"
-                  }
-                }
-              ]
-            }
-          ],
-          "attributes": [
-            {
-              "name": "variant",
-              "type": {
-                "text": "'primary' | 'success' | 'warning' | 'error' | 'neutral'"
-              },
-              "default": "'primary'",
-              "description": "Visual style variant of the badge.",
-              "fieldName": "variant",
-              "attribute": "variant"
-            },
-            {
-              "name": "hx-size",
-              "type": {
-                "text": "'sm' | 'md' | 'lg'"
-              },
-              "default": "'md'",
-              "description": "Size of the badge.",
-              "fieldName": "size",
-              "attribute": "hx-size"
-            },
-            {
-              "name": "pill",
-              "type": {
-                "text": "boolean"
-              },
-              "default": "false",
-              "description": "Whether the badge uses fully rounded (pill) styling.",
-              "fieldName": "pill",
-              "attribute": "pill"
-            },
-            {
-              "name": "pulse",
-              "type": {
-                "text": "boolean"
-              },
-              "default": "false",
-              "description": "Whether the badge displays an animated pulse for attention.",
-              "fieldName": "pulse",
-              "attribute": "pulse"
-            }
-          ],
-          "superclass": {
-            "name": "LitElement",
-            "package": "lit"
-          },
-          "tagName": "hx-badge",
-          "customElement": true,
-          "summary": "Presentational badge for status indicators, notification counts, and labels."
-        }
-      ],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "HelixBadge",
-          "declaration": {
-            "name": "HelixBadge",
-            "module": "src/components/hx-badge/hx-badge.ts"
-          }
-        },
-        {
-          "kind": "custom-element-definition",
-          "name": "hx-badge",
-          "declaration": {
-            "name": "HelixBadge",
-            "module": "src/components/hx-badge/hx-badge.ts"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
-      "path": "src/components/hx-badge/index.ts",
-      "declarations": [],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "HelixBadge",
-          "declaration": {
-            "name": "HelixBadge",
-            "module": "./hx-badge.js"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
       "path": "src/components/hx-button/hx-button.ts",
       "declarations": [
         {
@@ -894,6 +667,375 @@
           "declaration": {
             "name": "HelixButton",
             "module": "./hx-button.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/components/hx-badge/hx-badge.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "A small status indicator for notifications, counts, and labels.",
+          "name": "HelixBadge",
+          "cssProperties": [
+            {
+              "description": "Badge background color.",
+              "name": "--hx-badge-bg",
+              "default": "var(--hx-color-primary-500)"
+            },
+            {
+              "description": "Badge text color.",
+              "name": "--hx-badge-color",
+              "default": "var(--hx-color-neutral-0)"
+            },
+            {
+              "description": "Badge font size (set per size variant).",
+              "name": "--hx-badge-font-size"
+            },
+            {
+              "description": "Badge font weight.",
+              "name": "--hx-badge-font-weight",
+              "default": "var(--hx-font-weight-semibold)"
+            },
+            {
+              "description": "Badge font family.",
+              "name": "--hx-badge-font-family",
+              "default": "var(--hx-font-family-sans)"
+            },
+            {
+              "description": "Badge border radius.",
+              "name": "--hx-badge-border-radius",
+              "default": "var(--hx-border-radius-md)"
+            },
+            {
+              "description": "Badge horizontal padding (set per size variant).",
+              "name": "--hx-badge-padding-x"
+            },
+            {
+              "description": "Badge vertical padding (set per size variant).",
+              "name": "--hx-badge-padding-y"
+            },
+            {
+              "description": "Pulse color matching variant background with reduced opacity.",
+              "name": "--hx-badge-pulse-color"
+            },
+            {
+              "description": "Dot indicator size when rendered without content.",
+              "name": "--hx-badge-dot-size",
+              "default": "var(--hx-size-2)"
+            }
+          ],
+          "cssParts": [
+            {
+              "description": "The badge element.",
+              "name": "badge"
+            }
+          ],
+          "slots": [
+            {
+              "description": "Default slot for badge content (text, number). When empty with pulse enabled, renders as a dot indicator.",
+              "name": ""
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "variant",
+              "type": {
+                "text": "'primary' | 'success' | 'warning' | 'error' | 'neutral'"
+              },
+              "default": "'primary'",
+              "description": "Visual style variant of the badge.",
+              "attribute": "variant",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "size",
+              "type": {
+                "text": "'sm' | 'md' | 'lg'"
+              },
+              "default": "'md'",
+              "description": "Size of the badge.",
+              "attribute": "hx-size",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "pill",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the badge uses fully rounded (pill) styling.",
+              "attribute": "pill",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "pulse",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the badge displays an animated pulse for attention.",
+              "attribute": "pulse",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "_hasSlotContent",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "default": "false",
+              "description": "Tracks whether the default slot has assigned content."
+            },
+            {
+              "kind": "method",
+              "name": "_handleSlotChange",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "e",
+                  "type": {
+                    "text": "Event"
+                  }
+                }
+              ]
+            }
+          ],
+          "attributes": [
+            {
+              "name": "variant",
+              "type": {
+                "text": "'primary' | 'success' | 'warning' | 'error' | 'neutral'"
+              },
+              "default": "'primary'",
+              "description": "Visual style variant of the badge.",
+              "fieldName": "variant",
+              "attribute": "variant"
+            },
+            {
+              "name": "hx-size",
+              "type": {
+                "text": "'sm' | 'md' | 'lg'"
+              },
+              "default": "'md'",
+              "description": "Size of the badge.",
+              "fieldName": "size",
+              "attribute": "hx-size"
+            },
+            {
+              "name": "pill",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the badge uses fully rounded (pill) styling.",
+              "fieldName": "pill",
+              "attribute": "pill"
+            },
+            {
+              "name": "pulse",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the badge displays an animated pulse for attention.",
+              "fieldName": "pulse",
+              "attribute": "pulse"
+            }
+          ],
+          "superclass": {
+            "name": "LitElement",
+            "package": "lit"
+          },
+          "tagName": "hx-badge",
+          "customElement": true,
+          "summary": "Presentational badge for status indicators, notification counts, and labels."
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "HelixBadge",
+          "declaration": {
+            "name": "HelixBadge",
+            "module": "src/components/hx-badge/hx-badge.ts"
+          }
+        },
+        {
+          "kind": "custom-element-definition",
+          "name": "hx-badge",
+          "declaration": {
+            "name": "HelixBadge",
+            "module": "src/components/hx-badge/hx-badge.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/components/hx-badge/index.ts",
+      "declarations": [],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "HelixBadge",
+          "declaration": {
+            "name": "HelixBadge",
+            "module": "./hx-badge.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/components/hx-button-group/hx-button-group.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "A container component that groups related hx-button elements into a cohesive\nhorizontal or vertical action set. Eliminates double borders between adjacent\nbuttons and squares off inner border-radius for a unified visual appearance.",
+          "name": "HelixButtonGroup",
+          "cssProperties": [
+            {
+              "description": "Size token forwarded to child buttons. Accepts 'sm', 'md', or 'lg'.",
+              "name": "--hx-button-group-size",
+              "default": "md"
+            }
+          ],
+          "cssParts": [
+            {
+              "description": "The container div element wrapping all slotted buttons.",
+              "name": "group"
+            }
+          ],
+          "slots": [
+            {
+              "description": "Default slot accepting hx-button and hx-icon-button children.",
+              "name": ""
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "internals",
+              "type": {
+                "text": "ElementInternals"
+              },
+              "privacy": "private"
+            },
+            {
+              "kind": "field",
+              "name": "orientation",
+              "type": {
+                "text": "'horizontal' | 'vertical'"
+              },
+              "default": "'horizontal'",
+              "description": "Layout orientation of the button group.",
+              "attribute": "orientation",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "size",
+              "type": {
+                "text": "'sm' | 'md' | 'lg'"
+              },
+              "default": "'md'",
+              "description": "Size applied to the button group and cascaded to child buttons via\nthe --hx-button-group-size CSS custom property.",
+              "attribute": "hx-size",
+              "reflects": true
+            },
+            {
+              "kind": "method",
+              "name": "_handleSlotChange",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              }
+            },
+            {
+              "kind": "field",
+              "name": "role",
+              "type": {
+                "text": "string"
+              },
+              "default": "'group'"
+            }
+          ],
+          "attributes": [
+            {
+              "name": "orientation",
+              "type": {
+                "text": "'horizontal' | 'vertical'"
+              },
+              "default": "'horizontal'",
+              "description": "Layout orientation of the button group.",
+              "fieldName": "orientation",
+              "attribute": "orientation"
+            },
+            {
+              "name": "hx-size",
+              "type": {
+                "text": "'sm' | 'md' | 'lg'"
+              },
+              "default": "'md'",
+              "description": "Size applied to the button group and cascaded to child buttons via\nthe --hx-button-group-size CSS custom property.",
+              "fieldName": "size",
+              "attribute": "hx-size"
+            }
+          ],
+          "superclass": {
+            "name": "LitElement",
+            "package": "lit"
+          },
+          "tagName": "hx-button-group",
+          "customElement": true,
+          "summary": "Groups hx-button elements into a horizontal or vertical action set with shared borders."
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "HelixButtonGroup",
+          "declaration": {
+            "name": "HelixButtonGroup",
+            "module": "src/components/hx-button-group/hx-button-group.ts"
+          }
+        },
+        {
+          "kind": "custom-element-definition",
+          "name": "hx-button-group",
+          "declaration": {
+            "name": "HelixButtonGroup",
+            "module": "src/components/hx-button-group/hx-button-group.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/components/hx-button-group/index.ts",
+      "declarations": [],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "HelixButtonGroup",
+          "declaration": {
+            "name": "HelixButtonGroup",
+            "module": "./hx-button-group.js"
           }
         }
       ]
@@ -1438,156 +1580,6 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/components/hx-container/hx-container.ts",
-      "declarations": [
-        {
-          "kind": "class",
-          "description": "A layout container that constrains content width and provides\nconsistent vertical spacing and horizontal gutters.\n\nUses a two-layer model: the outer host spans full width (background,\nvertical padding), while the inner wrapper constrains max-width,\ncenters content, and applies horizontal gutters.",
-          "name": "HelixContainer",
-          "cssProperties": [
-            {
-              "description": "Background color on the outer wrapper.",
-              "name": "--hx-container-bg",
-              "default": "transparent"
-            },
-            {
-              "description": "Horizontal padding on the inner box.",
-              "name": "--hx-container-gutter",
-              "default": "var(--hx-space-6)"
-            },
-            {
-              "description": "Override the max-width set by the width property.",
-              "name": "--hx-container-max-width"
-            },
-            {
-              "description": "Max-width for the content width preset.",
-              "name": "--hx-container-content",
-              "default": "72rem"
-            },
-            {
-              "description": "Max-width for the sm width preset.",
-              "name": "--hx-container-sm",
-              "default": "640px"
-            },
-            {
-              "description": "Max-width for the md width preset.",
-              "name": "--hx-container-md",
-              "default": "768px"
-            },
-            {
-              "description": "Max-width for the lg width preset.",
-              "name": "--hx-container-lg",
-              "default": "1024px"
-            },
-            {
-              "description": "Max-width for the xl width preset.",
-              "name": "--hx-container-xl",
-              "default": "1280px"
-            }
-          ],
-          "cssParts": [
-            {
-              "description": "The inner wrapper that constrains max-width and applies gutters.",
-              "name": "inner"
-            }
-          ],
-          "slots": [
-            {
-              "description": "Default slot for container content.",
-              "name": ""
-            }
-          ],
-          "members": [
-            {
-              "kind": "field",
-              "name": "width",
-              "type": {
-                "text": "'full' | 'content' | 'narrow' | 'sm' | 'md' | 'lg' | 'xl'"
-              },
-              "default": "'content'",
-              "description": "Controls the max-width of the inner content wrapper.",
-              "attribute": "width",
-              "reflects": true
-            },
-            {
-              "kind": "field",
-              "name": "padding",
-              "type": {
-                "text": "'none' | 'sm' | 'md' | 'lg' | 'xl' | '2xl'"
-              },
-              "default": "'none'",
-              "description": "Vertical padding applied to the outer wrapper.",
-              "attribute": "padding",
-              "reflects": true
-            }
-          ],
-          "attributes": [
-            {
-              "name": "width",
-              "type": {
-                "text": "'full' | 'content' | 'narrow' | 'sm' | 'md' | 'lg' | 'xl'"
-              },
-              "default": "'content'",
-              "description": "Controls the max-width of the inner content wrapper.",
-              "fieldName": "width",
-              "attribute": "width"
-            },
-            {
-              "name": "padding",
-              "type": {
-                "text": "'none' | 'sm' | 'md' | 'lg' | 'xl' | '2xl'"
-              },
-              "default": "'none'",
-              "description": "Vertical padding applied to the outer wrapper.",
-              "fieldName": "padding",
-              "attribute": "padding"
-            }
-          ],
-          "superclass": {
-            "name": "LitElement",
-            "package": "lit"
-          },
-          "tagName": "hx-container",
-          "customElement": true,
-          "summary": "Layout primitive for constraining content width with consistent spacing."
-        }
-      ],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "HelixContainer",
-          "declaration": {
-            "name": "HelixContainer",
-            "module": "src/components/hx-container/hx-container.ts"
-          }
-        },
-        {
-          "kind": "custom-element-definition",
-          "name": "hx-container",
-          "declaration": {
-            "name": "HelixContainer",
-            "module": "src/components/hx-container/hx-container.ts"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
-      "path": "src/components/hx-container/index.ts",
-      "declarations": [],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "HelixContainer",
-          "declaration": {
-            "name": "HelixContainer",
-            "module": "./hx-container.js"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
       "path": "src/components/hx-form/hx-form.ts",
       "declarations": [
         {
@@ -1850,6 +1842,1069 @@
           "declaration": {
             "name": "HelixForm",
             "module": "./hx-form.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/components/hx-container/hx-container.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "A layout container that constrains content width and provides\nconsistent vertical spacing and horizontal gutters.\n\nUses a two-layer model: the outer host spans full width (background,\nvertical padding), while the inner wrapper constrains max-width,\ncenters content, and applies horizontal gutters.",
+          "name": "HelixContainer",
+          "cssProperties": [
+            {
+              "description": "Background color on the outer wrapper.",
+              "name": "--hx-container-bg",
+              "default": "transparent"
+            },
+            {
+              "description": "Horizontal padding on the inner box.",
+              "name": "--hx-container-gutter",
+              "default": "var(--hx-space-6)"
+            },
+            {
+              "description": "Override the max-width set by the width property.",
+              "name": "--hx-container-max-width"
+            },
+            {
+              "description": "Max-width for the content width preset.",
+              "name": "--hx-container-content",
+              "default": "72rem"
+            },
+            {
+              "description": "Max-width for the sm width preset.",
+              "name": "--hx-container-sm",
+              "default": "640px"
+            },
+            {
+              "description": "Max-width for the md width preset.",
+              "name": "--hx-container-md",
+              "default": "768px"
+            },
+            {
+              "description": "Max-width for the lg width preset.",
+              "name": "--hx-container-lg",
+              "default": "1024px"
+            },
+            {
+              "description": "Max-width for the xl width preset.",
+              "name": "--hx-container-xl",
+              "default": "1280px"
+            }
+          ],
+          "cssParts": [
+            {
+              "description": "The inner wrapper that constrains max-width and applies gutters.",
+              "name": "inner"
+            }
+          ],
+          "slots": [
+            {
+              "description": "Default slot for container content.",
+              "name": ""
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "width",
+              "type": {
+                "text": "'full' | 'content' | 'narrow' | 'sm' | 'md' | 'lg' | 'xl'"
+              },
+              "default": "'content'",
+              "description": "Controls the max-width of the inner content wrapper.",
+              "attribute": "width",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "padding",
+              "type": {
+                "text": "'none' | 'sm' | 'md' | 'lg' | 'xl' | '2xl'"
+              },
+              "default": "'none'",
+              "description": "Vertical padding applied to the outer wrapper.",
+              "attribute": "padding",
+              "reflects": true
+            }
+          ],
+          "attributes": [
+            {
+              "name": "width",
+              "type": {
+                "text": "'full' | 'content' | 'narrow' | 'sm' | 'md' | 'lg' | 'xl'"
+              },
+              "default": "'content'",
+              "description": "Controls the max-width of the inner content wrapper.",
+              "fieldName": "width",
+              "attribute": "width"
+            },
+            {
+              "name": "padding",
+              "type": {
+                "text": "'none' | 'sm' | 'md' | 'lg' | 'xl' | '2xl'"
+              },
+              "default": "'none'",
+              "description": "Vertical padding applied to the outer wrapper.",
+              "fieldName": "padding",
+              "attribute": "padding"
+            }
+          ],
+          "superclass": {
+            "name": "LitElement",
+            "package": "lit"
+          },
+          "tagName": "hx-container",
+          "customElement": true,
+          "summary": "Layout primitive for constraining content width with consistent spacing."
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "HelixContainer",
+          "declaration": {
+            "name": "HelixContainer",
+            "module": "src/components/hx-container/hx-container.ts"
+          }
+        },
+        {
+          "kind": "custom-element-definition",
+          "name": "hx-container",
+          "declaration": {
+            "name": "HelixContainer",
+            "module": "src/components/hx-container/hx-container.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/components/hx-container/index.ts",
+      "declarations": [],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "HelixContainer",
+          "declaration": {
+            "name": "HelixContainer",
+            "module": "./hx-container.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/components/hx-icon-button/hx-icon-button.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "An icon-only button component for compact, accessible actions.\nRenders a square button or anchor element containing a single icon.\nThe `label` property is required and provides the accessible name\nvia `aria-label` and a native tooltip via the `title` attribute.",
+          "name": "HelixIconButton",
+          "cssProperties": [
+            {
+              "description": "Button background color.",
+              "name": "--hx-icon-button-bg",
+              "default": "transparent"
+            },
+            {
+              "description": "Icon color.",
+              "name": "--hx-icon-button-color",
+              "default": "var(--hx-color-primary-500)"
+            },
+            {
+              "description": "Button border color.",
+              "name": "--hx-icon-button-border-color",
+              "default": "transparent"
+            },
+            {
+              "description": "Button border radius.",
+              "name": "--hx-icon-button-border-radius",
+              "default": "var(--hx-border-radius-md)"
+            },
+            {
+              "description": "Explicit width and height override for the button.",
+              "name": "--hx-icon-button-size"
+            },
+            {
+              "description": "Focus ring color.",
+              "name": "--hx-icon-button-focus-ring-color",
+              "default": "var(--hx-focus-ring-color)"
+            }
+          ],
+          "cssParts": [
+            {
+              "description": "The native button or anchor element.",
+              "name": "button"
+            },
+            {
+              "description": "The icon container span wrapping the default slot.",
+              "name": "icon"
+            }
+          ],
+          "slots": [
+            {
+              "description": "Icon element to display (hx-icon, svg, or img).",
+              "name": ""
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "label",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Accessible name for the button. Required. Rendered as `aria-label` and\n`title` on the underlying element. A console warning is emitted when absent.",
+              "attribute": "label"
+            },
+            {
+              "kind": "field",
+              "name": "variant",
+              "type": {
+                "text": "'primary' | 'secondary' | 'tertiary' | 'danger' | 'ghost'"
+              },
+              "default": "'ghost'",
+              "description": "Visual style variant of the button.",
+              "attribute": "variant",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "size",
+              "type": {
+                "text": "'sm' | 'md' | 'lg'"
+              },
+              "default": "'md'",
+              "description": "Size of the button.",
+              "attribute": "hx-size",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "type",
+              "type": {
+                "text": "'button' | 'submit' | 'reset'"
+              },
+              "default": "'button'",
+              "description": "The type attribute for the underlying button element.\nHas no effect when `href` is set.",
+              "attribute": "type"
+            },
+            {
+              "kind": "field",
+              "name": "disabled",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the button is disabled.",
+              "attribute": "disabled",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "href",
+              "type": {
+                "text": "string | undefined"
+              },
+              "default": "undefined",
+              "description": "When set, renders an `<a>` element instead of a `<button>`.",
+              "attribute": "href"
+            },
+            {
+              "kind": "field",
+              "name": "name",
+              "type": {
+                "text": "string | undefined"
+              },
+              "default": "undefined",
+              "description": "Name submitted with form data. Only applicable when rendering as a button.",
+              "attribute": "name"
+            },
+            {
+              "kind": "field",
+              "name": "value",
+              "type": {
+                "text": "string | undefined"
+              },
+              "default": "undefined",
+              "description": "Value submitted with form data. Only applicable when rendering as a button.",
+              "attribute": "value"
+            },
+            {
+              "kind": "field",
+              "name": "formAssociated",
+              "type": {
+                "text": "boolean"
+              },
+              "static": true,
+              "default": "true"
+            },
+            {
+              "kind": "field",
+              "name": "_internals",
+              "type": {
+                "text": "ElementInternals"
+              },
+              "privacy": "private"
+            },
+            {
+              "kind": "field",
+              "name": "form",
+              "type": {
+                "text": "HTMLFormElement | null"
+              },
+              "description": "Returns the associated form element, if any.",
+              "readonly": true
+            },
+            {
+              "kind": "method",
+              "name": "_handleClick",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "e",
+                  "type": {
+                    "text": "MouseEvent"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "_normalizedLabel",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "string"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "_classes",
+              "privacy": "private"
+            },
+            {
+              "kind": "method",
+              "name": "_iconSlot",
+              "privacy": "private"
+            }
+          ],
+          "events": [
+            {
+              "name": "hx-click",
+              "type": {
+                "text": "CustomEvent<{originalEvent: MouseEvent}>"
+              },
+              "description": "Dispatched when the button is clicked (not disabled)."
+            }
+          ],
+          "attributes": [
+            {
+              "name": "label",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Accessible name for the button. Required. Rendered as `aria-label` and\n`title` on the underlying element. A console warning is emitted when absent.",
+              "fieldName": "label",
+              "attribute": "label"
+            },
+            {
+              "name": "variant",
+              "type": {
+                "text": "'primary' | 'secondary' | 'tertiary' | 'danger' | 'ghost'"
+              },
+              "default": "'ghost'",
+              "description": "Visual style variant of the button.",
+              "fieldName": "variant",
+              "attribute": "variant"
+            },
+            {
+              "name": "hx-size",
+              "type": {
+                "text": "'sm' | 'md' | 'lg'"
+              },
+              "default": "'md'",
+              "description": "Size of the button.",
+              "fieldName": "size",
+              "attribute": "hx-size"
+            },
+            {
+              "name": "type",
+              "type": {
+                "text": "'button' | 'submit' | 'reset'"
+              },
+              "default": "'button'",
+              "description": "The type attribute for the underlying button element.\nHas no effect when `href` is set.",
+              "fieldName": "type",
+              "attribute": "type"
+            },
+            {
+              "name": "disabled",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the button is disabled.",
+              "fieldName": "disabled",
+              "attribute": "disabled"
+            },
+            {
+              "name": "href",
+              "type": {
+                "text": "string | undefined"
+              },
+              "default": "undefined",
+              "description": "When set, renders an `<a>` element instead of a `<button>`.",
+              "fieldName": "href",
+              "attribute": "href"
+            },
+            {
+              "name": "name",
+              "type": {
+                "text": "string | undefined"
+              },
+              "default": "undefined",
+              "description": "Name submitted with form data. Only applicable when rendering as a button.",
+              "fieldName": "name",
+              "attribute": "name"
+            },
+            {
+              "name": "value",
+              "type": {
+                "text": "string | undefined"
+              },
+              "default": "undefined",
+              "description": "Value submitted with form data. Only applicable when rendering as a button.",
+              "fieldName": "value",
+              "attribute": "value"
+            }
+          ],
+          "superclass": {
+            "name": "LitElement",
+            "package": "lit"
+          },
+          "tagName": "hx-icon-button",
+          "customElement": true,
+          "summary": "Icon-only action button with full accessibility support."
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "HelixIconButton",
+          "declaration": {
+            "name": "HelixIconButton",
+            "module": "src/components/hx-icon-button/hx-icon-button.ts"
+          }
+        },
+        {
+          "kind": "custom-element-definition",
+          "name": "hx-icon-button",
+          "declaration": {
+            "name": "HelixIconButton",
+            "module": "src/components/hx-icon-button/hx-icon-button.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/components/hx-icon-button/index.ts",
+      "declarations": [],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "HelixIconButton",
+          "declaration": {
+            "name": "HelixIconButton",
+            "module": "./hx-icon-button.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/components/hx-progress-bar/hx-progress-bar.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "A linear progress indicator for displaying operation completion status.\nSupports determinate and indeterminate modes for healthcare workflows.",
+          "name": "HelixProgressBar",
+          "cssProperties": [
+            {
+              "description": "Fill background color.",
+              "name": "--hx-progress-bar-fill-bg",
+              "default": "var(--hx-color-primary-500)"
+            },
+            {
+              "description": "Track background color.",
+              "name": "--hx-progress-bar-track-bg",
+              "default": "var(--hx-color-neutral-200)"
+            },
+            {
+              "description": "Height of the progress bar track.",
+              "name": "--hx-progress-bar-height",
+              "default": "var(--hx-space-2)"
+            },
+            {
+              "description": "Border radius of track and fill.",
+              "name": "--hx-progress-bar-border-radius",
+              "default": "var(--hx-border-radius-full)"
+            },
+            {
+              "description": "Label and value text color.",
+              "name": "--hx-progress-bar-label-color",
+              "default": "var(--hx-color-neutral-700)"
+            },
+            {
+              "description": "Label and value font size.",
+              "name": "--hx-progress-bar-font-size",
+              "default": "var(--hx-font-size-sm)"
+            },
+            {
+              "description": "Label and value font weight.",
+              "name": "--hx-progress-bar-font-weight",
+              "default": "var(--hx-font-weight-semibold)"
+            },
+            {
+              "description": "Label and value font family.",
+              "name": "--hx-progress-bar-font-family",
+              "default": "var(--hx-font-family-sans)"
+            },
+            {
+              "description": "Gap between label row and track.",
+              "name": "--hx-progress-bar-gap",
+              "default": "var(--hx-space-1)"
+            }
+          ],
+          "cssParts": [
+            {
+              "description": "The outer track container element.",
+              "name": "bar"
+            },
+            {
+              "description": "The track background element.",
+              "name": "track"
+            },
+            {
+              "description": "The progress fill element.",
+              "name": "fill"
+            },
+            {
+              "description": "The label container element.",
+              "name": "label"
+            },
+            {
+              "description": "The displayed percentage value text.",
+              "name": "value"
+            }
+          ],
+          "slots": [
+            {
+              "description": "Custom label content. When provided, replaces the `label` property text.",
+              "name": "label"
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "value",
+              "type": {
+                "text": "number"
+              },
+              "default": "0",
+              "description": "Current progress value (0 to max).",
+              "attribute": "value",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "max",
+              "type": {
+                "text": "number"
+              },
+              "default": "100",
+              "description": "Maximum value for the progress bar.",
+              "attribute": "max",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "indeterminate",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "When true, displays an animated indeterminate loading state.\nNo aria-valuenow is set in this mode.",
+              "attribute": "indeterminate",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "variant",
+              "type": {
+                "text": "ProgressBarVariant"
+              },
+              "default": "'primary'",
+              "description": "Visual variant that determines the fill color.",
+              "attribute": "variant",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "label",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Accessible label text. Used when the label slot is not populated.",
+              "attribute": "label",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "showValue",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "When true, displays the calculated percentage next to the label.",
+              "attribute": "show-value",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "_hasLabelSlotContent",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "default": "false",
+              "description": "Tracks whether the label slot has assigned content."
+            },
+            {
+              "kind": "field",
+              "name": "_clampedValue",
+              "type": {
+                "text": "number"
+              },
+              "privacy": "private",
+              "description": "Returns the clamped value between 0 and max.",
+              "readonly": true
+            },
+            {
+              "kind": "field",
+              "name": "_percentage",
+              "type": {
+                "text": "number"
+              },
+              "privacy": "private",
+              "description": "Returns the percentage (0–100), rounded to the nearest integer.",
+              "readonly": true
+            },
+            {
+              "kind": "method",
+              "name": "_handleLabelSlotChange",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "e",
+                  "type": {
+                    "text": "Event"
+                  }
+                }
+              ]
+            }
+          ],
+          "attributes": [
+            {
+              "name": "value",
+              "type": {
+                "text": "number"
+              },
+              "default": "0",
+              "description": "Current progress value (0 to max).",
+              "fieldName": "value",
+              "attribute": "value"
+            },
+            {
+              "name": "max",
+              "type": {
+                "text": "number"
+              },
+              "default": "100",
+              "description": "Maximum value for the progress bar.",
+              "fieldName": "max",
+              "attribute": "max"
+            },
+            {
+              "name": "indeterminate",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "When true, displays an animated indeterminate loading state.\nNo aria-valuenow is set in this mode.",
+              "fieldName": "indeterminate",
+              "attribute": "indeterminate"
+            },
+            {
+              "name": "variant",
+              "type": {
+                "text": "ProgressBarVariant"
+              },
+              "default": "'primary'",
+              "description": "Visual variant that determines the fill color.",
+              "fieldName": "variant",
+              "attribute": "variant"
+            },
+            {
+              "name": "label",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Accessible label text. Used when the label slot is not populated.",
+              "fieldName": "label",
+              "attribute": "label"
+            },
+            {
+              "name": "show-value",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "When true, displays the calculated percentage next to the label.",
+              "fieldName": "showValue",
+              "attribute": "show-value"
+            }
+          ],
+          "superclass": {
+            "name": "LitElement",
+            "package": "lit"
+          },
+          "tagName": "hx-progress-bar",
+          "customElement": true,
+          "summary": "Linear progress bar with determinate and indeterminate states."
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "HelixProgressBar",
+          "declaration": {
+            "name": "HelixProgressBar",
+            "module": "src/components/hx-progress-bar/hx-progress-bar.ts"
+          }
+        },
+        {
+          "kind": "custom-element-definition",
+          "name": "hx-progress-bar",
+          "declaration": {
+            "name": "HelixProgressBar",
+            "module": "src/components/hx-progress-bar/hx-progress-bar.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/components/hx-progress-bar/index.ts",
+      "declarations": [],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "HelixProgressBar",
+          "declaration": {
+            "name": "HelixProgressBar",
+            "module": "./hx-progress-bar.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/components/hx-card/hx-card.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "A flexible card component for displaying grouped content.",
+          "name": "HelixCard",
+          "cssProperties": [
+            {
+              "description": "Card background color.",
+              "name": "--hx-card-bg",
+              "default": "var(--hx-color-neutral-0)"
+            },
+            {
+              "description": "Card text color.",
+              "name": "--hx-card-color",
+              "default": "var(--hx-color-neutral-800)"
+            },
+            {
+              "description": "Card border color.",
+              "name": "--hx-card-border-color",
+              "default": "var(--hx-color-neutral-200)"
+            },
+            {
+              "description": "Card border radius.",
+              "name": "--hx-card-border-radius",
+              "default": "var(--hx-border-radius-lg)"
+            },
+            {
+              "description": "Internal padding for card sections.",
+              "name": "--hx-card-padding",
+              "default": "var(--hx-space-6)"
+            },
+            {
+              "description": "Gap between card sections.",
+              "name": "--hx-card-gap",
+              "default": "var(--hx-space-4)"
+            }
+          ],
+          "cssParts": [
+            {
+              "description": "The outer card container element.",
+              "name": "card"
+            },
+            {
+              "description": "The image slot container.",
+              "name": "image"
+            },
+            {
+              "description": "The heading slot container.",
+              "name": "heading"
+            },
+            {
+              "description": "The body slot container.",
+              "name": "body"
+            },
+            {
+              "description": "The footer slot container.",
+              "name": "footer"
+            },
+            {
+              "description": "The actions slot container.",
+              "name": "actions"
+            }
+          ],
+          "slots": [
+            {
+              "description": "Optional image or media content at the top of the card.",
+              "name": "image"
+            },
+            {
+              "description": "The card heading/title content.",
+              "name": "heading"
+            },
+            {
+              "description": "Default slot for the card body content.",
+              "name": ""
+            },
+            {
+              "description": "Optional footer content below the body.",
+              "name": "footer"
+            },
+            {
+              "description": "Optional action buttons, rendered with a top border separator.",
+              "name": "actions"
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "variant",
+              "type": {
+                "text": "'default' | 'featured' | 'compact'"
+              },
+              "default": "'default'",
+              "description": "Visual style variant of the card.",
+              "attribute": "variant",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "elevation",
+              "type": {
+                "text": "'flat' | 'raised' | 'floating'"
+              },
+              "default": "'flat'",
+              "description": "Elevation (shadow depth) of the card.",
+              "attribute": "elevation",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "wcHref",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Optional URL. When set, the card becomes interactive (clickable)\nand navigates to this URL on click.\nUses wc-href to avoid conflicting with the native HTML href attribute.",
+              "attribute": "hx-href"
+            },
+            {
+              "kind": "field",
+              "name": "_hasSlotContent",
+              "type": {
+                "text": "Record<string, boolean>"
+              },
+              "privacy": "private",
+              "default": "{ image: false, heading: false, footer: false, actions: false, }"
+            },
+            {
+              "kind": "method",
+              "name": "_handleSlotChange",
+              "privacy": "private",
+              "parameters": [
+                {
+                  "name": "slotName",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "_handleClick",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "e",
+                  "type": {
+                    "text": "MouseEvent"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "_handleKeyDown",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "e",
+                  "type": {
+                    "text": "KeyboardEvent"
+                  }
+                }
+              ]
+            }
+          ],
+          "events": [
+            {
+              "name": "hx-card-click",
+              "type": {
+                "text": "CustomEvent"
+              },
+              "description": "Dispatched when an interactive card is clicked.\nIncludes the target href in the detail."
+            },
+            {
+              "type": {
+                "text": "CustomEvent<{url: string, originalEvent: MouseEvent}>"
+              },
+              "description": "Dispatched when an interactive card (with wc-href) is clicked.",
+              "name": "wc-card-click"
+            }
+          ],
+          "attributes": [
+            {
+              "name": "variant",
+              "type": {
+                "text": "'default' | 'featured' | 'compact'"
+              },
+              "default": "'default'",
+              "description": "Visual style variant of the card.",
+              "fieldName": "variant",
+              "attribute": "variant"
+            },
+            {
+              "name": "elevation",
+              "type": {
+                "text": "'flat' | 'raised' | 'floating'"
+              },
+              "default": "'flat'",
+              "description": "Elevation (shadow depth) of the card.",
+              "fieldName": "elevation",
+              "attribute": "elevation"
+            },
+            {
+              "name": "hx-href",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Optional URL. When set, the card becomes interactive (clickable)\nand navigates to this URL on click.\nUses wc-href to avoid conflicting with the native HTML href attribute.",
+              "fieldName": "wcHref",
+              "attribute": "hx-href"
+            }
+          ],
+          "superclass": {
+            "name": "LitElement",
+            "package": "lit"
+          },
+          "tagName": "hx-card",
+          "customElement": true,
+          "summary": "Content container with image, heading, body, footer, and action slots."
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "HelixCard",
+          "declaration": {
+            "name": "HelixCard",
+            "module": "src/components/hx-card/hx-card.ts"
+          }
+        },
+        {
+          "kind": "custom-element-definition",
+          "name": "hx-card",
+          "declaration": {
+            "name": "HelixCard",
+            "module": "src/components/hx-card/hx-card.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/components/hx-card/index.ts",
+      "declarations": [],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "HelixCard",
+          "declaration": {
+            "name": "HelixCard",
+            "module": "./hx-card.js"
           }
         }
       ]
@@ -2701,277 +3756,6 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/components/hx-card/hx-card.ts",
-      "declarations": [
-        {
-          "kind": "class",
-          "description": "A flexible card component for displaying grouped content.",
-          "name": "HelixCard",
-          "cssProperties": [
-            {
-              "description": "Card background color.",
-              "name": "--hx-card-bg",
-              "default": "var(--hx-color-neutral-0)"
-            },
-            {
-              "description": "Card text color.",
-              "name": "--hx-card-color",
-              "default": "var(--hx-color-neutral-800)"
-            },
-            {
-              "description": "Card border color.",
-              "name": "--hx-card-border-color",
-              "default": "var(--hx-color-neutral-200)"
-            },
-            {
-              "description": "Card border radius.",
-              "name": "--hx-card-border-radius",
-              "default": "var(--hx-border-radius-lg)"
-            },
-            {
-              "description": "Internal padding for card sections.",
-              "name": "--hx-card-padding",
-              "default": "var(--hx-space-6)"
-            },
-            {
-              "description": "Gap between card sections.",
-              "name": "--hx-card-gap",
-              "default": "var(--hx-space-4)"
-            }
-          ],
-          "cssParts": [
-            {
-              "description": "The outer card container element.",
-              "name": "card"
-            },
-            {
-              "description": "The image slot container.",
-              "name": "image"
-            },
-            {
-              "description": "The heading slot container.",
-              "name": "heading"
-            },
-            {
-              "description": "The body slot container.",
-              "name": "body"
-            },
-            {
-              "description": "The footer slot container.",
-              "name": "footer"
-            },
-            {
-              "description": "The actions slot container.",
-              "name": "actions"
-            }
-          ],
-          "slots": [
-            {
-              "description": "Optional image or media content at the top of the card.",
-              "name": "image"
-            },
-            {
-              "description": "The card heading/title content.",
-              "name": "heading"
-            },
-            {
-              "description": "Default slot for the card body content.",
-              "name": ""
-            },
-            {
-              "description": "Optional footer content below the body.",
-              "name": "footer"
-            },
-            {
-              "description": "Optional action buttons, rendered with a top border separator.",
-              "name": "actions"
-            }
-          ],
-          "members": [
-            {
-              "kind": "field",
-              "name": "variant",
-              "type": {
-                "text": "'default' | 'featured' | 'compact'"
-              },
-              "default": "'default'",
-              "description": "Visual style variant of the card.",
-              "attribute": "variant",
-              "reflects": true
-            },
-            {
-              "kind": "field",
-              "name": "elevation",
-              "type": {
-                "text": "'flat' | 'raised' | 'floating'"
-              },
-              "default": "'flat'",
-              "description": "Elevation (shadow depth) of the card.",
-              "attribute": "elevation",
-              "reflects": true
-            },
-            {
-              "kind": "field",
-              "name": "wcHref",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "description": "Optional URL. When set, the card becomes interactive (clickable)\nand navigates to this URL on click.\nUses wc-href to avoid conflicting with the native HTML href attribute.",
-              "attribute": "hx-href"
-            },
-            {
-              "kind": "field",
-              "name": "_hasSlotContent",
-              "type": {
-                "text": "Record<string, boolean>"
-              },
-              "privacy": "private",
-              "default": "{ image: false, heading: false, footer: false, actions: false, }"
-            },
-            {
-              "kind": "method",
-              "name": "_handleSlotChange",
-              "privacy": "private",
-              "parameters": [
-                {
-                  "name": "slotName",
-                  "type": {
-                    "text": "string"
-                  }
-                }
-              ]
-            },
-            {
-              "kind": "method",
-              "name": "_handleClick",
-              "privacy": "private",
-              "return": {
-                "type": {
-                  "text": "void"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "e",
-                  "type": {
-                    "text": "MouseEvent"
-                  }
-                }
-              ]
-            },
-            {
-              "kind": "method",
-              "name": "_handleKeyDown",
-              "privacy": "private",
-              "return": {
-                "type": {
-                  "text": "void"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "e",
-                  "type": {
-                    "text": "KeyboardEvent"
-                  }
-                }
-              ]
-            }
-          ],
-          "events": [
-            {
-              "name": "hx-card-click",
-              "type": {
-                "text": "CustomEvent"
-              },
-              "description": "Dispatched when an interactive card is clicked.\nIncludes the target href in the detail."
-            },
-            {
-              "type": {
-                "text": "CustomEvent<{url: string, originalEvent: MouseEvent}>"
-              },
-              "description": "Dispatched when an interactive card (with wc-href) is clicked.",
-              "name": "wc-card-click"
-            }
-          ],
-          "attributes": [
-            {
-              "name": "variant",
-              "type": {
-                "text": "'default' | 'featured' | 'compact'"
-              },
-              "default": "'default'",
-              "description": "Visual style variant of the card.",
-              "fieldName": "variant",
-              "attribute": "variant"
-            },
-            {
-              "name": "elevation",
-              "type": {
-                "text": "'flat' | 'raised' | 'floating'"
-              },
-              "default": "'flat'",
-              "description": "Elevation (shadow depth) of the card.",
-              "fieldName": "elevation",
-              "attribute": "elevation"
-            },
-            {
-              "name": "hx-href",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "description": "Optional URL. When set, the card becomes interactive (clickable)\nand navigates to this URL on click.\nUses wc-href to avoid conflicting with the native HTML href attribute.",
-              "fieldName": "wcHref",
-              "attribute": "hx-href"
-            }
-          ],
-          "superclass": {
-            "name": "LitElement",
-            "package": "lit"
-          },
-          "tagName": "hx-card",
-          "customElement": true,
-          "summary": "Content container with image, heading, body, footer, and action slots."
-        }
-      ],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "HelixCard",
-          "declaration": {
-            "name": "HelixCard",
-            "module": "src/components/hx-card/hx-card.ts"
-          }
-        },
-        {
-          "kind": "custom-element-definition",
-          "name": "hx-card",
-          "declaration": {
-            "name": "HelixCard",
-            "module": "src/components/hx-card/hx-card.ts"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
-      "path": "src/components/hx-card/index.ts",
-      "declarations": [],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "HelixCard",
-          "declaration": {
-            "name": "HelixCard",
-            "module": "./hx-card.js"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
       "path": "src/components/hx-select/hx-select.ts",
       "declarations": [
         {
@@ -3562,6 +4346,708 @@
           "declaration": {
             "name": "HelixSelect",
             "module": "./hx-select.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/components/hx-slider/hx-slider.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "A range slider component for selecting a numeric value within a min/max boundary.\nSupports tick marks, value display, range labels, and native form participation\nvia ElementInternals.",
+          "name": "HelixSlider",
+          "cssProperties": [
+            {
+              "description": "Track background color.",
+              "name": "--hx-slider-track-bg",
+              "default": "var(--hx-color-neutral-200)"
+            },
+            {
+              "description": "Fill/progress color.",
+              "name": "--hx-slider-fill-bg",
+              "default": "var(--hx-color-primary-500)"
+            },
+            {
+              "description": "Thumb background color.",
+              "name": "--hx-slider-thumb-bg",
+              "default": "var(--hx-color-neutral-0)"
+            },
+            {
+              "description": "Thumb border color.",
+              "name": "--hx-slider-thumb-border-color",
+              "default": "var(--hx-color-primary-500)"
+            },
+            {
+              "description": "Thumb box shadow.",
+              "name": "--hx-slider-thumb-shadow",
+              "default": "var(--hx-shadow-sm)"
+            },
+            {
+              "description": "Focus ring color.",
+              "name": "--hx-slider-focus-ring-color",
+              "default": "var(--hx-focus-ring-color)"
+            },
+            {
+              "description": "Label text color.",
+              "name": "--hx-slider-label-color",
+              "default": "var(--hx-color-neutral-700)"
+            },
+            {
+              "description": "Value display text color.",
+              "name": "--hx-slider-value-color",
+              "default": "var(--hx-color-neutral-600)"
+            },
+            {
+              "description": "Tick mark color.",
+              "name": "--hx-slider-tick-color",
+              "default": "var(--hx-color-neutral-400)"
+            }
+          ],
+          "cssParts": [
+            {
+              "description": "The outer container element.",
+              "name": "slider"
+            },
+            {
+              "description": "The track background element.",
+              "name": "track"
+            },
+            {
+              "description": "The filled portion of the track showing progress.",
+              "name": "fill"
+            },
+            {
+              "description": "The draggable thumb overlay element.",
+              "name": "thumb"
+            },
+            {
+              "description": "The label element.",
+              "name": "label"
+            },
+            {
+              "description": "The element displaying the current numeric value.",
+              "name": "value-display"
+            },
+            {
+              "description": "Each individual tick mark element.",
+              "name": "tick"
+            }
+          ],
+          "slots": [
+            {
+              "description": "Custom label content (overrides the label property).",
+              "name": "label"
+            },
+            {
+              "description": "Custom help text content (overrides the helpText property).",
+              "name": "help"
+            },
+            {
+              "description": "Label rendered at the minimum end of the slider.",
+              "name": "min-label"
+            },
+            {
+              "description": "Label rendered at the maximum end of the slider.",
+              "name": "max-label"
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "formAssociated",
+              "type": {
+                "text": "boolean"
+              },
+              "static": true,
+              "default": "true"
+            },
+            {
+              "kind": "field",
+              "name": "_internals",
+              "type": {
+                "text": "ElementInternals"
+              },
+              "privacy": "private"
+            },
+            {
+              "kind": "field",
+              "name": "name",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "The name submitted with the form.",
+              "attribute": "name"
+            },
+            {
+              "kind": "field",
+              "name": "value",
+              "type": {
+                "text": "number"
+              },
+              "default": "0",
+              "description": "The current numeric value of the slider.",
+              "attribute": "value"
+            },
+            {
+              "kind": "field",
+              "name": "min",
+              "type": {
+                "text": "number"
+              },
+              "default": "0",
+              "description": "The minimum allowed value.",
+              "attribute": "min"
+            },
+            {
+              "kind": "field",
+              "name": "max",
+              "type": {
+                "text": "number"
+              },
+              "default": "100",
+              "description": "The maximum allowed value.",
+              "attribute": "max"
+            },
+            {
+              "kind": "field",
+              "name": "step",
+              "type": {
+                "text": "number"
+              },
+              "default": "1",
+              "description": "The stepping interval between values.",
+              "attribute": "step"
+            },
+            {
+              "kind": "field",
+              "name": "disabled",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the slider is disabled.",
+              "attribute": "disabled",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "label",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "The visible label text for the slider.",
+              "attribute": "label"
+            },
+            {
+              "kind": "field",
+              "name": "helpText",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Help text displayed below the slider for guidance.",
+              "attribute": "help-text"
+            },
+            {
+              "kind": "field",
+              "name": "showValue",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "When true, the current value is shown next to the label.",
+              "attribute": "show-value"
+            },
+            {
+              "kind": "field",
+              "name": "showTicks",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "When true, tick marks are rendered at each step interval.",
+              "attribute": "show-ticks"
+            },
+            {
+              "kind": "field",
+              "name": "size",
+              "type": {
+                "text": "'sm' | 'md' | 'lg'"
+              },
+              "default": "'md'",
+              "description": "The size variant of the slider.",
+              "attribute": "hx-size",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "_hasLabelSlot",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "default": "false"
+            },
+            {
+              "kind": "field",
+              "name": "_hasMinLabelSlot",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "default": "false"
+            },
+            {
+              "kind": "field",
+              "name": "_hasMaxLabelSlot",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "default": "false"
+            },
+            {
+              "kind": "field",
+              "name": "_hasHelpSlot",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "default": "false"
+            },
+            {
+              "kind": "field",
+              "name": "_input",
+              "type": {
+                "text": "HTMLInputElement"
+              },
+              "privacy": "private"
+            },
+            {
+              "kind": "field",
+              "name": "_sliderId",
+              "privacy": "private",
+              "readonly": true,
+              "default": "`hx-slider-${Math.random().toString(36).slice(2, 9)}`"
+            },
+            {
+              "kind": "field",
+              "name": "_labelId",
+              "privacy": "private",
+              "readonly": true,
+              "default": "`${this._sliderId}-label`"
+            },
+            {
+              "kind": "field",
+              "name": "_helpId",
+              "privacy": "private",
+              "readonly": true,
+              "default": "`${this._sliderId}-help`"
+            },
+            {
+              "kind": "method",
+              "name": "_fillPercent",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "number"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "_thumbPercent",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "number"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "_ticks",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "number[]"
+                }
+              }
+            },
+            {
+              "kind": "field",
+              "name": "form",
+              "type": {
+                "text": "HTMLFormElement | null"
+              },
+              "description": "Returns the associated form element, if any.",
+              "readonly": true
+            },
+            {
+              "kind": "field",
+              "name": "validationMessage",
+              "type": {
+                "text": "string"
+              },
+              "description": "Returns the validation message.",
+              "readonly": true
+            },
+            {
+              "kind": "field",
+              "name": "validity",
+              "type": {
+                "text": "ValidityState"
+              },
+              "description": "Returns the ValidityState object.",
+              "readonly": true
+            },
+            {
+              "kind": "method",
+              "name": "checkValidity",
+              "return": {
+                "type": {
+                  "text": "boolean"
+                }
+              },
+              "description": "Checks whether the slider satisfies its constraints."
+            },
+            {
+              "kind": "method",
+              "name": "reportValidity",
+              "return": {
+                "type": {
+                  "text": "boolean"
+                }
+              },
+              "description": "Reports validity and shows the browser's constraint validation UI."
+            },
+            {
+              "kind": "method",
+              "name": "formResetCallback",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Called by the form when it resets."
+            },
+            {
+              "kind": "method",
+              "name": "formStateRestoreCallback",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "state",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ],
+              "description": "Called when the form restores state (e.g., back/forward navigation)."
+            },
+            {
+              "kind": "method",
+              "name": "focus",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "options",
+                  "optional": true,
+                  "type": {
+                    "text": "FocusOptions"
+                  }
+                }
+              ],
+              "description": "Moves focus to the native range input."
+            },
+            {
+              "kind": "method",
+              "name": "_handleLabelSlotChange",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "e",
+                  "type": {
+                    "text": "Event"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "_handleHelpSlotChange",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "e",
+                  "type": {
+                    "text": "Event"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "_handleMinLabelSlotChange",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "e",
+                  "type": {
+                    "text": "Event"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "_handleMaxLabelSlotChange",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "e",
+                  "type": {
+                    "text": "Event"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "_handleInput",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "e",
+                  "type": {
+                    "text": "Event"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "_handleChange",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "e",
+                  "type": {
+                    "text": "Event"
+                  }
+                }
+              ]
+            }
+          ],
+          "events": [
+            {
+              "name": "hx-input",
+              "type": {
+                "text": "CustomEvent<{value: number}>"
+              },
+              "description": "Dispatched continuously while the user drags."
+            },
+            {
+              "name": "hx-change",
+              "type": {
+                "text": "CustomEvent<{value: number}>"
+              },
+              "description": "Dispatched when the user releases the thumb."
+            }
+          ],
+          "attributes": [
+            {
+              "name": "name",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "The name submitted with the form.",
+              "fieldName": "name",
+              "attribute": "name"
+            },
+            {
+              "name": "value",
+              "type": {
+                "text": "number"
+              },
+              "default": "0",
+              "description": "The current numeric value of the slider.",
+              "fieldName": "value",
+              "attribute": "value"
+            },
+            {
+              "name": "min",
+              "type": {
+                "text": "number"
+              },
+              "default": "0",
+              "description": "The minimum allowed value.",
+              "fieldName": "min",
+              "attribute": "min"
+            },
+            {
+              "name": "max",
+              "type": {
+                "text": "number"
+              },
+              "default": "100",
+              "description": "The maximum allowed value.",
+              "fieldName": "max",
+              "attribute": "max"
+            },
+            {
+              "name": "step",
+              "type": {
+                "text": "number"
+              },
+              "default": "1",
+              "description": "The stepping interval between values.",
+              "fieldName": "step",
+              "attribute": "step"
+            },
+            {
+              "name": "disabled",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the slider is disabled.",
+              "fieldName": "disabled",
+              "attribute": "disabled"
+            },
+            {
+              "name": "label",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "The visible label text for the slider.",
+              "fieldName": "label",
+              "attribute": "label"
+            },
+            {
+              "name": "help-text",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Help text displayed below the slider for guidance.",
+              "fieldName": "helpText",
+              "attribute": "help-text"
+            },
+            {
+              "name": "show-value",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "When true, the current value is shown next to the label.",
+              "fieldName": "showValue",
+              "attribute": "show-value"
+            },
+            {
+              "name": "show-ticks",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "When true, tick marks are rendered at each step interval.",
+              "fieldName": "showTicks",
+              "attribute": "show-ticks"
+            },
+            {
+              "name": "hx-size",
+              "type": {
+                "text": "'sm' | 'md' | 'lg'"
+              },
+              "default": "'md'",
+              "description": "The size variant of the slider.",
+              "fieldName": "size",
+              "attribute": "hx-size"
+            }
+          ],
+          "superclass": {
+            "name": "LitElement",
+            "package": "lit"
+          },
+          "tagName": "hx-slider",
+          "customElement": true,
+          "summary": "Form-associated range slider with label, ticks, and value display."
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "HelixSlider",
+          "declaration": {
+            "name": "HelixSlider",
+            "module": "src/components/hx-slider/hx-slider.ts"
+          }
+        },
+        {
+          "kind": "custom-element-definition",
+          "name": "hx-slider",
+          "declaration": {
+            "name": "HelixSlider",
+            "module": "src/components/hx-slider/hx-slider.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/components/hx-slider/index.ts",
+      "declarations": [],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "HelixSlider",
+          "declaration": {
+            "name": "HelixSlider",
+            "module": "./hx-slider.js"
           }
         }
       ]

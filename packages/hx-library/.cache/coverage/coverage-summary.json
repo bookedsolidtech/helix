@@ -1,7 +1,7 @@
 {
   "total": {
-    "lines": { "total": 2106, "covered": 0, "skipped": 0, "pct": 0 },
-    "statements": { "total": 2106, "covered": 0, "skipped": 0, "pct": 0 },
+    "lines": { "total": 2102, "covered": 0, "skipped": 0, "pct": 0 },
+    "statements": { "total": 2102, "covered": 0, "skipped": 0, "pct": 0 },
     "functions": { "total": 18, "covered": 0, "skipped": 0, "pct": 0 },
     "branches": { "total": 18, "covered": 0, "skipped": 0, "pct": 0 },
     "branchesTrue": { "total": 0, "covered": 0, "skipped": 0, "pct": 100 }
@@ -61,9 +61,9 @@
     "branches": { "total": 1, "covered": 0, "skipped": 0, "pct": 0 }
   },
   "/Volumes/Development/booked/helix/.worktrees/feature-t1-25-hx-progress-bar-linear-progress/packages/hx-library/src/components/hx-progress-bar/hx-progress-bar.ts": {
-    "lines": { "total": 77, "covered": 0, "skipped": 0, "pct": 0 },
+    "lines": { "total": 73, "covered": 0, "skipped": 0, "pct": 0 },
     "functions": { "total": 1, "covered": 0, "skipped": 0, "pct": 0 },
-    "statements": { "total": 77, "covered": 0, "skipped": 0, "pct": 0 },
+    "statements": { "total": 73, "covered": 0, "skipped": 0, "pct": 0 },
     "branches": { "total": 1, "covered": 0, "skipped": 0, "pct": 0 }
   },
   "/Volumes/Development/booked/helix/.worktrees/feature-t1-25-hx-progress-bar-linear-progress/packages/hx-library/src/components/hx-prose/hx-prose.ts": {
