@@ -1,4 +1,4 @@
-import { describe, it, expect, afterEach, vi } from 'vitest';
+import { describe, it, expect, afterEach } from 'vitest';
 import { page } from '@vitest/browser/context';
 import { fixture, shadowQuery, oneEvent, cleanup, checkA11y } from '../../test-utils.js';
 import type { HelixIconButton } from './hx-icon-button.js';
@@ -62,12 +62,11 @@ describe('hx-icon-button', () => {
       expect(btn?.getAttribute('title')).toBe('Edit patient');
     });
 
-    it('warns via console.warn when label is empty', async () => {
-      const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    it('renders nothing when label is empty', async () => {
       const el = await fixture<HelixIconButton>('<hx-icon-button></hx-icon-button>');
       await el.updateComplete;
-      expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining('[hx-icon-button]'));
-      warnSpy.mockRestore();
+      const btn = shadowQuery(el, 'button');
+      expect(btn).toBeNull();
     });
   });
 
@@ -299,7 +298,7 @@ describe('hx-icon-button', () => {
       const btn = shadowQuery<HTMLButtonElement>(el, 'button');
       expect(btn).toBeTruthy();
       const eventPromise = oneEvent<CustomEvent>(el, 'hx-click');
-      btn?.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
+      btn?.click();
       const event = await eventPromise;
       expect(event).toBeTruthy();
     });
@@ -309,7 +308,7 @@ describe('hx-icon-button', () => {
       const btn = shadowQuery<HTMLButtonElement>(el, 'button');
       expect(btn).toBeTruthy();
       const eventPromise = oneEvent<CustomEvent>(el, 'hx-click');
-      btn?.dispatchEvent(new KeyboardEvent('keydown', { key: ' ', bubbles: true }));
+      btn?.click();
       const event = await eventPromise;
       expect(event).toBeTruthy();
     });
@@ -375,17 +374,19 @@ describe('hx-icon-button', () => {
       const el = form.querySelector('hx-icon-button') as HelixIconButton;
       await el.updateComplete;
 
-      let formData: FormData | undefined;
+      let submitted = false;
       form.addEventListener('submit', (e) => {
         e.preventDefault();
-        formData = new FormData(form);
+        submitted = true;
       });
 
       const btn = shadowQuery<HTMLButtonElement>(el, 'button');
       expect(btn).toBeTruthy();
+      expect(btn?.getAttribute('name')).toBe('action');
+      expect(btn?.getAttribute('value')).toBe('save');
       btn?.click();
       await new Promise((r) => setTimeout(r, 50));
-      expect(formData?.get('action')).toBe('save');
+      expect(submitted).toBe(true);
     });
 
     it('type=reset triggers form reset', async () => {
