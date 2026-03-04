@@ -9,6 +9,7 @@ export const helixBadgeStyles = css`
     display: inline-flex;
     align-items: center;
     justify-content: center;
+    gap: var(--hx-space-1, 0.25rem);
     border-radius: var(--hx-badge-border-radius, var(--hx-border-radius-md, 0.375rem));
     background-color: var(--hx-badge-bg, var(--hx-color-primary-500, #2563eb));
     color: var(--hx-badge-color, var(--hx-color-neutral-0, #ffffff));
@@ -48,6 +49,12 @@ export const helixBadgeStyles = css`
     --hx-badge-pulse-color: var(--hx-color-primary-500, #2563eb);
   }
 
+  .badge--secondary {
+    --hx-badge-bg: var(--hx-color-neutral-100, #f3f4f6);
+    --hx-badge-color: var(--hx-color-neutral-700, #374151);
+    --hx-badge-pulse-color: var(--hx-color-neutral-100, #f3f4f6);
+  }
+
   .badge--success {
     --hx-badge-bg: var(--hx-color-success-700, #15803d);
     --hx-badge-color: var(--hx-color-neutral-0, #ffffff);
@@ -60,6 +67,12 @@ export const helixBadgeStyles = css`
     --hx-badge-pulse-color: var(--hx-color-warning-500, #eab308);
   }
 
+  .badge--danger {
+    --hx-badge-bg: var(--hx-color-error-500, #dc2626);
+    --hx-badge-color: var(--hx-color-neutral-0, #ffffff);
+    --hx-badge-pulse-color: var(--hx-color-error-500, #dc2626);
+  }
+
   .badge--error {
     --hx-badge-bg: var(--hx-color-error-500, #dc2626);
     --hx-badge-color: var(--hx-color-neutral-0, #ffffff);
@@ -70,6 +83,12 @@ export const helixBadgeStyles = css`
     --hx-badge-bg: var(--hx-color-neutral-200, #e5e7eb);
     --hx-badge-color: var(--hx-color-neutral-700, #374151);
     --hx-badge-pulse-color: var(--hx-color-neutral-200, #e5e7eb);
+  }
+
+  .badge--info {
+    --hx-badge-bg: var(--hx-color-info-700, #0369a1);
+    --hx-badge-color: var(--hx-color-neutral-0, #ffffff);
+    --hx-badge-pulse-color: var(--hx-color-info-700, #0369a1);
   }
 
   /* ─── Pill Mode ─── */
@@ -107,5 +126,31 @@ export const helixBadgeStyles = css`
     .badge--pulse {
       animation: none;
     }
+  }
+
+  /* ─── Remove Button ─── */
+
+  .badge__remove-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: none;
+    border: none;
+    padding: 0;
+    margin-inline-start: var(--hx-space-1, 0.25rem);
+    cursor: pointer;
+    color: inherit;
+    opacity: 0.7;
+    border-radius: var(--hx-border-radius-sm, 0.125rem);
+    line-height: 0;
+  }
+
+  .badge__remove-button:hover {
+    opacity: 1;
+  }
+
+  .badge__remove-button:focus-visible {
+    outline: 2px solid currentColor;
+    outline-offset: 1px;
   }
 `;
