@@ -33,6 +33,10 @@ export default defineConfig({
         'components/hx-slider/index': resolve(__dirname, 'src/components/hx-slider/index.ts'),
         'components/hx-form/index': resolve(__dirname, 'src/components/hx-form/index.ts'),
         'components/hx-prose/index': resolve(__dirname, 'src/components/hx-prose/index.ts'),
+        'components/hx-progress-bar/index': resolve(
+          __dirname,
+          'src/components/hx-progress-bar/index.ts',
+        ),
       },
       formats: ['es'],
     },
