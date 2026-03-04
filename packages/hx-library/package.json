@@ -29,6 +29,9 @@
   "customElements": "custom-elements.json",
   "scripts": {
     "dev": "vite build --watch",
+    "generate:barrel": "node scripts/generate-barrel.js",
+    "prepare": "node scripts/generate-barrel.js",
+    "prebuild": "node scripts/generate-barrel.js",
     "build": "vite build",
     "type-check": "tsc --noEmit",
     "test": "vitest run",
