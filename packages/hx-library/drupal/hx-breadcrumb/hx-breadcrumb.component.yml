@@ -1,0 +1,24 @@
+$schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/modules/sdc/src/metadata.schema.json'
+name: Helix Breadcrumb
+description: 'Hierarchical page path navigation showing current location in site structure.'
+status: experimental
+group: helix
+
+props:
+  type: object
+  properties:
+    separator:
+      type: string
+      title: Separator
+      description: 'The separator character displayed between breadcrumb items.'
+      default: '/'
+    label:
+      type: string
+      title: Label
+      description: 'The accessible label for the nav landmark.'
+      default: 'Breadcrumb'
+
+slots:
+  default:
+    title: Default
+    description: 'Default slot for hx-breadcrumb-item children.'

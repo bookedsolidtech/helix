@@ -1,0 +1,92 @@
+$schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/modules/sdc/src/metadata.schema.json'
+name: Helix Select
+description: 'A select component with a fully custom dropdown UI, providing combobox ARIA semantics, keyboard navigation, multi-select, and filterable options.  Options are provided via slotted `<option>` (and `<optgroup>`) elements in the light DOM. The component reads them on slot change and renders a custom listbox panel while keeping a hidden native `<select>` for form participation.'
+status: experimental
+group: helix
+
+props:
+  type: object
+  properties:
+    label:
+      type: string
+      title: Label
+      description: 'The visible label text for the select.'
+      default: ''
+    placeholder:
+      type: string
+      title: Placeholder
+      description: 'Placeholder text shown in the trigger when no option is selected.'
+      default: ''
+    value:
+      type: string
+      title: Value
+      description: 'The current value of the select (single mode). In multiple mode, use `values` for the full set. Setting `value` in multiple mode selects that single value and clears others.'
+      default: ''
+    required:
+      type: boolean
+      title: Required
+      description: 'Whether the select is required for form submission.'
+      default: false
+    disabled:
+      type: boolean
+      title: Disabled
+      description: 'Whether the select is disabled.'
+      default: false
+    name:
+      type: string
+      title: Name
+      description: 'The name used for form submission.'
+      default: ''
+    error:
+      type: string
+      title: Error
+      description: 'Error message to display. When set, the field enters an error state.'
+      default: ''
+    help-text:
+      type: string
+      title: Help-text
+      description: 'Help text displayed below the select for guidance.'
+      default: ''
+    hx-size:
+      type: string
+      title: Hx-size
+      description: 'Size variant of the select trigger.'
+      default: 'md'
+      enum:
+        - 'sm'
+        - 'md'
+        - 'lg'
+    aria-label:
+      type: string
+      title: Aria-label
+      description: 'Accessible name for screen readers, if different from the visible label.'
+      default: 'null'
+    multiple:
+      type: boolean
+      title: Multiple
+      description: 'Enables multi-select mode. Selected values are stored internally as a Set and surfaced as removable tags inside the trigger.'
+      default: false
+    searchable:
+      type: boolean
+      title: Searchable
+      description: 'Enables a search/filter input inside the listbox.'
+      default: false
+    open:
+      type: boolean
+      title: Open
+      description: 'Controls whether the dropdown listbox is open.'
+      default: false
+
+slots:
+  default:
+    title: Default
+    description: 'Default slot for `<option>` and `<optgroup>` elements.'
+  label:
+    title: Label
+    description: 'Custom label content (overrides the label property).'
+  error:
+    title: Error
+    description: 'Custom error content (overrides the error property).'
+  help-text:
+    title: Help-text
+    description: 'Custom help text content (overrides the helpText property).'

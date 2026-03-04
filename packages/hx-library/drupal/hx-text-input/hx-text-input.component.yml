@@ -1,0 +1,119 @@
+$schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/modules/sdc/src/metadata.schema.json'
+name: Helix Text Input
+description: 'A text input component with label, validation, and form association.'
+status: experimental
+group: helix
+
+props:
+  type: object
+  properties:
+    label:
+      type: string
+      title: Label
+      description: 'The visible label text for the input.'
+      default: ''
+    placeholder:
+      type: string
+      title: Placeholder
+      description: 'Placeholder text shown when the input is empty.'
+      default: ''
+    value:
+      type: string
+      title: Value
+      description: 'The current value of the input.'
+      default: ''
+    type:
+      type: string
+      title: Type
+      description: 'The type of the native input element.'
+      default: 'text'
+      enum:
+        - 'text'
+        - 'email'
+        - 'password'
+        - 'tel'
+        - 'url'
+        - 'search'
+        - 'number'
+        - 'date'
+    required:
+      type: boolean
+      title: Required
+      description: 'Whether the input is required for form submission.'
+      default: false
+    disabled:
+      type: boolean
+      title: Disabled
+      description: 'Whether the input is disabled.'
+      default: false
+    error:
+      type: string
+      title: Error
+      description: 'Error message to display. When set, the input enters an error state.'
+      default: ''
+    help-text:
+      type: string
+      title: Help-text
+      description: 'Help text displayed below the input for guidance.'
+      default: ''
+    name:
+      type: string
+      title: Name
+      description: 'The name of the input, used for form submission.'
+      default: ''
+    aria-label:
+      type: string
+      title: Aria-label
+      description: 'Accessible name for screen readers, if different from the visible label.'
+      default: 'null'
+    readonly:
+      type: boolean
+      title: Readonly
+      description: 'Whether the input is read-only.'
+      default: false
+    minlength:
+      type: number
+      title: Minlength
+      description: 'Minimum number of characters allowed.'
+      default: undefined
+    maxlength:
+      type: number
+      title: Maxlength
+      description: 'Maximum number of characters allowed.'
+      default: undefined
+    pattern:
+      type: string
+      title: Pattern
+      description: 'A regular expression pattern the value must match for form validation.'
+      default: ''
+    autocomplete:
+      type: string
+      title: Autocomplete
+      description: 'Hint for the browser''s autocomplete feature. Accepts standard HTML autocomplete values.'
+      default: ''
+    hx-size:
+      type: string
+      title: Hx-size
+      description: 'Visual size of the input field.'
+      default: 'md'
+      enum:
+        - 'sm'
+        - 'md'
+        - 'lg'
+
+slots:
+  label:
+    title: Label
+    description: 'Custom label content (overrides the label property). Use for Drupal Form API rendered labels.'
+  prefix:
+    title: Prefix
+    description: 'Content rendered before the input (e.g., icon).'
+  suffix:
+    title: Suffix
+    description: 'Content rendered after the input (e.g., icon or button).'
+  help-text:
+    title: Help-text
+    description: 'Custom help text content (overrides the helpText property).'
+  error:
+    title: Error
+    description: 'Custom error content (overrides the error property). Use for Drupal Form API rendered errors.'

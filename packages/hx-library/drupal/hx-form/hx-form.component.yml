@@ -1,0 +1,37 @@
+$schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/modules/sdc/src/metadata.schema.json'
+name: Helix Form
+description: 'A Light DOM form wrapper that styles native HTML form elements and wc-* components with the design system''s form styles.  When `action` is set, renders a `<form>` wrapper around slotted content. When no `action` is set (the Drupal pattern), renders only a `<slot>` so Drupal can provide its own `<form>` tag.  Uses adopted stylesheets to inject scoped CSS into the document without Shadow DOM, keeping native form participation and Drupal compatibility.'
+status: experimental
+group: helix
+
+props:
+  type: object
+  properties:
+    action:
+      type: string
+      title: Action
+      description: 'The URL to submit the form to. When empty, the form handles submission client-side only and dispatches `wc-submit`.'
+      default: ''
+    method:
+      type: string
+      title: Method
+      description: 'The HTTP method used when submitting the form.'
+      default: 'post'
+      enum:
+        - 'get'
+        - 'post'
+    novalidate:
+      type: boolean
+      title: Novalidate
+      description: 'When true, disables the browser''s built-in constraint validation on form submission.'
+      default: false
+    name:
+      type: string
+      title: Name
+      description: 'Identifies the form for scripting and form discovery.'
+      default: ''
+
+slots:
+  default:
+    title: Default
+    description: 'Default slot for form fields and controls.'

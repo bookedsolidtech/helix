@@ -1,0 +1,74 @@
+$schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/modules/sdc/src/metadata.schema.json'
+name: Helix Checkbox
+description: 'A checkbox component with label, validation, and form association.'
+status: experimental
+group: helix
+
+props:
+  type: object
+  properties:
+    checked:
+      type: boolean
+      title: Checked
+      description: 'Whether the checkbox is checked.'
+      default: false
+    indeterminate:
+      type: boolean
+      title: Indeterminate
+      description: 'Whether the checkbox is in an indeterminate state (e.g., for "select all" patterns).'
+      default: false
+    disabled:
+      type: boolean
+      title: Disabled
+      description: 'Whether the checkbox is disabled.'
+      default: false
+    required:
+      type: boolean
+      title: Required
+      description: 'Whether the checkbox is required for form submission.'
+      default: false
+    name:
+      type: string
+      title: Name
+      description: 'The name of the checkbox, used for form submission.'
+      default: ''
+    value:
+      type: string
+      title: Value
+      description: 'The value submitted when the checkbox is checked.'
+      default: 'on'
+    label:
+      type: string
+      title: Label
+      description: 'The visible label text for the checkbox.'
+      default: ''
+    error:
+      type: string
+      title: Error
+      description: 'Error message to display. When set, the checkbox enters an error state.'
+      default: ''
+    help-text:
+      type: string
+      title: Help-text
+      description: 'Help text displayed below the checkbox for guidance.'
+      default: ''
+    hx-size:
+      type: string
+      title: Hx-size
+      description: 'The size of the checkbox.'
+      default: 'md'
+      enum:
+        - 'sm'
+        - 'md'
+        - 'lg'
+
+slots:
+  default:
+    title: Default
+    description: 'Custom label content (overrides the label property). Rich HTML allowed — Drupal can include links in consent labels.'
+  error:
+    title: Error
+    description: 'Custom error content (overrides the error property).'
+  help-text:
+    title: Help-text
+    description: 'Custom help text content (overrides the helpText property).'

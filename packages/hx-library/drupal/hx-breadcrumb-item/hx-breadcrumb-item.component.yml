@@ -1,0 +1,19 @@
+$schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/modules/sdc/src/metadata.schema.json'
+name: Helix Breadcrumb Item
+description: 'A single breadcrumb navigation item.'
+status: experimental
+group: helix
+
+props:
+  type: object
+  properties:
+    href:
+      type: string
+      title: Href
+      description: 'The URL for this breadcrumb link. Omit for the current page (last item).'
+      default: 'undefined'
+
+slots:
+  default:
+    title: Default
+    description: 'The link or page text content.'

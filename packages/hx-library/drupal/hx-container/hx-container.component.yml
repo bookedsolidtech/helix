@@ -1,0 +1,39 @@
+$schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/modules/sdc/src/metadata.schema.json'
+name: Helix Container
+description: 'A layout container that constrains content width and provides consistent vertical spacing and horizontal gutters.  Uses a two-layer model: the outer host spans full width (background, vertical padding), while the inner wrapper constrains max-width, centers content, and applies horizontal gutters.'
+status: experimental
+group: helix
+
+props:
+  type: object
+  properties:
+    width:
+      type: string
+      title: Width
+      description: 'Controls the max-width of the inner content wrapper.'
+      default: 'content'
+      enum:
+        - 'full'
+        - 'content'
+        - 'narrow'
+        - 'sm'
+        - 'md'
+        - 'lg'
+        - 'xl'
+    padding:
+      type: string
+      title: Padding
+      description: 'Vertical padding applied to the outer wrapper.'
+      default: 'none'
+      enum:
+        - 'none'
+        - 'sm'
+        - 'md'
+        - 'lg'
+        - 'xl'
+        - '2xl'
+
+slots:
+  default:
+    title: Default
+    description: 'Default slot for container content.'

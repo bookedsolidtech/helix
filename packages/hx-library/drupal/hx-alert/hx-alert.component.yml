@@ -1,0 +1,40 @@
+$schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/modules/sdc/src/metadata.schema.json'
+name: Helix Alert
+description: 'A feedback component for communicating status messages, warnings, and errors. Critical for healthcare patient safety alerts.'
+status: experimental
+group: helix
+
+props:
+  type: object
+  properties:
+    variant:
+      type: string
+      title: Variant
+      description: 'Visual variant of the alert that determines colors and ARIA semantics.'
+      default: 'info'
+    dismissible:
+      type: boolean
+      title: Dismissible
+      description: 'Whether the alert can be dismissed by the user.'
+      default: false
+    open:
+      type: boolean
+      title: Open
+      description: 'Whether the alert is visible. Set to false to hide the alert.'
+      default: true
+    icon:
+      type: boolean
+      title: Icon
+      description: 'Whether to show the default variant icon. Set to false to hide the icon container entirely.'
+      default: true
+
+slots:
+  default:
+    title: Default
+    description: 'Default slot for alert message content.'
+  icon:
+    title: Icon
+    description: 'Custom icon to override the default variant icon.'
+  actions:
+    title: Actions
+    description: 'Action buttons rendered within the alert.'

@@ -1,0 +1,51 @@
+$schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/modules/sdc/src/metadata.schema.json'
+name: Helix Avatar
+description: 'A user avatar component that displays an image, initials, or a fallback icon. Supports a badge slot for status indicator overlays.'
+status: experimental
+group: helix
+
+props:
+  type: object
+  properties:
+    src:
+      type: string
+      title: Src
+      description: 'Image URL. When provided and successfully loaded, displays the image.'
+      default: 'undefined'
+    alt:
+      type: string
+      title: Alt
+      description: 'Accessible label for the image or avatar.'
+      default: ''
+    initials:
+      type: string
+      title: Initials
+      description: 'Fallback initials text displayed when no image is available.'
+      default: ''
+    hx-size:
+      type: string
+      title: Hx-size
+      description: 'Size variant of the avatar.'
+      default: 'md'
+      enum:
+        - 'xs'
+        - 'sm'
+        - 'md'
+        - 'lg'
+        - 'xl'
+    shape:
+      type: string
+      title: Shape
+      description: 'Shape variant of the avatar.'
+      default: 'circle'
+      enum:
+        - 'circle'
+        - 'square'
+
+slots:
+  default:
+    title: Default
+    description: 'Default slot for custom avatar content. Overrides src and initials when slotted content is present.'
+  badge:
+    title: Badge
+    description: 'Status indicator overlay, positioned at the bottom-right of the avatar.'

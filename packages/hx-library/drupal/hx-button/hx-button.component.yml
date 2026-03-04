@@ -1,0 +1,80 @@
+$schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/modules/sdc/src/metadata.schema.json'
+name: Helix Button
+description: 'A production-grade button component for user interaction. Supports multiple visual variants, sizes, loading state, prefix/suffix slots, anchor rendering, and full ElementInternals form association.'
+status: experimental
+group: helix
+
+props:
+  type: object
+  properties:
+    variant:
+      type: string
+      title: Variant
+      description: 'Visual style variant of the button.'
+      default: 'primary'
+      enum:
+        - 'primary'
+        - 'secondary'
+        - 'tertiary'
+        - 'danger'
+        - 'ghost'
+        - 'outline'
+    hx-size:
+      type: string
+      title: Hx-size
+      description: 'Size of the button.'
+      default: 'md'
+      enum:
+        - 'sm'
+        - 'md'
+        - 'lg'
+    disabled:
+      type: boolean
+      title: Disabled
+      description: 'Whether the button is disabled. Prevents all interaction and form actions.'
+      default: false
+    loading:
+      type: boolean
+      title: Loading
+      description: 'Whether the button is in a loading state. Shows spinner, prevents interaction, and sets aria-busy. Does not set the disabled attribute.'
+      default: false
+    type:
+      type: string
+      title: Type
+      description: 'The type attribute for the underlying button element. Ignored when href is set.'
+      default: 'button'
+      enum:
+        - 'button'
+        - 'submit'
+        - 'reset'
+    href:
+      type: string
+      title: Href
+      description: 'When set, renders an anchor element instead of a button.'
+      default: 'undefined'
+    target:
+      type: string
+      title: Target
+      description: 'Anchor target attribute. Only used when href is set.'
+      default: 'undefined'
+    name:
+      type: string
+      title: Name
+      description: 'Form field name submitted via ElementInternals.setFormValue on submit.'
+      default: 'undefined'
+    value:
+      type: string
+      title: Value
+      description: 'Form field value submitted via ElementInternals.setFormValue on submit.'
+      default: 'undefined'
+
+slots:
+  default:
+    title: Default
+    description: 'Default slot for button label text or content.'
+  prefix:
+    title: Prefix
+    description: 'Icon or content rendered before the label.'
+  suffix:
+    title: Suffix
+    description: 'Icon or content rendered after the label.'

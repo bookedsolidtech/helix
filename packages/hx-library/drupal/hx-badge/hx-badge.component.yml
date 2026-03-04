@@ -1,0 +1,55 @@
+$schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/modules/sdc/src/metadata.schema.json'
+name: Helix Badge
+description: 'A small status indicator for notifications, counts, and labels.'
+status: experimental
+group: helix
+
+props:
+  type: object
+  properties:
+    variant:
+      type: string
+      title: Variant
+      description: 'Visual style variant of the badge.'
+      default: 'primary'
+      enum:
+        - 'primary'
+        - 'secondary'
+        - 'success'
+        - 'warning'
+        - 'danger'
+        - 'error'
+        - 'neutral'
+        - 'info'
+    hx-size:
+      type: string
+      title: Hx-size
+      description: 'Size of the badge.'
+      default: 'md'
+      enum:
+        - 'sm'
+        - 'md'
+        - 'lg'
+    pill:
+      type: boolean
+      title: Pill
+      description: 'Whether the badge uses fully rounded (pill) styling.'
+      default: false
+    pulse:
+      type: boolean
+      title: Pulse
+      description: 'Whether the badge displays an animated pulse for attention.'
+      default: false
+    removable:
+      type: boolean
+      title: Removable
+      description: 'Whether the badge renders a dismiss button.'
+      default: false
+
+slots:
+  default:
+    title: Default
+    description: 'Default slot for badge content (text, number). When empty with pulse enabled, renders as a dot indicator.'
+  prefix:
+    title: Prefix
+    description: 'Icon or content rendered before the badge text.'

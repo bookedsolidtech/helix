@@ -1,0 +1,68 @@
+$schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/modules/sdc/src/metadata.schema.json'
+name: Helix Icon Button
+description: 'An icon-only button component for compact, accessible actions. Renders a square button or anchor element containing a single icon. The `label` property is required and provides the accessible name via `aria-label` and a native tooltip via the `title` attribute.'
+status: experimental
+group: helix
+
+props:
+  type: object
+  properties:
+    label:
+      type: string
+      title: Label
+      description: 'Accessible name for the button. Required. Rendered as `aria-label` and `title` on the underlying element. A console warning is emitted when absent.'
+      default: ''
+    variant:
+      type: string
+      title: Variant
+      description: 'Visual style variant of the button.'
+      default: 'ghost'
+      enum:
+        - 'primary'
+        - 'secondary'
+        - 'tertiary'
+        - 'danger'
+        - 'ghost'
+    hx-size:
+      type: string
+      title: Hx-size
+      description: 'Size of the button.'
+      default: 'md'
+      enum:
+        - 'sm'
+        - 'md'
+        - 'lg'
+    type:
+      type: string
+      title: Type
+      description: 'The type attribute for the underlying button element. Has no effect when `href` is set.'
+      default: 'button'
+      enum:
+        - 'button'
+        - 'submit'
+        - 'reset'
+    disabled:
+      type: boolean
+      title: Disabled
+      description: 'Whether the button is disabled.'
+      default: false
+    href:
+      type: string
+      title: Href
+      description: 'When set, renders an `<a>` element instead of a `<button>`.'
+      default: 'undefined'
+    name:
+      type: string
+      title: Name
+      description: 'Name submitted with form data. Only applicable when rendering as a button.'
+      default: 'undefined'
+    value:
+      type: string
+      title: Value
+      description: 'Value submitted with form data. Only applicable when rendering as a button.'
+      default: 'undefined'
+
+slots:
+  default:
+    title: Default
+    description: 'Icon element to display (hx-icon, svg, or img).'

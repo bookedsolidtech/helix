@@ -1,0 +1,89 @@
+$schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/modules/sdc/src/metadata.schema.json'
+name: Helix Textarea
+description: 'A multi-line text area component with label, validation, and form association.'
+status: experimental
+group: helix
+
+props:
+  type: object
+  properties:
+    label:
+      type: string
+      title: Label
+      description: 'The visible label text for the textarea.'
+      default: ''
+    placeholder:
+      type: string
+      title: Placeholder
+      description: 'Placeholder text shown when the textarea is empty.'
+      default: ''
+    value:
+      type: string
+      title: Value
+      description: 'The current value of the textarea.'
+      default: ''
+    required:
+      type: boolean
+      title: Required
+      description: 'Whether the textarea is required for form submission.'
+      default: false
+    disabled:
+      type: boolean
+      title: Disabled
+      description: 'Whether the textarea is disabled.'
+      default: false
+    error:
+      type: string
+      title: Error
+      description: 'Error message to display. When set, the textarea enters an error state.'
+      default: ''
+    help-text:
+      type: string
+      title: Help-text
+      description: 'Help text displayed below the textarea for guidance.'
+      default: ''
+    name:
+      type: string
+      title: Name
+      description: 'The name of the textarea, used for form submission.'
+      default: ''
+    rows:
+      type: number
+      title: Rows
+      description: 'The number of visible text rows.'
+      default: 4
+    maxlength:
+      type: number
+      title: Maxlength
+      description: 'Maximum number of characters allowed.'
+    resize:
+      type: string
+      title: Resize
+      description: 'Controls how the textarea can be resized. Use ''auto'' for auto-grow behavior.'
+      default: 'vertical'
+      enum:
+        - 'none'
+        - 'vertical'
+        - 'both'
+        - 'auto'
+    show-count:
+      type: boolean
+      title: Show-count
+      description: 'Whether to show a character count below the textarea.'
+      default: false
+    aria-label:
+      type: string
+      title: Aria-label
+      description: 'Accessible name for screen readers, if different from the visible label.'
+      default: 'null'
+
+slots:
+  label:
+    title: Label
+    description: 'Custom label content (overrides the label property). Use for Drupal Form API rendered labels.'
+  help-text:
+    title: Help-text
+    description: 'Custom help text content (overrides the helpText property).'
+  error:
+    title: Error
+    description: 'Custom error content (overrides the error property). Use for Drupal Form API rendered errors.'

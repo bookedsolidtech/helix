@@ -1,0 +1,28 @@
+$schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/modules/sdc/src/metadata.schema.json'
+name: Helix Prose
+description: 'A Light DOM prose container that applies typographic styles to rich text content such as CKEditor output, Markdown-rendered HTML, or any structured body copy.  Renders in the Light DOM (no Shadow DOM) so that global and scoped styles can target child elements directly. Uses the AdoptedStylesheetsController to inject scoped prose CSS into the document without duplication.'
+status: experimental
+group: helix
+
+props:
+  type: object
+  properties:
+    size:
+      type: string
+      title: Size
+      description: 'Typography scale for the prose content.'
+      default: 'base'
+      enum:
+        - 'sm'
+        - 'base'
+        - 'lg'
+    max-width:
+      type: string
+      title: Max-width
+      description: 'Maximum content width. When set, overrides the --hx-prose-max-width token. Accepts any valid CSS width value (e.g., ''640px'', ''80ch'', ''100%'').'
+      default: ''
+
+slots:
+  default:
+    title: Default
+    description: 'Default slot for rich text content (headings, paragraphs, lists, tables, etc.).'

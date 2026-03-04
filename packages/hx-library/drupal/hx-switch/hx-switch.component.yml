@@ -1,0 +1,69 @@
+$schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/modules/sdc/src/metadata.schema.json'
+name: Helix Switch
+description: 'A toggle switch component for on/off states.'
+status: experimental
+group: helix
+
+props:
+  type: object
+  properties:
+    checked:
+      type: boolean
+      title: Checked
+      description: 'Whether the switch is toggled on.'
+      default: false
+    disabled:
+      type: boolean
+      title: Disabled
+      description: 'Whether the switch is disabled.'
+      default: false
+    required:
+      type: boolean
+      title: Required
+      description: 'Whether the switch is required for form submission.'
+      default: false
+    name:
+      type: string
+      title: Name
+      description: 'The name of the switch, used for form submission.'
+      default: ''
+    value:
+      type: string
+      title: Value
+      description: 'The value submitted when the switch is checked.'
+      default: 'on'
+    label:
+      type: string
+      title: Label
+      description: 'The visible label text for the switch.'
+      default: ''
+    hx-size:
+      type: string
+      title: Hx-size
+      description: 'Size variant of the switch.'
+      default: 'md'
+      enum:
+        - 'sm'
+        - 'md'
+        - 'lg'
+    error:
+      type: string
+      title: Error
+      description: 'Error message to display. When set, the switch enters an error state.'
+      default: ''
+    help-text:
+      type: string
+      title: Help-text
+      description: 'Help text displayed below the switch for guidance.'
+      default: ''
+
+slots:
+  default:
+    title: Default
+    description: 'Custom label content (overrides the label property).'
+  error:
+    title: Error
+    description: 'Custom error content (overrides the error property).'
+  help-text:
+    title: Help-text
+    description: 'Custom help text content (overrides the helpText property).'

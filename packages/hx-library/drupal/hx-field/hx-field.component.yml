@@ -1,0 +1,60 @@
+$schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/modules/sdc/src/metadata.schema.json'
+name: Helix Field
+description: 'Layout wrapper providing consistent label + input + help text + validation message structure for any form control. Use this when wrapping non-HELiX form controls or native HTML elements in the HELiX form field pattern.  This component is NOT form-associated — it is a pure visual layout wrapper.'
+status: experimental
+group: helix
+
+props:
+  type: object
+  properties:
+    label:
+      type: string
+      title: Label
+      description: 'The visible label text for the field.'
+      default: ''
+    required:
+      type: boolean
+      title: Required
+      description: 'Whether the field is required. Shows a required indicator on the label.'
+      default: false
+    error:
+      type: string
+      title: Error
+      description: 'Error message to display. When set, the field enters an error state.'
+      default: ''
+    help-text:
+      type: string
+      title: Help-text
+      description: 'Help text displayed below the control for guidance.'
+      default: ''
+    disabled:
+      type: boolean
+      title: Disabled
+      description: 'Visual disabled state applied via opacity. Does not affect slotted control interactivity — set disabled on the slotted control directly.'
+      default: false
+    hx-size:
+      type: string
+      title: Hx-size
+      description: 'Size variant controlling label and help text font sizes.'
+      default: 'md'
+      enum:
+        - 'sm'
+        - 'md'
+        - 'lg'
+
+slots:
+  default:
+    title: Default
+    description: 'The form control element (native or custom).'
+  label:
+    title: Label
+    description: 'Custom label content (overrides the label property).'
+  help:
+    title: Help
+    description: 'Custom help text content (overrides the helpText property).'
+  error:
+    title: Error
+    description: 'Custom error content (overrides the error property).'
+  description:
+    title: Description
+    description: 'Additional descriptive content above the control.'

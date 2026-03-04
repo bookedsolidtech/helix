@@ -1,0 +1,63 @@
+$schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/modules/sdc/src/metadata.schema.json'
+name: Helix Radio Group
+description: 'A form-associated radio group that manages a set of `<hx-radio>` children.'
+status: experimental
+group: helix
+
+props:
+  type: object
+  properties:
+    value:
+      type: string
+      title: Value
+      description: 'The selected radio''s value.'
+      default: ''
+    name:
+      type: string
+      title: Name
+      description: 'The name used for form submission.'
+      default: ''
+    label:
+      type: string
+      title: Label
+      description: 'The fieldset legend/label text.'
+      default: ''
+    required:
+      type: boolean
+      title: Required
+      description: 'Whether a selection is required for form submission.'
+      default: false
+    disabled:
+      type: boolean
+      title: Disabled
+      description: 'Whether the entire group is disabled.'
+      default: false
+    error:
+      type: string
+      title: Error
+      description: 'Error message to display. When set, the group enters an error state.'
+      default: ''
+    help-text:
+      type: string
+      title: Help-text
+      description: 'Help text displayed below the group for guidance.'
+      default: ''
+    orientation:
+      type: string
+      title: Orientation
+      description: 'Layout orientation of the radio items.'
+      default: 'vertical'
+      enum:
+        - 'vertical'
+        - 'horizontal'
+
+slots:
+  default:
+    title: Default
+    description: '`<hx-radio>` elements.'
+  error:
+    title: Error
+    description: 'Custom error content (overrides the error property).'
+  help-text:
+    title: Help-text
+    description: 'Custom help text content (overrides the helpText property).'

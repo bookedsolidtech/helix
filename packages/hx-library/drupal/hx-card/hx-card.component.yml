@@ -1,0 +1,49 @@
+$schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/modules/sdc/src/metadata.schema.json'
+name: Helix Card
+description: 'A flexible card component for displaying grouped content.'
+status: experimental
+group: helix
+
+props:
+  type: object
+  properties:
+    variant:
+      type: string
+      title: Variant
+      description: 'Visual style variant of the card.'
+      default: 'default'
+      enum:
+        - 'default'
+        - 'featured'
+        - 'compact'
+    elevation:
+      type: string
+      title: Elevation
+      description: 'Elevation (shadow depth) of the card.'
+      default: 'flat'
+      enum:
+        - 'flat'
+        - 'raised'
+        - 'floating'
+    hx-href:
+      type: string
+      title: Hx-href
+      description: 'Optional URL. When set, the card becomes interactive (clickable) and navigates to this URL on click. Uses wc-href to avoid conflicting with the native HTML href attribute.'
+      default: ''
+
+slots:
+  image:
+    title: Image
+    description: 'Optional image or media content at the top of the card.'
+  heading:
+    title: Heading
+    description: 'The card heading/title content.'
+  default:
+    title: Default
+    description: 'Default slot for the card body content.'
+  footer:
+    title: Footer
+    description: 'Optional footer content below the body.'
+  actions:
+    title: Actions
+    description: 'Optional action buttons, rendered with a top border separator.'
