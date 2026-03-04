@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<!--
+  Drupal 11 Integration Test
+  Simulates a Drupal 11 Twig template consuming @helix/library components.
+
+  In a real Drupal deployment:
+  - The library is declared in a *.libraries.yml file
+  - Components are used in *.html.twig templates
+  - The Drupal.attachBehaviors() lifecycle manages JS
+  - This file simulates the rendered HTML output for integration verification.
+-->
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@helix/library — Drupal 11 Integration Test</title>
+
+    <!--
+      Design tokens CSS (equivalent to Drupal library CSS attachment):
+      In drupal: helix_library/global.css maps to tokens.css
+    -->
+    <link rel="stylesheet" href="/packages/hx-tokens/dist/tokens.css" />
+
+    <!--
+      Custom theme override to verify CSS custom property theming works.
+      In Drupal this would live in a custom theme's CSS file.
+    -->
+    <style>
+      body {
+        font-family: var(--hx-font-family-sans, sans-serif);
+        background: var(--hx-color-neutral-50, #f9fafb);
+        color: var(--hx-color-neutral-900, #111827);
+        margin: 0;
+        padding: 2rem;
+      }
+      section { margin-bottom: 3rem; }
+      h2 { border-bottom: 1px solid var(--hx-color-neutral-200, #e5e7eb); padding-bottom: 0.5rem; }
+      .row { display: flex; flex-wrap: wrap; gap: 1rem; align-items: center; margin-top: 1rem; }
+
+      /*
+        Theming verification: override primary color via CSS custom properties.
+        Drupal themes can do this in their theme CSS without touching component internals.
+      */
+      .theme-teal {
+        --hx-color-primary-500: #0d9488;
+        --hx-color-primary-600: #0f766e;
+        --hx-button-bg: var(--hx-color-primary-500);
+        --hx-button-hover-bg: var(--hx-color-primary-600);
+      }
+
+      /* Dark mode section */
+      .dark-section {
+        background: var(--hx-color-neutral-900, #111827);
+        padding: 1.5rem;
+        border-radius: 0.5rem;
+        color: var(--hx-color-neutral-100, #f3f4f6);
+      }
+    </style>
+
+    <!--
+      Self-contained bundle: Lit + @helix/tokens + all components.
+      In a real Drupal deployment, this is declared in helix_library.libraries.yml.
+    -->
+    <script type="module" src="/packages/hx-library/integration/dist/helix-bundle.js"></script>
+  </head>
+  <body data-drupal-integration-test="true">
+
+    <!--
+      ============================================================
+      SECTION 1: Display Components
+      Tests basic rendering of non-form-associated components
+      ============================================================
+    -->
+    <section id="display-components">
+      <h2>Display Components</h2>
+
+      <!-- hx-button: Simulates a Drupal form submit / action button in Twig -->
+      <div class="row" id="buttons-row">
+        <hx-button variant="primary">Primary Action</hx-button>
+        <hx-button variant="secondary">Secondary</hx-button>
+        <hx-button variant="ghost">Ghost</hx-button>
+        <hx-button variant="outline">Outline</hx-button>
+        <hx-button variant="danger">Delete</hx-button>
+        <hx-button disabled>Disabled</hx-button>
+      </div>
+
+      <!-- hx-badge -->
+      <div class="row" id="badges-row">
+        <hx-badge variant="primary">Published</hx-badge>
+        <hx-badge variant="success">Active</hx-badge>
+        <hx-badge variant="warning">Draft</hx-badge>
+        <hx-badge variant="error">Unpublished</hx-badge>
+        <hx-badge variant="neutral">Archived</hx-badge>
+      </div>
+
+      <!-- hx-alert -->
+      <div id="alerts-section">
+        <hx-alert variant="info" heading="Information">This is an informational message from Drupal.</hx-alert>
+        <hx-alert variant="success" heading="Success">Your changes have been saved.</hx-alert>
+        <hx-alert variant="warning" heading="Warning">This content is unpublished.</hx-alert>
+        <hx-alert variant="error" heading="Error">Validation failed. Please check your input.</hx-alert>
+      </div>
+
+      <!-- hx-card -->
+      <div class="row" id="cards-row">
+        <hx-card heading="Node: Article" subheading="Published by admin">
+          This simulates a Drupal node rendered in an hx-card.
+          <hx-button slot="footer" variant="secondary" size="sm">Edit</hx-button>
+        </hx-card>
+        <hx-card variant="featured" heading="Featured Content">
+          Featured node card variant.
+        </hx-card>
+      </div>
+
+      <!-- hx-avatar -->
+      <div class="row" id="avatars-row">
+        <hx-avatar initials="JD" size="sm"></hx-avatar>
+        <hx-avatar initials="AB" size="md"></hx-avatar>
+        <hx-avatar initials="XY" size="lg"></hx-avatar>
+      </div>
+
+      <!-- hx-breadcrumb -->
+      <div id="breadcrumb-row">
+        <hx-breadcrumb>
+          <hx-breadcrumb-item href="/">Home</hx-breadcrumb-item>
+          <hx-breadcrumb-item href="/admin">Admin</hx-breadcrumb-item>
+          <hx-breadcrumb-item>Content</hx-breadcrumb-item>
+        </hx-breadcrumb>
+      </div>
+
+      <!-- hx-container -->
+      <div id="container-row">
+        <hx-container>
+          <p>This content is inside an hx-container — max-width centered layout like Drupal's main content region.</p>
+        </hx-container>
+      </div>
+
+      <!-- hx-icon-button -->
+      <div class="row" id="icon-buttons-row">
+        <hx-icon-button label="Edit">
+          <svg slot="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+            <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/>
+            <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/>
+          </svg>
+        </hx-icon-button>
+        <hx-icon-button label="Delete" variant="danger">
+          <svg slot="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+            <polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a1 1 0 011-1h4a1 1 0 011 1v2"/>
+          </svg>
+        </hx-icon-button>
+      </div>
+    </section>
+
+    <!--
+      ============================================================
+      SECTION 2: Form-Associated Components
+      Tests ElementInternals form association — critical for Drupal Form API
+      ============================================================
+    -->
+    <section id="form-components">
+      <h2>Form-Associated Components (Drupal Form API)</h2>
+
+      <!--
+        Native HTML form — tests that form-associated components participate
+        in native form submission (ElementInternals.setFormValue).
+        In Drupal, forms use the Form API which renders native <form> elements.
+      -->
+      <form id="drupal-form" action="#" method="post" data-testid="drupal-form">
+        <div style="display:flex;flex-direction:column;gap:1rem;max-width:500px;">
+          <hx-text-input
+            name="title"
+            label="Node Title"
+            placeholder="Enter title"
+            required
+          ></hx-text-input>
+
+          <hx-textarea
+            name="body"
+            label="Body"
+            placeholder="Enter content body"
+            rows="4"
+          ></hx-textarea>
+
+          <hx-select
+            name="status"
+            label="Publication Status"
+          >
+            <option value="">— Select status —</option>
+            <option value="published">Published</option>
+            <option value="draft">Draft</option>
+            <option value="archived">Archived</option>
+          </hx-select>
+
+          <hx-radio-group name="content_type" label="Content Type" value="article">
+            <hx-radio value="article">Article</hx-radio>
+            <hx-radio value="page">Basic Page</hx-radio>
+            <hx-radio value="blog">Blog Post</hx-radio>
+          </hx-radio-group>
+
+          <hx-checkbox name="promoted" label="Promote to front page"></hx-checkbox>
+          <hx-checkbox name="sticky" label="Sticky at top of lists"></hx-checkbox>
+
+          <hx-switch name="comments_enabled" label="Enable Comments"></hx-switch>
+
+          <hx-slider name="priority" label="Priority" min="0" max="10" value="5"></hx-slider>
+
+          <div class="row">
+            <hx-button type="submit" variant="primary">Save Content</hx-button>
+            <hx-button type="button" variant="secondary">Preview</hx-button>
+          </div>
+        </div>
+      </form>
+    </section>
+
+    <!--
+      ============================================================
+      SECTION 3: Theming via CSS Custom Properties
+      Tests that components respond to theme overrides
+      ============================================================
+    -->
+    <section id="theming-test">
+      <h2>CSS Custom Property Theming</h2>
+      <p>Below buttons use a teal theme override — no component source changes needed.</p>
+
+      <div class="row theme-teal">
+        <hx-button variant="primary">Teal Primary</hx-button>
+        <hx-button variant="outline">Teal Outline</hx-button>
+      </div>
+
+      <!-- Dark section -->
+      <div class="dark-section" style="margin-top:1rem;" data-color-scheme="dark">
+        <hx-badge variant="primary">Dark Theme Badge</hx-badge>
+        <hx-alert variant="info" heading="Dark Mode">Components respond to CSS custom property overrides in dark contexts.</hx-alert>
+      </div>
+    </section>
+
+    <!--
+      ============================================================
+      SECTION 4: hx-prose (rich text / body field output)
+      In Drupal, body fields render HTML — hx-prose wraps this safely
+      ============================================================
+    -->
+    <section id="prose-test">
+      <h2>Rich Text (Drupal Body Field)</h2>
+      <hx-prose>
+        <h1>Article Title</h1>
+        <p>This is a body field rendered by Drupal's text filter system into an <code>hx-prose</code> component.</p>
+        <ul>
+          <li>Bullet point one</li>
+          <li>Bullet point two with <strong>bold text</strong></li>
+          <li>Bullet with <a href="#">a link</a></li>
+        </ul>
+        <blockquote>A blockquote from the body field content.</blockquote>
+        <p>Paragraph after the blockquote.</p>
+      </hx-prose>
+    </section>
+
+    <!--
+      Form submission verification script:
+      Verifies that form-associated components participate in native form submission.
+    -->
+    <script type="module">
+      const form = document.getElementById('drupal-form');
+      form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const data = new FormData(form);
+        const collected = {};
+        for (const [key, value] of data.entries()) {
+          collected[key] = value;
+        }
+        // Expose for Playwright to inspect
+        window.__formData = collected;
+        window.__formSubmitted = true;
+        console.log('[Drupal Integration] Form submitted:', JSON.stringify(collected));
+      });
+    </script>
+  </body>
+</html>

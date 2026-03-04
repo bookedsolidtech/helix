@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<!--
+  Next.js 15 Integration Test
+  Simulates Next.js 15 App Router SSR output consuming @helix/library components.
+
+  Key considerations for Next.js 15 / React:
+  - Web components must be used as client-side custom elements
+  - SSR: Next.js renders HTML on the server; custom elements define themselves on the client
+  - Hydration: React must NOT conflict with custom element internal DOM
+  - In Next.js App Router, web components should be used in 'use client' components
+    or in layout.tsx with a dynamic import to avoid SSR rendering their shadow DOM
+
+  This fixture simulates the hydrated HTML output that Next.js 15 would produce
+  after SSR + client-side hydration is complete.
+
+  For production Next.js use:
+  - Wrap hx-* usage in a 'use client' React component
+  - Or use dynamic(() => import('./Helix'), { ssr: false }) for pure client rendering
+  - Custom element registration happens once via a single import in a root client component
+-->
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@helix/library — Next.js 15 Integration Test</title>
+
+    <!-- Design tokens global CSS (equivalent to globals.css import in Next.js layout.tsx) -->
+    <link rel="stylesheet" href="/packages/hx-tokens/dist/tokens.css" />
+
+    <!--
+      Next.js 15 app/globals.css equivalent.
+      Theme overrides via CSS custom properties — works identically to Drupal.
+    -->
+    <style>
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: var(--hx-font-family-sans, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif);
+        background: var(--hx-color-neutral-50, #f9fafb);
+        color: var(--hx-color-neutral-900, #111827);
+        margin: 0;
+        padding: 2rem;
+        line-height: 1.5;
+      }
+
+      /* Simulates Next.js layout regions */
+      .next-layout { max-width: 1200px; margin: 0 auto; }
+      .next-header { padding: 1rem 0; border-bottom: 1px solid var(--hx-color-neutral-200, #e5e7eb); margin-bottom: 2rem; }
+      section { margin-bottom: 3rem; }
+      h2 { border-bottom: 1px solid var(--hx-color-neutral-200, #e5e7eb); padding-bottom: 0.5rem; }
+      .row { display: flex; flex-wrap: wrap; gap: 1rem; align-items: center; margin-top: 1rem; }
+
+      /*
+        SSR hydration compatibility marker.
+        Next.js attaches data-nextjs attributes during hydration.
+        Custom elements must not conflict with React's reconciliation.
+      */
+      [data-nextjs-hydrated] { outline: none; }
+
+      /* Theme customization via CSS custom properties (Next.js theme context equivalent) */
+      .brand-emerald {
+        --hx-color-primary-500: #059669;
+        --hx-color-primary-600: #047857;
+        --hx-button-bg: var(--hx-color-primary-500);
+      }
+    </style>
+
+    <!--
+      Self-contained bundle (simulates Next.js bundler output for web components).
+      In production Next.js, this is handled by webpack/turbopack bundling the
+      '@helix/library' npm package in a 'use client' boundary.
+    -->
+    <script type="module" src="/packages/hx-library/integration/dist/helix-bundle.js"></script>
+
+    <!--
+      Signal hydration completion once all components register.
+      In Next.js, this would happen inside the React hydration lifecycle.
+    -->
+    <script type="module">
+      // Wait for all hx- elements to be defined (simulates React hydration completing)
+      const helixTags = [
+        'hx-button', 'hx-badge', 'hx-alert', 'hx-card', 'hx-avatar',
+        'hx-breadcrumb', 'hx-container', 'hx-icon-button', 'hx-text-input',
+        'hx-checkbox', 'hx-radio-group', 'hx-select', 'hx-textarea',
+        'hx-switch', 'hx-slider', 'hx-prose', 'hx-form', 'hx-field',
+        'hx-button-group',
+      ];
+
+      Promise.all(helixTags.map(tag => customElements.whenDefined(tag))).then(() => {
+        window.__helixHydrated = true;
+        document.dispatchEvent(new CustomEvent('helix:hydrated'));
+        const status = document.getElementById('hydration-status');
+        if (status) {
+          status.textContent = 'All components hydrated successfully — no SSR errors.';
+          status.style.color = 'var(--hx-color-success-600, #16a34a)';
+        }
+        console.log('[Next.js Integration] All helix components hydrated');
+      });
+
+      // Expose component count for Playwright assertions
+      window.__getHelixComponents = () => {
+        const tags = new Set();
+        document.querySelectorAll('*').forEach(el => {
+          if (el.tagName.toLowerCase().startsWith('hx-')) {
+            tags.add(el.tagName.toLowerCase());
+          }
+        });
+        return [...tags];
+      };
+
+      // Form submission data collection (for Playwright verification)
+      // Use event delegation on document to handle form submit regardless of timing
+      document.addEventListener('submit', (e) => {
+        const form = e.target;
+        if (form && form.id === 'nextjs-form') {
+          e.preventDefault();
+          const data = new FormData(form);
+          const collected = {};
+          for (const [key, value] of data.entries()) {
+            collected[key] = value;
+          }
+          window.__formData = collected;
+          window.__formSubmitted = true;
+          console.log('[Next.js Integration] Form submitted:', JSON.stringify(collected));
+        }
+      });
+    </script>
+  </head>
+  <body>
+    <div class="next-layout" data-nextjs-hydrated="true">
+
+      <!-- Simulates Next.js App Router layout header -->
+      <header class="next-header">
+        <div class="row">
+          <hx-avatar initials="H" size="sm"></hx-avatar>
+          <span><strong>HELiX</strong> Healthcare Design System</span>
+          <hx-badge variant="primary" style="margin-left:auto">Beta</hx-badge>
+        </div>
+      </header>
+
+      <main>
+        <!--
+          ============================================================
+          SECTION 1: SSR Hydration Test
+          Custom elements should upgrade without React hydration errors.
+          In Next.js, these elements are rendered as unknown elements
+          during SSR, then upgraded by client JS without conflicts.
+          ============================================================
+        -->
+        <section id="ssr-hydration-test">
+          <h2>SSR Hydration (No Errors Expected)</h2>
+          <p id="hydration-status">Checking hydration status...</p>
+
+          <div class="row">
+            <hx-button variant="primary" id="ssr-button">SSR Hydrated Button</hx-button>
+            <hx-badge variant="success">Hydrated</hx-badge>
+          </div>
+
+          <hx-alert variant="info" heading="Next.js SSR Pattern">
+            In Next.js App Router, web components are used in 'use client' components.
+            The server renders them as unknown elements; the client upgrades them.
+            No hydration mismatch errors occur because React doesn't manage their shadow DOM.
+          </hx-alert>
+        </section>
+
+        <!--
+          ============================================================
+          SECTION 2: All Components Render Test
+          ============================================================
+        -->
+        <section id="all-components">
+          <h2>All Components Render</h2>
+
+          <!-- Display components -->
+          <div id="buttons-row" class="row">
+            <hx-button variant="primary">Primary</hx-button>
+            <hx-button variant="secondary">Secondary</hx-button>
+            <hx-button variant="ghost">Ghost</hx-button>
+            <hx-button variant="outline">Outline</hx-button>
+            <hx-button variant="danger">Danger</hx-button>
+            <hx-button loading>Loading</hx-button>
+            <hx-button disabled>Disabled</hx-button>
+          </div>
+
+          <div id="badges-row" class="row">
+            <hx-badge variant="primary">primary</hx-badge>
+            <hx-badge variant="success">success</hx-badge>
+            <hx-badge variant="warning">warning</hx-badge>
+            <hx-badge variant="error">error</hx-badge>
+            <hx-badge variant="neutral">neutral</hx-badge>
+          </div>
+
+          <div id="alerts-section">
+            <hx-alert variant="info" heading="Info">Informational message.</hx-alert>
+            <hx-alert variant="success" heading="Success">Operation completed.</hx-alert>
+            <hx-alert variant="warning" heading="Warning">Check your data.</hx-alert>
+            <hx-alert variant="error" heading="Error">Something went wrong.</hx-alert>
+          </div>
+
+          <div id="cards-row" class="row">
+            <hx-card heading="Patient Record" subheading="ID: 12345">
+              Card content representing a Next.js data fetch result.
+              <hx-button slot="footer" variant="primary" size="sm">View Details</hx-button>
+            </hx-card>
+            <hx-card variant="compact" heading="Compact Card">
+              Compact variant for dense UIs.
+            </hx-card>
+          </div>
+
+          <div id="avatars-row" class="row">
+            <hx-avatar initials="JD" size="xs"></hx-avatar>
+            <hx-avatar initials="AB" size="sm"></hx-avatar>
+            <hx-avatar initials="CD" size="md"></hx-avatar>
+            <hx-avatar initials="EF" size="lg"></hx-avatar>
+            <hx-avatar initials="GH" size="xl"></hx-avatar>
+          </div>
+
+          <div id="breadcrumb-row">
+            <hx-breadcrumb>
+              <hx-breadcrumb-item href="/">Home</hx-breadcrumb-item>
+              <hx-breadcrumb-item href="/patients">Patients</hx-breadcrumb-item>
+              <hx-breadcrumb-item>Patient 12345</hx-breadcrumb-item>
+            </hx-breadcrumb>
+          </div>
+
+          <div id="icon-buttons-row" class="row">
+            <hx-icon-button label="Edit patient">
+              <svg slot="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+                <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/>
+                <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/>
+              </svg>
+            </hx-icon-button>
+          </div>
+        </section>
+
+        <!--
+          ============================================================
+          SECTION 3: Form-Associated Components with React-managed form
+          ============================================================
+        -->
+        <section id="form-test">
+          <h2>Form-Associated Components (React/Server Actions Pattern)</h2>
+
+          <form id="nextjs-form" data-testid="nextjs-form" action="#" method="post">
+            <div style="display:flex;flex-direction:column;gap:1rem;max-width:500px;">
+              <hx-text-input
+                name="patient_name"
+                label="Patient Name"
+                placeholder="First Last"
+                required
+              ></hx-text-input>
+
+              <hx-text-input
+                name="patient_id"
+                label="Patient ID"
+                type="text"
+                placeholder="MRN-XXXXX"
+              ></hx-text-input>
+
+              <hx-select name="department" label="Department">
+                <option value="">— Select department —</option>
+                <option value="cardiology">Cardiology</option>
+                <option value="oncology">Oncology</option>
+                <option value="emergency">Emergency</option>
+              </hx-select>
+
+              <hx-radio-group name="urgency" label="Urgency" value="routine">
+                <hx-radio value="routine">Routine</hx-radio>
+                <hx-radio value="urgent">Urgent</hx-radio>
+                <hx-radio value="emergency">Emergency</hx-radio>
+              </hx-radio-group>
+
+              <hx-checkbox name="consent" label="Patient has provided informed consent" required></hx-checkbox>
+
+              <hx-switch name="alerts_enabled" label="Enable Notifications"></hx-switch>
+
+              <hx-textarea
+                name="notes"
+                label="Clinical Notes"
+                placeholder="Enter clinical observations..."
+                rows="3"
+              ></hx-textarea>
+
+              <hx-slider name="pain_scale" label="Pain Scale (0–10)" min="0" max="10" value="0"></hx-slider>
+
+              <div class="row">
+                <hx-button type="submit" variant="primary">Submit Form</hx-button>
+                <hx-button type="reset" variant="secondary">Reset</hx-button>
+              </div>
+            </div>
+          </form>
+        </section>
+
+        <!--
+          ============================================================
+          SECTION 4: CSS Custom Property Theming
+          ============================================================
+        -->
+        <section id="theming-test">
+          <h2>CSS Custom Property Theming in Next.js</h2>
+
+          <div class="row brand-emerald">
+            <hx-button variant="primary">Emerald Theme Button</hx-button>
+            <hx-badge variant="success">Themed Badge</hx-badge>
+          </div>
+
+          <hx-alert variant="success" heading="Theming Works">
+            CSS custom properties cascade into Shadow DOM via inherited values.
+            No component source modifications needed.
+          </hx-alert>
+        </section>
+
+        <!--
+          ============================================================
+          SECTION 5: hx-field and hx-form composition
+          ============================================================
+        -->
+        <section id="field-form-test">
+          <h2>hx-field and hx-form Composition</h2>
+          <hx-form>
+            <hx-field label="Email Address" required>
+              <hx-text-input name="email" type="email" placeholder="user@example.com"></hx-text-input>
+            </hx-field>
+            <hx-field label="Role">
+              <hx-select name="role">
+                <option value="admin">Administrator</option>
+                <option value="editor">Editor</option>
+                <option value="viewer">Viewer</option>
+              </hx-select>
+            </hx-field>
+            <hx-button type="submit" variant="primary">Save Settings</hx-button>
+          </hx-form>
+        </section>
+      </main>
+    </div>
+  </body>
+</html>
