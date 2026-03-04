@@ -30,22 +30,5 @@
     }
   ],
   "featureType": "code",
-  "complexity": "medium",
-  "updatedAt": "2026-03-04T21:02:25.251Z",
-  "model": "claude-sonnet-4-6",
-  "costUsd": 2.37491225,
-  "lastSessionId": "c715a6ba-ea36-40d1-bbd0-3610f7337c7b",
-  "executionHistory": [
-    {
-      "id": "12049b60-f0f8-4f3d-b1ad-9ce9f4a3c31e",
-      "startedAt": "2026-03-04T20:37:23.669Z",
-      "completedAt": "2026-03-04T21:02:23.492Z",
-      "durationMs": 1499823,
-      "costUsd": 2.37491225,
-      "model": "claude-sonnet-4-6",
-      "success": false,
-      "error": "Operation was cancelled",
-      "trigger": "manual"
-    }
-  ]
+  "complexity": "medium"
 }
