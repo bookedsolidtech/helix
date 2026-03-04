@@ -350,18 +350,56 @@
               "description": "Dot indicator size when rendered without content.",
               "name": "--hx-badge-dot-size",
               "default": "var(--hx-size-2)"
+            },
+            {
+              "description": "Background for the secondary variant.",
+              "name": "--hx-badge-secondary-bg",
+              "default": "var(--hx-color-neutral-100)"
+            },
+            {
+              "description": "Text color for the secondary variant.",
+              "name": "--hx-badge-secondary-color",
+              "default": "var(--hx-color-neutral-700)"
+            },
+            {
+              "description": "Background for the danger variant.",
+              "name": "--hx-badge-danger-bg",
+              "default": "var(--hx-color-error-500)"
+            },
+            {
+              "description": "Text color for the danger variant.",
+              "name": "--hx-badge-danger-color",
+              "default": "var(--hx-color-neutral-0)"
+            },
+            {
+              "description": "Background for the info variant.",
+              "name": "--hx-badge-info-bg",
+              "default": "var(--hx-color-info-700)"
+            },
+            {
+              "description": "Text color for the info variant.",
+              "name": "--hx-badge-info-color",
+              "default": "var(--hx-color-neutral-0)"
             }
           ],
           "cssParts": [
             {
               "description": "The badge element.",
               "name": "badge"
+            },
+            {
+              "description": "The remove/dismiss button.",
+              "name": "remove-button"
             }
           ],
           "slots": [
             {
               "description": "Default slot for badge content (text, number). When empty with pulse enabled, renders as a dot indicator.",
               "name": ""
+            },
+            {
+              "description": "Icon or content rendered before the badge text.",
+              "name": "prefix"
             }
           ],
           "members": [
@@ -369,7 +407,7 @@
               "kind": "field",
               "name": "variant",
               "type": {
-                "text": "'primary' | 'success' | 'warning' | 'error' | 'neutral'"
+                "text": "'primary' | 'secondary' | 'success' | 'warning' | 'danger' | 'error' | 'neutral' | 'info'"
               },
               "default": "'primary'",
               "description": "Visual style variant of the badge.",
@@ -411,6 +449,17 @@
             },
             {
               "kind": "field",
+              "name": "removable",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the badge renders a dismiss button.",
+              "attribute": "removable",
+              "reflects": true
+            },
+            {
+              "kind": "field",
               "name": "_hasSlotContent",
               "type": {
                 "text": "boolean"
@@ -436,13 +485,32 @@
                   }
                 }
               ]
+            },
+            {
+              "kind": "method",
+              "name": "_handleRemove",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              }
+            }
+          ],
+          "events": [
+            {
+              "name": "hx-remove",
+              "type": {
+                "text": "CustomEvent"
+              },
+              "description": "Dispatched when the user clicks the remove button."
             }
           ],
           "attributes": [
             {
               "name": "variant",
               "type": {
-                "text": "'primary' | 'success' | 'warning' | 'error' | 'neutral'"
+                "text": "'primary' | 'secondary' | 'success' | 'warning' | 'danger' | 'error' | 'neutral' | 'info'"
               },
               "default": "'primary'",
               "description": "Visual style variant of the badge.",
@@ -478,6 +546,16 @@
               "description": "Whether the badge displays an animated pulse for attention.",
               "fieldName": "pulse",
               "attribute": "pulse"
+            },
+            {
+              "name": "removable",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the badge renders a dismiss button.",
+              "fieldName": "removable",
+              "attribute": "removable"
             }
           ],
           "superclass": {
@@ -529,7 +607,7 @@
       "declarations": [
         {
           "kind": "class",
-          "description": "A production-grade button component for user interaction. Supports multiple\nvisual variants, sizes, loading state, prefix/suffix slots, anchor rendering,\nand full ElementInternals form association.",
+          "description": "A button component for user interaction.",
           "name": "HelixButton",
           "cssProperties": [
             {
@@ -570,63 +648,22 @@
           ],
           "cssParts": [
             {
-              "description": "The native button or anchor element.",
+              "description": "The native button element.",
               "name": "button"
-            },
-            {
-              "description": "The label text wrapper span.",
-              "name": "label"
-            },
-            {
-              "description": "The prefix slot container span.",
-              "name": "prefix"
-            },
-            {
-              "description": "The suffix slot container span.",
-              "name": "suffix"
-            },
-            {
-              "description": "The loading spinner SVG element.",
-              "name": "spinner"
             }
           ],
           "slots": [
             {
               "description": "Default slot for button label text or content.",
               "name": ""
-            },
-            {
-              "description": "Icon or content rendered before the label.",
-              "name": "prefix"
-            },
-            {
-              "description": "Icon or content rendered after the label.",
-              "name": "suffix"
             }
           ],
           "members": [
             {
               "kind": "field",
-              "name": "formAssociated",
-              "type": {
-                "text": "boolean"
-              },
-              "static": true,
-              "default": "true"
-            },
-            {
-              "kind": "field",
-              "name": "_internals",
-              "type": {
-                "text": "ElementInternals"
-              },
-              "privacy": "private"
-            },
-            {
-              "kind": "field",
               "name": "variant",
               "type": {
-                "text": "'primary' | 'secondary' | 'tertiary' | 'danger' | 'ghost' | 'outline'"
+                "text": "'primary' | 'secondary' | 'ghost'"
               },
               "default": "'primary'",
               "description": "Visual style variant of the button.",
@@ -651,19 +688,8 @@
                 "text": "boolean"
               },
               "default": "false",
-              "description": "Whether the button is disabled. Prevents all interaction and form actions.",
+              "description": "Whether the button is disabled.",
               "attribute": "disabled",
-              "reflects": true
-            },
-            {
-              "kind": "field",
-              "name": "loading",
-              "type": {
-                "text": "boolean"
-              },
-              "default": "false",
-              "description": "Whether the button is in a loading state. Shows spinner, prevents interaction,\nand sets aria-busy. Does not set the disabled attribute.",
-              "attribute": "loading",
               "reflects": true
             },
             {
@@ -673,48 +699,25 @@
                 "text": "'button' | 'submit' | 'reset'"
               },
               "default": "'button'",
-              "description": "The type attribute for the underlying button element. Ignored when href is set.",
+              "description": "The type attribute for the underlying button element.",
               "attribute": "type"
             },
             {
               "kind": "field",
-              "name": "href",
+              "name": "formAssociated",
               "type": {
-                "text": "string | undefined"
+                "text": "boolean"
               },
-              "default": "undefined",
-              "description": "When set, renders an anchor element instead of a button.",
-              "attribute": "href"
+              "static": true,
+              "default": "true"
             },
             {
               "kind": "field",
-              "name": "target",
+              "name": "_internals",
               "type": {
-                "text": "string | undefined"
+                "text": "ElementInternals"
               },
-              "default": "undefined",
-              "description": "Anchor target attribute. Only used when href is set.",
-              "attribute": "target"
-            },
-            {
-              "kind": "field",
-              "name": "name",
-              "type": {
-                "text": "string | undefined"
-              },
-              "default": "undefined",
-              "description": "Form field name submitted via ElementInternals.setFormValue on submit.",
-              "attribute": "name"
-            },
-            {
-              "kind": "field",
-              "name": "value",
-              "type": {
-                "text": "string | undefined"
-              },
-              "default": "undefined",
-              "description": "Form field value submitted via ElementInternals.setFormValue on submit.",
-              "attribute": "value"
+              "privacy": "private"
             },
             {
               "kind": "field",
@@ -742,16 +745,6 @@
                   }
                 }
               ]
-            },
-            {
-              "kind": "method",
-              "name": "_renderSpinner",
-              "privacy": "private"
-            },
-            {
-              "kind": "method",
-              "name": "_renderInner",
-              "privacy": "private"
             }
           ],
           "events": [
@@ -760,14 +753,14 @@
               "type": {
                 "text": "CustomEvent<{originalEvent: MouseEvent}>"
               },
-              "description": "Dispatched when the button is clicked and is neither disabled nor loading."
+              "description": "Dispatched when the button is clicked (not disabled)."
             }
           ],
           "attributes": [
             {
               "name": "variant",
               "type": {
-                "text": "'primary' | 'secondary' | 'tertiary' | 'danger' | 'ghost' | 'outline'"
+                "text": "'primary' | 'secondary' | 'ghost'"
               },
               "default": "'primary'",
               "description": "Visual style variant of the button.",
@@ -790,19 +783,9 @@
                 "text": "boolean"
               },
               "default": "false",
-              "description": "Whether the button is disabled. Prevents all interaction and form actions.",
+              "description": "Whether the button is disabled.",
               "fieldName": "disabled",
               "attribute": "disabled"
-            },
-            {
-              "name": "loading",
-              "type": {
-                "text": "boolean"
-              },
-              "default": "false",
-              "description": "Whether the button is in a loading state. Shows spinner, prevents interaction,\nand sets aria-busy. Does not set the disabled attribute.",
-              "fieldName": "loading",
-              "attribute": "loading"
             },
             {
               "name": "type",
@@ -810,49 +793,9 @@
                 "text": "'button' | 'submit' | 'reset'"
               },
               "default": "'button'",
-              "description": "The type attribute for the underlying button element. Ignored when href is set.",
+              "description": "The type attribute for the underlying button element.",
               "fieldName": "type",
               "attribute": "type"
-            },
-            {
-              "name": "href",
-              "type": {
-                "text": "string | undefined"
-              },
-              "default": "undefined",
-              "description": "When set, renders an anchor element instead of a button.",
-              "fieldName": "href",
-              "attribute": "href"
-            },
-            {
-              "name": "target",
-              "type": {
-                "text": "string | undefined"
-              },
-              "default": "undefined",
-              "description": "Anchor target attribute. Only used when href is set.",
-              "fieldName": "target",
-              "attribute": "target"
-            },
-            {
-              "name": "name",
-              "type": {
-                "text": "string | undefined"
-              },
-              "default": "undefined",
-              "description": "Form field name submitted via ElementInternals.setFormValue on submit.",
-              "fieldName": "name",
-              "attribute": "name"
-            },
-            {
-              "name": "value",
-              "type": {
-                "text": "string | undefined"
-              },
-              "default": "undefined",
-              "description": "Form field value submitted via ElementInternals.setFormValue on submit.",
-              "fieldName": "value",
-              "attribute": "value"
             }
           ],
           "superclass": {
@@ -861,7 +804,7 @@
           },
           "tagName": "hx-button",
           "customElement": true,
-          "summary": "Primary interactive element for triggering actions and form submission."
+          "summary": "Primary interactive element for triggering actions."
         }
       ],
       "exports": [
@@ -894,6 +837,156 @@
           "declaration": {
             "name": "HelixButton",
             "module": "./hx-button.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/components/hx-container/hx-container.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "A layout container that constrains content width and provides\nconsistent vertical spacing and horizontal gutters.\n\nUses a two-layer model: the outer host spans full width (background,\nvertical padding), while the inner wrapper constrains max-width,\ncenters content, and applies horizontal gutters.",
+          "name": "HelixContainer",
+          "cssProperties": [
+            {
+              "description": "Background color on the outer wrapper.",
+              "name": "--hx-container-bg",
+              "default": "transparent"
+            },
+            {
+              "description": "Horizontal padding on the inner box.",
+              "name": "--hx-container-gutter",
+              "default": "var(--hx-space-6)"
+            },
+            {
+              "description": "Override the max-width set by the width property.",
+              "name": "--hx-container-max-width"
+            },
+            {
+              "description": "Max-width for the content width preset.",
+              "name": "--hx-container-content",
+              "default": "72rem"
+            },
+            {
+              "description": "Max-width for the sm width preset.",
+              "name": "--hx-container-sm",
+              "default": "640px"
+            },
+            {
+              "description": "Max-width for the md width preset.",
+              "name": "--hx-container-md",
+              "default": "768px"
+            },
+            {
+              "description": "Max-width for the lg width preset.",
+              "name": "--hx-container-lg",
+              "default": "1024px"
+            },
+            {
+              "description": "Max-width for the xl width preset.",
+              "name": "--hx-container-xl",
+              "default": "1280px"
+            }
+          ],
+          "cssParts": [
+            {
+              "description": "The inner wrapper that constrains max-width and applies gutters.",
+              "name": "inner"
+            }
+          ],
+          "slots": [
+            {
+              "description": "Default slot for container content.",
+              "name": ""
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "width",
+              "type": {
+                "text": "'full' | 'content' | 'narrow' | 'sm' | 'md' | 'lg' | 'xl'"
+              },
+              "default": "'content'",
+              "description": "Controls the max-width of the inner content wrapper.",
+              "attribute": "width",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "padding",
+              "type": {
+                "text": "'none' | 'sm' | 'md' | 'lg' | 'xl' | '2xl'"
+              },
+              "default": "'none'",
+              "description": "Vertical padding applied to the outer wrapper.",
+              "attribute": "padding",
+              "reflects": true
+            }
+          ],
+          "attributes": [
+            {
+              "name": "width",
+              "type": {
+                "text": "'full' | 'content' | 'narrow' | 'sm' | 'md' | 'lg' | 'xl'"
+              },
+              "default": "'content'",
+              "description": "Controls the max-width of the inner content wrapper.",
+              "fieldName": "width",
+              "attribute": "width"
+            },
+            {
+              "name": "padding",
+              "type": {
+                "text": "'none' | 'sm' | 'md' | 'lg' | 'xl' | '2xl'"
+              },
+              "default": "'none'",
+              "description": "Vertical padding applied to the outer wrapper.",
+              "fieldName": "padding",
+              "attribute": "padding"
+            }
+          ],
+          "superclass": {
+            "name": "LitElement",
+            "package": "lit"
+          },
+          "tagName": "hx-container",
+          "customElement": true,
+          "summary": "Layout primitive for constraining content width with consistent spacing."
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "HelixContainer",
+          "declaration": {
+            "name": "HelixContainer",
+            "module": "src/components/hx-container/hx-container.ts"
+          }
+        },
+        {
+          "kind": "custom-element-definition",
+          "name": "hx-container",
+          "declaration": {
+            "name": "HelixContainer",
+            "module": "src/components/hx-container/hx-container.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/components/hx-container/index.ts",
+      "declarations": [],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "HelixContainer",
+          "declaration": {
+            "name": "HelixContainer",
+            "module": "./hx-container.js"
           }
         }
       ]
@@ -1432,156 +1525,6 @@
           "declaration": {
             "name": "HelixCheckbox",
             "module": "./hx-checkbox.js"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
-      "path": "src/components/hx-container/hx-container.ts",
-      "declarations": [
-        {
-          "kind": "class",
-          "description": "A layout container that constrains content width and provides\nconsistent vertical spacing and horizontal gutters.\n\nUses a two-layer model: the outer host spans full width (background,\nvertical padding), while the inner wrapper constrains max-width,\ncenters content, and applies horizontal gutters.",
-          "name": "HelixContainer",
-          "cssProperties": [
-            {
-              "description": "Background color on the outer wrapper.",
-              "name": "--hx-container-bg",
-              "default": "transparent"
-            },
-            {
-              "description": "Horizontal padding on the inner box.",
-              "name": "--hx-container-gutter",
-              "default": "var(--hx-space-6)"
-            },
-            {
-              "description": "Override the max-width set by the width property.",
-              "name": "--hx-container-max-width"
-            },
-            {
-              "description": "Max-width for the content width preset.",
-              "name": "--hx-container-content",
-              "default": "72rem"
-            },
-            {
-              "description": "Max-width for the sm width preset.",
-              "name": "--hx-container-sm",
-              "default": "640px"
-            },
-            {
-              "description": "Max-width for the md width preset.",
-              "name": "--hx-container-md",
-              "default": "768px"
-            },
-            {
-              "description": "Max-width for the lg width preset.",
-              "name": "--hx-container-lg",
-              "default": "1024px"
-            },
-            {
-              "description": "Max-width for the xl width preset.",
-              "name": "--hx-container-xl",
-              "default": "1280px"
-            }
-          ],
-          "cssParts": [
-            {
-              "description": "The inner wrapper that constrains max-width and applies gutters.",
-              "name": "inner"
-            }
-          ],
-          "slots": [
-            {
-              "description": "Default slot for container content.",
-              "name": ""
-            }
-          ],
-          "members": [
-            {
-              "kind": "field",
-              "name": "width",
-              "type": {
-                "text": "'full' | 'content' | 'narrow' | 'sm' | 'md' | 'lg' | 'xl'"
-              },
-              "default": "'content'",
-              "description": "Controls the max-width of the inner content wrapper.",
-              "attribute": "width",
-              "reflects": true
-            },
-            {
-              "kind": "field",
-              "name": "padding",
-              "type": {
-                "text": "'none' | 'sm' | 'md' | 'lg' | 'xl' | '2xl'"
-              },
-              "default": "'none'",
-              "description": "Vertical padding applied to the outer wrapper.",
-              "attribute": "padding",
-              "reflects": true
-            }
-          ],
-          "attributes": [
-            {
-              "name": "width",
-              "type": {
-                "text": "'full' | 'content' | 'narrow' | 'sm' | 'md' | 'lg' | 'xl'"
-              },
-              "default": "'content'",
-              "description": "Controls the max-width of the inner content wrapper.",
-              "fieldName": "width",
-              "attribute": "width"
-            },
-            {
-              "name": "padding",
-              "type": {
-                "text": "'none' | 'sm' | 'md' | 'lg' | 'xl' | '2xl'"
-              },
-              "default": "'none'",
-              "description": "Vertical padding applied to the outer wrapper.",
-              "fieldName": "padding",
-              "attribute": "padding"
-            }
-          ],
-          "superclass": {
-            "name": "LitElement",
-            "package": "lit"
-          },
-          "tagName": "hx-container",
-          "customElement": true,
-          "summary": "Layout primitive for constraining content width with consistent spacing."
-        }
-      ],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "HelixContainer",
-          "declaration": {
-            "name": "HelixContainer",
-            "module": "src/components/hx-container/hx-container.ts"
-          }
-        },
-        {
-          "kind": "custom-element-definition",
-          "name": "hx-container",
-          "declaration": {
-            "name": "HelixContainer",
-            "module": "src/components/hx-container/hx-container.ts"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
-      "path": "src/components/hx-container/index.ts",
-      "declarations": [],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "HelixContainer",
-          "declaration": {
-            "name": "HelixContainer",
-            "module": "./hx-container.js"
           }
         }
       ]
