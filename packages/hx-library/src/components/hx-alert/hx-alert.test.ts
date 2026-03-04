@@ -69,22 +69,22 @@ describe('hx-alert', () => {
     });
   });
 
-  // ─── Property: closable (3) ───
+  // ─── Property: dismissible (3) ───
 
-  describe('Property: closable', () => {
+  describe('Property: dismissible', () => {
     it('defaults to false', async () => {
-      const el = await fixture<WcAlert>('<hx-alert>Not closable</hx-alert>');
-      expect(el.closable).toBe(false);
+      const el = await fixture<WcAlert>('<hx-alert>Not dismissible</hx-alert>');
+      expect(el.dismissible).toBe(false);
     });
 
-    it('renders close button when closable', async () => {
-      const el = await fixture<WcAlert>('<hx-alert closable>Closable</hx-alert>');
+    it('renders close button when dismissible', async () => {
+      const el = await fixture<WcAlert>('<hx-alert dismissible>Dismissible</hx-alert>');
       const closeBtn = shadowQuery(el, '.alert__close-button');
       expect(closeBtn).toBeTruthy();
     });
 
-    it('does not render close button when not closable', async () => {
-      const el = await fixture<WcAlert>('<hx-alert>Not closable</hx-alert>');
+    it('does not render close button when not dismissible', async () => {
+      const el = await fixture<WcAlert>('<hx-alert>Not dismissible</hx-alert>');
       const closeBtn = shadowQuery(el, '.alert__close-button');
       expect(closeBtn).toBeNull();
     });
@@ -115,41 +115,64 @@ describe('hx-alert', () => {
     });
   });
 
+  // ─── Property: icon (3) ───
+
+  describe('Property: icon', () => {
+    it('defaults to true', async () => {
+      const el = await fixture<WcAlert>('<hx-alert>Test</hx-alert>');
+      expect(el.icon).toBe(true);
+    });
+
+    it('renders icon container by default', async () => {
+      const el = await fixture<WcAlert>('<hx-alert>Test</hx-alert>');
+      const iconPart = shadowQuery(el, '[part="icon"]');
+      expect(iconPart).toBeTruthy();
+    });
+
+    it('hides icon container when icon is false', async () => {
+      const el = await fixture<WcAlert>('<hx-alert>Test</hx-alert>');
+      el.icon = false;
+      await el.updateComplete;
+      const iconPart = shadowQuery(el, '[part="icon"]');
+      expect(iconPart).toBeNull();
+    });
+  });
+
   // ─── Events (4) ───
 
   describe('Events', () => {
-    it('dispatches wc-close when close button is clicked', async () => {
-      const el = await fixture<WcAlert>('<hx-alert closable>Closable</hx-alert>');
+    it('dispatches hx-dismiss when close button is clicked', async () => {
+      const el = await fixture<WcAlert>('<hx-alert dismissible>Dismissible</hx-alert>');
       const closeBtn = shadowQuery<HTMLButtonElement>(el, '.alert__close-button')!;
-      const eventPromise = oneEvent<CustomEvent>(el, 'hx-close');
+      const eventPromise = oneEvent<CustomEvent>(el, 'hx-dismiss');
       closeBtn.click();
       const event = await eventPromise;
       expect(event).toBeTruthy();
     });
 
-    it('hx-close event has detail.reason = "user"', async () => {
-      const el = await fixture<WcAlert>('<hx-alert closable>Closable</hx-alert>');
+    it('hx-dismiss event has detail.reason = "user"', async () => {
+      const el = await fixture<WcAlert>('<hx-alert dismissible>Dismissible</hx-alert>');
       const closeBtn = shadowQuery<HTMLButtonElement>(el, '.alert__close-button')!;
-      const eventPromise = oneEvent<CustomEvent>(el, 'hx-close');
+      const eventPromise = oneEvent<CustomEvent>(el, 'hx-dismiss');
       closeBtn.click();
       const event = await eventPromise;
       expect(event.detail.reason).toBe('user');
     });
 
-    it('hx-close bubbles and is composed', async () => {
-      const el = await fixture<WcAlert>('<hx-alert closable>Closable</hx-alert>');
+    it('hx-dismiss bubbles and is composed', async () => {
+      const el = await fixture<WcAlert>('<hx-alert dismissible>Dismissible</hx-alert>');
       const closeBtn = shadowQuery<HTMLButtonElement>(el, '.alert__close-button')!;
-      const eventPromise = oneEvent<CustomEvent>(el, 'hx-close');
+      const eventPromise = oneEvent<CustomEvent>(el, 'hx-dismiss');
       closeBtn.click();
       const event = await eventPromise;
       expect(event.bubbles).toBe(true);
       expect(event.composed).toBe(true);
     });
 
-    it('dispatches wc-after-close after close', async () => {
-      const el = await fixture<WcAlert>('<hx-alert closable>Closable</hx-alert>');
+    it('dispatches hx-after-dismiss after dismiss', async () => {
+      const el = await fixture<WcAlert>('<hx-alert dismissible>Dismissible</hx-alert>');
       const closeBtn = shadowQuery<HTMLButtonElement>(el, '.alert__close-button')!;
-      const eventPromise = oneEvent<CustomEvent>(el, 'hx-after-close');
+      const eventPromise = oneEvent<CustomEvent>(el, 'hx-after-dismiss');
       closeBtn.click();
       const event = await eventPromise;
       expect(event).toBeTruthy();
@@ -162,7 +185,7 @@ describe('hx-alert', () => {
 
   describe('Close behavior', () => {
     it('sets open to false when close button is clicked', async () => {
-      const el = await fixture<WcAlert>('<hx-alert closable>Closable</hx-alert>');
+      const el = await fixture<WcAlert>('<hx-alert dismissible>Dismissible</hx-alert>');
       const closeBtn = shadowQuery<HTMLButtonElement>(el, '.alert__close-button')!;
       closeBtn.click();
       await el.updateComplete;
@@ -170,7 +193,7 @@ describe('hx-alert', () => {
     });
 
     it('removes open attribute when closed', async () => {
-      const el = await fixture<WcAlert>('<hx-alert closable>Closable</hx-alert>');
+      const el = await fixture<WcAlert>('<hx-alert dismissible>Dismissible</hx-alert>');
       expect(el.hasAttribute('open')).toBe(true);
       const closeBtn = shadowQuery<HTMLButtonElement>(el, '.alert__close-button')!;
       closeBtn.click();
@@ -227,8 +250,8 @@ describe('hx-alert', () => {
       expect(part).toBeTruthy();
     });
 
-    it('exposes "close-button" part when closable', async () => {
-      const el = await fixture<WcAlert>('<hx-alert closable>Test</hx-alert>');
+    it('exposes "close-button" part when dismissible', async () => {
+      const el = await fixture<WcAlert>('<hx-alert dismissible>Test</hx-alert>');
       const part = shadowQuery(el, '[part="close-button"]');
       expect(part).toBeTruthy();
     });
@@ -284,13 +307,13 @@ describe('hx-alert', () => {
 
   describe('Close button accessibility', () => {
     it('close button has aria-label="Close"', async () => {
-      const el = await fixture<WcAlert>('<hx-alert closable>Closable</hx-alert>');
+      const el = await fixture<WcAlert>('<hx-alert dismissible>Dismissible</hx-alert>');
       const closeBtn = shadowQuery<HTMLButtonElement>(el, '.alert__close-button')!;
       expect(closeBtn.getAttribute('aria-label')).toBe('Close');
     });
 
     it('close button is a <button> element', async () => {
-      const el = await fixture<WcAlert>('<hx-alert closable>Closable</hx-alert>');
+      const el = await fixture<WcAlert>('<hx-alert dismissible>Dismissible</hx-alert>');
       const closeBtn = shadowQuery(el, '.alert__close-button')!;
       expect(closeBtn.tagName.toLowerCase()).toBe('button');
     });
@@ -332,8 +355,8 @@ describe('hx-alert', () => {
       }
     });
 
-    it('has no axe violations when closable', async () => {
-      const el = await fixture<WcAlert>('<hx-alert closable>Closable alert</hx-alert>');
+    it('has no axe violations when dismissible', async () => {
+      const el = await fixture<WcAlert>('<hx-alert dismissible>Dismissible alert</hx-alert>');
       await page.screenshot();
       const { violations } = await checkA11y(el);
       expect(violations).toEqual([]);
