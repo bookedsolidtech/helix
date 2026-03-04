@@ -1,0 +1,113 @@
+{
+  "category": "Uncategorized",
+  "description": "## Component: hx-breadcrumb (NEW)\n**Tier 1 — Universal Foundation | Industry Consensus: 4/6 libraries**\n\nHierarchical page path navigation showing current location in site structure.\n\n### ADR-001 Classification: Slot-Driven (Composite)\nDrupal controls breadcrumb items via slots. Component provides separator styling and ARIA navigation landmark.\n\n### API Design\n**Properties:** `separator` (string, default \"/\"), `label` (aria-label for nav, default \"Breadcrumb\")\n**Slots:** Default (hx-breadcrumb-item or `<a>` children)\n**CSS Parts:** `nav`, `list`, `separator`\n\n### Child: hx-breadcrumb-item\n**Properties:** `href` (string — omit for current page/last item)\n**Slots:** Default (link text)\n**CSS Parts:** `link`, `text`\n\n### Drupal Integration\n```twig\n{# Drupal breadcrumb preprocess renders items #}\n<hx-breadcrumb>\n  {% for item in breadcrumb %}\n    <hx-breadcrumb-item {% if item.url %}href=\"{{ item.url }}\"{% endif %}>\n      {{ item.text }}\n    </hx-breadcrumb-item>\n  {% endfor %}\n</hx-breadcrumb>\n```\n\nDrupal's breadcrumb system (hook_system_breadcrumb_alter, BreadcrumbBuilder) controls the items. Component provides consistent visual treatment and ARIA navigation landmark.\n\n### Healthcare: Deep navigation in clinical portals (Home > Department > Patient > Record > Lab Results)\n\n### Acceptance Criteria\n1. Last item renders as text (no link) — current page\n2. Separator between items (customizable)\n3. WCAG 2.1 AA: nav landmark with aria-label, aria-current=\"page\" on last\n4. Responsive: collapses middle items on small screens with ellipsis\n5. Works with Drupal's breadcrumb system",
+  "title": "T1-18: hx-breadcrumb — Hierarchical Navigation",
+  "status": "review",
+  "complexity": "small",
+  "priority": 2,
+  "source": "api",
+  "trustTier": 1,
+  "quarantineStatus": "passed",
+  "quarantineId": "2cd904ee-d887-455d-9b2a-f692472f157f",
+  "id": "feature-1772570675837-dpciuo78j",
+  "branchName": "feature/t1-18-hx-breadcrumb-hierarchical",
+  "descriptionHistory": [
+    {
+      "description": "## Component: hx-breadcrumb (NEW)\n**Tier 1 — Universal Foundation | Industry Consensus: 4/6 libraries**\n\nHierarchical page path navigation showing current location in site structure.\n\n### ADR-001 Classification: Slot-Driven (Composite)\nDrupal controls breadcrumb items via slots. Component provides separator styling and ARIA navigation landmark.\n\n### API Design\n**Properties:** `separator` (string, default \"/\"), `label` (aria-label for nav, default \"Breadcrumb\")\n**Slots:** Default (hx-breadcrumb-item or `<a>` children)\n**CSS Parts:** `nav`, `list`, `separator`\n\n### Child: hx-breadcrumb-item\n**Properties:** `href` (string — omit for current page/last item)\n**Slots:** Default (link text)\n**CSS Parts:** `link`, `text`\n\n### Drupal Integration\n```twig\n{# Drupal breadcrumb preprocess renders items #}\n<hx-breadcrumb>\n  {% for item in breadcrumb %}\n    <hx-breadcrumb-item {% if item.url %}href=\"{{ item.url }}\"{% endif %}>\n      {{ item.text }}\n    </hx-breadcrumb-item>\n  {% endfor %}\n</hx-breadcrumb>\n```\n\nDrupal's breadcrumb system (hook_system_breadcrumb_alter, BreadcrumbBuilder) controls the items. Component provides consistent visual treatment and ARIA navigation landmark.\n\n### Healthcare: Deep navigation in clinical portals (Home > Department > Patient > Record > Lab Results)\n\n### Acceptance Criteria\n1. Last item renders as text (no link) — current page\n2. Separator between items (customizable)\n3. WCAG 2.1 AA: nav landmark with aria-label, aria-current=\"page\" on last\n4. Responsive: collapses middle items on small screens with ellipsis\n5. Works with Drupal's breadcrumb system",
+      "timestamp": "2026-03-03T20:44:35.837Z",
+      "source": "initial"
+    }
+  ],
+  "createdAt": "2026-03-03T20:44:35.837Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-03-03T20:44:35.837Z",
+      "reason": "Feature created"
+    },
+    {
+      "from": "backlog",
+      "to": "in_progress",
+      "timestamp": "2026-03-04T00:16:48.001Z"
+    },
+    {
+      "from": "in_progress",
+      "to": "review",
+      "timestamp": "2026-03-04T00:45:18.913Z"
+    },
+    {
+      "from": "review",
+      "to": "backlog",
+      "timestamp": "2026-03-04T03:47:20.784Z"
+    },
+    {
+      "from": "in_progress",
+      "to": "blocked",
+      "timestamp": "2026-03-04T03:50:19.161Z",
+      "reason": "git workflow failed — uncommitted work in worktree at /Volumes/Development/booked/helix/.worktrees/feature-t1-18-hx-breadcrumb-hierarchical: git add staged nothing even after fallback — files may be unchanged"
+    },
+    {
+      "from": "blocked",
+      "to": "backlog",
+      "timestamp": "2026-03-04T05:39:03.210Z"
+    },
+    {
+      "from": "backlog",
+      "to": "review",
+      "timestamp": "2026-03-04T05:40:24.574Z"
+    },
+    {
+      "from": "review",
+      "to": "backlog",
+      "timestamp": "2026-03-04T05:40:37.061Z"
+    },
+    {
+      "from": "in_progress",
+      "to": "blocked",
+      "timestamp": "2026-03-04T05:43:01.860Z",
+      "reason": "git workflow failed — uncommitted work in worktree at /Volumes/Development/booked/helix/.worktrees/feature-t1-18-hx-breadcrumb-hierarchical: git workflow failed — uncommitted work in worktree at /Volumes/Development/booked/helix/.worktrees/feature-t1-18-hx-breadcrumb-hierarchical: Command failed: gh pr create --base dev --head feature/t1-18-hx-breadcrumb-hierarchical --title T1-18: hx-breadcrumb — Hierarchical Navigation --body ## Summary\n\n## Component: hx-breadcrumb (NEW)\n**Tier 1 — Universal Foundation | Industry Consensus: 4/6 libraries**\n\nHierarchical page path navigation showing current location in site structure.\n\n### ADR-001 Classification: Slot-Driven (Composite)\nDrupal controls breadcrumb items via slots. Component provides separator styling and ARIA navigation landmark.\n\n### API Design\n**Properties:** `separator` (string, default '/'), `label` (aria-label for nav, default 'Breadcrumb')\n**Slots:** Default (hx-breadcrumb-i...\n\n---\n*Recovered automatically by Automaker post-agent hook*\na pull request for branch \"feature/t1-18-hx-breadcrumb-hierarchical\" into branch \"dev\" already exists:\nhttps://github.com/bookedsolidtech/helix/pull/42\n | stderr: a pull request for branch \"feature/t1-18-hx-breadcrumb-hierarchical\" into branch \"dev\" already exists:\nhttps://github.com/bookedsolidtech/helix/pull/42"
+    },
+    {
+      "from": "blocked",
+      "to": "backlog",
+      "timestamp": "2026-03-04T05:51:20.224Z"
+    },
+    {
+      "from": "backlog",
+      "to": "review",
+      "timestamp": "2026-03-04T05:54:00.221Z"
+    }
+  ],
+  "featureType": "code",
+  "updatedAt": "2026-03-04T05:40:38.387Z",
+  "model": "claude-sonnet-4-6",
+  "costUsd": 2.51210675,
+  "lastSessionId": "d00a8345-ba56-43f6-aa3f-26271284fc32",
+  "prUrl": "https://github.com/bookedsolidtech/helix/pull/42",
+  "prNumber": 42,
+  "prCreatedAt": "2026-03-04T00:45:18.911Z",
+  "reviewStartedAt": "2026-03-04T00:45:18.913Z",
+  "prTrackedSince": "2026-03-04T00:45:18.915Z",
+  "prLastPolledAt": "2026-03-04T06:15:34.268Z",
+  "lastReviewFeedback": "coderabbitai: **Actionable comments posted: 3**\n\n<details>\n<summary>🤖 Prompt for all review comments with AI agents</summary>\n\n```\nVerify each finding against the current code and only fix it if needed.\n\nInline comments:\nIn\n`@packages/hx-library/src/components/hx-breadcrumb/hx-breadcrumb-item.styles.ts`:\n- Around line 10-11: Remove the hardcoded fallback literals from all CSS custom\nproperty usages in hx-breadcrumb-item.styles.ts so the styles rely only on\ndesign tokens; specifically replace multi-level var(...) expressions like color:\nvar(--hx-breadcrumb-link-color, var(--hx-color-primary-600, `#2563eb`)); and\nsimilar declarations for padding, gap, and border-radius with single-token\nreferences (e.g., color: var(--hx-breadcrumb-link-color); padding:\nvar(--hx-breadcrumb-item-padding); gap: var(--hx-breadcrumb-gap); border-radius:\nvar(--hx-breadcrumb-border-radius);) and update the same change for the other\noccurrences called out in the review (the anchor/link rule, chip/pill styles,\nand spacing/gap rules) so no hex or rem fallback values remain.\n\nIn `@packages/hx-library/src/components/hx-breadcrumb/hx-breadcrumb.stories.ts`:\n- Around line 10-47: The Storybook types are unparameterized causing weak\n`args`; define a props type (e.g., interface BreadcrumbProps { separator?:\nstring; label?: string }) that matches the component argTypes, import the\nStorybook generic types (Meta, StoryObj) if not already, then parameterize the\nmeta and story types by replacing the unparameterized uses with\nMeta<BreadcrumbProps> (or use \"satisfies Meta<BreadcrumbProps>\") and type Story\n= StoryObj<BreadcrumbProps>; update any downstream story vars to use that Story\ntype so `args` are strongly typed and no `any` is emitted.\n\nIn `@packages/hx-library/src/components/hx-breadcrumb/hx-breadcrumb.styles.ts`:\n- Around line 6-7: Remove the hardcoded fallbacks in hx-breadcrumb styles:\nreplace the literal \"sans-serif\" and \"0.875rem\" fallbacks with only design\ntokens so typography is fully tokenized",
+  "prIterationCount": 2,
+  "remediationCycleCount": 2,
+  "workItemState": "in_progress",
+  "statusChangeReason": "git workflow failed — uncommitted work in worktree at /Volumes/Development/booked/helix/.worktrees/feature-t1-18-hx-breadcrumb-hierarchical: git workflow failed — uncommitted work in worktree at /Volumes/Development/booked/helix/.worktrees/feature-t1-18-hx-breadcrumb-hierarchical: Command failed: gh pr create --base dev --head feature/t1-18-hx-breadcrumb-hierarchical --title T1-18: hx-breadcrumb — Hierarchical Navigation --body ## Summary\n\n## Component: hx-breadcrumb (NEW)\n**Tier 1 — Universal Foundation | Industry Consensus: 4/6 libraries**\n\nHierarchical page path navigation showing current location in site structure.\n\n### ADR-001 Classification: Slot-Driven (Composite)\nDrupal controls breadcrumb items via slots. Component provides separator styling and ARIA navigation landmark.\n\n### API Design\n**Properties:** `separator` (string, default '/'), `label` (aria-label for nav, default 'Breadcrumb')\n**Slots:** Default (hx-breadcrumb-i...\n\n---\n*Recovered automatically by Automaker post-agent hook*\na pull request for branch \"feature/t1-18-hx-breadcrumb-hierarchical\" into branch \"dev\" already exists:\nhttps://github.com/bookedsolidtech/helix/pull/42\n | stderr: a pull request for branch \"feature/t1-18-hx-breadcrumb-hierarchical\" into branch \"dev\" already exists:\nhttps://github.com/bookedsolidtech/helix/pull/42",
+  "failureCount": 2,
+  "threadFeedback": [
+    {
+      "threadId": "PRRT_kwDORRAfU85x9lMQ",
+      "status": "accepted",
+      "agentReasoning": "hx-breadcrumb-item.styles.ts still has hardcoded hex fallbacks (#2563eb, #1d4ed8, #3b82f6, #374151, #9ca3af, 0.125rem, 0.25rem) as third-level fallbacks. The project's zero-tolerance policy explicitly prohibits hardcoded values — colors and spacing must use design tokens exclusively. Two-level token chains are the correct pattern.",
+      "resolvedAt": "2026-03-04T05:43:01.865Z"
+    },
+    {
+      "threadId": "PRRT_kwDORRAfU85x9lMY",
+      "status": "accepted",
+      "agentReasoning": "hx-breadcrumb.styles.ts line 7 still has `var(--hx-font-size-sm, 0.875rem)` — a hardcoded rem value violating the same zero-tolerance policy. Also `sans-serif` on line 6 is a hardcoded font-family fallback that should be dropped in favor of a two-level token chain.",
+      "resolvedAt": "2026-03-04T05:43:01.865Z"
+    }
+  ]
+}

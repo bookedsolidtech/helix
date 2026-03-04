@@ -1,0 +1,27 @@
+{
+  "category": "Phase 2: Component Expansion",
+  "description": "**Milestone:** Phase 2: Component Expansion\n\nBuild hx-pagination: page navigation for content listings. Override pager.html.twig in Drupal. Supports page numbers, prev/next, and jump-to-page.\n\n**Files to Modify:**\n- packages/hx-library/src/components/hx-pagination/\n\n**Acceptance Criteria:**\n- [ ] Page number buttons with ellipsis\n- [ ] Previous/Next navigation\n- [ ] First/Last page buttons (optional)\n- [ ] Configurable sibling/boundary count\n- [ ] CSS parts: nav, list, item, button, ellipsis\n- [ ] Events: hx-page-change\n- [ ] ARIA: nav with aria-label=Pagination\n- [ ] <5KB gzipped\n\n**Complexity:** medium",
+  "title": "Implement hx-pagination component",
+  "status": "backlog",
+  "isEpic": false,
+  "epicId": "feature-1772158053419-7nvwtbujb",
+  "branchName": "feature/phase-2-component-implement-hx",
+  "isFoundation": false,
+  "id": "feature-1772158053423-dfnwwkwg3",
+  "descriptionHistory": [
+    {
+      "description": "**Milestone:** Phase 2: Component Expansion\n\nBuild hx-pagination: page navigation for content listings. Override pager.html.twig in Drupal. Supports page numbers, prev/next, and jump-to-page.\n\n**Files to Modify:**\n- packages/hx-library/src/components/hx-pagination/\n\n**Acceptance Criteria:**\n- [ ] Page number buttons with ellipsis\n- [ ] Previous/Next navigation\n- [ ] First/Last page buttons (optional)\n- [ ] Configurable sibling/boundary count\n- [ ] CSS parts: nav, list, item, button, ellipsis\n- [ ] Events: hx-page-change\n- [ ] ARIA: nav with aria-label=Pagination\n- [ ] <5KB gzipped\n\n**Complexity:** medium",
+      "timestamp": "2026-02-27T02:07:33.423Z",
+      "source": "initial"
+    }
+  ],
+  "createdAt": "2026-02-27T02:07:33.423Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-02-27T02:07:33.423Z",
+      "reason": "Feature created"
+    }
+  ]
+}

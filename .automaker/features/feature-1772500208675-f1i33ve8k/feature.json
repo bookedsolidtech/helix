@@ -1,0 +1,75 @@
+{
+  "category": "Uncategorized",
+  "description": "## What\n\nThe killer feature. Point at any library and get a comprehensive, shareable health report. This is the run Lighthouse, get a report moment for web components.\n\n## Deliverables\n\n1. **Audit page** (apps/admin/src/app/audit/[id]/page.tsx):\n   - Runs ALL available analyses against a single library: health scoring, accessibility profile, CEM validation, bundle size estimation, breaking change detection\n   - Single-page report card with: overall grade (A-F), score, dimension breakdown with pass or fail, top 5 critical issues with fix recommendations, component-by-component mini-grades, scoring tier badge\n   - Run Audit button triggers all scoring in parallel\n\n2. **Audit API route** (apps/admin/src/app/api/audit/[id]/route.ts):\n   - Orchestrates the full audit: health scorer (local) or wc-tools score_all_components (CDN), analyze_accessibility, validate_cem per component, estimate_bundle_size\n   - Aggregates into unified AuditReport type\n\n3. **audit-report.ts** (apps/admin/src/lib):\n   - AuditReport type with fields: libraryId, libraryName, scoringTier, overallScore, overallGrade, timestamp, health breakdown, accessibility breakdown, CEM quality, bundle size data, critical issues with fix recommendations, component grades array\n   - Report generation and aggregation logic\n\n4. **Export and Share:** Copy Report Link and Download as JSON buttons. Report is a static snapshot.\n\n## Acceptance Criteria\n\n- Audit completes in under 30s for local library, under 60s for CDN library\n- Report renders as single-page view with all sections\n- JSON export contains full AuditReport and can be re-imported\n- Works for both local and CDN libraries\n- Graceful degradation when individual tools fail (show partial results, not blank page)\n- TypeScript compiles with zero errors",
+  "title": "M5: One-Shot Audit & Shareable Report Card",
+  "status": "review",
+  "epicId": "feature-1772498927473-b350n8c7v",
+  "complexity": "large",
+  "priority": 3,
+  "source": "api",
+  "trustTier": 1,
+  "quarantineStatus": "passed",
+  "quarantineId": "f5c021c9-e3d5-434d-9836-54a0e6557f0e",
+  "id": "feature-1772500208675-f1i33ve8k",
+  "branchName": "feature/m5-one-shot-audit-shareable-report-card",
+  "descriptionHistory": [
+    {
+      "description": "## What\n\nThe killer feature. Point at any library and get a comprehensive, shareable health report. This is the run Lighthouse, get a report moment for web components.\n\n## Deliverables\n\n1. **Audit page** (apps/admin/src/app/audit/[id]/page.tsx):\n   - Runs ALL available analyses against a single library: health scoring, accessibility profile, CEM validation, bundle size estimation, breaking change detection\n   - Single-page report card with: overall grade (A-F), score, dimension breakdown with pass or fail, top 5 critical issues with fix recommendations, component-by-component mini-grades, scoring tier badge\n   - Run Audit button triggers all scoring in parallel\n\n2. **Audit API route** (apps/admin/src/app/api/audit/[id]/route.ts):\n   - Orchestrates the full audit: health scorer (local) or wc-tools score_all_components (CDN), analyze_accessibility, validate_cem per component, estimate_bundle_size\n   - Aggregates into unified AuditReport type\n\n3. **audit-report.ts** (apps/admin/src/lib):\n   - AuditReport type with fields: libraryId, libraryName, scoringTier, overallScore, overallGrade, timestamp, health breakdown, accessibility breakdown, CEM quality, bundle size data, critical issues with fix recommendations, component grades array\n   - Report generation and aggregation logic\n\n4. **Export and Share:** Copy Report Link and Download as JSON buttons. Report is a static snapshot.\n\n## Acceptance Criteria\n\n- Audit completes in under 30s for local library, under 60s for CDN library\n- Report renders as single-page view with all sections\n- JSON export contains full AuditReport and can be re-imported\n- Works for both local and CDN libraries\n- Graceful degradation when individual tools fail (show partial results, not blank page)\n- TypeScript compiles with zero errors",
+      "timestamp": "2026-03-03T01:10:08.675Z",
+      "source": "initial"
+    }
+  ],
+  "createdAt": "2026-03-03T01:10:08.675Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-03-03T01:10:08.675Z",
+      "reason": "Feature created"
+    },
+    {
+      "from": "backlog",
+      "to": "in_progress",
+      "timestamp": "2026-03-03T18:48:52.191Z"
+    },
+    {
+      "from": "in_progress",
+      "to": "review",
+      "timestamp": "2026-03-03T19:07:19.822Z"
+    },
+    {
+      "from": "review",
+      "to": "blocked",
+      "timestamp": "2026-03-03T19:14:49.991Z"
+    },
+    {
+      "from": "blocked",
+      "to": "review",
+      "timestamp": "2026-03-03T19:15:17.836Z"
+    },
+    {
+      "from": "review",
+      "to": "backlog",
+      "timestamp": "2026-03-03T20:01:01.530Z"
+    },
+    {
+      "from": "backlog",
+      "to": "review",
+      "timestamp": "2026-03-03T20:01:05.625Z"
+    }
+  ],
+  "featureType": "code",
+  "dependencies": [
+    "feature-1772500196323-1jufksod9"
+  ],
+  "updatedAt": "2026-03-03T18:56:01.138Z",
+  "model": "claude-sonnet-4-6",
+  "costUsd": 2.8875907499999993,
+  "lastSessionId": "0618cf0b-55a7-4134-9a92-e2c396b9dc56",
+  "prUrl": "https://github.com/bookedsolidtech/helix/pull/24",
+  "prNumber": 24,
+  "prCreatedAt": "2026-03-03T19:07:19.820Z",
+  "reviewStartedAt": "2026-03-03T19:07:19.822Z",
+  "prTrackedSince": "2026-03-03T19:07:19.835Z",
+  "prLastPolledAt": "2026-03-04T00:25:30.767Z"
+}

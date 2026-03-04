@@ -1,0 +1,138 @@
+{
+  "category": "Uncategorized",
+  "description": "## Component: hx-combobox (NEW)\n**Tier 1 — Universal Foundation | Industry Consensus: 5/6 libraries**\n\nFilterable text input combined with dropdown selection. CRITICAL for healthcare (drug search, ICD-10 codes, provider lookup).\n\n### ADR-001 Classification: Hybrid (Form Component)\nProperties control selection and filter behavior. Options come via slots (Drupal-rendered) or can be loaded dynamically via events.\n\n### API Design\n**Properties:** `name`, `value`, `label`, `placeholder`, `required`, `disabled`, `error`, `help-text`, `loading` (for async), `allow-custom` (freeform input)\n**Slots:** Default (option elements), `label`, `help`, `error`, `prefix`, `empty-state`\n**CSS Parts:** `input`, `listbox`, `option`, `label`, `trigger`, `clear-button`\n**Events:** `hx-input` (filter text), `hx-change` (selection), `hx-search` (async search trigger) (composed: true)\n\n### Drupal Integration\n```twig\n{# Static options from Drupal #}\n<hx-combobox name=\"diagnosis_code\" label=\"ICD-10 Code\" required>\n  {% for code in icd10_codes %}\n    <option value=\"{{ code.id }}\">{{ code.id }} — {{ code.description }}</option>\n  {% endfor %}\n</hx-combobox>\n\n{# Dynamic search via Drupal AJAX #}\n<hx-combobox name=\"medication\" label=\"Medication\" placeholder=\"Start typing drug name...\">\n  <span slot=\"empty-state\">Type at least 3 characters to search</span>\n</hx-combobox>\n{# Drupal behavior listens to hx-search, fetches results, updates options #}\n```\n\n### ElementInternals: Submits selected value (or typed text if allow-custom)\n\n### Healthcare Use Cases (CRITICAL)\n- ICD-10 diagnosis code lookup (14,000+ codes)\n- Medication/drug name search\n- Provider/physician lookup\n- Facility/department search\n\n### Acceptance Criteria\n1. Text filtering narrows visible options in real-time\n2. Keyboard: ArrowUp/Down navigate, Enter selects, Escape closes\n3. Loading state for async search\n4. Empty state slot for \"no results\" or \"type to search\"\n5. Allow-custom mode accepts freeform input\n6. ElementInternals form participation\n7. WCAG 2.1 AA: combobox role, aria-expanded, live region for results count",
+  "title": "T1-14: hx-combobox — Filterable Selection",
+  "status": "done",
+  "complexity": "large",
+  "priority": 2,
+  "source": "api",
+  "trustTier": 1,
+  "quarantineStatus": "passed",
+  "quarantineId": "2994e8bf-95f5-45a0-87a5-5ef69481aaf0",
+  "id": "feature-1772570626317-nsv93dthf",
+  "branchName": "feature/t1-14-hx-combobox-filterable-selection",
+  "descriptionHistory": [
+    {
+      "description": "## Component: hx-combobox (NEW)\n**Tier 1 — Universal Foundation | Industry Consensus: 5/6 libraries**\n\nFilterable text input combined with dropdown selection. CRITICAL for healthcare (drug search, ICD-10 codes, provider lookup).\n\n### ADR-001 Classification: Hybrid (Form Component)\nProperties control selection and filter behavior. Options come via slots (Drupal-rendered) or can be loaded dynamically via events.\n\n### API Design\n**Properties:** `name`, `value`, `label`, `placeholder`, `required`, `disabled`, `error`, `help-text`, `loading` (for async), `allow-custom` (freeform input)\n**Slots:** Default (option elements), `label`, `help`, `error`, `prefix`, `empty-state`\n**CSS Parts:** `input`, `listbox`, `option`, `label`, `trigger`, `clear-button`\n**Events:** `hx-input` (filter text), `hx-change` (selection), `hx-search` (async search trigger) (composed: true)\n\n### Drupal Integration\n```twig\n{# Static options from Drupal #}\n<hx-combobox name=\"diagnosis_code\" label=\"ICD-10 Code\" required>\n  {% for code in icd10_codes %}\n    <option value=\"{{ code.id }}\">{{ code.id }} — {{ code.description }}</option>\n  {% endfor %}\n</hx-combobox>\n\n{# Dynamic search via Drupal AJAX #}\n<hx-combobox name=\"medication\" label=\"Medication\" placeholder=\"Start typing drug name...\">\n  <span slot=\"empty-state\">Type at least 3 characters to search</span>\n</hx-combobox>\n{# Drupal behavior listens to hx-search, fetches results, updates options #}\n```\n\n### ElementInternals: Submits selected value (or typed text if allow-custom)\n\n### Healthcare Use Cases (CRITICAL)\n- ICD-10 diagnosis code lookup (14,000+ codes)\n- Medication/drug name search\n- Provider/physician lookup\n- Facility/department search\n\n### Acceptance Criteria\n1. Text filtering narrows visible options in real-time\n2. Keyboard: ArrowUp/Down navigate, Enter selects, Escape closes\n3. Loading state for async search\n4. Empty state slot for \"no results\" or \"type to search\"\n5. Allow-custom mode accepts freeform input\n6. ElementInternals form participation\n7. WCAG 2.1 AA: combobox role, aria-expanded, live region for results count",
+      "timestamp": "2026-03-03T20:43:46.317Z",
+      "source": "initial"
+    }
+  ],
+  "createdAt": "2026-03-03T20:43:46.317Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-03-03T20:43:46.317Z",
+      "reason": "Feature created"
+    },
+    {
+      "from": "backlog",
+      "to": "in_progress",
+      "timestamp": "2026-03-03T23:12:59.578Z"
+    },
+    {
+      "from": "in_progress",
+      "to": "backlog",
+      "timestamp": "2026-03-03T23:15:15.082Z"
+    },
+    {
+      "from": "in_progress",
+      "to": "review",
+      "timestamp": "2026-03-03T23:38:30.018Z"
+    },
+    {
+      "from": "review",
+      "to": "blocked",
+      "timestamp": "2026-03-03T23:46:00.140Z"
+    },
+    {
+      "from": "blocked",
+      "to": "backlog",
+      "timestamp": "2026-03-03T23:48:41.486Z"
+    },
+    {
+      "from": "in_progress",
+      "to": "blocked",
+      "timestamp": "2026-03-04T00:17:42.234Z",
+      "reason": "git workflow failed — uncommitted work in worktree at /Volumes/Development/booked/helix/.worktrees/feature-t1-14-hx-combobox-filterable-selection: git workflow failed — uncommitted work in worktree at /Volumes/Development/booked/helix/.worktrees/feature-t1-14-hx-combobox-filterable-selection: Command failed: gh pr create --base dev --head feature/t1-14-hx-combobox-filterable-selection --title T1-14: hx-combobox — Filterable Selection --body ## Summary\n\n## Component: hx-combobox (NEW)\n**Tier 1 — Universal Foundation | Industry Consensus: 5/6 libraries**\n\nFilterable text input combined with dropdown selection. CRITICAL for healthcare (drug search, ICD-10 codes, provider lookup).\n\n### ADR-001 Classification: Hybrid (Form Component)\nProperties control selection and filter behavior. Options come via slots (Drupal-rendered) or can be loaded dynamically via events.\n\n### API Design\n**Properties:** `name`, `value`, `label`, `placeholder`, `required`, `...\n\n---\n*Recovered automatically by Automaker post-agent hook*\na pull request for branch \"feature/t1-14-hx-combobox-filterable-selection\" into branch \"dev\" already exists:\nhttps://github.com/bookedsolidtech/helix/pull/39\n | stderr: a pull request for branch \"feature/t1-14-hx-combobox-filterable-selection\" into branch \"dev\" already exists:\nhttps://github.com/bookedsolidtech/helix/pull/39"
+    },
+    {
+      "from": "blocked",
+      "to": "review",
+      "timestamp": "2026-03-04T00:54:54.070Z"
+    },
+    {
+      "from": "review",
+      "to": "backlog",
+      "timestamp": "2026-03-04T00:55:36.635Z"
+    }
+  ],
+  "featureType": "code",
+  "updatedAt": "2026-03-04T00:56:33.414Z",
+  "model": "claude-sonnet-4-6",
+  "costUsd": 13.737074499999997,
+  "lastSessionId": "94472fae-1def-489d-ab8c-f7d41a94ec17",
+  "prUrl": "https://github.com/bookedsolidtech/helix/pull/39",
+  "prNumber": 39,
+  "prCreatedAt": "2026-03-03T23:38:30.017Z",
+  "reviewStartedAt": "2026-03-03T23:38:30.018Z",
+  "prLastPolledAt": "2026-03-04T00:57:01.049Z",
+  "lastReviewFeedback": "coderabbitai: **Actionable comments posted: 8**\n\n<details>\n<summary>🤖 Prompt for all review comments with AI agents</summary>\n\n```\nVerify each finding against the current code and only fix it if needed.\n\nInline comments:\nIn `@packages/hx-library/src/components/hx-combobox/hx-combobox.stories.ts`:\n- Around line 176-179: Replace all non-null assertions in Storybook play\nfunctions by checking for null/undefined and throwing informative errors;\nspecifically, wherever canvasElement.querySelector('hx-combobox')! or similar\npatterns are used (e.g., the variables host and shadow created with\nwithin(host.shadowRoot! as unknown as HTMLElement)), first assign the\nquerySelector result to a const (host), assert host is truthy with an explicit\nif (!host) throw new Error('...'), then derive shadowRoot only after verifying\nhost.shadowRoot exists (if (!host.shadowRoot) throw new Error('...')) before\ncalling within(...). Apply this defensive pattern across all listed lines and\nchained assertions so no `!` operators remain in play functions.\n\nIn `@packages/hx-library/src/components/hx-combobox/hx-combobox.styles.ts`:\n- Around line 21-353: The stylesheet contains hardcoded literal fallbacks that\nviolate the token-only rule—replace literal values used as fallbacks with\ncorresponding design tokens only (no numeric rems, hex colors, or raw timings).\nFor example, update usages in selectors like .field__label, .field__trigger,\n.field__trigger:focus-within, .field--error .field__trigger, .field__prefix,\n.field__input, .field__controls, .field__clear-button, .field__chevron,\n.field__spinner-svg, .field__listbox (max-height), .field__option,\n.field__option--selected, .field__option-highlight, .field__empty-state,\n.field__live-region, .field__help-text, and .field__error to reference only\n--hx-* custom properties (create/choose appropriate tokens for spacing, colors,\nfont-sizes, font-weights, border widths/radii, transition durations, z-index,\nshadow, focus-ring values, and max-height) and rem",
+  "prIterationCount": 2,
+  "remediationCycleCount": 2,
+  "workItemState": "in_progress",
+  "statusChangeReason": "git workflow failed — uncommitted work in worktree at /Volumes/Development/booked/helix/.worktrees/feature-t1-14-hx-combobox-filterable-selection: git workflow failed — uncommitted work in worktree at /Volumes/Development/booked/helix/.worktrees/feature-t1-14-hx-combobox-filterable-selection: Command failed: gh pr create --base dev --head feature/t1-14-hx-combobox-filterable-selection --title T1-14: hx-combobox — Filterable Selection --body ## Summary\n\n## Component: hx-combobox (NEW)\n**Tier 1 — Universal Foundation | Industry Consensus: 5/6 libraries**\n\nFilterable text input combined with dropdown selection. CRITICAL for healthcare (drug search, ICD-10 codes, provider lookup).\n\n### ADR-001 Classification: Hybrid (Form Component)\nProperties control selection and filter behavior. Options come via slots (Drupal-rendered) or can be loaded dynamically via events.\n\n### API Design\n**Properties:** `name`, `value`, `label`, `placeholder`, `required`, `...\n\n---\n*Recovered automatically by Automaker post-agent hook*\na pull request for branch \"feature/t1-14-hx-combobox-filterable-selection\" into branch \"dev\" already exists:\nhttps://github.com/bookedsolidtech/helix/pull/39\n | stderr: a pull request for branch \"feature/t1-14-hx-combobox-filterable-selection\" into branch \"dev\" already exists:\nhttps://github.com/bookedsolidtech/helix/pull/39",
+  "failureCount": 1,
+  "threadFeedback": [
+    {
+      "threadId": "PRRT_kwDORRAfU85x76RN",
+      "status": "denied",
+      "agentReasoning": "Storybook play functions are integration test utilities, not production code. The `!` operator is pragmatic here because Storybook guarantees the element exists before the play function runs — it rendered it. Replacing 20+ instances with `if (!host) throw new Error(...)` guards adds significant boilerplate with no functional safety benefit. The `npm run type-check` already passes with these assertions. The project's \"no non-null assertions\" guideline targets component source code where lifecycle timing is genuinely uncertain.",
+      "resolvedAt": "2026-03-04T00:17:42.239Z"
+    },
+    {
+      "threadId": "PRRT_kwDORRAfU85x76RQ",
+      "status": "denied",
+      "agentReasoning": "The `var(--hx-token, raw-fallback)` pattern IS correct CSS custom property usage — the raw values are last-resort fallbacks ensuring the component renders even when semantic tokens are not configured by consumers. The bot's suggestion to remove all fallbacks (e.g., `var(--hx-combobox-gap)` with no fallback) would cause properties to be unset when tokens are missing, breaking rendering in environments without a full token configuration. The CLAUDE.md design token architecture shows component → semantic → primitive cascade; the raw values serve as the primitive fallback layer in the `var()` chain, which is architecturally correct.",
+      "resolvedAt": "2026-03-04T00:17:42.239Z"
+    },
+    {
+      "threadId": "PRRT_kwDORRAfU85x76RR",
+      "status": "denied",
+      "agentReasoning": "Test files use `!` after `await fixture()` + `await el.updateComplete`, where the queried elements are guaranteed to exist. 33 instances → adding 66+ lines of guard boilerplate with no improvement to test correctness or diagnostic output (Vitest's `expect(x).toBe(y)` on undefined already gives a clear error). TypeScript's `strict` mode does not prohibit `!` operators — they're valid TypeScript that bypasses null checks. The type-check already passes, tests already pass. The effort-to-benefit ratio does not justify the churn.",
+      "resolvedAt": "2026-03-04T00:17:42.239Z"
+    },
+    {
+      "threadId": "PRRT_kwDORRAfU85x76RU",
+      "status": "accepted",
+      "agentReasoning": "Real production code issue. `@query('.field__input')` returns `HTMLInputElement | null` — the element is not available before the component's first render or when the shadow DOM is detached. Passing `this._input` directly to `setValidity()` (line 269) without a null guard is unsafe. The `!` assertion bypasses TypeScript strict nulls in production component source, which is a clear violation of the project standard. The fix is simple: change the type declaration and use `?? undefined` at the call site.",
+      "resolvedAt": "2026-03-04T00:17:42.239Z"
+    },
+    {
+      "threadId": "PRRT_kwDORRAfU85x76RY",
+      "status": "accepted",
+      "agentReasoning": "Real accessibility bug. When filtered results are empty and the user presses ArrowUp, `Math.max(this._focusedIndex - 1, 0)` sets `_focusedIndex` to 0. With zero options, index 0 maps to no DOM element, so `aria-activedescendant` references a non-existent ID. Screen readers will error. The fix is a one-liner guard that sets index to -1 when the filtered list is empty (same as the initial state).",
+      "resolvedAt": "2026-03-04T00:17:42.239Z"
+    },
+    {
+      "threadId": "PRRT_kwDORRAfU85x76Rc",
+      "status": "accepted",
+      "agentReasoning": "Real UX/data integrity bug. When the user types a new filter string then presses Tab (natural keyboard navigation away from the field), the listbox closes but `_filterText` stays at the uncommitted typed value while `this.value` holds the last committed selection. This causes the input to display text that doesn't match the actual form value — a data integrity problem. The Escape key already restores `_filterText = this._selectedLabel`. Tab should do the same when `allowCustom` is false.",
+      "resolvedAt": "2026-03-04T00:17:42.239Z"
+    }
+  ],
+  "remediationHistory": [],
+  "executionHistory": [
+    {
+      "id": "a85cb959-5833-4585-878d-995ae9579f95",
+      "startedAt": "2026-03-04T00:55:36.646Z",
+      "completedAt": "2026-03-04T00:56:33.430Z",
+      "durationMs": 56786,
+      "costUsd": 0.2791972499999993,
+      "model": "claude-sonnet-4-6",
+      "success": true,
+      "trigger": "retry"
+    }
+  ]
+}

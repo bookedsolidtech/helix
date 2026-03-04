@@ -1,0 +1,61 @@
+{
+  "category": "Uncategorized",
+  "description": "## Component: hx-spinner (NEW)\n**Tier 1 — Universal Foundation | Industry Consensus: 5/6 libraries**\n\nCircular loading indicator for async operations.\n\n### ADR-001 Classification: Property-Driven (Atomic)\n\n### API Design\n**Properties:** `hx-size` (sm|md|lg), `label` (accessible label, default \"Loading\"), `variant` (primary|neutral)\n**CSS Parts:** `spinner`, `track`, `indicator`\n\n### Drupal Integration\n```twig\n<hx-spinner hx-size=\"lg\" label=\"Loading patient records\"></hx-spinner>\n```\n\n### Healthcare: Data loading, form submission, async search results\n\n### Acceptance Criteria\n1. Smooth rotation animation using CSS (not JS)\n2. Accessible: role=\"status\", aria-label from label property\n3. All sizes consistent with design tokens\n4. Works inline and as overlay",
+  "title": "T1-26: hx-spinner — Circular Loading Indicator",
+  "status": "review",
+  "complexity": "small",
+  "priority": 2,
+  "source": "api",
+  "trustTier": 1,
+  "quarantineStatus": "passed",
+  "quarantineId": "a45bef63-373e-4a12-aaec-2b8ac4705e11",
+  "id": "feature-1772570744583-157arr9uk",
+  "branchName": "feature/t1-26-hx-spinner-circular-loading",
+  "descriptionHistory": [
+    {
+      "description": "## Component: hx-spinner (NEW)\n**Tier 1 — Universal Foundation | Industry Consensus: 5/6 libraries**\n\nCircular loading indicator for async operations.\n\n### ADR-001 Classification: Property-Driven (Atomic)\n\n### API Design\n**Properties:** `hx-size` (sm|md|lg), `label` (accessible label, default \"Loading\"), `variant` (primary|neutral)\n**CSS Parts:** `spinner`, `track`, `indicator`\n\n### Drupal Integration\n```twig\n<hx-spinner hx-size=\"lg\" label=\"Loading patient records\"></hx-spinner>\n```\n\n### Healthcare: Data loading, form submission, async search results\n\n### Acceptance Criteria\n1. Smooth rotation animation using CSS (not JS)\n2. Accessible: role=\"status\", aria-label from label property\n3. All sizes consistent with design tokens\n4. Works inline and as overlay",
+      "timestamp": "2026-03-03T20:45:44.583Z",
+      "source": "initial"
+    }
+  ],
+  "createdAt": "2026-03-03T20:45:44.583Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-03-03T20:45:44.583Z",
+      "reason": "Feature created"
+    },
+    {
+      "from": "backlog",
+      "to": "in_progress",
+      "timestamp": "2026-03-04T07:07:20.022Z"
+    },
+    {
+      "from": "in_progress",
+      "to": "review",
+      "timestamp": "2026-03-04T07:17:31.546Z"
+    },
+    {
+      "from": "review",
+      "to": "blocked",
+      "timestamp": "2026-03-04T07:26:31.695Z"
+    },
+    {
+      "from": "blocked",
+      "to": "review",
+      "timestamp": "2026-03-04T13:58:38.196Z"
+    }
+  ],
+  "featureType": "code",
+  "updatedAt": "2026-03-04T07:07:21.456Z",
+  "model": "claude-sonnet-4-6",
+  "costUsd": 3.8687845000000025,
+  "lastSessionId": "31d22b6a-07f5-4b51-8148-3ba3ddcab151",
+  "prUrl": "https://github.com/bookedsolidtech/helix/pull/50",
+  "prNumber": 50,
+  "prCreatedAt": "2026-03-04T07:17:31.544Z",
+  "reviewStartedAt": "2026-03-04T07:17:31.546Z",
+  "prTrackedSince": "2026-03-04T07:17:31.550Z",
+  "prLastPolledAt": "2026-03-04T15:33:13.946Z"
+}

@@ -1,0 +1,164 @@
+{
+  "category": "Uncategorized",
+  "description": "## Component: hx-file-upload (NEW)\n**Tier 2 — Standard Enterprise | Industry Consensus: 3/6 libraries**\n\nFile upload with drag-and-drop zone, file type validation, and progress display.\n\n### ADR-001 Classification: Hybrid (Form Component)\nProperties control file constraints. Slots for custom dropzone content.\n\n### API Design\n**Properties:** `name`, `accept` (MIME types), `max-size` (bytes), `max-files`, `multiple`, `label`, `disabled`, `error`\n**Slots:** Default (dropzone content — CMS can customize instructions), `file-list` (custom file list display)\n**CSS Parts:** `dropzone`, `file-list`, `file-item`, `progress`, `label`\n**Events:** `hx-upload` (files selected), `hx-remove` (file removed), `hx-error` (validation error)\n\n### Drupal Integration\n```twig\n<hx-file-upload name=\"lab_results\" accept=\".pdf,.jpg,.png,.dcm\" max-size=\"10485760\" multiple>\n  <span slot=\"help\">Upload lab results, imaging, or documents (PDF, JPG, PNG, DICOM — max 10MB each)</span>\n</hx-file-upload>\n```\n\nDrupal's file handling manages server-side upload. The component handles client-side UX (drag-drop, validation, preview).\n\n### ElementInternals: Submits FileList\n### Healthcare: Lab results upload, imaging files, insurance documents, consent forms\n\n### Acceptance Criteria\n1. Drag-and-drop zone with visual feedback\n2. Click to browse file picker\n3. Client-side file type and size validation\n4. File list with remove buttons\n5. Progress bar per file during upload\n6. ElementInternals with FileList",
+  "title": "T2-34: hx-file-upload — File Upload with Drag-and-Drop",
+  "status": "review",
+  "complexity": "large",
+  "priority": 3,
+  "source": "api",
+  "trustTier": 1,
+  "quarantineStatus": "passed",
+  "quarantineId": "955de705-9e46-44e4-bbac-36caab6b672f",
+  "id": "feature-1772570811619-qxw7xqygp",
+  "branchName": "feature/t2-34-hx-file-upload-file-upload-with",
+  "descriptionHistory": [
+    {
+      "description": "## Component: hx-file-upload (NEW)\n**Tier 2 — Standard Enterprise | Industry Consensus: 3/6 libraries**\n\nFile upload with drag-and-drop zone, file type validation, and progress display.\n\n### ADR-001 Classification: Hybrid (Form Component)\nProperties control file constraints. Slots for custom dropzone content.\n\n### API Design\n**Properties:** `name`, `accept` (MIME types), `max-size` (bytes), `max-files`, `multiple`, `label`, `disabled`, `error`\n**Slots:** Default (dropzone content — CMS can customize instructions), `file-list` (custom file list display)\n**CSS Parts:** `dropzone`, `file-list`, `file-item`, `progress`, `label`\n**Events:** `hx-upload` (files selected), `hx-remove` (file removed), `hx-error` (validation error)\n\n### Drupal Integration\n```twig\n<hx-file-upload name=\"lab_results\" accept=\".pdf,.jpg,.png,.dcm\" max-size=\"10485760\" multiple>\n  <span slot=\"help\">Upload lab results, imaging, or documents (PDF, JPG, PNG, DICOM — max 10MB each)</span>\n</hx-file-upload>\n```\n\nDrupal's file handling manages server-side upload. The component handles client-side UX (drag-drop, validation, preview).\n\n### ElementInternals: Submits FileList\n### Healthcare: Lab results upload, imaging files, insurance documents, consent forms\n\n### Acceptance Criteria\n1. Drag-and-drop zone with visual feedback\n2. Click to browse file picker\n3. Client-side file type and size validation\n4. File list with remove buttons\n5. Progress bar per file during upload\n6. ElementInternals with FileList",
+      "timestamp": "2026-03-03T20:46:51.619Z",
+      "source": "initial"
+    }
+  ],
+  "createdAt": "2026-03-03T20:46:51.619Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-03-03T20:46:51.619Z",
+      "reason": "Feature created"
+    },
+    {
+      "from": "backlog",
+      "to": "in_progress",
+      "timestamp": "2026-03-04T10:38:09.218Z"
+    },
+    {
+      "from": "in_progress",
+      "to": "backlog",
+      "timestamp": "2026-03-04T10:42:00.718Z"
+    },
+    {
+      "from": "in_progress",
+      "to": "blocked",
+      "timestamp": "2026-03-04T10:47:48.371Z"
+    },
+    {
+      "from": "blocked",
+      "to": "review",
+      "timestamp": "2026-03-04T10:54:26.843Z"
+    },
+    {
+      "from": "review",
+      "to": "backlog",
+      "timestamp": "2026-03-04T11:00:39.690Z"
+    },
+    {
+      "from": "in_progress",
+      "to": "blocked",
+      "timestamp": "2026-03-04T11:01:56.943Z"
+    },
+    {
+      "from": "in_progress",
+      "to": "blocked",
+      "timestamp": "2026-03-04T11:49:03.692Z",
+      "reason": "git workflow failed — uncommitted work in worktree at /Volumes/Development/booked/helix/.worktrees/feature-t2-34-hx-file-upload-file-upload-with: git workflow failed — uncommitted work in worktree at /Volumes/Development/booked/helix/.worktrees/feature-t2-34-hx-file-upload-file-upload-with: Command failed: gh pr create --base dev --head feature/t2-34-hx-file-upload-file-upload-with --title T2-34: hx-file-upload — File Upload with Drag-and-Drop --body ## Summary\n\n## Component: hx-file-upload (NEW)\n**Tier 2 — Standard Enterprise | Industry Consensus: 3/6 libraries**\n\nFile upload with drag-and-drop zone, file type validation, and progress display.\n\n### ADR-001 Classification: Hybrid (Form Component)\nProperties control file constraints. Slots for custom dropzone content.\n\n### API Design\n**Properties:** `name`, `accept` (MIME types), `max-size` (bytes), `max-files`, `multiple`, `label`, `disabled`, `error`\n**Slots:** Default (dropzone content — CMS can custo...\n\n---\n*Recovered automatically by Automaker post-agent hook*\na pull request for branch \"feature/t2-34-hx-file-upload-file-upload-with\" into branch \"dev\" already exists:\nhttps://github.com/bookedsolidtech/helix/pull/59\n | stderr: a pull request for branch \"feature/t2-34-hx-file-upload-file-upload-with\" into branch \"dev\" already exists:\nhttps://github.com/bookedsolidtech/helix/pull/59"
+    },
+    {
+      "from": "blocked",
+      "to": "review",
+      "timestamp": "2026-03-04T13:58:53.061Z"
+    }
+  ],
+  "featureType": "code",
+  "updatedAt": "2026-03-04T11:20:23.095Z",
+  "model": "claude-sonnet-4-6",
+  "costUsd": 5.76010925,
+  "lastSessionId": "53c01986-27ba-404f-9daa-42970da8f6c8",
+  "prUrl": "https://github.com/bookedsolidtech/helix/pull/59",
+  "prNumber": 59,
+  "prCreatedAt": "2026-03-04T10:54:26.840Z",
+  "reviewStartedAt": "2026-03-04T10:54:26.843Z",
+  "prTrackedSince": "2026-03-04T10:54:26.846Z",
+  "prLastPolledAt": "2026-03-04T15:33:21.549Z",
+  "lastReviewFeedback": "coderabbitai: **Actionable comments posted: 11**\n\n<details>\n<summary>🤖 Prompt for all review comments with AI agents</summary>\n\n```\nVerify each finding against the current code and only fix it if needed.\n\nInline comments:\nIn `@packages/hx-library/src/components/hx-file-upload/hx-file-upload.styles.ts`:\n- Around line 20-248: The stylesheet uses hardcoded fallbacks (hex colors,\nrem/px values, ms timings) instead of component tokens; update rules like\n.dropzone, .dropzone:focus-visible, .dropzone--drag-over, .file-input,\n.file-item, .file-item__name, .file-item__size, .file-item__remove and its\n:hover/:focus-visible, .progress-track/.progress-bar and .field__error to\nconsume component-level CSS tokens (create/rename tokens such as\n--hx-file-upload-dropzone-border-color, --hx-file-upload-dropzone-bg,\n--hx-file-upload-dropzone-active-bg, --hx-file-upload-error-color,\n--hx-file-upload-dropzone-border-radius, --hx-file-upload-progress-color,\n--hx-file-upload-spacing-* , --hx-file-upload-font-size-*,\n--hx-file-upload-timing-fast, etc.) and remove literal values (e.g., #..., rem,\npx, ms) from fallbacks so all visual values reference --hx-* tokens only; ensure\nany new tokens follow the existing --hx-* naming convention and replace\nhardcoded usages in the listed class selectors.\n\nIn `@packages/hx-library/src/components/hx-file-upload/hx-file-upload.test.ts`:\n- Around line 3-10: The test file imports an unused symbol shadowQueryAll from\nthe test-utils import list; remove shadowQueryAll from the import statement (the\nline importing fixture, shadowQuery, shadowQueryAll, oneEvent, cleanup,\ncheckA11y) so only used helpers remain (e.g., fixture, shadowQuery, oneEvent,\ncleanup, checkA11y), then run lint/tests to confirm the CI failure is resolved.\n- Line 22: The forEach callback currently returns the value of dt.items.add(f)\nimplicitly; change the callback to use a block body so it doesn't implicitly\nreturn (i.e., replace files.forEach((f) => dt.items.add(f)) with a braced\ncallback ",
+  "prIterationCount": 1,
+  "remediationCycleCount": 1,
+  "workItemState": "in_progress",
+  "executionHistory": [
+    {
+      "id": "89855ddd-6f10-444e-a4ee-248eaeb2d9d2",
+      "startedAt": "2026-03-04T11:00:40.079Z",
+      "completedAt": "2026-03-04T11:20:17.283Z",
+      "durationMs": 1177204,
+      "costUsd": 0,
+      "model": "claude-sonnet-4-6",
+      "success": false,
+      "error": "Agent loop detected (TaskOutput:4dd012d7). Aborting for retry with recovery guidance.",
+      "trigger": "retry"
+    }
+  ],
+  "threadFeedback": [
+    {
+      "threadId": "PRRT_kwDORRAfU85yB6fF",
+      "status": "denied",
+      "agentReasoning": "The CSS fallback pattern `var(--hx-token, #fallback)` is the standard and correct approach for CSS custom properties — without raw fallbacks, the component renders invisibly in environments where tokens aren't loaded. The existing components in this project (hx-button, hx-text-input, etc.) use the same pattern. Stripping fallbacks from this component alone would create an inconsistency and is not how the token system is designed. The CLAUDE.md \"no hardcoded values\" rule refers to component logic, not CSS custom property fallbacks.",
+      "resolvedAt": "2026-03-04T11:20:17.289Z"
+    },
+    {
+      "threadId": "PRRT_kwDORRAfU85yB6fK",
+      "status": "accepted",
+      "agentReasoning": "`shadowQueryAll` is imported but never used. This is a real CI lint failure (Biome flags unused imports). Fix is trivial and clearly correct.",
+      "resolvedAt": "2026-03-04T11:20:17.289Z"
+    },
+    {
+      "threadId": "PRRT_kwDORRAfU85yB6fa",
+      "status": "accepted",
+      "agentReasoning": "Arrow functions without braces implicitly return — `files.forEach((f) => dt.items.add(f))` returns `DataTransferItem` from every iteration, which is a Biome `noConfusingVoidType`/`noVoidTypeReturn` lint error. Adding braces makes intent explicit.",
+      "resolvedAt": "2026-03-04T11:20:17.289Z"
+    },
+    {
+      "threadId": "PRRT_kwDORRAfU85yB6fh",
+      "status": "accepted",
+      "agentReasoning": "The component exposes `checkValidity()`, `reportValidity()`, `validity`, and `validationMessage` as public API but they have no test coverage. For a form-associated healthcare component these are critical correctness guarantees.",
+      "resolvedAt": "2026-03-04T11:20:17.289Z"
+    },
+    {
+      "threadId": "PRRT_kwDORRAfU85yB6fk",
+      "status": "accepted",
+      "agentReasoning": "Using `!` non-null assertion on `document.getElementById(...)` violates the project's strict TypeScript policy. Should guard explicitly and throw with a clear error message.",
+      "resolvedAt": "2026-03-04T11:20:17.289Z"
+    },
+    {
+      "threadId": "PRRT_kwDORRAfU85yB6fp",
+      "status": "accepted",
+      "agentReasoning": "The `@query` decorator can return `null` if the element isn't in the shadow DOM yet. The `!` assertion violates project strict-mode rules. All call sites already use optional chaining (`?.`) so the type change is safe.",
+      "resolvedAt": "2026-03-04T11:20:17.289Z"
+    },
+    {
+      "threadId": "PRRT_kwDORRAfU85yB6fy",
+      "status": "accepted",
+      "agentReasoning": "`assignedNodes({ flatten: true })` counts whitespace text nodes, which can falsely report the slot as occupied when only whitespace has been inserted. `assignedElements()` only counts Element nodes, which is what we actually care about.",
+      "resolvedAt": "2026-03-04T11:20:17.289Z"
+    },
+    {
+      "threadId": "PRRT_kwDORRAfU85yB6f7",
+      "status": "accepted",
+      "agentReasoning": "Real bug: if a consumer sets `name` after files are already selected, the multi-file FormData is stored with the old key and never resynced. Adding `changedProperties.has('name')` to `updated()` is a simple correct fix.",
+      "resolvedAt": "2026-03-04T11:20:17.289Z"
+    },
+    {
+      "threadId": "PRRT_kwDORRAfU85yB6gC",
+      "status": "accepted",
+      "agentReasoning": "Real bug: with `multiple=false` and `max-files=\"1\"`, selecting a second file is incorrectly rejected with an `hx-error` event because capacity calculates to 0. In single-file mode the previous file should always be replaced, not block new selection.",
+      "resolvedAt": "2026-03-04T11:20:17.289Z"
+    },
+    {
+      "threadId": "PRRT_kwDORRAfU85yB6gF",
+      "status": "denied",
+      "agentReasoning": "Minor, and technically incorrect in Shadow DOM context: the host element's `aria-label` does not propagate into shadow DOM children. The internal `[role=\"button\"]` div already has its own `aria-label` computed from `this.label`. Adding host `aria-label` pass-through adds complexity without a clear correctness benefit — it would require observing host attribute mutations via `observedAttributes` or `attributeChangedCallback`, which duplicates Lit's property system. The current API is clear and documented.",
+      "resolvedAt": "2026-03-04T11:20:17.289Z"
+    }
+  ],
+  "remediationHistory": [],
+  "statusChangeReason": "git workflow failed — uncommitted work in worktree at /Volumes/Development/booked/helix/.worktrees/feature-t2-34-hx-file-upload-file-upload-with: git workflow failed — uncommitted work in worktree at /Volumes/Development/booked/helix/.worktrees/feature-t2-34-hx-file-upload-file-upload-with: Command failed: gh pr create --base dev --head feature/t2-34-hx-file-upload-file-upload-with --title T2-34: hx-file-upload — File Upload with Drag-and-Drop --body ## Summary\n\n## Component: hx-file-upload (NEW)\n**Tier 2 — Standard Enterprise | Industry Consensus: 3/6 libraries**\n\nFile upload with drag-and-drop zone, file type validation, and progress display.\n\n### ADR-001 Classification: Hybrid (Form Component)\nProperties control file constraints. Slots for custom dropzone content.\n\n### API Design\n**Properties:** `name`, `accept` (MIME types), `max-size` (bytes), `max-files`, `multiple`, `label`, `disabled`, `error`\n**Slots:** Default (dropzone content — CMS can custo...\n\n---\n*Recovered automatically by Automaker post-agent hook*\na pull request for branch \"feature/t2-34-hx-file-upload-file-upload-with\" into branch \"dev\" already exists:\nhttps://github.com/bookedsolidtech/helix/pull/59\n | stderr: a pull request for branch \"feature/t2-34-hx-file-upload-file-upload-with\" into branch \"dev\" already exists:\nhttps://github.com/bookedsolidtech/helix/pull/59",
+  "failureCount": 1
+}

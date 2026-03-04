@@ -1,0 +1,104 @@
+{
+  "category": "Uncategorized",
+  "description": "## Component: hx-button-group (NEW)\n**Tier 1 — Universal Foundation | Industry Consensus: 4/6 libraries**\n\nGroups related buttons with shared borders and spacing. Used for segmented controls, toolbar groups, and related action sets.\n\n### ADR-001 Classification: Slot-Driven (Composite)\nContainer component. Drupal controls which buttons appear via slots. Component provides layout and visual grouping.\n\n### API Design\n\n**Properties:**\n- `orientation`: horizontal | vertical\n- `hx-size`: sm | md | lg (applies to all children)\n\n**Slots:**\n- Default slot: Accepts hx-button and hx-icon-button children\n\n**CSS Parts:**\n- `group`: Container element\n\n### Drupal Integration\n```twig\n{# Toolbar actions in patient record #}\n<hx-button-group>\n  <hx-button variant=\"primary\">Save</hx-button>\n  <hx-button variant=\"secondary\">Cancel</hx-button>\n  <hx-button variant=\"ghost\">Reset</hx-button>\n</hx-button-group>\n```\nContent is fully slot-driven — Drupal TWIG templates control button order, count, and variants. Component provides visual cohesion (shared borders, border-radius on first/last child).\n\n### Acceptance Criteria\n1. Buttons share borders (no double borders between items)\n2. First/last child get appropriate border-radius\n3. Supports both horizontal and vertical orientation\n4. `slotchange` listener updates layout when buttons added/removed dynamically\n5. Size property cascades to child buttons via CSS custom properties\n6. Works with mixed hx-button and hx-icon-button children",
+  "title": "T1-03: hx-button-group — Grouped Action Buttons",
+  "status": "review",
+  "complexity": "small",
+  "priority": 2,
+  "source": "api",
+  "trustTier": 1,
+  "quarantineStatus": "passed",
+  "quarantineId": "0373b8b7-8d1a-4bce-bf6e-89afe8a41cb3",
+  "id": "feature-1772570511769-hr1q5a7lq",
+  "branchName": "feature/t1-03-hx-button-group-grouped-action",
+  "descriptionHistory": [
+    {
+      "description": "## Component: hx-button-group (NEW)\n**Tier 1 — Universal Foundation | Industry Consensus: 4/6 libraries**\n\nGroups related buttons with shared borders and spacing. Used for segmented controls, toolbar groups, and related action sets.\n\n### ADR-001 Classification: Slot-Driven (Composite)\nContainer component. Drupal controls which buttons appear via slots. Component provides layout and visual grouping.\n\n### API Design\n\n**Properties:**\n- `orientation`: horizontal | vertical\n- `hx-size`: sm | md | lg (applies to all children)\n\n**Slots:**\n- Default slot: Accepts hx-button and hx-icon-button children\n\n**CSS Parts:**\n- `group`: Container element\n\n### Drupal Integration\n```twig\n{# Toolbar actions in patient record #}\n<hx-button-group>\n  <hx-button variant=\"primary\">Save</hx-button>\n  <hx-button variant=\"secondary\">Cancel</hx-button>\n  <hx-button variant=\"ghost\">Reset</hx-button>\n</hx-button-group>\n```\nContent is fully slot-driven — Drupal TWIG templates control button order, count, and variants. Component provides visual cohesion (shared borders, border-radius on first/last child).\n\n### Acceptance Criteria\n1. Buttons share borders (no double borders between items)\n2. First/last child get appropriate border-radius\n3. Supports both horizontal and vertical orientation\n4. `slotchange` listener updates layout when buttons added/removed dynamically\n5. Size property cascades to child buttons via CSS custom properties\n6. Works with mixed hx-button and hx-icon-button children",
+      "timestamp": "2026-03-03T20:41:51.770Z",
+      "source": "initial"
+    }
+  ],
+  "createdAt": "2026-03-03T20:41:51.770Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-03-03T20:41:51.770Z",
+      "reason": "Feature created"
+    },
+    {
+      "from": "backlog",
+      "to": "in_progress",
+      "timestamp": "2026-03-03T20:49:36.049Z"
+    },
+    {
+      "from": "in_progress",
+      "to": "review",
+      "timestamp": "2026-03-03T20:56:44.836Z"
+    },
+    {
+      "from": "review",
+      "to": "blocked",
+      "timestamp": "2026-03-03T21:02:18.575Z"
+    },
+    {
+      "from": "blocked",
+      "to": "review",
+      "timestamp": "2026-03-04T00:54:41.185Z"
+    },
+    {
+      "from": "review",
+      "to": "backlog",
+      "timestamp": "2026-03-04T00:55:22.589Z"
+    },
+    {
+      "from": "in_progress",
+      "to": "blocked",
+      "timestamp": "2026-03-04T01:00:21.764Z",
+      "reason": "git workflow failed — uncommitted work in worktree at /Volumes/Development/booked/helix/.worktrees/feature-t1-03-hx-button-group-grouped-action: git workflow failed — uncommitted work in worktree at /Volumes/Development/booked/helix/.worktrees/feature-t1-03-hx-button-group-grouped-action: Command failed: gh pr create --base dev --head feature/t1-03-hx-button-group-grouped-action --title T1-03: hx-button-group — Grouped Action Buttons --body ## Summary\n\n## Component: hx-button-group (NEW)\n**Tier 1 — Universal Foundation | Industry Consensus: 4/6 libraries**\n\nGroups related buttons with shared borders and spacing. Used for segmented controls, toolbar groups, and related action sets.\n\n### ADR-001 Classification: Slot-Driven (Composite)\nContainer component. Drupal controls which buttons appear via slots. Component provides layout and visual grouping.\n\n### API Design\n\n**Properties:**\n- `orientation`: horizontal | vertical\n- `hx-size`: sm | md | lg ...\n\n---\n*Recovered automatically by Automaker post-agent hook*\na pull request for branch \"feature/t1-03-hx-button-group-grouped-action\" into branch \"dev\" already exists:\nhttps://github.com/bookedsolidtech/helix/pull/28\n | stderr: a pull request for branch \"feature/t1-03-hx-button-group-grouped-action\" into branch \"dev\" already exists:\nhttps://github.com/bookedsolidtech/helix/pull/28"
+    },
+    {
+      "from": "blocked",
+      "to": "review",
+      "timestamp": "2026-03-04T01:18:56.550Z"
+    }
+  ],
+  "featureType": "code",
+  "updatedAt": "2026-03-04T00:55:23.708Z",
+  "model": "claude-sonnet-4-6",
+  "costUsd": 3.8679317500000003,
+  "lastSessionId": "b52262eb-1c0d-4090-93eb-fc738e15cbaa",
+  "prUrl": "https://github.com/bookedsolidtech/helix/pull/28",
+  "prNumber": 28,
+  "prCreatedAt": "2026-03-03T20:56:44.835Z",
+  "reviewStartedAt": "2026-03-03T20:56:44.836Z",
+  "prTrackedSince": "2026-03-03T20:56:44.841Z",
+  "prLastPolledAt": "2026-03-04T04:31:20.933Z",
+  "lastReviewFeedback": "coderabbitai: **Actionable comments posted: 4**\n\n<details>\n<summary>🤖 Prompt for all review comments with AI agents</summary>\n\n```\nVerify each finding against the current code and only fix it if needed.\n\nInline comments:\nIn\n`@packages/hx-library/src/components/hx-button-group/hx-button-group.stories.ts`:\n- Around line 72-75: The tests use non-null assertions (group!, shadowRoot!,\ngroupDiv!) which break strict-null checks; update the play tests in\nhx-button-group.stories.ts (and the similar block at lines ~259-262) to avoid\n\"!\" by first asserting existence and then safely accessing properties (e.g.,\nawait expect(group).toBeTruthy(); const groupDiv =\ngroup?.shadowRoot?.querySelector('[part=\"group\"]'); await\nexpect(groupDiv).toBeTruthy(); then assert role via\ngroupDiv!.getAttribute('role') or better access after the existence check) —\nreplace all direct non-null assertions on group, shadowRoot, and groupDiv with\nsequential existence assertions or optional chaining followed by explicit\nexpects so the test fails visibly in CI if elements are missing.\n\nIn\n`@packages/hx-library/src/components/hx-button-group/hx-button-group.styles.ts`:\n- Around line 25-27: The styles use hardcoded fallback lengths (e.g., \"1px\",\n\"0.375rem\") in the CSS custom property fallbacks for selectors like\n.group--horizontal ::slotted(*:not(:first-child)) and the other grouped rules\naround lines noted; replace those raw literals with design-token variables (or\ntoken-to-token fallbacks) only — for example swap occurrences of\nvar(--hx-border-width-thin, 1px) and similar fallbacks to a token-only\nexpression like var(--hx-border-width-thin, var(--hx-border-width-default)) or\nanother appropriate --hx-* token so no raw length literals remain in the\ncomponent CSS.\n\nIn `@packages/hx-library/src/components/hx-button-group/hx-button-group.ts`:\n- Around line 21-24: Add ElementInternals to the HelixButtonGroup component and\nmove the group semantics to the host: declare a private field (e.g., private\n_internals: ",
+  "prIterationCount": 2,
+  "remediationCycleCount": 2,
+  "workItemState": "in_progress",
+  "statusChangeReason": "git workflow failed — uncommitted work in worktree at /Volumes/Development/booked/helix/.worktrees/feature-t1-03-hx-button-group-grouped-action: git workflow failed — uncommitted work in worktree at /Volumes/Development/booked/helix/.worktrees/feature-t1-03-hx-button-group-grouped-action: Command failed: gh pr create --base dev --head feature/t1-03-hx-button-group-grouped-action --title T1-03: hx-button-group — Grouped Action Buttons --body ## Summary\n\n## Component: hx-button-group (NEW)\n**Tier 1 — Universal Foundation | Industry Consensus: 4/6 libraries**\n\nGroups related buttons with shared borders and spacing. Used for segmented controls, toolbar groups, and related action sets.\n\n### ADR-001 Classification: Slot-Driven (Composite)\nContainer component. Drupal controls which buttons appear via slots. Component provides layout and visual grouping.\n\n### API Design\n\n**Properties:**\n- `orientation`: horizontal | vertical\n- `hx-size`: sm | md | lg ...\n\n---\n*Recovered automatically by Automaker post-agent hook*\na pull request for branch \"feature/t1-03-hx-button-group-grouped-action\" into branch \"dev\" already exists:\nhttps://github.com/bookedsolidtech/helix/pull/28\n | stderr: a pull request for branch \"feature/t1-03-hx-button-group-grouped-action\" into branch \"dev\" already exists:\nhttps://github.com/bookedsolidtech/helix/pull/28",
+  "failureCount": 1,
+  "threadFeedback": [
+    {
+      "threadId": "stories-role-stale-assertions",
+      "status": "accepted",
+      "agentReasoning": "The play tests in stories.ts at lines 74 and 261 still assert `groupDiv?.getAttribute('role') === 'group'`. Since role was moved from the internal wrapper div to the host via ElementInternals, `[part=\"group\"]` no longer carries `role=\"group\"`. These assertions will fail or produce incorrect results. The reviewer's fix (check `groupDiv?.hasAttribute('role')` is false) correctly verifies the migration happened.",
+      "resolvedAt": "2026-03-04T01:00:21.767Z"
+    },
+    {
+      "threadId": "test-requestupdate-spy",
+      "status": "denied",
+      "agentReasoning": "Looking at the current test.ts (lines 127-142), the requestUpdate spy is already in place: `vi.spyOn(el, 'requestUpdate')` and `expect(requestUpdateSpy).toHaveBeenCalled()` are both present. The feedback described what needed to be done, but it was already addressed. No action needed.",
+      "resolvedAt": "2026-03-04T01:00:21.767Z"
+    },
+    {
+      "threadId": "test-internals-any-type",
+      "status": "accepted",
+      "agentReasoning": "`(el as any).internals?.role` at line 168 of hx-button-group.test.ts violates the project's zero-any TypeScript rule. The reviewer correctly flags this. Since `internals` is private and `ElementInternals.role` does not reflect as an HTML attribute (confirmed by the CodeRabbit research), the test assertion should instead verify: (1) the host has no explicit `role` attribute (ElementInternals sets a default, not a DOM attribute), and (2) the internal wrapper div has no `role` attribute. This is the correct way to verify the ElementInternals pattern without using `any`.",
+      "resolvedAt": "2026-03-04T01:00:21.767Z"
+    }
+  ],
+  "remediationHistory": []
+}

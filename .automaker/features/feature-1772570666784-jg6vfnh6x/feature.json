@@ -1,0 +1,96 @@
+{
+  "category": "Uncategorized",
+  "description": "## Component: hx-accordion (NEW)\n**Tier 1 — Universal Foundation | Industry Consensus: 5/6 libraries**\n\nVertically stacked expandable/collapsible sections. Composed of hx-accordion-item children.\n\n### ADR-001 Classification: Slot-Driven (Composite)\nDrupal controls section headings and content via slots. Component provides expand/collapse behavior.\n\n### API Design\n**Properties:** `multiple` (boolean — allow multiple open), `disabled`\n**Slots:** Default (hx-accordion-item children)\n**Events:** `hx-accordion-change` (composed: true, detail: { item, open })\n\n### Child: hx-accordion-item\n**Properties:** `open` (boolean), `disabled`, `heading` (string, alt to slot)\n**Slots:** `heading` (trigger content — rich HTML), default (panel content)\n**CSS Parts:** `item`, `heading`, `trigger`, `content`, `icon` (expand/collapse chevron)\n\n### Drupal Integration\n```twig\n{# FAQ sections from Drupal Paragraphs #}\n<hx-accordion>\n  {% for paragraph in content.field_faq_items %}\n    <hx-accordion-item>\n      <span slot=\"heading\">{{ paragraph.field_question.value }}</span>\n      {{ paragraph.field_answer.value|raw }}\n    </hx-accordion-item>\n  {% endfor %}\n</hx-accordion>\n\n{# Patient intake sections #}\n<hx-accordion multiple>\n  <hx-accordion-item open>\n    <span slot=\"heading\">Personal Information</span>\n    {{ content.group_personal_info }}\n  </hx-accordion-item>\n  <hx-accordion-item>\n    <span slot=\"heading\">Insurance Details</span>\n    {{ content.group_insurance }}\n  </hx-accordion-item>\n</hx-accordion>\n```\n\n### Healthcare: FAQ sections, patient intake form sections, clinical guidelines, policy documents\n\n### Acceptance Criteria\n1. Single mode: only one section open at a time\n2. Multiple mode: any combination can be open\n3. Smooth height animation on expand/collapse\n4. Keyboard: Enter/Space toggle, Arrow keys navigate between headers\n5. WCAG 2.1 AA: proper disclosure pattern, aria-expanded\n6. slotchange handles dynamic item addition",
+  "title": "T1-17: hx-accordion — Expandable Sections",
+  "status": "review",
+  "complexity": "medium",
+  "priority": 2,
+  "source": "api",
+  "trustTier": 1,
+  "quarantineStatus": "passed",
+  "quarantineId": "ee726a9b-e0da-40ff-8c85-f57155e8d837",
+  "id": "feature-1772570666784-jg6vfnh6x",
+  "branchName": "feature/t1-17-hx-accordion-expandable-sections",
+  "descriptionHistory": [
+    {
+      "description": "## Component: hx-accordion (NEW)\n**Tier 1 — Universal Foundation | Industry Consensus: 5/6 libraries**\n\nVertically stacked expandable/collapsible sections. Composed of hx-accordion-item children.\n\n### ADR-001 Classification: Slot-Driven (Composite)\nDrupal controls section headings and content via slots. Component provides expand/collapse behavior.\n\n### API Design\n**Properties:** `multiple` (boolean — allow multiple open), `disabled`\n**Slots:** Default (hx-accordion-item children)\n**Events:** `hx-accordion-change` (composed: true, detail: { item, open })\n\n### Child: hx-accordion-item\n**Properties:** `open` (boolean), `disabled`, `heading` (string, alt to slot)\n**Slots:** `heading` (trigger content — rich HTML), default (panel content)\n**CSS Parts:** `item`, `heading`, `trigger`, `content`, `icon` (expand/collapse chevron)\n\n### Drupal Integration\n```twig\n{# FAQ sections from Drupal Paragraphs #}\n<hx-accordion>\n  {% for paragraph in content.field_faq_items %}\n    <hx-accordion-item>\n      <span slot=\"heading\">{{ paragraph.field_question.value }}</span>\n      {{ paragraph.field_answer.value|raw }}\n    </hx-accordion-item>\n  {% endfor %}\n</hx-accordion>\n\n{# Patient intake sections #}\n<hx-accordion multiple>\n  <hx-accordion-item open>\n    <span slot=\"heading\">Personal Information</span>\n    {{ content.group_personal_info }}\n  </hx-accordion-item>\n  <hx-accordion-item>\n    <span slot=\"heading\">Insurance Details</span>\n    {{ content.group_insurance }}\n  </hx-accordion-item>\n</hx-accordion>\n```\n\n### Healthcare: FAQ sections, patient intake form sections, clinical guidelines, policy documents\n\n### Acceptance Criteria\n1. Single mode: only one section open at a time\n2. Multiple mode: any combination can be open\n3. Smooth height animation on expand/collapse\n4. Keyboard: Enter/Space toggle, Arrow keys navigate between headers\n5. WCAG 2.1 AA: proper disclosure pattern, aria-expanded\n6. slotchange handles dynamic item addition",
+      "timestamp": "2026-03-03T20:44:26.785Z",
+      "source": "initial"
+    }
+  ],
+  "createdAt": "2026-03-03T20:44:26.785Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-03-03T20:44:26.785Z",
+      "reason": "Feature created"
+    },
+    {
+      "from": "backlog",
+      "to": "in_progress",
+      "timestamp": "2026-03-03T23:33:43.254Z"
+    },
+    {
+      "from": "in_progress",
+      "to": "review",
+      "timestamp": "2026-03-03T23:55:04.477Z"
+    },
+    {
+      "from": "review",
+      "to": "blocked",
+      "timestamp": "2026-03-04T00:01:07.116Z"
+    },
+    {
+      "from": "blocked",
+      "to": "review",
+      "timestamp": "2026-03-04T00:54:55.552Z"
+    },
+    {
+      "from": "review",
+      "to": "backlog",
+      "timestamp": "2026-03-04T00:55:39.617Z"
+    },
+    {
+      "from": "done",
+      "to": "review",
+      "timestamp": "2026-03-04T00:57:36.939Z"
+    }
+  ],
+  "featureType": "code",
+  "updatedAt": "2026-03-04T00:57:12.474Z",
+  "model": "claude-sonnet-4-6",
+  "costUsd": 6.029740249999999,
+  "lastSessionId": "95041f39-118f-4f25-a601-b23c7bc8a007",
+  "prUrl": "https://github.com/bookedsolidtech/helix/pull/40",
+  "prNumber": 40,
+  "prCreatedAt": "2026-03-03T23:55:04.475Z",
+  "reviewStartedAt": "2026-03-03T23:55:04.477Z",
+  "prTrackedSince": "2026-03-03T23:55:04.480Z",
+  "prLastPolledAt": "2026-03-04T00:58:26.298Z",
+  "lastReviewFeedback": "coderabbitai: **Actionable comments posted: 13**\n\n<details>\n<summary>🤖 Prompt for all review comments with AI agents</summary>\n\n```\nVerify each finding against the current code and only fix it if needed.\n\nInline comments:\nIn\n`@packages/hx-library/src/components/hx-accordion/hx-accordion-item.stories.ts`:\n- Around line 81-82: The play function defines an unused variable _canvas from\nwithin(canvasElement); remove the unused assignment or use it consistently —\neither delete the const _canvas = within(canvasElement); line in the play\nhandler for hx-accordion-item.stories.ts (and similarly in\nhx-accordion.stories.ts) or rename and use the variable (e.g., canvas =\nwithin(canvasElement)) where interaction queries/assertions occur so there are\nno unused variables.\n\nIn `@packages/hx-library/src/components/hx-accordion/hx-accordion-item.styles.ts`:\n- Around line 50-64: Update the .trigger selectors to match native button\nsemantics by adding and/or replacing [aria-disabled='true'] with the :disabled\npseudoclass: change .trigger:hover:not([aria-disabled='true']) to\n.trigger:hover:not(:disabled) (or combine both\n.trigger:hover:not(:disabled):not([aria-disabled='true']) if you need to support\nboth), ensure the focus style .trigger:focus-visible maintains behavior for\nenabled elements (e.g., .trigger:focus-visible:not(:disabled)), and replace\n.trigger[aria-disabled='true'] { cursor: not-allowed; } with .trigger:disabled {\ncursor: not-allowed; } (or include both :disabled and [aria-disabled='true']\nwhere backward support is required).\n- Around line 6-117: Replace all hardcoded fallback literals in this stylesheet\nwith the matching --hx-* design tokens: update color fallbacks in .item border,\n.trigger background/color, .trigger:hover, .icon color, .content\nbackground/color (replace `#e9ecef`, `#f8f9fa`, `#212529`, `#f1f3f5`, `#ffffff`, etc. with\ntoken vars like --hx-color-*), replace spacing/fallbacks used for padding/size\n(var(--hx-space-4), var(--hx-size-5)), typography fallbacks",
+  "prIterationCount": 2,
+  "remediationCycleCount": 2,
+  "workItemState": "in_progress",
+  "executionHistory": [
+    {
+      "id": "381101f3-b185-475f-96b7-a81c301e8911",
+      "startedAt": "2026-03-04T00:55:39.636Z",
+      "completedAt": "2026-03-04T00:57:12.496Z",
+      "durationMs": 92867,
+      "costUsd": 0.4058244999999996,
+      "model": "claude-sonnet-4-6",
+      "success": true,
+      "trigger": "retry"
+    }
+  ],
+  "threadFeedback": [
+    {
+      "threadId": "PRRT_kwDORRAfU85x8Atk",
+      "status": "denied",
+      "agentReasoning": "The feedback points to `::slotted(hx-accordion-item:last-child)` being ineffective across shadow boundaries, and recommends moving the last-item border suppression into `hx-accordion-item.styles.ts` as `:host(:last-of-type) .item { border-bottom: none; }`.\n\n    Both fixes are already implemented in the current codebase:\n    1. `hx-accordion.styles.ts` contains no `::slotted` rule — already removed in the iteration 1 refactoring.\n    2. `hx-accordion-item.styles.ts` already has the correct `:host(:last-of-type) .item { border-bottom: none; }` rule at lines 25-27.\n\n    The feedback is stale — it was raised against intermediate code that no longer exists. No changes needed.",
+      "resolvedAt": "2026-03-04T00:57:36.942Z"
+    }
+  ],
+  "remediationHistory": []
+}

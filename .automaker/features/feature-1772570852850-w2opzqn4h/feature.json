@@ -1,0 +1,44 @@
+{
+  "category": "Uncategorized",
+  "description": "## Component: hx-side-nav (NEW)\n**Tier 2 — Standard Enterprise | Industry Consensus: 3/6 libraries**\n\nCollapsible left-side navigation panel with nested menu items.\n\n### ADR-001 Classification: Slot-Driven (Composite)\nDrupal menu system controls navigation items via slots.\n\n### API Design\n**Properties:** `collapsed` (boolean — icon-only mode), `label` (nav landmark label)\n**Slots:** Default (hx-nav-item children), `header` (logo/branding), `footer` (user/settings)\n**CSS Parts:** `nav`, `header`, `body`, `footer`\n**Events:** `hx-collapse`, `hx-expand`\n\n### Child: hx-nav-item\n**Properties:** `href`, `active`, `expanded`, `disabled`\n**Slots:** Default (label), `icon`, `badge`, `children` (sub-items)\n\n### Drupal Integration\n```twig\n<hx-side-nav label=\"Main Navigation\">\n  <div slot=\"header\">\n    \n  </div>\n  {% for item in menu_items %}\n    <hx-nav-item href=\"{{ item.url }}\" {% if item.in_active_trail %}active{% endif %}>\n      <hx-icon slot=\"icon\" name=\"{{ item.icon }}\"></hx-icon>\n      {{ item.title }}\n      {% if item.below %}\n        {% for child in item.below %}\n          <hx-nav-item slot=\"children\" href=\"{{ child.url }}\">{{ child.title }}</hx-nav-item>\n        {% endfor %}\n      {% endif %}\n    </hx-nav-item>\n  {% endfor %}\n</hx-side-nav>\n```\n\nDrupal's menu system (menu_tree, MenuLinkTree) controls structure. Component provides visual treatment.\n\n### Healthcare: Clinical portal navigation, admin dashboards, department navigation\n\n### Acceptance Criteria\n1. Collapsed mode shows icons only with tooltips\n2. Nested sub-navigation with expand/collapse\n3. Active trail highlighting\n4. WCAG 2.1 AA: nav landmark, current page indicator\n5. Responsive: auto-collapses on small screens",
+  "title": "T2-37: hx-side-nav — Collapsible Side Navigation",
+  "status": "in_progress",
+  "complexity": "large",
+  "priority": 3,
+  "source": "api",
+  "trustTier": 1,
+  "quarantineStatus": "passed",
+  "quarantineId": "7127fe35-7a6b-48b4-84c7-ce09dc01eacc",
+  "id": "feature-1772570852850-w2opzqn4h",
+  "branchName": "feature/t2-37-hx-side-nav-collapsible-side",
+  "descriptionHistory": [
+    {
+      "description": "## Component: hx-side-nav (NEW)\n**Tier 2 — Standard Enterprise | Industry Consensus: 3/6 libraries**\n\nCollapsible left-side navigation panel with nested menu items.\n\n### ADR-001 Classification: Slot-Driven (Composite)\nDrupal menu system controls navigation items via slots.\n\n### API Design\n**Properties:** `collapsed` (boolean — icon-only mode), `label` (nav landmark label)\n**Slots:** Default (hx-nav-item children), `header` (logo/branding), `footer` (user/settings)\n**CSS Parts:** `nav`, `header`, `body`, `footer`\n**Events:** `hx-collapse`, `hx-expand`\n\n### Child: hx-nav-item\n**Properties:** `href`, `active`, `expanded`, `disabled`\n**Slots:** Default (label), `icon`, `badge`, `children` (sub-items)\n\n### Drupal Integration\n```twig\n<hx-side-nav label=\"Main Navigation\">\n  <div slot=\"header\">\n    \n  </div>\n  {% for item in menu_items %}\n    <hx-nav-item href=\"{{ item.url }}\" {% if item.in_active_trail %}active{% endif %}>\n      <hx-icon slot=\"icon\" name=\"{{ item.icon }}\"></hx-icon>\n      {{ item.title }}\n      {% if item.below %}\n        {% for child in item.below %}\n          <hx-nav-item slot=\"children\" href=\"{{ child.url }}\">{{ child.title }}</hx-nav-item>\n        {% endfor %}\n      {% endif %}\n    </hx-nav-item>\n  {% endfor %}\n</hx-side-nav>\n```\n\nDrupal's menu system (menu_tree, MenuLinkTree) controls structure. Component provides visual treatment.\n\n### Healthcare: Clinical portal navigation, admin dashboards, department navigation\n\n### Acceptance Criteria\n1. Collapsed mode shows icons only with tooltips\n2. Nested sub-navigation with expand/collapse\n3. Active trail highlighting\n4. WCAG 2.1 AA: nav landmark, current page indicator\n5. Responsive: auto-collapses on small screens",
+      "timestamp": "2026-03-03T20:47:32.851Z",
+      "source": "initial"
+    }
+  ],
+  "createdAt": "2026-03-03T20:47:32.851Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-03-03T20:47:32.851Z",
+      "reason": "Feature created"
+    },
+    {
+      "from": "backlog",
+      "to": "in_progress",
+      "timestamp": "2026-03-04T11:49:38.382Z"
+    },
+    {
+      "from": "in_progress",
+      "to": "backlog",
+      "timestamp": "2026-03-04T11:52:59.646Z"
+    }
+  ],
+  "featureType": "code",
+  "updatedAt": "2026-03-04T11:55:51.794Z",
+  "model": "claude-sonnet-4-6",
+  "costUsd": 2.603487
+}

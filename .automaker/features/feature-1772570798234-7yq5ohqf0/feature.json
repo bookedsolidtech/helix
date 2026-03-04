@@ -1,0 +1,69 @@
+{
+  "category": "Uncategorized",
+  "description": "## Component: hx-date-picker (NEW)\n**Tier 2 — Standard Enterprise | Industry Consensus: 3/6 libraries | HEALTHCARE-CRITICAL**\n\nCalendar-based date selection with text input fallback. Critical for healthcare (DOB, appointments, prescriptions).\n\n### ADR-001 Classification: Hybrid (Form Component)\nProperties control date constraints. Label/help via slots.\n\n### API Design\n**Properties:** `name`, `value` (ISO 8601 date string), `min`, `max`, `label`, `required`, `disabled`, `error`, `help-text`, `format` (display format), `locale`\n**Slots:** Default (label), `help`, `error`\n**CSS Parts:** `input`, `calendar`, `day`, `month-nav`, `label`, `trigger`\n**Events:** `hx-change` (composed: true, detail: { value, date })\n\n### Drupal Integration\n```twig\n<hx-date-picker name=\"date_of_birth\" label=\"Date of Birth\" required max=\"{{ 'now'|date('Y-m-d') }}\">\n  <span slot=\"help\">Must be 18 or older for self-registration</span>\n</hx-date-picker>\n\n<hx-date-picker name=\"appointment_date\" label=\"Appointment Date\" min=\"{{ 'now'|date('Y-m-d') }}\">\n</hx-date-picker>\n```\n\n### ElementInternals: Submits ISO 8601 date string\n### Healthcare: DOB entry, appointment scheduling, prescription dates, insurance expiry\n\n### Acceptance Criteria\n1. Calendar popup with month/year navigation\n2. Text input with date format masking\n3. Min/max date constraints (grey out unavailable dates)\n4. Keyboard: full calendar navigation\n5. Locale-aware date formatting\n6. ElementInternals form participation\n7. WCAG 2.1 AA: dialog calendar pattern, live region for month changes",
+  "title": "T2-32: hx-date-picker — Calendar Date Selection",
+  "status": "review",
+  "complexity": "large",
+  "priority": 3,
+  "source": "api",
+  "trustTier": 1,
+  "quarantineStatus": "passed",
+  "quarantineId": "3d4a085b-5ce1-4f96-8d50-2b544b0ab113",
+  "id": "feature-1772570798234-7yq5ohqf0",
+  "branchName": "feature/t2-32-hx-date-picker-calendar-date",
+  "descriptionHistory": [
+    {
+      "description": "## Component: hx-date-picker (NEW)\n**Tier 2 — Standard Enterprise | Industry Consensus: 3/6 libraries | HEALTHCARE-CRITICAL**\n\nCalendar-based date selection with text input fallback. Critical for healthcare (DOB, appointments, prescriptions).\n\n### ADR-001 Classification: Hybrid (Form Component)\nProperties control date constraints. Label/help via slots.\n\n### API Design\n**Properties:** `name`, `value` (ISO 8601 date string), `min`, `max`, `label`, `required`, `disabled`, `error`, `help-text`, `format` (display format), `locale`\n**Slots:** Default (label), `help`, `error`\n**CSS Parts:** `input`, `calendar`, `day`, `month-nav`, `label`, `trigger`\n**Events:** `hx-change` (composed: true, detail: { value, date })\n\n### Drupal Integration\n```twig\n<hx-date-picker name=\"date_of_birth\" label=\"Date of Birth\" required max=\"{{ 'now'|date('Y-m-d') }}\">\n  <span slot=\"help\">Must be 18 or older for self-registration</span>\n</hx-date-picker>\n\n<hx-date-picker name=\"appointment_date\" label=\"Appointment Date\" min=\"{{ 'now'|date('Y-m-d') }}\">\n</hx-date-picker>\n```\n\n### ElementInternals: Submits ISO 8601 date string\n### Healthcare: DOB entry, appointment scheduling, prescription dates, insurance expiry\n\n### Acceptance Criteria\n1. Calendar popup with month/year navigation\n2. Text input with date format masking\n3. Min/max date constraints (grey out unavailable dates)\n4. Keyboard: full calendar navigation\n5. Locale-aware date formatting\n6. ElementInternals form participation\n7. WCAG 2.1 AA: dialog calendar pattern, live region for month changes",
+      "timestamp": "2026-03-03T20:46:38.234Z",
+      "source": "initial"
+    }
+  ],
+  "createdAt": "2026-03-03T20:46:38.234Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-03-03T20:46:38.234Z",
+      "reason": "Feature created"
+    },
+    {
+      "from": "backlog",
+      "to": "in_progress",
+      "timestamp": "2026-03-04T09:45:32.017Z"
+    },
+    {
+      "from": "in_progress",
+      "to": "backlog",
+      "timestamp": "2026-03-04T09:48:33.316Z"
+    },
+    {
+      "from": "in_progress",
+      "to": "review",
+      "timestamp": "2026-03-04T10:21:20.584Z"
+    },
+    {
+      "from": "review",
+      "to": "blocked",
+      "timestamp": "2026-03-04T10:26:52.453Z"
+    },
+    {
+      "from": "blocked",
+      "to": "review",
+      "timestamp": "2026-03-04T13:58:48.950Z"
+    }
+  ],
+  "featureType": "code",
+  "updatedAt": "2026-03-04T09:52:28.058Z",
+  "model": "claude-sonnet-4-6",
+  "costUsd": 5.543032999999998,
+  "lastSessionId": "05383139-82ef-4c66-b9e6-a8e54e27f147",
+  "prUrl": "https://github.com/bookedsolidtech/helix/pull/56",
+  "prNumber": 56,
+  "prCreatedAt": "2026-03-04T10:21:20.582Z",
+  "reviewStartedAt": "2026-03-04T10:21:20.584Z",
+  "prTrackedSince": "2026-03-04T10:21:20.588Z",
+  "prLastPolledAt": "2026-03-04T15:33:18.888Z",
+  "lastReviewFeedback": "coderabbitai: **Actionable comments posted: 6**\n\n<details>\n<summary>🤖 Prompt for all review comments with AI agents</summary>\n\n```\nVerify each finding against the current code and only fix it if needed.\n\nInline comments:\nIn `@packages/hx-library/src/components/hx-date-picker/hx-date-picker.styles.ts`:\n- Around line 342-344: Replace the hardcoded opacity 0.2 in the\n.calendar__day--other-month.calendar__day--disabled rule with the project's\nopacity design token (e.g., use the CSS variable or token name your design\nsystem provides such as --hx-opacity-disabled or the theme token for disabled\nopacity); update the rule in hx-date-picker.styles.ts to reference that token\nand, if the token does not exist yet, add/align it in the token definitions so\nthe disabled other-month day uses the centralized opacity token instead of a\nmagic number.\n- Around line 167-171: Replace the hardcoded rgba shadow fallbacks in the\nhx-date-picker styles by using the design token(s) instead of literal colors:\nupdate the box-shadow declaration for --hx-date-picker-calendar-shadow to\nreference the appropriate token(s) (e.g., --hx-shadow-elevation-1 or a new\nprimitive/semantic shadow token such as --hx-shadow-calendar) and remove the raw\nrgba(...) values; if the token does not exist, add a new CSS custom property at\nthe primitive/semantic level and consume that token here (refer to the\n--hx-date-picker-calendar-shadow variable and the box-shadow usage in\nhx-date-picker.styles.ts).\n- Around line 320-330: Today indicator uses hardcoded sizing/offset\n(0.2rem/0.25rem); update the .calendar__Day--today pseudo-element\n(.calendar__day--today:not(.calendar__day--selected)::after) to use spacing\ntokens instead: replace bottom: 0.2rem with bottom: var(--hx-spacing-xxs,\n0.2rem) and width/height: 0.25rem with width: var(--hx-spacing-xs, 0.25rem) and\nheight: var(--hx-spacing-xs, 0.25rem); keep border-radius: 50% and existing\nbackground-color but use fallbacks as shown so design tokens control sizing\nwhile pre",
+  "prIterationCount": 1,
+  "remediationCycleCount": 1
+}
