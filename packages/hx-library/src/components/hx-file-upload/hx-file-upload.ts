@@ -122,7 +122,7 @@ export class HelixFileUpload extends LitElement {
   // ─── Internal References ───
 
   @query('.file-input')
-  private _fileInput!: HTMLInputElement;
+  declare private _fileInput: HTMLInputElement | null;
 
   // ─── Stable IDs ───
 
@@ -134,14 +134,14 @@ export class HelixFileUpload extends LitElement {
 
   private _handleFileListSlotChange(e: Event): void {
     const slot = e.target as HTMLSlotElement;
-    this._hasFileListSlot = slot.assignedNodes({ flatten: true }).length > 0;
+    this._hasFileListSlot = slot.assignedElements({ flatten: true }).length > 0;
   }
 
   // ─── Lifecycle ───
 
   override updated(changedProperties: Map<string, unknown>): void {
     super.updated(changedProperties);
-    if (changedProperties.has('_files')) {
+    if (changedProperties.has('_files') || changedProperties.has('name')) {
       this._syncFormValue();
     }
   }
@@ -196,9 +196,8 @@ export class HelixFileUpload extends LitElement {
 
     // Multiple files — use FormData so all files are submitted under the same name
     const formData = new FormData();
-    const fieldName = this.name || 'files';
     for (const entry of this._files) {
-      formData.append(fieldName, entry.file, entry.file.name);
+      formData.append(this.name, entry.file, entry.file.name);
     }
     this._internals.setFormValue(formData);
   }
@@ -282,8 +281,8 @@ export class HelixFileUpload extends LitElement {
 
     if (validFiles.length === 0) return;
 
-    // Enforce maxFiles limit
-    const currentCount = this._files.length;
+    // Enforce maxFiles limit (only in multiple mode — single-file mode always replaces)
+    const currentCount = this.multiple ? this._files.length : 0;
     const capacity =
       this.maxFiles > 0 ? Math.max(0, this.maxFiles - currentCount) : validFiles.length;
     const allowedFiles = validFiles.slice(0, capacity);
@@ -455,9 +454,7 @@ export class HelixFileUpload extends LitElement {
           (entry, index) => html`
             <li part="file-item" class="file-item">
               <div class="file-item__row">
-                <span class="file-item__name" title=${entry.file.name}>
-                  ${entry.file.name}
-                </span>
+                <span class="file-item__name" title=${entry.file.name}> ${entry.file.name} </span>
                 <span class="file-item__size">${this._formatSize(entry.file.size)}</span>
                 <button
                   type="button"
@@ -492,10 +489,7 @@ export class HelixFileUpload extends LitElement {
                 aria-valuemax="100"
                 aria-label=${`Upload progress for ${entry.file.name}: ${entry.progress}%`}
               >
-                <div
-                  class="progress-bar"
-                  style="width: ${entry.progress}%"
-                ></div>
+                <div class="progress-bar" style="width: ${entry.progress}%"></div>
               </div>
             </li>
           `,
@@ -523,12 +517,7 @@ export class HelixFileUpload extends LitElement {
       <div class="field">
         ${this.label
           ? html`
-              <label
-                part="label"
-                class="field__label"
-                id=${this._labelId}
-                for=${this._dropzoneId}
-              >
+              <label part="label" class="field__label" id=${this._labelId} for=${this._dropzoneId}>
                 ${this.label}
               </label>
             `
@@ -567,7 +556,6 @@ export class HelixFileUpload extends LitElement {
         <slot name="file-list" @slotchange=${this._handleFileListSlotChange}></slot>
 
         ${this._renderFileList()}
-
         ${hasError
           ? html`
               <div

@@ -1,13 +1,6 @@
 import { describe, it, expect, afterEach } from 'vitest';
 import { page } from '@vitest/browser/context';
-import {
-  fixture,
-  shadowQuery,
-  shadowQueryAll,
-  oneEvent,
-  cleanup,
-  checkA11y,
-} from '../../test-utils.js';
+import { fixture, shadowQuery, oneEvent, cleanup, checkA11y } from '../../test-utils.js';
 import type { HelixFileUpload } from './hx-file-upload.js';
 import './index.js';
 
@@ -19,7 +12,9 @@ function simulateFileInput(component: HelixFileUpload, files: File[]): void {
   const input = shadowQuery<HTMLInputElement>(component, '.file-input');
   if (!input) throw new Error('Could not find .file-input inside hx-file-upload shadow DOM');
   const dt = new DataTransfer();
-  files.forEach((f) => dt.items.add(f));
+  files.forEach((f) => {
+    dt.items.add(f);
+  });
   Object.defineProperty(input, 'files', { value: dt.files, configurable: true });
   input.dispatchEvent(new Event('change', { bubbles: true }));
 }
@@ -140,9 +135,7 @@ describe('hx-file-upload', () => {
     });
 
     it('max-files attribute maps to maxFiles property', async () => {
-      const el = await fixture<HelixFileUpload>(
-        '<hx-file-upload max-files="3"></hx-file-upload>',
-      );
+      const el = await fixture<HelixFileUpload>('<hx-file-upload max-files="3"></hx-file-upload>');
       expect(el.maxFiles).toBe(3);
     });
 
@@ -453,7 +446,9 @@ describe('hx-file-upload', () => {
     it('form getter returns the associated form element', async () => {
       const form = document.createElement('form');
       form.innerHTML = '<hx-file-upload name="upload"></hx-file-upload>';
-      document.getElementById('test-fixture-container')!.appendChild(form);
+      const container = document.getElementById('test-fixture-container');
+      if (!container) throw new Error('test fixture container not found');
+      container.appendChild(form);
       const el = form.querySelector('hx-file-upload') as HelixFileUpload;
       await el.updateComplete;
       expect(el.form).toBe(form);
@@ -479,6 +474,30 @@ describe('hx-file-upload', () => {
       el.formResetCallback();
       await el.updateComplete;
       expect(shadowQuery(el, '[part="file-list"]')).toBeNull();
+    });
+  });
+
+  // ─── Form Validation API (4) ───
+
+  describe('Form Validation API', () => {
+    it('checkValidity() returns true when component has no validity constraints', async () => {
+      const el = await fixture<HelixFileUpload>('<hx-file-upload></hx-file-upload>');
+      expect(el.checkValidity()).toBe(true);
+    });
+
+    it('reportValidity() returns true when component is valid', async () => {
+      const el = await fixture<HelixFileUpload>('<hx-file-upload></hx-file-upload>');
+      expect(el.reportValidity()).toBe(true);
+    });
+
+    it('validity.valid is true when no constraints are violated', async () => {
+      const el = await fixture<HelixFileUpload>('<hx-file-upload></hx-file-upload>');
+      expect(el.validity.valid).toBe(true);
+    });
+
+    it('validationMessage is empty when component is valid', async () => {
+      const el = await fixture<HelixFileUpload>('<hx-file-upload></hx-file-upload>');
+      expect(el.validationMessage).toBe('');
     });
   });
 
@@ -597,9 +616,7 @@ describe('hx-file-upload', () => {
 
   describe('Multiple file validation', () => {
     it('hx-error message references the rejected file name on type mismatch', async () => {
-      const el = await fixture<HelixFileUpload>(
-        '<hx-file-upload accept=".pdf"></hx-file-upload>',
-      );
+      const el = await fixture<HelixFileUpload>('<hx-file-upload accept=".pdf"></hx-file-upload>');
       const errorPromise = oneEvent<CustomEvent<{ message: string; files: File[] }>>(
         el,
         'hx-error',
