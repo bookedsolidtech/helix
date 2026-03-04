@@ -1,7 +1,7 @@
 {
   "config": {
-    "configFile": "/Volumes/Development/booked/helix/.worktrees/feature-t1-01-hx-button-primary-action-button/playwright.config.ts",
-    "rootDir": "/Volumes/Development/booked/helix/.worktrees/feature-t1-01-hx-button-primary-action-button/packages/hx-library/e2e",
+    "configFile": "/Volumes/Development/booked/helix/.worktrees/feature-t1-23-hx-divider-visual-separator/playwright.config.ts",
+    "rootDir": "/Volumes/Development/booked/helix/.worktrees/feature-t1-23-hx-divider-visual-separator/packages/hx-library/e2e",
     "forbidOnly": false,
     "fullyParallel": true,
     "globalSetup": null,
@@ -10,41 +10,49 @@
     "grep": {},
     "grepInvert": null,
     "maxFailures": 0,
-    "metadata": {},
+    "metadata": {
+      "actualWorkers": 4
+    },
     "preserveOutput": "always",
     "projects": [
       {
-        "outputDir": "/Volumes/Development/booked/helix/.worktrees/feature-t1-01-hx-button-primary-action-button/packages/hx-library/.cache/vrt-results",
+        "outputDir": "/Volumes/Development/booked/helix/.worktrees/feature-t1-23-hx-divider-visual-separator/packages/hx-library/.cache/vrt-results",
         "repeatEach": 1,
         "retries": 0,
-        "metadata": {},
+        "metadata": {
+          "actualWorkers": 4
+        },
         "id": "chromium",
         "name": "chromium",
-        "testDir": "/Volumes/Development/booked/helix/.worktrees/feature-t1-01-hx-button-primary-action-button/packages/hx-library/e2e",
+        "testDir": "/Volumes/Development/booked/helix/.worktrees/feature-t1-23-hx-divider-visual-separator/packages/hx-library/e2e",
         "testIgnore": [],
         "testMatch": ["**/*.@(spec|test).?(c|m)[jt]s?(x)"],
         "timeout": 30000
       },
       {
-        "outputDir": "/Volumes/Development/booked/helix/.worktrees/feature-t1-01-hx-button-primary-action-button/packages/hx-library/.cache/vrt-results",
+        "outputDir": "/Volumes/Development/booked/helix/.worktrees/feature-t1-23-hx-divider-visual-separator/packages/hx-library/.cache/vrt-results",
         "repeatEach": 1,
         "retries": 0,
-        "metadata": {},
+        "metadata": {
+          "actualWorkers": 4
+        },
         "id": "firefox",
         "name": "firefox",
-        "testDir": "/Volumes/Development/booked/helix/.worktrees/feature-t1-01-hx-button-primary-action-button/packages/hx-library/e2e",
+        "testDir": "/Volumes/Development/booked/helix/.worktrees/feature-t1-23-hx-divider-visual-separator/packages/hx-library/e2e",
         "testIgnore": [],
         "testMatch": ["**/*.@(spec|test).?(c|m)[jt]s?(x)"],
         "timeout": 30000
       },
       {
-        "outputDir": "/Volumes/Development/booked/helix/.worktrees/feature-t1-01-hx-button-primary-action-button/packages/hx-library/.cache/vrt-results",
+        "outputDir": "/Volumes/Development/booked/helix/.worktrees/feature-t1-23-hx-divider-visual-separator/packages/hx-library/.cache/vrt-results",
         "repeatEach": 1,
         "retries": 0,
-        "metadata": {},
+        "metadata": {
+          "actualWorkers": 4
+        },
         "id": "webkit",
         "name": "webkit",
-        "testDir": "/Volumes/Development/booked/helix/.worktrees/feature-t1-01-hx-button-primary-action-button/packages/hx-library/e2e",
+        "testDir": "/Volumes/Development/booked/helix/.worktrees/feature-t1-23-hx-divider-visual-separator/packages/hx-library/e2e",
         "testIgnore": [],
         "testMatch": ["**/*.@(spec|test).?(c|m)[jt]s?(x)"],
         "timeout": 30000
@@ -73,17 +81,157 @@
     "workers": 5,
     "webServer": null
   },
-  "suites": [],
-  "errors": [
+  "suites": [
     {
-      "message": "Error: No tests found.\nMake sure that arguments are regular expressions matching test files.\nYou may need to escape symbols like \"$\" or \"*\" and quote the arguments.",
-      "stack": "Error: No tests found.\nMake sure that arguments are regular expressions matching test files.\nYou may need to escape symbols like \"$\" or \"*\" and quote the arguments."
+      "title": "hx-divider-verify.spec.ts",
+      "file": "hx-divider-verify.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "hx-divider renders with shadow DOM and correct defaults",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium",
+              "projectName": "chromium",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 146,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-03-04T06:41:20.813Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d503252e62ab2d691049-491997c79effddac8075",
+          "file": "hx-divider-verify.spec.ts",
+          "line": 62,
+          "column": 1
+        },
+        {
+          "title": "hx-divider vertical + dashed variant",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium",
+              "projectName": "chromium",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 1,
+                  "status": "passed",
+                  "duration": 154,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-03-04T06:41:20.813Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d503252e62ab2d691049-9e10b907ddb6f3a70a43",
+          "file": "hx-divider-verify.spec.ts",
+          "line": 86,
+          "column": 1
+        },
+        {
+          "title": "hx-divider role=\"presentation\" sets aria-hidden on hr",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium",
+              "projectName": "chromium",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 2,
+                  "status": "passed",
+                  "duration": 142,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-03-04T06:41:20.811Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d503252e62ab2d691049-b21be90a282060cc5b28",
+          "file": "hx-divider-verify.spec.ts",
+          "line": 97,
+          "column": 1
+        },
+        {
+          "title": "hx-divider dotted variant with lg spacing",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium",
+              "projectName": "chromium",
+              "results": [
+                {
+                  "workerIndex": 3,
+                  "parallelIndex": 3,
+                  "status": "passed",
+                  "duration": 143,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-03-04T06:41:20.809Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d503252e62ab2d691049-25a376066777c149e5c6",
+          "file": "hx-divider-verify.spec.ts",
+          "line": 111,
+          "column": 1
+        }
+      ]
     }
   ],
+  "errors": [],
   "stats": {
-    "startTime": "2026-03-03T20:48:25.972Z",
-    "duration": 3.940999999999974,
-    "expected": 0,
+    "startTime": "2026-03-04T06:41:20.284Z",
+    "duration": 1128.3870000000002,
+    "expected": 4,
     "skipped": 0,
     "unexpected": 0,
     "flaky": 0
