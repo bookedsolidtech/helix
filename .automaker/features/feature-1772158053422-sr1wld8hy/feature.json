@@ -2,7 +2,7 @@
   "category": "Phase 2: Component Expansion",
   "description": "**Milestone:** Phase 2: Component Expansion\n\nBuild hx-avatar: user/provider profile images with fallback initials and status indicators. Used for healthcare provider profiles.\n\n**Files to Modify:**\n- packages/hx-library/src/components/hx-avatar/\n\n**Acceptance Criteria:**\n- [ ] Image, initials, and icon fallback modes\n- [ ] Sizes: xs, sm, md, lg, xl\n- [ ] Status indicator (online, away, busy, offline)\n- [ ] Shape: circle, square, rounded\n- [ ] CSS parts: image, initials, status\n- [ ] Lazy loading for images\n- [ ] <5KB gzipped\n\n**Complexity:** small",
   "title": "Implement hx-avatar component",
-  "status": "backlog",
+  "status": "blocked",
   "isEpic": false,
   "epicId": "feature-1772158053419-7nvwtbujb",
   "branchName": "feature/phase-2-component-implement-hx-avatar",
@@ -22,6 +22,33 @@
       "to": "backlog",
       "timestamp": "2026-02-27T02:07:33.422Z",
       "reason": "Feature created"
+    },
+    {
+      "from": "backlog",
+      "to": "in_progress",
+      "timestamp": "2026-03-04T19:34:29.799Z"
+    },
+    {
+      "from": "in_progress",
+      "to": "review",
+      "timestamp": "2026-03-04T19:38:36.659Z"
+    },
+    {
+      "from": "review",
+      "to": "blocked",
+      "timestamp": "2026-03-04T19:39:38.050Z"
     }
-  ]
+  ],
+  "featureType": "code",
+  "complexity": "medium",
+  "updatedAt": "2026-03-04T19:34:31.312Z",
+  "model": "claude-sonnet-4-6",
+  "costUsd": 1.753635,
+  "lastSessionId": "05b33e0a-1e16-442f-8e2c-26f2769ec118",
+  "prUrl": "https://github.com/bookedsolidtech/helix/pull/92",
+  "prNumber": 92,
+  "prCreatedAt": "2026-03-04T19:38:36.657Z",
+  "reviewStartedAt": "2026-03-04T19:38:36.659Z",
+  "prTrackedSince": "2026-03-04T19:38:36.663Z",
+  "prLastPolledAt": "2026-03-04T19:39:09.730Z"
 }
