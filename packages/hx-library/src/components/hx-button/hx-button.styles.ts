@@ -10,6 +10,8 @@ export const helixButtonStyles = css`
     opacity: var(--hx-opacity-disabled, 0.5);
   }
 
+  /* ─── Base Button ─── */
+
   .button {
     display: inline-flex;
     align-items: center;
@@ -86,6 +88,26 @@ export const helixButtonStyles = css`
     --hx-button-bg: var(--hx-color-primary-50, #eff6ff);
   }
 
+  .button--tertiary {
+    --hx-button-bg: var(--hx-color-neutral-100, #f1f5f9);
+    --hx-button-color: var(--hx-color-neutral-900, #0f172a);
+    --hx-button-border-color: transparent;
+  }
+
+  .button--tertiary:hover {
+    --hx-button-bg: var(--hx-color-neutral-200, #e2e8f0);
+  }
+
+  .button--danger {
+    --hx-button-bg: var(--hx-color-error-500, #dc2626);
+    --hx-button-color: var(--hx-color-neutral-0, #ffffff);
+    --hx-button-border-color: transparent;
+  }
+
+  .button--danger:hover {
+    --hx-button-bg: var(--hx-color-error-600, #b91c1c);
+  }
+
   .button--ghost {
     --hx-button-bg: transparent;
     --hx-button-color: var(--hx-color-primary-500, #2563eb);
@@ -96,10 +118,60 @@ export const helixButtonStyles = css`
     --hx-button-bg: var(--hx-color-neutral-100, #f1f5f9);
   }
 
+  .button--outline {
+    --hx-button-bg: transparent;
+    --hx-button-color: var(--hx-color-neutral-900, #0f172a);
+    --hx-button-border-color: var(--hx-color-neutral-300, #cbd5e1);
+  }
+
+  .button--outline:hover {
+    --hx-button-bg: var(--hx-color-neutral-50, #f8fafc);
+  }
+
   /* ─── Disabled ─── */
 
   .button[disabled] {
     cursor: not-allowed;
     opacity: var(--hx-opacity-disabled, 0.5);
+  }
+
+  /* ─── Loading State ─── */
+
+  .button--loading {
+    position: relative;
+    cursor: wait;
+  }
+
+  .button__spinner {
+    width: 1em;
+    height: 1em;
+    flex-shrink: 0;
+    animation: hx-spin var(--hx-duration-spinner, 750ms) linear infinite;
+  }
+
+  @keyframes hx-spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .button__spinner {
+      animation: none;
+      opacity: var(--hx-opacity-muted, 0.6);
+    }
+  }
+
+  /* ─── Prefix / Suffix / Label ─── */
+
+  .button__prefix,
+  .button__suffix {
+    display: inline-flex;
+    align-items: center;
+    flex-shrink: 0;
+  }
+
+  .button__label {
+    flex: 1 1 auto;
   }
 `;
