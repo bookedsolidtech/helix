@@ -1,12 +1,5 @@
 import { describe, it, expect, afterEach } from 'vitest';
-import {
-  fixture,
-  shadowQuery,
-  shadowQueryAll,
-  oneEvent,
-  cleanup,
-  checkA11y,
-} from '../../test-utils.js';
+import { fixture, shadowQuery, oneEvent, cleanup, checkA11y } from '../../test-utils.js';
 import type { HelixNumberInput } from './hx-number-input.js';
 import './index.js';
 
