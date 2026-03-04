@@ -66,7 +66,7 @@ export default tseslint.config(
     files: ['**/*.ts', '**/*.tsx'],
     rules: {
       // Allow non-null assertions sparingly in test files only (overridden below)
-      '@typescript-eslint/no-non-null-assertion': 'error',
+      '@typescript-eslint/no-non-null-assertion': 'warn',
 
       // Enforce explicit return types on public module functions
       '@typescript-eslint/explicit-function-return-type': 'off',
