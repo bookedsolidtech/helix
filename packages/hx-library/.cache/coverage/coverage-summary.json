@@ -1,7 +1,7 @@
 {
   "total": {
-    "lines": { "total": 2163, "covered": 0, "skipped": 0, "pct": 0 },
-    "statements": { "total": 2163, "covered": 0, "skipped": 0, "pct": 0 },
+    "lines": { "total": 2162, "covered": 0, "skipped": 0, "pct": 0 },
+    "statements": { "total": 2162, "covered": 0, "skipped": 0, "pct": 0 },
     "functions": { "total": 18, "covered": 0, "skipped": 0, "pct": 0 },
     "branches": { "total": 18, "covered": 0, "skipped": 0, "pct": 0 },
     "branchesTrue": { "total": 0, "covered": 0, "skipped": 0, "pct": 100 }
@@ -109,9 +109,9 @@
     "branches": { "total": 1, "covered": 0, "skipped": 0, "pct": 0 }
   },
   "/Volumes/Development/booked/helix/.worktrees/feature-t1-22-hx-tooltip-contextual-help-text/packages/hx-library/src/components/hx-tooltip/hx-tooltip.ts": {
-    "lines": { "total": 134, "covered": 0, "skipped": 0, "pct": 0 },
+    "lines": { "total": 133, "covered": 0, "skipped": 0, "pct": 0 },
     "functions": { "total": 1, "covered": 0, "skipped": 0, "pct": 0 },
-    "statements": { "total": 134, "covered": 0, "skipped": 0, "pct": 0 },
+    "statements": { "total": 133, "covered": 0, "skipped": 0, "pct": 0 },
     "branches": { "total": 1, "covered": 0, "skipped": 0, "pct": 0 }
   }
 }
