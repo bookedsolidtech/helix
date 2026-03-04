@@ -118,3 +118,19 @@ Input: {
   "command": "npm audit fix 2>&1 | grep \"^changed\\|^added\\|^removed\\|^updated\\|fixed\" | head -10",
   "timeout": 120000
 }
+
+🔧 Tool: Bash
+Input: {
+  "command": "npm audit 2>&1 | tail -10",
+  "timeout": 60000
+}
+
+🔧 Tool: Bash
+Input: {
+  "command": "git log --oneline --all | head -10 && echo \"---\" && ls -la /Volumes/Development/booked/helix/.worktrees/feature-phase-2-component-build-helixtailwind/.cache/dependency-audit/ 2>/dev/null"
+}
+
+🔧 Tool: Bash
+Input: {
+  "command": "python3 -c \"import time; t=1772657857246/1000; print(time.strftime('%Y-%m-%d %H:%M:%S', time.gmtime(t)))\""
+}
