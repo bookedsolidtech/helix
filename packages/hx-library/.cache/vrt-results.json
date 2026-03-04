@@ -1,7 +1,7 @@
 {
   "config": {
-    "configFile": "/Volumes/Development/booked/helix/.worktrees/feature-t1-07-hx-number-input-numeric-input/playwright.config.ts",
-    "rootDir": "/Volumes/Development/booked/helix/.worktrees/feature-t1-07-hx-number-input-numeric-input/packages/hx-library/e2e",
+    "configFile": "/Volumes/Development/booked/helix/.worktrees/feature-t1-01-hx-button-primary-action-button/playwright.config.ts",
+    "rootDir": "/Volumes/Development/booked/helix/.worktrees/feature-t1-01-hx-button-primary-action-button/packages/hx-library/e2e",
     "forbidOnly": false,
     "fullyParallel": true,
     "globalSetup": null,
@@ -10,49 +10,41 @@
     "grep": {},
     "grepInvert": null,
     "maxFailures": 0,
-    "metadata": {
-      "actualWorkers": 5
-    },
+    "metadata": {},
     "preserveOutput": "always",
     "projects": [
       {
-        "outputDir": "/Volumes/Development/booked/helix/.worktrees/feature-t1-07-hx-number-input-numeric-input/packages/hx-library/.cache/vrt-results",
+        "outputDir": "/Volumes/Development/booked/helix/.worktrees/feature-t1-01-hx-button-primary-action-button/packages/hx-library/.cache/vrt-results",
         "repeatEach": 1,
         "retries": 0,
-        "metadata": {
-          "actualWorkers": 5
-        },
+        "metadata": {},
         "id": "chromium",
         "name": "chromium",
-        "testDir": "/Volumes/Development/booked/helix/.worktrees/feature-t1-07-hx-number-input-numeric-input/packages/hx-library/e2e",
+        "testDir": "/Volumes/Development/booked/helix/.worktrees/feature-t1-01-hx-button-primary-action-button/packages/hx-library/e2e",
         "testIgnore": [],
         "testMatch": ["**/*.@(spec|test).?(c|m)[jt]s?(x)"],
         "timeout": 30000
       },
       {
-        "outputDir": "/Volumes/Development/booked/helix/.worktrees/feature-t1-07-hx-number-input-numeric-input/packages/hx-library/.cache/vrt-results",
+        "outputDir": "/Volumes/Development/booked/helix/.worktrees/feature-t1-01-hx-button-primary-action-button/packages/hx-library/.cache/vrt-results",
         "repeatEach": 1,
         "retries": 0,
-        "metadata": {
-          "actualWorkers": 5
-        },
+        "metadata": {},
         "id": "firefox",
         "name": "firefox",
-        "testDir": "/Volumes/Development/booked/helix/.worktrees/feature-t1-07-hx-number-input-numeric-input/packages/hx-library/e2e",
+        "testDir": "/Volumes/Development/booked/helix/.worktrees/feature-t1-01-hx-button-primary-action-button/packages/hx-library/e2e",
         "testIgnore": [],
         "testMatch": ["**/*.@(spec|test).?(c|m)[jt]s?(x)"],
         "timeout": 30000
       },
       {
-        "outputDir": "/Volumes/Development/booked/helix/.worktrees/feature-t1-07-hx-number-input-numeric-input/packages/hx-library/.cache/vrt-results",
+        "outputDir": "/Volumes/Development/booked/helix/.worktrees/feature-t1-01-hx-button-primary-action-button/packages/hx-library/.cache/vrt-results",
         "repeatEach": 1,
         "retries": 0,
-        "metadata": {
-          "actualWorkers": 5
-        },
+        "metadata": {},
         "id": "webkit",
         "name": "webkit",
-        "testDir": "/Volumes/Development/booked/helix/.worktrees/feature-t1-07-hx-number-input-numeric-input/packages/hx-library/e2e",
+        "testDir": "/Volumes/Development/booked/helix/.worktrees/feature-t1-01-hx-button-primary-action-button/packages/hx-library/e2e",
         "testIgnore": [],
         "testMatch": ["**/*.@(spec|test).?(c|m)[jt]s?(x)"],
         "timeout": 30000
@@ -81,494 +73,19 @@
     "workers": 5,
     "webServer": null
   },
-  "suites": [
+  "suites": [],
+  "errors": [
     {
-      "title": "hx-number-input-verify.spec.ts",
-      "file": "hx-number-input-verify.spec.ts",
-      "column": 0,
-      "line": 0,
-      "specs": [],
-      "suites": [
-        {
-          "title": "hx-number-input verification",
-          "file": "hx-number-input-verify.spec.ts",
-          "line": 17,
-          "column": 6,
-          "specs": [
-            {
-              "title": "renders with shadow DOM and label",
-              "ok": false,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "chromium",
-                  "projectName": "chromium",
-                  "results": [
-                    {
-                      "workerIndex": 0,
-                      "parallelIndex": 0,
-                      "status": "timedOut",
-                      "duration": 30050,
-                      "error": {
-                        "message": "\u001b[31mTest timeout of 30000ms exceeded while running \"beforeEach\" hook.\u001b[39m",
-                        "stack": "\u001b[31mTest timeout of 30000ms exceeded while running \"beforeEach\" hook.\u001b[39m\n    at /Volumes/Development/booked/helix/.worktrees/feature-t1-07-hx-number-input-numeric-input/packages/hx-library/e2e/hx-number-input-verify.spec.ts:18:8",
-                        "location": {
-                          "file": "/Volumes/Development/booked/helix/.worktrees/feature-t1-07-hx-number-input-numeric-input/packages/hx-library/e2e/hx-number-input-verify.spec.ts",
-                          "column": 8,
-                          "line": 18
-                        },
-                        "snippet": "  16 |\n  17 | test.describe('hx-number-input verification', () => {\n> 18 |   test.beforeEach(async ({ page }) => {\n     |        ^\n  19 |     await page.setContent(`\n  20 |       <!DOCTYPE html>\n  21 |       <html><body>"
-                      },
-                      "errors": [
-                        {
-                          "location": {
-                            "file": "/Volumes/Development/booked/helix/.worktrees/feature-t1-07-hx-number-input-numeric-input/packages/hx-library/e2e/hx-number-input-verify.spec.ts",
-                            "column": 8,
-                            "line": 18
-                          },
-                          "message": "\u001b[31mTest timeout of 30000ms exceeded while running \"beforeEach\" hook.\u001b[39m\n\n  16 |\n  17 | test.describe('hx-number-input verification', () => {\n> 18 |   test.beforeEach(async ({ page }) => {\n     |        ^\n  19 |     await page.setContent(`\n  20 |       <!DOCTYPE html>\n  21 |       <html><body>\n    at /Volumes/Development/booked/helix/.worktrees/feature-t1-07-hx-number-input-numeric-input/packages/hx-library/e2e/hx-number-input-verify.spec.ts:18:8"
-                        },
-                        {
-                          "location": {
-                            "file": "/Volumes/Development/booked/helix/.worktrees/feature-t1-07-hx-number-input-numeric-input/packages/hx-library/e2e/hx-number-input-verify.spec.ts",
-                            "column": 16,
-                            "line": 35
-                          },
-                          "message": "Error: page.waitForFunction: Test timeout of 30000ms exceeded.\n\n  33 |     // Inject the built component module directly (avoids file:// CORS restriction)\n  34 |     await page.addScriptTag({ path: distPath, type: 'module' });\n> 35 |     await page.waitForFunction(() => customElements.get('hx-number-input') !== undefined);\n     |                ^\n  36 |   });\n  37 |\n  38 |   test('renders with shadow DOM and label', async ({ page }) => {\n    at /Volumes/Development/booked/helix/.worktrees/feature-t1-07-hx-number-input-numeric-input/packages/hx-library/e2e/hx-number-input-verify.spec.ts:35:16"
-                        }
-                      ],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-03-03T21:28:31.783Z",
-                      "annotations": [],
-                      "attachments": [],
-                      "errorLocation": {
-                        "file": "/Volumes/Development/booked/helix/.worktrees/feature-t1-07-hx-number-input-numeric-input/packages/hx-library/e2e/hx-number-input-verify.spec.ts",
-                        "column": 8,
-                        "line": 18
-                      }
-                    }
-                  ],
-                  "status": "unexpected"
-                }
-              ],
-              "id": "dbeb02de2136e049a3d6-60b6e70e73cede650cee",
-              "file": "hx-number-input-verify.spec.ts",
-              "line": 38,
-              "column": 3
-            },
-            {
-              "title": "initial value is 10",
-              "ok": false,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "chromium",
-                  "projectName": "chromium",
-                  "results": [
-                    {
-                      "workerIndex": 1,
-                      "parallelIndex": 1,
-                      "status": "timedOut",
-                      "duration": 30043,
-                      "error": {
-                        "message": "\u001b[31mTest timeout of 30000ms exceeded while running \"beforeEach\" hook.\u001b[39m",
-                        "stack": "\u001b[31mTest timeout of 30000ms exceeded while running \"beforeEach\" hook.\u001b[39m\n    at /Volumes/Development/booked/helix/.worktrees/feature-t1-07-hx-number-input-numeric-input/packages/hx-library/e2e/hx-number-input-verify.spec.ts:18:8",
-                        "location": {
-                          "file": "/Volumes/Development/booked/helix/.worktrees/feature-t1-07-hx-number-input-numeric-input/packages/hx-library/e2e/hx-number-input-verify.spec.ts",
-                          "column": 8,
-                          "line": 18
-                        },
-                        "snippet": "  16 |\n  17 | test.describe('hx-number-input verification', () => {\n> 18 |   test.beforeEach(async ({ page }) => {\n     |        ^\n  19 |     await page.setContent(`\n  20 |       <!DOCTYPE html>\n  21 |       <html><body>"
-                      },
-                      "errors": [
-                        {
-                          "location": {
-                            "file": "/Volumes/Development/booked/helix/.worktrees/feature-t1-07-hx-number-input-numeric-input/packages/hx-library/e2e/hx-number-input-verify.spec.ts",
-                            "column": 8,
-                            "line": 18
-                          },
-                          "message": "\u001b[31mTest timeout of 30000ms exceeded while running \"beforeEach\" hook.\u001b[39m\n\n  16 |\n  17 | test.describe('hx-number-input verification', () => {\n> 18 |   test.beforeEach(async ({ page }) => {\n     |        ^\n  19 |     await page.setContent(`\n  20 |       <!DOCTYPE html>\n  21 |       <html><body>\n    at /Volumes/Development/booked/helix/.worktrees/feature-t1-07-hx-number-input-numeric-input/packages/hx-library/e2e/hx-number-input-verify.spec.ts:18:8"
-                        },
-                        {
-                          "location": {
-                            "file": "/Volumes/Development/booked/helix/.worktrees/feature-t1-07-hx-number-input-numeric-input/packages/hx-library/e2e/hx-number-input-verify.spec.ts",
-                            "column": 16,
-                            "line": 35
-                          },
-                          "message": "Error: page.waitForFunction: Test timeout of 30000ms exceeded.\n\n  33 |     // Inject the built component module directly (avoids file:// CORS restriction)\n  34 |     await page.addScriptTag({ path: distPath, type: 'module' });\n> 35 |     await page.waitForFunction(() => customElements.get('hx-number-input') !== undefined);\n     |                ^\n  36 |   });\n  37 |\n  38 |   test('renders with shadow DOM and label', async ({ page }) => {\n    at /Volumes/Development/booked/helix/.worktrees/feature-t1-07-hx-number-input-numeric-input/packages/hx-library/e2e/hx-number-input-verify.spec.ts:35:16"
-                        }
-                      ],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-03-03T21:28:31.778Z",
-                      "annotations": [],
-                      "attachments": [],
-                      "errorLocation": {
-                        "file": "/Volumes/Development/booked/helix/.worktrees/feature-t1-07-hx-number-input-numeric-input/packages/hx-library/e2e/hx-number-input-verify.spec.ts",
-                        "column": 8,
-                        "line": 18
-                      }
-                    }
-                  ],
-                  "status": "unexpected"
-                }
-              ],
-              "id": "dbeb02de2136e049a3d6-dd1a25da19041b2308fb",
-              "file": "hx-number-input-verify.spec.ts",
-              "line": 46,
-              "column": 3
-            },
-            {
-              "title": "increment button increases value by step (0.5)",
-              "ok": false,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "chromium",
-                  "projectName": "chromium",
-                  "results": [
-                    {
-                      "workerIndex": 2,
-                      "parallelIndex": 2,
-                      "status": "timedOut",
-                      "duration": 30039,
-                      "error": {
-                        "message": "\u001b[31mTest timeout of 30000ms exceeded while running \"beforeEach\" hook.\u001b[39m",
-                        "stack": "\u001b[31mTest timeout of 30000ms exceeded while running \"beforeEach\" hook.\u001b[39m\n    at /Volumes/Development/booked/helix/.worktrees/feature-t1-07-hx-number-input-numeric-input/packages/hx-library/e2e/hx-number-input-verify.spec.ts:18:8",
-                        "location": {
-                          "file": "/Volumes/Development/booked/helix/.worktrees/feature-t1-07-hx-number-input-numeric-input/packages/hx-library/e2e/hx-number-input-verify.spec.ts",
-                          "column": 8,
-                          "line": 18
-                        },
-                        "snippet": "  16 |\n  17 | test.describe('hx-number-input verification', () => {\n> 18 |   test.beforeEach(async ({ page }) => {\n     |        ^\n  19 |     await page.setContent(`\n  20 |       <!DOCTYPE html>\n  21 |       <html><body>"
-                      },
-                      "errors": [
-                        {
-                          "location": {
-                            "file": "/Volumes/Development/booked/helix/.worktrees/feature-t1-07-hx-number-input-numeric-input/packages/hx-library/e2e/hx-number-input-verify.spec.ts",
-                            "column": 8,
-                            "line": 18
-                          },
-                          "message": "\u001b[31mTest timeout of 30000ms exceeded while running \"beforeEach\" hook.\u001b[39m\n\n  16 |\n  17 | test.describe('hx-number-input verification', () => {\n> 18 |   test.beforeEach(async ({ page }) => {\n     |        ^\n  19 |     await page.setContent(`\n  20 |       <!DOCTYPE html>\n  21 |       <html><body>\n    at /Volumes/Development/booked/helix/.worktrees/feature-t1-07-hx-number-input-numeric-input/packages/hx-library/e2e/hx-number-input-verify.spec.ts:18:8"
-                        },
-                        {
-                          "location": {
-                            "file": "/Volumes/Development/booked/helix/.worktrees/feature-t1-07-hx-number-input-numeric-input/packages/hx-library/e2e/hx-number-input-verify.spec.ts",
-                            "column": 16,
-                            "line": 35
-                          },
-                          "message": "Error: page.waitForFunction: Test timeout of 30000ms exceeded.\n\n  33 |     // Inject the built component module directly (avoids file:// CORS restriction)\n  34 |     await page.addScriptTag({ path: distPath, type: 'module' });\n> 35 |     await page.waitForFunction(() => customElements.get('hx-number-input') !== undefined);\n     |                ^\n  36 |   });\n  37 |\n  38 |   test('renders with shadow DOM and label', async ({ page }) => {\n    at /Volumes/Development/booked/helix/.worktrees/feature-t1-07-hx-number-input-numeric-input/packages/hx-library/e2e/hx-number-input-verify.spec.ts:35:16"
-                        }
-                      ],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-03-03T21:28:31.784Z",
-                      "annotations": [],
-                      "attachments": [],
-                      "errorLocation": {
-                        "file": "/Volumes/Development/booked/helix/.worktrees/feature-t1-07-hx-number-input-numeric-input/packages/hx-library/e2e/hx-number-input-verify.spec.ts",
-                        "column": 8,
-                        "line": 18
-                      }
-                    }
-                  ],
-                  "status": "unexpected"
-                }
-              ],
-              "id": "dbeb02de2136e049a3d6-d0d6392969d03b2a3857",
-              "file": "hx-number-input-verify.spec.ts",
-              "line": 54,
-              "column": 3
-            },
-            {
-              "title": "decrement button decreases value by step (0.5)",
-              "ok": false,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "chromium",
-                  "projectName": "chromium",
-                  "results": [
-                    {
-                      "workerIndex": 3,
-                      "parallelIndex": 3,
-                      "status": "timedOut",
-                      "duration": 30024,
-                      "error": {
-                        "message": "\u001b[31mTest timeout of 30000ms exceeded while running \"beforeEach\" hook.\u001b[39m",
-                        "stack": "\u001b[31mTest timeout of 30000ms exceeded while running \"beforeEach\" hook.\u001b[39m\n    at /Volumes/Development/booked/helix/.worktrees/feature-t1-07-hx-number-input-numeric-input/packages/hx-library/e2e/hx-number-input-verify.spec.ts:18:8",
-                        "location": {
-                          "file": "/Volumes/Development/booked/helix/.worktrees/feature-t1-07-hx-number-input-numeric-input/packages/hx-library/e2e/hx-number-input-verify.spec.ts",
-                          "column": 8,
-                          "line": 18
-                        },
-                        "snippet": "  16 |\n  17 | test.describe('hx-number-input verification', () => {\n> 18 |   test.beforeEach(async ({ page }) => {\n     |        ^\n  19 |     await page.setContent(`\n  20 |       <!DOCTYPE html>\n  21 |       <html><body>"
-                      },
-                      "errors": [
-                        {
-                          "location": {
-                            "file": "/Volumes/Development/booked/helix/.worktrees/feature-t1-07-hx-number-input-numeric-input/packages/hx-library/e2e/hx-number-input-verify.spec.ts",
-                            "column": 8,
-                            "line": 18
-                          },
-                          "message": "\u001b[31mTest timeout of 30000ms exceeded while running \"beforeEach\" hook.\u001b[39m\n\n  16 |\n  17 | test.describe('hx-number-input verification', () => {\n> 18 |   test.beforeEach(async ({ page }) => {\n     |        ^\n  19 |     await page.setContent(`\n  20 |       <!DOCTYPE html>\n  21 |       <html><body>\n    at /Volumes/Development/booked/helix/.worktrees/feature-t1-07-hx-number-input-numeric-input/packages/hx-library/e2e/hx-number-input-verify.spec.ts:18:8"
-                        },
-                        {
-                          "location": {
-                            "file": "/Volumes/Development/booked/helix/.worktrees/feature-t1-07-hx-number-input-numeric-input/packages/hx-library/e2e/hx-number-input-verify.spec.ts",
-                            "column": 16,
-                            "line": 35
-                          },
-                          "message": "Error: page.waitForFunction: Test timeout of 30000ms exceeded.\n\n  33 |     // Inject the built component module directly (avoids file:// CORS restriction)\n  34 |     await page.addScriptTag({ path: distPath, type: 'module' });\n> 35 |     await page.waitForFunction(() => customElements.get('hx-number-input') !== undefined);\n     |                ^\n  36 |   });\n  37 |\n  38 |   test('renders with shadow DOM and label', async ({ page }) => {\n    at /Volumes/Development/booked/helix/.worktrees/feature-t1-07-hx-number-input-numeric-input/packages/hx-library/e2e/hx-number-input-verify.spec.ts:35:16"
-                        }
-                      ],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-03-03T21:28:31.771Z",
-                      "annotations": [],
-                      "attachments": [],
-                      "errorLocation": {
-                        "file": "/Volumes/Development/booked/helix/.worktrees/feature-t1-07-hx-number-input-numeric-input/packages/hx-library/e2e/hx-number-input-verify.spec.ts",
-                        "column": 8,
-                        "line": 18
-                      }
-                    }
-                  ],
-                  "status": "unexpected"
-                }
-              ],
-              "id": "dbeb02de2136e049a3d6-7915e13033d38bc8c8e3",
-              "file": "hx-number-input-verify.spec.ts",
-              "line": 68,
-              "column": 3
-            },
-            {
-              "title": "stepper hidden with no-stepper attribute",
-              "ok": false,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "chromium",
-                  "projectName": "chromium",
-                  "results": [
-                    {
-                      "workerIndex": 4,
-                      "parallelIndex": 4,
-                      "status": "timedOut",
-                      "duration": 30044,
-                      "error": {
-                        "message": "\u001b[31mTest timeout of 30000ms exceeded while running \"beforeEach\" hook.\u001b[39m",
-                        "stack": "\u001b[31mTest timeout of 30000ms exceeded while running \"beforeEach\" hook.\u001b[39m\n    at /Volumes/Development/booked/helix/.worktrees/feature-t1-07-hx-number-input-numeric-input/packages/hx-library/e2e/hx-number-input-verify.spec.ts:18:8",
-                        "location": {
-                          "file": "/Volumes/Development/booked/helix/.worktrees/feature-t1-07-hx-number-input-numeric-input/packages/hx-library/e2e/hx-number-input-verify.spec.ts",
-                          "column": 8,
-                          "line": 18
-                        },
-                        "snippet": "  16 |\n  17 | test.describe('hx-number-input verification', () => {\n> 18 |   test.beforeEach(async ({ page }) => {\n     |        ^\n  19 |     await page.setContent(`\n  20 |       <!DOCTYPE html>\n  21 |       <html><body>"
-                      },
-                      "errors": [
-                        {
-                          "location": {
-                            "file": "/Volumes/Development/booked/helix/.worktrees/feature-t1-07-hx-number-input-numeric-input/packages/hx-library/e2e/hx-number-input-verify.spec.ts",
-                            "column": 8,
-                            "line": 18
-                          },
-                          "message": "\u001b[31mTest timeout of 30000ms exceeded while running \"beforeEach\" hook.\u001b[39m\n\n  16 |\n  17 | test.describe('hx-number-input verification', () => {\n> 18 |   test.beforeEach(async ({ page }) => {\n     |        ^\n  19 |     await page.setContent(`\n  20 |       <!DOCTYPE html>\n  21 |       <html><body>\n    at /Volumes/Development/booked/helix/.worktrees/feature-t1-07-hx-number-input-numeric-input/packages/hx-library/e2e/hx-number-input-verify.spec.ts:18:8"
-                        },
-                        {
-                          "location": {
-                            "file": "/Volumes/Development/booked/helix/.worktrees/feature-t1-07-hx-number-input-numeric-input/packages/hx-library/e2e/hx-number-input-verify.spec.ts",
-                            "column": 16,
-                            "line": 35
-                          },
-                          "message": "Error: page.waitForFunction: Test timeout of 30000ms exceeded.\n\n  33 |     // Inject the built component module directly (avoids file:// CORS restriction)\n  34 |     await page.addScriptTag({ path: distPath, type: 'module' });\n> 35 |     await page.waitForFunction(() => customElements.get('hx-number-input') !== undefined);\n     |                ^\n  36 |   });\n  37 |\n  38 |   test('renders with shadow DOM and label', async ({ page }) => {\n    at /Volumes/Development/booked/helix/.worktrees/feature-t1-07-hx-number-input-numeric-input/packages/hx-library/e2e/hx-number-input-verify.spec.ts:35:16"
-                        }
-                      ],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-03-03T21:28:31.758Z",
-                      "annotations": [],
-                      "attachments": [],
-                      "errorLocation": {
-                        "file": "/Volumes/Development/booked/helix/.worktrees/feature-t1-07-hx-number-input-numeric-input/packages/hx-library/e2e/hx-number-input-verify.spec.ts",
-                        "column": 8,
-                        "line": 18
-                      }
-                    }
-                  ],
-                  "status": "unexpected"
-                }
-              ],
-              "id": "dbeb02de2136e049a3d6-f915cb5a8f1c7f018ce3",
-              "file": "hx-number-input-verify.spec.ts",
-              "line": 82,
-              "column": 3
-            },
-            {
-              "title": "error message rendered when error attribute set",
-              "ok": false,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "chromium",
-                  "projectName": "chromium",
-                  "results": [
-                    {
-                      "workerIndex": 5,
-                      "parallelIndex": 1,
-                      "status": "timedOut",
-                      "duration": 30029,
-                      "error": {
-                        "message": "\u001b[31mTest timeout of 30000ms exceeded while running \"beforeEach\" hook.\u001b[39m",
-                        "stack": "\u001b[31mTest timeout of 30000ms exceeded while running \"beforeEach\" hook.\u001b[39m\n    at /Volumes/Development/booked/helix/.worktrees/feature-t1-07-hx-number-input-numeric-input/packages/hx-library/e2e/hx-number-input-verify.spec.ts:18:8",
-                        "location": {
-                          "file": "/Volumes/Development/booked/helix/.worktrees/feature-t1-07-hx-number-input-numeric-input/packages/hx-library/e2e/hx-number-input-verify.spec.ts",
-                          "column": 8,
-                          "line": 18
-                        },
-                        "snippet": "  16 |\n  17 | test.describe('hx-number-input verification', () => {\n> 18 |   test.beforeEach(async ({ page }) => {\n     |        ^\n  19 |     await page.setContent(`\n  20 |       <!DOCTYPE html>\n  21 |       <html><body>"
-                      },
-                      "errors": [
-                        {
-                          "location": {
-                            "file": "/Volumes/Development/booked/helix/.worktrees/feature-t1-07-hx-number-input-numeric-input/packages/hx-library/e2e/hx-number-input-verify.spec.ts",
-                            "column": 8,
-                            "line": 18
-                          },
-                          "message": "\u001b[31mTest timeout of 30000ms exceeded while running \"beforeEach\" hook.\u001b[39m\n\n  16 |\n  17 | test.describe('hx-number-input verification', () => {\n> 18 |   test.beforeEach(async ({ page }) => {\n     |        ^\n  19 |     await page.setContent(`\n  20 |       <!DOCTYPE html>\n  21 |       <html><body>\n    at /Volumes/Development/booked/helix/.worktrees/feature-t1-07-hx-number-input-numeric-input/packages/hx-library/e2e/hx-number-input-verify.spec.ts:18:8"
-                        },
-                        {
-                          "location": {
-                            "file": "/Volumes/Development/booked/helix/.worktrees/feature-t1-07-hx-number-input-numeric-input/packages/hx-library/e2e/hx-number-input-verify.spec.ts",
-                            "column": 16,
-                            "line": 35
-                          },
-                          "message": "Error: page.waitForFunction: Test timeout of 30000ms exceeded.\n\n  33 |     // Inject the built component module directly (avoids file:// CORS restriction)\n  34 |     await page.addScriptTag({ path: distPath, type: 'module' });\n> 35 |     await page.waitForFunction(() => customElements.get('hx-number-input') !== undefined);\n     |                ^\n  36 |   });\n  37 |\n  38 |   test('renders with shadow DOM and label', async ({ page }) => {\n    at /Volumes/Development/booked/helix/.worktrees/feature-t1-07-hx-number-input-numeric-input/packages/hx-library/e2e/hx-number-input-verify.spec.ts:35:16"
-                        }
-                      ],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-03-03T21:29:02.628Z",
-                      "annotations": [],
-                      "attachments": [],
-                      "errorLocation": {
-                        "file": "/Volumes/Development/booked/helix/.worktrees/feature-t1-07-hx-number-input-numeric-input/packages/hx-library/e2e/hx-number-input-verify.spec.ts",
-                        "column": 8,
-                        "line": 18
-                      }
-                    }
-                  ],
-                  "status": "unexpected"
-                }
-              ],
-              "id": "dbeb02de2136e049a3d6-4c4fff07e60caa20bb82",
-              "file": "hx-number-input-verify.spec.ts",
-              "line": 101,
-              "column": 3
-            },
-            {
-              "title": "all CSS parts present",
-              "ok": false,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "chromium",
-                  "projectName": "chromium",
-                  "results": [
-                    {
-                      "workerIndex": 6,
-                      "parallelIndex": 2,
-                      "status": "timedOut",
-                      "duration": 30030,
-                      "error": {
-                        "message": "\u001b[31mTest timeout of 30000ms exceeded while running \"beforeEach\" hook.\u001b[39m",
-                        "stack": "\u001b[31mTest timeout of 30000ms exceeded while running \"beforeEach\" hook.\u001b[39m\n    at /Volumes/Development/booked/helix/.worktrees/feature-t1-07-hx-number-input-numeric-input/packages/hx-library/e2e/hx-number-input-verify.spec.ts:18:8",
-                        "location": {
-                          "file": "/Volumes/Development/booked/helix/.worktrees/feature-t1-07-hx-number-input-numeric-input/packages/hx-library/e2e/hx-number-input-verify.spec.ts",
-                          "column": 8,
-                          "line": 18
-                        },
-                        "snippet": "  16 |\n  17 | test.describe('hx-number-input verification', () => {\n> 18 |   test.beforeEach(async ({ page }) => {\n     |        ^\n  19 |     await page.setContent(`\n  20 |       <!DOCTYPE html>\n  21 |       <html><body>"
-                      },
-                      "errors": [
-                        {
-                          "location": {
-                            "file": "/Volumes/Development/booked/helix/.worktrees/feature-t1-07-hx-number-input-numeric-input/packages/hx-library/e2e/hx-number-input-verify.spec.ts",
-                            "column": 8,
-                            "line": 18
-                          },
-                          "message": "\u001b[31mTest timeout of 30000ms exceeded while running \"beforeEach\" hook.\u001b[39m\n\n  16 |\n  17 | test.describe('hx-number-input verification', () => {\n> 18 |   test.beforeEach(async ({ page }) => {\n     |        ^\n  19 |     await page.setContent(`\n  20 |       <!DOCTYPE html>\n  21 |       <html><body>\n    at /Volumes/Development/booked/helix/.worktrees/feature-t1-07-hx-number-input-numeric-input/packages/hx-library/e2e/hx-number-input-verify.spec.ts:18:8"
-                        },
-                        {
-                          "location": {
-                            "file": "/Volumes/Development/booked/helix/.worktrees/feature-t1-07-hx-number-input-numeric-input/packages/hx-library/e2e/hx-number-input-verify.spec.ts",
-                            "column": 16,
-                            "line": 35
-                          },
-                          "message": "Error: page.waitForFunction: Test timeout of 30000ms exceeded.\n\n  33 |     // Inject the built component module directly (avoids file:// CORS restriction)\n  34 |     await page.addScriptTag({ path: distPath, type: 'module' });\n> 35 |     await page.waitForFunction(() => customElements.get('hx-number-input') !== undefined);\n     |                ^\n  36 |   });\n  37 |\n  38 |   test('renders with shadow DOM and label', async ({ page }) => {\n    at /Volumes/Development/booked/helix/.worktrees/feature-t1-07-hx-number-input-numeric-input/packages/hx-library/e2e/hx-number-input-verify.spec.ts:35:16"
-                        }
-                      ],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-03-03T21:29:02.628Z",
-                      "annotations": [],
-                      "attachments": [],
-                      "errorLocation": {
-                        "file": "/Volumes/Development/booked/helix/.worktrees/feature-t1-07-hx-number-input-numeric-input/packages/hx-library/e2e/hx-number-input-verify.spec.ts",
-                        "column": 8,
-                        "line": 18
-                      }
-                    }
-                  ],
-                  "status": "unexpected"
-                }
-              ],
-              "id": "dbeb02de2136e049a3d6-c3423b6b6e2d17f6eac2",
-              "file": "hx-number-input-verify.spec.ts",
-              "line": 114,
-              "column": 3
-            }
-          ]
-        }
-      ]
+      "message": "Error: No tests found.\nMake sure that arguments are regular expressions matching test files.\nYou may need to escape symbols like \"$\" or \"*\" and quote the arguments.",
+      "stack": "Error: No tests found.\nMake sure that arguments are regular expressions matching test files.\nYou may need to escape symbols like \"$\" or \"*\" and quote the arguments."
     }
   ],
-  "errors": [],
   "stats": {
-    "startTime": "2026-03-03T21:28:31.225Z",
-    "duration": 61753.46,
+    "startTime": "2026-03-03T20:48:25.972Z",
+    "duration": 3.940999999999974,
     "expected": 0,
     "skipped": 0,
-    "unexpected": 7,
+    "unexpected": 0,
     "flaky": 0
   }
 }
