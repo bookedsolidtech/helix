@@ -30,6 +30,30 @@ export const helixAlertStyles = css`
     line-height: var(--hx-line-height-normal, 1.5);
   }
 
+  /* ─── Dismiss Animation ─── */
+
+  @keyframes hx-alert-dismiss {
+    from {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    to {
+      opacity: 0;
+      transform: translateY(-4px);
+    }
+  }
+
+  .alert--dismissing {
+    animation: hx-alert-dismiss var(--hx-transition-fast, 150ms) ease forwards;
+    pointer-events: none;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .alert--dismissing {
+      animation: none;
+    }
+  }
+
   /* ─── Icon ─── */
 
   .alert__icon {

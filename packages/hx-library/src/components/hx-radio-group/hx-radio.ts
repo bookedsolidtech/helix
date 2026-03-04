@@ -5,7 +5,7 @@ import { tokenStyles } from '@helix/tokens/lit';
 import { helixRadioStyles } from './hx-radio.styles.js';
 
 /**
- * An individual radio button, designed to be used inside a `<wc-radio-group>`.
+ * An individual radio button, designed to be used inside a `<hx-radio-group>`.
  *
  * @summary Presentational radio button managed by its parent radio group.
  *
@@ -76,7 +76,7 @@ export class HelixRadio extends LitElement {
 
   // ─── Internal IDs ───
 
-  private _inputId = `wc-radio-${Math.random().toString(36).slice(2, 9)}`;
+  private _inputId = `hx-radio-${Math.random().toString(36).slice(2, 9)}`;
 
   // ─── Event Handling ───
 
