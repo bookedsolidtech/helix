@@ -10,3 +10,5 @@ package-lock.json
 # MCP server test fixtures (intentionally malformed)
 apps/mcp-servers/**/__fixtures__/*-malformed.json
 apps/mcp-servers/**/__fixtures__/*-invalid.json
+# protoLabs Studio local state
+.automaker/

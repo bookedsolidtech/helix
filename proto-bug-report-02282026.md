@@ -71,7 +71,7 @@ resume path is entered.
 
 Any feature that has previously run (i.e., has `agent-output.md` in
 `.automaker/features/{featureId}/`) will hit this loop on every subsequent auto-mode
-pick-up. This means the problem gets *worse* the more features have run.
+pick-up. This means the problem gets _worse_ the more features have run.
 
 ---
 
@@ -173,6 +173,7 @@ const result = await simpleQuery({
 
 Change `cwd` in both `simpleQuery` calls in `PlanProcessor` to a neutral directory that
 does not contain any project-specific `CLAUDE.md`. Options:
+
 - Use the protoMaker server's own directory (`__dirname` or similar)
 - Use `os.tmpdir()`
 - Pass a flag to `simpleQuery` to skip CLAUDE.md inheritance for planning queries
@@ -181,11 +182,11 @@ does not contain any project-specific `CLAUDE.md`. Options:
 
 ## Summary Table
 
-| Bug | File | Line | Severity | Status |
-|-----|------|------|----------|--------|
+| Bug                               | File                                            | Line          | Severity | Status                    |
+| --------------------------------- | ----------------------------------------------- | ------------- | -------- | ------------------------- |
 | Double ConcurrencyManager acquire | `auto-mode-service.ts` + `execution-service.ts` | 1598, 405-406 | Critical | **Not fixed in codebase** |
-| HITL form OOM on reconnect | `hitl-form-service.ts`, `websockets.ts` | 298, 144 | Critical | **Not fixed in codebase** |
-| Planning CLAUDE.md override | `lead-engineer-processors.ts` | 194, 340 | High | **Not fixed in codebase** |
+| HITL form OOM on reconnect        | `hitl-form-service.ts`, `websockets.ts`         | 298, 144      | Critical | **Not fixed in codebase** |
+| Planning CLAUDE.md override       | `lead-engineer-processors.ts`                   | 194, 340      | High     | **Not fixed in codebase** |
 
 ### Workarounds applied (project-level, not permanent)
 
