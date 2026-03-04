@@ -57,6 +57,8 @@ apps/admin/src/data/library-registry.json
 
 # protoLabs Studio runtime state (never track)
 .automaker/knowledge.db
+.automaker/knowledge.db-shm
+.automaker/knowledge.db-wal
 .automaker/knowledge-eval.jsonl
 .automaker/worktrees/
 .automaker/checkpoints/
