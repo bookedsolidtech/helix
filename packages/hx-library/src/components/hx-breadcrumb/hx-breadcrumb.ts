@@ -74,10 +74,7 @@ export class HelixBreadcrumb extends LitElement {
     if (changedProperties.has('separator')) {
       // JSON.stringify wraps the string in quotes so the value is valid
       // for use in the CSS `content` property (e.g. '/' becomes '"/"').
-      this.style.setProperty(
-        '--hx-breadcrumb-separator-content',
-        JSON.stringify(this.separator),
-      );
+      this.style.setProperty('--hx-breadcrumb-separator-content', JSON.stringify(this.separator));
     }
   }
 

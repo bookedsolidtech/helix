@@ -55,9 +55,7 @@ export class HelixBreadcrumbItem extends LitElement {
       ${this.href
         ? html`<a part="link" href=${this.href}><slot></slot></a>`
         : html`<span part="text"><slot></slot></span>`}
-      ${!this.dataBcLast
-        ? html`<span class="separator" aria-hidden="true"></span>`
-        : nothing}
+      ${!this.dataBcLast ? html`<span class="separator" aria-hidden="true"></span>` : nothing}
     `;
   }
 }
