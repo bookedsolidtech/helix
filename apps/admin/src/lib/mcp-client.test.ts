@@ -10,10 +10,7 @@ import {
   clearMcpCache,
 } from './mcp-client';
 import type {
-  McpSession,
   McpComponentHealth,
-  McpHealthDiff,
-  McpAccessibilityProfile,
 } from './mcp-client';
 import { WC_TOOLS_BINARY } from './mcp-constants';
 
