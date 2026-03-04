@@ -1,0 +1,27 @@
+{
+  "category": "Phase 5: Enterprise Features",
+  "description": "**Milestone:** Phase 5: Enterprise Features\n\nComplete theming toolkit for rebranding Helix components. CLI command (helix theme generate) that produces a full token override package from brand colors. Zero-JavaScript theming via data-theme attribute.\n\n**Files to Modify:**\n- packages/cli/src/commands/theme.ts\n\n**Acceptance Criteria:**\n- [ ] helix theme generate CLI command\n- [ ] Brand color input → full token package output\n- [ ] Preview mode to visualize theme before committing\n- [ ] Theme package publishable to npm\n- [ ] Documentation for enterprise white-labeling\n\n**Complexity:** large",
+  "title": "Build white-labeling toolkit and theme CLI",
+  "status": "backlog",
+  "isEpic": false,
+  "epicId": "feature-1772158053433-9llitnj34",
+  "branchName": "feature/phase-5-enterprise-build-white",
+  "isFoundation": true,
+  "id": "feature-1772158053434-4og1tn75o",
+  "descriptionHistory": [
+    {
+      "description": "**Milestone:** Phase 5: Enterprise Features\n\nComplete theming toolkit for rebranding Helix components. CLI command (helix theme generate) that produces a full token override package from brand colors. Zero-JavaScript theming via data-theme attribute.\n\n**Files to Modify:**\n- packages/cli/src/commands/theme.ts\n\n**Acceptance Criteria:**\n- [ ] helix theme generate CLI command\n- [ ] Brand color input → full token package output\n- [ ] Preview mode to visualize theme before committing\n- [ ] Theme package publishable to npm\n- [ ] Documentation for enterprise white-labeling\n\n**Complexity:** large",
+      "timestamp": "2026-02-27T02:07:33.434Z",
+      "source": "initial"
+    }
+  ],
+  "createdAt": "2026-02-27T02:07:33.434Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-02-27T02:07:33.434Z",
+      "reason": "Feature created"
+    }
+  ]
+}

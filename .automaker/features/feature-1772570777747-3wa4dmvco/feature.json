@@ -1,0 +1,64 @@
+{
+  "category": "Uncategorized",
+  "description": "## Component: hx-copy-button (NEW)\n**Tier 2 — Standard Enterprise | Industry Consensus: 3/6 libraries**\n\nCopies specified text to clipboard with visual confirmation feedback.\n\n### ADR-001 Classification: Property-Driven (Atomic)\n\n### API Design\n**Properties:** `value` (text to copy), `label` (accessible label), `feedback-duration` (ms, default 2000), `hx-size`\n**Slots:** Default (button label), `success-icon`, `copy-icon`\n**CSS Parts:** `button`, `icon`\n**Events:** `hx-copy` (composed: true, detail: { value })\n\n### Drupal Integration\n```twig\n{# Copy MRN to clipboard #}\n<hx-copy-button value=\"{{ patient.field_mrn.value }}\" label=\"Copy MRN\">\n  {{ patient.field_mrn.value }}\n</hx-copy-button>\n```\n\n### Healthcare: Copy MRN, prescription IDs, appointment codes, reference numbers\n\n### Acceptance Criteria\n1. Copies value to clipboard via navigator.clipboard API\n2. Visual feedback (icon change + optional text) for configurable duration\n3. Fallback for older browsers (execCommand)\n4. Accessible: announces \"Copied\" to screen readers",
+  "title": "T2-30: hx-copy-button — Clipboard Copy Action",
+  "status": "review",
+  "complexity": "small",
+  "priority": 3,
+  "source": "api",
+  "trustTier": 1,
+  "quarantineStatus": "passed",
+  "quarantineId": "0cb7b8ec-aeaa-475a-aa6a-ff57176be329",
+  "id": "feature-1772570777747-3wa4dmvco",
+  "branchName": "feature/t2-30-hx-copy-button-clipboard-copy",
+  "descriptionHistory": [
+    {
+      "description": "## Component: hx-copy-button (NEW)\n**Tier 2 — Standard Enterprise | Industry Consensus: 3/6 libraries**\n\nCopies specified text to clipboard with visual confirmation feedback.\n\n### ADR-001 Classification: Property-Driven (Atomic)\n\n### API Design\n**Properties:** `value` (text to copy), `label` (accessible label), `feedback-duration` (ms, default 2000), `hx-size`\n**Slots:** Default (button label), `success-icon`, `copy-icon`\n**CSS Parts:** `button`, `icon`\n**Events:** `hx-copy` (composed: true, detail: { value })\n\n### Drupal Integration\n```twig\n{# Copy MRN to clipboard #}\n<hx-copy-button value=\"{{ patient.field_mrn.value }}\" label=\"Copy MRN\">\n  {{ patient.field_mrn.value }}\n</hx-copy-button>\n```\n\n### Healthcare: Copy MRN, prescription IDs, appointment codes, reference numbers\n\n### Acceptance Criteria\n1. Copies value to clipboard via navigator.clipboard API\n2. Visual feedback (icon change + optional text) for configurable duration\n3. Fallback for older browsers (execCommand)\n4. Accessible: announces \"Copied\" to screen readers",
+      "timestamp": "2026-03-03T20:46:17.748Z",
+      "source": "initial"
+    }
+  ],
+  "createdAt": "2026-03-03T20:46:17.748Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-03-03T20:46:17.748Z",
+      "reason": "Feature created"
+    },
+    {
+      "from": "backlog",
+      "to": "in_progress",
+      "timestamp": "2026-03-04T09:23:37.034Z"
+    },
+    {
+      "from": "in_progress",
+      "to": "review",
+      "timestamp": "2026-03-04T09:37:36.878Z"
+    },
+    {
+      "from": "review",
+      "to": "blocked",
+      "timestamp": "2026-03-04T09:44:38.796Z"
+    },
+    {
+      "from": "blocked",
+      "to": "review",
+      "timestamp": "2026-03-04T13:58:45.184Z"
+    }
+  ],
+  "featureType": "code",
+  "updatedAt": "2026-03-04T09:23:38.585Z",
+  "model": "claude-sonnet-4-6",
+  "costUsd": 5.455406000000001,
+  "lastSessionId": "d17ba7e2-bc47-4358-a455-e85594d3bfec",
+  "prUrl": "https://github.com/bookedsolidtech/helix/pull/54",
+  "prNumber": 54,
+  "prCreatedAt": "2026-03-04T09:37:36.876Z",
+  "reviewStartedAt": "2026-03-04T09:37:36.878Z",
+  "prTrackedSince": "2026-03-04T09:37:36.882Z",
+  "prLastPolledAt": "2026-03-04T15:33:17.394Z",
+  "lastReviewFeedback": "coderabbitai: **Actionable comments posted: 9**\n\n<details>\n<summary>🤖 Prompt for all review comments with AI agents</summary>\n\n```\nVerify each finding against the current code and only fix it if needed.\n\nInline comments:\nIn `@packages/hx-library/src/components/hx-copy-button/hx-copy-button.stories.ts`:\n- Around line 28-43: iconSuccess is declared but never used causing a lint\nfailure; either remove the unused constant or wire it into the story that needs\na success icon (e.g., pass iconSuccess into the story's template or props for\nthe hx-copy-button story). Locate the iconSuccess constant in\nhx-copy-button.stories (the SVG variable) and either delete the declaration or\nreference it where other icons are used (match the pattern used by existing icon\nvariables in this file) so the identifier is consumed.\n- Around line 113-123: The story's render function for hx-copy-button is\ninjecting iconCopy unslotted so it appears in the default slot as well as the\nnamed copy-icon slot; update the render template in the hx-copy-button story to\neither remove the bare ${iconCopy} or place it with a slot attribute (e.g.,\n<span slot=\"copy-icon\">${iconCopy}</span>) so the icon only renders into the\nnamed \"copy-icon\" slot for the hx-copy-button component.\n- Around line 568-570: Replace hardcoded inline style attributes on the story\n<p> elements (e.g., the style=\"margin-top: 0.75rem; font-size: 0.875rem; color:\n`#6b7280`;\" instances in hx-copy-button.stories.ts and the other occurrences at\nthe ranges noted) with the design-token CSS custom properties (use the --hx-*\ntokens for spacing, typography and color). Locate the inline style strings in\nthe story templates and change margin-top, font-size and color to use the\nappropriate tokens (for example --hx-spacing-*, --hx-font-size-*, --hx-color-*)\nso all spacing, type and color values come from the theme tokens instead of\nhardcoded rem/hex values. Ensure every listed occurrence (lines around 591-593,\n636-637, 650-652, 685, 687-688, 721, 757",
+  "prIterationCount": 1,
+  "remediationCycleCount": 1
+}

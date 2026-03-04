@@ -1,0 +1,27 @@
+{
+  "category": "Phase 2: Component Expansion",
+  "description": "**Milestone:** Phase 2: Component Expansion\n\nBuild hx-dialog: modal/non-modal dialog with focus trap, backdrop, animations. Required for confirmations, forms, media previews. Uses native <dialog> element internally. Trigger via Drupal behavior; composed: true events cross Shadow DOM.\n\n**Files to Modify:**\n- packages/hx-library/src/components/hx-dialog/\n\n**Acceptance Criteria:**\n- [ ] Modal and non-modal modes\n- [ ] Focus trap (tab cycling within dialog)\n- [ ] Click-outside-to-close (configurable)\n- [ ] Escape key closes\n- [ ] CSS parts: dialog, backdrop, header, body, footer\n- [ ] Slots: default, header, footer\n- [ ] Events: hx-open, hx-close, hx-cancel\n- [ ] ARIA: role=dialog, aria-modal, aria-labelledby\n- [ ] <5KB gzipped\n\n**Complexity:** large",
+  "title": "Implement hx-dialog component",
+  "status": "backlog",
+  "isEpic": false,
+  "epicId": "feature-1772158053419-7nvwtbujb",
+  "branchName": "feature/phase-2-component-implement-hx-dialog",
+  "isFoundation": true,
+  "id": "feature-1772158053420-9eo0hdeb2",
+  "descriptionHistory": [
+    {
+      "description": "**Milestone:** Phase 2: Component Expansion\n\nBuild hx-dialog: modal/non-modal dialog with focus trap, backdrop, animations. Required for confirmations, forms, media previews. Uses native <dialog> element internally. Trigger via Drupal behavior; composed: true events cross Shadow DOM.\n\n**Files to Modify:**\n- packages/hx-library/src/components/hx-dialog/\n\n**Acceptance Criteria:**\n- [ ] Modal and non-modal modes\n- [ ] Focus trap (tab cycling within dialog)\n- [ ] Click-outside-to-close (configurable)\n- [ ] Escape key closes\n- [ ] CSS parts: dialog, backdrop, header, body, footer\n- [ ] Slots: default, header, footer\n- [ ] Events: hx-open, hx-close, hx-cancel\n- [ ] ARIA: role=dialog, aria-modal, aria-labelledby\n- [ ] <5KB gzipped\n\n**Complexity:** large",
+      "timestamp": "2026-02-27T02:07:33.420Z",
+      "source": "initial"
+    }
+  ],
+  "createdAt": "2026-02-27T02:07:33.420Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-02-27T02:07:33.420Z",
+      "reason": "Feature created"
+    }
+  ]
+}

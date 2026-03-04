@@ -1,0 +1,64 @@
+{
+  "category": "Uncategorized",
+  "description": "## Component: hx-split-button (NEW)\n**Tier 2 — Standard Enterprise | Industry Consensus: 3/6 libraries**\n\nPrimary action button with attached dropdown menu for secondary actions.\n\n### ADR-001 Classification: Slot-Driven (Composite)\nProperties control primary action. Slots accept menu items from Drupal.\n\n### API Design\n**Properties:** `variant`, `hx-size`, `disabled`, `label` (primary button text — alt to slot)\n**Slots:** Default (primary button label), `menu` (hx-menu-item children)\n**CSS Parts:** `button`, `trigger`, `menu`\n**Events:** `hx-click` (primary), `hx-select` (menu item selected)\n\n### Drupal Integration\n```twig\n<hx-split-button variant=\"primary\">\n  Save Record\n  <hx-menu-item slot=\"menu\" value=\"save-draft\">Save as Draft</hx-menu-item>\n  <hx-menu-item slot=\"menu\" value=\"save-publish\">Save & Publish</hx-menu-item>\n  <hx-menu-item slot=\"menu\" value=\"save-notify\">Save & Notify Team</hx-menu-item>\n</hx-split-button>\n```\n\n### Healthcare: Save actions with variants, print options, export formats\n\n### Acceptance Criteria\n1. Primary button area and dropdown trigger are visually connected but independently clickable\n2. Menu items from slot, Drupal controls available actions\n3. Keyboard: Enter activates primary, ArrowDown opens menu\n4. WCAG 2.1 AA: proper menu button pattern",
+  "title": "T2-28: hx-split-button — Primary Action + Dropdown",
+  "status": "review",
+  "complexity": "medium",
+  "priority": 3,
+  "source": "api",
+  "trustTier": 1,
+  "quarantineStatus": "passed",
+  "quarantineId": "0924cc37-656e-4ead-949e-d5d1824844a8",
+  "id": "feature-1772570766529-ieur44xcf",
+  "branchName": "feature/t2-28-hx-split-button-primary-action",
+  "descriptionHistory": [
+    {
+      "description": "## Component: hx-split-button (NEW)\n**Tier 2 — Standard Enterprise | Industry Consensus: 3/6 libraries**\n\nPrimary action button with attached dropdown menu for secondary actions.\n\n### ADR-001 Classification: Slot-Driven (Composite)\nProperties control primary action. Slots accept menu items from Drupal.\n\n### API Design\n**Properties:** `variant`, `hx-size`, `disabled`, `label` (primary button text — alt to slot)\n**Slots:** Default (primary button label), `menu` (hx-menu-item children)\n**CSS Parts:** `button`, `trigger`, `menu`\n**Events:** `hx-click` (primary), `hx-select` (menu item selected)\n\n### Drupal Integration\n```twig\n<hx-split-button variant=\"primary\">\n  Save Record\n  <hx-menu-item slot=\"menu\" value=\"save-draft\">Save as Draft</hx-menu-item>\n  <hx-menu-item slot=\"menu\" value=\"save-publish\">Save & Publish</hx-menu-item>\n  <hx-menu-item slot=\"menu\" value=\"save-notify\">Save & Notify Team</hx-menu-item>\n</hx-split-button>\n```\n\n### Healthcare: Save actions with variants, print options, export formats\n\n### Acceptance Criteria\n1. Primary button area and dropdown trigger are visually connected but independently clickable\n2. Menu items from slot, Drupal controls available actions\n3. Keyboard: Enter activates primary, ArrowDown opens menu\n4. WCAG 2.1 AA: proper menu button pattern",
+      "timestamp": "2026-03-03T20:46:06.529Z",
+      "source": "initial"
+    }
+  ],
+  "createdAt": "2026-03-03T20:46:06.529Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-03-03T20:46:06.529Z",
+      "reason": "Feature created"
+    },
+    {
+      "from": "backlog",
+      "to": "in_progress",
+      "timestamp": "2026-03-04T07:18:06.405Z"
+    },
+    {
+      "from": "in_progress",
+      "to": "review",
+      "timestamp": "2026-03-04T07:31:42.960Z"
+    },
+    {
+      "from": "review",
+      "to": "blocked",
+      "timestamp": "2026-03-04T07:39:14.407Z"
+    },
+    {
+      "from": "blocked",
+      "to": "review",
+      "timestamp": "2026-03-04T13:58:41.787Z"
+    }
+  ],
+  "featureType": "code",
+  "updatedAt": "2026-03-04T07:18:07.892Z",
+  "model": "claude-sonnet-4-6",
+  "costUsd": 6.228034250000002,
+  "lastSessionId": "d528b7c4-a4d3-480d-824d-af8fb9500532",
+  "prUrl": "https://github.com/bookedsolidtech/helix/pull/51",
+  "prNumber": 51,
+  "prCreatedAt": "2026-03-04T07:31:42.959Z",
+  "reviewStartedAt": "2026-03-04T07:31:42.960Z",
+  "prTrackedSince": "2026-03-04T07:31:42.963Z",
+  "prLastPolledAt": "2026-03-04T15:33:14.735Z",
+  "lastReviewFeedback": "coderabbitai: **Actionable comments posted: 10**\n\n<details>\n<summary>🤖 Prompt for all review comments with AI agents</summary>\n\n```\nVerify each finding against the current code and only fix it if needed.\n\nInline comments:\nIn `@packages/hx-library/src/components/hx-split-button/hx-menu-item.styles.ts`:\n- Around line 18-64: The .menu-item styles contain hardcoded fallback literals\n(e.g., 0.5rem, 0.75rem, transparent, `#1e293b`, sans-serif, 1rem, 400, 1.5,\n0.25rem, 150ms, 2px, -2px, 0.5, etc. in properties like gap, padding,\nbackground-color, color, font-family, font-size, font-weight, line-height,\nborder-radius, transition, outline, outline-offset, and opacity). Replace each\nraw literal with a token-only fallback chain using --hx-* custom properties (for\nexample: gap: var(--hx-space-2); padding: var(--hx-space-2) var(--hx-space-3);\nbackground-color: var(--hx-menu-item-bg); color: var(--hx-menu-item-color);\nfont-family: var(--hx-menu-item-font-family); font-size:\nvar(--hx-menu-item-font-size); font-weight: var(--hx-menu-item-font-weight);\nline-height: var(--hx-menu-item-line-height); border-radius:\nvar(--hx-menu-item-border-radius); transition: background-color\nvar(--hx-transition-fast); outline: var(--hx-focus-ring-width) solid\nvar(--hx-menu-item-focus-ring-color); outline-offset:\nvar(--hx-focus-ring-offset); opacity: var(--hx-opacity-disabled); and similar\nfor :hover, :active, and :focus-visible states). Ensure every property in the\n.menu-item, .menu-item:hover, .menu-item:focus-visible, .menu-item:active and\n.menu-item[aria-disabled='true'] rules uses only token variables (no hardcoded\ncolor/size/timing/typography literals).\n\nIn `@packages/hx-library/src/components/hx-split-button/hx-menu-item.ts`:\n- Around line 34-36: HelixMenuItem is missing ElementInternals usage: add a\nprivate field (e.g., this._internals) initialized by calling attachInternals()\nin the HelixMenuItem class (constructor or connectedCallback), store the result\non the instance, and update any acce",
+  "prIterationCount": 1,
+  "remediationCycleCount": 1
+}

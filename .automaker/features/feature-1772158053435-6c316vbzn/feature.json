@@ -1,0 +1,27 @@
+{
+  "category": "Phase 5: Enterprise Features",
+  "description": "**Milestone:** Phase 5: Enterprise Features\n\nCommunity-contributed theme packages on npm with revenue share. Enterprise support SLA with response time guarantees, dedicated channel, and quarterly architecture reviews. Training materials and certification program.\n\n**Files to Modify:**\n- apps/docs/\n- docs/enterprise/\n\n**Acceptance Criteria:**\n- [ ] Theme marketplace section on Starlight docs\n- [ ] Theme submission and review process\n- [ ] Enterprise support tier documentation\n- [ ] SLA templates for healthcare customers\n- [ ] Training course outline\n\n**Complexity:** large",
+  "title": "Launch theme marketplace and enterprise support tiers",
+  "status": "backlog",
+  "isEpic": false,
+  "epicId": "feature-1772158053433-9llitnj34",
+  "branchName": "feature/phase-5-enterprise-launch-theme",
+  "isFoundation": false,
+  "id": "feature-1772158053435-6c316vbzn",
+  "descriptionHistory": [
+    {
+      "description": "**Milestone:** Phase 5: Enterprise Features\n\nCommunity-contributed theme packages on npm with revenue share. Enterprise support SLA with response time guarantees, dedicated channel, and quarterly architecture reviews. Training materials and certification program.\n\n**Files to Modify:**\n- apps/docs/\n- docs/enterprise/\n\n**Acceptance Criteria:**\n- [ ] Theme marketplace section on Starlight docs\n- [ ] Theme submission and review process\n- [ ] Enterprise support tier documentation\n- [ ] SLA templates for healthcare customers\n- [ ] Training course outline\n\n**Complexity:** large",
+      "timestamp": "2026-02-27T02:07:33.435Z",
+      "source": "initial"
+    }
+  ],
+  "createdAt": "2026-02-27T02:07:33.435Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-02-27T02:07:33.435Z",
+      "reason": "Feature created"
+    }
+  ]
+}

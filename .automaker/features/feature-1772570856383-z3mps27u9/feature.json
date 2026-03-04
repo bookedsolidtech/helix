@@ -1,0 +1,64 @@
+{
+  "category": "Uncategorized",
+  "description": "## Component: hx-top-nav (NEW)\n**Tier 2 — Standard Enterprise | Industry Consensus: 3/6 libraries**\n\nTop-of-page site navigation bar with logo, menu items, and utility area.\n\n### ADR-001 Classification: Slot-Driven (Composite)\nDrupal controls all navigation content via slots.\n\n### API Design\n**Properties:** `sticky` (boolean), `label` (nav landmark)\n**Slots:** `logo` (brand area), default (main nav items), `actions` (utility area — search, user menu)\n**CSS Parts:** `nav`, `logo`, `menu`, `actions`, `mobile-toggle`\n**Events:** `hx-mobile-toggle` (hamburger menu opened/closed)\n\n### Drupal Integration\n```twig\n<hx-top-nav sticky label=\"Site Navigation\">\n  <a slot=\"logo\" href=\"/\"></a>\n  {% for item in main_menu %}\n    <hx-nav-item href=\"{{ item.url }}\" {% if item.in_active_trail %}active{% endif %}>\n      {{ item.title }}\n    </hx-nav-item>\n  {% endfor %}\n  <div slot=\"actions\">\n    <hx-search placeholder=\"Search...\"></hx-search>\n    {{ drupal_block('user_menu') }}\n  </div>\n</hx-top-nav>\n```\n\n### Healthcare: Hospital portal headers, patient-facing site navigation\n\n### Acceptance Criteria\n1. Responsive: hamburger menu on mobile\n2. Sticky mode for persistent navigation\n3. Logo, nav items, and utility slots\n4. WCAG 2.1 AA: nav landmark, skip navigation link support\n5. Works with Drupal main menu system",
+  "title": "T2-38: hx-top-nav — Top-of-Page Navigation",
+  "status": "review",
+  "complexity": "medium",
+  "priority": 3,
+  "source": "api",
+  "trustTier": 1,
+  "quarantineStatus": "passed",
+  "quarantineId": "1552682f-e3bd-455b-8403-b2f70a369c98",
+  "id": "feature-1772570856383-z3mps27u9",
+  "branchName": "feature/t2-38-hx-top-nav-top-of-page-navigation",
+  "descriptionHistory": [
+    {
+      "description": "## Component: hx-top-nav (NEW)\n**Tier 2 — Standard Enterprise | Industry Consensus: 3/6 libraries**\n\nTop-of-page site navigation bar with logo, menu items, and utility area.\n\n### ADR-001 Classification: Slot-Driven (Composite)\nDrupal controls all navigation content via slots.\n\n### API Design\n**Properties:** `sticky` (boolean), `label` (nav landmark)\n**Slots:** `logo` (brand area), default (main nav items), `actions` (utility area — search, user menu)\n**CSS Parts:** `nav`, `logo`, `menu`, `actions`, `mobile-toggle`\n**Events:** `hx-mobile-toggle` (hamburger menu opened/closed)\n\n### Drupal Integration\n```twig\n<hx-top-nav sticky label=\"Site Navigation\">\n  <a slot=\"logo\" href=\"/\"></a>\n  {% for item in main_menu %}\n    <hx-nav-item href=\"{{ item.url }}\" {% if item.in_active_trail %}active{% endif %}>\n      {{ item.title }}\n    </hx-nav-item>\n  {% endfor %}\n  <div slot=\"actions\">\n    <hx-search placeholder=\"Search...\"></hx-search>\n    {{ drupal_block('user_menu') }}\n  </div>\n</hx-top-nav>\n```\n\n### Healthcare: Hospital portal headers, patient-facing site navigation\n\n### Acceptance Criteria\n1. Responsive: hamburger menu on mobile\n2. Sticky mode for persistent navigation\n3. Logo, nav items, and utility slots\n4. WCAG 2.1 AA: nav landmark, skip navigation link support\n5. Works with Drupal main menu system",
+      "timestamp": "2026-03-03T20:47:36.383Z",
+      "source": "initial"
+    }
+  ],
+  "createdAt": "2026-03-03T20:47:36.383Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-03-03T20:47:36.383Z",
+      "reason": "Feature created"
+    },
+    {
+      "from": "backlog",
+      "to": "in_progress",
+      "timestamp": "2026-03-04T11:50:11.463Z"
+    },
+    {
+      "from": "in_progress",
+      "to": "review",
+      "timestamp": "2026-03-04T11:58:38.177Z"
+    },
+    {
+      "from": "review",
+      "to": "blocked",
+      "timestamp": "2026-03-04T12:03:41.507Z"
+    },
+    {
+      "from": "blocked",
+      "to": "review",
+      "timestamp": "2026-03-04T13:58:57.477Z"
+    }
+  ],
+  "featureType": "code",
+  "updatedAt": "2026-03-04T11:50:13.023Z",
+  "model": "claude-sonnet-4-6",
+  "costUsd": 3.3633049999999995,
+  "lastSessionId": "f5f7fb3a-1429-44ac-ab76-0e67ce9da35e",
+  "prUrl": "https://github.com/bookedsolidtech/helix/pull/60",
+  "prNumber": 60,
+  "prCreatedAt": "2026-03-04T11:58:38.176Z",
+  "reviewStartedAt": "2026-03-04T11:58:38.177Z",
+  "prTrackedSince": "2026-03-04T11:58:38.178Z",
+  "prLastPolledAt": "2026-03-04T16:02:23.845Z",
+  "lastReviewFeedback": "coderabbitai: **Actionable comments posted: 1**\n\n<details>\n<summary>🤖 Prompt for all review comments with AI agents</summary>\n\n```\nVerify each finding against the current code and only fix it if needed.\n\nInline comments:\nIn `@packages/hx-library/src/components/hx-top-nav/hx-top-nav.styles.ts`:\n- Around line 155-161: The `@media` (prefers-reduced-motion: reduce) rule targets\n.nav__collapsible but there is no transition defined for that selector, so\neither remove the dead media-query block or add the intended transition to\n.nav__collapsible; update the stylesheet by either deleting the `@media`\n(prefers-reduced-motion: reduce) block around .nav__collapsible or by adding the\nplanned transition declaration (e.g., the same transition used for\ncollapsing/expanding the nav) to the .nav__collapsible selector so the\nreduced-motion override has an effect.\n```\n\n</details>\n\n---\n\n<details>\n<summary>ℹ️ Review info</summary>\n\n<details>\n<summary>⚙️ Run configuration</summary>\n\n**Configuration used**: Path: .coderabbit.yaml\n\n**Review profile**: ASSERTIVE\n\n**Plan**: Pro\n\n**Run ID**: `4a80794f-5d20-4fb3-baf7-e97a9b759ac5`\n\n</details>\n\n<details>\n<summary>📥 Commits</summary>\n\nReviewing files that changed from the base of the PR and between 8782cd74a32a4fa9a396a8e640bf8e6f33cccc55 and cce30c2cb6ca4613391c11a94bf7a53200fe7fc1.\n\n</details>\n\n<details>\n<summary>⛔ Files ignored due to path filters (9)</summary>\n\n* `packages/hx-library/.cache/coverage/coverage-summary.json` is excluded by `!**/.cache/**`\n* `packages/hx-library/.cache/test-results.json` is excluded by `!**/.cache/**`\n* `packages/hx-library/src/components/hx-button-group/__screenshots__/hx-button-group.test.ts/hx-button-group-Accessibility-has-no-axe-violations-in-default-state-1.png` is excluded by `!**/*.png`\n* `packages/hx-library/src/components/hx-button-group/__screenshots__/hx-button-group.test.ts/hx-button-group-Accessibility-has-no-axe-violations-with-aria-label-1.png` is excluded by `!**/*.png`\n* `packages/hx-library/",
+  "prIterationCount": 1,
+  "remediationCycleCount": 1
+}
