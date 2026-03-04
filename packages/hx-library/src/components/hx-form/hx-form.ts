@@ -6,7 +6,7 @@ import { helixFormScopedCss } from './hx-form.styles.js';
 
 /**
  * A Light DOM form wrapper that styles native HTML form elements and
- * wc-* components with the design system's form styles.
+ * hx-* components with the design system's form styles.
  *
  * When `action` is set, renders a `<form>` wrapper around slotted content.
  * When no `action` is set (the Drupal pattern), renders only a `<slot>`
@@ -15,15 +15,15 @@ import { helixFormScopedCss } from './hx-form.styles.js';
  * Uses adopted stylesheets to inject scoped CSS into the document without
  * Shadow DOM, keeping native form participation and Drupal compatibility.
  *
- * @summary Light DOM form wrapper with scoped styles for native and wc-* form elements.
+ * @summary Light DOM form wrapper with scoped styles for native and hx-* form elements.
  *
  * @tag hx-form
  *
  * @slot - Default slot for form fields and controls.
  *
- * @fires {CustomEvent<{valid: boolean, values: Record<string, FormDataEntryValue>}>} wc-submit - Dispatched on valid client-side submit when no action is set.
- * @fires {CustomEvent<{errors: Array<{name: string, message: string}>}>} wc-invalid - Dispatched when validation fails on submit.
- * @fires {CustomEvent} wc-reset - Dispatched when the form is reset.
+ * @fires {CustomEvent<{valid: boolean, values: Record<string, FormDataEntryValue>}>} hx-submit - Dispatched on valid client-side submit when no action is set.
+ * @fires {CustomEvent<{errors: Array<{name: string, message: string}>}>} hx-invalid - Dispatched when validation fails on submit.
+ * @fires {CustomEvent} hx-reset - Dispatched when the form is reset.
  *
  * @cssprop [--hx-form-gap=var(--hx-space-4)] - Gap between form fields.
  * @cssprop [--hx-form-max-width=none] - Maximum width of the form.
@@ -79,6 +79,13 @@ export class HelixForm extends LitElement {
    */
   @property({ type: Boolean })
   novalidate = false;
+
+  /**
+   * Controls browser autocomplete behavior for the form and its fields.
+   * @attr autocomplete
+   */
+  @property({ type: String })
+  autocomplete: 'on' | 'off' = 'on';
 
   /**
    * Identifies the form for scripting and form discovery.
@@ -284,6 +291,7 @@ export class HelixForm extends LitElement {
           action=${this.action}
           method=${this.method}
           name=${ifDefined(this.name || undefined)}
+          autocomplete=${this.autocomplete}
           ?novalidate=${this.novalidate}
         >
           <slot></slot>
@@ -294,6 +302,9 @@ export class HelixForm extends LitElement {
     return html`<slot></slot>`;
   }
 }
+
+/** @deprecated Use {@link HelixForm} instead. Kept for test compatibility. */
+export type WcForm = HelixForm;
 
 declare global {
   interface HTMLElementTagNameMap {
