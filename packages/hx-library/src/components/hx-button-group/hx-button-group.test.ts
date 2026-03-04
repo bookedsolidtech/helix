@@ -1,4 +1,4 @@
-import { describe, it, expect, afterEach } from 'vitest';
+import { describe, it, expect, afterEach, vi } from 'vitest';
 import { page } from '@vitest/browser/context';
 import { fixture, shadowQuery, cleanup, checkA11y } from '../../test-utils.js';
 import type { HelixButtonGroup } from './hx-button-group.js';
@@ -131,12 +131,15 @@ describe('hx-button-group', () => {
         </hx-button-group>
       `);
 
+      const requestUpdateSpy = vi.spyOn(el, 'requestUpdate');
+
       const button2 = document.createElement('hx-button');
       button2.setAttribute('variant', 'secondary');
       button2.textContent = 'Button 2';
       el.appendChild(button2);
 
       await el.updateComplete;
+      expect(requestUpdateSpy).toHaveBeenCalled();
       const buttons = el.querySelectorAll('hx-button');
       expect(buttons.length).toBe(2);
     });
@@ -162,7 +165,7 @@ describe('hx-button-group', () => {
         </hx-button-group>
       `);
       // The role should be on the host element via internals
-      expect(el.getAttribute('role')).toBe('group');
+      expect((el as any).internals?.role).toBe('group');
     });
 
     it('has no axe violations in default state', async () => {
