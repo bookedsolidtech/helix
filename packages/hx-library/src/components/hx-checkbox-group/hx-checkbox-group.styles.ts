@@ -6,7 +6,7 @@ export const helixCheckboxGroupStyles = css`
   }
 
   :host([disabled]) {
-    opacity: var(--hx-opacity-disabled, 0.5);
+    opacity: var(--hx-opacity-disabled);
     pointer-events: none;
   }
 
@@ -22,8 +22,8 @@ export const helixCheckboxGroupStyles = css`
     padding: 0;
     display: flex;
     flex-direction: column;
-    gap: var(--hx-space-2, 0.5rem);
-    font-family: var(--hx-font-family-sans, sans-serif);
+    gap: var(--hx-space-2);
+    font-family: var(--hx-font-family-sans);
   }
 
   /* ─── Legend ─── */
@@ -31,18 +31,18 @@ export const helixCheckboxGroupStyles = css`
   .fieldset__legend {
     display: flex;
     align-items: baseline;
-    gap: var(--hx-space-1, 0.25rem);
-    font-size: var(--hx-font-size-sm, 0.875rem);
-    font-weight: var(--hx-font-weight-medium, 500);
-    color: var(--hx-checkbox-group-label-color, var(--hx-color-neutral-700, #343a40));
-    line-height: var(--hx-line-height-normal, 1.5);
+    gap: var(--hx-space-1);
+    font-size: var(--hx-font-size-sm);
+    font-weight: var(--hx-font-weight-medium);
+    color: var(--hx-checkbox-group-label-color, var(--hx-color-neutral-700));
+    line-height: var(--hx-line-height-normal);
     padding: 0;
-    margin-bottom: var(--hx-space-1, 0.25rem);
+    margin-bottom: var(--hx-space-1);
   }
 
   .fieldset__required-marker {
-    color: var(--hx-checkbox-group-error-color, var(--hx-color-error-500, #dc3545));
-    font-weight: var(--hx-font-weight-bold, 700);
+    color: var(--hx-checkbox-group-error-color, var(--hx-color-error-500));
+    font-weight: var(--hx-font-weight-bold);
   }
 
   /* ─── Items Container ─── */
@@ -50,7 +50,7 @@ export const helixCheckboxGroupStyles = css`
   .fieldset__items {
     display: flex;
     flex-direction: column;
-    gap: var(--hx-checkbox-group-gap, var(--hx-space-3, 0.75rem));
+    gap: var(--hx-checkbox-group-gap, var(--hx-space-3));
   }
 
   :host([orientation='horizontal']) .fieldset__items {
@@ -61,20 +61,20 @@ export const helixCheckboxGroupStyles = css`
   /* ─── Error State ─── */
 
   .fieldset--error .fieldset__legend {
-    color: var(--hx-checkbox-group-error-color, var(--hx-color-error-500, #dc3545));
+    color: var(--hx-checkbox-group-error-color, var(--hx-color-error-500));
   }
 
   /* ─── Help Text & Error Messages ─── */
 
   .fieldset__help-text {
-    font-size: var(--hx-font-size-xs, 0.75rem);
-    color: var(--hx-color-neutral-500, #6c757d);
-    line-height: var(--hx-line-height-normal, 1.5);
+    font-size: var(--hx-font-size-xs);
+    color: var(--hx-color-neutral-500);
+    line-height: var(--hx-line-height-normal);
   }
 
   .fieldset__error {
-    font-size: var(--hx-font-size-xs, 0.75rem);
-    color: var(--hx-checkbox-group-error-color, var(--hx-color-error-500, #dc3545));
-    line-height: var(--hx-line-height-normal, 1.5);
+    font-size: var(--hx-font-size-xs);
+    color: var(--hx-checkbox-group-error-color, var(--hx-color-error-500));
+    line-height: var(--hx-line-height-normal);
   }
 `;

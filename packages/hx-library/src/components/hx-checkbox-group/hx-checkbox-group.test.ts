@@ -296,7 +296,8 @@ describe('hx-checkbox-group', () => {
       `);
       const eventPromise = oneEvent<CustomEvent<{ values: string[] }>>(el, 'hx-change');
       const checkboxA = el.querySelector('hx-checkbox[value="a"]') as HelixCheckbox;
-      const control = shadowQuery<HTMLElement>(checkboxA, '.checkbox__control')!;
+      const control = shadowQuery<HTMLElement>(checkboxA, '.checkbox__control');
+      if (!control) throw new Error('.checkbox__control not found');
       control.click();
       const event = await eventPromise;
       expect(event).toBeTruthy();
@@ -311,7 +312,8 @@ describe('hx-checkbox-group', () => {
       `);
       const eventPromise = oneEvent<CustomEvent<{ values: string[] }>>(el, 'hx-change');
       const checkboxA = el.querySelector('hx-checkbox[value="a"]') as HelixCheckbox;
-      const control = shadowQuery<HTMLElement>(checkboxA, '.checkbox__control')!;
+      const control = shadowQuery<HTMLElement>(checkboxA, '.checkbox__control');
+      if (!control) throw new Error('.checkbox__control not found');
       control.click();
       const event = await eventPromise;
       expect(Array.isArray(event.detail.values)).toBe(true);
@@ -326,7 +328,8 @@ describe('hx-checkbox-group', () => {
       `);
       const eventPromise = oneEvent<CustomEvent<{ values: string[] }>>(el, 'hx-change');
       const checkboxA = el.querySelector('hx-checkbox[value="a"]') as HelixCheckbox;
-      const control = shadowQuery<HTMLElement>(checkboxA, '.checkbox__control')!;
+      const control = shadowQuery<HTMLElement>(checkboxA, '.checkbox__control');
+      if (!control) throw new Error('.checkbox__control not found');
       control.click();
       const event = await eventPromise;
       expect(event.bubbles).toBe(true);
@@ -345,7 +348,8 @@ describe('hx-checkbox-group', () => {
         receivedEvents.push(e as CustomEvent<{ values: string[] }>);
       });
       const checkboxA = el.querySelector('hx-checkbox[value="a"]') as HelixCheckbox;
-      const control = shadowQuery<HTMLElement>(checkboxA, '.checkbox__control')!;
+      const control = shadowQuery<HTMLElement>(checkboxA, '.checkbox__control');
+      if (!control) throw new Error('.checkbox__control not found');
       control.click();
       // Wait for event processing
       await el.updateComplete;
@@ -382,9 +386,9 @@ describe('hx-checkbox-group', () => {
 
   describe('Form Integration', () => {
     it('has formAssociated=true', () => {
-      const ctor = customElements.get(
-        'hx-checkbox-group',
-      ) as unknown as { formAssociated: boolean };
+      const ctor = customElements.get('hx-checkbox-group') as unknown as {
+        formAssociated: boolean;
+      };
       expect(ctor.formAssociated).toBe(true);
     });
 
@@ -404,7 +408,9 @@ describe('hx-checkbox-group', () => {
           <hx-checkbox value="a" label="Option A"></hx-checkbox>
         </hx-checkbox-group>
       `;
-      document.getElementById('test-fixture-container')!.appendChild(form);
+      const container = document.getElementById('test-fixture-container');
+      if (!container) throw new Error('test-fixture-container not found');
+      container.appendChild(form);
       const el = form.querySelector('hx-checkbox-group') as HelixCheckboxGroup;
       await el.updateComplete;
       expect(el.form).toBe(form);

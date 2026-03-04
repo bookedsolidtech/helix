@@ -73,11 +73,10 @@ const meta = {
     // ── Events ──
     'hx-change': {
       action: 'hx-change',
-      description:
-        'Dispatched when any child checkbox changes. Detail: `{ values: string[] }`.',
+      description: 'Dispatched when any child checkbox changes. Detail: `{ values: string[] }`.',
       table: {
         category: 'Events',
-        type: { summary: "CustomEvent<{ values: string[] }>" },
+        type: { summary: 'CustomEvent<{ values: string[] }>' },
       },
     },
     // ── Slots ──
@@ -154,7 +153,7 @@ const meta = {
       },
       control: false,
     },
-    label: {
+    labelPart: {
       description: 'The legend/label.',
       table: {
         category: 'CSS Parts',
@@ -275,14 +274,15 @@ export const Default: Story = {
 
     // Click "Diabetes" and verify it becomes checked
     const diabetesCheckbox = canvasElement.querySelector('hx-checkbox[value="diabetes"]');
+    if (!diabetesCheckbox) throw new Error('Diabetes checkbox not found');
     await expect(diabetesCheckbox).toBeTruthy();
-    await clickCheckbox(diabetesCheckbox!);
+    await clickCheckbox(diabetesCheckbox);
 
     const diabetesHost = diabetesCheckbox as HTMLElement & { checked: boolean };
     await expect(diabetesHost.checked).toBe(true);
 
     // Click again to uncheck
-    await clickCheckbox(diabetesCheckbox!);
+    await clickCheckbox(diabetesCheckbox);
     await expect(diabetesHost.checked).toBe(false);
   },
 };
@@ -297,11 +297,7 @@ export const Vertical: Story = {
     orientation: 'vertical',
   },
   render: (args) => html`
-    <hx-checkbox-group
-      label=${args.label}
-      orientation=${args.orientation}
-      name="symptoms"
-    >
+    <hx-checkbox-group label=${args.label} orientation=${args.orientation} name="symptoms">
       <hx-checkbox value="fever" label="Fever"></hx-checkbox>
       <hx-checkbox value="cough" label="Cough"></hx-checkbox>
       <hx-checkbox value="shortness-of-breath" label="Shortness of Breath"></hx-checkbox>
@@ -315,11 +311,7 @@ export const Horizontal: Story = {
     orientation: 'horizontal',
   },
   render: (args) => html`
-    <hx-checkbox-group
-      label=${args.label}
-      orientation=${args.orientation}
-      name="visit-type"
-    >
+    <hx-checkbox-group label=${args.label} orientation=${args.orientation} name="visit-type">
       <hx-checkbox value="in-person" label="In-Person"></hx-checkbox>
       <hx-checkbox value="telehealth" label="Telehealth"></hx-checkbox>
       <hx-checkbox value="phone" label="Phone"></hx-checkbox>
@@ -338,11 +330,7 @@ export const Required: Story = {
     required: true,
   },
   render: (args) => html`
-    <hx-checkbox-group
-      label=${args.label}
-      name=${args.name}
-      ?required=${args.required}
-    >
+    <hx-checkbox-group label=${args.label} name=${args.name} ?required=${args.required}>
       <hx-checkbox value="penicillin" label="Penicillin"></hx-checkbox>
       <hx-checkbox value="sulfa" label="Sulfa Drugs"></hx-checkbox>
       <hx-checkbox value="aspirin" label="Aspirin"></hx-checkbox>
@@ -359,7 +347,8 @@ export const Required: Story = {
 
     // Check one item: group should become valid
     const penicillinCheckbox = canvasElement.querySelector('hx-checkbox[value="penicillin"]');
-    await clickCheckbox(penicillinCheckbox!);
+    if (!penicillinCheckbox) throw new Error('Penicillin checkbox not found');
+    await clickCheckbox(penicillinCheckbox);
 
     await expect(group.checkValidity()).toBe(true);
   },
@@ -413,11 +402,7 @@ export const Disabled: Story = {
     disabled: true,
   },
   render: (args) => html`
-    <hx-checkbox-group
-      label=${args.label}
-      name=${args.name}
-      ?disabled=${args.disabled}
-    >
+    <hx-checkbox-group label=${args.label} name=${args.name} ?disabled=${args.disabled}>
       <hx-checkbox value="chemotherapy" label="Chemotherapy" checked></hx-checkbox>
       <hx-checkbox value="radiation" label="Radiation Therapy"></hx-checkbox>
       <hx-checkbox value="surgery" label="Surgery" checked></hx-checkbox>
@@ -548,11 +533,7 @@ export const DrupalExample: Story = {
           Simulates Drupal Twig rendering: each taxonomy term maps to an
           <code>hx-checkbox</code> child element.
         </p>
-        <hx-checkbox-group
-          label="Chronic Conditions"
-          name="field_chronic_conditions"
-          required
-        >
+        <hx-checkbox-group label="Chronic Conditions" name="field_chronic_conditions" required>
           ${conditions.map(
             (term) => html`
               <hx-checkbox
@@ -641,8 +622,10 @@ export const InAForm: Story = {
     const diabetesCheckbox = canvasElement.querySelector('hx-checkbox[value="diabetes"]');
     const hypertensionCheckbox = canvasElement.querySelector('hx-checkbox[value="hypertension"]');
 
-    await clickCheckbox(diabetesCheckbox!);
-    await clickCheckbox(hypertensionCheckbox!);
+    if (!diabetesCheckbox) throw new Error('Diabetes checkbox not found');
+    if (!hypertensionCheckbox) throw new Error('Hypertension checkbox not found');
+    await clickCheckbox(diabetesCheckbox);
+    await clickCheckbox(hypertensionCheckbox);
 
     // Group is now valid
     await expect(group.checkValidity()).toBe(true);
@@ -738,23 +721,25 @@ export const HealthcarePreExistingConditions: Story = {
         Accurate history helps your care team provide the best possible treatment.
       </p>
 
-      <hx-checkbox-group
-        label="Pre-Existing Conditions"
-        name="pre_existing_conditions"
-        required
-      >
+      <hx-checkbox-group label="Pre-Existing Conditions" name="pre_existing_conditions" required>
         <hx-checkbox value="diabetes-type1" label="Diabetes (Type 1)"></hx-checkbox>
         <hx-checkbox value="diabetes-type2" label="Diabetes (Type 2)"></hx-checkbox>
         <hx-checkbox value="hypertension" label="Hypertension (High Blood Pressure)"></hx-checkbox>
         <hx-checkbox value="heart-disease" label="Coronary Heart Disease"></hx-checkbox>
         <hx-checkbox value="asthma" label="Asthma"></hx-checkbox>
-        <hx-checkbox value="arthritis" label="Arthritis (Rheumatoid or Osteoarthritis)"></hx-checkbox>
-        <hx-checkbox value="copd" label="Chronic Obstructive Pulmonary Disease (COPD)"></hx-checkbox>
+        <hx-checkbox
+          value="arthritis"
+          label="Arthritis (Rheumatoid or Osteoarthritis)"
+        ></hx-checkbox>
+        <hx-checkbox
+          value="copd"
+          label="Chronic Obstructive Pulmonary Disease (COPD)"
+        ></hx-checkbox>
         <hx-checkbox value="ckd" label="Chronic Kidney Disease"></hx-checkbox>
         <hx-checkbox value="none" label="None of the above"></hx-checkbox>
         <span slot="help">
-          Select all conditions that have been diagnosed by a physician. Required for accurate
-          care coordination and medication safety review.
+          Select all conditions that have been diagnosed by a physician. Required for accurate care
+          coordination and medication safety review.
         </span>
       </hx-checkbox-group>
     </div>
@@ -766,8 +751,10 @@ export const HealthcarePreExistingConditions: Story = {
     // Check two conditions
     const diabetesCheckbox = canvasElement.querySelector('hx-checkbox[value="diabetes-type2"]');
     const hypertensionCheckbox = canvasElement.querySelector('hx-checkbox[value="hypertension"]');
-    await clickCheckbox(diabetesCheckbox!);
-    await clickCheckbox(hypertensionCheckbox!);
+    if (!diabetesCheckbox) throw new Error('Diabetes checkbox not found');
+    if (!hypertensionCheckbox) throw new Error('Hypertension checkbox not found');
+    await clickCheckbox(diabetesCheckbox);
+    await clickCheckbox(hypertensionCheckbox);
 
     const diabetesHost = diabetesCheckbox as HTMLElement & { checked: boolean };
     const hypertensionHost = hypertensionCheckbox as HTMLElement & { checked: boolean };
@@ -793,13 +780,11 @@ export const HealthcareSymptomsChecklist: Story = {
         <hx-checkbox value="fatigue" label="Unusual Fatigue or Weakness"></hx-checkbox>
         <hx-checkbox value="headache" label="Headache"></hx-checkbox>
         <hx-checkbox value="chest-pain" label="Chest Pain or Tightness"></hx-checkbox>
-        <hx-checkbox
-          value="loss-taste-smell"
-          label="Loss of Taste or Smell"
-        ></hx-checkbox>
+        <hx-checkbox value="loss-taste-smell" label="Loss of Taste or Smell"></hx-checkbox>
         <hx-checkbox value="none" label="I am not experiencing any symptoms"></hx-checkbox>
         <span slot="help">
-          Select all symptoms you are currently experiencing. This information helps triage your visit.
+          Select all symptoms you are currently experiencing. This information helps triage your
+          visit.
         </span>
       </hx-checkbox-group>
     </div>
@@ -868,7 +853,8 @@ export const ChangeEvent: Story = {
 
     // Check "appointments"
     const appointmentsCheckbox = canvasElement.querySelector('hx-checkbox[value="appointments"]');
-    await clickCheckbox(appointmentsCheckbox!);
+    if (!appointmentsCheckbox) throw new Error('Appointments checkbox not found');
+    await clickCheckbox(appointmentsCheckbox);
 
     await expect(changeSpy).toHaveBeenCalledTimes(1);
     const firstDetail = (changeSpy.mock.calls[0][0] as CustomEvent<{ values: string[] }>).detail;
@@ -877,7 +863,8 @@ export const ChangeEvent: Story = {
 
     // Check "lab-results" as well
     const labCheckbox = canvasElement.querySelector('hx-checkbox[value="lab-results"]');
-    await clickCheckbox(labCheckbox!);
+    if (!labCheckbox) throw new Error('Lab checkbox not found');
+    await clickCheckbox(labCheckbox);
 
     await expect(changeSpy).toHaveBeenCalledTimes(2);
     const secondDetail = (changeSpy.mock.calls[1][0] as CustomEvent<{ values: string[] }>).detail;
@@ -886,7 +873,7 @@ export const ChangeEvent: Story = {
     await expect(secondDetail.values.length).toBe(2);
 
     // Uncheck "appointments"
-    await clickCheckbox(appointmentsCheckbox!);
+    await clickCheckbox(appointmentsCheckbox);
 
     await expect(changeSpy).toHaveBeenCalledTimes(3);
     const thirdDetail = (changeSpy.mock.calls[2][0] as CustomEvent<{ values: string[] }>).detail;

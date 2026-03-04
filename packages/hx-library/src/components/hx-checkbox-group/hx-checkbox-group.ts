@@ -88,7 +88,7 @@ export class HelixCheckboxGroup extends LitElement {
   orientation: 'vertical' | 'horizontal' = 'vertical';
 
   @query('.fieldset__items')
-  private _itemsEl!: HTMLElement;
+  private _itemsEl: HTMLElement | null = null;
 
   @state() private _hasErrorSlot = false;
 
@@ -136,6 +136,10 @@ export class HelixCheckboxGroup extends LitElement {
   override firstUpdated(changedProperties: Map<string, unknown>): void {
     super.firstUpdated(changedProperties);
     this._syncCheckboxes();
+    this._syncCheckboxNames();
+    const checkedValues = this._getCheckedValues();
+    this._updateFormValue(checkedValues);
+    this._updateValidity(checkedValues);
   }
 
   // ─── Checkbox Management ───
@@ -152,20 +156,16 @@ export class HelixCheckboxGroup extends LitElement {
 
   private _syncCheckboxes(): void {
     const checkboxes = this._getCheckboxes();
-    if (this.disabled) {
-      checkboxes.forEach((cb) => {
-        cb.disabled = true;
-      });
-    }
+    checkboxes.forEach((cb) => {
+      cb.disabled = this.disabled;
+    });
   }
 
   private _syncCheckboxNames(): void {
     if (!this.name) return;
     const checkboxes = this._getCheckboxes();
     checkboxes.forEach((cb) => {
-      if (!cb.name) {
-        cb.name = this.name;
-      }
+      cb.name = this.name;
     });
   }
 
@@ -209,6 +209,9 @@ export class HelixCheckboxGroup extends LitElement {
   private _handleSlotChange(): void {
     this._syncCheckboxes();
     this._syncCheckboxNames();
+    const checkedValues = this._getCheckedValues();
+    this._updateFormValue(checkedValues);
+    this._updateValidity(checkedValues);
   }
 
   // ─── Form Integration ───
@@ -296,12 +299,7 @@ export class HelixCheckboxGroup extends LitElement {
     };
 
     const describedBy =
-      [
-        hasError || this._hasErrorSlot ? this._errorId : null,
-        this._helpTextId,
-      ]
-        .filter(Boolean)
-        .join(' ') || undefined;
+      [this.error ? this._errorId : null, this._helpTextId].filter(Boolean).join(' ') || undefined;
 
     return html`
       <fieldset
