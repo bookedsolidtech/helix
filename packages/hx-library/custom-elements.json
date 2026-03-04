@@ -900,6 +900,419 @@
     },
     {
       "kind": "javascript-module",
+      "path": "src/components/hx-button-group/hx-button-group.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "A container component that groups related hx-button elements into a cohesive\nhorizontal or vertical action set. Eliminates double borders between adjacent\nbuttons and squares off inner border-radius for a unified visual appearance.",
+          "name": "HelixButtonGroup",
+          "cssProperties": [
+            {
+              "description": "Size token forwarded to child buttons. Accepts 'sm', 'md', or 'lg'.",
+              "name": "--hx-button-group-size",
+              "default": "md"
+            }
+          ],
+          "cssParts": [
+            {
+              "description": "The container div element wrapping all slotted buttons.",
+              "name": "group"
+            }
+          ],
+          "slots": [
+            {
+              "description": "Default slot accepting hx-button and hx-icon-button children.",
+              "name": ""
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "internals",
+              "type": {
+                "text": "ElementInternals"
+              },
+              "privacy": "private"
+            },
+            {
+              "kind": "field",
+              "name": "orientation",
+              "type": {
+                "text": "'horizontal' | 'vertical'"
+              },
+              "default": "'horizontal'",
+              "description": "Layout orientation of the button group.",
+              "attribute": "orientation",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "size",
+              "type": {
+                "text": "'sm' | 'md' | 'lg'"
+              },
+              "default": "'md'",
+              "description": "Size applied to the button group and cascaded to child buttons via\nthe --hx-button-group-size CSS custom property.",
+              "attribute": "hx-size",
+              "reflects": true
+            },
+            {
+              "kind": "method",
+              "name": "_handleSlotChange",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              }
+            },
+            {
+              "kind": "field",
+              "name": "role",
+              "type": {
+                "text": "string"
+              },
+              "default": "'group'"
+            }
+          ],
+          "attributes": [
+            {
+              "name": "orientation",
+              "type": {
+                "text": "'horizontal' | 'vertical'"
+              },
+              "default": "'horizontal'",
+              "description": "Layout orientation of the button group.",
+              "fieldName": "orientation",
+              "attribute": "orientation"
+            },
+            {
+              "name": "hx-size",
+              "type": {
+                "text": "'sm' | 'md' | 'lg'"
+              },
+              "default": "'md'",
+              "description": "Size applied to the button group and cascaded to child buttons via\nthe --hx-button-group-size CSS custom property.",
+              "fieldName": "size",
+              "attribute": "hx-size"
+            }
+          ],
+          "superclass": {
+            "name": "LitElement",
+            "package": "lit"
+          },
+          "tagName": "hx-button-group",
+          "customElement": true,
+          "summary": "Groups hx-button elements into a horizontal or vertical action set with shared borders."
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "HelixButtonGroup",
+          "declaration": {
+            "name": "HelixButtonGroup",
+            "module": "src/components/hx-button-group/hx-button-group.ts"
+          }
+        },
+        {
+          "kind": "custom-element-definition",
+          "name": "hx-button-group",
+          "declaration": {
+            "name": "HelixButtonGroup",
+            "module": "src/components/hx-button-group/hx-button-group.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/components/hx-button-group/index.ts",
+      "declarations": [],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "HelixButtonGroup",
+          "declaration": {
+            "name": "HelixButtonGroup",
+            "module": "./hx-button-group.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/components/hx-card/hx-card.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "A flexible card component for displaying grouped content.",
+          "name": "HelixCard",
+          "cssProperties": [
+            {
+              "description": "Card background color.",
+              "name": "--hx-card-bg",
+              "default": "var(--hx-color-neutral-0)"
+            },
+            {
+              "description": "Card text color.",
+              "name": "--hx-card-color",
+              "default": "var(--hx-color-neutral-800)"
+            },
+            {
+              "description": "Card border color.",
+              "name": "--hx-card-border-color",
+              "default": "var(--hx-color-neutral-200)"
+            },
+            {
+              "description": "Card border radius.",
+              "name": "--hx-card-border-radius",
+              "default": "var(--hx-border-radius-lg)"
+            },
+            {
+              "description": "Internal padding for card sections.",
+              "name": "--hx-card-padding",
+              "default": "var(--hx-space-6)"
+            },
+            {
+              "description": "Gap between card sections.",
+              "name": "--hx-card-gap",
+              "default": "var(--hx-space-4)"
+            }
+          ],
+          "cssParts": [
+            {
+              "description": "The outer card container element.",
+              "name": "card"
+            },
+            {
+              "description": "The image slot container.",
+              "name": "image"
+            },
+            {
+              "description": "The heading slot container.",
+              "name": "heading"
+            },
+            {
+              "description": "The body slot container.",
+              "name": "body"
+            },
+            {
+              "description": "The footer slot container.",
+              "name": "footer"
+            },
+            {
+              "description": "The actions slot container.",
+              "name": "actions"
+            }
+          ],
+          "slots": [
+            {
+              "description": "Optional image or media content at the top of the card.",
+              "name": "image"
+            },
+            {
+              "description": "The card heading/title content.",
+              "name": "heading"
+            },
+            {
+              "description": "Default slot for the card body content.",
+              "name": ""
+            },
+            {
+              "description": "Optional footer content below the body.",
+              "name": "footer"
+            },
+            {
+              "description": "Optional action buttons, rendered with a top border separator.",
+              "name": "actions"
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "variant",
+              "type": {
+                "text": "'default' | 'featured' | 'compact'"
+              },
+              "default": "'default'",
+              "description": "Visual style variant of the card.",
+              "attribute": "variant",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "elevation",
+              "type": {
+                "text": "'flat' | 'raised' | 'floating'"
+              },
+              "default": "'flat'",
+              "description": "Elevation (shadow depth) of the card.",
+              "attribute": "elevation",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "wcHref",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Optional URL. When set, the card becomes interactive (clickable)\nand navigates to this URL on click.\nUses wc-href to avoid conflicting with the native HTML href attribute.",
+              "attribute": "hx-href"
+            },
+            {
+              "kind": "field",
+              "name": "_hasSlotContent",
+              "type": {
+                "text": "Record<string, boolean>"
+              },
+              "privacy": "private",
+              "default": "{ image: false, heading: false, footer: false, actions: false, }"
+            },
+            {
+              "kind": "method",
+              "name": "_handleSlotChange",
+              "privacy": "private",
+              "parameters": [
+                {
+                  "name": "slotName",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "_handleClick",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "e",
+                  "type": {
+                    "text": "MouseEvent"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "_handleKeyDown",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "e",
+                  "type": {
+                    "text": "KeyboardEvent"
+                  }
+                }
+              ]
+            }
+          ],
+          "events": [
+            {
+              "name": "hx-card-click",
+              "type": {
+                "text": "CustomEvent"
+              },
+              "description": "Dispatched when an interactive card is clicked.\nIncludes the target href in the detail."
+            },
+            {
+              "type": {
+                "text": "CustomEvent<{url: string, originalEvent: MouseEvent}>"
+              },
+              "description": "Dispatched when an interactive card (with wc-href) is clicked.",
+              "name": "wc-card-click"
+            }
+          ],
+          "attributes": [
+            {
+              "name": "variant",
+              "type": {
+                "text": "'default' | 'featured' | 'compact'"
+              },
+              "default": "'default'",
+              "description": "Visual style variant of the card.",
+              "fieldName": "variant",
+              "attribute": "variant"
+            },
+            {
+              "name": "elevation",
+              "type": {
+                "text": "'flat' | 'raised' | 'floating'"
+              },
+              "default": "'flat'",
+              "description": "Elevation (shadow depth) of the card.",
+              "fieldName": "elevation",
+              "attribute": "elevation"
+            },
+            {
+              "name": "hx-href",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Optional URL. When set, the card becomes interactive (clickable)\nand navigates to this URL on click.\nUses wc-href to avoid conflicting with the native HTML href attribute.",
+              "fieldName": "wcHref",
+              "attribute": "hx-href"
+            }
+          ],
+          "superclass": {
+            "name": "LitElement",
+            "package": "lit"
+          },
+          "tagName": "hx-card",
+          "customElement": true,
+          "summary": "Content container with image, heading, body, footer, and action slots."
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "HelixCard",
+          "declaration": {
+            "name": "HelixCard",
+            "module": "src/components/hx-card/hx-card.ts"
+          }
+        },
+        {
+          "kind": "custom-element-definition",
+          "name": "hx-card",
+          "declaration": {
+            "name": "HelixCard",
+            "module": "src/components/hx-card/hx-card.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/components/hx-card/index.ts",
+      "declarations": [],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "HelixCard",
+          "declaration": {
+            "name": "HelixCard",
+            "module": "./hx-card.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
       "path": "src/components/hx-checkbox/hx-checkbox.ts",
       "declarations": [
         {
@@ -1856,6 +2269,344 @@
     },
     {
       "kind": "javascript-module",
+      "path": "src/components/hx-icon-button/hx-icon-button.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "An icon-only button component for compact, accessible actions.\nRenders a square button or anchor element containing a single icon.\nThe `label` property is required and provides the accessible name\nvia `aria-label` and a native tooltip via the `title` attribute.",
+          "name": "HelixIconButton",
+          "cssProperties": [
+            {
+              "description": "Button background color.",
+              "name": "--hx-icon-button-bg",
+              "default": "transparent"
+            },
+            {
+              "description": "Icon color.",
+              "name": "--hx-icon-button-color",
+              "default": "var(--hx-color-primary-500)"
+            },
+            {
+              "description": "Button border color.",
+              "name": "--hx-icon-button-border-color",
+              "default": "transparent"
+            },
+            {
+              "description": "Button border radius.",
+              "name": "--hx-icon-button-border-radius",
+              "default": "var(--hx-border-radius-md)"
+            },
+            {
+              "description": "Explicit width and height override for the button.",
+              "name": "--hx-icon-button-size"
+            },
+            {
+              "description": "Focus ring color.",
+              "name": "--hx-icon-button-focus-ring-color",
+              "default": "var(--hx-focus-ring-color)"
+            }
+          ],
+          "cssParts": [
+            {
+              "description": "The native button or anchor element.",
+              "name": "button"
+            },
+            {
+              "description": "The icon container span wrapping the default slot.",
+              "name": "icon"
+            }
+          ],
+          "slots": [
+            {
+              "description": "Icon element to display (hx-icon, svg, or img).",
+              "name": ""
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "label",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Accessible name for the button. Required. Rendered as `aria-label` and\n`title` on the underlying element. A console warning is emitted when absent.",
+              "attribute": "label"
+            },
+            {
+              "kind": "field",
+              "name": "variant",
+              "type": {
+                "text": "'primary' | 'secondary' | 'tertiary' | 'danger' | 'ghost'"
+              },
+              "default": "'ghost'",
+              "description": "Visual style variant of the button.",
+              "attribute": "variant",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "size",
+              "type": {
+                "text": "'sm' | 'md' | 'lg'"
+              },
+              "default": "'md'",
+              "description": "Size of the button.",
+              "attribute": "hx-size",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "type",
+              "type": {
+                "text": "'button' | 'submit' | 'reset'"
+              },
+              "default": "'button'",
+              "description": "The type attribute for the underlying button element.\nHas no effect when `href` is set.",
+              "attribute": "type"
+            },
+            {
+              "kind": "field",
+              "name": "disabled",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the button is disabled.",
+              "attribute": "disabled",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "href",
+              "type": {
+                "text": "string | undefined"
+              },
+              "default": "undefined",
+              "description": "When set, renders an `<a>` element instead of a `<button>`.",
+              "attribute": "href"
+            },
+            {
+              "kind": "field",
+              "name": "name",
+              "type": {
+                "text": "string | undefined"
+              },
+              "default": "undefined",
+              "description": "Name submitted with form data. Only applicable when rendering as a button.",
+              "attribute": "name"
+            },
+            {
+              "kind": "field",
+              "name": "value",
+              "type": {
+                "text": "string | undefined"
+              },
+              "default": "undefined",
+              "description": "Value submitted with form data. Only applicable when rendering as a button.",
+              "attribute": "value"
+            },
+            {
+              "kind": "field",
+              "name": "formAssociated",
+              "type": {
+                "text": "boolean"
+              },
+              "static": true,
+              "default": "true"
+            },
+            {
+              "kind": "field",
+              "name": "_internals",
+              "type": {
+                "text": "ElementInternals"
+              },
+              "privacy": "private"
+            },
+            {
+              "kind": "field",
+              "name": "form",
+              "type": {
+                "text": "HTMLFormElement | null"
+              },
+              "description": "Returns the associated form element, if any.",
+              "readonly": true
+            },
+            {
+              "kind": "method",
+              "name": "_handleClick",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "e",
+                  "type": {
+                    "text": "MouseEvent"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "_normalizedLabel",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "string"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "_classes",
+              "privacy": "private"
+            },
+            {
+              "kind": "method",
+              "name": "_iconSlot",
+              "privacy": "private"
+            }
+          ],
+          "events": [
+            {
+              "name": "hx-click",
+              "type": {
+                "text": "CustomEvent<{originalEvent: MouseEvent}>"
+              },
+              "description": "Dispatched when the button is clicked (not disabled)."
+            }
+          ],
+          "attributes": [
+            {
+              "name": "label",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Accessible name for the button. Required. Rendered as `aria-label` and\n`title` on the underlying element. A console warning is emitted when absent.",
+              "fieldName": "label",
+              "attribute": "label"
+            },
+            {
+              "name": "variant",
+              "type": {
+                "text": "'primary' | 'secondary' | 'tertiary' | 'danger' | 'ghost'"
+              },
+              "default": "'ghost'",
+              "description": "Visual style variant of the button.",
+              "fieldName": "variant",
+              "attribute": "variant"
+            },
+            {
+              "name": "hx-size",
+              "type": {
+                "text": "'sm' | 'md' | 'lg'"
+              },
+              "default": "'md'",
+              "description": "Size of the button.",
+              "fieldName": "size",
+              "attribute": "hx-size"
+            },
+            {
+              "name": "type",
+              "type": {
+                "text": "'button' | 'submit' | 'reset'"
+              },
+              "default": "'button'",
+              "description": "The type attribute for the underlying button element.\nHas no effect when `href` is set.",
+              "fieldName": "type",
+              "attribute": "type"
+            },
+            {
+              "name": "disabled",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the button is disabled.",
+              "fieldName": "disabled",
+              "attribute": "disabled"
+            },
+            {
+              "name": "href",
+              "type": {
+                "text": "string | undefined"
+              },
+              "default": "undefined",
+              "description": "When set, renders an `<a>` element instead of a `<button>`.",
+              "fieldName": "href",
+              "attribute": "href"
+            },
+            {
+              "name": "name",
+              "type": {
+                "text": "string | undefined"
+              },
+              "default": "undefined",
+              "description": "Name submitted with form data. Only applicable when rendering as a button.",
+              "fieldName": "name",
+              "attribute": "name"
+            },
+            {
+              "name": "value",
+              "type": {
+                "text": "string | undefined"
+              },
+              "default": "undefined",
+              "description": "Value submitted with form data. Only applicable when rendering as a button.",
+              "fieldName": "value",
+              "attribute": "value"
+            }
+          ],
+          "superclass": {
+            "name": "LitElement",
+            "package": "lit"
+          },
+          "tagName": "hx-icon-button",
+          "customElement": true,
+          "summary": "Icon-only action button with full accessibility support."
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "HelixIconButton",
+          "declaration": {
+            "name": "HelixIconButton",
+            "module": "src/components/hx-icon-button/hx-icon-button.ts"
+          }
+        },
+        {
+          "kind": "custom-element-definition",
+          "name": "hx-icon-button",
+          "declaration": {
+            "name": "HelixIconButton",
+            "module": "src/components/hx-icon-button/hx-icon-button.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/components/hx-icon-button/index.ts",
+      "declarations": [],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "HelixIconButton",
+          "declaration": {
+            "name": "HelixIconButton",
+            "module": "./hx-icon-button.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
       "path": "src/components/hx-prose/hx-prose.ts",
       "declarations": [
         {
@@ -2695,277 +3446,6 @@
           "declaration": {
             "name": "HelixRadio",
             "module": "./hx-radio.js"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
-      "path": "src/components/hx-card/hx-card.ts",
-      "declarations": [
-        {
-          "kind": "class",
-          "description": "A flexible card component for displaying grouped content.",
-          "name": "HelixCard",
-          "cssProperties": [
-            {
-              "description": "Card background color.",
-              "name": "--hx-card-bg",
-              "default": "var(--hx-color-neutral-0)"
-            },
-            {
-              "description": "Card text color.",
-              "name": "--hx-card-color",
-              "default": "var(--hx-color-neutral-800)"
-            },
-            {
-              "description": "Card border color.",
-              "name": "--hx-card-border-color",
-              "default": "var(--hx-color-neutral-200)"
-            },
-            {
-              "description": "Card border radius.",
-              "name": "--hx-card-border-radius",
-              "default": "var(--hx-border-radius-lg)"
-            },
-            {
-              "description": "Internal padding for card sections.",
-              "name": "--hx-card-padding",
-              "default": "var(--hx-space-6)"
-            },
-            {
-              "description": "Gap between card sections.",
-              "name": "--hx-card-gap",
-              "default": "var(--hx-space-4)"
-            }
-          ],
-          "cssParts": [
-            {
-              "description": "The outer card container element.",
-              "name": "card"
-            },
-            {
-              "description": "The image slot container.",
-              "name": "image"
-            },
-            {
-              "description": "The heading slot container.",
-              "name": "heading"
-            },
-            {
-              "description": "The body slot container.",
-              "name": "body"
-            },
-            {
-              "description": "The footer slot container.",
-              "name": "footer"
-            },
-            {
-              "description": "The actions slot container.",
-              "name": "actions"
-            }
-          ],
-          "slots": [
-            {
-              "description": "Optional image or media content at the top of the card.",
-              "name": "image"
-            },
-            {
-              "description": "The card heading/title content.",
-              "name": "heading"
-            },
-            {
-              "description": "Default slot for the card body content.",
-              "name": ""
-            },
-            {
-              "description": "Optional footer content below the body.",
-              "name": "footer"
-            },
-            {
-              "description": "Optional action buttons, rendered with a top border separator.",
-              "name": "actions"
-            }
-          ],
-          "members": [
-            {
-              "kind": "field",
-              "name": "variant",
-              "type": {
-                "text": "'default' | 'featured' | 'compact'"
-              },
-              "default": "'default'",
-              "description": "Visual style variant of the card.",
-              "attribute": "variant",
-              "reflects": true
-            },
-            {
-              "kind": "field",
-              "name": "elevation",
-              "type": {
-                "text": "'flat' | 'raised' | 'floating'"
-              },
-              "default": "'flat'",
-              "description": "Elevation (shadow depth) of the card.",
-              "attribute": "elevation",
-              "reflects": true
-            },
-            {
-              "kind": "field",
-              "name": "wcHref",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "description": "Optional URL. When set, the card becomes interactive (clickable)\nand navigates to this URL on click.\nUses wc-href to avoid conflicting with the native HTML href attribute.",
-              "attribute": "hx-href"
-            },
-            {
-              "kind": "field",
-              "name": "_hasSlotContent",
-              "type": {
-                "text": "Record<string, boolean>"
-              },
-              "privacy": "private",
-              "default": "{ image: false, heading: false, footer: false, actions: false, }"
-            },
-            {
-              "kind": "method",
-              "name": "_handleSlotChange",
-              "privacy": "private",
-              "parameters": [
-                {
-                  "name": "slotName",
-                  "type": {
-                    "text": "string"
-                  }
-                }
-              ]
-            },
-            {
-              "kind": "method",
-              "name": "_handleClick",
-              "privacy": "private",
-              "return": {
-                "type": {
-                  "text": "void"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "e",
-                  "type": {
-                    "text": "MouseEvent"
-                  }
-                }
-              ]
-            },
-            {
-              "kind": "method",
-              "name": "_handleKeyDown",
-              "privacy": "private",
-              "return": {
-                "type": {
-                  "text": "void"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "e",
-                  "type": {
-                    "text": "KeyboardEvent"
-                  }
-                }
-              ]
-            }
-          ],
-          "events": [
-            {
-              "name": "hx-card-click",
-              "type": {
-                "text": "CustomEvent"
-              },
-              "description": "Dispatched when an interactive card is clicked.\nIncludes the target href in the detail."
-            },
-            {
-              "type": {
-                "text": "CustomEvent<{url: string, originalEvent: MouseEvent}>"
-              },
-              "description": "Dispatched when an interactive card (with wc-href) is clicked.",
-              "name": "wc-card-click"
-            }
-          ],
-          "attributes": [
-            {
-              "name": "variant",
-              "type": {
-                "text": "'default' | 'featured' | 'compact'"
-              },
-              "default": "'default'",
-              "description": "Visual style variant of the card.",
-              "fieldName": "variant",
-              "attribute": "variant"
-            },
-            {
-              "name": "elevation",
-              "type": {
-                "text": "'flat' | 'raised' | 'floating'"
-              },
-              "default": "'flat'",
-              "description": "Elevation (shadow depth) of the card.",
-              "fieldName": "elevation",
-              "attribute": "elevation"
-            },
-            {
-              "name": "hx-href",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "description": "Optional URL. When set, the card becomes interactive (clickable)\nand navigates to this URL on click.\nUses wc-href to avoid conflicting with the native HTML href attribute.",
-              "fieldName": "wcHref",
-              "attribute": "hx-href"
-            }
-          ],
-          "superclass": {
-            "name": "LitElement",
-            "package": "lit"
-          },
-          "tagName": "hx-card",
-          "customElement": true,
-          "summary": "Content container with image, heading, body, footer, and action slots."
-        }
-      ],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "HelixCard",
-          "declaration": {
-            "name": "HelixCard",
-            "module": "src/components/hx-card/hx-card.ts"
-          }
-        },
-        {
-          "kind": "custom-element-definition",
-          "name": "hx-card",
-          "declaration": {
-            "name": "HelixCard",
-            "module": "src/components/hx-card/hx-card.ts"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
-      "path": "src/components/hx-card/index.ts",
-      "declarations": [],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "HelixCard",
-          "declaration": {
-            "name": "HelixCard",
-            "module": "./hx-card.js"
           }
         }
       ]
@@ -4105,6 +4585,341 @@
           "declaration": {
             "name": "HelixSwitch",
             "module": "./hx-switch.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/components/hx-tag/hx-tag.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "A removable or static label for categories, filters, and selections.\nDistinct from badge — tags represent user-applied or filterable labels.",
+          "name": "HelixTag",
+          "cssProperties": [
+            {
+              "description": "Tag background color.",
+              "name": "--hx-tag-bg",
+              "default": "var(--hx-color-neutral-100)"
+            },
+            {
+              "description": "Tag text color.",
+              "name": "--hx-tag-color",
+              "default": "var(--hx-color-neutral-700)"
+            },
+            {
+              "description": "Tag border color.",
+              "name": "--hx-tag-border-color",
+              "default": "var(--hx-color-neutral-200)"
+            },
+            {
+              "description": "Tag border radius.",
+              "name": "--hx-tag-border-radius",
+              "default": "var(--hx-border-radius-md)"
+            },
+            {
+              "description": "Tag font size (set per size variant).",
+              "name": "--hx-tag-font-size"
+            },
+            {
+              "description": "Tag font weight.",
+              "name": "--hx-tag-font-weight",
+              "default": "var(--hx-font-weight-medium)"
+            },
+            {
+              "description": "Tag font family.",
+              "name": "--hx-tag-font-family",
+              "default": "var(--hx-font-family-sans)"
+            },
+            {
+              "description": "Tag horizontal padding (set per size variant).",
+              "name": "--hx-tag-padding-x"
+            },
+            {
+              "description": "Tag vertical padding (set per size variant).",
+              "name": "--hx-tag-padding-y"
+            }
+          ],
+          "cssParts": [
+            {
+              "description": "The main tag container element.",
+              "name": "tag"
+            },
+            {
+              "description": "The remove button (only rendered when removable is true).",
+              "name": "remove-button"
+            },
+            {
+              "description": "The prefix slot wrapper.",
+              "name": "prefix"
+            }
+          ],
+          "slots": [
+            {
+              "description": "Default slot for tag label text.",
+              "name": ""
+            },
+            {
+              "description": "Icon or prefix content displayed before the label.",
+              "name": "prefix"
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "variant",
+              "type": {
+                "text": "'primary' | 'secondary' | 'neutral' | 'outline'"
+              },
+              "default": "'neutral'",
+              "description": "Visual style variant of the tag.",
+              "attribute": "variant",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "size",
+              "type": {
+                "text": "'sm' | 'md' | 'lg'"
+              },
+              "default": "'md'",
+              "description": "Size of the tag.",
+              "attribute": "hx-size",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "removable",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the tag displays a remove button to allow dismissal.",
+              "attribute": "removable",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "disabled",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the tag is in a disabled state, preventing interaction.",
+              "attribute": "disabled",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "selected",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the tag is in a selected/active state, used for filter toggle mode.",
+              "attribute": "selected",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "_hasPrefixContent",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "default": "false"
+            },
+            {
+              "kind": "method",
+              "name": "_handlePrefixSlotChange",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "e",
+                  "type": {
+                    "text": "Event"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "_handleTagClick",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "_handleKeyDown",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "e",
+                  "type": {
+                    "text": "KeyboardEvent"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "_handleRemoveClick",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "e",
+                  "type": {
+                    "text": "Event"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "_handleRemoveKeyDown",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "e",
+                  "type": {
+                    "text": "KeyboardEvent"
+                  }
+                }
+              ]
+            }
+          ],
+          "events": [
+            {
+              "name": "hx-select",
+              "type": {
+                "text": "CustomEvent<{selected: boolean}>"
+              },
+              "description": "Dispatched when the tag is clicked in toggle mode."
+            },
+            {
+              "name": "hx-remove",
+              "type": {
+                "text": "CustomEvent"
+              },
+              "description": "Dispatched when the remove button is clicked."
+            }
+          ],
+          "attributes": [
+            {
+              "name": "variant",
+              "type": {
+                "text": "'primary' | 'secondary' | 'neutral' | 'outline'"
+              },
+              "default": "'neutral'",
+              "description": "Visual style variant of the tag.",
+              "fieldName": "variant",
+              "attribute": "variant"
+            },
+            {
+              "name": "hx-size",
+              "type": {
+                "text": "'sm' | 'md' | 'lg'"
+              },
+              "default": "'md'",
+              "description": "Size of the tag.",
+              "fieldName": "size",
+              "attribute": "hx-size"
+            },
+            {
+              "name": "removable",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the tag displays a remove button to allow dismissal.",
+              "fieldName": "removable",
+              "attribute": "removable"
+            },
+            {
+              "name": "disabled",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the tag is in a disabled state, preventing interaction.",
+              "fieldName": "disabled",
+              "attribute": "disabled"
+            },
+            {
+              "name": "selected",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the tag is in a selected/active state, used for filter toggle mode.",
+              "fieldName": "selected",
+              "attribute": "selected"
+            }
+          ],
+          "superclass": {
+            "name": "LitElement",
+            "package": "lit"
+          },
+          "tagName": "hx-tag",
+          "customElement": true,
+          "summary": "Removable or static label for categories, filters, and selections."
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "HelixTag",
+          "declaration": {
+            "name": "HelixTag",
+            "module": "src/components/hx-tag/hx-tag.ts"
+          }
+        },
+        {
+          "kind": "custom-element-definition",
+          "name": "hx-tag",
+          "declaration": {
+            "name": "HelixTag",
+            "module": "src/components/hx-tag/hx-tag.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/components/hx-tag/index.ts",
+      "declarations": [],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "HelixTag",
+          "declaration": {
+            "name": "HelixTag",
+            "module": "./hx-tag.js"
           }
         }
       ]
