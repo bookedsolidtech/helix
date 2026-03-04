@@ -9,9 +9,7 @@ import {
   mcpAnalyzeAccessibility,
   clearMcpCache,
 } from './mcp-client';
-import type {
-  McpComponentHealth,
-} from './mcp-client';
+import type { McpComponentHealth } from './mcp-client';
 import { WC_TOOLS_BINARY } from './mcp-constants';
 
 afterEach(() => {

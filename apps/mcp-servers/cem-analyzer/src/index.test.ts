@@ -8,7 +8,7 @@ describe('MCP Server Lifecycle - CEM Analyzer', () => {
     it('creates server with correct metadata', () => {
       const server = new Server(
         { name: '@helix/mcp-cem-analyzer', version: '0.1.0' },
-        { capabilities: { tools: {} } }
+        { capabilities: { tools: {} } },
       );
       expect(server).toBeDefined();
     });
@@ -16,7 +16,7 @@ describe('MCP Server Lifecycle - CEM Analyzer', () => {
     it('server has correct name', () => {
       const server = new Server(
         { name: '@helix/mcp-cem-analyzer', version: '0.1.0' },
-        { capabilities: { tools: {} } }
+        { capabilities: { tools: {} } },
       );
       expect(server).toBeDefined();
     });
@@ -24,7 +24,7 @@ describe('MCP Server Lifecycle - CEM Analyzer', () => {
     it('server has correct version', () => {
       const server = new Server(
         { name: '@helix/mcp-cem-analyzer', version: '0.1.0' },
-        { capabilities: { tools: {} } }
+        { capabilities: { tools: {} } },
       );
       expect(server).toBeDefined();
     });
@@ -34,7 +34,7 @@ describe('MCP Server Lifecycle - CEM Analyzer', () => {
     it('declares tools capability', () => {
       const server = new Server(
         { name: '@helix/mcp-cem-analyzer', version: '0.1.0' },
-        { capabilities: { tools: {} } }
+        { capabilities: { tools: {} } },
       );
       expect(server).toBeDefined();
     });
@@ -42,7 +42,7 @@ describe('MCP Server Lifecycle - CEM Analyzer', () => {
     it('tools are registered successfully', () => {
       const server = new Server(
         { name: '@helix/mcp-cem-analyzer', version: '0.1.0' },
-        { capabilities: { tools: {} } }
+        { capabilities: { tools: {} } },
       );
       expect(() => registerCemTools(server)).not.toThrow();
     });
@@ -64,10 +64,7 @@ describe('MCP Server Lifecycle - CEM Analyzer', () => {
   describe('Error Handling', () => {
     it('handles initialization errors gracefully', () => {
       expect(() => {
-        new Server(
-          { name: '', version: '' },
-          { capabilities: {} }
-        );
+        new Server({ name: '', version: '' }, { capabilities: {} });
       }).not.toThrow();
     });
   });
