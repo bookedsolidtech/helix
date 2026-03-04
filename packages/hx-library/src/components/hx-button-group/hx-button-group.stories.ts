@@ -71,7 +71,7 @@ export const Default: Story = {
 
     const groupDiv = group?.shadowRoot?.querySelector('[part="group"]');
     await expect(groupDiv).toBeTruthy();
-    await expect(groupDiv?.getAttribute('role')).toBe('group');
+    await expect(groupDiv?.hasAttribute('role')).toBe(false);
   },
 };
 
@@ -258,7 +258,7 @@ export const PatientRecord: Story = {
     for (const group of groups) {
       const groupDiv = group.shadowRoot?.querySelector('[part="group"]');
       await expect(groupDiv).toBeTruthy();
-      await expect(groupDiv?.getAttribute('role')).toBe('group');
+      await expect(groupDiv?.hasAttribute('role')).toBe(false);
     }
   },
 };
