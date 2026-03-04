@@ -597,7 +597,8 @@ export const InAForm: Story = {
   },
   play: async ({ canvasElement }) => {
     const sliders = canvasElement.querySelectorAll('hx-slider');
-    const painInput = sliders[0]?.shadowRoot?.querySelector<HTMLInputElement>('input[type="range"]');
+    const painInput =
+      sliders[0]?.shadowRoot?.querySelector<HTMLInputElement>('input[type="range"]');
     if (painInput) {
       painInput.focus();
       await userEvent.keyboard('{ArrowRight}{ArrowRight}{ArrowRight}');

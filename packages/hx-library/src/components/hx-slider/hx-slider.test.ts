@@ -419,18 +419,14 @@ describe('hx-slider', () => {
 
   describe('Property: helpText', () => {
     it('renders help text below the slider', async () => {
-      const el = await fixture<HelixSlider>(
-        '<hx-slider help-text="Adjust the level"></hx-slider>',
-      );
+      const el = await fixture<HelixSlider>('<hx-slider help-text="Adjust the level"></hx-slider>');
       const helpEl = shadowQuery(el, '.slider__help-text');
       expect(helpEl).toBeTruthy();
       expect(helpEl?.textContent?.trim()).toContain('Adjust the level');
     });
 
     it('associates help text with input via aria-describedby', async () => {
-      const el = await fixture<HelixSlider>(
-        '<hx-slider help-text="Helpful guidance"></hx-slider>',
-      );
+      const el = await fixture<HelixSlider>('<hx-slider help-text="Helpful guidance"></hx-slider>');
       const input = shadowQuery(el, 'input[type="range"]');
       const helpEl = shadowQuery(el, '.slider__help-text');
       const describedBy = input?.getAttribute('aria-describedby');
