@@ -1,7 +1,7 @@
 {
   "config": {
-    "configFile": "/Volumes/Development/booked/helix/.worktrees/feature-t1-05-hx-text-input-single-line-text/playwright.config.ts",
-    "rootDir": "/Volumes/Development/booked/helix/.worktrees/feature-t1-05-hx-text-input-single-line-text/packages/hx-library/e2e",
+    "configFile": "/Volumes/Development/booked/helix/.worktrees/feature-t1-01-hx-button-primary-action-button/playwright.config.ts",
+    "rootDir": "/Volumes/Development/booked/helix/.worktrees/feature-t1-01-hx-button-primary-action-button/packages/hx-library/e2e",
     "forbidOnly": false,
     "fullyParallel": true,
     "globalSetup": null,
@@ -10,49 +10,41 @@
     "grep": {},
     "grepInvert": null,
     "maxFailures": 0,
-    "metadata": {
-      "actualWorkers": 5
-    },
+    "metadata": {},
     "preserveOutput": "always",
     "projects": [
       {
-        "outputDir": "/Volumes/Development/booked/helix/.worktrees/feature-t1-05-hx-text-input-single-line-text/packages/hx-library/.cache/vrt-results",
+        "outputDir": "/Volumes/Development/booked/helix/.worktrees/feature-t1-01-hx-button-primary-action-button/packages/hx-library/.cache/vrt-results",
         "repeatEach": 1,
         "retries": 0,
-        "metadata": {
-          "actualWorkers": 5
-        },
+        "metadata": {},
         "id": "chromium",
         "name": "chromium",
-        "testDir": "/Volumes/Development/booked/helix/.worktrees/feature-t1-05-hx-text-input-single-line-text/packages/hx-library/e2e",
+        "testDir": "/Volumes/Development/booked/helix/.worktrees/feature-t1-01-hx-button-primary-action-button/packages/hx-library/e2e",
         "testIgnore": [],
         "testMatch": ["**/*.@(spec|test).?(c|m)[jt]s?(x)"],
         "timeout": 30000
       },
       {
-        "outputDir": "/Volumes/Development/booked/helix/.worktrees/feature-t1-05-hx-text-input-single-line-text/packages/hx-library/.cache/vrt-results",
+        "outputDir": "/Volumes/Development/booked/helix/.worktrees/feature-t1-01-hx-button-primary-action-button/packages/hx-library/.cache/vrt-results",
         "repeatEach": 1,
         "retries": 0,
-        "metadata": {
-          "actualWorkers": 5
-        },
+        "metadata": {},
         "id": "firefox",
         "name": "firefox",
-        "testDir": "/Volumes/Development/booked/helix/.worktrees/feature-t1-05-hx-text-input-single-line-text/packages/hx-library/e2e",
+        "testDir": "/Volumes/Development/booked/helix/.worktrees/feature-t1-01-hx-button-primary-action-button/packages/hx-library/e2e",
         "testIgnore": [],
         "testMatch": ["**/*.@(spec|test).?(c|m)[jt]s?(x)"],
         "timeout": 30000
       },
       {
-        "outputDir": "/Volumes/Development/booked/helix/.worktrees/feature-t1-05-hx-text-input-single-line-text/packages/hx-library/.cache/vrt-results",
+        "outputDir": "/Volumes/Development/booked/helix/.worktrees/feature-t1-01-hx-button-primary-action-button/packages/hx-library/.cache/vrt-results",
         "repeatEach": 1,
         "retries": 0,
-        "metadata": {
-          "actualWorkers": 5
-        },
+        "metadata": {},
         "id": "webkit",
         "name": "webkit",
-        "testDir": "/Volumes/Development/booked/helix/.worktrees/feature-t1-05-hx-text-input-single-line-text/packages/hx-library/e2e",
+        "testDir": "/Volumes/Development/booked/helix/.worktrees/feature-t1-01-hx-button-primary-action-button/packages/hx-library/e2e",
         "testIgnore": [],
         "testMatch": ["**/*.@(spec|test).?(c|m)[jt]s?(x)"],
         "timeout": 30000
@@ -81,494 +73,19 @@
     "workers": 5,
     "webServer": null
   },
-  "suites": [
+  "suites": [],
+  "errors": [
     {
-      "title": "hx-text-input-verify.spec.ts",
-      "file": "hx-text-input-verify.spec.ts",
-      "column": 0,
-      "line": 0,
-      "specs": [],
-      "suites": [
-        {
-          "title": "hx-text-input verification",
-          "file": "hx-text-input-verify.spec.ts",
-          "line": 8,
-          "column": 6,
-          "specs": [
-            {
-              "title": "renders shadow DOM with native input",
-              "ok": false,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "chromium",
-                  "projectName": "chromium",
-                  "results": [
-                    {
-                      "workerIndex": 0,
-                      "parallelIndex": 0,
-                      "status": "timedOut",
-                      "duration": 30058,
-                      "error": {
-                        "message": "\u001b[31mTest timeout of 30000ms exceeded while running \"beforeEach\" hook.\u001b[39m",
-                        "stack": "\u001b[31mTest timeout of 30000ms exceeded while running \"beforeEach\" hook.\u001b[39m\n    at /Volumes/Development/booked/helix/.worktrees/feature-t1-05-hx-text-input-single-line-text/packages/hx-library/e2e/hx-text-input-verify.spec.ts:9:8",
-                        "location": {
-                          "file": "/Volumes/Development/booked/helix/.worktrees/feature-t1-05-hx-text-input-single-line-text/packages/hx-library/e2e/hx-text-input-verify.spec.ts",
-                          "column": 8,
-                          "line": 9
-                        },
-                        "snippet": "   7 |\n   8 | test.describe('hx-text-input verification', () => {\n>  9 |   test.beforeEach(async ({ page }) => {\n     |        ^\n  10 |     await page.setContent(`\n  11 |       <!DOCTYPE html>\n  12 |       <html>"
-                      },
-                      "errors": [
-                        {
-                          "location": {
-                            "file": "/Volumes/Development/booked/helix/.worktrees/feature-t1-05-hx-text-input-single-line-text/packages/hx-library/e2e/hx-text-input-verify.spec.ts",
-                            "column": 8,
-                            "line": 9
-                          },
-                          "message": "\u001b[31mTest timeout of 30000ms exceeded while running \"beforeEach\" hook.\u001b[39m\n\n   7 |\n   8 | test.describe('hx-text-input verification', () => {\n>  9 |   test.beforeEach(async ({ page }) => {\n     |        ^\n  10 |     await page.setContent(`\n  11 |       <!DOCTYPE html>\n  12 |       <html>\n    at /Volumes/Development/booked/helix/.worktrees/feature-t1-05-hx-text-input-single-line-text/packages/hx-library/e2e/hx-text-input-verify.spec.ts:9:8"
-                        },
-                        {
-                          "location": {
-                            "file": "/Volumes/Development/booked/helix/.worktrees/feature-t1-05-hx-text-input-single-line-text/packages/hx-library/e2e/hx-text-input-verify.spec.ts",
-                            "column": 16,
-                            "line": 24
-                          },
-                          "message": "Error: page.waitForFunction: Test timeout of 30000ms exceeded.\n\n  22 |     `);\n  23 |     await page.addScriptTag({ path: distPath, type: 'module' });\n> 24 |     await page.waitForFunction(() => customElements.get('hx-text-input') !== undefined);\n     |                ^\n  25 |     await page.waitForTimeout(300);\n  26 |   });\n  27 |\n    at /Volumes/Development/booked/helix/.worktrees/feature-t1-05-hx-text-input-single-line-text/packages/hx-library/e2e/hx-text-input-verify.spec.ts:24:16"
-                        }
-                      ],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-03-03T21:04:35.522Z",
-                      "annotations": [],
-                      "attachments": [],
-                      "errorLocation": {
-                        "file": "/Volumes/Development/booked/helix/.worktrees/feature-t1-05-hx-text-input-single-line-text/packages/hx-library/e2e/hx-text-input-verify.spec.ts",
-                        "column": 8,
-                        "line": 9
-                      }
-                    }
-                  ],
-                  "status": "unexpected"
-                }
-              ],
-              "id": "7eed9971373e7ec95715-ef2d60a795aae8d0bc4b",
-              "file": "hx-text-input-verify.spec.ts",
-              "line": 28,
-              "column": 3
-            },
-            {
-              "title": "renders label text",
-              "ok": false,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "chromium",
-                  "projectName": "chromium",
-                  "results": [
-                    {
-                      "workerIndex": 1,
-                      "parallelIndex": 1,
-                      "status": "timedOut",
-                      "duration": 30039,
-                      "error": {
-                        "message": "\u001b[31mTest timeout of 30000ms exceeded while running \"beforeEach\" hook.\u001b[39m",
-                        "stack": "\u001b[31mTest timeout of 30000ms exceeded while running \"beforeEach\" hook.\u001b[39m\n    at /Volumes/Development/booked/helix/.worktrees/feature-t1-05-hx-text-input-single-line-text/packages/hx-library/e2e/hx-text-input-verify.spec.ts:9:8",
-                        "location": {
-                          "file": "/Volumes/Development/booked/helix/.worktrees/feature-t1-05-hx-text-input-single-line-text/packages/hx-library/e2e/hx-text-input-verify.spec.ts",
-                          "column": 8,
-                          "line": 9
-                        },
-                        "snippet": "   7 |\n   8 | test.describe('hx-text-input verification', () => {\n>  9 |   test.beforeEach(async ({ page }) => {\n     |        ^\n  10 |     await page.setContent(`\n  11 |       <!DOCTYPE html>\n  12 |       <html>"
-                      },
-                      "errors": [
-                        {
-                          "location": {
-                            "file": "/Volumes/Development/booked/helix/.worktrees/feature-t1-05-hx-text-input-single-line-text/packages/hx-library/e2e/hx-text-input-verify.spec.ts",
-                            "column": 8,
-                            "line": 9
-                          },
-                          "message": "\u001b[31mTest timeout of 30000ms exceeded while running \"beforeEach\" hook.\u001b[39m\n\n   7 |\n   8 | test.describe('hx-text-input verification', () => {\n>  9 |   test.beforeEach(async ({ page }) => {\n     |        ^\n  10 |     await page.setContent(`\n  11 |       <!DOCTYPE html>\n  12 |       <html>\n    at /Volumes/Development/booked/helix/.worktrees/feature-t1-05-hx-text-input-single-line-text/packages/hx-library/e2e/hx-text-input-verify.spec.ts:9:8"
-                        },
-                        {
-                          "location": {
-                            "file": "/Volumes/Development/booked/helix/.worktrees/feature-t1-05-hx-text-input-single-line-text/packages/hx-library/e2e/hx-text-input-verify.spec.ts",
-                            "column": 16,
-                            "line": 24
-                          },
-                          "message": "Error: page.waitForFunction: Test timeout of 30000ms exceeded.\n\n  22 |     `);\n  23 |     await page.addScriptTag({ path: distPath, type: 'module' });\n> 24 |     await page.waitForFunction(() => customElements.get('hx-text-input') !== undefined);\n     |                ^\n  25 |     await page.waitForTimeout(300);\n  26 |   });\n  27 |\n    at /Volumes/Development/booked/helix/.worktrees/feature-t1-05-hx-text-input-single-line-text/packages/hx-library/e2e/hx-text-input-verify.spec.ts:24:16"
-                        }
-                      ],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-03-03T21:04:35.536Z",
-                      "annotations": [],
-                      "attachments": [],
-                      "errorLocation": {
-                        "file": "/Volumes/Development/booked/helix/.worktrees/feature-t1-05-hx-text-input-single-line-text/packages/hx-library/e2e/hx-text-input-verify.spec.ts",
-                        "column": 8,
-                        "line": 9
-                      }
-                    }
-                  ],
-                  "status": "unexpected"
-                }
-              ],
-              "id": "7eed9971373e7ec95715-2667840861a9229cf791",
-              "file": "hx-text-input-verify.spec.ts",
-              "line": 33,
-              "column": 3
-            },
-            {
-              "title": "accepts text input and fires hx-input event",
-              "ok": false,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "chromium",
-                  "projectName": "chromium",
-                  "results": [
-                    {
-                      "workerIndex": 2,
-                      "parallelIndex": 2,
-                      "status": "timedOut",
-                      "duration": 30040,
-                      "error": {
-                        "message": "\u001b[31mTest timeout of 30000ms exceeded while running \"beforeEach\" hook.\u001b[39m",
-                        "stack": "\u001b[31mTest timeout of 30000ms exceeded while running \"beforeEach\" hook.\u001b[39m\n    at /Volumes/Development/booked/helix/.worktrees/feature-t1-05-hx-text-input-single-line-text/packages/hx-library/e2e/hx-text-input-verify.spec.ts:9:8",
-                        "location": {
-                          "file": "/Volumes/Development/booked/helix/.worktrees/feature-t1-05-hx-text-input-single-line-text/packages/hx-library/e2e/hx-text-input-verify.spec.ts",
-                          "column": 8,
-                          "line": 9
-                        },
-                        "snippet": "   7 |\n   8 | test.describe('hx-text-input verification', () => {\n>  9 |   test.beforeEach(async ({ page }) => {\n     |        ^\n  10 |     await page.setContent(`\n  11 |       <!DOCTYPE html>\n  12 |       <html>"
-                      },
-                      "errors": [
-                        {
-                          "location": {
-                            "file": "/Volumes/Development/booked/helix/.worktrees/feature-t1-05-hx-text-input-single-line-text/packages/hx-library/e2e/hx-text-input-verify.spec.ts",
-                            "column": 8,
-                            "line": 9
-                          },
-                          "message": "\u001b[31mTest timeout of 30000ms exceeded while running \"beforeEach\" hook.\u001b[39m\n\n   7 |\n   8 | test.describe('hx-text-input verification', () => {\n>  9 |   test.beforeEach(async ({ page }) => {\n     |        ^\n  10 |     await page.setContent(`\n  11 |       <!DOCTYPE html>\n  12 |       <html>\n    at /Volumes/Development/booked/helix/.worktrees/feature-t1-05-hx-text-input-single-line-text/packages/hx-library/e2e/hx-text-input-verify.spec.ts:9:8"
-                        },
-                        {
-                          "location": {
-                            "file": "/Volumes/Development/booked/helix/.worktrees/feature-t1-05-hx-text-input-single-line-text/packages/hx-library/e2e/hx-text-input-verify.spec.ts",
-                            "column": 16,
-                            "line": 24
-                          },
-                          "message": "Error: page.waitForFunction: Test timeout of 30000ms exceeded.\n\n  22 |     `);\n  23 |     await page.addScriptTag({ path: distPath, type: 'module' });\n> 24 |     await page.waitForFunction(() => customElements.get('hx-text-input') !== undefined);\n     |                ^\n  25 |     await page.waitForTimeout(300);\n  26 |   });\n  27 |\n    at /Volumes/Development/booked/helix/.worktrees/feature-t1-05-hx-text-input-single-line-text/packages/hx-library/e2e/hx-text-input-verify.spec.ts:24:16"
-                        }
-                      ],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-03-03T21:04:35.549Z",
-                      "annotations": [],
-                      "attachments": [],
-                      "errorLocation": {
-                        "file": "/Volumes/Development/booked/helix/.worktrees/feature-t1-05-hx-text-input-single-line-text/packages/hx-library/e2e/hx-text-input-verify.spec.ts",
-                        "column": 8,
-                        "line": 9
-                      }
-                    }
-                  ],
-                  "status": "unexpected"
-                }
-              ],
-              "id": "7eed9971373e7ec95715-9e49cd1be4fb90d72d52",
-              "file": "hx-text-input-verify.spec.ts",
-              "line": 38,
-              "column": 3
-            },
-            {
-              "title": "readonly attribute sets native input readonly",
-              "ok": false,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "chromium",
-                  "projectName": "chromium",
-                  "results": [
-                    {
-                      "workerIndex": 3,
-                      "parallelIndex": 3,
-                      "status": "timedOut",
-                      "duration": 30036,
-                      "error": {
-                        "message": "\u001b[31mTest timeout of 30000ms exceeded while running \"beforeEach\" hook.\u001b[39m",
-                        "stack": "\u001b[31mTest timeout of 30000ms exceeded while running \"beforeEach\" hook.\u001b[39m\n    at /Volumes/Development/booked/helix/.worktrees/feature-t1-05-hx-text-input-single-line-text/packages/hx-library/e2e/hx-text-input-verify.spec.ts:9:8",
-                        "location": {
-                          "file": "/Volumes/Development/booked/helix/.worktrees/feature-t1-05-hx-text-input-single-line-text/packages/hx-library/e2e/hx-text-input-verify.spec.ts",
-                          "column": 8,
-                          "line": 9
-                        },
-                        "snippet": "   7 |\n   8 | test.describe('hx-text-input verification', () => {\n>  9 |   test.beforeEach(async ({ page }) => {\n     |        ^\n  10 |     await page.setContent(`\n  11 |       <!DOCTYPE html>\n  12 |       <html>"
-                      },
-                      "errors": [
-                        {
-                          "location": {
-                            "file": "/Volumes/Development/booked/helix/.worktrees/feature-t1-05-hx-text-input-single-line-text/packages/hx-library/e2e/hx-text-input-verify.spec.ts",
-                            "column": 8,
-                            "line": 9
-                          },
-                          "message": "\u001b[31mTest timeout of 30000ms exceeded while running \"beforeEach\" hook.\u001b[39m\n\n   7 |\n   8 | test.describe('hx-text-input verification', () => {\n>  9 |   test.beforeEach(async ({ page }) => {\n     |        ^\n  10 |     await page.setContent(`\n  11 |       <!DOCTYPE html>\n  12 |       <html>\n    at /Volumes/Development/booked/helix/.worktrees/feature-t1-05-hx-text-input-single-line-text/packages/hx-library/e2e/hx-text-input-verify.spec.ts:9:8"
-                        },
-                        {
-                          "location": {
-                            "file": "/Volumes/Development/booked/helix/.worktrees/feature-t1-05-hx-text-input-single-line-text/packages/hx-library/e2e/hx-text-input-verify.spec.ts",
-                            "column": 16,
-                            "line": 24
-                          },
-                          "message": "Error: page.waitForFunction: Test timeout of 30000ms exceeded.\n\n  22 |     `);\n  23 |     await page.addScriptTag({ path: distPath, type: 'module' });\n> 24 |     await page.waitForFunction(() => customElements.get('hx-text-input') !== undefined);\n     |                ^\n  25 |     await page.waitForTimeout(300);\n  26 |   });\n  27 |\n    at /Volumes/Development/booked/helix/.worktrees/feature-t1-05-hx-text-input-single-line-text/packages/hx-library/e2e/hx-text-input-verify.spec.ts:24:16"
-                        }
-                      ],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-03-03T21:04:35.521Z",
-                      "annotations": [],
-                      "attachments": [],
-                      "errorLocation": {
-                        "file": "/Volumes/Development/booked/helix/.worktrees/feature-t1-05-hx-text-input-single-line-text/packages/hx-library/e2e/hx-text-input-verify.spec.ts",
-                        "column": 8,
-                        "line": 9
-                      }
-                    }
-                  ],
-                  "status": "unexpected"
-                }
-              ],
-              "id": "7eed9971373e7ec95715-fd4a3fc26f47aeb29b9e",
-              "file": "hx-text-input-verify.spec.ts",
-              "line": 56,
-              "column": 3
-            },
-            {
-              "title": "hx-size attribute applies size class",
-              "ok": false,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "chromium",
-                  "projectName": "chromium",
-                  "results": [
-                    {
-                      "workerIndex": 4,
-                      "parallelIndex": 4,
-                      "status": "timedOut",
-                      "duration": 30041,
-                      "error": {
-                        "message": "\u001b[31mTest timeout of 30000ms exceeded while running \"beforeEach\" hook.\u001b[39m",
-                        "stack": "\u001b[31mTest timeout of 30000ms exceeded while running \"beforeEach\" hook.\u001b[39m\n    at /Volumes/Development/booked/helix/.worktrees/feature-t1-05-hx-text-input-single-line-text/packages/hx-library/e2e/hx-text-input-verify.spec.ts:9:8",
-                        "location": {
-                          "file": "/Volumes/Development/booked/helix/.worktrees/feature-t1-05-hx-text-input-single-line-text/packages/hx-library/e2e/hx-text-input-verify.spec.ts",
-                          "column": 8,
-                          "line": 9
-                        },
-                        "snippet": "   7 |\n   8 | test.describe('hx-text-input verification', () => {\n>  9 |   test.beforeEach(async ({ page }) => {\n     |        ^\n  10 |     await page.setContent(`\n  11 |       <!DOCTYPE html>\n  12 |       <html>"
-                      },
-                      "errors": [
-                        {
-                          "location": {
-                            "file": "/Volumes/Development/booked/helix/.worktrees/feature-t1-05-hx-text-input-single-line-text/packages/hx-library/e2e/hx-text-input-verify.spec.ts",
-                            "column": 8,
-                            "line": 9
-                          },
-                          "message": "\u001b[31mTest timeout of 30000ms exceeded while running \"beforeEach\" hook.\u001b[39m\n\n   7 |\n   8 | test.describe('hx-text-input verification', () => {\n>  9 |   test.beforeEach(async ({ page }) => {\n     |        ^\n  10 |     await page.setContent(`\n  11 |       <!DOCTYPE html>\n  12 |       <html>\n    at /Volumes/Development/booked/helix/.worktrees/feature-t1-05-hx-text-input-single-line-text/packages/hx-library/e2e/hx-text-input-verify.spec.ts:9:8"
-                        },
-                        {
-                          "location": {
-                            "file": "/Volumes/Development/booked/helix/.worktrees/feature-t1-05-hx-text-input-single-line-text/packages/hx-library/e2e/hx-text-input-verify.spec.ts",
-                            "column": 16,
-                            "line": 24
-                          },
-                          "message": "Error: page.waitForFunction: Test timeout of 30000ms exceeded.\n\n  22 |     `);\n  23 |     await page.addScriptTag({ path: distPath, type: 'module' });\n> 24 |     await page.waitForFunction(() => customElements.get('hx-text-input') !== undefined);\n     |                ^\n  25 |     await page.waitForTimeout(300);\n  26 |   });\n  27 |\n    at /Volumes/Development/booked/helix/.worktrees/feature-t1-05-hx-text-input-single-line-text/packages/hx-library/e2e/hx-text-input-verify.spec.ts:24:16"
-                        }
-                      ],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-03-03T21:04:35.538Z",
-                      "annotations": [],
-                      "attachments": [],
-                      "errorLocation": {
-                        "file": "/Volumes/Development/booked/helix/.worktrees/feature-t1-05-hx-text-input-single-line-text/packages/hx-library/e2e/hx-text-input-verify.spec.ts",
-                        "column": 8,
-                        "line": 9
-                      }
-                    }
-                  ],
-                  "status": "unexpected"
-                }
-              ],
-              "id": "7eed9971373e7ec95715-aaa1427641e40981f1f0",
-              "file": "hx-text-input-verify.spec.ts",
-              "line": 66,
-              "column": 3
-            },
-            {
-              "title": "error attribute shows error message",
-              "ok": false,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "chromium",
-                  "projectName": "chromium",
-                  "results": [
-                    {
-                      "workerIndex": 5,
-                      "parallelIndex": 1,
-                      "status": "timedOut",
-                      "duration": 30034,
-                      "error": {
-                        "message": "\u001b[31mTest timeout of 30000ms exceeded while running \"beforeEach\" hook.\u001b[39m",
-                        "stack": "\u001b[31mTest timeout of 30000ms exceeded while running \"beforeEach\" hook.\u001b[39m\n    at /Volumes/Development/booked/helix/.worktrees/feature-t1-05-hx-text-input-single-line-text/packages/hx-library/e2e/hx-text-input-verify.spec.ts:9:8",
-                        "location": {
-                          "file": "/Volumes/Development/booked/helix/.worktrees/feature-t1-05-hx-text-input-single-line-text/packages/hx-library/e2e/hx-text-input-verify.spec.ts",
-                          "column": 8,
-                          "line": 9
-                        },
-                        "snippet": "   7 |\n   8 | test.describe('hx-text-input verification', () => {\n>  9 |   test.beforeEach(async ({ page }) => {\n     |        ^\n  10 |     await page.setContent(`\n  11 |       <!DOCTYPE html>\n  12 |       <html>"
-                      },
-                      "errors": [
-                        {
-                          "location": {
-                            "file": "/Volumes/Development/booked/helix/.worktrees/feature-t1-05-hx-text-input-single-line-text/packages/hx-library/e2e/hx-text-input-verify.spec.ts",
-                            "column": 8,
-                            "line": 9
-                          },
-                          "message": "\u001b[31mTest timeout of 30000ms exceeded while running \"beforeEach\" hook.\u001b[39m\n\n   7 |\n   8 | test.describe('hx-text-input verification', () => {\n>  9 |   test.beforeEach(async ({ page }) => {\n     |        ^\n  10 |     await page.setContent(`\n  11 |       <!DOCTYPE html>\n  12 |       <html>\n    at /Volumes/Development/booked/helix/.worktrees/feature-t1-05-hx-text-input-single-line-text/packages/hx-library/e2e/hx-text-input-verify.spec.ts:9:8"
-                        },
-                        {
-                          "location": {
-                            "file": "/Volumes/Development/booked/helix/.worktrees/feature-t1-05-hx-text-input-single-line-text/packages/hx-library/e2e/hx-text-input-verify.spec.ts",
-                            "column": 16,
-                            "line": 24
-                          },
-                          "message": "Error: page.waitForFunction: Test timeout of 30000ms exceeded.\n\n  22 |     `);\n  23 |     await page.addScriptTag({ path: distPath, type: 'module' });\n> 24 |     await page.waitForFunction(() => customElements.get('hx-text-input') !== undefined);\n     |                ^\n  25 |     await page.waitForTimeout(300);\n  26 |   });\n  27 |\n    at /Volumes/Development/booked/helix/.worktrees/feature-t1-05-hx-text-input-single-line-text/packages/hx-library/e2e/hx-text-input-verify.spec.ts:24:16"
-                        }
-                      ],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-03-03T21:05:06.567Z",
-                      "annotations": [],
-                      "attachments": [],
-                      "errorLocation": {
-                        "file": "/Volumes/Development/booked/helix/.worktrees/feature-t1-05-hx-text-input-single-line-text/packages/hx-library/e2e/hx-text-input-verify.spec.ts",
-                        "column": 8,
-                        "line": 9
-                      }
-                    }
-                  ],
-                  "status": "unexpected"
-                }
-              ],
-              "id": "7eed9971373e7ec95715-d650e1e7d5d5e7a4757b",
-              "file": "hx-text-input-verify.spec.ts",
-              "line": 75,
-              "column": 3
-            },
-            {
-              "title": "date type attribute is accepted",
-              "ok": false,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "chromium",
-                  "projectName": "chromium",
-                  "results": [
-                    {
-                      "workerIndex": 6,
-                      "parallelIndex": 2,
-                      "status": "timedOut",
-                      "duration": 30030,
-                      "error": {
-                        "message": "\u001b[31mTest timeout of 30000ms exceeded while running \"beforeEach\" hook.\u001b[39m",
-                        "stack": "\u001b[31mTest timeout of 30000ms exceeded while running \"beforeEach\" hook.\u001b[39m\n    at /Volumes/Development/booked/helix/.worktrees/feature-t1-05-hx-text-input-single-line-text/packages/hx-library/e2e/hx-text-input-verify.spec.ts:9:8",
-                        "location": {
-                          "file": "/Volumes/Development/booked/helix/.worktrees/feature-t1-05-hx-text-input-single-line-text/packages/hx-library/e2e/hx-text-input-verify.spec.ts",
-                          "column": 8,
-                          "line": 9
-                        },
-                        "snippet": "   7 |\n   8 | test.describe('hx-text-input verification', () => {\n>  9 |   test.beforeEach(async ({ page }) => {\n     |        ^\n  10 |     await page.setContent(`\n  11 |       <!DOCTYPE html>\n  12 |       <html>"
-                      },
-                      "errors": [
-                        {
-                          "location": {
-                            "file": "/Volumes/Development/booked/helix/.worktrees/feature-t1-05-hx-text-input-single-line-text/packages/hx-library/e2e/hx-text-input-verify.spec.ts",
-                            "column": 8,
-                            "line": 9
-                          },
-                          "message": "\u001b[31mTest timeout of 30000ms exceeded while running \"beforeEach\" hook.\u001b[39m\n\n   7 |\n   8 | test.describe('hx-text-input verification', () => {\n>  9 |   test.beforeEach(async ({ page }) => {\n     |        ^\n  10 |     await page.setContent(`\n  11 |       <!DOCTYPE html>\n  12 |       <html>\n    at /Volumes/Development/booked/helix/.worktrees/feature-t1-05-hx-text-input-single-line-text/packages/hx-library/e2e/hx-text-input-verify.spec.ts:9:8"
-                        },
-                        {
-                          "location": {
-                            "file": "/Volumes/Development/booked/helix/.worktrees/feature-t1-05-hx-text-input-single-line-text/packages/hx-library/e2e/hx-text-input-verify.spec.ts",
-                            "column": 16,
-                            "line": 24
-                          },
-                          "message": "Error: page.waitForFunction: Test timeout of 30000ms exceeded.\n\n  22 |     `);\n  23 |     await page.addScriptTag({ path: distPath, type: 'module' });\n> 24 |     await page.waitForFunction(() => customElements.get('hx-text-input') !== undefined);\n     |                ^\n  25 |     await page.waitForTimeout(300);\n  26 |   });\n  27 |\n    at /Volumes/Development/booked/helix/.worktrees/feature-t1-05-hx-text-input-single-line-text/packages/hx-library/e2e/hx-text-input-verify.spec.ts:24:16"
-                        }
-                      ],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-03-03T21:05:06.567Z",
-                      "annotations": [],
-                      "attachments": [],
-                      "errorLocation": {
-                        "file": "/Volumes/Development/booked/helix/.worktrees/feature-t1-05-hx-text-input-single-line-text/packages/hx-library/e2e/hx-text-input-verify.spec.ts",
-                        "column": 8,
-                        "line": 9
-                      }
-                    }
-                  ],
-                  "status": "unexpected"
-                }
-              ],
-              "id": "7eed9971373e7ec95715-c39ffb67dc04869bbc45",
-              "file": "hx-text-input-verify.spec.ts",
-              "line": 84,
-              "column": 3
-            }
-          ]
-        }
-      ]
+      "message": "Error: No tests found.\nMake sure that arguments are regular expressions matching test files.\nYou may need to escape symbols like \"$\" or \"*\" and quote the arguments.",
+      "stack": "Error: No tests found.\nMake sure that arguments are regular expressions matching test files.\nYou may need to escape symbols like \"$\" or \"*\" and quote the arguments."
     }
   ],
-  "errors": [],
   "stats": {
-    "startTime": "2026-03-03T21:04:34.954Z",
-    "duration": 62146.399999999994,
+    "startTime": "2026-03-03T20:48:25.972Z",
+    "duration": 3.940999999999974,
     "expected": 0,
     "skipped": 0,
-    "unexpected": 7,
+    "unexpected": 0,
     "flaky": 0
   }
 }
