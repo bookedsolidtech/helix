@@ -111,11 +111,7 @@ export class HelixIconButton extends LitElement {
 
   override connectedCallback(): void {
     super.connectedCallback();
-    if (!this.label) {
-      console.warn(
-        '[hx-icon-button] The `label` property is required for accessibility. Provide an accessible name via the `label` attribute.',
-      );
-    }
+    // Label validation now happens in render() which enforces it by rendering nothing
   }
 
   // ─── Event Handling ───
@@ -151,6 +147,10 @@ export class HelixIconButton extends LitElement {
 
   // ─── Render Helpers ───
 
+  private _normalizedLabel(): string {
+    return this.label.trim();
+  }
+
   private _classes() {
     return {
       button: true,
@@ -166,7 +166,8 @@ export class HelixIconButton extends LitElement {
   // ─── Render ───
 
   override render() {
-    if (!this.label) {
+    const normalizedLabel = this._normalizedLabel();
+    if (!normalizedLabel) {
       return nothing;
     }
 
@@ -176,8 +177,8 @@ export class HelixIconButton extends LitElement {
           part="button"
           class=${classMap(this._classes())}
           href=${ifDefined(this.disabled ? undefined : this.href)}
-          aria-label=${this.label}
-          title=${this.label}
+          aria-label=${normalizedLabel}
+          title=${normalizedLabel}
           aria-disabled=${this.disabled ? 'true' : nothing}
           @click=${this._handleClick}
         >
@@ -192,8 +193,8 @@ export class HelixIconButton extends LitElement {
         class=${classMap(this._classes())}
         ?disabled=${this.disabled}
         type=${this.type}
-        aria-label=${this.label}
-        title=${this.label}
+        aria-label=${normalizedLabel}
+        title=${normalizedLabel}
         aria-disabled=${this.disabled ? 'true' : nothing}
         name=${ifDefined(this.name)}
         value=${ifDefined(this.value)}
