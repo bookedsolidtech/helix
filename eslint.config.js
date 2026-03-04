@@ -1,5 +1,6 @@
 import js from '@eslint/js';
 import tseslint from 'typescript-eslint';
+import prettierConfig from 'eslint-config-prettier';
 import lit from 'eslint-plugin-lit';
 import wc from 'eslint-plugin-wc';
 
@@ -116,4 +117,7 @@ export default tseslint.config(
       '@typescript-eslint/no-require-imports': 'off',
     },
   },
+
+  // ── Prettier (must be last to disable conflicting rules) ──────────
+  prettierConfig,
 );
