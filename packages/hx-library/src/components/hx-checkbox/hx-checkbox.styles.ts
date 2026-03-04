@@ -172,4 +172,34 @@ export const helixCheckboxStyles = css`
       var(--hx-checkbox-size, var(--hx-size-5, 1.25rem)) + var(--hx-space-2, 0.5rem)
     );
   }
+
+  /* ─── Size Variants ─── */
+
+  :host([hx-size='sm']) {
+    --hx-checkbox-size: var(--hx-size-4, 1rem);
+  }
+
+  :host([hx-size='sm']) .checkbox__label {
+    font-size: var(--hx-font-size-xs, 0.75rem);
+  }
+
+  :host([hx-size='sm']) .checkbox__help-text,
+  :host([hx-size='sm']) .checkbox__error {
+    font-size: var(--hx-font-size-xs, 0.75rem);
+    padding-left: calc(var(--hx-size-4, 1rem) + var(--hx-space-2, 0.5rem));
+  }
+
+  :host([hx-size='lg']) {
+    --hx-checkbox-size: var(--hx-size-6, 1.5rem);
+  }
+
+  :host([hx-size='lg']) .checkbox__label {
+    font-size: var(--hx-font-size-base, 1rem);
+  }
+
+  :host([hx-size='lg']) .checkbox__help-text,
+  :host([hx-size='lg']) .checkbox__error {
+    font-size: var(--hx-font-size-sm, 0.875rem);
+    padding-left: calc(var(--hx-size-6, 1.5rem) + var(--hx-space-2, 0.5rem));
+  }
 `;
