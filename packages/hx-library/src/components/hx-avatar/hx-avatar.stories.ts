@@ -54,7 +54,8 @@ const meta = {
     shape: {
       control: { type: 'select' },
       options: ['circle', 'square'],
-      description: 'Shape variant. Circle uses 50% border-radius; square uses the theme radius token.',
+      description:
+        'Shape variant. Circle uses 50% border-radius; square uses the theme radius token.',
       table: {
         category: 'Visual',
         defaultValue: { summary: 'circle' },

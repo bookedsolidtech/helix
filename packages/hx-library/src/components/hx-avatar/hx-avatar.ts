@@ -125,11 +125,7 @@ export class HelixAvatar extends LitElement {
     const showInitials = !showSlot && !showImage && !!this.initials.trim();
     const showFallback = !showSlot && !showImage && !showInitials;
 
-    const ariaLabel = showImage
-      ? this.alt || 'Avatar'
-      : showInitials
-        ? this.initials
-        : 'Avatar';
+    const ariaLabel = showImage ? this.alt || 'Avatar' : showInitials ? this.initials : 'Avatar';
 
     const classes = {
       avatar: true,
@@ -156,9 +152,7 @@ export class HelixAvatar extends LitElement {
             />`
           : nothing}
         ${showInitials
-          ? html`<span part="initials" class="avatar__initials"
-              >${this.initials.trim()}</span
-            >`
+          ? html`<span part="initials" class="avatar__initials">${this.initials.trim()}</span>`
           : nothing}
         ${showFallback ? this._renderFallbackIcon() : nothing}
         <span part="badge" class="avatar__badge">
