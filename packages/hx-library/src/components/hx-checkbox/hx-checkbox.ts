@@ -13,7 +13,7 @@ import { helixCheckboxStyles } from './hx-checkbox.styles.js';
  *
  * @tag hx-checkbox
  *
- * @slot - Custom label content (overrides the label property).
+ * @slot - Custom label content (overrides the label property). Rich HTML allowed — Drupal can include links in consent labels.
  * @slot error - Custom error content (overrides the error property).
  * @slot help-text - Custom help text content (overrides the helpText property).
  *
@@ -114,6 +114,13 @@ export class HelixCheckbox extends LitElement {
    */
   @property({ type: String, attribute: 'help-text' })
   helpText = '';
+
+  /**
+   * The size of the checkbox.
+   * @attr hx-size
+   */
+  @property({ type: String, attribute: 'hx-size', reflect: true })
+  hxSize: 'sm' | 'md' | 'lg' = 'md';
 
   @query('.checkbox__input')
   private _inputEl!: HTMLInputElement;
@@ -246,6 +253,9 @@ export class HelixCheckbox extends LitElement {
       'checkbox--error': hasError,
       'checkbox--disabled': this.disabled,
       'checkbox--required': this.required,
+      'checkbox--sm': this.hxSize === 'sm',
+      'checkbox--md': this.hxSize === 'md',
+      'checkbox--lg': this.hxSize === 'lg',
     };
 
     const describedBy =
@@ -332,6 +342,9 @@ export class HelixCheckbox extends LitElement {
     `;
   }
 }
+
+/** @deprecated Use HelixCheckbox instead. */
+export type WcCheckbox = HelixCheckbox;
 
 declare global {
   interface HTMLElementTagNameMap {
