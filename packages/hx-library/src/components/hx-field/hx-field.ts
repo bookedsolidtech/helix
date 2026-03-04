@@ -1,7 +1,6 @@
 import { LitElement, html, nothing } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
-import { ifDefined } from 'lit/directives/if-defined.js';
 import { tokenStyles } from '@helix/tokens/lit';
 import { helixFieldStyles } from './hx-field.styles.js';
 
@@ -86,6 +85,7 @@ export class HelixField extends LitElement {
 
   private _hasLabelSlot = false;
   private _hasErrorSlot = false;
+  private _hasHelpSlot = false;
 
   private _handleLabelSlotChange(e: Event): void {
     const slot = e.target as HTMLSlotElement;
@@ -99,6 +99,12 @@ export class HelixField extends LitElement {
     this.requestUpdate();
   }
 
+  private _handleHelpSlotChange(e: Event): void {
+    const slot = e.target as HTMLSlotElement;
+    this._hasHelpSlot = slot.assignedElements().length > 0;
+    this.requestUpdate();
+  }
+
   // ─── Unique IDs for Accessibility ───
 
   private _fieldId = `hx-field-${Math.random().toString(36).slice(2, 9)}`;
@@ -109,6 +115,7 @@ export class HelixField extends LitElement {
 
   override render() {
     const hasError = !!this.error || this._hasErrorSlot;
+    const hasHelp = !!this.helpText || this._hasHelpSlot;
 
     const fieldClasses = {
       field: true,
@@ -119,11 +126,6 @@ export class HelixField extends LitElement {
       'field--size-md': this.hxSize === 'md',
       'field--size-lg': this.hxSize === 'lg',
     };
-
-    const describedBy =
-      [hasError ? this._errorId : null, this.helpText && !hasError ? this._helpTextId : null]
-        .filter(Boolean)
-        .join(' ') || undefined;
 
     return html`
       <div part="field" class=${classMap(fieldClasses)}>
@@ -152,11 +154,7 @@ export class HelixField extends LitElement {
         <slot name="description"></slot>
 
         <!-- Control (default slot) -->
-        <div
-          part="control"
-          class="field__control"
-          aria-describedby=${ifDefined(describedBy)}
-        >
+        <div part="control" class="field__control">
           <slot></slot>
         </div>
 
@@ -177,14 +175,15 @@ export class HelixField extends LitElement {
             : nothing}
         </slot>
 
-        <!-- Help text (hidden when error is showing) -->
-        ${this.helpText && !hasError
-          ? html`
-              <div part="help-text" class="field__help-text" id=${this._helpTextId}>
-                <slot name="help">${this.helpText}</slot>
-              </div>
-            `
-          : nothing}
+        <!-- Help text (always in DOM so slot detection works; hidden when no help or error is shown) -->
+        <div
+          part="help-text"
+          class="field__help-text"
+          id=${this._helpTextId}
+          ?hidden=${!hasHelp || hasError}
+        >
+          <slot name="help" @slotchange=${this._handleHelpSlotChange}>${this.helpText}</slot>
+        </div>
       </div>
     `;
   }

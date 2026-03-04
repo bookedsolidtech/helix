@@ -21,9 +21,7 @@ describe('hx-field', () => {
     });
 
     it('renders default slot content (slotted input)', async () => {
-      const el = await fixture<HelixField>(
-        '<hx-field><input type="text" /></hx-field>',
-      );
+      const el = await fixture<HelixField>('<hx-field><input type="text" /></hx-field>');
       const slottedInput = el.querySelector('input');
       expect(slottedInput).toBeTruthy();
     });
@@ -156,18 +154,20 @@ describe('hx-field', () => {
       expect(helpDiv?.textContent?.trim()).toContain('Enter a valid email address');
     });
 
-    it('help text container is NOT rendered when error is showing', async () => {
+    it('help text container is hidden when error is showing', async () => {
       const el = await fixture<HelixField>(
         '<hx-field help-text="Some guidance" error="Invalid value"></hx-field>',
       );
       const helpDiv = shadowQuery(el, '[part="help-text"]');
-      expect(helpDiv).toBeNull();
+      expect(helpDiv).toBeTruthy();
+      expect(helpDiv?.hasAttribute('hidden')).toBe(true);
     });
 
-    it('help text is NOT rendered when both helpText and error are empty', async () => {
+    it('help text container is hidden when both helpText and error are empty', async () => {
       const el = await fixture<HelixField>('<hx-field></hx-field>');
       const helpDiv = shadowQuery(el, '[part="help-text"]');
-      expect(helpDiv).toBeNull();
+      expect(helpDiv).toBeTruthy();
+      expect(helpDiv?.hasAttribute('hidden')).toBe(true);
     });
   });
 
@@ -256,6 +256,17 @@ describe('hx-field', () => {
       const slottedHelp = el.querySelector('[slot="help"]');
       expect(slottedHelp).toBeTruthy();
       expect(slottedHelp?.textContent).toBe('Custom help');
+    });
+
+    it('help slot renders even when helpText property is empty', async () => {
+      const el = await fixture<HelixField>(
+        '<hx-field><em slot="help">Slot-only help</em></hx-field>',
+      );
+      await el.updateComplete;
+      const helpDiv = shadowQuery(el, '[part="help-text"]');
+      expect(helpDiv).toBeTruthy();
+      const slottedHelp = el.querySelector('[slot="help"]');
+      expect(slottedHelp?.textContent).toBe('Slot-only help');
     });
 
     it('description slot renders content', async () => {

@@ -1,7 +1,38 @@
 import type { Meta, StoryObj } from '@storybook/web-components';
 import { html } from 'lit';
 import { expect, within } from 'storybook/test';
+import type { HelixField } from './hx-field.js';
 import './hx-field.js';
+
+// ─────────────────────────────────────────────────
+// Test Helpers
+// ─────────────────────────────────────────────────
+
+function getShadowRoot(host: HTMLElement | null): HTMLElement {
+  if (!host) {
+    throw new Error('hx-field element not found');
+  }
+  if (!host.shadowRoot) {
+    throw new Error('shadowRoot not available on hx-field');
+  }
+  return host.shadowRoot as unknown as HTMLElement;
+}
+
+function getFieldHost(canvasElement: Element): HTMLElement {
+  const host = canvasElement.querySelector('hx-field');
+  if (!host) {
+    throw new Error('hx-field element not found');
+  }
+  return host as HTMLElement;
+}
+
+function getInputElement(canvasElement: Element): HTMLInputElement {
+  const input = canvasElement.querySelector('input');
+  if (!input) {
+    throw new Error('input element not found');
+  }
+  return input;
+}
 
 // ─────────────────────────────────────────────────
 // Meta Configuration
@@ -114,10 +145,10 @@ export const Default: Story = {
     label: 'Email Address',
   },
   play: async ({ canvasElement }) => {
-    const host = canvasElement.querySelector('hx-field');
+    const host = getFieldHost(canvasElement);
     await expect(host).toBeTruthy();
 
-    const shadow = within(host!.shadowRoot! as unknown as HTMLElement);
+    const shadow = within(getShadowRoot(host));
     const label = shadow.getByText('Email Address');
     await expect(label).toBeTruthy();
   },
@@ -134,10 +165,10 @@ export const WithHelpText: Story = {
     helpText: 'Found on the front of your insurance card, typically 9–12 digits.',
   },
   play: async ({ canvasElement }) => {
-    const host = canvasElement.querySelector('hx-field');
+    const host = getFieldHost(canvasElement);
     await expect(host).toBeTruthy();
 
-    const shadow = within(host!.shadowRoot! as unknown as HTMLElement);
+    const shadow = within(getShadowRoot(host));
     const helpText = shadow.getByText(/9–12 digits/i);
     await expect(helpText).toBeTruthy();
   },
@@ -155,11 +186,11 @@ export const Required: Story = {
     helpText: 'Required. Used for patient identification across all care settings.',
   },
   play: async ({ canvasElement }) => {
-    const host = canvasElement.querySelector('hx-field');
+    const host = getFieldHost(canvasElement);
     await expect(host).toBeTruthy();
-    await expect(host!.hasAttribute('required')).toBe(true);
+    await expect(host.hasAttribute('required')).toBe(true);
 
-    const shadow = within(host!.shadowRoot! as unknown as HTMLElement);
+    const shadow = within(getShadowRoot(host));
     const indicator = shadow.getByText('*');
     await expect(indicator).toBeTruthy();
   },
@@ -176,10 +207,10 @@ export const ErrorState: Story = {
     error: 'This field is required. Please enter a valid email address.',
   },
   play: async ({ canvasElement }) => {
-    const host = canvasElement.querySelector('hx-field');
+    const host = getFieldHost(canvasElement);
     await expect(host).toBeTruthy();
 
-    const shadow = within(host!.shadowRoot! as unknown as HTMLElement);
+    const shadow = within(getShadowRoot(host));
     const errorMsg = shadow.getByText(/This field is required/i);
     await expect(errorMsg).toBeTruthy();
   },
@@ -197,11 +228,7 @@ export const Disabled: Story = {
     helpText: 'This value is assigned by the system and cannot be modified.',
   },
   render: (args) => html`
-    <hx-field
-      label=${args.label}
-      help-text=${args.helpText}
-      ?disabled=${args.disabled}
-    >
+    <hx-field label=${args.label} help-text=${args.helpText} ?disabled=${args.disabled}>
       <input
         type="text"
         value="PAT-2026-00482"
@@ -211,12 +238,12 @@ export const Disabled: Story = {
     </hx-field>
   `,
   play: async ({ canvasElement }) => {
-    const host = canvasElement.querySelector('hx-field');
+    const host = getFieldHost(canvasElement);
     await expect(host).toBeTruthy();
-    await expect(host!.hasAttribute('disabled')).toBe(true);
+    await expect(host.hasAttribute('disabled')).toBe(true);
 
-    const input = canvasElement.querySelector('input');
-    await expect(input!.disabled).toBe(true);
+    const input = getInputElement(canvasElement);
+    await expect(input.disabled).toBe(true);
   },
 };
 
@@ -829,10 +856,10 @@ export const LabelRendered: Story = {
     helpText: 'Enter ICD-10 code for primary diagnosis.',
   },
   play: async ({ canvasElement }) => {
-    const host = canvasElement.querySelector('hx-field');
+    const host = getFieldHost(canvasElement);
     await expect(host).toBeTruthy();
 
-    const shadow = within(host!.shadowRoot! as unknown as HTMLElement);
+    const shadow = within(getShadowRoot(host));
 
     const label = shadow.getByText('Diagnosis Code');
     await expect(label).toBeTruthy();
@@ -850,10 +877,10 @@ export const ErrorSuppressesHelpText: Story = {
     error: 'Email format is invalid. Correct example: clinician@hospital.org',
   },
   play: async ({ canvasElement }) => {
-    const host = canvasElement.querySelector('hx-field');
+    const host = getFieldHost(canvasElement);
     await expect(host).toBeTruthy();
 
-    const shadow = within(host!.shadowRoot! as unknown as HTMLElement);
+    const shadow = within(getShadowRoot(host));
 
     // Error message should be present
     const errorEl = shadow.getByText(/Email format is invalid/i);
@@ -872,11 +899,11 @@ export const RequiredIndicatorPresent: Story = {
     required: true,
   },
   play: async ({ canvasElement }) => {
-    const host = canvasElement.querySelector('hx-field');
+    const host = getFieldHost(canvasElement);
     await expect(host).toBeTruthy();
-    await expect(host!.required).toBe(true);
+    await expect((host as HelixField).required).toBe(true);
 
-    const shadow = within(host!.shadowRoot! as unknown as HTMLElement);
+    const shadow = within(getShadowRoot(host));
     const asterisk = shadow.getByText('*');
     await expect(asterisk).toBeTruthy();
   },
@@ -899,12 +926,12 @@ export const DisabledStateVerification: Story = {
     </hx-field>
   `,
   play: async ({ canvasElement }) => {
-    const host = canvasElement.querySelector('hx-field');
+    const host = getFieldHost(canvasElement);
     await expect(host).toBeTruthy();
-    await expect(host!.hasAttribute('disabled')).toBe(true);
+    await expect(host.hasAttribute('disabled')).toBe(true);
 
-    const input = canvasElement.querySelector('input');
-    await expect(input!.disabled).toBe(true);
-    await expect(input!.value).toBe('LOCKED-VALUE');
+    const input = getInputElement(canvasElement);
+    await expect(input.disabled).toBe(true);
+    await expect(input.value).toBe('LOCKED-VALUE');
   },
 };

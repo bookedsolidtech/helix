@@ -6,7 +6,7 @@ export const helixFieldStyles = css`
   }
 
   :host([disabled]) {
-    opacity: var(--hx-opacity-disabled, 0.5);
+    opacity: var(--hx-opacity-disabled);
     pointer-events: none;
   }
 
@@ -17,8 +17,8 @@ export const helixFieldStyles = css`
   .field {
     display: flex;
     flex-direction: column;
-    gap: var(--hx-space-1, 0.25rem);
-    font-family: var(--hx-field-font-family, var(--hx-font-family-sans, sans-serif));
+    gap: var(--hx-space-1);
+    font-family: var(--hx-field-font-family, var(--hx-font-family-sans));
   }
 
   /* ─── Label ─── */
@@ -30,16 +30,16 @@ export const helixFieldStyles = css`
   .field__label {
     display: flex;
     align-items: baseline;
-    gap: var(--hx-space-1, 0.25rem);
-    font-size: var(--hx-font-size-sm, 0.875rem);
-    font-weight: var(--hx-font-weight-medium, 500);
-    color: var(--hx-field-label-color, var(--hx-color-neutral-700, #343a40));
-    line-height: var(--hx-line-height-normal, 1.5);
+    gap: var(--hx-space-1);
+    font-size: var(--hx-font-size-sm);
+    font-weight: var(--hx-font-weight-medium);
+    color: var(--hx-field-label-color, var(--hx-color-neutral-700));
+    line-height: var(--hx-line-height-normal);
   }
 
   .field__required-marker {
-    color: var(--hx-field-error-color, var(--hx-color-error-500, #dc3545));
-    font-weight: var(--hx-font-weight-bold, 700);
+    color: var(--hx-field-error-color, var(--hx-color-error-500));
+    font-weight: var(--hx-font-weight-bold);
   }
 
   /* ─── Control Wrapper ─── */
@@ -51,30 +51,30 @@ export const helixFieldStyles = css`
   /* ─── Size Variants ─── */
 
   :host([hx-size='sm']) .field__label {
-    font-size: var(--hx-font-size-xs, 0.75rem);
+    font-size: var(--hx-font-size-xs);
   }
 
   :host([hx-size='lg']) .field__label {
-    font-size: var(--hx-font-size-md, 1rem);
+    font-size: var(--hx-font-size-md);
   }
 
   /* ─── Help Text & Error Messages ─── */
 
   .field__help-text {
-    font-size: var(--hx-font-size-xs, 0.75rem);
-    color: var(--hx-color-neutral-500, #6c757d);
-    line-height: var(--hx-line-height-normal, 1.5);
+    font-size: var(--hx-font-size-xs);
+    color: var(--hx-color-neutral-500);
+    line-height: var(--hx-line-height-normal);
   }
 
   .field__error {
-    font-size: var(--hx-font-size-xs, 0.75rem);
-    color: var(--hx-field-error-color, var(--hx-color-error-500, #dc3545));
-    line-height: var(--hx-line-height-normal, 1.5);
+    font-size: var(--hx-font-size-xs);
+    color: var(--hx-field-error-color, var(--hx-color-error-500));
+    line-height: var(--hx-line-height-normal);
   }
 
   /* ─── Error State ─── */
 
   .field--error .field__label {
-    color: var(--hx-field-error-color, var(--hx-color-error-500, #dc3545));
+    color: var(--hx-field-error-color, var(--hx-color-error-500));
   }
 `;
