@@ -12,3 +12,7 @@ apps/mcp-servers/**/__fixtures__/*-malformed.json
 apps/mcp-servers/**/__fixtures__/*-invalid.json
 # protoLabs Studio local state
 .automaker/
+# MCP wc-tools health snapshots (generated)
+packages/.mcp-wc/
+# Claude Code local state
+.claude/
