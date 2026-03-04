@@ -135,7 +135,6 @@ export class HelixBadge extends LitElement {
         <slot @slotchange=${this._handleSlotChange}></slot>
         ${this.removable
           ? html`<button
-              type="button"
               part="remove-button"
               class="badge__remove-button"
               aria-label="Remove"
