@@ -14,6 +14,18 @@ export default defineConfig({
       entry: {
         index: resolve(__dirname, 'src/index.ts'),
         'components/hx-button/index': resolve(__dirname, 'src/components/hx-button/index.ts'),
+        'components/hx-icon-button/index': resolve(
+          __dirname,
+          'src/components/hx-icon-button/index.ts',
+        ),
+        'components/hx-button-group/index': resolve(
+          __dirname,
+          'src/components/hx-button-group/index.ts',
+        ),
+        'components/hx-copy-button/index': resolve(
+          __dirname,
+          'src/components/hx-copy-button/index.ts',
+        ),
         'components/hx-card/index': resolve(__dirname, 'src/components/hx-card/index.ts'),
         'components/hx-container/index': resolve(__dirname, 'src/components/hx-container/index.ts'),
         'components/hx-text-input/index': resolve(
