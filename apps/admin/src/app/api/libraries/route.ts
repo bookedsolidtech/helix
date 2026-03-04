@@ -14,7 +14,10 @@ export async function GET(): Promise<NextResponse> {
     return NextResponse.json({ libraries });
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Unknown error occurred';
-    return NextResponse.json({ error: 'Failed to load libraries', detail: message }, { status: 500 });
+    return NextResponse.json(
+      { error: 'Failed to load libraries', detail: message },
+      { status: 500 },
+    );
   }
 }
 

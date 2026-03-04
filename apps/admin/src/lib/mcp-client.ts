@@ -6,11 +6,7 @@
  */
 import { spawn, type ChildProcess } from 'node:child_process';
 import { existsSync } from 'node:fs';
-import {
-  WC_TOOLS_ROOT,
-  WC_TOOLS_BINARY,
-  getMcpProcessEnv,
-} from './mcp-constants';
+import { WC_TOOLS_ROOT, WC_TOOLS_BINARY, getMcpProcessEnv } from './mcp-constants';
 
 // ── Types (local mirrors of wc-tools types — no cross-project imports) ──
 
@@ -115,7 +111,10 @@ export function clearMcpCache(): void {
 // ── McpSession ──────────────────────────────────────────────────────────
 
 export interface McpSession {
-  callTool<T = unknown>(toolName: string, args?: Record<string, unknown>): Promise<McpToolResult<T>>;
+  callTool<T = unknown>(
+    toolName: string,
+    args?: Record<string, unknown>,
+  ): Promise<McpToolResult<T>>;
   close(): void;
 }
 
@@ -263,9 +262,7 @@ export async function createMcpSession(): Promise<McpSession | null> {
 
 // ── Typed wrappers (with caching) ───────────────────────────────────────
 
-async function withSession<T>(
-  fn: (session: McpSession) => Promise<T>,
-): Promise<T | null> {
+async function withSession<T>(fn: (session: McpSession) => Promise<T>): Promise<T | null> {
   const session = await createMcpSession();
   if (!session) return null;
   try {
