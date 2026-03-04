@@ -37,6 +37,8 @@ import { helixTextInputStyles } from './hx-text-input.styles.js';
  * @cssprop [--hx-input-focus-ring-color=var(--hx-focus-ring-color)] - Focus ring color.
  * @cssprop [--hx-input-error-color=var(--hx-color-error-500)] - Error state color.
  * @cssprop [--hx-input-label-color=var(--hx-color-neutral-700)] - Label text color.
+ * @cssprop [--hx-input-sm-font-size=0.875rem] - Font size for the sm size variant.
+ * @cssprop [--hx-input-lg-font-size=1.125rem] - Font size for the lg size variant.
  */
 @customElement('hx-text-input')
 export class HelixTextInput extends LitElement {
@@ -81,7 +83,7 @@ export class HelixTextInput extends LitElement {
    * @attr type
    */
   @property({ type: String })
-  type: 'text' | 'email' | 'password' | 'tel' | 'url' | 'search' | 'number' = 'text';
+  type: 'text' | 'email' | 'password' | 'tel' | 'url' | 'search' | 'number' | 'date' = 'text';
 
   /**
    * Whether the input is required for form submission.
@@ -125,6 +127,48 @@ export class HelixTextInput extends LitElement {
   @property({ type: String, attribute: 'aria-label' })
   override ariaLabel: string | null = null;
 
+  /**
+   * Whether the input is read-only.
+   * @attr readonly
+   */
+  @property({ type: Boolean, reflect: true })
+  readonly = false;
+
+  /**
+   * Minimum number of characters allowed.
+   * @attr minlength
+   */
+  @property({ type: Number })
+  minlength: number | undefined = undefined;
+
+  /**
+   * Maximum number of characters allowed.
+   * @attr maxlength
+   */
+  @property({ type: Number })
+  maxlength: number | undefined = undefined;
+
+  /**
+   * A regular expression pattern the value must match for form validation.
+   * @attr pattern
+   */
+  @property({ type: String })
+  pattern = '';
+
+  /**
+   * Hint for the browser's autocomplete feature. Accepts standard HTML autocomplete values.
+   * @attr autocomplete
+   */
+  @property({ type: String })
+  autocomplete = '';
+
+  /**
+   * Visual size of the input field.
+   * @attr hx-size
+   */
+  @property({ type: String, attribute: 'hx-size', reflect: true })
+  hxSize: 'sm' | 'md' | 'lg' = 'md';
+
   // ─── Internal References ───
 
   @query('.field__input')
@@ -159,6 +203,13 @@ export class HelixTextInput extends LitElement {
     super.updated(changedProperties);
     if (changedProperties.has('value')) {
       this._internals.setFormValue(this.value);
+    }
+    if (
+      changedProperties.has('value') ||
+      changedProperties.has('required') ||
+      changedProperties.has('minlength') ||
+      changedProperties.has('maxlength')
+    ) {
       this._updateValidity();
     }
   }
@@ -195,6 +246,22 @@ export class HelixTextInput extends LitElement {
       this._internals.setValidity(
         { valueMissing: true },
         this.error || 'This field is required.',
+        this._input,
+      );
+    } else if (
+      this.minlength !== undefined &&
+      this.value.length > 0 &&
+      this.value.length < this.minlength
+    ) {
+      this._internals.setValidity(
+        { tooShort: true },
+        this.error || `Please lengthen this text to ${this.minlength} characters or more.`,
+        this._input,
+      );
+    } else if (this.maxlength !== undefined && this.value.length > this.maxlength) {
+      this._internals.setValidity(
+        { tooLong: true },
+        this.error || `Please shorten this text to ${this.maxlength} characters or fewer.`,
         this._input,
       );
     } else {
@@ -278,6 +345,7 @@ export class HelixTextInput extends LitElement {
       'field--error': hasError,
       'field--disabled': this.disabled,
       'field--required': this.required,
+      [`field--size-${this.hxSize}`]: true,
     };
 
     const describedBy =
@@ -316,7 +384,12 @@ export class HelixTextInput extends LitElement {
             placeholder=${ifDefined(this.placeholder || undefined)}
             ?required=${this.required}
             ?disabled=${this.disabled}
+            ?readonly=${this.readonly}
             name=${ifDefined(this.name || undefined)}
+            minlength=${ifDefined(this.minlength)}
+            maxlength=${ifDefined(this.maxlength)}
+            pattern=${ifDefined(this.pattern || undefined)}
+            autocomplete=${ifDefined(this.autocomplete || undefined)}
             aria-label=${ifDefined(this.ariaLabel ?? undefined)}
             aria-labelledby=${ifDefined(
               this._hasLabelSlot ? `${this._inputId}-slotted-label` : undefined,
