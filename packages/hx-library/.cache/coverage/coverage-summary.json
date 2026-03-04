@@ -1,7 +1,7 @@
 {
   "total": {
-    "lines": { "total": 1747, "covered": 0, "skipped": 0, "pct": 0 },
-    "statements": { "total": 1747, "covered": 0, "skipped": 0, "pct": 0 },
+    "lines": { "total": 1751, "covered": 0, "skipped": 0, "pct": 0 },
+    "statements": { "total": 1751, "covered": 0, "skipped": 0, "pct": 0 },
     "functions": { "total": 15, "covered": 0, "skipped": 0, "pct": 0 },
     "branches": { "total": 15, "covered": 0, "skipped": 0, "pct": 0 },
     "branchesTrue": { "total": 0, "covered": 0, "skipped": 0, "pct": 100 }
@@ -49,9 +49,9 @@
     "branches": { "total": 1, "covered": 0, "skipped": 0, "pct": 0 }
   },
   "/Volumes/Development/booked/helix/.worktrees/feature-t1-02-hx-icon-button-icon-only-action/packages/hx-library/src/components/hx-icon-button/hx-icon-button.ts": {
-    "lines": { "total": 94, "covered": 0, "skipped": 0, "pct": 0 },
+    "lines": { "total": 98, "covered": 0, "skipped": 0, "pct": 0 },
     "functions": { "total": 1, "covered": 0, "skipped": 0, "pct": 0 },
-    "statements": { "total": 94, "covered": 0, "skipped": 0, "pct": 0 },
+    "statements": { "total": 98, "covered": 0, "skipped": 0, "pct": 0 },
     "branches": { "total": 1, "covered": 0, "skipped": 0, "pct": 0 }
   },
   "/Volumes/Development/booked/helix/.worktrees/feature-t1-02-hx-icon-button-icon-only-action/packages/hx-library/src/components/hx-prose/hx-prose.ts": {
