@@ -49,7 +49,15 @@ function SeverityIcon({ severity }: { severity: CriticalIssue['severity'] }) {
   return <AlertTriangle className="w-4 h-4 text-yellow-400 flex-shrink-0 mt-0.5" />;
 }
 
-function DimensionRow({ name, averageScore, passed }: { name: string; averageScore: number; passed: boolean }) {
+function DimensionRow({
+  name,
+  averageScore,
+  passed,
+}: {
+  name: string;
+  averageScore: number;
+  passed: boolean;
+}) {
   return (
     <div className="flex items-center gap-3 py-2 border-b border-white/[0.04] last:border-0">
       <div className="flex-1 text-sm text-foreground">{name}</div>
@@ -216,21 +224,32 @@ export default function AuditPage({ params }: AuditPageProps) {
             <div className="flex-1 space-y-2">
               <div className="text-xl font-bold text-foreground">{report.libraryName}</div>
               <div className="flex items-center gap-3 text-sm text-muted-foreground">
-                <span>Scoring Tier: <strong className="text-foreground">{report.scoringTier === 'full' ? 'Full (17 dimensions)' : 'CEM-only'}</strong></span>
+                <span>
+                  Scoring Tier:{' '}
+                  <strong className="text-foreground">
+                    {report.scoringTier === 'full' ? 'Full (17 dimensions)' : 'CEM-only'}
+                  </strong>
+                </span>
                 <span>•</span>
                 <span>{new Date(report.timestamp).toLocaleString()}</span>
               </div>
               <div className="grid grid-cols-3 gap-4 mt-4">
                 <div className="text-center p-3 rounded-lg bg-white/[0.03] border border-white/[0.06]">
-                  <div className="text-lg font-bold text-foreground">{report.health.averageScore}</div>
+                  <div className="text-lg font-bold text-foreground">
+                    {report.health.averageScore}
+                  </div>
                   <div className="text-xs text-muted-foreground mt-1">Health Score</div>
                 </div>
                 <div className="text-center p-3 rounded-lg bg-white/[0.03] border border-white/[0.06]">
-                  <div className="text-lg font-bold text-foreground">{report.accessibility.averageScore}</div>
+                  <div className="text-lg font-bold text-foreground">
+                    {report.accessibility.averageScore}
+                  </div>
                   <div className="text-xs text-muted-foreground mt-1">Accessibility</div>
                 </div>
                 <div className="text-center p-3 rounded-lg bg-white/[0.03] border border-white/[0.06]">
-                  <div className="text-lg font-bold text-foreground">{report.cemQuality.averageCompleteness}</div>
+                  <div className="text-lg font-bold text-foreground">
+                    {report.cemQuality.averageCompleteness}
+                  </div>
                   <div className="text-xs text-muted-foreground mt-1">CEM Quality</div>
                 </div>
               </div>
@@ -243,7 +262,10 @@ export default function AuditPage({ params }: AuditPageProps) {
               <h2 className="text-base font-semibold text-foreground mb-4">Critical Issues</h2>
               <div className="space-y-3">
                 {report.criticalIssues.map((issue, i) => (
-                  <div key={i} className="flex gap-3 p-3 rounded-lg bg-white/[0.03] border border-white/[0.04]">
+                  <div
+                    key={i}
+                    className="flex gap-3 p-3 rounded-lg bg-white/[0.03] border border-white/[0.04]"
+                  >
                     <SeverityIcon severity={issue.severity} />
                     <div className="flex-1 min-w-0">
                       <div className="text-sm font-medium text-foreground">
@@ -279,9 +301,12 @@ export default function AuditPage({ params }: AuditPageProps) {
                 <h2 className="text-base font-semibold text-foreground">Accessibility</h2>
                 <GradeBadge grade={report.accessibility.grade} />
               </div>
-              <div className="text-3xl font-bold text-foreground mb-1">{report.accessibility.averageScore}%</div>
+              <div className="text-3xl font-bold text-foreground mb-1">
+                {report.accessibility.averageScore}%
+              </div>
               <div className="text-xs text-muted-foreground">
-                {report.accessibility.passedComponents} / {report.accessibility.totalComponents} components passed (≥70%)
+                {report.accessibility.passedComponents} / {report.accessibility.totalComponents}{' '}
+                components passed (≥70%)
               </div>
             </div>
             <div className="p-6 rounded-xl border border-white/[0.08] bg-white/[0.02]">
@@ -289,9 +314,12 @@ export default function AuditPage({ params }: AuditPageProps) {
                 <h2 className="text-base font-semibold text-foreground">CEM Quality</h2>
                 <GradeBadge grade={report.cemQuality.grade} />
               </div>
-              <div className="text-3xl font-bold text-foreground mb-1">{report.cemQuality.averageCompleteness}%</div>
+              <div className="text-3xl font-bold text-foreground mb-1">
+                {report.cemQuality.averageCompleteness}%
+              </div>
               <div className="text-xs text-muted-foreground">
-                {report.cemQuality.fullyDocumented} / {report.cemQuality.totalComponents} fully documented (≥90%)
+                {report.cemQuality.fullyDocumented} / {report.cemQuality.totalComponents} fully
+                documented (≥90%)
               </div>
             </div>
           </div>
@@ -325,7 +353,9 @@ export default function AuditPage({ params }: AuditPageProps) {
                   <div className="text-xs text-muted-foreground mt-0.5">Average per component</div>
                 </div>
                 <div>
-                  <div className="text-lg font-bold text-foreground">{report.bundleSize.componentCount}</div>
+                  <div className="text-lg font-bold text-foreground">
+                    {report.bundleSize.componentCount}
+                  </div>
                   <div className="text-xs text-muted-foreground mt-0.5">Components measured</div>
                 </div>
               </div>

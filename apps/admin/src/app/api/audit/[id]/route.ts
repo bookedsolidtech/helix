@@ -8,11 +8,7 @@ import { validateComponent } from '@/lib/cem-validator';
 import { analyzeBundleSize } from '@/lib/bundle-analyzer';
 import { getAllComponents } from '@/lib/cem-parser';
 import { mcpScoreAllComponents, mcpAnalyzeAccessibility } from '@/lib/mcp-client';
-import {
-  aggregateLocalAudit,
-  aggregateMcpAudit,
-  type AuditReport,
-} from '@/lib/audit-report';
+import { aggregateLocalAudit, aggregateMcpAudit, type AuditReport } from '@/lib/audit-report';
 import type { McpAccessibilityProfile } from '@/lib/mcp-client';
 
 export const dynamic = 'force-dynamic';
@@ -51,9 +47,15 @@ export async function GET(_request: Request, { params }: RouteParams): Promise<N
       const tagNames = components.map((c) => c.tagName);
 
       const [a11yResults, cemValidations, bundleResults] = await Promise.all([
-        Promise.all(tagNames.map((tag) => Promise.resolve(analyzeAccessibility(tag)).catch(() => null))),
-        Promise.all(tagNames.map((tag) => Promise.resolve(validateComponent(tag) ?? null).catch(() => null))),
-        Promise.all(tagNames.map((tag) => Promise.resolve(analyzeBundleSize(tag)).catch(() => null))),
+        Promise.all(
+          tagNames.map((tag) => Promise.resolve(analyzeAccessibility(tag)).catch(() => null)),
+        ),
+        Promise.all(
+          tagNames.map((tag) => Promise.resolve(validateComponent(tag) ?? null).catch(() => null)),
+        ),
+        Promise.all(
+          tagNames.map((tag) => Promise.resolve(analyzeBundleSize(tag)).catch(() => null)),
+        ),
       ]);
 
       const report = aggregateLocalAudit(
@@ -104,9 +106,6 @@ export async function GET(_request: Request, { params }: RouteParams): Promise<N
     return NextResponse.json(report);
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Unknown error occurred';
-    return NextResponse.json(
-      { error: 'Audit failed', detail: message },
-      { status: 500 },
-    );
+    return NextResponse.json({ error: 'Audit failed', detail: message }, { status: 500 });
   }
 }
