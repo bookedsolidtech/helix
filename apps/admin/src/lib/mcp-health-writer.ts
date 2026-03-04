@@ -21,9 +21,11 @@ interface McpHistoryFile {
   issues: Array<{ message: string }>;
 }
 
-function dimensionToBreakdown(
-  d: HealthDimension,
-): { score: number; weight: number; details?: Record<string, unknown> } {
+function dimensionToBreakdown(d: HealthDimension): {
+  score: number;
+  weight: number;
+  details?: Record<string, unknown>;
+} {
   const entry: { score: number; weight: number; details?: Record<string, unknown> } = {
     score: d.score ?? 0,
     weight: d.weight,

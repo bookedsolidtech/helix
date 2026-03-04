@@ -8,9 +8,6 @@ export async function GET(): Promise<Response> {
     return Response.json(result);
   } catch (err) {
     const message = err instanceof Error ? err.message : 'Unknown error';
-    return Response.json(
-      { status: 'unreachable', error: message },
-      { status: 500 },
-    );
+    return Response.json({ status: 'unreachable', error: message }, { status: 500 });
   }
 }

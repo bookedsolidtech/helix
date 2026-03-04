@@ -25,7 +25,8 @@ vi.mock('@helix/mcp-shared', async () => {
 });
 
 // Import after mocking
-const { parseCem, diffCem, listAllComponents, validateCompleteness } = await import('./handlers.js');
+const { parseCem, diffCem, listAllComponents, validateCompleteness } =
+  await import('./handlers.js');
 
 describe('MCP Server: cem-analyzer handlers', () => {
   beforeEach(() => {
@@ -52,8 +53,17 @@ describe('MCP Server: cem-analyzer handlers', () => {
                   tagName: 'hx-button',
                   name: 'HxButton',
                   description: 'A button component',
-                  members: [{ name: 'variant', kind: 'field', type: { text: 'string' }, description: 'Button variant' }],
-                  events: [{ name: 'hx-click', type: { text: 'CustomEvent' }, description: 'Click event' }],
+                  members: [
+                    {
+                      name: 'variant',
+                      kind: 'field',
+                      type: { text: 'string' },
+                      description: 'Button variant',
+                    },
+                  ],
+                  events: [
+                    { name: 'hx-click', type: { text: 'CustomEvent' }, description: 'Click event' },
+                  ],
                   slots: [{ name: '', description: 'Default slot' }],
                   cssProperties: [{ name: '--hx-button-bg', description: 'Background color' }],
                   cssParts: [{ name: 'button', description: 'Button element' }],
@@ -69,7 +79,14 @@ describe('MCP Server: cem-analyzer handlers', () => {
           tagName: 'hx-button',
           name: 'HxButton',
           description: 'A button component',
-          members: [{ name: 'variant', kind: 'field', type: { text: 'string' }, description: 'Button variant' }],
+          members: [
+            {
+              name: 'variant',
+              kind: 'field',
+              type: { text: 'string' },
+              description: 'Button variant',
+            },
+          ],
           events: [{ name: 'hx-click', type: { text: 'CustomEvent' }, description: 'Click event' }],
           slots: [{ name: '', description: 'Default slot' }],
           cssProperties: [{ name: '--hx-button-bg', description: 'Background color' }],
@@ -307,10 +324,7 @@ describe('MCP Server: cem-analyzer handlers', () => {
                   {
                     tagName: 'hx-button',
                     name: 'HxButton',
-                    events: [
-                      { name: 'hx-click' },
-                      { name: 'hx-focus' },
-                    ],
+                    events: [{ name: 'hx-click' }, { name: 'hx-focus' }],
                   },
                 ],
               },
@@ -346,10 +360,7 @@ describe('MCP Server: cem-analyzer handlers', () => {
                   {
                     tagName: 'hx-button',
                     name: 'HxButton',
-                    slots: [
-                      { name: '' },
-                      { name: 'icon' },
-                    ],
+                    slots: [{ name: '' }, { name: 'icon' }],
                   },
                 ],
               },
@@ -521,10 +532,7 @@ describe('MCP Server: cem-analyzer handlers', () => {
                   {
                     tagName: 'hx-button',
                     name: 'HxButton',
-                    events: [
-                      { name: 'hx-click' },
-                      { name: 'hx-focus' },
-                    ],
+                    events: [{ name: 'hx-click' }, { name: 'hx-focus' }],
                   },
                 ],
               },
@@ -664,10 +672,7 @@ describe('MCP Server: cem-analyzer handlers', () => {
                       { name: 'variant', kind: 'field' },
                       { name: 'size', kind: 'field' },
                     ],
-                    events: [
-                      { name: 'hx-click' },
-                      { name: 'hx-focus' },
-                    ],
+                    events: [{ name: 'hx-click' }, { name: 'hx-focus' }],
                     slots: [{ name: '' }],
                   },
                 ],
@@ -705,9 +710,7 @@ describe('MCP Server: cem-analyzer handlers', () => {
             ],
           },
           {
-            declarations: [
-              { tagName: 'hx-input', name: 'HxInput' },
-            ],
+            declarations: [{ tagName: 'hx-input', name: 'HxInput' }],
           },
         ],
       });
@@ -761,10 +764,7 @@ describe('MCP Server: cem-analyzer handlers', () => {
     it('should handle modules with no declarations', async () => {
       mockFileOps.fileExists.mockReturnValue(true);
       mockFileOps.readJSON.mockReturnValue({
-        modules: [
-          { path: 'some/path.ts' },
-          { declarations: [] },
-        ],
+        modules: [{ path: 'some/path.ts' }, { declarations: [] }],
       });
 
       const result = await listAllComponents();
@@ -829,18 +829,10 @@ describe('MCP Server: cem-analyzer handlers', () => {
                 tagName: 'hx-button',
                 name: 'HxButton',
                 description: 'A button component',
-                members: [
-                  { name: 'variant', kind: 'field', description: 'Button variant' },
-                ],
-                events: [
-                  { name: 'hx-click', description: 'Click event' },
-                ],
-                cssProperties: [
-                  { name: '--hx-button-bg', description: 'Background color' },
-                ],
-                cssParts: [
-                  { name: 'button', description: 'Button element' },
-                ],
+                members: [{ name: 'variant', kind: 'field', description: 'Button variant' }],
+                events: [{ name: 'hx-click', description: 'Click event' }],
+                cssProperties: [{ name: '--hx-button-bg', description: 'Background color' }],
+                cssParts: [{ name: 'button', description: 'Button element' }],
               },
             ],
           },
@@ -864,9 +856,7 @@ describe('MCP Server: cem-analyzer handlers', () => {
                 tagName: 'hx-button',
                 name: 'HxButton',
                 description: 'A button',
-                members: [
-                  { name: 'variant', kind: 'field', description: 'Variant' },
-                ],
+                members: [{ name: 'variant', kind: 'field', description: 'Variant' }],
               },
             ],
           },
@@ -888,9 +878,7 @@ describe('MCP Server: cem-analyzer handlers', () => {
               {
                 tagName: 'hx-button',
                 name: 'HxButton',
-                members: [
-                  { name: 'variant', kind: 'field', description: 'Button variant' },
-                ],
+                members: [{ name: 'variant', kind: 'field', description: 'Button variant' }],
               },
             ],
           },
@@ -914,9 +902,7 @@ describe('MCP Server: cem-analyzer handlers', () => {
                 tagName: 'hx-button',
                 name: 'HxButton',
                 description: '   ',
-                members: [
-                  { name: 'variant', kind: 'field', description: 'Variant' },
-                ],
+                members: [{ name: 'variant', kind: 'field', description: 'Variant' }],
               },
             ],
           },
@@ -970,19 +956,10 @@ describe('MCP Server: cem-analyzer handlers', () => {
                 tagName: 'hx-button',
                 name: 'HxButton',
                 description: 'A button',
-                members: [
-                  { name: 'variant', kind: 'field', description: 'Variant' },
-                ],
-                events: [
-                  { name: 'hx-click' },
-                  { name: 'hx-focus', description: 'Focus event' },
-                ],
-                cssProperties: [
-                  { name: '--hx-button-bg' },
-                ],
-                cssParts: [
-                  { name: 'button' },
-                ],
+                members: [{ name: 'variant', kind: 'field', description: 'Variant' }],
+                events: [{ name: 'hx-click' }, { name: 'hx-focus', description: 'Focus event' }],
+                cssProperties: [{ name: '--hx-button-bg' }],
+                cssParts: [{ name: 'button' }],
               },
             ],
           },

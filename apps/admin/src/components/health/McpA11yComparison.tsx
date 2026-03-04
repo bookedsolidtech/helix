@@ -27,11 +27,7 @@ function ScoreIndicator({ score, label }: { score: number; label: string }) {
       <p
         className={cn(
           'text-2xl font-bold tabular-nums',
-          score >= 80
-            ? 'text-emerald-400'
-            : score >= 60
-              ? 'text-amber-400'
-              : 'text-red-400',
+          score >= 80 ? 'text-emerald-400' : score >= 60 ? 'text-amber-400' : 'text-red-400',
         )}
       >
         {score}%
