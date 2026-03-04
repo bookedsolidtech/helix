@@ -127,7 +127,9 @@ export function updateLibrary(id: string, partial: Partial<Omit<LibraryEntry, 'i
     throw new Error(`Library "${id}" not found`);
   }
 
-  const updated: LibraryEntry = { ...data.libraries[index]!, ...partial, id };
+  const existing = data.libraries[index];
+  if (!existing) throw new Error(`Library at index ${index} not found`);
+  const updated: LibraryEntry = { ...existing, ...partial, id };
   validateEntry(updated);
 
   data.libraries[index] = updated;
