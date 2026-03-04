@@ -1,7 +1,7 @@
 {
   "config": {
-    "configFile": "/Volumes/Development/booked/helix/.worktrees/feature-t1-01-hx-button-primary-action-button/playwright.config.ts",
-    "rootDir": "/Volumes/Development/booked/helix/.worktrees/feature-t1-01-hx-button-primary-action-button/packages/hx-library/e2e",
+    "configFile": "/Volumes/Development/booked/helix/.worktrees/feature-t1-26-hx-spinner-circular-loading/playwright.config.ts",
+    "rootDir": "/Volumes/Development/booked/helix/.worktrees/feature-t1-26-hx-spinner-circular-loading/packages/hx-library/e2e",
     "forbidOnly": false,
     "fullyParallel": true,
     "globalSetup": null,
@@ -10,41 +10,49 @@
     "grep": {},
     "grepInvert": null,
     "maxFailures": 0,
-    "metadata": {},
+    "metadata": {
+      "actualWorkers": 5
+    },
     "preserveOutput": "always",
     "projects": [
       {
-        "outputDir": "/Volumes/Development/booked/helix/.worktrees/feature-t1-01-hx-button-primary-action-button/packages/hx-library/.cache/vrt-results",
+        "outputDir": "/Volumes/Development/booked/helix/.worktrees/feature-t1-26-hx-spinner-circular-loading/packages/hx-library/.cache/vrt-results",
         "repeatEach": 1,
         "retries": 0,
-        "metadata": {},
+        "metadata": {
+          "actualWorkers": 5
+        },
         "id": "chromium",
         "name": "chromium",
-        "testDir": "/Volumes/Development/booked/helix/.worktrees/feature-t1-01-hx-button-primary-action-button/packages/hx-library/e2e",
+        "testDir": "/Volumes/Development/booked/helix/.worktrees/feature-t1-26-hx-spinner-circular-loading/packages/hx-library/e2e",
         "testIgnore": [],
         "testMatch": ["**/*.@(spec|test).?(c|m)[jt]s?(x)"],
         "timeout": 30000
       },
       {
-        "outputDir": "/Volumes/Development/booked/helix/.worktrees/feature-t1-01-hx-button-primary-action-button/packages/hx-library/.cache/vrt-results",
+        "outputDir": "/Volumes/Development/booked/helix/.worktrees/feature-t1-26-hx-spinner-circular-loading/packages/hx-library/.cache/vrt-results",
         "repeatEach": 1,
         "retries": 0,
-        "metadata": {},
+        "metadata": {
+          "actualWorkers": 5
+        },
         "id": "firefox",
         "name": "firefox",
-        "testDir": "/Volumes/Development/booked/helix/.worktrees/feature-t1-01-hx-button-primary-action-button/packages/hx-library/e2e",
+        "testDir": "/Volumes/Development/booked/helix/.worktrees/feature-t1-26-hx-spinner-circular-loading/packages/hx-library/e2e",
         "testIgnore": [],
         "testMatch": ["**/*.@(spec|test).?(c|m)[jt]s?(x)"],
         "timeout": 30000
       },
       {
-        "outputDir": "/Volumes/Development/booked/helix/.worktrees/feature-t1-01-hx-button-primary-action-button/packages/hx-library/.cache/vrt-results",
+        "outputDir": "/Volumes/Development/booked/helix/.worktrees/feature-t1-26-hx-spinner-circular-loading/packages/hx-library/.cache/vrt-results",
         "repeatEach": 1,
         "retries": 0,
-        "metadata": {},
+        "metadata": {
+          "actualWorkers": 5
+        },
         "id": "webkit",
         "name": "webkit",
-        "testDir": "/Volumes/Development/booked/helix/.worktrees/feature-t1-01-hx-button-primary-action-button/packages/hx-library/e2e",
+        "testDir": "/Volumes/Development/booked/helix/.worktrees/feature-t1-26-hx-spinner-circular-loading/packages/hx-library/e2e",
         "testIgnore": [],
         "testMatch": ["**/*.@(spec|test).?(c|m)[jt]s?(x)"],
         "timeout": 30000
@@ -73,17 +81,234 @@
     "workers": 5,
     "webServer": null
   },
-  "suites": [],
-  "errors": [
+  "suites": [
     {
-      "message": "Error: No tests found.\nMake sure that arguments are regular expressions matching test files.\nYou may need to escape symbols like \"$\" or \"*\" and quote the arguments.",
-      "stack": "Error: No tests found.\nMake sure that arguments are regular expressions matching test files.\nYou may need to escape symbols like \"$\" or \"*\" and quote the arguments."
+      "title": "hx-spinner-verify.spec.ts",
+      "file": "hx-spinner-verify.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "hx-spinner Playwright verification",
+          "file": "hx-spinner-verify.spec.ts",
+          "line": 32,
+          "column": 6,
+          "specs": [
+            {
+              "title": "renders with shadow DOM",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 178,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-03-04T07:16:49.483Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "856d293b2e956965f9e2-b6e064e9f4e3a4a73a56",
+              "file": "hx-spinner-verify.spec.ts",
+              "line": 105,
+              "column": 3
+            },
+            {
+              "title": "has role=\"status\", aria-label, and aria-live on spinner part",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 1,
+                      "status": "passed",
+                      "duration": 189,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-03-04T07:16:49.509Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "856d293b2e956965f9e2-17411897d114b409b33d",
+              "file": "hx-spinner-verify.spec.ts",
+              "line": 113,
+              "column": 3
+            },
+            {
+              "title": "exposes track and indicator parts",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 2,
+                      "parallelIndex": 2,
+                      "status": "passed",
+                      "duration": 166,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-03-04T07:16:49.505Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "856d293b2e956965f9e2-5695eaed473a1c5d271d",
+              "file": "hx-spinner-verify.spec.ts",
+              "line": 128,
+              "column": 3
+            },
+            {
+              "title": "reflects custom label as aria-label",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 3,
+                      "parallelIndex": 3,
+                      "status": "passed",
+                      "duration": 177,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-03-04T07:16:49.498Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "856d293b2e956965f9e2-e3f7e0ef6281e3a1c381",
+              "file": "hx-spinner-verify.spec.ts",
+              "line": 140,
+              "column": 3
+            },
+            {
+              "title": "applies size class from hx-size attribute",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 4,
+                      "parallelIndex": 4,
+                      "status": "passed",
+                      "duration": 190,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-03-04T07:16:49.475Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "856d293b2e956965f9e2-dfb2b3cc4586745379ae",
+              "file": "hx-spinner-verify.spec.ts",
+              "line": 148,
+              "column": 3
+            },
+            {
+              "title": "applies neutral variant class",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 2,
+                      "parallelIndex": 2,
+                      "status": "passed",
+                      "duration": 80,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-03-04T07:16:50.228Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "856d293b2e956965f9e2-7ca455db5b67d1ca46c5",
+              "file": "hx-spinner-verify.spec.ts",
+              "line": 156,
+              "column": 3
+            }
+          ]
+        }
+      ]
     }
   ],
+  "errors": [],
   "stats": {
-    "startTime": "2026-03-03T20:48:25.972Z",
-    "duration": 3.940999999999974,
-    "expected": 0,
+    "startTime": "2026-03-04T07:16:48.831Z",
+    "duration": 1509.321,
+    "expected": 6,
     "skipped": 0,
     "unexpected": 0,
     "flaky": 0
