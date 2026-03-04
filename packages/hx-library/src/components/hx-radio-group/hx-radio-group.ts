@@ -6,13 +6,13 @@ import { helixRadioGroupStyles } from './hx-radio-group.styles.js';
 import type { HelixRadio } from './hx-radio.js';
 
 /**
- * A form-associated radio group that manages a set of `<wc-radio>` children.
+ * A form-associated radio group that manages a set of `<hx-radio>` children.
  *
  * @summary Form-associated radio group with label, validation, help text, and keyboard navigation.
  *
  * @tag hx-radio-group
  *
- * @slot - `<wc-radio>` elements.
+ * @slot - `<hx-radio>` elements.
  * @slot error - Custom error content (overrides the error property).
  * @slot help-text - Custom help text content (overrides the helpText property).
  *
