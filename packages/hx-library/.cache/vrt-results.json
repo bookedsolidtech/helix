@@ -1,7 +1,7 @@
 {
   "config": {
-    "configFile": "/Volumes/Development/booked/helix/.worktrees/feature-t1-01-hx-button-primary-action-button/playwright.config.ts",
-    "rootDir": "/Volumes/Development/booked/helix/.worktrees/feature-t1-01-hx-button-primary-action-button/packages/hx-library/e2e",
+    "configFile": "/Volumes/Development/booked/helix/.worktrees/feature-t1-11-hx-radio-group-mutually-exclusive/playwright.config.ts",
+    "rootDir": "/Volumes/Development/booked/helix/.worktrees/feature-t1-11-hx-radio-group-mutually-exclusive/packages/hx-library/e2e",
     "forbidOnly": false,
     "fullyParallel": true,
     "globalSetup": null,
@@ -10,44 +10,52 @@
     "grep": {},
     "grepInvert": null,
     "maxFailures": 0,
-    "metadata": {},
+    "metadata": {
+      "actualWorkers": 4
+    },
     "preserveOutput": "always",
     "projects": [
       {
-        "outputDir": "/Volumes/Development/booked/helix/.worktrees/feature-t1-01-hx-button-primary-action-button/packages/hx-library/.cache/vrt-results",
+        "outputDir": "/Volumes/Development/booked/helix/.worktrees/feature-t1-11-hx-radio-group-mutually-exclusive/packages/hx-library/.cache/vrt-results",
         "repeatEach": 1,
         "retries": 0,
-        "metadata": {},
+        "metadata": {
+          "actualWorkers": 4
+        },
         "id": "chromium",
         "name": "chromium",
-        "testDir": "/Volumes/Development/booked/helix/.worktrees/feature-t1-01-hx-button-primary-action-button/packages/hx-library/e2e",
+        "testDir": "/Volumes/Development/booked/helix/.worktrees/feature-t1-11-hx-radio-group-mutually-exclusive/packages/hx-library/e2e",
         "testIgnore": [],
         "testMatch": ["**/*.@(spec|test).?(c|m)[jt]s?(x)"],
-        "timeout": 30000
+        "timeout": 15000
       },
       {
-        "outputDir": "/Volumes/Development/booked/helix/.worktrees/feature-t1-01-hx-button-primary-action-button/packages/hx-library/.cache/vrt-results",
+        "outputDir": "/Volumes/Development/booked/helix/.worktrees/feature-t1-11-hx-radio-group-mutually-exclusive/packages/hx-library/.cache/vrt-results",
         "repeatEach": 1,
         "retries": 0,
-        "metadata": {},
+        "metadata": {
+          "actualWorkers": 4
+        },
         "id": "firefox",
         "name": "firefox",
-        "testDir": "/Volumes/Development/booked/helix/.worktrees/feature-t1-01-hx-button-primary-action-button/packages/hx-library/e2e",
+        "testDir": "/Volumes/Development/booked/helix/.worktrees/feature-t1-11-hx-radio-group-mutually-exclusive/packages/hx-library/e2e",
         "testIgnore": [],
         "testMatch": ["**/*.@(spec|test).?(c|m)[jt]s?(x)"],
-        "timeout": 30000
+        "timeout": 15000
       },
       {
-        "outputDir": "/Volumes/Development/booked/helix/.worktrees/feature-t1-01-hx-button-primary-action-button/packages/hx-library/.cache/vrt-results",
+        "outputDir": "/Volumes/Development/booked/helix/.worktrees/feature-t1-11-hx-radio-group-mutually-exclusive/packages/hx-library/.cache/vrt-results",
         "repeatEach": 1,
         "retries": 0,
-        "metadata": {},
+        "metadata": {
+          "actualWorkers": 4
+        },
         "id": "webkit",
         "name": "webkit",
-        "testDir": "/Volumes/Development/booked/helix/.worktrees/feature-t1-01-hx-button-primary-action-button/packages/hx-library/e2e",
+        "testDir": "/Volumes/Development/booked/helix/.worktrees/feature-t1-11-hx-radio-group-mutually-exclusive/packages/hx-library/e2e",
         "testIgnore": [],
         "testMatch": ["**/*.@(spec|test).?(c|m)[jt]s?(x)"],
-        "timeout": 30000
+        "timeout": 15000
       }
     ],
     "quiet": false,
@@ -73,19 +81,324 @@
     "workers": 5,
     "webServer": null
   },
-  "suites": [],
-  "errors": [
+  "suites": [
     {
-      "message": "Error: No tests found.\nMake sure that arguments are regular expressions matching test files.\nYou may need to escape symbols like \"$\" or \"*\" and quote the arguments.",
-      "stack": "Error: No tests found.\nMake sure that arguments are regular expressions matching test files.\nYou may need to escape symbols like \"$\" or \"*\" and quote the arguments."
+      "title": "hx-radio-group-verify.spec.ts",
+      "file": "hx-radio-group-verify.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "hx-radio-group verification",
+          "file": "hx-radio-group-verify.spec.ts",
+          "line": 111,
+          "column": 6,
+          "specs": [
+            {
+              "title": "AC1: mutual exclusion - only one radio selected at a time",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 15000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "timedOut",
+                      "duration": 15033,
+                      "error": {
+                        "message": "\u001b[31mTest timeout of 15000ms exceeded while running \"beforeEach\" hook.\u001b[39m",
+                        "stack": "\u001b[31mTest timeout of 15000ms exceeded while running \"beforeEach\" hook.\u001b[39m\n    at /Volumes/Development/booked/helix/.worktrees/feature-t1-11-hx-radio-group-mutually-exclusive/packages/hx-library/e2e/hx-radio-group-verify.spec.ts:112:8",
+                        "location": {
+                          "file": "/Volumes/Development/booked/helix/.worktrees/feature-t1-11-hx-radio-group-mutually-exclusive/packages/hx-library/e2e/hx-radio-group-verify.spec.ts",
+                          "column": 8,
+                          "line": 112
+                        },
+                        "snippet": "  110 |\n  111 | test.describe('hx-radio-group verification', () => {\n> 112 |   test.beforeEach(async ({ page }) => {\n      |        ^\n  113 |     page.on('pageerror', (err) => console.log('Page error:', err.message));\n  114 |     page.on('console', (msg) => {\n  115 |       if (msg.type() === 'error') console.log('Console error:', msg.text());"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/Volumes/Development/booked/helix/.worktrees/feature-t1-11-hx-radio-group-mutually-exclusive/packages/hx-library/e2e/hx-radio-group-verify.spec.ts",
+                            "column": 8,
+                            "line": 112
+                          },
+                          "message": "\u001b[31mTest timeout of 15000ms exceeded while running \"beforeEach\" hook.\u001b[39m\n\n  110 |\n  111 | test.describe('hx-radio-group verification', () => {\n> 112 |   test.beforeEach(async ({ page }) => {\n      |        ^\n  113 |     page.on('pageerror', (err) => console.log('Page error:', err.message));\n  114 |     page.on('console', (msg) => {\n  115 |       if (msg.type() === 'error') console.log('Console error:', msg.text());\n    at /Volumes/Development/booked/helix/.worktrees/feature-t1-11-hx-radio-group-mutually-exclusive/packages/hx-library/e2e/hx-radio-group-verify.spec.ts:112:8"
+                        },
+                        {
+                          "location": {
+                            "file": "/Volumes/Development/booked/helix/.worktrees/feature-t1-11-hx-radio-group-mutually-exclusive/packages/hx-library/e2e/hx-radio-group-verify.spec.ts",
+                            "column": 16,
+                            "line": 118
+                          },
+                          "message": "Error: page.waitForFunction: Test timeout of 15000ms exceeded.\n\n  116 |     });\n  117 |     await page.goto(serverUrl);\n> 118 |     await page.waitForFunction(\n      |                ^\n  119 |       () => (window as Window & { __ready__?: boolean }).__ready__ === true,\n  120 |       { timeout: 20000 }\n  121 |     );\n    at /Volumes/Development/booked/helix/.worktrees/feature-t1-11-hx-radio-group-mutually-exclusive/packages/hx-library/e2e/hx-radio-group-verify.spec.ts:118:16"
+                        }
+                      ],
+                      "stdout": [
+                        {
+                          "text": "Console error: Failed to load module script: Expected a JavaScript-or-Wasm module script but the server responded with a MIME type of \"text/plain\". Strict MIME type checking is enforced for module scripts per HTML spec.\n"
+                        },
+                        {
+                          "text": "Console error: Failed to load resource: the server responded with a status of 404 (Not Found)\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-03-03T22:51:04.695Z",
+                      "annotations": [],
+                      "attachments": [],
+                      "errorLocation": {
+                        "file": "/Volumes/Development/booked/helix/.worktrees/feature-t1-11-hx-radio-group-mutually-exclusive/packages/hx-library/e2e/hx-radio-group-verify.spec.ts",
+                        "column": 8,
+                        "line": 112
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "fdcc6d1cc8af9932c04c-b1758b8c5faebfd5fedd",
+              "file": "hx-radio-group-verify.spec.ts",
+              "line": 124,
+              "column": 3
+            },
+            {
+              "title": "AC2: hx-change event fires with correct value on click",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 15000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 1,
+                      "status": "timedOut",
+                      "duration": 15043,
+                      "error": {
+                        "message": "\u001b[31mTest timeout of 15000ms exceeded while running \"beforeEach\" hook.\u001b[39m",
+                        "stack": "\u001b[31mTest timeout of 15000ms exceeded while running \"beforeEach\" hook.\u001b[39m\n    at /Volumes/Development/booked/helix/.worktrees/feature-t1-11-hx-radio-group-mutually-exclusive/packages/hx-library/e2e/hx-radio-group-verify.spec.ts:112:8",
+                        "location": {
+                          "file": "/Volumes/Development/booked/helix/.worktrees/feature-t1-11-hx-radio-group-mutually-exclusive/packages/hx-library/e2e/hx-radio-group-verify.spec.ts",
+                          "column": 8,
+                          "line": 112
+                        },
+                        "snippet": "  110 |\n  111 | test.describe('hx-radio-group verification', () => {\n> 112 |   test.beforeEach(async ({ page }) => {\n      |        ^\n  113 |     page.on('pageerror', (err) => console.log('Page error:', err.message));\n  114 |     page.on('console', (msg) => {\n  115 |       if (msg.type() === 'error') console.log('Console error:', msg.text());"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/Volumes/Development/booked/helix/.worktrees/feature-t1-11-hx-radio-group-mutually-exclusive/packages/hx-library/e2e/hx-radio-group-verify.spec.ts",
+                            "column": 8,
+                            "line": 112
+                          },
+                          "message": "\u001b[31mTest timeout of 15000ms exceeded while running \"beforeEach\" hook.\u001b[39m\n\n  110 |\n  111 | test.describe('hx-radio-group verification', () => {\n> 112 |   test.beforeEach(async ({ page }) => {\n      |        ^\n  113 |     page.on('pageerror', (err) => console.log('Page error:', err.message));\n  114 |     page.on('console', (msg) => {\n  115 |       if (msg.type() === 'error') console.log('Console error:', msg.text());\n    at /Volumes/Development/booked/helix/.worktrees/feature-t1-11-hx-radio-group-mutually-exclusive/packages/hx-library/e2e/hx-radio-group-verify.spec.ts:112:8"
+                        },
+                        {
+                          "location": {
+                            "file": "/Volumes/Development/booked/helix/.worktrees/feature-t1-11-hx-radio-group-mutually-exclusive/packages/hx-library/e2e/hx-radio-group-verify.spec.ts",
+                            "column": 16,
+                            "line": 118
+                          },
+                          "message": "Error: page.waitForFunction: Test timeout of 15000ms exceeded.\n\n  116 |     });\n  117 |     await page.goto(serverUrl);\n> 118 |     await page.waitForFunction(\n      |                ^\n  119 |       () => (window as Window & { __ready__?: boolean }).__ready__ === true,\n  120 |       { timeout: 20000 }\n  121 |     );\n    at /Volumes/Development/booked/helix/.worktrees/feature-t1-11-hx-radio-group-mutually-exclusive/packages/hx-library/e2e/hx-radio-group-verify.spec.ts:118:16"
+                        }
+                      ],
+                      "stdout": [
+                        {
+                          "text": "Console error: Failed to load module script: Expected a JavaScript-or-Wasm module script but the server responded with a MIME type of \"text/plain\". Strict MIME type checking is enforced for module scripts per HTML spec.\n"
+                        },
+                        {
+                          "text": "Console error: Failed to load resource: the server responded with a status of 404 (Not Found)\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-03-03T22:51:04.695Z",
+                      "annotations": [],
+                      "attachments": [],
+                      "errorLocation": {
+                        "file": "/Volumes/Development/booked/helix/.worktrees/feature-t1-11-hx-radio-group-mutually-exclusive/packages/hx-library/e2e/hx-radio-group-verify.spec.ts",
+                        "column": 8,
+                        "line": 112
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "fdcc6d1cc8af9932c04c-66e54712d52e510c43f1",
+              "file": "hx-radio-group-verify.spec.ts",
+              "line": 153,
+              "column": 3
+            },
+            {
+              "title": "AC3: ElementInternals form participation",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 15000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 2,
+                      "parallelIndex": 2,
+                      "status": "timedOut",
+                      "duration": 15037,
+                      "error": {
+                        "message": "\u001b[31mTest timeout of 15000ms exceeded while running \"beforeEach\" hook.\u001b[39m",
+                        "stack": "\u001b[31mTest timeout of 15000ms exceeded while running \"beforeEach\" hook.\u001b[39m\n    at /Volumes/Development/booked/helix/.worktrees/feature-t1-11-hx-radio-group-mutually-exclusive/packages/hx-library/e2e/hx-radio-group-verify.spec.ts:112:8",
+                        "location": {
+                          "file": "/Volumes/Development/booked/helix/.worktrees/feature-t1-11-hx-radio-group-mutually-exclusive/packages/hx-library/e2e/hx-radio-group-verify.spec.ts",
+                          "column": 8,
+                          "line": 112
+                        },
+                        "snippet": "  110 |\n  111 | test.describe('hx-radio-group verification', () => {\n> 112 |   test.beforeEach(async ({ page }) => {\n      |        ^\n  113 |     page.on('pageerror', (err) => console.log('Page error:', err.message));\n  114 |     page.on('console', (msg) => {\n  115 |       if (msg.type() === 'error') console.log('Console error:', msg.text());"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/Volumes/Development/booked/helix/.worktrees/feature-t1-11-hx-radio-group-mutually-exclusive/packages/hx-library/e2e/hx-radio-group-verify.spec.ts",
+                            "column": 8,
+                            "line": 112
+                          },
+                          "message": "\u001b[31mTest timeout of 15000ms exceeded while running \"beforeEach\" hook.\u001b[39m\n\n  110 |\n  111 | test.describe('hx-radio-group verification', () => {\n> 112 |   test.beforeEach(async ({ page }) => {\n      |        ^\n  113 |     page.on('pageerror', (err) => console.log('Page error:', err.message));\n  114 |     page.on('console', (msg) => {\n  115 |       if (msg.type() === 'error') console.log('Console error:', msg.text());\n    at /Volumes/Development/booked/helix/.worktrees/feature-t1-11-hx-radio-group-mutually-exclusive/packages/hx-library/e2e/hx-radio-group-verify.spec.ts:112:8"
+                        },
+                        {
+                          "location": {
+                            "file": "/Volumes/Development/booked/helix/.worktrees/feature-t1-11-hx-radio-group-mutually-exclusive/packages/hx-library/e2e/hx-radio-group-verify.spec.ts",
+                            "column": 16,
+                            "line": 118
+                          },
+                          "message": "Error: page.waitForFunction: Test timeout of 15000ms exceeded.\n\n  116 |     });\n  117 |     await page.goto(serverUrl);\n> 118 |     await page.waitForFunction(\n      |                ^\n  119 |       () => (window as Window & { __ready__?: boolean }).__ready__ === true,\n  120 |       { timeout: 20000 }\n  121 |     );\n    at /Volumes/Development/booked/helix/.worktrees/feature-t1-11-hx-radio-group-mutually-exclusive/packages/hx-library/e2e/hx-radio-group-verify.spec.ts:118:16"
+                        }
+                      ],
+                      "stdout": [
+                        {
+                          "text": "Console error: Failed to load module script: Expected a JavaScript-or-Wasm module script but the server responded with a MIME type of \"text/plain\". Strict MIME type checking is enforced for module scripts per HTML spec.\n"
+                        },
+                        {
+                          "text": "Console error: Failed to load resource: the server responded with a status of 404 (Not Found)\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-03-03T22:51:04.701Z",
+                      "annotations": [],
+                      "attachments": [],
+                      "errorLocation": {
+                        "file": "/Volumes/Development/booked/helix/.worktrees/feature-t1-11-hx-radio-group-mutually-exclusive/packages/hx-library/e2e/hx-radio-group-verify.spec.ts",
+                        "column": 8,
+                        "line": 112
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "fdcc6d1cc8af9932c04c-93dd1cb55f8cea5eb4df",
+              "file": "hx-radio-group-verify.spec.ts",
+              "line": 178,
+              "column": 3
+            },
+            {
+              "title": "AC5: radiogroup ARIA role and roving tabindex",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 15000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 3,
+                      "parallelIndex": 3,
+                      "status": "timedOut",
+                      "duration": 15037,
+                      "error": {
+                        "message": "\u001b[31mTest timeout of 15000ms exceeded while running \"beforeEach\" hook.\u001b[39m",
+                        "stack": "\u001b[31mTest timeout of 15000ms exceeded while running \"beforeEach\" hook.\u001b[39m\n    at /Volumes/Development/booked/helix/.worktrees/feature-t1-11-hx-radio-group-mutually-exclusive/packages/hx-library/e2e/hx-radio-group-verify.spec.ts:112:8",
+                        "location": {
+                          "file": "/Volumes/Development/booked/helix/.worktrees/feature-t1-11-hx-radio-group-mutually-exclusive/packages/hx-library/e2e/hx-radio-group-verify.spec.ts",
+                          "column": 8,
+                          "line": 112
+                        },
+                        "snippet": "  110 |\n  111 | test.describe('hx-radio-group verification', () => {\n> 112 |   test.beforeEach(async ({ page }) => {\n      |        ^\n  113 |     page.on('pageerror', (err) => console.log('Page error:', err.message));\n  114 |     page.on('console', (msg) => {\n  115 |       if (msg.type() === 'error') console.log('Console error:', msg.text());"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/Volumes/Development/booked/helix/.worktrees/feature-t1-11-hx-radio-group-mutually-exclusive/packages/hx-library/e2e/hx-radio-group-verify.spec.ts",
+                            "column": 8,
+                            "line": 112
+                          },
+                          "message": "\u001b[31mTest timeout of 15000ms exceeded while running \"beforeEach\" hook.\u001b[39m\n\n  110 |\n  111 | test.describe('hx-radio-group verification', () => {\n> 112 |   test.beforeEach(async ({ page }) => {\n      |        ^\n  113 |     page.on('pageerror', (err) => console.log('Page error:', err.message));\n  114 |     page.on('console', (msg) => {\n  115 |       if (msg.type() === 'error') console.log('Console error:', msg.text());\n    at /Volumes/Development/booked/helix/.worktrees/feature-t1-11-hx-radio-group-mutually-exclusive/packages/hx-library/e2e/hx-radio-group-verify.spec.ts:112:8"
+                        },
+                        {
+                          "location": {
+                            "file": "/Volumes/Development/booked/helix/.worktrees/feature-t1-11-hx-radio-group-mutually-exclusive/packages/hx-library/e2e/hx-radio-group-verify.spec.ts",
+                            "column": 16,
+                            "line": 118
+                          },
+                          "message": "Error: page.waitForFunction: Test timeout of 15000ms exceeded.\n\n  116 |     });\n  117 |     await page.goto(serverUrl);\n> 118 |     await page.waitForFunction(\n      |                ^\n  119 |       () => (window as Window & { __ready__?: boolean }).__ready__ === true,\n  120 |       { timeout: 20000 }\n  121 |     );\n    at /Volumes/Development/booked/helix/.worktrees/feature-t1-11-hx-radio-group-mutually-exclusive/packages/hx-library/e2e/hx-radio-group-verify.spec.ts:118:16"
+                        }
+                      ],
+                      "stdout": [
+                        {
+                          "text": "Console error: Failed to load module script: Expected a JavaScript-or-Wasm module script but the server responded with a MIME type of \"text/plain\". Strict MIME type checking is enforced for module scripts per HTML spec.\n"
+                        },
+                        {
+                          "text": "Console error: Failed to load resource: the server responded with a status of 404 (Not Found)\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-03-03T22:51:04.700Z",
+                      "annotations": [],
+                      "attachments": [],
+                      "errorLocation": {
+                        "file": "/Volumes/Development/booked/helix/.worktrees/feature-t1-11-hx-radio-group-mutually-exclusive/packages/hx-library/e2e/hx-radio-group-verify.spec.ts",
+                        "column": 8,
+                        "line": 112
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "fdcc6d1cc8af9932c04c-ac0589e846abbf8de399",
+              "file": "hx-radio-group-verify.spec.ts",
+              "line": 199,
+              "column": 3
+            }
+          ]
+        }
+      ]
     }
   ],
+  "errors": [],
   "stats": {
-    "startTime": "2026-03-03T20:48:25.972Z",
-    "duration": 3.940999999999974,
+    "startTime": "2026-03-03T22:51:03.997Z",
+    "duration": 19324.052,
     "expected": 0,
     "skipped": 0,
-    "unexpected": 0,
+    "unexpected": 4,
     "flaky": 0
   }
 }
