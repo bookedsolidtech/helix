@@ -7,6 +7,7 @@
 
 // Components
 export { HelixButton } from './components/hx-button/index.js';
+export { HelixIconButton } from './components/hx-icon-button/index.js';
 export { HelixCard } from './components/hx-card/index.js';
 export { HelixTextInput } from './components/hx-text-input/index.js';
 export { HelixCheckbox } from './components/hx-checkbox/index.js';

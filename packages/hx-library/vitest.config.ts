@@ -9,6 +9,7 @@ export default defineConfig({
       instances: [{ browser: 'chromium' }],
     },
     include: ['src/components/**/*.test.ts'],
+    exclude: ['.worktrees/**', 'node_modules/**'],
     reporters: ['verbose', 'json'],
     outputFile: { json: '.cache/test-results.json' },
     globals: true,
@@ -24,6 +25,12 @@ export default defineConfig({
       ],
       reporter: ['text', 'json-summary'],
       reportsDirectory: '.cache/coverage',
+      thresholds: {
+        statements: 80,
+        branches: 75,
+        functions: 90,
+        lines: 80,
+      },
     },
   },
 });
