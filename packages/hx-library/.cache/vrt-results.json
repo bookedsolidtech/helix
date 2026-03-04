@@ -11,7 +11,7 @@
     "grepInvert": null,
     "maxFailures": 0,
     "metadata": {
-      "actualWorkers": 4
+      "actualWorkers": 1
     },
     "preserveOutput": "always",
     "projects": [
@@ -20,7 +20,7 @@
         "repeatEach": 1,
         "retries": 0,
         "metadata": {
-          "actualWorkers": 4
+          "actualWorkers": 1
         },
         "id": "chromium",
         "name": "chromium",
@@ -34,7 +34,7 @@
         "repeatEach": 1,
         "retries": 0,
         "metadata": {
-          "actualWorkers": 4
+          "actualWorkers": 1
         },
         "id": "firefox",
         "name": "firefox",
@@ -48,7 +48,7 @@
         "repeatEach": 1,
         "retries": 0,
         "metadata": {
-          "actualWorkers": 4
+          "actualWorkers": 1
         },
         "id": "webkit",
         "name": "webkit",
@@ -83,155 +83,66 @@
   },
   "suites": [
     {
-      "title": "hx-divider-verify.spec.ts",
-      "file": "hx-divider-verify.spec.ts",
+      "title": "hx-divider-temp-verify.spec.ts",
+      "file": "hx-divider-temp-verify.spec.ts",
       "column": 0,
       "line": 0,
-      "specs": [
+      "specs": [],
+      "suites": [
         {
-          "title": "hx-divider renders with shadow DOM and correct defaults",
-          "ok": true,
-          "tags": [],
-          "tests": [
+          "title": "hx-divider component verification",
+          "file": "hx-divider-temp-verify.spec.ts",
+          "line": 5,
+          "column": 6,
+          "specs": [
             {
-              "timeout": 30000,
-              "annotations": [],
-              "expectedStatus": "passed",
-              "projectId": "chromium",
-              "projectName": "chromium",
-              "results": [
+              "title": "renders with correct shadow DOM structure and attributes",
+              "ok": true,
+              "tags": [],
+              "tests": [
                 {
-                  "workerIndex": 0,
-                  "parallelIndex": 0,
-                  "status": "passed",
-                  "duration": 146,
-                  "errors": [],
-                  "stdout": [],
-                  "stderr": [],
-                  "retry": 0,
-                  "startTime": "2026-03-04T06:41:20.813Z",
+                  "timeout": 30000,
                   "annotations": [],
-                  "attachments": []
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 585,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "Console messages: []\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-03-04T18:34:00.548Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
                 }
               ],
-              "status": "expected"
+              "id": "e3666e0a84b1f77f72b6-47a2c43778fcadf78516",
+              "file": "hx-divider-temp-verify.spec.ts",
+              "line": 6,
+              "column": 3
             }
-          ],
-          "id": "d503252e62ab2d691049-491997c79effddac8075",
-          "file": "hx-divider-verify.spec.ts",
-          "line": 62,
-          "column": 1
-        },
-        {
-          "title": "hx-divider vertical + dashed variant",
-          "ok": true,
-          "tags": [],
-          "tests": [
-            {
-              "timeout": 30000,
-              "annotations": [],
-              "expectedStatus": "passed",
-              "projectId": "chromium",
-              "projectName": "chromium",
-              "results": [
-                {
-                  "workerIndex": 1,
-                  "parallelIndex": 1,
-                  "status": "passed",
-                  "duration": 154,
-                  "errors": [],
-                  "stdout": [],
-                  "stderr": [],
-                  "retry": 0,
-                  "startTime": "2026-03-04T06:41:20.813Z",
-                  "annotations": [],
-                  "attachments": []
-                }
-              ],
-              "status": "expected"
-            }
-          ],
-          "id": "d503252e62ab2d691049-9e10b907ddb6f3a70a43",
-          "file": "hx-divider-verify.spec.ts",
-          "line": 86,
-          "column": 1
-        },
-        {
-          "title": "hx-divider role=\"presentation\" sets aria-hidden on hr",
-          "ok": true,
-          "tags": [],
-          "tests": [
-            {
-              "timeout": 30000,
-              "annotations": [],
-              "expectedStatus": "passed",
-              "projectId": "chromium",
-              "projectName": "chromium",
-              "results": [
-                {
-                  "workerIndex": 2,
-                  "parallelIndex": 2,
-                  "status": "passed",
-                  "duration": 142,
-                  "errors": [],
-                  "stdout": [],
-                  "stderr": [],
-                  "retry": 0,
-                  "startTime": "2026-03-04T06:41:20.811Z",
-                  "annotations": [],
-                  "attachments": []
-                }
-              ],
-              "status": "expected"
-            }
-          ],
-          "id": "d503252e62ab2d691049-b21be90a282060cc5b28",
-          "file": "hx-divider-verify.spec.ts",
-          "line": 97,
-          "column": 1
-        },
-        {
-          "title": "hx-divider dotted variant with lg spacing",
-          "ok": true,
-          "tags": [],
-          "tests": [
-            {
-              "timeout": 30000,
-              "annotations": [],
-              "expectedStatus": "passed",
-              "projectId": "chromium",
-              "projectName": "chromium",
-              "results": [
-                {
-                  "workerIndex": 3,
-                  "parallelIndex": 3,
-                  "status": "passed",
-                  "duration": 143,
-                  "errors": [],
-                  "stdout": [],
-                  "stderr": [],
-                  "retry": 0,
-                  "startTime": "2026-03-04T06:41:20.809Z",
-                  "annotations": [],
-                  "attachments": []
-                }
-              ],
-              "status": "expected"
-            }
-          ],
-          "id": "d503252e62ab2d691049-25a376066777c149e5c6",
-          "file": "hx-divider-verify.spec.ts",
-          "line": 111,
-          "column": 1
+          ]
         }
       ]
     }
   ],
   "errors": [],
   "stats": {
-    "startTime": "2026-03-04T06:41:20.284Z",
-    "duration": 1128.3870000000002,
-    "expected": 4,
+    "startTime": "2026-03-04T18:34:00.168Z",
+    "duration": 1422.447,
+    "expected": 1,
     "skipped": 0,
     "unexpected": 0,
     "flaky": 0
