@@ -1,9 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-<<<<<<< HEAD
-import { mkdtempSync, rmSync, mkdirSync, writeFileSync } from 'node:fs';
-=======
 import { mkdtempSync, rmSync, mkdirSync } from 'node:fs';
->>>>>>> origin/feature/t1-05-hx-text-input-single-line-text
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 
