@@ -32,7 +32,7 @@
     "generate:barrel": "node scripts/generate-barrel.js",
     "prepare": "node scripts/generate-barrel.js",
     "prebuild": "node scripts/generate-barrel.js",
-    "build": "vite build",
+    "build": "vite build && npm run cem",
     "type-check": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
