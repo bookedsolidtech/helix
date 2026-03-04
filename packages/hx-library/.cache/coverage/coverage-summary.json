@@ -1,96 +1,108 @@
 {
   "total": {
-    "lines": { "total": 1683, "covered": 0, "skipped": 0, "pct": 0 },
-    "statements": { "total": 1683, "covered": 0, "skipped": 0, "pct": 0 },
-    "functions": { "total": 15, "covered": 0, "skipped": 0, "pct": 0 },
-    "branches": { "total": 15, "covered": 0, "skipped": 0, "pct": 0 },
+    "lines": { "total": 1908, "covered": 0, "skipped": 0, "pct": 0 },
+    "statements": { "total": 1908, "covered": 0, "skipped": 0, "pct": 0 },
+    "functions": { "total": 17, "covered": 0, "skipped": 0, "pct": 0 },
+    "branches": { "total": 17, "covered": 0, "skipped": 0, "pct": 0 },
     "branchesTrue": { "total": 0, "covered": 0, "skipped": 0, "pct": 100 }
   },
-  "/Volumes/Development/booked/helix/.worktrees/feature-t1-03-hx-button-group-grouped-action/packages/hx-library/src/components/hx-alert/hx-alert.ts": {
+  "/Volumes/Development/booked/helix/.worktrees/feature-t1-20-hx-tag-removablestatic-label/packages/hx-library/src/components/hx-alert/hx-alert.ts": {
     "lines": { "total": 82, "covered": 0, "skipped": 0, "pct": 0 },
     "functions": { "total": 1, "covered": 0, "skipped": 0, "pct": 0 },
     "statements": { "total": 82, "covered": 0, "skipped": 0, "pct": 0 },
     "branches": { "total": 1, "covered": 0, "skipped": 0, "pct": 0 }
   },
-  "/Volumes/Development/booked/helix/.worktrees/feature-t1-03-hx-button-group-grouped-action/packages/hx-library/src/components/hx-badge/hx-badge.ts": {
+  "/Volumes/Development/booked/helix/.worktrees/feature-t1-20-hx-tag-removablestatic-label/packages/hx-library/src/components/hx-badge/hx-badge.ts": {
     "lines": { "total": 44, "covered": 0, "skipped": 0, "pct": 0 },
     "functions": { "total": 1, "covered": 0, "skipped": 0, "pct": 0 },
     "statements": { "total": 44, "covered": 0, "skipped": 0, "pct": 0 },
     "branches": { "total": 1, "covered": 0, "skipped": 0, "pct": 0 }
   },
-  "/Volumes/Development/booked/helix/.worktrees/feature-t1-03-hx-button-group-grouped-action/packages/hx-library/src/components/hx-button/hx-button.ts": {
-    "lines": { "total": 57, "covered": 0, "skipped": 0, "pct": 0 },
+  "/Volumes/Development/booked/helix/.worktrees/feature-t1-20-hx-tag-removablestatic-label/packages/hx-library/src/components/hx-button/hx-button.ts": {
+    "lines": { "total": 91, "covered": 0, "skipped": 0, "pct": 0 },
     "functions": { "total": 1, "covered": 0, "skipped": 0, "pct": 0 },
-    "statements": { "total": 57, "covered": 0, "skipped": 0, "pct": 0 },
+    "statements": { "total": 91, "covered": 0, "skipped": 0, "pct": 0 },
     "branches": { "total": 1, "covered": 0, "skipped": 0, "pct": 0 }
   },
-  "/Volumes/Development/booked/helix/.worktrees/feature-t1-03-hx-button-group-grouped-action/packages/hx-library/src/components/hx-button-group/hx-button-group.ts": {
-    "lines": { "total": 30, "covered": 0, "skipped": 0, "pct": 0 },
+  "/Volumes/Development/booked/helix/.worktrees/feature-t1-20-hx-tag-removablestatic-label/packages/hx-library/src/components/hx-button-group/hx-button-group.ts": {
+    "lines": { "total": 35, "covered": 0, "skipped": 0, "pct": 0 },
     "functions": { "total": 1, "covered": 0, "skipped": 0, "pct": 0 },
-    "statements": { "total": 30, "covered": 0, "skipped": 0, "pct": 0 },
+    "statements": { "total": 35, "covered": 0, "skipped": 0, "pct": 0 },
     "branches": { "total": 1, "covered": 0, "skipped": 0, "pct": 0 }
   },
-  "/Volumes/Development/booked/helix/.worktrees/feature-t1-03-hx-button-group-grouped-action/packages/hx-library/src/components/hx-card/hx-card.ts": {
+  "/Volumes/Development/booked/helix/.worktrees/feature-t1-20-hx-tag-removablestatic-label/packages/hx-library/src/components/hx-card/hx-card.ts": {
     "lines": { "total": 69, "covered": 0, "skipped": 0, "pct": 0 },
     "functions": { "total": 1, "covered": 0, "skipped": 0, "pct": 0 },
     "statements": { "total": 69, "covered": 0, "skipped": 0, "pct": 0 },
     "branches": { "total": 1, "covered": 0, "skipped": 0, "pct": 0 }
   },
-  "/Volumes/Development/booked/helix/.worktrees/feature-t1-03-hx-button-group-grouped-action/packages/hx-library/src/components/hx-checkbox/hx-checkbox.ts": {
+  "/Volumes/Development/booked/helix/.worktrees/feature-t1-20-hx-tag-removablestatic-label/packages/hx-library/src/components/hx-checkbox/hx-checkbox.ts": {
     "lines": { "total": 162, "covered": 0, "skipped": 0, "pct": 0 },
     "functions": { "total": 1, "covered": 0, "skipped": 0, "pct": 0 },
     "statements": { "total": 162, "covered": 0, "skipped": 0, "pct": 0 },
     "branches": { "total": 1, "covered": 0, "skipped": 0, "pct": 0 }
   },
-  "/Volumes/Development/booked/helix/.worktrees/feature-t1-03-hx-button-group-grouped-action/packages/hx-library/src/components/hx-container/hx-container.ts": {
+  "/Volumes/Development/booked/helix/.worktrees/feature-t1-20-hx-tag-removablestatic-label/packages/hx-library/src/components/hx-container/hx-container.ts": {
     "lines": { "total": 21, "covered": 0, "skipped": 0, "pct": 0 },
     "functions": { "total": 1, "covered": 0, "skipped": 0, "pct": 0 },
     "statements": { "total": 21, "covered": 0, "skipped": 0, "pct": 0 },
     "branches": { "total": 1, "covered": 0, "skipped": 0, "pct": 0 }
   },
-  "/Volumes/Development/booked/helix/.worktrees/feature-t1-03-hx-button-group-grouped-action/packages/hx-library/src/components/hx-form/hx-form.ts": {
+  "/Volumes/Development/booked/helix/.worktrees/feature-t1-20-hx-tag-removablestatic-label/packages/hx-library/src/components/hx-form/hx-form.ts": {
     "lines": { "total": 161, "covered": 0, "skipped": 0, "pct": 0 },
     "functions": { "total": 1, "covered": 0, "skipped": 0, "pct": 0 },
     "statements": { "total": 161, "covered": 0, "skipped": 0, "pct": 0 },
     "branches": { "total": 1, "covered": 0, "skipped": 0, "pct": 0 }
   },
-  "/Volumes/Development/booked/helix/.worktrees/feature-t1-03-hx-button-group-grouped-action/packages/hx-library/src/components/hx-prose/hx-prose.ts": {
+  "/Volumes/Development/booked/helix/.worktrees/feature-t1-20-hx-tag-removablestatic-label/packages/hx-library/src/components/hx-icon-button/hx-icon-button.ts": {
+    "lines": { "total": 98, "covered": 0, "skipped": 0, "pct": 0 },
+    "functions": { "total": 1, "covered": 0, "skipped": 0, "pct": 0 },
+    "statements": { "total": 98, "covered": 0, "skipped": 0, "pct": 0 },
+    "branches": { "total": 1, "covered": 0, "skipped": 0, "pct": 0 }
+  },
+  "/Volumes/Development/booked/helix/.worktrees/feature-t1-20-hx-tag-removablestatic-label/packages/hx-library/src/components/hx-prose/hx-prose.ts": {
     "lines": { "total": 52, "covered": 0, "skipped": 0, "pct": 0 },
     "functions": { "total": 1, "covered": 0, "skipped": 0, "pct": 0 },
     "statements": { "total": 52, "covered": 0, "skipped": 0, "pct": 0 },
     "branches": { "total": 1, "covered": 0, "skipped": 0, "pct": 0 }
   },
-  "/Volumes/Development/booked/helix/.worktrees/feature-t1-03-hx-button-group-grouped-action/packages/hx-library/src/components/hx-radio-group/hx-radio-group.ts": {
+  "/Volumes/Development/booked/helix/.worktrees/feature-t1-20-hx-tag-removablestatic-label/packages/hx-library/src/components/hx-radio-group/hx-radio-group.ts": {
     "lines": { "total": 216, "covered": 0, "skipped": 0, "pct": 0 },
     "functions": { "total": 1, "covered": 0, "skipped": 0, "pct": 0 },
     "statements": { "total": 216, "covered": 0, "skipped": 0, "pct": 0 },
     "branches": { "total": 1, "covered": 0, "skipped": 0, "pct": 0 }
   },
-  "/Volumes/Development/booked/helix/.worktrees/feature-t1-03-hx-button-group-grouped-action/packages/hx-library/src/components/hx-radio-group/hx-radio.ts": {
+  "/Volumes/Development/booked/helix/.worktrees/feature-t1-20-hx-tag-removablestatic-label/packages/hx-library/src/components/hx-radio-group/hx-radio.ts": {
     "lines": { "total": 55, "covered": 0, "skipped": 0, "pct": 0 },
     "functions": { "total": 1, "covered": 0, "skipped": 0, "pct": 0 },
     "statements": { "total": 55, "covered": 0, "skipped": 0, "pct": 0 },
     "branches": { "total": 1, "covered": 0, "skipped": 0, "pct": 0 }
   },
-  "/Volumes/Development/booked/helix/.worktrees/feature-t1-03-hx-button-group-grouped-action/packages/hx-library/src/components/hx-select/hx-select.ts": {
+  "/Volumes/Development/booked/helix/.worktrees/feature-t1-20-hx-tag-removablestatic-label/packages/hx-library/src/components/hx-select/hx-select.ts": {
     "lines": { "total": 188, "covered": 0, "skipped": 0, "pct": 0 },
     "functions": { "total": 1, "covered": 0, "skipped": 0, "pct": 0 },
     "statements": { "total": 188, "covered": 0, "skipped": 0, "pct": 0 },
     "branches": { "total": 1, "covered": 0, "skipped": 0, "pct": 0 }
   },
-  "/Volumes/Development/booked/helix/.worktrees/feature-t1-03-hx-button-group-grouped-action/packages/hx-library/src/components/hx-switch/hx-switch.ts": {
+  "/Volumes/Development/booked/helix/.worktrees/feature-t1-20-hx-tag-removablestatic-label/packages/hx-library/src/components/hx-switch/hx-switch.ts": {
     "lines": { "total": 160, "covered": 0, "skipped": 0, "pct": 0 },
     "functions": { "total": 1, "covered": 0, "skipped": 0, "pct": 0 },
     "statements": { "total": 160, "covered": 0, "skipped": 0, "pct": 0 },
     "branches": { "total": 1, "covered": 0, "skipped": 0, "pct": 0 }
   },
-  "/Volumes/Development/booked/helix/.worktrees/feature-t1-03-hx-button-group-grouped-action/packages/hx-library/src/components/hx-text-input/hx-text-input.ts": {
+  "/Volumes/Development/booked/helix/.worktrees/feature-t1-20-hx-tag-removablestatic-label/packages/hx-library/src/components/hx-tag/hx-tag.ts": {
+    "lines": { "total": 88, "covered": 0, "skipped": 0, "pct": 0 },
+    "functions": { "total": 1, "covered": 0, "skipped": 0, "pct": 0 },
+    "statements": { "total": 88, "covered": 0, "skipped": 0, "pct": 0 },
+    "branches": { "total": 1, "covered": 0, "skipped": 0, "pct": 0 }
+  },
+  "/Volumes/Development/booked/helix/.worktrees/feature-t1-20-hx-tag-removablestatic-label/packages/hx-library/src/components/hx-text-input/hx-text-input.ts": {
     "lines": { "total": 181, "covered": 0, "skipped": 0, "pct": 0 },
     "functions": { "total": 1, "covered": 0, "skipped": 0, "pct": 0 },
     "statements": { "total": 181, "covered": 0, "skipped": 0, "pct": 0 },
     "branches": { "total": 1, "covered": 0, "skipped": 0, "pct": 0 }
   },
-  "/Volumes/Development/booked/helix/.worktrees/feature-t1-03-hx-button-group-grouped-action/packages/hx-library/src/components/hx-textarea/hx-textarea.ts": {
+  "/Volumes/Development/booked/helix/.worktrees/feature-t1-20-hx-tag-removablestatic-label/packages/hx-library/src/components/hx-textarea/hx-textarea.ts": {
     "lines": { "total": 205, "covered": 0, "skipped": 0, "pct": 0 },
     "functions": { "total": 1, "covered": 0, "skipped": 0, "pct": 0 },
     "statements": { "total": 205, "covered": 0, "skipped": 0, "pct": 0 },

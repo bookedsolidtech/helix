@@ -32,6 +32,7 @@ export default defineConfig({
         'components/hx-switch/index': resolve(__dirname, 'src/components/hx-switch/index.ts'),
         'components/hx-form/index': resolve(__dirname, 'src/components/hx-form/index.ts'),
         'components/hx-prose/index': resolve(__dirname, 'src/components/hx-prose/index.ts'),
+        'components/hx-tag/index': resolve(__dirname, 'src/components/hx-tag/index.ts'),
       },
       formats: ['es'],
     },
