@@ -1,21 +1,21 @@
 {
   "total": {
-    "lines": { "total": 1820, "covered": 0, "skipped": 0, "pct": 0 },
-    "statements": { "total": 1820, "covered": 0, "skipped": 0, "pct": 0 },
-    "functions": { "total": 16, "covered": 0, "skipped": 0, "pct": 0 },
-    "branches": { "total": 16, "covered": 0, "skipped": 0, "pct": 0 },
+    "lines": { "total": 1963, "covered": 0, "skipped": 0, "pct": 0 },
+    "statements": { "total": 1963, "covered": 0, "skipped": 0, "pct": 0 },
+    "functions": { "total": 17, "covered": 0, "skipped": 0, "pct": 0 },
+    "branches": { "total": 17, "covered": 0, "skipped": 0, "pct": 0 },
     "branchesTrue": { "total": 0, "covered": 0, "skipped": 0, "pct": 100 }
   },
   "/Volumes/Development/booked/helix/.worktrees/feature-t1-17-hx-accordion-expandable-sections/packages/hx-library/src/components/hx-accordion/hx-accordion-item.ts": {
-    "lines": { "total": 69, "covered": 0, "skipped": 0, "pct": 0 },
+    "lines": { "total": 71, "covered": 0, "skipped": 0, "pct": 0 },
     "functions": { "total": 1, "covered": 0, "skipped": 0, "pct": 0 },
-    "statements": { "total": 69, "covered": 0, "skipped": 0, "pct": 0 },
+    "statements": { "total": 71, "covered": 0, "skipped": 0, "pct": 0 },
     "branches": { "total": 1, "covered": 0, "skipped": 0, "pct": 0 }
   },
   "/Volumes/Development/booked/helix/.worktrees/feature-t1-17-hx-accordion-expandable-sections/packages/hx-library/src/components/hx-accordion/hx-accordion.ts": {
-    "lines": { "total": 98, "covered": 0, "skipped": 0, "pct": 0 },
+    "lines": { "total": 107, "covered": 0, "skipped": 0, "pct": 0 },
     "functions": { "total": 1, "covered": 0, "skipped": 0, "pct": 0 },
-    "statements": { "total": 98, "covered": 0, "skipped": 0, "pct": 0 },
+    "statements": { "total": 107, "covered": 0, "skipped": 0, "pct": 0 },
     "branches": { "total": 1, "covered": 0, "skipped": 0, "pct": 0 }
   },
   "/Volumes/Development/booked/helix/.worktrees/feature-t1-17-hx-accordion-expandable-sections/packages/hx-library/src/components/hx-alert/hx-alert.ts": {
@@ -31,9 +31,9 @@
     "branches": { "total": 1, "covered": 0, "skipped": 0, "pct": 0 }
   },
   "/Volumes/Development/booked/helix/.worktrees/feature-t1-17-hx-accordion-expandable-sections/packages/hx-library/src/components/hx-button/hx-button.ts": {
-    "lines": { "total": 57, "covered": 0, "skipped": 0, "pct": 0 },
+    "lines": { "total": 91, "covered": 0, "skipped": 0, "pct": 0 },
     "functions": { "total": 1, "covered": 0, "skipped": 0, "pct": 0 },
-    "statements": { "total": 57, "covered": 0, "skipped": 0, "pct": 0 },
+    "statements": { "total": 91, "covered": 0, "skipped": 0, "pct": 0 },
     "branches": { "total": 1, "covered": 0, "skipped": 0, "pct": 0 }
   },
   "/Volumes/Development/booked/helix/.worktrees/feature-t1-17-hx-accordion-expandable-sections/packages/hx-library/src/components/hx-card/hx-card.ts": {
@@ -58,6 +58,12 @@
     "lines": { "total": 161, "covered": 0, "skipped": 0, "pct": 0 },
     "functions": { "total": 1, "covered": 0, "skipped": 0, "pct": 0 },
     "statements": { "total": 161, "covered": 0, "skipped": 0, "pct": 0 },
+    "branches": { "total": 1, "covered": 0, "skipped": 0, "pct": 0 }
+  },
+  "/Volumes/Development/booked/helix/.worktrees/feature-t1-17-hx-accordion-expandable-sections/packages/hx-library/src/components/hx-icon-button/hx-icon-button.ts": {
+    "lines": { "total": 98, "covered": 0, "skipped": 0, "pct": 0 },
+    "functions": { "total": 1, "covered": 0, "skipped": 0, "pct": 0 },
+    "statements": { "total": 98, "covered": 0, "skipped": 0, "pct": 0 },
     "branches": { "total": 1, "covered": 0, "skipped": 0, "pct": 0 }
   },
   "/Volumes/Development/booked/helix/.worktrees/feature-t1-17-hx-accordion-expandable-sections/packages/hx-library/src/components/hx-prose/hx-prose.ts": {

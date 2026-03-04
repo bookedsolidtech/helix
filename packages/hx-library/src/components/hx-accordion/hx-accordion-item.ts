@@ -137,6 +137,7 @@ export class HelixAccordionItem extends LitElement {
             id=${this._triggerId}
             type="button"
             ?disabled=${this.disabled}
+            aria-disabled=${this.disabled ? 'true' : 'false'}
             aria-expanded=${this.open ? 'true' : 'false'}
             aria-controls=${this._panelId}
             @click=${this._handleTriggerClick}
