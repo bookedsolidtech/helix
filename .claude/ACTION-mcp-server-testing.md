@@ -10,6 +10,7 @@
 ## Problem Statement
 
 Three MCP servers were built and committed to `main` with **ZERO test coverage**:
+
 - `@helix/mcp-health-scorer` - 3 source files, ~300 lines
 - `@helix/mcp-cem-analyzer` - 3 source files, ~300 lines
 - `@helix/mcp-typescript-diagnostics` - 3 source files, ~300 lines
@@ -17,6 +18,7 @@ Three MCP servers were built and committed to `main` with **ZERO test coverage**
 **Total untested code**: 9 files, ~900 lines
 
 **Risk level**: CRITICAL
+
 - Code has never been runtime validated
 - Edge cases unknown
 - Error handling gaps identified
@@ -29,6 +31,7 @@ Three MCP servers were built and committed to `main` with **ZERO test coverage**
 ### 1. Test Infrastructure Setup
 
 Create test files for each server:
+
 ```
 apps/mcp-servers/
 ├── health-scorer/src/
@@ -56,18 +59,21 @@ apps/mcp-servers/
 For each server, implement:
 
 #### Unit Tests
+
 - Each handler function in isolation
 - Tool definition validation
 - Input validation (schema validation)
 - Error handling paths
 
 #### Integration Tests
+
 - Tool execution end-to-end
 - File system operations (with temp directories)
 - Git operations (with test repos)
 - Cross-tool interactions
 
 #### Edge Case Tests
+
 - Empty inputs
 - Missing files
 - Malformed JSON
@@ -77,6 +83,7 @@ For each server, implement:
 - Very large inputs
 
 #### Security Tests
+
 - Path traversal attempts
 - Command injection attempts (if applicable)
 - Malicious input handling
@@ -92,6 +99,7 @@ For each server, implement:
 **Test cases needed**:
 
 #### `handlers.test.ts`
+
 ```typescript
 describe('scoreComponent', () => {
   test('returns component health from latest history');
@@ -114,13 +122,13 @@ describe('getHealthTrend', () => {
   test('calculates declining trend correctly');
   test('calculates stable trend correctly');
   test('handles division by zero (firstScore = 0)');
-  test('throws when days <= 0');  // NEW: not currently validated
+  test('throws when days <= 0'); // NEW: not currently validated
 });
 
 describe('getHealthDiff', () => {
   test('compares current vs base branch');
   test('handles component not in base branch');
-  test('throws when base branch does not exist');  // NEW: not currently tested
+  test('throws when base branch does not exist'); // NEW: not currently tested
   test('identifies improved dimensions');
   test('identifies regressed dimensions');
   test('calculates score delta correctly');
@@ -128,6 +136,7 @@ describe('getHealthDiff', () => {
 ```
 
 #### `tools.test.ts`
+
 ```typescript
 describe('MCP Tool Definitions', () => {
   test('all tools have valid schemas');
@@ -138,6 +147,7 @@ describe('MCP Tool Definitions', () => {
 ```
 
 #### `index.test.ts`
+
 ```typescript
 describe('MCP Server', () => {
   test('server starts successfully');
@@ -148,6 +158,7 @@ describe('MCP Server', () => {
 ```
 
 **Security-specific tests**:
+
 ```typescript
 describe('Security', () => {
   test('rejects path traversal attempts in file paths');
@@ -161,6 +172,7 @@ describe('Security', () => {
 **Why second**: Depends on CEM file integrity, less security risk
 
 **Test cases needed**:
+
 - CEM parsing validation
 - Component metadata extraction
 - Malformed CEM handling
@@ -171,6 +183,7 @@ describe('Security', () => {
 **Why third**: TypeScript API dependency, most complex to mock
 
 **Test cases needed**:
+
 - TS diagnostic extraction
 - Invalid TS file handling
 - Compiler API edge cases
@@ -183,6 +196,7 @@ describe('Security', () => {
 ### Step 1: Set up test fixtures
 
 Create test data directories:
+
 ```
 apps/mcp-servers/health-scorer/__tests__/
 ├── fixtures/
@@ -216,6 +230,7 @@ apps/mcp-servers/health-scorer/__tests__/
 ### Step 5: Verify in actual MCP runtime
 
 After tests pass:
+
 1. Manually test in Claude Desktop
 2. Validate all tools work end-to-end
 3. Document setup/usage

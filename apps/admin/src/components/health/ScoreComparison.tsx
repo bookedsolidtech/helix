@@ -134,7 +134,8 @@ export function ScoreComparison({ adminScores, mcpScores }: ScoreComparisonProps
                                 : 'text-muted-foreground',
                           )}
                         >
-                          {delta > 0 ? '+' : ''}{delta}
+                          {delta > 0 ? '+' : ''}
+                          {delta}
                         </span>
                       ) : (
                         <span className="text-xs text-white/20">&mdash;</span>
@@ -170,9 +171,7 @@ export function ScoreComparison({ adminScores, mcpScores }: ScoreComparisonProps
 
         {/* Legend */}
         <div className="flex items-center gap-4 mt-4 text-[10px] text-muted-foreground">
-          <span>
-            Admin: 17-dimension gated scoring (v = verified, h = heuristic, u = untested)
-          </span>
+          <span>Admin: 17-dimension gated scoring (v = verified, h = heuristic, u = untested)</span>
           <span>MCP: CEM-derived 6-dimension scoring</span>
         </div>
       </CardContent>
