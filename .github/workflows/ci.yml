@@ -1,14 +1,13 @@
 # ============================================================================
 # CI Pipeline — wc-2026 Enterprise Healthcare Web Component Library
 # ============================================================================
-# Enforces all 7 quality gates before merge:
-#   1. Type check (TypeScript strict, zero errors)
-#   2. Lint (ESLint 9 flat config)
-#   3. Format (Prettier)
+# Parallel quality gates — each job runs independently for fast feedback:
+#   1. Lint (ESLint 9 flat config)
+#   2. Format (Prettier)
+#   3. Type check (TypeScript strict, zero errors)
 #   4. Test (Vitest browser mode + Playwright Chromium)
-#   5. Build (Vite library mode via Turborepo)
-#   6. CEM (Custom Elements Manifest generation)
-#   7. Bundle size (per-component <5KB gzipped, full bundle <50KB gzipped)
+#   5. Build + CEM + Bundle size (Vite library mode via Turborepo)
+#   6. VRT (Visual regression via Storybook)
 # ============================================================================
 
 name: CI
@@ -26,46 +25,66 @@ concurrency:
 permissions:
   contents: read
 
+# ── Shared setup anchor ────────────────────────────────────────────────────
+# Reusable setup steps referenced by all jobs
+
 jobs:
-  quality:
-    name: Quality Gates
+  # ── Fast checks (no build needed, <30s each) ────────────────────────────
+
+  lint:
+    name: Lint
     runs-on: ubuntu-latest
-    timeout-minutes: 15
-
+    timeout-minutes: 10
     steps:
-      # ---- Setup ----
-
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: 'npm'
+      - run: npm ci
+      - run: npm run lint
 
-      - name: Install dependencies
-        run: npm ci
+  format:
+    name: Format
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+      - run: npm ci
+      - run: npm run format:check
 
-      - name: Install Playwright browsers
-        run: npx playwright install --with-deps chromium firefox webkit
+  type-check:
+    name: Type Check
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+      - run: npm ci
+      - run: npx turbo run type-check --filter='!docs'
 
-      # ---- Quality Checks ----
+  # ── Tests (need Playwright browsers) ────────────────────────────────────
 
-      - name: Type check
-        run: npm run type-check
-
-      - name: Lint
-        run: npm run lint
-
-      - name: Format check
-        run: npm run format:check
-
-      # ---- Tests ----
-
-      - name: Test
-        run: npm run test:library
-
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - run: npm run test:library
       - name: Upload test results
         if: always()
         uses: actions/upload-artifact@v4
@@ -75,36 +94,21 @@ jobs:
           retention-days: 30
           if-no-files-found: warn
 
-      # ---- Visual Regression Tests ----
+  # ── Build + CEM + Bundle size ───────────────────────────────────────────
 
-      - name: Build Storybook
-        run: npm run build:storybook
-
-      - name: Serve Storybook and run VRT
-        run: |
-          npx http-server apps/storybook/dist -p 3151 &
-          sleep 5
-          npm run test:vrt
-
-      - name: Upload VRT diff images
-        if: failure()
-        uses: actions/upload-artifact@v4
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
-          name: vrt-diffs
-          path: packages/hx-library/.cache/vrt-results/
-          retention-days: 7
-          if-no-files-found: warn
-
-      # ---- Build ----
-
-      - name: Build
-        run: npm run build
-
-      - name: Generate Custom Elements Manifest
-        run: npm run cem
-
-      # ---- Bundle Size Check ----
-
+          node-version: 20
+          cache: 'npm'
+      - run: npm ci
+      - run: npx turbo run build --filter='!docs'
+      - run: npm run cem
       - name: Bundle size check
         run: |
           echo "=== Bundle Size Report ==="
@@ -162,3 +166,65 @@ jobs:
           echo "=== End Bundle Size Report ==="
 
           exit $EXIT_CODE
+
+  # ── Visual Regression Tests ─────────────────────────────────────────────
+
+  vrt:
+    name: Visual Regression
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium firefox webkit
+      - run: npm run build:storybook
+      - name: Serve Storybook and run VRT
+        run: |
+          npx http-server apps/storybook/dist -p 3151 &
+          sleep 5
+          npm run test:vrt
+      - name: Upload VRT diff images
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: vrt-diffs
+          path: packages/hx-library/.cache/vrt-results/
+          retention-days: 7
+          if-no-files-found: warn
+
+  # ── Aggregate gate (for branch protection) ──────────────────────────────
+  # This job depends on all checks and is the single required status check
+  # in branch protection. This avoids needing to update branch protection
+  # every time a job name changes.
+
+  quality-gates:
+    name: Quality Gates
+    runs-on: ubuntu-latest
+    timeout-minutes: 1
+    needs: [lint, format, type-check, test, build, vrt]
+    if: always()
+    steps:
+      - name: Check all gates
+        run: |
+          echo "Lint:       ${{ needs.lint.result }}"
+          echo "Format:     ${{ needs.format.result }}"
+          echo "Type Check: ${{ needs.type-check.result }}"
+          echo "Test:       ${{ needs.test.result }}"
+          echo "Build:      ${{ needs.build.result }}"
+          echo "VRT:        ${{ needs.vrt.result }}"
+
+          if [[ "${{ needs.lint.result }}" != "success" ]] || \
+             [[ "${{ needs.format.result }}" != "success" ]] || \
+             [[ "${{ needs.type-check.result }}" != "success" ]] || \
+             [[ "${{ needs.test.result }}" != "success" ]] || \
+             [[ "${{ needs.build.result }}" != "success" ]] || \
+             [[ "${{ needs.vrt.result }}" != "success" ]]; then
+            echo "::error::One or more quality gates failed"
+            exit 1
+          fi
+
+          echo "All quality gates passed!"
