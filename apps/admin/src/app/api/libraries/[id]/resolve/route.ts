@@ -57,10 +57,14 @@ export async function POST(_request: Request, { params }: RouteParams): Promise<
 
     const session = await createMcpSession();
     if (!session) {
+<<<<<<< HEAD
       return NextResponse.json(
         { error: 'Failed to start wc-tools MCP session.' },
         { status: 503 },
       );
+=======
+      return NextResponse.json({ error: 'Failed to start wc-tools MCP session.' }, { status: 503 });
+>>>>>>> origin/feature/t1-05-hx-text-input-single-line-text
     }
 
     let resolvedData: ResolvedCemResult | null = null;

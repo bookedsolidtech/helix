@@ -35,9 +35,18 @@ export const dynamic = 'force-dynamic';
 
 function StatusBadge({ status }: { status: McpProbeStatus }) {
   const config = {
-    healthy: { label: 'Healthy', className: 'border-emerald-500/30 text-emerald-400 bg-emerald-500/10' },
-    degraded: { label: 'Degraded', className: 'border-amber-500/30 text-amber-400 bg-amber-500/10' },
-    unreachable: { label: 'Unreachable', className: 'border-red-500/30 text-red-400 bg-red-500/10' },
+    healthy: {
+      label: 'Healthy',
+      className: 'border-emerald-500/30 text-emerald-400 bg-emerald-500/10',
+    },
+    degraded: {
+      label: 'Degraded',
+      className: 'border-amber-500/30 text-amber-400 bg-amber-500/10',
+    },
+    unreachable: {
+      label: 'Unreachable',
+      className: 'border-red-500/30 text-red-400 bg-red-500/10',
+    },
   }[status];
 
   return (
@@ -87,7 +96,10 @@ function SmokeTestRow({ test }: { test: McpSmokeTestResult }) {
       <div className="flex items-center justify-between mb-1.5">
         <div className="flex items-center gap-2">
           <code className="text-sm font-mono font-medium text-foreground">{test.tool}</code>
-          <Badge variant="outline" className="text-[9px] font-medium border-white/[0.06] capitalize">
+          <Badge
+            variant="outline"
+            className="text-[9px] font-medium border-white/[0.06] capitalize"
+          >
             {test.category}
           </Badge>
         </div>
@@ -121,9 +133,7 @@ function SmokeTestRow({ test }: { test: McpSmokeTestResult }) {
         />
       </div>
       <p className="text-xs text-muted-foreground line-clamp-3">{test.summary}</p>
-      {test.error && (
-        <p className="text-xs text-red-400 mt-1">{test.error}</p>
-      )}
+      {test.error && <p className="text-xs text-red-400 mt-1">{test.error}</p>}
     </div>
   );
 }
@@ -191,7 +201,9 @@ function ProbeTimeline({ phases, totalMs }: { phases: McpPhaseResult[]; totalMs:
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between text-xs text-muted-foreground">
-        <span>{passedCount}/{phases.length} phases passed</span>
+        <span>
+          {passedCount}/{phases.length} phases passed
+        </span>
         <span className="tabular-nums font-medium text-foreground">{totalMs}ms total</span>
       </div>
       {/* Segmented timeline bar */}
@@ -215,11 +227,15 @@ function ProbeTimeline({ phases, totalMs }: { phases: McpPhaseResult[]; totalMs:
       <div className="space-y-1.5">
         {phases.map((phase, i) => (
           <div key={phase.name} className="flex items-center gap-3">
-            <span className="text-[10px] text-muted-foreground w-4 text-right tabular-nums">{i + 1}</span>
-            <div className={cn(
-              'w-1.5 h-1.5 rounded-full shrink-0',
-              phase.passed ? 'bg-emerald-400' : 'bg-red-400',
-            )} />
+            <span className="text-[10px] text-muted-foreground w-4 text-right tabular-nums">
+              {i + 1}
+            </span>
+            <div
+              className={cn(
+                'w-1.5 h-1.5 rounded-full shrink-0',
+                phase.passed ? 'bg-emerald-400' : 'bg-red-400',
+              )}
+            />
             <span className="text-xs text-foreground flex-1">{phase.name}</span>
             <span className="text-xs tabular-nums text-muted-foreground">{phase.latencyMs}ms</span>
           </div>
@@ -257,10 +273,12 @@ function ComponentSurfaceRow({ component }: { component: CemComponentSummary }) 
       <td className="py-2 px-2 text-xs text-muted-foreground">{component.superclass}</td>
       {cells.map((count, i) => (
         <td key={i} className="py-2 px-2 text-center">
-          <span className={cn(
-            'text-xs tabular-nums',
-            count > 0 ? 'text-foreground font-medium' : 'text-white/10',
-          )}>
+          <span
+            className={cn(
+              'text-xs tabular-nums',
+              count > 0 ? 'text-foreground font-medium' : 'text-white/10',
+            )}
+          >
             {count}
           </span>
         </td>
@@ -307,7 +325,10 @@ function CemDeepDive({
           </div>
           <div className="flex items-center gap-2">
             {cemExists ? (
-              <Badge variant="outline" className="text-[10px] border-emerald-500/30 text-emerald-400">
+              <Badge
+                variant="outline"
+                className="text-[10px] border-emerald-500/30 text-emerald-400"
+              >
                 <CheckCircle2 className="w-3 h-3 mr-1" /> Found
               </Badge>
             ) : (
@@ -317,9 +338,7 @@ function CemDeepDive({
             )}
             {cemAgeHours !== null && (
               <span className="text-[10px] text-muted-foreground tabular-nums">
-                {cemAgeHours < 1
-                  ? `${Math.round(cemAgeHours * 60)}m old`
-                  : `${cemAgeHours}h old`}
+                {cemAgeHours < 1 ? `${Math.round(cemAgeHours * 60)}m old` : `${cemAgeHours}h old`}
               </span>
             )}
           </div>
@@ -329,9 +348,12 @@ function CemDeepDive({
         {!cemExists ? (
           <div className="py-6 text-center">
             <p className="text-sm text-muted-foreground">
-              CEM not found at <code className="text-xs font-mono">{cemPath.split('/').slice(-3).join('/')}</code>
+              CEM not found at{' '}
+              <code className="text-xs font-mono">{cemPath.split('/').slice(-3).join('/')}</code>
             </p>
-            <p className="text-xs text-muted-foreground mt-1">Run <code className="font-mono">npm run cem</code> to generate</p>
+            <p className="text-xs text-muted-foreground mt-1">
+              Run <code className="font-mono">npm run cem</code> to generate
+            </p>
           </div>
         ) : (
           <div className="space-y-6">
@@ -371,14 +393,23 @@ function CemDeepDive({
                   <table className="w-full text-left">
                     <thead>
                       <tr className="bg-white/[0.02] border-b border-white/[0.06]">
-                        <th className="py-2 pr-3 pl-3 text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">Component</th>
-                        <th className="py-2 px-2 text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">Extends</th>
+                        <th className="py-2 pr-3 pl-3 text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">
+                          Component
+                        </th>
+                        <th className="py-2 px-2 text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">
+                          Extends
+                        </th>
                         {headers.map((h) => (
-                          <th key={h} className="py-2 px-2 text-center text-[10px] font-semibold text-muted-foreground uppercase tracking-wider whitespace-nowrap">
+                          <th
+                            key={h}
+                            className="py-2 px-2 text-center text-[10px] font-semibold text-muted-foreground uppercase tracking-wider whitespace-nowrap"
+                          >
                             {h}
                           </th>
                         ))}
-                        <th className="py-2 pl-2 pr-3 text-center text-[10px] font-semibold text-blue-400 uppercase tracking-wider">Total</th>
+                        <th className="py-2 pl-2 pr-3 text-center text-[10px] font-semibold text-blue-400 uppercase tracking-wider">
+                          Total
+                        </th>
                       </tr>
                     </thead>
                     <tbody className="pl-3">
@@ -389,16 +420,35 @@ function CemDeepDive({
                     {cemSurface && (
                       <tfoot>
                         <tr className="bg-white/[0.03] border-t border-white/[0.06]">
-                          <td className="py-2 pr-3 pl-3 text-xs font-bold text-foreground">Totals</td>
+                          <td className="py-2 pr-3 pl-3 text-xs font-bold text-foreground">
+                            Totals
+                          </td>
                           <td className="py-2 px-2" />
-                          <td className="py-2 px-2 text-center text-xs tabular-nums font-bold text-foreground">{cemSurface.attributes}</td>
-                          <td className="py-2 px-2 text-center text-xs tabular-nums font-bold text-foreground">{cemSurface.events}</td>
-                          <td className="py-2 px-2 text-center text-xs tabular-nums font-bold text-foreground">{cemSurface.slots}</td>
-                          <td className="py-2 px-2 text-center text-xs tabular-nums font-bold text-foreground">{cemSurface.cssProperties}</td>
-                          <td className="py-2 px-2 text-center text-xs tabular-nums font-bold text-foreground">{cemSurface.cssParts}</td>
-                          <td className="py-2 px-2 text-center text-xs tabular-nums font-bold text-foreground">{cemSurface.methods}</td>
+                          <td className="py-2 px-2 text-center text-xs tabular-nums font-bold text-foreground">
+                            {cemSurface.attributes}
+                          </td>
+                          <td className="py-2 px-2 text-center text-xs tabular-nums font-bold text-foreground">
+                            {cemSurface.events}
+                          </td>
+                          <td className="py-2 px-2 text-center text-xs tabular-nums font-bold text-foreground">
+                            {cemSurface.slots}
+                          </td>
+                          <td className="py-2 px-2 text-center text-xs tabular-nums font-bold text-foreground">
+                            {cemSurface.cssProperties}
+                          </td>
+                          <td className="py-2 px-2 text-center text-xs tabular-nums font-bold text-foreground">
+                            {cemSurface.cssParts}
+                          </td>
+                          <td className="py-2 px-2 text-center text-xs tabular-nums font-bold text-foreground">
+                            {cemSurface.methods}
+                          </td>
                           <td className="py-2 pl-2 pr-3 text-center text-xs tabular-nums font-bold text-blue-400">
-                            {cemSurface.attributes + cemSurface.events + cemSurface.slots + cemSurface.cssProperties + cemSurface.cssParts + cemSurface.methods}
+                            {cemSurface.attributes +
+                              cemSurface.events +
+                              cemSurface.slots +
+                              cemSurface.cssProperties +
+                              cemSurface.cssParts +
+                              cemSurface.methods}
                           </td>
                         </tr>
                       </tfoot>
@@ -473,14 +523,20 @@ export default async function McpPage() {
           icon={<Timer className="w-4 h-4" />}
           label="Startup"
           value={result.processStartupMs !== null ? `${result.processStartupMs}ms` : '—'}
-          subtitle={result.handshakeLatencyMs !== null ? `${result.handshakeLatencyMs}ms handshake` : 'No connection'}
+          subtitle={
+            result.handshakeLatencyMs !== null
+              ? `${result.handshakeLatencyMs}ms handshake`
+              : 'No connection'
+          }
           color={result.processStartupMs !== null ? 'text-blue-400' : 'text-muted-foreground'}
         />
         <KpiCard
           icon={<Wrench className="w-4 h-4" />}
           label="Tools"
           value={`${result.totalTools}/${result.expectedTools}`}
-          subtitle={result.totalTools >= result.expectedTools ? 'All tools registered' : 'Missing tools'}
+          subtitle={
+            result.totalTools >= result.expectedTools ? 'All tools registered' : 'Missing tools'
+          }
           color={result.totalTools >= result.expectedTools ? 'text-emerald-400' : 'text-amber-400'}
         />
         <KpiCard
@@ -488,7 +544,11 @@ export default async function McpPage() {
           label="Smoke Tests"
           value={smokePassRate}
           subtitle={`${smokePassCount}/${result.smokeTests.length} passed`}
-          color={smokePassCount === result.smokeTests.length && result.smokeTests.length > 0 ? 'text-emerald-400' : 'text-amber-400'}
+          color={
+            smokePassCount === result.smokeTests.length && result.smokeTests.length > 0
+              ? 'text-emerald-400'
+              : 'text-amber-400'
+          }
         />
       </div>
 
@@ -516,11 +576,15 @@ export default async function McpPage() {
                 </div>
                 <div>
                   <span className="text-xs text-muted-foreground">Version</span>
-                  <p className="text-sm font-medium text-foreground">{result.serverVersion ?? '—'}</p>
+                  <p className="text-sm font-medium text-foreground">
+                    {result.serverVersion ?? '—'}
+                  </p>
                 </div>
                 <div>
                   <span className="text-xs text-muted-foreground">Handshake</span>
-                  <p className="text-sm font-medium text-foreground">{result.handshakeLatencyMs}ms</p>
+                  <p className="text-sm font-medium text-foreground">
+                    {result.handshakeLatencyMs}ms
+                  </p>
                 </div>
                 <div>
                   <span className="text-xs text-muted-foreground">Process Start</span>
@@ -641,10 +705,7 @@ export default async function McpPage() {
           <CardContent>
             <div className="space-y-2">
               {result.errors.map((error, i) => (
-                <div
-                  key={i}
-                  className="rounded-lg bg-red-500/5 border border-red-500/10 p-3"
-                >
+                <div key={i} className="rounded-lg bg-red-500/5 border border-red-500/10 p-3">
                   <p className="text-xs text-red-400 font-mono">{error}</p>
                 </div>
               ))}
