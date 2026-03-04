@@ -2,7 +2,7 @@
   "category": "Uncategorized",
   "description": "## Component: hx-form (UPGRADE)\n**Tier 2 — Standard Enterprise | Industry Consensus: 3/6 libraries**\n\nUpgrade existing scaffold. Light DOM form wrapper for Drupal compatibility with validation orchestration.\n\n### ADR-001 Classification: SPECIAL — Light DOM Component\nPer our architecture, hx-form uses **Light DOM** (no Shadow DOM) so Drupal Form API tokens and hidden fields work correctly. Uses adopted stylesheets for styling. See `packages/hx-library/src/components/hx-form/hx-form.ts` for the existing pattern.\n\n### API Design\n**Properties:** `action` (form URL — when set, renders native `<form>`), `method` (get|post), `novalidate`, `autocomplete`\n**Slots:** Default (form fields — all content from Drupal)\n**Events:** `hx-submit` (composed: true, detail: { values: FormData }), `hx-invalid` (validation failed)\n\n### Critical Drupal Pattern\n```twig\n{# When action is set: renders <form> tag (server-side submission) #}\n<hx-form action=\"/patient/intake\" method=\"post\">\n  {{ form.form_build_id }}\n  {{ form.form_token }}\n  {{ form.form_id }}\n  <hx-text-input name=\"patient_name\" required>Name</hx-text-input>\n  <hx-button type=\"submit\">Submit</hx-button>\n</hx-form>\n\n{# When no action: renders slot only (Drupal provides its own <form>) #}\n{# This is the CMS-slot pattern — Drupal's form tag wraps everything #}\n<form action=\"/drupal-form\" method=\"post\">\n  {{ form.form_build_id }}\n  <hx-form>\n    <hx-text-input name=\"field_name\" required>Name</hx-text-input>\n    <hx-button type=\"submit\">Submit</hx-button>\n  </hx-form>\n</form>\n```\n\nThe dual-mode design is critical: when Drupal provides its own `<form>` tag (standard Form API), hx-form acts as a pure styling/validation wrapper WITHOUT generating a competing `<form>` tag. This prevents nested forms.\n\n### Healthcare: Patient intake, prescription orders, appointment scheduling\n\n### Acceptance Criteria\n1. Light DOM — NO Shadow DOM (Drupal form tokens must be in same DOM)\n2. Dual mode: generates `<form>` when action set, bare wrapper when not\n3. Validates all child hx-* form elements before submission\n4. Collects FormData from all ElementInternals children\n5. hx-submit event with FormData for client-side handling\n6. Works with Drupal Form API (CSRF tokens, form_build_id, etc.)\n7. Adopted stylesheets for consistent styling without Shadow DOM",
   "title": "T2-35: hx-form — Form Wrapper with Validation",
-  "status": "review",
+  "status": "backlog",
   "complexity": "medium",
   "priority": 3,
   "source": "api",
@@ -45,6 +45,11 @@
       "from": "blocked",
       "to": "review",
       "timestamp": "2026-03-04T13:58:55.234Z"
+    },
+    {
+      "from": "review",
+      "to": "backlog",
+      "timestamp": "2026-03-04T17:33:22.416Z"
     }
   ],
   "featureType": "code",

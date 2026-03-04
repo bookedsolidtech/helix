@@ -2,7 +2,7 @@
   "category": "Phase 2: Component Expansion",
   "description": "**Milestone:** Phase 2: Component Expansion\n\nBuild hx-icon: SVG icon system with sprite support. Load sprite via Drupal libraries.yml; reference by name. Supports inline SVG and external sprite references.\n\n**Files to Modify:**\n- packages/hx-library/src/components/hx-icon/\n\n**Acceptance Criteria:**\n- [ ] Inline SVG and external sprite reference modes\n- [ ] Configurable sprite URL\n- [ ] Sizes: xs, sm, md, lg, xl\n- [ ] Color inherits from currentColor\n- [ ] CSS parts: svg\n- [ ] Lazy loading for external sprites\n- [ ] ARIA: role=img with aria-label, or aria-hidden for decorative\n- [ ] <5KB gzipped\n\n**Complexity:** medium",
   "title": "Implement hx-icon component",
-  "status": "backlog",
+  "status": "blocked",
   "isEpic": false,
   "epicId": "feature-1772158053419-7nvwtbujb",
   "branchName": "feature/phase-2-component-implement-hx-icon",
@@ -22,6 +22,36 @@
       "to": "backlog",
       "timestamp": "2026-02-27T02:07:33.424Z",
       "reason": "Feature created"
+    },
+    {
+      "from": "backlog",
+      "to": "in_progress",
+      "timestamp": "2026-03-04T19:38:38.939Z"
+    },
+    {
+      "from": "in_progress",
+      "to": "review",
+      "timestamp": "2026-03-04T20:37:16.296Z"
+    },
+    {
+      "from": "review",
+      "to": "blocked",
+      "timestamp": "2026-03-04T20:45:47.891Z"
     }
-  ]
+  ],
+  "featureType": "code",
+  "complexity": "medium",
+  "updatedAt": "2026-03-04T19:38:40.528Z",
+  "model": "claude-sonnet-4-6",
+  "costUsd": 3.1812850000000013,
+  "lastSessionId": "218e586b-760f-4719-8af1-aaec9bf34bda",
+  "prUrl": "https://github.com/bookedsolidtech/helix/pull/93",
+  "prNumber": 93,
+  "prCreatedAt": "2026-03-04T20:37:16.294Z",
+  "reviewStartedAt": "2026-03-04T20:37:16.296Z",
+  "prTrackedSince": "2026-03-04T20:37:16.303Z",
+  "prLastPolledAt": "2026-03-04T20:58:23.745Z",
+  "lastReviewFeedback": "coderabbitai: **Actionable comments posted: 9**\n\n<details>\n<summary>🤖 Prompt for all review comments with AI agents</summary>\n\n```\nVerify each finding against the current code and only fix it if needed.\n\nInline comments:\nIn `@packages/hx-library/src/components/hx-icon/hx-icon.stories.ts`:\n- Around line 81-88: The Storybook render in hx-icon.stories.ts is forcing empty\nstring attributes for src and sprite-url which makes the hx-icon component treat\nthem as present (not undefined) and triggers inline mode; update the render\nfunction bindings for src and sprite-url to use Lit's ifDefined directive so the\nattributes are omitted when args.src or args.spriteUrl are undefined (import\nifDefined from 'lit/directives/if-defined.js'), leaving the component property\nundefined and allowing the hx-icon inline/sprite mode logic (referenced in\nhx-icon.ts) to work correctly.\n\nIn `@packages/hx-library/src/components/hx-icon/hx-icon.styles.ts`:\n- Around line 8-9: The component styles include hardcoded rem fallbacks (e.g.,\nin the width/height declarations inside hx-icon.styles.ts) which violate the\ntoken-only rule; remove all literal rem fallbacks and rely solely on CSS token\nvariables (for example use var(--hx-icon-size, var(--hx-size-6)) instead of\nvar(..., 1.5rem)), and update the other size occurrences referenced in the\ncomment (the width/height and the other size lines) so every fallback is another\n--hx-* token rather than a numeric literal; ensure no hardcoded values remain in\nthis file's style declarations.\n- Around line 48-50: The CSS class .icon__inline in hx-icon.styles.ts uses\ndisplay: contents which can remove wrapper semantics (ARIA/role) from the\naccessibility tree; change .icon__inline to a semantic-preserving inline layout\nsuch as display: inline-flex (or inline-block) and keep any\nvertical-alignment/size rules so the icon visually matches the previous layout,\nensuring the wrapper that carries role/aria-* (in the hx-icon component) retains\nits accessibility semantics.\n",
+  "prIterationCount": 1,
+  "remediationCycleCount": 1
 }

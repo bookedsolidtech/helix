@@ -1,0 +1,34 @@
+{
+  "category": "Phase 2: Component Expansion",
+  "description": "**Milestone:** Phase 2: Component Expansion\n\nBuild hx-tooltip: contextual help text and abbreviations. Uses @floating-ui/dom for smart positioning. Trigger on hover/focus with configurable delay.\n\n**Files to Modify:**\n- packages/hx-library/src/components/hx-tooltip/\n\n**Acceptance Criteria:**\n- [ ] Hover and focus triggers\n- [ ] Configurable delay (show/hide)\n- [ ] Smart positioning via @floating-ui/dom (auto-flip)\n- [ ] Arrow indicator\n- [ ] CSS parts: tooltip, arrow\n- [ ] Slots: default (trigger), content\n- [ ] ARIA: role=tooltip, aria-describedby\n- [ ] Escape key dismisses\n- [ ] <5KB gzipped\n\n**Complexity:** medium",
+  "title": "Implement hx-tooltip component",
+  "status": "in_progress",
+  "isEpic": false,
+  "epicId": "feature-1772158053419-7nvwtbujb",
+  "branchName": "feature/phase-2-component-implement-hx",
+  "isFoundation": false,
+  "id": "feature-1772158053421-ro1jy3vha",
+  "descriptionHistory": [
+    {
+      "description": "**Milestone:** Phase 2: Component Expansion\n\nBuild hx-tooltip: contextual help text and abbreviations. Uses @floating-ui/dom for smart positioning. Trigger on hover/focus with configurable delay.\n\n**Files to Modify:**\n- packages/hx-library/src/components/hx-tooltip/\n\n**Acceptance Criteria:**\n- [ ] Hover and focus triggers\n- [ ] Configurable delay (show/hide)\n- [ ] Smart positioning via @floating-ui/dom (auto-flip)\n- [ ] Arrow indicator\n- [ ] CSS parts: tooltip, arrow\n- [ ] Slots: default (trigger), content\n- [ ] ARIA: role=tooltip, aria-describedby\n- [ ] Escape key dismisses\n- [ ] <5KB gzipped\n\n**Complexity:** medium",
+      "timestamp": "2026-02-27T02:07:33.421Z",
+      "source": "initial"
+    }
+  ],
+  "createdAt": "2026-02-27T02:07:33.421Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-02-27T02:07:33.421Z",
+      "reason": "Feature created"
+    },
+    {
+      "from": "backlog",
+      "to": "in_progress",
+      "timestamp": "2026-03-04T19:27:45.425Z"
+    }
+  ],
+  "featureType": "code",
+  "complexity": "medium"
+}

@@ -19554,9 +19554,7 @@
     }
   ],
   "featureType": "code",
-  "dependencies": [
-    "feature-1772500170033-10s41zy8z"
-  ],
+  "dependencies": [],
   "updatedAt": "2026-03-03T04:26:09.940Z",
   "model": "claude-sonnet-4-6",
   "costUsd": 5.566146800000001,
