@@ -118,7 +118,10 @@ export function addLibrary(entry: Omit<LibraryEntry, 'id'>): LibraryEntry {
  * Partially updates an existing library entry.
  * Throws if the library is not found.
  */
-export function updateLibrary(id: string, partial: Partial<Omit<LibraryEntry, 'id'>>): LibraryEntry {
+export function updateLibrary(
+  id: string,
+  partial: Partial<Omit<LibraryEntry, 'id'>>,
+): LibraryEntry {
   const path = getRegistryPath();
   const data = readRegistryFile(path);
 

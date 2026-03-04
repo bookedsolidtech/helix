@@ -265,9 +265,7 @@ describe.skipIf(!serverAvailable)('probeMcpServer — live server', () => {
   });
 
   it('smoke tests include parameterized calls', () => {
-    const withArgs = result.smokeTests.filter(
-      (t) => Object.keys(t.args).length > 0,
-    );
+    const withArgs = result.smokeTests.filter((t) => Object.keys(t.args).length > 0);
     expect(withArgs.length).toBeGreaterThanOrEqual(3);
   });
 

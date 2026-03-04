@@ -13,6 +13,7 @@ Implemented comprehensive P2 improvements for the css-part-documentation hook (H
 **Solution:** Implemented sophisticated pattern matching to extract static portions from dynamic template expressions.
 
 **Implementation:**
+
 - Detects patterns like `part="${expr}-button"` and extracts `"button"`
 - Detects patterns like `part="container-${expr}"` and extracts `"container"`
 - Filters out variable names and template syntax
@@ -21,6 +22,7 @@ Implemented comprehensive P2 improvements for the css-part-documentation hook (H
 **Code Location:** `/Volumes/Development/wc-2026/scripts/hooks/css-part-documentation.ts` lines 234-310
 
 **Example:**
+
 ```typescript
 // Before: Would miss dynamic parts
 return html`<button part="${this.variant}-button">Click</button>`;
@@ -30,6 +32,7 @@ return html`<button part="${this.variant}-button">Click</button>`;
 ```
 
 **Tests Added:**
+
 - `should extract static suffix from dynamic prefix expressions`
 - `should extract static prefix from dynamic suffix expressions`
 - `should handle mixed static and dynamic parts`
@@ -42,6 +45,7 @@ return html`<button part="${this.variant}-button">Click</button>`;
 **Solution:** Enhanced `checkPartNamingConvention` to deduplicate violations by part name.
 
 **Implementation:**
+
 - Uses `Set<string>` to track seen part names
 - Only reports first occurrence of each unique part name
 - Maintains clear documentation of deduplication behavior
@@ -49,6 +53,7 @@ return html`<button part="${this.variant}-button">Click</button>`;
 **Code Location:** `/Volumes/Development/wc-2026/scripts/hooks/css-part-documentation.ts` lines 463-511
 
 **Example:**
+
 ```typescript
 // Component with repeated parts
 return html`
@@ -62,6 +67,7 @@ return html`
 ```
 
 **Tests:**
+
 - `checkPartNamingConvention > should not report duplicate violations for same part name` ✓
 
 ### 3. Unused Part Detection (NEW)
@@ -71,6 +77,7 @@ return html`
 **Solution:** Implemented `checkUnusedParts` function that reads component `.styles.ts` files and validates all parts are styled.
 
 **Implementation:**
+
 - Reads corresponding `.styles.ts` file for each component
 - Extracts all `::part(name)` selectors from CSS
 - Compares defined parts against styled parts
@@ -80,6 +87,7 @@ return html`
 **Code Location:** `/Volumes/Development/wc-2026/scripts/hooks/css-part-documentation.ts` lines 513-587
 
 **Example:**
+
 ```typescript
 // Component: hx-button.ts
 return html`<button part="button">Click</button>`;
@@ -92,6 +100,7 @@ return html`<button part="button">Click</button>`;
 ```
 
 **Features:**
+
 - Deduplicates parts (reports once per unique part name)
 - Skips validation when no `.styles.ts` file exists
 - Skips validation when component has no parts
@@ -99,6 +108,7 @@ return html`<button part="button">Click</button>`;
 - Handles file system errors gracefully
 
 **Tests:**
+
 - 7 unit tests (6 skipped due to ESM fs mocking complexity)
 - 2 tests passing with real file system
 - Integration test coverage via `validateCSSPartDocumentation`
@@ -108,6 +118,7 @@ return html`<button part="button">Click</button>`;
 ## Updated Documentation
 
 **Header Comments:** Updated to document all new capabilities:
+
 - Dynamic parts in template expressions
 - Parts defined but never styled with `::part()` selectors
 - Invalid part naming detection
@@ -117,6 +128,7 @@ return html`<button part="button">Click</button>`;
 ## Test Coverage
 
 ### Tests Added: 6 new tests
+
 1. Dynamic template expression handling (4 tests)
 2. Unused parts detection (2 active tests, 5 skipped for ESM mocking)
 
@@ -125,6 +137,7 @@ return html`<button part="button">Click</button>`;
 ### Total Tests: 58 tests (52 passing, 6 skipped)
 
 **Test Results:**
+
 ```
 ✓ css-part-documentation.test.ts (58 tests | 6 skipped) 42ms
   Test Files  1 passed (1)
@@ -134,6 +147,7 @@ return html`<button part="button">Click</button>`;
 ## Performance
 
 **No impact on execution time:**
+
 - Dynamic part extraction: O(n) regex matching (same as before)
 - Unused part detection: O(n) file read + O(m) regex matching
 - Overall hook performance: <50ms for typical component files
@@ -172,6 +186,7 @@ return html`<button part="button">Click</button>`;
 ## Future Enhancements
 
 ### Possible P3 Improvements:
+
 1. Add test-utils for fs mocking in ESM (enable skipped tests)
 2. Support multi-file component styles (import chains)
 3. Detect ::part() selectors in parent/consumer stylesheets

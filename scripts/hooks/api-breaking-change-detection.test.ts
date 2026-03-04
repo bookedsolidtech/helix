@@ -6,9 +6,8 @@ import { join } from 'path';
 describe('api-breaking-change-detection (H18)', () => {
   // Find project root by looking for scripts/hooks directory
   const cwd = process.cwd();
-  const PROJECT_ROOT = cwd.endsWith('scripts/hooks') || cwd.endsWith('scripts\\hooks')
-    ? join(cwd, '../..')
-    : cwd;
+  const PROJECT_ROOT =
+    cwd.endsWith('scripts/hooks') || cwd.endsWith('scripts\\hooks') ? join(cwd, '../..') : cwd;
   const TMP_DIR = join(PROJECT_ROOT, '.tmp-api-breaking-change-test');
   const hookScript = join(PROJECT_ROOT, 'scripts/hooks/api-breaking-change-detection.ts');
 
@@ -74,7 +73,10 @@ describe('api-breaking-change-detection (H18)', () => {
 
     it('should detect removed property', () => {
       const cemPath = join(TMP_DIR, 'packages/hx-library/custom-elements.json');
-      const componentPath = join(TMP_DIR, 'packages/hx-library/src/components/hx-button/hx-button.ts');
+      const componentPath = join(
+        TMP_DIR,
+        'packages/hx-library/src/components/hx-button/hx-button.ts',
+      );
       mkdirSync(join(TMP_DIR, 'packages/hx-library/src/components/hx-button'), { recursive: true });
 
       // Initial CEM with property
@@ -141,7 +143,10 @@ describe('api-breaking-change-detection (H18)', () => {
 
     it('should detect property type change', () => {
       const cemPath = join(TMP_DIR, 'packages/hx-library/custom-elements.json');
-      const componentPath = join(TMP_DIR, 'packages/hx-library/src/components/hx-button/hx-button.ts');
+      const componentPath = join(
+        TMP_DIR,
+        'packages/hx-library/src/components/hx-button/hx-button.ts',
+      );
       mkdirSync(join(TMP_DIR, 'packages/hx-library/src/components/hx-button'), { recursive: true });
 
       // Initial CEM
@@ -156,9 +161,7 @@ describe('api-breaking-change-detection (H18)', () => {
                 kind: 'class',
                 name: 'HelixButton',
                 tagName: 'hx-button',
-                members: [
-                  { kind: 'field', name: 'count', type: { text: 'number' } },
-                ],
+                members: [{ kind: 'field', name: 'count', type: { text: 'number' } }],
               },
             ],
           },
@@ -206,7 +209,10 @@ describe('api-breaking-change-detection (H18)', () => {
 
     it('should detect removed method', () => {
       const cemPath = join(TMP_DIR, 'packages/hx-library/custom-elements.json');
-      const componentPath = join(TMP_DIR, 'packages/hx-library/src/components/hx-button/hx-button.ts');
+      const componentPath = join(
+        TMP_DIR,
+        'packages/hx-library/src/components/hx-button/hx-button.ts',
+      );
       mkdirSync(join(TMP_DIR, 'packages/hx-library/src/components/hx-button'), { recursive: true });
 
       const initialCEM = {
@@ -272,7 +278,10 @@ describe('api-breaking-change-detection (H18)', () => {
 
     it('should detect method signature change', () => {
       const cemPath = join(TMP_DIR, 'packages/hx-library/custom-elements.json');
-      const componentPath = join(TMP_DIR, 'packages/hx-library/src/components/hx-button/hx-button.ts');
+      const componentPath = join(
+        TMP_DIR,
+        'packages/hx-library/src/components/hx-button/hx-button.ts',
+      );
       mkdirSync(join(TMP_DIR, 'packages/hx-library/src/components/hx-button'), { recursive: true });
 
       const initialCEM = {
@@ -346,7 +355,10 @@ describe('api-breaking-change-detection (H18)', () => {
 
     it('should detect removed event', () => {
       const cemPath = join(TMP_DIR, 'packages/hx-library/custom-elements.json');
-      const componentPath = join(TMP_DIR, 'packages/hx-library/src/components/hx-button/hx-button.ts');
+      const componentPath = join(
+        TMP_DIR,
+        'packages/hx-library/src/components/hx-button/hx-button.ts',
+      );
       mkdirSync(join(TMP_DIR, 'packages/hx-library/src/components/hx-button'), { recursive: true });
 
       const initialCEM = {
@@ -360,10 +372,7 @@ describe('api-breaking-change-detection (H18)', () => {
                 kind: 'class',
                 name: 'HelixButton',
                 tagName: 'hx-button',
-                events: [
-                  { name: 'hx-click' },
-                  { name: 'hx-focus' },
-                ],
+                events: [{ name: 'hx-click' }, { name: 'hx-focus' }],
               },
             ],
           },
@@ -412,7 +421,10 @@ describe('api-breaking-change-detection (H18)', () => {
 
     it('should detect event detail type change', () => {
       const cemPath = join(TMP_DIR, 'packages/hx-library/custom-elements.json');
-      const componentPath = join(TMP_DIR, 'packages/hx-library/src/components/hx-button/hx-button.ts');
+      const componentPath = join(
+        TMP_DIR,
+        'packages/hx-library/src/components/hx-button/hx-button.ts',
+      );
       mkdirSync(join(TMP_DIR, 'packages/hx-library/src/components/hx-button'), { recursive: true });
 
       const initialCEM = {
@@ -426,9 +438,7 @@ describe('api-breaking-change-detection (H18)', () => {
                 kind: 'class',
                 name: 'HelixButton',
                 tagName: 'hx-button',
-                events: [
-                  { name: 'hx-click', type: { text: 'CustomEvent<{ value: string }>' } },
-                ],
+                events: [{ name: 'hx-click', type: { text: 'CustomEvent<{ value: string }>' } }],
               },
             ],
           },
@@ -478,7 +488,10 @@ describe('api-breaking-change-detection (H18)', () => {
 
     it('should detect removed CSS part (warning)', () => {
       const cemPath = join(TMP_DIR, 'packages/hx-library/custom-elements.json');
-      const componentPath = join(TMP_DIR, 'packages/hx-library/src/components/hx-button/hx-button.ts');
+      const componentPath = join(
+        TMP_DIR,
+        'packages/hx-library/src/components/hx-button/hx-button.ts',
+      );
       mkdirSync(join(TMP_DIR, 'packages/hx-library/src/components/hx-button'), { recursive: true });
 
       const initialCEM = {
@@ -492,10 +505,7 @@ describe('api-breaking-change-detection (H18)', () => {
                 kind: 'class',
                 name: 'HelixButton',
                 tagName: 'hx-button',
-                cssParts: [
-                  { name: 'button' },
-                  { name: 'icon' },
-                ],
+                cssParts: [{ name: 'button' }, { name: 'icon' }],
               },
             ],
           },
@@ -544,7 +554,10 @@ describe('api-breaking-change-detection (H18)', () => {
 
     it('should detect removed slot (warning)', () => {
       const cemPath = join(TMP_DIR, 'packages/hx-library/custom-elements.json');
-      const componentPath = join(TMP_DIR, 'packages/hx-library/src/components/hx-button/hx-button.ts');
+      const componentPath = join(
+        TMP_DIR,
+        'packages/hx-library/src/components/hx-button/hx-button.ts',
+      );
       mkdirSync(join(TMP_DIR, 'packages/hx-library/src/components/hx-button'), { recursive: true });
 
       const initialCEM = {
@@ -558,10 +571,7 @@ describe('api-breaking-change-detection (H18)', () => {
                 kind: 'class',
                 name: 'HelixButton',
                 tagName: 'hx-button',
-                slots: [
-                  { name: '' },
-                  { name: 'icon' },
-                ],
+                slots: [{ name: '' }, { name: 'icon' }],
               },
             ],
           },
@@ -609,7 +619,10 @@ describe('api-breaking-change-detection (H18)', () => {
 
     it('should ignore private/protected members', () => {
       const cemPath = join(TMP_DIR, 'packages/hx-library/custom-elements.json');
-      const componentPath = join(TMP_DIR, 'packages/hx-library/src/components/hx-button/hx-button.ts');
+      const componentPath = join(
+        TMP_DIR,
+        'packages/hx-library/src/components/hx-button/hx-button.ts',
+      );
       mkdirSync(join(TMP_DIR, 'packages/hx-library/src/components/hx-button'), { recursive: true });
 
       const initialCEM = {
@@ -624,7 +637,12 @@ describe('api-breaking-change-detection (H18)', () => {
                 name: 'HelixButton',
                 tagName: 'hx-button',
                 members: [
-                  { kind: 'field', name: '_internal', privacy: 'private', type: { text: 'string' } },
+                  {
+                    kind: 'field',
+                    name: '_internal',
+                    privacy: 'private',
+                    type: { text: 'string' },
+                  },
                   { kind: 'field', name: 'public', type: { text: 'string' } },
                 ],
               },
@@ -675,7 +693,10 @@ describe('api-breaking-change-detection (H18)', () => {
   describe('Approval mechanism', () => {
     it('should allow approved breaking changes', () => {
       const cemPath = join(TMP_DIR, 'packages/hx-library/custom-elements.json');
-      const componentPath = join(TMP_DIR, 'packages/hx-library/src/components/hx-button/hx-button.ts');
+      const componentPath = join(
+        TMP_DIR,
+        'packages/hx-library/src/components/hx-button/hx-button.ts',
+      );
       mkdirSync(join(TMP_DIR, 'packages/hx-library/src/components/hx-button'), { recursive: true });
 
       const initialCEM = {
@@ -728,7 +749,7 @@ describe('api-breaking-change-detection (H18)', () => {
       writeFileSync(cemPath, JSON.stringify(updatedCEM, null, 2));
       writeFileSync(
         componentPath,
-        '// @breaking-change-approved: HELIX-123 Removing deprecated size property\n// Updated component'
+        '// @breaking-change-approved: HELIX-123 Removing deprecated size property\n// Updated component',
       );
       execSync('git add -A', { cwd: TMP_DIR });
 
@@ -757,9 +778,7 @@ describe('api-breaking-change-detection (H18)', () => {
               kind: 'class',
               name: `HelixComponent${i}`,
               tagName: `hx-component-${i}`,
-              members: [
-                { kind: 'field', name: 'variant', type: { text: 'string' } },
-              ],
+              members: [{ kind: 'field', name: 'variant', type: { text: 'string' } }],
               events: [{ name: `hx-event-${i}` }],
               cssParts: [{ name: 'container' }],
             },
@@ -788,7 +807,10 @@ describe('api-breaking-change-detection (H18)', () => {
 
   describe('Edge cases', () => {
     it('should handle missing CEM file', () => {
-      const componentPath = join(TMP_DIR, 'packages/hx-library/src/components/hx-button/hx-button.ts');
+      const componentPath = join(
+        TMP_DIR,
+        'packages/hx-library/src/components/hx-button/hx-button.ts',
+      );
       mkdirSync(join(TMP_DIR, 'packages/hx-library/src/components/hx-button'), { recursive: true });
 
       writeFileSync(componentPath, '// Component without CEM');
@@ -840,7 +862,10 @@ describe('api-breaking-change-detection (H18)', () => {
 
     it('should handle component removal', () => {
       const cemPath = join(TMP_DIR, 'packages/hx-library/custom-elements.json');
-      const componentPath = join(TMP_DIR, 'packages/hx-library/src/components/hx-button/hx-button.ts');
+      const componentPath = join(
+        TMP_DIR,
+        'packages/hx-library/src/components/hx-button/hx-button.ts',
+      );
       mkdirSync(join(TMP_DIR, 'packages/hx-library/src/components/hx-button'), { recursive: true });
 
       const initialCEM = {
