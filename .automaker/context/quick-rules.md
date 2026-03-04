@@ -1,5 +1,12 @@
 # Helix Quick Rules
 
+## Barrel File (CRITICAL)
+
+**NEVER manually edit `packages/hx-library/src/index.ts`.** It is auto-generated.
+Each component only needs its own files in `src/components/hx-foo/`. The barrel
+file is regenerated automatically by `npm run generate:barrel` (runs as prebuild).
+If you need to verify exports, run `npm run generate:barrel` in the hx-library package.
+
 ## Hard Constraints
 
 - No `any` types. No `!` assertions. TypeScript strict always.
