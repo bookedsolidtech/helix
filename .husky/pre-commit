@@ -1,9 +1,5 @@
-#!/usr/bin/env sh
-. "$(dirname -- "$0")/_/husky.sh"
-
 # Run lint-staged for formatting and linting
 npx lint-staged
 
 # Run comprehensive pre-commit quality checks
-# Use absolute path to ensure hook works from any directory
 bash "$(dirname "$0")/../scripts/pre-commit-check.sh"
