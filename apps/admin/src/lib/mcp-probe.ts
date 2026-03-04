@@ -1,11 +1,6 @@
 import { spawn } from 'node:child_process';
 import { existsSync, statSync } from 'node:fs';
-import {
-  WC_TOOLS_ROOT,
-  WC_TOOLS_BINARY,
-  CEM_PATH,
-  getMcpProcessEnv,
-} from './mcp-constants';
+import { WC_TOOLS_ROOT, WC_TOOLS_BINARY, CEM_PATH, getMcpProcessEnv } from './mcp-constants';
 
 // ── Types ────────────────────────────────────────────────────────────────
 
@@ -135,7 +130,10 @@ export const EXPECTED_TOOL_CATEGORIES: Record<string, number> = {
   bundle: 1,
 };
 
-export const EXPECTED_TOTAL_TOOLS = Object.values(EXPECTED_TOOL_CATEGORIES).reduce((a, b) => a + b, 0);
+export const EXPECTED_TOTAL_TOOLS = Object.values(EXPECTED_TOOL_CATEGORIES).reduce(
+  (a, b) => a + b,
+  0,
+);
 
 const TIMEOUT_HANDSHAKE = 3000;
 const TIMEOUT_TOOL_LIST = 2000;
@@ -268,7 +266,7 @@ export async function probeMcpServer(): Promise<McpProbeResult> {
   if (result.cemExists) {
     try {
       const stat = statSync(CEM_PATH);
-      result.cemAgeHours = Math.round((Date.now() - stat.mtimeMs) / 3600000 * 10) / 10;
+      result.cemAgeHours = Math.round(((Date.now() - stat.mtimeMs) / 3600000) * 10) / 10;
 
       const { readFileSync } = await import('node:fs');
       const cemContent = JSON.parse(readFileSync(CEM_PATH, 'utf-8')) as {
@@ -705,11 +703,7 @@ export function categorizeToolName(name: string): string {
 
 // ── Utilities ────────────────────────────────────────────────────────────
 
-function withTimeout<T>(
-  promise: Promise<T>,
-  ms: number,
-  message: string,
-): Promise<T> {
+function withTimeout<T>(promise: Promise<T>, ms: number, message: string): Promise<T> {
   return new Promise((resolve, reject) => {
     const timer = setTimeout(() => reject(new Error(message)), ms);
     promise
