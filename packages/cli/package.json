@@ -1,0 +1,31 @@
+{
+  "name": "@helixds/cli",
+  "version": "0.1.0",
+  "description": "ShadCN-style CLI for copying Helix DS components into your project",
+  "type": "module",
+  "bin": {
+    "helix": "./dist/index.js"
+  },
+  "main": "./dist/index.js",
+  "exports": {
+    ".": "./dist/index.js"
+  },
+  "files": ["dist"],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "type-check": "tsc --noEmit",
+    "lint": "eslint src/"
+  },
+  "dependencies": {
+    "@clack/prompts": "^0.9.0",
+    "commander": "^12.0.0"
+  },
+  "devDependencies": {
+    "tsup": "^8.0.0",
+    "typescript": "^5.7.2"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}
