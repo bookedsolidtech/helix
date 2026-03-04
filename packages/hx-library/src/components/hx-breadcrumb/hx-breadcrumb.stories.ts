@@ -43,7 +43,7 @@ const meta = {
 } satisfies Meta;
 
 export default meta;
-type Story = StoryObj;
+type Story = StoryObj<typeof meta>;
 
 // ─────────────────────────────────────────────────
 // Stories
@@ -60,7 +60,7 @@ export const Default: Story = {
     label: 'Breadcrumb',
   },
   render: (args) => html`
-    <hx-breadcrumb separator=${args['separator']} label=${args['label']}>
+    <hx-breadcrumb separator=${args.separator} label=${args.label}>
       <hx-breadcrumb-item href="/home">Home</hx-breadcrumb-item>
       <hx-breadcrumb-item href="/department">Department</hx-breadcrumb-item>
       <hx-breadcrumb-item>Patient Records</hx-breadcrumb-item>
@@ -78,7 +78,7 @@ export const CustomSeparator: Story = {
     label: 'Breadcrumb',
   },
   render: (args) => html`
-    <hx-breadcrumb separator=${args['separator']} label=${args['label']}>
+    <hx-breadcrumb separator=${args.separator} label=${args.label}>
       <hx-breadcrumb-item href="/home">Home</hx-breadcrumb-item>
       <hx-breadcrumb-item href="/department">Department</hx-breadcrumb-item>
       <hx-breadcrumb-item>Patient Records</hx-breadcrumb-item>
@@ -96,7 +96,7 @@ export const LongPath: Story = {
     label: 'Breadcrumb',
   },
   render: (args) => html`
-    <hx-breadcrumb separator=${args['separator']} label=${args['label']}>
+    <hx-breadcrumb separator=${args.separator} label=${args.label}>
       <hx-breadcrumb-item href="/home">Home</hx-breadcrumb-item>
       <hx-breadcrumb-item href="/department">Department</hx-breadcrumb-item>
       <hx-breadcrumb-item href="/department/division">Division</hx-breadcrumb-item>
@@ -116,7 +116,7 @@ export const SingleItem: Story = {
     label: 'Breadcrumb',
   },
   render: (args) => html`
-    <hx-breadcrumb separator=${args['separator']} label=${args['label']}>
+    <hx-breadcrumb separator=${args.separator} label=${args.label}>
       <hx-breadcrumb-item>Patient Records</hx-breadcrumb-item>
     </hx-breadcrumb>
   `,
@@ -133,8 +133,8 @@ export const WithCustomStyling: Story = {
   },
   render: (args) => html`
     <hx-breadcrumb
-      separator=${args['separator']}
-      label=${args['label']}
+      separator=${args.separator}
+      label=${args.label}
       style="
         --hx-breadcrumb-link-color: #7c3aed;
         --hx-breadcrumb-link-hover-color: #5b21b6;
