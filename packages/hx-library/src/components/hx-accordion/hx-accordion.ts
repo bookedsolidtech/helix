@@ -24,6 +24,14 @@ import type { HelixAccordionItem } from './hx-accordion-item.js';
 export class HelixAccordion extends LitElement {
   static override styles = [tokenStyles, helixAccordionStyles];
 
+  // ─── ElementInternals ───
+
+  private elementInternals = this.attachInternals();
+
+  // ─── Item disabled state tracking ───
+
+  private originalDisabledStates = new WeakMap<HelixAccordionItem, boolean>();
+
   // ─── Properties ───
 
   /**
@@ -45,19 +53,13 @@ export class HelixAccordion extends LitElement {
 
   override connectedCallback(): void {
     super.connectedCallback();
-    this.addEventListener(
-      'hx-accordion-item-toggle',
-      this._handleItemToggle as EventListener,
-    );
+    this.addEventListener('hx-accordion-item-toggle', this._handleItemToggle as EventListener);
     this.addEventListener('keydown', this._handleKeydown);
   }
 
   override disconnectedCallback(): void {
     super.disconnectedCallback();
-    this.removeEventListener(
-      'hx-accordion-item-toggle',
-      this._handleItemToggle as EventListener,
-    );
+    this.removeEventListener('hx-accordion-item-toggle', this._handleItemToggle as EventListener);
     this.removeEventListener('keydown', this._handleKeydown);
   }
 
@@ -79,16 +81,31 @@ export class HelixAccordion extends LitElement {
   }
 
   private _syncDisabledToChildren(): void {
+    const items = this._getItems();
     if (this.disabled) {
-      this._getItems().forEach((item) => {
+      items.forEach((item) => {
+        // Store original disabled state before overriding
+        if (!this.originalDisabledStates.has(item)) {
+          this.originalDisabledStates.set(item, item.disabled);
+        }
         item.disabled = true;
+      });
+    } else {
+      items.forEach((item) => {
+        // Restore original disabled state when parent is re-enabled
+        const originalState = this.originalDisabledStates.get(item);
+        if (originalState !== undefined) {
+          item.disabled = originalState;
+        }
       });
     }
   }
 
   // ─── Event Handling ───
 
-  private _handleItemToggle = (e: CustomEvent<{ item: HelixAccordionItem; open: boolean }>): void => {
+  private _handleItemToggle = (
+    e: CustomEvent<{ item: HelixAccordionItem; open: boolean }>,
+  ): void => {
     e.stopPropagation();
 
     const { item, open } = e.detail;

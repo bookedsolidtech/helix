@@ -40,7 +40,11 @@ function getItems(accordion: HelixAccordion): HelixAccordionItem[] {
 }
 
 function getTrigger(item: HelixAccordionItem): HTMLButtonElement {
-  return item.shadowRoot!.querySelector<HTMLButtonElement>('.trigger')!;
+  const trigger = item.shadowRoot?.querySelector<HTMLButtonElement>('.trigger');
+  if (!trigger) {
+    throw new Error('Could not find trigger element in accordion item');
+  }
+  return trigger;
 }
 
 describe('hx-accordion', () => {
@@ -388,11 +392,9 @@ describe('hx-accordion', () => {
       const trigger2 = getTrigger(item2);
 
       trigger1.focus();
-      el.dispatchEvent(
-        new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true }),
-      );
+      el.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true }));
 
-      expect(item2.shadowRoot!.activeElement).toBe(trigger2);
+      expect(item2.shadowRoot?.activeElement).toBe(trigger2);
     });
 
     it('ArrowUp moves focus from second item trigger to first', async () => {
@@ -402,11 +404,9 @@ describe('hx-accordion', () => {
       const trigger2 = getTrigger(item2);
 
       trigger2.focus();
-      el.dispatchEvent(
-        new KeyboardEvent('keydown', { key: 'ArrowUp', bubbles: true }),
-      );
+      el.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowUp', bubbles: true }));
 
-      expect(item1.shadowRoot!.activeElement).toBe(trigger1);
+      expect(item1.shadowRoot?.activeElement).toBe(trigger1);
     });
 
     it('ArrowDown wraps from last item to first', async () => {
@@ -416,11 +416,9 @@ describe('hx-accordion', () => {
       const trigger2 = getTrigger(item2);
 
       trigger2.focus();
-      el.dispatchEvent(
-        new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true }),
-      );
+      el.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true }));
 
-      expect(item1.shadowRoot!.activeElement).toBe(trigger1);
+      expect(item1.shadowRoot?.activeElement).toBe(trigger1);
     });
 
     it('ArrowUp wraps from first item to last', async () => {
@@ -430,11 +428,9 @@ describe('hx-accordion', () => {
       const trigger2 = getTrigger(item2);
 
       trigger1.focus();
-      el.dispatchEvent(
-        new KeyboardEvent('keydown', { key: 'ArrowUp', bubbles: true }),
-      );
+      el.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowUp', bubbles: true }));
 
-      expect(item2.shadowRoot!.activeElement).toBe(trigger2);
+      expect(item2.shadowRoot?.activeElement).toBe(trigger2);
     });
 
     it('arrow key navigation skips disabled items', async () => {
@@ -454,11 +450,9 @@ describe('hx-accordion', () => {
       const trigger3 = getTrigger(item3);
 
       trigger1.focus();
-      el.dispatchEvent(
-        new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true }),
-      );
+      el.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true }));
 
-      expect(item3.shadowRoot!.activeElement).toBe(trigger3);
+      expect(item3.shadowRoot?.activeElement).toBe(trigger3);
     });
   });
 

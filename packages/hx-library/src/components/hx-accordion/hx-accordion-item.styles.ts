@@ -3,11 +3,11 @@ import { css } from 'lit';
 export const helixAccordionItemStyles = css`
   :host {
     display: block;
-    font-family: var(--hx-font-family-sans, sans-serif);
+    font-family: var(--hx-font-family-sans);
   }
 
   :host([disabled]) {
-    opacity: var(--hx-opacity-disabled, 0.5);
+    opacity: var(--hx-opacity-disabled);
     pointer-events: none;
   }
 
@@ -18,8 +18,12 @@ export const helixAccordionItemStyles = css`
   /* ─── Item Container ─── */
 
   .item {
-    border-bottom: var(--hx-border-width-thin, 1px) solid
-      var(--hx-accordion-item-border-color, var(--hx-color-neutral-200, #e9ecef));
+    border-bottom: var(--hx-border-width-thin) solid
+      var(--hx-accordion-item-border-color, var(--hx-color-neutral-200));
+  }
+
+  :host(:last-of-type) .item {
+    border-bottom: none;
   }
 
   /* ─── Heading / Trigger ─── */
@@ -33,33 +37,32 @@ export const helixAccordionItemStyles = css`
     align-items: center;
     justify-content: space-between;
     width: 100%;
-    padding: var(--hx-space-4, 1rem);
-    background-color: var(--hx-accordion-item-heading-bg, var(--hx-color-neutral-50, #f8f9fa));
-    color: var(--hx-accordion-item-heading-color, var(--hx-color-neutral-900, #212529));
+    padding: var(--hx-space-4);
+    background-color: var(--hx-accordion-item-heading-bg, var(--hx-color-neutral-50));
+    color: var(--hx-accordion-item-heading-color, var(--hx-color-neutral-900));
     border: none;
     border-radius: 0;
     font-family: inherit;
-    font-size: var(--hx-font-size-md, 1rem);
-    font-weight: var(--hx-font-weight-medium, 500);
-    line-height: var(--hx-line-height-normal, 1.5);
+    font-size: var(--hx-font-size-md);
+    font-weight: var(--hx-font-weight-medium);
+    line-height: var(--hx-line-height-normal);
     cursor: pointer;
     text-align: left;
-    transition: background-color var(--hx-transition-fast, 150ms ease);
+    transition: background-color var(--hx-transition-fast);
   }
 
-  .trigger:hover:not([aria-disabled='true']) {
-    background-color: var(--hx-color-neutral-100, #f1f3f5);
+  .trigger:hover:not(:disabled) {
+    background-color: var(--hx-color-neutral-100);
   }
 
   .trigger:focus-visible {
-    outline: var(--hx-focus-ring-width, 2px) solid
-      var(--hx-focus-ring-color, #2563eb);
-    outline-offset: var(--hx-focus-ring-offset, -2px);
+    outline: var(--hx-focus-ring-width) solid var(--hx-focus-ring-color);
+    outline-offset: var(--hx-focus-ring-offset);
     z-index: 1;
     position: relative;
   }
 
-  .trigger[aria-disabled='true'] {
+  .trigger:disabled {
     cursor: not-allowed;
   }
 
@@ -70,10 +73,10 @@ export const helixAccordionItemStyles = css`
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
-    width: var(--hx-size-5, 1.25rem);
-    height: var(--hx-size-5, 1.25rem);
-    color: var(--hx-accordion-item-heading-color, var(--hx-color-neutral-900, #212529));
-    transition: transform var(--hx-transition-normal, 250ms ease);
+    width: var(--hx-size-5);
+    height: var(--hx-size-5);
+    color: var(--hx-accordion-item-heading-color, var(--hx-color-neutral-900));
+    transition: transform var(--hx-transition-normal);
   }
 
   :host([open]) .icon {
@@ -91,7 +94,7 @@ export const helixAccordionItemStyles = css`
   .content-wrapper {
     display: grid;
     grid-template-rows: 0fr;
-    transition: grid-template-rows var(--hx-transition-normal, 250ms ease);
+    transition: grid-template-rows var(--hx-transition-normal);
   }
 
   :host([open]) .content-wrapper {
@@ -109,10 +112,10 @@ export const helixAccordionItemStyles = css`
   }
 
   .content {
-    padding: var(--hx-accordion-item-content-padding, var(--hx-space-4, 1rem));
-    background-color: var(--hx-accordion-item-content-bg, var(--hx-color-neutral-0, #ffffff));
-    color: var(--hx-color-neutral-900, #212529);
-    font-size: var(--hx-font-size-md, 1rem);
-    line-height: var(--hx-line-height-normal, 1.5);
+    padding: var(--hx-accordion-item-content-padding, var(--hx-space-4));
+    background-color: var(--hx-accordion-item-content-bg, var(--hx-color-neutral-0));
+    color: var(--hx-color-neutral-900);
+    font-size: var(--hx-font-size-md);
+    line-height: var(--hx-line-height-normal);
   }
 `;

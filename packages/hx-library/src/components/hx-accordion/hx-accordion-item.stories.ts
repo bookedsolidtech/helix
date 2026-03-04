@@ -48,11 +48,7 @@ const meta = {
     disabled: false,
   },
   render: (args) => html`
-    <hx-accordion-item
-      heading=${args.heading}
-      ?open=${args.open}
-      ?disabled=${args.disabled}
-    >
+    <hx-accordion-item heading=${args.heading} ?open=${args.open} ?disabled=${args.disabled}>
       <p style="margin: 0;">
         This is the panel content for the accordion item. Place any HTML content here.
       </p>
@@ -79,7 +75,6 @@ export const Default: Story = {
     disabled: false,
   },
   play: async ({ canvasElement }) => {
-    const _canvas = within(canvasElement);
     const item = canvasElement.querySelector('hx-accordion-item');
 
     await expect(item).toBeTruthy();
@@ -265,16 +260,24 @@ export const WithRichContent: Story = {
         >
           <thead>
             <tr style="background: #f3f4f6;">
-              <th style="padding: 0.5rem 0.75rem; text-align: left; border-bottom: 1px solid #e5e7eb;">
+              <th
+                style="padding: 0.5rem 0.75rem; text-align: left; border-bottom: 1px solid #e5e7eb;"
+              >
                 Medication
               </th>
-              <th style="padding: 0.5rem 0.75rem; text-align: left; border-bottom: 1px solid #e5e7eb;">
+              <th
+                style="padding: 0.5rem 0.75rem; text-align: left; border-bottom: 1px solid #e5e7eb;"
+              >
                 Dose
               </th>
-              <th style="padding: 0.5rem 0.75rem; text-align: left; border-bottom: 1px solid #e5e7eb;">
+              <th
+                style="padding: 0.5rem 0.75rem; text-align: left; border-bottom: 1px solid #e5e7eb;"
+              >
                 Frequency
               </th>
-              <th style="padding: 0.5rem 0.75rem; text-align: left; border-bottom: 1px solid #e5e7eb;">
+              <th
+                style="padding: 0.5rem 0.75rem; text-align: left; border-bottom: 1px solid #e5e7eb;"
+              >
                 Prescriber
               </th>
             </tr>
@@ -283,13 +286,17 @@ export const WithRichContent: Story = {
             <tr>
               <td style="padding: 0.5rem 0.75rem; border-bottom: 1px solid #e5e7eb;">Metformin</td>
               <td style="padding: 0.5rem 0.75rem; border-bottom: 1px solid #e5e7eb;">500 mg</td>
-              <td style="padding: 0.5rem 0.75rem; border-bottom: 1px solid #e5e7eb;">Twice daily with meals</td>
+              <td style="padding: 0.5rem 0.75rem; border-bottom: 1px solid #e5e7eb;">
+                Twice daily with meals
+              </td>
               <td style="padding: 0.5rem 0.75rem; border-bottom: 1px solid #e5e7eb;">Dr. Patel</td>
             </tr>
             <tr>
               <td style="padding: 0.5rem 0.75rem; border-bottom: 1px solid #e5e7eb;">Lisinopril</td>
               <td style="padding: 0.5rem 0.75rem; border-bottom: 1px solid #e5e7eb;">10 mg</td>
-              <td style="padding: 0.5rem 0.75rem; border-bottom: 1px solid #e5e7eb;">Once daily (morning)</td>
+              <td style="padding: 0.5rem 0.75rem; border-bottom: 1px solid #e5e7eb;">
+                Once daily (morning)
+              </td>
               <td style="padding: 0.5rem 0.75rem; border-bottom: 1px solid #e5e7eb;">Dr. Patel</td>
             </tr>
             <tr>

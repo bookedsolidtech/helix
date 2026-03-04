@@ -117,12 +117,7 @@ export class HelixAccordionItem extends LitElement {
 
   private _renderChevronIcon() {
     return html`
-      <svg
-        viewBox="0 0 20 20"
-        aria-hidden="true"
-        focusable="false"
-        fill="currentColor"
-      >
+      <svg viewBox="0 0 20 20" aria-hidden="true" focusable="false" fill="currentColor">
         <path
           fill-rule="evenodd"
           d="M5.22 8.22a.75.75 0 0 1 1.06 0L10 11.94l3.72-3.72a.75.75 0 1 1 1.06 1.06l-4.25 4.25a.75.75 0 0 1-1.06 0L5.22 9.28a.75.75 0 0 1 0-1.06Z"
@@ -141,9 +136,9 @@ export class HelixAccordionItem extends LitElement {
             class="trigger"
             id=${this._triggerId}
             type="button"
+            ?disabled=${this.disabled}
             aria-expanded=${this.open ? 'true' : 'false'}
             aria-controls=${this._panelId}
-            aria-disabled=${this.disabled ? 'true' : 'false'}
             @click=${this._handleTriggerClick}
           >
             <slot name="heading">${this.heading}</slot>
@@ -151,7 +146,7 @@ export class HelixAccordionItem extends LitElement {
           </button>
         </h3>
 
-        <div class="content-wrapper">
+        <div class="content-wrapper" ?inert=${!this.open}>
           <div class="content-inner">
             <div
               part="content"

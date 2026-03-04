@@ -78,7 +78,6 @@ export const Default: Story = {
     disabled: false,
   },
   play: async ({ canvasElement }) => {
-    const _canvas = within(canvasElement);
     const accordion = canvasElement.querySelector('hx-accordion');
 
     await expect(accordion).toBeTruthy();
@@ -114,10 +113,14 @@ export const Multiple: Story = {
   render: (args) => html`
     <hx-accordion ?multiple=${args.multiple} ?disabled=${args.disabled}>
       <hx-accordion-item heading="Section One" open>
-        <p style="margin: 0;">Section one is open. Other sections can also be opened at the same time.</p>
+        <p style="margin: 0;">
+          Section one is open. Other sections can also be opened at the same time.
+        </p>
       </hx-accordion-item>
       <hx-accordion-item heading="Section Two" open>
-        <p style="margin: 0;">Section two is also open. Both sections remain open simultaneously.</p>
+        <p style="margin: 0;">
+          Section two is also open. Both sections remain open simultaneously.
+        </p>
       </hx-accordion-item>
       <hx-accordion-item heading="Section Three">
         <p style="margin: 0;">
@@ -160,7 +163,7 @@ export const Disabled: Story = {
     await expect(accordion?.disabled).toBe(true);
 
     // Allow time for disabled state to propagate to children
-    await new Promise((r) => setTimeout(r, 50));
+    await accordion?.updateComplete;
 
     const items = canvasElement.querySelectorAll('hx-accordion-item');
     for (const item of items) {
@@ -301,10 +304,11 @@ export const Controlled: Story = {
             cursor: pointer;
             font-size: 0.875rem;
           "
-          @click=${() => {
-            const items = document
-              .querySelector('#controlled-accordion')
-              ?.querySelectorAll('hx-accordion-item');
+          @click=${(e: Event) => {
+            const accordion = (e.currentTarget as HTMLElement)
+              .closest('div')
+              ?.querySelector('#controlled-accordion');
+            const items = accordion?.querySelectorAll('hx-accordion-item');
             items?.forEach((item) => {
               (item as HTMLElement & { open: boolean }).open = true;
             });
@@ -323,10 +327,11 @@ export const Controlled: Story = {
             cursor: pointer;
             font-size: 0.875rem;
           "
-          @click=${() => {
-            const items = document
-              .querySelector('#controlled-accordion')
-              ?.querySelectorAll('hx-accordion-item');
+          @click=${(e: Event) => {
+            const accordion = (e.currentTarget as HTMLElement)
+              .closest('div')
+              ?.querySelector('#controlled-accordion');
+            const items = accordion?.querySelectorAll('hx-accordion-item');
             items?.forEach((item) => {
               (item as HTMLElement & { open: boolean }).open = false;
             });
@@ -373,14 +378,18 @@ export const Controlled: Story = {
 
     // Click Collapse All
     await userEvent.click(collapseBtn);
-    await new Promise((r) => setTimeout(r, 50));
+    for (const item of items) {
+      await item.updateComplete;
+    }
     for (const item of items) {
       await expect(item.open).toBe(false);
     }
 
     // Click Expand All
     await userEvent.click(expandBtn);
-    await new Promise((r) => setTimeout(r, 50));
+    for (const item of items) {
+      await item.updateComplete;
+    }
     for (const item of items) {
       await expect(item.open).toBe(true);
     }
@@ -442,8 +451,8 @@ export const HealthcareExample: Story = {
             If you are experiencing a life-threatening emergency, call 911 immediately.
           </p>
           <p style="margin: 0;">
-            For urgent but non-life-threatening concerns after hours, contact our nurse triage
-            line at 1-800-555-0199. Triage nurses are available 24 hours a day, 7 days a week.
+            For urgent but non-life-threatening concerns after hours, contact our nurse triage line
+            at 1-800-555-0199. Triage nurses are available 24 hours a day, 7 days a week.
           </p>
         </hx-accordion-item>
 
@@ -477,7 +486,8 @@ export const HealthcareExample: Story = {
     await expect(secondTrigger).toBeTruthy();
     if (secondTrigger) {
       await userEvent.click(secondTrigger);
-      await new Promise((r) => setTimeout(r, 50));
+      await items[1].updateComplete;
+      await items[0].updateComplete;
       await expect(items[1].open).toBe(true);
       await expect(items[0].open).toBe(false);
     }
