@@ -19,13 +19,13 @@ type AlertVariant = 'info' | 'success' | 'warning' | 'error';
  * @slot icon - Custom icon to override the default variant icon.
  * @slot actions - Action buttons rendered within the alert.
  *
- * @fires {CustomEvent<{reason: string}>} hx-close - Dispatched when the user dismisses the alert.
- * @fires {CustomEvent} wc-after-close - Dispatched after the alert is dismissed.
+ * @fires {CustomEvent<{reason: string}>} hx-dismiss - Dispatched when the user dismisses the alert.
+ * @fires {CustomEvent} hx-after-dismiss - Dispatched after the alert is dismissed.
  *
  * @csspart alert - The outer alert container.
  * @csspart icon - The icon container.
  * @csspart message - The message content area.
- * @csspart close-button - The dismiss button (only rendered when closable).
+ * @csspart close-button - The dismiss button (only rendered when dismissible).
  * @csspart actions - The actions container.
  *
  * @cssprop [--hx-alert-bg=var(--hx-color-info-50)] - Alert background color.
@@ -53,10 +53,10 @@ export class HelixAlert extends LitElement {
 
   /**
    * Whether the alert can be dismissed by the user.
-   * @attr closable
+   * @attr dismissible
    */
   @property({ type: Boolean, reflect: true })
-  closable = false;
+  dismissible = false;
 
   /**
    * Whether the alert is visible. Set to false to hide the alert.
@@ -64,6 +64,13 @@ export class HelixAlert extends LitElement {
    */
   @property({ type: Boolean, reflect: true })
   open = true;
+
+  /**
+   * Whether to show the default variant icon. Set to false to hide the icon container entirely.
+   * @attr icon
+   */
+  @property({ type: Boolean, reflect: true })
+  icon = true;
 
   // ─── Private Helpers ───
 
@@ -140,15 +147,15 @@ export class HelixAlert extends LitElement {
 
   // ─── Event Handling ───
 
-  private _handleClose(): void {
+  private _handleDismiss(): void {
     this.open = false;
 
     /**
      * Dispatched when the user dismisses the alert.
-     * @event hx-close
+     * @event hx-dismiss
      */
     this.dispatchEvent(
-      new CustomEvent('hx-close', {
+      new CustomEvent('hx-dismiss', {
         bubbles: true,
         composed: true,
         detail: { reason: 'user' },
@@ -157,10 +164,10 @@ export class HelixAlert extends LitElement {
 
     /**
      * Dispatched after the alert is dismissed.
-     * @event hx-after-close
+     * @event hx-after-dismiss
      */
     this.dispatchEvent(
-      new CustomEvent('hx-after-close', {
+      new CustomEvent('hx-after-dismiss', {
         bubbles: true,
         composed: true,
       }),
@@ -177,9 +184,13 @@ export class HelixAlert extends LitElement {
 
     return html`
       <div part="alert" class=${classMap(classes)} role=${this._role} aria-live=${this._ariaLive}>
-        <div part="icon" class="alert__icon">
-          <slot name="icon">${this._renderDefaultIcon()}</slot>
-        </div>
+        ${this.icon
+          ? html`
+              <div part="icon" class="alert__icon">
+                <slot name="icon">${this._renderDefaultIcon()}</slot>
+              </div>
+            `
+          : nothing}
 
         <div part="message" class="alert__message">
           <slot></slot>
@@ -188,13 +199,13 @@ export class HelixAlert extends LitElement {
           </div>
         </div>
 
-        ${this.closable
+        ${this.dismissible
           ? html`
               <button
                 part="close-button"
                 class="alert__close-button"
                 aria-label="Close"
-                @click=${this._handleClose}
+                @click=${this._handleDismiss}
               >
                 ${this._renderCloseIcon()}
               </button>
@@ -210,3 +221,5 @@ declare global {
     'hx-alert': HelixAlert;
   }
 }
+
+export type { HelixAlert as WcAlert };
