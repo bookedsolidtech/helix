@@ -1,7 +1,7 @@
 {
   "config": {
-    "configFile": "/Volumes/Development/booked/helix/.worktrees/feature-t1-01-hx-button-primary-action-button/playwright.config.ts",
-    "rootDir": "/Volumes/Development/booked/helix/.worktrees/feature-t1-01-hx-button-primary-action-button/packages/hx-library/e2e",
+    "configFile": "/Volumes/Development/booked/helix/.worktrees/feature-t2-33-hx-time-picker-time-input-field/playwright.config.ts",
+    "rootDir": "/Volumes/Development/booked/helix/.worktrees/feature-t2-33-hx-time-picker-time-input-field/packages/hx-library/e2e",
     "forbidOnly": false,
     "fullyParallel": true,
     "globalSetup": null,
@@ -10,41 +10,49 @@
     "grep": {},
     "grepInvert": null,
     "maxFailures": 0,
-    "metadata": {},
+    "metadata": {
+      "actualWorkers": 5
+    },
     "preserveOutput": "always",
     "projects": [
       {
-        "outputDir": "/Volumes/Development/booked/helix/.worktrees/feature-t1-01-hx-button-primary-action-button/packages/hx-library/.cache/vrt-results",
+        "outputDir": "/Volumes/Development/booked/helix/.worktrees/feature-t2-33-hx-time-picker-time-input-field/packages/hx-library/.cache/vrt-results",
         "repeatEach": 1,
         "retries": 0,
-        "metadata": {},
+        "metadata": {
+          "actualWorkers": 5
+        },
         "id": "chromium",
         "name": "chromium",
-        "testDir": "/Volumes/Development/booked/helix/.worktrees/feature-t1-01-hx-button-primary-action-button/packages/hx-library/e2e",
+        "testDir": "/Volumes/Development/booked/helix/.worktrees/feature-t2-33-hx-time-picker-time-input-field/packages/hx-library/e2e",
         "testIgnore": [],
         "testMatch": ["**/*.@(spec|test).?(c|m)[jt]s?(x)"],
         "timeout": 30000
       },
       {
-        "outputDir": "/Volumes/Development/booked/helix/.worktrees/feature-t1-01-hx-button-primary-action-button/packages/hx-library/.cache/vrt-results",
+        "outputDir": "/Volumes/Development/booked/helix/.worktrees/feature-t2-33-hx-time-picker-time-input-field/packages/hx-library/.cache/vrt-results",
         "repeatEach": 1,
         "retries": 0,
-        "metadata": {},
+        "metadata": {
+          "actualWorkers": 5
+        },
         "id": "firefox",
         "name": "firefox",
-        "testDir": "/Volumes/Development/booked/helix/.worktrees/feature-t1-01-hx-button-primary-action-button/packages/hx-library/e2e",
+        "testDir": "/Volumes/Development/booked/helix/.worktrees/feature-t2-33-hx-time-picker-time-input-field/packages/hx-library/e2e",
         "testIgnore": [],
         "testMatch": ["**/*.@(spec|test).?(c|m)[jt]s?(x)"],
         "timeout": 30000
       },
       {
-        "outputDir": "/Volumes/Development/booked/helix/.worktrees/feature-t1-01-hx-button-primary-action-button/packages/hx-library/.cache/vrt-results",
+        "outputDir": "/Volumes/Development/booked/helix/.worktrees/feature-t2-33-hx-time-picker-time-input-field/packages/hx-library/.cache/vrt-results",
         "repeatEach": 1,
         "retries": 0,
-        "metadata": {},
+        "metadata": {
+          "actualWorkers": 5
+        },
         "id": "webkit",
         "name": "webkit",
-        "testDir": "/Volumes/Development/booked/helix/.worktrees/feature-t1-01-hx-button-primary-action-button/packages/hx-library/e2e",
+        "testDir": "/Volumes/Development/booked/helix/.worktrees/feature-t2-33-hx-time-picker-time-input-field/packages/hx-library/e2e",
         "testIgnore": [],
         "testMatch": ["**/*.@(spec|test).?(c|m)[jt]s?(x)"],
         "timeout": 30000
@@ -73,19 +81,496 @@
     "workers": 5,
     "webServer": null
   },
-  "suites": [],
-  "errors": [
+  "suites": [
     {
-      "message": "Error: No tests found.\nMake sure that arguments are regular expressions matching test files.\nYou may need to escape symbols like \"$\" or \"*\" and quote the arguments.",
-      "stack": "Error: No tests found.\nMake sure that arguments are regular expressions matching test files.\nYou may need to escape symbols like \"$\" or \"*\" and quote the arguments."
+      "title": "hx-time-picker-verify.spec.ts",
+      "file": "hx-time-picker-verify.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "hx-time-picker - Playwright verification",
+          "file": "hx-time-picker-verify.spec.ts",
+          "line": 16,
+          "column": 6,
+          "specs": [
+            {
+              "title": "component renders with shadow DOM",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 272,
+                      "error": {
+                        "message": "Error: ENOENT: no such file or directory, open '/Volumes/Development/booked/helix/.worktrees/feature-t2-33-hx-time-picker-time-input-field/packages/hx-library/dist/components/hx-time-picker/index.js'",
+                        "stack": "Error: ENOENT: no such file or directory, open '/Volumes/Development/booked/helix/.worktrees/feature-t2-33-hx-time-picker-time-input-field/packages/hx-library/dist/components/hx-time-picker/index.js'\n    at /Volumes/Development/booked/helix/.worktrees/feature-t2-33-hx-time-picker-time-input-field/packages/hx-library/e2e/hx-time-picker-verify.spec.ts:20:5",
+                        "location": {
+                          "file": "/Volumes/Development/booked/helix/.worktrees/feature-t2-33-hx-time-picker-time-input-field/packages/hx-library/e2e/hx-time-picker-verify.spec.ts",
+                          "column": 5,
+                          "line": 20
+                        },
+                        "snippet": "  18 |     await page.goto('about:blank');\n  19 |     // Load the built component via addScriptTag\n> 20 |     await page.addScriptTag({\n     |     ^\n  21 |       path: COMPONENT_DIST,\n  22 |       type: 'module',\n  23 |     });"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/Volumes/Development/booked/helix/.worktrees/feature-t2-33-hx-time-picker-time-input-field/packages/hx-library/e2e/hx-time-picker-verify.spec.ts",
+                            "column": 5,
+                            "line": 20
+                          },
+                          "message": "Error: ENOENT: no such file or directory, open '/Volumes/Development/booked/helix/.worktrees/feature-t2-33-hx-time-picker-time-input-field/packages/hx-library/dist/components/hx-time-picker/index.js'\n\n  18 |     await page.goto('about:blank');\n  19 |     // Load the built component via addScriptTag\n> 20 |     await page.addScriptTag({\n     |     ^\n  21 |       path: COMPONENT_DIST,\n  22 |       type: 'module',\n  23 |     });\n    at /Volumes/Development/booked/helix/.worktrees/feature-t2-33-hx-time-picker-time-input-field/packages/hx-library/e2e/hx-time-picker-verify.spec.ts:20:5"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-03-04T10:20:01.572Z",
+                      "annotations": [],
+                      "attachments": [],
+                      "errorLocation": {
+                        "file": "/Volumes/Development/booked/helix/.worktrees/feature-t2-33-hx-time-picker-time-input-field/packages/hx-library/e2e/hx-time-picker-verify.spec.ts",
+                        "column": 5,
+                        "line": 20
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "3d028e42b5ba8c6ab9d4-d565902aed07bc92768c",
+              "file": "hx-time-picker-verify.spec.ts",
+              "line": 41,
+              "column": 3
+            },
+            {
+              "title": "label is rendered",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 1,
+                      "status": "failed",
+                      "duration": 254,
+                      "error": {
+                        "message": "Error: ENOENT: no such file or directory, open '/Volumes/Development/booked/helix/.worktrees/feature-t2-33-hx-time-picker-time-input-field/packages/hx-library/dist/components/hx-time-picker/index.js'",
+                        "stack": "Error: ENOENT: no such file or directory, open '/Volumes/Development/booked/helix/.worktrees/feature-t2-33-hx-time-picker-time-input-field/packages/hx-library/dist/components/hx-time-picker/index.js'\n    at /Volumes/Development/booked/helix/.worktrees/feature-t2-33-hx-time-picker-time-input-field/packages/hx-library/e2e/hx-time-picker-verify.spec.ts:20:5",
+                        "location": {
+                          "file": "/Volumes/Development/booked/helix/.worktrees/feature-t2-33-hx-time-picker-time-input-field/packages/hx-library/e2e/hx-time-picker-verify.spec.ts",
+                          "column": 5,
+                          "line": 20
+                        },
+                        "snippet": "  18 |     await page.goto('about:blank');\n  19 |     // Load the built component via addScriptTag\n> 20 |     await page.addScriptTag({\n     |     ^\n  21 |       path: COMPONENT_DIST,\n  22 |       type: 'module',\n  23 |     });"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/Volumes/Development/booked/helix/.worktrees/feature-t2-33-hx-time-picker-time-input-field/packages/hx-library/e2e/hx-time-picker-verify.spec.ts",
+                            "column": 5,
+                            "line": 20
+                          },
+                          "message": "Error: ENOENT: no such file or directory, open '/Volumes/Development/booked/helix/.worktrees/feature-t2-33-hx-time-picker-time-input-field/packages/hx-library/dist/components/hx-time-picker/index.js'\n\n  18 |     await page.goto('about:blank');\n  19 |     // Load the built component via addScriptTag\n> 20 |     await page.addScriptTag({\n     |     ^\n  21 |       path: COMPONENT_DIST,\n  22 |       type: 'module',\n  23 |     });\n    at /Volumes/Development/booked/helix/.worktrees/feature-t2-33-hx-time-picker-time-input-field/packages/hx-library/e2e/hx-time-picker-verify.spec.ts:20:5"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-03-04T10:20:01.608Z",
+                      "annotations": [],
+                      "attachments": [],
+                      "errorLocation": {
+                        "file": "/Volumes/Development/booked/helix/.worktrees/feature-t2-33-hx-time-picker-time-input-field/packages/hx-library/e2e/hx-time-picker-verify.spec.ts",
+                        "column": 5,
+                        "line": 20
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "3d028e42b5ba8c6ab9d4-0c5e2bae1f28dd2d9723",
+              "file": "hx-time-picker-verify.spec.ts",
+              "line": 49,
+              "column": 3
+            },
+            {
+              "title": "input has correct 12h placeholder",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 2,
+                      "parallelIndex": 2,
+                      "status": "failed",
+                      "duration": 246,
+                      "error": {
+                        "message": "Error: ENOENT: no such file or directory, open '/Volumes/Development/booked/helix/.worktrees/feature-t2-33-hx-time-picker-time-input-field/packages/hx-library/dist/components/hx-time-picker/index.js'",
+                        "stack": "Error: ENOENT: no such file or directory, open '/Volumes/Development/booked/helix/.worktrees/feature-t2-33-hx-time-picker-time-input-field/packages/hx-library/dist/components/hx-time-picker/index.js'\n    at /Volumes/Development/booked/helix/.worktrees/feature-t2-33-hx-time-picker-time-input-field/packages/hx-library/e2e/hx-time-picker-verify.spec.ts:20:5",
+                        "location": {
+                          "file": "/Volumes/Development/booked/helix/.worktrees/feature-t2-33-hx-time-picker-time-input-field/packages/hx-library/e2e/hx-time-picker-verify.spec.ts",
+                          "column": 5,
+                          "line": 20
+                        },
+                        "snippet": "  18 |     await page.goto('about:blank');\n  19 |     // Load the built component via addScriptTag\n> 20 |     await page.addScriptTag({\n     |     ^\n  21 |       path: COMPONENT_DIST,\n  22 |       type: 'module',\n  23 |     });"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/Volumes/Development/booked/helix/.worktrees/feature-t2-33-hx-time-picker-time-input-field/packages/hx-library/e2e/hx-time-picker-verify.spec.ts",
+                            "column": 5,
+                            "line": 20
+                          },
+                          "message": "Error: ENOENT: no such file or directory, open '/Volumes/Development/booked/helix/.worktrees/feature-t2-33-hx-time-picker-time-input-field/packages/hx-library/dist/components/hx-time-picker/index.js'\n\n  18 |     await page.goto('about:blank');\n  19 |     // Load the built component via addScriptTag\n> 20 |     await page.addScriptTag({\n     |     ^\n  21 |       path: COMPONENT_DIST,\n  22 |       type: 'module',\n  23 |     });\n    at /Volumes/Development/booked/helix/.worktrees/feature-t2-33-hx-time-picker-time-input-field/packages/hx-library/e2e/hx-time-picker-verify.spec.ts:20:5"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-03-04T10:20:01.613Z",
+                      "annotations": [],
+                      "attachments": [],
+                      "errorLocation": {
+                        "file": "/Volumes/Development/booked/helix/.worktrees/feature-t2-33-hx-time-picker-time-input-field/packages/hx-library/e2e/hx-time-picker-verify.spec.ts",
+                        "column": 5,
+                        "line": 20
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "3d028e42b5ba8c6ab9d4-f7c2e1742907dc2c1743",
+              "file": "hx-time-picker-verify.spec.ts",
+              "line": 57,
+              "column": 3
+            },
+            {
+              "title": "dropdown opens on input click",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 3,
+                      "parallelIndex": 3,
+                      "status": "failed",
+                      "duration": 280,
+                      "error": {
+                        "message": "Error: ENOENT: no such file or directory, open '/Volumes/Development/booked/helix/.worktrees/feature-t2-33-hx-time-picker-time-input-field/packages/hx-library/dist/components/hx-time-picker/index.js'",
+                        "stack": "Error: ENOENT: no such file or directory, open '/Volumes/Development/booked/helix/.worktrees/feature-t2-33-hx-time-picker-time-input-field/packages/hx-library/dist/components/hx-time-picker/index.js'\n    at /Volumes/Development/booked/helix/.worktrees/feature-t2-33-hx-time-picker-time-input-field/packages/hx-library/e2e/hx-time-picker-verify.spec.ts:20:5",
+                        "location": {
+                          "file": "/Volumes/Development/booked/helix/.worktrees/feature-t2-33-hx-time-picker-time-input-field/packages/hx-library/e2e/hx-time-picker-verify.spec.ts",
+                          "column": 5,
+                          "line": 20
+                        },
+                        "snippet": "  18 |     await page.goto('about:blank');\n  19 |     // Load the built component via addScriptTag\n> 20 |     await page.addScriptTag({\n     |     ^\n  21 |       path: COMPONENT_DIST,\n  22 |       type: 'module',\n  23 |     });"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/Volumes/Development/booked/helix/.worktrees/feature-t2-33-hx-time-picker-time-input-field/packages/hx-library/e2e/hx-time-picker-verify.spec.ts",
+                            "column": 5,
+                            "line": 20
+                          },
+                          "message": "Error: ENOENT: no such file or directory, open '/Volumes/Development/booked/helix/.worktrees/feature-t2-33-hx-time-picker-time-input-field/packages/hx-library/dist/components/hx-time-picker/index.js'\n\n  18 |     await page.goto('about:blank');\n  19 |     // Load the built component via addScriptTag\n> 20 |     await page.addScriptTag({\n     |     ^\n  21 |       path: COMPONENT_DIST,\n  22 |       type: 'module',\n  23 |     });\n    at /Volumes/Development/booked/helix/.worktrees/feature-t2-33-hx-time-picker-time-input-field/packages/hx-library/e2e/hx-time-picker-verify.spec.ts:20:5"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-03-04T10:20:01.597Z",
+                      "annotations": [],
+                      "attachments": [],
+                      "errorLocation": {
+                        "file": "/Volumes/Development/booked/helix/.worktrees/feature-t2-33-hx-time-picker-time-input-field/packages/hx-library/e2e/hx-time-picker-verify.spec.ts",
+                        "column": 5,
+                        "line": 20
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "3d028e42b5ba8c6ab9d4-b50354a8d94a5fd4e651",
+              "file": "hx-time-picker-verify.spec.ts",
+              "line": 65,
+              "column": 3
+            },
+            {
+              "title": "correct number of time slots generated (08:00-17:00, step=30)",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 4,
+                      "parallelIndex": 4,
+                      "status": "failed",
+                      "duration": 245,
+                      "error": {
+                        "message": "Error: ENOENT: no such file or directory, open '/Volumes/Development/booked/helix/.worktrees/feature-t2-33-hx-time-picker-time-input-field/packages/hx-library/dist/components/hx-time-picker/index.js'",
+                        "stack": "Error: ENOENT: no such file or directory, open '/Volumes/Development/booked/helix/.worktrees/feature-t2-33-hx-time-picker-time-input-field/packages/hx-library/dist/components/hx-time-picker/index.js'\n    at /Volumes/Development/booked/helix/.worktrees/feature-t2-33-hx-time-picker-time-input-field/packages/hx-library/e2e/hx-time-picker-verify.spec.ts:20:5",
+                        "location": {
+                          "file": "/Volumes/Development/booked/helix/.worktrees/feature-t2-33-hx-time-picker-time-input-field/packages/hx-library/e2e/hx-time-picker-verify.spec.ts",
+                          "column": 5,
+                          "line": 20
+                        },
+                        "snippet": "  18 |     await page.goto('about:blank');\n  19 |     // Load the built component via addScriptTag\n> 20 |     await page.addScriptTag({\n     |     ^\n  21 |       path: COMPONENT_DIST,\n  22 |       type: 'module',\n  23 |     });"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/Volumes/Development/booked/helix/.worktrees/feature-t2-33-hx-time-picker-time-input-field/packages/hx-library/e2e/hx-time-picker-verify.spec.ts",
+                            "column": 5,
+                            "line": 20
+                          },
+                          "message": "Error: ENOENT: no such file or directory, open '/Volumes/Development/booked/helix/.worktrees/feature-t2-33-hx-time-picker-time-input-field/packages/hx-library/dist/components/hx-time-picker/index.js'\n\n  18 |     await page.goto('about:blank');\n  19 |     // Load the built component via addScriptTag\n> 20 |     await page.addScriptTag({\n     |     ^\n  21 |       path: COMPONENT_DIST,\n  22 |       type: 'module',\n  23 |     });\n    at /Volumes/Development/booked/helix/.worktrees/feature-t2-33-hx-time-picker-time-input-field/packages/hx-library/e2e/hx-time-picker-verify.spec.ts:20:5"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-03-04T10:20:01.590Z",
+                      "annotations": [],
+                      "attachments": [],
+                      "errorLocation": {
+                        "file": "/Volumes/Development/booked/helix/.worktrees/feature-t2-33-hx-time-picker-time-input-field/packages/hx-library/e2e/hx-time-picker-verify.spec.ts",
+                        "column": 5,
+                        "line": 20
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "3d028e42b5ba8c6ab9d4-f039d3d980799abc3e92",
+              "file": "hx-time-picker-verify.spec.ts",
+              "line": 89,
+              "column": 3
+            },
+            {
+              "title": "selecting a time slot sets value and dispatches hx-change",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 5,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 134,
+                      "error": {
+                        "message": "Error: ENOENT: no such file or directory, open '/Volumes/Development/booked/helix/.worktrees/feature-t2-33-hx-time-picker-time-input-field/packages/hx-library/dist/components/hx-time-picker/index.js'",
+                        "stack": "Error: ENOENT: no such file or directory, open '/Volumes/Development/booked/helix/.worktrees/feature-t2-33-hx-time-picker-time-input-field/packages/hx-library/dist/components/hx-time-picker/index.js'\n    at /Volumes/Development/booked/helix/.worktrees/feature-t2-33-hx-time-picker-time-input-field/packages/hx-library/e2e/hx-time-picker-verify.spec.ts:20:5",
+                        "location": {
+                          "file": "/Volumes/Development/booked/helix/.worktrees/feature-t2-33-hx-time-picker-time-input-field/packages/hx-library/e2e/hx-time-picker-verify.spec.ts",
+                          "column": 5,
+                          "line": 20
+                        },
+                        "snippet": "  18 |     await page.goto('about:blank');\n  19 |     // Load the built component via addScriptTag\n> 20 |     await page.addScriptTag({\n     |     ^\n  21 |       path: COMPONENT_DIST,\n  22 |       type: 'module',\n  23 |     });"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/Volumes/Development/booked/helix/.worktrees/feature-t2-33-hx-time-picker-time-input-field/packages/hx-library/e2e/hx-time-picker-verify.spec.ts",
+                            "column": 5,
+                            "line": 20
+                          },
+                          "message": "Error: ENOENT: no such file or directory, open '/Volumes/Development/booked/helix/.worktrees/feature-t2-33-hx-time-picker-time-input-field/packages/hx-library/dist/components/hx-time-picker/index.js'\n\n  18 |     await page.goto('about:blank');\n  19 |     // Load the built component via addScriptTag\n> 20 |     await page.addScriptTag({\n     |     ^\n  21 |       path: COMPONENT_DIST,\n  22 |       type: 'module',\n  23 |     });\n    at /Volumes/Development/booked/helix/.worktrees/feature-t2-33-hx-time-picker-time-input-field/packages/hx-library/e2e/hx-time-picker-verify.spec.ts:20:5"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-03-04T10:20:03.886Z",
+                      "annotations": [],
+                      "attachments": [],
+                      "errorLocation": {
+                        "file": "/Volumes/Development/booked/helix/.worktrees/feature-t2-33-hx-time-picker-time-input-field/packages/hx-library/e2e/hx-time-picker-verify.spec.ts",
+                        "column": 5,
+                        "line": 20
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "3d028e42b5ba8c6ab9d4-deeba289a8d752b38cd2",
+              "file": "hx-time-picker-verify.spec.ts",
+              "line": 112,
+              "column": 3
+            },
+            {
+              "title": "dropdown closes on Escape key",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 6,
+                      "parallelIndex": 3,
+                      "status": "failed",
+                      "duration": 125,
+                      "error": {
+                        "message": "Error: ENOENT: no such file or directory, open '/Volumes/Development/booked/helix/.worktrees/feature-t2-33-hx-time-picker-time-input-field/packages/hx-library/dist/components/hx-time-picker/index.js'",
+                        "stack": "Error: ENOENT: no such file or directory, open '/Volumes/Development/booked/helix/.worktrees/feature-t2-33-hx-time-picker-time-input-field/packages/hx-library/dist/components/hx-time-picker/index.js'\n    at /Volumes/Development/booked/helix/.worktrees/feature-t2-33-hx-time-picker-time-input-field/packages/hx-library/e2e/hx-time-picker-verify.spec.ts:20:5",
+                        "location": {
+                          "file": "/Volumes/Development/booked/helix/.worktrees/feature-t2-33-hx-time-picker-time-input-field/packages/hx-library/e2e/hx-time-picker-verify.spec.ts",
+                          "column": 5,
+                          "line": 20
+                        },
+                        "snippet": "  18 |     await page.goto('about:blank');\n  19 |     // Load the built component via addScriptTag\n> 20 |     await page.addScriptTag({\n     |     ^\n  21 |       path: COMPONENT_DIST,\n  22 |       type: 'module',\n  23 |     });"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/Volumes/Development/booked/helix/.worktrees/feature-t2-33-hx-time-picker-time-input-field/packages/hx-library/e2e/hx-time-picker-verify.spec.ts",
+                            "column": 5,
+                            "line": 20
+                          },
+                          "message": "Error: ENOENT: no such file or directory, open '/Volumes/Development/booked/helix/.worktrees/feature-t2-33-hx-time-picker-time-input-field/packages/hx-library/dist/components/hx-time-picker/index.js'\n\n  18 |     await page.goto('about:blank');\n  19 |     // Load the built component via addScriptTag\n> 20 |     await page.addScriptTag({\n     |     ^\n  21 |       path: COMPONENT_DIST,\n  22 |       type: 'module',\n  23 |     });\n    at /Volumes/Development/booked/helix/.worktrees/feature-t2-33-hx-time-picker-time-input-field/packages/hx-library/e2e/hx-time-picker-verify.spec.ts:20:5"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-03-04T10:20:03.890Z",
+                      "annotations": [],
+                      "attachments": [],
+                      "errorLocation": {
+                        "file": "/Volumes/Development/booked/helix/.worktrees/feature-t2-33-hx-time-picker-time-input-field/packages/hx-library/e2e/hx-time-picker-verify.spec.ts",
+                        "column": 5,
+                        "line": 20
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "3d028e42b5ba8c6ab9d4-df0151e11513e50ed8e8",
+              "file": "hx-time-picker-verify.spec.ts",
+              "line": 156,
+              "column": 3
+            },
+            {
+              "title": "form participation: value submitted as HH:MM",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 7,
+                      "parallelIndex": 4,
+                      "status": "failed",
+                      "duration": 133,
+                      "error": {
+                        "message": "Error: ENOENT: no such file or directory, open '/Volumes/Development/booked/helix/.worktrees/feature-t2-33-hx-time-picker-time-input-field/packages/hx-library/dist/components/hx-time-picker/index.js'",
+                        "stack": "Error: ENOENT: no such file or directory, open '/Volumes/Development/booked/helix/.worktrees/feature-t2-33-hx-time-picker-time-input-field/packages/hx-library/dist/components/hx-time-picker/index.js'\n    at /Volumes/Development/booked/helix/.worktrees/feature-t2-33-hx-time-picker-time-input-field/packages/hx-library/e2e/hx-time-picker-verify.spec.ts:20:5",
+                        "location": {
+                          "file": "/Volumes/Development/booked/helix/.worktrees/feature-t2-33-hx-time-picker-time-input-field/packages/hx-library/e2e/hx-time-picker-verify.spec.ts",
+                          "column": 5,
+                          "line": 20
+                        },
+                        "snippet": "  18 |     await page.goto('about:blank');\n  19 |     // Load the built component via addScriptTag\n> 20 |     await page.addScriptTag({\n     |     ^\n  21 |       path: COMPONENT_DIST,\n  22 |       type: 'module',\n  23 |     });"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/Volumes/Development/booked/helix/.worktrees/feature-t2-33-hx-time-picker-time-input-field/packages/hx-library/e2e/hx-time-picker-verify.spec.ts",
+                            "column": 5,
+                            "line": 20
+                          },
+                          "message": "Error: ENOENT: no such file or directory, open '/Volumes/Development/booked/helix/.worktrees/feature-t2-33-hx-time-picker-time-input-field/packages/hx-library/dist/components/hx-time-picker/index.js'\n\n  18 |     await page.goto('about:blank');\n  19 |     // Load the built component via addScriptTag\n> 20 |     await page.addScriptTag({\n     |     ^\n  21 |       path: COMPONENT_DIST,\n  22 |       type: 'module',\n  23 |     });\n    at /Volumes/Development/booked/helix/.worktrees/feature-t2-33-hx-time-picker-time-input-field/packages/hx-library/e2e/hx-time-picker-verify.spec.ts:20:5"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-03-04T10:20:03.950Z",
+                      "annotations": [],
+                      "attachments": [],
+                      "errorLocation": {
+                        "file": "/Volumes/Development/booked/helix/.worktrees/feature-t2-33-hx-time-picker-time-input-field/packages/hx-library/e2e/hx-time-picker-verify.spec.ts",
+                        "column": 5,
+                        "line": 20
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "3d028e42b5ba8c6ab9d4-9548c460cd0ecc6e59f3",
+              "file": "hx-time-picker-verify.spec.ts",
+              "line": 185,
+              "column": 3
+            }
+          ]
+        }
+      ]
     }
   ],
+  "errors": [],
   "stats": {
-    "startTime": "2026-03-03T20:48:25.972Z",
-    "duration": 3.940999999999974,
+    "startTime": "2026-03-04T10:20:00.268Z",
+    "duration": 4396.641,
     "expected": 0,
     "skipped": 0,
-    "unexpected": 0,
+    "unexpected": 8,
     "flaky": 0
   }
 }

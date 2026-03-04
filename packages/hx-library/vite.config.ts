@@ -33,6 +33,10 @@ export default defineConfig({
         'components/hx-slider/index': resolve(__dirname, 'src/components/hx-slider/index.ts'),
         'components/hx-form/index': resolve(__dirname, 'src/components/hx-form/index.ts'),
         'components/hx-prose/index': resolve(__dirname, 'src/components/hx-prose/index.ts'),
+        'components/hx-time-picker/index': resolve(
+          __dirname,
+          'src/components/hx-time-picker/index.ts',
+        ),
       },
       formats: ['es'],
     },
