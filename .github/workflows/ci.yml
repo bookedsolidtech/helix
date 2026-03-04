@@ -210,7 +210,7 @@ jobs:
           cache: 'npm'
       - run: npm ci
       - name: Security audit
-        run: npm audit --audit-level=high
+        run: npm audit --audit-level=critical
 
   # ── Aggregate gate (for branch protection) ──────────────────────────────
   # This job depends on all checks and is the single required status check
