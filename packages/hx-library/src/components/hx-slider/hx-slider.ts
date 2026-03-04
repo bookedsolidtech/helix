@@ -321,10 +321,7 @@ export class HelixSlider extends LitElement {
       <div part="slider" class=${classMap(containerClasses)}>
         <!-- Label row -->
         <div class="slider__label-row">
-          <slot
-            name="label"
-            @slotchange=${this._handleLabelSlotChange}
-          >
+          <slot name="label" @slotchange=${this._handleLabelSlotChange}>
             ${this.label
               ? html`<label
                   part="label"
@@ -338,20 +335,14 @@ export class HelixSlider extends LitElement {
           </slot>
 
           ${this.showValue
-            ? html`<span part="value-display" class="slider__value-display">
-                ${this.value}
-              </span>`
+            ? html`<span part="value-display" class="slider__value-display"> ${this.value} </span>`
             : nothing}
         </div>
 
         <!-- Track -->
         <div class="slider__track-container">
           <div part="track" class="slider__track">
-            <div
-              part="fill"
-              class="slider__fill"
-              style=${styleMap({ width: `${fillPct}%` })}
-            ></div>
+            <div part="fill" class="slider__fill" style=${styleMap({ width: `${fillPct}%` })}></div>
 
             <input
               class="slider__input"
@@ -367,7 +358,7 @@ export class HelixSlider extends LitElement {
               aria-valuemin=${this.min}
               aria-valuemax=${this.max}
               aria-valuenow=${this.value}
-              aria-label=${ifDefined(!hasLabel ? (this.label || undefined) : undefined)}
+              aria-label=${ifDefined(!hasLabel ? this.label || undefined : undefined)}
               aria-labelledby=${ifDefined(hasLabel ? this._labelId : undefined)}
               aria-describedby=${ifDefined(describedBy)}
               @input=${this._handleInput}
@@ -388,11 +379,12 @@ export class HelixSlider extends LitElement {
         ${this.showTicks && ticks.length > 0
           ? html`<div class="slider__ticks">
               ${ticks.map(
-                (pct) => html`<span
-                  part="tick"
-                  class="slider__tick"
-                  style=${styleMap({ left: `${pct}%` })}
-                ></span>`,
+                (pct) =>
+                  html`<span
+                    part="tick"
+                    class="slider__tick"
+                    style=${styleMap({ left: `${pct}%` })}
+                  ></span>`,
               )}
             </div>`
           : nothing}
@@ -400,27 +392,13 @@ export class HelixSlider extends LitElement {
         <!-- Range labels -->
         ${showRangeLabels
           ? html`<div class="slider__range-labels">
-              <slot
-                name="min-label"
-                @slotchange=${this._handleMinLabelSlotChange}
-              ></slot>
-              <slot
-                name="max-label"
-                @slotchange=${this._handleMaxLabelSlotChange}
-              ></slot>
+              <slot name="min-label" @slotchange=${this._handleMinLabelSlotChange}></slot>
+              <slot name="max-label" @slotchange=${this._handleMaxLabelSlotChange}></slot>
             </div>`
           : html`
               <!-- Always observe slot changes even when not rendered -->
-              <slot
-                name="min-label"
-                hidden
-                @slotchange=${this._handleMinLabelSlotChange}
-              ></slot>
-              <slot
-                name="max-label"
-                hidden
-                @slotchange=${this._handleMaxLabelSlotChange}
-              ></slot>
+              <slot name="min-label" hidden @slotchange=${this._handleMinLabelSlotChange}></slot>
+              <slot name="max-label" hidden @slotchange=${this._handleMaxLabelSlotChange}></slot>
             `}
 
         <!-- Help text -->
