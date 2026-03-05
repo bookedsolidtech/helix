@@ -1,7 +1,10 @@
 import { defineConfig } from 'vite';
 import { resolve } from 'path';
 import { readdirSync, existsSync } from 'fs';
+import { fileURLToPath } from 'url';
 import dts from 'vite-plugin-dts';
+
+const __dirname = fileURLToPath(new URL('.', import.meta.url));
 
 // Auto-discover component entry points from src/components/hx-*/index.ts
 // Eliminates merge conflicts when multiple component PRs modify this file.
