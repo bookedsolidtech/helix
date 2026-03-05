@@ -72,6 +72,7 @@ export class HelixSelect extends LitElement {
   // ─── Stable IDs ───
 
   private _selectId = `hx-select-${Math.random().toString(36).slice(2, 9)}`;
+  private _instanceId = this._selectId;
   private _listboxId = `${this._selectId}-listbox`;
   private _helpTextId = `${this._selectId}-help`;
   private _errorId = `${this._selectId}-error`;
@@ -159,6 +160,7 @@ export class HelixSelect extends LitElement {
 
   @state() private _options: SelectOption[] = [];
   @state() private _hasErrorSlot = false;
+  @state() private _focusedOptionIndex = -1;
 
   // ─── Queries ───
 
@@ -327,7 +329,96 @@ export class HelixSelect extends LitElement {
   // ─── Dropdown Control ───
 
   private _toggleDropdown(): void {
-    if (!this.disabled) this.open = !this.open;
+    if (!this.disabled) {
+      this.open = !this.open;
+      if (this.open) {
+        // Pre-focus the currently selected option (or first enabled) when opening
+        const selectedIndex = this._options.findIndex((o) => o.value === this.value);
+        this._focusedOptionIndex = selectedIndex >= 0 ? selectedIndex : 0;
+      } else {
+        this._focusedOptionIndex = -1;
+      }
+    }
+  }
+
+  // ─── Keyboard Navigation ───
+
+  private _handleKeydown(e: KeyboardEvent): void {
+    if (this.disabled) return;
+
+    const enabledIndices = this._options
+      .map((o, i) => ({ o, i }))
+      .filter(({ o }) => !o.disabled)
+      .map(({ i }) => i);
+
+    switch (e.key) {
+      case 'ArrowDown': {
+        e.preventDefault();
+        if (!this.open) {
+          this.open = true;
+          this._focusedOptionIndex = enabledIndices.length > 0 ? (enabledIndices[0] ?? 0) : 0;
+          break;
+        }
+        const nextDown = enabledIndices.find((i) => i > this._focusedOptionIndex);
+        this._focusedOptionIndex =
+          nextDown !== undefined ? nextDown : (enabledIndices[0] ?? this._focusedOptionIndex);
+        break;
+      }
+      case 'ArrowUp': {
+        e.preventDefault();
+        if (!this.open) {
+          this.open = true;
+          const lastEnabled = enabledIndices[enabledIndices.length - 1];
+          this._focusedOptionIndex = lastEnabled !== undefined ? lastEnabled : 0;
+          break;
+        }
+        const prevUp = [...enabledIndices].reverse().find((i) => i < this._focusedOptionIndex);
+        const lastEnabledUp = enabledIndices[enabledIndices.length - 1];
+        this._focusedOptionIndex =
+          prevUp !== undefined ? prevUp : (lastEnabledUp ?? this._focusedOptionIndex);
+        break;
+      }
+      case 'Home': {
+        e.preventDefault();
+        if (!this.open) {
+          this.open = true;
+        }
+        this._focusedOptionIndex = enabledIndices.length > 0 ? (enabledIndices[0] ?? 0) : 0;
+        break;
+      }
+      case 'End': {
+        e.preventDefault();
+        if (!this.open) {
+          this.open = true;
+        }
+        const lastEnabled = enabledIndices[enabledIndices.length - 1];
+        this._focusedOptionIndex = lastEnabled !== undefined ? lastEnabled : 0;
+        break;
+      }
+      case 'Enter':
+      case ' ': {
+        e.preventDefault();
+        if (!this.open) {
+          this.open = true;
+          const selIdx = this._options.findIndex((o) => o.value === this.value);
+          this._focusedOptionIndex = selIdx >= 0 ? selIdx : (enabledIndices[0] ?? 0);
+          break;
+        }
+        if (this._focusedOptionIndex >= 0 && this._focusedOptionIndex < this._options.length) {
+          const opt = this._options[this._focusedOptionIndex];
+          if (opt) this._selectOption(opt);
+        }
+        break;
+      }
+      case 'Escape': {
+        e.preventDefault();
+        this.open = false;
+        this._focusedOptionIndex = -1;
+        break;
+      }
+      default:
+        break;
+    }
   }
 
   // ─── Selection ───
@@ -337,6 +428,7 @@ export class HelixSelect extends LitElement {
     this.value = option.value; // triggers updated() → sync + formValue + validity
     this._dispatchChange();
     this.open = false;
+    this._focusedOptionIndex = -1;
   }
 
   // ─── Event Dispatchers ───
@@ -366,28 +458,35 @@ export class HelixSelect extends LitElement {
 
   // ─── Public Methods ───
 
-  /** Moves focus to the native select (for backward compatibility). */
+  /** Moves focus to the visible trigger button. */
   override focus(options?: FocusOptions): void {
-    this._select?.focus(options);
+    this._trigger?.focus(options);
   }
 
   // ─── Render Helpers ───
+
+  private _optionId(index: number): string {
+    return `hx-select-option-${this._instanceId}-${index}`;
+  }
 
   private _renderOptions() {
     if (this._options.length === 0) {
       return html`<div class="field__no-options">No options found</div>`;
     }
 
-    return this._options.map((opt) => {
+    return this._options.map((opt, index) => {
       const isSelected = opt.value === this.value;
+      const isFocused = index === this._focusedOptionIndex;
 
       return html`
         <div
+          id=${this._optionId(index)}
           part="option"
           role="option"
           class=${classMap({
             field__option: true,
             'field__option--selected': isSelected,
+            'field__option--focused': isFocused,
             'field__option--disabled': opt.disabled,
           })}
           aria-selected=${isSelected ? 'true' : 'false'}
@@ -458,11 +557,15 @@ export class HelixSelect extends LitElement {
             aria-expanded=${this.open ? 'true' : 'false'}
             aria-haspopup="listbox"
             aria-controls=${this._listboxId}
+            aria-activedescendant=${this.open && this._focusedOptionIndex >= 0
+              ? this._optionId(this._focusedOptionIndex)
+              : nothing}
             aria-invalid=${hasError ? 'true' : nothing}
             aria-describedby=${ifDefined(describedBy)}
             aria-required=${this.required ? 'true' : nothing}
             ?disabled=${this.disabled}
             @click=${this._toggleDropdown}
+            @keydown=${this._handleKeydown}
           >
             <span class="field__trigger-value"
               >${this._displayValue || this.placeholder || nothing}</span
@@ -540,4 +643,6 @@ declare global {
   }
 }
 
+export type { HelixSelect as HxSelect };
+/** @deprecated Use HxSelect instead */
 export type { HelixSelect as WcSelect };
