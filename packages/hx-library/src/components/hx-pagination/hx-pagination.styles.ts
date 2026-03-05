@@ -48,14 +48,8 @@ export const helixPaginationStyles = css`
   }
 
   .button:hover:not(:disabled) {
-    background: var(
-      --hx-pagination-hover-bg,
-      var(--hx-color-surface-hover, #f3f4f6)
-    );
-    border-color: var(
-      --hx-pagination-hover-border-color,
-      var(--hx-color-primary, #2563eb)
-    );
+    background: var(--hx-pagination-hover-bg, var(--hx-color-surface-hover, #f3f4f6));
+    border-color: var(--hx-pagination-hover-border-color, var(--hx-color-primary, #2563eb));
   }
 
   .button:focus-visible {
