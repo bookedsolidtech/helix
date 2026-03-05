@@ -1,4 +1,4 @@
-import { LitElement, html, svg } from 'lit';
+import { LitElement, html, svg, nothing } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { tokenStyles } from '@helix/tokens/lit';
@@ -149,7 +149,7 @@ export class HelixAccordionItem extends LitElement {
               part="content"
               class="content"
               role="region"
-              aria-hidden=${!this.expanded ? 'true' : 'false'}
+              aria-hidden=${this.expanded ? nothing : 'true'}
             >
               <slot></slot>
             </div>
