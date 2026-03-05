@@ -1,5 +1,5 @@
 import { LitElement, html, nothing } from 'lit';
-import { customElement, property } from 'lit/decorators.js';
+import { customElement, property, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { tokenStyles } from '@helix/tokens/lit';
 import { helixFieldStyles } from './hx-field.styles.js';
@@ -86,31 +86,28 @@ export class HelixField extends LitElement {
    * Size variant controlling label and help text font sizes.
    * @attr hx-size
    */
-  @property({ type: String, attribute: 'hx-size' })
+  @property({ type: String, attribute: 'hx-size', reflect: true })
   hxSize: 'sm' | 'md' | 'lg' = 'md';
 
   // ─── Slot Tracking ───
 
-  private _hasLabelSlot = false;
-  private _hasErrorSlot = false;
-  private _hasHelpSlot = false;
+  @state() private _hasLabelSlot = false;
+  @state() private _hasErrorSlot = false;
+  @state() private _hasHelpSlot = false;
 
   private _handleLabelSlotChange(e: Event): void {
     const slot = e.target as HTMLSlotElement;
     this._hasLabelSlot = slot.assignedElements().length > 0;
-    this.requestUpdate();
   }
 
   private _handleErrorSlotChange(e: Event): void {
     const slot = e.target as HTMLSlotElement;
     this._hasErrorSlot = slot.assignedElements().length > 0;
-    this.requestUpdate();
   }
 
   private _handleHelpSlotChange(e: Event): void {
     const slot = e.target as HTMLSlotElement;
     this._hasHelpSlot = slot.assignedElements().length > 0;
-    this.requestUpdate();
   }
 
   // ─── Unique IDs for Accessibility ───
@@ -206,6 +203,9 @@ export class HelixField extends LitElement {
   private _syncSlottedControl(): void {
     const control = this._slottedControl;
     if (!control) return;
+
+    // hx-* elements manage their own ARIA attributes; skip bridging for them
+    if (control.tagName.startsWith('HX-')) return;
 
     const hasError = !!this.error || this._hasErrorSlot;
     const hasDesc = !!(this.error || this.helpText || this._hasErrorSlot || this._hasHelpSlot);
