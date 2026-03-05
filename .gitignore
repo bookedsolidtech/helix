@@ -45,8 +45,8 @@ npm-debug.log*
 scripts/coverage/
 
 # Playwright test artifacts
-packages/hx-library/test-results/
 test-results/
+packages/hx-library/test-results/
 
 # Generated integration test bundles (esbuild output)
 testing/static-html/helix-bundle.js
