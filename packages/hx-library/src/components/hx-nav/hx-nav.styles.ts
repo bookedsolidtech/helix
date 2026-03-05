@@ -32,7 +32,7 @@ export const helixNavStyles = css`
     border-radius: var(--hx-nav-border-radius, var(--hx-border-radius-sm, 0.25rem));
     color: var(--hx-nav-color, var(--hx-color-neutral-100, #f3f4f6));
     cursor: pointer;
-    transition: background-color 150ms ease;
+    transition: background-color var(--hx-transition-fast, 150ms) ease;
     line-height: 0;
   }
 
@@ -83,8 +83,8 @@ export const helixNavStyles = css`
     line-height: var(--hx-line-height-normal, 1.5);
     white-space: nowrap;
     transition:
-      background-color 150ms ease,
-      color 150ms ease;
+      background-color var(--hx-transition-fast, 150ms) ease,
+      color var(--hx-transition-fast, 150ms) ease;
   }
 
   .nav__link:hover {
@@ -105,7 +105,7 @@ export const helixNavStyles = css`
   /* ─── Chevron Icon ─── */
 
   .nav__chevron {
-    transition: transform 200ms ease;
+    transition: transform var(--hx-transition-normal, 200ms) ease;
     flex-shrink: 0;
   }
 
@@ -175,7 +175,7 @@ export const helixNavStyles = css`
 
   :host([orientation='vertical']) .nav__submenu .nav__link {
     padding: var(--hx-space-1-5, 0.375rem) var(--hx-space-3, 0.75rem);
-    font-size: var(--hx-font-size-xs, 0.8125rem);
+    font-size: var(--hx-font-size-xs, 0.75rem);
     color: var(--hx-nav-link-color, var(--hx-color-neutral-300, #d1d5db));
   }
 
