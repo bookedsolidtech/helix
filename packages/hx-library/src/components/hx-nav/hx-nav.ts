@@ -95,8 +95,8 @@ export class HelixNav extends LitElement {
   }
 
   private _handleItemClick(item: NavItem, index: number, e: Event): void {
+    e.preventDefault();
     if (item.children?.length) {
-      e.preventDefault();
       this._expandedIndex = this._expandedIndex === index ? null : index;
     } else {
       this._mobileOpen = false;
