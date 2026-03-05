@@ -31,7 +31,15 @@ export class HelixBreadcrumbItem extends LitElement {
 
   override connectedCallback(): void {
     super.connectedCallback();
-    this.setAttribute('role', 'listitem');
+    // Only apply role="listitem" when this item is a direct child of an
+    // hx-breadcrumb element. Setting the role unconditionally when used
+    // standalone (outside a list context) creates an invalid ARIA hierarchy
+    // because listitem requires a list ancestor.
+    if (this.closest('hx-breadcrumb') !== null) {
+      this.setAttribute('role', 'listitem');
+    } else {
+      this.removeAttribute('role');
+    }
   }
 
   /**
