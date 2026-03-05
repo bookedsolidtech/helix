@@ -98,4 +98,27 @@ export const helixAccordionItemStyles = css`
     line-height: var(--hx-line-height-normal, 1.5);
     color: var(--hx-accordion-content-color, var(--hx-color-neutral-600, #495057));
   }
+
+  /* ─── Disabled host ─── */
+
+  :host([disabled]) {
+    pointer-events: none;
+    opacity: 0.5;
+  }
+
+  /* ─── Reduced motion ─── */
+
+  @media (prefers-reduced-motion: reduce) {
+    .trigger {
+      transition: none;
+    }
+
+    .icon {
+      transition: none;
+    }
+
+    .content-wrapper {
+      transition: none;
+    }
+  }
 `;
