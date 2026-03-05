@@ -142,6 +142,7 @@ export class HelixBreadcrumb extends LitElement {
 
     // Insert ellipsis after first item only if not already correctly placed
     const firstItem = items[0];
+    if (!firstItem) return;
     if (this._ellipsisItem.previousElementSibling !== firstItem) {
       firstItem.after(this._ellipsisItem);
     }
