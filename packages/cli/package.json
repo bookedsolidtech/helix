@@ -1,0 +1,25 @@
+{
+  "name": "@helix/cli",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Helix CLI — migration tooling and developer utilities",
+  "type": "module",
+  "bin": {
+    "helix": "./dist/index.js"
+  },
+  "main": "./dist/index.js",
+  "types": "./src/index.ts",
+  "scripts": {
+    "build": "tsc",
+    "type-check": "tsc --noEmit",
+    "lint": "eslint src/",
+    "clean": "rm -rf dist"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "typescript": "^5.7.2"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}
