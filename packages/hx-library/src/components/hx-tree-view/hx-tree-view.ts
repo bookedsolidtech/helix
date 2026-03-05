@@ -1,11 +1,11 @@
-import { LitElement, html, nothing } from 'lit';
+import { LitElement, html } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { tokenStyles } from '@helix/tokens/lit';
 import { helixTreeViewStyles } from './hx-tree-view.styles.js';
 import type { HelixTreeItem } from './hx-tree-item.js';
 
 /** Selection mode for the tree. */
-export type TreeSelection = 'none' | 'single' | 'multiple';
+type TreeSelection = 'none' | 'single' | 'multiple';
 
 /**
  * A hierarchical tree component for navigating nested data structures.
@@ -37,30 +37,7 @@ export class HelixTreeView extends LitElement {
   @property({ type: String, reflect: true })
   selection: TreeSelection = 'none';
 
-  // ─── Lifecycle ───
-
-  override connectedCallback(): void {
-    super.connectedCallback();
-    this.updateComplete.then(() => this._computeItemDepths(this, 0));
-  }
-
   // ─── Internal Helpers ───
-
-  private _computeItemDepths(container: Element, depth: number): void {
-    for (const child of Array.from(container.children)) {
-      if (child.tagName.toLowerCase() === 'hx-tree-item') {
-        const item = child as HelixTreeItem;
-        item.indent = depth;
-        this._computeItemDepths(item, depth + 1);
-      } else {
-        this._computeItemDepths(child, depth);
-      }
-    }
-  }
-
-  private _handleSlotChange(): void {
-    this._computeItemDepths(this, 0);
-  }
 
   /**
    * Returns a flat ordered list of all visible (not inside a collapsed item) hx-tree-items
@@ -182,16 +159,12 @@ export class HelixTreeView extends LitElement {
       <div
         class="tree"
         role="tree"
-        aria-multiselectable=${this.selection === 'none'
-          ? nothing
-          : this.selection === 'multiple'
-            ? 'true'
-            : 'false'}
+        aria-multiselectable=${this.selection === 'multiple' ? 'true' : 'false'}
         @hx-tree-item-select=${this._handleTreeItemSelect}
         @keydown=${this._handleKeyDown}
         @focusin=${this._handleFocusIn}
       >
-        <slot @slotchange=${this._handleSlotChange}></slot>
+        <slot></slot>
       </div>
     `;
   }
