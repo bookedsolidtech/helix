@@ -20,4 +20,14 @@ export const helixBreadcrumbStyles = css`
     padding: 0;
     gap: 0;
   }
+
+  /* Hide middle items when collapsed via maxItems */
+  ::slotted([data-bc-hidden]) {
+    display: none;
+  }
+
+  /* Visually hide the separator slot — used only to read text content */
+  .separator-slot {
+    display: none;
+  }
 `;
