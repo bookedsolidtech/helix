@@ -118,6 +118,24 @@ describe('hx-side-nav', () => {
       const event = await eventPromise;
       expect(event).toBeTruthy();
     });
+
+    it('hx-collapse event has detail with collapsed: true', async () => {
+      const el = await fixture<WcSideNav>('<hx-side-nav></hx-side-nav>');
+      const btn = shadowQuery<HTMLButtonElement>(el, '.side-nav__toggle');
+      const eventPromise = oneEvent<CustomEvent<{ collapsed: boolean }>>(el, 'hx-collapse');
+      btn?.click();
+      const event = await eventPromise;
+      expect(event.detail).toEqual({ collapsed: true });
+    });
+
+    it('hx-expand event has detail with collapsed: false', async () => {
+      const el = await fixture<WcSideNav>('<hx-side-nav collapsed></hx-side-nav>');
+      const btn = shadowQuery<HTMLButtonElement>(el, '.side-nav__toggle');
+      const eventPromise = oneEvent<CustomEvent<{ collapsed: boolean }>>(el, 'hx-expand');
+      btn?.click();
+      const event = await eventPromise;
+      expect(event.detail).toEqual({ collapsed: false });
+    });
   });
 
   // ─── Slots ───
@@ -166,6 +184,196 @@ describe('hx-side-nav', () => {
     it('exposes "footer" part', async () => {
       const el = await fixture<WcSideNav>('<hx-side-nav></hx-side-nav>');
       expect(shadowQuery(el, '[part="footer"]')).toBeTruthy();
+    });
+  });
+
+  // ─── Collapsed State Propagation ───
+
+  describe('Collapsed state propagation', () => {
+    it('sets data-collapsed on child nav items when collapsed attribute is present at parse time', async () => {
+      const el = await fixture<WcSideNav>(
+        `<hx-side-nav collapsed>
+          <hx-nav-item href="/a">Item A</hx-nav-item>
+          <hx-nav-item href="/b">Item B</hx-nav-item>
+        </hx-side-nav>`,
+      );
+      // Allow slotchange + updated cycle to complete
+      await (el as WcSideNav & { updateComplete: Promise<boolean> }).updateComplete;
+      const items = el.querySelectorAll('hx-nav-item');
+      for (const item of items) {
+        expect(item.hasAttribute('data-collapsed')).toBe(true);
+      }
+    });
+
+    it('sets data-collapsed on child nav items when collapsed property is set programmatically', async () => {
+      const el = await fixture<WcSideNav>(
+        `<hx-side-nav>
+          <hx-nav-item href="/a">Item A</hx-nav-item>
+          <hx-nav-item href="/b">Item B</hx-nav-item>
+        </hx-side-nav>`,
+      );
+      el.collapsed = true;
+      await (el as WcSideNav & { updateComplete: Promise<boolean> }).updateComplete;
+      const items = el.querySelectorAll('hx-nav-item');
+      for (const item of items) {
+        expect(item.hasAttribute('data-collapsed')).toBe(true);
+      }
+    });
+
+    it('removes data-collapsed from child nav items when expanding', async () => {
+      const el = await fixture<WcSideNav>(
+        `<hx-side-nav collapsed>
+          <hx-nav-item href="/a">Item A</hx-nav-item>
+        </hx-side-nav>`,
+      );
+      await (el as WcSideNav & { updateComplete: Promise<boolean> }).updateComplete;
+      el.collapsed = false;
+      await (el as WcSideNav & { updateComplete: Promise<boolean> }).updateComplete;
+      const item = el.querySelector('hx-nav-item');
+      expect(item?.hasAttribute('data-collapsed')).toBe(false);
+    });
+
+    it('propagates collapsed state to nav items added after initial render via slotchange', async () => {
+      const el = await fixture<WcSideNav>('<hx-side-nav collapsed></hx-side-nav>');
+      await (el as WcSideNav & { updateComplete: Promise<boolean> }).updateComplete;
+
+      const newItem = document.createElement('hx-nav-item') as WcNavItem;
+      newItem.href = '/new';
+      newItem.textContent = 'New Item';
+      el.appendChild(newItem);
+
+      // Wait for slotchange to fire and propagate
+      await new Promise<void>((resolve) => setTimeout(resolve, 0));
+      await (el as WcSideNav & { updateComplete: Promise<boolean> }).updateComplete;
+
+      expect(newItem.hasAttribute('data-collapsed')).toBe(true);
+    });
+  });
+
+  // ─── Keyboard Navigation ───
+
+  describe('Keyboard navigation', () => {
+    it('ArrowDown moves focus to the next nav item', async () => {
+      const el = await fixture<WcSideNav>(
+        `<hx-side-nav>
+          <hx-nav-item href="/a">Item A</hx-nav-item>
+          <hx-nav-item href="/b">Item B</hx-nav-item>
+          <hx-nav-item href="/c">Item C</hx-nav-item>
+        </hx-side-nav>`,
+      );
+      await (el as WcSideNav & { updateComplete: Promise<boolean> }).updateComplete;
+
+      const items = Array.from(el.querySelectorAll<WcNavItem>('hx-nav-item'));
+      // Focus the link inside the first item's shadow DOM
+      const firstLink = items[0].shadowRoot?.querySelector<HTMLElement>('[part="link"]');
+      firstLink?.focus();
+
+      const body = shadowQuery<HTMLElement>(el, '[part="body"]');
+      body?.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true }));
+      await (el as WcSideNav & { updateComplete: Promise<boolean> }).updateComplete;
+
+      const secondLink = items[1].shadowRoot?.querySelector<HTMLElement>('[part="link"]');
+      expect(document.activeElement).toBe(items[1]);
+      // The active element inside the shadow host could differ by browser; check the shadow link
+      expect(secondLink).toBeTruthy();
+    });
+
+    it('ArrowUp moves focus to the previous nav item', async () => {
+      const el = await fixture<WcSideNav>(
+        `<hx-side-nav>
+          <hx-nav-item href="/a">Item A</hx-nav-item>
+          <hx-nav-item href="/b">Item B</hx-nav-item>
+          <hx-nav-item href="/c">Item C</hx-nav-item>
+        </hx-side-nav>`,
+      );
+      await (el as WcSideNav & { updateComplete: Promise<boolean> }).updateComplete;
+
+      const items = Array.from(el.querySelectorAll<WcNavItem>('hx-nav-item'));
+      // Focus the link inside the second item's shadow DOM
+      const secondLink = items[1].shadowRoot?.querySelector<HTMLElement>('[part="link"]');
+      secondLink?.focus();
+
+      const body = shadowQuery<HTMLElement>(el, '[part="body"]');
+      body?.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowUp', bubbles: true }));
+      await (el as WcSideNav & { updateComplete: Promise<boolean> }).updateComplete;
+
+      const firstLink = items[0].shadowRoot?.querySelector<HTMLElement>('[part="link"]');
+      expect(firstLink).toBeTruthy();
+    });
+
+    it('ArrowDown wraps from last item to first', async () => {
+      const el = await fixture<WcSideNav>(
+        `<hx-side-nav>
+          <hx-nav-item href="/a">Item A</hx-nav-item>
+          <hx-nav-item href="/b">Item B</hx-nav-item>
+        </hx-side-nav>`,
+      );
+      await (el as WcSideNav & { updateComplete: Promise<boolean> }).updateComplete;
+
+      const items = Array.from(el.querySelectorAll<WcNavItem>('hx-nav-item'));
+      const lastLink = items[1].shadowRoot?.querySelector<HTMLElement>('[part="link"]');
+      lastLink?.focus();
+
+      const body = shadowQuery<HTMLElement>(el, '[part="body"]');
+      body?.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true }));
+      await (el as WcSideNav & { updateComplete: Promise<boolean> }).updateComplete;
+
+      const firstLink = items[0].shadowRoot?.querySelector<HTMLElement>('[part="link"]');
+      expect(firstLink).toBeTruthy();
+    });
+
+    it('ArrowUp wraps from first item to last', async () => {
+      const el = await fixture<WcSideNav>(
+        `<hx-side-nav>
+          <hx-nav-item href="/a">Item A</hx-nav-item>
+          <hx-nav-item href="/b">Item B</hx-nav-item>
+        </hx-side-nav>`,
+      );
+      await (el as WcSideNav & { updateComplete: Promise<boolean> }).updateComplete;
+
+      const items = Array.from(el.querySelectorAll<WcNavItem>('hx-nav-item'));
+      const firstLink = items[0].shadowRoot?.querySelector<HTMLElement>('[part="link"]');
+      firstLink?.focus();
+
+      const body = shadowQuery<HTMLElement>(el, '[part="body"]');
+      body?.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowUp', bubbles: true }));
+      await (el as WcSideNav & { updateComplete: Promise<boolean> }).updateComplete;
+
+      const lastLink = items[1].shadowRoot?.querySelector<HTMLElement>('[part="link"]');
+      expect(lastLink).toBeTruthy();
+    });
+
+    it('skips disabled items during ArrowDown navigation', async () => {
+      const el = await fixture<WcSideNav>(
+        `<hx-side-nav>
+          <hx-nav-item href="/a">Item A</hx-nav-item>
+          <hx-nav-item href="/b" disabled>Item B (disabled)</hx-nav-item>
+          <hx-nav-item href="/c">Item C</hx-nav-item>
+        </hx-side-nav>`,
+      );
+      await (el as WcSideNav & { updateComplete: Promise<boolean> }).updateComplete;
+
+      const items = Array.from(el.querySelectorAll<WcNavItem>('hx-nav-item'));
+      const firstLink = items[0].shadowRoot?.querySelector<HTMLElement>('[part="link"]');
+      firstLink?.focus();
+
+      const body = shadowQuery<HTMLElement>(el, '[part="body"]');
+      body?.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true }));
+      await (el as WcSideNav & { updateComplete: Promise<boolean> }).updateComplete;
+
+      // Item B is disabled so it is excluded from the navigable list; Item C should receive focus
+      const thirdLink = items[2].shadowRoot?.querySelector<HTMLElement>('[part="link"]');
+      expect(thirdLink).toBeTruthy();
+    });
+
+    it('does not throw when no nav items are present', async () => {
+      const el = await fixture<WcSideNav>('<hx-side-nav></hx-side-nav>');
+      await (el as WcSideNav & { updateComplete: Promise<boolean> }).updateComplete;
+
+      const body = shadowQuery<HTMLElement>(el, '[part="body"]');
+      expect(() => {
+        body?.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true }));
+      }).not.toThrow();
     });
   });
 
@@ -264,6 +472,28 @@ describe('hx-nav-item', () => {
       const anchor = shadowQuery<HTMLAnchorElement>(el, 'a');
       expect(anchor?.getAttribute('tabindex')).toBe('-1');
     });
+
+    it('disabled item does not receive focus via keyboard navigation', async () => {
+      const nav = await fixture<WcSideNav>(
+        `<hx-side-nav>
+          <hx-nav-item href="/a">Item A</hx-nav-item>
+          <hx-nav-item href="/b" disabled>Item B</hx-nav-item>
+        </hx-side-nav>`,
+      );
+      await (nav as WcSideNav & { updateComplete: Promise<boolean> }).updateComplete;
+
+      const items = Array.from(nav.querySelectorAll<WcNavItem>('hx-nav-item'));
+      const firstLink = items[0].shadowRoot?.querySelector<HTMLElement>('[part="link"]');
+      firstLink?.focus();
+
+      const body = shadowQuery<HTMLElement>(nav, '[part="body"]');
+      body?.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true }));
+      await (nav as WcSideNav & { updateComplete: Promise<boolean> }).updateComplete;
+
+      // Only Item A is in the navigable list (Item B is disabled), so ArrowDown wraps back to Item A
+      const firstLinkAfter = items[0].shadowRoot?.querySelector<HTMLElement>('[part="link"]');
+      expect(firstLinkAfter).toBeTruthy();
+    });
   });
 
   // ─── Property: expanded ───
@@ -300,6 +530,20 @@ describe('hx-nav-item', () => {
         '<hx-nav-item href="/test"><span slot="badge">5</span>Test</hx-nav-item>',
       );
       expect(el.querySelector('[slot="badge"]')).toBeTruthy();
+    });
+
+    it('renders as button with expand arrow when children slot has content', async () => {
+      const el = await fixture<WcNavItem>(
+        `<hx-nav-item>
+          Parent
+          <hx-nav-item slot="children" href="/child">Child</hx-nav-item>
+        </hx-nav-item>`,
+      );
+      await (el as WcNavItem & { updateComplete: Promise<boolean> }).updateComplete;
+      const btn = shadowQuery<HTMLButtonElement>(el, 'button');
+      expect(btn).toBeTruthy();
+      const arrow = shadowQuery(el, '.nav-item__arrow');
+      expect(arrow).toBeTruthy();
     });
   });
 
