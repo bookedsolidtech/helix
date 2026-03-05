@@ -6,27 +6,12 @@ import { registerCemTools } from './tools.js';
 describe('MCP Server Lifecycle - CEM Analyzer', () => {
   describe('Server Creation', () => {
     it('creates server with correct metadata', () => {
-      const server = new Server(
-        { name: '@helix/mcp-cem-analyzer', version: '0.1.0' },
-        { capabilities: { tools: {} } },
-      );
-      expect(server).toBeDefined();
-    });
-
-    it('server has correct name', () => {
-      const server = new Server(
-        { name: '@helix/mcp-cem-analyzer', version: '0.1.0' },
-        { capabilities: { tools: {} } },
-      );
-      expect(server).toBeDefined();
-    });
-
-    it('server has correct version', () => {
-      const server = new Server(
-        { name: '@helix/mcp-cem-analyzer', version: '0.1.0' },
-        { capabilities: { tools: {} } },
-      );
-      expect(server).toBeDefined();
+      expect(() => {
+        new Server(
+          { name: '@helix/mcp-cem-analyzer', version: '0.1.0' },
+          { capabilities: { tools: {} } },
+        );
+      }).not.toThrow();
     });
   });
 
@@ -36,7 +21,7 @@ describe('MCP Server Lifecycle - CEM Analyzer', () => {
         { name: '@helix/mcp-cem-analyzer', version: '0.1.0' },
         { capabilities: { tools: {} } },
       );
-      expect(server).toBeDefined();
+      expect(server).toBeInstanceOf(Server);
     });
 
     it('tools are registered successfully', () => {
@@ -50,8 +35,7 @@ describe('MCP Server Lifecycle - CEM Analyzer', () => {
 
   describe('Transport', () => {
     it('can create stdio transport', () => {
-      const transport = new StdioServerTransport();
-      expect(transport).toBeDefined();
+      expect(() => new StdioServerTransport()).not.toThrow();
     });
 
     it('transport has required methods', () => {
