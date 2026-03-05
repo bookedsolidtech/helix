@@ -3,8 +3,11 @@ import { css } from 'lit';
 export const helixBreadcrumbStyles = css`
   :host {
     display: block;
-    font-family: var(--hx-breadcrumb-font-family, var(--hx-font-family-sans));
-    font-size: var(--hx-breadcrumb-font-size, var(--hx-font-size-sm));
+    font-family: var(
+      --hx-breadcrumb-font-family,
+      var(--hx-font-family-sans, system-ui, sans-serif)
+    );
+    font-size: var(--hx-breadcrumb-font-size, var(--hx-font-size-sm, 0.875rem));
   }
 
   [part='nav'] {
