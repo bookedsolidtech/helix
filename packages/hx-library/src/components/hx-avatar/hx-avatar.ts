@@ -92,6 +92,22 @@ export class HelixAvatar extends LitElement {
     });
   }
 
+  // ─── URL Validation ───
+
+  /**
+   * Returns the src only if it uses a safe protocol (http/https/relative).
+   * Blocks data: and javascript: URIs which can be used as XSS vectors.
+   */
+  private get _safeSrc(): string | undefined {
+    const src = this.src;
+    if (!src) return undefined;
+    const lower = src.toLowerCase().trimStart();
+    if (lower.startsWith('data:') || lower.startsWith('javascript:')) {
+      return undefined;
+    }
+    return src;
+  }
+
   // ─── Image Error Handling ───
 
   private _handleImgError(): void {
@@ -119,7 +135,7 @@ export class HelixAvatar extends LitElement {
   // ─── Render ───
 
   override render() {
-    const src = this.src;
+    const src = this._safeSrc;
     const showSlot = this._hasDefaultSlot;
     const showImage = !showSlot && !!src && !this._imgError;
     const showInitials = !showSlot && !showImage && !!this.initials.trim();
@@ -168,3 +184,5 @@ declare global {
     'hx-avatar': HelixAvatar;
   }
 }
+
+export type WcAvatar = HelixAvatar;
