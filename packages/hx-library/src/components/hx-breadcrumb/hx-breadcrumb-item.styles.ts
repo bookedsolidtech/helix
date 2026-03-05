@@ -6,6 +6,10 @@ export const helixBreadcrumbItemStyles = css`
     align-items: center;
   }
 
+  [part='item'] {
+    display: contents;
+  }
+
   [part='link'] {
     color: var(--hx-breadcrumb-link-color, var(--hx-color-primary-600));
     text-decoration: none;
