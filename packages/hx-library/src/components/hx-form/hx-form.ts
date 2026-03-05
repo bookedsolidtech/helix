@@ -21,9 +21,9 @@ import { helixFormScopedCss } from './hx-form.styles.js';
  *
  * @slot - Default slot for form fields and controls.
  *
- * @fires {CustomEvent<{valid: boolean, values: Record<string, FormDataEntryValue>}>} wc-submit - Dispatched on valid client-side submit when no action is set.
- * @fires {CustomEvent<{errors: Array<{name: string, message: string}>}>} wc-invalid - Dispatched when validation fails on submit.
- * @fires {CustomEvent} wc-reset - Dispatched when the form is reset.
+ * @fires {CustomEvent<{valid: boolean, values: Record<string, FormDataEntryValue | FormDataEntryValue[]>}>} hx-submit - Dispatched on valid client-side submit when no action is set.
+ * @fires {CustomEvent<{errors: Array<{name: string, message: string}>}>} hx-invalid - Dispatched when validation fails on submit.
+ * @fires {CustomEvent} hx-reset - Dispatched when the form is reset.
  *
  * @cssprop [--hx-form-gap=var(--hx-space-4)] - Gap between form fields.
  * @cssprop [--hx-form-max-width=none] - Maximum width of the form.
@@ -225,10 +225,15 @@ export class HelixForm extends LitElement {
     }
 
     const formData = this.getFormData();
-    const values: Record<string, FormDataEntryValue> = {};
-    formData.forEach((value, key) => {
-      values[key] = value;
-    });
+    const values: Record<string, FormDataEntryValue | FormDataEntryValue[]> = {};
+    for (const key of new Set(formData.keys())) {
+      const all = formData.getAll(key);
+      if (all.length === 1 && all[0] !== undefined) {
+        values[key] = all[0];
+      } else {
+        values[key] = all;
+      }
+    }
 
     /**
      * Dispatched on valid client-side submit.
@@ -300,3 +305,6 @@ declare global {
     'hx-form': HelixForm;
   }
 }
+
+/** @deprecated Use `HelixForm` directly. Alias for backwards compatibility with tests that import `WcForm`. */
+export type WcForm = HelixForm;
