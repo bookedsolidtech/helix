@@ -67,15 +67,6 @@ export class HelixIcon extends LitElement {
   label = '';
 
   /**
-   * The `viewBox` attribute forwarded to the inner `<svg>` element in sprite
-   * mode. Override this when your icon set uses a coordinate system other than
-   * the default 24×24 grid.
-   * @attr view-box
-   */
-  @property({ type: String, attribute: 'view-box' })
-  viewBox = '0 0 24 24';
-
-  /**
    * Stores the sanitized inner markup of an externally fetched SVG.
    */
   @state()
@@ -154,20 +145,17 @@ export class HelixIcon extends LitElement {
     }
 
     // Remove dangerous embedded elements.
-    // animate/set/animateTransform/animateMotion can inject javascript: URLs at runtime.
-    svgEl
-      .querySelectorAll('script, foreignObject, animate, set, animateTransform, animateMotion')
-      .forEach((s) => {
-        s.remove();
-      });
+    svgEl.querySelectorAll('script, foreignObject').forEach((s) => {
+      s.remove();
+    });
 
     // URL-bearing attributes that can carry javascript:/data: payloads.
     const urlAttrs = new Set(['href', 'xlink:href', 'src', 'action', 'formaction']);
 
     // Sanitize every element including the root svg.
-    const allElements: Element[] = [svgEl, ...svgEl.querySelectorAll('*')];
+    const allElements: Element[] = [svgEl, ...Array.from(svgEl.querySelectorAll('*'))];
     allElements.forEach((el) => {
-      const attrs = [...el.attributes];
+      const attrs = Array.from(el.attributes);
       attrs.forEach((attr) => {
         const name = attr.name.toLowerCase();
         // Strip event-handler attributes.
@@ -210,7 +198,7 @@ export class HelixIcon extends LitElement {
       <svg
         part="svg"
         class="icon__svg"
-        viewBox=${this.viewBox}
+        viewBox="0 0 24 24"
         xmlns="http://www.w3.org/2000/svg"
         role=${isDecorative ? nothing : 'img'}
         aria-label=${isDecorative ? nothing : this.label}
