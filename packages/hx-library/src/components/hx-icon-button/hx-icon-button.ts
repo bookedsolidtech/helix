@@ -168,6 +168,9 @@ export class HelixIconButton extends LitElement {
   override render() {
     const normalizedLabel = this._normalizedLabel();
     if (!normalizedLabel) {
+      console.warn(
+        '[hx-icon-button] The `label` property is required for accessibility. Render suppressed.',
+      );
       return nothing;
     }
 
@@ -180,6 +183,7 @@ export class HelixIconButton extends LitElement {
           aria-label=${normalizedLabel}
           title=${normalizedLabel}
           aria-disabled=${this.disabled ? 'true' : nothing}
+          tabindex=${this.disabled ? '-1' : nothing}
           @click=${this._handleClick}
         >
           ${this._iconSlot()}
