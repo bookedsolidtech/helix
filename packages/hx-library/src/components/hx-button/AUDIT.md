@@ -3,6 +3,7 @@
 **Audited:** 2026-03-05
 **Auditor:** Antagonistic review pass — no fixes, document only.
 **Files reviewed:**
+
 - `hx-button.ts`
 - `hx-button.styles.ts`
 - `hx-button.stories.ts`
@@ -100,6 +101,7 @@ Two CSS rules both apply `opacity: 0.5` to a disabled button simultaneously:
 ```
 
 CSS opacity is multiplicative across parent/child. When `disabled` is set:
+
 - Host renders at 50% opacity
 - Inner button renders at 50% of that = **25% total opacity**
 
@@ -152,6 +154,7 @@ if (this.name !== undefined && this.value !== undefined) {
 ```
 
 No test in the suite verifies that:
+
 1. `name` and `value` properties exist and are settable
 2. `ElementInternals.setFormValue()` is called with the correct value
 3. The submitted form data includes the button's value under the given name
@@ -291,6 +294,7 @@ code should be removed.
 **Files:** `packages/hx-library/src/components/hx-button/` (no `.twig`, no Drupal notes)
 
 The CLAUDE.md states Drupal is the primary consumer. `hx-button` has no:
+
 - Twig template example
 - CDN `<script type="module">` import snippet
 - Documentation of how `ElementInternals` form association interacts with Drupal AJAX forms
@@ -324,23 +328,23 @@ would validate that the component correctly gates duplicate clicks.
 
 ## Summary Table
 
-| ID     | Area          | Severity | Description                                              |
-|--------|---------------|----------|----------------------------------------------------------|
-| P0-01  | Accessibility | P0       | Icon-only: `aria-label` on host not propagated to inner button |
-| P0-02  | Accessibility | P0       | Disabled anchor remains keyboard-focusable (missing `tabindex="-1"`) |
-| P1-01  | CSS / Visual  | P1       | Double opacity — disabled renders at 25%, not 50%        |
-| P1-02  | Tests         | P1       | No test: loading prevents form submission                |
-| P1-03  | Tests         | P1       | No test: `name`/`value` and `setFormValue()` untested   |
-| P1-04  | Storybook     | P1       | `size` argType key mismatches `hxSize` property / `hx-size` attribute |
-| P2-01  | CSS           | P2       | `white-space: nowrap` hardcoded, no escape hatch for long labels |
-| P2-02  | CSS           | P2       | Hover `filter: brightness()` applies during loading state |
-| P2-03  | TypeScript    | P2       | Deprecated `WcButton` type still imported in test file   |
-| P2-04  | Tests         | P2       | Form tests bypass `fixture()` helper — potential test pollution |
-| P2-05  | Tests         | P2       | Stale screenshots from renamed/split tests               |
-| P2-06  | Storybook     | P2       | Unused `_canvas` variable in Default story play function |
-| P2-07  | Drupal        | P2       | No Twig example, no CDN snippet, no AJAX form interaction docs |
-| P2-08  | Tests         | P2       | No test: icon-only accessibility with `aria-label`       |
-| P2-09  | Storybook     | P2       | No interactive loading state toggle story                |
+| ID    | Area          | Severity | Description                                                           |
+| ----- | ------------- | -------- | --------------------------------------------------------------------- |
+| P0-01 | Accessibility | P0       | Icon-only: `aria-label` on host not propagated to inner button        |
+| P0-02 | Accessibility | P0       | Disabled anchor remains keyboard-focusable (missing `tabindex="-1"`)  |
+| P1-01 | CSS / Visual  | P1       | Double opacity — disabled renders at 25%, not 50%                     |
+| P1-02 | Tests         | P1       | No test: loading prevents form submission                             |
+| P1-03 | Tests         | P1       | No test: `name`/`value` and `setFormValue()` untested                 |
+| P1-04 | Storybook     | P1       | `size` argType key mismatches `hxSize` property / `hx-size` attribute |
+| P2-01 | CSS           | P2       | `white-space: nowrap` hardcoded, no escape hatch for long labels      |
+| P2-02 | CSS           | P2       | Hover `filter: brightness()` applies during loading state             |
+| P2-03 | TypeScript    | P2       | Deprecated `WcButton` type still imported in test file                |
+| P2-04 | Tests         | P2       | Form tests bypass `fixture()` helper — potential test pollution       |
+| P2-05 | Tests         | P2       | Stale screenshots from renamed/split tests                            |
+| P2-06 | Storybook     | P2       | Unused `_canvas` variable in Default story play function              |
+| P2-07 | Drupal        | P2       | No Twig example, no CDN snippet, no AJAX form interaction docs        |
+| P2-08 | Tests         | P2       | No test: icon-only accessibility with `aria-label`                    |
+| P2-09 | Storybook     | P2       | No interactive loading state toggle story                             |
 
 ---
 
