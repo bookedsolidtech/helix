@@ -13,8 +13,8 @@ export const helixAvatarStyles = css`
     position: relative;
     width: var(--hx-avatar-size);
     height: var(--hx-avatar-size);
-    background-color: var(--hx-avatar-bg, var(--hx-color-primary-100, #dbeafe));
-    color: var(--hx-avatar-color, var(--hx-color-primary-700, #1d4ed8));
+    background-color: var(--hx-avatar-bg, var(--hx-color-primary-100));
+    color: var(--hx-avatar-color, var(--hx-color-primary-700));
     border-radius: var(--hx-avatar-border-radius);
     flex-shrink: 0;
   }
@@ -82,7 +82,7 @@ export const helixAvatarStyles = css`
   .avatar__fallback-icon {
     width: 60%;
     height: 60%;
-    color: var(--hx-avatar-color, var(--hx-color-primary-700, #1d4ed8));
+    color: var(--hx-avatar-color, var(--hx-color-primary-700));
   }
 
   /* ─── Badge Slot ─── */
