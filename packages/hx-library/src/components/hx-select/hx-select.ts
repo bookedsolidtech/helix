@@ -356,8 +356,7 @@ export class HelixSelect extends LitElement {
         e.preventDefault();
         if (!this.open) {
           this.open = true;
-          this._focusedOptionIndex =
-            enabledIndices.length > 0 ? (enabledIndices[0] ?? 0) : 0;
+          this._focusedOptionIndex = enabledIndices.length > 0 ? (enabledIndices[0] ?? 0) : 0;
           break;
         }
         const nextDown = enabledIndices.find((i) => i > this._focusedOptionIndex);
@@ -381,13 +380,17 @@ export class HelixSelect extends LitElement {
       }
       case 'Home': {
         e.preventDefault();
-        if (!this.open) { this.open = true; }
+        if (!this.open) {
+          this.open = true;
+        }
         this._focusedOptionIndex = enabledIndices.length > 0 ? (enabledIndices[0] ?? 0) : 0;
         break;
       }
       case 'End': {
         e.preventDefault();
-        if (!this.open) { this.open = true; }
+        if (!this.open) {
+          this.open = true;
+        }
         const lastEnabled = enabledIndices[enabledIndices.length - 1];
         this._focusedOptionIndex = lastEnabled !== undefined ? lastEnabled : 0;
         break;
