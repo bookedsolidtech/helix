@@ -27,18 +27,18 @@ export const helixDialogStyles = css`
     color: var(--hx-dialog-color, var(--hx-color-neutral-900));
     border-radius: var(--hx-dialog-border-radius, var(--hx-border-radius-lg));
     box-shadow: var(--hx-dialog-shadow, var(--hx-shadow-xl));
-    width: var(--hx-dialog-width, var(--hx-size-128));
-    max-width: calc(100vw - var(--hx-spacing-8));
-    max-height: calc(100vh - var(--hx-spacing-8));
+    width: var(--hx-dialog-width, var(--hx-size-128, 32rem));
+    max-width: calc(100vw - var(--hx-spacing-8, 2rem));
+    max-height: calc(100vh - var(--hx-spacing-8, 2rem));
     overflow: hidden;
     outline: none;
 
     /* Open/close animation */
     opacity: 0;
-    transform: translateY(var(--hx-spacing-4)) scale(0.97);
+    transform: translateY(var(--hx-spacing-4, 1rem)) scale(0.97);
     transition:
-      opacity var(--hx-duration-200) var(--hx-ease-out),
-      transform var(--hx-duration-200) var(--hx-ease-out);
+      opacity var(--hx-duration-200, 200ms) var(--hx-ease-out, ease-out),
+      transform var(--hx-duration-200, 200ms) var(--hx-ease-out, ease-out);
   }
 
   dialog[open] .dialog {
@@ -57,7 +57,7 @@ export const helixDialogStyles = css`
   dialog::backdrop {
     background-color: var(--hx-dialog-backdrop-color, var(--hx-color-neutral-900));
     opacity: 0;
-    transition: opacity var(--hx-duration-200) var(--hx-ease-out);
+    transition: opacity var(--hx-duration-200, 200ms) var(--hx-ease-out, ease-out);
   }
 
   dialog[open]::backdrop {
