@@ -1,5 +1,4 @@
 import { describe, it, expect, afterEach } from 'vitest';
-import { page } from '@vitest/browser/context';
 import { fixture, shadowQuery, cleanup, checkA11y } from '../../test-utils.js';
 import type { WcContainer } from './hx-container.js';
 import './index.js';
@@ -213,7 +212,6 @@ describe('hx-container', () => {
   describe('Accessibility', () => {
     it('has no axe violations in default state', async () => {
       const el = await fixture<WcContainer>('<hx-container>Content</hx-container>');
-      await page.screenshot();
       const { violations } = await checkA11y(el);
       expect(violations).toEqual([]);
     });
@@ -222,14 +220,12 @@ describe('hx-container', () => {
       const el = await fixture<WcContainer>(
         '<hx-container><h2>Section Title</h2><p>Paragraph content here.</p></hx-container>',
       );
-      await page.screenshot();
       const { violations } = await checkA11y(el);
       expect(violations).toEqual([]);
     });
 
     it('does not add any ARIA roles (structural element)', async () => {
       const el = await fixture<WcContainer>('<hx-container>Content</hx-container>');
-      await page.screenshot();
       expect(el.hasAttribute('role')).toBe(false);
       const inner = shadowQuery(el, '.container__inner')!;
       expect(inner.hasAttribute('role')).toBe(false);
