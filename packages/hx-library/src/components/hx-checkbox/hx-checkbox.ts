@@ -245,7 +245,7 @@ export class HelixCheckbox extends LitElement {
   private _labelId = `${this._id}-label`;
 
   override render() {
-    const hasError = !!this.error;
+    const hasError = !!this.error || this._hasErrorSlot;
 
     const containerClasses = {
       checkbox: true,
@@ -269,12 +269,7 @@ export class HelixCheckbox extends LitElement {
 
     return html`
       <div class=${classMap(containerClasses)}>
-        <label
-          part="control"
-          class="checkbox__control"
-          @click=${this._handleChange}
-          @keydown=${this._handleKeyDown}
-        >
+        <label part="control" class="checkbox__control" @click=${this._handleChange}>
           <input
             class="checkbox__input"
             type="checkbox"
@@ -290,11 +285,8 @@ export class HelixCheckbox extends LitElement {
             aria-labelledby=${this._labelId}
             tabindex="0"
             @keydown=${this._handleKeyDown}
+            @click=${(e: Event) => e.preventDefault()}
             @change=${(e: Event) => e.stopPropagation()}
-            @click=${(e: Event) => {
-              e.preventDefault();
-              e.stopPropagation();
-            }}
           />
 
           <span part="checkbox" class="checkbox__box">
