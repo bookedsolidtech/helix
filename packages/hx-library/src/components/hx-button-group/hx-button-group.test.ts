@@ -64,6 +64,19 @@ describe('hx-button-group', () => {
       const group = shadowQuery(el, '[part="group"]');
       expect(group?.classList.contains('group--horizontal')).toBe(true);
     });
+
+    it('updates class when orientation changes dynamically', async () => {
+      const el = await fixture<HelixButtonGroup>(`
+        <hx-button-group orientation="horizontal">
+          <hx-button variant="secondary">Button</hx-button>
+        </hx-button-group>
+      `);
+      el.orientation = 'vertical';
+      await el.updateComplete;
+      const group = shadowQuery(el, '[part="group"]');
+      expect(group?.classList.contains('group--vertical')).toBe(true);
+      expect(group?.classList.contains('group--horizontal')).toBe(false);
+    });
   });
 
   // ─── Property: size (3) ───
@@ -106,6 +119,42 @@ describe('hx-button-group', () => {
       `);
       const computed = getComputedStyle(el);
       expect(computed.getPropertyValue('--hx-button-group-size').trim()).toBe('lg');
+    });
+  });
+
+  // ─── CSS: Single Button (1) ───
+
+  describe('CSS: Single Button', () => {
+    it('single button receives full border-radius via :only-child rule', async () => {
+      const el = await fixture<HelixButtonGroup>(`
+        <hx-button-group>
+          <hx-button variant="secondary">Only Button</hx-button>
+        </hx-button-group>
+      `);
+      const button = el.querySelector('hx-button');
+      expect(button).toBeTruthy();
+      // A single button is both :first-child and :last-child, so :only-child
+      // rule must win with a full-radius value (not split left/right halves).
+      const computed = getComputedStyle(button!);
+      const radius = computed.getPropertyValue('--hx-button-border-radius').trim();
+      // The :only-child rule sets a single value (all four corners equal),
+      // while the :first-child/:last-child split rules each set two corners.
+      // Verify the radius is not the broken split value "0 <radius> <radius> 0".
+      expect(radius).not.toMatch(/^0\s/);
+    });
+  });
+
+  // ─── Property: label (1) ───
+
+  describe('Property: label', () => {
+    it('sets internals ariaLabel when label property is provided', async () => {
+      const el = await fixture<HelixButtonGroup>(`
+        <hx-button-group label="Form actions">
+          <hx-button variant="secondary">Save</hx-button>
+          <hx-button variant="secondary">Cancel</hx-button>
+        </hx-button-group>
+      `);
+      expect(el.label).toBe('Form actions');
     });
   });
 
