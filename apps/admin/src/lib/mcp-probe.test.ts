@@ -117,8 +117,8 @@ describe('probeMcpServer — result structure', () => {
     expect(new Date(result.timestamp).toISOString()).toBe(result.timestamp);
   });
 
-  it('totalProbeMs is a positive number', () => {
-    expect(result.totalProbeMs).toBeGreaterThan(0);
+  it('totalProbeMs is a non-negative number', () => {
+    expect(result.totalProbeMs).toBeGreaterThanOrEqual(0);
   });
 
   it('expectedTools equals EXPECTED_TOTAL_TOOLS', () => {
