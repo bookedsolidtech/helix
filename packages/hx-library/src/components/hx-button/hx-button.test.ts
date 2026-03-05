@@ -1,5 +1,5 @@
 import { describe, it, expect, afterEach } from 'vitest';
-import { page } from '@vitest/browser/context';
+import { page, userEvent } from '@vitest/browser/context';
 import { fixture, shadowQuery, oneEvent, cleanup, checkA11y } from '../../test-utils.js';
 import type { WcButton } from './hx-button.js';
 import './index.js';
@@ -110,10 +110,10 @@ describe('hx-button', () => {
       expect(btn.disabled).toBe(true);
     });
 
-    it('sets aria-disabled="true"', async () => {
+    it('does not set aria-disabled on native button (native disabled is sufficient)', async () => {
       const el = await fixture<WcButton>('<hx-button disabled>Click</hx-button>');
       const btn = shadowQuery(el, 'button')!;
-      expect(btn.getAttribute('aria-disabled')).toBe('true');
+      expect(btn.hasAttribute('aria-disabled')).toBe(false);
     });
 
     it('does not set aria-disabled when enabled', async () => {
@@ -178,7 +178,7 @@ describe('hx-button', () => {
         fired = true;
       });
       btn.click();
-      await new Promise((r) => setTimeout(r, 50));
+      await el.updateComplete;
       expect(fired).toBe(false);
     });
 
@@ -212,6 +212,20 @@ describe('hx-button', () => {
       expect(anchor.getAttribute('target')).toBe('_blank');
     });
 
+    it('sets rel="noopener noreferrer" when target="_blank"', async () => {
+      const el = await fixture<WcButton>(
+        '<hx-button href="https://example.com" target="_blank">Link</hx-button>',
+      );
+      const anchor = shadowQuery<HTMLAnchorElement>(el, 'a')!;
+      expect(anchor.getAttribute('rel')).toBe('noopener noreferrer');
+    });
+
+    it('does not set rel when target is not "_blank"', async () => {
+      const el = await fixture<WcButton>('<hx-button href="https://example.com">Link</hx-button>');
+      const anchor = shadowQuery<HTMLAnchorElement>(el, 'a')!;
+      expect(anchor.hasAttribute('rel')).toBe(false);
+    });
+
     it('removes href when disabled in anchor mode', async () => {
       const el = await fixture<WcButton>(
         '<hx-button href="https://example.com" disabled>Link</hx-button>',
@@ -224,7 +238,7 @@ describe('hx-button', () => {
         fired = true;
       });
       anchor.click();
-      await new Promise((r) => setTimeout(r, 50));
+      await el.updateComplete;
       expect(fired).toBe(false);
     });
   });
@@ -268,8 +282,7 @@ describe('hx-button', () => {
         fired = true;
       });
       btn.click();
-      // Give time for any async dispatch
-      await new Promise((r) => setTimeout(r, 50));
+      await el.updateComplete;
       expect(fired).toBe(false);
     });
   });
@@ -281,8 +294,8 @@ describe('hx-button', () => {
       const el = await fixture<WcButton>('<hx-button>Click</hx-button>');
       const btn = shadowQuery<HTMLButtonElement>(el, 'button')!;
       const eventPromise = oneEvent<CustomEvent>(el, 'hx-click');
-      btn.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
-      btn.click();
+      btn.focus();
+      await userEvent.keyboard('{Enter}');
       const event = await eventPromise;
       expect(event).toBeTruthy();
     });
@@ -291,8 +304,8 @@ describe('hx-button', () => {
       const el = await fixture<WcButton>('<hx-button>Click</hx-button>');
       const btn = shadowQuery<HTMLButtonElement>(el, 'button')!;
       const eventPromise = oneEvent<CustomEvent>(el, 'hx-click');
-      btn.dispatchEvent(new KeyboardEvent('keydown', { key: ' ', bubbles: true }));
-      btn.click();
+      btn.focus();
+      await userEvent.keyboard(' ');
       const event = await eventPromise;
       expect(event).toBeTruthy();
     });
@@ -393,7 +406,7 @@ describe('hx-button', () => {
 
       const btn = shadowQuery<HTMLButtonElement>(el, 'button')!;
       btn.click();
-      await new Promise((r) => setTimeout(r, 50));
+      await el.updateComplete;
       expect(submitted).toBe(true);
     });
 
@@ -415,7 +428,7 @@ describe('hx-button', () => {
 
       const btn = shadowQuery<HTMLButtonElement>(el, 'button')!;
       btn.click();
-      await new Promise((r) => setTimeout(r, 50));
+      await el.updateComplete;
       expect(wasReset).toBe(true);
     });
   });
