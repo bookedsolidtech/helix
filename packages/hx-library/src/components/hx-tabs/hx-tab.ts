@@ -1,4 +1,4 @@
-import { LitElement, html, nothing } from 'lit';
+import { LitElement, html } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { tokenStyles } from '@helix/tokens/lit';
 import { helixTabStyles } from './hx-tab.styles.js';
@@ -108,19 +108,11 @@ export class HelixTab extends LitElement {
         tabindex=${this.selected ? '0' : '-1'}
         @click=${this._handleClick}
       >
-        <span
-          part="prefix"
-          class="tab__prefix"
-          ?hidden=${!this._hasPrefixSlot}
-        >
+        <span part="prefix" class="tab__prefix" ?hidden=${!this._hasPrefixSlot}>
           <slot name="prefix" @slotchange=${this._handlePrefixSlotChange}></slot>
         </span>
         <slot></slot>
-        <span
-          part="suffix"
-          class="tab__suffix"
-          ?hidden=${!this._hasSuffixSlot}
-        >
+        <span part="suffix" class="tab__suffix" ?hidden=${!this._hasSuffixSlot}>
           <slot name="suffix" @slotchange=${this._handleSuffixSlotChange}></slot>
         </span>
       </button>

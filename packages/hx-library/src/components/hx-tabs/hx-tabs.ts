@@ -177,10 +177,9 @@ export class HelixTabs extends LitElement {
 
   private _handleTabSelect = (e: CustomEvent<{ panel: string }>): void => {
     e.stopPropagation();
-    const tab = e.composedPath().find(
-      (el): el is HelixTab =>
-        el instanceof Element && el.tagName.toLowerCase() === 'hx-tab',
-    );
+    const tab = e
+      .composedPath()
+      .find((el): el is HelixTab => el instanceof Element && el.tagName.toLowerCase() === 'hx-tab');
     if (tab) {
       this._activateTab(tab);
     }
@@ -258,12 +257,7 @@ export class HelixTabs extends LitElement {
   override render() {
     return html`
       <div class="tabs">
-        <div
-          part="tablist"
-          class="tablist"
-          role="tablist"
-          aria-orientation=${this.orientation}
-        >
+        <div part="tablist" class="tablist" role="tablist" aria-orientation=${this.orientation}>
           <slot name="tab" @slotchange=${this._handleSlotChange}></slot>
         </div>
         <div part="panels" class="panels">

@@ -1,5 +1,5 @@
 import { describe, it, expect, afterEach } from 'vitest';
-import { fixture, shadowQuery, shadowQueryAll, oneEvent, cleanup } from '../../test-utils.js';
+import { fixture, shadowQuery, oneEvent, cleanup } from '../../test-utils.js';
 import type { HelixTabs } from './hx-tabs.js';
 import type { HelixTab } from './hx-tab.js';
 import type { HelixTabPanel } from './hx-tab-panel.js';
@@ -170,7 +170,10 @@ describe('hx-tabs', () => {
     it('hx-tab-change detail contains correct index', async () => {
       const el = await fixture<HelixTabs>(DEFAULT_TABS_HTML);
       const tabs = Array.from(el.querySelectorAll('hx-tab')) as HelixTab[];
-      const eventPromise = oneEvent<CustomEvent<{ tabId: string; index: number }>>(el, 'hx-tab-change');
+      const eventPromise = oneEvent<CustomEvent<{ tabId: string; index: number }>>(
+        el,
+        'hx-tab-change',
+      );
       const btnBeta = shadowQuery<HTMLButtonElement>(tabs[1], 'button');
       assertEl(btnBeta, 'button').click();
       const event = await eventPromise;
@@ -180,7 +183,10 @@ describe('hx-tabs', () => {
     it('hx-tab-change detail contains the tab id', async () => {
       const el = await fixture<HelixTabs>(DEFAULT_TABS_HTML);
       const tabs = Array.from(el.querySelectorAll('hx-tab')) as HelixTab[];
-      const eventPromise = oneEvent<CustomEvent<{ tabId: string; index: number }>>(el, 'hx-tab-change');
+      const eventPromise = oneEvent<CustomEvent<{ tabId: string; index: number }>>(
+        el,
+        'hx-tab-change',
+      );
       const btnGamma = shadowQuery<HTMLButtonElement>(tabs[2], 'button');
       assertEl(btnGamma, 'button').click();
       const event = await eventPromise;

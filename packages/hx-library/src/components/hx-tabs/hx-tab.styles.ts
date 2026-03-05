@@ -50,10 +50,7 @@ export const helixTabStyles = css`
 
   .tab[aria-selected='true'] {
     color: var(--hx-tabs-tab-active-color, var(--hx-color-primary-600, #1d4ed8));
-    border-bottom-color: var(
-      --hx-tabs-indicator-color,
-      var(--hx-color-primary-500, #2563eb)
-    );
+    border-bottom-color: var(--hx-tabs-indicator-color, var(--hx-color-primary-500, #2563eb));
     font-weight: var(--hx-tabs-tab-active-font-weight, var(--hx-font-weight-semibold, 600));
   }
 
