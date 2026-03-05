@@ -254,19 +254,21 @@ export class HelixNav extends LitElement {
       fill="currentColor"
       aria-hidden="true"
     >
-      <path d="M4.5 6L8 9.5 11.5 6" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+      <path
+        d="M4.5 6L8 9.5 11.5 6"
+        stroke="currentColor"
+        stroke-width="1.5"
+        fill="none"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
     </svg>`;
   }
 
   private _renderSubMenu(children: NavItem[], parentIndex: number) {
     const isExpanded = this._expandedIndex === parentIndex;
     return html`
-      <ul
-        class="nav__submenu"
-        role="menu"
-        aria-label="Submenu"
-        ?hidden=${!isExpanded}
-      >
+      <ul class="nav__submenu" role="menu" aria-label="Submenu" ?hidden=${!isExpanded}>
         ${children.map(
           (child) => html`
             <li class="nav__submenu-item" role="none">
@@ -274,7 +276,7 @@ export class HelixNav extends LitElement {
                 part="link"
                 href=${child.href ?? '#'}
                 class=${classMap({
-                  'nav__link': true,
+                  nav__link: true,
                   'nav__link--active': !!child.current,
                 })}
                 role="menuitem"
@@ -296,7 +298,7 @@ export class HelixNav extends LitElement {
     const isExpanded = this._expandedIndex === index;
 
     const linkClasses = {
-      'nav__link': true,
+      nav__link: true,
       'nav__link--active': !!item.current,
       'nav__link--has-submenu': hasChildren,
       'nav__link--expanded': isExpanded,
@@ -312,8 +314,7 @@ export class HelixNav extends LitElement {
             @click=${(e: Event) => this._handleItemClick(item, index, e)}
             @keydown=${(e: KeyboardEvent) => this._handleKeydown(e, index, item)}
           >
-            ${item.label}
-            ${this._renderChevronIcon()}
+            ${item.label} ${this._renderChevronIcon()}
           </button>
           ${this._renderSubMenu(item.children!, index)}
         `
@@ -330,18 +331,14 @@ export class HelixNav extends LitElement {
           </a>
         `;
 
-    return html`
-      <li part="item" class="nav__item">
-        ${content}
-      </li>
-    `;
+    return html` <li part="item" class="nav__item">${content}</li> `;
   }
 
   // ─── Render ───
 
   override render() {
     const listClasses = {
-      'nav__list': true,
+      nav__list: true,
       'nav__list--open': this._mobileOpen,
     };
 
@@ -358,12 +355,7 @@ export class HelixNav extends LitElement {
           ${this._renderHamburgerIcon()}
         </button>
 
-        <ul
-          part="list"
-          id="nav-list"
-          class=${classMap(listClasses)}
-          role="list"
-        >
+        <ul part="list" id="nav-list" class=${classMap(listClasses)} role="list">
           ${this.items.map((item, i) => this._renderItem(item, i))}
         </ul>
       </nav>
