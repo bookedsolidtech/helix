@@ -40,9 +40,9 @@ export const helixPaginationStyles = css`
     font-family: inherit;
     cursor: pointer;
     transition:
-      background-color var(--hx-transition-fast, 150ms) ease,
-      border-color var(--hx-transition-fast, 150ms) ease,
-      color var(--hx-transition-fast, 150ms) ease;
+      background-color 0.15s ease,
+      border-color 0.15s ease,
+      color 0.15s ease;
     text-decoration: none;
     white-space: nowrap;
   }
@@ -61,7 +61,7 @@ export const helixPaginationStyles = css`
   .button--active {
     background: var(--hx-pagination-active-bg, var(--hx-color-primary, #2563eb));
     border-color: var(--hx-pagination-active-bg, var(--hx-color-primary, #2563eb));
-    color: var(--hx-pagination-active-color, var(--hx-color-surface, #ffffff));
+    color: var(--hx-pagination-active-color, #ffffff);
     font-weight: var(--hx-font-weight-semibold, 600);
     cursor: default;
     pointer-events: none;
@@ -82,16 +82,5 @@ export const helixPaginationStyles = css`
     color: var(--hx-pagination-ellipsis-color, var(--hx-color-text-secondary, #6b7280));
     font-size: var(--hx-font-size-sm, 0.875rem);
     user-select: none;
-  }
-
-  .button[aria-disabled='true'] {
-    cursor: default;
-    pointer-events: none;
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .button {
-      transition: none;
-    }
   }
 `;
