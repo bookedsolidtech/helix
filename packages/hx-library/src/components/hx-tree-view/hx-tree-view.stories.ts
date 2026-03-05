@@ -1,0 +1,179 @@
+import type { Meta, StoryObj } from '@storybook/web-components';
+import { html } from 'lit';
+import './hx-tree-view.js';
+import './hx-tree-item.js';
+
+// ─────────────────────────────────────────────────
+// META CONFIGURATION
+// ─────────────────────────────────────────────────
+
+const meta = {
+  title: 'Components/Tree View',
+  component: 'hx-tree-view',
+  tags: ['autodocs'],
+  argTypes: {
+    selection: {
+      control: { type: 'select' },
+      options: ['none', 'single', 'multiple'],
+      description: 'Selection mode for the tree.',
+      table: {
+        category: 'Behavior',
+        defaultValue: { summary: 'none' },
+        type: { summary: "'none' | 'single' | 'multiple'" },
+      },
+    },
+  },
+  args: {
+    selection: 'single',
+  },
+  parameters: {
+    docs: {
+      description: {
+        component:
+          'A hierarchical tree component for navigating nested data structures. ' +
+          'Supports expand/collapse with animation, single and multi-selection, ' +
+          'and full keyboard navigation following WAI-ARIA tree patterns.',
+      },
+    },
+  },
+} satisfies Meta;
+
+export default meta;
+type Story = StoryObj;
+
+// ─────────────────────────────────────────────────
+// STORIES
+// ─────────────────────────────────────────────────
+
+export const Default: Story = {
+  name: 'Default',
+  render: (args) => html`
+    <hx-tree-view selection=${args['selection']}>
+      <hx-tree-item>Documents</hx-tree-item>
+      <hx-tree-item>Downloads</hx-tree-item>
+      <hx-tree-item>Pictures</hx-tree-item>
+    </hx-tree-view>
+  `,
+};
+
+export const WithNestedItems: Story = {
+  name: 'Nested Items',
+  render: (args) => html`
+    <hx-tree-view selection=${args['selection']}>
+      <hx-tree-item expanded>
+        Documents
+        <hx-tree-item slot="children">Reports</hx-tree-item>
+        <hx-tree-item slot="children" expanded>
+          Projects
+          <hx-tree-item slot="children">Q1 Plan</hx-tree-item>
+          <hx-tree-item slot="children">Q2 Plan</hx-tree-item>
+        </hx-tree-item>
+        <hx-tree-item slot="children">Invoices</hx-tree-item>
+      </hx-tree-item>
+      <hx-tree-item>Downloads</hx-tree-item>
+      <hx-tree-item expanded>
+        Pictures
+        <hx-tree-item slot="children">2024</hx-tree-item>
+        <hx-tree-item slot="children">2025</hx-tree-item>
+      </hx-tree-item>
+    </hx-tree-view>
+  `,
+};
+
+export const SingleSelection: Story = {
+  name: 'Single Selection',
+  render: () => html`
+    <hx-tree-view selection="single">
+      <hx-tree-item expanded>
+        Departments
+        <hx-tree-item slot="children" selected>Cardiology</hx-tree-item>
+        <hx-tree-item slot="children">Neurology</hx-tree-item>
+        <hx-tree-item slot="children">Oncology</hx-tree-item>
+      </hx-tree-item>
+      <hx-tree-item expanded>
+        Administration
+        <hx-tree-item slot="children">Finance</hx-tree-item>
+        <hx-tree-item slot="children">HR</hx-tree-item>
+      </hx-tree-item>
+    </hx-tree-view>
+  `,
+};
+
+export const MultipleSelection: Story = {
+  name: 'Multiple Selection',
+  render: () => html`
+    <hx-tree-view selection="multiple">
+      <hx-tree-item expanded>
+        ICD-10 Categories
+        <hx-tree-item slot="children" selected>A00-A09: Intestinal infectious diseases</hx-tree-item>
+        <hx-tree-item slot="children" selected>A15-A19: Tuberculosis</hx-tree-item>
+        <hx-tree-item slot="children">A20-A28: Certain zoonotic bacterial diseases</hx-tree-item>
+        <hx-tree-item slot="children">A30-A49: Other bacterial diseases</hx-tree-item>
+      </hx-tree-item>
+    </hx-tree-view>
+  `,
+};
+
+export const WithDisabledItems: Story = {
+  name: 'Disabled Items',
+  render: () => html`
+    <hx-tree-view selection="single">
+      <hx-tree-item expanded>
+        Org Structure
+        <hx-tree-item slot="children">Active Department</hx-tree-item>
+        <hx-tree-item slot="children" disabled>Archived Department</hx-tree-item>
+        <hx-tree-item slot="children">
+          Subdepartment
+          <hx-tree-item slot="children" disabled>Inactive Unit</hx-tree-item>
+          <hx-tree-item slot="children">Active Unit</hx-tree-item>
+        </hx-tree-item>
+      </hx-tree-item>
+    </hx-tree-view>
+  `,
+};
+
+export const NoSelection: Story = {
+  name: 'No Selection (Navigation Only)',
+  render: () => html`
+    <hx-tree-view selection="none">
+      <hx-tree-item expanded>
+        Navigation
+        <hx-tree-item slot="children">Home</hx-tree-item>
+        <hx-tree-item slot="children">About</hx-tree-item>
+        <hx-tree-item slot="children" expanded>
+          Services
+          <hx-tree-item slot="children">Consulting</hx-tree-item>
+          <hx-tree-item slot="children">Support</hx-tree-item>
+        </hx-tree-item>
+      </hx-tree-item>
+    </hx-tree-view>
+  `,
+};
+
+export const HealthcareDrugHierarchy: Story = {
+  name: 'Healthcare: Drug Classification',
+  render: () => html`
+    <hx-tree-view selection="single">
+      <hx-tree-item expanded>
+        Cardiovascular Drugs
+        <hx-tree-item slot="children" expanded>
+          Antihypertensives
+          <hx-tree-item slot="children">ACE Inhibitors</hx-tree-item>
+          <hx-tree-item slot="children" selected>Beta Blockers</hx-tree-item>
+          <hx-tree-item slot="children">Calcium Channel Blockers</hx-tree-item>
+        </hx-tree-item>
+        <hx-tree-item slot="children">
+          Anticoagulants
+          <hx-tree-item slot="children">Warfarin</hx-tree-item>
+          <hx-tree-item slot="children">Heparin</hx-tree-item>
+        </hx-tree-item>
+      </hx-tree-item>
+      <hx-tree-item>
+        Antibiotics
+        <hx-tree-item slot="children">Penicillins</hx-tree-item>
+        <hx-tree-item slot="children">Cephalosporins</hx-tree-item>
+        <hx-tree-item slot="children">Fluoroquinolones</hx-tree-item>
+      </hx-tree-item>
+    </hx-tree-view>
+  `,
+};
