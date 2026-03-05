@@ -1,5 +1,5 @@
 import { LitElement, html, nothing } from 'lit';
-import { customElement, property } from 'lit/decorators.js';
+import { customElement, property, state } from 'lit/decorators.js';
 import { tokenStyles } from '@helix/tokens/lit';
 import { helixNavItemStyles } from './hx-nav-item.styles.js';
 
@@ -63,15 +63,24 @@ export class HelixNavItem extends LitElement {
   @property({ type: Boolean, reflect: true })
   disabled = false;
 
-  // ─── Private Helpers ───
+  // ─── State ───
 
+  /** Whether the children slot has assigned nodes. Updated via slotchange. */
+  @state() private _hasChildren = false;
+
+  /** Whether this item is in collapsed mode. Set externally by hx-side-nav via data-collapsed attribute. */
   private get _isCollapsed(): boolean {
     return this.hasAttribute('data-collapsed');
   }
 
-  private _hasChildren(): boolean {
-    return this.querySelector('[slot="children"]') !== null;
+  // ─── Slot Change Handler ───
+
+  private _onChildrenSlotChange(e: Event): void {
+    const slot = e.target as HTMLSlotElement;
+    this._hasChildren = slot.assignedNodes({ flatten: true }).length > 0;
   }
+
+  // ─── Private Helpers ───
 
   private _handleToggle(e: Event): void {
     if (this.disabled) return;
@@ -93,7 +102,6 @@ export class HelixNavItem extends LitElement {
 
   override render() {
     const label = this.textContent?.trim() ?? '';
-    const hasChildren = this._hasChildren();
 
     const innerContent = html`
       <span part="icon" class="nav-item__icon">
@@ -105,7 +113,7 @@ export class HelixNavItem extends LitElement {
       <span part="badge" class="nav-item__badge">
         <slot name="badge"></slot>
       </span>
-      ${hasChildren ? this._renderExpandArrow() : nothing}
+      ${this._hasChildren ? this._renderExpandArrow() : nothing}
       ${this._isCollapsed
         ? html`<span class="nav-item__tooltip" role="tooltip">${label}</span>`
         : nothing}
@@ -113,7 +121,7 @@ export class HelixNavItem extends LitElement {
 
     // Render as anchor when href provided and no expandable children
     const linkEl =
-      this.href && !hasChildren
+      this.href && !this._hasChildren
         ? html`<a
             part="link"
             class="nav-item__link"
@@ -129,7 +137,7 @@ export class HelixNavItem extends LitElement {
             class="nav-item__link"
             aria-current=${this.active ? 'page' : nothing}
             aria-disabled=${this.disabled ? 'true' : nothing}
-            aria-expanded=${hasChildren ? String(this.expanded) : nothing}
+            aria-expanded=${this._hasChildren ? String(this.expanded) : nothing}
             tabindex=${this.disabled ? '-1' : '0'}
             @click=${this._handleToggle}
           >
@@ -140,7 +148,7 @@ export class HelixNavItem extends LitElement {
       <div class="nav-item">
         ${linkEl}
         <div part="children" class="nav-item__children" role="group">
-          <slot name="children"></slot>
+          <slot name="children" @slotchange=${this._onChildrenSlotChange}></slot>
         </div>
       </div>
     `;
