@@ -1,4 +1,4 @@
-import { describe, it, expect, afterEach } from 'vitest';
+import { describe, it, expect, afterEach, beforeEach, vi } from 'vitest';
 import { page } from '@vitest/browser/context';
 import { fixture, shadowQuery, cleanup, checkA11y } from '../../test-utils.js';
 import type { HelixTooltip } from './hx-tooltip.js';
@@ -125,6 +125,13 @@ describe('hx-tooltip', () => {
   // ─── Accessibility: ARIA (3) ───
 
   describe('ARIA', () => {
+    beforeEach(() => {
+      vi.useFakeTimers();
+    });
+
+    afterEach(() => {
+      vi.useRealTimers();
+    });
     it('sets aria-describedby on trigger element pointing to tooltip id', async () => {
       const el = await fixture<HelixTooltip>(
         '<hx-tooltip><button id="trig">Trigger</button><span slot="content">Tip</span></hx-tooltip>',
@@ -151,7 +158,7 @@ describe('hx-tooltip', () => {
       );
       const wrapper = shadowQuery<HTMLElement>(el, '.trigger-wrapper')!;
       wrapper.dispatchEvent(new MouseEvent('mouseenter', { bubbles: true }));
-      await new Promise((r) => setTimeout(r, 50));
+      vi.runAllTimers();
       await el.updateComplete;
       const tooltip = shadowQuery(el, '[part="tooltip"]');
       expect(tooltip?.getAttribute('aria-hidden')).toBe('false');
@@ -161,13 +168,20 @@ describe('hx-tooltip', () => {
   // ─── Behavior: Show/Hide (4) ───
 
   describe('Behavior: Show/Hide', () => {
+    beforeEach(() => {
+      vi.useFakeTimers();
+    });
+
+    afterEach(() => {
+      vi.useRealTimers();
+    });
     it('shows tooltip on mouseenter', async () => {
       const el = await fixture<HelixTooltip>(
         '<hx-tooltip show-delay="0" hide-delay="0"><button>Trigger</button><span slot="content">Tip</span></hx-tooltip>',
       );
       const wrapper = shadowQuery<HTMLElement>(el, '.trigger-wrapper')!;
       wrapper.dispatchEvent(new MouseEvent('mouseenter', { bubbles: true }));
-      await new Promise((r) => setTimeout(r, 50));
+      vi.runAllTimers();
       await el.updateComplete;
       const tooltip = shadowQuery(el, '[part="tooltip"]');
       expect(tooltip?.classList.contains('visible')).toBe(true);
@@ -179,11 +193,11 @@ describe('hx-tooltip', () => {
       );
       const wrapper = shadowQuery<HTMLElement>(el, '.trigger-wrapper')!;
       wrapper.dispatchEvent(new MouseEvent('mouseenter', { bubbles: true }));
-      await new Promise((r) => setTimeout(r, 50));
+      vi.runAllTimers();
       await el.updateComplete;
 
       wrapper.dispatchEvent(new MouseEvent('mouseleave', { bubbles: true }));
-      await new Promise((r) => setTimeout(r, 50));
+      vi.runAllTimers();
       await el.updateComplete;
       const tooltip = shadowQuery(el, '[part="tooltip"]');
       expect(tooltip?.classList.contains('visible')).toBe(false);
@@ -195,7 +209,7 @@ describe('hx-tooltip', () => {
       );
       const wrapper = shadowQuery<HTMLElement>(el, '.trigger-wrapper')!;
       wrapper.dispatchEvent(new FocusEvent('focusin', { bubbles: true }));
-      await new Promise((r) => setTimeout(r, 50));
+      vi.runAllTimers();
       await el.updateComplete;
       const tooltip = shadowQuery(el, '[part="tooltip"]');
       expect(tooltip?.classList.contains('visible')).toBe(true);
@@ -207,7 +221,7 @@ describe('hx-tooltip', () => {
       );
       const wrapper = shadowQuery<HTMLElement>(el, '.trigger-wrapper')!;
       wrapper.dispatchEvent(new MouseEvent('mouseenter', { bubbles: true }));
-      await new Promise((r) => setTimeout(r, 50));
+      vi.runAllTimers();
       await el.updateComplete;
 
       el.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
