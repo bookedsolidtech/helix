@@ -1,7 +1,5 @@
 import { LitElement, html, nothing } from 'lit';
-import { customElement, property, state } from 'lit/decorators.js';
-import { classMap } from 'lit/directives/class-map.js';
-import { repeat } from 'lit/directives/repeat.js';
+import { customElement, property } from 'lit/decorators.js';
 import { tokenStyles } from '@helix/tokens/lit';
 import { helixPaginationStyles } from './hx-pagination.styles.js';
 
@@ -17,19 +15,6 @@ import { helixPaginationStyles } from './hx-pagination.styles.js';
  * @csspart item - Each `<li>` item.
  * @csspart button - Each page button or prev/next control.
  * @csspart ellipsis - The ellipsis (`…`) span between page groups.
- *
- * @cssprop [--hx-pagination-gap=0.25rem] - Gap between pagination buttons.
- * @cssprop [--hx-pagination-button-size=2.25rem] - Minimum width and height of each button.
- * @cssprop [--hx-pagination-border-color=#d1d5db] - Border color of buttons.
- * @cssprop [--hx-pagination-border-radius=0.375rem] - Border radius of buttons.
- * @cssprop [--hx-pagination-bg=#ffffff] - Background color of buttons.
- * @cssprop [--hx-pagination-color=#111827] - Text color of buttons.
- * @cssprop [--hx-pagination-hover-bg=#f3f4f6] - Background color of buttons on hover.
- * @cssprop [--hx-pagination-hover-border-color=#2563eb] - Border color of buttons on hover.
- * @cssprop [--hx-pagination-active-bg=#2563eb] - Background color of the active/current page button.
- * @cssprop [--hx-pagination-active-color=#ffffff] - Text color of the active/current page button.
- * @cssprop [--hx-pagination-ellipsis-color=#6b7280] - Color of ellipsis characters.
- * @cssprop [--hx-transition-fast=150ms] - Duration used for hover/focus transitions.
  *
  * @fires {CustomEvent<{ page: number }>} hx-page-change - Fired when the user navigates to a new page.
  *
@@ -83,9 +68,6 @@ export class HelixPagination extends LitElement {
    */
   @property({ type: String, reflect: true })
   label = 'Pagination';
-
-  /** Tracks the roving tabindex target. Null means default to currentPage. */
-  @state() private _rovingKey: number | string | null = null;
 
   // ─── Helpers ───
 
@@ -141,7 +123,6 @@ export class HelixPagination extends LitElement {
     if (clamped === this.currentPage) return;
 
     this.currentPage = clamped;
-    this._rovingKey = null; // reset so focus follows the new current page
     this.dispatchEvent(
       new CustomEvent<{ page: number }>('hx-page-change', {
         detail: { page: clamped },
@@ -151,62 +132,18 @@ export class HelixPagination extends LitElement {
     );
   }
 
-  private get _effectiveRovingKey(): number | string {
-    return this._rovingKey ?? this.currentPage;
-  }
-
-  private _handleFocusin(e: FocusEvent): void {
-    const btn = e.target as HTMLElement;
-    if (btn.tagName !== 'BUTTON') return;
-    const key = btn.dataset['rovingKey'];
-    if (key === undefined) return;
-    this._rovingKey = isNaN(Number(key)) ? key : Number(key);
-  }
-
-  private _handleKeydown(e: KeyboardEvent): void {
-    if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
-    e.preventDefault();
-
-    const list = this.shadowRoot?.querySelector('.list');
-    if (!list) return;
-
-    // Collect all non-disabled buttons (disabled prev/next excluded; aria-disabled current page included)
-    const buttons = Array.from(list.querySelectorAll<HTMLButtonElement>('button:not([disabled])'));
-    const focused = this.shadowRoot?.activeElement as HTMLButtonElement | null;
-    const currentIdx = focused ? buttons.indexOf(focused) : 0;
-
-    const nextIdx =
-      e.key === 'ArrowLeft'
-        ? Math.max(0, currentIdx - 1)
-        : Math.min(buttons.length - 1, currentIdx + 1);
-
-    if (nextIdx !== currentIdx) {
-      const nextBtn = buttons[nextIdx];
-      if (!nextBtn) return;
-      const key = nextBtn.dataset['rovingKey'];
-      if (key !== undefined) {
-        this._rovingKey = isNaN(Number(key)) ? key : Number(key);
-      }
-      nextBtn.focus();
-    }
-  }
-
   // ─── Render ───
 
   override render() {
     const pages = this._buildPageRange();
     const isFirst = this.currentPage <= 1;
     const isLast = this.currentPage >= this.totalPages;
-    const rovingKey = this._effectiveRovingKey;
+
+    let ellipsisIndex = 0;
 
     return html`
       <nav part="nav" aria-label=${this.label}>
-        <ul
-          part="list"
-          class="list"
-          @keydown=${this._handleKeydown}
-          @focusin=${this._handleFocusin}
-        >
+        <ul part="list" class="list">
           ${this.showFirstLast
             ? html`
                 <li part="item" class="item">
@@ -214,8 +151,6 @@ export class HelixPagination extends LitElement {
                     part="button"
                     class="button"
                     ?disabled=${isFirst}
-                    tabindex=${rovingKey === 'first' ? 0 : -1}
-                    data-roving-key="first"
                     aria-label="First page"
                     @click=${() => this._navigate(1)}
                   >
@@ -230,8 +165,6 @@ export class HelixPagination extends LitElement {
               part="button"
               class="button"
               ?disabled=${isFirst}
-              tabindex=${rovingKey === 'prev' ? 0 : -1}
-              data-roving-key="prev"
               aria-label="Previous page"
               @click=${() => this._navigate(this.currentPage - 1)}
             >
@@ -239,44 +172,37 @@ export class HelixPagination extends LitElement {
             </button>
           </li>
 
-          ${repeat(
-            pages,
-            (page, i) => (page === 'ellipsis' ? `ellipsis-${i}` : `page-${page}`),
-            (page) => {
-              if (page === 'ellipsis') {
-                return html`
-                  <li part="item" class="item">
-                    <span part="ellipsis" class="ellipsis" aria-hidden="true">…</span>
-                  </li>
-                `;
-              }
-              const isCurrent = page === this.currentPage;
+          ${pages.map((page) => {
+            if (page === 'ellipsis') {
+              const key = `ellipsis-${ellipsisIndex++}`;
               return html`
-                <li part="item" class="item">
-                  <button
-                    part="button"
-                    class=${classMap({ button: true, 'button--active': isCurrent })}
-                    aria-disabled=${isCurrent ? 'true' : nothing}
-                    tabindex=${rovingKey === page ? 0 : -1}
-                    data-roving-key=${page}
-                    aria-current=${isCurrent ? 'page' : nothing}
-                    aria-label=${`Page ${page}`}
-                    @click=${() => this._navigate(page)}
-                  >
-                    ${page}
-                  </button>
+                <li part="item" class="item" data-key=${key}>
+                  <span part="ellipsis" class="ellipsis" aria-hidden="true">…</span>
                 </li>
               `;
-            },
-          )}
+            }
+            const isCurrent = page === this.currentPage;
+            return html`
+              <li part="item" class="item">
+                <button
+                  part="button"
+                  class=${`button${isCurrent ? ' button--active' : ''}`}
+                  ?disabled=${isCurrent}
+                  aria-current=${isCurrent ? 'page' : nothing}
+                  aria-label=${`Page ${page}`}
+                  @click=${() => this._navigate(page)}
+                >
+                  ${page}
+                </button>
+              </li>
+            `;
+          })}
 
           <li part="item" class="item">
             <button
               part="button"
               class="button"
               ?disabled=${isLast}
-              tabindex=${rovingKey === 'next' ? 0 : -1}
-              data-roving-key="next"
               aria-label="Next page"
               @click=${() => this._navigate(this.currentPage + 1)}
             >
@@ -291,8 +217,6 @@ export class HelixPagination extends LitElement {
                     part="button"
                     class="button"
                     ?disabled=${isLast}
-                    tabindex=${rovingKey === 'last' ? 0 : -1}
-                    data-roving-key="last"
                     aria-label="Last page"
                     @click=${() => this._navigate(this.totalPages)}
                   >
