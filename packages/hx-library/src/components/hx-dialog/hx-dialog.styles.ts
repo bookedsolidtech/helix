@@ -55,10 +55,7 @@ export const helixDialogStyles = css`
   /* ─── Native backdrop (modal mode) ─── */
 
   dialog::backdrop {
-    background-color: var(
-      --hx-dialog-backdrop-color,
-      var(--hx-color-neutral-900)
-    );
+    background-color: var(--hx-dialog-backdrop-color, var(--hx-color-neutral-900));
     opacity: 0;
     transition: opacity var(--hx-duration-200) var(--hx-ease-out);
   }
@@ -78,10 +75,7 @@ export const helixDialogStyles = css`
   .dialog-backdrop {
     position: fixed;
     inset: 0;
-    background-color: var(
-      --hx-dialog-backdrop-color,
-      var(--hx-color-neutral-900)
-    );
+    background-color: var(--hx-dialog-backdrop-color, var(--hx-color-neutral-900));
     opacity: var(--hx-dialog-backdrop-opacity, 0.5);
     z-index: var(--hx-z-index-modal);
   }

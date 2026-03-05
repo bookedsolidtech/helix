@@ -48,7 +48,7 @@ export class HelixDialog extends LitElement {
   // ─── Queries ───
 
   @query('dialog')
-  private declare _dialogEl: HTMLDialogElement | null;
+  declare private _dialogEl: HTMLDialogElement | null;
 
   // ─── Internal state ───
 
@@ -352,8 +352,7 @@ export class HelixDialog extends LitElement {
 
   private _renderHeader() {
     const hasHeading = this.heading.trim().length > 0;
-    const hasHeaderContent =
-      this._hasHeaderSlot || this.querySelector('[slot="header"]') !== null;
+    const hasHeaderContent = this._hasHeaderSlot || this.querySelector('[slot="header"]') !== null;
     if (!hasHeading && !hasHeaderContent) return nothing;
 
     return html`
@@ -361,25 +360,15 @@ export class HelixDialog extends LitElement {
         ${hasHeading
           ? html`<h2 id=${this._headingId} class="dialog__heading">${this.heading}</h2>`
           : nothing}
-        <slot
-          name="header"
-          @slotchange=${this._handleHeaderSlotChange}
-        ></slot>
+        <slot name="header" @slotchange=${this._handleHeaderSlotChange}></slot>
       </div>
     `;
   }
 
   private _renderFooter() {
     return html`
-      <div
-        part="footer"
-        class="dialog__footer"
-        ?hidden=${!this._hasFooterSlot}
-      >
-        <slot
-          name="footer"
-          @slotchange=${this._handleFooterSlotChange}
-        ></slot>
+      <div part="footer" class="dialog__footer" ?hidden=${!this._hasFooterSlot}>
+        <slot name="footer" @slotchange=${this._handleFooterSlotChange}></slot>
       </div>
     `;
   }
@@ -411,10 +400,7 @@ export class HelixDialog extends LitElement {
         aria-labelledby=${hasHeading ? this._headingId : nothing}
         aria-modal=${this.modal ? 'true' : nothing}
       >
-        <div
-          part="dialog"
-          class=${classMap(dialogClasses)}
-        >
+        <div part="dialog" class=${classMap(dialogClasses)}>
           ${this._renderHeader()}
           <div part="body" class="dialog__body">
             <slot></slot>
