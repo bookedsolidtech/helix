@@ -1,4 +1,4 @@
-import { LitElement, html, nothing } from 'lit';
+import { LitElement, html, nothing, type PropertyValues } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { tokenStyles } from '@helix/tokens/lit';
 import { helixTreeItemStyles } from './hx-tree-item.styles.js';
@@ -16,7 +16,8 @@ import { helixTreeItemStyles } from './hx-tree-item.styles.js';
  * @slot children - Nested hx-tree-item elements for sub-tree.
  *
  * @csspart item - The outer item container.
- * @csspart label - The item row (label area, expand icon, icon).
+ * @csspart row - The item row (label area, expand icon, icon).
+ * @csspart label - The label text span.
  * @csspart expand-icon - The expand/collapse toggle button.
  * @csspart children - The children container.
  *
@@ -71,7 +72,6 @@ export class HelixTreeItem extends LitElement {
   private _handleChildrenSlotChange(e: Event): void {
     const slot = e.target as HTMLSlotElement;
     this._hasChildren = slot.assignedElements().length > 0;
-    this.requestUpdate();
   }
 
   // ─── Event Handlers ───
@@ -123,6 +123,14 @@ export class HelixTreeItem extends LitElement {
     }
   }
 
+  // ─── Lifecycle ───
+
+  override updated(changedProperties: PropertyValues): void {
+    if (changedProperties.has('indent')) {
+      this.style.setProperty('--_indent-level', String(this.indent));
+    }
+  }
+
   // ─── Public API ───
 
   /** Focus this item's interactive row element. */
@@ -158,7 +166,7 @@ export class HelixTreeItem extends LitElement {
     return html`
       <div part="item" class="item">
         <div
-          part="label"
+          part="row"
           class="item-row"
           role="treeitem"
           tabindex="-1"
