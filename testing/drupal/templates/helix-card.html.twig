@@ -1,0 +1,41 @@
+{#
+/**
+ * @file
+ * HELIX hx-card — Drupal 11 Twig integration.
+ *
+ * Usage:
+ *   {% include '@my_theme/helix-card.html.twig' with {
+ *     title: node.label,
+ *     body: content.body,
+ *     actions: [
+ *       { label: 'Read More', href: url, variant: 'primary' },
+ *     ],
+ *   } %}
+ */
+#}
+
+<hx-card {% if attributes %}{{ attributes }}{% endif %}>
+  {% if title %}
+    <span slot="header">{{ title }}</span>
+  {% endif %}
+
+  {% if image %}
+    <img slot="media" src="{{ image.url }}" alt="{{ image.alt }}" loading="lazy" />
+  {% endif %}
+
+  <div slot="body">
+    {{ body }}
+  </div>
+
+  {% if actions %}
+    <div slot="footer" class="card-actions">
+      {% for action in actions %}
+        <hx-button
+          variant="{{ action.variant|default('primary') }}"
+          {% if action.href %}onclick="window.location='{{ action.href }}'"{% endif %}
+          size="sm"
+        >{{ action.label }}</hx-button>
+      {% endfor %}
+    </div>
+  {% endif %}
+</hx-card>
