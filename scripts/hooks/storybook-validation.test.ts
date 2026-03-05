@@ -28,61 +28,6 @@ describe('storybook-validation (H09)', () => {
       expect(result.exitCode).toBe(0);
       expect(result.output).toContain('[PASS]');
     });
-
-    it('detects components without stories', () => {
-      // This would require git staging simulation
-      expect(true).toBe(true);
-    });
-
-    it('passes when component has stories', () => {
-      expect(true).toBe(true);
-    });
-
-    it('checks only hx-*.ts component files', () => {
-      expect(true).toBe(true);
-    });
-  });
-
-  describe('Exclusions', () => {
-    it('ignores test files', () => {
-      expect(true).toBe(true);
-    });
-
-    it('ignores style files', () => {
-      expect(true).toBe(true);
-    });
-
-    it('ignores index files', () => {
-      expect(true).toBe(true);
-    });
-
-    it('ignores utility files', () => {
-      expect(true).toBe(true);
-    });
-
-    it('ignores stories files themselves', () => {
-      expect(true).toBe(true);
-    });
-  });
-
-  describe('Validation', () => {
-    it('validates stories are in same directory', () => {
-      expect(true).toBe(true);
-    });
-
-    it('validates stories follow naming convention', () => {
-      expect(true).toBe(true);
-    });
-  });
-
-  describe('Error Handling', () => {
-    it('handles git command failures', () => {
-      expect(true).toBe(true);
-    });
-
-    it('handles missing components directory', () => {
-      expect(true).toBe(true);
-    });
   });
 
   describe('Performance', () => {
@@ -98,14 +43,6 @@ describe('storybook-validation (H09)', () => {
     it('provides clear error messages', () => {
       const result = runHook();
       expect(result.output).toContain('[HOOK] storybook-validation');
-    });
-
-    it('shows statistics for checked components', () => {
-      expect(true).toBe(true);
-    });
-
-    it('suggests how to create stories', () => {
-      expect(true).toBe(true);
     });
   });
 });
