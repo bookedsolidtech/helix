@@ -60,6 +60,9 @@ export class HelixDialog extends LitElement {
   @state()
   private _hasFooterSlot = false;
 
+  /** Cached focusable elements — populated on open, cleared on close. */
+  private _cachedFocusableElements: HTMLElement[] = [];
+
   // ─── Unique ID for aria-labelledby ───
 
   private readonly _headingId = `hx-dialog-heading-${Math.random().toString(36).slice(2, 9)}`;
@@ -102,10 +105,19 @@ export class HelixDialog extends LitElement {
   @property({ type: String })
   heading = '';
 
+  /**
+   * Accessible label for dialogs that use a custom header slot instead of the `heading` attribute.
+   * Required when `heading` is empty and no labelled heading is projected into the header slot.
+   * @attr aria-label
+   */
+  @property({ type: String, attribute: 'aria-label' })
+  ariaLabel = '';
+
   // ─── Lifecycle ───
 
-  override connectedCallback(): void {
-    super.connectedCallback();
+  override firstUpdated(): void {
+    // Initialize header slot state without a querySelector in render()
+    this._hasHeaderSlot = this.querySelector('[slot="header"]') !== null;
   }
 
   override disconnectedCallback(): void {
@@ -161,6 +173,11 @@ export class HelixDialog extends LitElement {
 
     this._addGlobalListeners();
 
+    // Cache focusable elements after the dialog is open in the DOM
+    void this.updateComplete.then(() => {
+      this._cachedFocusableElements = this._getFocusableElements();
+    });
+
     this.dispatchEvent(
       new CustomEvent('hx-open', {
         bubbles: true,
@@ -179,6 +196,7 @@ export class HelixDialog extends LitElement {
     }
 
     this._removeGlobalListeners();
+    this._cachedFocusableElements = [];
 
     if (wasOpen) {
       this.dispatchEvent(
@@ -216,7 +234,7 @@ export class HelixDialog extends LitElement {
       return;
     }
 
-    if (e.key === 'Tab') {
+    if (e.key === 'Tab' && this.modal) {
       this._trapFocus(e);
     }
   };
@@ -263,7 +281,10 @@ export class HelixDialog extends LitElement {
   }
 
   private _trapFocus(e: KeyboardEvent): void {
-    const focusable = this._getFocusableElements();
+    const focusable =
+      this._cachedFocusableElements.length > 0
+        ? this._cachedFocusableElements
+        : this._getFocusableElements();
     if (focusable.length === 0) {
       e.preventDefault();
       return;
@@ -352,8 +373,7 @@ export class HelixDialog extends LitElement {
 
   private _renderHeader() {
     const hasHeading = this.heading.trim().length > 0;
-    const hasHeaderContent = this._hasHeaderSlot || this.querySelector('[slot="header"]') !== null;
-    if (!hasHeading && !hasHeaderContent) return nothing;
+    if (!hasHeading && !this._hasHeaderSlot) return nothing;
 
     return html`
       <div part="header" class="dialog__header">
@@ -398,6 +418,7 @@ export class HelixDialog extends LitElement {
       ${this._renderNonModalBackdrop()}
       <dialog
         aria-labelledby=${hasHeading ? this._headingId : nothing}
+        aria-label=${!hasHeading && this.ariaLabel ? this.ariaLabel : nothing}
         aria-modal=${this.modal ? 'true' : nothing}
       >
         <div part="dialog" class=${classMap(dialogClasses)}>
