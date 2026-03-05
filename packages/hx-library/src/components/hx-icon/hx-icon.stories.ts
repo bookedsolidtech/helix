@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/web-components';
 import { html } from 'lit';
+import { ifDefined } from 'lit/directives/if-defined.js';
 import { expect } from 'storybook/test';
 import './hx-icon.js';
 
@@ -81,8 +82,8 @@ const meta = {
   render: (args) => html`
     <hx-icon
       name=${args.name}
-      src=${args.src ?? ''}
-      sprite-url=${args.spriteUrl ?? ''}
+      src=${ifDefined(args.src)}
+      sprite-url=${ifDefined(args.spriteUrl)}
       hx-size=${args.size}
       label=${args.label}
     ></hx-icon>

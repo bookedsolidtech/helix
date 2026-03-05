@@ -46,7 +46,11 @@ export const helixIconStyles = css`
   /* ─── Inline SVG wrapper ─── */
 
   .icon__inline {
-    display: contents;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
   }
 
   .icon__inline svg {

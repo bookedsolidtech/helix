@@ -44,6 +44,7 @@ npm-debug.log*
 scripts/coverage/
 
 # Playwright test artifacts
+test-results/
 packages/hx-library/test-results/
 
 # MCP server test coverage reports
