@@ -18,13 +18,16 @@ export async function GET(_request: Request, { params }: RouteParams): Promise<N
     const library = getLibrary(id);
 
     if (!library) {
-      return NextResponse.json({ error: `Library "${id}" not found.` }, { status: 404 });
+      return NextResponse.json({ error: `Library "${id}" not found` }, { status: 404 });
     }
 
     return NextResponse.json(library);
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Unknown error occurred';
-    return NextResponse.json({ error: 'Failed to load library', detail: message }, { status: 500 });
+    return NextResponse.json(
+      { error: 'Failed to load library', details: [message] },
+      { status: 500 },
+    );
   }
 }
 
@@ -55,10 +58,13 @@ export async function PATCH(request: Request, { params }: RouteParams): Promise<
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Unknown error occurred';
     if (message.includes('not found')) {
-      return NextResponse.json({ error: message }, { status: 404 });
+      return NextResponse.json({ error: message, details: [message] }, { status: 404 });
+    }
+    if (message.includes('required')) {
+      return NextResponse.json({ error: 'Validation failed', details: [message] }, { status: 400 });
     }
     return NextResponse.json(
-      { error: 'Failed to update library', detail: message },
+      { error: 'Failed to update library', details: [message] },
       { status: 500 },
     );
   }
@@ -67,24 +73,33 @@ export async function PATCH(request: Request, { params }: RouteParams): Promise<
 /**
  * DELETE /api/libraries/[id]
  * Removes a library entry by ID.
- * Returns 400 if the library is the default.
+ * Returns 403 if the library id is 'hx-library'.
  * Returns 404 if not found.
+ * Returns 204 on success.
  */
 export async function DELETE(_request: Request, { params }: RouteParams): Promise<NextResponse> {
   try {
     const { id } = await params;
+
+    if (id === 'hx-library') {
+      return NextResponse.json(
+        { error: 'The hx-library entry cannot be removed' },
+        { status: 403 },
+      );
+    }
+
     removeLibrary(id);
-    return NextResponse.json({ success: true, id });
+    return new NextResponse(null, { status: 204 });
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Unknown error occurred';
-    if (message.includes('Cannot remove the default library')) {
-      return NextResponse.json({ error: message }, { status: 400 });
-    }
     if (message.includes('not found')) {
-      return NextResponse.json({ error: message }, { status: 404 });
+      return NextResponse.json({ error: message, details: [message] }, { status: 404 });
+    }
+    if (message.includes('Cannot remove the default library')) {
+      return NextResponse.json({ error: message, details: [message] }, { status: 400 });
     }
     return NextResponse.json(
-      { error: 'Failed to delete library', detail: message },
+      { error: 'Failed to delete library', details: [message] },
       { status: 500 },
     );
   }
