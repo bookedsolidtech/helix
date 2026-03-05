@@ -81,9 +81,9 @@ export class HelixNav extends LitElement {
   @state() private _mobileOpen = false;
   @state() private _expandedIndex: number | null = null;
 
-  // ─── Private: keyboard/focus tracking ───
+  // ─── Private: bound event handler reference ───
 
-  private _focusableItems: HTMLElement[] = [];
+  private _boundOutsideClick: (e: MouseEvent) => void = this._handleOutsideClick.bind(this);
 
   // ─── Event Handling ───
 
@@ -124,7 +124,9 @@ export class HelixNav extends LitElement {
   }
 
   private _handleKeydown(e: KeyboardEvent, index: number, item: NavItem): void {
-    const items = this.shadowRoot?.querySelectorAll<HTMLElement>('[part="link"]');
+    const items = this.shadowRoot?.querySelectorAll<HTMLElement>(
+      ':scope > nav > [part="list"] > [part="item"] > [part="link"]',
+    );
     if (!items) return;
     const itemsArr = Array.from(items);
     const current = itemsArr[index];
@@ -173,7 +175,7 @@ export class HelixNav extends LitElement {
 
   private _handleSubKeydown(e: KeyboardEvent, parentIndex: number): void {
     const subItems = this.shadowRoot?.querySelectorAll<HTMLElement>(
-      `.nav__submenu:nth-child(${parentIndex + 1}) [part="link"]`,
+      `.nav__submenu:not([hidden]) [part="link"]`,
     );
     if (!subItems) return;
     const arr = Array.from(subItems);
@@ -215,12 +217,12 @@ export class HelixNav extends LitElement {
 
   override connectedCallback(): void {
     super.connectedCallback();
-    document.addEventListener('click', this._handleOutsideClick.bind(this));
+    document.addEventListener('click', this._boundOutsideClick);
   }
 
   override disconnectedCallback(): void {
     super.disconnectedCallback();
-    document.removeEventListener('click', this._handleOutsideClick.bind(this));
+    document.removeEventListener('click', this._boundOutsideClick);
   }
 
   // ─── Render Helpers ───
@@ -316,7 +318,7 @@ export class HelixNav extends LitElement {
           >
             ${item.label} ${this._renderChevronIcon()}
           </button>
-          ${this._renderSubMenu(item.children!, index)}
+          ${this._renderSubMenu(item.children ?? [], index)}
         `
       : html`
           <a

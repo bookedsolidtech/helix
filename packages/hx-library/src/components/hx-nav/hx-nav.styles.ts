@@ -235,6 +235,7 @@ export const helixNavStyles = css`
     .nav__chevron,
     [part='toggle'] {
       transition: none;
+      animation: none;
     }
   }
 `;
