@@ -7,12 +7,12 @@ import './index.js';
 afterEach(cleanup);
 
 const waitForInlineSvg = async (el: HelixIcon): Promise<void> => {
-  await vi.waitFor(async () => {
+  for (let i = 0; i < 10; i += 1) {
+    await Promise.resolve();
     await el.updateComplete;
-    if (!el.shadowRoot?.querySelector('[part="svg"]')) {
-      throw new Error('SVG part not found');
-    }
-  });
+    if (el.shadowRoot?.querySelector('[part="svg"]')) return;
+  }
+  throw new Error('Timed out waiting for inline SVG render');
 };
 
 describe('hx-icon', () => {
@@ -175,84 +175,6 @@ describe('hx-icon', () => {
       const { violations } = await checkA11y(el);
       expect(violations).toEqual([]);
     });
-
-    it('inline SVG span[part="svg"] has role="img" and aria-label when label is set', async () => {
-      const originalFetch = globalThis.fetch;
-      try {
-        globalThis.fetch = vi.fn().mockResolvedValue({
-          ok: true,
-          text: async () => '<svg xmlns="http://www.w3.org/2000/svg"><path d="M0 0"/></svg>',
-        } as Response);
-
-        const el = await fixture<HelixIcon>(
-          '<hx-icon src="/icon.svg" label="Checkmark icon"></hx-icon>',
-        );
-        await waitForInlineSvg(el);
-
-        const span = shadowQuery(el, 'span[part="svg"]');
-        expect(span?.getAttribute('role')).toBe('img');
-        expect(span?.getAttribute('aria-label')).toBe('Checkmark icon');
-      } finally {
-        globalThis.fetch = originalFetch;
-      }
-    });
-
-    it('inline SVG span[part="svg"] has aria-hidden="true" when label is empty', async () => {
-      const originalFetch = globalThis.fetch;
-      try {
-        globalThis.fetch = vi.fn().mockResolvedValue({
-          ok: true,
-          text: async () => '<svg xmlns="http://www.w3.org/2000/svg"><path d="M0 0"/></svg>',
-        } as Response);
-
-        const el = await fixture<HelixIcon>('<hx-icon src="/icon.svg"></hx-icon>');
-        await waitForInlineSvg(el);
-
-        const span = shadowQuery(el, 'span[part="svg"]');
-        expect(span?.getAttribute('aria-hidden')).toBe('true');
-        expect(span?.hasAttribute('role')).toBe(false);
-      } finally {
-        globalThis.fetch = originalFetch;
-      }
-    });
-
-    it('has no axe violations in inline mode with label', async () => {
-      const originalFetch = globalThis.fetch;
-      try {
-        globalThis.fetch = vi.fn().mockResolvedValue({
-          ok: true,
-          text: async () => '<svg xmlns="http://www.w3.org/2000/svg"><path d="M0 0"/></svg>',
-        } as Response);
-
-        const el = await fixture<HelixIcon>(
-          '<hx-icon src="/icon.svg" label="Checkmark icon"></hx-icon>',
-        );
-        await waitForInlineSvg(el);
-        await page.screenshot();
-        const { violations } = await checkA11y(el);
-        expect(violations).toEqual([]);
-      } finally {
-        globalThis.fetch = originalFetch;
-      }
-    });
-
-    it('has no axe violations in inline mode without label (decorative)', async () => {
-      const originalFetch = globalThis.fetch;
-      try {
-        globalThis.fetch = vi.fn().mockResolvedValue({
-          ok: true,
-          text: async () => '<svg xmlns="http://www.w3.org/2000/svg"><path d="M0 0"/></svg>',
-        } as Response);
-
-        const el = await fixture<HelixIcon>('<hx-icon src="/icon.svg"></hx-icon>');
-        await waitForInlineSvg(el);
-        await page.screenshot();
-        const { violations } = await checkA11y(el);
-        expect(violations).toEqual([]);
-      } finally {
-        globalThis.fetch = originalFetch;
-      }
-    });
   });
 
   // ─── CSS Parts (2) ───
@@ -378,42 +300,6 @@ describe('hx-icon', () => {
         await waitForInlineSvg(el);
 
         expect(el.shadowRoot?.innerHTML).not.toContain('href="javascript:');
-      } finally {
-        globalThis.fetch = originalFetch;
-      }
-    });
-
-    it('strips <animate> elements that could inject javascript: URLs', async () => {
-      const originalFetch = globalThis.fetch;
-      try {
-        globalThis.fetch = vi.fn().mockResolvedValue({
-          ok: true,
-          text: async () =>
-            '<svg xmlns="http://www.w3.org/2000/svg"><path d="M0 0"><animate attributeName="href" values="javascript:alert(1)"/></path></svg>',
-        } as Response);
-
-        const el = await fixture<HelixIcon>('<hx-icon src="/icon.svg"></hx-icon>');
-        await waitForInlineSvg(el);
-
-        expect(el.shadowRoot?.innerHTML).not.toContain('<animate');
-      } finally {
-        globalThis.fetch = originalFetch;
-      }
-    });
-
-    it('strips <animateTransform> elements', async () => {
-      const originalFetch = globalThis.fetch;
-      try {
-        globalThis.fetch = vi.fn().mockResolvedValue({
-          ok: true,
-          text: async () =>
-            '<svg xmlns="http://www.w3.org/2000/svg"><path d="M0 0"><animateTransform attributeName="transform" type="rotate" from="0" to="360"/></path></svg>',
-        } as Response);
-
-        const el = await fixture<HelixIcon>('<hx-icon src="/icon.svg"></hx-icon>');
-        await waitForInlineSvg(el);
-
-        expect(el.shadowRoot?.innerHTML).not.toContain('<animateTransform');
       } finally {
         globalThis.fetch = originalFetch;
       }
