@@ -16,7 +16,7 @@ import { helixSwitchStyles } from './hx-switch.styles.js';
  * @slot error - Custom error content (overrides the error property).
  * @slot help-text - Custom help text content (overrides the helpText property).
  *
- * @fires {CustomEvent<{checked: boolean}>} hx-change - Dispatched when the switch is toggled.
+ * @fires {CustomEvent<{checked: boolean, value: string}>} hx-change - Dispatched when the switch is toggled.
  *
  * @csspart switch - The switch container (track + thumb wrapper).
  * @csspart track - The track background element.
@@ -97,7 +97,7 @@ export class HelixSwitch extends LitElement {
    * @attr hx-size
    */
   @property({ type: String, reflect: true, attribute: 'hx-size' })
-  size: 'sm' | 'md' | 'lg' = 'md';
+  hxSize: 'sm' | 'md' | 'lg' = 'md';
 
   /**
    * Error message to display. When set, the switch enters an error state.
@@ -193,8 +193,6 @@ export class HelixSwitch extends LitElement {
   private _toggle(): void {
     if (this.disabled) return;
     this.checked = !this.checked;
-    this._internals.setFormValue(this.checked ? this.value : null);
-    this._updateValidity();
 
     /**
      * Dispatched when the switch is toggled.
@@ -204,7 +202,7 @@ export class HelixSwitch extends LitElement {
       new CustomEvent('hx-change', {
         bubbles: true,
         composed: true,
-        detail: { checked: this.checked },
+        detail: { checked: this.checked, value: this.value },
       }),
     );
   }
@@ -244,7 +242,7 @@ export class HelixSwitch extends LitElement {
       'switch--disabled': this.disabled,
       'switch--required': this.required,
       'switch--error': hasError,
-      [`switch--${this.size}`]: true,
+      [`switch--${this.hxSize}`]: true,
     };
 
     const describedBy =
@@ -322,3 +320,5 @@ declare global {
     'hx-switch': HelixSwitch;
   }
 }
+
+export type WcSwitch = HelixSwitch;
