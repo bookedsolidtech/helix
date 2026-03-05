@@ -300,13 +300,13 @@ export const Disabled: Story = {
 };
 
 export const Readonly: Story = {
-  name: 'Read-only (via CSS)',
+  name: 'Read-only',
   render: () => html`
     <hx-text-input
       label="Assigned Physician"
       value="Dr. Eleanor Vance"
       help-text="Read-only. Contact administration to change assigned physician."
-      style="pointer-events: none; opacity: 0.75;"
+      readonly
     ></hx-text-input>
   `,
 };
@@ -318,29 +318,25 @@ export const Readonly: Story = {
 export const SizeSmall: Story = {
   name: 'Size: Small',
   render: () => html`
-    <hx-text-input
-      label="Compact Input"
-      placeholder="Small variant"
-      style="font-size: 0.875rem; --hx-input-font-family: var(--hx-font-family-sans);"
-    ></hx-text-input>
+    <hx-text-input label="Compact Input" placeholder="Small variant" hx-size="sm"></hx-text-input>
   `,
 };
 
 export const SizeMedium: Story = {
   name: 'Size: Medium (Default)',
   render: () => html`
-    <hx-text-input label="Standard Input" placeholder="Medium variant (default)"></hx-text-input>
+    <hx-text-input
+      label="Standard Input"
+      placeholder="Medium variant (default)"
+      hx-size="md"
+    ></hx-text-input>
   `,
 };
 
 export const SizeLarge: Story = {
   name: 'Size: Large',
   render: () => html`
-    <hx-text-input
-      label="Large Input"
-      placeholder="Large variant"
-      style="font-size: 1.125rem;"
-    ></hx-text-input>
+    <hx-text-input label="Large Input" placeholder="Large variant" hx-size="lg"></hx-text-input>
   `,
 };
 
