@@ -1,5 +1,5 @@
-import { LitElement, html } from 'lit';
-import { customElement, property } from 'lit/decorators.js';
+import { LitElement, html, type PropertyValues } from 'lit';
+import { customElement, property, query } from 'lit/decorators.js';
 import { tokenStyles } from '@helix/tokens/lit';
 import { helixSideNavStyles } from './hx-side-nav.styles.js';
 
@@ -15,8 +15,8 @@ import { helixSideNavStyles } from './hx-side-nav.styles.js';
  * @slot header - Logo or branding content.
  * @slot footer - User profile or settings content.
  *
- * @fires {CustomEvent} hx-collapse - Dispatched when the nav collapses to icon-only mode.
- * @fires {CustomEvent} hx-expand - Dispatched when the nav expands to full width.
+ * @fires {CustomEvent<{ collapsed: boolean }>} hx-collapse - Dispatched when the nav collapses to icon-only mode.
+ * @fires {CustomEvent<{ collapsed: boolean }>} hx-expand - Dispatched when the nav expands to full width.
  *
  * @csspart nav - The outer nav element.
  * @csspart header - The header section.
@@ -51,6 +51,107 @@ export class HelixSideNav extends LitElement {
   @property({ type: String })
   label = 'Main Navigation';
 
+  // ─── Queries ───
+
+  @query('.side-nav__body')
+  private _bodyEl!: HTMLDivElement;
+
+  // ─── Lifecycle ───
+
+  override updated(changedProperties: PropertyValues): void {
+    super.updated(changedProperties);
+    if (changedProperties.has('collapsed')) {
+      this._propagateCollapsedToChildren();
+    }
+  }
+
+  // ─── Collapsed State Propagation ───
+
+  /**
+   * Propagates the collapsed state to all slotted hx-nav-item children by
+   * setting or removing the `data-collapsed` attribute. This allows child
+   * items to respond to collapsed mode via their CSS selectors.
+   */
+  private _propagateCollapsedToChildren(): void {
+    const slot = this.shadowRoot?.querySelector<HTMLSlotElement>('slot:not([name])');
+    if (!slot) return;
+
+    const navItems = slot
+      .assignedElements({ flatten: true })
+      .filter((el) => el.tagName.toLowerCase() === 'hx-nav-item');
+
+    for (const item of navItems) {
+      if (!(item instanceof HTMLElement)) continue;
+      if (this.collapsed) {
+        item.setAttribute('data-collapsed', '');
+      } else {
+        item.removeAttribute('data-collapsed');
+      }
+    }
+  }
+
+  /**
+   * Handles the default slot's slotchange event so that if items are added
+   * after initial render, they immediately receive the correct collapsed state.
+   */
+  private _onDefaultSlotChange(): void {
+    this._propagateCollapsedToChildren();
+  }
+
+  // ─── Keyboard Navigation ───
+
+  /**
+   * Implements roving tabindex-style ArrowUp/ArrowDown keyboard navigation
+   * among direct hx-nav-item children in the body slot. Disabled items are
+   * skipped. Focus is applied to the interactive element inside the shadow DOM
+   * of each item (anchor or button with part="link").
+   */
+  private _handleKeydown(e: KeyboardEvent): void {
+    if (e.key !== 'ArrowDown' && e.key !== 'ArrowUp') return;
+
+    const slot = this.shadowRoot?.querySelector<HTMLSlotElement>('slot:not([name])');
+    if (!slot) return;
+
+    const navItems = slot
+      .assignedElements({ flatten: true })
+      .filter(
+        (el): el is HTMLElement =>
+          el.tagName.toLowerCase() === 'hx-nav-item' && !el.hasAttribute('disabled'),
+      );
+
+    if (navItems.length === 0) return;
+
+    // Find which item currently contains focus
+    const activeEl = document.activeElement;
+    let currentIndex = -1;
+    for (let i = 0; i < navItems.length; i++) {
+      const item = navItems[i];
+      if (!item) continue;
+      if (
+        item === activeEl ||
+        item.contains(activeEl) ||
+        item.shadowRoot?.contains(activeEl) === true
+      ) {
+        currentIndex = i;
+        break;
+      }
+    }
+
+    e.preventDefault();
+
+    let nextIndex: number;
+    if (e.key === 'ArrowDown') {
+      nextIndex = currentIndex < navItems.length - 1 ? currentIndex + 1 : 0;
+    } else {
+      nextIndex = currentIndex > 0 ? currentIndex - 1 : navItems.length - 1;
+    }
+
+    const targetItem = navItems[nextIndex];
+    if (!targetItem) return;
+    const focusTarget = targetItem.shadowRoot?.querySelector<HTMLElement>('[part="link"]');
+    focusTarget?.focus();
+  }
+
   // ─── Event Handling ───
 
   private _handleToggle(): void {
@@ -62,9 +163,10 @@ export class HelixSideNav extends LitElement {
        * @event hx-collapse
        */
       this.dispatchEvent(
-        new CustomEvent('hx-collapse', {
+        new CustomEvent<{ collapsed: boolean }>('hx-collapse', {
           bubbles: true,
           composed: true,
+          detail: { collapsed: true },
         }),
       );
     } else {
@@ -73,9 +175,10 @@ export class HelixSideNav extends LitElement {
        * @event hx-expand
        */
       this.dispatchEvent(
-        new CustomEvent('hx-expand', {
+        new CustomEvent<{ collapsed: boolean }>('hx-expand', {
           bubbles: true,
           composed: true,
+          detail: { collapsed: false },
         }),
       );
     }
@@ -107,8 +210,8 @@ export class HelixSideNav extends LitElement {
           </button>
         </div>
 
-        <div part="body" class="side-nav__body" id="side-nav-body">
-          <slot></slot>
+        <div part="body" class="side-nav__body" id="side-nav-body" @keydown=${this._handleKeydown}>
+          <slot @slotchange=${this._onDefaultSlotChange}></slot>
         </div>
 
         <div part="footer" class="side-nav__footer">
