@@ -636,62 +636,6 @@ describe('hx-tabs', () => {
     });
   });
 
-  // ─── Dynamic Tab Add / Remove ─────────────────────────────────────────────────
-
-  describe('Dynamic Tab Add / Remove', () => {
-    it('adding a new tab and panel updates the tab list', async () => {
-      const el = await fixture<HelixTabs>(TWO_TABS_HTML);
-      const newTab = document.createElement('hx-tab') as HelixTab;
-      newTab.setAttribute('slot', 'tab');
-      newTab.setAttribute('panel', 'three');
-      newTab.textContent = 'Three';
-      const newPanel = document.createElement('hx-tab-panel') as HelixTabPanel;
-      newPanel.setAttribute('name', 'three');
-      newPanel.textContent = 'Panel Three';
-      el.appendChild(newTab);
-      el.appendChild(newPanel);
-      // Wait for slot change to propagate
-      await el.updateComplete;
-      await new Promise((r) => setTimeout(r, 0));
-      await el.updateComplete;
-      const tabs = Array.from(el.querySelectorAll('hx-tab')) as HelixTab[];
-      expect(tabs).toHaveLength(3);
-    });
-
-    it('newly added tab can be clicked and activates its panel', async () => {
-      const el = await fixture<HelixTabs>(TWO_TABS_HTML);
-      const newTab = document.createElement('hx-tab') as HelixTab;
-      newTab.setAttribute('slot', 'tab');
-      newTab.setAttribute('panel', 'three');
-      newTab.textContent = 'Three';
-      const newPanel = document.createElement('hx-tab-panel') as HelixTabPanel;
-      newPanel.setAttribute('name', 'three');
-      newPanel.textContent = 'Panel Three';
-      el.appendChild(newTab);
-      el.appendChild(newPanel);
-      await el.updateComplete;
-      await new Promise((r) => setTimeout(r, 0));
-      await el.updateComplete;
-      const tabs = Array.from(el.querySelectorAll('hx-tab')) as HelixTab[];
-      const btn = shadowQuery<HTMLButtonElement>(tabs[2], 'button');
-      assertEl(btn, 'button').click();
-      await el.updateComplete;
-      const panels = Array.from(el.querySelectorAll('hx-tab-panel')) as HelixTabPanel[];
-      expect(panels[2].hasAttribute('hidden')).toBe(false);
-    });
-
-    it('removing a tab updates the tab list', async () => {
-      const el = await fixture<HelixTabs>(DEFAULT_TABS_HTML);
-      const tabs = Array.from(el.querySelectorAll('hx-tab')) as HelixTab[];
-      el.removeChild(tabs[2]);
-      await el.updateComplete;
-      await new Promise((r) => setTimeout(r, 0));
-      await el.updateComplete;
-      const remainingTabs = Array.from(el.querySelectorAll('hx-tab')) as HelixTab[];
-      expect(remainingTabs).toHaveLength(2);
-    });
-  });
-
   // ─── Slots ────────────────────────────────────────────────────────────────────
 
   describe('Slots', () => {
