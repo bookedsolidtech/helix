@@ -47,6 +47,11 @@ scripts/coverage/
 # Playwright test artifacts
 test-results/
 packages/hx-library/test-results/
+test-results/
+
+# Generated integration test bundles (esbuild output)
+testing/static-html/helix-bundle.js
+testing/static-html/helix-bundle.css
 
 # Generated integration test bundles (esbuild output)
 testing/static-html/helix-bundle.js
