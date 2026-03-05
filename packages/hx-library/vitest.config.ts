@@ -1,6 +1,14 @@
 import { defineConfig } from 'vitest/config';
+import { resolve } from 'path';
 
 export default defineConfig({
+  server: {
+    fs: {
+      // Allow access to parent directories where node_modules may live.
+      // Required when running from a git worktree (node_modules in main repo root).
+      allow: [resolve(__dirname, '../..'), resolve(__dirname, '../../../..')],
+    },
+  },
   test: {
     browser: {
       enabled: true,
@@ -14,7 +22,7 @@ export default defineConfig({
     outputFile: { json: '.cache/test-results.json' },
     globals: true,
     coverage: {
-      provider: 'v8',
+      provider: 'istanbul',
       enabled: true,
       include: ['src/components/**/*.ts'],
       exclude: [
