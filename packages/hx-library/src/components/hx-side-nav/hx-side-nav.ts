@@ -210,12 +210,7 @@ export class HelixSideNav extends LitElement {
           </button>
         </div>
 
-        <div
-          part="body"
-          class="side-nav__body"
-          id="side-nav-body"
-          @keydown=${this._handleKeydown}
-        >
+        <div part="body" class="side-nav__body" id="side-nav-body" @keydown=${this._handleKeydown}>
           <slot @slotchange=${this._onDefaultSlotChange}></slot>
         </div>
 
