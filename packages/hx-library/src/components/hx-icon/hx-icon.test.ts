@@ -1,4 +1,4 @@
-import { describe, it, expect, afterEach } from 'vitest';
+import { describe, it, expect, afterEach, vi } from 'vitest';
 import { page } from '@vitest/browser/context';
 import { fixture, shadowQuery, cleanup, checkA11y } from '../../test-utils.js';
 import type { HelixIcon } from './hx-icon.js';
@@ -183,6 +183,145 @@ describe('hx-icon', () => {
       await el.updateComplete;
       const svgPart = shadowQuery(el, '[part="svg"]');
       expect(svgPart?.getAttribute('part')).toBe('svg');
+    });
+  });
+
+  // ─── Property: src (3) ───
+
+  describe('Property: src', () => {
+    it('src="" is treated as absent — sprite mode still works', async () => {
+      const el = await fixture<HelixIcon>('<hx-icon name="check" src=""></hx-icon>');
+      await el.updateComplete;
+      expect(el.src).toBe('');
+      const svg = shadowQuery(el, 'svg[part="svg"]');
+      expect(svg).toBeTruthy();
+    });
+
+    it('src attribute reflects to src property', async () => {
+      const el = await fixture<HelixIcon>('<hx-icon src="/icons/check.svg"></hx-icon>');
+      await el.updateComplete;
+      expect(el.src).toBe('/icons/check.svg');
+    });
+
+    it('renders nothing while src is set but fetch not yet resolved', async () => {
+      const originalFetch = globalThis.fetch;
+      try {
+        globalThis.fetch = vi.fn().mockReturnValue(new Promise(() => {}));
+
+        const el = await fixture<HelixIcon>('<hx-icon src="/test.svg"></hx-icon>');
+        await el.updateComplete;
+
+        const svgPart = shadowQuery(el, '[part="svg"]');
+        expect(svgPart).toBeNull();
+      } finally {
+        globalThis.fetch = originalFetch;
+      }
+    });
+  });
+
+  // ─── Sanitizer (5) ───
+
+  describe('Sanitizer', () => {
+    it('strips <script> elements from fetched SVG', async () => {
+      const originalFetch = globalThis.fetch;
+      try {
+        globalThis.fetch = vi.fn().mockResolvedValue({
+          ok: true,
+          text: async () =>
+            '<svg xmlns="http://www.w3.org/2000/svg"><script>alert(1)</script><path d="M0 0"/></svg>',
+        } as Response);
+
+        const el = await fixture<HelixIcon>('<hx-icon src="/icon.svg"></hx-icon>');
+        await el.updateComplete;
+        await new Promise((resolve) => setTimeout(resolve, 50));
+        await el.updateComplete;
+
+        expect(el.shadowRoot?.innerHTML).not.toContain('<script');
+      } finally {
+        globalThis.fetch = originalFetch;
+      }
+    });
+
+    it('strips on* event-handler attributes from child elements', async () => {
+      const originalFetch = globalThis.fetch;
+      try {
+        globalThis.fetch = vi.fn().mockResolvedValue({
+          ok: true,
+          text: async () =>
+            '<svg xmlns="http://www.w3.org/2000/svg"><path d="M0 0" onclick="alert(1)"/></svg>',
+        } as Response);
+
+        const el = await fixture<HelixIcon>('<hx-icon src="/icon.svg"></hx-icon>');
+        await el.updateComplete;
+        await new Promise((resolve) => setTimeout(resolve, 50));
+        await el.updateComplete;
+
+        expect(el.shadowRoot?.innerHTML).not.toContain('onclick');
+      } finally {
+        globalThis.fetch = originalFetch;
+      }
+    });
+
+    it('strips on* event-handler attributes from root svg element', async () => {
+      const originalFetch = globalThis.fetch;
+      try {
+        globalThis.fetch = vi.fn().mockResolvedValue({
+          ok: true,
+          text: async () =>
+            '<svg xmlns="http://www.w3.org/2000/svg" onload="alert(1)"><path d="M0 0"/></svg>',
+        } as Response);
+
+        const el = await fixture<HelixIcon>('<hx-icon src="/icon.svg"></hx-icon>');
+        await el.updateComplete;
+        await new Promise((resolve) => setTimeout(resolve, 50));
+        await el.updateComplete;
+
+        const svgPart = shadowQuery(el, '[part="svg"]');
+        const inlineSvg = svgPart?.querySelector('svg');
+        expect(inlineSvg?.hasAttribute('onload')).toBe(false);
+      } finally {
+        globalThis.fetch = originalFetch;
+      }
+    });
+
+    it('strips javascript: href values', async () => {
+      const originalFetch = globalThis.fetch;
+      try {
+        globalThis.fetch = vi.fn().mockResolvedValue({
+          ok: true,
+          text: async () =>
+            '<svg xmlns="http://www.w3.org/2000/svg"><a href="javascript:alert(1)"><path d="M0 0"/></a></svg>',
+        } as Response);
+
+        const el = await fixture<HelixIcon>('<hx-icon src="/icon.svg"></hx-icon>');
+        await el.updateComplete;
+        await new Promise((resolve) => setTimeout(resolve, 50));
+        await el.updateComplete;
+
+        expect(el.shadowRoot?.innerHTML).not.toContain('href="javascript:');
+      } finally {
+        globalThis.fetch = originalFetch;
+      }
+    });
+
+    it('strips <foreignObject> elements', async () => {
+      const originalFetch = globalThis.fetch;
+      try {
+        globalThis.fetch = vi.fn().mockResolvedValue({
+          ok: true,
+          text: async () =>
+            '<svg xmlns="http://www.w3.org/2000/svg"><foreignObject><div>XSS</div></foreignObject></svg>',
+        } as Response);
+
+        const el = await fixture<HelixIcon>('<hx-icon src="/icon.svg"></hx-icon>');
+        await el.updateComplete;
+        await new Promise((resolve) => setTimeout(resolve, 50));
+        await el.updateComplete;
+
+        expect(el.shadowRoot?.innerHTML).not.toContain('foreignObject');
+      } finally {
+        globalThis.fetch = originalFetch;
+      }
     });
   });
 });

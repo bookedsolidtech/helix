@@ -79,6 +79,12 @@ export class HelixIcon extends LitElement {
   @state()
   private _fetchedSrc: string | undefined = undefined;
 
+  /**
+   * Monotonically-increasing sequence number. Incremented before each fetch so
+   * that stale out-of-order responses can be discarded.
+   */
+  private _fetchSeq = 0;
+
   // ─── Lifecycle ───
 
   override updated(changed: Map<string, unknown>): void {
@@ -90,6 +96,8 @@ export class HelixIcon extends LitElement {
   // ─── Inline SVG Fetch ───
 
   private async _fetchInlineSvg(url: string | undefined): Promise<void> {
+    const seq = ++this._fetchSeq;
+
     if (!url) {
       this._inlineSvg = '';
       this._fetchedSrc = undefined;
@@ -98,6 +106,7 @@ export class HelixIcon extends LitElement {
 
     try {
       const response = await fetch(url);
+      if (seq !== this._fetchSeq) return;
       if (!response.ok) {
         this._inlineSvg = '';
         this._fetchedSrc = undefined;
@@ -105,10 +114,12 @@ export class HelixIcon extends LitElement {
       }
 
       const text = await response.text();
+      if (seq !== this._fetchSeq) return;
       const sanitized = this._sanitizeSvg(text);
       this._inlineSvg = sanitized;
       this._fetchedSrc = url;
     } catch {
+      if (seq !== this._fetchSeq) return;
       this._inlineSvg = '';
       this._fetchedSrc = undefined;
     }
@@ -133,15 +144,29 @@ export class HelixIcon extends LitElement {
       return '';
     }
 
-    // Remove script elements.
-    svgEl.querySelectorAll('script').forEach((s) => s.remove());
+    // Remove dangerous embedded elements.
+    svgEl.querySelectorAll('script, foreignObject').forEach((s) => s.remove());
 
-    // Remove event-handler attributes from every element.
-    svgEl.querySelectorAll('*').forEach((el) => {
+    // URL-bearing attributes that can carry javascript:/data: payloads.
+    const urlAttrs = new Set(['href', 'xlink:href', 'src', 'action', 'formaction']);
+
+    // Sanitize every element including the root svg.
+    const allElements: Element[] = [svgEl, ...Array.from(svgEl.querySelectorAll('*'))];
+    allElements.forEach((el) => {
       const attrs = Array.from(el.attributes);
       attrs.forEach((attr) => {
-        if (attr.name.toLowerCase().startsWith('on')) {
+        const name = attr.name.toLowerCase();
+        // Strip event-handler attributes.
+        if (name.startsWith('on')) {
           el.removeAttribute(attr.name);
+          return;
+        }
+        // Strip javascript: and data: URIs from URL-bearing attributes.
+        if (urlAttrs.has(name)) {
+          const val = attr.value.replace(/\s/g, '').toLowerCase();
+          if (val.startsWith('javascript:') || val.startsWith('data:')) {
+            el.removeAttribute(attr.name);
+          }
         }
       });
     });
@@ -209,8 +234,8 @@ export class HelixIcon extends LitElement {
   // ─── Render ───
 
   override render() {
-    // Inline fetch mode takes precedence.
-    if (this.src !== undefined) {
+    // Inline fetch mode takes precedence when src is a non-empty string.
+    if (typeof this.src === 'string' && this.src.trim().length > 0) {
       return this._renderInline();
     }
 
