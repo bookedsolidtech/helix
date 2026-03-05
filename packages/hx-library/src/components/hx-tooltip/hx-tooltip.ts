@@ -1,4 +1,6 @@
 import { LitElement, html } from 'lit';
+
+let _tooltipCounter = 0;
 import { customElement, property, state } from 'lit/decorators.js';
 import { tokenStyles } from '@helix/tokens/lit';
 import { computePosition, flip, shift, offset, arrow } from '@floating-ui/dom';
@@ -19,13 +21,14 @@ import { helixTooltipStyles } from './hx-tooltip.styles.js';
  *
  * @cssprop [--hx-tooltip-bg=var(--hx-color-neutral-900)] - Tooltip background color.
  * @cssprop [--hx-tooltip-color=var(--hx-color-neutral-50)] - Tooltip text color.
- * @cssprop [--hx-tooltip-font-size=var(--hx-text-xs)] - Tooltip font size.
+ * @cssprop [--hx-tooltip-font-size=var(--hx-font-size-xs)] - Tooltip font size.
  * @cssprop [--hx-tooltip-max-width=280px] - Maximum tooltip width.
  * @cssprop [--hx-tooltip-padding] - Tooltip padding.
  * @cssprop [--hx-tooltip-border-radius=var(--hx-border-radius-sm)] - Tooltip border radius.
  * @cssprop [--hx-tooltip-shadow] - Tooltip box shadow.
  * @cssprop [--hx-tooltip-z-index=9999] - Tooltip z-index.
  * @cssprop [--hx-tooltip-transition-duration=0.15s] - Show/hide transition duration.
+ * @cssprop [--hx-tooltip-arrow-size=8px] - Size of the arrow indicator.
  *
  * @example
  * ```html
@@ -65,18 +68,18 @@ export class HelixTooltip extends LitElement {
   private _showTimer: ReturnType<typeof setTimeout> | null = null;
   private _hideTimer: ReturnType<typeof setTimeout> | null = null;
 
-  private readonly _tooltipId = `hx-tooltip-${Math.random().toString(36).slice(2, 9)}`;
+  private readonly _tooltipId = `hx-tooltip-${++_tooltipCounter}`;
 
   // ─── Lifecycle ───
 
   override connectedCallback(): void {
     super.connectedCallback();
-    this.addEventListener('keydown', this._handleKeydown as EventListener);
+    this.addEventListener('keydown', this._handleKeydown);
   }
 
   override disconnectedCallback(): void {
     super.disconnectedCallback();
-    this.removeEventListener('keydown', this._handleKeydown as EventListener);
+    this.removeEventListener('keydown', this._handleKeydown);
     this._clearTimers();
   }
 
@@ -170,12 +173,12 @@ export class HelixTooltip extends LitElement {
 
   // ─── Events ───
 
-  private _handleKeydown(e: KeyboardEvent): void {
-    if (e.key === 'Escape' && this._visible) {
+  private _handleKeydown = (e: Event): void => {
+    if ((e as KeyboardEvent).key === 'Escape' && this._visible) {
       this._clearTimers();
       this._hide();
     }
-  }
+  };
 
   // ─── Render ───
 
