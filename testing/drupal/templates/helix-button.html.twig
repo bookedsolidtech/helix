@@ -1,0 +1,35 @@
+{#
+/**
+ * @file
+ * HELIX hx-button Drupal 11 Twig integration example.
+ *
+ * Usage in Drupal templates:
+ *   {% include '@my_theme/helix-button.html.twig' with {
+ *     label: 'Submit',
+ *     variant: 'primary',
+ *     type: 'submit',
+ *     disabled: false,
+ *   } %}
+ *
+ * Variables:
+ *   - label: Button text (required)
+ *   - variant: 'primary' | 'secondary' | 'destructive' | 'ghost' | 'link' (default: 'primary')
+ *   - type: 'button' | 'submit' | 'reset' (default: 'button')
+ *   - disabled: boolean (default: false)
+ *   - size: 'sm' | 'md' | 'lg' (default: 'md')
+ *   - attributes: Drupal attributes object (optional)
+ */
+#}
+{% set variant = variant|default('primary') %}
+{% set type = type|default('button') %}
+{% set size = size|default('md') %}
+
+<hx-button
+  variant="{{ variant }}"
+  type="{{ type }}"
+  size="{{ size }}"
+  {% if disabled %}disabled{% endif %}
+  {% if attributes %}{{ attributes }}{% endif %}
+>
+  {{ label }}
+</hx-button>
