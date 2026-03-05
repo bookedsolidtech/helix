@@ -440,30 +440,6 @@ export const Secondary: Story = {
       expect(defaultStory?.hasVRTTag).toBe(true);
     });
   });
-
-  describe('findSnapshotFiles - Playwright naming', () => {
-    it('should match Playwright snapshot naming format', () => {
-      const _deps = createMockDeps({
-        fileExists: () => true,
-      });
-
-      // Mock readdirSync to simulate Playwright snapshot structure
-      const _mockReaddir = (_dir: string) => {
-        if (dir.includes('__screenshots__/vrt.spec.ts')) {
-          return [
-            { name: 'hx-button--primary.png', isFile: () => true, isDirectory: () => false },
-            { name: 'hx-button--secondary.png', isFile: () => true, isDirectory: () => false },
-            { name: 'hx-card--default.png', isFile: () => true, isDirectory: () => false },
-          ];
-        }
-        return [];
-      };
-
-      // Note: This test would require mocking readdirSync which isn't trivial in this setup
-      // The actual implementation correctly handles this format
-      expect(true).toBe(true);
-    });
-  });
 });
 
 // ─── Integration Tests ────────────────────────────────────────────────────
@@ -661,8 +637,15 @@ describe('vrt-critical-paths (H14) - Integration Tests', () => {
 
       const result = await validateVRTCriticalPaths(deps, true);
 
-      // Should handle gracefully - either skip the file or report an error
-      expect(result.passed || result.violations.length >= 0).toBe(true);
+      // Should handle gracefully - return a valid result shape without throwing
+      expect(typeof result.passed).toBe('boolean');
+      expect(Array.isArray(result.violations)).toBe(true);
+      expect(typeof result.stats.filesChecked).toBe('number');
+      expect(
+        result.violations.every(
+          (v) => typeof v.message === 'string' && typeof v.severity === 'string',
+        ),
+      ).toBe(true);
     });
 
     it('should respect bail-fast mode', async () => {
@@ -769,43 +752,6 @@ describe('vrt-critical-paths (H14) - Integration Tests', () => {
         const perfViolation = result.violations.find((v) => v.file === '<performance>');
         expect(perfViolation).toBeDefined();
         expect(perfViolation?.severity).toBe('warning');
-      }
-    });
-  });
-
-  describe('Real Codebase Integration', () => {
-    it('should detect real hx-button component', async () => {
-      const realButtonPath = 'packages/hx-library/src/components/hx-button/hx-button.ts';
-      // eslint-disable-next-line @typescript-eslint/no-require-imports
-      const fs = require('fs');
-
-      // Only run if file exists
-      if (!fs.existsSync(realButtonPath)) {
-        expect(true).toBe(true);
-        return;
-      }
-
-      const componentName = extractComponentName(realButtonPath);
-      expect(componentName).toBe('hx-button');
-    });
-
-    it('should find real snapshots for hx-button', () => {
-      // eslint-disable-next-line @typescript-eslint/no-require-imports
-      const fs = require('fs');
-      const snapshotDir = 'packages/hx-library/__screenshots__';
-
-      // Only run if directory exists
-      if (!fs.existsSync(snapshotDir)) {
-        expect(true).toBe(true);
-        return;
-      }
-
-      const deps = createMockDeps();
-      const snapshots = findSnapshotFiles('hx-button', deps);
-
-      // If snapshots exist, they should be found
-      if (snapshots.length > 0) {
-        expect(snapshots.some((s) => s.includes('hx-button--primary.png'))).toBe(true);
       }
     });
   });

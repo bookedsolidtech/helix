@@ -28,65 +28,6 @@ describe('component-test-required (H10)', () => {
       expect(result.exitCode).toBe(0);
       expect(result.output).toContain('[PASS]');
     });
-
-    it('detects components without test files', () => {
-      // This would require git staging simulation
-      expect(true).toBe(true);
-    });
-
-    it('passes when component has test file', () => {
-      expect(true).toBe(true);
-    });
-
-    it('checks only hx-*.ts component files', () => {
-      expect(true).toBe(true);
-    });
-  });
-
-  describe('Exclusions', () => {
-    it('ignores test files themselves', () => {
-      expect(true).toBe(true);
-    });
-
-    it('ignores style files', () => {
-      expect(true).toBe(true);
-    });
-
-    it('ignores index files', () => {
-      expect(true).toBe(true);
-    });
-
-    it('ignores utility files', () => {
-      expect(true).toBe(true);
-    });
-
-    it('ignores stories files', () => {
-      expect(true).toBe(true);
-    });
-  });
-
-  describe('Validation', () => {
-    it('validates test file is in same directory', () => {
-      expect(true).toBe(true);
-    });
-
-    it('validates test file follows naming convention', () => {
-      expect(true).toBe(true);
-    });
-
-    it('accepts component and test in same commit', () => {
-      expect(true).toBe(true);
-    });
-  });
-
-  describe('Error Handling', () => {
-    it('handles git command failures', () => {
-      expect(true).toBe(true);
-    });
-
-    it('handles missing components directory', () => {
-      expect(true).toBe(true);
-    });
   });
 
   describe('Performance', () => {
@@ -102,14 +43,6 @@ describe('component-test-required (H10)', () => {
     it('provides clear error messages', () => {
       const result = runHook();
       expect(result.output).toContain('[HOOK] component-test-required');
-    });
-
-    it('shows statistics for checked components', () => {
-      expect(true).toBe(true);
-    });
-
-    it('suggests test template location', () => {
-      expect(true).toBe(true);
     });
   });
 });
