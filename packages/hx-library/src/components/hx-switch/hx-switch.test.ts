@@ -106,12 +106,12 @@ describe('hx-switch', () => {
   describe('Property: size', () => {
     it('defaults to md', async () => {
       const el = await fixture<WcSwitch>('<hx-switch></hx-switch>');
-      expect(el.size).toBe('md');
+      expect(el.hxSize).toBe('md');
     });
 
     it('reflects hx-size attribute for sm', async () => {
       const el = await fixture<WcSwitch>('<hx-switch hx-size="sm"></hx-switch>');
-      expect(el.size).toBe('sm');
+      expect(el.hxSize).toBe('sm');
       expect(el.getAttribute('hx-size')).toBe('sm');
     });
 
@@ -196,7 +196,7 @@ describe('hx-switch', () => {
   // --- Events (3) ---
 
   describe('Events', () => {
-    it('dispatches wc-change on toggle', async () => {
+    it('dispatches hx-change on toggle', async () => {
       const el = await fixture<WcSwitch>('<hx-switch></hx-switch>');
       const track = shadowQuery<HTMLElement>(el, '.switch__track');
       const eventPromise = oneEvent<CustomEvent>(el, 'hx-change');
@@ -373,6 +373,17 @@ describe('hx-switch', () => {
       await el.updateComplete;
       expect(el.checked).toBe(false);
     });
+
+    it('disabled switch does not toggle on keyboard', async () => {
+      const el = await fixture<WcSwitch>('<hx-switch disabled></hx-switch>');
+      const track = shadowQuery<HTMLElement>(el, '.switch__track');
+      track?.dispatchEvent(new KeyboardEvent('keydown', { key: ' ', bubbles: true }));
+      await el.updateComplete;
+      expect(el.checked).toBe(false);
+      track?.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
+      await el.updateComplete;
+      expect(el.checked).toBe(false);
+    });
   });
 
   // --- Accessibility (4) ---
@@ -440,8 +451,8 @@ describe('hx-switch', () => {
   describe('Methods', () => {
     it('focus() moves focus to track button', async () => {
       const el = await fixture<WcSwitch>('<hx-switch label="Test"></hx-switch>');
+      await el.updateComplete;
       el.focus();
-      await new Promise((r) => setTimeout(r, 50));
       const track = shadowQuery<HTMLButtonElement>(el, '.switch__track')!;
       expect(el.shadowRoot?.activeElement).toBe(track);
     });
