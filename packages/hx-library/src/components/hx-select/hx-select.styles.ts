@@ -231,6 +231,16 @@ export const helixSelectStyles = css`
     font-weight: var(--hx-font-weight-medium, 500);
   }
 
+  .field__option--focused {
+    background-color: var(--hx-select-option-hover-bg, var(--hx-color-primary-50, #eff6ff));
+    outline: 2px solid var(--hx-select-focus-ring-color, var(--hx-focus-ring-color, #2563eb));
+    outline-offset: -2px;
+  }
+
+  .field__option--focused.field__option--selected {
+    background-color: var(--hx-select-option-selected-bg, var(--hx-color-primary-100, #dbeafe));
+  }
+
   .field__option--disabled {
     opacity: var(--hx-opacity-disabled, 0.5);
     cursor: not-allowed;
