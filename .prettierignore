@@ -27,3 +27,9 @@ packages/.mcp-wc/
 **/*.stories.tsx
 **/*.spec.ts
 **/*.spec.tsx
+
+# Generated/built files — not source code
+apps/admin/public/helix/
+testing/static-html/helix-bundle.js
+testing/static-html/helix-bundle.css
+test-results/
