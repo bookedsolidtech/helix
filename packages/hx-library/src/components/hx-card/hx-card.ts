@@ -1,5 +1,5 @@
 import { LitElement, html, nothing } from 'lit';
-import { customElement, property } from 'lit/decorators.js';
+import { customElement, property, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { tokenStyles } from '@helix/tokens/lit';
 import { helixCardStyles } from './hx-card.styles.js';
@@ -17,7 +17,7 @@ import { helixCardStyles } from './hx-card.styles.js';
  * @slot footer - Optional footer content below the body.
  * @slot actions - Optional action buttons, rendered with a top border separator.
  *
- * @fires {CustomEvent<{url: string, originalEvent: MouseEvent}>} wc-card-click - Dispatched when an interactive card (with wc-href) is clicked.
+ * @fires {CustomEvent<{href: string, originalEvent: MouseEvent}>} hx-card-click - Dispatched when an interactive card (with hx-href) is clicked.
  *
  * @csspart card - The outer card container element.
  * @csspart image - The image slot container.
@@ -54,33 +54,43 @@ export class HelixCard extends LitElement {
   /**
    * Optional URL. When set, the card becomes interactive (clickable)
    * and navigates to this URL on click.
-   * Uses wc-href to avoid conflicting with the native HTML href attribute.
+   * Uses hx-href to avoid conflicting with the native HTML href attribute.
    * @attr hx-href
    */
   @property({ type: String, attribute: 'hx-href' })
-  wcHref = '';
+  hxHref = '';
 
   // ─── Slot Detection ───
 
-  private _hasSlotContent: Record<string, boolean> = {
-    image: false,
-    heading: false,
-    footer: false,
-    actions: false,
-  };
+  @state() private _hasImage = false;
+  @state() private _hasHeading = false;
+  @state() private _hasFooter = false;
+  @state() private _hasActions = false;
 
-  private _handleSlotChange(slotName: string) {
-    return (e: Event) => {
-      const slot = e.target as HTMLSlotElement;
-      this._hasSlotContent[slotName] = slot.assignedNodes({ flatten: true }).length > 0;
-      this.requestUpdate();
-    };
+  private _onImageSlotChange(e: Event): void {
+    const slot = e.target as HTMLSlotElement;
+    this._hasImage = slot.assignedNodes({ flatten: true }).length > 0;
+  }
+
+  private _onHeadingSlotChange(e: Event): void {
+    const slot = e.target as HTMLSlotElement;
+    this._hasHeading = slot.assignedNodes({ flatten: true }).length > 0;
+  }
+
+  private _onFooterSlotChange(e: Event): void {
+    const slot = e.target as HTMLSlotElement;
+    this._hasFooter = slot.assignedNodes({ flatten: true }).length > 0;
+  }
+
+  private _onActionsSlotChange(e: Event): void {
+    const slot = e.target as HTMLSlotElement;
+    this._hasActions = slot.assignedNodes({ flatten: true }).length > 0;
   }
 
   // ─── Event Handling ───
 
-  private _handleClick(e: MouseEvent): void {
-    if (!this.wcHref) return;
+  private _dispatchCardClick(originalEvent: MouseEvent | KeyboardEvent): void {
+    if (!this.hxHref) return;
 
     /**
      * Dispatched when an interactive card is clicked.
@@ -91,24 +101,28 @@ export class HelixCard extends LitElement {
       new CustomEvent('hx-card-click', {
         bubbles: true,
         composed: true,
-        detail: { url: this.wcHref, originalEvent: e },
+        detail: { href: this.hxHref, originalEvent },
       }),
     );
   }
 
+  private _handleClick(e: MouseEvent): void {
+    this._dispatchCardClick(e);
+  }
+
   private _handleKeyDown(e: KeyboardEvent): void {
-    if (!this.wcHref) return;
+    if (!this.hxHref) return;
 
     if (e.key === 'Enter' || e.key === ' ') {
       e.preventDefault();
-      this._handleClick(e as unknown as MouseEvent);
+      this._dispatchCardClick(e);
     }
   }
 
   // ─── Render ───
 
   override render() {
-    const isInteractive = !!this.wcHref;
+    const isInteractive = !!this.hxHref;
 
     const classes = {
       card: true,
@@ -123,28 +137,28 @@ export class HelixCard extends LitElement {
         class=${classMap(classes)}
         role=${isInteractive ? 'link' : nothing}
         tabindex=${isInteractive ? '0' : nothing}
-        aria-label=${isInteractive ? `Navigate to ${this.wcHref}` : nothing}
+        aria-label=${isInteractive ? `Navigate to ${this.hxHref}` : nothing}
         @click=${this._handleClick}
         @keydown=${this._handleKeyDown}
       >
-        <div class="card__image" part="image" ?hidden=${!this._hasSlotContent['image']}>
-          <slot name="image" @slotchange=${this._handleSlotChange('image')}></slot>
+        <div class="card__image" part="image" ?hidden=${!this._hasImage}>
+          <slot name="image" @slotchange=${this._onImageSlotChange}></slot>
         </div>
 
-        <div class="card__heading" part="heading" ?hidden=${!this._hasSlotContent['heading']}>
-          <slot name="heading" @slotchange=${this._handleSlotChange('heading')}></slot>
+        <div class="card__heading" part="heading" ?hidden=${!this._hasHeading}>
+          <slot name="heading" @slotchange=${this._onHeadingSlotChange}></slot>
         </div>
 
         <div class="card__body" part="body">
           <slot></slot>
         </div>
 
-        <div class="card__footer" part="footer" ?hidden=${!this._hasSlotContent['footer']}>
-          <slot name="footer" @slotchange=${this._handleSlotChange('footer')}></slot>
+        <div class="card__footer" part="footer" ?hidden=${!this._hasFooter}>
+          <slot name="footer" @slotchange=${this._onFooterSlotChange}></slot>
         </div>
 
-        <div class="card__actions" part="actions" ?hidden=${!this._hasSlotContent['actions']}>
-          <slot name="actions" @slotchange=${this._handleSlotChange('actions')}></slot>
+        <div class="card__actions" part="actions" ?hidden=${!this._hasActions}>
+          <slot name="actions" @slotchange=${this._onActionsSlotChange}></slot>
         </div>
       </div>
     `;
