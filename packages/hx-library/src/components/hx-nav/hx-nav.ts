@@ -1,6 +1,7 @@
 import { LitElement, html, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
+import { repeat } from 'lit/directives/repeat.js';
 import { tokenStyles } from '@helix/tokens/lit';
 import { helixNavStyles } from './hx-nav.styles.js';
 
@@ -59,7 +60,20 @@ export class HelixNav extends LitElement {
    * Navigation items array.
    * @attr items
    */
-  @property({ type: Array })
+  @property({
+    type: Array,
+    converter: {
+      fromAttribute(value: string | null): NavItem[] {
+        if (!value) return [];
+        try {
+          const parsed: unknown = JSON.parse(value);
+          return Array.isArray(parsed) ? (parsed as NavItem[]) : [];
+        } catch {
+          return [];
+        }
+      },
+    },
+  })
   items: NavItem[] = [];
 
   /**
@@ -84,6 +98,32 @@ export class HelixNav extends LitElement {
   // ─── Private: bound event handler reference ───
 
   private _boundOutsideClick: (e: MouseEvent) => void = this._handleOutsideClick.bind(this);
+
+  /**
+   * Sanitizes a URL to prevent XSS via javascript: or data: URIs.
+   * Only allows http:, https:, relative paths, and fragment-only links.
+   */
+  private _sanitizeHref(href: string | undefined): string {
+    if (!href || href === '#') return '#';
+    // Allow relative paths, fragments, and http(s)
+    if (
+      href.startsWith('/') ||
+      href.startsWith('./') ||
+      href.startsWith('../') ||
+      href.startsWith('#')
+    ) {
+      return href;
+    }
+    try {
+      const url = new URL(href, window.location.href);
+      if (url.protocol === 'http:' || url.protocol === 'https:') {
+        return href;
+      }
+    } catch {
+      // Invalid URL — fall through to safe default
+    }
+    return '#';
+  }
 
   // ─── Event Handling ───
 
@@ -270,18 +310,17 @@ export class HelixNav extends LitElement {
   private _renderSubMenu(children: NavItem[], parentIndex: number) {
     const isExpanded = this._expandedIndex === parentIndex;
     return html`
-      <ul class="nav__submenu" role="menu" aria-label="Submenu" ?hidden=${!isExpanded}>
+      <ul class="nav__submenu" role="list" aria-label="Submenu" ?hidden=${!isExpanded}>
         ${children.map(
           (child) => html`
-            <li class="nav__submenu-item" role="none">
+            <li class="nav__submenu-item">
               <a
                 part="link"
-                href=${child.href ?? '#'}
+                href=${this._sanitizeHref(child.href)}
                 class=${classMap({
                   nav__link: true,
                   'nav__link--active': !!child.current,
                 })}
-                role="menuitem"
                 aria-current=${child.current ? 'page' : nothing}
                 @click=${() => this._handleSubItemClick(child)}
                 @keydown=${(e: KeyboardEvent) => this._handleSubKeydown(e, parentIndex)}
@@ -323,7 +362,7 @@ export class HelixNav extends LitElement {
       : html`
           <a
             part="link"
-            href=${item.href ?? '#'}
+            href=${this._sanitizeHref(item.href)}
             class=${classMap(linkClasses)}
             aria-current=${item.current ? 'page' : nothing}
             @click=${(e: Event) => this._handleItemClick(item, index, e)}
@@ -358,12 +397,19 @@ export class HelixNav extends LitElement {
         </button>
 
         <ul part="list" id="nav-list" class=${classMap(listClasses)} role="list">
-          ${this.items.map((item, i) => this._renderItem(item, i))}
+          ${repeat(
+            this.items,
+            (item) => item.label,
+            (item, i) => this._renderItem(item, i),
+          )}
         </ul>
       </nav>
     `;
   }
 }
+
+/** Convenience alias matching library naming convention. */
+export type WcNav = HelixNav;
 
 declare global {
   interface HTMLElementTagNameMap {
