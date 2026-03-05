@@ -1,0 +1,26 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "$id": "SchematicsHelixAngularNgAdd",
+  "title": "Helix Angular ng-add Options",
+  "type": "object",
+  "properties": {
+    "project": {
+      "type": "string",
+      "description": "The name of the Angular CLI project to add @helixds/angular to.",
+      "$default": {
+        "$source": "projectName"
+      }
+    },
+    "skipImport": {
+      "type": "boolean",
+      "description": "Skip automatic import of HelixAngularModule into AppModule. Use this for standalone Angular apps.",
+      "default": false
+    },
+    "standalone": {
+      "type": "boolean",
+      "description": "Whether the target project uses standalone components (Angular 17+ default). When true, adds CUSTOM_ELEMENTS_SCHEMA to the bootstrap application config instead of AppModule.",
+      "default": false
+    }
+  },
+  "required": []
+}

@@ -1,0 +1,15 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "CommonJS",
+    "moduleResolution": "node",
+    "lib": ["ES2022"],
+    "declaration": true,
+    "outDir": "./schematics/dist",
+    "rootDir": "./schematics",
+    "strict": true,
+    "skipLibCheck": true
+  },
+  "include": ["schematics/**/*.ts"],
+  "exclude": ["node_modules", "schematics/dist"]
+}

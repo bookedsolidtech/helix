@@ -1,0 +1,53 @@
+{
+  "name": "@helixds/angular",
+  "version": "0.0.1",
+  "description": "Angular directive wrappers for Helix Design System web components",
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "schematics": "./schematics/collection.json",
+  "peerDependencies": {
+    "@angular/common": ">=17.0.0",
+    "@angular/core": ">=17.0.0",
+    "@angular/forms": ">=17.0.0",
+    "@helix/library": "*"
+  },
+  "peerDependenciesMeta": {
+    "@helix/library": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@angular-devkit/core": "^17.0.0",
+    "@angular-devkit/schematics": "^17.0.0",
+    "@angular/common": "^17.0.0",
+    "@angular/core": "^17.0.0",
+    "@angular/forms": "^17.0.0",
+    "@schematics/angular": "^17.0.0",
+    "typescript": "^5.7.2"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "build:schematics": "tsc -p schematics/tsconfig.json",
+    "build:all": "npm run build && npm run build:schematics",
+    "generate": "tsx scripts/generate-from-cem.ts",
+    "type-check": "tsc --noEmit -p tsconfig.json",
+    "lint": "eslint src/ --max-warnings 0",
+    "format:check": "prettier --check \"src/**/*.ts\" \"scripts/**/*.ts\" \"schematics/**/*.ts\"",
+    "verify": "npm run lint && npm run format:check && npm run type-check"
+  },
+  "keywords": [
+    "angular",
+    "web-components",
+    "helix",
+    "design-system"
+  ],
+  "license": "MIT"
+}

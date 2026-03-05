@@ -1,0 +1,10 @@
+{
+  "$schema": "./node_modules/@angular-devkit/schematics/collection-schema.json",
+  "schematics": {
+    "ng-add": {
+      "description": "Add @helixds/angular to an Angular project. Configures CUSTOM_ELEMENTS_SCHEMA and imports HelixAngularModule.",
+      "factory": "./dist/ng-add/index#ngAdd",
+      "schema": "./ng-add/schema.json"
+    }
+  }
+}
