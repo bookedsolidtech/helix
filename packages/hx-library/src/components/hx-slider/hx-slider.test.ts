@@ -487,10 +487,10 @@ describe('hx-slider', () => {
       const el = await fixture<HelixSlider>(
         '<hx-slider value="50" min="0" max="100" step="5"></hx-slider>',
       );
-      const input = shadowQuery<HTMLInputElement>(el, 'input[type="range"]');
+      const input = shadowQuery<HTMLInputElement>(el, 'input[type="range"]')!;
       const eventPromise = oneEvent<CustomEvent<{ value: number }>>(el, 'hx-input');
-      input!.value = String(el.value + el.step); // simulate ArrowRight
-      input?.dispatchEvent(new Event('input', { bubbles: true }));
+      input.value = String(el.value + el.step); // simulate ArrowRight
+      input.dispatchEvent(new Event('input', { bubbles: true }));
       const event = await eventPromise;
       expect(event.detail.value).toBe(55);
       expect(el.value).toBe(55);
@@ -500,10 +500,10 @@ describe('hx-slider', () => {
       const el = await fixture<HelixSlider>(
         '<hx-slider value="50" min="0" max="100" step="5"></hx-slider>',
       );
-      const input = shadowQuery<HTMLInputElement>(el, 'input[type="range"]');
+      const input = shadowQuery<HTMLInputElement>(el, 'input[type="range"]')!;
       const eventPromise = oneEvent<CustomEvent<{ value: number }>>(el, 'hx-input');
-      input!.value = String(el.value - el.step); // simulate ArrowLeft
-      input?.dispatchEvent(new Event('input', { bubbles: true }));
+      input.value = String(el.value - el.step); // simulate ArrowLeft
+      input.dispatchEvent(new Event('input', { bubbles: true }));
       const event = await eventPromise;
       expect(event.detail.value).toBe(45);
       expect(el.value).toBe(45);
@@ -513,10 +513,10 @@ describe('hx-slider', () => {
       const el = await fixture<HelixSlider>(
         '<hx-slider value="50" min="10" max="100" step="1"></hx-slider>',
       );
-      const input = shadowQuery<HTMLInputElement>(el, 'input[type="range"]');
+      const input = shadowQuery<HTMLInputElement>(el, 'input[type="range"]')!;
       const eventPromise = oneEvent<CustomEvent<{ value: number }>>(el, 'hx-change');
-      input!.value = String(el.min); // simulate Home key
-      input?.dispatchEvent(new Event('change', { bubbles: true }));
+      input.value = String(el.min); // simulate Home key
+      input.dispatchEvent(new Event('change', { bubbles: true }));
       const event = await eventPromise;
       expect(event.detail.value).toBe(10);
       expect(el.value).toBe(10);
@@ -526,10 +526,10 @@ describe('hx-slider', () => {
       const el = await fixture<HelixSlider>(
         '<hx-slider value="50" min="0" max="100" step="1"></hx-slider>',
       );
-      const input = shadowQuery<HTMLInputElement>(el, 'input[type="range"]');
+      const input = shadowQuery<HTMLInputElement>(el, 'input[type="range"]')!;
       const eventPromise = oneEvent<CustomEvent<{ value: number }>>(el, 'hx-change');
-      input!.value = String(el.max); // simulate End key
-      input?.dispatchEvent(new Event('change', { bubbles: true }));
+      input.value = String(el.max); // simulate End key
+      input.dispatchEvent(new Event('change', { bubbles: true }));
       const event = await eventPromise;
       expect(event.detail.value).toBe(100);
       expect(el.value).toBe(100);
