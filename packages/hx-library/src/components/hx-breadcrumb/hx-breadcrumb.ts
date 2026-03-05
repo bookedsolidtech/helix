@@ -160,6 +160,15 @@ export class HelixBreadcrumb extends LitElement {
 
   // ─── JSON-LD ───
 
+  /**
+   * Stable per-instance ID used to tag the injected script element so that
+   * multiple hx-breadcrumb instances on the same page don't produce conflicting
+   * or duplicate structured-data blocks. Each instance owns exactly one script
+   * tag identified by this ID; any stale tag from a previous render cycle is
+   * removed before a new one is inserted.
+   */
+  private readonly _jsonLdId = `hx-breadcrumb-ld-${Math.random().toString(36).slice(2)}`;
+
   private _updateJsonLd(items: Element[]): void {
     const schema = {
       '@context': 'https://schema.org',
@@ -177,8 +186,15 @@ export class HelixBreadcrumb extends LitElement {
     };
 
     if (!this._jsonLdScript) {
+      // Dedup guard: remove any stale script with this instance's ID before
+      // creating a fresh one. This handles the edge case where the element was
+      // reconnected to the DOM after being disconnected without the script
+      // reference being re-established.
+      document.getElementById(this._jsonLdId)?.remove();
+
       this._jsonLdScript = document.createElement('script');
       this._jsonLdScript.type = 'application/ld+json';
+      this._jsonLdScript.id = this._jsonLdId;
       this._jsonLdScript.setAttribute('data-hx-breadcrumb', '');
       document.head.appendChild(this._jsonLdScript);
     }
@@ -212,9 +228,9 @@ export class HelixBreadcrumb extends LitElement {
 
     return html`
       <nav part="nav" aria-label=${this.label}>
-        <div part="list" role="list">
+        <ol part="list">
           <slot @slotchange=${this._handleSlotChange}></slot>
-        </div>
+        </ol>
       </nav>
       <slot
         name="separator"
