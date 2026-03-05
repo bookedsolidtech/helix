@@ -131,6 +131,7 @@ export const helixIconButtonStyles = css`
 
   .button[disabled] {
     cursor: not-allowed;
+    opacity: var(--hx-opacity-disabled);
   }
 
   /* ─── Reduced Motion ─── */
