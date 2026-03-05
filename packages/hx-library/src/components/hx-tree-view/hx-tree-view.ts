@@ -109,7 +109,7 @@ export class HelixTreeView extends LitElement {
     // The focused element could be the item-row div inside the shadow DOM of hx-tree-item.
     // We need to find which hx-tree-item contains the focused element.
     for (let i = 0; i < items.length; i++) {
-      if (items[i].shadowRoot?.contains(focused) || items[i] === focused) {
+      if (items[i]?.shadowRoot?.contains(focused) || items[i] === focused) {
         currentIndex = i;
         break;
       }
