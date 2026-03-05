@@ -1,5 +1,5 @@
 import { LitElement, html, nothing } from 'lit';
-import { customElement, property, query } from 'lit/decorators.js';
+import { customElement, property, query, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import { live } from 'lit/directives/live.js';
@@ -153,8 +153,8 @@ export class HelixTextarea extends LitElement {
 
   // ─── Slot Tracking ───
 
-  private _hasLabelSlot = false;
-  private _hasErrorSlot = false;
+  @state() private _hasLabelSlot = false;
+  @state() private _hasErrorSlot = false;
 
   private _handleLabelSlotChange(e: Event): void {
     const slot = e.target as HTMLSlotElement;
@@ -165,13 +165,11 @@ export class HelixTextarea extends LitElement {
         slottedLabel.id = `${this._textareaId}-slotted-label`;
       }
     }
-    this.requestUpdate();
   }
 
   private _handleErrorSlotChange(e: Event): void {
     const slot = e.target as HTMLSlotElement;
     this._hasErrorSlot = slot.assignedElements().length > 0;
-    this.requestUpdate();
   }
 
   // ─── Lifecycle ───
@@ -323,7 +321,7 @@ export class HelixTextarea extends LitElement {
     };
 
     const describedBy =
-      [hasError ? this._errorId : null, this.helpText ? this._helpTextId : null]
+      [hasError ? this._errorId : null, !hasError && this.helpText ? this._helpTextId : null]
         .filter(Boolean)
         .join(' ') || undefined;
 
@@ -403,3 +401,5 @@ declare global {
     'hx-textarea': HelixTextarea;
   }
 }
+
+export type WcTextarea = HelixTextarea;
