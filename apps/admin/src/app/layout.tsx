@@ -13,6 +13,7 @@ import {
   HeartPulse,
   GitBranch,
   Cpu,
+  Library,
 } from 'lucide-react';
 import { DOCS_URL, STORYBOOK_URL } from '@/lib/env';
 import './globals.css';
@@ -68,6 +69,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
               <SidebarLink href="/components" icon={<Boxes className="w-4 h-4" />}>
                 Components
+              </SidebarLink>
+
+              <SidebarLink href="/libraries" icon={<Library className="w-4 h-4" />}>
+                Libraries
               </SidebarLink>
 
               <SidebarLink href="/tests" icon={<FileCheck2 className="w-4 h-4" />}>
