@@ -2,6 +2,7 @@ import { LitElement, html } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { tokenStyles } from '@helix/tokens/lit';
 import { helixAccordionStyles } from './hx-accordion.styles.js';
+import './hx-accordion-item.js';
 import type { HelixAccordionItem } from './hx-accordion-item.js';
 
 /**
@@ -68,7 +69,7 @@ export class HelixAccordion extends LitElement {
 
   override render() {
     return html`
-      <div class="accordion" role="list">
+      <div class="accordion">
         <slot></slot>
       </div>
     `;

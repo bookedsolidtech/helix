@@ -11,7 +11,7 @@ export const helixAccordionItemStyles = css`
     font-family: var(--hx-font-family-sans, sans-serif);
   }
 
-  .item:first-of-type {
+  :host(:first-child) .item {
     border-top: var(--hx-border-width-thin, 1px) solid
       var(--hx-accordion-border-color, var(--hx-color-neutral-200, #dee2e6));
   }

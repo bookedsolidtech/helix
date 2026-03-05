@@ -14,7 +14,8 @@ const meta = {
     mode: {
       control: { type: 'select' },
       options: ['single', 'multi'],
-      description: "Expansion mode: 'single' collapses others when one expands; 'multi' allows multiple open.",
+      description:
+        "Expansion mode: 'single' collapses others when one expands; 'multi' allows multiple open.",
       table: {
         category: 'Behavior',
         defaultValue: { summary: 'single' },
@@ -138,7 +139,8 @@ export const SingleMode: Story = {
     // Click second item trigger
     const secondTrigger = items[1].shadowRoot?.querySelector('summary');
     await expect(secondTrigger).toBeTruthy();
-    await userEvent.click(secondTrigger!);
+    if (!secondTrigger) return;
+    await userEvent.click(secondTrigger);
 
     // Wait for state update
     await new Promise((r) => setTimeout(r, 50));
@@ -160,22 +162,22 @@ export const MultiMode: Story = {
       <hx-accordion-item expanded>
         <span slot="trigger">Patient History</span>
         <p>
-          Review the comprehensive patient history including prior admissions, surgical history,
-          and chronic condition management plans.
+          Review the comprehensive patient history including prior admissions, surgical history, and
+          chronic condition management plans.
         </p>
       </hx-accordion-item>
       <hx-accordion-item expanded>
         <span slot="trigger">Current Medications</span>
         <p>
-          Lisinopril 10mg daily, Metformin 1000mg twice daily, Atorvastatin 40mg nightly.
-          Verify allergies before administration.
+          Lisinopril 10mg daily, Metformin 1000mg twice daily, Atorvastatin 40mg nightly. Verify
+          allergies before administration.
         </p>
       </hx-accordion-item>
       <hx-accordion-item>
         <span slot="trigger">Upcoming Appointments</span>
         <p>
-          Cardiology follow-up: March 15, 2026. Primary care: March 28, 2026. Lab work
-          ordered for March 10, 2026.
+          Cardiology follow-up: March 15, 2026. Primary care: March 28, 2026. Lab work ordered for
+          March 10, 2026.
         </p>
       </hx-accordion-item>
     </hx-accordion>
@@ -190,7 +192,9 @@ export const MultiMode: Story = {
 
     // Click third item
     const thirdTrigger = items[2].shadowRoot?.querySelector('summary');
-    await userEvent.click(thirdTrigger!);
+    await expect(thirdTrigger).toBeTruthy();
+    if (!thirdTrigger) return;
+    await userEvent.click(thirdTrigger);
     await new Promise((r) => setTimeout(r, 50));
 
     // In multi mode, first two remain expanded
@@ -253,7 +257,9 @@ export const DisabledItem: Story = {
     await expect(disabledItem.getAttribute('disabled')).not.toBeNull();
 
     const disabledTrigger = disabledItem.shadowRoot?.querySelector('summary');
-    await userEvent.click(disabledTrigger!);
+    await expect(disabledTrigger).toBeTruthy();
+    if (!disabledTrigger) return;
+    await userEvent.click(disabledTrigger);
     await new Promise((r) => setTimeout(r, 50));
 
     // Should remain collapsed
@@ -291,9 +297,10 @@ export const KeyboardNavigation: Story = {
     keyboardCollapseHandler.mockClear();
 
     const items = canvasElement.querySelectorAll('hx-accordion-item');
-    const firstTrigger = items[0].shadowRoot?.querySelector('summary') as HTMLElement;
+    const firstTrigger = items[0].shadowRoot?.querySelector('summary');
 
     await expect(firstTrigger).toBeTruthy();
+    if (!firstTrigger) return;
 
     // Focus trigger and press Enter
     firstTrigger.focus();
@@ -340,12 +347,14 @@ export const EventHandling: Story = {
 
     const item = canvasElement.querySelector('hx-accordion-item');
     const trigger = item?.shadowRoot?.querySelector('summary');
+    await expect(trigger).toBeTruthy();
+    if (!trigger) return;
 
-    await userEvent.click(trigger!);
+    await userEvent.click(trigger);
     await new Promise((r) => setTimeout(r, 50));
     await expect(expandEventHandler).toHaveBeenCalledTimes(1);
 
-    await userEvent.click(trigger!);
+    await userEvent.click(trigger);
     await new Promise((r) => setTimeout(r, 50));
     await expect(collapseEventHandler).toHaveBeenCalledTimes(1);
   },
@@ -450,8 +459,8 @@ export const CSSCustomProperties: Story = {
       <hx-accordion-item expanded>
         <span slot="trigger">Custom Themed Accordion</span>
         <p>
-          This accordion overrides CSS custom properties to apply a purple theme, demonstrating
-          the full theming surface available to consumer applications.
+          This accordion overrides CSS custom properties to apply a purple theme, demonstrating the
+          full theming surface available to consumer applications.
         </p>
       </hx-accordion-item>
       <hx-accordion-item>
@@ -485,9 +494,9 @@ export const FAQSection: Story = {
         <hx-accordion-item>
           <span slot="trigger">What should I bring to my appointment?</span>
           <p>
-            Bring a government-issued photo ID, your insurance cards, a list of current
-            medications including dosages, and any referral paperwork from your primary care
-            physician. Arrive 15 minutes early for registration.
+            Bring a government-issued photo ID, your insurance cards, a list of current medications
+            including dosages, and any referral paperwork from your primary care physician. Arrive
+            15 minutes early for registration.
           </p>
         </hx-accordion-item>
         <hx-accordion-item>
@@ -502,16 +511,16 @@ export const FAQSection: Story = {
           <span slot="trigger">What is your billing and payment policy?</span>
           <p>
             We accept most major insurance plans and offer a financial assistance program for
-            qualifying patients. Payment plans are available. Contact Patient Financial Services
-            at extension 4400 for billing inquiries.
+            qualifying patients. Payment plans are available. Contact Patient Financial Services at
+            extension 4400 for billing inquiries.
           </p>
         </hx-accordion-item>
         <hx-accordion-item>
           <span slot="trigger">How do I contact my care team after hours?</span>
           <p>
             For non-urgent questions, use the patient portal secure messaging feature. For urgent
-            medical concerns, call our 24-hour nurse advice line. For emergencies, call 911 or go
-            to the nearest emergency department.
+            medical concerns, call our 24-hour nurse advice line. For emergencies, call 911 or go to
+            the nearest emergency department.
           </p>
         </hx-accordion-item>
       </hx-accordion>
@@ -586,9 +595,7 @@ export const AllCombinations: Story = {
       </div>
 
       <div>
-        <h3 style="margin: 0 0 0.75rem; font-size: 1rem; font-weight: 600;">
-          Multi Mode
-        </h3>
+        <h3 style="margin: 0 0 0.75rem; font-size: 1rem; font-weight: 600;">Multi Mode</h3>
         <hx-accordion mode="multi" style="max-width: 500px;">
           <hx-accordion-item expanded>
             <span slot="trigger">First Item (starts expanded)</span>
