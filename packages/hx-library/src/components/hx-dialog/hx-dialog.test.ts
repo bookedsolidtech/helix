@@ -81,9 +81,7 @@ describe('hx-dialog', () => {
     });
 
     it('modal=false — uses native dialog.show() without aria-modal', async () => {
-      const el = await fixture<HelixDialog>(
-        '<hx-dialog open modal="false"></hx-dialog>',
-      );
+      const el = await fixture<HelixDialog>('<hx-dialog open modal="false"></hx-dialog>');
       // Lit boolean attribute: presence means true; to set false, use property
       el.modal = false;
       await el.updateComplete;
@@ -126,9 +124,7 @@ describe('hx-dialog', () => {
       const eventPromise = oneEvent<CustomEvent>(el, 'hx-close');
       // _cancel() dispatches hx-close after setting open=false
       const dialogEl = shadowQuery<HTMLDialogElement>(el, 'dialog');
-      dialogEl?.dispatchEvent(
-        new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }),
-      );
+      dialogEl?.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
       const event = await eventPromise;
       expect(event).toBeTruthy();
     });
@@ -147,9 +143,7 @@ describe('hx-dialog', () => {
       await el.updateComplete;
       const eventPromise = oneEvent<CustomEvent>(el, 'hx-cancel');
       const dialogEl = shadowQuery<HTMLDialogElement>(el, 'dialog');
-      dialogEl?.dispatchEvent(
-        new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }),
-      );
+      dialogEl?.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
       const event = await eventPromise;
       expect(event).toBeTruthy();
       expect(event.bubbles).toBe(true);
@@ -264,9 +258,7 @@ describe('hx-dialog', () => {
     });
 
     it('exposes "header" part when heading is provided', async () => {
-      const el = await fixture<HelixDialog>(
-        '<hx-dialog open heading="Dialog Title"></hx-dialog>',
-      );
+      const el = await fixture<HelixDialog>('<hx-dialog open heading="Dialog Title"></hx-dialog>');
       await el.updateComplete;
       const part = shadowQuery(el, '[part="header"]');
       expect(part).toBeTruthy();
@@ -291,6 +283,124 @@ describe('hx-dialog', () => {
       const part = shadowQuery(el, '[part="backdrop"]');
       expect(part).toBeTruthy();
       expect(part?.getAttribute('part')).toBe('backdrop');
+    });
+  });
+
+  // ─── Focus Trap (3) ───
+
+  describe('Focus Trap', () => {
+    it('modal dialog wraps Tab from last focusable element to first', async () => {
+      const el = await fixture<HelixDialog>(
+        `<hx-dialog open heading="Test">
+          <button id="first-btn">First</button>
+          <button slot="footer" id="last-btn">Last</button>
+        </hx-dialog>`,
+      );
+      el.modal = true;
+      await el.updateComplete;
+      // Wait for focus cache to populate
+      await new Promise((r) => setTimeout(r, 50));
+
+      const dialogEl = shadowQuery<HTMLDialogElement>(el, 'dialog');
+      const lastBtn = el.querySelector('#last-btn') as HTMLElement;
+      const firstBtn = el.querySelector('#first-btn') as HTMLElement;
+
+      lastBtn.focus();
+      dialogEl?.dispatchEvent(
+        new KeyboardEvent('keydown', { key: 'Tab', bubbles: true, cancelable: true }),
+      );
+      await el.updateComplete;
+
+      expect(document.activeElement).toBe(firstBtn);
+    });
+
+    it('modal dialog wraps Shift+Tab from first focusable element to last', async () => {
+      const el = await fixture<HelixDialog>(
+        `<hx-dialog open heading="Test">
+          <button id="first-btn">First</button>
+          <button slot="footer" id="last-btn">Last</button>
+        </hx-dialog>`,
+      );
+      el.modal = true;
+      await el.updateComplete;
+      await new Promise((r) => setTimeout(r, 50));
+
+      const dialogEl = shadowQuery<HTMLDialogElement>(el, 'dialog');
+      const lastBtn = el.querySelector('#last-btn') as HTMLElement;
+      const firstBtn = el.querySelector('#first-btn') as HTMLElement;
+
+      firstBtn.focus();
+      dialogEl?.dispatchEvent(
+        new KeyboardEvent('keydown', {
+          key: 'Tab',
+          shiftKey: true,
+          bubbles: true,
+          cancelable: true,
+        }),
+      );
+      await el.updateComplete;
+
+      expect(document.activeElement).toBe(lastBtn);
+    });
+
+    it('non-modal dialog does not trap Tab focus', async () => {
+      const el = await fixture<HelixDialog>(
+        '<hx-dialog open heading="Non-modal"><button id="btn">OK</button></hx-dialog>',
+      );
+      el.modal = false;
+      await el.updateComplete;
+
+      const btn = el.querySelector('#btn') as HTMLElement;
+      btn.focus();
+
+      const preventedCount = 0;
+      const dialogEl = shadowQuery<HTMLDialogElement>(el, 'dialog');
+      const tabEvent = new KeyboardEvent('keydown', {
+        key: 'Tab',
+        bubbles: true,
+        cancelable: true,
+      });
+      dialogEl?.dispatchEvent(tabEvent);
+
+      // The non-modal guard means _trapFocus is never called; preventDefault should not be called
+      expect(tabEvent.defaultPrevented).toBe(false);
+      expect(preventedCount).toBe(0);
+    });
+  });
+
+  // ─── Backdrop Click (2) ───
+
+  describe('Backdrop Click', () => {
+    it('closes modal dialog when backdrop area is clicked and closeOnBackdrop is true', async () => {
+      const el = await fixture<HelixDialog>('<hx-dialog open heading="Test"></hx-dialog>');
+      await el.updateComplete;
+
+      const eventPromise = oneEvent<CustomEvent>(el, 'hx-cancel');
+      const dialogEl = shadowQuery<HTMLDialogElement>(el, 'dialog');
+      // Simulate a click on the dialog element itself (the backdrop area in modal mode)
+      dialogEl?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+
+      const event = await eventPromise;
+      expect(event).toBeTruthy();
+      expect(el.open).toBe(false);
+    });
+
+    it('does not close dialog when backdrop is clicked and closeOnBackdrop is false', async () => {
+      const el = await fixture<HelixDialog>('<hx-dialog open heading="Test"></hx-dialog>');
+      el.closeOnBackdrop = false;
+      await el.updateComplete;
+
+      let cancelled = false;
+      el.addEventListener('hx-cancel', () => {
+        cancelled = true;
+      });
+
+      const dialogEl = shadowQuery<HTMLDialogElement>(el, 'dialog');
+      dialogEl?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+
+      await el.updateComplete;
+      expect(cancelled).toBe(false);
+      expect(el.open).toBe(true);
     });
   });
 
