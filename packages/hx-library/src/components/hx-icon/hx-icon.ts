@@ -145,7 +145,9 @@ export class HelixIcon extends LitElement {
     }
 
     // Remove dangerous embedded elements.
-    svgEl.querySelectorAll('script, foreignObject').forEach((s) => s.remove());
+    svgEl.querySelectorAll('script, foreignObject').forEach((s) => {
+      s.remove();
+    });
 
     // URL-bearing attributes that can carry javascript:/data: payloads.
     const urlAttrs = new Set(['href', 'xlink:href', 'src', 'action', 'formaction']);

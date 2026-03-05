@@ -6,6 +6,15 @@ import './index.js';
 
 afterEach(cleanup);
 
+const waitForInlineSvg = async (el: HelixIcon): Promise<void> => {
+  for (let i = 0; i < 10; i += 1) {
+    await Promise.resolve();
+    await el.updateComplete;
+    if (el.shadowRoot?.querySelector('[part="svg"]')) return;
+  }
+  throw new Error('Timed out waiting for inline SVG render');
+};
+
 describe('hx-icon', () => {
   // ─── Rendering (3) ───
 
@@ -232,9 +241,7 @@ describe('hx-icon', () => {
         } as Response);
 
         const el = await fixture<HelixIcon>('<hx-icon src="/icon.svg"></hx-icon>');
-        await el.updateComplete;
-        await new Promise((resolve) => setTimeout(resolve, 50));
-        await el.updateComplete;
+        await waitForInlineSvg(el);
 
         expect(el.shadowRoot?.innerHTML).not.toContain('<script');
       } finally {
@@ -252,9 +259,7 @@ describe('hx-icon', () => {
         } as Response);
 
         const el = await fixture<HelixIcon>('<hx-icon src="/icon.svg"></hx-icon>');
-        await el.updateComplete;
-        await new Promise((resolve) => setTimeout(resolve, 50));
-        await el.updateComplete;
+        await waitForInlineSvg(el);
 
         expect(el.shadowRoot?.innerHTML).not.toContain('onclick');
       } finally {
@@ -272,9 +277,7 @@ describe('hx-icon', () => {
         } as Response);
 
         const el = await fixture<HelixIcon>('<hx-icon src="/icon.svg"></hx-icon>');
-        await el.updateComplete;
-        await new Promise((resolve) => setTimeout(resolve, 50));
-        await el.updateComplete;
+        await waitForInlineSvg(el);
 
         const svgPart = shadowQuery(el, '[part="svg"]');
         const inlineSvg = svgPart?.querySelector('svg');
@@ -294,9 +297,7 @@ describe('hx-icon', () => {
         } as Response);
 
         const el = await fixture<HelixIcon>('<hx-icon src="/icon.svg"></hx-icon>');
-        await el.updateComplete;
-        await new Promise((resolve) => setTimeout(resolve, 50));
-        await el.updateComplete;
+        await waitForInlineSvg(el);
 
         expect(el.shadowRoot?.innerHTML).not.toContain('href="javascript:');
       } finally {
@@ -314,9 +315,7 @@ describe('hx-icon', () => {
         } as Response);
 
         const el = await fixture<HelixIcon>('<hx-icon src="/icon.svg"></hx-icon>');
-        await el.updateComplete;
-        await new Promise((resolve) => setTimeout(resolve, 50));
-        await el.updateComplete;
+        await waitForInlineSvg(el);
 
         expect(el.shadowRoot?.innerHTML).not.toContain('foreignObject');
       } finally {
