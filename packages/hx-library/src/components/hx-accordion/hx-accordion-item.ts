@@ -14,8 +14,8 @@ import { helixAccordionItemStyles } from './hx-accordion-item.styles.js';
  * @slot trigger - The heading/trigger content for this item.
  * @slot - Default slot for the collapsible body content.
  *
- * @fires {CustomEvent<{item: HelixAccordionItem}>} hx-expand - Dispatched when the item is expanded.
- * @fires {CustomEvent<{item: HelixAccordionItem}>} hx-collapse - Dispatched when the item is collapsed.
+ * @fires {CustomEvent<{expanded: boolean, itemId: string}>} hx-expand - Dispatched when the item is expanded.
+ * @fires {CustomEvent<{expanded: boolean, itemId: string}>} hx-collapse - Dispatched when the item is collapsed.
  *
  * @csspart item - The outer details element container.
  * @csspart trigger - The summary/trigger element.
@@ -57,6 +57,8 @@ export class HelixAccordionItem extends LitElement {
     const willExpand = !this.expanded;
     this.expanded = willExpand;
 
+    const detail = { expanded: willExpand, itemId: this.id || '' };
+
     if (willExpand) {
       /**
        * Dispatched when the item is expanded.
@@ -66,7 +68,7 @@ export class HelixAccordionItem extends LitElement {
         new CustomEvent('hx-expand', {
           bubbles: true,
           composed: true,
-          detail: { item: this },
+          detail,
         }),
       );
     } else {
@@ -78,7 +80,7 @@ export class HelixAccordionItem extends LitElement {
         new CustomEvent('hx-collapse', {
           bubbles: true,
           composed: true,
-          detail: { item: this },
+          detail,
         }),
       );
     }
@@ -97,6 +99,11 @@ export class HelixAccordionItem extends LitElement {
       e.preventDefault();
       this._toggle();
     }
+  }
+
+  private _handleToggle(e: Event): void {
+    // Prevent native <details> toggle from controlling state — Lit manages it
+    e.preventDefault();
   }
 
   // ─── Render ───
@@ -130,9 +137,10 @@ export class HelixAccordionItem extends LitElement {
         part="item"
         class=${classMap(itemClasses)}
         ?open=${this.expanded}
-        ?disabled=${this.disabled}
+        @toggle=${this._handleToggle}
       >
         <summary
+          id="trigger"
           part="trigger"
           class="trigger"
           aria-expanded=${this.expanded ? 'true' : 'false'}
@@ -149,6 +157,7 @@ export class HelixAccordionItem extends LitElement {
               part="content"
               class="content"
               role="region"
+              aria-labelledby="trigger"
               aria-hidden=${this.expanded ? nothing : 'true'}
             >
               <slot></slot>
