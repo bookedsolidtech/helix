@@ -19,8 +19,8 @@ type AlertVariant = 'info' | 'success' | 'warning' | 'error';
  * @slot icon - Custom icon to override the default variant icon.
  * @slot actions - Action buttons rendered within the alert.
  *
- * @fires {CustomEvent<{reason: string}>} hx-dismiss - Dispatched when the user dismisses the alert.
- * @fires {CustomEvent} hx-after-dismiss - Dispatched after the alert is dismissed.
+ * @fires {CustomEvent<{reason: string}>} hx-close - Dispatched when the user dismisses the alert.
+ * @fires {CustomEvent} hx-after-close - Dispatched after the alert is dismissed.
  *
  * @csspart alert - The outer alert container.
  * @csspart icon - The icon container.
@@ -79,14 +79,13 @@ export class HelixAlert extends LitElement {
     return this.variant === 'error' || this.variant === 'warning';
   }
 
-  /** Returns the appropriate ARIA role based on variant. */
+  /**
+   * Returns the appropriate ARIA role based on variant.
+   * role="alert" implies aria-live="assertive"; role="status" implies aria-live="polite".
+   * We do NOT set aria-live explicitly to avoid double-announcements in JAWS.
+   */
   private get _role(): string {
     return this._isAssertive ? 'alert' : 'status';
-  }
-
-  /** Returns the appropriate aria-live value based on variant. */
-  private get _ariaLive(): string {
-    return this._isAssertive ? 'assertive' : 'polite';
   }
 
   // ─── Default Icons ───
@@ -152,10 +151,10 @@ export class HelixAlert extends LitElement {
 
     /**
      * Dispatched when the user dismisses the alert.
-     * @event hx-dismiss
+     * @event hx-close
      */
     this.dispatchEvent(
-      new CustomEvent('hx-dismiss', {
+      new CustomEvent('hx-close', {
         bubbles: true,
         composed: true,
         detail: { reason: 'user' },
@@ -164,14 +163,21 @@ export class HelixAlert extends LitElement {
 
     /**
      * Dispatched after the alert is dismissed.
-     * @event hx-after-dismiss
+     * @event hx-after-close
      */
     this.dispatchEvent(
-      new CustomEvent('hx-after-dismiss', {
+      new CustomEvent('hx-after-close', {
         bubbles: true,
         composed: true,
       }),
     );
+  }
+
+  private _handleCloseKeydown(event: KeyboardEvent): void {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      this._handleDismiss();
+    }
   }
 
   // ─── Render ───
@@ -183,7 +189,7 @@ export class HelixAlert extends LitElement {
     };
 
     return html`
-      <div part="alert" class=${classMap(classes)} role=${this._role} aria-live=${this._ariaLive}>
+      <div part="alert" class=${classMap(classes)} role=${this._role}>
         ${this.icon
           ? html`
               <div part="icon" class="alert__icon">
@@ -206,6 +212,7 @@ export class HelixAlert extends LitElement {
                 class="alert__close-button"
                 aria-label="Close"
                 @click=${this._handleDismiss}
+                @keydown=${this._handleCloseKeydown}
               >
                 ${this._renderCloseIcon()}
               </button>
