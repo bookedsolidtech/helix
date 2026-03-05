@@ -64,7 +64,7 @@ export class HelixButton extends LitElement {
    * @attr hx-size
    */
   @property({ type: String, reflect: true, attribute: 'hx-size' })
-  size: 'sm' | 'md' | 'lg' = 'md';
+  hxSize: 'sm' | 'md' | 'lg' = 'md';
 
   /**
    * Whether the button is disabled. Prevents all interaction and form actions.
@@ -207,7 +207,7 @@ export class HelixButton extends LitElement {
     const classes = {
       button: true,
       [`button--${this.variant}`]: true,
-      [`button--${this.size}`]: true,
+      [`button--${this.hxSize}`]: true,
       'button--loading': this.loading,
     };
 
@@ -218,6 +218,7 @@ export class HelixButton extends LitElement {
           class=${classMap(classes)}
           href=${this.disabled ? nothing : ifDefined(this.href)}
           target=${ifDefined(this.target)}
+          rel=${this.target === '_blank' ? 'noopener noreferrer' : nothing}
           aria-disabled=${this.disabled ? 'true' : nothing}
           aria-busy=${this.loading ? 'true' : nothing}
           @click=${this._handleClick}
@@ -233,7 +234,6 @@ export class HelixButton extends LitElement {
         class=${classMap(classes)}
         ?disabled=${this.disabled}
         type=${this.type}
-        aria-disabled=${this.disabled ? 'true' : nothing}
         aria-busy=${this.loading ? 'true' : nothing}
         @click=${this._handleClick}
       >
