@@ -63,7 +63,7 @@ describe('hx-form', () => {
   // ─── Events (3) ───
 
   describe('Events', () => {
-    it('dispatches wc-submit on valid client-side submit', async () => {
+    it('dispatches hx-submit on valid client-side submit', async () => {
       const el = await fixture<WcForm>(`
         <hx-form action="">
           <form>
@@ -85,7 +85,30 @@ describe('hx-form', () => {
       expect(event.composed).toBe(true);
     });
 
-    it('dispatches wc-invalid when validation fails on submit', async () => {
+    it('hx-submit detail.values preserves multi-value fields as arrays', async () => {
+      const el = await fixture<WcForm>(`
+        <hx-form action="">
+          <form>
+            <input type="checkbox" name="allergies" value="peanuts" checked />
+            <input type="checkbox" name="allergies" value="dairy" checked />
+            <input type="text" name="patient" value="jdoe" />
+            <button type="submit">Submit</button>
+          </form>
+        </hx-form>
+      `);
+
+      const form = el.querySelector('form')!;
+      const eventPromise = oneEvent<CustomEvent>(el, 'hx-submit');
+      form.dispatchEvent(new SubmitEvent('submit', { bubbles: true, cancelable: true }));
+      const event = await eventPromise;
+
+      expect(Array.isArray(event.detail.values['allergies'])).toBe(true);
+      expect(event.detail.values['allergies']).toContain('peanuts');
+      expect(event.detail.values['allergies']).toContain('dairy');
+      expect(event.detail.values['patient']).toBe('jdoe');
+    });
+
+    it('dispatches hx-invalid when validation fails on submit', async () => {
       const el = await fixture<WcForm>(`
         <hx-form action="">
           <form>
@@ -109,7 +132,32 @@ describe('hx-form', () => {
       expect(event.detail.errors.length).toBeGreaterThan(0);
     });
 
-    it('dispatches wc-reset when form is reset', async () => {
+    it('does not dispatch hx-submit when action is set (native passthrough)', async () => {
+      const el = await fixture<WcForm>(`
+        <hx-form action="/api/submit">
+          <form action="/api/submit" method="post">
+            <input type="text" name="field" value="value" />
+            <button type="submit">Submit</button>
+          </form>
+        </hx-form>
+      `);
+
+      const form = el.querySelector('form')!;
+      let dispatched = false;
+      el.addEventListener('hx-submit', () => {
+        dispatched = true;
+      });
+
+      const submitEvent = new SubmitEvent('submit', { bubbles: true, cancelable: true });
+      form.dispatchEvent(submitEvent);
+
+      // Native submission passthrough: event should NOT have been prevented
+      // and hx-submit should NOT have been dispatched
+      expect(dispatched).toBe(false);
+      expect(submitEvent.defaultPrevented).toBe(false);
+    });
+
+    it('dispatches hx-reset when form is reset', async () => {
       const el = await fixture<WcForm>(`
         <hx-form action="">
           <form>
@@ -173,6 +221,43 @@ describe('hx-form', () => {
       const formData = el.getFormData();
       expect(formData.get('username')).toBe('jdoe');
       expect(formData.get('email')).toBe('jdoe@example.com');
+    });
+
+    it('getFormData() preserves multi-value fields (checkboxes with same name)', async () => {
+      const el = await fixture<WcForm>(`
+        <hx-form>
+          <form>
+            <input type="checkbox" name="allergies" value="peanuts" checked />
+            <input type="checkbox" name="allergies" value="shellfish" checked />
+            <input type="checkbox" name="allergies" value="dairy" />
+          </form>
+        </hx-form>
+      `);
+
+      const formData = el.getFormData();
+      const allValues = formData.getAll('allergies');
+      expect(allValues).toHaveLength(2);
+      expect(allValues).toContain('peanuts');
+      expect(allValues).toContain('shellfish');
+    });
+
+    it('getFormData() collects from named inputs manually when no child <form>', async () => {
+      const el = await fixture<WcForm>(`
+        <hx-form>
+          <input type="text" name="patient" value="Jane Doe" />
+          <input type="checkbox" name="consent" value="yes" checked />
+          <input type="checkbox" name="medications" value="aspirin" checked />
+          <input type="checkbox" name="medications" value="ibuprofen" checked />
+        </hx-form>
+      `);
+
+      const formData = el.getFormData();
+      expect(formData.get('patient')).toBe('Jane Doe');
+      expect(formData.get('consent')).toBe('yes');
+      const meds = formData.getAll('medications');
+      expect(meds).toHaveLength(2);
+      expect(meds).toContain('aspirin');
+      expect(meds).toContain('ibuprofen');
     });
   });
 
