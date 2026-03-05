@@ -34,7 +34,7 @@ export const helixTreeItemStyles = css`
     font-family: var(--hx-tree-item-font-family, var(--hx-font-family-sans, sans-serif));
     font-size: var(--hx-tree-item-font-size, var(--hx-font-size-sm, 0.875rem));
     line-height: var(--hx-line-height-normal, 1.5);
-    transition: background-color var(--hx-transition-fast, 150ms) ease;
+    transition: background-color var(--hx-transition-fast, 150ms ease);
     user-select: none;
   }
 
@@ -89,7 +89,7 @@ export const helixTreeItemStyles = css`
     color: var(--hx-tree-item-expand-icon-color, var(--hx-color-neutral-500, #6b7280));
     cursor: pointer;
     border-radius: var(--hx-border-radius-sm, 0.25rem);
-    transition: transform var(--hx-transition-fast, 150ms) ease;
+    transition: transform var(--hx-transition-fast, 150ms ease);
     pointer-events: auto;
   }
 
@@ -105,7 +105,7 @@ export const helixTreeItemStyles = css`
     stroke-width: 2;
     stroke-linecap: round;
     stroke-linejoin: round;
-    transition: transform var(--hx-transition-fast, 150ms) ease;
+    transition: transform var(--hx-transition-fast, 150ms ease);
   }
 
   :host([expanded]) .expand-btn svg {
@@ -146,7 +146,8 @@ export const helixTreeItemStyles = css`
   .children {
     display: grid;
     grid-template-rows: 0fr;
-    transition: grid-template-rows var(--hx-transition-base, 200ms) ease;
+    transition: grid-template-rows var(--hx-transition-base, 200ms ease);
+    --_indent-level: calc(var(--_indent-level, 0) + 1);
   }
 
   .children--expanded {
