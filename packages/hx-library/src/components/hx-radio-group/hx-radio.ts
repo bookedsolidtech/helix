@@ -63,12 +63,9 @@ export class HelixRadio extends LitElement {
   override connectedCallback(): void {
     super.connectedCallback();
     this.setAttribute('role', 'radio');
-    this.setAttribute('aria-checked', String(this.checked));
-    this.setAttribute('aria-disabled', String(this.disabled));
   }
 
   override updated(changedProperties: Map<string, unknown>): void {
-    super.updated(changedProperties);
     if (changedProperties.has('checked')) {
       this.setAttribute('aria-checked', String(this.checked));
     }
@@ -138,6 +135,3 @@ declare global {
     'hx-radio': HelixRadio;
   }
 }
-
-/** @public Type alias for use in test files and consumers. */
-export type WcRadio = HelixRadio;

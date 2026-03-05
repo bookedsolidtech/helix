@@ -67,12 +67,6 @@ export const helixBadgeStyles = css`
     --hx-badge-pulse-color: var(--hx-color-warning-500, #eab308);
   }
 
-  .badge--danger {
-    --hx-badge-bg: var(--hx-color-error-500, #dc2626);
-    --hx-badge-color: var(--hx-color-neutral-0, #ffffff);
-    --hx-badge-pulse-color: var(--hx-color-error-500, #dc2626);
-  }
-
   .badge--error {
     --hx-badge-bg: var(--hx-color-error-500, #dc2626);
     --hx-badge-color: var(--hx-color-neutral-0, #ffffff);
@@ -119,7 +113,8 @@ export const helixBadgeStyles = css`
   }
 
   .badge--pulse {
-    animation: wc-badge-pulse 2s ease-in-out infinite;
+    animation: wc-badge-pulse var(--hx-badge-pulse-duration, var(--hx-duration-slow, 2s))
+      var(--hx-badge-pulse-easing, var(--hx-ease-in-out, ease-in-out)) infinite;
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -150,7 +145,7 @@ export const helixBadgeStyles = css`
   }
 
   .badge__remove-button:focus-visible {
-    outline: 2px solid currentColor;
-    outline-offset: 1px;
+    outline: var(--hx-focus-ring-width, 2px) solid var(--hx-focus-ring-color, currentColor);
+    outline-offset: var(--hx-focus-ring-offset, 1px);
   }
 `;
