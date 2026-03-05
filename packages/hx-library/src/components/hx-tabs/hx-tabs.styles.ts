@@ -15,7 +15,7 @@ export const helixTabsStyles = css`
   .tabs {
     display: flex;
     flex-direction: column;
-    gap: 0;
+    gap: var(--hx-tabs-gap, 0);
   }
 
   :host([orientation='vertical']) .tabs {
