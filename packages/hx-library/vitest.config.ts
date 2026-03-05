@@ -23,6 +23,7 @@ export default defineConfig({
     exclude: ['.worktrees/**', 'node_modules/**'],
     reporters: ['verbose', 'json'],
     outputFile: { json: '.cache/test-results.json' },
+    testTimeout: 30000,
     globals: true,
     coverage: {
       provider: 'istanbul',
