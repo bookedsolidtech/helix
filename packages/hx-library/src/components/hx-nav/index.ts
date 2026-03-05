@@ -1,1 +1,1 @@
-export { HelixNav } from './hx-nav.js';
+export { HelixNav, type NavItem, type WcNav } from './hx-nav.js';
