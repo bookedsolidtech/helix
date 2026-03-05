@@ -9,7 +9,6 @@ build/
 
 # Auto-generated files (regenerated at build time, never commit)
 packages/hx-library/src/index.ts
-packages/hx-library/vite.config.ts
 packages/hx-library/custom-elements.json
 .astro/
 .next/
