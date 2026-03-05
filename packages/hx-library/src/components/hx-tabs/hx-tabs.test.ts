@@ -7,6 +7,14 @@ import './index.js';
 
 afterEach(cleanup);
 
+// ─── Test Helpers ──────────────────────────────────────────────────────────────
+
+/** Asserts an element is non-null and returns it typed, avoiding non-null assertions. */
+function assertEl<T extends Element>(el: T | null | undefined, label: string): T {
+  if (!el) throw new Error(`Expected element "${label}" to exist in DOM`);
+  return el;
+}
+
 // ─── Fixture Helpers ───────────────────────────────────────────────────────────
 
 const DEFAULT_TABS_HTML = `
@@ -111,7 +119,7 @@ describe('hx-tabs', () => {
       const el = await fixture<HelixTabs>(DEFAULT_TABS_HTML);
       const tabs = Array.from(el.querySelectorAll('hx-tab')) as HelixTab[];
       const btnBeta = shadowQuery<HTMLButtonElement>(tabs[1], 'button');
-      btnBeta!.click();
+      assertEl(btnBeta, 'button').click();
       await el.updateComplete;
       const btnBetaAfter = shadowQuery<HTMLButtonElement>(tabs[1], 'button');
       expect(btnBetaAfter?.getAttribute('aria-selected')).toBe('true');
@@ -122,7 +130,7 @@ describe('hx-tabs', () => {
       const tabs = Array.from(el.querySelectorAll('hx-tab')) as HelixTab[];
       const panels = Array.from(el.querySelectorAll('hx-tab-panel')) as HelixTabPanel[];
       const btnBeta = shadowQuery<HTMLButtonElement>(tabs[1], 'button');
-      btnBeta!.click();
+      assertEl(btnBeta, 'button').click();
       await el.updateComplete;
       expect(panels[1].hasAttribute('hidden')).toBe(false);
     });
@@ -132,7 +140,7 @@ describe('hx-tabs', () => {
       const tabs = Array.from(el.querySelectorAll('hx-tab')) as HelixTab[];
       const panels = Array.from(el.querySelectorAll('hx-tab-panel')) as HelixTabPanel[];
       const btnBeta = shadowQuery<HTMLButtonElement>(tabs[1], 'button');
-      btnBeta!.click();
+      assertEl(btnBeta, 'button').click();
       await el.updateComplete;
       expect(panels[0].hasAttribute('hidden')).toBe(true);
       expect(panels[2].hasAttribute('hidden')).toBe(true);
@@ -143,7 +151,7 @@ describe('hx-tabs', () => {
       const tabs = Array.from(el.querySelectorAll('hx-tab')) as HelixTab[];
       const eventPromise = oneEvent<CustomEvent>(el, 'hx-tab-change');
       const btnBeta = shadowQuery<HTMLButtonElement>(tabs[1], 'button');
-      btnBeta!.click();
+      assertEl(btnBeta, 'button').click();
       const event = await eventPromise;
       expect(event).toBeTruthy();
     });
@@ -153,7 +161,7 @@ describe('hx-tabs', () => {
       const tabs = Array.from(el.querySelectorAll('hx-tab')) as HelixTab[];
       const eventPromise = oneEvent<CustomEvent>(el, 'hx-tab-change');
       const btnBeta = shadowQuery<HTMLButtonElement>(tabs[1], 'button');
-      btnBeta!.click();
+      assertEl(btnBeta, 'button').click();
       const event = await eventPromise;
       expect(event.bubbles).toBe(true);
       expect(event.composed).toBe(true);
@@ -164,7 +172,7 @@ describe('hx-tabs', () => {
       const tabs = Array.from(el.querySelectorAll('hx-tab')) as HelixTab[];
       const eventPromise = oneEvent<CustomEvent<{ tabId: string; index: number }>>(el, 'hx-tab-change');
       const btnBeta = shadowQuery<HTMLButtonElement>(tabs[1], 'button');
-      btnBeta!.click();
+      assertEl(btnBeta, 'button').click();
       const event = await eventPromise;
       expect(event.detail.index).toBe(1);
     });
@@ -174,7 +182,7 @@ describe('hx-tabs', () => {
       const tabs = Array.from(el.querySelectorAll('hx-tab')) as HelixTab[];
       const eventPromise = oneEvent<CustomEvent<{ tabId: string; index: number }>>(el, 'hx-tab-change');
       const btnGamma = shadowQuery<HTMLButtonElement>(tabs[2], 'button');
-      btnGamma!.click();
+      assertEl(btnGamma, 'button').click();
       const event = await eventPromise;
       expect(event.detail.tabId).toBe(tabs[2].id);
     });
@@ -187,7 +195,7 @@ describe('hx-tabs', () => {
         eventFired = true;
       });
       const btnAlpha = shadowQuery<HTMLButtonElement>(tabs[0], 'button');
-      btnAlpha!.click();
+      assertEl(btnAlpha, 'button').click();
       await el.updateComplete;
       expect(eventFired).toBe(false);
     });
@@ -200,7 +208,7 @@ describe('hx-tabs', () => {
       const el = await fixture<HelixTabs>(DEFAULT_TABS_HTML);
       const tabs = Array.from(el.querySelectorAll('hx-tab')) as HelixTab[];
       const btnAlpha = shadowQuery<HTMLButtonElement>(tabs[0], 'button');
-      btnAlpha!.focus();
+      assertEl(btnAlpha, 'button').focus();
       el.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true }));
       await el.updateComplete;
       expect(tabs[1].selected).toBe(true);
@@ -211,9 +219,9 @@ describe('hx-tabs', () => {
       const tabs = Array.from(el.querySelectorAll('hx-tab')) as HelixTab[];
       // First activate beta so focus is on it
       const btnBeta = shadowQuery<HTMLButtonElement>(tabs[1], 'button');
-      btnBeta!.click();
+      assertEl(btnBeta, 'button').click();
       await el.updateComplete;
-      btnBeta!.focus();
+      assertEl(btnBeta, 'button').focus();
       el.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowLeft', bubbles: true }));
       await el.updateComplete;
       expect(tabs[0].selected).toBe(true);
@@ -224,9 +232,9 @@ describe('hx-tabs', () => {
       const tabs = Array.from(el.querySelectorAll('hx-tab')) as HelixTab[];
       // Activate last tab first
       const btnGamma = shadowQuery<HTMLButtonElement>(tabs[2], 'button');
-      btnGamma!.click();
+      assertEl(btnGamma, 'button').click();
       await el.updateComplete;
-      btnGamma!.focus();
+      assertEl(btnGamma, 'button').focus();
       el.dispatchEvent(new KeyboardEvent('keydown', { key: 'Home', bubbles: true }));
       await el.updateComplete;
       expect(tabs[0].selected).toBe(true);
@@ -236,7 +244,7 @@ describe('hx-tabs', () => {
       const el = await fixture<HelixTabs>(DEFAULT_TABS_HTML);
       const tabs = Array.from(el.querySelectorAll('hx-tab')) as HelixTab[];
       const btnAlpha = shadowQuery<HTMLButtonElement>(tabs[0], 'button');
-      btnAlpha!.focus();
+      assertEl(btnAlpha, 'button').focus();
       el.dispatchEvent(new KeyboardEvent('keydown', { key: 'End', bubbles: true }));
       await el.updateComplete;
       expect(tabs[2].selected).toBe(true);
@@ -246,9 +254,9 @@ describe('hx-tabs', () => {
       const el = await fixture<HelixTabs>(DEFAULT_TABS_HTML);
       const tabs = Array.from(el.querySelectorAll('hx-tab')) as HelixTab[];
       const btnGamma = shadowQuery<HTMLButtonElement>(tabs[2], 'button');
-      btnGamma!.click();
+      assertEl(btnGamma, 'button').click();
       await el.updateComplete;
-      btnGamma!.focus();
+      assertEl(btnGamma, 'button').focus();
       el.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true }));
       await el.updateComplete;
       expect(tabs[0].selected).toBe(true);
@@ -258,7 +266,7 @@ describe('hx-tabs', () => {
       const el = await fixture<HelixTabs>(DEFAULT_TABS_HTML);
       const tabs = Array.from(el.querySelectorAll('hx-tab')) as HelixTab[];
       const btnAlpha = shadowQuery<HTMLButtonElement>(tabs[0], 'button');
-      btnAlpha!.focus();
+      assertEl(btnAlpha, 'button').focus();
       el.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowLeft', bubbles: true }));
       await el.updateComplete;
       expect(tabs[2].selected).toBe(true);
@@ -281,7 +289,7 @@ describe('hx-tabs', () => {
       `);
       const tabs = Array.from(el.querySelectorAll('hx-tab')) as HelixTab[];
       const btnOne = shadowQuery<HTMLButtonElement>(tabs[0], 'button');
-      btnOne!.focus();
+      assertEl(btnOne, 'button').focus();
       el.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true }));
       await el.updateComplete;
       // Tab 0 should still be selected since activation is manual
@@ -301,12 +309,12 @@ describe('hx-tabs', () => {
       const tabs = Array.from(el.querySelectorAll('hx-tab')) as HelixTab[];
       // Navigate to tab two with ArrowRight (no activation)
       const btnOne = shadowQuery<HTMLButtonElement>(tabs[0], 'button');
-      btnOne!.focus();
+      assertEl(btnOne, 'button').focus();
       el.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true }));
       await el.updateComplete;
       // Now the button for tab two should be focused — press Space
       const btnTwo = shadowQuery<HTMLButtonElement>(tabs[1], 'button');
-      btnTwo!.focus();
+      assertEl(btnTwo, 'button').focus();
       const eventPromise = oneEvent<CustomEvent>(el, 'hx-tab-change');
       el.dispatchEvent(new KeyboardEvent('keydown', { key: ' ', bubbles: true }));
       const event = await eventPromise;
@@ -326,7 +334,7 @@ describe('hx-tabs', () => {
       `);
       const tabs = Array.from(el.querySelectorAll('hx-tab')) as HelixTab[];
       const btnTwo = shadowQuery<HTMLButtonElement>(tabs[1], 'button');
-      btnTwo!.focus();
+      assertEl(btnTwo, 'button').focus();
       const eventPromise = oneEvent<CustomEvent>(el, 'hx-tab-change');
       el.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
       const event = await eventPromise;
@@ -352,7 +360,7 @@ describe('hx-tabs', () => {
       `);
       const tabs = Array.from(el.querySelectorAll('hx-tab')) as HelixTab[];
       const btnOne = shadowQuery<HTMLButtonElement>(tabs[0], 'button');
-      btnOne!.focus();
+      assertEl(btnOne, 'button').focus();
       el.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true }));
       await el.updateComplete;
       expect(tabs[1].selected).toBe(true);
@@ -369,9 +377,9 @@ describe('hx-tabs', () => {
       `);
       const tabs = Array.from(el.querySelectorAll('hx-tab')) as HelixTab[];
       const btnTwo = shadowQuery<HTMLButtonElement>(tabs[1], 'button');
-      btnTwo!.click();
+      assertEl(btnTwo, 'button').click();
       await el.updateComplete;
-      btnTwo!.focus();
+      assertEl(btnTwo, 'button').focus();
       el.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowUp', bubbles: true }));
       await el.updateComplete;
       expect(tabs[0].selected).toBe(true);
@@ -388,9 +396,9 @@ describe('hx-tabs', () => {
       `);
       const tabs = Array.from(el.querySelectorAll('hx-tab')) as HelixTab[];
       const btnTwo = shadowQuery<HTMLButtonElement>(tabs[1], 'button');
-      btnTwo!.click();
+      assertEl(btnTwo, 'button').click();
       await el.updateComplete;
-      btnTwo!.focus();
+      assertEl(btnTwo, 'button').focus();
       el.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowLeft', bubbles: true }));
       await el.updateComplete;
       // Tab two should still be active because ArrowLeft does not apply in vertical
@@ -408,7 +416,7 @@ describe('hx-tabs', () => {
       `);
       const tabs = Array.from(el.querySelectorAll('hx-tab')) as HelixTab[];
       const btnOne = shadowQuery<HTMLButtonElement>(tabs[0], 'button');
-      btnOne!.focus();
+      assertEl(btnOne, 'button').focus();
       el.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true }));
       await el.updateComplete;
       // Tab one should still be active because ArrowRight does not apply in vertical
@@ -434,7 +442,7 @@ describe('hx-tabs', () => {
         eventFired = true;
       });
       const btnTwo = shadowQuery<HTMLButtonElement>(tabs[1], 'button');
-      btnTwo!.click();
+      assertEl(btnTwo, 'button').click();
       await el.updateComplete;
       expect(eventFired).toBe(false);
       expect(tabs[0].selected).toBe(true);
@@ -454,7 +462,7 @@ describe('hx-tabs', () => {
       `);
       const tabs = Array.from(el.querySelectorAll('hx-tab')) as HelixTab[];
       const btnOne = shadowQuery<HTMLButtonElement>(tabs[0], 'button');
-      btnOne!.focus();
+      assertEl(btnOne, 'button').focus();
       el.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true }));
       await el.updateComplete;
       // tab two is disabled so focus/activation jumps to tab three
@@ -560,7 +568,7 @@ describe('hx-tabs', () => {
       const el = await fixture<HelixTabs>(TWO_TABS_HTML);
       const tabs = Array.from(el.querySelectorAll('hx-tab')) as HelixTab[];
       const btnTwo = shadowQuery<HTMLButtonElement>(tabs[1], 'button');
-      btnTwo!.click();
+      assertEl(btnTwo, 'button').click();
       await el.updateComplete;
       expect(tabs[0].tabIndex).toBe(-1);
       expect(tabs[1].tabIndex).toBe(0);

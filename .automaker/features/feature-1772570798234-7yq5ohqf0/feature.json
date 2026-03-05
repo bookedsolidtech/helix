@@ -2,7 +2,7 @@
   "category": "Uncategorized",
   "description": "## Component: hx-date-picker (NEW)\n**Tier 2 — Standard Enterprise | Industry Consensus: 3/6 libraries | HEALTHCARE-CRITICAL**\n\nCalendar-based date selection with text input fallback. Critical for healthcare (DOB, appointments, prescriptions).\n\n### ADR-001 Classification: Hybrid (Form Component)\nProperties control date constraints. Label/help via slots.\n\n### API Design\n**Properties:** `name`, `value` (ISO 8601 date string), `min`, `max`, `label`, `required`, `disabled`, `error`, `help-text`, `format` (display format), `locale`\n**Slots:** Default (label), `help`, `error`\n**CSS Parts:** `input`, `calendar`, `day`, `month-nav`, `label`, `trigger`\n**Events:** `hx-change` (composed: true, detail: { value, date })\n\n### Drupal Integration\n```twig\n<hx-date-picker name=\"date_of_birth\" label=\"Date of Birth\" required max=\"{{ 'now'|date('Y-m-d') }}\">\n  <span slot=\"help\">Must be 18 or older for self-registration</span>\n</hx-date-picker>\n\n<hx-date-picker name=\"appointment_date\" label=\"Appointment Date\" min=\"{{ 'now'|date('Y-m-d') }}\">\n</hx-date-picker>\n```\n\n### ElementInternals: Submits ISO 8601 date string\n### Healthcare: DOB entry, appointment scheduling, prescription dates, insurance expiry\n\n### Acceptance Criteria\n1. Calendar popup with month/year navigation\n2. Text input with date format masking\n3. Min/max date constraints (grey out unavailable dates)\n4. Keyboard: full calendar navigation\n5. Locale-aware date formatting\n6. ElementInternals form participation\n7. WCAG 2.1 AA: dialog calendar pattern, live region for month changes",
   "title": "T2-32: hx-date-picker — Calendar Date Selection",
-  "status": "review",
+  "status": "backlog",
   "complexity": "large",
   "priority": 3,
   "source": "api",
@@ -50,6 +50,11 @@
       "from": "blocked",
       "to": "review",
       "timestamp": "2026-03-04T13:58:48.950Z"
+    },
+    {
+      "from": "review",
+      "to": "backlog",
+      "timestamp": "2026-03-04T17:33:02.657Z"
     }
   ],
   "featureType": "code",

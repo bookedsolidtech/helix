@@ -2,7 +2,7 @@
   "category": "Uncategorized",
   "description": "## Component: hx-copy-button (NEW)\n**Tier 2 — Standard Enterprise | Industry Consensus: 3/6 libraries**\n\nCopies specified text to clipboard with visual confirmation feedback.\n\n### ADR-001 Classification: Property-Driven (Atomic)\n\n### API Design\n**Properties:** `value` (text to copy), `label` (accessible label), `feedback-duration` (ms, default 2000), `hx-size`\n**Slots:** Default (button label), `success-icon`, `copy-icon`\n**CSS Parts:** `button`, `icon`\n**Events:** `hx-copy` (composed: true, detail: { value })\n\n### Drupal Integration\n```twig\n{# Copy MRN to clipboard #}\n<hx-copy-button value=\"{{ patient.field_mrn.value }}\" label=\"Copy MRN\">\n  {{ patient.field_mrn.value }}\n</hx-copy-button>\n```\n\n### Healthcare: Copy MRN, prescription IDs, appointment codes, reference numbers\n\n### Acceptance Criteria\n1. Copies value to clipboard via navigator.clipboard API\n2. Visual feedback (icon change + optional text) for configurable duration\n3. Fallback for older browsers (execCommand)\n4. Accessible: announces \"Copied\" to screen readers",
   "title": "T2-30: hx-copy-button — Clipboard Copy Action",
-  "status": "review",
+  "status": "backlog",
   "complexity": "small",
   "priority": 3,
   "source": "api",
@@ -45,6 +45,11 @@
       "from": "blocked",
       "to": "review",
       "timestamp": "2026-03-04T13:58:45.184Z"
+    },
+    {
+      "from": "review",
+      "to": "backlog",
+      "timestamp": "2026-03-04T17:32:50.879Z"
     }
   ],
   "featureType": "code",

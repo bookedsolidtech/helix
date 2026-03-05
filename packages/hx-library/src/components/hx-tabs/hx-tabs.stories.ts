@@ -298,8 +298,8 @@ export const Vertical: Story = {
   play: async ({ canvasElement }) => {
     await new Promise((r) => setTimeout(r, 50));
     const tabsEl = canvasElement.querySelector('hx-tabs');
-    await expect(tabsEl).toBeTruthy();
-    await expect(tabsEl!.getAttribute('orientation')).toBe('vertical');
+    if (!tabsEl) throw new Error('hx-tabs element not found');
+    await expect(tabsEl.getAttribute('orientation')).toBe('vertical');
   },
 };
 
@@ -336,8 +336,8 @@ export const ManualActivation: Story = {
   play: async ({ canvasElement }) => {
     await new Promise((r) => setTimeout(r, 50));
     const tabsEl = canvasElement.querySelector('hx-tabs');
-    await expect(tabsEl).toBeTruthy();
-    await expect(tabsEl!.getAttribute('activation')).toBe('manual');
+    if (!tabsEl) throw new Error('hx-tabs element not found');
+    await expect(tabsEl.getAttribute('activation')).toBe('manual');
   },
 };
 
@@ -365,13 +365,13 @@ export const WithDisabledTab: Story = {
   play: async ({ canvasElement }) => {
     await new Promise((r) => setTimeout(r, 50));
     const disabledTab = canvasElement.querySelector('hx-tab[panel="discontinued"]');
-    await expect(disabledTab).toBeTruthy();
-    await expect(disabledTab!.hasAttribute('disabled')).toBeTruthy();
+    if (!disabledTab) throw new Error('disabled hx-tab element not found');
+    await expect(disabledTab.hasAttribute('disabled')).toBeTruthy();
 
     // Clicking a disabled tab should not change the active panel
     const panels = canvasElement.querySelectorAll('hx-tab-panel');
     const activePanelBefore = Array.from(panels).find((p) => !p.hasAttribute('hidden'));
-    await userEvent.click(disabledTab!);
+    await userEvent.click(disabledTab);
     await new Promise((r) => setTimeout(r, 50));
     const activePanelAfter = Array.from(panels).find((p) => !p.hasAttribute('hidden'));
     await expect(activePanelBefore).toBe(activePanelAfter);
@@ -431,8 +431,8 @@ export const ManyTabs: Story = {
     await expect(lastTab.hasAttribute('selected')).toBeTruthy();
 
     const lastPanel = canvasElement.querySelector('hx-tab-panel[name="imaging"]');
-    await expect(lastPanel).toBeTruthy();
-    await expect(lastPanel!.hasAttribute('hidden')).toBeFalsy();
+    if (!lastPanel) throw new Error('hx-tab-panel[name="imaging"] not found');
+    await expect(lastPanel.hasAttribute('hidden')).toBeFalsy();
   },
 };
 
@@ -581,23 +581,27 @@ export const Healthcare: Story = {
     // Demographics tab should be active by default
     await expect(tabEls[0].hasAttribute('selected')).toBeTruthy();
     const demographicsPanel = canvasElement.querySelector('hx-tab-panel[name="patient-demographics"]');
-    await expect(demographicsPanel!.hasAttribute('hidden')).toBeFalsy();
+    if (!demographicsPanel) throw new Error('hx-tab-panel[name="patient-demographics"] not found');
+    await expect(demographicsPanel.hasAttribute('hidden')).toBeFalsy();
 
     // Navigate to Vitals tab
     await userEvent.click(tabEls[1]);
     await new Promise((r) => setTimeout(r, 50));
     await expect(tabEls[1].hasAttribute('selected')).toBeTruthy();
     const vitalsPanel = canvasElement.querySelector('hx-tab-panel[name="patient-vitals"]');
-    await expect(vitalsPanel!.hasAttribute('hidden')).toBeFalsy();
-    await expect(demographicsPanel!.hasAttribute('hidden')).toBeTruthy();
+    if (!vitalsPanel) throw new Error('hx-tab-panel[name="patient-vitals"] not found');
+    await expect(vitalsPanel.hasAttribute('hidden')).toBeFalsy();
+    await expect(demographicsPanel.hasAttribute('hidden')).toBeTruthy();
 
     // Navigate to Clinical Notes tab
     const notesTab = canvasElement.querySelector('hx-tab[panel="patient-notes"]');
-    await userEvent.click(notesTab!);
+    if (!notesTab) throw new Error('hx-tab[panel="patient-notes"] not found');
+    await userEvent.click(notesTab);
     await new Promise((r) => setTimeout(r, 50));
     const notesPanel = canvasElement.querySelector('hx-tab-panel[name="patient-notes"]');
-    await expect(notesPanel!.hasAttribute('hidden')).toBeFalsy();
-    await expect(vitalsPanel!.hasAttribute('hidden')).toBeTruthy();
+    if (!notesPanel) throw new Error('hx-tab-panel[name="patient-notes"] not found');
+    await expect(notesPanel.hasAttribute('hidden')).toBeFalsy();
+    await expect(vitalsPanel.hasAttribute('hidden')).toBeTruthy();
   },
 };
 

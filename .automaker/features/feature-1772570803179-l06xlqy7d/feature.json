@@ -2,7 +2,7 @@
   "category": "Uncategorized",
   "description": "## Component: hx-time-picker (NEW)\n**Tier 2 — Standard Enterprise | Industry Consensus: 2/6 libraries | HEALTHCARE-CRITICAL**\n\nTime input with optional dropdown for common time slots.\n\n### ADR-001 Classification: Hybrid (Form Component)\n\n### API Design\n**Properties:** `name`, `value` (HH:MM format), `min`, `max`, `step` (minutes), `label`, `required`, `disabled`, `error`, `format` (12h|24h)\n**Slots:** Default (label), `help`, `error`\n**CSS Parts:** `input`, `listbox`, `option`, `label`\n**Events:** `hx-change` (composed: true)\n\n### Drupal Integration\n```twig\n<hx-time-picker name=\"appointment_time\" label=\"Appointment Time\" min=\"08:00\" max=\"17:00\" step=\"15\" format=\"12h\">\n</hx-time-picker>\n```\n\n### ElementInternals: Submits HH:MM time string\n### Healthcare: Appointment times, medication schedules, shift scheduling\n\n### Acceptance Criteria\n1. Dropdown with time slots at step intervals\n2. Text input with time format masking\n3. 12-hour and 24-hour formats\n4. Min/max time constraints\n5. ElementInternals form participation",
   "title": "T2-33: hx-time-picker — Time Input Field",
-  "status": "review",
+  "status": "backlog",
   "complexity": "medium",
   "priority": 3,
   "source": "api",
@@ -56,6 +56,11 @@
       "from": "blocked",
       "to": "review",
       "timestamp": "2026-03-04T13:58:50.939Z"
+    },
+    {
+      "from": "review",
+      "to": "backlog",
+      "timestamp": "2026-03-04T17:33:07.936Z"
     }
   ],
   "featureType": "code",

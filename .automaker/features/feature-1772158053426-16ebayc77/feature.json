@@ -2,7 +2,7 @@
   "category": "Phase 2: Component Expansion",
   "description": "**Milestone:** Phase 2: Component Expansion\n\nCreate a build step that generates Drupal Single Directory Component (SDC) definitions from the Custom Elements Manifest. Each component gets a .component.yml with props, slots, and schema auto-mapped from CEM data.\n\n**Files to Modify:**\n- scripts/cem-to-sdc.ts\n- packages/hx-library/drupal/\n\n**Acceptance Criteria:**\n- [ ] CEM-to-SDC generator build step\n- [ ] Generated .component.yml for each component\n- [ ] Props mapped from CEM attributes with correct types\n- [ ] Slots mapped from CEM slots\n- [ ] Schema validation for generated files\n- [ ] CI step validates generated SDCs match CEM\n\n**Complexity:** large",
   "title": "Build Drupal SDC auto-generation from CEM",
-  "status": "backlog",
+  "status": "blocked",
   "isEpic": false,
   "epicId": "feature-1772158053419-7nvwtbujb",
   "branchName": "feature/phase-2-component-build-drupal-sdc",
@@ -22,6 +22,36 @@
       "to": "backlog",
       "timestamp": "2026-02-27T02:07:33.426Z",
       "reason": "Feature created"
+    },
+    {
+      "from": "backlog",
+      "to": "in_progress",
+      "timestamp": "2026-03-04T20:15:55.606Z"
+    },
+    {
+      "from": "in_progress",
+      "to": "review",
+      "timestamp": "2026-03-04T20:40:34.309Z"
+    },
+    {
+      "from": "review",
+      "to": "blocked",
+      "timestamp": "2026-03-04T20:47:37.029Z"
     }
-  ]
+  ],
+  "featureType": "code",
+  "complexity": "medium",
+  "updatedAt": "2026-03-04T20:16:01.444Z",
+  "model": "claude-sonnet-4-6",
+  "costUsd": 1.6988389999999998,
+  "lastSessionId": "e259f854-4d29-43d4-8b1e-bfe26fb79ad5",
+  "prUrl": "https://github.com/bookedsolidtech/helix/pull/94",
+  "prNumber": 94,
+  "prCreatedAt": "2026-03-04T20:40:34.307Z",
+  "reviewStartedAt": "2026-03-04T20:40:34.309Z",
+  "prTrackedSince": "2026-03-04T20:40:34.311Z",
+  "prLastPolledAt": "2026-03-04T21:08:23.154Z",
+  "lastReviewFeedback": "coderabbitai: **Actionable comments posted: 17**\n\n<details>\n<summary>🤖 Prompt for all review comments with AI agents</summary>\n\n```\nVerify each finding against the current code and only fix it if needed.\n\nInline comments:\nIn `@package.json`:\n- Line 32: The repo currently exposes \"cem-to-sdc\" only as a manual root script,\nso wire it into the automated build: update the build flow that runs the\nhx-library CEM generation to also invoke the SDC conversion (e.g., call the\nexisting \"cem-to-sdc\" script as part of the hx-library package build or add a\nturborepo pipeline task that runs \"cem-to-sdc\" after the package build).\nSpecifically, modify the place that runs the \"cem\" generation (refer to\npackages/hx-library package.json build/cem step and the root \"cem-to-sdc\" script\nname) so the SDC conversion runs automatically during CI/build (or add it as a\ndependent task in the turbo pipeline), ensuring SDC output is generated and kept\nin sync without manual intervention.\n\nIn `@packages/hx-library/drupal/hx-avatar/hx-avatar.component.yml`:\n- Around line 10-15: The 'src' field in hx-avatar.component.yml currently uses\nthe literal string 'undefined' as its default which creates a real string value\nand can cause bad image requests; remove the \"default: 'undefined'\" line (or\nreplace it with an empty string or null if your schema requires a default) so\nthe src is truly unset when not provided—update the src entry in\nhx-avatar.component.yml (the src property under src/type/title/description)\naccordingly and ensure consumers rely on absence of the field rather than the\nstring \"undefined\".\n\nIn\n`@packages/hx-library/drupal/hx-breadcrumb-item/hx-breadcrumb-item.component.yml`:\n- Around line 10-14: The YAML schema sets href to the literal string\n'undefined', which contradicts \"omit for the current page\" and can create broken\nURLs; update the hx-breadcrumb-item.component.yml schema by removing the\ndefault: 'undefined' (or change it to null/omit the default entirely) for the\nhref property so",
+  "prIterationCount": 1,
+  "remediationCycleCount": 1
 }

@@ -2,7 +2,7 @@
   "category": "Phase 2: Component Expansion",
   "description": "**Milestone:** Phase 2: Component Expansion\n\nBuild hx-nav: primary and secondary navigation component. Supports horizontal menu bar and vertical sidebar patterns. Mobile responsive with hamburger toggle.\n\n**Files to Modify:**\n- packages/hx-library/src/components/hx-nav/\n\n**Acceptance Criteria:**\n- [ ] Horizontal and vertical layouts\n- [ ] Nested submenu support\n- [ ] Mobile responsive with hamburger toggle\n- [ ] Active/current page indication\n- [ ] CSS parts: nav, list, item, link, toggle\n- [ ] Keyboard: arrow keys, Enter, Escape for submenus\n- [ ] ARIA: role=navigation, aria-current, aria-expanded for submenus\n- [ ] <5KB gzipped\n\n**Complexity:** large",
   "title": "Implement hx-nav component",
-  "status": "backlog",
+  "status": "blocked",
   "isEpic": false,
   "epicId": "feature-1772158053419-7nvwtbujb",
   "branchName": "feature/phase-2-component-implement-hx-nav",
@@ -22,6 +22,35 @@
       "to": "backlog",
       "timestamp": "2026-02-27T02:07:33.426Z",
       "reason": "Feature created"
+    },
+    {
+      "from": "backlog",
+      "to": "in_progress",
+      "timestamp": "2026-03-04T20:37:22.820Z"
+    },
+    {
+      "from": "in_progress",
+      "to": "blocked",
+      "timestamp": "2026-03-04T21:07:24.455Z"
+    }
+  ],
+  "featureType": "code",
+  "complexity": "medium",
+  "updatedAt": "2026-03-04T21:02:25.251Z",
+  "model": "claude-sonnet-4-6",
+  "costUsd": 2.37491225,
+  "lastSessionId": "c715a6ba-ea36-40d1-bbd0-3610f7337c7b",
+  "executionHistory": [
+    {
+      "id": "12049b60-f0f8-4f3d-b1ad-9ce9f4a3c31e",
+      "startedAt": "2026-03-04T20:37:23.669Z",
+      "completedAt": "2026-03-04T21:02:23.492Z",
+      "durationMs": 1499823,
+      "costUsd": 2.37491225,
+      "model": "claude-sonnet-4-6",
+      "success": false,
+      "error": "Operation was cancelled",
+      "trigger": "manual"
     }
   ]
 }

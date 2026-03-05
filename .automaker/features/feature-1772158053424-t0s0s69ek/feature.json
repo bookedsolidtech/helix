@@ -2,7 +2,7 @@
   "category": "Phase 2: Component Expansion",
   "description": "**Milestone:** Phase 2: Component Expansion\n\nBuild hx-progress: progress bar for form completion, loading, and upload states. Connect to Drupal AJAX progress events. Determinate and indeterminate modes.\n\n**Files to Modify:**\n- packages/hx-library/src/components/hx-progress/\n\n**Acceptance Criteria:**\n- [ ] Determinate mode (0-100%)\n- [ ] Indeterminate mode (animated)\n- [ ] Label and value display options\n- [ ] Size variants\n- [ ] CSS parts: track, fill, label\n- [ ] ARIA: role=progressbar, aria-valuenow/min/max\n- [ ] <5KB gzipped\n\n**Complexity:** small",
   "title": "Implement hx-progress component",
-  "status": "backlog",
+  "status": "review",
   "isEpic": false,
   "epicId": "feature-1772158053419-7nvwtbujb",
   "branchName": "feature/phase-2-component-implement-hx",
@@ -22,6 +22,14 @@
       "to": "backlog",
       "timestamp": "2026-02-27T02:07:33.424Z",
       "reason": "Feature created"
+    },
+    {
+      "from": "backlog",
+      "to": "review",
+      "timestamp": "2026-03-04T19:34:29.784Z"
     }
-  ]
+  ],
+  "featureType": "code",
+  "prNumber": 91,
+  "reviewStartedAt": "2026-03-04T19:34:29.784Z"
 }
