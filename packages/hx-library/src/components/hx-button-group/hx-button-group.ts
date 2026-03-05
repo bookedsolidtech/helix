@@ -1,5 +1,6 @@
 import { LitElement, html } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
+import { classMap } from 'lit/directives/class-map.js';
 import { tokenStyles } from '@helix/tokens/lit';
 import { helixButtonGroupStyles } from './hx-button-group.styles.js';
 
@@ -39,6 +40,15 @@ export class HelixButtonGroup extends LitElement {
   @property({ type: String, reflect: true, attribute: 'hx-size' })
   size: 'sm' | 'md' | 'lg' = 'md';
 
+  /**
+   * Accessible label for the button group. Sets aria-label via ElementInternals.
+   * Required for WCAG 2.1 AA compliance when the group purpose is not clear from context.
+   * Alternatively, consumers may apply aria-label directly as an HTML attribute.
+   * @attr label
+   */
+  @property({ type: String })
+  label: string = '';
+
   // ─── Constructor ───
 
   constructor() {
@@ -55,11 +65,18 @@ export class HelixButtonGroup extends LitElement {
     if (changedProperties.has('size')) {
       this.style.setProperty('--hx-button-group-size', this.size);
     }
+
+    if (changedProperties.has('label')) {
+      this.internals.ariaLabel = this.label || null;
+    }
   }
 
   override connectedCallback(): void {
     super.connectedCallback();
     this.style.setProperty('--hx-button-group-size', this.size);
+    if (this.label) {
+      this.internals.ariaLabel = this.label;
+    }
   }
 
   // ─── Event Handling ───
@@ -74,7 +91,14 @@ export class HelixButtonGroup extends LitElement {
 
   override render() {
     return html`
-      <div part="group" class="group group--${this.orientation}">
+      <div
+        part="group"
+        class=${classMap({
+          group: true,
+          'group--horizontal': this.orientation === 'horizontal',
+          'group--vertical': this.orientation === 'vertical',
+        })}
+      >
         <slot @slotchange=${this._handleSlotChange}></slot>
       </div>
     `;
