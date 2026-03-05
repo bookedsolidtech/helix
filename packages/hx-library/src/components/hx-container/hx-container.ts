@@ -24,6 +24,7 @@ import { helixContainerStyles } from './hx-container.styles.js';
  * @cssprop [--hx-container-gutter=var(--hx-space-6)] - Horizontal padding on the inner box.
  * @cssprop [--hx-container-max-width] - Override the max-width set by the width property.
  * @cssprop [--hx-container-content=72rem] - Max-width for the content width preset.
+ * @cssprop [--hx-container-narrow=48rem] - Max-width for the narrow width preset.
  * @cssprop [--hx-container-sm=640px] - Max-width for the sm width preset.
  * @cssprop [--hx-container-md=768px] - Max-width for the md width preset.
  * @cssprop [--hx-container-lg=1024px] - Max-width for the lg width preset.
@@ -36,6 +37,15 @@ export class HelixContainer extends LitElement {
   /**
    * Controls the max-width of the inner content wrapper.
    * @attr width
+   * @example
+   * // Width presets and their default max-width values:
+   * // full    → no max-width constraint
+   * // content → 72rem (1152px)
+   * // narrow  → 48rem (768px) — override with --hx-container-narrow
+   * // sm      → 640px — override with --hx-container-sm
+   * // md      → 768px — override with --hx-container-md
+   * // lg      → 1024px — override with --hx-container-lg
+   * // xl      → 1280px — override with --hx-container-xl
    */
   @property({ type: String, reflect: true })
   width: 'full' | 'content' | 'narrow' | 'sm' | 'md' | 'lg' | 'xl' = 'content';
@@ -68,3 +78,5 @@ declare global {
     'hx-container': HelixContainer;
   }
 }
+
+export type WcContainer = HelixContainer;
