@@ -24,8 +24,8 @@ export const helixTreeItemStyles = css`
     padding: var(--hx-tree-item-padding-y, var(--hx-space-1, 0.25rem))
       var(--hx-tree-item-padding-x, var(--hx-space-2, 0.5rem));
     padding-left: calc(
-      var(--hx-tree-item-padding-x, var(--hx-space-2, 0.5rem)) +
-        var(--_indent-level, 0) * var(--hx-tree-indent-size, 1.5rem)
+      var(--hx-tree-item-padding-x, var(--hx-space-2, 0.5rem)) + var(--_indent-level, 0) *
+        var(--hx-tree-indent-size, 1.5rem)
     );
     border-radius: var(--hx-tree-item-border-radius, var(--hx-border-radius-sm, 0.25rem));
     cursor: pointer;
