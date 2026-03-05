@@ -26,10 +26,10 @@ describe('hx-tree-view', () => {
       expect(tree?.getAttribute('role')).toBe('tree');
     });
 
-    it('sets aria-multiselectable="false" by default', async () => {
+    it('omits aria-multiselectable when selection is "none"', async () => {
       const el = await fixture<WcTreeView>('<hx-tree-view></hx-tree-view>');
       const tree = shadowQuery(el, '.tree');
-      expect(tree?.getAttribute('aria-multiselectable')).toBe('false');
+      expect(tree?.getAttribute('aria-multiselectable')).toBeNull();
     });
 
     it('sets aria-multiselectable="true" in multiple selection mode', async () => {
@@ -442,8 +442,6 @@ describe('hx-tree-item', () => {
           <hx-tree-item slot="children">Child</hx-tree-item>
         </hx-tree-item>`,
       );
-      // Wait for slotchange event to fire
-      await new Promise((r) => setTimeout(r, 0));
       await el.updateComplete;
       const btn = shadowQuery(el, '.expand-btn');
       expect(btn).toBeTruthy();
@@ -522,7 +520,6 @@ describe('hx-tree-item', () => {
           <hx-tree-item slot="children">Child</hx-tree-item>
         </hx-tree-item>`,
       );
-      await new Promise((r) => setTimeout(r, 0));
       await el.updateComplete;
 
       expect(el.expanded).toBe(false);
@@ -540,7 +537,6 @@ describe('hx-tree-item', () => {
           <hx-tree-item slot="children">Child</hx-tree-item>
         </hx-tree-item>`,
       );
-      await new Promise((r) => setTimeout(r, 0));
       await el.updateComplete;
 
       expect(el.expanded).toBe(true);
