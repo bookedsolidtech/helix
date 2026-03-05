@@ -284,8 +284,7 @@ describe('hx-icon-button', () => {
         fired = true;
       });
       btn?.click();
-      // Give time for any async dispatch
-      await new Promise((r) => setTimeout(r, 50));
+      await el.updateComplete;
       expect(fired).toBe(false);
     });
   });
@@ -298,6 +297,7 @@ describe('hx-icon-button', () => {
       const btn = shadowQuery<HTMLButtonElement>(el, 'button');
       expect(btn).toBeTruthy();
       const eventPromise = oneEvent<CustomEvent>(el, 'hx-click');
+      btn?.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
       btn?.click();
       const event = await eventPromise;
       expect(event).toBeTruthy();
@@ -308,6 +308,7 @@ describe('hx-icon-button', () => {
       const btn = shadowQuery<HTMLButtonElement>(el, 'button');
       expect(btn).toBeTruthy();
       const eventPromise = oneEvent<CustomEvent>(el, 'hx-click');
+      btn?.dispatchEvent(new KeyboardEvent('keydown', { key: ' ', bubbles: true }));
       btn?.click();
       const event = await eventPromise;
       expect(event).toBeTruthy();
@@ -360,7 +361,7 @@ describe('hx-icon-button', () => {
       const btn = shadowQuery<HTMLButtonElement>(el, 'button');
       expect(btn).toBeTruthy();
       btn?.click();
-      await new Promise((r) => setTimeout(r, 50));
+      await el.updateComplete;
       expect(submitted).toBe(true);
     });
 
@@ -385,7 +386,7 @@ describe('hx-icon-button', () => {
       expect(btn?.getAttribute('name')).toBe('action');
       expect(btn?.getAttribute('value')).toBe('save');
       btn?.click();
-      await new Promise((r) => setTimeout(r, 50));
+      await el.updateComplete;
       expect(submitted).toBe(true);
     });
 
@@ -410,7 +411,7 @@ describe('hx-icon-button', () => {
       const btn = shadowQuery<HTMLButtonElement>(el, 'button');
       expect(btn).toBeTruthy();
       btn?.click();
-      await new Promise((r) => setTimeout(r, 50));
+      await el.updateComplete;
       expect(input.value).toBe('original');
     });
   });
