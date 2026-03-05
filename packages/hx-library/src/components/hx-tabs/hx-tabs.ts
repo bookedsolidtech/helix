@@ -205,11 +205,9 @@ export class HelixTabs extends LitElement {
       return;
     }
 
-    // Determine focused tab
-    const focusedTab = enabledTabs.find((tab) => {
-      const btn = tab.shadowRoot?.querySelector('button');
-      return btn === document.activeElement || tab === document.activeElement;
-    });
+    // Determine focused tab — when a button inside shadow DOM is focused,
+    // document.activeElement returns the shadow host (hx-tab), not the inner button.
+    const focusedTab = enabledTabs.find((tab) => tab === document.activeElement);
 
     if (e.key === ' ' || e.key === 'Enter') {
       if (focusedTab) {
