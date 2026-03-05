@@ -390,7 +390,7 @@ export class HelixTextInput extends LitElement {
             maxlength=${ifDefined(this.maxlength)}
             pattern=${ifDefined(this.pattern || undefined)}
             autocomplete=${ifDefined(this.autocomplete || undefined)}
-            aria-label=${ifDefined(this.ariaLabel ?? undefined)}
+            aria-label=${ifDefined(this.ariaLabel || undefined)}
             aria-labelledby=${ifDefined(
               this._hasLabelSlot ? `${this._inputId}-slotted-label` : undefined,
             )}
@@ -439,3 +439,5 @@ declare global {
     'hx-text-input': HelixTextInput;
   }
 }
+
+export type WcTextInput = HelixTextInput;
