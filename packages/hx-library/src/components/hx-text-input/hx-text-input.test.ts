@@ -226,7 +226,7 @@ describe('hx-text-input', () => {
   // ─── Events (4) ───
 
   describe('Events', () => {
-    it('dispatches wc-input on keystroke', async () => {
+    it('dispatches hx-input on keystroke', async () => {
       const el = await fixture<WcTextInput>('<hx-text-input></hx-text-input>');
       const input = shadowQuery<HTMLInputElement>(el, 'input')!;
       const eventPromise = oneEvent<CustomEvent>(el, 'hx-input');
@@ -246,7 +246,7 @@ describe('hx-text-input', () => {
       expect(event.detail.value).toBe('hello');
     });
 
-    it('dispatches wc-change on blur', async () => {
+    it('dispatches hx-change on blur', async () => {
       const el = await fixture<WcTextInput>('<hx-text-input></hx-text-input>');
       const input = shadowQuery<HTMLInputElement>(el, 'input')!;
       const eventPromise = oneEvent<CustomEvent>(el, 'hx-change');
@@ -397,7 +397,7 @@ describe('hx-text-input', () => {
     it('focus() moves focus to native input', async () => {
       const el = await fixture<WcTextInput>('<hx-text-input></hx-text-input>');
       el.focus();
-      await new Promise((r) => setTimeout(r, 50));
+      await el.updateComplete;
       const input = shadowQuery<HTMLInputElement>(el, 'input')!;
       expect(el.shadowRoot?.activeElement).toBe(input);
     });
@@ -406,7 +406,7 @@ describe('hx-text-input', () => {
       const el = await fixture<WcTextInput>('<hx-text-input value="hello world"></hx-text-input>');
       el.focus();
       el.select();
-      await new Promise((r) => setTimeout(r, 50));
+      await el.updateComplete;
       const input = shadowQuery<HTMLInputElement>(el, 'input')!;
       expect(input.selectionStart).toBe(0);
       expect(input.selectionEnd).toBe('hello world'.length);
