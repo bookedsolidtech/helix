@@ -30,30 +30,6 @@ export const helixAlertStyles = css`
     line-height: var(--hx-line-height-normal, 1.5);
   }
 
-  /* ─── Dismiss Animation ─── */
-
-  @keyframes hx-alert-dismiss {
-    from {
-      opacity: 1;
-      transform: translateY(0);
-    }
-    to {
-      opacity: 0;
-      transform: translateY(-4px);
-    }
-  }
-
-  .alert--dismissing {
-    animation: hx-alert-dismiss var(--hx-transition-fast, 150ms) ease forwards;
-    pointer-events: none;
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .alert--dismissing {
-      animation: none;
-    }
-  }
-
   /* ─── Icon ─── */
 
   .alert__icon {
@@ -86,14 +62,15 @@ export const helixAlertStyles = css`
   }
 
   /* ─── Close Button ─── */
+  /* Minimum 44x44px touch target per WCAG 2.5.5 (healthcare mandate). */
 
   .alert__close-button {
     display: inline-flex;
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
-    width: var(--hx-space-6, 1.5rem);
-    height: var(--hx-space-6, 1.5rem);
+    min-width: 2.75rem; /* 44px */
+    min-height: 2.75rem; /* 44px */
     margin-left: auto;
     padding: 0;
     border: none;
