@@ -93,11 +93,7 @@ export class HelixSideNav extends LitElement {
 
   override render() {
     return html`
-      <nav
-        part="nav"
-        class="side-nav"
-        aria-label=${this.label}
-      >
+      <nav part="nav" class="side-nav" aria-label=${this.label}>
         <div part="header" class="side-nav__header">
           <slot name="header"></slot>
           <button

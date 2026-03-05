@@ -92,7 +92,8 @@ export const helixSideNavStyles = css`
     background: transparent;
     color: var(--hx-side-nav-toggle-color, var(--hx-color-neutral-400, #9ca3af));
     cursor: pointer;
-    transition: background-color var(--hx-transition-fast, 150ms) ease,
+    transition:
+      background-color var(--hx-transition-fast, 150ms) ease,
       color var(--hx-transition-fast, 150ms) ease;
   }
 

@@ -3,6 +3,7 @@ import { css } from 'lit';
 export const helixNavItemStyles = css`
   :host {
     display: block;
+    background-color: var(--hx-nav-item-host-bg, var(--hx-color-neutral-900, #111827));
   }
 
   * {
@@ -28,7 +29,8 @@ export const helixNavItemStyles = css`
     color: var(--hx-nav-item-color, var(--hx-color-neutral-300, #d1d5db));
     border-radius: var(--hx-border-radius-sm, 0.25rem);
     margin: 0 var(--hx-space-2, 0.5rem);
-    transition: background-color var(--hx-transition-fast, 150ms) ease,
+    transition:
+      background-color var(--hx-transition-fast, 150ms) ease,
       color var(--hx-transition-fast, 150ms) ease;
     white-space: nowrap;
     overflow: hidden;
@@ -50,7 +52,10 @@ export const helixNavItemStyles = css`
   }
 
   .nav-item__link:hover {
-    background-color: var(--hx-nav-item-hover-bg, color-mix(in srgb, currentColor 10%, transparent));
+    background-color: var(
+      --hx-nav-item-hover-bg,
+      color-mix(in srgb, currentColor 10%, transparent)
+    );
     color: var(--hx-nav-item-hover-color, var(--hx-color-neutral-100, #f3f4f6));
   }
 
@@ -96,7 +101,8 @@ export const helixNavItemStyles = css`
     min-width: 0;
     overflow: hidden;
     text-overflow: ellipsis;
-    transition: opacity var(--hx-transition-fast, 150ms) ease,
+    transition:
+      opacity var(--hx-transition-fast, 150ms) ease,
       width var(--hx-transition-fast, 150ms) ease;
   }
 
