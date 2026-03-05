@@ -7,7 +7,7 @@ export const helixIconStyles = css`
     justify-content: center;
     width: var(--hx-icon-size, var(--hx-size-6, 1.5rem));
     height: var(--hx-icon-size, var(--hx-size-6, 1.5rem));
-    color: var(--hx-icon-color, var(--hx-color-text-primary, currentColor));
+    color: var(--hx-icon-color, currentColor);
     flex-shrink: 0;
   }
 
