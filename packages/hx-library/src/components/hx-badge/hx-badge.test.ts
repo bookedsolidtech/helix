@@ -1,5 +1,5 @@
 import { describe, it, expect, afterEach } from 'vitest';
-import { page } from '@vitest/browser/context';
+import { page, userEvent } from '@vitest/browser/context';
 import { fixture, shadowQuery, cleanup, checkA11y, oneEvent } from '../../test-utils.js';
 import type { WcBadge } from './hx-badge.js';
 import './index.js';
@@ -82,12 +82,6 @@ describe('hx-badge', () => {
       const el = await fixture<WcBadge>('<hx-badge variant="secondary">Tag</hx-badge>');
       const badge = shadowQuery(el, 'span')!;
       expect(badge.classList.contains('badge--secondary')).toBe(true);
-    });
-
-    it('applies danger class', async () => {
-      const el = await fixture<WcBadge>('<hx-badge variant="danger">Critical</hx-badge>');
-      const badge = shadowQuery(el, 'span')!;
-      expect(badge.classList.contains('badge--danger')).toBe(true);
     });
 
     it('applies info class', async () => {
@@ -187,8 +181,6 @@ describe('hx-badge', () => {
   describe('Dot Indicator', () => {
     it('renders as dot when slot is empty and pulse is true', async () => {
       const el = await fixture<WcBadge>('<hx-badge pulse></hx-badge>');
-      // Wait for slotchange to fire
-      await new Promise((r) => setTimeout(r, 50));
       await el.updateComplete;
       const badge = shadowQuery(el, 'span')!;
       expect(badge.classList.contains('badge--dot')).toBe(true);
@@ -196,7 +188,6 @@ describe('hx-badge', () => {
 
     it('does not render as dot when slot has content', async () => {
       const el = await fixture<WcBadge>('<hx-badge pulse>5</hx-badge>');
-      await new Promise((r) => setTimeout(r, 50));
       await el.updateComplete;
       const badge = shadowQuery(el, 'span')!;
       expect(badge.classList.contains('badge--dot')).toBe(false);
@@ -204,7 +195,6 @@ describe('hx-badge', () => {
 
     it('does not render as dot when pulse is false and slot is empty', async () => {
       const el = await fixture<WcBadge>('<hx-badge></hx-badge>');
-      await new Promise((r) => setTimeout(r, 50));
       await el.updateComplete;
       const badge = shadowQuery(el, 'span')!;
       expect(badge.classList.contains('badge--dot')).toBe(false);
@@ -258,7 +248,7 @@ describe('hx-badge', () => {
     });
   });
 
-  // ─── Events: hx-remove (1) ───
+  // ─── Events: hx-remove (3) ───
 
   describe('Events: hx-remove', () => {
     it('dispatches hx-remove when remove button is clicked', async () => {
@@ -271,6 +261,28 @@ describe('hx-badge', () => {
       expect(event).toBeTruthy();
       expect(event.bubbles).toBe(true);
       expect(event.composed).toBe(true);
+    });
+
+    it('dispatches hx-remove when Enter is pressed on remove button', async () => {
+      const el = await fixture<WcBadge>('<hx-badge removable>Tag</hx-badge>');
+      const btn = shadowQuery(el, '[part="remove-button"]') as HTMLButtonElement;
+      expect(btn).toBeTruthy();
+      btn.focus();
+      const eventPromise = oneEvent(el, 'hx-remove');
+      await userEvent.keyboard('{Enter}');
+      const event = await eventPromise;
+      expect(event).toBeTruthy();
+    });
+
+    it('dispatches hx-remove when Space is pressed on remove button', async () => {
+      const el = await fixture<WcBadge>('<hx-badge removable>Tag</hx-badge>');
+      const btn = shadowQuery(el, '[part="remove-button"]') as HTMLButtonElement;
+      expect(btn).toBeTruthy();
+      btn.focus();
+      const eventPromise = oneEvent(el, 'hx-remove');
+      await userEvent.keyboard(' ');
+      const event = await eventPromise;
+      expect(event).toBeTruthy();
     });
   });
 
@@ -328,7 +340,6 @@ describe('hx-badge', () => {
         'secondary',
         'success',
         'warning',
-        'danger',
         'error',
         'neutral',
         'info',
