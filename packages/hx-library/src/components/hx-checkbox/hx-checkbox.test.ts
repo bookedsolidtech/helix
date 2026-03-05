@@ -213,7 +213,7 @@ describe('hx-checkbox', () => {
   // ─── Events (3) ───
 
   describe('Events', () => {
-    it('dispatches wc-change on toggle', async () => {
+    it('dispatches hx-change on toggle', async () => {
       const el = await fixture<WcCheckbox>('<hx-checkbox></hx-checkbox>');
       const eventPromise = oneEvent<CustomEvent>(el, 'hx-change');
       const control = shadowQuery<HTMLElement>(el, '.checkbox__control')!;
@@ -240,6 +240,18 @@ describe('hx-checkbox', () => {
       const event = await eventPromise;
       expect(event.bubbles).toBe(true);
       expect(event.composed).toBe(true);
+    });
+
+    it('disabled checkbox does not dispatch hx-change on click', async () => {
+      const el = await fixture<WcCheckbox>('<hx-checkbox disabled></hx-checkbox>');
+      let fired = false;
+      el.addEventListener('hx-change', () => {
+        fired = true;
+      });
+      const control = shadowQuery<HTMLElement>(el, '.checkbox__control')!;
+      control.click();
+      await el.updateComplete;
+      expect(fired).toBe(false);
     });
   });
 
@@ -390,16 +402,16 @@ describe('hx-checkbox', () => {
   describe('Keyboard', () => {
     it('Space key toggles checked', async () => {
       const el = await fixture<WcCheckbox>('<hx-checkbox label="Test"></hx-checkbox>');
-      const control = shadowQuery<HTMLElement>(el, '.checkbox__control')!;
-      control.dispatchEvent(new KeyboardEvent('keydown', { key: ' ', bubbles: true }));
+      const input = shadowQuery<HTMLInputElement>(el, 'input')!;
+      input.dispatchEvent(new KeyboardEvent('keydown', { key: ' ', bubbles: true }));
       await el.updateComplete;
       expect(el.checked).toBe(true);
     });
 
     it('Enter key does NOT toggle checked', async () => {
       const el = await fixture<WcCheckbox>('<hx-checkbox label="Test"></hx-checkbox>');
-      const control = shadowQuery<HTMLElement>(el, '.checkbox__control')!;
-      control.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
+      const input = shadowQuery<HTMLInputElement>(el, 'input')!;
+      input.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
       await el.updateComplete;
       expect(el.checked).toBe(false);
     });
