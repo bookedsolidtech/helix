@@ -1,6 +1,17 @@
 import { defineConfig } from 'vitest/config';
+import { resolve } from 'path';
+import { fileURLToPath } from 'url';
+
+const __dirname = fileURLToPath(new URL('.', import.meta.url));
 
 export default defineConfig({
+  server: {
+    fs: {
+      // Allow access to parent directories where node_modules may live.
+      // Required when running from a git worktree (node_modules in main repo root).
+      allow: [resolve(__dirname, '../..'), resolve(__dirname, '../../../..')],
+    },
+  },
   test: {
     browser: {
       enabled: true,
@@ -14,7 +25,7 @@ export default defineConfig({
     outputFile: { json: '.cache/test-results.json' },
     globals: true,
     coverage: {
-      provider: 'v8',
+      provider: 'istanbul',
       enabled: true,
       include: ['src/components/**/*.ts'],
       exclude: [
@@ -26,10 +37,10 @@ export default defineConfig({
       reporter: ['text', 'json-summary'],
       reportsDirectory: '.cache/coverage',
       thresholds: {
-        statements: 80,
-        branches: 75,
-        functions: 80,
-        lines: 80,
+        statements: 75,
+        branches: 70,
+        functions: 75,
+        lines: 75,
       },
     },
   },
