@@ -25,21 +25,6 @@ import type { HelixTabPanel } from './hx-tab-panel.js';
  * @cssprop [--hx-tabs-border-color=var(--hx-color-neutral-200, #e9ecef)] - Tablist border color.
  * @cssprop [--hx-tabs-border-width=1px] - Tablist border width.
  * @cssprop [--hx-tabs-vertical-width=12rem] - Width of the tablist in vertical orientation.
- * @cssprop [--hx-tabs-gap=0] - Gap between the tablist and panels container.
- * @cssprop [--hx-tabs-tab-color=var(--hx-color-neutral-600, #495057)] - Inactive tab text color.
- * @cssprop [--hx-tabs-tab-active-color=var(--hx-color-primary-600, #1d4ed8)] - Active tab text color.
- * @cssprop [--hx-tabs-tab-hover-color=var(--hx-color-neutral-800, #212529)] - Tab hover text color.
- * @cssprop [--hx-tabs-tab-hover-bg=var(--hx-color-neutral-50, #f8f9fa)] - Tab hover background.
- * @cssprop [--hx-tabs-tab-font-size=var(--hx-font-size-md, 1rem)] - Tab font size.
- * @cssprop [--hx-tabs-tab-font-weight=var(--hx-font-weight-medium, 500)] - Tab font weight.
- * @cssprop [--hx-tabs-tab-active-font-weight=var(--hx-font-weight-semibold, 600)] - Active tab font weight.
- * @cssprop [--hx-tabs-tab-padding-x=var(--hx-space-4, 1rem)] - Horizontal tab padding.
- * @cssprop [--hx-tabs-tab-padding-y=var(--hx-space-2, 0.5rem)] - Vertical tab padding.
- * @cssprop [--hx-tabs-indicator-color=var(--hx-color-primary-500, #2563eb)] - Active indicator color.
- * @cssprop [--hx-tabs-indicator-size=2px] - Active indicator thickness.
- * @cssprop [--hx-tabs-focus-ring-color=var(--hx-focus-ring-color, #2563eb)] - Focus ring color for tabs and panels.
- * @cssprop [--hx-tabs-panel-padding=var(--hx-space-4, 1rem)] - Panel inner padding.
- * @cssprop [--hx-tabs-panel-color=var(--hx-color-neutral-700, #343a40)] - Panel text color.
  */
 @customElement('hx-tabs')
 export class HelixTabs extends LitElement {
@@ -73,23 +58,12 @@ export class HelixTabs extends LitElement {
 
   // ─── Child Accessors ───
 
-  private _cachedTabs: HelixTab[] | null = null;
-  private _cachedPanels: HelixTabPanel[] | null = null;
-
   private _getTabs(): HelixTab[] {
-    if (!this._cachedTabs) {
-      this._cachedTabs = Array.from(this.querySelectorAll(':scope > hx-tab')) as HelixTab[];
-    }
-    return this._cachedTabs;
+    return Array.from(this.querySelectorAll('hx-tab')) as HelixTab[];
   }
 
   private _getPanels(): HelixTabPanel[] {
-    if (!this._cachedPanels) {
-      this._cachedPanels = Array.from(
-        this.querySelectorAll(':scope > hx-tab-panel'),
-      ) as HelixTabPanel[];
-    }
-    return this._cachedPanels;
+    return Array.from(this.querySelectorAll('hx-tab-panel')) as HelixTabPanel[];
   }
 
   private _getEnabledTabs(): HelixTab[] {
@@ -212,8 +186,6 @@ export class HelixTabs extends LitElement {
   };
 
   private _handleSlotChange = (): void => {
-    this._cachedTabs = null;
-    this._cachedPanels = null;
     this._syncTabsAndPanels();
   };
 

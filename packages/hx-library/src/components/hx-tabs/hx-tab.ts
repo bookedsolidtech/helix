@@ -1,5 +1,5 @@
 import { LitElement, html } from 'lit';
-import { customElement, property, state } from 'lit/decorators.js';
+import { customElement, property } from 'lit/decorators.js';
 import { tokenStyles } from '@helix/tokens/lit';
 import { helixTabStyles } from './hx-tab.styles.js';
 
@@ -60,8 +60,8 @@ export class HelixTab extends LitElement {
 
   // ─── Slot Visibility ───
 
-  @state() private _hasPrefixSlot = false;
-  @state() private _hasSuffixSlot = false;
+  private _hasPrefixSlot = false;
+  private _hasSuffixSlot = false;
 
   // ─── Event Handling ───
 
@@ -86,11 +86,13 @@ export class HelixTab extends LitElement {
   private _handlePrefixSlotChange(e: Event): void {
     const slot = e.target as HTMLSlotElement;
     this._hasPrefixSlot = slot.assignedNodes({ flatten: true }).length > 0;
+    this.requestUpdate();
   }
 
   private _handleSuffixSlotChange(e: Event): void {
     const slot = e.target as HTMLSlotElement;
     this._hasSuffixSlot = slot.assignedNodes({ flatten: true }).length > 0;
+    this.requestUpdate();
   }
 
   // ─── Render ───

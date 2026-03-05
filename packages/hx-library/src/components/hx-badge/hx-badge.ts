@@ -14,7 +14,7 @@ import { helixBadgeStyles } from './hx-badge.styles.js';
  * @slot - Default slot for badge content (text, number). When empty with pulse enabled, renders as a dot indicator.
  * @slot prefix - Icon or content rendered before the badge text.
  *
- * @fires {CustomEvent} hx-remove - Dispatched when the user clicks the remove button.
+ * @fires {CustomEvent<void>} hx-remove - Dispatched when the user clicks the remove button.
  *
  * @csspart badge - The badge element.
  * @csspart remove-button - The remove/dismiss button.
@@ -31,8 +31,6 @@ import { helixBadgeStyles } from './hx-badge.styles.js';
  * @cssprop [--hx-badge-dot-size=var(--hx-size-2)] - Dot indicator size when rendered without content.
  * @cssprop [--hx-badge-secondary-bg=var(--hx-color-neutral-100)] - Background for the secondary variant.
  * @cssprop [--hx-badge-secondary-color=var(--hx-color-neutral-700)] - Text color for the secondary variant.
- * @cssprop [--hx-badge-danger-bg=var(--hx-color-error-500)] - Background for the danger variant.
- * @cssprop [--hx-badge-danger-color=var(--hx-color-neutral-0)] - Text color for the danger variant.
  * @cssprop [--hx-badge-info-bg=var(--hx-color-info-700)] - Background for the info variant.
  * @cssprop [--hx-badge-info-color=var(--hx-color-neutral-0)] - Text color for the info variant.
  */
@@ -45,15 +43,8 @@ export class HelixBadge extends LitElement {
    * @attr variant
    */
   @property({ type: String, reflect: true })
-  variant:
-    | 'primary'
-    | 'secondary'
-    | 'success'
-    | 'warning'
-    | 'danger'
-    | 'error'
-    | 'neutral'
-    | 'info' = 'primary';
+  variant: 'primary' | 'secondary' | 'success' | 'warning' | 'error' | 'neutral' | 'info' =
+    'primary';
 
   /**
    * Size of the badge.
