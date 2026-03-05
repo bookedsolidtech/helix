@@ -532,5 +532,78 @@ describe('hx-field', () => {
       const descEl = el.querySelector(`#${descId!}`);
       expect(descEl?.textContent).toBe('Invalid');
     });
+
+    it('removes aria-describedby from slotted control when error and helpText are both cleared', async () => {
+      const el = await fixture<HelixField>(
+        '<hx-field error="Required" help-text="Enter a value"><input type="text" /></hx-field>',
+      );
+      await el.updateComplete;
+      const input = el.querySelector('input');
+      expect(input?.hasAttribute('aria-describedby')).toBe(true);
+
+      el.error = '';
+      el.helpText = '';
+      await el.updateComplete;
+
+      expect(input?.hasAttribute('aria-describedby')).toBe(false);
+    });
+
+    it('does not set aria attributes on slotted hx-* custom elements', async () => {
+      const el = await fixture<HelixField>(
+        '<hx-field label="Name" required error="Required"><hx-text-input></hx-text-input></hx-field>',
+      );
+      await el.updateComplete;
+      const hxInput = el.querySelector('hx-text-input');
+      expect(hxInput?.hasAttribute('aria-label')).toBe(false);
+      expect(hxInput?.hasAttribute('aria-required')).toBe(false);
+      expect(hxInput?.hasAttribute('aria-invalid')).toBe(false);
+    });
+  });
+
+  // ─── Lifecycle (2) ───
+
+  describe('Lifecycle', () => {
+    it('removes aria attributes from slotted control and description span on disconnect', async () => {
+      const el = await fixture<HelixField>(
+        '<hx-field label="Name" required error="Required"><input type="text" /></hx-field>',
+      );
+      await el.updateComplete;
+      const input = el.querySelector('input');
+      expect(input?.getAttribute('aria-label')).toBe('Name');
+      expect(input?.getAttribute('aria-required')).toBe('true');
+      expect(input?.getAttribute('aria-invalid')).toBe('true');
+      expect(input?.hasAttribute('aria-describedby')).toBe(true);
+
+      el.remove();
+
+      expect(input?.hasAttribute('aria-label')).toBe(false);
+      expect(input?.hasAttribute('aria-required')).toBe(false);
+      expect(input?.hasAttribute('aria-invalid')).toBe(false);
+      expect(input?.hasAttribute('aria-describedby')).toBe(false);
+      const descSpan = el.querySelector('[id$="-desc"]');
+      expect(descSpan).toBeNull();
+    });
+
+    it('does not accumulate stale description spans across disconnect/reconnect cycles', async () => {
+      const container = document.createElement('div');
+      document.body.appendChild(container);
+      try {
+        const el = await fixture<HelixField>(
+          '<hx-field label="Name"><input type="text" /></hx-field>',
+        );
+        await el.updateComplete;
+        expect(el.querySelectorAll('[id$="-desc"]').length).toBe(1);
+
+        // Disconnect and reconnect
+        el.remove();
+        container.appendChild(el);
+        await el.updateComplete;
+
+        // Should still have exactly one description span
+        expect(el.querySelectorAll('[id$="-desc"]').length).toBe(1);
+      } finally {
+        document.body.removeChild(container);
+      }
+    });
   });
 });
