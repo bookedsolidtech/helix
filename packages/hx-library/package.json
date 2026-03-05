@@ -42,6 +42,7 @@
     "clean": "rm -rf dist custom-elements.json"
   },
   "dependencies": {
+    "@floating-ui/dom": "^1.7.6",
     "@helix/tokens": "*",
     "lit": "^3.3.2"
   },
