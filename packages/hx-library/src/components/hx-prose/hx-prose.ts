@@ -1,13 +1,7 @@
-import { LitElement, nothing } from 'lit';
+import { LitElement, html } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { AdoptedStylesheetsController } from '../../controllers/adopted-stylesheets.js';
 import { helixProseScopedCss } from './hx-prose.styles.js';
-
-const sizeMap: Record<string, string> = {
-  sm: 'var(--hx-font-size-sm, 0.875rem)',
-  base: '',
-  lg: 'var(--hx-font-size-lg, 1.125rem)',
-};
 
 /**
  * A Light DOM prose container that applies typographic styles to rich text
@@ -33,9 +27,7 @@ const sizeMap: Record<string, string> = {
  */
 @customElement('hx-prose')
 export class HelixProse extends LitElement {
-  // ─── Light DOM: no shadow root; Lit static styles are ignored.
-  // Styles are injected via AdoptedStylesheetsController instead.
-  static override styles = [];
+  // ─── Light DOM ───
 
   override createRenderRoot(): this {
     return this;
@@ -66,6 +58,7 @@ export class HelixProse extends LitElement {
 
   override connectedCallback(): void {
     super.connectedCallback();
+    this.style.display = 'block';
     this._applyMaxWidth();
     this._applySize();
   }
@@ -90,6 +83,12 @@ export class HelixProse extends LitElement {
   }
 
   private _applySize(): void {
+    const sizeMap: Record<string, string> = {
+      sm: 'var(--hx-font-size-sm, 0.875rem)',
+      base: '',
+      lg: 'var(--hx-font-size-lg, 1.125rem)',
+    };
+
     const fontSize = sizeMap[this.size];
     if (fontSize) {
       this.style.setProperty('--hx-prose-font-size', fontSize);
@@ -99,10 +98,9 @@ export class HelixProse extends LitElement {
   }
 
   // ─── Render ───
-  // Light DOM: content lives directly in the element; no slot element needed.
 
   override render() {
-    return nothing;
+    return html`<slot></slot>`;
   }
 }
 
