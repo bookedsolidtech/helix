@@ -4,13 +4,9 @@
  *
  * Provides skip navigation for accessibility.
  */
-import Analytics from '@vercel/analytics/astro';
 
 const PAGE_TITLE_ID = '_top';
 ---
-
-<!-- Vercel Analytics -->
-<Analytics />
 
 <!-- Original skip link for accessibility -->
 <a class="sl-skiplink" href={`#${PAGE_TITLE_ID}`}>{Astro.locals.t('skipLink.label')}</a>
