@@ -125,6 +125,7 @@ export class HelixRadioGroup extends LitElement {
     super.connectedCallback();
     this.addEventListener('hx-radio-select', this._handleRadioSelect as EventListener);
     this.addEventListener('keydown', this._handleKeydown);
+    this.setAttribute('role', 'radiogroup');
   }
 
   override disconnectedCallback(): void {
@@ -143,6 +144,11 @@ export class HelixRadioGroup extends LitElement {
     if (changedProperties.has('disabled')) {
       this._syncRadios();
     }
+    if (changedProperties.has('label')) {
+      if (this.label) {
+        this.setAttribute('aria-label', this.label);
+      }
+    }
   }
 
   override firstUpdated(changedProperties: Map<string, unknown>): void {
@@ -152,13 +158,8 @@ export class HelixRadioGroup extends LitElement {
 
   // ─── Radio Management ───
 
-  private _cachedRadios: HelixRadio[] | null = null;
-
   private _getRadios(): HelixRadio[] {
-    if (!this._cachedRadios) {
-      this._cachedRadios = Array.from(this.querySelectorAll('hx-radio')) as HelixRadio[];
-    }
-    return this._cachedRadios;
+    return Array.from(this.querySelectorAll('hx-radio')) as HelixRadio[];
   }
 
   private _getEnabledRadios(): HelixRadio[] {
@@ -235,10 +236,9 @@ export class HelixRadioGroup extends LitElement {
 
     e.preventDefault();
 
-    const targetRadio = (e.target as Element)?.closest?.('hx-radio') as HelixRadio | null;
-    const currentIndex = targetRadio
-      ? enabledRadios.indexOf(targetRadio)
-      : enabledRadios.findIndex((radio) => radio.checked);
+    const currentIndex = enabledRadios.findIndex(
+      (radio) => radio === (e.target as Element)?.closest?.('hx-radio') || radio.checked,
+    );
 
     let nextIndex: number;
     if (e.key === 'ArrowDown' || e.key === 'ArrowRight') {
@@ -261,7 +261,6 @@ export class HelixRadioGroup extends LitElement {
   };
 
   private _handleSlotChange(): void {
-    this._cachedRadios = null;
     this._syncRadios();
   }
 
@@ -328,15 +327,8 @@ export class HelixRadioGroup extends LitElement {
       'fieldset--required': this.required,
     };
 
-    const describedBy = hasError ? this._errorId : this.helpText ? this._helpTextId : nothing;
-
     return html`
-      <fieldset
-        part="fieldset"
-        class=${classMap(fieldsetClasses)}
-        role="radiogroup"
-        aria-describedby=${describedBy}
-      >
+      <fieldset part="fieldset" class=${classMap(fieldsetClasses)}>
         ${this.label
           ? html`
               <legend part="legend" class="fieldset__legend">
@@ -383,6 +375,3 @@ declare global {
     'hx-radio-group': HelixRadioGroup;
   }
 }
-
-/** @public Type alias for use in test files and consumers. */
-export type WcRadioGroup = HelixRadioGroup;
