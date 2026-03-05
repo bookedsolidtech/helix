@@ -1,0 +1,38 @@
+{
+  "name": "@helixds/react",
+  "version": "0.0.1",
+  "private": true,
+  "description": "React wrappers for Helix Design System web components",
+  "type": "module",
+  "main": "./src/index.ts",
+  "module": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "import": "./src/index.ts"
+    }
+  },
+  "scripts": {
+    "generate": "tsx scripts/generate-wrappers.ts",
+    "build": "vite build",
+    "type-check": "tsc --noEmit",
+    "dev": "vite build --watch"
+  },
+  "dependencies": {
+    "@helix/library": "*",
+    "@lit/react": "^1.0.5"
+  },
+  "peerDependencies": {
+    "react": ">=18.0.0",
+    "react-dom": ">=18.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "typescript": "^5.7.2",
+    "tsx": "^4.21.0",
+    "vite": "^6.2.0",
+    "vite-plugin-dts": "^4.5.4"
+  }
+}
