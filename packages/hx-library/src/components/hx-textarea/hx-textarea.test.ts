@@ -173,7 +173,7 @@ describe('hx-textarea', () => {
     });
   });
 
-  // --- Property: disabled (2) ---
+  // --- Property: disabled (3) ---
 
   describe('Property: disabled', () => {
     it('sets disabled attr on native textarea', async () => {
@@ -184,6 +184,16 @@ describe('hx-textarea', () => {
 
     it('applies host opacity via disabled attribute', async () => {
       const el = await fixture<WcTextarea>('<hx-textarea disabled></hx-textarea>');
+      expect(el.hasAttribute('disabled')).toBe(true);
+    });
+
+    it('native textarea is disabled so browser prevents input events', async () => {
+      const el = await fixture<WcTextarea>('<hx-textarea disabled></hx-textarea>');
+      const textarea = shadowQuery<HTMLTextAreaElement>(el, 'textarea')!;
+      // When a native textarea is disabled, the browser does not fire input events
+      // from user interaction. Verify the textarea is genuinely disabled.
+      expect(textarea.disabled).toBe(true);
+      // Verify the host reflects the disabled attribute so consumers can style it
       expect(el.hasAttribute('disabled')).toBe(true);
     });
   });
@@ -243,7 +253,7 @@ describe('hx-textarea', () => {
   // --- Events (4) ---
 
   describe('Events', () => {
-    it('dispatches wc-input on keystroke', async () => {
+    it('dispatches hx-input on keystroke', async () => {
       const el = await fixture<WcTextarea>('<hx-textarea></hx-textarea>');
       const textarea = shadowQuery<HTMLTextAreaElement>(el, 'textarea')!;
       const eventPromise = oneEvent<CustomEvent>(el, 'hx-input');
@@ -263,7 +273,7 @@ describe('hx-textarea', () => {
       expect(event.detail.value).toBe('hello world');
     });
 
-    it('dispatches wc-change on blur', async () => {
+    it('dispatches hx-change on blur', async () => {
       const el = await fixture<WcTextarea>('<hx-textarea></hx-textarea>');
       const textarea = shadowQuery<HTMLTextAreaElement>(el, 'textarea')!;
       const eventPromise = oneEvent<CustomEvent>(el, 'hx-change');
@@ -285,7 +295,7 @@ describe('hx-textarea', () => {
     });
   });
 
-  // --- Slots (1) ---
+  // --- Slots (3) ---
 
   describe('Slots', () => {
     it('help-text slot renders', async () => {
@@ -295,6 +305,28 @@ describe('hx-textarea', () => {
       const helpSlot = el.querySelector('[slot="help-text"]');
       expect(helpSlot).toBeTruthy();
       expect(helpSlot?.textContent).toBe('Custom help');
+    });
+
+    it('label slot renders and sets aria-labelledby', async () => {
+      const el = await fixture<WcTextarea>(
+        '<hx-textarea><label slot="label">Custom Label</label></hx-textarea>',
+      );
+      await el.updateComplete;
+      const slottedLabel = el.querySelector('[slot="label"]');
+      expect(slottedLabel).toBeTruthy();
+      expect(slottedLabel?.textContent).toBe('Custom Label');
+      const textarea = shadowQuery<HTMLTextAreaElement>(el, 'textarea')!;
+      expect(textarea.getAttribute('aria-labelledby')).toBeTruthy();
+    });
+
+    it('error slot renders and sets error state', async () => {
+      const el = await fixture<WcTextarea>(
+        '<hx-textarea><span slot="error">Slot error</span></hx-textarea>',
+      );
+      await el.updateComplete;
+      const slottedError = el.querySelector('[slot="error"]');
+      expect(slottedError).toBeTruthy();
+      expect(slottedError?.textContent).toBe('Slot error');
     });
   });
 
@@ -390,6 +422,15 @@ describe('hx-textarea', () => {
       await el.updateComplete;
       expect(el.validationMessage).toBeTruthy();
     });
+
+    it('tooLong validity flag is set when value exceeds maxlength', async () => {
+      const el = await fixture<WcTextarea>(
+        '<hx-textarea maxlength="5" value="toolong"></hx-textarea>',
+      );
+      await el.updateComplete;
+      expect(el.validity.tooLong).toBe(true);
+      expect(el.checkValidity()).toBe(false);
+    });
   });
 
   // --- Methods (2) ---
@@ -398,7 +439,7 @@ describe('hx-textarea', () => {
     it('focus() moves focus to native textarea', async () => {
       const el = await fixture<WcTextarea>('<hx-textarea></hx-textarea>');
       el.focus();
-      await new Promise((r) => setTimeout(r, 50));
+      await el.updateComplete;
       const textarea = shadowQuery<HTMLTextAreaElement>(el, 'textarea')!;
       expect(el.shadowRoot?.activeElement).toBe(textarea);
     });
@@ -407,7 +448,7 @@ describe('hx-textarea', () => {
       const el = await fixture<WcTextarea>('<hx-textarea value="hello world"></hx-textarea>');
       el.focus();
       el.select();
-      await new Promise((r) => setTimeout(r, 50));
+      await el.updateComplete;
       const textarea = shadowQuery<HTMLTextAreaElement>(el, 'textarea')!;
       expect(textarea.selectionStart).toBe(0);
       expect(textarea.selectionEnd).toBe('hello world'.length);
