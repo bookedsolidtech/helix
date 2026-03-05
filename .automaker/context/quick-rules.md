@@ -15,8 +15,9 @@ If you need to verify exports, run `npm run generate:barrel` in the hx-library p
 - All CSS parts: `@csspart` JSDoc. All CSS props: `@cssprop` JSDoc. All events: `@fires` JSDoc.
 - CustomEvent dispatches: `bubbles: true, composed: true`.
 - After any component change: `npm run cem` then `npm run type-check` then `npm run test:library`.
-- **Before every commit**: `npm run lint` (zero errors) and `npm run format:check` (zero issues). Auto-fix with `npx eslint --fix .` and `npm run format`.
-- **Before PR creation**: verify all quality gates pass locally: lint, format, type-check, test.
+- **MANDATORY before ANY git push — NO EXCEPTIONS**: Run `npm run verify` (lint + format:check + type-check). Zero failures required. If it fails, fix it and re-run. Do NOT push until `npm run verify` exits clean. This cannot be skipped. The CI pipeline will catch failures and waste cycles — prevent this at the source.
+- Auto-fix helpers: `npx eslint --fix .` for lint, `npm run format` for formatting. Run `npm run verify` again after auto-fixing to confirm clean.
+- **Before PR creation**: verify all quality gates pass locally: `npm run verify && npm run test:library`.
 
 ## Token Usage
 
