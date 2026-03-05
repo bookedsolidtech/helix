@@ -495,6 +495,19 @@ export default defineConfig({
           ],
         },
         {
+          label: 'Framework Adapters',
+          collapsed: true,
+          items: [
+            { label: 'Overview', slug: 'frameworks/overview' },
+            { label: 'React & Next.js', slug: 'frameworks/react' },
+            { label: 'Vue & Nuxt', slug: 'frameworks/vue' },
+            { label: 'Angular', slug: 'frameworks/angular' },
+            { label: 'SSR/SSG Compatibility', slug: 'frameworks/ssr-compatibility' },
+            { label: 'Common Gotchas', slug: 'frameworks/gotchas' },
+            { label: 'Storybook Integration', slug: 'frameworks/storybook' },
+          ],
+        },
+        {
           label: 'Architecture',
           collapsed: true,
           items: [
