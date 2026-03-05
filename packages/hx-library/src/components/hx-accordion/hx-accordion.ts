@@ -52,10 +52,10 @@ export class HelixAccordion extends LitElement {
 
   // ─── Single-expand coordination ───
 
-  private _handleChildExpand(e: CustomEvent<{ item: HelixAccordionItem }>): void {
+  private _handleChildExpand(e: CustomEvent<{ expanded: boolean; itemId: string }>): void {
     if (this.mode !== 'single') return;
 
-    const expandedItem = e.detail.item;
+    const expandedItem = e.composedPath()[0] as HelixAccordionItem;
     const items = this.querySelectorAll<HelixAccordionItem>('hx-accordion-item');
 
     items.forEach((item) => {
@@ -69,7 +69,7 @@ export class HelixAccordion extends LitElement {
 
   override render() {
     return html`
-      <div class="accordion">
+      <div part="accordion" class="accordion">
         <slot></slot>
       </div>
     `;
