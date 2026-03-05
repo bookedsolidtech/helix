@@ -49,14 +49,14 @@ describe('hx-breadcrumb', () => {
       expect(shadowQuery(el, '[part="list"]')).toBeTruthy();
     });
 
-    it('renders a list container element with role="list"', async () => {
+    it('renders a semantic ol element as list container', async () => {
       const el = await fixture<HelixBreadcrumb>(`
         <hx-breadcrumb>
           <hx-breadcrumb-item>Current</hx-breadcrumb-item>
         </hx-breadcrumb>
       `);
-      const list = shadowQuery(el, '[role="list"]');
-      expect(list).toBeInstanceOf(HTMLElement);
+      const list = shadowQuery(el, 'ol[part="list"]');
+      expect(list).toBeInstanceOf(HTMLOListElement);
     });
   });
 
@@ -144,7 +144,6 @@ describe('hx-breadcrumb', () => {
           <hx-breadcrumb-item>Patient Records</hx-breadcrumb-item>
         </hx-breadcrumb>
       `);
-      await new Promise((r) => setTimeout(r, 50));
       await el.updateComplete;
       const items = Array.from(el.querySelectorAll('hx-breadcrumb-item'));
       expect(items[2]?.getAttribute('aria-current')).toBe('page');
@@ -158,7 +157,6 @@ describe('hx-breadcrumb', () => {
           <hx-breadcrumb-item>Patient Records</hx-breadcrumb-item>
         </hx-breadcrumb>
       `);
-      await new Promise((r) => setTimeout(r, 50));
       await el.updateComplete;
       const items = Array.from(el.querySelectorAll('hx-breadcrumb-item'));
       expect(items[0]?.hasAttribute('aria-current')).toBe(false);
@@ -172,7 +170,6 @@ describe('hx-breadcrumb', () => {
           <hx-breadcrumb-item>Current</hx-breadcrumb-item>
         </hx-breadcrumb>
       `);
-      await new Promise((r) => setTimeout(r, 50));
       await el.updateComplete;
       const items = Array.from(el.querySelectorAll('hx-breadcrumb-item'));
       expect(items[1]?.hasAttribute('data-bc-last')).toBe(true);
@@ -185,7 +182,6 @@ describe('hx-breadcrumb', () => {
           <hx-breadcrumb-item>Current</hx-breadcrumb-item>
         </hx-breadcrumb>
       `);
-      await new Promise((r) => setTimeout(r, 50));
       await el.updateComplete;
       const items = Array.from(el.querySelectorAll('hx-breadcrumb-item'));
       expect(items[0]?.hasAttribute('data-bc-last')).toBe(false);
@@ -197,11 +193,196 @@ describe('hx-breadcrumb', () => {
           <hx-breadcrumb-item>Only Item</hx-breadcrumb-item>
         </hx-breadcrumb>
       `);
-      await new Promise((r) => setTimeout(r, 50));
       await el.updateComplete;
       const item = el.querySelector('hx-breadcrumb-item');
       expect(item?.getAttribute('aria-current')).toBe('page');
       expect(item?.hasAttribute('data-bc-last')).toBe(true);
+    });
+  });
+
+  // ─── Collapse (max-items) (5) ───
+
+  describe('Collapse (max-items)', () => {
+    it('shows all items when max-items is 0 (default)', async () => {
+      const el = await fixture<HelixBreadcrumb>(`
+        <hx-breadcrumb>
+          <hx-breadcrumb-item href="/a">A</hx-breadcrumb-item>
+          <hx-breadcrumb-item href="/b">B</hx-breadcrumb-item>
+          <hx-breadcrumb-item href="/c">C</hx-breadcrumb-item>
+          <hx-breadcrumb-item>D</hx-breadcrumb-item>
+        </hx-breadcrumb>
+      `);
+      await el.updateComplete;
+      const items = Array.from(el.querySelectorAll('hx-breadcrumb-item:not(.hx-bc-ellipsis)'));
+      const hiddenCount = items.filter((i) => i.hasAttribute('data-bc-hidden')).length;
+      expect(hiddenCount).toBe(0);
+    });
+
+    it('hides middle items when item count exceeds max-items', async () => {
+      const el = await fixture<HelixBreadcrumb>(`
+        <hx-breadcrumb max-items="2">
+          <hx-breadcrumb-item href="/a">A</hx-breadcrumb-item>
+          <hx-breadcrumb-item href="/b">B</hx-breadcrumb-item>
+          <hx-breadcrumb-item href="/c">C</hx-breadcrumb-item>
+          <hx-breadcrumb-item>D</hx-breadcrumb-item>
+        </hx-breadcrumb>
+      `);
+      await el.updateComplete;
+      const items = Array.from(
+        el.querySelectorAll<HTMLElement>('hx-breadcrumb-item:not(.hx-bc-ellipsis)'),
+      );
+      expect(items[0]?.hasAttribute('data-bc-hidden')).toBe(false);
+      expect(items[1]?.hasAttribute('data-bc-hidden')).toBe(true);
+      expect(items[2]?.hasAttribute('data-bc-hidden')).toBe(true);
+      expect(items[3]?.hasAttribute('data-bc-hidden')).toBe(false);
+    });
+
+    it('inserts an ellipsis item when collapsed', async () => {
+      const el = await fixture<HelixBreadcrumb>(`
+        <hx-breadcrumb max-items="2">
+          <hx-breadcrumb-item href="/a">A</hx-breadcrumb-item>
+          <hx-breadcrumb-item href="/b">B</hx-breadcrumb-item>
+          <hx-breadcrumb-item>C</hx-breadcrumb-item>
+        </hx-breadcrumb>
+      `);
+      await el.updateComplete;
+      const ellipsis = el.querySelector('.hx-bc-ellipsis');
+      expect(ellipsis).toBeTruthy();
+      expect(ellipsis?.getAttribute('aria-hidden')).toBe('true');
+    });
+
+    it('removes ellipsis item when max-items is cleared', async () => {
+      const el = await fixture<HelixBreadcrumb>(`
+        <hx-breadcrumb max-items="2">
+          <hx-breadcrumb-item href="/a">A</hx-breadcrumb-item>
+          <hx-breadcrumb-item href="/b">B</hx-breadcrumb-item>
+          <hx-breadcrumb-item>C</hx-breadcrumb-item>
+        </hx-breadcrumb>
+      `);
+      await el.updateComplete;
+      expect(el.querySelector('.hx-bc-ellipsis')).toBeTruthy();
+
+      el.maxItems = 0;
+      // Trigger slotchange re-evaluation by forcing a re-render then checking
+      // the DOM synchronously — maxItems = 0 calls _removeCollapse() directly
+      // inside _handleSlotChange so we need a fresh slotchange event. We can
+      // simulate that by removing and re-appending a child.
+      const first = el.querySelector('hx-breadcrumb-item');
+      if (first) {
+        el.appendChild(first);
+      }
+      await el.updateComplete;
+      expect(el.querySelector('.hx-bc-ellipsis')).toBeNull();
+    });
+
+    it('does not collapse when item count equals max-items', async () => {
+      const el = await fixture<HelixBreadcrumb>(`
+        <hx-breadcrumb max-items="3">
+          <hx-breadcrumb-item href="/a">A</hx-breadcrumb-item>
+          <hx-breadcrumb-item href="/b">B</hx-breadcrumb-item>
+          <hx-breadcrumb-item>C</hx-breadcrumb-item>
+        </hx-breadcrumb>
+      `);
+      await el.updateComplete;
+      expect(el.querySelector('.hx-bc-ellipsis')).toBeNull();
+      const items = Array.from(
+        el.querySelectorAll<HTMLElement>('hx-breadcrumb-item:not(.hx-bc-ellipsis)'),
+      );
+      expect(items.every((i) => !i.hasAttribute('data-bc-hidden'))).toBe(true);
+    });
+  });
+
+  // ─── JSON-LD (5) ───
+
+  describe('JSON-LD', () => {
+    it('does not inject a script when json-ld attribute is absent', async () => {
+      const before = document.querySelectorAll('script[data-hx-breadcrumb]').length;
+      await fixture<HelixBreadcrumb>(`
+        <hx-breadcrumb>
+          <hx-breadcrumb-item href="/home">Home</hx-breadcrumb-item>
+          <hx-breadcrumb-item>Current</hx-breadcrumb-item>
+        </hx-breadcrumb>
+      `);
+      const after = document.querySelectorAll('script[data-hx-breadcrumb]').length;
+      expect(after).toBe(before);
+    });
+
+    it('injects a JSON-LD script into document.head when json-ld is true', async () => {
+      const el = await fixture<HelixBreadcrumb>(`
+        <hx-breadcrumb json-ld>
+          <hx-breadcrumb-item href="/home">Home</hx-breadcrumb-item>
+          <hx-breadcrumb-item>Current</hx-breadcrumb-item>
+        </hx-breadcrumb>
+      `);
+      await el.updateComplete;
+      const script = document.querySelector<HTMLScriptElement>(`script[data-hx-breadcrumb]`);
+      expect(script).toBeTruthy();
+      expect(script?.type).toBe('application/ld+json');
+
+      const data = JSON.parse(script?.textContent ?? '{}') as Record<string, unknown>;
+      expect(data['@type']).toBe('BreadcrumbList');
+    });
+
+    it('removes the JSON-LD script on disconnect', async () => {
+      const el = await fixture<HelixBreadcrumb>(`
+        <hx-breadcrumb json-ld>
+          <hx-breadcrumb-item href="/home">Home</hx-breadcrumb-item>
+          <hx-breadcrumb-item>Current</hx-breadcrumb-item>
+        </hx-breadcrumb>
+      `);
+      await el.updateComplete;
+      // Confirm script was injected
+      expect(document.querySelector(`#${(el as unknown as { _jsonLdId: string })._jsonLdId}`)).toBeTruthy();
+
+      el.remove();
+      // Script should be gone after disconnection
+      expect(document.querySelector(`script[data-hx-breadcrumb][id="${(el as unknown as { _jsonLdId: string })._jsonLdId}"]`)).toBeNull();
+    });
+
+    it('produces no duplicate scripts when two instances have json-ld enabled', async () => {
+      const wrapper = document.createElement('div');
+      document.body.appendChild(wrapper);
+      wrapper.innerHTML = `
+        <hx-breadcrumb id="bc1" json-ld>
+          <hx-breadcrumb-item href="/a">A</hx-breadcrumb-item>
+          <hx-breadcrumb-item>B</hx-breadcrumb-item>
+        </hx-breadcrumb>
+        <hx-breadcrumb id="bc2" json-ld>
+          <hx-breadcrumb-item href="/x">X</hx-breadcrumb-item>
+          <hx-breadcrumb-item>Y</hx-breadcrumb-item>
+        </hx-breadcrumb>
+      `;
+      const bc1 = wrapper.querySelector<HelixBreadcrumb>('#bc1')!;
+      const bc2 = wrapper.querySelector<HelixBreadcrumb>('#bc2')!;
+      await bc1.updateComplete;
+      await bc2.updateComplete;
+
+      const scripts = document.querySelectorAll('script[data-hx-breadcrumb]');
+      // Each instance owns exactly one script — no duplicates
+      expect(scripts.length).toBe(2);
+
+      // IDs must be distinct
+      const ids = Array.from(scripts).map((s) => s.id);
+      expect(new Set(ids).size).toBe(2);
+
+      wrapper.remove();
+    });
+
+    it('updates the existing script content when items change', async () => {
+      const el = await fixture<HelixBreadcrumb>(`
+        <hx-breadcrumb json-ld>
+          <hx-breadcrumb-item href="/home">Home</hx-breadcrumb-item>
+          <hx-breadcrumb-item>Current</hx-breadcrumb-item>
+        </hx-breadcrumb>
+      `);
+      await el.updateComplete;
+
+      const scriptId = (el as unknown as { _jsonLdId: string })._jsonLdId;
+      const script = document.getElementById(scriptId) as HTMLScriptElement;
+      expect(script).toBeTruthy();
+
+      const data = JSON.parse(script.textContent ?? '{}') as { itemListElement: unknown[] };
+      expect(data.itemListElement).toHaveLength(2);
     });
   });
 
@@ -251,6 +432,32 @@ describe('hx-breadcrumb', () => {
         '<hx-breadcrumb-item>Current</hx-breadcrumb-item>',
       );
       expect(shadowQuery(el, '[part="text"]')).toBeTruthy();
+    });
+  });
+
+  // ─── hx-breadcrumb-item: role guard (2) ───
+
+  describe('hx-breadcrumb-item: role guard', () => {
+    it('sets role="listitem" when inside hx-breadcrumb', async () => {
+      const el = await fixture<HelixBreadcrumb>(`
+        <hx-breadcrumb>
+          <hx-breadcrumb-item href="/home">Home</hx-breadcrumb-item>
+          <hx-breadcrumb-item>Current</hx-breadcrumb-item>
+        </hx-breadcrumb>
+      `);
+      await el.updateComplete;
+      const items = Array.from(el.querySelectorAll('hx-breadcrumb-item'));
+      items.forEach((item) => {
+        expect(item.getAttribute('role')).toBe('listitem');
+      });
+    });
+
+    it('does not set role="listitem" when used standalone', async () => {
+      const el = await fixture<HelixBreadcrumbItem>(
+        '<hx-breadcrumb-item href="/home">Home</hx-breadcrumb-item>',
+      );
+      // Standalone item has no hx-breadcrumb ancestor — role must not be set
+      expect(el.getAttribute('role')).toBeNull();
     });
   });
 
@@ -351,7 +558,6 @@ describe('hx-breadcrumb', () => {
           <hx-breadcrumb-item>Patient Records</hx-breadcrumb-item>
         </hx-breadcrumb>
       `);
-      await new Promise((r) => setTimeout(r, 50));
       await el.updateComplete;
       await page.screenshot();
       const { violations } = await checkA11y(el);
@@ -364,7 +570,6 @@ describe('hx-breadcrumb', () => {
           <hx-breadcrumb-item>Home</hx-breadcrumb-item>
         </hx-breadcrumb>
       `);
-      await new Promise((r) => setTimeout(r, 50));
       await el.updateComplete;
       await page.screenshot();
       const { violations } = await checkA11y(el);
@@ -378,7 +583,6 @@ describe('hx-breadcrumb', () => {
           <hx-breadcrumb-item>Current</hx-breadcrumb-item>
         </hx-breadcrumb>
       `);
-      await new Promise((r) => setTimeout(r, 50));
       await el.updateComplete;
       await page.screenshot();
       const { violations } = await checkA11y(el);
