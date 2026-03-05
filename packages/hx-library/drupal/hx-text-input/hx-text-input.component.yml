@@ -65,7 +65,6 @@ props:
       type: string
       title: Aria-label
       description: 'Accessible name for screen readers, if different from the visible label.'
-      default: 'null'
     readonly:
       type: boolean
       title: Readonly
@@ -75,12 +74,10 @@ props:
       type: number
       title: Minlength
       description: 'Minimum number of characters allowed.'
-      default: undefined
     maxlength:
       type: number
       title: Maxlength
       description: 'Maximum number of characters allowed.'
-      default: undefined
     pattern:
       type: string
       title: Pattern

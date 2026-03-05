@@ -11,7 +11,6 @@ props:
       type: string
       title: Src
       description: 'Image URL. When provided and successfully loaded, displays the image.'
-      default: 'undefined'
     alt:
       type: string
       title: Alt

@@ -60,7 +60,6 @@ props:
       type: string
       title: Aria-label
       description: 'Accessible name for screen readers, if different from the visible label.'
-      default: 'null'
     multiple:
       type: boolean
       title: Multiple

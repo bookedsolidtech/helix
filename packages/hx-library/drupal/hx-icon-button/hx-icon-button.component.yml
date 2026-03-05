@@ -50,17 +50,14 @@ props:
       type: string
       title: Href
       description: 'When set, renders an `<a>` element instead of a `<button>`.'
-      default: 'undefined'
     name:
       type: string
       title: Name
       description: 'Name submitted with form data. Only applicable when rendering as a button.'
-      default: 'undefined'
     value:
       type: string
       title: Value
       description: 'Value submitted with form data. Only applicable when rendering as a button.'
-      default: 'undefined'
 
 slots:
   default:

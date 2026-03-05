@@ -51,22 +51,18 @@ props:
       type: string
       title: Href
       description: 'When set, renders an anchor element instead of a button.'
-      default: 'undefined'
     target:
       type: string
       title: Target
       description: 'Anchor target attribute. Only used when href is set.'
-      default: 'undefined'
     name:
       type: string
       title: Name
       description: 'Form field name submitted via ElementInternals.setFormValue on submit.'
-      default: 'undefined'
     value:
       type: string
       title: Value
       description: 'Form field value submitted via ElementInternals.setFormValue on submit.'
-      default: 'undefined'
 
 slots:
   default:

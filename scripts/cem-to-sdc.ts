@@ -168,10 +168,11 @@ function resolveType(typeText: string): {
   // Supports both inline and multiline (leading-pipe) CEM formats.
   //   'primary' | 'secondary' | 'tertiary'
   //   | 'primary'\n    | 'secondary'
+  //   'primary' | 'secondary' | undefined   (strip null/undefined arms first)
   const arms = normalized
     .split('|')
     .map((arm) => arm.trim())
-    .filter((arm) => arm.length > 0);
+    .filter((arm) => arm.length > 0 && arm !== 'undefined' && arm !== 'null');
 
   const allQuoted = arms.every((arm) => /^'[^']*'$/.test(arm) || /^"[^"]*"$/.test(arm));
 
@@ -235,10 +236,15 @@ function extractComponentsFromCEM(cemPath: string): SdcComponent[] {
         const typeText = member.type?.text ?? 'string';
         const { jsonType, enumValues } = resolveType(typeText);
 
-        // Resolve default value — strip string quotes, leave booleans/numbers as-is
+        // Resolve default value — strip string quotes, leave booleans/numbers as-is.
+        // Skip JavaScript sentinel values (undefined, null) — these mean "no default"
+        // and must not be emitted as literal YAML strings.
         let defaultValue: string | undefined;
         if (member.default !== undefined) {
-          defaultValue = stripStringDefault(member.default);
+          const normalized = stripStringDefault(member.default);
+          if (normalized !== 'undefined' && normalized !== 'null') {
+            defaultValue = normalized;
+          }
         }
 
         props.push({

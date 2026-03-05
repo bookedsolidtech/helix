@@ -28,6 +28,7 @@
     "lint:fix": "turbo lint --fix",
     "clean": "turbo clean",
     "cem": "turbo cem --filter=@helix/library",
+    "postcem": "tsx scripts/cem-to-sdc.ts --force",
     "generate-docs": "tsx scripts/generate-component-docs.ts",
     "cem-to-sdc": "tsx scripts/cem-to-sdc.ts",
     "preview:docs": "turbo preview --filter=docs",
