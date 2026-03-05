@@ -353,7 +353,7 @@ describe('hx-dialog', () => {
       const btn = el.querySelector('#btn') as HTMLElement;
       btn.focus();
 
-      let preventedCount = 0;
+      const preventedCount = 0;
       const dialogEl = shadowQuery<HTMLDialogElement>(el, 'dialog');
       const tabEvent = new KeyboardEvent('keydown', {
         key: 'Tab',
