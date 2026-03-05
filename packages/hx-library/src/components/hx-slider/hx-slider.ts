@@ -3,7 +3,6 @@ import { customElement, property, query, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import { live } from 'lit/directives/live.js';
-import { repeat } from 'lit/directives/repeat.js';
 import { styleMap } from 'lit/directives/style-map.js';
 import { tokenStyles } from '@helix/tokens/lit';
 import { helixSliderStyles } from './hx-slider.styles.js';
@@ -147,7 +146,7 @@ export class HelixSlider extends LitElement {
   // ─── Internal References ───
 
   @query('.slider__input')
-  private _input!: HTMLInputElement | null;
+  private _input!: HTMLInputElement;
 
   // ─── Unique IDs ───
 
@@ -167,9 +166,7 @@ export class HelixSlider extends LitElement {
     return this._fillPercent();
   }
 
-  private _cachedTicks: number[] = [];
-
-  private _computeTicks(): number[] {
+  private _ticks(): number[] {
     if (!this.showTicks) return [];
     const ticks: number[] = [];
     const range = this.max - this.min;
@@ -183,33 +180,10 @@ export class HelixSlider extends LitElement {
 
   // ─── Lifecycle ───
 
-  override willUpdate(changedProperties: Map<string, unknown>): void {
-    if (
-      changedProperties.has('min') ||
-      changedProperties.has('max') ||
-      changedProperties.has('step') ||
-      changedProperties.has('showTicks')
-    ) {
-      this._cachedTicks = this._computeTicks();
-    }
-  }
-
   override updated(changedProperties: Map<string, unknown>): void {
     super.updated(changedProperties);
     if (changedProperties.has('value') || changedProperties.has('name')) {
       this._internals.setFormValue(String(this.value));
-    }
-  }
-
-  override firstUpdated(): void {
-    if (import.meta.env['DEV']) {
-      Promise.resolve().then(() => {
-        if (!this.label && !this._hasLabelSlot) {
-          console.warn(
-            '[hx-slider] No accessible name provided. Set the "label" attribute or use the slot="label".',
-          );
-        }
-      });
     }
   }
 
@@ -328,7 +302,7 @@ export class HelixSlider extends LitElement {
   override render() {
     const fillPct = this._fillPercent();
     const thumbPct = this._thumbPercent();
-    const ticks = this._cachedTicks;
+    const ticks = this._ticks();
     const hasLabel = !!this.label || this._hasLabelSlot;
     const showRangeLabels = this._hasMinLabelSlot || this._hasMaxLabelSlot;
 
@@ -380,6 +354,7 @@ export class HelixSlider extends LitElement {
               step=${this.step}
               ?disabled=${this.disabled}
               name=${ifDefined(this.name || undefined)}
+              role="slider"
               aria-valuemin=${this.min}
               aria-valuemax=${this.max}
               aria-valuenow=${this.value}
@@ -403,9 +378,7 @@ export class HelixSlider extends LitElement {
         <!-- Tick marks -->
         ${this.showTicks && ticks.length > 0
           ? html`<div class="slider__ticks">
-              ${repeat(
-                ticks,
-                (pct) => pct,
+              ${ticks.map(
                 (pct) =>
                   html`<span
                     part="tick"
