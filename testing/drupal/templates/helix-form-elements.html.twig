@@ -1,0 +1,126 @@
+{#
+/**
+ * @file
+ * HELIX form-associated components — Drupal 11 Twig integration.
+ *
+ * Demonstrates hx-text-input, hx-checkbox, hx-select, hx-textarea,
+ * hx-switch, and hx-radio-group in a Drupal form context.
+ *
+ * In Drupal, form elements are typically rendered via form_element.html.twig.
+ * HELIX components work as custom element wrappers — the component handles
+ * its own label, description, and error state internally via slots/attributes.
+ *
+ * Variables:
+ *   - form: Drupal form render array
+ *   - errors: array of error messages (optional)
+ */
+#}
+
+<form method="post" action="{{ url('<current>') }}" novalidate>
+  {{ form.form_build_id }}
+  {{ form.form_token }}
+  {{ form.form_id }}
+
+  {# Text Input #}
+  <div class="form-item">
+    <hx-text-input
+      name="{{ form.username['#name']|default('username') }}"
+      label="{{ form.username['#title']|default('Username') }}"
+      {% if form.username['#required'] %}required{% endif %}
+      {% if form.username['#default_value'] %}value="{{ form.username['#default_value'] }}"{% endif %}
+      {% if form.username['#placeholder'] %}placeholder="{{ form.username['#placeholder'] }}"{% endif %}
+      {% if errors.username %}error="{{ errors.username|first }}"{% endif %}
+    ></hx-text-input>
+  </div>
+
+  {# Email Input #}
+  <div class="form-item">
+    <hx-text-input
+      name="{{ form.email['#name']|default('email') }}"
+      type="email"
+      label="{{ form.email['#title']|default('Email') }}"
+      {% if form.email['#required'] %}required{% endif %}
+      {% if errors.email %}error="{{ errors.email|first }}"{% endif %}
+    ></hx-text-input>
+  </div>
+
+  {# Textarea #}
+  <div class="form-item">
+    <hx-textarea
+      name="{{ form.body['#name']|default('body') }}"
+      label="{{ form.body['#title']|default('Message') }}"
+      rows="{{ form.body['#rows']|default(4) }}"
+      {% if form.body['#required'] %}required{% endif %}
+    ></hx-textarea>
+  </div>
+
+  {# Select #}
+  <div class="form-item">
+    <hx-select
+      name="{{ form.category['#name']|default('category') }}"
+      label="{{ form.category['#title']|default('Category') }}"
+      {% if form.category['#required'] %}required{% endif %}
+    >
+      <option value="">{{ 'Select...'|t }}</option>
+      {% for key, option in form.category['#options']|default({}) %}
+        <option value="{{ key }}"
+          {% if form.category['#value'] == key %}selected{% endif %}
+        >{{ option }}</option>
+      {% endfor %}
+    </hx-select>
+  </div>
+
+  {# Checkbox #}
+  <div class="form-item">
+    <hx-checkbox
+      name="{{ form.agree['#name']|default('agree') }}"
+      label="{{ form.agree['#title']|default('I agree to the terms') }}"
+      value="1"
+      {% if form.agree['#default_value'] %}checked{% endif %}
+      {% if form.agree['#required'] %}required{% endif %}
+    ></hx-checkbox>
+  </div>
+
+  {# Switch (boolean toggle) #}
+  <div class="form-item">
+    <hx-switch
+      name="{{ form.notifications['#name']|default('notifications') }}"
+      label="{{ form.notifications['#title']|default('Enable notifications') }}"
+      {% if form.notifications['#default_value'] %}checked{% endif %}
+    ></hx-switch>
+  </div>
+
+  {# Radio group #}
+  <div class="form-item">
+    <hx-radio-group
+      name="{{ form.plan['#name']|default('plan') }}"
+      label="{{ form.plan['#title']|default('Choose a plan') }}"
+      {% if form.plan['#required'] %}required{% endif %}
+    >
+      {% for key, option in form.plan['#options']|default({'free': 'Free', 'pro': 'Pro'}) %}
+        <hx-radio
+          value="{{ key }}"
+          label="{{ option }}"
+          {% if form.plan['#value'] == key %}checked{% endif %}
+        ></hx-radio>
+      {% endfor %}
+    </hx-radio-group>
+  </div>
+
+  {# Slider #}
+  <div class="form-item">
+    <hx-slider
+      name="{{ form.priority['#name']|default('priority') }}"
+      label="{{ form.priority['#title']|default('Priority') }}"
+      min="{{ form.priority['#min']|default(0) }}"
+      max="{{ form.priority['#max']|default(100) }}"
+      value="{{ form.priority['#default_value']|default(50) }}"
+    ></hx-slider>
+  </div>
+
+  {# Submit button using hx-button #}
+  <hx-button type="submit" variant="primary">
+    {{ form.submit['#value']|default('Submit'|t) }}
+  </hx-button>
+
+</form>
