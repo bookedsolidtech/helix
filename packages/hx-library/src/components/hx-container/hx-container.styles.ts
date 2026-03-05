@@ -62,7 +62,7 @@ export const helixContainerStyles = css`
   }
 
   .container__inner--narrow {
-    max-width: var(--hx-container-max-width, 48rem);
+    max-width: var(--hx-container-max-width, var(--hx-container-narrow, 48rem));
   }
 
   .container__inner--sm {
