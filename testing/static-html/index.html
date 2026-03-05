@@ -1,0 +1,400 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>HELIX Integration Test — Static HTML (Drupal Simulation)</title>
+    <style>
+      :root {
+        --hx-color-primary: #3b82f6;
+        --hx-color-primary-hover: #2563eb;
+      }
+
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        font-family:
+          system-ui,
+          -apple-system,
+          sans-serif;
+        background: #0f172a;
+        color: #f1f5f9;
+        padding: 32px;
+      }
+      h1 {
+        font-size: 24px;
+        font-weight: 700;
+        margin-bottom: 8px;
+      }
+      h2 {
+        font-size: 16px;
+        font-weight: 600;
+        margin: 24px 0 12px;
+      }
+      .subtitle {
+        color: #94a3b8;
+        margin-bottom: 24px;
+        font-size: 14px;
+      }
+      .section {
+        background: #1e293b;
+        border: 1px solid #334155;
+        border-radius: 8px;
+        padding: 24px;
+        margin-bottom: 16px;
+      }
+      .component-grid {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        align-items: center;
+      }
+      .test-result {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 8px 12px;
+        background: #0f172a;
+        border-radius: 6px;
+        border: 1px solid #1e293b;
+        margin-bottom: 6px;
+        font-size: 14px;
+      }
+      .badge-pass {
+        background: #166534;
+        color: #86efac;
+        padding: 2px 8px;
+        border-radius: 4px;
+        font-size: 12px;
+        font-weight: 600;
+      }
+      .badge-fail {
+        background: #7f1d1d;
+        color: #fca5a5;
+        padding: 2px 8px;
+        border-radius: 4px;
+        font-size: 12px;
+        font-weight: 600;
+      }
+      .summary {
+        display: flex;
+        gap: 24px;
+        padding: 16px;
+        background: #1e293b;
+        border-radius: 8px;
+        margin-bottom: 24px;
+      }
+      .summary-item .count {
+        font-size: 28px;
+        font-weight: 700;
+      }
+      .summary-item .label {
+        font-size: 12px;
+        color: #94a3b8;
+      }
+      .pass-count {
+        color: #86efac;
+      }
+      .fail-count {
+        color: #fca5a5;
+      }
+      pre {
+        background: #0f172a;
+        padding: 12px;
+        border-radius: 6px;
+        font-size: 12px;
+        color: #86efac;
+        margin-top: 12px;
+        white-space: pre-wrap;
+      }
+      .themed-section {
+        --hx-color-primary: #8b5cf6;
+        --hx-color-primary-hover: #7c3aed;
+      }
+      label {
+        display: block;
+        margin-bottom: 4px;
+        font-size: 14px;
+        color: #94a3b8;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>HELIX Integration Test — Static HTML</h1>
+    <p class="subtitle">
+      Simulates Drupal 11 usage: library loaded via &lt;script type="module"&gt;
+    </p>
+
+    <div id="summary" class="summary">
+      <div class="summary-item">
+        <div class="count pass-count" id="pass-count">0</div>
+        <div class="label">Passed</div>
+      </div>
+      <div class="summary-item">
+        <div class="count fail-count" id="fail-count">0</div>
+        <div class="label">Failed</div>
+      </div>
+    </div>
+
+    <div id="test-results"></div>
+
+    <h2>All Components — Rendered</h2>
+    <div class="section">
+      <div class="component-grid">
+        <hx-button data-testid="hx-button">Primary</hx-button>
+        <hx-button variant="secondary">Secondary</hx-button>
+        <hx-button variant="destructive">Destructive</hx-button>
+        <hx-badge>Badge</hx-badge>
+        <hx-badge variant="secondary">Secondary</hx-badge>
+        <hx-avatar initials="JD"></hx-avatar>
+        <hx-icon-button aria-label="Settings">⚙</hx-icon-button>
+      </div>
+    </div>
+
+    <h2>Display Components</h2>
+    <div class="section">
+      <hx-alert style="margin-bottom: 12px">
+        <span slot="title">Info Alert</span>
+        This is a HELIX alert component rendered in static HTML.
+      </hx-alert>
+      <hx-card data-testid="hx-card" style="display: block; max-width: 400px">
+        <span slot="header">Card Title</span>
+        Card body content goes here.
+      </hx-card>
+    </div>
+
+    <h2>Form-Associated Components</h2>
+    <div class="section">
+      <form id="test-form" data-testid="test-form">
+        <div style="margin-bottom: 16px">
+          <hx-text-input
+            name="username"
+            label="Username"
+            placeholder="Enter your username"
+            data-testid="hx-text-input"
+          ></hx-text-input>
+        </div>
+        <div style="margin-bottom: 16px">
+          <hx-textarea
+            name="bio"
+            label="Bio"
+            placeholder="Tell us about yourself"
+            data-testid="hx-textarea"
+          ></hx-textarea>
+        </div>
+        <div style="margin-bottom: 16px">
+          <hx-select name="role" label="Role" data-testid="hx-select">
+            <option value="">Select a role</option>
+            <option value="admin">Admin</option>
+            <option value="user">User</option>
+            <option value="viewer">Viewer</option>
+          </hx-select>
+        </div>
+        <div style="margin-bottom: 16px">
+          <hx-checkbox
+            name="agree"
+            label="I agree to terms"
+            data-testid="hx-checkbox"
+          ></hx-checkbox>
+        </div>
+        <div style="margin-bottom: 16px">
+          <hx-switch
+            name="notifications"
+            label="Enable notifications"
+            data-testid="hx-switch"
+          ></hx-switch>
+        </div>
+        <div style="margin-bottom: 16px">
+          <hx-radio-group name="plan" label="Plan" data-testid="hx-radio-group">
+            <hx-radio value="free" label="Free"></hx-radio>
+            <hx-radio value="pro" label="Pro"></hx-radio>
+            <hx-radio value="enterprise" label="Enterprise"></hx-radio>
+          </hx-radio-group>
+        </div>
+        <div style="margin-bottom: 16px">
+          <hx-slider
+            name="volume"
+            label="Volume"
+            min="0"
+            max="100"
+            value="50"
+            data-testid="hx-slider"
+          ></hx-slider>
+        </div>
+        <hx-button type="submit" data-testid="form-submit">Submit Form</hx-button>
+      </form>
+      <pre id="form-output" style="display: none" data-testid="form-output"></pre>
+    </div>
+
+    <h2>Theming via CSS Custom Properties</h2>
+    <div class="section themed-section" data-testid="themed-container">
+      <p style="font-size: 12px; color: #94a3b8; margin-bottom: 12px">
+        --hx-color-primary overridden to #8b5cf6 (purple) via CSS custom properties
+      </p>
+      <div class="component-grid">
+        <hx-button data-testid="themed-button">Themed Button</hx-button>
+        <hx-badge>Themed Badge</hx-badge>
+      </div>
+    </div>
+
+    <h2>Navigation Components</h2>
+    <div class="section">
+      <hx-breadcrumb data-testid="hx-breadcrumb">
+        <hx-breadcrumb-item href="/">Home</hx-breadcrumb-item>
+        <hx-breadcrumb-item href="/components">Components</hx-breadcrumb-item>
+        <hx-breadcrumb-item>Integration Test</hx-breadcrumb-item>
+      </hx-breadcrumb>
+    </div>
+
+    <h2>Layout Components</h2>
+    <div class="section">
+      <hx-container data-testid="hx-container">
+        <hx-prose data-testid="hx-prose">
+          <h3>Prose Component</h3>
+          <p>This is a prose block inside an hx-container. Typography is automatically styled.</p>
+        </hx-prose>
+      </hx-container>
+    </div>
+
+    <!--
+    NOTE: hx-field and hx-form are composition components.
+    hx-button-group wraps hx-button elements.
+  -->
+    <h2>Composition Components</h2>
+    <div class="section">
+      <hx-button-group data-testid="hx-button-group">
+        <hx-button>First</hx-button>
+        <hx-button>Second</hx-button>
+        <hx-button>Third</hx-button>
+      </hx-button-group>
+    </div>
+
+    <!--
+    Load library as ES module (CDN/Drupal pattern).
+    In production: use a CDN URL or Drupal libraries.yml JS path.
+    The bundled file includes all dependencies (lit, tokens).
+  -->
+    <script type="module" src="./helix-bundle.js"></script>
+
+    <script type="module">
+      function addResult(name, passed, message = '') {
+        const container = document.getElementById('test-results');
+        const div = document.createElement('div');
+        div.className = 'test-result';
+        div.setAttribute('data-testid', `result-${name.replace(/\s+/g, '-').toLowerCase()}`);
+        div.innerHTML = `
+        <span class="${passed ? 'badge-pass' : 'badge-fail'}">${passed ? 'PASS' : 'FAIL'}</span>
+        <span>${name}</span>
+        ${message ? `<span style="font-size: 12px; color: #94a3b8;">${message}</span>` : ''}
+      `;
+        container.appendChild(div);
+
+        const passCount = parseInt(document.getElementById('pass-count').textContent, 10);
+        const failCount = parseInt(document.getElementById('fail-count').textContent, 10);
+        if (passed) {
+          document.getElementById('pass-count').textContent = passCount + 1;
+        } else {
+          document.getElementById('fail-count').textContent = failCount + 1;
+          document.getElementById('fail-count').style.color = '#fca5a5';
+        }
+      }
+
+      async function runTests() {
+        // Wait for the library script to register at least one custom element
+        try {
+          await Promise.race([
+            customElements.whenDefined('hx-button'),
+            new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 5000)),
+          ]);
+          addResult(
+            'Library loads as ES module',
+            true,
+            'hx-button defined — library loaded via &lt;script type=module&gt;',
+          );
+        } catch {
+          addResult(
+            'Library loads as ES module',
+            false,
+            'Timed out waiting for custom elements to register',
+          );
+          return;
+        }
+
+        // Small delay to allow all elements to register
+        await new Promise((r) => setTimeout(r, 100));
+
+        const components = [
+          'hx-alert',
+          'hx-avatar',
+          'hx-badge',
+          'hx-breadcrumb',
+          'hx-button',
+          'hx-button-group',
+          'hx-card',
+          'hx-checkbox',
+          'hx-container',
+          'hx-field',
+          'hx-form',
+          'hx-icon-button',
+          'hx-prose',
+          'hx-radio-group',
+          'hx-select',
+          'hx-slider',
+          'hx-switch',
+          'hx-text-input',
+          'hx-textarea',
+        ];
+
+        for (const tag of components) {
+          const defined = customElements.get(tag) !== undefined;
+          addResult(`${tag} registered`, defined);
+        }
+
+        // Test form submission
+        const form = document.getElementById('test-form');
+        addResult(
+          'Form element contains hx-* inputs',
+          form !== null,
+          'hx-text-input, hx-checkbox, hx-switch in form',
+        );
+
+        // Test theming
+        const themed = document.querySelector('.themed-section');
+        const style = getComputedStyle(themed);
+        const primary = style.getPropertyValue('--hx-color-primary').trim();
+        addResult(
+          'CSS custom property theming',
+          primary !== '',
+          `--hx-color-primary = "${primary}"`,
+        );
+
+        // Test button renders with shadow DOM
+        const btn = document.querySelector('hx-button');
+        if (btn) {
+          await customElements.whenDefined('hx-button');
+          const hasShadow = btn.shadowRoot !== null;
+          addResult('hx-button has shadow DOM', hasShadow);
+        }
+      }
+
+      // Form submission handler
+      document.getElementById('test-form').addEventListener('submit', function (e) {
+        e.preventDefault();
+        const data = new FormData(this);
+        const output = {};
+        data.forEach((value, key) => {
+          output[key] = value;
+        });
+        const pre = document.getElementById('form-output');
+        pre.textContent = JSON.stringify(output, null, 2);
+        pre.style.display = 'block';
+        pre.setAttribute('data-testid', 'form-output');
+      });
+
+      runTests().catch(console.error);
+    </script>
+  </body>
+</html>
