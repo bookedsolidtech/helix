@@ -225,6 +225,7 @@ export class HelixCheckbox extends LitElement {
   private _handleKeyDown(e: KeyboardEvent): void {
     if (e.key === ' ') {
       e.preventDefault();
+      e.stopPropagation();
       this._handleChange();
     }
   }
@@ -287,9 +288,13 @@ export class HelixCheckbox extends LitElement {
             aria-invalid=${hasError ? 'true' : nothing}
             aria-describedby=${ifDefined(describedBy)}
             aria-labelledby=${this._labelId}
-            tabindex="-1"
+            tabindex="0"
+            @keydown=${this._handleKeyDown}
             @change=${(e: Event) => e.stopPropagation()}
-            @click=${(e: Event) => e.preventDefault()}
+            @click=${(e: Event) => {
+              e.preventDefault();
+              e.stopPropagation();
+            }}
           />
 
           <span part="checkbox" class="checkbox__box">
