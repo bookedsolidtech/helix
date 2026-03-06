@@ -25,7 +25,11 @@ export class HelixCarouselItem extends LitElement {
 
       .slide-group {
         height: 100%;
-        outline: none;
+      }
+
+      .slide-group:focus-visible {
+        outline: var(--hx-focus-ring-width, 2px) solid var(--hx-focus-ring-color, #2563eb);
+        outline-offset: var(--hx-focus-ring-offset, 2px);
       }
     `,
   ];
