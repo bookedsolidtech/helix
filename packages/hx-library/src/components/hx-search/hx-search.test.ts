@@ -317,6 +317,58 @@ describe('hx-search', () => {
     });
   });
 
+  // ─── Keyboard: Escape (2) ───
+
+  describe('Keyboard: Escape', () => {
+    it('clears value and fires hx-clear on Escape when value is non-empty', async () => {
+      const el = await fixture<HelixSearch>('<hx-search value="cardiology"></hx-search>');
+      const input = shadowQuery<HTMLInputElement>(el, 'input')!;
+      const eventPromise = oneEvent<CustomEvent>(el, 'hx-clear');
+      input.dispatchEvent(
+        new KeyboardEvent('keydown', { key: 'Escape', bubbles: true, composed: true }),
+      );
+      await eventPromise;
+      expect(el.value).toBe('');
+    });
+
+    it('does nothing on Escape when value is empty', async () => {
+      const el = await fixture<HelixSearch>('<hx-search></hx-search>');
+      const input = shadowQuery<HTMLInputElement>(el, 'input')!;
+      let clearFired = false;
+      el.addEventListener('hx-clear', () => {
+        clearFired = true;
+      });
+      input.dispatchEvent(
+        new KeyboardEvent('keydown', { key: 'Escape', bubbles: true, composed: true }),
+      );
+      await new Promise((r) => setTimeout(r, 50));
+      expect(clearFired).toBe(false);
+    });
+  });
+
+  // ─── ARIA: role="search" landmark (1) ───
+
+  describe('ARIA landmarks', () => {
+    it('has role="search" on the field container', async () => {
+      const el = await fixture<HelixSearch>('<hx-search label="Patient Search"></hx-search>');
+      const field = shadowQuery(el, '[role="search"]');
+      expect(field).toBeTruthy();
+    });
+
+    it('aria-labelledby references the label element ID when label is set', async () => {
+      const el = await fixture<HelixSearch>('<hx-search label="Patient Search"></hx-search>');
+      const input = shadowQuery<HTMLInputElement>(el, 'input')!;
+      const label = shadowQuery<HTMLLabelElement>(el, 'label')!;
+      expect(input.getAttribute('aria-labelledby')).toBe(label.id);
+    });
+
+    it('uses aria-label="Search" on input when no label is provided', async () => {
+      const el = await fixture<HelixSearch>('<hx-search></hx-search>');
+      const input = shadowQuery<HTMLInputElement>(el, 'input')!;
+      expect(input.getAttribute('aria-label')).toBe('Search');
+    });
+  });
+
   // ─── Accessibility (axe-core) ───
 
   describe('Accessibility (axe-core)', () => {
