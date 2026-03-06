@@ -282,12 +282,12 @@ describe('hx-split-button', () => {
       await el.updateComplete;
       await new Promise((r) => setTimeout(r, 50));
 
-      // Click the inner button of the menu item
+      // Click the inner element of the menu item
       const menuItem = el.querySelector('hx-menu-item') as HelixMenuItem;
-      const itemButton = menuItem.shadowRoot?.querySelector('button');
+      const itemEl = menuItem.shadowRoot?.querySelector('.menu-item') as HTMLElement;
 
       const eventPromise = oneEvent(el, 'hx-select');
-      itemButton?.click();
+      itemEl?.click();
       const event = await eventPromise;
       expect(event).toBeTruthy();
     });
@@ -306,10 +306,10 @@ describe('hx-split-button', () => {
       await new Promise((r) => setTimeout(r, 50));
 
       const menuItem = el.querySelector('hx-menu-item') as HelixMenuItem;
-      const itemButton = menuItem.shadowRoot?.querySelector('button');
+      const itemEl = menuItem.shadowRoot?.querySelector('.menu-item') as HTMLElement;
 
       const eventPromise = oneEvent<CustomEvent<{ value: string; label: string }>>(el, 'hx-select');
-      itemButton?.click();
+      itemEl?.click();
       const event = await eventPromise;
       expect(event.detail.value).toBe('save-draft');
       expect(event.detail.label).toBe('Save as Draft');
@@ -440,8 +440,8 @@ describe('hx-split-button', () => {
       await new Promise((r) => setTimeout(r, 50));
 
       const menuItem = el.querySelector('hx-menu-item') as HelixMenuItem;
-      const itemButton = menuItem.shadowRoot?.querySelector('button');
-      itemButton?.click();
+      const itemEl = menuItem.shadowRoot?.querySelector('.menu-item') as HTMLElement;
+      itemEl?.click();
       await el.updateComplete;
 
       const menu = shadowQuery(el, '.split-button__menu');
@@ -538,8 +538,8 @@ describe('hx-menu-item', () => {
       const el = await fixture<HelixMenuItem>(`
         <hx-menu-item value="test">Test Item</hx-menu-item>
       `);
-      const button = shadowQuery(el, 'button');
-      expect(button?.getAttribute('role')).toBe('menuitem');
+      const item = shadowQuery(el, '.menu-item');
+      expect(item?.getAttribute('role')).toBe('menuitem');
     });
 
     it('renders slot content', async () => {
@@ -553,42 +553,42 @@ describe('hx-menu-item', () => {
   // ─── Events ───
 
   describe('Events', () => {
-    it('fires hx-menu-item-select on click', async () => {
+    it('fires hx-item-select on click', async () => {
       const el = await fixture<HelixMenuItem>(`
         <hx-menu-item value="save-draft">Save as Draft</hx-menu-item>
       `);
-      const button = shadowQuery<HTMLButtonElement>(el, 'button');
-      const eventPromise = oneEvent(el, 'hx-menu-item-select');
-      button?.click();
+      const item = shadowQuery<HTMLElement>(el, '.menu-item');
+      const eventPromise = oneEvent(el, 'hx-item-select');
+      item?.click();
       const event = await eventPromise;
       expect(event).toBeTruthy();
     });
 
-    it('hx-menu-item-select detail has correct value and label', async () => {
+    it('hx-item-select detail has correct value and label', async () => {
       const el = await fixture<HelixMenuItem>(`
         <hx-menu-item value="save-draft">Save as Draft</hx-menu-item>
       `);
-      const button = shadowQuery<HTMLButtonElement>(el, 'button');
-      const eventPromise = oneEvent<CustomEvent<{ value: string; label: string }>>(
+      const item = shadowQuery<HTMLElement>(el, '.menu-item');
+      const eventPromise = oneEvent<CustomEvent<{ value: string; item: HelixMenuItem }>>(
         el,
-        'hx-menu-item-select',
+        'hx-item-select',
       );
-      button?.click();
+      item?.click();
       const event = await eventPromise;
       expect(event.detail.value).toBe('save-draft');
-      expect(event.detail.label).toBe('Save as Draft');
+      expect(event.detail.item).toBe(el);
     });
 
     it('does not fire event when disabled', async () => {
       const el = await fixture<HelixMenuItem>(`
         <hx-menu-item value="save-draft" disabled>Save as Draft</hx-menu-item>
       `);
-      const button = shadowQuery<HTMLButtonElement>(el, 'button');
+      const item = shadowQuery<HTMLElement>(el, '.menu-item');
       let fired = false;
-      el.addEventListener('hx-menu-item-select', () => {
+      el.addEventListener('hx-item-select', () => {
         fired = true;
       });
-      button?.click();
+      item?.click();
       await new Promise((r) => setTimeout(r, 50));
       expect(fired).toBe(false);
     });
