@@ -1,0 +1,30 @@
+{
+  "category": "Uncategorized",
+  "description": "## Deep Component Audit — hx-contextual-help\n\n**Component directory:** `packages/hx-library/src/components/hx-contextual-help/`\n\n### wc-mcp Tools — USE THESE FOR SCORING\n- `score_component`, `get_component`, `analyze_accessibility`, `validate_usage`, `list_css_parts`, `list_events`, `list_slots`, `get_design_tokens`\n- **Report any wc-mcp bugs to `/Volumes/Development/booked/wc-tools` board.**\n\n### Audit Scope\n1. **Design Tokens** — `--hx-` tokens. Trigger icon, popover background, typography. Dark mode.\n2. **Accessibility** — WCAG 2.1 AA. Trigger button labeling. Popover association (aria-describedby). Keyboard (Enter/Space to toggle, Escape to close). Focus management.\n3. **Functionality** — Info vs help variants. Trigger (icon button). Popover positioning. Slot content. Dismiss behavior.\n4. **TypeScript** — Strict. No `any`.\n5. **CSS/Styling** — Shadow DOM. CSS Parts. Popover positioning. Z-index.\n6. **CEM Accuracy** — All API documented.\n7. **Tests** — 80%+ coverage. Toggle. Keyboard. Positioning. ARIA.\n8. **Storybook** — Info/help variants. Rich content. Positioning.\n9. **Drupal Compatibility** — Help text integration. Twig-friendly.\n10. **Portability** — CDN-ready.\n\n### Deliverable\nDetailed audit report. Fix CRITICAL+HIGH. Document rest.",
+  "title": "Deep Audit v2: hx-contextual-help",
+  "status": "backlog",
+  "branchName": "feature/deep-audit-v2-hx-contextual-help",
+  "complexity": "architectural",
+  "priority": 3,
+  "source": "api",
+  "trustTier": 1,
+  "quarantineStatus": "passed",
+  "quarantineId": "759928a1-494f-40b5-ba38-339e1f730c24",
+  "id": "feature-1772817689823-jhkmcmu0p",
+  "descriptionHistory": [
+    {
+      "description": "## Deep Component Audit — hx-contextual-help\n\n**Component directory:** `packages/hx-library/src/components/hx-contextual-help/`\n\n### wc-mcp Tools — USE THESE FOR SCORING\n- `score_component`, `get_component`, `analyze_accessibility`, `validate_usage`, `list_css_parts`, `list_events`, `list_slots`, `get_design_tokens`\n- **Report any wc-mcp bugs to `/Volumes/Development/booked/wc-tools` board.**\n\n### Audit Scope\n1. **Design Tokens** — `--hx-` tokens. Trigger icon, popover background, typography. Dark mode.\n2. **Accessibility** — WCAG 2.1 AA. Trigger button labeling. Popover association (aria-describedby). Keyboard (Enter/Space to toggle, Escape to close). Focus management.\n3. **Functionality** — Info vs help variants. Trigger (icon button). Popover positioning. Slot content. Dismiss behavior.\n4. **TypeScript** — Strict. No `any`.\n5. **CSS/Styling** — Shadow DOM. CSS Parts. Popover positioning. Z-index.\n6. **CEM Accuracy** — All API documented.\n7. **Tests** — 80%+ coverage. Toggle. Keyboard. Positioning. ARIA.\n8. **Storybook** — Info/help variants. Rich content. Positioning.\n9. **Drupal Compatibility** — Help text integration. Twig-friendly.\n10. **Portability** — CDN-ready.\n\n### Deliverable\nDetailed audit report. Fix CRITICAL+HIGH. Document rest.",
+      "timestamp": "2026-03-06T17:21:29.823Z",
+      "source": "initial"
+    }
+  ],
+  "createdAt": "2026-03-06T17:21:29.823Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-03-06T17:21:29.823Z",
+      "reason": "Feature created"
+    }
+  ]
+}

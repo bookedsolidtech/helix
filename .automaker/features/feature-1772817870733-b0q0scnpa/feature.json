@@ -1,0 +1,30 @@
+{
+  "category": "Uncategorized",
+  "description": "## Deep Component Audit — hx-popover\n\n**Component directory:** `packages/hx-library/src/components/hx-popover/`\n\n### wc-mcp Tools — USE THESE\n- `score_component`, `get_component`, `analyze_accessibility`, `list_css_parts`, `list_events`, `list_slots`, `get_design_tokens`\n- **Report wc-mcp bugs to `/Volumes/Development/booked/wc-tools` board.**\n\n### Audit Scope\n1. **Design Tokens** — `--hx-` tokens. Background, shadow, border, arrow. Dark mode.\n2. **Accessibility** — WCAG 2.1 AA. Focus management. Escape to dismiss. aria-describedby linking. Role based on content.\n3. **Functionality** — Trigger (click/hover/focus). Positioning (12 placements). Arrow. Click-outside dismiss. Nested popovers. Animation.\n4. **TypeScript** — Strict. No `any`.\n5. **CSS/Styling** — Shadow DOM. CSS Parts. Arrow rendering. Z-index. Max-width.\n6. **CEM Accuracy** — All API documented.\n7. **Tests** — 80%+ coverage. Trigger modes. Positioning. Dismiss. Keyboard.\n8. **Storybook** — Click/hover/focus triggers. All placements. Rich content. Arrow.\n9. **Drupal Compatibility** — Twig-friendly.\n10. **Portability** — CDN-ready.\n\n### Deliverable\nDetailed audit report. Fix CRITICAL+HIGH. Document rest.",
+  "title": "Deep Audit v2: hx-popover",
+  "status": "backlog",
+  "branchName": "feature/deep-audit-v2-hx-popover",
+  "complexity": "architectural",
+  "priority": 3,
+  "source": "api",
+  "trustTier": 1,
+  "quarantineStatus": "passed",
+  "quarantineId": "161a4046-800d-4cda-9857-6688058c5758",
+  "id": "feature-1772817870733-b0q0scnpa",
+  "descriptionHistory": [
+    {
+      "description": "## Deep Component Audit — hx-popover\n\n**Component directory:** `packages/hx-library/src/components/hx-popover/`\n\n### wc-mcp Tools — USE THESE\n- `score_component`, `get_component`, `analyze_accessibility`, `list_css_parts`, `list_events`, `list_slots`, `get_design_tokens`\n- **Report wc-mcp bugs to `/Volumes/Development/booked/wc-tools` board.**\n\n### Audit Scope\n1. **Design Tokens** — `--hx-` tokens. Background, shadow, border, arrow. Dark mode.\n2. **Accessibility** — WCAG 2.1 AA. Focus management. Escape to dismiss. aria-describedby linking. Role based on content.\n3. **Functionality** — Trigger (click/hover/focus). Positioning (12 placements). Arrow. Click-outside dismiss. Nested popovers. Animation.\n4. **TypeScript** — Strict. No `any`.\n5. **CSS/Styling** — Shadow DOM. CSS Parts. Arrow rendering. Z-index. Max-width.\n6. **CEM Accuracy** — All API documented.\n7. **Tests** — 80%+ coverage. Trigger modes. Positioning. Dismiss. Keyboard.\n8. **Storybook** — Click/hover/focus triggers. All placements. Rich content. Arrow.\n9. **Drupal Compatibility** — Twig-friendly.\n10. **Portability** — CDN-ready.\n\n### Deliverable\nDetailed audit report. Fix CRITICAL+HIGH. Document rest.",
+      "timestamp": "2026-03-06T17:24:30.733Z",
+      "source": "initial"
+    }
+  ],
+  "createdAt": "2026-03-06T17:24:30.733Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-03-06T17:24:30.733Z",
+      "reason": "Feature created"
+    }
+  ]
+}
