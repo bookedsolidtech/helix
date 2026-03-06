@@ -118,11 +118,11 @@ describe('hx-meter', () => {
       expect(labelPart).toBeTruthy();
     });
 
-    it('does not show label part when label is not set', async () => {
+    it('renders label part even when label attribute is not set (for slot-based labeling)', async () => {
       const el = await fixture<HelixMeter>('<hx-meter value="50"></hx-meter>');
       await el.updateComplete;
       const labelPart = shadowQuery(el, '[part="label"]');
-      expect(labelPart).toBeNull();
+      expect(labelPart).toBeTruthy();
     });
   });
 
@@ -151,9 +151,7 @@ describe('hx-meter', () => {
     });
 
     it('handles custom ranges correctly', async () => {
-      const el = await fixture<HelixMeter>(
-        '<hx-meter value="15" min="10" max="20"></hx-meter>',
-      );
+      const el = await fixture<HelixMeter>('<hx-meter value="15" min="10" max="20"></hx-meter>');
       await el.updateComplete;
       const indicator = shadowQuery(el, '[part="indicator"]') as HTMLElement;
       expect(indicator?.style.width).toBe('50%');
@@ -257,7 +255,7 @@ describe('hx-meter', () => {
       expect(el.dataset['state']).toBe('warning');
     });
 
-    it('has data-state="default" with only optimum set (no low/high)', async () => {
+    it('has data-state="optimum" with only optimum set (no low/high)', async () => {
       const el = await fixture<HelixMeter>(
         '<hx-meter value="50" min="0" max="100" optimum="50"></hx-meter>',
       );
@@ -288,11 +286,54 @@ describe('hx-meter', () => {
       expect(native?.getAttribute('aria-hidden')).toBe('true');
     });
 
-    it('uses fallback aria-label when label not set', async () => {
+    it('does not set aria-label when label is not provided', async () => {
       const el = await fixture<HelixMeter>('<hx-meter value="30" max="100"></hx-meter>');
       await el.updateComplete;
       const base = shadowQuery(el, '[part="base"]');
-      expect(base?.getAttribute('aria-label')).toBe('30 of 100');
+      expect(base?.hasAttribute('aria-label')).toBe(false);
+    });
+
+    it('sets aria-valuetext with value and max in default state', async () => {
+      const el = await fixture<HelixMeter>('<hx-meter value="30" max="100"></hx-meter>');
+      await el.updateComplete;
+      const base = shadowQuery(el, '[part="base"]');
+      expect(base?.getAttribute('aria-valuetext')).toBe('30 of 100');
+    });
+
+    it('sets aria-valuetext including state when thresholds produce optimum', async () => {
+      const el = await fixture<HelixMeter>(
+        '<hx-meter value="50" min="0" max="100" low="25" high="75" optimum="50"></hx-meter>',
+      );
+      await el.updateComplete;
+      const base = shadowQuery(el, '[part="base"]');
+      expect(base?.getAttribute('aria-valuetext')).toBe('50 of 100 (optimum)');
+    });
+
+    it('sets aria-valuetext including state when thresholds produce warning', async () => {
+      const el = await fixture<HelixMeter>(
+        '<hx-meter value="80" min="0" max="100" low="25" high="75" optimum="50"></hx-meter>',
+      );
+      await el.updateComplete;
+      const base = shadowQuery(el, '[part="base"]');
+      expect(base?.getAttribute('aria-valuetext')).toBe('80 of 100 (warning)');
+    });
+
+    it('sets aria-valuetext including state when thresholds produce danger', async () => {
+      const el = await fixture<HelixMeter>(
+        '<hx-meter value="10" min="0" max="100" low="25" high="75" optimum="90"></hx-meter>',
+      );
+      await el.updateComplete;
+      const base = shadowQuery(el, '[part="base"]');
+      expect(base?.getAttribute('aria-valuetext')).toBe('10 of 100 (danger)');
+    });
+
+    it('uses aria-labelledby when slot content is provided without label attribute', async () => {
+      const el = await fixture<HelixMeter>(
+        '<hx-meter value="45" min="0" max="200"><span slot="label">Custom</span></hx-meter>',
+      );
+      await el.updateComplete;
+      const base = shadowQuery(el, '[part="base"]');
+      expect(base?.getAttribute('aria-labelledby')).toBe('label');
     });
   });
 
@@ -307,6 +348,11 @@ describe('hx-meter', () => {
     it('exposes "indicator" part', async () => {
       const el = await fixture<HelixMeter>('<hx-meter></hx-meter>');
       expect(shadowQuery(el, '[part~="indicator"]')).toBeTruthy();
+    });
+
+    it('exposes "track" part', async () => {
+      const el = await fixture<HelixMeter>('<hx-meter></hx-meter>');
+      expect(shadowQuery(el, '[part~="track"]')).toBeTruthy();
     });
 
     it('exposes "label" part when label is set', async () => {
@@ -326,6 +372,33 @@ describe('hx-meter', () => {
       const slotContent = el.querySelector('[slot="label"]');
       expect(slotContent).toBeTruthy();
       expect(slotContent?.textContent).toBe('Custom label');
+    });
+  });
+
+  // ─── Boundary / Edge Cases ───
+
+  describe('Boundary / Edge Cases', () => {
+    it('value exactly at low threshold is in middle zone (optimum)', async () => {
+      const el = await fixture<HelixMeter>(
+        '<hx-meter value="25" min="0" max="100" low="25" high="75" optimum="50"></hx-meter>',
+      );
+      await el.updateComplete;
+      expect(el.dataset['state']).toBe('optimum');
+    });
+
+    it('value exactly at high threshold is in middle zone (optimum)', async () => {
+      const el = await fixture<HelixMeter>(
+        '<hx-meter value="75" min="0" max="100" low="25" high="75" optimum="50"></hx-meter>',
+      );
+      await el.updateComplete;
+      expect(el.dataset['state']).toBe('optimum');
+    });
+
+    it('handles min === max without throwing (zero-division guard)', async () => {
+      const el = await fixture<HelixMeter>('<hx-meter value="5" min="5" max="5"></hx-meter>');
+      await el.updateComplete;
+      const indicator = shadowQuery(el, '[part="indicator"]') as HTMLElement;
+      expect(indicator?.style.width).toBe('0%');
     });
   });
 
