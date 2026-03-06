@@ -1,6 +1,7 @@
 # hx-meter — Antagonistic Quality Audit (T3-03)
 
 **Audited files:**
+
 - `hx-meter.ts`
 - `hx-meter.styles.ts`
 - `hx-meter.test.ts`
@@ -134,7 +135,7 @@ If a `size` property is added (see TypeScript P2), corresponding stories are abs
 The audit requirements explicitly list expected CSS parts as `(track, fill, label)`. The `.meter__track` div has no `part` attribute:
 
 ```html
-<div class="meter__track">
+<div class="meter__track"></div>
 ```
 
 Consumers cannot style the track via `::part(track)`. This violates the component's documented customization contract. The audit requirement calls out `track` as a required CSS part.
@@ -201,27 +202,27 @@ There is no `hx-meter.twig` file or Drupal-specific documentation in the compone
 
 ## Summary Table
 
-| # | Area        | Severity | Finding |
-|---|-------------|----------|---------|
-| 1 | Accessibility | P1 | No `aria-valuetext` — semantic state (optimum/warning/danger) not communicated to screen readers |
-| 2 | Accessibility | P1 | Slot-only label produces wrong accessible name (WCAG 2.5.3 violation) |
-| 3 | CSS          | P1 | Missing `track` CSS part — required by audit contract |
-| 4 | Storybook    | P1 | Default story controls for `low`, `high`, `optimum` are non-functional (not bound in render) |
-| 5 | Tests        | P1 | No test for `aria-valuetext` (feature also missing) |
-| 6 | Tests        | P1 | Slot-only label accessible name bug is untested |
-| 7 | TypeScript   | P2 | Final `return 'default'` in `_resolveState()` is unreachable — dead code |
-| 8 | TypeScript   | P2 | No `size` property if size variants are expected |
-| 9 | Accessibility | P2 | `role="meter"` element not focusable (no `tabindex="0"`) |
-| 10 | Accessibility | P2 | `data-state` attribute set redundantly on both host and inner div |
-| 11 | Tests        | P2 | Test description at line 260 says "default" but asserts "optimum" — misleading |
-| 12 | Tests        | P2 | Boundary values `value === low` and `value === high` not tested |
-| 13 | Tests        | P2 | `min === max` zero-division guard not tested |
-| 14 | Tests        | P2 | Duplicate CSS-part assertions in Rendering and CSS Parts suites |
-| 15 | Storybook    | P2 | `LabelSlot` story demonstrates an accessibility failure silently |
-| 16 | Storybook    | P2 | No story for aria-label-only (no visible label) usage |
-| 17 | CSS          | P2 | No `size` CSS variants or custom property |
-| 18 | Performance  | P2 | Bundle size not verified against 5KB gate for this component specifically |
-| 19 | Drupal       | P2 | No Twig template or Drupal usage example |
+| #   | Area          | Severity | Finding                                                                                          |
+| --- | ------------- | -------- | ------------------------------------------------------------------------------------------------ |
+| 1   | Accessibility | P1       | No `aria-valuetext` — semantic state (optimum/warning/danger) not communicated to screen readers |
+| 2   | Accessibility | P1       | Slot-only label produces wrong accessible name (WCAG 2.5.3 violation)                            |
+| 3   | CSS           | P1       | Missing `track` CSS part — required by audit contract                                            |
+| 4   | Storybook     | P1       | Default story controls for `low`, `high`, `optimum` are non-functional (not bound in render)     |
+| 5   | Tests         | P1       | No test for `aria-valuetext` (feature also missing)                                              |
+| 6   | Tests         | P1       | Slot-only label accessible name bug is untested                                                  |
+| 7   | TypeScript    | P2       | Final `return 'default'` in `_resolveState()` is unreachable — dead code                         |
+| 8   | TypeScript    | P2       | No `size` property if size variants are expected                                                 |
+| 9   | Accessibility | P2       | `role="meter"` element not focusable (no `tabindex="0"`)                                         |
+| 10  | Accessibility | P2       | `data-state` attribute set redundantly on both host and inner div                                |
+| 11  | Tests         | P2       | Test description at line 260 says "default" but asserts "optimum" — misleading                   |
+| 12  | Tests         | P2       | Boundary values `value === low` and `value === high` not tested                                  |
+| 13  | Tests         | P2       | `min === max` zero-division guard not tested                                                     |
+| 14  | Tests         | P2       | Duplicate CSS-part assertions in Rendering and CSS Parts suites                                  |
+| 15  | Storybook     | P2       | `LabelSlot` story demonstrates an accessibility failure silently                                 |
+| 16  | Storybook     | P2       | No story for aria-label-only (no visible label) usage                                            |
+| 17  | CSS           | P2       | No `size` CSS variants or custom property                                                        |
+| 18  | Performance   | P2       | Bundle size not verified against 5KB gate for this component specifically                        |
+| 19  | Drupal        | P2       | No Twig template or Drupal usage example                                                         |
 
 **P0 findings: 0**
 **P1 findings: 6**
