@@ -107,9 +107,7 @@ export const WithPrefixIcons: Story = {
           stroke-linejoin="round"
           aria-hidden="true"
         >
-          <path
-            d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"
-          />
+          <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7" />
           <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" />
         </svg>
         Edit Record
@@ -177,6 +175,22 @@ export const CheckboxItems: Story = {
       </hx-menu-item>
       <hx-menu-item type="checkbox" value="sms">SMS Alerts</hx-menu-item>
       <hx-menu-item type="checkbox" value="push">Push Notifications</hx-menu-item>
+    </hx-menu>
+  `,
+};
+
+// ─────────────────────────────────────────────────
+// 5b. RADIO GROUP ITEMS
+// ─────────────────────────────────────────────────
+
+export const RadioGroupItems: Story = {
+  name: 'Radio Group Items',
+  render: () => html`
+    <hx-menu>
+      <hx-menu-item type="radio" value="low" checked>Low Priority</hx-menu-item>
+      <hx-menu-item type="radio" value="medium">Medium Priority</hx-menu-item>
+      <hx-menu-item type="radio" value="high">High Priority</hx-menu-item>
+      <hx-menu-item type="radio" value="urgent">Urgent</hx-menu-item>
     </hx-menu>
   `,
 };
@@ -252,8 +266,7 @@ export const SelectEvent: Story = {
     </div>
     <script>
       document.getElementById('demo-menu').addEventListener('hx-select', (e) => {
-        document.getElementById('demo-output').textContent =
-          'Selected: ' + e.detail.value;
+        document.getElementById('demo-output').textContent = 'Selected: ' + e.detail.value;
       });
     </script>
   `,
@@ -355,12 +368,8 @@ export const HealthcareContextMenu: Story = {
           stroke-linejoin="round"
           aria-hidden="true"
         >
-          <path
-            d="M9 11l3 3L22 4"
-          />
-          <path
-            d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"
-          />
+          <path d="M9 11l3 3L22 4" />
+          <path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11" />
         </svg>
         Place Order
       </hx-menu-item>
