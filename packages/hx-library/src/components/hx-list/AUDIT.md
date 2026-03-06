@@ -1,6 +1,7 @@
 # hx-list Antagonistic Audit (T2-03)
 
 Reviewed files:
+
 - `hx-list.ts`
 - `hx-list-item.ts`
 - `hx-list.styles.ts`
@@ -67,6 +68,7 @@ The JSDoc states `label` is "Required when variant is 'interactive' (listbox rol
 ### P0 — ARIA listbox pattern is missing required keyboard navigation
 
 Per ARIA Authoring Practices Guide (APG), a `role="listbox"` widget MUST support:
+
 - `ArrowDown` / `ArrowUp` to move focus between options
 - `Home` / `End` to jump to first/last option
 - (Optionally) `ArrowDown` with selection movement
@@ -206,6 +208,7 @@ The `Interactive` story's `@hx-select` handler calls `console.log`. Storybook ac
 ### P0 — `:host-context()` is deprecated and unsupported in Firefox
 
 All interactive item styling — `cursor: pointer`, hover background, and `focus-visible` ring — is gated behind `:host-context(hx-list[variant='interactive'])`. This pseudo-class:
+
 - Was removed from the CSS Scoping Level 1 spec
 - Has **never been supported in Firefox** (or Safari)
 - Is supported only in Chromium (and may be removed in future versions)
@@ -266,35 +269,35 @@ The component is declarative and can be rendered via Twig (`<hx-list variant="bu
 
 ## Summary Table
 
-| # | Severity | Area | Finding |
-|---|----------|------|---------|
-| 1 | P0 | TypeScript | Description list (`<dl>`) variant missing |
-| 2 | P0 | CSS | `:host-context()` unsupported in Firefox — interactive styles broken |
-| 3 | P0 | Accessibility | Listbox pattern missing arrow key navigation (WCAG 2.1.1) |
-| 4 | P0 | Accessibility | ARIA ownership broken across double Shadow DOM boundary |
-| 5 | P1 | TypeScript | Unsafe `as HelixListItem` cast without `instanceof` guard |
-| 6 | P1 | TypeScript | `label` not enforced for interactive variant |
-| 7 | P1 | Accessibility | `aria-multiselectable` absent on listbox |
-| 8 | P1 | Accessibility | `<a>` inside `role="option"` — invalid ARIA |
-| 9 | P1 | Accessibility | Numbered list not covered by axe-core test |
-| 10 | P1 | TypeScript | `_isInteractive` not reactive to parent variant changes |
-| 11 | P1 | Tests | No tests for nested lists |
-| 12 | P1 | Tests | No keyboard navigation tests (`Enter`/`Space`/arrow keys) |
-| 13 | P1 | Tests | `href` + `disabled` combination untested |
-| 14 | P1 | Tests | Negative event assertion uses unreliable timing |
-| 15 | P1 | CSS | `--hx-list-item-description-color` token missing |
-| 16 | P1 | Storybook | Interactive story missing `label` attribute (WCAG failure) |
-| 17 | P2 | Accessibility | `<ol role="list">` suppresses ordered semantics in VoiceOver |
-| 18 | P2 | TypeScript | `closest()` not reactive and doesn't pierce Shadow DOM |
-| 19 | P2 | Tests | Description slot rendering untested |
-| 20 | P2 | Tests | `label` → `aria-label` binding untested |
-| 21 | P2 | Storybook | No nested list story |
-| 22 | P2 | Storybook | No description list story |
-| 23 | P2 | CSS | Hardcoded hex fallbacks may drift from token values |
-| 24 | P2 | CSS | No `--hx-list-marker-*` token for bullet/number customization |
-| 25 | P2 | Performance | Bundle size not measured/verified |
-| 26 | P2 | Drupal | No Twig template or Drupal behavior for interactive mode |
-| 27 | P3 | Storybook | `console.log` should be replaced with Storybook `fn()`/`action()` |
-| 28 | P3 | CSS | `outline: none` intent inconsistent across browsers |
+| #   | Severity | Area          | Finding                                                              |
+| --- | -------- | ------------- | -------------------------------------------------------------------- |
+| 1   | P0       | TypeScript    | Description list (`<dl>`) variant missing                            |
+| 2   | P0       | CSS           | `:host-context()` unsupported in Firefox — interactive styles broken |
+| 3   | P0       | Accessibility | Listbox pattern missing arrow key navigation (WCAG 2.1.1)            |
+| 4   | P0       | Accessibility | ARIA ownership broken across double Shadow DOM boundary              |
+| 5   | P1       | TypeScript    | Unsafe `as HelixListItem` cast without `instanceof` guard            |
+| 6   | P1       | TypeScript    | `label` not enforced for interactive variant                         |
+| 7   | P1       | Accessibility | `aria-multiselectable` absent on listbox                             |
+| 8   | P1       | Accessibility | `<a>` inside `role="option"` — invalid ARIA                          |
+| 9   | P1       | Accessibility | Numbered list not covered by axe-core test                           |
+| 10  | P1       | TypeScript    | `_isInteractive` not reactive to parent variant changes              |
+| 11  | P1       | Tests         | No tests for nested lists                                            |
+| 12  | P1       | Tests         | No keyboard navigation tests (`Enter`/`Space`/arrow keys)            |
+| 13  | P1       | Tests         | `href` + `disabled` combination untested                             |
+| 14  | P1       | Tests         | Negative event assertion uses unreliable timing                      |
+| 15  | P1       | CSS           | `--hx-list-item-description-color` token missing                     |
+| 16  | P1       | Storybook     | Interactive story missing `label` attribute (WCAG failure)           |
+| 17  | P2       | Accessibility | `<ol role="list">` suppresses ordered semantics in VoiceOver         |
+| 18  | P2       | TypeScript    | `closest()` not reactive and doesn't pierce Shadow DOM               |
+| 19  | P2       | Tests         | Description slot rendering untested                                  |
+| 20  | P2       | Tests         | `label` → `aria-label` binding untested                              |
+| 21  | P2       | Storybook     | No nested list story                                                 |
+| 22  | P2       | Storybook     | No description list story                                            |
+| 23  | P2       | CSS           | Hardcoded hex fallbacks may drift from token values                  |
+| 24  | P2       | CSS           | No `--hx-list-marker-*` token for bullet/number customization        |
+| 25  | P2       | Performance   | Bundle size not measured/verified                                    |
+| 26  | P2       | Drupal        | No Twig template or Drupal behavior for interactive mode             |
+| 27  | P3       | Storybook     | `console.log` should be replaced with Storybook `fn()`/`action()`    |
+| 28  | P3       | CSS           | `outline: none` intent inconsistent across browsers                  |
 
 **P0 count: 4 — RELEASE BLOCKED**
