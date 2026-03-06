@@ -268,10 +268,10 @@ export class HelixTimePicker extends LitElement {
   // ─── Query References ───
 
   @query('.field__input')
-  private _inputEl: HTMLInputElement | null = null;
+  private _inputEl!: HTMLInputElement;
 
   @query('.field__listbox')
-  private _listboxEl: HTMLUListElement | null = null;
+  private _listboxEl!: HTMLUListElement;
 
   // ─── Computed Slots ───
 
