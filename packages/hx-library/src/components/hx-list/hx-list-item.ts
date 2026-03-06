@@ -1,5 +1,6 @@
 import { LitElement, html, nothing } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
+import { classMap } from 'lit/directives/class-map.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import { tokenStyles } from '@helix/tokens/lit';
 import { helixListItemStyles } from './hx-list-item.styles.js';
@@ -9,6 +10,7 @@ import type { HelixList } from './hx-list.js';
  * A rich list item for use inside `hx-list`.
  *
  * @summary Individual list item with optional prefix, suffix, description, link, and disabled/selected states.
+ * Uses `role="option"` inside interactive lists and `role="listitem"` otherwise.
  *
  * @tag hx-list-item
  *
@@ -31,9 +33,15 @@ import type { HelixList } from './hx-list.js';
  * @cssprop [--hx-list-item-bg-hover=var(--hx-color-neutral-50)] - Item hover background.
  * @cssprop [--hx-list-item-bg-selected=var(--hx-color-primary-50)] - Selected item background.
  * @cssprop [--hx-list-item-color-selected=var(--hx-color-primary-700)] - Selected item text color.
+ * @cssprop [--hx-list-item-description-color=var(--hx-color-neutral-500)] - Description text color.
  */
 @customElement('hx-list-item')
 export class HelixListItem extends LitElement {
+  static override shadowRootOptions: ShadowRootInit = {
+    ...LitElement.shadowRootOptions,
+    delegatesFocus: true,
+  };
+
   static override styles = [tokenStyles, helixListItemStyles];
 
   /**
@@ -51,7 +59,8 @@ export class HelixListItem extends LitElement {
   selected = false;
 
   /**
-   * When set, renders the item as a link.
+   * When set, renders the item as a link (only in non-interactive lists).
+   * In interactive lists, href is ignored to maintain valid ARIA ownership.
    * @attr href
    */
   @property({ type: String })
@@ -64,13 +73,12 @@ export class HelixListItem extends LitElement {
   @property({ type: String })
   value: string | undefined = undefined;
 
+  /** @internal Set by parent hx-list to indicate interactive mode. */
+  @property({ type: Boolean, attribute: false })
+  _interactive = false;
+
   private get _parentList(): HelixList | null {
     return this.closest('hx-list') as HelixList | null;
-  }
-
-  private get _isInteractive(): boolean {
-    const parent = this._parentList;
-    return parent?.variant === 'interactive';
   }
 
   private _handleClick(e: MouseEvent): void {
@@ -109,20 +117,21 @@ export class HelixListItem extends LitElement {
   }
 
   override render() {
-    const isInteractive = this._isInteractive;
+    const isInteractive = this._interactive;
 
-    // Determine ARIA role
     const role = isInteractive ? 'option' : 'listitem';
 
-    if (this.href !== undefined && !this.disabled) {
+    const classes = classMap({
+      'list-item': true,
+      'list-item--interactive': isInteractive,
+      'list-item--selected': this.selected,
+      'list-item--disabled': this.disabled,
+    });
+
+    // In interactive mode, href is ignored to avoid invalid ARIA (anchor inside option)
+    if (this.href !== undefined && !this.disabled && !isInteractive) {
       return html`
-        <li
-          part="base"
-          class="list-item"
-          role=${role}
-          aria-selected=${isInteractive ? String(this.selected) : nothing}
-          aria-disabled=${this.disabled ? 'true' : nothing}
-        >
+        <li part="base" class=${classes} role=${role}>
           <a class="list-item__link" href=${ifDefined(this.href)} @click=${this._handleClick}>
             ${this._renderContent()}
           </a>
@@ -133,9 +142,7 @@ export class HelixListItem extends LitElement {
     return html`
       <li
         part="base"
-        class="list-item ${this.selected ? 'list-item--selected' : ''} ${this.disabled
-          ? 'list-item--disabled'
-          : ''}"
+        class=${classes}
         role=${role}
         aria-selected=${isInteractive ? String(this.selected) : nothing}
         aria-disabled=${this.disabled ? 'true' : nothing}
