@@ -25,6 +25,9 @@ export const helixActionBarStyles = css`
     position: sticky;
     top: 0;
     z-index: var(--hx-action-bar-z-index, 10);
+    padding-top: calc(
+      var(--hx-action-bar-padding, var(--hx-space-2, 0.5rem)) + env(safe-area-inset-top, 0px)
+    );
   }
 
   /* ─── Variant: outlined ─── */
@@ -90,13 +93,5 @@ export const helixActionBarStyles = css`
 
   ::slotted(*) {
     flex-shrink: 0;
-  }
-
-  /* ─── Reduced Motion ─── */
-
-  @media (prefers-reduced-motion: reduce) {
-    .base {
-      transition: none;
-    }
   }
 `;
