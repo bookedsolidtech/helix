@@ -140,16 +140,17 @@ export class HelixImage extends LitElement {
       ...(this.ratio ? { '--_ratio': this.ratio } : {}),
       ...(this.fit ? { '--_fit': this.fit } : {}),
       ...(borderRadius ? { '--_radius': borderRadius } : {}),
-      ...(this.width != null ? { width: typeof this.width === 'number' ? `${this.width}px` : this.width } : {}),
-      ...(this.height != null ? { height: typeof this.height === 'number' ? `${this.height}px` : this.height } : {}),
+      ...(this.width != null
+        ? { width: typeof this.width === 'number' ? `${this.width}px` : this.width }
+        : {}),
+      ...(this.height != null
+        ? { height: typeof this.height === 'number' ? `${this.height}px` : this.height }
+        : {}),
     };
 
     if (this._error) {
       return html`
-        <div
-          class="image__container image__container--error"
-          style=${styleMap(containerStyles)}
-        >
+        <div class="image__container image__container--error" style=${styleMap(containerStyles)}>
           <slot name="fallback"></slot>
         </div>
       `;
