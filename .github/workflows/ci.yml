@@ -104,11 +104,7 @@ jobs:
     needs: changes
     if: needs.changes.outputs.source == 'true'
     runs-on: ubuntu-latest
-<<<<<<< HEAD
-    timeout-minutes: 20
-=======
     timeout-minutes: 30
->>>>>>> origin/dev
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
