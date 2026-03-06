@@ -2,7 +2,7 @@
   "category": "Uncategorized",
   "description": "Antagonistic quality review of `hx-structured-list` (T3-05) **after implementation completes**.\\n\\nReview every file in `packages/hx-library/src/components/hx-structured-list/` critically.\\n\\n**Audit areas:**\\n1. TypeScript — strict, selectable prop typed, row/cell data typed, header typed\\n2. Accessibility — if selectable: radio group pattern with keyboard, otherwise `role=\"grid\"` or table semantics, row selection aria-selected, axe-core pass\\n3. Tests — basic display, selectable rows, keyboard selection, header alignment, striped variant, 80%+ coverage\\n4. Storybook — basic, selectable, with header, striped\\n5. CSS — `--hx-*` tokens, row hover/selected states, CSS parts (list, row, cell, header)\\n6. Performance — bundle < 5KB\\n7. Drupal — Twig-renderable\\n\\n**Output:** Write findings to `packages/hx-library/src/components/hx-structured-list/AUDIT.md` with severity (P0/P1/P2). DO NOT fix — document only. Commit AUDIT.md as your PR.",
   "title": "AUDIT: hx-structured-list — T3-05 antagonistic quality review",
-  "status": "backlog",
+  "status": "done",
   "dependencies": [
     "feature-1772753167412-iqsl8y2m8"
   ],
@@ -28,6 +28,13 @@
       "to": "backlog",
       "timestamp": "2026-03-05T23:37:22.051Z",
       "reason": "Feature created"
+    },
+    {
+      "from": "backlog",
+      "to": "done",
+      "timestamp": "2026-03-06T14:14:58.162Z"
     }
-  ]
+  ],
+  "featureType": "code",
+  "completedAt": "2026-03-06T14:14:58.162Z"
 }

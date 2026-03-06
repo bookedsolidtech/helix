@@ -2,7 +2,7 @@
   "category": "Uncategorized",
   "description": "Deep antagonistic quality review of `hx-alert` (T1-24). 5/6 libraries ship this.\n\nReview every file in `packages/hx-library/src/components/hx-alert/` critically.\n\n**Audit areas:**\n1. TypeScript — strict, variant typing (info/success/warning/error), dismissible prop, icon prop, title/description slots\n2. Accessibility — `role=\"alert\"` for dynamic alerts (auto-announced), `role=\"status\"` for informational, dismiss button has accessible label, icon is decorative (aria-hidden), status not conveyed by color alone (icon + text), axe-core pass\n3. Tests — all variants, dismissible behavior, programmatic show/hide, dynamic injection (role=\"alert\" fires), icon visibility\n4. Storybook — all variants, dismissible, with/without icon, with title slot\n5. CSS — left border variant, icon colors via `--hx-*` semantic tokens (never hardcoded), CSS parts (icon, title, body, close-button)\n6. Performance — bundle < 5KB\n7. Drupal — Twig-renderable, server-side rendered for static alerts\n\n**Output:** Write findings to `packages/hx-library/src/components/hx-alert/AUDIT.md` with severity (P0/P1/P2). DO NOT fix — document only. Commit AUDIT.md as your PR.",
   "title": "AUDIT: hx-alert — T1-24 antagonistic quality review",
-  "status": "backlog",
+  "status": "done",
   "complexity": "medium",
   "priority": 2,
   "source": "api",
@@ -25,6 +25,13 @@
       "to": "backlog",
       "timestamp": "2026-03-05T23:17:52.674Z",
       "reason": "Feature created"
+    },
+    {
+      "from": "backlog",
+      "to": "done",
+      "timestamp": "2026-03-06T14:12:08.503Z"
     }
-  ]
+  ],
+  "featureType": "code",
+  "completedAt": "2026-03-06T14:12:08.503Z"
 }

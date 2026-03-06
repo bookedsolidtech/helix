@@ -2,7 +2,7 @@
   "category": "Uncategorized",
   "description": "Implement `hx-focus-ring` (T4 Infrastructure) — utility that renders a consistent visible focus indicator around an element, using CSS custom properties from the design token system.\n\n**Files to create** in `packages/hx-library/src/components/hx-focus-ring/`:\n- `index.ts`, `hx-focus-ring.ts`, `hx-focus-ring.styles.ts`, `hx-focus-ring.stories.ts`, `hx-focus-ring.test.ts`\n\n**Props:** `visible` (boolean — show/hide ring), `color` (string — CSS color override, falls back to `--hx-focus-ring-color`), `width` (string — ring width, falls back to `--hx-focus-ring-width`), `offset` (string — ring offset, falls back to `--hx-focus-ring-offset`), `shape` (`box`|`circle`|`pill`)\n\n**Slots:** default (the focusable element being wrapped)\n\n**CSS Parts:** `base`, `ring`\n\n**Implementation:** Renders an absolutely-positioned `<div part=\"ring\">` that overlays the slotted content. The ring is only visible when `visible=true`. Other components use this internally for consistent focus indication.\n\n**ARIA:** No ARIA semantics — purely visual. The slotted focusable element manages its own ARIA.\n\n**Quality gates:** type-check zero errors, tests (visible toggle, token consumption), axe-core zero violations, Storybook showing button wrapped in focus ring, bundle < 2KB.\n\nRegister in `packages/hx-library/src/index.ts` and `packages/hx-library/vite.config.ts`.",
   "title": "IMPLEMENT: hx-focus-ring — T4 Focus Indicator Utility",
-  "status": "backlog",
+  "status": "done",
   "complexity": "small",
   "priority": 3,
   "source": "api",
@@ -25,6 +25,14 @@
       "to": "backlog",
       "timestamp": "2026-03-05T23:28:32.272Z",
       "reason": "Feature created"
+    },
+    {
+      "from": "backlog",
+      "to": "done",
+      "timestamp": "2026-03-06T14:13:27.092Z"
     }
-  ]
+  ],
+  "featureType": "code",
+  "prLastPolledAt": "2026-03-06T14:01:11.489Z",
+  "completedAt": "2026-03-06T14:13:27.092Z"
 }

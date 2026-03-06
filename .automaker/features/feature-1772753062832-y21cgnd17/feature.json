@@ -2,7 +2,7 @@
   "category": "Uncategorized",
   "description": "Implement `hx-list` and `hx-list-item` (T2 tier) — 4/6 enterprise libraries ship this. Styled list container with rich list items.\n\n**Files to create** in `packages/hx-library/src/components/hx-list/`:\n- `index.ts`, `hx-list.ts`, `hx-list.styles.ts`, `hx-list.stories.ts`, `hx-list.test.ts`\n\n**`hx-list` props:** `variant` (`plain`|`bulleted`|`numbered`|`interactive`), `divided` (boolean — dividers between items)\n\n**`hx-list-item` props:** `disabled` (boolean), `selected` (boolean), `href` (string — makes item a link), `value` (string)\n\n**Slots on `hx-list-item`:** default (label), `prefix` (icon/avatar), `suffix` (icon/badge/text), `description` (secondary text)\n\n**Events:** `hx-select` on `hx-list` when item clicked (interactive mode), `hx-list-item-click` on item\n\n**CSS Parts:** `hx-list`: `base`; `hx-list-item`: `base`, `prefix`, `label`, `description`, `suffix`\n\n**ARIA:** Interactive variant: `hx-list` gets `role=\"listbox\"`, items get `role=\"option\"` with `aria-selected`. Plain/bulleted: `role=\"list\"` + `role=\"listitem\"`.\n\n**Quality gates:** type-check zero errors, all tests, axe-core zero violations (both interactive and plain modes), Storybook all variants, CEM accurate, bundle < 4KB.\n\nRegister `hx-list` and `hx-list-item` in `packages/hx-library/src/index.ts` and `packages/hx-library/vite.config.ts`.",
   "title": "IMPLEMENT: hx-list — T2 List/List Item Component",
-  "status": "backlog",
+  "status": "done",
   "complexity": "small",
   "priority": 3,
   "source": "api",
@@ -25,6 +25,13 @@
       "to": "backlog",
       "timestamp": "2026-03-05T23:24:22.833Z",
       "reason": "Feature created"
+    },
+    {
+      "from": "backlog",
+      "to": "done",
+      "timestamp": "2026-03-06T14:12:49.266Z"
     }
-  ]
+  ],
+  "featureType": "code",
+  "completedAt": "2026-03-06T14:12:49.266Z"
 }

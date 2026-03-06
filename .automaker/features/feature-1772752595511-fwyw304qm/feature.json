@@ -2,7 +2,7 @@
   "category": "Uncategorized",
   "description": "Deep antagonistic quality review of `hx-radio-group` (T1-11). 6/6 libraries ship this.\n\nReview every file in `packages/hx-library/src/components/hx-radio-group/` critically.\n\n**Audit areas:**\n1. TypeScript — strict, slotted radio child typing, value/selected-value typing, form association via ElementInternals\n2. Accessibility — `role=\"radiogroup\"` with `aria-labelledby`, individual radios `role=\"radio\"` with `aria-checked`, roving tabindex (only one radio in tab order at a time), arrow keys navigate within group, axe-core pass\n3. Tests — selection behavior, keyboard navigation (arrows), form association and submission, required validation, disabled group/individual radios\n4. Storybook — horizontal/vertical layout, required, error state, disabled variants\n5. CSS — consistent radio styling, `--hx-*` tokens, CSS parts\n6. Performance — bundle < 5KB\n7. Drupal — Twig-renderable with slotted radios\n\n**Output:** Write findings to `packages/hx-library/src/components/hx-radio-group/AUDIT.md` with severity (P0/P1/P2). DO NOT fix — document only. Commit AUDIT.md as your PR.",
   "title": "AUDIT: hx-radio-group — T1-11 antagonistic quality review",
-  "status": "backlog",
+  "status": "done",
   "complexity": "medium",
   "priority": 2,
   "source": "api",
@@ -25,6 +25,13 @@
       "to": "backlog",
       "timestamp": "2026-03-05T23:16:35.511Z",
       "reason": "Feature created"
+    },
+    {
+      "from": "backlog",
+      "to": "done",
+      "timestamp": "2026-03-06T14:11:47.517Z"
     }
-  ]
+  ],
+  "featureType": "code",
+  "completedAt": "2026-03-06T14:11:47.517Z"
 }

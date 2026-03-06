@@ -2,7 +2,7 @@
   "category": "Uncategorized",
   "description": "Antagonistic quality review of `hx-code-snippet` (T3-13) **after implementation completes**.\\n\\nReview every file in `packages/hx-library/src/components/hx-code-snippet/` critically.\\n\\n**Audit areas:**\\n1. TypeScript — strict, language typed, copy-to-clipboard prop typed, line numbers prop typed\\n2. Accessibility — code block uses `<pre><code>` semantics, copy button has accessible label + success state announced, keyboard operable copy, syntax highlighting doesn't break screen reader reading, axe-core pass\\n3. Tests — copy to clipboard, language display, line numbers, overflow scroll, expand/collapse for long snippets, 80%+ coverage\\n4. Storybook — multiple languages, with/without line numbers, copy demo\\n5. CSS — `--hx-*` tokens for code colors (monospace font token), CSS parts (code, copy-btn, header)\\n6. Performance — bundle < 5KB (no bundled syntax highlighter — use CSS or minimal approach)\\n7. Drupal — Twig-renderable\\n\\n**Output:** Write findings to `packages/hx-library/src/components/hx-code-snippet/AUDIT.md` with severity (P0/P1/P2). DO NOT fix — document only. Commit AUDIT.md as your PR.",
   "title": "AUDIT: hx-code-snippet — T3-13 antagonistic quality review",
-  "status": "backlog",
+  "status": "in_progress",
   "dependencies": [
     "feature-1772753229940-6wpqe4u6z"
   ],
@@ -28,6 +28,14 @@
       "to": "backlog",
       "timestamp": "2026-03-05T23:38:18.455Z",
       "reason": "Feature created"
+    },
+    {
+      "from": "backlog",
+      "to": "in_progress",
+      "timestamp": "2026-03-06T14:57:26.417Z"
     }
-  ]
+  ],
+  "featureType": "code",
+  "model": "claude-sonnet-4-6",
+  "updatedAt": "2026-03-06T14:57:30.210Z"
 }

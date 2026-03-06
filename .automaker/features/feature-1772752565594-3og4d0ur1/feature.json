@@ -2,7 +2,7 @@
   "category": "Uncategorized",
   "description": "Deep antagonistic quality review of `hx-icon-button` (T1-02). 5/6 libraries ship this.\n\nReview every file in `packages/hx-library/src/components/hx-icon-button/` critically.\n\n**Audit areas:**\n1. TypeScript — strict compliance, no `any`, proper typing for icon name/label props\n2. Accessibility — icon-only button MUST have accessible label (aria-label or visually-hidden text), keyboard activation, focus visible, tooltip integration if present, axe-core pass\n3. Tests — all sizes, all states (default/disabled/loading), accessible label present, axe scan\n4. Storybook — all variants with controls, accessible label demonstrated\n5. CSS — `--hx-*` tokens only, circular/square shape variants, CSS parts exposed\n6. Performance — bundle < 5KB\n7. Drupal — Twig-renderable\n\n**Output:** Write findings to `packages/hx-library/src/components/hx-icon-button/AUDIT.md` with severity (P0/P1/P2) and file:line refs. DO NOT fix — document only. Commit AUDIT.md as your PR.",
   "title": "AUDIT: hx-icon-button — T1-02 antagonistic quality review",
-  "status": "backlog",
+  "status": "done",
   "complexity": "medium",
   "priority": 2,
   "source": "api",
@@ -55,6 +55,11 @@
       "from": "blocked",
       "to": "backlog",
       "timestamp": "2026-03-05T23:33:56.683Z"
+    },
+    {
+      "from": "backlog",
+      "to": "done",
+      "timestamp": "2026-03-06T14:11:43.069Z"
     }
   ],
   "featureType": "code",
@@ -75,5 +80,6 @@
     }
   ],
   "summary": "## Summary: Deep antagonistic quality review of `hx-icon-button` (T1-02)\n\n### Changes Implemented\n- Wrote `AUDIT.md` with full antagonistic review across all 7 audit areas\n- 2 P0, 9 P1, 11 P2 findings documented with file:line references and fix priority\n\n### Files Modified\n- `packages/hx-library/src/components/hx-icon-button/AUDIT.md` (created, 294 lines)\n\n### Key Findings\n\n**P0 (blocking):**\n1. **Form data bug** — `name`/`value` props are forwarded to the inner `<button>` in Shadow DOM, but the custom element never calls `this._internals.setFormValue()`. Name/value pairs are silently lost from submitted form data. The existing test only checks that `submit` fired, not that `FormData` contains the value.\n2. **Keyboard tests are structurally invalid** — Tests dispatch a fake `keydown` event then immediately call `btn?.click()`. The keyboard event has zero effect; the `hx-click` event comes from `.click()`. These tests give false confidence that Enter/Space activation works.\n\n**Top P1 findings:**\n- Missing `loading` state entirely (spec calls for it)\n- Disabled `<a>` link loses semantic role (no `href`, no `role=\"link\"`)\n- Hover `filter: brightness()` applies on all variants, but secondary/tertiary/danger/ghost also override bg-color on hover — double-darkening, visual inconsistency vs. primary\n- `title` tooltip is inaccessible to keyboard and touch users\n\n### Verification Status\n- No code changes made; audit is documentation-only per feature spec\n- No Playwright verification required (no functionality to verify)\n\n### Notes for Developer\n- P0-1 can be confirmed immediately: add `new FormData(form).get('action')` assertion to the \"submits name/value pair\" test — it will return `null`, not `'save'`\n- P0-2 can be confirmed: delete `btn?.click()` from the keyboard tests — they will time out waiting for `hx-click` that never fires",
-  "failureCount": 0
+  "failureCount": 0,
+  "completedAt": "2026-03-06T14:11:43.069Z"
 }

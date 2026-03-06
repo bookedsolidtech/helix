@@ -2,7 +2,7 @@
   "category": "Uncategorized",
   "description": "Implement `hx-image` (T3 tier) — 1/6 libraries ship this. Accessible image wrapper with lazy loading, fallback, and aspect ratio control.\n\n**Files to create** in `packages/hx-library/src/components/hx-image/`:\n- `index.ts`, `hx-image.ts`, `hx-image.styles.ts`, `hx-image.stories.ts`, `hx-image.test.ts`\n\n**Props:** `src` (string), `alt` (string — required for non-decorative), `width` (number|string), `height` (number|string), `loading` (`lazy`|`eager`, default `lazy`), `fit` (`contain`|`cover`|`fill`|`none`|`scale-down`), `ratio` (string — CSS aspect-ratio like \"16/9\" or \"1\"), `rounded` (boolean|string — border-radius), `fallback-src` (string — shown on error)\n\n**Slots:** `fallback` (custom error/loading state)\n\n**Events:** `hx-load`, `hx-error`\n\n**CSS Parts:** `base` (img element)\n\n**ARIA:** When `alt` is empty string: `role=\"presentation\"`. When `alt` provided: normal ``. Host element should NOT duplicate the alt via aria-label. The inner `` handles all semantics.\n\n**Quality gates:** type-check zero errors, all tests (load, error/fallback, alt handling), axe-core zero violations (both decorative and informative modes), Storybook all fit modes + aspect ratios, bundle < 2KB.\n\nRegister in `packages/hx-library/src/index.ts` and `packages/hx-library/vite.config.ts`.",
   "title": "IMPLEMENT: hx-image — T3 Accessible Image Component",
-  "status": "backlog",
+  "status": "done",
   "complexity": "small",
   "priority": 3,
   "source": "api",
@@ -25,6 +25,42 @@
       "to": "backlog",
       "timestamp": "2026-03-05T23:26:53.730Z",
       "reason": "Feature created"
+    },
+    {
+      "from": "backlog",
+      "to": "in_progress",
+      "timestamp": "2026-03-06T14:26:05.041Z"
+    },
+    {
+      "from": "in_progress",
+      "to": "review",
+      "timestamp": "2026-03-06T14:31:50.135Z"
+    },
+    {
+      "from": "review",
+      "to": "blocked",
+      "timestamp": "2026-03-06T14:40:50.257Z",
+      "reason": "Max state transitions exceeded"
+    },
+    {
+      "from": "blocked",
+      "to": "done",
+      "timestamp": "2026-03-06T14:41:01.476Z"
     }
-  ]
+  ],
+  "featureType": "code",
+  "model": "claude-sonnet-4-6",
+  "updatedAt": "2026-03-06T14:26:08.438Z",
+  "costUsd": 1.524903,
+  "lastSessionId": "d8a0600c-438e-4239-b1d5-ae632e03245f",
+  "prUrl": "https://github.com/bookedsolidtech/helix/pull/303",
+  "prNumber": 303,
+  "prCreatedAt": "2026-03-06T14:31:50.133Z",
+  "reviewStartedAt": "2026-03-06T14:31:50.135Z",
+  "prTrackedSince": "2026-03-06T14:31:50.136Z",
+  "prLastPolledAt": "2026-03-06T14:40:52.797Z",
+  "statusChangeReason": "Max state transitions exceeded",
+  "failureCount": 1,
+  "prMergedAt": "2026-03-06T14:40:18Z",
+  "completedAt": "2026-03-06T14:41:01.476Z"
 }

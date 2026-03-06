@@ -2,7 +2,7 @@
   "category": "Uncategorized",
   "description": "Antagonistic quality review of `hx-text` (T3-12) **after implementation completes**.\\n\\nReview every file in `packages/hx-library/src/components/hx-text/` critically.\\n\\n**Audit areas:**\\n1. TypeScript — strict, variant typed (body/lead/small/caption/overline), weight typed, color typed\\n2. Accessibility — semantic element selection (p, span, strong, em) based on context, heading levels NOT handled here (use hx-heading), truncation provides full text via title or aria-label, axe-core pass\\n3. Tests — all variants, truncation, all semantic element types, color variants, 80%+ coverage\\n4. Storybook — all variants with font size/weight/color controls\\n5. CSS — `--hx-*` typography tokens (font-size, line-height, letter-spacing), CSS parts (text)\\n6. Performance — bundle < 5KB\\n7. Drupal — Twig-renderable\\n\\n**Output:** Write findings to `packages/hx-library/src/components/hx-text/AUDIT.md` with severity (P0/P1/P2). DO NOT fix — document only. Commit AUDIT.md as your PR.",
   "title": "AUDIT: hx-text — T3-12 antagonistic quality review",
-  "status": "backlog",
+  "status": "done",
   "dependencies": [
     "feature-1772753221401-vi1k8e2qf"
   ],
@@ -28,6 +28,33 @@
       "to": "backlog",
       "timestamp": "2026-03-05T23:38:12.782Z",
       "reason": "Feature created"
+    },
+    {
+      "from": "backlog",
+      "to": "in_progress",
+      "timestamp": "2026-03-06T14:55:08.149Z"
     }
-  ]
+  ],
+  "featureType": "code",
+  "model": "claude-sonnet-4-6",
+  "updatedAt": "2026-03-06T14:59:13.777Z",
+  "costUsd": 0.7676455000000001,
+  "lastSessionId": "4114ae90-7157-4392-9f76-65a2272123cc",
+  "executionHistory": [
+    {
+      "id": "105e4db7-97ab-4c25-8aa4-f0b33427dfec",
+      "startedAt": "2026-03-06T14:55:08.486Z",
+      "completedAt": "2026-03-06T14:59:13.794Z",
+      "durationMs": 245308,
+      "costUsd": 0.7676455000000001,
+      "model": "claude-sonnet-4-6",
+      "success": true,
+      "trigger": "manual"
+    }
+  ],
+  "summary": "## Summary: Antagonistic quality review of `hx-text` (T3-12)\n\n### Changes Implemented\n- Wrote `AUDIT.md` with 12 findings (1 P0, 5 P1, 6 P2) covering all 7 required audit areas: TypeScript, Accessibility, Tests, Storybook, CSS, Performance, Drupal\n\n### Files Modified\n- `packages/hx-library/src/components/hx-text/AUDIT.md` (new file, 198 lines)\n\n### Key Findings\n\n**P0:**\n- `P0-01`: Truncated text (`truncate` / `lines`) adds no `title` or `aria-label` — screen readers cannot access clipped content; healthcare impact on patient name/note truncation\n\n**P1:**\n- `P1-01`: No semantic element selection (`as` prop) — always renders `<span>` with no mechanism for `<p>`, `<strong>`, `<em>`\n- `P1-02`: `:host([lines])` CSS selector matches `lines=\"0\"`, forcing `display:block` when no clamping is intended\n- `P1-03`: Variant set deviates from spec (`lead`/`small` missing; `body-sm`/`body-lg`/`label`/`label-sm`/`code` added) with no documentation\n- `P1-04`: No test verifying `-webkit-line-clamp` inline style is applied for `lines > 0`\n- `P1-05`: `inverse` color excluded from axe loop with no justification (only `disabled` is justified)\n\n**P2:**\n- Storybook `weight=\"\"` leakage (should use `ifDefined`)\n- `code` variant untested in a11y loop without explanation\n- Non-prefixed `line-clamp` in styleMap is a browser no-op\n- No Drupal Twig integration docs\n- `WcText` type alias uses stale naming prefix\n\n### Risks/Blockers Encountered\n- None — documentation-only task\n\n### Learnings\n- The CSS `:host([attr])` selector pattern is a recurring footgun — it matches any presence of the attribute including `attr=\"0\"` and `attr=\"false\"`. Components must use `:host([attr]:not([attr=\"0\"]))` or equivalent to avoid false positives.\n- Axe-core is insufficient as the sole accessibility test for truncation patterns. Full-text exposure requires explicit test assertions.\n\n### Notes for Developer\n- The P0 truncation fix requires the component to track the full text content (e.g., via a getter on `textContent`) and apply it as `title` when `truncate` or `lines` is active. The `title` attribute would need to be set on the host element or exposed via `aria-label` on the inner span.\n\n### Verification Status\n- This is an audit-only task (document findings, do not fix). No Playwright verification required. The AUDIT.md was committed and a PR was opened targeting `dev` (PR #333).",
+  "prUrl": "https://github.com/bookedsolidtech/helix/pull/333",
+  "prNumber": 333,
+  "prTrackedSince": "2026-03-06T14:59:51.992Z",
+  "prLastPolledAt": "2026-03-06T14:59:54.414Z"
 }
