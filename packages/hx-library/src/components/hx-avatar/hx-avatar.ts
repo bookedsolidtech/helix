@@ -1,4 +1,4 @@
-import { LitElement, html, nothing } from 'lit';
+import { LitElement, html, nothing, type PropertyValues } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { tokenStyles } from '@helix/tokens/lit';
@@ -26,6 +26,8 @@ import { helixAvatarStyles } from './hx-avatar.styles.js';
  * @cssprop [--hx-avatar-bg=var(--hx-color-primary-100)] - Background color of the avatar container.
  * @cssprop [--hx-avatar-color=var(--hx-color-primary-700)] - Text and icon color inside the avatar.
  * @cssprop [--hx-avatar-font-size] - Font size for the initials text, set per size variant.
+ *
+ * @property {string} label - Human-readable label. Overrides alt/initials for accessible name.
  */
 @customElement('hx-avatar')
 export class HelixAvatar extends LitElement {
@@ -44,6 +46,14 @@ export class HelixAvatar extends LitElement {
    */
   @property({ type: String })
   alt = '';
+
+  /**
+   * Human-readable label for the avatar. Used as the accessible name in non-image states.
+   * When omitted, falls back to `alt`, then `initials`, then 'Avatar'.
+   * @attr label
+   */
+  @property({ type: String })
+  label = '';
 
   /**
    * Fallback initials text displayed when no image is available.
@@ -77,6 +87,19 @@ export class HelixAvatar extends LitElement {
    */
   @state()
   private _hasDefaultSlot = false;
+
+  // ─── Lifecycle ───
+
+  override willUpdate(changedProperties: PropertyValues): void {
+    if (changedProperties.has('src')) {
+      this._imgError = false;
+    }
+    if (import.meta.env?.DEV && this.src && !this.alt && !this.label) {
+      console.warn(
+        `[hx-avatar] src is set without alt or label. Provide an alt or label attribute for accessibility.`,
+      );
+    }
+  }
 
   // ─── Slot Change Handling ───
 
@@ -125,7 +148,7 @@ export class HelixAvatar extends LitElement {
     const showInitials = !showSlot && !showImage && !!this.initials.trim();
     const showFallback = !showSlot && !showImage && !showInitials;
 
-    const ariaLabel = showImage ? this.alt || 'Avatar' : showInitials ? this.initials : 'Avatar';
+    const ariaLabel = this.label || this.alt || (showInitials ? this.initials : '') || 'Avatar';
 
     const classes = {
       avatar: true,
@@ -147,6 +170,7 @@ export class HelixAvatar extends LitElement {
               class="avatar__image"
               src=${src}
               alt=${this.alt}
+              aria-hidden="true"
               loading="lazy"
               @error=${this._handleImgError}
             />`

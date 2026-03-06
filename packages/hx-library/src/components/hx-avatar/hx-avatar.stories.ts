@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/web-components';
 import { html } from 'lit';
+import { ifDefined } from 'lit/directives/if-defined.js';
 import { expect } from 'storybook/test';
 import './hx-avatar.js';
 
@@ -24,6 +25,16 @@ const meta = {
     alt: {
       control: 'text',
       description: 'Accessible label for the image or avatar.',
+      table: {
+        category: 'Accessibility',
+        defaultValue: { summary: "''" },
+        type: { summary: 'string' },
+      },
+    },
+    label: {
+      control: 'text',
+      description:
+        'Human-readable label for the avatar. Used as accessible name in non-image states.',
       table: {
         category: 'Accessibility',
         defaultValue: { summary: "''" },
@@ -66,14 +77,16 @@ const meta = {
   args: {
     src: undefined,
     alt: '',
+    label: '',
     initials: '',
     size: 'md',
     shape: 'circle',
   },
   render: (args) => html`
     <hx-avatar
-      src=${args.src ?? ''}
+      src=${ifDefined(args.src)}
       alt=${args.alt}
+      label=${ifDefined(args.label || undefined)}
       initials=${args.initials}
       hx-size=${args.size}
       shape=${args.shape}
@@ -171,23 +184,23 @@ export const Sizes: Story = {
   render: () => html`
     <div style="display: flex; align-items: center; gap: 1.5rem; flex-wrap: wrap;">
       <div style="display: flex; flex-direction: column; align-items: center; gap: 0.5rem;">
-        <hx-avatar hx-size="xs" initials="XS"></hx-avatar>
+        <hx-avatar hx-size="xs" initials="XS" alt="Extra small avatar"></hx-avatar>
         <span style="font-size: 0.75rem; color: #6b7280;">xs</span>
       </div>
       <div style="display: flex; flex-direction: column; align-items: center; gap: 0.5rem;">
-        <hx-avatar hx-size="sm" initials="SM"></hx-avatar>
+        <hx-avatar hx-size="sm" initials="SM" alt="Small avatar"></hx-avatar>
         <span style="font-size: 0.75rem; color: #6b7280;">sm</span>
       </div>
       <div style="display: flex; flex-direction: column; align-items: center; gap: 0.5rem;">
-        <hx-avatar hx-size="md" initials="MD"></hx-avatar>
+        <hx-avatar hx-size="md" initials="MD" alt="Medium avatar"></hx-avatar>
         <span style="font-size: 0.75rem; color: #6b7280;">md</span>
       </div>
       <div style="display: flex; flex-direction: column; align-items: center; gap: 0.5rem;">
-        <hx-avatar hx-size="lg" initials="LG"></hx-avatar>
+        <hx-avatar hx-size="lg" initials="LG" alt="Large avatar"></hx-avatar>
         <span style="font-size: 0.75rem; color: #6b7280;">lg</span>
       </div>
       <div style="display: flex; flex-direction: column; align-items: center; gap: 0.5rem;">
-        <hx-avatar hx-size="xl" initials="XL"></hx-avatar>
+        <hx-avatar hx-size="xl" initials="XL" alt="Extra large avatar"></hx-avatar>
         <span style="font-size: 0.75rem; color: #6b7280;">xl</span>
       </div>
     </div>
@@ -206,11 +219,11 @@ export const Shapes: Story = {
   render: () => html`
     <div style="display: flex; align-items: center; gap: 2rem;">
       <div style="display: flex; flex-direction: column; align-items: center; gap: 0.5rem;">
-        <hx-avatar hx-size="lg" shape="circle" initials="RN"></hx-avatar>
+        <hx-avatar hx-size="lg" shape="circle" initials="RN" alt="Circle shape"></hx-avatar>
         <span style="font-size: 0.75rem; color: #6b7280;">circle</span>
       </div>
       <div style="display: flex; flex-direction: column; align-items: center; gap: 0.5rem;">
-        <hx-avatar hx-size="lg" shape="square" initials="RN"></hx-avatar>
+        <hx-avatar hx-size="lg" shape="square" initials="RN" alt="Square shape"></hx-avatar>
         <span style="font-size: 0.75rem; color: #6b7280;">square</span>
       </div>
     </div>
@@ -235,8 +248,9 @@ export const WithBadge: Story = {
   },
   render: (args) => html`
     <hx-avatar
-      src=${args.src ?? ''}
+      src=${ifDefined(args.src)}
       alt=${args.alt}
+      label=${ifDefined(args.label || undefined)}
       initials=${args.initials}
       hx-size=${args.size}
       shape=${args.shape}
@@ -302,7 +316,42 @@ export const FallbackChain: Story = {
 };
 
 // ════════════════════════════════════════════════════════════════════════════
-// 8. SLOTTED CONTENT
+// 8. BROKEN IMAGE FALLBACK
+// ════════════════════════════════════════════════════════════════════════════
+
+/**
+ * Demonstrates the image error fallback path:
+ * 1. Broken src + initials → falls back to initials
+ * 2. Broken src + no initials → falls back to icon
+ *
+ * This is the most important fallback behavior for developers to understand.
+ */
+export const BrokenImageFallback: Story = {
+  render: () => html`
+    <div style="display: flex; align-items: center; gap: 2rem; flex-wrap: wrap;">
+      <div style="display: flex; flex-direction: column; align-items: center; gap: 0.5rem;">
+        <hx-avatar
+          hx-size="lg"
+          src="https://invalid-url-that-will-fail.example/avatar.png"
+          alt="Dr. Jane Smith"
+          initials="JS"
+        ></hx-avatar>
+        <span style="font-size: 0.75rem; color: #6b7280;">Broken src + initials</span>
+      </div>
+      <div style="display: flex; flex-direction: column; align-items: center; gap: 0.5rem;">
+        <hx-avatar
+          hx-size="lg"
+          src="https://invalid-url-that-will-fail.example/avatar.png"
+          alt="Unknown user"
+        ></hx-avatar>
+        <span style="font-size: 0.75rem; color: #6b7280;">Broken src + no initials</span>
+      </div>
+    </div>
+  `,
+};
+
+// ════════════════════════════════════════════════════════════════════════════
+// 9. SLOTTED CONTENT
 // ════════════════════════════════════════════════════════════════════════════
 
 /**
