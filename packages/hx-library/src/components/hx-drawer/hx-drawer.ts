@@ -97,6 +97,8 @@ export class HelixDrawer extends LitElement {
   private _cachedFocusableElements: HTMLElement[] = [];
   private _triggerElement: HTMLElement | null = null;
   private _animationTimeout: ReturnType<typeof setTimeout> | null = null;
+  private _previousBodyOverflow = '';
+  private _hiddenSiblings: Element[] = [];
 
   private readonly _titleId = `hx-drawer-title-${Math.random().toString(36).slice(2, 9)}`;
 
@@ -117,11 +119,12 @@ export class HelixDrawer extends LitElement {
   placement: DrawerPlacement = 'end';
 
   /**
-   * The size of the drawer panel. Use 'sm', 'md', 'lg', 'full', or any valid CSS length.
+   * The size of the drawer panel.
+   * Accepts 'sm' | 'md' | 'lg' | 'full', or any valid CSS length via --hx-drawer-size token.
    * @attr size
    */
   @property({ type: String, reflect: true })
-  size: DrawerSize | string = 'md';
+  size: string = 'md';
 
   /**
    * When true, the drawer is constrained to its positioned parent instead of the viewport.
@@ -145,13 +148,14 @@ export class HelixDrawer extends LitElement {
   @property({ type: Boolean, reflect: true, attribute: 'no-footer' })
   noFooter = false;
 
-  // ─── Lifecycle ───
+  /**
+   * An accessible label for the drawer. Used as aria-label when no label slot is provided.
+   * @attr label
+   */
+  @property({ type: String, reflect: true })
+  label = '';
 
-  override firstUpdated(): void {
-    this._hasHeaderActionsSlot = this.querySelector('[slot="header-actions"]') !== null;
-    this._hasFooterSlot = this.querySelector('[slot="footer"]') !== null;
-    this._hasLabelSlot = this.querySelector('[slot="label"]') !== null;
-  }
+  // ─── Lifecycle ───
 
   override disconnectedCallback(): void {
     super.disconnectedCallback();
@@ -199,8 +203,21 @@ export class HelixDrawer extends LitElement {
   // ─── Private: Open / Close ───
 
   private _openDrawer(): void {
+    if (this._animationTimeout !== null) {
+      clearTimeout(this._animationTimeout);
+      this._animationTimeout = null;
+    }
+
     // Capture trigger for focus restoration
-    this._triggerElement = document.activeElement as HTMLElement | null;
+    const activeEl = document.activeElement;
+    this._triggerElement = activeEl instanceof HTMLElement ? activeEl : null;
+
+    if (!this.contained) {
+      this._previousBodyOverflow = document.body.style.overflow;
+      document.body.style.overflow = 'hidden';
+    }
+
+    this._hideBackgroundContent();
 
     this._applySizeVar();
 
@@ -209,11 +226,13 @@ export class HelixDrawer extends LitElement {
 
     // Transition to open state
     void this.updateComplete.then(() => {
+      if (!this.open) return;
       this._isOpen = true;
       this._addListeners();
 
       // Set initial focus after next render
       void this.updateComplete.then(() => {
+        if (!this.open) return;
         this._cachedFocusableElements = this._getFocusableElements();
         this._setInitialFocus();
 
@@ -227,6 +246,11 @@ export class HelixDrawer extends LitElement {
   }
 
   private _closeDrawer(): void {
+    if (this._animationTimeout !== null) {
+      clearTimeout(this._animationTimeout);
+      this._animationTimeout = null;
+    }
+
     this._isOpen = false;
     this._removeListeners();
     this._cachedFocusableElements = [];
@@ -240,6 +264,10 @@ export class HelixDrawer extends LitElement {
       if (this._triggerElement && typeof this._triggerElement.focus === 'function') {
         this._triggerElement.focus();
       }
+      if (!this.contained) {
+        document.body.style.overflow = this._previousBodyOverflow;
+      }
+      this._restoreBackgroundContent();
       this._triggerElement = null;
     }, duration);
   }
@@ -252,12 +280,10 @@ export class HelixDrawer extends LitElement {
   // ─── Event Listeners ───
 
   private _addListeners(): void {
-    this._overlayEl?.addEventListener('keydown', this._handleKeyDown);
     document.addEventListener('keydown', this._handleKeyDown);
   }
 
   private _removeListeners(): void {
-    this._overlayEl?.removeEventListener('keydown', this._handleKeyDown);
     document.removeEventListener('keydown', this._handleKeyDown);
   }
 
@@ -339,8 +365,7 @@ export class HelixDrawer extends LitElement {
 
     if (!first || !last) return;
 
-    const shadowActive = this.shadowRoot?.activeElement;
-    const active = (shadowActive ?? document.activeElement) as HTMLElement | null;
+    const active = document.activeElement as HTMLElement | null;
 
     if (e.shiftKey) {
       if (active === first) {
@@ -353,6 +378,26 @@ export class HelixDrawer extends LitElement {
         first.focus();
       }
     }
+  }
+
+  // ─── Background Content Visibility ───
+
+  private _hideBackgroundContent(): void {
+    if (this.contained) return;
+    this._hiddenSiblings = [];
+    for (const child of Array.from(document.body.children)) {
+      if (child === this || child === this.parentElement) continue;
+      if (child.getAttribute('aria-hidden') === 'true') continue;
+      child.setAttribute('aria-hidden', 'true');
+      this._hiddenSiblings.push(child);
+    }
+  }
+
+  private _restoreBackgroundContent(): void {
+    for (const el of this._hiddenSiblings) {
+      el.removeAttribute('aria-hidden');
+    }
+    this._hiddenSiblings = [];
   }
 
   // ─── Overlay Click ───
@@ -457,6 +502,7 @@ export class HelixDrawer extends LitElement {
         role="dialog"
         aria-modal="true"
         aria-labelledby=${this._hasLabelSlot ? this._titleId : nothing}
+        aria-label=${!this._hasLabelSlot && this.label ? this.label : nothing}
         tabindex="-1"
         @click=${this._handleOverlayClick}
       >

@@ -33,7 +33,8 @@ const meta = {
     size: {
       control: 'select',
       options: ['sm', 'md', 'lg', 'full'],
-      description: "The size of the drawer panel. Accepts 'sm', 'md', 'lg', 'full', or any valid CSS length.",
+      description:
+        "The size of the drawer panel. Accepts 'sm', 'md', 'lg', 'full', or any valid CSS length.",
       table: {
         category: 'Layout',
         defaultValue: { summary: 'md' },
@@ -42,7 +43,8 @@ const meta = {
     },
     contained: {
       control: 'boolean',
-      description: 'When true, constrains the drawer to its positioned parent instead of the viewport.',
+      description:
+        'When true, constrains the drawer to its positioned parent instead of the viewport.',
       table: {
         category: 'Behavior',
         defaultValue: { summary: 'false' },
@@ -199,12 +201,7 @@ export const Contained: Story = {
       >
         Open Contained Drawer
       </button>
-      <hx-drawer
-        ?open=${args.open}
-        placement=${args.placement}
-        size=${args.size}
-        contained
-      >
+      <hx-drawer ?open=${args.open} placement=${args.placement} size=${args.size} contained>
         <span slot="label">Contained Drawer</span>
         <p>This drawer is constrained to its parent container.</p>
       </hx-drawer>
@@ -231,16 +228,93 @@ export const WithHeaderActions: Story = {
       >
         Open Drawer
       </button>
-      <hx-drawer
-        ?open=${args.open}
-        placement=${args.placement}
-        size=${args.size}
-      >
+      <hx-drawer ?open=${args.open} placement=${args.placement} size=${args.size}>
         <span slot="label">Drawer with Actions</span>
         <button slot="header-actions" title="Settings">&#9881;</button>
         <p>Drawer body content. The header shows extra actions next to the close button.</p>
         <button slot="footer">Cancel</button>
         <button slot="footer">Save</button>
+      </hx-drawer>
+    </div>
+  `,
+  args: {
+    open: false,
+    placement: 'end',
+    size: 'md',
+  },
+};
+
+/** Drawer with navigation content — demonstrates focus trap with multiple interactive elements. */
+export const WithNavigationContent: Story = {
+  render: (args) => html`
+    <div>
+      <button
+        @click=${(e: Event) => {
+          const host = (e.target as HTMLElement).nextElementSibling as HTMLElement & {
+            open: boolean;
+          };
+          if (host) host.open = true;
+        }}
+      >
+        Open Navigation Drawer
+      </button>
+      <hx-drawer ?open=${args.open} placement="start" size=${args.size} label="Site Navigation">
+        <span slot="label">Navigation</span>
+        <nav>
+          <ul style="list-style: none; padding: 0; margin: 0;">
+            <li style="margin-bottom: 0.5rem;"><a href="#dashboard">Dashboard</a></li>
+            <li style="margin-bottom: 0.5rem;"><a href="#patients">Patients</a></li>
+            <li style="margin-bottom: 0.5rem;"><a href="#appointments">Appointments</a></li>
+            <li style="margin-bottom: 0.5rem;"><a href="#records">Records</a></li>
+            <li style="margin-bottom: 0.5rem;"><a href="#settings">Settings</a></li>
+          </ul>
+        </nav>
+        <button slot="footer">Log Out</button>
+      </hx-drawer>
+    </div>
+  `,
+  args: {
+    open: false,
+    size: 'sm',
+  },
+};
+
+/** Drawer with a form — demonstrates focus trap with form inputs. */
+export const WithForm: Story = {
+  render: (args) => html`
+    <div>
+      <button
+        @click=${(e: Event) => {
+          const host = (e.target as HTMLElement).nextElementSibling as HTMLElement & {
+            open: boolean;
+          };
+          if (host) host.open = true;
+        }}
+      >
+        Open Form Drawer
+      </button>
+      <hx-drawer ?open=${args.open} placement=${args.placement} size=${args.size}>
+        <span slot="label">Patient Details</span>
+        <form style="display: flex; flex-direction: column; gap: 1rem;">
+          <label>
+            First Name
+            <input type="text" style="display: block; width: 100%; padding: 0.5rem;" />
+          </label>
+          <label>
+            Last Name
+            <input type="text" style="display: block; width: 100%; padding: 0.5rem;" />
+          </label>
+          <label>
+            Date of Birth
+            <input type="date" style="display: block; width: 100%; padding: 0.5rem;" />
+          </label>
+          <label>
+            Notes
+            <textarea rows="3" style="display: block; width: 100%; padding: 0.5rem;"></textarea>
+          </label>
+        </form>
+        <button slot="footer">Cancel</button>
+        <button slot="footer">Save Patient</button>
       </hx-drawer>
     </div>
   `,
