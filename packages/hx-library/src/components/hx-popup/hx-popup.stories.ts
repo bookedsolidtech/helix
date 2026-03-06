@@ -232,7 +232,7 @@ export const WithArrow: Story = {
     <div
       style="padding: 8rem; display: flex; gap: 4rem; justify-content: center; align-items: center; flex-wrap: wrap;"
     >
-      <hx-popup active placement="top" distance="8" arrow style="--arrow-color: #374151;">
+      <hx-popup active placement="top" distance="8" arrow style="--hx-arrow-color: #374151;">
         <button slot="anchor" style="padding: 0.5rem 1rem;">Top arrow</button>
         <div
           style="background: #374151; color: white; border-radius: 0.375rem; padding: 0.5rem 0.75rem; font-size: 0.875rem;"
@@ -240,7 +240,7 @@ export const WithArrow: Story = {
           Arrow above
         </div>
       </hx-popup>
-      <hx-popup active placement="bottom" distance="8" arrow style="--arrow-color: #374151;">
+      <hx-popup active placement="bottom" distance="8" arrow style="--hx-arrow-color: #374151;">
         <button slot="anchor" style="padding: 0.5rem 1rem;">Bottom arrow</button>
         <div
           style="background: #374151; color: white; border-radius: 0.375rem; padding: 0.5rem 0.75rem; font-size: 0.875rem;"
@@ -248,7 +248,7 @@ export const WithArrow: Story = {
           Arrow below
         </div>
       </hx-popup>
-      <hx-popup active placement="right" distance="8" arrow style="--arrow-color: #374151;">
+      <hx-popup active placement="right" distance="8" arrow style="--hx-arrow-color: #374151;">
         <button slot="anchor" style="padding: 0.5rem 1rem;">Right arrow</button>
         <div
           style="background: #374151; color: white; border-radius: 0.375rem; padding: 0.5rem 0.75rem; font-size: 0.875rem;"
@@ -295,7 +295,9 @@ export const Inactive: Story = {
 export const FlipBehavior: Story = {
   name: 'Flip to Avoid Overflow',
   render: () => html`
-    <div style="padding: 2rem; display: flex; justify-content: flex-start; align-items: flex-start;">
+    <div
+      style="padding: 2rem; display: flex; justify-content: flex-start; align-items: flex-start;"
+    >
       <hx-popup active placement="top" distance="8" flip>
         <button slot="anchor" style="padding: 0.5rem 1rem;">Near top edge — flips to bottom</button>
         <div
@@ -365,7 +367,7 @@ export const CSSParts: Story = {
         box-shadow: 0 4px 12px rgba(67, 56, 202, 0.4);
       }
       .parts-demo hx-popup::part(arrow) {
-        --arrow-color: #4338ca;
+        --hx-arrow-color: #4338ca;
       }
     </style>
     <div
