@@ -623,7 +623,84 @@ export const HealthcareMRN: Story = {
 };
 
 // ─────────────────────────────────────────────────
-// 7. ALL SIZES — Kitchen sink showing all sizes in a row
+// 7. SUCCESS STATE — Shows the component locked in copied state
+// ─────────────────────────────────────────────────
+
+export const SuccessState: Story = {
+  args: {
+    value: 'Copied value',
+    label: 'Copy to clipboard',
+    feedbackDuration: 999999,
+  },
+  render: (args) => html`
+    <div>
+      <hx-copy-button
+        value=${args.value}
+        label=${args.label}
+        feedback-duration=${args.feedbackDuration}
+        hx-size=${args.size}
+        ?disabled=${args.disabled}
+      >
+        <svg
+          slot="copy-icon"
+          xmlns="http://www.w3.org/2000/svg"
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+        >
+          <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+          <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"></path>
+        </svg>
+        <svg
+          slot="success-icon"
+          xmlns="http://www.w3.org/2000/svg"
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+        >
+          <polyline points="20 6 9 17 4 12"></polyline>
+        </svg>
+      </hx-copy-button>
+      <p style="margin-top: 0.75rem; font-size: 0.875rem; color: #6b7280;">
+        Click to enter the success/copied state. The very long
+        <code>feedback-duration</code> keeps it visible for visual review.
+      </p>
+    </div>
+  `,
+  play: async ({ canvasElement }) => {
+    const originalClipboard = navigator.clipboard;
+    Object.defineProperty(navigator, 'clipboard', {
+      value: { writeText: async () => {} },
+      configurable: true,
+    });
+
+    const el = canvasElement.querySelector('hx-copy-button');
+    const btn = el?.shadowRoot?.querySelector('button');
+    if (btn) {
+      await userEvent.click(btn);
+    }
+
+    Object.defineProperty(navigator, 'clipboard', {
+      value: originalClipboard,
+      configurable: true,
+    });
+  },
+};
+
+// ─────────────────────────────────────────────────
+// 8. ALL SIZES — Kitchen sink showing all sizes in a row
 // ─────────────────────────────────────────────────
 
 export const AllSizes: Story = {
