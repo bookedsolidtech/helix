@@ -99,12 +99,48 @@ describe('hx-list', () => {
     });
   });
 
+  // ─── Property: label → aria-label ───
+
+  describe('Property: label', () => {
+    it('sets aria-label on the inner list element', async () => {
+      const el = await fixture<HelixList>(
+        '<hx-list variant="interactive" label="Options"></hx-list>',
+      );
+      const base = shadowQuery(el, '[part~="base"]')!;
+      expect(base.getAttribute('aria-label')).toBe('Options');
+    });
+
+    it('does not set aria-label when label is undefined', async () => {
+      const el = await fixture<HelixList>('<hx-list variant="interactive"></hx-list>');
+      const base = shadowQuery(el, '[part~="base"]')!;
+      expect(base.getAttribute('aria-label')).toBeNull();
+    });
+  });
+
+  // ─── aria-multiselectable ───
+
+  describe('ARIA: multiselectable', () => {
+    it('sets aria-multiselectable="false" on interactive listbox', async () => {
+      const el = await fixture<HelixList>(
+        '<hx-list variant="interactive" label="Options"></hx-list>',
+      );
+      const base = shadowQuery(el, '[part~="base"]')!;
+      expect(base.getAttribute('aria-multiselectable')).toBe('false');
+    });
+
+    it('does not set aria-multiselectable on non-interactive list', async () => {
+      const el = await fixture<HelixList>('<hx-list variant="plain"></hx-list>');
+      const base = shadowQuery(el, '[part~="base"]')!;
+      expect(base.getAttribute('aria-multiselectable')).toBeNull();
+    });
+  });
+
   // ─── hx-select event ───
 
   describe('Events: hx-select', () => {
     it('dispatches hx-select when item clicked in interactive mode', async () => {
       const el = await fixture<HelixList>(`
-        <hx-list variant="interactive">
+        <hx-list variant="interactive" label="Options">
           <hx-list-item value="test">Test</hx-list-item>
         </hx-list>
       `);
@@ -118,7 +154,7 @@ describe('hx-list', () => {
 
     it('hx-select detail contains item and value', async () => {
       const el = await fixture<HelixList>(`
-        <hx-list variant="interactive">
+        <hx-list variant="interactive" label="Options">
           <hx-list-item value="appointments">Appointments</hx-list-item>
         </hx-list>
       `);
@@ -143,8 +179,153 @@ describe('hx-list', () => {
       });
       const liEl = shadowQuery<HTMLElement>(item, '[part~="base"]')!;
       liEl.click();
+      // Use a microtask flush + setTimeout to reliably assert non-firing
       await el.updateComplete;
+      await new Promise((resolve) => setTimeout(resolve, 0));
       expect(fired).toBe(false);
+    });
+  });
+
+  // ─── Keyboard Navigation (interactive listbox) ───
+
+  describe('Keyboard Navigation', () => {
+    it('ArrowDown moves focus to next item', async () => {
+      const el = await fixture<HelixList>(`
+        <hx-list variant="interactive" label="Options">
+          <hx-list-item value="a">A</hx-list-item>
+          <hx-list-item value="b">B</hx-list-item>
+          <hx-list-item value="c">C</hx-list-item>
+        </hx-list>
+      `);
+      const items = el.querySelectorAll('hx-list-item');
+      const listEl = shadowQuery<HTMLElement>(el, '[part~="base"]')!;
+      items[0].focus();
+      listEl.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true }));
+      await el.updateComplete;
+      expect(document.activeElement).toBe(items[1]);
+    });
+
+    it('ArrowUp moves focus to previous item', async () => {
+      const el = await fixture<HelixList>(`
+        <hx-list variant="interactive" label="Options">
+          <hx-list-item value="a">A</hx-list-item>
+          <hx-list-item value="b">B</hx-list-item>
+          <hx-list-item value="c">C</hx-list-item>
+        </hx-list>
+      `);
+      const items = el.querySelectorAll('hx-list-item');
+      const listEl = shadowQuery<HTMLElement>(el, '[part~="base"]')!;
+      items[2].focus();
+      listEl.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowUp', bubbles: true }));
+      await el.updateComplete;
+      expect(document.activeElement).toBe(items[1]);
+    });
+
+    it('Home moves focus to first item', async () => {
+      const el = await fixture<HelixList>(`
+        <hx-list variant="interactive" label="Options">
+          <hx-list-item value="a">A</hx-list-item>
+          <hx-list-item value="b">B</hx-list-item>
+          <hx-list-item value="c">C</hx-list-item>
+        </hx-list>
+      `);
+      const items = el.querySelectorAll('hx-list-item');
+      const listEl = shadowQuery<HTMLElement>(el, '[part~="base"]')!;
+      items[2].focus();
+      listEl.dispatchEvent(new KeyboardEvent('keydown', { key: 'Home', bubbles: true }));
+      await el.updateComplete;
+      expect(document.activeElement).toBe(items[0]);
+    });
+
+    it('End moves focus to last item', async () => {
+      const el = await fixture<HelixList>(`
+        <hx-list variant="interactive" label="Options">
+          <hx-list-item value="a">A</hx-list-item>
+          <hx-list-item value="b">B</hx-list-item>
+          <hx-list-item value="c">C</hx-list-item>
+        </hx-list>
+      `);
+      const items = el.querySelectorAll('hx-list-item');
+      const listEl = shadowQuery<HTMLElement>(el, '[part~="base"]')!;
+      items[0].focus();
+      listEl.dispatchEvent(new KeyboardEvent('keydown', { key: 'End', bubbles: true }));
+      await el.updateComplete;
+      expect(document.activeElement).toBe(items[2]);
+    });
+
+    it('ArrowDown wraps to first item from last', async () => {
+      const el = await fixture<HelixList>(`
+        <hx-list variant="interactive" label="Options">
+          <hx-list-item value="a">A</hx-list-item>
+          <hx-list-item value="b">B</hx-list-item>
+        </hx-list>
+      `);
+      const items = el.querySelectorAll('hx-list-item');
+      const listEl = shadowQuery<HTMLElement>(el, '[part~="base"]')!;
+      items[1].focus();
+      listEl.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true }));
+      await el.updateComplete;
+      expect(document.activeElement).toBe(items[0]);
+    });
+
+    it('ArrowUp wraps to last item from first', async () => {
+      const el = await fixture<HelixList>(`
+        <hx-list variant="interactive" label="Options">
+          <hx-list-item value="a">A</hx-list-item>
+          <hx-list-item value="b">B</hx-list-item>
+        </hx-list>
+      `);
+      const items = el.querySelectorAll('hx-list-item');
+      const listEl = shadowQuery<HTMLElement>(el, '[part~="base"]')!;
+      items[0].focus();
+      listEl.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowUp', bubbles: true }));
+      await el.updateComplete;
+      expect(document.activeElement).toBe(items[1]);
+    });
+
+    it('skips disabled items in keyboard navigation', async () => {
+      const el = await fixture<HelixList>(`
+        <hx-list variant="interactive" label="Options">
+          <hx-list-item value="a">A</hx-list-item>
+          <hx-list-item value="b" disabled>B</hx-list-item>
+          <hx-list-item value="c">C</hx-list-item>
+        </hx-list>
+      `);
+      const items = el.querySelectorAll('hx-list-item');
+      const listEl = shadowQuery<HTMLElement>(el, '[part~="base"]')!;
+      items[0].focus();
+      listEl.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true }));
+      await el.updateComplete;
+      // Should skip disabled item B and focus C
+      expect(document.activeElement).toBe(items[2]);
+    });
+
+    it('Enter key triggers hx-list-item-click on focused item', async () => {
+      const el = await fixture<HelixList>(`
+        <hx-list variant="interactive" label="Options">
+          <hx-list-item value="test">Test</hx-list-item>
+        </hx-list>
+      `);
+      const item = el.querySelector('hx-list-item')!;
+      const liEl = shadowQuery<HTMLElement>(item, '[part~="base"]')!;
+      const eventPromise = oneEvent(item, 'hx-list-item-click');
+      liEl.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
+      const event = await eventPromise;
+      expect(event).toBeTruthy();
+    });
+
+    it('Space key triggers hx-list-item-click on focused item', async () => {
+      const el = await fixture<HelixList>(`
+        <hx-list variant="interactive" label="Options">
+          <hx-list-item value="test">Test</hx-list-item>
+        </hx-list>
+      `);
+      const item = el.querySelector('hx-list-item')!;
+      const liEl = shadowQuery<HTMLElement>(item, '[part~="base"]')!;
+      const eventPromise = oneEvent(item, 'hx-list-item-click');
+      liEl.dispatchEvent(new KeyboardEvent('keydown', { key: ' ', bubbles: true }));
+      const event = await eventPromise;
+      expect(event).toBeTruthy();
     });
   });
 });
@@ -211,6 +392,7 @@ describe('hx-list-item', () => {
       const liEl = shadowQuery<HTMLElement>(el, '[part~="base"]')!;
       liEl.click();
       await el.updateComplete;
+      await new Promise((resolve) => setTimeout(resolve, 0));
       expect(fired).toBe(false);
     });
   });
@@ -253,6 +435,26 @@ describe('hx-list-item', () => {
       const anchor = shadowQuery<HTMLAnchorElement>(el, 'a')!;
       expect(anchor.getAttribute('href')).toBe('https://example.com');
     });
+
+    it('does not render <a> when disabled + href', async () => {
+      const el = await fixture<HelixListItem>(
+        '<hx-list-item href="https://example.com" disabled>Item</hx-list-item>',
+      );
+      const anchor = shadowQuery(el, 'a');
+      expect(anchor).toBeNull();
+    });
+
+    it('does not render <a> when interactive + href (invalid ARIA)', async () => {
+      const container = await fixture<HelixList>(`
+        <hx-list variant="interactive" label="Options">
+          <hx-list-item href="https://example.com" value="test">Item</hx-list-item>
+        </hx-list>
+      `);
+      const item = container.querySelector('hx-list-item')!;
+      await item.updateComplete;
+      const anchor = shadowQuery(item, 'a');
+      expect(anchor).toBeNull();
+    });
   });
 
   // ─── Property: value ───
@@ -270,9 +472,7 @@ describe('hx-list-item', () => {
 
   describe('Events: hx-list-item-click', () => {
     it('dispatches hx-list-item-click on click', async () => {
-      const el = await fixture<HelixListItem>(
-        '<hx-list-item value="test">Item</hx-list-item>',
-      );
+      const el = await fixture<HelixListItem>('<hx-list-item value="test">Item</hx-list-item>');
       const eventPromise = oneEvent(el, 'hx-list-item-click');
       const liEl = shadowQuery<HTMLElement>(el, '[part~="base"]')!;
       liEl.click();
@@ -281,9 +481,7 @@ describe('hx-list-item', () => {
     });
 
     it('hx-list-item-click detail contains value', async () => {
-      const el = await fixture<HelixListItem>(
-        '<hx-list-item value="labs">Item</hx-list-item>',
-      );
+      const el = await fixture<HelixListItem>('<hx-list-item value="labs">Item</hx-list-item>');
       const eventPromise = oneEvent<CustomEvent>(el, 'hx-list-item-click');
       const liEl = shadowQuery<HTMLElement>(el, '[part~="base"]')!;
       liEl.click();
@@ -313,7 +511,7 @@ describe('hx-list-item', () => {
 
     it('has role="option" inside interactive hx-list', async () => {
       const container = await fixture<HelixList>(`
-        <hx-list variant="interactive">
+        <hx-list variant="interactive" label="Options">
           <hx-list-item>Item</hx-list-item>
         </hx-list>
       `);
@@ -325,7 +523,7 @@ describe('hx-list-item', () => {
 
     it('sets aria-selected on items in interactive list', async () => {
       const container = await fixture<HelixList>(`
-        <hx-list variant="interactive">
+        <hx-list variant="interactive" label="Options">
           <hx-list-item selected>Item</hx-list-item>
         </hx-list>
       `);
@@ -373,6 +571,36 @@ describe('hx-list-item', () => {
       const slotted = el.querySelector('[slot="description"]');
       expect(slotted).toBeTruthy();
     });
+
+    it('description slot has dedicated CSS part', async () => {
+      const el = await fixture<HelixListItem>(
+        '<hx-list-item>Item<span slot="description">Details</span></hx-list-item>',
+      );
+      const descPart = shadowQuery(el, '[part~="description"]');
+      expect(descPart).toBeTruthy();
+    });
+  });
+
+  // ─── Nested lists ───
+
+  describe('Nested lists', () => {
+    it('renders nested hx-list inside hx-list-item', async () => {
+      const container = await fixture<HelixList>(`
+        <hx-list variant="bulleted">
+          <hx-list-item>
+            Parent item
+            <hx-list variant="bulleted" slot="description">
+              <hx-list-item>Child item 1</hx-list-item>
+              <hx-list-item>Child item 2</hx-list-item>
+            </hx-list>
+          </hx-list-item>
+        </hx-list>
+      `);
+      const nestedList = container.querySelector('hx-list-item hx-list');
+      expect(nestedList).toBeTruthy();
+      const nestedItems = nestedList!.querySelectorAll('hx-list-item');
+      expect(nestedItems.length).toBe(2);
+    });
   });
 
   // ─── Accessibility (axe-core) ───
@@ -395,6 +623,19 @@ describe('hx-list-item', () => {
         <hx-list variant="bulleted">
           <hx-list-item>Item one</hx-list-item>
           <hx-list-item>Item two</hx-list-item>
+        </hx-list>
+      `);
+      await page.screenshot();
+      const { violations } = await checkA11y(el);
+      expect(violations).toEqual([]);
+    });
+
+    it('hx-list numbered has no axe violations', async () => {
+      const el = await fixture<HelixList>(`
+        <hx-list variant="numbered">
+          <hx-list-item>Step one</hx-list-item>
+          <hx-list-item>Step two</hx-list-item>
+          <hx-list-item>Step three</hx-list-item>
         </hx-list>
       `);
       await page.screenshot();
