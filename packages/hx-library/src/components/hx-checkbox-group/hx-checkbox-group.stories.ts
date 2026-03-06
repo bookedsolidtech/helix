@@ -815,7 +815,7 @@ export const HealthcareAllergySelection: Story = {
           <hx-checkbox value="no-drug-allergies" label="No known drug allergies"></hx-checkbox>
         </hx-checkbox-group>
 
-        <hx-checkbox-group label="Environmental & Other Allergies" name="other_allergies">
+        <hx-checkbox-group label="Environmental &amp; Other Allergies" name="other_allergies">
           <hx-checkbox value="latex" label="Latex"></hx-checkbox>
           <hx-checkbox value="shellfish" label="Shellfish"></hx-checkbox>
           <hx-checkbox value="peanuts" label="Peanuts / Tree Nuts"></hx-checkbox>

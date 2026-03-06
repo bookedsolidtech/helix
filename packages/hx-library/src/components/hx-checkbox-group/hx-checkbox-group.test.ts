@@ -2,7 +2,7 @@ import { describe, it, expect, afterEach } from 'vitest';
 import {
   fixture,
   shadowQuery,
-  shadowQueryAll,
+
   oneEvent,
   cleanup,
   checkA11y,

@@ -148,8 +148,7 @@ export const helixTimePickerStyles = css`
     border-radius: var(--hx-time-picker-border-radius, var(--hx-border-radius-md, 0.375rem));
     box-shadow: var(
       --hx-time-picker-listbox-shadow,
-      0 4px 16px
-        color-mix(in srgb, var(--hx-color-neutral-900) 12%, transparent)
+      0 4px 16px color-mix(in srgb, var(--hx-color-neutral-900) 12%, transparent)
     );
     max-height: var(--hx-time-picker-listbox-max-height, 16rem);
     overflow-y: auto;
@@ -189,30 +188,18 @@ export const helixTimePickerStyles = css`
 
   .field__option:hover,
   .field__option--active {
-    background-color: var(
-      --hx-time-picker-option-hover-bg,
-      var(--hx-color-primary-50)
-    );
+    background-color: var(--hx-time-picker-option-hover-bg, var(--hx-color-primary-50));
     color: var(--hx-time-picker-option-hover-color, var(--hx-color-primary-700));
   }
 
   .field__option--selected {
-    background-color: var(
-      --hx-time-picker-option-selected-bg,
-      var(--hx-color-primary-100)
-    );
-    color: var(
-      --hx-time-picker-option-selected-color,
-      var(--hx-color-primary-800)
-    );
+    background-color: var(--hx-time-picker-option-selected-bg, var(--hx-color-primary-100));
+    color: var(--hx-time-picker-option-selected-color, var(--hx-color-primary-800));
     font-weight: var(--hx-font-weight-medium, 500);
   }
 
   .field__option--selected.field__option--active {
-    background-color: var(
-      --hx-time-picker-option-selected-bg,
-      var(--hx-color-primary-100)
-    );
+    background-color: var(--hx-time-picker-option-selected-bg, var(--hx-color-primary-100));
   }
 
   /* ─── Help Text & Error Messages ─── */
