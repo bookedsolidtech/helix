@@ -9,7 +9,12 @@ import { helixButtonGroupStyles } from './hx-button-group.styles.js';
  * horizontal or vertical action set. Eliminates double borders between adjacent
  * buttons and squares off inner border-radius for a unified visual appearance.
  *
- * @summary Groups hx-button elements into a horizontal or vertical action set with shared borders.
+ * Uses `ElementInternals` to set role="group" without a DOM attribute, providing
+ * an accessible grouping container. Consumers should provide an `aria-label`
+ * attribute or the `label` property to describe the group purpose for assistive
+ * technology (WCAG 2.1 AA).
+ *
+ * @summary Groups hx-button elements into a horizontal or vertical action set with shared borders and accessible role="group".
  *
  * @tag hx-button-group
  *
@@ -23,7 +28,7 @@ import { helixButtonGroupStyles } from './hx-button-group.styles.js';
 export class HelixButtonGroup extends LitElement {
   static override styles = [tokenStyles, helixButtonGroupStyles];
 
-  private internals: ElementInternals;
+  private _internals: ElementInternals;
 
   /**
    * Layout orientation of the button group.
@@ -53,8 +58,8 @@ export class HelixButtonGroup extends LitElement {
 
   constructor() {
     super();
-    this.internals = this.attachInternals();
-    this.internals.role = 'group';
+    this._internals = this.attachInternals();
+    this._internals.role = 'group';
   }
 
   // ─── Lifecycle ───
@@ -67,7 +72,7 @@ export class HelixButtonGroup extends LitElement {
     }
 
     if (changedProperties.has('label')) {
-      this.internals.ariaLabel = this.label || null;
+      this._internals.ariaLabel = this.label || null;
     }
   }
 
@@ -75,7 +80,7 @@ export class HelixButtonGroup extends LitElement {
     super.connectedCallback();
     this.style.setProperty('--hx-button-group-size', this.size);
     if (this.label) {
-      this.internals.ariaLabel = this.label;
+      this._internals.ariaLabel = this.label;
     }
   }
 
