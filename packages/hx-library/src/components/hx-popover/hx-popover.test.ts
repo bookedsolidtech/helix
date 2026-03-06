@@ -252,6 +252,63 @@ describe('hx-popover', () => {
     });
   });
 
+  // ─── Click-outside dismiss (2) ───
+
+  describe('Click-outside dismiss', () => {
+    it('hides when clicking outside with trigger="click"', async () => {
+      const outside = document.createElement('div');
+      document.body.appendChild(outside);
+      const el = await fixture<HelixPopover>(
+        '<hx-popover trigger="click"><button slot="anchor">Trigger</button><p>Content</p></hx-popover>',
+      );
+      const wrapper = shadowQuery<HTMLElement>(el, '.trigger-wrapper')!;
+      wrapper.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+      await el.updateComplete;
+      expect(shadowQuery(el, '[part="body"]')?.classList.contains('visible')).toBe(true);
+
+      // Click on an element outside the popover
+      outside.dispatchEvent(new MouseEvent('click', { bubbles: true, composed: true }));
+      await el.updateComplete;
+      expect(shadowQuery(el, '[part="body"]')?.classList.contains('visible')).toBe(false);
+      outside.remove();
+    });
+
+    it('does not hide when clicking inside the popover', async () => {
+      const el = await fixture<HelixPopover>(
+        '<hx-popover trigger="click"><button slot="anchor">Trigger</button><p>Content</p></hx-popover>',
+      );
+      const wrapper = shadowQuery<HTMLElement>(el, '.trigger-wrapper')!;
+      wrapper.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+      await el.updateComplete;
+
+      // Click inside the popover element
+      el.dispatchEvent(new MouseEvent('click', { bubbles: true, composed: true }));
+      await el.updateComplete;
+      expect(shadowQuery(el, '[part="body"]')?.classList.contains('visible')).toBe(true);
+    });
+  });
+
+  // ─── Property: label (2) ───
+
+  describe('Property: label', () => {
+    it('defaults to "Popover"', async () => {
+      const el = await fixture<HelixPopover>(
+        '<hx-popover><button slot="anchor">Trigger</button><p>Content</p></hx-popover>',
+      );
+      expect(el.label).toBe('Popover');
+      const body = shadowQuery(el, '[part="body"]');
+      expect(body?.getAttribute('aria-label')).toBe('Popover');
+    });
+
+    it('uses custom label for aria-label', async () => {
+      const el = await fixture<HelixPopover>(
+        '<hx-popover label="Patient info"><button slot="anchor">Trigger</button><p>Content</p></hx-popover>',
+      );
+      const body = shadowQuery(el, '[part="body"]');
+      expect(body?.getAttribute('aria-label')).toBe('Patient info');
+    });
+  });
+
   // ─── Events (2) ───
 
   describe('Events', () => {
