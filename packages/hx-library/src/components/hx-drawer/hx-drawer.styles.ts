@@ -150,7 +150,10 @@ export const helixDrawerStyles = css`
     align-items: center;
     justify-content: space-between;
     gap: var(--hx-spacing-4, 1rem);
-    padding: var(--hx-drawer-header-padding, var(--hx-spacing-5, 1.25rem) var(--hx-spacing-6, 1.5rem));
+    padding: var(
+      --hx-drawer-header-padding,
+      var(--hx-spacing-5, 1.25rem) var(--hx-spacing-6, 1.5rem)
+    );
     border-bottom: var(--hx-border-width-1, 1px) solid
       var(--hx-drawer-header-border-color, var(--hx-color-neutral-200));
     flex-shrink: 0;
