@@ -48,20 +48,20 @@ describe('hx-divider', () => {
 
     it('sets aria-orientation="horizontal" on base', async () => {
       const el = await fixture<HelixDivider>('<hx-divider></hx-divider>');
-      const base = shadowQuery(el, '[part="base"]')!;
-      expect(base.getAttribute('aria-orientation')).toBe('horizontal');
+      const base = shadowQuery(el, '[part="base"]');
+      expect(base?.getAttribute('aria-orientation')).toBe('horizontal');
     });
 
     it('sets aria-orientation="vertical" on base', async () => {
       const el = await fixture<HelixDivider>('<hx-divider orientation="vertical"></hx-divider>');
-      const base = shadowQuery(el, '[part="base"]')!;
-      expect(base.getAttribute('aria-orientation')).toBe('vertical');
+      const base = shadowQuery(el, '[part="base"]');
+      expect(base?.getAttribute('aria-orientation')).toBe('vertical');
     });
 
     it('sets role="separator" on base', async () => {
       const el = await fixture<HelixDivider>('<hx-divider></hx-divider>');
-      const base = shadowQuery(el, '[part="base"]')!;
-      expect(base.getAttribute('role')).toBe('separator');
+      const base = shadowQuery(el, '[part="base"]');
+      expect(base?.getAttribute('role')).toBe('separator');
     });
   });
 
