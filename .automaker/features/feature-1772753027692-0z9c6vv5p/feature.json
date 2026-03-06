@@ -2,7 +2,7 @@
   "category": "Uncategorized",
   "description": "Implement `hx-progress-bar` (T1-25) — 6/6 enterprise libraries ship this. Linear progress indicator for determinate and indeterminate states.\n\n**Files to create** in `packages/hx-library/src/components/hx-progress-bar/`:\n- `index.ts` — re-export\n- `hx-progress-bar.ts` — Lit component\n- `hx-progress-bar.styles.ts` — CSS with `--hx-*` tokens\n- `hx-progress-bar.stories.ts` — Storybook stories\n- `hx-progress-bar.test.ts` — Vitest tests\n\n**Props:** `value` (0-100, or null for indeterminate), `max` (default 100), `label` (string — accessible label), `size` (sm/md/lg — track height), `variant` (`default`|`success`|`warning`|`danger`)\n\n**Slots:** `label` (visible label text above bar)\n\n**CSS Parts:** `base` (outer track), `indicator` (filled portion), `label`\n\n**ARIA:** `role=\"progressbar\"`, `aria-valuenow`, `aria-valuemin=\"0\"`, `aria-valuemax`, `aria-label` from `label` prop. When indeterminate (value=null), omit `aria-valuenow`.\n\n**Animation:** Indeterminate state uses a looping CSS animation on the indicator (`prefers-reduced-motion: reduce` must stop animation).\n\n**Quality gates:** type-check zero errors, all tests pass (determinate + indeterminate), axe-core zero violations (test both modes), Storybook all variants, CEM accurate, bundle < 3KB.\n\nRegister in `packages/hx-library/src/index.ts` and `packages/hx-library/vite.config.ts`.",
   "title": "IMPLEMENT: hx-progress-bar — T1-25 Linear Progress Indicator",
-  "status": "backlog",
+  "status": "done",
   "complexity": "small",
   "priority": 2,
   "source": "api",
@@ -25,6 +25,13 @@
       "to": "backlog",
       "timestamp": "2026-03-05T23:23:47.693Z",
       "reason": "Feature created"
+    },
+    {
+      "from": "backlog",
+      "to": "done",
+      "timestamp": "2026-03-06T14:12:39.888Z"
     }
-  ]
+  ],
+  "featureType": "code",
+  "completedAt": "2026-03-06T14:12:39.888Z"
 }

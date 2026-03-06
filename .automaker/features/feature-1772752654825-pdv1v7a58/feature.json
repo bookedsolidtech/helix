@@ -2,7 +2,7 @@
   "category": "Uncategorized",
   "description": "Deep antagonistic quality review of `hx-badge` (T1-19). 5/6 libraries ship this.\n\nReview every file in `packages/hx-library/src/components/hx-badge/` critically.\n\n**Audit areas:**\n1. TypeScript — strict, variant typing (info/success/warning/error/neutral), size typing, count/max props\n2. Accessibility — badge content must be accessible (not just visual color), `aria-label` when badge conveys status not in text, pulse animation must respect `prefers-reduced-motion`, axe-core pass\n3. Tests — all variants, count display, max value truncation (e.g. 99+), empty/dot mode, pulse animation\n4. Storybook — all variants, count demos, dot mode, pulse mode\n5. CSS — color variants using `--hx-*` semantic tokens (no hardcoded colors), CSS parts (base)\n6. Performance — bundle < 5KB (should be tiny)\n7. Drupal — Twig-renderable, status conveyed in text not just color\n\n**Output:** Write findings to `packages/hx-library/src/components/hx-badge/AUDIT.md` with severity (P0/P1/P2). DO NOT fix — document only. Commit AUDIT.md as your PR.",
   "title": "AUDIT: hx-badge — T1-19 antagonistic quality review",
-  "status": "backlog",
+  "status": "done",
   "complexity": "small",
   "priority": 2,
   "source": "api",
@@ -25,6 +25,13 @@
       "to": "backlog",
       "timestamp": "2026-03-05T23:17:34.826Z",
       "reason": "Feature created"
+    },
+    {
+      "from": "backlog",
+      "to": "done",
+      "timestamp": "2026-03-06T14:12:03.784Z"
     }
-  ]
+  ],
+  "featureType": "code",
+  "completedAt": "2026-03-06T14:12:03.784Z"
 }

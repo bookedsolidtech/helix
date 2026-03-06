@@ -2,7 +2,7 @@
   "category": "Uncategorized",
   "description": "Deep antagonistic quality review of `hx-top-nav` (T2-38). 3/6 libraries. NOTE: PR #175 required. Note: repo also has `hx-nav` — reconcile overlap in findings.\n\nReview `packages/hx-library/src/components/hx-top-nav/`.\n\n**Audit areas:**\n1. TypeScript — strict, nav item typing, logo slot typing, action slots typing, mobile menu state\n2. Accessibility — `<header>` landmark wrapper, `<nav aria-label=\"Main\">`, mobile hamburger `aria-expanded`/`aria-controls`, skip link compatible, current page `aria-current=\"page\"`, keyboard nav, axe-core pass\n3. Tests — mobile/desktop layout, mobile menu open/close, active item, keyboard nav\n4. Storybook — desktop/mobile, with logo, with actions, with search\n5. CSS — responsive breakpoint, mobile menu transition, `--hx-*` tokens, CSS parts, sticky behavior\n6. Performance — bundle < 5KB\n7. Drupal — Twig-renderable, server-side active state, works with Drupal menu system\n\n**Output:** Write findings to `packages/hx-library/src/components/hx-top-nav/AUDIT.md`. Include note on hx-nav overlap. DO NOT fix — document only. Commit AUDIT.md as your PR.",
   "title": "AUDIT: hx-top-nav — T2-38 antagonistic quality review",
-  "status": "backlog",
+  "status": "done",
   "complexity": "medium",
   "priority": 3,
   "source": "api",
@@ -25,6 +25,13 @@
       "to": "backlog",
       "timestamp": "2026-03-05T23:19:14.741Z",
       "reason": "Feature created"
+    },
+    {
+      "from": "backlog",
+      "to": "done",
+      "timestamp": "2026-03-06T14:12:29.956Z"
     }
-  ]
+  ],
+  "featureType": "code",
+  "completedAt": "2026-03-06T14:12:29.956Z"
 }

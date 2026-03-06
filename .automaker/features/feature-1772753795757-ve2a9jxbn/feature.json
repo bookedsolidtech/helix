@@ -2,7 +2,7 @@
   "category": "Uncategorized",
   "description": "Antagonistic quality review of `hx-dropdown` (T2-10) **after implementation completes**.\\n\\nReview every file in `packages/hx-library/src/components/hx-dropdown/` critically.\\n\\n**Audit areas:**\\n1. TypeScript — strict, trigger slot vs prop typed, placement typed, open prop typed\\n2. Accessibility — trigger has aria-expanded/aria-haspopup, menu has correct role, keyboard: Enter/Space opens, Arrow Down moves to first item, Escape closes, axe-core pass\\n3. Tests — open/close, keyboard nav, click-outside, all placements, disabled trigger, 80%+ coverage\\n4. Storybook — dropdown with menu, with custom content, all placements\\n5. CSS — `--hx-*` tokens, CSS parts (trigger, panel)\\n6. Performance — bundle < 5KB\\n7. Drupal — Twig-renderable\\n\\n**Output:** Write findings to `packages/hx-library/src/components/hx-dropdown/AUDIT.md` with severity (P0/P1/P2). DO NOT fix — document only. Commit AUDIT.md as your PR.",
   "title": "AUDIT: hx-dropdown — T2-10 antagonistic quality review",
-  "status": "backlog",
+  "status": "done",
   "dependencies": [
     "feature-1772753122145-bo7y5h5ma"
   ],
@@ -28,6 +28,13 @@
       "to": "backlog",
       "timestamp": "2026-03-05T23:36:35.757Z",
       "reason": "Feature created"
+    },
+    {
+      "from": "backlog",
+      "to": "done",
+      "timestamp": "2026-03-06T14:14:54.683Z"
     }
-  ]
+  ],
+  "featureType": "code",
+  "completedAt": "2026-03-06T14:14:54.683Z"
 }

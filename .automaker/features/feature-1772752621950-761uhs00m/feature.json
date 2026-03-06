@@ -2,7 +2,7 @@
   "category": "Uncategorized",
   "description": "Deep antagonistic quality review of `hx-number-input` (T1-07). 5/6 libraries ship this.\n\nNOTE: This component arrived via `rescue/abandoned-components` (PR #175). Verify PR #175 is merged to dev before starting. Files at `packages/hx-library/src/components/hx-number-input/`.\n\n**Audit areas:**\n1. TypeScript — strict, min/max/step/value typing, stepper button event types, ElementInternals form association\n2. Accessibility — numeric input with `type=\"number\"` considerations vs pattern+inputmode, stepper buttons labeled (aria-label), keyboard (arrow keys increment/decrement, Enter submits), `aria-valuemin`/`aria-valuemax` if applicable, axe-core pass\n3. Tests — increment/decrement buttons, min/max clamping, step precision, form association, disabled/readonly, keyboard nav\n4. Storybook — min/max/step demos, with/without steppers, error states\n5. CSS — stepper button styling, `--hx-*` tokens, CSS parts\n6. Performance — bundle < 5KB\n7. Drupal — form-associated, Twig-renderable\n\n**Output:** Write findings to `packages/hx-library/src/components/hx-number-input/AUDIT.md` with severity (P0/P1/P2). DO NOT fix — document only. Commit AUDIT.md as your PR.",
   "title": "AUDIT: hx-number-input — T1-07 antagonistic quality review",
-  "status": "backlog",
+  "status": "done",
   "complexity": "medium",
   "priority": 2,
   "source": "api",
@@ -25,6 +25,13 @@
       "to": "backlog",
       "timestamp": "2026-03-05T23:17:01.950Z",
       "reason": "Feature created"
+    },
+    {
+      "from": "backlog",
+      "to": "done",
+      "timestamp": "2026-03-06T14:11:57.496Z"
     }
-  ]
+  ],
+  "featureType": "code",
+  "completedAt": "2026-03-06T14:11:57.496Z"
 }
