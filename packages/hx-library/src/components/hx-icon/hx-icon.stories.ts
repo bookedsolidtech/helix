@@ -248,7 +248,116 @@ export const Sizes: Story = {
 };
 
 // ════════════════════════════════════════════════════════════════════════════
-// 6. INLINE SVG MODE
+// 6. COLOR VARIANTS
+// ════════════════════════════════════════════════════════════════════════════
+
+/**
+ * Demonstrates `--hx-icon-color` custom property and `currentColor` inheritance.
+ * Icons inherit color from their parent context by default. Override with
+ * `--hx-icon-color` for explicit control. Useful for status indicators,
+ * branded icons, or icons that need to differ from surrounding text color.
+ */
+export const ColorVariants: Story = {
+  render: () => html`
+    <div style="display: flex; align-items: center; gap: 2rem; flex-wrap: wrap;">
+      <div style="display: flex; flex-direction: column; align-items: center; gap: 0.5rem;">
+        <hx-icon name="check" hx-size="lg" label="Default color"></hx-icon>
+        <span style="font-size: 0.75rem; color: #6b7280;">currentColor</span>
+      </div>
+      <div
+        style="display: flex; flex-direction: column; align-items: center; gap: 0.5rem; color: var(--hx-color-success, #16a34a);"
+      >
+        <hx-icon name="check" hx-size="lg" label="Success"></hx-icon>
+        <span style="font-size: 0.75rem;">Inherited green</span>
+      </div>
+      <div style="display: flex; flex-direction: column; align-items: center; gap: 0.5rem;">
+        <hx-icon
+          name="check"
+          hx-size="lg"
+          label="Explicit red"
+          style="--hx-icon-color: var(--hx-color-error, #dc2626);"
+        ></hx-icon>
+        <span style="font-size: 0.75rem; color: #6b7280;">--hx-icon-color</span>
+      </div>
+      <div style="display: flex; flex-direction: column; align-items: center; gap: 0.5rem;">
+        <hx-icon
+          name="check"
+          hx-size="lg"
+          label="Blue override"
+          style="--hx-icon-color: var(--hx-color-info, #2563eb);"
+        ></hx-icon>
+        <span style="font-size: 0.75rem; color: #6b7280;">--hx-icon-color</span>
+      </div>
+    </div>
+  `,
+};
+
+// ════════════════════════════════════════════════════════════════════════════
+// 7. ICON CATALOG
+// ════════════════════════════════════════════════════════════════════════════
+
+/**
+ * Browseable catalog of common icon names for use with sprite mode.
+ * These are representative names — the actual available icons depend on the
+ * sprite sheet provided via `sprite-url`. In healthcare applications, icons
+ * carry clinical significance (e.g., "warning" vs "error" vs "alert").
+ *
+ * Since `hx-icon` is sprite-source agnostic, icons will only render visually
+ * when a matching sprite sheet is loaded. This catalog demonstrates the
+ * naming pattern and layout.
+ */
+export const IconCatalog: Story = {
+  render: () => {
+    const iconNames = [
+      'check',
+      'close',
+      'search',
+      'home',
+      'settings',
+      'user',
+      'heart',
+      'star',
+      'warning',
+      'error',
+      'info',
+      'help',
+      'edit',
+      'delete',
+      'add',
+      'remove',
+      'arrow-left',
+      'arrow-right',
+      'arrow-up',
+      'arrow-down',
+      'chevron-left',
+      'chevron-right',
+      'menu',
+      'notifications',
+    ];
+    return html`
+      <div
+        style="display: grid; grid-template-columns: repeat(auto-fill, minmax(6rem, 1fr)); gap: 1rem;"
+      >
+        ${iconNames.map(
+          (name) => html`
+            <div
+              style="display: flex; flex-direction: column; align-items: center; gap: 0.5rem; padding: 0.75rem; border: 1px solid #e5e7eb; border-radius: 0.5rem;"
+            >
+              <hx-icon name=${name} hx-size="lg" label=${name}></hx-icon>
+              <span
+                style="font-size: 0.625rem; color: #6b7280; text-align: center; word-break: break-all;"
+                >${name}</span
+              >
+            </div>
+          `,
+        )}
+      </div>
+    `;
+  },
+};
+
+// ════════════════════════════════════════════════════════════════════════════
+// 8. INLINE SVG MODE
 // ════════════════════════════════════════════════════════════════════════════
 
 /**
@@ -275,16 +384,11 @@ export const InlineSvgMode: Story = {
   },
   render: (args) => html`
     <div style="display: flex; flex-direction: column; gap: 0.75rem;">
-      <hx-icon
-        src=${args.src ?? ''}
-        hx-size=${args.size}
-        label=${args.label}
-      ></hx-icon>
+      <hx-icon src=${args.src ?? ''} hx-size=${args.size} label=${args.label}></hx-icon>
       <p style="font-size: 0.875rem; color: #6b7280; margin: 0;">
-        The <code>src</code> attribute triggers inline fetch mode. The SVG is
-        fetched, sanitised, and embedded directly inside the shadow root.
-        Script elements and event-handler attributes are stripped before
-        rendering.
+        The <code>src</code> attribute triggers inline fetch mode. The SVG is fetched, sanitised,
+        and embedded directly inside the shadow root. Script elements and event-handler attributes
+        are stripped before rendering.
       </p>
     </div>
   `,
