@@ -92,11 +92,14 @@ export class HelixNav extends LitElement {
 
   // ─── State ───
 
+  /** @internal */
   @state() private _mobileOpen = false;
+  /** @internal */
   @state() private _expandedIndex: number | null = null;
 
   // ─── Private: bound event handler reference ───
 
+  /** @internal */
   private _boundOutsideClick: (e: MouseEvent) => void = this._handleOutsideClick.bind(this);
 
   /**
@@ -165,7 +168,7 @@ export class HelixNav extends LitElement {
 
   private _handleKeydown(e: KeyboardEvent, index: number, item: NavItem): void {
     const items = this.shadowRoot?.querySelectorAll<HTMLElement>(
-      ':scope > nav > [part="list"] > [part="item"] > [part="link"]',
+      ':scope > [part="nav"] > [part="list"] > [part="item"] > [part="link"]',
     );
     if (!items) return;
     const itemsArr = Array.from(items);
@@ -310,11 +313,12 @@ export class HelixNav extends LitElement {
   private _renderSubMenu(children: NavItem[], parentIndex: number) {
     const isExpanded = this._expandedIndex === parentIndex;
     return html`
-      <ul class="nav__submenu" role="list" aria-label="Submenu" ?hidden=${!isExpanded}>
+      <ul class="nav__submenu" role="menu" aria-label="Submenu" ?hidden=${!isExpanded}>
         ${children.map(
           (child) => html`
-            <li class="nav__submenu-item">
+            <li class="nav__submenu-item" role="none">
               <a
+                role="menuitem"
                 part="link"
                 href=${this._sanitizeHref(child.href)}
                 class=${classMap({
