@@ -26,6 +26,12 @@ describe('hx-divider', () => {
       const lines = el.shadowRoot?.querySelectorAll('.divider__line') ?? [];
       expect(lines.length).toBe(2);
     });
+
+    it('exposes "line" CSS part on both line spans', async () => {
+      const el = await fixture<HelixDivider>('<hx-divider></hx-divider>');
+      const lines = el.shadowRoot?.querySelectorAll('[part~="line"]') ?? [];
+      expect(lines.length).toBe(2);
+    });
   });
 
   // ─── Property: orientation ───
@@ -89,6 +95,33 @@ describe('hx-divider', () => {
     });
   });
 
+  // ─── Property: decorative ───
+
+  describe('Property: decorative', () => {
+    it('defaults to false', async () => {
+      const el = await fixture<HelixDivider>('<hx-divider></hx-divider>');
+      expect(el.decorative).toBe(false);
+    });
+
+    it('reflects decorative attribute to host', async () => {
+      const el = await fixture<HelixDivider>('<hx-divider decorative></hx-divider>');
+      expect(el.hasAttribute('decorative')).toBe(true);
+      expect(el.decorative).toBe(true);
+    });
+
+    it('sets role="presentation" when decorative', async () => {
+      const el = await fixture<HelixDivider>('<hx-divider decorative></hx-divider>');
+      const base = shadowQuery(el, '[part="base"]');
+      expect(base?.getAttribute('role')).toBe('presentation');
+    });
+
+    it('does not set aria-orientation when decorative', async () => {
+      const el = await fixture<HelixDivider>('<hx-divider decorative></hx-divider>');
+      const base = shadowQuery(el, '[part="base"]');
+      expect(base?.hasAttribute('aria-orientation')).toBe(false);
+    });
+  });
+
   // ─── Label slot ───
 
   describe('Label slot', () => {
@@ -132,6 +165,13 @@ describe('hx-divider', () => {
     it('has no axe violations — with label', async () => {
       const el = await fixture<HelixDivider>('<hx-divider>Section</hx-divider>');
       await el.updateComplete;
+      await page.screenshot();
+      const { violations } = await checkA11y(el);
+      expect(violations).toEqual([]);
+    });
+
+    it('has no axe violations — decorative', async () => {
+      const el = await fixture<HelixDivider>('<hx-divider decorative></hx-divider>');
       await page.screenshot();
       const { violations } = await checkA11y(el);
       expect(violations).toEqual([]);
