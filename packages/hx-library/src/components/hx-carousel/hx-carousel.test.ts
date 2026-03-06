@@ -284,7 +284,9 @@ describe('hx-carousel', () => {
 
   describe('Properties', () => {
     it('loop attribute reflects to host', async () => {
-      const el = await fixture<HelixCarousel>('<hx-carousel loop><hx-carousel-item>1</hx-carousel-item></hx-carousel>');
+      const el = await fixture<HelixCarousel>(
+        '<hx-carousel loop><hx-carousel-item>1</hx-carousel-item></hx-carousel>',
+      );
       expect(el.hasAttribute('loop')).toBe(true);
     });
 

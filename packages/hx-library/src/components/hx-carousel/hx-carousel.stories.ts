@@ -134,9 +134,7 @@ function demoSlide(i: number) {
 export const Default: Story = {
   render: () => html`
     <div style="max-width: 600px; margin: 2rem auto; font-family: sans-serif;">
-      <hx-carousel>
-        ${demoSlide(0)} ${demoSlide(1)} ${demoSlide(2)}
-      </hx-carousel>
+      <hx-carousel> ${demoSlide(0)} ${demoSlide(1)} ${demoSlide(2)} </hx-carousel>
     </div>
   `,
   play: async ({ canvasElement }) => {
@@ -183,8 +181,7 @@ export const MultiSlide: Story = {
   render: () => html`
     <div style="max-width: 700px; margin: 2rem auto; font-family: sans-serif;">
       <hx-carousel slides-per-page="2" slides-per-move="1">
-        ${demoSlide(0)} ${demoSlide(1)} ${demoSlide(2)} ${demoSlide(3)}
-        ${demoSlide(4)}
+        ${demoSlide(0)} ${demoSlide(1)} ${demoSlide(2)} ${demoSlide(3)} ${demoSlide(4)}
       </hx-carousel>
     </div>
   `,
@@ -261,20 +258,16 @@ export const MouseDragging: Story = {
 
 export const PatientEducation: Story = {
   render: () => html`
-    <div
-      style="max-width: 600px; margin: 2rem auto; font-family: sans-serif;"
-    >
+    <div style="max-width: 600px; margin: 2rem auto; font-family: sans-serif;">
       <hx-carousel loop>
         <hx-carousel-item>
           <div
             style="padding: 2rem; background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 0.5rem; min-height: 180px;"
           >
-            <h3 style="color: #1e40af; margin: 0 0 0.75rem;">
-              Hand Hygiene
-            </h3>
+            <h3 style="color: #1e40af; margin: 0 0 0.75rem;">Hand Hygiene</h3>
             <p style="color: #1e3a8a; margin: 0; line-height: 1.6;">
-              Wash hands with soap and water for at least 20 seconds before
-              and after patient contact to prevent the spread of infection.
+              Wash hands with soap and water for at least 20 seconds before and after patient
+              contact to prevent the spread of infection.
             </p>
           </div>
         </hx-carousel-item>
@@ -282,12 +275,10 @@ export const PatientEducation: Story = {
           <div
             style="padding: 2rem; background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 0.5rem; min-height: 180px;"
           >
-            <h3 style="color: #166534; margin: 0 0 0.75rem;">
-              Medication Safety
-            </h3>
+            <h3 style="color: #166534; margin: 0 0 0.75rem;">Medication Safety</h3>
             <p style="color: #14532d; margin: 0; line-height: 1.6;">
-              Always verify the 5 rights: right patient, right drug, right
-              dose, right route, and right time before administration.
+              Always verify the 5 rights: right patient, right drug, right dose, right route, and
+              right time before administration.
             </p>
           </div>
         </hx-carousel-item>
@@ -295,12 +286,10 @@ export const PatientEducation: Story = {
           <div
             style="padding: 2rem; background: #fefce8; border: 1px solid #fef08a; border-radius: 0.5rem; min-height: 180px;"
           >
-            <h3 style="color: #854d0e; margin: 0 0 0.75rem;">
-              Fall Prevention
-            </h3>
+            <h3 style="color: #854d0e; margin: 0 0 0.75rem;">Fall Prevention</h3>
             <p style="color: #713f12; margin: 0; line-height: 1.6;">
-              Keep call bells within reach, bed in lowest position, and
-              ensure the environment is clear of hazards at all times.
+              Keep call bells within reach, bed in lowest position, and ensure the environment is
+              clear of hazards at all times.
             </p>
           </div>
         </hx-carousel-item>
