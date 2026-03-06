@@ -7,11 +7,14 @@ import { helixFieldLabelStyles } from './hx-field-label.styles.js';
  * Standardized label for form fields. Used as a consistent sub-component
  * for hx-field and other form field components.
  *
- * When the `for` attribute is set, renders a native `<label for="...">` element
- * for direct label association with a same-document form control.
+ * When the `for` attribute is set, renders a native `<label for="...">` element.
+ * **Important:** Due to shadow DOM encapsulation, the `for` attribute only
+ * associates with inputs in the same shadow root. For labeling inputs outside
+ * the shadow boundary, use `aria-labelledby` on the input referencing this
+ * component's `id` attribute instead.
  *
  * When `for` is unset, renders a `<span>` that can be referenced via
- * `aria-labelledby` for labeling controls in a shadow DOM boundary.
+ * `aria-labelledby` for labeling controls across shadow DOM boundaries.
  *
  * @summary Standardized label for form fields.
  *
@@ -29,6 +32,7 @@ import { helixFieldLabelStyles } from './hx-field-label.styles.js';
  * @cssprop [--hx-font-label-weight=var(--hx-font-weight-medium)] - Label font weight.
  * @cssprop [--hx-font-label-line-height=var(--hx-line-height-normal)] - Label line height.
  * @cssprop [--hx-font-label-family=var(--hx-font-family-sans)] - Label font family.
+ * @cssprop [--hx-field-label-required-color=var(--hx-color-danger)] - Required indicator color.
  */
 @customElement('hx-field-label')
 export class HelixFieldLabel extends LitElement {
@@ -36,7 +40,9 @@ export class HelixFieldLabel extends LitElement {
 
   /**
    * The ID of the associated form control. When set, renders a native
-   * `<label for="...">` element for direct label association.
+   * `<label for="...">` element. Note: due to shadow DOM encapsulation,
+   * this only works for inputs within the same shadow root. For cross-boundary
+   * labeling, use `aria-labelledby` on the target input instead.
    * @attr for
    */
   @property({ type: String })
@@ -58,9 +64,10 @@ export class HelixFieldLabel extends LitElement {
 
   override render() {
     const requiredIndicator = this.required
-      ? html`<span part="required-indicator" class="required-indicator" aria-hidden="true"
-          ><slot name="required-indicator">*</slot></span
-        >`
+      ? html`<span part="required-indicator" class="required-indicator">
+          <span aria-hidden="true"><slot name="required-indicator">*</slot></span>
+          <span class="visually-hidden">required</span>
+        </span>`
       : nothing;
 
     const optionalIndicator = this.optional

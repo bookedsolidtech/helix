@@ -84,10 +84,19 @@ describe('hx-field-label', () => {
       expect(indicator).toBeTruthy();
     });
 
-    it('required indicator has aria-hidden="true"', async () => {
+    it('required indicator has aria-hidden on visual asterisk', async () => {
       const el = await fixture<HelixFieldLabel>('<hx-field-label required>Label</hx-field-label>');
       const indicator = shadowQuery(el, '[part="required-indicator"]');
-      expect(indicator?.getAttribute('aria-hidden')).toBe('true');
+      const hiddenSpan = indicator?.querySelector('[aria-hidden="true"]');
+      expect(hiddenSpan).toBeTruthy();
+    });
+
+    it('required indicator includes visually-hidden "required" text for AT', async () => {
+      const el = await fixture<HelixFieldLabel>('<hx-field-label required>Label</hx-field-label>');
+      const indicator = shadowQuery(el, '[part="required-indicator"]');
+      const srText = indicator?.querySelector('.visually-hidden');
+      expect(srText).toBeTruthy();
+      expect(srText?.textContent?.trim()).toBe('required');
     });
 
     it('does not show required indicator when required is false', async () => {
@@ -128,9 +137,7 @@ describe('hx-field-label', () => {
 
   describe('Slots', () => {
     it('default slot renders label text content', async () => {
-      const el = await fixture<HelixFieldLabel>(
-        '<hx-field-label>Patient Name</hx-field-label>',
-      );
+      const el = await fixture<HelixFieldLabel>('<hx-field-label>Patient Name</hx-field-label>');
       expect(el.textContent?.trim()).toBe('Patient Name');
     });
 
@@ -140,6 +147,13 @@ describe('hx-field-label', () => {
       );
       const slotted = el.querySelector('[slot="required-indicator"]');
       expect(slotted?.textContent).toBe('(req)');
+
+      const slot = el.shadowRoot?.querySelector(
+        'slot[name="required-indicator"]',
+      ) as HTMLSlotElement | null;
+      expect(slot).toBeTruthy();
+      const assignedNodes = slot?.assignedNodes({ flatten: false }) ?? [];
+      expect(assignedNodes.length).toBeGreaterThan(0);
     });
 
     it('required-indicator slot is not rendered when required is false', async () => {
@@ -227,9 +241,7 @@ describe('hx-field-label', () => {
     });
 
     it('has no axe violations when optional', async () => {
-      const el = await fixture<HelixFieldLabel>(
-        '<hx-field-label optional>Notes</hx-field-label>',
-      );
+      const el = await fixture<HelixFieldLabel>('<hx-field-label optional>Notes</hx-field-label>');
       const { violations } = await checkA11y(el);
       expect(violations).toEqual([]);
     });
