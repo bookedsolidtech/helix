@@ -8,6 +8,7 @@ export const helixCardStyles = css`
   .card {
     display: flex;
     flex-direction: column;
+    gap: var(--hx-card-gap, 0);
     background-color: var(--hx-card-bg, var(--hx-color-neutral-0, #ffffff));
     color: var(--hx-card-color, var(--hx-color-neutral-800, #212529));
     border: var(--hx-border-width-thin, 1px) solid
@@ -45,8 +46,30 @@ export const helixCardStyles = css`
     border-width: var(--hx-border-width-medium, 2px);
   }
 
+  .card--compact .card__heading,
+  .card--compact .card__body,
+  .card--compact .card__footer,
+  .card--compact .card__actions {
+    padding-right: var(--hx-space-3, 0.75rem);
+    padding-left: var(--hx-space-3, 0.75rem);
+  }
+
+  .card--compact .card__heading {
+    padding-top: var(--hx-space-3, 0.75rem);
+  }
+
   .card--compact .card__body {
-    padding: var(--hx-space-3, 0.75rem);
+    padding-top: var(--hx-space-3, 0.75rem);
+    padding-bottom: var(--hx-space-3, 0.75rem);
+  }
+
+  .card--compact .card__footer {
+    padding-bottom: var(--hx-space-3, 0.75rem);
+  }
+
+  .card--compact .card__actions {
+    padding-top: var(--hx-space-3, 0.75rem);
+    padding-bottom: var(--hx-space-3, 0.75rem);
   }
 
   /* ─── Interactive ─── */
@@ -124,5 +147,17 @@ export const helixCardStyles = css`
     border-top: var(--hx-border-width-thin, 1px) solid
       var(--hx-card-border-color, var(--hx-color-neutral-200, #dee2e6));
     margin-top: auto;
+  }
+
+  /* ─── Reduced Motion ─── */
+
+  @media (prefers-reduced-motion: reduce) {
+    .card {
+      transition: none;
+    }
+
+    .card--interactive:hover {
+      transform: none;
+    }
   }
 `;
