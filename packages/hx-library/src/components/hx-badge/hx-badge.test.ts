@@ -295,10 +295,88 @@ describe('hx-badge', () => {
       expect(display).toBe('inline-block');
     });
 
-    it('does not have interactive ARIA role', async () => {
+    it('has role=status for assistive technology', async () => {
       const el = await fixture<WcBadge>('<hx-badge>Status</hx-badge>');
       const badge = shadowQuery(el, 'span')!;
-      expect(badge.hasAttribute('role')).toBe(false);
+      expect(badge.getAttribute('role')).toBe('status');
+    });
+  });
+
+  // ─── Property: count/max (5) ───
+
+  describe('Property: count/max', () => {
+    it('displays count when set', async () => {
+      const el = await fixture<WcBadge>('<hx-badge count="5"></hx-badge>');
+      const countEl = shadowQuery(el, '.badge__count');
+      expect(countEl).toBeTruthy();
+      expect(countEl?.textContent).toBe('5');
+    });
+
+    it('truncates to max+ when count exceeds max', async () => {
+      const el = await fixture<WcBadge>('<hx-badge count="150" max="99"></hx-badge>');
+      const countEl = shadowQuery(el, '.badge__count');
+      expect(countEl?.textContent).toBe('99+');
+    });
+
+    it('shows exact count when at or below max', async () => {
+      const el = await fixture<WcBadge>('<hx-badge count="99" max="99"></hx-badge>');
+      const countEl = shadowQuery(el, '.badge__count');
+      expect(countEl?.textContent).toBe('99');
+    });
+
+    it('shows count without max', async () => {
+      const el = await fixture<WcBadge>('<hx-badge count="42"></hx-badge>');
+      const countEl = shadowQuery(el, '.badge__count');
+      expect(countEl?.textContent).toBe('42');
+    });
+
+    it('count=0 renders as 0', async () => {
+      const el = await fixture<WcBadge>('<hx-badge count="0"></hx-badge>');
+      const countEl = shadowQuery(el, '.badge__count');
+      expect(countEl?.textContent).toBe('0');
+    });
+  });
+
+  // ─── Accessibility: aria-label (3) ───
+
+  describe('Accessibility: aria-label', () => {
+    it('sets aria-label on badge span for dot indicator', async () => {
+      const el = await fixture<WcBadge>(
+        '<hx-badge pulse aria-label="New notifications"></hx-badge>',
+      );
+      await el.updateComplete;
+      const badge = shadowQuery(el, '[part="badge"]')!;
+      expect(badge.getAttribute('aria-label')).toBe('New notifications');
+    });
+
+    it('does not set aria-label when not provided', async () => {
+      const el = await fixture<WcBadge>('<hx-badge>Status</hx-badge>');
+      const badge = shadowQuery(el, '[part="badge"]')!;
+      expect(badge.hasAttribute('aria-label')).toBe(false);
+    });
+
+    it('badge span has role=status', async () => {
+      const el = await fixture<WcBadge>('<hx-badge>5</hx-badge>');
+      const badge = shadowQuery(el, '[part="badge"]')!;
+      expect(badge.getAttribute('role')).toBe('status');
+    });
+  });
+
+  // ─── Remove button aria-label (2) ───
+
+  describe('Remove button aria-label', () => {
+    it('includes badge text in remove button label', async () => {
+      const el = await fixture<WcBadge>('<hx-badge removable>Tag</hx-badge>');
+      await el.updateComplete;
+      const btn = shadowQuery(el, '[part="remove-button"]') as HTMLButtonElement;
+      expect(btn.getAttribute('aria-label')).toBe('Remove Tag');
+    });
+
+    it('includes count in remove button label', async () => {
+      const el = await fixture<WcBadge>('<hx-badge removable count="5"></hx-badge>');
+      await el.updateComplete;
+      const btn = shadowQuery(el, '[part="remove-button"]') as HTMLButtonElement;
+      expect(btn.getAttribute('aria-label')).toBe('Remove 5');
     });
   });
 
