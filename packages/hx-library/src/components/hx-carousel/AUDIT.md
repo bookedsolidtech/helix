@@ -3,6 +3,7 @@
 **Auditor:** Antagonistic quality agent
 **Date:** 2026-03-06
 **Files reviewed:**
+
 - `hx-carousel.ts`
 - `hx-carousel.styles.ts`
 - `hx-carousel.test.ts`
@@ -11,6 +12,7 @@
 - `index.ts`
 
 **Severity legend:**
+
 - **P0** — Blocks release. Functional breakage or WCAG violation in production.
 - **P1** — Must fix before merge. Spec non-compliance or significant accessibility gap.
 - **P2** — Should fix before merge. Quality, maintainability, or coverage gap.
@@ -56,7 +58,7 @@ The label is hardcoded. If a page contains two carousels (e.g., "Featured Produc
 aria-live=${isAutoplayStopped ? 'polite' : 'off'}
 ```
 
-The `aria-live` region is placed on `.scroll-container`, which contains `.track`. Slide transitions are CSS `transform`-only — no DOM nodes are added, removed, or mutated. Screen reader live regions only announce when DOM *content* changes. The current setup guarantees that slide changes are **never announced** to screen reader users regardless of the `aria-live` value.
+The `aria-live` region is placed on `.scroll-container`, which contains `.track`. Slide transitions are CSS `transform`-only — no DOM nodes are added, removed, or mutated. Screen reader live regions only announce when DOM _content_ changes. The current setup guarantees that slide changes are **never announced** to screen reader users regardless of the `aria-live` value.
 
 **Concrete impact:** A keyboard user presses ArrowRight. The visual slide changes. The screen reader announces nothing. The user has no confirmation that navigation succeeded.
 
@@ -70,13 +72,13 @@ The `aria-live` region is placed on `.scroll-container`, which contains `.track`
 
 The feature spec explicitly requires CSS parts: `carousel`, `slide`, `prev-btn`, `next-btn`, `pagination`. The current implementation exposes:
 
-| Required Part | Implemented Part |
-|---|---|
-| `carousel` | `base` (renamed) |
-| `slide` | ❌ not exposed |
-| `prev-btn` | ❌ not exposed (only container `navigation`) |
-| `next-btn` | ❌ not exposed (only container `navigation`) |
-| `pagination` | ✅ |
+| Required Part | Implemented Part                             |
+| ------------- | -------------------------------------------- |
+| `carousel`    | `base` (renamed)                             |
+| `slide`       | ❌ not exposed                               |
+| `prev-btn`    | ❌ not exposed (only container `navigation`) |
+| `next-btn`    | ❌ not exposed (only container `navigation`) |
+| `pagination`  | ✅                                           |
 
 The `play-pause-btn` also has no `part` attribute. Consumer teams cannot style individual navigation buttons without using deep CSS selectors, which violates Shadow DOM encapsulation principles.
 
@@ -221,7 +223,7 @@ The drag tests only verify that dragging works when enabled. There is no test co
 
 ## Storybook
 
-### P2 — All stories use static `render: () => html\`...\`` ignoring `args`
+### P2 — All stories use static `render: () => html\`...\``ignoring`args`
 
 **File:** `hx-carousel.stories.ts:134–253`
 
@@ -236,7 +238,7 @@ All 8 stories use a `render` function that hard-codes values and does not consum
 **File:** `hx-carousel.stories.ts:199–217`
 
 ```ts
-src="https://picsum.photos/seed/a/600/300"
+src = 'https://picsum.photos/seed/a/600/300';
 ```
 
 Healthcare environments with strict network egress rules or air-gapped deployments will see broken images. Stories should use local asset files or data URIs, not public CDN URLs.
@@ -298,54 +300,55 @@ Four inline SVG blocks (`_renderPrevIcon`, `_renderNextIcon`, `_renderPlayIcon`,
 **File:** `packages/hx-library/src/components/hx-carousel/`
 
 The feature specification explicitly requires "Drupal — Twig-renderable" as an audit area. The component directory contains no:
+
 - Twig template (`.html.twig`)
 - Drupal behaviors file (`hx-carousel.behaviors.js`)
 - Integration documentation
 
-Other components in the system pattern include Drupal integration artifacts. This component is unverified for Drupal CMS compatibility. The web component standard means it *should* be Twig-renderable, but without a template example and behavioral attachment, Drupal consumers have no reference implementation.
+Other components in the system pattern include Drupal integration artifacts. This component is unverified for Drupal CMS compatibility. The web component standard means it _should_ be Twig-renderable, but without a template example and behavioral attachment, Drupal consumers have no reference implementation.
 
 ---
 
 ## Summary Table
 
-| # | File | Severity | Finding |
-|---|------|----------|---------|
-| 1 | `hx-carousel.ts:435` | **P1** | Pagination dot `aria-label` missing "of N" total count |
-| 2 | `hx-carousel.ts:552` | **P1** | Hardcoded `aria-label="Carousel"` blocks multi-carousel pages |
-| 3 | `hx-carousel.ts:559` | **P1** | `aria-live` region is non-functional — slide changes invisible to screen readers |
-| 4 | `hx-carousel.ts:383` | **P1** | Missing `prev-btn`, `next-btn` CSS parts; `base` vs `carousel` name mismatch |
-| 5 | `hx-carousel.test.ts:78` | **P1** | Test locks in wrong pagination label format (`"Slide 1"` not `"Slide 1 of 3"`) |
-| 6 | `hx-carousel/` (dir) | **P1** | No Drupal Twig template or integration documentation |
-| 7 | `hx-carousel.ts:551` | **P2** | `aria-roledescription="carousel"` + `role="region"` is non-standard |
-| 8 | `hx-carousel-item.ts:28` | **P2** | `outline: none` removes focus indicator from focusable slide group |
-| 9 | `hx-carousel.ts:323` | **P2** | No touch event support — tablets cannot use drag navigation |
-| 10 | `hx-carousel.ts:244` | **P2** | `_resumeAutoplay` duplicates timer callback from `_startAutoplay` |
-| 11 | `hx-carousel.test.ts` | **P2** | No test for `prefers-reduced-motion` preventing autoplay |
-| 12 | `hx-carousel.test.ts` | **P2** | No test for `goTo()` same-index no-op |
-| 13 | `hx-carousel.test.ts` | **P2** | No test for single-slide carousel edge case |
-| 14 | `hx-carousel.test.ts` | **P2** | No test for `mouseDragging=false` preventing drag |
-| 15 | `hx-carousel.test.ts` | **P2** | No test for `disconnectedCallback` timer cleanup |
-| 16 | `hx-carousel.stories.ts` | **P2** | All stories ignore `args` — Storybook controls non-functional |
-| 17 | `hx-carousel.stories.ts:199` | **P2** | External picsum.photos URLs fail in air-gapped environments |
-| 18 | `hx-carousel.stories.ts:141` | **P2** | Unused `_canvas` variable in Default play function |
-| 19 | `hx-carousel.styles.ts:109` | **P2** | `scroll-container` part name is semantically misleading |
-| 20 | `hx-carousel.ts:81` | **P3** | `mouseDragging` not reflected to host (inconsistent with `loop`, `autoplay`) |
-| 21 | `hx-carousel.ts:448` | **P3** | Inline SVG icons re-parsed on every render — use module-level constants |
-| 22 | `hx-carousel.stories.ts` | **P3** | No dedicated `WithPagination` story |
-| 23 | `hx-carousel.ts:27` | **P3** | No component-level CSS custom properties for button sizing, dot sizing |
+| #   | File                         | Severity | Finding                                                                          |
+| --- | ---------------------------- | -------- | -------------------------------------------------------------------------------- |
+| 1   | `hx-carousel.ts:435`         | **P1**   | Pagination dot `aria-label` missing "of N" total count                           |
+| 2   | `hx-carousel.ts:552`         | **P1**   | Hardcoded `aria-label="Carousel"` blocks multi-carousel pages                    |
+| 3   | `hx-carousel.ts:559`         | **P1**   | `aria-live` region is non-functional — slide changes invisible to screen readers |
+| 4   | `hx-carousel.ts:383`         | **P1**   | Missing `prev-btn`, `next-btn` CSS parts; `base` vs `carousel` name mismatch     |
+| 5   | `hx-carousel.test.ts:78`     | **P1**   | Test locks in wrong pagination label format (`"Slide 1"` not `"Slide 1 of 3"`)   |
+| 6   | `hx-carousel/` (dir)         | **P1**   | No Drupal Twig template or integration documentation                             |
+| 7   | `hx-carousel.ts:551`         | **P2**   | `aria-roledescription="carousel"` + `role="region"` is non-standard              |
+| 8   | `hx-carousel-item.ts:28`     | **P2**   | `outline: none` removes focus indicator from focusable slide group               |
+| 9   | `hx-carousel.ts:323`         | **P2**   | No touch event support — tablets cannot use drag navigation                      |
+| 10  | `hx-carousel.ts:244`         | **P2**   | `_resumeAutoplay` duplicates timer callback from `_startAutoplay`                |
+| 11  | `hx-carousel.test.ts`        | **P2**   | No test for `prefers-reduced-motion` preventing autoplay                         |
+| 12  | `hx-carousel.test.ts`        | **P2**   | No test for `goTo()` same-index no-op                                            |
+| 13  | `hx-carousel.test.ts`        | **P2**   | No test for single-slide carousel edge case                                      |
+| 14  | `hx-carousel.test.ts`        | **P2**   | No test for `mouseDragging=false` preventing drag                                |
+| 15  | `hx-carousel.test.ts`        | **P2**   | No test for `disconnectedCallback` timer cleanup                                 |
+| 16  | `hx-carousel.stories.ts`     | **P2**   | All stories ignore `args` — Storybook controls non-functional                    |
+| 17  | `hx-carousel.stories.ts:199` | **P2**   | External picsum.photos URLs fail in air-gapped environments                      |
+| 18  | `hx-carousel.stories.ts:141` | **P2**   | Unused `_canvas` variable in Default play function                               |
+| 19  | `hx-carousel.styles.ts:109`  | **P2**   | `scroll-container` part name is semantically misleading                          |
+| 20  | `hx-carousel.ts:81`          | **P3**   | `mouseDragging` not reflected to host (inconsistent with `loop`, `autoplay`)     |
+| 21  | `hx-carousel.ts:448`         | **P3**   | Inline SVG icons re-parsed on every render — use module-level constants          |
+| 22  | `hx-carousel.stories.ts`     | **P3**   | No dedicated `WithPagination` story                                              |
+| 23  | `hx-carousel.ts:27`          | **P3**   | No component-level CSS custom properties for button sizing, dot sizing           |
 
 ---
 
 ## Release Gate Assessment
 
-| Gate | Status | Blocker |
-|------|--------|---------|
-| TypeScript strict | ✅ Pass | No `any` types, no non-null assertions |
-| Tests | ⚠️ Partial | 5 missing coverage scenarios (P2); 1 test validates wrong value (P1) |
-| Accessibility WCAG 2.1 AA | ❌ Fail | P1: Live region non-functional; P1: Hardcoded non-distinguishable label; P1: Pagination labels missing context |
-| Storybook | ⚠️ Partial | Controls non-functional across all stories (P2) |
-| CEM accuracy | ⚠️ Partial | CSS parts in JSDoc don't match spec (`base` vs `carousel`; missing `prev-btn`, `next-btn`) |
-| Bundle size | ✅ Likely pass | No external carousel library; self-contained |
-| Drupal | ❌ Unverified | No Twig template or Drupal behaviors file |
+| Gate                      | Status         | Blocker                                                                                                        |
+| ------------------------- | -------------- | -------------------------------------------------------------------------------------------------------------- |
+| TypeScript strict         | ✅ Pass        | No `any` types, no non-null assertions                                                                         |
+| Tests                     | ⚠️ Partial     | 5 missing coverage scenarios (P2); 1 test validates wrong value (P1)                                           |
+| Accessibility WCAG 2.1 AA | ❌ Fail        | P1: Live region non-functional; P1: Hardcoded non-distinguishable label; P1: Pagination labels missing context |
+| Storybook                 | ⚠️ Partial     | Controls non-functional across all stories (P2)                                                                |
+| CEM accuracy              | ⚠️ Partial     | CSS parts in JSDoc don't match spec (`base` vs `carousel`; missing `prev-btn`, `next-btn`)                     |
+| Bundle size               | ✅ Likely pass | No external carousel library; self-contained                                                                   |
+| Drupal                    | ❌ Unverified  | No Twig template or Drupal behaviors file                                                                      |
 
 **Verdict: BLOCKED.** Three P1 accessibility findings (non-functional live region, undifferentiated label, pagination label format) constitute WCAG 2.1 AA violations. One P1 test finding encodes the wrong expected value. Drupal compatibility is unverified against the spec requirement.
