@@ -9,12 +9,12 @@
 
 ## Summary
 
-| Severity | Count |
-|----------|-------|
-| P0 (Blocker) | 2 |
-| P1 (High) | 8 |
-| P2 (Medium) | 8 |
-| **Total** | **18** |
+| Severity     | Count  |
+| ------------ | ------ |
+| P0 (Blocker) | 2      |
+| P1 (High)    | 8      |
+| P2 (Medium)  | 8      |
+| **Total**    | **18** |
 
 ---
 
@@ -26,7 +26,7 @@
 
 ```html
 <div class="section section--overflow" hidden>
-  <slot name="overflow" @slotchange=${this._handleSlotChange}></slot>
+  <slot name="overflow" @slotchange="${this._handleSlotChange}"></slot>
 </div>
 ```
 
@@ -117,7 +117,7 @@ Additionally, the host element itself now carries an `aria-label` attribute (fro
 `_getFocusableItems()` discovers focusable items using a CSS selector:
 
 ```typescript
-'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
 ```
 
 This selector targets native HTML elements only. A `<hx-button>` custom element does not match `button` (its tag is `hx-button`), does not have `[href]`, and its `tabindex` may only be set via `ElementInternals` (not a DOM attribute). These elements are completely invisible to the roving tabindex system. Any action bar populated with design system components (`hx-button`, `hx-icon-button`) will have no keyboard navigation.
@@ -140,16 +140,16 @@ The audit spec requires: _"Drupal — Twig-renderable."_ No Twig template exists
 
 Critical code paths with zero test coverage:
 
-| Missing Test | Code Path |
-|---|---|
-| `Home` key moves focus to first item | `_handleKeydown` Home branch |
-| `End` key moves focus to last item | `_handleKeydown` End branch |
-| `ArrowLeft` wraps last-to-first | `_moveFocus('prev')` wrap |
-| `_initRovingTabindex` sets first item tabindex=0 | `_initRovingTabindex()` |
-| Disabled item excluded from navigation | `_isFocusable()` disabled branch |
-| `disconnectedCallback` removes keydown listener | Memory leak guard |
-| Custom element in slot gets proper tabindex | Focusable item discovery |
-| Sticky axe-core accessibility | Sticky state a11y |
+| Missing Test                                     | Code Path                        |
+| ------------------------------------------------ | -------------------------------- |
+| `Home` key moves focus to first item             | `_handleKeydown` Home branch     |
+| `End` key moves focus to last item               | `_handleKeydown` End branch      |
+| `ArrowLeft` wraps last-to-first                  | `_moveFocus('prev')` wrap        |
+| `_initRovingTabindex` sets first item tabindex=0 | `_initRovingTabindex()`          |
+| Disabled item excluded from navigation           | `_isFocusable()` disabled branch |
+| `disconnectedCallback` removes keydown listener  | Memory leak guard                |
+| Custom element in slot gets proper tabindex      | Focusable item discovery         |
+| Sticky axe-core accessibility                    | Sticky state a11y                |
 
 The Home key P0 bug (P0-02) is untested, meaning a broken behavior has shipped without detection.
 
@@ -162,10 +162,13 @@ The Home key P0 bug (P0-02) is untested, meaning a broken behavior has shipped w
 Every story renders action buttons with hardcoded inline styles:
 
 ```html
-<button style="padding: 0.375rem 0.75rem; border: 1px solid #d1d5db; border-radius: 0.375rem; background: white; cursor: pointer;">
+<button
+  style="padding: 0.375rem 0.75rem; border: 1px solid #d1d5db; border-radius: 0.375rem; background: white; cursor: pointer;"
+></button>
 ```
 
 And `PatientRecordToolbar` uses raw hex values:
+
 - `#2563eb` (hardcoded brand blue)
 - `#fca5a5`, `#fef2f2`, `#dc2626` (hardcoded danger red)
 
