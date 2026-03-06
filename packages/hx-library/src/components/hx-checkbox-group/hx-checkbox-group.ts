@@ -88,7 +88,7 @@ export class HelixCheckboxGroup extends LitElement {
   orientation: 'vertical' | 'horizontal' = 'vertical';
 
   @query('.fieldset__items')
-  private declare _itemsEl: HTMLElement | null;
+  declare private _itemsEl: HTMLElement | null;
 
   @state() private _hasErrorSlot = false;
 

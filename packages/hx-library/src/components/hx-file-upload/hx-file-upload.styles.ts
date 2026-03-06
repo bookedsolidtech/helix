@@ -44,18 +44,9 @@ export const helixFileUploadStyles = css`
     min-height: var(--hx-size-32, 8rem);
     padding: var(--hx-space-6, 1.5rem) var(--hx-space-4, 1rem);
     border: var(--hx-border-width-thin, 1px) dashed
-      var(
-        --hx-file-upload-dropzone-border-color,
-        var(--hx-color-neutral-300, #ced4da)
-      );
-    border-radius: var(
-      --hx-file-upload-dropzone-border-radius,
-      var(--hx-border-radius-lg, 0.5rem)
-    );
-    background-color: var(
-      --hx-file-upload-dropzone-bg,
-      var(--hx-color-neutral-50, #f8f9fa)
-    );
+      var(--hx-file-upload-dropzone-border-color, var(--hx-color-neutral-300, #ced4da));
+    border-radius: var(--hx-file-upload-dropzone-border-radius, var(--hx-border-radius-lg, 0.5rem));
+    background-color: var(--hx-file-upload-dropzone-bg, var(--hx-color-neutral-50, #f8f9fa));
     cursor: pointer;
     text-align: center;
     transition:
@@ -73,8 +64,7 @@ export const helixFileUploadStyles = css`
     box-shadow: 0 0 0 var(--hx-focus-ring-width, 2px)
       color-mix(
         in srgb,
-        var(--hx-focus-ring-color, #2563eb)
-          calc(var(--hx-focus-ring-opacity, 0.25) * 100%),
+        var(--hx-focus-ring-color, #2563eb) calc(var(--hx-focus-ring-opacity, 0.25) * 100%),
         transparent
       );
   }
@@ -93,10 +83,7 @@ export const helixFileUploadStyles = css`
   }
 
   .dropzone--error {
-    border-color: var(
-      --hx-file-upload-error-color,
-      var(--hx-color-error-500, #dc3545)
-    );
+    border-color: var(--hx-file-upload-error-color, var(--hx-color-error-500, #dc3545));
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -141,8 +128,7 @@ export const helixFileUploadStyles = css`
     flex-direction: column;
     gap: var(--hx-space-1, 0.25rem);
     padding: var(--hx-space-2, 0.5rem) var(--hx-space-3, 0.75rem);
-    border: var(--hx-border-width-thin, 1px) solid
-      var(--hx-color-neutral-200, #e9ecef);
+    border: var(--hx-border-width-thin, 1px) solid var(--hx-color-neutral-200, #e9ecef);
     border-radius: var(--hx-border-radius-md, 0.375rem);
     background-color: var(--hx-color-neutral-0, #ffffff);
   }
@@ -181,25 +167,18 @@ export const helixFileUploadStyles = css`
     color: var(--hx-color-neutral-500, #6c757d);
     cursor: pointer;
     line-height: 1;
-    transition: color var(--hx-transition-fast, 150ms ease),
+    transition:
+      color var(--hx-transition-fast, 150ms ease),
       background-color var(--hx-transition-fast, 150ms ease);
   }
 
   .file-item__remove:hover {
-    color: var(
-      --hx-file-upload-error-color,
-      var(--hx-color-error-500, #dc3545)
-    );
-    background-color: color-mix(
-      in srgb,
-      var(--hx-color-error-500, #dc3545) 8%,
-      transparent
-    );
+    color: var(--hx-file-upload-error-color, var(--hx-color-error-500, #dc3545));
+    background-color: color-mix(in srgb, var(--hx-color-error-500, #dc3545) 8%, transparent);
   }
 
   .file-item__remove:focus-visible {
-    outline: var(--hx-focus-ring-width, 2px) solid
-      var(--hx-focus-ring-color, #2563eb);
+    outline: var(--hx-focus-ring-width, 2px) solid var(--hx-focus-ring-color, #2563eb);
     outline-offset: 2px;
   }
 
@@ -221,10 +200,7 @@ export const helixFileUploadStyles = css`
 
   .progress-bar {
     height: 100%;
-    background-color: var(
-      --hx-file-upload-progress-color,
-      var(--hx-color-primary-500, #2563eb)
-    );
+    background-color: var(--hx-file-upload-progress-color, var(--hx-color-primary-500, #2563eb));
     border-radius: inherit;
     transition: width var(--hx-transition-fast, 150ms ease);
     width: 0%;
@@ -240,10 +216,7 @@ export const helixFileUploadStyles = css`
 
   .field__error {
     font-size: var(--hx-font-size-xs, 0.75rem);
-    color: var(
-      --hx-file-upload-error-color,
-      var(--hx-color-error-500, #dc3545)
-    );
+    color: var(--hx-file-upload-error-color, var(--hx-color-error-500, #dc3545));
     line-height: var(--hx-line-height-normal, 1.5);
   }
 `;
