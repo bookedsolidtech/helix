@@ -47,7 +47,7 @@ export const helixPaginationStyles = css`
     white-space: nowrap;
   }
 
-  .button:hover:not(:disabled) {
+  .button:hover:not(:disabled):not([aria-disabled='true']) {
     background: var(--hx-pagination-hover-bg, var(--hx-color-surface-hover, #f3f4f6));
     border-color: var(--hx-pagination-hover-border-color, var(--hx-color-primary, #2563eb));
   }
