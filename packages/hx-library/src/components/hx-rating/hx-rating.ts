@@ -118,8 +118,9 @@ export class HelixRating extends LitElement {
 
   private _clampAndSnap(v: number): number {
     const clamped = Math.min(Math.max(0, v), this.max);
-    const snapped = Math.round(clamped / this.precision) * this.precision;
-    return Math.round(snapped * 10) / 10;
+    const steps = Math.round(clamped / this.precision);
+    const snapped = steps * this.precision;
+    return parseFloat(snapped.toFixed(this.precision === 0.5 ? 1 : 0));
   }
 
   private _getStarState(i: number): 'full' | 'half' | 'empty' {
@@ -191,6 +192,9 @@ export class HelixRating extends LitElement {
 
     if (next !== null) {
       this._setValue(next);
+      void this.updateComplete.then(() => {
+        this.shadowRoot?.querySelector<HTMLElement>('[part="symbol"][tabindex="0"]')?.focus();
+      });
     }
   }
 

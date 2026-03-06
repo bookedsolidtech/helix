@@ -7,7 +7,7 @@ export const helixRatingStyles = css`
 
   :host([disabled]) {
     pointer-events: none;
-    opacity: var(--hx-opacity-disabled, 0.4);
+    opacity: var(--hx-opacity-disabled, 0.5);
   }
 
   /* ─── Base Container ─── */
