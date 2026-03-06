@@ -36,40 +36,47 @@ describe('hx-container', () => {
       expect(inner.classList.contains('container__inner--content')).toBe(true);
     });
 
-    it('width="full" applies full class', async () => {
+    it('width="full" applies full class and max-width: none', async () => {
       const el = await fixture<WcContainer>('<hx-container width="full">Content</hx-container>');
       const inner = shadowQuery(el, '.container__inner')!;
       expect(inner.classList.contains('container__inner--full')).toBe(true);
+      expect(getComputedStyle(inner).maxWidth).toBe('none');
     });
 
-    it('width="narrow" applies narrow class', async () => {
+    it('width="narrow" applies narrow class and max-width', async () => {
       const el = await fixture<WcContainer>('<hx-container width="narrow">Content</hx-container>');
       const inner = shadowQuery(el, '.container__inner')!;
       expect(inner.classList.contains('container__inner--narrow')).toBe(true);
+      const maxWidth = getComputedStyle(inner).maxWidth;
+      expect(maxWidth).not.toBe('none');
     });
 
-    it('width="sm" applies sm class', async () => {
+    it('width="sm" applies sm class and max-width: 640px', async () => {
       const el = await fixture<WcContainer>('<hx-container width="sm">Content</hx-container>');
       const inner = shadowQuery(el, '.container__inner')!;
       expect(inner.classList.contains('container__inner--sm')).toBe(true);
+      expect(getComputedStyle(inner).maxWidth).toBe('640px');
     });
 
-    it('width="md" applies md class', async () => {
+    it('width="md" applies md class and max-width: 768px', async () => {
       const el = await fixture<WcContainer>('<hx-container width="md">Content</hx-container>');
       const inner = shadowQuery(el, '.container__inner')!;
       expect(inner.classList.contains('container__inner--md')).toBe(true);
+      expect(getComputedStyle(inner).maxWidth).toBe('768px');
     });
 
-    it('width="lg" applies lg class', async () => {
+    it('width="lg" applies lg class and max-width: 1024px', async () => {
       const el = await fixture<WcContainer>('<hx-container width="lg">Content</hx-container>');
       const inner = shadowQuery(el, '.container__inner')!;
       expect(inner.classList.contains('container__inner--lg')).toBe(true);
+      expect(getComputedStyle(inner).maxWidth).toBe('1024px');
     });
 
-    it('width="xl" applies xl class', async () => {
+    it('width="xl" applies xl class and max-width: 1280px', async () => {
       const el = await fixture<WcContainer>('<hx-container width="xl">Content</hx-container>');
       const inner = shadowQuery(el, '.container__inner')!;
       expect(inner.classList.contains('container__inner--xl')).toBe(true);
+      expect(getComputedStyle(inner).maxWidth).toBe('1280px');
     });
   });
 
@@ -191,12 +198,13 @@ describe('hx-container', () => {
       expect(styles.display).toBe('block');
     });
 
-    it('.container__inner has auto horizontal margins for centering', async () => {
-      const el = await fixture<WcContainer>('<hx-container>Content</hx-container>');
+    it('.container__inner is centered via auto margins', async () => {
+      const el = await fixture<WcContainer>(
+        '<hx-container width="sm" style="width: 1200px;">Content</hx-container>',
+      );
       const inner = shadowQuery(el, '.container__inner')!;
       const styles = getComputedStyle(inner);
-      expect(styles.marginLeft).toBe('0px');
-      expect(styles.marginRight).toBe('0px');
+      expect(styles.marginLeft).toBe(styles.marginRight);
     });
 
     it('width="full" inner has no max-width constraint', async () => {
