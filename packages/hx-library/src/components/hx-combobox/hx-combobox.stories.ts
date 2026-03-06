@@ -66,15 +66,6 @@ const meta = {
         type: { summary: 'boolean' },
       },
     },
-    multiple: {
-      control: 'boolean',
-      description: 'Whether multiple options can be selected.',
-      table: {
-        category: 'Behavior',
-        defaultValue: { summary: 'false' },
-        type: { summary: 'boolean' },
-      },
-    },
     clearable: {
       control: 'boolean',
       description: 'Whether to show a clear button when a value is set.',
@@ -128,7 +119,6 @@ const meta = {
     size: 'md',
     required: false,
     disabled: false,
-    multiple: false,
     clearable: false,
     loading: false,
     filterDebounce: 0,
@@ -153,7 +143,6 @@ export const Default: Story = {
       hx-size=${args.size}
       ?required=${args.required}
       ?disabled=${args.disabled}
-      ?multiple=${args.multiple}
       ?clearable=${args.clearable}
       ?loading=${args.loading}
       filter-debounce=${args.filterDebounce}
@@ -183,22 +172,6 @@ export const WithOptions: Story = {
       <option slot="option" value="de">Germany</option>
       <option slot="option" value="fr">France</option>
       <option slot="option" value="jp">Japan</option>
-    </hx-combobox>
-  `,
-};
-
-// ─────────────────────────────────────────────────
-// Multiple
-// ─────────────────────────────────────────────────
-
-export const Multiple: Story = {
-  render: () => html`
-    <hx-combobox label="Skills" placeholder="Select skills..." multiple>
-      <option slot="option" value="js">JavaScript</option>
-      <option slot="option" value="ts">TypeScript</option>
-      <option slot="option" value="react">React</option>
-      <option slot="option" value="lit">Lit</option>
-      <option slot="option" value="css">CSS</option>
     </hx-combobox>
   `,
 };
