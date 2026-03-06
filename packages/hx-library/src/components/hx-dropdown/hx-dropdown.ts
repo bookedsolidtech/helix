@@ -93,8 +93,8 @@ export class HelixDropdown extends LitElement {
 
   @state() private _panelVisible = false;
 
-  @query('[part="panel"]') private _panel!: HTMLElement;
-  @query('[part="trigger"]') private _triggerWrapper!: HTMLElement;
+  @query('[part="panel"]') private _panel: HTMLElement | null = null;
+  @query('[part="trigger"]') private _triggerWrapper: HTMLElement | null = null;
 
   // ─── Lifecycle ───
 
@@ -251,6 +251,7 @@ export class HelixDropdown extends LitElement {
 
   override firstUpdated(): void {
     this._setupTriggerAria();
+    this._syncAriaDisabled();
   }
 
   private _setupTriggerAria(): void {
@@ -271,6 +272,17 @@ export class HelixDropdown extends LitElement {
       if (trigger) {
         trigger.setAttribute('aria-expanded', String(this.open));
       }
+    }
+    if (changedProperties.has('disabled')) {
+      this._syncAriaDisabled();
+    }
+  }
+
+  private _syncAriaDisabled(): void {
+    if (this.disabled) {
+      this.setAttribute('aria-disabled', 'true');
+    } else {
+      this.removeAttribute('aria-disabled');
     }
   }
 }

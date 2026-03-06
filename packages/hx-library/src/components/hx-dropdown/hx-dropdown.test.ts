@@ -75,15 +75,33 @@ describe('hx-dropdown', () => {
     });
 
     it('reflects open attribute', async () => {
-      const el = await fixture<HelixDropdown>('<hx-dropdown open><button slot="trigger">T</button><div role="menu" aria-label="Actions">Content</div></hx-dropdown>');
+      const el = await fixture<HelixDropdown>(
+        '<hx-dropdown open><button slot="trigger">T</button><div role="menu" aria-label="Actions">Content</div></hx-dropdown>',
+      );
       expect(el.open).toBe(true);
       expect(el.getAttribute('open')).not.toBeNull();
     });
 
     it('reflects disabled attribute', async () => {
-      const el = await fixture<HelixDropdown>('<hx-dropdown disabled><button slot="trigger">T</button><div role="menu" aria-label="Actions">Content</div></hx-dropdown>');
+      const el = await fixture<HelixDropdown>(
+        '<hx-dropdown disabled><button slot="trigger">T</button><div role="menu" aria-label="Actions">Content</div></hx-dropdown>',
+      );
       expect(el.disabled).toBe(true);
       expect(el.getAttribute('disabled')).not.toBeNull();
+    });
+
+    it('sets aria-disabled="true" when disabled', async () => {
+      const el = await fixture<HelixDropdown>(
+        '<hx-dropdown disabled><button slot="trigger">T</button><div role="menu" aria-label="Actions">Content</div></hx-dropdown>',
+      );
+      await el.updateComplete;
+      expect(el.getAttribute('aria-disabled')).toBe('true');
+    });
+
+    it('removes aria-disabled when not disabled', async () => {
+      const el = await fixture<HelixDropdown>(triggerHtml);
+      await el.updateComplete;
+      expect(el.getAttribute('aria-disabled')).toBeNull();
     });
   });
 
@@ -132,7 +150,9 @@ describe('hx-dropdown', () => {
     });
 
     it('does not open when disabled', async () => {
-      const el = await fixture<HelixDropdown>('<hx-dropdown disabled><button slot="trigger">T</button><div role="menu" aria-label="Actions">Content</div></hx-dropdown>');
+      const el = await fixture<HelixDropdown>(
+        '<hx-dropdown disabled><button slot="trigger">T</button><div role="menu" aria-label="Actions">Content</div></hx-dropdown>',
+      );
       const trigger = el.querySelector<HTMLElement>('[slot="trigger"]')!;
       trigger.click();
       await el.updateComplete;
