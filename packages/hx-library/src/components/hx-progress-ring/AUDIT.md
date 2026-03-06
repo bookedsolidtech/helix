@@ -4,6 +4,7 @@
 **Auditor:** AVA (Autonomous Virtual Agency)
 **Branch:** `feature/audit-hx-progress-ring-t2-05`
 **Files reviewed:**
+
 - `hx-progress-ring.ts`
 - `hx-progress-ring.styles.ts`
 - `hx-progress-ring.test.ts`
@@ -40,6 +41,7 @@ override firstUpdated(): void {
 ```
 
 **Problem:** `firstUpdated()` fires after the first client-side render. In Drupal's server-side rendering, the browser parses the raw HTML before JavaScript executes. During that window:
+
 - The element has no `role` — screen readers cannot identify it as a progressbar.
 - `aria-valuemin` and `aria-valuemax` are absent.
 - If JavaScript is deferred or fails, the element is semantically invisible.
@@ -74,9 +76,11 @@ if (this.label) {
 The axe-core tests pass because `role=progressbar` does not currently trigger the `aria-required-attr` rule in axe's ruleset, but ARIA Authoring Practices Guide explicitly states progressbar widgets must have accessible names. In a healthcare context this is not negotiable.
 
 **Evidence:** Every test fixture that is axe-tested provides a `label` attribute:
+
 ```ts
-'<hx-progress-ring value="65" label="Loading: 65%"></hx-progress-ring>'
+'<hx-progress-ring value="65" label="Loading: 65%"></hx-progress-ring>';
 ```
+
 This masks the missing-label path from axe coverage.
 
 **Fix:** Either (a) make `label` required and emit a console warning when absent, or (b) add `aria-required-attr` to the axe ruleset configuration for `progressbar` and test the no-label path to confirm it fails correctly.
@@ -103,9 +107,18 @@ The audit specification explicitly requires `max` typed as a number. The compone
 
 ```css
 @keyframes hx-progress-ring-dash {
-  0%   { stroke-dasharray: 1, 200; stroke-dashoffset: 0; }
-  50%  { stroke-dasharray: 89, 200; stroke-dashoffset: -35; }
-  100% { stroke-dasharray: 89, 200; stroke-dashoffset: -124; }
+  0% {
+    stroke-dasharray: 1, 200;
+    stroke-dashoffset: 0;
+  }
+  50% {
+    stroke-dasharray: 89, 200;
+    stroke-dashoffset: -35;
+  }
+  100% {
+    stroke-dasharray: 89, 200;
+    stroke-dashoffset: -124;
+  }
 }
 ```
 
@@ -122,6 +135,7 @@ This is a P2 because `strokeWidth` is a public property users can set, but the a
 **File:** `hx-progress-ring.test.ts`
 
 Missing tests:
+
 - `value=0`: No test verifies the indicator stroke-dashoffset equals the full circumference (ring fully hidden). The clamp test (`value=-10 → 0`) covers clamping but not the zero-value render path.
 - `value=100`: No test verifies the dashoffset equals 0 (ring fully visible/closed).
 - Determinate → indeterminate transition: Tests cover indeterminate → determinate (line 79-86) but not the reverse (`el.value = null; await el.updateComplete`).
@@ -189,15 +203,15 @@ This is consistent with every other component in the library that follows the Li
 
 ## Area Scores
 
-| Area            | Score | Notes |
-|-----------------|-------|-------|
-| TypeScript      | 7/10  | No `any`, correct types, but missing `max` (P2-01), missing render return type (P2-06) |
-| Accessibility   | 6/10  | ARIA timing defect (P1-01), no label enforcement (P1-02), no `aria-busy` (P2-04) |
-| Tests           | 7/10  | 28 tests, axe coverage, but missing 0%/100% boundary values and reverse transition (P2-03) |
-| Storybook       | 8/10  | Comprehensive stories, healthcare scenarios, but null control unreachable (P2-05) |
-| CSS             | 8/10  | Full token coverage, reduced-motion support, animation (P2-02 is aesthetic/edge-case) |
-| Performance     | 9/10  | SVG-based, minimal deps, well within 5KB |
-| Drupal          | 6/10  | Clean attribute API, but ARIA timing defect (P1-01) affects pre-hydration semantics |
+| Area          | Score | Notes                                                                                      |
+| ------------- | ----- | ------------------------------------------------------------------------------------------ |
+| TypeScript    | 7/10  | No `any`, correct types, but missing `max` (P2-01), missing render return type (P2-06)     |
+| Accessibility | 6/10  | ARIA timing defect (P1-01), no label enforcement (P1-02), no `aria-busy` (P2-04)           |
+| Tests         | 7/10  | 28 tests, axe coverage, but missing 0%/100% boundary values and reverse transition (P2-03) |
+| Storybook     | 8/10  | Comprehensive stories, healthcare scenarios, but null control unreachable (P2-05)          |
+| CSS           | 8/10  | Full token coverage, reduced-motion support, animation (P2-02 is aesthetic/edge-case)      |
+| Performance   | 9/10  | SVG-based, minimal deps, well within 5KB                                                   |
+| Drupal        | 6/10  | Clean attribute API, but ARIA timing defect (P1-01) affects pre-hydration semantics        |
 
 ---
 
