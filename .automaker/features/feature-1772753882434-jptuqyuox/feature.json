@@ -2,7 +2,7 @@
   "category": "Uncategorized",
   "description": "Antagonistic quality review of `hx-stack` (T3-10) **after implementation completes**.\\n\\nReview every file in `packages/hx-library/src/components/hx-stack/` critically.\\n\\n**Audit areas:**\\n1. TypeScript — strict, direction (horizontal/vertical) typed, gap typed using design token scale, align/justify typed\\n2. Accessibility — layout-only component, reading order must match visual order, no ARIA needed unless dividers present, axe-core pass\\n3. Tests — horizontal/vertical, all gap values, wrapping behavior, alignment, nested stacks, 80%+ coverage\\n4. Storybook — vertical/horizontal stacks, all gap sizes, alignment demos\\n5. CSS — `--hx-*` gap tokens, Flexbox implementation, CSS parts (stack)\\n6. Performance — bundle < 5KB (should be smallest in library)\\n7. Drupal — Twig-renderable\\n\\n**Output:** Write findings to `packages/hx-library/src/components/hx-stack/AUDIT.md` with severity (P0/P1/P2). DO NOT fix — document only. Commit AUDIT.md as your PR.",
   "title": "AUDIT: hx-stack — T3-10 antagonistic quality review",
-  "status": "backlog",
+  "status": "review",
   "dependencies": [
     "feature-1772753207079-uo77um8h3"
   ],
@@ -28,6 +28,38 @@
       "to": "backlog",
       "timestamp": "2026-03-05T23:38:02.434Z",
       "reason": "Feature created"
+    },
+    {
+      "from": "backlog",
+      "to": "in_progress",
+      "timestamp": "2026-03-06T14:51:06.723Z"
+    },
+    {
+      "from": "done",
+      "to": "review",
+      "timestamp": "2026-03-06T14:55:48.005Z"
     }
-  ]
+  ],
+  "featureType": "code",
+  "model": "claude-sonnet-4-6",
+  "updatedAt": "2026-03-06T14:55:02.875Z",
+  "costUsd": 0.57203625,
+  "lastSessionId": "793a21c5-ac60-4b01-951f-6c21d3880edd",
+  "executionHistory": [
+    {
+      "id": "2c79d5ef-dc99-44f9-8587-887711172390",
+      "startedAt": "2026-03-06T14:51:07.088Z",
+      "completedAt": "2026-03-06T14:55:02.890Z",
+      "durationMs": 235802,
+      "costUsd": 0.57203625,
+      "model": "claude-sonnet-4-6",
+      "success": true,
+      "trigger": "manual"
+    }
+  ],
+  "summary": "## Summary: Antagonistic quality review of `hx-stack` (T3-10)\n\n### Changes Implemented\n- Created `AUDIT.md` in `packages/hx-library/src/components/hx-stack/` with a full antagonistic quality review across all 7 audit areas.\n\n### Files Modified\n- `packages/hx-library/src/components/hx-stack/AUDIT.md` (created)\n\n### Risks/Blockers Encountered\n- None. Component code was not modified (audit-only task).\n\n### Learnings\n\n**Key findings:**\n\n**P1 (blocking):**\n1. **Tests never verify CSS behavior** — all tests check attribute reflection (`el.getAttribute(...)`, `el.gap`) but zero tests call `getComputedStyle()`. The entire CSS layer could be broken and the test suite would still pass green. This is the most critical gap.\n2. **No nested stack test** — nesting is a primary use case (PatientFormLayout story shows 4-level nesting) with no test coverage.\n3. **No role guard test** — `connectedCallback` correctly checks before setting `role=\"presentation\"`, but there's no test asserting the guard works.\n4. **Missing Storybook stories** — `AllGaps`, `Wrapping`, `Inline`, `AllAlignments` variants are absent, violating quality gate 4.\n\n**P2 (non-blocking):**\n- Redundant default gap in base CSS (pre-hydration pattern, valid but undocumented)\n- No runtime validation for invalid attribute values\n- `role=\"presentation\"` consequences undocumented in JSDoc\n- `PatientFormLayout` story lacks `play` function\n- `inline` implementation uses `inline-block` host + `flex` inner (functional but unconventional)\n\n**Verdict: NOT READY TO MERGE** — 2 P1 categories (tests, Storybook) require remediation.\n\n### Verification Status\n- `npm run verify` passed (0 errors) before commit.\n- This is a documentation-only audit. No Playwright verification required — the deliverable is the AUDIT.md file committed to the branch, verified to exist and contain complete findings.\n\n### Notes for Developer\n- TypeScript, Accessibility, CSS, Performance, and Drupal areas all pass.\n- The component architecture is sound — layout-only, no ARIA needed, tokens used correctly throughout.\n- Fix P1-01 first (add `getComputedStyle` assertions) as it provides the most confidence that subsequent CSS changes don't silently regress.",
+  "prUrl": "https://github.com/bookedsolidtech/helix/pull/331",
+  "prNumber": 331,
+  "reviewStartedAt": "2026-03-06T14:55:48.005Z",
+  "prLastPolledAt": "2026-03-06T14:59:53.193Z"
 }

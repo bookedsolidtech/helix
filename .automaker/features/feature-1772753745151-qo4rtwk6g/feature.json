@@ -2,7 +2,7 @@
   "category": "Uncategorized",
   "description": "Antagonistic quality review of `hx-steps` (T2-01) **after implementation completes**.\\n\\nReview every file in `packages/hx-library/src/components/hx-steps/` critically.\\n\\n**Audit areas:**\\n1. TypeScript — strict, step data typed (label, description, status: complete/current/upcoming), orientation typed\\n2. Accessibility — `role=\"list\"` with step items as `role=\"listitem\"`, current step `aria-current=\"step\"`, complete steps communicated, keyboard navigable if interactive, axe-core pass\\n3. Tests — all step statuses, vertical/horizontal orientation, clickable/non-clickable steps, step count validation, 80%+ coverage\\n4. Storybook — horizontal/vertical, all status combinations\\n5. CSS — `--hx-*` tokens, connector lines between steps, CSS parts (step, connector, label, icon)\\n6. Performance — bundle < 5KB\\n7. Drupal — Twig-renderable\\n\\n**Output:** Write findings to `packages/hx-library/src/components/hx-steps/AUDIT.md` with severity (P0/P1/P2). DO NOT fix — document only. Commit AUDIT.md as your PR.",
   "title": "AUDIT: hx-steps — T2-01 antagonistic quality review",
-  "status": "backlog",
+  "status": "done",
   "dependencies": [
     "feature-1772753048239-itjzcdlmm"
   ],
@@ -28,6 +28,58 @@
       "to": "backlog",
       "timestamp": "2026-03-05T23:35:45.151Z",
       "reason": "Feature created"
+    },
+    {
+      "from": "backlog",
+      "to": "in_progress",
+      "timestamp": "2026-03-06T14:31:53.193Z"
+    },
+    {
+      "from": "done",
+      "to": "review",
+      "timestamp": "2026-03-06T14:37:42.390Z"
+    },
+    {
+      "from": "review",
+      "to": "done",
+      "timestamp": "2026-03-06T14:43:30.173Z"
+    },
+    {
+      "from": "done",
+      "to": "blocked",
+      "timestamp": "2026-03-06T14:46:45.909Z",
+      "reason": "Max state transitions exceeded"
+    },
+    {
+      "from": "blocked",
+      "to": "done",
+      "timestamp": "2026-03-06T14:48:33.195Z"
     }
-  ]
+  ],
+  "featureType": "code",
+  "model": "claude-sonnet-4-6",
+  "updatedAt": "2026-03-06T14:36:39.398Z",
+  "costUsd": 0.74932375,
+  "lastSessionId": "e3018dce-75e8-4b28-b466-78865bd3ed7a",
+  "executionHistory": [
+    {
+      "id": "2cd516d2-5454-4f5e-9417-2b8ae80acecb",
+      "startedAt": "2026-03-06T14:31:53.560Z",
+      "completedAt": "2026-03-06T14:36:39.429Z",
+      "durationMs": 285869,
+      "costUsd": 0.74932375,
+      "model": "claude-sonnet-4-6",
+      "success": true,
+      "trigger": "manual"
+    }
+  ],
+  "summary": "## Summary: Antagonistic quality review of `hx-steps` (T2-01)\n\n### Changes Implemented\n- Performed full antagonistic audit of all 7 files in `packages/hx-library/src/components/hx-steps/`\n- Wrote `AUDIT.md` with 29 findings across all required audit areas\n- **No implementation changes** — documentation only per feature spec\n\n### Files Modified\n- `packages/hx-library/src/components/hx-steps/AUDIT.md` (created, 353 lines)\n\n### Findings Summary\n\n| Severity | Count | Highlights |\n|----------|-------|-----------|\n| **P0** | 1 | `aria-current=\"step\"` on inner indicator div, not on `role=\"listitem\"` host |\n| **P1** | 11 | No keyboard support; status invisible to AT; no Twig template; connector hardcoded; status vocab mismatch |\n| **P2** | 17 | No focus styles; duplicate stories; hardcoded hex fallbacks; bundle unverified |\n\n**Ship status: BLOCKED** — 1 P0 and 11 P1 findings must be resolved.\n\n### Risks/Blockers Encountered\n- None — audit-only task, no implementation risk.\n\n### Learnings\n- The `aria-current=\"step\"` misplacement on the inner indicator div vs. the `role=\"listitem\"` host is a subtle but P0-severity ARIA error. The correct location is the host element.\n- Interactive steps with no `tabindex`, `keydown` handler, or `role=\"button\"` — but showing `cursor: pointer` — is a common pattern that fails WCAG 2.1.1.\n- The status vocabulary mismatch (spec says `current/upcoming`, implementation says `active/pending`) signals a requirements drift that could affect Drupal consumers.\n\n### Notes for Developer\n- PR #305 contains only `AUDIT.md`. No code was changed.\n- The P0 fix requires moving `aria-current` binding from the shadow DOM indicator div to the host element in `connectedCallback`/`updated`.\n- The keyboard accessibility P1 requires either wrapping the step in a `<button>` or adding `tabindex=\"0\"` + `keydown` handler + checking for the `clickable` prop pattern.\n- Connector `2px` values should become a `--hx-steps-connector-thickness` token.\n\n### Verification Status\n- `npm run verify` passed: 11/11 tasks successful, 0 errors.\n- Playwright verification not applicable — this feature adds only a static markdown document with no UI implementation.",
+  "prUrl": "https://github.com/bookedsolidtech/helix/pull/305",
+  "prNumber": 305,
+  "reviewStartedAt": "2026-03-06T14:37:42.390Z",
+  "prLastPolledAt": "2026-03-06T14:42:52.689Z",
+  "prMergedAt": "2026-03-06T14:42:25Z",
+  "completedAt": "2026-03-06T14:43:30.173Z",
+  "statusChangeReason": "Max state transitions exceeded",
+  "failureCount": 1
 }

@@ -2,7 +2,7 @@
   "category": "Uncategorized",
   "description": "Implement `hx-carousel` (T4 tier) — 2/6 libraries ship this. Scrollable carousel/slider for images or content slides.\n\n**Files to create** in `packages/hx-library/src/components/hx-carousel/`:\n- `index.ts`, `hx-carousel.ts`, `hx-carousel.styles.ts`, `hx-carousel.stories.ts`, `hx-carousel.test.ts`\n\n**Props:** `loop` (boolean), `autoplay` (boolean), `autoplay-interval` (ms, default 3000), `slides-per-page` (number, default 1), `slides-per-move` (number, default 1), `orientation` (`horizontal`|`vertical`), `mouse-dragging` (boolean)\n\n**`hx-carousel-item`:** wrapper for each slide, `role=\"group\"` with `aria-label=\"Slide N of M\"`\n\n**Slots:** default (hx-carousel-item children), `next-button`, `previous-button`\n\n**Events:** `hx-slide-change` (`{ index, slide }`)\n\n**CSS Parts:** `base`, `scroll-container`, `pagination`, `pagination-item` (dot indicators), `navigation` (prev/next buttons)\n\n**ARIA:** `role=\"region\"` with `aria-label=\"Carousel\"`. Scroll container: `aria-live=\"polite\"` when autoplay stopped. Previous/next buttons: `aria-label=\"Previous slide\"` / `aria-label=\"Next slide\"`. Pagination dots: `aria-label=\"Slide N\"`, `aria-current` on active.\n\n**Autoplay:** Must pause on hover, focus, and when `prefers-reduced-motion: reduce`. Play/pause toggle button required for WCAG 2.2.2.\n\n**Quality gates:** type-check zero errors, all tests (navigation, autoplay pause, loop, keyboard), axe-core zero violations, Storybook with images + multi-slide, bundle < 5KB.\n\nRegister `hx-carousel` and `hx-carousel-item` in `packages/hx-library/src/index.ts` and `packages/hx-library/vite.config.ts`.",
   "title": "IMPLEMENT: hx-carousel — T4 Image/Content Carousel",
-  "status": "backlog",
+  "status": "done",
   "complexity": "medium",
   "priority": 3,
   "source": "api",
@@ -25,6 +25,13 @@
       "to": "backlog",
       "timestamp": "2026-03-05T23:29:03.490Z",
       "reason": "Feature created"
+    },
+    {
+      "from": "backlog",
+      "to": "done",
+      "timestamp": "2026-03-06T14:13:36.223Z"
     }
-  ]
+  ],
+  "featureType": "code",
+  "completedAt": "2026-03-06T14:13:36.223Z"
 }

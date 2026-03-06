@@ -24,11 +24,38 @@ concurrency:
 
 permissions:
   contents: read
+  pull-requests: read
 
 # ── Shared setup anchor ────────────────────────────────────────────────────
 # Reusable setup steps referenced by all jobs
 
 jobs:
+  # ── Change detection ───────────────────────────────────────────────────
+  # Determines which jobs to run based on changed files.
+  # Audit-only PRs (AUDIT.md files) skip Test and VRT.
+
+  changes:
+    name: Detect Changes
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    outputs:
+      source: ${{ steps.filter.outputs.source }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            source:
+              - 'packages/hx-library/src/**/*.ts'
+              - 'packages/hx-library/src/**/*.styles.ts'
+              - 'packages/hx-library/vite.config.ts'
+              - 'packages/hx-library/tsconfig*.json'
+              - 'package.json'
+              - 'package-lock.json'
+              - 'tsconfig*.json'
+              - '.github/workflows/**'
+
   # ── Fast checks (no build needed, <30s each) ────────────────────────────
 
   lint:
@@ -74,8 +101,14 @@ jobs:
 
   test:
     name: Test
+    needs: changes
+    if: needs.changes.outputs.source == 'true'
     runs-on: ubuntu-latest
+<<<<<<< HEAD
     timeout-minutes: 20
+=======
+    timeout-minutes: 30
+>>>>>>> origin/dev
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -171,6 +204,8 @@ jobs:
 
   vrt:
     name: Visual Regression
+    needs: changes
+    if: needs.changes.outputs.source == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
@@ -234,13 +269,38 @@ jobs:
           echo "VRT:        ${{ needs.vrt.result }}"
           echo "Audit:      ${{ needs.audit.result }}"
 
-          if [[ "${{ needs.lint.result }}" != "success" ]] || \
-             [[ "${{ needs.format.result }}" != "success" ]] || \
-             [[ "${{ needs.type-check.result }}" != "success" ]] || \
-             [[ "${{ needs.test.result }}" != "success" ]] || \
-             [[ "${{ needs.build.result }}" != "success" ]] || \
-             [[ "${{ needs.vrt.result }}" != "success" ]] || \
-             [[ "${{ needs.audit.result }}" != "success" ]]; then
+          # Test and VRT may be skipped for audit-only PRs (no source changes)
+          FAIL=0
+
+          for gate in lint format type-check build audit; do
+            result="${{ needs.lint.result }}"
+            case "$gate" in
+              lint)       result="${{ needs.lint.result }}" ;;
+              format)     result="${{ needs.format.result }}" ;;
+              type-check) result="${{ needs.type-check.result }}" ;;
+              build)      result="${{ needs.build.result }}" ;;
+              audit)      result="${{ needs.audit.result }}" ;;
+            esac
+            if [[ "$result" != "success" ]]; then
+              echo "::error::Gate '$gate' did not succeed: $result"
+              FAIL=1
+            fi
+          done
+
+          # Test and VRT are allowed to be skipped (audit-only PRs)
+          for gate in test vrt; do
+            result="${{ needs.test.result }}"
+            case "$gate" in
+              test) result="${{ needs.test.result }}" ;;
+              vrt)  result="${{ needs.vrt.result }}" ;;
+            esac
+            if [[ "$result" != "success" && "$result" != "skipped" ]]; then
+              echo "::error::Gate '$gate' did not succeed: $result"
+              FAIL=1
+            fi
+          done
+
+          if [[ "$FAIL" -eq 1 ]]; then
             echo "::error::One or more quality gates failed"
             exit 1
           fi

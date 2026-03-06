@@ -2,7 +2,7 @@
   "category": "Uncategorized",
   "description": "Implement `hx-status-indicator` (T3 tier) — 2/6 libraries ship this. Colored dot/badge indicating system/entity health status.\n\n**Files to create** in `packages/hx-library/src/components/hx-status-indicator/`:\n- `index.ts`, `hx-status-indicator.ts`, `hx-status-indicator.styles.ts`, `hx-status-indicator.stories.ts`, `hx-status-indicator.test.ts`\n\n**Props:** `status` (`online`|`offline`|`away`|`busy`|`unknown`), `pulse` (boolean — animated pulse ring), `size` (sm/md/lg)\n\n**Slots:** none (purely visual)\n\n**CSS Parts:** `base` (the dot), `pulse-ring`\n\n**ARIA:** `role=\"img\"` with `aria-label` describing the status (e.g., \"Status: Online\"). When decorative (status conveyed by adjacent text), support `aria-hidden=\"true\"`.\n\n**Colors:** Map each status to `--hx-*` semantic tokens: online→success, offline→neutral, away→warning, busy→danger, unknown→neutral-muted.\n\n**Animation:** Pulse ring uses CSS keyframe animation. Must respect `prefers-reduced-motion: reduce`.\n\n**Quality gates:** type-check zero errors, all tests (each status, pulse toggle, accessible label), axe-core zero violations, Storybook all statuses + pulse demo, bundle < 2KB.\n\nRegister in `packages/hx-library/src/index.ts` and `packages/hx-library/vite.config.ts`.",
   "title": "IMPLEMENT: hx-status-indicator — T3 Status/Health Indicator",
-  "status": "backlog",
+  "status": "done",
   "complexity": "small",
   "priority": 3,
   "source": "api",
@@ -25,6 +25,13 @@
       "to": "backlog",
       "timestamp": "2026-03-05T23:25:42.061Z",
       "reason": "Feature created"
+    },
+    {
+      "from": "backlog",
+      "to": "done",
+      "timestamp": "2026-03-06T14:13:02.428Z"
     }
-  ]
+  ],
+  "featureType": "code",
+  "completedAt": "2026-03-06T14:13:02.428Z"
 }
