@@ -5,6 +5,8 @@ import { tokenStyles } from '@helix/tokens/lit';
 import { helixCheckboxGroupStyles } from './hx-checkbox-group.styles.js';
 import type { HelixCheckbox } from '../hx-checkbox/hx-checkbox.js';
 
+let _uid = 0;
+
 /**
  * A form-associated checkbox group that manages a set of `<hx-checkbox>` children.
  *
@@ -91,13 +93,14 @@ export class HelixCheckboxGroup extends LitElement {
   declare private _itemsEl: HTMLElement | null;
 
   @state() private _hasErrorSlot = false;
+  @state() private _hasHelpSlot = false;
 
-  /** Deduplicates rapid back-to-back child hx-change events (label double-fire guard). */
-  private _suppressNextChildChange = false;
+  /** Guards against label→input click double-fire from hx-checkbox. */
+  private _processingChange = false;
 
   // ─── Internal IDs ───
 
-  private _groupId = `hx-checkbox-group-${Math.random().toString(36).slice(2, 9)}`;
+  private _groupId = `hx-checkbox-group-${++_uid}`;
   private _helpTextId = `${this._groupId}-help`;
   private _errorId = `${this._groupId}-error`;
 
@@ -106,6 +109,11 @@ export class HelixCheckboxGroup extends LitElement {
   private _handleErrorSlotChange(e: Event): void {
     const slot = e.target as HTMLSlotElement;
     this._hasErrorSlot = slot.assignedNodes({ flatten: true }).length > 0;
+  }
+
+  private _handleHelpSlotChange(e: Event): void {
+    const slot = e.target as HTMLSlotElement;
+    this._hasHelpSlot = slot.assignedNodes({ flatten: true }).length > 0;
   }
 
   // ─── Lifecycle ───
@@ -172,21 +180,16 @@ export class HelixCheckboxGroup extends LitElement {
   // ─── Event Handling ───
 
   private _handleCheckboxChange = (e: CustomEvent<{ checked: boolean; value: string }>): void => {
-    // Only intercept events from direct hx-checkbox children — do not re-intercept
-    // the hx-change we dispatch ourselves from this element.
     if (e.target === this) return;
 
     e.stopImmediatePropagation();
 
-    // Guard against double-fire: clicking a <label> that wraps <input> triggers
-    // _handleChange twice (once for label click, once for the synthetic input click).
-    if (this._suppressNextChildChange) {
-      this._suppressNextChildChange = false;
-      return;
-    }
-    this._suppressNextChildChange = true;
+    // hx-checkbox double-fires hx-change (label click bubbles from input back to label).
+    // Coalesce into a single group-level event per microtask.
+    if (this._processingChange) return;
+    this._processingChange = true;
     void Promise.resolve().then(() => {
-      this._suppressNextChildChange = false;
+      this._processingChange = false;
     });
 
     const values = this._getCheckedValues();
@@ -298,8 +301,10 @@ export class HelixCheckboxGroup extends LitElement {
       'fieldset--required': this.required,
     };
 
-    const describedBy =
-      [this.error ? this._errorId : null, this._helpTextId].filter(Boolean).join(' ') || undefined;
+    const describedByParts: string[] = [];
+    if (hasError) describedByParts.push(this._errorId);
+    if (this._hasHelpSlot) describedByParts.push(this._helpTextId);
+    const describedBy = describedByParts.length > 0 ? describedByParts.join(' ') : undefined;
 
     return html`
       <fieldset
@@ -318,22 +323,14 @@ export class HelixCheckboxGroup extends LitElement {
           <slot @slotchange=${this._handleSlotChange}></slot>
         </div>
 
-        <slot name="error" @slotchange=${this._handleErrorSlotChange}>
-          ${this.error && !this._hasErrorSlot
-            ? html`<div
-                part="error-message"
-                class="fieldset__error"
-                id=${this._errorId}
-                role="alert"
-                aria-live="polite"
-              >
-                ${this.error}
-              </div>`
-            : nothing}
-        </slot>
+        <div part="error-message" class="fieldset__error" id=${this._errorId} role="alert">
+          <slot name="error" @slotchange=${this._handleErrorSlotChange}>
+            ${this.error && !this._hasErrorSlot ? this.error : nothing}
+          </slot>
+        </div>
 
         <div part="help-text" class="fieldset__help-text" id=${this._helpTextId}>
-          <slot name="help"></slot>
+          <slot name="help" @slotchange=${this._handleHelpSlotChange}></slot>
         </div>
       </fieldset>
     `;

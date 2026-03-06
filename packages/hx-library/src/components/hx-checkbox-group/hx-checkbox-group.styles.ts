@@ -7,7 +7,7 @@ export const helixCheckboxGroupStyles = css`
 
   :host([disabled]) {
     opacity: var(--hx-opacity-disabled);
-    pointer-events: none;
+    cursor: not-allowed;
   }
 
   * {
@@ -24,6 +24,10 @@ export const helixCheckboxGroupStyles = css`
     flex-direction: column;
     gap: var(--hx-space-2);
     font-family: var(--hx-font-family-sans);
+  }
+
+  .fieldset--disabled {
+    pointer-events: none;
   }
 
   /* ─── Legend ─── */
@@ -72,9 +76,17 @@ export const helixCheckboxGroupStyles = css`
     line-height: var(--hx-line-height-normal);
   }
 
+  .fieldset__help-text:empty {
+    display: none;
+  }
+
   .fieldset__error {
     font-size: var(--hx-font-size-xs);
     color: var(--hx-checkbox-group-error-color, var(--hx-color-error-500));
     line-height: var(--hx-line-height-normal);
+  }
+
+  .fieldset__error:empty {
+    display: none;
   }
 `;
