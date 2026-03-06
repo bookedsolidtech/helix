@@ -1,8 +1,8 @@
-# AUDIT: hx-progress-ring — Antagonistic Quality Review (T2-05)
+# AUDIT: hx-progress-ring — Deep Audit v2
 
 **Date:** 2026-03-06
 **Auditor:** AVA (Autonomous Virtual Agency)
-**Branch:** `feature/audit-hx-progress-ring-t2-05`
+**Branch:** `feature/deep-audit-v2-hx-progress-ring`
 **Files reviewed:**
 
 - `hx-progress-ring.ts`
@@ -215,13 +215,22 @@ This is consistent with every other component in the library that follows the Li
 
 ---
 
-## Priority Fix Order
+## Fix Status (Deep Audit v2)
 
-1. **P1-01** — ARIA initialization timing (accessibility regression in SSR/Drupal)
-2. **P1-02** — Label not enforced (WCAG 4.1.2 risk in healthcare context)
-3. **P2-03** — Add `value=0`, `value=100`, and determinate→indeterminate transition tests
-4. **P2-01** — Add `max` property to match audit spec requirements
-5. **P2-04** — Add `aria-busy` for indeterminate state
-6. **P2-05** — Fix Storybook null control unreachability
-7. **P2-02** — Document or fix indeterminate animation hardcoded values
-8. **P2-06** — Add `render()` return type annotation
+| Finding | Status     | Fix Applied                                                             |
+| ------- | ---------- | ----------------------------------------------------------------------- |
+| P1-01   | FIXED      | Moved ARIA attrs from `firstUpdated()` to `connectedCallback()`         |
+| P1-02   | FIXED      | Added `console.warn` when neither `label` nor `aria-labelledby` present |
+| P2-01   | DEFERRED   | `max` property — future enhancement, not blocking                       |
+| P2-02   | DOCUMENTED | Indeterminate animation values work for default/common stroke widths    |
+| P2-03   | FIXED      | Added 5 new tests: value=0, value=100, det→indet transition, aria-busy  |
+| P2-04   | FIXED      | Added `aria-busy="true"` in indeterminate, removed in determinate       |
+| P2-05   | FIXED      | Changed to `.value` property binding; null properly passes to component |
+| P2-06   | FIXED      | Added `override render(): TemplateResult` with import                   |
+
+### Verification Results
+
+- **TypeScript**: 0 errors (`npm run type-check`)
+- **Tests**: 37/37 pass (was 28, +5 new tests, +4 axe-core)
+- **Lint/Format**: Clean (`npm run verify`)
+- **Files changed**: 3 (hx-progress-ring.ts, .test.ts, .stories.ts)
