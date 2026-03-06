@@ -11,5 +11,11 @@
     "enabled": false,
     "disabled_reason": "Project deactivated"
   },
-  "autoModeEnabled": false
+  "autoModeEnabled": false,
+  "discord": {
+    "devChannelId": "1478236578701901834",
+    "generalChannelId": "1478215835901362198",
+    "updatesChannelId": "1478216123265847428",
+    "botToken": "MTQ3ODIxOTU1MTY5ODA1OTM1Ng.GV9L0a.oLBg4vNxhUpr0jGNNteG1V6v9e55LCy2L-nuG4"
+  }
 }
