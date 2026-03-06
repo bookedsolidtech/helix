@@ -9,10 +9,10 @@
 
 ## Severity Legend
 
-| Level | Definition |
-|-------|-----------|
-| **P0** | Fundamental breakage — component does not deliver its stated purpose; ships broken behavior to consumers |
-| **P1** | Material defect — WCAG violation, broken test reliability, undocumented public API, or misleading documentation |
+| Level  | Definition                                                                                                             |
+| ------ | ---------------------------------------------------------------------------------------------------------------------- |
+| **P0** | Fundamental breakage — component does not deliver its stated purpose; ships broken behavior to consumers               |
+| **P1** | Material defect — WCAG violation, broken test reliability, undocumented public API, or misleading documentation        |
 | **P2** | Quality gap — convention violation, fragile test, or suboptimal pattern that does not yet cause a user-visible failure |
 
 ---
@@ -106,6 +106,7 @@ For `WithFor`, this means the play test is NOT actually asserting that a `<label
 **File:** `hx-field-label.styles.ts` (line 20)
 
 **Description:**
+
 ```css
 .required-indicator {
   color: var(--hx-color-danger, var(--hx-color-error-500, #ef4444));
@@ -137,6 +138,7 @@ Additionally, the `CSSCustomProperties` story (lines 287-302) demonstrates overr
 
 **Description:**
 The `required-indicator slot overrides default asterisk` test:
+
 ```ts
 const slotted = el.querySelector('[slot="required-indicator"]');
 expect(slotted?.textContent).toBe('(req)');
@@ -161,46 +163,55 @@ This queries the light DOM (`el.querySelector`) to verify the slotted element ex
 
 ## Summary Table
 
-| ID | Severity | Area | Description |
-|----|----------|------|-------------|
-| P0-01 | **P0** | Accessibility / Architecture | Cross-shadow-DOM `for` association is fundamentally broken |
-| P0-02 | **P0** | Storybook / Documentation | Stories demonstrate broken association as working |
-| P1-01 | **P1** | Accessibility (WCAG 1.3.1) | Required `*` hidden from AT with no visually-hidden text supplement |
-| P1-02 | **P1** | Storybook / Tests | `getByRole('generic')` does not select `<label>` elements correctly |
-| P1-03 | **P1** | CSS / Documentation | `--hx-color-danger` consumed but not documented as `@cssprop` |
-| P2-01 | **P2** | Storybook / Conventions | Hardcoded hex colors in story demos violate token convention |
-| P2-02 | **P2** | Tests | Slot test queries light DOM only; does not verify shadow slot rendering |
-| P2-03 | **P2** | TypeScript | `for` as property name is a reserved keyword (low risk) |
+| ID    | Severity | Area                         | Description                                                             |
+| ----- | -------- | ---------------------------- | ----------------------------------------------------------------------- |
+| P0-01 | **P0**   | Accessibility / Architecture | Cross-shadow-DOM `for` association is fundamentally broken              |
+| P0-02 | **P0**   | Storybook / Documentation    | Stories demonstrate broken association as working                       |
+| P1-01 | **P1**   | Accessibility (WCAG 1.3.1)   | Required `*` hidden from AT with no visually-hidden text supplement     |
+| P1-02 | **P1**   | Storybook / Tests            | `getByRole('generic')` does not select `<label>` elements correctly     |
+| P1-03 | **P1**   | CSS / Documentation          | `--hx-color-danger` consumed but not documented as `@cssprop`           |
+| P2-01 | **P2**   | Storybook / Conventions      | Hardcoded hex colors in story demos violate token convention            |
+| P2-02 | **P2**   | Tests                        | Slot test queries light DOM only; does not verify shadow slot rendering |
+| P2-03 | **P2**   | TypeScript                   | `for` as property name is a reserved keyword (low risk)                 |
 
 ---
 
 ## Area-by-Area Assessment
 
 ### 1. TypeScript
+
 **Pass with minor concern.** No `any` types. All three props correctly typed and reflected. `declare global` block present. The only flag is P2-03 (`for` as property name).
 
 ### 2. Accessibility
+
 **Fail — P0 and P1 findings.**
+
 - P0-01: Shadow DOM boundary breaks `for`/`id` label association — the component cannot deliver its stated primary purpose.
 - P1-01: Required asterisk hidden from AT without visually-hidden supplement violates WCAG 1.3.1 Level A.
-The axe-core tests pass because axe cannot verify cross-shadow-root `for` resolution and does not flag the missing visually-hidden text in this context.
+  The axe-core tests pass because axe cannot verify cross-shadow-root `for` resolution and does not flag the missing visually-hidden text in this context.
 
 ### 3. Tests
+
 **Partial pass.** 26 tests across 7 describe blocks. Coverage is structurally good. Failures: P2-02 (slot test fragility) and the acknowledged but untreated cross-shadow-DOM gap.
 
 ### 4. Storybook
+
 **Fail — P0 and P1 findings.**
+
 - P0-02: Multiple stories demonstrate broken `for`+input association as canonical usage.
 - P1-02: Play tests use `getByRole('generic')` which does not correctly target `<label>` elements.
-8 stories cover the main variants including healthcare scenarios, CSS parts, and CSS custom properties. Story breadth is good; accuracy is not.
+  8 stories cover the main variants including healthcare scenarios, CSS parts, and CSS custom properties. Story breadth is good; accuracy is not.
 
 ### 5. CSS
+
 **Pass with P1 and P2 concerns.**
 All design values use `--hx-*` token cascade with hardcoded fallbacks. Three CSS parts are implemented and exported. P1-03: `--hx-color-danger` is consumed but not documented. P2-01: Story demos use hardcoded hex values.
 
 ### 6. Performance
+
 **Pass.** Component implementation is minimal — simple Lit template with no heavy imports beyond `lit`, `lit/decorators`, and token styles. Well under 5KB budget.
 
 ### 7. Drupal
+
 **Fail — consequence of P0-01.**
 Drupal form inputs live in light DOM. `<hx-field-label for="field-name">` rendered in a Twig template will produce a shadow-DOM `<label for="...">` that cannot reach the Drupal input. The Drupal consumer must use `aria-labelledby` instead. No Twig example or Drupal-specific documentation is provided. Without clear guidance, Drupal integrators will use `for` and ship inaccessible forms.
