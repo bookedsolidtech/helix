@@ -1,6 +1,7 @@
 # hx-toast Antagonistic Quality Audit (T2-07)
 
 **Audited files:**
+
 - `hx-toast.ts`
 - `hx-toast.styles.ts`
 - `hx-toast.test.ts`
@@ -15,7 +16,7 @@
 ## Summary
 
 | Severity | Count |
-|----------|-------|
+| -------- | ----- |
 | P0       | 0     |
 | P1       | 5     |
 | P2       | 8     |
@@ -61,6 +62,7 @@ Without `aria-atomic="true"`, screen readers may read only the changed portion o
 **File:** `hx-toast.ts:330–366`, `hx-toast.test.ts` (entire file)
 
 The `toast()` function is the primary programmatic API for creating toasts. It handles:
+
 - Finding or creating `hx-toast-stack` on `document.body`
 - Stack limit enforcement (hiding oldest toast at capacity)
 - Auto-removal of toast element after `hx-after-hide`
@@ -70,6 +72,7 @@ None of this logic has a single test. The `hx-toast-stack` tests in `hx-toast.te
 **Coverage gap:** The `toast()` function contains meaningful conditional logic (stack creation, limit enforcement, DOM lifecycle cleanup) that is entirely dark from a test perspective. Bugs here would go undetected.
 
 **Expected behavior:** Test coverage for:
+
 - `toast()` creates a `hx-toast-stack` on `document.body` if none exists
 - `toast()` reuses an existing `hx-toast-stack` for the same placement
 - Stack limit enforcement hides the oldest open toast
@@ -87,6 +90,7 @@ The audit spec explicitly requires "JS behaviors for programmatic toast triggeri
 This is a hard blocker for the primary consumer of this component library (Drupal CMS). Twig templates cannot import ES modules directly; they require Drupal behaviors to bridge the gap.
 
 **Expected behavior:** A `hx-toast.drupal.js` file providing a `Drupal.behaviors.hxToast` implementation that:
+
 - Attaches to elements with `data-hx-toast` attributes
 - Calls `toast()` with serialized options from data attributes
 - Properly detaches to prevent memory leaks on partial DOM updates
@@ -181,7 +185,7 @@ The label is hardcoded English. Healthcare applications are frequently multiling
 <hx-toast-stack
   placement="top-center"
   style="position: absolute; left: 0; right: 0; top: 0; transform: none;"
->
+></hx-toast-stack>
 ```
 
 The story applies inline `transform: none` which overrides the component's `transform: translateX(-50%)` that is responsible for horizontally centering `top-center` and `bottom-center` placements. This story demonstrates the component in a broken state — the `top-center` placement would not be centered in real usage within the story viewport.
@@ -212,12 +216,12 @@ But the JS property default is `'bottom-end'` (bottom-right). Because `placement
 
 ## Audit Coverage Summary
 
-| Area                         | Status      | Findings       |
-|------------------------------|-------------|----------------|
-| TypeScript (strict, types)   | PASS        | None           |
-| Accessibility (ARIA/axe)     | PARTIAL     | P1-01, P1-02   |
-| Tests (coverage/completeness)| FAIL        | P1-03, P2-02, P2-03 |
-| Storybook (variants/demos)   | PARTIAL     | P2-07          |
-| CSS (tokens, animation, parts) | PARTIAL   | P2-04, P2-05, P2-08 |
-| Performance (bundle size)    | PASS        | ~14KB raw, well under 5KB gzipped estimate |
-| Drupal integration           | FAIL        | P1-04          |
+| Area                           | Status  | Findings                                   |
+| ------------------------------ | ------- | ------------------------------------------ |
+| TypeScript (strict, types)     | PASS    | None                                       |
+| Accessibility (ARIA/axe)       | PARTIAL | P1-01, P1-02                               |
+| Tests (coverage/completeness)  | FAIL    | P1-03, P2-02, P2-03                        |
+| Storybook (variants/demos)     | PARTIAL | P2-07                                      |
+| CSS (tokens, animation, parts) | PARTIAL | P2-04, P2-05, P2-08                        |
+| Performance (bundle size)      | PASS    | ~14KB raw, well under 5KB gzipped estimate |
+| Drupal integration             | FAIL    | P1-04                                      |
