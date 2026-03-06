@@ -5,8 +5,9 @@ import { tokenStyles } from '@helix/tokens/lit';
 import { helixMenuItemStyles } from './hx-menu-item.styles.js';
 
 /**
- * A single interactive item for use inside `hx-menu`. Supports normal and
- * checkbox types, loading state, prefix/suffix slots, and submenu nesting.
+ * A single interactive item for use inside `hx-menu`. Supports normal, checkbox,
+ * and radio types, loading state, prefix/suffix slots, and submenu nesting.
+ * Use `aria-label` on the parent `hx-menu` to provide an accessible name.
  *
  * @summary Interactive item within an hx-menu.
  *
@@ -17,12 +18,18 @@ import { helixMenuItemStyles } from './hx-menu-item.styles.js';
  * @slot suffix - Shortcut text or icon rendered after the label.
  * @slot submenu - A nested hx-menu for submenu content.
  *
+ * @fires {CustomEvent<{item: HelixMenuItem, value: string}>} hx-item-select - Dispatched when the item is activated via click, Enter, or Space.
+ * @fires {CustomEvent<{item: HelixMenuItem}>} hx-item-submenu-open - Dispatched when ArrowRight is pressed on an item with a submenu.
+ *
  * @csspart base - The root item element.
  * @csspart prefix - Prefix slot wrapper.
  * @csspart label - Label slot wrapper.
  * @csspart suffix - Suffix slot wrapper.
  * @csspart submenu-icon - The chevron icon indicating a submenu.
  * @csspart checked-icon - The checkmark icon for checkbox-type items.
+ *
+ * @cssprop [--hx-menu-item-color=var(--hx-color-neutral-900)] - Item text color.
+ * @cssprop [--hx-menu-item-hover-bg=var(--hx-color-neutral-100)] - Item hover/focus background.
  */
 @customElement('hx-menu-item')
 export class HelixMenuItem extends LitElement {
@@ -51,10 +58,11 @@ export class HelixMenuItem extends LitElement {
 
   /**
    * The type of menu item. "checkbox" renders a checkmark and toggles checked state.
+   * "radio" renders a checkmark and emits selection for radio-group behavior.
    * @attr type
    */
   @property({ type: String, reflect: true })
-  type: 'normal' | 'checkbox' = 'normal';
+  type: 'normal' | 'checkbox' | 'radio' = 'normal';
 
   /**
    * Whether the item is in a loading state. Shows a spinner and prevents interaction.
@@ -81,6 +89,8 @@ export class HelixMenuItem extends LitElement {
 
     if (this.type === 'checkbox') {
       this.checked = !this.checked;
+    } else if (this.type === 'radio') {
+      this.checked = true;
     }
 
     this.dispatchEvent(
@@ -172,8 +182,20 @@ export class HelixMenuItem extends LitElement {
     `;
   }
 
+  private _getRole(): string {
+    switch (this.type) {
+      case 'checkbox':
+        return 'menuitemcheckbox';
+      case 'radio':
+        return 'menuitemradio';
+      default:
+        return 'menuitem';
+    }
+  }
+
   override render() {
-    const role = this.type === 'checkbox' ? 'menuitemcheckbox' : 'menuitem';
+    const role = this._getRole();
+    const hasCheckableRole = this.type === 'checkbox' || this.type === 'radio';
     const classes = {
       'menu-item': true,
       'menu-item--checked': this.checked,
@@ -186,13 +208,14 @@ export class HelixMenuItem extends LitElement {
         role=${role}
         tabindex=${this.disabled ? '-1' : '0'}
         aria-disabled=${this.disabled ? 'true' : nothing}
-        aria-checked=${this.type === 'checkbox' ? (this.checked ? 'true' : 'false') : nothing}
+        aria-checked=${hasCheckableRole ? (this.checked ? 'true' : 'false') : nothing}
+        aria-haspopup=${this._hasSubmenu ? 'true' : nothing}
         aria-busy=${this.loading ? 'true' : nothing}
         @click=${this._handleClick}
         @keydown=${this._handleKeyDown}
       >
         ${this.loading ? this._renderSpinner() : nothing}
-        ${this.type === 'checkbox' ? this._renderCheckedIcon() : nothing}
+        ${hasCheckableRole ? this._renderCheckedIcon() : nothing}
         <span part="prefix" class="menu-item__prefix">
           <slot name="prefix"></slot>
         </span>
