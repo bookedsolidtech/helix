@@ -146,19 +146,33 @@ export class HelixOverflowMenu extends LitElement {
 
   // ─── Focus management ───
 
-  private _focusFirstItem(): void {
+  private _getMenuItems(): HTMLElement[] {
     const slot = this.shadowRoot?.querySelector('slot') as HTMLSlotElement | null;
-    const items = slot
-      ?.assignedElements({ flatten: true })
-      .filter(
-        (el) =>
-          el instanceof HTMLElement &&
-          (el.getAttribute('role') === 'menuitem' ||
-            el.getAttribute('role') === 'menuitemcheckbox' ||
-            el.getAttribute('role') === 'menuitemradio' ||
-            el.tagName.toLowerCase().startsWith('hx-')),
-      ) as HTMLElement[] | undefined;
-    items?.[0]?.focus();
+    return (
+      slot
+        ?.assignedElements({ flatten: true })
+        .filter(
+          (el): el is HTMLElement =>
+            el instanceof HTMLElement &&
+            el.getAttribute('aria-disabled') !== 'true' &&
+            (el.getAttribute('role') === 'menuitem' ||
+              el.getAttribute('role') === 'menuitemcheckbox' ||
+              el.getAttribute('role') === 'menuitemradio' ||
+              el.tagName.toLowerCase().startsWith('hx-')),
+        ) ?? []
+    );
+  }
+
+  private _focusFirstItem(): void {
+    this._getMenuItems()[0]?.focus();
+  }
+
+  private _focusItemByOffset(current: HTMLElement, delta: number): void {
+    const items = this._getMenuItems();
+    if (items.length === 0) return;
+    const index = items.indexOf(current);
+    const next = index === -1 ? 0 : (index + delta + items.length) % items.length;
+    items[next]?.focus();
   }
 
   // ─── Event Handlers ───
@@ -177,14 +191,41 @@ export class HelixOverflowMenu extends LitElement {
   }
 
   private _handleKeydown(e: KeyboardEvent): void {
-    if (!this._open) return;
-    if (e.key === 'Escape') {
-      e.stopPropagation();
-      this._hide();
-      (this.shadowRoot?.querySelector('[part="button"]') as HTMLElement | null)?.focus();
+    if (!this._open) {
+      if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+        e.preventDefault();
+        void this._show();
+      }
+      return;
     }
-    if (e.key === 'Tab') {
-      this._hide();
+
+    switch (e.key) {
+      case 'Escape':
+        e.stopPropagation();
+        this._hide();
+        (this.shadowRoot?.querySelector('[part="button"]') as HTMLElement | null)?.focus();
+        break;
+      case 'Tab':
+        this._hide();
+        break;
+      case 'ArrowDown':
+        e.preventDefault();
+        this._focusItemByOffset(e.target as HTMLElement, 1);
+        break;
+      case 'ArrowUp':
+        e.preventDefault();
+        this._focusItemByOffset(e.target as HTMLElement, -1);
+        break;
+      case 'Home':
+        e.preventDefault();
+        this._getMenuItems()[0]?.focus();
+        break;
+      case 'End': {
+        e.preventDefault();
+        const items = this._getMenuItems();
+        items[items.length - 1]?.focus();
+        break;
+      }
     }
   }
 
@@ -193,7 +234,7 @@ export class HelixOverflowMenu extends LitElement {
     const menuItem = target.closest(
       '[role="menuitem"], [role="menuitemcheckbox"], [role="menuitemradio"]',
     ) as HTMLElement | null;
-    if (!menuItem) return;
+    if (!menuItem || menuItem.getAttribute('aria-disabled') === 'true') return;
     const value = menuItem.getAttribute('data-value') ?? menuItem.textContent?.trim() ?? '';
     this.dispatchEvent(
       new CustomEvent('hx-select', {
@@ -255,7 +296,7 @@ export class HelixOverflowMenu extends LitElement {
         class=${classMap(btnClasses)}
         type="button"
         aria-label="More actions"
-        aria-haspopup="true"
+        aria-haspopup="menu"
         aria-expanded=${this._open ? 'true' : 'false'}
         ?disabled=${this.disabled}
         @click=${this._handleTriggerClick}
