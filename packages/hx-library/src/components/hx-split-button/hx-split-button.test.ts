@@ -2,7 +2,8 @@ import { describe, it, expect, afterEach } from 'vitest';
 import { page } from '@vitest/browser/context';
 import { fixture, shadowQuery, oneEvent, cleanup, checkA11y } from '../../test-utils.js';
 import type { HelixSplitButton } from './hx-split-button.js';
-import type { HelixMenuItem } from './hx-menu-item.js';
+import type { HelixMenuItem } from '../hx-menu/hx-menu-item.js';
+import '../hx-menu/hx-menu-item.js';
 import './index.js';
 
 afterEach(cleanup);
