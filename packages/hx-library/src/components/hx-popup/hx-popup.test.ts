@@ -339,14 +339,17 @@ describe('hx-popup', () => {
       anchorEl.textContent = 'External';
       document.body.appendChild(anchorEl);
 
-      const el = await fixture<HelixPopup>(
-        '<hx-popup active><div>Content</div></hx-popup>',
-      );
-      el.anchor = anchorEl;
-      await el.updateComplete;
+      try {
+        const el = await fixture<HelixPopup>(
+          '<hx-popup active><div>Content</div></hx-popup>',
+        );
+        el.anchor = anchorEl;
+        await el.updateComplete;
 
-      expect(el.anchor).toBe(anchorEl);
-      anchorEl.remove();
+        expect(el.anchor).toBe(anchorEl);
+      } finally {
+        anchorEl.remove();
+      }
     });
   });
 
