@@ -75,13 +75,17 @@ describe('hx-dropdown', () => {
     });
 
     it('reflects open attribute', async () => {
-      const el = await fixture<HelixDropdown>('<hx-dropdown open><button slot="trigger">T</button><div role="menu" aria-label="Actions">Content</div></hx-dropdown>');
+      const el = await fixture<HelixDropdown>(
+        '<hx-dropdown open><button slot="trigger">T</button><div role="menu" aria-label="Actions">Content</div></hx-dropdown>',
+      );
       expect(el.open).toBe(true);
       expect(el.getAttribute('open')).not.toBeNull();
     });
 
     it('reflects disabled attribute', async () => {
-      const el = await fixture<HelixDropdown>('<hx-dropdown disabled><button slot="trigger">T</button><div role="menu" aria-label="Actions">Content</div></hx-dropdown>');
+      const el = await fixture<HelixDropdown>(
+        '<hx-dropdown disabled><button slot="trigger">T</button><div role="menu" aria-label="Actions">Content</div></hx-dropdown>',
+      );
       expect(el.disabled).toBe(true);
       expect(el.getAttribute('disabled')).not.toBeNull();
     });
@@ -132,7 +136,9 @@ describe('hx-dropdown', () => {
     });
 
     it('does not open when disabled', async () => {
-      const el = await fixture<HelixDropdown>('<hx-dropdown disabled><button slot="trigger">T</button><div role="menu" aria-label="Actions">Content</div></hx-dropdown>');
+      const el = await fixture<HelixDropdown>(
+        '<hx-dropdown disabled><button slot="trigger">T</button><div role="menu" aria-label="Actions">Content</div></hx-dropdown>',
+      );
       const trigger = el.querySelector<HTMLElement>('[slot="trigger"]')!;
       trigger.click();
       await el.updateComplete;
@@ -200,11 +206,21 @@ describe('hx-dropdown', () => {
   // ─── ARIA (3) ───
 
   describe('ARIA', () => {
-    it('sets aria-haspopup on trigger element', async () => {
+    it('sets aria-haspopup="menu" on trigger element', async () => {
       const el = await fixture<HelixDropdown>(triggerHtml);
       await el.updateComplete;
       const trigger = el.querySelector('[slot="trigger"]');
-      expect(trigger?.getAttribute('aria-haspopup')).toBe('true');
+      expect(trigger?.getAttribute('aria-haspopup')).toBe('menu');
+    });
+
+    it('sets aria-controls on trigger referencing the panel id', async () => {
+      const el = await fixture<HelixDropdown>(triggerHtml);
+      await el.updateComplete;
+      const trigger = el.querySelector('[slot="trigger"]');
+      const panelId = trigger?.getAttribute('aria-controls');
+      expect(panelId).toBeTruthy();
+      const panel = el.shadowRoot?.querySelector(`#${panelId}`);
+      expect(panel).toBeTruthy();
     });
 
     it('trigger aria-expanded is false by default', async () => {
@@ -229,6 +245,142 @@ describe('hx-dropdown', () => {
       await el.updateComplete;
       const panel = shadowQuery(el, '[part="panel"]');
       expect(panel?.getAttribute('aria-hidden')).toBe('false');
+    });
+  });
+
+  // ─── Keyboard interaction ───
+
+  describe('Keyboard interaction', () => {
+    it('opens on Enter key on trigger', async () => {
+      const el = await fixture<HelixDropdown>(triggerHtml);
+      const trigger = el.querySelector<HTMLElement>('[slot="trigger"]')!;
+      trigger.dispatchEvent(
+        new KeyboardEvent('keydown', { key: 'Enter', bubbles: true, composed: true }),
+      );
+      await el.updateComplete;
+      expect(el.open).toBe(true);
+    });
+
+    it('opens on Space key on trigger', async () => {
+      const el = await fixture<HelixDropdown>(triggerHtml);
+      const trigger = el.querySelector<HTMLElement>('[slot="trigger"]')!;
+      trigger.dispatchEvent(
+        new KeyboardEvent('keydown', { key: ' ', bubbles: true, composed: true }),
+      );
+      await el.updateComplete;
+      expect(el.open).toBe(true);
+    });
+
+    it('opens on ArrowDown key on trigger', async () => {
+      const el = await fixture<HelixDropdown>(triggerHtml);
+      const trigger = el.querySelector<HTMLElement>('[slot="trigger"]')!;
+      trigger.dispatchEvent(
+        new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true, composed: true }),
+      );
+      await el.updateComplete;
+      expect(el.open).toBe(true);
+    });
+
+    it('does not trap focus on Tab (no restore focus to trigger)', async () => {
+      const el = await fixture<HelixDropdown>(triggerHtml);
+      const trigger = el.querySelector<HTMLElement>('[slot="trigger"]')!;
+      trigger.click();
+      await el.updateComplete;
+      expect(el.open).toBe(true);
+      el.dispatchEvent(new KeyboardEvent('keydown', { key: 'Tab', bubbles: true }));
+      await el.updateComplete;
+      expect(el.open).toBe(false);
+    });
+  });
+
+  // ─── Click-outside ───
+
+  describe('Click-outside', () => {
+    it('closes panel on click outside', async () => {
+      const el = await fixture<HelixDropdown>(triggerHtml);
+      const trigger = el.querySelector<HTMLElement>('[slot="trigger"]')!;
+      const showPromise = oneEvent(el, 'hx-show');
+      trigger.click();
+      await showPromise;
+      await el.updateComplete;
+      expect(el.open).toBe(true);
+      // Create an element outside the dropdown and click it
+      const outside = document.createElement('div');
+      document.body.appendChild(outside);
+      outside.click();
+      await el.updateComplete;
+      expect(el.open).toBe(false);
+      outside.remove();
+    });
+  });
+
+  // ─── Panel click edge cases ───
+
+  describe('Panel click edge cases', () => {
+    it('does not fire hx-select when clicking non-menu content in panel', async () => {
+      const el = await fixture<HelixDropdown>(`
+        <hx-dropdown>
+          <button slot="trigger" type="button">Open</button>
+          <div>
+            <p>Not a menu item</p>
+            <span data-value="real" role="menuitem" tabindex="-1">Real item</span>
+          </div>
+        </hx-dropdown>
+      `);
+      const trigger = el.querySelector<HTMLElement>('[slot="trigger"]')!;
+      trigger.click();
+      await el.updateComplete;
+
+      let selectFired = false;
+      el.addEventListener('hx-select', () => {
+        selectFired = true;
+      });
+      // Click the paragraph which is not a menuitem or [data-value]
+      const p = el.querySelector('p')!;
+      p.click();
+      expect(selectFired).toBe(false);
+      expect(el.open).toBe(true);
+    });
+
+    it('hx-select reads value attribute when no data-value exists', async () => {
+      const el = await fixture<HelixDropdown>(`
+        <hx-dropdown>
+          <button slot="trigger" type="button">Open</button>
+          <ul role="menu" aria-label="Test">
+            <li role="menuitem" tabindex="-1" value="attr-val">Attr item</li>
+          </ul>
+        </hx-dropdown>
+      `);
+      const trigger = el.querySelector<HTMLElement>('[slot="trigger"]')!;
+      trigger.click();
+      await el.updateComplete;
+
+      const eventPromise = oneEvent<CustomEvent>(el, 'hx-select');
+      const item = el.querySelector<HTMLElement>('[role="menuitem"]')!;
+      item.click();
+      const event = await eventPromise;
+      expect(event.detail.value).toBe('attr-val');
+    });
+
+    it('hx-select value is null when menuitem has no data-value', async () => {
+      const el = await fixture<HelixDropdown>(`
+        <hx-dropdown>
+          <button slot="trigger" type="button">Open</button>
+          <ul role="menu" aria-label="Test">
+            <li role="menuitem" tabindex="-1">No value item</li>
+          </ul>
+        </hx-dropdown>
+      `);
+      const trigger = el.querySelector<HTMLElement>('[slot="trigger"]')!;
+      trigger.click();
+      await el.updateComplete;
+
+      const eventPromise = oneEvent<CustomEvent>(el, 'hx-select');
+      const item = el.querySelector<HTMLElement>('[role="menuitem"]')!;
+      item.click();
+      const event = await eventPromise;
+      expect(event.detail.value).toBeNull();
+      expect(event.detail.label).toBe('No value item');
     });
   });
 

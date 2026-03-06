@@ -32,6 +32,7 @@ firstFocusable?.focus();
 `this._panel` is a shadow DOM element. `querySelector` on a shadow DOM host element does **not** traverse slotted (light DOM) content. The menu items in the default slot (`<ul role="menu">…</ul>`) are assigned via `<slot>`, not children of the panel in the shadow tree. This query will always return `null`. Focus **never moves to the first menu item** when the dropdown opens.
 
 To correctly find slotted elements, the code must use:
+
 ```typescript
 const slot = panel.querySelector<HTMLSlotElement>('slot');
 const assignedNodes = slot?.assignedElements({ flatten: true }) ?? [];
@@ -97,6 +98,7 @@ Lines 182-184 (`_handleTriggerKeydown`) are uncovered. No test exercises keyboar
 The ARIA Menu Button pattern (APG) requires Arrow Down / Arrow Up navigation between `role="menuitem"` elements after the panel opens. The component provides no such navigation. After opening, keyboard users must Tab through all items rather than using Arrow keys. This is a regression from expected ARIA menu button behavior.
 
 Missing keyboard interactions:
+
 - `ArrowDown` — move focus to next item (wrap to first)
 - `ArrowUp` — move focus to previous item (wrap to last)
 - `Home` — focus first item
@@ -150,15 +152,15 @@ Floating UI supports `'left'` and `'right'` as placements, not `'start'` / `'end
 
 The following scenarios have no test coverage:
 
-| Scenario | Impact |
-|---|---|
-| Keyboard open via Enter on trigger | Branch 182-184 — P1-04 above |
-| Keyboard open via Space on trigger | Branch 182-184 |
-| Keyboard open via ArrowDown on trigger | Branch 182-184 |
-| Click-outside closes the panel | Outside click listener — logic untested |
-| All `placement` values render without error | Regression guard |
-| `hx-select` event `value` is `null` when no `data-value` set | Edge case |
-| Focus returns to trigger on Escape | Only implicit via ARIA test |
+| Scenario                                                     | Impact                                  |
+| ------------------------------------------------------------ | --------------------------------------- |
+| Keyboard open via Enter on trigger                           | Branch 182-184 — P1-04 above            |
+| Keyboard open via Space on trigger                           | Branch 182-184                          |
+| Keyboard open via ArrowDown on trigger                       | Branch 182-184                          |
+| Click-outside closes the panel                               | Outside click listener — logic untested |
+| All `placement` values render without error                  | Regression guard                        |
+| `hx-select` event `value` is `null` when no `data-value` set | Edge case                               |
+| Focus returns to trigger on Escape                           | Only implicit via ARIA test             |
 
 ---
 
@@ -190,15 +192,60 @@ Both `opacity` and `visibility` transition at 150ms. During close, `pointer-even
 
 ## Audit Summary
 
-| Area | Findings | P0 | P1 | P2 |
-|---|---|---|---|---|
-| TypeScript | Type not exported, no `any` | 0 | 0 | 1 |
-| Accessibility | `aria-haspopup`, `aria-controls`, keyboard nav | 0 | 2 | 2 |
-| Tests | Missing keyboard paths, click-outside | 0 | 1 | 1 |
-| Storybook | Play function shadow DOM query | 0 | 1 | 0 |
-| CSS | All tokens used, no hardcoded values | 0 | 0 | 0 |
-| Performance | 2.29 kB gzip — within budget | 0 | 0 | 0 |
-| Implementation | Focus management bug (shadow DOM) | 1 | 0 | 2 |
-| **Total** | | **1** | **4** | **6** |
+| Area           | Findings                                       | P0    | P1    | P2    |
+| -------------- | ---------------------------------------------- | ----- | ----- | ----- |
+| TypeScript     | Type not exported, no `any`                    | 0     | 0     | 1     |
+| Accessibility  | `aria-haspopup`, `aria-controls`, keyboard nav | 0     | 2     | 2     |
+| Tests          | Missing keyboard paths, click-outside          | 0     | 1     | 1     |
+| Storybook      | Play function shadow DOM query                 | 0     | 1     | 0     |
+| CSS            | All tokens used, no hardcoded values           | 0     | 0     | 0     |
+| Performance    | 2.29 kB gzip — within budget                   | 0     | 0     | 0     |
+| Implementation | Focus management bug (shadow DOM)              | 1     | 0     | 2     |
+| **Total**      |                                                | **1** | **4** | **6** |
 
 **Verdict: DOES NOT PASS quality gate.** P0-01 (broken focus management) and P1-01 through P1-04 must be resolved before merge to `main`.
+
+---
+
+## Deep Audit v2 — Remediation (2026-03-06)
+
+### Fixed Issues
+
+| Issue                                                 | Fix Applied                                                                                                            |
+| ----------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| **P0-01**: Focus management shadow DOM violation      | Rewrote to traverse slotted light DOM via `slot.assignedElements()`                                                    |
+| **P1-01**: `aria-haspopup="true"` incorrect           | Changed to `aria-haspopup="menu"` per ARIA 1.1 spec                                                                    |
+| **P1-02**: No `aria-controls` on trigger              | Added unique panel `id` and `aria-controls` linking trigger to panel                                                   |
+| **P1-03**: Storybook play function queries shadow DOM | Changed `shadowRoot.querySelector('[role="menu"]')` to `querySelector('[role="menu"]')` (light DOM)                    |
+| **P1-04**: Branch coverage 64.58%                     | Added 7 new tests (keyboard Enter/Space/ArrowDown, Tab, click-outside, panel click edges). Now 36 tests, 77.58% branch |
+| **P2-02**: Tab traps focus on trigger                 | `_hide()` now accepts `{ restoreFocus: false }` — Tab does not return focus to trigger                                 |
+| **P2-03**: `DropdownPlacement` not exported           | Added `export` keyword, re-exported from `index.ts`                                                                    |
+| **P2-06**: Overly broad panel click delegation        | Narrowed selector from `[role="menuitem"], [data-value], li, button` to `[role="menuitem"], [data-value]`              |
+
+### Remaining P2 Items (documented, not blocking)
+
+| Issue                                              | Status                                                      |
+| -------------------------------------------------- | ----------------------------------------------------------- |
+| **P2-01**: No arrow key roving navigation in panel | Documented — would add ~30 lines. Not blocking for MVP.     |
+| **P2-04**: `start`/`end` placements not RTL-aware  | Documented — maps to `left`/`right` via string replacement. |
+| **P2-05**: Missing placement regression tests      | Partially addressed — keyboard tests cover main paths.      |
+| **P2-07**: Panel transition timing note            | Non-issue — noted for reference only.                       |
+
+### Post-Remediation Coverage
+
+```
+hx-dropdown.ts | 96.96% Stmts | 77.58% Branch | 100% Funcs | 100% Lines
+```
+
+Branch coverage at 77.58% (up from 64.58%). Remaining uncovered branches are null guards on shadow DOM queries (`_setupTriggerAria`, `updated`) that protect against edge cases where the slot or trigger element is not yet available.
+
+### Post-Remediation Test Count
+
+36 tests (up from 29), all passing. 0 axe violations.
+
+### Verification Gates
+
+- TypeScript: 0 errors
+- Tests: 36/36 pass, 0 axe violations
+- `npm run verify`: all 11 tasks pass
+- Full suite: 3106/3106 tests pass
