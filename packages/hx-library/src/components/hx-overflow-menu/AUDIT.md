@@ -3,6 +3,7 @@
 Antagonistic quality review of all files in `packages/hx-library/src/components/hx-overflow-menu/`.
 
 Files reviewed:
+
 - `hx-overflow-menu.ts`
 - `hx-overflow-menu.styles.ts`
 - `hx-overflow-menu.test.ts`
@@ -14,7 +15,7 @@ Files reviewed:
 ## Summary
 
 | Severity | Count |
-|----------|-------|
+| -------- | ----- |
 | P0       | 1     |
 | P1       | 3     |
 | P2       | 10    |
@@ -30,6 +31,7 @@ Files reviewed:
 The `_handleKeydown` handler only responds to `Escape` and `Tab`. It does not implement Up/Down arrow key navigation between `[role="menuitem"]` elements.
 
 The WAI-ARIA Authoring Practices for the [Menu Button Pattern](https://www.w3.org/WAI/ARIA/apg/patterns/menu-button/) mandates:
+
 - `ArrowDown` — move focus to the next menu item; wrap from last to first.
 - `ArrowUp` — move focus to the previous menu item; wrap from first to last.
 - `Home` — move focus to the first menu item.
@@ -69,7 +71,7 @@ ARIA 1.2 specifies that `aria-haspopup` should use the role token of the popup �
 aria-label="More actions"
 ```
 
-The feature spec states: *"trigger button has accessible label ('More options' or custom)"*. There is no `label` property on the component, making the accessible name non-overridable from the consuming template. In a healthcare application, the same overflow menu may appear in multiple contexts (patient row, appointment row, document row), each requiring a unique accessible label so screen reader users can distinguish repeated controls on the page.
+The feature spec states: _"trigger button has accessible label ('More options' or custom)"_. There is no `label` property on the component, making the accessible name non-overridable from the consuming template. In a healthcare application, the same overflow menu may appear in multiple contexts (patient row, appointment row, document row), each requiring a unique accessible label so screen reader users can distinguish repeated controls on the page.
 
 WCAG 2.4.6 (Headings and Labels) and 2.4.9 (Link Purpose) are at risk when identical labels are used for different controls.
 
@@ -98,6 +100,7 @@ Additionally, if any other future component also uses `@floating-ui/dom`, it wil
 **File:** `hx-overflow-menu.test.ts`
 
 The feature spec explicitly lists "disabled items" as a required test case. No test exists that:
+
 - Renders a menu item with the `disabled` attribute.
 - Verifies the item is not focusable or clickable.
 - Verifies `hx-select` is NOT dispatched when a disabled item is interacted with.
@@ -198,7 +201,7 @@ This is a public API surface (CSS parts are part of the component contract) and 
 
 **File:** `hx-overflow-menu.stories.ts`
 
-The feature spec requires: *"Storybook — standard overflow menu, with icons, in table row context"*. The `PatientRowActions` story covers the table row context. However, there is no story showing menu items with leading icon content (e.g., SVG icons or `hx-icon` elements inside `[role="menuitem"]`). All existing stories use text-only menu items. This is a spec gap.
+The feature spec requires: _"Storybook — standard overflow menu, with icons, in table row context"_. The `PatientRowActions` story covers the table row context. However, there is no story showing menu items with leading icon content (e.g., SVG icons or `hx-icon` elements inside `[role="menuitem"]`). All existing stories use text-only menu items. This is a spec gap.
 
 ---
 
@@ -206,33 +209,33 @@ The feature spec requires: *"Storybook — standard overflow menu, with icons, i
 
 **File:** (absent)
 
-The feature spec requires Drupal compatibility: *"Twig-renderable"*. No Twig template, Drupal behavior, or Drupal-specific usage documentation exists anywhere in the component directory. While the web component itself is usable from Twig as a custom element, the non-standard attribute `hx-size` (using the `hx-` prefix for a property attribute rather than a boolean/value attribute) could confuse Drupal integrators unfamiliar with the convention. A Twig usage example in the component README or Starlight docs would satisfy this requirement.
+The feature spec requires Drupal compatibility: _"Twig-renderable"_. No Twig template, Drupal behavior, or Drupal-specific usage documentation exists anywhere in the component directory. While the web component itself is usable from Twig as a custom element, the non-standard attribute `hx-size` (using the `hx-` prefix for a property attribute rather than a boolean/value attribute) could confuse Drupal integrators unfamiliar with the convention. A Twig usage example in the component README or Starlight docs would satisfy this requirement.
 
 ---
 
 ## Passing Areas (for completeness)
 
-| Area | Status | Notes |
-|------|--------|-------|
-| TypeScript strict — no `any` | PASS | No `any` types found |
-| Placement property typed | PASS | Full 12-value union type |
-| Icon property typed | PASS | `'vertical' \| 'horizontal'` |
-| Size property typed | PASS | `'sm' \| 'md' \| 'lg'` |
-| Trigger `aria-label` present | PASS | Hardcoded but present (see P1-02) |
-| Panel `role="menu"` | PASS | |
-| `aria-expanded` reflects state | PASS | |
-| Escape closes panel | PASS | Tested |
-| Tab closes panel | PASS | Tested |
-| Focus moves to first item on open | PASS | `_focusFirstItem()` |
-| `hx-show` / `hx-hide` / `hx-select` events | PASS | All three dispatched correctly |
-| `@csspart button` and `@csspart panel` documented | PASS | JSDoc present |
-| All `--hx-*` token usage | PASS | No hardcoded colors/spacing outside fallback values |
-| Reduced motion media query | PASS | Transition disabled |
-| axe-core tests (closed, open, disabled) | PASS | Three scenarios covered |
-| Storybook autodocs | PASS | `tags: ['autodocs']` present |
-| Storybook controls for all public props | PASS | placement, size, disabled, icon all have controls |
-| Table row context story | PASS | `PatientRowActions` |
-| Shadow DOM encapsulation | PASS | |
-| `index.ts` re-export | PASS | |
-| `declare global` block | PASS | `HTMLElementTagNameMap` extended |
-| Event listeners cleaned up on disconnect | PASS | `disconnectedCallback` removes both listeners |
+| Area                                              | Status | Notes                                               |
+| ------------------------------------------------- | ------ | --------------------------------------------------- |
+| TypeScript strict — no `any`                      | PASS   | No `any` types found                                |
+| Placement property typed                          | PASS   | Full 12-value union type                            |
+| Icon property typed                               | PASS   | `'vertical' \| 'horizontal'`                        |
+| Size property typed                               | PASS   | `'sm' \| 'md' \| 'lg'`                              |
+| Trigger `aria-label` present                      | PASS   | Hardcoded but present (see P1-02)                   |
+| Panel `role="menu"`                               | PASS   |                                                     |
+| `aria-expanded` reflects state                    | PASS   |                                                     |
+| Escape closes panel                               | PASS   | Tested                                              |
+| Tab closes panel                                  | PASS   | Tested                                              |
+| Focus moves to first item on open                 | PASS   | `_focusFirstItem()`                                 |
+| `hx-show` / `hx-hide` / `hx-select` events        | PASS   | All three dispatched correctly                      |
+| `@csspart button` and `@csspart panel` documented | PASS   | JSDoc present                                       |
+| All `--hx-*` token usage                          | PASS   | No hardcoded colors/spacing outside fallback values |
+| Reduced motion media query                        | PASS   | Transition disabled                                 |
+| axe-core tests (closed, open, disabled)           | PASS   | Three scenarios covered                             |
+| Storybook autodocs                                | PASS   | `tags: ['autodocs']` present                        |
+| Storybook controls for all public props           | PASS   | placement, size, disabled, icon all have controls   |
+| Table row context story                           | PASS   | `PatientRowActions`                                 |
+| Shadow DOM encapsulation                          | PASS   |                                                     |
+| `index.ts` re-export                              | PASS   |                                                     |
+| `declare global` block                            | PASS   | `HTMLElementTagNameMap` extended                    |
+| Event listeners cleaned up on disconnect          | PASS   | `disconnectedCallback` removes both listeners       |
