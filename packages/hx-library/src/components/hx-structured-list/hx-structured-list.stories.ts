@@ -138,14 +138,20 @@ export const UserProfile: Story = {
       <hx-structured-list-row>
         <span slot="label">Full name</span>
         Jane Doe
-        <button slot="actions" style="font-size: 0.75rem; padding: 0.25rem 0.5rem; cursor: pointer;">
+        <button
+          slot="actions"
+          style="font-size: 0.75rem; padding: 0.25rem 0.5rem; cursor: pointer;"
+        >
           Edit
         </button>
       </hx-structured-list-row>
       <hx-structured-list-row>
         <span slot="label">Email</span>
         jane.doe@example.com
-        <button slot="actions" style="font-size: 0.75rem; padding: 0.25rem 0.5rem; cursor: pointer;">
+        <button
+          slot="actions"
+          style="font-size: 0.75rem; padding: 0.25rem 0.5rem; cursor: pointer;"
+        >
           Edit
         </button>
       </hx-structured-list-row>
