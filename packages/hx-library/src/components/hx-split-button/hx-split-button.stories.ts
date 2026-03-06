@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/web-components';
 import { html } from 'lit';
 import { expect, within, userEvent, fn } from 'storybook/test';
 import './hx-split-button.js';
-import './hx-menu-item.js';
+import '../hx-menu/hx-menu-item.js';
 
 // ─────────────────────────────────────────────────
 // Meta Configuration
