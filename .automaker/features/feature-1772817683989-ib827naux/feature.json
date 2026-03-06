@@ -1,0 +1,30 @@
+{
+  "category": "Uncategorized",
+  "description": "## Deep Component Audit — hx-container\n\n**Component directory:** `packages/hx-library/src/components/hx-container/`\n**wc-mcp Health Score:** 100 (A) — No issues.\n\n### wc-mcp Tools — USE THESE FOR SCORING\n- `score_component`, `get_component`, `analyze_accessibility`, `validate_usage`, `list_css_parts`, `list_slots`, `get_design_tokens`\n- **Report any wc-mcp bugs to `/Volumes/Development/booked/wc-tools` board.**\n\n### Audit Scope\n1. **Design Tokens** — `--hx-` tokens. Max-width, padding, gutter. Breakpoint-aware.\n2. **Accessibility** — WCAG 2.1 AA. Landmark roles if applicable. Content reflow at zoom.\n3. **Functionality** — Max-width variants (sm, md, lg, xl, full). Fluid vs fixed. Padding. Nesting.\n4. **TypeScript** — Strict. No `any`.\n5. **CSS/Styling** — Shadow DOM. Responsive max-widths. CSS Parts. Container queries if used.\n6. **CEM Accuracy** — Verify 100 holds.\n7. **Tests** — 80%+ coverage. Responsive. Variants.\n8. **Storybook** — All size variants. Nested containers. Content examples.\n9. **Drupal Compatibility** — Layout builder integration. Region wrapper.\n10. **Portability** — CDN-ready.\n\n### Deliverable\nDetailed audit report. Fix CRITICAL+HIGH. Document rest.",
+  "title": "Deep Audit v2: hx-container",
+  "status": "backlog",
+  "branchName": "feature/deep-audit-v2-hx-container",
+  "complexity": "architectural",
+  "priority": 3,
+  "source": "api",
+  "trustTier": 1,
+  "quarantineStatus": "passed",
+  "quarantineId": "5eba3bf1-d294-4f86-97ff-829b0ca16467",
+  "id": "feature-1772817683989-ib827naux",
+  "descriptionHistory": [
+    {
+      "description": "## Deep Component Audit — hx-container\n\n**Component directory:** `packages/hx-library/src/components/hx-container/`\n**wc-mcp Health Score:** 100 (A) — No issues.\n\n### wc-mcp Tools — USE THESE FOR SCORING\n- `score_component`, `get_component`, `analyze_accessibility`, `validate_usage`, `list_css_parts`, `list_slots`, `get_design_tokens`\n- **Report any wc-mcp bugs to `/Volumes/Development/booked/wc-tools` board.**\n\n### Audit Scope\n1. **Design Tokens** — `--hx-` tokens. Max-width, padding, gutter. Breakpoint-aware.\n2. **Accessibility** — WCAG 2.1 AA. Landmark roles if applicable. Content reflow at zoom.\n3. **Functionality** — Max-width variants (sm, md, lg, xl, full). Fluid vs fixed. Padding. Nesting.\n4. **TypeScript** — Strict. No `any`.\n5. **CSS/Styling** — Shadow DOM. Responsive max-widths. CSS Parts. Container queries if used.\n6. **CEM Accuracy** — Verify 100 holds.\n7. **Tests** — 80%+ coverage. Responsive. Variants.\n8. **Storybook** — All size variants. Nested containers. Content examples.\n9. **Drupal Compatibility** — Layout builder integration. Region wrapper.\n10. **Portability** — CDN-ready.\n\n### Deliverable\nDetailed audit report. Fix CRITICAL+HIGH. Document rest.",
+      "timestamp": "2026-03-06T17:21:23.989Z",
+      "source": "initial"
+    }
+  ],
+  "createdAt": "2026-03-06T17:21:23.989Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-03-06T17:21:23.989Z",
+      "reason": "Feature created"
+    }
+  ]
+}

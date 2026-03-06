@@ -1,0 +1,30 @@
+{
+  "category": "Uncategorized",
+  "description": "## Deep Component Audit — hx-link\n\n**Component directory:** `packages/hx-library/src/components/hx-link/`\n**NOTE:** No index.ts — may be incomplete/from PR 175 rescue.\n\n### wc-mcp Tools — USE THESE\n- `score_component`, `get_component`, `analyze_accessibility`, `validate_usage`\n- **Report wc-mcp bugs to `/Volumes/Development/booked/wc-tools` board.**\n\n### Audit Scope\n1. **Existence Check** — Complete implementation? Document gaps.\n2. **Design Tokens** — `--hx-` tokens. Color, hover color, visited, underline. Dark mode.\n3. **Accessibility** — WCAG 2.1 AA. Anchor semantics. External link indicator. New window warning.\n4. **Functionality** — href, target, rel. External link detection. Download attribute. Disabled state.\n5. **TypeScript** — Strict. No `any`.\n6. **CSS/Styling** — Shadow DOM. Underline variants. Color states. Focus-ring.\n7. **CEM Accuracy** — Must be documented if shipping.\n8. **Tests** — Navigation. External link. Disabled. ARIA.\n9. **Storybook** — Internal/external. Disabled. Variants.\n10. **Drupal Compatibility** — Twig link. Menu items.\n\n### Deliverable\nIf incomplete: document gaps. If complete: full audit. Fix CRITICAL+HIGH.",
+  "title": "Deep Audit v2: hx-link",
+  "status": "backlog",
+  "branchName": "feature/deep-audit-v2-hx-link",
+  "complexity": "architectural",
+  "priority": 3,
+  "source": "api",
+  "trustTier": 1,
+  "quarantineStatus": "passed",
+  "quarantineId": "119ea4f0-9bf3-4acd-a996-fddf02fe8516",
+  "id": "feature-1772817810872-deru9dhm5",
+  "descriptionHistory": [
+    {
+      "description": "## Deep Component Audit — hx-link\n\n**Component directory:** `packages/hx-library/src/components/hx-link/`\n**NOTE:** No index.ts — may be incomplete/from PR 175 rescue.\n\n### wc-mcp Tools — USE THESE\n- `score_component`, `get_component`, `analyze_accessibility`, `validate_usage`\n- **Report wc-mcp bugs to `/Volumes/Development/booked/wc-tools` board.**\n\n### Audit Scope\n1. **Existence Check** — Complete implementation? Document gaps.\n2. **Design Tokens** — `--hx-` tokens. Color, hover color, visited, underline. Dark mode.\n3. **Accessibility** — WCAG 2.1 AA. Anchor semantics. External link indicator. New window warning.\n4. **Functionality** — href, target, rel. External link detection. Download attribute. Disabled state.\n5. **TypeScript** — Strict. No `any`.\n6. **CSS/Styling** — Shadow DOM. Underline variants. Color states. Focus-ring.\n7. **CEM Accuracy** — Must be documented if shipping.\n8. **Tests** — Navigation. External link. Disabled. ARIA.\n9. **Storybook** — Internal/external. Disabled. Variants.\n10. **Drupal Compatibility** — Twig link. Menu items.\n\n### Deliverable\nIf incomplete: document gaps. If complete: full audit. Fix CRITICAL+HIGH.",
+      "timestamp": "2026-03-06T17:23:30.873Z",
+      "source": "initial"
+    }
+  ],
+  "createdAt": "2026-03-06T17:23:30.873Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-03-06T17:23:30.873Z",
+      "reason": "Feature created"
+    }
+  ]
+}

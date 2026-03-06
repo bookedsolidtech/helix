@@ -1,0 +1,30 @@
+{
+  "category": "Uncategorized",
+  "description": "## Deep Component Audit — hx-button\n\n**Component directory:** `packages/hx-library/src/components/hx-button/`\n**wc-mcp Health Score:** 96 (A)\n**Known issues:** formAssociated and _internals missing descriptions.\n\n### Audit Scope\n1. **Design Tokens** — `--hx-` tokens. All variants (primary, secondary, ghost, destructive). States (hover, active, focus, disabled). Dark mode.\n2. **Accessibility** — WCAG 2.1 AA. Button role. Disabled state (aria-disabled vs disabled). Loading state. Icon-only buttons need labels.\n3. **Functionality** — All variants. Sizes. Loading state. Icon slots (start/end). Form submission (ElementInternals). Click events. Link mode (href).\n4. **TypeScript** — Strict. formAssociated static. ElementInternals typing. No `any`.\n5. **CSS/Styling** — Shadow DOM. CSS Parts (button). Ripple effect integration. Focus-ring.\n6. **CEM Accuracy** — Fix formAssociated + _internals descriptions.\n7. **Tests** — 80%+ coverage. All variants. Form integration. Keyboard (Enter/Space). Disabled state.\n8. **Storybook** — All variants/sizes/states. Loading. Icons. Form demo.\n9. **Drupal Compatibility** — Form actions. Twig attributes. Drupal AJAX compatibility.\n10. **Portability** — CDN-ready. Form-associated custom element support.\n\n### Deliverable\nDetailed audit report. Fix CRITICAL+HIGH. Document rest.",
+  "title": "Deep Audit v2: hx-button",
+  "status": "backlog",
+  "branchName": "feature/deep-audit-v2-hx-button",
+  "complexity": "architectural",
+  "priority": 3,
+  "source": "api",
+  "trustTier": 1,
+  "quarantineStatus": "passed",
+  "quarantineId": "b1caeb90-4a31-46a4-b83f-e2b93ae43e46",
+  "id": "feature-1772817617205-upgzlb7bf",
+  "descriptionHistory": [
+    {
+      "description": "## Deep Component Audit — hx-button\n\n**Component directory:** `packages/hx-library/src/components/hx-button/`\n**wc-mcp Health Score:** 96 (A)\n**Known issues:** formAssociated and _internals missing descriptions.\n\n### Audit Scope\n1. **Design Tokens** — `--hx-` tokens. All variants (primary, secondary, ghost, destructive). States (hover, active, focus, disabled). Dark mode.\n2. **Accessibility** — WCAG 2.1 AA. Button role. Disabled state (aria-disabled vs disabled). Loading state. Icon-only buttons need labels.\n3. **Functionality** — All variants. Sizes. Loading state. Icon slots (start/end). Form submission (ElementInternals). Click events. Link mode (href).\n4. **TypeScript** — Strict. formAssociated static. ElementInternals typing. No `any`.\n5. **CSS/Styling** — Shadow DOM. CSS Parts (button). Ripple effect integration. Focus-ring.\n6. **CEM Accuracy** — Fix formAssociated + _internals descriptions.\n7. **Tests** — 80%+ coverage. All variants. Form integration. Keyboard (Enter/Space). Disabled state.\n8. **Storybook** — All variants/sizes/states. Loading. Icons. Form demo.\n9. **Drupal Compatibility** — Form actions. Twig attributes. Drupal AJAX compatibility.\n10. **Portability** — CDN-ready. Form-associated custom element support.\n\n### Deliverable\nDetailed audit report. Fix CRITICAL+HIGH. Document rest.",
+      "timestamp": "2026-03-06T17:20:17.205Z",
+      "source": "initial"
+    }
+  ],
+  "createdAt": "2026-03-06T17:20:17.205Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-03-06T17:20:17.205Z",
+      "reason": "Feature created"
+    }
+  ]
+}

@@ -1,0 +1,30 @@
+{
+  "category": "Uncategorized",
+  "description": "## Deep Component Audit — hx-dialog\n\n**Component directory:** `packages/hx-library/src/components/hx-dialog/`\n\n### wc-mcp Tools — USE THESE FOR SCORING\n- `score_component`, `get_component`, `analyze_accessibility`, `validate_usage`, `list_css_parts`, `list_events`, `list_slots`, `get_design_tokens`\n- **Report any wc-mcp bugs to `/Volumes/Development/booked/wc-tools` board.**\n\n### Audit Scope\n1. **Design Tokens** — `--hx-` tokens. Overlay, surface, header, footer, border-radius. Dark mode.\n2. **Accessibility** — WCAG 2.1 AA. dialog role. aria-modal. Focus trap. Return focus on close. Escape to dismiss. aria-labelledby/describedby.\n3. **Functionality** — Open/close. Modal vs non-modal. Overlay click dismiss. Header/body/footer slots. Scroll behavior (body lock). Nested dialogs. Animation.\n4. **TypeScript** — Strict. No `any`.\n5. **CSS/Styling** — Shadow DOM. CSS Parts. Overlay. Centered positioning. Responsive (full-screen on mobile). Z-index management.\n6. **CEM Accuracy** — All API documented.\n7. **Tests** — 80%+ coverage. Focus trap. Escape. Overlay click. Scroll lock. ARIA.\n8. **Storybook** — Basic. Scrolling content. Form inside. Nested. Sizes.\n9. **Drupal Compatibility** — AJAX dialog replacement. Twig-friendly.\n10. **Portability** — CDN-ready.\n\n### Deliverable\nDetailed audit report. Fix CRITICAL+HIGH. Document rest.",
+  "title": "Deep Audit v2: hx-dialog",
+  "status": "backlog",
+  "branchName": "feature/deep-audit-v2-hx-dialog",
+  "complexity": "architectural",
+  "priority": 3,
+  "source": "api",
+  "trustTier": 1,
+  "quarantineStatus": "passed",
+  "quarantineId": "06798c1c-1b4f-4b1c-8f29-7bf47339d7f8",
+  "id": "feature-1772817716044-41n12756z",
+  "descriptionHistory": [
+    {
+      "description": "## Deep Component Audit — hx-dialog\n\n**Component directory:** `packages/hx-library/src/components/hx-dialog/`\n\n### wc-mcp Tools — USE THESE FOR SCORING\n- `score_component`, `get_component`, `analyze_accessibility`, `validate_usage`, `list_css_parts`, `list_events`, `list_slots`, `get_design_tokens`\n- **Report any wc-mcp bugs to `/Volumes/Development/booked/wc-tools` board.**\n\n### Audit Scope\n1. **Design Tokens** — `--hx-` tokens. Overlay, surface, header, footer, border-radius. Dark mode.\n2. **Accessibility** — WCAG 2.1 AA. dialog role. aria-modal. Focus trap. Return focus on close. Escape to dismiss. aria-labelledby/describedby.\n3. **Functionality** — Open/close. Modal vs non-modal. Overlay click dismiss. Header/body/footer slots. Scroll behavior (body lock). Nested dialogs. Animation.\n4. **TypeScript** — Strict. No `any`.\n5. **CSS/Styling** — Shadow DOM. CSS Parts. Overlay. Centered positioning. Responsive (full-screen on mobile). Z-index management.\n6. **CEM Accuracy** — All API documented.\n7. **Tests** — 80%+ coverage. Focus trap. Escape. Overlay click. Scroll lock. ARIA.\n8. **Storybook** — Basic. Scrolling content. Form inside. Nested. Sizes.\n9. **Drupal Compatibility** — AJAX dialog replacement. Twig-friendly.\n10. **Portability** — CDN-ready.\n\n### Deliverable\nDetailed audit report. Fix CRITICAL+HIGH. Document rest.",
+      "timestamp": "2026-03-06T17:21:56.044Z",
+      "source": "initial"
+    }
+  ],
+  "createdAt": "2026-03-06T17:21:56.044Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-03-06T17:21:56.044Z",
+      "reason": "Feature created"
+    }
+  ]
+}

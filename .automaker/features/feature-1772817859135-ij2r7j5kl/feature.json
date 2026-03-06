@@ -1,0 +1,30 @@
+{
+  "category": "Uncategorized",
+  "description": "## Deep Component Audit — hx-overflow-menu\n\n**Component directory:** `packages/hx-library/src/components/hx-overflow-menu/`\n\n### wc-mcp Tools — USE THESE\n- `score_component`, `get_component`, `analyze_accessibility`, `list_css_parts`, `list_events`, `list_slots`, `get_design_tokens`\n- **Report wc-mcp bugs to `/Volumes/Development/booked/wc-tools` board.**\n\n### Audit Scope\n1. **Design Tokens** — `--hx-` tokens. Trigger, menu panel, item hover. Dark mode.\n2. **Accessibility** — WCAG 2.1 AA. Menu button pattern. aria-expanded, aria-haspopup. Keyboard. Focus management on open/close.\n3. **Functionality** — Three-dot/kebab trigger. Menu items. Dividers. Disabled items. Positioning. Click-outside dismiss.\n4. **TypeScript** — Strict. No `any`.\n5. **CSS/Styling** — Shadow DOM. CSS Parts. Positioning. Z-index.\n6. **CEM Accuracy** — All API documented.\n7. **Tests** — 80%+ coverage. Toggle. Items. Keyboard. Positioning.\n8. **Storybook** — Default. With dividers. Disabled items. Positioning.\n9. **Drupal Compatibility** — Operations column. Twig-friendly.\n10. **Portability** — CDN-ready.\n\n### Deliverable\nDetailed audit report. Fix CRITICAL+HIGH. Document rest.",
+  "title": "Deep Audit v2: hx-overflow-menu",
+  "status": "backlog",
+  "branchName": "feature/deep-audit-v2-hx-overflow-menu",
+  "complexity": "architectural",
+  "priority": 3,
+  "source": "api",
+  "trustTier": 1,
+  "quarantineStatus": "passed",
+  "quarantineId": "80ec3c05-fcc9-420b-aba0-3cb6a306e148",
+  "id": "feature-1772817859135-ij2r7j5kl",
+  "descriptionHistory": [
+    {
+      "description": "## Deep Component Audit — hx-overflow-menu\n\n**Component directory:** `packages/hx-library/src/components/hx-overflow-menu/`\n\n### wc-mcp Tools — USE THESE\n- `score_component`, `get_component`, `analyze_accessibility`, `list_css_parts`, `list_events`, `list_slots`, `get_design_tokens`\n- **Report wc-mcp bugs to `/Volumes/Development/booked/wc-tools` board.**\n\n### Audit Scope\n1. **Design Tokens** — `--hx-` tokens. Trigger, menu panel, item hover. Dark mode.\n2. **Accessibility** — WCAG 2.1 AA. Menu button pattern. aria-expanded, aria-haspopup. Keyboard. Focus management on open/close.\n3. **Functionality** — Three-dot/kebab trigger. Menu items. Dividers. Disabled items. Positioning. Click-outside dismiss.\n4. **TypeScript** — Strict. No `any`.\n5. **CSS/Styling** — Shadow DOM. CSS Parts. Positioning. Z-index.\n6. **CEM Accuracy** — All API documented.\n7. **Tests** — 80%+ coverage. Toggle. Items. Keyboard. Positioning.\n8. **Storybook** — Default. With dividers. Disabled items. Positioning.\n9. **Drupal Compatibility** — Operations column. Twig-friendly.\n10. **Portability** — CDN-ready.\n\n### Deliverable\nDetailed audit report. Fix CRITICAL+HIGH. Document rest.",
+      "timestamp": "2026-03-06T17:24:19.135Z",
+      "source": "initial"
+    }
+  ],
+  "createdAt": "2026-03-06T17:24:19.135Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-03-06T17:24:19.135Z",
+      "reason": "Feature created"
+    }
+  ]
+}
