@@ -35,7 +35,7 @@ const meta = {
         type: { summary: "'flat' | 'raised' | 'floating'" },
       },
     },
-    wcHref: {
+    hxHref: {
       control: 'text',
       description:
         'Optional URL. When set, the card becomes interactive (clickable) and navigates to this URL on click.',
@@ -49,13 +49,13 @@ const meta = {
   args: {
     variant: 'default',
     elevation: 'flat',
-    wcHref: '',
+    hxHref: '',
   },
   render: (args) => html`
     <hx-card
       variant=${args.variant}
       elevation=${args.elevation}
-      hx-href=${args.wcHref || ''}
+      hx-href=${args.hxHref || ''}
       style="max-width: 400px;"
     >
       <span slot="heading">Patient Overview</span>
@@ -302,11 +302,12 @@ const cardClickHandler = fn();
 
 export const Interactive: Story = {
   args: {
-    wcHref: 'https://ehr.example.com/patient/12345',
+    hxHref: 'https://ehr.example.com/patient/12345',
   },
   render: () => html`
     <hx-card
       hx-href="https://ehr.example.com/patient/12345"
+      hx-label="Open patient record for James Wilson"
       elevation="raised"
       style="max-width: 400px;"
       @hx-card-click=${cardClickHandler}
@@ -852,7 +853,7 @@ export const InteractiveClickTest: Story = {
     await expect(interactiveClickHandler).toHaveBeenCalledTimes(1);
 
     const callDetail = interactiveClickHandler.mock.calls[0]?.[0]?.detail;
-    await expect(callDetail?.url).toBe('https://ehr.example.com/patient/67890');
+    await expect(callDetail?.href).toBe('https://ehr.example.com/patient/67890');
   },
 };
 
@@ -963,12 +964,7 @@ export const InteractiveFocusManagement: Story = {
 
 export const PatientSummaryCard: Story = {
   render: () => html`
-    <hx-card
-      variant="featured"
-      elevation="raised"
-      hx-href="https://ehr.example.com/patient/00-54321"
-      style="max-width: 420px;"
-    >
+    <hx-card variant="featured" elevation="raised" style="max-width: 420px;">
       <span
         slot="heading"
         style="display: flex; align-items: center; justify-content: space-between; width: 100%;"
@@ -1012,11 +1008,7 @@ export const PatientDashboard: Story = {
       style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1.5rem;"
     >
       <!-- Critical patient -->
-      <hx-card
-        variant="featured"
-        elevation="raised"
-        hx-href="https://ehr.example.com/patient/00-11001"
-      >
+      <hx-card variant="featured" elevation="raised">
         <span
           slot="heading"
           style="display: flex; align-items: center; justify-content: space-between; width: 100%;"
@@ -1042,7 +1034,7 @@ export const PatientDashboard: Story = {
       </hx-card>
 
       <!-- Observation patient -->
-      <hx-card elevation="raised" hx-href="https://ehr.example.com/patient/00-11002">
+      <hx-card elevation="raised">
         <span
           slot="heading"
           style="display: flex; align-items: center; justify-content: space-between; width: 100%;"
@@ -1068,7 +1060,7 @@ export const PatientDashboard: Story = {
       </hx-card>
 
       <!-- Stable patient -->
-      <hx-card elevation="raised" hx-href="https://ehr.example.com/patient/00-11003">
+      <hx-card elevation="raised">
         <span
           slot="heading"
           style="display: flex; align-items: center; justify-content: space-between; width: 100%;"
@@ -1094,7 +1086,7 @@ export const PatientDashboard: Story = {
       </hx-card>
 
       <!-- Discharge pending -->
-      <hx-card elevation="raised" hx-href="https://ehr.example.com/patient/00-11004">
+      <hx-card elevation="raised">
         <span
           slot="heading"
           style="display: flex; align-items: center; justify-content: space-between; width: 100%;"
@@ -1120,7 +1112,7 @@ export const PatientDashboard: Story = {
       </hx-card>
 
       <!-- Stable patient 2 -->
-      <hx-card elevation="raised" hx-href="https://ehr.example.com/patient/00-11005">
+      <hx-card elevation="raised">
         <span
           slot="heading"
           style="display: flex; align-items: center; justify-content: space-between; width: 100%;"
@@ -1147,7 +1139,7 @@ export const PatientDashboard: Story = {
       </hx-card>
 
       <!-- New admission -->
-      <hx-card elevation="raised" hx-href="https://ehr.example.com/patient/00-11006">
+      <hx-card elevation="raised">
         <span
           slot="heading"
           style="display: flex; align-items: center; justify-content: space-between; width: 100%;"
