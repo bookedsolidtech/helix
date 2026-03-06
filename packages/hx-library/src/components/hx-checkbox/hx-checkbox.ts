@@ -41,8 +41,10 @@ export class HelixCheckbox extends LitElement {
 
   // ─── Form Association ───
 
+  /** Enables form association via ElementInternals so the checkbox participates in `<form>` submission and validation. */
   static formAssociated = true;
 
+  /** The ElementInternals instance used for form value, validity, and label association. @internal */
   private _internals: ElementInternals;
 
   constructor() {
@@ -122,9 +124,11 @@ export class HelixCheckbox extends LitElement {
   @property({ type: String, attribute: 'hx-size', reflect: true })
   hxSize: 'sm' | 'md' | 'lg' = 'md';
 
+  /** Reference to the hidden native `<input type="checkbox">` used for form semantics and focus delegation. @internal */
   @query('.checkbox__input')
   private _inputEl!: HTMLInputElement;
 
+  /** Tracks whether the `error` slot has projected content, enabling error styling even without the `error` property. @internal */
   @state() private _hasErrorSlot = false;
 
   // ─── Slot Handlers ───
@@ -239,9 +243,13 @@ export class HelixCheckbox extends LitElement {
 
   // ─── Render ───
 
+  /** Unique auto-generated ID for ARIA associations between the input, label, and descriptive elements. @internal */
   private _id = `hx-checkbox-${Math.random().toString(36).slice(2, 9)}`;
+  /** ID for the help-text element, referenced by `aria-describedby`. @internal */
   private _helpTextId = `${this._id}-help`;
+  /** ID for the error element, referenced by `aria-describedby`. @internal */
   private _errorId = `${this._id}-error`;
+  /** ID for the label element, referenced by `aria-labelledby`. @internal */
   private _labelId = `${this._id}-label`;
 
   override render() {

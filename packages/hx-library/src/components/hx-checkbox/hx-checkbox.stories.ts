@@ -94,6 +94,16 @@ const meta = {
         type: { summary: 'string' },
       },
     },
+    hxSize: {
+      control: 'inline-radio',
+      options: ['sm', 'md', 'lg'],
+      description: 'The size of the checkbox.',
+      table: {
+        category: 'Appearance',
+        defaultValue: { summary: 'md' },
+        type: { summary: "'sm' | 'md' | 'lg'" },
+      },
+    },
   },
   args: {
     checked: false,
@@ -105,6 +115,7 @@ const meta = {
     error: '',
     helpText: '',
     name: '',
+    hxSize: 'md',
   },
   render: (args) => html`
     <hx-checkbox
@@ -117,6 +128,7 @@ const meta = {
       error=${args.error}
       help-text=${args.helpText}
       name=${args.name}
+      hx-size=${args.hxSize}
     ></hx-checkbox>
   `,
 } satisfies Meta;
@@ -217,6 +229,16 @@ export const Required: Story = {
     required: true,
     helpText: 'This acknowledgement is required before submission.',
   },
+};
+
+export const Sizes: Story = {
+  render: () => html`
+    <div style="display: flex; flex-direction: column; gap: 1.5rem; max-width: 480px;">
+      <hx-checkbox label="Small checkbox" hx-size="sm" checked></hx-checkbox>
+      <hx-checkbox label="Medium checkbox (default)" hx-size="md" checked></hx-checkbox>
+      <hx-checkbox label="Large checkbox" hx-size="lg" checked></hx-checkbox>
+    </div>
+  `,
 };
 
 export const WithHelpText: Story = {
