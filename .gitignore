@@ -89,3 +89,4 @@ apps/admin/src/data/library-registry.json
 
 # MCP health scorer output (regenerated on demand)
 packages/.mcp-wc/
+.automaker-lock
