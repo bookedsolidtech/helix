@@ -1,11 +1,11 @@
 import { LitElement, html, nothing } from 'lit';
-import { customElement, property } from 'lit/decorators.js';
+import { customElement, property, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { tokenStyles } from '@helix/tokens/lit';
 import { helixMessageBarStyles } from './hx-message-bar.styles.js';
 
 /** Message bar variant determines visual styling and ARIA semantics. */
-type MessageBarVariant = 'info' | 'success' | 'warning' | 'error';
+export type MessageBarVariant = 'info' | 'success' | 'warning' | 'error';
 
 /**
  * A full-width inline notification bar for page-level or section-level messages.
@@ -69,14 +69,26 @@ export class HelixMessageBar extends LitElement {
   @property({ type: Boolean, reflect: true })
   sticky = false;
 
+  // ─── Private State ───
+
+  /** @internal */
+  @state() private _hasActions = false;
+
   // ─── Private Helpers ───
 
+  /** @internal */
   private get _isAssertive(): boolean {
     return this.variant === 'error' || this.variant === 'warning';
   }
 
+  /** @internal */
   private get _role(): string {
     return this._isAssertive ? 'alert' : 'status';
+  }
+
+  /** @internal */
+  private get _ariaLive(): string {
+    return this._isAssertive ? 'assertive' : 'polite';
   }
 
   // ─── Default Icons ───
@@ -148,11 +160,9 @@ export class HelixMessageBar extends LitElement {
     );
   }
 
-  private _handleCloseKeydown(event: KeyboardEvent): void {
-    if (event.key === 'Enter' || event.key === ' ') {
-      event.preventDefault();
-      this._handleClose();
-    }
+  private _handleActionSlotChange(e: Event): void {
+    const slot = e.target as HTMLSlotElement;
+    this._hasActions = slot.assignedNodes({ flatten: true }).length > 0;
   }
 
   // ─── Render ───
@@ -165,7 +175,7 @@ export class HelixMessageBar extends LitElement {
     };
 
     return html`
-      <div part="base" class=${classMap(classes)} role=${this._role}>
+      <div part="base" class=${classMap(classes)} role=${this._role} aria-live=${this._ariaLive}>
         <div part="icon" class="message-bar__icon">
           <slot name="icon">${this._renderDefaultIcon()}</slot>
         </div>
@@ -174,8 +184,8 @@ export class HelixMessageBar extends LitElement {
           <slot></slot>
         </div>
 
-        <div part="action" class="message-bar__action">
-          <slot name="action"></slot>
+        <div part="action" class="message-bar__action" ?hidden=${!this._hasActions}>
+          <slot name="action" @slotchange=${this._handleActionSlotChange}></slot>
         </div>
 
         ${this.closable
@@ -185,7 +195,6 @@ export class HelixMessageBar extends LitElement {
                 class="message-bar__close-button"
                 aria-label="Close"
                 @click=${this._handleClose}
-                @keydown=${this._handleCloseKeydown}
               >
                 ${this._renderCloseIcon()}
               </button>
