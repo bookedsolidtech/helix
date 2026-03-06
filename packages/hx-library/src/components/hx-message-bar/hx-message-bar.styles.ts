@@ -70,7 +70,7 @@ export const helixMessageBarStyles = css`
     gap: var(--hx-space-2, 0.5rem);
   }
 
-  .message-bar__action:empty {
+  .message-bar__action[hidden] {
     display: none;
   }
 
