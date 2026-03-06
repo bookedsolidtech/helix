@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/web-components';
 import { html } from 'lit';
 import { expect, within, userEvent } from 'storybook/test';
-import '@wc-2026/library/hx-time-picker';
+import './hx-time-picker.js';
 
 // ─────────────────────────────────────────────────
 // Meta Configuration
