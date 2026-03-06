@@ -2,7 +2,7 @@
   "category": "Uncategorized",
   "description": "Deep antagonistic quality review of `hx-checkbox` (T1-09). 6/6 libraries ship this.\n\nReview every file in `packages/hx-library/src/components/hx-checkbox/` critically.\n\n**Audit areas:**\n1. TypeScript — strict, indeterminate state typing, form value/checked typing, ElementInternals\n2. Accessibility — `role=\"checkbox\"`, `aria-checked` (true/false/mixed for indeterminate), keyboard (Space to toggle), label association, group context with `aria-describedby`, axe-core pass\n3. Tests — checked/unchecked/indeterminate states, form association, disabled state, label click activates checkbox, programmatic state changes\n4. Storybook — all states, indeterminate demo, form integration demo\n5. CSS — custom checkbox mark rendering, focus ring, `--hx-*` tokens, CSS parts (checkbox, label, checkmark)\n6. Performance — bundle < 5KB\n7. Drupal — form-associated, Twig-renderable\n\n**Output:** Write findings to `packages/hx-library/src/components/hx-checkbox/AUDIT.md` with severity (P0/P1/P2). DO NOT fix — document only. Commit AUDIT.md as your PR.",
   "title": "AUDIT: hx-checkbox — T1-09 antagonistic quality review",
-  "status": "backlog",
+  "status": "done",
   "complexity": "medium",
   "priority": 2,
   "source": "api",
@@ -25,6 +25,13 @@
       "to": "backlog",
       "timestamp": "2026-03-05T23:16:30.899Z",
       "reason": "Feature created"
+    },
+    {
+      "from": "backlog",
+      "to": "done",
+      "timestamp": "2026-03-06T14:11:47.028Z"
     }
-  ]
+  ],
+  "featureType": "code",
+  "completedAt": "2026-03-06T14:11:47.028Z"
 }

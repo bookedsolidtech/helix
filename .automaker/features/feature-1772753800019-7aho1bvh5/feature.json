@@ -2,7 +2,7 @@
   "category": "Uncategorized",
   "description": "Antagonistic quality review of `hx-overflow-menu` (T2-11) **after implementation completes**.\\n\\nReview every file in `packages/hx-library/src/components/hx-overflow-menu/` critically.\\n\\n**Audit areas:**\\n1. TypeScript — strict, trigger icon typed, placement typed, items typed\\n2. Accessibility — trigger button has accessible label (\\\"More options\\\" or custom), menu role, keyboard: Enter/Space opens, arrow navigation in menu, Escape closes, axe-core pass\\n3. Tests — trigger activation, keyboard nav, all placements, disabled items, 80%+ coverage\\n4. Storybook — standard overflow menu, with icons, in table row context\\n5. CSS — `--hx-*` tokens, CSS parts (trigger, menu)\\n6. Performance — bundle < 5KB\\n7. Drupal — Twig-renderable\\n\\n**Output:** Write findings to `packages/hx-library/src/components/hx-overflow-menu/AUDIT.md` with severity (P0/P1/P2). DO NOT fix — document only. Commit AUDIT.md as your PR.",
   "title": "AUDIT: hx-overflow-menu — T2-11 antagonistic quality review",
-  "status": "backlog",
+  "status": "done",
   "dependencies": [
     "feature-1772753129117-5mz45ot5t"
   ],
@@ -28,6 +28,13 @@
       "to": "backlog",
       "timestamp": "2026-03-05T23:36:40.019Z",
       "reason": "Feature created"
+    },
+    {
+      "from": "backlog",
+      "to": "done",
+      "timestamp": "2026-03-06T14:14:55.562Z"
     }
-  ]
+  ],
+  "featureType": "code",
+  "completedAt": "2026-03-06T14:14:55.562Z"
 }

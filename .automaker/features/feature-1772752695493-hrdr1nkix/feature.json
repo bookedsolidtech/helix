@@ -2,7 +2,7 @@
   "category": "Uncategorized",
   "description": "Deep antagonistic quality review of `hx-split-button` (T2-28). 3/6 libraries. NOTE: PR #175 required.\n\nReview `packages/hx-library/src/components/hx-split-button/` (includes hx-menu-item).\n\n**Audit areas:**\n1. TypeScript — strict, primary action vs dropdown trigger typing, menu-item typing\n2. Accessibility — primary button and dropdown trigger are separate focusable elements, dropdown trigger has `aria-haspopup=\"menu\"` and `aria-expanded`, menu has `role=\"menu\"`, items have `role=\"menuitem\"`, keyboard (Enter/Space on primary, arrow keys in menu, Escape closes), axe-core pass\n3. Tests — primary action fires, dropdown opens/closes, menu item selection, keyboard nav through menu, disabled states\n4. Storybook — all variants, menu item types, disabled primary/items\n5. CSS — connected primary+trigger appearance, `--hx-*` tokens, CSS parts\n6. Performance — bundle < 5KB\n7. Drupal — Twig-renderable\n\n**Output:** Write findings to `packages/hx-library/src/components/hx-split-button/AUDIT.md` with severity (P0/P1/P2). DO NOT fix — document only. Commit AUDIT.md as your PR.",
   "title": "AUDIT: hx-split-button — T2-28 antagonistic quality review",
-  "status": "backlog",
+  "status": "done",
   "complexity": "large",
   "priority": 3,
   "source": "api",
@@ -25,6 +25,13 @@
       "to": "backlog",
       "timestamp": "2026-03-05T23:18:15.494Z",
       "reason": "Feature created"
+    },
+    {
+      "from": "backlog",
+      "to": "done",
+      "timestamp": "2026-03-06T14:12:15.508Z"
     }
-  ]
+  ],
+  "featureType": "code",
+  "completedAt": "2026-03-06T14:12:15.508Z"
 }

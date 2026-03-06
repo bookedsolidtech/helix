@@ -2,7 +2,7 @@
   "category": "Uncategorized",
   "description": "Deep antagonistic quality review of `hx-avatar` (T1-21). 4/6 libraries ship this.\n\nReview every file in `packages/hx-library/src/components/hx-avatar/` critically.\n\n**Audit areas:**\n1. TypeScript — strict, image/initials/icon fallback typing, size typing, shape (circle/square) typing\n2. Accessibility — image `alt` text required and passed through, initials-only mode needs `aria-label`, decorative avatars have `aria-hidden`, fallback chain (image → initials → icon) maintains accessibility, axe-core pass\n3. Tests — image load success/failure fallback, initials generation, icon fallback, all sizes, all shapes\n4. Storybook — all modes (image/initials/icon), all sizes, circle/square, fallback demo\n5. CSS — circular clipping, `--hx-*` tokens for size/color, CSS parts (image, initials, icon)\n6. Performance — bundle < 5KB, no unnecessary image loading\n7. Drupal — Twig-renderable with server-side initials/alt\n\n**Output:** Write findings to `packages/hx-library/src/components/hx-avatar/AUDIT.md` with severity (P0/P1/P2). DO NOT fix — document only. Commit AUDIT.md as your PR.",
   "title": "AUDIT: hx-avatar — T1-21 antagonistic quality review",
-  "status": "backlog",
+  "status": "done",
   "complexity": "medium",
   "priority": 2,
   "source": "api",
@@ -25,6 +25,13 @@
       "to": "backlog",
       "timestamp": "2026-03-05T23:17:39.936Z",
       "reason": "Feature created"
+    },
+    {
+      "from": "backlog",
+      "to": "done",
+      "timestamp": "2026-03-06T14:12:04.679Z"
     }
-  ]
+  ],
+  "featureType": "code",
+  "completedAt": "2026-03-06T14:12:04.679Z"
 }

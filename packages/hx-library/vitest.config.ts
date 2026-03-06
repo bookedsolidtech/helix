@@ -25,9 +25,18 @@ export default defineConfig({
     outputFile: { json: '.cache/test-results.json' },
     testTimeout: 30000,
     globals: true,
+    pool: 'threads',
+    poolOptions: {
+      threads: {
+        minThreads: 2,
+        maxThreads: 4,
+      },
+    },
+    // Coverage disabled by default — run `npm run test:coverage` for reports.
+    // Keeps CI fast (~5min instead of ~20min).
     coverage: {
       provider: 'istanbul',
-      enabled: true,
+      enabled: false,
       include: ['src/components/**/*.ts'],
       exclude: [
         'src/components/**/*.test.ts',
