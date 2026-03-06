@@ -83,9 +83,22 @@ export class HelixAlert extends LitElement {
    * Returns the appropriate ARIA role based on variant.
    * role="alert" implies aria-live="assertive"; role="status" implies aria-live="polite".
    * We do NOT set aria-live explicitly to avoid double-announcements in JAWS.
+   * Role is set on the host element (not shadow DOM) for screen reader reliability.
    */
   private get _role(): string {
     return this._isAssertive ? 'alert' : 'status';
+  }
+
+  override updated(changedProperties: Map<PropertyKey, unknown>): void {
+    super.updated(changedProperties);
+    if (changedProperties.has('variant')) {
+      this.setAttribute('role', this._role);
+    }
+  }
+
+  override connectedCallback(): void {
+    super.connectedCallback();
+    this.setAttribute('role', this._role);
   }
 
   // ─── Default Icons ───
@@ -173,13 +186,6 @@ export class HelixAlert extends LitElement {
     );
   }
 
-  private _handleCloseKeydown(event: KeyboardEvent): void {
-    if (event.key === 'Enter' || event.key === ' ') {
-      event.preventDefault();
-      this._handleDismiss();
-    }
-  }
-
   // ─── Render ───
 
   override render() {
@@ -189,7 +195,7 @@ export class HelixAlert extends LitElement {
     };
 
     return html`
-      <div part="alert" class=${classMap(classes)} role=${this._role}>
+      <div part="alert" class=${classMap(classes)}>
         ${this.icon
           ? html`
               <div part="icon" class="alert__icon">
@@ -212,7 +218,6 @@ export class HelixAlert extends LitElement {
                 class="alert__close-button"
                 aria-label="Close"
                 @click=${this._handleDismiss}
-                @keydown=${this._handleCloseKeydown}
               >
                 ${this._renderCloseIcon()}
               </button>
@@ -229,4 +234,4 @@ declare global {
   }
 }
 
-export type { HelixAlert as WcAlert };
+export type { HelixAlert as HxAlert };
