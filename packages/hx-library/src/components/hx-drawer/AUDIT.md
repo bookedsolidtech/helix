@@ -3,6 +3,7 @@
 **Auditor:** Antagonistic Quality Review Agent
 **Branch reviewed:** `feature/implement-hx-drawer-t2-slide-in`
 **Files reviewed:**
+
 - `hx-drawer.ts`
 - `hx-drawer.styles.ts`
 - `hx-drawer.test.ts`
@@ -13,12 +14,12 @@
 
 ## Severity Legend
 
-| Severity | Meaning |
-|----------|---------|
-| **P0** | Showstopper — blocks merge. Missing feature or broken behavior. |
-| **P1** | Major — significant accessibility, correctness, or correctness gap. Must fix before ship. |
-| **P2** | Minor — quality, spec deviation, or subtle risk. Fix before release. |
-| **P3** | Low — polish or informational. Fix when convenient. |
+| Severity | Meaning                                                                                   |
+| -------- | ----------------------------------------------------------------------------------------- |
+| **P0**   | Showstopper — blocks merge. Missing feature or broken behavior.                           |
+| **P1**   | Major — significant accessibility, correctness, or correctness gap. Must fix before ship. |
+| **P2**   | Minor — quality, spec deviation, or subtle risk. Fix before release.                      |
+| **P3**   | Low — polish or informational. Fix when convenient.                                       |
 
 ---
 
@@ -102,6 +103,7 @@ Without this, screen readers with poor `aria-modal` support will allow users to 
 The feature description requires: _"Twig-renderable, JS behaviors for open/close."_ There is no `hx-drawer.behaviors.js` (or `.es6.js`) file and no Twig example template. The Drupal consumer cannot wire up open/close triggers using Drupal behaviors without this file.
 
 **Required fix:** Create `hx-drawer.behaviors.js` implementing a Drupal behavior that:
+
 - Finds `[data-hx-drawer-trigger]` elements
 - Calls `drawerEl.show()` / `drawerEl.hide()` on click
 - Handles attach/detach cleanup
@@ -193,7 +195,9 @@ The `hidden` attribute relies on the browser's default `[hidden] { display: none
 **Required fix:** Add an explicit rule in the component styles:
 
 ```css
-[hidden] { display: none !important; }
+[hidden] {
+  display: none !important;
+}
 ```
 
 ---
@@ -274,41 +278,41 @@ Using `void` to discard promises suppresses any rejection silently. If `updateCo
 
 ## Test Coverage Gaps
 
-| Behavior | Tested | Notes |
-|----------|--------|-------|
-| Drawer opens | Yes | |
-| Drawer closes | Yes | |
-| All placements | Yes | |
-| Focus trap (Tab key) | **No** | P1-02 exposes correctness issue here |
-| Escape closes | Yes | |
-| Backdrop click closes | Yes | |
-| Scroll lock on body | **No** | P0-01; feature not implemented |
-| Focus returns to trigger on close | **No** | Untested |
-| Background aria-hidden on open | **No** | P1-03; feature not implemented |
-| Rapid open/close race | **No** | P1-05 |
-| `aria-labelledby` when no label | **No** | P1-06 |
-| `noHeader` + accessible name | **No** | P1-06 |
+| Behavior                          | Tested | Notes                                |
+| --------------------------------- | ------ | ------------------------------------ |
+| Drawer opens                      | Yes    |                                      |
+| Drawer closes                     | Yes    |                                      |
+| All placements                    | Yes    |                                      |
+| Focus trap (Tab key)              | **No** | P1-02 exposes correctness issue here |
+| Escape closes                     | Yes    |                                      |
+| Backdrop click closes             | Yes    |                                      |
+| Scroll lock on body               | **No** | P0-01; feature not implemented       |
+| Focus returns to trigger on close | **No** | Untested                             |
+| Background aria-hidden on open    | **No** | P1-03; feature not implemented       |
+| Rapid open/close race             | **No** | P1-05                                |
+| `aria-labelledby` when no label   | **No** | P1-06                                |
+| `noHeader` + accessible name      | **No** | P1-06                                |
 
 ---
 
 ## Summary Table
 
-| ID | Severity | Area | Title |
-|----|----------|------|-------|
-| P0-01 | P0 | Accessibility/Behavior | Body scroll lock not implemented |
-| P1-01 | P1 | Behavior | Duplicate keydown listener — double handler invocation |
-| P1-02 | P1 | Accessibility | Focus trap broken for slotted elements |
-| P1-03 | P1 | Accessibility | Background content not `aria-hidden` when open |
-| P1-04 | P1 | Drupal | No Drupal behaviors file |
-| P1-05 | P1 | Behavior | Animation timeout race condition on rapid open/close |
-| P1-06 | P1 | Accessibility | Dialog has no accessible name when label slot empty |
-| P2-01 | P2 | TypeScript | `DrawerSize \| string` collapses to `string` |
-| P2-02 | P2 | CSS/API | CSS part name `close-button` deviates from spec (`close-btn`) |
-| P2-03 | P2 | CSS | Footer `hidden` attribute has no CSS override for reset safety |
-| P2-04 | P2 | TypeScript | `_triggerElement` cast bypasses `HTMLElement` type guard |
-| P2-05 | P2 | Storybook | No story for nested interactive content |
-| P3-01 | P3 | Code quality | `firstUpdated()` slot detection is redundant |
-| P3-02 | P3 | Code quality | `void` promise discards suppress rejections silently |
-| P3-03 | P3 | Code quality | Overlay `addEventListener` is effectively unreachable |
+| ID    | Severity | Area                   | Title                                                          |
+| ----- | -------- | ---------------------- | -------------------------------------------------------------- |
+| P0-01 | P0       | Accessibility/Behavior | Body scroll lock not implemented                               |
+| P1-01 | P1       | Behavior               | Duplicate keydown listener — double handler invocation         |
+| P1-02 | P1       | Accessibility          | Focus trap broken for slotted elements                         |
+| P1-03 | P1       | Accessibility          | Background content not `aria-hidden` when open                 |
+| P1-04 | P1       | Drupal                 | No Drupal behaviors file                                       |
+| P1-05 | P1       | Behavior               | Animation timeout race condition on rapid open/close           |
+| P1-06 | P1       | Accessibility          | Dialog has no accessible name when label slot empty            |
+| P2-01 | P2       | TypeScript             | `DrawerSize \| string` collapses to `string`                   |
+| P2-02 | P2       | CSS/API                | CSS part name `close-button` deviates from spec (`close-btn`)  |
+| P2-03 | P2       | CSS                    | Footer `hidden` attribute has no CSS override for reset safety |
+| P2-04 | P2       | TypeScript             | `_triggerElement` cast bypasses `HTMLElement` type guard       |
+| P2-05 | P2       | Storybook              | No story for nested interactive content                        |
+| P3-01 | P3       | Code quality           | `firstUpdated()` slot detection is redundant                   |
+| P3-02 | P3       | Code quality           | `void` promise discards suppress rejections silently           |
+| P3-03 | P3       | Code quality           | Overlay `addEventListener` is effectively unreachable          |
 
 **Total: 1 P0, 6 P1, 5 P2, 3 P3 — Merge BLOCKED pending P0 and P1 resolution.**
