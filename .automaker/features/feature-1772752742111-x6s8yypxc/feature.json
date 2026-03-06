@@ -2,7 +2,7 @@
   "category": "Uncategorized",
   "description": "Deep antagonistic quality review of `hx-side-nav` (T2-37). 3/6 libraries — collapsible left navigation.\n\nReview `packages/hx-library/src/components/hx-side-nav/`.\n\n**Audit areas:**\n1. TypeScript — strict, collapsed/expanded state, nav item typing, active item indication, group/section typing\n2. Accessibility — `<nav aria-label=\"...\">` landmark, current page has `aria-current=\"page\"`, collapse toggle has `aria-expanded`, icons have labels when nav is collapsed (tooltip or aria-label), keyboard nav (Tab through links), axe-core pass\n3. Tests — expand/collapse, active item, keyboard nav, icon-only collapsed mode, responsive behavior\n4. Storybook — expanded/collapsed, with icons, grouped items, active states, responsive\n5. CSS — smooth collapse animation, `--hx-*` tokens, fixed/sticky variants, CSS parts\n6. Performance — bundle < 5KB\n7. Drupal — Twig-renderable, server-side active state\n\n**Output:** Write findings to `packages/hx-library/src/components/hx-side-nav/AUDIT.md` with severity (P0/P1/P2). DO NOT fix — document only. Commit AUDIT.md as your PR.",
   "title": "AUDIT: hx-side-nav — T2-37 antagonistic quality review",
-  "status": "backlog",
+  "status": "done",
   "complexity": "large",
   "priority": 3,
   "source": "api",
@@ -25,6 +25,13 @@
       "to": "backlog",
       "timestamp": "2026-03-05T23:19:02.111Z",
       "reason": "Feature created"
+    },
+    {
+      "from": "backlog",
+      "to": "done",
+      "timestamp": "2026-03-06T14:12:24.231Z"
     }
-  ]
+  ],
+  "featureType": "code",
+  "completedAt": "2026-03-06T14:12:24.231Z"
 }

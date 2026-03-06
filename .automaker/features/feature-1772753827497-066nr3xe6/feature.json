@@ -2,7 +2,7 @@
   "category": "Uncategorized",
   "description": "Antagonistic quality review of `hx-message-bar` (T3-02) **after implementation completes**.\\n\\nReview every file in `packages/hx-library/src/components/hx-message-bar/` critically.\\n\\n**Audit areas:**\\n1. TypeScript — strict, variant (info/success/warning/error) typed, dismissible prop typed\\n2. Accessibility — `role=\"alert\"` for error/warning, `role=\"status\"` for info/success, dismiss button accessible label, icon decorative (aria-hidden), axe-core pass\\n3. Tests — all variants, dismissible behavior, hx-dismiss event, action button slot, persistent vs auto-dismiss, 80%+ coverage\\n4. Storybook — all variants, with/without dismiss, with action button\\n5. CSS — `--hx-*` tokens, variant colors via tokens (not hardcoded), CSS parts (bar, icon, message, actions, close)\\n6. Performance — bundle < 5KB\\n7. Drupal — Twig-renderable\\n\\n**Output:** Write findings to `packages/hx-library/src/components/hx-message-bar/AUDIT.md` with severity (P0/P1/P2). DO NOT fix — document only. Commit AUDIT.md as your PR.",
   "title": "AUDIT: hx-message-bar — T3-02 antagonistic quality review",
-  "status": "backlog",
+  "status": "done",
   "dependencies": [
     "feature-1772753148677-y9lkusrz6"
   ],
@@ -28,6 +28,58 @@
       "to": "backlog",
       "timestamp": "2026-03-05T23:37:07.497Z",
       "reason": "Feature created"
+    },
+    {
+      "from": "backlog",
+      "to": "in_progress",
+      "timestamp": "2026-03-06T14:41:01.511Z"
+    },
+    {
+      "from": "done",
+      "to": "review",
+      "timestamp": "2026-03-06T14:47:09.939Z"
+    },
+    {
+      "from": "review",
+      "to": "done",
+      "timestamp": "2026-03-06T14:51:06.687Z"
+    },
+    {
+      "from": "done",
+      "to": "blocked",
+      "timestamp": "2026-03-06T14:56:15.688Z",
+      "reason": "Max state transitions exceeded"
+    },
+    {
+      "from": "blocked",
+      "to": "done",
+      "timestamp": "2026-03-06T14:57:26.394Z"
     }
-  ]
+  ],
+  "featureType": "code",
+  "model": "claude-sonnet-4-6",
+  "updatedAt": "2026-03-06T14:46:22.143Z",
+  "costUsd": 0.88748225,
+  "lastSessionId": "5e9eadd3-34ae-44c9-950c-0dc285c2898b",
+  "executionHistory": [
+    {
+      "id": "7438f58e-4a7f-4d78-824d-f0f3f48e84e6",
+      "startedAt": "2026-03-06T14:41:01.914Z",
+      "completedAt": "2026-03-06T14:46:22.158Z",
+      "durationMs": 320244,
+      "costUsd": 0.88748225,
+      "model": "claude-sonnet-4-6",
+      "success": true,
+      "trigger": "manual"
+    }
+  ],
+  "summary": "## Summary: Antagonistic quality review of `hx-message-bar` (T3-02)\n\n### Changes Implemented\n- Wrote `AUDIT.md` with full antagonistic quality review across all 7 audit areas\n- 0 P0 issues, 3 P1 blockers, 14 P2 issues documented\n- No implementation files modified — audit only\n\n### Files Modified\n- `packages/hx-library/src/components/hx-message-bar/AUDIT.md` (created, 222 lines)\n\n### Key Findings\n\n**P1 Blockers:**\n1. **A1 — Shadow DOM ARIA isolation risk:** `role=\"alert\"/\"status\"` is on an internal shadow DOM `<div>`, not the host element. JAWS and older screen readers that don't pierce shadow roots will miss the live region — critical for healthcare.\n2. **A2 — Missing `aria-atomic` on `role=\"status\"`:** Info/success variants may read partial content updates; patient data in success messages could be announced incompletely.\n3. **T1 — Branch coverage 73.33%:** Below the mandatory 80% gate. `_handleCloseKeydown` (lines 152-154) is entirely untested — three keyboard tests needed to close the gap.\n\n**Notable P2 issues:**\n- `MessageBarVariant` type not exported\n- 17 hardcoded hex fallback values throughout styles (violates zero-hardcoded rule)\n- CSS part names diverge from design spec (`base` vs `bar`, `action` vs `actions`, `close-button` vs `close`)\n- Event named `hx-close` but spec named it `hx-dismiss` — undocumented deviation\n- No `Sticky` or `ClosedState` Storybook stories\n- `color-mix()` usage may not be supported in all enterprise target environments\n- No Twig usage example for Drupal teams\n\n### Verification Status\n- `npm run verify` passes (0 errors, 0 warnings)\n- `npm run test:library` passes (39/39 for hx-message-bar)\n- Bundle: ~2.7 KB gzip (gate: <5 KB) — PASS\n- PR: https://github.com/bookedsolidtech/helix/pull/309\n\n### Notes for Developer\nThe implementation is solid overall — the component works, all tests pass, and the bundle is lean. The blocking issues are the shadow DOM ARIA role placement (a real healthcare screen reader risk) and the branch coverage gap from the untested keydown handler. Address P1s before merging. The `_handleCloseKeydown` method is also arguably redundant since native `<button>` handles Enter/Space — consider removing it rather than testing it.",
+  "prUrl": "https://github.com/bookedsolidtech/helix/pull/309",
+  "prNumber": 309,
+  "reviewStartedAt": "2026-03-06T14:47:09.939Z",
+  "prLastPolledAt": "2026-03-06T14:50:53.330Z",
+  "prMergedAt": "2026-03-06T14:50:25Z",
+  "completedAt": "2026-03-06T14:51:06.687Z",
+  "statusChangeReason": "Max state transitions exceeded",
+  "failureCount": 1
 }

@@ -2,7 +2,7 @@
   "category": "Uncategorized",
   "description": "Antagonistic quality review of `hx-contextual-help` (T3-06) **after implementation completes**.\\n\\nReview every file in `packages/hx-library/src/components/hx-contextual-help/` critically.\\n\\n**Audit areas:**\\n1. TypeScript — strict, trigger typed, popover placement typed, help content typed\\n2. Accessibility — trigger button has accessible label (\\\"Help\\\" or custom), popover has role=dialog, focus management, Escape closes, healthcare context: clear, plain-language help text required, axe-core pass\\n3. Tests — trigger open/close, keyboard interaction, content rendering, placement variants, 80%+ coverage\\n4. Storybook — with text content, with links, all placements\\n5. CSS — `--hx-*` tokens, help icon styling, CSS parts (trigger, panel)\\n6. Performance — bundle < 5KB\\n7. Drupal — Twig-renderable\\n\\n**Output:** Write findings to `packages/hx-library/src/components/hx-contextual-help/AUDIT.md` with severity (P0/P1/P2). DO NOT fix — document only. Commit AUDIT.md as your PR.",
   "title": "AUDIT: hx-contextual-help — T3-06 antagonistic quality review",
-  "status": "backlog",
+  "status": "done",
   "dependencies": [
     "feature-1772753174699-2oc0yl9ok"
   ],
@@ -28,6 +28,13 @@
       "to": "backlog",
       "timestamp": "2026-03-05T23:37:27.071Z",
       "reason": "Feature created"
+    },
+    {
+      "from": "backlog",
+      "to": "done",
+      "timestamp": "2026-03-06T14:14:58.679Z"
     }
-  ]
+  ],
+  "featureType": "code",
+  "completedAt": "2026-03-06T14:14:58.679Z"
 }

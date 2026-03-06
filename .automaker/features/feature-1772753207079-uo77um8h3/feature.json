@@ -2,7 +2,7 @@
   "category": "Uncategorized",
   "description": "Implement `hx-stack` (T3 tier) — 2/6 libraries ship this. Flexbox layout wrapper for consistent vertical/horizontal spacing between children.\n\n**Files to create** in `packages/hx-library/src/components/hx-stack/`:\n- `index.ts`, `hx-stack.ts`, `hx-stack.styles.ts`, `hx-stack.stories.ts`, `hx-stack.test.ts`\n\n**Props:** `direction` (`horizontal`|`vertical`, default `vertical`), `gap` (`none`|`xs`|`sm`|`md`|`lg`|`xl`), `align` (`start`|`center`|`end`|`stretch`|`baseline`), `justify` (`start`|`center`|`end`|`between`|`around`|`evenly`), `wrap` (boolean), `inline` (boolean — `display: inline-flex`)\n\n**Slots:** default (any children)\n\n**CSS Parts:** `base`\n\n**ARIA:** `role=\"presentation\"` — layout utility only.\n\n**Implementation:** Maps props to CSS flexbox properties. Uses `--hx-spacing-*` tokens for gap values.\n\n**Quality gates:** type-check zero errors, all tests (direction, gap, alignment), axe-core zero violations, Storybook with vertical/horizontal/centered/between demos, bundle < 2KB.\n\nRegister in `packages/hx-library/src/index.ts` and `packages/hx-library/vite.config.ts`.",
   "title": "IMPLEMENT: hx-stack — T3 Flexbox Stack Layout Component",
-  "status": "backlog",
+  "status": "done",
   "complexity": "small",
   "priority": 3,
   "source": "api",
@@ -25,6 +25,14 @@
       "to": "backlog",
       "timestamp": "2026-03-05T23:26:47.079Z",
       "reason": "Feature created"
+    },
+    {
+      "from": "backlog",
+      "to": "done",
+      "timestamp": "2026-03-06T14:13:11.256Z"
     }
-  ]
+  ],
+  "featureType": "code",
+  "prLastPolledAt": "2026-03-06T14:01:07.400Z",
+  "completedAt": "2026-03-06T14:13:11.256Z"
 }

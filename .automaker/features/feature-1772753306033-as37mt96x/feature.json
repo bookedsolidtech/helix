@@ -2,7 +2,7 @@
   "category": "Uncategorized",
   "description": "Implement `hx-visually-hidden` (T4 Infrastructure) — utility component that hides content visually while keeping it accessible to screen readers.\n\n**Files to create** in `packages/hx-library/src/components/hx-visually-hidden/`:\n- `index.ts`, `hx-visually-hidden.ts`, `hx-visually-hidden.styles.ts`, `hx-visually-hidden.stories.ts`, `hx-visually-hidden.test.ts`\n\n**Props:** none\n\n**Slots:** default (the visually-hidden content)\n\n**CSS Parts:** `base`\n\n**Implementation:** Apply the standard visually-hidden CSS pattern:\n```css\n:host {\n  position: absolute !important;\n  width: 1px !important;\n  height: 1px !important;\n  padding: 0 !important;\n  margin: -1px !important;\n  overflow: hidden !important;\n  clip: rect(0, 0, 0, 0) !important;\n  white-space: nowrap !important;\n  border: 0 !important;\n}\n```\n\n**ARIA:** No ARIA role — the slotted content provides its own semantics. Do NOT use `visibility: hidden` or `display: none` as those hide from screen readers too.\n\n**Quality gates:** type-check zero errors, tests (content accessible, not visually rendered), axe-core zero violations, Storybook demo showing screen reader announcement pattern, bundle < 1KB.\n\nRegister in `packages/hx-library/src/index.ts` and `packages/hx-library/vite.config.ts`.",
   "title": "IMPLEMENT: hx-visually-hidden — T4 Screen-Reader-Only Text",
-  "status": "backlog",
+  "status": "done",
   "complexity": "small",
   "priority": 3,
   "source": "api",
@@ -25,6 +25,14 @@
       "to": "backlog",
       "timestamp": "2026-03-05T23:28:26.033Z",
       "reason": "Feature created"
+    },
+    {
+      "from": "backlog",
+      "to": "done",
+      "timestamp": "2026-03-06T14:13:25.754Z"
     }
-  ]
+  ],
+  "featureType": "code",
+  "prLastPolledAt": "2026-03-06T14:01:12.824Z",
+  "completedAt": "2026-03-06T14:13:25.754Z"
 }

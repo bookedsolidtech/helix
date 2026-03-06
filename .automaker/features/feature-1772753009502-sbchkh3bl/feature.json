@@ -2,7 +2,7 @@
   "category": "Uncategorized",
   "description": "Implement `hx-link` (T1-04) — 6/6 enterprise libraries ship this. Styled anchor element with consistent design tokens.\n\n**Files to create** in `packages/hx-library/src/components/hx-link/`:\n- `index.ts` — re-export\n- `hx-link.ts` — Lit component\n- `hx-link.styles.ts` — CSS with `--hx-*` tokens\n- `hx-link.stories.ts` — Storybook stories\n- `hx-link.test.ts` — Vitest tests\n\n**Props:** `href` (string), `target` (`_blank`|`_self`|`_parent`|`_top`), `rel` (string), `download` (string|boolean), `disabled` (boolean), `variant` (`default`|`subtle`|`danger`)\n\n**Slots:** default (link text), `prefix` (icon before), `suffix` (icon after)\n\n**Events:** `hx-click`\n\n**CSS Parts:** `base` (the anchor element)\n\n**ARIA:** When `disabled`, renders as `<span role=\"link\" aria-disabled=\"true\">`. When `target=\"_blank\"`, adds visually-hidden \"(opens in new tab)\" text and `rel=\"noopener noreferrer\"`.\n\n**Reference:** Study `hx-button` for the disabled-as-span pattern. Follow all project conventions.\n\n**Quality gates:** type-check zero errors, all tests pass, axe-core zero violations, Storybook stories for all variants, CEM accurate, bundle < 5KB.\n\nRegister in `packages/hx-library/src/index.ts` and `packages/hx-library/vite.config.ts`.",
   "title": "IMPLEMENT: hx-link — T1-04 Hyperlink Component",
-  "status": "backlog",
+  "status": "review",
   "complexity": "small",
   "priority": 2,
   "source": "api",
@@ -25,6 +25,13 @@
       "to": "backlog",
       "timestamp": "2026-03-05T23:23:29.503Z",
       "reason": "Feature created"
+    },
+    {
+      "from": "backlog",
+      "to": "review",
+      "timestamp": "2026-03-06T14:24:49.903Z"
     }
-  ]
+  ],
+  "featureType": "code",
+  "reviewStartedAt": "2026-03-06T14:24:49.903Z"
 }

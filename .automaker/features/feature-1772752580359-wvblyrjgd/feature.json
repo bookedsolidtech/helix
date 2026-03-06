@@ -2,7 +2,7 @@
   "category": "Uncategorized",
   "description": "Deep antagonistic quality review of `hx-textarea` (T1-06). 6/6 libraries ship this.\n\nReview every file in `packages/hx-library/src/components/hx-textarea/` critically.\n\n**Audit areas:**\n1. TypeScript — strict, ElementInternals form association, auto-resize implementation typing\n2. Accessibility — label association, `aria-describedby` for help/error, `aria-invalid`, `aria-required`, character count announced to screen readers if present, axe-core pass\n3. Tests — form association, auto-resize behavior, min/max rows, character count, disabled/readonly, error/help text\n4. Storybook — all variants, auto-resize demo, character count demo\n5. CSS — `--hx-*` tokens, resize handle visible/hidden variants, CSS parts (textarea, label, helper, counter)\n6. Performance — bundle < 5KB\n7. Drupal — form-associated, Twig-renderable\n\n**Output:** Write findings to `packages/hx-library/src/components/hx-textarea/AUDIT.md` with severity (P0/P1/P2). DO NOT fix — document only. Commit AUDIT.md as your PR.",
   "title": "AUDIT: hx-textarea — T1-06 antagonistic quality review",
-  "status": "backlog",
+  "status": "done",
   "complexity": "medium",
   "priority": 2,
   "source": "api",
@@ -25,6 +25,13 @@
       "to": "backlog",
       "timestamp": "2026-03-05T23:16:20.360Z",
       "reason": "Feature created"
+    },
+    {
+      "from": "backlog",
+      "to": "done",
+      "timestamp": "2026-03-06T14:11:45.305Z"
     }
-  ]
+  ],
+  "featureType": "code",
+  "completedAt": "2026-03-06T14:11:45.305Z"
 }

@@ -2,7 +2,7 @@
   "category": "Uncategorized",
   "description": "Deep antagonistic quality review of `hx-container` (T3-59). Layout wrapper — implied in all systems.\n\nReview `packages/hx-library/src/components/hx-container/`.\n\n**Audit areas:**\n1. TypeScript — strict, size prop typing (sm/md/lg/xl/full), padding prop, alignment prop\n2. Accessibility — purely presentational, but must not introduce landmark confusion or break reading order, axe-core pass\n3. Tests — all sizes render correct max-width, padding variants, full-width mode, content slot\n4. Storybook — all size variants, with content demo\n5. CSS — max-width values use `--hx-*` tokens (not hardcoded px), responsive padding, center alignment, CSS parts\n6. Performance — bundle < 2KB (it's a layout primitive)\n7. Drupal — Twig-renderable, wraps page content\n\n**Output:** Write findings to `packages/hx-library/src/components/hx-container/AUDIT.md` with severity (P0/P1/P2). DO NOT fix — document only. Commit AUDIT.md as your PR.",
   "title": "AUDIT: hx-container — T3-59 antagonistic quality review",
-  "status": "backlog",
+  "status": "done",
   "complexity": "small",
   "priority": 3,
   "source": "api",
@@ -25,6 +25,13 @@
       "to": "backlog",
       "timestamp": "2026-03-05T23:19:31.546Z",
       "reason": "Feature created"
+    },
+    {
+      "from": "backlog",
+      "to": "done",
+      "timestamp": "2026-03-06T14:12:33.075Z"
     }
-  ]
+  ],
+  "featureType": "code",
+  "completedAt": "2026-03-06T14:12:33.075Z"
 }

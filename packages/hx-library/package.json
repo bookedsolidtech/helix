@@ -35,6 +35,7 @@
     "build": "vite build && npm run cem",
     "type-check": "tsc --noEmit",
     "test": "vitest run",
+    "test:coverage": "vitest run --coverage.enabled",
     "test:watch": "vitest",
     "test:ui": "vitest --ui",
     "cem": "custom-elements-manifest analyze --litelement --globs \"src/components/**/*.ts\" --exclude \"**/*.stories.ts\" --exclude \"**/*.styles.ts\"",
