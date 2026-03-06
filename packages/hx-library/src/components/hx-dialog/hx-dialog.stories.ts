@@ -255,11 +255,8 @@ export const NoBackdropClose: Story = {
  */
 export const WithCustomHeader: Story = {
   render: () => html`
-    <hx-dialog open modal>
-      <div
-        slot="header"
-        style="display: flex; align-items: center; gap: 0.75rem; width: 100%;"
-      >
+    <hx-dialog open modal aria-label="Critical Alert">
+      <div slot="header" style="display: flex; align-items: center; gap: 0.75rem; width: 100%;">
         <span
           style="
             display: inline-flex;
@@ -332,9 +329,8 @@ export const WithFooter: Story = {
     <hx-dialog open modal heading="Discharge Patient">
       <p style="margin: 0 0 0.75rem; font-size: 0.875rem;">
         You are about to discharge
-        <strong>John Smith</strong> from
-        <strong>Ward 3, Bed 12</strong>. Please confirm the discharge summary has been completed and
-        reviewed.
+        <strong>John Smith</strong> from <strong>Ward 3, Bed 12</strong>. Please confirm the
+        discharge summary has been completed and reviewed.
       </p>
       <ul
         style="margin: 0; padding: 0 0 0 1.25rem; font-size: 0.875rem; color: #374151; line-height: 1.75;"
@@ -432,9 +428,9 @@ export const TriggerButton: Story = {
           <button
             style="padding: 0.5rem 1rem; border: 1px solid #d1d5db; border-radius: 0.375rem; background: #ffffff; cursor: pointer;"
             @click=${(e: Event) => {
-              const host = (e.target as HTMLElement).closest('div[slot="footer"]')?.closest('hx-dialog') as
-                | (HTMLElement & { close: () => void })
-                | null;
+              const host = (e.target as HTMLElement)
+                .closest('div[slot="footer"]')
+                ?.closest('hx-dialog') as (HTMLElement & { close: () => void }) | null;
               host?.close();
             }}
           >
@@ -520,15 +516,11 @@ export const EventFiring: Story = {
       <hx-dialog
         heading="Event Demo"
         @hx-open=${(e: Event) => {
-          const log = (e.target as HTMLElement)
-            .closest('div')
-            ?.querySelector('#event-log');
+          const log = (e.target as HTMLElement).closest('div')?.querySelector('#event-log');
           if (log) log.textContent = 'hx-open fired';
         }}
         @hx-close=${(e: Event) => {
-          const log = (e.target as HTMLElement)
-            .closest('div')
-            ?.querySelector('#event-log');
+          const log = (e.target as HTMLElement).closest('div')?.querySelector('#event-log');
           if (log) log.textContent = 'hx-close fired';
         }}
       >
