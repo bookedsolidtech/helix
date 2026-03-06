@@ -3,6 +3,7 @@
 **Reviewer:** Antagonistic Quality Agent (T3)
 **Date:** 2026-03-06
 **Files Reviewed:**
+
 - `hx-status-indicator.ts`
 - `hx-status-indicator.styles.ts`
 - `hx-status-indicator.test.ts`
@@ -13,11 +14,11 @@
 
 ## Severity Key
 
-| Level | Meaning |
-|-------|---------|
-| P0 | Blocking — must fix before merge; correctness/security/accessibility failure |
-| P1 | Significant — violates project policy or spec; should fix before merge |
-| P2 | Minor — improvement opportunity; fix before next release cycle |
+| Level | Meaning                                                                      |
+| ----- | ---------------------------------------------------------------------------- |
+| P0    | Blocking — must fix before merge; correctness/security/accessibility failure |
+| P1    | Significant — violates project policy or spec; should fix before merge       |
+| P2    | Minor — improvement opportunity; fix before next release cycle               |
 
 ---
 
@@ -72,7 +73,7 @@ The `??` fallback is correct and handles out-of-type runtime strings. No issue.
 **File:** `hx-status-indicator.ts:70`
 
 ```html
-<div class="indicator" role="img" aria-label=${this._getLabel()}>
+<div class="indicator" role="img" aria-label="${this._getLabel()}"></div>
 ```
 
 The accessible role is placed on an inner shadow DOM div, not on the host element. The semantically correct approach for Lit components is to use `ElementInternals.role` (via `static formAssociated` or direct `this.internals_.role`) or place role on the host via `connectedCallback`. Modern browsers (Chrome 92+, Firefox 92+, Safari 16.4+) do expose shadow DOM children to the accessibility tree, so axe-core passes and AT works in current environments. However, placing the role on the host element is more robust and future-proof, particularly for AT that traverse the flat accessibility tree.
@@ -130,6 +131,7 @@ it('exposes "pulse-ring" part', ...); // identical assertion
 The ARIA tests verify the initial `aria-label` for one status (`online`) but never verify that `aria-label` updates when `status` is changed dynamically on a live element. This is critical for real-world usage where status indicators update without full re-render (e.g., WebSocket status updates in a healthcare dashboard).
 
 Missing test pattern:
+
 ```ts
 it('updates aria-label when status changes dynamically', async () => {
   const el = await fixture(...'<hx-status-indicator status="online">');
@@ -169,6 +171,7 @@ When `label` is an empty string (the default), the fallback label is used. This 
 The `label` prop has a Storybook control but there is no named story demonstrating a non-default label. Autodocs consumers relying on stories to understand usage patterns will not see an example of contextual labeling (e.g., `label="EHR System is online"`). This is important for the healthcare use case where status labels should be system-specific, not generic.
 
 Missing story:
+
 ```ts
 export const CustomLabel: Story = {
   name: 'Custom Accessible Label',
@@ -197,20 +200,37 @@ There is no story demonstrating size + pulse combinations. In healthcare dashboa
 All five status color rules include hardcoded hex fallbacks:
 
 ```css
-:host([status='online'])  { --_dot-color: var(--hx-color-success-500, #22c55e); }
-:host([status='offline']) { --_dot-color: var(--hx-color-neutral-400, #94a3b8); }
-:host([status='away'])    { --_dot-color: var(--hx-color-warning-500, #f59e0b); }
-:host([status='busy'])    { --_dot-color: var(--hx-color-danger-500, #ef4444); }
-:host([status='unknown']) { --_dot-color: var(--hx-color-neutral-300, #cbd5e1); }
+:host([status='online']) {
+  --_dot-color: var(--hx-color-success-500, #22c55e);
+}
+:host([status='offline']) {
+  --_dot-color: var(--hx-color-neutral-400, #94a3b8);
+}
+:host([status='away']) {
+  --_dot-color: var(--hx-color-warning-500, #f59e0b);
+}
+:host([status='busy']) {
+  --_dot-color: var(--hx-color-danger-500, #ef4444);
+}
+:host([status='unknown']) {
+  --_dot-color: var(--hx-color-neutral-300, #cbd5e1);
+}
 ```
 
 CLAUDE.md "Zero-Tolerance Policy" states: **"No hardcoded values — Colors, spacing, typography, and timing use design tokens. Always."**
 
 The same violation applies to size fallbacks:
+
 ```css
-:host([size='sm']) { --_indicator-size: var(--hx-size-2, 0.5rem); }
-:host([size='md']) { --_indicator-size: var(--hx-size-3, 0.75rem); }
-:host([size='lg']) { --_indicator-size: var(--hx-size-4, 1rem); }
+:host([size='sm']) {
+  --_indicator-size: var(--hx-size-2, 0.5rem);
+}
+:host([size='md']) {
+  --_indicator-size: var(--hx-size-3, 0.75rem);
+}
+:host([size='lg']) {
+  --_indicator-size: var(--hx-size-4, 1rem);
+}
 ```
 
 **Counterargument:** Fallback values in `var()` are a common and necessary pattern for resilience when tokens are not loaded. Many components in this library use this pattern. However, the existence of `tokenStyles` import (`@helix/tokens/lit`) in the component suggests tokens are expected to be available at render time. If tokens are guaranteed via `tokenStyles`, the hardcoded fallbacks are redundant. If they are not guaranteed, this reveals a token-loading architecture concern.
@@ -239,8 +259,12 @@ The pulse ring color is tied to the private `--_dot-color` custom property. Cons
 **File:** `hx-status-indicator.styles.ts:28, 39`
 
 ```css
-.indicator__dot { z-index: 1; }
-.indicator__pulse-ring { z-index: 0; }
+.indicator__dot {
+  z-index: 1;
+}
+.indicator__pulse-ring {
+  z-index: 0;
+}
 ```
 
 These z-index values are not from tokens and create a stacking context within the shadow root. While the values are correct for the layering intent, they are arbitrary magic numbers. Since these are scoped to the shadow DOM, they cannot conflict with global stacking contexts, so this is a very low risk P2.
@@ -276,20 +300,20 @@ The `pulse="false"` pattern is a known footgun for Drupal template authors unfam
 
 ## Finding Summary
 
-| ID | Severity | Area | Description |
-|----|----------|------|-------------|
-| T3-01-1 | P1 | TypeScript | Status type set (`online/offline/away/busy`) does not match feature spec (`active/inactive/error/warning`) |
-| T3-01-2 | P1 | CSS | Hardcoded hex color fallbacks and rem size fallbacks violate "No hardcoded values" policy |
-| T3-01-3 | P1 | Tests | CSS Parts describe block is a verbatim duplicate of Rendering describe block — zero additive coverage |
-| T3-01-4 | P2 | Accessibility | `role="img"` on shadow child div; host has no ARIA role; less robust than `ElementInternals.role` |
-| T3-01-5 | P2 | Accessibility | `prefers-reduced-motion` uses `display: none !important` — valid but architecturally fragile |
-| T3-01-6 | P2 | Accessibility | `DecorativeUsage` pattern insufficiently documented in JSDoc |
-| T3-01-7 | P2 | Tests | No dynamic status update test (status changes after initial render not verified) |
-| T3-01-8 | P2 | Tests | No explicit test for `status="unknown"` aria-label; covered only by default state |
-| T3-01-9 | P2 | Tests | `label` cleared to `''` after being set — fallback behavior not tested |
-| T3-01-10 | P2 | Storybook | No named story demonstrating custom `label` prop usage |
-| T3-01-11 | P2 | Storybook | `SystemHealthDashboard` uses inline styles; no token-based layout |
-| T3-01-12 | P2 | CSS | No default `--_dot-color` — invalid/absent status renders an invisible dot silently |
-| T3-01-13 | P2 | CSS | Pulse ring color not independently overridable via public custom property |
-| T3-01-14 | P2 | CSS | `z-index: 1` and `z-index: 0` are magic numbers, not from tokens |
-| T3-01-15 | P2 | Drupal | Boolean `pulse` attribute footgun not documented for Twig template authors |
+| ID       | Severity | Area          | Description                                                                                                |
+| -------- | -------- | ------------- | ---------------------------------------------------------------------------------------------------------- |
+| T3-01-1  | P1       | TypeScript    | Status type set (`online/offline/away/busy`) does not match feature spec (`active/inactive/error/warning`) |
+| T3-01-2  | P1       | CSS           | Hardcoded hex color fallbacks and rem size fallbacks violate "No hardcoded values" policy                  |
+| T3-01-3  | P1       | Tests         | CSS Parts describe block is a verbatim duplicate of Rendering describe block — zero additive coverage      |
+| T3-01-4  | P2       | Accessibility | `role="img"` on shadow child div; host has no ARIA role; less robust than `ElementInternals.role`          |
+| T3-01-5  | P2       | Accessibility | `prefers-reduced-motion` uses `display: none !important` — valid but architecturally fragile               |
+| T3-01-6  | P2       | Accessibility | `DecorativeUsage` pattern insufficiently documented in JSDoc                                               |
+| T3-01-7  | P2       | Tests         | No dynamic status update test (status changes after initial render not verified)                           |
+| T3-01-8  | P2       | Tests         | No explicit test for `status="unknown"` aria-label; covered only by default state                          |
+| T3-01-9  | P2       | Tests         | `label` cleared to `''` after being set — fallback behavior not tested                                     |
+| T3-01-10 | P2       | Storybook     | No named story demonstrating custom `label` prop usage                                                     |
+| T3-01-11 | P2       | Storybook     | `SystemHealthDashboard` uses inline styles; no token-based layout                                          |
+| T3-01-12 | P2       | CSS           | No default `--_dot-color` — invalid/absent status renders an invisible dot silently                        |
+| T3-01-13 | P2       | CSS           | Pulse ring color not independently overridable via public custom property                                  |
+| T3-01-14 | P2       | CSS           | `z-index: 1` and `z-index: 0` are magic numbers, not from tokens                                           |
+| T3-01-15 | P2       | Drupal        | Boolean `pulse` attribute footgun not documented for Twig template authors                                 |
