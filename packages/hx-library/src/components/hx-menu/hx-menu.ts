@@ -104,7 +104,7 @@ export class HelixMenu extends LitElement {
         this.dispatchEvent(new CustomEvent('hx-close', { bubbles: true, composed: true }));
         break;
       default:
-        if (e.key.length === 1 && !e.ctrlKey && !e.metaKey && !e.altKey) {
+        if (e.key.length === 1 && e.key !== ' ' && !e.ctrlKey && !e.metaKey && !e.altKey) {
           this._handleTypeahead(e.key, items);
         }
         break;

@@ -36,10 +36,10 @@ Files reviewed: `hx-menu.ts`, `hx-menu-item.ts`, `hx-menu-divider.ts`, `hx-menu.
 | --- | ----------------------------------------------------------------- | ------------------------------------------------------------------ |
 | H1  | `--hx-menu-shadow` CSS token undocumented in JSDoc                | Added `@cssprop` to hx-menu JSDoc                                  |
 | H2  | `--hx-menu-item-color` and `--hx-menu-item-hover-bg` undocumented | Added `@cssprop` entries to hx-menu-item JSDoc                     |
-| H3  | No `menuitemradio` / radio type support                           | Added `type="radio"` with `menuitemradio` role and one-way checked |
+| H3  | No `menuitemradio` / radio type support                           | Added `type="radio"` with `menuitemradio` role and built-in mutual exclusion (unchecks siblings in same menu) |
 | H4  | Home/End keyboard navigation untested                             | Added 2 tests for Home and End key focus                           |
 | H5  | Typeahead search untested                                         | Added 2 tests (single char + multi-char buffer)                    |
-| H6  | Radio type untested                                               | Added 4 tests (role, aria-checked, click behavior, icon)           |
+| H6  | Radio type untested                                               | Added 5 tests (role, aria-checked, click behavior, icon, mutual exclusion) |
 | H7  | Submenu `aria-haspopup` untested                                  | Added 1 test                                                       |
 | H8  | No Radio Group Storybook story                                    | Added RadioGroupItems story with mutual exclusion                  |
 
@@ -80,8 +80,8 @@ Files reviewed: `hx-menu.ts`, `hx-menu-item.ts`, `hx-menu-divider.ts`, `hx-menu.
 
 | Metric              | Before | After |
 | ------------------- | ------ | ----- |
-| Total tests         | 41     | 54    |
-| New tests added     | —      | 13    |
+| Total tests         | 41     | 55    |
+| New tests added     | —      | 14    |
 | All tests passing   | Yes    | Yes   |
 | axe-core a11y tests | 4      | 4     |
 
@@ -92,8 +92,8 @@ Files reviewed: `hx-menu.ts`, `hx-menu-item.ts`, `hx-menu-divider.ts`, `hx-menu.
 | Gate                 | Status  | Notes                                                                               |
 | -------------------- | ------- | ----------------------------------------------------------------------------------- |
 | 1. TypeScript strict | PASS    | Zero errors                                                                         |
-| 2. Tests             | PASS    | 54 tests passing, new coverage for typeahead/radio/Home/End/submenu                 |
-| 3. Accessibility     | PARTIAL | aria-haspopup fixed; M2 (roving tabindex), M3 (focus ring), M13 (aria-label) remain |
+| 2. Tests             | PASS    | 55 tests passing, new coverage for typeahead/radio/Home/End/submenu                 |
+| 3. Accessibility     | PARTIAL | aria-haspopup fixed; M2 (roving tabindex), M3 (focus ring), M10 (loading nav announcement), M13 (aria-label) remain |
 | 4. Storybook         | PASS    | 12 stories including new RadioGroupItems                                            |
 | 5. CEM accuracy      | PASS    | All events, CSS props, and slots documented                                         |
 | 6. Bundle size       | UNKNOWN | Not measured in this audit                                                          |

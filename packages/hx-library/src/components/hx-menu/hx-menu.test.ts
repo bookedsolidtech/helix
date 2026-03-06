@@ -409,6 +409,27 @@ describe('hx-menu-item', () => {
       const icon = shadowQuery(el, '[part~="checked-icon"]');
       expect(icon).toBeTruthy();
     });
+
+    it('unchecks sibling radio items on selection (mutual exclusion)', async () => {
+      const menu = await fixture<HelixMenu>(`
+        <hx-menu>
+          <hx-menu-item type="radio" value="a" checked>Alpha</hx-menu-item>
+          <hx-menu-item type="radio" value="b">Beta</hx-menu-item>
+          <hx-menu-item type="radio" value="c">Charlie</hx-menu-item>
+        </hx-menu>
+      `);
+      const items = Array.from(menu.querySelectorAll('hx-menu-item')) as HelixMenuItem[];
+      expect(items[0].checked).toBe(true);
+
+      const betaInner = shadowQuery<HTMLElement>(items[1], '.menu-item')!;
+      betaInner.click();
+      await items[1].updateComplete;
+      await items[0].updateComplete;
+
+      expect(items[0].checked).toBe(false);
+      expect(items[1].checked).toBe(true);
+      expect(items[2].checked).toBe(false);
+    });
   });
 
   describe('Property: loading', () => {

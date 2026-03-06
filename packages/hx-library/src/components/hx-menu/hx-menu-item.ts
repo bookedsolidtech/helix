@@ -90,7 +90,16 @@ export class HelixMenuItem extends LitElement {
     if (this.type === 'checkbox') {
       this.checked = !this.checked;
     } else if (this.type === 'radio') {
-      this.checked = true;
+      const menu = this.closest('hx-menu');
+      if (menu) {
+        menu
+          .querySelectorAll<HelixMenuItem>(':scope > hx-menu-item[type="radio"]')
+          .forEach((sibling) => {
+            sibling.checked = sibling === this;
+          });
+      } else {
+        this.checked = true;
+      }
     }
 
     this.dispatchEvent(

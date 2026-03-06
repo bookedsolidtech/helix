@@ -186,16 +186,7 @@ export const CheckboxItems: Story = {
 export const RadioGroupItems: Story = {
   name: 'Radio Group Items',
   render: () => html`
-    <hx-menu
-      @hx-select=${(e: CustomEvent) => {
-        const menu = (e.target as HTMLElement).closest('hx-menu');
-        if (!menu) return;
-        const items = menu.querySelectorAll('hx-menu-item[type="radio"]');
-        items.forEach((item) => {
-          (item as HTMLElement & { checked: boolean }).checked = item === e.detail.item;
-        });
-      }}
-    >
+    <hx-menu>
       <hx-menu-item type="radio" value="low" checked>Low Priority</hx-menu-item>
       <hx-menu-item type="radio" value="medium">Medium Priority</hx-menu-item>
       <hx-menu-item type="radio" value="high">High Priority</hx-menu-item>
