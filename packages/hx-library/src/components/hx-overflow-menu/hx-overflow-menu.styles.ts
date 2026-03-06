@@ -115,6 +115,25 @@ export const helixOverflowMenuStyles = css`
     outline-offset: -2px;
   }
 
+  /* ─── Slot: dividers / separators ─── */
+
+  ::slotted(hr),
+  ::slotted([role='separator']) {
+    border: none;
+    height: var(--hx-border-width-thin, 1px);
+    background-color: var(--hx-color-neutral-200, #e5e7eb);
+    margin: var(--hx-space-1, 0.25rem) 0;
+    padding: 0;
+  }
+
+  /* ─── Slot: disabled items ─── */
+
+  ::slotted([aria-disabled='true']) {
+    opacity: var(--hx-opacity-disabled, 0.4);
+    cursor: not-allowed;
+    pointer-events: none;
+  }
+
   /* ─── Reduced Motion ─── */
 
   @media (prefers-reduced-motion: reduce) {
