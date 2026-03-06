@@ -2,7 +2,7 @@
   "category": "Uncategorized",
   "description": "Deep antagonistic quality review of `hx-pagination` (T2-39). 3/6 libraries.\n\nReview `packages/hx-library/src/components/hx-pagination/`.\n\n**Audit areas:**\n1. TypeScript — strict, current-page/total-pages/page-size typing, hx-page-change event detail typing\n2. Accessibility — `<nav aria-label=\"Pagination\">`, current page button has `aria-current=\"page\"`, prev/next disabled state communicated (`aria-disabled` or `disabled`), ellipsis is presentational, keyboard nav through page buttons, axe-core pass\n3. Tests — page selection, prev/next navigation, first/last page boundary, ellipsis display logic, page size change\n4. Storybook — various total pages, current page states, with page size selector\n5. CSS — active page styling, `--hx-*` tokens, CSS parts (prev, next, page, ellipsis)\n6. Performance — bundle < 5KB\n7. Drupal — Twig-renderable, GET parameter compatible\n\n**Output:** Write findings to `packages/hx-library/src/components/hx-pagination/AUDIT.md` with severity (P0/P1/P2). DO NOT fix — document only. Commit AUDIT.md as your PR.",
   "title": "AUDIT: hx-pagination — T2-39 antagonistic quality review",
-  "status": "backlog",
+  "status": "done",
   "complexity": "medium",
   "priority": 3,
   "source": "api",
@@ -25,6 +25,13 @@
       "to": "backlog",
       "timestamp": "2026-03-05T23:19:19.926Z",
       "reason": "Feature created"
+    },
+    {
+      "from": "backlog",
+      "to": "done",
+      "timestamp": "2026-03-06T14:12:30.848Z"
     }
-  ]
+  ],
+  "featureType": "code",
+  "completedAt": "2026-03-06T14:12:30.848Z"
 }

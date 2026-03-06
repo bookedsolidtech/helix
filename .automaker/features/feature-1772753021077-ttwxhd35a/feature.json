@@ -2,7 +2,7 @@
   "category": "Uncategorized",
   "description": "Implement `hx-divider` (T1-23) — 6/6 enterprise libraries ship this. Horizontal or vertical separator line with optional label.\n\n**Files to create** in `packages/hx-library/src/components/hx-divider/`:\n- `index.ts` — re-export\n- `hx-divider.ts` — Lit component\n- `hx-divider.styles.ts` — CSS with `--hx-*` tokens\n- `hx-divider.stories.ts` — Storybook stories\n- `hx-divider.test.ts` — Vitest tests\n\n**Props:** `orientation` (`horizontal`|`vertical`, default `horizontal`), `spacing` (`none`|`sm`|`md`|`lg`)\n\n**Slots:** default (optional label text — renders centered between lines when present)\n\n**CSS Parts:** `base` (the hr/divider element), `label` (optional centered text)\n\n**ARIA:** Host gets `role=\"separator\"`, `aria-orientation` matching prop. When vertical, must be used as a presentational element between siblings.\n\n**Implementation note:** Use `<hr>` semantics in the shadow root. When slotted content exists, render as flex row with two `<span>` lines flanking the slot.\n\n**Quality gates:** type-check zero errors, all tests pass, axe-core zero violations, Storybook with horizontal/vertical/with-label, CEM accurate, bundle < 2KB.\n\nRegister in `packages/hx-library/src/index.ts` and `packages/hx-library/vite.config.ts`.",
   "title": "IMPLEMENT: hx-divider — T1-23 Visual Separator",
-  "status": "backlog",
+  "status": "done",
   "complexity": "small",
   "priority": 2,
   "source": "api",
@@ -25,6 +25,13 @@
       "to": "backlog",
       "timestamp": "2026-03-05T23:23:41.077Z",
       "reason": "Feature created"
+    },
+    {
+      "from": "backlog",
+      "to": "done",
+      "timestamp": "2026-03-06T14:12:38.906Z"
     }
-  ]
+  ],
+  "featureType": "code",
+  "completedAt": "2026-03-06T14:12:38.906Z"
 }

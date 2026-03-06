@@ -2,7 +2,7 @@
   "category": "Uncategorized",
   "description": "Antagonistic quality review of `hx-carousel` (T4-07) **after implementation completes**.\\n\\nReview every file in `packages/hx-library/src/components/hx-carousel/` critically.\\n\\n**Audit areas:**\\n1. TypeScript — strict, loop prop typed, autoplay/interval typed, items-per-view typed, navigation typed\\n2. Accessibility — `role=\"region\"` with accessible name, prev/next buttons have accessible labels, pagination dots have accessible labels (\\\"Slide 1 of 5\\\"), auto-play MUST have pause control (WCAG 2.2.2), keyboard: arrow keys navigate, autoplay pauses on focus/hover, axe-core pass\\n3. Tests — navigation, loop behavior, autoplay pause on focus, keyboard nav, 80%+ coverage\\n4. Storybook — basic, autoplay, multi-item, with pagination\\n5. CSS — `--hx-*` tokens, smooth scroll animation, `prefers-reduced-motion` stops animation, CSS parts (carousel, slide, prev-btn, next-btn, pagination)\\n6. Performance — bundle < 5KB, no external carousel lib dependency\\n7. Drupal — Twig-renderable\\n\\n**Output:** Write findings to `packages/hx-library/src/components/hx-carousel/AUDIT.md` with severity (P0/P1/P2). DO NOT fix — document only. Commit AUDIT.md as your PR.",
   "title": "AUDIT: hx-carousel — T4-07 antagonistic quality review",
-  "status": "backlog",
+  "status": "done",
   "dependencies": [
     "feature-1772753343490-jlxsp4dfi"
   ],
@@ -28,6 +28,13 @@
       "to": "backlog",
       "timestamp": "2026-03-05T23:39:32.810Z",
       "reason": "Feature created"
+    },
+    {
+      "from": "backlog",
+      "to": "done",
+      "timestamp": "2026-03-06T14:14:59.790Z"
     }
-  ]
+  ],
+  "featureType": "code",
+  "completedAt": "2026-03-06T14:14:59.790Z"
 }

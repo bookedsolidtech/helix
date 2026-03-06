@@ -2,7 +2,7 @@
   "category": "Uncategorized",
   "description": "Deep antagonistic quality review of `hx-accordion` (T1-17). 5/6 libraries ship this.\n\nReview every file in `packages/hx-library/src/components/hx-accordion/` critically.\n\n**Audit areas:**\n1. TypeScript — strict, accordion-item typing, single/multi expand mode, open state typing\n2. Accessibility — disclosure pattern: each header is a `<button>` (or `role=\"button\"`), `aria-expanded`, `aria-controls` pointing to panel, panel `id` matches, keyboard (Enter/Space toggle, arrow keys navigate between items), axe-core pass\n3. Tests — expand/collapse, single-expand mode (one open at a time), keyboard navigation, animated open/close\n4. Storybook — single/multiple expand modes, nested content, icons in headers\n5. CSS — smooth open/close animation using CSS only or minimal JS, `--hx-*` tokens, CSS parts (header, panel, icon)\n6. Performance — bundle < 5KB\n7. Drupal — Twig-renderable with slotted items\n\n**Output:** Write findings to `packages/hx-library/src/components/hx-accordion/AUDIT.md` with severity (P0/P1/P2). DO NOT fix — document only. Commit AUDIT.md as your PR.",
   "title": "AUDIT: hx-accordion — T1-17 antagonistic quality review",
-  "status": "backlog",
+  "status": "done",
   "complexity": "large",
   "priority": 2,
   "source": "api",
@@ -25,6 +25,13 @@
       "to": "backlog",
       "timestamp": "2026-03-05T23:17:24.558Z",
       "reason": "Feature created"
+    },
+    {
+      "from": "backlog",
+      "to": "done",
+      "timestamp": "2026-03-06T14:12:01.643Z"
     }
-  ]
+  ],
+  "featureType": "code",
+  "completedAt": "2026-03-06T14:12:01.643Z"
 }

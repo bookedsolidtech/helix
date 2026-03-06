@@ -2,7 +2,7 @@
   "category": "Uncategorized",
   "description": "Implement `hx-menu`, `hx-menu-item`, and `hx-menu-divider` (T2 tier) — 5/6 enterprise libraries ship this. Context menu with items, groups, and submenus.\n\n**Files to create** in `packages/hx-library/src/components/hx-menu/`:\n- `index.ts`, `hx-menu.ts`, `hx-menu.styles.ts`, `hx-menu.stories.ts`, `hx-menu.test.ts`\n\n**`hx-menu` props:** none (manages keyboard navigation of items)\n\n**`hx-menu-item` props:** `value` (string), `disabled` (boolean), `checked` (boolean — for checkmark items), `type` (`normal`|`checkbox`), `loading` (boolean)\n\n**`hx-menu-divider`:** no props, just a visual separator between menu sections\n\n**Slots on `hx-menu`:** default (hx-menu-item and hx-menu-divider children)\n**Slots on `hx-menu-item`:** `prefix` (icon), default (label), `suffix` (shortcut text/icon), `submenu` (nested hx-menu)\n\n**Events:** `hx-select` on `hx-menu` with `{ item, value }`\n\n**CSS Parts:** `hx-menu`: `base`; `hx-menu-item`: `base`, `prefix`, `label`, `suffix`, `submenu-icon`, `checked-icon`\n\n**ARIA:** `hx-menu` gets `role=\"menu\"`. Items get `role=\"menuitem\"` (or `role=\"menuitemcheckbox\"` for checkbox type). `aria-disabled`, `aria-checked`. Keyboard: Arrow Up/Down navigate, Enter/Space activate, Escape closes, Arrow Right opens submenu.\n\n**Quality gates:** type-check zero errors, all tests (keyboard nav, checkbox items, submenu, disabled items), axe-core zero violations, Storybook all patterns, bundle < 5KB combined.\n\nRegister all three in `packages/hx-library/src/index.ts` and `packages/hx-library/vite.config.ts`.",
   "title": "IMPLEMENT: hx-menu — T2 Context/Action Menu",
-  "status": "backlog",
+  "status": "done",
   "complexity": "medium",
   "priority": 3,
   "source": "api",
@@ -25,6 +25,14 @@
       "to": "backlog",
       "timestamp": "2026-03-05T23:25:14.254Z",
       "reason": "Feature created"
+    },
+    {
+      "from": "backlog",
+      "to": "done",
+      "timestamp": "2026-03-06T14:12:55.095Z"
     }
-  ]
+  ],
+  "featureType": "code",
+  "prLastPolledAt": "2026-03-06T14:01:04.579Z",
+  "completedAt": "2026-03-06T14:12:55.095Z"
 }
