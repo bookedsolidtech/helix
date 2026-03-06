@@ -286,8 +286,13 @@ export class HelixSplitButton extends LitElement {
         (el): el is HelixMenuItem =>
           el.tagName.toLowerCase() === 'hx-menu-item' && !(el as HelixMenuItem).disabled,
       )
-      .map((item) => item.shadowRoot?.querySelector<HTMLElement>('button') ?? null)
-      .filter((btn): btn is HTMLElement => btn !== null);
+      .map(
+        (item) =>
+          item.shadowRoot?.querySelector<HTMLElement>('.menu-item') ??
+          item.shadowRoot?.querySelector<HTMLElement>('[role="menuitem"]') ??
+          null,
+      )
+      .filter((el): el is HTMLElement => el !== null);
   }
 
   // ─── Render ───
