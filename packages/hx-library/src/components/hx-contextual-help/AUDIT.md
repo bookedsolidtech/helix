@@ -2,6 +2,7 @@
 
 **Reviewed:** `packages/hx-library/src/components/hx-contextual-help/`
 **Files audited:**
+
 - `hx-contextual-help.ts`
 - `hx-contextual-help.styles.ts`
 - `hx-contextual-help.test.ts`
@@ -13,7 +14,7 @@
 ## Summary
 
 | Severity | Count |
-|----------|-------|
+| -------- | ----- |
 | P0       | 1     |
 | P1       | 5     |
 | P2       | 7     |
@@ -39,10 +40,12 @@ There is no `aria-label` and no `aria-labelledby`. WCAG 2.1 SC 4.1.2 and ARIA sp
 The axe-core test suite (`Accessibility (axe-core)`) only tests the open state **with a heading** (`has no axe violations in open state with heading`). There is no axe test for the open state **without a heading**. The P0 violation is undetected by the existing test suite.
 
 **Required fix:** Add a `label` or `aria-label` fallback when `heading` is empty. At minimum:
+
 ```ts
 aria-label=${!hasHeading ? this.label : nothing}
 aria-labelledby=${hasHeading ? this._headingId : nothing}
 ```
+
 This reuses the existing `label` property (default `"Help"`) as the dialog's accessible name when no heading is provided.
 
 ---
@@ -92,6 +95,7 @@ APG dialog pattern requires a visible close mechanism inside the dialog. This is
 **File:** `hx-contextual-help.test.ts`, lines 313–332
 
 The axe-core suite has two tests:
+
 1. Closed state (passes — no dialog rendered)
 2. Open state **with heading** (passes — dialog has `aria-labelledby`)
 
