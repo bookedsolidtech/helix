@@ -150,7 +150,7 @@ describe('hx-data-table', () => {
       expect(ths[0].getAttribute('aria-sort')).toBe('descending');
     });
 
-    it('sets aria-sort="none" on non-active column', async () => {
+    it('does not set aria-sort on non-sortable column', async () => {
       const el = await fixture<HelixDataTable>('<hx-data-table></hx-data-table>');
       el.columns = COLUMNS;
       el.rows = ROWS;
@@ -158,7 +158,8 @@ describe('hx-data-table', () => {
       await el.updateComplete;
 
       const ths = el.shadowRoot!.querySelectorAll('th[part~="th"]');
-      expect(ths[1].getAttribute('aria-sort')).toBe('none');
+      // COLUMNS[1] (Status) has sortable: false
+      expect(ths[1].hasAttribute('aria-sort')).toBe(false);
     });
   });
 
@@ -171,7 +172,9 @@ describe('hx-data-table', () => {
       el.rows = ROWS;
       await el.updateComplete;
 
-      const checkboxes = el.shadowRoot!.querySelectorAll('input[type="checkbox"][part~="checkbox"]');
+      const checkboxes = el.shadowRoot!.querySelectorAll(
+        'input[type="checkbox"][part~="checkbox"]',
+      );
       // 1 header + 3 row checkboxes
       expect(checkboxes.length).toBe(4);
     });
@@ -272,7 +275,9 @@ describe('hx-data-table', () => {
 
   describe('Empty State', () => {
     it('renders emptyLabel when rows is empty', async () => {
-      const el = await fixture<HelixDataTable>('<hx-data-table empty-label="No patients"></hx-data-table>');
+      const el = await fixture<HelixDataTable>(
+        '<hx-data-table empty-label="No patients"></hx-data-table>',
+      );
       el.columns = COLUMNS;
       el.rows = [];
       await el.updateComplete;
@@ -355,6 +360,76 @@ describe('hx-data-table', () => {
     });
   });
 
+  // ─── Checkbox StopPropagation ───
+
+  describe('Checkbox StopPropagation', () => {
+    it('clicking checkbox does not fire hx-row-click', async () => {
+      const el = await fixture<HelixDataTable>('<hx-data-table selectable></hx-data-table>');
+      el.columns = COLUMNS;
+      el.rows = ROWS;
+      await el.updateComplete;
+
+      let rowClickFired = false;
+      el.addEventListener('hx-row-click', () => {
+        rowClickFired = true;
+      });
+
+      const checkbox = el.shadowRoot!.querySelector<HTMLInputElement>(
+        'tbody input[type="checkbox"]',
+      )!;
+      await userEvent.click(checkbox);
+      await el.updateComplete;
+
+      expect(rowClickFired).toBe(false);
+    });
+  });
+
+  // ─── JSON String Coercion ───
+
+  describe('JSON String Coercion', () => {
+    it('parses columns from JSON string attribute', async () => {
+      const colsJson = JSON.stringify(COLUMNS);
+      const el = await fixture<HelixDataTable>(
+        `<hx-data-table columns='${colsJson}'></hx-data-table>`,
+      );
+      el.rows = ROWS;
+      await el.updateComplete;
+
+      const headers = el.shadowRoot!.querySelectorAll('th[part~="th"]');
+      expect(headers.length).toBe(COLUMNS.length);
+    });
+
+    it('parses rows from JSON string attribute', async () => {
+      const rowsJson = JSON.stringify(ROWS);
+      const el = await fixture<HelixDataTable>(
+        `<hx-data-table rows='${rowsJson}'></hx-data-table>`,
+      );
+      el.columns = COLUMNS;
+      await el.updateComplete;
+
+      const rows = el.shadowRoot!.querySelectorAll('tbody tr[part~="tr"]');
+      expect(rows.length).toBe(ROWS.length);
+    });
+
+    it('falls back to empty array on invalid JSON columns', async () => {
+      const el = await fixture<HelixDataTable>(
+        `<hx-data-table columns='not-valid-json'></hx-data-table>`,
+      );
+      await el.updateComplete;
+
+      expect(el.columns).toEqual([]);
+    });
+
+    it('falls back to empty array on invalid JSON rows', async () => {
+      const el = await fixture<HelixDataTable>(
+        `<hx-data-table rows='not-valid-json'></hx-data-table>`,
+      );
+      await el.updateComplete;
+
+      expect(el.rows).toEqual([]);
+    });
+  });
+
   // ─── ARIA / Accessibility ───
 
   describe('Accessibility (axe-core)', () => {
@@ -389,7 +464,9 @@ describe('hx-data-table', () => {
     });
 
     it('has no axe violations when empty', async () => {
-      const el = await fixture<HelixDataTable>('<hx-data-table empty-label="No data"></hx-data-table>');
+      const el = await fixture<HelixDataTable>(
+        '<hx-data-table empty-label="No data"></hx-data-table>',
+      );
       el.columns = COLUMNS;
       el.rows = [];
       await el.updateComplete;
@@ -426,6 +503,103 @@ describe('hx-data-table', () => {
 
       const focused = el.shadowRoot!.activeElement;
       expect(focused).toBe(ths[1]);
+    });
+
+    it('ArrowLeft moves focus to previous cell', async () => {
+      const el = await fixture<HelixDataTable>('<hx-data-table></hx-data-table>');
+      el.columns = COLUMNS;
+      el.rows = ROWS;
+      await el.updateComplete;
+
+      const ths = el.shadowRoot!.querySelectorAll<HTMLElement>('th[part~="th"]');
+      ths[1].setAttribute('tabindex', '0');
+      ths[1].focus();
+
+      await userEvent.keyboard('{ArrowLeft}');
+      await el.updateComplete;
+
+      expect(el.shadowRoot!.activeElement).toBe(ths[0]);
+    });
+
+    it('ArrowDown moves focus to cell below', async () => {
+      const el = await fixture<HelixDataTable>('<hx-data-table></hx-data-table>');
+      el.columns = COLUMNS;
+      el.rows = ROWS;
+      await el.updateComplete;
+
+      const ths = el.shadowRoot!.querySelectorAll<HTMLElement>('th[part~="th"]');
+      const tds = el.shadowRoot!.querySelectorAll<HTMLElement>('td[part~="td"]');
+      ths[0].focus();
+
+      await userEvent.keyboard('{ArrowDown}');
+      await el.updateComplete;
+
+      expect(el.shadowRoot!.activeElement).toBe(tds[0]);
+    });
+
+    it('ArrowUp moves focus to cell above', async () => {
+      const el = await fixture<HelixDataTable>('<hx-data-table></hx-data-table>');
+      el.columns = COLUMNS;
+      el.rows = ROWS;
+      await el.updateComplete;
+
+      const tds = el.shadowRoot!.querySelectorAll<HTMLElement>('td[part~="td"]');
+      const ths = el.shadowRoot!.querySelectorAll<HTMLElement>('th[part~="th"]');
+      tds[0].setAttribute('tabindex', '0');
+      tds[0].focus();
+
+      await userEvent.keyboard('{ArrowUp}');
+      await el.updateComplete;
+
+      expect(el.shadowRoot!.activeElement).toBe(ths[0]);
+    });
+
+    it('Home moves focus to first cell in the row', async () => {
+      const el = await fixture<HelixDataTable>('<hx-data-table></hx-data-table>');
+      el.columns = COLUMNS;
+      el.rows = ROWS;
+      await el.updateComplete;
+
+      const ths = el.shadowRoot!.querySelectorAll<HTMLElement>('th[part~="th"]');
+      ths[1].setAttribute('tabindex', '0');
+      ths[1].focus();
+
+      await userEvent.keyboard('{Home}');
+      await el.updateComplete;
+
+      expect(el.shadowRoot!.activeElement).toBe(ths[0]);
+    });
+
+    it('End moves focus to last cell in the row', async () => {
+      const el = await fixture<HelixDataTable>('<hx-data-table></hx-data-table>');
+      el.columns = COLUMNS;
+      el.rows = ROWS;
+      await el.updateComplete;
+
+      const ths = el.shadowRoot!.querySelectorAll<HTMLElement>('th[part~="th"]');
+      ths[0].focus();
+
+      await userEvent.keyboard('{End}');
+      await el.updateComplete;
+
+      expect(el.shadowRoot!.activeElement).toBe(ths[COLUMNS.length - 1]);
+    });
+
+    it('Space toggles row selection when focused on a selectable cell', async () => {
+      const el = await fixture<HelixDataTable>('<hx-data-table selectable></hx-data-table>');
+      el.columns = COLUMNS;
+      el.rows = ROWS;
+      await el.updateComplete;
+
+      const tds = el.shadowRoot!.querySelectorAll<HTMLElement>('td[part~="td"][data-row-index]');
+      tds[0].setAttribute('tabindex', '0');
+      tds[0].focus();
+
+      const eventPromise = oneEvent<CustomEvent>(el, 'hx-select');
+      await userEvent.keyboard('{ }');
+      const event = await eventPromise;
+
+      expect(event.detail.selectedRows).toHaveLength(1);
     });
   });
 });
