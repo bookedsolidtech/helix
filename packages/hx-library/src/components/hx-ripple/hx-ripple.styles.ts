@@ -4,7 +4,6 @@ export const helixRippleStyles = css`
   :host {
     display: inline-block;
     position: relative;
-    overflow: hidden;
   }
 
   .ripple__base {
@@ -15,6 +14,10 @@ export const helixRippleStyles = css`
     pointer-events: none;
   }
 
+  :host([unbounded]) .ripple__base {
+    overflow: visible;
+  }
+
   .ripple__wave {
     position: absolute;
     border-radius: 50%;
@@ -23,11 +26,12 @@ export const helixRippleStyles = css`
     opacity: var(--hx-ripple-opacity, 0.2);
     animation: hx-ripple-expand var(--hx-ripple-duration, 600ms) ease-out forwards;
     pointer-events: none;
+    will-change: transform, opacity;
   }
 
   @keyframes hx-ripple-expand {
     to {
-      transform: scale(4);
+      transform: scale(var(--hx-ripple-scale, 4));
       opacity: 0;
     }
   }

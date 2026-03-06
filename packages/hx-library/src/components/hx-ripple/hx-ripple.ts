@@ -19,6 +19,7 @@ import { helixRippleStyles } from './hx-ripple.styles.js';
  * @cssprop [--hx-ripple-color=currentColor] - Color of the ripple wave.
  * @cssprop [--hx-ripple-opacity=0.2] - Opacity of the ripple wave.
  * @cssprop [--hx-ripple-duration=600ms] - Duration of the ripple animation.
+ * @cssprop [--hx-ripple-scale=4] - Final scale factor of the ripple expansion.
  */
 @customElement('hx-ripple')
 export class HelixRipple extends LitElement {
@@ -38,11 +39,20 @@ export class HelixRipple extends LitElement {
   @property({ type: Boolean, reflect: true })
   disabled = false;
 
+  /**
+   * When true, the ripple expands beyond the component bounds.
+   * Used for icon buttons where the ripple should exceed the hit area.
+   * @attr unbounded
+   */
+  @property({ type: Boolean, reflect: true })
+  unbounded = false;
+
+  /** @internal */
   private _reduceMotion(): boolean {
     return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   }
 
-  private _handlePointerDown = (e: PointerEvent): void => {
+  private _createRipple(clientX: number, clientY: number): void {
     if (this.disabled || this._reduceMotion()) return;
 
     const base = this.shadowRoot?.querySelector<HTMLElement>('.ripple__base');
@@ -50,8 +60,8 @@ export class HelixRipple extends LitElement {
 
     const rect = base.getBoundingClientRect();
     const size = Math.max(rect.width, rect.height);
-    const x = e.clientX - rect.left - size / 2;
-    const y = e.clientY - rect.top - size / 2;
+    const x = clientX - rect.left - size / 2;
+    const y = clientY - rect.top - size / 2;
 
     const ripple = document.createElement('span');
     ripple.className = 'ripple__wave';
@@ -76,16 +86,32 @@ export class HelixRipple extends LitElement {
       },
       { once: true },
     );
+  }
+
+  /** @internal */
+  private _handlePointerDown = (e: PointerEvent): void => {
+    this._createRipple(e.clientX, e.clientY);
+  };
+
+  /** @internal */
+  private _handleKeyDown = (e: KeyboardEvent): void => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      const rect = this.getBoundingClientRect();
+      this._createRipple(rect.left + rect.width / 2, rect.top + rect.height / 2);
+    }
   };
 
   override connectedCallback(): void {
     super.connectedCallback();
+    this.setAttribute('role', 'presentation');
     this.addEventListener('pointerdown', this._handlePointerDown);
+    this.addEventListener('keydown', this._handleKeyDown);
   }
 
   override disconnectedCallback(): void {
     super.disconnectedCallback();
     this.removeEventListener('pointerdown', this._handlePointerDown);
+    this.removeEventListener('keydown', this._handleKeyDown);
   }
 
   override render() {
