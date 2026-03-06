@@ -9,12 +9,12 @@
 
 ## Summary
 
-| Severity | Count |
-|----------|-------|
-| P0 (Blocker) | 1 |
-| P1 (High) | 5 |
-| P2 (Medium) | 6 |
-| **Total** | **12** |
+| Severity     | Count  |
+| ------------ | ------ |
+| P0 (Blocker) | 1      |
+| P1 (High)    | 5      |
+| P2 (Medium)  | 6      |
+| **Total**    | **12** |
 
 ---
 
