@@ -18,6 +18,7 @@ A keyboard-only user cannot navigate the saturation/value space at all. Only mou
 **WCAG 2.1 failure:** SC 2.1.1 Keyboard (Level A) — all functionality must be operable via keyboard.
 
 Required remediation:
+
 - Add `role="slider"` or a 2D custom role with `tabindex="0"`.
 - Add `aria-label`, `aria-valuemin/max/now` for both axes (saturation and value).
 - Add `keydown` handler supporting arrow keys for both S and V axes.
@@ -65,7 +66,7 @@ Additionally, `type: Array` does not have a TypeScript-narrowed type — `swatch
 
 The trigger button has `aria-label="Choose color"` which is static. A screen reader user activating this button gets no indication of the current color value. They must rely on the visible `trigger-label` span which is inside the button and readable — however, the `aria-label` overrides all child text for accessible name computation. The color value text is effectively hidden from AT.
 
-**Remediation:** Use `aria-label=${`Choose color: ${this._inputValue}`}` or remove `aria-label` and rely on button text content.
+**Remediation:** Use `aria-label=${`Choose color: ${this.\_inputValue}`}` or remove `aria-label` and rely on button text content.
 
 ---
 
@@ -74,6 +75,7 @@ The trigger button has `aria-label="Choose color"` which is static. A screen rea
 The hue slider exposes `aria-valuenow=${Math.round(this._hsv.h)}` (a number 0–360) with no `aria-valuetext`. Screen readers announce "0" through "360" which is meaningless to most users. The opacity slider similarly announces a percentage integer with no textual context.
 
 **Remediation:**
+
 - Hue: `aria-valuetext="${Math.round(this._hsv.h)}°"`
 - Opacity: `aria-valuetext="${Math.round(this._hsv.a * 100)}%"`
 
@@ -95,25 +97,25 @@ The `/ 0.2` opacity shorthand is valid inside `color()` or `oklch()` functions b
 
 The project mandate is "Never hardcode colors." The following rules use hardcoded values instead of `--hx-*` tokens:
 
-| Location | Value | Lines |
-|---|---|---|
-| `.trigger-swatch` border | `rgba(0, 0, 0, 0.1)` | styles:43 |
-| `.gradient-thumb` border | `#fff` | styles:110 |
-| `.gradient-thumb` shadow | `rgba(0, 0, 0, 0.3)` | styles:111 |
-| `.panel` box-shadow | `rgba(0, 0, 0, 0.15)` | styles:67 |
-| `.panel` border | `1px solid` (hardcoded width) | styles:64 |
-| `.slider-thumb` border | `#fff` | styles:165 |
-| `.slider-thumb` shadow | `rgba(0, 0, 0, 0.3)` | styles:166 |
-| `.swatch-btn` border | `rgba(0, 0, 0, 0.1)` | styles:185 |
-| `.swatch-btn:hover` border | `rgba(0, 0, 0, 0.3)` | styles:194 |
-| `.input-preview` border | `rgba(0, 0, 0, 0.1)` | styles:253 |
+| Location                   | Value                         | Lines      |
+| -------------------------- | ----------------------------- | ---------- |
+| `.trigger-swatch` border   | `rgba(0, 0, 0, 0.1)`          | styles:43  |
+| `.gradient-thumb` border   | `#fff`                        | styles:110 |
+| `.gradient-thumb` shadow   | `rgba(0, 0, 0, 0.3)`          | styles:111 |
+| `.panel` box-shadow        | `rgba(0, 0, 0, 0.15)`         | styles:67  |
+| `.panel` border            | `1px solid` (hardcoded width) | styles:64  |
+| `.slider-thumb` border     | `#fff`                        | styles:165 |
+| `.slider-thumb` shadow     | `rgba(0, 0, 0, 0.3)`          | styles:166 |
+| `.swatch-btn` border       | `rgba(0, 0, 0, 0.1)`          | styles:185 |
+| `.swatch-btn:hover` border | `rgba(0, 0, 0, 0.3)`          | styles:194 |
+| `.input-preview` border    | `rgba(0, 0, 0, 0.1)`          | styles:253 |
 
 ---
 
 ### P1-7: `@change` on color input instead of `@input` (`hx-color-picker.ts:728`)
 
 ```html
-<input ... @change=${this._handleInputChange} @blur=${this._handleInputBlur} />
+<input ... @change="${this._handleInputChange}" @blur="${this._handleInputBlur}" />
 ```
 
 `change` fires only on blur or Enter. As a user types a color value, there is no real-time update to the picker. Live preview is a standard expectation for color pickers. The `hx-input` event (for live drag feedback) exists but the text input path bypasses it entirely.
@@ -123,6 +125,7 @@ The project mandate is "Never hardcode colors." The following rules use hardcode
 ### P1-8: `slider` CSS part documented but never applied (`hx-color-picker.ts:253`)
 
 The JSDoc documents:
+
 ```
 @csspart slider - Shared slider container.
 ```
@@ -134,6 +137,7 @@ But no element in the template has `part="slider"`. The `hue-slider` and `opacit
 ### P1-9: Storybook missing required "swatches-only" and "compact mode" stories
 
 The feature spec requires:
+
 - `SwatchesOnly` story (picker panel showing swatches without gradient picker)
 - `Compact` story (compact mode)
 
@@ -203,8 +207,12 @@ Tests cover `hex`, `rgb`, `hsl` format properties but `hsv` format output is nev
 ### P2-8: Hardcoded layout dimensions (`hx-color-picker.styles.ts:88, 68`)
 
 ```css
-.gradient-grid { height: 160px; }
-.panel { width: 260px; }
+.gradient-grid {
+  height: 160px;
+}
+.panel {
+  width: 260px;
+}
 ```
 
 Both are hardcoded pixel values with no `--hx-*` token fallback. Consumers cannot resize the picker panel via CSS custom properties.
@@ -214,6 +222,7 @@ Both are hardcoded pixel values with no `--hx-*` token fallback. Consumers canno
 ### P2-9: No Drupal integration documentation
 
 The component is entirely client-side with no SSR path. The JSDoc example shows only HTML usage with no mention of:
+
 - Drupal behaviors required to set `swatches` JS property
 - Recommended CDN import path
 - Progressive enhancement strategy (what renders without JS)
@@ -235,27 +244,27 @@ These assertions pass for any non-empty string. A test clicking the `#ff0000` sw
 
 ## Summary table
 
-| ID | Area | Severity | Description |
-|---|---|---|---|
-| P0-1 | Accessibility | **P0** | Gradient grid has no keyboard support — WCAG 2.1.1 failure |
-| P1-1 | TypeScript/Runtime | **P1** | Event listener memory leak in `disconnectedCallback` |
-| P1-2 | TypeScript/Drupal | **P1** | `swatches` array property not usable from HTML attributes |
-| P1-3 | Accessibility | **P1** | Trigger `aria-label` overrides current color value for AT |
-| P1-4 | Accessibility | **P1** | Sliders missing `aria-valuetext` |
-| P1-5 | CSS | **P1** | Invalid `box-shadow` syntax — focus ring on input not rendered |
-| P1-6 | CSS | **P1** | 10+ hardcoded color values, violates token mandate |
-| P1-7 | Accessibility/UX | **P1** | `@change` instead of `@input` — no real-time input feedback |
-| P1-8 | CEM/CSS | **P1** | `slider` CSS part documented but never applied |
-| P1-9 | Storybook | **P1** | Missing swatches-only and compact mode stories |
-| P2-1 | TypeScript | **P2** | `parseColor` cannot parse HSV format strings (round-trip bug) |
-| P2-2 | Tests | **P2** | Value parsing tests don't verify parsed color output |
-| P2-3 | Tests | **P2** | `hx-input` event has zero test coverage |
-| P2-4 | Tests | **P2** | Format cycling has zero test coverage |
-| P2-5 | Tests | **P2** | Text input → color update flow untested |
-| P2-6 | Tests | **P2** | Slider keyboard navigation untested |
-| P2-7 | Tests | **P2** | HSV format output untested end-to-end |
-| P2-8 | CSS | **P2** | Hardcoded `width: 260px` and `height: 160px` not tokenized |
-| P2-9 | Drupal | **P2** | No Drupal/Twig integration documentation |
-| P2-10 | Tests | **P2** | `hx-change` event assertion too loose |
+| ID    | Area               | Severity | Description                                                    |
+| ----- | ------------------ | -------- | -------------------------------------------------------------- |
+| P0-1  | Accessibility      | **P0**   | Gradient grid has no keyboard support — WCAG 2.1.1 failure     |
+| P1-1  | TypeScript/Runtime | **P1**   | Event listener memory leak in `disconnectedCallback`           |
+| P1-2  | TypeScript/Drupal  | **P1**   | `swatches` array property not usable from HTML attributes      |
+| P1-3  | Accessibility      | **P1**   | Trigger `aria-label` overrides current color value for AT      |
+| P1-4  | Accessibility      | **P1**   | Sliders missing `aria-valuetext`                               |
+| P1-5  | CSS                | **P1**   | Invalid `box-shadow` syntax — focus ring on input not rendered |
+| P1-6  | CSS                | **P1**   | 10+ hardcoded color values, violates token mandate             |
+| P1-7  | Accessibility/UX   | **P1**   | `@change` instead of `@input` — no real-time input feedback    |
+| P1-8  | CEM/CSS            | **P1**   | `slider` CSS part documented but never applied                 |
+| P1-9  | Storybook          | **P1**   | Missing swatches-only and compact mode stories                 |
+| P2-1  | TypeScript         | **P2**   | `parseColor` cannot parse HSV format strings (round-trip bug)  |
+| P2-2  | Tests              | **P2**   | Value parsing tests don't verify parsed color output           |
+| P2-3  | Tests              | **P2**   | `hx-input` event has zero test coverage                        |
+| P2-4  | Tests              | **P2**   | Format cycling has zero test coverage                          |
+| P2-5  | Tests              | **P2**   | Text input → color update flow untested                        |
+| P2-6  | Tests              | **P2**   | Slider keyboard navigation untested                            |
+| P2-7  | Tests              | **P2**   | HSV format output untested end-to-end                          |
+| P2-8  | CSS                | **P2**   | Hardcoded `width: 260px` and `height: 160px` not tokenized     |
+| P2-9  | Drupal             | **P2**   | No Drupal/Twig integration documentation                       |
+| P2-10 | Tests              | **P2**   | `hx-change` event assertion too loose                          |
 
 **Total:** 1 P0, 9 P1, 10 P2 — **component is not merge-ready.**
