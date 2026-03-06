@@ -1,4 +1,4 @@
-import { LitElement, html, svg } from 'lit';
+import { LitElement, html, svg, type TemplateResult } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { tokenStyles } from '@helix/tokens/lit';
 import { helixProgressRingStyles } from './hx-progress-ring.styles.js';
@@ -91,7 +91,8 @@ export class HelixProgressRing extends LitElement {
 
   // ─── Lifecycle ───
 
-  override firstUpdated(): void {
+  override connectedCallback(): void {
+    super.connectedCallback();
     this.setAttribute('role', 'progressbar');
     this.setAttribute('aria-valuemin', '0');
     this.setAttribute('aria-valuemax', '100');
@@ -107,9 +108,11 @@ export class HelixProgressRing extends LitElement {
   private _syncState(): void {
     if (this._isIndeterminate) {
       this.setAttribute('indeterminate', '');
+      this.setAttribute('aria-busy', 'true');
       this.removeAttribute('aria-valuenow');
     } else {
       this.removeAttribute('indeterminate');
+      this.removeAttribute('aria-busy');
       this.setAttribute('aria-valuenow', String(this._clampedValue));
     }
 
@@ -118,11 +121,18 @@ export class HelixProgressRing extends LitElement {
     } else {
       this.removeAttribute('aria-label');
     }
+
+    if (!this.label && !this.hasAttribute('aria-labelledby')) {
+      console.warn(
+        'hx-progress-ring: accessible name is required. Set the "label" attribute or use "aria-labelledby".',
+        this,
+      );
+    }
   }
 
   // ─── Render ───
 
-  override render() {
+  override render(): TemplateResult {
     const cx = 50;
     const cy = 50;
     const r = this._radius;

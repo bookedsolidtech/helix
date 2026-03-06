@@ -23,7 +23,9 @@ describe('hx-progress-ring', () => {
     });
 
     it('renders track and indicator circles', async () => {
-      const el = await fixture<HelixProgressRing>('<hx-progress-ring value="50"></hx-progress-ring>');
+      const el = await fixture<HelixProgressRing>(
+        '<hx-progress-ring value="50"></hx-progress-ring>',
+      );
       const track = shadowQuery(el, '[part="track"]');
       const indicator = shadowQuery(el, '[part="indicator"]');
       expect(track).toBeTruthy();
@@ -31,7 +33,9 @@ describe('hx-progress-ring', () => {
     });
 
     it('renders label part for center slot', async () => {
-      const el = await fixture<HelixProgressRing>('<hx-progress-ring value="50"></hx-progress-ring>');
+      const el = await fixture<HelixProgressRing>(
+        '<hx-progress-ring value="50"></hx-progress-ring>',
+      );
       const label = shadowQuery(el, '[part="label"]');
       expect(label).toBeTruthy();
     });
@@ -46,20 +50,44 @@ describe('hx-progress-ring', () => {
     });
 
     it('sets aria-valuenow when value is provided', async () => {
-      const el = await fixture<HelixProgressRing>('<hx-progress-ring value="75"></hx-progress-ring>');
+      const el = await fixture<HelixProgressRing>(
+        '<hx-progress-ring value="75"></hx-progress-ring>',
+      );
       expect(el.getAttribute('aria-valuenow')).toBe('75');
     });
 
     it('clamps value above 100 to 100', async () => {
-      const el = await fixture<HelixProgressRing>('<hx-progress-ring value="150"></hx-progress-ring>');
+      const el = await fixture<HelixProgressRing>(
+        '<hx-progress-ring value="150"></hx-progress-ring>',
+      );
       await el.updateComplete;
       expect(el.getAttribute('aria-valuenow')).toBe('100');
     });
 
     it('clamps value below 0 to 0', async () => {
-      const el = await fixture<HelixProgressRing>('<hx-progress-ring value="-10"></hx-progress-ring>');
+      const el = await fixture<HelixProgressRing>(
+        '<hx-progress-ring value="-10"></hx-progress-ring>',
+      );
       await el.updateComplete;
       expect(el.getAttribute('aria-valuenow')).toBe('0');
+    });
+
+    it('renders full indicator at value=100 (dashoffset = 0)', async () => {
+      const el = await fixture<HelixProgressRing>(
+        '<hx-progress-ring value="100"></hx-progress-ring>',
+      );
+      const indicator = shadowQuery(el, '[part="indicator"]');
+      expect(indicator?.getAttribute('stroke-dashoffset')).toBe('0');
+    });
+
+    it('renders empty indicator at value=0 (dashoffset = circumference)', async () => {
+      const el = await fixture<HelixProgressRing>(
+        '<hx-progress-ring value="0"></hx-progress-ring>',
+      );
+      const indicator = shadowQuery(el, '[part="indicator"]');
+      const dashoffset = parseFloat(indicator?.getAttribute('stroke-dashoffset') ?? '0');
+      // Full circumference means no visible indicator
+      expect(dashoffset).toBeGreaterThan(0);
     });
   });
 
@@ -84,6 +112,34 @@ describe('hx-progress-ring', () => {
       expect(el.hasAttribute('indeterminate')).toBe(false);
       expect(el.getAttribute('aria-valuenow')).toBe('50');
     });
+
+    it('transitions from determinate to indeterminate when value set to null', async () => {
+      const el = await fixture<HelixProgressRing>(
+        '<hx-progress-ring value="50"></hx-progress-ring>',
+      );
+      expect(el.hasAttribute('indeterminate')).toBe(false);
+      expect(el.getAttribute('aria-valuenow')).toBe('50');
+      el.value = null;
+      await el.updateComplete;
+      expect(el.hasAttribute('indeterminate')).toBe(true);
+      expect(el.hasAttribute('aria-valuenow')).toBe(false);
+    });
+  });
+
+  // ─── ARIA busy state (2) ───
+
+  describe('ARIA busy state', () => {
+    it('sets aria-busy=true in indeterminate mode', async () => {
+      const el = await fixture<HelixProgressRing>('<hx-progress-ring></hx-progress-ring>');
+      expect(el.getAttribute('aria-busy')).toBe('true');
+    });
+
+    it('removes aria-busy in determinate mode', async () => {
+      const el = await fixture<HelixProgressRing>(
+        '<hx-progress-ring value="50"></hx-progress-ring>',
+      );
+      expect(el.hasAttribute('aria-busy')).toBe(false);
+    });
   });
 
   // ─── Property: size (3) ───
@@ -95,12 +151,16 @@ describe('hx-progress-ring', () => {
     });
 
     it('reflects size attribute sm', async () => {
-      const el = await fixture<HelixProgressRing>('<hx-progress-ring size="sm"></hx-progress-ring>');
+      const el = await fixture<HelixProgressRing>(
+        '<hx-progress-ring size="sm"></hx-progress-ring>',
+      );
       expect(el.getAttribute('size')).toBe('sm');
     });
 
     it('reflects size attribute lg', async () => {
-      const el = await fixture<HelixProgressRing>('<hx-progress-ring size="lg"></hx-progress-ring>');
+      const el = await fixture<HelixProgressRing>(
+        '<hx-progress-ring size="lg"></hx-progress-ring>',
+      );
       expect(el.getAttribute('size')).toBe('lg');
     });
   });
@@ -114,7 +174,9 @@ describe('hx-progress-ring', () => {
     });
 
     it('reflects stroke-width attribute', async () => {
-      const el = await fixture<HelixProgressRing>('<hx-progress-ring stroke-width="8"></hx-progress-ring>');
+      const el = await fixture<HelixProgressRing>(
+        '<hx-progress-ring stroke-width="8"></hx-progress-ring>',
+      );
       expect(el.strokeWidth).toBe(8);
     });
   });
@@ -128,17 +190,23 @@ describe('hx-progress-ring', () => {
     });
 
     it('reflects success variant', async () => {
-      const el = await fixture<HelixProgressRing>('<hx-progress-ring variant="success"></hx-progress-ring>');
+      const el = await fixture<HelixProgressRing>(
+        '<hx-progress-ring variant="success"></hx-progress-ring>',
+      );
       expect(el.getAttribute('variant')).toBe('success');
     });
 
     it('reflects warning variant', async () => {
-      const el = await fixture<HelixProgressRing>('<hx-progress-ring variant="warning"></hx-progress-ring>');
+      const el = await fixture<HelixProgressRing>(
+        '<hx-progress-ring variant="warning"></hx-progress-ring>',
+      );
       expect(el.getAttribute('variant')).toBe('warning');
     });
 
     it('reflects danger variant', async () => {
-      const el = await fixture<HelixProgressRing>('<hx-progress-ring variant="danger"></hx-progress-ring>');
+      const el = await fixture<HelixProgressRing>(
+        '<hx-progress-ring variant="danger"></hx-progress-ring>',
+      );
       expect(el.getAttribute('variant')).toBe('danger');
     });
   });
@@ -169,22 +237,30 @@ describe('hx-progress-ring', () => {
 
   describe('CSS Parts', () => {
     it('exposes "base" part on SVG', async () => {
-      const el = await fixture<HelixProgressRing>('<hx-progress-ring value="50"></hx-progress-ring>');
+      const el = await fixture<HelixProgressRing>(
+        '<hx-progress-ring value="50"></hx-progress-ring>',
+      );
       expect(shadowQuery(el, '[part~="base"]')).toBeTruthy();
     });
 
     it('exposes "track" part', async () => {
-      const el = await fixture<HelixProgressRing>('<hx-progress-ring value="50"></hx-progress-ring>');
+      const el = await fixture<HelixProgressRing>(
+        '<hx-progress-ring value="50"></hx-progress-ring>',
+      );
       expect(shadowQuery(el, '[part~="track"]')).toBeTruthy();
     });
 
     it('exposes "indicator" part', async () => {
-      const el = await fixture<HelixProgressRing>('<hx-progress-ring value="50"></hx-progress-ring>');
+      const el = await fixture<HelixProgressRing>(
+        '<hx-progress-ring value="50"></hx-progress-ring>',
+      );
       expect(shadowQuery(el, '[part~="indicator"]')).toBeTruthy();
     });
 
     it('exposes "label" part', async () => {
-      const el = await fixture<HelixProgressRing>('<hx-progress-ring value="50"></hx-progress-ring>');
+      const el = await fixture<HelixProgressRing>(
+        '<hx-progress-ring value="50"></hx-progress-ring>',
+      );
       expect(shadowQuery(el, '[part~="label"]')).toBeTruthy();
     });
   });
