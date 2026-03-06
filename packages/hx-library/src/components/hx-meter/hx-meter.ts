@@ -19,6 +19,7 @@ type MeterState = 'optimum' | 'warning' | 'danger' | 'default';
  * @slot label - Visible label rendered above the meter track.
  *
  * @csspart base - The outer wrapper element.
+ * @csspart track - The track background element.
  * @csspart indicator - The filled bar indicating the current value.
  * @csspart label - The label wrapper element.
  *
@@ -114,22 +115,22 @@ export class HelixMeter extends LitElement {
     const opt = this.optimum!;
     const optimumInLow = hasLow && opt < this.low!;
     const optimumInHigh = hasHigh && opt > this.high!;
-    const optimumInMiddle = !optimumInLow && !optimumInHigh;
 
-    if (optimumInMiddle) {
-      if (inMiddleZone) return 'optimum';
-      if (inLowZone || inHighZone) return 'warning';
-    } else if (optimumInLow) {
+    if (optimumInLow) {
       if (inLowZone) return 'optimum';
       if (inMiddleZone) return 'warning';
-      if (inHighZone) return 'danger';
-    } else if (optimumInHigh) {
-      if (inHighZone) return 'optimum';
-      if (inMiddleZone) return 'warning';
-      if (inLowZone) return 'danger';
+      return 'danger';
     }
 
-    return 'default';
+    if (optimumInHigh) {
+      if (inHighZone) return 'optimum';
+      if (inMiddleZone) return 'warning';
+      return 'danger';
+    }
+
+    // optimum is in middle zone
+    if (inMiddleZone) return 'optimum';
+    return 'warning';
   }
 
   override updated() {
@@ -137,10 +138,16 @@ export class HelixMeter extends LitElement {
     this.dataset['state'] = this._resolveState();
   }
 
+  private _valueText(): string {
+    const state = this._resolveState();
+    const base = `${this._clampedValue()} of ${this.max}`;
+    if (state === 'default') return base;
+    return `${base} (${state})`;
+  }
+
   override render() {
     const pct = this._percentage();
     const state = this._resolveState();
-    const ariaLabel = this.label ?? `${this._clampedValue()} of ${this.max}`;
     const hasLabel = this.label !== undefined;
 
     return html`
@@ -151,15 +158,19 @@ export class HelixMeter extends LitElement {
         aria-valuenow=${this._clampedValue()}
         aria-valuemin=${this.min}
         aria-valuemax=${this.max}
-        aria-label=${ariaLabel}
+        aria-valuetext=${this._valueText()}
+        aria-label=${ifDefined(this.label)}
+        aria-labelledby=${ifDefined(!hasLabel ? 'label' : undefined)}
         data-state=${state}
       >
         ${hasLabel
           ? html`<span part="label" class="meter__label">
               <slot name="label">${this.label}</slot>
             </span>`
-          : html`<slot name="label"></slot>`}
-        <div class="meter__track">
+          : html`<span id="label" part="label" class="meter__label">
+              <slot name="label"></slot>
+            </span>`}
+        <div part="track" class="meter__track">
           <div
             part="indicator"
             class="meter__indicator"
