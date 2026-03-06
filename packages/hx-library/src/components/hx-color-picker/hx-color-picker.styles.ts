@@ -92,6 +92,11 @@ export const helixColorPickerStyles = css`
     flex-shrink: 0;
   }
 
+  .gradient-grid:focus-visible {
+    outline: var(--hx-focus-ring-width, 2px) solid var(--hx-focus-ring-color, #2563eb);
+    outline-offset: var(--hx-focus-ring-offset, 2px);
+  }
+
   .gradient-grid-bg {
     position: absolute;
     inset: 0;
@@ -241,7 +246,7 @@ export const helixColorPickerStyles = css`
 
   .color-input:focus {
     border-color: var(--hx-focus-ring-color, #2563eb);
-    box-shadow: 0 0 0 2px var(--hx-focus-ring-color, #2563eb) / 0.2;
+    box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
   }
 
   /* ─── Color preview strip in input area ─── */

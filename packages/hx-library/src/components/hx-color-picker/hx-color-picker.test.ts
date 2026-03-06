@@ -134,24 +134,18 @@ describe('hx-color-picker', () => {
 
   describe('Property: disabled', () => {
     it('sets native disabled on trigger button', async () => {
-      const el = await fixture<HelixColorPicker>(
-        '<hx-color-picker disabled></hx-color-picker>',
-      );
+      const el = await fixture<HelixColorPicker>('<hx-color-picker disabled></hx-color-picker>');
       const trigger = shadowQuery<HTMLButtonElement>(el, '[part="trigger"]');
       expect(trigger?.disabled).toBe(true);
     });
 
     it('reflects disabled attribute to host', async () => {
-      const el = await fixture<HelixColorPicker>(
-        '<hx-color-picker disabled></hx-color-picker>',
-      );
+      const el = await fixture<HelixColorPicker>('<hx-color-picker disabled></hx-color-picker>');
       expect(el.hasAttribute('disabled')).toBe(true);
     });
 
     it('does not open panel when disabled', async () => {
-      const el = await fixture<HelixColorPicker>(
-        '<hx-color-picker disabled></hx-color-picker>',
-      );
+      const el = await fixture<HelixColorPicker>('<hx-color-picker disabled></hx-color-picker>');
       const trigger = shadowQuery<HTMLButtonElement>(el, '[part="trigger"]');
       trigger?.click();
       await el.updateComplete;
@@ -350,6 +344,20 @@ describe('hx-color-picker', () => {
       const el = await fixture<HelixColorPicker>('<hx-color-picker inline></hx-color-picker>');
       const panel = shadowQuery(el, '.panel');
       expect(panel?.getAttribute('role')).toBe('dialog');
+    });
+
+    it('uses custom label for trigger aria-label', async () => {
+      const el = await fixture<HelixColorPicker>(
+        '<hx-color-picker label="Pick brand color"></hx-color-picker>',
+      );
+      const trigger = shadowQuery(el, '[part="trigger"]');
+      expect(trigger?.getAttribute('aria-label')).toBe('Pick brand color');
+    });
+
+    it('gradient grid is keyboard-focusable', async () => {
+      const el = await fixture<HelixColorPicker>('<hx-color-picker inline></hx-color-picker>');
+      const grid = shadowQuery(el, '[part="grid"]');
+      expect(grid?.getAttribute('tabindex')).toBe('0');
     });
   });
 
