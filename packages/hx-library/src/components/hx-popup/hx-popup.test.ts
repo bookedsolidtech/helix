@@ -305,7 +305,13 @@ describe('hx-popup', () => {
       await el.updateComplete;
 
       let caught = false;
-      document.addEventListener('hx-reposition', () => { caught = true; }, { once: true });
+      document.addEventListener(
+        'hx-reposition',
+        () => {
+          caught = true;
+        },
+        { once: true },
+      );
       await el.reposition();
       await new Promise((r) => setTimeout(r, 10));
 
@@ -339,14 +345,15 @@ describe('hx-popup', () => {
       anchorEl.textContent = 'External';
       document.body.appendChild(anchorEl);
 
-      const el = await fixture<HelixPopup>(
-        '<hx-popup active><div>Content</div></hx-popup>',
-      );
-      el.anchor = anchorEl;
-      await el.updateComplete;
+      try {
+        const el = await fixture<HelixPopup>('<hx-popup active><div>Content</div></hx-popup>');
+        el.anchor = anchorEl;
+        await el.updateComplete;
 
-      expect(el.anchor).toBe(anchorEl);
-      anchorEl.remove();
+        expect(el.anchor).toBe(anchorEl);
+      } finally {
+        anchorEl.remove();
+      }
     });
   });
 

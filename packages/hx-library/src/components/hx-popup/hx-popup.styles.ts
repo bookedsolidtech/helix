@@ -18,9 +18,9 @@ export const helixPopupStyles = css`
 
   [part='arrow'] {
     position: absolute;
-    width: var(--arrow-size, 8px);
-    height: var(--arrow-size, 8px);
-    background: var(--arrow-color, currentColor);
+    width: var(--hx-arrow-size, 8px);
+    height: var(--hx-arrow-size, 8px);
+    background: var(--hx-arrow-color, currentColor);
     transform: rotate(45deg);
     pointer-events: none;
   }

@@ -45,10 +45,10 @@ type ArrowPlacement = 'start' | 'center' | 'end';
  * @csspart popup - The popup container element.
  * @csspart arrow - The arrow indicator element (only present when `arrow` is true).
  *
- * @cssprop [--arrow-size=8px] - Size of the arrow element.
- * @cssprop [--arrow-color=currentColor] - Color of the arrow element.
- * @cssprop --auto-size-available-width - Available width set by auto-size middleware.
- * @cssprop --auto-size-available-height - Available height set by auto-size middleware.
+ * @cssprop [--hx-arrow-size=8px] - Size of the arrow element.
+ * @cssprop [--hx-arrow-color=currentColor] - Color of the arrow element.
+ * @cssprop --hx-auto-size-available-width - Available width set by auto-size middleware.
+ * @cssprop --hx-auto-size-available-height - Available height set by auto-size middleware.
  *
  * @fires {CustomEvent} hx-reposition - Emitted after the popup is repositioned.
  *
@@ -219,7 +219,7 @@ export class HelixPopup extends LitElement {
       return this.anchor;
     }
     if (typeof this.anchor === 'string') {
-      return document.querySelector(this.anchor);
+      return (this.getRootNode() as Document | ShadowRoot).querySelector(this.anchor);
     }
     return this._anchorSlotEl;
   }
@@ -286,8 +286,8 @@ export class HelixPopup extends LitElement {
       middleware.push(
         sizeMiddleware({
           apply: ({ availableWidth, availableHeight }) => {
-            popupEl.style.setProperty('--auto-size-available-width', `${availableWidth}px`);
-            popupEl.style.setProperty('--auto-size-available-height', `${availableHeight}px`);
+            popupEl.style.setProperty('--hx-auto-size-available-width', `${availableWidth}px`);
+            popupEl.style.setProperty('--hx-auto-size-available-height', `${availableHeight}px`);
           },
         }),
       );
