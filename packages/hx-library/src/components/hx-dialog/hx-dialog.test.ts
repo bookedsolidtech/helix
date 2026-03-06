@@ -368,6 +368,70 @@ describe('hx-dialog', () => {
     });
   });
 
+  // ─── Focus Management (3) ───
+
+  describe('Focus Management', () => {
+    it('restores focus to trigger element after dialog closes (D1)', async () => {
+      const wrapper = document.createElement('div');
+      const triggerBtn = document.createElement('button');
+      triggerBtn.id = 'trigger';
+      triggerBtn.textContent = 'Open';
+      wrapper.appendChild(triggerBtn);
+      document.body.appendChild(wrapper);
+
+      const el = await fixture<HelixDialog>(
+        '<hx-dialog heading="Focus Test"><button id="inner">OK</button></hx-dialog>',
+      );
+
+      triggerBtn.focus();
+      expect(document.activeElement).toBe(triggerBtn);
+
+      el.show();
+      await el.updateComplete;
+      await new Promise((r) => setTimeout(r, 50));
+
+      el.close();
+      await el.updateComplete;
+      await new Promise((r) => setTimeout(r, 50));
+
+      expect(document.activeElement).toBe(triggerBtn);
+      wrapper.remove();
+    });
+
+    it('sets initial focus on first focusable element after open (D3)', async () => {
+      const el = await fixture<HelixDialog>(
+        `<hx-dialog heading="Focus Test">
+          <button id="first-focusable">First</button>
+          <button id="second-focusable">Second</button>
+        </hx-dialog>`,
+      );
+
+      el.show();
+      await el.updateComplete;
+      await new Promise((r) => setTimeout(r, 50));
+
+      const firstBtn = el.querySelector('#first-focusable');
+      expect(document.activeElement).toBe(firstBtn);
+    });
+
+    it('locks body scroll when modal opens and restores on close (D4)', async () => {
+      const el = await fixture<HelixDialog>(
+        '<hx-dialog modal heading="Scroll Lock Test">Content</hx-dialog>',
+      );
+
+      const originalOverflow = document.body.style.overflow;
+      el.show();
+      await el.updateComplete;
+
+      expect(document.body.style.overflow).toBe('hidden');
+
+      el.close();
+      await el.updateComplete;
+
+      expect(document.body.style.overflow).toBe(originalOverflow);
+    });
+  });
+
   // ─── Backdrop Click (2) ───
 
   describe('Backdrop Click', () => {

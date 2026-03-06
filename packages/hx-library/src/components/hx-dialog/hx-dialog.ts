@@ -1,8 +1,9 @@
 import { LitElement, html, nothing } from 'lit';
 import { customElement, property, query, state } from 'lit/decorators.js';
-import { classMap } from 'lit/directives/class-map.js';
 import { tokenStyles } from '@helix/tokens/lit';
 import { helixDialogStyles } from './hx-dialog.styles.js';
+
+let _idCounter = 0;
 
 /**
  * A modal and non-modal dialog component built on the native HTML `<dialog>` element.
@@ -63,9 +64,15 @@ export class HelixDialog extends LitElement {
   /** Cached focusable elements — populated on open, cleared on close. */
   private _cachedFocusableElements: HTMLElement[] = [];
 
+  /** Element that had focus before the dialog opened — restored on close. */
+  private _previouslyFocusedElement: HTMLElement | null = null;
+
+  /** Stored body overflow value to restore after modal close. */
+  private _previousBodyOverflow = '';
+
   // ─── Unique ID for aria-labelledby ───
 
-  private readonly _headingId = `hx-dialog-heading-${Math.random().toString(36).slice(2, 9)}`;
+  private readonly _headingId = `hx-dialog-heading-${++_idCounter}`;
 
   // ─── Public Properties ───
 
@@ -161,10 +168,16 @@ export class HelixDialog extends LitElement {
     const dialog = this._dialogEl;
     if (!dialog) return;
 
+    // D1: Store the currently focused element for restoration on close
+    this._previouslyFocusedElement = document.activeElement as HTMLElement | null;
+
     if (this.modal) {
       if (!dialog.open) {
         dialog.showModal();
       }
+      // D4: Lock body scroll while modal is open
+      this._previousBodyOverflow = document.body.style.overflow;
+      document.body.style.overflow = 'hidden';
     } else {
       if (!dialog.open) {
         dialog.show();
@@ -173,9 +186,14 @@ export class HelixDialog extends LitElement {
 
     this._addGlobalListeners();
 
-    // Cache focusable elements after the dialog is open in the DOM
+    // Cache focusable elements and set initial focus after render
     void this.updateComplete.then(() => {
       this._cachedFocusableElements = this._getFocusableElements();
+      // D3: Move focus to the first focusable element inside the dialog
+      const firstFocusable = this._cachedFocusableElements[0];
+      if (firstFocusable) {
+        firstFocusable.focus();
+      }
     });
 
     this.dispatchEvent(
@@ -195,8 +213,19 @@ export class HelixDialog extends LitElement {
       dialog.close();
     }
 
+    // D4: Restore body scroll
+    if (this.modal) {
+      document.body.style.overflow = this._previousBodyOverflow;
+    }
+
     this._removeGlobalListeners();
     this._cachedFocusableElements = [];
+
+    // D1: Restore focus to the element that opened the dialog
+    if (wasOpen && this._previouslyFocusedElement) {
+      this._previouslyFocusedElement.focus();
+      this._previouslyFocusedElement = null;
+    }
 
     if (wasOpen) {
       this.dispatchEvent(
@@ -410,10 +439,6 @@ export class HelixDialog extends LitElement {
   override render() {
     const hasHeading = this.heading.trim().length > 0;
 
-    const dialogClasses = {
-      dialog: true,
-    };
-
     return html`
       ${this._renderNonModalBackdrop()}
       <dialog
@@ -421,7 +446,7 @@ export class HelixDialog extends LitElement {
         aria-label=${!hasHeading && this.ariaLabel ? this.ariaLabel : nothing}
         aria-modal=${this.modal ? 'true' : nothing}
       >
-        <div part="dialog" class=${classMap(dialogClasses)}>
+        <div part="dialog" class="dialog">
           ${this._renderHeader()}
           <div part="body" class="dialog__body">
             <slot></slot>

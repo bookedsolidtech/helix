@@ -77,7 +77,13 @@ export const helixDialogStyles = css`
     inset: 0;
     background-color: var(--hx-dialog-backdrop-color, var(--hx-color-neutral-900));
     opacity: var(--hx-dialog-backdrop-opacity, 0.5);
-    z-index: var(--hx-z-index-modal);
+    z-index: var(--hx-z-index-modal, 1000);
+  }
+
+  /* Ensure non-modal dialog content renders above the backdrop */
+  :host(:not([modal])) dialog {
+    position: relative;
+    z-index: calc(var(--hx-z-index-modal, 1000) + 1);
   }
 
   /* ─── Header ─── */
