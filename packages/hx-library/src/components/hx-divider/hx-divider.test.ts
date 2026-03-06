@@ -23,7 +23,7 @@ describe('hx-divider', () => {
 
     it('renders two line spans', async () => {
       const el = await fixture<HelixDivider>('<hx-divider></hx-divider>');
-      const lines = el.shadowRoot!.querySelectorAll('.divider__line');
+      const lines = el.shadowRoot?.querySelectorAll('.divider__line') ?? [];
       expect(lines.length).toBe(2);
     });
   });

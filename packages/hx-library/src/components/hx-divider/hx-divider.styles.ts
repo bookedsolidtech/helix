@@ -31,8 +31,7 @@ export const helixDividerStyles = css`
 
   /* ─── Horizontal (default) ─── */
 
-  :host([orientation='horizontal']),
-  :host(:not([orientation])) {
+  :host([orientation='horizontal']) {
     margin-block: var(--_spacing);
   }
 

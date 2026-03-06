@@ -58,7 +58,7 @@ export const Default: Story = {
   play: async ({ canvasElement }) => {
     const el = canvasElement.querySelector('hx-divider');
     await expect(el).toBeTruthy();
-    await expect(el!.shadowRoot?.querySelector('[part="base"]')).toBeTruthy();
+    await expect(el?.shadowRoot?.querySelector('[part="base"]')).toBeTruthy();
   },
 };
 

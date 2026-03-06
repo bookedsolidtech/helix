@@ -1,4 +1,4 @@
-import { LitElement, html } from 'lit';
+import { LitElement, html, type PropertyValues } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { tokenStyles } from '@helix/tokens/lit';
 import { helixDividerStyles } from './hx-divider.styles.js';
@@ -44,15 +44,24 @@ export class HelixDivider extends LitElement {
   @state()
   private _hasLabel = false;
 
-  private _slotChangeHandler = (): void => {
-    const slot = this.shadowRoot?.querySelector('slot:not([name])') as HTMLSlotElement | null;
-    const nodes = slot?.assignedNodes({ flatten: true }) ?? [];
+  private _checkSlot(slot: HTMLSlotElement): void {
+    const nodes = slot.assignedNodes({ flatten: true });
     this._hasLabel = nodes.some((node) =>
       node.nodeType === Node.TEXT_NODE
         ? (node.textContent ?? '').trim().length > 0
         : node.nodeType === Node.ELEMENT_NODE,
     );
+  }
+
+  private _slotChangeHandler = (e: Event): void => {
+    this._checkSlot(e.target as HTMLSlotElement);
   };
+
+  override firstUpdated(_changedProperties: PropertyValues): void {
+    super.firstUpdated(_changedProperties);
+    const slot = this.shadowRoot?.querySelector<HTMLSlotElement>('slot:not([name])');
+    if (slot) this._checkSlot(slot);
+  }
 
   override render() {
     return html`
