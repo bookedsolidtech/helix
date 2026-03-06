@@ -1,12 +1,12 @@
-import { LitElement, html } from 'lit';
-import { customElement, property } from 'lit/decorators.js';
+import { LitElement, html, nothing } from 'lit';
+import { customElement, property, state } from 'lit/decorators.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import { AdoptedStylesheetsController } from '../../controllers/adopted-stylesheets.js';
 import { helixFormScopedCss } from './hx-form.styles.js';
 
 /**
  * A Light DOM form wrapper that styles native HTML form elements and
- * wc-* components with the design system's form styles.
+ * hx-* components with the design system's form styles.
  *
  * When `action` is set, renders a `<form>` wrapper around slotted content.
  * When no `action` is set (the Drupal pattern), renders only a `<slot>`
@@ -15,13 +15,18 @@ import { helixFormScopedCss } from './hx-form.styles.js';
  * Uses adopted stylesheets to inject scoped CSS into the document without
  * Shadow DOM, keeping native form participation and Drupal compatibility.
  *
- * @summary Light DOM form wrapper with scoped styles for native and wc-* form elements.
+ * **Accessibility:** When client-side validation fails, the component renders
+ * an error summary with `role="alert"` and sets `aria-invalid="true"` on
+ * invalid fields. Consumers handling `hx-invalid` directly should ensure
+ * error messages are associated with fields via `aria-describedby`.
+ *
+ * @summary Light DOM form wrapper with scoped styles for native and hx-* form elements.
  *
  * @tag hx-form
  *
  * @slot - Default slot for form fields and controls.
  *
- * @fires {CustomEvent<{valid: boolean, values: Record<string, FormDataEntryValue | FormDataEntryValue[]>}>} hx-submit - Dispatched on valid client-side submit when no action is set.
+ * @fires {CustomEvent<{valid: boolean, formData: FormData, values: Record<string, FormDataEntryValue | FormDataEntryValue[]>}>} hx-submit - Dispatched on valid client-side submit when no action is set.
  * @fires {CustomEvent<{errors: Array<{name: string, message: string}>}>} hx-invalid - Dispatched when validation fails on submit.
  * @fires {CustomEvent} hx-reset - Dispatched when the form is reset.
  *
@@ -39,7 +44,13 @@ export class HelixForm extends LitElement {
 
   // ─── Adopted Stylesheets ───
 
+  /** @internal */
   private _styles = new AdoptedStylesheetsController(this, helixFormScopedCss, document);
+
+  // ─── Reactive State ───
+
+  @state()
+  private _validationErrors: Array<{ name: string; message: string }> = [];
 
   // ─── Lifecycle ───
 
@@ -59,7 +70,7 @@ export class HelixForm extends LitElement {
 
   /**
    * The URL to submit the form to. When empty, the form handles
-   * submission client-side only and dispatches `wc-submit`.
+   * submission client-side only and dispatches `hx-submit`.
    * @attr action
    */
   @property({ type: String })
@@ -155,8 +166,8 @@ export class HelixForm extends LitElement {
   }
 
   /**
-   * Returns all child wc-* form components (elements whose tag starts
-   * with `wc-` and that have a `name` property or a `value` property).
+   * Returns all child hx-* form components that match the known
+   * form element selector list.
    */
   getFormElements(): HTMLElement[] {
     return Array.from(
@@ -180,11 +191,38 @@ export class HelixForm extends LitElement {
     );
   }
 
+  /**
+   * Programmatically sets validation errors on the form, typically from
+   * server-side validation responses. Renders an error summary with
+   * `role="alert"` and sets `aria-invalid` on matching fields.
+   */
+  setErrors(errors: Array<{ name: string; message: string }>): void {
+    this._validationErrors = errors;
+    for (const error of errors) {
+      const el = this.querySelector(`[name="${CSS.escape(error.name)}"]`) as HTMLElement | null;
+      if (el) {
+        el.setAttribute('aria-invalid', 'true');
+      }
+    }
+  }
+
+  /**
+   * Clears all validation errors and removes `aria-invalid` from all fields.
+   */
+  clearErrors(): void {
+    this._validationErrors = [];
+    const elements = this._getAllValidatableElements();
+    for (const el of elements) {
+      el.removeAttribute('aria-invalid');
+    }
+  }
+
   // ─── Private Helpers ───
 
   /**
    * Returns all elements that support constraint validation, including
-   * both native form elements and wc-* components with `checkValidity`.
+   * both native form elements and hx-* components with `checkValidity`.
+   * @internal
    */
   private _getAllValidatableElements(): HTMLElement[] {
     const native = Array.from(this.querySelectorAll<HTMLElement>('input, select, textarea'));
@@ -196,19 +234,40 @@ export class HelixForm extends LitElement {
     return [...native, ...wcElements];
   }
 
+  /**
+   * Sets `aria-invalid` on invalid fields and removes it from valid ones.
+   * @internal
+   */
+  private _syncAriaInvalid(): void {
+    const elements = this._getAllValidatableElements();
+    for (const el of elements) {
+      if ('validity' in el) {
+        const validatable = el as HTMLInputElement;
+        if (!validatable.validity.valid) {
+          validatable.setAttribute('aria-invalid', 'true');
+        } else {
+          validatable.removeAttribute('aria-invalid');
+        }
+      }
+    }
+  }
+
   // ─── Event Handling ───
 
+  /** @internal */
   private _handleSubmit = (e: Event): void => {
     // If there is an action, let native form submission happen
     if (this.action) {
       return;
     }
 
-    // Client-side only: prevent default and dispatch wc-submit or wc-invalid
+    // Client-side only: prevent default and dispatch hx-submit or hx-invalid
     e.preventDefault();
 
     if (!this.novalidate && !this.checkValidity()) {
       const errors = this._collectValidationErrors();
+      this._validationErrors = errors;
+      this._syncAriaInvalid();
 
       /**
        * Dispatched when validation fails on submit.
@@ -223,6 +282,10 @@ export class HelixForm extends LitElement {
       );
       return;
     }
+
+    // Clear previous errors on successful submit
+    this._validationErrors = [];
+    this._syncAriaInvalid();
 
     const formData = this.getFormData();
     const values: Record<string, FormDataEntryValue | FormDataEntryValue[]> = {};
@@ -243,12 +306,19 @@ export class HelixForm extends LitElement {
       new CustomEvent('hx-submit', {
         bubbles: true,
         composed: true,
-        detail: { valid: true, values },
+        detail: { valid: true, formData, values },
       }),
     );
   };
 
+  /** @internal */
   private _handleReset = (): void => {
+    this._validationErrors = [];
+    const elements = this._getAllValidatableElements();
+    for (const el of elements) {
+      el.removeAttribute('aria-invalid');
+    }
+
     /**
      * Dispatched when the form is reset.
      * @event hx-reset
@@ -261,6 +331,7 @@ export class HelixForm extends LitElement {
     );
   };
 
+  /** @internal */
   private _collectValidationErrors(): Array<{ name: string; message: string }> {
     const errors: Array<{ name: string; message: string }> = [];
     const elements = this._getAllValidatableElements();
@@ -283,8 +354,20 @@ export class HelixForm extends LitElement {
   // ─── Render ───
 
   override render() {
+    const errorSummary =
+      this._validationErrors.length > 0
+        ? html`
+            <div class="hx-form-error-summary" role="alert" aria-live="assertive">
+              <ul>
+                ${this._validationErrors.map((err) => html`<li>${err.message}</li>`)}
+              </ul>
+            </div>
+          `
+        : nothing;
+
     if (this.action) {
       return html`
+        ${errorSummary}
         <form
           action=${this.action}
           method=${this.method}
@@ -296,7 +379,7 @@ export class HelixForm extends LitElement {
       `;
     }
 
-    return html`<slot></slot>`;
+    return html`${errorSummary}<slot></slot>`;
   }
 }
 
@@ -305,6 +388,3 @@ declare global {
     'hx-form': HelixForm;
   }
 }
-
-/** @deprecated Use `HelixForm` directly. Alias for backwards compatibility with tests that import `WcForm`. */
-export type WcForm = HelixForm;
