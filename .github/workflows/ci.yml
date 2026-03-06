@@ -103,11 +103,7 @@ jobs:
     needs: changes
     if: needs.changes.outputs.source == 'true'
     runs-on: ubuntu-latest
-<<<<<<< Updated upstream
-    timeout-minutes: 20
-=======
     timeout-minutes: 30
->>>>>>> Stashed changes
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
