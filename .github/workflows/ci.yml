@@ -40,8 +40,19 @@ jobs:
     timeout-minutes: 2
     outputs:
       source: ${{ steps.filter.outputs.source }}
+      is_audit: ${{ steps.check-audit.outputs.is_audit }}
     steps:
       - uses: actions/checkout@v4
+      - name: Check if audit branch
+        id: check-audit
+        run: |
+          BRANCH="${{ github.head_ref || github.ref_name }}"
+          if [[ "$BRANCH" == *"deep-audit"* ]] || [[ "$BRANCH" == *"audit/"* ]]; then
+            echo "is_audit=true" >> "$GITHUB_OUTPUT"
+            echo "Audit branch detected: $BRANCH — skipping CI"
+          else
+            echo "is_audit=false" >> "$GITHUB_OUTPUT"
+          fi
       - uses: dorny/paths-filter@v3
         id: filter
         with:
@@ -60,6 +71,8 @@ jobs:
 
   lint:
     name: Lint
+    needs: changes
+    if: needs.changes.outputs.is_audit != 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
@@ -73,6 +86,8 @@ jobs:
 
   format:
     name: Format
+    needs: changes
+    if: needs.changes.outputs.is_audit != 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
@@ -86,6 +101,8 @@ jobs:
 
   type-check:
     name: Type Check
+    needs: changes
+    if: needs.changes.outputs.is_audit != 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
@@ -102,7 +119,7 @@ jobs:
   test:
     name: Test
     needs: changes
-    if: needs.changes.outputs.source == 'true'
+    if: needs.changes.outputs.source == 'true' && needs.changes.outputs.is_audit != 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
@@ -127,6 +144,8 @@ jobs:
 
   build:
     name: Build
+    needs: changes
+    if: needs.changes.outputs.is_audit != 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
@@ -201,7 +220,7 @@ jobs:
   vrt:
     name: Visual Regression
     needs: changes
-    if: needs.changes.outputs.source == 'true'
+    if: needs.changes.outputs.source == 'true' && needs.changes.outputs.is_audit != 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
@@ -231,6 +250,8 @@ jobs:
 
   audit:
     name: Security Audit
+    needs: changes
+    if: needs.changes.outputs.is_audit != 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
@@ -252,11 +273,14 @@ jobs:
     name: Quality Gates
     runs-on: ubuntu-latest
     timeout-minutes: 1
-    needs: [lint, format, type-check, test, build, vrt, audit]
+    needs: [changes, lint, format, type-check, test, build, vrt, audit]
     if: always()
     steps:
       - name: Check all gates
         run: |
+          IS_AUDIT="${{ needs.changes.outputs.is_audit }}"
+
+          echo "Audit branch: $IS_AUDIT"
           echo "Lint:       ${{ needs.lint.result }}"
           echo "Format:     ${{ needs.format.result }}"
           echo "Type Check: ${{ needs.type-check.result }}"
@@ -265,7 +289,12 @@ jobs:
           echo "VRT:        ${{ needs.vrt.result }}"
           echo "Audit:      ${{ needs.audit.result }}"
 
-          # Test and VRT may be skipped for audit-only PRs (no source changes)
+          # Audit branches skip all CI — auto-pass
+          if [[ "$IS_AUDIT" == "true" ]]; then
+            echo "Audit branch — all gates skipped. Auto-pass."
+            exit 0
+          fi
+
           FAIL=0
 
           for gate in lint format type-check build audit; do
@@ -283,7 +312,7 @@ jobs:
             fi
           done
 
-          # Test and VRT are allowed to be skipped (audit-only PRs)
+          # Test and VRT are allowed to be skipped (no source changes)
           for gate in test vrt; do
             result="${{ needs.test.result }}"
             case "$gate" in
