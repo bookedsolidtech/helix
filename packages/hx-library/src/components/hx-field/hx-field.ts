@@ -19,6 +19,12 @@ function isFormControl(el: Element): el is HTMLElement {
  *
  * This component is NOT form-associated — it is a pure visual layout wrapper.
  *
+ * **Accessibility:** Automatically bridges ARIA attributes onto slotted native
+ * form controls — `aria-label`, `aria-required`, `aria-invalid`, and
+ * `aria-describedby` (via a light-DOM description span). Error messages use
+ * `role="alert"` with `aria-live="polite"`. HX-prefixed custom elements are
+ * skipped since they manage their own ARIA.
+ *
  * @summary Layout wrapper for label, control, help text, and error message.
  *
  * @tag hx-field
@@ -37,6 +43,7 @@ function isFormControl(el: Element): el is HTMLElement {
  * @csspart required-indicator - The required asterisk span.
  *
  * @cssprop [--hx-field-label-color=var(--hx-color-neutral-700)] - Label color.
+ * @cssprop [--hx-field-help-text-color=var(--hx-color-neutral-500)] - Help text color.
  * @cssprop [--hx-field-error-color=var(--hx-color-error-500)] - Error color.
  * @cssprop [--hx-field-font-family=var(--hx-font-family-sans)] - Font family.
  */
@@ -91,8 +98,11 @@ export class HelixField extends LitElement {
 
   // ─── Slot Tracking ───
 
+  /** Whether the label slot has assigned elements (used to toggle default label rendering). */
   @state() private _hasLabelSlot = false;
+  /** Whether the error slot has assigned elements (used to toggle error state class). */
   @state() private _hasErrorSlot = false;
+  /** Whether the help slot has assigned elements (used to toggle help text visibility). */
   @state() private _hasHelpSlot = false;
 
   private _handleLabelSlotChange(e: Event): void {
@@ -112,9 +122,13 @@ export class HelixField extends LitElement {
 
   // ─── Unique IDs for Accessibility ───
 
+  /** Auto-generated unique ID for this field instance, used as a prefix for child element IDs. */
   private _fieldId = `hx-field-${Math.random().toString(36).slice(2, 9)}`;
+  /** ID applied to the help text container for aria-describedby association. */
   private _helpTextId = `${this._fieldId}-help`;
+  /** ID applied to the error message container for aria-describedby association. */
   private _errorId = `${this._fieldId}-error`;
+  /** ID applied to the light-DOM description span for cross-shadow-root aria-describedby. */
   private _a11yDescId = `${this._fieldId}-desc`;
 
   // ─── A11y: Slotted control tracking + light-DOM description element ───
