@@ -23,6 +23,19 @@
    ========================================================================== */
 
 /* ==========================================================================
+   Base Container
+   ========================================================================== */
+
+hx-prose {
+  display: block;
+  max-width: var(--hx-prose-max-width, 720px);
+  font-family: var(--hx-font-family-sans, sans-serif);
+  font-size: var(--hx-prose-font-size, var(--hx-font-size-md, 1rem));
+  line-height: var(--hx-prose-line-height, var(--hx-line-height-relaxed, 1.75));
+  color: var(--hx-prose-color, var(--hx-color-neutral-700, #343a40));
+}
+
+/* ==========================================================================
    Headings
    ========================================================================== */
 
@@ -130,8 +143,8 @@ hx-prose p {
   color: var(--hx-prose-color, var(--hx-color-neutral-700, #343a40));
 }
 
-/* Lead paragraph */
-hx-prose p:first-child,
+/* Lead paragraph — opt-in only via .lead class to avoid
+   unintended styling of CMS-generated first paragraphs */
 hx-prose p.lead {
   font-size: var(--hx-prose-lead-font-size, var(--hx-font-size-lg, 1.125rem));
   color: var(--hx-prose-lead-color, var(--hx-color-neutral-600, #495057));
@@ -403,7 +416,7 @@ hx-prose caption {
   font-weight: var(--hx-font-weight-medium, 500);
   color: var(--hx-color-text-muted, var(--hx-color-neutral-500, #6c757d));
   text-align: left;
-  caption-side: bottom;
+  caption-side: top;
 }
 
 hx-prose thead {
@@ -421,7 +434,6 @@ hx-prose th {
   font-weight: var(--hx-font-weight-semibold, 600);
   color: var(--hx-prose-heading-color, var(--hx-color-neutral-900, #111827));
   text-align: left;
-  white-space: nowrap;
   background-color: var(--hx-color-surface-raised, var(--hx-color-neutral-50, #f8f9fa));
 }
 
@@ -466,11 +478,11 @@ hx-prose code {
     'Cascadia Code',
     monospace
   );
-  font-size: 0.875em;
+  font-size: var(--hx-font-size-sm, 0.875em);
   font-weight: var(--hx-font-weight-normal, 400);
   background-color: var(--hx-color-surface-sunken, var(--hx-color-neutral-100, #e9ecef));
   color: var(--hx-color-error-600, #b02a37);
-  padding: 0.125em var(--hx-space-1, 0.25rem);
+  padding: var(--hx-space-px, 0.125em) var(--hx-space-1, 0.25rem);
   border-radius: var(--hx-border-radius-sm, 0.25rem);
   word-break: break-word;
 }
@@ -519,12 +531,12 @@ hx-prose kbd {
     'Cascadia Code',
     monospace
   );
-  font-size: 0.875em;
-  padding: 0.125em var(--hx-space-2, 0.5rem);
+  font-size: var(--hx-font-size-sm, 0.875em);
+  padding: var(--hx-space-px, 0.125em) var(--hx-space-2, 0.5rem);
   background-color: var(--hx-color-neutral-800, #212529);
   color: var(--hx-color-neutral-0, #ffffff);
   border-radius: var(--hx-border-radius-sm, 0.25rem);
-  box-shadow: inset 0 -1px 0 rgba(0, 0, 0, 0.25);
+  box-shadow: var(--hx-shadow-inset-sm, inset 0 -1px 0 rgba(0, 0, 0, 0.25));
 }
 
 /* Sample Output */
@@ -536,7 +548,7 @@ hx-prose samp {
     'Cascadia Code',
     monospace
   );
-  font-size: 0.875em;
+  font-size: var(--hx-font-size-sm, 0.875em);
 }
 
 /* Variable */

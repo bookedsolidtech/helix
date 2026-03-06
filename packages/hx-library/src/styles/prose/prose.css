@@ -7,12 +7,12 @@
 
    Override prose custom properties at :root or on any ancestor:
      :root {
-       --wc-prose-max-width: 720px;
-       --wc-prose-font-size: var(--wc-font-size-md, 1rem);
-       --wc-prose-line-height: var(--wc-line-height-relaxed, 1.75);
-       --wc-prose-color: var(--wc-color-neutral-700, #343a40);
-       --wc-prose-heading-color: var(--wc-color-neutral-900, #111827);
-       --wc-prose-link-color: var(--wc-color-primary-500, #2563EB);
+       --hx-prose-max-width: 720px;
+       --hx-prose-font-size: var(--hx-font-size-md, 1rem);
+       --hx-prose-line-height: var(--hx-line-height-relaxed, 1.75);
+       --hx-prose-color: var(--hx-color-neutral-700, #343a40);
+       --hx-prose-heading-color: var(--hx-color-neutral-900, #111827);
+       --hx-prose-link-color: var(--hx-color-primary-500, #2563EB);
      }
    ========================================================================== */
 

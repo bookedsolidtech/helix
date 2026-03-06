@@ -10,14 +10,14 @@ img {
   max-width: 100%;
   height: auto;
   display: block;
-  border-radius: var(--wc-border-radius-sm, 0.25rem);
+  border-radius: var(--hx-border-radius-sm, 0.25rem);
 }
 
 /* ─── Figure ─── */
 
 figure {
   margin: 0;
-  margin-bottom: var(--wc-space-6, 1.5rem);
+  margin-bottom: var(--hx-space-6, 1.5rem);
 }
 
 figure img {
@@ -29,14 +29,14 @@ figure > a {
 }
 
 figure > a img {
-  border-radius: var(--wc-border-radius-sm, 0.25rem);
+  border-radius: var(--hx-border-radius-sm, 0.25rem);
 }
 
 figcaption {
-  margin-top: var(--wc-space-2, 0.5rem);
-  font-size: var(--wc-font-size-sm, 0.875rem);
-  line-height: var(--wc-line-height-normal, 1.5);
-  color: var(--wc-color-text-muted, var(--wc-color-neutral-500, #6c757d));
+  margin-top: var(--hx-space-2, 0.5rem);
+  font-size: var(--hx-font-size-sm, 0.875rem);
+  line-height: var(--hx-line-height-normal, 1.5);
+  color: var(--hx-color-text-muted, var(--hx-color-neutral-500, #6c757d));
   font-style: italic;
 }
 
@@ -46,8 +46,8 @@ video {
   max-width: 100%;
   height: auto;
   display: block;
-  margin-bottom: var(--wc-space-6, 1.5rem);
-  border-radius: var(--wc-border-radius-sm, 0.25rem);
+  margin-bottom: var(--hx-space-6, 1.5rem);
+  border-radius: var(--hx-border-radius-sm, 0.25rem);
 }
 
 /* ─── Iframes (embedded video, maps, etc.) ─── */
@@ -55,8 +55,8 @@ video {
 iframe {
   max-width: 100%;
   border: 0;
-  margin-bottom: var(--wc-space-6, 1.5rem);
-  border-radius: var(--wc-border-radius-sm, 0.25rem);
+  margin-bottom: var(--hx-space-6, 1.5rem);
+  border-radius: var(--hx-border-radius-sm, 0.25rem);
 }
 
 /* ─── Responsive Embed Wrapper ─── */
@@ -70,8 +70,8 @@ iframe {
   padding-bottom: 56.25%; /* 16:9 aspect ratio */
   height: 0;
   overflow: hidden;
-  margin-bottom: var(--wc-space-6, 1.5rem);
-  border-radius: var(--wc-border-radius-sm, 0.25rem);
+  margin-bottom: var(--hx-space-6, 1.5rem);
+  border-radius: var(--hx-border-radius-sm, 0.25rem);
 }
 
 .embed-responsive iframe,
@@ -93,7 +93,7 @@ iframe {
 
 audio {
   width: 100%;
-  margin-bottom: var(--wc-space-6, 1.5rem);
+  margin-bottom: var(--hx-space-6, 1.5rem);
 }
 
 /* ─── Object / Embed ─── */

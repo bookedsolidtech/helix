@@ -1,7 +1,7 @@
 import { describe, it, expect, afterEach } from 'vitest';
 import { page } from '@vitest/browser/context';
 import { fixture, cleanup, checkA11y } from '../../test-utils.js';
-import type { WcProse } from './hx-prose.js';
+import type { HelixProse } from './hx-prose.js';
 import './index.js';
 
 afterEach(cleanup);
@@ -11,40 +11,65 @@ describe('hx-prose', () => {
 
   describe('Rendering', () => {
     it('renders as Light DOM (no shadowRoot)', async () => {
-      const el = await fixture<WcProse>('<hx-prose><p>Hello</p></hx-prose>');
+      const el = await fixture<HelixProse>('<hx-prose><p>Hello</p></hx-prose>');
       expect(el.shadowRoot).toBeNull();
     });
 
     it('content is accessible in light DOM', async () => {
-      const el = await fixture<WcProse>('<hx-prose><p>Accessible text</p></hx-prose>');
+      const el = await fixture<HelixProse>('<hx-prose><p>Accessible text</p></hx-prose>');
       const p = el.querySelector('p');
       expect(p).toBeTruthy();
       expect(p?.textContent).toBe('Accessible text');
     });
 
     it('displays as block', async () => {
-      const el = await fixture<WcProse>('<hx-prose><p>Content</p></hx-prose>');
-      expect(el.style.display).toBe('block');
+      const el = await fixture<HelixProse>('<hx-prose><p>Content</p></hx-prose>');
+      const computed = window.getComputedStyle(el);
+      expect(computed.display).toBe('block');
     });
   });
 
-  // ─── Properties (3) ───
+  // ─── Properties (5) ───
 
   describe('Properties', () => {
     it('size defaults to "base"', async () => {
-      const el = await fixture<WcProse>('<hx-prose><p>Text</p></hx-prose>');
+      const el = await fixture<HelixProse>('<hx-prose><p>Text</p></hx-prose>');
       expect(el.size).toBe('base');
     });
 
     it('size attribute is reflected', async () => {
-      const el = await fixture<WcProse>('<hx-prose size="sm"><p>Text</p></hx-prose>');
+      const el = await fixture<HelixProse>('<hx-prose size="sm"><p>Text</p></hx-prose>');
       expect(el.getAttribute('size')).toBe('sm');
       expect(el.size).toBe('sm');
     });
 
+    it('size="lg" sets font-size CSS custom property', async () => {
+      const el = await fixture<HelixProse>('<hx-prose size="lg"><p>Text</p></hx-prose>');
+      expect(el.size).toBe('lg');
+      const value = el.style.getPropertyValue('--hx-prose-font-size');
+      expect(value).toContain('--hx-font-size-lg');
+    });
+
     it('max-width sets inline style', async () => {
-      const el = await fixture<WcProse>('<hx-prose max-width="600px"><p>Text</p></hx-prose>');
+      const el = await fixture<HelixProse>('<hx-prose max-width="600px"><p>Text</p></hx-prose>');
       expect(el.style.maxWidth).toBe('600px');
+    });
+
+    it('clearing maxWidth removes inline style', async () => {
+      const el = await fixture<HelixProse>('<hx-prose max-width="600px"><p>Text</p></hx-prose>');
+      expect(el.style.maxWidth).toBe('600px');
+      el.maxWidth = '';
+      await el.updateComplete;
+      expect(el.style.maxWidth).toBe('');
+    });
+
+    it('dynamically updating size changes CSS custom property', async () => {
+      const el = await fixture<HelixProse>('<hx-prose><p>Text</p></hx-prose>');
+      expect(el.style.getPropertyValue('--hx-prose-font-size')).toBe('');
+      el.size = 'sm';
+      await el.updateComplete;
+      const value = el.style.getPropertyValue('--hx-prose-font-size');
+      expect(value).toContain('--hx-font-size-sm');
     });
   });
 
@@ -52,8 +77,7 @@ describe('hx-prose', () => {
 
   describe('Scoped Styles', () => {
     it('adopted stylesheet is injected into document', async () => {
-      const _el = await fixture<WcProse>('<hx-prose><p>Styled</p></hx-prose>');
-      // The AdoptedStylesheetsController injects a CSSStyleSheet into document.adoptedStyleSheets
+      const _el = await fixture<HelixProse>('<hx-prose><p>Styled</p></hx-prose>');
       const hasProseSheet = document.adoptedStyleSheets.some((sheet) => {
         try {
           const rules = Array.from(sheet.cssRules);
@@ -65,11 +89,10 @@ describe('hx-prose', () => {
       expect(hasProseSheet).toBe(true);
     });
 
-    it('styles are scoped to wc-prose', async () => {
-      const el = await fixture<WcProse>('<hx-prose><p>Scoped content</p></hx-prose>');
+    it('styles are scoped to hx-prose', async () => {
+      const el = await fixture<HelixProse>('<hx-prose><p>Scoped content</p></hx-prose>');
       const p = el.querySelector('p');
       expect(p).toBeTruthy();
-      // Verify that the prose scoped CSS uses wc-prose selectors
       const proseSheet = document.adoptedStyleSheets.find((sheet) => {
         try {
           const rules = Array.from(sheet.cssRules);
@@ -85,7 +108,7 @@ describe('hx-prose', () => {
     });
 
     it('stylesheet is removed on disconnect', async () => {
-      const el = await fixture<WcProse>('<hx-prose><p>Temp</p></hx-prose>');
+      const el = await fixture<HelixProse>('<hx-prose><p>Temp</p></hx-prose>');
       const sheetCountBefore = document.adoptedStyleSheets.filter((sheet) => {
         try {
           const rules = Array.from(sheet.cssRules);
@@ -110,42 +133,63 @@ describe('hx-prose', () => {
     });
   });
 
-  // ─── Typography (3) ───
+  // ─── Typography (5) ───
 
   describe('Typography', () => {
-    it('headings are styled', async () => {
-      const el = await fixture<WcProse>('<hx-prose><h2>My Heading</h2></hx-prose>');
+    it('headings are styled with bold weight', async () => {
+      const el = await fixture<HelixProse>('<hx-prose><h2>My Heading</h2></hx-prose>');
       const h2 = el.querySelector('h2');
       expect(h2).toBeTruthy();
       const computed = window.getComputedStyle(h2!);
-      // Headings should have bold-range font weight (>=600)
       expect(Number(computed.fontWeight)).toBeGreaterThanOrEqual(600);
     });
 
-    it('paragraphs are styled', async () => {
-      const el = await fixture<WcProse>('<hx-prose><p>Paragraph text</p></hx-prose>');
+    it('paragraphs have healthcare-appropriate line-height (>=1.5)', async () => {
+      const el = await fixture<HelixProse>('<hx-prose><p>Paragraph text</p></hx-prose>');
       const p = el.querySelector('p');
       expect(p).toBeTruthy();
       const computed = window.getComputedStyle(p!);
-      // Paragraphs should have a line-height set (relaxed ~1.75)
-      expect(parseFloat(computed.lineHeight)).toBeGreaterThan(0);
+      const fontSize = parseFloat(computed.fontSize);
+      const lineHeight = parseFloat(computed.lineHeight);
+      const ratio = lineHeight / fontSize;
+      expect(ratio).toBeGreaterThanOrEqual(1.5);
     });
 
-    it('links are styled', async () => {
-      const el = await fixture<WcProse>('<hx-prose><p><a href="#">Test link</a></p></hx-prose>');
+    it('links are styled with underline', async () => {
+      const el = await fixture<HelixProse>('<hx-prose><p><a href="#">Test link</a></p></hx-prose>');
       const link = el.querySelector('a');
       expect(link).toBeTruthy();
       const computed = window.getComputedStyle(link!);
-      // Links should have underline text decoration
       expect(computed.textDecorationLine).toContain('underline');
+    });
+
+    it('blockquotes have left border and italic style', async () => {
+      const el = await fixture<HelixProse>(
+        '<hx-prose><blockquote><p>Quote text</p></blockquote></hx-prose>',
+      );
+      const bq = el.querySelector('blockquote');
+      expect(bq).toBeTruthy();
+      const computed = window.getComputedStyle(bq!);
+      expect(computed.fontStyle).toBe('italic');
+      expect(computed.borderLeftStyle).not.toBe('none');
+    });
+
+    it('code blocks have monospace font', async () => {
+      const el = await fixture<HelixProse>(
+        '<hx-prose><pre><code>const x = 1;</code></pre></hx-prose>',
+      );
+      const pre = el.querySelector('pre');
+      expect(pre).toBeTruthy();
+      const computed = window.getComputedStyle(pre!);
+      expect(computed.fontFamily).toMatch(/mono/i);
     });
   });
 
-  // ─── Accessibility (3) ───
+  // ─── Accessibility (4) ───
 
   describe('Accessibility (axe-core)', () => {
     it('has no axe violations with heading content', async () => {
-      const el = await fixture<WcProse>(`
+      const el = await fixture<HelixProse>(`
         <hx-prose>
           <h1>Main Heading</h1>
           <p>Introduction paragraph with <a href="#">a link</a>.</p>
@@ -159,7 +203,7 @@ describe('hx-prose', () => {
     });
 
     it('has no axe violations with table content', async () => {
-      const el = await fixture<WcProse>(`
+      const el = await fixture<HelixProse>(`
         <hx-prose>
           <h2>Data Table</h2>
           <table>
@@ -179,7 +223,7 @@ describe('hx-prose', () => {
     });
 
     it('has no axe violations with list content', async () => {
-      const el = await fixture<WcProse>(`
+      const el = await fixture<HelixProse>(`
         <hx-prose>
           <h2>Procedure Steps</h2>
           <ol>
@@ -192,6 +236,19 @@ describe('hx-prose', () => {
             <li>Mask</li>
             <li>Gown</li>
           </ul>
+        </hx-prose>
+      `);
+      await page.screenshot();
+      const { violations } = await checkA11y(el);
+      expect(violations).toEqual([]);
+    });
+
+    it('has no axe violations with images that have alt text', async () => {
+      const el = await fixture<HelixProse>(`
+        <hx-prose>
+          <h2>Patient Chart</h2>
+          <img src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" alt="Patient vital signs chart">
+          <img src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" alt="">
         </hx-prose>
       `);
       await page.screenshot();
