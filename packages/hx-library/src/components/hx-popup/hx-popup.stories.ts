@@ -295,7 +295,9 @@ export const Inactive: Story = {
 export const FlipBehavior: Story = {
   name: 'Flip to Avoid Overflow',
   render: () => html`
-    <div style="padding: 2rem; display: flex; justify-content: flex-start; align-items: flex-start;">
+    <div
+      style="padding: 2rem; display: flex; justify-content: flex-start; align-items: flex-start;"
+    >
       <hx-popup active placement="top" distance="8" flip>
         <button slot="anchor" style="padding: 0.5rem 1rem;">Near top edge — flips to bottom</button>
         <div
