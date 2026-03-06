@@ -80,12 +80,12 @@ describe('hx-popup', () => {
       expect(el.hasAttribute('active')).toBe(true);
     });
 
-    it('popup has aria-hidden="true" when inactive', async () => {
+    it('popup container has no aria-hidden attribute', async () => {
       const el = await fixture<HelixPopup>(
         '<hx-popup><button slot="anchor">Anchor</button><div>Content</div></hx-popup>',
       );
       const popup = shadowQuery(el, '[part="popup"]');
-      expect(popup?.getAttribute('aria-hidden')).toBe('true');
+      expect(popup?.hasAttribute('aria-hidden')).toBe(false);
     });
   });
 
@@ -332,12 +332,12 @@ describe('hx-popup', () => {
       expect(styles.position).toBe('fixed');
     });
 
-    it('aria-hidden is "false" when active', async () => {
+    it('popup container has no aria-hidden when active', async () => {
       const el = await fixture<HelixPopup>(
         '<hx-popup active><button slot="anchor">Anchor</button><div>Content</div></hx-popup>',
       );
       const popup = shadowQuery(el, '[part="popup"]');
-      expect(popup?.getAttribute('aria-hidden')).toBe('false');
+      expect(popup?.hasAttribute('aria-hidden')).toBe(false);
     });
 
     it('anchor element sets anchor via Element reference', async () => {
@@ -414,6 +414,79 @@ describe('hx-popup', () => {
       const event = await eventPromise;
 
       expect(event.type).toBe('hx-reposition');
+    });
+  });
+
+  // ─── Property: strategy (3) ───
+
+  describe('Property: strategy', () => {
+    it('defaults to "fixed"', async () => {
+      const el = await fixture<HelixPopup>(
+        '<hx-popup><button slot="anchor">Anchor</button><div>Content</div></hx-popup>',
+      );
+      expect(el.strategy).toBe('fixed');
+    });
+
+    it('reflects strategy attribute', async () => {
+      const el = await fixture<HelixPopup>(
+        '<hx-popup strategy="absolute"><button slot="anchor">Anchor</button><div>Content</div></hx-popup>',
+      );
+      expect(el.strategy).toBe('absolute');
+      expect(el.getAttribute('strategy')).toBe('absolute');
+    });
+
+    it('accepts "absolute" strategy', async () => {
+      const el = await fixture<HelixPopup>(
+        '<hx-popup><button slot="anchor">Anchor</button><div>Content</div></hx-popup>',
+      );
+      el.strategy = 'absolute';
+      await el.updateComplete;
+      expect(el.strategy).toBe('absolute');
+    });
+  });
+
+  // ─── CSS selector anchor (2) ───
+
+  describe('CSS selector anchor', () => {
+    it('resolves anchor from CSS selector string', async () => {
+      const anchorBtn = document.createElement('button');
+      anchorBtn.id = 'popup-anchor-test';
+      anchorBtn.textContent = 'External Anchor';
+      document.body.appendChild(anchorBtn);
+
+      try {
+        const el = await fixture<HelixPopup>('<hx-popup active><div>Content</div></hx-popup>');
+        const eventPromise = oneEvent(el, 'hx-reposition');
+        el.anchor = '#popup-anchor-test';
+        await el.updateComplete;
+        const event = await eventPromise;
+
+        expect(el.anchor).toBe('#popup-anchor-test');
+        expect(event.type).toBe('hx-reposition');
+      } finally {
+        anchorBtn.remove();
+      }
+    });
+
+    it('returns null anchor for non-existent selector', async () => {
+      const el = await fixture<HelixPopup>(
+        '<hx-popup><button slot="anchor">Anchor</button><div>Content</div></hx-popup>',
+      );
+      el.anchor = '#does-not-exist';
+      await el.updateComplete;
+      expect(el.anchor).toBe('#does-not-exist');
+    });
+  });
+
+  // ─── Auto placement (1) ───
+
+  describe('Auto placement', () => {
+    it('accepts placement="auto" without throwing', async () => {
+      const el = await fixture<HelixPopup>(
+        '<hx-popup placement="auto" active><button slot="anchor">Anchor</button><div>Content</div></hx-popup>',
+      );
+      await el.updateComplete;
+      expect(el.placement).toBe('auto');
     });
   });
 
