@@ -2,7 +2,7 @@
   "category": "Uncategorized",
   "description": "Antagonistic quality review of `hx-spinner` (T1-09) **after implementation completes**.\\n\\nReview every file in `packages/hx-library/src/components/hx-spinner/` critically.\\n\\n**Audit areas:**\\n1. TypeScript — strict, size typed, label/accessible-name typed\\n2. Accessibility — `role=\\\"status\\\"` with aria-label (or aria-live region), decorative mode via aria-hidden, `prefers-reduced-motion` respected, axe-core pass\\n3. Tests — all sizes, accessible label modes, reduced motion, inline vs page-level use\\n4. Storybook — all sizes, inline/overlay variants\\n5. CSS — `--hx-*` tokens, CSS animation (prefers-reduced-motion), CSS parts\\n6. Performance — bundle < 5KB, animation is CSS only (no JS timer)\\n7. Drupal — Twig-renderable\\n\\n**Output:** Write findings to `packages/hx-library/src/components/hx-spinner/AUDIT.md` with severity (P0/P1/P2). DO NOT fix — document only. Commit AUDIT.md as your PR.",
   "title": "AUDIT: hx-spinner — T1-09 antagonistic quality review",
-  "status": "backlog",
+  "status": "done",
   "dependencies": [
     "feature-1772753034551-7gvn0bm4p"
   ],
@@ -28,6 +28,13 @@
       "to": "backlog",
       "timestamp": "2026-03-05T23:35:16.272Z",
       "reason": "Feature created"
+    },
+    {
+      "from": "backlog",
+      "to": "done",
+      "timestamp": "2026-03-06T14:13:43.841Z"
     }
-  ]
+  ],
+  "featureType": "code",
+  "completedAt": "2026-03-06T14:13:43.841Z"
 }

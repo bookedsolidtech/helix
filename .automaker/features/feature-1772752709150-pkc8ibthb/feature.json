@@ -2,7 +2,7 @@
   "category": "Uncategorized",
   "description": "Deep antagonistic quality review of `hx-search` (T2-31). 3/6 libraries. NOTE: PR #175 required.\n\nReview `packages/hx-library/src/components/hx-search/`.\n\n**Audit areas:**\n1. TypeScript — strict, `type=\"search\"` input typing, clear button typing, submit event typing\n2. Accessibility — `role=\"search\"` landmark on wrapper, input `type=\"search\"`, clear button has `aria-label`, search icon is decorative, Escape clears, Enter submits, axe-core pass\n3. Tests — typing, clear button, Escape clears, Enter submits hx-search event, form association\n4. Storybook — default, with placeholder, loading state, with results count\n5. CSS — search icon, clear button, `--hx-*` tokens, CSS parts\n6. Performance — bundle < 5KB\n7. Drupal — form GET action compatible, Twig-renderable\n\n**Output:** Write findings to `packages/hx-library/src/components/hx-search/AUDIT.md` with severity (P0/P1/P2). DO NOT fix — document only. Commit AUDIT.md as your PR.",
   "title": "AUDIT: hx-search — T2-31 antagonistic quality review",
-  "status": "backlog",
+  "status": "done",
   "complexity": "medium",
   "priority": 3,
   "source": "api",
@@ -25,6 +25,13 @@
       "to": "backlog",
       "timestamp": "2026-03-05T23:18:29.150Z",
       "reason": "Feature created"
+    },
+    {
+      "from": "backlog",
+      "to": "done",
+      "timestamp": "2026-03-06T14:12:18.620Z"
     }
-  ]
+  ],
+  "featureType": "code",
+  "completedAt": "2026-03-06T14:12:18.620Z"
 }

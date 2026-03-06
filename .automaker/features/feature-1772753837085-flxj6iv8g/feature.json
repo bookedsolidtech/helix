@@ -2,7 +2,7 @@
   "category": "Uncategorized",
   "description": "Antagonistic quality review of `hx-tile` (T3-04) **after implementation completes**.\\n\\nReview every file in `packages/hx-library/src/components/hx-tile/` critically.\\n\\n**Audit areas:**\\n1. TypeScript — strict, clickable/selectable prop typed, selected state typed, variant typed\\n2. Accessibility — if clickable: keyboard activatable, role appropriate (button or link), if selectable: aria-selected or aria-checked, focus visible, axe-core pass\\n3. Tests — clickable vs static, selectable state, hx-select event, keyboard activation, 80%+ coverage\\n4. Storybook — static, clickable, selectable variants\\n5. CSS — `--hx-*` tokens, selected state visual indicator, focus ring, CSS parts (tile, header, body, footer)\\n6. Performance — bundle < 5KB\\n7. Drupal — Twig-renderable\\n\\n**Output:** Write findings to `packages/hx-library/src/components/hx-tile/AUDIT.md` with severity (P0/P1/P2). DO NOT fix — document only. Commit AUDIT.md as your PR.",
   "title": "AUDIT: hx-tile — T3-04 antagonistic quality review",
-  "status": "backlog",
+  "status": "blocked",
   "dependencies": [
     "feature-1772753160738-6ggn0r7qz"
   ],
@@ -28,6 +28,53 @@
       "to": "backlog",
       "timestamp": "2026-03-05T23:37:17.085Z",
       "reason": "Feature created"
+    },
+    {
+      "from": "backlog",
+      "to": "in_progress",
+      "timestamp": "2026-03-06T14:43:30.209Z"
+    },
+    {
+      "from": "done",
+      "to": "review",
+      "timestamp": "2026-03-06T14:49:20.845Z"
+    },
+    {
+      "from": "review",
+      "to": "done",
+      "timestamp": "2026-03-06T14:54:04.877Z"
+    },
+    {
+      "from": "done",
+      "to": "blocked",
+      "timestamp": "2026-03-06T14:58:26.404Z",
+      "reason": "Max state transitions exceeded"
     }
-  ]
+  ],
+  "featureType": "code",
+  "model": "claude-sonnet-4-6",
+  "updatedAt": "2026-03-06T14:48:30.490Z",
+  "costUsd": 0.7026077499999999,
+  "lastSessionId": "5777b056-c25c-49c2-aa69-0c46e0f176f8",
+  "executionHistory": [
+    {
+      "id": "07d9158a-7bef-4e85-a3bb-89d96fb51e84",
+      "startedAt": "2026-03-06T14:43:30.620Z",
+      "completedAt": "2026-03-06T14:48:30.503Z",
+      "durationMs": 299883,
+      "costUsd": 0.7026077499999999,
+      "model": "claude-sonnet-4-6",
+      "success": true,
+      "trigger": "manual"
+    }
+  ],
+  "summary": "## Summary: Antagonistic Quality Review of `hx-tile` (T3-04)\n\n### Changes Implemented\n- Performed comprehensive antagonistic audit of all 5 hx-tile source files\n- Wrote findings to `packages/hx-library/src/components/hx-tile/AUDIT.md` with severity classifications\n- Committed and pushed AUDIT.md to branch\n\n### Files Modified\n- `packages/hx-library/src/components/hx-tile/AUDIT.md` (created, 324 lines)\n\n### Findings Summary\n\n**1 P0 (Critical/Blocker)**\n- P0-01: No static/non-interactive mode — every enabled tile unconditionally gets `role=\"button\"`, `aria-pressed`, click/keyboard handlers. Cannot create decorative tiles.\n\n**9 P1 (High Severity)**\n- P1-01: CSS parts mismatch — spec requires `tile, header, body, footer`; component exports `base, icon, label, description, badge`\n- P1-02: No `prefers-reduced-motion` media query — uses transition + transform animations in a healthcare context\n- P1-03: Selected state uses raw semantic tokens directly, missing `--hx-tile-selected-border-color` / `--hx-tile-selected-bg` component tokens\n- P1-04: `aria-pressed` applied to all non-link tiles regardless of intent — semantic mismatch for navigation-intent tiles\n- P1-05: Disabled-click test uses `el.click()` on host, not shadow `[part=\"base\"]` — unreliable test\n- P1-06: No keyboard test for disabled state (Enter/Space on disabled tile)\n- P1-07: No test for \"static vs clickable\" distinction (mirrors P0-01 gap)\n- P1-08: No Drupal behavior file — `hx-click` event intercepts native navigation with no consumer guidance\n- P1-09: `selected` attribute reflects on host in link mode but visual state is silently suppressed\n\n**13 P2 (Medium Severity)**\n- Duplicate test assertion, debug `page.screenshot()` artifacts in axe tests, Space key on link tiles fires `hx-click` (undocumented), hardcoded hex colors in Storybook story, NavigationGrid story misuses selectable tiles for navigation, meta render empty href, `:host` inline-block vs block mismatch, no `aria-label` support, incomplete Storybook play functions, missing Twig template, misleading variable name, missing explicit `tabindex=\"-1\"` on disabled links, hardcoded hex fallbacks in theme tokens\n\n### Risks/Blockers Encountered\n- None. All source files were readable and the audit was straightforward.\n\n### Learnings\n- The hx-tile component is fundamentally missing a \"static\" mode — this is a design-level gap that needs resolution before the component can be considered spec-complete\n- The CSS parts API doesn't match the feature spec at all (base/icon/label vs tile/header/body/footer) — implementation deviated from spec\n- The `prefers-reduced-motion` gap is a recurring pattern likely affecting other animated components in the library\n\n### Notes for Developer\n- The P0 issue (no static mode) requires an API design decision before implementation: likely a `clickable` boolean prop or an explicit `mode` enum\n- P1-01 (CSS parts) may require a spec update rather than a component change — verify the intended API before refactoring\n- P1-02 (prefers-reduced-motion) is a quick CSS fix but should be applied library-wide as a pattern\n\n### Verification Status\n- Playwright verification was not applicable to this task — the output is a documentation file (AUDIT.md), not a functional implementation.\n- `npm run verify` passed (0 errors, 0 warnings) before commit.\n- Git diff confirms only `AUDIT.md` was created; no source files were modified.",
+  "prUrl": "https://github.com/bookedsolidtech/helix/pull/323",
+  "prNumber": 323,
+  "reviewStartedAt": "2026-03-06T14:49:20.845Z",
+  "prLastPolledAt": "2026-03-06T14:53:53.217Z",
+  "prMergedAt": "2026-03-06T14:53:37Z",
+  "completedAt": "2026-03-06T14:54:04.877Z",
+  "statusChangeReason": "Max state transitions exceeded",
+  "failureCount": 1
 }

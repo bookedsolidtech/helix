@@ -2,7 +2,7 @@
   "category": "Uncategorized",
   "description": "Antagonistic quality review of `hx-progress-ring` (T2-05) **after implementation completes**.\\n\\nReview every file in `packages/hx-library/src/components/hx-progress-ring/` critically.\\n\\n**Audit areas:**\\n1. TypeScript — strict, value/max typed as numbers, size typed, label typed\\n2. Accessibility — `role=\"progressbar\"`, aria-valuenow/min/max, aria-label required, indeterminate state, axe-core pass\\n3. Tests — all values (0/50/100%), indeterminate, size variants, label display, 80%+ coverage\\n4. Storybook — determinate/indeterminate, all sizes, with/without label\\n5. CSS — `--hx-*` tokens, SVG stroke animation, CSS parts (track, fill, label)\\n6. Performance — bundle < 5KB, SVG-based (no canvas)\\n7. Drupal — Twig-renderable\\n\\n**Output:** Write findings to `packages/hx-library/src/components/hx-progress-ring/AUDIT.md` with severity (P0/P1/P2). DO NOT fix — document only. Commit AUDIT.md as your PR.",
   "title": "AUDIT: hx-progress-ring — T2-05 antagonistic quality review",
-  "status": "backlog",
+  "status": "done",
   "dependencies": [
     "feature-1772753076361-x3yt2fndh"
   ],
@@ -28,6 +28,13 @@
       "to": "backlog",
       "timestamp": "2026-03-05T23:36:04.537Z",
       "reason": "Feature created"
+    },
+    {
+      "from": "backlog",
+      "to": "done",
+      "timestamp": "2026-03-06T14:14:52.457Z"
     }
-  ]
+  ],
+  "featureType": "code",
+  "completedAt": "2026-03-06T14:14:52.457Z"
 }

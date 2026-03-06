@@ -2,7 +2,7 @@
   "category": "Uncategorized",
   "description": "Implement `hx-rating` (T3 tier) — 2/6 libraries ship this. Star rating input for user feedback and display.\n\n**Files to create** in `packages/hx-library/src/components/hx-rating/`:\n- `index.ts`, `hx-rating.ts`, `hx-rating.styles.ts`, `hx-rating.stories.ts`, `hx-rating.test.ts`\n\n**Props:** `value` (number, 0 to max), `max` (number, default 5), `precision` (0.5|1, default 1 — allow half-star ratings), `readonly` (boolean), `disabled` (boolean), `name` (string — form field), `label` (string — accessible)\n\n**Slots:** `icon` (custom rating icon, default is star)\n\n**Events:** `hx-change` (`{ value }`), `hx-hover` (`{ value }` — while hovering for preview)\n\n**CSS Parts:** `base`, `symbol` (each star/icon)\n\n**ARIA:** `role=\"radiogroup\"` with `aria-label`. Each star is `role=\"radio\"` with `aria-label=\"N star\"` and `aria-checked`. Keyboard: Arrow Left/Right change value, Home sets to 0, End sets to max. When readonly: `role=\"img\"` with `aria-label=\"Rating: N out of max\"`.\n\n**ElementInternals:** Form participant. `setFormValue(String(value))`.\n\n**Quality gates:** type-check zero errors, all tests (click to rate, keyboard, hover preview, half-star, readonly, form submission), axe-core zero violations, Storybook all modes, bundle < 3KB.\n\nRegister in `packages/hx-library/src/index.ts` and `packages/hx-library/vite.config.ts`.",
   "title": "IMPLEMENT: hx-rating — T3 Star Rating Input",
-  "status": "backlog",
+  "status": "done",
   "complexity": "small",
   "priority": 3,
   "source": "api",
@@ -25,6 +25,14 @@
       "to": "backlog",
       "timestamp": "2026-03-05T23:27:24.087Z",
       "reason": "Feature created"
+    },
+    {
+      "from": "backlog",
+      "to": "done",
+      "timestamp": "2026-03-06T14:13:23.476Z"
     }
-  ]
+  ],
+  "featureType": "code",
+  "prLastPolledAt": "2026-03-06T14:01:10.771Z",
+  "completedAt": "2026-03-06T14:13:23.476Z"
 }

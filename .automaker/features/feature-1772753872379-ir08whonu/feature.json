@@ -2,7 +2,7 @@
   "category": "Uncategorized",
   "description": "Antagonistic quality review of `hx-split-panel` (T3-08) **after implementation completes**.\\n\\nReview every file in `packages/hx-library/src/components/hx-split-panel/` critically.\\n\\n**Audit areas:**\\n1. TypeScript — strict, orientation typed (horizontal/vertical), initial size/min/max typed as numbers or percentages\\n2. Accessibility — divider has `role=\"separator\"`, aria-orientation, keyboard resizable (Arrow keys move divider), aria-valuemin/max/now for divider position, axe-core pass\\n3. Tests — drag to resize, keyboard resize, min/max constraints, snap points, panel collapse, 80%+ coverage\\n4. Storybook — horizontal/vertical, with min/max, collapsible panels\\n5. CSS — `--hx-*` tokens, resize handle styling, cursor changes, CSS parts (start-panel, end-panel, divider)\\n6. Performance — bundle < 5KB\\n7. Drupal — Twig-renderable\\n\\n**Output:** Write findings to `packages/hx-library/src/components/hx-split-panel/AUDIT.md` with severity (P0/P1/P2). DO NOT fix — document only. Commit AUDIT.md as your PR.",
   "title": "AUDIT: hx-split-panel — T3-08 antagonistic quality review",
-  "status": "backlog",
+  "status": "done",
   "dependencies": [
     "feature-1772753187808-r76bcu2nh"
   ],
@@ -28,6 +28,13 @@
       "to": "backlog",
       "timestamp": "2026-03-05T23:37:52.379Z",
       "reason": "Feature created"
+    },
+    {
+      "from": "backlog",
+      "to": "done",
+      "timestamp": "2026-03-06T14:14:59.103Z"
     }
-  ]
+  ],
+  "featureType": "code",
+  "completedAt": "2026-03-06T14:14:59.103Z"
 }

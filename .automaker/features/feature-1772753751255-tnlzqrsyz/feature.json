@@ -2,7 +2,7 @@
   "category": "Uncategorized",
   "description": "Antagonistic quality review of `hx-data-table` (T2-02) **after implementation completes**.\\n\\nReview every file in `packages/hx-library/src/components/hx-data-table/` critically.\\n\\n**Audit areas:**\\n1. TypeScript — strict, column definition typed (header, accessor, sortable, width), row data typed as generic, sort state typed\\n2. Accessibility — `role=\"table\"` with proper thead/tbody structure or ARIA equivalents, sortable column buttons with aria-sort, keyboard navigation within table (arrow keys, home/end), row selection with aria-selected, axe-core pass\\n3. Tests — sorting, filtering, pagination, selection (single/multi), empty state, loading state, 80%+ coverage\\n4. Storybook — all features demonstrated with controls\\n5. CSS — `--hx-*` tokens, sticky headers, responsive behavior, CSS parts (table, row, cell, header)\\n6. Performance — bundle < 5KB, virtual scrolling if implemented\\n7. Drupal — Twig-renderable or client-side only with clear docs\\n\\n**Output:** Write findings to `packages/hx-library/src/components/hx-data-table/AUDIT.md` with severity (P0/P1/P2). DO NOT fix — document only. Commit AUDIT.md as your PR.",
   "title": "AUDIT: hx-data-table — T2-02 antagonistic quality review",
-  "status": "backlog",
+  "status": "done",
   "dependencies": [
     "feature-1772753056299-towjxbtf2"
   ],
@@ -28,6 +28,58 @@
       "to": "backlog",
       "timestamp": "2026-03-05T23:35:51.255Z",
       "reason": "Feature created"
+    },
+    {
+      "from": "backlog",
+      "to": "in_progress",
+      "timestamp": "2026-03-06T14:33:41.488Z"
+    },
+    {
+      "from": "done",
+      "to": "review",
+      "timestamp": "2026-03-06T14:39:46.593Z"
+    },
+    {
+      "from": "review",
+      "to": "done",
+      "timestamp": "2026-03-06T14:46:25.098Z"
+    },
+    {
+      "from": "done",
+      "to": "blocked",
+      "timestamp": "2026-03-06T14:48:49.522Z",
+      "reason": "Max state transitions exceeded"
+    },
+    {
+      "from": "blocked",
+      "to": "done",
+      "timestamp": "2026-03-06T14:51:06.682Z"
     }
-  ]
+  ],
+  "featureType": "code",
+  "model": "claude-sonnet-4-6",
+  "updatedAt": "2026-03-06T14:38:55.329Z",
+  "costUsd": 0.8913570000000001,
+  "lastSessionId": "6544da13-b212-4205-a677-e2c4a7b1e851",
+  "executionHistory": [
+    {
+      "id": "464a460d-48b3-4495-aaa6-6f02e2a4d996",
+      "startedAt": "2026-03-06T14:33:41.938Z",
+      "completedAt": "2026-03-06T14:38:55.373Z",
+      "durationMs": 313435,
+      "costUsd": 0.8913570000000001,
+      "model": "claude-sonnet-4-6",
+      "success": true,
+      "trigger": "manual"
+    }
+  ],
+  "summary": "## Summary: Antagonistic quality review of `hx-data-table` (T2-02)\n\n### Changes Implemented\n- Created `packages/hx-library/src/components/hx-data-table/AUDIT.md` with 30 findings across 7 audit areas\n\n### Files Modified\n- `packages/hx-library/src/components/hx-data-table/AUDIT.md` (created, 313 lines)\n\n### Audit Findings (30 total)\n\n**P0 — Blocks merge (4 findings):**\n1. `aria-sort=\"none\"` applied to ALL `<th>` elements including non-sortable columns — violates WAI-ARIA spec\n2. Arrow-key navigation breaks when focus is inside a sort `<button>` — `shadowRoot.activeElement` returns the button but `cells` array only contains `th`/`td` elements, so `indexOf` returns -1 and navigation silently no-ops\n3. CSS part naming mismatch: spec says `row`/`cell`/`header`, implementation uses `tr`/`td`/`th` — consumer overrides against spec will not work\n4. `--hx-data-table-empty-color` JSDoc says fallback is `neutral-400` but CSS uses `neutral-600` — CEM generates wrong token defaults\n\n**P1 — Must fix before release (13 findings):**\n- Missing Home/End keyboard navigation (required by spec)\n- Skeleton rows not hidden from AT with `aria-hidden`\n- Checkbox `<th>` excluded from grid keyboard navigation\n- No filtering or pagination implemented (audit spec explicitly listed these)\n- Missing tests: ArrowDown/Up/Left/Home/End, Space selection, checkbox stopPropagation, JSON string coercion\n- CSS `min-width: 600px` hardcoded — should be a token\n- Sticky header may not work due to `:host { overflow-x: auto }` interaction\n- No pagination or virtual scrolling\n- No Drupal integration documentation\n\n**P2 — Fix before final ship (13 findings):**\n- Row type not generic; no exported sort-state type; `willUpdate` performance warn guard\n- Storybook: no controls for columns/rows, no loading slot story, no Drupal story\n- CSS: no `focus-visible` on `<td>` cells; no invalid JSON recovery test\n- Sort button label doesn't communicate current sort state; checkbox labels use positional text\n\n### Risks/Blockers Encountered\n- None — audit is documentation-only per spec\n\n### Learnings\n- `shadowRoot.activeElement` returns the actual focused element (e.g., a `<button>`), not its `<th>` ancestor — grid keyboard nav patterns must walk up the DOM to find the cell container\n- `aria-sort` must be omitted entirely from non-sortable columns, not set to `none`\n- Sticky headers require care when `:host` has any `overflow` set\n\n### Notes for Developer\n- The 4 P0 findings must be resolved before merge: `aria-sort` scope, keyboard nav focus resolution, CSS part names, and empty-color token doc\n- Filtering and pagination are not implemented at all — these are significant missing features per the feature spec\n- The JSON string coercion in `willUpdate` is the correct Drupal integration path but needs documentation\n\n### Verification Status\n- Playwright verification was not applicable to this task — it is a documentation-only audit (AUDIT.md creation). No component code was modified.\n- `npm run verify` passed (0 errors, 0 failures) before commit.",
+  "prUrl": "https://github.com/bookedsolidtech/helix/pull/306",
+  "prNumber": 306,
+  "reviewStartedAt": "2026-03-06T14:39:46.593Z",
+  "prLastPolledAt": "2026-03-06T14:45:52.666Z",
+  "prMergedAt": "2026-03-06T14:44:01Z",
+  "completedAt": "2026-03-06T14:46:25.098Z",
+  "statusChangeReason": "Max state transitions exceeded",
+  "failureCount": 1
 }

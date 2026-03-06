@@ -2,7 +2,7 @@
   "category": "Uncategorized",
   "description": "Deep antagonistic quality review of `hx-dialog` (T1-27). 6/6 libraries — highest-risk a11y component.\n\nReview every file in `packages/hx-library/src/components/hx-dialog/` critically.\n\n**Audit areas:**\n1. TypeScript — strict, modal/non-modal variants, return value typing, close reason typing\n2. Accessibility — uses native `<dialog>` element (mandatory for correct a11y), `aria-labelledby` pointing to title, `aria-describedby` pointing to content, focus trap inside when open, Escape closes, focus returns to trigger on close, backdrop click closes (optional but correct), scroll locked when open, axe-core pass\n3. Tests — open/close, Escape closes, backdrop click, focus trap (Tab/Shift+Tab cycle within), focus restoration, form inside dialog, alert dialog variant (`role=\"alertdialog\"`)\n4. Storybook — modal/non-modal, alert dialog, form dialog, with/without close button\n5. CSS — backdrop styling, `--hx-*` tokens, animation respects `prefers-reduced-motion`, CSS parts (dialog, header, body, footer, close-button)\n6. Performance — bundle < 5KB\n7. Drupal — Twig-renderable trigger, content via slots\n\n**Output:** Write findings to `packages/hx-library/src/components/hx-dialog/AUDIT.md` with severity (P0/P1/P2). DO NOT fix — document only. Commit AUDIT.md as your PR.",
   "title": "AUDIT: hx-dialog — T1-27 antagonistic quality review",
-  "status": "backlog",
+  "status": "done",
   "complexity": "large",
   "priority": 2,
   "source": "api",
@@ -25,6 +25,13 @@
       "to": "backlog",
       "timestamp": "2026-03-05T23:17:58.892Z",
       "reason": "Feature created"
+    },
+    {
+      "from": "backlog",
+      "to": "done",
+      "timestamp": "2026-03-06T14:12:14.269Z"
     }
-  ]
+  ],
+  "featureType": "code",
+  "completedAt": "2026-03-06T14:12:14.269Z"
 }

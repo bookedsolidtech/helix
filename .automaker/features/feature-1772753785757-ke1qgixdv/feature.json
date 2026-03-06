@@ -2,7 +2,7 @@
   "category": "Uncategorized",
   "description": "Antagonistic quality review of `hx-popover` (T2-08) **after implementation completes**.\\n\\nReview every file in `packages/hx-library/src/components/hx-popover/` critically.\\n\\n**Audit areas:**\\n1. TypeScript — strict, placement typed (top/bottom/left/right + start/end), trigger typed (click/hover/focus), open prop typed\\n2. Accessibility — `role=\"dialog\"` if interactive content, focus management (trap if modal-like), Escape closes, trigger aria-expanded, axe-core pass\\n3. Tests — all placements, all trigger types, Escape close, click-outside close, focus management, 80%+ coverage\\n4. Storybook — all placements, interactive content demo, trigger types\\n5. CSS — `--hx-*` tokens, arrow/caret positioning, CSS parts (content, arrow)\\n6. Performance — bundle < 5KB, uses Popover API or Floating UI\\n7. Drupal — Twig-renderable\\n\\n**Output:** Write findings to `packages/hx-library/src/components/hx-popover/AUDIT.md` with severity (P0/P1/P2). DO NOT fix — document only. Commit AUDIT.md as your PR.",
   "title": "AUDIT: hx-popover — T2-08 antagonistic quality review",
-  "status": "backlog",
+  "status": "done",
   "dependencies": [
     "feature-1772753106022-zjr4ns73h"
   ],
@@ -28,6 +28,13 @@
       "to": "backlog",
       "timestamp": "2026-03-05T23:36:25.757Z",
       "reason": "Feature created"
+    },
+    {
+      "from": "backlog",
+      "to": "done",
+      "timestamp": "2026-03-06T14:14:54.233Z"
     }
-  ]
+  ],
+  "featureType": "code",
+  "completedAt": "2026-03-06T14:14:54.233Z"
 }

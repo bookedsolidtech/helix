@@ -2,7 +2,7 @@
   "category": "Uncategorized",
   "description": "Deep antagonistic quality review of `hx-tree-view` (T2-36). 4/6 libraries — healthcare: org charts, taxonomy browsers.\n\nReview `packages/hx-library/src/components/hx-tree-view/`.\n\n**Audit areas:**\n1. TypeScript — strict, tree item typing, expand/collapse state, selected item, multi-select typing\n2. Accessibility — `role=\"tree\"` on container, `role=\"treeitem\"` on items, `aria-expanded` on expandable items, `aria-selected`, `aria-level`, keyboard (arrows navigate, Enter selects, Right expands, Left collapses/moves to parent, Home/End), axe-core pass\n3. Tests — expand/collapse, keyboard navigation (full ARIA tree pattern), selection, multi-select, async children loading\n4. Storybook — nested items, checkboxes, icons, async loading, multi-select\n5. CSS — tree indentation, expand icon, `--hx-*` tokens, CSS parts\n6. Performance — bundle < 5KB, virtualized for large trees if implemented\n7. Drupal — Twig-renderable, server-side tree structure\n\n**Output:** Write findings to `packages/hx-library/src/components/hx-tree-view/AUDIT.md` with severity (P0/P1/P2). DO NOT fix — document only. Commit AUDIT.md as your PR.",
   "title": "AUDIT: hx-tree-view — T2-36 antagonistic quality review",
-  "status": "backlog",
+  "status": "done",
   "complexity": "large",
   "priority": 3,
   "source": "api",
@@ -25,6 +25,13 @@
       "to": "backlog",
       "timestamp": "2026-03-05T23:18:57.258Z",
       "reason": "Feature created"
+    },
+    {
+      "from": "backlog",
+      "to": "done",
+      "timestamp": "2026-03-06T14:12:23.508Z"
     }
-  ]
+  ],
+  "featureType": "code",
+  "completedAt": "2026-03-06T14:12:23.508Z"
 }

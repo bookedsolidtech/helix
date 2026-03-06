@@ -2,7 +2,7 @@
   "category": "Uncategorized",
   "description": "Deep antagonistic quality review of `hx-button-group` (T1-03). 4/6 libraries ship this.\n\nReview every file in `packages/hx-library/src/components/hx-button-group/` critically.\n\n**Audit areas:**\n1. TypeScript — strict, slotted button typing, orientation prop typed\n2. Accessibility — `role=\"group\"` with accessible label, keyboard roving tabindex or sequential tab, connected borders don't affect focus visibility, axe-core pass\n3. Tests — horizontal/vertical orientation, mixed button types, disabled children, keyboard nav between buttons\n4. Storybook — orientation variants, mixed types demo\n5. CSS — shared borders between adjacent buttons, no gaps, `--hx-*` tokens, CSS parts\n6. Performance — bundle < 5KB\n7. Drupal — Twig-renderable with slotted buttons\n\n**Output:** Write findings to `packages/hx-library/src/components/hx-button-group/AUDIT.md` with severity (P0/P1/P2). DO NOT fix — document only. Commit AUDIT.md as your PR.",
   "title": "AUDIT: hx-button-group — T1-03 antagonistic quality review",
-  "status": "backlog",
+  "status": "done",
   "complexity": "medium",
   "priority": 2,
   "source": "api",
@@ -55,6 +55,11 @@
       "from": "blocked",
       "to": "backlog",
       "timestamp": "2026-03-05T23:33:57.220Z"
+    },
+    {
+      "from": "backlog",
+      "to": "done",
+      "timestamp": "2026-03-06T14:11:43.955Z"
     }
   ],
   "featureType": "code",
@@ -75,5 +80,6 @@
     }
   ],
   "summary": "## Summary: Deep antagonistic quality review of `hx-button-group` (T1-03)\n\n### Changes Implemented\n- Created `AUDIT.md` with 19 findings across 4 severity levels (2 P0, 7 P1, 6 P2, 4 P3)\n\n### Files Modified\n- `packages/hx-library/src/components/hx-button-group/AUDIT.md` (created)\n\n### Key Findings\n\n**P0-01 (Critical): `--hx-button-group-size` cascade is broken**\n`hx-button` never reads `--hx-button-group-size`. The component's core size-cascade feature is entirely non-functional. Stories mask this by manually setting `hx-size` on each child button.\n\n**P0-02 (Critical): `::slotted(:focus-within)` is an invalid CSS selector**\nThe focus-ring fix for negative-margin shared-border layout uses `::slotted(:focus-within)` — browsers silently discard this rule because `::slotted()` only accepts simple selectors. Focus rings are clipped by adjacent buttons in all browsers. This is a direct WCAG 2.4.11 violation.\n\n**Notable P1s:** Non-functional `prefers-reduced-motion` rule (can't pierce shadow DOM); `internals.ariaLabel` never asserted in tests; no keyboard navigation tests; no disabled-button tests; `label` prop missing from Storybook argTypes.\n\n### Risks/Blockers Encountered\nNone — audit only, no implementation.\n\n### Verification Status\nThis is a documentation-only PR (AUDIT.md). No Playwright verification required — the task explicitly states \"document only, do not fix.\"\n\n### Notes for Developer\nThe two P0 findings need follow-up features:\n1. Implement `--hx-button-group-size` consumption in `hx-button`, or drop the prop from the group\n2. Fix focus-ring z-index via `focusin`/`focusout` event listeners + `::slotted(.is-focused)` class toggle",
-  "failureCount": 0
+  "failureCount": 0,
+  "completedAt": "2026-03-06T14:11:43.955Z"
 }

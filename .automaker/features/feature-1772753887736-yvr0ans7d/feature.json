@@ -2,7 +2,7 @@
   "category": "Uncategorized",
   "description": "Antagonistic quality review of `hx-image` (T3-11) **after implementation completes**.\\n\\nReview every file in `packages/hx-library/src/components/hx-image/` critically.\\n\\n**Audit areas:**\\n1. TypeScript — strict, src/alt/width/height typed, loading (lazy/eager) typed, fit (cover/contain/fill) typed\\n2. Accessibility — alt text required (no empty alt unless decorative with explicit `decorative` prop), decorative images get alt=\\\"\\\", loading state announced, axe-core pass\\n3. Tests — with/without alt, decorative, lazy loading, error state (broken image fallback), aspect ratio, 80%+ coverage\\n4. Storybook — responsive, with caption, broken image fallback, lazy loading demo\\n5. CSS — `--hx-*` tokens, aspect ratio via CSS, CSS parts (img, caption, fallback)\\n6. Performance — bundle < 5KB, native lazy loading preferred over JS intersection observer\\n7. Drupal — Twig-renderable, responsive images\\n\\n**Output:** Write findings to `packages/hx-library/src/components/hx-image/AUDIT.md` with severity (P0/P1/P2). DO NOT fix — document only. Commit AUDIT.md as your PR.",
   "title": "AUDIT: hx-image — T3-11 antagonistic quality review",
-  "status": "backlog",
+  "status": "done",
   "dependencies": [
     "feature-1772753213730-vy9qey9bv"
   ],
@@ -28,6 +28,33 @@
       "to": "backlog",
       "timestamp": "2026-03-05T23:38:07.737Z",
       "reason": "Feature created"
+    },
+    {
+      "from": "backlog",
+      "to": "in_progress",
+      "timestamp": "2026-03-06T14:54:04.914Z"
     }
-  ]
+  ],
+  "featureType": "code",
+  "model": "claude-sonnet-4-6",
+  "updatedAt": "2026-03-06T14:57:23.513Z",
+  "costUsd": 0.6315387499999999,
+  "lastSessionId": "46cabcd8-b645-4920-92a9-d9e7da6510bd",
+  "executionHistory": [
+    {
+      "id": "ef8053a3-fd84-423d-88e6-ac916bb61bbd",
+      "startedAt": "2026-03-06T14:54:05.281Z",
+      "completedAt": "2026-03-06T14:57:23.526Z",
+      "durationMs": 198245,
+      "costUsd": 0.6315387499999999,
+      "model": "claude-sonnet-4-6",
+      "success": true,
+      "trigger": "manual"
+    }
+  ],
+  "summary": "## Summary: Antagonistic quality review of `hx-image` (T3-11)\n\n### Changes Implemented\n- Conducted full antagonistic review of all 5 files in `packages/hx-library/src/components/hx-image/`\n- Wrote `AUDIT.md` with 17 findings across P0/P1/P2 severity tiers\n- Committed and pushed audit doc, opened PR #332\n\n### Files Modified\n- `packages/hx-library/src/components/hx-image/AUDIT.md` (created)\n\n### Key Findings\n\n**P0 (Blocks Merge):**\n1. `alt` defaults to `''` — every `<hx-image>` with no alt is silently decorative. WCAG 1.1.1 violation; screen readers skip clinical/informative images with no warning.\n2. No `srcset`/`sizes` support — Drupal responsive image styles (the primary consumer pattern) are entirely unsupported.\n\n**P1 (Must Fix):**\n3. Caption feature entirely absent — no `<figcaption>`, no caption slot, no `caption` CSS part, no caption story. Audit spec requires all three.\n4. No ARIA live region on error/fallback container — AT users receive zero feedback on image load failure.\n5. `rounded` prop and `_computeBorderRadius` have zero test coverage.\n6. Default story `play` fn asserts `getAttribute('alt')` on a non-reflected property — always returns `null`.\n7. Duplicate CSS Parts test adds no additional coverage over existing Rendering test.\n\n**P2 (10 issues):** `inline-block` host default, missing tests for `ratio`/`fit`/`width`/`height`, no `decorative` prop, `rounded` Lit type mismatch, properties not reflected to attributes, error container collapses without height, missing lazy/responsive stories.\n\n### Verification Status\n- Audit-only PR: no code changes. No Playwright verification required (no behavior changed).\n- `git diff --stat` confirms only `AUDIT.md` added.\n\n### Notes for Developer\n- The P0-01 alt default issue is the most impactful finding — it's a single-character fix (`alt = ''` → no default, or require alt) but the implications are large. Every existing consumer using `<hx-image>` without explicit `alt` is shipping inaccessible images.\n- The caption feature (P1-01) will require a `<figure>`/`<figcaption>` refactor of the render tree, a new slot, and a new CSS part — scope this as a separate feature.",
+  "prUrl": "https://github.com/bookedsolidtech/helix/pull/332",
+  "prNumber": 332,
+  "prTrackedSince": "2026-03-06T14:58:06.405Z",
+  "prLastPolledAt": "2026-03-06T14:59:53.821Z"
 }
