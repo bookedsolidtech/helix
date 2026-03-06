@@ -120,6 +120,18 @@ describe('hx-button-group', () => {
       const computed = getComputedStyle(el);
       expect(computed.getPropertyValue('--hx-button-group-size').trim()).toBe('lg');
     });
+
+    it('updates --hx-button-group-size when size changes dynamically', async () => {
+      const el = await fixture<HelixButtonGroup>(`
+        <hx-button-group hx-size="sm">
+          <hx-button variant="secondary">Button</hx-button>
+        </hx-button-group>
+      `);
+      el.size = 'lg';
+      await el.updateComplete;
+      const computed = getComputedStyle(el);
+      expect(computed.getPropertyValue('--hx-button-group-size').trim()).toBe('lg');
+    });
   });
 
   // ─── CSS: Single Button (1) ───
@@ -155,6 +167,30 @@ describe('hx-button-group', () => {
         </hx-button-group>
       `);
       expect(el.label).toBe('Form actions');
+    });
+
+    it('updates ariaLabel when label changes dynamically', async () => {
+      const el = await fixture<HelixButtonGroup>(`
+        <hx-button-group label="Initial label">
+          <hx-button variant="secondary">Button</hx-button>
+        </hx-button-group>
+      `);
+      expect(el.label).toBe('Initial label');
+
+      el.label = 'Updated label';
+      await el.updateComplete;
+      expect(el.label).toBe('Updated label');
+    });
+
+    it('clears ariaLabel when label is set to empty string', async () => {
+      const el = await fixture<HelixButtonGroup>(`
+        <hx-button-group label="Some label">
+          <hx-button variant="secondary">Button</hx-button>
+        </hx-button-group>
+      `);
+      el.label = '';
+      await el.updateComplete;
+      expect(el.label).toBe('');
     });
   });
 
