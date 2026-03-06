@@ -37,7 +37,7 @@ const meta = {
       table: {
         category: 'Value',
         defaultValue: { summary: '1' },
-        type: { summary: "'0.5' | '1'" },
+        type: { summary: '0.5 | 1' },
       },
     },
     readonly: {
@@ -108,7 +108,8 @@ export const Default: Story = {
   `,
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    const rating = canvas.getByShadowRole?.('radiogroup') ?? canvasElement.querySelector('hx-rating');
+    const rating =
+      canvas.getByShadowRole?.('radiogroup') ?? canvasElement.querySelector('hx-rating');
     expect(rating).toBeTruthy();
   },
 };
@@ -118,11 +119,7 @@ export const WithValue: Story = {
     value: 3,
   },
   render: (args) => html`
-    <hx-rating
-      value="${args.value}"
-      max="${args.max}"
-      label="${args.label}"
-    ></hx-rating>
+    <hx-rating value="${args.value}" max="${args.max}" label="${args.label}"></hx-rating>
   `,
 };
 
@@ -194,11 +191,7 @@ export const MaxTen: Story = {
     max: 10,
   },
   render: (args) => html`
-    <hx-rating
-      value="${args.value}"
-      max="${args.max}"
-      label="${args.label}"
-    ></hx-rating>
+    <hx-rating value="${args.value}" max="${args.max}" label="${args.label}"></hx-rating>
   `,
 };
 
@@ -212,11 +205,7 @@ export const FormParticipation: Story = {
         alert('Rating submitted: ' + data.get('product-rating'));
       }}"
     >
-      <hx-rating
-        name="product-rating"
-        value="0"
-        label="Rate this product"
-      ></hx-rating>
+      <hx-rating name="product-rating" value="0" label="Rate this product"></hx-rating>
       <button type="submit" style="margin-left: 1rem;">Submit</button>
     </form>
   `,

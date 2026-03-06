@@ -1,6 +1,13 @@
 import { describe, it, expect, afterEach } from 'vitest';
 import { page } from '@vitest/browser/context';
-import { fixture, shadowQuery, shadowQueryAll, oneEvent, cleanup, checkA11y } from '../../test-utils.js';
+import {
+  fixture,
+  shadowQuery,
+  shadowQueryAll,
+  oneEvent,
+  cleanup,
+  checkA11y,
+} from '../../test-utils.js';
 import { HelixRating } from './hx-rating.js';
 import './index.js';
 
@@ -81,7 +88,9 @@ describe('hx-rating', () => {
     it('does not fire hx-change when readonly and clicked', async () => {
       const el = await fixture<HelixRating>('<hx-rating value="2" readonly></hx-rating>');
       let fired = false;
-      el.addEventListener('hx-change', () => { fired = true; });
+      el.addEventListener('hx-change', () => {
+        fired = true;
+      });
       const symbol = shadowQuery<HTMLElement>(el, '[part="symbol"]');
       symbol?.click();
       await el.updateComplete;
@@ -106,7 +115,9 @@ describe('hx-rating', () => {
     it('does not fire hx-change when disabled and clicked', async () => {
       const el = await fixture<HelixRating>('<hx-rating value="2" disabled></hx-rating>');
       let fired = false;
-      el.addEventListener('hx-change', () => { fired = true; });
+      el.addEventListener('hx-change', () => {
+        fired = true;
+      });
       const symbol = shadowQuery<HTMLElement>(el, '[part="symbol"]');
       symbol?.click();
       await el.updateComplete;
@@ -226,27 +237,21 @@ describe('hx-rating', () => {
   // ─── Hover Preview (2) ───
 
   describe('Hover Preview', () => {
-    it('fires hx-hover event on mouseenter', async () => {
+    it('fires hx-hover with correct value on mouseenter', async () => {
       const el = await fixture<HelixRating>('<hx-rating max="5"></hx-rating>');
       const eventPromise = oneEvent<CustomEvent<{ value: number }>>(el, 'hx-hover');
       const symbols = shadowQueryAll<HTMLElement>(el, '[part="symbol"]');
-      const rect = { left: 0, width: 24, top: 0, height: 24, right: 24, bottom: 24 } as DOMRect;
-      const mockEvent = new MouseEvent('mouseenter', {
-        bubbles: true,
-        clientX: 20,
-      });
-      Object.defineProperty(mockEvent, 'currentTarget', { value: { getBoundingClientRect: () => rect } });
-      symbols[1]?.dispatchEvent(new MouseEvent('mouseenter', { bubbles: true, clientX: 40 }));
-      // Fire via the actual handler
-      el.dispatchEvent(new CustomEvent('hx-hover', { detail: { value: 2 }, bubbles: true, composed: true }));
+      // Dispatch mouseenter on 3rd star (precision=1, so _resolveValue returns i=3)
+      symbols[2]?.dispatchEvent(new MouseEvent('mouseenter', { bubbles: true, composed: true }));
       const event = await eventPromise;
-      expect(event.detail.value).toBeDefined();
+      expect(event.detail.value).toBe(3);
     });
 
     it('hx-hover bubbles and is composed', async () => {
       const el = await fixture<HelixRating>('<hx-rating max="5"></hx-rating>');
       const eventPromise = oneEvent<CustomEvent>(el, 'hx-hover');
-      el.dispatchEvent(new CustomEvent('hx-hover', { bubbles: true, composed: true, detail: { value: 3 } }));
+      const symbols = shadowQueryAll<HTMLElement>(el, '[part="symbol"]');
+      symbols[0]?.dispatchEvent(new MouseEvent('mouseenter', { bubbles: true, composed: true }));
       const event = await eventPromise;
       expect(event.bubbles).toBe(true);
       expect(event.composed).toBe(true);
