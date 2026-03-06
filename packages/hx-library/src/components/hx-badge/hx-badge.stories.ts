@@ -14,14 +14,13 @@ const meta = {
   argTypes: {
     variant: {
       control: { type: 'select' },
-      options: ['primary', 'secondary', 'success', 'warning', 'danger', 'error', 'neutral', 'info'],
+      options: ['primary', 'secondary', 'success', 'warning', 'error', 'neutral', 'info'],
       description: 'Visual style variant that determines the badge color scheme.',
       table: {
         category: 'Visual',
         defaultValue: { summary: 'primary' },
         type: {
-          summary:
-            "'primary' | 'secondary' | 'success' | 'warning' | 'danger' | 'error' | 'neutral' | 'info'",
+          summary: "'primary' | 'secondary' | 'success' | 'warning' | 'error' | 'neutral' | 'info'",
         },
       },
     },
@@ -201,19 +200,6 @@ export const Secondary: Story = {
   },
 };
 
-/** Danger variant for destructive actions and high-risk clinical conditions. */
-export const Danger: Story = {
-  args: {
-    variant: 'danger',
-    label: 'Do Not Administer',
-  },
-  play: async ({ canvasElement }) => {
-    const badge = canvasElement.querySelector('hx-badge');
-    const span = badge?.shadowRoot?.querySelector('span');
-    await expect(span?.classList.contains('badge--danger')).toBe(true);
-  },
-};
-
 /** Info variant for neutral informational notices and guidance messages. */
 export const Info: Story = {
   args: {
@@ -301,6 +287,26 @@ export const Pulsing: Story = {
   },
 };
 
+/** Count mode with max truncation for notification counts. */
+export const CountWithMax: Story = {
+  render: () => html`
+    <div style="display: flex; gap: 0.75rem; align-items: center;">
+      <hx-badge variant="error" pill count=${5} max=${99}>5</hx-badge>
+      <hx-badge variant="error" pill count=${42} max=${99}>42</hx-badge>
+      <hx-badge variant="error" pill count=${100} max=${99}>99+</hx-badge>
+      <hx-badge variant="error" pill count=${999} max=${99}>999</hx-badge>
+      <hx-badge variant="primary" pill count=${3}>3</hx-badge>
+    </div>
+  `,
+  play: async ({ canvasElement }) => {
+    const badges = canvasElement.querySelectorAll('hx-badge');
+    await expect(badges.length).toBe(5);
+
+    const third = badges[2].shadowRoot?.querySelector('.badge__count');
+    await expect(third?.textContent).toBe('99+');
+  },
+};
+
 /** Dot indicator: an empty badge with pulse renders as a small notification dot. */
 export const DotIndicator: Story = {
   render: () => html`
@@ -313,6 +319,7 @@ export const DotIndicator: Story = {
         <hx-badge
           variant="error"
           pulse
+          aria-label="New messages"
           style="position: absolute; top: -4px; right: -10px;"
         ></hx-badge>
       </div>
@@ -324,6 +331,7 @@ export const DotIndicator: Story = {
         <hx-badge
           variant="success"
           pulse
+          aria-label="New lab results"
           style="position: absolute; top: -4px; right: -10px;"
         ></hx-badge>
       </div>
@@ -335,6 +343,7 @@ export const DotIndicator: Story = {
         <hx-badge
           variant="warning"
           pulse
+          aria-label="New orders"
           style="position: absolute; top: -4px; right: -10px;"
         ></hx-badge>
       </div>
@@ -346,6 +355,7 @@ export const DotIndicator: Story = {
         <hx-badge
           variant="primary"
           pulse
+          aria-label="New alerts"
           style="position: absolute; top: -4px; right: -10px;"
         ></hx-badge>
       </div>
@@ -375,7 +385,6 @@ export const AllVariants: Story = {
       <hx-badge variant="secondary">Secondary</hx-badge>
       <hx-badge variant="success">Success</hx-badge>
       <hx-badge variant="warning">Warning</hx-badge>
-      <hx-badge variant="danger">Danger</hx-badge>
       <hx-badge variant="error">Error</hx-badge>
       <hx-badge variant="neutral">Neutral</hx-badge>
       <hx-badge variant="info">Info</hx-badge>
@@ -383,7 +392,7 @@ export const AllVariants: Story = {
   `,
   play: async ({ canvasElement }) => {
     const badges = canvasElement.querySelectorAll('hx-badge');
-    await expect(badges.length).toBe(8);
+    await expect(badges.length).toBe(7);
   },
 };
 
@@ -410,7 +419,6 @@ export const AllCombinations: Story = {
       'secondary',
       'success',
       'warning',
-      'danger',
       'error',
       'neutral',
       'info',
@@ -456,7 +464,7 @@ export const AllCombinations: Story = {
   },
   play: async ({ canvasElement }) => {
     const badges = canvasElement.querySelectorAll('hx-badge');
-    await expect(badges.length).toBe(24);
+    await expect(badges.length).toBe(21);
   },
 };
 
@@ -733,7 +741,6 @@ export const ManyBadges: Story = {
       'secondary',
       'success',
       'warning',
-      'danger',
       'error',
       'neutral',
       'info',
@@ -1261,7 +1268,6 @@ export const RemovableVariants: StoryObj<typeof meta> = {
       <hx-badge variant="secondary" removable>Secondary</hx-badge>
       <hx-badge variant="success" removable>Success</hx-badge>
       <hx-badge variant="warning" removable>Warning</hx-badge>
-      <hx-badge variant="danger" removable>Danger</hx-badge>
       <hx-badge variant="error" removable>Error</hx-badge>
       <hx-badge variant="neutral" removable>Neutral</hx-badge>
       <hx-badge variant="info" removable>Info</hx-badge>
@@ -1269,7 +1275,7 @@ export const RemovableVariants: StoryObj<typeof meta> = {
   `,
   play: async ({ canvasElement }) => {
     const badges = canvasElement.querySelectorAll('hx-badge');
-    await expect(badges.length).toBe(8);
+    await expect(badges.length).toBe(7);
 
     for (const badge of badges) {
       const removeBtn = badge.shadowRoot?.querySelector('[part="remove-button"]');
@@ -1365,21 +1371,6 @@ export const WithPrefixAllVariants: StoryObj<typeof meta> = {
         </svg>
         Review
       </hx-badge>
-      <hx-badge variant="danger">
-        <svg
-          slot="prefix"
-          viewBox="0 0 16 16"
-          width="12"
-          height="12"
-          aria-hidden="true"
-          fill="currentColor"
-        >
-          <path
-            d="M8 1a7 7 0 1 0 0 14A7 7 0 0 0 8 1zM7.25 4.5h1.5v5h-1.5v-5zm0 6.5h1.5v1.5h-1.5V11z"
-          />
-        </svg>
-        Danger
-      </hx-badge>
       <hx-badge variant="info">
         <svg
           slot="prefix"
@@ -1399,6 +1390,6 @@ export const WithPrefixAllVariants: StoryObj<typeof meta> = {
   `,
   play: async ({ canvasElement }) => {
     const badges = canvasElement.querySelectorAll('hx-badge');
-    await expect(badges.length).toBe(6);
+    await expect(badges.length).toBe(5);
   },
 };
