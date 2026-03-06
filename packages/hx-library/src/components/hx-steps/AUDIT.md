@@ -3,6 +3,7 @@
 **Date:** 2026-03-06
 **Auditor:** Antagonistic Review Agent
 **Files reviewed:**
+
 - `hx-steps.ts`
 - `hx-step.ts`
 - `hx-steps.styles.ts`
@@ -15,11 +16,11 @@
 
 ## Severity Key
 
-| Level | Meaning |
-|-------|---------|
-| **P0** | Blocks ship — functional or accessibility regression |
+| Level  | Meaning                                                                |
+| ------ | ---------------------------------------------------------------------- |
+| **P0** | Blocks ship — functional or accessibility regression                   |
 | **P1** | Must fix before merge — WCAG violation, missing feature, policy breach |
-| **P2** | Should fix — quality gap, incomplete coverage, UX concern |
+| **P2** | Should fix — quality gap, incomplete coverage, UX concern              |
 
 ---
 
@@ -92,10 +93,11 @@ WCAG 1.3.1 (Info and Relationships) and 1.4.1 (Use of Color) require non-color, 
 Every `hx-step` renders with `cursor: pointer` in CSS and a `@click` handler on the `.step` div:
 
 ```html
-<div part="base" class="step" @click=${this._handleClick}>
+<div part="base" class="step" @click="${this._handleClick}"></div>
 ```
 
 However, there is:
+
 - No `tabindex="0"` on the clickable element
 - No `keydown` handler for `Enter` or `Space`
 - No `role="button"` on the clickable div
@@ -220,8 +222,8 @@ The custom icon SVGs use `width="16" height="16"` HTML attributes. Icon sizing s
 **File:** `hx-step.styles.ts:63`, `hx-step.styles.ts:161`
 
 ```css
-height: 2px;  /* horizontal connector */
-width: 2px;   /* vertical connector */
+height: 2px; /* horizontal connector */
+width: 2px; /* vertical connector */
 ```
 
 Both connector dimensions use hardcoded `2px`. This should use a token such as `--hx-border-width` or a component-level `--hx-steps-connector-thickness` token. Per CLAUDE.md: "Never hardcode colors, spacing, or typography values. Always use tokens."
@@ -281,6 +283,7 @@ The CSS parts (`base`, `indicator`, `connector`, `label`, `description`) have no
 No automated bundle size gate is visible for `hx-steps` specifically. The inline SVG paths (checkmark + X-mark) add bytes that should be accounted for. The two-component structure (hx-steps + hx-step) means two separate bundles are possible depending on entry point splitting. The `<5KB per component min+gz` gate must be explicitly verified and documented.
 
 Estimated concern areas:
+
 - Two Lit components with shadow DOM + styles
 - Inline SVG strings in template literals (not tree-shakeable)
 - `tokenStyles` import from `@helix/tokens/lit` (shared, but still bundled per component)
@@ -300,6 +303,7 @@ No `.twig` template file exists in the component directory. Per project requirem
 **File:** (missing)
 
 The `label`, `description`, `status` attributes map to Drupal field values. Without a Twig example or README, there is no guidance on:
+
 - How to map a multi-step form's steps to `hx-step` children
 - How to handle dynamic step count
 - Which properties are managed by the parent and should not be set in Twig
@@ -314,37 +318,37 @@ The `label`, `description`, `status` attributes map to Drupal field values. With
 
 ## Summary Table
 
-| # | Area | Severity | Finding |
-|---|------|----------|---------|
-| 1 | TypeScript | P1 | Status vocabulary mismatch with spec (`pending/active` vs `upcoming/current`) |
-| 2 | TypeScript | P1 | Internal `orientation`/`size` props on `hx-step` are public reflected attributes |
-| 3 | TypeScript | P2 | No CEM `@internal` tag on internal properties; they appear in public API docs |
-| 4 | Accessibility | **P0** | `aria-current="step"` on inner indicator div, not on `role="listitem"` host |
-| 5 | Accessibility | P1 | Complete/error status not announced to screen readers (SVGs are `aria-hidden`, no fallback text) |
-| 6 | Accessibility | P1 | Interactive steps have no keyboard support (`tabindex`, `keydown`, `role="button"`) |
-| 7 | Accessibility | P1 | No `clickable`/disabled mechanism — all steps are always interactive |
-| 8 | Accessibility | P1 | `role="list"` has no accessible name enforcement or guidance |
-| 9 | Accessibility | P2 | No focus styles defined |
-| 10 | Accessibility | P2 | `active` and `complete` indicators are visually identical (color-only differentiation) |
-| 11 | Tests | P1 | No keyboard interaction tests |
-| 12 | Tests | P1 | No test for non-clickable/disabled step behavior |
-| 13 | Tests | P1 | `aria-current` test validates incorrect placement (inner div, not host) |
-| 14 | Tests | P2 | No dynamic child re-sync (slot change) test |
-| 15 | Tests | P2 | Standalone axe test uses artificial `<ul>` wrapper |
-| 16 | Tests | P2 | No explicit 80% coverage gate verification |
-| 17 | Storybook | P2 | No story demonstrating `hx-step-click` event interactivity |
-| 18 | Storybook | P2 | `Default` and `Horizontal` stories are functionally duplicative |
-| 19 | Storybook | P2 | No size + vertical combination stories |
-| 20 | Storybook | P2 | `WithCustomIcon` story uses inline `width`/`height` overriding token sizing |
-| 21 | CSS | P1 | Connector `2px` thickness hardcoded — not tokenized |
-| 22 | CSS | P1 | `cursor: pointer` unconditionally applied — no non-interactive state |
-| 23 | CSS | P2 | Hardcoded hex fallbacks violate token-only policy |
-| 24 | CSS | P2 | Missing `--hx-steps-connector-complete-color` component token |
-| 25 | CSS | P2 | No `::part()` focus-visible styles provided |
-| 26 | Performance | P2 | Bundle size unverified; inline SVGs add non-tree-shakeable bytes |
-| 27 | Drupal | P1 | No Drupal Twig template provided |
-| 28 | Drupal | P1 | No documentation on Drupal attribute mapping |
-| 29 | Drupal | P2 | `orientation`/`size` reflected on `hx-step` creates Drupal hydration risk |
+| #   | Area          | Severity | Finding                                                                                          |
+| --- | ------------- | -------- | ------------------------------------------------------------------------------------------------ |
+| 1   | TypeScript    | P1       | Status vocabulary mismatch with spec (`pending/active` vs `upcoming/current`)                    |
+| 2   | TypeScript    | P1       | Internal `orientation`/`size` props on `hx-step` are public reflected attributes                 |
+| 3   | TypeScript    | P2       | No CEM `@internal` tag on internal properties; they appear in public API docs                    |
+| 4   | Accessibility | **P0**   | `aria-current="step"` on inner indicator div, not on `role="listitem"` host                      |
+| 5   | Accessibility | P1       | Complete/error status not announced to screen readers (SVGs are `aria-hidden`, no fallback text) |
+| 6   | Accessibility | P1       | Interactive steps have no keyboard support (`tabindex`, `keydown`, `role="button"`)              |
+| 7   | Accessibility | P1       | No `clickable`/disabled mechanism — all steps are always interactive                             |
+| 8   | Accessibility | P1       | `role="list"` has no accessible name enforcement or guidance                                     |
+| 9   | Accessibility | P2       | No focus styles defined                                                                          |
+| 10  | Accessibility | P2       | `active` and `complete` indicators are visually identical (color-only differentiation)           |
+| 11  | Tests         | P1       | No keyboard interaction tests                                                                    |
+| 12  | Tests         | P1       | No test for non-clickable/disabled step behavior                                                 |
+| 13  | Tests         | P1       | `aria-current` test validates incorrect placement (inner div, not host)                          |
+| 14  | Tests         | P2       | No dynamic child re-sync (slot change) test                                                      |
+| 15  | Tests         | P2       | Standalone axe test uses artificial `<ul>` wrapper                                               |
+| 16  | Tests         | P2       | No explicit 80% coverage gate verification                                                       |
+| 17  | Storybook     | P2       | No story demonstrating `hx-step-click` event interactivity                                       |
+| 18  | Storybook     | P2       | `Default` and `Horizontal` stories are functionally duplicative                                  |
+| 19  | Storybook     | P2       | No size + vertical combination stories                                                           |
+| 20  | Storybook     | P2       | `WithCustomIcon` story uses inline `width`/`height` overriding token sizing                      |
+| 21  | CSS           | P1       | Connector `2px` thickness hardcoded — not tokenized                                              |
+| 22  | CSS           | P1       | `cursor: pointer` unconditionally applied — no non-interactive state                             |
+| 23  | CSS           | P2       | Hardcoded hex fallbacks violate token-only policy                                                |
+| 24  | CSS           | P2       | Missing `--hx-steps-connector-complete-color` component token                                    |
+| 25  | CSS           | P2       | No `::part()` focus-visible styles provided                                                      |
+| 26  | Performance   | P2       | Bundle size unverified; inline SVGs add non-tree-shakeable bytes                                 |
+| 27  | Drupal        | P1       | No Drupal Twig template provided                                                                 |
+| 28  | Drupal        | P1       | No documentation on Drupal attribute mapping                                                     |
+| 29  | Drupal        | P2       | `orientation`/`size` reflected on `hx-step` creates Drupal hydration risk                        |
 
 ---
 
