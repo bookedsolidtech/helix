@@ -100,31 +100,32 @@ describe('hx-focus-ring', () => {
       const ring = shadowQuery(el, '[part~="ring"]');
       expect(ring?.classList.contains('ring--pill')).toBe(true);
     });
+
+    it('falls back to box shape for invalid value', async () => {
+      const el = await fixture<HelixFocusRing>('<hx-focus-ring shape="invalid"></hx-focus-ring>');
+      await el.updateComplete;
+      const ring = shadowQuery(el, '[part~="ring"]');
+      expect(ring?.classList.contains('ring--box')).toBe(true);
+    });
   });
 
   // ─── Property: color/width/offset overrides ───
 
   describe('Token overrides', () => {
     it('sets --_ring-color on base when color prop is set', async () => {
-      const el = await fixture<HelixFocusRing>(
-        '<hx-focus-ring color="#ff0000"></hx-focus-ring>',
-      );
+      const el = await fixture<HelixFocusRing>('<hx-focus-ring color="#ff0000"></hx-focus-ring>');
       const base = shadowQuery<HTMLElement>(el, '[part~="base"]');
       expect(base?.style.getPropertyValue('--_ring-color')).toBe('#ff0000');
     });
 
     it('sets --_ring-width on base when width prop is set', async () => {
-      const el = await fixture<HelixFocusRing>(
-        '<hx-focus-ring width="4px"></hx-focus-ring>',
-      );
+      const el = await fixture<HelixFocusRing>('<hx-focus-ring width="4px"></hx-focus-ring>');
       const base = shadowQuery<HTMLElement>(el, '[part~="base"]');
       expect(base?.style.getPropertyValue('--_ring-width')).toBe('4px');
     });
 
     it('sets --_ring-offset on base when offset prop is set', async () => {
-      const el = await fixture<HelixFocusRing>(
-        '<hx-focus-ring offset="6px"></hx-focus-ring>',
-      );
+      const el = await fixture<HelixFocusRing>('<hx-focus-ring offset="6px"></hx-focus-ring>');
       const base = shadowQuery<HTMLElement>(el, '[part~="base"]');
       expect(base?.style.getPropertyValue('--_ring-offset')).toBe('6px');
     });
@@ -132,7 +133,57 @@ describe('hx-focus-ring', () => {
     it('does not set inline style on base when no overrides are set', async () => {
       const el = await fixture<HelixFocusRing>('<hx-focus-ring></hx-focus-ring>');
       const base = shadowQuery<HTMLElement>(el, '[part~="base"]');
-      expect(base?.getAttribute('style') ?? '').toBe('');
+      expect(base?.getAttribute('style')).toBeNull();
+    });
+  });
+
+  // ─── Focus-visible detection ───
+
+  describe('Focus-visible detection', () => {
+    it('shows ring when slotted button receives focus', async () => {
+      const el = await fixture<HelixFocusRing>(
+        '<hx-focus-ring><button>Click</button></hx-focus-ring>',
+      );
+      const button = el.querySelector('button')!;
+      button.focus();
+      await el.updateComplete;
+      const ring = shadowQuery(el, '[part~="ring"]');
+      expect(ring?.classList.contains('ring--active')).toBe(true);
+    });
+
+    it('hides ring when slotted element loses focus', async () => {
+      const el = await fixture<HelixFocusRing>(
+        '<hx-focus-ring><button>Click</button></hx-focus-ring>',
+      );
+      const button = el.querySelector('button')!;
+      button.focus();
+      await el.updateComplete;
+      button.blur();
+      await el.updateComplete;
+      const ring = shadowQuery(el, '[part~="ring"]');
+      expect(ring?.classList.contains('ring--active')).toBe(false);
+    });
+
+    it('shows ring when slotted input receives focus', async () => {
+      const el = await fixture<HelixFocusRing>(
+        '<hx-focus-ring><input type="text" /></hx-focus-ring>',
+      );
+      const input = el.querySelector('input')!;
+      input.focus();
+      await el.updateComplete;
+      const ring = shadowQuery(el, '[part~="ring"]');
+      expect(ring?.classList.contains('ring--active')).toBe(true);
+    });
+
+    it('shows ring when slotted anchor receives focus', async () => {
+      const el = await fixture<HelixFocusRing>(
+        '<hx-focus-ring><a href="#">Link</a></hx-focus-ring>',
+      );
+      const anchor = el.querySelector('a')!;
+      anchor.focus();
+      await el.updateComplete;
+      const ring = shadowQuery(el, '[part~="ring"]');
+      expect(ring?.classList.contains('ring--active')).toBe(true);
     });
   });
 
@@ -150,6 +201,22 @@ describe('hx-focus-ring', () => {
     it('has no axe violations when visible', async () => {
       const el = await fixture<HelixFocusRing>(
         '<hx-focus-ring visible><button>Click</button></hx-focus-ring>',
+      );
+      const { violations } = await checkA11y(el);
+      expect(violations).toHaveLength(0);
+    });
+
+    it('has no axe violations when wrapping an input', async () => {
+      const el = await fixture<HelixFocusRing>(
+        '<hx-focus-ring><label>Name <input type="text" /></label></hx-focus-ring>',
+      );
+      const { violations } = await checkA11y(el);
+      expect(violations).toHaveLength(0);
+    });
+
+    it('has no axe violations when wrapping a link', async () => {
+      const el = await fixture<HelixFocusRing>(
+        '<hx-focus-ring><a href="#">Learn more</a></hx-focus-ring>',
       );
       const { violations } = await checkA11y(el);
       expect(violations).toHaveLength(0);
