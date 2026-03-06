@@ -32,16 +32,16 @@ Files reviewed: `hx-menu.ts`, `hx-menu-item.ts`, `hx-menu-divider.ts`, `hx-menu.
 
 ### HIGH — Fixed
 
-| #   | Issue                                                             | Fix Applied                                                        |
-| --- | ----------------------------------------------------------------- | ------------------------------------------------------------------ |
-| H1  | `--hx-menu-shadow` CSS token undocumented in JSDoc                | Added `@cssprop` to hx-menu JSDoc                                  |
-| H2  | `--hx-menu-item-color` and `--hx-menu-item-hover-bg` undocumented | Added `@cssprop` entries to hx-menu-item JSDoc                     |
+| #   | Issue                                                             | Fix Applied                                                                                                   |
+| --- | ----------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
+| H1  | `--hx-menu-shadow` CSS token undocumented in JSDoc                | Added `@cssprop` to hx-menu JSDoc                                                                             |
+| H2  | `--hx-menu-item-color` and `--hx-menu-item-hover-bg` undocumented | Added `@cssprop` entries to hx-menu-item JSDoc                                                                |
 | H3  | No `menuitemradio` / radio type support                           | Added `type="radio"` with `menuitemradio` role and built-in mutual exclusion (unchecks siblings in same menu) |
-| H4  | Home/End keyboard navigation untested                             | Added 2 tests for Home and End key focus                           |
-| H5  | Typeahead search untested                                         | Added 2 tests (single char + multi-char buffer)                    |
-| H6  | Radio type untested                                               | Added 5 tests (role, aria-checked, click behavior, icon, mutual exclusion) |
-| H7  | Submenu `aria-haspopup` untested                                  | Added 1 test                                                       |
-| H8  | No Radio Group Storybook story                                    | Added RadioGroupItems story with mutual exclusion                  |
+| H4  | Home/End keyboard navigation untested                             | Added 2 tests for Home and End key focus                                                                      |
+| H5  | Typeahead search untested                                         | Added 2 tests (single char + multi-char buffer)                                                               |
+| H6  | Radio type untested                                               | Added 5 tests (role, aria-checked, click behavior, icon, mutual exclusion)                                    |
+| H7  | Submenu `aria-haspopup` untested                                  | Added 1 test                                                                                                  |
+| H8  | No Radio Group Storybook story                                    | Added RadioGroupItems story with mutual exclusion                                                             |
 
 ---
 
@@ -89,12 +89,12 @@ Files reviewed: `hx-menu.ts`, `hx-menu-item.ts`, `hx-menu-divider.ts`, `hx-menu.
 
 ## Gate Status
 
-| Gate                 | Status  | Notes                                                                               |
-| -------------------- | ------- | ----------------------------------------------------------------------------------- |
-| 1. TypeScript strict | PASS    | Zero errors                                                                         |
-| 2. Tests             | PASS    | 55 tests passing, new coverage for typeahead/radio/Home/End/submenu                 |
+| Gate                 | Status  | Notes                                                                                                               |
+| -------------------- | ------- | ------------------------------------------------------------------------------------------------------------------- |
+| 1. TypeScript strict | PASS    | Zero errors                                                                                                         |
+| 2. Tests             | PASS    | 55 tests passing, new coverage for typeahead/radio/Home/End/submenu                                                 |
 | 3. Accessibility     | PARTIAL | aria-haspopup fixed; M2 (roving tabindex), M3 (focus ring), M10 (loading nav announcement), M13 (aria-label) remain |
-| 4. Storybook         | PASS    | 12 stories including new RadioGroupItems                                            |
-| 5. CEM accuracy      | PASS    | All events, CSS props, and slots documented                                         |
-| 6. Bundle size       | UNKNOWN | Not measured in this audit                                                          |
-| 7. Code review       | PENDING | Requires 3-tier review                                                              |
+| 4. Storybook         | PASS    | 12 stories including new RadioGroupItems                                                                            |
+| 5. CEM accuracy      | PASS    | All events, CSS props, and slots documented                                                                         |
+| 6. Bundle size       | UNKNOWN | Not measured in this audit                                                                                          |
+| 7. Code review       | PENDING | Requires 3-tier review                                                                                              |
