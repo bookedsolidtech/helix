@@ -3,7 +3,7 @@ import { customElement, property, state, query } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { tokenStyles } from '@helix/tokens/lit';
 import { helixSplitButtonStyles } from './hx-split-button.styles.js';
-import type { HelixMenuItem } from './hx-menu-item.js';
+import type { HelixMenuItem } from '../hx-menu/hx-menu-item.js';
 
 /**
  * A split button combining a primary action button with an attached dropdown
@@ -226,9 +226,12 @@ export class HelixSplitButton extends LitElement {
   // ─── Menu Item Selection ───
 
   private _handleMenuItemSelect(e: Event): void {
-    const custom = e as CustomEvent<{ value: string; label: string }>;
+    const custom = e as CustomEvent<{ item: HelixMenuItem; value: string }>;
     this._closeMenu();
     this._triggerButton?.focus();
+
+    const item = custom.detail.item;
+    const label = item?.textContent?.trim() ?? '';
 
     /**
      * Dispatched when a menu item is selected.
@@ -238,7 +241,7 @@ export class HelixSplitButton extends LitElement {
       new CustomEvent<{ value: string; label: string }>('hx-select', {
         bubbles: true,
         composed: true,
-        detail: { value: custom.detail.value, label: custom.detail.label },
+        detail: { value: custom.detail.value, label },
       }),
     );
   }
@@ -362,7 +365,7 @@ export class HelixSplitButton extends LitElement {
           role="menu"
           aria-label="Secondary actions"
           @keydown=${this._handleMenuKeydown}
-          @hx-menu-item-select=${this._handleMenuItemSelect}
+          @hx-item-select=${this._handleMenuItemSelect}
         >
           <slot name="menu"></slot>
         </div>
