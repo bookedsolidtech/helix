@@ -90,7 +90,7 @@ describe('hx-format-date', () => {
       const el = await fixture<WcFormatDate>(`<hx-format-date lang="en-US" month="long" year="numeric" day="numeric"></hx-format-date>`);
       const dateObj = new Date(ISO_DATE);
       el.date = dateObj;
-      await (el as WcFormatDate & { updateComplete: Promise<boolean> }).updateComplete;
+      await el.updateComplete;
       const time = shadowQuery(el, 'time')!;
       expect(time.getAttribute('datetime')).toBe(dateObj.toISOString());
     });
