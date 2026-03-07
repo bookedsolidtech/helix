@@ -28,19 +28,9 @@ const meta = {
         type: { summary: 'boolean' },
       },
     },
-    unbounded: {
-      control: 'boolean',
-      description: 'When true, the ripple expands beyond the component bounds.',
-      table: {
-        category: 'Visual',
-        defaultValue: { summary: 'false' },
-        type: { summary: 'boolean' },
-      },
-    },
   },
   args: {
     disabled: false,
-    unbounded: false,
   },
 } satisfies Meta;
 
@@ -104,75 +94,7 @@ export const OnCard: Story = {
 };
 
 // ─────────────────────────────────────────────────
-// 5. UNBOUNDED — Ripple extends beyond bounds (icon buttons)
-// ─────────────────────────────────────────────────
-
-export const Unbounded: Story = {
-  render: () => html`
-    <div style="display: flex; gap: 2rem; align-items: center; padding: 2rem;">
-      <div style="text-align: center;">
-        <hx-ripple unbounded>
-          <button
-            style="width: 40px; height: 40px; border-radius: 50%; border: none; background: #e5e7eb; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1.25rem;"
-            aria-label="Settings"
-          >
-            &#9881;
-          </button>
-        </hx-ripple>
-        <div style="margin-top: 0.5rem; font-size: 0.75rem; color: #6b7280;">unbounded</div>
-      </div>
-      <div style="text-align: center;">
-        <hx-ripple>
-          <button
-            style="width: 40px; height: 40px; border-radius: 50%; border: none; background: #e5e7eb; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1.25rem;"
-            aria-label="Settings"
-          >
-            &#9881;
-          </button>
-        </hx-ripple>
-        <div style="margin-top: 0.5rem; font-size: 0.75rem; color: #6b7280;">bounded (default)</div>
-      </div>
-    </div>
-  `,
-};
-
-// ─────────────────────────────────────────────────
-// 6. ON ICON BUTTONS
-// ─────────────────────────────────────────────────
-
-export const OnIconButtons: Story = {
-  render: () => html`
-    <div style="display: flex; gap: 1rem; align-items: center;">
-      <hx-ripple unbounded>
-        <button
-          style="width: 36px; height: 36px; border-radius: 50%; border: none; background: transparent; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1.25rem;"
-          aria-label="Favorite"
-        >
-          &#9829;
-        </button>
-      </hx-ripple>
-      <hx-ripple unbounded>
-        <button
-          style="width: 36px; height: 36px; border-radius: 50%; border: none; background: transparent; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1.25rem;"
-          aria-label="Share"
-        >
-          &#8599;
-        </button>
-      </hx-ripple>
-      <hx-ripple unbounded>
-        <button
-          style="width: 36px; height: 36px; border-radius: 50%; border: none; background: transparent; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1.25rem;"
-          aria-label="More options"
-        >
-          &#8942;
-        </button>
-      </hx-ripple>
-    </div>
-  `,
-};
-
-// ─────────────────────────────────────────────────
-// 7. MULTIPLE BUTTONS
+// 5. MULTIPLE BUTTONS
 // ─────────────────────────────────────────────────
 
 export const MultipleButtons: Story = {
@@ -192,7 +114,7 @@ export const MultipleButtons: Story = {
 };
 
 // ─────────────────────────────────────────────────
-// 8. CSS CUSTOM PROPERTIES DEMO
+// 6. CSS CUSTOM PROPERTIES DEMO
 // ─────────────────────────────────────────────────
 
 export const CSSCustomProperties: Story = {
@@ -222,38 +144,6 @@ export const CSSCustomProperties: Story = {
           </hx-ripple>
         </div>
       </div>
-      <div>
-        <code style="font-size: 0.75rem; color: #6b7280;">--hx-ripple-scale: 2</code>
-        <div style="margin-top: 0.5rem;">
-          <hx-ripple style="--hx-ripple-scale: 2;">
-            <hx-button variant="primary">Small Scale Ripple</hx-button>
-          </hx-ripple>
-        </div>
-      </div>
-    </div>
-  `,
-};
-
-// ─────────────────────────────────────────────────
-// 9. REDUCED MOTION — Demonstrates prefers-reduced-motion behavior
-// ─────────────────────────────────────────────────
-
-export const ReducedMotion: Story = {
-  render: () => html`
-    <div style="display: flex; flex-direction: column; gap: 1rem; max-width: 480px;">
-      <p style="font-size: 0.875rem; color: #374151; margin: 0;">
-        When <code>prefers-reduced-motion: reduce</code> is active in your OS settings, the ripple
-        animation is completely suppressed. The component checks both the CSS media query (which
-        sets <code>animation: none</code>) and the JavaScript <code>matchMedia</code> API (which
-        prevents ripple DOM creation entirely).
-      </p>
-      <p style="font-size: 0.875rem; color: #6b7280; margin: 0;">
-        To test: enable "Reduce motion" in your OS accessibility settings, then click the button
-        below. No ripple should appear.
-      </p>
-      <hx-ripple>
-        <hx-button variant="primary">Click to Test Reduced Motion</hx-button>
-      </hx-ripple>
     </div>
   `,
 };
