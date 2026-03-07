@@ -14,6 +14,14 @@ export interface HxDataTableColumn {
 }
 
 /**
+ * Sort state exported for TypeScript consumers and CEM event types.
+ */
+export interface HxDataTableSortState {
+  key: string;
+  direction: 'asc' | 'desc';
+}
+
+/**
  * An enterprise data table with sorting, row selection, and keyboard navigation.
  *
  * @summary Enterprise data table with sorting, selection, and responsive scroll.
@@ -24,7 +32,7 @@ export interface HxDataTableColumn {
  * @slot empty - Custom empty-state content rendered when `rows` is empty and not loading.
  * @slot loading - Custom loading content rendered when `loading` is true.
  *
- * @fires {CustomEvent<{key: string, direction: 'asc' | 'desc'}>} hx-sort - Dispatched when a sortable column header is clicked.
+ * @fires {CustomEvent<HxDataTableSortState>} hx-sort - Dispatched when a sortable column header is clicked.
  * @fires {CustomEvent<{selectedRows: Record<string, unknown>[]}>} hx-select - Dispatched when row selection changes.
  * @fires {CustomEvent<{row: Record<string, unknown>, index: number}>} hx-row-click - Dispatched when a data row is clicked.
  *
@@ -43,7 +51,8 @@ export interface HxDataTableColumn {
  * @cssprop [--hx-data-table-border-color=var(--hx-color-neutral-200)] - Row border color.
  * @cssprop [--hx-data-table-row-hover-bg=var(--hx-color-neutral-50)] - Row hover background.
  * @cssprop [--hx-data-table-row-selected-bg=var(--hx-color-primary-50)] - Selected row background.
- * @cssprop [--hx-data-table-empty-color=var(--hx-color-neutral-400)] - Empty state text color.
+ * @cssprop [--hx-data-table-empty-color=var(--hx-color-neutral-600)] - Empty state text color.
+ * @cssprop [--hx-data-table-min-width=600px] - Minimum table width before horizontal scrolling.
  */
 @customElement('hx-data-table')
 export class HelixDataTable extends LitElement {
@@ -53,7 +62,7 @@ export class HelixDataTable extends LitElement {
 
   /**
    * Column definitions. Each item: `{ key, label, sortable?, width? }`.
-   * Can be set as a JS array or a JSON string.
+   * Can be set as a JS array or a JSON string (e.g., from a Drupal Twig attribute).
    * @attr columns
    */
   @property({ type: Array })
@@ -61,7 +70,7 @@ export class HelixDataTable extends LitElement {
 
   /**
    * Row data. Each item is a plain object keyed by column `key` values.
-   * Can be set as a JS array or a JSON string.
+   * Can be set as a JS array or a JSON string (e.g., from a Drupal Twig attribute).
    * @attr rows
    */
   @property({ type: Array })
@@ -109,6 +118,20 @@ export class HelixDataTable extends LitElement {
   @property({ type: Boolean, reflect: true, attribute: 'sticky-header' })
   stickyHeader = false;
 
+  /**
+   * Current page (1-based). Set to 0 or leave at default (0) to disable pagination.
+   * @attr page
+   */
+  @property({ type: Number })
+  page = 1;
+
+  /**
+   * Number of rows per page. Set to 0 to disable pagination (show all rows).
+   * @attr page-size
+   */
+  @property({ type: Number, attribute: 'page-size' })
+  pageSize = 0;
+
   // ─── Internal State ───
 
   @state()
@@ -117,7 +140,8 @@ export class HelixDataTable extends LitElement {
   // ─── Lifecycle ───
 
   override willUpdate(changed: Map<string, unknown>): void {
-    // Coerce JSON strings to arrays (e.g., from HTML attribute)
+    // Coerce JSON strings to arrays — this is the Drupal/Twig integration path.
+    // Lit does not JSON-parse array attributes automatically, so we do it here.
     if (changed.has('columns') && typeof (this.columns as unknown) === 'string') {
       try {
         this.columns = JSON.parse(this.columns as unknown as string) as HxDataTableColumn[];
@@ -132,7 +156,8 @@ export class HelixDataTable extends LitElement {
         this.rows = [];
       }
     }
-    if (this.rows.length > 500) {
+    // Only warn when rows actually changes to avoid noise on every property update.
+    if (changed.has('rows') && this.rows.length > 500) {
       console.warn(
         '[hx-data-table] Rendering more than 500 rows may impact performance. Consider server-side pagination.',
       );
@@ -147,7 +172,7 @@ export class HelixDataTable extends LitElement {
     this.sortKey = key;
     this.sortDirection = direction;
     this.dispatchEvent(
-      new CustomEvent('hx-sort', {
+      new CustomEvent<HxDataTableSortState>('hx-sort', {
         bubbles: true,
         composed: true,
         detail: { key, direction },
@@ -196,14 +221,29 @@ export class HelixDataTable extends LitElement {
   // ─── Keyboard Navigation ───
 
   private _handleKeydown(e: KeyboardEvent): void {
-    if (!['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', ' '].includes(e.key)) return;
+    if (!['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Home', 'End', ' '].includes(e.key))
+      return;
 
     const root = this.shadowRoot;
     if (!root) return;
 
     const cells = Array.from(root.querySelectorAll<HTMLElement>('[part~="td"],[part~="th"]'));
-    const focused = root.activeElement as HTMLElement | null;
+
+    // When focus is inside a child element (e.g., the sort <button> inside a <th>),
+    // shadowRoot.activeElement returns the child, not the cell. Walk up to find the cell.
+    let focused = root.activeElement as HTMLElement | null;
     if (!focused) return;
+
+    if (cells.indexOf(focused) === -1) {
+      let ancestor = focused.parentElement;
+      while (ancestor) {
+        if (cells.includes(ancestor as HTMLElement)) {
+          focused = ancestor as HTMLElement;
+          break;
+        }
+        ancestor = ancestor.parentElement;
+      }
+    }
 
     const colCount = this.columns.length + (this.selectable ? 1 : 0);
     const idx = cells.indexOf(focused);
@@ -219,6 +259,14 @@ export class HelixDataTable extends LitElement {
       target = cells[idx + colCount] ?? null;
     } else if (e.key === 'ArrowUp' && idx - colCount >= 0) {
       target = cells[idx - colCount] ?? null;
+    } else if (e.key === 'Home') {
+      // First cell of the current row
+      const rowStart = idx - (idx % colCount);
+      target = cells[rowStart] ?? null;
+    } else if (e.key === 'End') {
+      // Last cell of the current row
+      const rowEnd = Math.min(idx - (idx % colCount) + colCount - 1, cells.length - 1);
+      target = cells[rowEnd] ?? null;
     } else if (e.key === ' ' && focused.getAttribute('part')?.includes('td')) {
       // Toggle selection on Space in a data row
       const rowIdx = Number(focused.dataset['rowIndex']);
@@ -269,7 +317,7 @@ export class HelixDataTable extends LitElement {
       <tr part="tr">
         ${this.selectable
           ? html`
-              <th part="th" class="col-checkbox">
+              <th part="th" class="col-checkbox" tabindex="0">
                 <input
                   type="checkbox"
                   part="checkbox"
@@ -289,18 +337,22 @@ export class HelixDataTable extends LitElement {
               part="th"
               tabindex="0"
               style=${col.width ? `width: ${col.width}` : ''}
-              aria-sort=${this.sortKey === col.key
-                ? this.sortDirection === 'asc'
-                  ? 'ascending'
-                  : 'descending'
-                : 'none'}
+              aria-sort=${col.sortable
+                ? this.sortKey === col.key
+                  ? this.sortDirection === 'asc'
+                    ? 'ascending'
+                    : 'descending'
+                  : 'none'
+                : nothing}
             >
               ${col.sortable
                 ? html`
                     <button
                       class="sort-btn"
                       @click=${() => this._handleSort(col.key)}
-                      aria-label=${`Sort by ${col.label}`}
+                      aria-label=${this.sortKey === col.key
+                        ? `Sort by ${col.label}, currently sorted ${this.sortDirection === 'asc' ? 'ascending' : 'descending'}`
+                        : `Sort by ${col.label}`}
                     >
                       ${col.label} ${this._renderSortIcon(col.key)}
                     </button>
@@ -317,7 +369,7 @@ export class HelixDataTable extends LitElement {
     return Array.from(
       { length: 3 },
       (_, i) => html`
-        <tr part="tr" key=${i}>
+        <tr part="tr" aria-hidden="true" key=${i}>
           ${this.selectable
             ? html`<td part="td" class="col-checkbox">
                 <span class="skeleton-cell" style="width:1rem;margin:auto"></span>
@@ -347,12 +399,23 @@ export class HelixDataTable extends LitElement {
   }
 
   private _renderDataRows() {
-    return this.rows.map(
-      (row, index) => html`
+    let displayRows = this.rows;
+
+    // Client-side pagination when pageSize > 0
+    if (this.pageSize > 0) {
+      const start = (this.page - 1) * this.pageSize;
+      displayRows = this.rows.slice(start, start + this.pageSize);
+    }
+
+    return displayRows.map((row, pageIndex) => {
+      // The global row index for selection and events
+      const globalIndex =
+        this.pageSize > 0 ? (this.page - 1) * this.pageSize + pageIndex : pageIndex;
+      return html`
         <tr
           part="tr"
-          aria-selected=${this.selectable ? String(this._selectedRows.has(index)) : nothing}
-          @click=${() => this._handleRowClick(row, index)}
+          aria-selected=${this.selectable ? String(this._selectedRows.has(globalIndex)) : nothing}
+          @click=${() => this._handleRowClick(row, globalIndex)}
         >
           ${this.selectable
             ? html`
@@ -360,25 +423,25 @@ export class HelixDataTable extends LitElement {
                   <input
                     type="checkbox"
                     part="checkbox"
-                    aria-label=${`Select row ${index + 1}`}
-                    .checked=${this._selectedRows.has(index)}
+                    aria-label=${`Select row ${globalIndex + 1}`}
+                    .checked=${this._selectedRows.has(globalIndex)}
                     @click=${(e: Event) => e.stopPropagation()}
                     @change=${(e: Event) =>
-                      this._handleSelect(index, (e.target as HTMLInputElement).checked)}
+                      this._handleSelect(globalIndex, (e.target as HTMLInputElement).checked)}
                   />
                 </td>
               `
             : nothing}
           ${this.columns.map(
             (col) => html`
-              <td part="td" tabindex="-1" data-row-index=${index}>
+              <td part="td" tabindex="-1" data-row-index=${globalIndex}>
                 ${row[col.key] != null ? String(row[col.key]) : ''}
               </td>
             `,
           )}
         </tr>
-      `,
-    );
+      `;
+    });
   }
 
   // ─── Render ───
