@@ -207,17 +207,16 @@ export const DarkMode: Story = {
   name: 'Dark Mode Contrast',
   decorators: [
     (story) => html`
-      <div
-        data-theme="dark"
-        style="background: #111827; padding: 2rem; border-radius: 0.5rem;"
-      >
+      <div data-theme="dark" style="background: #111827; padding: 2rem; border-radius: 0.5rem;">
         ${story()}
       </div>
     `,
   ],
   render: () => html`
     <hx-focus-ring visible shape="box" data-theme="dark" style="margin: 0.5rem;">
-      <button style="background: #1f2937; color: #f9fafb; border: 1px solid #374151; padding: 0.5rem 1rem; border-radius: 0.375rem; cursor: pointer;">
+      <button
+        style="background: #1f2937; color: #f9fafb; border: 1px solid #374151; padding: 0.5rem 1rem; border-radius: 0.375rem; cursor: pointer;"
+      >
         Button on dark surface
       </button>
     </hx-focus-ring>

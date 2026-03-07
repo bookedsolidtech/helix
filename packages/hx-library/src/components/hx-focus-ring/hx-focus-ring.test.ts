@@ -106,25 +106,19 @@ describe('hx-focus-ring', () => {
 
   describe('Token overrides', () => {
     it('sets --_ring-color on base when color prop is set', async () => {
-      const el = await fixture<HelixFocusRing>(
-        '<hx-focus-ring color="#ff0000"></hx-focus-ring>',
-      );
+      const el = await fixture<HelixFocusRing>('<hx-focus-ring color="#ff0000"></hx-focus-ring>');
       const base = shadowQuery<HTMLElement>(el, '[part~="base"]');
       expect(base?.style.getPropertyValue('--_ring-color')).toBe('#ff0000');
     });
 
     it('sets --_ring-width on base when width prop is set', async () => {
-      const el = await fixture<HelixFocusRing>(
-        '<hx-focus-ring width="4px"></hx-focus-ring>',
-      );
+      const el = await fixture<HelixFocusRing>('<hx-focus-ring width="4px"></hx-focus-ring>');
       const base = shadowQuery<HTMLElement>(el, '[part~="base"]');
       expect(base?.style.getPropertyValue('--_ring-width')).toBe('4px');
     });
 
     it('sets --_ring-offset on base when offset prop is set', async () => {
-      const el = await fixture<HelixFocusRing>(
-        '<hx-focus-ring offset="6px"></hx-focus-ring>',
-      );
+      const el = await fixture<HelixFocusRing>('<hx-focus-ring offset="6px"></hx-focus-ring>');
       const base = shadowQuery<HTMLElement>(el, '[part~="base"]');
       expect(base?.style.getPropertyValue('--_ring-offset')).toBe('6px');
     });
