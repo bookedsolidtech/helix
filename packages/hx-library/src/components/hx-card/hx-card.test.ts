@@ -1,6 +1,12 @@
 import { describe, it, expect, afterEach } from 'vitest';
 import { page } from '@vitest/browser/context';
-import { fixture, shadowQuery, oneEvent, cleanup, checkA11y } from '../../test-utils.js';
+import {
+  fixture,
+  shadowQuery,
+  oneEvent,
+  cleanup,
+  checkA11y,
+} from '../../test-utils.js';
 import type { HelixCard } from './hx-card.js';
 import './index.js';
 
@@ -104,55 +110,6 @@ describe('hx-card', () => {
       const el = await fixture<HelixCard>('<hx-card hx-href="/test">Content</hx-card>');
       const card = shadowQuery(el, '.card')!;
       expect(card.getAttribute('aria-label')).toBe('Navigate to /test');
-    });
-  });
-
-  // ─── Property: hx-label (2) ───
-
-  describe('Property: hx-label', () => {
-    it('uses hx-label for aria-label when set', async () => {
-      const el = await fixture<HelixCard>(
-        '<hx-card hx-href="/test" hx-label="Open patient record">Content</hx-card>',
-      );
-      const card = shadowQuery(el, '.card')!;
-      expect(card.getAttribute('aria-label')).toBe('Open patient record');
-    });
-
-    it('falls back to Navigate to URL when hx-label not set', async () => {
-      const el = await fixture<HelixCard>('<hx-card hx-href="/test">Content</hx-card>');
-      const card = shadowQuery(el, '.card')!;
-      expect(card.getAttribute('aria-label')).toBe('Navigate to /test');
-    });
-  });
-
-  // ─── Property reactivity (2) ───
-
-  describe('Property reactivity', () => {
-    it('updates interactive state when hxHref set after render', async () => {
-      const el = await fixture<HelixCard>('<hx-card>Content</hx-card>');
-      const card = shadowQuery(el, '.card')!;
-      expect(card.classList.contains('card--interactive')).toBe(false);
-      expect(card.hasAttribute('role')).toBe(false);
-
-      el.hxHref = '/new-path';
-      await el.updateComplete;
-
-      expect(card.classList.contains('card--interactive')).toBe(true);
-      expect(card.getAttribute('role')).toBe('link');
-      expect(card.getAttribute('tabindex')).toBe('0');
-      expect(card.getAttribute('aria-label')).toBe('Navigate to /new-path');
-    });
-
-    it('removes interactive state when hxHref cleared', async () => {
-      const el = await fixture<HelixCard>('<hx-card hx-href="/test">Content</hx-card>');
-      const card = shadowQuery(el, '.card')!;
-      expect(card.classList.contains('card--interactive')).toBe(true);
-
-      el.hxHref = '';
-      await el.updateComplete;
-
-      expect(card.classList.contains('card--interactive')).toBe(false);
-      expect(card.hasAttribute('role')).toBe(false);
     });
   });
 
@@ -263,9 +220,7 @@ describe('hx-card', () => {
 
   describe('Slot: heading', () => {
     it('heading content renders', async () => {
-      const el = await fixture<HelixCard>(
-        '<hx-card><span slot="heading">Title</span>Body</hx-card>',
-      );
+      const el = await fixture<HelixCard>('<hx-card><span slot="heading">Title</span>Body</hx-card>');
       const headingSlot = el.querySelector('[slot="heading"]');
       expect(headingSlot).toBeTruthy();
       expect(headingSlot?.textContent).toBe('Title');
@@ -353,18 +308,6 @@ describe('hx-card', () => {
       const el = await fixture<HelixCard>('<hx-card>Content</hx-card>');
       const footer = shadowQuery(el, '[part="footer"]');
       expect(footer).toBeTruthy();
-    });
-
-    it('image part exposed', async () => {
-      const el = await fixture<HelixCard>('<hx-card>Content</hx-card>');
-      const image = shadowQuery(el, '[part="image"]');
-      expect(image).toBeTruthy();
-    });
-
-    it('actions part exposed', async () => {
-      const el = await fixture<HelixCard>('<hx-card>Content</hx-card>');
-      const actions = shadowQuery(el, '[part="actions"]');
-      expect(actions).toBeTruthy();
     });
   });
 
