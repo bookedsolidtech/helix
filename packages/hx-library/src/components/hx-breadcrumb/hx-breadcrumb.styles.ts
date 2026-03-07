@@ -29,7 +29,10 @@ export const helixBreadcrumbStyles = css`
     display: none;
   }
 
-  /* Visually hide the separator slot — used only to read text content */
+  /* Visually hide the separator slot — used only to read text content.
+   * display:none is intentional: the slot contains no interactive or focusable
+   * content. If a future change adds focusable elements to this slot, switch to
+   * visibility:hidden + position:absolute to preserve focus reachability. */
   .separator-slot {
     display: none;
   }
