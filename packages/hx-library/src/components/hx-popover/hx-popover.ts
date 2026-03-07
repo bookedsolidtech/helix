@@ -25,10 +25,6 @@ type TriggerMode = 'click' | 'hover' | 'focus' | 'manual';
 /**
  * A popover that displays rich floating content attached to a trigger element.
  *
- * The anchor element receives `aria-expanded` reflecting visibility state.
- * The popover body uses `role="dialog"` with a configurable `aria-label`.
- * Press Escape to dismiss. Clicking outside closes click-triggered popovers.
- *
  * @summary Rich floating overlay attached to a trigger element.
  *
  * @tag hx-popover
@@ -110,17 +106,8 @@ export class HelixPopover extends LitElement {
   @property({ type: Boolean, reflect: true })
   arrow = false;
 
-  /**
-   * Accessible label for the popover dialog.
-   * @attr label
-   */
-  @property({ type: String })
-  label = 'Popover';
-
-  /** @internal */
   @state() private _visible = false;
 
-  /** @internal */
   private readonly _popoverId = `hx-popover-${++_popoverCounter}`;
 
   // ─── Lifecycle ───
@@ -133,7 +120,6 @@ export class HelixPopover extends LitElement {
   override disconnectedCallback(): void {
     super.disconnectedCallback();
     this.removeEventListener('keydown', this._handleKeydown);
-    document.removeEventListener('click', this._handleOutsideClick, true);
   }
 
   override firstUpdated(): void {
@@ -188,11 +174,6 @@ export class HelixPopover extends LitElement {
     this._visible = true;
     this.open = true;
     this._updateAnchorAriaExpanded();
-    // Register outside-click on next microtask so the opening click doesn't
-    // immediately trigger it during the same event propagation cycle.
-    queueMicrotask(() => {
-      document.addEventListener('click', this._handleOutsideClick, true);
-    });
     await this.updateComplete;
     await this._updatePosition();
     this.dispatchEvent(new CustomEvent('hx-after-show', { bubbles: true, composed: true }));
@@ -204,7 +185,6 @@ export class HelixPopover extends LitElement {
     this._visible = false;
     this.open = false;
     this._updateAnchorAriaExpanded();
-    document.removeEventListener('click', this._handleOutsideClick, true);
     await this.updateComplete;
     this.dispatchEvent(new CustomEvent('hx-after-hide', { bubbles: true, composed: true }));
   }
@@ -265,23 +245,12 @@ export class HelixPopover extends LitElement {
 
   // ─── Event Handlers ───
 
-  /** @internal */
   private _handleKeydown = (e: Event): void => {
     if ((e as KeyboardEvent).key === 'Escape' && this._visible) {
       void this._hide();
     }
   };
 
-  /** @internal */
-  private _handleOutsideClick = (e: MouseEvent): void => {
-    if (this.trigger !== 'click' || !this._visible) return;
-    const path = e.composedPath();
-    if (!path.includes(this)) {
-      void this._hide();
-    }
-  };
-
-  /** @internal */
   private _handleAnchorClick = (): void => {
     if (this.trigger !== 'click') return;
     if (this._visible) {
@@ -291,25 +260,21 @@ export class HelixPopover extends LitElement {
     }
   };
 
-  /** @internal */
   private _handleAnchorMouseEnter = (): void => {
     if (this.trigger !== 'hover') return;
     void this._show();
   };
 
-  /** @internal */
   private _handleAnchorMouseLeave = (): void => {
     if (this.trigger !== 'hover') return;
     void this._hide();
   };
 
-  /** @internal */
   private _handleAnchorFocusIn = (): void => {
     if (this.trigger !== 'focus') return;
     void this._show();
   };
 
-  /** @internal */
   private _handleAnchorFocusOut = (): void => {
     if (this.trigger !== 'focus') return;
     void this._hide();
@@ -338,7 +303,7 @@ export class HelixPopover extends LitElement {
         id=${this._popoverId}
         role="dialog"
         aria-modal="false"
-        aria-label=${this.label}
+        aria-label="Popover"
         aria-hidden=${String(!this._visible)}
         class=${this._visible ? 'visible' : ''}
       >

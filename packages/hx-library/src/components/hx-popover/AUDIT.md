@@ -1,170 +1,194 @@
-# AUDIT: hx-popover — Deep Audit v2
+# AUDIT: hx-popover (T2-08) — Antagonistic Quality Review
 
 **Reviewed:** `packages/hx-library/src/components/hx-popover/`
 **Files audited:**
-
 - `hx-popover.ts`
 - `hx-popover.styles.ts`
 - `hx-popover.test.ts`
 - `hx-popover.stories.ts`
 - `index.ts`
 
-**wc-mcp Health Score:** 86/100 (B) — pre-audit
-**wc-mcp Accessibility Score:** 0/100 (F) — CEM lacks accessibility documentation
-
 ---
 
 ## Summary
 
-| Severity | Found | Fixed | Remaining |
-| -------- | ----- | ----- | --------- |
-| CRITICAL | 2     | 1     | 1         |
-| HIGH     | 7     | 3     | 4         |
-| MEDIUM   | 6     | 0     | 6         |
+| Severity | Count |
+|----------|-------|
+| P0       | 2     |
+| P1       | 7     |
+| P2       | 6     |
 
 ---
 
-## CRITICAL Issues
+## P0 — Critical (blocks merge)
 
-### P0-01: No click-outside-to-close — FIXED
+### P0-01: No click-outside-to-close
 
 **File:** `hx-popover.ts`
 
-Added `_handleOutsideClick` handler using `e.composedPath()` to detect clicks outside the component. Listener registered on `document` (capture phase) via `queueMicrotask` in `_show()`, removed in `_hide()` and `disconnectedCallback()`. Only fires when `trigger="click"`.
+The component has no document-level click listener to close the popover when the user clicks outside of it. This is a fundamental UX requirement for all popover/dropdown components. Currently, the only ways to close are: second click on the trigger, Escape key, or programmatic `open = false`.
 
-Tests added: click-outside dismiss, click-inside stays open.
+A click listener must be added on `document` (in `_show`, removed in `_hide`) that calls `_hide()` when the click target is outside the component's shadow root. Without this, users have no standard way to dismiss the popover.
 
----
-
-### P0-02: `role="dialog"` applied universally without focus management — DOCUMENTED
-
-**File:** `hx-popover.ts`
-
-`role="dialog"` is applied unconditionally. The ARIA spec requires focus to move into a dialog on open, but this implementation keeps focus on the trigger. For simple informational popovers, `role="tooltip"` may be more appropriate.
-
-**Recommendation:** Add a `role` property defaulting to `"dialog"` that allows consumers to set `"tooltip"` for non-interactive content. When `role="dialog"`, add `tabindex="-1"` to body and call `focus()` on show, restoring focus on hide.
+There is also no test coverage for click-outside behavior (because the feature is absent), which the audit description explicitly requires.
 
 ---
 
-## HIGH Issues
+### P0-02: `role="dialog"` applied universally without focus management
 
-### P1-01: `aria-label="Popover"` hardcoded — FIXED
+**File:** `hx-popover.ts`, lines 301–313
 
-**File:** `hx-popover.ts`
+`role="dialog"` is unconditionally applied to the popover body for all trigger modes and all content types. The ARIA spec requires that when a `dialog` element is opened, focus must move into it (typically to the first focusable element or the dialog container itself). This implementation does **not** move focus on show.
 
-Added `label` property (default `"Popover"`) that maps to `aria-label` on the dialog body. Consumers can now set `label="Patient details"` for meaningful screen reader announcements.
+**Consequences:**
+- Screen readers announce the element as a dialog and expect focus to transfer in, but focus stays on the trigger.
+- VoiceOver (macOS/iOS) will not automatically read the popover content.
+- AT users on click-trigger mode will hear "button, collapsed" → click → focus stays on button → popover content is invisible to them unless they manually navigate.
 
-Tests added: default label, custom label.
-
----
-
-### P1-02: Private members leaking to CEM — FIXED
-
-**File:** `hx-popover.ts`
-
-Added `@internal` JSDoc tags to all private state/handlers: `_visible`, `_popoverId`, `_handleKeydown`, `_handleOutsideClick`, `_handleAnchorClick`, `_handleAnchorMouseEnter`, `_handleAnchorMouseLeave`, `_handleAnchorFocusIn`, `_handleAnchorFocusOut`.
+**Fix options (either acceptable):**
+1. Change `role` to `tooltip` for non-interactive / informational popovers and add a `role` property allowing callers to opt into `dialog` + focus management.
+2. Add `tabindex="-1"` to the body element and call `bodyEl.focus()` inside `_show()`, then return focus to the trigger inside `_hide()`.
 
 ---
 
-### P1-03: Accessibility JSDoc missing from class description — FIXED
+## P1 — High (significant quality gap)
 
-**File:** `hx-popover.ts`
+### P1-01: `aria-label="Popover"` is hardcoded and non-descriptive
 
-Added accessibility documentation to the class JSDoc describing `aria-expanded` on anchor, `role="dialog"`, configurable `aria-label`, Escape dismiss, and click-outside dismiss.
+**File:** `hx-popover.ts`, line 306
 
----
+The dialog body has `aria-label="Popover"` hardcoded. Screen readers announce this as "Popover, dialog" — entirely useless. There is no way for the consumer to provide a meaningful label (e.g., "Patient details", "Help text for date field").
 
-### P1-04: Hidden popover body is not `inert` — DOCUMENTED
-
-**File:** `hx-popover.ts`
-
-When hidden (`aria-hidden="true"`), keyboard users can Tab into focusable elements inside the popover content. The body should receive the `inert` attribute when `_visible === false`.
+A `label` or `heading` property should be added, or the component should support `aria-labelledby` pointing to a heading in the default slot.
 
 ---
 
-### P1-05: Escape key only works when focus is on host or child — DOCUMENTED
+### P1-02: Hidden popover body is not `inert`
 
-**File:** `hx-popover.ts`
+**File:** `hx-popover.ts`, lines 301–313
 
-The `keydown` listener is on `this` (host element). If focus moves elsewhere on the page, Escape won't close the popover. The listener should be on `document` while open.
+When the popover is hidden (`aria-hidden="true"`), the body element is visually hidden via CSS (`visibility: hidden; opacity: 0`) and hidden from the AT tree via `aria-hidden`. However, it is **not** marked `inert`. This means:
+
+- Keyboard users can Tab into focusable elements inside the hidden popover content (links, buttons, form fields in the default slot).
+- This is a WCAG 2.1 AA violation under SC 2.1.1 (Keyboard) and SC 1.3.1 (Info and Relationships).
+
+The body element should receive the `inert` attribute when `_visible === false`, and it should be removed when `_visible === true`.
 
 ---
 
-### P1-06: Missing test — hover `mouseleave` hides popover — DOCUMENTED
+### P1-03: Escape key only works when focus is on the host element or a child
+
+**File:** `hx-popover.ts`, lines 117, 248–252
+
+The `keydown` listener is attached to `this` (the host element). If `trigger="click"` opens a popover and the user Tabs into content elsewhere on the page, pressing Escape will not close the popover because the event target is no longer within the component.
+
+The listener should be on `document` while the popover is open (added in `_show`, removed in `_hide`), consistent with how `role="dialog"` semantics work in production.
+
+---
+
+### P1-04: `aria-expanded` is not updated on open/close after initial setup
+
+**File:** `hx-popover.ts`, lines 158–167
+
+`_updateAnchorAriaExpanded()` is called inside `_show()` and `_hide()`, and it does update. However, there is no test verifying `aria-expanded` changes from `"false"` → `"true"` → `"false"` across the open/close cycle. The existing test (line 192–199 in the test file) only checks the initial state. A regression could easily be introduced undetected.
+
+---
+
+### P1-05: Missing test — hover `mouseleave` hides popover
 
 **File:** `hx-popover.test.ts`
 
-`mouseenter` tested, but no test for `mouseleave` closing the popover.
+The `Behavior: Show/Hide` suite tests `mouseenter` for `trigger="hover"` (line 229) but has no corresponding test for `mouseleave` closing the popover. The `_handleAnchorMouseLeave` handler exists in the implementation but is untested.
 
 ---
 
-### P1-07: Missing test — `trigger="focus"` open and close — DOCUMENTED
+### P1-06: Missing test — `trigger="focus"` open and close
 
 **File:** `hx-popover.test.ts`
 
-No tests for `trigger="focus"`. Both `focusin` and `focusout` handlers are untested.
+There are zero tests for `trigger="focus"`. The `focusin` → show and `focusout` → hide handlers exist in the implementation but have no test coverage. This leaves a whole trigger mode completely untested.
 
 ---
 
-## MEDIUM Issues (Documented — no fix applied)
+### P1-07: Missing tests for `hx-after-show` and `hx-after-hide` events
+
+**File:** `hx-popover.test.ts`
+
+The component dispatches four events: `hx-show`, `hx-after-show`, `hx-hide`, `hx-after-hide`. Only `hx-show` and `hx-hide` are tested. The "after" variants — which signal animation/transition completion — have no coverage.
+
+---
+
+## P2 — Medium (code quality / completeness)
 
 ### P2-01: Hardcoded `rgba(0,0,0,0.12)` fallback in box-shadow
 
 **File:** `hx-popover.styles.ts`, line 25
 
-Should use a design token like `var(--hx-shadow-md)` instead of a raw rgba value.
+```css
+box-shadow: var(--hx-popover-shadow, 0 4px 16px rgba(0, 0, 0, 0.12));
+```
 
-### P2-02: Arrow border clipping — wrong border side shown
+The fallback `0 4px 16px rgba(0, 0, 0, 0.12)` is a hardcoded value. The project convention (CLAUDE.md) requires: "No hardcoded values — Colors, spacing, typography, and timing use design tokens. Always." This should use `var(--hx-shadow-md)` or an equivalent token, with the raw value as the last resort only if no token exists.
 
-**File:** `hx-popover.styles.ts`, `hx-popover.ts`
+---
 
-Arrow renders all 4 border sides. The two sides facing the popover body should be transparent.
+### P2-02: Arrow border clipping — wrong border side shown for each placement
 
-### P2-03: Duplicate ARIA methods
+**File:** `hx-popover.styles.ts`, lines 39–47; `hx-popover.ts`, lines 228–243
 
-**File:** `hx-popover.ts`
+The arrow element is a rotated square (`transform: rotate(45deg)`) with a border on all four sides. When positioned against an anchor, the two border sides facing the popover body should be hidden so only the two facing outward are visible. The current implementation renders a full border on all four sides, producing a visually incorrect diamond/rhombus shape with a visible inner border line cutting through the popover body edge.
 
-`_setupAnchorAria` and `_updateAnchorAriaExpanded` can be collapsed into a single method.
+The `_updatePosition` logic sets the `staticSide` correctly but does not zero out the border on the anchor-facing sides. The arrow CSS should conditionally remove specific border sides based on placement (e.g., for `bottom` placement, the arrow points upward — `border-bottom` and `border-right` on the rotated element should be transparent).
 
-### P2-04: Storybook Placements story shows only 4 of 12 variants
+---
 
-**File:** `hx-popover.stories.ts`
+### P2-03: `_setupAnchorAria` and `_updateAnchorAriaExpanded` are duplicate logic
 
-Only cardinal directions shown. All 12 placement variants should be demonstrated.
+**File:** `hx-popover.ts`, lines 145–167
 
-### P2-05: `display: inline-block` + `position: relative` on `:host`
+Both methods perform the same slot query and `setAttribute('aria-expanded', ...)` call. `_setupAnchorAria` sets the initial value; `_updateAnchorAriaExpanded` updates it on show/hide. They can be collapsed into a single `_setAnchorAriaExpanded(value: boolean)` method.
 
-**File:** `hx-popover.styles.ts`
+---
 
-`position: relative` is vestigial since body uses `position: fixed`. Consider `display: contents`.
+### P2-04: Storybook `Placements` story shows only 4 of 12 placement variants
+
+**File:** `hx-popover.stories.ts`, lines 154–170
+
+The `Placements` story iterates over `['top', 'bottom', 'left', 'right']` — only the 4 cardinal directions. The type system supports 12 variants (`top-start`, `top-end`, `right-start`, `right-end`, `bottom-start`, `bottom-end`, `left-start`, `left-end` are absent). The story should demonstrate all variants, especially the alignment variants which are the most likely to have visual regressions.
+
+---
+
+### P2-05: `display: inline-block` on `:host` may cause unexpected layout behavior
+
+**File:** `hx-popover.styles.ts`, line 5
+
+```css
+:host {
+  display: inline-block;
+  position: relative;
+}
+```
+
+The `position: relative` on `:host` is vestigial — the popover body uses `position: fixed` and is positioned via Floating UI, so the `:host` offset origin is irrelevant. More importantly, `display: inline-block` causes the component to collapse to zero height in flex/grid containers when the anchor slot is empty, potentially affecting page layout in ways that are hard to debug. Consider `display: contents` with inline-block applied only to `.trigger-wrapper`, or document the expected host display behavior.
+
+---
 
 ### P2-06: Module-level `_popoverCounter` is not SSR-safe
 
-**File:** `hx-popover.ts`
+**File:** `hx-popover.ts`, line 7
 
-Module-level counter causes ID collisions across frames. Consider `crypto.randomUUID()`.
+```ts
+let _popoverCounter = 0;
+```
 
----
-
-## Audit Dimensions
-
-| #   | Dimension            | Status   | Notes                                                                                                                         |
-| --- | -------------------- | -------- | ----------------------------------------------------------------------------------------------------------------------------- |
-| 1   | Design Tokens        | PASS     | 11 `--hx-popover-*` tokens with semantic fallbacks. P2-01 box-shadow exception.                                               |
-| 2   | Accessibility        | PARTIAL  | role=dialog, aria-expanded, aria-hidden, Escape dismiss all present. Missing: inert, focus management, document-level Escape. |
-| 3   | Functionality        | PASS     | Click/hover/focus/manual triggers. 12 placements via Floating UI. Arrow. Click-outside dismiss (added).                       |
-| 4   | TypeScript           | PASS     | Strict mode. No `any`. Clean union types for placement/trigger.                                                               |
-| 5   | CSS/Styling          | PASS     | Shadow DOM encapsulation. CSS Parts (body, arrow). prefers-reduced-motion.                                                    |
-| 6   | CEM Accuracy         | IMPROVED | Private members tagged @internal. New `label` property documented.                                                            |
-| 7   | Tests                | PASS     | 30 tests. Rendering, properties, slots, ARIA, show/hide, events, click-outside, label, axe-core.                              |
-| 8   | Storybook            | PASS     | 9 stories. Default, arrow, placements, triggers, manual, rich content, events, escape, CSS parts.                             |
-| 9   | Drupal Compatibility | PASS     | Standard slots, attributes, events. Twig-friendly.                                                                            |
-| 10  | Portability          | PASS     | CDN-ready. No framework dependencies beyond Lit.                                                                              |
+Module-level mutable state causes ID collisions when the module is imported in multiple documents/frames (e.g., Storybook iframes, server-side rendering). The generated `_popoverId` is used as the `id` on the body element. While `aria-controls` is intentionally omitted (with a code comment explaining the cross-root limitation), if a future fix re-introduces `aria-controls` or uses the ID for any purpose, duplicate IDs will cause silent bugs. The counter should use `crypto.randomUUID()` or a weakref-based approach.
 
 ---
 
-## Test Coverage
+## Non-Issues (confirmed acceptable)
 
-- **Total tests:** 30 (was 26, added 4)
-- **New tests:** click-outside dismiss (2), label property (2)
-- **Axe-core:** 2 tests (default + open state), zero violations
+- **`aria-controls` omitted**: Correctly documented in code comment. Cross-root IDREF cannot be resolved by axe-core. This is a known Shadow DOM limitation.
+- **Floating UI vs. browser Popover API**: Using Floating UI is acceptable and provides broader browser support.
+- **TypeScript types**: `PopoverPlacement` and `TriggerMode` union types are correct and complete. No `any` types found.
+- **Token usage (general)**: CSS custom properties follow the `--hx-*` pattern consistently (except P2-01 above).
+- **`@floating-ui/dom` `arrow` function naming**: The imported `arrow` function and the `@property() arrow` boolean coexist without TypeScript conflict because `this.arrow` (class property) and `arrow` (module import) are distinct identifiers. This is not a defect, though it reduces readability.
