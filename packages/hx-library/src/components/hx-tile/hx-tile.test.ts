@@ -1,12 +1,6 @@
 import { describe, it, expect, afterEach } from 'vitest';
 import { page } from '@vitest/browser/context';
-import {
-  fixture,
-  shadowQuery,
-  oneEvent,
-  cleanup,
-  checkA11y,
-} from '../../test-utils.js';
+import { fixture, shadowQuery, oneEvent, cleanup, checkA11y } from '../../test-utils.js';
 import type { HelixTile } from './hx-tile.js';
 import './index.js';
 
@@ -17,24 +11,18 @@ describe('hx-tile', () => {
 
   describe('Rendering', () => {
     it('renders with shadow DOM', async () => {
-      const el = await fixture<HelixTile>(
-        '<hx-tile><span slot="label">Test</span></hx-tile>',
-      );
+      const el = await fixture<HelixTile>('<hx-tile><span slot="label">Test</span></hx-tile>');
       expect(el.shadowRoot).toBeTruthy();
     });
 
     it('exposes "base" CSS part', async () => {
-      const el = await fixture<HelixTile>(
-        '<hx-tile><span slot="label">Test</span></hx-tile>',
-      );
+      const el = await fixture<HelixTile>('<hx-tile><span slot="label">Test</span></hx-tile>');
       const base = shadowQuery(el, '[part="base"]');
       expect(base).toBeTruthy();
     });
 
     it('applies default variant class', async () => {
-      const el = await fixture<HelixTile>(
-        '<hx-tile><span slot="label">Test</span></hx-tile>',
-      );
+      const el = await fixture<HelixTile>('<hx-tile><span slot="label">Test</span></hx-tile>');
       const base = shadowQuery(el, '[part="base"]')!;
       expect(base.classList.contains('tile--default')).toBe(true);
     });
@@ -44,9 +32,7 @@ describe('hx-tile', () => {
 
   describe('Property: variant', () => {
     it('applies default class', async () => {
-      const el = await fixture<HelixTile>(
-        '<hx-tile><span slot="label">Test</span></hx-tile>',
-      );
+      const el = await fixture<HelixTile>('<hx-tile><span slot="label">Test</span></hx-tile>');
       const base = shadowQuery(el, '[part="base"]')!;
       expect(base.classList.contains('tile--default')).toBe(true);
     });
@@ -72,18 +58,14 @@ describe('hx-tile', () => {
 
   describe('Button mode (no href)', () => {
     it('renders as div with role="button"', async () => {
-      const el = await fixture<HelixTile>(
-        '<hx-tile><span slot="label">Test</span></hx-tile>',
-      );
+      const el = await fixture<HelixTile>('<hx-tile><span slot="label">Test</span></hx-tile>');
       const base = shadowQuery(el, '[part="base"]')!;
       expect(base.tagName.toLowerCase()).toBe('div');
       expect(base.getAttribute('role')).toBe('button');
     });
 
     it('has aria-pressed="false" by default', async () => {
-      const el = await fixture<HelixTile>(
-        '<hx-tile><span slot="label">Test</span></hx-tile>',
-      );
+      const el = await fixture<HelixTile>('<hx-tile><span slot="label">Test</span></hx-tile>');
       const base = shadowQuery(el, '[part="base"]')!;
       expect(base.getAttribute('aria-pressed')).toBe('false');
     });
@@ -97,9 +79,7 @@ describe('hx-tile', () => {
     });
 
     it('has tabindex="0"', async () => {
-      const el = await fixture<HelixTile>(
-        '<hx-tile><span slot="label">Test</span></hx-tile>',
-      );
+      const el = await fixture<HelixTile>('<hx-tile><span slot="label">Test</span></hx-tile>');
       const base = shadowQuery(el, '[part="base"]')!;
       expect(base.getAttribute('tabindex')).toBe('0');
     });
@@ -139,6 +119,15 @@ describe('hx-tile', () => {
       const base = shadowQuery(el, '[part="base"]')!;
       expect(base.hasAttribute('role')).toBe(false);
     });
+
+    it('removes href from anchor when disabled', async () => {
+      const el = await fixture<HelixTile>(
+        '<hx-tile href="/dashboard" disabled><span slot="label">Test</span></hx-tile>',
+      );
+      const base = shadowQuery(el, 'a[part="base"]') as HTMLAnchorElement;
+      expect(base.hasAttribute('href')).toBe(false);
+      expect(base.getAttribute('aria-disabled')).toBe('true');
+    });
   });
 
   // ─── Property: disabled ───
@@ -173,9 +162,7 @@ describe('hx-tile', () => {
 
   describe('Events: button mode', () => {
     it('dispatches hx-select on click', async () => {
-      const el = await fixture<HelixTile>(
-        '<hx-tile><span slot="label">Test</span></hx-tile>',
-      );
+      const el = await fixture<HelixTile>('<hx-tile><span slot="label">Test</span></hx-tile>');
       const base = shadowQuery(el, '[part="base"]')!;
       const eventPromise = oneEvent<CustomEvent>(el, 'hx-select');
       base.click();
@@ -184,9 +171,7 @@ describe('hx-tile', () => {
     });
 
     it('hx-select detail contains selected state and originalEvent', async () => {
-      const el = await fixture<HelixTile>(
-        '<hx-tile><span slot="label">Test</span></hx-tile>',
-      );
+      const el = await fixture<HelixTile>('<hx-tile><span slot="label">Test</span></hx-tile>');
       const base = shadowQuery(el, '[part="base"]')!;
       const eventPromise = oneEvent<CustomEvent>(el, 'hx-select');
       base.click();
@@ -196,9 +181,7 @@ describe('hx-tile', () => {
     });
 
     it('toggles selected property on click', async () => {
-      const el = await fixture<HelixTile>(
-        '<hx-tile><span slot="label">Test</span></hx-tile>',
-      );
+      const el = await fixture<HelixTile>('<hx-tile><span slot="label">Test</span></hx-tile>');
       const base = shadowQuery(el, '[part="base"]')!;
       expect(el.selected).toBe(false);
       base.click();
@@ -218,6 +201,20 @@ describe('hx-tile', () => {
       await new Promise((r) => setTimeout(r, 50));
       expect(fired).toBe(false);
     });
+
+    it('does not dispatch hx-select when disabled via keyboard', async () => {
+      const el = await fixture<HelixTile>(
+        '<hx-tile disabled><span slot="label">Test</span></hx-tile>',
+      );
+      const base = shadowQuery(el, '[part="base"]')!;
+      let fired = false;
+      el.addEventListener('hx-select', () => {
+        fired = true;
+      });
+      base.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
+      await new Promise((r) => setTimeout(r, 50));
+      expect(fired).toBe(false);
+    });
   });
 
   // ─── Events: link mode ───
@@ -230,7 +227,9 @@ describe('hx-tile', () => {
       const base = shadowQuery(el, '[part="base"]')!;
       const eventPromise = oneEvent<CustomEvent>(el, 'hx-click');
       // Use dispatchEvent (untrusted) to avoid anchor navigation in headless browser
-      base.dispatchEvent(new MouseEvent('click', { bubbles: true, composed: true, cancelable: true }));
+      base.dispatchEvent(
+        new MouseEvent('click', { bubbles: true, composed: true, cancelable: true }),
+      );
       const event = await eventPromise;
       expect(event.detail.href).toBe('/test');
       expect(event.detail.originalEvent).toBeInstanceOf(MouseEvent);
@@ -246,7 +245,9 @@ describe('hx-tile', () => {
         fired = true;
       });
       // Use dispatchEvent (untrusted) to avoid anchor navigation in headless browser
-      base.dispatchEvent(new MouseEvent('click', { bubbles: true, composed: true, cancelable: true }));
+      base.dispatchEvent(
+        new MouseEvent('click', { bubbles: true, composed: true, cancelable: true }),
+      );
       await new Promise((r) => setTimeout(r, 50));
       expect(fired).toBe(false);
     });
@@ -256,9 +257,7 @@ describe('hx-tile', () => {
 
   describe('Keyboard', () => {
     it('Enter fires hx-select in button mode', async () => {
-      const el = await fixture<HelixTile>(
-        '<hx-tile><span slot="label">Test</span></hx-tile>',
-      );
+      const el = await fixture<HelixTile>('<hx-tile><span slot="label">Test</span></hx-tile>');
       const base = shadowQuery(el, '[part="base"]')!;
       const eventPromise = oneEvent<CustomEvent>(el, 'hx-select');
       base.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
@@ -267,9 +266,7 @@ describe('hx-tile', () => {
     });
 
     it('Space fires hx-select in button mode', async () => {
-      const el = await fixture<HelixTile>(
-        '<hx-tile><span slot="label">Test</span></hx-tile>',
-      );
+      const el = await fixture<HelixTile>('<hx-tile><span slot="label">Test</span></hx-tile>');
       const base = shadowQuery(el, '[part="base"]')!;
       const eventPromise = oneEvent<CustomEvent>(el, 'hx-select');
       base.dispatchEvent(new KeyboardEvent('keydown', { key: ' ', bubbles: true }));
@@ -301,25 +298,19 @@ describe('hx-tile', () => {
     });
 
     it('label part exposed', async () => {
-      const el = await fixture<HelixTile>(
-        '<hx-tile><span slot="label">Test</span></hx-tile>',
-      );
+      const el = await fixture<HelixTile>('<hx-tile><span slot="label">Test</span></hx-tile>');
       const label = shadowQuery(el, '[part="label"]');
       expect(label).toBeTruthy();
     });
 
     it('description part exposed', async () => {
-      const el = await fixture<HelixTile>(
-        '<hx-tile><span slot="label">Test</span></hx-tile>',
-      );
+      const el = await fixture<HelixTile>('<hx-tile><span slot="label">Test</span></hx-tile>');
       const description = shadowQuery(el, '[part="description"]');
       expect(description).toBeTruthy();
     });
 
     it('badge part exposed', async () => {
-      const el = await fixture<HelixTile>(
-        '<hx-tile><span slot="label">Test</span></hx-tile>',
-      );
+      const el = await fixture<HelixTile>('<hx-tile><span slot="label">Test</span></hx-tile>');
       const badge = shadowQuery(el, '[part="badge"]');
       expect(badge).toBeTruthy();
     });
@@ -329,9 +320,7 @@ describe('hx-tile', () => {
 
   describe('Slots', () => {
     it('icon slot hidden when empty', async () => {
-      const el = await fixture<HelixTile>(
-        '<hx-tile><span slot="label">Test</span></hx-tile>',
-      );
+      const el = await fixture<HelixTile>('<hx-tile><span slot="label">Test</span></hx-tile>');
       const iconDiv = shadowQuery(el, '.tile__icon')!;
       expect(iconDiv.hasAttribute('hidden')).toBe(true);
     });
@@ -345,17 +334,13 @@ describe('hx-tile', () => {
     });
 
     it('description slot hidden when empty', async () => {
-      const el = await fixture<HelixTile>(
-        '<hx-tile><span slot="label">Test</span></hx-tile>',
-      );
+      const el = await fixture<HelixTile>('<hx-tile><span slot="label">Test</span></hx-tile>');
       const descDiv = shadowQuery(el, '.tile__description')!;
       expect(descDiv.hasAttribute('hidden')).toBe(true);
     });
 
     it('badge slot hidden when empty', async () => {
-      const el = await fixture<HelixTile>(
-        '<hx-tile><span slot="label">Test</span></hx-tile>',
-      );
+      const el = await fixture<HelixTile>('<hx-tile><span slot="label">Test</span></hx-tile>');
       const badgeDiv = shadowQuery(el, '.tile__badge')!;
       expect(badgeDiv.hasAttribute('hidden')).toBe(true);
     });
@@ -373,9 +358,7 @@ describe('hx-tile', () => {
 
   describe('Accessibility (axe-core)', () => {
     it('has no axe violations in button mode', async () => {
-      const el = await fixture<HelixTile>(
-        '<hx-tile><span slot="label">Dashboard</span></hx-tile>',
-      );
+      const el = await fixture<HelixTile>('<hx-tile><span slot="label">Dashboard</span></hx-tile>');
       await page.screenshot();
       const { violations } = await checkA11y(el);
       expect(violations).toEqual([]);
