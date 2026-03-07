@@ -8,15 +8,15 @@ Branch: feature/deep-audit-v2-hx-help-text
 
 ## Summary Table
 
-| Area          | Status   | Issues                          |
-| ------------- | -------- | ------------------------------- |
-| TypeScript    | PASS     | 1 P2 (deferred)                 |
-| Accessibility | PASS     | 3 P0 FIXED, 2 P1 FIXED          |
-| Tests         | PASS     | 2 P1 FIXED (18 new tests added) |
-| Storybook     | PASS     | 1 P1 FIXED, 2 P2 (deferred)     |
-| CSS           | PASS     | 1 P1 FIXED, 2 P2 (deferred)     |
-| Performance   | PASS     | 1 P1 FIXED (3.9KB raw / 1.46KB gz, within 5KB gate) |
-| Drupal        | PASS     | 1 P1 FIXED (Twig template created)                   |
+| Area          | Status | Issues                                              |
+| ------------- | ------ | --------------------------------------------------- |
+| TypeScript    | PASS   | 1 P2 (deferred)                                     |
+| Accessibility | PASS   | 3 P0 FIXED, 2 P1 FIXED                              |
+| Tests         | PASS   | 2 P1 FIXED (18 new tests added)                     |
+| Storybook     | PASS   | 1 P1 FIXED, 2 P2 (deferred)                         |
+| CSS           | PASS   | 1 P1 FIXED, 2 P2 (deferred)                         |
+| Performance   | PASS   | 1 P1 FIXED (3.9KB raw / 1.46KB gz, within 5KB gate) |
+| Drupal        | PASS   | 1 P1 FIXED (Twig template created)                  |
 
 **Ship status: READY** — All P0 and P1 issues resolved. P1-05 bundle size verified (1.46KB gz). P1-06 Drupal Twig template created. Remaining P2 items deferred to follow-up.
 
@@ -96,6 +96,7 @@ import { tokenStyles } from '@helix/tokens/lit';
 ```
 
 **Resolution:** Bundle size verified via production build (Vite library mode):
+
 - Raw: 3,917 bytes
 - Gzip: 1,464 bytes
 
@@ -108,6 +109,7 @@ Both are well within the 5KB min+gz quality gate. `tokenStyles` does not bloat t
 **Files:** `testing/drupal/templates/helix-help-text.html.twig` (created)
 
 **Resolution:** Created `testing/drupal/templates/helix-help-text.html.twig` with full integration documentation covering:
+
 - Basic usage with `text` and `variant` variables
 - Validation error state pattern
 - Integration with Drupal `form_element.html.twig` override including `aria-describedby` association
