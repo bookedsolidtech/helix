@@ -84,6 +84,7 @@ export class HelixSelect extends LitElement {
 
   private _selectId = `hx-select-${Math.random().toString(36).slice(2, 9)}`;
   private _listboxId = `${this._selectId}-listbox`;
+  private _labelId = `${this._selectId}-label`;
   private _helpTextId = `${this._selectId}-help`;
   private _errorId = `${this._selectId}-error`;
 
@@ -583,7 +584,12 @@ export class HelixSelect extends LitElement {
         <!-- Label -->
         <slot name="label">
           ${this.label
-            ? html`<label part="label" class="field__label" for=${this._selectId}>
+            ? html`<label
+                part="label"
+                class="field__label"
+                id=${this._labelId}
+                for=${this._selectId}
+              >
                 ${this.label}
                 ${this.required
                   ? html`<span class="field__required-marker" aria-hidden="true">*</span>`
@@ -611,6 +617,7 @@ export class HelixSelect extends LitElement {
             aria-describedby=${ifDefined(describedBy)}
             aria-required=${this.required ? 'true' : nothing}
             aria-disabled=${this.disabled ? 'true' : nothing}
+            aria-labelledby=${ifDefined(this.label ? this._labelId : undefined)}
             aria-label=${ifDefined(this.ariaLabel ?? undefined)}
             @click=${this._toggleDropdown}
             @keydown=${this._handleKeydown}
