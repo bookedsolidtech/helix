@@ -9,6 +9,8 @@ import type { HelixStep } from './hx-step.js';
  * `<hx-step>` children as a horizontal or vertical step tracker with connector
  * lines and status-based styling.
  *
+ * Provide an `aria-label` on `<hx-steps>` to describe the step process for assistive technology.
+ *
  * @summary Multi-step progress indicator container.
  *
  * @tag hx-steps
@@ -76,10 +78,12 @@ export class HelixSteps extends LitElement {
 
   // ─── Child Sync ───
 
+  /** @internal */
   private _getSteps(): HelixStep[] {
     return Array.from(this.querySelectorAll(':scope > hx-step')) as HelixStep[];
   }
 
+  /** @internal */
   private _syncChildren(): void {
     const steps = this._getSteps();
     steps.forEach((step, i) => {
@@ -91,10 +95,12 @@ export class HelixSteps extends LitElement {
 
   // ─── Event Handling ───
 
+  /** @internal */
   private _handleSlotChange = (): void => {
     this._syncChildren();
   };
 
+  /** @internal */
   private _handleStepClickInternal = (e: Event): void => {
     e.stopPropagation();
     const steps = this._getSteps();

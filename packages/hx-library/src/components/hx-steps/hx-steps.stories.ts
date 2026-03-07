@@ -176,6 +176,18 @@ export const WithCustomIcon: Story = {
   `,
 };
 
+export const WithDisabledStep: Story = {
+  name: 'With Disabled Step',
+  render: () => html`
+    <hx-steps orientation="horizontal">
+      <hx-step label="Complete" status="complete"></hx-step>
+      <hx-step label="Active" status="active"></hx-step>
+      <hx-step label="Disabled" status="pending" disabled></hx-step>
+      <hx-step label="Pending" status="pending"></hx-step>
+    </hx-steps>
+  `,
+};
+
 export const VerticalAllStatuses: Story = {
   name: 'Vertical — All Statuses',
   render: () => html`
