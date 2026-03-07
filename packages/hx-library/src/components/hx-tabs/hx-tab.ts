@@ -1,4 +1,4 @@
-import { LitElement, html } from 'lit';
+import { LitElement, html, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { tokenStyles } from '@helix/tokens/lit';
 import { helixTabStyles } from './hx-tab.styles.js';
@@ -60,6 +60,14 @@ export class HelixTab extends LitElement {
   @property({ type: Boolean, reflect: true })
   disabled = false;
 
+  /**
+   * The id of the panel this tab controls. Set by the parent `<hx-tabs>` to establish the
+   * aria-controls relationship on the inner button element (which carries role="tab").
+   * @internal
+   */
+  @property({ type: String, attribute: false })
+  controls = '';
+
   // ─── Slot Visibility ───
 
   /** @internal */
@@ -106,7 +114,8 @@ export class HelixTab extends LitElement {
         class="tab"
         role="tab"
         aria-selected=${this.selected ? 'true' : 'false'}
-        ?disabled=${this.disabled}
+        aria-disabled=${this.disabled ? 'true' : 'false'}
+        aria-controls=${this.controls || nothing}
         tabindex=${this.selected ? '0' : '-1'}
         @click=${this._handleClick}
       >

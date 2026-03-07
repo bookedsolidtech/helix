@@ -314,8 +314,8 @@ export const ManualActivation: Story = {
   render: (args) => html`
     <div>
       <p style="margin-bottom: 1rem; font-size: 0.875rem; color: #6c757d;">
-        In manual activation mode, arrow keys move focus without activating tabs.
-        Press Space or Enter to activate the focused tab.
+        In manual activation mode, arrow keys move focus without activating tabs. Press Space or
+        Enter to activate the focused tab.
       </p>
       <hx-tabs activation=${args.activation}>
         <hx-tab slot="tab" panel="alerts">Alerts</hx-tab>
@@ -460,7 +460,9 @@ export const Healthcare: Story = {
         <hx-tab slot="tab" panel="patient-notes">Clinical Notes</hx-tab>
 
         <hx-tab-panel name="patient-demographics">
-          <dl style="display: grid; grid-template-columns: max-content 1fr; gap: 0.5rem 1.5rem; margin: 0;">
+          <dl
+            style="display: grid; grid-template-columns: max-content 1fr; gap: 0.5rem 1.5rem; margin: 0;"
+          >
             <dt style="font-weight: 600; color: #495057;">Full Name</dt>
             <dd style="margin: 0; color: #212529;">Jane Marie Doe</dd>
             <dt style="font-weight: 600; color: #495057;">Date of Birth</dt>
@@ -480,10 +482,26 @@ export const Healthcare: Story = {
           <table style="width: 100%; border-collapse: collapse; font-size: 0.9rem;">
             <thead>
               <tr style="border-bottom: 2px solid #dee2e6;">
-                <th style="text-align: left; padding: 0.5rem 0.75rem; color: #495057; font-weight: 600;">Measurement</th>
-                <th style="text-align: left; padding: 0.5rem 0.75rem; color: #495057; font-weight: 600;">Value</th>
-                <th style="text-align: left; padding: 0.5rem 0.75rem; color: #495057; font-weight: 600;">Date</th>
-                <th style="text-align: left; padding: 0.5rem 0.75rem; color: #495057; font-weight: 600;">Recorded By</th>
+                <th
+                  style="text-align: left; padding: 0.5rem 0.75rem; color: #495057; font-weight: 600;"
+                >
+                  Measurement
+                </th>
+                <th
+                  style="text-align: left; padding: 0.5rem 0.75rem; color: #495057; font-weight: 600;"
+                >
+                  Value
+                </th>
+                <th
+                  style="text-align: left; padding: 0.5rem 0.75rem; color: #495057; font-weight: 600;"
+                >
+                  Date
+                </th>
+                <th
+                  style="text-align: left; padding: 0.5rem 0.75rem; color: #495057; font-weight: 600;"
+                >
+                  Recorded By
+                </th>
               </tr>
             </thead>
             <tbody>
@@ -522,22 +540,40 @@ export const Healthcare: Story = {
         </hx-tab-panel>
 
         <hx-tab-panel name="patient-medications">
-          <ul style="margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 0.75rem;">
-            <li style="padding: 0.75rem; background: #f8f9fa; border-radius: 0.375rem; border-left: 4px solid #2563eb;">
+          <ul
+            style="margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 0.75rem;"
+          >
+            <li
+              style="padding: 0.75rem; background: #f8f9fa; border-radius: 0.375rem; border-left: 4px solid #2563eb;"
+            >
               <strong style="display: block; color: #212529;">Lisinopril 10 mg</strong>
-              <span style="font-size: 0.875rem; color: #6c757d;">Once daily — Hypertension management</span>
+              <span style="font-size: 0.875rem; color: #6c757d;"
+                >Once daily — Hypertension management</span
+              >
             </li>
-            <li style="padding: 0.75rem; background: #f8f9fa; border-radius: 0.375rem; border-left: 4px solid #2563eb;">
+            <li
+              style="padding: 0.75rem; background: #f8f9fa; border-radius: 0.375rem; border-left: 4px solid #2563eb;"
+            >
               <strong style="display: block; color: #212529;">Metformin 500 mg</strong>
-              <span style="font-size: 0.875rem; color: #6c757d;">Twice daily with meals — Type 2 Diabetes</span>
+              <span style="font-size: 0.875rem; color: #6c757d;"
+                >Twice daily with meals — Type 2 Diabetes</span
+              >
             </li>
-            <li style="padding: 0.75rem; background: #f8f9fa; border-radius: 0.375rem; border-left: 4px solid #2563eb;">
+            <li
+              style="padding: 0.75rem; background: #f8f9fa; border-radius: 0.375rem; border-left: 4px solid #2563eb;"
+            >
               <strong style="display: block; color: #212529;">Atorvastatin 20 mg</strong>
-              <span style="font-size: 0.875rem; color: #6c757d;">Once daily at bedtime — Hypercholesterolemia</span>
+              <span style="font-size: 0.875rem; color: #6c757d;"
+                >Once daily at bedtime — Hypercholesterolemia</span
+              >
             </li>
-            <li style="padding: 0.75rem; background: #fff3cd; border-radius: 0.375rem; border-left: 4px solid #f59e0b;">
+            <li
+              style="padding: 0.75rem; background: #fff3cd; border-radius: 0.375rem; border-left: 4px solid #f59e0b;"
+            >
               <strong style="display: block; color: #212529;">Penicillin</strong>
-              <span style="font-size: 0.875rem; color: #b45309;">ALLERGY — Anaphylaxis. Do not administer.</span>
+              <span style="font-size: 0.875rem; color: #b45309;"
+                >ALLERGY — Anaphylaxis. Do not administer.</span
+              >
             </li>
           </ul>
         </hx-tab-panel>
@@ -550,9 +586,13 @@ export const Healthcare: Story = {
                 <time style="font-size: 0.875rem; color: #6c757d;">2026-02-18</time>
               </header>
               <p style="margin: 0; font-size: 0.9rem; color: #343a40; line-height: 1.6;">
-                Patient reports improved adherence to dietary guidelines. HbA1c trending down from 7.8% to 7.2%. Continue current Metformin dose. Follow up in 3 months for repeat labs.
+                Patient reports improved adherence to dietary guidelines. HbA1c trending down from
+                7.8% to 7.2%. Continue current Metformin dose. Follow up in 3 months for repeat
+                labs.
               </p>
-              <footer style="margin-top: 0.5rem; font-size: 0.8rem; color: #6c757d;">Dr. A. Patel, MD</footer>
+              <footer style="margin-top: 0.5rem; font-size: 0.8rem; color: #6c757d;">
+                Dr. A. Patel, MD
+              </footer>
             </div>
             <div style="padding: 0.75rem; border: 1px solid #dee2e6; border-radius: 0.375rem;">
               <header style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
@@ -560,9 +600,12 @@ export const Healthcare: Story = {
                 <time style="font-size: 0.875rem; color: #6c757d;">2025-11-05</time>
               </header>
               <p style="margin: 0; font-size: 0.9rem; color: #343a40; line-height: 1.6;">
-                Routine annual exam. All preventive screenings up to date. Mammogram ordered. Flu and COVID boosters administered. No new concerns reported by patient.
+                Routine annual exam. All preventive screenings up to date. Mammogram ordered. Flu
+                and COVID boosters administered. No new concerns reported by patient.
               </p>
-              <footer style="margin-top: 0.5rem; font-size: 0.8rem; color: #6c757d;">Dr. A. Patel, MD</footer>
+              <footer style="margin-top: 0.5rem; font-size: 0.8rem; color: #6c757d;">
+                Dr. A. Patel, MD
+              </footer>
             </div>
           </article>
         </hx-tab-panel>
@@ -580,7 +623,9 @@ export const Healthcare: Story = {
 
     // Demographics tab should be active by default
     await expect(tabEls[0].hasAttribute('selected')).toBeTruthy();
-    const demographicsPanel = canvasElement.querySelector('hx-tab-panel[name="patient-demographics"]');
+    const demographicsPanel = canvasElement.querySelector(
+      'hx-tab-panel[name="patient-demographics"]',
+    );
     if (!demographicsPanel) throw new Error('hx-tab-panel[name="patient-demographics"] not found');
     await expect(demographicsPanel.hasAttribute('hidden')).toBeFalsy();
 
@@ -606,7 +651,108 @@ export const Healthcare: Story = {
 };
 
 // ─────────────────────────────────────────────────
-//  7. INTERACTION TEST — TAB CHANGE EVENT
+//  7. WITH ICONS (prefix/suffix slots)
+// ─────────────────────────────────────────────────
+
+export const WithIcons: Story = {
+  name: 'With Icons (prefix/suffix slots)',
+  render: () => html`
+    <hx-tabs>
+      <hx-tab slot="tab" panel="overview">
+        <svg
+          slot="prefix"
+          xmlns="http://www.w3.org/2000/svg"
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+        >
+          <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+          <polyline points="9 22 9 12 15 12 15 22" />
+        </svg>
+        Overview
+      </hx-tab>
+      <hx-tab slot="tab" panel="alerts">
+        <svg
+          slot="prefix"
+          xmlns="http://www.w3.org/2000/svg"
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+        >
+          <path
+            d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"
+          />
+          <line x1="12" y1="9" x2="12" y2="13" />
+          <line x1="12" y1="17" x2="12.01" y2="17" />
+        </svg>
+        Alerts
+        <span
+          slot="suffix"
+          style="display:inline-flex;align-items:center;justify-content:center;background:#dc3545;color:#fff;border-radius:9999px;font-size:0.7rem;font-weight:700;min-width:1.25rem;height:1.25rem;padding:0 0.25rem;"
+          >3</span
+        >
+      </hx-tab>
+      <hx-tab slot="tab" panel="documents">
+        <svg
+          slot="prefix"
+          xmlns="http://www.w3.org/2000/svg"
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+        >
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+          <polyline points="14 2 14 8 20 8" />
+        </svg>
+        Documents
+      </hx-tab>
+      <hx-tab-panel name="overview">
+        <p>Overview panel: summary information is displayed here.</p>
+      </hx-tab-panel>
+      <hx-tab-panel name="alerts">
+        <p>Alerts panel: 3 active clinical alerts require attention.</p>
+      </hx-tab-panel>
+      <hx-tab-panel name="documents">
+        <p>Documents panel: uploaded forms, consent documents, and referral letters.</p>
+      </hx-tab-panel>
+    </hx-tabs>
+  `,
+  play: async ({ canvasElement }) => {
+    await new Promise((r) => setTimeout(r, 50));
+    const tabs = canvasElement.querySelectorAll('hx-tab');
+    await expect(tabs.length).toBe(3);
+
+    // Verify prefix slots are populated
+    const alertsTab = canvasElement.querySelector('hx-tab[panel="alerts"]');
+    if (!alertsTab) throw new Error('hx-tab[panel="alerts"] not found');
+    const prefixSlotContent = alertsTab.querySelector('[slot="prefix"]');
+    await expect(prefixSlotContent).toBeTruthy();
+
+    // Verify suffix badge is present on alerts tab
+    const suffixBadge = alertsTab.querySelector('[slot="suffix"]');
+    await expect(suffixBadge).toBeTruthy();
+  },
+};
+
+// ─────────────────────────────────────────────────
+//  8. INTERACTION TEST — TAB CHANGE EVENT
 // ─────────────────────────────────────────────────
 
 export const InteractionTest: Story = {
@@ -616,11 +762,7 @@ export const InteractionTest: Story = {
     activation: 'automatic',
   },
   render: (args) => html`
-    <hx-tabs
-      orientation=${args.orientation}
-      activation=${args.activation}
-      @hx-tab-change=${fn()}
-    >
+    <hx-tabs orientation=${args.orientation} activation=${args.activation} @hx-tab-change=${fn()}>
       <hx-tab slot="tab" panel="tab1">Appointments</hx-tab>
       <hx-tab slot="tab" panel="tab2">Messages</hx-tab>
       <hx-tab slot="tab" panel="tab3">Documents</hx-tab>
