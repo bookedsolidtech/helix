@@ -1,0 +1,30 @@
+{
+  "category": "Uncategorized",
+  "description": "## Deep Component Audit — hx-field\n\n**Component directory:** `packages/hx-library/src/components/hx-field/`\n**wc-mcp Health Score:** 88 (B)\n**Known issues:** _hasLabelSlot, _hasErrorSlot, _hasHelpSlot, _fieldId, _helpTextId, _errorId — all missing descriptions.\n\n### wc-mcp Tools — USE THESE FOR SCORING\n- `score_component`, `get_component`, `analyze_accessibility`, `validate_usage`, `list_css_parts`, `list_events`, `list_slots`, `get_design_tokens`\n- **Report any wc-mcp bugs to `/Volumes/Development/booked/wc-tools` board.**\n\n### Audit Scope\n1. **Design Tokens** — `--hx-` tokens. Label, help text, error text colors/spacing. Dark mode.\n2. **Accessibility** — WCAG 2.1 AA. Label association (for/id). Required indicator. Error association (aria-describedby). Help text association.\n3. **Functionality** — Label/help-text/error-text slots. Required indicator. Slot presence detection. ID generation for ARIA associations.\n4. **TypeScript** — Strict. No `any`. Proper ID management.\n5. **CSS/Styling** — Shadow DOM. CSS Parts. Layout (label above, beside). Spacing.\n6. **CEM Accuracy** — Fix all 6 missing descriptions.\n7. **Tests** — 80%+ coverage. Slots. ARIA associations. Required. Error state.\n8. **Storybook** — With/without label. Help text. Error. Required.\n9. **Drupal Compatibility** — Form element wrapper. Twig-friendly.\n10. **Portability** — CDN-ready.\n\n### Deliverable\nDetailed audit report. Fix CRITICAL+HIGH. Document rest.",
+  "title": "Deep Audit v2: hx-field",
+  "status": "backlog",
+  "branchName": "feature/deep-audit-v2-hx-field",
+  "complexity": "architectural",
+  "priority": 3,
+  "source": "api",
+  "trustTier": 1,
+  "quarantineStatus": "passed",
+  "quarantineId": "8b0f86fe-c463-4dd4-931b-09129338278a",
+  "id": "feature-1772817740219-a9rsnb9oh",
+  "descriptionHistory": [
+    {
+      "description": "## Deep Component Audit — hx-field\n\n**Component directory:** `packages/hx-library/src/components/hx-field/`\n**wc-mcp Health Score:** 88 (B)\n**Known issues:** _hasLabelSlot, _hasErrorSlot, _hasHelpSlot, _fieldId, _helpTextId, _errorId — all missing descriptions.\n\n### wc-mcp Tools — USE THESE FOR SCORING\n- `score_component`, `get_component`, `analyze_accessibility`, `validate_usage`, `list_css_parts`, `list_events`, `list_slots`, `get_design_tokens`\n- **Report any wc-mcp bugs to `/Volumes/Development/booked/wc-tools` board.**\n\n### Audit Scope\n1. **Design Tokens** — `--hx-` tokens. Label, help text, error text colors/spacing. Dark mode.\n2. **Accessibility** — WCAG 2.1 AA. Label association (for/id). Required indicator. Error association (aria-describedby). Help text association.\n3. **Functionality** — Label/help-text/error-text slots. Required indicator. Slot presence detection. ID generation for ARIA associations.\n4. **TypeScript** — Strict. No `any`. Proper ID management.\n5. **CSS/Styling** — Shadow DOM. CSS Parts. Layout (label above, beside). Spacing.\n6. **CEM Accuracy** — Fix all 6 missing descriptions.\n7. **Tests** — 80%+ coverage. Slots. ARIA associations. Required. Error state.\n8. **Storybook** — With/without label. Help text. Error. Required.\n9. **Drupal Compatibility** — Form element wrapper. Twig-friendly.\n10. **Portability** — CDN-ready.\n\n### Deliverable\nDetailed audit report. Fix CRITICAL+HIGH. Document rest.",
+      "timestamp": "2026-03-06T17:22:20.219Z",
+      "source": "initial"
+    }
+  ],
+  "createdAt": "2026-03-06T17:22:20.219Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-03-06T17:22:20.219Z",
+      "reason": "Feature created"
+    }
+  ]
+}

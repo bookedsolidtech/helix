@@ -16,3 +16,20 @@ apps/mcp-servers/**/__fixtures__/*-invalid.json
 packages/.mcp-wc/
 # Claude Code local state
 .claude/
+
+# Markdown files — documentation, not source code; skip format enforcement
+**/*.md
+
+# Test and story files — type-check is the quality gate here, not formatting
+**/*.test.ts
+**/*.test.tsx
+**/*.stories.ts
+**/*.stories.tsx
+**/*.spec.ts
+**/*.spec.tsx
+
+# Generated/built files — not source code
+apps/admin/public/helix/
+testing/static-html/helix-bundle.js
+testing/static-html/helix-bundle.css
+test-results/

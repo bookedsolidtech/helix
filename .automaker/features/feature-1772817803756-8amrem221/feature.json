@@ -1,0 +1,30 @@
+{
+  "category": "Uncategorized",
+  "description": "## Deep Component Audit — hx-image\n\n**Component directory:** `packages/hx-library/src/components/hx-image/`\n\n### wc-mcp Tools — USE THESE\n- `score_component`, `get_component`, `analyze_accessibility`, `list_css_parts`, `get_design_tokens`\n- **Report wc-mcp bugs to `/Volumes/Development/booked/wc-tools` board.**\n\n### Audit Scope\n1. **Design Tokens** — `--hx-` tokens. Border-radius, aspect-ratio, placeholder background. Dark mode.\n2. **Accessibility** — WCAG 2.1 AA. Alt text requirement. Decorative image support (alt=\"\"). Lazy loading. Aspect ratio for CLS prevention.\n3. **Functionality** — Lazy loading (IntersectionObserver). Placeholder/skeleton on load. Error fallback. Aspect ratio enforcement. Object-fit. Responsive (srcset/sizes).\n4. **TypeScript** — Strict. No `any`.\n5. **CSS/Styling** — Shadow DOM. CSS Parts. Object-fit. Aspect ratio. Border radius.\n6. **CEM Accuracy** — All API documented.\n7. **Tests** — 80%+ coverage. Loading states. Error fallback. Lazy. Alt text.\n8. **Storybook** — Various ratios. Lazy loading. Error state. Responsive.\n9. **Drupal Compatibility** — Image field output. Responsive images module. Twig-friendly.\n10. **Portability** — CDN-ready.\n\n### Deliverable\nDetailed audit report. Fix CRITICAL+HIGH. Document rest.",
+  "title": "Deep Audit v2: hx-image",
+  "status": "backlog",
+  "branchName": "feature/deep-audit-v2-hx-image",
+  "complexity": "architectural",
+  "priority": 3,
+  "source": "api",
+  "trustTier": 1,
+  "quarantineStatus": "passed",
+  "quarantineId": "117343ae-eaa1-4ca2-90cf-07171fb83bc9",
+  "id": "feature-1772817803756-8amrem221",
+  "descriptionHistory": [
+    {
+      "description": "## Deep Component Audit — hx-image\n\n**Component directory:** `packages/hx-library/src/components/hx-image/`\n\n### wc-mcp Tools — USE THESE\n- `score_component`, `get_component`, `analyze_accessibility`, `list_css_parts`, `get_design_tokens`\n- **Report wc-mcp bugs to `/Volumes/Development/booked/wc-tools` board.**\n\n### Audit Scope\n1. **Design Tokens** — `--hx-` tokens. Border-radius, aspect-ratio, placeholder background. Dark mode.\n2. **Accessibility** — WCAG 2.1 AA. Alt text requirement. Decorative image support (alt=\"\"). Lazy loading. Aspect ratio for CLS prevention.\n3. **Functionality** — Lazy loading (IntersectionObserver). Placeholder/skeleton on load. Error fallback. Aspect ratio enforcement. Object-fit. Responsive (srcset/sizes).\n4. **TypeScript** — Strict. No `any`.\n5. **CSS/Styling** — Shadow DOM. CSS Parts. Object-fit. Aspect ratio. Border radius.\n6. **CEM Accuracy** — All API documented.\n7. **Tests** — 80%+ coverage. Loading states. Error fallback. Lazy. Alt text.\n8. **Storybook** — Various ratios. Lazy loading. Error state. Responsive.\n9. **Drupal Compatibility** — Image field output. Responsive images module. Twig-friendly.\n10. **Portability** — CDN-ready.\n\n### Deliverable\nDetailed audit report. Fix CRITICAL+HIGH. Document rest.",
+      "timestamp": "2026-03-06T17:23:23.757Z",
+      "source": "initial"
+    }
+  ],
+  "createdAt": "2026-03-06T17:23:23.757Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-03-06T17:23:23.757Z",
+      "reason": "Feature created"
+    }
+  ]
+}

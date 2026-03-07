@@ -1,0 +1,30 @@
+{
+  "category": "Uncategorized",
+  "description": "## Deep Component Audit — hx-nav\n\n**Component directory:** `packages/hx-library/src/components/hx-nav/`\n**Sub-components:** hx-nav-item\n\n### wc-mcp Tools — USE THESE\n- `score_component`, `get_component`, `analyze_accessibility`, `list_css_parts`, `list_events`, `list_slots`, `get_design_tokens`\n- **Report wc-mcp bugs to `/Volumes/Development/booked/wc-tools` board.**\n\n### Audit Scope\n1. **Design Tokens** — `--hx-` tokens. Active indicator, hover, spacing, divider. Dark mode.\n2. **Accessibility** — WCAG 2.1 AA. nav landmark with aria-label. Current page (aria-current). Keyboard navigation.\n3. **Functionality** — Horizontal/vertical. Active item. Nested items. Collapsible groups. Icons. Badges.\n4. **TypeScript** — Strict. No `any`.\n5. **CSS/Styling** — Shadow DOM. CSS Parts. Active indicator animation. Responsive.\n6. **CEM Accuracy** — Both nav + nav-item documented.\n7. **Tests** — 80%+ coverage. Navigation. Active state. Keyboard. Nested.\n8. **Storybook** — Horizontal/vertical. With icons. Active. Nested.\n9. **Drupal Compatibility** — Menu block. Main navigation. Twig-friendly.\n10. **Portability** — CDN-ready.\n\n### Deliverable\nDetailed audit report. Fix CRITICAL+HIGH. Document rest.",
+  "title": "Deep Audit v2: hx-nav",
+  "status": "backlog",
+  "branchName": "feature/deep-audit-v2-hx-nav",
+  "complexity": "architectural",
+  "priority": 3,
+  "source": "api",
+  "trustTier": 1,
+  "quarantineStatus": "passed",
+  "quarantineId": "de64d912-a06b-42ed-873e-b3e514eefab7",
+  "id": "feature-1772817846562-1fkz9k15s",
+  "descriptionHistory": [
+    {
+      "description": "## Deep Component Audit — hx-nav\n\n**Component directory:** `packages/hx-library/src/components/hx-nav/`\n**Sub-components:** hx-nav-item\n\n### wc-mcp Tools — USE THESE\n- `score_component`, `get_component`, `analyze_accessibility`, `list_css_parts`, `list_events`, `list_slots`, `get_design_tokens`\n- **Report wc-mcp bugs to `/Volumes/Development/booked/wc-tools` board.**\n\n### Audit Scope\n1. **Design Tokens** — `--hx-` tokens. Active indicator, hover, spacing, divider. Dark mode.\n2. **Accessibility** — WCAG 2.1 AA. nav landmark with aria-label. Current page (aria-current). Keyboard navigation.\n3. **Functionality** — Horizontal/vertical. Active item. Nested items. Collapsible groups. Icons. Badges.\n4. **TypeScript** — Strict. No `any`.\n5. **CSS/Styling** — Shadow DOM. CSS Parts. Active indicator animation. Responsive.\n6. **CEM Accuracy** — Both nav + nav-item documented.\n7. **Tests** — 80%+ coverage. Navigation. Active state. Keyboard. Nested.\n8. **Storybook** — Horizontal/vertical. With icons. Active. Nested.\n9. **Drupal Compatibility** — Menu block. Main navigation. Twig-friendly.\n10. **Portability** — CDN-ready.\n\n### Deliverable\nDetailed audit report. Fix CRITICAL+HIGH. Document rest.",
+      "timestamp": "2026-03-06T17:24:06.563Z",
+      "source": "initial"
+    }
+  ],
+  "createdAt": "2026-03-06T17:24:06.563Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-03-06T17:24:06.563Z",
+      "reason": "Feature created"
+    }
+  ]
+}

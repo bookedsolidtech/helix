@@ -1,0 +1,30 @@
+{
+  "category": "Uncategorized",
+  "description": "## Deep Component Audit — hx-focus-ring\n\n**Component directory:** `packages/hx-library/src/components/hx-focus-ring/`\n\n### wc-mcp Tools — USE THESE\n- `score_component`, `get_component`, `analyze_accessibility`, `get_design_tokens`, `find_components_using_token`\n- **Report wc-mcp bugs to `/Volumes/Development/booked/wc-tools` board.**\n\n### Audit Scope\n1. **Design Tokens** — `--hx-` tokens. Ring color, width, offset, border-radius. Dark mode. High contrast mode.\n2. **Accessibility** — WCAG 2.1 AA. Focus indicator visibility (3:1 contrast ratio minimum per WCAG 2.4.11). :focus-visible support. Reduced-motion.\n3. **Functionality** — Attach to any focusable element. Keyboard-only focus detection. Custom ring styling. Inset vs outset.\n4. **TypeScript** — Strict. No `any`.\n5. **CSS/Styling** — Shadow DOM. Integration with other components' focus states. CSS Parts.\n6. **CEM Accuracy** — All API documented.\n7. **Tests** — 80%+ coverage. Focus/blur. Keyboard vs mouse. Customization.\n8. **Storybook** — On various elements. Custom styling. Dark mode.\n9. **Drupal Compatibility** — Works with Drupal form elements.\n10. **Portability** — CDN-ready. Utility component used by others.\n\n### Deliverable\nDetailed audit report. Fix CRITICAL+HIGH. Document rest.",
+  "title": "Deep Audit v2: hx-focus-ring",
+  "status": "backlog",
+  "branchName": "feature/deep-audit-v2-hx-focus-ring",
+  "complexity": "architectural",
+  "priority": 3,
+  "source": "api",
+  "trustTier": 1,
+  "quarantineStatus": "passed",
+  "quarantineId": "e252195b-6457-43e1-9f8b-3d59f41179b8",
+  "id": "feature-1772817757140-113yrfzhv",
+  "descriptionHistory": [
+    {
+      "description": "## Deep Component Audit — hx-focus-ring\n\n**Component directory:** `packages/hx-library/src/components/hx-focus-ring/`\n\n### wc-mcp Tools — USE THESE\n- `score_component`, `get_component`, `analyze_accessibility`, `get_design_tokens`, `find_components_using_token`\n- **Report wc-mcp bugs to `/Volumes/Development/booked/wc-tools` board.**\n\n### Audit Scope\n1. **Design Tokens** — `--hx-` tokens. Ring color, width, offset, border-radius. Dark mode. High contrast mode.\n2. **Accessibility** — WCAG 2.1 AA. Focus indicator visibility (3:1 contrast ratio minimum per WCAG 2.4.11). :focus-visible support. Reduced-motion.\n3. **Functionality** — Attach to any focusable element. Keyboard-only focus detection. Custom ring styling. Inset vs outset.\n4. **TypeScript** — Strict. No `any`.\n5. **CSS/Styling** — Shadow DOM. Integration with other components' focus states. CSS Parts.\n6. **CEM Accuracy** — All API documented.\n7. **Tests** — 80%+ coverage. Focus/blur. Keyboard vs mouse. Customization.\n8. **Storybook** — On various elements. Custom styling. Dark mode.\n9. **Drupal Compatibility** — Works with Drupal form elements.\n10. **Portability** — CDN-ready. Utility component used by others.\n\n### Deliverable\nDetailed audit report. Fix CRITICAL+HIGH. Document rest.",
+      "timestamp": "2026-03-06T17:22:37.140Z",
+      "source": "initial"
+    }
+  ],
+  "createdAt": "2026-03-06T17:22:37.140Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-03-06T17:22:37.140Z",
+      "reason": "Feature created"
+    }
+  ]
+}

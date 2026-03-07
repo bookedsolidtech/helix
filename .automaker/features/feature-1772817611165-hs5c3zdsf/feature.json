@@ -1,0 +1,30 @@
+{
+  "category": "Uncategorized",
+  "description": "## Deep Component Audit — hx-alert\n\n**Component directory:** `packages/hx-library/src/components/hx-alert/`\n**wc-mcp Health Score:** 100 (A) — No issues found in CEM documentation.\n\n### Audit Scope (ALL areas — leave nothing unchecked)\n\n1. **Design Tokens** — Verify ALL CSS custom properties use `--hx-` prefixed tokens. No hardcoded values. Three-tier cascade. Dark mode overrides.\n2. **Accessibility (A11Y)** — WCAG 2.1 AA. ARIA roles (alert/status). Live regions. Keyboard dismissal. Focus management on close. Screen reader announcements.\n3. **Functionality** — All public properties, methods, events. Variants (info, success, warning, error). Dismissible behavior. Auto-dismiss timer. Slot behavior.\n4. **TypeScript** — Strict mode. No `any`. Proper exports.\n5. **CSS/Styling** — Shadow DOM encapsulation. CSS Parts. Responsive. Icon integration.\n6. **CEM Accuracy** — Score 100 per wc-mcp. Verify this holds after deep inspection.\n7. **Tests** — Coverage 80%+. All variants. Dismiss behavior. ARIA live region. Timing.\n8. **Storybook** — All variants (info/success/warning/error). Dismissible toggle. Autodocs.\n9. **Drupal Compatibility** — Twig-friendly. Server messages map to component variants.\n10. **Portability** — CDN-ready. No external deps.\n\n### Deliverable\nDetailed markdown audit report. Fix CRITICAL+HIGH. Document MEDIUM+LOW.",
+  "title": "Deep Audit v2: hx-alert",
+  "status": "backlog",
+  "branchName": "feature/deep-audit-v2-hx-alert",
+  "complexity": "architectural",
+  "priority": 3,
+  "source": "api",
+  "trustTier": 1,
+  "quarantineStatus": "passed",
+  "quarantineId": "854e43ce-ddae-4244-bd53-3b08dbdd86f1",
+  "id": "feature-1772817611165-hs5c3zdsf",
+  "descriptionHistory": [
+    {
+      "description": "## Deep Component Audit — hx-alert\n\n**Component directory:** `packages/hx-library/src/components/hx-alert/`\n**wc-mcp Health Score:** 100 (A) — No issues found in CEM documentation.\n\n### Audit Scope (ALL areas — leave nothing unchecked)\n\n1. **Design Tokens** — Verify ALL CSS custom properties use `--hx-` prefixed tokens. No hardcoded values. Three-tier cascade. Dark mode overrides.\n2. **Accessibility (A11Y)** — WCAG 2.1 AA. ARIA roles (alert/status). Live regions. Keyboard dismissal. Focus management on close. Screen reader announcements.\n3. **Functionality** — All public properties, methods, events. Variants (info, success, warning, error). Dismissible behavior. Auto-dismiss timer. Slot behavior.\n4. **TypeScript** — Strict mode. No `any`. Proper exports.\n5. **CSS/Styling** — Shadow DOM encapsulation. CSS Parts. Responsive. Icon integration.\n6. **CEM Accuracy** — Score 100 per wc-mcp. Verify this holds after deep inspection.\n7. **Tests** — Coverage 80%+. All variants. Dismiss behavior. ARIA live region. Timing.\n8. **Storybook** — All variants (info/success/warning/error). Dismissible toggle. Autodocs.\n9. **Drupal Compatibility** — Twig-friendly. Server messages map to component variants.\n10. **Portability** — CDN-ready. No external deps.\n\n### Deliverable\nDetailed markdown audit report. Fix CRITICAL+HIGH. Document MEDIUM+LOW.",
+      "timestamp": "2026-03-06T17:20:11.165Z",
+      "source": "initial"
+    }
+  ],
+  "createdAt": "2026-03-06T17:20:11.165Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-03-06T17:20:11.165Z",
+      "reason": "Feature created"
+    }
+  ]
+}

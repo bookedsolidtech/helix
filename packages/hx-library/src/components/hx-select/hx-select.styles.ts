@@ -108,40 +108,42 @@ export const helixSelectStyles = css`
     padding: var(--hx-space-3, 0.75rem) var(--hx-space-4, 1rem);
   }
 
-  /* ─── Trigger content area ─── */
+  /* ─── Trigger value ─── */
 
-  .field__trigger-content {
-    display: flex;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: var(--hx-space-1, 0.25rem);
+  .field__trigger-value {
     flex: 1;
     min-width: 0;
-    overflow: hidden;
-  }
-
-  .field__trigger-value,
-  .field__trigger-placeholder {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
   }
 
-  .field__trigger--placeholder .field__trigger-value,
-  .field__trigger-placeholder {
+  .field__trigger--placeholder .field__trigger-value {
     color: var(--hx-color-neutral-400, #adb5bd);
   }
 
-  /* ─── Chevron ─── */
+  /* ─── Chevron (CSS-drawn) ─── */
 
   .field__chevron {
     flex-shrink: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    width: 12px;
+    height: 8px;
+    position: relative;
     color: var(--hx-select-chevron-color, var(--hx-color-neutral-500, #6c757d));
     pointer-events: none;
     transition: transform var(--hx-transition-fast, 150ms ease);
+  }
+
+  .field__chevron::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 2px;
+    width: 7px;
+    height: 7px;
+    border-right: 1.5px solid currentColor;
+    border-bottom: 1.5px solid currentColor;
+    transform: rotate(45deg);
   }
 
   .field--open .field__chevron {
@@ -197,39 +199,6 @@ export const helixSelectStyles = css`
     display: none;
   }
 
-  /* ─── Search Input ─── */
-
-  .field__search {
-    padding: var(--hx-space-2, 0.5rem);
-    border-bottom: var(--hx-border-width-thin, 1px) solid
-      var(--hx-select-border-color, var(--hx-color-neutral-300, #ced4da));
-    flex-shrink: 0;
-  }
-
-  .field__search-input {
-    width: 100%;
-    border: var(--hx-border-width-thin, 1px) solid
-      var(--hx-select-border-color, var(--hx-color-neutral-300, #ced4da));
-    border-radius: var(--hx-border-radius-sm, 0.25rem);
-    background-color: var(--hx-select-bg, var(--hx-color-neutral-0, #ffffff));
-    color: var(--hx-select-color, var(--hx-color-neutral-800, #212529));
-    font-family: inherit;
-    font-size: var(--hx-font-size-sm, 0.875rem);
-    padding: var(--hx-space-1, 0.25rem) var(--hx-space-2, 0.5rem);
-    outline: none;
-  }
-
-  .field__search-input:focus-visible {
-    border-color: var(--hx-select-focus-ring-color, var(--hx-focus-ring-color, #2563eb));
-    box-shadow: 0 0 0 var(--hx-focus-ring-width, 2px)
-      color-mix(
-        in srgb,
-        var(--hx-select-focus-ring-color, var(--hx-focus-ring-color, #2563eb))
-          calc(var(--hx-focus-ring-opacity, 0.25) * 100%),
-        transparent
-      );
-  }
-
   /* ─── Options Container ─── */
 
   .field__options {
@@ -253,8 +222,7 @@ export const helixSelectStyles = css`
     transition: background-color var(--hx-transition-fast, 150ms ease);
   }
 
-  .field__option:hover,
-  .field__option--active {
+  .field__option:hover {
     background-color: var(--hx-select-option-hover-bg, var(--hx-color-primary-50, #eff6ff));
   }
 
@@ -263,8 +231,14 @@ export const helixSelectStyles = css`
     font-weight: var(--hx-font-weight-medium, 500);
   }
 
-  .field__option--selected.field__option--active {
+  .field__option--focused {
     background-color: var(--hx-select-option-hover-bg, var(--hx-color-primary-50, #eff6ff));
+    outline: 2px solid var(--hx-select-focus-ring-color, var(--hx-focus-ring-color, #2563eb));
+    outline-offset: -2px;
+  }
+
+  .field__option--focused.field__option--selected {
+    background-color: var(--hx-select-option-selected-bg, var(--hx-color-primary-100, #dbeafe));
   }
 
   .field__option--disabled {
@@ -280,38 +254,6 @@ export const helixSelectStyles = css`
     text-overflow: ellipsis;
   }
 
-  /* ─── Option Checkbox (multiple mode) ─── */
-
-  .field__option-checkbox {
-    flex-shrink: 0;
-    width: var(--hx-space-4, 1rem);
-    height: var(--hx-space-4, 1rem);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border: var(--hx-border-width-thin, 1px) solid
-      var(--hx-select-border-color, var(--hx-color-neutral-300, #ced4da));
-    border-radius: var(--hx-border-radius-xs, 0.125rem);
-    color: var(--hx-color-primary-500, #2563eb);
-  }
-
-  .field__option--selected .field__option-checkbox {
-    background-color: var(--hx-color-primary-500, #2563eb);
-    border-color: var(--hx-color-primary-500, #2563eb);
-    color: var(--hx-color-neutral-0, #ffffff);
-  }
-
-  /* ─── Option Groups ─── */
-
-  .field__optgroup-label {
-    padding: var(--hx-space-1, 0.25rem) var(--hx-space-3, 0.75rem);
-    font-size: var(--hx-font-size-xs, 0.75rem);
-    font-weight: var(--hx-font-weight-semibold, 600);
-    color: var(--hx-color-neutral-500, #6c757d);
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-  }
-
   /* ─── No Options State ─── */
 
   .field__no-options {
@@ -319,55 +261,6 @@ export const helixSelectStyles = css`
     text-align: center;
     color: var(--hx-color-neutral-400, #adb5bd);
     font-size: var(--hx-font-size-sm, 0.875rem);
-  }
-
-  /* ─── Tags (multiple mode) ─── */
-
-  .field__tags {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--hx-space-1, 0.25rem);
-  }
-
-  .field__tag {
-    display: inline-flex;
-    align-items: center;
-    gap: var(--hx-space-1, 0.25rem);
-    padding: 0 var(--hx-space-2, 0.5rem);
-    background-color: var(--hx-select-tag-bg, var(--hx-color-primary-100, #dbeafe));
-    color: var(--hx-select-tag-color, var(--hx-color-primary-700, #1d4ed8));
-    border-radius: var(--hx-border-radius-full, 9999px);
-    font-size: var(--hx-font-size-xs, 0.75rem);
-    font-weight: var(--hx-font-weight-medium, 500);
-    line-height: var(--hx-line-height-tight, 1.25);
-    max-height: var(--hx-space-6, 1.5rem);
-  }
-
-  .field__tag-label {
-    white-space: nowrap;
-    max-width: var(--hx-select-tag-max-width, 8rem);
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
-  .field__tag-remove {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0;
-    border: none;
-    background: transparent;
-    color: inherit;
-    cursor: pointer;
-    line-height: 1;
-    flex-shrink: 0;
-  }
-
-  .field__tag-remove:focus-visible {
-    outline: var(--hx-focus-ring-width, 2px) solid
-      var(--hx-select-focus-ring-color, var(--hx-focus-ring-color, #2563eb));
-    border-radius: var(--hx-border-radius-xs, 0.125rem);
-    outline-offset: 1px;
   }
 
   /* ─── Hidden native select (form participation + test compat) ─── */
@@ -379,7 +272,6 @@ export const helixSelectStyles = css`
     overflow: hidden;
     opacity: 0;
     pointer-events: none;
-    /* Visually hidden but still in the accessibility tree for select tests */
     clip: rect(0, 0, 0, 0);
   }
 
