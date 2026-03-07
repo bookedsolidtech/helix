@@ -19,13 +19,10 @@ import type { HelixCarouselItem } from './hx-carousel-item.js';
  * @fires {CustomEvent<{index: number, slide: HelixCarouselItem}>} hx-slide-change - Dispatched when the active slide changes.
  *
  * @csspart base - The outer wrapper element.
- * @csspart viewport - The slide viewport/overflow container.
+ * @csspart scroll-container - The slide viewport/overflow container.
  * @csspart pagination - The pagination dot container.
  * @csspart pagination-item - Individual pagination dot button.
  * @csspart navigation - The previous/next button wrapper.
- * @csspart prev-btn - The previous navigation button.
- * @csspart next-btn - The next navigation button.
- * @csspart play-pause-btn - The autoplay play/pause toggle button.
  *
  * @cssprop [--hx-carousel-gap=0px] - Gap between slides.
  * @cssprop [--hx-carousel-slide-width=100%] - Width override for each slide.
@@ -78,17 +75,10 @@ export class HelixCarousel extends LitElement {
   orientation: 'horizontal' | 'vertical' = 'horizontal';
 
   /**
-   * Accessible label for the carousel region. Use unique labels when multiple carousels exist on the same page.
-   * @attr label
-   */
-  @property({ type: String, reflect: true })
-  label = 'Carousel';
-
-  /**
    * Whether click-drag scrolling is enabled.
    * @attr mouse-dragging
    */
-  @property({ type: Boolean, attribute: 'mouse-dragging', reflect: true })
+  @property({ type: Boolean, attribute: 'mouse-dragging' })
   mouseDragging = false;
 
   @state() private _currentIndex = 0;
@@ -215,20 +205,18 @@ export class HelixCarousel extends LitElement {
 
   // ─── Autoplay ───
 
-  private _advanceSlide = (): void => {
-    if (this.loop) {
-      this.goTo(this._currentIndex + this.slidesPerMove);
-    } else if (this._currentIndex < this._maxIndex) {
-      this.goTo(this._currentIndex + this.slidesPerMove);
-    } else {
-      this.goTo(0);
-    }
-  };
-
   private _startAutoplay(): void {
     if (this._autoplayTimer !== null) return;
     this._isPlaying = true;
-    this._autoplayTimer = setInterval(this._advanceSlide, this.autoplayInterval);
+    this._autoplayTimer = setInterval(() => {
+      if (this.loop) {
+        this.goTo(this._currentIndex + this.slidesPerMove);
+      } else if (this._currentIndex < this._maxIndex) {
+        this.goTo(this._currentIndex + this.slidesPerMove);
+      } else {
+        this.goTo(0);
+      }
+    }, this.autoplayInterval);
   }
 
   private _stopAutoplay(): void {
@@ -256,7 +244,15 @@ export class HelixCarousel extends LitElement {
   private _resumeAutoplay(): void {
     if (!this.autoplay || !this._isPlaying || this._reducedMotion) return;
     if (this._autoplayTimer !== null) return;
-    this._autoplayTimer = setInterval(this._advanceSlide, this.autoplayInterval);
+    this._autoplayTimer = setInterval(() => {
+      if (this.loop) {
+        this.goTo(this._currentIndex + this.slidesPerMove);
+      } else if (this._currentIndex < this._maxIndex) {
+        this.goTo(this._currentIndex + this.slidesPerMove);
+      } else {
+        this.goTo(0);
+      }
+    }, this.autoplayInterval);
   }
 
   // ─── Event Handlers ───
@@ -322,7 +318,7 @@ export class HelixCarousel extends LitElement {
     }
   };
 
-  // ─── Drag Handlers (Mouse + Touch) ───
+  // ─── Drag Handlers ───
 
   private _handleDragStart(e: MouseEvent): void {
     if (!this.mouseDragging) return;
@@ -359,42 +355,6 @@ export class HelixCarousel extends LitElement {
     (e.currentTarget as HTMLElement).style.cursor = '';
   }
 
-  private _handleTouchStart(e: TouchEvent): void {
-    if (!this.mouseDragging || e.touches.length === 0) return;
-    const touch = e.touches[0] as Touch;
-    this._isDragging = true;
-    this._dragMoved = false;
-    this._dragStartCoord = this.orientation === 'horizontal' ? touch.clientX : touch.clientY;
-  }
-
-  private _handleTouchMove(e: TouchEvent): void {
-    if (!this._isDragging || e.touches.length === 0) return;
-    const touch = e.touches[0] as Touch;
-    const current = this.orientation === 'horizontal' ? touch.clientX : touch.clientY;
-    const diff = current - this._dragStartCoord;
-    if (Math.abs(diff) > 5) {
-      this._dragMoved = true;
-      e.preventDefault();
-    }
-  }
-
-  private _handleTouchEnd(e: TouchEvent): void {
-    if (!this._isDragging || e.changedTouches.length === 0) return;
-    const touch = e.changedTouches[0] as Touch;
-    const current = this.orientation === 'horizontal' ? touch.clientX : touch.clientY;
-    const diff = current - this._dragStartCoord;
-    const threshold = 50;
-    if (this._dragMoved) {
-      if (diff > threshold) {
-        this.previous();
-      } else if (diff < -threshold) {
-        this.next();
-      }
-    }
-    this._isDragging = false;
-    this._dragMoved = false;
-  }
-
   // ─── Computed ───
 
   private get _trackTransform(): string {
@@ -421,7 +381,6 @@ export class HelixCarousel extends LitElement {
         <slot name="previous-button">
           <button
             class="nav-btn"
-            part="prev-btn"
             type="button"
             aria-label="Previous slide"
             ?disabled=${!this._canGoPrev}
@@ -434,7 +393,6 @@ export class HelixCarousel extends LitElement {
           ? html`
               <button
                 class="play-pause-btn"
-                part="play-pause-btn"
                 type="button"
                 aria-label=${this._isPlaying ? 'Pause autoplay' : 'Play autoplay'}
                 @click=${() => this._toggleAutoplay()}
@@ -446,7 +404,6 @@ export class HelixCarousel extends LitElement {
         <slot name="next-button">
           <button
             class="nav-btn"
-            part="next-btn"
             type="button"
             aria-label="Next slide"
             ?disabled=${!this._canGoNext}
@@ -465,7 +422,7 @@ export class HelixCarousel extends LitElement {
     const dots = Array.from({ length: count }, (_, i) => i);
     return html`
       <div class="controls">
-        <div class="pagination" part="pagination" role="tablist" aria-label="Slide navigation">
+        <div class="pagination" part="pagination">
           ${dots.map(
             (i) => html`
               <button
@@ -474,10 +431,9 @@ export class HelixCarousel extends LitElement {
                   'is-active': i === this._currentIndex,
                 })}
                 part="pagination-item"
-                role="tab"
                 type="button"
-                aria-label="Slide ${i + 1} of ${count}"
-                aria-selected=${i === this._currentIndex ? 'true' : 'false'}
+                aria-label="Slide ${i + 1}"
+                aria-current=${i === this._currentIndex ? 'true' : 'false'}
                 @click=${() => this.goTo(i)}
               >
                 <span class="pagination-dot"></span>
@@ -586,26 +542,27 @@ export class HelixCarousel extends LitElement {
 
   // ─── Render ───
 
-  private get _liveRegionText(): string {
-    if (this._slides.length === 0) return '';
-    return `Slide ${this._currentIndex + 1} of ${this._slides.length}`;
-  }
-
   override render() {
+    const isAutoplayStopped = this.autoplay && !this._isPlaying;
     return html`
-      <div class="base" part="base" role="region" aria-label=${this.label} tabindex="0">
+      <div
+        class="base"
+        part="base"
+        role="region"
+        aria-label="Carousel"
+        aria-roledescription="carousel"
+        tabindex="0"
+      >
         ${this._renderNavigation()}
         <div class="scroll-container-wrapper">
           <div
             class="scroll-container"
-            part="viewport"
+            part="scroll-container"
+            aria-live=${isAutoplayStopped ? 'polite' : 'off'}
             @mousedown=${this._handleDragStart}
             @mousemove=${this._handleDragMove}
             @mouseup=${this._handleDragEnd}
             @mouseleave=${this._handleDragEnd}
-            @touchstart=${this._handleTouchStart}
-            @touchmove=${this._handleTouchMove}
-            @touchend=${this._handleTouchEnd}
           >
             <div class="track" style="transform: ${this._trackTransform};">
               <slot @slotchange=${this._handleSlotChange}></slot>
@@ -613,7 +570,6 @@ export class HelixCarousel extends LitElement {
           </div>
         </div>
         ${this._renderPagination()}
-        <div class="sr-only" aria-live="polite" aria-atomic="true">${this._liveRegionText}</div>
       </div>
     `;
   }
