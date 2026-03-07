@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/web-components';
 import { html } from 'lit';
-import { expect, within } from 'storybook/test';
+import { expect, fn, within } from 'storybook/test';
 import './hx-list.js';
 import './hx-list-item.js';
 
@@ -15,12 +15,12 @@ const meta = {
   argTypes: {
     variant: {
       control: { type: 'select' },
-      options: ['plain', 'bulleted', 'numbered', 'interactive'],
+      options: ['plain', 'bulleted', 'numbered', 'description', 'interactive'],
       description: 'Visual style variant of the list.',
       table: {
         category: 'Visual',
         defaultValue: { summary: 'plain' },
-        type: { summary: "'plain' | 'bulleted' | 'numbered' | 'interactive'" },
+        type: { summary: "'plain' | 'bulleted' | 'numbered' | 'description' | 'interactive'" },
       },
     },
     divided: {
@@ -102,9 +102,8 @@ export const Interactive: Story = {
   render: () => html`
     <hx-list
       variant="interactive"
-      @hx-select=${(e: CustomEvent) => {
-        console.log('hx-select fired:', e.detail);
-      }}
+      label="Patient actions"
+      @hx-select=${fn()}
     >
       <hx-list-item value="schedule">Schedule Appointment</hx-list-item>
       <hx-list-item value="labs">View Lab Results</hx-list-item>
@@ -132,7 +131,7 @@ export const Divided: Story = {
 export const InteractiveDivided: Story = {
   name: 'Interactive + Divided',
   render: () => html`
-    <hx-list variant="interactive" divided style="max-width: 320px;">
+    <hx-list variant="interactive" label="Account menu" divided style="max-width: 320px;">
       <hx-list-item value="profile">My Profile</hx-list-item>
       <hx-list-item value="settings">Settings</hx-list-item>
       <hx-list-item value="notifications">Notifications</hx-list-item>
@@ -444,6 +443,52 @@ export const PatientNavigationMenu: Story = {
         </hx-list-item>
       </hx-list>
     </nav>
+  `,
+};
+
+// ─────────────────────────────────────────────────
+// 7. DESCRIPTION LIST
+// ─────────────────────────────────────────────────
+
+export const DescriptionList: Story = {
+  name: 'Description List',
+  render: () => html`
+    <hx-list variant="description" style="max-width: 400px;">
+      <hx-list-item type="term">Allergies</hx-list-item>
+      <hx-list-item type="definition">Penicillin, Sulfa drugs</hx-list-item>
+      <hx-list-item type="term">Blood Type</hx-list-item>
+      <hx-list-item type="definition">O positive</hx-list-item>
+      <hx-list-item type="term">Primary Diagnosis</hx-list-item>
+      <hx-list-item type="definition">Type 2 Diabetes Mellitus (E11.9)</hx-list-item>
+    </hx-list>
+  `,
+};
+
+// ─────────────────────────────────────────────────
+// 8. NESTED LISTS
+// ─────────────────────────────────────────────────
+
+export const NestedList: Story = {
+  name: 'Nested Lists',
+  render: () => html`
+    <hx-list variant="bulleted">
+      <hx-list-item>
+        Pre-operative checklist
+        <hx-list variant="bulleted" slot="description">
+          <hx-list-item>NPO after midnight</hx-list-item>
+          <hx-list-item>Remove jewelry and piercings</hx-list-item>
+          <hx-list-item>Arrange transportation home</hx-list-item>
+        </hx-list>
+      </hx-list-item>
+      <hx-list-item>
+        Post-operative instructions
+        <hx-list variant="numbered" slot="description">
+          <hx-list-item>Rest for 24 hours</hx-list-item>
+          <hx-list-item>Take prescribed medications</hx-list-item>
+          <hx-list-item>Follow-up in 2 weeks</hx-list-item>
+        </hx-list>
+      </hx-list-item>
+    </hx-list>
   `,
 };
 

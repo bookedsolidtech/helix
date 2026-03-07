@@ -78,10 +78,13 @@ describe('hx-list', () => {
       expect(base.getAttribute('role')).toBe('list');
     });
 
-    it('sets role="list" for numbered variant', async () => {
+    it('renders <ol> without redundant role for numbered variant', async () => {
+      // Per WCAG audit fix (P2): <ol role="list"> suppresses ordered list semantics in VoiceOver.
+      // The <ol> element has an implicit listitem role; no explicit role attribute needed.
       const el = await fixture<HelixList>('<hx-list variant="numbered"></hx-list>');
       const base = shadowQuery(el, '[part~="base"]')!;
-      expect(base.getAttribute('role')).toBe('list');
+      expect(base.tagName.toLowerCase()).toBe('ol');
+      expect(base.getAttribute('role')).toBeNull();
     });
   });
 
@@ -143,7 +146,8 @@ describe('hx-list', () => {
       });
       const liEl = shadowQuery<HTMLElement>(item, '[part~="base"]')!;
       liEl.click();
-      await el.updateComplete;
+      // Use a proper async tick to ensure all microtasks are flushed (not just updateComplete)
+      await new Promise((resolve) => setTimeout(resolve, 0));
       expect(fired).toBe(false);
     });
   });
@@ -311,28 +315,29 @@ describe('hx-list-item', () => {
       expect(li.getAttribute('role')).toBe('listitem');
     });
 
-    it('has role="option" inside interactive hx-list', async () => {
+    it('has role="option" on the host element inside interactive hx-list', async () => {
+      // ARIA ownership fix: role="option" is on the HOST element (hx-list-item), not the shadow <li>.
+      // This ensures ul[role=listbox] > hx-list-item[role=option] ownership is correct.
       const container = await fixture<HelixList>(`
-        <hx-list variant="interactive">
+        <hx-list variant="interactive" label="Options">
           <hx-list-item>Item</hx-list-item>
         </hx-list>
       `);
       const item = container.querySelector('hx-list-item')!;
       await item.updateComplete;
-      const li = shadowQuery(item, '[part~="base"]')!;
-      expect(li.getAttribute('role')).toBe('option');
+      expect(item.getAttribute('role')).toBe('option');
     });
 
-    it('sets aria-selected on items in interactive list', async () => {
+    it('sets aria-selected on host element in interactive list', async () => {
+      // ARIA ownership fix: aria-selected is on the HOST element, synced by _syncHostAria().
       const container = await fixture<HelixList>(`
-        <hx-list variant="interactive">
+        <hx-list variant="interactive" label="Options">
           <hx-list-item selected>Item</hx-list-item>
         </hx-list>
       `);
       const item = container.querySelector('hx-list-item')!;
       await item.updateComplete;
-      const li = shadowQuery(item, '[part~="base"]')!;
-      expect(li.getAttribute('aria-selected')).toBe('true');
+      expect(item.getAttribute('aria-selected')).toBe('true');
     });
 
     it('sets aria-disabled when disabled', async () => {
@@ -366,12 +371,110 @@ describe('hx-list-item', () => {
       expect(slotted).toBeTruthy();
     });
 
-    it('description slot renders content', async () => {
+    it('description slot renders content and is accessible', async () => {
       const el = await fixture<HelixListItem>(
         '<hx-list-item>Item<span slot="description">Details here</span></hx-list-item>',
       );
       const slotted = el.querySelector('[slot="description"]');
       expect(slotted).toBeTruthy();
+      expect(slotted?.textContent).toBe('Details here');
+      // Verify the description part exists in shadow DOM
+      const descPart = shadowQuery(el, '[part~="description"]');
+      expect(descPart).toBeTruthy();
+    });
+  });
+
+  // ─── href + disabled combination ───
+
+  describe('href + disabled combination', () => {
+    it('renders as plain <li> (no anchor) when disabled and href set', async () => {
+      const el = await fixture<HelixListItem>(
+        '<hx-list-item href="https://example.com" disabled>Item</hx-list-item>',
+      );
+      const anchor = shadowQuery(el, 'a');
+      expect(anchor).toBeNull();
+    });
+
+    it('does not dispatch hx-list-item-click when disabled and href set', async () => {
+      const el = await fixture<HelixListItem>(
+        '<hx-list-item href="https://example.com" disabled>Item</hx-list-item>',
+      );
+      let fired = false;
+      el.addEventListener('hx-list-item-click', () => {
+        fired = true;
+      });
+      const liEl = shadowQuery<HTMLElement>(el, '[part~="base"]')!;
+      liEl.click();
+      await new Promise((resolve) => setTimeout(resolve, 0));
+      expect(fired).toBe(false);
+    });
+  });
+
+  // ─── interactive property (set by parent) ───
+
+  describe('Property: interactive', () => {
+    it('sets role="option" on host when interactive=true', async () => {
+      const el = await fixture<HelixListItem>('<hx-list-item interactive>Item</hx-list-item>');
+      await el.updateComplete;
+      expect(el.getAttribute('role')).toBe('option');
+    });
+
+    it('sets aria-selected on host when interactive=true', async () => {
+      const el = await fixture<HelixListItem>(
+        '<hx-list-item interactive selected>Item</hx-list-item>',
+      );
+      await el.updateComplete;
+      expect(el.getAttribute('aria-selected')).toBe('true');
+    });
+
+    it('does not set role on host when interactive=false', async () => {
+      const el = await fixture<HelixListItem>('<hx-list-item>Item</hx-list-item>');
+      await el.updateComplete;
+      expect(el.getAttribute('role')).toBeNull();
+    });
+
+    it('does not render <a> link in interactive mode (invalid ARIA)', async () => {
+      const container = await fixture<HelixList>(`
+        <hx-list variant="interactive" label="Options">
+          <hx-list-item href="https://example.com" value="link">Link Item</hx-list-item>
+        </hx-list>
+      `);
+      const item = container.querySelector('hx-list-item')!;
+      await item.updateComplete;
+      const anchor = shadowQuery(item, 'a');
+      expect(anchor).toBeNull();
+    });
+
+    it('parent hx-list sets interactive on child items', async () => {
+      const el = await fixture<HelixList>(`
+        <hx-list variant="interactive" label="Options">
+          <hx-list-item value="a">Option A</hx-list-item>
+        </hx-list>
+      `);
+      await el.updateComplete;
+      const item = el.querySelector<HelixListItem>('hx-list-item')!;
+      await item.updateComplete;
+      expect(item.interactive).toBe(true);
+    });
+  });
+
+  // ─── description list type ───
+
+  describe('Property: type (description list)', () => {
+    it('renders <dt> when type="term"', async () => {
+      const el = await fixture<HelixListItem>(
+        '<hx-list-item type="term">Allergies</hx-list-item>',
+      );
+      const dt = shadowQuery(el, 'dt');
+      expect(dt).toBeTruthy();
+    });
+
+    it('renders <dd> when type="definition"', async () => {
+      const el = await fixture<HelixListItem>(
+        '<hx-list-item type="definition">Penicillin</hx-list-item>',
+      );
+      const dd = shadowQuery(el, 'dd');
+      expect(dd).toBeTruthy();
     });
   });
 
@@ -402,6 +505,19 @@ describe('hx-list-item', () => {
       expect(violations).toEqual([]);
     });
 
+    it('hx-list numbered has no axe violations', async () => {
+      const el = await fixture<HelixList>(`
+        <hx-list variant="numbered">
+          <hx-list-item>Step one</hx-list-item>
+          <hx-list-item>Step two</hx-list-item>
+          <hx-list-item>Step three</hx-list-item>
+        </hx-list>
+      `);
+      await page.screenshot();
+      const { violations } = await checkA11y(el);
+      expect(violations).toEqual([]);
+    });
+
     it('hx-list interactive has no axe violations', async () => {
       const el = await fixture<HelixList>(`
         <hx-list variant="interactive" label="Options">
@@ -419,6 +535,166 @@ describe('hx-list-item', () => {
       const el = await fixture<HelixList>(`
         <hx-list variant="interactive" label="Actions">
           <hx-list-item disabled>Unavailable</hx-list-item>
+        </hx-list>
+      `);
+      await page.screenshot();
+      const { violations } = await checkA11y(el);
+      expect(violations).toEqual([]);
+    });
+  });
+
+  // ─── Keyboard navigation ───
+
+  describe('Keyboard navigation (interactive)', () => {
+    it('ArrowDown moves focus to next item', async () => {
+      const el = await fixture<HelixList>(`
+        <hx-list variant="interactive" label="Options">
+          <hx-list-item value="a">Option A</hx-list-item>
+          <hx-list-item value="b">Option B</hx-list-item>
+          <hx-list-item value="c">Option C</hx-list-item>
+        </hx-list>
+      `);
+      await el.updateComplete;
+      const items = Array.from(el.querySelectorAll<HelixListItem>('hx-list-item'));
+      await items[0].updateComplete;
+      items[0].focus();
+      el.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true }));
+      expect(document.activeElement).toBe(items[1]);
+    });
+
+    it('ArrowUp moves focus to previous item', async () => {
+      const el = await fixture<HelixList>(`
+        <hx-list variant="interactive" label="Options">
+          <hx-list-item value="a">Option A</hx-list-item>
+          <hx-list-item value="b">Option B</hx-list-item>
+        </hx-list>
+      `);
+      await el.updateComplete;
+      const items = Array.from(el.querySelectorAll<HelixListItem>('hx-list-item'));
+      await items[1].updateComplete;
+      items[1].focus();
+      el.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowUp', bubbles: true }));
+      expect(document.activeElement).toBe(items[0]);
+    });
+
+    it('Home moves focus to first item', async () => {
+      const el = await fixture<HelixList>(`
+        <hx-list variant="interactive" label="Options">
+          <hx-list-item value="a">Option A</hx-list-item>
+          <hx-list-item value="b">Option B</hx-list-item>
+          <hx-list-item value="c">Option C</hx-list-item>
+        </hx-list>
+      `);
+      await el.updateComplete;
+      const items = Array.from(el.querySelectorAll<HelixListItem>('hx-list-item'));
+      await items[2].updateComplete;
+      items[2].focus();
+      el.dispatchEvent(new KeyboardEvent('keydown', { key: 'Home', bubbles: true }));
+      expect(document.activeElement).toBe(items[0]);
+    });
+
+    it('End moves focus to last item', async () => {
+      const el = await fixture<HelixList>(`
+        <hx-list variant="interactive" label="Options">
+          <hx-list-item value="a">Option A</hx-list-item>
+          <hx-list-item value="b">Option B</hx-list-item>
+          <hx-list-item value="c">Option C</hx-list-item>
+        </hx-list>
+      `);
+      await el.updateComplete;
+      const items = Array.from(el.querySelectorAll<HelixListItem>('hx-list-item'));
+      await items[0].updateComplete;
+      items[0].focus();
+      el.dispatchEvent(new KeyboardEvent('keydown', { key: 'End', bubbles: true }));
+      expect(document.activeElement).toBe(items[2]);
+    });
+
+    it('Enter dispatches hx-list-item-click on focused item', async () => {
+      const el = await fixture<HelixList>(`
+        <hx-list variant="interactive" label="Options">
+          <hx-list-item value="a">Option A</hx-list-item>
+        </hx-list>
+      `);
+      await el.updateComplete;
+      const item = el.querySelector<HelixListItem>('hx-list-item')!;
+      await item.updateComplete;
+      const eventPromise = oneEvent(item, 'hx-list-item-click');
+      const liEl = shadowQuery<HTMLElement>(item, '[part~="base"]')!;
+      liEl.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
+      const event = await eventPromise;
+      expect(event).toBeTruthy();
+    });
+
+    it('Space dispatches hx-list-item-click on focused item', async () => {
+      const el = await fixture<HelixList>(`
+        <hx-list variant="interactive" label="Options">
+          <hx-list-item value="b">Option B</hx-list-item>
+        </hx-list>
+      `);
+      await el.updateComplete;
+      const item = el.querySelector<HelixListItem>('hx-list-item')!;
+      await item.updateComplete;
+      const eventPromise = oneEvent(item, 'hx-list-item-click');
+      const liEl = shadowQuery<HTMLElement>(item, '[part~="base"]')!;
+      liEl.dispatchEvent(new KeyboardEvent('keydown', { key: ' ', bubbles: true }));
+      const event = await eventPromise;
+      expect(event).toBeTruthy();
+    });
+  });
+
+  // ─── Property: label ───
+
+  describe('Property: label', () => {
+    it('sets aria-label on the listbox element', async () => {
+      const el = await fixture<HelixList>(
+        '<hx-list variant="interactive" label="Treatment options"></hx-list>',
+      );
+      const base = shadowQuery(el, '[part~="base"]')!;
+      expect(base.getAttribute('aria-label')).toBe('Treatment options');
+    });
+  });
+
+  // ─── Description variant ───
+
+  describe('Variant: description', () => {
+    it('renders <dl> for description variant', async () => {
+      const el = await fixture<HelixList>('<hx-list variant="description"></hx-list>');
+      const dl = shadowQuery(el, 'dl');
+      expect(dl).toBeInstanceOf(HTMLElement);
+    });
+  });
+
+  // ─── Nested lists ───
+
+  describe('Nested lists', () => {
+    it('renders a nested bulleted list inside a list item', async () => {
+      const el = await fixture<HelixList>(`
+        <hx-list variant="bulleted">
+          <hx-list-item>
+            Parent
+            <hx-list variant="bulleted">
+              <hx-list-item>Child A</hx-list-item>
+              <hx-list-item>Child B</hx-list-item>
+            </hx-list>
+          </hx-list-item>
+        </hx-list>
+      `);
+      const nestedList = el.querySelector('hx-list-item hx-list');
+      expect(nestedList).toBeTruthy();
+      const nestedItems = nestedList!.querySelectorAll('hx-list-item');
+      expect(nestedItems.length).toBe(2);
+    });
+
+    it('nested list has no axe violations', async () => {
+      const el = await fixture<HelixList>(`
+        <hx-list variant="bulleted">
+          <hx-list-item>
+            Outer item
+            <hx-list variant="numbered">
+              <hx-list-item>Inner step one</hx-list-item>
+              <hx-list-item>Inner step two</hx-list-item>
+            </hx-list>
+          </hx-list-item>
         </hx-list>
       `);
       await page.screenshot();

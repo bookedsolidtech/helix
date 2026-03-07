@@ -3,7 +3,6 @@ import { customElement, property } from 'lit/decorators.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import { tokenStyles } from '@helix/tokens/lit';
 import { helixListItemStyles } from './hx-list-item.styles.js';
-import type { HelixList } from './hx-list.js';
 
 /**
  * A rich list item for use inside `hx-list`.
@@ -20,7 +19,7 @@ import type { HelixList } from './hx-list.js';
  * @fires {CustomEvent<{item: HelixListItem, value: string | undefined}>} hx-list-item-click -
  *   Dispatched when the item is clicked and not disabled.
  *
- * @csspart base - The root item element (li, a, or button wrapper).
+ * @csspart base - The root item element (li, dt, dd, or wrapper).
  * @csspart prefix - The prefix slot container.
  * @csspart label - The label slot container.
  * @csspart description - The description slot container.
@@ -31,6 +30,7 @@ import type { HelixList } from './hx-list.js';
  * @cssprop [--hx-list-item-bg-hover=var(--hx-color-neutral-50)] - Item hover background.
  * @cssprop [--hx-list-item-bg-selected=var(--hx-color-primary-50)] - Selected item background.
  * @cssprop [--hx-list-item-color-selected=var(--hx-color-primary-700)] - Selected item text color.
+ * @cssprop [--hx-list-item-description-color=var(--hx-color-neutral-500)] - Description text color.
  */
 @customElement('hx-list-item')
 export class HelixListItem extends LitElement {
@@ -51,7 +51,7 @@ export class HelixListItem extends LitElement {
   selected = false;
 
   /**
-   * When set, renders the item as a link.
+   * When set, renders the item as a link (only in non-interactive variants).
    * @attr href
    */
   @property({ type: String })
@@ -64,13 +64,56 @@ export class HelixListItem extends LitElement {
   @property({ type: String })
   value: string | undefined = undefined;
 
-  private get _parentList(): HelixList | null {
-    return this.closest('hx-list') as HelixList | null;
+  /**
+   * Set by the parent hx-list to indicate this item is part of an interactive listbox.
+   * Controls CSS styling and ARIA role via host attributes.
+   * @attr interactive
+   */
+  @property({ type: Boolean, reflect: true })
+  interactive = false;
+
+  /**
+   * Item type for description list variant. Use 'term' for <dt> and 'definition' for <dd>.
+   * @attr type
+   */
+  @property({ type: String, reflect: true })
+  type: 'default' | 'term' | 'definition' = 'default';
+
+  override updated(changedProps: Map<string, unknown>): void {
+    super.updated(changedProps);
+    if (
+      changedProps.has('interactive') ||
+      changedProps.has('selected') ||
+      changedProps.has('disabled')
+    ) {
+      this._syncHostAria();
+    }
   }
 
-  private get _isInteractive(): boolean {
-    const parent = this._parentList;
-    return parent?.variant === 'interactive';
+  /**
+   * Syncs ARIA attributes to the host element when in interactive (listbox option) mode.
+   * This ensures correct ARIA ownership: ul[role=listbox] > hx-list-item[role=option].
+   */
+  private _syncHostAria(): void {
+    if (this.interactive) {
+      this.setAttribute('role', 'option');
+      this.setAttribute('aria-selected', String(this.selected));
+      if (this.disabled) {
+        this.setAttribute('aria-disabled', 'true');
+      } else {
+        this.removeAttribute('aria-disabled');
+      }
+      if (!this.disabled) {
+        this.setAttribute('tabindex', '0');
+      } else {
+        this.removeAttribute('tabindex');
+      }
+    } else {
+      this.removeAttribute('role');
+      this.removeAttribute('aria-selected');
+      this.removeAttribute('aria-disabled');
+      this.removeAttribute('tabindex');
+    }
   }
 
   private _handleClick(e: MouseEvent): void {
@@ -109,18 +152,58 @@ export class HelixListItem extends LitElement {
   }
 
   override render() {
-    const isInteractive = this._isInteractive;
+    // Description list: render as <dt> (term) or <dd> (definition)
+    if (this.type === 'term') {
+      return html`
+        <dt
+          part="base"
+          class="list-item ${this.disabled ? 'list-item--disabled' : ''}"
+          aria-disabled=${this.disabled ? 'true' : nothing}
+        >
+          ${this._renderContent()}
+        </dt>
+      `;
+    }
 
-    // Determine ARIA role
-    const role = isInteractive ? 'option' : 'listitem';
+    if (this.type === 'definition') {
+      return html`
+        <dd
+          part="base"
+          class="list-item ${this.disabled ? 'list-item--disabled' : ''}"
+          aria-disabled=${this.disabled ? 'true' : nothing}
+        >
+          ${this._renderContent()}
+        </dd>
+      `;
+    }
 
+    // Interactive mode: role is on the host element (ARIA ownership across shadow DOM).
+    // Internal <li> uses role="presentation" so AT sees: listbox > option (host).
+    if (this.interactive) {
+      // In interactive mode, links are not rendered as <a> to avoid
+      // invalid ARIA: focusable content inside role="option" is prohibited.
+      return html`
+        <li
+          part="base"
+          role="presentation"
+          class="list-item ${this.selected ? 'list-item--selected' : ''} ${this.disabled
+            ? 'list-item--disabled'
+            : ''}"
+          @click=${this._handleClick}
+          @keydown=${this._handleKeydown}
+        >
+          ${this._renderContent()}
+        </li>
+      `;
+    }
+
+    // Non-interactive with href: render as link
     if (this.href !== undefined && !this.disabled) {
       return html`
         <li
           part="base"
           class="list-item"
-          role=${role}
-          aria-selected=${isInteractive ? String(this.selected) : nothing}
+          role="listitem"
           aria-disabled=${this.disabled ? 'true' : nothing}
         >
           <a class="list-item__link" href=${ifDefined(this.href)} @click=${this._handleClick}>
@@ -130,16 +213,15 @@ export class HelixListItem extends LitElement {
       `;
     }
 
+    // Default non-interactive
     return html`
       <li
         part="base"
         class="list-item ${this.selected ? 'list-item--selected' : ''} ${this.disabled
           ? 'list-item--disabled'
           : ''}"
-        role=${role}
-        aria-selected=${isInteractive ? String(this.selected) : nothing}
+        role="listitem"
         aria-disabled=${this.disabled ? 'true' : nothing}
-        tabindex=${isInteractive && !this.disabled ? '0' : nothing}
         @click=${this._handleClick}
         @keydown=${this._handleKeydown}
       >
