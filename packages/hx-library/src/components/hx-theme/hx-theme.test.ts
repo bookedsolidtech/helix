@@ -314,9 +314,7 @@ describe('hx-theme', () => {
     });
 
     it('default slot renders HTML children', async () => {
-      const el = await fixture<HelixTheme>(
-        '<hx-theme><span class="child">Child</span></hx-theme>',
-      );
+      const el = await fixture<HelixTheme>('<hx-theme><span class="child">Child</span></hx-theme>');
       const span = el.querySelector('span.child');
       expect(span).toBeTruthy();
     });
@@ -326,9 +324,7 @@ describe('hx-theme', () => {
 
   describe('Accessibility (axe-core)', () => {
     it('has no axe violations in default state', async () => {
-      const el = await fixture<HelixTheme>(
-        '<hx-theme><p>Accessible themed content</p></hx-theme>',
-      );
+      const el = await fixture<HelixTheme>('<hx-theme><p>Accessible themed content</p></hx-theme>');
       await page.screenshot();
       const { violations } = await checkA11y(el);
       expect(violations).toEqual([]);

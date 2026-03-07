@@ -53,7 +53,9 @@ const meta = {
         <p style="margin: 0 0 0.5rem; font-weight: 600; font-size: 1rem;">
           Theme: <code>${args.theme}</code>
         </p>
-        <p style="margin: 0 0 0.75rem; color: var(--hx-color-text-secondary, var(--hx-color-neutral-600, #475569));">
+        <p
+          style="margin: 0 0 0.75rem; color: var(--hx-color-text-secondary, var(--hx-color-neutral-600, #475569));"
+        >
           This content inherits <code>--hx-*</code> design tokens from the theme provider.
         </p>
         <p style="margin: 0; color: var(--hx-color-primary-500, #2563eb);">
@@ -86,7 +88,9 @@ export const Dark: Story = {
   args: { theme: 'dark' },
   decorators: [
     (story) => html`
-      <div style="background: var(--hx-color-neutral-950, #0d1117); padding: 2rem; min-height: 120px;">
+      <div
+        style="background: var(--hx-color-neutral-950, #0d1117); padding: 2rem; min-height: 120px;"
+      >
         ${story()}
       </div>
     `,
@@ -102,9 +106,7 @@ export const HighContrast: Story = {
   args: { theme: 'high-contrast' },
   decorators: [
     (story) => html`
-      <div style="background: #000; padding: 2rem; min-height: 120px;">
-        ${story()}
-      </div>
+      <div style="background: #000; padding: 2rem; min-height: 120px;">${story()}</div>
     `,
   ],
 };
@@ -128,12 +130,10 @@ export const SystemDetection: Story = {
           font-family: sans-serif;
         "
       >
-        <p style="margin: 0 0 0.5rem; font-weight: 600;">
-          System Theme Detection
-        </p>
+        <p style="margin: 0 0 0.5rem; font-weight: 600;">System Theme Detection</p>
         <p style="margin: 0; color: var(--hx-color-neutral-600, #475569); font-size: 0.875rem;">
-          This theme provider auto-detects your OS color scheme preference
-          via <code>prefers-color-scheme</code> and applies the matching tokens.
+          This theme provider auto-detects your OS color scheme preference via
+          <code>prefers-color-scheme</code> and applies the matching tokens.
         </p>
       </div>
     </hx-theme>
@@ -163,7 +163,9 @@ export const ThemeSwitcherDemo: Story = {
           <p style="margin: 0; color: var(--hx-color-primary-500);">
             Primary color — updates when you switch theme
           </p>
-          <p style="margin: 0.5rem 0 0; font-size: 0.875rem; color: var(--hx-color-text-secondary);">
+          <p
+            style="margin: 0.5rem 0 0; font-size: 0.875rem; color: var(--hx-color-text-secondary);"
+          >
             Shadow: <code>var(--hx-shadow-sm)</code>
           </p>
         </div>
@@ -211,7 +213,11 @@ export const SideBySide: Story = {
   render: () => html`
     <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem;">
       <div>
-        <p style="margin: 0 0 0.5rem; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; color: #6b7280;">Light</p>
+        <p
+          style="margin: 0 0 0.5rem; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; color: #6b7280;"
+        >
+          Light
+        </p>
         <hx-theme theme="light">
           <div
             style="
@@ -225,13 +231,19 @@ export const SideBySide: Story = {
             "
           >
             <p style="margin: 0; color: var(--hx-color-primary-500);">Primary color</p>
-            <p style="margin: 0.25rem 0 0; color: var(--hx-color-text-secondary);">Secondary text</p>
+            <p style="margin: 0.25rem 0 0; color: var(--hx-color-text-secondary);">
+              Secondary text
+            </p>
           </div>
         </hx-theme>
       </div>
 
       <div style="background: #1a1a2e; padding: 0.5rem; border-radius: 0.375rem;">
-        <p style="margin: 0 0 0.5rem; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; color: #9ca3af;">Dark</p>
+        <p
+          style="margin: 0 0 0.5rem; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; color: #9ca3af;"
+        >
+          Dark
+        </p>
         <hx-theme theme="dark">
           <div
             style="
@@ -245,13 +257,19 @@ export const SideBySide: Story = {
             "
           >
             <p style="margin: 0; color: var(--hx-color-primary-400);">Primary color</p>
-            <p style="margin: 0.25rem 0 0; color: var(--hx-color-text-secondary);">Secondary text</p>
+            <p style="margin: 0.25rem 0 0; color: var(--hx-color-text-secondary);">
+              Secondary text
+            </p>
           </div>
         </hx-theme>
       </div>
 
       <div style="background: #000; padding: 0.5rem; border-radius: 0.375rem;">
-        <p style="margin: 0 0 0.5rem; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; color: #9ca3af;">High Contrast</p>
+        <p
+          style="margin: 0 0 0.5rem; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; color: #9ca3af;"
+        >
+          High Contrast
+        </p>
         <hx-theme theme="high-contrast">
           <div
             style="
@@ -265,7 +283,9 @@ export const SideBySide: Story = {
             "
           >
             <p style="margin: 0; color: var(--hx-color-text-link);">Primary link color (yellow)</p>
-            <p style="margin: 0.25rem 0 0; color: var(--hx-color-text-secondary);">Secondary text</p>
+            <p style="margin: 0.25rem 0 0; color: var(--hx-color-text-secondary);">
+              Secondary text
+            </p>
           </div>
         </hx-theme>
       </div>
@@ -308,7 +328,9 @@ export const NestedThemes: Story = {
             "
           >
             <p style="margin: 0; font-weight: 600;">Dark sidebar (nested hx-theme)</p>
-            <p style="margin: 0.5rem 0 0; color: var(--hx-color-text-secondary); font-size: 0.875rem;">
+            <p
+              style="margin: 0.5rem 0 0; color: var(--hx-color-text-secondary); font-size: 0.875rem;"
+            >
               Tokens are scoped to this subtree. The outer light tokens remain unaffected.
             </p>
           </aside>
