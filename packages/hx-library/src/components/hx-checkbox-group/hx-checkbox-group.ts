@@ -1,9 +1,12 @@
 import { LitElement, html, nothing } from 'lit';
-import { customElement, property, query, state } from 'lit/decorators.js';
+import { customElement, property, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { tokenStyles } from '@helix/tokens/lit';
 import { helixCheckboxGroupStyles } from './hx-checkbox-group.styles.js';
 import type { HelixCheckbox } from '../hx-checkbox/hx-checkbox.js';
+
+/** Monotonic counter for stable, SSR-safe IDs. */
+let _uid = 0;
 
 /**
  * A form-associated checkbox group that manages a set of `<hx-checkbox>` children.
@@ -27,6 +30,17 @@ import type { HelixCheckbox } from '../hx-checkbox/hx-checkbox.js';
  * @cssprop [--hx-checkbox-group-gap=var(--hx-space-3, 0.75rem)] - Gap between checkbox items.
  * @cssprop [--hx-checkbox-group-label-color=var(--hx-color-neutral-700, #343a40)] - Label text color.
  * @cssprop [--hx-checkbox-group-error-color=var(--hx-color-error-500, #dc3545)] - Error message color.
+ *
+ * @drupal
+ * Form-associated; render via Twig:
+ * ```twig
+ * <hx-checkbox-group name="{{ field_name }}" label="{{ label }}"{{ required ? ' required' : '' }}>
+ *   {% for option in options %}
+ *     <hx-checkbox value="{{ option.value }}" label="{{ option.label }}"></hx-checkbox>
+ *   {% endfor %}
+ * </hx-checkbox-group>
+ * ```
+ * The `name` attribute propagates automatically to child checkboxes — no Drupal behavior required.
  */
 @customElement('hx-checkbox-group')
 export class HelixCheckboxGroup extends LitElement {
@@ -87,17 +101,12 @@ export class HelixCheckboxGroup extends LitElement {
   @property({ type: String, reflect: true })
   orientation: 'vertical' | 'horizontal' = 'vertical';
 
-  @query('.fieldset__items')
-  declare private _itemsEl: HTMLElement | null;
-
   @state() private _hasErrorSlot = false;
-
-  /** Deduplicates rapid back-to-back child hx-change events (label double-fire guard). */
-  private _suppressNextChildChange = false;
+  @state() private _hasHelpSlot = false;
 
   // ─── Internal IDs ───
 
-  private _groupId = `hx-checkbox-group-${Math.random().toString(36).slice(2, 9)}`;
+  private _groupId = `hx-checkbox-group-${++_uid}`;
   private _helpTextId = `${this._groupId}-help`;
   private _errorId = `${this._groupId}-error`;
 
@@ -106,6 +115,11 @@ export class HelixCheckboxGroup extends LitElement {
   private _handleErrorSlotChange(e: Event): void {
     const slot = e.target as HTMLSlotElement;
     this._hasErrorSlot = slot.assignedNodes({ flatten: true }).length > 0;
+  }
+
+  private _handleHelpSlotChange(e: Event): void {
+    const slot = e.target as HTMLSlotElement;
+    this._hasHelpSlot = slot.assignedNodes({ flatten: true }).length > 0;
   }
 
   // ─── Lifecycle ───
@@ -145,7 +159,7 @@ export class HelixCheckboxGroup extends LitElement {
   // ─── Checkbox Management ───
 
   private _getCheckboxes(): HelixCheckbox[] {
-    return Array.from(this.querySelectorAll('hx-checkbox')) as HelixCheckbox[];
+    return Array.from(this.children).filter((c): c is HelixCheckbox => c.tagName === 'HX-CHECKBOX');
   }
 
   private _getCheckedValues(): string[] {
@@ -177,17 +191,6 @@ export class HelixCheckboxGroup extends LitElement {
     if (e.target === this) return;
 
     e.stopImmediatePropagation();
-
-    // Guard against double-fire: clicking a <label> that wraps <input> triggers
-    // _handleChange twice (once for label click, once for the synthetic input click).
-    if (this._suppressNextChildChange) {
-      this._suppressNextChildChange = false;
-      return;
-    }
-    this._suppressNextChildChange = true;
-    void Promise.resolve().then(() => {
-      this._suppressNextChildChange = false;
-    });
 
     const values = this._getCheckedValues();
     this._updateFormValue(values);
@@ -229,10 +232,11 @@ export class HelixCheckboxGroup extends LitElement {
   private _updateValidity(values?: string[]): void {
     const checkedValues = values ?? this._getCheckedValues();
     if (this.required && checkedValues.length === 0) {
+      const firstCheckbox = this._getCheckboxes()[0];
       this._internals.setValidity(
         { valueMissing: true },
         this.error || 'Please select at least one option.',
-        this._itemsEl ?? undefined,
+        firstCheckbox,
       );
     } else {
       this._internals.setValidity({});
@@ -299,7 +303,9 @@ export class HelixCheckboxGroup extends LitElement {
     };
 
     const describedBy =
-      [this.error ? this._errorId : null, this._helpTextId].filter(Boolean).join(' ') || undefined;
+      [hasError ? this._errorId : null, this._hasHelpSlot ? this._helpTextId : null]
+        .filter(Boolean)
+        .join(' ') || undefined;
 
     return html`
       <fieldset
@@ -318,22 +324,14 @@ export class HelixCheckboxGroup extends LitElement {
           <slot @slotchange=${this._handleSlotChange}></slot>
         </div>
 
-        <slot name="error" @slotchange=${this._handleErrorSlotChange}>
-          ${this.error && !this._hasErrorSlot
-            ? html`<div
-                part="error-message"
-                class="fieldset__error"
-                id=${this._errorId}
-                role="alert"
-                aria-live="polite"
-              >
-                ${this.error}
-              </div>`
-            : nothing}
-        </slot>
+        ${hasError
+          ? html`<div part="error-message" class="fieldset__error" id=${this._errorId} role="alert">
+              <slot name="error" @slotchange=${this._handleErrorSlotChange}> ${this.error} </slot>
+            </div>`
+          : html`<slot name="error" @slotchange=${this._handleErrorSlotChange}></slot>`}
 
         <div part="help-text" class="fieldset__help-text" id=${this._helpTextId}>
-          <slot name="help"></slot>
+          <slot name="help" @slotchange=${this._handleHelpSlotChange}></slot>
         </div>
       </fieldset>
     `;
