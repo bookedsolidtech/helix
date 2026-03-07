@@ -243,10 +243,10 @@ describe('hx-pagination', () => {
       const select = el.shadowRoot!.querySelector<HTMLSelectElement>('select')!;
       const [event] = await Promise.all([
         oneEvent(el, 'hx-page-size-change'),
-        Promise.resolve(() => {
+        Promise.resolve().then(() => {
           select.value = '50';
           select.dispatchEvent(new Event('change', { bubbles: true }));
-        })(),
+        }),
       ]);
       expect((event as CustomEvent<{ pageSize: number }>).detail.pageSize).toBe(50);
     });
@@ -258,10 +258,10 @@ describe('hx-pagination', () => {
       const select = el.shadowRoot!.querySelector<HTMLSelectElement>('select')!;
       const [event] = await Promise.all([
         oneEvent(el, 'hx-page-size-change'),
-        Promise.resolve(() => {
+        Promise.resolve().then(() => {
           select.value = '10';
           select.dispatchEvent(new Event('change', { bubbles: true }));
-        })(),
+        }),
       ]);
       expect((event as CustomEvent).bubbles).toBe(true);
       expect((event as CustomEvent).composed).toBe(true);
