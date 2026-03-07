@@ -1,4 +1,4 @@
-import { LitElement, html, nothing } from 'lit';
+import { LitElement, html } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { styleMap } from 'lit/directives/style-map.js';
 import { tokenStyles } from '@helix/tokens/lit';
@@ -9,19 +9,14 @@ import { helixSpinnerStyles } from './hx-spinner.styles.js';
  * Purely visual — no slots. Announces loading state to screen readers via
  * `role="status"` and an `aria-label` (customizable via the `label` prop).
  *
- * When `decorative` is set, the spinner becomes accessibility-silent
- * (`role="presentation"`, no `aria-label`), suitable for use alongside
- * text that already conveys loading state.
- *
  * @summary Circular loading indicator component.
  *
  * @tag hx-spinner
  *
- * @csspart base - The spinner wrapper element.
+ * @csspart base - The SVG spinner element.
  *
  * @cssprop [--hx-spinner-color] - Spinner arc color. Defaults per variant.
  * @cssprop [--hx-spinner-track-color] - Spinner track color. Defaults per variant.
- * @cssprop [--hx-duration-spinner=750ms] - Rotation speed of the spinner animation.
  */
 @customElement('hx-spinner')
 export class HelixSpinner extends LitElement {
@@ -46,21 +41,9 @@ export class HelixSpinner extends LitElement {
    * Accessible label announced to screen readers. Defaults to "Loading".
    * @attr label
    */
-  @property({ type: String, reflect: true })
+  @property({ type: String })
   label = 'Loading';
 
-  /**
-   * When true, the spinner is purely decorative — no screen reader
-   * announcement. Use when surrounding text already conveys loading state.
-   * @attr decorative
-   */
-  @property({ type: Boolean, reflect: true })
-  decorative = false;
-
-  /**
-   * Checks whether the current size value is a known token size.
-   * @internal
-   */
   private _isTokenSize(): boolean {
     return this.size === 'sm' || this.size === 'md' || this.size === 'lg';
   }
@@ -74,8 +57,8 @@ export class HelixSpinner extends LitElement {
         class="spinner"
         part="base"
         style=${customSizeStyle}
-        role=${this.decorative ? 'presentation' : 'status'}
-        aria-label=${this.decorative ? nothing : this.label}
+        role="status"
+        aria-label=${this.label}
       >
         <svg
           class="spinner__svg"
@@ -93,6 +76,7 @@ export class HelixSpinner extends LitElement {
             fill="none"
           />
         </svg>
+        <span class="spinner__sr-text">${this.label}...</span>
       </div>
     `;
   }
