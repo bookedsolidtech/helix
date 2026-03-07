@@ -1,7 +1,14 @@
 import { describe, it, expect, afterEach } from 'vitest';
 import { page } from '@vitest/browser/context';
-import { fixture, shadowQuery, oneEvent, cleanup, checkA11y } from '../../test-utils.js';
-import type { HxAlert } from './hx-alert.js';
+import {
+  fixture,
+  shadowQuery,
+  _shadowQueryAll,
+  oneEvent,
+  cleanup,
+  checkA11y,
+} from '../../test-utils.js';
+import type { WcAlert } from './hx-alert.js';
 import './index.js';
 
 afterEach(cleanup);
@@ -11,23 +18,23 @@ describe('hx-alert', () => {
 
   describe('Rendering', () => {
     it('renders with shadow DOM', async () => {
-      const el = await fixture<HxAlert>('<hx-alert>Test</hx-alert>');
+      const el = await fixture<WcAlert>('<hx-alert>Test</hx-alert>');
       expect(el.shadowRoot).toBeTruthy();
     });
 
     it('renders the alert container', async () => {
-      const el = await fixture<HxAlert>('<hx-alert>Test message</hx-alert>');
+      const el = await fixture<WcAlert>('<hx-alert>Test message</hx-alert>');
       const alert = shadowQuery(el, '.alert');
       expect(alert).toBeTruthy();
     });
 
     it('renders default slot content', async () => {
-      const el = await fixture<HxAlert>('<hx-alert>Hello world</hx-alert>');
+      const el = await fixture<WcAlert>('<hx-alert>Hello world</hx-alert>');
       expect(el.textContent?.trim()).toContain('Hello world');
     });
 
     it('is visible by default (open=true)', async () => {
-      const el = await fixture<HxAlert>('<hx-alert>Visible</hx-alert>');
+      const el = await fixture<WcAlert>('<hx-alert>Visible</hx-alert>');
       expect(el.open).toBe(true);
       expect(el.hasAttribute('open')).toBe(true);
     });
@@ -37,27 +44,27 @@ describe('hx-alert', () => {
 
   describe('Property: variant', () => {
     it('defaults to "info"', async () => {
-      const el = await fixture<HxAlert>('<hx-alert>Default variant</hx-alert>');
+      const el = await fixture<WcAlert>('<hx-alert>Default variant</hx-alert>');
       expect(el.variant).toBe('info');
     });
 
     it('reflects variant attribute to property', async () => {
-      const el = await fixture<HxAlert>('<hx-alert variant="error">Error</hx-alert>');
+      const el = await fixture<WcAlert>('<hx-alert variant="error">Error</hx-alert>');
       expect(el.variant).toBe('error');
     });
 
     it('applies "success" variant via attribute', async () => {
-      const el = await fixture<HxAlert>('<hx-alert variant="success">Success</hx-alert>');
+      const el = await fixture<WcAlert>('<hx-alert variant="success">Success</hx-alert>');
       expect(el.getAttribute('variant')).toBe('success');
     });
 
     it('applies "warning" variant via attribute', async () => {
-      const el = await fixture<HxAlert>('<hx-alert variant="warning">Warning</hx-alert>');
+      const el = await fixture<WcAlert>('<hx-alert variant="warning">Warning</hx-alert>');
       expect(el.getAttribute('variant')).toBe('warning');
     });
 
     it('applies "error" variant via attribute', async () => {
-      const el = await fixture<HxAlert>('<hx-alert variant="error">Error</hx-alert>');
+      const el = await fixture<WcAlert>('<hx-alert variant="error">Error</hx-alert>');
       expect(el.getAttribute('variant')).toBe('error');
     });
   });
@@ -66,18 +73,18 @@ describe('hx-alert', () => {
 
   describe('Property: dismissible', () => {
     it('defaults to false', async () => {
-      const el = await fixture<HxAlert>('<hx-alert>Not dismissible</hx-alert>');
+      const el = await fixture<WcAlert>('<hx-alert>Not dismissible</hx-alert>');
       expect(el.dismissible).toBe(false);
     });
 
     it('renders close button when dismissible', async () => {
-      const el = await fixture<HxAlert>('<hx-alert dismissible>Dismissible</hx-alert>');
+      const el = await fixture<WcAlert>('<hx-alert dismissible>Dismissible</hx-alert>');
       const closeBtn = shadowQuery(el, '.alert__close-button');
       expect(closeBtn).toBeTruthy();
     });
 
     it('does not render close button when not dismissible', async () => {
-      const el = await fixture<HxAlert>('<hx-alert>Not dismissible</hx-alert>');
+      const el = await fixture<WcAlert>('<hx-alert>Not dismissible</hx-alert>');
       const closeBtn = shadowQuery(el, '.alert__close-button');
       expect(closeBtn).toBeNull();
     });
@@ -87,12 +94,12 @@ describe('hx-alert', () => {
 
   describe('Property: open', () => {
     it('defaults to true', async () => {
-      const el = await fixture<HxAlert>('<hx-alert>Open</hx-alert>');
+      const el = await fixture<WcAlert>('<hx-alert>Open</hx-alert>');
       expect(el.open).toBe(true);
     });
 
     it('hides alert when open is false', async () => {
-      const el = await fixture<HxAlert>('<hx-alert>Hidden</hx-alert>');
+      const el = await fixture<WcAlert>('<hx-alert>Hidden</hx-alert>');
       el.open = false;
       await el.updateComplete;
       const computedStyle = getComputedStyle(el);
@@ -100,7 +107,7 @@ describe('hx-alert', () => {
     });
 
     it('reflects open attribute', async () => {
-      const el = await fixture<HxAlert>('<hx-alert>Open</hx-alert>');
+      const el = await fixture<WcAlert>('<hx-alert>Open</hx-alert>');
       expect(el.hasAttribute('open')).toBe(true);
       el.open = false;
       await el.updateComplete;
@@ -112,18 +119,18 @@ describe('hx-alert', () => {
 
   describe('Property: icon', () => {
     it('defaults to true', async () => {
-      const el = await fixture<HxAlert>('<hx-alert>Test</hx-alert>');
+      const el = await fixture<WcAlert>('<hx-alert>Test</hx-alert>');
       expect(el.icon).toBe(true);
     });
 
     it('renders icon container by default', async () => {
-      const el = await fixture<HxAlert>('<hx-alert>Test</hx-alert>');
+      const el = await fixture<WcAlert>('<hx-alert>Test</hx-alert>');
       const iconPart = shadowQuery(el, '[part="icon"]');
       expect(iconPart).toBeTruthy();
     });
 
     it('hides icon container when icon is false', async () => {
-      const el = await fixture<HxAlert>('<hx-alert>Test</hx-alert>');
+      const el = await fixture<WcAlert>('<hx-alert>Test</hx-alert>');
       el.icon = false;
       await el.updateComplete;
       const iconPart = shadowQuery(el, '[part="icon"]');
@@ -135,7 +142,7 @@ describe('hx-alert', () => {
 
   describe('Events', () => {
     it('dispatches hx-close when close button is clicked', async () => {
-      const el = await fixture<HxAlert>('<hx-alert dismissible>Dismissible</hx-alert>');
+      const el = await fixture<WcAlert>('<hx-alert dismissible>Dismissible</hx-alert>');
       const closeBtn = shadowQuery<HTMLButtonElement>(el, '.alert__close-button')!;
       const eventPromise = oneEvent<CustomEvent>(el, 'hx-close');
       closeBtn.click();
@@ -144,7 +151,7 @@ describe('hx-alert', () => {
     });
 
     it('hx-close event has detail.reason = "user"', async () => {
-      const el = await fixture<HxAlert>('<hx-alert dismissible>Dismissible</hx-alert>');
+      const el = await fixture<WcAlert>('<hx-alert dismissible>Dismissible</hx-alert>');
       const closeBtn = shadowQuery<HTMLButtonElement>(el, '.alert__close-button')!;
       const eventPromise = oneEvent<CustomEvent>(el, 'hx-close');
       closeBtn.click();
@@ -153,7 +160,7 @@ describe('hx-alert', () => {
     });
 
     it('hx-close bubbles and is composed', async () => {
-      const el = await fixture<HxAlert>('<hx-alert dismissible>Dismissible</hx-alert>');
+      const el = await fixture<WcAlert>('<hx-alert dismissible>Dismissible</hx-alert>');
       const closeBtn = shadowQuery<HTMLButtonElement>(el, '.alert__close-button')!;
       const eventPromise = oneEvent<CustomEvent>(el, 'hx-close');
       closeBtn.click();
@@ -163,7 +170,7 @@ describe('hx-alert', () => {
     });
 
     it('dispatches hx-after-close after dismiss', async () => {
-      const el = await fixture<HxAlert>('<hx-alert dismissible>Dismissible</hx-alert>');
+      const el = await fixture<WcAlert>('<hx-alert dismissible>Dismissible</hx-alert>');
       const closeBtn = shadowQuery<HTMLButtonElement>(el, '.alert__close-button')!;
       const eventPromise = oneEvent<CustomEvent>(el, 'hx-after-close');
       closeBtn.click();
@@ -178,7 +185,7 @@ describe('hx-alert', () => {
 
   describe('Close behavior', () => {
     it('sets open to false when close button is clicked', async () => {
-      const el = await fixture<HxAlert>('<hx-alert dismissible>Dismissible</hx-alert>');
+      const el = await fixture<WcAlert>('<hx-alert dismissible>Dismissible</hx-alert>');
       const closeBtn = shadowQuery<HTMLButtonElement>(el, '.alert__close-button')!;
       closeBtn.click();
       await el.updateComplete;
@@ -186,7 +193,7 @@ describe('hx-alert', () => {
     });
 
     it('removes open attribute when closed', async () => {
-      const el = await fixture<HxAlert>('<hx-alert dismissible>Dismissible</hx-alert>');
+      const el = await fixture<WcAlert>('<hx-alert dismissible>Dismissible</hx-alert>');
       expect(el.hasAttribute('open')).toBe(true);
       const closeBtn = shadowQuery<HTMLButtonElement>(el, '.alert__close-button')!;
       closeBtn.click();
@@ -195,34 +202,46 @@ describe('hx-alert', () => {
     });
   });
 
-  // ─── Keyboard Interaction (3) ───
+  // ─── Keyboard Interaction (4) ───
 
   describe('Keyboard interaction', () => {
-    it('close button is a native <button> and supports keyboard activation', async () => {
-      const el = await fixture<HxAlert>('<hx-alert dismissible>Dismissible</hx-alert>');
+    it('dismisses alert when Enter is pressed on close button', async () => {
+      const el = await fixture<WcAlert>('<hx-alert dismissible>Dismissible</hx-alert>');
       const closeBtn = shadowQuery<HTMLButtonElement>(el, '.alert__close-button')!;
-      expect(closeBtn.tagName.toLowerCase()).toBe('button');
-    });
-
-    it('dispatches hx-close exactly once on click (no double dispatch)', async () => {
-      const el = await fixture<HxAlert>('<hx-alert dismissible>Dismissible</hx-alert>');
-      const closeBtn = shadowQuery<HTMLButtonElement>(el, '.alert__close-button')!;
-      let eventCount = 0;
-      el.addEventListener('hx-close', () => eventCount++);
-      closeBtn.click();
+      const eventPromise = oneEvent<CustomEvent>(el, 'hx-close');
+      closeBtn.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
+      const event = await eventPromise;
+      expect(event).toBeTruthy();
       await el.updateComplete;
-      expect(eventCount).toBe(1);
       expect(el.open).toBe(false);
     });
 
-    it('dispatches hx-after-close exactly once on click', async () => {
-      const el = await fixture<HxAlert>('<hx-alert dismissible>Dismissible</hx-alert>');
+    it('dismisses alert when Space is pressed on close button', async () => {
+      const el = await fixture<WcAlert>('<hx-alert dismissible>Dismissible</hx-alert>');
       const closeBtn = shadowQuery<HTMLButtonElement>(el, '.alert__close-button')!;
-      let eventCount = 0;
-      el.addEventListener('hx-after-close', () => eventCount++);
-      closeBtn.click();
+      const eventPromise = oneEvent<CustomEvent>(el, 'hx-close');
+      closeBtn.dispatchEvent(new KeyboardEvent('keydown', { key: ' ', bubbles: true }));
+      const event = await eventPromise;
+      expect(event).toBeTruthy();
       await el.updateComplete;
-      expect(eventCount).toBe(1);
+      expect(el.open).toBe(false);
+    });
+
+    it('dispatches hx-after-close when Enter is pressed on close button', async () => {
+      const el = await fixture<WcAlert>('<hx-alert dismissible>Dismissible</hx-alert>');
+      const closeBtn = shadowQuery<HTMLButtonElement>(el, '.alert__close-button')!;
+      const eventPromise = oneEvent<CustomEvent>(el, 'hx-after-close');
+      closeBtn.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
+      const event = await eventPromise;
+      expect(event).toBeTruthy();
+    });
+
+    it('does not dismiss alert on unrelated key press on close button', async () => {
+      const el = await fixture<WcAlert>('<hx-alert dismissible>Dismissible</hx-alert>');
+      const closeBtn = shadowQuery<HTMLButtonElement>(el, '.alert__close-button')!;
+      closeBtn.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+      await el.updateComplete;
+      expect(el.open).toBe(true);
     });
   });
 
@@ -230,7 +249,7 @@ describe('hx-alert', () => {
 
   describe('Focus management', () => {
     it('moves focus to document.body after dismiss when no trigger element', async () => {
-      const el = await fixture<HxAlert>('<hx-alert dismissible>Dismissible</hx-alert>');
+      const el = await fixture<WcAlert>('<hx-alert dismissible>Dismissible</hx-alert>');
       const closeBtn = shadowQuery<HTMLButtonElement>(el, '.alert__close-button')!;
       closeBtn.focus();
       closeBtn.click();
@@ -245,7 +264,7 @@ describe('hx-alert', () => {
       trigger.textContent = 'Show alert';
       document.body.appendChild(trigger);
 
-      const el = await fixture<HxAlert>('<hx-alert dismissible>Dismissible</hx-alert>');
+      const el = await fixture<WcAlert>('<hx-alert dismissible>Dismissible</hx-alert>');
       trigger.focus();
 
       const closeBtn = shadowQuery<HTMLButtonElement>(el, '.alert__close-button')!;
@@ -263,12 +282,12 @@ describe('hx-alert', () => {
 
   describe('Slots', () => {
     it('default slot renders message content', async () => {
-      const el = await fixture<HxAlert>('<hx-alert>Alert message here</hx-alert>');
+      const el = await fixture<WcAlert>('<hx-alert>Alert message here</hx-alert>');
       expect(el.textContent?.trim()).toContain('Alert message here');
     });
 
     it('icon slot renders custom icon', async () => {
-      const el = await fixture<HxAlert>(
+      const el = await fixture<WcAlert>(
         '<hx-alert><span slot="icon">ICON</span>Message</hx-alert>',
       );
       const iconSlot = el.querySelector('[slot="icon"]');
@@ -277,7 +296,7 @@ describe('hx-alert', () => {
     });
 
     it('actions slot renders action content', async () => {
-      const el = await fixture<HxAlert>(
+      const el = await fixture<WcAlert>(
         '<hx-alert>Message<button slot="actions">Action</button></hx-alert>',
       );
       const actionSlot = el.querySelector('[slot="actions"]');
@@ -290,31 +309,31 @@ describe('hx-alert', () => {
 
   describe('CSS Parts', () => {
     it('exposes "alert" part', async () => {
-      const el = await fixture<HxAlert>('<hx-alert>Test</hx-alert>');
+      const el = await fixture<WcAlert>('<hx-alert>Test</hx-alert>');
       const part = shadowQuery(el, '[part="alert"]');
       expect(part).toBeTruthy();
     });
 
     it('exposes "icon" part', async () => {
-      const el = await fixture<HxAlert>('<hx-alert>Test</hx-alert>');
+      const el = await fixture<WcAlert>('<hx-alert>Test</hx-alert>');
       const part = shadowQuery(el, '[part="icon"]');
       expect(part).toBeTruthy();
     });
 
     it('exposes "message" part', async () => {
-      const el = await fixture<HxAlert>('<hx-alert>Test</hx-alert>');
+      const el = await fixture<WcAlert>('<hx-alert>Test</hx-alert>');
       const part = shadowQuery(el, '[part="message"]');
       expect(part).toBeTruthy();
     });
 
     it('exposes "close-button" part when dismissible', async () => {
-      const el = await fixture<HxAlert>('<hx-alert dismissible>Test</hx-alert>');
+      const el = await fixture<WcAlert>('<hx-alert dismissible>Test</hx-alert>');
       const part = shadowQuery(el, '[part="close-button"]');
       expect(part).toBeTruthy();
     });
 
     it('exposes "actions" part', async () => {
-      const el = await fixture<HxAlert>('<hx-alert>Test</hx-alert>');
+      const el = await fixture<WcAlert>('<hx-alert>Test</hx-alert>');
       const part = shadowQuery(el, '[part="actions"]');
       expect(part).toBeTruthy();
     });
@@ -323,32 +342,28 @@ describe('hx-alert', () => {
   // ─── Accessibility (4) ───
 
   describe('Accessibility', () => {
-    it('uses role="status" for info variant on host element', async () => {
-      const el = await fixture<HxAlert>('<hx-alert variant="info">Info</hx-alert>');
-      expect(el.getAttribute('role')).toBe('status');
+    it('uses role="status" for info variant', async () => {
+      const el = await fixture<WcAlert>('<hx-alert variant="info">Info</hx-alert>');
+      const alert = shadowQuery(el, '.alert')!;
+      expect(alert.getAttribute('role')).toBe('status');
     });
 
-    it('uses role="status" for success variant on host element', async () => {
-      const el = await fixture<HxAlert>('<hx-alert variant="success">Success</hx-alert>');
-      expect(el.getAttribute('role')).toBe('status');
+    it('uses role="status" for success variant', async () => {
+      const el = await fixture<WcAlert>('<hx-alert variant="success">Success</hx-alert>');
+      const alert = shadowQuery(el, '.alert')!;
+      expect(alert.getAttribute('role')).toBe('status');
     });
 
-    it('uses role="alert" for warning variant on host element', async () => {
-      const el = await fixture<HxAlert>('<hx-alert variant="warning">Warning</hx-alert>');
-      expect(el.getAttribute('role')).toBe('alert');
+    it('uses role="alert" for warning variant', async () => {
+      const el = await fixture<WcAlert>('<hx-alert variant="warning">Warning</hx-alert>');
+      const alert = shadowQuery(el, '.alert')!;
+      expect(alert.getAttribute('role')).toBe('alert');
     });
 
-    it('uses role="alert" for error variant on host element', async () => {
-      const el = await fixture<HxAlert>('<hx-alert variant="error">Error</hx-alert>');
-      expect(el.getAttribute('role')).toBe('alert');
-    });
-
-    it('updates role when variant changes dynamically', async () => {
-      const el = await fixture<HxAlert>('<hx-alert variant="info">Dynamic</hx-alert>');
-      expect(el.getAttribute('role')).toBe('status');
-      el.variant = 'error';
-      await el.updateComplete;
-      expect(el.getAttribute('role')).toBe('alert');
+    it('uses role="alert" for error variant', async () => {
+      const el = await fixture<WcAlert>('<hx-alert variant="error">Error</hx-alert>');
+      const alert = shadowQuery(el, '.alert')!;
+      expect(alert.getAttribute('role')).toBe('alert');
     });
   });
 
@@ -356,13 +371,13 @@ describe('hx-alert', () => {
 
   describe('Close button accessibility', () => {
     it('close button has aria-label="Close"', async () => {
-      const el = await fixture<HxAlert>('<hx-alert dismissible>Dismissible</hx-alert>');
+      const el = await fixture<WcAlert>('<hx-alert dismissible>Dismissible</hx-alert>');
       const closeBtn = shadowQuery<HTMLButtonElement>(el, '.alert__close-button')!;
       expect(closeBtn.getAttribute('aria-label')).toBe('Close');
     });
 
     it('close button is a <button> element', async () => {
-      const el = await fixture<HxAlert>('<hx-alert dismissible>Dismissible</hx-alert>');
+      const el = await fixture<WcAlert>('<hx-alert dismissible>Dismissible</hx-alert>');
       const closeBtn = shadowQuery(el, '.alert__close-button')!;
       expect(closeBtn.tagName.toLowerCase()).toBe('button');
     });
@@ -374,7 +389,7 @@ describe('hx-alert', () => {
     it('renders a default SVG icon per variant', async () => {
       const variants = ['info', 'success', 'warning', 'error'] as const;
       for (const variant of variants) {
-        const el = await fixture<HxAlert>(`<hx-alert variant="${variant}">Test</hx-alert>`);
+        const el = await fixture<WcAlert>(`<hx-alert variant="${variant}">Test</hx-alert>`);
         const iconContainer = shadowQuery(el, '[part="icon"]')!;
         const svg = iconContainer.querySelector('svg');
         expect(svg).toBeTruthy();
@@ -386,7 +401,7 @@ describe('hx-alert', () => {
 
   describe('Accessibility (axe-core)', () => {
     it('has no axe violations in default state', async () => {
-      const el = await fixture<HxAlert>('<hx-alert>This is an alert</hx-alert>');
+      const el = await fixture<WcAlert>('<hx-alert>This is an alert</hx-alert>');
       await page.screenshot();
       const { violations } = await checkA11y(el);
       expect(violations).toEqual([]);
@@ -394,7 +409,7 @@ describe('hx-alert', () => {
 
     it('has no axe violations for all variants', async () => {
       for (const variant of ['info', 'success', 'warning', 'error']) {
-        const el = await fixture<HxAlert>(
+        const el = await fixture<WcAlert>(
           `<hx-alert variant="${variant}">Alert message</hx-alert>`,
         );
         await page.screenshot();
@@ -405,7 +420,7 @@ describe('hx-alert', () => {
     });
 
     it('has no axe violations when dismissible', async () => {
-      const el = await fixture<HxAlert>('<hx-alert dismissible>Dismissible alert</hx-alert>');
+      const el = await fixture<WcAlert>('<hx-alert dismissible>Dismissible alert</hx-alert>');
       await page.screenshot();
       const { violations } = await checkA11y(el);
       expect(violations).toEqual([]);

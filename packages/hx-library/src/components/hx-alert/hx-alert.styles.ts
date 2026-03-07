@@ -61,20 +61,16 @@ export const helixAlertStyles = css`
     margin-top: var(--hx-space-2, 0.5rem);
   }
 
-  .alert__actions:not(:has(*)) {
-    display: none;
-  }
-
   /* ─── Close Button ─── */
-  /* Minimum 44x44px touch target per WCAG 2.5.8 / Apple HIG. */
+  /* Minimum 44x44px touch target per WCAG 2.5.5 (healthcare mandate). */
 
   .alert__close-button {
     display: inline-flex;
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
-    min-width: 44px;
-    min-height: 44px;
+    min-width: 2.75rem; /* 44px */
+    min-height: 2.75rem; /* 44px */
     margin-left: auto;
     padding: 0;
     border: none;
