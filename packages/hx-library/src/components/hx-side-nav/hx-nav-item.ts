@@ -1,11 +1,16 @@
 import { LitElement, html, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
+
+let nextTooltipId = 0;
 import { tokenStyles } from '@helix/tokens/lit';
 import { helixNavItemStyles } from './hx-nav-item.styles.js';
 
 /**
  * A navigation item for use inside hx-side-nav.
  * Supports icons, badges, sub-navigation, and active/disabled states.
+ * Uses `aria-current="page"` to indicate the active page, `aria-disabled` for disabled items,
+ * and `aria-expanded` for items with nested children. In collapsed mode, a tooltip with
+ * `role="tooltip"` is displayed and linked via `aria-describedby`.
  *
  * @summary Navigation item for hx-side-nav with support for icons, badges, and nested children.
  *
@@ -28,6 +33,8 @@ import { helixNavItemStyles } from './hx-nav-item.styles.js';
  * @cssprop [--hx-nav-item-active-bg=var(--hx-color-primary-600)] - Active item background.
  * @cssprop [--hx-nav-item-active-color=var(--hx-color-neutral-50)] - Active item text color.
  * @cssprop [--hx-nav-item-padding] - Item padding.
+ * @cssprop [--hx-nav-item-host-bg=var(--hx-color-neutral-900)] - Host background color.
+ * @cssprop [--hx-nav-item-active-hover-bg=var(--hx-color-primary-700)] - Active item hover background.
  */
 @customElement('hx-nav-item')
 export class HelixNavItem extends LitElement {
@@ -68,9 +75,30 @@ export class HelixNavItem extends LitElement {
   /** Whether the children slot has assigned nodes. Updated via slotchange. */
   @state() private _hasChildren = false;
 
-  /** Whether this item is in collapsed mode. Set externally by hx-side-nav via data-collapsed attribute. */
-  private get _isCollapsed(): boolean {
-    return this.hasAttribute('data-collapsed');
+  /** Whether this item is in collapsed mode. Synced from the `data-collapsed` attribute via MutationObserver. */
+  @state() private _isCollapsed = false;
+
+  /** Unique ID for the tooltip element, used by aria-describedby. */
+  private readonly _tooltipId = `hx-nav-tooltip-${nextTooltipId++}`;
+
+  /** Observes `data-collapsed` attribute changes and syncs to reactive `_isCollapsed` state. */
+  private _attrObserver: MutationObserver | null = null;
+
+  // ─── Lifecycle ───
+
+  override connectedCallback(): void {
+    super.connectedCallback();
+    this._isCollapsed = this.hasAttribute('data-collapsed');
+    this._attrObserver = new MutationObserver(() => {
+      this._isCollapsed = this.hasAttribute('data-collapsed');
+    });
+    this._attrObserver.observe(this, { attributes: true, attributeFilter: ['data-collapsed'] });
+  }
+
+  override disconnectedCallback(): void {
+    super.disconnectedCallback();
+    this._attrObserver?.disconnect();
+    this._attrObserver = null;
   }
 
   // ─── Slot Change Handler ───
@@ -98,10 +126,27 @@ export class HelixNavItem extends LitElement {
     </span>`;
   }
 
+  // ─── Private Helpers (label) ───
+
+  /**
+   * Extracts the label text from only the default slot's assigned nodes,
+   * excluding named slots (icon, badge, children) to avoid garbled tooltip text.
+   */
+  private _getSlotLabel(): string {
+    const slot = this.shadowRoot?.querySelector<HTMLSlotElement>('slot:not([name])');
+    if (!slot) return this.textContent?.trim() ?? '';
+    return slot
+      .assignedNodes({ flatten: true })
+      .filter((node) => node.nodeType === Node.TEXT_NODE)
+      .map((node) => node.textContent?.trim() ?? '')
+      .filter(Boolean)
+      .join(' ');
+  }
+
   // ─── Render ───
 
   override render() {
-    const label = this.textContent?.trim() ?? '';
+    const label = this._getSlotLabel() || this.textContent?.trim() || '';
 
     const innerContent = html`
       <span part="icon" class="nav-item__icon">
@@ -115,9 +160,11 @@ export class HelixNavItem extends LitElement {
       </span>
       ${this._hasChildren ? this._renderExpandArrow() : nothing}
       ${this._isCollapsed
-        ? html`<span class="nav-item__tooltip" role="tooltip">${label}</span>`
+        ? html`<span class="nav-item__tooltip" role="tooltip" id=${this._tooltipId}>${label}</span>`
         : nothing}
     `;
+
+    const describedBy = this._isCollapsed ? this._tooltipId : undefined;
 
     // Render as anchor when href provided and no expandable children
     const linkEl =
@@ -128,6 +175,7 @@ export class HelixNavItem extends LitElement {
             href=${this.href}
             aria-current=${this.active ? 'page' : nothing}
             aria-disabled=${this.disabled ? 'true' : nothing}
+            aria-describedby=${describedBy ?? nothing}
             tabindex=${this.disabled ? '-1' : '0'}
           >
             ${innerContent}
@@ -138,6 +186,7 @@ export class HelixNavItem extends LitElement {
             aria-current=${this.active ? 'page' : nothing}
             aria-disabled=${this.disabled ? 'true' : nothing}
             aria-expanded=${this._hasChildren ? String(this.expanded) : nothing}
+            aria-describedby=${describedBy ?? nothing}
             tabindex=${this.disabled ? '-1' : '0'}
             @click=${this._handleToggle}
           >
