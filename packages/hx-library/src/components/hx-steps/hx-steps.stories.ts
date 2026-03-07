@@ -66,18 +66,6 @@ export const Default: Story = {
   `,
 };
 
-export const Horizontal: Story = {
-  name: 'Horizontal',
-  render: () => html`
-    <hx-steps orientation="horizontal">
-      <hx-step label="Step 1" status="complete"></hx-step>
-      <hx-step label="Step 2" status="active"></hx-step>
-      <hx-step label="Step 3" status="pending"></hx-step>
-      <hx-step label="Step 4" status="pending"></hx-step>
-    </hx-steps>
-  `,
-};
-
 export const Vertical: Story = {
   name: 'Vertical',
   render: () => html`
@@ -146,6 +134,28 @@ export const SizeLg: Story = {
   `,
 };
 
+export const SizeSmVertical: Story = {
+  name: 'Size: Small + Vertical',
+  render: () => html`
+    <hx-steps size="sm" orientation="vertical" style="max-width: 20rem;">
+      <hx-step label="Step 1" status="complete" description="Done"></hx-step>
+      <hx-step label="Step 2" status="active" description="In progress"></hx-step>
+      <hx-step label="Step 3" status="pending" description="Upcoming"></hx-step>
+    </hx-steps>
+  `,
+};
+
+export const SizeLgVertical: Story = {
+  name: 'Size: Large + Vertical',
+  render: () => html`
+    <hx-steps size="lg" orientation="vertical" style="max-width: 24rem;">
+      <hx-step label="Step 1" status="complete" description="Done"></hx-step>
+      <hx-step label="Step 2" status="active" description="In progress"></hx-step>
+      <hx-step label="Step 3" status="pending" description="Upcoming"></hx-step>
+    </hx-steps>
+  `,
+};
+
 export const WithError: Story = {
   name: 'With Error Step',
   render: () => html`
@@ -162,13 +172,28 @@ export const WithCustomIcon: Story = {
   render: () => html`
     <hx-steps orientation="horizontal">
       <hx-step label="Upload" status="complete">
-        <svg slot="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
-          <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/>
+        <svg
+          slot="icon"
+          aria-hidden="true"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+          <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12" />
         </svg>
       </hx-step>
       <hx-step label="Review" status="active">
-        <svg slot="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
-          <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+        <svg
+          slot="icon"
+          aria-hidden="true"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+          <circle cx="11" cy="11" r="8" />
+          <path d="m21 21-4.35-4.35" />
         </svg>
       </hx-step>
       <hx-step label="Approve" status="pending"></hx-step>
@@ -198,4 +223,32 @@ export const VerticalAllStatuses: Story = {
       <hx-step label="Pending" status="pending" description="Not yet started"></hx-step>
     </hx-steps>
   `,
+};
+
+export const InteractiveEvent: Story = {
+  name: 'Interactive: hx-step-click Event',
+  render: () => {
+    const onStepClick = (e: Event) => {
+      const customEvent = e as CustomEvent<{ index: number }>;
+      const output = document.getElementById('step-click-output');
+      if (output) {
+        output.textContent = `Step clicked: index ${customEvent.detail.index}`;
+      }
+    };
+
+    return html`
+      <hx-steps
+        orientation="horizontal"
+        aria-label="Interactive wizard"
+        @hx-step-click=${onStepClick}
+      >
+        <hx-step label="Account" status="complete" description="Done"></hx-step>
+        <hx-step label="Profile" status="active" description="Active"></hx-step>
+        <hx-step label="Review" status="pending" description="Upcoming"></hx-step>
+      </hx-steps>
+      <p id="step-click-output" style="margin-top: 1rem; font-family: sans-serif; color: #334155;">
+        Click a step above to see the event detail.
+      </p>
+    `;
+  },
 };

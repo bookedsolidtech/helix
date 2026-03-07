@@ -112,7 +112,9 @@ describe('hx-steps', () => {
       const steps = el.querySelectorAll('hx-step');
       const eventPromise = oneEvent<CustomEvent>(el, 'hx-step-click');
       const firstStep = steps[0] as HelixStep;
-      firstStep.shadowRoot?.querySelector('.step')?.dispatchEvent(new MouseEvent('click', { bubbles: true, composed: true }));
+      firstStep.shadowRoot
+        ?.querySelector('.step')
+        ?.dispatchEvent(new MouseEvent('click', { bubbles: true, composed: true }));
       const event = await eventPromise;
       expect(event).toBeTruthy();
     });
@@ -126,7 +128,9 @@ describe('hx-steps', () => {
         'hx-step-click',
       );
       const firstStep = steps[0] as HelixStep;
-      firstStep.shadowRoot?.querySelector('.step')?.dispatchEvent(new MouseEvent('click', { bubbles: true, composed: true }));
+      firstStep.shadowRoot
+        ?.querySelector('.step')
+        ?.dispatchEvent(new MouseEvent('click', { bubbles: true, composed: true }));
       const event = await eventPromise;
       expect(event.detail.index).toBe(0);
       expect(event.detail.step).toBeInstanceOf(HTMLElement);
@@ -138,7 +142,9 @@ describe('hx-steps', () => {
       const steps = el.querySelectorAll('hx-step');
       const eventPromise = oneEvent<CustomEvent>(el, 'hx-step-click');
       const firstStep = steps[0] as HelixStep;
-      firstStep.shadowRoot?.querySelector('.step')?.dispatchEvent(new MouseEvent('click', { bubbles: true, composed: true }));
+      firstStep.shadowRoot
+        ?.querySelector('.step')
+        ?.dispatchEvent(new MouseEvent('click', { bubbles: true, composed: true }));
       const event = await eventPromise;
       expect(event.bubbles).toBe(true);
       expect(event.composed).toBe(true);
@@ -155,6 +161,32 @@ describe('hx-steps', () => {
       steps.forEach((step, i) => {
         expect(step.index).toBe(i);
       });
+    });
+  });
+
+  // ─── Dynamic Child Re-sync ───
+
+  describe('Dynamic Child Re-sync (slot change)', () => {
+    it('re-syncs index and orientation when a new hx-step is appended', async () => {
+      const el = await fixture<HelixSteps>(
+        '<hx-steps orientation="vertical" aria-label="Dynamic steps"><hx-step label="A" status="complete"></hx-step><hx-step label="B" status="active"></hx-step></hx-steps>',
+      );
+      await el.updateComplete;
+
+      // Append a new step dynamically
+      const newStep = document.createElement('hx-step') as HelixStep;
+      newStep.label = 'C';
+      newStep.status = 'pending';
+      el.appendChild(newStep);
+
+      // Wait for slotchange + re-render
+      await el.updateComplete;
+      await newStep.updateComplete;
+
+      const steps = Array.from(el.querySelectorAll('hx-step')) as HelixStep[];
+      expect(steps).toHaveLength(3);
+      expect(steps[2].index).toBe(2);
+      expect(steps[2].orientation).toBe('vertical');
     });
   });
 });
@@ -309,27 +341,39 @@ describe('hx-step', () => {
 
   describe('Property: disabled', () => {
     it('reflects disabled attr to host', async () => {
-      const el = await fixture<HelixStep>('<hx-step label="Test" status="pending" disabled></hx-step>');
+      const el = await fixture<HelixStep>(
+        '<hx-step label="Test" status="pending" disabled></hx-step>',
+      );
       expect(el.getAttribute('disabled')).not.toBeNull();
     });
 
     it('sets aria-disabled="true" when disabled', async () => {
-      const el = await fixture<HelixStep>('<hx-step label="Test" status="pending" disabled></hx-step>');
+      const el = await fixture<HelixStep>(
+        '<hx-step label="Test" status="pending" disabled></hx-step>',
+      );
       await el.updateComplete;
       expect(el.getAttribute('aria-disabled')).toBe('true');
     });
 
     it('sets tabindex="-1" when disabled', async () => {
-      const el = await fixture<HelixStep>('<hx-step label="Test" status="pending" disabled></hx-step>');
+      const el = await fixture<HelixStep>(
+        '<hx-step label="Test" status="pending" disabled></hx-step>',
+      );
       await el.updateComplete;
       expect(el.getAttribute('tabindex')).toBe('-1');
     });
 
     it('does not fire hx-step-click-internal when disabled', async () => {
-      const el = await fixture<HelixStep>('<hx-step label="Test" status="pending" disabled></hx-step>');
+      const el = await fixture<HelixStep>(
+        '<hx-step label="Test" status="pending" disabled></hx-step>',
+      );
       let fired = false;
-      el.addEventListener('hx-step-click-internal', () => { fired = true; });
-      el.shadowRoot?.querySelector('.step')?.dispatchEvent(new MouseEvent('click', { bubbles: true, composed: true }));
+      el.addEventListener('hx-step-click-internal', () => {
+        fired = true;
+      });
+      el.shadowRoot
+        ?.querySelector('.step')
+        ?.dispatchEvent(new MouseEvent('click', { bubbles: true, composed: true }));
       expect(fired).toBe(false);
     });
   });
@@ -345,7 +389,9 @@ describe('hx-step', () => {
     it('fires hx-step-click-internal on Enter key', async () => {
       const el = await fixture<HelixStep>('<hx-step label="Test" status="pending"></hx-step>');
       let fired = false;
-      el.addEventListener('hx-step-click-internal', () => { fired = true; });
+      el.addEventListener('hx-step-click-internal', () => {
+        fired = true;
+      });
       el.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
       expect(fired).toBe(true);
     });
@@ -353,7 +399,9 @@ describe('hx-step', () => {
     it('fires hx-step-click-internal on Space key', async () => {
       const el = await fixture<HelixStep>('<hx-step label="Test" status="pending"></hx-step>');
       let fired = false;
-      el.addEventListener('hx-step-click-internal', () => { fired = true; });
+      el.addEventListener('hx-step-click-internal', () => {
+        fired = true;
+      });
       el.dispatchEvent(new KeyboardEvent('keydown', { key: ' ', bubbles: true }));
       expect(fired).toBe(true);
     });
@@ -361,7 +409,9 @@ describe('hx-step', () => {
     it('does not fire on other keys', async () => {
       const el = await fixture<HelixStep>('<hx-step label="Test" status="pending"></hx-step>');
       let fired = false;
-      el.addEventListener('hx-step-click-internal', () => { fired = true; });
+      el.addEventListener('hx-step-click-internal', () => {
+        fired = true;
+      });
       el.dispatchEvent(new KeyboardEvent('keydown', { key: 'Tab', bubbles: true }));
       expect(fired).toBe(false);
     });
