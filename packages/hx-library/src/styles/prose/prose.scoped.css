@@ -23,6 +23,17 @@
    ========================================================================== */
 
 /* ==========================================================================
+   Container Base
+   Sets display:block declaratively to prevent FOUC before JS lifecycle fires.
+   Establishes font-family baseline so prose is not affected by ancestor fonts.
+   ========================================================================== */
+
+hx-prose {
+  display: block;
+  font-family: var(--hx-font-family-sans, sans-serif);
+}
+
+/* ==========================================================================
    Headings
    ========================================================================== */
 
@@ -130,8 +141,10 @@ hx-prose p {
   color: var(--hx-prose-color, var(--hx-color-neutral-700, #343a40));
 }
 
-/* Lead paragraph */
-hx-prose p:first-child,
+/* Lead paragraph — opt-in via .lead class only.
+   Removed p:first-child because CKEditor/Drupal output always starts with a <p>
+   and promoting every first paragraph to lead styling is semantically incorrect
+   for healthcare content (medication instructions, care plans, clinical protocols). */
 hx-prose p.lead {
   font-size: var(--hx-prose-lead-font-size, var(--hx-font-size-lg, 1.125rem));
   color: var(--hx-prose-lead-color, var(--hx-color-neutral-600, #495057));
@@ -403,7 +416,10 @@ hx-prose caption {
   font-weight: var(--hx-font-weight-medium, 500);
   color: var(--hx-color-text-muted, var(--hx-color-neutral-500, #6c757d));
   text-align: left;
-  caption-side: bottom;
+  /* caption-side:top matches DOM order — WAI-ARIA authoring practices recommend
+     caption at top for data tables so screen reader announcement aligns with
+     visual placement. caption-side:bottom creates AT/visual mismatch (WCAG H39). */
+  caption-side: top;
 }
 
 hx-prose thead {
@@ -421,7 +437,9 @@ hx-prose th {
   font-weight: var(--hx-font-weight-semibold, 600);
   color: var(--hx-prose-heading-color, var(--hx-color-neutral-900, #111827));
   text-align: left;
-  white-space: nowrap;
+  /* Removed white-space:nowrap — long clinical header text (e.g. "Prescribing Physician")
+     causes horizontal overflow on mobile viewports and forces table width to be
+     determined by longest header rather than content. */
   background-color: var(--hx-color-surface-raised, var(--hx-color-neutral-50, #f8f9fa));
 }
 
@@ -442,7 +460,10 @@ hx-prose tbody tr:hover {
   background-color: var(--hx-color-primary-50, #e6f3f3);
 }
 
-/* Alignment Helpers */
+/* Alignment Helpers — Drupal CKEditor compatibility shims.
+   The HTML `align` attribute is deprecated in HTML5 but CKEditor may still
+   emit it. These selectors normalize deprecated presentational markup.
+   Note: [align='left'] is intentionally omitted since left-align is the default. */
 hx-prose th[align='center'],
 hx-prose td[align='center'] {
   text-align: center;
@@ -466,11 +487,11 @@ hx-prose code {
     'Cascadia Code',
     monospace
   );
-  font-size: 0.875em;
+  font-size: var(--hx-font-size-sm, 0.875em);
   font-weight: var(--hx-font-weight-normal, 400);
   background-color: var(--hx-color-surface-sunken, var(--hx-color-neutral-100, #e9ecef));
   color: var(--hx-color-error-600, #b02a37);
-  padding: 0.125em var(--hx-space-1, 0.25rem);
+  padding: var(--hx-prose-code-padding-v, 0.125em) var(--hx-space-1, 0.25rem);
   border-radius: var(--hx-border-radius-sm, 0.25rem);
   word-break: break-word;
 }
@@ -519,12 +540,12 @@ hx-prose kbd {
     'Cascadia Code',
     monospace
   );
-  font-size: 0.875em;
-  padding: 0.125em var(--hx-space-2, 0.5rem);
+  font-size: var(--hx-font-size-sm, 0.875em);
+  padding: var(--hx-prose-code-padding-v, 0.125em) var(--hx-space-2, 0.5rem);
   background-color: var(--hx-color-neutral-800, #212529);
   color: var(--hx-color-neutral-0, #ffffff);
   border-radius: var(--hx-border-radius-sm, 0.25rem);
-  box-shadow: inset 0 -1px 0 rgba(0, 0, 0, 0.25);
+  box-shadow: var(--hx-shadow-inset-sm, inset 0 -1px 0 rgba(0, 0, 0, 0.25));
 }
 
 /* Sample Output */
@@ -536,7 +557,7 @@ hx-prose samp {
     'Cascadia Code',
     monospace
   );
-  font-size: 0.875em;
+  font-size: var(--hx-font-size-sm, 0.875em);
 }
 
 /* Variable */
@@ -726,11 +747,10 @@ hx-prose .align-right img {
   display: block;
 }
 
-/* Clear after floats */
-hx-prose .align-left + *,
-hx-prose .align-right + * {
-  clear: none;
-}
+/* Float siblings — allow content to wrap around aligned images (intentional).
+   Removed explicit clear:none; the default is already no-clear and setting it
+   explicitly prevented consumers from overriding it when clearfix is needed.
+   Use the .clearfix utility class on the parent container when floats must be cleared. */
 
 /* CKEditor Caption */
 hx-prose .caption {
