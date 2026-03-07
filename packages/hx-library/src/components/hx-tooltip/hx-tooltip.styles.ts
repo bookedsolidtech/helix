@@ -20,7 +20,7 @@ export const helixTooltipStyles = css`
     font-size: var(--hx-tooltip-font-size, var(--hx-font-size-xs, 0.75rem));
     line-height: var(--hx-line-height-normal, 1.5);
     border-radius: var(--hx-tooltip-border-radius, var(--hx-border-radius-sm, 0.25rem));
-    box-shadow: var(--hx-tooltip-shadow, 0 2px 8px rgba(0, 0, 0, 0.2));
+    box-shadow: var(--hx-tooltip-shadow, var(--hx-shadow-sm, 0 2px 8px rgba(0, 0, 0, 0.2)));
     pointer-events: none;
     visibility: hidden;
     opacity: 0;
