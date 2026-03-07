@@ -56,6 +56,7 @@ export class HelixTopNav extends LitElement {
 
   // ─── Private State ───
 
+  /** Whether the mobile collapsible menu is currently open. */
   @state() private _mobileOpen = false;
 
   // ─── Event Handling ───
