@@ -15,7 +15,7 @@ const meta = {
     variant: {
       control: { type: 'select' },
       options: ['default', 'error', 'warning', 'success'],
-      description: 'Visual variant that determines the text color.',
+      description: 'Visual variant that determines the text color and icon indicator.',
       table: {
         category: 'Visual',
         defaultValue: { summary: 'default' },
@@ -35,8 +35,7 @@ const meta = {
     variant: 'default',
     label: 'Enter your full name as it appears on your ID.',
   },
-  render: (args) =>
-    html`<hx-help-text variant=${args.variant}>${args.label}</hx-help-text>`,
+  render: (args) => html`<hx-help-text variant=${args.variant}>${args.label}</hx-help-text>`,
 } satisfies Meta;
 
 export default meta;
@@ -75,12 +74,22 @@ export const Warning: Story = {
     variant: 'warning',
     label: 'This value will be visible to other users.',
   },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const el = canvas.getByText('This value will be visible to other users.');
+    await expect(el).toBeInTheDocument();
+  },
 };
 
 export const Success: Story = {
   args: {
     variant: 'success',
     label: 'Your password meets all requirements.',
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const el = canvas.getByText('Your password meets all requirements.');
+    await expect(el).toBeInTheDocument();
   },
 };
 
@@ -147,9 +156,13 @@ export const AllVariants: Story = {
   name: 'All Variants',
   render: () => html`
     <div style="display: flex; flex-direction: column; gap: 0.75rem;">
-      <hx-help-text variant="default">Default: Enter your full name as it appears on your ID.</hx-help-text>
+      <hx-help-text variant="default"
+        >Default: Enter your full name as it appears on your ID.</hx-help-text
+      >
       <hx-help-text variant="error">Error: This field is required.</hx-help-text>
-      <hx-help-text variant="warning">Warning: This value will be visible to other users.</hx-help-text>
+      <hx-help-text variant="warning"
+        >Warning: This value will be visible to other users.</hx-help-text
+      >
       <hx-help-text variant="success">Success: Your password meets all requirements.</hx-help-text>
     </div>
   `,
