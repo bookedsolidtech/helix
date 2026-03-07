@@ -57,7 +57,8 @@ const meta = {
     icon: {
       control: { type: 'select' },
       options: ['vertical', 'horizontal'],
-      description: 'Icon orientation: vertical (kebab ⋮) or horizontal (meatball ···).',
+      description:
+        'Icon orientation: vertical (kebab ⋮) or horizontal (meatball ···).',
       table: {
         category: 'Visual',
         defaultValue: { summary: 'vertical' },
@@ -278,7 +279,9 @@ export const ManyItems: Story = {
 
 export const PatientRowActions: Story = {
   render: () => html`
-    <table style="border-collapse: collapse; width: 100%; max-width: 640px; font-size: 0.875rem;">
+    <table
+      style="border-collapse: collapse; width: 100%; max-width: 640px; font-size: 0.875rem;"
+    >
       <thead>
         <tr style="background: #f9fafb; border-bottom: 2px solid #e5e7eb;">
           <th style="padding: 0.75rem 1rem; text-align: left; font-weight: 600; color: #374151;">
@@ -287,7 +290,9 @@ export const PatientRowActions: Story = {
           <th style="padding: 0.75rem 1rem; text-align: left; font-weight: 600; color: #374151;">
             Ward
           </th>
-          <th style="padding: 0.75rem 1rem; text-align: right; font-weight: 600; color: #374151;">
+          <th
+            style="padding: 0.75rem 1rem; text-align: right; font-weight: 600; color: #374151;"
+          >
             Actions
           </th>
         </tr>
@@ -355,117 +360,5 @@ export const KeyboardEscape: Story = {
 
     const panelAfter = el?.shadowRoot?.querySelector('[part="panel"]');
     await expect(panelAfter).toBeNull();
-  },
-};
-
-// ─────────────────────────────────────────────────
-// 11. WITH DIVIDERS — separator between groups
-// ─────────────────────────────────────────────────
-
-export const WithDividers: Story = {
-  render: () => html`
-    <div style="display: flex; justify-content: center; padding: 4rem 2rem;">
-      <hx-overflow-menu>
-        <button role="menuitem">View details</button>
-        <button role="menuitem">Edit</button>
-        <hr role="separator" />
-        <button role="menuitem">Duplicate</button>
-        <button role="menuitem">Archive</button>
-        <hr role="separator" />
-        <button role="menuitem" style="color: #dc2626;">Delete</button>
-      </hx-overflow-menu>
-    </div>
-  `,
-};
-
-// ─────────────────────────────────────────────────
-// 12. DISABLED ITEMS — aria-disabled on individual items
-// ─────────────────────────────────────────────────
-
-export const DisabledItems: Story = {
-  render: () => html`
-    <div style="display: flex; justify-content: center; padding: 4rem 2rem;">
-      <hx-overflow-menu>
-        <button role="menuitem">View details</button>
-        <button role="menuitem" aria-disabled="true">Edit (locked)</button>
-        <button role="menuitem">Duplicate</button>
-        <button role="menuitem" aria-disabled="true">Delete (no permission)</button>
-      </hx-overflow-menu>
-    </div>
-  `,
-};
-
-// ─────────────────────────────────────────────────
-// 13. ALL PLACEMENTS — visual reference for each position
-// ─────────────────────────────────────────────────
-
-export const AllPlacements: Story = {
-  render: () => html`
-    <div
-      style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 3rem; padding: 6rem 2rem; justify-items: center;"
-    >
-      ${(
-        [
-          'top-start',
-          'top',
-          'top-end',
-          'left-start',
-          'bottom',
-          'right-start',
-          'left',
-          'bottom-start',
-          'right',
-          'left-end',
-          'bottom-end',
-          'right-end',
-        ] as const
-      ).map(
-        (p) => html`
-          <div style="display: flex; flex-direction: column; align-items: center; gap: 0.5rem;">
-            <span style="font-size: 0.75rem; color: #6b7280; font-family: monospace;">${p}</span>
-            <hx-overflow-menu placement=${p} hx-size="sm">
-              <button role="menuitem">Action A</button>
-              <button role="menuitem">Action B</button>
-              <button role="menuitem">Action C</button>
-            </hx-overflow-menu>
-          </div>
-        `,
-      )}
-    </div>
-  `,
-};
-
-// ─────────────────────────────────────────────────
-// 14. KEYBOARD NAVIGATION — arrow keys move focus
-// ─────────────────────────────────────────────────
-
-export const KeyboardNavigation: Story = {
-  render: () => html`
-    <div style="display: flex; justify-content: center; padding: 4rem 2rem;">
-      <hx-overflow-menu>
-        <button role="menuitem">First</button>
-        <button role="menuitem">Second</button>
-        <button role="menuitem">Third</button>
-      </hx-overflow-menu>
-    </div>
-  `,
-  play: async ({ canvasElement }) => {
-    const el = canvasElement.querySelector('hx-overflow-menu');
-    await expect(el).toBeTruthy();
-
-    const triggerBtn = el?.shadowRoot?.querySelector('[part="button"]') as HTMLElement | null;
-    await userEvent.click(triggerBtn!);
-
-    // First item should have focus after open
-    const items = el?.querySelectorAll('[role="menuitem"]');
-    await expect(document.activeElement).toBe(items?.[0]);
-
-    // ArrowDown moves to second
-    await userEvent.keyboard('{ArrowDown}');
-    await expect(document.activeElement).toBe(items?.[1]);
-
-    // ArrowDown moves to third
-    await userEvent.keyboard('{ArrowDown}');
-    await expect(document.activeElement).toBe(items?.[2]);
   },
 };
