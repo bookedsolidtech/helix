@@ -185,7 +185,9 @@ describe('hx-data-table', () => {
       el.rows = ROWS;
       await el.updateComplete;
 
-      const checkboxes = el.shadowRoot!.querySelectorAll('input[type="checkbox"][part~="checkbox"]');
+      const checkboxes = el.shadowRoot!.querySelectorAll(
+        'input[type="checkbox"][part~="checkbox"]',
+      );
       // 1 header + 3 row checkboxes
       expect(checkboxes.length).toBe(4);
     });
@@ -321,7 +323,9 @@ describe('hx-data-table', () => {
 
   describe('Empty State', () => {
     it('renders emptyLabel when rows is empty', async () => {
-      const el = await fixture<HelixDataTable>('<hx-data-table empty-label="No patients"></hx-data-table>');
+      const el = await fixture<HelixDataTable>(
+        '<hx-data-table empty-label="No patients"></hx-data-table>',
+      );
       el.columns = COLUMNS;
       el.rows = [];
       await el.updateComplete;
@@ -419,7 +423,9 @@ describe('hx-data-table', () => {
   describe('JSON string attribute coercion', () => {
     it('parses columns from JSON string attribute', async () => {
       const columnsJson = JSON.stringify(COLUMNS);
-      const el = await fixture<HelixDataTable>(`<hx-data-table columns='${columnsJson}'></hx-data-table>`);
+      const el = await fixture<HelixDataTable>(
+        `<hx-data-table columns='${columnsJson}'></hx-data-table>`,
+      );
       el.rows = ROWS;
       await el.updateComplete;
 
@@ -429,7 +435,9 @@ describe('hx-data-table', () => {
 
     it('parses rows from JSON string attribute', async () => {
       const rowsJson = JSON.stringify(ROWS);
-      const el = await fixture<HelixDataTable>(`<hx-data-table rows='${rowsJson}'></hx-data-table>`);
+      const el = await fixture<HelixDataTable>(
+        `<hx-data-table rows='${rowsJson}'></hx-data-table>`,
+      );
       el.columns = COLUMNS;
       await el.updateComplete;
 
@@ -438,13 +446,17 @@ describe('hx-data-table', () => {
     });
 
     it('falls back to empty array on invalid JSON columns attribute', async () => {
-      const el = await fixture<HelixDataTable>(`<hx-data-table columns='not-valid-json'></hx-data-table>`);
+      const el = await fixture<HelixDataTable>(
+        `<hx-data-table columns='not-valid-json'></hx-data-table>`,
+      );
       await el.updateComplete;
       expect(el.columns).toEqual([]);
     });
 
     it('falls back to empty array on invalid JSON rows attribute', async () => {
-      const el = await fixture<HelixDataTable>(`<hx-data-table rows='not-valid-json'></hx-data-table>`);
+      const el = await fixture<HelixDataTable>(
+        `<hx-data-table rows='not-valid-json'></hx-data-table>`,
+      );
       await el.updateComplete;
       expect(el.rows).toEqual([]);
     });
@@ -544,7 +556,9 @@ describe('hx-data-table', () => {
     });
 
     it('has no axe violations when empty', async () => {
-      const el = await fixture<HelixDataTable>('<hx-data-table empty-label="No data"></hx-data-table>');
+      const el = await fixture<HelixDataTable>(
+        '<hx-data-table empty-label="No data"></hx-data-table>',
+      );
       el.columns = COLUMNS;
       el.rows = [];
       await el.updateComplete;
@@ -685,7 +699,9 @@ describe('hx-data-table', () => {
       await el.updateComplete;
 
       // Query specifically for a data td (has data-row-index); checkbox tds don't
-      const firstDataTd = el.shadowRoot!.querySelector<HTMLElement>('tbody td[data-row-index="0"]')!;
+      const firstDataTd = el.shadowRoot!.querySelector<HTMLElement>(
+        'tbody td[data-row-index="0"]',
+      )!;
       firstDataTd.setAttribute('tabindex', '0');
       firstDataTd.focus();
 
