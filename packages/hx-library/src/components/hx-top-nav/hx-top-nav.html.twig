@@ -1,0 +1,64 @@
+{#
+  hx-top-nav — Drupal Twig Integration Template
+
+  Variables:
+  - sticky:      (boolean) Whether the nav sticks to top of viewport during scroll.
+  - label:       (string)  Accessible aria-label for the <nav> landmark.
+                           Defaults to "Site Navigation" if not provided.
+  - logo_text:   (string)  Text or rendered markup for the logo area.
+  - logo_url:    (string)  URL for the logo link. Defaults to front page.
+  - menu_items:  (array)   Array of menu item objects:
+                             - title:           (string)  Display text.
+                             - url:             (string)  Navigation URL.
+                             - in_active_trail: (boolean) True when item is active/current.
+  - actions:     (string)  Rendered HTML/markup for the actions slot (search, user menu, etc.).
+
+  IMPORTANT: Do NOT wrap menu items in a <nav> element — hx-top-nav renders a <nav>
+  landmark internally. Placing a <nav> in the default slot creates nested landmarks,
+  which is an accessibility violation (WCAG 1.3.6).
+
+  Usage example (Drupal block template):
+
+    {% set menu_items = items %}
+    {% include '@my_theme/hx-top-nav.html.twig' with {
+      sticky: true,
+      label: 'Site Navigation',
+      logo_text: site_name,
+      logo_url: path('<front>'),
+      menu_items: menu_items,
+    } %}
+
+  For aria-current, Drupal's menu system exposes `in_active_trail` on each item.
+  This template emits `aria-current="page"` automatically for active trail items.
+#}
+
+<hx-top-nav
+  {% if sticky %}sticky{% endif %}
+  {% if label %}label="{{ label }}"{% endif %}
+>
+  {# ── Logo Slot ─────────────────────────────────── #}
+  {% if logo_text %}
+    <a
+      slot="logo"
+      href="{{ logo_url | default(path('<front>')) }}"
+      class="hx-top-nav__logo-link"
+    >{{ logo_text }}</a>
+  {% endif %}
+
+  {# ── Navigation Links (default slot) ──────────── #}
+  {# Use bare <a> links — NOT wrapped in <nav> — see IMPORTANT note above. #}
+  {% for item in menu_items %}
+    <a
+      href="{{ item.url }}"
+      {% if item.in_active_trail %}aria-current="page"{% endif %}
+      class="hx-top-nav__nav-link{% if item.in_active_trail %} hx-top-nav__nav-link--active{% endif %}"
+    >{{ item.title }}</a>
+  {% endfor %}
+
+  {# ── Actions Slot (search, user menu, etc.) ───── #}
+  {% if actions %}
+    <div slot="actions" class="hx-top-nav__actions">
+      {{ actions }}
+    </div>
+  {% endif %}
+</hx-top-nav>
