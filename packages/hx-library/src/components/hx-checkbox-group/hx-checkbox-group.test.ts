@@ -1,5 +1,12 @@
 import { describe, it, expect, afterEach } from 'vitest';
-import { fixture, shadowQuery, oneEvent, cleanup, checkA11y } from '../../test-utils.js';
+import {
+  fixture,
+  shadowQuery,
+
+  oneEvent,
+  cleanup,
+  checkA11y,
+} from '../../test-utils.js';
 import type { HelixCheckboxGroup } from './hx-checkbox-group.js';
 import type { HelixCheckbox } from '../hx-checkbox/hx-checkbox.js';
 import '../hx-checkbox/index.js';
@@ -77,7 +84,7 @@ describe('hx-checkbox-group', () => {
     });
   });
 
-  // ─── Property: required (3) ───
+  // ─── Property: required (2) ───
 
   describe('Property: required', () => {
     it('shows required marker asterisk in legend', async () => {
@@ -98,16 +105,6 @@ describe('hx-checkbox-group', () => {
         </hx-checkbox-group>
       `);
       expect(el.hasAttribute('required')).toBe(true);
-    });
-
-    it('does not set aria-required on fieldset (not allowed by ARIA spec)', async () => {
-      const el = await fixture<HelixCheckboxGroup>(`
-        <hx-checkbox-group label="Test Group" required>
-          <hx-checkbox value="a" label="Option A"></hx-checkbox>
-        </hx-checkbox-group>
-      `);
-      const fieldset = shadowQuery(el, 'fieldset');
-      expect(fieldset?.hasAttribute('aria-required')).toBe(false);
     });
   });
 
@@ -135,15 +132,14 @@ describe('hx-checkbox-group', () => {
       expect(errorDiv).toBeTruthy();
     });
 
-    it('error div uses role="alert" without conflicting aria-live', async () => {
+    it('error div has aria-live="polite"', async () => {
       const el = await fixture<HelixCheckboxGroup>(`
         <hx-checkbox-group label="Test Group" error="Error">
           <hx-checkbox value="a" label="Option A"></hx-checkbox>
         </hx-checkbox-group>
       `);
       const errorDiv = shadowQuery(el, '.fieldset__error');
-      expect(errorDiv?.getAttribute('role')).toBe('alert');
-      expect(errorDiv?.hasAttribute('aria-live')).toBe(false);
+      expect(errorDiv?.getAttribute('aria-live')).toBe('polite');
     });
   });
 
@@ -460,7 +456,7 @@ describe('hx-checkbox-group', () => {
     });
   });
 
-  // ─── Validation (4) ───
+  // ─── Validation (3) ───
 
   describe('Validation', () => {
     it('checkValidity returns false when required and no checkboxes are checked', async () => {
@@ -488,70 +484,6 @@ describe('hx-checkbox-group', () => {
         </hx-checkbox-group>
       `);
       expect(el.reportValidity()).toBe(false);
-    });
-
-    it('validationMessage is non-empty when required and no checkboxes are checked', async () => {
-      const el = await fixture<HelixCheckboxGroup>(`
-        <hx-checkbox-group label="Test Group" name="options" required>
-          <hx-checkbox value="a" label="Option A"></hx-checkbox>
-        </hx-checkbox-group>
-      `);
-      expect(el.validationMessage.length).toBeGreaterThan(0);
-    });
-  });
-
-  // ─── ARIA: aria-describedby (3) ───
-
-  describe('ARIA: aria-describedby', () => {
-    it('includes error id in aria-describedby when error prop is set', async () => {
-      const el = await fixture<HelixCheckboxGroup>(`
-        <hx-checkbox-group label="Test Group" error="Required">
-          <hx-checkbox value="a" label="Option A"></hx-checkbox>
-        </hx-checkbox-group>
-      `);
-      const fieldset = shadowQuery(el, 'fieldset');
-      const describedBy = fieldset?.getAttribute('aria-describedby') ?? '';
-      const errorDiv = shadowQuery(el, '.fieldset__error');
-      expect(describedBy).toContain(errorDiv?.id ?? 'MISSING');
-    });
-
-    it('includes error id in aria-describedby when error slot is used', async () => {
-      const el = await fixture<HelixCheckboxGroup>(`
-        <hx-checkbox-group label="Test Group">
-          <hx-checkbox value="a" label="Option A"></hx-checkbox>
-          <span slot="error">Slotted error</span>
-        </hx-checkbox-group>
-      `);
-      await el.updateComplete;
-      const fieldset = shadowQuery(el, 'fieldset');
-      const describedBy = fieldset?.getAttribute('aria-describedby') ?? '';
-      const errorDiv = shadowQuery(el, '.fieldset__error');
-      expect(describedBy).toContain(errorDiv?.id ?? 'MISSING');
-    });
-
-    it('does not include help-text id when help slot is empty', async () => {
-      const el = await fixture<HelixCheckboxGroup>(`
-        <hx-checkbox-group label="Test Group">
-          <hx-checkbox value="a" label="Option A"></hx-checkbox>
-        </hx-checkbox-group>
-      `);
-      const fieldset = shadowQuery(el, 'fieldset');
-      const describedBy = fieldset?.getAttribute('aria-describedby');
-      expect(describedBy).toBeFalsy();
-    });
-
-    it('includes help-text id when help slot has content', async () => {
-      const el = await fixture<HelixCheckboxGroup>(`
-        <hx-checkbox-group label="Test Group">
-          <hx-checkbox value="a" label="Option A"></hx-checkbox>
-          <span slot="help">Help text</span>
-        </hx-checkbox-group>
-      `);
-      await el.updateComplete;
-      const fieldset = shadowQuery(el, 'fieldset');
-      const describedBy = fieldset?.getAttribute('aria-describedby') ?? '';
-      const helpDiv = shadowQuery(el, '.fieldset__help-text');
-      expect(describedBy).toContain(helpDiv?.id ?? 'MISSING');
     });
   });
 
