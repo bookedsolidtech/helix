@@ -1,10 +1,10 @@
 import { LitElement, html } from 'lit';
-
-let _tooltipCounter = 0;
 import { customElement, property, state } from 'lit/decorators.js';
 import { tokenStyles } from '@helix/tokens/lit';
 import { computePosition, flip, shift, offset, arrow } from '@floating-ui/dom';
 import { helixTooltipStyles } from './hx-tooltip.styles.js';
+
+let _tooltipCounter = 0;
 
 /**
  * A tooltip that displays contextual help text on hover or focus.
@@ -63,23 +63,27 @@ export class HelixTooltip extends LitElement {
   @property({ type: Number, attribute: 'hide-delay' })
   hideDelay = 100;
 
+  /** @internal */
   @state() private _visible = false;
 
+  /** @internal */
   private _showTimer: ReturnType<typeof setTimeout> | null = null;
+  /** @internal */
   private _hideTimer: ReturnType<typeof setTimeout> | null = null;
 
+  /** @internal */
   private readonly _tooltipId = `hx-tooltip-${++_tooltipCounter}`;
 
   // ─── Lifecycle ───
 
   override connectedCallback(): void {
     super.connectedCallback();
-    this.addEventListener('keydown', this._handleKeydown);
+    this.addEventListener('keydown', this._handleKeydown as EventListener);
   }
 
   override disconnectedCallback(): void {
     super.disconnectedCallback();
-    this.removeEventListener('keydown', this._handleKeydown);
+    this.removeEventListener('keydown', this._handleKeydown as EventListener);
     this._clearTimers();
   }
 
@@ -173,8 +177,9 @@ export class HelixTooltip extends LitElement {
 
   // ─── Events ───
 
-  private _handleKeydown = (e: Event): void => {
-    if ((e as KeyboardEvent).key === 'Escape' && this._visible) {
+  /** @internal */
+  private _handleKeydown = (e: KeyboardEvent): void => {
+    if (e.key === 'Escape' && this._visible) {
       this._clearTimers();
       this._hide();
     }
