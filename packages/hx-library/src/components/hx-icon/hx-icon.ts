@@ -5,13 +5,6 @@ import { tokenStyles } from '@helix/tokens/lit';
 import { helixIconStyles } from './hx-icon.styles.js';
 
 /**
- * Module-level cache for fetched SVG content keyed by URL.
- * Shared across all `hx-icon` instances to avoid duplicate network requests
- * when multiple icons reference the same `src` URL.
- */
-const svgCache = new Map<string, Promise<string>>();
-
-/**
  * An icon component that supports inline SVG fetching and SVG sprite sheet references.
  * Decorative icons are automatically hidden from assistive technology.
  * When a label is provided the icon is announced as an image with that label.
@@ -112,34 +105,20 @@ export class HelixIcon extends LitElement {
     }
 
     try {
-      // Use module-level cache to deduplicate fetches across instances.
-      if (!svgCache.has(url)) {
-        svgCache.set(
-          url,
-          fetch(url).then((response) => {
-            if (!response.ok) {
-              svgCache.delete(url);
-              return '';
-            }
-            return response.text();
-          }),
-        );
-      }
-
-      const text = await svgCache.get(url)!;
+      const response = await fetch(url);
       if (seq !== this._fetchSeq) return;
-
-      if (!text) {
+      if (!response.ok) {
         this._inlineSvg = '';
         this._fetchedSrc = undefined;
         return;
       }
 
+      const text = await response.text();
+      if (seq !== this._fetchSeq) return;
       const sanitized = this._sanitizeSvg(text);
       this._inlineSvg = sanitized;
       this._fetchedSrc = url;
     } catch {
-      svgCache.delete(url!);
       if (seq !== this._fetchSeq) return;
       this._inlineSvg = '';
       this._fetchedSrc = undefined;
@@ -173,16 +152,6 @@ export class HelixIcon extends LitElement {
     // URL-bearing attributes that can carry javascript:/data: payloads.
     const urlAttrs = new Set(['href', 'xlink:href', 'src', 'action', 'formaction']);
 
-    // ARIA attributes to strip from fetched SVGs so the wrapper controls
-    // semantics and there is no double-announcement.
-    const ariaStripAttrs = new Set([
-      'role',
-      'aria-label',
-      'aria-labelledby',
-      'aria-hidden',
-      'aria-describedby',
-    ]);
-
     // Sanitize every element including the root svg.
     const allElements: Element[] = [svgEl, ...Array.from(svgEl.querySelectorAll('*'))];
     allElements.forEach((el) => {
@@ -191,16 +160,6 @@ export class HelixIcon extends LitElement {
         const name = attr.name.toLowerCase();
         // Strip event-handler attributes.
         if (name.startsWith('on')) {
-          el.removeAttribute(attr.name);
-          return;
-        }
-        // Strip style attributes to prevent CSS injection vectors.
-        if (name === 'style') {
-          el.removeAttribute(attr.name);
-          return;
-        }
-        // Strip ARIA attributes so the wrapper element controls semantics.
-        if (ariaStripAttrs.has(name)) {
           el.removeAttribute(attr.name);
           return;
         }
@@ -213,9 +172,6 @@ export class HelixIcon extends LitElement {
         }
       });
     });
-
-    // Ensure the inner SVG is not focusable in keyboard navigation.
-    svgEl.setAttribute('focusable', 'false');
 
     return svgEl.outerHTML;
   }
