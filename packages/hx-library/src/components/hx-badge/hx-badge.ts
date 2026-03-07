@@ -11,7 +11,7 @@ import { helixBadgeStyles } from './hx-badge.styles.js';
  *
  * @tag hx-badge
  *
- * @slot - Default slot for badge content (text, number). When empty with pulse enabled, renders as a dot indicator. Ignored when `count` is set.
+ * @slot - Default slot for badge content (text, number). When empty with pulse enabled, renders as a dot indicator.
  * @slot prefix - Icon or content rendered before the badge text.
  *
  * @fires {CustomEvent<void>} hx-remove - Dispatched when the user clicks the remove button.
@@ -29,6 +29,10 @@ import { helixBadgeStyles } from './hx-badge.styles.js';
  * @cssprop [--hx-badge-padding-y] - Badge vertical padding (set per size variant).
  * @cssprop [--hx-badge-pulse-color] - Pulse color matching variant background with reduced opacity.
  * @cssprop [--hx-badge-dot-size=var(--hx-size-2)] - Dot indicator size when rendered without content.
+ * @cssprop [--hx-badge-secondary-bg=var(--hx-color-neutral-100)] - Background for the secondary variant.
+ * @cssprop [--hx-badge-secondary-color=var(--hx-color-neutral-700)] - Text color for the secondary variant.
+ * @cssprop [--hx-badge-info-bg=var(--hx-color-info-700)] - Background for the info variant.
+ * @cssprop [--hx-badge-info-color=var(--hx-color-neutral-0)] - Text color for the info variant.
  */
 @customElement('hx-badge')
 export class HelixBadge extends LitElement {
@@ -71,60 +75,24 @@ export class HelixBadge extends LitElement {
   removable = false;
 
   /**
-   * Numeric count to display. When set, overrides slotted content.
-   * Used with `max` for truncation (e.g., `99+`).
-   * @attr count
-   */
-  @property({ type: Number, reflect: true })
-  count: number | undefined;
-
-  /**
-   * Maximum value before truncation. When `count` exceeds `max`,
-   * the badge displays `{max}+` (e.g., `99+`).
-   * @attr max
-   */
-  @property({ type: Number, reflect: true })
-  max: number | undefined;
-
-  /**
-   * Accessible label for the badge. Required for dot indicators
-   * to provide screen reader context (e.g., "New notifications").
-   * @attr aria-label
-   */
-  @property({ type: String, attribute: 'aria-label', reflect: true })
-  override ariaLabel: string | null = null;
-
-  /**
    * Tracks whether the default slot has assigned content.
    */
   @state()
   private _hasSlotContent = false;
-
-  /**
-   * Tracks the text content of the badge for contextual remove label.
-   */
-  @state()
-  private _slotText = '';
 
   // ─── Slot Change Handling ───
 
   private _handleSlotChange(e: Event): void {
     const slot = e.target as HTMLSlotElement;
     const nodes = slot.assignedNodes({ flatten: true });
-    let text = '';
+    // Check if any assigned node has non-whitespace content
     this._hasSlotContent = nodes.some((node) => {
-      if (node.nodeType === Node.ELEMENT_NODE) {
-        text += (node as Element).textContent ?? '';
-        return true;
-      }
+      if (node.nodeType === Node.ELEMENT_NODE) return true;
       if (node.nodeType === Node.TEXT_NODE) {
-        const content = (node.textContent ?? '').trim();
-        text += content;
-        return content.length > 0;
+        return (node.textContent ?? '').trim().length > 0;
       }
       return false;
     });
-    this._slotText = text.trim();
   }
 
   // ─── Event Handling ───
@@ -138,29 +106,10 @@ export class HelixBadge extends LitElement {
     );
   }
 
-  // ─── Computed Display ───
-
-  private get _displayCount(): string | undefined {
-    if (this.count === undefined) return undefined;
-    if (this.max !== undefined && this.count > this.max) {
-      return `${this.max}+`;
-    }
-    return String(this.count);
-  }
-
-  private get _hasContent(): boolean {
-    return this._displayCount !== undefined || this._hasSlotContent;
-  }
-
-  private get _removeLabel(): string {
-    const text = this._displayCount ?? this._slotText;
-    return text ? `Remove ${text}` : 'Remove';
-  }
-
   // ─── Render ───
 
   override render() {
-    const isDot = !this._hasContent && this.pulse;
+    const isDot = !this._hasSlotContent && this.pulse;
 
     const classes = {
       badge: true,
@@ -172,21 +121,14 @@ export class HelixBadge extends LitElement {
     };
 
     return html`
-      <span
-        part="badge"
-        class=${classMap(classes)}
-        role="status"
-        aria-label=${this.ariaLabel ?? nothing}
-      >
+      <span part="badge" class=${classMap(classes)}>
         <slot name="prefix"></slot>
-        ${this._displayCount !== undefined
-          ? html`<span class="badge__count">${this._displayCount}</span>`
-          : html`<slot @slotchange=${this._handleSlotChange}></slot>`}
+        <slot @slotchange=${this._handleSlotChange}></slot>
         ${this.removable
           ? html`<button
               part="remove-button"
               class="badge__remove-button"
-              aria-label=${this._removeLabel}
+              aria-label="Remove"
               @click=${this._handleRemove}
             >
               <svg viewBox="0 0 12 12" aria-hidden="true" width="10" height="10">
