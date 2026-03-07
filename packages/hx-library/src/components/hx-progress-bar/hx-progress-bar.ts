@@ -1,11 +1,9 @@
 import { LitElement, html, nothing } from 'lit';
-import { customElement, property, state } from 'lit/decorators.js';
+import { customElement, property } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import { tokenStyles } from '@helix/tokens/lit';
 import { helixProgressBarStyles } from './hx-progress-bar.styles.js';
-
-let idCounter = 0;
 
 /**
  * A linear progress indicator for determinate and indeterminate states.
@@ -19,8 +17,6 @@ let idCounter = 0;
  * @csspart base - The outer track container element.
  * @csspart indicator - The filled portion indicating progress.
  * @csspart label - The label slot wrapper element.
- *
- * @fires {CustomEvent} hx-complete - Dispatched when value reaches max (completion).
  *
  * @cssprop [--hx-progress-bar-track-bg=var(--hx-color-neutral-100)] - Track background color.
  * @cssprop [--hx-progress-bar-indicator-bg=var(--hx-color-primary-500)] - Indicator fill color.
@@ -59,14 +55,6 @@ export class HelixProgressBar extends LitElement {
   label = '';
 
   /**
-   * Explicitly set indeterminate state. When true, the progress bar shows
-   * an indeterminate animation regardless of value.
-   * @attr indeterminate
-   */
-  @property({ type: Boolean, reflect: true })
-  indeterminate = false;
-
-  /**
    * Size of the progress bar track.
    * @attr hx-size
    */
@@ -80,34 +68,14 @@ export class HelixProgressBar extends LitElement {
   @property({ type: String, reflect: true })
   variant: 'default' | 'success' | 'warning' | 'danger' = 'default';
 
-  @state()
-  private _complete = false;
-
-  private readonly _labelId = `hx-progress-label-${++idCounter}`;
-
   private get _isIndeterminate(): boolean {
-    return this.indeterminate || this.value === null;
+    return this.value === null;
   }
 
   private get _percentage(): number {
     if (this._isIndeterminate) return 0;
     const clamped = Math.max(0, Math.min(this.value ?? 0, this.max));
     return (clamped / this.max) * 100;
-  }
-
-  override updated(changed: Map<PropertyKey, unknown>): void {
-    if (changed.has('value')) {
-      const prev = changed.get('value') as number | null;
-      const wasComplete = prev !== null && prev !== undefined && prev >= this.max;
-      const isComplete = this.value !== null && this.value >= this.max && !this.indeterminate;
-
-      if (isComplete && !wasComplete) {
-        this._complete = true;
-        this.dispatchEvent(new CustomEvent('hx-complete', { bubbles: true, composed: true }));
-      } else if (!isComplete) {
-        this._complete = false;
-      }
-    }
   }
 
   override render() {
@@ -119,12 +87,12 @@ export class HelixProgressBar extends LitElement {
     };
 
     const indicatorStyle = this._isIndeterminate ? '' : `width: ${this._percentage}%`;
+
     const ariaValueNow = this._isIndeterminate ? undefined : (this.value ?? 0);
-    const useAriaLabelledBy = !this.label;
 
     return html`
       <div class=${classMap(classes)}>
-        <span part="label" class="progress-bar__label" id=${this._labelId}>
+        <span part="label" class="progress-bar__label">
           <slot name="label"></slot>
         </span>
         <div
@@ -135,7 +103,6 @@ export class HelixProgressBar extends LitElement {
           aria-valuemin="0"
           aria-valuemax=${this.max}
           aria-label=${this.label || nothing}
-          aria-labelledby=${useAriaLabelledBy ? this._labelId : nothing}
         >
           <div
             part="indicator"
@@ -143,9 +110,6 @@ export class HelixProgressBar extends LitElement {
             style=${indicatorStyle || nothing}
           ></div>
         </div>
-        <span class="progress-bar__live" role="status" aria-live="polite">
-          ${this._complete ? 'Complete' : nothing}
-        </span>
       </div>
     `;
   }
