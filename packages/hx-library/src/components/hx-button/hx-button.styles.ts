@@ -132,6 +132,7 @@ export const helixButtonStyles = css`
 
   .button[disabled] {
     cursor: not-allowed;
+    opacity: var(--hx-opacity-disabled, 0.5);
   }
 
   /* ─── Loading State ─── */

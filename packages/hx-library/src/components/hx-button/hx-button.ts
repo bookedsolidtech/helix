@@ -41,10 +41,8 @@ export class HelixButton extends LitElement {
 
   // ─── Form Association ───
 
-  /** Declares this element as a form-associated custom element. */
   static formAssociated = true;
 
-  /** ElementInternals instance for form participation and AOM. */
   private _internals: ElementInternals;
 
   constructor() {
@@ -53,14 +51,6 @@ export class HelixButton extends LitElement {
   }
 
   // ─── Public Properties ───
-
-  /**
-   * Accessible label forwarded to the inner button or anchor element via
-   * aria-label. Required for icon-only buttons that have no visible text.
-   * @attr label
-   */
-  @property({ type: String, reflect: true })
-  label: string | undefined = undefined;
 
   /**
    * Visual style variant of the button.
@@ -229,7 +219,6 @@ export class HelixButton extends LitElement {
           href=${this.disabled ? nothing : ifDefined(this.href)}
           target=${ifDefined(this.target)}
           rel=${this.target === '_blank' ? 'noopener noreferrer' : nothing}
-          aria-label=${ifDefined(this.label)}
           aria-disabled=${this.disabled ? 'true' : nothing}
           aria-busy=${this.loading ? 'true' : nothing}
           @click=${this._handleClick}
@@ -245,7 +234,6 @@ export class HelixButton extends LitElement {
         class=${classMap(classes)}
         ?disabled=${this.disabled}
         type=${this.type}
-        aria-label=${ifDefined(this.label)}
         aria-busy=${this.loading ? 'true' : nothing}
         @click=${this._handleClick}
       >

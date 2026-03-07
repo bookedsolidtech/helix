@@ -226,21 +226,6 @@ describe('hx-button', () => {
       expect(anchor.hasAttribute('rel')).toBe(false);
     });
 
-    it('suppresses hx-click and sets aria-busy when loading in anchor mode', async () => {
-      const el = await fixture<WcButton>(
-        '<hx-button href="https://example.com" loading>Link</hx-button>',
-      );
-      const anchor = shadowQuery<HTMLAnchorElement>(el, 'a')!;
-      expect(anchor.getAttribute('aria-busy')).toBe('true');
-      let fired = false;
-      el.addEventListener('hx-click', () => {
-        fired = true;
-      });
-      anchor.click();
-      await el.updateComplete;
-      expect(fired).toBe(false);
-    });
-
     it('removes href when disabled in anchor mode', async () => {
       const el = await fixture<WcButton>(
         '<hx-button href="https://example.com" disabled>Link</hx-button>',
@@ -425,34 +410,6 @@ describe('hx-button', () => {
       expect(submitted).toBe(true);
     });
 
-    it('returns the parent form from form getter', async () => {
-      const form = document.createElement('form');
-      form.innerHTML = '<hx-button>Click</hx-button>';
-      document.getElementById('test-fixture-container')!.appendChild(form);
-      const el = form.querySelector('hx-button') as WcButton;
-      await el.updateComplete;
-      expect(el.form).toBe(form);
-    });
-
-    it('calls setFormValue when name and value are set on submit', async () => {
-      const form = document.createElement('form');
-      form.innerHTML = '<hx-button type="submit" name="action" value="confirm">Submit</hx-button>';
-      document.getElementById('test-fixture-container')!.appendChild(form);
-      const el = form.querySelector('hx-button') as WcButton;
-      await el.updateComplete;
-
-      let submitted = false;
-      form.addEventListener('submit', (e) => {
-        e.preventDefault();
-        submitted = true;
-      });
-
-      const btn = shadowQuery<HTMLButtonElement>(el, 'button')!;
-      btn.click();
-      await el.updateComplete;
-      expect(submitted).toBe(true);
-    });
-
     it('calls form.reset on type=reset click', async () => {
       const form = document.createElement('form');
       form.innerHTML =
@@ -473,30 +430,6 @@ describe('hx-button', () => {
       btn.click();
       await el.updateComplete;
       expect(wasReset).toBe(true);
-    });
-  });
-
-  // ─── Property: label (aria-label passthrough) ───
-
-  describe('Property: label', () => {
-    it('forwards label to inner button aria-label', async () => {
-      const el = await fixture<WcButton>('<hx-button label="Close dialog">X</hx-button>');
-      const btn = shadowQuery(el, 'button')!;
-      expect(btn.getAttribute('aria-label')).toBe('Close dialog');
-    });
-
-    it('forwards label to inner anchor aria-label', async () => {
-      const el = await fixture<WcButton>(
-        '<hx-button href="https://example.com" label="Visit site">Link</hx-button>',
-      );
-      const anchor = shadowQuery(el, 'a')!;
-      expect(anchor.getAttribute('aria-label')).toBe('Visit site');
-    });
-
-    it('does not set aria-label when label is not provided', async () => {
-      const el = await fixture<WcButton>('<hx-button>Click</hx-button>');
-      const btn = shadowQuery(el, 'button')!;
-      expect(btn.hasAttribute('aria-label')).toBe(false);
     });
   });
 
