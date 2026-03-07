@@ -13,13 +13,16 @@ import ComponentDoc from '../../../components/ComponentDoc.astro';
 
 ## Variants
 
-Primary, secondary, and ghost visual styles.
+Primary, secondary, tertiary, danger, ghost, and outline visual styles.
 
 <ComponentDemo title="Variants">
   <div style="display: flex; gap: 0.75rem; flex-wrap: wrap; align-items: center;">
     <hx-button variant="primary">Primary</hx-button>
     <hx-button variant="secondary">Secondary</hx-button>
+    <hx-button variant="tertiary">Tertiary</hx-button>
+    <hx-button variant="danger">Danger</hx-button>
     <hx-button variant="ghost">Ghost</hx-button>
+    <hx-button variant="outline">Outline</hx-button>
   </div>
 </ComponentDemo>
 
@@ -35,6 +38,21 @@ Small, medium, and large button sizes.
   </div>
 </ComponentDemo>
 
+## Loading
+
+Buttons in loading state show a spinner and prevent interaction.
+
+<ComponentDemo title="Loading">
+  <div style="display: flex; gap: 0.75rem; flex-wrap: wrap; align-items: center;">
+    <hx-button variant="primary" loading>
+      Saving...
+    </hx-button>
+    <hx-button variant="secondary" loading>
+      Loading
+    </hx-button>
+  </div>
+</ComponentDemo>
+
 ## Disabled
 
 Buttons in disabled state across all variants.
@@ -47,46 +65,40 @@ Buttons in disabled state across all variants.
     <hx-button variant="secondary" disabled>
       Secondary
     </hx-button>
+    <hx-button variant="danger" disabled>
+      Danger
+    </hx-button>
     <hx-button variant="ghost" disabled>
       Ghost
     </hx-button>
   </div>
 </ComponentDemo>
 
-## All Combinations
+## With Prefix and Suffix Slots
 
-Full variant × size matrix.
+Use `prefix` and `suffix` slots to add icons or content before/after the label.
 
-<ComponentDemo title="All Combinations">
-  <div style="display: grid; grid-template-columns: repeat(3, auto); gap: 0.75rem; justify-items: start; align-items: center;">
-    <hx-button variant="primary" size="sm">
-      Primary SM
+<ComponentDemo title="Prefix & Suffix">
+  <div style="display: flex; gap: 0.75rem; flex-wrap: wrap; align-items: center;">
+    <hx-button variant="primary">
+      <span slot="prefix">+</span>
+      Add Item
     </hx-button>
-    <hx-button variant="primary" size="md">
-      Primary MD
-    </hx-button>
-    <hx-button variant="primary" size="lg">
-      Primary LG
-    </hx-button>
-    <hx-button variant="secondary" size="sm">
-      Secondary SM
-    </hx-button>
-    <hx-button variant="secondary" size="md">
-      Secondary MD
-    </hx-button>
-    <hx-button variant="secondary" size="lg">
-      Secondary LG
-    </hx-button>
-    <hx-button variant="ghost" size="sm">
-      Ghost SM
-    </hx-button>
-    <hx-button variant="ghost" size="md">
-      Ghost MD
-    </hx-button>
-    <hx-button variant="ghost" size="lg">
-      Ghost LG
+    <hx-button variant="secondary">
+      Download
+      <span slot="suffix">↓</span>
     </hx-button>
   </div>
+</ComponentDemo>
+
+## As Link
+
+Set `href` to render the button as an anchor element.
+
+<ComponentDemo title="Link Button">
+  <hx-button variant="primary" href="https://example.com" target="_blank">
+    Visit Site
+  </hx-button>
 </ComponentDemo>
 
 ## API Reference
