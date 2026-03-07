@@ -1,10 +1,8 @@
 import { LitElement, html } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { tokenStyles } from '@helix/tokens/lit';
-import { computePosition, flip, shift, offset, arrow } from '@floating-ui/dom';
+import { computePosition, flip, shift, offset, arrow, type Placement } from '@floating-ui/dom';
 import { helixTooltipStyles } from './hx-tooltip.styles.js';
-
-let _tooltipCounter = 0;
 
 /**
  * A tooltip that displays contextual help text on hover or focus.
@@ -37,6 +35,14 @@ let _tooltipCounter = 0;
  *   <span slot="content">Helpful context here</span>
  * </hx-tooltip>
  * ```
+ *
+ * @example Drupal/Twig usage
+ * ```twig
+ * <hx-tooltip>
+ *   <button type="button">{{ trigger_label }}</button>
+ *   <span slot="content">{{ tooltip_text }}</span>
+ * </hx-tooltip>
+ * ```
  */
 @customElement('hx-tooltip')
 export class HelixTooltip extends LitElement {
@@ -44,10 +50,12 @@ export class HelixTooltip extends LitElement {
 
   /**
    * Preferred placement of the tooltip relative to the trigger.
+   * Supports all Floating UI placement values including alignment variants
+   * (e.g. 'top-start', 'bottom-end') and 'auto'.
    * @attr placement
    */
   @property({ type: String, reflect: true })
-  placement: 'top' | 'bottom' | 'left' | 'right' = 'top';
+  placement: Placement = 'top';
 
   /**
    * Delay in milliseconds before the tooltip is shown.
@@ -71,8 +79,21 @@ export class HelixTooltip extends LitElement {
   /** @internal */
   private _hideTimer: ReturnType<typeof setTimeout> | null = null;
 
-  /** @internal */
-  private readonly _tooltipId = `hx-tooltip-${++_tooltipCounter}`;
+  /**
+   * Unique ID for this tooltip instance.
+   * Uses crypto.randomUUID() to prevent SSR hydration ID collisions.
+   * @internal
+   */
+  private readonly _tooltipId = `hx-tooltip-${crypto.randomUUID()}`;
+
+  /**
+   * Visually-hidden description element in light DOM.
+   * Necessary because aria-describedby cannot cross Shadow DOM boundaries —
+   * ARIA ID references are scoped to the element's root node. This element
+   * lives in the document scope so the trigger's aria-describedby resolves correctly.
+   * @internal
+   */
+  private _lightDomDescription: HTMLSpanElement | null = null;
 
   // ─── Lifecycle ───
 
@@ -85,6 +106,8 @@ export class HelixTooltip extends LitElement {
     super.disconnectedCallback();
     this.removeEventListener('keydown', this._handleKeydown as EventListener);
     this._clearTimers();
+    this._lightDomDescription?.remove();
+    this._lightDomDescription = null;
   }
 
   override firstUpdated(): void {
@@ -97,6 +120,30 @@ export class HelixTooltip extends LitElement {
     const slot = this.shadowRoot?.querySelector('slot:not([name])') as HTMLSlotElement | null;
     if (!slot) return;
     const trigger = slot.assignedElements()[0] as HTMLElement | undefined;
+
+    // Sync content from the content slot into a visually-hidden light DOM element.
+    // aria-describedby cannot cross Shadow DOM boundaries, so the referenced element
+    // must live in the document scope (light DOM), not inside the shadow root.
+    const contentSlot = this.shadowRoot?.querySelector(
+      'slot[name="content"]',
+    ) as HTMLSlotElement | null;
+    const contentText =
+      contentSlot
+        ?.assignedElements()
+        .map((el) => el.textContent)
+        .join(' ')
+        .trim() ?? '';
+
+    if (!this._lightDomDescription) {
+      this._lightDomDescription = document.createElement('span');
+      this._lightDomDescription.id = this._tooltipId;
+      // Visually hidden but accessible to screen readers via aria-describedby
+      this._lightDomDescription.style.cssText =
+        'position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0';
+      this.appendChild(this._lightDomDescription);
+    }
+    this._lightDomDescription.textContent = contentText;
+
     if (trigger) {
       trigger.setAttribute('aria-describedby', this._tooltipId);
     }
@@ -166,12 +213,14 @@ export class HelixTooltip extends LitElement {
         basePlacement
       ] ?? 'bottom';
 
+    // Offset is derived from the arrow element's actual size so that custom
+    // --hx-tooltip-arrow-size values position the arrow correctly.
     Object.assign(arrowEl.style, {
       left: arrowData?.x != null ? `${arrowData.x}px` : '',
       top: arrowData?.y != null ? `${arrowData.y}px` : '',
       right: '',
       bottom: '',
-      [staticSide]: '-4px',
+      [staticSide]: `${-(arrowEl.offsetWidth / 2)}px`,
     });
   }
 
@@ -185,6 +234,25 @@ export class HelixTooltip extends LitElement {
     }
   };
 
+  /**
+   * Handle mouseleave on the trigger wrapper.
+   * Does not schedule hide if keyboard focus is still on the trigger element,
+   * preventing mixed keyboard+mouse interactions from dismissing the tooltip
+   * while the user is still navigating by keyboard.
+   * @internal
+   */
+  private _handleTriggerMouseleave(): void {
+    const slot = this.shadowRoot?.querySelector('slot:not([name])') as HTMLSlotElement | null;
+    const trigger = slot?.assignedElements()[0] as HTMLElement | undefined;
+    if (
+      trigger &&
+      (trigger === document.activeElement || trigger.contains(document.activeElement))
+    ) {
+      return;
+    }
+    this._scheduleHide();
+  }
+
   // ─── Render ───
 
   override render() {
@@ -192,7 +260,7 @@ export class HelixTooltip extends LitElement {
       <div
         class="trigger-wrapper"
         @mouseenter=${this._scheduleShow}
-        @mouseleave=${this._scheduleHide}
+        @mouseleave=${this._handleTriggerMouseleave}
         @focusin=${this._scheduleShow}
         @focusout=${this._scheduleHide}
       >
@@ -204,8 +272,10 @@ export class HelixTooltip extends LitElement {
         role="tooltip"
         aria-hidden=${String(!this._visible)}
         class=${this._visible ? 'visible' : ''}
+        @mouseenter=${this._clearTimers}
+        @mouseleave=${this._scheduleHide}
       >
-        <slot name="content"></slot>
+        <slot name="content" @slotchange=${this._setupTriggerAria}></slot>
         <div part="arrow"></div>
       </div>
     `;
