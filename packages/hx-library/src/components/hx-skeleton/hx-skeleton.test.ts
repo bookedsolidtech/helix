@@ -1,6 +1,6 @@
 import { describe, it, expect, afterEach } from 'vitest';
 import { page } from '@vitest/browser/context';
-import { fixture, shadowQuery, cleanup, checkA11y } from '../../test-utils.js';
+import { fixture, shadowQuery, cleanup, checkA11y, oneEvent } from '../../test-utils.js';
 import type { HelixSkeleton } from './hx-skeleton.js';
 import './index.js';
 
@@ -28,15 +28,20 @@ describe('hx-skeleton', () => {
       expect(base).toBeInstanceOf(HTMLSpanElement);
     });
 
-    it('is hidden from assistive technology', async () => {
+    it('is hidden from assistive technology via shadow child', async () => {
       const el = await fixture<HelixSkeleton>('<hx-skeleton></hx-skeleton>');
       const base = shadowQuery(el, '[part="base"]')!;
       expect(base.getAttribute('aria-hidden')).toBe('true');
       expect(base.getAttribute('role')).toBe('presentation');
     });
+
+    it('sets aria-hidden on the host element', async () => {
+      const el = await fixture<HelixSkeleton>('<hx-skeleton></hx-skeleton>');
+      expect(el.getAttribute('aria-hidden')).toBe('true');
+    });
   });
 
-  // ─── Property: variant (5) ───
+  // ─── Property: variant (6) ───
 
   describe('Property: variant', () => {
     it('defaults to rect', async () => {
@@ -61,10 +66,38 @@ describe('hx-skeleton', () => {
       expect(base.classList.contains('skeleton--circle')).toBe(true);
     });
 
+    it('applies rect variant class', async () => {
+      const el = await fixture<HelixSkeleton>('<hx-skeleton variant="rect"></hx-skeleton>');
+      const base = shadowQuery(el, '[part="base"]')!;
+      expect(base.classList.contains('skeleton--rect')).toBe(true);
+    });
+
     it('applies button variant class', async () => {
       const el = await fixture<HelixSkeleton>('<hx-skeleton variant="button"></hx-skeleton>');
       const base = shadowQuery(el, '[part="base"]')!;
       expect(base.classList.contains('skeleton--button')).toBe(true);
+    });
+
+    it('applies paragraph variant class', async () => {
+      const el = await fixture<HelixSkeleton>('<hx-skeleton variant="paragraph"></hx-skeleton>');
+      const base = shadowQuery(el, '[part="base"]')!;
+      expect(base.classList.contains('skeleton--paragraph')).toBe(true);
+    });
+
+    it('gracefully degrades with unknown variant — renders without error', async () => {
+      // TypeScript types are erased at runtime; consumers (e.g. Drupal CMS) may
+      // pass arbitrary strings. The component must not throw or produce invisible output.
+      const el = await fixture<HelixSkeleton>(
+        '<hx-skeleton variant="image" width="100px" height="50px"></hx-skeleton>',
+      );
+      await el.updateComplete;
+      const base = shadowQuery(el, '[part="base"]')!;
+      // The base element must still be present (not crash)
+      expect(base).toBeTruthy();
+      // The base element gets the skeleton base class
+      expect(base.classList.contains('skeleton')).toBe(true);
+      // Unknown variant class is applied (no styles — but no crash)
+      expect(base.classList.contains('skeleton--image')).toBe(true);
     });
   });
 
@@ -82,12 +115,49 @@ describe('hx-skeleton', () => {
       expect(base.classList.contains('skeleton--animated')).toBe(true);
     });
 
-    it('does not apply animated class when animated is false', async () => {
-      const el = await fixture<HelixSkeleton>('<hx-skeleton animated="false"></hx-skeleton>');
+    it('does not apply animated class when animated attribute is absent', async () => {
+      // Boolean Lit properties treat attribute PRESENCE as true. To test false
+      // state, we must omit the attribute entirely — not pass animated="false".
+      const el = await fixture<HelixSkeleton>('<hx-skeleton></hx-skeleton>');
+      el.removeAttribute('animated');
       el.animated = false;
       await el.updateComplete;
       const base = shadowQuery(el, '[part="base"]')!;
       expect(base.classList.contains('skeleton--animated')).toBe(false);
+    });
+  });
+
+  // ─── Property: loaded (4) ───
+
+  describe('Property: loaded', () => {
+    it('defaults to false', async () => {
+      const el = await fixture<HelixSkeleton>('<hx-skeleton></hx-skeleton>');
+      expect(el.loaded).toBe(false);
+    });
+
+    it('hides the skeleton when loaded is true', async () => {
+      const el = await fixture<HelixSkeleton>('<hx-skeleton></hx-skeleton>');
+      el.loaded = true;
+      await el.updateComplete;
+      const base = shadowQuery(el, '[part="base"]');
+      expect(base).toBeNull();
+    });
+
+    it('dispatches hx-loaded event when loaded transitions to true', async () => {
+      const el = await fixture<HelixSkeleton>('<hx-skeleton></hx-skeleton>');
+      const eventPromise = oneEvent(el, 'hx-loaded');
+      el.loaded = true;
+      await el.updateComplete;
+      const event = await eventPromise;
+      expect(event).toBeTruthy();
+      expect(event.type).toBe('hx-loaded');
+    });
+
+    it('reflects loaded attribute to host', async () => {
+      const el = await fixture<HelixSkeleton>('<hx-skeleton></hx-skeleton>');
+      el.loaded = true;
+      await el.updateComplete;
+      expect(el.hasAttribute('loaded')).toBe(true);
     });
   });
 
@@ -155,7 +225,7 @@ describe('hx-skeleton', () => {
     });
 
     it('has no axe violations for all variants', async () => {
-      for (const variant of ['text', 'circle', 'rect', 'button'] as const) {
+      for (const variant of ['text', 'circle', 'rect', 'button', 'paragraph'] as const) {
         const el = await fixture<HelixSkeleton>(
           `<hx-skeleton variant="${variant}" width="100px" height="100px"></hx-skeleton>`,
         );
