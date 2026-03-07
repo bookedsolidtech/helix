@@ -44,10 +44,9 @@ export const helixAccordionItemStyles = css`
 
   .item--disabled .trigger {
     cursor: not-allowed;
-    opacity: 0.5;
   }
 
-  .trigger:hover:not(.item--disabled .trigger) {
+  :host(:not([disabled])) .trigger:hover {
     background-color: var(--hx-accordion-trigger-hover-bg, var(--hx-color-neutral-50, #f8f9fa));
   }
 

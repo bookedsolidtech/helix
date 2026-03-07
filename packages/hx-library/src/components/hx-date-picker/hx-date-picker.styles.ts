@@ -235,6 +235,12 @@ export const helixDatePickerStyles = css`
   /* ─── Calendar Grid ─── */
 
   .calendar__grid {
+    display: flex;
+    flex-direction: column;
+    gap: var(--hx-space-1, 0.25rem);
+  }
+
+  .calendar__row {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
     gap: var(--hx-space-1, 0.25rem);
@@ -278,7 +284,6 @@ export const helixDatePickerStyles = css`
       color var(--hx-transition-fast, 150ms ease);
     outline: none;
     position: relative;
-    tabindex: 0;
   }
 
   .calendar__day:hover:not(.calendar__day--disabled):not(.calendar__day--selected) {
@@ -325,14 +330,6 @@ export const helixDatePickerStyles = css`
     pointer-events: none;
   }
 
-  .calendar__day--other-month {
-    color: var(--hx-color-neutral-400, #adb5bd);
-  }
-
-  .calendar__day--other-month.calendar__day--disabled {
-    opacity: 0.2;
-  }
-
   /* ─── Live Region ─── */
 
   .calendar__live-region {
@@ -359,5 +356,57 @@ export const helixDatePickerStyles = css`
     font-size: var(--hx-font-size-xs, 0.75rem);
     color: var(--hx-date-picker-error-color, var(--hx-color-error-500, #dc3545));
     line-height: var(--hx-line-height-normal, 1.5);
+  }
+
+  .calendar__nav-btn:disabled {
+    opacity: var(--hx-opacity-disabled, 0.4);
+    cursor: not-allowed;
+    pointer-events: none;
+  }
+
+  /* ─── Forced Colors (High Contrast Mode) ─── */
+
+  @media (forced-colors: active) {
+    .field__input-wrapper {
+      border: 1px solid ButtonText;
+    }
+
+    .field__input-wrapper:focus-within {
+      outline: 2px solid Highlight;
+      outline-offset: 1px;
+      box-shadow: none;
+    }
+
+    .calendar__day:focus-visible {
+      outline: 2px solid Highlight;
+      box-shadow: none;
+    }
+
+    .calendar__day--selected {
+      background-color: Highlight;
+      color: HighlightText;
+      border: 1px solid Highlight;
+    }
+
+    .calendar__day--today:not(.calendar__day--selected) {
+      border: 2px solid LinkText;
+    }
+
+    .calendar__day--today:not(.calendar__day--selected)::after {
+      display: none;
+    }
+
+    .calendar__day--disabled {
+      color: GrayText;
+    }
+
+    .calendar__nav-btn:focus-visible {
+      outline: 2px solid Highlight;
+      box-shadow: none;
+    }
+
+    .field--error .field__input-wrapper {
+      border-color: LinkText;
+    }
   }
 `;

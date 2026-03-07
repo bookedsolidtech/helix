@@ -1,6 +1,6 @@
-# AUDIT: hx-code-snippet — Deep Audit v2 (T3-13)
+# AUDIT: hx-code-snippet — Antagonistic Quality Review (T3-13)
 
-**Reviewer:** Deep audit v2
+**Reviewer:** Automated antagonistic audit
 **Date:** 2026-03-06
 **Files audited:**
 
@@ -14,106 +14,274 @@
 
 ---
 
-## Fixes Applied (13 P1 issues resolved)
+## 1. TypeScript
 
-### 1. Accessibility: `aria-expanded` on expand button — FIXED
+### P1 — No `lineNumbers` property exists
 
-Added `aria-expanded=${this._expanded}` to the expand/collapse button. Screen readers now receive programmatic state.
+The feature specification explicitly calls out "line numbers prop typed" as an audit criterion. No `lineNumbers` (or equivalent) property is implemented anywhere in the component. The test file contains no line-number-related tests. This is a missing feature, not a gap in typing.
 
-### 2. Accessibility: Unique region labels — FIXED
+### P2 — `render()` lacks explicit return type
 
-`aria-label` on `<pre>` now includes the language when set: `"Code snippet: javascript"`. Multiple instances on a page will have distinct landmark labels.
+`override render()` has no return type annotation. Lit's base class accepts `TemplateResult | nothing`, but the strict project policy prefers explicit types. Should be `override render(): TemplateResult | typeof nothing`.
 
-### 3. Accessibility: Copy confirmation via `aria-live` — FIXED
+### P2 — Unsafe cast without null guard in `_handleSlotChange`
 
-Added a visually-hidden `<span role="status" aria-live="polite">` that announces "Code copied to clipboard" when the copy action fires. Works regardless of focus position.
+```ts
+const slot = e.target as HTMLSlotElement;
+```
 
-### 4. Accessibility: `language-*` class on `<code>` — FIXED
+`e.target` can be `null`. The cast is unchecked. Should be:
 
-The `<code>` element now receives `class="language-<name>"` when the `language` property is set. Third-party highlighters (Prism, Shiki, highlight.js) can now target these elements.
-
-### 5. TypeScript: Null guard in `_handleSlotChange` — FIXED
-
-`e.target` is now cast as `HTMLSlotElement | null` with an early return if null.
-
-### 6. TypeScript: Explicit return type on `render()` — FIXED
-
-`render()` now returns `TemplateResult | typeof nothing`.
-
-### 7. Architecture: JSDoc corrected — FIXED
-
-Removed misleading claim that "pre-highlighted HTML is also accepted." JSDoc now clearly states slot content is extracted as plain text and HTML tags will be stripped.
-
-### 8. Architecture: `copyable` boolean attribute documented — FIXED
-
-JSDoc now warns HTML/Twig authors that `copyable="false"` still enables the copy button (boolean attribute trap). Recommends omitting the attribute or using JavaScript.
-
-### 9. CSS: Inline padding tokenized — FIXED
-
-`padding: 0.125em 0.375em` replaced with `padding: var(--hx-code-snippet-inline-padding, var(--hx-space-half, 0.125em) var(--hx-space-1-5, 0.375em))`.
-
-### 10. CSS: `tab-size` tokenized — FIXED
-
-`tab-size: 2` replaced with `tab-size: var(--hx-code-snippet-tab-size, 2)`.
-
-### 11. CSS: `line-height: 1` on copy button tokenized — FIXED
-
-Replaced with `line-height: var(--hx-line-height-none, 1)`.
-
-### 12. CSS: Focus styles for scrollable pre — FIXED
-
-Added `tabindex="0"` to `<pre>` and `:focus-visible` styles so keyboard users can scroll horizontally.
-
-### 13. Tests: Multiple P1 test gaps filled — FIXED
-
-- **`copyable="false"` boolean trap**: New test confirms HTML `copyable="false"` still shows the copy button.
-- **Overflow scroll**: Test verifies `overflow-x: auto` on `<pre>` and `tabindex="0"` for keyboard access.
-- **Timer cleanup**: Test verifies disconnect before 2s timer does not cause post-disconnect state mutation.
-- **aria-live announcement**: Test verifies live region contains "Code copied to clipboard" after click.
-- **aria-expanded**: Test verifies initial `false` and toggles to `true` on click.
-- **Unique aria-label**: Test verifies `aria-label="Code snippet: javascript"` when language is set.
-- **Slot content in shadow code**: Test verifies slotted text appears in shadow DOM `<code>` element.
-- **language-\* class**: Test verifies `class="language-typescript"` applied to `<code>`.
-
-### 14. Storybook: MaxLines story fixed — FIXED
-
-Content now uses actual newlines via template literal so `_isTruncated()` works and the "Show more" button appears.
-
-### 15. Storybook: Unused `_canvas` variable removed — FIXED
-
-Dead `within(canvasElement)` call removed from Default play function. Unused `within` import removed.
+```ts
+const slot = e.target as HTMLSlotElement | null;
+if (!slot) return;
+```
 
 ---
 
-## Remaining P2 Issues (documented, not blocking)
+## 2. Accessibility
 
-| #   | Area        | Severity | Finding                                                                         | Status     |
-| --- | ----------- | -------- | ------------------------------------------------------------------------------- | ---------- |
-| 1   | CSS         | P2       | `z-index: 1` on copy button not tokenized                                       | Documented |
-| 2   | CSS         | P2       | `--hx-filter-brightness-active` removed (used raw `0.8` fallback)               | Documented |
-| 3   | Tests       | P2       | No keyboard interaction tests (Enter/Space on buttons)                          | Documented |
-| 4   | Tests       | P2       | `page.screenshot()` used before axe-core — removed in favor of `updateComplete` | Fixed      |
-| 5   | Storybook   | P2       | No dedicated bash/typescript language stories                                   | Documented |
-| 6   | Storybook   | P2       | No play function for expand/collapse interaction                                | Documented |
-| 7   | Performance | P2       | No bundle size measurement on record                                            | Documented |
-| 8   | Drupal      | P2       | Clipboard API requires HTTPS — no documentation or fallback                     | Documented |
+### P1 — `aria-expanded` missing on expand/collapse button
+
+The expand button toggles between "Show more" / "Show less" but never sets `aria-expanded`. Screen readers receive no state signal beyond the label text change. WCAG 4.1.2 (Name, Role, Value) requires widget state to be programmatically determinable.
+
+**Required:**
+
+```html
+<button aria-expanded="${this._expanded}" ...></button>
+```
+
+### P1 — Duplicate landmark labels: all instances share `aria-label="Code snippet"`
+
+`<pre role="region" aria-label="Code snippet">` is applied to every instance. When a page contains multiple code snippets, all region landmarks have the identical label "Code snippet". This violates WCAG 1.3.6 and makes navigation landmarks useless for screen reader users who rely on landmark lists. Each instance must either use a unique descriptive label (e.g., incorporating the `language` attribute) or `role="region"` should be removed if the element does not represent a significant landmark.
+
+### P1 — Copy success state not announced via live region
+
+When the copy button is clicked, `aria-label` changes from "Copy code" to "Copied!" on the button element. A screen reader only announces an attribute change on a focused element in some implementations. A user who copies with a keyboard shortcut while focus is elsewhere will not hear the confirmation. An `aria-live="polite"` visually-hidden region should announce the "Copied!" state.
+
+### P2 — No keyboard interaction tests
+
+All test-file assertions use `btn.click()`. No tests use `dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter' }))` or `{ key: ' ' }`. While native `<button>` elements handle keyboard activation, the absence of tests means regressions in keyboard behavior would go undetected.
+
+### P2 — Language not surfaced on `<code>` element
+
+Convention for syntax highlighter integration (Prism, highlight.js, Shiki) is to add `class="language-<name>"` to the `<code>` element. The `language` attribute is accepted but never applied to the rendered `<code>` tag. Third-party highlighter libraries that query `code[class*="language-"]` will not target these elements. The JSDoc claims "consumers integrating their own highlighter via slotted content" but the slot is hidden — this integration path doesn't work as described (see Architecture section).
 
 ---
 
-## Missing Features (out of scope for audit)
+## 3. Tests
 
-| Feature                | Status          | Notes                                                                    |
-| ---------------------- | --------------- | ------------------------------------------------------------------------ |
-| `lineNumbers` property | Not implemented | Feature request, not a defect. Would require significant implementation. |
-| `header` CSS part      | Not implemented | No header UI exists. Would need design spec for a language label bar.    |
-| Twig template          | Not created     | Documentation/integration task, not a component defect.                  |
+### P1 — Boolean attribute `copyable="false"` test is misleading and documents wrong behavior
+
+```ts
+it('hides copy button when copyable=false', async () => {
+  const el = await fixture<HelixCodeSnippet>(
+    '<hx-code-snippet copyable="false">const x = 1;</hx-code-snippet>',
+  );
+  // Set programmatically since boolean false attr via HTML is tricky
+  el.copyable = false;
+```
+
+The comment acknowledges the issue but the test still passes `copyable="false"` as HTML, then immediately overrides it with `el.copyable = false`. This tests the programmatic API only. The real behavior — that `copyable="false"` renders the copy button visible because the attribute is present — is untested and undocumented. In Drupal Twig templates, authors may write `copyable="false"` expecting it to hide the button. It will not.
+
+**Required:** A test must assert that `copyable="false"` in HTML DOES show the copy button (confirming the boolean attribute trap), and the JSDoc must warn about this.
+
+### P1 — No overflow scroll test
+
+The specification calls out "overflow scroll" as a required test. No test verifies that `pre` has `overflow-x: auto` applied, or that long lines create horizontal scroll rather than clipping or wrapping.
+
+### P1 — No timer cleanup test
+
+`_copyTimer` is a stored timeout reference cleaned up in `disconnectedCallback`. No test verifies that disconnecting the element before the 2-second reset fires does not produce memory leaks or post-disconnect state mutations.
+
+### P2 — No test that slot content flows into displayed `<code>` element
+
+The component uses a hidden slot to capture text and re-inserts it into a `<code>` element. No test verifies that the text actually appears inside the shadow DOM's `<code>` element (as opposed to just checking the light-DOM `textContent`).
+
+### P2 — axe-core test uses `page.screenshot()` as a prerequisite
+
+```ts
+await page.screenshot();
+const { violations } = await checkA11y(el);
+```
+
+A screenshot is not a logical prerequisite for an accessibility audit. This pattern appears in every axe-core test. If `checkA11y` requires element rendering to be complete, `el.updateComplete` should be awaited instead.
 
 ---
 
-## Verification
+## 4. Storybook
 
-- **TypeScript**: `npm run type-check` — 0 errors
-- **Tests**: `npm run test:library` — 3110 passed (0 failed)
-- **New tests added**: 10 new test cases covering all P1 gaps
+### P1 — MaxLines story content has no newlines — "Show more" never triggers
 
-**Verdict: READY for merge.** All 13 P1 findings resolved. Remaining P2s are documented for future improvement.
+```ts
+render: () => html`
+  <hx-code-snippet language="javascript" max-lines="5">
+    line 1: const a = 1; line 2: const b = 2; ...
+  </hx-code-snippet>
+`,
+```
+
+The content is a single long line. The `_isTruncated()` check splits on `\n`. No `\n` characters exist in this template literal. The "Show more" button will never appear. This story does not demonstrate the feature it is named for.
+
+### P2 — `_canvas` variable declared but unused in `Default` play function
+
+```ts
+play: async ({ canvasElement }) => {
+  const _canvas = within(canvasElement);  // unused
+```
+
+The `_canvas` variable is defined with an underscore prefix to suppress lint warnings, but it is never used. This is dead code in a story used for documentation.
+
+### P2 — No play function for expand/collapse interaction
+
+`MaxLines` has no `play` function. There is no interactive Storybook test demonstrating that clicking "Show more" expands the content and the button text changes.
+
+### P2 — No `bash` or `typescript` named language stories
+
+The audit spec calls out multiple languages. `bash` appears only in a healthcare scenario story and `typescript` only in CSSParts. Neither is a standalone language story for documentation clarity.
+
+---
+
+## 5. CSS
+
+### P1 — Inline mode padding uses hardcoded values
+
+```css
+.code-snippet--inline {
+  padding: 0.125em 0.375em;
+```
+
+These values are hardcoded. They should use `--hx-*` spacing tokens. Project rule: no hardcoded colors, spacing, or typography values. `0.125em` and `0.375em` have no token equivalents exposed in the component's custom property surface.
+
+### P1 — No `header` CSS part
+
+The audit specification explicitly requires "CSS parts (code, copy-btn, header)". No `header` element or `part="header"` exists in the component. There is no visual header region at all — the copy button floats absolutely over the code block. If a header section (e.g., for language labels or a title bar) was intended, it is absent.
+
+### P2 — Hardcoded `tab-size: 2`
+
+```css
+.code-snippet__code {
+  tab-size: 2;
+```
+
+Hardcoded value. Should be a token: `tab-size: var(--hx-code-snippet-tab-size, 2)` at minimum, or a global `--hx-tab-size` token if one exists.
+
+### P2 — Hardcoded `z-index: 1` on copy button
+
+```css
+.code-snippet__copy-button {
+  z-index: 1;
+```
+
+No `--hx-z-index-*` token used. Stacking context assumptions should be documented and tokenized.
+
+### P2 — Hardcoded `line-height: 1` on copy button
+
+```css
+.code-snippet__copy-button {
+  line-height: 1;
+```
+
+No token. Should be `line-height: var(--hx-line-height-none, 1)` or similar.
+
+### P2 — `--hx-filter-brightness-active` is not a standard design token
+
+```css
+filter: brightness(var(--hx-filter-brightness-active, 0.8));
+```
+
+This token is not part of the documented `--hx-*` token system. If it does not exist in `@helix/tokens`, the fallback value `0.8` is a hardcoded raw value.
+
+---
+
+## 6. Architecture / Correctness
+
+### P1 — Hidden slot + manual re-render breaks slot content for syntax highlighters
+
+The component hides its slot (`display: none`) and manually re-renders slot text content inside a `<code>` element:
+
+```html
+<!-- Hidden slot to capture text content for display and copy -->
+<slot class="code-snippet__slot" @slotchange="${this._handleSlotChange}"></slot>
+```
+
+The JSDoc claims: "Pre-highlighted HTML is also accepted." This is **incorrect**. The `_handleSlotChange` handler extracts `textContent` from slotted nodes, discarding all HTML markup. Pre-highlighted HTML passed as slot content has its tags stripped, leaving only text. The JSDoc is actively misleading.
+
+Additionally, this architecture causes a **flash of empty content**: on first render, `_codeText` is `''`. The slot fires `slotchange` asynchronously after the first render cycle. Until that resolves and `updateComplete` settles, the `<code>` element is empty. This is observable in SSR, slow parse contexts, or test environments.
+
+### P1 — `copyable` defaults to `true` but the attribute is a boolean
+
+`@property({ type: Boolean, reflect: true }) copyable: boolean = true`
+
+With a `true` default, the `copyable` attribute is not reflected by default (Lit only reflects when you explicitly set the property). When `copyable` is `true` (default), no `copyable` attribute appears on the host element. When set to `false`, `reflect: true` would attempt to set `copyable=""` which is a presence attribute — but removing a boolean attribute to signal `false` is not how `reflect` works for booleans in Lit. Lit correctly handles this by removing the attribute when `false`. However, this inverts the expected convention: the default is `true` (copy enabled), but no attribute is present. Setting `copyable` in HTML always enables it. There is no HTML-only way to disable it after the fact without JavaScript.
+
+---
+
+## 7. Performance
+
+### P1 — `tokenStyles` import from `@helix/tokens/lit` — bundle impact unquantified
+
+```ts
+static override styles = [tokenStyles, helixCodeSnippetStyles];
+```
+
+`tokenStyles` inlines the entire token CSS into every component's shadow root. If this represents the full token set, it could be 10–50KB of CSS per shadow root instance on a page with many snippets. The per-component bundle target is <5KB. This import's actual size has not been audited. If `tokenStyles` is shared across all components via the same Lit stylesheet (deduplicated by the browser's adopted stylesheets), this is acceptable. If not, it is a critical bundle issue.
+
+### P2 — No actual bundle size measurement documented
+
+The component has never had its min+gz size measured and reported. The performance gate requires <5KB. Given the token import, this must be verified via `mcp__wc-mcp__estimate_bundle_size` or equivalent before merge.
+
+---
+
+## 8. Drupal Integration
+
+### P1 — No Twig template or integration documentation
+
+The audit specification requires the component to be "Twig-renderable." No Twig template, Drupal library definition, or integration example exists anywhere in the component directory. Other audited components (e.g., hx-action-bar, hx-tile) include Drupal integration examples. This is absent here.
+
+### P2 — Clipboard API requires HTTPS — no user-facing documentation
+
+`navigator.clipboard.writeText()` requires a secure context (HTTPS or localhost). Drupal staging environments often run HTTP. The failure is silently caught and the `hx-copy` event still fires, but the clipboard is not populated. No documentation warns integrators of this limitation. The catch block should ideally set a flag or provide a fallback using `document.execCommand('copy')` (deprecated but broadly supported).
+
+---
+
+## Summary Table
+
+| #   | Area          | Severity | Finding                                                                                                                              |
+| --- | ------------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------ |
+| 1   | TypeScript    | P1       | `lineNumbers` property is entirely missing                                                                                           |
+| 2   | TypeScript    | P2       | `render()` lacks explicit return type                                                                                                |
+| 3   | TypeScript    | P2       | Unsafe cast in `_handleSlotChange` — no null guard                                                                                   |
+| 4   | Accessibility | P1       | `aria-expanded` missing on expand/collapse button                                                                                    |
+| 5   | Accessibility | P1       | All instances share identical `role="region"` label "Code snippet"                                                                   |
+| 6   | Accessibility | P1       | Copy success "Copied!" not announced via `aria-live`                                                                                 |
+| 7   | Accessibility | P2       | No keyboard interaction tests                                                                                                        |
+| 8   | Accessibility | P2       | `language` not applied as `class="language-*"` on `<code>`                                                                           |
+| 9   | Tests         | P1       | `copyable="false"` HTML test is misleading — documents wrong behavior                                                                |
+| 10  | Tests         | P1       | No overflow scroll test                                                                                                              |
+| 11  | Tests         | P1       | No timer cleanup test (disconnectedCallback path)                                                                                    |
+| 12  | Tests         | P2       | No test that slot text appears in shadow `<code>` element                                                                            |
+| 13  | Tests         | P2       | `page.screenshot()` used as prerequisite for axe-core tests                                                                          |
+| 14  | Storybook     | P1       | MaxLines story has no newlines — "Show more" never appears                                                                           |
+| 15  | Storybook     | P2       | `_canvas` variable declared but never used in Default play fn                                                                        |
+| 16  | Storybook     | P2       | No play function for expand/collapse interaction                                                                                     |
+| 17  | Storybook     | P2       | No dedicated bash/typescript language stories                                                                                        |
+| 18  | CSS           | P1       | Inline padding `0.125em 0.375em` — hardcoded, not tokenized                                                                          |
+| 19  | CSS           | P1       | No `header` CSS part — required by spec                                                                                              |
+| 20  | CSS           | P2       | `tab-size: 2` hardcoded                                                                                                              |
+| 21  | CSS           | P2       | `z-index: 1` hardcoded                                                                                                               |
+| 22  | CSS           | P2       | `line-height: 1` hardcoded                                                                                                           |
+| 23  | CSS           | P2       | `--hx-filter-brightness-active` is not a documented token                                                                            |
+| 24  | Architecture  | P1       | Hidden slot + `textContent` strips HTML — JSDoc "pre-highlighted HTML accepted" is false                                             |
+| 25  | Architecture  | P1       | Flash of empty `<code>` on initial render before `slotchange` fires                                                                  |
+| 26  | Architecture  | P1       | `copyable` default `true` + boolean attribute semantics undocumented — Twig/HTML authors cannot disable via attribute string "false" |
+| 27  | Performance   | P1       | `tokenStyles` bundle impact unquantified — could exceed 5KB target                                                                   |
+| 28  | Performance   | P2       | No bundle size measurement on record                                                                                                 |
+| 29  | Drupal        | P1       | No Twig template or integration documentation                                                                                        |
+| 30  | Drupal        | P2       | Clipboard API requires HTTPS — no documentation or fallback                                                                          |
+
+**P0 count:** 0
+**P1 count:** 13
+**P2 count:** 11
+
+**Verdict: NOT ready for merge.** Thirteen P1 findings must be resolved before this component meets the project quality bar. The most critical issues are: missing `aria-expanded` on expand button, duplicate landmark labels, unanounced copy state, the broken MaxLines story, incorrect JSDoc about slot HTML support, and missing Drupal integration documentation.
