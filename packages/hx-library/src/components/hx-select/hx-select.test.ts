@@ -135,10 +135,12 @@ describe('hx-select', () => {
       expect(errorDiv?.textContent?.trim()).toBe('Required field');
     });
 
-    it('error div has aria-live="polite"', async () => {
+    it('error div does not mix role="alert" with aria-live="polite"', async () => {
       const el = await fixture<WcSelect>('<hx-select error="Required"></hx-select>');
       const errorDiv = shadowQuery(el, '.field__error');
-      expect(errorDiv?.getAttribute('aria-live')).toBe('polite');
+      // role="alert" implies assertive — must not be overridden with aria-live="polite"
+      expect(errorDiv?.getAttribute('role')).toBe('alert');
+      expect(errorDiv?.getAttribute('aria-live')).not.toBe('polite');
     });
 
     it('sets aria-invalid="true" on select', async () => {
@@ -212,19 +214,55 @@ describe('hx-select', () => {
     });
   });
 
-  // ─── Property: ariaLabel (1) ───
+  // ─── Property: ariaLabel (2) ───
 
   describe('Property: ariaLabel', () => {
-    it('sets aria-label on native select', async () => {
+    it('sets aria-label on the combobox trigger (the interactive element)', async () => {
       const el = await fixture<WcSelect>('<hx-select aria-label="Select country"></hx-select>');
+      const trigger = shadowQuery<HTMLElement>(el, '[role="combobox"]')!;
+      expect(trigger.getAttribute('aria-label')).toBe('Select country');
+    });
+
+    it('optgroup children are cloned into native select for form participation', async () => {
+      const el = await fixture<WcSelect>(`
+        <hx-select name="region">
+          <optgroup label="North America">
+            <option value="us">United States</option>
+            <option value="ca">Canada</option>
+          </optgroup>
+        </hx-select>
+      `);
+      await el.updateComplete;
+      await el.updateComplete;
       const select = shadowQuery<HTMLSelectElement>(el, 'select')!;
-      expect(select.getAttribute('aria-label')).toBe('Select country');
+      const cloned = select.querySelectorAll('option[data-cloned]');
+      expect(cloned.length).toBe(2);
     });
   });
 
-  // ─── Events (3) ───
+  // ─── Events (4) ───
 
   describe('Events', () => {
+    it('dispatches hx-change via combobox option click (not via native select)', async () => {
+      const el = await fixture<WcSelect>(`
+        <hx-select>
+          <option value="a">A</option>
+          <option value="b">B</option>
+        </hx-select>
+      `);
+      await el.updateComplete;
+      await el.updateComplete;
+      el.open = true;
+      await el.updateComplete;
+      const eventPromise = oneEvent<CustomEvent>(el, 'hx-change');
+      const options = el.shadowRoot!.querySelectorAll<HTMLElement>('[role="option"]');
+      options[1]!.click();
+      const event = await eventPromise;
+      expect(event.detail.value).toBe('b');
+      expect(el.value).toBe('b');
+      expect(el.open).toBe(false);
+    });
+
     it('dispatches wc-change on selection', async () => {
       const el = await fixture<WcSelect>(`
         <hx-select>
@@ -337,6 +375,29 @@ describe('hx-select', () => {
       const help = shadowQuery(el, '[part="help-text"]');
       expect(help).toBeTruthy();
     });
+
+    it('trigger part exposed', async () => {
+      const el = await fixture<WcSelect>('<hx-select></hx-select>');
+      const trigger = shadowQuery(el, '[part="trigger"]');
+      expect(trigger).toBeTruthy();
+    });
+
+    it('listbox part exposed', async () => {
+      const el = await fixture<WcSelect>('<hx-select></hx-select>');
+      const listbox = shadowQuery(el, '[part="listbox"]');
+      expect(listbox).toBeTruthy();
+    });
+
+    it('option part exposed when options are present and dropdown is open', async () => {
+      const el = await fixture<WcSelect>(`
+        <hx-select open>
+          <option value="us">United States</option>
+        </hx-select>
+      `);
+      await el.updateComplete;
+      const option = shadowQuery(el, '[part="option"]');
+      expect(option).toBeTruthy();
+    });
   });
 
   // ─── Form (5) ───
@@ -370,7 +431,7 @@ describe('hx-select', () => {
 
     it('formStateRestoreCallback restores value', async () => {
       const el = await fixture<WcSelect>('<hx-select></hx-select>');
-      el.formStateRestoreCallback('restored');
+      el.formStateRestoreCallback('restored', 'restore');
       await el.updateComplete;
       expect(el.value).toBe('restored');
     });
@@ -417,7 +478,7 @@ describe('hx-select', () => {
     it('label is associated with select via for/id', async () => {
       const el = await fixture<WcSelect>('<hx-select label="Country"></hx-select>');
       const label = shadowQuery<HTMLLabelElement>(el, 'label')!;
-      const trigger = shadowQuery<HTMLButtonElement>(el, '[role="combobox"]')!;
+      const trigger = shadowQuery<HTMLElement>(el, '[role="combobox"]')!;
       expect(label.getAttribute('for')).toBe(trigger.id);
     });
 
@@ -451,7 +512,7 @@ describe('hx-select', () => {
       const el = await fixture<WcSelect>('<hx-select></hx-select>');
       el.focus();
       await el.updateComplete;
-      const trigger = shadowQuery<HTMLButtonElement>(el, '[role="combobox"]')!;
+      const trigger = shadowQuery<HTMLElement>(el, '[role="combobox"]')!;
       expect(el.shadowRoot?.activeElement).toBe(trigger);
     });
   });
@@ -467,7 +528,7 @@ describe('hx-select', () => {
         </hx-select>
       `);
       await el.updateComplete;
-      const trigger = shadowQuery<HTMLButtonElement>(el, '[role="combobox"]')!;
+      const trigger = shadowQuery<HTMLElement>(el, '[role="combobox"]')!;
       trigger.click();
       await el.updateComplete;
       expect(el.open).toBe(true);
@@ -481,7 +542,7 @@ describe('hx-select', () => {
         </hx-select>
       `);
       await el.updateComplete;
-      const trigger = shadowQuery<HTMLButtonElement>(el, '[role="combobox"]')!;
+      const trigger = shadowQuery<HTMLElement>(el, '[role="combobox"]')!;
       trigger.click();
       await el.updateComplete;
       expect(el.open).toBe(false);
@@ -507,9 +568,11 @@ describe('hx-select', () => {
     });
 
     it('does not open when disabled', async () => {
-      const el = await fixture<WcSelect>('<hx-select disabled><option value="a">A</option></hx-select>');
+      const el = await fixture<WcSelect>(
+        '<hx-select disabled><option value="a">A</option></hx-select>',
+      );
       await el.updateComplete;
-      const trigger = shadowQuery<HTMLButtonElement>(el, '[role="combobox"]')!;
+      const trigger = shadowQuery<HTMLElement>(el, '[role="combobox"]')!;
       trigger.click();
       await el.updateComplete;
       expect(el.open).toBe(false);
@@ -527,7 +590,7 @@ describe('hx-select', () => {
         </hx-select>
       `);
       await el.updateComplete;
-      const trigger = shadowQuery<HTMLButtonElement>(el, '[role="combobox"]')!;
+      const trigger = shadowQuery<HTMLElement>(el, '[role="combobox"]')!;
       trigger.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true }));
       await el.updateComplete;
       expect(el.open).toBe(true);
@@ -544,7 +607,7 @@ describe('hx-select', () => {
       await el.updateComplete;
       el.open = true;
       await el.updateComplete;
-      const trigger = shadowQuery<HTMLButtonElement>(el, '[role="combobox"]')!;
+      const trigger = shadowQuery<HTMLElement>(el, '[role="combobox"]')!;
       // Move to index 0
       trigger.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true }));
       await el.updateComplete;
@@ -564,7 +627,7 @@ describe('hx-select', () => {
         </hx-select>
       `);
       await el.updateComplete;
-      const trigger = shadowQuery<HTMLButtonElement>(el, '[role="combobox"]')!;
+      const trigger = shadowQuery<HTMLElement>(el, '[role="combobox"]')!;
       trigger.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowUp', bubbles: true }));
       await el.updateComplete;
       expect(el.open).toBe(true);
@@ -580,7 +643,7 @@ describe('hx-select', () => {
       await el.updateComplete;
       el.open = true;
       await el.updateComplete;
-      const trigger = shadowQuery<HTMLButtonElement>(el, '[role="combobox"]')!;
+      const trigger = shadowQuery<HTMLElement>(el, '[role="combobox"]')!;
       // Focus first option via ArrowDown
       trigger.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true }));
       await el.updateComplete;
@@ -602,7 +665,7 @@ describe('hx-select', () => {
       await el.updateComplete;
       el.open = true;
       await el.updateComplete;
-      const trigger = shadowQuery<HTMLButtonElement>(el, '[role="combobox"]')!;
+      const trigger = shadowQuery<HTMLElement>(el, '[role="combobox"]')!;
       trigger.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true }));
       await el.updateComplete;
       const eventPromise = oneEvent<CustomEvent>(el, 'hx-change');
@@ -623,7 +686,7 @@ describe('hx-select', () => {
       await el.updateComplete;
       el.open = true;
       await el.updateComplete;
-      const trigger = shadowQuery<HTMLButtonElement>(el, '[role="combobox"]')!;
+      const trigger = shadowQuery<HTMLElement>(el, '[role="combobox"]')!;
       trigger.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true }));
       await el.updateComplete;
       trigger.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
@@ -643,7 +706,7 @@ describe('hx-select', () => {
       await el.updateComplete;
       el.open = true;
       await el.updateComplete;
-      const trigger = shadowQuery<HTMLButtonElement>(el, '[role="combobox"]')!;
+      const trigger = shadowQuery<HTMLElement>(el, '[role="combobox"]')!;
       trigger.dispatchEvent(new KeyboardEvent('keydown', { key: 'End', bubbles: true }));
       await el.updateComplete;
       const lastDescendant = trigger.getAttribute('aria-activedescendant');
@@ -666,7 +729,7 @@ describe('hx-select', () => {
         </hx-select>
       `);
       await el.updateComplete;
-      const trigger = shadowQuery<HTMLButtonElement>(el, '[role="combobox"]')!;
+      const trigger = shadowQuery<HTMLElement>(el, '[role="combobox"]')!;
       expect(trigger.hasAttribute('aria-activedescendant')).toBe(false);
     });
 
@@ -680,7 +743,7 @@ describe('hx-select', () => {
       await el.updateComplete;
       el.open = true;
       await el.updateComplete;
-      const trigger = shadowQuery<HTMLButtonElement>(el, '[role="combobox"]')!;
+      const trigger = shadowQuery<HTMLElement>(el, '[role="combobox"]')!;
       trigger.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true }));
       await el.updateComplete;
       const activeId = trigger.getAttribute('aria-activedescendant');
@@ -699,7 +762,7 @@ describe('hx-select', () => {
       await el.updateComplete;
       el.open = true;
       await el.updateComplete;
-      const trigger = shadowQuery<HTMLButtonElement>(el, '[role="combobox"]')!;
+      const trigger = shadowQuery<HTMLElement>(el, '[role="combobox"]')!;
       trigger.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true }));
       await el.updateComplete;
       trigger.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
@@ -732,6 +795,16 @@ describe('hx-select', () => {
       const el = await fixture<WcSelect>(`<hx-select label="Country" disabled>
         <option value="us">United States</option>
       </hx-select>`);
+      const { violations } = await checkA11y(el);
+      expect(violations).toEqual([]);
+    });
+
+    it('has no axe violations when dropdown is open', async () => {
+      const el = await fixture<WcSelect>(`<hx-select label="Country" open>
+        <option value="us">United States</option>
+        <option value="ca">Canada</option>
+      </hx-select>`);
+      await el.updateComplete;
       const { violations } = await checkA11y(el);
       expect(violations).toEqual([]);
     });
