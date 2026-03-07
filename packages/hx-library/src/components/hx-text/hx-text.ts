@@ -2,6 +2,7 @@ import { LitElement, html } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { styleMap } from 'lit/directives/style-map.js';
+import { ifDefined } from 'lit/directives/if-defined.js';
 import { tokenStyles } from '@helix/tokens/lit';
 import { helixTextStyles } from './hx-text.styles.js';
 
@@ -65,22 +66,29 @@ export class HelixText extends LitElement {
   lines = 0;
 
   override render() {
+    const effectiveLines = Math.max(0, this.lines);
+    const isTruncated = this.truncate && effectiveLines === 0;
+    const isClamped = effectiveLines > 0;
     const classes = {
       text: true,
       [`text--${this.variant}`]: true,
       [`text--color-${this.color}`]: true,
       [`text--weight-${this.weight}`]: this.weight !== undefined,
-      'text--truncate': this.truncate && this.lines === 0,
-      'text--clamp': this.lines > 0,
+      'text--truncate': isTruncated,
+      'text--clamp': isClamped,
     };
 
-    const inlineStyles =
-      this.lines > 0
-        ? { '-webkit-line-clamp': String(this.lines), 'line-clamp': String(this.lines) }
-        : {};
+    const inlineStyles = isClamped ? { '-webkit-line-clamp': String(effectiveLines) } : {};
+
+    const titleText = isTruncated || isClamped ? this.textContent?.trim() : undefined;
 
     return html`
-      <span part="base" class=${classMap(classes)} style=${styleMap(inlineStyles)}>
+      <span
+        part="base"
+        class=${classMap(classes)}
+        style=${styleMap(inlineStyles)}
+        title=${ifDefined(titleText || undefined)}
+      >
         <slot></slot>
       </span>
     `;
