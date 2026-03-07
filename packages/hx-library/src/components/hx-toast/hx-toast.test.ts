@@ -33,6 +33,12 @@ describe('hx-toast', () => {
       expect(msg).toBeTruthy();
     });
 
+    it('exposes "action" CSS part', async () => {
+      const el = await fixture<HelixToast>('<hx-toast>Test</hx-toast>');
+      const action = shadowQuery(el, '[part~="action"]');
+      expect(action).toBeTruthy();
+    });
+
     it('renders no close button when closable is false', async () => {
       const el = await fixture<HelixToast>('<hx-toast>Test</hx-toast>');
       const btn = shadowQuery(el, '[part~="close-button"]');
