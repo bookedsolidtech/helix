@@ -303,7 +303,7 @@ export class HelixCheckbox extends LitElement {
             aria-label=${ifDefined(hostAriaLabel)}
             aria-labelledby=${ifDefined(!hostAriaLabel ? this._labelId : undefined)}
             @keydown=${this._handleKeyDown}
-            @click=${(e: Event) => e.preventDefault()}
+            @click=${(e: Event) => { e.preventDefault(); e.stopPropagation(); }}
             @change=${(e: Event) => e.stopPropagation()}
           />
 
