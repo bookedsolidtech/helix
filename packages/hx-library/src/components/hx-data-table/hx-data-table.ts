@@ -43,8 +43,7 @@ export interface HxDataTableColumn {
  * @cssprop [--hx-data-table-border-color=var(--hx-color-neutral-200)] - Row border color.
  * @cssprop [--hx-data-table-row-hover-bg=var(--hx-color-neutral-50)] - Row hover background.
  * @cssprop [--hx-data-table-row-selected-bg=var(--hx-color-primary-50)] - Selected row background.
- * @cssprop [--hx-data-table-empty-color=var(--hx-color-neutral-600)] - Empty state text color.
- * @cssprop [--hx-data-table-min-width=600px] - Minimum table width before horizontal scroll activates.
+ * @cssprop [--hx-data-table-empty-color=var(--hx-color-neutral-400)] - Empty state text color.
  */
 @customElement('hx-data-table')
 export class HelixDataTable extends LitElement {
@@ -119,31 +118,21 @@ export class HelixDataTable extends LitElement {
 
   override willUpdate(changed: Map<string, unknown>): void {
     // Coerce JSON strings to arrays (e.g., from HTML attribute)
-    if (changed.has('columns')) {
-      if (typeof (this.columns as unknown) === 'string') {
-        try {
-          this.columns = JSON.parse(this.columns as unknown as string) as HxDataTableColumn[];
-        } catch {
-          this.columns = [];
-        }
-      }
-      if (!Array.isArray(this.columns)) {
+    if (changed.has('columns') && typeof (this.columns as unknown) === 'string') {
+      try {
+        this.columns = JSON.parse(this.columns as unknown as string) as HxDataTableColumn[];
+      } catch {
         this.columns = [];
       }
     }
-    if (changed.has('rows')) {
-      if (typeof (this.rows as unknown) === 'string') {
-        try {
-          this.rows = JSON.parse(this.rows as unknown as string) as Record<string, unknown>[];
-        } catch {
-          this.rows = [];
-        }
-      }
-      if (!Array.isArray(this.rows)) {
+    if (changed.has('rows') && typeof (this.rows as unknown) === 'string') {
+      try {
+        this.rows = JSON.parse(this.rows as unknown as string) as Record<string, unknown>[];
+      } catch {
         this.rows = [];
       }
     }
-    if (changed.has('rows') && this.rows.length > 500) {
+    if (this.rows.length > 500) {
       console.warn(
         '[hx-data-table] Rendering more than 500 rows may impact performance. Consider server-side pagination.',
       );
@@ -207,20 +196,13 @@ export class HelixDataTable extends LitElement {
   // ─── Keyboard Navigation ───
 
   private _handleKeydown(e: KeyboardEvent): void {
-    if (!['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Home', 'End', ' '].includes(e.key))
-      return;
+    if (!['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', ' '].includes(e.key)) return;
 
     const root = this.shadowRoot;
     if (!root) return;
 
     const cells = Array.from(root.querySelectorAll<HTMLElement>('[part~="td"],[part~="th"]'));
-    let focused = root.activeElement as HTMLElement | null;
-    if (!focused) return;
-
-    // Walk up from nested elements (e.g. sort button inside <th>) to find the cell
-    while (focused && !cells.includes(focused)) {
-      focused = focused.parentElement;
-    }
+    const focused = root.activeElement as HTMLElement | null;
     if (!focused) return;
 
     const colCount = this.columns.length + (this.selectable ? 1 : 0);
@@ -237,15 +219,8 @@ export class HelixDataTable extends LitElement {
       target = cells[idx + colCount] ?? null;
     } else if (e.key === 'ArrowUp' && idx - colCount >= 0) {
       target = cells[idx - colCount] ?? null;
-    } else if (e.key === 'Home') {
-      // Move to the first cell in the current row
-      const rowStart = idx - (idx % colCount);
-      target = cells[rowStart] ?? null;
-    } else if (e.key === 'End') {
-      // Move to the last cell in the current row
-      const rowEnd = idx - (idx % colCount) + colCount - 1;
-      target = cells[Math.min(rowEnd, cells.length - 1)] ?? null;
     } else if (e.key === ' ' && focused.getAttribute('part')?.includes('td')) {
+      // Toggle selection on Space in a data row
       const rowIdx = Number(focused.dataset['rowIndex']);
       if (this.selectable && !isNaN(rowIdx)) {
         e.preventDefault();
@@ -294,7 +269,7 @@ export class HelixDataTable extends LitElement {
       <tr part="tr">
         ${this.selectable
           ? html`
-              <th part="th" class="col-checkbox" tabindex="0">
+              <th part="th" class="col-checkbox">
                 <input
                   type="checkbox"
                   part="checkbox"
@@ -314,13 +289,11 @@ export class HelixDataTable extends LitElement {
               part="th"
               tabindex="0"
               style=${col.width ? `width: ${col.width}` : ''}
-              aria-sort=${col.sortable
-                ? this.sortKey === col.key
-                  ? this.sortDirection === 'asc'
-                    ? 'ascending'
-                    : 'descending'
-                  : 'none'
-                : nothing}
+              aria-sort=${this.sortKey === col.key
+                ? this.sortDirection === 'asc'
+                  ? 'ascending'
+                  : 'descending'
+                : 'none'}
             >
               ${col.sortable
                 ? html`
@@ -344,7 +317,7 @@ export class HelixDataTable extends LitElement {
     return Array.from(
       { length: 3 },
       (_, i) => html`
-        <tr part="tr" key=${i} aria-hidden="true">
+        <tr part="tr" key=${i}>
           ${this.selectable
             ? html`<td part="td" class="col-checkbox">
                 <span class="skeleton-cell" style="width:1rem;margin:auto"></span>
