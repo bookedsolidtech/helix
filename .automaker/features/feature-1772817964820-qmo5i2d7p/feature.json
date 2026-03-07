@@ -1,0 +1,30 @@
+{
+  "category": "Uncategorized",
+  "description": "## Deep Component Audit — hx-split-button\n\n**Component directory:** `packages/hx-library/src/components/hx-split-button/`\n**NOTE:** No index.ts — may be incomplete/from PR 175 rescue.\n\n### wc-mcp Tools — USE THESE\n- `score_component`, `get_component`, `analyze_accessibility`, `validate_usage`\n- **Report wc-mcp bugs to `/Volumes/Development/booked/wc-tools` board.**\n\n### Audit Scope\n1. **Existence Check** — Complete implementation? Document gaps.\n2. **Design Tokens** — `--hx-` tokens. Primary action, dropdown trigger, divider. Dark mode.\n3. **Accessibility** — WCAG 2.1 AA. Button group pattern. Dropdown menu accessible. aria-haspopup.\n4. **Functionality** — Primary action click. Dropdown with alternatives. Menu positioning. Disabled state.\n5. **TypeScript** — Strict. No `any`.\n6. **CSS/Styling** — Shadow DOM. Button + trigger seamless styling. CSS Parts.\n7. **CEM Accuracy** — Must be documented if shipping.\n8. **Tests** — Primary click. Dropdown. Keyboard. Menu items.\n9. **Storybook** — Default. With menu items. Disabled. Variants.\n10. **Drupal Compatibility** — Operations dropdown. Twig-friendly.\n\n### Deliverable\nIf incomplete: document gaps. If complete: full audit. Fix CRITICAL+HIGH.",
+  "title": "Deep Audit v2: hx-split-button",
+  "status": "backlog",
+  "branchName": "feature/deep-audit-v2-hx-split-button",
+  "complexity": "architectural",
+  "priority": 3,
+  "source": "api",
+  "trustTier": 1,
+  "quarantineStatus": "passed",
+  "quarantineId": "b8037036-0aeb-411a-8e54-49b461f75f85",
+  "id": "feature-1772817964820-qmo5i2d7p",
+  "descriptionHistory": [
+    {
+      "description": "## Deep Component Audit — hx-split-button\n\n**Component directory:** `packages/hx-library/src/components/hx-split-button/`\n**NOTE:** No index.ts — may be incomplete/from PR 175 rescue.\n\n### wc-mcp Tools — USE THESE\n- `score_component`, `get_component`, `analyze_accessibility`, `validate_usage`\n- **Report wc-mcp bugs to `/Volumes/Development/booked/wc-tools` board.**\n\n### Audit Scope\n1. **Existence Check** — Complete implementation? Document gaps.\n2. **Design Tokens** — `--hx-` tokens. Primary action, dropdown trigger, divider. Dark mode.\n3. **Accessibility** — WCAG 2.1 AA. Button group pattern. Dropdown menu accessible. aria-haspopup.\n4. **Functionality** — Primary action click. Dropdown with alternatives. Menu positioning. Disabled state.\n5. **TypeScript** — Strict. No `any`.\n6. **CSS/Styling** — Shadow DOM. Button + trigger seamless styling. CSS Parts.\n7. **CEM Accuracy** — Must be documented if shipping.\n8. **Tests** — Primary click. Dropdown. Keyboard. Menu items.\n9. **Storybook** — Default. With menu items. Disabled. Variants.\n10. **Drupal Compatibility** — Operations dropdown. Twig-friendly.\n\n### Deliverable\nIf incomplete: document gaps. If complete: full audit. Fix CRITICAL+HIGH.",
+      "timestamp": "2026-03-06T17:26:04.820Z",
+      "source": "initial"
+    }
+  ],
+  "createdAt": "2026-03-06T17:26:04.820Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-03-06T17:26:04.820Z",
+      "reason": "Feature created"
+    }
+  ]
+}

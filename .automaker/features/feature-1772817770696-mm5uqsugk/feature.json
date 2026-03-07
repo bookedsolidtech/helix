@@ -1,0 +1,30 @@
+{
+  "category": "Uncategorized",
+  "description": "## Deep Component Audit — hx-format-date\n\n**Component directory:** `packages/hx-library/src/components/hx-format-date/`\n\n### wc-mcp Tools — USE THESE\n- `score_component`, `get_component`, `validate_usage`, `get_design_tokens`\n- **Report wc-mcp bugs to `/Volumes/Development/booked/wc-tools` board.**\n\n### Audit Scope\n1. **Design Tokens** — `--hx-` tokens for typography if any. Minimal visual footprint expected.\n2. **Accessibility** — WCAG 2.1 AA. datetime attribute for machine-readable. Screen reader friendly output.\n3. **Functionality** — Date formatting (Intl.DateTimeFormat). Locale support. Relative time. Custom format strings. ISO input. Timezone handling.\n4. **TypeScript** — Strict. No `any`. Date/Intl types.\n5. **CSS/Styling** — Inline element. Minimal styling. Inherits parent typography.\n6. **CEM Accuracy** — All format options documented.\n7. **Tests** — 80%+ coverage. Formats. Locales. Relative time. Edge cases (invalid date).\n8. **Storybook** — Various formats. Locales. Relative time. Live updating.\n9. **Drupal Compatibility** — Date field output. Twig date filter replacement.\n10. **Portability** — CDN-ready. No external date lib (uses Intl).\n\n### Deliverable\nDetailed audit report. Fix CRITICAL+HIGH. Document rest.",
+  "title": "Deep Audit v2: hx-format-date",
+  "status": "backlog",
+  "branchName": "feature/deep-audit-v2-hx-format-date",
+  "complexity": "architectural",
+  "priority": 3,
+  "source": "api",
+  "trustTier": 1,
+  "quarantineStatus": "passed",
+  "quarantineId": "83c6c3f1-e090-4e04-bec5-c29697b380c8",
+  "id": "feature-1772817770696-mm5uqsugk",
+  "descriptionHistory": [
+    {
+      "description": "## Deep Component Audit — hx-format-date\n\n**Component directory:** `packages/hx-library/src/components/hx-format-date/`\n\n### wc-mcp Tools — USE THESE\n- `score_component`, `get_component`, `validate_usage`, `get_design_tokens`\n- **Report wc-mcp bugs to `/Volumes/Development/booked/wc-tools` board.**\n\n### Audit Scope\n1. **Design Tokens** — `--hx-` tokens for typography if any. Minimal visual footprint expected.\n2. **Accessibility** — WCAG 2.1 AA. datetime attribute for machine-readable. Screen reader friendly output.\n3. **Functionality** — Date formatting (Intl.DateTimeFormat). Locale support. Relative time. Custom format strings. ISO input. Timezone handling.\n4. **TypeScript** — Strict. No `any`. Date/Intl types.\n5. **CSS/Styling** — Inline element. Minimal styling. Inherits parent typography.\n6. **CEM Accuracy** — All format options documented.\n7. **Tests** — 80%+ coverage. Formats. Locales. Relative time. Edge cases (invalid date).\n8. **Storybook** — Various formats. Locales. Relative time. Live updating.\n9. **Drupal Compatibility** — Date field output. Twig date filter replacement.\n10. **Portability** — CDN-ready. No external date lib (uses Intl).\n\n### Deliverable\nDetailed audit report. Fix CRITICAL+HIGH. Document rest.",
+      "timestamp": "2026-03-06T17:22:50.696Z",
+      "source": "initial"
+    }
+  ],
+  "createdAt": "2026-03-06T17:22:50.696Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-03-06T17:22:50.696Z",
+      "reason": "Feature created"
+    }
+  ]
+}

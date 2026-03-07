@@ -1,0 +1,30 @@
+{
+  "category": "Uncategorized",
+  "description": "## Deep Component Audit — hx-skeleton\n\n**Component directory:** `packages/hx-library/src/components/hx-skeleton/`\n\n### wc-mcp Tools — USE THESE\n- `score_component`, `get_component`, `analyze_accessibility`, `list_css_parts`, `get_design_tokens`\n- **Report wc-mcp bugs to `/Volumes/Development/booked/wc-tools` board.**\n\n### Audit Scope\n1. **Design Tokens** — `--hx-` tokens. Background, shimmer color, border-radius. Dark mode.\n2. **Accessibility** — WCAG 2.1 AA. aria-busy on parent. aria-hidden on skeleton. Reduced-motion (no shimmer).\n3. **Functionality** — Shape variants (text, circle, rect). Custom dimensions. Shimmer animation. Loading state pattern.\n4. **TypeScript** — Strict. No `any`.\n5. **CSS/Styling** — Shadow DOM. CSS Parts. Shimmer animation. Responsive sizing.\n6. **CEM Accuracy** — All API documented.\n7. **Tests** — 80%+ coverage. Shapes. Animation. Reduced-motion. ARIA.\n8. **Storybook** — Text lines. Circle. Rectangle. Card skeleton. List skeleton.\n9. **Drupal Compatibility** — Loading states. Twig-friendly.\n10. **Portability** — CDN-ready.\n\n### Deliverable\nDetailed audit report. Fix CRITICAL+HIGH. Document rest.",
+  "title": "Deep Audit v2: hx-skeleton",
+  "status": "backlog",
+  "branchName": "feature/deep-audit-v2-hx-skeleton",
+  "complexity": "architectural",
+  "priority": 3,
+  "source": "api",
+  "trustTier": 1,
+  "quarantineStatus": "passed",
+  "quarantineId": "8fa860a4-d903-4e6a-8b07-a7362fcfafa7",
+  "id": "feature-1772817945253-daa9u9fy6",
+  "descriptionHistory": [
+    {
+      "description": "## Deep Component Audit — hx-skeleton\n\n**Component directory:** `packages/hx-library/src/components/hx-skeleton/`\n\n### wc-mcp Tools — USE THESE\n- `score_component`, `get_component`, `analyze_accessibility`, `list_css_parts`, `get_design_tokens`\n- **Report wc-mcp bugs to `/Volumes/Development/booked/wc-tools` board.**\n\n### Audit Scope\n1. **Design Tokens** — `--hx-` tokens. Background, shimmer color, border-radius. Dark mode.\n2. **Accessibility** — WCAG 2.1 AA. aria-busy on parent. aria-hidden on skeleton. Reduced-motion (no shimmer).\n3. **Functionality** — Shape variants (text, circle, rect). Custom dimensions. Shimmer animation. Loading state pattern.\n4. **TypeScript** — Strict. No `any`.\n5. **CSS/Styling** — Shadow DOM. CSS Parts. Shimmer animation. Responsive sizing.\n6. **CEM Accuracy** — All API documented.\n7. **Tests** — 80%+ coverage. Shapes. Animation. Reduced-motion. ARIA.\n8. **Storybook** — Text lines. Circle. Rectangle. Card skeleton. List skeleton.\n9. **Drupal Compatibility** — Loading states. Twig-friendly.\n10. **Portability** — CDN-ready.\n\n### Deliverable\nDetailed audit report. Fix CRITICAL+HIGH. Document rest.",
+      "timestamp": "2026-03-06T17:25:45.253Z",
+      "source": "initial"
+    }
+  ],
+  "createdAt": "2026-03-06T17:25:45.253Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-03-06T17:25:45.253Z",
+      "reason": "Feature created"
+    }
+  ]
+}

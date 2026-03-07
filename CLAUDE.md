@@ -201,12 +201,14 @@ npm run dev:admin              # Admin Dashboard on port 3159
 ### Build & Quality
 
 ```bash
+npm run verify                 # MANDATORY before push: lint + format:check + type-check
 npm run build                  # Build everything (Turborepo)
-npm run type-check             # TypeScript strict (must pass before commit)
+npm run type-check             # TypeScript strict
 npm run test                   # Vitest browser mode (112 tests)
 npm run test:library           # Tests for @wc-2026/library only
 npm run cem                    # Generate Custom Elements Manifest
 npm run lint                   # ESLint
+npm run format                 # Auto-fix formatting
 ```
 
 ### Component Development Workflow
@@ -271,9 +273,30 @@ All agents: `.claude/agents/engineering/`
 
 ---
 
+## Pre-Push Quality Gate — MANDATORY, NO EXCEPTIONS
+
+**Run `npm run verify` before every `git push`. Zero failures required.**
+
+```bash
+npm run verify   # runs: lint + format:check + type-check
+```
+
+Do NOT push if `npm run verify` fails. Fix the issue first, then re-run.
+
+Auto-fix helpers:
+```bash
+npx eslint --fix .    # auto-fix lint errors
+npm run format        # auto-fix formatting
+npm run verify        # confirm clean — must be zero failures before push
+```
+
+**Why this matters:** Git hooks are bypassed in the automated workflow (`HUSKY=0`, `--no-verify`). The only guarantee of code quality before CI is running `npm run verify` manually before every push. A PR that fails CI wastes agent cycles and blocks other work. This is not optional.
+
+---
+
 ## Git Rules
 
-- `npm run type-check` must pass before every commit
+- `npm run verify` must pass before every `git push` (runs lint + format:check + type-check)
 - Never use `--no-verify`
 - Never use `git reset --hard` or `git push --force` without explicit permission
 - Commit messages: concise, imperative ("Add hx-select component", not "Added")

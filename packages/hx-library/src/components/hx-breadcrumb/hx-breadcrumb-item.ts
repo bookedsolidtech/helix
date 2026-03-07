@@ -13,8 +13,10 @@ import { helixBreadcrumbItemStyles } from './hx-breadcrumb-item.styles.js';
  *
  * @slot - The link or page text content.
  *
+ * @csspart item - Wrapper around the link or text content.
  * @csspart link - The anchor element when href is provided.
  * @csspart text - The span element when no href (current page).
+ * @csspart separator - The separator element rendered after non-last items.
  *
  * @cssprop [--hx-breadcrumb-link-color=var(--hx-color-primary-600)] - Link text color.
  * @cssprop [--hx-breadcrumb-link-hover-color=var(--hx-color-primary-700)] - Link hover text color.
@@ -29,7 +31,15 @@ export class HelixBreadcrumbItem extends LitElement {
 
   override connectedCallback(): void {
     super.connectedCallback();
-    this.setAttribute('role', 'listitem');
+    // Only apply role="listitem" when this item is a direct child of an
+    // hx-breadcrumb element. Setting the role unconditionally when used
+    // standalone (outside a list context) creates an invalid ARIA hierarchy
+    // because listitem requires a list ancestor.
+    if (this.closest('hx-breadcrumb') !== null) {
+      this.setAttribute('role', 'listitem');
+    } else {
+      this.removeAttribute('role');
+    }
   }
 
   /**
@@ -52,10 +62,14 @@ export class HelixBreadcrumbItem extends LitElement {
 
   override render() {
     return html`
-      ${this.href
-        ? html`<a part="link" href=${this.href}><slot></slot></a>`
-        : html`<span part="text"><slot></slot></span>`}
-      ${!this.dataBcLast ? html`<span class="separator" aria-hidden="true"></span>` : nothing}
+      <span part="item">
+        ${this.href
+          ? html`<a part="link" href=${this.href}><slot></slot></a>`
+          : html`<span part="text"><slot></slot></span>`}
+      </span>
+      ${!this.dataBcLast
+        ? html`<span class="separator" part="separator" aria-hidden="true"></span>`
+        : nothing}
     `;
   }
 }

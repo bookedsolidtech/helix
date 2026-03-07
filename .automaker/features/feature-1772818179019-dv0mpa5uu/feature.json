@@ -1,0 +1,30 @@
+{
+  "category": "Uncategorized",
+  "description": "## Deep Audit V2: hx-toast\n\n**Comprehensive enterprise-grade quality audit** of the `hx-toast` component (notification/toast system).\n\n### Audit Dimensions\n1. **Design Tokens** — All colors, spacing, typography use `--hx-*` tokens. No hardcoded values.\n2. **Accessibility** — WCAG 2.1 AA compliance. ARIA live regions, role=\"alert\"/\"status\", auto-dismiss timing, screen reader announcements.\n3. **Functionality** — Show/hide, auto-dismiss, stacking, positioning, variant types (info/success/warning/error).\n4. **TypeScript** — Strict mode. No `any`. Proper types for all props, events, methods.\n5. **CSS Architecture** — Shadow DOM encapsulation. CSS Parts exposed. Three-tier token cascade. Animation tokens.\n6. **CEM Accuracy** — `custom-elements.json` matches actual public API exactly.\n7. **Test Coverage** — Vitest browser tests. 80%+ coverage. All variants tested.\n8. **Storybook** — Stories for all variants. Controls for all public properties.\n9. **Drupal Compatibility** — Works in Twig templates without modification.\n10. **Portability** — No framework dependencies. Works in vanilla HTML.\n\n### wc-mcp Tool Usage (MANDATORY)\nUse these MCP tools during your audit:\n- `score_component({ tagName: \"hx-toast\" })` — Get health score baseline\n- `get_component({ tagName: \"hx-toast\" })` — Full component details\n- `analyze_accessibility({ tagName: \"hx-toast\" })` — A11Y audit\n- `validate_usage({ tagName: \"hx-toast\", html: \"...\" })` — Validate usage patterns\n- `list_css_parts({ tagName: \"hx-toast\" })` — CSS Parts inventory\n- `list_events({ tagName: \"hx-toast\" })` — Events inventory\n- `list_slots({ tagName: \"hx-toast\" })` — Slots inventory\n- `get_design_tokens({ tagName: \"hx-toast\" })` — Token usage\n\nIf any wc-mcp tool returns unexpected results or errors, report the bug to the wc-tools board at `/Volumes/Development/booked/wc-tools`.\n\n### Deliverables\n- Fix all issues found inline\n- Update tests to cover gaps\n- Update Storybook stories if needed\n- Ensure CEM is accurate after changes\n- Run `npm run verify` before committing",
+  "title": "DEEP AUDIT: hx-toast — Enterprise Component Quality Review",
+  "status": "backlog",
+  "branchName": "feature/deep-audit-v2-hx-toast",
+  "complexity": "architectural",
+  "priority": 3,
+  "source": "api",
+  "trustTier": 1,
+  "quarantineStatus": "passed",
+  "quarantineId": "3e724355-baba-49cb-9116-25101d71df4d",
+  "id": "feature-1772818179019-dv0mpa5uu",
+  "descriptionHistory": [
+    {
+      "description": "## Deep Audit V2: hx-toast\n\n**Comprehensive enterprise-grade quality audit** of the `hx-toast` component (notification/toast system).\n\n### Audit Dimensions\n1. **Design Tokens** — All colors, spacing, typography use `--hx-*` tokens. No hardcoded values.\n2. **Accessibility** — WCAG 2.1 AA compliance. ARIA live regions, role=\"alert\"/\"status\", auto-dismiss timing, screen reader announcements.\n3. **Functionality** — Show/hide, auto-dismiss, stacking, positioning, variant types (info/success/warning/error).\n4. **TypeScript** — Strict mode. No `any`. Proper types for all props, events, methods.\n5. **CSS Architecture** — Shadow DOM encapsulation. CSS Parts exposed. Three-tier token cascade. Animation tokens.\n6. **CEM Accuracy** — `custom-elements.json` matches actual public API exactly.\n7. **Test Coverage** — Vitest browser tests. 80%+ coverage. All variants tested.\n8. **Storybook** — Stories for all variants. Controls for all public properties.\n9. **Drupal Compatibility** — Works in Twig templates without modification.\n10. **Portability** — No framework dependencies. Works in vanilla HTML.\n\n### wc-mcp Tool Usage (MANDATORY)\nUse these MCP tools during your audit:\n- `score_component({ tagName: \"hx-toast\" })` — Get health score baseline\n- `get_component({ tagName: \"hx-toast\" })` — Full component details\n- `analyze_accessibility({ tagName: \"hx-toast\" })` — A11Y audit\n- `validate_usage({ tagName: \"hx-toast\", html: \"...\" })` — Validate usage patterns\n- `list_css_parts({ tagName: \"hx-toast\" })` — CSS Parts inventory\n- `list_events({ tagName: \"hx-toast\" })` — Events inventory\n- `list_slots({ tagName: \"hx-toast\" })` — Slots inventory\n- `get_design_tokens({ tagName: \"hx-toast\" })` — Token usage\n\nIf any wc-mcp tool returns unexpected results or errors, report the bug to the wc-tools board at `/Volumes/Development/booked/wc-tools`.\n\n### Deliverables\n- Fix all issues found inline\n- Update tests to cover gaps\n- Update Storybook stories if needed\n- Ensure CEM is accurate after changes\n- Run `npm run verify` before committing",
+      "timestamp": "2026-03-06T17:29:39.019Z",
+      "source": "initial"
+    }
+  ],
+  "createdAt": "2026-03-06T17:29:39.019Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-03-06T17:29:39.019Z",
+      "reason": "Feature created"
+    }
+  ]
+}
