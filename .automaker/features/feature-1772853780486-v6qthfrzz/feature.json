@@ -1,0 +1,30 @@
+{
+  "category": "Uncategorized",
+  "description": "Resolve all defects found in the Deep Audit v2 for `hx-steps`.\nSource: `packages/hx-library/src/components/hx-steps/AUDIT.md`\n\n**Summary:** 29 defects — 1 P0, 13 P1, 15 P2, 0 P3\n\n### P0 — Critical\n- [ ] [P0] `aria-current=\"step\"` placed on inner indicator div, not on the listitem host\n\nReference the AUDIT.md in the component directory for full details and code locations.",
+  "title": "Audit Fix: hx-steps",
+  "status": "backlog",
+  "complexity": "large",
+  "priority": 3,
+  "source": "api",
+  "trustTier": 1,
+  "quarantineStatus": "passed",
+  "quarantineId": "adb1be1a-1702-4030-a6d2-1aa09ef25297",
+  "id": "feature-1772853780486-v6qthfrzz",
+  "branchName": "feature/audit-fix-hx-steps",
+  "descriptionHistory": [
+    {
+      "description": "Resolve all defects found in the Deep Audit v2 for `hx-steps`.\nSource: `packages/hx-library/src/components/hx-steps/AUDIT.md`\n\n**Summary:** 29 defects — 1 P0, 13 P1, 15 P2, 0 P3\n\n### P0 — Critical\n- [ ] [P0] `aria-current=\"step\"` placed on inner indicator div, not on the listitem host\n\nReference the AUDIT.md in the component directory for full details and code locations.",
+      "timestamp": "2026-03-07T03:23:00.486Z",
+      "source": "initial"
+    }
+  ],
+  "createdAt": "2026-03-07T03:23:00.486Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-03-07T03:23:00.486Z",
+      "reason": "Feature created"
+    }
+  ]
+}

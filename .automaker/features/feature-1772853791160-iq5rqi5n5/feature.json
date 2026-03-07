@@ -1,0 +1,30 @@
+{
+  "category": "Uncategorized",
+  "description": "Resolve all defects found in the Deep Audit v2 for `hx-tag`.\nSource: `packages/hx-library/src/components/hx-tag/AUDIT.md`\n\n**Summary:** 20 defects — 2 P0, 7 P1, 11 P2, 0 P3\n\n### P0 — Critical\n- [ ] [P0] 01: Remove button touch target is dangerously small\n- [ ] [P0] 02: `aria-label` polluted by prefix slot icon text\n\nReference the AUDIT.md in the component directory for full details and code locations.",
+  "title": "Audit Fix: hx-tag",
+  "status": "backlog",
+  "complexity": "medium",
+  "priority": 3,
+  "source": "api",
+  "trustTier": 1,
+  "quarantineStatus": "passed",
+  "quarantineId": "661f2de5-eca1-4ec7-bb69-a817bee43a34",
+  "id": "feature-1772853791160-iq5rqi5n5",
+  "branchName": "feature/audit-fix-hx-tag",
+  "descriptionHistory": [
+    {
+      "description": "Resolve all defects found in the Deep Audit v2 for `hx-tag`.\nSource: `packages/hx-library/src/components/hx-tag/AUDIT.md`\n\n**Summary:** 20 defects — 2 P0, 7 P1, 11 P2, 0 P3\n\n### P0 — Critical\n- [ ] [P0] 01: Remove button touch target is dangerously small\n- [ ] [P0] 02: `aria-label` polluted by prefix slot icon text\n\nReference the AUDIT.md in the component directory for full details and code locations.",
+      "timestamp": "2026-03-07T03:23:11.161Z",
+      "source": "initial"
+    }
+  ],
+  "createdAt": "2026-03-07T03:23:11.161Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-03-07T03:23:11.161Z",
+      "reason": "Feature created"
+    }
+  ]
+}

@@ -1,0 +1,30 @@
+{
+  "category": "Uncategorized",
+  "description": "Resolve all defects found in the Deep Audit v2 for `hx-tabs`.\nSource: `packages/hx-library/src/components/hx-tabs/AUDIT.md`\n\n**Summary:** 12 defects — 1 P0, 5 P1, 6 P2, 0 P3\n\n### P0 — Critical\n- [ ] [P0] `aria-controls` on host, not on `role=\"tab\"` button\n\nReference the AUDIT.md in the component directory for full details and code locations.",
+  "title": "Audit Fix: hx-tabs",
+  "status": "backlog",
+  "complexity": "medium",
+  "priority": 3,
+  "source": "api",
+  "trustTier": 1,
+  "quarantineStatus": "passed",
+  "quarantineId": "a915f3ea-db5f-4865-b00c-bffc2b3bbee3",
+  "id": "feature-1772853788548-vnsemy00e",
+  "branchName": "feature/audit-fix-hx-tabs",
+  "descriptionHistory": [
+    {
+      "description": "Resolve all defects found in the Deep Audit v2 for `hx-tabs`.\nSource: `packages/hx-library/src/components/hx-tabs/AUDIT.md`\n\n**Summary:** 12 defects — 1 P0, 5 P1, 6 P2, 0 P3\n\n### P0 — Critical\n- [ ] [P0] `aria-controls` on host, not on `role=\"tab\"` button\n\nReference the AUDIT.md in the component directory for full details and code locations.",
+      "timestamp": "2026-03-07T03:23:08.548Z",
+      "source": "initial"
+    }
+  ],
+  "createdAt": "2026-03-07T03:23:08.548Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-03-07T03:23:08.548Z",
+      "reason": "Feature created"
+    }
+  ]
+}

@@ -1,0 +1,30 @@
+{
+  "category": "Uncategorized",
+  "description": "Resolve all defects found in the Deep Audit v2 for `hx-color-picker`.\nSource: `packages/hx-library/src/components/hx-color-picker/AUDIT.md`\n\n**Summary:** 20 defects — 1 P0, 9 P1, 10 P2, 0 P3\n\n### P0 — Critical\n- [ ] [P0] 1: Gradient grid has zero keyboard operability\n\nReference the AUDIT.md in the component directory for full details and code locations.",
+  "title": "Audit Fix: hx-color-picker",
+  "status": "backlog",
+  "complexity": "medium",
+  "priority": 3,
+  "source": "api",
+  "trustTier": 1,
+  "quarantineStatus": "passed",
+  "quarantineId": "f74e7e70-1991-4a5d-ba91-438be3f0163f",
+  "id": "feature-1772853660907-bof6seynd",
+  "branchName": "feature/audit-fix-hx-color-picker",
+  "descriptionHistory": [
+    {
+      "description": "Resolve all defects found in the Deep Audit v2 for `hx-color-picker`.\nSource: `packages/hx-library/src/components/hx-color-picker/AUDIT.md`\n\n**Summary:** 20 defects — 1 P0, 9 P1, 10 P2, 0 P3\n\n### P0 — Critical\n- [ ] [P0] 1: Gradient grid has zero keyboard operability\n\nReference the AUDIT.md in the component directory for full details and code locations.",
+      "timestamp": "2026-03-07T03:21:00.908Z",
+      "source": "initial"
+    }
+  ],
+  "createdAt": "2026-03-07T03:21:00.908Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-03-07T03:21:00.908Z",
+      "reason": "Feature created"
+    }
+  ]
+}

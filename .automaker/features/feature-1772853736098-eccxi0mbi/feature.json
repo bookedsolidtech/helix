@@ -1,0 +1,30 @@
+{
+  "category": "Uncategorized",
+  "description": "Resolve all defects found in the Deep Audit v2 for `hx-popover`.\nSource: `packages/hx-library/src/components/hx-popover/AUDIT.md`\n\n**Summary:** 15 defects — 2 P0, 7 P1, 6 P2, 0 P3\n\n### P0 — Critical\n- [ ] [P0] 01: No click-outside-to-close\n- [ ] [P0] 02: `role=\"dialog\"` applied universally without focus management\n\nReference the AUDIT.md in the component directory for full details and code locations.",
+  "title": "Audit Fix: hx-popover",
+  "status": "backlog",
+  "complexity": "medium",
+  "priority": 3,
+  "source": "api",
+  "trustTier": 1,
+  "quarantineStatus": "passed",
+  "quarantineId": "b7dcf075-ed2e-4327-8fd6-063266435b47",
+  "id": "feature-1772853736098-eccxi0mbi",
+  "branchName": "feature/audit-fix-hx-popover",
+  "descriptionHistory": [
+    {
+      "description": "Resolve all defects found in the Deep Audit v2 for `hx-popover`.\nSource: `packages/hx-library/src/components/hx-popover/AUDIT.md`\n\n**Summary:** 15 defects — 2 P0, 7 P1, 6 P2, 0 P3\n\n### P0 — Critical\n- [ ] [P0] 01: No click-outside-to-close\n- [ ] [P0] 02: `role=\"dialog\"` applied universally without focus management\n\nReference the AUDIT.md in the component directory for full details and code locations.",
+      "timestamp": "2026-03-07T03:22:16.099Z",
+      "source": "initial"
+    }
+  ],
+  "createdAt": "2026-03-07T03:22:16.099Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-03-07T03:22:16.099Z",
+      "reason": "Feature created"
+    }
+  ]
+}

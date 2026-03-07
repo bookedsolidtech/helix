@@ -1,0 +1,30 @@
+{
+  "category": "Uncategorized",
+  "description": "Resolve all defects found in the Deep Audit v2 for `hx-prose`.\nSource: `packages/hx-library/src/components/hx-prose/AUDIT.md`\n\n**Summary:** 18 defects — 2 P0, 8 P1, 8 P2, 0 P3\n\n### P0 — Critical\n- [ ] [P0] 01: Stale `--wc-*` token namespace in unscoped CSS partials\n- [ ] [P0] 02: Test file imports nonexistent type `WcProse`\n\nReference the AUDIT.md in the component directory for full details and code locations.",
+  "title": "Audit Fix: hx-prose",
+  "status": "backlog",
+  "complexity": "medium",
+  "priority": 3,
+  "source": "api",
+  "trustTier": 1,
+  "quarantineStatus": "passed",
+  "quarantineId": "03434dff-4a02-44a9-a5fa-91f6a5546bb7",
+  "id": "feature-1772853748414-ptfv4ma97",
+  "branchName": "feature/audit-fix-hx-prose",
+  "descriptionHistory": [
+    {
+      "description": "Resolve all defects found in the Deep Audit v2 for `hx-prose`.\nSource: `packages/hx-library/src/components/hx-prose/AUDIT.md`\n\n**Summary:** 18 defects — 2 P0, 8 P1, 8 P2, 0 P3\n\n### P0 — Critical\n- [ ] [P0] 01: Stale `--wc-*` token namespace in unscoped CSS partials\n- [ ] [P0] 02: Test file imports nonexistent type `WcProse`\n\nReference the AUDIT.md in the component directory for full details and code locations.",
+      "timestamp": "2026-03-07T03:22:28.415Z",
+      "source": "initial"
+    }
+  ],
+  "createdAt": "2026-03-07T03:22:28.415Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-03-07T03:22:28.415Z",
+      "reason": "Feature created"
+    }
+  ]
+}

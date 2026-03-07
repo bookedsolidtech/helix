@@ -1,0 +1,30 @@
+{
+  "category": "Uncategorized",
+  "description": "Resolve all defects found in the Deep Audit v2 for `hx-breadcrumb`.\nSource: `packages/hx-library/src/components/hx-breadcrumb/AUDIT.md`\n\n**Summary:** 27 defects — 0 P0, 10 P1, 17 P2, 0 P3\n\n### P1 — High\n- [ ] [Accessibility] Current page item with `href` renders as a navigable link\n- [ ] [Accessibility] No keyboard-accessible \"expand\" for collapsed breadcrumb\n- [ ] [Tests] `_handleSeparatorSlotChange` is entirely untested\n- [ ] [Tests] No test for collapsed state with keyboard interaction\n- [ ] [Storybook] `maxItems` and `jsonLd` properties missing from `argTypes`\n- [ ] [Storybook] No story for collapsed/truncated breadcrumb (`maxItems`)\n- [ ] [Storybook] No story with icon content\n- [ ] [CSS] Hardcoded hex fallback values throughout item styles\n- [ ] [Drupal] \"Current page is always last item\" assumption breaks Drupal rendering\n- [ ] [Drupal] JSON-LD head injection incompatible with Drupal's head management\n\n### P2 — Medium\n- [ ] [TypeScript] `_itemCount` reactive state is a render-trigger hack\n- [ ] [TypeScript] `Record<string, unknown>` used in JSON-LD entry builder\n- [ ] [TypeScript] Private state accessed in tests via `as unknown as` cast\n- [ ] [Accessibility] `aria-current=\"page\"` placed on `listitem` host rather than the inner link/text\n- [ ] [Accessibility] Ellipsis item acquires `role=\"listitem\"` via `connectedCallback`\n- [ ] [Tests] JSON-LD href values not verified\n- [ ] [Tests] No test for `max-items` value equal to exactly item count\n- [ ] [Tests] No test for dynamic item insertion/removal\n- [ ] [Storybook] `subcomponents` declaration uses string value\n- [ ] [Storybook] No story for separator slot (named slot usage)\n- [ ] [CSS] No CSS truncation for long item text\n- [ ] [CSS] `separator-slot` hidden via `display: none` without `visibility: hidden`\n- [ ] [CSS] CSS `content` property value injection is fragile\n- [ ] [Performance] JSON-LD side effect mutates `document.head`\n- [ ] [Performance] Bundle size: cannot verify without build output\n- [ ] [Drupal] No Twig template or Drupal integration example\n- [ ] [Drupal] Server-side `aria-current` not documented\n\nReference the AUDIT.md in the component directory for full details and code locations.",
+  "title": "Audit Fix: hx-breadcrumb",
+  "status": "backlog",
+  "complexity": "large",
+  "priority": 4,
+  "source": "api",
+  "trustTier": 1,
+  "quarantineStatus": "passed",
+  "quarantineId": "cc0038f8-301f-4311-a5be-58c4ad7cf53b",
+  "id": "feature-1772853608746-zcm77ydhy",
+  "branchName": "feature/audit-fix-hx-breadcrumb",
+  "descriptionHistory": [
+    {
+      "description": "Resolve all defects found in the Deep Audit v2 for `hx-breadcrumb`.\nSource: `packages/hx-library/src/components/hx-breadcrumb/AUDIT.md`\n\n**Summary:** 27 defects — 0 P0, 10 P1, 17 P2, 0 P3\n\n### P1 — High\n- [ ] [Accessibility] Current page item with `href` renders as a navigable link\n- [ ] [Accessibility] No keyboard-accessible \"expand\" for collapsed breadcrumb\n- [ ] [Tests] `_handleSeparatorSlotChange` is entirely untested\n- [ ] [Tests] No test for collapsed state with keyboard interaction\n- [ ] [Storybook] `maxItems` and `jsonLd` properties missing from `argTypes`\n- [ ] [Storybook] No story for collapsed/truncated breadcrumb (`maxItems`)\n- [ ] [Storybook] No story with icon content\n- [ ] [CSS] Hardcoded hex fallback values throughout item styles\n- [ ] [Drupal] \"Current page is always last item\" assumption breaks Drupal rendering\n- [ ] [Drupal] JSON-LD head injection incompatible with Drupal's head management\n\n### P2 — Medium\n- [ ] [TypeScript] `_itemCount` reactive state is a render-trigger hack\n- [ ] [TypeScript] `Record<string, unknown>` used in JSON-LD entry builder\n- [ ] [TypeScript] Private state accessed in tests via `as unknown as` cast\n- [ ] [Accessibility] `aria-current=\"page\"` placed on `listitem` host rather than the inner link/text\n- [ ] [Accessibility] Ellipsis item acquires `role=\"listitem\"` via `connectedCallback`\n- [ ] [Tests] JSON-LD href values not verified\n- [ ] [Tests] No test for `max-items` value equal to exactly item count\n- [ ] [Tests] No test for dynamic item insertion/removal\n- [ ] [Storybook] `subcomponents` declaration uses string value\n- [ ] [Storybook] No story for separator slot (named slot usage)\n- [ ] [CSS] No CSS truncation for long item text\n- [ ] [CSS] `separator-slot` hidden via `display: none` without `visibility: hidden`\n- [ ] [CSS] CSS `content` property value injection is fragile\n- [ ] [Performance] JSON-LD side effect mutates `document.head`\n- [ ] [Performance] Bundle size: cannot verify without build output\n- [ ] [Drupal] No Twig template or Drupal integration example\n- [ ] [Drupal] Server-side `aria-current` not documented\n\nReference the AUDIT.md in the component directory for full details and code locations.",
+      "timestamp": "2026-03-07T03:20:08.746Z",
+      "source": "initial"
+    }
+  ],
+  "createdAt": "2026-03-07T03:20:08.746Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-03-07T03:20:08.746Z",
+      "reason": "Feature created"
+    }
+  ]
+}

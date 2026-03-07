@@ -1,0 +1,30 @@
+{
+  "category": "Uncategorized",
+  "description": "Resolve all defects found in the Deep Audit v2 for `hx-meter`.\nSource: `packages/hx-library/src/components/hx-meter/AUDIT.md`\n\n**Summary:** 20 defects — 0 P0, 6 P1, 14 P2, 0 P3\n\nReference the AUDIT.md in the component directory for full details and code locations.",
+  "title": "Audit Fix: hx-meter",
+  "status": "backlog",
+  "complexity": "medium",
+  "priority": 4,
+  "source": "api",
+  "trustTier": 1,
+  "quarantineStatus": "passed",
+  "quarantineId": "da7aee79-7549-4e2f-8e22-401be7375969",
+  "id": "feature-1772853726109-9wbvgb04o",
+  "branchName": "feature/audit-fix-hx-meter",
+  "descriptionHistory": [
+    {
+      "description": "Resolve all defects found in the Deep Audit v2 for `hx-meter`.\nSource: `packages/hx-library/src/components/hx-meter/AUDIT.md`\n\n**Summary:** 20 defects — 0 P0, 6 P1, 14 P2, 0 P3\n\nReference the AUDIT.md in the component directory for full details and code locations.",
+      "timestamp": "2026-03-07T03:22:06.109Z",
+      "source": "initial"
+    }
+  ],
+  "createdAt": "2026-03-07T03:22:06.109Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-03-07T03:22:06.109Z",
+      "reason": "Feature created"
+    }
+  ]
+}

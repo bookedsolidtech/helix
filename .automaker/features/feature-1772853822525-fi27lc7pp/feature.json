@@ -1,0 +1,30 @@
+{
+  "category": "Uncategorized",
+  "description": "Resolve all defects found in the Deep Audit v2 for `hx-top-nav`.\nSource: `packages/hx-library/src/components/hx-top-nav/AUDIT.md`\n\n**Summary:** 31 defects — 2 P0, 9 P1, 13 P2, 7 P3\n\n### P0 — Critical\n- [ ] [Accessibility] Nested `<nav>` landmark actively promoted in Storybook\n- [ ] [Accessibility] No `<header>` landmark wrapper\n\nReference the AUDIT.md in the component directory for full details and code locations.",
+  "title": "Audit Fix: hx-top-nav",
+  "status": "backlog",
+  "complexity": "large",
+  "priority": 3,
+  "source": "api",
+  "trustTier": 1,
+  "quarantineStatus": "passed",
+  "quarantineId": "350733e8-b5df-4028-8cfa-a4b34f5d076b",
+  "id": "feature-1772853822525-fi27lc7pp",
+  "branchName": "feature/audit-fix-hx-top-nav",
+  "descriptionHistory": [
+    {
+      "description": "Resolve all defects found in the Deep Audit v2 for `hx-top-nav`.\nSource: `packages/hx-library/src/components/hx-top-nav/AUDIT.md`\n\n**Summary:** 31 defects — 2 P0, 9 P1, 13 P2, 7 P3\n\n### P0 — Critical\n- [ ] [Accessibility] Nested `<nav>` landmark actively promoted in Storybook\n- [ ] [Accessibility] No `<header>` landmark wrapper\n\nReference the AUDIT.md in the component directory for full details and code locations.",
+      "timestamp": "2026-03-07T03:23:42.525Z",
+      "source": "initial"
+    }
+  ],
+  "createdAt": "2026-03-07T03:23:42.525Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-03-07T03:23:42.525Z",
+      "reason": "Feature created"
+    }
+  ]
+}

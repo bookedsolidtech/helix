@@ -1,0 +1,30 @@
+{
+  "category": "Uncategorized",
+  "description": "Resolve all defects found in the Deep Audit v2 for `hx-date-picker`.\nSource: `packages/hx-library/src/components/hx-date-picker/AUDIT.md`\n\n**Summary:** 28 defects — 2 P0, 8 P1, 18 P2, 0 P3\n\n### P0 — Critical\n- [ ] [P0] 1: ARIA Grid: Missing `role=\"row\"` — Structure Violation\n- [ ] [P0] 2: Day Cells: `aria-pressed` Used Instead of `aria-selected`\n\nReference the AUDIT.md in the component directory for full details and code locations.",
+  "title": "Audit Fix: hx-date-picker",
+  "status": "backlog",
+  "complexity": "large",
+  "priority": 3,
+  "source": "api",
+  "trustTier": 1,
+  "quarantineStatus": "passed",
+  "quarantineId": "039ed075-30a7-4a17-a8ec-871f7932d039",
+  "id": "feature-1772853675748-mopdv2kr4",
+  "branchName": "feature/audit-fix-hx-date-picker",
+  "descriptionHistory": [
+    {
+      "description": "Resolve all defects found in the Deep Audit v2 for `hx-date-picker`.\nSource: `packages/hx-library/src/components/hx-date-picker/AUDIT.md`\n\n**Summary:** 28 defects — 2 P0, 8 P1, 18 P2, 0 P3\n\n### P0 — Critical\n- [ ] [P0] 1: ARIA Grid: Missing `role=\"row\"` — Structure Violation\n- [ ] [P0] 2: Day Cells: `aria-pressed` Used Instead of `aria-selected`\n\nReference the AUDIT.md in the component directory for full details and code locations.",
+      "timestamp": "2026-03-07T03:21:15.748Z",
+      "source": "initial"
+    }
+  ],
+  "createdAt": "2026-03-07T03:21:15.748Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-03-07T03:21:15.748Z",
+      "reason": "Feature created"
+    }
+  ]
+}

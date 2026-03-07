@@ -1,0 +1,30 @@
+{
+  "category": "Uncategorized",
+  "description": "Resolve all defects found in the Deep Audit v2 for `hx-tree-view`.\nSource: `packages/hx-library/src/components/hx-tree-view/AUDIT.md`\n\n**Summary:** 33 defects — 3 P0, 8 P1, 22 P2, 0 P3\n\n### P0 — Critical\n- [ ] [P0] 1: Tree is Not Keyboard-Accessible via Tab\n- [ ] [P0] 2: `aria-level` Missing on All Treeitems\n- [ ] [P0] 3: `aria-label` / `aria-labelledby` Missing on Tree Container\n\nReference the AUDIT.md in the component directory for full details and code locations.",
+  "title": "Audit Fix: hx-tree-view",
+  "status": "backlog",
+  "complexity": "large",
+  "priority": 3,
+  "source": "api",
+  "trustTier": 1,
+  "quarantineStatus": "passed",
+  "quarantineId": "ce4acb7f-cbc9-46c9-9e04-e4e1f23340a5",
+  "id": "feature-1772853825742-tfwm5u9v1",
+  "branchName": "feature/audit-fix-hx-tree-view",
+  "descriptionHistory": [
+    {
+      "description": "Resolve all defects found in the Deep Audit v2 for `hx-tree-view`.\nSource: `packages/hx-library/src/components/hx-tree-view/AUDIT.md`\n\n**Summary:** 33 defects — 3 P0, 8 P1, 22 P2, 0 P3\n\n### P0 — Critical\n- [ ] [P0] 1: Tree is Not Keyboard-Accessible via Tab\n- [ ] [P0] 2: `aria-level` Missing on All Treeitems\n- [ ] [P0] 3: `aria-label` / `aria-labelledby` Missing on Tree Container\n\nReference the AUDIT.md in the component directory for full details and code locations.",
+      "timestamp": "2026-03-07T03:23:45.742Z",
+      "source": "initial"
+    }
+  ],
+  "createdAt": "2026-03-07T03:23:45.742Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-03-07T03:23:45.742Z",
+      "reason": "Feature created"
+    }
+  ]
+}

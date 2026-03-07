@@ -1,0 +1,30 @@
+{
+  "category": "Uncategorized",
+  "description": "Resolve all defects found in the Deep Audit v2 for `hx-action-bar`.\nSource: `packages/hx-library/src/components/hx-action-bar/AUDIT.md`\n\n**Summary:** 18 defects — 2 P0, 8 P1, 8 P2, 0 P3\n\n### P0 — Critical\n- [ ] [P0] 01: `overflow` slot is permanently hidden — documented API that is non-functional\n- [ ] [P0] 02: `Home` key handler fires a spurious `.focus()` call on an incorrect element\n\n### P1 — High\n- [ ] [P1] 01: `position` property absent — spec requires `top | bottom | sticky`, implementation uses boolean `sticky`\n- [ ] [P1] 02: No mobile safe area insets — iOS home indicator will obscure sticky bottom bars\n- [ ] [P1] 03: `aria-label` is not reactive — host attribute changes after first render are silently ignored\n- [ ] [P1] 04: Custom element focusable items not discoverable — `hx-button` and similar components invisible to roving tabindex\n- [ ] [P1] 05: No Drupal Twig template provided\n- [ ] [P1] 06: Test suite missing coverage for `Home`, `End`, ArrowLeft wrap, tabindex state, and disabled exclusion\n- [ ] [P1] 07: Storybook stories use hardcoded raw colors instead of design tokens or hx-button\n- [ ] [P1] 08: `_getFocusableItems()` includes direct focusable slots AND their focusable descendants — double-counts compound components\n\n### P2 — Medium\n- [ ] [P2] 01: `_getFocusableItems()` called on every keydown with no caching\n- [ ] [P2] 02: `transition: none` in `prefers-reduced-motion` is dead code\n- [ ] [P2] 03: Three-section layout with competing auto margins does not guarantee true center alignment\n- [ ] [P2] 04: `_handleKeydown` bound in `connectedCallback` is an unusual and fragile pattern\n- [ ] [P2] 05: Dead code in Default story play function\n- [ ] [P2] 06: `KeyboardNavigation` story play function does not test keyboard navigation\n- [ ] [P2] 07: No `scroll-padding-top` compensation documented or provided for sticky bar\n- [ ] [P2] 08: Default `aria-label` fallback of `'Actions'` is non-descriptive and should be documented as required\n\nReference the AUDIT.md in the component directory for full details and code locations.",
+  "title": "Audit Fix: hx-action-bar",
+  "status": "backlog",
+  "complexity": "medium",
+  "priority": 3,
+  "source": "api",
+  "trustTier": 1,
+  "quarantineStatus": "passed",
+  "quarantineId": "6f9be828-a3c0-40df-95fc-8935f90d9b82",
+  "id": "feature-1772853561859-84z0zbwy9",
+  "branchName": "feature/audit-fix-hx-action-bar",
+  "descriptionHistory": [
+    {
+      "description": "Resolve all defects found in the Deep Audit v2 for `hx-action-bar`.\nSource: `packages/hx-library/src/components/hx-action-bar/AUDIT.md`\n\n**Summary:** 18 defects — 2 P0, 8 P1, 8 P2, 0 P3\n\n### P0 — Critical\n- [ ] [P0] 01: `overflow` slot is permanently hidden — documented API that is non-functional\n- [ ] [P0] 02: `Home` key handler fires a spurious `.focus()` call on an incorrect element\n\n### P1 — High\n- [ ] [P1] 01: `position` property absent — spec requires `top | bottom | sticky`, implementation uses boolean `sticky`\n- [ ] [P1] 02: No mobile safe area insets — iOS home indicator will obscure sticky bottom bars\n- [ ] [P1] 03: `aria-label` is not reactive — host attribute changes after first render are silently ignored\n- [ ] [P1] 04: Custom element focusable items not discoverable — `hx-button` and similar components invisible to roving tabindex\n- [ ] [P1] 05: No Drupal Twig template provided\n- [ ] [P1] 06: Test suite missing coverage for `Home`, `End`, ArrowLeft wrap, tabindex state, and disabled exclusion\n- [ ] [P1] 07: Storybook stories use hardcoded raw colors instead of design tokens or hx-button\n- [ ] [P1] 08: `_getFocusableItems()` includes direct focusable slots AND their focusable descendants — double-counts compound components\n\n### P2 — Medium\n- [ ] [P2] 01: `_getFocusableItems()` called on every keydown with no caching\n- [ ] [P2] 02: `transition: none` in `prefers-reduced-motion` is dead code\n- [ ] [P2] 03: Three-section layout with competing auto margins does not guarantee true center alignment\n- [ ] [P2] 04: `_handleKeydown` bound in `connectedCallback` is an unusual and fragile pattern\n- [ ] [P2] 05: Dead code in Default story play function\n- [ ] [P2] 06: `KeyboardNavigation` story play function does not test keyboard navigation\n- [ ] [P2] 07: No `scroll-padding-top` compensation documented or provided for sticky bar\n- [ ] [P2] 08: Default `aria-label` fallback of `'Actions'` is non-descriptive and should be documented as required\n\nReference the AUDIT.md in the component directory for full details and code locations.",
+      "timestamp": "2026-03-07T03:19:21.860Z",
+      "source": "initial"
+    }
+  ],
+  "createdAt": "2026-03-07T03:19:21.860Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-03-07T03:19:21.860Z",
+      "reason": "Feature created"
+    }
+  ]
+}

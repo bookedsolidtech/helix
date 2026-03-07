@@ -1,0 +1,30 @@
+{
+  "category": "Uncategorized",
+  "description": "Resolve all defects found in the Deep Audit v2 for `hx-spinner`.\nSource: `packages/hx-library/src/components/hx-spinner/AUDIT.md`\n\n**Summary:** 13 defects — 2 P0, 5 P1, 6 P2, 0 P3\n\n### P0 — Critical\n- [ ] [P0] 1: Dual announcement — `aria-label` + visually-hidden inner text create double read\n- [ ] [P0] 2: No decorative mode — spinner cannot be silenced when adjacent text exists\n\nReference the AUDIT.md in the component directory for full details and code locations.",
+  "title": "Audit Fix: hx-spinner",
+  "status": "backlog",
+  "complexity": "medium",
+  "priority": 3,
+  "source": "api",
+  "trustTier": 1,
+  "quarantineStatus": "passed",
+  "quarantineId": "6a8e7b6b-3c77-4189-900d-ff5118177574",
+  "id": "feature-1772853771478-3zq4owkvl",
+  "branchName": "feature/audit-fix-hx-spinner",
+  "descriptionHistory": [
+    {
+      "description": "Resolve all defects found in the Deep Audit v2 for `hx-spinner`.\nSource: `packages/hx-library/src/components/hx-spinner/AUDIT.md`\n\n**Summary:** 13 defects — 2 P0, 5 P1, 6 P2, 0 P3\n\n### P0 — Critical\n- [ ] [P0] 1: Dual announcement — `aria-label` + visually-hidden inner text create double read\n- [ ] [P0] 2: No decorative mode — spinner cannot be silenced when adjacent text exists\n\nReference the AUDIT.md in the component directory for full details and code locations.",
+      "timestamp": "2026-03-07T03:22:51.478Z",
+      "source": "initial"
+    }
+  ],
+  "createdAt": "2026-03-07T03:22:51.478Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-03-07T03:22:51.478Z",
+      "reason": "Feature created"
+    }
+  ]
+}

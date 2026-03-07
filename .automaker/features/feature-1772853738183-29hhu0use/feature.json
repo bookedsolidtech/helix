@@ -1,0 +1,30 @@
+{
+  "category": "Uncategorized",
+  "description": "Resolve all defects found in the Deep Audit v2 for `hx-popup`.\nSource: `packages/hx-library/src/components/hx-popup/AUDIT.md`\n\n**Summary:** 27 defects — 1 P0, 9 P1, 17 P2, 0 P3\n\n### P0 — Critical\n- [ ] [P0] Bundle size almost certainly violates the 5KB gate\n\nReference the AUDIT.md in the component directory for full details and code locations.",
+  "title": "Audit Fix: hx-popup",
+  "status": "backlog",
+  "complexity": "large",
+  "priority": 3,
+  "source": "api",
+  "trustTier": 1,
+  "quarantineStatus": "passed",
+  "quarantineId": "9e55caee-5b64-4c92-813c-1fefd9a39e44",
+  "id": "feature-1772853738183-29hhu0use",
+  "branchName": "feature/audit-fix-hx-popup",
+  "descriptionHistory": [
+    {
+      "description": "Resolve all defects found in the Deep Audit v2 for `hx-popup`.\nSource: `packages/hx-library/src/components/hx-popup/AUDIT.md`\n\n**Summary:** 27 defects — 1 P0, 9 P1, 17 P2, 0 P3\n\n### P0 — Critical\n- [ ] [P0] Bundle size almost certainly violates the 5KB gate\n\nReference the AUDIT.md in the component directory for full details and code locations.",
+      "timestamp": "2026-03-07T03:22:18.183Z",
+      "source": "initial"
+    }
+  ],
+  "createdAt": "2026-03-07T03:22:18.183Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-03-07T03:22:18.183Z",
+      "reason": "Feature created"
+    }
+  ]
+}

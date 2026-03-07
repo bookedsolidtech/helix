@@ -1,0 +1,30 @@
+{
+  "category": "Uncategorized",
+  "description": "Resolve all defects found in the Deep Audit v2 for `hx-grid`.\nSource: `packages/hx-library/src/components/hx-grid/AUDIT.md`\n\n**Summary:** 17 defects — 3 P0, 7 P1, 7 P2, 0 P3\n\n### P0 — Critical\n- [ ] [P0] 01: `display: grid` is applied to the wrong element\n- [ ] [P0] 02: Tests validate dead code — false green suite\n\nReference the AUDIT.md in the component directory for full details and code locations.",
+  "title": "Audit Fix: hx-grid",
+  "status": "backlog",
+  "complexity": "large",
+  "priority": 3,
+  "source": "api",
+  "trustTier": 1,
+  "quarantineStatus": "passed",
+  "quarantineId": "4ceecd87-afbe-4a1b-b544-ff9d2474effb",
+  "id": "feature-1772853705761-xqmmsurud",
+  "branchName": "feature/audit-fix-hx-grid",
+  "descriptionHistory": [
+    {
+      "description": "Resolve all defects found in the Deep Audit v2 for `hx-grid`.\nSource: `packages/hx-library/src/components/hx-grid/AUDIT.md`\n\n**Summary:** 17 defects — 3 P0, 7 P1, 7 P2, 0 P3\n\n### P0 — Critical\n- [ ] [P0] 01: `display: grid` is applied to the wrong element\n- [ ] [P0] 02: Tests validate dead code — false green suite\n\nReference the AUDIT.md in the component directory for full details and code locations.",
+      "timestamp": "2026-03-07T03:21:45.761Z",
+      "source": "initial"
+    }
+  ],
+  "createdAt": "2026-03-07T03:21:45.761Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-03-07T03:21:45.761Z",
+      "reason": "Feature created"
+    }
+  ]
+}

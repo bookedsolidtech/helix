@@ -1,0 +1,30 @@
+{
+  "category": "Uncategorized",
+  "description": "Resolve all defects found in the Deep Audit v2 for `hx-toast`.\nSource: `packages/hx-library/src/components/hx-toast/AUDIT.md`\n\n**Summary:** 13 defects — 0 P0, 5 P1, 8 P2, 0 P3\n\nReference the AUDIT.md in the component directory for full details and code locations.",
+  "title": "Audit Fix: hx-toast",
+  "status": "backlog",
+  "complexity": "medium",
+  "priority": 4,
+  "source": "api",
+  "trustTier": 1,
+  "quarantineStatus": "passed",
+  "quarantineId": "ec086910-8252-4169-b14b-ae507a58bd9a",
+  "id": "feature-1772853814741-tc0vnimjf",
+  "branchName": "feature/audit-fix-hx-toast",
+  "descriptionHistory": [
+    {
+      "description": "Resolve all defects found in the Deep Audit v2 for `hx-toast`.\nSource: `packages/hx-library/src/components/hx-toast/AUDIT.md`\n\n**Summary:** 13 defects — 0 P0, 5 P1, 8 P2, 0 P3\n\nReference the AUDIT.md in the component directory for full details and code locations.",
+      "timestamp": "2026-03-07T03:23:34.741Z",
+      "source": "initial"
+    }
+  ],
+  "createdAt": "2026-03-07T03:23:34.741Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-03-07T03:23:34.741Z",
+      "reason": "Feature created"
+    }
+  ]
+}
