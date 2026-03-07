@@ -27,6 +27,8 @@ import { helixStepStyles } from './hx-step.styles.js';
  * @cssprop [--hx-steps-label-font-size=var(--hx-font-size-sm)] - Label font size.
  * @cssprop [--hx-steps-description-font-size=var(--hx-font-size-xs)] - Description font size.
  * @cssprop [--hx-steps-connector-color=var(--hx-color-neutral-200)] - Connector line color.
+ * @cssprop [--hx-steps-connector-complete-color=var(--hx-color-primary-500)] - Connector color when step is complete.
+ * @cssprop [--hx-steps-connector-thickness=var(--hx-border-width,2px)] - Connector line thickness.
  * @cssprop [--hx-steps-label-color=var(--hx-color-neutral-600)] - Label text color.
  * @cssprop [--hx-steps-description-color=var(--hx-color-neutral-500)] - Description text color.
  */
@@ -167,6 +169,7 @@ export class HelixStep extends LitElement {
       >
         <path d="M20 6L9 17l-5-5" />
       </svg>
+      <span class="sr-only">Complete</span>
     `;
   }
 
@@ -183,6 +186,7 @@ export class HelixStep extends LitElement {
       >
         <path d="M18 6L6 18M6 6l12 12" />
       </svg>
+      <span class="sr-only">Error</span>
     `;
   }
 

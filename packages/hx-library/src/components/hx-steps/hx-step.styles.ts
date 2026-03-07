@@ -8,6 +8,20 @@ export const helixStepStyles = css`
     min-width: 0;
   }
 
+  /* ─── Visually Hidden (SR only) ─── */
+
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+  }
+
   /* ─── Step Wrapper ─── */
 
   .step {
@@ -21,7 +35,7 @@ export const helixStepStyles = css`
   /* ─── Focus ─── */
 
   :host(:focus-visible) .step__indicator {
-    outline: 2px solid var(--hx-color-primary-500, #2563eb);
+    outline: 2px solid var(--hx-color-primary-500);
     outline-offset: 2px;
   }
 
@@ -44,12 +58,12 @@ export const helixStepStyles = css`
     width: var(--hx-steps-indicator-size, 2rem);
     height: var(--hx-steps-indicator-size, 2rem);
     border-radius: var(--hx-border-radius-full, 9999px);
-    border: 2px solid var(--hx-color-neutral-300, #cbd5e1);
-    background-color: var(--hx-color-neutral-0, #ffffff);
-    color: var(--hx-color-neutral-500, #64748b);
-    font-size: var(--hx-steps-indicator-font-size, var(--hx-font-size-sm, 0.875rem));
-    font-weight: var(--hx-font-weight-semibold, 600);
-    font-family: var(--hx-font-family-sans, sans-serif);
+    border: 2px solid var(--hx-color-neutral-300);
+    background-color: var(--hx-color-neutral-0);
+    color: var(--hx-color-neutral-500);
+    font-size: var(--hx-steps-indicator-font-size, var(--hx-font-size-sm));
+    font-weight: var(--hx-font-weight-semibold);
+    font-family: var(--hx-font-family-sans);
     transition:
       background-color var(--hx-transition-fast, 150ms ease),
       border-color var(--hx-transition-fast, 150ms ease),
@@ -67,9 +81,9 @@ export const helixStepStyles = css`
 
   .step__connector {
     flex: 1;
-    height: 2px;
+    height: var(--hx-steps-connector-thickness, var(--hx-border-width, 2px));
     min-width: 0;
-    background-color: var(--hx-steps-connector-color, var(--hx-color-neutral-200, #e2e8f0));
+    background-color: var(--hx-steps-connector-color, var(--hx-color-neutral-200));
     transition: background-color var(--hx-transition-fast, 150ms ease);
   }
 
@@ -87,60 +101,62 @@ export const helixStepStyles = css`
   }
 
   .step__label {
-    font-family: var(--hx-font-family-sans, sans-serif);
-    font-size: var(--hx-steps-label-font-size, var(--hx-font-size-sm, 0.875rem));
-    font-weight: var(--hx-font-weight-medium, 500);
-    color: var(--hx-steps-label-color, var(--hx-color-neutral-600, #475569));
+    font-family: var(--hx-font-family-sans);
+    font-size: var(--hx-steps-label-font-size, var(--hx-font-size-sm));
+    font-weight: var(--hx-font-weight-medium);
+    color: var(--hx-steps-label-color, var(--hx-color-neutral-600));
     line-height: var(--hx-line-height-tight, 1.25);
   }
 
   .step__description {
-    font-family: var(--hx-font-family-sans, sans-serif);
-    font-size: var(--hx-steps-description-font-size, var(--hx-font-size-xs, 0.75rem));
-    color: var(--hx-steps-description-color, var(--hx-color-neutral-500, #64748b));
+    font-family: var(--hx-font-family-sans);
+    font-size: var(--hx-steps-description-font-size, var(--hx-font-size-xs));
+    color: var(--hx-steps-description-color, var(--hx-color-neutral-500));
     margin-top: var(--hx-space-1, 0.25rem);
     line-height: var(--hx-line-height-normal, 1.5);
   }
 
   /* ─── Status: active ─── */
 
+  /* Active: outlined indicator (in-progress) — visually distinct from complete (filled) */
   :host([status='active']) .step__indicator {
-    border-color: var(--hx-color-primary-500, #2563eb);
-    background-color: var(--hx-color-primary-500, #2563eb);
-    color: var(--hx-color-neutral-0, #ffffff);
+    border-color: var(--hx-color-primary-500);
+    background-color: var(--hx-color-primary-500);
+    color: var(--hx-color-neutral-0);
   }
 
   :host([status='active']) .step__label {
-    color: var(--hx-color-primary-700, #1d4ed8);
-    font-weight: var(--hx-font-weight-semibold, 600);
+    color: var(--hx-color-primary-700);
+    font-weight: var(--hx-font-weight-semibold);
   }
 
   /* ─── Status: complete ─── */
 
+  /* Complete: filled indicator with darker shade — visually distinct from active */
   :host([status='complete']) .step__indicator {
-    border-color: var(--hx-color-primary-500, #2563eb);
-    background-color: var(--hx-color-primary-500, #2563eb);
-    color: var(--hx-color-neutral-0, #ffffff);
+    border-color: var(--hx-color-primary-700);
+    background-color: var(--hx-color-primary-700);
+    color: var(--hx-color-neutral-0);
   }
 
   :host([status='complete']) .step__connector {
-    background-color: var(--hx-color-primary-500, #2563eb);
+    background-color: var(--hx-steps-connector-complete-color, var(--hx-color-primary-500));
   }
 
   :host([status='complete']) .step__label {
-    color: var(--hx-color-neutral-700, #334155);
+    color: var(--hx-color-neutral-700);
   }
 
   /* ─── Status: error ─── */
 
   :host([status='error']) .step__indicator {
-    border-color: var(--hx-color-error-500, #ef4444);
-    background-color: var(--hx-color-error-500, #ef4444);
-    color: var(--hx-color-neutral-0, #ffffff);
+    border-color: var(--hx-color-error-500);
+    background-color: var(--hx-color-error-500);
+    color: var(--hx-color-neutral-0);
   }
 
   :host([status='error']) .step__label {
-    color: var(--hx-color-error-700, #b91c1c);
+    color: var(--hx-color-error-700);
   }
 
   /* ─── Status: disabled ─── */
@@ -152,9 +168,9 @@ export const helixStepStyles = css`
   }
 
   :host([disabled]) .step__indicator {
-    border-color: var(--hx-color-neutral-300, #cbd5e1);
-    background-color: var(--hx-color-neutral-100, #f1f5f9);
-    color: var(--hx-color-neutral-400, #94a3b8);
+    border-color: var(--hx-color-neutral-300);
+    background-color: var(--hx-color-neutral-100);
+    color: var(--hx-color-neutral-400);
   }
 
   /* ─── Vertical Layout ─── */
@@ -178,7 +194,7 @@ export const helixStepStyles = css`
   }
 
   :host([orientation='vertical']) .step__connector {
-    width: 2px;
+    width: var(--hx-steps-connector-thickness, var(--hx-border-width, 2px));
     height: auto;
     min-height: var(--hx-space-8, 2rem);
     flex: 1;
@@ -199,39 +215,39 @@ export const helixStepStyles = css`
 
   @media (prefers-color-scheme: dark) {
     .step__indicator {
-      background-color: var(--hx-color-neutral-800, #1e293b);
-      border-color: var(--hx-color-neutral-600, #475569);
-      color: var(--hx-color-neutral-300, #cbd5e1);
+      background-color: var(--hx-color-neutral-800);
+      border-color: var(--hx-color-neutral-600);
+      color: var(--hx-color-neutral-300);
     }
 
     .step__connector {
-      background-color: var(--hx-color-neutral-700, #334155);
+      background-color: var(--hx-color-neutral-700);
     }
 
     .step__label {
-      color: var(--hx-color-neutral-300, #cbd5e1);
+      color: var(--hx-color-neutral-300);
     }
 
     .step__description {
-      color: var(--hx-color-neutral-400, #94a3b8);
+      color: var(--hx-color-neutral-400);
     }
 
     :host([status='active']) .step__label {
-      color: var(--hx-color-primary-300, #93c5fd);
+      color: var(--hx-color-primary-300);
     }
 
     :host([status='complete']) .step__label {
-      color: var(--hx-color-neutral-200, #e2e8f0);
+      color: var(--hx-color-neutral-200);
     }
 
     :host([status='error']) .step__label {
-      color: var(--hx-color-error-300, #fca5a5);
+      color: var(--hx-color-error-300);
     }
 
     :host([disabled]) .step__indicator {
-      background-color: var(--hx-color-neutral-900, #0f172a);
-      border-color: var(--hx-color-neutral-700, #334155);
-      color: var(--hx-color-neutral-600, #475569);
+      background-color: var(--hx-color-neutral-900);
+      border-color: var(--hx-color-neutral-700);
+      color: var(--hx-color-neutral-600);
     }
   }
 `;
