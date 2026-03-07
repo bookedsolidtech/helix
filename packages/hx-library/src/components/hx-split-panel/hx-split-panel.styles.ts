@@ -4,11 +4,8 @@ export const helixSplitPanelStyles = css`
   :host {
     display: flex;
     --_divider-size: var(--hx-split-panel-divider-size, 4px);
-    --_divider-color: var(--hx-split-panel-divider-color, var(--hx-color-neutral-200, #e2e8f0));
-    --_divider-hover-color: var(
-      --hx-split-panel-divider-hover-color,
-      var(--hx-color-primary-500, #3b82f6)
-    );
+    --_divider-color: var(--hx-split-panel-divider-color, var(--hx-color-neutral-200));
+    --_divider-hover-color: var(--hx-split-panel-divider-hover-color, var(--hx-color-primary-500));
     overflow: hidden;
   }
 
@@ -46,16 +43,32 @@ export const helixSplitPanelStyles = css`
     width: 100%;
   }
 
-  /* ─── Divider ─── */
+  /* ─── Divider Track (flex child wrapper) ─── */
+
+  .divider-track {
+    flex-shrink: 0;
+    position: relative;
+    overflow: visible;
+    display: flex;
+    align-items: stretch;
+  }
+
+  :host([orientation='horizontal']) .divider-track {
+    width: var(--_divider-size);
+    height: 100%;
+  }
+
+  :host([orientation='vertical']) .divider-track {
+    width: 100%;
+    height: var(--_divider-size);
+  }
+
+  /* ─── Divider (separator role — no interactive children) ─── */
 
   .divider {
-    flex-shrink: 0;
+    flex: 1;
     background-color: var(--_divider-color);
     cursor: col-resize;
-    position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: center;
     transition: background-color 0.15s ease;
     touch-action: none;
     user-select: none;
@@ -64,20 +77,22 @@ export const helixSplitPanelStyles = css`
   }
 
   :host([orientation='horizontal']) .divider {
-    width: var(--_divider-size);
-    height: 100%;
     cursor: col-resize;
   }
 
   :host([orientation='vertical']) .divider {
-    width: 100%;
-    height: var(--_divider-size);
     cursor: row-resize;
   }
 
   .divider:hover,
   .divider:focus-visible {
     background-color: var(--_divider-hover-color);
+  }
+
+  .divider:focus-visible {
+    outline: 2px solid var(--_divider-hover-color);
+    outline-offset: 2px;
+    box-shadow: 0 0 0 4px color-mix(in srgb, var(--_divider-hover-color) 30%, transparent);
   }
 
   :host([disabled]) .divider {
@@ -88,5 +103,52 @@ export const helixSplitPanelStyles = css`
   :host([disabled]) .divider:hover,
   :host([disabled]) .divider:focus-visible {
     background-color: var(--_divider-color);
+    outline: none;
+    box-shadow: none;
+  }
+
+  /* ─── Collapse Controls (siblings of separator, not children) ─── */
+
+  .collapse-controls {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    z-index: 2;
+    pointer-events: auto;
+  }
+
+  :host([orientation='vertical']) .collapse-controls {
+    flex-direction: row;
+  }
+
+  .collapse-btn {
+    background: var(--_divider-hover-color);
+    border: 2px solid white;
+    color: white;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 8px;
+    padding: 0;
+    line-height: 1;
+    flex-shrink: 0;
+  }
+
+  .collapse-btn:hover {
+    filter: brightness(1.1);
+  }
+
+  .collapse-btn:focus-visible {
+    outline: 2px solid white;
+    outline-offset: 2px;
   }
 `;
