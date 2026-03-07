@@ -1,12 +1,5 @@
 import { describe, it, expect, afterEach } from 'vitest';
-import {
-  fixture,
-  shadowQuery,
-
-  oneEvent,
-  cleanup,
-  checkA11y,
-} from '../../test-utils.js';
+import { fixture, shadowQuery, oneEvent, cleanup, checkA11y } from '../../test-utils.js';
 import type { HelixCheckboxGroup } from './hx-checkbox-group.js';
 import type { HelixCheckbox } from '../hx-checkbox/hx-checkbox.js';
 import '../hx-checkbox/index.js';
