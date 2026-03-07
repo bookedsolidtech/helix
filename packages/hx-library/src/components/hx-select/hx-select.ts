@@ -20,6 +20,16 @@ interface SelectOption {
  * for form participation and provides a combobox trigger for consistent
  * cross-browser styling.
  *
+ * @remarks Multi-select is intentionally not supported. This component
+ * implements a single-value select (combobox) pattern only. For multi-value
+ * selection use a separate multi-select component.
+ *
+ * @remarks The listbox panel uses `position: absolute` and may be clipped by
+ * ancestor elements with `overflow: hidden` or `overflow: auto`. This is a
+ * known limitation when embedding the component inside cards, tables, or
+ * dialogs. Use the CSS custom property `--hx-select-listbox-shadow` or
+ * restructure the containing layout to avoid clipping.
+ *
  * @summary Form-associated custom select with label, error, and help text.
  *
  * @tag hx-select
@@ -53,6 +63,7 @@ interface SelectOption {
  * @cssprop [--hx-select-listbox-bg=var(--hx-color-neutral-0)] - Listbox panel background color.
  * @cssprop [--hx-select-option-hover-bg=var(--hx-color-primary-50)] - Option hover background color.
  * @cssprop [--hx-select-option-selected-bg=var(--hx-color-primary-100)] - Selected option background color.
+ * @cssprop [--hx-select-placeholder-color=var(--hx-color-neutral-400)] - Placeholder text color.
  */
 @customElement('hx-select')
 export class HelixSelect extends LitElement {
@@ -72,7 +83,6 @@ export class HelixSelect extends LitElement {
   // ─── Stable IDs ───
 
   private _selectId = `hx-select-${Math.random().toString(36).slice(2, 9)}`;
-  private _instanceId = this._selectId;
   private _listboxId = `${this._selectId}-listbox`;
   private _helpTextId = `${this._selectId}-help`;
   private _errorId = `${this._selectId}-error`;
@@ -168,7 +178,7 @@ export class HelixSelect extends LitElement {
   private _select!: HTMLSelectElement;
 
   @query('.field__trigger')
-  private _trigger!: HTMLButtonElement;
+  private _trigger!: HTMLElement;
 
   // ─── Computed helpers ───
 
@@ -195,6 +205,14 @@ export class HelixSelect extends LitElement {
       this._syncNativeSelect();
       this._updateFormValue();
       this._updateValidity();
+    }
+    if (changedProperties.has('size')) {
+      const validSizes: string[] = ['sm', 'md', 'lg'];
+      if (!validSizes.includes(this.size)) {
+        console.warn(
+          `[hx-select] Invalid size "${this.size}". Expected one of: ${validSizes.join(', ')}.`,
+        );
+      }
     }
   }
 
@@ -248,8 +266,13 @@ export class HelixSelect extends LitElement {
   }
 
   /** Called when the browser restores form state (e.g., bfcache navigation). */
-  formStateRestoreCallback(state: string): void {
-    this.value = state;
+  formStateRestoreCallback(
+    state: string | File | FormData,
+    _mode: 'restore' | 'autocomplete',
+  ): void {
+    if (typeof state === 'string') {
+      this.value = state;
+    }
   }
 
   // ─── Native Select Sync ───
@@ -263,59 +286,56 @@ export class HelixSelect extends LitElement {
 
   // ─── Option Syncing from Slot ───
 
-  private _handleSlotChange(): void {
-    this._readOptions();
-    this._syncClonedOptions();
-  }
-
   private _parseOption(el: HTMLOptionElement): SelectOption {
     return { value: el.value, label: el.textContent?.trim() ?? el.value, disabled: el.disabled };
   }
 
-  private _readOptions(): void {
+  /**
+   * Single-pass slot handler: reads options into _options for the custom
+   * listbox AND clones them into the native <select> for form participation.
+   * Handles both top-level <option> and <optgroup> children.
+   */
+  private _handleSlotChange(): void {
     const slot = this.shadowRoot?.querySelector<HTMLSlotElement>('slot:not([name])');
     if (!slot) return;
 
     const parsed: SelectOption[] = [];
 
+    // Remove previously cloned options from native select
+    if (this._select) {
+      this._select.querySelectorAll('option[data-cloned]').forEach((opt) => opt.remove());
+    }
+
+    const cloneIntoSelect = (optEl: HTMLOptionElement): void => {
+      if (!this._select) return;
+      const clone = optEl.cloneNode(true) as HTMLOptionElement;
+      clone.setAttribute('data-cloned', '');
+      this._select.appendChild(clone);
+    };
+
     for (const el of slot.assignedElements({ flatten: true })) {
       if (el instanceof HTMLOptionElement) {
         parsed.push(this._parseOption(el));
+        cloneIntoSelect(el);
       } else if (el instanceof HTMLOptGroupElement) {
         for (const child of Array.from(el.children)) {
-          if (child instanceof HTMLOptionElement) parsed.push(this._parseOption(child));
+          if (child instanceof HTMLOptionElement) {
+            parsed.push(this._parseOption(child));
+            cloneIntoSelect(child);
+          }
         }
       }
     }
 
     this._options = parsed;
-  }
 
-  private _syncClonedOptions(): void {
-    if (!this._select) return;
-
-    const slot = this.shadowRoot?.querySelector<HTMLSlotElement>('slot:not([name])');
-    if (!slot) return;
-
-    const slottedOptions = slot
-      .assignedElements({ flatten: true })
-      .filter((el): el is HTMLOptionElement => el instanceof HTMLOptionElement);
-
-    // Remove previously cloned options
-    this._select.querySelectorAll('option[data-cloned]').forEach((opt) => opt.remove());
-
-    // Clone slotted options into the native select
-    slottedOptions.forEach((option) => {
-      const clone = option.cloneNode(true) as HTMLOptionElement;
-      clone.setAttribute('data-cloned', '');
-      this._select.appendChild(clone);
-    });
-
-    if (this.value) {
-      this._select.value = this.value;
-    } else if (!this.placeholder && slottedOptions.length > 0) {
-      this.value = this._select.value;
-      this._updateFormValue();
+    if (this._select) {
+      if (this.value) {
+        this._select.value = this.value;
+      } else if (!this.placeholder && parsed.length > 0) {
+        this.value = this._select.value;
+        this._updateFormValue();
+      }
     }
   }
 
@@ -414,10 +434,37 @@ export class HelixSelect extends LitElement {
         e.preventDefault();
         this.open = false;
         this._focusedOptionIndex = -1;
+        this._trigger?.focus();
         break;
       }
-      default:
+      case 'Tab': {
+        // Close the dropdown but allow Tab to move focus naturally
+        if (this.open) {
+          this.open = false;
+          this._focusedOptionIndex = -1;
+        }
         break;
+      }
+      default: {
+        // Typeahead: single printable character jumps to first matching option
+        if (!e.ctrlKey && !e.metaKey && !e.altKey && e.key.length === 1) {
+          const char = e.key.toLowerCase();
+          const startIndex = this.open ? this._focusedOptionIndex + 1 : 0;
+          const matching = this._options
+            .map((o, i) => ({ o, i }))
+            .filter(({ o }) => !o.disabled && o.label.toLowerCase().startsWith(char));
+          const afterCurrent = matching.find(({ i }) => i >= startIndex);
+          const target = afterCurrent ?? matching[0];
+          if (target) {
+            if (!this.open) {
+              this.open = true;
+            }
+            this._focusedOptionIndex = target.i;
+            e.preventDefault();
+          }
+        }
+        break;
+      }
     }
   }
 
@@ -466,7 +513,7 @@ export class HelixSelect extends LitElement {
   // ─── Render Helpers ───
 
   private _optionId(index: number): string {
-    return `hx-select-option-${this._instanceId}-${index}`;
+    return `hx-select-option-${this._selectId}-${index}`;
   }
 
   private _renderOptions() {
@@ -547,13 +594,13 @@ export class HelixSelect extends LitElement {
 
         <!-- Select Wrapper: trigger + listbox -->
         <div part="select-wrapper" class="field__select-wrapper">
-          <!-- Custom Trigger (combobox button) -->
-          <button
+          <!-- Custom Trigger (combobox — div to avoid native role conflicts per APG) -->
+          <div
             part="trigger"
-            type="button"
             id=${this._selectId}
             class=${classMap(triggerClasses)}
             role="combobox"
+            tabindex=${this.disabled ? '-1' : '0'}
             aria-expanded=${this.open ? 'true' : 'false'}
             aria-haspopup="listbox"
             aria-controls=${this._listboxId}
@@ -563,7 +610,8 @@ export class HelixSelect extends LitElement {
             aria-invalid=${hasError ? 'true' : nothing}
             aria-describedby=${ifDefined(describedBy)}
             aria-required=${this.required ? 'true' : nothing}
-            ?disabled=${this.disabled}
+            aria-disabled=${this.disabled ? 'true' : nothing}
+            aria-label=${ifDefined(this.ariaLabel ?? undefined)}
             @click=${this._toggleDropdown}
             @keydown=${this._handleKeydown}
           >
@@ -571,7 +619,7 @@ export class HelixSelect extends LitElement {
               >${this._displayValue || this.placeholder || nothing}</span
             >
             <span class="field__chevron" aria-hidden="true"></span>
-          </button>
+          </div>
 
           <!-- Custom Listbox Panel -->
           <div
@@ -612,13 +660,7 @@ export class HelixSelect extends LitElement {
         <!-- Error -->
         <slot name="error" @slotchange=${this._handleErrorSlotChange}>
           ${hasError
-            ? html`<div
-                part="error"
-                class="field__error"
-                id=${this._errorId}
-                role="alert"
-                aria-live="polite"
-              >
+            ? html`<div part="error" class="field__error" id=${this._errorId} role="alert">
                 ${this.error}
               </div>`
             : nothing}
