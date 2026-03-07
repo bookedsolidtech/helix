@@ -95,9 +95,7 @@ describe('hx-combobox', () => {
     });
 
     it('shows asterisk when required', async () => {
-      const el = await fixture<HxCombobox>(
-        '<hx-combobox label="Fruit" required></hx-combobox>',
-      );
+      const el = await fixture<HxCombobox>('<hx-combobox label="Fruit" required></hx-combobox>');
       const marker = shadowQuery(el, '.field__required-marker');
       expect(marker).toBeTruthy();
       expect(marker?.textContent).toBe('*');
@@ -108,9 +106,7 @@ describe('hx-combobox', () => {
 
   describe('Property: placeholder', () => {
     it('sets placeholder on native input', async () => {
-      const el = await fixture<HxCombobox>(
-        '<hx-combobox placeholder="Search..."></hx-combobox>',
-      );
+      const el = await fixture<HxCombobox>('<hx-combobox placeholder="Search..."></hx-combobox>');
       const input = shadowQuery<HTMLInputElement>(el, 'input')!;
       expect(input.getAttribute('placeholder')).toBe('Search...');
     });
@@ -120,9 +116,7 @@ describe('hx-combobox', () => {
 
   describe('Property: value', () => {
     it('reflects value attribute', async () => {
-      const el = await fixture<HxCombobox>(
-        withOptions('value="banana"'),
-      );
+      const el = await fixture<HxCombobox>(withOptions('value="banana"'));
       expect(el.value).toBe('banana');
     });
 
@@ -193,9 +187,7 @@ describe('hx-combobox', () => {
 
   describe('Property: error', () => {
     it('renders error message in role="alert" div', async () => {
-      const el = await fixture<HxCombobox>(
-        '<hx-combobox error="Required field"></hx-combobox>',
-      );
+      const el = await fixture<HxCombobox>('<hx-combobox error="Required field"></hx-combobox>');
       const errorEl = shadowQuery(el, '[role="alert"]');
       expect(errorEl?.textContent?.trim()).toBe('Required field');
     });
@@ -206,10 +198,12 @@ describe('hx-combobox', () => {
       expect(input?.getAttribute('aria-invalid')).toBe('true');
     });
 
-    it('error div has aria-live="polite"', async () => {
+    it('error div does not override role="alert" with aria-live (P1-5 fix)', async () => {
+      // role="alert" already implies aria-live="assertive" — explicit aria-live="polite" was invalid
       const el = await fixture<HxCombobox>('<hx-combobox error="Oops"></hx-combobox>');
       const errorEl = shadowQuery(el, '[role="alert"]');
-      expect(errorEl?.getAttribute('aria-live')).toBe('polite');
+      expect(errorEl).toBeTruthy();
+      expect(errorEl?.getAttribute('aria-live')).toBeNull();
     });
   });
 
@@ -237,9 +231,7 @@ describe('hx-combobox', () => {
 
   describe('Property: clearable', () => {
     it('shows clear button when value is set and clearable=true', async () => {
-      const el = await fixture<HxCombobox>(
-        withOptions('value="apple" clearable'),
-      );
+      const el = await fixture<HxCombobox>(withOptions('value="apple" clearable'));
       await el.updateComplete;
       const clearBtn = shadowQuery(el, '[part="clear-button"]');
       expect(clearBtn).toBeTruthy();
@@ -364,6 +356,19 @@ describe('hx-combobox', () => {
       const event = await clearPromise;
       expect(event).toBeTruthy();
     });
+
+    it('dispatches hx-hide when listbox closes (P2-9)', async () => {
+      const el = await fixture<HxCombobox>(withOptions());
+      const input = shadowQuery<HTMLInputElement>(el, 'input')!;
+      // Open first
+      input.dispatchEvent(new Event('focus'));
+      await el.updateComplete;
+      // Close with Escape and capture hx-hide
+      const hidePromise = oneEvent(el, 'hx-hide');
+      input.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+      const event = await hidePromise;
+      expect(event).toBeTruthy();
+    });
   });
 
   // ─── Keyboard Navigation (4) ───
@@ -413,6 +418,65 @@ describe('hx-combobox', () => {
       const listbox = shadowQuery(el, '[role="listbox"]');
       expect(listbox?.hasAttribute('hidden')).toBe(true);
     });
+
+    it('ArrowUp opens listbox and focuses last option (P2-11)', async () => {
+      const el = await fixture<HxCombobox>(withOptions());
+      const input = shadowQuery<HTMLInputElement>(el, 'input')!;
+      input.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowUp', bubbles: true }));
+      await el.updateComplete;
+      const listbox = shadowQuery(el, '[role="listbox"]');
+      expect(listbox?.hasAttribute('hidden')).toBe(false);
+      // Last option should be focused (cherry = index 2)
+      const focusedOption = shadowQuery(el, '.field__option--focused');
+      expect(focusedOption).toBeTruthy();
+    });
+
+    it('Home key focuses first enabled option (P1-1)', async () => {
+      const el = await fixture<HxCombobox>(withOptions());
+      const input = shadowQuery<HTMLInputElement>(el, 'input')!;
+      // Open and navigate down past first option
+      input.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true }));
+      await el.updateComplete;
+      input.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true }));
+      await el.updateComplete;
+      // Press Home to jump to first
+      input.dispatchEvent(new KeyboardEvent('keydown', { key: 'Home', bubbles: true }));
+      await el.updateComplete;
+      const options = el.shadowRoot?.querySelectorAll('.field__option--focused');
+      expect(options?.length).toBe(1);
+    });
+
+    it('End key focuses last enabled option (P1-1)', async () => {
+      const el = await fixture<HxCombobox>(withOptions());
+      const input = shadowQuery<HTMLInputElement>(el, 'input')!;
+      input.dispatchEvent(new KeyboardEvent('keydown', { key: 'End', bubbles: true }));
+      await el.updateComplete;
+      const listbox = shadowQuery(el, '[role="listbox"]');
+      expect(listbox?.hasAttribute('hidden')).toBe(false);
+      const focusedOption = shadowQuery(el, '.field__option--focused');
+      expect(focusedOption).toBeTruthy();
+    });
+
+    it('disabled options are skipped during keyboard navigation (P2-12)', async () => {
+      const el = await fixture<HxCombobox>(`
+        <hx-combobox>
+          <option slot="option" value="apple">Apple</option>
+          <option slot="option" value="banana" disabled>Banana</option>
+          <option slot="option" value="cherry">Cherry</option>
+        </hx-combobox>
+      `);
+      await el.updateComplete;
+      const input = shadowQuery<HTMLInputElement>(el, 'input')!;
+      // ArrowDown twice should skip "banana" (disabled) and land on "cherry"
+      input.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true }));
+      await el.updateComplete;
+      input.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true }));
+      await el.updateComplete;
+      // Select with Enter — should be cherry (not banana)
+      input.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
+      await el.updateComplete;
+      expect(el.value).toBe('cherry');
+    });
   });
 
   // ─── Form Integration (5) ───
@@ -424,9 +488,7 @@ describe('hx-combobox', () => {
     });
 
     it('form getter returns associated form', async () => {
-      const el = await fixture<HxCombobox>(
-        '<form><hx-combobox name="fruit"></hx-combobox></form>',
-      );
+      const el = await fixture<HxCombobox>('<form><hx-combobox name="fruit"></hx-combobox></form>');
       const combobox = el.querySelector('hx-combobox') as HxCombobox;
       expect(combobox.form).toBeInstanceOf(HTMLFormElement);
     });
@@ -440,7 +502,8 @@ describe('hx-combobox', () => {
 
     it('formStateRestoreCallback restores value', async () => {
       const el = await fixture<HxCombobox>(withOptions());
-      el.formStateRestoreCallback('cherry');
+      // P1-6: Updated signature includes optional mode param
+      el.formStateRestoreCallback('cherry', 'restore');
       expect(el.value).toBe('cherry');
     });
 
@@ -481,6 +544,74 @@ describe('hx-combobox', () => {
     });
   });
 
+  // ─── Multiple Selection (P0-1) ───
+
+  describe('Multiple Selection', () => {
+    it('selecting two options accumulates comma-separated value', async () => {
+      const el = await fixture<HxCombobox>(withOptions('multiple'));
+      const input = shadowQuery<HTMLInputElement>(el, 'input')!;
+      input.dispatchEvent(new Event('focus'));
+      await el.updateComplete;
+      const options = el.shadowRoot?.querySelectorAll<HTMLElement>('[role="option"]');
+      options?.[0]?.click(); // apple
+      await el.updateComplete;
+      options?.[1]?.click(); // banana
+      await el.updateComplete;
+      expect(el.value).toBe('apple,banana');
+    });
+
+    it('clicking selected option in multiple mode deselects it', async () => {
+      const el = await fixture<HxCombobox>(withOptions('multiple'));
+      const input = shadowQuery<HTMLInputElement>(el, 'input')!;
+      input.dispatchEvent(new Event('focus'));
+      await el.updateComplete;
+      const options = el.shadowRoot?.querySelectorAll<HTMLElement>('[role="option"]');
+      options?.[0]?.click(); // select apple
+      await el.updateComplete;
+      options?.[0]?.click(); // deselect apple
+      await el.updateComplete;
+      expect(el.value).toBe('');
+    });
+
+    it('renders chips for selected values in multiple mode', async () => {
+      const el = await fixture<HxCombobox>(withOptions('multiple value="apple,banana"'));
+      await el.updateComplete;
+      const chips = el.shadowRoot?.querySelectorAll('.field__chip');
+      expect(chips?.length).toBe(2);
+    });
+
+    it('chip remove button removes that value', async () => {
+      const el = await fixture<HxCombobox>(withOptions('multiple value="apple,banana"'));
+      await el.updateComplete;
+      const removeBtn = shadowQuery<HTMLButtonElement>(el, '.field__chip-remove')!;
+      removeBtn.click();
+      await el.updateComplete;
+      expect(el.value).toBe('banana');
+    });
+
+    it('listbox stays open after selection in multiple mode', async () => {
+      const el = await fixture<HxCombobox>(withOptions('multiple'));
+      const input = shadowQuery<HTMLInputElement>(el, 'input')!;
+      input.dispatchEvent(new Event('focus'));
+      await el.updateComplete;
+      const options = el.shadowRoot?.querySelectorAll<HTMLElement>('[role="option"]');
+      options?.[0]?.click();
+      await el.updateComplete;
+      const listbox = shadowQuery(el, '[role="listbox"]');
+      expect(listbox?.hasAttribute('hidden')).toBe(false);
+    });
+
+    it('clear button clears all selected values in multiple mode', async () => {
+      const el = await fixture<HxCombobox>(withOptions('multiple value="apple,banana" clearable'));
+      await el.updateComplete;
+      const clearBtn = shadowQuery<HTMLButtonElement>(el, '[part="clear-button"]')!;
+      clearBtn.click();
+      await el.updateComplete;
+      expect(el.value).toBe('');
+      expect(el.shadowRoot?.querySelectorAll('.field__chip').length).toBe(0);
+    });
+  });
+
   // ─── Methods (1) ───
 
   describe('Methods', () => {
@@ -505,9 +636,7 @@ describe('hx-combobox', () => {
     });
 
     it('has no axe violations when disabled', async () => {
-      const el = await fixture<HxCombobox>(
-        '<hx-combobox label="Fruit" disabled></hx-combobox>',
-      );
+      const el = await fixture<HxCombobox>('<hx-combobox label="Fruit" disabled></hx-combobox>');
       await checkA11y(el);
     });
 
