@@ -404,10 +404,22 @@ export const RelativeTimeAuto: Story = {
 
     return html`
       <div style="display: flex; flex-direction: column; gap: 0.5rem; font-family: sans-serif;">
-        <div><strong>5 minutes ago:</strong> <hx-format-date date=${fiveMinutesAgo} relative lang="en-US"></hx-format-date></div>
-        <div><strong>2 hours ago:</strong> <hx-format-date date=${twoHoursAgo} relative lang="en-US"></hx-format-date></div>
-        <div><strong>3 days ago:</strong> <hx-format-date date=${threeDaysAgo} relative lang="en-US"></hx-format-date></div>
-        <div><strong>In 2 weeks:</strong> <hx-format-date date=${inTwoWeeks} relative lang="en-US"></hx-format-date></div>
+        <div>
+          <strong>5 minutes ago:</strong>
+          <hx-format-date date=${fiveMinutesAgo} relative lang="en-US"></hx-format-date>
+        </div>
+        <div>
+          <strong>2 hours ago:</strong>
+          <hx-format-date date=${twoHoursAgo} relative lang="en-US"></hx-format-date>
+        </div>
+        <div>
+          <strong>3 days ago:</strong>
+          <hx-format-date date=${threeDaysAgo} relative lang="en-US"></hx-format-date>
+        </div>
+        <div>
+          <strong>In 2 weeks:</strong>
+          <hx-format-date date=${inTwoWeeks} relative lang="en-US"></hx-format-date>
+        </div>
       </div>
     `;
   },
@@ -438,10 +450,22 @@ export const RelativeTimeLocales: Story = {
     const twoHoursAgo = new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString();
     return html`
       <div style="display: flex; flex-direction: column; gap: 0.5rem; font-family: sans-serif;">
-        <div><strong>en-US:</strong> <hx-format-date date=${twoHoursAgo} relative lang="en-US"></hx-format-date></div>
-        <div><strong>de:</strong> <hx-format-date date=${twoHoursAgo} relative lang="de"></hx-format-date></div>
-        <div><strong>ja:</strong> <hx-format-date date=${twoHoursAgo} relative lang="ja"></hx-format-date></div>
-        <div><strong>fr:</strong> <hx-format-date date=${twoHoursAgo} relative lang="fr"></hx-format-date></div>
+        <div>
+          <strong>en-US:</strong>
+          <hx-format-date date=${twoHoursAgo} relative lang="en-US"></hx-format-date>
+        </div>
+        <div>
+          <strong>de:</strong>
+          <hx-format-date date=${twoHoursAgo} relative lang="de"></hx-format-date>
+        </div>
+        <div>
+          <strong>ja:</strong>
+          <hx-format-date date=${twoHoursAgo} relative lang="ja"></hx-format-date>
+        </div>
+        <div>
+          <strong>fr:</strong>
+          <hx-format-date date=${twoHoursAgo} relative lang="fr"></hx-format-date>
+        </div>
       </div>
     `;
   },
@@ -502,7 +526,9 @@ export const DischargeDate: Story = {
     <div style="font-family: sans-serif;">
       <table style="border-collapse: collapse; font-size: 0.875rem;">
         <tr>
-          <td style="padding: 0.5rem 1rem 0.5rem 0; color: #6b7280; font-weight: 500;">Admitted:</td>
+          <td style="padding: 0.5rem 1rem 0.5rem 0; color: #6b7280; font-weight: 500;">
+            Admitted:
+          </td>
           <td style="padding: 0.5rem 0;">
             <hx-format-date
               date="2024-06-10T08:30:00.000Z"
@@ -516,7 +542,9 @@ export const DischargeDate: Story = {
           </td>
         </tr>
         <tr>
-          <td style="padding: 0.5rem 1rem 0.5rem 0; color: #6b7280; font-weight: 500;">Discharged:</td>
+          <td style="padding: 0.5rem 1rem 0.5rem 0; color: #6b7280; font-weight: 500;">
+            Discharged:
+          </td>
           <td style="padding: 0.5rem 0;">
             <hx-format-date
               date="2024-06-15T14:30:00.000Z"
@@ -530,7 +558,9 @@ export const DischargeDate: Story = {
           </td>
         </tr>
         <tr>
-          <td style="padding: 0.5rem 1rem 0.5rem 0; color: #6b7280; font-weight: 500;">Duration:</td>
+          <td style="padding: 0.5rem 1rem 0.5rem 0; color: #6b7280; font-weight: 500;">
+            Duration:
+          </td>
           <td style="padding: 0.5rem 0;">5 days</td>
         </tr>
       </table>
@@ -561,7 +591,8 @@ export const InlineParagraph: Story = {
         month="long"
         day="numeric"
         year="numeric"
-      ></hx-format-date>.
+      ></hx-format-date
+      >.
     </p>
   `,
 };

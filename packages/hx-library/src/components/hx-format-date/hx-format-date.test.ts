@@ -14,18 +14,24 @@ describe('hx-format-date', () => {
 
   describe('Rendering', () => {
     it('renders with shadow DOM', async () => {
-      const el = await fixture<HxFormatDate>(`<hx-format-date date="${ISO_DATE}"></hx-format-date>`);
+      const el = await fixture<HxFormatDate>(
+        `<hx-format-date date="${ISO_DATE}"></hx-format-date>`,
+      );
       expect(el.shadowRoot).toBeTruthy();
     });
 
     it('renders a <time> element', async () => {
-      const el = await fixture<HxFormatDate>(`<hx-format-date date="${ISO_DATE}"></hx-format-date>`);
+      const el = await fixture<HxFormatDate>(
+        `<hx-format-date date="${ISO_DATE}"></hx-format-date>`,
+      );
       const time = shadowQuery(el, 'time');
       expect(time).toBeInstanceOf(HTMLElement);
     });
 
     it('exposes "base" CSS part on the <time> element', async () => {
-      const el = await fixture<HxFormatDate>(`<hx-format-date date="${ISO_DATE}"></hx-format-date>`);
+      const el = await fixture<HxFormatDate>(
+        `<hx-format-date date="${ISO_DATE}"></hx-format-date>`,
+      );
       const time = shadowQuery(el, '[part~="base"]');
       expect(time).toBeTruthy();
     });
@@ -43,7 +49,9 @@ describe('hx-format-date', () => {
 
   describe('datetime attribute', () => {
     it('sets the datetime attribute to the ISO 8601 string', async () => {
-      const el = await fixture<HxFormatDate>(`<hx-format-date date="${ISO_DATE}"></hx-format-date>`);
+      const el = await fixture<HxFormatDate>(
+        `<hx-format-date date="${ISO_DATE}"></hx-format-date>`,
+      );
       const time = shadowQuery(el, 'time')!;
       expect(time.getAttribute('datetime')).toBe(new Date(ISO_DATE).toISOString());
     });
@@ -98,7 +106,9 @@ describe('hx-format-date', () => {
     });
 
     it('accepts a Date object via property', async () => {
-      const el = await fixture<HxFormatDate>(`<hx-format-date lang="en-US" month="long" year="numeric" day="numeric"></hx-format-date>`);
+      const el = await fixture<HxFormatDate>(
+        `<hx-format-date lang="en-US" month="long" year="numeric" day="numeric"></hx-format-date>`,
+      );
       const dateObj = new Date(ISO_DATE);
       el.date = dateObj;
       await el.updateComplete;

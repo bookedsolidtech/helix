@@ -21,12 +21,14 @@ no visible content. This means:
   rendering instead.
 
 Use `hx-format-date` when:
+
 - The date display is non-critical to SEO
 - You need client-side locale detection (`navigator.language`) to auto-format for
   the user's browser locale
 - You need relative time display ("2 hours ago") that reflects the browser's current time
 
 Use Drupal's `format_date` / `\Drupal::service('date.formatter')->format()` when:
+
 - SEO matters for the date content
 - You need the formatted date to appear without a JS dependency
 - Server-side timezone handling is preferred
@@ -99,11 +101,11 @@ must periodically re-set the `date` attribute (e.g. via a Drupal Behavior using
 
 All hyphenated attributes work natively in Twig without escaping:
 
-| Component attribute | Twig example                           |
-| ------------------- | -------------------------------------- |
-| `time-zone`         | `time-zone="America/New_York"`         |
-| `time-zone-name`    | `time-zone-name="short"`               |
-| `hour-format`       | `hour-format="24"`                     |
+| Component attribute | Twig example                   |
+| ------------------- | ------------------------------ |
+| `time-zone`         | `time-zone="America/New_York"` |
+| `time-zone-name`    | `time-zone-name="short"`       |
+| `hour-format`       | `hour-format="24"`             |
 
 ---
 
