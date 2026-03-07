@@ -19,6 +19,7 @@ import { helixRippleStyles } from './hx-ripple.styles.js';
  * @cssprop [--hx-ripple-color=currentColor] - Color of the ripple wave.
  * @cssprop [--hx-ripple-opacity=0.2] - Opacity of the ripple wave.
  * @cssprop [--hx-ripple-duration=600ms] - Duration of the ripple animation.
+ * @cssprop [--hx-ripple-scale=4] - Scale factor for the ripple wave at peak expansion.
  */
 @customElement('hx-ripple')
 export class HelixRipple extends LitElement {
@@ -32,26 +33,32 @@ export class HelixRipple extends LitElement {
   color: string | undefined = undefined;
 
   /**
-   * When true, disables ripple creation on pointer events.
+   * When true, disables ripple creation on pointer and keyboard events.
    * @attr disabled
    */
   @property({ type: Boolean, reflect: true })
   disabled = false;
 
+  /**
+   * When true, the ripple wave expands beyond the component bounds.
+   * Used for icon buttons where the ripple should exceed the icon hit area.
+   * @attr unbounded
+   */
+  @property({ type: Boolean, reflect: true })
+  unbounded = false;
+
   private _reduceMotion(): boolean {
     return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   }
 
-  private _handlePointerDown = (e: PointerEvent): void => {
-    if (this.disabled || this._reduceMotion()) return;
-
+  private _createRipple(clientX: number, clientY: number): void {
     const base = this.shadowRoot?.querySelector<HTMLElement>('.ripple__base');
     if (!base) return;
 
     const rect = base.getBoundingClientRect();
     const size = Math.max(rect.width, rect.height);
-    const x = e.clientX - rect.left - size / 2;
-    const y = e.clientY - rect.top - size / 2;
+    const x = clientX - rect.left - size / 2;
+    const y = clientY - rect.top - size / 2;
 
     const ripple = document.createElement('span');
     ripple.className = 'ripple__wave';
@@ -76,16 +83,37 @@ export class HelixRipple extends LitElement {
       },
       { once: true },
     );
+  }
+
+  private _handlePointerDown = (e: PointerEvent): void => {
+    if (this.disabled || this._reduceMotion()) return;
+    this._createRipple(e.clientX, e.clientY);
+  };
+
+  private _handleKeyDown = (e: KeyboardEvent): void => {
+    if (this.disabled || this._reduceMotion()) return;
+    if (e.key !== 'Enter' && e.key !== ' ') return;
+
+    const base = this.shadowRoot?.querySelector<HTMLElement>('.ripple__base');
+    if (!base) return;
+
+    const rect = base.getBoundingClientRect();
+    this._createRipple(rect.left + rect.width / 2, rect.top + rect.height / 2);
   };
 
   override connectedCallback(): void {
     super.connectedCallback();
+    if (!this.hasAttribute('role')) {
+      this.setAttribute('role', 'presentation');
+    }
     this.addEventListener('pointerdown', this._handlePointerDown);
+    this.addEventListener('keydown', this._handleKeyDown);
   }
 
   override disconnectedCallback(): void {
     super.disconnectedCallback();
     this.removeEventListener('pointerdown', this._handlePointerDown);
+    this.removeEventListener('keydown', this._handleKeyDown);
   }
 
   override render() {
