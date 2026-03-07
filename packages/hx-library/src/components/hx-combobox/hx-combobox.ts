@@ -7,11 +7,18 @@ import { helixComboboxStyles } from './hx-combobox.styles.js';
 
 // ─── Internal option model ───
 
-interface ComboboxOption {
+// P1-7: Exported so TypeScript consumers can type option arrays programmatically
+export interface ComboboxOption {
   value: string;
   label: string;
   disabled: boolean;
 }
+
+// P2-13: Exported size type for TypeScript consumers
+export type HxComboboxSize = 'sm' | 'md' | 'lg';
+
+// P2-6: Module-level counter for deterministic, collision-free IDs
+let _comboboxIdCounter = 0;
 
 /**
  * A form-associated combobox component combining a text input with a listbox
@@ -71,7 +78,8 @@ export class HelixCombobox extends LitElement {
 
   // ─── Stable IDs ───
 
-  private _id = `hx-combobox-${Math.random().toString(36).slice(2, 9)}`;
+  // P2-6: Use module-level counter instead of Math.random() to guarantee uniqueness
+  private _id = `hx-combobox-${++_comboboxIdCounter}`;
   private _listboxId = `${this._id}-listbox`;
   private _helpTextId = `${this._id}-help`;
   private _errorId = `${this._id}-error`;
@@ -139,7 +147,7 @@ export class HelixCombobox extends LitElement {
    * @attr hx-size
    */
   @property({ type: String, attribute: 'hx-size', reflect: true })
-  size: 'sm' | 'md' | 'lg' = 'md';
+  size: HxComboboxSize = 'md';
 
   /**
    * Whether multiple options can be selected.
@@ -192,6 +200,14 @@ export class HelixCombobox extends LitElement {
   // ─── Debounce timer ───
 
   private _debounceTimer: ReturnType<typeof setTimeout> | null = null;
+
+  // ─── Multiple Selection ───
+
+  // P0-1: Derive selected values Set from the comma-separated value property
+  private get _selectedValuesSet(): Set<string> {
+    if (!this.multiple || !this.value) return new Set();
+    return new Set(this.value.split(',').filter(Boolean));
+  }
 
   // ─── Filtered options ───
 
@@ -274,8 +290,14 @@ export class HelixCombobox extends LitElement {
   }
 
   /** Called when the browser restores form state (e.g., bfcache navigation). */
-  formStateRestoreCallback(state: string): void {
-    this.value = state;
+  // P1-6: Correct signature per WHATWG spec — includes mode param and all state types
+  formStateRestoreCallback(
+    state: string | File | FormData | null,
+    _mode?: 'restore' | 'autocomplete',
+  ): void {
+    if (typeof state === 'string') {
+      this.value = state;
+    }
   }
 
   // ─── Option Syncing from Slot ───
@@ -429,6 +451,20 @@ export class HelixCombobox extends LitElement {
         this._closeDropdown();
         break;
       }
+      // P1-1: Home/End keyboard navigation for option list
+      case 'Home': {
+        e.preventDefault();
+        if (!this._open) this._openDropdown();
+        this._focusedOptionIndex = enabledIndices.length > 0 ? (enabledIndices[0] ?? -1) : -1;
+        break;
+      }
+      case 'End': {
+        e.preventDefault();
+        if (!this._open) this._openDropdown();
+        this._focusedOptionIndex =
+          enabledIndices.length > 0 ? (enabledIndices[enabledIndices.length - 1] ?? -1) : -1;
+        break;
+      }
       default:
         break;
     }
@@ -436,13 +472,34 @@ export class HelixCombobox extends LitElement {
 
   // ─── Selection ───
 
+  // P0-1: Handle both single and multiple selection modes
   private _selectOption(option: ComboboxOption): void {
     if (option.disabled) return;
-    this.value = option.value;
+    if (this.multiple) {
+      const current = this._selectedValuesSet;
+      const next = new Set(current);
+      if (next.has(option.value)) {
+        next.delete(option.value);
+      } else {
+        next.add(option.value);
+      }
+      this.value = [...next].join(',');
+      // Keep dropdown open for multiple selection so user can pick more
+    } else {
+      this.value = option.value;
+      this._closeDropdown();
+    }
     this._filterText = '';
     if (this._input) this._input.value = '';
     this._dispatchChange();
-    this._closeDropdown();
+  }
+
+  // P0-1: Remove a single value from multi-selection
+  private _removeValue(val: string): void {
+    const next = this._selectedValuesSet;
+    next.delete(val);
+    this.value = [...next].join(',');
+    this._dispatchChange();
   }
 
   // ─── Clear ───
@@ -494,6 +551,8 @@ export class HelixCombobox extends LitElement {
   }
 
   private get _displayValue(): string {
+    // P0-1: In multiple mode, chips render selected values — input shows only filter text
+    if (this.multiple) return '';
     if (!this.value) return '';
     const opt = this._options.find((o) => o.value === this.value);
     return opt ? opt.label : this.value;
@@ -511,7 +570,10 @@ export class HelixCombobox extends LitElement {
     }
 
     return filtered.map((opt, index) => {
-      const isSelected = opt.value === this.value;
+      // P0-1: Use Set membership for multiple mode, direct equality for single mode
+      const isSelected = this.multiple
+        ? this._selectedValuesSet.has(opt.value)
+        : opt.value === this.value;
       const isFocused = index === this._focusedOptionIndex;
 
       return html`
@@ -586,6 +648,44 @@ export class HelixCombobox extends LitElement {
           <!-- Prefix Slot -->
           <slot name="prefix" class="field__prefix"></slot>
 
+          <!-- P0-1: Selected value chips for multiple mode -->
+          ${this.multiple && this._selectedValuesSet.size > 0
+            ? [...this._selectedValuesSet].map((val) => {
+                const opt = this._options.find((o) => o.value === val);
+                const label = opt ? opt.label : val;
+                return html`
+                  <span class="field__chip">
+                    <span class="field__chip-label">${label}</span>
+                    <button
+                      type="button"
+                      class="field__chip-remove"
+                      aria-label="Remove ${label}"
+                      @click=${(e: Event) => {
+                        e.stopPropagation();
+                        this._removeValue(val);
+                      }}
+                    >
+                      <svg
+                        width="8"
+                        height="8"
+                        viewBox="0 0 8 8"
+                        fill="none"
+                        aria-hidden="true"
+                        focusable="false"
+                      >
+                        <path
+                          d="M1 1L7 7M7 1L1 7"
+                          stroke="currentColor"
+                          stroke-width="1.5"
+                          stroke-linecap="round"
+                        />
+                      </svg>
+                    </button>
+                  </span>
+                `;
+              })
+            : nothing}
+
           <!-- Text Input (combobox role) -->
           <input
             part="input"
@@ -601,7 +701,7 @@ export class HelixCombobox extends LitElement {
             aria-describedby=${ifDefined(describedBy)}
             aria-required=${this.required ? 'true' : nothing}
             aria-label=${ifDefined(this.ariaLabel ?? undefined)}
-            aria-multiselectable=${this.multiple ? 'true' : nothing}
+            aria-busy=${this.loading ? 'true' : nothing}
             .value=${this._filterText || (this._open ? '' : this._displayValue)}
             placeholder=${ifDefined(this.placeholder || undefined)}
             ?disabled=${this.disabled}
@@ -630,7 +730,7 @@ export class HelixCombobox extends LitElement {
                   type="button"
                   class="field__clear-button"
                   aria-label="Clear"
-                  tabindex="-1"
+                  tabindex="0"
                   @click=${this._handleClear}
                 >
                   <svg
@@ -675,13 +775,7 @@ export class HelixCombobox extends LitElement {
         <!-- Error -->
         <slot name="error" @slotchange=${this._handleErrorSlotChange}>
           ${hasError
-            ? html`<div
-                part="error"
-                class="field__error"
-                id=${this._errorId}
-                role="alert"
-                aria-live="polite"
-              >
+            ? html`<div part="error" class="field__error" id=${this._errorId} role="alert">
                 ${this.error}
               </div>`
             : nothing}

@@ -193,13 +193,23 @@ export const WithOptions: Story = {
 
 export const Multiple: Story = {
   render: () => html`
-    <hx-combobox label="Skills" placeholder="Select skills..." multiple>
-      <option slot="option" value="js">JavaScript</option>
-      <option slot="option" value="ts">TypeScript</option>
-      <option slot="option" value="react">React</option>
-      <option slot="option" value="lit">Lit</option>
-      <option slot="option" value="css">CSS</option>
-    </hx-combobox>
+    <div style="max-width: 400px;">
+      <hx-combobox
+        label="Skills"
+        placeholder="Select skills..."
+        multiple
+        clearable
+        help-text="Select one or more skills. Chips appear for each selection."
+      >
+        <option slot="option" value="js">JavaScript</option>
+        <option slot="option" value="ts">TypeScript</option>
+        <option slot="option" value="react">React</option>
+        <option slot="option" value="lit">Lit</option>
+        <option slot="option" value="css">CSS</option>
+        <option slot="option" value="html">HTML</option>
+        <option slot="option" value="a11y">Accessibility</option>
+      </hx-combobox>
+    </div>
   `,
 };
 
@@ -296,6 +306,60 @@ export const WithError: Story = {
       <option slot="option" value="neurology">Neurology</option>
       <option slot="option" value="oncology">Oncology</option>
     </hx-combobox>
+  `,
+};
+
+// ─────────────────────────────────────────────────
+// Prefix and Suffix Slots (P2-3)
+// ─────────────────────────────────────────────────
+
+export const WithPrefixSuffix: Story = {
+  render: () => html`
+    <div style="display: flex; flex-direction: column; gap: 1rem; max-width: 400px;">
+      <hx-combobox label="Search with icon prefix" placeholder="Search medications...">
+        <span slot="prefix" aria-hidden="true" style="padding-left: 0.5rem;">🔍</span>
+        <option slot="option" value="aspirin">Aspirin 81mg</option>
+        <option slot="option" value="metformin">Metformin 500mg</option>
+        <option slot="option" value="lisinopril">Lisinopril 10mg</option>
+      </hx-combobox>
+      <hx-combobox label="Search with suffix badge" placeholder="Select status...">
+        <span
+          slot="suffix"
+          aria-hidden="true"
+          style="padding-right: 0.5rem; font-size: 0.75rem; color: #6c757d;"
+          >↕</span
+        >
+        <option slot="option" value="active">Active</option>
+        <option slot="option" value="inactive">Inactive</option>
+        <option slot="option" value="pending">Pending</option>
+      </hx-combobox>
+    </div>
+  `,
+};
+
+// ─────────────────────────────────────────────────
+// Custom Empty Label Slot (P2-4)
+// ─────────────────────────────────────────────────
+
+export const WithCustomEmptyLabel: Story = {
+  render: () => html`
+    <div style="max-width: 400px;">
+      <hx-combobox
+        label="Diagnosis Code"
+        placeholder="Type to search ICD-10 codes..."
+        help-text="Type at least 3 characters to see matching codes."
+      >
+        <div slot="empty-label" style="padding: 0.75rem; text-align: center; color: #6c757d;">
+          <p style="margin: 0; font-size: 0.875rem; font-weight: 500;">No matching codes found</p>
+          <p style="margin: 0.25rem 0 0; font-size: 0.75rem;">
+            Try a different search term or consult the ICD-10 reference.
+          </p>
+        </div>
+        <option slot="option" value="j06.9">J06.9 — Acute upper respiratory infection</option>
+        <option slot="option" value="i10">I10 — Essential hypertension</option>
+        <option slot="option" value="e11.9">E11.9 — Type 2 diabetes mellitus</option>
+      </hx-combobox>
+    </div>
   `,
 };
 
