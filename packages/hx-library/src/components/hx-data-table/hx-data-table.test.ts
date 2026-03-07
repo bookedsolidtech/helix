@@ -684,14 +684,13 @@ describe('hx-data-table', () => {
       el.rows = ROWS;
       await el.updateComplete;
 
-      const tds = el.shadowRoot!.querySelectorAll<HTMLElement>('tbody td[part~="td"]');
-      // Focus first non-checkbox td (column 0 of row 0)
-      const firstDataTd = tds[0];
+      // Query specifically for a data td (has data-row-index); checkbox tds don't
+      const firstDataTd = el.shadowRoot!.querySelector<HTMLElement>('tbody td[data-row-index="0"]')!;
       firstDataTd.setAttribute('tabindex', '0');
       firstDataTd.focus();
 
       const eventPromise = oneEvent<CustomEvent>(el, 'hx-select');
-      await userEvent.keyboard('{ }');
+      await userEvent.keyboard(' ');
       const event = await eventPromise;
 
       expect(event.detail.selectedRows).toHaveLength(1);
