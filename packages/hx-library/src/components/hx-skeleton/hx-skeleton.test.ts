@@ -28,11 +28,17 @@ describe('hx-skeleton', () => {
       expect(base).toBeInstanceOf(HTMLSpanElement);
     });
 
-    it('is hidden from assistive technology', async () => {
+    it('is hidden from assistive technology (shadow child)', async () => {
       const el = await fixture<HelixSkeleton>('<hx-skeleton></hx-skeleton>');
       const base = shadowQuery(el, '[part="base"]')!;
       expect(base.getAttribute('aria-hidden')).toBe('true');
       expect(base.getAttribute('role')).toBe('presentation');
+    });
+
+    it('sets aria-hidden and role on host element', async () => {
+      const el = await fixture<HelixSkeleton>('<hx-skeleton></hx-skeleton>');
+      expect(el.getAttribute('aria-hidden')).toBe('true');
+      expect(el.getAttribute('role')).toBe('presentation');
     });
   });
 
@@ -61,6 +67,12 @@ describe('hx-skeleton', () => {
       expect(base.classList.contains('skeleton--circle')).toBe(true);
     });
 
+    it('applies rect variant class', async () => {
+      const el = await fixture<HelixSkeleton>('<hx-skeleton variant="rect"></hx-skeleton>');
+      const base = shadowQuery(el, '[part="base"]')!;
+      expect(base.classList.contains('skeleton--rect')).toBe(true);
+    });
+
     it('applies button variant class', async () => {
       const el = await fixture<HelixSkeleton>('<hx-skeleton variant="button"></hx-skeleton>');
       const base = shadowQuery(el, '[part="base"]')!;
@@ -82,8 +94,9 @@ describe('hx-skeleton', () => {
       expect(base.classList.contains('skeleton--animated')).toBe(true);
     });
 
-    it('does not apply animated class when animated is false', async () => {
-      const el = await fixture<HelixSkeleton>('<hx-skeleton animated="false"></hx-skeleton>');
+    it('does not apply animated class when animated attribute is absent', async () => {
+      const el = await fixture<HelixSkeleton>('<hx-skeleton></hx-skeleton>');
+      el.removeAttribute('animated');
       el.animated = false;
       await el.updateComplete;
       const base = shadowQuery(el, '[part="base"]')!;
