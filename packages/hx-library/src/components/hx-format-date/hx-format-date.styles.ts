@@ -5,7 +5,7 @@ export const helixFormatDateStyles = css`
     display: inline;
   }
 
-  time {
+  [part='base'] {
     display: inline;
     font: inherit;
     color: inherit;

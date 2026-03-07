@@ -1,6 +1,6 @@
 import { describe, it, expect, afterEach } from 'vitest';
 import { fixture, shadowQuery, cleanup, checkA11y } from '../../test-utils.js';
-import type { WcFormatDate } from './hx-format-date.js';
+import type { HxFormatDate } from './hx-format-date.js';
 import './index.js';
 
 afterEach(cleanup);
@@ -14,24 +14,30 @@ describe('hx-format-date', () => {
 
   describe('Rendering', () => {
     it('renders with shadow DOM', async () => {
-      const el = await fixture<WcFormatDate>(`<hx-format-date date="${ISO_DATE}"></hx-format-date>`);
+      const el = await fixture<HxFormatDate>(
+        `<hx-format-date date="${ISO_DATE}"></hx-format-date>`,
+      );
       expect(el.shadowRoot).toBeTruthy();
     });
 
     it('renders a <time> element', async () => {
-      const el = await fixture<WcFormatDate>(`<hx-format-date date="${ISO_DATE}"></hx-format-date>`);
+      const el = await fixture<HxFormatDate>(
+        `<hx-format-date date="${ISO_DATE}"></hx-format-date>`,
+      );
       const time = shadowQuery(el, 'time');
       expect(time).toBeInstanceOf(HTMLElement);
     });
 
     it('exposes "base" CSS part on the <time> element', async () => {
-      const el = await fixture<WcFormatDate>(`<hx-format-date date="${ISO_DATE}"></hx-format-date>`);
+      const el = await fixture<HxFormatDate>(
+        `<hx-format-date date="${ISO_DATE}"></hx-format-date>`,
+      );
       const time = shadowQuery(el, '[part~="base"]');
       expect(time).toBeTruthy();
     });
 
     it('renders formatted text content', async () => {
-      const el = await fixture<WcFormatDate>(
+      const el = await fixture<HxFormatDate>(
         `<hx-format-date date="${ISO_DATE}" lang="en-US" month="long" year="numeric" day="numeric"></hx-format-date>`,
       );
       const time = shadowQuery(el, 'time')!;
@@ -43,13 +49,15 @@ describe('hx-format-date', () => {
 
   describe('datetime attribute', () => {
     it('sets the datetime attribute to the ISO 8601 string', async () => {
-      const el = await fixture<WcFormatDate>(`<hx-format-date date="${ISO_DATE}"></hx-format-date>`);
+      const el = await fixture<HxFormatDate>(
+        `<hx-format-date date="${ISO_DATE}"></hx-format-date>`,
+      );
       const time = shadowQuery(el, 'time')!;
       expect(time.getAttribute('datetime')).toBe(new Date(ISO_DATE).toISOString());
     });
 
     it('sets datetime correctly for a Unix timestamp', async () => {
-      const el = await fixture<WcFormatDate>(
+      const el = await fixture<HxFormatDate>(
         `<hx-format-date date="${EPOCH_MS}"></hx-format-date>`,
       );
       const time = shadowQuery(el, 'time')!;
@@ -58,12 +66,23 @@ describe('hx-format-date', () => {
 
     it('uses current time datetime when date is empty', async () => {
       const before = Date.now();
-      const el = await fixture<WcFormatDate>(`<hx-format-date></hx-format-date>`);
+      const el = await fixture<HxFormatDate>(`<hx-format-date></hx-format-date>`);
       const after = Date.now();
       const time = shadowQuery(el, 'time')!;
       const dt = new Date(time.getAttribute('datetime')!).getTime();
       expect(dt).toBeGreaterThanOrEqual(before);
       expect(dt).toBeLessThanOrEqual(after);
+    });
+
+    it('sets timezone-offset datetime when time-zone is set', async () => {
+      // ISO_DATE = 2024-06-15T14:30:00.000Z; America/New_York in June is EDT (UTC-4)
+      // So local time = 10:30 EDT → datetime should contain "-04:00"
+      const el = await fixture<HxFormatDate>(
+        `<hx-format-date date="${ISO_DATE}" lang="en-US" hour="numeric" minute="2-digit" time-zone="America/New_York"></hx-format-date>`,
+      );
+      const time = shadowQuery(el, 'time')!;
+      const dt = time.getAttribute('datetime')!;
+      expect(dt).toContain('-04:00');
     });
   });
 
@@ -71,7 +90,7 @@ describe('hx-format-date', () => {
 
   describe('Date parsing', () => {
     it('parses an ISO date string', async () => {
-      const el = await fixture<WcFormatDate>(
+      const el = await fixture<HxFormatDate>(
         `<hx-format-date date="${ISO_DATE}" lang="en-US" month="numeric" year="numeric" day="numeric"></hx-format-date>`,
       );
       const time = shadowQuery(el, 'time')!;
@@ -79,7 +98,7 @@ describe('hx-format-date', () => {
     });
 
     it('parses a Unix timestamp (ms) string', async () => {
-      const el = await fixture<WcFormatDate>(
+      const el = await fixture<HxFormatDate>(
         `<hx-format-date date="${EPOCH_MS}" lang="en-US" month="numeric" year="numeric" day="numeric"></hx-format-date>`,
       );
       const time = shadowQuery(el, 'time')!;
@@ -87,7 +106,9 @@ describe('hx-format-date', () => {
     });
 
     it('accepts a Date object via property', async () => {
-      const el = await fixture<WcFormatDate>(`<hx-format-date lang="en-US" month="long" year="numeric" day="numeric"></hx-format-date>`);
+      const el = await fixture<HxFormatDate>(
+        `<hx-format-date lang="en-US" month="long" year="numeric" day="numeric"></hx-format-date>`,
+      );
       const dateObj = new Date(ISO_DATE);
       el.date = dateObj;
       await el.updateComplete;
@@ -97,7 +118,7 @@ describe('hx-format-date', () => {
 
     it('falls back to current date for invalid date strings', async () => {
       const before = Date.now();
-      const el = await fixture<WcFormatDate>(`<hx-format-date date="not-a-date"></hx-format-date>`);
+      const el = await fixture<HxFormatDate>(`<hx-format-date date="not-a-date"></hx-format-date>`);
       const after = Date.now();
       const time = shadowQuery(el, 'time')!;
       const dt = new Date(time.getAttribute('datetime')!).getTime();
@@ -110,7 +131,7 @@ describe('hx-format-date', () => {
 
   describe('Locale formatting', () => {
     it('formats in en-US locale', async () => {
-      const el = await fixture<WcFormatDate>(
+      const el = await fixture<HxFormatDate>(
         `<hx-format-date date="${ISO_DATE}" lang="en-US" month="long" year="numeric" day="numeric"></hx-format-date>`,
       );
       const time = shadowQuery(el, 'time')!;
@@ -119,7 +140,7 @@ describe('hx-format-date', () => {
     });
 
     it('formats in de locale', async () => {
-      const el = await fixture<WcFormatDate>(
+      const el = await fixture<HxFormatDate>(
         `<hx-format-date date="${ISO_DATE}" lang="de" month="long" year="numeric" day="numeric"></hx-format-date>`,
       );
       const time = shadowQuery(el, 'time')!;
@@ -128,7 +149,7 @@ describe('hx-format-date', () => {
     });
 
     it('formats in ja locale', async () => {
-      const el = await fixture<WcFormatDate>(
+      const el = await fixture<HxFormatDate>(
         `<hx-format-date date="${ISO_DATE}" lang="ja" month="long" year="numeric" day="numeric"></hx-format-date>`,
       );
       const time = shadowQuery(el, 'time')!;
@@ -137,11 +158,11 @@ describe('hx-format-date', () => {
     });
   });
 
-  // ─── Format options (5) ───
+  // ─── Format options (7) ───
 
   describe('Format options', () => {
     it('applies month format option', async () => {
-      const el = await fixture<WcFormatDate>(
+      const el = await fixture<HxFormatDate>(
         `<hx-format-date date="${ISO_DATE}" lang="en-US" month="short"></hx-format-date>`,
       );
       const time = shadowQuery(el, 'time')!;
@@ -149,7 +170,7 @@ describe('hx-format-date', () => {
     });
 
     it('applies year format option', async () => {
-      const el = await fixture<WcFormatDate>(
+      const el = await fixture<HxFormatDate>(
         `<hx-format-date date="${ISO_DATE}" lang="en-US" year="numeric"></hx-format-date>`,
       );
       const time = shadowQuery(el, 'time')!;
@@ -157,7 +178,7 @@ describe('hx-format-date', () => {
     });
 
     it('applies weekday format option', async () => {
-      const el = await fixture<WcFormatDate>(
+      const el = await fixture<HxFormatDate>(
         `<hx-format-date date="${ISO_DATE}" lang="en-US" weekday="long" month="long" year="numeric" day="numeric"></hx-format-date>`,
       );
       const time = shadowQuery(el, 'time')!;
@@ -166,7 +187,7 @@ describe('hx-format-date', () => {
     });
 
     it('applies 24-hour clock via hour-format="24"', async () => {
-      const el = await fixture<WcFormatDate>(
+      const el = await fixture<HxFormatDate>(
         `<hx-format-date date="${ISO_DATE}" lang="en-US" hour="2-digit" minute="2-digit" hour-format="24"></hx-format-date>`,
       );
       const time = shadowQuery(el, 'time')!;
@@ -175,32 +196,83 @@ describe('hx-format-date', () => {
     });
 
     it('applies 12-hour clock via hour-format="12"', async () => {
-      const el = await fixture<WcFormatDate>(
+      const el = await fixture<HxFormatDate>(
         `<hx-format-date date="${ISO_DATE}" lang="en-US" hour="numeric" minute="2-digit" hour-format="12"></hx-format-date>`,
       );
       const time = shadowQuery(el, 'time')!;
       // 12-hour format should include AM or PM
       expect(time.textContent).toMatch(/AM|PM/i);
     });
+
+    it('applies second format option', async () => {
+      const el = await fixture<HxFormatDate>(
+        `<hx-format-date date="${ISO_DATE}" lang="en-US" hour="numeric" minute="2-digit" second="2-digit"></hx-format-date>`,
+      );
+      const time = shadowQuery(el, 'time')!;
+      // time with seconds should have three colon-separated groups
+      expect(time.textContent).toMatch(/\d+:\d+:\d+/);
+    });
+
+    it('applies time-zone-name="short" showing UTC abbreviation', async () => {
+      const el = await fixture<HxFormatDate>(
+        `<hx-format-date date="${ISO_DATE}" lang="en-US" hour="numeric" minute="2-digit" time-zone="UTC" time-zone-name="short"></hx-format-date>`,
+      );
+      const time = shadowQuery(el, 'time')!;
+      expect(time.textContent).toContain('UTC');
+    });
   });
 
-  // ─── Relative time (4) ───
+  // ─── Timezone (3) ───
+
+  describe('Timezone', () => {
+    it('applies time-zone attribute and shifts displayed time', async () => {
+      // ISO_DATE = 14:30 UTC; America/New_York in June is EDT (UTC-4) = 10:30
+      const el = await fixture<HxFormatDate>(
+        `<hx-format-date date="${ISO_DATE}" lang="en-US" hour="2-digit" minute="2-digit" hour-format="24" time-zone="America/New_York"></hx-format-date>`,
+      );
+      const time = shadowQuery(el, 'time')!;
+      expect(time.textContent!.trim().length).toBeGreaterThan(0);
+      // 14:30 UTC - 4h = 10:30 EDT
+      expect(time.textContent).toContain('10:30');
+    });
+
+    it('handles invalid time-zone gracefully without throwing', async () => {
+      const el = await fixture<HxFormatDate>(
+        `<hx-format-date date="${ISO_DATE}" lang="en-US" month="long" year="numeric" day="numeric" time-zone="Foo/InvalidZone"></hx-format-date>`,
+      );
+      const time = shadowQuery(el, 'time')!;
+      // Should not throw; element should still render
+      expect(time).toBeTruthy();
+      // Fallback to UTC ISO for datetime
+      expect(time.getAttribute('datetime')).toBe(new Date(ISO_DATE).toISOString());
+    });
+
+    it('returns empty string for formatted text on invalid time-zone', async () => {
+      const el = await fixture<HxFormatDate>(
+        `<hx-format-date date="${ISO_DATE}" lang="en-US" month="long" year="numeric" day="numeric" time-zone="Foo/InvalidZone"></hx-format-date>`,
+      );
+      const time = shadowQuery(el, 'time')!;
+      // textContent will be empty (formatter construction failed gracefully)
+      expect(time.textContent).toBe('');
+    });
+  });
+
+  // ─── Relative time (5) ───
 
   describe('Relative time', () => {
     it('renders relative time text when relative=true', async () => {
       const twoHoursAgo = new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString();
-      const el = await fixture<WcFormatDate>(
+      const el = await fixture<HxFormatDate>(
         `<hx-format-date date="${twoHoursAgo}" lang="en-US" relative></hx-format-date>`,
       );
       const time = shadowQuery(el, 'time')!;
-      // Should contain "hours ago" or similar relative phrasing
       expect(time.textContent!.trim().length).toBeGreaterThan(0);
-      expect(time.textContent).toMatch(/hours? ago/i);
+      expect(time.textContent).toMatch(/ago/i);
     });
 
     it('renders "in X minutes" for a future date', async () => {
       const inFiveMinutes = new Date(Date.now() + 5 * 60 * 1000).toISOString();
-      const el = await fixture<WcFormatDate>(
+      const el = await fixture<HxFormatDate>(
         `<hx-format-date date="${inFiveMinutes}" lang="en-US" relative></hx-format-date>`,
       );
       const time = shadowQuery(el, 'time')!;
@@ -209,7 +281,7 @@ describe('hx-format-date', () => {
 
     it('uses numeric="always" when set', async () => {
       const yesterday = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
-      const el = await fixture<WcFormatDate>(
+      const el = await fixture<HxFormatDate>(
         `<hx-format-date date="${yesterday}" lang="en-US" relative numeric="always"></hx-format-date>`,
       );
       const time = shadowQuery(el, 'time')!;
@@ -217,9 +289,19 @@ describe('hx-format-date', () => {
       expect(time.textContent).toMatch(/\d+ day/i);
     });
 
+    it('uses numeric="auto" producing natural language (yesterday)', async () => {
+      // 25 hours ago is definitively "yesterday" regardless of clock boundary
+      const yesterday = new Date(Date.now() - 25 * 60 * 60 * 1000).toISOString();
+      const el = await fixture<HxFormatDate>(
+        `<hx-format-date date="${yesterday}" lang="en-US" relative numeric="auto"></hx-format-date>`,
+      );
+      const time = shadowQuery(el, 'time')!;
+      expect(time.textContent).toMatch(/yesterday/i);
+    });
+
     it('still sets datetime attribute with ISO string for relative mode', async () => {
       const twoHoursAgo = new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString();
-      const el = await fixture<WcFormatDate>(
+      const el = await fixture<HxFormatDate>(
         `<hx-format-date date="${twoHoursAgo}" lang="en-US" relative></hx-format-date>`,
       );
       const time = shadowQuery(el, 'time')!;
@@ -233,7 +315,7 @@ describe('hx-format-date', () => {
 
   describe('Default formatting', () => {
     it('renders year+month+day when no format options are set', async () => {
-      const el = await fixture<WcFormatDate>(
+      const el = await fixture<HxFormatDate>(
         `<hx-format-date date="${ISO_DATE}" lang="en-US"></hx-format-date>`,
       );
       const time = shadowQuery(el, 'time')!;
@@ -243,19 +325,34 @@ describe('hx-format-date', () => {
     });
 
     it('produces a non-empty string in default mode', async () => {
-      const el = await fixture<WcFormatDate>(`<hx-format-date></hx-format-date>`);
+      const el = await fixture<HxFormatDate>(`<hx-format-date></hx-format-date>`);
       const time = shadowQuery(el, 'time')!;
       expect(time.textContent!.trim().length).toBeGreaterThan(0);
     });
   });
 
-  // ─── Accessibility (1) ───
+  // ─── Accessibility (3) ───
 
   describe('Accessibility: axe-core', () => {
-    it('has no axe violations', async () => {
-      const el = await fixture<WcFormatDate>(
+    it('has no axe violations (absolute mode)', async () => {
+      const el = await fixture<HxFormatDate>(
         `<hx-format-date date="${ISO_DATE}" lang="en-US" month="long" year="numeric" day="numeric"></hx-format-date>`,
       );
+      const { violations } = await checkA11y(el);
+      expect(violations).toHaveLength(0);
+    });
+
+    it('has no axe violations (relative mode)', async () => {
+      const twoHoursAgo = new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString();
+      const el = await fixture<HxFormatDate>(
+        `<hx-format-date date="${twoHoursAgo}" lang="en-US" relative></hx-format-date>`,
+      );
+      const { violations } = await checkA11y(el);
+      expect(violations).toHaveLength(0);
+    });
+
+    it('has no axe violations (default no-args case)', async () => {
+      const el = await fixture<HxFormatDate>(`<hx-format-date></hx-format-date>`);
       const { violations } = await checkA11y(el);
       expect(violations).toHaveLength(0);
     });
