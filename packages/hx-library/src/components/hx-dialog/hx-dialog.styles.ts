@@ -15,6 +15,9 @@ export const helixDialogStyles = css`
     max-width: 100%;
     max-height: 100%;
     overflow: visible;
+    /* D5 — ensure native dialog element renders above the non-modal backdrop sibling */
+    position: relative;
+    z-index: calc(var(--hx-z-index-modal, 100) + 1);
   }
 
   /* ─── Dialog container ─── */
@@ -77,7 +80,8 @@ export const helixDialogStyles = css`
     inset: 0;
     background-color: var(--hx-dialog-backdrop-color, var(--hx-color-neutral-900));
     opacity: var(--hx-dialog-backdrop-opacity, 0.5);
-    z-index: var(--hx-z-index-modal);
+    /* D5 — backdrop z-index must be lower than the dialog element's z-index */
+    z-index: var(--hx-z-index-modal, 100);
   }
 
   /* ─── Header ─── */
@@ -100,6 +104,44 @@ export const helixDialogStyles = css`
     font-weight: var(--hx-font-weight-semibold);
     line-height: var(--hx-line-height-snug);
     color: var(--hx-dialog-heading-color, var(--hx-color-neutral-900));
+    flex: 1 1 auto;
+  }
+
+  /* ─── Built-in close button (D17) ─── */
+
+  .dialog__close-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: var(--hx-spacing-8, 2rem);
+    height: var(--hx-spacing-8, 2rem);
+    padding: 0;
+    margin-left: auto;
+    background: transparent;
+    border: none;
+    border-radius: var(--hx-border-radius-sm, 0.25rem);
+    cursor: pointer;
+    color: var(--hx-color-neutral-500, #6b7280);
+    font-size: 1.25rem;
+    line-height: 1;
+    transition:
+      color var(--hx-duration-100, 100ms) ease,
+      background-color var(--hx-duration-100, 100ms) ease;
+  }
+
+  .dialog__close-btn::before {
+    content: '×';
+  }
+
+  .dialog__close-btn:hover {
+    color: var(--hx-color-neutral-900, #111827);
+    background-color: var(--hx-color-neutral-100, #f3f4f6);
+  }
+
+  .dialog__close-btn:focus-visible {
+    outline: 2px solid var(--hx-color-primary-500, #3b82f6);
+    outline-offset: 2px;
   }
 
   /* ─── Body ─── */
@@ -122,5 +164,19 @@ export const helixDialogStyles = css`
     border-top: var(--hx-border-width-1) solid
       var(--hx-dialog-footer-border-color, var(--hx-color-neutral-200));
     flex-shrink: 0;
+  }
+
+  /* ─── Visually-hidden description (D8) ─── */
+
+  .dialog__description {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
   }
 `;

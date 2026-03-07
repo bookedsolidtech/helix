@@ -252,14 +252,15 @@ export const NoBackdropClose: Story = {
  *
  * Common in healthcare dashboards where dialog headers must include
  * patient identifiers, alert severity indicators, or workflow step labels.
+ *
+ * **Accessibility note:** When using a custom header slot without a `heading` attribute,
+ * you MUST provide `aria-label` on `<hx-dialog>` to give the dialog an accessible name.
  */
 export const WithCustomHeader: Story = {
+  // D2 — added aria-label="Critical Alert" to give the dialog an accessible name
   render: () => html`
-    <hx-dialog open modal>
-      <div
-        slot="header"
-        style="display: flex; align-items: center; gap: 0.75rem; width: 100%;"
-      >
+    <hx-dialog open modal aria-label="Critical Alert">
+      <div slot="header" style="display: flex; align-items: center; gap: 0.75rem; width: 100%;">
         <span
           style="
             display: inline-flex;
@@ -309,6 +310,7 @@ export const WithCustomHeader: Story = {
     const dialog = canvasElement.querySelector('hx-dialog');
     await expect(dialog).toBeTruthy();
     await expect(dialog?.hasAttribute('open')).toBe(true);
+    await expect(dialog?.getAttribute('aria-label')).toBe('Critical Alert');
 
     const customHeader = canvasElement.querySelector('[slot="header"]');
     await expect(customHeader).toBeTruthy();
@@ -332,9 +334,8 @@ export const WithFooter: Story = {
     <hx-dialog open modal heading="Discharge Patient">
       <p style="margin: 0 0 0.75rem; font-size: 0.875rem;">
         You are about to discharge
-        <strong>John Smith</strong> from
-        <strong>Ward 3, Bed 12</strong>. Please confirm the discharge summary has been completed and
-        reviewed.
+        <strong>John Smith</strong> from <strong>Ward 3, Bed 12</strong>. Please confirm the
+        discharge summary has been completed and reviewed.
       </p>
       <ul
         style="margin: 0; padding: 0 0 0 1.25rem; font-size: 0.875rem; color: #374151; line-height: 1.75;"
@@ -394,6 +395,10 @@ export const WithFooter: Story = {
  * dialogs in application-level code — the dialog starts closed and is opened
  * in response to a user action.
  *
+ * **Focus restoration:** When the dialog closes (via the built-in × button, the Cancel
+ * button, or Escape), focus automatically returns to `#open-dialog-btn`. This behaviour
+ * is built into the component — no manual wiring is required (WCAG 2.4.3).
+ *
  * The `play` function simulates the full open cycle by finding the trigger button
  * and clicking it, then asserting the dialog reaches the open state.
  */
@@ -403,18 +408,19 @@ export const TriggerButton: Story = {
       <button
         id="open-dialog-btn"
         style="padding: 0.5rem 1rem; border: none; border-radius: 0.375rem; background: #2563eb; color: #ffffff; cursor: pointer; font-weight: 600;"
-        @click=${(e: Event) => {
-          const host = (e.target as HTMLElement).closest('div');
-          const dialog = host?.querySelector('hx-dialog') as
-            | (HTMLElement & { showModal: () => void })
-            | null;
-          dialog?.showModal();
+        @click=${() => {
+          // D23 — reference dialog by ID for robust traversal
+          (
+            document.getElementById('trigger-btn-dialog') as HTMLElement & {
+              showModal: () => void;
+            }
+          )?.showModal();
         }}
       >
         Schedule Appointment
       </button>
 
-      <hx-dialog heading="Schedule Appointment" close-on-backdrop>
+      <hx-dialog id="trigger-btn-dialog" heading="Schedule Appointment" close-on-backdrop>
         <p style="margin: 0 0 0.75rem; font-size: 0.875rem;">
           Select a date and time for the patient's next appointment. All available slots are shown
           for the next 30 days.
@@ -432,10 +438,12 @@ export const TriggerButton: Story = {
           <button
             style="padding: 0.5rem 1rem; border: 1px solid #d1d5db; border-radius: 0.375rem; background: #ffffff; cursor: pointer;"
             @click=${(e: Event) => {
-              const host = (e.target as HTMLElement).closest('div[slot="footer"]')?.closest('hx-dialog') as
-                | (HTMLElement & { close: () => void })
-                | null;
-              host?.close();
+              // D23 — use closest('hx-dialog') since Cancel is inside the dialog
+              (
+                (e.target as HTMLElement).closest('hx-dialog') as HTMLElement & {
+                  close: () => void;
+                }
+              )?.close();
             }}
           >
             Cancel
@@ -486,12 +494,13 @@ export const EventFiring: Story = {
         <button
           id="open-event-btn"
           style="padding: 0.5rem 1rem; border: none; border-radius: 0.375rem; background: #2563eb; color: #ffffff; cursor: pointer;"
-          @click=${(e: Event) => {
-            const host = (e.target as HTMLElement).closest('div');
-            const dlg = host?.querySelector('hx-dialog') as
-              | (HTMLElement & { showModal: () => void })
-              | null;
-            dlg?.showModal();
+          @click=${() => {
+            // D23 — reference dialog by ID instead of fragile closest() + querySelector()
+            (
+              document.getElementById('event-demo-dialog') as HTMLElement & {
+                showModal: () => void;
+              }
+            )?.showModal();
           }}
         >
           Open
@@ -499,12 +508,12 @@ export const EventFiring: Story = {
         <button
           id="close-event-btn"
           style="padding: 0.5rem 1rem; border: 1px solid #d1d5db; border-radius: 0.375rem; background: #ffffff; cursor: pointer;"
-          @click=${(e: Event) => {
-            const host = (e.target as HTMLElement).closest('div');
-            const dlg = host?.querySelector('hx-dialog') as
-              | (HTMLElement & { close: () => void })
-              | null;
-            dlg?.close();
+          @click=${() => {
+            (
+              document.getElementById('event-demo-dialog') as HTMLElement & {
+                close: () => void;
+              }
+            )?.close();
           }}
         >
           Close
@@ -518,18 +527,17 @@ export const EventFiring: Story = {
       </div>
 
       <hx-dialog
+        id="event-demo-dialog"
         heading="Event Demo"
         @hx-open=${(e: Event) => {
-          const log = (e.target as HTMLElement)
-            .closest('div')
-            ?.querySelector('#event-log');
+          const log = document.getElementById('event-log');
           if (log) log.textContent = 'hx-open fired';
+          void e;
         }}
         @hx-close=${(e: Event) => {
-          const log = (e.target as HTMLElement)
-            .closest('div')
-            ?.querySelector('#event-log');
+          const log = document.getElementById('event-log');
           if (log) log.textContent = 'hx-close fired';
+          void e;
         }}
       >
         <p style="margin: 0; font-size: 0.875rem;">
@@ -694,5 +702,183 @@ export const DangerConfirmation: Story = {
 
     const footerSlot = canvasElement.querySelector('[slot="footer"]');
     await expect(footerSlot).toBeTruthy();
+  },
+};
+
+// ════════════════════════════════════════════════════════════════════════════
+// 11. ALERT DIALOG — role="alertdialog" for urgent clinical notifications (D15)
+// ════════════════════════════════════════════════════════════════════════════
+
+/**
+ * Demonstrates `variant="alertdialog"` which sets `role="alertdialog"` on the
+ * native `<dialog>` element. Screen readers announce alert dialogs as urgent,
+ * requiring immediate attention — distinct from standard `role="dialog"`.
+ *
+ * Use this variant for:
+ * - Drug interaction warnings
+ * - Critical lab value alerts
+ * - Discharge confirmation for high-risk patients
+ * - Any notification requiring immediate clinician action
+ *
+ * @see https://www.w3.org/WAI/ARIA/apg/patterns/alertdialog/
+ */
+export const AlertDialog: Story = {
+  render: () => html`
+    <hx-dialog
+      open
+      modal
+      variant="alertdialog"
+      heading="Critical Drug Interaction Warning"
+      description="This alert requires immediate attention before proceeding with the medication order."
+    >
+      <div
+        style="display: flex; align-items: flex-start; gap: 0.75rem; padding: 0.75rem; background: #fef2f2; border: 1px solid #fca5a5; border-radius: 0.375rem; margin-bottom: 1rem;"
+      >
+        <span
+          style="color: #dc2626; font-size: 1.5rem; line-height: 1; flex-shrink: 0;"
+          aria-hidden="true"
+          >⚠</span
+        >
+        <div>
+          <p style="margin: 0 0 0.25rem; font-size: 0.875rem; color: #991b1b; font-weight: 700;">
+            Contraindicated combination detected
+          </p>
+          <p style="margin: 0; font-size: 0.875rem; color: #374151;">
+            Warfarin (current) + Aspirin (new order) — high risk of bleeding. Review or override
+            requires attending physician sign-off.
+          </p>
+        </div>
+      </div>
+      <p style="margin: 0; font-size: 0.875rem; color: #6b7280;">
+        Patient: Jane Doe — MRN 00482910 — Prescribed by Dr. Smith
+      </p>
+      <div slot="footer" style="display: flex; gap: 0.75rem; justify-content: flex-end;">
+        <button
+          style="padding: 0.5rem 1rem; border: 1px solid #d1d5db; border-radius: 0.375rem; background: #ffffff; cursor: pointer;"
+        >
+          Cancel Order
+        </button>
+        <button
+          style="padding: 0.5rem 1rem; border: none; border-radius: 0.375rem; background: #dc2626; color: #ffffff; cursor: pointer; font-weight: 600;"
+        >
+          Override with Justification
+        </button>
+      </div>
+    </hx-dialog>
+  `,
+  play: async ({ canvasElement }) => {
+    const dialog = canvasElement.querySelector('hx-dialog');
+    await expect(dialog).toBeTruthy();
+    await expect(dialog?.hasAttribute('open')).toBe(true);
+    await expect(dialog?.getAttribute('variant')).toBe('alertdialog');
+
+    const nativeDialog = dialog?.shadowRoot?.querySelector('dialog');
+    await expect(nativeDialog?.getAttribute('role')).toBe('alertdialog');
+  },
+};
+
+// ════════════════════════════════════════════════════════════════════════════
+// 12. FORM INSIDE DIALOG — Patient data entry (D16)
+// ════════════════════════════════════════════════════════════════════════════
+
+/**
+ * Demonstrates a form inside a dialog — a common pattern for patient data entry,
+ * appointment scheduling, MRN confirmation, and intake forms in healthcare workflows.
+ *
+ * The form submits within the dialog; the dialog remains open unless explicitly closed
+ * by a button action. Use `method="dialog"` on the form or handle `submit` events
+ * programmatically to close after validation.
+ */
+export const FormInsideDialog: Story = {
+  render: () => html`
+    <hx-dialog id="form-dialog" open modal heading="New Patient Referral">
+      <form
+        id="referral-form"
+        style="display: flex; flex-direction: column; gap: 1rem;"
+        @submit=${(e: Event) => {
+          e.preventDefault();
+          const form = e.target as HTMLFormElement;
+          const data = new FormData(form);
+          const name = data.get('patient-name');
+          const dob = data.get('patient-dob');
+          alert(`Referral submitted: ${String(name)}, DOB ${String(dob)}`);
+          (document.getElementById('form-dialog') as HTMLElement & { close: () => void })?.close();
+        }}
+      >
+        <label
+          style="display: flex; flex-direction: column; gap: 0.25rem; font-size: 0.875rem; font-weight: 600;"
+        >
+          Patient Full Name
+          <input
+            type="text"
+            name="patient-name"
+            required
+            placeholder="Last, First Middle"
+            style="padding: 0.375rem 0.5rem; border: 1px solid #d1d5db; border-radius: 0.375rem; font-size: 0.875rem; font-weight: 400;"
+          />
+        </label>
+        <label
+          style="display: flex; flex-direction: column; gap: 0.25rem; font-size: 0.875rem; font-weight: 600;"
+        >
+          Date of Birth
+          <input
+            type="date"
+            name="patient-dob"
+            required
+            style="padding: 0.375rem 0.5rem; border: 1px solid #d1d5db; border-radius: 0.375rem; font-size: 0.875rem; font-weight: 400;"
+          />
+        </label>
+        <label
+          style="display: flex; flex-direction: column; gap: 0.25rem; font-size: 0.875rem; font-weight: 600;"
+        >
+          Referring Provider
+          <select
+            name="provider"
+            style="padding: 0.375rem 0.5rem; border: 1px solid #d1d5db; border-radius: 0.375rem; font-size: 0.875rem; font-weight: 400;"
+          >
+            <option value="">Select provider…</option>
+            <option value="smith">Dr. Smith — Internal Medicine</option>
+            <option value="jones">Dr. Jones — Cardiology</option>
+            <option value="patel">Dr. Patel — Oncology</option>
+          </select>
+        </label>
+      </form>
+      <div slot="footer" style="display: flex; gap: 0.75rem; justify-content: flex-end;">
+        <button
+          type="button"
+          style="padding: 0.5rem 1rem; border: 1px solid #d1d5db; border-radius: 0.375rem; background: #ffffff; cursor: pointer;"
+          @click=${(e: Event) => {
+            (
+              (e.target as HTMLElement).closest('hx-dialog') as HTMLElement & {
+                close: () => void;
+              }
+            )?.close();
+          }}
+        >
+          Cancel
+        </button>
+        <button
+          type="submit"
+          form="referral-form"
+          style="padding: 0.5rem 1rem; border: none; border-radius: 0.375rem; background: #2563eb; color: #ffffff; cursor: pointer; font-weight: 600;"
+        >
+          Submit Referral
+        </button>
+      </div>
+    </hx-dialog>
+  `,
+  play: async ({ canvasElement }) => {
+    const dialog = canvasElement.querySelector('hx-dialog');
+    await expect(dialog).toBeTruthy();
+    await expect(dialog?.hasAttribute('open')).toBe(true);
+
+    const form = canvasElement.querySelector('form#referral-form');
+    await expect(form).toBeTruthy();
+
+    const inputs = form?.querySelectorAll('input, select');
+    await expect(inputs?.length).toBe(3);
+
+    const submitBtn = canvasElement.querySelector('button[type="submit"]');
+    await expect(submitBtn).toBeTruthy();
   },
 };
