@@ -41,30 +41,14 @@ const meta = {
         type: { summary: 'string' },
       },
     },
-    decorative: {
-      control: 'boolean',
-      description:
-        'When true, the spinner is purely decorative with no screen reader announcement.',
-      table: {
-        category: 'Accessibility',
-        defaultValue: { summary: 'false' },
-        type: { summary: 'boolean' },
-      },
-    },
   },
   args: {
     size: 'md',
     variant: 'default',
     label: 'Loading',
-    decorative: false,
   },
   render: (args) => html`
-    <hx-spinner
-      size=${args.size}
-      variant=${args.variant}
-      label=${args.label}
-      ?decorative=${args.decorative}
-    ></hx-spinner>
+    <hx-spinner size=${args.size} variant=${args.variant} label=${args.label}></hx-spinner>
   `,
 } satisfies Meta;
 
@@ -217,24 +201,6 @@ export const ButtonWithSpinner: Story = {
 
 // ─────────────────────────────────────────────────
 // 7. CSS CUSTOM PROPERTIES DEMO
-// ─────────────────────────────────────────────────
-
-// ─────────────────────────────────────────────────
-// 7. DECORATIVE MODE
-// ─────────────────────────────────────────────────
-
-export const Decorative: Story = {
-  name: 'Decorative (a11y-silent)',
-  render: () => html`
-    <div style="display: flex; align-items: center; gap: 0.75rem; padding: 1rem; border: 1px solid #e5e7eb; border-radius: 0.5rem; max-width: 320px;">
-      <hx-spinner size="sm" variant="primary" decorative></hx-spinner>
-      <span style="color: #374151; font-size: 0.875rem;" role="status">Loading patient records...</span>
-    </div>
-  `,
-};
-
-// ─────────────────────────────────────────────────
-// 8. CSS CUSTOM PROPERTIES DEMO
 // ─────────────────────────────────────────────────
 
 export const CSSCustomProperties: Story = {

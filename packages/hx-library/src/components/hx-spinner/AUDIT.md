@@ -1,161 +1,226 @@
-# hx-spinner — Deep Audit v2
+# AUDIT: hx-spinner (T1-09) — Antagonistic Quality Review
 
-**Auditor:** Claude Opus 4.6 (deep audit v2)
-**Date:** 2026-03-06
-**Branch:** feature/deep-audit-v2-hx-spinner
-**wc-mcp health score:** 100 (A)
-**wc-mcp a11y score:** 35/100 (F) — CEM documentation gap; form/keyboard/focus/disabled dimensions don't apply to a status indicator
+**Reviewed files** (from `feature/implement-hx-spinner-t1-26-loading` worktree):
+- `hx-spinner.ts`
+- `hx-spinner.styles.ts`
+- `hx-spinner.test.ts`
+- `hx-spinner.stories.ts`
+- `index.ts`
 
----
-
-## Executive Summary
-
-`hx-spinner` is a well-structured loading indicator with solid SVG animation, design token usage, and shadow DOM encapsulation. The original audit (T1-09) identified 2 P0 and 5 P1 issues. This Deep Audit v2 fixes all P0 and P1 issues. The wc-mcp a11y score of 35/100 is a false negative — spinners don't need form association, keyboard events, focus methods, or disabled states.
-
-### Changes Made in This Audit
-
-| Change                                                              | File                                  | Severity Fixed |
-| ------------------------------------------------------------------- | ------------------------------------- | -------------- |
-| Removed dual announcement (sr-text span + aria-label)               | `hx-spinner.ts`, `hx-spinner.styles.ts` | CRITICAL (P0-1) |
-| Added `decorative` boolean property for a11y-silent mode            | `hx-spinner.ts`                       | CRITICAL (P0-2) |
-| Documented `--hx-duration-spinner` CSS custom property              | `hx-spinner.ts`                       | HIGH (P1-1)    |
-| Replaced ambiguous reduced-motion static with opacity pulse         | `hx-spinner.styles.ts`                | HIGH (P1-2)    |
-| Added `rgba()` fallback + `@supports` guard for `color-mix()`      | `hx-spinner.styles.ts`                | HIGH (P1-3)    |
-| Added tests for decorative mode, reactive label, label reflection   | `hx-spinner.test.ts`                  | HIGH (P1-4/P1-5) |
-| Added `@internal` to `_isTokenSize` private method                  | `hx-spinner.ts`                       | HIGH           |
-| Fixed `@csspart base` description (div wrapper, not SVG)            | `hx-spinner.ts`                       | MEDIUM         |
-| Added `reflect: true` to `label` property for Drupal compat         | `hx-spinner.ts`                       | MEDIUM (P2-2)  |
-| Added `Decorative` story with role="status" text companion          | `hx-spinner.stories.ts`               | MEDIUM         |
-| Added `decorative` argType/control to Storybook meta                | `hx-spinner.stories.ts`               | MEDIUM         |
+**Bundle:** 4,351 bytes raw / 1,603 bytes gzip (within budget)
 
 ---
 
-## Audit Results by Dimension
+## P0 — Critical (blocks merge)
 
-### 1. Design Tokens
+### P0-1: Dual announcement — `aria-label` + visually-hidden inner text create double read
 
-| Token                       | Semantic Fallback                                    | Status |
-| --------------------------- | ---------------------------------------------------- | ------ |
-| `--hx-spinner-color`        | Per-variant: neutral-600 / primary-500 / neutral-0   | PASS   |
-| `--hx-spinner-track-color`  | Per-variant: neutral-200 / primary-100 / rgba fallback | PASS (FIXED) |
-| `--hx-duration-spinner`     | `750ms`                                              | PASS (DOCUMENTED) |
-| Size tokens (sm/md/lg)      | `--hx-size-4`, `--hx-size-6`, `--hx-size-8`         | PASS   |
-| Reduced-motion opacity      | `--hx-opacity-muted` removed; pulse animation used   | PASS (FIXED) |
+**File:** `hx-spinner.ts:55-81`
 
-**Dark mode:** Handled at semantic token level — no hardcoded colors. PASS.
+The `role="status"` container has both an `aria-label` attribute AND visible inner text (`.spinner__sr-text`) inside it. These are two different announcement paths:
 
-### 2. Accessibility
+- **Accessible name** (`aria-label`): read by AT when the user navigates to the element. Returns `"Loading"`.
+- **Live region content** (`.spinner__sr-text`): announced by AT when the spinner is dynamically inserted into the DOM. Returns `"Loading..."` (with hardcoded ellipsis appended).
 
-| Check                        | Status | Notes                                      |
-| ---------------------------- | ------ | ------------------------------------------ |
-| `role="status"`              | PASS   | On wrapper div, announces loading state    |
-| `aria-label`                 | PASS   | Customizable via `label` prop              |
-| `aria-hidden="true"` on SVG  | PASS   | Prevents SVG from being announced          |
-| `focusable="false"` on SVG   | PASS   | Prevents IE/Edge focus on SVG              |
-| Dual announcement removed    | PASS   | sr-text span removed (was P0-1)            |
-| Decorative mode              | PASS   | `role="presentation"` + no aria-label      |
-| Reduced motion               | PASS   | Opacity pulse (2s), no spatial animation   |
-| `color-mix()` fallback       | PASS   | `rgba(255,255,255,0.3)` + `@supports`     |
+On dynamic mount, screen readers will announce the inner text `"Loading..."` via the live region. If a user then focuses the element, AT announces `"Loading"` again from `aria-label`. In practice (NVDA+Chrome, JAWS, VoiceOver) this produces redundant announcements. In a healthcare context this is an accessibility defect.
 
-### 3. Functionality
-
-| Feature                | Status | Notes                              |
-| ---------------------- | ------ | ---------------------------------- |
-| Size: sm/md/lg         | PASS   | Token-driven via host attributes   |
-| Custom CSS size        | PASS   | Arbitrary strings (e.g. "3rem")    |
-| Variant: default       | PASS   | Neutral colors                     |
-| Variant: primary       | PASS   | Primary brand colors               |
-| Variant: inverted      | PASS   | White on dark backgrounds          |
-| Decorative mode        | PASS   | New — silences ARIA announcements  |
-
-### 4. TypeScript
-
-| Check                  | Status | Notes                              |
-| ---------------------- | ------ | ---------------------------------- |
-| Strict mode            | PASS   | Zero errors                        |
-| No `any`               | PASS   | No `any` types used                |
-| `@internal` on private | PASS   | `_isTokenSize` marked internal     |
-
-### 5. CSS/Styling
-
-| Check                  | Status | Notes                              |
-| ---------------------- | ------ | ---------------------------------- |
-| Shadow DOM              | PASS   | Fully encapsulated                 |
-| CSS Parts               | PASS   | `base` part exposed                |
-| SVG animation           | PASS   | Rotation + dash animation          |
-| Reduced motion          | PASS   | Opacity pulse replaces rotation    |
-| GPU promotion           | N/A    | CSS transform already promotes     |
-| `@supports` guard       | PASS   | `color-mix()` guarded              |
-
-### 6. CEM Accuracy
-
-| Check                  | Status | Notes                              |
-| ---------------------- | ------ | ---------------------------------- |
-| Properties documented  | PASS   | size, variant, label, decorative   |
-| CSS properties listed  | PASS   | 3 custom properties documented     |
-| CSS parts listed       | PASS   | `base` part documented correctly   |
-| Private methods hidden | PASS   | `@internal` on `_isTokenSize`      |
-
-### 7. Tests
-
-| Check                  | Status | Notes                              |
-| ---------------------- | ------ | ---------------------------------- |
-| Test count             | 30     | Up from 22 (8 new tests)          |
-| Rendering tests        | PASS   | Shadow DOM, SVG, parts, no sr-text |
-| Property tests         | PASS   | size, variant, label, decorative   |
-| ARIA tests             | PASS   | role, aria-label, aria-hidden      |
-| Decorative mode tests  | PASS   | 7 new tests for decorative prop   |
-| Label reflection test  | PASS   | Attribute reflection verified      |
-| Reactive label test    | PASS   | Dynamic update verified            |
-| axe-core tests         | PASS   | 7 variants tested (including decorative) |
-
-### 8. Storybook
-
-| Story                  | Status | Notes                              |
-| ---------------------- | ------ | ---------------------------------- |
-| Default                | PASS   | With interaction test              |
-| Size variants          | PASS   | sm, md, lg, custom                 |
-| Color variants         | PASS   | default, primary, inverted         |
-| All sizes/variants     | PASS   | Grid display                       |
-| Custom label           | PASS   | Healthcare context                 |
-| Healthcare scenarios   | PASS   | Inline, overlay, button companion  |
-| CSS custom properties  | PASS   | Color override demos               |
-| Decorative mode        | PASS   | New — with role="status" text      |
-| Controls               | PASS   | decorative boolean added           |
-
-### 9. Drupal Compatibility
-
-| Check                  | Status | Notes                              |
-| ---------------------- | ------ | ---------------------------------- |
-| Attribute-driven       | PASS   | All props set via attributes       |
-| `label` reflected      | PASS   | Now reflects for Twig consistency  |
-| No JS required         | PASS   | Works as pure HTML element         |
-| AJAX throbber usage    | PASS   | Can replace Drupal AJAX throbber   |
-
-### 10. Portability
-
-| Check                  | Status | Notes                              |
-| ---------------------- | ------ | ---------------------------------- |
-| CDN-ready              | PASS   | Self-contained, no external deps   |
-| No slots               | PASS   | Purely visual component            |
-| Framework-agnostic     | PASS   | Standard custom element            |
+**Root cause:** Both mechanisms serve the same purpose. Only one should be used:
+- Keep `role="status"` + `aria-label` for accessible name (navigation context).
+- Remove `.spinner__sr-text` entirely, OR remove `aria-label` and rely on inner text for live region.
+  The `aria-label` approach is preferred (it doesn't inject text into the live region on mount).
 
 ---
 
-## Remaining P2 Items (documented, not fixed)
+### P0-2: No decorative mode — spinner cannot be silenced when adjacent text exists
 
-| ID    | Area       | Description                                           |
-| ----- | ---------- | ----------------------------------------------------- |
-| P2-1  | TypeScript | `size` union collapses to `string` — intentional for custom CSS values |
-| P2-3  | DX         | Hardcoded `...` removed with sr-text (resolved by P0-1 fix) |
-| P2-4  | Storybook  | `size` argType is `select`-only — CustomSize story covers custom values |
-| P2-5  | CSS        | Magic numbers in SVG dash math — aesthetic choice, r=10 circumference math |
-| P2-6  | Drupal     | No Twig template — systemic gap across all components |
+**File:** `hx-spinner.ts` (entire component)
+
+A spinner used alongside visible loading text (e.g., `<hx-spinner> Saving...`) will announce its label to AT even when the adjacent text makes it redundant. There is no supported mechanism to suppress the spinner's ARIA announcements — no `decorative` boolean property, no documented `aria-hidden` pattern.
+
+Consumers must manually apply `aria-hidden="true"` to `<hx-spinner>` themselves, but Shadow DOM means the `role="status"` inside the shadow root is not suppressed by `aria-hidden` on the host in all browsers. This is an unresolved accessibility gap for the most common inline-loading pattern.
+
+**Expected:** A `decorative` boolean property that, when set, replaces `role="status"` with `role="presentation"` and removes the `aria-label` and sr-text.
 
 ---
 
-## Verification
+## P1 — High (significant quality gap)
 
-- `npm run verify`: 0 errors (lint + format:check + type-check)
-- `npm run test:library`: 3120 tests pass (79 files), including 30 hx-spinner tests
-- `git diff --stat`: 4 source files + 7 screenshot PNGs modified
+### P1-1: `--hx-duration-spinner` is an undocumented public CSS custom property
+
+**File:** `hx-spinner.styles.ts:22`
+
+```css
+animation: hx-spinner-rotate var(--hx-duration-spinner, 750ms) linear infinite;
+```
+
+The component exposes `--hx-duration-spinner` as a consumer-overridable token, but:
+1. It is not listed in the `@cssprop` JSDoc block in `hx-spinner.ts`.
+2. It will not appear in the generated CEM.
+3. There is no corresponding token defined in the design token system.
+
+This is an undocumented public API surface violation.
+
+---
+
+### P1-2: `prefers-reduced-motion` fallback is visually ambiguous
+
+**File:** `hx-spinner.styles.ts:55-65`
+
+```css
+@media (prefers-reduced-motion: reduce) {
+  .spinner__svg { animation: none; }
+  .spinner__arc {
+    animation: none;
+    stroke-dashoffset: 14;
+    opacity: var(--hx-opacity-muted, 0.6);
+  }
+}
+```
+
+Under reduced motion, the spinner renders as a static partial arc at 60% opacity. This does not clearly communicate "loading in progress" — it looks like an incomplete, faded ring. Users who need reduced motion still need to know the system is working.
+
+A static full ring (100% opacity track, colored arc segment at 100% opacity) or a slow fade pulse (which is acceptable under WCAG APCA reduced motion) would communicate the loading state far more clearly.
+
+---
+
+### P1-3: `color-mix(in srgb, ...)` used without fallback in inverted variant
+
+**File:** `hx-spinner.styles.ts:97-98`
+
+```css
+--_spinner-track-color: var(
+  --hx-spinner-track-color,
+  color-mix(in srgb, var(--hx-color-neutral-0, #ffffff) 30%, transparent)
+);
+```
+
+`color-mix()` has no support in: Chrome < 111, Firefox < 113, Safari < 16.2. Enterprise healthcare environments often include older or locked-down browser deployments. Without a `@supports` guard or a raw hex fallback, the inverted variant's track color will be empty/invalid in unsupported browsers — the track will be invisible, making the spinner look broken.
+
+---
+
+### P1-4: Tests do not cover `prefers-reduced-motion` behavior
+
+**File:** `hx-spinner.test.ts`
+
+The CSS `@media (prefers-reduced-motion: reduce)` block is the critical accessibility adaptation for this component. No test verifies:
+- That `animation` is set to `none` on `.spinner__svg` under reduced motion.
+- That `.spinner__arc` loses its animation and retains a static `stroke-dashoffset`.
+- That the spinner is visually recognizable in the reduced-motion state.
+
+Playwright/Vitest browser mode can emulate `prefers-reduced-motion: reduce` via `page.emulateMedia({ reducedMotion: 'reduce' })`. This test gap means the reduced motion path is untested on every CI run.
+
+---
+
+### P1-5: Tests do not verify sr-text content or the label-to-aria-label binding on update
+
+**File:** `hx-spinner.test.ts:30-34`
+
+The test only asserts the `.spinner__sr-text` element exists — it does not verify:
+- The text content is `${label}...` (with hardcoded ellipsis).
+- That `aria-label` on the base element updates reactively when `label` property changes at runtime.
+- That setting `label=""` (empty string) does not produce `aria-label=""` (which is a WCAG failure — an empty accessible name is worse than no aria-label).
+
+---
+
+## P2 — Medium (tech debt / DX gap)
+
+### P2-1: `size` TypeScript union collapses to `string` — no runtime narrowing
+
+**File:** `hx-spinner.ts:31`
+
+```typescript
+size: 'sm' | 'md' | 'lg' | string = 'md';
+```
+
+`'sm' | 'md' | 'lg' | string` resolves to `string` at the TypeScript level — the string literal members add no type safety. TypeScript will not flag `size="xxl"` as an error. Consider:
+- `type SpinnerSize = 'sm' | 'md' | 'lg'` for the token sizes, combined with a separate `customSize?: string` property.
+- Or keep the union but document that it intentionally degrades to `string` for custom CSS values (add a comment explaining the design choice).
+
+---
+
+### P2-2: `aria-label` label property not reflected as attribute — breaks Twig/Drupal patterns
+
+**File:** `hx-spinner.ts:44`
+
+```typescript
+@property({ type: String })
+label = 'Loading';
+```
+
+`label` is not reflected (`reflect: true` is absent). Drupal Twig templates set attributes, not properties. If a Drupal template uses `<hx-spinner label="Fetching records"></hx-spinner>`, the attribute IS passed as an HTML attribute and Lit will read it on first render. However, if JavaScript sets `el.label = 'Updated'`, it will not sync back to the attribute. While this works for static Twig usage, it creates an inconsistency between the reflected `size`/`variant` (which are reflected) and `label` (which is not). Document this intentional asymmetry or reflect it.
+
+---
+
+### P2-3: Hardcoded `...` appended to sr-text produces inconsistent punctuation
+
+**File:** `hx-spinner.ts:79`
+
+```html
+<span class="spinner__sr-text">${this.label}...</span>
+```
+
+The component appends `...` to every label unconditionally. If a consumer provides `label="Loading patient record..."`, the rendered text is `"Loading patient record......"`. If they provide `label="Saving"`, it becomes `"Saving..."`. This is inconsistent and non-overridable.
+
+The ellipsis should either be removed (let the consumer control punctuation) or made opt-in.
+
+---
+
+### P2-4: Storybook `size` argType control is `select`-only — custom sizes untestable from controls
+
+**File:** `hx-spinner.stories.ts:15-22`
+
+```typescript
+size: {
+  control: { type: 'select' },
+  options: ['sm', 'md', 'lg'],
+```
+
+The `select` control only exposes token values. A user exploring Storybook has no way to test custom CSS sizes (e.g., `"3rem"`, `"48px"`) from the controls panel. A `text` control with a note about accepted values would better document the prop's capabilities. The `CustomSize` story exists but is static — it cannot demonstrate the input freedom.
+
+---
+
+### P2-5: Magic numbers in CSS with no inline documentation
+
+**File:** `hx-spinner.styles.ts:31-34`
+
+```css
+stroke-dasharray: 56;
+stroke-dashoffset: 14;
+```
+
+The SVG arc uses `r=10` on a 24x24 viewBox (circumference = 2π × 10 ≈ 62.83). The values `56` (dash array) and `14` (offset) are intentional aesthetic choices that create a ~75% arc, but this math is not documented anywhere. Future maintainers modifying the SVG dimensions will not understand why these numbers exist or how to recalculate them. A comment explaining the relationship between `r`, circumference, and dash values is required.
+
+---
+
+### P2-6: No Drupal Twig template or integration notes
+
+**File:** directory (`hx-spinner/`)
+
+The CLAUDE.md states Drupal compatibility is a non-negotiable. The `hx-spinner` directory has no:
+- `hx-spinner.twig` template demonstrating Drupal usage.
+- Documentation on how to register the component in a Drupal theme.
+- Notes on the `label` attribute behavior in a Twig context.
+
+Every other T1 component audited so far (hx-tag, hx-switch, hx-textarea) also lacks Twig templates, but given the healthcare Drupal mandate, this is a systemic gap that starts here.
+
+---
+
+## Summary Matrix
+
+| ID    | Area          | Severity | Description                                              |
+|-------|---------------|----------|----------------------------------------------------------|
+| P0-1  | Accessibility | P0       | Dual announcement: `aria-label` + live region sr-text    |
+| P0-2  | Accessibility | P0       | No decorative mode to suppress announcements             |
+| P1-1  | CEM/API       | P1       | `--hx-duration-spinner` undocumented custom property     |
+| P1-2  | Accessibility | P1       | Reduced-motion fallback is visually ambiguous            |
+| P1-3  | CSS           | P1       | `color-mix()` without fallback — broken in older browsers|
+| P1-4  | Tests         | P1       | No reduced-motion behavior test                          |
+| P1-5  | Tests         | P1       | sr-text content and reactive label update untested       |
+| P2-1  | TypeScript    | P2       | `size` union collapses to `string`                       |
+| P2-2  | Drupal/DX     | P2       | `label` not reflected — asymmetric vs `size`/`variant`  |
+| P2-3  | DX            | P2       | Hardcoded `...` appended to all sr-text labels           |
+| P2-4  | Storybook     | P2       | `size` argType `select`-only, custom sizes not explorable|
+| P2-5  | CSS           | P2       | Magic numbers in SVG dash math — no inline documentation |
+| P2-6  | Drupal        | P2       | No Twig template or Drupal integration notes             |
+
+**P0 count: 2 — merge blocked until resolved.**
