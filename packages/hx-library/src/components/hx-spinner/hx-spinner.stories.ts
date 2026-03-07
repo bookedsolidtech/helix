@@ -13,9 +13,9 @@ const meta = {
   tags: ['autodocs'],
   argTypes: {
     size: {
-      control: { type: 'select' },
-      options: ['sm', 'md', 'lg'],
-      description: "Size of the spinner. Accepts 'sm' | 'md' | 'lg' or a CSS size string.",
+      control: 'text',
+      description:
+        "Size of the spinner. Use token values 'sm' | 'md' | 'lg' for standard sizing, or any valid CSS size string (e.g. '3rem', '48px') for custom sizes.",
       table: {
         category: 'Visual',
         defaultValue: { summary: 'md' },
@@ -41,14 +41,30 @@ const meta = {
         type: { summary: 'string' },
       },
     },
+    decorative: {
+      control: 'boolean',
+      description:
+        'When true, suppresses all ARIA announcements (role="presentation", no aria-label). Use when the spinner appears alongside visible loading text.',
+      table: {
+        category: 'Accessibility',
+        defaultValue: { summary: 'false' },
+        type: { summary: 'boolean' },
+      },
+    },
   },
   args: {
     size: 'md',
     variant: 'default',
     label: 'Loading',
+    decorative: false,
   },
   render: (args) => html`
-    <hx-spinner size=${args.size} variant=${args.variant} label=${args.label}></hx-spinner>
+    <hx-spinner
+      size=${args.size}
+      variant=${args.variant}
+      label=${args.label}
+      ?decorative=${args.decorative}
+    ></hx-spinner>
   `,
 } satisfies Meta;
 
@@ -108,7 +124,9 @@ export const PrimaryVariant: Story = {
 export const InvertedVariant: Story = {
   name: 'Variant: Inverted',
   render: () => html`
-    <div style="background: var(--hx-color-primary-500, #2563eb); padding: 1.5rem; border-radius: 0.5rem; display: inline-flex;">
+    <div
+      style="background: var(--hx-color-primary-500, #2563eb); padding: 1.5rem; border-radius: 0.5rem; display: inline-flex;"
+    >
       <hx-spinner variant="inverted" label="Loading"></hx-spinner>
     </div>
   `,
@@ -139,7 +157,9 @@ export const AllVariants: Story = {
         <hx-spinner variant="primary" label="Loading"></hx-spinner>
         <small>primary</small>
       </div>
-      <div style="background: var(--hx-color-primary-500, #2563eb); padding: 0.75rem; border-radius: 0.375rem; display: flex; flex-direction: column; align-items: center; gap: 0.5rem;">
+      <div
+        style="background: var(--hx-color-primary-500, #2563eb); padding: 0.75rem; border-radius: 0.375rem; display: flex; flex-direction: column; align-items: center; gap: 0.5rem;"
+      >
         <hx-spinner variant="inverted" label="Loading"></hx-spinner>
         <small style="color: white;">inverted</small>
       </div>
@@ -155,6 +175,18 @@ export const CustomLabel: Story = {
   args: { label: 'Saving patient record' },
 };
 
+export const Decorative: Story = {
+  name: 'Decorative (with visible text)',
+  render: () => html`
+    <div
+      style="display: flex; align-items: center; gap: 0.75rem; padding: 1rem; border: 1px solid #e5e7eb; border-radius: 0.5rem; max-width: 320px;"
+    >
+      <hx-spinner size="sm" variant="primary" decorative></hx-spinner>
+      <span style="color: #374151; font-size: 0.875rem;">Saving patient record...</span>
+    </div>
+  `,
+};
+
 // ─────────────────────────────────────────────────
 // 6. HEALTHCARE SCENARIOS
 // ─────────────────────────────────────────────────
@@ -162,7 +194,9 @@ export const CustomLabel: Story = {
 export const InlineLoading: Story = {
   name: 'Inline Loading State',
   render: () => html`
-    <div style="display: flex; align-items: center; gap: 0.75rem; padding: 1rem; border: 1px solid #e5e7eb; border-radius: 0.5rem; max-width: 320px;">
+    <div
+      style="display: flex; align-items: center; gap: 0.75rem; padding: 1rem; border: 1px solid #e5e7eb; border-radius: 0.5rem; max-width: 320px;"
+    >
       <hx-spinner size="sm" variant="primary" label="Loading patient data"></hx-spinner>
       <span style="color: #374151; font-size: 0.875rem;">Fetching patient records...</span>
     </div>
@@ -172,12 +206,16 @@ export const InlineLoading: Story = {
 export const OverlayLoading: Story = {
   name: 'Overlay Loading State',
   render: () => html`
-    <div style="position: relative; width: 320px; height: 160px; border: 1px solid #e5e7eb; border-radius: 0.5rem; overflow: hidden;">
+    <div
+      style="position: relative; width: 320px; height: 160px; border: 1px solid #e5e7eb; border-radius: 0.5rem; overflow: hidden;"
+    >
       <div style="padding: 1.5rem; filter: blur(2px);">
         <h3 style="margin: 0 0 0.5rem;">Patient Chart</h3>
         <p style="margin: 0; color: #6b7280; font-size: 0.875rem;">Loading clinical data...</p>
       </div>
-      <div style="position: absolute; inset: 0; background: rgba(255,255,255,0.8); display: flex; align-items: center; justify-content: center;">
+      <div
+        style="position: absolute; inset: 0; background: rgba(255,255,255,0.8); display: flex; align-items: center; justify-content: center;"
+      >
         <hx-spinner size="lg" variant="primary" label="Loading patient chart"></hx-spinner>
       </div>
     </div>
