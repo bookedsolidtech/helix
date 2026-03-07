@@ -37,10 +37,14 @@ import { helixSwitchStyles } from './hx-switch.styles.js';
  * @cssprop [--hx-switch-focus-ring-color=var(--hx-focus-ring-color)] - Focus ring color.
  * @cssprop [--hx-switch-label-color=var(--hx-color-neutral-700)] - Label text color.
  * @cssprop [--hx-switch-error-color=var(--hx-color-error-500)] - Error message color.
+ * @cssprop [--hx-switch-help-text-color=var(--hx-color-neutral-500)] - Help text color.
  */
 @customElement('hx-switch')
 export class HelixSwitch extends LitElement {
   static override styles = [tokenStyles, helixSwitchStyles];
+
+  /** Monotonic counter for deterministic, unique IDs across instances. */
+  private static _instanceCounter = 0;
 
   // ─── Form Association ───
 
@@ -188,7 +192,7 @@ export class HelixSwitch extends LitElement {
 
   /** Reference to the native button element acting as the switch track. */
   @query('.switch__track')
-  private _trackEl!: HTMLButtonElement;
+  private _trackEl: HTMLButtonElement | null = null;
 
   /** Whether the error slot has assigned content. */
   @state() private _hasErrorSlot = false;
@@ -217,10 +221,6 @@ export class HelixSwitch extends LitElement {
     if (this.disabled) return;
     this.checked = !this.checked;
 
-    /**
-     * Dispatched when the switch is toggled.
-     * @event hx-change
-     */
     this.dispatchEvent(
       new CustomEvent('hx-change', {
         bubbles: true,
@@ -253,7 +253,7 @@ export class HelixSwitch extends LitElement {
   // ─── Render ───
 
   /** Unique ID for this switch instance, used for ARIA associations. */
-  private _switchId = `hx-switch-${Math.random().toString(36).slice(2, 9)}`;
+  private _switchId = `hx-switch-${++HelixSwitch._instanceCounter}`;
   /** ID for the label element, referenced by aria-labelledby. */
   private _labelId = `${this._switchId}-label`;
   /** ID for the help text element, referenced by aria-describedby. */
@@ -335,4 +335,6 @@ declare global {
   }
 }
 
+/** @deprecated Use HxSwitch instead. */
 export type WcSwitch = HelixSwitch;
+export type HxSwitch = HelixSwitch;
