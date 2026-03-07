@@ -347,12 +347,7 @@ export const AllStates: Story = {
         format="12h"
       ></hx-time-picker>
 
-      <hx-time-picker
-        label="Required Field"
-        step="30"
-        format="12h"
-        required
-      ></hx-time-picker>
+      <hx-time-picker label="Required Field" step="30" format="12h" required></hx-time-picker>
 
       <hx-time-picker
         label="Error State"
@@ -436,10 +431,7 @@ export const WithHelpSlot: Story = {
   name: 'With Help Slot',
   render: () => html`
     <hx-time-picker label="Procedure Start Time" step="15" format="12h" min="07:00" max="19:00">
-      <div
-        slot="help"
-        style="font-size: 0.75rem; color: var(--hx-color-neutral-500, #6c757d);"
-      >
+      <div slot="help" style="font-size: 0.75rem; color: var(--hx-color-neutral-500, #6c757d);">
         Select the scheduled start time for this procedure. Times are shown in 15-minute intervals.
       </div>
     </hx-time-picker>
@@ -595,9 +587,7 @@ export const CSSParts: Story = {
       style="display: flex; flex-direction: column; gap: 1.5rem; max-width: 360px;"
     >
       <div>
-        <p
-          style="margin: 0 0 0.5rem; font-size: 0.875rem; color: var(--hx-color-neutral-500);"
-        >
+        <p style="margin: 0 0 0.5rem; font-size: 0.875rem; color: var(--hx-color-neutral-500);">
           Parts styled: label, input, listbox, option
         </p>
         <hx-time-picker
@@ -778,7 +768,9 @@ export const SurgerySchedule: Story = {
       background: var(--hx-color-neutral-0);
     "
     >
-      <h3 style="margin: 0 0 1rem; font-size: 1rem; font-weight: 600; color: var(--hx-color-neutral-900);">
+      <h3
+        style="margin: 0 0 1rem; font-size: 1rem; font-weight: 600; color: var(--hx-color-neutral-900);"
+      >
         OR Scheduling
       </h3>
       <div style="display: flex; flex-direction: column; gap: 1rem;">
@@ -826,7 +818,9 @@ export const MedicationSchedule: Story = {
       background: var(--hx-color-neutral-0);
     "
     >
-      <h3 style="margin: 0 0 1rem; font-size: 1rem; font-weight: 600; color: var(--hx-color-neutral-900);">
+      <h3
+        style="margin: 0 0 1rem; font-size: 1rem; font-weight: 600; color: var(--hx-color-neutral-900);"
+      >
         Medication Administration Times
       </h3>
       <div style="display: flex; flex-direction: column; gap: 1rem;">
@@ -873,7 +867,9 @@ export const ShiftHandoff: Story = {
       background: var(--hx-color-neutral-0);
     "
     >
-      <h3 style="margin: 0 0 1rem; font-size: 1rem; font-weight: 600; color: var(--hx-color-neutral-900);">
+      <h3
+        style="margin: 0 0 1rem; font-size: 1rem; font-weight: 600; color: var(--hx-color-neutral-900);"
+      >
         Nursing Shift Times
       </h3>
       <div style="display: flex; flex-direction: column; gap: 1rem;">

@@ -1,5 +1,12 @@
 import { describe, it, expect, afterEach } from 'vitest';
-import { fixture, shadowQuery, shadowQueryAll, oneEvent, cleanup, checkA11y } from '../../test-utils.js';
+import {
+  fixture,
+  shadowQuery,
+  shadowQueryAll,
+  oneEvent,
+  cleanup,
+  checkA11y,
+} from '../../test-utils.js';
 import type { HelixTimePicker } from './hx-time-picker.js';
 import './index.js';
 
@@ -30,25 +37,19 @@ describe('hx-time-picker', () => {
     });
 
     it('renders input with correct placeholder for 12h format', async () => {
-      const el = await fixture<HelixTimePicker>(
-        '<hx-time-picker format="12h"></hx-time-picker>',
-      );
+      const el = await fixture<HelixTimePicker>('<hx-time-picker format="12h"></hx-time-picker>');
       const input = shadowQuery<HTMLInputElement>(el, 'input')!;
       expect(input.getAttribute('placeholder')).toBe('hh:mm AM');
     });
 
     it('renders input with correct placeholder for 24h format', async () => {
-      const el = await fixture<HelixTimePicker>(
-        '<hx-time-picker format="24h"></hx-time-picker>',
-      );
+      const el = await fixture<HelixTimePicker>('<hx-time-picker format="24h"></hx-time-picker>');
       const input = shadowQuery<HTMLInputElement>(el, 'input')!;
       expect(input.getAttribute('placeholder')).toBe('hh:mm');
     });
 
     it('exposes "label" CSS part', async () => {
-      const el = await fixture<HelixTimePicker>(
-        '<hx-time-picker label="Time"></hx-time-picker>',
-      );
+      const el = await fixture<HelixTimePicker>('<hx-time-picker label="Time"></hx-time-picker>');
       const label = shadowQuery(el, '[part="label"]');
       expect(label).toBeTruthy();
     });
@@ -114,9 +115,7 @@ describe('hx-time-picker', () => {
     });
 
     it('programmatic value update updates displayed input', async () => {
-      const el = await fixture<HelixTimePicker>(
-        '<hx-time-picker format="24h"></hx-time-picker>',
-      );
+      const el = await fixture<HelixTimePicker>('<hx-time-picker format="24h"></hx-time-picker>');
       el.value = '09:15';
       await el.updateComplete;
       const input = shadowQuery<HTMLInputElement>(el, 'input')!;
@@ -338,9 +337,7 @@ describe('hx-time-picker', () => {
     });
 
     it('formResetCallback clears value', async () => {
-      const el = await fixture<HelixTimePicker>(
-        '<hx-time-picker value="14:30"></hx-time-picker>',
-      );
+      const el = await fixture<HelixTimePicker>('<hx-time-picker value="14:30"></hx-time-picker>');
       el.formResetCallback();
       await el.updateComplete;
       expect(el.value).toBe('');
@@ -469,9 +466,7 @@ describe('hx-time-picker', () => {
     });
 
     it('does not open dropdown when disabled', async () => {
-      const el = await fixture<HelixTimePicker>(
-        '<hx-time-picker disabled></hx-time-picker>',
-      );
+      const el = await fixture<HelixTimePicker>('<hx-time-picker disabled></hx-time-picker>');
       const input = shadowQuery<HTMLInputElement>(el, 'input')!;
       input.click();
       await el.updateComplete;
@@ -1092,9 +1087,7 @@ describe('hx-time-picker', () => {
 
   describe('formResetCallback event behavior', () => {
     it('formResetCallback does not dispatch hx-change (A-22)', async () => {
-      const el = await fixture<HelixTimePicker>(
-        '<hx-time-picker value="14:30"></hx-time-picker>',
-      );
+      const el = await fixture<HelixTimePicker>('<hx-time-picker value="14:30"></hx-time-picker>');
       let changeEventFired = false;
       el.addEventListener('hx-change', () => {
         changeEventFired = true;
