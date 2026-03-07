@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/web-components';
-import { html } from 'lit';
+import { html, nothing } from 'lit';
 import { expect } from 'storybook/test';
 import './hx-badge.js';
 
@@ -14,14 +14,14 @@ const meta = {
   argTypes: {
     variant: {
       control: { type: 'select' },
-      options: ['primary', 'secondary', 'success', 'warning', 'danger', 'error', 'neutral', 'info'],
+      options: ['primary', 'secondary', 'success', 'warning', 'error', 'neutral', 'info'],
       description: 'Visual style variant that determines the badge color scheme.',
       table: {
         category: 'Visual',
         defaultValue: { summary: 'primary' },
         type: {
           summary:
-            "'primary' | 'secondary' | 'success' | 'warning' | 'danger' | 'error' | 'neutral' | 'info'",
+            "'primary' | 'secondary' | 'success' | 'warning' | 'error' | 'neutral' | 'info'",
         },
       },
     },
@@ -62,6 +62,42 @@ const meta = {
         type: { summary: 'boolean' },
       },
     },
+    count: {
+      control: 'number',
+      description: 'Numeric count to display. Truncated to `${max}+` when count exceeds max.',
+      table: {
+        category: 'Content',
+        type: { summary: 'number' },
+      },
+    },
+    max: {
+      control: 'number',
+      description: 'Maximum count before truncation to `${max}+`. Defaults to 99.',
+      table: {
+        category: 'Content',
+        defaultValue: { summary: '99' },
+        type: { summary: 'number' },
+      },
+    },
+    dotLabel: {
+      control: 'text',
+      description:
+        'Accessible label for dot indicator mode (required for WCAG 4.1.2 compliance). Example: "3 new messages".',
+      table: {
+        category: 'Accessibility',
+        type: { summary: 'string' },
+      },
+    },
+    removeLabel: {
+      control: 'text',
+      description:
+        'Accessible label for the remove button. Include context for better accessibility.',
+      table: {
+        category: 'Accessibility',
+        defaultValue: { summary: 'Remove' },
+        type: { summary: 'string' },
+      },
+    },
     label: {
       control: 'text',
       description: 'Badge label text passed via the default slot.',
@@ -82,10 +118,14 @@ const meta = {
   render: (args) => html`
     <hx-badge
       variant=${args.variant}
-      hx-size=${args.size}
+      size=${args.size}
       ?pill=${args.pill}
       ?pulse=${args.pulse}
       ?removable=${args.removable}
+      count=${args.count ?? nothing}
+      max=${args.max ?? nothing}
+      dot-label=${args.dotLabel ?? nothing}
+      remove-label=${args.removeLabel ?? nothing}
     >
       ${args.label}
     </hx-badge>
@@ -201,19 +241,6 @@ export const Secondary: Story = {
   },
 };
 
-/** Danger variant for destructive actions and high-risk clinical conditions. */
-export const Danger: Story = {
-  args: {
-    variant: 'danger',
-    label: 'Do Not Administer',
-  },
-  play: async ({ canvasElement }) => {
-    const badge = canvasElement.querySelector('hx-badge');
-    const span = badge?.shadowRoot?.querySelector('span');
-    await expect(span?.classList.contains('badge--danger')).toBe(true);
-  },
-};
-
 /** Info variant for neutral informational notices and guidance messages. */
 export const Info: Story = {
   args: {
@@ -271,7 +298,124 @@ export const Large: Story = {
 };
 
 // ════════════════════════════════════════════════════════════════════════════
-// 4. SPECIAL MODES
+// 4. COUNT / MAX
+// ════════════════════════════════════════════════════════════════════════════
+
+/** Badge with a numeric count. When count exceeds max, displays `${max}+`. */
+export const WithCount: Story = {
+  render: () => html`
+    <div style="display: flex; gap: 1rem; align-items: center; font-family: var(--hx-font-family-sans, sans-serif);">
+      <div style="display: flex; flex-direction: column; align-items: center; gap: 0.25rem;">
+        <hx-badge variant="error" pill count="3"></hx-badge>
+        <span style="font-size: 0.75rem; color: var(--hx-color-neutral-500, #6b7280);">count=3</span>
+      </div>
+      <div style="display: flex; flex-direction: column; align-items: center; gap: 0.25rem;">
+        <hx-badge variant="warning" pill count="42"></hx-badge>
+        <span style="font-size: 0.75rem; color: var(--hx-color-neutral-500, #6b7280);">count=42</span>
+      </div>
+      <div style="display: flex; flex-direction: column; align-items: center; gap: 0.25rem;">
+        <hx-badge variant="primary" pill count="99"></hx-badge>
+        <span style="font-size: 0.75rem; color: var(--hx-color-neutral-500, #6b7280);">count=99 (max)</span>
+      </div>
+      <div style="display: flex; flex-direction: column; align-items: center; gap: 0.25rem;">
+        <hx-badge variant="error" pill count="150" max="99"></hx-badge>
+        <span style="font-size: 0.75rem; color: var(--hx-color-neutral-500, #6b7280);">count=150, max=99 → 99+</span>
+      </div>
+      <div style="display: flex; flex-direction: column; align-items: center; gap: 0.25rem;">
+        <hx-badge variant="success" pill count="5" max="9"></hx-badge>
+        <span style="font-size: 0.75rem; color: var(--hx-color-neutral-500, #6b7280);">count=5, max=9</span>
+      </div>
+      <div style="display: flex; flex-direction: column; align-items: center; gap: 0.25rem;">
+        <hx-badge variant="info" pill count="10" max="9"></hx-badge>
+        <span style="font-size: 0.75rem; color: var(--hx-color-neutral-500, #6b7280);">count=10, max=9 → 9+</span>
+      </div>
+    </div>
+  `,
+  play: async ({ canvasElement }) => {
+    const badges = canvasElement.querySelectorAll('hx-badge');
+    await expect(badges.length).toBe(6);
+
+    // count=3 displays "3"
+    const b0 = badges[0].shadowRoot?.querySelector('span');
+    await expect(b0?.textContent?.trim()).toBe('3');
+
+    // count=150, max=99 displays "99+"
+    const b3 = badges[3].shadowRoot?.querySelector('span');
+    await expect(b3?.textContent?.trim()).toBe('99+');
+
+    // count=10, max=9 displays "9+"
+    const b5 = badges[5].shadowRoot?.querySelector('span');
+    await expect(b5?.textContent?.trim()).toBe('9+');
+  },
+};
+
+/** Removable badges with numeric counts — the primary filter tag use case. */
+export const RemovableWithCount: Story = {
+  render: () => html`
+    <div
+      style="display: flex; flex-direction: column; gap: 1rem; font-family: var(--hx-font-family-sans, sans-serif);"
+    >
+      <p style="margin: 0; color: var(--hx-color-neutral-700, #374151); font-weight: 600;">
+        Active Filters
+      </p>
+      <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+        <hx-badge
+          variant="primary"
+          pill
+          removable
+          remove-label="Remove ICU filter"
+          count="12"
+        >ICU</hx-badge>
+        <hx-badge
+          variant="success"
+          pill
+          removable
+          remove-label="Remove Stable filter"
+          count="28"
+        >Stable</hx-badge>
+        <hx-badge
+          variant="warning"
+          pill
+          removable
+          remove-label="Remove Pending Review filter"
+          count="5"
+        >Pending Review</hx-badge>
+        <hx-badge
+          variant="error"
+          pill
+          removable
+          remove-label="Remove Critical filter"
+          count="3"
+        >Critical</hx-badge>
+        <hx-badge
+          variant="neutral"
+          pill
+          removable
+          remove-label="Remove Discharged filter"
+          count="107"
+          max="99"
+        >Discharged</hx-badge>
+      </div>
+    </div>
+  `,
+  play: async ({ canvasElement }) => {
+    const badges = canvasElement.querySelectorAll('hx-badge');
+    await expect(badges.length).toBe(5);
+
+    for (const badge of badges) {
+      const btn = badge.shadowRoot?.querySelector('[part="remove-button"]');
+      await expect(btn).toBeTruthy();
+    }
+
+    // Last badge: count=107, max=99 → "99+"
+    const lastBadge = badges[4];
+    const span = lastBadge.shadowRoot?.querySelector('span');
+    await expect(span?.textContent?.trim()).toBe('99+');
+  },
+};
+
+// ════════════════════════════════════════════════════════════════════════════
+// 5. SPECIAL MODES
 // ════════════════════════════════════════════════════════════════════════════
 
 /** Pill mode applies fully rounded corners, ideal for notification counts. */
@@ -301,7 +445,7 @@ export const Pulsing: Story = {
   },
 };
 
-/** Dot indicator: an empty badge with pulse renders as a small notification dot. */
+/** Dot indicator: an empty badge with pulse renders as a small notification dot. Use `dot-label` for WCAG compliance. */
 export const DotIndicator: Story = {
   render: () => html`
     <div style="display: flex; gap: 1.5rem; align-items: center;">
@@ -313,6 +457,7 @@ export const DotIndicator: Story = {
         <hx-badge
           variant="error"
           pulse
+          dot-label="New messages"
           style="position: absolute; top: -4px; right: -10px;"
         ></hx-badge>
       </div>
@@ -324,6 +469,7 @@ export const DotIndicator: Story = {
         <hx-badge
           variant="success"
           pulse
+          dot-label="New lab results"
           style="position: absolute; top: -4px; right: -10px;"
         ></hx-badge>
       </div>
@@ -335,6 +481,7 @@ export const DotIndicator: Story = {
         <hx-badge
           variant="warning"
           pulse
+          dot-label="Pending orders"
           style="position: absolute; top: -4px; right: -10px;"
         ></hx-badge>
       </div>
@@ -346,6 +493,7 @@ export const DotIndicator: Story = {
         <hx-badge
           variant="primary"
           pulse
+          dot-label="New alerts"
           style="position: absolute; top: -4px; right: -10px;"
         ></hx-badge>
       </div>
@@ -367,7 +515,7 @@ export const DotIndicator: Story = {
 // 5. KITCHEN SINKS
 // ════════════════════════════════════════════════════════════════════════════
 
-/** All eight variants displayed side by side for visual comparison. */
+/** All seven variants displayed side by side for visual comparison. */
 export const AllVariants: Story = {
   render: () => html`
     <div style="display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap;">
@@ -375,7 +523,6 @@ export const AllVariants: Story = {
       <hx-badge variant="secondary">Secondary</hx-badge>
       <hx-badge variant="success">Success</hx-badge>
       <hx-badge variant="warning">Warning</hx-badge>
-      <hx-badge variant="danger">Danger</hx-badge>
       <hx-badge variant="error">Error</hx-badge>
       <hx-badge variant="neutral">Neutral</hx-badge>
       <hx-badge variant="info">Info</hx-badge>
@@ -383,7 +530,7 @@ export const AllVariants: Story = {
   `,
   play: async ({ canvasElement }) => {
     const badges = canvasElement.querySelectorAll('hx-badge');
-    await expect(badges.length).toBe(8);
+    await expect(badges.length).toBe(7);
   },
 };
 
@@ -391,9 +538,9 @@ export const AllVariants: Story = {
 export const AllSizes: Story = {
   render: () => html`
     <div style="display: flex; gap: 0.75rem; align-items: center;">
-      <hx-badge hx-size="sm">Small</hx-badge>
-      <hx-badge hx-size="md">Medium</hx-badge>
-      <hx-badge hx-size="lg">Large</hx-badge>
+      <hx-badge size="sm">Small</hx-badge>
+      <hx-badge size="md">Medium</hx-badge>
+      <hx-badge size="lg">Large</hx-badge>
     </div>
   `,
   play: async ({ canvasElement }) => {
@@ -410,7 +557,6 @@ export const AllCombinations: Story = {
       'secondary',
       'success',
       'warning',
-      'danger',
       'error',
       'neutral',
       'info',
@@ -446,7 +592,7 @@ export const AllCombinations: Story = {
             </div>
             ${sizes.map(
               (size) => html`
-                <div><hx-badge variant=${variant} hx-size=${size}>${variant}</hx-badge></div>
+                <div><hx-badge variant=${variant} size=${size}>${variant}</hx-badge></div>
               `,
             )}
           `,
@@ -456,7 +602,7 @@ export const AllCombinations: Story = {
   },
   play: async ({ canvasElement }) => {
     const badges = canvasElement.querySelectorAll('hx-badge');
-    await expect(badges.length).toBe(24);
+    await expect(badges.length).toBe(21);
   },
 };
 
@@ -473,7 +619,7 @@ export const OnAButton: Story = {
         <hx-badge
           variant="error"
           pill
-          hx-size="sm"
+          size="sm"
           style="position: absolute; top: -6px; right: -8px;"
           >7</hx-badge
         >
@@ -484,7 +630,7 @@ export const OnAButton: Story = {
           variant="warning"
           pill
           pulse
-          hx-size="sm"
+          size="sm"
           style="position: absolute; top: -6px; right: -8px;"
           >3</hx-badge
         >
@@ -516,7 +662,7 @@ export const InCardHeader: Story = {
         style="display: flex; justify-content: space-between; align-items: center;"
       >
         <span>Patient Record #4821</span>
-        <hx-badge variant="success" hx-size="sm">Active</hx-badge>
+        <hx-badge variant="success" size="sm">Active</hx-badge>
       </div>
       <div>
         <p
@@ -605,7 +751,7 @@ export const WithOtherComponents: Story = {
 
       <!-- Badge inside an alert -->
       <hx-alert variant="warning" open>
-        Patient has <hx-badge variant="error" hx-size="sm">3</hx-badge> overdue medication orders
+        Patient has <hx-badge variant="error" size="sm">3</hx-badge> overdue medication orders
         requiring physician review.
       </hx-alert>
 
@@ -661,8 +807,8 @@ export const SingleCharacter: Story = {
       <hx-badge variant="warning" pill>!</hx-badge>
       <hx-badge variant="neutral" pill>0</hx-badge>
       <hx-badge variant="primary" pill>9</hx-badge>
-      <hx-badge variant="error" pill hx-size="sm">2</hx-badge>
-      <hx-badge variant="success" pill hx-size="lg">7</hx-badge>
+      <hx-badge variant="error" pill size="sm">2</hx-badge>
+      <hx-badge variant="success" pill size="lg">7</hx-badge>
     </div>
   `,
   play: async ({ canvasElement }) => {
@@ -733,7 +879,6 @@ export const ManyBadges: Story = {
       'secondary',
       'success',
       'warning',
-      'danger',
       'error',
       'neutral',
       'info',
@@ -743,7 +888,7 @@ export const ManyBadges: Story = {
       <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; max-width: 700px;">
         ${departments.map(
           (dept, i) => html`
-            <hx-badge variant=${variants[i % variants.length]} hx-size="sm">${dept}</hx-badge>
+            <hx-badge variant=${variants[i % variants.length]} size="sm">${dept}</hx-badge>
           `,
         )}
       </div>
@@ -1261,7 +1406,6 @@ export const RemovableVariants: StoryObj<typeof meta> = {
       <hx-badge variant="secondary" removable>Secondary</hx-badge>
       <hx-badge variant="success" removable>Success</hx-badge>
       <hx-badge variant="warning" removable>Warning</hx-badge>
-      <hx-badge variant="danger" removable>Danger</hx-badge>
       <hx-badge variant="error" removable>Error</hx-badge>
       <hx-badge variant="neutral" removable>Neutral</hx-badge>
       <hx-badge variant="info" removable>Info</hx-badge>
@@ -1269,7 +1413,7 @@ export const RemovableVariants: StoryObj<typeof meta> = {
   `,
   play: async ({ canvasElement }) => {
     const badges = canvasElement.querySelectorAll('hx-badge');
-    await expect(badges.length).toBe(8);
+    await expect(badges.length).toBe(7);
 
     for (const badge of badges) {
       const removeBtn = badge.shadowRoot?.querySelector('[part="remove-button"]');
@@ -1364,21 +1508,6 @@ export const WithPrefixAllVariants: StoryObj<typeof meta> = {
           />
         </svg>
         Review
-      </hx-badge>
-      <hx-badge variant="danger">
-        <svg
-          slot="prefix"
-          viewBox="0 0 16 16"
-          width="12"
-          height="12"
-          aria-hidden="true"
-          fill="currentColor"
-        >
-          <path
-            d="M8 1a7 7 0 1 0 0 14A7 7 0 0 0 8 1zM7.25 4.5h1.5v5h-1.5v-5zm0 6.5h1.5v1.5h-1.5V11z"
-          />
-        </svg>
-        Danger
       </hx-badge>
       <hx-badge variant="info">
         <svg
