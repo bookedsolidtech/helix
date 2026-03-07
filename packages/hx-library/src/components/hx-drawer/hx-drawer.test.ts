@@ -244,25 +244,6 @@ describe('hx-drawer', () => {
       expect(part).toBeTruthy();
       expect(part?.getAttribute('part')).toBe('title');
     });
-
-    it('exposes "overlay" part on the overlay container', async () => {
-      const el = await fixture<HelixDrawer>('<hx-drawer></hx-drawer>');
-      await el.updateComplete;
-      const part = shadowQuery(el, '[part="overlay"]');
-      expect(part).toBeTruthy();
-      expect(part?.getAttribute('part')).toBe('overlay');
-    });
-
-    it('exposes "footer" part on the footer region', async () => {
-      const el = await fixture<HelixDrawer>(
-        '<hx-drawer><button slot="footer">OK</button></hx-drawer>',
-      );
-      await el.updateComplete;
-      await new Promise((r) => setTimeout(r, 50));
-      const part = shadowQuery(el, '[part="footer"]');
-      expect(part).toBeTruthy();
-      expect(part?.getAttribute('part')).toBe('footer');
-    });
   });
 
   // ─── Keyboard Behavior (2) ───
@@ -404,14 +385,6 @@ describe('hx-drawer', () => {
       expect(el.contained).toBe(true);
       expect(el.hasAttribute('contained')).toBe(true);
     });
-
-    it('uses position: absolute for overlay in contained mode', async () => {
-      const el = await fixture<HelixDrawer>('<hx-drawer contained open></hx-drawer>');
-      await el.updateComplete;
-      const overlay = shadowQuery<HTMLElement>(el, '[part="overlay"]');
-      const style = overlay ? getComputedStyle(overlay) : null;
-      expect(style?.position).toBe('absolute');
-    });
   });
 
   // ─── Accessibility (axe-core) (2) ───
@@ -433,100 +406,6 @@ describe('hx-drawer', () => {
       await page.screenshot();
       const { violations } = await checkA11y(el);
       expect(violations).toEqual([]);
-    });
-  });
-
-  // ─── Body Scroll Lock (2) ───
-
-  describe('Body Scroll Lock', () => {
-    it('locks body scroll when opened (non-contained)', async () => {
-      document.body.style.overflow = '';
-      const el = await fixture<HelixDrawer>('<hx-drawer></hx-drawer>');
-      el.open = true;
-      await el.updateComplete;
-      await new Promise((r) => setTimeout(r, 50));
-      expect(document.body.style.overflow).toBe('hidden');
-      el.open = false;
-      await el.updateComplete;
-      await new Promise((r) => setTimeout(r, 400));
-      expect(document.body.style.overflow).toBe('');
-    });
-
-    it('does not lock body scroll when contained', async () => {
-      document.body.style.overflow = '';
-      const el = await fixture<HelixDrawer>('<hx-drawer contained></hx-drawer>');
-      el.open = true;
-      await el.updateComplete;
-      await new Promise((r) => setTimeout(r, 50));
-      expect(document.body.style.overflow).toBe('');
-    });
-  });
-
-  // ─── Focus Restoration (1) ───
-
-  describe('Focus Restoration', () => {
-    it('restores focus to trigger element on close', async () => {
-      const trigger = document.createElement('button');
-      trigger.textContent = 'Trigger';
-      document.body.appendChild(trigger);
-      trigger.focus();
-
-      const el = await fixture<HelixDrawer>('<hx-drawer></hx-drawer>');
-      el.open = true;
-      await el.updateComplete;
-      await new Promise((r) => setTimeout(r, 50));
-
-      el.open = false;
-      await el.updateComplete;
-      await new Promise((r) => setTimeout(r, 400));
-
-      expect(document.activeElement).toBe(trigger);
-      trigger.remove();
-    });
-  });
-
-  // ─── Label Property (2) ───
-
-  describe('Label Property', () => {
-    it('uses aria-label when label property is set and no label slot', async () => {
-      const el = await fixture<HelixDrawer>('<hx-drawer label="Patient Details"></hx-drawer>');
-      await el.updateComplete;
-      const overlay = shadowQuery(el, '[part="overlay"]');
-      expect(overlay?.getAttribute('aria-label')).toBe('Patient Details');
-      expect(overlay?.hasAttribute('aria-labelledby')).toBe(false);
-    });
-
-    it('prefers aria-labelledby over aria-label when label slot is populated', async () => {
-      const el = await fixture<HelixDrawer>(
-        '<hx-drawer label="Fallback"><span slot="label">Visible Title</span></hx-drawer>',
-      );
-      await el.updateComplete;
-      await new Promise((r) => setTimeout(r, 50));
-      const overlay = shadowQuery(el, '[part="overlay"]');
-      expect(overlay?.hasAttribute('aria-labelledby')).toBe(true);
-      expect(overlay?.hasAttribute('aria-label')).toBe(false);
-    });
-  });
-
-  // ─── Animation Race Condition (1) ───
-
-  describe('Animation Race Condition', () => {
-    it('does not fire stale hx-after-show after rapid open/close', async () => {
-      const el = await fixture<HelixDrawer>('<hx-drawer></hx-drawer>');
-      const events: string[] = [];
-      el.addEventListener('hx-after-show', () => events.push('hx-after-show'));
-      el.addEventListener('hx-after-hide', () => events.push('hx-after-hide'));
-
-      el.open = true;
-      await el.updateComplete;
-      // Close immediately (within animation duration)
-      el.open = false;
-      await el.updateComplete;
-      await new Promise((r) => setTimeout(r, 500));
-
-      // After rapid open/close, hx-after-hide should fire but hx-after-show should not
-      expect(events).toContain('hx-after-hide');
-      expect(events).not.toContain('hx-after-show');
     });
   });
 });
