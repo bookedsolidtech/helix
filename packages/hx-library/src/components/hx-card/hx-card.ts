@@ -12,12 +12,12 @@ import { helixCardStyles } from './hx-card.styles.js';
  * @tag hx-card
  *
  * @slot image - Optional image or media content at the top of the card.
- * @slot heading - The card heading/title content.
+ * @slot heading - The card heading/title content. Use a semantic heading element (h2, h3, etc.) for proper accessibility.
  * @slot - Default slot for the card body content.
  * @slot footer - Optional footer content below the body.
- * @slot actions - Optional action buttons, rendered with a top border separator.
+ * @slot actions - Optional action buttons, rendered with a top border separator. Do NOT use together with hx-href (interactive card + focusable actions is an ARIA anti-pattern).
  *
- * @fires {CustomEvent<{href: string, originalEvent: MouseEvent}>} hx-card-click - Dispatched when an interactive card (with hx-href) is clicked.
+ * @fires {CustomEvent<{href: string, originalEvent: MouseEvent | KeyboardEvent}>} hx-card-click - Dispatched when an interactive card (with hx-href) is clicked.
  *
  * @csspart card - The outer card container element.
  * @csspart image - The image slot container.
@@ -32,6 +32,7 @@ import { helixCardStyles } from './hx-card.styles.js';
  * @cssprop [--hx-card-border-radius=var(--hx-border-radius-lg)] - Card border radius.
  * @cssprop [--hx-card-padding=var(--hx-space-6)] - Internal padding for card sections.
  * @cssprop [--hx-card-gap=var(--hx-space-4)] - Gap between card sections.
+ * @cssprop [--hx-card-image-aspect-ratio=16/9] - Aspect ratio for the image slot.
  */
 @customElement('hx-card')
 export class HelixCard extends LitElement {
@@ -58,7 +59,16 @@ export class HelixCard extends LitElement {
    * @attr hx-href
    */
   @property({ type: String, attribute: 'hx-href' })
-  hxHref = '';
+  hxHref: string | undefined = undefined;
+
+  /**
+   * Accessible label for interactive cards. Use this to provide a meaningful
+   * description of the card's purpose rather than exposing the raw URL.
+   * Only applies when hx-href is set.
+   * @attr hx-aria-label
+   */
+  @property({ type: String, attribute: 'hx-aria-label' })
+  hxAriaLabel: string | undefined = undefined;
 
   // ─── Slot Detection ───
 
@@ -85,6 +95,13 @@ export class HelixCard extends LitElement {
   private _onActionsSlotChange(e: Event): void {
     const slot = e.target as HTMLSlotElement;
     this._hasActions = slot.assignedNodes({ flatten: true }).length > 0;
+    if (this._hasActions && this.hxHref) {
+      console.warn(
+        '[hx-card] Using hx-href (interactive card) together with the actions slot is an ARIA anti-pattern: ' +
+          'interactive controls cannot be nested inside role="link". ' +
+          'Use either hx-href or the actions slot, not both.',
+      );
+    }
   }
 
   // ─── Event Handling ───
@@ -98,11 +115,14 @@ export class HelixCard extends LitElement {
      * @event hx-card-click
      */
     this.dispatchEvent(
-      new CustomEvent('hx-card-click', {
-        bubbles: true,
-        composed: true,
-        detail: { href: this.hxHref, originalEvent },
-      }),
+      new CustomEvent<{ href: string; originalEvent: MouseEvent | KeyboardEvent }>(
+        'hx-card-click',
+        {
+          bubbles: true,
+          composed: true,
+          detail: { href: this.hxHref, originalEvent },
+        },
+      ),
     );
   }
 
@@ -137,7 +157,7 @@ export class HelixCard extends LitElement {
         class=${classMap(classes)}
         role=${isInteractive ? 'link' : nothing}
         tabindex=${isInteractive ? '0' : nothing}
-        aria-label=${isInteractive ? `Navigate to ${this.hxHref}` : nothing}
+        aria-label=${isInteractive && this.hxAriaLabel ? this.hxAriaLabel : nothing}
         @click=${this._handleClick}
         @keydown=${this._handleKeyDown}
       >

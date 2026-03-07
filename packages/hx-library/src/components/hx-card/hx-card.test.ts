@@ -106,10 +106,39 @@ describe('hx-card', () => {
       expect(card.getAttribute('tabindex')).toBe('0');
     });
 
-    it('has aria-label="Navigate to {hx-href}" when hx-href set', async () => {
+    it('has no aria-label by default when hx-href set (accessible name from content)', async () => {
       const el = await fixture<HelixCard>('<hx-card hx-href="/test">Content</hx-card>');
       const card = shadowQuery(el, '.card')!;
-      expect(card.getAttribute('aria-label')).toBe('Navigate to /test');
+      expect(card.hasAttribute('aria-label')).toBe(false);
+    });
+
+    it('uses hx-aria-label when provided on interactive card', async () => {
+      const el = await fixture<HelixCard>(
+        '<hx-card hx-href="/test" hx-aria-label="View patient record">Content</hx-card>',
+      );
+      const card = shadowQuery(el, '.card')!;
+      expect(card.getAttribute('aria-label')).toBe('View patient record');
+    });
+
+    it('updates interactive attributes when hxHref changes after initial render', async () => {
+      const el = await fixture<HelixCard>('<hx-card>Content</hx-card>');
+      const card = shadowQuery(el, '.card')!;
+      expect(card.hasAttribute('role')).toBe(false);
+      expect(card.hasAttribute('tabindex')).toBe(false);
+
+      el.hxHref = '/new-path';
+      await el.updateComplete;
+
+      expect(card.getAttribute('role')).toBe('link');
+      expect(card.getAttribute('tabindex')).toBe('0');
+      expect(card.classList.contains('card--interactive')).toBe(true);
+
+      el.hxHref = undefined;
+      await el.updateComplete;
+
+      expect(card.hasAttribute('role')).toBe(false);
+      expect(card.hasAttribute('tabindex')).toBe(false);
+      expect(card.classList.contains('card--interactive')).toBe(false);
     });
   });
 
@@ -311,6 +340,22 @@ describe('hx-card', () => {
     });
   });
 
+  // ─── Interactive + Actions Anti-Pattern ───
+
+  describe('Interactive + Actions slot (known limitation)', () => {
+    it('renders both hx-href and actions slot content (ARIA anti-pattern — avoid in production)', async () => {
+      const el = await fixture<HelixCard>(
+        '<hx-card hx-href="/test"><span slot="heading">Title</span><button slot="actions">Action</button></hx-card>',
+      );
+      const card = shadowQuery(el, '.card')!;
+      // Card has role="link" when hx-href is set
+      expect(card.getAttribute('role')).toBe('link');
+      // Actions slot is populated (consumer's responsibility to avoid this combination)
+      const action = el.querySelector('[slot="actions"]');
+      expect(action).toBeTruthy();
+    });
+  });
+
   // ─── Accessibility (axe-core) ───
 
   describe('Accessibility (axe-core)', () => {
@@ -326,6 +371,15 @@ describe('hx-card', () => {
     it('has no axe violations when interactive', async () => {
       const el = await fixture<HelixCard>(
         '<hx-card hx-href="https://example.com"><span slot="heading">Title</span><p>Content</p></hx-card>',
+      );
+      await page.screenshot();
+      const { violations } = await checkA11y(el);
+      expect(violations).toEqual([]);
+    });
+
+    it('has no axe violations when interactive with hx-aria-label', async () => {
+      const el = await fixture<HelixCard>(
+        '<hx-card hx-href="https://example.com" hx-aria-label="View patient record"><span slot="heading">Title</span><p>Content</p></hx-card>',
       );
       await page.screenshot();
       const { violations } = await checkA11y(el);
