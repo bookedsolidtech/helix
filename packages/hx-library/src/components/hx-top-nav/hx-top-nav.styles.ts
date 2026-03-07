@@ -29,8 +29,9 @@ export const helixTopNavStyles = css`
 
   .nav__bar {
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
-    height: var(--hx-top-nav-height, var(--hx-space-16, 4rem));
+    min-height: var(--hx-top-nav-height, var(--hx-space-16, 4rem));
     padding-inline: var(--hx-top-nav-padding-x, var(--hx-space-6, 1.5rem));
     gap: var(--hx-space-4, 1rem);
   }
@@ -108,6 +109,10 @@ export const helixTopNavStyles = css`
     /* Hide hamburger on desktop */
     .mobile-toggle {
       display: none;
+    }
+
+    .nav__bar {
+      flex-wrap: nowrap;
     }
 
     /* Collapsible becomes a standard inline flex row */
