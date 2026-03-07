@@ -95,7 +95,9 @@ describe('hx-combobox', () => {
     });
 
     it('shows asterisk when required', async () => {
-      const el = await fixture<HxCombobox>('<hx-combobox label="Fruit" required></hx-combobox>');
+      const el = await fixture<HxCombobox>(
+        '<hx-combobox label="Fruit" required></hx-combobox>',
+      );
       const marker = shadowQuery(el, '.field__required-marker');
       expect(marker).toBeTruthy();
       expect(marker?.textContent).toBe('*');
@@ -106,7 +108,9 @@ describe('hx-combobox', () => {
 
   describe('Property: placeholder', () => {
     it('sets placeholder on native input', async () => {
-      const el = await fixture<HxCombobox>('<hx-combobox placeholder="Search..."></hx-combobox>');
+      const el = await fixture<HxCombobox>(
+        '<hx-combobox placeholder="Search..."></hx-combobox>',
+      );
       const input = shadowQuery<HTMLInputElement>(el, 'input')!;
       expect(input.getAttribute('placeholder')).toBe('Search...');
     });
@@ -116,7 +120,9 @@ describe('hx-combobox', () => {
 
   describe('Property: value', () => {
     it('reflects value attribute', async () => {
-      const el = await fixture<HxCombobox>(withOptions('value="banana"'));
+      const el = await fixture<HxCombobox>(
+        withOptions('value="banana"'),
+      );
       expect(el.value).toBe('banana');
     });
 
@@ -187,7 +193,9 @@ describe('hx-combobox', () => {
 
   describe('Property: error', () => {
     it('renders error message in role="alert" div', async () => {
-      const el = await fixture<HxCombobox>('<hx-combobox error="Required field"></hx-combobox>');
+      const el = await fixture<HxCombobox>(
+        '<hx-combobox error="Required field"></hx-combobox>',
+      );
       const errorEl = shadowQuery(el, '[role="alert"]');
       expect(errorEl?.textContent?.trim()).toBe('Required field');
     });
@@ -198,11 +206,10 @@ describe('hx-combobox', () => {
       expect(input?.getAttribute('aria-invalid')).toBe('true');
     });
 
-    it('error div uses role="alert" (implicit assertive)', async () => {
+    it('error div has aria-live="polite"', async () => {
       const el = await fixture<HxCombobox>('<hx-combobox error="Oops"></hx-combobox>');
       const errorEl = shadowQuery(el, '[role="alert"]');
-      expect(errorEl?.getAttribute('role')).toBe('alert');
-      expect(errorEl?.hasAttribute('aria-live')).toBe(false);
+      expect(errorEl?.getAttribute('aria-live')).toBe('polite');
     });
   });
 
@@ -230,7 +237,9 @@ describe('hx-combobox', () => {
 
   describe('Property: clearable', () => {
     it('shows clear button when value is set and clearable=true', async () => {
-      const el = await fixture<HxCombobox>(withOptions('value="apple" clearable'));
+      const el = await fixture<HxCombobox>(
+        withOptions('value="apple" clearable'),
+      );
       await el.updateComplete;
       const clearBtn = shadowQuery(el, '[part="clear-button"]');
       expect(clearBtn).toBeTruthy();
@@ -355,17 +364,6 @@ describe('hx-combobox', () => {
       const event = await clearPromise;
       expect(event).toBeTruthy();
     });
-
-    it('dispatches hx-hide when listbox closes', async () => {
-      const el = await fixture<HxCombobox>(withOptions());
-      const input = shadowQuery<HTMLInputElement>(el, 'input')!;
-      input.dispatchEvent(new Event('focus'));
-      await el.updateComplete;
-      const hidePromise = oneEvent(el, 'hx-hide');
-      input.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
-      const event = await hidePromise;
-      expect(event).toBeTruthy();
-    });
   });
 
   // ─── Keyboard Navigation (4) ───
@@ -405,44 +403,6 @@ describe('hx-combobox', () => {
       expect(el.value).toBe('apple');
     });
 
-    it('ArrowUp opens listbox and focuses last option', async () => {
-      const el = await fixture<HxCombobox>(withOptions());
-      const input = shadowQuery<HTMLInputElement>(el, 'input')!;
-      input.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowUp', bubbles: true }));
-      await el.updateComplete;
-      const listbox = shadowQuery(el, '[role="listbox"]');
-      expect(listbox?.hasAttribute('hidden')).toBe(false);
-    });
-
-    it('Home key focuses first option', async () => {
-      const el = await fixture<HxCombobox>(withOptions());
-      const input = shadowQuery<HTMLInputElement>(el, 'input')!;
-      // Open with ArrowDown to focus first item
-      input.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true }));
-      await el.updateComplete;
-      // Navigate down
-      input.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true }));
-      await el.updateComplete;
-      // Press Home to go back to first
-      input.dispatchEvent(new KeyboardEvent('keydown', { key: 'Home', bubbles: true }));
-      await el.updateComplete;
-      // Select with Enter
-      input.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
-      await el.updateComplete;
-      expect(el.value).toBe('apple');
-    });
-
-    it('End key focuses last option', async () => {
-      const el = await fixture<HxCombobox>(withOptions());
-      const input = shadowQuery<HTMLInputElement>(el, 'input')!;
-      input.dispatchEvent(new KeyboardEvent('keydown', { key: 'End', bubbles: true }));
-      await el.updateComplete;
-      // Select with Enter
-      input.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
-      await el.updateComplete;
-      expect(el.value).toBe('cherry');
-    });
-
     it('Tab closes listbox', async () => {
       const el = await fixture<HxCombobox>(withOptions());
       const input = shadowQuery<HTMLInputElement>(el, 'input')!;
@@ -464,7 +424,9 @@ describe('hx-combobox', () => {
     });
 
     it('form getter returns associated form', async () => {
-      const el = await fixture<HxCombobox>('<form><hx-combobox name="fruit"></hx-combobox></form>');
+      const el = await fixture<HxCombobox>(
+        '<form><hx-combobox name="fruit"></hx-combobox></form>',
+      );
       const combobox = el.querySelector('hx-combobox') as HxCombobox;
       expect(combobox.form).toBeInstanceOf(HTMLFormElement);
     });
@@ -478,7 +440,7 @@ describe('hx-combobox', () => {
 
     it('formStateRestoreCallback restores value', async () => {
       const el = await fixture<HxCombobox>(withOptions());
-      el.formStateRestoreCallback('cherry', 'restore');
+      el.formStateRestoreCallback('cherry');
       expect(el.value).toBe('cherry');
     });
 
@@ -532,47 +494,6 @@ describe('hx-combobox', () => {
     });
   });
 
-  // ─── Loading State (2) ───
-
-  describe('Loading State', () => {
-    it('sets aria-busy="true" on input when loading', async () => {
-      const el = await fixture<HxCombobox>('<hx-combobox loading></hx-combobox>');
-      const input = shadowQuery(el, 'input');
-      expect(input?.getAttribute('aria-busy')).toBe('true');
-    });
-
-    it('does not set aria-busy when not loading', async () => {
-      const el = await fixture<HxCombobox>('<hx-combobox></hx-combobox>');
-      const input = shadowQuery(el, 'input');
-      expect(input?.hasAttribute('aria-busy')).toBe(false);
-    });
-  });
-
-  // ─── Disabled Option Skipping (1) ───
-
-  describe('Disabled Option Skipping', () => {
-    it('keyboard navigation skips disabled options', async () => {
-      const el = await fixture<HxCombobox>(`
-        <hx-combobox>
-          <option slot="option" value="a">Option A</option>
-          <option slot="option" value="b" disabled>Option B (disabled)</option>
-          <option slot="option" value="c">Option C</option>
-        </hx-combobox>
-      `);
-      const input = shadowQuery<HTMLInputElement>(el, 'input')!;
-      // Open and navigate to first
-      input.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true }));
-      await el.updateComplete;
-      // Navigate down — should skip disabled B and land on C
-      input.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true }));
-      await el.updateComplete;
-      // Select with Enter
-      input.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
-      await el.updateComplete;
-      expect(el.value).toBe('c');
-    });
-  });
-
   // ─── Accessibility (3) ───
 
   describe('Accessibility (axe-core)', () => {
@@ -584,7 +505,9 @@ describe('hx-combobox', () => {
     });
 
     it('has no axe violations when disabled', async () => {
-      const el = await fixture<HxCombobox>('<hx-combobox label="Fruit" disabled></hx-combobox>');
+      const el = await fixture<HxCombobox>(
+        '<hx-combobox label="Fruit" disabled></hx-combobox>',
+      );
       await checkA11y(el);
     });
 

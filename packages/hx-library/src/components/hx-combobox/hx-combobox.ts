@@ -5,20 +5,13 @@ import { ifDefined } from 'lit/directives/if-defined.js';
 import { tokenStyles } from '@helix/tokens/lit';
 import { helixComboboxStyles } from './hx-combobox.styles.js';
 
-// ─── Module-level ID counter ───
+// ─── Internal option model ───
 
-let _comboboxCounter = 0;
-
-// ─── Public option model ───
-
-export interface ComboboxOption {
+interface ComboboxOption {
   value: string;
   label: string;
   disabled: boolean;
 }
-
-/** Size variants for the combobox. */
-export type HxComboboxSize = 'sm' | 'md' | 'lg';
 
 /**
  * A form-associated combobox component combining a text input with a listbox
@@ -78,7 +71,7 @@ export class HelixCombobox extends LitElement {
 
   // ─── Stable IDs ───
 
-  private _id = `hx-combobox-${++_comboboxCounter}`;
+  private _id = `hx-combobox-${Math.random().toString(36).slice(2, 9)}`;
   private _listboxId = `${this._id}-listbox`;
   private _helpTextId = `${this._id}-help`;
   private _errorId = `${this._id}-error`;
@@ -146,7 +139,14 @@ export class HelixCombobox extends LitElement {
    * @attr hx-size
    */
   @property({ type: String, attribute: 'hx-size', reflect: true })
-  size: HxComboboxSize = 'md';
+  size: 'sm' | 'md' | 'lg' = 'md';
+
+  /**
+   * Whether multiple options can be selected.
+   * @attr multiple
+   */
+  @property({ type: Boolean, reflect: true })
+  multiple = false;
 
   /**
    * Whether the combobox shows a clear button when a value is set.
@@ -274,13 +274,8 @@ export class HelixCombobox extends LitElement {
   }
 
   /** Called when the browser restores form state (e.g., bfcache navigation). */
-  formStateRestoreCallback(
-    state: string | File | FormData,
-    _mode: 'restore' | 'autocomplete',
-  ): void {
-    if (typeof state === 'string') {
-      this.value = state;
-    }
+  formStateRestoreCallback(state: string): void {
+    this.value = state;
   }
 
   // ─── Option Syncing from Slot ───
@@ -428,19 +423,6 @@ export class HelixCombobox extends LitElement {
         this._closeDropdown();
         this._filterText = '';
         if (this._input) this._input.value = '';
-        break;
-      }
-      case 'Home': {
-        e.preventDefault();
-        if (!this._open) this._openDropdown();
-        this._focusedOptionIndex = enabledIndices.length > 0 ? (enabledIndices[0] ?? -1) : -1;
-        break;
-      }
-      case 'End': {
-        e.preventDefault();
-        if (!this._open) this._openDropdown();
-        const lastEnabled = enabledIndices[enabledIndices.length - 1];
-        this._focusedOptionIndex = lastEnabled !== undefined ? lastEnabled : -1;
         break;
       }
       case 'Tab': {
@@ -619,7 +601,7 @@ export class HelixCombobox extends LitElement {
             aria-describedby=${ifDefined(describedBy)}
             aria-required=${this.required ? 'true' : nothing}
             aria-label=${ifDefined(this.ariaLabel ?? undefined)}
-            aria-busy=${this.loading ? 'true' : nothing}
+            aria-multiselectable=${this.multiple ? 'true' : nothing}
             .value=${this._filterText || (this._open ? '' : this._displayValue)}
             placeholder=${ifDefined(this.placeholder || undefined)}
             ?disabled=${this.disabled}
@@ -648,6 +630,7 @@ export class HelixCombobox extends LitElement {
                   type="button"
                   class="field__clear-button"
                   aria-label="Clear"
+                  tabindex="-1"
                   @click=${this._handleClear}
                 >
                   <svg
@@ -680,6 +663,7 @@ export class HelixCombobox extends LitElement {
           id=${this._listboxId}
           class="field__listbox"
           aria-label=${ifDefined(this.label || this.ariaLabel || undefined)}
+          aria-multiselectable=${this.multiple ? 'true' : nothing}
           ?hidden=${!this._open}
         >
           <div class="field__options">${this._renderOptions()}</div>
@@ -691,7 +675,13 @@ export class HelixCombobox extends LitElement {
         <!-- Error -->
         <slot name="error" @slotchange=${this._handleErrorSlotChange}>
           ${hasError
-            ? html`<div part="error" class="field__error" id=${this._errorId} role="alert">
+            ? html`<div
+                part="error"
+                class="field__error"
+                id=${this._errorId}
+                role="alert"
+                aria-live="polite"
+              >
                 ${this.error}
               </div>`
             : nothing}
