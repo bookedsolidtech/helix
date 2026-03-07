@@ -11,10 +11,6 @@ export const helixDrawerStyles = css`
     overflow: hidden;
   }
 
-  [hidden] {
-    display: none !important;
-  }
-
   /* ─── Overlay ─── */
 
   .drawer-overlay {
