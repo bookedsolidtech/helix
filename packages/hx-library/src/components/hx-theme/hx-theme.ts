@@ -1,4 +1,4 @@
-import { LitElement, html } from 'lit';
+import { LitElement, html, type PropertyValues } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { tokenEntries, darkTokenEntries } from '@helix/tokens';
 import { helixThemeStyles } from './hx-theme.styles.js';
@@ -48,8 +48,11 @@ export class HelixTheme extends LitElement {
   @property({ type: Boolean, reflect: true })
   system = false;
 
+  /** @internal */
   private _mediaQuery: MediaQueryList | null = null;
+  /** @internal */
   private _mediaHandler: (() => void) | null = null;
+  /** @internal */
   private _themeSheet: CSSStyleSheet | null = null;
 
   override firstUpdated(): void {
@@ -59,7 +62,7 @@ export class HelixTheme extends LitElement {
     }
   }
 
-  override updated(changed: Map<string, unknown>): void {
+  override updated(changed: PropertyValues): void {
     super.updated(changed);
     if (changed.has('system')) {
       if (this.system) {
@@ -89,6 +92,7 @@ export class HelixTheme extends LitElement {
     return this.theme;
   }
 
+  /** @internal */
   private _initThemeSheet(): void {
     if (this.shadowRoot) {
       this._themeSheet = new CSSStyleSheet();
@@ -100,6 +104,7 @@ export class HelixTheme extends LitElement {
     }
   }
 
+  /** @internal */
   private _attachMediaQuery(): void {
     if (this._mediaQuery) return;
     this._mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
@@ -107,6 +112,7 @@ export class HelixTheme extends LitElement {
     this._mediaQuery.addEventListener('change', this._mediaHandler);
   }
 
+  /** @internal */
   private _detachMediaQuery(): void {
     if (this._mediaQuery && this._mediaHandler) {
       this._mediaQuery.removeEventListener('change', this._mediaHandler);
@@ -115,6 +121,7 @@ export class HelixTheme extends LitElement {
     this._mediaHandler = null;
   }
 
+  /** @internal */
   private _buildTokenCss(theme: ThemeName): string {
     let entries: Array<{ name: string; value: string }>;
 
@@ -133,6 +140,7 @@ export class HelixTheme extends LitElement {
     return `:host {\n${props}\n}`;
   }
 
+  /** @internal */
   private _applyEffectiveTheme(): void {
     if (!this._themeSheet) return;
     this._themeSheet.replaceSync(this._buildTokenCss(this.effectiveTheme));
@@ -152,6 +160,3 @@ declare global {
     'hx-theme': HelixTheme;
   }
 }
-
-/** @deprecated Use HelixTheme */
-export type WcTheme = HelixTheme;
