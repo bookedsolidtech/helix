@@ -132,14 +132,15 @@ describe('hx-checkbox-group', () => {
       expect(errorDiv).toBeTruthy();
     });
 
-    it('error div has aria-live="polite"', async () => {
+    it('error div uses role="alert" without aria-live override', async () => {
       const el = await fixture<HelixCheckboxGroup>(`
         <hx-checkbox-group label="Test Group" error="Error">
           <hx-checkbox value="a" label="Option A"></hx-checkbox>
         </hx-checkbox-group>
       `);
       const errorDiv = shadowQuery(el, '.fieldset__error');
-      expect(errorDiv?.getAttribute('aria-live')).toBe('polite');
+      expect(errorDiv?.getAttribute('role')).toBe('alert');
+      expect(errorDiv?.hasAttribute('aria-live')).toBe(false);
     });
   });
 
@@ -453,6 +454,78 @@ describe('hx-checkbox-group', () => {
 
       expect(checkboxes[0].checked).toBe(false);
       expect(checkboxes[1].checked).toBe(false);
+    });
+  });
+
+  // ─── Form State Restore & Getters (5) ───
+
+  describe('formStateRestoreCallback and getters', () => {
+    it('formStateRestoreCallback restores checked state from FormData', async () => {
+      const el = await fixture<HelixCheckboxGroup>(`
+        <hx-checkbox-group label="Test Group" name="options">
+          <hx-checkbox value="a" label="Option A"></hx-checkbox>
+          <hx-checkbox value="b" label="Option B"></hx-checkbox>
+        </hx-checkbox-group>
+      `);
+      const fd = new FormData();
+      fd.append('options', 'b');
+      el.formStateRestoreCallback(fd);
+      await el.updateComplete;
+      const checkboxes = Array.from(el.querySelectorAll('hx-checkbox')) as HelixCheckbox[];
+      expect(checkboxes[0].checked).toBe(false);
+      expect(checkboxes[1].checked).toBe(true);
+    });
+
+    it('formStateRestoreCallback ignores non-FormData state', async () => {
+      const el = await fixture<HelixCheckboxGroup>(`
+        <hx-checkbox-group label="Test Group" name="options">
+          <hx-checkbox value="a" label="Option A" checked></hx-checkbox>
+        </hx-checkbox-group>
+      `);
+      // Should silently no-op for string state
+      expect(() => el.formStateRestoreCallback('some-string')).not.toThrow();
+      await el.updateComplete;
+      const cb = el.querySelector('hx-checkbox') as HelixCheckbox;
+      expect(cb.checked).toBe(true);
+    });
+
+    it('validationMessage getter returns empty string when valid', async () => {
+      const el = await fixture<HelixCheckboxGroup>(`
+        <hx-checkbox-group label="Test Group" name="options">
+          <hx-checkbox value="a" label="Option A"></hx-checkbox>
+        </hx-checkbox-group>
+      `);
+      expect(el.validationMessage).toBe('');
+    });
+
+    it('validationMessage getter returns message when invalid', async () => {
+      const el = await fixture<HelixCheckboxGroup>(`
+        <hx-checkbox-group label="Test Group" name="options" required>
+          <hx-checkbox value="a" label="Option A"></hx-checkbox>
+        </hx-checkbox-group>
+      `);
+      expect(el.validationMessage).toBeTruthy();
+    });
+
+    it('validity getter returns ValidityState with valueMissing when required and empty', async () => {
+      const el = await fixture<HelixCheckboxGroup>(`
+        <hx-checkbox-group label="Test Group" name="options" required>
+          <hx-checkbox value="a" label="Option A"></hx-checkbox>
+        </hx-checkbox-group>
+      `);
+      expect(el.validity).toBeInstanceOf(ValidityState);
+      expect(el.validity.valueMissing).toBe(true);
+    });
+
+    it('sets form value on first render when checkboxes have checked attribute', async () => {
+      const el = await fixture<HelixCheckboxGroup>(`
+        <hx-checkbox-group label="Test Group" name="options" required>
+          <hx-checkbox value="a" label="Option A" checked></hx-checkbox>
+          <hx-checkbox value="b" label="Option B"></hx-checkbox>
+        </hx-checkbox-group>
+      `);
+      // Group should be valid since a checkbox is pre-checked
+      expect(el.checkValidity()).toBe(true);
     });
   });
 

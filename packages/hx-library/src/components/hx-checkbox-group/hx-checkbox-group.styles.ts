@@ -7,7 +7,7 @@ export const helixCheckboxGroupStyles = css`
 
   :host([disabled]) {
     opacity: var(--hx-opacity-disabled);
-    pointer-events: none;
+    cursor: not-allowed;
   }
 
   * {
