@@ -204,6 +204,3 @@ declare global {
     'hx-toggle-button': HelixToggleButton;
   }
 }
-
-/** @deprecated Use HelixToggleButton */
-export type WcToggleButton = HelixToggleButton;
