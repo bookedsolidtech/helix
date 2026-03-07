@@ -7,11 +7,20 @@ import './hx-grid.js';
 // Helpers
 // ─────────────────────────────────────────────────
 
-const gridItem = (label: string, color = '#e0f2fe') => html`
+const ITEM_COLORS = [
+  'var(--hx-color-primary-100, #dbeafe)',
+  'var(--hx-color-warning-100, #fef9c3)',
+  'var(--hx-color-success-100, #dcfce7)',
+  'var(--hx-color-danger-100, #fce7f3)',
+  'var(--hx-color-neutral-100, #f1f5f9)',
+  'var(--hx-color-warning-50, #ffedd5)',
+] as const;
+
+const gridItem = (label: string, colorToken = ITEM_COLORS[0]) => html`
   <div
     style="
       padding: 1rem;
-      background: ${color};
+      background: ${colorToken};
       border-radius: 0.375rem;
       font-size: 0.875rem;
       font-family: sans-serif;
@@ -73,6 +82,26 @@ const meta = {
         type: { summary: "'start' | 'center' | 'end' | 'stretch'" },
       },
     },
+    rowGap: {
+      control: { type: 'select' },
+      options: ['none', 'xs', 'sm', 'md', 'lg', 'xl'],
+      description: 'Row gap override. When set, takes precedence over `gap` for row spacing.',
+      table: {
+        category: 'Layout',
+        defaultValue: { summary: 'undefined' },
+        type: { summary: "'none' | 'xs' | 'sm' | 'md' | 'lg' | 'xl'" },
+      },
+    },
+    columnGap: {
+      control: { type: 'select' },
+      options: ['none', 'xs', 'sm', 'md', 'lg', 'xl'],
+      description: 'Column gap override. When set, takes precedence over `gap` for column spacing.',
+      table: {
+        category: 'Layout',
+        defaultValue: { summary: 'undefined' },
+        type: { summary: "'none' | 'xs' | 'sm' | 'md' | 'lg' | 'xl'" },
+      },
+    },
   },
   args: {
     columns: 3,
@@ -88,8 +117,8 @@ const meta = {
       justify=${args.justify}
     >
       ${gridItem('Column 1')}
-      ${gridItem('Column 2', '#fef9c3')}
-      ${gridItem('Column 3', '#dcfce7')}
+      ${gridItem('Column 2', ITEM_COLORS[1])}
+      ${gridItem('Column 3', ITEM_COLORS[2])}
     </hx-grid>
   `,
 } satisfies Meta;
@@ -119,7 +148,7 @@ export const TwoColumns: Story = {
   render: (args) => html`
     <hx-grid columns=${args.columns} gap=${args.gap}>
       ${gridItem('Left Panel')}
-      ${gridItem('Right Panel', '#fef9c3')}
+      ${gridItem('Right Panel', ITEM_COLORS[1])}
     </hx-grid>
   `,
   play: async ({ canvasElement }) => {
@@ -137,9 +166,9 @@ export const FourColumns: Story = {
   render: (args) => html`
     <hx-grid columns=${args.columns} gap=${args.gap}>
       ${gridItem('Q1')}
-      ${gridItem('Q2', '#fef9c3')}
-      ${gridItem('Q3', '#dcfce7')}
-      ${gridItem('Q4', '#fce7f3')}
+      ${gridItem('Q2', ITEM_COLORS[1])}
+      ${gridItem('Q3', ITEM_COLORS[2])}
+      ${gridItem('Q4', ITEM_COLORS[3])}
     </hx-grid>
   `,
   play: async ({ canvasElement }) => {
@@ -149,7 +178,24 @@ export const FourColumns: Story = {
 };
 
 // ─────────────────────────────────────────────────
-// 4. CUSTOM TEMPLATE (asymmetric)
+// 4. TWELVE COLUMNS
+// ─────────────────────────────────────────────────
+
+export const TwelveColumns: Story = {
+  args: { columns: 12 },
+  render: (args) => html`
+    <hx-grid columns=${args.columns} gap="xs">
+      ${Array.from({ length: 12 }, (_, i) => gridItem(`${i + 1}`))}
+    </hx-grid>
+  `,
+  play: async ({ canvasElement }) => {
+    const el = canvasElement.querySelector('hx-grid');
+    await expect(el?.getAttribute('columns')).toBe('12');
+  },
+};
+
+// ─────────────────────────────────────────────────
+// 5. CUSTOM TEMPLATE (asymmetric)
 // ─────────────────────────────────────────────────
 
 export const CustomTemplate: Story = {
@@ -157,8 +203,8 @@ export const CustomTemplate: Story = {
   render: (args) => html`
     <hx-grid columns=${args.columns} gap="md">
       ${gridItem('Sidebar')}
-      ${gridItem('Main Content', '#fef9c3')}
-      ${gridItem('Aside', '#dcfce7')}
+      ${gridItem('Main Content', ITEM_COLORS[1])}
+      ${gridItem('Aside', ITEM_COLORS[2])}
     </hx-grid>
   `,
   play: async ({ canvasElement }) => {
@@ -168,26 +214,26 @@ export const CustomTemplate: Story = {
 };
 
 // ─────────────────────────────────────────────────
-// 5. WITH hx-grid-item PLACEMENT
+// 6. WITH hx-grid-item PLACEMENT
 // ─────────────────────────────────────────────────
 
 export const WithGridItems: Story = {
   render: () => html`
     <hx-grid columns="4" gap="md">
       <hx-grid-item span="2">
-        ${gridItem('Span 2 columns', '#dbeafe')}
+        ${gridItem('Span 2 columns', ITEM_COLORS[0])}
       </hx-grid-item>
       <hx-grid-item>
-        ${gridItem('1 col', '#fef9c3')}
+        ${gridItem('1 col', ITEM_COLORS[1])}
       </hx-grid-item>
       <hx-grid-item>
-        ${gridItem('1 col', '#dcfce7')}
+        ${gridItem('1 col', ITEM_COLORS[2])}
       </hx-grid-item>
       <hx-grid-item column="1 / 3">
-        ${gridItem('Explicit 1/3', '#fce7f3')}
+        ${gridItem('Explicit 1/3', ITEM_COLORS[3])}
       </hx-grid-item>
       <hx-grid-item column="3 / 5">
-        ${gridItem('Explicit 3/5', '#ffedd5')}
+        ${gridItem('Explicit 3/5', ITEM_COLORS[5])}
       </hx-grid-item>
     </hx-grid>
   `,
@@ -200,7 +246,7 @@ export const WithGridItems: Story = {
 };
 
 // ─────────────────────────────────────────────────
-// 6. RESPONSIVE — HEALTHCARE PATIENT DASHBOARD
+// 7. RESPONSIVE — HEALTHCARE PATIENT DASHBOARD
 // ─────────────────────────────────────────────────
 
 export const PatientDashboard: Story = {
@@ -238,7 +284,7 @@ export const PatientDashboard: Story = {
 };
 
 // ─────────────────────────────────────────────────
-// 7. GAP VARIANTS
+// 8. GAP VARIANTS
 // ─────────────────────────────────────────────────
 
 export const GapVariants: Story = {
@@ -250,8 +296,8 @@ export const GapVariants: Story = {
             <p style="margin: 0 0 0.5rem; font-size: 0.75rem; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em;">gap="${gap}"</p>
             <hx-grid columns="3" gap=${gap}>
               ${gridItem('A')}
-              ${gridItem('B', '#fef9c3')}
-              ${gridItem('C', '#dcfce7')}
+              ${gridItem('B', ITEM_COLORS[1])}
+              ${gridItem('C', ITEM_COLORS[2])}
             </hx-grid>
           </div>
         `,
