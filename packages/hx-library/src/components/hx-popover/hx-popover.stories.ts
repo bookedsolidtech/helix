@@ -82,15 +82,6 @@ const meta = {
         type: { summary: 'boolean' },
       },
     },
-    label: {
-      control: { type: 'text' },
-      description: 'Accessible label for the popover dialog.',
-      table: {
-        category: 'Accessibility',
-        defaultValue: { summary: 'Popover' },
-        type: { summary: 'string' },
-      },
-    },
   },
   args: {
     placement: 'bottom',
@@ -99,7 +90,6 @@ const meta = {
     distance: 8,
     skidding: 0,
     arrow: false,
-    label: 'Popover',
   },
   render: (args) => html`
     <div style="padding: 6rem; display: flex; justify-content: center; align-items: center;">
@@ -108,7 +98,6 @@ const meta = {
         trigger=${args.trigger}
         distance=${args.distance}
         skidding=${args.skidding}
-        label=${args.label}
         ?open=${args.open}
         ?arrow=${args.arrow}
       >
@@ -213,9 +202,7 @@ export const TriggerModes: Story = {
 export const ManualTrigger: Story = {
   name: 'Manual (Controlled)',
   render: () => html`
-    <div
-      style="padding: 6rem; display: flex; flex-direction: column; gap: 1rem; align-items: center;"
-    >
+    <div style="padding: 6rem; display: flex; flex-direction: column; gap: 1rem; align-items: center;">
       <div style="display: flex; gap: 1rem;">
         <button
           @click=${(e: Event) => {
