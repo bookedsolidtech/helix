@@ -300,6 +300,33 @@ describe('hx-contextual-help', () => {
       expect(popover?.hasAttribute('aria-labelledby')).toBe(false);
     });
 
+    it('popover has aria-label fallback from label property when heading is empty', async () => {
+      const el = await fixture<HelixContextualHelp>(
+        '<hx-contextual-help label="Field assistance"></hx-contextual-help>',
+      );
+      el.show();
+      await el.updateComplete;
+      const popover = shadowQuery(el, '[part="popover"]');
+      expect(popover?.getAttribute('aria-label')).toBe('Field assistance');
+    });
+
+    it('popover has aria-modal="true"', async () => {
+      const el = await fixture<HelixContextualHelp>('<hx-contextual-help></hx-contextual-help>');
+      el.show();
+      await el.updateComplete;
+      const popover = shadowQuery(el, '[part="popover"]');
+      expect(popover?.getAttribute('aria-modal')).toBe('true');
+    });
+
+    it('popover has close button with part="close-button"', async () => {
+      const el = await fixture<HelixContextualHelp>('<hx-contextual-help></hx-contextual-help>');
+      el.show();
+      await el.updateComplete;
+      const closeBtn = shadowQuery(el, '[part="close-button"]');
+      expect(closeBtn).toBeTruthy();
+      expect(closeBtn?.getAttribute('aria-label')).toBe('Close');
+    });
+
     it('trigger has type="button"', async () => {
       const el = await fixture<HelixContextualHelp>('<hx-contextual-help></hx-contextual-help>');
       await el.updateComplete;
@@ -308,7 +335,7 @@ describe('hx-contextual-help', () => {
     });
   });
 
-  // ─── Accessibility (axe-core) (2) ───
+  // ─── Accessibility (axe-core) (3) ───
 
   describe('Accessibility (axe-core)', () => {
     it('has no axe violations in closed state', async () => {
@@ -328,6 +355,42 @@ describe('hx-contextual-help', () => {
       await page.screenshot();
       const { violations } = await checkA11y(el);
       expect(violations).toEqual([]);
+    });
+
+    it('has no axe violations in open state without heading', async () => {
+      const el = await fixture<HelixContextualHelp>(
+        '<hx-contextual-help>This field requires a valid value.</hx-contextual-help>',
+      );
+      el.show();
+      await el.updateComplete;
+      await page.screenshot();
+      const { violations } = await checkA11y(el);
+      expect(violations).toEqual([]);
+    });
+  });
+
+  // ─── Focus Management (2) ───
+
+  describe('Focus Management', () => {
+    it('focus moves into the popover when show() is called', async () => {
+      const el = await fixture<HelixContextualHelp>('<hx-contextual-help></hx-contextual-help>');
+      // Wait for hx-open event which fires after focus() inside _show()
+      const eventPromise = oneEvent<CustomEvent>(el, 'hx-open');
+      el.show();
+      await eventPromise;
+      // Close button (first focusable element) should receive focus
+      const closeBtn = shadowQuery(el, 'button[part="close-button"]');
+      expect(el.shadowRoot?.activeElement).toBe(closeBtn);
+    });
+
+    it('focus returns to trigger after hide()', async () => {
+      const el = await fixture<HelixContextualHelp>('<hx-contextual-help></hx-contextual-help>');
+      el.show();
+      await el.updateComplete;
+      el.hide();
+      await el.updateComplete;
+      const trigger = shadowQuery<HTMLButtonElement>(el, 'button[part="trigger"]');
+      expect(el.shadowRoot?.activeElement).toBe(trigger);
     });
   });
 });
