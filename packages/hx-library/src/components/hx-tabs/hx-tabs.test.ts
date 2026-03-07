@@ -538,11 +538,13 @@ describe('hx-tabs', () => {
       expect(btn?.getAttribute('aria-selected')).toBe('false');
     });
 
-    it('tab has aria-controls referencing its panel id', async () => {
+    it('tab button has aria-controls referencing its panel id', async () => {
       const el = await fixture<HelixTabs>(DEFAULT_TABS_HTML);
       const tabs = Array.from(el.querySelectorAll('hx-tab')) as HelixTab[];
       const panels = Array.from(el.querySelectorAll('hx-tab-panel')) as HelixTabPanel[];
-      const controlsAttr = tabs[0].getAttribute('aria-controls');
+      // aria-controls belongs on the button (role="tab"), not the host element
+      const btn = shadowQuery<HTMLButtonElement>(tabs[0], 'button');
+      const controlsAttr = btn?.getAttribute('aria-controls');
       expect(controlsAttr).toBeTruthy();
       expect(controlsAttr).toBe(panels[0].id);
     });

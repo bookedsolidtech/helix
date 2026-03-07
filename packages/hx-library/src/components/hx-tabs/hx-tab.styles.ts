@@ -7,7 +7,6 @@ export const helixTabStyles = css`
 
   :host([disabled]) {
     opacity: var(--hx-opacity-disabled, 0.5);
-    pointer-events: none;
   }
 
   * {
@@ -44,7 +43,7 @@ export const helixTabStyles = css`
 
   /* ─── Hover State ─── */
 
-  .tab:not([aria-selected='true']):hover {
+  .tab:not([aria-selected='true']):not([aria-disabled='true']):hover {
     color: var(--hx-tabs-tab-hover-color, var(--hx-color-neutral-800, #212529));
     background-color: var(--hx-tabs-tab-hover-bg, var(--hx-color-neutral-50, #f8f9fa));
   }
@@ -72,7 +71,7 @@ export const helixTabStyles = css`
 
   /* ─── Disabled State ─── */
 
-  .tab[disabled] {
+  .tab[aria-disabled='true'] {
     cursor: not-allowed;
     color: var(--hx-color-neutral-400, #adb5bd);
   }
