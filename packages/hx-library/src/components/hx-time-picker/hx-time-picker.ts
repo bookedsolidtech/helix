@@ -135,7 +135,7 @@ function parseUserInput(raw: string): string | null {
  *
  * @tag hx-time-picker
  *
- * @slot - Default slot; overrides the rendered label element when used.
+ * @slot label - Custom label content; overrides the rendered label element when used.
  * @slot help - Help text displayed below the field.
  * @slot error - Custom error content; overrides the `error` property.
  *
