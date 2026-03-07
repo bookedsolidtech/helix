@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/web-components';
-import { html } from 'lit';
+import { html, nothing } from 'lit';
 import { expect } from 'storybook/test';
 import './hx-divider.js';
 
@@ -32,15 +32,39 @@ const meta = {
         type: { summary: "'none' | 'sm' | 'md' | 'lg'" },
       },
     },
+    decorative: {
+      control: { type: 'boolean' },
+      description:
+        'When true, renders as a decorative divider (role="presentation"). Screen readers will not announce it.',
+      table: {
+        category: 'Accessibility',
+        defaultValue: { summary: 'false' },
+        type: { summary: 'boolean' },
+      },
+    },
+    label: {
+      control: { type: 'text' },
+      description: 'Optional text label centered between the divider lines. Also sets aria-label.',
+      table: {
+        category: 'Content',
+        type: { summary: 'string' },
+      },
+    },
   },
   args: {
     orientation: 'horizontal',
     spacing: 'md',
+    decorative: false,
   },
   render: (args) => html`
     <div style="padding: 1rem; max-width: 480px;">
       <p style="margin: 0;">Section one content</p>
-      <hx-divider orientation=${args.orientation} spacing=${args.spacing}></hx-divider>
+      <hx-divider
+        orientation=${args.orientation}
+        spacing=${args.spacing}
+        ?decorative=${args.decorative}
+        label=${args.label ?? nothing}
+      ></hx-divider>
       <p style="margin: 0;">Section two content</p>
     </div>
   `,
@@ -137,7 +161,49 @@ export const SpacingVariants: Story = {
 };
 
 // ─────────────────────────────────────────────────
-// 6. HEALTHCARE SCENARIOS
+// 6. DECORATIVE
+// ─────────────────────────────────────────────────
+
+export const Decorative: Story = {
+  args: {
+    decorative: true,
+  },
+  render: () => html`
+    <div style="padding: 1rem; max-width: 480px;">
+      <p style="margin: 0;">Visual section break (no screen reader announcement)</p>
+      <hx-divider decorative></hx-divider>
+      <p style="margin: 0;">Content continues</p>
+    </div>
+  `,
+  play: async ({ canvasElement }) => {
+    const el = canvasElement.querySelector('hx-divider');
+    await expect(el).toBeTruthy();
+    await expect(el?.shadowRoot?.querySelector('[part="base"]')?.getAttribute('role')).toBe(
+      'presentation',
+    );
+  },
+};
+
+// ─────────────────────────────────────────────────
+// 7. VERTICAL DECORATIVE
+// ─────────────────────────────────────────────────
+
+export const VerticalDecorative: Story = {
+  args: {
+    orientation: 'vertical',
+    decorative: true,
+  },
+  render: () => html`
+    <div style="display: flex; align-items: center; gap: 0; height: 2rem;">
+      <span>Patient ID: 10042</span>
+      <hx-divider orientation="vertical" spacing="sm" decorative></hx-divider>
+      <span>DOB: 1982-03-15</span>
+    </div>
+  `,
+};
+
+// ─────────────────────────────────────────────────
+// 8. HEALTHCARE SCENARIOS
 // ─────────────────────────────────────────────────
 
 export const PatientRecordSections: Story = {
