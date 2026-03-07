@@ -82,10 +82,12 @@ describe('hx-slider', () => {
       expect(Number(input?.value)).toBe(75);
     });
 
-    it('updates aria-valuenow on native input', async () => {
+    it('native input value reflects the slider value (aria-valuenow is implicit on <input type="range">)', async () => {
       const el = await fixture<HelixSlider>('<hx-slider value="30"></hx-slider>');
-      const input = shadowQuery(el, 'input[type="range"]');
-      expect(input?.getAttribute('aria-valuenow')).toBe('30');
+      const input = shadowQuery<HTMLInputElement>(el, 'input[type="range"]');
+      // Explicit aria-valuenow is intentionally absent — <input type="range"> provides it implicitly
+      expect(input?.getAttribute('aria-valuenow')).toBeNull();
+      expect(Number(input?.value)).toBe(30);
     });
   });
 
@@ -110,11 +112,14 @@ describe('hx-slider', () => {
       expect(Number(input?.step)).toBe(5);
     });
 
-    it('sets aria-valuemin and aria-valuemax on native input', async () => {
+    it('native min/max attributes are set (aria-valuemin/max are implicit on <input type="range">)', async () => {
       const el = await fixture<HelixSlider>('<hx-slider min="20" max="80"></hx-slider>');
-      const input = shadowQuery(el, 'input[type="range"]');
-      expect(input?.getAttribute('aria-valuemin')).toBe('20');
-      expect(input?.getAttribute('aria-valuemax')).toBe('80');
+      const input = shadowQuery<HTMLInputElement>(el, 'input[type="range"]');
+      // Explicit aria-valuemin/max are intentionally absent — <input type="range"> provides them implicitly
+      expect(input?.getAttribute('aria-valuemin')).toBeNull();
+      expect(input?.getAttribute('aria-valuemax')).toBeNull();
+      expect(Number(input?.min)).toBe(20);
+      expect(Number(input?.max)).toBe(80);
     });
   });
 
@@ -330,7 +335,7 @@ describe('hx-slider', () => {
 
     it('formStateRestoreCallback restores a numeric value', async () => {
       const el = await fixture<HelixSlider>('<hx-slider></hx-slider>');
-      el.formStateRestoreCallback('55');
+      el.formStateRestoreCallback('55', 'restore');
       await el.updateComplete;
       expect(el.value).toBe(55);
     });
