@@ -5,9 +5,9 @@ export const helixFocusRingStyles = css`
     display: inline-block;
     position: relative;
 
-    --_ring-color: var(--hx-focus-ring-color, var(--hx-color-primary-500, #2563eb));
-    --_ring-width: var(--hx-focus-ring-width, var(--hx-border-width-focus, 2px));
-    --_ring-offset: var(--hx-focus-ring-offset, var(--hx-spacing-focus-offset, 2px));
+    --_ring-color: var(--hx-focus-ring-color, #2563eb);
+    --_ring-width: var(--hx-focus-ring-width, 2px);
+    --_ring-offset: var(--hx-focus-ring-offset, 2px);
   }
 
   /* ─── Base ─── */
@@ -28,8 +28,7 @@ export const helixFocusRingStyles = css`
     transition: opacity var(--hx-transition-fast, 150ms ease);
   }
 
-  :host([visible]) .ring,
-  .ring--active {
+  :host([visible]) .ring {
     opacity: 1;
   }
 
@@ -45,29 +44,5 @@ export const helixFocusRingStyles = css`
 
   .ring--pill {
     border-radius: 9999px;
-  }
-
-  /* ─── Dark Mode ─── */
-
-  @media (prefers-color-scheme: dark) {
-    :host {
-      --_ring-color: var(--hx-focus-ring-color, var(--hx-color-primary-300, #93c5fd));
-    }
-  }
-
-  /* ─── Reduced Motion ─── */
-
-  @media (prefers-reduced-motion: reduce) {
-    .ring {
-      transition: none;
-    }
-  }
-
-  /* ─── Forced Colors (Windows High Contrast) ─── */
-
-  @media (forced-colors: active) {
-    .ring {
-      border-color: Highlight;
-    }
   }
 `;
