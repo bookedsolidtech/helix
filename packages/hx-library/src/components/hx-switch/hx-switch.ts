@@ -8,6 +8,11 @@ import { helixSwitchStyles } from './hx-switch.styles.js';
 /**
  * A toggle switch component for on/off states.
  *
+ * Uses `role="switch"` with `aria-checked` to convey toggle state.
+ * Supports keyboard activation via Space key (per ARIA APG switch pattern).
+ * Label association is handled through `aria-labelledby`, and
+ * error/help text are linked via `aria-describedby`.
+ *
  * @summary Form-associated toggle switch with label, error, and help text.
  *
  * @tag hx-switch
@@ -39,8 +44,10 @@ export class HelixSwitch extends LitElement {
 
   // ─── Form Association ───
 
+  /** Enables the element to participate in form submission and validation. */
   static formAssociated = true;
 
+  /** ElementInternals instance for form association, validation, and ARIA. */
   private _internals: ElementInternals;
 
   constructor() {
@@ -153,6 +160,7 @@ export class HelixSwitch extends LitElement {
     return this._internals.reportValidity();
   }
 
+  /** Recalculates and sets the validity state based on required and checked. */
   private _updateValidity(): void {
     if (this.required && !this.checked) {
       this._internals.setValidity(
@@ -172,24 +180,39 @@ export class HelixSwitch extends LitElement {
   }
 
   /** Called when the form restores state (e.g., back/forward navigation). */
-  formStateRestoreCallback(state: string): void {
-    this.checked = state === this.value;
+  formStateRestoreCallback(state: File | string | null, _mode: 'restore' | 'autocomplete'): void {
+    if (typeof state === 'string') {
+      this.checked = state === this.value;
+    }
   }
 
+  /** Reference to the native button element acting as the switch track. */
   @query('.switch__track')
   private _trackEl!: HTMLButtonElement;
 
+  /** Whether the error slot has assigned content. */
   @state() private _hasErrorSlot = false;
+
+  /** Whether the default slot has assigned content (slotted label). */
+  @state() private _hasDefaultSlot = false;
 
   // ─── Slot Handlers ───
 
+  /** Updates _hasErrorSlot when error slot content changes. */
   private _handleErrorSlotChange(e: Event): void {
     const slot = e.target as HTMLSlotElement;
     this._hasErrorSlot = slot.assignedNodes({ flatten: true }).length > 0;
   }
 
+  /** Updates _hasDefaultSlot when default slot content changes. */
+  private _handleDefaultSlotChange(e: Event): void {
+    const slot = e.target as HTMLSlotElement;
+    this._hasDefaultSlot = slot.assignedNodes({ flatten: true }).length > 0;
+  }
+
   // ─── Event Handling ───
 
+  /** Toggles checked state and dispatches hx-change event. */
   private _toggle(): void {
     if (this.disabled) return;
     this.checked = !this.checked;
@@ -207,12 +230,14 @@ export class HelixSwitch extends LitElement {
     );
   }
 
+  /** Handles click events on the track. */
   private _handleClick(): void {
     this._toggle();
   }
 
+  /** Handles keydown events — Space toggles the switch per ARIA APG. */
   private _handleKeyDown(e: KeyboardEvent): void {
-    if (e.key === ' ' || e.key === 'Enter') {
+    if (e.key === ' ') {
       e.preventDefault();
       this._toggle();
     }
@@ -227,14 +252,18 @@ export class HelixSwitch extends LitElement {
 
   // ─── Render ───
 
+  /** Unique ID for this switch instance, used for ARIA associations. */
   private _switchId = `hx-switch-${Math.random().toString(36).slice(2, 9)}`;
+  /** ID for the label element, referenced by aria-labelledby. */
   private _labelId = `${this._switchId}-label`;
+  /** ID for the help text element, referenced by aria-describedby. */
   private _helpTextId = `${this._switchId}-help`;
+  /** ID for the error element, referenced by aria-describedby. */
   private _errorId = `${this._switchId}-error`;
 
   override render() {
     const hasError = !!this.error;
-    const hasLabel = !!this.label;
+    const hasLabel = !!this.label || this._hasDefaultSlot;
 
     const containerClasses = {
       switch: true,
@@ -273,31 +302,16 @@ export class HelixSwitch extends LitElement {
             <span part="thumb" class="switch__thumb"></span>
           </button>
 
-          ${hasLabel
-            ? html`
-                <span
-                  part="label"
-                  class="switch__label"
-                  id=${this._labelId}
-                  @click=${this._handleClick}
-                >
-                  <slot>${this.label}</slot>${this.required
-                    ? html`<span class="switch__required-marker" aria-hidden="true">*</span>`
-                    : nothing}
-                </span>
-              `
-            : html`<span class="switch__label" id=${this._labelId}><slot></slot></span>`}
+          <span part="label" class="switch__label" id=${this._labelId} @click=${this._handleClick}>
+            <slot @slotchange=${this._handleDefaultSlotChange}>${this.label}</slot>${this.required
+              ? html`<span class="switch__required-marker" aria-hidden="true">*</span>`
+              : nothing}
+          </span>
         </div>
 
         <slot name="error" @slotchange=${this._handleErrorSlotChange}>
           ${hasError
-            ? html`<div
-                part="error"
-                class="switch__error"
-                id=${this._errorId}
-                role="alert"
-                aria-live="polite"
-              >
+            ? html`<div part="error" class="switch__error" id=${this._errorId} role="alert">
                 ${this.error}
               </div>`
             : nothing}
