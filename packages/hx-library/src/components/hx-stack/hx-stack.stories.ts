@@ -201,7 +201,116 @@ export const SpaceBetween: Story = {
 };
 
 // ─────────────────────────────────────────────────
-// 5. HEALTHCARE — Patient Form Layout
+// 5. ALL GAP SIZES
+// ─────────────────────────────────────────────────
+
+export const AllGapSizes: Story = {
+  render: () => html`
+    <hx-stack direction="vertical" gap="lg">
+      ${(['none', 'xs', 'sm', 'md', 'lg', 'xl'] as const).map(
+        (gap) => html`
+          <div>
+            <div style="font-size: 0.75rem; font-weight: 600; color: #6b7280; margin-bottom: 0.25rem;">
+              gap="${gap}"
+            </div>
+            <hx-stack direction="horizontal" gap=${gap}>
+              <div style="padding: 0.5rem 1rem; background: #dbeafe; border-radius: 0.25rem; font-size: 0.875rem;">A</div>
+              <div style="padding: 0.5rem 1rem; background: #dbeafe; border-radius: 0.25rem; font-size: 0.875rem;">B</div>
+              <div style="padding: 0.5rem 1rem; background: #dbeafe; border-radius: 0.25rem; font-size: 0.875rem;">C</div>
+            </hx-stack>
+          </div>
+        `,
+      )}
+    </hx-stack>
+  `,
+  play: async ({ canvasElement }) => {
+    const stacks = canvasElement.querySelectorAll('hx-stack[direction="horizontal"]');
+    await expect(stacks.length).toBe(6);
+  },
+};
+
+// ─────────────────────────────────────────────────
+// 6. ALL ALIGNMENTS
+// ─────────────────────────────────────────────────
+
+export const AllAlignments: Story = {
+  render: () => html`
+    <hx-stack direction="vertical" gap="lg">
+      ${(['start', 'center', 'end', 'stretch', 'baseline'] as const).map(
+        (align) => html`
+          <div>
+            <div style="font-size: 0.75rem; font-weight: 600; color: #6b7280; margin-bottom: 0.25rem;">
+              align="${align}"
+            </div>
+            <hx-stack direction="horizontal" gap="sm" align=${align} style="border: 1px dashed #cbd5e1; padding: 0.5rem; min-height: 80px;">
+              <div style="padding: 0.5rem 1rem; background: #fce7f3; border-radius: 0.25rem; font-size: 0.875rem;">Short</div>
+              <div style="padding: 1rem 1rem; background: #fce7f3; border-radius: 0.25rem; font-size: 0.875rem;">Taller</div>
+              <div style="padding: 0.25rem 1rem; background: #fce7f3; border-radius: 0.25rem; font-size: 0.875rem;">Tiny</div>
+            </hx-stack>
+          </div>
+        `,
+      )}
+    </hx-stack>
+  `,
+  play: async ({ canvasElement }) => {
+    const stacks = canvasElement.querySelectorAll('hx-stack[direction="horizontal"]');
+    await expect(stacks.length).toBe(5);
+  },
+};
+
+// ─────────────────────────────────────────────────
+// 7. WRAPPING
+// ─────────────────────────────────────────────────
+
+export const Wrapping: Story = {
+  args: {
+    direction: 'horizontal',
+    gap: 'md',
+    wrap: true,
+  },
+  render: (args) => html`
+    <hx-stack
+      direction=${args.direction}
+      gap=${args.gap}
+      ?wrap=${args.wrap}
+      style="max-width: 320px; border: 1px dashed #cbd5e1; padding: 1rem;"
+    >
+      ${Array.from({ length: 8 }, (_, i) => html`
+        <div style="padding: 0.5rem 1rem; background: #d1fae5; border-radius: 0.25rem; font-size: 0.875rem; white-space: nowrap;">
+          Item ${i + 1}
+        </div>
+      `)}
+    </hx-stack>
+  `,
+  play: async ({ canvasElement }) => {
+    const el = canvasElement.querySelector('hx-stack');
+    await expect(el?.hasAttribute('wrap')).toBe(true);
+  },
+};
+
+// ─────────────────────────────────────────────────
+// 8. INLINE
+// ─────────────────────────────────────────────────
+
+export const Inline: Story = {
+  render: () => html`
+    <div style="font-size: 0.875rem;">
+      Text before
+      <hx-stack direction="horizontal" gap="xs" inline>
+        <div style="padding: 0.25rem 0.5rem; background: #fef3c7; border-radius: 0.25rem; font-size: 0.875rem;">Tag A</div>
+        <div style="padding: 0.25rem 0.5rem; background: #fef3c7; border-radius: 0.25rem; font-size: 0.875rem;">Tag B</div>
+      </hx-stack>
+      text after.
+    </div>
+  `,
+  play: async ({ canvasElement }) => {
+    const el = canvasElement.querySelector('hx-stack');
+    await expect(el?.hasAttribute('inline')).toBe(true);
+  },
+};
+
+// ─────────────────────────────────────────────────
+// 9. HEALTHCARE — Patient Form Layout
 // ─────────────────────────────────────────────────
 
 export const PatientFormLayout: Story = {
@@ -243,4 +352,8 @@ export const PatientFormLayout: Story = {
       </hx-stack>
     </hx-stack>
   `,
+  play: async ({ canvasElement }) => {
+    const stacks = canvasElement.querySelectorAll('hx-stack');
+    await expect(stacks.length).toBeGreaterThanOrEqual(4);
+  },
 };
