@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/web-components';
 import { html } from 'lit';
-import { expect } from 'storybook/test';
+import { expect, userEvent } from 'storybook/test';
 import './hx-popup.js';
 
 // ─── Meta ────────────────────────────────────────────────────────────────────
@@ -62,6 +62,17 @@ const meta = {
         category: 'Positioning',
         defaultValue: { summary: '0' },
         type: { summary: 'number' },
+      },
+    },
+    strategy: {
+      control: { type: 'select' },
+      options: ['fixed', 'absolute'],
+      description:
+        'Positioning strategy. Use "absolute" inside overflow:hidden/scroll containers.',
+      table: {
+        category: 'Positioning',
+        defaultValue: { summary: 'fixed' },
+        type: { summary: "'fixed' | 'absolute'" },
       },
     },
     arrow: {
@@ -129,6 +140,7 @@ const meta = {
     flip: false,
     shift: false,
     autoSize: false,
+    strategy: 'fixed',
   },
   render: (args) => html`
     <div style="padding: 8rem; display: flex; justify-content: center; align-items: center;">
@@ -142,6 +154,7 @@ const meta = {
         ?flip=${args.flip}
         ?shift=${args.shift}
         ?auto-size=${args.autoSize}
+        strategy=${args.strategy}
       >
         <button slot="anchor" style="padding: 0.5rem 1rem; cursor: default;">Anchor</button>
         <div
@@ -182,7 +195,61 @@ export const Default: Story = {
 };
 
 // ─────────────────────────────────────────────────
-// 2. PLACEMENT VARIANTS
+// 2. INTERACTIVE TOGGLE
+// ─────────────────────────────────────────────────
+
+export const Interactive: Story = {
+  name: 'Interactive (Toggle)',
+  render: () => html`
+    <div style="padding: 8rem; display: flex; justify-content: center; align-items: center;">
+      <hx-popup id="interactive-popup" placement="bottom" distance="8">
+        <button
+          id="interactive-trigger"
+          slot="anchor"
+          aria-expanded="false"
+          aria-controls="interactive-popup"
+          style="padding: 0.5rem 1rem;"
+          onclick="
+            const popup = this.closest('hx-popup') || this.parentElement?.closest('hx-popup');
+            if (popup) {
+              popup.active = !popup.active;
+              this.setAttribute('aria-expanded', String(popup.active));
+            }
+          "
+        >
+          Toggle Popup
+        </button>
+        <div
+          role="dialog"
+          aria-label="Example popup"
+          style="background: white; border: 1px solid #e5e7eb; border-radius: 0.375rem; padding: 0.75rem 1rem; box-shadow: 0 4px 12px rgba(0,0,0,0.1); font-size: 0.875rem; min-width: 12rem;"
+        >
+          <p style="margin: 0 0 0.5rem;">Popup is open!</p>
+          <p style="margin: 0; font-size: 0.75rem; color: #6b7280;">
+            Click the trigger again to close.
+          </p>
+        </div>
+      </hx-popup>
+    </div>
+  `,
+  play: async ({ canvasElement }) => {
+    const trigger = canvasElement.querySelector('#interactive-trigger') as HTMLButtonElement;
+    const popup = canvasElement.querySelector('hx-popup') as HTMLElement & { active: boolean };
+
+    await expect(popup.active).toBe(false);
+    await expect(trigger.getAttribute('aria-expanded')).toBe('false');
+
+    await userEvent.click(trigger);
+    await expect(popup.active).toBe(true);
+    await expect(trigger.getAttribute('aria-expanded')).toBe('true');
+
+    await userEvent.click(trigger);
+    await expect(popup.active).toBe(false);
+  },
+};
+
+// ─────────────────────────────────────────────────
+// 3. PLACEMENT VARIANTS
 // ─────────────────────────────────────────────────
 
 export const Placements: Story = {
@@ -223,7 +290,46 @@ export const Placements: Story = {
 };
 
 // ─────────────────────────────────────────────────
-// 3. WITH ARROW
+// 4. AUTO PLACEMENT
+// ─────────────────────────────────────────────────
+
+export const AutoPlacement: Story = {
+  name: 'Auto Placement',
+  render: () => html`
+    <div
+      style="padding: 6rem; display: flex; gap: 4rem; justify-content: space-between; align-items: center;"
+    >
+      <hx-popup active placement="auto" distance="8">
+        <button slot="anchor" style="padding: 0.5rem 1rem;">Auto (left side)</button>
+        <div
+          style="background: white; border: 1px solid #e5e7eb; border-radius: 0.375rem; padding: 0.75rem 1rem; box-shadow: 0 4px 12px rgba(0,0,0,0.1); font-size: 0.875rem; white-space: nowrap;"
+        >
+          Auto-placed popup
+        </div>
+      </hx-popup>
+      <hx-popup active placement="auto" distance="8">
+        <button slot="anchor" style="padding: 0.5rem 1rem;">Auto (right side)</button>
+        <div
+          style="background: white; border: 1px solid #e5e7eb; border-radius: 0.375rem; padding: 0.75rem 1rem; box-shadow: 0 4px 12px rgba(0,0,0,0.1); font-size: 0.875rem; white-space: nowrap;"
+        >
+          Auto-placed popup
+        </div>
+      </hx-popup>
+    </div>
+  `,
+  play: async ({ canvasElement }) => {
+    const popups = canvasElement.querySelectorAll('hx-popup');
+    for (const popup of popups) {
+      await expect(popup.getAttribute('placement')).toBe('auto');
+      // Both popups should have run positioning and have left/top set
+      const popupEl = popup.shadowRoot?.querySelector<HTMLElement>('[part="popup"]');
+      await expect(popupEl?.style.left).toBeTruthy();
+    }
+  },
+};
+
+// ─────────────────────────────────────────────────
+// 5. WITH ARROW
 // ─────────────────────────────────────────────────
 
 export const WithArrow: Story = {
@@ -248,6 +354,14 @@ export const WithArrow: Story = {
           Arrow below
         </div>
       </hx-popup>
+      <hx-popup active placement="left" distance="8" arrow style="--hx-arrow-color: #374151;">
+        <button slot="anchor" style="padding: 0.5rem 1rem;">Left arrow</button>
+        <div
+          style="background: #374151; color: white; border-radius: 0.375rem; padding: 0.5rem 0.75rem; font-size: 0.875rem;"
+        >
+          Arrow left
+        </div>
+      </hx-popup>
       <hx-popup active placement="right" distance="8" arrow style="--hx-arrow-color: #374151;">
         <button slot="anchor" style="padding: 0.5rem 1rem;">Right arrow</button>
         <div
@@ -259,13 +373,82 @@ export const WithArrow: Story = {
     </div>
   `,
   play: async ({ canvasElement }) => {
-    const popup = canvasElement.querySelector('hx-popup');
-    await expect(popup?.shadowRoot?.querySelector('[part="arrow"]')).toBeTruthy();
+    const popups = canvasElement.querySelectorAll('hx-popup');
+    for (const popup of popups) {
+      await expect(popup.shadowRoot?.querySelector('[part="arrow"]')).toBeTruthy();
+    }
   },
 };
 
 // ─────────────────────────────────────────────────
-// 4. INACTIVE STATE
+// 6. ARROW PLACEMENT VARIANTS
+// ─────────────────────────────────────────────────
+
+export const ArrowPlacements: Story = {
+  name: 'Arrow Placement (start / center / end)',
+  render: () => html`
+    <div
+      style="padding: 8rem; display: flex; gap: 4rem; justify-content: center; align-items: center; flex-wrap: wrap;"
+    >
+      <hx-popup
+        active
+        placement="bottom"
+        distance="8"
+        arrow
+        arrow-placement="start"
+        style="--hx-arrow-color: #4338ca;"
+      >
+        <button slot="anchor" style="padding: 0.5rem 2rem;">start</button>
+        <div
+          style="background: #4338ca; color: white; border-radius: 0.375rem; padding: 0.5rem 1.5rem; font-size: 0.875rem; min-width: 10rem;"
+        >
+          arrow-placement="start"
+        </div>
+      </hx-popup>
+      <hx-popup
+        active
+        placement="bottom"
+        distance="8"
+        arrow
+        arrow-placement="center"
+        style="--hx-arrow-color: #4338ca;"
+      >
+        <button slot="anchor" style="padding: 0.5rem 2rem;">center</button>
+        <div
+          style="background: #4338ca; color: white; border-radius: 0.375rem; padding: 0.5rem 1.5rem; font-size: 0.875rem; min-width: 10rem;"
+        >
+          arrow-placement="center"
+        </div>
+      </hx-popup>
+      <hx-popup
+        active
+        placement="bottom"
+        distance="8"
+        arrow
+        arrow-placement="end"
+        style="--hx-arrow-color: #4338ca;"
+      >
+        <button slot="anchor" style="padding: 0.5rem 2rem;">end</button>
+        <div
+          style="background: #4338ca; color: white; border-radius: 0.375rem; padding: 0.5rem 1.5rem; font-size: 0.875rem; min-width: 10rem;"
+        >
+          arrow-placement="end"
+        </div>
+      </hx-popup>
+    </div>
+  `,
+  play: async ({ canvasElement }) => {
+    const popups = canvasElement.querySelectorAll('hx-popup');
+    for (const popup of popups) {
+      const arrowEl = popup.shadowRoot?.querySelector<HTMLElement>('[part="arrow"]');
+      await expect(arrowEl).toBeTruthy();
+      await expect(arrowEl?.getAttribute('data-placement')).toBeTruthy();
+    }
+  },
+};
+
+// ─────────────────────────────────────────────────
+// 7. INACTIVE STATE
 // ─────────────────────────────────────────────────
 
 export const Inactive: Story = {
@@ -284,12 +467,13 @@ export const Inactive: Story = {
     const popup = canvasElement.querySelector('hx-popup');
     await expect(popup?.active).toBe(false);
     const popupEl = popup?.shadowRoot?.querySelector('[part="popup"]');
-    await expect(popupEl?.getAttribute('aria-hidden')).toBe('true');
+    // When inactive, popup container should have inert attribute
+    await expect(popupEl?.hasAttribute('inert')).toBe(true);
   },
 };
 
 // ─────────────────────────────────────────────────
-// 5. FLIP BEHAVIOR
+// 8. FLIP BEHAVIOR
 // ─────────────────────────────────────────────────
 
 export const FlipBehavior: Story = {
@@ -308,10 +492,19 @@ export const FlipBehavior: Story = {
       </hx-popup>
     </div>
   `,
+  play: async ({ canvasElement }) => {
+    const popup = canvasElement.querySelector('hx-popup');
+    // Wait for positioning to settle
+    await new Promise((r) => setTimeout(r, 50));
+    const popupEl = popup?.shadowRoot?.querySelector<HTMLElement>('[part="popup"]');
+    // Popup should have been positioned (left/top set by floating-ui)
+    await expect(popupEl?.style.left).toBeTruthy();
+    await expect(popupEl?.style.top).toBeTruthy();
+  },
 };
 
 // ─────────────────────────────────────────────────
-// 6. SHIFT BEHAVIOR
+// 9. SHIFT BEHAVIOR
 // ─────────────────────────────────────────────────
 
 export const ShiftBehavior: Story = {
@@ -328,10 +521,96 @@ export const ShiftBehavior: Story = {
       </hx-popup>
     </div>
   `,
+  play: async ({ canvasElement }) => {
+    const popup = canvasElement.querySelector('hx-popup');
+    await new Promise((r) => setTimeout(r, 50));
+    const popupEl = popup?.shadowRoot?.querySelector<HTMLElement>('[part="popup"]');
+    await expect(popupEl?.style.left).toBeTruthy();
+    await expect(popupEl?.style.top).toBeTruthy();
+  },
 };
 
 // ─────────────────────────────────────────────────
-// 7. EXTERNAL ANCHOR (CSS SELECTOR)
+// 10. FLIP FALLBACK PLACEMENTS
+// ─────────────────────────────────────────────────
+
+export const FlipFallbackPlacements: Story = {
+  name: 'Flip Fallback Placements',
+  render: () => html`
+    <div
+      style="padding: 2rem; display: flex; justify-content: flex-start; align-items: flex-start;"
+    >
+      <hx-popup
+        active
+        placement="top"
+        distance="8"
+        flip
+        flip-fallback-placements='["right","bottom"]'
+      >
+        <button slot="anchor" style="padding: 0.5rem 1rem;">
+          Tries: top → right → bottom
+        </button>
+        <div
+          style="background: white; border: 1px solid #e5e7eb; border-radius: 0.375rem; padding: 0.75rem 1rem; box-shadow: 0 4px 12px rgba(0,0,0,0.1); font-size: 0.875rem;"
+        >
+          <strong>flip-fallback-placements='["right","bottom"]'</strong>
+          <p style="margin: 0.5rem 0 0; font-size: 0.75rem; color: #6b7280;">
+            When the preferred placement overflows, tries the fallbacks in order.
+          </p>
+        </div>
+      </hx-popup>
+    </div>
+  `,
+};
+
+// ─────────────────────────────────────────────────
+// 11. AUTO SIZE
+// ─────────────────────────────────────────────────
+
+export const AutoSize: Story = {
+  name: 'Auto Size (Constrain to Viewport)',
+  render: () => html`
+    <div
+      style="padding: 4rem; display: flex; justify-content: center; align-items: flex-end; height: 60vh;"
+    >
+      <hx-popup active placement="top" distance="8" auto-size>
+        <button slot="anchor" style="padding: 0.5rem 1rem;">Auto Size</button>
+        <div
+          style="
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.375rem;
+            padding: 0.75rem 1rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            font-size: 0.875rem;
+            overflow-y: auto;
+            max-height: var(--hx-auto-size-available-height, 300px);
+          "
+        >
+          <p style="margin: 0 0 0.5rem;"><strong>autoSize is active.</strong></p>
+          <p style="margin: 0 0 0.5rem;">
+            <code>--hx-auto-size-available-height</code> is set on :host and consumed by this
+            popup's <code>max-height</code>.
+          </p>
+          ${Array.from(
+            { length: 10 },
+            (_, i) => html`<p style="margin: 0.25rem 0;">List item ${i + 1}</p>`,
+          )}
+        </div>
+      </hx-popup>
+    </div>
+  `,
+  play: async ({ canvasElement }) => {
+    const popup = canvasElement.querySelector('hx-popup') as HTMLElement;
+    await new Promise((r) => setTimeout(r, 100));
+    // autoSize sets custom properties on :host
+    const height = popup.style.getPropertyValue('--hx-auto-size-available-height');
+    await expect(height).toBeTruthy();
+  },
+};
+
+// ─────────────────────────────────────────────────
+// 12. EXTERNAL ANCHOR (CSS SELECTOR)
 // ─────────────────────────────────────────────────
 
 export const ExternalAnchor: Story = {
@@ -351,7 +630,7 @@ export const ExternalAnchor: Story = {
 };
 
 // ─────────────────────────────────────────────────
-// 8. CSS PARTS
+// 13. CSS PARTS
 // ─────────────────────────────────────────────────
 
 export const CSSParts: Story = {
