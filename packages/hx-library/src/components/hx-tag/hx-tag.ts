@@ -1,5 +1,5 @@
 import { LitElement, html, nothing } from 'lit';
-import { customElement, property } from 'lit/decorators.js';
+import { customElement, property, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { tokenStyles } from '@helix/tokens/lit';
 import { helixTagStyles } from './hx-tag.styles.js';
@@ -29,9 +29,17 @@ import { helixTagStyles } from './hx-tag.styles.js';
  * @cssprop [--hx-tag-font-size] - Tag font size (set per size variant).
  * @cssprop [--hx-tag-font-weight=var(--hx-font-weight-medium)] - Tag font weight.
  * @cssprop [--hx-tag-font-family=var(--hx-font-family-sans)] - Tag font family.
- * @cssprop [--hx-tag-border-radius=var(--hx-border-radius-sm)] - Tag border radius.
+ * @cssprop [--hx-tag-border-radius=var(--hx-border-radius-sm)] - Tag border radius (non-pill mode).
+ * @cssprop [--hx-tag-border-radius-pill=var(--hx-border-radius-full)] - Border radius in pill mode. Independent of --hx-tag-border-radius so consumer overrides don't break pill shape.
  * @cssprop [--hx-tag-padding-x] - Tag horizontal padding (set per size variant).
  * @cssprop [--hx-tag-padding-y] - Tag vertical padding (set per size variant).
+ *
+ * @note Visual style variants (filled/outlined/ghost) are not supported. This component
+ * intentionally provides only filled-style tags with color variation via the `variant` prop.
+ *
+ * @note aria-live removal announcements are the consuming application's responsibility.
+ * When a tag is removed from the DOM, applications should announce the change via their
+ * own aria-live region to inform screen reader users of clinical data filter changes.
  */
 @customElement('hx-tag')
 export class HelixTag extends LitElement {
@@ -47,6 +55,9 @@ export class HelixTag extends LitElement {
   /**
    * Size of the tag.
    * @attr hx-size
+   * @note The attribute name is `hx-size` (not `size`) to avoid conflict with the native
+   * `size` attribute. Storybook autodocs controls bind to the property name `size`; when
+   * writing HTML or Drupal Twig templates always use the `hx-size` attribute name.
    */
   @property({ type: String, reflect: true, attribute: 'hx-size' })
   size: 'sm' | 'md' | 'lg' = 'md';
@@ -72,6 +83,21 @@ export class HelixTag extends LitElement {
   @property({ type: Boolean, reflect: true })
   disabled = false;
 
+  // ─── Internal State ───
+
+  /**
+   * Text from the default slot only (excludes prefix/suffix slotted content).
+   * Used to build the remove button's aria-label without polluting it with icon text.
+   * @internal
+   */
+  @state() private _defaultSlotText = '';
+
+  /** @internal Whether the prefix slot has assigned content. */
+  @state() private _hasPrefix = false;
+
+  /** @internal Whether the suffix slot has assigned content. */
+  @state() private _hasSuffix = false;
+
   // ─── Event Handling ───
 
   /** @internal */
@@ -85,11 +111,32 @@ export class HelixTag extends LitElement {
     );
   }
 
+  /** @internal Updates _defaultSlotText from only the default slot's text nodes. */
+  private _onDefaultSlotChange(e: Event): void {
+    const slot = e.target as HTMLSlotElement;
+    const nodes = slot.assignedNodes({ flatten: true });
+    this._defaultSlotText = nodes
+      .filter((n): n is Text => n.nodeType === Node.TEXT_NODE)
+      .map((n) => n.textContent ?? '')
+      .join('')
+      .trim();
+  }
+
+  /** @internal */
+  private _onPrefixSlotChange(e: Event): void {
+    const slot = e.target as HTMLSlotElement;
+    this._hasPrefix = slot.assignedNodes({ flatten: true }).length > 0;
+  }
+
+  /** @internal */
+  private _onSuffixSlotChange(e: Event): void {
+    const slot = e.target as HTMLSlotElement;
+    this._hasSuffix = slot.assignedNodes({ flatten: true }).length > 0;
+  }
+
   // ─── Render ───
 
   override render() {
-    const labelText = this.textContent?.trim() ?? '';
-
     const classes = {
       tag: true,
       [`tag--${this.variant}`]: true,
@@ -97,26 +144,32 @@ export class HelixTag extends LitElement {
       'tag--pill': this.pill,
     };
 
+    const prefixClasses = {
+      tag__prefix: true,
+      'tag__prefix--hidden': !this._hasPrefix,
+    };
+
+    const suffixClasses = {
+      tag__suffix: true,
+      'tag__suffix--hidden': !this._hasSuffix,
+    };
+
     return html`
-      <span
-        part="base"
-        class=${classMap(classes)}
-        aria-disabled=${this.disabled ? 'true' : nothing}
-      >
-        <span part="prefix" class="tag__prefix">
-          <slot name="prefix"></slot>
+      <span part="base" class=${classMap(classes)}>
+        <span part="prefix" class=${classMap(prefixClasses)}>
+          <slot name="prefix" @slotchange=${this._onPrefixSlotChange}></slot>
         </span>
         <span part="label" class="tag__label">
-          <slot></slot>
+          <slot @slotchange=${this._onDefaultSlotChange}></slot>
         </span>
-        <span part="suffix" class="tag__suffix">
-          <slot name="suffix"></slot>
+        <span part="suffix" class=${classMap(suffixClasses)}>
+          <slot name="suffix" @slotchange=${this._onSuffixSlotChange}></slot>
         </span>
         ${this.removable
           ? html`<button
               part="remove-button"
               class="tag__remove-button"
-              aria-label=${`Remove ${labelText}`}
+              aria-label=${`Remove ${this._defaultSlotText}`}
               ?disabled=${this.disabled}
               @click=${this._handleRemove}
             >
@@ -133,6 +186,9 @@ export class HelixTag extends LitElement {
   }
 }
 
+export type HxTag = HelixTag;
+
+/** @deprecated Use {@link HxTag} instead. The `Wc` prefix was a legacy alias. */
 export type WcTag = HelixTag;
 
 declare global {
