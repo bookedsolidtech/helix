@@ -652,16 +652,15 @@ describe('hx-date-picker', () => {
       expect(firstDay?.getAttribute('aria-label')).toBeTruthy();
     });
 
-    it('selected day has aria-pressed="true"', async () => {
+    it('selected day gridcell has aria-selected="true"', async () => {
       const el = await fixture<HelixDatePicker>(
         '<hx-date-picker value="2026-03-04"></hx-date-picker>',
       );
-      // Navigate to March 2026 by setting value — calendar syncs view on open.
       await openCalendar(el);
-      const selectedDay = el.shadowRoot!.querySelector<HTMLButtonElement>(
-        '[part="day"][aria-pressed="true"]',
+      const selectedCell = el.shadowRoot!.querySelector<HTMLElement>(
+        '[role="gridcell"][aria-selected="true"]',
       );
-      expect(selectedDay).toBeTruthy();
+      expect(selectedCell).toBeTruthy();
     });
   });
 
@@ -712,6 +711,164 @@ describe('hx-date-picker', () => {
       );
       const { violations } = await checkA11y(el);
       expect(violations).toEqual([]);
+    });
+
+    it('has no axe violations with calendar open', async () => {
+      const el = await fixture<HelixDatePicker>(
+        '<hx-date-picker label="Appointment Date"></hx-date-picker>',
+      );
+      await openCalendar(el);
+      const { violations } = await checkA11y(el);
+      expect(violations).toEqual([]);
+    });
+  });
+
+  // ─── ARIA Grid Structure (3) ────────────────────────────────────────
+
+  describe('ARIA Grid Structure', () => {
+    it('calendar grid contains role="row" elements', async () => {
+      const el = await fixture<HelixDatePicker>('<hx-date-picker></hx-date-picker>');
+      await openCalendar(el);
+      const rows = el.shadowRoot!.querySelectorAll('[role="grid"] [role="row"]');
+      expect(rows.length).toBeGreaterThan(0);
+    });
+
+    it('gridcells are nested within role="row" elements', async () => {
+      const el = await fixture<HelixDatePicker>('<hx-date-picker></hx-date-picker>');
+      await openCalendar(el);
+      const gridcells = el.shadowRoot!.querySelectorAll('[role="row"] > [role="gridcell"]');
+      expect(gridcells.length).toBeGreaterThan(0);
+    });
+
+    it('today button has aria-current="date"', async () => {
+      const el = await fixture<HelixDatePicker>('<hx-date-picker></hx-date-picker>');
+      await openCalendar(el);
+      const todayBtn = el.shadowRoot!.querySelector<HTMLButtonElement>('[aria-current="date"]');
+      expect(todayBtn).toBeTruthy();
+    });
+  });
+
+  // ─── Keyboard Navigation: Arrow Keys (4) ───────────────────────────
+
+  describe('Keyboard Navigation: Arrow Keys', () => {
+    it('ArrowRight moves focus to the next day', async () => {
+      const el = await fixture<HelixDatePicker>(
+        '<hx-date-picker value="2026-03-10"></hx-date-picker>',
+      );
+      await openCalendar(el);
+      const calendar = shadowQuery(el, '[part="calendar"]')!;
+      calendar.dispatchEvent(
+        new KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true, cancelable: true }),
+      );
+      await el.updateComplete;
+      const focused = el.shadowRoot!.querySelector<HTMLButtonElement>(
+        '[data-day="11"][tabindex="0"]',
+      );
+      expect(focused).toBeTruthy();
+    });
+
+    it('ArrowLeft moves focus to the previous day', async () => {
+      const el = await fixture<HelixDatePicker>(
+        '<hx-date-picker value="2026-03-10"></hx-date-picker>',
+      );
+      await openCalendar(el);
+      const calendar = shadowQuery(el, '[part="calendar"]')!;
+      calendar.dispatchEvent(
+        new KeyboardEvent('keydown', { key: 'ArrowLeft', bubbles: true, cancelable: true }),
+      );
+      await el.updateComplete;
+      const focused = el.shadowRoot!.querySelector<HTMLButtonElement>(
+        '[data-day="9"][tabindex="0"]',
+      );
+      expect(focused).toBeTruthy();
+    });
+
+    it('ArrowDown moves focus down one week', async () => {
+      const el = await fixture<HelixDatePicker>(
+        '<hx-date-picker value="2026-03-10"></hx-date-picker>',
+      );
+      await openCalendar(el);
+      const calendar = shadowQuery(el, '[part="calendar"]')!;
+      calendar.dispatchEvent(
+        new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true, cancelable: true }),
+      );
+      await el.updateComplete;
+      const focused = el.shadowRoot!.querySelector<HTMLButtonElement>(
+        '[data-day="17"][tabindex="0"]',
+      );
+      expect(focused).toBeTruthy();
+    });
+
+    it('ArrowUp moves focus up one week', async () => {
+      const el = await fixture<HelixDatePicker>(
+        '<hx-date-picker value="2026-03-10"></hx-date-picker>',
+      );
+      await openCalendar(el);
+      const calendar = shadowQuery(el, '[part="calendar"]')!;
+      calendar.dispatchEvent(
+        new KeyboardEvent('keydown', { key: 'ArrowUp', bubbles: true, cancelable: true }),
+      );
+      await el.updateComplete;
+      const focused = el.shadowRoot!.querySelector<HTMLButtonElement>(
+        '[data-day="3"][tabindex="0"]',
+      );
+      expect(focused).toBeTruthy();
+    });
+  });
+
+  // ─── Keyboard Navigation: PageUp/PageDown (2) ──────────────────────
+
+  describe('Keyboard Navigation: PageUp/PageDown', () => {
+    it('PageDown navigates to next month', async () => {
+      const el = await fixture<HelixDatePicker>(
+        '<hx-date-picker value="2026-03-10"></hx-date-picker>',
+      );
+      await openCalendar(el);
+      const monthLabelBefore = shadowQuery(el, '.calendar__month-label')?.textContent?.trim() ?? '';
+      const calendar = shadowQuery(el, '[part="calendar"]')!;
+      calendar.dispatchEvent(
+        new KeyboardEvent('keydown', { key: 'PageDown', bubbles: true, cancelable: true }),
+      );
+      await el.updateComplete;
+      const monthLabelAfter = shadowQuery(el, '.calendar__month-label')?.textContent?.trim() ?? '';
+      expect(monthLabelAfter).not.toBe(monthLabelBefore);
+    });
+
+    it('PageUp navigates to previous month', async () => {
+      const el = await fixture<HelixDatePicker>(
+        '<hx-date-picker value="2026-03-10"></hx-date-picker>',
+      );
+      await openCalendar(el);
+      const monthLabelBefore = shadowQuery(el, '.calendar__month-label')?.textContent?.trim() ?? '';
+      const calendar = shadowQuery(el, '[part="calendar"]')!;
+      calendar.dispatchEvent(
+        new KeyboardEvent('keydown', { key: 'PageUp', bubbles: true, cancelable: true }),
+      );
+      await el.updateComplete;
+      const monthLabelAfter = shadowQuery(el, '.calendar__month-label')?.textContent?.trim() ?? '';
+      expect(monthLabelAfter).not.toBe(monthLabelBefore);
+    });
+  });
+
+  // ─── Navigation Boundaries (2) ─────────────────────────────────────
+
+  describe('Navigation Boundaries', () => {
+    it('prev-month button is disabled when at min boundary', async () => {
+      const el = await fixture<HelixDatePicker>(
+        '<hx-date-picker value="2026-03-10" min="2026-03-01"></hx-date-picker>',
+      );
+      await openCalendar(el);
+      const prevBtn = shadowQuery<HTMLButtonElement>(el, '[aria-label="Previous month"]')!;
+      expect(prevBtn.disabled).toBe(true);
+    });
+
+    it('next-month button is disabled when at max boundary', async () => {
+      const el = await fixture<HelixDatePicker>(
+        '<hx-date-picker value="2026-03-10" max="2026-03-31"></hx-date-picker>',
+      );
+      await openCalendar(el);
+      const nextBtn = shadowQuery<HTMLButtonElement>(el, '[aria-label="Next month"]')!;
+      expect(nextBtn.disabled).toBe(true);
     });
   });
 });
