@@ -97,6 +97,7 @@ export class HelixDrawer extends LitElement {
   private _cachedFocusableElements: HTMLElement[] = [];
   private _triggerElement: HTMLElement | null = null;
   private _animationTimeout: ReturnType<typeof setTimeout> | null = null;
+  private _previousBodyOverflow: string | null = null;
 
   private readonly _titleId = `hx-drawer-title-${Math.random().toString(36).slice(2, 9)}`;
 
@@ -159,6 +160,7 @@ export class HelixDrawer extends LitElement {
     if (this._animationTimeout !== null) {
       clearTimeout(this._animationTimeout);
     }
+    this._restoreBodyScroll();
   }
 
   override updated(changedProperties: Map<string, unknown>): void {
@@ -198,11 +200,24 @@ export class HelixDrawer extends LitElement {
 
   // ─── Private: Open / Close ───
 
+  private _lockBodyScroll(): void {
+    if (this.contained) return;
+    this._previousBodyOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+  }
+
+  private _restoreBodyScroll(): void {
+    if (this._previousBodyOverflow === null) return;
+    document.body.style.overflow = this._previousBodyOverflow;
+    this._previousBodyOverflow = null;
+  }
+
   private _openDrawer(): void {
     // Capture trigger for focus restoration
     this._triggerElement = document.activeElement as HTMLElement | null;
 
     this._applySizeVar();
+    this._lockBodyScroll();
 
     // Dispatch hx-show before visual update
     this.dispatchEvent(new CustomEvent('hx-show', { bubbles: true, composed: true }));
@@ -230,6 +245,7 @@ export class HelixDrawer extends LitElement {
     this._isOpen = false;
     this._removeListeners();
     this._cachedFocusableElements = [];
+    this._restoreBodyScroll();
 
     this.dispatchEvent(new CustomEvent('hx-hide', { bubbles: true, composed: true }));
 
