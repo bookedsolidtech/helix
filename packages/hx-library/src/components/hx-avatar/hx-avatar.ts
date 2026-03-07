@@ -1,4 +1,4 @@
-import { LitElement, html, nothing } from 'lit';
+import { LitElement, html, nothing, type PropertyValues } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { tokenStyles } from '@helix/tokens/lit';
@@ -13,7 +13,7 @@ import { helixAvatarStyles } from './hx-avatar.styles.js';
  * @tag hx-avatar
  *
  * @slot - Default slot for custom avatar content. Overrides src and initials when slotted content is present.
- * @slot badge - Status indicator overlay, positioned at the bottom-right of the avatar.
+ * @slot badge - Status indicator overlay, positioned at the bottom-right of the avatar container.
  *
  * @csspart avatar - The outer container element.
  * @csspart image - The img element shown when src is provided.
@@ -39,11 +39,22 @@ export class HelixAvatar extends LitElement {
   src: string | undefined = undefined;
 
   /**
-   * Accessible label for the image or avatar.
+   * Accessible label for the image. Required when `src` is provided.
+   * Used as the container's aria-label in image mode.
    * @attr alt
    */
   @property({ type: String })
   alt = '';
+
+  /**
+   * Human-readable accessible name for non-image states (initials, fallback icon).
+   * In healthcare contexts, provide the full person name (e.g., "Dr. Jane Doe") rather than
+   * relying on raw initials, which screen readers announce as individual letters.
+   * When set, takes precedence over raw initials and the generic "Avatar" fallback.
+   * @attr label
+   */
+  @property({ type: String })
+  label = '';
 
   /**
    * Fallback initials text displayed when no image is available.
@@ -78,12 +89,64 @@ export class HelixAvatar extends LitElement {
   @state()
   private _hasDefaultSlot = false;
 
+  /**
+   * Tracks whether the badge slot has assigned content.
+   */
+  @state()
+  private _hasBadgeSlot = false;
+
+  // ─── Lifecycle ───
+
+  override updated(changedProperties: PropertyValues): void {
+    // P0-1: Reset image error state when src changes so a new valid src renders correctly.
+    if (changedProperties.has('src')) {
+      this._imgError = false;
+    }
+
+    // P1-2: Warn when src is provided without alt — silent accessibility failure in healthcare UIs.
+    if (changedProperties.has('src') || changedProperties.has('alt')) {
+      if (this.src && !this.alt) {
+        console.warn(
+          '[hx-avatar] Accessibility: "alt" attribute is required when "src" is provided. ' +
+            'Without alt text, screen readers announce a non-descriptive label. ' +
+            'Add alt="Full name or description" to your hx-avatar element.',
+        );
+      }
+    }
+
+    // P2-1: Warn when invalid size or shape attribute values are used (e.g., from Twig templates).
+    const validSizes: ReadonlyArray<string> = ['xs', 'sm', 'md', 'lg', 'xl'];
+    if (changedProperties.has('size') && !validSizes.includes(this.size)) {
+      console.warn(
+        `[hx-avatar] Invalid hx-size="${String(this.size)}". Valid values: xs, sm, md, lg, xl. Rendering with "md".`,
+      );
+    }
+    const validShapes: ReadonlyArray<string> = ['circle', 'square'];
+    if (changedProperties.has('shape') && !validShapes.includes(this.shape)) {
+      console.warn(
+        `[hx-avatar] Invalid shape="${String(this.shape)}". Valid values: circle, square. Rendering with "circle".`,
+      );
+    }
+  }
+
   // ─── Slot Change Handling ───
 
   private _handleSlotChange(e: Event): void {
     const slot = e.target as HTMLSlotElement;
     const nodes = slot.assignedNodes({ flatten: true });
     this._hasDefaultSlot = nodes.some((node) => {
+      if (node.nodeType === Node.ELEMENT_NODE) return true;
+      if (node.nodeType === Node.TEXT_NODE) {
+        return (node.textContent ?? '').trim().length > 0;
+      }
+      return false;
+    });
+  }
+
+  private _handleBadgeSlotChange(e: Event): void {
+    const slot = e.target as HTMLSlotElement;
+    const nodes = slot.assignedNodes({ flatten: true });
+    this._hasBadgeSlot = nodes.some((node) => {
       if (node.nodeType === Node.ELEMENT_NODE) return true;
       if (node.nodeType === Node.TEXT_NODE) {
         return (node.textContent ?? '').trim().length > 0;
@@ -125,38 +188,58 @@ export class HelixAvatar extends LitElement {
     const showInitials = !showSlot && !showImage && !!this.initials.trim();
     const showFallback = !showSlot && !showImage && !showInitials;
 
-    const ariaLabel = showImage ? this.alt || 'Avatar' : showInitials ? this.initials : 'Avatar';
+    // P1-1 / P1-7: Use label property for human-readable accessible name in non-image states.
+    const ariaLabel = showImage
+      ? this.alt || this.label || 'Avatar'
+      : showInitials
+        ? this.label || this.initials
+        : this.label || 'Avatar';
+
+    // P2-1: Safe class fallback for invalid attribute values supplied via HTML/Twig.
+    const validSizes: ReadonlyArray<string> = ['xs', 'sm', 'md', 'lg', 'xl'];
+    const validShapes: ReadonlyArray<string> = ['circle', 'square'];
+    const sizeClass = validSizes.includes(this.size) ? this.size : 'md';
+    const shapeClass = validShapes.includes(this.shape) ? this.shape : 'circle';
 
     const classes = {
       avatar: true,
-      [`avatar--${this.size}`]: true,
-      [`avatar--${this.shape}`]: true,
+      [`avatar--${sizeClass}`]: true,
+      [`avatar--${shapeClass}`]: true,
+    };
+
+    // P2-2: Badge wrapper is hidden (not removed) when empty so slotchange detection still works.
+    const badgeClasses = {
+      avatar__badge: true,
+      'avatar__badge--hidden': !this._hasBadgeSlot,
     };
 
     return html`
-      <div
-        part="avatar"
-        class=${classMap(classes)}
-        role=${showSlot ? nothing : 'img'}
-        aria-label=${showSlot ? nothing : ariaLabel}
-      >
-        <slot @slotchange=${this._handleSlotChange}></slot>
-        ${showImage && src
-          ? html`<img
-              part="image"
-              class="avatar__image"
-              src=${src}
-              alt=${this.alt}
-              loading="lazy"
-              @error=${this._handleImgError}
-            />`
-          : nothing}
-        ${showInitials
-          ? html`<span part="initials" class="avatar__initials">${this.initials.trim()}</span>`
-          : nothing}
-        ${showFallback ? this._renderFallbackIcon() : nothing}
-        <span part="badge" class="avatar__badge">
-          <slot name="badge"></slot>
+      <div class="avatar-wrapper">
+        <div
+          part="avatar"
+          class=${classMap(classes)}
+          role=${showSlot ? nothing : 'img'}
+          aria-label=${showSlot ? nothing : ariaLabel}
+        >
+          <slot @slotchange=${this._handleSlotChange}></slot>
+          ${showImage && src
+            ? html`<img
+                part="image"
+                class="avatar__image"
+                src=${src}
+                alt=${this.alt}
+                aria-hidden="true"
+                loading="lazy"
+                @error=${this._handleImgError}
+              />`
+            : nothing}
+          ${showInitials
+            ? html`<span part="initials" class="avatar__initials">${this.initials.trim()}</span>`
+            : nothing}
+          ${showFallback ? this._renderFallbackIcon() : nothing}
+        </div>
+        <span part="badge" class=${classMap(badgeClasses)}>
+          <slot name="badge" @slotchange=${this._handleBadgeSlotChange}></slot>
         </span>
       </div>
     `;
