@@ -274,9 +274,7 @@ describe('hx-list-item', () => {
 
   describe('Events: hx-list-item-click', () => {
     it('dispatches hx-list-item-click on click', async () => {
-      const el = await fixture<HelixListItem>(
-        '<hx-list-item value="test">Item</hx-list-item>',
-      );
+      const el = await fixture<HelixListItem>('<hx-list-item value="test">Item</hx-list-item>');
       const eventPromise = oneEvent(el, 'hx-list-item-click');
       const liEl = shadowQuery<HTMLElement>(el, '[part~="base"]')!;
       liEl.click();
@@ -285,9 +283,7 @@ describe('hx-list-item', () => {
     });
 
     it('hx-list-item-click detail contains value', async () => {
-      const el = await fixture<HelixListItem>(
-        '<hx-list-item value="labs">Item</hx-list-item>',
-      );
+      const el = await fixture<HelixListItem>('<hx-list-item value="labs">Item</hx-list-item>');
       const eventPromise = oneEvent<CustomEvent>(el, 'hx-list-item-click');
       const liEl = shadowQuery<HTMLElement>(el, '[part~="base"]')!;
       liEl.click();
@@ -462,9 +458,7 @@ describe('hx-list-item', () => {
 
   describe('Property: type (description list)', () => {
     it('renders <dt> when type="term"', async () => {
-      const el = await fixture<HelixListItem>(
-        '<hx-list-item type="term">Allergies</hx-list-item>',
-      );
+      const el = await fixture<HelixListItem>('<hx-list-item type="term">Allergies</hx-list-item>');
       const dt = shadowQuery(el, 'dt');
       expect(dt).toBeTruthy();
     });

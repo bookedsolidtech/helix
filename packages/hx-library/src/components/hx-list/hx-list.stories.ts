@@ -100,11 +100,7 @@ export const Numbered: Story = {
 export const Interactive: Story = {
   args: { variant: 'interactive' },
   render: () => html`
-    <hx-list
-      variant="interactive"
-      label="Patient actions"
-      @hx-select=${fn()}
-    >
+    <hx-list variant="interactive" label="Patient actions" @hx-select=${fn()}>
       <hx-list-item value="schedule">Schedule Appointment</hx-list-item>
       <hx-list-item value="labs">View Lab Results</hx-list-item>
       <hx-list-item value="refill">Request Prescription Refill</hx-list-item>
