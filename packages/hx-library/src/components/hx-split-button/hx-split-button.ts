@@ -45,8 +45,14 @@ export class HelixSplitButton extends LitElement {
 
   // ─── Internal References ───
 
+  @query('.split-button__menu')
+  private _menuPanel!: HTMLElement;
+
   @query('.split-button__trigger')
   private _triggerButton!: HTMLButtonElement;
+
+  @query('.split-button__primary')
+  private _primaryButton!: HTMLButtonElement;
 
   // ─── Internal State ───
 
@@ -175,7 +181,11 @@ export class HelixSplitButton extends LitElement {
     const items = this._getMenuItems();
     if (items.length === 0) return;
 
-    const currentIndex = items.findIndex((item) => item === document.activeElement);
+    const focused = this.shadowRoot?.activeElement as HTMLElement | null;
+    // The shadow activeElement is the menu panel; actual focus is in light DOM.
+    // Use document.activeElement to find which item has focus.
+    const lightActive = document.activeElement as HTMLElement | null;
+    const currentIndex = items.findIndex((item) => item === lightActive);
 
     switch (e.key) {
       case 'ArrowDown': {
@@ -207,6 +217,8 @@ export class HelixSplitButton extends LitElement {
         break;
       }
       default:
+        // Suppress the unused-variable warning for the focused variable
+        void focused;
         break;
     }
   }
@@ -261,11 +273,10 @@ export class HelixSplitButton extends LitElement {
   }
 
   /**
-   * Returns enabled hx-menu-item host elements assigned to the `menu` slot.
-   * Uses the host elements (not inner shadow elements) so that focus tracking
-   * via `document.activeElement` works correctly across shadow boundaries.
+   * Returns the focusable inner button elements of enabled hx-menu-item children
+   * assigned to the `menu` slot.
    */
-  private _getMenuItems(): HelixMenuItem[] {
+  private _getMenuItems(): HTMLElement[] {
     const slot = this.shadowRoot?.querySelector<HTMLSlotElement>('slot[name="menu"]');
     if (!slot) return [];
 
@@ -274,7 +285,14 @@ export class HelixSplitButton extends LitElement {
       .filter(
         (el): el is HelixMenuItem =>
           el.tagName.toLowerCase() === 'hx-menu-item' && !(el as HelixMenuItem).disabled,
-      );
+      )
+      .map(
+        (item) =>
+          item.shadowRoot?.querySelector<HTMLElement>('.menu-item') ??
+          item.shadowRoot?.querySelector<HTMLElement>('[role="menuitem"]') ??
+          null,
+      )
+      .filter((el): el is HTMLElement => el !== null);
   }
 
   // ─── Render ───
