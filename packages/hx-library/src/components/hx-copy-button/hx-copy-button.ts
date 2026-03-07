@@ -20,8 +20,6 @@ import { helixCopyButtonStyles } from './hx-copy-button.styles.js';
  *
  * @fires {CustomEvent<{value: string}>} hx-copy - Dispatched after the value
  *   has been successfully written to the clipboard.
- * @fires {CustomEvent<{value: string}>} hx-copy-error - Dispatched when the
- *   clipboard write fails (permissions denied, browser restrictions, etc.).
  *
  * @csspart button - The native button element.
  * @csspart icon - The icon container span wrapping the active icon slot.
@@ -81,9 +79,6 @@ export class HelixCopyButton extends LitElement {
   /** True while the success feedback window is active. */
   @state() private _copied = false;
 
-  /** True briefly when a clipboard write fails. */
-  @state() private _error = false;
-
   /** Timeout handle used to revert the copied state. */
   private _feedbackTimer: ReturnType<typeof setTimeout> | null = null;
 
@@ -114,11 +109,8 @@ export class HelixCopyButton extends LitElement {
       textarea.style.opacity = '0';
       document.body.appendChild(textarea);
       textarea.select();
-      const success = document.execCommand('copy');
+      document.execCommand('copy');
       document.body.removeChild(textarea);
-      if (!success) {
-        throw new Error('execCommand copy failed');
-      }
     }
   }
 
@@ -136,26 +128,7 @@ export class HelixCopyButton extends LitElement {
     try {
       await this._copyToClipboard();
     } catch {
-      this._clearFeedbackTimer();
-      this._error = true;
-
-      /**
-       * Dispatched when the clipboard write fails.
-       * @event hx-copy-error
-       */
-      this.dispatchEvent(
-        new CustomEvent<{ value: string }>('hx-copy-error', {
-          bubbles: true,
-          composed: true,
-          detail: { value: this.value },
-        }),
-      );
-
-      this._feedbackTimer = setTimeout(() => {
-        this._error = false;
-        this._feedbackTimer = null;
-      }, this.feedbackDuration);
-
+      // Copy failed silently; do not enter success state.
       return;
     }
 
@@ -211,7 +184,7 @@ export class HelixCopyButton extends LitElement {
         class=${classMap(this._buttonClasses())}
         type="button"
         ?disabled=${this.disabled}
-        aria-label=${this._copied ? `${this.label} — Copied` : this.label}
+        aria-label=${this.label}
         title=${this.label}
         aria-disabled=${this.disabled ? 'true' : nothing}
         @click=${this._handleClick}
@@ -221,7 +194,7 @@ export class HelixCopyButton extends LitElement {
       </button>
 
       <span aria-live="polite" aria-atomic="true" class="sr-only">
-        ${this._copied ? 'Copied' : this._error ? 'Copy failed' : nothing}
+        ${this._copied ? 'Copied' : nothing}
       </span>
     `;
   }

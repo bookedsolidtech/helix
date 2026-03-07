@@ -254,19 +254,6 @@ describe('hx-copy-button', () => {
       expect(btn!.classList.contains('button--copied')).toBe(true);
     });
 
-    it('updates aria-label to include "Copied" after successful click', async () => {
-      const el = await fixture<HelixCopyButton>(
-        '<hx-copy-button value="test-value" label="Copy MRN"></hx-copy-button>',
-      );
-      const btn = shadowQuery<HTMLButtonElement>(el, 'button');
-      expect(btn).toBeTruthy();
-      const eventPromise = oneEvent(el, 'hx-copy');
-      btn!.click();
-      await eventPromise;
-      await el.updateComplete;
-      expect(btn!.getAttribute('aria-label')).toContain('Copied');
-    });
-
     it('shows "Copied" in live region after successful click', async () => {
       const el = await fixture<HelixCopyButton>(
         '<hx-copy-button value="test-value"></hx-copy-button>',
@@ -360,46 +347,6 @@ describe('hx-copy-button', () => {
       btn!.click();
       const event = await eventPromise;
       expect(event.detail.value).toBe('space-test');
-    });
-  });
-
-  // ─── Clipboard Failure (2) ───
-
-  describe('Clipboard failure', () => {
-    it('fires hx-copy-error when clipboard.writeText rejects', async () => {
-      writeTextSpy.mockRejectedValue(new DOMException('Permission denied'));
-
-      const el = await fixture<HelixCopyButton>(
-        '<hx-copy-button value="fail-test"></hx-copy-button>',
-      );
-      const btn = shadowQuery<HTMLButtonElement>(el, 'button');
-      expect(btn).toBeTruthy();
-
-      const eventPromise = oneEvent<CustomEvent<{ value: string }>>(el, 'hx-copy-error');
-      btn!.click();
-      const event = await eventPromise;
-
-      expect(event.detail.value).toBe('fail-test');
-      expect(event.bubbles).toBe(true);
-      expect(event.composed).toBe(true);
-    });
-
-    it('announces "Copy failed" in live region on clipboard rejection', async () => {
-      writeTextSpy.mockRejectedValue(new DOMException('Permission denied'));
-
-      const el = await fixture<HelixCopyButton>(
-        '<hx-copy-button value="fail-test"></hx-copy-button>',
-      );
-      const btn = shadowQuery<HTMLButtonElement>(el, 'button');
-      expect(btn).toBeTruthy();
-
-      const eventPromise = oneEvent(el, 'hx-copy-error');
-      btn!.click();
-      await eventPromise;
-      await el.updateComplete;
-
-      const liveRegion = shadowQuery(el, '[aria-live="polite"]');
-      expect(liveRegion?.textContent?.trim()).toBe('Copy failed');
     });
   });
 
