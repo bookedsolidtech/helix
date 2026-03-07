@@ -249,6 +249,7 @@ function formatColor(hsv: HSV, format: ColorFormat, includeAlpha: boolean): stri
  * @csspart trigger - The trigger button element.
  * @csspart swatches - The swatch color buttons container.
  * @csspart grid - The 2D saturation/value gradient picker area.
+ * @csspart slider - Shared slider container.
  * @csspart hue-slider - The hue slider track.
  * @csspart opacity-slider - The alpha/opacity slider track.
  * @csspart input - The text input area.
@@ -318,13 +319,6 @@ export class HelixColorPicker extends LitElement {
   name = '';
 
   /**
-   * Accessible label for the color picker. Used as aria-label on the trigger and panel.
-   * @attr label
-   */
-  @property({ type: String, reflect: true })
-  label = 'Choose color';
-
-  /**
    * When true the picker is shown inline instead of in a popover.
    * @attr inline
    */
@@ -343,25 +337,22 @@ export class HelixColorPicker extends LitElement {
   private _draggingHue = false;
   private _draggingOpacity = false;
 
-  private _boundDocumentClick = this._handleDocumentClick.bind(this);
-  private _boundPointerMove = this._handlePointerMove.bind(this);
-  private _boundPointerUp = this._handlePointerUp.bind(this);
-
   // ─── Lifecycle ───────────────────────────────────────────────────────────
 
   override connectedCallback(): void {
     super.connectedCallback();
     this._syncFromValue();
-    document.addEventListener('click', this._boundDocumentClick, true);
-    document.addEventListener('pointermove', this._boundPointerMove);
-    document.addEventListener('pointerup', this._boundPointerUp);
+    this._handleDocumentClick = this._handleDocumentClick.bind(this);
+    document.addEventListener('click', this._handleDocumentClick, true);
+    document.addEventListener('pointermove', this._handlePointerMove.bind(this));
+    document.addEventListener('pointerup', this._handlePointerUp.bind(this));
   }
 
   override disconnectedCallback(): void {
     super.disconnectedCallback();
-    document.removeEventListener('click', this._boundDocumentClick, true);
-    document.removeEventListener('pointermove', this._boundPointerMove);
-    document.removeEventListener('pointerup', this._boundPointerUp);
+    document.removeEventListener('click', this._handleDocumentClick, true);
+    document.removeEventListener('pointermove', this._handlePointerMove.bind(this));
+    document.removeEventListener('pointerup', this._handlePointerUp.bind(this));
   }
 
   override willUpdate(changedProperties: Map<string, unknown>): void {
@@ -386,8 +377,9 @@ export class HelixColorPicker extends LitElement {
     this.value = formatted;
     this._inputValue = formatted;
     this._internals.setFormValue(formatted);
+    const eventName = source === 'drag' ? 'hx-input' : 'hx-change';
     this.dispatchEvent(
-      new CustomEvent(source === 'drag' ? 'hx-input' : 'hx-change', {
+      new CustomEvent(eventName, {
         bubbles: true,
         composed: true,
         detail: { value: formatted },
@@ -555,34 +547,6 @@ export class HelixColorPicker extends LitElement {
     }
   }
 
-  // ─── Grid keyboard handling ──────────────────────────────────────────────
-
-  private _handleGridKeydown(e: KeyboardEvent): void {
-    let ds = 0;
-    let dv = 0;
-    if (e.key === 'ArrowRight') ds = 1;
-    else if (e.key === 'ArrowLeft') ds = -1;
-    else if (e.key === 'ArrowUp') dv = 1;
-    else if (e.key === 'ArrowDown') dv = -1;
-    else if (e.key === 'Home') {
-      this._hsv = { ...this._hsv, s: 0 };
-      this._commit('change');
-      return;
-    } else if (e.key === 'End') {
-      this._hsv = { ...this._hsv, s: 100 };
-      this._commit('change');
-      return;
-    } else return;
-
-    e.preventDefault();
-    this._hsv = {
-      ...this._hsv,
-      s: clamp(this._hsv.s + ds, 0, 100),
-      v: clamp(this._hsv.v + dv, 0, 100),
-    };
-    this._commit('change');
-  }
-
   // ─── Input ───────────────────────────────────────────────────────────────
 
   private _handleInputChange(e: Event): void {
@@ -650,11 +614,8 @@ export class HelixColorPicker extends LitElement {
       <div
         part="grid"
         class="gradient-grid"
-        role="group"
-        aria-label="Color saturation and brightness"
-        tabindex="0"
+        role="presentation"
         @pointerdown=${this._handleGridPointerDown}
-        @keydown=${this._handleGridKeydown}
       >
         <div class="gradient-grid-bg" style=${styleMap({ '--_hue-color': hueColor })}></div>
         <div
@@ -778,7 +739,7 @@ export class HelixColorPicker extends LitElement {
       <div
         class="panel"
         role="dialog"
-        aria-label=${this.label}
+        aria-label="Color picker"
         aria-modal="true"
         tabindex="-1"
         @keydown=${this._handlePanelKeydown}
@@ -805,7 +766,7 @@ export class HelixColorPicker extends LitElement {
         part="trigger"
         type="button"
         class="trigger"
-        aria-label=${this.label}
+        aria-label="Choose color"
         aria-haspopup="dialog"
         aria-expanded=${this._open ? 'true' : 'false'}
         ?disabled=${this.disabled}
