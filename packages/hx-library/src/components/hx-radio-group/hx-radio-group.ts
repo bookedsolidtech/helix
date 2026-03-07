@@ -9,8 +9,6 @@ import type { HelixRadio } from './hx-radio.js';
  * A form-associated radio group that manages a set of `<hx-radio>` children.
  *
  * @summary Form-associated radio group with label, validation, help text, and keyboard navigation.
- * Uses `role="radiogroup"` on the fieldset with arrow-key navigation (roving tabindex pattern).
- * Supports `aria-describedby` for error and help text. WCAG 2.1 AA compliant.
  *
  * @tag hx-radio-group
  *
@@ -36,10 +34,8 @@ export class HelixRadioGroup extends LitElement {
 
   // ─── Form Association ───
 
-  /** Enables native form association via ElementInternals. */
   static formAssociated = true;
 
-  /** @internal ElementInternals instance for form participation and validation. */
   private _internals: ElementInternals;
 
   constructor() {
@@ -105,20 +101,15 @@ export class HelixRadioGroup extends LitElement {
   @property({ type: String, reflect: true })
   orientation: 'vertical' | 'horizontal' = 'vertical';
 
-  /** @internal Reference to the group container for validation anchor. */
   @query('.fieldset__group')
   private _groupEl!: HTMLElement;
 
-  /** @internal Tracks whether the error slot has assigned content. */
   @state() private _hasErrorSlot = false;
 
   // ─── Internal IDs ───
 
-  /** @internal Unique ID for the radio group container. */
   private _groupId = `hx-radio-group-${Math.random().toString(36).slice(2, 9)}`;
-  /** @internal ID for the help text element, used for aria-describedby. */
   private _helpTextId = `${this._groupId}-help`;
-  /** @internal ID for the error element, used for aria-describedby. */
   private _errorId = `${this._groupId}-error`;
 
   // ─── Slot Handlers ───
@@ -161,7 +152,6 @@ export class HelixRadioGroup extends LitElement {
 
   // ─── Radio Management ───
 
-  /** @internal Cached list of child hx-radio elements; invalidated on slot change. */
   private _cachedRadios: HelixRadio[] | null = null;
 
   private _getRadios(): HelixRadio[] {
@@ -206,7 +196,6 @@ export class HelixRadioGroup extends LitElement {
 
   // ─── Event Handling ───
 
-  /** @internal Handles hx-radio-select events from child radios. */
   private _handleRadioSelect = (e: CustomEvent<{ value: string }>): void => {
     e.stopPropagation();
 
@@ -233,7 +222,6 @@ export class HelixRadioGroup extends LitElement {
     );
   };
 
-  /** @internal Arrow key navigation handler for roving tabindex pattern. */
   private _handleKeydown = (e: KeyboardEvent): void => {
     const enabledRadios = this._getEnabledRadios();
     if (enabledRadios.length === 0) {

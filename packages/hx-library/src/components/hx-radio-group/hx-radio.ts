@@ -8,8 +8,6 @@ import { helixRadioStyles } from './hx-radio.styles.js';
  * An individual radio button, designed to be used inside a `<hx-radio-group>`.
  *
  * @summary Presentational radio button managed by its parent radio group.
- * Sets `role="radio"`, `aria-checked`, and `aria-disabled` on the host element.
- * Focus is managed by the parent group via roving tabindex.
  *
  * @tag hx-radio
  *
@@ -81,7 +79,6 @@ export class HelixRadio extends LitElement {
 
   // ─── Internal IDs ───
 
-  /** @internal Unique ID for the hidden native radio input. */
   private _inputId = `hx-radio-${Math.random().toString(36).slice(2, 9)}`;
 
   // ─── Event Handling ───
