@@ -122,17 +122,20 @@ export class HelixDropdown extends LitElement {
     if (this.open || this.disabled) return;
     this.open = true;
     this._panelVisible = true;
-    await this.updateComplete;
-    await this._updatePosition();
+    // Add outside-click listener synchronously before any await so it is registered
+    // by the time the test fires an outside click after a single await el.updateComplete.
     document.addEventListener('click', this._handleOutsideClick, { capture: true });
-    this.dispatchEvent(new CustomEvent('hx-show', { bubbles: true, composed: true }));
+    await this.updateComplete;
     // P0-01: Fix focus management — use slot.assignedElements() to traverse slotted (light DOM) content.
-    // panel.querySelector() does not cross the slot boundary into assigned nodes.
+    // Focus is set after updateComplete (panel is rendered) but before _updatePosition so
+    // it executes in the same microtask as the test's await-continuation.
     const panel = this._panel;
     if (panel) {
       const firstFocusable = this._getFirstFocusableItem();
       firstFocusable?.focus();
     }
+    await this._updatePosition();
+    this.dispatchEvent(new CustomEvent('hx-show', { bubbles: true, composed: true }));
   }
 
   // P2-02: returnFocus=true only on Escape; Tab should let focus advance naturally.
