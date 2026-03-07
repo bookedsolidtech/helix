@@ -3,7 +3,6 @@
 **Audit date:** 2026-03-05
 **Auditor:** chief-code-reviewer (T1 antagonistic pass)
 **Files reviewed:**
-
 - `hx-dialog.ts`
 - `hx-dialog.styles.ts`
 - `hx-dialog.test.ts`
@@ -72,7 +71,7 @@ private readonly _headingId = `hx-dialog-heading-${Math.random().toString(36).sl
 
 `Math.random()` produces non-deterministic IDs. This is acceptable at runtime but problematic for server-side rendering, snapshot tests, and visual regression baselines (ID changes on every render cycle in some testing environments). A deterministic counter would be more robust.
 
-**Recommendation:** Use a module-level monotonically incrementing counter: `let _counter = 0; private readonly _headingId = \`hx-dialog-heading-\${++\_counter}\`;`
+**Recommendation:** Use a module-level monotonically incrementing counter: `let _counter = 0; private readonly _headingId = \`hx-dialog-heading-\${++_counter}\`;`
 
 ---
 
@@ -87,7 +86,6 @@ private readonly _headingId = `hx-dialog-heading-${Math.random().toString(36).sl
 This is the single most well-known dialog accessibility requirement and is absent from both the implementation and the test suite.
 
 **Recommendation:**
-
 1. Store `document.activeElement` (or `document.activeElement as HTMLElement`) before calling `_openDialog()`.
 2. In `_closeDialog()`, call `.focus()` on the stored element after the native dialog closes.
 
@@ -295,7 +293,6 @@ Bundle size is expected to be within the <5KB budget. The component has minimal 
 The component accepts all configuration via attributes (`heading`, `open`, `modal`, `close-on-backdrop`) which are Twig-renderable. However, the trigger-button interaction pattern requires JavaScript (`showModal()` / `close()`). No Drupal behavior (`Drupal.behaviors.hxDialog`) is documented or provided. In a Drupal CMS context, consumers need a clear pattern for wiring trigger buttons via Drupal behaviors rather than inline event listeners.
 
 **Recommendation:** Add a Drupal integration note to the JSDoc or docs site covering:
-
 1. Rendering `<hx-dialog>` with Twig attributes
 2. A minimal `Drupal.behaviors.hxDialog` snippet for trigger-button wiring
 3. Focus restoration pattern using `document.activeElement` before calling `showModal()`
@@ -304,55 +301,37 @@ The component accepts all configuration via attributes (`heading`, `open`, `moda
 
 ## Defect Register
 
-| ID  | Severity | Area       | Title                                                                      | Status                       |
-| --- | -------- | ---------- | -------------------------------------------------------------------------- | ---------------------------- |
-| D1  | P0       | A11y       | No focus restoration to trigger on dialog close (WCAG 2.4.3)               | **RESOLVED** (deep-audit-v2) |
-| D2  | P0       | Storybook  | `WithCustomHeader` story renders unlabelled dialog                         | **RESOLVED** (deep-audit-v2) |
-| D3  | P1       | A11y       | Initial focus after `showModal()` does not reach slotted light DOM content | **RESOLVED** (deep-audit-v2) |
-| D4  | P1       | A11y       | Body scroll not locked when modal dialog is open                           | **RESOLVED** (deep-audit-v2) |
-| D5  | P1       | CSS        | Non-modal backdrop z-index renders over dialog content                     | **RESOLVED** (deep-audit-v2) |
-| D6  | P1       | Tests      | No test for focus restoration on dialog close                              | **RESOLVED** (deep-audit-v2) |
-| D7  | P1       | Tests      | No test for initial focus after dialog open                                | **RESOLVED** (deep-audit-v2) |
-| D8  | P2       | A11y       | `aria-describedby` not implemented                                         | Open                         |
-| D9  | P2       | A11y       | No `role="alertdialog"` variant                                            | Open                         |
-| D10 | P2       | TypeScript | `ariaLabel` property shadows `ARIAMixin.ariaLabel`                         | Open                         |
-| D11 | P2       | TypeScript | `close()` does not accept `returnValue` parameter                          | Open                         |
-| D12 | P2       | Tests      | No test for `role="alertdialog"` variant                                   | Open                         |
-| D13 | P2       | Tests      | No test for form submission inside dialog                                  | Open                         |
-| D14 | P2       | Tests      | Axe tests do not cover custom header without `aria-label`                  | Open                         |
-| D15 | P2       | Storybook  | No `alertdialog` story                                                     | Open                         |
-| D16 | P2       | Storybook  | No form-inside-dialog story                                                | Open                         |
-| D17 | P2       | Storybook  | No close button / `close-button` CSS part absent                           | Open                         |
-| D18 | P2       | CSS        | `dialog::backdrop` shadow DOM support limited below Firefox 122            | Open                         |
-| D19 | P2       | CSS        | `::backdrop` at `opacity: 0` creates invisible pointer-blocking layer      | Open                         |
-| D20 | P2       | Drupal     | No Twig example or Drupal behaviors pattern documented                     | Open                         |
-| D21 | P3       | TypeScript | `Math.random()` heading ID is non-deterministic                            | **RESOLVED** (deep-audit-v2) |
-| D22 | P3       | TypeScript | `classMap` used for static-only class                                      | **RESOLVED** (deep-audit-v2) |
-| D23 | P3       | Storybook  | Story event handlers use fragile `closest()` traversal                     | Open                         |
-| D24 | P3       | Storybook  | `TriggerButton` story does not demonstrate focus restoration               | Open                         |
+| ID | Severity | Area | Title |
+|----|----------|------|-------|
+| D1 | P0 | A11y | No focus restoration to trigger on dialog close (WCAG 2.4.3) |
+| D2 | P0 | Storybook | `WithCustomHeader` story renders unlabelled dialog |
+| D3 | P1 | A11y | Initial focus after `showModal()` does not reach slotted light DOM content |
+| D4 | P1 | A11y | Body scroll not locked when modal dialog is open |
+| D5 | P1 | CSS | Non-modal backdrop z-index renders over dialog content |
+| D6 | P1 | Tests | No test for focus restoration on dialog close |
+| D7 | P1 | Tests | No test for initial focus after dialog open |
+| D8 | P2 | A11y | `aria-describedby` not implemented |
+| D9 | P2 | A11y | No `role="alertdialog"` variant |
+| D10 | P2 | TypeScript | `ariaLabel` property shadows `ARIAMixin.ariaLabel` |
+| D11 | P2 | TypeScript | `close()` does not accept `returnValue` parameter |
+| D12 | P2 | Tests | No test for `role="alertdialog"` variant |
+| D13 | P2 | Tests | No test for form submission inside dialog |
+| D14 | P2 | Tests | Axe tests do not cover custom header without `aria-label` |
+| D15 | P2 | Storybook | No `alertdialog` story |
+| D16 | P2 | Storybook | No form-inside-dialog story |
+| D17 | P2 | Storybook | No close button / `close-button` CSS part absent |
+| D18 | P2 | CSS | `dialog::backdrop` shadow DOM support limited below Firefox 122 |
+| D19 | P2 | CSS | `::backdrop` at `opacity: 0` creates invisible pointer-blocking layer |
+| D20 | P2 | Drupal | No Twig example or Drupal behaviors pattern documented |
+| D21 | P3 | TypeScript | `Math.random()` heading ID is non-deterministic |
+| D22 | P3 | TypeScript | `classMap` used for static-only class |
+| D23 | P3 | Storybook | Story event handlers use fragile `closest()` traversal |
+| D24 | P3 | Storybook | `TriggerButton` story does not demonstrate focus restoration |
 
 ---
 
-## Deep Audit V2 — Resolution Summary (2026-03-06)
-
-**All P0 and P1 defects resolved.** Two P3 items also fixed.
-
-### Fixes applied:
-
-- **D1** — `_previouslyFocusedElement` stored on open, `.focus()` called on close (WCAG 2.4.3)
-- **D2** — Added `aria-label="Critical Alert"` to `WithCustomHeader` story
-- **D3** — After `updateComplete`, first focusable element receives `.focus()`
-- **D4** — `document.body.style.overflow = 'hidden'` on modal open, restored on close
-- **D5** — Non-modal `<dialog>` gets `z-index: calc(var(--hx-z-index-modal) + 1)` via `:host(:not([modal]))` selector
-- **D6** — New test: focus restoration to trigger element after dialog close
-- **D7** — New test: initial focus placement + body scroll lock verification
-- **D21** — Replaced `Math.random()` with module-level monotonic counter
-- **D22** — Removed `classMap` import; static `class="dialog"` applied directly
-
-### Remaining (P2/P3 — documented, not blocking):
-
-13 open P2/P3 items documented above for future work.
-
 ## Verdict
 
-**SHIP-READY** for WCAG 2.1 AA minimum viable compliance. All P0 and P1 defects resolved. Remaining P2/P3 items are enhancements, not blockers.
+**DO NOT SHIP** in current state. Two P0 defects (focus restoration, inaccessible demo story) and five P1 defects must be resolved before this component can meet the WCAG 2.1 AA healthcare mandate.
+
+Minimum viable ship requires resolving: D1, D2, D3, D4, D5, D6, D7.
