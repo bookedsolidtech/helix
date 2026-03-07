@@ -134,6 +134,17 @@ export const helixSliderStyles = css`
     padding-block: var(--hx-slider-input-padding-block, 0.75rem);
   }
 
+  /* In forced-color mode, restore native outline so the input remains focusable */
+  @media (forced-colors: active) {
+    .slider__input {
+      outline: revert;
+      opacity: 1;
+    }
+    .slider__input:focus-visible {
+      outline: 2px solid ButtonText;
+    }
+  }
+
   .slider__input:disabled {
     cursor: not-allowed;
   }
@@ -141,17 +152,25 @@ export const helixSliderStyles = css`
   /* ─── Thumb (visual, :before on a wrapper or via ::after on track) ─── */
   /*
    * The native thumb is hidden (opacity 0 on the input). We render a visible
-   * thumb element that is positioned via a CSS custom property updated in JS.
+   * thumb element positioned by --fill-pct (a raw 0–100 number set in JS).
+   *
+   * Correct alignment formula keeps the thumb centered within the track at
+   * both extremes, preventing the left/right halves from clipping outside:
+   *   left = fillPct% * (1 – thumbSize/100%) + thumbSize * (1 – fillPct/100)
+   * Simplified: left = calc(var(--fill-pct,0)*1% + var(--_thumb-size)*(1 - var(--fill-pct,0)/100))
+   * Combined with translate(-50%,-50%) this places the thumb center correctly
+   * at every position from min to max.
    */
 
   .slider__thumb-visual {
     position: absolute;
     top: 50%;
+    /* Corrected position: thumb stays within track at all fill values */
+    left: calc(var(--fill-pct, 0) * 1% + var(--_thumb-size, 1rem) * (1 - var(--fill-pct, 0) / 100));
     transform: translate(-50%, -50%);
     border-radius: var(--hx-border-radius-full, 9999px);
     background-color: var(--hx-slider-thumb-bg, var(--hx-color-neutral-0, #ffffff));
-    border: var(--hx-border-width-thin, 2px) solid
-      var(--hx-slider-thumb-border-color, var(--hx-color-primary-500, #2563eb));
+    border: 2px solid var(--hx-slider-thumb-border-color, var(--hx-color-primary-500, #2563eb));
     box-shadow: var(--hx-slider-thumb-shadow, var(--hx-shadow-sm, 0 1px 2px 0 rgb(0 0 0 / 0.05)));
     pointer-events: none;
     transition:
@@ -175,18 +194,39 @@ export const helixSliderStyles = css`
   /* ─── Thumb sizes ─── */
 
   .slider--sm .slider__thumb-visual {
-    width: var(--hx-slider-thumb-size-sm, var(--hx-size-3, 0.75rem));
-    height: var(--hx-slider-thumb-size-sm, var(--hx-size-3, 0.75rem));
+    --_thumb-size: var(--hx-slider-thumb-size-sm, var(--hx-size-3, 0.75rem));
+    width: var(--_thumb-size);
+    height: var(--_thumb-size);
   }
 
   .slider--md .slider__thumb-visual {
-    width: var(--hx-slider-thumb-size-md, var(--hx-size-4, 1rem));
-    height: var(--hx-slider-thumb-size-md, var(--hx-size-4, 1rem));
+    --_thumb-size: var(--hx-slider-thumb-size-md, var(--hx-size-4, 1rem));
+    width: var(--_thumb-size);
+    height: var(--_thumb-size);
   }
 
   .slider--lg .slider__thumb-visual {
-    width: var(--hx-slider-thumb-size-lg, var(--hx-size-5, 1.25rem));
-    height: var(--hx-slider-thumb-size-lg, var(--hx-size-5, 1.25rem));
+    --_thumb-size: var(--hx-slider-thumb-size-lg, var(--hx-size-5, 1.25rem));
+    width: var(--_thumb-size);
+    height: var(--_thumb-size);
+  }
+
+  /* ─── Forced colors (Windows High Contrast) ─── */
+  @media (forced-colors: active) {
+    .slider__fill {
+      background-color: Highlight;
+    }
+    .slider__track {
+      background-color: ButtonFace;
+      border: 1px solid ButtonText;
+    }
+    .slider__thumb-visual {
+      background-color: ButtonText;
+      border-color: ButtonText;
+    }
+    .slider__input:focus-visible ~ .slider__thumb-visual {
+      outline: 2px solid Highlight;
+    }
   }
 
   /* ─── Ticks ─── */
@@ -213,7 +253,7 @@ export const helixSliderStyles = css`
     display: flex;
     justify-content: space-between;
     font-size: var(--hx-font-size-xs, 0.75rem);
-    color: var(--hx-color-neutral-500, #6c757d);
+    color: var(--hx-slider-range-label-color, var(--hx-color-neutral-500, #6c757d));
     line-height: var(--hx-line-height-normal, 1.5);
     margin-top: var(--hx-space-0-5, 0.125rem);
   }
@@ -222,7 +262,7 @@ export const helixSliderStyles = css`
 
   .slider__help-text {
     font-size: var(--hx-font-size-xs, 0.75rem);
-    color: var(--hx-color-neutral-500, #6c757d);
+    color: var(--hx-slider-help-text-color, var(--hx-color-neutral-500, #6c757d));
     line-height: var(--hx-line-height-normal, 1.5);
   }
 
