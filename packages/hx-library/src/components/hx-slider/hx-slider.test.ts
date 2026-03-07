@@ -310,8 +310,19 @@ describe('hx-slider', () => {
       expect(el.form).toBe(form);
     });
 
-    it('formResetCallback resets value to min', async () => {
+    it('formResetCallback resets value to the declared default (value attribute)', async () => {
       const el = await fixture<HelixSlider>('<hx-slider min="10" value="80"></hx-slider>');
+      el.value = 50;
+      await el.updateComplete;
+      el.formResetCallback();
+      await el.updateComplete;
+      expect(el.value).toBe(80);
+    });
+
+    it('formResetCallback resets to min when no value attribute is set', async () => {
+      const el = await fixture<HelixSlider>('<hx-slider min="10" max="100"></hx-slider>');
+      el.value = 60;
+      await el.updateComplete;
       el.formResetCallback();
       await el.updateComplete;
       expect(el.value).toBe(10);
@@ -326,9 +337,40 @@ describe('hx-slider', () => {
 
     it('formStateRestoreCallback ignores non-numeric state', async () => {
       const el = await fixture<HelixSlider>('<hx-slider value="20"></hx-slider>');
-      el.formStateRestoreCallback('not-a-number');
+      el.formStateRestoreCallback('not-a-number', 'restore');
       await el.updateComplete;
       expect(el.value).toBe(20);
+    });
+
+    it('formStateRestoreCallback clamps restored value to [min, max]', async () => {
+      const el = await fixture<HelixSlider>('<hx-slider min="0" max="100"></hx-slider>');
+      el.formStateRestoreCallback('150', 'restore');
+      await el.updateComplete;
+      expect(el.value).toBe(100);
+    });
+
+    it('value is clamped to max when set above max', async () => {
+      const el = await fixture<HelixSlider>('<hx-slider min="0" max="100" value="50"></hx-slider>');
+      el.value = 150;
+      await el.updateComplete;
+      expect(el.value).toBe(100);
+    });
+
+    it('value is clamped to min when set below min', async () => {
+      const el = await fixture<HelixSlider>('<hx-slider min="10" max="100" value="50"></hx-slider>');
+      el.value = -5;
+      await el.updateComplete;
+      expect(el.value).toBe(10);
+    });
+
+    it('name and value appear in FormData on submit', async () => {
+      const form = document.createElement('form');
+      form.innerHTML = '<hx-slider name="dosage" value="10" min="0" max="100"></hx-slider>';
+      document.getElementById('test-fixture-container')!.appendChild(form);
+      const el = form.querySelector('hx-slider') as HelixSlider;
+      await el.updateComplete;
+      const data = new FormData(form);
+      expect(data.get('dosage')).toBe('10');
     });
   });
 
@@ -435,7 +477,7 @@ describe('hx-slider', () => {
     });
   });
 
-  // ─── Fill width (2) ───
+  // ─── Fill width (3) ───
 
   describe('Fill width', () => {
     it('fill width is 0% when value equals min', async () => {
@@ -450,6 +492,14 @@ describe('hx-slider', () => {
       );
       const fill = shadowQuery<HTMLElement>(el, '[part="fill"]');
       expect(fill?.style.width).toBe('100%');
+    });
+
+    it('fill width is 50% when value is mid-range', async () => {
+      const el = await fixture<HelixSlider>(
+        '<hx-slider min="0" max="100" value="50"></hx-slider>',
+      );
+      const fill = shadowQuery<HTMLElement>(el, '[part="fill"]');
+      expect(fill?.style.width).toBe('50%');
     });
   });
 
@@ -532,6 +582,60 @@ describe('hx-slider', () => {
       input!.dispatchEvent(new Event('input', { bubbles: true }));
       await el.updateComplete;
       expect(el.value).toBe(100);
+    });
+  });
+
+  // ─── Accessible name (label slot regression) ───
+
+  describe('Accessible name', () => {
+    it('aria-labelledby references an element that exists in shadow DOM when label slot is used', async () => {
+      const el = await fixture<HelixSlider>(
+        '<hx-slider><strong slot="label">Pain Level</strong></hx-slider>',
+      );
+      await el.updateComplete;
+      const input = shadowQuery<HTMLInputElement>(el, 'input[type="range"]');
+      const labelId = input?.getAttribute('aria-labelledby');
+      expect(labelId).toBeTruthy();
+      const labelEl = el.shadowRoot?.getElementById(labelId!);
+      expect(labelEl).toBeTruthy();
+    });
+
+    it('aria-labelledby references an element that exists when label prop is set', async () => {
+      const el = await fixture<HelixSlider>('<hx-slider label="Volume"></hx-slider>');
+      await el.updateComplete;
+      const input = shadowQuery<HTMLInputElement>(el, 'input[type="range"]');
+      const labelId = input?.getAttribute('aria-labelledby');
+      expect(labelId).toBeTruthy();
+      const labelEl = el.shadowRoot?.getElementById(labelId!);
+      expect(labelEl).toBeTruthy();
+    });
+
+    it('aria-labelledby is absent when no label is provided', async () => {
+      const el = await fixture<HelixSlider>('<hx-slider></hx-slider>');
+      await el.updateComplete;
+      const input = shadowQuery<HTMLInputElement>(el, 'input[type="range"]');
+      expect(input?.getAttribute('aria-labelledby')).toBeNull();
+    });
+
+    it('aria-valuetext is set on input when valueText prop is provided', async () => {
+      const el = await fixture<HelixSlider>(
+        '<hx-slider label="Pain" value="7" aria-valuetext="7 — Moderate-Severe"></hx-slider>',
+      );
+      await el.updateComplete;
+      const input = shadowQuery<HTMLInputElement>(el, 'input[type="range"]');
+      expect(input?.getAttribute('aria-valuetext')).toBe('7 — Moderate-Severe');
+    });
+
+    it('host has aria-disabled="true" when disabled', async () => {
+      const el = await fixture<HelixSlider>('<hx-slider disabled></hx-slider>');
+      await el.updateComplete;
+      expect(el.getAttribute('aria-disabled')).toBe('true');
+    });
+
+    it('host has no aria-disabled when not disabled', async () => {
+      const el = await fixture<HelixSlider>('<hx-slider></hx-slider>');
+      await el.updateComplete;
+      expect(el.getAttribute('aria-disabled')).toBeNull();
     });
   });
 
