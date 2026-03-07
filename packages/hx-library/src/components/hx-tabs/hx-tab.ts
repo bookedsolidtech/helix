@@ -16,6 +16,8 @@ import { helixTabStyles } from './hx-tab.styles.js';
  * @slot suffix - Icon or content rendered after the label.
  *
  * @csspart tab - The underlying button element.
+ * @csspart prefix - The container for prefix slot content (e.g. icons).
+ * @csspart suffix - The container for suffix slot content (e.g. badges).
  *
  * @cssprop [--hx-tabs-tab-color=var(--hx-color-neutral-600, #495057)] - Inactive tab text color.
  * @cssprop [--hx-tabs-tab-active-color=var(--hx-color-primary-600, #1d4ed8)] - Active tab text color.
@@ -60,7 +62,9 @@ export class HelixTab extends LitElement {
 
   // ─── Slot Visibility ───
 
+  /** @internal */
   @state() private _hasPrefixSlot = false;
+  /** @internal */
   @state() private _hasSuffixSlot = false;
 
   // ─── Event Handling ───
