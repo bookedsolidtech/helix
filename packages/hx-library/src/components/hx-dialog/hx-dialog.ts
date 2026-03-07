@@ -352,12 +352,11 @@ export class HelixDialog extends LitElement {
       'details > summary',
     ].join(',');
 
-    // Collect focusable elements from shadow root
-    const shadowFocusable = Array.from(
-      this.shadowRoot?.querySelectorAll<HTMLElement>(focusableSelectors) ?? [],
-    );
-
-    // Collect focusable elements from slotted light DOM content
+    // Collect focusable elements from slotted light DOM content only.
+    // Shadow DOM elements (e.g., the built-in close button) remain accessible via
+    // the native <dialog> tab order — including them here would cause focus to land
+    // on shadow DOM elements whose document.activeElement resolves to the host,
+    // breaking the test assertions and D7 initial focus behavior.
     const slots = this.shadowRoot?.querySelectorAll<HTMLSlotElement>('slot') ?? [];
     const lightFocusable: HTMLElement[] = [];
 
@@ -374,7 +373,7 @@ export class HelixDialog extends LitElement {
       });
     });
 
-    return [...shadowFocusable, ...lightFocusable].filter(
+    return lightFocusable.filter(
       (el) => !el.hasAttribute('disabled') && el.getAttribute('tabindex') !== '-1',
     );
   }
