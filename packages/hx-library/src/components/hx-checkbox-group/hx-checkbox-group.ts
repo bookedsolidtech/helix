@@ -312,7 +312,6 @@ export class HelixCheckboxGroup extends LitElement {
         part="group"
         class=${classMap(fieldsetClasses)}
         aria-describedby=${describedBy ?? nothing}
-        aria-required=${this.required ? 'true' : nothing}
       >
         <legend part="label" class="fieldset__legend">
           <slot name="label">${this.label}</slot>
