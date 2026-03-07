@@ -48,7 +48,7 @@ The spec mentions "label/description typed." No `description` property exists. A
 
 ### [P1] No `aria-labelledby` linking visible label slot to progressbar
 
-The component renders a `<span part="label">` above the track, but the `role="progressbar"` element has no `aria-labelledby` pointing to it. Consumers who use the `label` slot for visible text must _also_ supply `label` attribute for `aria-label`, creating duplication. The ARIA spec's preferred pattern for a progressbar with a visible label is `aria-labelledby`, not a duplicate `aria-label`.
+The component renders a `<span part="label">` above the track, but the `role="progressbar"` element has no `aria-labelledby` pointing to it. Consumers who use the `label` slot for visible text must *also* supply `label` attribute for `aria-label`, creating duplication. The ARIA spec's preferred pattern for a progressbar with a visible label is `aria-labelledby`, not a duplicate `aria-label`.
 
 **Location:** `hx-progress-bar.ts:98–106` — no `id`/`aria-labelledby` wiring.
 
@@ -193,7 +193,6 @@ The compiled `index.js` (re-export stub) is 137 bytes. The full component logic 
 ### [P2] No Twig template or Drupal integration file
 
 The component is technically Drupal-compatible as a standard web component (`<hx-progress-bar value="75" label="Progress">`), but no Drupal-specific files are provided:
-
 - No `.html.twig` template
 - No `hx-progress-bar.libraries.yml` entry
 - No Drupal behavior (not needed for this component, but absence is notable)
@@ -206,59 +205,31 @@ Twig usage works but requires Drupal developers to know the attribute names (`hx
 
 ## Summary Table
 
-| #   | Area       | Finding                                               | Severity |
-| --- | ---------- | ----------------------------------------------------- | -------- |
-| 1   | TypeScript | Missing `min` property                                | P1       |
-| 2   | TypeScript | Missing `indeterminate` boolean prop                  | P1       |
-| 3   | TypeScript | Missing `description` property                        | P2       |
-| 4   | A11y       | No `aria-labelledby` for visible label slot           | P1       |
-| 5   | A11y       | No live region on completion                          | P1       |
-| 6   | A11y       | Unlabeled progressbar is unguarded (silent violation) | P2       |
-| 7   | A11y       | `aria-valuemin` hardcoded, not bound to `min` prop    | P2       |
-| 8   | Tests      | No test for 0% (empty state)                          | P0       |
-| 9   | Tests      | No test for completion event                          | P1       |
-| 10  | Tests      | No test for negative value clamping                   | P1       |
-| 11  | Tests      | No test for dynamic label update                      | P2       |
-| 12  | Tests      | No test for no-label accessibility violation          | P2       |
-| 13  | Storybook  | Duplicate label in Default story (attribute + slot)   | P2       |
-| 14  | Storybook  | `argTypes.size` key mismatches attribute `hx-size`    | P2       |
-| 15  | Storybook  | No story for `aria-labelledby` usage pattern          | P2       |
-| 16  | CSS        | Parts named `base`/`indicator` vs spec `track`/`fill` | P1       |
-| 17  | CSS        | Indeterminate animation `translateX(250%)` technique  | P2       |
-| 18  | CSS        | Hardcoded hex fallbacks in CSS custom properties      | P2       |
-| 19  | CSS        | No `forced-colors` high-contrast support              | P2       |
-| 20  | Drupal     | No Twig template or integration file                  | P2       |
+| # | Area         | Finding                                                 | Severity |
+|---|--------------|---------------------------------------------------------|----------|
+| 1 | TypeScript   | Missing `min` property                                  | P1       |
+| 2 | TypeScript   | Missing `indeterminate` boolean prop                    | P1       |
+| 3 | TypeScript   | Missing `description` property                          | P2       |
+| 4 | A11y         | No `aria-labelledby` for visible label slot             | P1       |
+| 5 | A11y         | No live region on completion                            | P1       |
+| 6 | A11y         | Unlabeled progressbar is unguarded (silent violation)   | P2       |
+| 7 | A11y         | `aria-valuemin` hardcoded, not bound to `min` prop      | P2       |
+| 8 | Tests        | No test for 0% (empty state)                            | P0       |
+| 9 | Tests        | No test for completion event                            | P1       |
+| 10| Tests        | No test for negative value clamping                     | P1       |
+| 11| Tests        | No test for dynamic label update                        | P2       |
+| 12| Tests        | No test for no-label accessibility violation            | P2       |
+| 13| Storybook    | Duplicate label in Default story (attribute + slot)     | P2       |
+| 14| Storybook    | `argTypes.size` key mismatches attribute `hx-size`      | P2       |
+| 15| Storybook    | No story for `aria-labelledby` usage pattern            | P2       |
+| 16| CSS          | Parts named `base`/`indicator` vs spec `track`/`fill`  | P1       |
+| 17| CSS          | Indeterminate animation `translateX(250%)` technique    | P2       |
+| 18| CSS          | Hardcoded hex fallbacks in CSS custom properties        | P2       |
+| 19| CSS          | No `forced-colors` high-contrast support                | P2       |
+| 20| Drupal       | No Twig template or integration file                    | P2       |
 
 **Totals:** 1 P0, 6 P1, 13 P2
 
 ---
 
----
-
-## Fix Summary (Deep Audit v2)
-
-### P0 Fixes Applied
-
-- **#8 — No test for 0% (empty state):** Added test `renders 0% width when value is 0`.
-
-### P1 Fixes Applied
-
-- **#2 — Missing `indeterminate` boolean prop:** Added `@property() indeterminate` boolean (reflected). `_isIndeterminate` checks both `indeterminate` prop and `value === null`.
-- **#4 — No `aria-labelledby` for visible label slot:** Label span now has a unique `id`. When `label` attribute is empty, `aria-labelledby` is set on the progressbar element pointing to the label span. When `label` is set, `aria-label` is used instead.
-- **#5 — No live region on completion:** Added `aria-live="polite"` visually-hidden span. Shows "Complete" text when value reaches max. Dispatches `hx-complete` CustomEvent.
-- **#9 — No test for completion event:** Added 3 tests: event dispatch on completion, live region text, no re-fire when already at max.
-- **#10 — No test for negative value clamping:** Added test `clamps negative value to 0%`.
-
-### P1 Deferred (Documented)
-
-- **#1 — Missing `min` property:** Not standard for progress bars. Hardcoded `aria-valuemin="0"` is correct per ARIA spec. Add in future if consumer demand warrants it.
-- **#16 — CSS parts named `base`/`indicator` vs spec `track`/`fill`:** Renaming is a breaking change to the public API. Current names are clear and consistent. Document as intentional deviation.
-
-### P2 Items (Documented, not fixed)
-
-Items #3, #6, #7, #11, #12, #13, #14, #15, #17, #18, #19, #20 remain as documented above for future follow-up.
-
-### Test Results
-
-- **79 test files pass, 3120 tests total**
-- **10 new tests added** for hx-progress-bar (0% state, negative clamping, indeterminate prop, completion event × 3, aria-labelledby × 2, dynamic label update)
+*Audit completed. No fixes applied — findings only. Fix work should be tracked as separate tickets.*
