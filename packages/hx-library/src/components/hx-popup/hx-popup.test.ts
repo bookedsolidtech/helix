@@ -80,12 +80,20 @@ describe('hx-popup', () => {
       expect(el.hasAttribute('active')).toBe(true);
     });
 
-    it('popup has aria-hidden="true" when inactive', async () => {
+    it('popup has inert when inactive', async () => {
       const el = await fixture<HelixPopup>(
         '<hx-popup><button slot="anchor">Anchor</button><div>Content</div></hx-popup>',
       );
       const popup = shadowQuery(el, '[part="popup"]');
-      expect(popup?.getAttribute('aria-hidden')).toBe('true');
+      expect(popup?.hasAttribute('inert')).toBe(true);
+    });
+
+    it('popup does not have inert when active', async () => {
+      const el = await fixture<HelixPopup>(
+        '<hx-popup active><button slot="anchor">Anchor</button><div>Content</div></hx-popup>',
+      );
+      const popup = shadowQuery(el, '[part="popup"]');
+      expect(popup?.hasAttribute('inert')).toBe(false);
     });
   });
 
@@ -129,6 +137,13 @@ describe('hx-popup', () => {
         expect(el.placement).toBe(placement);
         cleanup();
       }
+    });
+
+    it('accepts "auto" placement', async () => {
+      const el = await fixture<HelixPopup>(
+        '<hx-popup placement="auto"><button slot="anchor">Anchor</button><div>Content</div></hx-popup>',
+      );
+      expect(el.placement).toBe('auto');
     });
   });
 
@@ -187,6 +202,97 @@ describe('hx-popup', () => {
     });
   });
 
+  // ─── Property: arrowPlacement (3) ───
+
+  describe('Property: arrowPlacement', () => {
+    it('defaults to null', async () => {
+      const el = await fixture<HelixPopup>(
+        '<hx-popup arrow><button slot="anchor">Anchor</button><div>Content</div></hx-popup>',
+      );
+      expect(el.arrowPlacement).toBeNull();
+    });
+
+    it('reads arrow-placement="start" attribute', async () => {
+      const el = await fixture<HelixPopup>(
+        '<hx-popup arrow arrow-placement="start"><button slot="anchor">A</button><div>C</div></hx-popup>',
+      );
+      expect(el.arrowPlacement).toBe('start');
+    });
+
+    it('reads arrow-placement="end" attribute', async () => {
+      const el = await fixture<HelixPopup>(
+        '<hx-popup arrow arrow-placement="end"><button slot="anchor">A</button><div>C</div></hx-popup>',
+      );
+      expect(el.arrowPlacement).toBe('end');
+    });
+
+    it('reads arrow-placement="center" attribute', async () => {
+      const el = await fixture<HelixPopup>(
+        '<hx-popup arrow arrow-placement="center"><button slot="anchor">A</button><div>C</div></hx-popup>',
+      );
+      expect(el.arrowPlacement).toBe('center');
+    });
+
+    it('sets arrow left offset for start placement on top popup', async () => {
+      const el = await fixture<HelixPopup>(
+        '<hx-popup active arrow arrow-placement="start" placement="bottom" distance="8"><button slot="anchor">Anchor</button><div>Content</div></hx-popup>',
+      );
+      await el.updateComplete;
+      const eventPromise = oneEvent(el, 'hx-reposition');
+      await el.reposition();
+      await eventPromise;
+
+      const arrowEl = shadowQuery<HTMLElement>(el, '[part="arrow"]');
+      expect(arrowEl?.style.left).toBeTruthy();
+      expect(arrowEl?.getAttribute('data-placement')).toBe('bottom');
+    });
+
+    it('sets arrow right offset for end placement on top popup', async () => {
+      const el = await fixture<HelixPopup>(
+        '<hx-popup active arrow arrow-placement="end" placement="bottom" distance="8"><button slot="anchor">Anchor</button><div>Content</div></hx-popup>',
+      );
+      await el.updateComplete;
+      const eventPromise = oneEvent(el, 'hx-reposition');
+      await el.reposition();
+      await eventPromise;
+
+      const arrowEl = shadowQuery<HTMLElement>(el, '[part="arrow"]');
+      expect(arrowEl?.style.right).toBeTruthy();
+      expect(arrowEl?.getAttribute('data-placement')).toBe('bottom');
+    });
+  });
+
+  // ─── Property: arrowPadding (2) ───
+
+  describe('Property: arrowPadding', () => {
+    it('defaults to 10', async () => {
+      const el = await fixture<HelixPopup>(
+        '<hx-popup arrow><button slot="anchor">Anchor</button><div>Content</div></hx-popup>',
+      );
+      expect(el.arrowPadding).toBe(10);
+    });
+
+    it('reads arrow-padding attribute', async () => {
+      const el = await fixture<HelixPopup>(
+        '<hx-popup arrow arrow-padding="20"><button slot="anchor">A</button><div>C</div></hx-popup>',
+      );
+      expect(el.arrowPadding).toBe(20);
+    });
+
+    it('uses arrowPadding as offset for start arrowPlacement', async () => {
+      const el = await fixture<HelixPopup>(
+        '<hx-popup active arrow arrow-placement="start" arrow-padding="15" placement="bottom" distance="8"><button slot="anchor">Anchor</button><div>Content</div></hx-popup>',
+      );
+      await el.updateComplete;
+      const eventPromise = oneEvent(el, 'hx-reposition');
+      await el.reposition();
+      await eventPromise;
+
+      const arrowEl = shadowQuery<HTMLElement>(el, '[part="arrow"]');
+      expect(arrowEl?.style.left).toBe('15px');
+    });
+  });
+
   // ─── Property: flip (2) ───
 
   describe('Property: flip', () => {
@@ -223,7 +329,7 @@ describe('hx-popup', () => {
     });
   });
 
-  // ─── Property: autoSize (2) ───
+  // ─── Property: autoSize (3) ───
 
   describe('Property: autoSize', () => {
     it('defaults to false', async () => {
@@ -238,6 +344,71 @@ describe('hx-popup', () => {
         '<hx-popup auto-size><button slot="anchor">Anchor</button><div>Content</div></hx-popup>',
       );
       expect(el.autoSize).toBe(true);
+    });
+
+    it('sets --hx-auto-size-available-width and --hx-auto-size-available-height on :host when active', async () => {
+      const el = await fixture<HelixPopup>(
+        '<hx-popup active auto-size><button slot="anchor">Anchor</button><div>Content</div></hx-popup>',
+      );
+      await el.updateComplete;
+      const eventPromise = oneEvent(el, 'hx-reposition');
+      await el.reposition();
+      await eventPromise;
+
+      const width = el.style.getPropertyValue('--hx-auto-size-available-width');
+      const height = el.style.getPropertyValue('--hx-auto-size-available-height');
+      expect(width).toBeTruthy();
+      expect(height).toBeTruthy();
+    });
+
+    it('removes --hx-auto-size-* properties when autoSize is disabled', async () => {
+      const el = await fixture<HelixPopup>(
+        '<hx-popup active auto-size><button slot="anchor">Anchor</button><div>Content</div></hx-popup>',
+      );
+      await el.updateComplete;
+      const eventPromise = oneEvent(el, 'hx-reposition');
+      await el.reposition();
+      await eventPromise;
+
+      // Now disable autoSize
+      el.autoSize = false;
+      await el.updateComplete;
+
+      const width = el.style.getPropertyValue('--hx-auto-size-available-width');
+      const height = el.style.getPropertyValue('--hx-auto-size-available-height');
+      expect(width).toBe('');
+      expect(height).toBe('');
+    });
+  });
+
+  // ─── Property: strategy (2) ───
+
+  describe('Property: strategy', () => {
+    it('defaults to "fixed"', async () => {
+      const el = await fixture<HelixPopup>(
+        '<hx-popup><button slot="anchor">Anchor</button><div>Content</div></hx-popup>',
+      );
+      expect(el.strategy).toBe('fixed');
+    });
+
+    it('accepts "absolute" strategy', async () => {
+      const el = await fixture<HelixPopup>(
+        '<hx-popup strategy="absolute"><button slot="anchor">A</button><div>C</div></hx-popup>',
+      );
+      expect(el.strategy).toBe('absolute');
+    });
+
+    it('sets popup element position style to match strategy', async () => {
+      const el = await fixture<HelixPopup>(
+        '<hx-popup active strategy="absolute"><button slot="anchor">Anchor</button><div>Content</div></hx-popup>',
+      );
+      await el.updateComplete;
+      const eventPromise = oneEvent(el, 'hx-reposition');
+      await el.reposition();
+      await eventPromise;
+
+      const popup = shadowQuery<HTMLElement>(el, '[part="popup"]');
+      expect(popup?.style.position).toBe('absolute');
     });
   });
 
@@ -319,7 +490,7 @@ describe('hx-popup', () => {
     });
   });
 
-  // ─── Positioning (3) ───
+  // ─── Positioning (6) ───
 
   describe('Positioning', () => {
     it('popup is positioned fixed when active', async () => {
@@ -332,12 +503,12 @@ describe('hx-popup', () => {
       expect(styles.position).toBe('fixed');
     });
 
-    it('aria-hidden is "false" when active', async () => {
+    it('popup has inert removed when active', async () => {
       const el = await fixture<HelixPopup>(
         '<hx-popup active><button slot="anchor">Anchor</button><div>Content</div></hx-popup>',
       );
       const popup = shadowQuery(el, '[part="popup"]');
-      expect(popup?.getAttribute('aria-hidden')).toBe('false');
+      expect(popup?.hasAttribute('inert')).toBe(false);
     });
 
     it('anchor element sets anchor via Element reference', async () => {
@@ -354,6 +525,73 @@ describe('hx-popup', () => {
       } finally {
         anchorEl.remove();
       }
+    });
+
+    it('anchor prop accepts CSS selector string and resolves element', async () => {
+      const anchorEl = document.createElement('button');
+      anchorEl.id = 'test-anchor-btn';
+      anchorEl.textContent = 'External';
+      document.body.appendChild(anchorEl);
+
+      try {
+        const el = await fixture<HelixPopup>(
+          '<hx-popup active anchor="#test-anchor-btn"><div>Content</div></hx-popup>',
+        );
+        await el.updateComplete;
+
+        // Verify the string anchor is stored and active (positioning will try to use it)
+        expect(el.anchor).toBe('#test-anchor-btn');
+        // Verify it resolves to the element — reposition should succeed without errors
+        const eventPromise = oneEvent(el, 'hx-reposition');
+        await el.reposition();
+        await eventPromise;
+      } finally {
+        anchorEl.remove();
+      }
+    });
+
+    it('sets left and top on popup element after reposition', async () => {
+      const el = await fixture<HelixPopup>(
+        '<hx-popup active placement="bottom" distance="8"><button slot="anchor">Anchor</button><div>Content</div></hx-popup>',
+      );
+      await el.updateComplete;
+      const eventPromise = oneEvent(el, 'hx-reposition');
+      await el.reposition();
+      await eventPromise;
+
+      const popup = shadowQuery<HTMLElement>(el, '[part="popup"]');
+      expect(popup?.style.left).toBeTruthy();
+      expect(popup?.style.top).toBeTruthy();
+    });
+
+    it('sets data-placement on arrow element after reposition', async () => {
+      const el = await fixture<HelixPopup>(
+        '<hx-popup active arrow placement="bottom" distance="8"><button slot="anchor">Anchor</button><div>Content</div></hx-popup>',
+      );
+      await el.updateComplete;
+      const eventPromise = oneEvent(el, 'hx-reposition');
+      await el.reposition();
+      await eventPromise;
+
+      const arrowEl = shadowQuery<HTMLElement>(el, '[part="arrow"]');
+      expect(arrowEl?.getAttribute('data-placement')).toBeTruthy();
+    });
+
+    it('auto placement triggers reposition without errors', async () => {
+      const el = await fixture<HelixPopup>(
+        '<hx-popup active placement="auto"><button slot="anchor">Anchor</button><div>Content</div></hx-popup>',
+      );
+      await el.updateComplete;
+
+      const eventPromise = oneEvent(el, 'hx-reposition');
+      await el.reposition();
+      const event = await eventPromise;
+
+      expect(event.type).toBe('hx-reposition');
+      const popup = shadowQuery<HTMLElement>(el, '[part="popup"]');
+      // Positioning should have run — left and top should be set
+      expect(popup?.style.left).toBeTruthy();
+      expect(popup?.style.top).toBeTruthy();
     });
   });
 

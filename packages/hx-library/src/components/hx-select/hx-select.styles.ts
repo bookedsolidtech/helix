@@ -73,18 +73,33 @@ export const helixSelectStyles = css`
     outline: none;
   }
 
+  /* Fallback focus ring for environments where :focus-visible is unavailable */
+  .field__trigger:focus {
+    border-color: var(--hx-select-focus-ring-color, var(--hx-focus-ring-color, #2563eb));
+    box-shadow: 0 0 0 var(--hx-focus-ring-width, 2px)
+      var(--hx-select-focus-ring-color, var(--hx-focus-ring-color, #2563eb));
+  }
+
+  /* Enhanced focus ring with opacity via color-mix when :focus-visible is available */
   .field__trigger:focus-visible {
     border-color: var(--hx-select-focus-ring-color, var(--hx-focus-ring-color, #2563eb));
     box-shadow: 0 0 0 var(--hx-focus-ring-width, 2px)
-      color-mix(
-        in srgb,
-        var(--hx-select-focus-ring-color, var(--hx-focus-ring-color, #2563eb))
-          calc(var(--hx-focus-ring-opacity, 0.25) * 100%),
-        transparent
-      );
+      var(--hx-select-focus-ring-color, var(--hx-focus-ring-color, #2563eb));
   }
 
-  .field__trigger:disabled {
+  @supports (color: color-mix(in srgb, red 50%, blue)) {
+    .field__trigger:focus-visible {
+      box-shadow: 0 0 0 var(--hx-focus-ring-width, 2px)
+        color-mix(
+          in srgb,
+          var(--hx-select-focus-ring-color, var(--hx-focus-ring-color, #2563eb))
+            calc(var(--hx-focus-ring-opacity, 0.25) * 100%),
+          transparent
+        );
+    }
+  }
+
+  .field__trigger[aria-disabled='true'] {
     cursor: not-allowed;
   }
 
@@ -119,7 +134,7 @@ export const helixSelectStyles = css`
   }
 
   .field__trigger--placeholder .field__trigger-value {
-    color: var(--hx-color-neutral-400, #adb5bd);
+    color: var(--hx-select-placeholder-color, var(--hx-color-neutral-400, #adb5bd));
   }
 
   /* ─── Chevron (CSS-drawn) ─── */
@@ -162,15 +177,28 @@ export const helixSelectStyles = css`
     border-color: var(--hx-select-error-color, var(--hx-color-error-500, #dc3545));
   }
 
+  .field--error .field__trigger:focus {
+    border-color: var(--hx-select-error-color, var(--hx-color-error-500, #dc3545));
+    box-shadow: 0 0 0 var(--hx-focus-ring-width, 2px)
+      var(--hx-select-error-color, var(--hx-color-error-500, #dc3545));
+  }
+
   .field--error .field__trigger:focus-visible {
     border-color: var(--hx-select-error-color, var(--hx-color-error-500, #dc3545));
     box-shadow: 0 0 0 var(--hx-focus-ring-width, 2px)
-      color-mix(
-        in srgb,
-        var(--hx-select-error-color, var(--hx-color-error-500, #dc3545))
-          calc(var(--hx-focus-ring-opacity, 0.25) * 100%),
-        transparent
-      );
+      var(--hx-select-error-color, var(--hx-color-error-500, #dc3545));
+  }
+
+  @supports (color: color-mix(in srgb, red 50%, blue)) {
+    .field--error .field__trigger:focus-visible {
+      box-shadow: 0 0 0 var(--hx-focus-ring-width, 2px)
+        color-mix(
+          in srgb,
+          var(--hx-select-error-color, var(--hx-color-error-500, #dc3545))
+            calc(var(--hx-focus-ring-opacity, 0.25) * 100%),
+          transparent
+        );
+    }
   }
 
   /* ─── Listbox Panel ─── */
@@ -185,10 +213,7 @@ export const helixSelectStyles = css`
     border: var(--hx-border-width-thin, 1px) solid
       var(--hx-select-border-color, var(--hx-color-neutral-300, #ced4da));
     border-radius: var(--hx-select-border-radius, var(--hx-border-radius-md, 0.375rem));
-    box-shadow: var(
-      --hx-select-listbox-shadow,
-      0 4px 16px color-mix(in srgb, var(--hx-color-neutral-900, #0d1117) 12%, transparent)
-    );
+    box-shadow: var(--hx-select-listbox-shadow, 0 4px 16px rgba(13, 17, 23, 0.12));
     max-height: var(--hx-select-listbox-max-height, 16rem);
     overflow: hidden;
     display: flex;

@@ -43,10 +43,6 @@ export const helixOverflowMenuStyles = css`
     background-color: var(--hx-color-neutral-100, #f3f4f6);
   }
 
-  .trigger[disabled] {
-    cursor: not-allowed;
-  }
-
   /* ─── Size Variants ─── */
 
   .trigger--sm {
@@ -112,7 +108,7 @@ export const helixOverflowMenuStyles = css`
   ::slotted([role='menuitemcheckbox']:focus-visible),
   ::slotted([role='menuitemradio']:focus-visible) {
     outline: var(--hx-focus-ring-width, 2px) solid var(--hx-focus-ring-color, #2563eb);
-    outline-offset: -2px;
+    outline-offset: 0;
   }
 
   /* ─── Reduced Motion ─── */

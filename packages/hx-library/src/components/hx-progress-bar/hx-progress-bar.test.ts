@@ -1,4 +1,4 @@
-import { describe, it, expect, afterEach } from 'vitest';
+import { describe, it, expect, afterEach, vi } from 'vitest';
 import { page } from '@vitest/browser/context';
 import { fixture, shadowQuery, cleanup, checkA11y } from '../../test-utils.js';
 import type { HelixProgressBar } from './hx-progress-bar.js';
@@ -15,16 +15,16 @@ describe('hx-progress-bar', () => {
       expect(el.shadowRoot).toBeTruthy();
     });
 
-    it('exposes "base" CSS part', async () => {
+    it('exposes "track" CSS part', async () => {
       const el = await fixture<HelixProgressBar>('<hx-progress-bar></hx-progress-bar>');
-      const base = shadowQuery(el, '[part="base"]');
-      expect(base).toBeTruthy();
+      const track = shadowQuery(el, '[part="track"]');
+      expect(track).toBeTruthy();
     });
 
-    it('exposes "indicator" CSS part', async () => {
+    it('exposes "fill" CSS part', async () => {
       const el = await fixture<HelixProgressBar>('<hx-progress-bar></hx-progress-bar>');
-      const indicator = shadowQuery(el, '[part="indicator"]');
-      expect(indicator).toBeTruthy();
+      const fill = shadowQuery(el, '[part="fill"]');
+      expect(fill).toBeTruthy();
     });
 
     it('exposes "label" CSS part', async () => {
@@ -37,38 +37,46 @@ describe('hx-progress-bar', () => {
   // ─── ARIA: Determinate (5) ───
 
   describe('ARIA: Determinate', () => {
-    it('has role="progressbar" on base', async () => {
+    it('has role="progressbar" on track', async () => {
       const el = await fixture<HelixProgressBar>('<hx-progress-bar value="50"></hx-progress-bar>');
-      const base = shadowQuery(el, '[part="base"]')!;
-      expect(base.getAttribute('role')).toBe('progressbar');
+      const track = shadowQuery(el, '[part="track"]')!;
+      expect(track.getAttribute('role')).toBe('progressbar');
     });
 
     it('sets aria-valuenow to value', async () => {
       const el = await fixture<HelixProgressBar>('<hx-progress-bar value="42"></hx-progress-bar>');
-      const base = shadowQuery(el, '[part="base"]')!;
-      expect(base.getAttribute('aria-valuenow')).toBe('42');
+      const track = shadowQuery(el, '[part="track"]')!;
+      expect(track.getAttribute('aria-valuenow')).toBe('42');
     });
 
-    it('sets aria-valuemin to 0', async () => {
+    it('sets aria-valuemin to min (default 0)', async () => {
       const el = await fixture<HelixProgressBar>('<hx-progress-bar value="50"></hx-progress-bar>');
-      const base = shadowQuery(el, '[part="base"]')!;
-      expect(base.getAttribute('aria-valuemin')).toBe('0');
+      const track = shadowQuery(el, '[part="track"]')!;
+      expect(track.getAttribute('aria-valuemin')).toBe('0');
+    });
+
+    it('sets aria-valuemin to custom min', async () => {
+      const el = await fixture<HelixProgressBar>(
+        '<hx-progress-bar value="50" min="20"></hx-progress-bar>',
+      );
+      const track = shadowQuery(el, '[part="track"]')!;
+      expect(track.getAttribute('aria-valuemin')).toBe('20');
     });
 
     it('sets aria-valuemax to max', async () => {
       const el = await fixture<HelixProgressBar>(
         '<hx-progress-bar value="50" max="200"></hx-progress-bar>',
       );
-      const base = shadowQuery(el, '[part="base"]')!;
-      expect(base.getAttribute('aria-valuemax')).toBe('200');
+      const track = shadowQuery(el, '[part="track"]')!;
+      expect(track.getAttribute('aria-valuemax')).toBe('200');
     });
 
     it('sets aria-label from label prop', async () => {
       const el = await fixture<HelixProgressBar>(
         '<hx-progress-bar value="50" label="Upload progress"></hx-progress-bar>',
       );
-      const base = shadowQuery(el, '[part="base"]')!;
-      expect(base.getAttribute('aria-label')).toBe('Upload progress');
+      const track = shadowQuery(el, '[part="track"]')!;
+      expect(track.getAttribute('aria-label')).toBe('Upload progress');
     });
   });
 
@@ -77,14 +85,14 @@ describe('hx-progress-bar', () => {
   describe('ARIA: Indeterminate', () => {
     it('omits aria-valuenow when value is null', async () => {
       const el = await fixture<HelixProgressBar>('<hx-progress-bar></hx-progress-bar>');
-      const base = shadowQuery(el, '[part="base"]')!;
-      expect(base.hasAttribute('aria-valuenow')).toBe(false);
+      const track = shadowQuery(el, '[part="track"]')!;
+      expect(track.hasAttribute('aria-valuenow')).toBe(false);
     });
 
     it('still has role="progressbar" in indeterminate state', async () => {
       const el = await fixture<HelixProgressBar>('<hx-progress-bar></hx-progress-bar>');
-      const base = shadowQuery(el, '[part="base"]')!;
-      expect(base.getAttribute('role')).toBe('progressbar');
+      const track = shadowQuery(el, '[part="track"]')!;
+      expect(track.getAttribute('role')).toBe('progressbar');
     });
 
     it('applies indeterminate class when value is null', async () => {
@@ -92,9 +100,17 @@ describe('hx-progress-bar', () => {
       const wrapper = shadowQuery(el, '.progress-bar')!;
       expect(wrapper.classList.contains('progress-bar--indeterminate')).toBe(true);
     });
+
+    it('applies indeterminate class when indeterminate attribute is set', async () => {
+      const el = await fixture<HelixProgressBar>(
+        '<hx-progress-bar value="50" indeterminate></hx-progress-bar>',
+      );
+      const wrapper = shadowQuery(el, '.progress-bar')!;
+      expect(wrapper.classList.contains('progress-bar--indeterminate')).toBe(true);
+    });
   });
 
-  // ─── Property: value (3) ───
+  // ─── Property: value (5) ───
 
   describe('Property: value', () => {
     it('reflects value attr to host', async () => {
@@ -102,18 +118,50 @@ describe('hx-progress-bar', () => {
       expect(el.getAttribute('value')).toBe('75');
     });
 
-    it('sets indicator width based on value', async () => {
-      const el = await fixture<HelixProgressBar>('<hx-progress-bar value="50"></hx-progress-bar>');
-      const indicator = shadowQuery(el, '[part="indicator"]') as HTMLElement;
-      expect(indicator.style.width).toBe('50%');
+    it('renders indicator at 0% width for value=0', async () => {
+      const el = await fixture<HelixProgressBar>('<hx-progress-bar value="0"></hx-progress-bar>');
+      const fill = shadowQuery(el, '[part="fill"]') as HTMLElement;
+      expect(fill.style.width).toBe('0%');
     });
 
-    it('clamps value to 0–max range', async () => {
+    it('sets fill width based on value', async () => {
+      const el = await fixture<HelixProgressBar>('<hx-progress-bar value="50"></hx-progress-bar>');
+      const fill = shadowQuery(el, '[part="fill"]') as HTMLElement;
+      expect(fill.style.width).toBe('50%');
+    });
+
+    it('clamps value above max to 100%', async () => {
       const el = await fixture<HelixProgressBar>(
         '<hx-progress-bar value="150" max="100"></hx-progress-bar>',
       );
-      const indicator = shadowQuery(el, '[part="indicator"]') as HTMLElement;
-      expect(indicator.style.width).toBe('100%');
+      const fill = shadowQuery(el, '[part="fill"]') as HTMLElement;
+      expect(fill.style.width).toBe('100%');
+    });
+
+    it('clamps negative value to 0%', async () => {
+      const el = await fixture<HelixProgressBar>('<hx-progress-bar value="-10"></hx-progress-bar>');
+      const fill = shadowQuery(el, '[part="fill"]') as HTMLElement;
+      expect(fill.style.width).toBe('0%');
+    });
+  });
+
+  // ─── Property: min (2) ───
+
+  describe('Property: min', () => {
+    it('reflects min attr to host', async () => {
+      const el = await fixture<HelixProgressBar>(
+        '<hx-progress-bar value="50" min="20"></hx-progress-bar>',
+      );
+      expect(el.getAttribute('min')).toBe('20');
+    });
+
+    it('calculates percentage relative to min offset', async () => {
+      // value=60, min=20, max=100 → (60-20)/(100-20) = 40/80 = 50%
+      const el = await fixture<HelixProgressBar>(
+        '<hx-progress-bar value="60" min="20" max="100"></hx-progress-bar>',
+      );
+      const fill = shadowQuery(el, '[part="fill"]') as HTMLElement;
+      expect(fill.style.width).toBe('50%');
     });
   });
 
@@ -131,8 +179,8 @@ describe('hx-progress-bar', () => {
       const el = await fixture<HelixProgressBar>(
         '<hx-progress-bar value="50" max="200"></hx-progress-bar>',
       );
-      const indicator = shadowQuery(el, '[part="indicator"]') as HTMLElement;
-      expect(indicator.style.width).toBe('25%');
+      const fill = shadowQuery(el, '[part="fill"]') as HTMLElement;
+      expect(fill.style.width).toBe('25%');
     });
   });
 
@@ -140,9 +188,7 @@ describe('hx-progress-bar', () => {
 
   describe('Property: variant', () => {
     it('applies default variant class', async () => {
-      const el = await fixture<HelixProgressBar>(
-        '<hx-progress-bar value="50"></hx-progress-bar>',
-      );
+      const el = await fixture<HelixProgressBar>('<hx-progress-bar value="50"></hx-progress-bar>');
       const wrapper = shadowQuery(el, '.progress-bar')!;
       expect(wrapper.classList.contains('progress-bar--default')).toBe(true);
     });
@@ -211,15 +257,15 @@ describe('hx-progress-bar', () => {
     });
   });
 
-  // ─── Dynamic Updates (2) ───
+  // ─── Dynamic Updates (3) ───
 
   describe('Dynamic Updates', () => {
-    it('updates indicator width when value changes', async () => {
+    it('updates fill width when value changes', async () => {
       const el = await fixture<HelixProgressBar>('<hx-progress-bar value="30"></hx-progress-bar>');
       el.value = 70;
       await el.updateComplete;
-      const indicator = shadowQuery(el, '[part="indicator"]') as HTMLElement;
-      expect(indicator.style.width).toBe('70%');
+      const fill = shadowQuery(el, '[part="fill"]') as HTMLElement;
+      expect(fill.style.width).toBe('70%');
     });
 
     it('switches to indeterminate when value set to null', async () => {
@@ -228,8 +274,44 @@ describe('hx-progress-bar', () => {
       await el.updateComplete;
       const wrapper = shadowQuery(el, '.progress-bar')!;
       expect(wrapper.classList.contains('progress-bar--indeterminate')).toBe(true);
-      const base = shadowQuery(el, '[part="base"]')!;
-      expect(base.hasAttribute('aria-valuenow')).toBe(false);
+      const track = shadowQuery(el, '[part="track"]')!;
+      expect(track.hasAttribute('aria-valuenow')).toBe(false);
+    });
+
+    it('updates aria-label when label property changes', async () => {
+      const el = await fixture<HelixProgressBar>(
+        '<hx-progress-bar value="50" label="Upload progress"></hx-progress-bar>',
+      );
+      el.label = 'New label';
+      await el.updateComplete;
+      const track = shadowQuery(el, '[part="track"]')!;
+      expect(track.getAttribute('aria-label')).toBe('New label');
+    });
+  });
+
+  // ─── Events (1) ───
+
+  describe('Events', () => {
+    it('dispatches hx-complete event when value reaches max', async () => {
+      const el = await fixture<HelixProgressBar>('<hx-progress-bar value="50"></hx-progress-bar>');
+      const eventPromise = new Promise<CustomEvent>((resolve) => {
+        el.addEventListener('hx-complete', (e) => resolve(e as CustomEvent), { once: true });
+      });
+      el.value = 100;
+      await el.updateComplete;
+      const event = await eventPromise;
+      expect(event.type).toBe('hx-complete');
+    });
+  });
+
+  // ─── Warnings (1) ───
+
+  describe('Warnings', () => {
+    it('logs a warning when no accessible label is provided', async () => {
+      const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+      await fixture<HelixProgressBar>('<hx-progress-bar value="50"></hx-progress-bar>');
+      expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining('[hx-progress-bar]'));
+      warnSpy.mockRestore();
     });
   });
 

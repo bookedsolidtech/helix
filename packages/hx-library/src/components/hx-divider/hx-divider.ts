@@ -1,4 +1,4 @@
-import { LitElement, html, type PropertyValues } from 'lit';
+import { LitElement, html, nothing, type PropertyValues } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { tokenStyles } from '@helix/tokens/lit';
 import { helixDividerStyles } from './hx-divider.styles.js';
@@ -41,6 +41,22 @@ export class HelixDivider extends LitElement {
   @property({ type: String, reflect: true })
   spacing: 'none' | 'sm' | 'md' | 'lg' = 'md';
 
+  /**
+   * When true, renders the divider as decorative only (role="presentation").
+   * Screen readers will not announce decorative dividers.
+   * @attr decorative
+   */
+  @property({ type: Boolean, reflect: true })
+  decorative = false;
+
+  /**
+   * Optional text label rendered centered between the divider lines.
+   * Also sets aria-label on the separator for assistive technologies.
+   * @attr label
+   */
+  @property({ type: String, reflect: true })
+  label?: string;
+
   @state()
   private _hasLabel = false;
 
@@ -64,11 +80,21 @@ export class HelixDivider extends LitElement {
   }
 
   override render() {
+    const isDecorative = this.decorative;
+    const showLabel = this._hasLabel || !!this.label;
+
     return html`
-      <div part="base" class="divider" role="separator" aria-orientation=${this.orientation}>
+      <div
+        part="base"
+        class="divider"
+        role="${isDecorative ? 'presentation' : 'separator'}"
+        aria-orientation="${isDecorative ? nothing : this.orientation}"
+        aria-label="${!isDecorative && this.label ? this.label : nothing}"
+      >
         <span class="divider__line"></span>
-        ${this._hasLabel
+        ${showLabel
           ? html`<span part="label" class="divider__label">
+              ${this.label ? html`${this.label}` : nothing}
               <slot @slotchange=${this._slotChangeHandler}></slot>
             </span>`
           : html`<slot @slotchange=${this._slotChangeHandler}></slot>`}
@@ -83,3 +109,5 @@ declare global {
     'hx-divider': HelixDivider;
   }
 }
+
+export type WcDivider = HelixDivider;

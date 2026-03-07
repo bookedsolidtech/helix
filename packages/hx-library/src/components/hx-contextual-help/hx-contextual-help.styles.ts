@@ -34,11 +34,11 @@ export const helixContextualHelpStyles = css`
   }
 
   .trigger:hover {
-    background-color: var(--hx-color-neutral-100);
+    background-color: var(--hx-contextual-help-trigger-hover-bg, var(--hx-color-neutral-100));
   }
 
   .trigger:active {
-    background-color: var(--hx-color-neutral-200);
+    background-color: var(--hx-contextual-help-trigger-active-bg, var(--hx-color-neutral-200));
   }
 
   /* ─── Trigger sizes ─── */
@@ -77,19 +77,58 @@ export const helixContextualHelpStyles = css`
     box-shadow: var(--hx-contextual-help-shadow, var(--hx-shadow-lg));
     padding: var(--hx-contextual-help-padding, var(--hx-spacing-4));
     max-width: var(--hx-contextual-help-max-width, 280px);
-    min-width: 160px;
+    min-width: var(--hx-contextual-help-min-width, 160px);
     outline: none;
+  }
+
+  /* ─── Popover header ─── */
+
+  .popover__header {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--hx-spacing-2);
+    margin-bottom: var(--hx-spacing-2);
   }
 
   /* ─── Popover heading ─── */
 
   .popover__heading {
-    margin: 0 0 var(--hx-spacing-2) 0;
+    margin: 0;
     font-family: var(--hx-font-family-sans);
     font-size: var(--hx-font-size-sm);
     font-weight: var(--hx-font-weight-semibold);
     line-height: var(--hx-line-height-snug);
     color: var(--hx-contextual-help-heading-color, var(--hx-color-neutral-900));
+    flex: 1;
+  }
+
+  /* ─── Close button ─── */
+
+  .popover__close {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--hx-contextual-help-color, var(--hx-color-neutral-500));
+    padding: 0;
+    font-size: 1.25em;
+    line-height: 1;
+    flex-shrink: 0;
+    border-radius: var(--hx-border-radius-sm);
+    margin-left: auto;
+    font-family: inherit;
+  }
+
+  .popover__close:focus-visible {
+    outline: var(--hx-focus-ring-width) solid
+      var(--hx-contextual-help-focus-ring-color, var(--hx-focus-ring-color));
+    outline-offset: var(--hx-focus-ring-offset);
+  }
+
+  .popover__close:hover {
+    color: var(--hx-color-neutral-900);
   }
 
   /* ─── Popover content ─── */

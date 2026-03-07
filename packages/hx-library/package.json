@@ -43,9 +43,11 @@
     "clean": "rm -rf dist custom-elements.json"
   },
   "dependencies": {
-    "@floating-ui/dom": "^1.7.6",
     "@helix/tokens": "*",
     "lit": "^3.3.2"
+  },
+  "peerDependencies": {
+    "@floating-ui/dom": "^1.7.6"
   },
   "devDependencies": {
     "@custom-elements-manifest/analyzer": "^0.11.0",

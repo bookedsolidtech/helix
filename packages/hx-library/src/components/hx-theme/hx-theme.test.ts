@@ -1,4 +1,4 @@
-import { describe, it, expect, afterEach } from 'vitest';
+import { describe, it, expect, afterEach, vi } from 'vitest';
 import { page } from '@vitest/browser/context';
 import { fixture, shadowQuery, cleanup, checkA11y } from '../../test-utils.js';
 import type { HelixTheme } from './hx-theme.js';
@@ -56,6 +56,11 @@ describe('hx-theme', () => {
       const el = await fixture<HelixTheme>('<hx-theme theme="high-contrast">Content</hx-theme>');
       expect(el.theme).toBe('high-contrast');
     });
+
+    it('accepts "auto" theme', async () => {
+      const el = await fixture<HelixTheme>('<hx-theme theme="auto">Content</hx-theme>');
+      expect(el.theme).toBe('auto');
+    });
   });
 
   // ─── Property: system ───
@@ -96,11 +101,15 @@ describe('hx-theme', () => {
       expect(value).toBe('0 1px 2px 0 rgb(0 0 0 / 0.3)');
     });
 
-    it('injects dark token overrides in high-contrast mode', async () => {
+    it('injects distinct high-contrast token overrides in high-contrast mode', async () => {
       const el = await fixture<HelixTheme>('<hx-theme theme="high-contrast">Content</hx-theme>');
       await el.updateComplete;
-      const value = getComputedStyle(el).getPropertyValue('--hx-shadow-sm').trim();
-      expect(value).toBe('0 1px 2px 0 rgb(0 0 0 / 0.3)');
+      // HC shadow uses white (not dark's black) — distinguishes HC from dark
+      const shadowValue = getComputedStyle(el).getPropertyValue('--hx-shadow-sm').trim();
+      expect(shadowValue).toBe('0 1px 2px 0 rgb(255 255 255 / 0.2)');
+      // HC text.primary is pure white (#FFFFFF), not a var() reference
+      const textPrimary = getComputedStyle(el).getPropertyValue('--hx-color-text-primary').trim();
+      expect(textPrimary.toLowerCase()).toBe('#ffffff');
     });
   });
 
@@ -120,6 +129,12 @@ describe('hx-theme', () => {
     it('returns "high-contrast" when theme="high-contrast"', async () => {
       const el = await fixture<HelixTheme>('<hx-theme theme="high-contrast">Content</hx-theme>');
       expect(el.effectiveTheme).toBe('high-contrast');
+    });
+
+    it('returns "light" or "dark" when theme="auto"', async () => {
+      const el = await fixture<HelixTheme>('<hx-theme theme="auto">Content</hx-theme>');
+      const effective = el.effectiveTheme;
+      expect(effective === 'light' || effective === 'dark').toBe(true);
     });
   });
 
@@ -216,6 +231,62 @@ describe('hx-theme', () => {
     });
   });
 
+  // ─── System mode token injection ───
+
+  describe('System mode token injection', () => {
+    it('injects tokens (not just effectiveTheme string) when system=true', async () => {
+      const el = await fixture<HelixTheme>('<hx-theme system>Content</hx-theme>');
+      await el.updateComplete;
+      // The token must be injected regardless of which OS preference resolves
+      const value = getComputedStyle(el).getPropertyValue('--hx-color-primary-500').trim();
+      expect(value).toBeTruthy();
+      expect(value.length).toBeGreaterThan(0);
+    });
+
+    it('injects tokens when theme="auto"', async () => {
+      const el = await fixture<HelixTheme>('<hx-theme theme="auto">Content</hx-theme>');
+      await el.updateComplete;
+      const value = getComputedStyle(el).getPropertyValue('--hx-color-primary-500').trim();
+      expect(value).toBeTruthy();
+      expect(value.length).toBeGreaterThan(0);
+    });
+  });
+
+  // ─── Nested themes ───
+
+  describe('Nested themes', () => {
+    it('inner theme overrides outer theme tokens within its subtree', async () => {
+      const outer = await fixture<HelixTheme>(
+        '<hx-theme theme="light"><hx-theme theme="dark" id="inner">Content</hx-theme></hx-theme>',
+      );
+      await outer.updateComplete;
+      const inner = outer.querySelector<HelixTheme>('#inner')!;
+      await inner.updateComplete;
+
+      // Outer (light) should have light shadow value
+      const outerShadow = getComputedStyle(outer).getPropertyValue('--hx-shadow-sm').trim();
+      expect(outerShadow).toBe('0 1px 2px 0 rgb(0 0 0 / 0.05)');
+
+      // Inner (dark) should have dark shadow value
+      const innerShadow = getComputedStyle(inner).getPropertyValue('--hx-shadow-sm').trim();
+      expect(innerShadow).toBe('0 1px 2px 0 rgb(0 0 0 / 0.3)');
+    });
+  });
+
+  // ─── Consumer token overrides ───
+
+  describe('Consumer token overrides', () => {
+    it('inline style override takes precedence over injected theme tokens', async () => {
+      const el = await fixture<HelixTheme>(
+        '<hx-theme theme="light" style="--hx-color-primary-500: red;">Content</hx-theme>',
+      );
+      await el.updateComplete;
+      // Inline style should win over the adoptedStyleSheet (:host) declaration
+      const value = getComputedStyle(el).getPropertyValue('--hx-color-primary-500').trim();
+      expect(value).toBe('red');
+    });
+  });
+
   // ─── Lifecycle ───
 
   describe('Lifecycle', () => {
@@ -223,9 +294,14 @@ describe('hx-theme', () => {
       const el = await fixture<HelixTheme>('<hx-theme system>Content</hx-theme>');
       await el.updateComplete;
 
+      // Capture the internal handler reference before removal
+      const spy = vi.fn();
+      window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', spy);
+
       el.remove();
-      // Should not throw when removed from DOM
       expect(el.isConnected).toBe(false);
+
+      window.matchMedia('(prefers-color-scheme: dark)').removeEventListener('change', spy);
     });
   });
 
@@ -238,9 +314,7 @@ describe('hx-theme', () => {
     });
 
     it('default slot renders HTML children', async () => {
-      const el = await fixture<HelixTheme>(
-        '<hx-theme><span class="child">Child</span></hx-theme>',
-      );
+      const el = await fixture<HelixTheme>('<hx-theme><span class="child">Child</span></hx-theme>');
       const span = el.querySelector('span.child');
       expect(span).toBeTruthy();
     });
@@ -250,9 +324,7 @@ describe('hx-theme', () => {
 
   describe('Accessibility (axe-core)', () => {
     it('has no axe violations in default state', async () => {
-      const el = await fixture<HelixTheme>(
-        '<hx-theme><p>Accessible themed content</p></hx-theme>',
-      );
+      const el = await fixture<HelixTheme>('<hx-theme><p>Accessible themed content</p></hx-theme>');
       await page.screenshot();
       const { violations } = await checkA11y(el);
       expect(violations).toEqual([]);

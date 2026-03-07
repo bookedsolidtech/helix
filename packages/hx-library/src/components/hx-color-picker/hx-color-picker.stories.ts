@@ -159,7 +159,8 @@ export const WithOpacity: Story = {
   play: async ({ canvasElement }) => {
     const el = canvasElement.querySelector('hx-color-picker');
     await expect(el).toBeTruthy();
-    const opacitySlider = el?.shadowRoot?.querySelector('[part="opacity-slider"]');
+    // part="slider opacity-slider" — use word-match selector
+    const opacitySlider = el?.shadowRoot?.querySelector('[part~="opacity-slider"]');
     await expect(opacitySlider).toBeTruthy();
   },
 };
@@ -284,5 +285,100 @@ export const FullFeatured: Story = {
     opacity: true,
     inline: true,
     swatches: ['#ef4444', '#f97316', '#eab308', '#22c55e', '#3b82f6', '#8b5cf6'],
+  },
+};
+
+// ─────────────────────────────────────────────────
+// 11. SWATCHES ONLY (P1-9)
+// Hides gradient/sliders — shows only preset swatches + input.
+// Useful for preset-only color selection UIs where free-form picking
+// is not desired (e.g. brand color selection from a defined palette).
+// ─────────────────────────────────────────────────
+
+export const SwatchesOnly: Story = {
+  args: {
+    value: '#3b82f6',
+    inline: true,
+    swatchesOnly: true,
+    swatches: [
+      '#ef4444',
+      '#f97316',
+      '#eab308',
+      '#22c55e',
+      '#3b82f6',
+      '#8b5cf6',
+      '#ec4899',
+      '#6b7280',
+      '#000000',
+      '#ffffff',
+    ],
+  },
+  render: (args) => html`
+    <div style="padding: 2rem; max-width: 320px;">
+      <p
+        style="margin-bottom: 0.5rem; font-size: 0.75rem; color: #6b7280; font-family: sans-serif;"
+      >
+        Swatches-only mode: gradient grid and sliders are hidden. Only preset colors and the text
+        input are shown.
+      </p>
+      <hx-color-picker
+        value=${args.value}
+        inline
+        swatches-only
+        .swatches=${args.swatches ?? []}
+        name="preset-color"
+      ></hx-color-picker>
+    </div>
+  `,
+  play: async ({ canvasElement }) => {
+    const el = canvasElement.querySelector('hx-color-picker');
+    await expect(el).toBeTruthy();
+    // Grid and sliders should NOT be present in swatches-only mode
+    const grid = el?.shadowRoot?.querySelector('[part="grid"]');
+    await expect(grid).toBeNull();
+    const hueSlider = el?.shadowRoot?.querySelector('[part="hue-slider"]');
+    await expect(hueSlider).toBeNull();
+    // Swatches should be present
+    const swatches = el?.shadowRoot?.querySelector('[part="swatches"]');
+    await expect(swatches).toBeTruthy();
+  },
+};
+
+// ─────────────────────────────────────────────────
+// 12. COMPACT (P1-9)
+// Inline picker in a constrained container.
+// Demonstrates resizing via CSS custom properties:
+//   --hx-color-picker-width and --hx-color-picker-grid-height
+// ─────────────────────────────────────────────────
+
+export const Compact: Story = {
+  args: {
+    value: '#22c55e',
+    inline: true,
+    swatches: ['#ef4444', '#22c55e', '#3b82f6', '#8b5cf6'],
+  },
+  render: (args) => html`
+    <div style="padding: 2rem;">
+      <p
+        style="margin-bottom: 0.5rem; font-size: 0.75rem; color: #6b7280; font-family: sans-serif;"
+      >
+        Compact mode: reduced panel width and grid height via CSS custom properties.
+      </p>
+      <hx-color-picker
+        value=${args.value}
+        inline
+        .swatches=${args.swatches ?? []}
+        name="compact-color"
+        style="--hx-color-picker-width: 200px; --hx-color-picker-grid-height: 100px;"
+      ></hx-color-picker>
+    </div>
+  `,
+  play: async ({ canvasElement }) => {
+    const el = canvasElement.querySelector('hx-color-picker');
+    await expect(el).toBeTruthy();
+    const panel = el?.shadowRoot?.querySelector('.panel');
+    await expect(panel).toBeTruthy();
+    const grid = el?.shadowRoot?.querySelector('[part="grid"]');
+    await expect(grid).toBeTruthy();
   },
 };

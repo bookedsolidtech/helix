@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/web-components';
 import { html } from 'lit';
+import { ifDefined } from 'lit/directives/if-defined.js';
 import { expect, within, userEvent, fn } from 'storybook/test';
 import './hx-checkbox.js';
 
@@ -94,6 +95,16 @@ const meta = {
         type: { summary: 'string' },
       },
     },
+    hxSize: {
+      control: 'select',
+      options: ['sm', 'md', 'lg'],
+      description: 'The size of the checkbox.',
+      table: {
+        category: 'Appearance',
+        defaultValue: { summary: 'md' },
+        type: { summary: "'sm' | 'md' | 'lg'" },
+      },
+    },
   },
   args: {
     checked: false,
@@ -105,6 +116,7 @@ const meta = {
     error: '',
     helpText: '',
     name: '',
+    hxSize: 'md',
   },
   render: (args) => html`
     <hx-checkbox
@@ -114,9 +126,10 @@ const meta = {
       .indeterminate=${args.indeterminate}
       label=${args.label}
       value=${args.value}
-      error=${args.error}
-      help-text=${args.helpText}
-      name=${args.name}
+      error=${ifDefined(args.error || undefined)}
+      help-text=${ifDefined(args.helpText || undefined)}
+      name=${ifDefined(args.name || undefined)}
+      hx-size=${args.hxSize}
     ></hx-checkbox>
   `,
 } satisfies Meta;

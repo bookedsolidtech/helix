@@ -29,6 +29,13 @@ describe('hx-dialog', () => {
       expect(bodyPart).toBeTruthy();
     });
 
+    it('exposes "header" CSS part always (built-in close button renders header)', async () => {
+      const el = await fixture<HelixDialog>('<hx-dialog open></hx-dialog>');
+      await el.updateComplete;
+      const headerPart = shadowQuery(el, '[part="header"]');
+      expect(headerPart).toBeTruthy();
+    });
+
     it('exposes "header" CSS part when heading is set', async () => {
       const el = await fixture<HelixDialog>(
         '<hx-dialog open heading="Confirm Action"></hx-dialog>',
@@ -104,6 +111,45 @@ describe('hx-dialog', () => {
       const el = await fixture<HelixDialog>('<hx-dialog close-on-backdrop></hx-dialog>');
       await el.updateComplete;
       expect(el.closeOnBackdrop).toBe(true);
+    });
+
+    it('variant="alertdialog" — sets role="alertdialog" on native dialog element (D9/D12)', async () => {
+      const el = await fixture<HelixDialog>(
+        '<hx-dialog open heading="Drug Interaction" variant="alertdialog"></hx-dialog>',
+      );
+      await el.updateComplete;
+      const nativeDialog = shadowQuery<HTMLDialogElement>(el, 'dialog');
+      expect(nativeDialog?.getAttribute('role')).toBe('alertdialog');
+    });
+
+    it('variant="dialog" — does not set explicit role on native dialog element', async () => {
+      const el = await fixture<HelixDialog>(
+        '<hx-dialog open heading="Confirm" variant="dialog"></hx-dialog>',
+      );
+      await el.updateComplete;
+      const nativeDialog = shadowQuery<HTMLDialogElement>(el, 'dialog');
+      expect(nativeDialog?.hasAttribute('role')).toBe(false);
+    });
+
+    it('description — renders visually-hidden span with aria-describedby (D8)', async () => {
+      const el = await fixture<HelixDialog>(
+        '<hx-dialog open heading="Test" description="Additional context for screen readers."></hx-dialog>',
+      );
+      await el.updateComplete;
+      const descEl = shadowQuery(el, '.dialog__description');
+      expect(descEl).toBeTruthy();
+      expect(descEl?.textContent?.trim()).toBe('Additional context for screen readers.');
+
+      const nativeDialog = shadowQuery<HTMLDialogElement>(el, 'dialog');
+      expect(nativeDialog?.hasAttribute('aria-describedby')).toBe(true);
+    });
+
+    it('close(returnValue) — stores returnValue on native dialog (D11)', async () => {
+      const el = await fixture<HelixDialog>('<hx-dialog open heading="Test"></hx-dialog>');
+      await el.updateComplete;
+      el.close('confirmed');
+      await el.updateComplete;
+      expect(el.returnValue).toBe('confirmed');
     });
   });
 
@@ -238,7 +284,7 @@ describe('hx-dialog', () => {
     });
   });
 
-  // ─── CSS Parts (5) ───
+  // ─── CSS Parts (6) ───
 
   describe('CSS Parts', () => {
     it('exposes "dialog" part on the inner content container', async () => {
@@ -263,6 +309,16 @@ describe('hx-dialog', () => {
       const part = shadowQuery(el, '[part="header"]');
       expect(part).toBeTruthy();
       expect(part?.getAttribute('part')).toBe('header');
+    });
+
+    it('exposes "close-button" part in the header (D17)', async () => {
+      const el = await fixture<HelixDialog>(
+        '<hx-dialog open heading="Close Button Test"></hx-dialog>',
+      );
+      await el.updateComplete;
+      const part = shadowQuery(el, '[part="close-button"]');
+      expect(part).toBeTruthy();
+      expect(part?.getAttribute('part')).toBe('close-button');
     });
 
     it('exposes "footer" part in the shadow DOM', async () => {
@@ -404,7 +460,94 @@ describe('hx-dialog', () => {
     });
   });
 
-  // ─── Accessibility (axe-core) (2) ───
+  // ─── Focus Management (D6, D7) ───
+
+  describe('Focus Management', () => {
+    it('D7 — sets initial focus on first focusable element when dialog opens', async () => {
+      const trigger = document.createElement('button');
+      trigger.textContent = 'Open Dialog';
+      document.body.appendChild(trigger);
+      trigger.focus();
+
+      const el = await fixture<HelixDialog>(
+        `<hx-dialog heading="Focus Test">
+          <button id="first-focusable">First</button>
+          <button slot="footer" id="last-focusable">Last</button>
+        </hx-dialog>`,
+      );
+
+      el.showModal();
+      await el.updateComplete;
+      // Allow updateComplete.then() callback to run (initial focus is set inside)
+      await new Promise((r) => setTimeout(r, 50));
+
+      const firstFocusable = el.querySelector('#first-focusable') as HTMLElement;
+      expect(document.activeElement).toBe(firstFocusable);
+
+      document.body.removeChild(trigger);
+    });
+
+    it('D6 — restores focus to trigger element when dialog closes (WCAG 2.4.3)', async () => {
+      const trigger = document.createElement('button');
+      trigger.id = 'trigger-btn';
+      trigger.textContent = 'Open Dialog';
+      document.body.appendChild(trigger);
+
+      const el = await fixture<HelixDialog>(
+        '<hx-dialog heading="Focus Restore Test"><button>OK</button></hx-dialog>',
+      );
+
+      // Focus the trigger, then open the dialog (as if trigger opened it)
+      trigger.focus();
+      expect(document.activeElement).toBe(trigger);
+
+      el.showModal();
+      await el.updateComplete;
+      await new Promise((r) => setTimeout(r, 50));
+
+      // Close the dialog
+      el.close();
+      await el.updateComplete;
+
+      // Focus should return to the trigger
+      expect(document.activeElement).toBe(trigger);
+
+      document.body.removeChild(trigger);
+    });
+  });
+
+  // ─── Form Submission (D13) ───
+
+  describe('Form Submission', () => {
+    it('D13 — form inside dialog fires submit event and dialog remains open', async () => {
+      const el = await fixture<HelixDialog>(
+        `<hx-dialog open heading="Form Test">
+          <form id="test-form">
+            <input type="text" name="field" value="test" />
+            <button type="submit">Submit</button>
+          </form>
+        </hx-dialog>`,
+      );
+      await el.updateComplete;
+
+      let submitted = false;
+      const form = el.querySelector<HTMLFormElement>('#test-form');
+      form?.addEventListener('submit', (e) => {
+        e.preventDefault();
+        submitted = true;
+      });
+
+      const submitBtn = el.querySelector<HTMLButtonElement>('button[type="submit"]');
+      submitBtn?.click();
+
+      await el.updateComplete;
+      expect(submitted).toBe(true);
+      // Dialog should remain open — form submission alone does not close the dialog
+      expect(el.open).toBe(true);
+    });
+  });
+
+  // ─── Accessibility (axe-core) (3) ───
 
   describe('Accessibility (axe-core)', () => {
     it('has no axe violations in closed state', async () => {
@@ -418,6 +561,21 @@ describe('hx-dialog', () => {
     it('has no axe violations in open state with heading', async () => {
       const el = await fixture<HelixDialog>(
         '<hx-dialog open heading="Confirm Discharge">Are you sure?</hx-dialog>',
+      );
+      await el.updateComplete;
+      await page.screenshot();
+      const { violations } = await checkA11y(el);
+      expect(violations).toEqual([]);
+    });
+
+    it('D14 — has no axe violations with custom header slot and aria-label', async () => {
+      const el = await fixture<HelixDialog>(
+        `<hx-dialog open aria-label="Critical Alert">
+          <div slot="header">
+            <strong>Critical Alert</strong>
+          </div>
+          <p>Drug interaction detected.</p>
+        </hx-dialog>`,
       );
       await el.updateComplete;
       await page.screenshot();

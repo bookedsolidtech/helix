@@ -172,21 +172,15 @@ export const WithSuffix: Story = {
 };
 
 export const RemovableInteractive: Story = {
-  render: () => {
-    const tags = ['Healthcare', 'Cardiology', 'Oncology', 'Neurology'];
-    const container = document.createElement('div');
-    container.style.display = 'flex';
-    container.style.gap = '0.5rem';
-    container.style.flexWrap = 'wrap';
-
-    tags.forEach((label) => {
-      const tag = document.createElement('hx-tag') as HTMLElement & { removable: boolean };
-      tag.removable = true;
-      tag.textContent = label;
-      tag.addEventListener('hx-remove', () => tag.remove());
-      container.appendChild(tag);
-    });
-
-    return container;
-  },
+  render: () => html`
+    <div
+      style="display:flex;gap:0.5rem;flex-wrap:wrap;"
+      @hx-remove=${(e: Event) => (e.target as HTMLElement).remove()}
+    >
+      <hx-tag removable>Healthcare</hx-tag>
+      <hx-tag removable>Cardiology</hx-tag>
+      <hx-tag removable>Oncology</hx-tag>
+      <hx-tag removable>Neurology</hx-tag>
+    </div>
+  `,
 };

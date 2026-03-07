@@ -1,4 +1,4 @@
-import { LitElement, html, nothing } from 'lit';
+import { LitElement, html, nothing, PropertyValues } from 'lit';
 import { customElement, property, query, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { tokenStyles } from '@helix/tokens/lit';
@@ -22,9 +22,12 @@ import { helixContextualHelpStyles } from './hx-contextual-help.styles.js';
  * @csspart trigger - The question-mark icon button element.
  * @csspart popover - The floating help panel container.
  * @csspart heading - The heading element inside the popover.
+ * @csspart close-button - The close button inside the popover header.
  *
  * @cssprop [--hx-contextual-help-trigger-color=var(--hx-color-primary-500)] - Trigger icon color.
  * @cssprop [--hx-contextual-help-trigger-border-radius=var(--hx-border-radius-md)] - Trigger border radius.
+ * @cssprop [--hx-contextual-help-trigger-hover-bg=var(--hx-color-neutral-100)] - Trigger hover background color.
+ * @cssprop [--hx-contextual-help-trigger-active-bg=var(--hx-color-neutral-200)] - Trigger active background color.
  * @cssprop [--hx-contextual-help-focus-ring-color=var(--hx-focus-ring-color)] - Focus ring color.
  * @cssprop [--hx-contextual-help-bg=var(--hx-color-neutral-0)] - Popover background color.
  * @cssprop [--hx-contextual-help-color=var(--hx-color-neutral-900)] - Popover text color.
@@ -33,6 +36,7 @@ import { helixContextualHelpStyles } from './hx-contextual-help.styles.js';
  * @cssprop [--hx-contextual-help-shadow=var(--hx-shadow-lg)] - Popover box shadow.
  * @cssprop [--hx-contextual-help-padding=var(--hx-spacing-4)] - Popover padding.
  * @cssprop [--hx-contextual-help-max-width=280px] - Popover maximum width.
+ * @cssprop [--hx-contextual-help-min-width=160px] - Popover minimum width.
  * @cssprop [--hx-contextual-help-heading-color=var(--hx-color-neutral-900)] - Heading text color.
  * @cssprop [--hx-contextual-help-z-index=9999] - Popover z-index.
  */
@@ -48,15 +52,18 @@ export class HelixContextualHelp extends LitElement {
   @query('.popover')
   declare private _popoverEl: HTMLElement | null;
 
+  @query('.popover__close')
+  declare private _closeEl: HTMLButtonElement | null;
+
   // ─── Internal state ───
 
   @state()
   private _open = false;
 
-  // ─── Unique IDs ───
+  // ─── Unique IDs (crypto.randomUUID for SSR safety) ───
 
-  private readonly _headingId = `hx-contextual-help-heading-${Math.random().toString(36).slice(2, 9)}`;
-  private readonly _popoverId = `hx-contextual-help-popover-${Math.random().toString(36).slice(2, 9)}`;
+  private readonly _headingId = `hx-contextual-help-heading-${crypto.randomUUID().split('-')[0]}`;
+  private readonly _popoverId = `hx-contextual-help-popover-${crypto.randomUUID().split('-')[0]}`;
 
   // ─── Public Properties ───
 
@@ -85,6 +92,7 @@ export class HelixContextualHelp extends LitElement {
 
   /**
    * Accessible label for the trigger button. Rendered as `aria-label`.
+   * Also used as the dialog's accessible name when no `heading` is provided.
    * @attr label
    */
   @property({ type: String })
@@ -101,6 +109,25 @@ export class HelixContextualHelp extends LitElement {
     super.disconnectedCallback();
     this.removeEventListener('keydown', this._handleKeydown);
     document.removeEventListener('click', this._handleOutsideClick);
+  }
+
+  override willUpdate(changedProperties: PropertyValues<this>): void {
+    const validPlacements = ['top', 'bottom', 'left', 'right'] as const;
+    const validSizes = ['sm', 'md'] as const;
+
+    if (changedProperties.has('placement') && !validPlacements.includes(this.placement)) {
+      console.warn(
+        `hx-contextual-help: invalid placement "${this.placement}". Expected one of: ${validPlacements.join(', ')}. Falling back to "right".`,
+      );
+      this.placement = 'right';
+    }
+
+    if (changedProperties.has('size') && !validSizes.includes(this.size)) {
+      console.warn(
+        `hx-contextual-help: invalid hx-size "${this.size}". Expected one of: ${validSizes.join(', ')}. Falling back to "md".`,
+      );
+      this.size = 'md';
+    }
   }
 
   // ─── Public Methods ───
@@ -122,8 +149,8 @@ export class HelixContextualHelp extends LitElement {
     this._open = true;
     await this.updateComplete;
     await this._updatePosition();
-    // Focus the popover so Escape key handling works for keyboard users
-    this._popoverEl?.focus();
+    // Focus the close button (first focusable element) so keyboard users can interact
+    (this._closeEl ?? this._popoverEl)?.focus();
     document.addEventListener('click', this._handleOutsideClick);
     this.dispatchEvent(
       new CustomEvent('hx-open', {
@@ -166,6 +193,58 @@ export class HelixContextualHelp extends LitElement {
     });
   }
 
+  // ─── Focus Trap ───
+
+  private _getFocusableElements(): HTMLElement[] {
+    const FOCUSABLE =
+      'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
+    const popover = this._popoverEl;
+    if (!popover) return [];
+
+    // Focusable elements within shadow DOM (e.g., close button)
+    const shadowFocusable = Array.from(popover.querySelectorAll<HTMLElement>(FOCUSABLE));
+
+    // Focusable elements within slotted light DOM content
+    const slot = popover.querySelector<HTMLSlotElement>('slot');
+    const slottedFocusable: HTMLElement[] = [];
+    if (slot) {
+      for (const assigned of slot.assignedElements({ flatten: true })) {
+        if (assigned.matches(FOCUSABLE)) {
+          slottedFocusable.push(assigned as HTMLElement);
+        }
+        for (const child of assigned.querySelectorAll<HTMLElement>(FOCUSABLE)) {
+          slottedFocusable.push(child);
+        }
+      }
+    }
+
+    return [...shadowFocusable, ...slottedFocusable];
+  }
+
+  private _trapFocus(e: KeyboardEvent): void {
+    const focusable = this._getFocusableElements();
+    const first = focusable[0];
+    const last = focusable[focusable.length - 1];
+    if (!first || !last) return;
+
+    // Active element may be in shadow DOM or light DOM (slotted content)
+    const activeEl = this.shadowRoot?.activeElement ?? document.activeElement;
+
+    if (e.shiftKey) {
+      // Shift+Tab from first focusable or popover container → wrap to last
+      if (activeEl === first || activeEl === this._popoverEl) {
+        e.preventDefault();
+        last.focus();
+      }
+    } else {
+      // Tab from last focusable → wrap to first
+      if (activeEl === last) {
+        e.preventDefault();
+        first.focus();
+      }
+    }
+  }
+
   // ─── Event Handlers ───
 
   private _handleTriggerClick(): void {
@@ -180,6 +259,10 @@ export class HelixContextualHelp extends LitElement {
     if (e.key === 'Escape' && this._open) {
       e.stopPropagation();
       this._hide();
+      return;
+    }
+    if (e.key === 'Tab' && this._open) {
+      this._trapFocus(e);
     }
   };
 
@@ -224,15 +307,27 @@ export class HelixContextualHelp extends LitElement {
         class="popover"
         id=${this._popoverId}
         role="dialog"
+        aria-label=${!hasHeading ? this.label : nothing}
         aria-labelledby=${hasHeading ? this._headingId : nothing}
-        aria-modal="false"
+        aria-modal="true"
         tabindex="-1"
       >
-        ${hasHeading
-          ? html`<h3 id=${this._headingId} part="heading" class="popover__heading">
-              ${this.heading}
-            </h3>`
-          : nothing}
+        <div class="popover__header">
+          ${hasHeading
+            ? html`<h3 id=${this._headingId} part="heading" class="popover__heading">
+                ${this.heading}
+              </h3>`
+            : nothing}
+          <button
+            type="button"
+            part="close-button"
+            class="popover__close"
+            aria-label="Close"
+            @click=${this._hide}
+          >
+            &times;
+          </button>
+        </div>
         <div class="popover__body">
           <slot></slot>
         </div>

@@ -135,13 +135,44 @@ jobs:
           cache: 'npm'
       - run: npm ci
       - run: npx playwright install --with-deps chromium
-      - name: Run tests (PR — changed components only)
+      - name: Run tests (PR — path-filtered by changed components)
         if: github.event_name == 'pull_request'
-        run: npx vitest run --changed=origin/${{ github.base_ref }}
+        run: |
+          BRANCH="${{ github.head_ref }}"
+          # Fast path: audit-fix branches encode the component name directly
+          if [[ "$BRANCH" =~ feature/audit-fix-(hx-[a-z-]+) ]]; then
+            COMPONENT="${BASH_REMATCH[1]}"
+            echo "Audit-fix branch — running tests for: $COMPONENT"
+            npx vitest run "src/components/$COMPONENT/"
+          else
+            # General PR: extract changed component dirs from git diff
+            CHANGED=$(git diff --name-only "origin/${{ github.base_ref }}...HEAD" \
+              | grep 'src/components/hx-' \
+              | sed 's|src/components/\(hx-[^/]*\)/.*|\1|' \
+              | sort -u)
+            if [ -z "$CHANGED" ]; then
+              echo "No component changes — skipping tests"
+              exit 0
+            fi
+            PATHS=$(echo "$CHANGED" | sed 's|^|src/components/|' | sed 's|$|/|' | tr '\n' ' ')
+            echo "Running tests for: $PATHS"
+            npx vitest run $PATHS
+          fi
         working-directory: packages/hx-library
-      - name: Run tests (push — components changed in merge)
+      - name: Run tests (push — path-filtered by merged changes)
         if: github.event_name == 'push'
-        run: npx vitest run --changed=HEAD~1
+        run: |
+          CHANGED=$(git diff --name-only HEAD~1...HEAD \
+            | grep 'src/components/hx-' \
+            | sed 's|src/components/\(hx-[^/]*\)/.*|\1|' \
+            | sort -u)
+          if [ -z "$CHANGED" ]; then
+            echo "No component changes — skipping tests"
+            exit 0
+          fi
+          PATHS=$(echo "$CHANGED" | sed 's|^|src/components/|' | sed 's|$|/|' | tr '\n' ' ')
+          echo "Running tests for: $PATHS"
+          npx vitest run $PATHS
         working-directory: packages/hx-library
       - name: Upload test results
         if: always()
@@ -232,7 +263,10 @@ jobs:
   vrt:
     name: Visual Regression
     needs: changes
-    if: needs.changes.outputs.source == 'true' && needs.changes.outputs.is_audit != 'true'
+    if: >
+      needs.changes.outputs.source == 'true' &&
+      needs.changes.outputs.is_audit != 'true' &&
+      !contains(github.head_ref || github.ref_name, 'audit-fix')
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:

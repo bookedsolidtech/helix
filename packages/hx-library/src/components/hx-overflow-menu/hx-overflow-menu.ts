@@ -20,7 +20,9 @@ import { helixOverflowMenuStyles } from './hx-overflow-menu.styles.js';
  * @fires {CustomEvent<void>} hx-hide - Dispatched when the panel closes.
  *
  * @csspart button - The trigger icon button element.
+ * @csspart trigger - Alias for button — the trigger icon button element.
  * @csspart panel - The floating menu panel container.
+ * @csspart menu - Alias for panel — the floating menu panel container.
  *
  * @cssprop [--hx-overflow-menu-panel-bg=var(--hx-color-neutral-0,#fff)] - Panel background color.
  * @cssprop [--hx-overflow-menu-panel-border=1px solid var(--hx-color-neutral-200,#e5e7eb)] - Panel border.
@@ -82,14 +84,19 @@ export class HelixOverflowMenu extends LitElement {
   @property({ type: String, reflect: true })
   icon: 'vertical' | 'horizontal' = 'vertical';
 
+  /**
+   * Accessible label for the trigger button.
+   * @attr label
+   */
+  @property({ type: String, reflect: true })
+  label = 'More actions';
+
   @state() private _open = false;
 
   // ─── Lifecycle ───
 
   override connectedCallback(): void {
     super.connectedCallback();
-    this._handleDocumentClick = this._handleDocumentClick.bind(this);
-    this._handleKeydown = this._handleKeydown.bind(this);
     document.addEventListener('click', this._handleDocumentClick, true);
     this.addEventListener('keydown', this._handleKeydown);
   }
@@ -128,8 +135,8 @@ export class HelixOverflowMenu extends LitElement {
   // ─── Positioning (Floating UI) ───
 
   private async _updatePosition(): Promise<void> {
-    const trigger = this.shadowRoot?.querySelector('[part="button"]') as HTMLElement | null;
-    const panel = this.shadowRoot?.querySelector('[part="panel"]') as HTMLElement | null;
+    const trigger = this.shadowRoot?.querySelector('[part~="button"]') as HTMLElement | null;
+    const panel = this.shadowRoot?.querySelector('[part~="panel"]') as HTMLElement | null;
     if (!trigger || !panel) return;
 
     const { x, y } = await computePosition(trigger, panel, {
@@ -147,53 +154,82 @@ export class HelixOverflowMenu extends LitElement {
   // ─── Focus management ───
 
   private _focusFirstItem(): void {
-    const slot = this.shadowRoot?.querySelector('slot') as HTMLSlotElement | null;
-    const items = slot
-      ?.assignedElements({ flatten: true })
-      .filter(
-        (el) =>
-          el instanceof HTMLElement &&
-          (el.getAttribute('role') === 'menuitem' ||
-            el.getAttribute('role') === 'menuitemcheckbox' ||
-            el.getAttribute('role') === 'menuitemradio' ||
-            el.tagName.toLowerCase().startsWith('hx-')),
-      ) as HTMLElement[] | undefined;
-    items?.[0]?.focus();
+    const items = this._getMenuItems();
+    items[0]?.focus();
   }
 
-  // ─── Event Handlers ───
+  private _getMenuItems(): HTMLElement[] {
+    const slot = this.shadowRoot?.querySelector('slot') as HTMLSlotElement | null;
+    return (
+      (slot
+        ?.assignedElements({ flatten: true })
+        .filter(
+          (el) =>
+            el instanceof HTMLElement &&
+            !el.hasAttribute('disabled') &&
+            !(el as HTMLButtonElement).disabled &&
+            (el.getAttribute('role') === 'menuitem' ||
+              el.getAttribute('role') === 'menuitemcheckbox' ||
+              el.getAttribute('role') === 'menuitemradio' ||
+              el.tagName.toLowerCase().startsWith('hx-')),
+        ) as HTMLElement[]) ?? []
+    );
+  }
 
-  private _handleTriggerClick(e: MouseEvent): void {
+  // ─── Event Handlers (arrow function class fields — stable reference, no bind needed) ───
+
+  private readonly _handleTriggerClick = (e: MouseEvent): void => {
     e.stopPropagation();
     this._toggle();
-  }
+  };
 
-  private _handleDocumentClick(e: MouseEvent): void {
+  private readonly _handleDocumentClick = (e: MouseEvent): void => {
     if (!this._open) return;
     const path = e.composedPath();
     if (!path.includes(this)) {
       this._hide();
     }
-  }
+  };
 
-  private _handleKeydown(e: KeyboardEvent): void {
+  private readonly _handleKeydown = (e: KeyboardEvent): void => {
     if (!this._open) return;
     if (e.key === 'Escape') {
       e.stopPropagation();
       this._hide();
-      (this.shadowRoot?.querySelector('[part="button"]') as HTMLElement | null)?.focus();
+      (this.shadowRoot?.querySelector('[part~="button"]') as HTMLElement | null)?.focus();
+      return;
     }
     if (e.key === 'Tab') {
       this._hide();
+      return;
     }
-  }
+    if (e.key === 'ArrowDown' || e.key === 'ArrowUp' || e.key === 'Home' || e.key === 'End') {
+      e.preventDefault();
+      e.stopPropagation();
+      const items = this._getMenuItems();
+      if (items.length === 0) return;
+      const focused = items.indexOf(document.activeElement as HTMLElement);
+      let next: number;
+      if (e.key === 'ArrowDown') {
+        next = focused < 0 || focused >= items.length - 1 ? 0 : focused + 1;
+      } else if (e.key === 'ArrowUp') {
+        next = focused <= 0 ? items.length - 1 : focused - 1;
+      } else if (e.key === 'Home') {
+        next = 0;
+      } else {
+        next = items.length - 1;
+      }
+      items[next]?.focus();
+    }
+  };
 
-  private _handleSlotClick(e: Event): void {
+  private readonly _handleSlotClick = (e: Event): void => {
     const target = e.target as HTMLElement;
     const menuItem = target.closest(
       '[role="menuitem"], [role="menuitemcheckbox"], [role="menuitemradio"]',
     ) as HTMLElement | null;
     if (!menuItem) return;
+    if (menuItem.hasAttribute('disabled') || (menuItem as HTMLButtonElement).disabled) return;
     const value = menuItem.getAttribute('data-value') ?? menuItem.textContent?.trim() ?? '';
     this.dispatchEvent(
       new CustomEvent('hx-select', {
@@ -203,7 +239,7 @@ export class HelixOverflowMenu extends LitElement {
       }),
     );
     this._hide();
-  }
+  };
 
   // ─── SVG Icons ───
 
@@ -251,11 +287,11 @@ export class HelixOverflowMenu extends LitElement {
 
     return html`
       <button
-        part="button"
+        part="button trigger"
         class=${classMap(btnClasses)}
         type="button"
-        aria-label="More actions"
-        aria-haspopup="true"
+        aria-label=${this.label}
+        aria-haspopup="menu"
         aria-expanded=${this._open ? 'true' : 'false'}
         ?disabled=${this.disabled}
         @click=${this._handleTriggerClick}
@@ -265,7 +301,7 @@ export class HelixOverflowMenu extends LitElement {
       ${this._open
         ? html`
             <div
-              part="panel"
+              part="panel menu"
               role="menu"
               aria-label="Actions"
               class="panel"

@@ -15,12 +15,15 @@ import { helixTopNavStyles } from './hx-top-nav.styles.js';
  *
  * @slot logo - Brand area rendered on the left side.
  * @slot - Default slot for primary navigation items rendered in the center.
+ *   IMPORTANT: Do NOT place a `<nav>` element in this slot — the component
+ *   already renders a `<nav>` landmark internally. Use a `<div>` or bare links.
  * @slot actions - Utility area rendered on the right side (search, user menu, etc.).
  *
  * @fires {CustomEvent<{open: boolean}>} hx-mobile-toggle - Dispatched when the
  *   hamburger button is toggled. Detail contains the new open state.
  *
- * @csspart nav - The outer `<nav>` element.
+ * @csspart header - The outer `<header>` landmark element.
+ * @csspart nav - The `<nav>` element inside the header.
  * @csspart logo - The logo slot container.
  * @csspart menu - The primary navigation slot container.
  * @csspart actions - The actions slot container.
@@ -59,6 +62,18 @@ export class HelixTopNav extends LitElement {
   /** Whether the mobile collapsible menu is currently open. */
   @state() private _mobileOpen = false;
 
+  // ─── Lifecycle ───
+
+  override connectedCallback(): void {
+    super.connectedCallback();
+    this.addEventListener('keydown', this._handleKeydown);
+  }
+
+  override disconnectedCallback(): void {
+    super.disconnectedCallback();
+    this.removeEventListener('keydown', this._handleKeydown);
+  }
+
   // ─── Event Handling ───
 
   private _handleMobileToggle(): void {
@@ -75,7 +90,32 @@ export class HelixTopNav extends LitElement {
         detail: { open: this._mobileOpen },
       }),
     );
+
+    if (this._mobileOpen) {
+      // Move focus to first interactive element in the default slot
+      this.updateComplete.then(() => {
+        const slot = this.shadowRoot?.querySelector<HTMLSlotElement>('slot:not([name])');
+        const assigned = slot?.assignedElements({ flatten: true }) ?? [];
+        const firstFocusable = assigned.find((el): el is HTMLElement => el instanceof HTMLElement);
+        firstFocusable?.focus();
+      });
+    }
   }
+
+  private _handleKeydown = (e: KeyboardEvent): void => {
+    if (e.key === 'Escape' && this._mobileOpen) {
+      this._mobileOpen = false;
+      this.dispatchEvent(
+        new CustomEvent<{ open: boolean }>('hx-mobile-toggle', {
+          bubbles: true,
+          composed: true,
+          detail: { open: false },
+        }),
+      );
+      // Return focus to the toggle button
+      this.shadowRoot?.querySelector<HTMLButtonElement>('[part="mobile-toggle"]')?.focus();
+    }
+  };
 
   // ─── Render Helpers ───
 
@@ -114,35 +154,37 @@ export class HelixTopNav extends LitElement {
     };
 
     return html`
-      <nav part="nav" class="nav" aria-label=${this.label}>
-        <div class="nav__bar">
-          <div part="logo" class="nav__logo">
-            <slot name="logo"></slot>
-          </div>
-
-          <button
-            part="mobile-toggle"
-            class="mobile-toggle"
-            type="button"
-            aria-expanded=${this._mobileOpen ? 'true' : 'false'}
-            aria-controls="nav-menu"
-            aria-label="Toggle navigation"
-            @click=${this._handleMobileToggle}
-          >
-            ${this._renderHamburgerIcon()}
-          </button>
-
-          <div id="nav-menu" class=${classMap(menuClasses)}>
-            <div part="menu" class="nav__menu">
-              <slot></slot>
+      <header part="header">
+        <nav part="nav" class="nav" aria-label=${this.label}>
+          <div class="nav__bar">
+            <div part="logo" class="nav__logo">
+              <slot name="logo"></slot>
             </div>
 
-            <div part="actions" class="nav__actions">
-              <slot name="actions"></slot>
+            <button
+              part="mobile-toggle"
+              class="mobile-toggle"
+              type="button"
+              aria-expanded=${String(this._mobileOpen)}
+              aria-controls="nav-menu"
+              aria-label="Toggle navigation"
+              @click=${this._handleMobileToggle}
+            >
+              ${this._renderHamburgerIcon()}
+            </button>
+
+            <div id="nav-menu" class=${classMap(menuClasses)}>
+              <div part="menu" class="nav__menu">
+                <slot></slot>
+              </div>
+
+              <div part="actions" class="nav__actions">
+                <slot name="actions"></slot>
+              </div>
             </div>
           </div>
-        </div>
-      </nav>
+        </nav>
+      </header>
     `;
   }
 }

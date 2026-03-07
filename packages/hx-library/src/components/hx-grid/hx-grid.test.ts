@@ -64,10 +64,22 @@ describe('hx-grid', () => {
       expect(base?.style.gridTemplateColumns).toContain('repeat(4, 1fr)');
     });
 
+    it('sets 12-column grid', async () => {
+      const el = await fixture<HelixGrid>('<hx-grid columns="12"></hx-grid>');
+      const base = shadowQuery<HTMLElement>(el, '[part="base"]');
+      expect(base?.style.gridTemplateColumns).toContain('repeat(12, 1fr)');
+    });
+
     it('passes raw string template for columns', async () => {
       const el = await fixture<HelixGrid>('<hx-grid columns="1fr 2fr 1fr"></hx-grid>');
       const base = shadowQuery<HTMLElement>(el, '[part="base"]');
       expect(base?.style.gridTemplateColumns).toContain('1fr 2fr 1fr');
+    });
+
+    it('base element is an actual CSS grid container', async () => {
+      const el = await fixture<HelixGrid>('<hx-grid columns="3"></hx-grid>');
+      const base = shadowQuery<HTMLElement>(el, '[part="base"]');
+      expect(base?.style.display).toBe('grid');
     });
   });
 
@@ -115,6 +127,35 @@ describe('hx-grid', () => {
       const el = await fixture<HelixGrid>('<hx-grid column-gap="xl"></hx-grid>');
       expect(el.columnGap).toBe('xl');
       expect(el.getAttribute('column-gap')).toBe('xl');
+    });
+
+    it('applies row-gap to base element inline style', async () => {
+      const el = await fixture<HelixGrid>('<hx-grid row-gap="lg"></hx-grid>');
+      const base = shadowQuery<HTMLElement>(el, '[part="base"]');
+      expect(base?.style.rowGap).toContain('var(--hx-space-6');
+    });
+
+    it('applies column-gap to base element inline style', async () => {
+      const el = await fixture<HelixGrid>('<hx-grid column-gap="sm"></hx-grid>');
+      const base = shadowQuery<HTMLElement>(el, '[part="base"]');
+      expect(base?.style.columnGap).toContain('var(--hx-space-2');
+    });
+  });
+
+  // ─── Nested grids ───
+
+  describe('Nested grids', () => {
+    it('inner hx-grid establishes its own grid context independently', async () => {
+      const outer = await fixture<HelixGrid>(
+        '<hx-grid columns="2"><hx-grid columns="3" id="inner"><div>A</div><div>B</div><div>C</div></hx-grid><div>Right</div></hx-grid>',
+      );
+      const inner = outer.querySelector<HelixGrid>('#inner');
+      expect(inner).toBeTruthy();
+      const innerBase = shadowQuery<HTMLElement>(inner!, '[part="base"]');
+      expect(innerBase?.style.gridTemplateColumns).toContain('repeat(3, 1fr)');
+      // Outer base should remain 2-column
+      const outerBase = shadowQuery<HTMLElement>(outer, '[part="base"]');
+      expect(outerBase?.style.gridTemplateColumns).toContain('repeat(2, 1fr)');
     });
   });
 

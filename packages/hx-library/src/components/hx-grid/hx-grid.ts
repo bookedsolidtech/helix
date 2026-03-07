@@ -106,6 +106,7 @@ export class HelixGrid extends LitElement {
 
   private _baseStyle(): string {
     return [
+      'display: grid',
       `grid-template-columns: ${this._gridTemplateColumns()}`,
       `row-gap: ${this._computedRowGap()}`,
       `column-gap: ${this._computedColumnGap()}`,
