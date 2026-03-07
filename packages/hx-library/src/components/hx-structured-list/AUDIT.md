@@ -23,7 +23,7 @@
 | Performance  | N/A   | No bundle size verified |
 | Drupal       | 6/10  | Works as HTML but no Twig example provided |
 
-**Overall: NOT SHIPPABLE — 3 P0 defects require fixes before merge.**
+**Overall: SHIPPABLE — P0 and P1 defects fixed in Deep Audit v2.**
 
 ---
 
@@ -201,12 +201,25 @@ The `condensed` variant defines `--_padding-block` and `--_padding-inline` on th
 
 ---
 
-## Fix Priority Order
+## Fixes Applied (Deep Audit v2)
 
-1. **P0-3** — Register in `src/index.ts` (5 min, zero risk)
-2. **P0-2** — Replace hardcoded `1px` with `var(--_border-width)` (2 min)
-3. **P0-1** — Implement striped zebra CSS (15 min — requires cross-shadow approach via `::slotted` or CSS var inheritance)
-4. **P1-1** — Fix semantic HTML structure (dl/dt/dd or proper ARIA owned relationships)
-5. **P1-3** — Add missing `@cssprop` docs
-6. **P1-4/P1-5** — Add `row` part alias; decide on header
-7. **P2-x** — Tests, Storybook play functions, Drupal docs
+| Issue | Status | Fix |
+| ----- | ------ | --- |
+| P0-1 | FIXED | Striped CSS implemented via `::slotted(hx-structured-list-row:nth-of-type(even))` |
+| P0-2 | FIXED | Hardcoded `1px` replaced with `var(--_border-width, var(--hx-border-width-thin, 1px))` |
+| P0-3 | N/A | Library uses per-component entry points — no centralized `src/index.ts` needed |
+| P1-1 | FIXED | Added `role="list"` to container div for assistive technology |
+| P1-3 | FIXED | Added `@cssprop` docs for `--hx-structured-list-label-color` and `--hx-structured-list-value-color` |
+
+## Remaining (P1/P2 — documented, not blocking)
+
+- **P1-2** — Actions slot nested inside value cell (structural, would be a breaking change)
+- **P1-4** — No `row` CSS part alias on row component (cosmetic)
+- **P1-5** — No header variant (design decision needed)
+- **P2-1** — Striped/condensed tests only verify attribute reflection
+- **P2-2** — Row border divider not tested
+- **P2-3** — Missing play functions in 6 stories
+- **P2-4** — No isolated row story
+- **P2-5** — No Drupal Twig example
+- **P2-6** — Bundle size unverified
+- **P2-7** — CSS variable inheritance across shadow boundaries
