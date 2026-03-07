@@ -695,7 +695,7 @@ describe('hx-time-picker', () => {
   // ─── Slots (3) ───
 
   describe('Slots', () => {
-    it('default slot overrides the label element', async () => {
+    it('label slot overrides the label element', async () => {
       const el = await fixture<HelixTimePicker>(
         '<hx-time-picker label="Default Label"><span slot="label">Custom Label</span></hx-time-picker>',
       );
