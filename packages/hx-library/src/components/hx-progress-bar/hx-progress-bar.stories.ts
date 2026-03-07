@@ -13,12 +13,20 @@ const meta = {
   argTypes: {
     value: {
       control: { type: 'number', min: 0, max: 100 },
-      description:
-        'Current progress value (0–max). Set to null for indeterminate state.',
+      description: 'Current progress value (min–max). Set to null for indeterminate state.',
       table: {
         category: 'State',
         defaultValue: { summary: 'null' },
         type: { summary: 'number | null' },
+      },
+    },
+    min: {
+      control: { type: 'number' },
+      description: 'Minimum value for the progress bar.',
+      table: {
+        category: 'State',
+        defaultValue: { summary: '0' },
+        type: { summary: 'number' },
       },
     },
     max: {
@@ -30,16 +38,35 @@ const meta = {
         type: { summary: 'number' },
       },
     },
+    indeterminate: {
+      control: 'boolean',
+      description: 'When true, shows an animated indeterminate loading state regardless of value.',
+      table: {
+        category: 'State',
+        defaultValue: { summary: 'false' },
+        type: { summary: 'boolean' },
+      },
+    },
     label: {
       control: 'text',
-      description: 'Accessible label for the progress bar (maps to aria-label).',
+      description:
+        'Accessible label for the progress bar (maps to aria-label). Use when no visible label slot is provided.',
       table: {
         category: 'Accessibility',
         defaultValue: { summary: "''" },
         type: { summary: 'string' },
       },
     },
-    size: {
+    description: {
+      control: 'text',
+      description: 'Additional description linked via aria-describedby (visually hidden).',
+      table: {
+        category: 'Accessibility',
+        defaultValue: { summary: "''" },
+        type: { summary: 'string' },
+      },
+    },
+    'hx-size': {
       control: { type: 'select' },
       options: ['sm', 'md', 'lg'],
       description: 'Size of the progress bar track.',
@@ -62,9 +89,12 @@ const meta = {
   },
   args: {
     value: 60,
+    min: 0,
     max: 100,
-    label: 'Upload progress',
-    size: 'md',
+    indeterminate: false,
+    label: '',
+    description: '',
+    'hx-size': 'md',
     variant: 'default',
   },
 } satisfies Meta;
@@ -76,16 +106,20 @@ type Story = StoryObj;
 // Stories
 // ─────────────────────────────────────────────────
 
+/**
+ * Default story using the label slot for visible text.
+ * The component automatically links the slot to `aria-labelledby` — no need to
+ * duplicate the label as an `aria-label` attribute when using the slot.
+ */
 export const Default: Story = {
   render: (args) => html`
     <hx-progress-bar
       .value=${args.value}
       .max=${args.max}
-      label=${args.label}
-      hx-size=${args.size}
+      hx-size=${args['hx-size']}
       variant=${args.variant}
     >
-      <span slot="label">${args.label}</span>
+      <span slot="label">Upload progress</span>
     </hx-progress-bar>
   `,
 };
@@ -93,33 +127,52 @@ export const Default: Story = {
 export const Indeterminate: Story = {
   args: {
     value: null,
+    indeterminate: false,
     label: 'Loading…',
   },
   render: (args) => html`
     <hx-progress-bar
       .value=${args.value}
       label=${args.label}
-      hx-size=${args.size}
+      hx-size=${args['hx-size']}
       variant=${args.variant}
     >
-      <span slot="label">${args.label}</span>
     </hx-progress-bar>
+  `,
+};
+
+/**
+ * Demonstrates the canonical `aria-labelledby` usage pattern:
+ * use the label slot for the visible label and rely on the component's
+ * built-in `aria-labelledby` wiring — no redundant `label` attribute needed.
+ */
+export const WithAriaLabelledBy: Story = {
+  args: {
+    value: 45,
+    label: '',
+  },
+  render: (args) => html`
+    <div style="width: 400px;">
+      <hx-progress-bar .value=${args.value} hx-size=${args['hx-size']} variant=${args.variant}>
+        <span slot="label">Files uploaded: ${args.value} of ${args.max}</span>
+      </hx-progress-bar>
+    </div>
   `,
 };
 
 export const Variants: Story = {
   render: () => html`
     <div style="display: flex; flex-direction: column; gap: 1rem; width: 400px;">
-      <hx-progress-bar value="75" label="Default" variant="default">
+      <hx-progress-bar value="75" variant="default">
         <span slot="label">Default — 75%</span>
       </hx-progress-bar>
-      <hx-progress-bar value="100" label="Success" variant="success">
+      <hx-progress-bar value="100" variant="success">
         <span slot="label">Success — 100%</span>
       </hx-progress-bar>
-      <hx-progress-bar value="50" label="Warning" variant="warning">
+      <hx-progress-bar value="50" variant="warning">
         <span slot="label">Warning — 50%</span>
       </hx-progress-bar>
-      <hx-progress-bar value="25" label="Danger" variant="danger">
+      <hx-progress-bar value="25" variant="danger">
         <span slot="label">Danger — 25%</span>
       </hx-progress-bar>
     </div>
@@ -129,13 +182,13 @@ export const Variants: Story = {
 export const Sizes: Story = {
   render: () => html`
     <div style="display: flex; flex-direction: column; gap: 1rem; width: 400px;">
-      <hx-progress-bar value="60" label="Small" hx-size="sm">
+      <hx-progress-bar value="60" hx-size="sm">
         <span slot="label">Small</span>
       </hx-progress-bar>
-      <hx-progress-bar value="60" label="Medium" hx-size="md">
+      <hx-progress-bar value="60" hx-size="md">
         <span slot="label">Medium (default)</span>
       </hx-progress-bar>
-      <hx-progress-bar value="60" label="Large" hx-size="lg">
+      <hx-progress-bar value="60" hx-size="lg">
         <span slot="label">Large</span>
       </hx-progress-bar>
     </div>
@@ -145,11 +198,10 @@ export const Sizes: Story = {
 export const ZeroProgress: Story = {
   args: {
     value: 0,
-    label: 'Not started',
   },
   render: (args) => html`
-    <hx-progress-bar value=${args.value} label=${args.label} hx-size=${args.size}>
-      <span slot="label">${args.label}</span>
+    <hx-progress-bar value=${args.value} hx-size=${args['hx-size']}>
+      <span slot="label">Not started</span>
     </hx-progress-bar>
   `,
 };
@@ -158,16 +210,10 @@ export const Complete: Story = {
   args: {
     value: 100,
     variant: 'success',
-    label: 'Upload complete',
   },
   render: (args) => html`
-    <hx-progress-bar
-      value=${args.value}
-      variant=${args.variant}
-      label=${args.label}
-      hx-size=${args.size}
-    >
-      <span slot="label">${args.label}</span>
+    <hx-progress-bar value=${args.value} variant=${args.variant} hx-size=${args['hx-size']}>
+      <span slot="label">Upload complete</span>
     </hx-progress-bar>
   `,
 };
