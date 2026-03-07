@@ -22,9 +22,7 @@ describe('hx-ripple', () => {
     });
 
     it('renders default slot', async () => {
-      const el = await fixture<HelixRipple>(
-        '<hx-ripple><button>Click</button></hx-ripple>',
-      );
+      const el = await fixture<HelixRipple>('<hx-ripple><button>Click</button></hx-ripple>');
       const slotted = el.querySelector('button');
       expect(slotted).toBeTruthy();
     });
@@ -47,19 +45,37 @@ describe('hx-ripple', () => {
       const el = await fixture<HelixRipple>('<hx-ripple color="#ff0000"></hx-ripple>');
       expect(el.getAttribute('color')).toBe('#ff0000');
     });
+
+    it('defaults unbounded to false', async () => {
+      const el = await fixture<HelixRipple>('<hx-ripple></hx-ripple>');
+      expect(el.unbounded).toBe(false);
+    });
+
+    it('reflects unbounded attribute to host', async () => {
+      const el = await fixture<HelixRipple>('<hx-ripple unbounded></hx-ripple>');
+      expect(el.hasAttribute('unbounded')).toBe(true);
+    });
+
+    it('sets role="presentation" on host', async () => {
+      const el = await fixture<HelixRipple>('<hx-ripple></hx-ripple>');
+      expect(el.getAttribute('role')).toBe('presentation');
+    });
   });
 
   // ─── Ripple Creation ───
 
   describe('Ripple creation', () => {
     it('creates a ripple wave on pointerdown', async () => {
-      const el = await fixture<HelixRipple>(
-        '<hx-ripple><button>Click</button></hx-ripple>',
-      );
+      const el = await fixture<HelixRipple>('<hx-ripple><button>Click</button></hx-ripple>');
       const base = shadowQuery<HTMLElement>(el, '.ripple__base')!;
 
       el.dispatchEvent(
-        new PointerEvent('pointerdown', { bubbles: true, composed: true, clientX: 10, clientY: 10 }),
+        new PointerEvent('pointerdown', {
+          bubbles: true,
+          composed: true,
+          clientX: 10,
+          clientY: 10,
+        }),
       );
       await el.updateComplete;
 
@@ -74,7 +90,12 @@ describe('hx-ripple', () => {
       const base = shadowQuery<HTMLElement>(el, '.ripple__base')!;
 
       el.dispatchEvent(
-        new PointerEvent('pointerdown', { bubbles: true, composed: true, clientX: 10, clientY: 10 }),
+        new PointerEvent('pointerdown', {
+          bubbles: true,
+          composed: true,
+          clientX: 10,
+          clientY: 10,
+        }),
       );
       await el.updateComplete;
 
@@ -94,13 +115,16 @@ describe('hx-ripple', () => {
         dispatchEvent: vi.fn(),
       } as MediaQueryList);
 
-      const el = await fixture<HelixRipple>(
-        '<hx-ripple><button>Click</button></hx-ripple>',
-      );
+      const el = await fixture<HelixRipple>('<hx-ripple><button>Click</button></hx-ripple>');
       const base = shadowQuery<HTMLElement>(el, '.ripple__base')!;
 
       el.dispatchEvent(
-        new PointerEvent('pointerdown', { bubbles: true, composed: true, clientX: 10, clientY: 10 }),
+        new PointerEvent('pointerdown', {
+          bubbles: true,
+          composed: true,
+          clientX: 10,
+          clientY: 10,
+        }),
       );
       await el.updateComplete;
 
@@ -111,13 +135,16 @@ describe('hx-ripple', () => {
     });
 
     it('ripple wave has aria-hidden="true"', async () => {
-      const el = await fixture<HelixRipple>(
-        '<hx-ripple><button>Click</button></hx-ripple>',
-      );
+      const el = await fixture<HelixRipple>('<hx-ripple><button>Click</button></hx-ripple>');
       const base = shadowQuery<HTMLElement>(el, '.ripple__base')!;
 
       el.dispatchEvent(
-        new PointerEvent('pointerdown', { bubbles: true, composed: true, clientX: 10, clientY: 10 }),
+        new PointerEvent('pointerdown', {
+          bubbles: true,
+          composed: true,
+          clientX: 10,
+          clientY: 10,
+        }),
       );
       await el.updateComplete;
 
@@ -126,17 +153,153 @@ describe('hx-ripple', () => {
     });
 
     it('ripple wave exposes "ripple" CSS part', async () => {
-      const el = await fixture<HelixRipple>(
-        '<hx-ripple><button>Click</button></hx-ripple>',
-      );
+      const el = await fixture<HelixRipple>('<hx-ripple><button>Click</button></hx-ripple>');
       const base = shadowQuery<HTMLElement>(el, '.ripple__base')!;
 
       el.dispatchEvent(
-        new PointerEvent('pointerdown', { bubbles: true, composed: true, clientX: 10, clientY: 10 }),
+        new PointerEvent('pointerdown', {
+          bubbles: true,
+          composed: true,
+          clientX: 10,
+          clientY: 10,
+        }),
       );
       await el.updateComplete;
 
       const ripple = base.querySelector('[part~="ripple"]');
+      expect(ripple).toBeTruthy();
+    });
+
+    it('creates a ripple wave on Enter keydown', async () => {
+      const el = await fixture<HelixRipple>('<hx-ripple><button>Click</button></hx-ripple>');
+      const base = shadowQuery<HTMLElement>(el, '.ripple__base')!;
+
+      el.dispatchEvent(
+        new KeyboardEvent('keydown', { key: 'Enter', bubbles: true, composed: true }),
+      );
+      await el.updateComplete;
+
+      const ripple = base.querySelector('.ripple__wave');
+      expect(ripple).toBeTruthy();
+    });
+
+    it('creates a ripple wave on Space keydown', async () => {
+      const el = await fixture<HelixRipple>('<hx-ripple><button>Click</button></hx-ripple>');
+      const base = shadowQuery<HTMLElement>(el, '.ripple__base')!;
+
+      el.dispatchEvent(new KeyboardEvent('keydown', { key: ' ', bubbles: true, composed: true }));
+      await el.updateComplete;
+
+      const ripple = base.querySelector('.ripple__wave');
+      expect(ripple).toBeTruthy();
+    });
+
+    it('does NOT create a ripple on other key presses', async () => {
+      const el = await fixture<HelixRipple>('<hx-ripple><button>Click</button></hx-ripple>');
+      const base = shadowQuery<HTMLElement>(el, '.ripple__base')!;
+
+      el.dispatchEvent(new KeyboardEvent('keydown', { key: 'Tab', bubbles: true, composed: true }));
+      await el.updateComplete;
+
+      const ripple = base.querySelector('.ripple__wave');
+      expect(ripple).toBeNull();
+    });
+
+    it('does NOT create a ripple on Enter when disabled', async () => {
+      const el = await fixture<HelixRipple>(
+        '<hx-ripple disabled><button>Click</button></hx-ripple>',
+      );
+      const base = shadowQuery<HTMLElement>(el, '.ripple__base')!;
+
+      el.dispatchEvent(
+        new KeyboardEvent('keydown', { key: 'Enter', bubbles: true, composed: true }),
+      );
+      await el.updateComplete;
+
+      const ripple = base.querySelector('.ripple__wave');
+      expect(ripple).toBeNull();
+    });
+
+    it('removes ripple element after animationend', async () => {
+      const el = await fixture<HelixRipple>('<hx-ripple><button>Click</button></hx-ripple>');
+      const base = shadowQuery<HTMLElement>(el, '.ripple__base')!;
+
+      el.dispatchEvent(
+        new PointerEvent('pointerdown', {
+          bubbles: true,
+          composed: true,
+          clientX: 10,
+          clientY: 10,
+        }),
+      );
+      await el.updateComplete;
+
+      const ripple = base.querySelector<HTMLElement>('.ripple__wave')!;
+      expect(ripple).toBeTruthy();
+
+      ripple.dispatchEvent(new Event('animationend'));
+
+      expect(base.querySelector('.ripple__wave')).toBeNull();
+    });
+
+    it('applies color prop as backgroundColor on ripple wave', async () => {
+      const el = await fixture<HelixRipple>(
+        '<hx-ripple color="red"><button>Click</button></hx-ripple>',
+      );
+      const base = shadowQuery<HTMLElement>(el, '.ripple__base')!;
+
+      el.dispatchEvent(
+        new PointerEvent('pointerdown', {
+          bubbles: true,
+          composed: true,
+          clientX: 10,
+          clientY: 10,
+        }),
+      );
+      await el.updateComplete;
+
+      const ripple = base.querySelector<HTMLElement>('.ripple__wave')!;
+      expect(ripple.style.backgroundColor).toBe('red');
+    });
+  });
+
+  // ─── Unbounded Mode ───
+
+  describe('Unbounded mode', () => {
+    it('defaults unbounded to false', async () => {
+      const el = await fixture<HelixRipple>('<hx-ripple></hx-ripple>');
+      expect(el.unbounded).toBe(false);
+    });
+
+    it('sets unbounded property from attribute', async () => {
+      const el = await fixture<HelixRipple>('<hx-ripple unbounded></hx-ripple>');
+      expect(el.unbounded).toBe(true);
+    });
+
+    it('reflects unbounded to host attribute', async () => {
+      const el = await fixture<HelixRipple>('<hx-ripple></hx-ripple>');
+      el.unbounded = true;
+      await el.updateComplete;
+      expect(el.hasAttribute('unbounded')).toBe(true);
+    });
+
+    it('still creates ripple wave when unbounded', async () => {
+      const el = await fixture<HelixRipple>(
+        '<hx-ripple unbounded><button>Click</button></hx-ripple>',
+      );
+      const base = shadowQuery<HTMLElement>(el, '.ripple__base')!;
+
+      el.dispatchEvent(
+        new PointerEvent('pointerdown', {
+          bubbles: true,
+          composed: true,
+          clientX: 10,
+          clientY: 10,
+        }),
+      );
+      await el.updateComplete;
+
+      const ripple = base.querySelector('.ripple__wave');
       expect(ripple).toBeTruthy();
     });
   });
@@ -155,9 +318,7 @@ describe('hx-ripple', () => {
 
   describe('Accessibility (axe-core)', () => {
     it('has no axe violations in default state', async () => {
-      const el = await fixture<HelixRipple>(
-        '<hx-ripple><button>Click me</button></hx-ripple>',
-      );
+      const el = await fixture<HelixRipple>('<hx-ripple><button>Click me</button></hx-ripple>');
       await page.screenshot();
       const { violations } = await checkA11y(el);
       expect(violations).toEqual([]);
@@ -166,6 +327,15 @@ describe('hx-ripple', () => {
     it('has no axe violations when disabled', async () => {
       const el = await fixture<HelixRipple>(
         '<hx-ripple disabled><button>Click me</button></hx-ripple>',
+      );
+      await page.screenshot();
+      const { violations } = await checkA11y(el);
+      expect(violations).toEqual([]);
+    });
+
+    it('has no axe violations when unbounded', async () => {
+      const el = await fixture<HelixRipple>(
+        '<hx-ripple unbounded><button>Click me</button></hx-ripple>',
       );
       await page.screenshot();
       const { violations } = await checkA11y(el);
