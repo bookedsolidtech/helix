@@ -10,7 +10,7 @@ import {
 } from '@floating-ui/dom';
 import { helixDropdownStyles } from './hx-dropdown.styles.js';
 
-export type DropdownPlacement =
+type DropdownPlacement =
   | 'top'
   | 'top-start'
   | 'top-end'
@@ -96,8 +96,6 @@ export class HelixDropdown extends LitElement {
   @query('[part="panel"]') private _panel!: HTMLElement;
   @query('[part="trigger"]') private _triggerWrapper!: HTMLElement;
 
-  private readonly _panelId = `hx-dropdown-panel-${Math.random().toString(36).slice(2, 9)}`;
-
   // ─── Lifecycle ───
 
   override connectedCallback(): void {
@@ -123,36 +121,26 @@ export class HelixDropdown extends LitElement {
     await this._updatePosition();
     document.addEventListener('click', this._handleOutsideClick, { capture: true });
     this.dispatchEvent(new CustomEvent('hx-show', { bubbles: true, composed: true }));
-    // Focus first focusable item in panel (must traverse slotted light DOM)
+    // Focus first focusable item in panel
     const panel = this._panel;
     if (panel) {
-      const slot = panel.querySelector<HTMLSlotElement>('slot');
-      const assigned = slot?.assignedElements({ flatten: true }) ?? [];
-      for (const node of assigned) {
-        if (!(node instanceof HTMLElement)) continue;
-        const focusable = node.matches('[role="menuitem"]')
-          ? node
-          : node.querySelector<HTMLElement>('[role="menuitem"]');
-        if (focusable) {
-          focusable.focus();
-          break;
-        }
-      }
+      const firstFocusable = panel.querySelector<HTMLElement>(
+        '[role="menuitem"], button, [tabindex]:not([tabindex="-1"]), a[href], input, select, textarea',
+      );
+      firstFocusable?.focus();
     }
   }
 
-  private _hide(options?: { restoreFocus?: boolean }): void {
+  private _hide(): void {
     if (!this.open) return;
     this.open = false;
     this._panelVisible = false;
     document.removeEventListener('click', this._handleOutsideClick);
     this.dispatchEvent(new CustomEvent('hx-hide', { bubbles: true, composed: true }));
-    // Return focus to trigger only when explicitly requested (e.g. Escape, item select)
-    if (options?.restoreFocus !== false) {
-      const slot = this.shadowRoot?.querySelector<HTMLSlotElement>('slot[name="trigger"]');
-      const trigger = slot?.assignedElements()[0] as HTMLElement | undefined;
-      trigger?.focus();
-    }
+    // Return focus to trigger
+    const slot = this.shadowRoot?.querySelector<HTMLSlotElement>('slot[name="trigger"]');
+    const trigger = slot?.assignedElements()[0] as HTMLElement | undefined;
+    trigger?.focus();
   }
 
   // ─── Positioning ───
@@ -202,7 +190,7 @@ export class HelixDropdown extends LitElement {
       e.stopPropagation();
       this._hide();
     } else if (e.key === 'Tab' && this.open) {
-      this._hide({ restoreFocus: false });
+      this._hide();
     }
   }
 
@@ -215,7 +203,7 @@ export class HelixDropdown extends LitElement {
 
   private _handlePanelClick(e: MouseEvent): void {
     const target = e.target as HTMLElement;
-    const item = target.closest<HTMLElement>('[role="menuitem"], [data-value]');
+    const item = target.closest<HTMLElement>('[role="menuitem"], [data-value], li, button');
     if (!item) return;
 
     const value = item.dataset['value'] ?? item.getAttribute('value') ?? null;
@@ -245,9 +233,7 @@ export class HelixDropdown extends LitElement {
         <slot name="trigger" @slotchange=${this._onTriggerSlotChange}></slot>
       </div>
       <div
-        id=${this._panelId}
         part="panel"
-        role="menu"
         aria-hidden=${this._panelVisible ? 'false' : 'true'}
         class=${this._panelVisible ? 'panel panel--visible' : 'panel'}
         @click=${this._handlePanelClick}
@@ -272,9 +258,8 @@ export class HelixDropdown extends LitElement {
     if (!slot) return;
     const trigger = slot.assignedElements()[0] as HTMLElement | undefined;
     if (trigger) {
-      trigger.setAttribute('aria-haspopup', 'menu');
+      trigger.setAttribute('aria-haspopup', 'true');
       trigger.setAttribute('aria-expanded', String(this.open));
-      trigger.setAttribute('aria-controls', this._panelId);
     }
   }
 
