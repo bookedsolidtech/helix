@@ -6,14 +6,10 @@ export const helixPopupStyles = css`
   }
 
   [part='popup'] {
-    position: var(--_strategy, fixed);
+    position: fixed;
     z-index: var(--hx-popup-z-index, 9000);
     inset: 0 auto auto 0;
     box-sizing: border-box;
-  }
-
-  :host([strategy='absolute']) [part='popup'] {
-    --_strategy: absolute;
   }
 
   :host(:not([active])) [part='popup'] {

@@ -118,17 +118,6 @@ const meta = {
         type: { summary: 'boolean' },
       },
     },
-    strategy: {
-      control: { type: 'select' },
-      options: ['fixed', 'absolute'],
-      description:
-        'Positioning strategy. Use `fixed` for most cases, `absolute` when inside a scroll container with `overflow: hidden`.',
-      table: {
-        category: 'Positioning',
-        defaultValue: { summary: 'fixed' },
-        type: { summary: "'fixed' | 'absolute'" },
-      },
-    },
   },
   args: {
     placement: 'bottom',
@@ -140,7 +129,6 @@ const meta = {
     flip: false,
     shift: false,
     autoSize: false,
-    strategy: 'fixed',
   },
   render: (args) => html`
     <div style="padding: 8rem; display: flex; justify-content: center; align-items: center;">
@@ -154,7 +142,6 @@ const meta = {
         ?flip=${args.flip}
         ?shift=${args.shift}
         ?auto-size=${args.autoSize}
-        strategy=${args.strategy}
       >
         <button slot="anchor" style="padding: 0.5rem 1rem; cursor: default;">Anchor</button>
         <div
@@ -393,86 +380,4 @@ export const CSSParts: Story = {
       </hx-popup>
     </div>
   `,
-};
-
-// ─────────────────────────────────────────────────
-// 9. AUTO PLACEMENT
-// ─────────────────────────────────────────────────
-
-/**
- * When `placement="auto"` is set, Floating UI's `autoPlacement` middleware
- * chooses the optimal side based on available space. The popup will
- * automatically reposition as the viewport or scroll container changes.
- */
-export const AutoPlacement: Story = {
-  name: 'Auto Placement',
-  render: () => html`
-    <div style="padding: 8rem; display: flex; justify-content: center; align-items: center;">
-      <hx-popup active placement="auto" distance="8">
-        <button slot="anchor" style="padding: 0.5rem 1rem;">Auto-placed anchor</button>
-        <div
-          style="background: white; border: 1px solid #e5e7eb; border-radius: 0.375rem; padding: 0.75rem 1rem; box-shadow: 0 4px 12px rgba(0,0,0,0.1); font-size: 0.875rem;"
-        >
-          Floating UI picks the best side
-        </div>
-      </hx-popup>
-    </div>
-  `,
-  play: async ({ canvasElement }) => {
-    const popup = canvasElement.querySelector('hx-popup');
-    await expect(popup).toBeTruthy();
-    await expect(popup?.placement).toBe('auto');
-  },
-};
-
-// ─────────────────────────────────────────────────
-// 10. AUTO SIZE
-// ─────────────────────────────────────────────────
-
-/**
- * When `auto-size` is enabled, the popup sets `--hx-auto-size-available-width`
- * and `--hx-auto-size-available-height` CSS custom properties. Use these in
- * popup content to constrain dimensions within the viewport.
- */
-export const AutoSize: Story = {
-  name: 'Auto Size',
-  render: () => html`
-    <div
-      style="padding: 2rem; height: 300px; overflow: auto; border: 1px solid #e5e7eb; border-radius: 0.375rem; position: relative;"
-    >
-      <div style="padding: 6rem 2rem; display: flex; justify-content: center;">
-        <hx-popup active placement="bottom" distance="8" auto-size>
-          <button slot="anchor" style="padding: 0.5rem 1rem;">Auto-sized popup</button>
-          <div
-            style="background: white; border: 1px solid #e5e7eb; border-radius: 0.375rem; padding: 0.75rem 1rem; box-shadow: 0 4px 12px rgba(0,0,0,0.1); font-size: 0.875rem; max-width: var(--hx-auto-size-available-width); max-height: var(--hx-auto-size-available-height); overflow: auto;"
-          >
-            <p style="margin: 0 0 0.5rem;">
-              This popup content is constrained by the available viewport space using
-              <code>--hx-auto-size-available-width</code> and
-              <code>--hx-auto-size-available-height</code>.
-            </p>
-            <p style="margin: 0 0 0.5rem;">
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor
-              incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud
-              exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
-            </p>
-            <p style="margin: 0 0 0.5rem;">
-              Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat
-              nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui
-              officia deserunt mollit anim id est laborum.
-            </p>
-            <p style="margin: 0;">
-              Resize the browser window or scroll the container to see the popup constrain itself
-              within the available space.
-            </p>
-          </div>
-        </hx-popup>
-      </div>
-    </div>
-  `,
-  play: async ({ canvasElement }) => {
-    const popup = canvasElement.querySelector('hx-popup');
-    await expect(popup).toBeTruthy();
-    await expect(popup?.autoSize).toBe(true);
-  },
 };

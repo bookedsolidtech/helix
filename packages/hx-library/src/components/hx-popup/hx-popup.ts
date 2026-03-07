@@ -11,7 +11,7 @@ import {
   size as sizeMiddleware,
   autoPlacement as autoPlacementMiddleware,
 } from '@floating-ui/dom';
-import type { Placement, Strategy, Middleware } from '@floating-ui/dom';
+import type { Placement, Middleware } from '@floating-ui/dom';
 import { helixPopupStyles } from './hx-popup.styles.js';
 
 type PopupPlacement =
@@ -35,14 +35,6 @@ type ArrowPlacement = 'start' | 'center' | 'end';
  * A low-level positioning primitive that anchors a floating panel to a reference element.
  * This is the base that hx-tooltip, hx-dropdown, and hx-popover build upon.
  *
- * **This component is a positioning utility only.** It does not manage focus, roles, or
- * keyboard navigation. Consumers are responsible for all ARIA semantics:
- *
- * - Add the appropriate `role` to popup content (`tooltip`, `dialog`, `listbox`, etc.)
- * - Manage `aria-expanded` on the trigger element
- * - Add `aria-controls` / `aria-labelledby` linking trigger to popup content
- * - Implement focus management (trapping, restoration) for modal-like popups
- *
  * @summary Low-level popup positioning utility.
  *
  * @tag hx-popup
@@ -53,7 +45,6 @@ type ArrowPlacement = 'start' | 'center' | 'end';
  * @csspart popup - The popup container element.
  * @csspart arrow - The arrow indicator element (only present when `arrow` is true).
  *
- * @cssprop [--hx-popup-z-index=9000] - Z-index of the popup container.
  * @cssprop [--hx-arrow-size=8px] - Size of the arrow element.
  * @cssprop [--hx-arrow-color=currentColor] - Color of the arrow element.
  * @cssprop --hx-auto-size-available-width - Available width set by auto-size middleware.
@@ -64,8 +55,8 @@ type ArrowPlacement = 'start' | 'center' | 'end';
  * @example
  * ```html
  * <hx-popup active placement="bottom">
- *   <button slot="anchor" aria-expanded="true" aria-controls="popup-content">Trigger</button>
- *   <div id="popup-content" role="dialog" aria-label="Popup">Popup content</div>
+ *   <button slot="anchor">Trigger</button>
+ *   <div>Popup content</div>
  * </hx-popup>
  * ```
  */
@@ -149,20 +140,20 @@ export class HelixPopup extends LitElement {
   @property({
     attribute: 'flip-fallback-placements',
     converter: {
-      fromAttribute(value: string | null): PopupPlacement[] {
+      fromAttribute(value: string | null): string[] {
         if (!value) return [];
         try {
-          return JSON.parse(value) as PopupPlacement[];
+          return JSON.parse(value) as string[];
         } catch {
           return [];
         }
       },
-      toAttribute(value: PopupPlacement[]): string {
+      toAttribute(value: string[]): string {
         return JSON.stringify(value);
       },
     },
   })
-  flipFallbackPlacements: PopupPlacement[] = [];
+  flipFallbackPlacements: string[] = [];
 
   /**
    * When true, shifts the popup along the axis to remain in the viewport.
@@ -170,14 +161,6 @@ export class HelixPopup extends LitElement {
    */
   @property({ type: Boolean, reflect: true })
   shift = false;
-
-  /**
-   * Positioning strategy. Use `fixed` for most cases, `absolute` when the popup
-   * is inside a scroll container with `overflow: hidden`.
-   * @attr strategy
-   */
-  @property({ reflect: true })
-  strategy: Strategy = 'fixed';
 
   /**
    * When true, resizes the popup to fit within the viewport.
@@ -216,7 +199,6 @@ export class HelixPopup extends LitElement {
       changedProperties.has('flipFallbackPlacements') ||
       changedProperties.has('shift') ||
       changedProperties.has('autoSize') ||
-      changedProperties.has('strategy') ||
       changedProperties.has('anchor');
 
     if (activeChanged) {
@@ -316,7 +298,7 @@ export class HelixPopup extends LitElement {
 
     const { x, y, placement, middlewareData } = await computePosition(anchorEl, popupEl, {
       placement: effectivePlacement,
-      strategy: this.strategy,
+      strategy: 'fixed',
       middleware,
     });
 
@@ -386,7 +368,7 @@ export class HelixPopup extends LitElement {
   override render() {
     return html`
       <slot name="anchor" @slotchange=${this._handleAnchorSlotChange}></slot>
-      <div part="popup">
+      <div part="popup" aria-hidden=${String(!this.active)}>
         <slot></slot>
         ${this.arrow ? html`<div part="arrow"></div>` : ''}
       </div>
