@@ -158,7 +158,7 @@ export class HelixTextarea extends LitElement {
 
   /** @internal */
   @query('.field__textarea')
-  private _textarea: HTMLTextAreaElement | null = null;
+  declare private _textarea: HTMLTextAreaElement | undefined;
 
   // ─── Slot Tracking ───
 
