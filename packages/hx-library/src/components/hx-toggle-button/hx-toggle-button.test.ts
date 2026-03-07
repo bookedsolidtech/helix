@@ -1,5 +1,5 @@
 import { describe, it, expect, afterEach } from 'vitest';
-import { page } from '@vitest/browser/context';
+import { page, userEvent } from '@vitest/browser/context';
 import { fixture, shadowQuery, oneEvent, cleanup, checkA11y } from '../../test-utils.js';
 import type { HelixToggleButton } from './hx-toggle-button.js';
 import './index.js';
@@ -278,7 +278,7 @@ describe('hx-toggle-button', () => {
       const btn = shadowQuery<HTMLButtonElement>(el, 'button')!;
       btn.focus();
       const eventPromise = oneEvent<CustomEvent<{ pressed: boolean }>>(el, 'hx-toggle');
-      await page.keyboard.press('Space');
+      await userEvent.keyboard('{Space}');
       const event = await eventPromise;
       expect(event).toBeTruthy();
       expect(event.detail.pressed).toBe(true);
@@ -289,7 +289,7 @@ describe('hx-toggle-button', () => {
       const btn = shadowQuery<HTMLButtonElement>(el, 'button')!;
       btn.focus();
       const eventPromise = oneEvent<CustomEvent<{ pressed: boolean }>>(el, 'hx-toggle');
-      await page.keyboard.press('Enter');
+      await userEvent.keyboard('{Enter}');
       const event = await eventPromise;
       expect(event).toBeTruthy();
       expect(event.detail.pressed).toBe(true);
