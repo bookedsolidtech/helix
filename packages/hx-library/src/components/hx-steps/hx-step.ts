@@ -1,4 +1,4 @@
-import { LitElement, html, nothing } from 'lit';
+import { LitElement, html } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { tokenStyles } from '@helix/tokens/lit';
 import { helixStepStyles } from './hx-step.styles.js';
@@ -57,6 +57,13 @@ export class HelixStep extends LitElement {
   @property({ type: String, reflect: true })
   description = '';
 
+  /**
+   * Whether the step is disabled and non-interactive.
+   * @attr disabled
+   */
+  @property({ type: Boolean, reflect: true })
+  disabled = false;
+
   // ─── Internal Properties (set by parent hx-steps) ───
 
   /**
@@ -87,11 +94,51 @@ export class HelixStep extends LitElement {
     if (!this.hasAttribute('role')) {
       this.setAttribute('role', 'listitem');
     }
+    this.setAttribute('tabindex', this.disabled ? '-1' : '0');
+    this.addEventListener('keydown', this._handleKeydown);
+  }
+
+  override disconnectedCallback(): void {
+    super.disconnectedCallback();
+    this.removeEventListener('keydown', this._handleKeydown);
+  }
+
+  override updated(changedProperties: Map<string, unknown>): void {
+    super.updated(changedProperties);
+    if (changedProperties.has('status')) {
+      if (this.status === 'active') {
+        this.setAttribute('aria-current', 'step');
+      } else {
+        this.removeAttribute('aria-current');
+      }
+    }
+    if (changedProperties.has('disabled')) {
+      if (this.disabled) {
+        this.setAttribute('tabindex', '-1');
+        this.setAttribute('aria-disabled', 'true');
+      } else {
+        this.setAttribute('tabindex', '0');
+        this.removeAttribute('aria-disabled');
+      }
+    }
   }
 
   // ─── Event Handling ───
 
+  /** @internal */
+  private _handleKeydown = (event: KeyboardEvent): void => {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      this._handleClick();
+    }
+  };
+
+  /** @internal */
   private _handleClick(): void {
+    if (this.disabled) {
+      return;
+    }
+
     /**
      * Internal event dispatched to signal step click to the parent container.
      * @internal
@@ -106,6 +153,7 @@ export class HelixStep extends LitElement {
 
   // ─── Render Helpers ───
 
+  /** @internal */
   private _renderCheckmark() {
     return html`
       <svg
@@ -122,6 +170,7 @@ export class HelixStep extends LitElement {
     `;
   }
 
+  /** @internal */
   private _renderXMark() {
     return html`
       <svg
@@ -137,6 +186,7 @@ export class HelixStep extends LitElement {
     `;
   }
 
+  /** @internal */
   private _renderIndicatorContent() {
     if (this.status === 'complete') {
       return this._renderCheckmark();
@@ -150,14 +200,10 @@ export class HelixStep extends LitElement {
   // ─── Render ───
 
   override render() {
-    const isActive = this.status === 'active';
-
     return html`
       <div part="base" class="step" @click=${this._handleClick}>
         <div class="step__track">
-          <div part="indicator" class="step__indicator" aria-current=${isActive ? 'step' : nothing}>
-            ${this._renderIndicatorContent()}
-          </div>
+          <div part="indicator" class="step__indicator">${this._renderIndicatorContent()}</div>
           <div part="connector" class="step__connector" aria-hidden="true"></div>
         </div>
         <div class="step__label-area">

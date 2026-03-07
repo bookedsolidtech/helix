@@ -211,28 +211,28 @@ describe('hx-step', () => {
       expect(el.getAttribute('status')).toBe('active');
     });
 
-    it('sets aria-current="step" on indicator when active', async () => {
+    it('sets aria-current="step" on host when active', async () => {
       const el = await fixture<HelixStep>('<hx-step label="Test" status="active"></hx-step>');
-      const indicator = shadowQuery(el, '[part~="indicator"]');
-      expect(indicator?.getAttribute('aria-current')).toBe('step');
+      await el.updateComplete;
+      expect(el.getAttribute('aria-current')).toBe('step');
     });
 
     it('does not set aria-current when pending', async () => {
       const el = await fixture<HelixStep>('<hx-step label="Test" status="pending"></hx-step>');
-      const indicator = shadowQuery(el, '[part~="indicator"]');
-      expect(indicator?.hasAttribute('aria-current')).toBe(false);
+      await el.updateComplete;
+      expect(el.hasAttribute('aria-current')).toBe(false);
     });
 
     it('does not set aria-current when complete', async () => {
       const el = await fixture<HelixStep>('<hx-step label="Test" status="complete"></hx-step>');
-      const indicator = shadowQuery(el, '[part~="indicator"]');
-      expect(indicator?.hasAttribute('aria-current')).toBe(false);
+      await el.updateComplete;
+      expect(el.hasAttribute('aria-current')).toBe(false);
     });
 
     it('does not set aria-current when error', async () => {
       const el = await fixture<HelixStep>('<hx-step label="Test" status="error"></hx-step>');
-      const indicator = shadowQuery(el, '[part~="indicator"]');
-      expect(indicator?.hasAttribute('aria-current')).toBe(false);
+      await el.updateComplete;
+      expect(el.hasAttribute('aria-current')).toBe(false);
     });
 
     it('renders checkmark SVG when complete', async () => {
@@ -302,6 +302,84 @@ describe('hx-step', () => {
       );
       const icon = el.querySelector('[slot="icon"]');
       expect(icon).toBeTruthy();
+    });
+  });
+
+  // ─── Property: disabled ───
+
+  describe('Property: disabled', () => {
+    it('reflects disabled attr to host', async () => {
+      const el = await fixture<HelixStep>('<hx-step label="Test" status="pending" disabled></hx-step>');
+      expect(el.getAttribute('disabled')).not.toBeNull();
+    });
+
+    it('sets aria-disabled="true" when disabled', async () => {
+      const el = await fixture<HelixStep>('<hx-step label="Test" status="pending" disabled></hx-step>');
+      await el.updateComplete;
+      expect(el.getAttribute('aria-disabled')).toBe('true');
+    });
+
+    it('sets tabindex="-1" when disabled', async () => {
+      const el = await fixture<HelixStep>('<hx-step label="Test" status="pending" disabled></hx-step>');
+      await el.updateComplete;
+      expect(el.getAttribute('tabindex')).toBe('-1');
+    });
+
+    it('does not fire hx-step-click-internal when disabled', async () => {
+      const el = await fixture<HelixStep>('<hx-step label="Test" status="pending" disabled></hx-step>');
+      let fired = false;
+      el.addEventListener('hx-step-click-internal', () => { fired = true; });
+      el.shadowRoot?.querySelector('.step')?.dispatchEvent(new MouseEvent('click', { bubbles: true, composed: true }));
+      expect(fired).toBe(false);
+    });
+  });
+
+  // ─── Keyboard Navigation ───
+
+  describe('Keyboard Navigation', () => {
+    it('has tabindex="0" by default', async () => {
+      const el = await fixture<HelixStep>('<hx-step label="Test" status="pending"></hx-step>');
+      expect(el.getAttribute('tabindex')).toBe('0');
+    });
+
+    it('fires hx-step-click-internal on Enter key', async () => {
+      const el = await fixture<HelixStep>('<hx-step label="Test" status="pending"></hx-step>');
+      let fired = false;
+      el.addEventListener('hx-step-click-internal', () => { fired = true; });
+      el.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
+      expect(fired).toBe(true);
+    });
+
+    it('fires hx-step-click-internal on Space key', async () => {
+      const el = await fixture<HelixStep>('<hx-step label="Test" status="pending"></hx-step>');
+      let fired = false;
+      el.addEventListener('hx-step-click-internal', () => { fired = true; });
+      el.dispatchEvent(new KeyboardEvent('keydown', { key: ' ', bubbles: true }));
+      expect(fired).toBe(true);
+    });
+
+    it('does not fire on other keys', async () => {
+      const el = await fixture<HelixStep>('<hx-step label="Test" status="pending"></hx-step>');
+      let fired = false;
+      el.addEventListener('hx-step-click-internal', () => { fired = true; });
+      el.dispatchEvent(new KeyboardEvent('keydown', { key: 'Tab', bubbles: true }));
+      expect(fired).toBe(false);
+    });
+  });
+
+  // ─── aria-current ───
+
+  describe('aria-current on host', () => {
+    it('sets aria-current="step" on host when active', async () => {
+      const el = await fixture<HelixStep>('<hx-step label="Test" status="active"></hx-step>');
+      await el.updateComplete;
+      expect(el.getAttribute('aria-current')).toBe('step');
+    });
+
+    it('removes aria-current from host when not active', async () => {
+      const el = await fixture<HelixStep>('<hx-step label="Test" status="pending"></hx-step>');
+      await el.updateComplete;
+      expect(el.hasAttribute('aria-current')).toBe(false);
     });
   });
 
