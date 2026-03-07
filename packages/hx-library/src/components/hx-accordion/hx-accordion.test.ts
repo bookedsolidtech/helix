@@ -63,6 +63,67 @@ describe('hx-accordion', () => {
       expect(el.getAttribute('mode')).toBe('multi');
     });
   });
+
+  // ─── Single mode initial enforcement (1) ───
+
+  describe('Single mode initial enforcement', () => {
+    it('enforces only first expanded item when multiple are expanded in single mode', async () => {
+      const el = await fixture<HelixAccordion>(`
+        <hx-accordion mode="single">
+          <hx-accordion-item expanded>
+            <span slot="trigger">Item 1</span>
+            <p>Content 1</p>
+          </hx-accordion-item>
+          <hx-accordion-item expanded>
+            <span slot="trigger">Item 2</span>
+            <p>Content 2</p>
+          </hx-accordion-item>
+        </hx-accordion>
+      `);
+
+      await el.updateComplete;
+      const items = el.querySelectorAll<HelixAccordionItem>('hx-accordion-item');
+      expect(items[0].expanded).toBe(true);
+      expect(items[1].expanded).toBe(false);
+    });
+  });
+
+  // ─── Sibling collapse events (1) ───
+
+  describe('Sibling collapse events', () => {
+    it('dispatches hx-collapse for siblings collapsed in single mode', async () => {
+      const el = await fixture<HelixAccordion>(`
+        <hx-accordion mode="single">
+          <hx-accordion-item expanded>
+            <span slot="trigger">Item 1</span>
+            <p>Content 1</p>
+          </hx-accordion-item>
+          <hx-accordion-item>
+            <span slot="trigger">Item 2</span>
+            <p>Content 2</p>
+          </hx-accordion-item>
+        </hx-accordion>
+      `);
+
+      const items = el.querySelectorAll<HelixAccordionItem>('hx-accordion-item');
+      await items[0].updateComplete;
+      await items[1].updateComplete;
+
+      let collapseCount = 0;
+      items[0].addEventListener('hx-collapse', () => {
+        collapseCount++;
+      });
+
+      // Expand second item — first should collapse AND dispatch hx-collapse
+      const summary2 = shadowQuery<HTMLElement>(items[1], 'summary')!;
+      summary2.click();
+      await items[1].updateComplete;
+      await items[0].updateComplete;
+
+      expect(items[0].expanded).toBe(false);
+      expect(collapseCount).toBe(1);
+    });
+  });
 });
 
 describe('hx-accordion-item', () => {
@@ -318,7 +379,7 @@ describe('hx-accordion-item', () => {
     });
   });
 
-  // ─── Keyboard navigation (2) ───
+  // ─── Keyboard navigation (4) ───
 
   describe('Keyboard navigation', () => {
     it('Enter key toggles accordion item', async () => {
@@ -351,6 +412,30 @@ describe('hx-accordion-item', () => {
       await userEvent.keyboard(' ');
       await eventPromise;
       expect(el.expanded).toBe(true);
+    });
+
+    it('disabled items are removed from tab order', async () => {
+      const el = await fixture<HelixAccordionItem>(`
+        <hx-accordion-item disabled>
+          <span slot="trigger">Title</span>
+          <p>Content</p>
+        </hx-accordion-item>
+      `);
+
+      const summary = shadowQuery<HTMLElement>(el, 'summary')!;
+      expect(summary.getAttribute('tabindex')).toBe('-1');
+    });
+
+    it('enabled items have tabindex 0', async () => {
+      const el = await fixture<HelixAccordionItem>(`
+        <hx-accordion-item>
+          <span slot="trigger">Title</span>
+          <p>Content</p>
+        </hx-accordion-item>
+      `);
+
+      const summary = shadowQuery<HTMLElement>(el, 'summary')!;
+      expect(summary.getAttribute('tabindex')).toBe('0');
     });
   });
 
