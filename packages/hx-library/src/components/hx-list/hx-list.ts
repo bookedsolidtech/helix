@@ -159,19 +159,20 @@ export class HelixList extends LitElement {
 
     if (isNumbered) {
       return html`
-        <ol
+        <div
           part="base"
+          role="list"
           class="list list--${this.variant}"
           aria-label=${ifDefined(this.label)}
           @hx-list-item-click=${this._handleItemClick}
         >
           ${slot}
-        </ol>
+        </div>
       `;
     }
 
     return html`
-      <ul
+      <div
         part="base"
         class="list list--${this.variant}"
         role=${isInteractive ? 'listbox' : 'list'}
@@ -180,7 +181,7 @@ export class HelixList extends LitElement {
         @hx-list-item-click=${this._handleItemClick}
       >
         ${slot}
-      </ul>
+      </div>
     `;
   }
 }
