@@ -22,6 +22,7 @@ import type { HelixMenuItem } from './hx-menu-item.js';
  * @cssprop [--hx-menu-bg=var(--hx-color-neutral-0)] - Menu background color.
  * @cssprop [--hx-menu-border-color=var(--hx-color-neutral-200)] - Menu border color.
  * @cssprop [--hx-menu-border-radius=var(--hx-border-radius-md)] - Menu border radius.
+ * @cssprop [--hx-menu-shadow] - Menu box shadow.
  * @cssprop [--hx-menu-min-width=10rem] - Minimum menu width.
  */
 @customElement('hx-menu')
@@ -29,6 +30,10 @@ export class HelixMenu extends LitElement {
   static override styles = [tokenStyles, helixMenuStyles];
 
   private _focusedIndex = -1;
+
+  private _typeaheadBuffer = '';
+
+  private _typeaheadTimeout: ReturnType<typeof setTimeout> | undefined;
 
   private _getItems(): HelixMenuItem[] {
     return Array.from(this.querySelectorAll<HelixMenuItem>('hx-menu-item')).filter(
@@ -98,6 +103,28 @@ export class HelixMenu extends LitElement {
         e.preventDefault();
         this.dispatchEvent(new CustomEvent('hx-close', { bubbles: true, composed: true }));
         break;
+      default:
+        if (e.key.length === 1 && e.key !== ' ' && !e.ctrlKey && !e.metaKey && !e.altKey) {
+          this._handleTypeahead(e.key, items);
+        }
+        break;
+    }
+  }
+
+  private _handleTypeahead(char: string, items: HelixMenuItem[]): void {
+    clearTimeout(this._typeaheadTimeout);
+    this._typeaheadBuffer += char.toLowerCase();
+    this._typeaheadTimeout = setTimeout(() => {
+      this._typeaheadBuffer = '';
+    }, 500);
+
+    const match = items.findIndex((item) => {
+      const text = item.textContent?.trim().toLowerCase() ?? '';
+      return text.startsWith(this._typeaheadBuffer);
+    });
+
+    if (match !== -1) {
+      this._focusItem(match);
     }
   }
 
