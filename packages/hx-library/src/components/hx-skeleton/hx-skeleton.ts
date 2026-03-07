@@ -20,18 +20,11 @@ import { helixSkeletonStyles } from './hx-skeleton.styles.js';
  * @cssprop [--hx-skeleton-duration=1.5s] - Shimmer animation duration.
  * @cssprop [--hx-skeleton-text-radius=var(--hx-border-radius-full)] - Border radius for text variant.
  * @cssprop [--hx-skeleton-rect-radius=var(--hx-border-radius-sm)] - Border radius for rect variant.
- * @cssprop [--hx-skeleton-circle-radius=50%] - Border radius for circle variant.
  * @cssprop [--hx-skeleton-button-radius=var(--hx-border-radius-md)] - Border radius for button variant.
  */
 @customElement('hx-skeleton')
 export class HelixSkeleton extends LitElement {
   static override styles = [tokenStyles, helixSkeletonStyles];
-
-  override connectedCallback(): void {
-    super.connectedCallback();
-    this.setAttribute('aria-hidden', 'true');
-    this.setAttribute('role', 'presentation');
-  }
 
   /**
    * Shape variant of the skeleton placeholder.
