@@ -175,9 +175,7 @@ export const Decorative: Story = {
   args: {
     src: 'https://picsum.photos/seed/decorative/800/400',
   },
-  render: (args) => html`
-    <hx-image src=${args.src} decorative style="width: 400px;"></hx-image>
-  `,
+  render: (args) => html` <hx-image src=${args.src} decorative style="width: 400px;"></hx-image> `,
   play: async ({ canvasElement }) => {
     const img = canvasElement.querySelector('hx-image');
     await expect(img).toBeTruthy();
