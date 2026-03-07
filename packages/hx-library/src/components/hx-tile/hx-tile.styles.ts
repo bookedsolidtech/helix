@@ -65,9 +65,9 @@ export const helixTileStyles = css`
   /* ─── Selected ─── */
 
   .tile--selected {
-    border-color: var(--hx-color-primary-500, #2563eb);
+    border-color: var(--hx-tile-selected-border-color, var(--hx-color-primary-500, #2563eb));
     border-width: var(--hx-border-width-medium, 2px);
-    background-color: var(--hx-color-primary-50, #eff6ff);
+    background-color: var(--hx-tile-selected-bg, var(--hx-color-primary-50, #eff6ff));
   }
 
   /* ─── Disabled ─── */
@@ -117,5 +117,21 @@ export const helixTileStyles = css`
 
   [hidden] {
     display: none !important;
+  }
+
+  /* ─── Motion safety ─── */
+
+  @media (prefers-reduced-motion: reduce) {
+    .tile {
+      transition: none;
+    }
+
+    .tile--interactive:hover {
+      transform: none;
+    }
+
+    .tile--interactive:active {
+      transform: none;
+    }
   }
 `;
