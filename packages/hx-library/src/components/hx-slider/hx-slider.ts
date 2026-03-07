@@ -12,6 +12,12 @@ import { helixSliderStyles } from './hx-slider.styles.js';
  * Supports tick marks, value display, range labels, and native form participation
  * via ElementInternals.
  *
+ * The native `<input type="range">` receives `role="slider"` with `aria-valuenow`,
+ * `aria-valuemin`, and `aria-valuemax`. Label association uses `aria-labelledby`
+ * when a label is present, or `aria-label` as a fallback. Help text is linked via
+ * `aria-describedby`. Keyboard navigation follows the native range behavior:
+ * Arrow keys increment/decrement by step, Home jumps to min, End jumps to max.
+ *
  * @summary Form-associated range slider with label, ticks, and value display.
  *
  * @tag hx-slider
@@ -48,8 +54,10 @@ export class HelixSlider extends LitElement {
 
   // ─── Form Association ───
 
+  /** Enables native form participation via ElementInternals. */
   static formAssociated = true;
 
+  /** ElementInternals instance for form value, validity, and label association. */
   private _internals: ElementInternals;
 
   constructor() {
@@ -138,20 +146,28 @@ export class HelixSlider extends LitElement {
 
   // ─── Internal State ───
 
+  /** Whether the label slot has assigned content. */
   @state() private _hasLabelSlot = false;
+  /** Whether the min-label slot has assigned content. */
   @state() private _hasMinLabelSlot = false;
+  /** Whether the max-label slot has assigned content. */
   @state() private _hasMaxLabelSlot = false;
+  /** Whether the help slot has assigned content. */
   @state() private _hasHelpSlot = false;
 
   // ─── Internal References ───
 
+  /** Reference to the native range `<input>` inside shadow DOM. */
   @query('.slider__input')
   private _input!: HTMLInputElement;
 
   // ─── Unique IDs ───
 
+  /** Unique ID for the native range input element. */
   private readonly _sliderId = `hx-slider-${Math.random().toString(36).slice(2, 9)}`;
+  /** Unique ID for the label element, derived from _sliderId. */
   private readonly _labelId = `${this._sliderId}-label`;
+  /** Unique ID for the help text element, derived from _sliderId. */
   private readonly _helpId = `${this._sliderId}-help`;
 
   // ─── Computed Values ───
