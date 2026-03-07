@@ -627,9 +627,17 @@ export const WithLabelSlot: Story = {
   name: 'With Label Slot (Drupal Form API)',
   render: () => html`
     <hx-number-input .value=${250} .min=${0} .max=${1000} name="dosage">
-      <label slot="label" style="font-size: 0.875rem; font-weight: 500; color: var(--hx-color-neutral-700, #374151);">
+      <label
+        slot="label"
+        style="font-size: 0.875rem; font-weight: 500; color: var(--hx-color-neutral-700, #374151);"
+      >
         Dosage (mg)
-        <span aria-hidden="true" style="color: var(--hx-color-error-500, #dc3545); font-weight: 700;"> *</span>
+        <span
+          aria-hidden="true"
+          style="color: var(--hx-color-error-500, #dc3545); font-weight: 700;"
+        >
+          *</span
+        >
       </label>
     </hx-number-input>
   `,
@@ -647,9 +655,17 @@ export const DrupalFormAPI: Story = {
   name: 'Drupal Form API (All Slots)',
   render: () => html`
     <hx-number-input .value=${null} name="dosage" required>
-      <label slot="label" style="font-size: 0.875rem; font-weight: 500; color: var(--hx-color-neutral-700, #374151);">
+      <label
+        slot="label"
+        style="font-size: 0.875rem; font-weight: 500; color: var(--hx-color-neutral-700, #374151);"
+      >
         Dosage (mg)
-        <span aria-hidden="true" style="color: var(--hx-color-error-500, #dc3545); font-weight: 700;"> *</span>
+        <span
+          aria-hidden="true"
+          style="color: var(--hx-color-error-500, #dc3545); font-weight: 700;"
+        >
+          *</span
+        >
       </label>
       <div
         slot="error"
