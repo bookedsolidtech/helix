@@ -73,7 +73,7 @@ export const helixTileStyles = css`
   /* ─── Disabled ─── */
 
   .tile--disabled {
-    opacity: 0.5;
+    opacity: var(--hx-opacity-disabled, 0.5);
     cursor: not-allowed;
     pointer-events: none;
   }
@@ -84,7 +84,7 @@ export const helixTileStyles = css`
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: var(--hx-tile-icon-size, 2.5rem);
+    font-size: var(--hx-tile-icon-size, var(--hx-size-icon-lg, 2.5rem));
     line-height: 1;
   }
 
