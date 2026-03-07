@@ -62,7 +62,7 @@ export const helixFieldStyles = css`
 
   .field__help-text {
     font-size: var(--hx-font-size-xs, 0.75rem);
-    color: var(--hx-field-help-text-color, var(--hx-color-neutral-500, #6b7280));
+    color: var(--hx-color-neutral-500, #6b7280);
     line-height: var(--hx-line-height-normal, 1.5);
   }
 
