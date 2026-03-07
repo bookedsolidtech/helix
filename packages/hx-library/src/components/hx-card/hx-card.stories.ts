@@ -35,7 +35,7 @@ const meta = {
         type: { summary: "'flat' | 'raised' | 'floating'" },
       },
     },
-    wcHref: {
+    hxHref: {
       control: 'text',
       description:
         'Optional URL. When set, the card becomes interactive (clickable) and navigates to this URL on click.',
@@ -49,13 +49,13 @@ const meta = {
   args: {
     variant: 'default',
     elevation: 'flat',
-    wcHref: '',
+    hxHref: '',
   },
   render: (args) => html`
     <hx-card
       variant=${args.variant}
       elevation=${args.elevation}
-      hx-href=${args.wcHref || ''}
+      hx-href=${args.hxHref || ''}
       style="max-width: 400px;"
     >
       <span slot="heading">Patient Overview</span>
@@ -302,7 +302,7 @@ const cardClickHandler = fn();
 
 export const Interactive: Story = {
   args: {
-    wcHref: 'https://ehr.example.com/patient/12345',
+    hxHref: 'https://ehr.example.com/patient/12345',
   },
   render: () => html`
     <hx-card
@@ -852,7 +852,7 @@ export const InteractiveClickTest: Story = {
     await expect(interactiveClickHandler).toHaveBeenCalledTimes(1);
 
     const callDetail = interactiveClickHandler.mock.calls[0]?.[0]?.detail;
-    await expect(callDetail?.url).toBe('https://ehr.example.com/patient/67890');
+    await expect(callDetail?.href).toBe('https://ehr.example.com/patient/67890');
   },
 };
 
