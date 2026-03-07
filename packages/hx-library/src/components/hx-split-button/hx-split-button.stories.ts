@@ -138,12 +138,7 @@ export const Danger: Story = {
     label: 'Delete Record',
   },
   render: (args) => html`
-    <hx-split-button
-      variant=${args.variant}
-      hx-size=${args.size}
-      ?disabled=${args.disabled}
-      .label=${args.label}
-    >
+    <hx-split-button variant=${args.variant} hx-size=${args.size} ?disabled=${args.disabled}>
       <hx-menu-item slot="menu" value="archive">Archive Record</hx-menu-item>
       <hx-menu-item slot="menu" value="flag">Flag for Review</hx-menu-item>
       <hx-menu-item slot="menu" value="delete-all">Delete All Related</hx-menu-item>
@@ -231,12 +226,7 @@ export const MenuItemDisabled: Story = {
     label: 'Save Record',
   },
   render: (args) => html`
-    <hx-split-button
-      variant=${args.variant}
-      hx-size=${args.size}
-      ?disabled=${args.disabled}
-      .label=${args.label}
-    >
+    <hx-split-button variant=${args.variant} hx-size=${args.size} ?disabled=${args.disabled}>
       <hx-menu-item slot="menu" value="save-draft">Save as Draft</hx-menu-item>
       <hx-menu-item slot="menu" value="save-publish" disabled>
         Save &amp; Publish (Unavailable)
