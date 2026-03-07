@@ -18,6 +18,13 @@ export const helixStepStyles = css`
     cursor: pointer;
   }
 
+  /* ─── Focus ─── */
+
+  :host(:focus-visible) .step__indicator {
+    outline: 2px solid var(--hx-color-primary-500, #2563eb);
+    outline-offset: 2px;
+  }
+
   /* ─── Track (indicator + connector) ─── */
 
   .step__track {
@@ -136,6 +143,20 @@ export const helixStepStyles = css`
     color: var(--hx-color-error-700, #b91c1c);
   }
 
+  /* ─── Status: disabled ─── */
+
+  :host([disabled]) .step {
+    cursor: not-allowed;
+    opacity: 0.5;
+    pointer-events: none;
+  }
+
+  :host([disabled]) .step__indicator {
+    border-color: var(--hx-color-neutral-300, #cbd5e1);
+    background-color: var(--hx-color-neutral-100, #f1f5f9);
+    color: var(--hx-color-neutral-400, #94a3b8);
+  }
+
   /* ─── Vertical Layout ─── */
 
   :host([orientation='vertical']) {
@@ -172,5 +193,45 @@ export const helixStepStyles = css`
 
   :host([orientation='vertical']:last-child) .step__label-area {
     padding-bottom: 0;
+  }
+
+  /* ─── Dark Mode ─── */
+
+  @media (prefers-color-scheme: dark) {
+    .step__indicator {
+      background-color: var(--hx-color-neutral-800, #1e293b);
+      border-color: var(--hx-color-neutral-600, #475569);
+      color: var(--hx-color-neutral-300, #cbd5e1);
+    }
+
+    .step__connector {
+      background-color: var(--hx-color-neutral-700, #334155);
+    }
+
+    .step__label {
+      color: var(--hx-color-neutral-300, #cbd5e1);
+    }
+
+    .step__description {
+      color: var(--hx-color-neutral-400, #94a3b8);
+    }
+
+    :host([status='active']) .step__label {
+      color: var(--hx-color-primary-300, #93c5fd);
+    }
+
+    :host([status='complete']) .step__label {
+      color: var(--hx-color-neutral-200, #e2e8f0);
+    }
+
+    :host([status='error']) .step__label {
+      color: var(--hx-color-error-300, #fca5a5);
+    }
+
+    :host([disabled]) .step__indicator {
+      background-color: var(--hx-color-neutral-900, #0f172a);
+      border-color: var(--hx-color-neutral-700, #334155);
+      color: var(--hx-color-neutral-600, #475569);
+    }
   }
 `;
