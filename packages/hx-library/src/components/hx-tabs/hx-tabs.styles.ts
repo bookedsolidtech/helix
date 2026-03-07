@@ -42,10 +42,20 @@ export const helixTabsStyles = css`
 
   /* ─── Vertical Orientation ─── */
 
+  :host([orientation='vertical']) {
+    --_tab-indicator-bottom: 0px;
+    --_tab-indicator-end: var(--hx-tabs-indicator-size, 2px);
+    --_tab-indicator-bottom-color: transparent;
+    --_tab-indicator-end-color: var(
+      --hx-tabs-indicator-color,
+      var(--hx-color-primary-500, #2563eb)
+    );
+  }
+
   :host([orientation='vertical']) .tablist {
     flex-direction: column;
     border-bottom: none;
-    border-right: var(--hx-tabs-border-width, 1px) solid
+    border-inline-end: var(--hx-tabs-border-width, 1px) solid
       var(--hx-tabs-border-color, var(--hx-color-neutral-200, #e9ecef));
     overflow-x: visible;
     overflow-y: auto;
