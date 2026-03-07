@@ -57,8 +57,7 @@ const meta = {
     icon: {
       control: { type: 'select' },
       options: ['vertical', 'horizontal'],
-      description:
-        'Icon orientation: vertical (kebab ⋮) or horizontal (meatball ···).',
+      description: 'Icon orientation: vertical (kebab ⋮) or horizontal (meatball ···).',
       table: {
         category: 'Visual',
         defaultValue: { summary: 'vertical' },
@@ -107,7 +106,7 @@ export const Default: Story = {
     const el = canvasElement.querySelector('hx-overflow-menu');
     await expect(el).toBeTruthy();
 
-    const triggerBtn = el?.shadowRoot?.querySelector('[part="button"]') as HTMLElement | null;
+    const triggerBtn = el?.shadowRoot?.querySelector('[part~="button"]') as HTMLElement | null;
     await expect(triggerBtn).toBeTruthy();
 
     let showFired = false;
@@ -119,7 +118,7 @@ export const Default: Story = {
     await expect(showFired).toBe(true);
 
     // Panel should be present after open
-    const panel = el?.shadowRoot?.querySelector('[part="panel"]');
+    const panel = el?.shadowRoot?.querySelector('[part~="panel"]');
     await expect(panel).toBeTruthy();
   },
 };
@@ -188,7 +187,9 @@ export const Disabled: Story = {
     const el = canvasElement.querySelector('hx-overflow-menu');
     await expect(el).toBeTruthy();
 
-    const triggerBtn = el?.shadowRoot?.querySelector('[part="button"]') as HTMLButtonElement | null;
+    const triggerBtn = el?.shadowRoot?.querySelector(
+      '[part~="button"]',
+    ) as HTMLButtonElement | null;
     await expect(triggerBtn).toBeTruthy();
     await expect(triggerBtn?.disabled).toBe(true);
 
@@ -221,7 +222,7 @@ export const SelectEvent: Story = {
     const selectSpy = fn();
     el?.addEventListener('hx-select', selectSpy);
 
-    const triggerBtn = el?.shadowRoot?.querySelector('[part="button"]') as HTMLElement | null;
+    const triggerBtn = el?.shadowRoot?.querySelector('[part~="button"]') as HTMLElement | null;
     await userEvent.click(triggerBtn!);
 
     const slot = el?.shadowRoot?.querySelector('slot') as HTMLSlotElement | null;
@@ -279,9 +280,7 @@ export const ManyItems: Story = {
 
 export const PatientRowActions: Story = {
   render: () => html`
-    <table
-      style="border-collapse: collapse; width: 100%; max-width: 640px; font-size: 0.875rem;"
-    >
+    <table style="border-collapse: collapse; width: 100%; max-width: 640px; font-size: 0.875rem;">
       <thead>
         <tr style="background: #f9fafb; border-bottom: 2px solid #e5e7eb;">
           <th style="padding: 0.75rem 1rem; text-align: left; font-weight: 600; color: #374151;">
@@ -290,9 +289,7 @@ export const PatientRowActions: Story = {
           <th style="padding: 0.75rem 1rem; text-align: left; font-weight: 600; color: #374151;">
             Ward
           </th>
-          <th
-            style="padding: 0.75rem 1rem; text-align: right; font-weight: 600; color: #374151;"
-          >
+          <th style="padding: 0.75rem 1rem; text-align: right; font-weight: 600; color: #374151;">
             Actions
           </th>
         </tr>
@@ -328,7 +325,90 @@ export const PatientRowActions: Story = {
 };
 
 // ─────────────────────────────────────────────────
-// 10. ESCAPE KEY closes panel
+// 10. ICON ITEMS — menu items with leading SVG icon content
+// ─────────────────────────────────────────────────
+
+export const WithIconItems: Story = {
+  render: () => html`
+    <div style="display: flex; justify-content: center; padding: 4rem 2rem;">
+      <hx-overflow-menu>
+        <button role="menuitem" style="display: flex; align-items: center; gap: 0.5rem;">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            aria-hidden="true"
+          >
+            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+          </svg>
+          Edit record
+        </button>
+        <button role="menuitem" style="display: flex; align-items: center; gap: 0.5rem;">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            aria-hidden="true"
+          >
+            <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+          </svg>
+          Duplicate
+        </button>
+        <button role="menuitem" style="display: flex; align-items: center; gap: 0.5rem;">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            aria-hidden="true"
+          >
+            <polyline points="21 8 21 21 3 21 3 8" />
+            <rect x="1" y="3" width="22" height="5" />
+            <line x1="10" y1="12" x2="14" y2="12" />
+          </svg>
+          Archive
+        </button>
+        <button
+          role="menuitem"
+          style="display: flex; align-items: center; gap: 0.5rem; color: #dc2626;"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            aria-hidden="true"
+          >
+            <polyline points="3 6 5 6 21 6" />
+            <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
+            <path d="M10 11v6M14 11v6" />
+            <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" />
+          </svg>
+          Delete
+        </button>
+      </hx-overflow-menu>
+    </div>
+  `,
+};
+
+// ─────────────────────────────────────────────────
+// 11. ESCAPE KEY closes panel
 // ─────────────────────────────────────────────────
 
 export const KeyboardEscape: Story = {
@@ -349,16 +429,16 @@ export const KeyboardEscape: Story = {
       hideFired = true;
     });
 
-    const triggerBtn = el?.shadowRoot?.querySelector('[part="button"]') as HTMLElement | null;
+    const triggerBtn = el?.shadowRoot?.querySelector('[part~="button"]') as HTMLElement | null;
     await userEvent.click(triggerBtn!);
 
-    const panel = el?.shadowRoot?.querySelector('[part="panel"]');
+    const panel = el?.shadowRoot?.querySelector('[part~="panel"]');
     await expect(panel).toBeTruthy();
 
     await userEvent.keyboard('{Escape}');
     await expect(hideFired).toBe(true);
 
-    const panelAfter = el?.shadowRoot?.querySelector('[part="panel"]');
+    const panelAfter = el?.shadowRoot?.querySelector('[part~="panel"]');
     await expect(panelAfter).toBeNull();
   },
 };
