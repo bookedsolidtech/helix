@@ -142,17 +142,27 @@ export class HelixDataTable extends LitElement {
   override willUpdate(changed: Map<string, unknown>): void {
     // Coerce JSON strings to arrays — this is the Drupal/Twig integration path.
     // Lit does not JSON-parse array attributes automatically, so we do it here.
-    if (changed.has('columns') && typeof (this.columns as unknown) === 'string') {
-      try {
-        this.columns = JSON.parse(this.columns as unknown as string) as HxDataTableColumn[];
-      } catch {
+    // Note: Lit's defaultConverter returns null (not a string) when JSON.parse fails for
+    // type: Array — so we guard against both string and any non-array value.
+    if (changed.has('columns')) {
+      if (typeof (this.columns as unknown) === 'string') {
+        try {
+          this.columns = JSON.parse(this.columns as unknown as string) as HxDataTableColumn[];
+        } catch {
+          this.columns = [];
+        }
+      } else if (!Array.isArray(this.columns)) {
         this.columns = [];
       }
     }
-    if (changed.has('rows') && typeof (this.rows as unknown) === 'string') {
-      try {
-        this.rows = JSON.parse(this.rows as unknown as string) as Record<string, unknown>[];
-      } catch {
+    if (changed.has('rows')) {
+      if (typeof (this.rows as unknown) === 'string') {
+        try {
+          this.rows = JSON.parse(this.rows as unknown as string) as Record<string, unknown>[];
+        } catch {
+          this.rows = [];
+        }
+      } else if (!Array.isArray(this.rows)) {
         this.rows = [];
       }
     }
