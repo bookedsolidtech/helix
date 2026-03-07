@@ -347,12 +347,7 @@ export const AllStates: Story = {
         format="12h"
       ></hx-time-picker>
 
-      <hx-time-picker
-        label="Required Field"
-        step="30"
-        format="12h"
-        required
-      ></hx-time-picker>
+      <hx-time-picker label="Required Field" step="30" format="12h" required></hx-time-picker>
 
       <hx-time-picker
         label="Error State"
@@ -383,7 +378,7 @@ export const FormatComparison: Story = {
     <div style="display: flex; gap: 2rem; flex-wrap: wrap; max-width: 760px;">
       <div style="flex: 1; min-width: 280px;">
         <p
-          style="margin: 0 0 0.5rem; font-size: 0.75rem; font-weight: 600; color: #6c757d; text-transform: uppercase; letter-spacing: 0.05em;"
+          style="margin: 0 0 0.5rem; font-size: 0.75rem; font-weight: 600; color: var(--hx-color-neutral-500); text-transform: uppercase; letter-spacing: 0.05em;"
         >
           12-Hour Format (default)
         </p>
@@ -397,7 +392,7 @@ export const FormatComparison: Story = {
       </div>
       <div style="flex: 1; min-width: 280px;">
         <p
-          style="margin: 0 0 0.5rem; font-size: 0.75rem; font-weight: 600; color: #6c757d; text-transform: uppercase; letter-spacing: 0.05em;"
+          style="margin: 0 0 0.5rem; font-size: 0.75rem; font-weight: 600; color: var(--hx-color-neutral-500); text-transform: uppercase; letter-spacing: 0.05em;"
         >
           24-Hour Format
         </p>
@@ -436,10 +431,7 @@ export const WithHelpSlot: Story = {
   name: 'With Help Slot',
   render: () => html`
     <hx-time-picker label="Procedure Start Time" step="15" format="12h" min="07:00" max="19:00">
-      <div
-        slot="help"
-        style="font-size: 0.75rem; color: var(--hx-color-neutral-500, #6c757d);"
-      >
+      <div slot="help" style="font-size: 0.75rem; color: var(--hx-color-neutral-500, #6c757d);">
         Select the scheduled start time for this procedure. Times are shown in 15-minute intervals.
       </div>
     </hx-time-picker>
@@ -483,7 +475,7 @@ export const CSSCustomProperties: Story = {
     <div style="display: flex; flex-direction: column; gap: 2rem; max-width: 360px;">
       <div>
         <p
-          style="margin: 0 0 0.5rem; font-size: 0.75rem; color: #6c757d; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;"
+          style="margin: 0 0 0.5rem; font-size: 0.75rem; color: var(--hx-color-neutral-500); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;"
         >
           Default (all tokens at defaults)
         </p>
@@ -492,7 +484,7 @@ export const CSSCustomProperties: Story = {
 
       <div>
         <p
-          style="margin: 0 0 0.5rem; font-size: 0.75rem; color: #6c757d; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;"
+          style="margin: 0 0 0.5rem; font-size: 0.75rem; color: var(--hx-color-neutral-500); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;"
         >
           Custom border radius + border color
         </p>
@@ -500,13 +492,13 @@ export const CSSCustomProperties: Story = {
           label="Rounded Picker"
           step="30"
           format="12h"
-          style="--hx-time-picker-border-radius: 9999px; --hx-time-picker-border-color: #2563EB;"
+          style="--hx-time-picker-border-radius: 9999px; --hx-time-picker-border-color: var(--hx-color-primary-600);"
         ></hx-time-picker>
       </div>
 
       <div>
         <p
-          style="margin: 0 0 0.5rem; font-size: 0.75rem; color: #6c757d; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;"
+          style="margin: 0 0 0.5rem; font-size: 0.75rem; color: var(--hx-color-neutral-500); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;"
         >
           Dark surface
         </p>
@@ -515,20 +507,20 @@ export const CSSCustomProperties: Story = {
           step="30"
           format="12h"
           style="
-            --hx-time-picker-bg: #1e293b;
-            --hx-time-picker-color: #f1f5f9;
-            --hx-time-picker-border-color: #334155;
-            --hx-time-picker-label-color: #94a3b8;
-            --hx-time-picker-chevron-color: #94a3b8;
-            --hx-time-picker-listbox-bg: #1e293b;
-            --hx-time-picker-option-color: #f1f5f9;
+            --hx-time-picker-bg: var(--hx-color-neutral-900);
+            --hx-time-picker-color: var(--hx-color-neutral-50);
+            --hx-time-picker-border-color: var(--hx-color-neutral-700);
+            --hx-time-picker-label-color: var(--hx-color-neutral-300);
+            --hx-time-picker-chevron-color: var(--hx-color-neutral-300);
+            --hx-time-picker-listbox-bg: var(--hx-color-neutral-900);
+            --hx-time-picker-option-color: var(--hx-color-neutral-50);
           "
         ></hx-time-picker>
       </div>
 
       <div>
         <p
-          style="margin: 0 0 0.5rem; font-size: 0.75rem; color: #6c757d; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;"
+          style="margin: 0 0 0.5rem; font-size: 0.75rem; color: var(--hx-color-neutral-500); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;"
         >
           Custom focus ring color (click to focus)
         </p>
@@ -536,13 +528,13 @@ export const CSSCustomProperties: Story = {
           label="Green Focus Ring"
           step="30"
           format="12h"
-          style="--hx-time-picker-focus-ring-color: #198754;"
+          style="--hx-time-picker-focus-ring-color: var(--hx-color-success-600);"
         ></hx-time-picker>
       </div>
 
       <div>
         <p
-          style="margin: 0 0 0.5rem; font-size: 0.75rem; color: #6c757d; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;"
+          style="margin: 0 0 0.5rem; font-size: 0.75rem; color: var(--hx-color-neutral-500); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;"
         >
           Custom error color
         </p>
@@ -551,7 +543,7 @@ export const CSSCustomProperties: Story = {
           error="Invalid time selection."
           step="30"
           format="12h"
-          style="--hx-time-picker-error-color: #dc6502;"
+          style="--hx-time-picker-error-color: var(--hx-color-warning-600);"
         ></hx-time-picker>
       </div>
     </div>
@@ -567,7 +559,7 @@ export const CSSParts: Story = {
   render: () => html`
     <style>
       .css-parts-demo hx-time-picker::part(label) {
-        color: #0d6efd;
+        color: var(--hx-color-primary-600);
         font-weight: 700;
         text-transform: uppercase;
         letter-spacing: 0.05em;
@@ -576,13 +568,13 @@ export const CSSParts: Story = {
 
       .css-parts-demo hx-time-picker::part(input) {
         font-weight: 500;
-        color: #212529;
+        color: var(--hx-color-neutral-900);
       }
 
       .css-parts-demo hx-time-picker::part(listbox) {
-        border: 2px solid #0d6efd;
+        border: 2px solid var(--hx-color-primary-600);
         border-radius: 0.5rem;
-        box-shadow: 0 4px 12px rgba(13, 110, 253, 0.15);
+        box-shadow: 0 4px 12px color-mix(in srgb, var(--hx-color-primary-600) 15%, transparent);
       }
 
       .css-parts-demo hx-time-picker::part(option) {
@@ -595,9 +587,7 @@ export const CSSParts: Story = {
       style="display: flex; flex-direction: column; gap: 1.5rem; max-width: 360px;"
     >
       <div>
-        <p
-          style="margin: 0 0 0.5rem; font-size: 0.875rem; color: #6c757d;"
-        >
+        <p style="margin: 0 0 0.5rem; font-size: 0.875rem; color: var(--hx-color-neutral-500);">
           Parts styled: label, input, listbox, option
         </p>
         <hx-time-picker
@@ -747,13 +737,13 @@ export const InAForm: Story = {
       <div style="display: flex; gap: 0.75rem; margin-top: 0.5rem;">
         <button
           type="submit"
-          style="padding: 0.5rem 1rem; background: #2563EB; color: white; border: none; border-radius: 0.375rem; cursor: pointer; font-size: 0.875rem;"
+          style="padding: 0.5rem 1rem; background: var(--hx-color-primary-600); color: var(--hx-color-neutral-0); border: none; border-radius: 0.375rem; cursor: pointer; font-size: 0.875rem;"
         >
           Schedule Appointment
         </button>
         <button
           type="reset"
-          style="padding: 0.5rem 1rem; background: transparent; color: #6c757d; border: 1px solid #dee2e6; border-radius: 0.375rem; cursor: pointer; font-size: 0.875rem;"
+          style="padding: 0.5rem 1rem; background: transparent; color: var(--hx-color-neutral-500); border: 1px solid var(--hx-color-neutral-200); border-radius: 0.375rem; cursor: pointer; font-size: 0.875rem;"
         >
           Reset
         </button>
@@ -772,13 +762,15 @@ export const SurgerySchedule: Story = {
     <div
       style="
       padding: 1.5rem;
-      border: 1px solid #dee2e6;
+      border: 1px solid var(--hx-color-neutral-200);
       border-radius: 0.5rem;
       max-width: 400px;
-      background: #fff;
+      background: var(--hx-color-neutral-0);
     "
     >
-      <h3 style="margin: 0 0 1rem; font-size: 1rem; font-weight: 600; color: #212529;">
+      <h3
+        style="margin: 0 0 1rem; font-size: 1rem; font-weight: 600; color: var(--hx-color-neutral-900);"
+      >
         OR Scheduling
       </h3>
       <div style="display: flex; flex-direction: column; gap: 1rem;">
@@ -820,13 +812,15 @@ export const MedicationSchedule: Story = {
     <div
       style="
       padding: 1.5rem;
-      border: 1px solid #dee2e6;
+      border: 1px solid var(--hx-color-neutral-200);
       border-radius: 0.5rem;
       max-width: 400px;
-      background: #fff;
+      background: var(--hx-color-neutral-0);
     "
     >
-      <h3 style="margin: 0 0 1rem; font-size: 1rem; font-weight: 600; color: #212529;">
+      <h3
+        style="margin: 0 0 1rem; font-size: 1rem; font-weight: 600; color: var(--hx-color-neutral-900);"
+      >
         Medication Administration Times
       </h3>
       <div style="display: flex; flex-direction: column; gap: 1rem;">
@@ -867,13 +861,15 @@ export const ShiftHandoff: Story = {
     <div
       style="
       padding: 1.5rem;
-      border: 1px solid #dee2e6;
+      border: 1px solid var(--hx-color-neutral-200);
       border-radius: 0.5rem;
       max-width: 400px;
-      background: #fff;
+      background: var(--hx-color-neutral-0);
     "
     >
-      <h3 style="margin: 0 0 1rem; font-size: 1rem; font-weight: 600; color: #212529;">
+      <h3
+        style="margin: 0 0 1rem; font-size: 1rem; font-weight: 600; color: var(--hx-color-neutral-900);"
+      >
         Nursing Shift Times
       </h3>
       <div style="display: flex; flex-direction: column; gap: 1rem;">
