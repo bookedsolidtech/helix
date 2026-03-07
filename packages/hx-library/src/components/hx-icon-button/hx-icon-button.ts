@@ -93,10 +93,8 @@ export class HelixIconButton extends LitElement {
 
   // ─── Form Association via ElementInternals ───
 
-  /** Opts the element into form association via the Custom Elements API. */
   static formAssociated = true;
 
-  /** @internal ElementInternals instance for form participation. */
   private _internals: ElementInternals;
 
   constructor() {
