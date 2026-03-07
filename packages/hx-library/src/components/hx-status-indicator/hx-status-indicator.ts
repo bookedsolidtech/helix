@@ -18,12 +18,26 @@ const STATUS_LABELS: Record<StatusIndicatorStatus, string> = {
  * A colored dot/badge indicating system or entity health status.
  * Purely visual — no slots. Supports an animated pulse ring.
  *
+ * Uses `role="img"` with an auto-generated `aria-label` (e.g. "Status: Online").
+ * Set `aria-hidden="true"` on the host when status is conveyed by adjacent text.
+ *
  * @summary Status indicator dot component.
  *
  * @tag hx-status-indicator
  *
  * @csspart base - The dot element.
  * @csspart pulse-ring - The animated pulse ring element.
+ *
+ * @cssproperty [--hx-status-indicator-color-online] - Override color for the "online" status dot.
+ * @cssproperty [--hx-status-indicator-color-offline] - Override color for the "offline" status dot.
+ * @cssproperty [--hx-status-indicator-color-away] - Override color for the "away" status dot.
+ * @cssproperty [--hx-status-indicator-color-busy] - Override color for the "busy" status dot.
+ * @cssproperty [--hx-status-indicator-color-unknown] - Override color for the "unknown" status dot.
+ * @cssproperty [--hx-status-indicator-size-sm] - Override size for the "sm" variant.
+ * @cssproperty [--hx-status-indicator-size-md] - Override size for the "md" variant.
+ * @cssproperty [--hx-status-indicator-size-lg] - Override size for the "lg" variant.
+ * @cssproperty [--hx-status-indicator-pulse-duration] - Override pulse animation duration.
+ * @cssproperty [--hx-status-indicator-pulse-scale] - Override pulse animation max scale.
  */
 @customElement('hx-status-indicator')
 export class HelixStatusIndicator extends LitElement {
