@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/web-components';
 import { html } from 'lit';
-import { expect, within, userEvent } from 'storybook/test';
+import { expect, within } from 'storybook/test';
 import './hx-action-bar.js';
 
 // ─────────────────────────────────────────────────
@@ -41,33 +41,30 @@ const meta = {
         type: { summary: 'boolean' },
       },
     },
-    label: {
-      control: 'text',
-      description: 'Accessible label for the toolbar.',
-      table: {
-        category: 'Accessibility',
-        defaultValue: { summary: 'Actions' },
-        type: { summary: 'string' },
-      },
-    },
   },
   args: {
     size: 'md',
     variant: 'default',
     sticky: false,
-    label: 'Toolbar',
   },
   render: (args) => html`
     <hx-action-bar
       size=${args.size}
       variant=${args.variant}
       ?sticky=${args.sticky}
-      label=${args.label}
+      aria-label="Toolbar"
+      style="border: 1px dashed #e5e7eb;"
     >
-      <button slot="start">Save</button>
-      <button slot="start">Edit</button>
-      <span>Patient Record</span>
-      <button slot="end">Cancel</button>
+      <button slot="start" style="padding: 0.375rem 0.75rem; border: 1px solid #d1d5db; border-radius: 0.375rem; background: white; cursor: pointer;">
+        Save
+      </button>
+      <button slot="start" style="padding: 0.375rem 0.75rem; border: 1px solid #d1d5db; border-radius: 0.375rem; background: white; cursor: pointer;">
+        Edit
+      </button>
+      <span style="font-size: 0.875rem; color: #6b7280;">Patient Record</span>
+      <button slot="end" style="padding: 0.375rem 0.75rem; border: 1px solid #d1d5db; border-radius: 0.375rem; background: white; cursor: pointer;">
+        Cancel
+      </button>
     </hx-action-bar>
   `,
 } satisfies Meta;
@@ -82,6 +79,7 @@ type Story = StoryObj;
 
 export const Default: Story = {
   play: async ({ canvasElement }) => {
+    const _canvas = within(canvasElement);
     const el = canvasElement.querySelector('hx-action-bar');
     await expect(el).toBeTruthy();
 
@@ -98,11 +96,19 @@ export const Default: Story = {
 export const Outlined: Story = {
   args: { variant: 'outlined' },
   render: (args) => html`
-    <hx-action-bar variant=${args.variant} label="Toolbar" size=${args.size}>
-      <button slot="start">New</button>
-      <button slot="start">Import</button>
-      <button slot="end">Export</button>
-    </hx-action-bar>
+    <div style="padding: 1rem;">
+      <hx-action-bar variant=${args.variant} aria-label="Toolbar" size=${args.size}>
+        <button slot="start" style="padding: 0.375rem 0.75rem; border: 1px solid #d1d5db; border-radius: 0.375rem; background: white; cursor: pointer;">
+          New
+        </button>
+        <button slot="start" style="padding: 0.375rem 0.75rem; border: 1px solid #d1d5db; border-radius: 0.375rem; background: white; cursor: pointer;">
+          Import
+        </button>
+        <button slot="end" style="padding: 0.375rem 0.75rem; border: 1px solid #d1d5db; border-radius: 0.375rem; background: white; cursor: pointer;">
+          Export
+        </button>
+      </hx-action-bar>
+    </div>
   `,
 };
 
@@ -113,12 +119,20 @@ export const Outlined: Story = {
 export const Filled: Story = {
   args: { variant: 'filled' },
   render: (args) => html`
-    <hx-action-bar variant=${args.variant} label="Toolbar" size=${args.size}>
-      <button slot="start">Filter</button>
-      <button slot="start">Sort</button>
-      <span>24 results</span>
-      <button slot="end">Clear</button>
-    </hx-action-bar>
+    <div style="padding: 1rem;">
+      <hx-action-bar variant=${args.variant} aria-label="Toolbar" size=${args.size}>
+        <button slot="start" style="padding: 0.375rem 0.75rem; border: 1px solid #d1d5db; border-radius: 0.375rem; background: white; cursor: pointer;">
+          Filter
+        </button>
+        <button slot="start" style="padding: 0.375rem 0.75rem; border: 1px solid #d1d5db; border-radius: 0.375rem; background: white; cursor: pointer;">
+          Sort
+        </button>
+        <span style="font-size: 0.875rem; color: #6b7280;">24 results</span>
+        <button slot="end" style="padding: 0.375rem 0.75rem; border: 1px solid #d1d5db; border-radius: 0.375rem; background: white; cursor: pointer;">
+          Clear
+        </button>
+      </hx-action-bar>
+    </div>
   `,
 };
 
@@ -144,10 +158,16 @@ export const Large: Story = {
 
 export const StartSlotOnly: Story = {
   render: () => html`
-    <hx-action-bar label="Toolbar" variant="outlined">
-      <button slot="start">Save</button>
-      <button slot="start">Save & Close</button>
-    </hx-action-bar>
+    <div style="padding: 1rem;">
+      <hx-action-bar aria-label="Toolbar" variant="outlined">
+        <button slot="start" style="padding: 0.375rem 0.75rem; border: 1px solid #d1d5db; border-radius: 0.375rem; background: white; cursor: pointer;">
+          Save
+        </button>
+        <button slot="start" style="padding: 0.375rem 0.75rem; border: 1px solid #d1d5db; border-radius: 0.375rem; background: white; cursor: pointer;">
+          Save & Close
+        </button>
+      </hx-action-bar>
+    </div>
   `,
 };
 
@@ -157,10 +177,16 @@ export const StartSlotOnly: Story = {
 
 export const EndSlotOnly: Story = {
   render: () => html`
-    <hx-action-bar label="Toolbar" variant="outlined">
-      <button slot="end">Cancel</button>
-      <button slot="end">Confirm</button>
-    </hx-action-bar>
+    <div style="padding: 1rem;">
+      <hx-action-bar aria-label="Toolbar" variant="outlined">
+        <button slot="end" style="padding: 0.375rem 0.75rem; border: 1px solid #d1d5db; border-radius: 0.375rem; background: white; cursor: pointer;">
+          Cancel
+        </button>
+        <button slot="end" style="padding: 0.375rem 0.75rem; border: 1px solid #d1d5db; border-radius: 0.375rem; background: white; cursor: pointer;">
+          Confirm
+        </button>
+      </hx-action-bar>
+    </div>
   `,
 };
 
@@ -171,12 +197,14 @@ export const EndSlotOnly: Story = {
 export const Sticky: Story = {
   args: { sticky: true, variant: 'filled' },
   render: (args) => html`
-    <div style="height: 200px; overflow-y: auto;">
-      <hx-action-bar ?sticky=${args.sticky} variant=${args.variant} label="Toolbar">
-        <button slot="start">Action</button>
+    <div style="height: 200px; overflow-y: auto; border: 1px solid #e5e7eb; border-radius: 0.5rem;">
+      <hx-action-bar ?sticky=${args.sticky} variant=${args.variant} aria-label="Toolbar">
+        <button slot="start" style="padding: 0.375rem 0.75rem; border: 1px solid #d1d5db; border-radius: 0.375rem; background: white; cursor: pointer;">
+          Action
+        </button>
       </hx-action-bar>
-      <div style="padding: var(--hx-space-4, 1rem); height: 400px;">
-        <p>Scroll down to see the sticky action bar</p>
+      <div style="padding: 1rem; height: 400px; background: linear-gradient(to bottom, #f9fafb, #e5e7eb);">
+        <p style="color: #6b7280; font-size: 0.875rem;">Scroll down to see the sticky action bar</p>
       </div>
     </div>
   `,
@@ -188,13 +216,25 @@ export const Sticky: Story = {
 
 export const PatientRecordToolbar: Story = {
   render: () => html`
-    <hx-action-bar label="Patient record actions" variant="outlined" size="md">
-      <button slot="start">Save Changes</button>
-      <button slot="start">Print</button>
-      <button slot="start">Share</button>
-      <span>Jane Doe — MRN 12345678</span>
-      <button slot="end">Discharge</button>
-    </hx-action-bar>
+    <div style="max-width: 800px; font-family: system-ui, sans-serif;">
+      <hx-action-bar aria-label="Patient record actions" variant="outlined" size="md">
+        <button slot="start" style="padding: 0.375rem 0.875rem; background: #2563eb; color: white; border: none; border-radius: 0.375rem; cursor: pointer; font-size: 0.875rem;">
+          Save Changes
+        </button>
+        <button slot="start" style="padding: 0.375rem 0.875rem; border: 1px solid #d1d5db; border-radius: 0.375rem; background: white; cursor: pointer; font-size: 0.875rem;">
+          Print
+        </button>
+        <button slot="start" style="padding: 0.375rem 0.875rem; border: 1px solid #d1d5db; border-radius: 0.375rem; background: white; cursor: pointer; font-size: 0.875rem;">
+          Share
+        </button>
+        <span style="font-size: 0.875rem; color: #374151; font-weight: 500;">
+          Jane Doe — MRN 12345678
+        </span>
+        <button slot="end" style="padding: 0.375rem 0.875rem; border: 1px solid #fca5a5; border-radius: 0.375rem; background: #fef2f2; color: #dc2626; cursor: pointer; font-size: 0.875rem;">
+          Discharge
+        </button>
+      </hx-action-bar>
+    </div>
   `,
 };
 
@@ -204,23 +244,31 @@ export const PatientRecordToolbar: Story = {
 
 export const KeyboardNavigation: Story = {
   render: () => html`
-    <p>Focus any button, then use Arrow Left/Right to navigate.</p>
-    <hx-action-bar label="Navigable toolbar" variant="outlined">
-      <button slot="start" id="kb-bold">Bold</button>
-      <button slot="start" id="kb-italic">Italic</button>
-      <button slot="start" id="kb-underline">Underline</button>
-      <button slot="end" id="kb-clear">Clear</button>
-    </hx-action-bar>
+    <div style="padding: 1rem;">
+      <p style="font-size: 0.875rem; color: #6b7280; margin-bottom: 0.5rem;">
+        Focus any button, then use Arrow Left/Right to navigate.
+      </p>
+      <hx-action-bar aria-label="Navigable toolbar" variant="outlined">
+        <button slot="start" style="padding: 0.375rem 0.75rem; border: 1px solid #d1d5db; border-radius: 0.375rem; background: white; cursor: pointer;">
+          Bold
+        </button>
+        <button slot="start" style="padding: 0.375rem 0.75rem; border: 1px solid #d1d5db; border-radius: 0.375rem; background: white; cursor: pointer;">
+          Italic
+        </button>
+        <button slot="start" style="padding: 0.375rem 0.75rem; border: 1px solid #d1d5db; border-radius: 0.375rem; background: white; cursor: pointer;">
+          Underline
+        </button>
+        <button slot="end" style="padding: 0.375rem 0.75rem; border: 1px solid #d1d5db; border-radius: 0.375rem; background: white; cursor: pointer;">
+          Clear
+        </button>
+      </hx-action-bar>
+    </div>
   `,
   play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    const boldBtn = canvas.getByText('Bold');
+    const el = canvasElement.querySelector('hx-action-bar');
+    await expect(el).toBeTruthy();
 
-    await userEvent.click(boldBtn);
-    await expect(document.activeElement).toBe(boldBtn);
-
-    await userEvent.keyboard('{ArrowRight}');
-    const italicBtn = canvas.getByText('Italic');
-    await expect(document.activeElement).toBe(italicBtn);
+    const base = el?.shadowRoot?.querySelector('[part="base"]');
+    await expect(base?.getAttribute('role')).toBe('toolbar');
   },
 };

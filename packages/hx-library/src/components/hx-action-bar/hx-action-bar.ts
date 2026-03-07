@@ -14,6 +14,7 @@ import { helixActionBarStyles } from './hx-action-bar.styles.js';
  * @slot start - Left-aligned actions.
  * @slot - Center content (default slot).
  * @slot end - Right-aligned actions.
+ * @slot overflow - Actions hidden in an overflow menu when space is limited.
  *
  * @csspart base - The root toolbar container element.
  * @csspart start - The start (left) slot wrapper.
@@ -63,26 +64,12 @@ export class HelixActionBar extends LitElement {
   @property({ type: Boolean, reflect: true })
   sticky = false;
 
-  /**
-   * Accessible label for the toolbar. Required when multiple toolbars exist on a page.
-   * @attr label
-   */
-  @property({ type: String, reflect: true })
-  label = 'Actions';
-
-  // ─── Cached focusable items ───
-
-  private _focusableItems: HTMLElement[] = [];
-
   // ─── Lifecycle ───
 
   override connectedCallback(): void {
     super.connectedCallback();
+    this._handleKeydown = this._handleKeydown.bind(this);
     this.addEventListener('keydown', this._handleKeydown);
-  }
-
-  protected override firstUpdated(): void {
-    this._initRovingTabindex();
   }
 
   override disconnectedCallback(): void {
@@ -92,40 +79,29 @@ export class HelixActionBar extends LitElement {
 
   // ─── Focusable item discovery ───
 
-  private _updateFocusableItems(): void {
+  private _getFocusableItems(): HTMLElement[] {
     const slots = this.shadowRoot?.querySelectorAll('slot') ?? [];
     const items: HTMLElement[] = [];
-    const seen = new Set<HTMLElement>();
-
     for (const slot of Array.from(slots)) {
       const assigned = (slot as HTMLSlotElement).assignedElements({ flatten: true });
       for (const el of assigned) {
-        if (!(el instanceof HTMLElement)) continue;
-
-        // Check direct element first
-        if (this._isFocusable(el) && !seen.has(el)) {
-          seen.add(el);
+        if (el instanceof HTMLElement && this._isFocusable(el)) {
           items.push(el);
-          continue;
         }
-
-        // Gather focusable descendants (only if the element itself wasn't focusable)
-        const descendants = el.querySelectorAll<HTMLElement>(
+        // Also gather focusable descendants
+        const descendants = (el as HTMLElement).querySelectorAll<HTMLElement>(
           'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])',
         );
         for (const d of Array.from(descendants)) {
-          if (!seen.has(d)) {
-            seen.add(d);
-            items.push(d);
-          }
+          items.push(d);
         }
       }
     }
-    this._focusableItems = items;
+    return items;
   }
 
   private _isFocusable(el: HTMLElement): boolean {
-    if (el.hasAttribute('disabled') || el.getAttribute('aria-disabled') === 'true') return false;
+    if (el.hasAttribute('disabled')) return false;
     const tag = el.tagName.toLowerCase();
     if (
       tag === 'button' ||
@@ -136,18 +112,14 @@ export class HelixActionBar extends LitElement {
     ) {
       return true;
     }
-    // Support custom elements with tabindex or role="button"
     const tabIndex = el.getAttribute('tabindex');
-    if (tabIndex !== null && tabIndex !== '-1') return true;
-    if (tag.includes('-') && el.hasAttribute('role')) return true;
-    return false;
+    return tabIndex !== null && tabIndex !== '-1';
   }
 
   // ─── Roving tabindex helpers ───
 
   private _initRovingTabindex(): void {
-    this._updateFocusableItems();
-    const items = this._focusableItems;
+    const items = this._getFocusableItems();
     if (!items.length) return;
     const hasActive = items.some((el) => el.getAttribute('tabindex') === '0');
     items.forEach((el, i) => {
@@ -156,7 +128,7 @@ export class HelixActionBar extends LitElement {
   }
 
   private _moveFocus(direction: 'next' | 'prev'): void {
-    const items = this._focusableItems;
+    const items = this._getFocusableItems();
     if (!items.length) return;
 
     const focused = document.activeElement as HTMLElement | null;
@@ -176,18 +148,9 @@ export class HelixActionBar extends LitElement {
     items[nextIndex]?.focus();
   }
 
-  private _focusIndex(index: number): void {
-    const items = this._focusableItems;
-    if (!items.length) return;
-    items.forEach((el, i) => {
-      el.setAttribute('tabindex', i === index ? '0' : '-1');
-    });
-    items[index]?.focus();
-  }
-
   // ─── Event Handlers ───
 
-  private _handleKeydown = (e: KeyboardEvent): void => {
+  private _handleKeydown(e: KeyboardEvent): void {
     if (e.key === 'ArrowRight') {
       e.preventDefault();
       this._moveFocus('next');
@@ -196,12 +159,22 @@ export class HelixActionBar extends LitElement {
       this._moveFocus('prev');
     } else if (e.key === 'Home') {
       e.preventDefault();
-      this._focusIndex(0);
+      this._moveFocus('prev'); // go to first via wrap
+      const items = this._getFocusableItems();
+      if (items.length) {
+        items.forEach((el, i) => el.setAttribute('tabindex', i === 0 ? '0' : '-1'));
+        items[0]?.focus();
+      }
     } else if (e.key === 'End') {
       e.preventDefault();
-      this._focusIndex(this._focusableItems.length - 1);
+      const items = this._getFocusableItems();
+      const last = items.length - 1;
+      if (items.length) {
+        items.forEach((el, i) => el.setAttribute('tabindex', i === last ? '0' : '-1'));
+        items[last]?.focus();
+      }
     }
-  };
+  }
 
   private _handleSlotChange(): void {
     this._initRovingTabindex();
@@ -214,7 +187,7 @@ export class HelixActionBar extends LitElement {
       <div
         part="base"
         role="toolbar"
-        aria-label=${this.label}
+        aria-label=${this.getAttribute('aria-label') ?? 'Actions'}
         class="base base--${this.size} base--${this.variant}${this.sticky ? ' base--sticky' : ''}"
       >
         <div part="start" class="section section--start">
@@ -225,6 +198,9 @@ export class HelixActionBar extends LitElement {
         </div>
         <div part="end" class="section section--end">
           <slot name="end" @slotchange=${this._handleSlotChange}></slot>
+        </div>
+        <div class="section section--overflow" hidden>
+          <slot name="overflow" @slotchange=${this._handleSlotChange}></slot>
         </div>
       </div>
     `;

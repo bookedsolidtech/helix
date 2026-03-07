@@ -520,6 +520,11 @@ export class HelixDatePicker extends LitElement {
   private _handleCalendarKeydown(e: KeyboardEvent): void {
     const { key } = e;
 
+    if (key === 'Tab') {
+      this._handleCalendarTab(e);
+      return;
+    }
+
     if (
       key !== 'ArrowLeft' &&
       key !== 'ArrowRight' &&
@@ -624,71 +629,123 @@ export class HelixDatePicker extends LitElement {
     });
   }
 
+  // ─── Navigation Boundary Checks ───
+
+  private _isPrevMonthDisabled(): boolean {
+    if (!this.min) return false;
+    const firstOfCurrentView = new Date(this._viewYear, this._viewMonth, 1);
+    const minDate = this._parseISODate(this.min);
+    if (!minDate) return false;
+    return firstOfCurrentView <= minDate;
+  }
+
+  private _isNextMonthDisabled(): boolean {
+    if (!this.max) return false;
+    const lastOfCurrentView = new Date(this._viewYear, this._viewMonth + 1, 0);
+    const maxDate = this._parseISODate(this.max);
+    if (!maxDate) return false;
+    return lastOfCurrentView >= maxDate;
+  }
+
+  // ─── Focus Trap ───
+
+  private _handleCalendarTab(e: KeyboardEvent): void {
+    if (e.key !== 'Tab' || !this._isOpen) return;
+
+    const focusableEls = this._calendar?.querySelectorAll<HTMLElement>(
+      'button:not([disabled]), [tabindex="0"]',
+    );
+    if (!focusableEls || focusableEls.length === 0) return;
+
+    const first = focusableEls[0];
+    const last = focusableEls[focusableEls.length - 1];
+
+    if (e.shiftKey) {
+      if (document.activeElement === first || this.shadowRoot?.activeElement === first) {
+        e.preventDefault();
+        last?.focus();
+      }
+    } else {
+      if (document.activeElement === last || this.shadowRoot?.activeElement === last) {
+        e.preventDefault();
+        first?.focus();
+      }
+    }
+  }
+
   // ─── Render Helpers ───
 
   private _renderWeekdayHeaders() {
-    return Array.from(
+    const headers = Array.from(
       { length: 7 },
       (_, i) =>
         html`<div class="calendar__weekday" role="columnheader" aria-label=${this._getDayName(i)}>
           ${this._getDayName(i).slice(0, 2)}
         </div>`,
     );
+    return html`<div class="calendar__row" role="row">${headers}</div>`;
   }
 
   private _renderDayGrid() {
     const cells = this._getDaysInGrid();
     const selectedDate = this._parseISODate(this.value);
 
-    return cells.map((date, index) => {
-      if (date === null) {
+    const rows: ReturnType<typeof html>[] = [];
+
+    for (let rowStart = 0; rowStart < cells.length; rowStart += 7) {
+      const rowCells = cells.slice(rowStart, rowStart + 7).map((date) => {
+        if (date === null) {
+          return html`<div class="calendar__day-cell" role="gridcell"></div>`;
+        }
+
+        const isSelected = selectedDate ? this._isSameDay(date, selectedDate) : false;
+        const isToday = this._isToday(date);
+        const isDisabled = this._isDateDisabled(date);
+        const isFocused = this._focusedDay === date.getDate();
+        const dayNumber = date.getDate();
+
+        const ariaLabel = date.toLocaleDateString(this.locale, {
+          weekday: 'long',
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric',
+        });
+
+        const dayClasses = {
+          calendar__day: true,
+          'calendar__day--selected': isSelected,
+          'calendar__day--today': isToday,
+          'calendar__day--disabled': isDisabled,
+        };
+
         return html`<div
           class="calendar__day-cell"
           role="gridcell"
-          aria-hidden="true"
-          key=${index}
-        ></div>`;
-      }
-
-      const isSelected = selectedDate ? this._isSameDay(date, selectedDate) : false;
-      const isToday = this._isToday(date);
-      const isDisabled = this._isDateDisabled(date);
-      const isFocused = this._focusedDay === date.getDate();
-      const dayNumber = date.getDate();
-
-      const ariaLabel = date.toLocaleDateString(this.locale, {
-        weekday: 'long',
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric',
+          aria-selected=${isSelected ? 'true' : 'false'}
+        >
+          <button
+            part="day"
+            class=${classMap(dayClasses)}
+            type="button"
+            data-day=${dayNumber}
+            aria-label=${ariaLabel}
+            aria-disabled=${isDisabled ? 'true' : nothing}
+            aria-current=${isToday ? 'date' : nothing}
+            tabindex=${isFocused ? '0' : '-1'}
+            ?disabled=${isDisabled}
+            @click=${() => {
+              this._selectDay(date);
+            }}
+          >
+            ${dayNumber}
+          </button>
+        </div>`;
       });
 
-      const dayClasses = {
-        calendar__day: true,
-        'calendar__day--selected': isSelected,
-        'calendar__day--today': isToday,
-        'calendar__day--disabled': isDisabled,
-      };
+      rows.push(html`<div class="calendar__row" role="row">${rowCells}</div>`);
+    }
 
-      return html`<div class="calendar__day-cell" role="gridcell">
-        <button
-          part="day"
-          class=${classMap(dayClasses)}
-          type="button"
-          data-day=${dayNumber}
-          aria-label=${ariaLabel}
-          aria-pressed=${isSelected ? 'true' : 'false'}
-          aria-disabled=${isDisabled ? 'true' : nothing}
-          tabindex=${isFocused ? '0' : '-1'}
-          ?disabled=${isDisabled}
-          @click=${() => {
-            this._selectDay(date);
-          }}
-        >
-          ${dayNumber}
-        </button>
-      </div>`;
-    });
+    return rows;
   }
 
   // ─── Render ───
@@ -735,7 +792,6 @@ export class HelixDatePicker extends LitElement {
             class="field__input"
             id=${this._inputId}
             type="text"
-            role="combobox"
             readonly
             .value=${live(displayValue)}
             placeholder=${ifDefined(this.format || undefined)}
@@ -748,8 +804,6 @@ export class HelixDatePicker extends LitElement {
             aria-describedby=${ifDefined(describedBy)}
             aria-required=${this.required ? 'true' : nothing}
             aria-haspopup="dialog"
-            aria-expanded=${this._isOpen ? 'true' : 'false'}
-            aria-controls=${this._calendarId}
             @click=${this._openCalendar}
           />
           <button
@@ -812,6 +866,7 @@ export class HelixDatePicker extends LitElement {
                     class="calendar__nav-btn"
                     type="button"
                     aria-label="Previous month"
+                    ?disabled=${this._isPrevMonthDisabled()}
                     @click=${this._prevMonth}
                   >
                     &#8249;
@@ -823,6 +878,7 @@ export class HelixDatePicker extends LitElement {
                     class="calendar__nav-btn"
                     type="button"
                     aria-label="Next month"
+                    ?disabled=${this._isNextMonthDisabled()}
                     @click=${this._nextMonth}
                   >
                     &#8250;
@@ -841,13 +897,7 @@ export class HelixDatePicker extends LitElement {
         <slot name="error" @slotchange=${this._handleErrorSlotChange}>
           ${this.error
             ? html`
-                <div
-                  part="error"
-                  class="field__error"
-                  id=${this._errorId}
-                  role="alert"
-                  aria-live="polite"
-                >
+                <div part="error" class="field__error" id=${this._errorId} role="alert">
                   ${this.error}
                 </div>
               `
