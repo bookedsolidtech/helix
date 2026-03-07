@@ -129,7 +129,6 @@ export const helixNumberInputStyles = css`
   }
 
   .field__input[type='number'] {
-    -moz-appearance: textfield;
     appearance: textfield;
   }
 
@@ -163,7 +162,6 @@ export const helixNumberInputStyles = css`
     justify-content: center;
     background: transparent;
     border: none;
-    outline: none;
     cursor: pointer;
     color: var(--hx-color-neutral-600);
     padding: 0;
@@ -183,6 +181,11 @@ export const helixNumberInputStyles = css`
   .field__stepper-btn:hover:not(:disabled) {
     background-color: var(--hx-color-neutral-50);
     color: var(--hx-color-neutral-800);
+  }
+
+  /* Suppress focus ring for mouse/touch focus; keep for keyboard and programmatic focus */
+  .field__stepper-btn:focus:not(:focus-visible) {
+    outline: none;
   }
 
   .field__stepper-btn:focus-visible {
