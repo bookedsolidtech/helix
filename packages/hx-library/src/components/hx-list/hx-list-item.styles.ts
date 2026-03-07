@@ -26,20 +26,20 @@ export const helixListItemStyles = css`
     width: 100%;
   }
 
-  /* ─── Interactive items (replaces :host-context for Firefox support) ─── */
+  /* ─── Interactive items ─── */
 
-  .list-item--interactive {
+  :host-context(hx-list[variant='interactive']) .list-item {
     cursor: pointer;
     border-radius: var(--hx-border-radius-md, 0.375rem);
     transition: background-color var(--hx-transition-fast, 150ms ease);
     outline: none;
   }
 
-  .list-item--interactive:hover:not(.list-item--disabled) {
+  :host-context(hx-list[variant='interactive']) .list-item:hover:not(.list-item--disabled) {
     background-color: var(--hx-list-item-bg-hover, var(--hx-color-neutral-50, #f8fafc));
   }
 
-  .list-item--interactive:focus-visible {
+  :host-context(hx-list[variant='interactive']) .list-item:focus-visible {
     outline: var(--hx-focus-ring-width, 2px) solid var(--hx-focus-ring-color, #2563eb);
     outline-offset: var(--hx-focus-ring-offset, 2px);
   }
@@ -98,7 +98,7 @@ export const helixListItemStyles = css`
   .list-item__description {
     display: block;
     font-size: var(--hx-font-size-sm, 0.875rem);
-    color: var(--hx-list-item-description-color, var(--hx-color-neutral-500, #64748b));
+    color: var(--hx-color-neutral-500, #64748b);
     margin-top: var(--hx-space-1, 0.25rem);
   }
 `;
