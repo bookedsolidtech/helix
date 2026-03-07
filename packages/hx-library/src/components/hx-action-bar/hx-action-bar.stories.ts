@@ -55,14 +55,23 @@ const meta = {
       aria-label="Toolbar"
       style="border: 1px dashed #e5e7eb;"
     >
-      <button slot="start" style="padding: 0.375rem 0.75rem; border: 1px solid #d1d5db; border-radius: 0.375rem; background: white; cursor: pointer;">
+      <button
+        slot="start"
+        style="padding: 0.375rem 0.75rem; border: 1px solid #d1d5db; border-radius: 0.375rem; background: white; cursor: pointer;"
+      >
         Save
       </button>
-      <button slot="start" style="padding: 0.375rem 0.75rem; border: 1px solid #d1d5db; border-radius: 0.375rem; background: white; cursor: pointer;">
+      <button
+        slot="start"
+        style="padding: 0.375rem 0.75rem; border: 1px solid #d1d5db; border-radius: 0.375rem; background: white; cursor: pointer;"
+      >
         Edit
       </button>
       <span style="font-size: 0.875rem; color: #6b7280;">Patient Record</span>
-      <button slot="end" style="padding: 0.375rem 0.75rem; border: 1px solid #d1d5db; border-radius: 0.375rem; background: white; cursor: pointer;">
+      <button
+        slot="end"
+        style="padding: 0.375rem 0.75rem; border: 1px solid #d1d5db; border-radius: 0.375rem; background: white; cursor: pointer;"
+      >
         Cancel
       </button>
     </hx-action-bar>
@@ -98,13 +107,22 @@ export const Outlined: Story = {
   render: (args) => html`
     <div style="padding: 1rem;">
       <hx-action-bar variant=${args.variant} aria-label="Toolbar" size=${args.size}>
-        <button slot="start" style="padding: 0.375rem 0.75rem; border: 1px solid #d1d5db; border-radius: 0.375rem; background: white; cursor: pointer;">
+        <button
+          slot="start"
+          style="padding: 0.375rem 0.75rem; border: 1px solid #d1d5db; border-radius: 0.375rem; background: white; cursor: pointer;"
+        >
           New
         </button>
-        <button slot="start" style="padding: 0.375rem 0.75rem; border: 1px solid #d1d5db; border-radius: 0.375rem; background: white; cursor: pointer;">
+        <button
+          slot="start"
+          style="padding: 0.375rem 0.75rem; border: 1px solid #d1d5db; border-radius: 0.375rem; background: white; cursor: pointer;"
+        >
           Import
         </button>
-        <button slot="end" style="padding: 0.375rem 0.75rem; border: 1px solid #d1d5db; border-radius: 0.375rem; background: white; cursor: pointer;">
+        <button
+          slot="end"
+          style="padding: 0.375rem 0.75rem; border: 1px solid #d1d5db; border-radius: 0.375rem; background: white; cursor: pointer;"
+        >
           Export
         </button>
       </hx-action-bar>
@@ -121,14 +139,23 @@ export const Filled: Story = {
   render: (args) => html`
     <div style="padding: 1rem;">
       <hx-action-bar variant=${args.variant} aria-label="Toolbar" size=${args.size}>
-        <button slot="start" style="padding: 0.375rem 0.75rem; border: 1px solid #d1d5db; border-radius: 0.375rem; background: white; cursor: pointer;">
+        <button
+          slot="start"
+          style="padding: 0.375rem 0.75rem; border: 1px solid #d1d5db; border-radius: 0.375rem; background: white; cursor: pointer;"
+        >
           Filter
         </button>
-        <button slot="start" style="padding: 0.375rem 0.75rem; border: 1px solid #d1d5db; border-radius: 0.375rem; background: white; cursor: pointer;">
+        <button
+          slot="start"
+          style="padding: 0.375rem 0.75rem; border: 1px solid #d1d5db; border-radius: 0.375rem; background: white; cursor: pointer;"
+        >
           Sort
         </button>
         <span style="font-size: 0.875rem; color: #6b7280;">24 results</span>
-        <button slot="end" style="padding: 0.375rem 0.75rem; border: 1px solid #d1d5db; border-radius: 0.375rem; background: white; cursor: pointer;">
+        <button
+          slot="end"
+          style="padding: 0.375rem 0.75rem; border: 1px solid #d1d5db; border-radius: 0.375rem; background: white; cursor: pointer;"
+        >
           Clear
         </button>
       </hx-action-bar>
@@ -160,10 +187,16 @@ export const StartSlotOnly: Story = {
   render: () => html`
     <div style="padding: 1rem;">
       <hx-action-bar aria-label="Toolbar" variant="outlined">
-        <button slot="start" style="padding: 0.375rem 0.75rem; border: 1px solid #d1d5db; border-radius: 0.375rem; background: white; cursor: pointer;">
+        <button
+          slot="start"
+          style="padding: 0.375rem 0.75rem; border: 1px solid #d1d5db; border-radius: 0.375rem; background: white; cursor: pointer;"
+        >
           Save
         </button>
-        <button slot="start" style="padding: 0.375rem 0.75rem; border: 1px solid #d1d5db; border-radius: 0.375rem; background: white; cursor: pointer;">
+        <button
+          slot="start"
+          style="padding: 0.375rem 0.75rem; border: 1px solid #d1d5db; border-radius: 0.375rem; background: white; cursor: pointer;"
+        >
           Save & Close
         </button>
       </hx-action-bar>
@@ -179,10 +212,16 @@ export const EndSlotOnly: Story = {
   render: () => html`
     <div style="padding: 1rem;">
       <hx-action-bar aria-label="Toolbar" variant="outlined">
-        <button slot="end" style="padding: 0.375rem 0.75rem; border: 1px solid #d1d5db; border-radius: 0.375rem; background: white; cursor: pointer;">
+        <button
+          slot="end"
+          style="padding: 0.375rem 0.75rem; border: 1px solid #d1d5db; border-radius: 0.375rem; background: white; cursor: pointer;"
+        >
           Cancel
         </button>
-        <button slot="end" style="padding: 0.375rem 0.75rem; border: 1px solid #d1d5db; border-radius: 0.375rem; background: white; cursor: pointer;">
+        <button
+          slot="end"
+          style="padding: 0.375rem 0.75rem; border: 1px solid #d1d5db; border-radius: 0.375rem; background: white; cursor: pointer;"
+        >
           Confirm
         </button>
       </hx-action-bar>
@@ -199,11 +238,16 @@ export const Sticky: Story = {
   render: (args) => html`
     <div style="height: 200px; overflow-y: auto; border: 1px solid #e5e7eb; border-radius: 0.5rem;">
       <hx-action-bar ?sticky=${args.sticky} variant=${args.variant} aria-label="Toolbar">
-        <button slot="start" style="padding: 0.375rem 0.75rem; border: 1px solid #d1d5db; border-radius: 0.375rem; background: white; cursor: pointer;">
+        <button
+          slot="start"
+          style="padding: 0.375rem 0.75rem; border: 1px solid #d1d5db; border-radius: 0.375rem; background: white; cursor: pointer;"
+        >
           Action
         </button>
       </hx-action-bar>
-      <div style="padding: 1rem; height: 400px; background: linear-gradient(to bottom, #f9fafb, #e5e7eb);">
+      <div
+        style="padding: 1rem; height: 400px; background: linear-gradient(to bottom, #f9fafb, #e5e7eb);"
+      >
         <p style="color: #6b7280; font-size: 0.875rem;">Scroll down to see the sticky action bar</p>
       </div>
     </div>
@@ -218,19 +262,31 @@ export const PatientRecordToolbar: Story = {
   render: () => html`
     <div style="max-width: 800px; font-family: system-ui, sans-serif;">
       <hx-action-bar aria-label="Patient record actions" variant="outlined" size="md">
-        <button slot="start" style="padding: 0.375rem 0.875rem; background: #2563eb; color: white; border: none; border-radius: 0.375rem; cursor: pointer; font-size: 0.875rem;">
+        <button
+          slot="start"
+          style="padding: 0.375rem 0.875rem; background: #2563eb; color: white; border: none; border-radius: 0.375rem; cursor: pointer; font-size: 0.875rem;"
+        >
           Save Changes
         </button>
-        <button slot="start" style="padding: 0.375rem 0.875rem; border: 1px solid #d1d5db; border-radius: 0.375rem; background: white; cursor: pointer; font-size: 0.875rem;">
+        <button
+          slot="start"
+          style="padding: 0.375rem 0.875rem; border: 1px solid #d1d5db; border-radius: 0.375rem; background: white; cursor: pointer; font-size: 0.875rem;"
+        >
           Print
         </button>
-        <button slot="start" style="padding: 0.375rem 0.875rem; border: 1px solid #d1d5db; border-radius: 0.375rem; background: white; cursor: pointer; font-size: 0.875rem;">
+        <button
+          slot="start"
+          style="padding: 0.375rem 0.875rem; border: 1px solid #d1d5db; border-radius: 0.375rem; background: white; cursor: pointer; font-size: 0.875rem;"
+        >
           Share
         </button>
         <span style="font-size: 0.875rem; color: #374151; font-weight: 500;">
           Jane Doe — MRN 12345678
         </span>
-        <button slot="end" style="padding: 0.375rem 0.875rem; border: 1px solid #fca5a5; border-radius: 0.375rem; background: #fef2f2; color: #dc2626; cursor: pointer; font-size: 0.875rem;">
+        <button
+          slot="end"
+          style="padding: 0.375rem 0.875rem; border: 1px solid #fca5a5; border-radius: 0.375rem; background: #fef2f2; color: #dc2626; cursor: pointer; font-size: 0.875rem;"
+        >
           Discharge
         </button>
       </hx-action-bar>
@@ -249,16 +305,28 @@ export const KeyboardNavigation: Story = {
         Focus any button, then use Arrow Left/Right to navigate.
       </p>
       <hx-action-bar aria-label="Navigable toolbar" variant="outlined">
-        <button slot="start" style="padding: 0.375rem 0.75rem; border: 1px solid #d1d5db; border-radius: 0.375rem; background: white; cursor: pointer;">
+        <button
+          slot="start"
+          style="padding: 0.375rem 0.75rem; border: 1px solid #d1d5db; border-radius: 0.375rem; background: white; cursor: pointer;"
+        >
           Bold
         </button>
-        <button slot="start" style="padding: 0.375rem 0.75rem; border: 1px solid #d1d5db; border-radius: 0.375rem; background: white; cursor: pointer;">
+        <button
+          slot="start"
+          style="padding: 0.375rem 0.75rem; border: 1px solid #d1d5db; border-radius: 0.375rem; background: white; cursor: pointer;"
+        >
           Italic
         </button>
-        <button slot="start" style="padding: 0.375rem 0.75rem; border: 1px solid #d1d5db; border-radius: 0.375rem; background: white; cursor: pointer;">
+        <button
+          slot="start"
+          style="padding: 0.375rem 0.75rem; border: 1px solid #d1d5db; border-radius: 0.375rem; background: white; cursor: pointer;"
+        >
           Underline
         </button>
-        <button slot="end" style="padding: 0.375rem 0.75rem; border: 1px solid #d1d5db; border-radius: 0.375rem; background: white; cursor: pointer;">
+        <button
+          slot="end"
+          style="padding: 0.375rem 0.75rem; border: 1px solid #d1d5db; border-radius: 0.375rem; background: white; cursor: pointer;"
+        >
           Clear
         </button>
       </hx-action-bar>

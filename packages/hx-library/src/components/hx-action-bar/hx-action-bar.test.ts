@@ -67,7 +67,9 @@ describe('hx-action-bar', () => {
     });
 
     it('reflects variant attribute to host', async () => {
-      const el = await fixture<HelixActionBar>('<hx-action-bar variant="outlined"></hx-action-bar>');
+      const el = await fixture<HelixActionBar>(
+        '<hx-action-bar variant="outlined"></hx-action-bar>',
+      );
       expect(el.getAttribute('variant')).toBe('outlined');
     });
 
@@ -111,9 +113,7 @@ describe('hx-action-bar', () => {
     });
 
     it('renders default (center) slot content', async () => {
-      const el = await fixture<HelixActionBar>(
-        '<hx-action-bar><span>Title</span></hx-action-bar>',
-      );
+      const el = await fixture<HelixActionBar>('<hx-action-bar><span>Title</span></hx-action-bar>');
       const span = el.querySelector('span');
       expect(span?.textContent).toBe('Title');
     });

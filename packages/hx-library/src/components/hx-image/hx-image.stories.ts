@@ -147,11 +147,7 @@ export const Decorative: Story = {
     alt: '',
   },
   render: (args) => html`
-    <hx-image
-      src=${args.src}
-      alt=${args.alt}
-      style="width: 400px;"
-    ></hx-image>
+    <hx-image src=${args.src} alt=${args.alt} style="width: 400px;"></hx-image>
   `,
   play: async ({ canvasElement }) => {
     const img = canvasElement.querySelector('hx-image');

@@ -11,25 +11,33 @@ describe('hx-image', () => {
 
   describe('Rendering', () => {
     it('renders with shadow DOM', async () => {
-      const el = await fixture<HelixImage>('<hx-image src="https://example.com/img.png" alt="Test"></hx-image>');
+      const el = await fixture<HelixImage>(
+        '<hx-image src="https://example.com/img.png" alt="Test"></hx-image>',
+      );
       expect(el.shadowRoot).toBeTruthy();
     });
 
     it('renders an img element inside shadow DOM', async () => {
-      const el = await fixture<HelixImage>('<hx-image src="https://example.com/img.png" alt="Test"></hx-image>');
+      const el = await fixture<HelixImage>(
+        '<hx-image src="https://example.com/img.png" alt="Test"></hx-image>',
+      );
       const img = shadowQuery(el, 'img');
       expect(img).toBeTruthy();
     });
 
     it('exposes "base" CSS part on the img element', async () => {
-      const el = await fixture<HelixImage>('<hx-image src="https://example.com/img.png" alt="Test"></hx-image>');
+      const el = await fixture<HelixImage>(
+        '<hx-image src="https://example.com/img.png" alt="Test"></hx-image>',
+      );
       const img = shadowQuery(el, '[part="base"]');
       expect(img).toBeTruthy();
       expect(img?.tagName.toLowerCase()).toBe('img');
     });
 
     it('applies default loading=lazy to the img', async () => {
-      const el = await fixture<HelixImage>('<hx-image src="https://example.com/img.png" alt="Test"></hx-image>');
+      const el = await fixture<HelixImage>(
+        '<hx-image src="https://example.com/img.png" alt="Test"></hx-image>',
+      );
       const img = shadowQuery(el, 'img');
       expect(img?.getAttribute('loading')).toBe('lazy');
     });
@@ -39,13 +47,17 @@ describe('hx-image', () => {
 
   describe('Property: src', () => {
     it('sets the src attribute on the img element', async () => {
-      const el = await fixture<HelixImage>('<hx-image src="https://example.com/photo.jpg" alt="Photo"></hx-image>');
+      const el = await fixture<HelixImage>(
+        '<hx-image src="https://example.com/photo.jpg" alt="Photo"></hx-image>',
+      );
       const img = shadowQuery(el, 'img');
       expect(img?.getAttribute('src')).toBe('https://example.com/photo.jpg');
     });
 
     it('reflects property to img src when changed', async () => {
-      const el = await fixture<HelixImage>('<hx-image src="https://example.com/a.jpg" alt="A"></hx-image>');
+      const el = await fixture<HelixImage>(
+        '<hx-image src="https://example.com/a.jpg" alt="A"></hx-image>',
+      );
       el.src = 'https://example.com/b.jpg';
       await el.updateComplete;
       const img = shadowQuery(el, 'img');
@@ -57,26 +69,34 @@ describe('hx-image', () => {
 
   describe('Property: alt and ARIA', () => {
     it('sets alt text on the img element', async () => {
-      const el = await fixture<HelixImage>('<hx-image src="https://example.com/img.png" alt="Descriptive text"></hx-image>');
+      const el = await fixture<HelixImage>(
+        '<hx-image src="https://example.com/img.png" alt="Descriptive text"></hx-image>',
+      );
       const img = shadowQuery(el, 'img');
       expect(img?.getAttribute('alt')).toBe('Descriptive text');
     });
 
     it('does NOT add role=presentation when alt is non-empty', async () => {
-      const el = await fixture<HelixImage>('<hx-image src="https://example.com/img.png" alt="Descriptive text"></hx-image>');
+      const el = await fixture<HelixImage>(
+        '<hx-image src="https://example.com/img.png" alt="Descriptive text"></hx-image>',
+      );
       const img = shadowQuery(el, 'img');
       expect(img?.getAttribute('role')).toBeNull();
     });
 
     it('adds role=presentation when alt is empty string (decorative)', async () => {
-      const el = await fixture<HelixImage>('<hx-image src="https://example.com/img.png" alt=""></hx-image>');
+      const el = await fixture<HelixImage>(
+        '<hx-image src="https://example.com/img.png" alt=""></hx-image>',
+      );
       await el.updateComplete;
       const img = shadowQuery(el, 'img');
       expect(img?.getAttribute('role')).toBe('presentation');
     });
 
     it('does NOT add aria-label to the host element', async () => {
-      const el = await fixture<HelixImage>('<hx-image src="https://example.com/img.png" alt="Photo"></hx-image>');
+      const el = await fixture<HelixImage>(
+        '<hx-image src="https://example.com/img.png" alt="Photo"></hx-image>',
+      );
       expect(el.hasAttribute('aria-label')).toBe(false);
     });
   });
@@ -85,13 +105,17 @@ describe('hx-image', () => {
 
   describe('Property: loading', () => {
     it('defaults to loading=lazy', async () => {
-      const el = await fixture<HelixImage>('<hx-image src="https://example.com/img.png" alt="Test"></hx-image>');
+      const el = await fixture<HelixImage>(
+        '<hx-image src="https://example.com/img.png" alt="Test"></hx-image>',
+      );
       const img = shadowQuery(el, 'img');
       expect(img?.getAttribute('loading')).toBe('lazy');
     });
 
     it('sets loading=eager when specified', async () => {
-      const el = await fixture<HelixImage>('<hx-image src="https://example.com/img.png" alt="Test" loading="eager"></hx-image>');
+      const el = await fixture<HelixImage>(
+        '<hx-image src="https://example.com/img.png" alt="Test" loading="eager"></hx-image>',
+      );
       const img = shadowQuery(el, 'img');
       expect(img?.getAttribute('loading')).toBe('eager');
     });
@@ -101,7 +125,9 @@ describe('hx-image', () => {
 
   describe('Events', () => {
     it('dispatches hx-load when image loads', async () => {
-      const el = await fixture<HelixImage>('<hx-image src="https://example.com/img.png" alt="Test"></hx-image>');
+      const el = await fixture<HelixImage>(
+        '<hx-image src="https://example.com/img.png" alt="Test"></hx-image>',
+      );
       const img = shadowQuery<HTMLImageElement>(el, 'img');
       expect(img).toBeTruthy();
 
@@ -113,7 +139,9 @@ describe('hx-image', () => {
     });
 
     it('dispatches hx-error when image fails to load', async () => {
-      const el = await fixture<HelixImage>('<hx-image src="https://broken.url/img.png" alt="Test"></hx-image>');
+      const el = await fixture<HelixImage>(
+        '<hx-image src="https://broken.url/img.png" alt="Test"></hx-image>',
+      );
       const img = shadowQuery<HTMLImageElement>(el, 'img');
       expect(img).toBeTruthy();
 
@@ -182,7 +210,9 @@ describe('hx-image', () => {
 
   describe('CSS Parts', () => {
     it('exposes "base" part on img element', async () => {
-      const el = await fixture<HelixImage>('<hx-image src="https://example.com/img.png" alt="Test"></hx-image>');
+      const el = await fixture<HelixImage>(
+        '<hx-image src="https://example.com/img.png" alt="Test"></hx-image>',
+      );
       const base = shadowQuery(el, '[part="base"]');
       expect(base).toBeTruthy();
       expect(base?.getAttribute('part')).toBe('base');
@@ -193,7 +223,9 @@ describe('hx-image', () => {
 
   describe('Accessibility (axe-core)', () => {
     it('has no axe violations with informative image (alt provided)', async () => {
-      const el = await fixture<HelixImage>('<hx-image src="https://example.com/img.png" alt="A descriptive label"></hx-image>');
+      const el = await fixture<HelixImage>(
+        '<hx-image src="https://example.com/img.png" alt="A descriptive label"></hx-image>',
+      );
       await el.updateComplete;
       await page.screenshot();
       const { violations } = await checkA11y(el);
@@ -201,7 +233,9 @@ describe('hx-image', () => {
     });
 
     it('has no axe violations with decorative image (alt empty)', async () => {
-      const el = await fixture<HelixImage>('<hx-image src="https://example.com/img.png" alt=""></hx-image>');
+      const el = await fixture<HelixImage>(
+        '<hx-image src="https://example.com/img.png" alt=""></hx-image>',
+      );
       await el.updateComplete;
       await page.screenshot();
       const { violations } = await checkA11y(el);
