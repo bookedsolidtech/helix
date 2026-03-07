@@ -164,8 +164,8 @@ export const helixNavItemStyles = css`
     pointer-events: none;
     opacity: 0;
     transition: opacity var(--hx-transition-fast, 150ms) ease;
-    z-index: 100;
-    box-shadow: 0 2px 8px rgb(0 0 0 / 0.2);
+    z-index: var(--hx-z-index-tooltip, 100);
+    box-shadow: var(--hx-shadow-md, 0 2px 8px rgb(0 0 0 / 0.2));
   }
 
   :host([data-collapsed]) .nav-item__link:hover .nav-item__tooltip,
