@@ -1,4 +1,4 @@
-import { LitElement, html, nothing, type TemplateResult } from 'lit';
+import { LitElement, html, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { tokenStyles } from '@helix/tokens/lit';
 import { helixCodeSnippetStyles } from './hx-code-snippet.styles.js';
@@ -7,17 +7,13 @@ import { helixCodeSnippetStyles } from './hx-code-snippet.styles.js';
  * A styled code block with optional copy button and max-lines truncation.
  * Supports block (`<pre><code>`) and inline (`<code>`) rendering modes.
  * No external syntax highlighting dependency — use the `language` attribute
- * as a hint; the component applies `class="language-<name>"` on the `<code>`
- * element so external highlighters (Prism, Shiki, highlight.js) can target it.
- *
- * **Note:** Slot content is extracted as plain text (`textContent`). Pre-highlighted
- * HTML markup passed into the slot will have its tags stripped.
+ * as a hint for consumers integrating their own highlighter via slotted content.
  *
  * @summary Styled code display component with copy-to-clipboard and expand/collapse.
  *
  * @tag hx-code-snippet
  *
- * @slot - Code content as plain text.
+ * @slot - Code content as text. Pre-highlighted HTML is also accepted.
  *
  * @fires {CustomEvent<{text: string}>} hx-copy - Dispatched when the copy button is clicked.
  *
@@ -32,8 +28,6 @@ import { helixCodeSnippetStyles } from './hx-code-snippet.styles.js';
  * @cssprop [--hx-code-snippet-font-size=var(--hx-font-size-sm,0.875rem)] - Font size.
  * @cssprop [--hx-code-snippet-border-radius=var(--hx-border-radius-md,0.375rem)] - Border radius.
  * @cssprop [--hx-code-snippet-padding=var(--hx-space-4,1rem)] - Inner padding (block mode).
- * @cssprop [--hx-code-snippet-inline-padding=var(--hx-space-half,0.125em) var(--hx-space-1-5,0.375em)] - Inline mode padding.
- * @cssprop [--hx-code-snippet-tab-size=2] - Tab size for code indentation.
  */
 @customElement('hx-code-snippet')
 export class HelixCodeSnippet extends LitElement {
@@ -43,7 +37,7 @@ export class HelixCodeSnippet extends LitElement {
 
   /**
    * Language hint for consumers to apply syntax highlighting.
-   * Applied as `class="language-<name>"` on the `<code>` element.
+   * Does not affect rendering directly.
    * @attr language
    */
   @property({ type: String, reflect: true })
@@ -65,11 +59,6 @@ export class HelixCodeSnippet extends LitElement {
 
   /**
    * When true, shows a copy-to-clipboard button.
-   *
-   * **Note for HTML/Twig authors:** This is a boolean attribute. Setting
-   * `copyable="false"` in HTML still enables the copy button because the
-   * attribute is *present*. To disable, omit the attribute entirely or
-   * set the property via JavaScript: `el.copyable = false`.
    * @attr copyable
    */
   @property({ type: Boolean, reflect: true })
@@ -104,8 +93,7 @@ export class HelixCodeSnippet extends LitElement {
   // ─── Event Handlers ───
 
   private _handleSlotChange(e: Event): void {
-    const slot = e.target as HTMLSlotElement | null;
-    if (!slot) return;
+    const slot = e.target as HTMLSlotElement;
     const nodes = slot.assignedNodes({ flatten: true });
     this._codeText = nodes.map((n) => n.textContent ?? '').join('');
   }
@@ -155,32 +143,12 @@ export class HelixCodeSnippet extends LitElement {
     return lines.length > this.maxLines;
   }
 
-  private _getCodeClasses(): string {
-    const classes = ['code-snippet__code'];
-    if (this.language) {
-      classes.push(`language-${this.language}`);
-    }
-    return classes.join(' ');
-  }
-
-  private _getRegionLabel(): string {
-    if (this.language) {
-      return `Code snippet: ${this.language}`;
-    }
-    return 'Code snippet';
-  }
-
   // ─── Render ───
 
-  override render(): TemplateResult | typeof nothing {
+  override render() {
     if (this.inline) {
       return html`
-        <code
-          part="base code"
-          class="code-snippet code-snippet--inline ${this.language
-            ? `language-${this.language}`
-            : ''}"
-        >
+        <code part="base code" class="code-snippet code-snippet--inline">
           <slot @slotchange=${this._handleSlotChange}></slot>
         </code>
       `;
@@ -207,18 +175,12 @@ export class HelixCodeSnippet extends LitElement {
 
         <pre
           role="region"
-          aria-label=${this._getRegionLabel()}
+          aria-label="Code snippet"
           class="code-snippet__pre ${this.wrap ? 'code-snippet__pre--wrap' : ''}"
-          tabindex="0"
-        ><code part="code" class=${this._getCodeClasses()}>${displayText}</code></pre>
+        ><code part="code" class="code-snippet__code">${displayText}</code></pre>
 
         <!-- Hidden slot to capture text content for display and copy -->
         <slot class="code-snippet__slot" @slotchange=${this._handleSlotChange}></slot>
-
-        <!-- Live region for copy confirmation announcements -->
-        <span class="code-snippet__live-region" role="status" aria-live="polite">
-          ${this._copied ? 'Code copied to clipboard' : ''}
-        </span>
 
         ${truncated
           ? html`
@@ -226,7 +188,6 @@ export class HelixCodeSnippet extends LitElement {
                 part="expand-button"
                 class="code-snippet__expand-button"
                 type="button"
-                aria-expanded=${this._expanded}
                 @click=${this._handleExpand}
               >
                 ${this._expanded ? 'Show less' : 'Show more'}

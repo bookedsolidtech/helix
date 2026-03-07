@@ -17,10 +17,7 @@ export const helixCodeSnippetStyles = css`
     font-size: var(--hx-code-snippet-font-size, var(--hx-font-size-sm, 0.875em));
     background-color: var(--hx-code-snippet-inline-bg, var(--hx-color-neutral-100, #f1f5f9));
     color: var(--hx-code-snippet-inline-color, var(--hx-color-neutral-900, #0f172a));
-    padding: var(
-      --hx-code-snippet-inline-padding,
-      var(--hx-space-half, 0.125em) var(--hx-space-1-5, 0.375em)
-    );
+    padding: 0.125em 0.375em;
     border-radius: var(--hx-code-snippet-border-radius, var(--hx-border-radius-sm, 0.25rem));
   }
 
@@ -39,20 +36,6 @@ export const helixCodeSnippetStyles = css`
     display: none;
   }
 
-  /* ─── Live Region (visually hidden) ─── */
-
-  .code-snippet__live-region {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    padding: 0;
-    margin: -1px;
-    overflow: hidden;
-    clip: rect(0, 0, 0, 0);
-    white-space: nowrap;
-    border: 0;
-  }
-
   /* ─── Pre / Code ─── */
 
   .code-snippet__pre {
@@ -60,11 +43,6 @@ export const helixCodeSnippetStyles = css`
     padding: var(--hx-code-snippet-padding, var(--hx-space-4, 1rem));
     overflow-x: auto;
     white-space: pre;
-  }
-
-  .code-snippet__pre:focus-visible {
-    outline: var(--hx-focus-ring-width, 2px) solid var(--hx-focus-ring-color, #2563eb);
-    outline-offset: var(--hx-focus-ring-offset, -2px);
   }
 
   .code-snippet__pre--wrap {
@@ -78,7 +56,7 @@ export const helixCodeSnippetStyles = css`
     font-size: var(--hx-code-snippet-font-size, var(--hx-font-size-sm, 0.875rem));
     line-height: var(--hx-line-height-relaxed, 1.625);
     color: var(--hx-code-snippet-color, var(--hx-color-neutral-100, #f1f5f9));
-    tab-size: var(--hx-code-snippet-tab-size, 2);
+    tab-size: 2;
   }
 
   /* ─── Copy Button ─── */
@@ -98,7 +76,7 @@ export const helixCodeSnippetStyles = css`
     font-family: var(--hx-font-family-sans, sans-serif);
     font-size: var(--hx-font-size-xs, 0.75rem);
     font-weight: var(--hx-font-weight-medium, 500);
-    line-height: var(--hx-line-height-none, 1);
+    line-height: 1;
     cursor: pointer;
     transition:
       background-color var(--hx-transition-fast, 150ms ease),
@@ -119,7 +97,7 @@ export const helixCodeSnippetStyles = css`
   }
 
   .code-snippet__copy-button:active {
-    filter: brightness(0.8);
+    filter: brightness(var(--hx-filter-brightness-active, 0.8));
   }
 
   /* ─── Expand Button ─── */
