@@ -173,6 +173,47 @@ describe('hx-text', () => {
       const el = await fixture<WcText>('<hx-text lines="2">Text</hx-text>');
       expect(el.getAttribute('lines')).toBe('2');
     });
+
+    it('sets -webkit-line-clamp inline style when lines > 0', async () => {
+      const el = await fixture<WcText>('<hx-text lines="3">Text</hx-text>');
+      const base = shadowQuery(el, '[part="base"]')!;
+      expect(base.style.getPropertyValue('-webkit-line-clamp')).toBe('3');
+    });
+
+    it('does not set -webkit-line-clamp inline style when lines=0', async () => {
+      const el = await fixture<WcText>('<hx-text>Text</hx-text>');
+      const base = shadowQuery(el, '[part="base"]')!;
+      expect(base.style.getPropertyValue('-webkit-line-clamp')).toBe('');
+    });
+
+    it('treats negative lines as 0 (no clamping)', async () => {
+      const el = await fixture<WcText>('<hx-text lines="-1">Text</hx-text>');
+      const base = shadowQuery(el, '[part="base"]')!;
+      expect(base.classList.contains('text--clamp')).toBe(false);
+      expect(base.style.getPropertyValue('-webkit-line-clamp')).toBe('');
+    });
+  });
+
+  // ─── Truncation: title attribute ───
+
+  describe('Truncation: title attribute', () => {
+    it('adds title to base span when truncate=true', async () => {
+      const el = await fixture<WcText>('<hx-text truncate>Full patient name here</hx-text>');
+      const base = shadowQuery(el, '[part="base"]')!;
+      expect(base.getAttribute('title')).toBe('Full patient name here');
+    });
+
+    it('adds title to base span when lines > 0', async () => {
+      const el = await fixture<WcText>('<hx-text lines="2">Long clinical note text</hx-text>');
+      const base = shadowQuery(el, '[part="base"]')!;
+      expect(base.getAttribute('title')).toBe('Long clinical note text');
+    });
+
+    it('does not add title when text is not truncated', async () => {
+      const el = await fixture<WcText>('<hx-text>Normal text</hx-text>');
+      const base = shadowQuery(el, '[part="base"]')!;
+      expect(base.hasAttribute('title')).toBe(false);
+    });
   });
 
   // ─── Accessibility (axe-core) ───
@@ -186,7 +227,16 @@ describe('hx-text', () => {
     });
 
     it('has no axe violations for all variants', async () => {
-      const variants = ['body', 'body-sm', 'body-lg', 'label', 'label-sm', 'caption', 'overline'];
+      const variants = [
+        'body',
+        'body-sm',
+        'body-lg',
+        'label',
+        'label-sm',
+        'caption',
+        'code',
+        'overline',
+      ];
       for (const variant of variants) {
         const el = await fixture<WcText>(`<hx-text variant="${variant}">Sample text</hx-text>`);
         await page.screenshot();
@@ -198,6 +248,7 @@ describe('hx-text', () => {
 
     it('has no axe violations for all colors', async () => {
       // "disabled" is intentionally low-contrast (WCAG 1.4.3 exempts inactive UI components)
+      // "inverse" renders white text — tested below with dark background
       const colors = ['default', 'subtle', 'danger', 'success', 'warning'];
       for (const color of colors) {
         const el = await fixture<WcText>(`<hx-text color="${color}">Sample text</hx-text>`);
@@ -206,6 +257,15 @@ describe('hx-text', () => {
         expect(violations, `color="${color}" should have no violations`).toEqual([]);
         el.remove();
       }
+    });
+
+    it('has no axe violations for inverse color on dark background', async () => {
+      const wrapper = await fixture<HTMLDivElement>(
+        '<div style="background: #1e293b; padding: 1rem;"><hx-text color="inverse">Inverse text</hx-text></div>',
+      );
+      await page.screenshot();
+      const { violations } = await checkA11y(wrapper);
+      expect(violations).toEqual([]);
     });
 
     it('has no axe violations when truncated', async () => {
