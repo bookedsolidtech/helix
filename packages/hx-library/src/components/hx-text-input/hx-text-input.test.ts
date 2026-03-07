@@ -1,7 +1,10 @@
 import { describe, it, expect, afterEach } from 'vitest';
 import { fixture, shadowQuery, oneEvent, cleanup, checkA11y } from '../../test-utils.js';
-import type { WcTextInput } from './hx-text-input.js';
+import type { HxTextInput } from './hx-text-input.js';
 import './index.js';
+
+// Backward-compat alias used throughout tests
+type WcTextInput = HxTextInput;
 
 afterEach(cleanup);
 
@@ -114,6 +117,30 @@ describe('hx-text-input', () => {
       const input = shadowQuery<HTMLInputElement>(el, 'input')!;
       expect(input.getAttribute('type')).toBe('number');
     });
+
+    it('sets tel type', async () => {
+      const el = await fixture<WcTextInput>('<hx-text-input type="tel"></hx-text-input>');
+      const input = shadowQuery<HTMLInputElement>(el, 'input')!;
+      expect(input.getAttribute('type')).toBe('tel');
+    });
+
+    it('sets url type', async () => {
+      const el = await fixture<WcTextInput>('<hx-text-input type="url"></hx-text-input>');
+      const input = shadowQuery<HTMLInputElement>(el, 'input')!;
+      expect(input.getAttribute('type')).toBe('url');
+    });
+
+    it('sets search type', async () => {
+      const el = await fixture<WcTextInput>('<hx-text-input type="search"></hx-text-input>');
+      const input = shadowQuery<HTMLInputElement>(el, 'input')!;
+      expect(input.getAttribute('type')).toBe('search');
+    });
+
+    it('sets date type', async () => {
+      const el = await fixture<WcTextInput>('<hx-text-input type="date"></hx-text-input>');
+      const input = shadowQuery<HTMLInputElement>(el, 'input')!;
+      expect(input.getAttribute('type')).toBe('date');
+    });
   });
 
   // ─── Property: required (2) ───
@@ -125,10 +152,13 @@ describe('hx-text-input', () => {
       expect(input.required).toBe(true);
     });
 
-    it('sets aria-required="true" on native input', async () => {
+    it('native required attribute implies aria-required — no explicit aria-required set', async () => {
       const el = await fixture<WcTextInput>('<hx-text-input required></hx-text-input>');
       const input = shadowQuery<HTMLInputElement>(el, 'input')!;
-      expect(input.getAttribute('aria-required')).toBe('true');
+      // Native `required` maps to aria-required implicitly; we do NOT set it explicitly
+      // to follow the "prefer native semantics" principle (avoids redundant ARIA).
+      expect(input.required).toBe(true);
+      expect(input.getAttribute('aria-required')).toBeNull();
     });
   });
 
@@ -389,6 +419,22 @@ describe('hx-text-input', () => {
       await el.updateComplete;
       expect(el.validationMessage).toBeTruthy();
     });
+
+    it('tooShort validity flag set when value shorter than minlength', async () => {
+      const el = await fixture<WcTextInput>(
+        '<hx-text-input minlength="5" value="ab"></hx-text-input>',
+      );
+      await el.updateComplete;
+      expect(el.validity.tooShort).toBe(true);
+    });
+
+    it('tooLong validity flag set when value longer than maxlength', async () => {
+      const el = await fixture<WcTextInput>(
+        '<hx-text-input maxlength="3" value="toolong"></hx-text-input>',
+      );
+      await el.updateComplete;
+      expect(el.validity.tooLong).toBe(true);
+    });
   });
 
   // ─── Methods (2) ───
@@ -491,9 +537,7 @@ describe('hx-text-input', () => {
 
   describe('Property: pattern', () => {
     it('sets pattern attr on native input', async () => {
-      const el = await fixture<WcTextInput>(
-        '<hx-text-input pattern="[A-Z]+"></hx-text-input>',
-      );
+      const el = await fixture<WcTextInput>('<hx-text-input pattern="[A-Z]+"></hx-text-input>');
       const input = shadowQuery<HTMLInputElement>(el, 'input')!;
       expect(input.getAttribute('pattern')).toBe('[A-Z]+');
     });
@@ -503,9 +547,7 @@ describe('hx-text-input', () => {
 
   describe('Property: autocomplete', () => {
     it('sets autocomplete attr on native input', async () => {
-      const el = await fixture<WcTextInput>(
-        '<hx-text-input autocomplete="email"></hx-text-input>',
-      );
+      const el = await fixture<WcTextInput>('<hx-text-input autocomplete="email"></hx-text-input>');
       const input = shadowQuery<HTMLInputElement>(el, 'input')!;
       expect(input.getAttribute('autocomplete')).toBe('email');
     });
@@ -533,6 +575,50 @@ describe('hx-text-input', () => {
     });
   });
 
+  // ─── Slot: P0/P1 correctness ───
+
+  describe('Slot: error and help-text ARIA correctness', () => {
+    it('slotted error activates error state (aria-invalid) without error attr', async () => {
+      const el = await fixture<WcTextInput>(
+        '<hx-text-input><div slot="error">Slotted error</div></hx-text-input>',
+      );
+      await el.updateComplete;
+      const input = shadowQuery<HTMLInputElement>(el, 'input')!;
+      expect(input.getAttribute('aria-invalid')).toBe('true');
+    });
+
+    it('slotted error wrapper has ID for aria-describedby', async () => {
+      const el = await fixture<WcTextInput>(
+        '<hx-text-input><div slot="error">Slotted error</div></hx-text-input>',
+      );
+      await el.updateComplete;
+      const input = shadowQuery<HTMLInputElement>(el, 'input')!;
+      const errorWrapper = shadowQuery(el, '[part="error"]');
+      expect(errorWrapper).toBeTruthy();
+      expect(input.getAttribute('aria-describedby')).toContain(errorWrapper!.id);
+    });
+
+    it('help-text slot renders wrapper without helpText property (P0-01)', async () => {
+      const el = await fixture<WcTextInput>(
+        '<hx-text-input><em slot="help-text">Rich help</em></hx-text-input>',
+      );
+      await el.updateComplete;
+      const wrapper = shadowQuery(el, '[part="help-text"]');
+      expect(wrapper).toBeTruthy();
+    });
+
+    it('slotted help-text is included in aria-describedby (P1-03)', async () => {
+      const el = await fixture<WcTextInput>(
+        '<hx-text-input><em slot="help-text">Rich help</em></hx-text-input>',
+      );
+      await el.updateComplete;
+      const input = shadowQuery<HTMLInputElement>(el, 'input')!;
+      const wrapper = shadowQuery(el, '[part="help-text"]');
+      expect(wrapper).toBeTruthy();
+      expect(input.getAttribute('aria-describedby')).toContain(wrapper!.id);
+    });
+  });
+
   // ─── CSS Parts: help-text and error (2) ───
 
   describe('CSS Parts: help-text and error', () => {
@@ -545,9 +631,7 @@ describe('hx-text-input', () => {
     });
 
     it('error part exposed', async () => {
-      const el = await fixture<WcTextInput>(
-        '<hx-text-input error="An error"></hx-text-input>',
-      );
+      const el = await fixture<WcTextInput>('<hx-text-input error="An error"></hx-text-input>');
       const errorPart = shadowQuery(el, '[part="error"]');
       expect(errorPart).toBeTruthy();
     });
