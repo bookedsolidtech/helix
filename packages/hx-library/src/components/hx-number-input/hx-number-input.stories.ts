@@ -93,7 +93,7 @@ const meta = {
         type: { summary: 'string' },
       },
     },
-    helpText: {
+    'help-text': {
       control: 'text',
       description: 'Help text displayed below the input for guidance.',
       table: {
@@ -102,7 +102,7 @@ const meta = {
         type: { summary: 'string' },
       },
     },
-    hxSize: {
+    'hx-size': {
       control: { type: 'select' },
       options: ['sm', 'md', 'lg'],
       description: 'Size variant controlling input padding and font size.',
@@ -112,7 +112,7 @@ const meta = {
         type: { summary: "'sm' | 'md' | 'lg'" },
       },
     },
-    noStepper: {
+    'no-stepper': {
       control: 'boolean',
       description: 'When set, hides the +/- stepper buttons.',
       table: {
@@ -141,9 +141,9 @@ const meta = {
     disabled: false,
     readonly: false,
     error: '',
-    helpText: '',
-    hxSize: 'md',
-    noStepper: false,
+    'help-text': '',
+    'hx-size': 'md',
+    'no-stepper': false,
     name: '',
   },
   render: (args) => html`
@@ -157,9 +157,9 @@ const meta = {
       ?disabled=${args.disabled}
       ?readonly=${args.readonly}
       error=${args.error}
-      help-text=${args.helpText}
-      hx-size=${args.hxSize}
-      ?no-stepper=${args.noStepper}
+      help-text=${args['help-text']}
+      hx-size=${args['hx-size']}
+      ?no-stepper=${args['no-stepper']}
       name=${args.name}
     ></hx-number-input>
   `,
@@ -618,6 +618,76 @@ export const WithHelpSlot: Story = {
     docs: {
       description: {
         story: 'Uses the help slot to render rich help text content with custom markup.',
+      },
+    },
+  },
+};
+
+export const WithLabelSlot: Story = {
+  name: 'With Label Slot (Drupal Form API)',
+  render: () => html`
+    <hx-number-input .value=${250} .min=${0} .max=${1000} name="dosage">
+      <label
+        slot="label"
+        style="font-size: 0.875rem; font-weight: 500; color: var(--hx-color-neutral-700, #374151);"
+      >
+        Dosage (mg)
+        <span
+          aria-hidden="true"
+          style="color: var(--hx-color-error-500, #dc3545); font-weight: 700;"
+        >
+          *</span
+        >
+      </label>
+    </hx-number-input>
+  `,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Uses the label slot to render a server-side label from the Drupal Form API. This is the primary Drupal integration pattern when the label is rendered by the server rather than passed as a property.',
+      },
+    },
+  },
+};
+
+export const DrupalFormAPI: Story = {
+  name: 'Drupal Form API (All Slots)',
+  render: () => html`
+    <hx-number-input .value=${null} name="dosage" required>
+      <label
+        slot="label"
+        style="font-size: 0.875rem; font-weight: 500; color: var(--hx-color-neutral-700, #374151);"
+      >
+        Dosage (mg)
+        <span
+          aria-hidden="true"
+          style="color: var(--hx-color-error-500, #dc3545); font-weight: 700;"
+        >
+          *</span
+        >
+      </label>
+      <div
+        slot="error"
+        style="display: flex; align-items: center; gap: 0.25rem; color: var(--hx-color-error-500, #dc3545); font-size: 0.75rem;"
+      >
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+          <path
+            d="M8 1a7 7 0 100 14A7 7 0 008 1zm-.75 3.75a.75.75 0 011.5 0v4a.75.75 0 01-1.5 0v-4zM8 12a1 1 0 110-2 1 1 0 010 2z"
+          />
+        </svg>
+        Dosage is required.
+      </div>
+      <div slot="help" style="font-size: 0.75rem; color: var(--hx-color-neutral-500, #6c757d);">
+        Enter prescribed dosage in milligrams (0–1000 mg).
+      </div>
+    </hx-number-input>
+  `,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Demonstrates the full Drupal Form API pattern using all three slots simultaneously: a server-rendered label slot, a server-rendered error slot, and a server-rendered help slot. This is the recommended integration pattern for Drupal Form API consumers.',
       },
     },
   },
@@ -1106,13 +1176,13 @@ export const InAForm: Story = {
       <div style="display: flex; gap: 0.75rem; margin-top: 0.5rem;">
         <button
           type="submit"
-          style="padding: 0.5rem 1rem; background: #2563EB; color: white; border: none; border-radius: 0.375rem; cursor: pointer; font-size: 0.875rem;"
+          style="padding: 0.5rem 1rem; background: var(--hx-color-primary-600, #2563eb); color: var(--hx-color-neutral-0, #fff); border: none; border-radius: var(--hx-border-radius-md, 0.375rem); cursor: pointer; font-size: var(--hx-font-size-sm, 0.875rem);"
         >
           Submit Order
         </button>
         <button
           type="reset"
-          style="padding: 0.5rem 1rem; background: transparent; border: 1px solid #dee2e6; border-radius: 0.375rem; cursor: pointer; font-size: 0.875rem;"
+          style="padding: 0.5rem 1rem; background: transparent; border: var(--hx-border-width-thin, 1px) solid var(--hx-color-neutral-200, #dee2e6); border-radius: var(--hx-border-radius-md, 0.375rem); cursor: pointer; font-size: var(--hx-font-size-sm, 0.875rem);"
         >
           Reset
         </button>
