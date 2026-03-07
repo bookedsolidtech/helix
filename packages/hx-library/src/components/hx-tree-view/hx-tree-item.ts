@@ -16,8 +16,9 @@ import { helixTreeItemStyles } from './hx-tree-item.styles.js';
  * @slot children - Nested hx-tree-item elements for sub-tree.
  *
  * @csspart item - The outer item container.
- * @csspart label - The item row (label area, expand icon, icon).
+ * @csspart row - The interactive item row (contains expand icon, icon slot, and label).
  * @csspart expand-icon - The expand/collapse toggle button.
+ * @csspart label - The label text content area.
  * @csspart children - The children container.
  *
  * @cssprop [--hx-tree-item-color=var(--hx-color-neutral-900)] - Item text color.
@@ -158,7 +159,7 @@ export class HelixTreeItem extends LitElement {
     return html`
       <div part="item" class="item">
         <div
-          part="label"
+          part="row"
           class="item-row"
           role="treeitem"
           tabindex="-1"
