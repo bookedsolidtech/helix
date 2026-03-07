@@ -75,13 +75,17 @@ describe('hx-dropdown', () => {
     });
 
     it('reflects open attribute', async () => {
-      const el = await fixture<HelixDropdown>('<hx-dropdown open><button slot="trigger">T</button><div role="menu" aria-label="Actions">Content</div></hx-dropdown>');
+      const el = await fixture<HelixDropdown>(
+        '<hx-dropdown open><button slot="trigger">T</button><div role="menu" aria-label="Actions">Content</div></hx-dropdown>',
+      );
       expect(el.open).toBe(true);
       expect(el.getAttribute('open')).not.toBeNull();
     });
 
     it('reflects disabled attribute', async () => {
-      const el = await fixture<HelixDropdown>('<hx-dropdown disabled><button slot="trigger">T</button><div role="menu" aria-label="Actions">Content</div></hx-dropdown>');
+      const el = await fixture<HelixDropdown>(
+        '<hx-dropdown disabled><button slot="trigger">T</button><div role="menu" aria-label="Actions">Content</div></hx-dropdown>',
+      );
       expect(el.disabled).toBe(true);
       expect(el.getAttribute('disabled')).not.toBeNull();
     });
@@ -132,11 +136,156 @@ describe('hx-dropdown', () => {
     });
 
     it('does not open when disabled', async () => {
-      const el = await fixture<HelixDropdown>('<hx-dropdown disabled><button slot="trigger">T</button><div role="menu" aria-label="Actions">Content</div></hx-dropdown>');
+      const el = await fixture<HelixDropdown>(
+        '<hx-dropdown disabled><button slot="trigger">T</button><div role="menu" aria-label="Actions">Content</div></hx-dropdown>',
+      );
       const trigger = el.querySelector<HTMLElement>('[slot="trigger"]')!;
       trigger.click();
       await el.updateComplete;
       expect(el.open).toBe(false);
+    });
+
+    it('closes on outside click', async () => {
+      const el = await fixture<HelixDropdown>(triggerHtml);
+      const trigger = el.querySelector<HTMLElement>('[slot="trigger"]')!;
+      trigger.click();
+      await el.updateComplete;
+      expect(el.open).toBe(true);
+      // Simulate a click outside the component.
+      document.dispatchEvent(new MouseEvent('click', { bubbles: true, composed: true }));
+      await el.updateComplete;
+      expect(el.open).toBe(false);
+    });
+  });
+
+  // ─── Keyboard Interactions (P1-04 / P2-05) ───
+
+  describe('Keyboard Interactions', () => {
+    it('opens on Enter key on trigger', async () => {
+      const el = await fixture<HelixDropdown>(triggerHtml);
+      const triggerWrapper = shadowQuery(el, '[part="trigger"]')!;
+      triggerWrapper.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
+      await el.updateComplete;
+      expect(el.open).toBe(true);
+    });
+
+    it('opens on Space key on trigger', async () => {
+      const el = await fixture<HelixDropdown>(triggerHtml);
+      const triggerWrapper = shadowQuery(el, '[part="trigger"]')!;
+      triggerWrapper.dispatchEvent(new KeyboardEvent('keydown', { key: ' ', bubbles: true }));
+      await el.updateComplete;
+      expect(el.open).toBe(true);
+    });
+
+    it('opens on ArrowDown key on trigger', async () => {
+      const el = await fixture<HelixDropdown>(triggerHtml);
+      const triggerWrapper = shadowQuery(el, '[part="trigger"]')!;
+      triggerWrapper.dispatchEvent(
+        new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true }),
+      );
+      await el.updateComplete;
+      expect(el.open).toBe(true);
+    });
+
+    it('focuses first menu item on open via keyboard', async () => {
+      const el = await fixture<HelixDropdown>(triggerHtml);
+      const triggerWrapper = shadowQuery(el, '[part="trigger"]')!;
+      triggerWrapper.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
+      await el.updateComplete;
+      await el.updateComplete;
+      const firstItem = el.querySelector<HTMLElement>('[role="menuitem"]')!;
+      expect(document.activeElement).toBe(firstItem);
+    });
+
+    it('navigates down through items on ArrowDown', async () => {
+      const el = await fixture<HelixDropdown>(triggerHtml);
+      const trigger = el.querySelector<HTMLElement>('[slot="trigger"]')!;
+      trigger.click();
+      await el.updateComplete;
+      const items = el.querySelectorAll<HTMLElement>('[role="menuitem"]');
+      items[0]?.focus();
+      el.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true }));
+      expect(document.activeElement).toBe(items[1]);
+    });
+
+    it('wraps from last to first on ArrowDown', async () => {
+      const el = await fixture<HelixDropdown>(triggerHtml);
+      const trigger = el.querySelector<HTMLElement>('[slot="trigger"]')!;
+      trigger.click();
+      await el.updateComplete;
+      const items = el.querySelectorAll<HTMLElement>('[role="menuitem"]');
+      items[items.length - 1]?.focus();
+      el.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true }));
+      expect(document.activeElement).toBe(items[0]);
+    });
+
+    it('navigates up through items on ArrowUp', async () => {
+      const el = await fixture<HelixDropdown>(triggerHtml);
+      const trigger = el.querySelector<HTMLElement>('[slot="trigger"]')!;
+      trigger.click();
+      await el.updateComplete;
+      const items = el.querySelectorAll<HTMLElement>('[role="menuitem"]');
+      items[1]?.focus();
+      el.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowUp', bubbles: true }));
+      expect(document.activeElement).toBe(items[0]);
+    });
+
+    it('focuses last item on End key', async () => {
+      const el = await fixture<HelixDropdown>(triggerHtml);
+      const trigger = el.querySelector<HTMLElement>('[slot="trigger"]')!;
+      trigger.click();
+      await el.updateComplete;
+      const items = el.querySelectorAll<HTMLElement>('[role="menuitem"]');
+      items[0]?.focus();
+      el.dispatchEvent(new KeyboardEvent('keydown', { key: 'End', bubbles: true }));
+      expect(document.activeElement).toBe(items[items.length - 1]);
+    });
+
+    it('focuses first item on Home key', async () => {
+      const el = await fixture<HelixDropdown>(triggerHtml);
+      const trigger = el.querySelector<HTMLElement>('[slot="trigger"]')!;
+      trigger.click();
+      await el.updateComplete;
+      const items = el.querySelectorAll<HTMLElement>('[role="menuitem"]');
+      items[items.length - 1]?.focus();
+      el.dispatchEvent(new KeyboardEvent('keydown', { key: 'Home', bubbles: true }));
+      expect(document.activeElement).toBe(items[0]);
+    });
+
+    it('returns focus to trigger on Escape', async () => {
+      const el = await fixture<HelixDropdown>(triggerHtml);
+      const trigger = el.querySelector<HTMLElement>('[slot="trigger"]')!;
+      trigger.click();
+      await el.updateComplete;
+      trigger.focus();
+      el.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+      await el.updateComplete;
+      expect(el.open).toBe(false);
+      expect(document.activeElement).toBe(trigger);
+    });
+  });
+
+  // ─── hx-select edge cases (P2-05) ───
+
+  describe('hx-select edge cases', () => {
+    it('dispatches hx-select with null value when no data-value is set', async () => {
+      const noValueHtml = `
+        <hx-dropdown>
+          <button slot="trigger" type="button">Open</button>
+          <ul role="menu" aria-label="Actions">
+            <li role="menuitem" tabindex="-1">No Value</li>
+          </ul>
+        </hx-dropdown>
+      `;
+      const el = await fixture<HelixDropdown>(noValueHtml);
+      const trigger = el.querySelector<HTMLElement>('[slot="trigger"]')!;
+      trigger.click();
+      await el.updateComplete;
+      const eventPromise = oneEvent<CustomEvent>(el, 'hx-select');
+      const item = el.querySelector<HTMLElement>('[role="menuitem"]')!;
+      item.click();
+      const event = await eventPromise;
+      expect(event.detail.value).toBeNull();
     });
   });
 
@@ -200,11 +349,23 @@ describe('hx-dropdown', () => {
   // ─── ARIA (3) ───
 
   describe('ARIA', () => {
-    it('sets aria-haspopup on trigger element', async () => {
+    it('sets aria-haspopup="menu" on trigger element', async () => {
       const el = await fixture<HelixDropdown>(triggerHtml);
       await el.updateComplete;
       const trigger = el.querySelector('[slot="trigger"]');
-      expect(trigger?.getAttribute('aria-haspopup')).toBe('true');
+      // P1-01: ARIA 1.1+ requires aria-haspopup="menu" for menu buttons.
+      expect(trigger?.getAttribute('aria-haspopup')).toBe('menu');
+    });
+
+    it('sets aria-controls on trigger element pointing to the panel', async () => {
+      const el = await fixture<HelixDropdown>(triggerHtml);
+      await el.updateComplete;
+      const trigger = el.querySelector('[slot="trigger"]');
+      const panelId = trigger?.getAttribute('aria-controls');
+      expect(panelId).toBeTruthy();
+      // P1-02: aria-controls must reference the panel element.
+      const panel = shadowQuery(el, '[part="panel"]');
+      expect(panel?.id).toBe(panelId);
     });
 
     it('trigger aria-expanded is false by default', async () => {

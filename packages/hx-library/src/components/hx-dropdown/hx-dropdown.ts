@@ -10,7 +10,8 @@ import {
 } from '@floating-ui/dom';
 import { helixDropdownStyles } from './hx-dropdown.styles.js';
 
-type DropdownPlacement =
+// P2-03: Export so TypeScript consumers can import this type for prop typing.
+export type DropdownPlacement =
   | 'top'
   | 'top-start'
   | 'top-end'
@@ -93,6 +94,10 @@ export class HelixDropdown extends LitElement {
 
   @state() private _panelVisible = false;
 
+  // P1-02: Unique panel ID for aria-controls.
+  private static _instanceCounter = 0;
+  private _panelId = `hx-dropdown-panel-${++HelixDropdown._instanceCounter}`;
+
   @query('[part="panel"]') private _panel!: HTMLElement;
   @query('[part="trigger"]') private _triggerWrapper!: HTMLElement;
 
@@ -117,30 +122,34 @@ export class HelixDropdown extends LitElement {
     if (this.open || this.disabled) return;
     this.open = true;
     this._panelVisible = true;
-    await this.updateComplete;
-    await this._updatePosition();
+    // Add outside-click listener synchronously before any await so it is registered
+    // by the time the test fires an outside click after a single await el.updateComplete.
     document.addEventListener('click', this._handleOutsideClick, { capture: true });
-    this.dispatchEvent(new CustomEvent('hx-show', { bubbles: true, composed: true }));
-    // Focus first focusable item in panel
+    await this.updateComplete;
+    // P0-01: Fix focus management — use slot.assignedElements() to traverse slotted (light DOM) content.
+    // Focus is set after updateComplete (panel is rendered) but before _updatePosition so
+    // it executes in the same microtask as the test's await-continuation.
     const panel = this._panel;
     if (panel) {
-      const firstFocusable = panel.querySelector<HTMLElement>(
-        '[role="menuitem"], button, [tabindex]:not([tabindex="-1"]), a[href], input, select, textarea',
-      );
+      const firstFocusable = this._getFirstFocusableItem();
       firstFocusable?.focus();
     }
+    await this._updatePosition();
+    this.dispatchEvent(new CustomEvent('hx-show', { bubbles: true, composed: true }));
   }
 
-  private _hide(): void {
+  // P2-02: returnFocus=true only on Escape; Tab should let focus advance naturally.
+  private _hide(returnFocus = true): void {
     if (!this.open) return;
     this.open = false;
     this._panelVisible = false;
     document.removeEventListener('click', this._handleOutsideClick);
     this.dispatchEvent(new CustomEvent('hx-hide', { bubbles: true, composed: true }));
-    // Return focus to trigger
-    const slot = this.shadowRoot?.querySelector<HTMLSlotElement>('slot[name="trigger"]');
-    const trigger = slot?.assignedElements()[0] as HTMLElement | undefined;
-    trigger?.focus();
+    if (returnFocus) {
+      const slot = this.shadowRoot?.querySelector<HTMLSlotElement>('slot[name="trigger"]');
+      const trigger = slot?.assignedElements()[0] as HTMLElement | undefined;
+      trigger?.focus();
+    }
   }
 
   // ─── Positioning ───
@@ -188,10 +197,71 @@ export class HelixDropdown extends LitElement {
   private _handleKeydown(e: KeyboardEvent): void {
     if (e.key === 'Escape' && this.open) {
       e.stopPropagation();
-      this._hide();
+      this._hide(true); // return focus to trigger on Escape
     } else if (e.key === 'Tab' && this.open) {
-      this._hide();
+      // P2-02: Do not return focus to trigger on Tab — let focus advance naturally to next page element.
+      this._hide(false);
+    } else if (
+      this.open &&
+      (e.key === 'ArrowDown' || e.key === 'ArrowUp' || e.key === 'Home' || e.key === 'End')
+    ) {
+      // P2-01: Arrow key roving within panel per APG Menu Button pattern.
+      e.preventDefault();
+      this._handleMenuNavigation(e.key);
     }
+  }
+
+  // P2-01: Move focus among menuitem elements using arrow keys.
+  private _handleMenuNavigation(key: string): void {
+    const items = this._getFocusableMenuItems();
+    if (items.length === 0) return;
+    const currentIndex = items.indexOf(document.activeElement as HTMLElement);
+    let nextIndex: number;
+    if (key === 'ArrowDown') {
+      nextIndex = currentIndex < items.length - 1 ? currentIndex + 1 : 0;
+    } else if (key === 'ArrowUp') {
+      nextIndex = currentIndex > 0 ? currentIndex - 1 : items.length - 1;
+    } else if (key === 'Home') {
+      nextIndex = 0;
+    } else {
+      nextIndex = items.length - 1;
+    }
+    items[nextIndex]?.focus();
+  }
+
+  // P0-01 / P2-01: Get focusable menu items from slotted content.
+  private _getFocusableMenuItems(): HTMLElement[] {
+    const panel = this._panel;
+    if (!panel) return [];
+    const slot = panel.querySelector<HTMLSlotElement>('slot');
+    const assignedNodes = slot?.assignedElements({ flatten: true }) ?? [];
+    const items: HTMLElement[] = [];
+    for (const node of assignedNodes) {
+      if (!(node instanceof HTMLElement)) continue;
+      if (node.matches('[role="menuitem"]')) {
+        items.push(node);
+      } else {
+        node.querySelectorAll<HTMLElement>('[role="menuitem"]').forEach((item) => items.push(item));
+      }
+    }
+    return items;
+  }
+
+  // P0-01: Find the first focusable element in slotted panel content.
+  private _getFirstFocusableItem(): HTMLElement | null {
+    const panel = this._panel;
+    if (!panel) return null;
+    const slot = panel.querySelector<HTMLSlotElement>('slot');
+    const assignedNodes = slot?.assignedElements({ flatten: true }) ?? [];
+    const focusableSelector =
+      '[role="menuitem"], button, [tabindex]:not([tabindex="-1"]), a[href], input, select, textarea';
+    for (const node of assignedNodes) {
+      if (!(node instanceof HTMLElement)) continue;
+      if (node.matches(focusableSelector)) return node;
+      const found = node.querySelector<HTMLElement>(focusableSelector);
+      if (found) return found;
+    }
+    return null;
   }
 
   private _handleOutsideClick(e: MouseEvent): void {
@@ -203,7 +273,8 @@ export class HelixDropdown extends LitElement {
 
   private _handlePanelClick(e: MouseEvent): void {
     const target = e.target as HTMLElement;
-    const item = target.closest<HTMLElement>('[role="menuitem"], [data-value], li, button');
+    // P2-06: Narrow selector — bare 'li' and 'button' cause spurious hx-select events.
+    const item = target.closest<HTMLElement>('[role="menuitem"], [data-value]');
     if (!item) return;
 
     const value = item.dataset['value'] ?? item.getAttribute('value') ?? null;
@@ -234,6 +305,7 @@ export class HelixDropdown extends LitElement {
       </div>
       <div
         part="panel"
+        id=${this._panelId}
         aria-hidden=${this._panelVisible ? 'false' : 'true'}
         class=${this._panelVisible ? 'panel panel--visible' : 'panel'}
         @click=${this._handlePanelClick}
@@ -258,8 +330,11 @@ export class HelixDropdown extends LitElement {
     if (!slot) return;
     const trigger = slot.assignedElements()[0] as HTMLElement | undefined;
     if (trigger) {
-      trigger.setAttribute('aria-haspopup', 'true');
+      // P1-01: Use aria-haspopup="menu" per ARIA 1.1+ / APG Menu Button pattern.
+      trigger.setAttribute('aria-haspopup', 'menu');
       trigger.setAttribute('aria-expanded', String(this.open));
+      // P1-02: Link trigger to panel for screen reader navigation.
+      trigger.setAttribute('aria-controls', this._panelId);
     }
   }
 
