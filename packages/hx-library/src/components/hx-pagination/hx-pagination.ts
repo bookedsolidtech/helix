@@ -10,13 +10,6 @@ import { helixPaginationStyles } from './hx-pagination.styles.js';
  *
  * @summary Page navigation with page numbers, prev/next, and ellipsis.
  *
- * The component renders a `<nav>` landmark with `aria-label` for screen readers.
- * The current page button receives `aria-current="page"`. Keyboard navigation
- * follows the roving-tabindex pattern — Arrow Left/Right moves focus between
- * buttons. Previous/Next/First/Last buttons are disabled (via the `disabled`
- * attribute) when at range boundaries. Ellipsis separators are hidden from
- * assistive technology with `aria-hidden="true"`.
- *
  * @tag hx-pagination
  *
  * @csspart nav - The wrapping `<nav>` element.
@@ -91,12 +84,11 @@ export class HelixPagination extends LitElement {
   @property({ type: String, reflect: true })
   label = 'Pagination';
 
-  /** @internal Tracks the roving tabindex target. Null means default to currentPage. */
+  /** Tracks the roving tabindex target. Null means default to currentPage. */
   @state() private _rovingKey: number | string | null = null;
 
   // ─── Helpers ───
 
-  /** @internal */
   private _buildPageRange(): Array<number | 'ellipsis'> {
     const total = Math.max(1, this.totalPages);
     const current = Math.min(Math.max(1, this.currentPage), total);
@@ -138,14 +130,12 @@ export class HelixPagination extends LitElement {
     return items;
   }
 
-  /** @internal */
   private _range(start: number, end: number): number[] {
     const result: number[] = [];
     for (let i = start; i <= end; i++) result.push(i);
     return result;
   }
 
-  /** @internal */
   private _navigate(page: number): void {
     const clamped = Math.min(Math.max(1, page), this.totalPages);
     if (clamped === this.currentPage) return;
@@ -161,12 +151,10 @@ export class HelixPagination extends LitElement {
     );
   }
 
-  /** @internal */
   private get _effectiveRovingKey(): number | string {
     return this._rovingKey ?? this.currentPage;
   }
 
-  /** @internal */
   private _handleFocusin(e: FocusEvent): void {
     const btn = e.target as HTMLElement;
     if (btn.tagName !== 'BUTTON') return;
@@ -175,7 +163,6 @@ export class HelixPagination extends LitElement {
     this._rovingKey = isNaN(Number(key)) ? key : Number(key);
   }
 
-  /** @internal */
   private _handleKeydown(e: KeyboardEvent): void {
     if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
     e.preventDefault();
@@ -217,7 +204,6 @@ export class HelixPagination extends LitElement {
         <ul
           part="list"
           class="list"
-          role="list"
           @keydown=${this._handleKeydown}
           @focusin=${this._handleFocusin}
         >
