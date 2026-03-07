@@ -75,14 +75,9 @@ export const helixSplitPanelStyles = css`
     cursor: row-resize;
   }
 
-  .divider:hover {
-    background-color: var(--_divider-hover-color);
-  }
-
+  .divider:hover,
   .divider:focus-visible {
     background-color: var(--_divider-hover-color);
-    outline: 2px solid var(--hx-color-focus-ring, var(--hx-color-primary-500, #3b82f6));
-    outline-offset: -1px;
   }
 
   :host([disabled]) .divider {
