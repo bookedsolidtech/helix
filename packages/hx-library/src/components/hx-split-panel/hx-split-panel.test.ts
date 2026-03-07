@@ -224,14 +224,18 @@ describe('hx-split-panel', () => {
     });
 
     it('divider aria-orientation is "vertical" for horizontal split', async () => {
-      const el = await fixture<HelixSplitPanel>('<hx-split-panel orientation="horizontal"></hx-split-panel>');
+      const el = await fixture<HelixSplitPanel>(
+        '<hx-split-panel orientation="horizontal"></hx-split-panel>',
+      );
       const divider = shadowQuery(el, '[part="divider"]');
       // A vertical divider bar separates content horizontally — aria-orientation is "vertical"
       expect(divider?.getAttribute('aria-orientation')).toBe('vertical');
     });
 
     it('divider aria-orientation is "horizontal" for vertical split', async () => {
-      const el = await fixture<HelixSplitPanel>('<hx-split-panel orientation="vertical"></hx-split-panel>');
+      const el = await fixture<HelixSplitPanel>(
+        '<hx-split-panel orientation="vertical"></hx-split-panel>',
+      );
       const divider = shadowQuery(el, '[part="divider"]');
       expect(divider?.getAttribute('aria-orientation')).toBe('horizontal');
     });

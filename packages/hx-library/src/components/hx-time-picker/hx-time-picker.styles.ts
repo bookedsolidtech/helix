@@ -57,6 +57,9 @@ export const helixTimePickerStyles = css`
 
   .field__combobox:focus-within {
     border-color: var(--hx-time-picker-focus-ring-color, var(--hx-focus-ring-color));
+    /* Fallback for Safari < 16.2 (no color-mix support) */
+    box-shadow: 0 0 0 var(--hx-focus-ring-width, 2px)
+      var(--hx-time-picker-focus-ring-color, var(--hx-focus-ring-color));
     box-shadow: 0 0 0 var(--hx-focus-ring-width, 2px)
       color-mix(
         in srgb,
@@ -74,6 +77,9 @@ export const helixTimePickerStyles = css`
 
   .field--error .field__combobox:focus-within {
     border-color: var(--hx-time-picker-error-color, var(--hx-color-error-500));
+    /* Fallback for Safari < 16.2 (no color-mix support) */
+    box-shadow: 0 0 0 var(--hx-focus-ring-width, 2px)
+      var(--hx-time-picker-error-color, var(--hx-color-error-500));
     box-shadow: 0 0 0 var(--hx-focus-ring-width, 2px)
       color-mix(
         in srgb,
@@ -122,7 +128,7 @@ export const helixTimePickerStyles = css`
     height: 100%;
     min-height: var(--hx-size-10, 2.5rem);
     flex-shrink: 0;
-    border-left: var(--hx-border-width-thin, 1px) solid
+    border-inline-start: var(--hx-border-width-thin, 1px) solid
       var(--hx-time-picker-border-color, var(--hx-color-neutral-300));
   }
 
@@ -139,8 +145,8 @@ export const helixTimePickerStyles = css`
   .field__listbox {
     position: absolute;
     top: calc(100% + var(--hx-space-1, 0.25rem));
-    left: 0;
-    right: 0;
+    inset-inline-start: 0;
+    inset-inline-end: 0;
     z-index: var(--hx-z-index-dropdown, 1000);
     background-color: var(--hx-time-picker-listbox-bg, var(--hx-color-neutral-0));
     border: var(--hx-border-width-thin, 1px) solid
