@@ -2,7 +2,7 @@
   "category": "Uncategorized",
   "description": "## Deep Component Audit — hx-card\n\n**Component directory:** `packages/hx-library/src/components/hx-card/`\n**wc-mcp Health Score:** 94 (A)\n**Known issues:** _hasSlotContent missing description.\n\n### Audit Scope\n1. **Design Tokens** — `--hx-` tokens. Padding, border-radius, shadow, background. Dark mode.\n2. **Accessibility** — WCAG 2.1 AA. Semantic structure. Interactive cards (clickable) need proper roles. Focus management.\n3. **Functionality** — Header/body/footer slots. Image slot. Clickable variant. Elevation variants. Slot content detection.\n4. **TypeScript** — Strict. No `any`.\n5. **CSS/Styling** — Shadow DOM. CSS Parts (header, body, footer, image). Responsive.\n6. **CEM Accuracy** — Fix _hasSlotContent description.\n7. **Tests** — 80%+ coverage. Slots. Clickable. Variants.\n8. **Storybook** — All variants. Slot combinations. Interactive.\n9. **Drupal Compatibility** — Content cards. Twig templates. Views integration.\n10. **Portability** — CDN-ready.\n\n### Deliverable\nDetailed audit report. Fix CRITICAL+HIGH. Document rest.",
   "title": "Deep Audit v2: hx-card",
-  "status": "backlog",
+  "status": "done",
   "branchName": "feature/deep-audit-v2-hx-card",
   "complexity": "architectural",
   "priority": 3,
@@ -25,6 +25,22 @@
       "to": "backlog",
       "timestamp": "2026-03-06T17:20:28.532Z",
       "reason": "Feature created"
+    },
+    {
+      "from": "backlog",
+      "to": "review",
+      "timestamp": "2026-03-06T22:17:05.644Z"
+    },
+    {
+      "from": "review",
+      "to": "done",
+      "timestamp": "2026-03-07T01:01:29.057Z"
     }
-  ]
+  ],
+  "featureType": "code",
+  "prLastPolledAt": "2026-03-07T00:38:05.388Z",
+  "reviewStartedAt": "2026-03-06T22:17:05.644Z",
+  "prNumber": 374,
+  "prMergedAt": "2026-03-07T00:57:17Z",
+  "completedAt": "2026-03-07T01:01:29.057Z"
 }

@@ -2,7 +2,7 @@
   "category": "Uncategorized",
   "description": "## Deep Component Audit — hx-search\n\n**Component directory:** `packages/hx-library/src/components/hx-search/`\n\n### wc-mcp Tools — USE THESE\n- `score_component`, `get_component`, `analyze_accessibility`, `validate_usage`, `list_css_parts`, `list_events`, `list_slots`, `get_design_tokens`\n- **Report wc-mcp bugs to `/Volumes/Development/booked/wc-tools` board.**\n\n### Audit Scope\n1. **Design Tokens** — `--hx-` tokens. Input, icon, clear button, border. Dark mode.\n2. **Accessibility** — WCAG 2.1 AA. search role. aria-label. Clear button labeling. Suggestions (combobox pattern if applicable).\n3. **Functionality** — Search input. Clear button. Search icon. Debounced input event. Form integration. Expandable mode.\n4. **TypeScript** — Strict. No `any`.\n5. **CSS/Styling** — Shadow DOM. CSS Parts. Icon positioning. Responsive.\n6. **CEM Accuracy** — All API documented.\n7. **Tests** — 80%+ coverage. Input. Clear. Debounce. Keyboard (Enter, Escape).\n8. **Storybook** — Default. Expandable. With suggestions. In header.\n9. **Drupal Compatibility** — Search block. Twig-friendly.\n10. **Portability** — CDN-ready.\n\n### Deliverable\nDetailed audit report. Fix CRITICAL+HIGH. Document rest.",
   "title": "Deep Audit v2: hx-search",
-  "status": "backlog",
+  "status": "done",
   "branchName": "feature/deep-audit-v2-hx-search",
   "complexity": "architectural",
   "priority": 3,
@@ -25,6 +25,22 @@
       "to": "backlog",
       "timestamp": "2026-03-06T17:25:21.579Z",
       "reason": "Feature created"
+    },
+    {
+      "from": "backlog",
+      "to": "review",
+      "timestamp": "2026-03-06T22:19:26.557Z"
+    },
+    {
+      "from": "review",
+      "to": "done",
+      "timestamp": "2026-03-07T01:01:29.377Z"
     }
-  ]
+  ],
+  "featureType": "code",
+  "prLastPolledAt": "2026-03-07T00:38:29.569Z",
+  "reviewStartedAt": "2026-03-06T22:19:26.557Z",
+  "prNumber": 416,
+  "prMergedAt": "2026-03-07T00:58:29Z",
+  "completedAt": "2026-03-07T01:01:29.377Z"
 }

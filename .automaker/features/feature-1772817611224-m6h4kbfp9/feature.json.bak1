@@ -1,0 +1,37 @@
+{
+  "category": "Uncategorized",
+  "description": "## Deep Component Audit — hx-badge\n\n**Component directory:** `packages/hx-library/src/components/hx-badge/`\n**wc-mcp Health Score:** 100 (A) — No issues.\n\n### Audit Scope\n1. **Design Tokens** — `--hx-` tokens. No hardcoded values. Dark mode.\n2. **Accessibility** — WCAG 2.1 AA. Semantic markup. Color contrast for all variants. Screen reader text for status badges.\n3. **Functionality** — Variants (info, success, warning, error, neutral). Sizes. Pill/dot modes. Content overflow.\n4. **TypeScript** — Strict. No `any`.\n5. **CSS/Styling** — Shadow DOM. CSS Parts. Inline/block display modes.\n6. **CEM Accuracy** — Verify 100 score.\n7. **Tests** — 80%+ coverage. All variants. Accessibility.\n8. **Storybook** — All variants/sizes. Interactive controls.\n9. **Drupal Compatibility** — Twig-friendly.\n10. **Portability** — CDN-ready.\n\n### Deliverable\nDetailed audit report. Fix CRITICAL+HIGH. Document rest.",
+  "title": "Deep Audit v2: hx-badge",
+  "status": "in_progress",
+  "branchName": "feature/deep-audit-v2-hx-badge",
+  "complexity": "architectural",
+  "priority": 3,
+  "source": "api",
+  "trustTier": 1,
+  "quarantineStatus": "passed",
+  "quarantineId": "bca45292-967d-4463-bf04-4fd780075d15",
+  "id": "feature-1772817611224-m6h4kbfp9",
+  "descriptionHistory": [
+    {
+      "description": "## Deep Component Audit — hx-badge\n\n**Component directory:** `packages/hx-library/src/components/hx-badge/`\n**wc-mcp Health Score:** 100 (A) — No issues.\n\n### Audit Scope\n1. **Design Tokens** — `--hx-` tokens. No hardcoded values. Dark mode.\n2. **Accessibility** — WCAG 2.1 AA. Semantic markup. Color contrast for all variants. Screen reader text for status badges.\n3. **Functionality** — Variants (info, success, warning, error, neutral). Sizes. Pill/dot modes. Content overflow.\n4. **TypeScript** — Strict. No `any`.\n5. **CSS/Styling** — Shadow DOM. CSS Parts. Inline/block display modes.\n6. **CEM Accuracy** — Verify 100 score.\n7. **Tests** — 80%+ coverage. All variants. Accessibility.\n8. **Storybook** — All variants/sizes. Interactive controls.\n9. **Drupal Compatibility** — Twig-friendly.\n10. **Portability** — CDN-ready.\n\n### Deliverable\nDetailed audit report. Fix CRITICAL+HIGH. Document rest.",
+      "timestamp": "2026-03-06T17:20:11.225Z",
+      "source": "initial"
+    }
+  ],
+  "createdAt": "2026-03-06T17:20:11.225Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-03-06T17:20:11.225Z",
+      "reason": "Feature created"
+    },
+    {
+      "from": "backlog",
+      "to": "in_progress",
+      "timestamp": "2026-03-06T18:48:35.684Z"
+    }
+  ],
+  "featureType": "code",
+  "model": "claude-opus-4-6"
+}

@@ -2,7 +2,7 @@
   "category": "Uncategorized",
   "description": "## Deep Component Audit — hx-checkbox-group\n\n**Component directory:** `packages/hx-library/src/components/hx-checkbox-group/`\n**NOTE:** This directory has NO index.ts — may be incomplete/from PR 175 rescue. Audit must verify if component exists and is functional.\n\n### Audit Scope\n1. **Existence Check** — Does this component have a complete implementation? If not, document what's missing.\n2. **Design Tokens** — `--hx-` tokens if implemented.\n3. **Accessibility** — WCAG 2.1 AA. role=\"group\". Group label. Error announcements.\n4. **Functionality** — Groups checkboxes. Min/max selection. Validation. Form integration.\n5. **TypeScript** — Strict. No `any`.\n6. **CSS/Styling** — Shadow DOM. Layout. Spacing between checkboxes.\n7. **CEM Accuracy** — Must be in CEM if shipping.\n8. **Tests** — Must exist.\n9. **Storybook** — Must exist.\n10. **Drupal Compatibility** — Twig-friendly.\n\n### Deliverable\nIf incomplete: document what exists, what's missing, and what needs to be built. If complete: full audit report.",
   "title": "Deep Audit v2: hx-checkbox-group",
-  "status": "backlog",
+  "status": "done",
   "branchName": "feature/deep-audit-v2-hx-checkbox-group",
   "complexity": "architectural",
   "priority": 3,
@@ -25,6 +25,22 @@
       "to": "backlog",
       "timestamp": "2026-03-06T17:20:47.675Z",
       "reason": "Feature created"
+    },
+    {
+      "from": "backlog",
+      "to": "review",
+      "timestamp": "2026-03-06T22:17:07.870Z"
+    },
+    {
+      "from": "review",
+      "to": "done",
+      "timestamp": "2026-03-07T01:01:29.090Z"
     }
-  ]
+  ],
+  "featureType": "code",
+  "prLastPolledAt": "2026-03-07T00:38:07.368Z",
+  "reviewStartedAt": "2026-03-06T22:17:07.870Z",
+  "prNumber": 377,
+  "prMergedAt": "2026-03-07T00:57:26Z",
+  "completedAt": "2026-03-07T01:01:29.090Z"
 }

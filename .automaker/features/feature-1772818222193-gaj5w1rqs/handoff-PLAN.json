@@ -1,0 +1,11 @@
+{
+  "phase": "PLAN",
+  "summary": "Feature: DEEP AUDIT: Astro Docs Site — Enterprise Documentation Quality Review\n\n## Deep Audit V2: Astro Starlight Documentation Site\n\n**Comprehensive enterprise-grade quality audit** of the documentation site at `apps/docs/`.\n\n### Audit Dimensions\n1. **Content Accuracy** — All component docs match current CEM. No stale API references. All 78+ components documented.\n2. **Navigation** — Sidebar structure logical. Categories match component taxonomy. Search works.\n3. **Code Examples** — All example",
+  "discoveries": [],
+  "modifiedFiles": [],
+  "outstandingQuestions": [],
+  "scopeLimits": [],
+  "testCoverage": "N/A — plan phase",
+  "verdict": "WARN",
+  "createdAt": "2026-03-07T02:32:45.775Z"
+}

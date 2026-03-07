@@ -1,0 +1,40 @@
+{
+  "category": "Uncategorized",
+  "description": "## Deep Audit V2: hx-visually-hidden\n\n**Comprehensive enterprise-grade quality audit** of the `hx-visually-hidden` utility component.\n\n### Audit Dimensions\n1. **Design Tokens** — Verify CSS approach uses standard visually-hidden technique (not display:none).\n2. **Accessibility** — This IS the accessibility utility. Verify it works correctly for screen readers in all contexts.\n3. **Functionality** — Content hidden visually but available to assistive technology. Focusable variant if needed.\n4. **TypeScript** — Strict mode. No `any`. Proper types.\n5. **CSS Architecture** — Shadow DOM encapsulation. Standard visually-hidden CSS pattern.\n6. **CEM Accuracy** — `custom-elements.json` matches actual public API exactly.\n7. **Test Coverage** — Vitest browser tests. Verify screen reader behavior.\n8. **Storybook** — Stories demonstrating usage with screen reader context.\n9. **Drupal Compatibility** — Works in Twig templates without modification.\n10. **Portability** — No framework dependencies. Works in vanilla HTML.\n\n### wc-mcp Tool Usage (MANDATORY)\nUse these MCP tools during your audit:\n- `score_component({ tagName: \"hx-visually-hidden\" })` — Get health score baseline\n- `get_component({ tagName: \"hx-visually-hidden\" })` — Full component details\n- `analyze_accessibility({ tagName: \"hx-visually-hidden\" })` — A11Y audit\n- `list_css_parts({ tagName: \"hx-visually-hidden\" })` — CSS Parts inventory\n- `list_slots({ tagName: \"hx-visually-hidden\" })` — Slots inventory\n\nIf any wc-mcp tool returns unexpected results or errors, report the bug to the wc-tools board at `/Volumes/Development/booked/wc-tools`.\n\n### Deliverables\n- Fix all issues found inline\n- Update tests to cover gaps\n- Update Storybook stories if needed\n- Ensure CEM is accurate after changes\n- Run `npm run verify` before committing",
+  "title": "DEEP AUDIT: hx-visually-hidden — Enterprise Component Quality Review",
+  "status": "in_progress",
+  "branchName": "feature/deep-audit-v2-hx-visually-hidden",
+  "complexity": "architectural",
+  "priority": 3,
+  "source": "api",
+  "trustTier": 1,
+  "quarantineStatus": "passed",
+  "quarantineId": "4cf36745-0d72-472f-b1c2-32a12d47f34c",
+  "id": "feature-1772818211078-cuboi5wir",
+  "descriptionHistory": [
+    {
+      "description": "## Deep Audit V2: hx-visually-hidden\n\n**Comprehensive enterprise-grade quality audit** of the `hx-visually-hidden` utility component.\n\n### Audit Dimensions\n1. **Design Tokens** — Verify CSS approach uses standard visually-hidden technique (not display:none).\n2. **Accessibility** — This IS the accessibility utility. Verify it works correctly for screen readers in all contexts.\n3. **Functionality** — Content hidden visually but available to assistive technology. Focusable variant if needed.\n4. **TypeScript** — Strict mode. No `any`. Proper types.\n5. **CSS Architecture** — Shadow DOM encapsulation. Standard visually-hidden CSS pattern.\n6. **CEM Accuracy** — `custom-elements.json` matches actual public API exactly.\n7. **Test Coverage** — Vitest browser tests. Verify screen reader behavior.\n8. **Storybook** — Stories demonstrating usage with screen reader context.\n9. **Drupal Compatibility** — Works in Twig templates without modification.\n10. **Portability** — No framework dependencies. Works in vanilla HTML.\n\n### wc-mcp Tool Usage (MANDATORY)\nUse these MCP tools during your audit:\n- `score_component({ tagName: \"hx-visually-hidden\" })` — Get health score baseline\n- `get_component({ tagName: \"hx-visually-hidden\" })` — Full component details\n- `analyze_accessibility({ tagName: \"hx-visually-hidden\" })` — A11Y audit\n- `list_css_parts({ tagName: \"hx-visually-hidden\" })` — CSS Parts inventory\n- `list_slots({ tagName: \"hx-visually-hidden\" })` — Slots inventory\n\nIf any wc-mcp tool returns unexpected results or errors, report the bug to the wc-tools board at `/Volumes/Development/booked/wc-tools`.\n\n### Deliverables\n- Fix all issues found inline\n- Update tests to cover gaps\n- Update Storybook stories if needed\n- Ensure CEM is accurate after changes\n- Run `npm run verify` before committing",
+      "timestamp": "2026-03-06T17:30:11.079Z",
+      "source": "initial"
+    }
+  ],
+  "createdAt": "2026-03-06T17:30:11.079Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-03-06T17:30:11.079Z",
+      "reason": "Feature created"
+    },
+    {
+      "from": "backlog",
+      "to": "in_progress",
+      "timestamp": "2026-03-07T02:31:11.546Z"
+    }
+  ],
+  "featureType": "code",
+  "model": "claude-opus-4-6",
+  "updatedAt": "2026-03-07T02:32:25.567Z",
+  "costUsd": 1.4087137499999995,
+  "lastSessionId": "42a7c671-0a01-4b7b-b21a-472aed0e153e"
+}

@@ -2,7 +2,7 @@
   "category": "Uncategorized",
   "description": "## Deep Component Audit — hx-spinner\n\n**Component directory:** `packages/hx-library/src/components/hx-spinner/`\n\n### wc-mcp Tools — USE THESE\n- `score_component`, `get_component`, `analyze_accessibility`, `list_css_parts`, `get_design_tokens`\n- **Report wc-mcp bugs to `/Volumes/Development/booked/wc-tools` board.**\n\n### Audit Scope\n1. **Design Tokens** — `--hx-` tokens. Track color, indicator color, size. Dark mode.\n2. **Accessibility** — WCAG 2.1 AA. role=\"status\". aria-label=\"Loading\". Reduced-motion.\n3. **Functionality** — Size variants. Color variants. Track visible/hidden. Speed customization.\n4. **TypeScript** — Strict. No `any`.\n5. **CSS/Styling** — Shadow DOM. CSS Parts. SVG/CSS animation. Performance (GPU layer).\n6. **CEM Accuracy** — All API documented.\n7. **Tests** — 80%+ coverage. Rendering. Sizes. ARIA. Reduced-motion.\n8. **Storybook** — Sizes. Colors. In button. Overlay.\n9. **Drupal Compatibility** — AJAX throbber replacement. Twig-friendly.\n10. **Portability** — CDN-ready.\n\n### Deliverable\nDetailed audit report. Fix CRITICAL+HIGH. Document rest.",
   "title": "Deep Audit v2: hx-spinner",
-  "status": "backlog",
+  "status": "done",
   "branchName": "feature/deep-audit-v2-hx-spinner",
   "complexity": "architectural",
   "priority": 3,
@@ -25,6 +25,47 @@
       "to": "backlog",
       "timestamp": "2026-03-06T17:25:57.702Z",
       "reason": "Feature created"
+    },
+    {
+      "from": "backlog",
+      "to": "in_progress",
+      "timestamp": "2026-03-07T00:53:07.878Z"
+    },
+    {
+      "from": "done",
+      "to": "blocked",
+      "timestamp": "2026-03-07T01:11:47.576Z",
+      "reason": "Max state transitions exceeded"
+    },
+    {
+      "from": "blocked",
+      "to": "done",
+      "timestamp": "2026-03-07T01:13:41.139Z"
     }
-  ]
+  ],
+  "featureType": "code",
+  "model": "claude-opus-4-6",
+  "updatedAt": "2026-03-07T01:03:35.219Z",
+  "costUsd": 2.2063015,
+  "lastSessionId": "9d35d0a3-0bad-4348-9062-0e63c893ae6d",
+  "executionHistory": [
+    {
+      "id": "37c926f0-57f5-4553-a7d6-c5a845a70681",
+      "startedAt": "2026-03-07T00:54:20.078Z",
+      "completedAt": "2026-03-07T01:03:35.303Z",
+      "durationMs": 555225,
+      "costUsd": 2.2063015,
+      "model": "claude-opus-4-6",
+      "success": true,
+      "trigger": "manual"
+    }
+  ],
+  "summary": "## Summary: Deep Audit v2: hx-spinner\n\n### Changes Implemented\n- **P0-1 (CRITICAL):** Removed dual screen reader announcement — eliminated `.spinner__sr-text` span, keeping only `role=\"status\"` + `aria-label` as the sole announcement mechanism\n- **P0-2 (CRITICAL):** Added `decorative` boolean property — when set, uses `role=\"presentation\"` and removes `aria-label`, making spinner a11y-silent for use alongside text that conveys loading state\n- **P1-1 (HIGH):** Documented `--hx-duration-spinner` CSS custom property in JSDoc block\n- **P1-2 (HIGH):** Replaced ambiguous static reduced-motion fallback with `hx-spinner-pulse` opacity animation (2s ease-in-out)\n- **P1-3 (HIGH):** Added `rgba(255, 255, 255, 0.3)` fallback for inverted track color + `@supports` guard for `color-mix()`\n- **P1-4/P1-5 (HIGH):** Added 8 new tests: decorative mode (7 tests), label reflection, reactive label update\n- Added `@internal` to `_isTokenSize` private method to exclude from CEM\n- Fixed `@csspart base` description from \"SVG element\" to \"wrapper element\"\n- Added `reflect: true` to `label` property for Drupal Twig compatibility\n- Added `Decorative` story and `decorative` control to Storybook\n\n### Files Modified\n- `packages/hx-library/src/components/hx-spinner/hx-spinner.ts` — decorative prop, remove sr-text, JSDoc fixes\n- `packages/hx-library/src/components/hx-spinner/hx-spinner.styles.ts` — reduced motion pulse, color-mix fallback, remove sr-text styles\n- `packages/hx-library/src/components/hx-spinner/hx-spinner.test.ts` — 8 new tests (30 total, up from 22)\n- `packages/hx-library/src/components/hx-spinner/hx-spinner.stories.ts` — Decorative story + argType\n- `packages/hx-library/src/components/hx-spinner/AUDIT.md` — Full Deep Audit v2 report\n\n### Verification Status\n- `npm run verify`: 0 errors (lint + format:check + type-check)\n- `npm run test:library`: 3120 tests pass (79 files), all 30 hx-spinner tests pass\n- `git diff --stat`: Only intended files changed\n- wc-mcp health score: 100 (A)\n\n### Risks/Blockers Encountered\n- None. All fixes applied cleanly.\n\n### Learnings\n- The wc-mcp a11y score (35/100) is a false negative for status indicators — form association, keyboard events, focus, and disabled dimensions don't apply to spinners\n- `color-mix()` needs `@supports` guards for enterprise healthcare environments with older browsers\n- Dual announcement (aria-label + live region text) is a common pattern that causes redundant screen reader output\n\n### Notes for Developer\n- P2 items documented in AUDIT.md but not fixed (intentional design choices or systemic gaps)\n- The `decorative` prop follows the same pattern as `aria-hidden` but works correctly through Shadow DOM",
+  "prUrl": "https://github.com/bookedsolidtech/helix/pull/423",
+  "prNumber": 423,
+  "prTrackedSince": "2026-03-07T01:04:17.483Z",
+  "prLastPolledAt": "2026-03-07T01:13:37.892Z",
+  "statusChangeReason": "Max state transitions exceeded",
+  "failureCount": 1,
+  "completedAt": "2026-03-07T01:13:41.139Z"
 }

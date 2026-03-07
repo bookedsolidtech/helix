@@ -1,0 +1,37 @@
+{
+  "category": "Uncategorized",
+  "description": "## Deep Component Audit — hx-copy-button\n\n**Component directory:** `packages/hx-library/src/components/hx-copy-button/`\n**NOTE:** No index.ts — may be incomplete/from PR 175 rescue.\n\n### wc-mcp Tools — USE THESE FOR SCORING\n- `score_component`, `get_component`, `analyze_accessibility`, `validate_usage`\n- **Report any wc-mcp bugs to `/Volumes/Development/booked/wc-tools` board.**\n\n### Audit Scope\n1. **Existence Check** — Complete implementation? If not, document gaps.\n2. **Design Tokens** — `--hx-` tokens. Button styling, success state icon/color. Dark mode.\n3. **Accessibility** — WCAG 2.1 AA. Button label (\"Copy to clipboard\"). Success announcement (aria-live).\n4. **Functionality** — Copy to clipboard API. Success/error feedback. Timeout reset. Custom copy content via property or slot.\n5. **TypeScript** — Strict. No `any`.\n6. **CSS/Styling** — Shadow DOM. Icon swap animation. CSS Parts.\n7. **CEM Accuracy** — Must be documented if shipping.\n8. **Tests** — Clipboard API mock. Success state. Timeout.\n9. **Storybook** — Default. Custom content. Success feedback.\n10. **Drupal Compatibility** — Twig-friendly.\n\n### Deliverable\nIf incomplete: document gaps. If complete: full audit. Fix CRITICAL+HIGH.",
+  "title": "Deep Audit v2: hx-copy-button",
+  "status": "in_progress",
+  "branchName": "feature/deep-audit-v2-hx-copy-button",
+  "complexity": "architectural",
+  "priority": 3,
+  "source": "api",
+  "trustTier": 1,
+  "quarantineStatus": "passed",
+  "quarantineId": "b54e475a-bb11-47ec-96bf-945ea476b09b",
+  "id": "feature-1772817696053-ffn42rq3o",
+  "descriptionHistory": [
+    {
+      "description": "## Deep Component Audit — hx-copy-button\n\n**Component directory:** `packages/hx-library/src/components/hx-copy-button/`\n**NOTE:** No index.ts — may be incomplete/from PR 175 rescue.\n\n### wc-mcp Tools — USE THESE FOR SCORING\n- `score_component`, `get_component`, `analyze_accessibility`, `validate_usage`\n- **Report any wc-mcp bugs to `/Volumes/Development/booked/wc-tools` board.**\n\n### Audit Scope\n1. **Existence Check** — Complete implementation? If not, document gaps.\n2. **Design Tokens** — `--hx-` tokens. Button styling, success state icon/color. Dark mode.\n3. **Accessibility** — WCAG 2.1 AA. Button label (\"Copy to clipboard\"). Success announcement (aria-live).\n4. **Functionality** — Copy to clipboard API. Success/error feedback. Timeout reset. Custom copy content via property or slot.\n5. **TypeScript** — Strict. No `any`.\n6. **CSS/Styling** — Shadow DOM. Icon swap animation. CSS Parts.\n7. **CEM Accuracy** — Must be documented if shipping.\n8. **Tests** — Clipboard API mock. Success state. Timeout.\n9. **Storybook** — Default. Custom content. Success feedback.\n10. **Drupal Compatibility** — Twig-friendly.\n\n### Deliverable\nIf incomplete: document gaps. If complete: full audit. Fix CRITICAL+HIGH.",
+      "timestamp": "2026-03-06T17:21:36.053Z",
+      "source": "initial"
+    }
+  ],
+  "createdAt": "2026-03-06T17:21:36.053Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-03-06T17:21:36.053Z",
+      "reason": "Feature created"
+    },
+    {
+      "from": "backlog",
+      "to": "in_progress",
+      "timestamp": "2026-03-06T19:21:30.456Z"
+    }
+  ],
+  "featureType": "code",
+  "model": "claude-opus-4-6"
+}

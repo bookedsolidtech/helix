@@ -1,0 +1,37 @@
+{
+  "category": "Uncategorized",
+  "description": "## Deep Component Audit — hx-data-table\n\n**Component directory:** `packages/hx-library/src/components/hx-data-table/`\n\n### wc-mcp Tools — USE THESE FOR SCORING\n- `score_component`, `get_component`, `analyze_accessibility`, `validate_usage`, `list_css_parts`, `list_events`, `list_slots`, `get_design_tokens`\n- **Report any wc-mcp bugs to `/Volumes/Development/booked/wc-tools` board.**\n\n### Audit Scope\n1. **Design Tokens** — `--hx-` tokens. Row striping, header background, borders, selection highlight. Dark mode.\n2. **Accessibility** — WCAG 2.1 AA. Proper table semantics. Column headers (scope). Sort announcement. Row selection announcement. Keyboard navigation (grid pattern).\n3. **Functionality** — Sorting. Pagination integration. Row selection (single/multi). Column resize. Sticky header. Responsive (horizontal scroll or card view). Data binding.\n4. **TypeScript** — Strict. No `any`. Column definition types. Generic row type.\n5. **CSS/Styling** — Shadow DOM. CSS Parts (header, row, cell). Responsive strategy. Overflow handling.\n6. **CEM Accuracy** — Complex API fully documented.\n7. **Tests** — 80%+ coverage. Sorting. Selection. Keyboard navigation. Responsive.\n8. **Storybook** — Basic. Sortable. Selectable. Paginated. Responsive.\n9. **Drupal Compatibility** — Views table output. Twig-friendly. Dynamic data loading.\n10. **Portability** — CDN-ready. No external table lib.\n\n### Deliverable\nDetailed audit report. Fix CRITICAL+HIGH. Document rest.",
+  "title": "Deep Audit v2: hx-data-table",
+  "status": "in_progress",
+  "branchName": "feature/deep-audit-v2-hx-data-table",
+  "complexity": "architectural",
+  "priority": 3,
+  "source": "api",
+  "trustTier": 1,
+  "quarantineStatus": "passed",
+  "quarantineId": "14b27f55-6635-499e-b653-5c6e8c4d0063",
+  "id": "feature-1772817703165-mg5xm14fy",
+  "descriptionHistory": [
+    {
+      "description": "## Deep Component Audit — hx-data-table\n\n**Component directory:** `packages/hx-library/src/components/hx-data-table/`\n\n### wc-mcp Tools — USE THESE FOR SCORING\n- `score_component`, `get_component`, `analyze_accessibility`, `validate_usage`, `list_css_parts`, `list_events`, `list_slots`, `get_design_tokens`\n- **Report any wc-mcp bugs to `/Volumes/Development/booked/wc-tools` board.**\n\n### Audit Scope\n1. **Design Tokens** — `--hx-` tokens. Row striping, header background, borders, selection highlight. Dark mode.\n2. **Accessibility** — WCAG 2.1 AA. Proper table semantics. Column headers (scope). Sort announcement. Row selection announcement. Keyboard navigation (grid pattern).\n3. **Functionality** — Sorting. Pagination integration. Row selection (single/multi). Column resize. Sticky header. Responsive (horizontal scroll or card view). Data binding.\n4. **TypeScript** — Strict. No `any`. Column definition types. Generic row type.\n5. **CSS/Styling** — Shadow DOM. CSS Parts (header, row, cell). Responsive strategy. Overflow handling.\n6. **CEM Accuracy** — Complex API fully documented.\n7. **Tests** — 80%+ coverage. Sorting. Selection. Keyboard navigation. Responsive.\n8. **Storybook** — Basic. Sortable. Selectable. Paginated. Responsive.\n9. **Drupal Compatibility** — Views table output. Twig-friendly. Dynamic data loading.\n10. **Portability** — CDN-ready. No external table lib.\n\n### Deliverable\nDetailed audit report. Fix CRITICAL+HIGH. Document rest.",
+      "timestamp": "2026-03-06T17:21:43.165Z",
+      "source": "initial"
+    }
+  ],
+  "createdAt": "2026-03-06T17:21:43.165Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-03-06T17:21:43.165Z",
+      "reason": "Feature created"
+    },
+    {
+      "from": "backlog",
+      "to": "in_progress",
+      "timestamp": "2026-03-06T19:28:54.626Z"
+    }
+  ],
+  "featureType": "code",
+  "model": "claude-opus-4-6"
+}

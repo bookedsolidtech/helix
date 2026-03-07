@@ -1,0 +1,30 @@
+{
+  "category": "Uncategorized",
+  "description": "## Post-Audit Follow-Up: hx-carousel\n\nIssues identified during Deep Audit v2 of `hx-carousel` that were not fixed inline.\n\n### Items\n- [ ] The `scroll-container` CSS part was renamed to `viewport` — any external CSS targeting `::part(scroll-container)` needs updating\n- [ ] Pagination dots now use `aria-selected` instead of `aria-current` (better semantic match for tab pattern)\n- [ ] The `label` property reflects to host, so consumers can use CSS `[label=\"...\"]` selectors if needed\n\n### Context\n- Audit feature: `feature-1772817634363-6ub04xmql`\n- Files modified during audit: `packages/hx-library/src/components/hx-carousel/hx-carousel.ts`, `packages/hx-library/src/components/hx-carousel/hx-carousel-item.ts`, `packages/hx-library/src/components/hx-carousel/hx-carousel.styles.ts`, `packages/hx-library/src/components/hx-carousel/hx-carousel.stories.ts`, `packages/hx-library/src/components/hx-carousel/hx-carousel.test.ts`\n- Audit cost: $0.00",
+  "title": "Post-Audit: hx-carousel — follow-up items",
+  "status": "backlog",
+  "complexity": "medium",
+  "priority": 4,
+  "source": "api",
+  "trustTier": 1,
+  "quarantineStatus": "passed",
+  "quarantineId": "50b5d4c3-3bf0-473e-9dfc-ff548eb9b78a",
+  "id": "feature-1772852605211-mn3pabdrl",
+  "branchName": "feature/post-audit-hx-carousel-follow-up-items",
+  "descriptionHistory": [
+    {
+      "description": "## Post-Audit Follow-Up: hx-carousel\n\nIssues identified during Deep Audit v2 of `hx-carousel` that were not fixed inline.\n\n### Items\n- [ ] The `scroll-container` CSS part was renamed to `viewport` — any external CSS targeting `::part(scroll-container)` needs updating\n- [ ] Pagination dots now use `aria-selected` instead of `aria-current` (better semantic match for tab pattern)\n- [ ] The `label` property reflects to host, so consumers can use CSS `[label=\"...\"]` selectors if needed\n\n### Context\n- Audit feature: `feature-1772817634363-6ub04xmql`\n- Files modified during audit: `packages/hx-library/src/components/hx-carousel/hx-carousel.ts`, `packages/hx-library/src/components/hx-carousel/hx-carousel-item.ts`, `packages/hx-library/src/components/hx-carousel/hx-carousel.styles.ts`, `packages/hx-library/src/components/hx-carousel/hx-carousel.stories.ts`, `packages/hx-library/src/components/hx-carousel/hx-carousel.test.ts`\n- Audit cost: $0.00",
+      "timestamp": "2026-03-07T03:03:25.211Z",
+      "source": "initial"
+    }
+  ],
+  "createdAt": "2026-03-07T03:03:25.211Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-03-07T03:03:25.211Z",
+      "reason": "Feature created"
+    }
+  ]
+}

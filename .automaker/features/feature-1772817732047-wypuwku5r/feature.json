@@ -2,7 +2,7 @@
   "category": "Uncategorized",
   "description": "## Deep Component Audit — hx-dropdown\n\n**Component directory:** `packages/hx-library/src/components/hx-dropdown/`\n\n### wc-mcp Tools — USE THESE FOR SCORING\n- `score_component`, `get_component`, `analyze_accessibility`, `validate_usage`, `list_css_parts`, `list_events`, `list_slots`, `get_design_tokens`\n- **Report any wc-mcp bugs to `/Volumes/Development/booked/wc-tools` board.**\n\n### Audit Scope\n1. **Design Tokens** — `--hx-` tokens. Trigger, panel background, shadow, border-radius. Dark mode.\n2. **Accessibility** — WCAG 2.1 AA. Trigger button. aria-expanded, aria-haspopup. Keyboard (Enter/Space to toggle, Escape to close, Tab to navigate).\n3. **Functionality** — Trigger slot. Panel positioning (top/bottom/left/right + auto). Click-outside dismiss. Hover mode option. Distance/skidding offsets.\n4. **TypeScript** — Strict. No `any`.\n5. **CSS/Styling** — Shadow DOM. CSS Parts. Popover positioning. Z-index.\n6. **CEM Accuracy** — All API documented.\n7. **Tests** — 80%+ coverage. Open/close. Positioning. Keyboard. Outside click.\n8. **Storybook** — Placements. Hover. Nested content.\n9. **Drupal Compatibility** — Twig-friendly.\n10. **Portability** — CDN-ready.\n\n### Deliverable\nDetailed audit report. Fix CRITICAL+HIGH. Document rest.",
   "title": "Deep Audit v2: hx-dropdown",
-  "status": "backlog",
+  "status": "done",
   "branchName": "feature/deep-audit-v2-hx-dropdown",
   "complexity": "architectural",
   "priority": 3,
@@ -25,6 +25,22 @@
       "to": "backlog",
       "timestamp": "2026-03-06T17:22:12.047Z",
       "reason": "Feature created"
+    },
+    {
+      "from": "backlog",
+      "to": "review",
+      "timestamp": "2026-03-06T22:17:24.400Z"
+    },
+    {
+      "from": "review",
+      "to": "done",
+      "timestamp": "2026-03-07T01:01:29.182Z"
     }
-  ]
+  ],
+  "featureType": "code",
+  "prLastPolledAt": "2026-03-07T00:38:14.618Z",
+  "reviewStartedAt": "2026-03-06T22:17:24.400Z",
+  "prNumber": 388,
+  "prMergedAt": "2026-03-07T00:57:45Z",
+  "completedAt": "2026-03-07T01:01:29.182Z"
 }

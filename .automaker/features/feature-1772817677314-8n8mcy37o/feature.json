@@ -2,7 +2,7 @@
   "category": "Uncategorized",
   "description": "## Deep Component Audit — hx-combobox\n\n**Component directory:** `packages/hx-library/src/components/hx-combobox/`\n\n### wc-mcp Tools — USE THESE FOR SCORING\n- `score_component`, `get_component`, `analyze_accessibility`, `validate_usage`, `list_css_parts`, `list_events`, `list_slots`, `get_design_tokens`\n- **Report any wc-mcp bugs to `/Volumes/Development/booked/wc-tools` board.**\n\n### Audit Scope\n1. **Design Tokens** — `--hx-` tokens. Input, dropdown, option highlight, scrollbar. Dark mode.\n2. **Accessibility** — WCAG 2.1 AA. combobox pattern (ARIA 1.2). aria-expanded, aria-activedescendant, aria-autocomplete. Keyboard (arrow keys, Enter, Escape, Home, End).\n3. **Functionality** — Autocomplete/filter. Single/multi select. Free text entry. Async options. Clear button. Form integration.\n4. **TypeScript** — Strict. No `any`. Complex state management types.\n5. **CSS/Styling** — Shadow DOM. Dropdown positioning (popover/popup). CSS Parts.\n6. **CEM Accuracy** — Complex API fully documented.\n7. **Tests** — 80%+ coverage. Filtering. Selection. Keyboard. Async.\n8. **Storybook** — Autocomplete. Multi-select. Async loading. Form.\n9. **Drupal Compatibility** — Entity reference fields. Twig-friendly.\n10. **Portability** — CDN-ready.\n\n### Deliverable\nDetailed audit report. Fix CRITICAL+HIGH. Document rest.",
   "title": "Deep Audit v2: hx-combobox",
-  "status": "backlog",
+  "status": "done",
   "branchName": "feature/deep-audit-v2-hx-combobox",
   "complexity": "architectural",
   "priority": 3,
@@ -25,6 +25,22 @@
       "to": "backlog",
       "timestamp": "2026-03-06T17:21:17.315Z",
       "reason": "Feature created"
+    },
+    {
+      "from": "backlog",
+      "to": "review",
+      "timestamp": "2026-03-06T22:17:10.107Z"
+    },
+    {
+      "from": "review",
+      "to": "done",
+      "timestamp": "2026-03-07T01:01:29.116Z"
     }
-  ]
+  ],
+  "featureType": "code",
+  "prLastPolledAt": "2026-03-07T00:38:10.863Z",
+  "reviewStartedAt": "2026-03-06T22:17:10.107Z",
+  "prNumber": 382,
+  "prMergedAt": "2026-03-07T00:57:41Z",
+  "completedAt": "2026-03-07T01:01:29.116Z"
 }

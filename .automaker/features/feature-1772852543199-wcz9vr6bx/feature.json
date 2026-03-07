@@ -1,0 +1,30 @@
+{
+  "category": "Uncategorized",
+  "description": "## Post-Audit Follow-Up: hx-action-bar\n\nIssues identified during Deep Audit v2 of `hx-action-bar` that were not fixed inline.\n\n### Items\n- [ ] 7 MEDIUM/deferred items documented in AUDIT.md for follow-up (bottom sticky position, center alignment, Drupal Twig, scroll-padding docs, default label guidance)\n- [ ] The `label` property is a breaking change from the previous `aria-label` pass-through pattern\n\n### Context\n- Audit feature: `feature-1772817611136-9dz83gbp3`\n- Files modified during audit: `hx-action-bar.ts`, `hx-action-bar.styles.ts`, `hx-action-bar.test.ts`, `hx-action-bar.stories.ts`, `AUDIT.md`",
+  "title": "Post-Audit: hx-action-bar — follow-up items",
+  "status": "backlog",
+  "complexity": "small",
+  "priority": 4,
+  "source": "api",
+  "trustTier": 1,
+  "quarantineStatus": "passed",
+  "quarantineId": "1330fafd-746c-42b6-8661-e63892a0c842",
+  "id": "feature-1772852543199-wcz9vr6bx",
+  "branchName": "feature/post-audit-hx-action-bar-follow-up-items",
+  "descriptionHistory": [
+    {
+      "description": "## Post-Audit Follow-Up: hx-action-bar\n\nIssues identified during Deep Audit v2 of `hx-action-bar` that were not fixed inline.\n\n### Items\n- [ ] 7 MEDIUM/deferred items documented in AUDIT.md for follow-up (bottom sticky position, center alignment, Drupal Twig, scroll-padding docs, default label guidance)\n- [ ] The `label` property is a breaking change from the previous `aria-label` pass-through pattern\n\n### Context\n- Audit feature: `feature-1772817611136-9dz83gbp3`\n- Files modified during audit: `hx-action-bar.ts`, `hx-action-bar.styles.ts`, `hx-action-bar.test.ts`, `hx-action-bar.stories.ts`, `AUDIT.md`",
+      "timestamp": "2026-03-07T03:02:23.199Z",
+      "source": "initial"
+    }
+  ],
+  "createdAt": "2026-03-07T03:02:23.200Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-03-07T03:02:23.200Z",
+      "reason": "Feature created"
+    }
+  ]
+}

@@ -1,0 +1,11 @@
+{
+  "phase": "PLAN",
+  "summary": "Feature: Deep Audit v2: hx-copy-button\n\n## Deep Component Audit — hx-copy-button\n\n**Component directory:** `packages/hx-library/src/components/hx-copy-button/`\n**NOTE:** No index.ts — may be incomplete/from PR 175 rescue.\n\n### wc-mcp Tools — USE THESE FOR SCORING\n- `score_component`, `get_component`, `analyze_accessibility`, `validate_usage`\n- **Report any wc-mcp bugs to `/Volumes/Development/booked/wc-tools` board.**\n\n### Audit Scope\n1. **Existence Check** — Complete implementation? If not, doc",
+  "discoveries": [],
+  "modifiedFiles": [],
+  "outstandingQuestions": [],
+  "scopeLimits": [],
+  "testCoverage": "N/A — plan phase",
+  "verdict": "WARN",
+  "createdAt": "2026-03-06T19:23:03.544Z"
+}

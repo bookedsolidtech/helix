@@ -2,7 +2,7 @@
   "category": "Uncategorized",
   "description": "## Deep Component Audit — hx-divider\n\n**Component directory:** `packages/hx-library/src/components/hx-divider/`\n\n### wc-mcp Tools — USE THESE FOR SCORING\n- `score_component`, `get_component`, `analyze_accessibility`, `validate_usage`, `list_css_parts`, `get_design_tokens`\n- **Report any wc-mcp bugs to `/Volumes/Development/booked/wc-tools` board.**\n\n### Audit Scope\n1. **Design Tokens** — `--hx-` tokens. Color, thickness, spacing. Dark mode.\n2. **Accessibility** — WCAG 2.1 AA. role=\"separator\". aria-orientation. Decorative vs semantic.\n3. **Functionality** — Horizontal/vertical. Thickness variants. With label/text. Spacing.\n4. **TypeScript** — Strict. No `any`.\n5. **CSS/Styling** — Shadow DOM. CSS Parts. Flexible width/height.\n6. **CEM Accuracy** — All API documented.\n7. **Tests** — 80%+ coverage. Orientation. Label. ARIA.\n8. **Storybook** — Horizontal/vertical. With text. Spacing variants.\n9. **Drupal Compatibility** — Twig-friendly.\n10. **Portability** — CDN-ready.\n\n### Deliverable\nDetailed audit report. Fix CRITICAL+HIGH. Document rest.",
   "title": "Deep Audit v2: hx-divider",
-  "status": "backlog",
+  "status": "done",
   "branchName": "feature/deep-audit-v2-hx-divider",
   "complexity": "architectural",
   "priority": 3,
@@ -25,6 +25,22 @@
       "to": "backlog",
       "timestamp": "2026-03-06T17:22:00.942Z",
       "reason": "Feature created"
+    },
+    {
+      "from": "backlog",
+      "to": "review",
+      "timestamp": "2026-03-06T22:17:22.831Z"
+    },
+    {
+      "from": "review",
+      "to": "done",
+      "timestamp": "2026-03-07T01:01:29.166Z"
     }
-  ]
+  ],
+  "featureType": "code",
+  "prLastPolledAt": "2026-03-07T00:38:12.738Z",
+  "reviewStartedAt": "2026-03-06T22:17:22.831Z",
+  "prNumber": 385,
+  "prMergedAt": "2026-03-07T00:57:40Z",
+  "completedAt": "2026-03-07T01:01:29.166Z"
 }
