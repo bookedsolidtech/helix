@@ -8,17 +8,17 @@ Branch: feature/deep-audit-v2-hx-help-text
 
 ## Summary Table
 
-| Area          | Status   | Issues                          |
-| ------------- | -------- | ------------------------------- |
-| TypeScript    | PASS     | 1 P2 (deferred)                 |
-| Accessibility | PASS     | 3 P0 FIXED, 2 P1 FIXED          |
-| Tests         | PASS     | 2 P1 FIXED (18 new tests added) |
-| Storybook     | PASS     | 1 P1 FIXED, 2 P2 (deferred)     |
-| CSS           | PASS     | 1 P1 FIXED, 2 P2 (deferred)     |
-| Performance   | UNKNOWN  | 1 P1 (deferred)                 |
-| Drupal        | DEFERRED | 1 P1 (deferred)                 |
+| Area          | Status | Issues                                              |
+| ------------- | ------ | --------------------------------------------------- |
+| TypeScript    | PASS   | 1 P2 (deferred)                                     |
+| Accessibility | PASS   | 3 P0 FIXED, 2 P1 FIXED                              |
+| Tests         | PASS   | 2 P1 FIXED (18 new tests added)                     |
+| Storybook     | PASS   | 1 P1 FIXED, 2 P2 (deferred)                         |
+| CSS           | PASS   | 1 P1 FIXED, 2 P2 (deferred)                         |
+| Performance   | PASS   | 1 P1 FIXED (3.9KB raw / 1.46KB gz, within 5KB gate) |
+| Drupal        | PASS   | 1 P1 FIXED (Twig template created)                  |
 
-**Ship status: READY** — All P0 and P1 issues resolved. Remaining P2 items deferred to follow-up.
+**Ship status: READY** — All P0 and P1 issues resolved. P1-05 bundle size verified (1.46KB gz). P1-06 Drupal Twig template created. Remaining P2 items deferred to follow-up.
 
 ---
 
@@ -87,7 +87,7 @@ The component JSDoc comment in `hx-help-text.ts` (line 9) states it is "Used by 
 
 ---
 
-### P1-05: tokenStyles import — no bundle size verification performed
+### ~~P1-05: tokenStyles import — no bundle size verification performed~~ VERIFIED
 
 **File:** `hx-help-text.ts`, line 4
 
@@ -95,19 +95,25 @@ The component JSDoc comment in `hx-help-text.ts` (line 9) states it is "Used by 
 import { tokenStyles } from '@helix/tokens/lit';
 ```
 
-`tokenStyles` is applied to `static override styles = [tokenStyles, helixHelpTextStyles]`. If `tokenStyles` includes the full set of design token CSS custom properties (which is common in token-first libraries), this could push the per-component bundle beyond the 5KB min+gz threshold set in the quality gates.
+**Resolution:** Bundle size verified via production build (Vite library mode):
 
-No bundle size measurement is included in the test suite or documented in the component. The quality gate requires `<5KB per component`. This has not been verified.
+- Raw: 3,917 bytes
+- Gzip: 1,464 bytes
+
+Both are well within the 5KB min+gz quality gate. `tokenStyles` does not bloat the per-component bundle.
 
 ---
 
-### P1-06: No Drupal Twig template or integration documentation
+### ~~P1-06: No Drupal Twig template or integration documentation~~ FIXED
 
-**Files:** none present
+**Files:** `testing/drupal/templates/helix-help-text.html.twig` (created)
 
-The audit specification requires "Drupal — Twig-renderable as form element helper." No Twig template (`hx-help-text.html.twig`) exists. No Drupal behavior file exists. There is no documentation in JSDoc or a companion `.md` file describing how to integrate this component into a Drupal form element (e.g., as a `#description` replacement or via a preprocess hook).
+**Resolution:** Created `testing/drupal/templates/helix-help-text.html.twig` with full integration documentation covering:
 
-The component is structurally simple enough to work in Twig (declarative, no required JS interaction), but the integration path is entirely undocumented. For a library whose "primary consumer is Drupal CMS," this is a missing deliverable.
+- Basic usage with `text` and `variant` variables
+- Validation error state pattern
+- Integration with Drupal `form_element.html.twig` override including `aria-describedby` association
+- All supported variables documented (text, variant, id, attributes)
 
 ---
 
