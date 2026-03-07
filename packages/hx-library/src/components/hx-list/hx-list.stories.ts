@@ -1,10 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/web-components';
 import { html } from 'lit';
-import { expect, within, fn } from 'storybook/test';
+import { expect, within } from 'storybook/test';
 import './hx-list.js';
 import './hx-list-item.js';
-
-const handleSelect = fn();
 
 // ─────────────────────────────────────────────────
 // Meta Configuration
@@ -104,9 +102,8 @@ export const Interactive: Story = {
   render: () => html`
     <hx-list
       variant="interactive"
-      label="Patient Actions"
       @hx-select=${(e: CustomEvent) => {
-        handleSelect(e.detail);
+        console.log('hx-select fired:', e.detail);
       }}
     >
       <hx-list-item value="schedule">Schedule Appointment</hx-list-item>
@@ -135,7 +132,7 @@ export const Divided: Story = {
 export const InteractiveDivided: Story = {
   name: 'Interactive + Divided',
   render: () => html`
-    <hx-list variant="interactive" divided label="Account Menu" style="max-width: 320px;">
+    <hx-list variant="interactive" divided style="max-width: 320px;">
       <hx-list-item value="profile">My Profile</hx-list-item>
       <hx-list-item value="settings">Settings</hx-list-item>
       <hx-list-item value="notifications">Notifications</hx-list-item>
@@ -151,7 +148,7 @@ export const InteractiveDivided: Story = {
 export const WithPrefixSlot: Story = {
   name: 'With Prefix Icons',
   render: () => html`
-    <hx-list variant="interactive" divided label="Quick Actions" style="max-width: 360px;">
+    <hx-list variant="interactive" divided style="max-width: 360px;">
       <hx-list-item value="appointments">
         <svg
           slot="prefix"
@@ -199,7 +196,7 @@ export const WithPrefixSlot: Story = {
 export const WithDescriptionSlot: Story = {
   name: 'With Description',
   render: () => html`
-    <hx-list variant="interactive" divided label="Care Team" style="max-width: 400px;">
+    <hx-list variant="interactive" divided style="max-width: 400px;">
       <hx-list-item value="john">
         John Smith
         <span slot="description">Primary Care · Last visit: Jan 15, 2026</span>
@@ -219,7 +216,7 @@ export const WithDescriptionSlot: Story = {
 export const WithSuffixSlot: Story = {
   name: 'With Suffix Badges',
   render: () => html`
-    <hx-list variant="interactive" divided label="Notifications" style="max-width: 360px;">
+    <hx-list variant="interactive" divided style="max-width: 360px;">
       <hx-list-item value="messages">
         Messages
         <span
@@ -246,7 +243,7 @@ export const WithSuffixSlot: Story = {
 export const RichItems: Story = {
   name: 'Rich Items (prefix + description + suffix)',
   render: () => html`
-    <hx-list variant="interactive" divided label="Patient Search Results" style="max-width: 460px;">
+    <hx-list variant="interactive" divided style="max-width: 460px;">
       <hx-list-item value="smith">
         <svg
           slot="prefix"
@@ -332,7 +329,7 @@ export const RichItems: Story = {
 export const DisabledItem: Story = {
   name: 'Disabled Item',
   render: () => html`
-    <hx-list variant="interactive" divided label="Actions" style="max-width: 320px;">
+    <hx-list variant="interactive" divided style="max-width: 320px;">
       <hx-list-item value="available">Available Action</hx-list-item>
       <hx-list-item value="disabled" disabled>Restricted Action</hx-list-item>
       <hx-list-item value="another">Another Action</hx-list-item>
@@ -343,7 +340,7 @@ export const DisabledItem: Story = {
 export const SelectedItem: Story = {
   name: 'Selected Item',
   render: () => html`
-    <hx-list variant="interactive" label="Navigation" style="max-width: 320px;">
+    <hx-list variant="interactive" style="max-width: 320px;">
       <hx-list-item value="appointments" selected>Appointments</hx-list-item>
       <hx-list-item value="records">Medical Records</hx-list-item>
       <hx-list-item value="billing">Billing</hx-list-item>
@@ -370,7 +367,7 @@ export const PatientNavigationMenu: Story = {
   name: 'Patient Navigation Menu',
   render: () => html`
     <nav aria-label="Patient portal navigation" style="max-width: 280px;">
-      <hx-list variant="interactive" divided label="Patient Portal">
+      <hx-list variant="interactive" divided>
         <hx-list-item value="overview" selected>
           <svg
             slot="prefix"
@@ -480,32 +477,6 @@ export const MedicationList: Story = {
           style="background: #fee2e2; color: #991b1b; border-radius: 0.25rem; padding: 0.125rem 0.5rem; font-size: 0.75rem; font-weight: 600;"
           >Expired</span
         >
-      </hx-list-item>
-    </hx-list>
-  `,
-};
-
-// ─────────────────────────────────────────────────
-// 7. NESTED LIST
-// ─────────────────────────────────────────────────
-
-export const NestedList: Story = {
-  name: 'Nested List',
-  render: () => html`
-    <hx-list variant="bulleted" style="max-width: 400px;">
-      <hx-list-item>
-        Primary Care
-        <hx-list variant="bulleted" slot="description">
-          <hx-list-item>Annual physical</hx-list-item>
-          <hx-list-item>Vaccinations</hx-list-item>
-        </hx-list>
-      </hx-list-item>
-      <hx-list-item>
-        Specialist Referrals
-        <hx-list variant="numbered" slot="description">
-          <hx-list-item>Cardiology consultation</hx-list-item>
-          <hx-list-item>Dermatology follow-up</hx-list-item>
-        </hx-list>
       </hx-list-item>
     </hx-list>
   `,
