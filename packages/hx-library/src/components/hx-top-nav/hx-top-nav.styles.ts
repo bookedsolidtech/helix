@@ -7,12 +7,21 @@ export const helixTopNavStyles = css`
     display: block;
   }
 
+  /* ─── Header wrapper (landmark) ─── */
+
+  header {
+    display: block;
+    margin: 0;
+    padding: 0;
+  }
+
   /* ─── Sticky mode ─── */
 
   :host([sticky]) .nav {
     position: sticky;
     top: 0;
-    z-index: var(--hx-top-nav-z-index, var(--hx-z-index-sticky, 100));
+    /* Fallback 1000 is appropriate for sticky navbars (below modals ~1300, above content) */
+    z-index: var(--hx-top-nav-z-index, var(--hx-z-index-sticky, 1000));
   }
 
   /* ─── Nav container ─── */
@@ -51,13 +60,18 @@ export const helixTopNavStyles = css`
     align-items: center;
     justify-content: center;
     margin-inline-start: auto;
-    padding: var(--hx-space-2, 0.5rem);
+    /* var(--hx-space-3, 0.75rem) padding + 24px icon = 48×48px touch target (exceeds WCAG 2.5.5 44×44px) */
+    padding: var(--hx-space-3, 0.75rem);
     background: transparent;
     border: none;
     border-radius: var(--hx-border-radius-sm, 0.25rem);
     color: var(--hx-top-nav-toggle-color, var(--hx-color-neutral-700, #343a40));
     cursor: pointer;
     line-height: 0;
+  }
+
+  .mobile-toggle:hover {
+    background: var(--hx-color-neutral-100, #f1f3f5);
   }
 
   .mobile-toggle:focus-visible {
@@ -84,6 +98,7 @@ export const helixTopNavStyles = css`
 
   .nav__collapsible--open {
     display: flex;
+    animation: hx-mobile-nav-open var(--hx-duration-fast, 150ms) ease-out;
   }
 
   /* ─── Menu and actions in collapsible (mobile) ─── */
@@ -105,6 +120,8 @@ export const helixTopNavStyles = css`
 
   /* ─── Desktop breakpoint ─── */
 
+  /* NOTE: CSS @media queries do not support custom properties.
+     This value corresponds to --hx-breakpoint-md (768px). */
   @media (min-width: 768px) {
     /* Hide hamburger on desktop */
     .mobile-toggle {
@@ -126,11 +143,13 @@ export const helixTopNavStyles = css`
       border-top: none;
       margin-inline-start: auto;
       gap: var(--hx-space-4, 1rem);
+      animation: none;
     }
 
     /* Override open modifier — always visible on desktop regardless of state */
     .nav__collapsible--open {
       display: flex;
+      animation: none;
     }
 
     /* Menu grows to fill available space */
@@ -157,11 +176,24 @@ export const helixTopNavStyles = css`
     }
   }
 
+  /* ─── Mobile menu open animation ─── */
+
+  @keyframes hx-mobile-nav-open {
+    from {
+      opacity: 0;
+      transform: translateY(-0.25rem);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
   /* ─── Reduced motion ─── */
 
   @media (prefers-reduced-motion: reduce) {
-    .nav__collapsible {
-      transition: none;
+    .nav__collapsible--open {
+      animation: none;
     }
   }
 `;
