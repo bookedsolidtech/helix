@@ -1,4 +1,4 @@
-import { LitElement, html, nothing, type PropertyValues } from 'lit';
+import { LitElement, html, type PropertyValues } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { tokenStyles } from '@helix/tokens/lit';
 import { helixDividerStyles } from './hx-divider.styles.js';
@@ -8,10 +8,6 @@ import { helixDividerStyles } from './hx-divider.styles.js';
  * horizontal and vertical orientations, configurable spacing, and an optional
  * centered label rendered between two lines.
  *
- * When `decorative` is set, the divider uses `role="presentation"` so screen
- * readers skip it entirely. Otherwise it uses `role="separator"` with
- * `aria-orientation` to announce the separator semantically.
- *
  * @summary Horizontal or vertical separator line with optional label.
  *
  * @tag hx-divider
@@ -19,7 +15,6 @@ import { helixDividerStyles } from './hx-divider.styles.js';
  * @slot - Optional label text rendered centered between two lines.
  *
  * @csspart base - The root divider element.
- * @csspart line - The visual dividing line (two are rendered, flanking the label).
  * @csspart label - The optional centered label wrapper.
  *
  * @cssprop [--hx-divider-color=var(--hx-color-neutral-200)] - Line color.
@@ -46,19 +41,9 @@ export class HelixDivider extends LitElement {
   @property({ type: String, reflect: true })
   spacing: 'none' | 'sm' | 'md' | 'lg' = 'md';
 
-  /**
-   * When true, the divider is purely decorative and hidden from assistive
-   * technology via `role="presentation"`.
-   * @attr decorative
-   */
-  @property({ type: Boolean, reflect: true })
-  decorative = false;
-
-  /** @internal */
   @state()
   private _hasLabel = false;
 
-  /** @internal */
   private _checkSlot(slot: HTMLSlotElement): void {
     const nodes = slot.assignedNodes({ flatten: true });
     this._hasLabel = nodes.some((node) =>
@@ -68,7 +53,6 @@ export class HelixDivider extends LitElement {
     );
   }
 
-  /** @internal */
   private _slotChangeHandler = (e: Event): void => {
     this._checkSlot(e.target as HTMLSlotElement);
   };
@@ -80,18 +64,15 @@ export class HelixDivider extends LitElement {
   }
 
   override render() {
-    const role = this.decorative ? 'presentation' : 'separator';
-    const ariaOrientation = this.decorative ? nothing : this.orientation;
-
     return html`
-      <div part="base" class="divider" role=${role} aria-orientation=${ariaOrientation}>
-        <span part="line" class="divider__line"></span>
+      <div part="base" class="divider" role="separator" aria-orientation=${this.orientation}>
+        <span class="divider__line"></span>
         ${this._hasLabel
           ? html`<span part="label" class="divider__label">
               <slot @slotchange=${this._slotChangeHandler}></slot>
             </span>`
           : html`<slot @slotchange=${this._slotChangeHandler}></slot>`}
-        <span part="line" class="divider__line"></span>
+        <span class="divider__line"></span>
       </div>
     `;
   }

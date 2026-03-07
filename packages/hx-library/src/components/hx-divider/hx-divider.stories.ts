@@ -32,29 +32,15 @@ const meta = {
         type: { summary: "'none' | 'sm' | 'md' | 'lg'" },
       },
     },
-    decorative: {
-      control: { type: 'boolean' },
-      description: 'When true, the divider is purely decorative (role="presentation").',
-      table: {
-        category: 'Accessibility',
-        defaultValue: { summary: 'false' },
-        type: { summary: 'boolean' },
-      },
-    },
   },
   args: {
     orientation: 'horizontal',
     spacing: 'md',
-    decorative: false,
   },
   render: (args) => html`
     <div style="padding: 1rem; max-width: 480px;">
       <p style="margin: 0;">Section one content</p>
-      <hx-divider
-        orientation=${args.orientation}
-        spacing=${args.spacing}
-        ?decorative=${args.decorative}
-      ></hx-divider>
+      <hx-divider orientation=${args.orientation} spacing=${args.spacing}></hx-divider>
       <p style="margin: 0;">Section two content</p>
     </div>
   `,
@@ -131,24 +117,7 @@ export const WithLabel: Story = {
 };
 
 // ─────────────────────────────────────────────────
-// 5. DECORATIVE
-// ─────────────────────────────────────────────────
-
-export const Decorative: Story = {
-  args: {
-    decorative: true,
-  },
-  render: () => html`
-    <div style="padding: 1rem; max-width: 480px;">
-      <p style="margin: 0;">Content above</p>
-      <hx-divider decorative></hx-divider>
-      <p style="margin: 0;">Content below (divider hidden from screen readers)</p>
-    </div>
-  `,
-};
-
-// ─────────────────────────────────────────────────
-// 6. SPACING VARIANTS
+// 5. SPACING VARIANTS
 // ─────────────────────────────────────────────────
 
 export const SpacingVariants: Story = {
