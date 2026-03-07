@@ -90,14 +90,7 @@ export class HelixFormatDate extends LitElement {
    * @attr time-zone-name
    */
   @property({ attribute: 'time-zone-name' })
-  timeZoneName:
-    | 'short'
-    | 'long'
-    | 'shortOffset'
-    | 'longOffset'
-    | 'shortGeneric'
-    | 'longGeneric'
-    | undefined = undefined;
+  timeZoneName: 'short' | 'long' | undefined = undefined;
 
   /**
    * IANA time zone identifier (e.g. `"America/New_York"`, `"UTC"`).
@@ -125,10 +118,6 @@ export class HelixFormatDate extends LitElement {
   /**
    * When true, displays a relative time string such as "2 hours ago" or "in 3 days"
    * using `Intl.RelativeTimeFormat`.
-   *
-   * **Important:** The relative time is computed once on render and does NOT auto-update.
-   * Consumers must trigger re-renders (e.g., update the `date` property on an interval)
-   * to keep the displayed relative time current.
    * @attr relative
    */
   @property({ type: Boolean })
@@ -184,18 +173,14 @@ export class HelixFormatDate extends LitElement {
     const absMonth = Math.abs(diffMonth);
     const diffYear = Math.round(diffDay / 365);
 
-    try {
-      const rtf = new Intl.RelativeTimeFormat(this._getLocale(), { numeric: this.numeric });
+    const rtf = new Intl.RelativeTimeFormat(this._getLocale(), { numeric: this.numeric });
 
-      if (absSec < 60) return rtf.format(diffSec, 'second');
-      if (absMin < 60) return rtf.format(diffMin, 'minute');
-      if (absHour < 24) return rtf.format(diffHour, 'hour');
-      if (absDay < 30) return rtf.format(diffDay, 'day');
-      if (absMonth < 12) return rtf.format(diffMonth, 'month');
-      return rtf.format(diffYear, 'year');
-    } catch {
-      return '';
-    }
+    if (absSec < 60) return rtf.format(diffSec, 'second');
+    if (absMin < 60) return rtf.format(diffMin, 'minute');
+    if (absHour < 24) return rtf.format(diffHour, 'hour');
+    if (absDay < 30) return rtf.format(diffDay, 'day');
+    if (absMonth < 12) return rtf.format(diffMonth, 'month');
+    return rtf.format(diffYear, 'year');
   }
 
   private _formatAbsolute(date: Date): string {
@@ -221,11 +206,7 @@ export class HelixFormatDate extends LitElement {
       options.day = 'numeric';
     }
 
-    try {
-      return new Intl.DateTimeFormat(this._getLocale(), options).format(date);
-    } catch {
-      return '';
-    }
+    return new Intl.DateTimeFormat(this._getLocale(), options).format(date);
   }
 
   // ─── Render ───

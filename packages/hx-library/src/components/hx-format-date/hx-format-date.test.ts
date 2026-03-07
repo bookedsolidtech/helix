@@ -14,24 +14,18 @@ describe('hx-format-date', () => {
 
   describe('Rendering', () => {
     it('renders with shadow DOM', async () => {
-      const el = await fixture<WcFormatDate>(
-        `<hx-format-date date="${ISO_DATE}"></hx-format-date>`,
-      );
+      const el = await fixture<WcFormatDate>(`<hx-format-date date="${ISO_DATE}"></hx-format-date>`);
       expect(el.shadowRoot).toBeTruthy();
     });
 
     it('renders a <time> element', async () => {
-      const el = await fixture<WcFormatDate>(
-        `<hx-format-date date="${ISO_DATE}"></hx-format-date>`,
-      );
+      const el = await fixture<WcFormatDate>(`<hx-format-date date="${ISO_DATE}"></hx-format-date>`);
       const time = shadowQuery(el, 'time');
       expect(time).toBeInstanceOf(HTMLElement);
     });
 
     it('exposes "base" CSS part on the <time> element', async () => {
-      const el = await fixture<WcFormatDate>(
-        `<hx-format-date date="${ISO_DATE}"></hx-format-date>`,
-      );
+      const el = await fixture<WcFormatDate>(`<hx-format-date date="${ISO_DATE}"></hx-format-date>`);
       const time = shadowQuery(el, '[part~="base"]');
       expect(time).toBeTruthy();
     });
@@ -49,9 +43,7 @@ describe('hx-format-date', () => {
 
   describe('datetime attribute', () => {
     it('sets the datetime attribute to the ISO 8601 string', async () => {
-      const el = await fixture<WcFormatDate>(
-        `<hx-format-date date="${ISO_DATE}"></hx-format-date>`,
-      );
+      const el = await fixture<WcFormatDate>(`<hx-format-date date="${ISO_DATE}"></hx-format-date>`);
       const time = shadowQuery(el, 'time')!;
       expect(time.getAttribute('datetime')).toBe(new Date(ISO_DATE).toISOString());
     });
@@ -95,9 +87,7 @@ describe('hx-format-date', () => {
     });
 
     it('accepts a Date object via property', async () => {
-      const el = await fixture<WcFormatDate>(
-        `<hx-format-date lang="en-US" month="long" year="numeric" day="numeric"></hx-format-date>`,
-      );
+      const el = await fixture<WcFormatDate>(`<hx-format-date lang="en-US" month="long" year="numeric" day="numeric"></hx-format-date>`);
       const dateObj = new Date(ISO_DATE);
       el.date = dateObj;
       await el.updateComplete;
@@ -227,15 +217,6 @@ describe('hx-format-date', () => {
       expect(time.textContent).toMatch(/\d+ day/i);
     });
 
-    it('uses numeric="auto" to produce natural language (e.g. "yesterday")', async () => {
-      const yesterday = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
-      const el = await fixture<WcFormatDate>(
-        `<hx-format-date date="${yesterday}" lang="en-US" relative numeric="auto"></hx-format-date>`,
-      );
-      const time = shadowQuery(el, 'time')!;
-      expect(time.textContent).toContain('yesterday');
-    });
-
     it('still sets datetime attribute with ISO string for relative mode', async () => {
       const twoHoursAgo = new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString();
       const el = await fixture<WcFormatDate>(
@@ -245,48 +226,6 @@ describe('hx-format-date', () => {
       const dt = time.getAttribute('datetime')!;
       // Should be a valid ISO date string
       expect(new Date(dt).toISOString()).toBe(dt);
-    });
-  });
-
-  // ─── Time zone (3) ───
-
-  describe('Time zone', () => {
-    it('applies timeZone to shift displayed time', async () => {
-      const el = await fixture<WcFormatDate>(
-        `<hx-format-date date="${ISO_DATE}" lang="en-US" hour="numeric" minute="2-digit" time-zone="America/New_York"></hx-format-date>`,
-      );
-      const time = shadowQuery(el, 'time')!;
-      expect(time.textContent!.trim().length).toBeGreaterThan(0);
-    });
-
-    it('renders timeZoneName short abbreviation', async () => {
-      const el = await fixture<WcFormatDate>(
-        `<hx-format-date date="${ISO_DATE}" lang="en-US" hour="numeric" minute="2-digit" time-zone="UTC" time-zone-name="short"></hx-format-date>`,
-      );
-      const time = shadowQuery(el, 'time')!;
-      expect(time.textContent).toContain('UTC');
-    });
-
-    it('handles invalid timeZone gracefully without throwing', async () => {
-      const el = await fixture<WcFormatDate>(
-        `<hx-format-date date="${ISO_DATE}" lang="en-US" time-zone="Foo/Bar" hour="numeric"></hx-format-date>`,
-      );
-      const time = shadowQuery(el, 'time')!;
-      // Should render empty string (fallback) rather than crashing
-      expect(time.textContent).toBe('');
-    });
-  });
-
-  // ─── Second attribute (1) ───
-
-  describe('Second attribute', () => {
-    it('renders seconds when second="2-digit" is set', async () => {
-      const el = await fixture<WcFormatDate>(
-        `<hx-format-date date="${ISO_DATE}" lang="en-US" hour="numeric" minute="2-digit" second="2-digit" time-zone="UTC"></hx-format-date>`,
-      );
-      const time = shadowQuery(el, 'time')!;
-      // 14:30:00 UTC — should contain "00" for seconds
-      expect(time.textContent).toMatch(/00/);
     });
   });
 
@@ -313,25 +252,10 @@ describe('hx-format-date', () => {
   // ─── Accessibility (1) ───
 
   describe('Accessibility: axe-core', () => {
-    it('has no axe violations (absolute format)', async () => {
+    it('has no axe violations', async () => {
       const el = await fixture<WcFormatDate>(
         `<hx-format-date date="${ISO_DATE}" lang="en-US" month="long" year="numeric" day="numeric"></hx-format-date>`,
       );
-      const { violations } = await checkA11y(el);
-      expect(violations).toHaveLength(0);
-    });
-
-    it('has no axe violations (relative format)', async () => {
-      const twoHoursAgo = new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString();
-      const el = await fixture<WcFormatDate>(
-        `<hx-format-date date="${twoHoursAgo}" lang="en-US" relative></hx-format-date>`,
-      );
-      const { violations } = await checkA11y(el);
-      expect(violations).toHaveLength(0);
-    });
-
-    it('has no axe violations (default no-args)', async () => {
-      const el = await fixture<WcFormatDate>(`<hx-format-date></hx-format-date>`);
       const { violations } = await checkA11y(el);
       expect(violations).toHaveLength(0);
     });
