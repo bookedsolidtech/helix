@@ -4,6 +4,23 @@ import { classMap } from 'lit/directives/class-map.js';
 import { tokenStyles } from '@helix/tokens/lit';
 import { helixAccordionItemStyles } from './hx-accordion-item.styles.js';
 
+const chevronIcon = svg`
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width="16"
+    height="16"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    stroke-width="2"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    aria-hidden="true"
+  >
+    <polyline points="6 9 12 15 18 9"></polyline>
+  </svg>
+`;
+
 /**
  * An individual accordion item with collapsible content.
  *
@@ -57,39 +74,25 @@ export class HelixAccordionItem extends LitElement {
     const willExpand = !this.expanded;
     this.expanded = willExpand;
 
-    const detail = { expanded: willExpand, itemId: this.id || '' };
+    this._dispatchToggleEvent(willExpand);
+  }
 
-    if (willExpand) {
-      /**
-       * Dispatched when the item is expanded.
-       * @event hx-expand
-       */
-      this.dispatchEvent(
-        new CustomEvent('hx-expand', {
-          bubbles: true,
-          composed: true,
-          detail,
-        }),
-      );
-    } else {
-      /**
-       * Dispatched when the item is collapsed.
-       * @event hx-collapse
-       */
-      this.dispatchEvent(
-        new CustomEvent('hx-collapse', {
-          bubbles: true,
-          composed: true,
-          detail,
-        }),
-      );
-    }
+  _dispatchToggleEvent(expanded: boolean): void {
+    const detail = { expanded, itemId: this.id || '' };
+    const eventName = expanded ? 'hx-expand' : 'hx-collapse';
+
+    this.dispatchEvent(
+      new CustomEvent(eventName, {
+        bubbles: true,
+        composed: true,
+        detail,
+      }),
+    );
   }
 
   // ─── Event Handlers ───
 
   private _handleSummaryClick(e: MouseEvent): void {
-    // Prevent native details toggle; we handle it programmatically for animation
     e.preventDefault();
     this._toggle();
   }
@@ -101,11 +104,6 @@ export class HelixAccordionItem extends LitElement {
     }
   }
 
-  private _handleToggle(e: Event): void {
-    // Prevent native <details> toggle from controlling state — Lit manages it
-    e.preventDefault();
-  }
-
   // ─── Render ───
 
   override render() {
@@ -115,34 +113,13 @@ export class HelixAccordionItem extends LitElement {
       'item--disabled': this.disabled,
     };
 
-    const chevronIcon = svg`
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        width="16"
-        height="16"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="2"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-        aria-hidden="true"
-      >
-        <polyline points="6 9 12 15 18 9"></polyline>
-      </svg>
-    `;
-
     return html`
-      <details
-        part="item"
-        class=${classMap(itemClasses)}
-        ?open=${this.expanded}
-        @toggle=${this._handleToggle}
-      >
+      <details part="item" class=${classMap(itemClasses)} ?open=${this.expanded}>
         <summary
           id="trigger"
           part="trigger"
           class="trigger"
+          tabindex=${this.disabled ? '-1' : '0'}
           aria-expanded=${this.expanded ? 'true' : 'false'}
           aria-disabled=${this.disabled ? 'true' : 'false'}
           @click=${this._handleSummaryClick}
