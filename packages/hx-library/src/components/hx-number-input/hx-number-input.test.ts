@@ -102,10 +102,10 @@ describe('hx-number-input', () => {
       expect(el.hasAttribute('required')).toBe(true);
     });
 
-    it('sets aria-required="true" on native input', async () => {
+    it('sets native required attribute on input', async () => {
       const el = await fixture<HelixNumberInput>('<hx-number-input required></hx-number-input>');
       const input = shadowQuery<HTMLInputElement>(el, 'input')!;
-      expect(input.getAttribute('aria-required')).toBe('true');
+      expect(input.required).toBe(true);
     });
 
     it('marks validity as valueMissing when required and no value', async () => {
@@ -317,12 +317,12 @@ describe('hx-number-input', () => {
       expect(errorDiv?.textContent?.trim()).toBe('Value is required');
     });
 
-    it('error div has aria-live="polite"', async () => {
+    it('error div has role="alert"', async () => {
       const el = await fixture<HelixNumberInput>(
         '<hx-number-input error="Invalid"></hx-number-input>',
       );
       const errorDiv = shadowQuery(el, '.field__error');
-      expect(errorDiv?.getAttribute('aria-live')).toBe('polite');
+      expect(errorDiv?.getAttribute('role')).toBe('alert');
     });
 
     it('applies field--error class to field container', async () => {
@@ -548,8 +548,19 @@ describe('hx-number-input', () => {
       expect(el.form).toBe(form);
     });
 
-    it('formResetCallback resets value to null', async () => {
+    it('formResetCallback restores value to default', async () => {
       const el = await fixture<HelixNumberInput>('<hx-number-input value="42"></hx-number-input>');
+      el.value = 99;
+      await el.updateComplete;
+      el.formResetCallback();
+      await el.updateComplete;
+      expect(el.value).toBe(42);
+    });
+
+    it('formResetCallback restores to null when no default value', async () => {
+      const el = await fixture<HelixNumberInput>('<hx-number-input></hx-number-input>');
+      el.value = 50;
+      await el.updateComplete;
       el.formResetCallback();
       await el.updateComplete;
       expect(el.value).toBeNull();
@@ -595,6 +606,13 @@ describe('hx-number-input', () => {
     it('formStateRestoreCallback sets null for non-numeric state', async () => {
       const el = await fixture<HelixNumberInput>('<hx-number-input></hx-number-input>');
       el.formStateRestoreCallback('not-a-number');
+      await el.updateComplete;
+      expect(el.value).toBeNull();
+    });
+
+    it('formStateRestoreCallback rejects partial numeric strings like "77abc"', async () => {
+      const el = await fixture<HelixNumberInput>('<hx-number-input></hx-number-input>');
+      el.formStateRestoreCallback('77abc');
       await el.updateComplete;
       expect(el.value).toBeNull();
     });

@@ -22,7 +22,7 @@ const meta = {
         type: { summary: "'primary' | 'secondary' | 'tertiary' | 'danger' | 'ghost' | 'outline'" },
       },
     },
-    hxSize: {
+    size: {
       control: { type: 'select' },
       options: ['sm', 'md', 'lg'],
       description: 'Size of the button. Controls padding, font-size, and min-height.',
@@ -107,7 +107,7 @@ const meta = {
   },
   args: {
     variant: 'primary',
-    hxSize: 'md',
+    size: 'md',
     disabled: false,
     loading: false,
     type: 'button',
@@ -116,7 +116,7 @@ const meta = {
   render: (args) => html`
     <hx-button
       variant=${args.variant}
-      hx-size=${args.hxSize}
+      hx-size=${args.size}
       ?disabled=${args.disabled}
       ?loading=${args.loading}
       type=${args.type}
@@ -211,21 +211,21 @@ export const Outline: Story = {
 
 export const Small: Story = {
   args: {
-    hxSize: 'sm',
+    size: 'sm',
     label: 'Edit',
   },
 };
 
 export const Medium: Story = {
   args: {
-    hxSize: 'md',
+    size: 'md',
     label: 'Submit Request',
   },
 };
 
 export const Large: Story = {
   args: {
-    hxSize: 'lg',
+    size: 'lg',
     label: 'Begin Assessment',
   },
 };
