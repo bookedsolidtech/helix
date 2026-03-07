@@ -52,15 +52,24 @@ export const helixSpinnerStyles = css`
     }
   }
 
+  @keyframes hx-spinner-pulse {
+    0%,
+    100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.4;
+    }
+  }
+
   @media (prefers-reduced-motion: reduce) {
     .spinner__svg {
-      animation: none;
+      animation: hx-spinner-pulse 2s ease-in-out infinite;
     }
 
     .spinner__arc {
       animation: none;
       stroke-dashoffset: 14;
-      opacity: var(--hx-opacity-muted, 0.6);
     }
   }
 
@@ -92,23 +101,15 @@ export const helixSpinnerStyles = css`
 
   :host([variant='inverted']) {
     --_spinner-color: var(--hx-spinner-color, var(--hx-color-neutral-0, #ffffff));
-    --_spinner-track-color: var(
-      --hx-spinner-track-color,
-      color-mix(in srgb, var(--hx-color-neutral-0, #ffffff) 30%, transparent)
-    );
+    --_spinner-track-color: var(--hx-spinner-track-color, rgba(255, 255, 255, 0.3));
   }
 
-  /* ─── Visually-hidden text for screen readers ─── */
-
-  .spinner__sr-text {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    padding: 0;
-    margin: -1px;
-    overflow: hidden;
-    clip: rect(0, 0, 0, 0);
-    white-space: nowrap;
-    border: 0;
+  @supports (color: color-mix(in srgb, red, blue)) {
+    :host([variant='inverted']) {
+      --_spinner-track-color: var(
+        --hx-spinner-track-color,
+        color-mix(in srgb, var(--hx-color-neutral-0, #ffffff) 30%, transparent)
+      );
+    }
   }
 `;
