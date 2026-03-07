@@ -362,7 +362,9 @@ describe('hx-slider', () => {
     });
 
     it('value is clamped to min when set below min', async () => {
-      const el = await fixture<HelixSlider>('<hx-slider min="10" max="100" value="50"></hx-slider>');
+      const el = await fixture<HelixSlider>(
+        '<hx-slider min="10" max="100" value="50"></hx-slider>',
+      );
       el.value = -5;
       await el.updateComplete;
       expect(el.value).toBe(10);
@@ -500,9 +502,7 @@ describe('hx-slider', () => {
     });
 
     it('fill width is 50% when value is mid-range', async () => {
-      const el = await fixture<HelixSlider>(
-        '<hx-slider min="0" max="100" value="50"></hx-slider>',
-      );
+      const el = await fixture<HelixSlider>('<hx-slider min="0" max="100" value="50"></hx-slider>');
       const fill = shadowQuery<HTMLElement>(el, '[part="fill"]');
       expect(fill?.style.width).toBe('50%');
     });
