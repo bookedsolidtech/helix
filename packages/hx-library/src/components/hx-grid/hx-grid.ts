@@ -40,18 +40,7 @@ export class HelixGrid extends LitElement {
    * Number of equal columns (`repeat(N, 1fr)`) or a CSS grid-template-columns string.
    * @attr columns
    */
-  @property({
-    reflect: true,
-    converter: {
-      fromAttribute(value: string | null): number | string {
-        if (value === null) return 1;
-        return /^\d+$/.test(value) ? Number(value) : value;
-      },
-      toAttribute(value: number | string): string {
-        return String(value);
-      },
-    },
-  })
+  @property({ reflect: true })
   columns: number | string = 1;
 
   /**
@@ -91,7 +80,7 @@ export class HelixGrid extends LitElement {
 
   private _gridTemplateColumns(): string {
     const cols = this.columns;
-    if (typeof cols === 'number') {
+    if (typeof cols === 'number' || /^\d+$/.test(String(cols))) {
       return `var(--hx-grid-columns, repeat(${cols}, 1fr))`;
     }
     return `var(--hx-grid-columns, ${cols})`;
