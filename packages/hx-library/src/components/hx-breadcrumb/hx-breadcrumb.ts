@@ -90,24 +90,16 @@ export class HelixBreadcrumb extends LitElement {
       this._removeCollapse(items);
     }
 
-    // Check if any item has the explicit `current` attribute
-    const hasExplicitCurrent = items.some((item) => item.hasAttribute('current'));
-
     // Update ARIA attributes on all real items
     items.forEach((item, i) => {
       const el = item as HTMLElement;
       const isLast = i === items.length - 1;
-      const isCurrent = hasExplicitCurrent ? el.hasAttribute('current') : isLast;
-
-      if (isCurrent) {
-        el.setAttribute('aria-current', 'page');
-      } else {
-        el.removeAttribute('aria-current');
-      }
 
       if (isLast) {
+        el.setAttribute('aria-current', 'page');
         el.setAttribute('data-bc-last', '');
       } else {
+        el.removeAttribute('aria-current');
         el.removeAttribute('data-bc-last');
       }
     });
@@ -143,17 +135,8 @@ export class HelixBreadcrumb extends LitElement {
     if (!this._ellipsisItem) {
       const el = document.createElement('hx-breadcrumb-item');
       el.classList.add('hx-bc-ellipsis');
-      el.setAttribute('role', 'button');
-      el.setAttribute('tabindex', '0');
-      el.setAttribute('aria-label', 'Show all breadcrumb items');
+      el.setAttribute('aria-hidden', 'true');
       el.textContent = '…';
-      el.addEventListener('click', () => this._expandCollapsed());
-      el.addEventListener('keydown', (e: KeyboardEvent) => {
-        if (e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault();
-          this._expandCollapsed();
-        }
-      });
       this._ellipsisItem = el;
     }
 
@@ -162,15 +145,6 @@ export class HelixBreadcrumb extends LitElement {
     if (!firstItem) return;
     if (this._ellipsisItem.previousElementSibling !== firstItem) {
       firstItem.after(this._ellipsisItem);
-    }
-  }
-
-  private _expandCollapsed(): void {
-    this.maxItems = 0;
-    const slot = this.shadowRoot?.querySelector<HTMLSlotElement>('slot:not([name])');
-    if (slot) {
-      const items = this._getBreadcrumbItems(slot);
-      this._removeCollapse(items);
     }
   }
 
@@ -239,19 +213,9 @@ export class HelixBreadcrumb extends LitElement {
   override updated(changedProperties: Map<string, unknown>): void {
     super.updated(changedProperties);
     if (changedProperties.has('separator')) {
+      // JSON.stringify wraps the string in quotes so the value is valid
+      // for use in the CSS `content` property (e.g. '/' becomes '"/"').
       this.style.setProperty('--hx-breadcrumb-separator-content', JSON.stringify(this.separator));
-    }
-
-    if (changedProperties.has('jsonLd')) {
-      if (this.jsonLd) {
-        const slot = this.shadowRoot?.querySelector<HTMLSlotElement>('slot:not([name])');
-        if (slot) {
-          this._updateJsonLd(this._getBreadcrumbItems(slot));
-        }
-      } else {
-        this._jsonLdScript?.remove();
-        this._jsonLdScript = null;
-      }
     }
   }
 
