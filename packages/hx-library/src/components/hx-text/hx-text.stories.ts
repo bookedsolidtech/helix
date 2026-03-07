@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/web-components';
 import { html } from 'lit';
+import { ifDefined } from 'lit/directives/if-defined.js';
 import './hx-text.js';
 
 // ─────────────────────────────────────────────────
@@ -86,7 +87,7 @@ const meta = {
       ?truncate=${args.truncate}
       lines=${args.lines > 0 ? args.lines : 0}
       color=${args.color}
-      weight=${args.weight ?? ''}
+      weight=${ifDefined(args.weight)}
     >
       ${args.content}
     </hx-text>
