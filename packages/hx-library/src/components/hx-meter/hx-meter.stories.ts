@@ -1,6 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/web-components';
 import { html } from 'lit';
-import { ifDefined } from 'lit/directives/if-defined.js';
 import { expect, within } from 'storybook/test';
 import './hx-meter.js';
 
@@ -84,9 +83,6 @@ const meta = {
       value=${args.value}
       min=${args.min}
       max=${args.max}
-      low=${ifDefined(args.low)}
-      high=${ifDefined(args.high)}
-      optimum=${ifDefined(args.optimum)}
       label=${args.label ?? ''}
     ></hx-meter>
   `,
@@ -233,7 +229,7 @@ export const CustomRange: Story = {
 export const LabelSlot: Story = {
   name: 'Label via slot',
   render: () => html`
-    <hx-meter value="45" min="0" max="200" label="Disk usage: 45 GB of 200 GB">
+    <hx-meter value="45" min="0" max="200">
       <span slot="label">Disk usage: 45 GB of 200 GB</span>
     </hx-meter>
   `,
@@ -247,33 +243,9 @@ export const DiskUsage: Story = {
   name: 'Disk Usage',
   render: () => html`
     <div style="display: flex; flex-direction: column; gap: 1rem; max-width: 400px;">
-      <hx-meter
-        value="25"
-        min="0"
-        max="100"
-        low="70"
-        high="90"
-        optimum="30"
-        label="System (/): 25 GB used"
-      ></hx-meter>
-      <hx-meter
-        value="78"
-        min="0"
-        max="100"
-        low="70"
-        high="90"
-        optimum="30"
-        label="Data (/data): 78 GB used"
-      ></hx-meter>
-      <hx-meter
-        value="95"
-        min="0"
-        max="100"
-        low="70"
-        high="90"
-        optimum="30"
-        label="Backup (/backup): 95 GB used"
-      ></hx-meter>
+      <hx-meter value="25" min="0" max="100" low="70" high="90" optimum="30" label="System (/): 25 GB used"></hx-meter>
+      <hx-meter value="78" min="0" max="100" low="70" high="90" optimum="30" label="Data (/data): 78 GB used"></hx-meter>
+      <hx-meter value="95" min="0" max="100" low="70" high="90" optimum="30" label="Backup (/backup): 95 GB used"></hx-meter>
     </div>
   `,
 };
@@ -282,33 +254,9 @@ export const HealthScore: Story = {
   name: 'Patient Health Score',
   render: () => html`
     <div style="display: flex; flex-direction: column; gap: 1rem; max-width: 400px;">
-      <hx-meter
-        value="85"
-        min="0"
-        max="100"
-        low="40"
-        high="60"
-        optimum="100"
-        label="Cardiovascular score: 85/100"
-      ></hx-meter>
-      <hx-meter
-        value="55"
-        min="0"
-        max="100"
-        low="40"
-        high="60"
-        optimum="100"
-        label="Respiratory score: 55/100"
-      ></hx-meter>
-      <hx-meter
-        value="30"
-        min="0"
-        max="100"
-        low="40"
-        high="60"
-        optimum="100"
-        label="Hydration score: 30/100"
-      ></hx-meter>
+      <hx-meter value="85" min="0" max="100" low="40" high="60" optimum="100" label="Cardiovascular score: 85/100"></hx-meter>
+      <hx-meter value="55" min="0" max="100" low="40" high="60" optimum="100" label="Respiratory score: 55/100"></hx-meter>
+      <hx-meter value="30" min="0" max="100" low="40" high="60" optimum="100" label="Hydration score: 30/100"></hx-meter>
     </div>
   `,
 };
