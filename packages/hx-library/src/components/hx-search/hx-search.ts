@@ -115,7 +115,6 @@ export class HelixSearch extends LitElement {
   // ─── Unique IDs ───
 
   private _inputId = `hx-search-${Math.random().toString(36).slice(2, 9)}`;
-  private _labelId = `hx-search-label-${Math.random().toString(36).slice(2, 9)}`;
 
   // ─── Lifecycle ───
 
@@ -197,10 +196,6 @@ export class HelixSearch extends LitElement {
         this._debounceTimer = null;
       }
       this._dispatchSearch();
-    } else if (e.key === 'Escape') {
-      if (this.value) {
-        this._handleClear();
-      }
     }
   }
 
@@ -321,15 +316,13 @@ export class HelixSearch extends LitElement {
     return html`
       <div
         part="field"
-        role="search"
         class=${classMap(fieldClasses)}
-        aria-label=${ifDefined(this.label || 'Search')}
         aria-busy=${this.loading ? 'true' : nothing}
       >
         <div class="field__label-wrapper">
           ${this.label
             ? html`
-                <label part="label" class="field__label" id=${this._labelId} for=${this._inputId}>
+                <label part="label" class="field__label" for=${this._inputId}>
                   ${this.label}
                 </label>
               `
@@ -352,7 +345,7 @@ export class HelixSearch extends LitElement {
             ?disabled=${this.disabled}
             name=${ifDefined(this.name || undefined)}
             aria-label=${ifDefined(this.label ? undefined : 'Search')}
-            aria-labelledby=${ifDefined(this.label ? this._labelId : undefined)}
+            aria-labelledby=${ifDefined(this.label ? this._inputId : undefined)}
             @input=${this._handleInput}
             @keydown=${this._handleKeydown}
           />
