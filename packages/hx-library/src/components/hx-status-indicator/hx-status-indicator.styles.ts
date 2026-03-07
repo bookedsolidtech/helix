@@ -35,7 +35,7 @@ export const helixStatusIndicatorStyles = css`
     border-radius: 50%;
     background-color: var(--_dot-color);
     opacity: 0.4;
-    animation: hx-status-pulse 1.5s ease-out infinite;
+    animation: hx-status-pulse var(--hx-status-indicator-pulse-duration, 1.5s) ease-out infinite;
     z-index: 0;
   }
 
@@ -49,7 +49,7 @@ export const helixStatusIndicatorStyles = css`
       opacity: 0.4;
     }
     100% {
-      transform: scale(2.5);
+      transform: scale(var(--hx-status-indicator-pulse-scale, 2.5));
       opacity: 0;
     }
   }
@@ -63,36 +63,36 @@ export const helixStatusIndicatorStyles = css`
   /* ─── Size Variants ─── */
 
   :host([size='sm']) {
-    --_indicator-size: var(--hx-size-2, 0.5rem);
+    --_indicator-size: var(--hx-status-indicator-size-sm, var(--hx-size-2, 0.5rem));
   }
 
   :host([size='md']) {
-    --_indicator-size: var(--hx-size-3, 0.75rem);
+    --_indicator-size: var(--hx-status-indicator-size-md, var(--hx-size-3, 0.75rem));
   }
 
   :host([size='lg']) {
-    --_indicator-size: var(--hx-size-4, 1rem);
+    --_indicator-size: var(--hx-status-indicator-size-lg, var(--hx-size-4, 1rem));
   }
 
   /* ─── Status Colors ─── */
 
   :host([status='online']) {
-    --_dot-color: var(--hx-color-success-500, #22c55e);
+    --_dot-color: var(--hx-status-indicator-color-online, var(--hx-color-success-500, #22c55e));
   }
 
   :host([status='offline']) {
-    --_dot-color: var(--hx-color-neutral-400, #94a3b8);
+    --_dot-color: var(--hx-status-indicator-color-offline, var(--hx-color-neutral-400, #94a3b8));
   }
 
   :host([status='away']) {
-    --_dot-color: var(--hx-color-warning-500, #f59e0b);
+    --_dot-color: var(--hx-status-indicator-color-away, var(--hx-color-warning-500, #f59e0b));
   }
 
   :host([status='busy']) {
-    --_dot-color: var(--hx-color-danger-500, #ef4444);
+    --_dot-color: var(--hx-status-indicator-color-busy, var(--hx-color-danger-500, #ef4444));
   }
 
   :host([status='unknown']) {
-    --_dot-color: var(--hx-color-neutral-300, #cbd5e1);
+    --_dot-color: var(--hx-status-indicator-color-unknown, var(--hx-color-neutral-300, #cbd5e1));
   }
 `;
