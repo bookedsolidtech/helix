@@ -12,24 +12,12 @@ const meta = {
   argTypes: {
     placement: {
       control: { type: 'select' },
-      options: [
-        'top',
-        'top-start',
-        'top-end',
-        'bottom',
-        'bottom-start',
-        'bottom-end',
-        'start',
-        'end',
-      ],
+      options: ['top', 'top-start', 'top-end', 'bottom', 'bottom-start', 'bottom-end', 'start', 'end'],
       description: 'Preferred placement of the dropdown panel.',
       table: {
         category: 'Positioning',
         defaultValue: { summary: 'bottom-start' },
-        type: {
-          summary:
-            "'top' | 'top-start' | 'top-end' | 'bottom' | 'bottom-start' | 'bottom-end' | 'start' | 'end'",
-        },
+        type: { summary: "'top' | 'top-start' | 'top-end' | 'bottom' | 'bottom-start' | 'bottom-end' | 'start' | 'end'" },
       },
     },
     open: {
@@ -76,30 +64,9 @@ const meta = {
       >
         <button slot="trigger" type="button">Open Menu</button>
         <ul style="margin: 0; padding: 0.25rem 0; list-style: none;">
-          <li
-            data-value="edit"
-            role="menuitem"
-            tabindex="-1"
-            style="padding: 0.5rem 1rem; cursor: pointer;"
-          >
-            Edit
-          </li>
-          <li
-            data-value="duplicate"
-            role="menuitem"
-            tabindex="-1"
-            style="padding: 0.5rem 1rem; cursor: pointer;"
-          >
-            Duplicate
-          </li>
-          <li
-            data-value="delete"
-            role="menuitem"
-            tabindex="-1"
-            style="padding: 0.5rem 1rem; cursor: pointer; color: #dc2626;"
-          >
-            Delete
-          </li>
+          <li data-value="edit" role="menuitem" tabindex="-1" style="padding: 0.5rem 1rem; cursor: pointer;">Edit</li>
+          <li data-value="duplicate" role="menuitem" tabindex="-1" style="padding: 0.5rem 1rem; cursor: pointer;">Duplicate</li>
+          <li data-value="delete" role="menuitem" tabindex="-1" style="padding: 0.5rem 1rem; cursor: pointer; color: #dc2626;">Delete</li>
         </ul>
       </hx-dropdown>
     </div>
@@ -120,30 +87,9 @@ export const Default: Story = {
       <hx-dropdown>
         <button slot="trigger" type="button">Open Menu</button>
         <ul style="margin: 0; padding: 0.25rem 0; list-style: none;">
-          <li
-            data-value="edit"
-            role="menuitem"
-            tabindex="-1"
-            style="padding: 0.5rem 1rem; cursor: pointer;"
-          >
-            Edit
-          </li>
-          <li
-            data-value="duplicate"
-            role="menuitem"
-            tabindex="-1"
-            style="padding: 0.5rem 1rem; cursor: pointer;"
-          >
-            Duplicate
-          </li>
-          <li
-            data-value="delete"
-            role="menuitem"
-            tabindex="-1"
-            style="padding: 0.5rem 1rem; cursor: pointer; color: #dc2626;"
-          >
-            Delete
-          </li>
+          <li data-value="edit" role="menuitem" tabindex="-1" style="padding: 0.5rem 1rem; cursor: pointer;">Edit</li>
+          <li data-value="duplicate" role="menuitem" tabindex="-1" style="padding: 0.5rem 1rem; cursor: pointer;">Duplicate</li>
+          <li data-value="delete" role="menuitem" tabindex="-1" style="padding: 0.5rem 1rem; cursor: pointer; color: #dc2626;">Delete</li>
         </ul>
       </hx-dropdown>
     </div>
@@ -153,7 +99,7 @@ export const Default: Story = {
     const dropdown = canvasElement.querySelector('hx-dropdown');
     await expect(dropdown).toBeTruthy();
     await expect(dropdown?.shadowRoot?.querySelector('[part="panel"]')).toBeTruthy();
-    await expect(dropdown?.querySelector('[role="menu"]')).toBeTruthy();
+    await expect(dropdown?.shadowRoot?.querySelector('[role="menu"]')).toBeTruthy();
 
     // Trigger opens dropdown
     const trigger = canvas.getByRole('button');
@@ -184,30 +130,9 @@ export const IconTrigger: Story = {
           ⋯
         </button>
         <ul style="margin: 0; padding: 0.25rem 0; list-style: none;">
-          <li
-            data-value="view"
-            role="menuitem"
-            tabindex="-1"
-            style="padding: 0.5rem 1rem; cursor: pointer;"
-          >
-            View details
-          </li>
-          <li
-            data-value="export"
-            role="menuitem"
-            tabindex="-1"
-            style="padding: 0.5rem 1rem; cursor: pointer;"
-          >
-            Export
-          </li>
-          <li
-            data-value="archive"
-            role="menuitem"
-            tabindex="-1"
-            style="padding: 0.5rem 1rem; cursor: pointer;"
-          >
-            Archive
-          </li>
+          <li data-value="view" role="menuitem" tabindex="-1" style="padding: 0.5rem 1rem; cursor: pointer;">View details</li>
+          <li data-value="export" role="menuitem" tabindex="-1" style="padding: 0.5rem 1rem; cursor: pointer;">Export</li>
+          <li data-value="archive" role="menuitem" tabindex="-1" style="padding: 0.5rem 1rem; cursor: pointer;">Archive</li>
         </ul>
       </hx-dropdown>
     </div>
@@ -233,38 +158,10 @@ export const CustomTrigger: Story = {
           Patient Actions ▾
         </a>
         <ul style="margin: 0; padding: 0.25rem 0; list-style: none; min-width: 180px;">
-          <li
-            data-value="schedule"
-            role="menuitem"
-            tabindex="-1"
-            style="padding: 0.5rem 1rem; cursor: pointer;"
-          >
-            Schedule Appointment
-          </li>
-          <li
-            data-value="notes"
-            role="menuitem"
-            tabindex="-1"
-            style="padding: 0.5rem 1rem; cursor: pointer;"
-          >
-            Add Clinical Note
-          </li>
-          <li
-            data-value="referral"
-            role="menuitem"
-            tabindex="-1"
-            style="padding: 0.5rem 1rem; cursor: pointer;"
-          >
-            Create Referral
-          </li>
-          <li
-            data-value="discharge"
-            role="menuitem"
-            tabindex="-1"
-            style="padding: 0.5rem 1rem; cursor: pointer; color: #dc2626;"
-          >
-            Discharge Patient
-          </li>
+          <li data-value="schedule" role="menuitem" tabindex="-1" style="padding: 0.5rem 1rem; cursor: pointer;">Schedule Appointment</li>
+          <li data-value="notes" role="menuitem" tabindex="-1" style="padding: 0.5rem 1rem; cursor: pointer;">Add Clinical Note</li>
+          <li data-value="referral" role="menuitem" tabindex="-1" style="padding: 0.5rem 1rem; cursor: pointer;">Create Referral</li>
+          <li data-value="discharge" role="menuitem" tabindex="-1" style="padding: 0.5rem 1rem; cursor: pointer; color: #dc2626;">Discharge Patient</li>
         </ul>
       </hx-dropdown>
     </div>
@@ -282,14 +179,7 @@ export const Disabled: Story = {
       <hx-dropdown disabled>
         <button slot="trigger" type="button" disabled>Disabled Menu</button>
         <ul style="margin: 0; padding: 0.25rem 0; list-style: none;">
-          <li
-            data-value="action"
-            role="menuitem"
-            tabindex="-1"
-            style="padding: 0.5rem 1rem; cursor: pointer;"
-          >
-            Action
-          </li>
+          <li data-value="action" role="menuitem" tabindex="-1" style="padding: 0.5rem 1rem; cursor: pointer;">Action</li>
         </ul>
       </hx-dropdown>
     </div>
@@ -308,20 +198,14 @@ export const Disabled: Story = {
 export const Placements: Story = {
   name: 'Placement Variants',
   render: () => html`
-    <div
-      style="padding: 8rem; display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center; align-items: center;"
-    >
+    <div style="padding: 8rem; display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center; align-items: center;">
       ${(['bottom-start', 'bottom', 'bottom-end', 'top-start', 'top', 'top-end'] as const).map(
         (p) => html`
           <hx-dropdown placement=${p}>
             <button slot="trigger" type="button">${p}</button>
             <ul style="margin: 0; padding: 0.25rem 0; list-style: none;">
-              <li role="menuitem" tabindex="-1" style="padding: 0.5rem 1rem; cursor: pointer;">
-                Option A
-              </li>
-              <li role="menuitem" tabindex="-1" style="padding: 0.5rem 1rem; cursor: pointer;">
-                Option B
-              </li>
+              <li role="menuitem" tabindex="-1" style="padding: 0.5rem 1rem; cursor: pointer;">Option A</li>
+              <li role="menuitem" tabindex="-1" style="padding: 0.5rem 1rem; cursor: pointer;">Option B</li>
             </ul>
           </hx-dropdown>
         `,
@@ -338,65 +222,22 @@ export const HealthcareUseCases: Story = {
   name: 'Healthcare: Patient Actions',
   render: () => html`
     <div style="padding: 4rem; max-width: 600px; margin: 0 auto;">
-      <div
-        style="display: flex; align-items: center; justify-content: space-between; padding: 1rem; border: 1px solid #e5e7eb; border-radius: 0.5rem;"
-      >
+      <div style="display: flex; align-items: center; justify-content: space-between; padding: 1rem; border: 1px solid #e5e7eb; border-radius: 0.5rem;">
         <div>
           <strong>John Smith</strong>
-          <span style="color: #6b7280; font-size: 0.875rem;">
-            — DOB: 1968-04-12 | MRN: 00123456</span
-          >
+          <span style="color: #6b7280; font-size: 0.875rem;"> — DOB: 1968-04-12 | MRN: 00123456</span>
         </div>
         <hx-dropdown placement="bottom-end">
-          <button
-            slot="trigger"
-            type="button"
-            style="padding: 0.375rem 0.75rem; border: 1px solid #d1d5db; border-radius: 0.375rem; cursor: pointer;"
-          >
+          <button slot="trigger" type="button" style="padding: 0.375rem 0.75rem; border: 1px solid #d1d5db; border-radius: 0.375rem; cursor: pointer;">
             Actions ▾
           </button>
           <ul style="margin: 0; padding: 0.25rem 0; list-style: none; min-width: 200px;">
-            <li
-              data-value="schedule"
-              role="menuitem"
-              tabindex="-1"
-              style="padding: 0.5rem 1rem; cursor: pointer;"
-            >
-              Schedule Appointment
-            </li>
-            <li
-              data-value="notes"
-              role="menuitem"
-              tabindex="-1"
-              style="padding: 0.5rem 1rem; cursor: pointer;"
-            >
-              Add Clinical Note
-            </li>
-            <li
-              data-value="labs"
-              role="menuitem"
-              tabindex="-1"
-              style="padding: 0.5rem 1rem; cursor: pointer;"
-            >
-              Order Labs
-            </li>
-            <li
-              data-value="referral"
-              role="menuitem"
-              tabindex="-1"
-              style="padding: 0.5rem 1rem; cursor: pointer;"
-            >
-              Create Referral
-            </li>
+            <li data-value="schedule" role="menuitem" tabindex="-1" style="padding: 0.5rem 1rem; cursor: pointer;">Schedule Appointment</li>
+            <li data-value="notes" role="menuitem" tabindex="-1" style="padding: 0.5rem 1rem; cursor: pointer;">Add Clinical Note</li>
+            <li data-value="labs" role="menuitem" tabindex="-1" style="padding: 0.5rem 1rem; cursor: pointer;">Order Labs</li>
+            <li data-value="referral" role="menuitem" tabindex="-1" style="padding: 0.5rem 1rem; cursor: pointer;">Create Referral</li>
             <hr style="margin: 0.25rem 0; border: none; border-top: 1px solid #e5e7eb;" />
-            <li
-              data-value="discharge"
-              role="menuitem"
-              tabindex="-1"
-              style="padding: 0.5rem 1rem; cursor: pointer; color: #dc2626;"
-            >
-              Discharge Patient
-            </li>
+            <li data-value="discharge" role="menuitem" tabindex="-1" style="padding: 0.5rem 1rem; cursor: pointer; color: #dc2626;">Discharge Patient</li>
           </ul>
         </hx-dropdown>
       </div>
