@@ -46,7 +46,9 @@ export class HelixCheckbox extends LitElement {
   static override styles = [tokenStyles, helixCheckboxStyles];
 
   // P0-02: observe aria-label on host to forward to inner input
-  static override observedAttributes = [...(LitElement.observedAttributes ?? []), 'aria-label'];
+  static override get observedAttributes(): string[] {
+    return [...(super.observedAttributes ?? []), 'aria-label'];
+  }
 
   override attributeChangedCallback(name: string, old: string | null, next: string | null): void {
     super.attributeChangedCallback(name, old, next);
