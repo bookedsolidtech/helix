@@ -12,9 +12,8 @@ import { helixTextareaStyles } from './hx-textarea.styles.js';
  * Uses `aria-invalid` to convey error state and `aria-describedby` to link
  * error/help text to the textarea. Label association is handled through
  * `aria-labelledby` (for slotted labels) or the standard `<label for>` pattern.
- * Supports `aria-required` for required fields and `aria-label` for cases where
- * a visible label is not present. Validation errors are announced via `role="alert"`
- * with `aria-live="polite"`.
+ * Supports `aria-label` for cases where a visible label is not present.
+ * Validation errors are announced via `role="alert"` (assertive live region).
  *
  * @summary Form-associated textarea with built-in label, error, help text, character counter, and auto-resize.
  *
@@ -159,7 +158,7 @@ export class HelixTextarea extends LitElement {
 
   /** @internal */
   @query('.field__textarea')
-  private _textarea!: HTMLTextAreaElement;
+  declare private _textarea: HTMLTextAreaElement | undefined;
 
   // ─── Slot Tracking ───
 
@@ -167,6 +166,8 @@ export class HelixTextarea extends LitElement {
   @state() private _hasLabelSlot = false;
   /** @internal */
   @state() private _hasErrorSlot = false;
+  /** @internal */
+  @state() private _hasHelpTextSlot = false;
 
   /** @internal */
   private _handleLabelSlotChange(e: Event): void {
@@ -186,12 +187,24 @@ export class HelixTextarea extends LitElement {
     this._hasErrorSlot = slot.assignedElements().length > 0;
   }
 
+  /** @internal */
+  private _handleHelpTextSlotChange(e: Event): void {
+    const slot = e.target as HTMLSlotElement;
+    this._hasHelpTextSlot = slot.assignedElements().length > 0;
+  }
+
   // ─── Lifecycle ───
 
   override updated(changedProperties: Map<string, unknown>): void {
     super.updated(changedProperties);
     if (changedProperties.has('value')) {
       this._internals.setFormValue(this.value);
+    }
+    if (
+      changedProperties.has('value') ||
+      changedProperties.has('required') ||
+      changedProperties.has('maxlength')
+    ) {
       this._updateValidity();
     }
   }
@@ -225,17 +238,18 @@ export class HelixTextarea extends LitElement {
 
   /** @internal */
   private _updateValidity(): void {
+    const anchor = this._textarea ?? undefined;
     if (this.required && !this.value) {
       this._internals.setValidity(
         { valueMissing: true },
         this.error || 'This field is required.',
-        this._textarea,
+        anchor,
       );
     } else if (this.maxlength !== undefined && this.value.length > this.maxlength) {
       this._internals.setValidity(
         { tooLong: true },
         this.error || `Value must be ${this.maxlength} characters or fewer.`,
-        this._textarea,
+        anchor,
       );
     } else {
       this._internals.setValidity({});
@@ -259,7 +273,6 @@ export class HelixTextarea extends LitElement {
   private _handleInput(e: Event): void {
     const target = e.target as HTMLTextAreaElement;
     this.value = target.value;
-    this._internals.setFormValue(this.value);
 
     // Auto-grow: reset height then set to scrollHeight
     if (this.resize === 'auto') {
@@ -320,6 +333,8 @@ export class HelixTextarea extends LitElement {
   private _helpTextId = `${this._textareaId}-help`;
   /** @internal */
   private _errorId = `${this._textareaId}-error`;
+  /** @internal */
+  private _counterId = `${this._textareaId}-counter`;
 
   /** @internal */
   private _renderCounter() {
@@ -328,7 +343,11 @@ export class HelixTextarea extends LitElement {
     const count = this.value.length;
     const display = this.maxlength !== undefined ? `${count} / ${this.maxlength}` : `${count}`;
 
-    return html` <div part="counter" class="field__counter">${display}</div> `;
+    return html`
+      <div part="counter" class="field__counter" id=${this._counterId} aria-live="polite">
+        ${display}
+      </div>
+    `;
   }
 
   override render() {
@@ -341,8 +360,13 @@ export class HelixTextarea extends LitElement {
       'field--required': this.required,
     };
 
+    const hasHelpText = (!!this.helpText || this._hasHelpTextSlot) && !hasError;
     const describedBy =
-      [hasError ? this._errorId : null, !hasError && this.helpText ? this._helpTextId : null]
+      [
+        hasError ? this._errorId : null,
+        hasHelpText ? this._helpTextId : null,
+        this.showCount ? this._counterId : null,
+      ]
         .filter(Boolean)
         .join(' ') || undefined;
 
@@ -381,37 +405,28 @@ export class HelixTextarea extends LitElement {
             )}
             aria-invalid=${hasError ? 'true' : nothing}
             aria-describedby=${ifDefined(describedBy)}
-            aria-required=${this.required ? 'true' : nothing}
             @input=${this._handleInput}
             @change=${this._handleChange}
           ></textarea>
         </div>
 
         ${this._renderCounter()}
-
-        <slot name="error" @slotchange=${this._handleErrorSlotChange}>
-          ${this.error
-            ? html`
-                <div
-                  part="error"
-                  class="field__error"
-                  id=${this._errorId}
-                  role="alert"
-                  aria-live="polite"
-                >
-                  ${this.error}
-                </div>
-              `
-            : nothing}
-        </slot>
-
-        ${this.helpText && !hasError
+        ${hasError
           ? html`
-              <div part="help-text" class="field__help-text" id=${this._helpTextId}>
-                <slot name="help-text">${this.helpText}</slot>
+              <div part="error" class="field__error" id=${this._errorId} role="alert">
+                <slot name="error" @slotchange=${this._handleErrorSlotChange}> ${this.error} </slot>
               </div>
             `
-          : nothing}
+          : html`<slot name="error" @slotchange=${this._handleErrorSlotChange}></slot>`}
+        ${hasHelpText
+          ? html`
+              <div part="help-text" class="field__help-text" id=${this._helpTextId}>
+                <slot name="help-text" @slotchange=${this._handleHelpTextSlotChange}>
+                  ${this.helpText}
+                </slot>
+              </div>
+            `
+          : html`<slot name="help-text" @slotchange=${this._handleHelpTextSlotChange}></slot>`}
       </div>
     `;
   }
