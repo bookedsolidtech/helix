@@ -1,5 +1,5 @@
 import { LitElement, html, nothing } from 'lit';
-import { customElement, property } from 'lit/decorators.js';
+import { customElement, property, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import { tokenStyles } from '@helix/tokens/lit';
@@ -14,8 +14,8 @@ import { helixProgressBarStyles } from './hx-progress-bar.styles.js';
  *
  * @slot label - Visible label text rendered above the progress bar track.
  *
- * @csspart base - The outer track container element.
- * @csspart indicator - The filled portion indicating progress.
+ * @csspart track - The outer track container element.
+ * @csspart fill - The filled portion indicating progress.
  * @csspart label - The label slot wrapper element.
  *
  * @cssprop [--hx-progress-bar-track-bg=var(--hx-color-neutral-100)] - Track background color.
@@ -34,11 +34,18 @@ export class HelixProgressBar extends LitElement {
   static override styles = [tokenStyles, helixProgressBarStyles];
 
   /**
-   * Current progress value (0–max). Set to null for indeterminate state.
+   * Current progress value (min–max). Set to null for indeterminate state.
    * @attr value
    */
   @property({ type: Number, reflect: true })
   value: number | null = null;
+
+  /**
+   * Minimum value for the progress bar.
+   * @attr min
+   */
+  @property({ type: Number, reflect: true })
+  min = 0;
 
   /**
    * Maximum value for the progress bar.
@@ -48,11 +55,25 @@ export class HelixProgressBar extends LitElement {
   max = 100;
 
   /**
-   * Accessible label for the progress bar (maps to aria-label).
+   * When true, displays an animated indeterminate loading state regardless of value.
+   * @attr indeterminate
+   */
+  @property({ type: Boolean, reflect: true })
+  indeterminate = false;
+
+  /**
+   * Accessible label for the progress bar (maps to aria-label when no label slot content is used).
    * @attr label
    */
   @property({ type: String, reflect: true })
   label = '';
+
+  /**
+   * Additional description for the progress operation, linked via aria-describedby.
+   * @attr description
+   */
+  @property({ type: String, reflect: true })
+  description = '';
 
   /**
    * Size of the progress bar track.
@@ -68,17 +89,43 @@ export class HelixProgressBar extends LitElement {
   @property({ type: String, reflect: true })
   variant: 'default' | 'success' | 'warning' | 'danger' = 'default';
 
+  @state() private _liveMessage = '';
+
   private get _isIndeterminate(): boolean {
-    return this.value === null;
+    return this.indeterminate || this.value === null;
   }
 
   private get _percentage(): number {
     if (this._isIndeterminate) return 0;
-    const clamped = Math.max(0, Math.min(this.value ?? 0, this.max));
-    return (clamped / this.max) * 100;
+    const range = this.max - this.min;
+    if (range <= 0) return 0;
+    const clamped = Math.max(this.min, Math.min(this.value ?? this.min, this.max));
+    return ((clamped - this.min) / range) * 100;
+  }
+
+  private get _isComplete(): boolean {
+    return !this._isIndeterminate && this.value !== null && this.value >= this.max;
+  }
+
+  override updated(changedProps: Map<string, unknown>): void {
+    if ((changedProps.has('value') || changedProps.has('max')) && this._isComplete) {
+      this._liveMessage = 'Complete';
+      this.dispatchEvent(new CustomEvent('hx-complete', { bubbles: true, composed: true }));
+    } else if (changedProps.has('value') && !this._isComplete) {
+      this._liveMessage = '';
+    }
+
+    if (!this.label) {
+      console.warn(
+        '[hx-progress-bar] No accessible label provided. Set the `label` attribute or use the label slot. An unlabeled progressbar violates WCAG 2.1 AA (4.1.2 Name, Role, Value).',
+      );
+    }
   }
 
   override render() {
+    const labelId = `${this.id || 'hx-pb'}-label`;
+    const descId = this.description ? `${this.id || 'hx-pb'}-desc` : undefined;
+
     const classes = {
       'progress-bar': true,
       [`progress-bar--${this.size}`]: true,
@@ -87,29 +134,30 @@ export class HelixProgressBar extends LitElement {
     };
 
     const indicatorStyle = this._isIndeterminate ? '' : `width: ${this._percentage}%`;
-
-    const ariaValueNow = this._isIndeterminate ? undefined : (this.value ?? 0);
+    const ariaValueNow = this._isIndeterminate ? undefined : (this.value ?? this.min);
 
     return html`
       <div class=${classMap(classes)}>
-        <span part="label" class="progress-bar__label">
+        <span id=${labelId} part="label" class="progress-bar__label">
           <slot name="label"></slot>
         </span>
+        ${this.description
+          ? html`<span id=${descId} class="sr-only">${this.description}</span>`
+          : nothing}
         <div
-          part="base"
-          class="progress-bar__base"
+          part="track"
+          class="progress-bar__track"
           role="progressbar"
           aria-valuenow=${ifDefined(ariaValueNow)}
-          aria-valuemin="0"
+          aria-valuemin=${this.min}
           aria-valuemax=${this.max}
           aria-label=${this.label || nothing}
+          aria-labelledby=${labelId}
+          aria-describedby=${ifDefined(descId)}
         >
-          <div
-            part="indicator"
-            class="progress-bar__indicator"
-            style=${indicatorStyle || nothing}
-          ></div>
+          <div part="fill" class="progress-bar__fill" style=${indicatorStyle || nothing}></div>
         </div>
+        <div aria-live="polite" aria-atomic="true" class="sr-only">${this._liveMessage}</div>
       </div>
     `;
   }
