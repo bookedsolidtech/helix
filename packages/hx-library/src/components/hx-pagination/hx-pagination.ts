@@ -17,25 +17,50 @@ import { helixPaginationStyles } from './hx-pagination.styles.js';
  * @csspart item - Each `<li>` item.
  * @csspart button - Each page button or prev/next control.
  * @csspart ellipsis - The ellipsis (`…`) span between page groups.
+ * @csspart page-size-wrapper - The wrapper `<div>` around the page-size selector.
+ * @csspart page-size-label - The `<label>` element for the page-size selector.
+ * @csspart page-size-select - The `<select>` element for page-size.
  *
- * @cssprop [--hx-pagination-gap=0.25rem] - Gap between pagination buttons.
+ * @cssprop [--hx-pagination-gap=0.25rem] - Gap between pagination buttons. Inherits from --hx-spacing-1.
  * @cssprop [--hx-pagination-button-size=2.25rem] - Minimum width and height of each button.
- * @cssprop [--hx-pagination-border-color=#d1d5db] - Border color of buttons.
- * @cssprop [--hx-pagination-border-radius=0.375rem] - Border radius of buttons.
- * @cssprop [--hx-pagination-bg=#ffffff] - Background color of buttons.
- * @cssprop [--hx-pagination-color=#111827] - Text color of buttons.
- * @cssprop [--hx-pagination-hover-bg=#f3f4f6] - Background color of buttons on hover.
- * @cssprop [--hx-pagination-hover-border-color=#2563eb] - Border color of buttons on hover.
- * @cssprop [--hx-pagination-active-bg=#2563eb] - Background color of the active/current page button.
- * @cssprop [--hx-pagination-active-color=#ffffff] - Text color of the active/current page button.
- * @cssprop [--hx-pagination-ellipsis-color=#6b7280] - Color of ellipsis characters.
+ * @cssprop [--hx-pagination-border-color] - Border color of buttons. Inherits from --hx-color-border (final fallback: #d1d5db).
+ * @cssprop [--hx-pagination-border-radius] - Border radius of buttons. Inherits from --hx-border-radius-md (final fallback: 0.375rem).
+ * @cssprop [--hx-pagination-bg] - Background color of buttons. Inherits from --hx-color-surface (final fallback: #ffffff).
+ * @cssprop [--hx-pagination-color] - Text color of buttons. Inherits from --hx-color-text-primary (final fallback: #111827).
+ * @cssprop [--hx-pagination-hover-bg] - Background color of buttons on hover. Inherits from --hx-color-surface-hover (final fallback: #f3f4f6).
+ * @cssprop [--hx-pagination-hover-border-color] - Border color of buttons on hover. Inherits from --hx-color-primary (final fallback: #2563eb).
+ * @cssprop [--hx-pagination-active-bg] - Background color of the active/current page button. Inherits from --hx-color-primary (final fallback: #2563eb).
+ * @cssprop [--hx-pagination-active-color] - Text color of the active/current page button. Inherits from --hx-color-surface (final fallback: #ffffff).
+ * @cssprop [--hx-pagination-active-border-color] - Border color of the active/current page button. Defaults to --hx-pagination-active-bg.
+ * @cssprop [--hx-pagination-ellipsis-color] - Color of ellipsis characters. Inherits from --hx-color-text-secondary (final fallback: #6b7280).
  * @cssprop [--hx-transition-fast=150ms] - Duration used for hover/focus transitions.
  *
  * @fires {CustomEvent<{ page: number }>} hx-page-change - Fired when the user navigates to a new page.
+ * @fires {CustomEvent<{ pageSize: number }>} hx-page-size-change - Fired when the user selects a new page size.
  *
  * @example
  * ```html
  * <hx-pagination total-pages="10" current-page="1"></hx-pagination>
+ * ```
+ *
+ * @example Drupal / Twig integration
+ * ```twig
+ * {#
+ *   Drupal's pager uses 0-based page index in the URL (?page=N).
+ *   This component is 1-based, so add 1 to the Drupal page value.
+ *   Listen to hx-page-change and update the URL query param:
+ *     element.addEventListener('hx-page-change', (e) => {
+ *       const params = new URLSearchParams(location.search);
+ *       params.set('page', e.detail.page - 1); // convert back to 0-based
+ *       history.pushState({}, '', '?' + params.toString());
+ *     });
+ * #}
+ * <hx-pagination
+ *   total-pages="{{ total_pages }}"
+ *   current-page="{{ pager.current_page + 1 }}"
+ *   label="{{ 'Pagination'|t }}"
+ *   {{ show_first_last ? 'show-first-last' : '' }}
+ * ></hx-pagination>
  * ```
  */
 @customElement('hx-pagination')
@@ -53,7 +78,7 @@ export class HelixPagination extends LitElement {
    * The currently active page (1-based).
    * @attr current-page
    */
-  @property({ type: Number, attribute: 'current-page', reflect: true })
+  @property({ type: Number, attribute: 'current-page' })
   currentPage = 1;
 
   /**
@@ -84,12 +109,36 @@ export class HelixPagination extends LitElement {
   @property({ type: String, reflect: true })
   label = 'Pagination';
 
+  /**
+   * The number of items displayed per page. When set, a page-size selector
+   * `<select>` is rendered. Set `show-page-size` to display the selector.
+   * @attr page-size
+   */
+  @property({ type: Number, attribute: 'page-size', reflect: true })
+  pageSize = 25;
+
+  /**
+   * Whether to show the page-size selector UI.
+   * @attr show-page-size
+   */
+  @property({ type: Boolean, attribute: 'show-page-size', reflect: true })
+  showPageSize = false;
+
   /** Tracks the roving tabindex target. Null means default to currentPage. */
   @state() private _rovingKey: number | string | null = null;
+
+  /** Text for the aria-live region, updated on navigation. */
+  @state() private _liveMessage = '';
+
+  /** Memoization cache for _buildPageRange. */
+  private _pageRangeCache: { key: string; result: Array<number | 'ellipsis'> } | null = null;
 
   // ─── Helpers ───
 
   private _buildPageRange(): Array<number | 'ellipsis'> {
+    const key = `${this.totalPages}-${this.currentPage}-${this.siblingCount}-${this.boundaryCount}`;
+    if (this._pageRangeCache?.key === key) return this._pageRangeCache.result;
+
     const total = Math.max(1, this.totalPages);
     const current = Math.min(Math.max(1, this.currentPage), total);
     const boundary = Math.max(0, this.boundaryCount);
@@ -104,7 +153,7 @@ export class HelixPagination extends LitElement {
     );
     const siblingEnd = Math.min(
       Math.max(current + sibling, boundary + sibling * 2 + 2),
-      endPages.length > 0 ? (endPages[0] as number) - 2 : total - 1,
+      endPages.length > 0 ? endPages[0]! - 2 : total - 1,
     );
 
     const items: Array<number | 'ellipsis'> = [];
@@ -127,6 +176,7 @@ export class HelixPagination extends LitElement {
 
     for (const p of endPages) items.push(p);
 
+    this._pageRangeCache = { key, result: items };
     return items;
   }
 
@@ -142,9 +192,25 @@ export class HelixPagination extends LitElement {
 
     this.currentPage = clamped;
     this._rovingKey = null; // reset so focus follows the new current page
+    this._liveMessage = `Page ${clamped} of ${this.totalPages}`;
     this.dispatchEvent(
       new CustomEvent<{ page: number }>('hx-page-change', {
         detail: { page: clamped },
+        bubbles: true,
+        composed: true,
+      }),
+    );
+  }
+
+  private _handlePageSizeChange(e: Event): void {
+    const select = e.target as HTMLSelectElement;
+    const newSize = Number(select.value);
+    if (newSize === this.pageSize) return;
+
+    this.pageSize = newSize;
+    this.dispatchEvent(
+      new CustomEvent<{ pageSize: number }>('hx-page-size-change', {
+        detail: { pageSize: newSize },
         bubbles: true,
         composed: true,
       }),
@@ -200,109 +266,135 @@ export class HelixPagination extends LitElement {
     const rovingKey = this._effectiveRovingKey;
 
     return html`
-      <nav part="nav" aria-label=${this.label}>
-        <ul
-          part="list"
-          class="list"
-          @keydown=${this._handleKeydown}
-          @focusin=${this._handleFocusin}
-        >
-          ${this.showFirstLast
-            ? html`
-                <li part="item" class="item">
-                  <button
-                    part="button"
-                    class="button"
-                    ?disabled=${isFirst}
-                    tabindex=${rovingKey === 'first' ? 0 : -1}
-                    data-roving-key="first"
-                    aria-label="First page"
-                    @click=${() => this._navigate(1)}
+      <div class="pagination-root">
+        ${this.showPageSize
+          ? html`
+              <div part="page-size-wrapper" class="page-size-wrapper">
+                <label part="page-size-label" class="page-size-label">
+                  Rows per page:
+                  <select
+                    part="page-size-select"
+                    class="page-size-select"
+                    @change=${this._handlePageSizeChange}
                   >
-                    «
-                  </button>
-                </li>
-              `
-            : nothing}
+                    ${[10, 25, 50, 100].map(
+                      (n) =>
+                        html`<option value=${n} ?selected=${n === this.pageSize}>${n}</option>`,
+                    )}
+                  </select>
+                </label>
+              </div>
+            `
+          : nothing}
 
-          <li part="item" class="item">
-            <button
-              part="button"
-              class="button"
-              ?disabled=${isFirst}
-              tabindex=${rovingKey === 'prev' ? 0 : -1}
-              data-roving-key="prev"
-              aria-label="Previous page"
-              @click=${() => this._navigate(this.currentPage - 1)}
-            >
-              ‹
-            </button>
-          </li>
+        <nav part="nav" aria-label=${this.label}>
+          <span class="visually-hidden" aria-live="polite" aria-atomic="true"
+            >${this._liveMessage}</span
+          >
+          <ul
+            part="list"
+            class="list"
+            role="list"
+            @keydown=${this._handleKeydown}
+            @focusin=${this._handleFocusin}
+          >
+            ${this.showFirstLast
+              ? html`
+                  <li part="item" class="item">
+                    <button
+                      part="button"
+                      class="button"
+                      ?disabled=${isFirst}
+                      tabindex=${rovingKey === 'first' ? 0 : -1}
+                      data-roving-key="first"
+                      aria-label="First page"
+                      @click=${() => this._navigate(1)}
+                    >
+                      «
+                    </button>
+                  </li>
+                `
+              : nothing}
 
-          ${repeat(
-            pages,
-            (page, i) => (page === 'ellipsis' ? `ellipsis-${i}` : `page-${page}`),
-            (page) => {
-              if (page === 'ellipsis') {
+            <li part="item" class="item">
+              <button
+                part="button"
+                class="button"
+                ?disabled=${isFirst}
+                tabindex=${rovingKey === 'prev' ? 0 : -1}
+                data-roving-key="prev"
+                aria-label="Previous page"
+                @click=${() => this._navigate(this.currentPage - 1)}
+              >
+                ‹
+              </button>
+            </li>
+
+            ${repeat(
+              pages,
+              (page, i) => (page === 'ellipsis' ? `ellipsis-${i}` : `page-${page}`),
+              (page) => {
+                if (page === 'ellipsis') {
+                  return html`
+                    <li part="item" class="item">
+                      <span part="ellipsis" class="ellipsis" aria-hidden="true">…</span>
+                    </li>
+                  `;
+                }
+                const isCurrent = page === this.currentPage;
                 return html`
                   <li part="item" class="item">
-                    <span part="ellipsis" class="ellipsis" aria-hidden="true">…</span>
+                    <button
+                      part="button"
+                      class=${classMap({ button: true })}
+                      aria-disabled=${isCurrent ? 'true' : nothing}
+                      tabindex=${rovingKey === page ? 0 : -1}
+                      data-roving-key=${page}
+                      aria-current=${isCurrent ? 'page' : nothing}
+                      aria-label=${`Page ${page}`}
+                      @click=${() => this._navigate(page)}
+                    >
+                      ${page}
+                    </button>
                   </li>
                 `;
-              }
-              const isCurrent = page === this.currentPage;
-              return html`
-                <li part="item" class="item">
-                  <button
-                    part="button"
-                    class=${classMap({ button: true, 'button--active': isCurrent })}
-                    aria-disabled=${isCurrent ? 'true' : nothing}
-                    tabindex=${rovingKey === page ? 0 : -1}
-                    data-roving-key=${page}
-                    aria-current=${isCurrent ? 'page' : nothing}
-                    aria-label=${`Page ${page}`}
-                    @click=${() => this._navigate(page)}
-                  >
-                    ${page}
-                  </button>
-                </li>
-              `;
-            },
-          )}
+              },
+            )}
 
-          <li part="item" class="item">
-            <button
-              part="button"
-              class="button"
-              ?disabled=${isLast}
-              tabindex=${rovingKey === 'next' ? 0 : -1}
-              data-roving-key="next"
-              aria-label="Next page"
-              @click=${() => this._navigate(this.currentPage + 1)}
-            >
-              ›
-            </button>
-          </li>
+            <li part="item" class="item">
+              <button
+                part="button"
+                class="button"
+                ?disabled=${isLast}
+                tabindex=${rovingKey === 'next' ? 0 : -1}
+                data-roving-key="next"
+                aria-label="Next page"
+                @click=${() => this._navigate(this.currentPage + 1)}
+              >
+                ›
+              </button>
+            </li>
 
-          ${this.showFirstLast
-            ? html`
-                <li part="item" class="item">
-                  <button
-                    part="button"
-                    class="button"
-                    ?disabled=${isLast}
-                    tabindex=${rovingKey === 'last' ? 0 : -1}
-                    data-roving-key="last"
-                    aria-label="Last page"
-                    @click=${() => this._navigate(this.totalPages)}
-                  >
-                    »
-                  </button>
-                </li>
-              `
-            : nothing}
-        </ul>
-      </nav>
+            ${this.showFirstLast
+              ? html`
+                  <li part="item" class="item">
+                    <button
+                      part="button"
+                      class="button"
+                      ?disabled=${isLast}
+                      tabindex=${rovingKey === 'last' ? 0 : -1}
+                      data-roving-key="last"
+                      aria-label="Last page"
+                      @click=${() => this._navigate(this.totalPages)}
+                    >
+                      »
+                    </button>
+                  </li>
+                `
+              : nothing}
+          </ul>
+        </nav>
+      </div>
     `;
   }
 }
