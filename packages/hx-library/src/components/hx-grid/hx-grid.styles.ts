@@ -2,7 +2,7 @@ import { css } from 'lit';
 
 export const helixGridStyles = css`
   :host {
-    display: grid;
+    display: block;
     box-sizing: border-box;
     width: 100%;
   }
