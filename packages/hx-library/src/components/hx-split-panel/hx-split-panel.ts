@@ -5,6 +5,9 @@ import { helixSplitPanelStyles } from './hx-split-panel.styles.js';
 
 /**
  * A resizable two-pane layout with a draggable divider.
+ * The divider uses `role="separator"` with full ARIA support including
+ * `aria-valuenow`, `aria-valuemin`, `aria-valuemax`, and `aria-label`.
+ * Keyboard navigation via arrow keys, Home, and End.
  *
  * @summary Resizable split panel with start and end panes.
  *
@@ -64,12 +67,23 @@ export class HelixSplitPanel extends LitElement {
   @property({ type: Boolean, reflect: true })
   disabled = false;
 
-  // Minimum panel size as a percentage to prevent full collapse
+  /**
+   * Accessible label for the divider. Describes what the separator controls.
+   * @attr label
+   */
+  @property({ type: String })
+  label = 'Resize panels';
+
+  /** @internal */
   private readonly _minPercent = 0;
+  /** @internal */
   private readonly _maxPercent = 100;
 
+  /** @internal */
   private _dragging = false;
+  /** @internal */
   private _dragStart = 0;
+  /** @internal */
   private _positionAtDragStart = 0;
 
   private _clamp(value: number): number {
@@ -188,6 +202,7 @@ export class HelixSplitPanel extends LitElement {
         aria-valuenow=${this.position}
         aria-valuemin="0"
         aria-valuemax="100"
+        aria-label=${this.label}
         aria-disabled=${this.disabled ? 'true' : 'false'}
         tabindex=${this.disabled ? '-1' : '0'}
         @pointerdown=${this._onPointerDown}
