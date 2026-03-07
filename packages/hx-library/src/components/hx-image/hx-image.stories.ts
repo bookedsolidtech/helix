@@ -24,11 +24,20 @@ const meta = {
     alt: {
       control: 'text',
       description:
-        'Accessible description. Set to empty string for decorative images (applies role="presentation").',
+        'Accessible description. Required for informative images. Use the `decorative` prop for decorative images.',
       table: {
         category: 'Accessibility',
-        defaultValue: { summary: "''" },
         type: { summary: 'string' },
+      },
+    },
+    decorative: {
+      control: 'boolean',
+      description:
+        'Marks the image as decorative. Use instead of alt="" to make intent explicit. Applies role="presentation" and alt="" to the inner img.',
+      table: {
+        category: 'Accessibility',
+        defaultValue: { summary: 'false' },
+        type: { summary: 'boolean' },
       },
     },
     width: {
@@ -92,6 +101,23 @@ const meta = {
         type: { summary: 'string' },
       },
     },
+    srcset: {
+      control: 'text',
+      description:
+        'Comma-separated list of image candidates for responsive images (srcset attribute).',
+      table: {
+        category: 'Content',
+        type: { summary: 'string' },
+      },
+    },
+    sizes: {
+      control: 'text',
+      description: 'Media conditions for responsive image selection. Used alongside srcset.',
+      table: {
+        category: 'Content',
+        type: { summary: 'string' },
+      },
+    },
   },
   args: {
     src: 'https://picsum.photos/seed/helix/800/600',
@@ -101,7 +127,7 @@ const meta = {
   render: (args) => html`
     <hx-image
       src=${args.src}
-      alt=${args.alt}
+      alt=${args.alt ?? ''}
       loading=${args.loading}
       fit=${args.fit ?? ''}
       ratio=${args.ratio ?? ''}
@@ -129,7 +155,10 @@ export const Default: Story = {
   play: async ({ canvasElement }) => {
     const img = canvasElement.querySelector('hx-image');
     await expect(img).toBeTruthy();
+    // With reflect: true, the alt attribute is reflected to the host element
     await expect(img?.getAttribute('alt')).toBe('A sample image');
+    const innerImg = img?.shadowRoot?.querySelector('img');
+    await expect(innerImg?.getAttribute('alt')).toBe('A sample image');
   },
 };
 
@@ -138,26 +167,23 @@ export const Default: Story = {
 // ════════════════════════════════════════════════════════════════════════════
 
 /**
- * Decorative image with an empty alt string.
+ * Decorative image using the explicit `decorative` prop.
  * The inner img receives role="presentation" to suppress screen reader announcements.
+ * Prefer `decorative` over `alt=""` to make decorative intent explicit in markup.
  */
 export const Decorative: Story = {
   args: {
     src: 'https://picsum.photos/seed/decorative/800/400',
-    alt: '',
   },
   render: (args) => html`
-    <hx-image
-      src=${args.src}
-      alt=${args.alt}
-      style="width: 400px;"
-    ></hx-image>
+    <hx-image src=${args.src} decorative style="width: 400px;"></hx-image>
   `,
   play: async ({ canvasElement }) => {
     const img = canvasElement.querySelector('hx-image');
     await expect(img).toBeTruthy();
     const innerImg = img?.shadowRoot?.querySelector('img');
     await expect(innerImg?.getAttribute('role')).toBe('presentation');
+    await expect(innerImg?.getAttribute('alt')).toBe('');
   },
 };
 
@@ -312,4 +338,126 @@ export const Fallback: Story = {
       </div>
     </div>
   `,
+};
+
+// ════════════════════════════════════════════════════════════════════════════
+// 7. CAPTION
+// ════════════════════════════════════════════════════════════════════════════
+
+/**
+ * Image with a caption using the named `caption` slot.
+ * The caption is rendered in a semantic figcaption element.
+ */
+export const WithCaption: Story = {
+  render: () => html`
+    <div style="display: flex; gap: 1.5rem; flex-wrap: wrap; align-items: flex-start;">
+      <div style="width: 300px;">
+        <hx-image
+          src="https://picsum.photos/seed/caption/600/400"
+          alt="Healthcare facility entrance"
+          ratio="3/2"
+          style="width: 300px;"
+        >
+          <span slot="caption">Healthcare facility entrance, 2024.</span>
+        </hx-image>
+      </div>
+      <div style="width: 300px;">
+        <hx-image
+          src="https://picsum.photos/seed/caption2/600/400"
+          alt="Medical team in consultation"
+          ratio="3/2"
+          rounded="0.5rem"
+          style="width: 300px;"
+        >
+          <span slot="caption"
+            >Medical team in consultation — <em>Photo courtesy of Helix Health.</em></span
+          >
+        </hx-image>
+      </div>
+    </div>
+  `,
+};
+
+// ════════════════════════════════════════════════════════════════════════════
+// 8. LAZY LOADING DEMO
+// ════════════════════════════════════════════════════════════════════════════
+
+/**
+ * Demonstrates lazy vs eager loading strategies.
+ * The `loading` attribute controls when the browser fetches the image resource.
+ * Use `lazy` for below-the-fold images (default) and `eager` for above-the-fold hero images.
+ */
+export const LazyLoading: Story = {
+  render: () => html`
+    <div style="display: flex; gap: 2rem; flex-wrap: wrap;">
+      <div style="display: flex; flex-direction: column; gap: 0.5rem; width: 260px;">
+        <hx-image
+          src="https://picsum.photos/seed/lazy/520/390"
+          alt="Lazy-loaded image"
+          loading="lazy"
+          ratio="4/3"
+          style="width: 260px;"
+        ></hx-image>
+        <code style="font-size: 0.75rem;">loading="lazy"</code>
+        <p style="font-size: 0.75rem; color: #6b7280; margin: 0;">
+          Deferred until near viewport. Default behavior. Ideal for below-the-fold images.
+        </p>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 0.5rem; width: 260px;">
+        <hx-image
+          src="https://picsum.photos/seed/eager/520/390"
+          alt="Eagerly-loaded image"
+          loading="eager"
+          ratio="4/3"
+          style="width: 260px;"
+        ></hx-image>
+        <code style="font-size: 0.75rem;">loading="eager"</code>
+        <p style="font-size: 0.75rem; color: #6b7280; margin: 0;">
+          Fetched immediately. Use for hero images and above-the-fold content.
+        </p>
+      </div>
+    </div>
+  `,
+  play: async ({ canvasElement }) => {
+    const imgs = canvasElement.querySelectorAll('hx-image');
+    const [lazyImg, eagerImg] = Array.from(imgs);
+    const lazyInner = lazyImg?.shadowRoot?.querySelector('img');
+    const eagerInner = eagerImg?.shadowRoot?.querySelector('img');
+    await expect(lazyInner?.getAttribute('loading')).toBe('lazy');
+    await expect(eagerInner?.getAttribute('loading')).toBe('eager');
+  },
+};
+
+// ════════════════════════════════════════════════════════════════════════════
+// 9. RESPONSIVE (srcset / sizes)
+// ════════════════════════════════════════════════════════════════════════════
+
+/**
+ * Responsive image using `srcset` and `sizes` — the Drupal-native pattern.
+ * The browser selects the best candidate based on viewport width and device pixel ratio.
+ * This enables Drupal responsive image styles without bypassing the component.
+ */
+export const Responsive: Story = {
+  render: () => html`
+    <div style="display: flex; flex-direction: column; gap: 1rem; max-width: 600px;">
+      <hx-image
+        src="https://picsum.photos/seed/resp/800/600"
+        srcset="https://picsum.photos/seed/resp/400/300 400w, https://picsum.photos/seed/resp/800/600 800w, https://picsum.photos/seed/resp/1200/900 1200w"
+        sizes="(max-width: 400px) 100vw, (max-width: 800px) 50vw, 400px"
+        alt="Responsive image — browser selects optimal size"
+        ratio="4/3"
+        style="width: 100%;"
+      ></hx-image>
+      <p style="font-size: 0.75rem; color: #6b7280; margin: 0;">
+        Browser selects from 400w, 800w, or 1200w candidates based on viewport and device pixel
+        ratio.
+      </p>
+    </div>
+  `,
+  play: async ({ canvasElement }) => {
+    const img = canvasElement.querySelector('hx-image');
+    const innerImg = img?.shadowRoot?.querySelector('img');
+    await expect(innerImg?.getAttribute('srcset')).toContain('400w');
+    await expect(innerImg?.getAttribute('sizes')).toContain('max-width');
+  },
 };
