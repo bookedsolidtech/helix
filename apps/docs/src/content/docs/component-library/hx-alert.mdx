@@ -24,16 +24,16 @@ Info, success, warning, and error styles with appropriate ARIA semantics.
   </div>
 </ComponentDemo>
 
-## Closable
+## Dismissible
 
 Alerts with a dismiss button. Click the close icon to hide the alert.
 
-<ComponentDemo title="Closable">
+<ComponentDemo title="Dismissible">
   <div style="display: grid; gap: 0.75rem;">
-    <hx-alert variant="info" closable>
+    <hx-alert variant="info" dismissible>
       This alert can be dismissed by the user.
     </hx-alert>
-    <hx-alert variant="success" closable>
+    <hx-alert variant="success" dismissible>
       Success! You can close this notification.
     </hx-alert>
   </div>
@@ -44,7 +44,7 @@ Alerts with a dismiss button. Click the close icon to hide the alert.
 Use the `actions` slot to add action buttons inside the alert.
 
 <ComponentDemo title="With Actions">
-  <hx-alert variant="warning" closable>
+  <hx-alert variant="warning" dismissible>
     Your session is about to expire.
     <div slot="actions">
       <hx-button variant="secondary" size="sm">
