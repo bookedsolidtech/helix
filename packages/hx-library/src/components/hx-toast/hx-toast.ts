@@ -34,6 +34,7 @@ export type ToastStackPlacement =
  * @csspart icon - The icon slot wrapper.
  * @csspart message - The message slot wrapper.
  * @csspart close-button - The dismiss button (only when closable).
+ * @csspart action - The action slot wrapper.
  *
  * @cssprop [--hx-toast-bg=var(--hx-color-neutral-900)] - Toast background color.
  * @cssprop [--hx-toast-color=var(--hx-color-neutral-0)] - Toast text color.
@@ -77,6 +78,7 @@ export class HelixToast extends LitElement {
 
   // ─── Private State ───
 
+  /** @internal */
   private _timer: ReturnType<typeof setTimeout> | null = null;
 
   // ─── Lifecycle ───
@@ -118,6 +120,7 @@ export class HelixToast extends LitElement {
 
   // ─── Private Helpers ───
 
+  /** @internal */
   private _startTimer(): void {
     this._clearTimer();
     this._timer = setTimeout(() => {
@@ -125,6 +128,7 @@ export class HelixToast extends LitElement {
     }, this.duration);
   }
 
+  /** @internal */
   private _clearTimer(): void {
     if (this._timer !== null) {
       clearTimeout(this._timer);
@@ -132,10 +136,12 @@ export class HelixToast extends LitElement {
     }
   }
 
+  /** @internal */
   private _emitShow(): void {
     this.dispatchEvent(new CustomEvent('hx-show', { bubbles: true, composed: true }));
   }
 
+  /** @internal */
   private _emitHide(): void {
     this.dispatchEvent(new CustomEvent('hx-hide', { bubbles: true, composed: true }));
 
@@ -158,36 +164,43 @@ export class HelixToast extends LitElement {
 
   // ─── Event Handlers ───
 
+  /** @internal */
   private _handleMouseEnter(): void {
     this._clearTimer();
   }
 
+  /** @internal */
   private _handleMouseLeave(): void {
     if (this.open && this.duration > 0) {
       this._startTimer();
     }
   }
 
+  /** @internal */
   private _handleFocusIn(): void {
     this._clearTimer();
   }
 
+  /** @internal */
   private _handleFocusOut(): void {
     if (this.open && this.duration > 0) {
       this._startTimer();
     }
   }
 
+  /** @internal */
   private _handleClose(): void {
     this.hide();
   }
 
   // ─── ARIA Helpers ───
 
+  /** @internal */
   private get _role(): 'alert' | 'status' {
     return this.variant === 'danger' ? 'alert' : 'status';
   }
 
+  /** @internal */
   private get _ariaLive(): 'assertive' | 'polite' {
     return this.variant === 'danger' ? 'assertive' : 'polite';
   }
@@ -215,7 +228,7 @@ export class HelixToast extends LitElement {
         <span part="message" class="toast__message">
           <slot></slot>
         </span>
-        <span class="toast__action">
+        <span part="action" class="toast__action">
           <slot name="action"></slot>
         </span>
         ${this.closable
