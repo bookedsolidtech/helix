@@ -161,14 +161,15 @@ describe('hx-split-button', () => {
       expect(trigger?.disabled).toBe(true);
     });
 
-    it('sets aria-disabled on primary and trigger', async () => {
+    it('does not set redundant aria-disabled on native disabled buttons', async () => {
       const el = await fixture<HelixSplitButton>(`
         <hx-split-button disabled>Save</hx-split-button>
       `);
       const primary = shadowQuery(el, '.split-button__primary');
       const trigger = shadowQuery(el, '.split-button__trigger');
-      expect(primary?.getAttribute('aria-disabled')).toBe('true');
-      expect(trigger?.getAttribute('aria-disabled')).toBe('true');
+      // Native disabled attribute communicates disabled state to AT; aria-disabled is redundant
+      expect(primary?.hasAttribute('aria-disabled')).toBe(false);
+      expect(trigger?.hasAttribute('aria-disabled')).toBe(false);
     });
 
     it('does not fire hx-click when disabled', async () => {
@@ -381,6 +382,160 @@ describe('hx-split-button', () => {
       primary?.click();
       const event = await eventPromise;
       expect(event).toBeTruthy();
+    });
+
+    it('ArrowDown moves focus from first item to second item', async () => {
+      const el = await fixture<HelixSplitButton>(`
+        <hx-split-button>
+          Save Record
+          <hx-menu-item slot="menu" value="item-1">Item One</hx-menu-item>
+          <hx-menu-item slot="menu" value="item-2">Item Two</hx-menu-item>
+          <hx-menu-item slot="menu" value="item-3">Item Three</hx-menu-item>
+        </hx-split-button>
+      `);
+      // Open menu so items are focusable
+      const trigger = shadowQuery<HTMLButtonElement>(el, '.split-button__trigger');
+      trigger?.click();
+      await el.updateComplete;
+      await new Promise((r) => setTimeout(r, 50));
+
+      const items = el.querySelectorAll<HelixMenuItem>('hx-menu-item');
+      // Focus first item
+      items[0].focus();
+      await new Promise((r) => setTimeout(r, 10));
+
+      // ArrowDown from first item should move to second
+      const menu = shadowQuery(el, '.split-button__menu');
+      menu?.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true }));
+      await new Promise((r) => setTimeout(r, 10));
+
+      expect(document.activeElement).toBe(items[1]);
+    });
+
+    it('ArrowDown wraps from last item to first item', async () => {
+      const el = await fixture<HelixSplitButton>(`
+        <hx-split-button>
+          Save Record
+          <hx-menu-item slot="menu" value="item-1">Item One</hx-menu-item>
+          <hx-menu-item slot="menu" value="item-2">Item Two</hx-menu-item>
+        </hx-split-button>
+      `);
+      const trigger = shadowQuery<HTMLButtonElement>(el, '.split-button__trigger');
+      trigger?.click();
+      await el.updateComplete;
+      await new Promise((r) => setTimeout(r, 50));
+
+      const items = el.querySelectorAll<HelixMenuItem>('hx-menu-item');
+      // Focus last item
+      items[1].focus();
+      await new Promise((r) => setTimeout(r, 10));
+
+      const menu = shadowQuery(el, '.split-button__menu');
+      menu?.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true }));
+      await new Promise((r) => setTimeout(r, 10));
+
+      expect(document.activeElement).toBe(items[0]);
+    });
+
+    it('ArrowUp moves focus from second item to first item', async () => {
+      const el = await fixture<HelixSplitButton>(`
+        <hx-split-button>
+          Save Record
+          <hx-menu-item slot="menu" value="item-1">Item One</hx-menu-item>
+          <hx-menu-item slot="menu" value="item-2">Item Two</hx-menu-item>
+        </hx-split-button>
+      `);
+      const trigger = shadowQuery<HTMLButtonElement>(el, '.split-button__trigger');
+      trigger?.click();
+      await el.updateComplete;
+      await new Promise((r) => setTimeout(r, 50));
+
+      const items = el.querySelectorAll<HelixMenuItem>('hx-menu-item');
+      // Focus second item
+      items[1].focus();
+      await new Promise((r) => setTimeout(r, 10));
+
+      const menu = shadowQuery(el, '.split-button__menu');
+      menu?.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowUp', bubbles: true }));
+      await new Promise((r) => setTimeout(r, 10));
+
+      expect(document.activeElement).toBe(items[0]);
+    });
+
+    it('ArrowUp wraps from first item to last item', async () => {
+      const el = await fixture<HelixSplitButton>(`
+        <hx-split-button>
+          Save Record
+          <hx-menu-item slot="menu" value="item-1">Item One</hx-menu-item>
+          <hx-menu-item slot="menu" value="item-2">Item Two</hx-menu-item>
+          <hx-menu-item slot="menu" value="item-3">Item Three</hx-menu-item>
+        </hx-split-button>
+      `);
+      const trigger = shadowQuery<HTMLButtonElement>(el, '.split-button__trigger');
+      trigger?.click();
+      await el.updateComplete;
+      await new Promise((r) => setTimeout(r, 50));
+
+      const items = el.querySelectorAll<HelixMenuItem>('hx-menu-item');
+      // Focus first item
+      items[0].focus();
+      await new Promise((r) => setTimeout(r, 10));
+
+      const menu = shadowQuery(el, '.split-button__menu');
+      menu?.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowUp', bubbles: true }));
+      await new Promise((r) => setTimeout(r, 10));
+
+      expect(document.activeElement).toBe(items[2]);
+    });
+
+    it('Home key moves focus to first item', async () => {
+      const el = await fixture<HelixSplitButton>(`
+        <hx-split-button>
+          Save Record
+          <hx-menu-item slot="menu" value="item-1">Item One</hx-menu-item>
+          <hx-menu-item slot="menu" value="item-2">Item Two</hx-menu-item>
+          <hx-menu-item slot="menu" value="item-3">Item Three</hx-menu-item>
+        </hx-split-button>
+      `);
+      const trigger = shadowQuery<HTMLButtonElement>(el, '.split-button__trigger');
+      trigger?.click();
+      await el.updateComplete;
+      await new Promise((r) => setTimeout(r, 50));
+
+      const items = el.querySelectorAll<HelixMenuItem>('hx-menu-item');
+      items[2].focus();
+      await new Promise((r) => setTimeout(r, 10));
+
+      const menu = shadowQuery(el, '.split-button__menu');
+      menu?.dispatchEvent(new KeyboardEvent('keydown', { key: 'Home', bubbles: true }));
+      await new Promise((r) => setTimeout(r, 10));
+
+      expect(document.activeElement).toBe(items[0]);
+    });
+
+    it('End key moves focus to last item', async () => {
+      const el = await fixture<HelixSplitButton>(`
+        <hx-split-button>
+          Save Record
+          <hx-menu-item slot="menu" value="item-1">Item One</hx-menu-item>
+          <hx-menu-item slot="menu" value="item-2">Item Two</hx-menu-item>
+          <hx-menu-item slot="menu" value="item-3">Item Three</hx-menu-item>
+        </hx-split-button>
+      `);
+      const trigger = shadowQuery<HTMLButtonElement>(el, '.split-button__trigger');
+      trigger?.click();
+      await el.updateComplete;
+      await new Promise((r) => setTimeout(r, 50));
+
+      const items = el.querySelectorAll<HelixMenuItem>('hx-menu-item');
+      items[0].focus();
+      await new Promise((r) => setTimeout(r, 10));
+
+      const menu = shadowQuery(el, '.split-button__menu');
+      menu?.dispatchEvent(new KeyboardEvent('keydown', { key: 'End', bubbles: true }));
+      await new Promise((r) => setTimeout(r, 10));
+
+      expect(document.activeElement).toBe(items[2]);
     });
   });
 
