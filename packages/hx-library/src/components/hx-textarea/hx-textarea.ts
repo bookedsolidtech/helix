@@ -9,6 +9,13 @@ import { helixTextareaStyles } from './hx-textarea.styles.js';
 /**
  * A multi-line text area component with label, validation, and form association.
  *
+ * Uses `aria-invalid` to convey error state and `aria-describedby` to link
+ * error/help text to the textarea. Label association is handled through
+ * `aria-labelledby` (for slotted labels) or the standard `<label for>` pattern.
+ * Supports `aria-required` for required fields and `aria-label` for cases where
+ * a visible label is not present. Validation errors are announced via `role="alert"`
+ * with `aria-live="polite"`.
+ *
  * @summary Form-associated textarea with built-in label, error, help text, character counter, and auto-resize.
  *
  * @tag hx-textarea
@@ -44,8 +51,10 @@ export class HelixTextarea extends LitElement {
 
   // ─── Form Association ───
 
+  /** Enables the element to participate in form submission and validation. */
   static formAssociated = true;
 
+  /** ElementInternals instance for form association, validation, and ARIA. */
   private _internals: ElementInternals;
 
   constructor() {
@@ -148,14 +157,18 @@ export class HelixTextarea extends LitElement {
 
   // ─── Internal References ───
 
+  /** @internal */
   @query('.field__textarea')
   private _textarea!: HTMLTextAreaElement;
 
   // ─── Slot Tracking ───
 
+  /** @internal */
   @state() private _hasLabelSlot = false;
+  /** @internal */
   @state() private _hasErrorSlot = false;
 
+  /** @internal */
   private _handleLabelSlotChange(e: Event): void {
     const slot = e.target as HTMLSlotElement;
     this._hasLabelSlot = slot.assignedElements().length > 0;
@@ -167,6 +180,7 @@ export class HelixTextarea extends LitElement {
     }
   }
 
+  /** @internal */
   private _handleErrorSlotChange(e: Event): void {
     const slot = e.target as HTMLSlotElement;
     this._hasErrorSlot = slot.assignedElements().length > 0;
@@ -209,6 +223,7 @@ export class HelixTextarea extends LitElement {
     return this._internals.reportValidity();
   }
 
+  /** @internal */
   private _updateValidity(): void {
     if (this.required && !this.value) {
       this._internals.setValidity(
@@ -227,19 +242,20 @@ export class HelixTextarea extends LitElement {
     }
   }
 
-  // Called by the form when it resets
+  /** Called by the browser when the owning form is reset. */
   formResetCallback(): void {
     this.value = '';
     this._internals.setFormValue('');
   }
 
-  // Called when the form restores state (e.g., back/forward navigation)
+  /** Called by the browser to restore form state (e.g., back/forward navigation). */
   formStateRestoreCallback(state: string): void {
     this.value = state;
   }
 
   // ─── Event Handling ───
 
+  /** @internal */
   private _handleInput(e: Event): void {
     const target = e.target as HTMLTextAreaElement;
     this.value = target.value;
@@ -264,6 +280,7 @@ export class HelixTextarea extends LitElement {
     );
   }
 
+  /** @internal */
   private _handleChange(e: Event): void {
     const target = e.target as HTMLTextAreaElement;
     this.value = target.value;
@@ -297,10 +314,14 @@ export class HelixTextarea extends LitElement {
 
   // ─── Render ───
 
+  /** @internal */
   private _textareaId = `hx-textarea-${Math.random().toString(36).slice(2, 9)}`;
+  /** @internal */
   private _helpTextId = `${this._textareaId}-help`;
+  /** @internal */
   private _errorId = `${this._textareaId}-error`;
 
+  /** @internal */
   private _renderCounter() {
     if (!this.showCount) return nothing;
 
