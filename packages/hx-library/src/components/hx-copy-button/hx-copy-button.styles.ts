@@ -7,6 +7,7 @@ export const helixCopyButtonStyles = css`
 
   :host([disabled]) {
     pointer-events: none;
+    opacity: var(--hx-opacity-disabled);
   }
 
   .button {
