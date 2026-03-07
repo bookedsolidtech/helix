@@ -22,28 +22,28 @@ describe('hx-list', () => {
       expect(base).toBeTruthy();
     });
 
-    it('renders <ul> for plain variant by default', async () => {
+    it('renders base container for plain variant by default', async () => {
       const el = await fixture<HelixList>('<hx-list></hx-list>');
-      const base = shadowQuery(el, 'ul');
-      expect(base).toBeInstanceOf(HTMLUListElement);
+      const base = shadowQuery(el, '[part~="base"]');
+      expect(base).toBeInstanceOf(HTMLElement);
     });
 
-    it('renders <ol> for numbered variant', async () => {
+    it('renders base container with role="list" for numbered variant', async () => {
       const el = await fixture<HelixList>('<hx-list variant="numbered"></hx-list>');
-      const base = shadowQuery(el, 'ol');
-      expect(base).toBeInstanceOf(HTMLOListElement);
+      const base = shadowQuery(el, '[part~="base"]');
+      expect(base?.getAttribute('role')).toBe('list');
     });
 
-    it('renders <ul> for bulleted variant', async () => {
+    it('renders base container for bulleted variant', async () => {
       const el = await fixture<HelixList>('<hx-list variant="bulleted"></hx-list>');
-      const base = shadowQuery(el, 'ul');
-      expect(base).toBeInstanceOf(HTMLUListElement);
+      const base = shadowQuery(el, '[part~="base"]');
+      expect(base).toBeInstanceOf(HTMLElement);
     });
 
-    it('renders <ul> for interactive variant', async () => {
+    it('renders base container for interactive variant', async () => {
       const el = await fixture<HelixList>('<hx-list variant="interactive"></hx-list>');
-      const base = shadowQuery(el, 'ul');
-      expect(base).toBeInstanceOf(HTMLUListElement);
+      const base = shadowQuery(el, '[part~="base"]');
+      expect(base).toBeInstanceOf(HTMLElement);
     });
   });
 
@@ -78,13 +78,12 @@ describe('hx-list', () => {
       expect(base.getAttribute('role')).toBe('list');
     });
 
-    it('renders <ol> without redundant role for numbered variant', async () => {
-      // Per WCAG audit fix (P2): <ol role="list"> suppresses ordered list semantics in VoiceOver.
-      // The <ol> element has an implicit listitem role; no explicit role attribute needed.
+    it('renders numbered variant with explicit role="list" for ARIA compatibility', async () => {
+      // div[role="list"] avoids the axe `list` rule violation that fires when <ol>/<ul>
+      // contain custom element children (hx-list-item) that are not <li> elements.
       const el = await fixture<HelixList>('<hx-list variant="numbered"></hx-list>');
       const base = shadowQuery(el, '[part~="base"]')!;
-      expect(base.tagName.toLowerCase()).toBe('ol');
-      expect(base.getAttribute('role')).toBeNull();
+      expect(base.getAttribute('role')).toBe('list');
     });
   });
 
