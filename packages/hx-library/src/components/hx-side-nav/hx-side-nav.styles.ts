@@ -119,6 +119,18 @@ export const helixSideNavStyles = css`
     transform: rotate(180deg);
   }
 
+  /* ─── Responsive: auto-collapse on small screens ─── */
+
+  @media (max-width: 768px) {
+    :host {
+      --hx-side-nav-width: 3.5rem;
+    }
+
+    :host(:not([collapsed])) .side-nav {
+      width: var(--hx-side-nav-width, 3.5rem);
+    }
+  }
+
   @media (prefers-reduced-motion: reduce) {
     .side-nav {
       transition: none;

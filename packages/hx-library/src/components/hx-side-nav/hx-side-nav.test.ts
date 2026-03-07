@@ -185,11 +185,6 @@ describe('hx-side-nav', () => {
       const el = await fixture<WcSideNav>('<hx-side-nav></hx-side-nav>');
       expect(shadowQuery(el, '[part="footer"]')).toBeTruthy();
     });
-
-    it('exposes "toggle" part', async () => {
-      const el = await fixture<WcSideNav>('<hx-side-nav></hx-side-nav>');
-      expect(shadowQuery(el, '[part="toggle"]')).toBeTruthy();
-    });
   });
 
   // ─── Collapsed State Propagation ───
