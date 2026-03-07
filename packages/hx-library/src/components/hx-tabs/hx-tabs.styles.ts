@@ -33,7 +33,6 @@ export const helixTabsStyles = css`
       var(--hx-tabs-border-color, var(--hx-color-neutral-200, #e9ecef));
     overflow-x: auto;
     scrollbar-width: none;
-    -webkit-overflow-scrolling: touch;
   }
 
   .tablist::-webkit-scrollbar {

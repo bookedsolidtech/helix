@@ -36,9 +36,8 @@ export class HelixTabPanel extends LitElement {
   override connectedCallback(): void {
     super.connectedCallback();
     this.setAttribute('role', 'tabpanel');
-    if (!this.hasAttribute('tabindex')) {
-      this.setAttribute('tabindex', '0');
-    }
+    // tabindex is managed dynamically by the parent hx-tabs component:
+    // active panels get tabindex="0", hidden panels get tabindex="-1"
   }
 
   // ─── Render ───
