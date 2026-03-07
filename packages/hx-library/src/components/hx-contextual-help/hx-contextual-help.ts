@@ -10,11 +10,6 @@ import { helixContextualHelpStyles } from './hx-contextual-help.styles.js';
  * user activates a question-mark icon button. Designed for enterprise healthcare
  * UIs where inline field-level guidance improves form accuracy.
  *
- * **Accessibility:** The trigger button uses `aria-label` and `aria-expanded`.
- * The popover uses `role="dialog"` with `aria-labelledby` (when heading is set)
- * or `aria-label` (fallback). Escape key closes the popover and returns focus
- * to the trigger. Keyboard activation via Enter/Space on the trigger button.
- *
  * @summary Question-mark trigger that opens an accessible help popover.
  *
  * @tag hx-contextual-help
@@ -230,7 +225,6 @@ export class HelixContextualHelp extends LitElement {
         id=${this._popoverId}
         role="dialog"
         aria-labelledby=${hasHeading ? this._headingId : nothing}
-        aria-label=${hasHeading ? nothing : this.label}
         aria-modal="false"
         tabindex="-1"
       >

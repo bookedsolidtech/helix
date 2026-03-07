@@ -300,17 +300,6 @@ describe('hx-contextual-help', () => {
       expect(popover?.hasAttribute('aria-labelledby')).toBe(false);
     });
 
-    it('popover has aria-label fallback when heading is empty', async () => {
-      const el = await fixture<HelixContextualHelp>(
-        '<hx-contextual-help label="More info"></hx-contextual-help>',
-      );
-      el.show();
-      await el.updateComplete;
-      const popover = shadowQuery(el, '[part="popover"]');
-      expect(popover?.getAttribute('aria-label')).toBe('More info');
-      expect(popover?.hasAttribute('aria-labelledby')).toBe(false);
-    });
-
     it('trigger has type="button"', async () => {
       const el = await fixture<HelixContextualHelp>('<hx-contextual-help></hx-contextual-help>');
       await el.updateComplete;

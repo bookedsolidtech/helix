@@ -6,12 +6,25 @@ export const helixHelpTextStyles = css`
   }
 
   .help-text {
+    display: inline-flex;
+    align-items: baseline;
+    gap: var(--hx-help-text-icon-gap, 0.375rem);
     font-family: var(--hx-help-text-font-family, var(--hx-font-family-sans, sans-serif));
     font-size: var(--hx-help-text-font-size, var(--hx-font-size-sm, 0.875rem));
     font-weight: var(--hx-help-text-font-weight, var(--hx-font-weight-normal, 400));
     line-height: var(--hx-help-text-line-height, var(--hx-line-height-normal, 1.5));
     color: var(--hx-help-text-color, var(--hx-color-neutral-500, #6b7280));
     margin: 0;
+  }
+
+  .help-text__icon {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+  }
+
+  .help-text__text {
+    min-width: 0;
   }
 
   /* ─── Variant: default ─── */

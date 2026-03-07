@@ -1,202 +1,203 @@
-# Deep Audit v2: hx-contextual-help
+# AUDIT: hx-contextual-help (T3-06) — Antagonistic Quality Review
 
-**Audited:** `packages/hx-library/src/components/hx-contextual-help/`
-**Date:** 2026-03-06
-**wc-mcp Health Score:** 84/100 (B)
-**wc-mcp Accessibility Score:** 10/100 (F) — CEM metadata gap, not runtime
-
----
-
-## Scores
-
-| Dimension               | Score                         | Notes                                                                                                   |
-| ----------------------- | ----------------------------- | ------------------------------------------------------------------------------------------------------- |
-| Component Health        | 84/100 (B)                    | Private members leak into CEM                                                                           |
-| Accessibility (CEM)     | 10/100 (F)                    | ARIA patterns not documented in CEM metadata                                                            |
-| Accessibility (Runtime) | PASS                          | dialog role, aria-labelledby, aria-expanded, keyboard nav, focus mgmt                                   |
-| TypeScript              | PASS                          | Strict, zero `any`, zero errors                                                                         |
-| Tests                   | 33 tests, all pass            | 4 rendering, 5 properties, 6 open/close, 4 events, 3 keyboard, 2 slots, 3 CSS parts, 5 ARIA, 2 axe-core |
-| Storybook               | 10 stories                    | Default, 4 placements, 2 sizes, no heading, rich content, form demo, keyboard nav, events               |
-| Design Tokens           | 12 CSS custom properties      | All major visual props tokenized                                                                        |
-| CSS Parts               | 3 (trigger, popover, heading) | All documented in CEM                                                                                   |
-| Events                  | 2 (hx-open, hx-close)         | Both tested, bubbles + composed                                                                         |
+**Reviewed:** `packages/hx-library/src/components/hx-contextual-help/`
+**Files audited:**
+- `hx-contextual-help.ts`
+- `hx-contextual-help.styles.ts`
+- `hx-contextual-help.test.ts`
+- `hx-contextual-help.stories.ts`
+- `index.ts`
 
 ---
 
-## Issues Fixed in This Audit
+## Summary
 
-### FIXED: P0-01 — `role="dialog"` without accessible name when heading is empty
-
-**Severity:** CRITICAL (was P0)
-**File:** `hx-contextual-help.ts`
-
-When `heading` is empty (the default), the popover dialog had no accessible name. WCAG 2.1 SC 4.1.2 requires dialogs to have an accessible name.
-
-**Fix applied:** Added `aria-label=${hasHeading ? nothing : this.label}` fallback on the popover. When no heading is set, the `label` property (default "Help") serves as the dialog's accessible name.
-
-**Test added:** New test "popover has aria-label fallback when heading is empty" verifies the behavior.
-
-### FIXED: CEM accessibility documentation gap
-
-**Severity:** HIGH
-**File:** `hx-contextual-help.ts`
-
-The wc-mcp accessibility score was F (10/100) because the component description didn't mention ARIA patterns.
-
-**Fix applied:** Added accessibility documentation block to JSDoc describing aria-label, aria-expanded, role="dialog", aria-labelledby, Escape key, and keyboard activation patterns.
+| Severity | Count |
+|----------|-------|
+| P0       | 1     |
+| P1       | 5     |
+| P2       | 7     |
 
 ---
 
-## Remaining Issues (Documented)
+## P0 — Critical (blocks merge)
 
-### P1-01: `aria-modal="false"` semantic debate
+### P0-01: `role="dialog"` without accessible name when `heading` is empty
 
-**Severity:** MEDIUM (downgraded from P1)
-**File:** `hx-contextual-help.ts:228`
+**File:** `hx-contextual-help.ts`, lines 221–239
 
-The popover uses `aria-modal="false"` with `role="dialog"`. This is technically valid — contextual help IS non-modal (user should still interact with the form while help is shown). A tooltip role could be considered but `role="dialog"` is more appropriate for rich content with interactive elements. **No change needed** — current implementation matches the non-modal contextual help pattern.
+When `heading` is empty (the default), the rendered popover is:
 
-### P1-02: No focus trap for dialog
+```html
+<div role="dialog" aria-modal="false" tabindex="-1">
+  <div class="popover__body"><slot></slot></div>
+</div>
+```
 
-**Severity:** LOW (downgraded from P1)
-**File:** `hx-contextual-help.ts`
+There is no `aria-label` and no `aria-labelledby`. WCAG 2.1 SC 4.1.2 and ARIA spec both require dialogs to have an accessible name. Screen readers will announce "dialog" with no label — users get zero context about what the dialog contains.
 
-No focus trap exists. However, this is a **non-modal** dialog — APG focus trap is only required for modal dialogs. The `aria-modal="false"` explicitly declares this as non-modal. Users should be able to Tab away to the form field they need help with. **No change needed.**
+The axe-core test suite (`Accessibility (axe-core)`) only tests the open state **with a heading** (`has no axe violations in open state with heading`). There is no axe test for the open state **without a heading**. The P0 violation is undetected by the existing test suite.
 
-### P1-03: No visible close button in popover
-
-**Severity:** MEDIUM
-**File:** `hx-contextual-help.ts`
-
-No close button inside the popover. Dismiss is via trigger re-click, Escape, or outside click. For touch-only users this may be sufficient (tap outside), but a visible close button would improve discoverability.
-
-**Recommendation:** Consider adding an optional close button in a future enhancement. Not blocking.
-
-### P2-01: Hover/active states use semantic tokens without component-level overrides
-
-**Severity:** LOW
-**File:** `hx-contextual-help.styles.ts:37-42`
-
-`.trigger:hover` uses `var(--hx-color-neutral-100)` and `.trigger:active` uses `var(--hx-color-neutral-200)` without component-level token overrides. Consumers cannot independently theme hover/active states.
-
-### P2-02: `min-width: 160px` hardcoded
-
-**Severity:** LOW
-**File:** `hx-contextual-help.styles.ts:80`
-
-Should be a component-level token `--hx-contextual-help-min-width`.
-
-### P2-03: `Math.random()` for IDs — not SSR-safe
-
-**Severity:** LOW
-**File:** `hx-contextual-help.ts:58-59`
-
-Server-rendered HTML and client-side hydration will generate mismatched IDs. Consider `crypto.randomUUID()` or a counter-based approach.
-
-### P2-04: `aria-controls` removed when closed
-
-**Severity:** LOW
-**File:** `hx-contextual-help.ts:258`
-
-`aria-controls` is removed when popover is closed. Technically acceptable since the target element doesn't exist in DOM, but diverges from some sibling component patterns.
+**Required fix:** Add a `label` or `aria-label` fallback when `heading` is empty. At minimum:
+```ts
+aria-label=${!hasHeading ? this.label : nothing}
+aria-labelledby=${hasHeading ? this._headingId : nothing}
+```
+This reuses the existing `label` property (default `"Help"`) as the dialog's accessible name when no heading is provided.
 
 ---
 
-## Audit Dimensions Detail
+## P1 — High (significant quality gap)
 
-### 1. Design Tokens
+### P1-01: `aria-modal="false"` is incorrect and harmful
 
-**Status:** PASS (12 tokens)
+**File:** `hx-contextual-help.ts`, line 229
 
-| Token                                        | Fallback                 | Purpose               |
-| -------------------------------------------- | ------------------------ | --------------------- |
-| `--hx-contextual-help-trigger-color`         | `--hx-color-primary-500` | Trigger icon color    |
-| `--hx-contextual-help-trigger-border-radius` | `--hx-border-radius-md`  | Trigger border radius |
-| `--hx-contextual-help-focus-ring-color`      | `--hx-focus-ring-color`  | Focus ring color      |
-| `--hx-contextual-help-bg`                    | `--hx-color-neutral-0`   | Popover background    |
-| `--hx-contextual-help-color`                 | `--hx-color-neutral-900` | Popover text color    |
-| `--hx-contextual-help-border-color`          | `--hx-color-neutral-200` | Popover border        |
-| `--hx-contextual-help-border-radius`         | `--hx-border-radius-md`  | Popover border radius |
-| `--hx-contextual-help-shadow`                | `--hx-shadow-lg`         | Popover box shadow    |
-| `--hx-contextual-help-padding`               | `--hx-spacing-4`         | Popover padding       |
-| `--hx-contextual-help-max-width`             | `280px`                  | Max width             |
-| `--hx-contextual-help-heading-color`         | `--hx-color-neutral-900` | Heading color         |
-| `--hx-contextual-help-z-index`               | `9999`                   | Z-index               |
+```html
+aria-modal="false"
+```
 
-Dark mode: Supported via semantic token cascade. All fallbacks reference `--hx-*` semantic tokens that resolve differently in dark mode.
+`aria-modal="false"` explicitly tells assistive technologies that this dialog does **not** restrict the virtual cursor to its content. For a `role="dialog"` element this is the wrong semantic — ARIA authoring practices for dialogs state that `aria-modal="true"` should be set when the dialog is intended to focus the user's attention (even non-blocking popovers benefit from it to guide screen reader navigation). Setting `aria-modal="false"` causes screen readers to continue reading surrounding page content as if the dialog weren't open, defeating the purpose of the `role="dialog"` pattern.
 
-### 2. Accessibility
+If non-modal informational behavior is intended, the correct role is `role="tooltip"` or `role="status"`, not `role="dialog"` with `aria-modal="false"`.
 
-**Status:** PASS (runtime), needs CEM improvement
+---
 
-- Trigger: `<button>` with `aria-label`, `aria-expanded`, `type="button"`
-- Popover: `role="dialog"`, `aria-labelledby` (with heading) or `aria-label` (without heading)
-- Keyboard: Enter/Space toggles (native button), Escape closes, focus returns to trigger
-- Focus: Popover receives focus on open, trigger receives focus on close
-- SVG: `aria-hidden="true"` (decorative)
-- Reduced motion: `@media (prefers-reduced-motion: reduce)` removes transitions
-- axe-core: 2 tests (closed state, open with heading) — both pass
+### P1-02: Focus trap absent for `role="dialog"`
 
-### 3. Functionality
+**File:** `hx-contextual-help.ts`, lines 120–133
 
-**Status:** PASS
+The `_show()` method moves focus to the popover container (`this._popoverEl?.focus()`), but there is no focus trap. Once the user presses Tab from inside the popover, focus escapes to the next focusable element in the page, leaving the "dialog" open and the user disoriented.
 
-- Open/close via click toggle, `show()`/`hide()` methods, Escape key, outside click
-- Popover positioning via `@floating-ui/dom` with flip, shift, offset middleware
-- 4 placement options: top, bottom, left, right
-- 2 size options: sm, md
-- Heading renders as `<h3>` with part="heading"
-- Default slot for rich content (text, links, HTML)
+ARIA Authoring Practices Guide (APG) dialog pattern requires that Tab and Shift+Tab cycle focus within the dialog until it is dismissed. This is especially important in healthcare UIs where the form field needing help is adjacent to the trigger — a Tab keypress from inside the popover will land on that field, not return to the trigger.
 
-### 4. TypeScript
+**Required fix:** Add Tab/Shift+Tab trap: collect all focusable descendants of `.popover__body`, intercept Tab on last element to return to first, and Shift+Tab on first to return to last (or close and return to trigger).
 
-**Status:** PASS — zero errors, strict mode, no `any`
+---
 
-### 5. CSS/Styling
+### P1-03: No close button inside the popover
 
-**Status:** PASS
+**File:** `hx-contextual-help.ts`, `hx-contextual-help.stories.ts`
 
-- Shadow DOM encapsulation
-- 3 CSS parts: trigger, popover, heading
-- `position: fixed` strategy for popover (works in overflow containers)
-- Focus-visible outline with token-driven color/width/offset
-- Reduced motion support
+The popover has no visible close button. The only way to dismiss it is: second click on the trigger, Escape key, or clicking outside. For keyboard-only users who have Tab focus inside the popover and cannot reach the trigger or fire Escape naturally, there is no in-popover dismiss affordance.
 
-### 6. CEM Accuracy
+APG dialog pattern requires a visible close mechanism inside the dialog. This is also needed for mobile/touch users who may have opened the popover and have no keyboard available.
 
-**Status:** PASS — All public API documented
+**Required fix:** Add an `×` close button to the popover header (or footer). Expose it as a `csspart` (e.g., `part="close-button"`).
 
-- 4 properties (placement, heading, size, label)
-- 2 methods (show, hide)
-- 2 events (hx-open, hx-close)
-- 1 slot (default)
-- 3 CSS parts
-- 12 CSS custom properties
+---
 
-### 7. Tests
+### P1-04: Missing test — axe-core for open state without heading
 
-**Status:** PASS — 33 tests, all passing
+**File:** `hx-contextual-help.test.ts`, lines 313–332
 
-Coverage areas: rendering (4), properties (5), open/close (6), events (4), keyboard (3), slots (2), CSS parts (3), ARIA (5), axe-core (2)
+The axe-core suite has two tests:
+1. Closed state (passes — no dialog rendered)
+2. Open state **with heading** (passes — dialog has `aria-labelledby`)
 
-### 8. Storybook
+There is no test for open state **without heading**. This gap masks the P0-01 violation described above. A component can claim axe-core compliance while failing on its most common use case (no heading).
 
-**Status:** PASS — 10 stories with interaction tests
+---
 
-Default, PlacementRight/Left/Top/Bottom, SizeSmall/Medium, NoHeading, RichContent, FormFieldDemo, KeyboardNavigation, EventsFiring
+### P1-05: Missing test — focus returns to trigger after `hide()`
 
-### 9. Drupal Compatibility
+**File:** `hx-contextual-help.test.ts`
 
-**Status:** PASS
+The `_hide()` method calls `this._triggerEl?.focus()` to return focus to the trigger (line 141). There is no test verifying this behavior. Focus management is a critical accessibility requirement and regressions here would be silent.
 
-- Standard custom element, attribute-driven API
-- No framework dependencies in runtime
-- Works in Twig templates: `<hx-contextual-help heading="Help" placement="right">Content</hx-contextual-help>`
+There is also no test for focus moving **into** the popover on `show()`, which is required by the ARIA dialog pattern (and partially implemented via `this._popoverEl?.focus()`).
 
-### 10. Portability
+---
 
-**Status:** PASS
+## P2 — Medium (code quality / completeness)
 
-- Self-registering via `@customElement('hx-contextual-help')`
-- CDN-ready (imports from index.ts)
-- No framework-specific APIs
+### P2-01: `.trigger:hover` and `.trigger:active` use raw semantic tokens without component-level overrides
+
+**File:** `hx-contextual-help.styles.ts`, lines 37–42
+
+```css
+.trigger:hover {
+  background-color: var(--hx-color-neutral-100);
+}
+.trigger:active {
+  background-color: var(--hx-color-neutral-200);
+}
+```
+
+These states hardcode semantic tokens without exposing component-level custom property overrides (e.g., `--hx-contextual-help-trigger-hover-bg`). Consumers cannot theme hover/active states independently from the neutral palette. All other interactive states on the trigger expose a component token; these two do not. Inconsistent token exposure.
+
+---
+
+### P2-02: `min-width: 160px` is a hardcoded magic number
+
+**File:** `hx-contextual-help.styles.ts`, line 80
+
+```css
+min-width: 160px;
+```
+
+This violates the project's no-hardcoded-values rule (CLAUDE.md). It should be a design token or a component-level custom property (e.g., `--hx-contextual-help-min-width`).
+
+---
+
+### P2-03: `placement` and `size` have no runtime validation
+
+**File:** `hx-contextual-help.ts`, lines 68–84
+
+The `placement` and `size` properties are typed as union literals in TypeScript but there is no runtime guard. If a consumer sets `placement="diagonal"` via an HTML attribute (e.g., from a CMS or Twig template), it will be passed directly to `computePosition()` from `@floating-ui/dom`, which silently falls back to an undefined behavior. In a healthcare UI rendered from Drupal, attribute values come from CMS editors — runtime validation with a console warning is warranted.
+
+---
+
+### P2-04: Storybook missing explicit "with links" story
+
+**File:** `hx-contextual-help.stories.ts`
+
+The audit specification explicitly requires: "Storybook — with text content, with links, all placements." The `RichContent` story (lines 164–178) has a list but no hyperlinks. There is no story demonstrating a popover with `<a>` elements inside the slot — which is important for verifying focus management with interactive content and for validating that links are visually styled correctly inside the shadow DOM context.
+
+---
+
+### P2-05: `FormFieldDemo` story uses inline styles instead of design tokens
+
+**File:** `hx-contextual-help.stories.ts`, lines 185–264
+
+The `FormFieldDemo` story has extensive inline `style="..."` attributes with hardcoded hex colors (`#111827`, `#374151`, `#d1d5db`), pixel values, and raw CSS. This demonstrates the component in a context that actively contradicts the design system's token architecture. If this story is used as reference by implementors (which is its purpose), it teaches the wrong pattern.
+
+---
+
+### P2-06: `_headingId` and `_popoverId` use `Math.random()` — not SSR-safe
+
+**File:** `hx-contextual-help.ts`, lines 58–59
+
+```ts
+private readonly _headingId = `hx-contextual-help-heading-${Math.random().toString(36).slice(2, 9)}`;
+private readonly _popoverId = `hx-contextual-help-popover-${Math.random().toString(36).slice(2, 9)}`;
+```
+
+`Math.random()` is not cryptographically random and produces different values on each instantiation — meaning server-rendered HTML and client-side hydration will generate mismatched IDs. Prefer `crypto.randomUUID()` (or the existing pattern used in sibling components if one exists) for deterministic ID generation in SSR contexts.
+
+---
+
+### P2-07: `aria-controls` on trigger only set when open — violates ARIA spec
+
+**File:** `hx-contextual-help.ts`, line 258
+
+```ts
+aria-controls=${this._open ? this._popoverId : nothing}
+```
+
+The `aria-controls` attribute is removed entirely when the popover is closed. ARIA spec says `aria-controls` should reference the controlled element's ID regardless of its open/closed state — the button controls that region whether it is visible or not. When the popover is rendered conditionally (`_renderPopover()` returns `nothing` when closed), the referenced element does not exist in the DOM, making this technically acceptable as a workaround. However, the pattern diverges from sibling components (`hx-popover`) and creates an inconsistency reviewers must re-explain. A better approach is to always render the popover element (with `hidden` or `inert` when closed) and always maintain `aria-controls`.
+
+---
+
+## Non-Issues (confirmed acceptable)
+
+- **TypeScript types**: `placement: 'top' | 'bottom' | 'left' | 'right'`, `size: 'sm' | 'md'`, `label: string`, `heading: string` — all typed correctly with no `any`.
+- **SVG `aria-hidden="true"`**: Correct. The icon is decorative; the button's `aria-label` carries the accessible name.
+- **`@floating-ui/dom` dependency**: Already a project dependency (used by `hx-popover`). Not a new bundle addition.
+- **`aria-expanded` on trigger**: Correctly toggles between `"true"` and `"false"` and is tested.
+- **Outside-click-to-close**: Implemented correctly via `document.addEventListener('click', ...)` added on show and removed on hide.
+- **Escape key closes popover**: Implemented and tested (3 keyboard tests).
+- **CSS token usage (general)**: `--hx-*` tokens used consistently throughout, with `--hx-contextual-help-*` component tokens exposed for all major visual properties.
+- **Reduced-motion support**: `@media (prefers-reduced-motion: reduce)` block present.
+- **`type="button"` on trigger**: Correct. Prevents accidental form submission.
+- **`disconnectedCallback` cleanup**: Document-level click listener removed on disconnect.
