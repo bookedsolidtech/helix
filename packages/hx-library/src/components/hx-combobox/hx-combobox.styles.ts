@@ -58,6 +58,8 @@ export const helixComboboxStyles = css`
 
   .field__input-wrapper:focus-within {
     border-color: var(--hx-combobox-focus-ring-color, var(--hx-focus-ring-color, #2563eb));
+    /* P2-7: Solid fallback for browsers without color-mix() (Chrome <111, Safari <16.2) */
+    box-shadow: 0 0 0 var(--hx-focus-ring-width, 2px) rgba(37, 99, 235, 0.25);
     box-shadow: 0 0 0 var(--hx-focus-ring-width, 2px)
       color-mix(
         in srgb,
@@ -73,6 +75,8 @@ export const helixComboboxStyles = css`
 
   .field--error .field__input-wrapper:focus-within {
     border-color: var(--hx-combobox-error-color, var(--hx-color-error-500, #dc3545));
+    /* P2-7: Solid fallback for browsers without color-mix() */
+    box-shadow: 0 0 0 var(--hx-focus-ring-width, 2px) rgba(220, 53, 69, 0.25);
     box-shadow: 0 0 0 var(--hx-focus-ring-width, 2px)
       color-mix(
         in srgb,
@@ -206,6 +210,8 @@ export const helixComboboxStyles = css`
     border: var(--hx-border-width-thin, 1px) solid
       var(--hx-combobox-border-color, var(--hx-color-neutral-300, #ced4da));
     border-radius: var(--hx-combobox-border-radius, var(--hx-border-radius-md, 0.375rem));
+    /* P2-7: Solid fallback for browsers without color-mix() */
+    box-shadow: 0 4px 16px rgba(13, 17, 23, 0.12);
     box-shadow: var(
       --hx-combobox-listbox-shadow,
       0 4px 16px color-mix(in srgb, var(--hx-color-neutral-900, #0d1117) 12%, transparent)
@@ -305,5 +311,70 @@ export const helixComboboxStyles = css`
     .field__option {
       transition: none;
     }
+  }
+
+  /* ─── Multiple Selection / Chips (P0-1) ─── */
+
+  :host([multiple]) .field__input-wrapper {
+    flex-wrap: wrap;
+    padding: var(--hx-space-1, 0.25rem);
+    gap: var(--hx-space-1, 0.25rem);
+    align-items: center;
+  }
+
+  :host([multiple]) .field__input {
+    min-width: 8rem;
+    padding: var(--hx-space-1, 0.25rem) var(--hx-space-2, 0.5rem);
+    flex-shrink: 1;
+  }
+
+  .field__chip {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--hx-space-1, 0.25rem);
+    padding: 0 var(--hx-space-1, 0.25rem) 0 var(--hx-space-2, 0.5rem);
+    height: 1.5rem;
+    background-color: var(--hx-combobox-chip-bg, var(--hx-color-primary-100, #dbeafe));
+    color: var(--hx-combobox-chip-color, var(--hx-color-primary-800, #1e40af));
+    border-radius: var(--hx-border-radius-full, 9999px);
+    font-size: var(--hx-font-size-sm, 0.875rem);
+    white-space: nowrap;
+    max-width: 12rem;
+    flex-shrink: 0;
+  }
+
+  .field__chip-label {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 8rem;
+  }
+
+  .field__chip-remove {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 1rem;
+    height: 1rem;
+    border: none;
+    background: none;
+    cursor: pointer;
+    padding: 0;
+    color: inherit;
+    opacity: 0.7;
+    border-radius: 50%;
+    line-height: 1;
+    transition: opacity var(--hx-transition-fast, 150ms ease);
+  }
+
+  .field__chip-remove:hover {
+    opacity: 1;
+    background-color: var(--hx-combobox-chip-remove-hover-bg, var(--hx-color-primary-200, #bfdbfe));
+  }
+
+  .field__chip-remove:focus-visible {
+    outline: 2px solid var(--hx-combobox-focus-ring-color, var(--hx-focus-ring-color, #2563eb));
+    outline-offset: 1px;
+    opacity: 1;
   }
 `;
