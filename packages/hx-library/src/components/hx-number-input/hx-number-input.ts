@@ -16,7 +16,7 @@ import { helixNumberInputStyles } from './hx-number-input.styles.js';
  *
  * @tag hx-number-input
  *
- * @slot - Default slot — label override for Drupal Form API rendered labels.
+ * @slot label - Custom label content (overrides the label property). Use for Drupal Form API rendered labels.
  * @slot help - Custom help text content (overrides the helpText property).
  * @slot error - Custom error content (overrides the error property). Use for Drupal Form API rendered errors.
  * @slot prefix - Content rendered before the input (e.g., a unit icon).
@@ -41,6 +41,8 @@ import { helixNumberInputStyles } from './hx-number-input.styles.js';
  * @cssprop [--hx-number-input-border-radius=var(--hx-border-radius-md)] - Input border radius.
  * @cssprop [--hx-number-input-error-color=var(--hx-color-error-500)] - Error state color.
  * @cssprop [--hx-number-input-focus-ring-color=var(--hx-focus-ring-color)] - Focus ring color.
+ * @cssprop [--hx-number-input-label-color=var(--hx-color-neutral-700)] - Label text color.
+ * @cssprop [--hx-number-input-font-family=var(--hx-font-family-sans)] - Font family.
  */
 @customElement('hx-number-input')
 export class HelixNumberInput extends LitElement {
@@ -171,6 +173,9 @@ export class HelixNumberInput extends LitElement {
   @state() private _hasErrorSlot = false;
   @state() private _hasHelpSlot = false;
 
+  /** The value captured at first render, used by formResetCallback. */
+  private _defaultValue: number | null = null;
+
   /** Timer ID for the long-press initial delay. */
   private _longPressTimer: ReturnType<typeof setTimeout> | null = null;
 
@@ -211,6 +216,10 @@ export class HelixNumberInput extends LitElement {
   }
 
   // ─── Lifecycle ───
+
+  override firstUpdated(): void {
+    this._defaultValue = this.value;
+  }
 
   override disconnectedCallback(): void {
     super.disconnectedCallback();
@@ -310,13 +319,13 @@ export class HelixNumberInput extends LitElement {
 
   /** Called by the form when it resets. */
   formResetCallback(): void {
-    this.value = null;
-    this._internals.setFormValue(null);
+    this.value = this._defaultValue;
+    this._internals.setFormValue(this.value !== null ? String(this.value) : null);
   }
 
   /** Called when the form restores state (e.g., back/forward navigation). */
   formStateRestoreCallback(state: string): void {
-    const parsed = parseFloat(state);
+    const parsed = Number(state);
     this.value = isNaN(parsed) ? null : parsed;
   }
 
@@ -361,13 +370,6 @@ export class HelixNumberInput extends LitElement {
     if (next === this.value) return;
     this.value = next;
 
-    this.dispatchEvent(
-      new CustomEvent<{ value: number | null }>('hx-input', {
-        bubbles: true,
-        composed: true,
-        detail: { value: this.value },
-      }),
-    );
     this.dispatchEvent(
       new CustomEvent<{ value: number | null }>('hx-change', {
         bubbles: true,
@@ -545,7 +547,7 @@ export class HelixNumberInput extends LitElement {
             .value=${live(displayValue)}
             min=${ifDefined(this.min)}
             max=${ifDefined(this.max)}
-            step=${ifDefined(this.step !== 1 ? this.step : undefined)}
+            step=${this.step}
             ?required=${this.required}
             ?disabled=${this.disabled}
             ?readonly=${this.readonly}
@@ -555,7 +557,6 @@ export class HelixNumberInput extends LitElement {
             )}
             aria-invalid=${hasError ? 'true' : nothing}
             aria-describedby=${ifDefined(describedBy)}
-            aria-required=${this.required ? 'true' : nothing}
             @input=${this._handleInput}
             @change=${this._handleChange}
             @keydown=${this._handleKeyDown}
@@ -568,7 +569,7 @@ export class HelixNumberInput extends LitElement {
           ${this.noStepper
             ? nothing
             : html`
-                <div part="stepper" class="field__stepper" aria-hidden="true">
+                <div part="stepper" class="field__stepper">
                   <button
                     part="increment"
                     class="field__stepper-btn"
@@ -604,13 +605,7 @@ export class HelixNumberInput extends LitElement {
         <slot name="error" @slotchange=${this._handleErrorSlotChange}>
           ${this.error
             ? html`
-                <div
-                  part="error-message"
-                  class="field__error"
-                  id=${this._errorId}
-                  role="alert"
-                  aria-live="polite"
-                >
+                <div part="error-message" class="field__error" id=${this._errorId} role="alert">
                   ${this.error}
                 </div>
               `
