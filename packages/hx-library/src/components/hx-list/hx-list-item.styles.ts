@@ -26,21 +26,21 @@ export const helixListItemStyles = css`
     width: 100%;
   }
 
-  /* ─── Interactive items ─── */
+  /* ─── Interactive items — use :host([interactive]) instead of deprecated :host-context() ─── */
 
-  :host-context(hx-list[variant='interactive']) .list-item {
+  :host([interactive]) .list-item {
     cursor: pointer;
     border-radius: var(--hx-border-radius-md, 0.375rem);
     transition: background-color var(--hx-transition-fast, 150ms ease);
-    outline: none;
   }
 
-  :host-context(hx-list[variant='interactive']) .list-item:hover:not(.list-item--disabled) {
+  :host([interactive]) .list-item:hover:not(.list-item--disabled) {
     background-color: var(--hx-list-item-bg-hover, var(--hx-color-neutral-50, #f8fafc));
   }
 
-  :host-context(hx-list[variant='interactive']) .list-item:focus-visible {
-    outline: var(--hx-focus-ring-width, 2px) solid var(--hx-focus-ring-color, #2563eb);
+  :host([interactive]):focus-visible .list-item {
+    outline: var(--hx-focus-ring-width, 2px) solid
+      var(--hx-focus-ring-color, var(--hx-color-primary-600, #2563eb));
     outline-offset: var(--hx-focus-ring-offset, 2px);
   }
 
@@ -70,7 +70,8 @@ export const helixListItemStyles = css`
   }
 
   .list-item__link:focus-visible {
-    outline: var(--hx-focus-ring-width, 2px) solid var(--hx-focus-ring-color, #2563eb);
+    outline: var(--hx-focus-ring-width, 2px) solid
+      var(--hx-focus-ring-color, var(--hx-color-primary-600, #2563eb));
     outline-offset: var(--hx-focus-ring-offset, 2px);
     border-radius: var(--hx-border-radius-sm, 0.25rem);
   }
@@ -98,7 +99,7 @@ export const helixListItemStyles = css`
   .list-item__description {
     display: block;
     font-size: var(--hx-font-size-sm, 0.875rem);
-    color: var(--hx-color-neutral-500, #64748b);
+    color: var(--hx-list-item-description-color, var(--hx-color-neutral-500, #64748b));
     margin-top: var(--hx-space-1, 0.25rem);
   }
 `;
