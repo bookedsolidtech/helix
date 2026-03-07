@@ -20,6 +20,10 @@ import { helixFormatDateStyles } from './hx-format-date.styles.js';
 export class HelixFormatDate extends LitElement {
   static override styles = [tokenStyles, helixFormatDateStyles];
 
+  // ─── Intl formatter caches (keyed by locale+options fingerprint) ───
+  private static _dtfCache = new Map<string, Intl.DateTimeFormat>();
+  private static _rtfCache = new Map<string, Intl.RelativeTimeFormat>();
+
   /**
    * The date/time value to format. Accepts an ISO string, a Unix timestamp (ms), or
    * a `Date` object. Defaults to the current date/time when empty.
@@ -86,11 +90,13 @@ export class HelixFormatDate extends LitElement {
   second: 'numeric' | '2-digit' | undefined = undefined;
 
   /**
-   * Time zone name display format.
+   * Time zone name display format. Accepts all values supported by
+   * `Intl.DateTimeFormatOptions.timeZoneName` including `'short'`, `'long'`,
+   * `'shortOffset'`, `'longOffset'`, `'shortGeneric'`, and `'longGeneric'`.
    * @attr time-zone-name
    */
   @property({ attribute: 'time-zone-name' })
-  timeZoneName: 'short' | 'long' | undefined = undefined;
+  timeZoneName: Intl.DateTimeFormatOptions['timeZoneName'] = undefined;
 
   /**
    * IANA time zone identifier (e.g. `"America/New_York"`, `"UTC"`).
@@ -118,6 +124,11 @@ export class HelixFormatDate extends LitElement {
   /**
    * When true, displays a relative time string such as "2 hours ago" or "in 3 days"
    * using `Intl.RelativeTimeFormat`.
+   *
+   * **Important:** The relative time string is computed once at render time and does
+   * not auto-update. If the displayed text must stay current (e.g. a live "X minutes
+   * ago" counter), the consuming component must re-set the `date` property on its own
+   * interval to trigger a re-render.
    * @attr relative
    */
   @property({ type: Boolean })
@@ -158,6 +169,57 @@ export class HelixFormatDate extends LitElement {
     return undefined;
   }
 
+  /**
+   * Returns the `datetime` attribute value. When `timeZone` is set, returns a
+   * timezone-offset ISO string (e.g. `2024-09-20T05:00:00-04:00`) so that
+   * assistive technology reads the same local time as the visual display.
+   */
+  private _getDatetimeAttr(date: Date): string {
+    if (!this.timeZone) return date.toISOString();
+    try {
+      const fmtOpts: Intl.DateTimeFormatOptions = {
+        timeZone: this.timeZone,
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: false,
+      };
+      const reduceParts = (parts: Intl.DateTimeFormatPart[]) =>
+        parts.reduce<Record<string, string>>((acc, p) => {
+          if (p.type !== 'literal') acc[p.type] = p.value;
+          return acc;
+        }, {});
+
+      const tzParts = reduceParts(new Intl.DateTimeFormat('en-CA', fmtOpts).formatToParts(date));
+      const utcParts = reduceParts(
+        new Intl.DateTimeFormat('en-CA', { ...fmtOpts, timeZone: 'UTC' }).formatToParts(date),
+      );
+
+      const toMs = (p: Record<string, string>) =>
+        Date.UTC(
+          parseInt(p['year'] ?? '0'),
+          parseInt(p['month'] ?? '1') - 1,
+          parseInt(p['day'] ?? '1'),
+          parseInt(p['hour'] === '24' ? '0' : (p['hour'] ?? '0')),
+          parseInt(p['minute'] ?? '0'),
+          parseInt(p['second'] ?? '0'),
+        );
+
+      const offsetMin = Math.round((toMs(tzParts) - toMs(utcParts)) / 60000);
+      const sign = offsetMin >= 0 ? '+' : '-';
+      const absMin = Math.abs(offsetMin);
+      const hh = String(Math.floor(absMin / 60)).padStart(2, '0');
+      const mm = String(absMin % 60).padStart(2, '0');
+      const h = tzParts['hour'] === '24' ? '00' : (tzParts['hour'] ?? '00');
+      return `${tzParts['year']}-${tzParts['month']}-${tzParts['day']}T${h}:${tzParts['minute']}:${tzParts['second']}${sign}${hh}:${mm}`;
+    } catch {
+      return date.toISOString();
+    }
+  }
+
   private _formatRelative(date: Date): string {
     const now = new Date();
     const diffMs = date.getTime() - now.getTime();
@@ -173,14 +235,28 @@ export class HelixFormatDate extends LitElement {
     const absMonth = Math.abs(diffMonth);
     const diffYear = Math.round(diffDay / 365);
 
-    const rtf = new Intl.RelativeTimeFormat(this._getLocale(), { numeric: this.numeric });
+    const locale = this._getLocale();
+    const cacheKey = `${locale}|${this.numeric}`;
+    let rtf = HelixFormatDate._rtfCache.get(cacheKey);
+    if (!rtf) {
+      try {
+        rtf = new Intl.RelativeTimeFormat(locale, { numeric: this.numeric });
+        HelixFormatDate._rtfCache.set(cacheKey, rtf);
+      } catch {
+        return '';
+      }
+    }
 
-    if (absSec < 60) return rtf.format(diffSec, 'second');
-    if (absMin < 60) return rtf.format(diffMin, 'minute');
-    if (absHour < 24) return rtf.format(diffHour, 'hour');
-    if (absDay < 30) return rtf.format(diffDay, 'day');
-    if (absMonth < 12) return rtf.format(diffMonth, 'month');
-    return rtf.format(diffYear, 'year');
+    try {
+      if (absSec < 60) return rtf.format(diffSec, 'second');
+      if (absMin < 60) return rtf.format(diffMin, 'minute');
+      if (absHour < 24) return rtf.format(diffHour, 'hour');
+      if (absDay < 30) return rtf.format(diffDay, 'day');
+      if (absMonth < 12) return rtf.format(diffMonth, 'month');
+      return rtf.format(diffYear, 'year');
+    } catch {
+      return '';
+    }
   }
 
   private _formatAbsolute(date: Date): string {
@@ -206,21 +282,38 @@ export class HelixFormatDate extends LitElement {
       options.day = 'numeric';
     }
 
-    return new Intl.DateTimeFormat(this._getLocale(), options).format(date);
+    const locale = this._getLocale();
+    const cacheKey = `${locale}|${JSON.stringify(options)}`;
+    let dtf = HelixFormatDate._dtfCache.get(cacheKey);
+    if (!dtf) {
+      try {
+        dtf = new Intl.DateTimeFormat(locale, options);
+        HelixFormatDate._dtfCache.set(cacheKey, dtf);
+      } catch {
+        // Invalid options (e.g. unknown timeZone) — return empty string
+        return '';
+      }
+    }
+
+    try {
+      return dtf.format(date);
+    } catch {
+      return '';
+    }
   }
 
   // ─── Render ───
 
   override render() {
     const date = this._getDate();
-    const isoString = date.toISOString();
+    const datetimeAttr = this._getDatetimeAttr(date);
     const formattedText = this.relative ? this._formatRelative(date) : this._formatAbsolute(date);
 
-    return html`<time part="base" datetime=${isoString}>${formattedText}</time>`;
+    return html`<time part="base" datetime=${datetimeAttr}>${formattedText}</time>`;
   }
 }
 
-export type WcFormatDate = HelixFormatDate;
+export type HxFormatDate = HelixFormatDate;
 
 declare global {
   interface HTMLElementTagNameMap {
