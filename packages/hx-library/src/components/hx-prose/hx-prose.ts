@@ -35,7 +35,6 @@ export class HelixProse extends LitElement {
 
   // ─── Adopted Stylesheets ───
 
-  /** Injects scoped prose CSS into the document via adopted stylesheets. */
   private _styles = new AdoptedStylesheetsController(this, helixProseScopedCss, document);
 
   // ─── Properties ───
