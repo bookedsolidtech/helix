@@ -21,13 +21,12 @@ export const helixTooltipStyles = css`
     line-height: var(--hx-line-height-normal, 1.5);
     border-radius: var(--hx-tooltip-border-radius, var(--hx-border-radius-sm, 0.25rem));
     box-shadow: var(--hx-tooltip-shadow, var(--hx-shadow-sm, 0 2px 8px rgba(0, 0, 0, 0.2)));
-    pointer-events: none;
     visibility: hidden;
     opacity: 0;
     transition:
       opacity var(--hx-tooltip-transition-duration, 0.15s) ease,
       visibility var(--hx-tooltip-transition-duration, 0.15s) ease;
-    word-wrap: break-word;
+    overflow-wrap: break-word;
   }
 
   [part='tooltip'].visible {
