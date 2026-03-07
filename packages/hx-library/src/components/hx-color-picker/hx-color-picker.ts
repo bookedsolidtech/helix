@@ -140,6 +140,7 @@ function rgbToHsl(rgb: RGB): { h: number; s: number; l: number; a: number } {
   return { h: h * 360, s: s * 100, l: l * 100, a: rgb.a };
 }
 
+// P2-1: parseColor now handles HSV/HSVA input strings for round-trip correctness
 function parseColor(value: string): HSV | null {
   if (!value) return null;
 
@@ -201,6 +202,20 @@ function parseColor(value: string): HSV | null {
     });
   }
 
+  // P2-1: Support HSV/HSVA input strings (component's own output format)
+  const hsvMatch = value.match(
+    /hsva?\(\s*([\d.]+)\s*,\s*([\d.]+)%\s*,\s*([\d.]+)%(?:\s*,\s*([\d.]+))?\s*\)/,
+  );
+  if (hsvMatch) {
+    const [, hm1, hm2, hm3, hm4] = hsvMatch;
+    return {
+      h: parseFloat(hm1 ?? '0'),
+      s: parseFloat(hm2 ?? '0'),
+      v: parseFloat(hm3 ?? '0'),
+      a: hm4 !== undefined ? parseFloat(hm4) : 1,
+    };
+  }
+
   return null;
 }
 
@@ -249,16 +264,43 @@ function formatColor(hsv: HSV, format: ColorFormat, includeAlpha: boolean): stri
  * @csspart trigger - The trigger button element.
  * @csspart swatches - The swatch color buttons container.
  * @csspart grid - The 2D saturation/value gradient picker area.
- * @csspart slider - Shared slider container.
+ * @csspart slider - Shared slider container (also on hue-slider and opacity-slider).
  * @csspart hue-slider - The hue slider track.
  * @csspart opacity-slider - The alpha/opacity slider track.
  * @csspart input - The text input area.
  *
  * @cssprop [--hx-color-picker-z-index=1000] - z-index of the popover panel.
+ * @cssprop [--hx-color-picker-width=260px] - Width of the picker panel.
+ * @cssprop [--hx-color-picker-grid-height=160px] - Height of the gradient grid.
+ * @cssprop [--hx-color-picker-thumb-border=#fff] - Border color of slider/grid thumbs.
+ * @cssprop [--hx-color-picker-thumb-shadow=rgba(0,0,0,0.3)] - Shadow color of slider/grid thumbs.
+ * @cssprop [--hx-color-picker-panel-shadow=rgba(0,0,0,0.15)] - Panel drop-shadow color.
+ * @cssprop [--hx-color-picker-swatch-border=rgba(0,0,0,0.1)] - Swatch button border color.
+ * @cssprop [--hx-color-picker-swatch-border-hover=rgba(0,0,0,0.3)] - Swatch button border on hover.
  *
  * @example
  * ```html
  * <hx-color-picker value="#3b82f6" format="hex"></hx-color-picker>
+ * ```
+ *
+ * @example Drupal / Twig usage
+ * The `swatches` property must be set via JavaScript (Drupal behavior) because arrays
+ * cannot be serialized as HTML attributes:
+ * ```js
+ * // my-theme/js/color-picker-behavior.js
+ * Drupal.behaviors.helixColorPicker = {
+ *   attach(context) {
+ *     context.querySelectorAll('hx-color-picker[data-swatches]').forEach((el) => {
+ *       el.swatches = JSON.parse(el.dataset.swatches);
+ *     });
+ *   },
+ * };
+ * ```
+ * ```twig
+ * <hx-color-picker
+ *   value="{{ color }}"
+ *   data-swatches='{{ swatches | json_encode }}'
+ * ></hx-color-picker>
  * ```
  */
 @customElement('hx-color-picker')
@@ -272,6 +314,9 @@ export class HelixColorPicker extends LitElement {
   constructor() {
     super();
     this._internals = this.attachInternals();
+    // P1-1: Store bound references so connectedCallback/disconnectedCallback use the same object
+    this._boundPointerMove = this._handlePointerMove.bind(this);
+    this._boundPointerUp = this._handlePointerUp.bind(this);
   }
 
   // ─── Public Properties ───────────────────────────────────────────────────
@@ -299,10 +344,20 @@ export class HelixColorPicker extends LitElement {
 
   /**
    * Array of preset swatch color strings.
-   * @attr swatches
+   * Set via JS property only — arrays cannot be serialized as HTML attributes.
+   * In Drupal/Twig, use a behavior to read `data-swatches` and set this property.
+   * See JSDoc example above.
    */
-  @property({ type: Array })
+  @property({ attribute: false })
   swatches: string[] = [];
+
+  /**
+   * When true, hides the gradient grid and sliders, showing only swatches and the input.
+   * Useful for compact preset-only color selection UIs.
+   * @attr swatches-only
+   */
+  @property({ type: Boolean, reflect: true, attribute: 'swatches-only' })
+  swatchesOnly = false;
 
   /**
    * Whether the control is disabled.
@@ -337,6 +392,10 @@ export class HelixColorPicker extends LitElement {
   private _draggingHue = false;
   private _draggingOpacity = false;
 
+  // P1-1: Stored bound references to prevent memory leaks
+  private _boundPointerMove: (e: PointerEvent) => void;
+  private _boundPointerUp: () => void;
+
   // ─── Lifecycle ───────────────────────────────────────────────────────────
 
   override connectedCallback(): void {
@@ -344,15 +403,17 @@ export class HelixColorPicker extends LitElement {
     this._syncFromValue();
     this._handleDocumentClick = this._handleDocumentClick.bind(this);
     document.addEventListener('click', this._handleDocumentClick, true);
-    document.addEventListener('pointermove', this._handlePointerMove.bind(this));
-    document.addEventListener('pointerup', this._handlePointerUp.bind(this));
+    // P1-1: Use stored bound references (not inline .bind() which creates new objects)
+    document.addEventListener('pointermove', this._boundPointerMove);
+    document.addEventListener('pointerup', this._boundPointerUp);
   }
 
   override disconnectedCallback(): void {
     super.disconnectedCallback();
     document.removeEventListener('click', this._handleDocumentClick, true);
-    document.removeEventListener('pointermove', this._handlePointerMove.bind(this));
-    document.removeEventListener('pointerup', this._handlePointerUp.bind(this));
+    // P1-1: Remove using the same stored references added in connectedCallback
+    document.removeEventListener('pointermove', this._boundPointerMove);
+    document.removeEventListener('pointerup', this._boundPointerUp);
   }
 
   override willUpdate(changedProperties: Map<string, unknown>): void {
@@ -442,6 +503,36 @@ export class HelixColorPicker extends LitElement {
     this._hsv = { ...this._hsv, s: x * 100, v: (1 - y) * 100 };
     this._commit('drag');
     this.requestUpdate();
+  }
+
+  // P0-1: Keyboard support for gradient grid — fixes WCAG 2.1 SC 2.1.1 failure
+  private _handleGridKeydown(e: KeyboardEvent): void {
+    let sDelta = 0;
+    let vDelta = 0;
+    if (e.key === 'ArrowLeft') sDelta = -1;
+    else if (e.key === 'ArrowRight') sDelta = 1;
+    else if (e.key === 'ArrowUp') vDelta = 1;
+    else if (e.key === 'ArrowDown') vDelta = -1;
+    else if (e.key === 'PageUp') vDelta = 10;
+    else if (e.key === 'PageDown') vDelta = -10;
+    else if (e.key === 'Home') {
+      this._hsv = { ...this._hsv, s: 0, v: 100 };
+      this._commit('change');
+      return;
+    } else if (e.key === 'End') {
+      this._hsv = { ...this._hsv, s: 100, v: 0 };
+      this._commit('change');
+      return;
+    }
+    if (sDelta !== 0 || vDelta !== 0) {
+      e.preventDefault();
+      this._hsv = {
+        ...this._hsv,
+        s: clamp(this._hsv.s + sDelta, 0, 100),
+        v: clamp(this._hsv.v + vDelta, 0, 100),
+      };
+      this._commit('change');
+    }
   }
 
   // ─── Hue slider dragging ─────────────────────────────────────────────────
@@ -549,6 +640,7 @@ export class HelixColorPicker extends LitElement {
 
   // ─── Input ───────────────────────────────────────────────────────────────
 
+  // P1-7: Bound to @input (was @change) for real-time color preview while typing
   private _handleInputChange(e: Event): void {
     const input = e.target as HTMLInputElement;
     const parsed = parseColor(input.value.trim());
@@ -610,12 +702,21 @@ export class HelixColorPicker extends LitElement {
     const thumbY = `${100 - this._hsv.v}%`;
     const hueColor = this._hueColor();
 
+    // P0-1: Grid is now keyboard-operable — WCAG 2.1 SC 2.1.1 compliance
+    // Arrow keys adjust saturation (left/right) and value (up/down)
     return html`
       <div
         part="grid"
         class="gradient-grid"
-        role="presentation"
+        role="slider"
+        tabindex="0"
+        aria-label="Color gradient"
+        aria-valuemin="0"
+        aria-valuemax="100"
+        aria-valuenow=${Math.round(this._hsv.s)}
+        aria-valuetext="Saturation ${Math.round(this._hsv.s)}%, Value ${Math.round(this._hsv.v)}%"
         @pointerdown=${this._handleGridPointerDown}
+        @keydown=${this._handleGridKeydown}
       >
         <div class="gradient-grid-bg" style=${styleMap({ '--_hue-color': hueColor })}></div>
         <div
@@ -631,9 +732,11 @@ export class HelixColorPicker extends LitElement {
     const pct = `${(this._hsv.h / 360) * 100}%`;
     const hueColor = this._hueColor();
 
+    // P1-8: part="slider hue-slider" — exposes the documented shared "slider" CSS part
+    // P1-4: aria-valuetext announces the hue angle with degree symbol
     return html`
       <div
-        part="hue-slider"
+        part="slider hue-slider"
         class="slider-track hue-track"
         role="slider"
         tabindex="0"
@@ -641,6 +744,7 @@ export class HelixColorPicker extends LitElement {
         aria-valuemin="0"
         aria-valuemax="360"
         aria-valuenow=${Math.round(this._hsv.h)}
+        aria-valuetext="${Math.round(this._hsv.h)}°"
         @pointerdown=${this._handleHuePointerDown}
         @keydown=${this._handleHueKeydown}
       >
@@ -660,9 +764,11 @@ export class HelixColorPicker extends LitElement {
     const thumbColor = `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, ${this._hsv.a})`;
     const hueColor = this._hueColor();
 
+    // P1-8: part="slider opacity-slider" — exposes the documented shared "slider" CSS part
+    // P1-4: aria-valuetext announces the opacity as a percentage
     return html`
       <div
-        part="opacity-slider"
+        part="slider opacity-slider"
         class="slider-track opacity-track"
         role="slider"
         tabindex="0"
@@ -670,6 +776,7 @@ export class HelixColorPicker extends LitElement {
         aria-valuemin="0"
         aria-valuemax="100"
         aria-valuenow=${Math.round(this._hsv.a * 100)}
+        aria-valuetext="${Math.round(this._hsv.a * 100)}%"
         style=${styleMap({ '--_hue-color': hueColor })}
         @pointerdown=${this._handleOpacityPointerDown}
         @keydown=${this._handleOpacityKeydown}
@@ -727,7 +834,7 @@ export class HelixColorPicker extends LitElement {
           aria-label="Color value"
           autocomplete="off"
           spellcheck="false"
-          @change=${this._handleInputChange}
+          @input=${this._handleInputChange}
           @blur=${this._handleInputBlur}
         />
       </div>
@@ -744,7 +851,9 @@ export class HelixColorPicker extends LitElement {
         tabindex="-1"
         @keydown=${this._handlePanelKeydown}
       >
-        ${this._renderGrid()} ${this._renderHueSlider()} ${this._renderOpacitySlider()}
+        ${this.swatchesOnly
+          ? nothing
+          : html`${this._renderGrid()} ${this._renderHueSlider()} ${this._renderOpacitySlider()}`}
         ${this._renderSwatches()} ${this._renderInput()}
       </div>
     `;
@@ -761,12 +870,13 @@ export class HelixColorPicker extends LitElement {
       `;
     }
 
+    // P1-3: aria-label includes the current color value so AT users know the selected color
     return html`
       <button
         part="trigger"
         type="button"
         class="trigger"
-        aria-label="Choose color"
+        aria-label="Choose color: ${this._inputValue}"
         aria-haspopup="dialog"
         aria-expanded=${this._open ? 'true' : 'false'}
         ?disabled=${this.disabled}
