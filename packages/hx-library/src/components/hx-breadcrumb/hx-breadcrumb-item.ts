@@ -31,10 +31,6 @@ export class HelixBreadcrumbItem extends LitElement {
 
   override connectedCallback(): void {
     super.connectedCallback();
-    // Skip role assignment for the managed ellipsis element — it has its own
-    // role="button" set by the parent breadcrumb.
-    if (this.classList.contains('hx-bc-ellipsis')) return;
-
     // Only apply role="listitem" when this item is a direct child of an
     // hx-breadcrumb element. Setting the role unconditionally when used
     // standalone (outside a list context) creates an invalid ARIA hierarchy
@@ -48,8 +44,6 @@ export class HelixBreadcrumbItem extends LitElement {
 
   /**
    * The URL for this breadcrumb link. Omit for the current page (last item).
-   * When `current` is true, this property is ignored and the item renders as
-   * static text regardless.
    * @attr href
    */
   @property({ type: String, reflect: true })
@@ -66,24 +60,11 @@ export class HelixBreadcrumbItem extends LitElement {
   @property({ type: Boolean, attribute: 'data-bc-last', reflect: true })
   dataBcLast = false;
 
-  /**
-   * Explicitly marks this item as the current page. Takes precedence over the
-   * parent's positional last-item detection. When true, the item renders as
-   * static text (never a link) even if `href` is set.
-   *
-   * Useful for Drupal integration where the current page item may not be the
-   * last in the breadcrumb trail.
-   * @attr current
-   */
-  @property({ type: Boolean, reflect: true })
-  current = false;
-
   override render() {
-    const isLink = this.href && !this.current;
     return html`
       <span part="item">
-        ${isLink
-          ? html`<a part="link" href=${this.href!}><slot></slot></a>`
+        ${this.href
+          ? html`<a part="link" href=${this.href}><slot></slot></a>`
           : html`<span part="text"><slot></slot></span>`}
       </span>
       ${!this.dataBcLast

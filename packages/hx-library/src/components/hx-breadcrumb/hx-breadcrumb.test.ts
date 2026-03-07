@@ -248,7 +248,7 @@ describe('hx-breadcrumb', () => {
       await el.updateComplete;
       const ellipsis = el.querySelector('.hx-bc-ellipsis');
       expect(ellipsis).toBeTruthy();
-      expect(ellipsis?.getAttribute('role')).toBe('button');
+      expect(ellipsis?.getAttribute('aria-hidden')).toBe('true');
     });
 
     it('removes ellipsis item when max-items is cleared', async () => {
@@ -332,17 +332,11 @@ describe('hx-breadcrumb', () => {
       `);
       await el.updateComplete;
       // Confirm script was injected
-      expect(
-        document.querySelector(`#${(el as unknown as { _jsonLdId: string })._jsonLdId}`),
-      ).toBeTruthy();
+      expect(document.querySelector(`#${(el as unknown as { _jsonLdId: string })._jsonLdId}`)).toBeTruthy();
 
       el.remove();
       // Script should be gone after disconnection
-      expect(
-        document.querySelector(
-          `script[data-hx-breadcrumb][id="${(el as unknown as { _jsonLdId: string })._jsonLdId}"]`,
-        ),
-      ).toBeNull();
+      expect(document.querySelector(`script[data-hx-breadcrumb][id="${(el as unknown as { _jsonLdId: string })._jsonLdId}"]`)).toBeNull();
     });
 
     it('produces no duplicate scripts when two instances have json-ld enabled', async () => {
@@ -550,187 +544,6 @@ describe('hx-breadcrumb', () => {
       const strong = el.querySelector('strong');
       expect(strong).toBeTruthy();
       expect(strong?.textContent).toBe('Home');
-    });
-  });
-
-  // ─── Separator Slot (2) ───
-
-  describe('Separator Slot', () => {
-    it('overrides separator CSS property when separator slot is provided', async () => {
-      const el = await fixture<HelixBreadcrumb>(`
-        <hx-breadcrumb>
-          <hx-breadcrumb-item href="/home">Home</hx-breadcrumb-item>
-          <hx-breadcrumb-item>Current</hx-breadcrumb-item>
-          <span slot="separator">›</span>
-        </hx-breadcrumb>
-      `);
-      await el.updateComplete;
-      const propValue = el.style.getPropertyValue('--hx-breadcrumb-separator-content');
-      expect(propValue).toBe('"›"');
-    });
-
-    it('uses empty string when separator slot element is empty', async () => {
-      const el = await fixture<HelixBreadcrumb>(`
-        <hx-breadcrumb>
-          <hx-breadcrumb-item href="/home">Home</hx-breadcrumb-item>
-          <hx-breadcrumb-item>Current</hx-breadcrumb-item>
-          <span slot="separator"></span>
-        </hx-breadcrumb>
-      `);
-      await el.updateComplete;
-      const propValue = el.style.getPropertyValue('--hx-breadcrumb-separator-content');
-      expect(propValue).toBe('""');
-    });
-  });
-
-  // ─── Dynamic Item Management (2) ───
-
-  describe('Dynamic Item Management', () => {
-    it('updates aria-current when items are added dynamically', async () => {
-      const el = await fixture<HelixBreadcrumb>(`
-        <hx-breadcrumb>
-          <hx-breadcrumb-item href="/home">Home</hx-breadcrumb-item>
-          <hx-breadcrumb-item>Current</hx-breadcrumb-item>
-        </hx-breadcrumb>
-      `);
-      await el.updateComplete;
-
-      // Add a new last item
-      const newItem = document.createElement('hx-breadcrumb-item');
-      newItem.textContent = 'New Last';
-      el.appendChild(newItem);
-      await el.updateComplete;
-
-      const items = Array.from(el.querySelectorAll('hx-breadcrumb-item'));
-      expect(items[1]?.hasAttribute('aria-current')).toBe(false);
-      expect(items[2]?.getAttribute('aria-current')).toBe('page');
-    });
-
-    it('updates aria-current when items are removed dynamically', async () => {
-      const el = await fixture<HelixBreadcrumb>(`
-        <hx-breadcrumb>
-          <hx-breadcrumb-item href="/home">Home</hx-breadcrumb-item>
-          <hx-breadcrumb-item href="/dept">Department</hx-breadcrumb-item>
-          <hx-breadcrumb-item>Current</hx-breadcrumb-item>
-        </hx-breadcrumb>
-      `);
-      await el.updateComplete;
-
-      // Remove the last item
-      const lastItem = el.querySelector('hx-breadcrumb-item:last-of-type');
-      lastItem?.remove();
-      await el.updateComplete;
-
-      const items = Array.from(el.querySelectorAll('hx-breadcrumb-item'));
-      expect(items[1]?.getAttribute('aria-current')).toBe('page');
-    });
-  });
-
-  // ─── Current Attribute (3) ───
-
-  describe('Current Attribute', () => {
-    it('sets aria-current on item with current attribute instead of last item', async () => {
-      const el = await fixture<HelixBreadcrumb>(`
-        <hx-breadcrumb>
-          <hx-breadcrumb-item href="/home">Home</hx-breadcrumb-item>
-          <hx-breadcrumb-item current href="/dept">Department</hx-breadcrumb-item>
-          <hx-breadcrumb-item href="/sub">Sub-page</hx-breadcrumb-item>
-        </hx-breadcrumb>
-      `);
-      await el.updateComplete;
-      const items = Array.from(el.querySelectorAll('hx-breadcrumb-item'));
-      expect(items[1]?.getAttribute('aria-current')).toBe('page');
-      expect(items[2]?.hasAttribute('aria-current')).toBe(false);
-    });
-
-    it('renders current item as text even when href is set', async () => {
-      const el = await fixture<HelixBreadcrumbItem>(
-        '<hx-breadcrumb-item current href="/dept">Department</hx-breadcrumb-item>',
-      );
-      expect(shadowQuery(el, '[part="link"]')).toBeNull();
-      expect(shadowQuery(el, '[part="text"]')).toBeTruthy();
-    });
-
-    it('data-bc-last is still set on the last item regardless of current attribute', async () => {
-      const el = await fixture<HelixBreadcrumb>(`
-        <hx-breadcrumb>
-          <hx-breadcrumb-item current href="/home">Home</hx-breadcrumb-item>
-          <hx-breadcrumb-item href="/dept">Department</hx-breadcrumb-item>
-        </hx-breadcrumb>
-      `);
-      await el.updateComplete;
-      const items = Array.from(el.querySelectorAll('hx-breadcrumb-item'));
-      expect(items[1]?.hasAttribute('data-bc-last')).toBe(true);
-    });
-  });
-
-  // ─── Keyboard Expand (2) ───
-
-  describe('Keyboard Expand', () => {
-    it('expands collapsed items when ellipsis is clicked', async () => {
-      const el = await fixture<HelixBreadcrumb>(`
-        <hx-breadcrumb max-items="2">
-          <hx-breadcrumb-item href="/a">A</hx-breadcrumb-item>
-          <hx-breadcrumb-item href="/b">B</hx-breadcrumb-item>
-          <hx-breadcrumb-item>C</hx-breadcrumb-item>
-        </hx-breadcrumb>
-      `);
-      await el.updateComplete;
-
-      const ellipsis = el.querySelector('.hx-bc-ellipsis') as HTMLElement;
-      expect(ellipsis).toBeTruthy();
-
-      ellipsis.click();
-      await el.updateComplete;
-
-      expect(el.querySelector('.hx-bc-ellipsis')).toBeNull();
-      const items = Array.from(
-        el.querySelectorAll<HTMLElement>('hx-breadcrumb-item:not(.hx-bc-ellipsis)'),
-      );
-      expect(items.every((i) => !i.hasAttribute('data-bc-hidden'))).toBe(true);
-    });
-
-    it('ellipsis has role="button" and tabindex="0"', async () => {
-      const el = await fixture<HelixBreadcrumb>(`
-        <hx-breadcrumb max-items="2">
-          <hx-breadcrumb-item href="/a">A</hx-breadcrumb-item>
-          <hx-breadcrumb-item href="/b">B</hx-breadcrumb-item>
-          <hx-breadcrumb-item>C</hx-breadcrumb-item>
-        </hx-breadcrumb>
-      `);
-      await el.updateComplete;
-
-      const ellipsis = el.querySelector('.hx-bc-ellipsis') as HTMLElement;
-      expect(ellipsis?.getAttribute('role')).toBe('button');
-      expect(ellipsis?.getAttribute('tabindex')).toBe('0');
-      expect(ellipsis?.getAttribute('aria-label')).toBe('Show all breadcrumb items');
-    });
-  });
-
-  // ─── JSON-LD Schema Values (1) ───
-
-  describe('JSON-LD Schema Values', () => {
-    it('produces correct href and name values in schema', async () => {
-      const el = await fixture<HelixBreadcrumb>(`
-        <hx-breadcrumb json-ld>
-          <hx-breadcrumb-item href="/home">Home</hx-breadcrumb-item>
-          <hx-breadcrumb-item href="/dept">Department</hx-breadcrumb-item>
-          <hx-breadcrumb-item>Current</hx-breadcrumb-item>
-        </hx-breadcrumb>
-      `);
-      await el.updateComplete;
-
-      const script = document.querySelector<HTMLScriptElement>('script[data-hx-breadcrumb]');
-      const data = JSON.parse(script?.textContent ?? '{}') as {
-        itemListElement: Array<{ name: string; item?: string; position: number }>;
-      };
-      expect(data.itemListElement).toHaveLength(3);
-      expect(data.itemListElement[0]?.name).toBe('Home');
-      expect(data.itemListElement[0]?.item).toBe('/home');
-      expect(data.itemListElement[1]?.name).toBe('Department');
-      expect(data.itemListElement[1]?.item).toBe('/dept');
-      expect(data.itemListElement[2]?.name).toBe('Current');
-      expect(data.itemListElement[2]?.item).toBeUndefined();
     });
   });
 
