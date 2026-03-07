@@ -9,24 +9,7 @@
 
 ## Summary
 
-`hx-avatar` is a well-structured component with good fallback chain logic and clean CSS token usage. The deep audit v2 identified 2 P0, 7 P1, and 8 P2 issues. **All P0 and P1 issues have been fixed.** P2 items are documented below for future work.
-
-### Fixes Applied (Deep Audit v2)
-
-- **P0-1 FIXED:** `_imgError` now resets in `willUpdate()` when `src` changes
-- **P0-2 FIXED:** Removed `overflow: hidden` from `.avatar`; image clipped via `border-radius: inherit`
-- **P1-1/P1-7 FIXED:** Added `label` property for human-readable accessible name (priority: label > alt > initials > 'Avatar')
-- **P1-2 FIXED:** Dev-mode console warning when `src` set without `alt` or `label`
-- **P1-3 FIXED:** Added `aria-hidden="true"` to `<img>` — container `role="img"` handles semantics
-- **P1-4 FIXED:** Added 3 image error fallback tests (initials fallback, icon fallback, src change reset)
-- **P1-5 FIXED:** `_imgError` reset test included in P1-4 tests
-- **P1-6 FIXED:** Story render uses `ifDefined()` instead of `?? ''` for src attribute
-- **P2-3 FIXED:** Added meaningful alt text to Sizes/Shapes stories
-- **P2-4 FIXED:** Added BrokenImageFallback story
-- **P2-5 FIXED:** Added `:host([hidden])` rule
-- **P2-7 FIXED:** Replaced `setTimeout(50)` with `requestAnimationFrame` pattern
-- **P2-8 FIXED:** axe-core tests expanded from 2 to 5 (added image, slotted, badge modes)
-- **BONUS:** Added `Property: label` test block (3 tests)
+`hx-avatar` is a well-structured component with good fallback chain logic and clean CSS token usage. However, several issues range from silent functional regressions (P0) to accessibility gaps that violate the healthcare mandate. The critical path: two P0 bugs (image error state not reset; badge clipped by overflow:hidden), one P1 ARIA issue (generic fallback label), and missing test coverage for image error recovery.
 
 ---
 
@@ -130,8 +113,7 @@ When `src` is provided and `alt=""` (default), the rendered output is:
 
 ```html
 <div role="img" aria-label="Avatar">
-  <img src="..." alt="" />
-  <!-- treated as decorative -->
+  <img src="..." alt="" />  <!-- treated as decorative -->
 </div>
 ```
 
@@ -144,7 +126,6 @@ Some screen readers (NVDA, JAWS) will announce the `role="img"` container with i
 **File:** `hx-avatar.test.ts`
 
 The test suite has no test that:
-
 - Sets `src` to a URL that will fail to load and verifies the initials fallback renders
 - Sets `src` to a URL that will fail to load (no initials) and verifies the icon fallback renders
 - Simulates `_handleImgError()` directly and verifies re-render
@@ -265,12 +246,10 @@ Multiple tests use `await new Promise((r) => setTimeout(r, 50))` to wait for slo
 **File:** `hx-avatar.test.ts:209-226`
 
 The axe-core tests cover:
-
 - ✅ Default (fallback icon)
 - ✅ Initials
 
 Not covered:
-
 - ❌ Image mode (`src` with valid `alt`)
 - ❌ Image mode with `alt=""` (the dangerous default — would catch P1-2)
 - ❌ Slotted content mode
@@ -280,22 +259,22 @@ Not covered:
 
 ## Findings Summary Table
 
-| ID   | Severity | Area          | Title                                                         |
-| ---- | -------- | ------------- | ------------------------------------------------------------- | ---------- |
-| P0-1 | P0       | TypeScript/UX | `_imgError` never resets on `src` change — permanent breakage | FIXED      |
-| P0-2 | P0       | CSS           | Badge clipped by `overflow: hidden` on avatar container       | FIXED      |
-| P1-1 | P1       | Accessibility | Generic `aria-label="Avatar"` — non-descriptive in healthcare | FIXED      |
-| P1-2 | P1       | Accessibility | `alt` not required when `src` provided — silent a11y failure  | FIXED      |
-| P1-3 | P1       | Accessibility | `role="img"` + inner `<img alt="">` = double semantics        | FIXED      |
-| P1-4 | P1       | Tests         | No test for image load failure → fallback recovery            | FIXED      |
-| P1-5 | P1       | Tests         | No test for `_imgError` reset on `src` change                 | FIXED      |
-| P1-6 | P1       | Storybook     | Story render sends `src=""` instead of omitting attribute     | FIXED      |
-| P1-7 | P1       | Accessibility | Initials `aria-label` exposes raw initials, not a full name   | FIXED      |
-| P2-1 | P2       | TypeScript    | No runtime guard for invalid `size`/`shape` values            | DOCUMENTED |
-| P2-2 | P2       | CSS/DOM       | Empty badge `<span>` always in DOM                            | DOCUMENTED |
-| P2-3 | P2       | Storybook     | `Sizes`/`Shapes` stories have no meaningful `alt` text        | FIXED      |
-| P2-4 | P2       | Storybook     | No story for broken `src` → fallback recovery path            | FIXED      |
-| P2-5 | P2       | CSS           | No `:host([hidden])` display:none rule                        | FIXED      |
-| P2-6 | P2       | Drupal        | No Twig integration example or documentation                  | DOCUMENTED |
-| P2-7 | P2       | Tests         | `setTimeout(50)` timing-based waits are fragile               | FIXED      |
-| P2-8 | P2       | Tests         | axe-core covers only 2 of 5 avatar rendering modes            | FIXED      |
+| ID   | Severity | Area          | Title                                                          |
+|------|----------|---------------|----------------------------------------------------------------|
+| P0-1 | P0       | TypeScript/UX | `_imgError` never resets on `src` change — permanent breakage  |
+| P0-2 | P0       | CSS           | Badge clipped by `overflow: hidden` on avatar container        |
+| P1-1 | P1       | Accessibility | Generic `aria-label="Avatar"` — non-descriptive in healthcare  |
+| P1-2 | P1       | Accessibility | `alt` not required when `src` provided — silent a11y failure   |
+| P1-3 | P1       | Accessibility | `role="img"` + inner `<img alt="">` = double semantics         |
+| P1-4 | P1       | Tests         | No test for image load failure → fallback recovery             |
+| P1-5 | P1       | Tests         | No test for `_imgError` reset on `src` change                  |
+| P1-6 | P1       | Storybook     | Story render sends `src=""` instead of omitting attribute      |
+| P1-7 | P1       | Accessibility | Initials `aria-label` exposes raw initials, not a full name    |
+| P2-1 | P2       | TypeScript    | No runtime guard for invalid `size`/`shape` values             |
+| P2-2 | P2       | CSS/DOM       | Empty badge `<span>` always in DOM                             |
+| P2-3 | P2       | Storybook     | `Sizes`/`Shapes` stories have no meaningful `alt` text         |
+| P2-4 | P2       | Storybook     | No story for broken `src` → fallback recovery path             |
+| P2-5 | P2       | CSS           | No `:host([hidden])` display:none rule                         |
+| P2-6 | P2       | Drupal        | No Twig integration example or documentation                   |
+| P2-7 | P2       | Tests         | `setTimeout(50)` timing-based waits are fragile                |
+| P2-8 | P2       | Tests         | axe-core covers only 2 of 5 avatar rendering modes             |
