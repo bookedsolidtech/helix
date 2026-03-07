@@ -263,6 +263,42 @@ describe('hx-tree-view', () => {
     });
   });
 
+  // ─── Property: label ───
+
+  describe('Property: label', () => {
+    it('defaults to empty string', async () => {
+      const el = await fixture<WcTreeView>('<hx-tree-view></hx-tree-view>');
+      expect(el.label).toBe('');
+    });
+
+    it('reflects label attribute to property', async () => {
+      const el = await fixture<WcTreeView>('<hx-tree-view label="File browser"></hx-tree-view>');
+      expect(el.label).toBe('File browser');
+    });
+
+    it('sets aria-label on the tree container', async () => {
+      const el = await fixture<WcTreeView>('<hx-tree-view label="File browser"></hx-tree-view>');
+      const tree = shadowQuery(el, '.tree');
+      expect(tree?.getAttribute('aria-label')).toBe('File browser');
+    });
+
+    it('does not set aria-label when label is empty', async () => {
+      const el = await fixture<WcTreeView>('<hx-tree-view></hx-tree-view>');
+      const tree = shadowQuery(el, '.tree');
+      expect(tree?.getAttribute('aria-label')).toBeNull();
+    });
+  });
+
+  // ─── CSS Parts ───
+
+  describe('CSS Parts', () => {
+    it('exposes "tree" part on the container', async () => {
+      const el = await fixture<WcTreeView>('<hx-tree-view></hx-tree-view>');
+      const part = shadowQuery(el, '[part~="tree"]');
+      expect(part).toBeTruthy();
+    });
+  });
+
   // ─── Accessibility ───
 
   describe('Accessibility', () => {
@@ -462,6 +498,19 @@ describe('hx-tree-item', () => {
     it('exposes "item" part', async () => {
       const el = await fixture<WcTreeItem>('<hx-tree-item>Label</hx-tree-item>');
       const part = shadowQuery(el, '[part~="item"]');
+      expect(part).toBeTruthy();
+    });
+
+    it('exposes "row" part on the interactive row', async () => {
+      const el = await fixture<WcTreeItem>('<hx-tree-item>Label</hx-tree-item>');
+      const part = shadowQuery(el, '[part~="row"]');
+      expect(part).toBeTruthy();
+      expect(part?.getAttribute('role')).toBe('treeitem');
+    });
+
+    it('exposes "label" part on the text content', async () => {
+      const el = await fixture<WcTreeItem>('<hx-tree-item>Label</hx-tree-item>');
+      const part = shadowQuery(el, '.item-label[part~="label"]');
       expect(part).toBeTruthy();
     });
 

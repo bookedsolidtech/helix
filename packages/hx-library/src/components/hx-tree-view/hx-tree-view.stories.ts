@@ -12,6 +12,15 @@ const meta = {
   component: 'hx-tree-view',
   tags: ['autodocs'],
   argTypes: {
+    label: {
+      control: { type: 'text' },
+      description: 'Accessible label for the tree (aria-label).',
+      table: {
+        category: 'Accessibility',
+        defaultValue: { summary: '' },
+        type: { summary: 'string' },
+      },
+    },
     selection: {
       control: { type: 'select' },
       options: ['none', 'single', 'multiple'],
@@ -24,6 +33,7 @@ const meta = {
     },
   },
   args: {
+    label: 'File browser',
     selection: 'single',
   },
   parameters: {
@@ -48,7 +58,7 @@ type Story = StoryObj;
 export const Default: Story = {
   name: 'Default',
   render: (args) => html`
-    <hx-tree-view selection=${args['selection']}>
+    <hx-tree-view label=${args['label']} selection=${args['selection']}>
       <hx-tree-item>Documents</hx-tree-item>
       <hx-tree-item>Downloads</hx-tree-item>
       <hx-tree-item>Pictures</hx-tree-item>
@@ -59,7 +69,7 @@ export const Default: Story = {
 export const WithNestedItems: Story = {
   name: 'Nested Items',
   render: (args) => html`
-    <hx-tree-view selection=${args['selection']}>
+    <hx-tree-view label=${args['label']} selection=${args['selection']}>
       <hx-tree-item expanded>
         Documents
         <hx-tree-item slot="children">Reports</hx-tree-item>
@@ -83,7 +93,7 @@ export const WithNestedItems: Story = {
 export const SingleSelection: Story = {
   name: 'Single Selection',
   render: () => html`
-    <hx-tree-view selection="single">
+    <hx-tree-view label="Departments" selection="single">
       <hx-tree-item expanded>
         Departments
         <hx-tree-item slot="children" selected>Cardiology</hx-tree-item>
@@ -102,7 +112,7 @@ export const SingleSelection: Story = {
 export const MultipleSelection: Story = {
   name: 'Multiple Selection',
   render: () => html`
-    <hx-tree-view selection="multiple">
+    <hx-tree-view label="ICD-10 categories" selection="multiple">
       <hx-tree-item expanded>
         ICD-10 Categories
         <hx-tree-item slot="children" selected>A00-A09: Intestinal infectious diseases</hx-tree-item>
@@ -117,7 +127,7 @@ export const MultipleSelection: Story = {
 export const WithDisabledItems: Story = {
   name: 'Disabled Items',
   render: () => html`
-    <hx-tree-view selection="single">
+    <hx-tree-view label="Organization structure" selection="single">
       <hx-tree-item expanded>
         Org Structure
         <hx-tree-item slot="children">Active Department</hx-tree-item>
@@ -135,7 +145,7 @@ export const WithDisabledItems: Story = {
 export const NoSelection: Story = {
   name: 'No Selection (Navigation Only)',
   render: () => html`
-    <hx-tree-view selection="none">
+    <hx-tree-view label="Site navigation" selection="none">
       <hx-tree-item expanded>
         Navigation
         <hx-tree-item slot="children">Home</hx-tree-item>
@@ -153,7 +163,7 @@ export const NoSelection: Story = {
 export const HealthcareDrugHierarchy: Story = {
   name: 'Healthcare: Drug Classification',
   render: () => html`
-    <hx-tree-view selection="single">
+    <hx-tree-view label="Drug classification" selection="single">
       <hx-tree-item expanded>
         Cardiovascular Drugs
         <hx-tree-item slot="children" expanded>
