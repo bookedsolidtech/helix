@@ -1,5 +1,4 @@
 import { describe, it, expect, afterEach } from 'vitest';
-import { page } from '@vitest/browser/context';
 import { fixture, shadowQuery, oneEvent, cleanup, checkA11y } from '../../test-utils.js';
 import type { HelixTile } from './hx-tile.js';
 import './index.js';
@@ -7,7 +6,7 @@ import './index.js';
 afterEach(cleanup);
 
 describe('hx-tile', () => {
-  // ─── Rendering (3) ───
+  // ─── Rendering ───
 
   describe('Rendering', () => {
     it('renders with shadow DOM', async () => {
@@ -15,42 +14,87 @@ describe('hx-tile', () => {
       expect(el.shadowRoot).toBeTruthy();
     });
 
-    it('exposes "base" CSS part', async () => {
+    it('exposes "tile" CSS part', async () => {
       const el = await fixture<HelixTile>('<hx-tile><span slot="label">Test</span></hx-tile>');
-      const base = shadowQuery(el, '[part="base"]');
-      expect(base).toBeTruthy();
+      const tile = shadowQuery(el, '[part="tile"]');
+      expect(tile).toBeTruthy();
     });
 
     it('applies default variant class', async () => {
       const el = await fixture<HelixTile>('<hx-tile><span slot="label">Test</span></hx-tile>');
-      const base = shadowQuery(el, '[part="base"]')!;
-      expect(base.classList.contains('tile--default')).toBe(true);
+      const tile = shadowQuery(el, '[part="tile"]')!;
+      expect(tile.classList.contains('tile--default')).toBe(true);
     });
   });
 
-  // ─── Property: variant (3) ───
+  // ─── Property: variant ───
 
   describe('Property: variant', () => {
-    it('applies default class', async () => {
-      const el = await fixture<HelixTile>('<hx-tile><span slot="label">Test</span></hx-tile>');
-      const base = shadowQuery(el, '[part="base"]')!;
-      expect(base.classList.contains('tile--default')).toBe(true);
-    });
-
     it('applies outlined class', async () => {
       const el = await fixture<HelixTile>(
         '<hx-tile variant="outlined"><span slot="label">Test</span></hx-tile>',
       );
-      const base = shadowQuery(el, '[part="base"]')!;
-      expect(base.classList.contains('tile--outlined')).toBe(true);
+      const tile = shadowQuery(el, '[part="tile"]')!;
+      expect(tile.classList.contains('tile--outlined')).toBe(true);
     });
 
     it('applies filled class', async () => {
       const el = await fixture<HelixTile>(
         '<hx-tile variant="filled"><span slot="label">Test</span></hx-tile>',
       );
-      const base = shadowQuery(el, '[part="base"]')!;
-      expect(base.classList.contains('tile--filled')).toBe(true);
+      const tile = shadowQuery(el, '[part="tile"]')!;
+      expect(tile.classList.contains('tile--filled')).toBe(true);
+    });
+  });
+
+  // ─── Static mode (clickable=false) ───
+
+  describe('Static mode (clickable=false)', () => {
+    it('renders as div with no role when clickable=false', async () => {
+      const el = await fixture<HelixTile>(
+        '<hx-tile clickable="false"><span slot="label">Test</span></hx-tile>',
+      );
+      const tile = shadowQuery(el, '[part="tile"]')!;
+      expect(tile.tagName.toLowerCase()).toBe('div');
+      expect(tile.hasAttribute('role')).toBe(false);
+    });
+
+    it('has no tabindex in static mode', async () => {
+      const el = await fixture<HelixTile>(
+        '<hx-tile clickable="false"><span slot="label">Test</span></hx-tile>',
+      );
+      const tile = shadowQuery(el, '[part="tile"]')!;
+      expect(tile.hasAttribute('tabindex')).toBe(false);
+    });
+
+    it('has no aria-pressed in static mode', async () => {
+      const el = await fixture<HelixTile>(
+        '<hx-tile clickable="false"><span slot="label">Test</span></hx-tile>',
+      );
+      const tile = shadowQuery(el, '[part="tile"]')!;
+      expect(tile.hasAttribute('aria-pressed')).toBe(false);
+    });
+
+    it('applies tile--static class in static mode', async () => {
+      const el = await fixture<HelixTile>(
+        '<hx-tile clickable="false"><span slot="label">Test</span></hx-tile>',
+      );
+      const tile = shadowQuery(el, '[part="tile"]')!;
+      expect(tile.classList.contains('tile--static')).toBe(true);
+    });
+
+    it('does not dispatch hx-select when clicked in static mode', async () => {
+      const el = await fixture<HelixTile>(
+        '<hx-tile clickable="false"><span slot="label">Test</span></hx-tile>',
+      );
+      let fired = false;
+      el.addEventListener('hx-select', () => {
+        fired = true;
+      });
+      const tile = shadowQuery(el, '[part="tile"]')!;
+      tile.click();
+      await new Promise((r) => setTimeout(r, 50));
+      expect(fired).toBe(false);
     });
   });
 
@@ -59,37 +103,37 @@ describe('hx-tile', () => {
   describe('Button mode (no href)', () => {
     it('renders as div with role="button"', async () => {
       const el = await fixture<HelixTile>('<hx-tile><span slot="label">Test</span></hx-tile>');
-      const base = shadowQuery(el, '[part="base"]')!;
-      expect(base.tagName.toLowerCase()).toBe('div');
-      expect(base.getAttribute('role')).toBe('button');
+      const tile = shadowQuery(el, '[part="tile"]')!;
+      expect(tile.tagName.toLowerCase()).toBe('div');
+      expect(tile.getAttribute('role')).toBe('button');
     });
 
     it('has aria-pressed="false" by default', async () => {
       const el = await fixture<HelixTile>('<hx-tile><span slot="label">Test</span></hx-tile>');
-      const base = shadowQuery(el, '[part="base"]')!;
-      expect(base.getAttribute('aria-pressed')).toBe('false');
+      const tile = shadowQuery(el, '[part="tile"]')!;
+      expect(tile.getAttribute('aria-pressed')).toBe('false');
     });
 
     it('has aria-pressed="true" when selected', async () => {
       const el = await fixture<HelixTile>(
         '<hx-tile selected><span slot="label">Test</span></hx-tile>',
       );
-      const base = shadowQuery(el, '[part="base"]')!;
-      expect(base.getAttribute('aria-pressed')).toBe('true');
+      const tile = shadowQuery(el, '[part="tile"]')!;
+      expect(tile.getAttribute('aria-pressed')).toBe('true');
     });
 
     it('has tabindex="0"', async () => {
       const el = await fixture<HelixTile>('<hx-tile><span slot="label">Test</span></hx-tile>');
-      const base = shadowQuery(el, '[part="base"]')!;
-      expect(base.getAttribute('tabindex')).toBe('0');
+      const tile = shadowQuery(el, '[part="tile"]')!;
+      expect(tile.getAttribute('tabindex')).toBe('0');
     });
 
     it('applies tile--selected class when selected', async () => {
       const el = await fixture<HelixTile>(
         '<hx-tile selected><span slot="label">Test</span></hx-tile>',
       );
-      const base = shadowQuery(el, '[part="base"]')!;
-      expect(base.classList.contains('tile--selected')).toBe(true);
+      const tile = shadowQuery(el, '[part="tile"]')!;
+      expect(tile.classList.contains('tile--selected')).toBe(true);
     });
   });
 
@@ -100,33 +144,49 @@ describe('hx-tile', () => {
       const el = await fixture<HelixTile>(
         '<hx-tile href="/dashboard"><span slot="label">Test</span></hx-tile>',
       );
-      const base = shadowQuery(el, '[part="base"]')!;
-      expect(base.tagName.toLowerCase()).toBe('a');
+      const tile = shadowQuery(el, '[part="tile"]')!;
+      expect(tile.tagName.toLowerCase()).toBe('a');
     });
 
     it('anchor has correct href', async () => {
       const el = await fixture<HelixTile>(
         '<hx-tile href="/dashboard"><span slot="label">Test</span></hx-tile>',
       );
-      const base = shadowQuery(el, 'a[part="base"]') as HTMLAnchorElement;
-      expect(base.getAttribute('href')).toBe('/dashboard');
+      const tile = shadowQuery(el, 'a[part="tile"]') as HTMLAnchorElement;
+      expect(tile.getAttribute('href')).toBe('/dashboard');
     });
 
     it('does not render role="button" in link mode', async () => {
       const el = await fixture<HelixTile>(
         '<hx-tile href="/dashboard"><span slot="label">Test</span></hx-tile>',
       );
-      const base = shadowQuery(el, '[part="base"]')!;
-      expect(base.hasAttribute('role')).toBe(false);
+      const tile = shadowQuery(el, '[part="tile"]')!;
+      expect(tile.hasAttribute('role')).toBe(false);
     });
 
     it('removes href from anchor when disabled', async () => {
       const el = await fixture<HelixTile>(
         '<hx-tile href="/dashboard" disabled><span slot="label">Test</span></hx-tile>',
       );
-      const base = shadowQuery(el, 'a[part="base"]') as HTMLAnchorElement;
-      expect(base.hasAttribute('href')).toBe(false);
-      expect(base.getAttribute('aria-disabled')).toBe('true');
+      const tile = shadowQuery(el, 'a[part="tile"]') as HTMLAnchorElement;
+      expect(tile.hasAttribute('href')).toBe(false);
+      expect(tile.getAttribute('aria-disabled')).toBe('true');
+    });
+
+    it('sets tabindex="-1" on disabled anchor', async () => {
+      const el = await fixture<HelixTile>(
+        '<hx-tile href="/dashboard" disabled><span slot="label">Test</span></hx-tile>',
+      );
+      const tile = shadowQuery(el, 'a[part="tile"]') as HTMLAnchorElement;
+      expect(tile.getAttribute('tabindex')).toBe('-1');
+    });
+
+    it('does not apply tile--selected class in link mode', async () => {
+      const el = await fixture<HelixTile>(
+        '<hx-tile href="/dashboard" selected><span slot="label">Test</span></hx-tile>',
+      );
+      const tile = shadowQuery(el, '[part="tile"]')!;
+      expect(tile.classList.contains('tile--selected')).toBe(false);
     });
   });
 
@@ -137,24 +197,24 @@ describe('hx-tile', () => {
       const el = await fixture<HelixTile>(
         '<hx-tile disabled><span slot="label">Test</span></hx-tile>',
       );
-      const base = shadowQuery(el, '[part="base"]')!;
-      expect(base.classList.contains('tile--disabled')).toBe(true);
+      const tile = shadowQuery(el, '[part="tile"]')!;
+      expect(tile.classList.contains('tile--disabled')).toBe(true);
     });
 
     it('has aria-disabled="true" when disabled', async () => {
       const el = await fixture<HelixTile>(
         '<hx-tile disabled><span slot="label">Test</span></hx-tile>',
       );
-      const base = shadowQuery(el, '[part="base"]')!;
-      expect(base.getAttribute('aria-disabled')).toBe('true');
+      const tile = shadowQuery(el, '[part="tile"]')!;
+      expect(tile.getAttribute('aria-disabled')).toBe('true');
     });
 
     it('has tabindex="-1" when disabled', async () => {
       const el = await fixture<HelixTile>(
         '<hx-tile disabled><span slot="label">Test</span></hx-tile>',
       );
-      const base = shadowQuery(el, '[part="base"]')!;
-      expect(base.getAttribute('tabindex')).toBe('-1');
+      const tile = shadowQuery(el, '[part="tile"]')!;
+      expect(tile.getAttribute('tabindex')).toBe('-1');
     });
   });
 
@@ -163,18 +223,18 @@ describe('hx-tile', () => {
   describe('Events: button mode', () => {
     it('dispatches hx-select on click', async () => {
       const el = await fixture<HelixTile>('<hx-tile><span slot="label">Test</span></hx-tile>');
-      const base = shadowQuery(el, '[part="base"]')!;
+      const tile = shadowQuery(el, '[part="tile"]')!;
       const eventPromise = oneEvent<CustomEvent>(el, 'hx-select');
-      base.click();
+      tile.click();
       const event = await eventPromise;
       expect(event).toBeTruthy();
     });
 
     it('hx-select detail contains selected state and originalEvent', async () => {
       const el = await fixture<HelixTile>('<hx-tile><span slot="label">Test</span></hx-tile>');
-      const base = shadowQuery(el, '[part="base"]')!;
+      const tile = shadowQuery(el, '[part="tile"]')!;
       const eventPromise = oneEvent<CustomEvent>(el, 'hx-select');
-      base.click();
+      tile.click();
       const event = await eventPromise;
       expect(typeof event.detail.selected).toBe('boolean');
       expect(event.detail.originalEvent).toBeInstanceOf(MouseEvent);
@@ -182,9 +242,9 @@ describe('hx-tile', () => {
 
     it('toggles selected property on click', async () => {
       const el = await fixture<HelixTile>('<hx-tile><span slot="label">Test</span></hx-tile>');
-      const base = shadowQuery(el, '[part="base"]')!;
+      const tile = shadowQuery(el, '[part="tile"]')!;
       expect(el.selected).toBe(false);
-      base.click();
+      tile.click();
       await el.updateComplete;
       expect(el.selected).toBe(true);
     });
@@ -197,7 +257,9 @@ describe('hx-tile', () => {
       el.addEventListener('hx-select', () => {
         fired = true;
       });
-      el.click();
+      // Click on shadow tile element (disabled tile has pointer-events: none, so use dispatchEvent)
+      const tile = shadowQuery(el, '[part="tile"]')!;
+      tile.dispatchEvent(new MouseEvent('click', { bubbles: true, composed: true }));
       await new Promise((r) => setTimeout(r, 50));
       expect(fired).toBe(false);
     });
@@ -206,12 +268,26 @@ describe('hx-tile', () => {
       const el = await fixture<HelixTile>(
         '<hx-tile disabled><span slot="label">Test</span></hx-tile>',
       );
-      const base = shadowQuery(el, '[part="base"]')!;
+      const tile = shadowQuery(el, '[part="tile"]')!;
       let fired = false;
       el.addEventListener('hx-select', () => {
         fired = true;
       });
-      base.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
+      tile.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
+      await new Promise((r) => setTimeout(r, 50));
+      expect(fired).toBe(false);
+    });
+
+    it('does not dispatch hx-select via Space when disabled', async () => {
+      const el = await fixture<HelixTile>(
+        '<hx-tile disabled><span slot="label">Test</span></hx-tile>',
+      );
+      const tile = shadowQuery(el, '[part="tile"]')!;
+      let fired = false;
+      el.addEventListener('hx-select', () => {
+        fired = true;
+      });
+      tile.dispatchEvent(new KeyboardEvent('keydown', { key: ' ', bubbles: true }));
       await new Promise((r) => setTimeout(r, 50));
       expect(fired).toBe(false);
     });
@@ -224,10 +300,10 @@ describe('hx-tile', () => {
       const el = await fixture<HelixTile>(
         '<hx-tile href="/test"><span slot="label">Test</span></hx-tile>',
       );
-      const base = shadowQuery(el, '[part="base"]')!;
+      const tile = shadowQuery(el, '[part="tile"]')!;
       const eventPromise = oneEvent<CustomEvent>(el, 'hx-click');
       // Use dispatchEvent (untrusted) to avoid anchor navigation in headless browser
-      base.dispatchEvent(
+      tile.dispatchEvent(
         new MouseEvent('click', { bubbles: true, composed: true, cancelable: true }),
       );
       const event = await eventPromise;
@@ -239,13 +315,13 @@ describe('hx-tile', () => {
       const el = await fixture<HelixTile>(
         '<hx-tile href="/test"><span slot="label">Test</span></hx-tile>',
       );
-      const base = shadowQuery(el, '[part="base"]')!;
+      const tile = shadowQuery(el, '[part="tile"]')!;
       let fired = false;
       el.addEventListener('hx-select', () => {
         fired = true;
       });
       // Use dispatchEvent (untrusted) to avoid anchor navigation in headless browser
-      base.dispatchEvent(
+      tile.dispatchEvent(
         new MouseEvent('click', { bubbles: true, composed: true, cancelable: true }),
       );
       await new Promise((r) => setTimeout(r, 50));
@@ -258,18 +334,18 @@ describe('hx-tile', () => {
   describe('Keyboard', () => {
     it('Enter fires hx-select in button mode', async () => {
       const el = await fixture<HelixTile>('<hx-tile><span slot="label">Test</span></hx-tile>');
-      const base = shadowQuery(el, '[part="base"]')!;
+      const tile = shadowQuery(el, '[part="tile"]')!;
       const eventPromise = oneEvent<CustomEvent>(el, 'hx-select');
-      base.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
+      tile.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
       const event = await eventPromise;
       expect(event).toBeTruthy();
     });
 
     it('Space fires hx-select in button mode', async () => {
       const el = await fixture<HelixTile>('<hx-tile><span slot="label">Test</span></hx-tile>');
-      const base = shadowQuery(el, '[part="base"]')!;
+      const tile = shadowQuery(el, '[part="tile"]')!;
       const eventPromise = oneEvent<CustomEvent>(el, 'hx-select');
-      base.dispatchEvent(new KeyboardEvent('keydown', { key: ' ', bubbles: true }));
+      tile.dispatchEvent(new KeyboardEvent('keydown', { key: ' ', bubbles: true }));
       const event = await eventPromise;
       expect(event).toBeTruthy();
     });
@@ -278,9 +354,20 @@ describe('hx-tile', () => {
       const el = await fixture<HelixTile>(
         '<hx-tile href="/test"><span slot="label">Test</span></hx-tile>',
       );
-      const base = shadowQuery(el, '[part="base"]')!;
+      const tile = shadowQuery(el, '[part="tile"]')!;
       const eventPromise = oneEvent<CustomEvent>(el, 'hx-click');
-      base.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
+      tile.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
+      const event = await eventPromise;
+      expect(event.detail.href).toBe('/test');
+    });
+
+    it('Space fires hx-click in link mode', async () => {
+      const el = await fixture<HelixTile>(
+        '<hx-tile href="/test"><span slot="label">Test</span></hx-tile>',
+      );
+      const tile = shadowQuery(el, '[part="tile"]')!;
+      const eventPromise = oneEvent<CustomEvent>(el, 'hx-click');
+      tile.dispatchEvent(new KeyboardEvent('keydown', { key: ' ', bubbles: true }));
       const event = await eventPromise;
       expect(event.detail.href).toBe('/test');
     });
@@ -289,6 +376,12 @@ describe('hx-tile', () => {
   // ─── CSS Parts ───
 
   describe('CSS Parts', () => {
+    it('tile part exposed', async () => {
+      const el = await fixture<HelixTile>('<hx-tile><span slot="label">Test</span></hx-tile>');
+      const tile = shadowQuery(el, '[part="tile"]');
+      expect(tile).toBeTruthy();
+    });
+
     it('icon part exposed', async () => {
       const el = await fixture<HelixTile>(
         '<hx-tile><span slot="icon">&#127968;</span><span slot="label">Test</span></hx-tile>',
@@ -359,7 +452,6 @@ describe('hx-tile', () => {
   describe('Accessibility (axe-core)', () => {
     it('has no axe violations in button mode', async () => {
       const el = await fixture<HelixTile>('<hx-tile><span slot="label">Dashboard</span></hx-tile>');
-      await page.screenshot();
       const { violations } = await checkA11y(el);
       expect(violations).toEqual([]);
     });
@@ -368,7 +460,6 @@ describe('hx-tile', () => {
       const el = await fixture<HelixTile>(
         '<hx-tile selected><span slot="label">Selected Tile</span></hx-tile>',
       );
-      await page.screenshot();
       const { violations } = await checkA11y(el);
       expect(violations).toEqual([]);
     });
@@ -377,7 +468,6 @@ describe('hx-tile', () => {
       const el = await fixture<HelixTile>(
         '<hx-tile disabled><span slot="label">Disabled Tile</span></hx-tile>',
       );
-      await page.screenshot();
       const { violations } = await checkA11y(el);
       expect(violations).toEqual([]);
     });
@@ -386,7 +476,14 @@ describe('hx-tile', () => {
       const el = await fixture<HelixTile>(
         '<hx-tile href="/dashboard"><span slot="label">Dashboard</span></hx-tile>',
       );
-      await page.screenshot();
+      const { violations } = await checkA11y(el);
+      expect(violations).toEqual([]);
+    });
+
+    it('has no axe violations in static mode', async () => {
+      const el = await fixture<HelixTile>(
+        '<hx-tile clickable="false"><span slot="label">Info Tile</span></hx-tile>',
+      );
       const { violations } = await checkA11y(el);
       expect(violations).toEqual([]);
     });
@@ -396,7 +493,6 @@ describe('hx-tile', () => {
         const el = await fixture<HelixTile>(
           `<hx-tile variant="${variant}"><span slot="label">Tile</span></hx-tile>`,
         );
-        await page.screenshot();
         const { violations } = await checkA11y(el);
         expect(violations, `variant="${variant}" should have no violations`).toEqual([]);
         el.remove();
