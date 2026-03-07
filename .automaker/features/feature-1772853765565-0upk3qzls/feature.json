@@ -1,0 +1,30 @@
+{
+  "category": "Uncategorized",
+  "description": "Resolve all defects found in the Deep Audit v2 for `hx-slider`.\nSource: `packages/hx-library/src/components/hx-slider/AUDIT.md`\n\n**Summary:** 39 defects — 2 P0, 13 P1, 16 P2, 8 P3\n\n### P0 — Critical\n- [ ] [Accessibility] `aria-labelledby` points to non-existent element when label slot is populated\n- [ ] [Accessibility] `aria-label` binding is effectively dead code\n\nReference the AUDIT.md in the component directory for full details and code locations.",
+  "title": "Audit Fix: hx-slider",
+  "status": "backlog",
+  "complexity": "large",
+  "priority": 3,
+  "source": "api",
+  "trustTier": 1,
+  "quarantineStatus": "passed",
+  "quarantineId": "2d188d22-8f67-45fc-b057-8c0bfff369d2",
+  "id": "feature-1772853765565-0upk3qzls",
+  "branchName": "feature/audit-fix-hx-slider",
+  "descriptionHistory": [
+    {
+      "description": "Resolve all defects found in the Deep Audit v2 for `hx-slider`.\nSource: `packages/hx-library/src/components/hx-slider/AUDIT.md`\n\n**Summary:** 39 defects — 2 P0, 13 P1, 16 P2, 8 P3\n\n### P0 — Critical\n- [ ] [Accessibility] `aria-labelledby` points to non-existent element when label slot is populated\n- [ ] [Accessibility] `aria-label` binding is effectively dead code\n\nReference the AUDIT.md in the component directory for full details and code locations.",
+      "timestamp": "2026-03-07T03:22:45.565Z",
+      "source": "initial"
+    }
+  ],
+  "createdAt": "2026-03-07T03:22:45.565Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-03-07T03:22:45.565Z",
+      "reason": "Feature created"
+    }
+  ]
+}

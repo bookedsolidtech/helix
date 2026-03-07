@@ -1,0 +1,30 @@
+{
+  "category": "Uncategorized",
+  "description": "Resolve all defects found in the Deep Audit v2 for `hx-split-button`.\nSource: `packages/hx-library/src/components/hx-split-button/AUDIT.md`\n\n**Summary:** 18 defects — 2 P0, 7 P1, 9 P2, 0 P3\n\n### P0 — Critical\n- [ ] [P0] 01: Arrow key navigation in menu is broken — stuck on first item\n\nReference the AUDIT.md in the component directory for full details and code locations.",
+  "title": "Audit Fix: hx-split-button",
+  "status": "backlog",
+  "complexity": "medium",
+  "priority": 3,
+  "source": "api",
+  "trustTier": 1,
+  "quarantineStatus": "passed",
+  "quarantineId": "b27ad9af-746e-49e7-b075-b027999b7a19",
+  "id": "feature-1772853774146-jtteq3b77",
+  "branchName": "feature/audit-fix-hx-split-button",
+  "descriptionHistory": [
+    {
+      "description": "Resolve all defects found in the Deep Audit v2 for `hx-split-button`.\nSource: `packages/hx-library/src/components/hx-split-button/AUDIT.md`\n\n**Summary:** 18 defects — 2 P0, 7 P1, 9 P2, 0 P3\n\n### P0 — Critical\n- [ ] [P0] 01: Arrow key navigation in menu is broken — stuck on first item\n\nReference the AUDIT.md in the component directory for full details and code locations.",
+      "timestamp": "2026-03-07T03:22:54.147Z",
+      "source": "initial"
+    }
+  ],
+  "createdAt": "2026-03-07T03:22:54.147Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-03-07T03:22:54.147Z",
+      "reason": "Feature created"
+    }
+  ]
+}

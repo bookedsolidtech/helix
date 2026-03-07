@@ -1,0 +1,30 @@
+{
+  "category": "Uncategorized",
+  "description": "Resolve all defects found in the Deep Audit v2 for `hx-card`.\nSource: `packages/hx-library/src/components/hx-card/AUDIT.md`\n\n**Summary:** 25 defects — 0 P0, 8 P1, 17 P2, 0 P3\n\n### P1 — High\n- [ ] [P1] `@fires` JSDoc type mismatch: `originalEvent` typed as `MouseEvent` only\n- [ ] [P1] Interactive card accessible name exposes raw URL, not content description\n- [ ] [P1] Interactive card + actions slot anti-pattern is unguarded and demonstrated in stories\n- [ ] [P1] No `@media (prefers-reduced-motion)` guard on transitions and transforms\n- [ ] [P1] `InteractiveClickTest` play function checks wrong event detail property\n- [ ] [P1] `wcHref` arg name in Storybook does not match the Lit property `hxHref`\n- [ ] [P1] `--hx-card-gap` is documented but never used in the stylesheet\n- [ ] [P1] `.card--compact` only reduces body padding — heading, footer, actions are unchanged\n\n### P2 — Medium\n- [ ] [P2] `CustomEvent` dispatch is not generically typed\n- [ ] [P2] `hxHref` defaults to empty string rather than `string | undefined`\n- [ ] [P2] Focus tabindex is on inner shadow-DOM div, not the host element\n- [ ] [P2] Heading slot provides no semantic heading enforcement\n- [ ] [P2] `checkA11y` test does not cover interactive card + actions slot combination\n- [ ] [P2] No test for `hxHref` property change after initial render\n- [ ] [P2] No test for the interactive + actions slot anti-pattern combination\n- [ ] [P2] Stale screenshot names contain `wc-` prefix\n- [ ] [P2] External image URLs will fail in offline/CI environments\n- [ ] [P2] Horizontal layout is missing — audit spec calls it out but component has no such feature\n- [ ] [P2] No image aspect ratio enforcement\n- [ ] [P2] `--hx-transform-lift-md` token name does not follow project naming conventions\n- [ ] [P2] Hardcoded hex fallback values throughout stylesheet\n- [ ] [P2] Token stylesheet injected per-instance via `tokenStyles`\n- [ ] [P2] Five hidden slot wrapper divs always in the DOM\n- [ ] [P2] No documented Drupal usage example or Twig template\n- [ ] [P2] `hx-card-click` event has no Drupal behavior documentation\n\nReference the AUDIT.md in the component directory for full details and code locations.",
+  "title": "Audit Fix: hx-card",
+  "status": "backlog",
+  "complexity": "large",
+  "priority": 4,
+  "source": "api",
+  "trustTier": 1,
+  "quarantineStatus": "passed",
+  "quarantineId": "fc5085e6-1ecf-498f-bdad-9a15297cce52",
+  "id": "feature-1772853624298-p47p37acc",
+  "branchName": "feature/audit-fix-hx-card",
+  "descriptionHistory": [
+    {
+      "description": "Resolve all defects found in the Deep Audit v2 for `hx-card`.\nSource: `packages/hx-library/src/components/hx-card/AUDIT.md`\n\n**Summary:** 25 defects — 0 P0, 8 P1, 17 P2, 0 P3\n\n### P1 — High\n- [ ] [P1] `@fires` JSDoc type mismatch: `originalEvent` typed as `MouseEvent` only\n- [ ] [P1] Interactive card accessible name exposes raw URL, not content description\n- [ ] [P1] Interactive card + actions slot anti-pattern is unguarded and demonstrated in stories\n- [ ] [P1] No `@media (prefers-reduced-motion)` guard on transitions and transforms\n- [ ] [P1] `InteractiveClickTest` play function checks wrong event detail property\n- [ ] [P1] `wcHref` arg name in Storybook does not match the Lit property `hxHref`\n- [ ] [P1] `--hx-card-gap` is documented but never used in the stylesheet\n- [ ] [P1] `.card--compact` only reduces body padding — heading, footer, actions are unchanged\n\n### P2 — Medium\n- [ ] [P2] `CustomEvent` dispatch is not generically typed\n- [ ] [P2] `hxHref` defaults to empty string rather than `string | undefined`\n- [ ] [P2] Focus tabindex is on inner shadow-DOM div, not the host element\n- [ ] [P2] Heading slot provides no semantic heading enforcement\n- [ ] [P2] `checkA11y` test does not cover interactive card + actions slot combination\n- [ ] [P2] No test for `hxHref` property change after initial render\n- [ ] [P2] No test for the interactive + actions slot anti-pattern combination\n- [ ] [P2] Stale screenshot names contain `wc-` prefix\n- [ ] [P2] External image URLs will fail in offline/CI environments\n- [ ] [P2] Horizontal layout is missing — audit spec calls it out but component has no such feature\n- [ ] [P2] No image aspect ratio enforcement\n- [ ] [P2] `--hx-transform-lift-md` token name does not follow project naming conventions\n- [ ] [P2] Hardcoded hex fallback values throughout stylesheet\n- [ ] [P2] Token stylesheet injected per-instance via `tokenStyles`\n- [ ] [P2] Five hidden slot wrapper divs always in the DOM\n- [ ] [P2] No documented Drupal usage example or Twig template\n- [ ] [P2] `hx-card-click` event has no Drupal behavior documentation\n\nReference the AUDIT.md in the component directory for full details and code locations.",
+      "timestamp": "2026-03-07T03:20:24.298Z",
+      "source": "initial"
+    }
+  ],
+  "createdAt": "2026-03-07T03:20:24.298Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-03-07T03:20:24.298Z",
+      "reason": "Feature created"
+    }
+  ]
+}

@@ -1,0 +1,30 @@
+{
+  "category": "Uncategorized",
+  "description": "Resolve all defects found in the Deep Audit v2 for `hx-avatar`.\nSource: `packages/hx-library/src/components/hx-avatar/AUDIT.md`\n\n**Summary:** 23 defects — 3 P0, 8 P1, 12 P2, 0 P3\n\n### P0 — Critical\n- [ ] [P0] 1: `_imgError` state never resets when `src` changes\n- [ ] [P0] 2: Badge slot clipped by `overflow: hidden` on parent\n\n### P1 — High\n- [ ] [P1] 1: Generic `aria-label=\"Avatar\"` hardcoded as fallback — non-descriptive in healthcare\n- [ ] [P1] 2: `alt` property is not required when `src` is provided — no validation or warning\n- [ ] [P1] 3: `role=\"img\"` on container + `` inside creates double semantics\n- [ ] [P1] 4: No test for image load failure → fallback recovery\n- [ ] [P1] 5: No test for `_imgError` reset on `src` change (consequence of P0-1)\n- [ ] [P1] 6: Story `render` function sends `src=\"\"` when `src` is `undefined`\n- [ ] [P1] 7: Initials `aria-label` exposes raw initials string — not human-readable\n\n### P2 — Medium\n- [ ] [P2] 1: No type-level guard for invalid `size` or `shape` attribute values\n- [ ] [P2] 2: Empty badge `<span>` always present in DOM even without badge content\n- [ ] [P2] 3: `Sizes` and `Shapes` stories render avatars with no meaningful `alt` text\n- [ ] [P2] 4: No story demonstrating image load failure / broken `src` fallback\n- [ ] [P2] 5: No `:host([hidden])` rule\n- [ ] [P2] 6: Missing Drupal integration documentation or Twig example\n- [ ] [P2] 7: `setTimeout(50)` timing-based waits in tests are fragile\n- [ ] [P2] 8: `axe-core` tests cover only 2 of 5 avatar rendering modes\n\nReference the AUDIT.md in the component directory for full details and code locations.",
+  "title": "Audit Fix: hx-avatar",
+  "status": "backlog",
+  "complexity": "large",
+  "priority": 3,
+  "source": "api",
+  "trustTier": 1,
+  "quarantineStatus": "passed",
+  "quarantineId": "376a94c7-7a65-4bec-870b-c936534c208a",
+  "id": "feature-1772853585245-fdppvw2zc",
+  "branchName": "feature/audit-fix-hx-avatar",
+  "descriptionHistory": [
+    {
+      "description": "Resolve all defects found in the Deep Audit v2 for `hx-avatar`.\nSource: `packages/hx-library/src/components/hx-avatar/AUDIT.md`\n\n**Summary:** 23 defects — 3 P0, 8 P1, 12 P2, 0 P3\n\n### P0 — Critical\n- [ ] [P0] 1: `_imgError` state never resets when `src` changes\n- [ ] [P0] 2: Badge slot clipped by `overflow: hidden` on parent\n\n### P1 — High\n- [ ] [P1] 1: Generic `aria-label=\"Avatar\"` hardcoded as fallback — non-descriptive in healthcare\n- [ ] [P1] 2: `alt` property is not required when `src` is provided — no validation or warning\n- [ ] [P1] 3: `role=\"img\"` on container + `` inside creates double semantics\n- [ ] [P1] 4: No test for image load failure → fallback recovery\n- [ ] [P1] 5: No test for `_imgError` reset on `src` change (consequence of P0-1)\n- [ ] [P1] 6: Story `render` function sends `src=\"\"` when `src` is `undefined`\n- [ ] [P1] 7: Initials `aria-label` exposes raw initials string — not human-readable\n\n### P2 — Medium\n- [ ] [P2] 1: No type-level guard for invalid `size` or `shape` attribute values\n- [ ] [P2] 2: Empty badge `<span>` always present in DOM even without badge content\n- [ ] [P2] 3: `Sizes` and `Shapes` stories render avatars with no meaningful `alt` text\n- [ ] [P2] 4: No story demonstrating image load failure / broken `src` fallback\n- [ ] [P2] 5: No `:host([hidden])` rule\n- [ ] [P2] 6: Missing Drupal integration documentation or Twig example\n- [ ] [P2] 7: `setTimeout(50)` timing-based waits in tests are fragile\n- [ ] [P2] 8: `axe-core` tests cover only 2 of 5 avatar rendering modes\n\nReference the AUDIT.md in the component directory for full details and code locations.",
+      "timestamp": "2026-03-07T03:19:45.245Z",
+      "source": "initial"
+    }
+  ],
+  "createdAt": "2026-03-07T03:19:45.245Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-03-07T03:19:45.245Z",
+      "reason": "Feature created"
+    }
+  ]
+}

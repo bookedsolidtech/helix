@@ -1,0 +1,30 @@
+{
+  "category": "Uncategorized",
+  "description": "Resolve all defects found in the Deep Audit v2 for `hx-tile`.\nSource: `packages/hx-library/src/components/hx-tile/AUDIT.md`\n\n**Summary:** 23 defects — 1 P0, 9 P1, 13 P2, 0 P3\n\n### P0 — Critical\n- [ ] [P0] 01: No static (non-interactive) mode — every enabled tile is always interactive\n\nReference the AUDIT.md in the component directory for full details and code locations.",
+  "title": "Audit Fix: hx-tile",
+  "status": "backlog",
+  "complexity": "medium",
+  "priority": 3,
+  "source": "api",
+  "trustTier": 1,
+  "quarantineStatus": "passed",
+  "quarantineId": "b617c76c-c3b1-42f8-84ff-690d556cda58",
+  "id": "feature-1772853810281-072qu49k3",
+  "branchName": "feature/audit-fix-hx-tile",
+  "descriptionHistory": [
+    {
+      "description": "Resolve all defects found in the Deep Audit v2 for `hx-tile`.\nSource: `packages/hx-library/src/components/hx-tile/AUDIT.md`\n\n**Summary:** 23 defects — 1 P0, 9 P1, 13 P2, 0 P3\n\n### P0 — Critical\n- [ ] [P0] 01: No static (non-interactive) mode — every enabled tile is always interactive\n\nReference the AUDIT.md in the component directory for full details and code locations.",
+      "timestamp": "2026-03-07T03:23:30.281Z",
+      "source": "initial"
+    }
+  ],
+  "createdAt": "2026-03-07T03:23:30.281Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-03-07T03:23:30.281Z",
+      "reason": "Feature created"
+    }
+  ]
+}

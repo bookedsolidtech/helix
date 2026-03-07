@@ -1,0 +1,30 @@
+{
+  "category": "Uncategorized",
+  "description": "Resolve all defects found in the Deep Audit v2 for `hx-radio-group`.\nSource: `packages/hx-library/src/components/hx-radio-group/AUDIT.md`\n\n**Summary:** 18 defects — 3 P0, 7 P1, 8 P2, 0 P3\n\n### P0 — Critical\n- [ ] [P0] 1: Focus ring CSS is dead — keyboard navigation has no visual indicator\n- [ ] [P0] 2: Space key does not select the focused radio\n- [ ] [P0] 3: Required validation is not initialized on first render\n\nReference the AUDIT.md in the component directory for full details and code locations.",
+  "title": "Audit Fix: hx-radio-group",
+  "status": "backlog",
+  "complexity": "large",
+  "priority": 3,
+  "source": "api",
+  "trustTier": 1,
+  "quarantineStatus": "passed",
+  "quarantineId": "1e30af1f-875a-493d-b918-46e47fc92780",
+  "id": "feature-1772853752019-s23vbqm7b",
+  "branchName": "feature/audit-fix-hx-radio-group",
+  "descriptionHistory": [
+    {
+      "description": "Resolve all defects found in the Deep Audit v2 for `hx-radio-group`.\nSource: `packages/hx-library/src/components/hx-radio-group/AUDIT.md`\n\n**Summary:** 18 defects — 3 P0, 7 P1, 8 P2, 0 P3\n\n### P0 — Critical\n- [ ] [P0] 1: Focus ring CSS is dead — keyboard navigation has no visual indicator\n- [ ] [P0] 2: Space key does not select the focused radio\n- [ ] [P0] 3: Required validation is not initialized on first render\n\nReference the AUDIT.md in the component directory for full details and code locations.",
+      "timestamp": "2026-03-07T03:22:32.019Z",
+      "source": "initial"
+    }
+  ],
+  "createdAt": "2026-03-07T03:22:32.019Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-03-07T03:22:32.019Z",
+      "reason": "Feature created"
+    }
+  ]
+}

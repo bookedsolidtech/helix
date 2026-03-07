@@ -1,0 +1,30 @@
+{
+  "category": "Uncategorized",
+  "description": "Resolve all defects found in the Deep Audit v2 for `hx-copy-button`.\nSource: `packages/hx-library/src/components/hx-copy-button/AUDIT.md`\n\n**Summary:** 26 defects — 0 P0, 8 P1, 17 P2, 1 P3\n\nReference the AUDIT.md in the component directory for full details and code locations.",
+  "title": "Audit Fix: hx-copy-button",
+  "status": "backlog",
+  "complexity": "large",
+  "priority": 4,
+  "source": "api",
+  "trustTier": 1,
+  "quarantineStatus": "passed",
+  "quarantineId": "06fd62dd-f01a-46d4-a1af-ba00157000e0",
+  "id": "feature-1772853669425-qj9dwp8oz",
+  "branchName": "feature/audit-fix-hx-copy-button",
+  "descriptionHistory": [
+    {
+      "description": "Resolve all defects found in the Deep Audit v2 for `hx-copy-button`.\nSource: `packages/hx-library/src/components/hx-copy-button/AUDIT.md`\n\n**Summary:** 26 defects — 0 P0, 8 P1, 17 P2, 1 P3\n\nReference the AUDIT.md in the component directory for full details and code locations.",
+      "timestamp": "2026-03-07T03:21:09.425Z",
+      "source": "initial"
+    }
+  ],
+  "createdAt": "2026-03-07T03:21:09.425Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-03-07T03:21:09.425Z",
+      "reason": "Feature created"
+    }
+  ]
+}

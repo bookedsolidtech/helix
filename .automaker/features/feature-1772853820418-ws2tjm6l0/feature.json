@@ -1,0 +1,30 @@
+{
+  "category": "Uncategorized",
+  "description": "Resolve all defects found in the Deep Audit v2 for `hx-tooltip`.\nSource: `packages/hx-library/src/components/hx-tooltip/AUDIT.md`\n\n**Summary:** 13 defects — 2 P0, 5 P1, 6 P2, 0 P3\n\n### P0 — Critical\n- [ ] [P0] 1: `aria-describedby` ID reference crosses Shadow DOM boundary\n- [ ] [P0] 2: `pointer-events: none` on tooltip violates WCAG 1.4.13\n\nReference the AUDIT.md in the component directory for full details and code locations.",
+  "title": "Audit Fix: hx-tooltip",
+  "status": "backlog",
+  "complexity": "medium",
+  "priority": 3,
+  "source": "api",
+  "trustTier": 1,
+  "quarantineStatus": "passed",
+  "quarantineId": "e0b880b0-2cf6-47d1-8676-264720a40be9",
+  "id": "feature-1772853820418-ws2tjm6l0",
+  "branchName": "feature/audit-fix-hx-tooltip",
+  "descriptionHistory": [
+    {
+      "description": "Resolve all defects found in the Deep Audit v2 for `hx-tooltip`.\nSource: `packages/hx-library/src/components/hx-tooltip/AUDIT.md`\n\n**Summary:** 13 defects — 2 P0, 5 P1, 6 P2, 0 P3\n\n### P0 — Critical\n- [ ] [P0] 1: `aria-describedby` ID reference crosses Shadow DOM boundary\n- [ ] [P0] 2: `pointer-events: none` on tooltip violates WCAG 1.4.13\n\nReference the AUDIT.md in the component directory for full details and code locations.",
+      "timestamp": "2026-03-07T03:23:40.418Z",
+      "source": "initial"
+    }
+  ],
+  "createdAt": "2026-03-07T03:23:40.418Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-03-07T03:23:40.418Z",
+      "reason": "Feature created"
+    }
+  ]
+}

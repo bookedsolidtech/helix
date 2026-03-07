@@ -1,0 +1,30 @@
+{
+  "category": "Uncategorized",
+  "description": "Resolve all defects found in the Deep Audit v2 for `hx-pagination`.\nSource: `packages/hx-library/src/components/hx-pagination/AUDIT.md`\n\n**Summary:** 26 defects — 1 P0, 11 P1, 14 P2, 0 P3\n\n### P0 — Critical\n- [ ] [TypeScript] `page-size` property is entirely absent\n\nReference the AUDIT.md in the component directory for full details and code locations.",
+  "title": "Audit Fix: hx-pagination",
+  "status": "backlog",
+  "complexity": "large",
+  "priority": 3,
+  "source": "api",
+  "trustTier": 1,
+  "quarantineStatus": "passed",
+  "quarantineId": "8bacb125-bf19-4e71-83e7-f96c09c6d3d5",
+  "id": "feature-1772853733808-x61xz1tii",
+  "branchName": "feature/audit-fix-hx-pagination",
+  "descriptionHistory": [
+    {
+      "description": "Resolve all defects found in the Deep Audit v2 for `hx-pagination`.\nSource: `packages/hx-library/src/components/hx-pagination/AUDIT.md`\n\n**Summary:** 26 defects — 1 P0, 11 P1, 14 P2, 0 P3\n\n### P0 — Critical\n- [ ] [TypeScript] `page-size` property is entirely absent\n\nReference the AUDIT.md in the component directory for full details and code locations.",
+      "timestamp": "2026-03-07T03:22:13.808Z",
+      "source": "initial"
+    }
+  ],
+  "createdAt": "2026-03-07T03:22:13.808Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-03-07T03:22:13.808Z",
+      "reason": "Feature created"
+    }
+  ]
+}

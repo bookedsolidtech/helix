@@ -1,0 +1,30 @@
+{
+  "category": "Uncategorized",
+  "description": "Resolve all defects found in the Deep Audit v2 for `hx-progress-ring`.\nSource: `packages/hx-library/src/components/hx-progress-ring/AUDIT.md`\n\n**Summary:** 8 defects — 0 P0, 2 P1, 6 P2, 0 P3\n\nReference the AUDIT.md in the component directory for full details and code locations.",
+  "title": "Audit Fix: hx-progress-ring",
+  "status": "backlog",
+  "complexity": "small",
+  "priority": 4,
+  "source": "api",
+  "trustTier": 1,
+  "quarantineStatus": "passed",
+  "quarantineId": "0c09dd97-3e2f-46dd-a86e-0b1e789eafec",
+  "id": "feature-1772853745241-fg3v3fwk0",
+  "branchName": "feature/audit-fix-hx-progress-ring",
+  "descriptionHistory": [
+    {
+      "description": "Resolve all defects found in the Deep Audit v2 for `hx-progress-ring`.\nSource: `packages/hx-library/src/components/hx-progress-ring/AUDIT.md`\n\n**Summary:** 8 defects — 0 P0, 2 P1, 6 P2, 0 P3\n\nReference the AUDIT.md in the component directory for full details and code locations.",
+      "timestamp": "2026-03-07T03:22:25.241Z",
+      "source": "initial"
+    }
+  ],
+  "createdAt": "2026-03-07T03:22:25.241Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-03-07T03:22:25.241Z",
+      "reason": "Feature created"
+    }
+  ]
+}

@@ -1,0 +1,30 @@
+{
+  "category": "Uncategorized",
+  "description": "Resolve all defects found in the Deep Audit v2 for `hx-focus-ring`.\nSource: `packages/hx-library/src/components/hx-focus-ring/AUDIT.md`\n\n**Summary:** 16 defects — 3 P0, 4 P1, 9 P2, 0 P3\n\n### P0 — Critical\n- [ ] [P0] 01: Hardcoded hex color in CSS\n- [ ] [P0] 02: Hardcoded pixel fallbacks for width and offset\n- [ ] [P0] 03: No dark mode contrast handling (WCAG 2.4.11 risk)\n\nReference the AUDIT.md in the component directory for full details and code locations.",
+  "title": "Audit Fix: hx-focus-ring",
+  "status": "backlog",
+  "complexity": "large",
+  "priority": 3,
+  "source": "api",
+  "trustTier": 1,
+  "quarantineStatus": "passed",
+  "quarantineId": "21aa6d14-9d57-40dd-b08d-3e9f4415a340",
+  "id": "feature-1772853696594-y3pafvr4k",
+  "branchName": "feature/audit-fix-hx-focus-ring",
+  "descriptionHistory": [
+    {
+      "description": "Resolve all defects found in the Deep Audit v2 for `hx-focus-ring`.\nSource: `packages/hx-library/src/components/hx-focus-ring/AUDIT.md`\n\n**Summary:** 16 defects — 3 P0, 4 P1, 9 P2, 0 P3\n\n### P0 — Critical\n- [ ] [P0] 01: Hardcoded hex color in CSS\n- [ ] [P0] 02: Hardcoded pixel fallbacks for width and offset\n- [ ] [P0] 03: No dark mode contrast handling (WCAG 2.4.11 risk)\n\nReference the AUDIT.md in the component directory for full details and code locations.",
+      "timestamp": "2026-03-07T03:21:36.595Z",
+      "source": "initial"
+    }
+  ],
+  "createdAt": "2026-03-07T03:21:36.595Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-03-07T03:21:36.595Z",
+      "reason": "Feature created"
+    }
+  ]
+}

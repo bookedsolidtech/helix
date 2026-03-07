@@ -1,0 +1,30 @@
+{
+  "category": "Uncategorized",
+  "description": "Resolve all defects found in the Deep Audit v2 for `hx-checkbox`.\nSource: `packages/hx-library/src/components/hx-checkbox/AUDIT.md`\n\n**Summary:** 36 defects — 2 P0, 10 P1, 24 P2, 0 P3\n\n### P0 — Critical\n- [ ] [P0] 01 · `aria-describedby` breaks when using the `error` named slot\n- [ ] [P0] 02 · `NoLabel` pattern (`aria-label` on host) does not produce an accessible name\n\n### P1 — High\n- [ ] [P1] 01 · `formStateRestoreCallback` has wrong TypeScript signature\n- [ ] [P1] 02 · `role=\"alert\"` + `aria-live=\"polite\"` is semantically contradictory\n- [ ] [P1] 03 · Hover border-color ignores `--hx-checkbox-border-color` token\n- [ ] [P1] 04 · `hx-size` property entirely absent from Storybook `argTypes`\n- [ ] [P1] 05 · No axe-core test for indeterminate state\n- [ ] [P1] 06 · No test verifying `aria-checked=\"mixed\"` in indeterminate state\n- [ ] [P1] 07 · Error `slot` has no test coverage\n- [ ] [P1] 08 · `render` function passes empty-string attributes unconditionally\n- [ ] [P1] 09 · `indeterminate` property does not reflect to attribute\n- [ ] [P1] 10 · No test for `label` click activating checkbox (only `.checkbox__control` click is tested)\n\n### P2 — Medium\n- [ ] [P2] 01-15: Multiple medium-priority issues including deprecated type aliases, missing tokens, redundant attributes, Math.random() IDs, missing tests and stories\n\nReference the AUDIT.md in the component directory for full details and code locations.",
+  "title": "Audit Fix: hx-checkbox",
+  "status": "backlog",
+  "complexity": "large",
+  "priority": 3,
+  "source": "api",
+  "trustTier": 1,
+  "quarantineStatus": "passed",
+  "quarantineId": "b39910d3-9605-4fe2-a5ee-9f93026f849f",
+  "id": "feature-1772853647355-hi8ial520",
+  "branchName": "feature/audit-fix-hx-checkbox",
+  "descriptionHistory": [
+    {
+      "description": "Resolve all defects found in the Deep Audit v2 for `hx-checkbox`.\nSource: `packages/hx-library/src/components/hx-checkbox/AUDIT.md`\n\n**Summary:** 36 defects — 2 P0, 10 P1, 24 P2, 0 P3\n\n### P0 — Critical\n- [ ] [P0] 01 · `aria-describedby` breaks when using the `error` named slot\n- [ ] [P0] 02 · `NoLabel` pattern (`aria-label` on host) does not produce an accessible name\n\n### P1 — High\n- [ ] [P1] 01 · `formStateRestoreCallback` has wrong TypeScript signature\n- [ ] [P1] 02 · `role=\"alert\"` + `aria-live=\"polite\"` is semantically contradictory\n- [ ] [P1] 03 · Hover border-color ignores `--hx-checkbox-border-color` token\n- [ ] [P1] 04 · `hx-size` property entirely absent from Storybook `argTypes`\n- [ ] [P1] 05 · No axe-core test for indeterminate state\n- [ ] [P1] 06 · No test verifying `aria-checked=\"mixed\"` in indeterminate state\n- [ ] [P1] 07 · Error `slot` has no test coverage\n- [ ] [P1] 08 · `render` function passes empty-string attributes unconditionally\n- [ ] [P1] 09 · `indeterminate` property does not reflect to attribute\n- [ ] [P1] 10 · No test for `label` click activating checkbox (only `.checkbox__control` click is tested)\n\n### P2 — Medium\n- [ ] [P2] 01-15: Multiple medium-priority issues including deprecated type aliases, missing tokens, redundant attributes, Math.random() IDs, missing tests and stories\n\nReference the AUDIT.md in the component directory for full details and code locations.",
+      "timestamp": "2026-03-07T03:20:47.355Z",
+      "source": "initial"
+    }
+  ],
+  "createdAt": "2026-03-07T03:20:47.355Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-03-07T03:20:47.355Z",
+      "reason": "Feature created"
+    }
+  ]
+}

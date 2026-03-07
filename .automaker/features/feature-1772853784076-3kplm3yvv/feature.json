@@ -1,0 +1,30 @@
+{
+  "category": "Uncategorized",
+  "description": "Resolve all defects found in the Deep Audit v2 for `hx-structured-list`.\nSource: `packages/hx-library/src/components/hx-structured-list/AUDIT.md`\n\n**Summary:** 15 defects — 3 P0, 5 P1, 7 P2, 0 P3\n\n### P0 — Critical\n- [ ] [P0] 1: `striped` prop declared but CSS never applied\n- [ ] [P0] 2: Hardcoded `1px` border in row — violates No-Hardcode rule\n- [ ] [P0] 3: Component not registered in main library `src/index.ts`\n\nReference the AUDIT.md in the component directory for full details and code locations.",
+  "title": "Audit Fix: hx-structured-list",
+  "status": "backlog",
+  "complexity": "large",
+  "priority": 3,
+  "source": "api",
+  "trustTier": 1,
+  "quarantineStatus": "passed",
+  "quarantineId": "ea2ff986-fe9f-40b5-a748-5bca7c201255",
+  "id": "feature-1772853784076-3kplm3yvv",
+  "branchName": "feature/audit-fix-hx-structured-list",
+  "descriptionHistory": [
+    {
+      "description": "Resolve all defects found in the Deep Audit v2 for `hx-structured-list`.\nSource: `packages/hx-library/src/components/hx-structured-list/AUDIT.md`\n\n**Summary:** 15 defects — 3 P0, 5 P1, 7 P2, 0 P3\n\n### P0 — Critical\n- [ ] [P0] 1: `striped` prop declared but CSS never applied\n- [ ] [P0] 2: Hardcoded `1px` border in row — violates No-Hardcode rule\n- [ ] [P0] 3: Component not registered in main library `src/index.ts`\n\nReference the AUDIT.md in the component directory for full details and code locations.",
+      "timestamp": "2026-03-07T03:23:04.076Z",
+      "source": "initial"
+    }
+  ],
+  "createdAt": "2026-03-07T03:23:04.076Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-03-07T03:23:04.076Z",
+      "reason": "Feature created"
+    }
+  ]
+}
