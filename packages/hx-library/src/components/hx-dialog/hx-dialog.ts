@@ -1,8 +1,10 @@
 import { LitElement, html, nothing } from 'lit';
 import { customElement, property, query, state } from 'lit/decorators.js';
-import { classMap } from 'lit/directives/class-map.js';
 import { tokenStyles } from '@helix/tokens/lit';
 import { helixDialogStyles } from './hx-dialog.styles.js';
+
+// D21 — deterministic monotonic counter instead of Math.random()
+let _dialogCounter = 0;
 
 /**
  * A modal and non-modal dialog component built on the native HTML `<dialog>` element.
@@ -24,6 +26,7 @@ import { helixDialogStyles } from './hx-dialog.styles.js';
  * @csspart dialog - The inner container div that holds the dialog content.
  * @csspart backdrop - The non-modal backdrop overlay element.
  * @csspart header - The header region containing the heading and header slot.
+ * @csspart close-button - The built-in close button in the dialog header.
  * @csspart body - The scrollable body region containing the default slot.
  * @csspart footer - The footer region containing the footer slot.
  *
@@ -33,17 +36,46 @@ import { helixDialogStyles } from './hx-dialog.styles.js';
  * @cssprop [--hx-dialog-shadow=var(--hx-shadow-xl)] - Dialog box shadow.
  * @cssprop [--hx-dialog-width=32rem] - Dialog width.
  * @cssprop [--hx-dialog-backdrop-color=var(--hx-color-neutral-900)] - Backdrop overlay color.
- * @cssprop [--hx-dialog-backdrop-opacity=0.5] - Backdrop overlay opacity.
+ * @cssprop [--hx-dialog-backdrop-opacity=0.5] - Backdrop overlay opacity (set to 0 to hide; note
+ *   that opacity:0 makes the backdrop invisible but still present in the layout — use pointer-events
+ *   carefully if you need a fully non-blocking backdrop).
  * @cssprop [--hx-dialog-header-padding] - Padding inside the dialog header.
  * @cssprop [--hx-dialog-header-border-color=var(--hx-color-neutral-200)] - Header bottom border color.
  * @cssprop [--hx-dialog-heading-color=var(--hx-color-neutral-900)] - Heading text color.
  * @cssprop [--hx-dialog-body-padding] - Padding inside the dialog body.
  * @cssprop [--hx-dialog-footer-padding] - Padding inside the dialog footer.
  * @cssprop [--hx-dialog-footer-border-color=var(--hx-color-neutral-200)] - Footer top border color.
+ *
+ * @remarks
+ * **Browser support for `::backdrop`:** The `dialog::backdrop` pseudo-element inside Shadow DOM
+ * is well-supported in Chrome/Chromium and Firefox 122+. For Firefox < 122, modal backdrop
+ * animation will silently fall back to no animation. A non-modal backdrop fallback is rendered
+ * for non-modal dialogs.
+ *
+ * **Drupal integration:** This component is Twig-renderable via attributes (`heading`, `open`,
+ * `modal`, `close-on-backdrop`). For trigger-button wiring in Drupal behaviors:
+ * ```js
+ * Drupal.behaviors.hxDialog = {
+ *   attach(context) {
+ *     context.querySelectorAll('[data-hx-dialog-trigger]').forEach((btn) => {
+ *       btn.addEventListener('click', () => {
+ *         const id = btn.getAttribute('data-hx-dialog-trigger');
+ *         document.getElementById(id)?.showModal();
+ *       });
+ *     });
+ *   },
+ * };
+ * ```
+ * Focus restoration to the trigger element is handled automatically by the component.
  */
 @customElement('hx-dialog')
 export class HelixDialog extends LitElement {
   static override styles = [tokenStyles, helixDialogStyles];
+
+  // D10 — observe aria-label attribute without shadowing ARIAMixin.ariaLabel
+  static override get observedAttributes(): string[] {
+    return [...super.observedAttributes, 'aria-label'];
+  }
 
   // ─── Queries ───
 
@@ -63,9 +95,16 @@ export class HelixDialog extends LitElement {
   /** Cached focusable elements — populated on open, cleared on close. */
   private _cachedFocusableElements: HTMLElement[] = [];
 
-  // ─── Unique ID for aria-labelledby ───
+  /** The element that had focus when the dialog opened — restored on close (D1). */
+  private _triggerElement: HTMLElement | null = null;
 
-  private readonly _headingId = `hx-dialog-heading-${Math.random().toString(36).slice(2, 9)}`;
+  /** Pending returnValue to pass to native dialog.close() (D11). */
+  private _pendingReturnValue: string | undefined = undefined;
+
+  // ─── Unique IDs for aria-labelledby / aria-describedby ───
+
+  private readonly _headingId = `hx-dialog-heading-${++_dialogCounter}`;
+  private readonly _descriptionId = `hx-dialog-description-${_dialogCounter}`;
 
   // ─── Public Properties ───
 
@@ -106,14 +145,43 @@ export class HelixDialog extends LitElement {
   heading = '';
 
   /**
-   * Accessible label for dialogs that use a custom header slot instead of the `heading` attribute.
-   * Required when `heading` is empty and no labelled heading is projected into the header slot.
-   * @attr aria-label
+   * ARIA role variant. Use `'alertdialog'` for urgent dialogs requiring immediate attention
+   * (e.g., drug interaction warnings, critical lab alerts). Defaults to `'dialog'`.
+   * @attr variant
    */
-  @property({ type: String, attribute: 'aria-label' })
-  ariaLabel = '';
+  @property({ type: String, reflect: true })
+  variant: 'dialog' | 'alertdialog' = 'dialog';
+
+  /**
+   * Optional description text linked to the dialog via `aria-describedby`.
+   * When provided, screen readers will announce this text when the dialog receives focus.
+   * Recommended for dialogs that surface critical clinical information.
+   * @attr description
+   */
+  @property({ type: String })
+  description = '';
+
+  /**
+   * Returns the dialog's return value — the string passed to `close(returnValue)`.
+   * Mirrors `HTMLDialogElement.returnValue`.
+   */
+  get returnValue(): string {
+    return this._dialogEl?.returnValue ?? '';
+  }
 
   // ─── Lifecycle ───
+
+  // D10 — re-render when aria-label attribute changes (without declaring a shadowing property)
+  override attributeChangedCallback(
+    name: string,
+    oldVal: string | null,
+    newVal: string | null,
+  ): void {
+    super.attributeChangedCallback(name, oldVal, newVal);
+    if (name === 'aria-label' && oldVal !== newVal) {
+      this.requestUpdate('aria-label', oldVal);
+    }
+  }
 
   override firstUpdated(): void {
     // Initialize header slot state without a querySelector in render()
@@ -123,6 +191,10 @@ export class HelixDialog extends LitElement {
   override disconnectedCallback(): void {
     super.disconnectedCallback();
     this._removeGlobalListeners();
+    // Restore body scroll if disconnected while open
+    if (this.modal && this.open) {
+      document.body.style.overflow = '';
+    }
   }
 
   override updated(changedProperties: Map<string, unknown>): void {
@@ -150,8 +222,14 @@ export class HelixDialog extends LitElement {
     this.open = true;
   }
 
-  /** Closes the dialog. */
-  close(): void {
+  /**
+   * Closes the dialog.
+   * @param returnValue - Optional return value string stored as `dialog.returnValue`.
+   */
+  close(returnValue?: string): void {
+    if (returnValue !== undefined) {
+      this._pendingReturnValue = returnValue;
+    }
     this.open = false;
   }
 
@@ -161,10 +239,15 @@ export class HelixDialog extends LitElement {
     const dialog = this._dialogEl;
     if (!dialog) return;
 
+    // D1 — store the element that triggered the dialog open for focus restoration on close
+    this._triggerElement = document.activeElement as HTMLElement | null;
+
     if (this.modal) {
       if (!dialog.open) {
         dialog.showModal();
       }
+      // D4 — lock body scroll when modal dialog is open
+      document.body.style.overflow = 'hidden';
     } else {
       if (!dialog.open) {
         dialog.show();
@@ -176,6 +259,9 @@ export class HelixDialog extends LitElement {
     // Cache focusable elements after the dialog is open in the DOM
     void this.updateComplete.then(() => {
       this._cachedFocusableElements = this._getFocusableElements();
+      // D3 — explicitly move initial focus to the first focusable element inside the dialog
+      // (browser's built-in focus delegation cannot reach slotted light DOM through Shadow DOM)
+      this._cachedFocusableElements[0]?.focus();
     });
 
     this.dispatchEvent(
@@ -192,11 +278,24 @@ export class HelixDialog extends LitElement {
 
     const wasOpen = dialog.open;
     if (dialog.open) {
-      dialog.close();
+      // D11 — forward returnValue to native dialog.close() if provided
+      if (this._pendingReturnValue !== undefined) {
+        dialog.close(this._pendingReturnValue);
+        this._pendingReturnValue = undefined;
+      } else {
+        dialog.close();
+      }
     }
+
+    // D4 — restore body scroll when dialog closes
+    document.body.style.overflow = '';
 
     this._removeGlobalListeners();
     this._cachedFocusableElements = [];
+
+    // D1 — restore focus to the element that opened the dialog (WCAG 2.4.3)
+    this._triggerElement?.focus();
+    this._triggerElement = null;
 
     if (wasOpen) {
       this.dispatchEvent(
@@ -373,14 +472,21 @@ export class HelixDialog extends LitElement {
 
   private _renderHeader() {
     const hasHeading = this.heading.trim().length > 0;
-    if (!hasHeading && !this._hasHeaderSlot) return nothing;
 
+    // Always render header to include the built-in close button (D17)
     return html`
       <div part="header" class="dialog__header">
         ${hasHeading
           ? html`<h2 id=${this._headingId} class="dialog__heading">${this.heading}</h2>`
           : nothing}
         <slot name="header" @slotchange=${this._handleHeaderSlotChange}></slot>
+        <button
+          part="close-button"
+          class="dialog__close-btn"
+          type="button"
+          aria-label="Close dialog"
+          @click=${() => this.close()}
+        ></button>
       </div>
     `;
   }
@@ -405,24 +511,32 @@ export class HelixDialog extends LitElement {
     `;
   }
 
+  // D8 — render visually-hidden description for aria-describedby
+  private _renderDescription() {
+    if (!this.description) return nothing;
+    return html`<span id=${this._descriptionId} class="dialog__description"
+      >${this.description}</span
+    >`;
+  }
+
   // ─── Render ───
 
   override render() {
     const hasHeading = this.heading.trim().length > 0;
-
-    const dialogClasses = {
-      dialog: true,
-    };
+    // D10 — read aria-label via getAttribute to avoid shadowing ARIAMixin.ariaLabel
+    const ariaLabel = this.getAttribute('aria-label');
 
     return html`
       ${this._renderNonModalBackdrop()}
       <dialog
+        role=${this.variant !== 'dialog' ? this.variant : nothing}
         aria-labelledby=${hasHeading ? this._headingId : nothing}
-        aria-label=${!hasHeading && this.ariaLabel ? this.ariaLabel : nothing}
+        aria-label=${!hasHeading && ariaLabel ? ariaLabel : nothing}
+        aria-describedby=${this.description ? this._descriptionId : nothing}
         aria-modal=${this.modal ? 'true' : nothing}
       >
-        <div part="dialog" class=${classMap(dialogClasses)}>
-          ${this._renderHeader()}
+        <div part="dialog" class="dialog">
+          ${this._renderHeader()} ${this._renderDescription()}
           <div part="body" class="dialog__body">
             <slot></slot>
           </div>
