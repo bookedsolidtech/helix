@@ -28,6 +28,15 @@ const meta = {
         type: { summary: 'number' },
       },
     },
+    pageSize: {
+      control: { type: 'number', min: 1 },
+      description: 'Number of items displayed per page. Used with show-page-size.',
+      table: {
+        category: 'State',
+        defaultValue: { summary: '25' },
+        type: { summary: 'number' },
+      },
+    },
     siblingCount: {
       control: { type: 'number', min: 0 },
       description: 'Number of page buttons shown on each side of the current page.',
@@ -55,6 +64,15 @@ const meta = {
         type: { summary: 'boolean' },
       },
     },
+    showPageSize: {
+      control: { type: 'boolean' },
+      description: 'Whether to show the page-size selector.',
+      table: {
+        category: 'Behavior',
+        defaultValue: { summary: 'false' },
+        type: { summary: 'boolean' },
+      },
+    },
     label: {
       control: { type: 'text' },
       description: 'Accessible label for the nav element.',
@@ -68,18 +86,22 @@ const meta = {
   args: {
     totalPages: 10,
     currentPage: 1,
+    pageSize: 25,
     siblingCount: 1,
     boundaryCount: 1,
     showFirstLast: false,
+    showPageSize: false,
     label: 'Pagination',
   },
   render: (args) => html`
     <hx-pagination
       total-pages=${args.totalPages}
       current-page=${args.currentPage}
+      page-size=${args.pageSize}
       sibling-count=${args.siblingCount}
       boundary-count=${args.boundaryCount}
       ?show-first-last=${args.showFirstLast}
+      ?show-page-size=${args.showPageSize}
       label=${args.label}
     ></hx-pagination>
   `,
@@ -175,24 +197,59 @@ export const WideSiblings: Story = {
 };
 
 // ─────────────────────────────────────────────────
-// 8. EVENTS
+// 8. SINGLE PAGE (degenerate state)
 // ─────────────────────────────────────────────────
 
-const pageChangeHandler = fn();
-
-export const EventHandling: Story = {
-  name: 'Test: Events',
-  render: () => html`
-    <hx-pagination
-      total-pages="10"
-      current-page="5"
-      @hx-page-change=${pageChangeHandler}
-    ></hx-pagination>
-  `,
+export const SinglePage: Story = {
+  name: 'Single Page',
+  args: {
+    totalPages: 1,
+    currentPage: 1,
+  },
 };
 
 // ─────────────────────────────────────────────────
-// 9. CSS PARTS
+// 9. WITH PAGE SIZE SELECTOR
+// ─────────────────────────────────────────────────
+
+export const WithPageSizeSelector: Story = {
+  name: 'With Page Size Selector',
+  args: {
+    totalPages: 10,
+    currentPage: 1,
+    showPageSize: true,
+    pageSize: 25,
+  },
+};
+
+// ─────────────────────────────────────────────────
+// 10. EVENTS
+// ─────────────────────────────────────────────────
+
+export const EventHandling: Story = {
+  name: 'Test: Events',
+  render: (args) => {
+    const onPageChange = fn();
+    const onPageSizeChange = fn();
+    return html`
+      <hx-pagination
+        total-pages=${args.totalPages}
+        current-page=${args.currentPage}
+        page-size=${args.pageSize}
+        sibling-count=${args.siblingCount}
+        boundary-count=${args.boundaryCount}
+        ?show-first-last=${args.showFirstLast}
+        ?show-page-size=${args.showPageSize}
+        label=${args.label}
+        @hx-page-change=${onPageChange}
+        @hx-page-size-change=${onPageSizeChange}
+      ></hx-pagination>
+    `;
+  },
+};
+
+// ─────────────────────────────────────────────────
+// 11. CSS PARTS
 // ─────────────────────────────────────────────────
 
 export const CSSParts: Story = {
@@ -219,14 +276,54 @@ export const CSSParts: Story = {
 };
 
 // ─────────────────────────────────────────────────
-// 10. HEALTHCARE SCENARIO
+// 12. MULTIPLE CONTROLS (accessibility labeling)
+// ─────────────────────────────────────────────────
+
+export const MultipleControls: Story = {
+  name: 'Multiple Pagination Controls',
+  render: () => html`
+    <div style="display: flex; flex-direction: column; gap: 2rem; max-width: 600px;">
+      <p style="font-size: 0.875rem; color: #6b7280; margin: 0;">
+        Healthcare views often show pagination at both the top and bottom of a table. Each
+        <code>&lt;hx-pagination&gt;</code> must have a distinct <code>label</code>
+        so screen readers can differentiate them.
+      </p>
+      <div>
+        <p style="font-size: 0.75rem; color: #9ca3af; margin: 0 0 0.5rem;">Top pagination</p>
+        <hx-pagination
+          total-pages="10"
+          current-page="3"
+          label="Patient list pagination, top"
+        ></hx-pagination>
+      </div>
+      <div
+        style="border: 1px dashed #e5e7eb; padding: 1rem; text-align: center; color: #9ca3af; font-size: 0.875rem;"
+      >
+        Table content here
+      </div>
+      <div>
+        <p style="font-size: 0.75rem; color: #9ca3af; margin: 0 0 0.5rem;">Bottom pagination</p>
+        <hx-pagination
+          total-pages="10"
+          current-page="3"
+          label="Patient list pagination, bottom"
+        ></hx-pagination>
+      </div>
+    </div>
+  `,
+};
+
+// ─────────────────────────────────────────────────
+// 13. HEALTHCARE SCENARIO
 // ─────────────────────────────────────────────────
 
 export const PatientList: Story = {
   name: 'Healthcare: Patient List',
   render: () => html`
     <div style="max-width: 800px;">
-      <div style="border: 1px solid #e5e7eb; border-radius: 0.5rem; overflow: hidden; margin-bottom: 1rem;">
+      <div
+        style="border: 1px solid #e5e7eb; border-radius: 0.5rem; overflow: hidden; margin-bottom: 1rem;"
+      >
         <table style="width: 100%; border-collapse: collapse; font-size: 0.875rem;">
           <thead style="background: #f9fafb;">
             <tr>
@@ -266,6 +363,8 @@ export const PatientList: Story = {
           total-pages="94"
           current-page="1"
           show-first-last
+          show-page-size
+          page-size="25"
           label="Patient list pagination"
         ></hx-pagination>
       </div>
