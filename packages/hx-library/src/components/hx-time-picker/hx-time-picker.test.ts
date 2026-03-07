@@ -639,12 +639,13 @@ describe('hx-time-picker', () => {
       expect(errorDiv?.getAttribute('role')).toBe('alert');
     });
 
-    it('error div has aria-live="polite"', async () => {
+    it('error div does not have aria-live (role="alert" is assertive by default)', async () => {
       const el = await fixture<HelixTimePicker>(
         '<hx-time-picker error="Required"></hx-time-picker>',
       );
       const errorDiv = shadowQuery(el, '.field__error');
-      expect(errorDiv?.getAttribute('aria-live')).toBe('polite');
+      // role="alert" carries implicit aria-live="assertive"; redundant aria-live is removed
+      expect(errorDiv?.getAttribute('aria-live')).toBeNull();
     });
 
     it('does not render error div when no error', async () => {
@@ -833,6 +834,274 @@ describe('hx-time-picker', () => {
       );
       const { violations } = await checkA11y(el);
       expect(violations).toEqual([]);
+    });
+
+    it('has no axe violations with dropdown open (A-10)', async () => {
+      const el = await fixture<HelixTimePicker>(
+        '<hx-time-picker label="Appointment Time" min="09:00" max="10:00" step="60"></hx-time-picker>',
+      );
+      const input = shadowQuery<HTMLInputElement>(el, 'input')!;
+      input.click();
+      await el.updateComplete;
+      const { violations } = await checkA11y(el);
+      expect(violations).toEqual([]);
+    });
+  });
+
+  // ─── ARIA 1.2 Combobox (A-01, A-05) ───
+
+  describe('ARIA 1.2 Combobox role placement', () => {
+    it('role="combobox" is on the input element, not a wrapper div (A-01)', async () => {
+      const el = await fixture<HelixTimePicker>('<hx-time-picker></hx-time-picker>');
+      const input = shadowQuery<HTMLInputElement>(el, 'input')!;
+      expect(input.getAttribute('role')).toBe('combobox');
+    });
+
+    it('wrapper div does not have role="combobox" (A-01)', async () => {
+      const el = await fixture<HelixTimePicker>('<hx-time-picker></hx-time-picker>');
+      const comboboxDiv = el.shadowRoot?.querySelector('div[role="combobox"]');
+      expect(comboboxDiv).toBeNull();
+    });
+
+    it('input has aria-expanded="false" when closed (A-01)', async () => {
+      const el = await fixture<HelixTimePicker>('<hx-time-picker></hx-time-picker>');
+      const input = shadowQuery<HTMLInputElement>(el, 'input')!;
+      expect(input.getAttribute('aria-expanded')).toBe('false');
+    });
+
+    it('input has aria-expanded="true" when open (A-01)', async () => {
+      const el = await fixture<HelixTimePicker>('<hx-time-picker></hx-time-picker>');
+      const input = shadowQuery<HTMLInputElement>(el, 'input')!;
+      input.click();
+      await el.updateComplete;
+      expect(input.getAttribute('aria-expanded')).toBe('true');
+    });
+
+    it('wrapper div does not have aria-owns (A-05)', async () => {
+      const el = await fixture<HelixTimePicker>('<hx-time-picker></hx-time-picker>');
+      const input = shadowQuery<HTMLInputElement>(el, 'input')!;
+      input.click();
+      await el.updateComplete;
+      const comboboxWrapper = el.shadowRoot?.querySelector('.field__combobox');
+      expect(comboboxWrapper?.hasAttribute('aria-owns')).toBe(false);
+    });
+  });
+
+  // ─── Toggle button part (A-11) ───
+
+  describe('Toggle button CSS part', () => {
+    it('toggle button has part="toggle" (A-11)', async () => {
+      const el = await fixture<HelixTimePicker>('<hx-time-picker></hx-time-picker>');
+      const toggle = shadowQuery(el, '[part="toggle"]');
+      expect(toggle).toBeTruthy();
+    });
+  });
+
+  // ─── Slotted label aria-labelledby (A-03) ───
+
+  describe('Slotted label accessibility', () => {
+    it('input gets aria-labelledby when label slot is used (A-03)', async () => {
+      const el = await fixture<HelixTimePicker>(
+        '<hx-time-picker><label slot="label" id="my-label">My Time</label></hx-time-picker>',
+      );
+      await el.updateComplete;
+      const input = shadowQuery<HTMLInputElement>(el, 'input')!;
+      expect(input.getAttribute('aria-labelledby')).toBe('my-label');
+    });
+
+    it('assigns an id to the slotted label if it lacks one (A-03)', async () => {
+      const el = await fixture<HelixTimePicker>(
+        '<hx-time-picker><label slot="label">No ID Label</label></hx-time-picker>',
+      );
+      await el.updateComplete;
+      const slottedLabel = el.querySelector<HTMLLabelElement>('[slot="label"]')!;
+      expect(slottedLabel.id).toBeTruthy();
+      const input = shadowQuery<HTMLInputElement>(el, 'input')!;
+      expect(input.getAttribute('aria-labelledby')).toBe(slottedLabel.id);
+    });
+
+    it('input has no aria-labelledby when prop label is used (A-03)', async () => {
+      const el = await fixture<HelixTimePicker>(
+        '<hx-time-picker label="Appointment Time"></hx-time-picker>',
+      );
+      await el.updateComplete;
+      const input = shadowQuery<HTMLInputElement>(el, 'input')!;
+      expect(input.getAttribute('aria-labelledby')).toBeNull();
+    });
+  });
+
+  // ─── Home/End keyboard navigation (A-04) ───
+
+  describe('Home/End keyboard navigation', () => {
+    it('Home key jumps to the first option (A-04)', async () => {
+      const el = await fixture<HelixTimePicker>(
+        '<hx-time-picker format="24h" min="09:00" max="11:00" step="30"></hx-time-picker>',
+      );
+      const input = shadowQuery<HTMLInputElement>(el, 'input')!;
+      // Open and move to the last option first
+      input.click();
+      await el.updateComplete;
+      input.dispatchEvent(new KeyboardEvent('keydown', { key: 'End', bubbles: true }));
+      await el.updateComplete;
+      input.dispatchEvent(new KeyboardEvent('keydown', { key: 'Home', bubbles: true }));
+      await el.updateComplete;
+      const allOptions = shadowQueryAll(el, '[role="option"]');
+      const activeOption = shadowQuery(el, '.field__option--active');
+      expect(activeOption).toBe(allOptions[0]);
+    });
+
+    it('End key jumps to the last option (A-04)', async () => {
+      const el = await fixture<HelixTimePicker>(
+        '<hx-time-picker format="24h" min="09:00" max="11:00" step="30"></hx-time-picker>',
+      );
+      const input = shadowQuery<HTMLInputElement>(el, 'input')!;
+      input.click();
+      await el.updateComplete;
+      input.dispatchEvent(new KeyboardEvent('keydown', { key: 'End', bubbles: true }));
+      await el.updateComplete;
+      const allOptions = shadowQueryAll(el, '[role="option"]');
+      const activeOption = shadowQuery(el, '.field__option--active');
+      expect(activeOption).toBe(allOptions[allOptions.length - 1]);
+    });
+
+    it('Home key does nothing when dropdown is closed (A-04)', async () => {
+      const el = await fixture<HelixTimePicker>(
+        '<hx-time-picker format="24h" min="09:00" max="10:00" step="60"></hx-time-picker>',
+      );
+      const input = shadowQuery<HTMLInputElement>(el, 'input')!;
+      input.dispatchEvent(new KeyboardEvent('keydown', { key: 'Home', bubbles: true }));
+      await el.updateComplete;
+      const listbox = shadowQuery(el, '[role="listbox"]');
+      expect(listbox).toBeNull();
+    });
+  });
+
+  // ─── Typed input parsing (A-08) ───
+
+  describe('Typed input parsing via parseUserInput', () => {
+    it('typing a valid 24h time and blurring sets the value (A-08)', async () => {
+      const el = await fixture<HelixTimePicker>('<hx-time-picker format="24h"></hx-time-picker>');
+      const input = shadowQuery<HTMLInputElement>(el, 'input')!;
+      input.value = '14:30';
+      input.dispatchEvent(new Event('change', { bubbles: true }));
+      await el.updateComplete;
+      expect(el.value).toBe('14:30');
+    });
+
+    it('typing "12:00 PM" sets value to "12:00" (noon) (A-08)', async () => {
+      const el = await fixture<HelixTimePicker>('<hx-time-picker format="12h"></hx-time-picker>');
+      const input = shadowQuery<HTMLInputElement>(el, 'input')!;
+      input.value = '12:00 PM';
+      input.dispatchEvent(new Event('change', { bubbles: true }));
+      await el.updateComplete;
+      expect(el.value).toBe('12:00');
+    });
+
+    it('typing "12:00 AM" sets value to "00:00" (midnight) (A-08)', async () => {
+      const el = await fixture<HelixTimePicker>('<hx-time-picker format="12h"></hx-time-picker>');
+      const input = shadowQuery<HTMLInputElement>(el, 'input')!;
+      input.value = '12:00 AM';
+      input.dispatchEvent(new Event('change', { bubbles: true }));
+      await el.updateComplete;
+      expect(el.value).toBe('00:00');
+    });
+
+    it('typing invalid input reverts display to last known value (A-08)', async () => {
+      const el = await fixture<HelixTimePicker>(
+        '<hx-time-picker format="24h" value="09:00"></hx-time-picker>',
+      );
+      const input = shadowQuery<HTMLInputElement>(el, 'input')!;
+      // Dispatch input event first so _inputDisplayValue changes to 'not-a-time'
+      // (required so Lit detects the subsequent revert as a state change)
+      input.value = 'not-a-time';
+      input.dispatchEvent(new Event('input', { bubbles: true }));
+      await el.updateComplete;
+      // Now dispatch change — component sees invalid input and reverts
+      input.dispatchEvent(new Event('change', { bubbles: true }));
+      await el.updateComplete;
+      // Canonical value stays at 09:00 and display is reverted
+      expect(el.value).toBe('09:00');
+      expect(input.value).toBe('09:00');
+    });
+
+    it('clearing the input sets value to empty string (A-08)', async () => {
+      const el = await fixture<HelixTimePicker>(
+        '<hx-time-picker format="24h" value="09:00"></hx-time-picker>',
+      );
+      const input = shadowQuery<HTMLInputElement>(el, 'input')!;
+      input.value = '';
+      input.dispatchEvent(new Event('change', { bubbles: true }));
+      await el.updateComplete;
+      expect(el.value).toBe('');
+    });
+  });
+
+  // ─── Live typing opens dropdown (A-09) ───
+
+  describe('Live typing input handler', () => {
+    it('typing into the input opens the listbox (A-09)', async () => {
+      const el = await fixture<HelixTimePicker>('<hx-time-picker></hx-time-picker>');
+      const input = shadowQuery<HTMLInputElement>(el, 'input')!;
+      input.value = '09';
+      input.dispatchEvent(new Event('input', { bubbles: true }));
+      await el.updateComplete;
+      const listbox = shadowQuery(el, '[role="listbox"]');
+      expect(listbox).toBeTruthy();
+    });
+
+    it('typing updates _inputDisplayValue (A-09)', async () => {
+      const el = await fixture<HelixTimePicker>('<hx-time-picker></hx-time-picker>');
+      const input = shadowQuery<HTMLInputElement>(el, 'input')!;
+      input.value = '09:30';
+      input.dispatchEvent(new Event('input', { bubbles: true }));
+      await el.updateComplete;
+      // The input element should retain the typed value
+      expect(input.value).toBe('09:30');
+    });
+  });
+
+  // ─── step=0 guard (A-20) ───
+
+  describe('step guard for invalid values', () => {
+    it('step=0 clamps to 1 and generates slots without crashing (A-20)', async () => {
+      // With step=0 (clamped to 1), a narrow range should still work
+      const el = await fixture<HelixTimePicker>(
+        '<hx-time-picker format="24h" min="09:00" max="09:02" step="0"></hx-time-picker>',
+      );
+      const input = shadowQuery<HTMLInputElement>(el, 'input')!;
+      input.click();
+      await el.updateComplete;
+      const options = shadowQueryAll(el, '[role="option"]');
+      // step clamped to 1: options at 09:00, 09:01, 09:02 = 3 options
+      expect(options.length).toBe(3);
+    });
+
+    it('negative step clamps to 1 and generates slots without crashing (A-20)', async () => {
+      const el = await fixture<HelixTimePicker>(
+        '<hx-time-picker format="24h" min="09:00" max="09:01" step="-5"></hx-time-picker>',
+      );
+      const input = shadowQuery<HTMLInputElement>(el, 'input')!;
+      input.click();
+      await el.updateComplete;
+      const options = shadowQueryAll(el, '[role="option"]');
+      expect(options.length).toBe(2); // 09:00 and 09:01
+    });
+  });
+
+  // ─── formResetCallback does not dispatch hx-change (A-22) ───
+
+  describe('formResetCallback event behavior', () => {
+    it('formResetCallback does not dispatch hx-change (A-22)', async () => {
+      const el = await fixture<HelixTimePicker>(
+        '<hx-time-picker value="14:30"></hx-time-picker>',
+      );
+      let changeEventFired = false;
+      el.addEventListener('hx-change', () => {
+        changeEventFired = true;
+      });
+      el.formResetCallback();
+      await el.updateComplete;
+      expect(changeEventFired).toBe(false);
     });
   });
 });
