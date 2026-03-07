@@ -159,10 +159,10 @@ describe('hx-text-input', () => {
       expect(errorDiv?.textContent?.trim()).toBe('Required field');
     });
 
-    it('error div has aria-live="polite"', async () => {
+    it('error div has role="alert"', async () => {
       const el = await fixture<WcTextInput>('<hx-text-input error="Required"></hx-text-input>');
       const errorDiv = shadowQuery(el, '.field__error');
-      expect(errorDiv?.getAttribute('aria-live')).toBe('polite');
+      expect(errorDiv?.getAttribute('role')).toBe('alert');
     });
 
     it('sets aria-invalid="true" on input', async () => {
@@ -432,6 +432,124 @@ describe('hx-text-input', () => {
       const helpDiv = shadowQuery(el, '.field__help-text')!;
       const describedBy = input.getAttribute('aria-describedby');
       expect(describedBy).toContain(helpDiv.id);
+    });
+  });
+
+  // ─── Property: readonly (2) ───
+
+  describe('Property: readonly', () => {
+    it('sets readonly attr on native input', async () => {
+      const el = await fixture<WcTextInput>('<hx-text-input readonly></hx-text-input>');
+      const input = shadowQuery<HTMLInputElement>(el, 'input')!;
+      expect(input.readOnly).toBe(true);
+    });
+
+    it('reflects readonly attribute to host', async () => {
+      const el = await fixture<WcTextInput>('<hx-text-input readonly></hx-text-input>');
+      expect(el.hasAttribute('readonly')).toBe(true);
+    });
+  });
+
+  // ─── Property: hxSize (3) ───
+
+  describe('Property: hxSize', () => {
+    it('defaults to md', async () => {
+      const el = await fixture<WcTextInput>('<hx-text-input></hx-text-input>');
+      expect(el.hxSize).toBe('md');
+    });
+
+    it('applies field--size-sm class', async () => {
+      const el = await fixture<WcTextInput>('<hx-text-input hx-size="sm"></hx-text-input>');
+      const field = shadowQuery(el, '.field');
+      expect(field?.classList.contains('field--size-sm')).toBe(true);
+    });
+
+    it('applies field--size-lg class', async () => {
+      const el = await fixture<WcTextInput>('<hx-text-input hx-size="lg"></hx-text-input>');
+      const field = shadowQuery(el, '.field');
+      expect(field?.classList.contains('field--size-lg')).toBe(true);
+    });
+  });
+
+  // ─── Property: minlength / maxlength (2) ───
+
+  describe('Property: minlength/maxlength', () => {
+    it('sets minlength attr on native input', async () => {
+      const el = await fixture<WcTextInput>('<hx-text-input minlength="3"></hx-text-input>');
+      const input = shadowQuery<HTMLInputElement>(el, 'input')!;
+      expect(input.getAttribute('minlength')).toBe('3');
+    });
+
+    it('sets maxlength attr on native input', async () => {
+      const el = await fixture<WcTextInput>('<hx-text-input maxlength="50"></hx-text-input>');
+      const input = shadowQuery<HTMLInputElement>(el, 'input')!;
+      expect(input.getAttribute('maxlength')).toBe('50');
+    });
+  });
+
+  // ─── Property: pattern (1) ───
+
+  describe('Property: pattern', () => {
+    it('sets pattern attr on native input', async () => {
+      const el = await fixture<WcTextInput>(
+        '<hx-text-input pattern="[A-Z]+"></hx-text-input>',
+      );
+      const input = shadowQuery<HTMLInputElement>(el, 'input')!;
+      expect(input.getAttribute('pattern')).toBe('[A-Z]+');
+    });
+  });
+
+  // ─── Property: autocomplete (1) ───
+
+  describe('Property: autocomplete', () => {
+    it('sets autocomplete attr on native input', async () => {
+      const el = await fixture<WcTextInput>(
+        '<hx-text-input autocomplete="email"></hx-text-input>',
+      );
+      const input = shadowQuery<HTMLInputElement>(el, 'input')!;
+      expect(input.getAttribute('autocomplete')).toBe('email');
+    });
+  });
+
+  // ─── Slots: label and error (2) ───
+
+  describe('Slots: label and error', () => {
+    it('label slot renders slotted content', async () => {
+      const el = await fixture<WcTextInput>(
+        '<hx-text-input><label slot="label">Custom Label</label></hx-text-input>',
+      );
+      const slotted = el.querySelector('[slot="label"]');
+      expect(slotted).toBeTruthy();
+      expect(slotted?.textContent).toBe('Custom Label');
+    });
+
+    it('error slot renders slotted content', async () => {
+      const el = await fixture<WcTextInput>(
+        '<hx-text-input><div slot="error">Custom Error</div></hx-text-input>',
+      );
+      const slotted = el.querySelector('[slot="error"]');
+      expect(slotted).toBeTruthy();
+      expect(slotted?.textContent).toBe('Custom Error');
+    });
+  });
+
+  // ─── CSS Parts: help-text and error (2) ───
+
+  describe('CSS Parts: help-text and error', () => {
+    it('help-text part exposed', async () => {
+      const el = await fixture<WcTextInput>(
+        '<hx-text-input help-text="Some help"></hx-text-input>',
+      );
+      const helpText = shadowQuery(el, '[part="help-text"]');
+      expect(helpText).toBeTruthy();
+    });
+
+    it('error part exposed', async () => {
+      const el = await fixture<WcTextInput>(
+        '<hx-text-input error="An error"></hx-text-input>',
+      );
+      const errorPart = shadowQuery(el, '[part="error"]');
+      expect(errorPart).toBeTruthy();
     });
   });
 
