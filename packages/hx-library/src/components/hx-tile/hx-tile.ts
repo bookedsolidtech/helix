@@ -5,9 +5,10 @@ import { tokenStyles } from '@helix/tokens/lit';
 import { helixTileStyles } from './hx-tile.styles.js';
 
 /**
- * A clickable tile component for dashboards, navigation grids, and selection patterns.
+ * A tile component for dashboards, navigation grids, and selection patterns.
+ * Supports static (non-interactive), selectable (toggle button), and link modes.
  *
- * @summary Clickable tile with icon, label, description, and badge slots.
+ * @summary Tile with icon, label, description, and badge slots.
  *
  * @tag hx-tile
  *
@@ -16,10 +17,10 @@ import { helixTileStyles } from './hx-tile.styles.js';
  * @slot description - Optional descriptive text below the label.
  * @slot badge - Optional overlay badge positioned at the top-right corner.
  *
- * @fires {CustomEvent<{href: string, originalEvent: MouseEvent | KeyboardEvent}>} hx-click - Dispatched when a link tile is clicked.
+ * @fires {CustomEvent<{href: string, originalEvent: MouseEvent | KeyboardEvent}>} hx-click - Dispatched when a link tile is activated.
  * @fires {CustomEvent<{selected: boolean, originalEvent: MouseEvent | KeyboardEvent}>} hx-select - Dispatched when a selectable tile is toggled.
  *
- * @csspart base - The outer tile container element.
+ * @csspart tile - The outer tile container element.
  * @csspart icon - The icon slot container.
  * @csspart label - The label slot container.
  * @csspart description - The description slot container.
@@ -34,12 +35,16 @@ import { helixTileStyles } from './hx-tile.styles.js';
  * @cssprop [--hx-tile-icon-size=var(--hx-size-icon-lg)] - Icon size.
  * @cssprop [--hx-tile-label-color=var(--hx-color-neutral-800)] - Label text color.
  * @cssprop [--hx-tile-description-color=var(--hx-color-neutral-600)] - Description text color.
+ * @cssprop [--hx-tile-selected-border-color=var(--hx-color-primary-500)] - Selected state border color.
+ * @cssprop [--hx-tile-selected-bg=var(--hx-color-primary-50)] - Selected state background color.
  *
  * @accessibility
- * - **Button mode (no href)**: Uses `role="button"`, `tabindex="0"`, `aria-pressed` for toggle state, and `aria-disabled` when disabled.
+ * - **Static mode (clickable=false)**: Renders as a plain `<div>` with no interactive role or event handling.
+ * - **Button mode (no href, clickable=true)**: Uses `role="button"`, `tabindex="0"`, `aria-pressed` for toggle state, and `aria-disabled` when disabled.
  * - **Link mode (href set)**: Renders a native `<a>` element with `aria-disabled` when disabled.
- * - **Keyboard**: Activates on `Enter` and `Space` in both modes.
+ * - **Keyboard**: Activates on `Enter` and `Space` in button and link modes. Space on anchor elements prevents default scroll.
  * - **Focus**: Visible focus ring via `:focus-visible` using `--hx-focus-ring-*` tokens.
+ * - **Icon-only tiles**: Provide an `aria-label` attribute for accessible naming when no label slot is used.
  */
 @customElement('hx-tile')
 export class HelixTile extends LitElement {
@@ -53,8 +58,26 @@ export class HelixTile extends LitElement {
   href = '';
 
   /**
+   * When false, the tile is purely static/decorative: no interactive role, no event handlers.
+   * Use for read-only informational tiles in dashboards where interaction is not needed.
+   * Ignored when `href` is set (link mode is always interactive).
+   *
+   * Accepts `clickable="false"` from HTML/Twig templates (Drupal-compatible).
+   * @attr clickable
+   */
+  @property({
+    reflect: true,
+    converter: {
+      fromAttribute: (value: string | null) => value !== 'false',
+      toAttribute: (value: boolean) => String(value),
+    },
+  })
+  clickable = true;
+
+  /**
    * Whether the tile is in a selected/pressed state.
-   * Only meaningful when the tile is selectable (no href).
+   * Only meaningful in button mode (no href, clickable=true).
+   * Setting this in link mode has no visual effect — use navigation patterns instead.
    * @attr selected
    */
   @property({ type: Boolean, reflect: true })
@@ -107,6 +130,17 @@ export class HelixTile extends LitElement {
   private _onBadgeSlotChange(e: Event): void {
     const slot = e.target as HTMLSlotElement;
     this._hasBadge = slot.assignedNodes({ flatten: true }).length > 0;
+  }
+
+  // ─── Lifecycle ───
+
+  override updated(changedProperties: Map<string, unknown>): void {
+    super.updated(changedProperties);
+    if (changedProperties.has('selected') && this.href && this.selected) {
+      console.warn(
+        '[hx-tile] `selected` has no visual effect in link mode (href is set). Use navigation patterns instead.',
+      );
+    }
   }
 
   // ─── Event Handling ───
@@ -165,47 +199,63 @@ export class HelixTile extends LitElement {
 
   // ─── Render ───
 
+  /** @internal */
+  private _renderSlots() {
+    return html`
+      <div class="tile__icon" part="icon" ?hidden=${!this._hasIcon}>
+        <slot name="icon" @slotchange=${this._onIconSlotChange}></slot>
+      </div>
+      <div class="tile__label" part="label" ?hidden=${!this._hasLabel}>
+        <slot name="label" @slotchange=${this._onLabelSlotChange}></slot>
+      </div>
+      <div class="tile__description" part="description" ?hidden=${!this._hasDescription}>
+        <slot name="description" @slotchange=${this._onDescriptionSlotChange}></slot>
+      </div>
+      <div class="tile__badge" part="badge" ?hidden=${!this._hasBadge}>
+        <slot name="badge" @slotchange=${this._onBadgeSlotChange}></slot>
+      </div>
+    `;
+  }
+
   override render() {
     const isLink = !!this.href;
-    const isInteractive = !this.disabled;
+    const isButtonMode = !isLink && this.clickable;
+    const isStaticMode = !isLink && !this.clickable;
+    const isActivatable = (isLink || isButtonMode) && !this.disabled;
 
     const classes = {
       tile: true,
       [`tile--${this.variant}`]: true,
-      'tile--interactive': isInteractive,
-      'tile--selected': this.selected && !isLink,
+      'tile--interactive': isActivatable,
+      'tile--static': isStaticMode,
+      'tile--selected': this.selected && isButtonMode,
       'tile--disabled': this.disabled,
     };
 
     if (isLink) {
       return html`
         <a
-          part="base"
+          part="tile"
           class=${classMap(classes)}
           href=${this.disabled ? nothing : this.href}
           aria-disabled=${this.disabled ? 'true' : nothing}
+          tabindex=${this.disabled ? '-1' : nothing}
           @click=${this._handleClick}
           @keydown=${this._handleKeyDown}
         >
-          <div class="tile__icon" part="icon" ?hidden=${!this._hasIcon}>
-            <slot name="icon" @slotchange=${this._onIconSlotChange}></slot>
-          </div>
-          <div class="tile__label" part="label" ?hidden=${!this._hasLabel}>
-            <slot name="label" @slotchange=${this._onLabelSlotChange}></slot>
-          </div>
-          <div class="tile__description" part="description" ?hidden=${!this._hasDescription}>
-            <slot name="description" @slotchange=${this._onDescriptionSlotChange}></slot>
-          </div>
-          <div class="tile__badge" part="badge" ?hidden=${!this._hasBadge}>
-            <slot name="badge" @slotchange=${this._onBadgeSlotChange}></slot>
-          </div>
+          ${this._renderSlots()}
         </a>
       `;
     }
 
+    if (isStaticMode) {
+      return html` <div part="tile" class=${classMap(classes)}>${this._renderSlots()}</div> `;
+    }
+
+    // Button mode (clickable=true, no href)
     return html`
       <div
-        part="base"
+        part="tile"
         class=${classMap(classes)}
         role="button"
         tabindex=${this.disabled ? '-1' : '0'}
@@ -214,18 +264,7 @@ export class HelixTile extends LitElement {
         @click=${this._handleClick}
         @keydown=${this._handleKeyDown}
       >
-        <div class="tile__icon" part="icon" ?hidden=${!this._hasIcon}>
-          <slot name="icon" @slotchange=${this._onIconSlotChange}></slot>
-        </div>
-        <div class="tile__label" part="label" ?hidden=${!this._hasLabel}>
-          <slot name="label" @slotchange=${this._onLabelSlotChange}></slot>
-        </div>
-        <div class="tile__description" part="description" ?hidden=${!this._hasDescription}>
-          <slot name="description" @slotchange=${this._onDescriptionSlotChange}></slot>
-        </div>
-        <div class="tile__badge" part="badge" ?hidden=${!this._hasBadge}>
-          <slot name="badge" @slotchange=${this._onBadgeSlotChange}></slot>
-        </div>
+        ${this._renderSlots()}
       </div>
     `;
   }

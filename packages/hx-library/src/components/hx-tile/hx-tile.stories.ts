@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/web-components';
 import { html } from 'lit';
+import { ifDefined } from 'lit/directives/if-defined.js';
 import { expect, fn } from 'storybook/test';
 import './hx-tile.js';
 
@@ -29,6 +30,16 @@ const meta = {
         type: { summary: 'string' },
       },
     },
+    clickable: {
+      control: 'boolean',
+      description:
+        'When false, the tile is purely static/decorative with no interactive role or behavior.',
+      table: {
+        category: 'Interaction',
+        defaultValue: { summary: 'true' },
+        type: { summary: 'boolean' },
+      },
+    },
     selected: {
       control: 'boolean',
       description: 'Whether the tile is in a selected/pressed state.',
@@ -51,6 +62,7 @@ const meta = {
   args: {
     variant: 'default',
     href: '',
+    clickable: true,
     selected: false,
     disabled: false,
   },
@@ -59,7 +71,8 @@ const meta = {
       variant=${args.variant}
       ?selected=${args.selected}
       ?disabled=${args.disabled}
-      href=${args.href || ''}
+      ?clickable=${args.clickable}
+      href=${ifDefined(args.href || undefined)}
       style="width: 160px;"
     >
       <span slot="icon">&#127968;</span>
@@ -76,6 +89,13 @@ type Story = StoryObj;
 
 export const Default: Story = {
   args: {},
+};
+
+export const Static: Story = {
+  name: 'Static (non-interactive)',
+  args: {
+    clickable: false,
+  },
 };
 
 export const Outlined: Story = {
@@ -118,14 +138,15 @@ export const WithBadge: Story = {
       <span
         slot="badge"
         style="
-          background: #ef4444;
-          color: white;
-          border-radius: 9999px;
-          font-size: 0.75rem;
-          padding: 2px 6px;
-          font-weight: 600;
+          background: var(--hx-color-error-500, #ef4444);
+          color: var(--hx-color-neutral-0, #ffffff);
+          border-radius: var(--hx-border-radius-full, 9999px);
+          font-size: var(--hx-font-size-xs, 0.75rem);
+          padding: var(--hx-space-0-5, 2px) var(--hx-space-1-5, 6px);
+          font-weight: var(--hx-font-weight-semibold, 600);
         "
-      >3</span>
+        >3</span
+      >
     </hx-tile>
   `,
 };
@@ -170,23 +191,23 @@ export const NavigationGrid: Story = {
         gap: 1rem;
       "
     >
-      <hx-tile>
+      <hx-tile href="/dashboard">
         <span slot="icon">&#127968;</span>
         <span slot="label">Dashboard</span>
       </hx-tile>
-      <hx-tile>
+      <hx-tile href="/patients">
         <span slot="icon">&#128100;</span>
         <span slot="label">Patients</span>
       </hx-tile>
-      <hx-tile>
+      <hx-tile href="/reports">
         <span slot="icon">&#128203;</span>
         <span slot="label">Reports</span>
       </hx-tile>
-      <hx-tile>
+      <hx-tile href="/analytics">
         <span slot="icon">&#128200;</span>
         <span slot="label">Analytics</span>
       </hx-tile>
-      <hx-tile>
+      <hx-tile href="/settings">
         <span slot="icon">&#9881;</span>
         <span slot="label">Settings</span>
       </hx-tile>
@@ -235,8 +256,26 @@ export const InteractiveEvents: Story = {
   },
   play: async ({ canvasElement }) => {
     const tile = canvasElement.querySelector('hx-tile')!;
-    const base = tile.shadowRoot?.querySelector('[part="base"]') as HTMLElement;
+    const base = tile.shadowRoot?.querySelector('[part="tile"]') as HTMLElement;
+
+    // Test click activation
     base.click();
+    await expect(tile.selected).toBe(true);
+
+    // Reset
+    base.click();
+    await expect(tile.selected).toBe(false);
+
+    // Test keyboard activation (Enter)
+    base.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
+    await expect(tile.selected).toBe(true);
+
+    // Reset
+    base.click();
+    await expect(tile.selected).toBe(false);
+
+    // Test keyboard activation (Space)
+    base.dispatchEvent(new KeyboardEvent('keydown', { key: ' ', bubbles: true }));
     await expect(tile.selected).toBe(true);
   },
 };
