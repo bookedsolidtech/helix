@@ -44,11 +44,19 @@ function groupBy(entries: TokenEntry[], field: keyof TokenEntry): Record<string,
   return result;
 }
 
+function buildCssProps(entries: Array<{ name: string; value: string }>): string {
+  return entries.map((t) => `  ${t.name}: ${t.value};`).join('\n');
+}
+
 /** The raw token JSON source of truth */
 export const tokens = tokensJson;
 
-/** Light-mode tokens (excludes the "dark" key) */
-const { dark: darkJson, ...lightJson } = tokensJson as Record<string, unknown>;
+/** Light-mode tokens (excludes theme-variant keys) */
+const {
+  dark: darkJson,
+  'high-contrast': hcJson,
+  ...lightJson
+} = tokensJson as Record<string, unknown>;
 
 /** Flattened array of all light-mode token entries with metadata */
 export const tokenEntries: TokenEntry[] = flattenTokens(lightJson);
@@ -58,6 +66,11 @@ export const darkTokenEntries: TokenEntry[] = darkJson
   ? flattenTokens(darkJson as Record<string, unknown>)
   : [];
 
+/** Flattened array of high-contrast override entries */
+export const highContrastTokenEntries: TokenEntry[] = hcJson
+  ? flattenTokens(hcJson as Record<string, unknown>)
+  : [];
+
 /** Token entries grouped by top-level category */
 export const tokensByCategory: Record<string, TokenEntry[]> = groupBy(tokenEntries, 'category');
 
@@ -65,3 +78,21 @@ export const tokensByCategory: Record<string, TokenEntry[]> = groupBy(tokenEntri
 export const tokenMap: Record<string, string> = Object.fromEntries(
   tokenEntries.map((t) => [t.name, t.value]),
 );
+
+/**
+ * Pre-built CSS custom property declarations for the light theme.
+ * Import this instead of `tokenEntries` in components to reduce bundle size.
+ */
+export const lightTokenCss: string = buildCssProps(tokenEntries);
+
+/**
+ * Pre-built CSS custom property declarations for dark-mode overrides only.
+ * Apply on top of `lightTokenCss` for dark theme.
+ */
+export const darkTokenCss: string = buildCssProps(darkTokenEntries);
+
+/**
+ * Pre-built CSS custom property declarations for high-contrast overrides only.
+ * Apply on top of `lightTokenCss` for high-contrast theme.
+ */
+export const highContrastTokenCss: string = buildCssProps(highContrastTokenEntries);
