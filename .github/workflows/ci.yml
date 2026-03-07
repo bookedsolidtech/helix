@@ -115,34 +115,39 @@ jobs:
       - run: npx turbo run type-check --filter='!docs'
 
   # ── Tests (need Playwright browsers) ────────────────────────────────────
-  # Sharded across 4 runners for speed — 3,200+ browser-mode tests require parallelism.
+  # Changed-file mode: only runs tests for components touched in this PR/push.
+  # A single-component PR runs ~20-50 tests in <2 min instead of 3,200+ tests.
+  # Full suite only runs when triggered manually or on a scheduled basis.
 
   test:
-    name: Test (Shard ${{ matrix.shard }})
+    name: Test
     needs: changes
     if: needs.changes.outputs.source == 'true' && needs.changes.outputs.is_audit != 'true'
     runs-on: ubuntu-latest
-    timeout-minutes: 45
-    strategy:
-      fail-fast: false
-      matrix:
-        shard: ['1/4', '2/4', '3/4', '4/4']
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: 'npm'
       - run: npm ci
       - run: npx playwright install --with-deps chromium
-      - name: Run tests (shard ${{ matrix.shard }})
-        run: npx vitest run --shard=${{ matrix.shard }}
+      - name: Run tests (PR — changed components only)
+        if: github.event_name == 'pull_request'
+        run: npx vitest run --changed=origin/${{ github.base_ref }}
+        working-directory: packages/hx-library
+      - name: Run tests (push — components changed in merge)
+        if: github.event_name == 'push'
+        run: npx vitest run --changed=HEAD~1
         working-directory: packages/hx-library
       - name: Upload test results
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: test-results-shard-${{ strategy.job-index }}
+          name: test-results
           path: packages/hx-library/.cache/test-results.json
           retention-days: 30
           if-no-files-found: warn
