@@ -1,4 +1,4 @@
-import { LitElement, html } from 'lit';
+import { LitElement, html, nothing } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { tokenStyles } from '@helix/tokens/lit';
 import { helixTreeViewStyles } from './hx-tree-view.styles.js';
@@ -11,6 +11,11 @@ type TreeSelection = 'none' | 'single' | 'multiple';
  * A hierarchical tree component for navigating nested data structures.
  * Used in healthcare applications for org charts, ICD-10 code hierarchies, and department navigation.
  *
+ * Implements WAI-ARIA tree view pattern with `role="tree"` on the container
+ * and `role="treeitem"` on each item. Supports `aria-label` via the `label` property
+ * for screen reader identification. Full keyboard navigation: Arrow keys for movement,
+ * Enter/Space for selection, Home/End for first/last item.
+ *
  * @summary Hierarchical tree view with expand/collapse and keyboard navigation.
  *
  * @tag hx-tree-view
@@ -19,6 +24,8 @@ type TreeSelection = 'none' | 'single' | 'multiple';
  *
  * @fires {CustomEvent<{item: HelixTreeItem, selected: boolean}>} hx-select - Dispatched when a tree item is selected or deselected.
  *
+ * @csspart tree - The tree container element with role="tree".
+ *
  * @cssprop [--hx-tree-font-family=var(--hx-font-family-sans)] - Tree font family.
  */
 @customElement('hx-tree-view')
@@ -26,6 +33,14 @@ export class HelixTreeView extends LitElement {
   static override styles = [tokenStyles, helixTreeViewStyles];
 
   // ─── Properties ───
+
+  /**
+   * Accessible label for the tree. Applied as `aria-label` on the tree container.
+   * Provides context to screen readers about the tree's purpose.
+   * @attr label
+   */
+  @property({ type: String, reflect: true })
+  label = '';
 
   /**
    * Selection mode for the tree.
@@ -157,8 +172,10 @@ export class HelixTreeView extends LitElement {
   override render() {
     return html`
       <div
+        part="tree"
         class="tree"
         role="tree"
+        aria-label=${this.label || nothing}
         aria-multiselectable=${this.selection === 'multiple' ? 'true' : 'false'}
         @hx-tree-item-select=${this._handleTreeItemSelect}
         @keydown=${this._handleKeyDown}
