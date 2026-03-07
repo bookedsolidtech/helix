@@ -115,13 +115,164 @@ describe('hx-help-text', () => {
     });
   });
 
+  // ─── Icons ───
+
+  describe('Icons', () => {
+    it('default variant does NOT render an icon', async () => {
+      const el = await fixture<WcHelpText>('<hx-help-text>Help</hx-help-text>');
+      const icon = shadowQuery(el, '[part="icon"]');
+      expect(icon).toBeNull();
+    });
+
+    it('error variant renders an icon with SVG inside [part="icon"]', async () => {
+      const el = await fixture<WcHelpText>('<hx-help-text variant="error">Error</hx-help-text>');
+      const icon = shadowQuery(el, '[part="icon"]');
+      expect(icon).toBeTruthy();
+      const svg = icon?.querySelector('svg');
+      expect(svg).toBeTruthy();
+    });
+
+    it('warning variant renders an icon with SVG inside [part="icon"]', async () => {
+      const el = await fixture<WcHelpText>(
+        '<hx-help-text variant="warning">Warning</hx-help-text>',
+      );
+      const icon = shadowQuery(el, '[part="icon"]');
+      expect(icon).toBeTruthy();
+      const svg = icon?.querySelector('svg');
+      expect(svg).toBeTruthy();
+    });
+
+    it('success variant renders an icon with SVG inside [part="icon"]', async () => {
+      const el = await fixture<WcHelpText>(
+        '<hx-help-text variant="success">Success</hx-help-text>',
+      );
+      const icon = shadowQuery(el, '[part="icon"]');
+      expect(icon).toBeTruthy();
+      const svg = icon?.querySelector('svg');
+      expect(svg).toBeTruthy();
+    });
+
+    it('icon SVGs have aria-hidden="true"', async () => {
+      for (const variant of ['error', 'warning', 'success']) {
+        const el = await fixture<WcHelpText>(
+          `<hx-help-text variant="${variant}">Text</hx-help-text>`,
+        );
+        const icon = shadowQuery(el, '[part="icon"]');
+        const svg = icon?.querySelector('svg');
+        expect(
+          svg?.getAttribute('aria-hidden'),
+          `${variant} icon SVG should have aria-hidden="true"`,
+        ).toBe('true');
+        el.remove();
+      }
+    });
+  });
+
+  // ─── CSS Parts (extended) ───
+
+  describe('CSS Parts (extended)', () => {
+    it('text part exists on default variant', async () => {
+      const el = await fixture<WcHelpText>('<hx-help-text>Help</hx-help-text>');
+      const text = shadowQuery(el, '[part="text"]');
+      expect(text).toBeTruthy();
+    });
+
+    it('icon part exists on error variant', async () => {
+      const el = await fixture<WcHelpText>('<hx-help-text variant="error">Error</hx-help-text>');
+      const icon = shadowQuery(el, '[part="icon"]');
+      expect(icon).toBeTruthy();
+    });
+
+    it('icon part does NOT exist on default variant', async () => {
+      const el = await fixture<WcHelpText>('<hx-help-text>Help</hx-help-text>');
+      const icon = shadowQuery(el, '[part="icon"]');
+      expect(icon).toBeNull();
+    });
+  });
+
+  // ─── Accessibility (ARIA) ───
+
+  describe('Accessibility (ARIA)', () => {
+    it('error variant base element has role="alert"', async () => {
+      const el = await fixture<WcHelpText>(
+        '<hx-help-text variant="error">Error message</hx-help-text>',
+      );
+      const base = shadowQuery(el, '[part="base"]')!;
+      expect(base.getAttribute('role')).toBe('alert');
+    });
+
+    it('warning variant base element has aria-live="polite"', async () => {
+      const el = await fixture<WcHelpText>(
+        '<hx-help-text variant="warning">Warning message</hx-help-text>',
+      );
+      const base = shadowQuery(el, '[part="base"]')!;
+      expect(base.getAttribute('aria-live')).toBe('polite');
+    });
+
+    it('success variant base element has aria-live="polite"', async () => {
+      const el = await fixture<WcHelpText>(
+        '<hx-help-text variant="success">Success message</hx-help-text>',
+      );
+      const base = shadowQuery(el, '[part="base"]')!;
+      expect(base.getAttribute('aria-live')).toBe('polite');
+    });
+
+    it('default variant base element has NO role attribute', async () => {
+      const el = await fixture<WcHelpText>('<hx-help-text>Help</hx-help-text>');
+      const base = shadowQuery(el, '[part="base"]')!;
+      expect(base.hasAttribute('role')).toBe(false);
+    });
+
+    it('default variant base element has NO aria-live attribute', async () => {
+      const el = await fixture<WcHelpText>('<hx-help-text>Help</hx-help-text>');
+      const base = shadowQuery(el, '[part="base"]')!;
+      expect(base.hasAttribute('aria-live')).toBe(false);
+    });
+  });
+
+  // ─── Dynamic variant change ───
+
+  describe('Dynamic variant change', () => {
+    it('changing from default to error adds icon and role="alert"', async () => {
+      const el = await fixture<WcHelpText>('<hx-help-text>Help</hx-help-text>');
+
+      // Verify default state: no icon, no role
+      expect(shadowQuery(el, '[part="icon"]')).toBeNull();
+      expect(shadowQuery(el, '[part="base"]')!.hasAttribute('role')).toBe(false);
+
+      // Change to error
+      el.variant = 'error';
+      await el.updateComplete;
+
+      // Verify error state: icon present, role="alert"
+      const icon = shadowQuery(el, '[part="icon"]');
+      expect(icon).toBeTruthy();
+      expect(icon?.querySelector('svg')).toBeTruthy();
+      expect(shadowQuery(el, '[part="base"]')!.getAttribute('role')).toBe('alert');
+    });
+
+    it('changing from error back to default removes icon and role', async () => {
+      const el = await fixture<WcHelpText>('<hx-help-text variant="error">Error</hx-help-text>');
+
+      // Verify error state
+      expect(shadowQuery(el, '[part="icon"]')).toBeTruthy();
+      expect(shadowQuery(el, '[part="base"]')!.getAttribute('role')).toBe('alert');
+
+      // Change back to default
+      el.variant = 'default';
+      await el.updateComplete;
+
+      // Verify default state: no icon, no role
+      expect(shadowQuery(el, '[part="icon"]')).toBeNull();
+      expect(shadowQuery(el, '[part="base"]')!.hasAttribute('role')).toBe(false);
+    });
+  });
+
   // ─── Accessibility (axe-core) ───
 
   describe('Accessibility (axe-core)', () => {
     it('has no axe violations in default state', async () => {
-      const el = await fixture<WcHelpText>(
-        '<hx-help-text>Enter your full name</hx-help-text>',
-      );
+      const el = await fixture<WcHelpText>('<hx-help-text>Enter your full name</hx-help-text>');
       await page.screenshot();
       const { violations } = await checkA11y(el);
       expect(violations).toEqual([]);
