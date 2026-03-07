@@ -5,14 +5,11 @@ export const helixAvatarStyles = css`
     display: inline-block;
   }
 
-  :host([hidden]) {
-    display: none !important;
-  }
-
   .avatar {
     display: flex;
     align-items: center;
     justify-content: center;
+    overflow: hidden;
     position: relative;
     width: var(--hx-avatar-size);
     height: var(--hx-avatar-size);
@@ -66,7 +63,6 @@ export const helixAvatarStyles = css`
     height: 100%;
     object-fit: cover;
     display: block;
-    border-radius: inherit;
   }
 
   /* ─── Initials ─── */
