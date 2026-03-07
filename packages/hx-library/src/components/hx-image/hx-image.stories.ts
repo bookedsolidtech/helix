@@ -23,21 +23,12 @@ const meta = {
     },
     alt: {
       control: 'text',
-      description: 'Accessible description. Required for informative images.',
+      description:
+        'Accessible description. Set to empty string for decorative images (applies role="presentation").',
       table: {
         category: 'Accessibility',
         defaultValue: { summary: "''" },
         type: { summary: 'string' },
-      },
-    },
-    decorative: {
-      control: 'boolean',
-      description:
-        'Marks image as decorative (role="presentation", alt=""). Use for background/ornamental images.',
-      table: {
-        category: 'Accessibility',
-        defaultValue: { summary: 'false' },
-        type: { summary: 'boolean' },
       },
     },
     width: {
@@ -86,10 +77,10 @@ const meta = {
     rounded: {
       control: 'text',
       description:
-        'Border radius. Set to "" (boolean attribute) for theme token; a string for custom CSS value.',
+        'Border radius. Boolean true uses the theme radius token; a string is used as a CSS value.',
       table: {
         category: 'Visual',
-        type: { summary: 'string' },
+        type: { summary: 'boolean | string' },
       },
     },
     fallbackSrc: {
@@ -98,22 +89,6 @@ const meta = {
       description: 'Fallback image URL shown when the primary src fails to load.',
       table: {
         category: 'Behavior',
-        type: { summary: 'string' },
-      },
-    },
-    srcset: {
-      control: 'text',
-      description: 'Responsive image source set. Passed to the img srcset attribute.',
-      table: {
-        category: 'Responsive',
-        type: { summary: 'string' },
-      },
-    },
-    sizes: {
-      control: 'text',
-      description: 'Responsive image sizes descriptor. Passed to the img sizes attribute.',
-      table: {
-        category: 'Responsive',
         type: { summary: 'string' },
       },
     },
@@ -128,13 +103,10 @@ const meta = {
       src=${args.src}
       alt=${args.alt}
       loading=${args.loading}
-      ?decorative=${args.decorative}
       fit=${args.fit ?? ''}
       ratio=${args.ratio ?? ''}
       rounded=${args.rounded ?? ''}
       fallback-src=${args.fallbackSrc ?? ''}
-      srcset=${args.srcset ?? ''}
-      sizes=${args.sizes ?? ''}
       width=${args.width ?? ''}
       height=${args.height ?? ''}
       style="width: 400px;"
@@ -157,7 +129,7 @@ export const Default: Story = {
   play: async ({ canvasElement }) => {
     const img = canvasElement.querySelector('hx-image');
     await expect(img).toBeTruthy();
-    await expect(img?.src).toBe('https://picsum.photos/seed/helix/800/600');
+    await expect(img?.getAttribute('alt')).toBe('A sample image');
   },
 };
 
@@ -166,23 +138,26 @@ export const Default: Story = {
 // ════════════════════════════════════════════════════════════════════════════
 
 /**
- * Decorative image using the `decorative` prop.
- * The inner img receives role="presentation" and aria-hidden="true"
- * to suppress screen reader announcements.
+ * Decorative image with an empty alt string.
+ * The inner img receives role="presentation" to suppress screen reader announcements.
  */
 export const Decorative: Story = {
   args: {
     src: 'https://picsum.photos/seed/decorative/800/400',
     alt: '',
-    decorative: true,
   },
-  render: (args) => html` <hx-image src=${args.src} decorative style="width: 400px;"></hx-image> `,
+  render: (args) => html`
+    <hx-image
+      src=${args.src}
+      alt=${args.alt}
+      style="width: 400px;"
+    ></hx-image>
+  `,
   play: async ({ canvasElement }) => {
     const img = canvasElement.querySelector('hx-image');
     await expect(img).toBeTruthy();
     const innerImg = img?.shadowRoot?.querySelector('img');
     await expect(innerImg?.getAttribute('role')).toBe('presentation');
-    await expect(innerImg?.getAttribute('alt')).toBe('');
   },
 };
 
@@ -336,93 +311,5 @@ export const Fallback: Story = {
         <span style="font-size: 0.75rem; color: #6b7280;">fallback slot</span>
       </div>
     </div>
-  `,
-};
-
-// ════════════════════════════════════════════════════════════════════════════
-// 7. LAZY LOADING
-// ════════════════════════════════════════════════════════════════════════════
-
-/**
- * Demonstrates lazy vs eager loading. The lazy image defers loading until
- * it enters the viewport. The eager image loads immediately.
- */
-export const LazyLoading: Story = {
-  render: () => html`
-    <div style="display: flex; gap: 1.5rem; flex-wrap: wrap; align-items: flex-start;">
-      <div style="display: flex; flex-direction: column; gap: 0.5rem; width: 240px;">
-        <hx-image
-          src="https://picsum.photos/seed/lazy/480/360"
-          alt="Lazy loaded image"
-          loading="lazy"
-          ratio="4/3"
-          style="width: 240px;"
-        ></hx-image>
-        <span style="font-size: 0.75rem; color: #6b7280;">loading="lazy" (default)</span>
-      </div>
-      <div style="display: flex; flex-direction: column; gap: 0.5rem; width: 240px;">
-        <hx-image
-          src="https://picsum.photos/seed/eager/480/360"
-          alt="Eagerly loaded image"
-          loading="eager"
-          ratio="4/3"
-          style="width: 240px;"
-        ></hx-image>
-        <span style="font-size: 0.75rem; color: #6b7280;">loading="eager"</span>
-      </div>
-    </div>
-  `,
-  play: async ({ canvasElement }) => {
-    const images = canvasElement.querySelectorAll('hx-image');
-    const lazyImg = images[0]?.shadowRoot?.querySelector('img');
-    const eagerImg = images[1]?.shadowRoot?.querySelector('img');
-    await expect(lazyImg?.getAttribute('loading')).toBe('lazy');
-    await expect(eagerImg?.getAttribute('loading')).toBe('eager');
-  },
-};
-
-// ════════════════════════════════════════════════════════════════════════════
-// 8. RESPONSIVE (srcset/sizes)
-// ════════════════════════════════════════════════════════════════════════════
-
-/**
- * Responsive image with srcset and sizes for Drupal-compatible responsive image output.
- */
-export const Responsive: Story = {
-  render: () => html`
-    <hx-image
-      src="https://picsum.photos/seed/responsive/800/600"
-      srcset="https://picsum.photos/seed/responsive/400/300 400w, https://picsum.photos/seed/responsive/800/600 800w, https://picsum.photos/seed/responsive/1200/900 1200w"
-      sizes="(max-width: 600px) 100vw, (max-width: 1200px) 50vw, 800px"
-      alt="Responsive image with srcset"
-      ratio="4/3"
-      style="max-width: 100%;"
-    ></hx-image>
-  `,
-  play: async ({ canvasElement }) => {
-    const img = canvasElement.querySelector('hx-image');
-    const innerImg = img?.shadowRoot?.querySelector('img');
-    await expect(innerImg?.hasAttribute('srcset')).toBe(true);
-    await expect(innerImg?.hasAttribute('sizes')).toBe(true);
-  },
-};
-
-// ════════════════════════════════════════════════════════════════════════════
-// 9. CAPTION
-// ════════════════════════════════════════════════════════════════════════════
-
-/**
- * Image with a caption slot. Wraps the image in a `<figure>` with `<figcaption>`.
- */
-export const WithCaption: Story = {
-  render: () => html`
-    <hx-image
-      src="https://picsum.photos/seed/caption/800/500"
-      alt="Patient care facility"
-      ratio="16/9"
-      style="max-width: 500px;"
-    >
-      <span slot="caption">Figure 1: Main reception area of the healthcare facility.</span>
-    </hx-image>
   `,
 };
