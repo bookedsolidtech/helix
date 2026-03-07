@@ -36,6 +36,7 @@ import { helixSearchStyles } from './hx-search.styles.js';
  * @cssprop [--hx-search-focus-ring-color=var(--hx-focus-ring-color)] - Focus ring color.
  * @cssprop [--hx-search-icon-color=var(--hx-color-neutral-500)] - Search icon color.
  * @cssprop [--hx-search-clear-color=var(--hx-color-neutral-400)] - Clear button icon color.
+ * @cssprop [--hx-opacity-disabled=0.5] - Opacity applied when the component is disabled.
  */
 @customElement('hx-search')
 export class HelixSearch extends LitElement {
@@ -106,7 +107,7 @@ export class HelixSearch extends LitElement {
   // ─── Internal References ───
 
   @query('.field__input')
-  private _input!: HTMLInputElement;
+  private _input: HTMLInputElement | null = null;
 
   // ─── Debounce Timer ───
 
@@ -167,8 +168,8 @@ export class HelixSearch extends LitElement {
   }
 
   /** Called when the form restores state (e.g., back/forward navigation). */
-  formStateRestoreCallback(state: string): void {
-    this.value = state;
+  formStateRestoreCallback(state: File | string | FormData | null): void {
+    this.value = typeof state === 'string' ? state : '';
   }
 
   // ─── Event Handling ───
@@ -196,6 +197,8 @@ export class HelixSearch extends LitElement {
         this._debounceTimer = null;
       }
       this._dispatchSearch();
+    } else if (e.key === 'Escape' && this.value) {
+      this._handleClear();
     }
   }
 
@@ -317,6 +320,7 @@ export class HelixSearch extends LitElement {
       <div
         part="field"
         class=${classMap(fieldClasses)}
+        role="search"
         aria-busy=${this.loading ? 'true' : nothing}
       >
         <div class="field__label-wrapper">
@@ -345,7 +349,6 @@ export class HelixSearch extends LitElement {
             ?disabled=${this.disabled}
             name=${ifDefined(this.name || undefined)}
             aria-label=${ifDefined(this.label ? undefined : 'Search')}
-            aria-labelledby=${ifDefined(this.label ? this._inputId : undefined)}
             @input=${this._handleInput}
             @keydown=${this._handleKeydown}
           />
@@ -367,6 +370,10 @@ export class HelixSearch extends LitElement {
 
         <div part="suggestions" class="field__suggestions">
           <slot name="suggestions"></slot>
+        </div>
+
+        <div role="status" aria-live="polite" class="field__status">
+          ${this.loading ? 'Loading search results' : nothing}
         </div>
       </div>
     `;

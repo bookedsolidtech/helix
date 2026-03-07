@@ -35,7 +35,7 @@ export const helixSearchStyles = css`
     gap: var(--hx-space-1, 0.25rem);
     font-size: var(--hx-font-size-sm, 0.875rem);
     font-weight: var(--hx-font-weight-medium, 500);
-    color: var(--hx-input-label-color, var(--hx-color-neutral-700, #343a40));
+    color: var(--hx-input-label-color, var(--hx-color-neutral-700));
     line-height: var(--hx-line-height-normal, 1.5);
   }
 
@@ -45,9 +45,9 @@ export const helixSearchStyles = css`
     display: flex;
     align-items: center;
     border: var(--hx-border-width-thin, 1px) solid
-      var(--hx-search-border-color, var(--hx-color-neutral-300, #ced4da));
+      var(--hx-search-border-color, var(--hx-color-neutral-300));
     border-radius: var(--hx-search-border-radius, var(--hx-border-radius-md, 0.375rem));
-    background-color: var(--hx-search-bg, var(--hx-color-neutral-0, #ffffff));
+    background-color: var(--hx-search-bg, var(--hx-color-neutral-0));
     transition:
       border-color var(--hx-transition-fast, 150ms ease),
       box-shadow var(--hx-transition-fast, 150ms ease);
@@ -55,14 +55,22 @@ export const helixSearchStyles = css`
   }
 
   .field__input-wrapper:focus-within {
-    border-color: var(--hx-search-focus-ring-color, var(--hx-focus-ring-color, #2563eb));
+    border-color: var(--hx-search-focus-ring-color, var(--hx-focus-ring-color));
+    /* Fallback for browsers without color-mix() support */
     box-shadow: 0 0 0 var(--hx-focus-ring-width, 2px)
-      color-mix(
-        in srgb,
-        var(--hx-search-focus-ring-color, var(--hx-focus-ring-color, #2563eb))
-          calc(var(--hx-focus-ring-opacity, 0.25) * 100%),
-        transparent
-      );
+      var(--hx-search-focus-ring-color, var(--hx-focus-ring-color));
+  }
+
+  @supports (color: color-mix(in srgb, red, transparent)) {
+    .field__input-wrapper:focus-within {
+      box-shadow: 0 0 0 var(--hx-focus-ring-width, 2px)
+        color-mix(
+          in srgb,
+          var(--hx-search-focus-ring-color, var(--hx-focus-ring-color))
+            calc(var(--hx-focus-ring-opacity, 0.25) * 100%),
+          transparent
+        );
+    }
   }
 
   /* ─── Search Icon ─── */
@@ -71,7 +79,7 @@ export const helixSearchStyles = css`
     display: flex;
     align-items: center;
     padding: 0 var(--hx-space-3, 0.75rem);
-    color: var(--hx-search-icon-color, var(--hx-color-neutral-500, #6c757d));
+    color: var(--hx-search-icon-color, var(--hx-color-neutral-500));
     flex-shrink: 0;
   }
 
@@ -106,7 +114,7 @@ export const helixSearchStyles = css`
     padding: var(--hx-space-2, 0.5rem) var(--hx-space-3, 0.75rem);
     font-family: inherit;
     font-size: var(--hx-font-size-md, 1rem);
-    color: var(--hx-input-color, var(--hx-color-neutral-800, #212529));
+    color: var(--hx-input-color, var(--hx-color-neutral-800));
     line-height: var(--hx-line-height-normal, 1.5);
     min-height: var(--hx-size-10, 2.5rem);
     width: 100%;
@@ -122,7 +130,7 @@ export const helixSearchStyles = css`
   }
 
   .field__input::placeholder {
-    color: var(--hx-color-neutral-400, #adb5bd);
+    color: var(--hx-color-neutral-400);
   }
 
   .field__input:disabled {
@@ -138,19 +146,19 @@ export const helixSearchStyles = css`
     background: transparent;
     border: none;
     cursor: pointer;
-    color: var(--hx-search-clear-color, var(--hx-color-neutral-400, #adb5bd));
+    color: var(--hx-search-clear-color, var(--hx-color-neutral-400));
     flex-shrink: 0;
     line-height: 1;
     transition: color var(--hx-transition-fast, 150ms ease);
   }
 
   .field__clear-btn:hover {
-    color: var(--hx-color-neutral-600, #6c757d);
+    color: var(--hx-color-neutral-600);
   }
 
   .field__clear-btn:focus-visible {
     outline: var(--hx-focus-ring-width, 2px) solid
-      var(--hx-search-focus-ring-color, var(--hx-focus-ring-color, #2563eb));
+      var(--hx-search-focus-ring-color, var(--hx-focus-ring-color));
     outline-offset: -2px;
     border-radius: var(--hx-border-radius-sm, 0.25rem);
   }
@@ -159,6 +167,20 @@ export const helixSearchStyles = css`
 
   .field__suggestions {
     display: contents;
+  }
+
+  /* ─── Loading Status (visually hidden, announced by screen readers) ─── */
+
+  .field__status {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
   }
 
   /* ─── Size Variants ─── */
@@ -188,12 +210,12 @@ export const helixSearchStyles = css`
   /* ─── Loading State ─── */
 
   .field--loading .field__search-icon {
-    color: var(--hx-search-icon-color, var(--hx-color-neutral-500, #6c757d));
+    color: var(--hx-search-icon-color, var(--hx-color-neutral-500));
   }
 
   /* ─── Disabled State ─── */
 
   .field--disabled .field__input-wrapper {
-    background-color: var(--hx-color-neutral-100, #f8f9fa);
+    background-color: var(--hx-color-neutral-100);
   }
 `;

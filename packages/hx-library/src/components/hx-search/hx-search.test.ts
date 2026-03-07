@@ -188,6 +188,31 @@ describe('hx-search', () => {
     });
   });
 
+  // ─── Keyboard: Escape key (2) ───
+
+  describe('Keyboard: Escape key', () => {
+    it('clears the value when Escape is pressed and value is non-empty', async () => {
+      const el = await fixture<HelixSearch>('<hx-search value="some query"></hx-search>');
+      const input = shadowQuery<HTMLInputElement>(el, 'input')!;
+      input.dispatchEvent(
+        new KeyboardEvent('keydown', { key: 'Escape', bubbles: true, composed: true }),
+      );
+      await el.updateComplete;
+      expect(el.value).toBe('');
+    });
+
+    it('fires hx-clear when Escape is pressed with a non-empty value', async () => {
+      const el = await fixture<HelixSearch>('<hx-search value="some query"></hx-search>');
+      const input = shadowQuery<HTMLInputElement>(el, 'input')!;
+      const eventPromise = oneEvent<CustomEvent>(el, 'hx-clear');
+      input.dispatchEvent(
+        new KeyboardEvent('keydown', { key: 'Escape', bubbles: true, composed: true }),
+      );
+      const event = await eventPromise;
+      expect(event).toBeTruthy();
+    });
+  });
+
   // ─── Event: hx-clear (2) ───
 
   describe('Event: hx-clear', () => {
@@ -244,6 +269,20 @@ describe('hx-search', () => {
     it('formResetCallback clears the value', async () => {
       const el = await fixture<HelixSearch>('<hx-search value="existing query"></hx-search>');
       el.formResetCallback();
+      await el.updateComplete;
+      expect(el.value).toBe('');
+    });
+
+    it('formStateRestoreCallback restores a string value', async () => {
+      const el = await fixture<HelixSearch>('<hx-search></hx-search>');
+      el.formStateRestoreCallback('restored-value');
+      await el.updateComplete;
+      expect(el.value).toBe('restored-value');
+    });
+
+    it('formStateRestoreCallback handles null by resetting to empty string', async () => {
+      const el = await fixture<HelixSearch>('<hx-search value="existing"></hx-search>');
+      el.formStateRestoreCallback(null);
       await el.updateComplete;
       expect(el.value).toBe('');
     });
