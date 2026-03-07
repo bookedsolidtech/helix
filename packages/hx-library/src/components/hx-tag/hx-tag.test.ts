@@ -254,6 +254,12 @@ describe('hx-tag', () => {
       expect(base?.getAttribute('part')).toBe('base');
     });
 
+    it('suffix part is accessible for external styling', async () => {
+      const el = await fixture<WcTag>('<hx-tag>Tag</hx-tag>');
+      const suffix = shadowQuery(el, '[part="suffix"]');
+      expect(suffix?.getAttribute('part')).toBe('suffix');
+    });
+
     it('remove-button part is accessible for external styling when removable', async () => {
       const el = await fixture<WcTag>('<hx-tag removable>Tag</hx-tag>');
       const btn = shadowQuery(el, '[part="remove-button"]');
