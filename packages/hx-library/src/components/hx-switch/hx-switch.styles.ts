@@ -157,4 +157,13 @@ export const helixSwitchStyles = css`
     color: var(--hx-switch-error-color, var(--hx-color-error-500, #dc3545));
     line-height: var(--hx-line-height-normal, 1.5);
   }
+
+  /* --- Reduced Motion --- */
+
+  @media (prefers-reduced-motion: reduce) {
+    .switch__track,
+    .switch__thumb {
+      transition: none;
+    }
+  }
 `;
