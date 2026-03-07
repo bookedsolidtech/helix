@@ -163,16 +163,16 @@ This queries the light DOM (`el.querySelector`) to verify the slotted element ex
 
 ## Summary Table
 
-| ID    | Severity | Area                         | Description                                                             | Status                                                         |
-| ----- | -------- | ---------------------------- | ----------------------------------------------------------------------- | -------------------------------------------------------------- |
-| P0-01 | **P0**   | Accessibility / Architecture | Cross-shadow-DOM `for` association is fundamentally broken              | **FIXED** (docs updated, `aria-labelledby` pattern documented) |
-| P0-02 | **P0**   | Storybook / Documentation    | Stories demonstrate broken association as working                       | **FIXED** (stories use `aria-labelledby` pattern)              |
-| P1-01 | **P1**   | Accessibility (WCAG 1.3.1)   | Required `*` hidden from AT with no visually-hidden text supplement     | **FIXED** (visually-hidden "required" text added)              |
-| P1-02 | **P1**   | Storybook / Tests            | `getByRole('generic')` does not select `<label>` elements correctly     | **FIXED** (play tests use `shadowRoot.querySelector`)          |
-| P1-03 | **P1**   | CSS / Documentation          | `--hx-color-danger` consumed but not documented as `@cssprop`           | **FIXED** (`--hx-field-label-required-color` token added)      |
-| P2-01 | **P2**   | Storybook / Conventions      | Hardcoded hex colors in story demos violate token convention            | Open                                                           |
-| P2-02 | **P2**   | Tests                        | Slot test queries light DOM only; does not verify shadow slot rendering | **FIXED** (shadow slot `assignedNodes` assertion added)        |
-| P2-03 | **P2**   | TypeScript                   | `for` as property name is a reserved keyword (low risk)                 | Open                                                           |
+| ID    | Severity | Area                         | Description                                                             |
+| ----- | -------- | ---------------------------- | ----------------------------------------------------------------------- |
+| P0-01 | **P0**   | Accessibility / Architecture | Cross-shadow-DOM `for` association is fundamentally broken              |
+| P0-02 | **P0**   | Storybook / Documentation    | Stories demonstrate broken association as working                       |
+| P1-01 | **P1**   | Accessibility (WCAG 1.3.1)   | Required `*` hidden from AT with no visually-hidden text supplement     |
+| P1-02 | **P1**   | Storybook / Tests            | `getByRole('generic')` does not select `<label>` elements correctly     |
+| P1-03 | **P1**   | CSS / Documentation          | `--hx-color-danger` consumed but not documented as `@cssprop`           |
+| P2-01 | **P2**   | Storybook / Conventions      | Hardcoded hex colors in story demos violate token convention            |
+| P2-02 | **P2**   | Tests                        | Slot test queries light DOM only; does not verify shadow slot rendering |
+| P2-03 | **P2**   | TypeScript                   | `for` as property name is a reserved keyword (low risk)                 |
 
 ---
 

@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/web-components';
 import { html } from 'lit';
-import { expect } from 'storybook/test';
+import { expect, within } from 'storybook/test';
 import type { HelixFieldLabel } from './hx-field-label.js';
 import './hx-field-label.js';
 
@@ -16,6 +16,13 @@ function getLabelHost(canvasElement: Element): HTMLElement {
   return host as HTMLElement;
 }
 
+function getShadowRoot(host: HTMLElement): HTMLElement {
+  if (!host.shadowRoot) {
+    throw new Error('shadowRoot not available on hx-field-label');
+  }
+  return host.shadowRoot as unknown as HTMLElement;
+}
+
 // ─────────────────────────────────────────────────
 // Meta Configuration
 // ─────────────────────────────────────────────────
@@ -28,7 +35,7 @@ const meta = {
     for: {
       control: 'text',
       description:
-        'ID of the associated form control. When set, renders a native `<label for="...">` element. **Note:** Due to shadow DOM encapsulation, the native `for` association only works for inputs within the same shadow root. For cross-boundary labeling (the common case), use `aria-labelledby` on the input referencing this component\'s `id` instead.',
+        'ID of the associated form control. When set, renders a native `<label for="...">` element for direct label association. When unset, renders a `<span>` for aria-labelledby use.',
       table: {
         category: 'Association',
         defaultValue: { summary: "''" },
@@ -82,24 +89,24 @@ export const Default: Story = {
     const host = getLabelHost(canvasElement);
     await expect(host).toBeTruthy();
 
-    const base = host.shadowRoot!.querySelector('[part="base"]');
-    await expect(base?.tagName.toLowerCase()).toBe('span');
+    const shadow = within(getShadowRoot(host));
+    const base = shadow.getByRole('generic', { hidden: true });
+    await expect(base.tagName.toLowerCase()).toBe('span');
   },
 };
 
 // ─────────────────────────────────────────────────
-// 2. CROSS-BOUNDARY LABEL — aria-labelledby pattern
+// 2. WITH FOR — native label association
 // ─────────────────────────────────────────────────
 
-export const WithAriaLabelledby: Story = {
-  name: 'Cross-boundary Label (aria-labelledby)',
+export const WithFor: Story = {
+  name: 'With For Attribute (label)',
   render: () => html`
     <div>
-      <hx-field-label id="email-label">Patient Email</hx-field-label>
+      <hx-field-label for="patient-email">Patient Email</hx-field-label>
       <input
         id="patient-email"
         type="email"
-        aria-labelledby="email-label"
         placeholder="clinician@hospital.org"
         style="display: block; margin-top: 0.25rem; padding: 0.5rem 0.75rem; border: 1px solid var(--hx-color-neutral-300, #dee2e6); border-radius: 0.375rem; font-size: 0.875rem;"
       />
@@ -108,10 +115,11 @@ export const WithAriaLabelledby: Story = {
   play: async ({ canvasElement }) => {
     const host = getLabelHost(canvasElement);
     await expect(host).toBeTruthy();
-    await expect(host.id).toBe('email-label');
 
-    const input = canvasElement.querySelector('input');
-    await expect(input?.getAttribute('aria-labelledby')).toBe('email-label');
+    const shadow = within(getShadowRoot(host));
+    const label = shadow.getByRole('generic', { hidden: true });
+    await expect(label.tagName.toLowerCase()).toBe('label');
+    await expect(label.getAttribute('for')).toBe('patient-email');
   },
 };
 
@@ -124,16 +132,17 @@ export const Required: Story = {
   args: {
     required: true,
   },
-  render: () => html` <hx-field-label required for="mrn">Medical Record Number</hx-field-label> `,
+  render: () => html`
+    <hx-field-label required for="mrn">Medical Record Number</hx-field-label>
+  `,
   play: async ({ canvasElement }) => {
     const host = getLabelHost(canvasElement);
     await expect(host.hasAttribute('required')).toBe(true);
 
-    const indicator = host.shadowRoot!.querySelector('[part="required-indicator"]');
+    const shadow = within(getShadowRoot(host));
+    const indicator = shadow.getByText('*');
     await expect(indicator).toBeTruthy();
-
-    const hiddenSpan = indicator?.querySelector('[aria-hidden="true"]');
-    await expect(hiddenSpan).toBeTruthy();
+    await expect(indicator.getAttribute('aria-hidden')).toBe('true');
   },
 };
 
@@ -146,14 +155,16 @@ export const Optional: Story = {
   args: {
     optional: true,
   },
-  render: () => html` <hx-field-label optional for="notes">Additional Notes</hx-field-label> `,
+  render: () => html`
+    <hx-field-label optional for="notes">Additional Notes</hx-field-label>
+  `,
   play: async ({ canvasElement }) => {
     const host = getLabelHost(canvasElement);
     await expect(host.hasAttribute('optional')).toBe(true);
 
-    const indicator = host.shadowRoot!.querySelector('[part="optional-indicator"]');
+    const shadow = within(getShadowRoot(host));
+    const indicator = shadow.getByText('(optional)');
     await expect(indicator).toBeTruthy();
-    await expect(indicator?.textContent?.trim()).toBe('(optional)');
   },
 };
 
@@ -217,35 +228,32 @@ export const HealthcareFormLabels: Story = {
   render: () => html`
     <form style="display: flex; flex-direction: column; gap: 1.25rem; max-width: 400px;">
       <div>
-        <hx-field-label required id="patient-name-label">Full Name</hx-field-label>
+        <hx-field-label required for="patient-name">Full Name</hx-field-label>
         <input
           id="patient-name"
           type="text"
           placeholder="First Middle Last"
           required
-          aria-labelledby="patient-name-label"
           style="display: block; width: 100%; margin-top: 0.25rem; padding: 0.5rem 0.75rem; border: 1px solid var(--hx-color-neutral-300, #dee2e6); border-radius: 0.375rem; font-size: 0.875rem;"
         />
       </div>
 
       <div>
-        <hx-field-label required id="dob-label">Date of Birth</hx-field-label>
+        <hx-field-label required for="dob">Date of Birth</hx-field-label>
         <input
           id="dob"
           type="date"
           required
-          aria-labelledby="dob-label"
           style="display: block; width: 100%; margin-top: 0.25rem; padding: 0.5rem 0.75rem; border: 1px solid var(--hx-color-neutral-300, #dee2e6); border-radius: 0.375rem; font-size: 0.875rem;"
         />
       </div>
 
       <div>
-        <hx-field-label optional id="pcp-label">Primary Care Provider</hx-field-label>
+        <hx-field-label optional for="pcp">Primary Care Provider</hx-field-label>
         <input
           id="pcp"
           type="text"
           placeholder="Dr. Eleanor Vance, MD"
-          aria-labelledby="pcp-label"
           style="display: block; width: 100%; margin-top: 0.25rem; padding: 0.5rem 0.75rem; border: 1px solid var(--hx-color-neutral-300, #dee2e6); border-radius: 0.375rem; font-size: 0.875rem;"
         />
       </div>
@@ -285,9 +293,9 @@ export const CSSCustomProperties: Story = {
         <p
           style="margin: 0 0 0.5rem; font-size: 0.75rem; color: var(--hx-color-neutral-500, #6c757d); text-transform: uppercase; letter-spacing: 0.05em;"
         >
-          --hx-field-label-required-color
+          --hx-color-danger (required indicator)
         </p>
-        <hx-field-label required style="--hx-field-label-required-color: #d97706;">
+        <hx-field-label required style="--hx-color-danger: #d97706;">
           Custom amber required indicator
         </hx-field-label>
       </div>
@@ -304,7 +312,8 @@ export const SpanRenderedWithoutFor: Story = {
   render: () => html`<hx-field-label>Diagnosis Code</hx-field-label>`,
   play: async ({ canvasElement }) => {
     const host = getLabelHost(canvasElement);
-    const base = host.shadowRoot!.querySelector('[part="base"]');
+    const shadow = host.shadowRoot!;
+    const base = shadow.querySelector('[part="base"]');
     await expect(base?.tagName.toLowerCase()).toBe('span');
   },
 };
@@ -314,7 +323,8 @@ export const LabelRenderedWithFor: Story = {
   render: () => html`<hx-field-label for="some-input">Patient ID</hx-field-label>`,
   play: async ({ canvasElement }) => {
     const host = getLabelHost(canvasElement);
-    const base = host.shadowRoot!.querySelector('[part="base"]');
+    const shadow = host.shadowRoot!;
+    const base = shadow.querySelector('[part="base"]');
     await expect(base?.tagName.toLowerCase()).toBe('label');
     await expect(base?.getAttribute('for')).toBe('some-input');
   },
@@ -327,11 +337,10 @@ export const RequiredIndicatorPresent: Story = {
     const host = getLabelHost(canvasElement) as HelixFieldLabel;
     await expect(host.required).toBe(true);
 
-    const indicator = host.shadowRoot!.querySelector('[part="required-indicator"]');
+    const shadow = host.shadowRoot!;
+    const indicator = shadow.querySelector('[part="required-indicator"]');
     await expect(indicator).toBeTruthy();
-
-    const hiddenSpan = indicator?.querySelector('[aria-hidden="true"]');
-    await expect(hiddenSpan).toBeTruthy();
+    await expect(indicator?.getAttribute('aria-hidden')).toBe('true');
   },
 };
 
@@ -342,7 +351,8 @@ export const OptionalIndicatorPresent: Story = {
     const host = getLabelHost(canvasElement) as HelixFieldLabel;
     await expect(host.optional).toBe(true);
 
-    const indicator = host.shadowRoot!.querySelector('[part="optional-indicator"]');
+    const shadow = host.shadowRoot!;
+    const indicator = shadow.querySelector('[part="optional-indicator"]');
     await expect(indicator).toBeTruthy();
     await expect(indicator?.textContent?.trim()).toBe('(optional)');
   },
