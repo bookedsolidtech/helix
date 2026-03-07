@@ -20,6 +20,7 @@ import { helixTagStyles } from './hx-tag.styles.js';
  * @csspart base - The root tag element.
  * @csspart prefix - The prefix slot wrapper.
  * @csspart label - The label slot wrapper.
+ * @csspart suffix - The suffix slot wrapper.
  * @csspart remove-button - The remove/dismiss button.
  *
  * @cssprop [--hx-tag-bg=var(--hx-color-neutral-100)] - Tag background color.
@@ -73,6 +74,7 @@ export class HelixTag extends LitElement {
 
   // ─── Event Handling ───
 
+  /** @internal */
   private _handleRemove(): void {
     if (this.disabled) return;
     this.dispatchEvent(
@@ -107,7 +109,7 @@ export class HelixTag extends LitElement {
         <span part="label" class="tag__label">
           <slot></slot>
         </span>
-        <span class="tag__suffix">
+        <span part="suffix" class="tag__suffix">
           <slot name="suffix"></slot>
         </span>
         ${this.removable
