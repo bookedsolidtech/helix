@@ -276,9 +276,9 @@ describe('hx-toggle-button', () => {
     it('toggles on Space key press', async () => {
       const el = await fixture<HelixToggleButton>('<hx-toggle-button>Toggle</hx-toggle-button>');
       const btn = shadowQuery<HTMLButtonElement>(el, 'button')!;
+      btn.focus();
       const eventPromise = oneEvent<CustomEvent<{ pressed: boolean }>>(el, 'hx-toggle');
-      btn.dispatchEvent(new KeyboardEvent('keydown', { key: ' ', bubbles: true }));
-      btn.click();
+      await page.keyboard.press('Space');
       const event = await eventPromise;
       expect(event).toBeTruthy();
       expect(event.detail.pressed).toBe(true);
@@ -287,9 +287,9 @@ describe('hx-toggle-button', () => {
     it('toggles on Enter key press', async () => {
       const el = await fixture<HelixToggleButton>('<hx-toggle-button>Toggle</hx-toggle-button>');
       const btn = shadowQuery<HTMLButtonElement>(el, 'button')!;
+      btn.focus();
       const eventPromise = oneEvent<CustomEvent<{ pressed: boolean }>>(el, 'hx-toggle');
-      btn.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
-      btn.click();
+      await page.keyboard.press('Enter');
       const event = await eventPromise;
       expect(event).toBeTruthy();
       expect(event.detail.pressed).toBe(true);
@@ -374,6 +374,26 @@ describe('hx-toggle-button', () => {
       form.reset();
       await el.updateComplete;
 
+      expect(el.pressed).toBe(false);
+    });
+
+    it('formStateRestoreCallback restores pressed=true from state "pressed"', async () => {
+      const el = await fixture<HelixToggleButton>('<hx-toggle-button>Toggle</hx-toggle-button>');
+      expect(el.pressed).toBe(false);
+      (el as unknown as { formStateRestoreCallback: (s: string) => void }).formStateRestoreCallback(
+        'pressed',
+      );
+      expect(el.pressed).toBe(true);
+    });
+
+    it('formStateRestoreCallback restores pressed=false from non-pressed state', async () => {
+      const el = await fixture<HelixToggleButton>(
+        '<hx-toggle-button pressed>Toggle</hx-toggle-button>',
+      );
+      expect(el.pressed).toBe(true);
+      (el as unknown as { formStateRestoreCallback: (s: string) => void }).formStateRestoreCallback(
+        'off',
+      );
       expect(el.pressed).toBe(false);
     });
   });

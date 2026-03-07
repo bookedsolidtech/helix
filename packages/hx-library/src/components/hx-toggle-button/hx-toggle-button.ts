@@ -1,4 +1,4 @@
-import { LitElement, html } from 'lit';
+import { LitElement, html, nothing, type PropertyValues } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { tokenStyles } from '@helix/tokens/lit';
@@ -96,6 +96,14 @@ export class HelixToggleButton extends LitElement {
   @property({ type: String })
   value: string | undefined = undefined;
 
+  /**
+   * Accessible label forwarded to the inner `<button>` as `aria-label`.
+   * Required for icon-only toggle buttons where no visible text is present.
+   * @attr label
+   */
+  @property({ type: String })
+  label: string | undefined = undefined;
+
   // ─── Form API ───
 
   /** Returns the associated form element, if any. */
@@ -105,7 +113,7 @@ export class HelixToggleButton extends LitElement {
 
   // ─── Lifecycle ───
 
-  override updated(changedProperties: Map<string | number | symbol, unknown>): void {
+  override updated(changedProperties: PropertyValues): void {
     super.updated(changedProperties);
 
     if (changedProperties.has('pressed') || changedProperties.has('value')) {
@@ -127,7 +135,8 @@ export class HelixToggleButton extends LitElement {
 
   private _syncFormValue(): void {
     if (this.pressed && this.value !== undefined) {
-      this._internals.setFormValue(this.value);
+      // Pass explicit state 'pressed' so formStateRestoreCallback can reliably detect it.
+      this._internals.setFormValue(this.value, 'pressed');
     } else {
       this._internals.setFormValue(null);
     }
@@ -191,6 +200,7 @@ export class HelixToggleButton extends LitElement {
         ?disabled=${this.disabled}
         type="button"
         aria-pressed=${this.pressed ? 'true' : 'false'}
+        aria-label=${this.label ?? nothing}
         @click=${this._handleClick}
       >
         ${this._renderInner()}
