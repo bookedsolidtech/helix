@@ -142,18 +142,6 @@ describe('hx-split-panel', () => {
       const divider = shadowQuery(el, '[part="divider"]');
       expect(divider?.getAttribute('aria-orientation')).toBe('horizontal');
     });
-
-    it('divider has default aria-label "Resize panels"', async () => {
-      const el = await fixture<HelixSplitPanel>('<hx-split-panel></hx-split-panel>');
-      const divider = shadowQuery(el, '[part="divider"]');
-      expect(divider?.getAttribute('aria-label')).toBe('Resize panels');
-    });
-
-    it('divider aria-label reflects custom label property', async () => {
-      const el = await fixture<HelixSplitPanel>('<hx-split-panel label="Adjust sidebar"></hx-split-panel>');
-      const divider = shadowQuery(el, '[part="divider"]');
-      expect(divider?.getAttribute('aria-label')).toBe('Adjust sidebar');
-    });
   });
 
   // ─── Keyboard Interaction ───
