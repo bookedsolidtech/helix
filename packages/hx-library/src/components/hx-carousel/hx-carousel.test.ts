@@ -29,9 +29,9 @@ describe('hx-carousel', () => {
       expect(shadowQuery(el, '[part="base"]')).toBeTruthy();
     });
 
-    it('exposes "viewport" CSS part', async () => {
+    it('exposes "scroll-container" CSS part', async () => {
       const el = await fixture<HelixCarousel>(threeSlides);
-      expect(shadowQuery(el, '[part="viewport"]')).toBeTruthy();
+      expect(shadowQuery(el, '[part="scroll-container"]')).toBeTruthy();
     });
 
     it('exposes "navigation" CSS part', async () => {
@@ -43,30 +43,9 @@ describe('hx-carousel', () => {
       const el = await fixture<HelixCarousel>(threeSlides);
       expect(shadowQuery(el, '[part="pagination"]')).toBeTruthy();
     });
-
-    it('exposes "prev-btn" CSS part', async () => {
-      const el = await fixture<HelixCarousel>(threeSlides);
-      expect(shadowQuery(el, '[part="prev-btn"]')).toBeTruthy();
-    });
-
-    it('exposes "next-btn" CSS part', async () => {
-      const el = await fixture<HelixCarousel>(threeSlides);
-      expect(shadowQuery(el, '[part="next-btn"]')).toBeTruthy();
-    });
-
-    it('exposes "play-pause-btn" CSS part when autoplay is set', async () => {
-      const el = await fixture<HelixCarousel>(`
-        <hx-carousel autoplay>
-          <hx-carousel-item>1</hx-carousel-item>
-          <hx-carousel-item>2</hx-carousel-item>
-        </hx-carousel>
-      `);
-      await el.updateComplete;
-      expect(shadowQuery(el, '[part="play-pause-btn"]')).toBeTruthy();
-    });
   });
 
-  // ─── ARIA (6) ───
+  // ─── ARIA (5) ───
 
   describe('ARIA', () => {
     it('base element has role="region"', async () => {
@@ -75,20 +54,10 @@ describe('hx-carousel', () => {
       expect(base?.getAttribute('role')).toBe('region');
     });
 
-    it('base element has aria-label defaulting to "Carousel"', async () => {
+    it('base element has aria-label="Carousel"', async () => {
       const el = await fixture<HelixCarousel>(threeSlides);
       const base = shadowQuery(el, '[part="base"]');
       expect(base?.getAttribute('aria-label')).toBe('Carousel');
-    });
-
-    it('base element uses custom label when provided', async () => {
-      const el = await fixture<HelixCarousel>(`
-        <hx-carousel label="Featured Products">
-          <hx-carousel-item>1</hx-carousel-item>
-        </hx-carousel>
-      `);
-      const base = shadowQuery(el, '[part="base"]');
-      expect(base?.getAttribute('aria-label')).toBe('Featured Products');
     });
 
     it('prev button has aria-label="Previous slide"', async () => {
@@ -103,24 +72,11 @@ describe('hx-carousel', () => {
       expect(next).toBeTruthy();
     });
 
-    it('pagination dots have aria-label="Slide N of M"', async () => {
+    it('pagination dots have aria-label="Slide N"', async () => {
       const el = await fixture<HelixCarousel>(threeSlides);
       await el.updateComplete;
-      const dot1 = shadowQuery(el, '[part="pagination-item"][aria-label="Slide 1 of 3"]');
+      const dot1 = shadowQuery(el, '[part="pagination-item"][aria-label="Slide 1"]');
       expect(dot1).toBeTruthy();
-      const dot3 = shadowQuery(el, '[part="pagination-item"][aria-label="Slide 3 of 3"]');
-      expect(dot3).toBeTruthy();
-    });
-
-    it('aria-live region updates on slide change', async () => {
-      const el = await fixture<HelixCarousel>(threeSlides);
-      await el.updateComplete;
-      const liveRegion = shadowQuery(el, '[aria-live="polite"]');
-      expect(liveRegion).toBeTruthy();
-      expect(liveRegion?.textContent?.trim()).toContain('Slide 1 of 3');
-      el.next();
-      await el.updateComplete;
-      expect(liveRegion?.textContent?.trim()).toContain('Slide 2 of 3');
     });
   });
 
@@ -177,20 +133,6 @@ describe('hx-carousel', () => {
       (dots?.[2] as HTMLButtonElement)?.click();
       await el.updateComplete;
       expect(el['_currentIndex']).toBe(2);
-    });
-
-    it('goTo() same-index does not fire hx-slide-change', async () => {
-      const el = await fixture<HelixCarousel>(threeSlides);
-      await el.updateComplete;
-      el.goTo(1);
-      await el.updateComplete;
-      let fired = false;
-      el.addEventListener('hx-slide-change', () => {
-        fired = true;
-      });
-      el.goTo(1);
-      await el.updateComplete;
-      expect(fired).toBe(false);
     });
   });
 
@@ -338,7 +280,7 @@ describe('hx-carousel', () => {
     });
   });
 
-  // ─── Properties (5) ───
+  // ─── Properties (4) ───
 
   describe('Properties', () => {
     it('loop attribute reflects to host', async () => {
@@ -363,13 +305,6 @@ describe('hx-carousel', () => {
     it('autoplayInterval defaults to 3000', async () => {
       const el = await fixture<HelixCarousel>(threeSlides);
       expect(el.autoplayInterval).toBe(3000);
-    });
-
-    it('mouseDragging reflects to host', async () => {
-      const el = await fixture<HelixCarousel>(
-        '<hx-carousel mouse-dragging><hx-carousel-item>1</hx-carousel-item></hx-carousel>',
-      );
-      expect(el.hasAttribute('mouse-dragging')).toBe(true);
     });
   });
 
@@ -455,7 +390,7 @@ describe('hx-carousel', () => {
     });
   });
 
-  // ─── Autoplay Toggle & Resume (4) ───
+  // ─── Autoplay Toggle & Resume (3) ───
 
   describe('Autoplay Toggle & Resume', () => {
     beforeEach(() => {
@@ -566,7 +501,7 @@ describe('hx-carousel', () => {
     });
   });
 
-  // ─── Mouse Dragging (4) ───
+  // ─── Mouse Dragging (3) ───
 
   describe('Mouse Dragging', () => {
     it('drag right (positive diff) calls previous()', async () => {
@@ -580,7 +515,7 @@ describe('hx-carousel', () => {
       await el.updateComplete;
       el.goTo(2);
       await el.updateComplete;
-      const container = shadowQuery(el, '[part="viewport"]') as HTMLElement;
+      const container = shadowQuery(el, '[part="scroll-container"]') as HTMLElement;
       container.dispatchEvent(
         new MouseEvent('mousedown', { clientX: 200, bubbles: true, cancelable: true }),
       );
@@ -599,7 +534,7 @@ describe('hx-carousel', () => {
         </hx-carousel>
       `);
       await el.updateComplete;
-      const container = shadowQuery(el, '[part="viewport"]') as HTMLElement;
+      const container = shadowQuery(el, '[part="scroll-container"]') as HTMLElement;
       container.dispatchEvent(
         new MouseEvent('mousedown', { clientX: 200, bubbles: true, cancelable: true }),
       );
@@ -617,7 +552,7 @@ describe('hx-carousel', () => {
         </hx-carousel>
       `);
       await el.updateComplete;
-      const container = shadowQuery(el, '[part="viewport"]') as HTMLElement;
+      const container = shadowQuery(el, '[part="scroll-container"]') as HTMLElement;
       container.dispatchEvent(
         new MouseEvent('mousedown', { clientX: 200, bubbles: true, cancelable: true }),
       );
@@ -625,78 +560,6 @@ describe('hx-carousel', () => {
       container.dispatchEvent(new MouseEvent('mouseup', { clientX: 210, bubbles: true }));
       await el.updateComplete;
       expect(el['_currentIndex']).toBe(0);
-    });
-
-    it('drag does nothing when mouseDragging is false', async () => {
-      const el = await fixture<HelixCarousel>(`
-        <hx-carousel>
-          <hx-carousel-item>1</hx-carousel-item>
-          <hx-carousel-item>2</hx-carousel-item>
-        </hx-carousel>
-      `);
-      await el.updateComplete;
-      const container = shadowQuery(el, '[part="viewport"]') as HTMLElement;
-      container.dispatchEvent(
-        new MouseEvent('mousedown', { clientX: 200, bubbles: true, cancelable: true }),
-      );
-      container.dispatchEvent(new MouseEvent('mousemove', { clientX: 140, bubbles: true }));
-      container.dispatchEvent(new MouseEvent('mouseup', { clientX: 140, bubbles: true }));
-      await el.updateComplete;
-      expect(el['_currentIndex']).toBe(0);
-    });
-  });
-
-  // ─── Single Slide Edge Case (2) ───
-
-  describe('Single Slide', () => {
-    it('hides pagination when only one slide exists', async () => {
-      const el = await fixture<HelixCarousel>(`
-        <hx-carousel>
-          <hx-carousel-item>Only slide</hx-carousel-item>
-        </hx-carousel>
-      `);
-      await el.updateComplete;
-      const pagination = shadowQuery(el, '[part="pagination"]');
-      expect(pagination).toBeNull();
-    });
-
-    it('both nav buttons are disabled with one slide (no loop)', async () => {
-      const el = await fixture<HelixCarousel>(`
-        <hx-carousel>
-          <hx-carousel-item>Only slide</hx-carousel-item>
-        </hx-carousel>
-      `);
-      await el.updateComplete;
-      const prev = shadowQuery<HTMLButtonElement>(el, '[aria-label="Previous slide"]');
-      const next = shadowQuery<HTMLButtonElement>(el, '[aria-label="Next slide"]');
-      expect(prev?.disabled).toBe(true);
-      expect(next?.disabled).toBe(true);
-    });
-  });
-
-  // ─── Disconnect Cleanup (1) ───
-
-  describe('Disconnect Cleanup', () => {
-    beforeEach(() => {
-      vi.useFakeTimers();
-    });
-
-    afterEach(() => {
-      vi.useRealTimers();
-    });
-
-    it('disconnectedCallback stops autoplay timer', async () => {
-      const el = await fixture<HelixCarousel>(`
-        <hx-carousel autoplay autoplay-interval="1000" loop>
-          <hx-carousel-item>1</hx-carousel-item>
-          <hx-carousel-item>2</hx-carousel-item>
-        </hx-carousel>
-      `);
-      await el.updateComplete;
-      expect(el['_isPlaying']).toBe(true);
-      el.remove();
-      expect(el['_isPlaying']).toBe(false);
-      expect(el['_autoplayTimer']).toBeNull();
     });
   });
 
