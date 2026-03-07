@@ -751,8 +751,8 @@ export const KeyboardToggle: Story = {
     await waitForUpdate(canvasElement);
     await expect(track.getAttribute('aria-checked')).toBe('true');
 
-    // Press Enter to toggle off
-    await userEvent.keyboard('{Enter}');
+    // Press Space again to toggle off
+    await userEvent.keyboard(' ');
     await waitForUpdate(canvasElement);
     await expect(track.getAttribute('aria-checked')).toBe('false');
   },
