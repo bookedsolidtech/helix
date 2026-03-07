@@ -41,12 +41,14 @@ const meta = {
     },
     type: {
       control: { type: 'select' },
-      options: ['text', 'email', 'password', 'tel', 'url', 'search', 'number'],
+      options: ['text', 'email', 'password', 'tel', 'url', 'search', 'number', 'date'],
       description: 'The type of the native input element.',
       table: {
         category: 'Behavior',
         defaultValue: { summary: "'text'" },
-        type: { summary: "'text' | 'email' | 'password' | 'tel' | 'url' | 'search' | 'number'" },
+        type: {
+          summary: "'text' | 'email' | 'password' | 'tel' | 'url' | 'search' | 'number' | 'date'",
+        },
       },
     },
     required: {
@@ -101,6 +103,62 @@ const meta = {
         category: 'Accessibility',
         defaultValue: { summary: 'null' },
         type: { summary: 'string | null' },
+      },
+    },
+    readonly: {
+      control: 'boolean',
+      description: 'Whether the input is read-only.',
+      table: {
+        category: 'State',
+        defaultValue: { summary: 'false' },
+        type: { summary: 'boolean' },
+      },
+    },
+    hxSize: {
+      control: { type: 'select' },
+      options: ['sm', 'md', 'lg'],
+      description: 'Visual size of the input field.',
+      table: {
+        category: 'Appearance',
+        defaultValue: { summary: "'md'" },
+        type: { summary: "'sm' | 'md' | 'lg'" },
+      },
+    },
+    minlength: {
+      control: 'number',
+      description: 'Minimum number of characters allowed.',
+      table: {
+        category: 'Validation',
+        defaultValue: { summary: 'undefined' },
+        type: { summary: 'number | undefined' },
+      },
+    },
+    maxlength: {
+      control: 'number',
+      description: 'Maximum number of characters allowed.',
+      table: {
+        category: 'Validation',
+        defaultValue: { summary: 'undefined' },
+        type: { summary: 'number | undefined' },
+      },
+    },
+    pattern: {
+      control: 'text',
+      description: 'A regular expression pattern the value must match for form validation.',
+      table: {
+        category: 'Validation',
+        defaultValue: { summary: "''" },
+        type: { summary: 'string' },
+      },
+    },
+    autocomplete: {
+      control: 'text',
+      description:
+        'Hint for the browser autocomplete feature. Accepts standard HTML autocomplete values.',
+      table: {
+        category: 'Behavior',
+        defaultValue: { summary: "''" },
+        type: { summary: 'string' },
       },
     },
   },
@@ -446,17 +504,9 @@ export const AllTypes: Story = {
 export const AllSizes: Story = {
   render: () => html`
     <div style="display: flex; flex-direction: column; gap: 1.5rem; max-width: 480px;">
-      <hx-text-input
-        label="Small"
-        placeholder="Compact input"
-        style="font-size: 0.875rem;"
-      ></hx-text-input>
-      <hx-text-input label="Medium (Default)" placeholder="Standard input"></hx-text-input>
-      <hx-text-input
-        label="Large"
-        placeholder="Spacious input"
-        style="font-size: 1.125rem;"
-      ></hx-text-input>
+      <hx-text-input label="Small" placeholder="Compact input" hx-size="sm"></hx-text-input>
+      <hx-text-input label="Medium (Default)" placeholder="Standard input" hx-size="md"></hx-text-input>
+      <hx-text-input label="Large" placeholder="Spacious input" hx-size="lg"></hx-text-input>
     </div>
   `,
 };
