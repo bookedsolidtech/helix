@@ -4,8 +4,6 @@ import { tokenStyles } from '@helix/tokens/lit';
 import { computePosition, flip, shift, offset, arrow } from '@floating-ui/dom';
 import { helixPopoverStyles } from './hx-popover.styles.js';
 
-let _popoverCounter = 0;
-
 type PopoverPlacement =
   | 'top'
   | 'top-start'
@@ -106,24 +104,30 @@ export class HelixPopover extends LitElement {
   @property({ type: Boolean, reflect: true })
   arrow = false;
 
+  /**
+   * Accessible label for the popover body (sets aria-label on the dialog).
+   * @attr label
+   */
+  @property({ type: String, reflect: true })
+  label = 'Popover';
+
   @state() private _visible = false;
 
-  private readonly _popoverId = `hx-popover-${++_popoverCounter}`;
+  private _previousFocus: HTMLElement | null = null;
+
+  // P2-06: use crypto.randomUUID() instead of module-level mutable counter
+  private readonly _popoverId = `hx-popover-${crypto.randomUUID()}`;
 
   // ─── Lifecycle ───
 
-  override connectedCallback(): void {
-    super.connectedCallback();
-    this.addEventListener('keydown', this._handleKeydown);
-  }
-
   override disconnectedCallback(): void {
     super.disconnectedCallback();
-    this.removeEventListener('keydown', this._handleKeydown);
+    document.removeEventListener('click', this._handleDocumentClick);
+    document.removeEventListener('keydown', this._handleDocumentKeydown);
   }
 
   override firstUpdated(): void {
-    this._setupAnchorAria();
+    this._setAnchorAriaExpanded(false);
     // Sync initial open state
     if (this.open) {
       void this._show();
@@ -142,27 +146,17 @@ export class HelixPopover extends LitElement {
 
   // ─── ARIA setup ───
 
-  private _setupAnchorAria(): void {
+  // P2-03: collapsed _setupAnchorAria + _updateAnchorAriaExpanded into one method
+  private _setAnchorAriaExpanded(value: boolean): void {
     const anchorSlot = this.shadowRoot?.querySelector(
       'slot[name="anchor"]',
     ) as HTMLSlotElement | null;
     if (!anchorSlot) return;
     const anchorEl = anchorSlot.assignedElements()[0] as HTMLElement | undefined;
     if (anchorEl) {
-      anchorEl.setAttribute('aria-expanded', String(this._visible));
+      anchorEl.setAttribute('aria-expanded', String(value));
       // aria-controls is omitted: the body lives in Shadow DOM and axe-core
       // cannot resolve cross-root IDREF values, which causes a critical violation.
-    }
-  }
-
-  private _updateAnchorAriaExpanded(): void {
-    const anchorSlot = this.shadowRoot?.querySelector(
-      'slot[name="anchor"]',
-    ) as HTMLSlotElement | null;
-    if (!anchorSlot) return;
-    const anchorEl = anchorSlot.assignedElements()[0] as HTMLElement | undefined;
-    if (anchorEl) {
-      anchorEl.setAttribute('aria-expanded', String(this._visible));
     }
   }
 
@@ -170,21 +164,37 @@ export class HelixPopover extends LitElement {
 
   private async _show(): Promise<void> {
     if (this._visible) return;
+    // P0-02: save focus target before moving focus into dialog
+    this._previousFocus = document.activeElement as HTMLElement | null;
     this.dispatchEvent(new CustomEvent('hx-show', { bubbles: true, composed: true }));
     this._visible = true;
     this.open = true;
-    this._updateAnchorAriaExpanded();
+    this._setAnchorAriaExpanded(true);
     await this.updateComplete;
     await this._updatePosition();
+    // P0-02: move focus into dialog body
+    const bodyEl = this.shadowRoot?.querySelector('[part="body"]') as HTMLElement | null;
+    if (bodyEl) bodyEl.focus();
+    // P1-03: listen for Escape at document level while open
+    document.addEventListener('keydown', this._handleDocumentKeydown);
+    // P0-01: listen for outside clicks; deferred to avoid catching the opening click
+    setTimeout(() => {
+      document.addEventListener('click', this._handleDocumentClick);
+    }, 0);
     this.dispatchEvent(new CustomEvent('hx-after-show', { bubbles: true, composed: true }));
   }
 
   private async _hide(): Promise<void> {
     if (!this._visible) return;
+    document.removeEventListener('click', this._handleDocumentClick);
+    document.removeEventListener('keydown', this._handleDocumentKeydown);
     this.dispatchEvent(new CustomEvent('hx-hide', { bubbles: true, composed: true }));
     this._visible = false;
     this.open = false;
-    this._updateAnchorAriaExpanded();
+    this._setAnchorAriaExpanded(false);
+    // P0-02: return focus to the element that was focused before the popover opened
+    this._previousFocus?.focus();
+    this._previousFocus = null;
     await this.updateComplete;
     this.dispatchEvent(new CustomEvent('hx-after-hide', { bubbles: true, composed: true }));
   }
@@ -240,13 +250,41 @@ export class HelixPopover extends LitElement {
         bottom: '',
         [staticSide]: '-5px',
       });
+
+      // P2-02: hide the two border sides facing the popover body so only
+      // the outward-facing corner is visible (avoids the inner border line).
+      // Reset all four sides first, then make the two inner-facing ones transparent.
+      const borderSides = ['border-top', 'border-right', 'border-bottom', 'border-left'] as const;
+      for (const side of borderSides) {
+        arrowEl.style.setProperty(side, '');
+      }
+      // Maps base placement → the two sides that face inward toward the popover body
+      const innerBorderMap: Record<string, readonly [string, string]> = {
+        bottom: ['border-bottom', 'border-right'],
+        top: ['border-top', 'border-left'],
+        right: ['border-top', 'border-right'],
+        left: ['border-bottom', 'border-left'],
+      };
+      const innerSides = innerBorderMap[basePlacement] ?? ['border-bottom', 'border-right'];
+      arrowEl.style.setProperty(innerSides[0], '1px solid transparent');
+      arrowEl.style.setProperty(innerSides[1], '1px solid transparent');
     }
   }
 
   // ─── Event Handlers ───
 
-  private _handleKeydown = (e: Event): void => {
+  // P1-03 / P0-01: document-level handlers active only while popover is open
+  private _handleDocumentKeydown = (e: Event): void => {
     if ((e as KeyboardEvent).key === 'Escape' && this._visible) {
+      void this._hide();
+    }
+  };
+
+  // P0-01: close when click target is outside this component
+  private _handleDocumentClick = (e: Event): void => {
+    // Shadow DOM retargets events from within to the host at document level,
+    // so a click on the trigger wrapper appears as e.target === this.
+    if (e.target !== this && !this.contains(e.target as Node)) {
       void this._hide();
     }
   };
@@ -281,7 +319,7 @@ export class HelixPopover extends LitElement {
   };
 
   private _handleAnchorSlotChange(): void {
-    this._setupAnchorAria();
+    this._setAnchorAriaExpanded(this._visible);
   }
 
   // ─── Render ───
@@ -303,8 +341,10 @@ export class HelixPopover extends LitElement {
         id=${this._popoverId}
         role="dialog"
         aria-modal="false"
-        aria-label="Popover"
+        aria-label=${this.label}
         aria-hidden=${String(!this._visible)}
+        tabindex="-1"
+        ?inert=${!this._visible}
         class=${this._visible ? 'visible' : ''}
       >
         <slot></slot>

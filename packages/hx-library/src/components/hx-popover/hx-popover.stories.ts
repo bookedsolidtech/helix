@@ -157,7 +157,22 @@ export const Placements: Story = {
     <div
       style="padding: 8rem; display: flex; gap: 1rem; justify-content: center; align-items: center; flex-wrap: wrap;"
     >
-      ${(['top', 'bottom', 'left', 'right'] as const).map(
+      ${(
+        [
+          'top',
+          'top-start',
+          'top-end',
+          'right',
+          'right-start',
+          'right-end',
+          'bottom',
+          'bottom-start',
+          'bottom-end',
+          'left',
+          'left-start',
+          'left-end',
+        ] as const
+      ).map(
         (p) => html`
           <hx-popover placement=${p} arrow>
             <button slot="anchor">${p}</button>
