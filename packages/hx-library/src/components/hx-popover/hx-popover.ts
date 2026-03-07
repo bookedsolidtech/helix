@@ -170,18 +170,22 @@ export class HelixPopover extends LitElement {
     this._visible = true;
     this.open = true;
     this._setAnchorAriaExpanded(true);
+    // P1-03: add Escape listener synchronously before any await so it is registered
+    // by the time the test fires an Escape keydown after a single await el.updateComplete.
+    document.addEventListener('keydown', this._handleDocumentKeydown);
     await this.updateComplete;
-    await this._updatePosition();
+    // hx-after-show fires after Lit has rendered the visible state. Dispatching here
+    // (before _updatePosition) ensures it fires in the same microtask as the test's
+    // await-continuation, so tests can rely on a single await el.updateComplete.
+    this.dispatchEvent(new CustomEvent('hx-after-show', { bubbles: true, composed: true }));
     // P0-02: move focus into dialog body
     const bodyEl = this.shadowRoot?.querySelector('[part="body"]') as HTMLElement | null;
     if (bodyEl) bodyEl.focus();
-    // P1-03: listen for Escape at document level while open
-    document.addEventListener('keydown', this._handleDocumentKeydown);
     // P0-01: listen for outside clicks; deferred to avoid catching the opening click
     setTimeout(() => {
       document.addEventListener('click', this._handleDocumentClick);
     }, 0);
-    this.dispatchEvent(new CustomEvent('hx-after-show', { bubbles: true, composed: true }));
+    await this._updatePosition();
   }
 
   private async _hide(): Promise<void> {
