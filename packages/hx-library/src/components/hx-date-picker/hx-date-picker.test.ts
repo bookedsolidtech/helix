@@ -323,53 +323,36 @@ describe('hx-date-picker', () => {
 
   describe('Calendar: Min/Max', () => {
     it('days before min have aria-disabled="true"', async () => {
-      // Set min to the 15th of the current month being rendered.
-      // We open without a set value, so view defaults to current month.
-      const today = new Date();
-      const year = today.getFullYear();
-      const month = String(today.getMonth() + 1).padStart(2, '0');
-      const minDate = `${year}-${month}-15`;
-
+      // Anchor the calendar view with a static value and static min date.
       const el = await fixture<HelixDatePicker>(
-        `<hx-date-picker min="${minDate}"></hx-date-picker>`,
+        '<hx-date-picker value="2026-06-15" min="2026-06-15"></hx-date-picker>',
       );
       await openCalendar(el);
 
       const days = el.shadowRoot!.querySelectorAll<HTMLButtonElement>('[part="day"]');
-      // Day 1 should be before the min date and therefore disabled.
+      // Day 1 of June 2026 is before min=2026-06-15 — must be disabled.
       const dayOne = Array.from(days).find((d) => d.dataset['day'] === '1');
-      if (dayOne) {
-        expect(dayOne.getAttribute('aria-disabled')).toBe('true');
-      }
+      expect(dayOne).toBeTruthy();
+      expect(dayOne!.getAttribute('aria-disabled')).toBe('true');
     });
 
     it('days after max have aria-disabled="true"', async () => {
-      const today = new Date();
-      const year = today.getFullYear();
-      const month = String(today.getMonth() + 1).padStart(2, '0');
-      const maxDate = `${year}-${month}-05`;
-
+      // Anchor the calendar view with a static value and static max date.
       const el = await fixture<HelixDatePicker>(
-        `<hx-date-picker max="${maxDate}"></hx-date-picker>`,
+        '<hx-date-picker value="2026-06-01" max="2026-06-05"></hx-date-picker>',
       );
       await openCalendar(el);
 
       const days = el.shadowRoot!.querySelectorAll<HTMLButtonElement>('[part="day"]');
-      // Find any day button with data-day > 5 — it must be aria-disabled.
-      const dayAfterMax = Array.from(days).find((d) => Number(d.dataset['day']) > 5);
-      if (dayAfterMax) {
-        expect(dayAfterMax.getAttribute('aria-disabled')).toBe('true');
-      }
+      // Day 10 of June 2026 is after max=2026-06-05 — must be disabled.
+      const dayAfterMax = Array.from(days).find((d) => Number(d.dataset['day']) === 10);
+      expect(dayAfterMax).toBeTruthy();
+      expect(dayAfterMax!.getAttribute('aria-disabled')).toBe('true');
     });
 
     it('clicking a disabled day does NOT fire hx-change', async () => {
-      const today = new Date();
-      const year = today.getFullYear();
-      const month = String(today.getMonth() + 1).padStart(2, '0');
-      const minDate = `${year}-${month}-20`;
-
       const el = await fixture<HelixDatePicker>(
-        `<hx-date-picker min="${minDate}"></hx-date-picker>`,
+        '<hx-date-picker value="2026-06-15" min="2026-06-15"></hx-date-picker>',
       );
       await openCalendar(el);
 
@@ -378,13 +361,12 @@ describe('hx-date-picker', () => {
         eventFired = true;
       });
 
-      // Day 1 is before min-20, so it is disabled.
+      // Day 1 of June 2026 is before min=2026-06-15, so it is disabled.
       const days = el.shadowRoot!.querySelectorAll<HTMLButtonElement>('[part="day"]');
       const dayOne = Array.from(days).find((d) => d.dataset['day'] === '1');
-      if (dayOne) {
-        dayOne.click();
-        await el.updateComplete;
-      }
+      expect(dayOne).toBeTruthy();
+      dayOne!.click();
+      await el.updateComplete;
 
       expect(eventFired).toBe(false);
     });
@@ -614,12 +596,14 @@ describe('hx-date-picker', () => {
   // ─── Property: name (1) ───────────────────────────────────────────────
 
   describe('Property: name', () => {
-    it('sets name attribute on the native input', async () => {
+    it('does not set name attribute on shadow input (form value handled via ElementInternals)', async () => {
       const el = await fixture<HelixDatePicker>(
         '<hx-date-picker name="discharge-date"></hx-date-picker>',
       );
       const input = shadowQuery<HTMLInputElement>(el, 'input')!;
-      expect(input.getAttribute('name')).toBe('discharge-date');
+      // Shadow DOM inputs with `name` may confuse Drupal form processors.
+      // Form values are submitted via ElementInternals.setFormValue() instead.
+      expect(input.getAttribute('name')).toBeNull();
     });
   });
 
@@ -675,6 +659,23 @@ describe('hx-date-picker', () => {
       await el.updateComplete;
       const calendar = shadowQuery(el, '[part="calendar"]');
       expect(calendar).toBeNull();
+    });
+  });
+
+  // ─── Focus Management (1) ─────────────────────────────────────────────
+
+  describe('Focus Management', () => {
+    it('focus returns to trigger button after calendar closes via Escape', async () => {
+      const el = await fixture<HelixDatePicker>('<hx-date-picker label="Date"></hx-date-picker>');
+      await openCalendar(el);
+
+      document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+      await el.updateComplete;
+      // Wait for updateComplete.then() focus scheduling
+      await new Promise((r) => setTimeout(r, 0));
+
+      const trigger = getTriggerButton(el);
+      expect(el.shadowRoot!.activeElement).toBe(trigger);
     });
   });
 
