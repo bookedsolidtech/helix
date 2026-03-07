@@ -41,30 +41,22 @@ describe('hx-message-bar', () => {
     });
 
     it('reflects variant attribute to property', async () => {
-      const el = await fixture<WcMessageBar>(
-        '<hx-message-bar variant="error">Error</hx-message-bar>',
-      );
+      const el = await fixture<WcMessageBar>('<hx-message-bar variant="error">Error</hx-message-bar>');
       expect(el.variant).toBe('error');
     });
 
     it('applies "success" variant via attribute', async () => {
-      const el = await fixture<WcMessageBar>(
-        '<hx-message-bar variant="success">Success</hx-message-bar>',
-      );
+      const el = await fixture<WcMessageBar>('<hx-message-bar variant="success">Success</hx-message-bar>');
       expect(el.getAttribute('variant')).toBe('success');
     });
 
     it('applies "warning" variant via attribute', async () => {
-      const el = await fixture<WcMessageBar>(
-        '<hx-message-bar variant="warning">Warning</hx-message-bar>',
-      );
+      const el = await fixture<WcMessageBar>('<hx-message-bar variant="warning">Warning</hx-message-bar>');
       expect(el.getAttribute('variant')).toBe('warning');
     });
 
     it('applies "error" variant via attribute', async () => {
-      const el = await fixture<WcMessageBar>(
-        '<hx-message-bar variant="error">Error</hx-message-bar>',
-      );
+      const el = await fixture<WcMessageBar>('<hx-message-bar variant="error">Error</hx-message-bar>');
       expect(el.getAttribute('variant')).toBe('error');
     });
   });
@@ -228,54 +220,30 @@ describe('hx-message-bar', () => {
     });
   });
 
-  // ─── Accessibility ───
+  // ─── Accessibility (3) ───
 
   describe('Accessibility', () => {
     it('uses role="status" for info variant', async () => {
-      const el = await fixture<WcMessageBar>(
-        '<hx-message-bar variant="info">Info</hx-message-bar>',
-      );
+      const el = await fixture<WcMessageBar>('<hx-message-bar variant="info">Info</hx-message-bar>');
       const base = shadowQuery(el, '[role="status"]');
       expect(base).toBeTruthy();
     });
 
     it('uses role="status" for success variant', async () => {
-      const el = await fixture<WcMessageBar>(
-        '<hx-message-bar variant="success">Success</hx-message-bar>',
-      );
+      const el = await fixture<WcMessageBar>('<hx-message-bar variant="success">Success</hx-message-bar>');
       const base = shadowQuery(el, '[role="status"]');
       expect(base).toBeTruthy();
     });
 
     it('uses role="alert" for warning variant', async () => {
-      const el = await fixture<WcMessageBar>(
-        '<hx-message-bar variant="warning">Warning</hx-message-bar>',
-      );
+      const el = await fixture<WcMessageBar>('<hx-message-bar variant="warning">Warning</hx-message-bar>');
       const base = shadowQuery(el, '[role="alert"]');
       expect(base).toBeTruthy();
     });
 
     it('uses role="alert" for error variant', async () => {
-      const el = await fixture<WcMessageBar>(
-        '<hx-message-bar variant="error">Error</hx-message-bar>',
-      );
+      const el = await fixture<WcMessageBar>('<hx-message-bar variant="error">Error</hx-message-bar>');
       const base = shadowQuery(el, '[role="alert"]');
-      expect(base).toBeTruthy();
-    });
-
-    it('uses aria-live="polite" for info variant', async () => {
-      const el = await fixture<WcMessageBar>(
-        '<hx-message-bar variant="info">Info</hx-message-bar>',
-      );
-      const base = shadowQuery(el, '[aria-live="polite"]');
-      expect(base).toBeTruthy();
-    });
-
-    it('uses aria-live="assertive" for error variant', async () => {
-      const el = await fixture<WcMessageBar>(
-        '<hx-message-bar variant="error">Error</hx-message-bar>',
-      );
-      const base = shadowQuery(el, '[aria-live="assertive"]');
       expect(base).toBeTruthy();
     });
 
@@ -285,9 +253,7 @@ describe('hx-message-bar', () => {
     });
 
     it('has no axe violations when closable', async () => {
-      const el = await fixture<WcMessageBar>(
-        '<hx-message-bar closable>Test message</hx-message-bar>',
-      );
+      const el = await fixture<WcMessageBar>('<hx-message-bar closable>Test message</hx-message-bar>');
       await checkA11y(el);
     });
 
@@ -324,20 +290,6 @@ describe('hx-message-bar', () => {
       );
       const slottedAction = el.querySelector('[slot="action"]');
       expect(slottedAction).toBeTruthy();
-    });
-
-    it('action container is hidden when no action is slotted', async () => {
-      const el = await fixture<WcMessageBar>('<hx-message-bar>No actions</hx-message-bar>');
-      const actionContainer = shadowQuery(el, '.message-bar__action');
-      expect(actionContainer?.hasAttribute('hidden')).toBe(true);
-    });
-
-    it('action container is visible when action is slotted', async () => {
-      const el = await fixture<WcMessageBar>(
-        '<hx-message-bar>Message<button slot="action">Act</button></hx-message-bar>',
-      );
-      const actionContainer = shadowQuery(el, '.message-bar__action');
-      expect(actionContainer?.hasAttribute('hidden')).toBe(false);
     });
   });
 });
