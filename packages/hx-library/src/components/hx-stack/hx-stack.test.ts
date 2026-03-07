@@ -24,6 +24,11 @@ describe('hx-stack', () => {
       const el = await fixture<HelixStack>('<hx-stack></hx-stack>');
       expect(el.getAttribute('role')).toBe('presentation');
     });
+
+    it('preserves custom role set by consumer', async () => {
+      const el = await fixture<HelixStack>('<hx-stack role="group"></hx-stack>');
+      expect(el.getAttribute('role')).toBe('group');
+    });
   });
 
   // ─── Property: direction ───
@@ -40,9 +45,16 @@ describe('hx-stack', () => {
       expect(el.getAttribute('direction')).toBe('horizontal');
     });
 
-    it('sets direction to vertical when attribute is "vertical"', async () => {
+    it('applies flex-direction: column for vertical', async () => {
       const el = await fixture<HelixStack>('<hx-stack direction="vertical"></hx-stack>');
-      expect(el.direction).toBe('vertical');
+      const base = shadowQuery(el, '[part="base"]');
+      expect(getComputedStyle(base).flexDirection).toBe('column');
+    });
+
+    it('applies flex-direction: row for horizontal', async () => {
+      const el = await fixture<HelixStack>('<hx-stack direction="horizontal"></hx-stack>');
+      const base = shadowQuery(el, '[part="base"]');
+      expect(getComputedStyle(base).flexDirection).toBe('row');
     });
   });
 
@@ -66,6 +78,20 @@ describe('hx-stack', () => {
         expect(el.gap).toBe(gap);
       }
     });
+
+    it('applies zero gap for none', async () => {
+      const el = await fixture<HelixStack>('<hx-stack gap="none"></hx-stack>');
+      const base = shadowQuery(el, '[part="base"]');
+      const styles = getComputedStyle(base);
+      expect(styles.gap).toBe('0px');
+    });
+
+    it('applies non-zero gap for md', async () => {
+      const el = await fixture<HelixStack>('<hx-stack gap="md"></hx-stack>');
+      const base = shadowQuery(el, '[part="base"]');
+      const styles = getComputedStyle(base);
+      expect(styles.gap).not.toBe('0px');
+    });
   });
 
   // ─── Property: align ───
@@ -80,6 +106,36 @@ describe('hx-stack', () => {
       const el = await fixture<HelixStack>('<hx-stack align="center"></hx-stack>');
       expect(el.align).toBe('center');
       expect(el.getAttribute('align')).toBe('center');
+    });
+
+    it('applies align-items: center for align="center"', async () => {
+      const el = await fixture<HelixStack>('<hx-stack align="center"></hx-stack>');
+      const base = shadowQuery(el, '[part="base"]');
+      expect(getComputedStyle(base).alignItems).toBe('center');
+    });
+
+    it('applies align-items: flex-start for align="start"', async () => {
+      const el = await fixture<HelixStack>('<hx-stack align="start"></hx-stack>');
+      const base = shadowQuery(el, '[part="base"]');
+      expect(getComputedStyle(base).alignItems).toBe('flex-start');
+    });
+
+    it('applies align-items: flex-end for align="end"', async () => {
+      const el = await fixture<HelixStack>('<hx-stack align="end"></hx-stack>');
+      const base = shadowQuery(el, '[part="base"]');
+      expect(getComputedStyle(base).alignItems).toBe('flex-end');
+    });
+
+    it('applies align-items: stretch for align="stretch"', async () => {
+      const el = await fixture<HelixStack>('<hx-stack align="stretch"></hx-stack>');
+      const base = shadowQuery(el, '[part="base"]');
+      expect(getComputedStyle(base).alignItems).toBe('stretch');
+    });
+
+    it('applies align-items: baseline for align="baseline"', async () => {
+      const el = await fixture<HelixStack>('<hx-stack align="baseline"></hx-stack>');
+      const base = shadowQuery(el, '[part="base"]');
+      expect(getComputedStyle(base).alignItems).toBe('baseline');
     });
   });
 
@@ -96,6 +152,30 @@ describe('hx-stack', () => {
       expect(el.justify).toBe('between');
       expect(el.getAttribute('justify')).toBe('between');
     });
+
+    it('applies justify-content: center for justify="center"', async () => {
+      const el = await fixture<HelixStack>('<hx-stack justify="center"></hx-stack>');
+      const base = shadowQuery(el, '[part="base"]');
+      expect(getComputedStyle(base).justifyContent).toBe('center');
+    });
+
+    it('applies justify-content: space-between for justify="between"', async () => {
+      const el = await fixture<HelixStack>('<hx-stack justify="between"></hx-stack>');
+      const base = shadowQuery(el, '[part="base"]');
+      expect(getComputedStyle(base).justifyContent).toBe('space-between');
+    });
+
+    it('applies justify-content: space-around for justify="around"', async () => {
+      const el = await fixture<HelixStack>('<hx-stack justify="around"></hx-stack>');
+      const base = shadowQuery(el, '[part="base"]');
+      expect(getComputedStyle(base).justifyContent).toBe('space-around');
+    });
+
+    it('applies justify-content: space-evenly for justify="evenly"', async () => {
+      const el = await fixture<HelixStack>('<hx-stack justify="evenly"></hx-stack>');
+      const base = shadowQuery(el, '[part="base"]');
+      expect(getComputedStyle(base).justifyContent).toBe('space-evenly');
+    });
   });
 
   // ─── Property: wrap ───
@@ -110,6 +190,18 @@ describe('hx-stack', () => {
       const el = await fixture<HelixStack>('<hx-stack wrap></hx-stack>');
       expect(el.wrap).toBe(true);
       expect(el.hasAttribute('wrap')).toBe(true);
+    });
+
+    it('applies flex-wrap: wrap when wrap is set', async () => {
+      const el = await fixture<HelixStack>('<hx-stack wrap></hx-stack>');
+      const base = shadowQuery(el, '[part="base"]');
+      expect(getComputedStyle(base).flexWrap).toBe('wrap');
+    });
+
+    it('does not wrap by default', async () => {
+      const el = await fixture<HelixStack>('<hx-stack></hx-stack>');
+      const base = shadowQuery(el, '[part="base"]');
+      expect(getComputedStyle(base).flexWrap).toBe('nowrap');
     });
   });
 
@@ -126,6 +218,16 @@ describe('hx-stack', () => {
       expect(el.inline).toBe(true);
       expect(el.hasAttribute('inline')).toBe(true);
     });
+
+    it('renders as block by default', async () => {
+      const el = await fixture<HelixStack>('<hx-stack></hx-stack>');
+      expect(getComputedStyle(el).display).toBe('block');
+    });
+
+    it('renders as inline-block when inline is set', async () => {
+      const el = await fixture<HelixStack>('<hx-stack inline></hx-stack>');
+      expect(getComputedStyle(el).display).toBe('inline-block');
+    });
   });
 
   // ─── Slots ───
@@ -136,6 +238,33 @@ describe('hx-stack', () => {
         '<hx-stack><div id="child">content</div></hx-stack>',
       );
       expect(el.querySelector('#child')).toBeTruthy();
+    });
+  });
+
+  // ─── Nested Stacks ───
+
+  describe('Nested Stacks', () => {
+    it('renders nested stacks correctly', async () => {
+      const el = await fixture<HelixStack>(`
+        <hx-stack direction="vertical" gap="lg">
+          <hx-stack direction="horizontal" gap="sm">
+            <div id="inner-a">A</div>
+            <div id="inner-b">B</div>
+          </hx-stack>
+          <div id="outer-c">C</div>
+        </hx-stack>
+      `);
+      const outerBase = shadowQuery(el, '[part="base"]');
+      expect(getComputedStyle(outerBase).flexDirection).toBe('column');
+
+      const innerStack = el.querySelector('hx-stack') as HelixStack;
+      expect(innerStack).toBeTruthy();
+      const innerBase = shadowQuery(innerStack, '[part="base"]');
+      expect(getComputedStyle(innerBase).flexDirection).toBe('row');
+
+      expect(innerStack.querySelector('#inner-a')).toBeTruthy();
+      expect(innerStack.querySelector('#inner-b')).toBeTruthy();
+      expect(el.querySelector('#outer-c')).toBeTruthy();
     });
   });
 
