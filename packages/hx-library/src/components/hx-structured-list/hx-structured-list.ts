@@ -54,7 +54,7 @@ export class HelixStructuredList extends LitElement {
 
   override render() {
     return html`
-      <div part="base" class="list">
+      <div part="base" class="list" role="list">
         <slot></slot>
       </div>
     `;
@@ -77,6 +77,9 @@ export class HelixStructuredList extends LitElement {
  * @csspart label - The label (`dt`) cell.
  * @csspart value - The value (`dd`) cell.
  * @csspart actions - The actions cell.
+ *
+ * @cssprop [--hx-structured-list-label-color=var(--hx-color-neutral-700)] - Label text color.
+ * @cssprop [--hx-structured-list-value-color=var(--hx-color-neutral-900)] - Value text color.
  */
 @customElement('hx-structured-list-row')
 export class HelixStructuredListRow extends LitElement {
