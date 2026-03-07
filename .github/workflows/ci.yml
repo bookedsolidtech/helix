@@ -115,13 +115,18 @@ jobs:
       - run: npx turbo run type-check --filter='!docs'
 
   # ── Tests (need Playwright browsers) ────────────────────────────────────
+  # Sharded across 4 runners for speed — 3,200+ browser-mode tests require parallelism.
 
   test:
-    name: Test
+    name: Test (Shard ${{ matrix.shard }})
     needs: changes
     if: needs.changes.outputs.source == 'true' && needs.changes.outputs.is_audit != 'true'
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: ['1/4', '2/4', '3/4', '4/4']
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -130,12 +135,14 @@ jobs:
           cache: 'npm'
       - run: npm ci
       - run: npx playwright install --with-deps chromium
-      - run: npm run test:library
+      - name: Run tests (shard ${{ matrix.shard }})
+        run: npx vitest run --shard=${{ matrix.shard }}
+        working-directory: packages/hx-library
       - name: Upload test results
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: test-results
+          name: test-results-shard-${{ strategy.job-index }}
           path: packages/hx-library/.cache/test-results.json
           retention-days: 30
           if-no-files-found: warn
@@ -222,7 +229,7 @@ jobs:
     needs: changes
     if: needs.changes.outputs.source == 'true' && needs.changes.outputs.is_audit != 'true'
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -231,6 +238,13 @@ jobs:
           cache: 'npm'
       - run: npm ci
       - run: npx playwright install --with-deps chromium firefox webkit
+      - name: Restore VRT baselines
+        uses: actions/cache@v4
+        with:
+          path: packages/hx-library/__screenshots__
+          key: vrt-screenshots-${{ hashFiles('packages/hx-library/src/**/*.ts') }}
+          restore-keys: |
+            vrt-screenshots-
       - run: npm run build:storybook
       - name: Serve Storybook and run VRT
         run: |
