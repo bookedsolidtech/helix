@@ -27,10 +27,10 @@ describe('hx-spinner', () => {
       expect(svg).toBeTruthy();
     });
 
-    it('renders visually-hidden sr text', async () => {
+    it('does not render visually-hidden sr-text span', async () => {
       const el = await fixture<HelixSpinner>('<hx-spinner></hx-spinner>');
-      const srText = shadowQuery(el, '.spinner__sr-text');
-      expect(srText).toBeTruthy();
+      const srText = el.shadowRoot?.querySelector('.spinner__sr-text');
+      expect(srText).toBeNull();
     });
   });
 
@@ -104,6 +104,80 @@ describe('hx-spinner', () => {
       const el = await fixture<HelixSpinner>('<hx-spinner label="Processing"></hx-spinner>');
       const base = shadowQuery(el, '[part~="base"]');
       expect(base?.getAttribute('aria-label')).toBe('Processing');
+    });
+
+    it('reflects label attribute to host', async () => {
+      const el = await fixture<HelixSpinner>('<hx-spinner label="Uploading"></hx-spinner>');
+      expect(el.getAttribute('label')).toBe('Uploading');
+    });
+
+    it('reactively updates aria-label when label property changes', async () => {
+      const el = await fixture<HelixSpinner>('<hx-spinner label="Loading"></hx-spinner>');
+      const base = shadowQuery(el, '[part~="base"]');
+      expect(base?.getAttribute('aria-label')).toBe('Loading');
+
+      el.label = 'Saving';
+      await el.updateComplete;
+
+      expect(base?.getAttribute('aria-label')).toBe('Saving');
+    });
+  });
+
+  // ─── Property: decorative ───
+
+  describe('Property: decorative', () => {
+    it('defaults to decorative=false', async () => {
+      const el = await fixture<HelixSpinner>('<hx-spinner></hx-spinner>');
+      expect(el.decorative).toBe(false);
+    });
+
+    it('reflects decorative attribute to host', async () => {
+      const el = await fixture<HelixSpinner>('<hx-spinner decorative></hx-spinner>');
+      expect(el.hasAttribute('decorative')).toBe(true);
+    });
+
+    it('uses role="presentation" when decorative', async () => {
+      const el = await fixture<HelixSpinner>('<hx-spinner decorative></hx-spinner>');
+      const base = shadowQuery(el, '[part~="base"]');
+      expect(base?.getAttribute('role')).toBe('presentation');
+    });
+
+    it('uses role="status" when not decorative', async () => {
+      const el = await fixture<HelixSpinner>('<hx-spinner></hx-spinner>');
+      const base = shadowQuery(el, '[part~="base"]');
+      expect(base?.getAttribute('role')).toBe('status');
+    });
+
+    it('removes aria-label when decorative', async () => {
+      const el = await fixture<HelixSpinner>('<hx-spinner decorative></hx-spinner>');
+      const base = shadowQuery(el, '[part~="base"]');
+      expect(base?.hasAttribute('aria-label')).toBe(false);
+    });
+
+    it('has aria-label when not decorative', async () => {
+      const el = await fixture<HelixSpinner>('<hx-spinner></hx-spinner>');
+      const base = shadowQuery(el, '[part~="base"]');
+      expect(base?.getAttribute('aria-label')).toBe('Loading');
+    });
+
+    it('reactively switches between decorative and non-decorative', async () => {
+      const el = await fixture<HelixSpinner>('<hx-spinner></hx-spinner>');
+      const base = shadowQuery(el, '[part~="base"]');
+
+      expect(base?.getAttribute('role')).toBe('status');
+      expect(base?.getAttribute('aria-label')).toBe('Loading');
+
+      el.decorative = true;
+      await el.updateComplete;
+
+      expect(base?.getAttribute('role')).toBe('presentation');
+      expect(base?.hasAttribute('aria-label')).toBe(false);
+
+      el.decorative = false;
+      await el.updateComplete;
+
+      expect(base?.getAttribute('role')).toBe('status');
+      expect(base?.getAttribute('aria-label')).toBe('Loading');
     });
   });
 
@@ -184,6 +258,13 @@ describe('hx-spinner', () => {
       const el = await fixture<HelixSpinner>(
         '<hx-spinner label="Saving changes"></hx-spinner>',
       );
+      await page.screenshot();
+      const { violations } = await checkA11y(el);
+      expect(violations).toEqual([]);
+    });
+
+    it('has no axe violations in decorative mode', async () => {
+      const el = await fixture<HelixSpinner>('<hx-spinner decorative></hx-spinner>');
       await page.screenshot();
       const { violations } = await checkA11y(el);
       expect(violations).toEqual([]);
