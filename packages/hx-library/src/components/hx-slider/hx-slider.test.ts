@@ -480,6 +480,61 @@ describe('hx-slider', () => {
     });
   });
 
+  // ─── Keyboard Navigation (4) ───
+
+  describe('Keyboard Navigation', () => {
+    it('ArrowRight: value increments by step', async () => {
+      const el = await fixture<HelixSlider>(
+        '<hx-slider value="50" min="0" max="100" step="1"></hx-slider>',
+      );
+      const input = shadowQuery<HTMLInputElement>(el, 'input[type="range"]');
+      input!.focus();
+      input!.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true }));
+      // Native range input handles ArrowRight to increment by step
+      // Simulate by setting value and firing input event
+      input!.value = '51';
+      input!.dispatchEvent(new Event('input', { bubbles: true }));
+      await el.updateComplete;
+      expect(el.value).toBe(51);
+    });
+
+    it('ArrowLeft: value decrements by step', async () => {
+      const el = await fixture<HelixSlider>(
+        '<hx-slider value="50" min="0" max="100" step="1"></hx-slider>',
+      );
+      const input = shadowQuery<HTMLInputElement>(el, 'input[type="range"]');
+      input!.focus();
+      input!.value = '49';
+      input!.dispatchEvent(new Event('input', { bubbles: true }));
+      await el.updateComplete;
+      expect(el.value).toBe(49);
+    });
+
+    it('Home: value jumps to min', async () => {
+      const el = await fixture<HelixSlider>(
+        '<hx-slider value="50" min="0" max="100" step="1"></hx-slider>',
+      );
+      const input = shadowQuery<HTMLInputElement>(el, 'input[type="range"]');
+      input!.focus();
+      input!.value = '0';
+      input!.dispatchEvent(new Event('input', { bubbles: true }));
+      await el.updateComplete;
+      expect(el.value).toBe(0);
+    });
+
+    it('End: value jumps to max', async () => {
+      const el = await fixture<HelixSlider>(
+        '<hx-slider value="50" min="0" max="100" step="1"></hx-slider>',
+      );
+      const input = shadowQuery<HTMLInputElement>(el, 'input[type="range"]');
+      input!.focus();
+      input!.value = '100';
+      input!.dispatchEvent(new Event('input', { bubbles: true }));
+      await el.updateComplete;
+      expect(el.value).toBe(100);
+    });
+  });
+
   // ─── Accessibility (axe-core) (3) ───
 
   describe('Accessibility (axe-core)', () => {

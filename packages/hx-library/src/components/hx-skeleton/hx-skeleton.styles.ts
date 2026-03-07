@@ -24,7 +24,7 @@ export const helixSkeletonStyles = css`
   }
 
   .skeleton--circle {
-    border-radius: var(--hx-skeleton-circle-radius, 50%);
+    border-radius: 50%;
     aspect-ratio: var(--_circle-aspect-ratio, 1);
     width: var(--_width, 2.5rem);
     height: var(--_height, var(--_width, 2.5rem));
@@ -67,7 +67,7 @@ export const helixSkeletonStyles = css`
 
   @media (prefers-reduced-motion: reduce) {
     .skeleton--animated::after {
-      display: none;
+      animation: none;
     }
   }
 `;
