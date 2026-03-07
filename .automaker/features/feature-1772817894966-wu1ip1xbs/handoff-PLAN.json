@@ -1,0 +1,11 @@
+{
+  "phase": "PLAN",
+  "summary": "Feature: Deep Audit v2: hx-prose\n\n## Deep Component Audit — hx-prose\n\n**Component directory:** `packages/hx-library/src/components/hx-prose/`\n**wc-mcp Health Score:** 92 (A)\n**Known issues:** _styles missing description.\n\n### wc-mcp Tools — USE THESE\n- `score_component`, `get_component`, `analyze_accessibility`, `list_css_parts`, `get_design_tokens`\n- **Report wc-mcp bugs to `/Volumes/Development/booked/wc-tools` board.**\n\n### Audit Scope\n1. **Design Tokens** — `--hx-` tokens. Typography (headin",
+  "discoveries": [],
+  "modifiedFiles": [],
+  "outstandingQuestions": [],
+  "scopeLimits": [],
+  "testCoverage": "N/A — plan phase",
+  "verdict": "WARN",
+  "createdAt": "2026-03-06T21:08:25.019Z"
+}

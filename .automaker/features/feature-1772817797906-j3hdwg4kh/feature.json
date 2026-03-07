@@ -2,7 +2,7 @@
   "category": "Uncategorized",
   "description": "## Deep Component Audit — hx-icon-button\n\n**Component directory:** `packages/hx-library/src/components/hx-icon-button/`\n**wc-mcp Health Score:** 95 (A)\n**Known issues:** formAssociated, _internals missing descriptions.\n\n### wc-mcp Tools — USE THESE\n- `score_component`, `get_component`, `analyze_accessibility`, `validate_usage`, `list_css_parts`, `list_events`, `get_design_tokens`\n- **Report wc-mcp bugs to `/Volumes/Development/booked/wc-tools` board.**\n\n### Audit Scope\n1. **Design Tokens** — `--hx-` tokens. Background, border, hover/active states. Sizes. Dark mode.\n2. **Accessibility** — WCAG 2.1 AA. MUST have aria-label (no visible text). Tooltip for sighted users. Disabled state.\n3. **Functionality** — Variants. Sizes. Disabled. Loading. Tooltip integration. Form association. Link mode (href).\n4. **TypeScript** — Strict. formAssociated. ElementInternals. No `any`.\n5. **CSS/Styling** — Shadow DOM. Equal width/height. CSS Parts. Focus-ring. Ripple.\n6. **CEM Accuracy** — Fix 2 missing descriptions.\n7. **Tests** — 80%+ coverage. ARIA label requirement. Variants. Keyboard. Form.\n8. **Storybook** — All variants/sizes. With tooltip. Disabled. Loading.\n9. **Drupal Compatibility** — Twig-friendly. Action buttons.\n10. **Portability** — CDN-ready. Form-associated.\n\n### Deliverable\nDetailed audit report. Fix CRITICAL+HIGH. Document rest.",
   "title": "Deep Audit v2: hx-icon-button",
-  "status": "backlog",
+  "status": "done",
   "branchName": "feature/deep-audit-v2-hx-icon-button",
   "complexity": "architectural",
   "priority": 3,
@@ -25,6 +25,21 @@
       "to": "backlog",
       "timestamp": "2026-03-06T17:23:17.906Z",
       "reason": "Feature created"
+    },
+    {
+      "from": "backlog",
+      "to": "review",
+      "timestamp": "2026-03-06T22:17:34.772Z"
+    },
+    {
+      "from": "review",
+      "to": "done",
+      "timestamp": "2026-03-07T01:01:29.248Z"
     }
-  ]
+  ],
+  "featureType": "code",
+  "reviewStartedAt": "2026-03-06T22:17:34.772Z",
+  "prNumber": 398,
+  "prMergedAt": "2026-03-07T00:57:57Z",
+  "completedAt": "2026-03-07T01:01:29.248Z"
 }

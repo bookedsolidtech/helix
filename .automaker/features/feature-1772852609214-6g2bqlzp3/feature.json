@@ -1,0 +1,30 @@
+{
+  "category": "Uncategorized",
+  "description": "## Post-Audit Follow-Up: hx-checkbox\n\nIssues identified during Deep Audit v2 of `hx-checkbox` that were not fixed inline.\n\n### Items\n- [ ] LOW: The `WcCheckbox` type alias (line 344) could be removed in a future major version.\n- [ ] LOW: Consider adding `@internal` support to the CEM analyzer config to auto-exclude private members from the manifest.\n\n### Context\n- Audit feature: `feature-1772817641456-h88glik8c`\n- Files modified during audit: `packages/hx-library/src/components/hx-checkbox/hx-checkbox.ts`, `packages/hx-library/src/components/hx-checkbox/hx-checkbox.test.ts`, `packages/hx-library/src/components/hx-checkbox/hx-checkbox.stories.ts`\n- Audit cost: $0.00",
+  "title": "Post-Audit: hx-checkbox — follow-up items",
+  "status": "backlog",
+  "complexity": "small",
+  "priority": 4,
+  "source": "api",
+  "trustTier": 1,
+  "quarantineStatus": "passed",
+  "quarantineId": "c5b19420-8515-407a-b20a-ef0856649244",
+  "id": "feature-1772852609214-6g2bqlzp3",
+  "branchName": "feature/post-audit-hx-checkbox-follow-up-items",
+  "descriptionHistory": [
+    {
+      "description": "## Post-Audit Follow-Up: hx-checkbox\n\nIssues identified during Deep Audit v2 of `hx-checkbox` that were not fixed inline.\n\n### Items\n- [ ] LOW: The `WcCheckbox` type alias (line 344) could be removed in a future major version.\n- [ ] LOW: Consider adding `@internal` support to the CEM analyzer config to auto-exclude private members from the manifest.\n\n### Context\n- Audit feature: `feature-1772817641456-h88glik8c`\n- Files modified during audit: `packages/hx-library/src/components/hx-checkbox/hx-checkbox.ts`, `packages/hx-library/src/components/hx-checkbox/hx-checkbox.test.ts`, `packages/hx-library/src/components/hx-checkbox/hx-checkbox.stories.ts`\n- Audit cost: $0.00",
+      "timestamp": "2026-03-07T03:03:29.215Z",
+      "source": "initial"
+    }
+  ],
+  "createdAt": "2026-03-07T03:03:29.215Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-03-07T03:03:29.215Z",
+      "reason": "Feature created"
+    }
+  ]
+}

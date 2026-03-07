@@ -1,0 +1,11 @@
+{
+  "phase": "PLAN",
+  "summary": "Feature: DEEP AUDIT: hx-tree-view — Enterprise Component Quality Review\n\n## Deep Audit V2: hx-tree-view\n\n**Comprehensive enterprise-grade quality audit** of the `hx-tree-view` component.\n\n### Audit Dimensions\n1. **Design Tokens** — All colors, spacing, typography use `--hx-*` tokens. No hardcoded values.\n2. **Accessibility** — WCAG 2.1 AA compliance. Tree role, treeitem roles, aria-expanded, keyboard navigation (arrow keys, Home/End).\n3. **Functionality** — Expand/collapse, selection (single/mul",
+  "discoveries": [],
+  "modifiedFiles": [],
+  "outstandingQuestions": [],
+  "scopeLimits": [],
+  "testCoverage": "N/A — plan phase",
+  "verdict": "WARN",
+  "createdAt": "2026-03-07T02:32:40.543Z"
+}

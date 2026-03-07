@@ -2,7 +2,7 @@
   "category": "Uncategorized",
   "description": "## Deep Component Audit — hx-split-panel\n\n**Component directory:** `packages/hx-library/src/components/hx-split-panel/`\n\n### wc-mcp Tools — USE THESE\n- `score_component`, `get_component`, `analyze_accessibility`, `list_css_parts`, `list_events`, `list_slots`, `get_design_tokens`\n- **Report wc-mcp bugs to `/Volumes/Development/booked/wc-tools` board.**\n\n### Audit Scope\n1. **Design Tokens** — `--hx-` tokens. Divider color, handle, min sizes. Dark mode.\n2. **Accessibility** — WCAG 2.1 AA. Separator role. Keyboard resize (arrow keys). aria-valuenow for position.\n3. **Functionality** — Horizontal/vertical. Drag to resize. Min/max panel sizes. Snap positions. Collapse. Initial position.\n4. **TypeScript** — Strict. No `any`.\n5. **CSS/Styling** — Shadow DOM. CSS Parts (divider, handle). Cursor styles. Responsive.\n6. **CEM Accuracy** — All API documented.\n7. **Tests** — 80%+ coverage. Drag. Keyboard resize. Min/max. Collapse. Snap.\n8. **Storybook** — Horizontal/vertical. Collapsible. Nested. With content.\n9. **Drupal Compatibility** — Layout tool. Twig-friendly.\n10. **Portability** — CDN-ready.\n\n### Deliverable\nDetailed audit report. Fix CRITICAL+HIGH. Document rest.",
   "title": "Deep Audit v2: hx-split-panel",
-  "status": "backlog",
+  "status": "done",
   "branchName": "feature/deep-audit-v2-hx-split-panel",
   "complexity": "architectural",
   "priority": 3,
@@ -25,6 +25,46 @@
       "to": "backlog",
       "timestamp": "2026-03-06T17:26:10.591Z",
       "reason": "Feature created"
+    },
+    {
+      "from": "backlog",
+      "to": "in_progress",
+      "timestamp": "2026-03-07T00:53:39.060Z"
+    },
+    {
+      "from": "in_progress",
+      "to": "review",
+      "timestamp": "2026-03-07T00:59:07.077Z"
+    },
+    {
+      "from": "review",
+      "to": "done",
+      "timestamp": "2026-03-07T01:04:03.000Z"
+    },
+    {
+      "from": "done",
+      "to": "blocked",
+      "timestamp": "2026-03-07T01:06:39.755Z",
+      "reason": "Max state transitions exceeded"
+    },
+    {
+      "from": "blocked",
+      "to": "done",
+      "timestamp": "2026-03-07T01:09:15.134Z"
     }
-  ]
+  ],
+  "featureType": "code",
+  "model": "claude-opus-4-6",
+  "updatedAt": "2026-03-07T00:55:09.354Z",
+  "costUsd": 1.056183,
+  "lastSessionId": "96f264e1-ad2e-416f-9702-d68765883cf8",
+  "prUrl": "https://github.com/bookedsolidtech/helix/pull/422",
+  "prNumber": 422,
+  "prCreatedAt": "2026-03-07T00:59:07.077Z",
+  "reviewStartedAt": "2026-03-07T00:59:07.077Z",
+  "prTrackedSince": "2026-03-07T00:59:07.079Z",
+  "prLastPolledAt": "2026-03-07T01:03:39.015Z",
+  "completedAt": "2026-03-07T01:04:03.000Z",
+  "statusChangeReason": "Max state transitions exceeded",
+  "failureCount": 1
 }

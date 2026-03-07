@@ -2,7 +2,7 @@
   "category": "Uncategorized",
   "description": "## Deep Component Audit — hx-prose\n\n**Component directory:** `packages/hx-library/src/components/hx-prose/`\n**wc-mcp Health Score:** 92 (A)\n**Known issues:** _styles missing description.\n\n### wc-mcp Tools — USE THESE\n- `score_component`, `get_component`, `analyze_accessibility`, `list_css_parts`, `get_design_tokens`\n- **Report wc-mcp bugs to `/Volumes/Development/booked/wc-tools` board.**\n\n### Audit Scope\n1. **Design Tokens** — `--hx-` tokens. Typography (headings, body, links, code). Spacing. Colors. Dark mode.\n2. **Accessibility** — WCAG 2.1 AA. Heading hierarchy. Link styling. Reading width. Line height.\n3. **Functionality** — Style raw HTML content (CMS output). Heading styles. Lists. Tables. Code blocks. Blockquotes. Images. Links.\n4. **TypeScript** — Strict. No `any`.\n5. **CSS/Styling** — Shadow DOM. Light DOM content styling via ::slotted or adopted styles. CSS Parts. Max-width for readability.\n6. **CEM Accuracy** — Fix _styles description.\n7. **Tests** — 80%+ coverage. Various HTML content. Typography. Responsiveness.\n8. **Storybook** — Rich HTML content. Headings. Lists. Code. Tables.\n9. **Drupal Compatibility** — CRITICAL: text format output. Node body. Twig-friendly.\n10. **Portability** — CDN-ready.\n\n### Deliverable\nDetailed audit report. Fix CRITICAL+HIGH. Document rest.",
   "title": "Deep Audit v2: hx-prose",
-  "status": "backlog",
+  "status": "done",
   "branchName": "feature/deep-audit-v2-hx-prose",
   "complexity": "architectural",
   "priority": 3,
@@ -25,6 +25,19 @@
       "to": "backlog",
       "timestamp": "2026-03-06T17:24:54.966Z",
       "reason": "Feature created"
+    },
+    {
+      "from": "backlog",
+      "to": "review",
+      "timestamp": "2026-03-06T22:19:24.349Z"
+    },
+    {
+      "from": "review",
+      "to": "done",
+      "timestamp": "2026-03-07T01:02:29.354Z"
     }
-  ]
+  ],
+  "featureType": "code",
+  "reviewStartedAt": "2026-03-06T22:19:24.349Z",
+  "completedAt": "2026-03-07T01:02:29.354Z"
 }

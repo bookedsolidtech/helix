@@ -2,7 +2,7 @@
   "category": "Uncategorized",
   "description": "## Deep Component Audit — hx-drawer\n\n**Component directory:** `packages/hx-library/src/components/hx-drawer/`\n\n### wc-mcp Tools — USE THESE FOR SCORING\n- `score_component`, `get_component`, `analyze_accessibility`, `validate_usage`, `list_css_parts`, `list_events`, `list_slots`, `get_design_tokens`\n- **Report any wc-mcp bugs to `/Volumes/Development/booked/wc-tools` board.**\n\n### Audit Scope\n1. **Design Tokens** — `--hx-` tokens. Surface, overlay, width, shadow. Dark mode.\n2. **Accessibility** — WCAG 2.1 AA. dialog role. Focus trap. Return focus on close. Escape to dismiss. aria-labelledby.\n3. **Functionality** — Left/right/top/bottom placement. Overlay click dismiss. Contained mode. Push content. Header/body/footer slots. Animation (slide).\n4. **TypeScript** — Strict. No `any`.\n5. **CSS/Styling** — Shadow DOM. CSS Parts. Slide animation. Overlay. Z-index. Responsive width.\n6. **CEM Accuracy** — All API documented.\n7. **Tests** — 80%+ coverage. Open/close. Focus trap. Placement. Overlay. Keyboard.\n8. **Storybook** — Placements. Contained. With navigation content. Sizes.\n9. **Drupal Compatibility** — Off-canvas replacement. Admin toolbar. Twig-friendly.\n10. **Portability** — CDN-ready.\n\n### Deliverable\nDetailed audit report. Fix CRITICAL+HIGH. Document rest.",
   "title": "Deep Audit v2: hx-drawer",
-  "status": "backlog",
+  "status": "done",
   "branchName": "feature/deep-audit-v2-hx-drawer",
   "complexity": "architectural",
   "priority": 3,
@@ -25,6 +25,22 @@
       "to": "backlog",
       "timestamp": "2026-03-06T17:22:06.948Z",
       "reason": "Feature created"
+    },
+    {
+      "from": "backlog",
+      "to": "review",
+      "timestamp": "2026-03-06T22:17:23.563Z"
+    },
+    {
+      "from": "review",
+      "to": "done",
+      "timestamp": "2026-03-07T01:01:29.174Z"
     }
-  ]
+  ],
+  "featureType": "code",
+  "prLastPolledAt": "2026-03-07T00:38:15.241Z",
+  "reviewStartedAt": "2026-03-06T22:17:23.563Z",
+  "prNumber": 389,
+  "prMergedAt": "2026-03-07T00:57:49Z",
+  "completedAt": "2026-03-07T01:01:29.174Z"
 }

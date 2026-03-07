@@ -2,7 +2,7 @@
   "category": "Uncategorized",
   "description": "## Deep Component Audit — hx-list\n\n**Component directory:** `packages/hx-library/src/components/hx-list/`\n**Sub-components:** hx-list-item\n\n### wc-mcp Tools — USE THESE\n- `score_component`, `get_component`, `analyze_accessibility`, `list_css_parts`, `list_slots`, `get_design_tokens`\n- **Report wc-mcp bugs to `/Volumes/Development/booked/wc-tools` board.**\n\n### Audit Scope\n1. **Design Tokens** — `--hx-` tokens. Item padding, divider, hover highlight. Dark mode.\n2. **Accessibility** — WCAG 2.1 AA. list/listitem roles. Navigation list pattern. Selection announcement.\n3. **Functionality** — Ordered/unordered. Interactive items. Selection (single/multi). Dividers. Nested lists. Icon/avatar prefix.\n4. **TypeScript** — Strict. No `any`.\n5. **CSS/Styling** — Shadow DOM. CSS Parts. Dividers. Hover/active states.\n6. **CEM Accuracy** — Both list + list-item documented.\n7. **Tests** — 80%+ coverage. Selection. Keyboard. Nested. ARIA.\n8. **Storybook** — Basic. Interactive. Nested. With icons/avatars.\n9. **Drupal Compatibility** — Views list. Menu rendering. Twig-friendly.\n10. **Portability** — CDN-ready.\n\n### Deliverable\nDetailed audit report. Fix CRITICAL+HIGH. Document rest.",
   "title": "Deep Audit v2: hx-list",
-  "status": "backlog",
+  "status": "done",
   "branchName": "feature/deep-audit-v2-hx-list",
   "complexity": "architectural",
   "priority": 3,
@@ -25,6 +25,22 @@
       "to": "backlog",
       "timestamp": "2026-03-06T17:23:36.809Z",
       "reason": "Feature created"
+    },
+    {
+      "from": "backlog",
+      "to": "review",
+      "timestamp": "2026-03-06T22:17:37.882Z"
+    },
+    {
+      "from": "review",
+      "to": "done",
+      "timestamp": "2026-03-07T01:01:29.273Z"
     }
-  ]
+  ],
+  "featureType": "code",
+  "prLastPolledAt": "2026-03-07T00:38:21.612Z",
+  "reviewStartedAt": "2026-03-06T22:17:37.882Z",
+  "prNumber": 401,
+  "prMergedAt": "2026-03-07T00:58:11Z",
+  "completedAt": "2026-03-07T01:01:29.273Z"
 }

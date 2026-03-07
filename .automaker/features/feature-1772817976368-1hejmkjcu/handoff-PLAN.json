@@ -1,0 +1,11 @@
+{
+  "phase": "PLAN",
+  "summary": "Feature: Deep Audit v2: hx-stack\n\n## Deep Component Audit — hx-stack\n\n**Component directory:** `packages/hx-library/src/components/hx-stack/`\n\n### wc-mcp Tools — USE THESE\n- `score_component`, `get_component`, `analyze_accessibility`, `list_css_parts`, `list_slots`, `get_design_tokens`\n- **Report wc-mcp bugs to `/Volumes/Development/booked/wc-tools` board.**\n\n### Audit Scope\n1. **Design Tokens** — `--hx-` tokens. Gap/spacing. Direction.\n2. **Accessibility** — WCAG 2.1 AA. Layout component — no s",
+  "discoveries": [],
+  "modifiedFiles": [],
+  "outstandingQuestions": [],
+  "scopeLimits": [],
+  "testCoverage": "N/A — plan phase",
+  "verdict": "APPROVE",
+  "createdAt": "2026-03-07T01:02:33.650Z"
+}

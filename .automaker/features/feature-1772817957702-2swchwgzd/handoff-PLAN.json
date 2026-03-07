@@ -1,0 +1,11 @@
+{
+  "phase": "PLAN",
+  "summary": "Feature: Deep Audit v2: hx-spinner\n\n## Deep Component Audit — hx-spinner\n\n**Component directory:** `packages/hx-library/src/components/hx-spinner/`\n\n### wc-mcp Tools — USE THESE\n- `score_component`, `get_component`, `analyze_accessibility`, `list_css_parts`, `get_design_tokens`\n- **Report wc-mcp bugs to `/Volumes/Development/booked/wc-tools` board.**\n\n### Audit Scope\n1. **Design Tokens** — `--hx-` tokens. Track color, indicator color, size. Dark mode.\n2. **Accessibility** — WCAG 2.1 AA. role=\"st",
+  "discoveries": [],
+  "modifiedFiles": [],
+  "outstandingQuestions": [],
+  "scopeLimits": [],
+  "testCoverage": "N/A — plan phase",
+  "verdict": "WARN",
+  "createdAt": "2026-03-07T00:54:19.729Z"
+}

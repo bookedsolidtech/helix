@@ -2,7 +2,7 @@
   "category": "Uncategorized",
   "description": "## Deep Component Audit — hx-button-group\n\n**Component directory:** `packages/hx-library/src/components/hx-button-group/`\n**wc-mcp Health Score:** 88 (B)\n**Known issues:** 'internals' and 'role' properties missing descriptions.\n\n### Audit Scope\n1. **Design Tokens** — `--hx-` tokens. Gap/spacing between buttons. Border radius handling on grouped buttons. Dark mode.\n2. **Accessibility** — WCAG 2.1 AA. role=\"group\" with aria-label. Keyboard navigation between buttons.\n3. **Functionality** — Horizontal/vertical orientation. Button spacing. First/last border radius. Mixed button types.\n4. **TypeScript** — Strict. ElementInternals for role. No `any`.\n5. **CSS/Styling** — Shadow DOM. Adjacent button border handling. Responsive stacking.\n6. **CEM Accuracy** — Fix internals + role descriptions.\n7. **Tests** — 80%+ coverage. Grouping behavior. Orientation. ARIA.\n8. **Storybook** — Horizontal/vertical. Mixed buttons. Sizes.\n9. **Drupal Compatibility** — Twig-friendly.\n10. **Portability** — CDN-ready.\n\n### Deliverable\nDetailed audit report. Fix CRITICAL+HIGH. Document rest.",
   "title": "Deep Audit v2: hx-button-group",
-  "status": "backlog",
+  "status": "done",
   "branchName": "feature/deep-audit-v2-hx-button-group",
   "complexity": "architectural",
   "priority": 3,
@@ -25,6 +25,22 @@
       "to": "backlog",
       "timestamp": "2026-03-06T17:20:23.111Z",
       "reason": "Feature created"
+    },
+    {
+      "from": "backlog",
+      "to": "review",
+      "timestamp": "2026-03-06T22:17:04.779Z"
+    },
+    {
+      "from": "review",
+      "to": "done",
+      "timestamp": "2026-03-07T01:01:29.048Z"
     }
-  ]
+  ],
+  "featureType": "code",
+  "prLastPolledAt": "2026-03-07T00:38:04.218Z",
+  "reviewStartedAt": "2026-03-06T22:17:04.779Z",
+  "prNumber": 373,
+  "prMergedAt": "2026-03-07T00:57:27Z",
+  "completedAt": "2026-03-07T01:01:29.048Z"
 }

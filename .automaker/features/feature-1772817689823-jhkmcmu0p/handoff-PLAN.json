@@ -1,0 +1,11 @@
+{
+  "phase": "PLAN",
+  "summary": "Feature: Deep Audit v2: hx-contextual-help\n\n## Deep Component Audit — hx-contextual-help\n\n**Component directory:** `packages/hx-library/src/components/hx-contextual-help/`\n\n### wc-mcp Tools — USE THESE FOR SCORING\n- `score_component`, `get_component`, `analyze_accessibility`, `validate_usage`, `list_css_parts`, `list_events`, `list_slots`, `get_design_tokens`\n- **Report any wc-mcp bugs to `/Volumes/Development/booked/wc-tools` board.**\n\n### Audit Scope\n1. **Design Tokens** — `--hx-` tokens. Trig",
+  "discoveries": [],
+  "modifiedFiles": [],
+  "outstandingQuestions": [],
+  "scopeLimits": [],
+  "testCoverage": "N/A — plan phase",
+  "verdict": "WARN",
+  "createdAt": "2026-03-06T19:22:33.275Z"
+}

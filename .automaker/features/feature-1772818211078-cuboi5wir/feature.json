@@ -2,7 +2,7 @@
   "category": "Uncategorized",
   "description": "## Deep Audit V2: hx-visually-hidden\n\n**Comprehensive enterprise-grade quality audit** of the `hx-visually-hidden` utility component.\n\n### Audit Dimensions\n1. **Design Tokens** — Verify CSS approach uses standard visually-hidden technique (not display:none).\n2. **Accessibility** — This IS the accessibility utility. Verify it works correctly for screen readers in all contexts.\n3. **Functionality** — Content hidden visually but available to assistive technology. Focusable variant if needed.\n4. **TypeScript** — Strict mode. No `any`. Proper types.\n5. **CSS Architecture** — Shadow DOM encapsulation. Standard visually-hidden CSS pattern.\n6. **CEM Accuracy** — `custom-elements.json` matches actual public API exactly.\n7. **Test Coverage** — Vitest browser tests. Verify screen reader behavior.\n8. **Storybook** — Stories demonstrating usage with screen reader context.\n9. **Drupal Compatibility** — Works in Twig templates without modification.\n10. **Portability** — No framework dependencies. Works in vanilla HTML.\n\n### wc-mcp Tool Usage (MANDATORY)\nUse these MCP tools during your audit:\n- `score_component({ tagName: \"hx-visually-hidden\" })` — Get health score baseline\n- `get_component({ tagName: \"hx-visually-hidden\" })` — Full component details\n- `analyze_accessibility({ tagName: \"hx-visually-hidden\" })` — A11Y audit\n- `list_css_parts({ tagName: \"hx-visually-hidden\" })` — CSS Parts inventory\n- `list_slots({ tagName: \"hx-visually-hidden\" })` — Slots inventory\n\nIf any wc-mcp tool returns unexpected results or errors, report the bug to the wc-tools board at `/Volumes/Development/booked/wc-tools`.\n\n### Deliverables\n- Fix all issues found inline\n- Update tests to cover gaps\n- Update Storybook stories if needed\n- Ensure CEM is accurate after changes\n- Run `npm run verify` before committing",
   "title": "DEEP AUDIT: hx-visually-hidden — Enterprise Component Quality Review",
-  "status": "backlog",
+  "status": "done",
   "branchName": "feature/deep-audit-v2-hx-visually-hidden",
   "complexity": "architectural",
   "priority": 3,
@@ -25,6 +25,47 @@
       "to": "backlog",
       "timestamp": "2026-03-06T17:30:11.079Z",
       "reason": "Feature created"
+    },
+    {
+      "from": "backlog",
+      "to": "in_progress",
+      "timestamp": "2026-03-07T02:31:11.546Z"
+    },
+    {
+      "from": "done",
+      "to": "blocked",
+      "timestamp": "2026-03-07T02:45:51.034Z",
+      "reason": "Max state transitions exceeded"
+    },
+    {
+      "from": "blocked",
+      "to": "done",
+      "timestamp": "2026-03-07T02:54:49.351Z"
     }
-  ]
+  ],
+  "featureType": "code",
+  "model": "claude-opus-4-6",
+  "updatedAt": "2026-03-07T02:37:51.353Z",
+  "costUsd": 1.4087137499999995,
+  "lastSessionId": "42a7c671-0a01-4b7b-b21a-472aed0e153e",
+  "executionHistory": [
+    {
+      "id": "560532f4-5998-484a-a9e1-6a9ad030e294",
+      "startedAt": "2026-03-07T02:32:24.174Z",
+      "completedAt": "2026-03-07T02:37:51.364Z",
+      "durationMs": 327190,
+      "costUsd": 1.4087137499999995,
+      "model": "claude-opus-4-6",
+      "success": true,
+      "trigger": "manual"
+    }
+  ],
+  "summary": "## Summary: Deep Audit v2: hx-visually-hidden\n\n### Changes Implemented\n- Added `focusable` boolean property with `reflect: true` for skip-link accessibility pattern\n- Added `:host([focusable]:focus-within)` CSS rule that removes all visually-hidden constraints when a child receives focus\n- Added modern `clip-path: inset(50%) !important` alongside deprecated `clip: rect(0,0,0,0)`\n- Added a11y contract test guarding against `display:none` / `visibility:hidden`\n- Added 4 focusable property tests (default value, attribute reflection, removal, keyboard accessibility)\n- Added 2 nesting context tests (nav element, list item)\n- Added `SkipLink` story demonstrating the focusable variant with anchor tag\n- Updated AUDIT.md with Deep Audit v2 results\n\n### Files Modified\n- `packages/hx-library/src/components/hx-visually-hidden/hx-visually-hidden.ts` — added focusable property\n- `packages/hx-library/src/components/hx-visually-hidden/hx-visually-hidden.styles.ts` — added clip-path and focus-within rule\n- `packages/hx-library/src/components/hx-visually-hidden/hx-visually-hidden.test.ts` — added 7 new tests\n- `packages/hx-library/src/components/hx-visually-hidden/hx-visually-hidden.stories.ts` — added SkipLink story\n- `packages/hx-library/src/components/hx-visually-hidden/AUDIT.md` — updated with audit results\n\n### Verification Status\n- `npm run verify` passes: 0 errors, 11/11 tasks cached (FULL TURBO)\n- `git diff --stat` confirms only 5 intended files changed\n- Working tree is clean\n\n### Risks/Blockers Encountered\n- None. Component was well-structured; audit findings were clear and fixable.\n\n### Learnings\n- The wc-mcp accessibility score (5/100) is expected for utility components that don't need ARIA roles, form association, or focus delegation — the score is designed for interactive components.\n- The `focusable` + `:focus-within` pattern is the standard approach for skip links in web component libraries.",
+  "prUrl": "https://github.com/bookedsolidtech/helix/pull/455",
+  "prNumber": 455,
+  "prTrackedSince": "2026-03-07T02:38:20.863Z",
+  "prLastPolledAt": "2026-03-07T02:54:38.657Z",
+  "statusChangeReason": "Max state transitions exceeded",
+  "failureCount": 1,
+  "completedAt": "2026-03-07T02:54:49.351Z"
 }

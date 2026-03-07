@@ -2,7 +2,7 @@
   "category": "Uncategorized",
   "description": "## Deep Component Audit — hx-skeleton\n\n**Component directory:** `packages/hx-library/src/components/hx-skeleton/`\n\n### wc-mcp Tools — USE THESE\n- `score_component`, `get_component`, `analyze_accessibility`, `list_css_parts`, `get_design_tokens`\n- **Report wc-mcp bugs to `/Volumes/Development/booked/wc-tools` board.**\n\n### Audit Scope\n1. **Design Tokens** — `--hx-` tokens. Background, shimmer color, border-radius. Dark mode.\n2. **Accessibility** — WCAG 2.1 AA. aria-busy on parent. aria-hidden on skeleton. Reduced-motion (no shimmer).\n3. **Functionality** — Shape variants (text, circle, rect). Custom dimensions. Shimmer animation. Loading state pattern.\n4. **TypeScript** — Strict. No `any`.\n5. **CSS/Styling** — Shadow DOM. CSS Parts. Shimmer animation. Responsive sizing.\n6. **CEM Accuracy** — All API documented.\n7. **Tests** — 80%+ coverage. Shapes. Animation. Reduced-motion. ARIA.\n8. **Storybook** — Text lines. Circle. Rectangle. Card skeleton. List skeleton.\n9. **Drupal Compatibility** — Loading states. Twig-friendly.\n10. **Portability** — CDN-ready.\n\n### Deliverable\nDetailed audit report. Fix CRITICAL+HIGH. Document rest.",
   "title": "Deep Audit v2: hx-skeleton",
-  "status": "backlog",
+  "status": "done",
   "branchName": "feature/deep-audit-v2-hx-skeleton",
   "complexity": "architectural",
   "priority": 3,
@@ -25,6 +25,46 @@
       "to": "backlog",
       "timestamp": "2026-03-06T17:25:45.253Z",
       "reason": "Feature created"
+    },
+    {
+      "from": "backlog",
+      "to": "in_progress",
+      "timestamp": "2026-03-07T00:52:36.710Z"
+    },
+    {
+      "from": "in_progress",
+      "to": "review",
+      "timestamp": "2026-03-07T00:58:58.913Z"
+    },
+    {
+      "from": "review",
+      "to": "done",
+      "timestamp": "2026-03-07T01:04:00.751Z"
+    },
+    {
+      "from": "done",
+      "to": "blocked",
+      "timestamp": "2026-03-07T01:06:31.247Z",
+      "reason": "Max state transitions exceeded"
+    },
+    {
+      "from": "blocked",
+      "to": "done",
+      "timestamp": "2026-03-07T01:09:11.694Z"
     }
-  ]
+  ],
+  "featureType": "code",
+  "model": "claude-opus-4-6",
+  "updatedAt": "2026-03-07T00:53:58.340Z",
+  "costUsd": 1.1591902499999998,
+  "lastSessionId": "d00470b7-8cf9-483a-8ebe-b0d1d46c62b9",
+  "prUrl": "https://github.com/bookedsolidtech/helix/pull/421",
+  "prNumber": 421,
+  "prCreatedAt": "2026-03-07T00:58:58.912Z",
+  "reviewStartedAt": "2026-03-07T00:58:58.913Z",
+  "prTrackedSince": "2026-03-07T00:58:58.915Z",
+  "prLastPolledAt": "2026-03-07T01:03:38.384Z",
+  "completedAt": "2026-03-07T01:04:00.751Z",
+  "statusChangeReason": "Max state transitions exceeded",
+  "failureCount": 1
 }

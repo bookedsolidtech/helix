@@ -2,7 +2,7 @@
   "category": "Uncategorized",
   "description": "## Deep Component Audit — hx-carousel\n\n**Component directory:** `packages/hx-library/src/components/hx-carousel/`\n**Sub-components:** hx-carousel-item\n\n### Audit Scope\n1. **Design Tokens** — `--hx-` tokens. Navigation arrows, dots, spacing. Transition timing. Dark mode.\n2. **Accessibility** — WCAG 2.1 AA. ARIA live region for slide changes. Keyboard (arrow keys). Pause on hover/focus. Reduced-motion.\n3. **Functionality** — Auto-play. Loop. Swipe/touch. Navigation dots/arrows. Items per view. Responsive breakpoints.\n4. **TypeScript** — Strict. No `any`.\n5. **CSS/Styling** — Shadow DOM. CSS Parts. Smooth transitions. Responsive.\n6. **CEM Accuracy** — Both carousel + carousel-item documented.\n7. **Tests** — 80%+ coverage. Navigation. Auto-play. Keyboard. Touch.\n8. **Storybook** — Multiple slides. Auto-play. Navigation styles.\n9. **Drupal Compatibility** — Views slideshow integration. Dynamic content.\n10. **Portability** — CDN-ready. No external carousel lib dependency.\n\n### Deliverable\nDetailed audit report. Fix CRITICAL+HIGH. Document rest.",
   "title": "Deep Audit v2: hx-carousel",
-  "status": "backlog",
+  "status": "done",
   "branchName": "feature/deep-audit-v2-hx-carousel",
   "complexity": "architectural",
   "priority": 3,
@@ -25,6 +25,22 @@
       "to": "backlog",
       "timestamp": "2026-03-06T17:20:34.363Z",
       "reason": "Feature created"
+    },
+    {
+      "from": "backlog",
+      "to": "review",
+      "timestamp": "2026-03-06T22:17:06.539Z"
+    },
+    {
+      "from": "review",
+      "to": "done",
+      "timestamp": "2026-03-07T01:01:29.068Z"
     }
-  ]
+  ],
+  "featureType": "code",
+  "prLastPolledAt": "2026-03-07T00:38:06.676Z",
+  "reviewStartedAt": "2026-03-06T22:17:06.539Z",
+  "prNumber": 376,
+  "prMergedAt": "2026-03-07T00:57:19Z",
+  "completedAt": "2026-03-07T01:01:29.068Z"
 }

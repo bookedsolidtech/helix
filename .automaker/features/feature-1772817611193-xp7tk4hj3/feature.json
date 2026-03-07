@@ -2,7 +2,7 @@
   "category": "Uncategorized",
   "description": "## Deep Component Audit — hx-avatar\n\n**Component directory:** `packages/hx-library/src/components/hx-avatar/`\n**wc-mcp Health Score:** 100 (A) — No issues.\n\n### Audit Scope\n1. **Design Tokens** — `--hx-` tokens only. No hardcoded values. Three-tier cascade. Dark mode.\n2. **Accessibility** — WCAG 2.1 AA. Alt text for images. Fallback initials. ARIA labels.\n3. **Functionality** — Image loading/error fallback. Initials generation. Size variants. Shape variants. Status indicator.\n4. **TypeScript** — Strict. No `any`.\n5. **CSS/Styling** — Shadow DOM. CSS Parts. Responsive sizing.\n6. **CEM Accuracy** — Verify 100 score holds.\n7. **Tests** — 80%+ coverage. Image error fallback. Initials. Sizes.\n8. **Storybook** — All sizes/shapes/states. Image + fallback demos.\n9. **Drupal Compatibility** — Twig-friendly. User profile integration.\n10. **Portability** — CDN-ready.\n\n### Deliverable\nDetailed audit report. Fix CRITICAL+HIGH. Document rest.",
   "title": "Deep Audit v2: hx-avatar",
-  "status": "backlog",
+  "status": "done",
   "branchName": "feature/deep-audit-v2-hx-avatar",
   "complexity": "architectural",
   "priority": 3,
@@ -25,6 +25,22 @@
       "to": "backlog",
       "timestamp": "2026-03-06T17:20:11.193Z",
       "reason": "Feature created"
+    },
+    {
+      "from": "backlog",
+      "to": "review",
+      "timestamp": "2026-03-06T22:17:02.128Z"
+    },
+    {
+      "from": "review",
+      "to": "done",
+      "timestamp": "2026-03-07T01:01:29.009Z"
     }
-  ]
+  ],
+  "featureType": "code",
+  "prLastPolledAt": "2026-03-07T00:38:00.778Z",
+  "reviewStartedAt": "2026-03-06T22:17:02.128Z",
+  "prNumber": 368,
+  "prMergedAt": "2026-03-07T00:58:36Z",
+  "completedAt": "2026-03-07T01:01:29.009Z"
 }

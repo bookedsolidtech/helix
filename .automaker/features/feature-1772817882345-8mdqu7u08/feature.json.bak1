@@ -1,0 +1,42 @@
+{
+  "category": "Uncategorized",
+  "description": "## Deep Component Audit — hx-progress-bar\n\n**Component directory:** `packages/hx-library/src/components/hx-progress-bar/`\n\n### wc-mcp Tools — USE THESE\n- `score_component`, `get_component`, `analyze_accessibility`, `list_css_parts`, `get_design_tokens`\n- **Report wc-mcp bugs to `/Volumes/Development/booked/wc-tools` board.**\n\n### Audit Scope\n1. **Design Tokens** — `--hx-` tokens. Track, fill, label. Color variants. Dark mode.\n2. **Accessibility** — WCAG 2.1 AA. progressbar role. aria-valuenow/min/max. aria-label. Indeterminate state.\n3. **Functionality** — Value (0-100). Indeterminate mode. Label/description. Size variants. Color variants.\n4. **TypeScript** — Strict. No `any`.\n5. **CSS/Styling** — Shadow DOM. CSS Parts. Fill animation. Indeterminate animation. Responsive.\n6. **CEM Accuracy** — All API documented.\n7. **Tests** — 80%+ coverage. Values. Indeterminate. ARIA. Variants.\n8. **Storybook** — Values. Indeterminate. Sizes. Colors. With label.\n9. **Drupal Compatibility** — Batch API progress. Twig-friendly.\n10. **Portability** — CDN-ready.\n\n### Deliverable\nDetailed audit report. Fix CRITICAL+HIGH. Document rest.",
+  "title": "Deep Audit v2: hx-progress-bar",
+  "status": "backlog",
+  "branchName": "feature/deep-audit-v2-hx-progress-bar",
+  "complexity": "architectural",
+  "priority": 3,
+  "source": "api",
+  "trustTier": 1,
+  "quarantineStatus": "passed",
+  "quarantineId": "d0ddfc73-c59e-4d0e-a87d-8c0e85fb791d",
+  "id": "feature-1772817882345-8mdqu7u08",
+  "descriptionHistory": [
+    {
+      "description": "## Deep Component Audit — hx-progress-bar\n\n**Component directory:** `packages/hx-library/src/components/hx-progress-bar/`\n\n### wc-mcp Tools — USE THESE\n- `score_component`, `get_component`, `analyze_accessibility`, `list_css_parts`, `get_design_tokens`\n- **Report wc-mcp bugs to `/Volumes/Development/booked/wc-tools` board.**\n\n### Audit Scope\n1. **Design Tokens** — `--hx-` tokens. Track, fill, label. Color variants. Dark mode.\n2. **Accessibility** — WCAG 2.1 AA. progressbar role. aria-valuenow/min/max. aria-label. Indeterminate state.\n3. **Functionality** — Value (0-100). Indeterminate mode. Label/description. Size variants. Color variants.\n4. **TypeScript** — Strict. No `any`.\n5. **CSS/Styling** — Shadow DOM. CSS Parts. Fill animation. Indeterminate animation. Responsive.\n6. **CEM Accuracy** — All API documented.\n7. **Tests** — 80%+ coverage. Values. Indeterminate. ARIA. Variants.\n8. **Storybook** — Values. Indeterminate. Sizes. Colors. With label.\n9. **Drupal Compatibility** — Batch API progress. Twig-friendly.\n10. **Portability** — CDN-ready.\n\n### Deliverable\nDetailed audit report. Fix CRITICAL+HIGH. Document rest.",
+      "timestamp": "2026-03-06T17:24:42.345Z",
+      "source": "initial"
+    }
+  ],
+  "createdAt": "2026-03-06T17:24:42.345Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-03-06T17:24:42.345Z",
+      "reason": "Feature created"
+    },
+    {
+      "from": "backlog",
+      "to": "in_progress",
+      "timestamp": "2026-03-06T20:58:51.618Z"
+    },
+    {
+      "from": "in_progress",
+      "to": "backlog",
+      "timestamp": "2026-03-06T20:59:34.555Z"
+    }
+  ],
+  "featureType": "code",
+  "model": "claude-opus-4-6"
+}

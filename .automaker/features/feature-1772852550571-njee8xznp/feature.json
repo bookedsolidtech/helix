@@ -1,0 +1,30 @@
+{
+  "category": "Uncategorized",
+  "description": "## Post-Audit Follow-Up: hx-breadcrumb\n\nIssues identified during Deep Audit v2 of `hx-breadcrumb` that were not fixed inline.\n\n### Items\n- [ ] The `current` attribute is additive — existing behavior (last item = current page) still works when no `current` is set, but should be documented\n- [ ] The ellipsis expand sets `maxItems = 0` permanently on click, meaning re-collapse requires a page refresh — consider adding toggle behavior\n\n### Context\n- Audit feature: `feature-1772817611248-6zvrfppiu`",
+  "title": "Post-Audit: hx-breadcrumb — follow-up items",
+  "status": "backlog",
+  "complexity": "small",
+  "priority": 4,
+  "source": "api",
+  "trustTier": 1,
+  "quarantineStatus": "passed",
+  "quarantineId": "9a9b9a59-59df-4e8c-92c9-1f433ff1c96d",
+  "id": "feature-1772852550571-njee8xznp",
+  "branchName": "feature/post-audit-hx-breadcrumb-follow-up-items",
+  "descriptionHistory": [
+    {
+      "description": "## Post-Audit Follow-Up: hx-breadcrumb\n\nIssues identified during Deep Audit v2 of `hx-breadcrumb` that were not fixed inline.\n\n### Items\n- [ ] The `current` attribute is additive — existing behavior (last item = current page) still works when no `current` is set, but should be documented\n- [ ] The ellipsis expand sets `maxItems = 0` permanently on click, meaning re-collapse requires a page refresh — consider adding toggle behavior\n\n### Context\n- Audit feature: `feature-1772817611248-6zvrfppiu`",
+      "timestamp": "2026-03-07T03:02:30.571Z",
+      "source": "initial"
+    }
+  ],
+  "createdAt": "2026-03-07T03:02:30.571Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-03-07T03:02:30.571Z",
+      "reason": "Feature created"
+    }
+  ]
+}

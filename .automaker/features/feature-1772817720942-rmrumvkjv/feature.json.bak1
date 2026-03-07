@@ -1,0 +1,37 @@
+{
+  "category": "Uncategorized",
+  "description": "## Deep Component Audit — hx-divider\n\n**Component directory:** `packages/hx-library/src/components/hx-divider/`\n\n### wc-mcp Tools — USE THESE FOR SCORING\n- `score_component`, `get_component`, `analyze_accessibility`, `validate_usage`, `list_css_parts`, `get_design_tokens`\n- **Report any wc-mcp bugs to `/Volumes/Development/booked/wc-tools` board.**\n\n### Audit Scope\n1. **Design Tokens** — `--hx-` tokens. Color, thickness, spacing. Dark mode.\n2. **Accessibility** — WCAG 2.1 AA. role=\"separator\". aria-orientation. Decorative vs semantic.\n3. **Functionality** — Horizontal/vertical. Thickness variants. With label/text. Spacing.\n4. **TypeScript** — Strict. No `any`.\n5. **CSS/Styling** — Shadow DOM. CSS Parts. Flexible width/height.\n6. **CEM Accuracy** — All API documented.\n7. **Tests** — 80%+ coverage. Orientation. Label. ARIA.\n8. **Storybook** — Horizontal/vertical. With text. Spacing variants.\n9. **Drupal Compatibility** — Twig-friendly.\n10. **Portability** — CDN-ready.\n\n### Deliverable\nDetailed audit report. Fix CRITICAL+HIGH. Document rest.",
+  "title": "Deep Audit v2: hx-divider",
+  "status": "in_progress",
+  "branchName": "feature/deep-audit-v2-hx-divider",
+  "complexity": "architectural",
+  "priority": 3,
+  "source": "api",
+  "trustTier": 1,
+  "quarantineStatus": "passed",
+  "quarantineId": "b9f4e4ab-76b4-482c-b45f-e09c7c0fcd30",
+  "id": "feature-1772817720942-rmrumvkjv",
+  "descriptionHistory": [
+    {
+      "description": "## Deep Component Audit — hx-divider\n\n**Component directory:** `packages/hx-library/src/components/hx-divider/`\n\n### wc-mcp Tools — USE THESE FOR SCORING\n- `score_component`, `get_component`, `analyze_accessibility`, `validate_usage`, `list_css_parts`, `get_design_tokens`\n- **Report any wc-mcp bugs to `/Volumes/Development/booked/wc-tools` board.**\n\n### Audit Scope\n1. **Design Tokens** — `--hx-` tokens. Color, thickness, spacing. Dark mode.\n2. **Accessibility** — WCAG 2.1 AA. role=\"separator\". aria-orientation. Decorative vs semantic.\n3. **Functionality** — Horizontal/vertical. Thickness variants. With label/text. Spacing.\n4. **TypeScript** — Strict. No `any`.\n5. **CSS/Styling** — Shadow DOM. CSS Parts. Flexible width/height.\n6. **CEM Accuracy** — All API documented.\n7. **Tests** — 80%+ coverage. Orientation. Label. ARIA.\n8. **Storybook** — Horizontal/vertical. With text. Spacing variants.\n9. **Drupal Compatibility** — Twig-friendly.\n10. **Portability** — CDN-ready.\n\n### Deliverable\nDetailed audit report. Fix CRITICAL+HIGH. Document rest.",
+      "timestamp": "2026-03-06T17:22:00.942Z",
+      "source": "initial"
+    }
+  ],
+  "createdAt": "2026-03-06T17:22:00.942Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-03-06T17:22:00.942Z",
+      "reason": "Feature created"
+    },
+    {
+      "from": "backlog",
+      "to": "in_progress",
+      "timestamp": "2026-03-06T19:29:28.886Z"
+    }
+  ],
+  "featureType": "code",
+  "model": "claude-opus-4-6"
+}

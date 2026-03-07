@@ -2,7 +2,7 @@
   "category": "Uncategorized",
   "description": "## Deep Component Audit — hx-ripple\n\n**Component directory:** `packages/hx-library/src/components/hx-ripple/`\n\n### wc-mcp Tools — USE THESE\n- `score_component`, `get_component`, `get_design_tokens`, `find_components_using_token`\n- **Report wc-mcp bugs to `/Volumes/Development/booked/wc-tools` board.**\n\n### Audit Scope\n1. **Design Tokens** — `--hx-` tokens. Ripple color, opacity, duration. Dark mode.\n2. **Accessibility** — WCAG 2.1 AA. Reduced-motion support (prefers-reduced-motion). Decorative only.\n3. **Functionality** — Click ripple effect. Touch support. Programmatic trigger. Unbounded mode. Integration with buttons/cards.\n4. **TypeScript** — Strict. No `any`.\n5. **CSS/Styling** — Shadow DOM. Animation performance (transform/opacity only). Containment. CSS Parts.\n6. **CEM Accuracy** — All API documented.\n7. **Tests** — 80%+ coverage. Click trigger. Touch. Animation. Reduced-motion.\n8. **Storybook** — On button. On card. Unbounded. Custom color.\n9. **Drupal Compatibility** — Utility component. Twig-friendly.\n10. **Portability** — CDN-ready. Performance-critical utility.\n\n### Deliverable\nDetailed audit report. Fix CRITICAL+HIGH. Document rest.",
   "title": "Deep Audit v2: hx-ripple",
-  "status": "backlog",
+  "status": "done",
   "branchName": "feature/deep-audit-v2-hx-ripple",
   "complexity": "architectural",
   "priority": 3,
@@ -25,6 +25,22 @@
       "to": "backlog",
       "timestamp": "2026-03-06T17:25:16.289Z",
       "reason": "Feature created"
+    },
+    {
+      "from": "backlog",
+      "to": "review",
+      "timestamp": "2026-03-06T22:19:25.722Z"
+    },
+    {
+      "from": "review",
+      "to": "done",
+      "timestamp": "2026-03-07T01:01:29.367Z"
     }
-  ]
+  ],
+  "featureType": "code",
+  "prLastPolledAt": "2026-03-07T00:38:30.108Z",
+  "reviewStartedAt": "2026-03-06T22:19:25.722Z",
+  "prNumber": 417,
+  "prMergedAt": "2026-03-07T00:58:35Z",
+  "completedAt": "2026-03-07T01:01:29.367Z"
 }

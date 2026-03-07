@@ -1,0 +1,37 @@
+{
+  "category": "Uncategorized",
+  "description": "## Deep Component Audit — hx-side-nav\n\n**Component directory:** `packages/hx-library/src/components/hx-side-nav/`\n\n### wc-mcp Tools — USE THESE\n- `score_component`, `get_component`, `analyze_accessibility`, `list_css_parts`, `list_events`, `list_slots`, `get_design_tokens`\n- **Report wc-mcp bugs to `/Volumes/Development/booked/wc-tools` board.**\n\n### Audit Scope\n1. **Design Tokens** — `--hx-` tokens. Background, active item, hover, width, collapse. Dark mode.\n2. **Accessibility** — WCAG 2.1 AA. nav landmark. aria-label. Current page. Keyboard navigation. Collapsible sections.\n3. **Functionality** — Collapsible/expandable. Rail mode (icons only). Sections/groups. Active item. Nested items. Responsive (drawer on mobile).\n4. **TypeScript** — Strict. No `any`.\n5. **CSS/Styling** — Shadow DOM. CSS Parts. Collapse animation. Rail width. Responsive.\n6. **CEM Accuracy** — All API documented.\n7. **Tests** — 80%+ coverage. Collapse. Rail. Active. Keyboard. Responsive.\n8. **Storybook** — Expanded. Rail. Collapsible. With sections. Responsive.\n9. **Drupal Compatibility** — Admin sidebar. Twig-friendly.\n10. **Portability** — CDN-ready.\n\n### Deliverable\nDetailed audit report. Fix CRITICAL+HIGH. Document rest.",
+  "title": "Deep Audit v2: hx-side-nav",
+  "status": "in_progress",
+  "branchName": "feature/deep-audit-v2-hx-side-nav",
+  "complexity": "architectural",
+  "priority": 3,
+  "source": "api",
+  "trustTier": 1,
+  "quarantineStatus": "passed",
+  "quarantineId": "bc605419-17ec-4f7b-a27f-393e69760063",
+  "id": "feature-1772817939818-1bpg8o25c",
+  "descriptionHistory": [
+    {
+      "description": "## Deep Component Audit — hx-side-nav\n\n**Component directory:** `packages/hx-library/src/components/hx-side-nav/`\n\n### wc-mcp Tools — USE THESE\n- `score_component`, `get_component`, `analyze_accessibility`, `list_css_parts`, `list_events`, `list_slots`, `get_design_tokens`\n- **Report wc-mcp bugs to `/Volumes/Development/booked/wc-tools` board.**\n\n### Audit Scope\n1. **Design Tokens** — `--hx-` tokens. Background, active item, hover, width, collapse. Dark mode.\n2. **Accessibility** — WCAG 2.1 AA. nav landmark. aria-label. Current page. Keyboard navigation. Collapsible sections.\n3. **Functionality** — Collapsible/expandable. Rail mode (icons only). Sections/groups. Active item. Nested items. Responsive (drawer on mobile).\n4. **TypeScript** — Strict. No `any`.\n5. **CSS/Styling** — Shadow DOM. CSS Parts. Collapse animation. Rail width. Responsive.\n6. **CEM Accuracy** — All API documented.\n7. **Tests** — 80%+ coverage. Collapse. Rail. Active. Keyboard. Responsive.\n8. **Storybook** — Expanded. Rail. Collapsible. With sections. Responsive.\n9. **Drupal Compatibility** — Admin sidebar. Twig-friendly.\n10. **Portability** — CDN-ready.\n\n### Deliverable\nDetailed audit report. Fix CRITICAL+HIGH. Document rest.",
+      "timestamp": "2026-03-06T17:25:39.818Z",
+      "source": "initial"
+    }
+  ],
+  "createdAt": "2026-03-06T17:25:39.818Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-03-06T17:25:39.818Z",
+      "reason": "Feature created"
+    },
+    {
+      "from": "backlog",
+      "to": "in_progress",
+      "timestamp": "2026-03-07T00:52:33.571Z"
+    }
+  ],
+  "featureType": "code",
+  "model": "claude-opus-4-6"
+}

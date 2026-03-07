@@ -1,0 +1,37 @@
+{
+  "category": "Uncategorized",
+  "description": "## Deep Component Audit — hx-carousel\n\n**Component directory:** `packages/hx-library/src/components/hx-carousel/`\n**Sub-components:** hx-carousel-item\n\n### Audit Scope\n1. **Design Tokens** — `--hx-` tokens. Navigation arrows, dots, spacing. Transition timing. Dark mode.\n2. **Accessibility** — WCAG 2.1 AA. ARIA live region for slide changes. Keyboard (arrow keys). Pause on hover/focus. Reduced-motion.\n3. **Functionality** — Auto-play. Loop. Swipe/touch. Navigation dots/arrows. Items per view. Responsive breakpoints.\n4. **TypeScript** — Strict. No `any`.\n5. **CSS/Styling** — Shadow DOM. CSS Parts. Smooth transitions. Responsive.\n6. **CEM Accuracy** — Both carousel + carousel-item documented.\n7. **Tests** — 80%+ coverage. Navigation. Auto-play. Keyboard. Touch.\n8. **Storybook** — Multiple slides. Auto-play. Navigation styles.\n9. **Drupal Compatibility** — Views slideshow integration. Dynamic content.\n10. **Portability** — CDN-ready. No external carousel lib dependency.\n\n### Deliverable\nDetailed audit report. Fix CRITICAL+HIGH. Document rest.",
+  "title": "Deep Audit v2: hx-carousel",
+  "status": "in_progress",
+  "branchName": "feature/deep-audit-v2-hx-carousel",
+  "complexity": "architectural",
+  "priority": 3,
+  "source": "api",
+  "trustTier": 1,
+  "quarantineStatus": "passed",
+  "quarantineId": "4add8d83-2e56-4e50-bda6-fc823e304e28",
+  "id": "feature-1772817634363-6ub04xmql",
+  "descriptionHistory": [
+    {
+      "description": "## Deep Component Audit — hx-carousel\n\n**Component directory:** `packages/hx-library/src/components/hx-carousel/`\n**Sub-components:** hx-carousel-item\n\n### Audit Scope\n1. **Design Tokens** — `--hx-` tokens. Navigation arrows, dots, spacing. Transition timing. Dark mode.\n2. **Accessibility** — WCAG 2.1 AA. ARIA live region for slide changes. Keyboard (arrow keys). Pause on hover/focus. Reduced-motion.\n3. **Functionality** — Auto-play. Loop. Swipe/touch. Navigation dots/arrows. Items per view. Responsive breakpoints.\n4. **TypeScript** — Strict. No `any`.\n5. **CSS/Styling** — Shadow DOM. CSS Parts. Smooth transitions. Responsive.\n6. **CEM Accuracy** — Both carousel + carousel-item documented.\n7. **Tests** — 80%+ coverage. Navigation. Auto-play. Keyboard. Touch.\n8. **Storybook** — Multiple slides. Auto-play. Navigation styles.\n9. **Drupal Compatibility** — Views slideshow integration. Dynamic content.\n10. **Portability** — CDN-ready. No external carousel lib dependency.\n\n### Deliverable\nDetailed audit report. Fix CRITICAL+HIGH. Document rest.",
+      "timestamp": "2026-03-06T17:20:34.363Z",
+      "source": "initial"
+    }
+  ],
+  "createdAt": "2026-03-06T17:20:34.363Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-03-06T17:20:34.363Z",
+      "reason": "Feature created"
+    },
+    {
+      "from": "backlog",
+      "to": "in_progress",
+      "timestamp": "2026-03-06T19:04:07.847Z"
+    }
+  ],
+  "featureType": "code",
+  "model": "claude-opus-4-6"
+}

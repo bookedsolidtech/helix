@@ -2,7 +2,7 @@
   "category": "Uncategorized",
   "description": "## Deep Component Audit — hx-checkbox\n\n**Component directory:** `packages/hx-library/src/components/hx-checkbox/`\n**wc-mcp Health Score:** 90 (A)\n**Known issues:** formAssociated, _internals, _inputEl, _hasErrorSlot, _id, _helpTextId, _errorId, _labelId — all missing descriptions.\n\n### Audit Scope\n1. **Design Tokens** — `--hx-` tokens. Checkmark, border, background. States (checked, indeterminate, disabled, error). Dark mode.\n2. **Accessibility** — WCAG 2.1 AA. Proper label association. Indeterminate state. Error state announcements. Required indicator.\n3. **Functionality** — Checked/unchecked/indeterminate. Form integration (ElementInternals). Validation. Error/help text slots. Required.\n4. **TypeScript** — Strict. formAssociated. ElementInternals. No `any`.\n5. **CSS/Styling** — Shadow DOM. Custom checkmark styling. Focus-ring. CSS Parts.\n6. **CEM Accuracy** — Fix all 8 missing descriptions.\n7. **Tests** — 80%+ coverage. States. Form integration. Validation. Keyboard (Space).\n8. **Storybook** — All states. Error. Help text. Indeterminate.\n9. **Drupal Compatibility** — Form API integration. Twig attributes.\n10. **Portability** — CDN-ready. Form-associated.\n\n### Deliverable\nDetailed audit report. Fix CRITICAL+HIGH. Document rest.",
   "title": "Deep Audit v2: hx-checkbox",
-  "status": "backlog",
+  "status": "done",
   "branchName": "feature/deep-audit-v2-hx-checkbox",
   "complexity": "architectural",
   "priority": 3,
@@ -25,6 +25,22 @@
       "to": "backlog",
       "timestamp": "2026-03-06T17:20:41.456Z",
       "reason": "Feature created"
+    },
+    {
+      "from": "backlog",
+      "to": "review",
+      "timestamp": "2026-03-06T22:17:07.002Z"
+    },
+    {
+      "from": "review",
+      "to": "done",
+      "timestamp": "2026-03-07T01:01:29.081Z"
     }
-  ]
+  ],
+  "featureType": "code",
+  "prLastPolledAt": "2026-03-07T00:38:06.032Z",
+  "reviewStartedAt": "2026-03-06T22:17:07.002Z",
+  "prNumber": 375,
+  "prMergedAt": "2026-03-07T00:57:32Z",
+  "completedAt": "2026-03-07T01:01:29.081Z"
 }

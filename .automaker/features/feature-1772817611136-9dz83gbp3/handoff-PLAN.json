@@ -1,0 +1,11 @@
+{
+  "phase": "PLAN",
+  "summary": "Feature: Deep Audit v2: hx-action-bar\n\n## Deep Component Audit — hx-action-bar\n\n**Component directory:** `packages/hx-library/src/components/hx-action-bar/`\n\n### Audit Scope (ALL areas — leave nothing unchecked)\n\n1. **Design Tokens** — Verify ALL CSS custom properties use `--hx-` prefixed tokens. No hardcoded colors, spacing, typography, or timing values. Three-tier cascade. Dark mode overrides.\n2. **Accessibility (A11Y)** — WCAG 2.1 AA. ARIA roles/states/properties. Keyboard navigation. Focus m",
+  "discoveries": [],
+  "modifiedFiles": [],
+  "outstandingQuestions": [],
+  "scopeLimits": [],
+  "testCoverage": "N/A — plan phase",
+  "verdict": "WARN",
+  "createdAt": "2026-03-06T18:49:07.551Z"
+}
