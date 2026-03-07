@@ -22,14 +22,6 @@ interface SelectOption {
  *
  * @summary Form-associated custom select with label, error, and help text.
  *
- * ### Accessibility
- *
- * The trigger uses `role="combobox"` with `aria-expanded`, `aria-haspopup="listbox"`,
- * `aria-controls`, and `aria-activedescendant` for screen-reader navigation.
- * Arrow keys, Home, End, Enter, Space, and Escape provide full keyboard support
- * following the ARIA combobox (select-only) pattern. When a label is provided it is
- * associated via `for`/`id`. Error and help-text are linked with `aria-describedby`.
- *
  * @tag hx-select
  *
  * @slot - Default slot for `<option>` and `<optgroup>` elements.
@@ -68,10 +60,8 @@ export class HelixSelect extends LitElement {
 
   // ─── Form Association ───
 
-  /** Enables the browser's form-association lifecycle for this element. */
   static formAssociated = true;
 
-  /** ElementInternals instance for form value, validity, and state management. */
   private _internals: ElementInternals;
 
   constructor() {
@@ -81,15 +71,10 @@ export class HelixSelect extends LitElement {
 
   // ─── Stable IDs ───
 
-  /** Unique ID for the trigger element, used by the label `for` attribute. */
   private _selectId = `hx-select-${Math.random().toString(36).slice(2, 9)}`;
-  /** Instance identifier used to generate unique option IDs. */
   private _instanceId = this._selectId;
-  /** ID for the listbox panel, referenced by `aria-controls`. */
   private _listboxId = `${this._selectId}-listbox`;
-  /** ID for the help-text element, referenced by `aria-describedby`. */
   private _helpTextId = `${this._selectId}-help`;
-  /** ID for the error element, referenced by `aria-describedby`. */
   private _errorId = `${this._selectId}-error`;
 
   // ─── Public Properties ───
@@ -173,26 +158,20 @@ export class HelixSelect extends LitElement {
 
   // ─── Internal State ───
 
-  /** Parsed option models derived from slotted `<option>` elements. */
   @state() private _options: SelectOption[] = [];
-  /** Whether the error slot has projected content. */
   @state() private _hasErrorSlot = false;
-  /** Index of the currently keyboard-focused option in the listbox (-1 = none). */
   @state() private _focusedOptionIndex = -1;
 
   // ─── Queries ───
 
-  /** Reference to the hidden native `<select>` used for form participation. */
   @query('.field__select')
   private _select!: HTMLSelectElement;
 
-  /** Reference to the visible trigger `<button>` acting as the combobox. */
   @query('.field__trigger')
   private _trigger!: HTMLButtonElement;
 
   // ─── Computed helpers ───
 
-  /** The human-readable label of the currently selected option, or empty string. */
   private get _displayValue(): string {
     if (!this.value) return '';
     const opt = this._options.find((o) => o.value === this.value);
@@ -246,12 +225,10 @@ export class HelixSelect extends LitElement {
     return this._internals.reportValidity();
   }
 
-  /** Pushes the current value to ElementInternals for form submission. */
   private _updateFormValue(): void {
     this._internals.setFormValue(this.value || null);
   }
 
-  /** Recalculates and sets the element's validity via ElementInternals. */
   private _updateValidity(): void {
     if (this.required && !this.value) {
       this._internals.setValidity(
@@ -277,7 +254,6 @@ export class HelixSelect extends LitElement {
 
   // ─── Native Select Sync ───
 
-  /** Synchronizes the hidden native select's value with the component value. */
   private _syncNativeSelect(): void {
     if (!this._select) return;
     if (this.value) {
@@ -287,18 +263,15 @@ export class HelixSelect extends LitElement {
 
   // ─── Option Syncing from Slot ───
 
-  /** Re-reads options and syncs clones when slotted content changes. */
   private _handleSlotChange(): void {
     this._readOptions();
     this._syncClonedOptions();
   }
 
-  /** Extracts value, label, and disabled state from an `<option>` element. */
   private _parseOption(el: HTMLOptionElement): SelectOption {
     return { value: el.value, label: el.textContent?.trim() ?? el.value, disabled: el.disabled };
   }
 
-  /** Parses all slotted `<option>` and `<optgroup>` elements into internal models. */
   private _readOptions(): void {
     const slot = this.shadowRoot?.querySelector<HTMLSlotElement>('slot:not([name])');
     if (!slot) return;
@@ -318,7 +291,6 @@ export class HelixSelect extends LitElement {
     this._options = parsed;
   }
 
-  /** Clones slotted options into the hidden native select for form participation. */
   private _syncClonedOptions(): void {
     if (!this._select) return;
 
@@ -349,7 +321,6 @@ export class HelixSelect extends LitElement {
 
   // ─── Slot Change Handlers ───
 
-  /** Tracks whether the error slot has projected content. */
   private _handleErrorSlotChange(e: Event): void {
     const slot = e.target as HTMLSlotElement;
     this._hasErrorSlot = slot.assignedNodes({ flatten: true }).length > 0;
@@ -357,7 +328,6 @@ export class HelixSelect extends LitElement {
 
   // ─── Dropdown Control ───
 
-  /** Toggles the dropdown open/closed, updating focused option index. */
   private _toggleDropdown(): void {
     if (!this.disabled) {
       this.open = !this.open;
@@ -373,7 +343,6 @@ export class HelixSelect extends LitElement {
 
   // ─── Keyboard Navigation ───
 
-  /** Handles keyboard navigation (Arrow, Home, End, Enter, Space, Escape). */
   private _handleKeydown(e: KeyboardEvent): void {
     if (this.disabled) return;
 
@@ -454,7 +423,6 @@ export class HelixSelect extends LitElement {
 
   // ─── Selection ───
 
-  /** Selects the given option, updates value, dispatches change, and closes dropdown. */
   private _selectOption(option: SelectOption): void {
     if (option.disabled) return;
     this.value = option.value; // triggers updated() → sync + formValue + validity
@@ -465,7 +433,6 @@ export class HelixSelect extends LitElement {
 
   // ─── Event Dispatchers ───
 
-  /** Fires the `hx-change` CustomEvent with the current value. */
   private _dispatchChange(): void {
     this.dispatchEvent(
       new CustomEvent('hx-change', {
@@ -476,7 +443,6 @@ export class HelixSelect extends LitElement {
     );
   }
 
-  /** Forwards the native select's change event as a component value update. */
   private _handleNativeChange(e: Event): void {
     this.value = (e.target as HTMLSelectElement).value; // triggers updated()
     this._dispatchChange();
@@ -484,7 +450,6 @@ export class HelixSelect extends LitElement {
 
   // ─── Outside Click Handler ───
 
-  /** Closes the dropdown when clicking outside the component. */
   private _handleOutsideClick = (e: MouseEvent): void => {
     if (this.open && !e.composedPath().includes(this)) {
       this.open = false;
@@ -500,12 +465,10 @@ export class HelixSelect extends LitElement {
 
   // ─── Render Helpers ───
 
-  /** Generates a unique DOM id for the option at the given index. */
   private _optionId(index: number): string {
     return `hx-select-option-${this._instanceId}-${index}`;
   }
 
-  /** Renders the listbox option elements with selection and focus states. */
   private _renderOptions() {
     if (this._options.length === 0) {
       return html`<div class="field__no-options">No options found</div>`;
