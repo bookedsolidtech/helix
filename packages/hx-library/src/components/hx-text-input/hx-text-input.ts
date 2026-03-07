@@ -8,6 +8,9 @@ import { helixTextInputStyles } from './hx-text-input.styles.js';
 
 /**
  * A text input component with label, validation, and form association.
+ * Supports accessible labeling via `label` property, `aria-label` attribute, or the `label` slot.
+ * Uses `aria-invalid`, `aria-describedby`, and `aria-required` on the native input for screen reader support.
+ * Error messages are announced via `role="alert"`. Keyboard navigation follows native input behavior.
  *
  * @summary Form-associated text input with built-in label, error, and help text.
  *
@@ -46,8 +49,10 @@ export class HelixTextInput extends LitElement {
 
   // ─── Form Association ───
 
+  /** @internal */
   static formAssociated = true;
 
+  /** @internal */
   private _internals: ElementInternals;
 
   constructor() {
@@ -171,14 +176,18 @@ export class HelixTextInput extends LitElement {
 
   // ─── Internal References ───
 
+  /** @internal */
   @query('.field__input')
   private _input!: HTMLInputElement;
 
   // ─── Slot Tracking ───
 
+  /** @internal */
   private _hasLabelSlot = false;
+  /** @internal */
   private _hasErrorSlot = false;
 
+  /** @internal */
   private _handleLabelSlotChange(e: Event): void {
     const slot = e.target as HTMLSlotElement;
     this._hasLabelSlot = slot.assignedElements().length > 0;
@@ -191,6 +200,7 @@ export class HelixTextInput extends LitElement {
     this.requestUpdate();
   }
 
+  /** @internal */
   private _handleErrorSlotChange(e: Event): void {
     const slot = e.target as HTMLSlotElement;
     this._hasErrorSlot = slot.assignedElements().length > 0;
@@ -241,6 +251,7 @@ export class HelixTextInput extends LitElement {
     return this._internals.reportValidity();
   }
 
+  /** @internal */
   private _updateValidity(): void {
     if (this.required && !this.value) {
       this._internals.setValidity(
@@ -282,6 +293,7 @@ export class HelixTextInput extends LitElement {
 
   // ─── Event Handling ───
 
+  /** @internal */
   private _handleInput(e: Event): void {
     const target = e.target as HTMLInputElement;
     this.value = target.value;
@@ -300,6 +312,7 @@ export class HelixTextInput extends LitElement {
     );
   }
 
+  /** @internal */
   private _handleChange(e: Event): void {
     const target = e.target as HTMLInputElement;
     this.value = target.value;
@@ -333,8 +346,11 @@ export class HelixTextInput extends LitElement {
 
   // ─── Render ───
 
+  /** @internal */
   private _inputId = `hx-text-input-${Math.random().toString(36).slice(2, 9)}`;
+  /** @internal */
   private _helpTextId = `${this._inputId}-help`;
+  /** @internal */
   private _errorId = `${this._inputId}-error`;
 
   override render() {
@@ -409,13 +425,7 @@ export class HelixTextInput extends LitElement {
         <slot name="error" @slotchange=${this._handleErrorSlotChange}>
           ${this.error
             ? html`
-                <div
-                  part="error"
-                  class="field__error"
-                  id=${this._errorId}
-                  role="alert"
-                  aria-live="polite"
-                >
+                <div part="error" class="field__error" id=${this._errorId} role="alert">
                   ${this.error}
                 </div>
               `
