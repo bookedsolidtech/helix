@@ -17,7 +17,7 @@ import { helixCardStyles } from './hx-card.styles.js';
  * @slot footer - Optional footer content below the body.
  * @slot actions - Optional action buttons, rendered with a top border separator.
  *
- * @fires {CustomEvent<{href: string, originalEvent: MouseEvent | KeyboardEvent}>} hx-card-click - Dispatched when an interactive card (with hx-href) is clicked or activated via keyboard.
+ * @fires {CustomEvent<{href: string, originalEvent: MouseEvent}>} hx-card-click - Dispatched when an interactive card (with hx-href) is clicked.
  *
  * @csspart card - The outer card container element.
  * @csspart image - The image slot container.
@@ -27,12 +27,11 @@ import { helixCardStyles } from './hx-card.styles.js';
  * @csspart actions - The actions slot container.
  *
  * @cssprop [--hx-card-bg=var(--hx-color-neutral-0)] - Card background color.
- * @cssprop [--hx-card-image-aspect-ratio] - Optional aspect ratio for image slot (e.g., 16/9).
  * @cssprop [--hx-card-color=var(--hx-color-neutral-800)] - Card text color.
  * @cssprop [--hx-card-border-color=var(--hx-color-neutral-200)] - Card border color.
  * @cssprop [--hx-card-border-radius=var(--hx-border-radius-lg)] - Card border radius.
  * @cssprop [--hx-card-padding=var(--hx-space-6)] - Internal padding for card sections.
- * @cssprop [--hx-card-gap=0] - Gap between card sections. Set to add extra spacing between image, heading, body, footer, and actions.
+ * @cssprop [--hx-card-gap=var(--hx-space-4)] - Gap between card sections.
  */
 @customElement('hx-card')
 export class HelixCard extends LitElement {
@@ -60,15 +59,6 @@ export class HelixCard extends LitElement {
    */
   @property({ type: String, attribute: 'hx-href' })
   hxHref = '';
-
-  /**
-   * Accessible label for interactive cards. When set, overrides the default
-   * "Navigate to {hx-href}" aria-label with a descriptive label.
-   * Recommended for all interactive cards in healthcare contexts.
-   * @attr hx-label
-   */
-  @property({ type: String, attribute: 'hx-label' })
-  hxLabel = '';
 
   // ─── Slot Detection ───
 
@@ -108,14 +98,11 @@ export class HelixCard extends LitElement {
      * @event hx-card-click
      */
     this.dispatchEvent(
-      new CustomEvent<{ href: string; originalEvent: MouseEvent | KeyboardEvent }>(
-        'hx-card-click',
-        {
-          bubbles: true,
-          composed: true,
-          detail: { href: this.hxHref, originalEvent },
-        },
-      ),
+      new CustomEvent('hx-card-click', {
+        bubbles: true,
+        composed: true,
+        detail: { href: this.hxHref, originalEvent },
+      }),
     );
   }
 
@@ -150,7 +137,7 @@ export class HelixCard extends LitElement {
         class=${classMap(classes)}
         role=${isInteractive ? 'link' : nothing}
         tabindex=${isInteractive ? '0' : nothing}
-        aria-label=${isInteractive ? this.hxLabel || `Navigate to ${this.hxHref}` : nothing}
+        aria-label=${isInteractive ? `Navigate to ${this.hxHref}` : nothing}
         @click=${this._handleClick}
         @keydown=${this._handleKeyDown}
       >
