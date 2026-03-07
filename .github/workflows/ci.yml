@@ -232,7 +232,10 @@ jobs:
   vrt:
     name: Visual Regression
     needs: changes
-    if: needs.changes.outputs.source == 'true' && needs.changes.outputs.is_audit != 'true'
+    if: >
+      needs.changes.outputs.source == 'true' &&
+      needs.changes.outputs.is_audit != 'true' &&
+      !contains(github.head_ref || github.ref_name, 'audit-fix')
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
