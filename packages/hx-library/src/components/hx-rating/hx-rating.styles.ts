@@ -57,6 +57,7 @@ export const helixRatingStyles = css`
 
   .base:not(.base--readonly) .symbol:hover {
     transform: scale(1.15);
+    color: var(--hx-rating-hover-color, var(--hx-color-warning-300, #fcd34d));
   }
 
   /* ─── Half-Star Layout ─── */

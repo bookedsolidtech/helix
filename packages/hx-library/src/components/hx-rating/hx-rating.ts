@@ -8,6 +8,15 @@ import { helixRatingStyles } from './hx-rating.styles.js';
  * Supports whole and half-star ratings, keyboard navigation, hover preview,
  * and native form participation via ElementInternals.
  *
+ * ### Accessibility
+ *
+ * - **Interactive mode**: Uses `role="radiogroup"` with individual `role="radio"` stars.
+ *   Each star has `aria-label` ("1 star", "2 stars", etc.) and `aria-checked`.
+ * - **Readonly mode**: Uses `role="img"` with a descriptive `aria-label` ("Rating: 3 out of 5").
+ * - **Keyboard**: Arrow keys (Left/Right/Up/Down) adjust value by `precision` step.
+ *   Home sets to 0, End sets to `max`. Focus follows the active tab stop.
+ * - **Disabled**: Sets `aria-disabled="true"` on the group and prevents interaction.
+ *
  * @summary Star rating input for user feedback and display.
  *
  * @tag hx-rating
@@ -22,6 +31,7 @@ import { helixRatingStyles } from './hx-rating.styles.js';
  *
  * @cssprop [--hx-rating-color=var(--hx-color-warning-400,#fbbf24)] - Filled star color.
  * @cssprop [--hx-rating-empty-color=var(--hx-color-neutral-300,#d1d5db)] - Empty star color.
+ * @cssprop [--hx-rating-hover-color=var(--hx-color-warning-300,#fcd34d)] - Star color on hover.
  * @cssprop [--hx-rating-size=var(--hx-font-size-xl,1.25rem)] - Star icon size.
  * @cssprop [--hx-rating-gap=var(--hx-space-1,0.25rem)] - Gap between stars.
  *
@@ -40,8 +50,10 @@ export class HelixRating extends LitElement {
 
   // ─── Form Association ───
 
+  /** @internal */
   static formAssociated = true;
 
+  /** @internal */
   private _internals: ElementInternals;
 
   constructor() {
@@ -100,6 +112,7 @@ export class HelixRating extends LitElement {
   @property({ type: String })
   label = '';
 
+  /** @internal */
   @state() private _hoverValue: number | null = null;
 
   // ─── Lifecycle ───

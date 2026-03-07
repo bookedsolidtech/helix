@@ -73,26 +73,6 @@ const meta = {
         type: { summary: "'start' | 'center' | 'end' | 'stretch'" },
       },
     },
-    rowGap: {
-      control: { type: 'select' },
-      options: [undefined, 'none', 'xs', 'sm', 'md', 'lg', 'xl'],
-      description: 'Row gap override. When set, takes precedence over `gap` for row spacing.',
-      table: {
-        category: 'Layout',
-        defaultValue: { summary: 'undefined' },
-        type: { summary: "'none' | 'xs' | 'sm' | 'md' | 'lg' | 'xl' | undefined" },
-      },
-    },
-    columnGap: {
-      control: { type: 'select' },
-      options: [undefined, 'none', 'xs', 'sm', 'md', 'lg', 'xl'],
-      description: 'Column gap override. When set, takes precedence over `gap` for column spacing.',
-      table: {
-        category: 'Layout',
-        defaultValue: { summary: 'undefined' },
-        type: { summary: "'none' | 'xs' | 'sm' | 'md' | 'lg' | 'xl' | undefined" },
-      },
-    },
   },
   args: {
     columns: 3,
@@ -101,8 +81,15 @@ const meta = {
     justify: 'stretch',
   },
   render: (args) => html`
-    <hx-grid columns=${args.columns} gap=${args.gap} align=${args.align} justify=${args.justify}>
-      ${gridItem('Column 1')} ${gridItem('Column 2', '#fef9c3')} ${gridItem('Column 3', '#dcfce7')}
+    <hx-grid
+      columns=${args.columns}
+      gap=${args.gap}
+      align=${args.align}
+      justify=${args.justify}
+    >
+      ${gridItem('Column 1')}
+      ${gridItem('Column 2', '#fef9c3')}
+      ${gridItem('Column 3', '#dcfce7')}
     </hx-grid>
   `,
 } satisfies Meta;
@@ -131,7 +118,8 @@ export const TwoColumns: Story = {
   args: { columns: 2 },
   render: (args) => html`
     <hx-grid columns=${args.columns} gap=${args.gap}>
-      ${gridItem('Left Panel')} ${gridItem('Right Panel', '#fef9c3')}
+      ${gridItem('Left Panel')}
+      ${gridItem('Right Panel', '#fef9c3')}
     </hx-grid>
   `,
   play: async ({ canvasElement }) => {
@@ -148,7 +136,9 @@ export const FourColumns: Story = {
   args: { columns: 4 },
   render: (args) => html`
     <hx-grid columns=${args.columns} gap=${args.gap}>
-      ${gridItem('Q1')} ${gridItem('Q2', '#fef9c3')} ${gridItem('Q3', '#dcfce7')}
+      ${gridItem('Q1')}
+      ${gridItem('Q2', '#fef9c3')}
+      ${gridItem('Q3', '#dcfce7')}
       ${gridItem('Q4', '#fce7f3')}
     </hx-grid>
   `,
@@ -166,7 +156,9 @@ export const CustomTemplate: Story = {
   args: { columns: '1fr 2fr 1fr' },
   render: (args) => html`
     <hx-grid columns=${args.columns} gap="md">
-      ${gridItem('Sidebar')} ${gridItem('Main Content', '#fef9c3')} ${gridItem('Aside', '#dcfce7')}
+      ${gridItem('Sidebar')}
+      ${gridItem('Main Content', '#fef9c3')}
+      ${gridItem('Aside', '#dcfce7')}
     </hx-grid>
   `,
   play: async ({ canvasElement }) => {
@@ -182,11 +174,21 @@ export const CustomTemplate: Story = {
 export const WithGridItems: Story = {
   render: () => html`
     <hx-grid columns="4" gap="md">
-      <hx-grid-item span="2"> ${gridItem('Span 2 columns', '#dbeafe')} </hx-grid-item>
-      <hx-grid-item> ${gridItem('1 col', '#fef9c3')} </hx-grid-item>
-      <hx-grid-item> ${gridItem('1 col', '#dcfce7')} </hx-grid-item>
-      <hx-grid-item column="1 / 3"> ${gridItem('Explicit 1/3', '#fce7f3')} </hx-grid-item>
-      <hx-grid-item column="3 / 5"> ${gridItem('Explicit 3/5', '#ffedd5')} </hx-grid-item>
+      <hx-grid-item span="2">
+        ${gridItem('Span 2 columns', '#dbeafe')}
+      </hx-grid-item>
+      <hx-grid-item>
+        ${gridItem('1 col', '#fef9c3')}
+      </hx-grid-item>
+      <hx-grid-item>
+        ${gridItem('1 col', '#dcfce7')}
+      </hx-grid-item>
+      <hx-grid-item column="1 / 3">
+        ${gridItem('Explicit 1/3', '#fce7f3')}
+      </hx-grid-item>
+      <hx-grid-item column="3 / 5">
+        ${gridItem('Explicit 3/5', '#ffedd5')}
+      </hx-grid-item>
     </hx-grid>
   `,
   play: async ({ canvasElement }) => {
@@ -205,57 +207,25 @@ export const PatientDashboard: Story = {
   render: () => html`
     <div style="font-family: sans-serif;">
       <hx-grid columns="3" gap="lg">
-        <div
-          style="padding: 1.25rem; background: #fff; border: 1px solid #e2e8f0; border-radius: 0.5rem; grid-column: span 2;"
-        >
-          <h3
-            style="margin: 0 0 0.5rem; font-size: 0.875rem; color: #475569; text-transform: uppercase; letter-spacing: 0.05em;"
-          >
-            Patient Overview
-          </h3>
+        <div style="padding: 1.25rem; background: #fff; border: 1px solid #e2e8f0; border-radius: 0.5rem; grid-column: span 2;">
+          <h3 style="margin: 0 0 0.5rem; font-size: 0.875rem; color: #475569; text-transform: uppercase; letter-spacing: 0.05em;">Patient Overview</h3>
           <p style="margin: 0; font-size: 1.25rem; font-weight: 600;">Jane Doe — MRN: 885521</p>
-          <p style="margin: 0.25rem 0 0; color: #64748b; font-size: 0.875rem;">
-            DOB: 1982-03-15 — Room 214-B — Dr. Patel
-          </p>
+          <p style="margin: 0.25rem 0 0; color: #64748b; font-size: 0.875rem;">DOB: 1982-03-15 — Room 214-B — Dr. Patel</p>
         </div>
-        <div
-          style="padding: 1.25rem; background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 0.5rem;"
-        >
-          <h3
-            style="margin: 0 0 0.5rem; font-size: 0.875rem; color: #15803d; text-transform: uppercase; letter-spacing: 0.05em;"
-          >
-            Status
-          </h3>
+        <div style="padding: 1.25rem; background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 0.5rem;">
+          <h3 style="margin: 0 0 0.5rem; font-size: 0.875rem; color: #15803d; text-transform: uppercase; letter-spacing: 0.05em;">Status</h3>
           <p style="margin: 0; font-weight: 600; color: #16a34a;">Stable</p>
         </div>
-        <div
-          style="padding: 1.25rem; background: #fff; border: 1px solid #e2e8f0; border-radius: 0.5rem;"
-        >
-          <h3
-            style="margin: 0 0 0.5rem; font-size: 0.875rem; color: #475569; text-transform: uppercase; letter-spacing: 0.05em;"
-          >
-            Blood Pressure
-          </h3>
+        <div style="padding: 1.25rem; background: #fff; border: 1px solid #e2e8f0; border-radius: 0.5rem;">
+          <h3 style="margin: 0 0 0.5rem; font-size: 0.875rem; color: #475569; text-transform: uppercase; letter-spacing: 0.05em;">Blood Pressure</h3>
           <p style="margin: 0; font-size: 1.125rem; font-weight: 600;">120 / 80</p>
         </div>
-        <div
-          style="padding: 1.25rem; background: #fff; border: 1px solid #e2e8f0; border-radius: 0.5rem;"
-        >
-          <h3
-            style="margin: 0 0 0.5rem; font-size: 0.875rem; color: #475569; text-transform: uppercase; letter-spacing: 0.05em;"
-          >
-            Heart Rate
-          </h3>
+        <div style="padding: 1.25rem; background: #fff; border: 1px solid #e2e8f0; border-radius: 0.5rem;">
+          <h3 style="margin: 0 0 0.5rem; font-size: 0.875rem; color: #475569; text-transform: uppercase; letter-spacing: 0.05em;">Heart Rate</h3>
           <p style="margin: 0; font-size: 1.125rem; font-weight: 600;">72 bpm</p>
         </div>
-        <div
-          style="padding: 1.25rem; background: #fff; border: 1px solid #e2e8f0; border-radius: 0.5rem;"
-        >
-          <h3
-            style="margin: 0 0 0.5rem; font-size: 0.875rem; color: #475569; text-transform: uppercase; letter-spacing: 0.05em;"
-          >
-            Temperature
-          </h3>
+        <div style="padding: 1.25rem; background: #fff; border: 1px solid #e2e8f0; border-radius: 0.5rem;">
+          <h3 style="margin: 0 0 0.5rem; font-size: 0.875rem; color: #475569; text-transform: uppercase; letter-spacing: 0.05em;">Temperature</h3>
           <p style="margin: 0; font-size: 1.125rem; font-weight: 600;">98.6 °F</p>
         </div>
       </hx-grid>
@@ -277,13 +247,11 @@ export const GapVariants: Story = {
       ${(['none', 'xs', 'sm', 'md', 'lg', 'xl'] as const).map(
         (gap) => html`
           <div>
-            <p
-              style="margin: 0 0 0.5rem; font-size: 0.75rem; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em;"
-            >
-              gap="${gap}"
-            </p>
+            <p style="margin: 0 0 0.5rem; font-size: 0.75rem; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em;">gap="${gap}"</p>
             <hx-grid columns="3" gap=${gap}>
-              ${gridItem('A')} ${gridItem('B', '#fef9c3')} ${gridItem('C', '#dcfce7')}
+              ${gridItem('A')}
+              ${gridItem('B', '#fef9c3')}
+              ${gridItem('C', '#dcfce7')}
             </hx-grid>
           </div>
         `,
@@ -293,44 +261,5 @@ export const GapVariants: Story = {
   play: async ({ canvasElement }) => {
     const grids = canvasElement.querySelectorAll('hx-grid');
     await expect(grids.length).toBe(6);
-  },
-};
-
-// ─────────────────────────────────────────────────
-// 8. TWELVE COLUMNS
-// ─────────────────────────────────────────────────
-
-export const TwelveColumns: Story = {
-  args: { columns: 12, gap: 'xs' },
-  render: (args) => html`
-    <hx-grid columns=${args.columns} gap=${args.gap}>
-      ${Array.from({ length: 12 }, (_, i) =>
-        gridItem(`${i + 1}`, i % 2 === 0 ? '#e0f2fe' : '#fef9c3'),
-      )}
-    </hx-grid>
-  `,
-  play: async ({ canvasElement }) => {
-    const el = canvasElement.querySelector('hx-grid');
-    await expect(el?.getAttribute('columns')).toBe('12');
-  },
-};
-
-// ─────────────────────────────────────────────────
-// 9. NESTED GRIDS
-// ─────────────────────────────────────────────────
-
-export const NestedGrids: Story = {
-  render: () => html`
-    <hx-grid columns="2" gap="lg">
-      <hx-grid columns="3" gap="sm">
-        ${gridItem('Nested 1')} ${gridItem('Nested 2', '#fef9c3')}
-        ${gridItem('Nested 3', '#dcfce7')}
-      </hx-grid>
-      ${gridItem('Outer column 2', '#fce7f3')}
-    </hx-grid>
-  `,
-  play: async ({ canvasElement }) => {
-    const grids = canvasElement.querySelectorAll('hx-grid');
-    await expect(grids.length).toBe(2);
   },
 };
