@@ -67,8 +67,7 @@ const meta = {
     strategy: {
       control: { type: 'select' },
       options: ['fixed', 'absolute'],
-      description:
-        'Positioning strategy. Use "absolute" inside overflow:hidden/scroll containers.',
+      description: 'Positioning strategy. Use "absolute" inside overflow:hidden/scroll containers.',
       table: {
         category: 'Positioning',
         defaultValue: { summary: 'fixed' },
@@ -547,9 +546,7 @@ export const FlipFallbackPlacements: Story = {
         flip
         flip-fallback-placements='["right","bottom"]'
       >
-        <button slot="anchor" style="padding: 0.5rem 1rem;">
-          Tries: top → right → bottom
-        </button>
+        <button slot="anchor" style="padding: 0.5rem 1rem;">Tries: top → right → bottom</button>
         <div
           style="background: white; border: 1px solid #e5e7eb; border-radius: 0.375rem; padding: 0.75rem 1rem; box-shadow: 0 4px 12px rgba(0,0,0,0.1); font-size: 0.875rem;"
         >
