@@ -117,6 +117,56 @@ describe('hx-text', () => {
     }
   });
 
+  // ─── Property: as ───
+
+  describe('Property: as', () => {
+    it('defaults to as="span"', async () => {
+      const el = await fixture<WcText>('<hx-text>Text</hx-text>');
+      expect(el.as).toBe('span');
+    });
+
+    it('renders a <span> base by default', async () => {
+      const el = await fixture<WcText>('<hx-text>Text</hx-text>');
+      const base = shadowQuery(el, 'span[part="base"]');
+      expect(base).toBeInstanceOf(HTMLSpanElement);
+    });
+
+    it('renders a <p> base when as="p"', async () => {
+      const el = await fixture<WcText>('<hx-text as="p">Text</hx-text>');
+      const base = shadowQuery(el, 'p[part="base"]');
+      expect(base).toBeInstanceOf(HTMLParagraphElement);
+    });
+
+    it('renders a <strong> base when as="strong"', async () => {
+      const el = await fixture<WcText>('<hx-text as="strong">Text</hx-text>');
+      const base = shadowQuery(el, 'strong[part="base"]');
+      expect(base).toBeTruthy();
+    });
+
+    it('renders a <em> base when as="em"', async () => {
+      const el = await fixture<WcText>('<hx-text as="em">Text</hx-text>');
+      const base = shadowQuery(el, 'em[part="base"]');
+      expect(base).toBeTruthy();
+    });
+
+    it('renders a <div> base when as="div"', async () => {
+      const el = await fixture<WcText>('<hx-text as="div">Text</hx-text>');
+      const base = shadowQuery(el, 'div[part="base"]');
+      expect(base).toBeInstanceOf(HTMLDivElement);
+    });
+
+    it('falls back to span for unknown as value', async () => {
+      const el = await fixture<WcText>('<hx-text as="script">Text</hx-text>');
+      const base = shadowQuery(el, 'span[part="base"]');
+      expect(base).toBeInstanceOf(HTMLSpanElement);
+    });
+
+    it('reflects as attribute to host', async () => {
+      const el = await fixture<WcText>('<hx-text as="p">Text</hx-text>');
+      expect(el.getAttribute('as')).toBe('p');
+    });
+  });
+
   // ─── Property: truncate ───
 
   describe('Property: truncate', () => {
