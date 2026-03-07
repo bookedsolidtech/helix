@@ -31,6 +31,9 @@ type PopupPlacement =
 
 type ArrowPlacement = 'start' | 'center' | 'end';
 
+// More precise type matching @floating-ui/dom's arrow middleware data structure
+type ArrowData = { x?: number; y?: number; centerOffset: number };
+
 /**
  * A low-level positioning primitive that anchors a floating panel to a reference element.
  * This is the base that hx-tooltip, hx-dropdown, and hx-popover build upon.
@@ -45,19 +48,91 @@ type ArrowPlacement = 'start' | 'center' | 'end';
  * @csspart popup - The popup container element.
  * @csspart arrow - The arrow indicator element (only present when `arrow` is true).
  *
+ * @cssprop [--hx-popup-z-index=9000] - Z-index of the popup container.
+ * @cssprop [--hx-popup-transition=none] - Transition applied to the popup element.
+ *   Consumers who need enter/exit animations can set this property AND override the
+ *   default `display: none` hide mechanism via `::part(popup)`. Example:
+ *   ```css
+ *   hx-popup { --hx-popup-transition: opacity 0.2s ease; }
+ *   hx-popup:not([active])::part(popup) { display: block; opacity: 0; pointer-events: none; }
+ *   hx-popup[active]::part(popup) { opacity: 1; }
+ *   ```
  * @cssprop [--hx-arrow-size=8px] - Size of the arrow element.
- * @cssprop [--hx-arrow-color=currentColor] - Color of the arrow element.
- * @cssprop --hx-auto-size-available-width - Available width set by auto-size middleware.
- * @cssprop --hx-auto-size-available-height - Available height set by auto-size middleware.
+ * @cssprop [--hx-arrow-color=var(--hx-color-surface-overlay, #ffffff)] - Color of the arrow element.
+ * @cssprop --hx-auto-size-available-width - Available width set by auto-size middleware (on :host).
+ * @cssprop --hx-auto-size-available-height - Available height set by auto-size middleware (on :host).
  *
  * @fires {CustomEvent} hx-reposition - Emitted after the popup is repositioned.
  *
+ * ## Accessibility Contract
+ *
+ * `hx-popup` is a **positioning utility**, not an interactive widget. It does not provide
+ * ARIA semantics. Consumers are responsible for all accessibility:
+ *
+ * - **Popup role**: Add `role="tooltip"`, `role="dialog"`, `role="listbox"`, etc. to the
+ *   slotted popup content depending on its purpose.
+ * - **Trigger state**: The element that triggers the popup MUST set `aria-expanded="true/false"`.
+ * - **Association**: Use `aria-controls` on the trigger to reference the popup content element,
+ *   and `aria-labelledby` / `aria-describedby` as appropriate.
+ * - **Focus management**: `hx-popup` does NOT trap focus. Consumers building dialogs or menus
+ *   MUST implement focus trapping and keyboard dismiss (Escape key) themselves.
+ * - **Visibility**: The popup is hidden via `display: none` (CSS) and the `inert` attribute
+ *   when inactive. Both are reliable accessibility-tree hiding mechanisms.
+ *
  * @example
  * ```html
- * <hx-popup active placement="bottom">
- *   <button slot="anchor">Trigger</button>
- *   <div>Popup content</div>
+ * <!-- Tooltip pattern -->
+ * <hx-popup id="my-tooltip" placement="bottom" distance="8">
+ *   <button
+ *     slot="anchor"
+ *     aria-describedby="tooltip-content"
+ *     aria-expanded="false"
+ *     aria-controls="my-tooltip"
+ *   >
+ *     Trigger
+ *   </button>
+ *   <div id="tooltip-content" role="tooltip">Tooltip text</div>
  * </hx-popup>
+ * ```
+ *
+ * ## Drupal Integration
+ *
+ * `hx-popup` is a JS utility — Twig provides markup only. No Drupal behavior file is
+ * required for basic usage, since the `anchor` slot and `active` attribute are sufficient.
+ *
+ * ```twig
+ * {# Basic Twig usage — prefer anchor slot in server-rendered contexts #}
+ * <hx-popup id="my-popup" placement="bottom" distance="8">
+ *   <button
+ *     slot="anchor"
+ *     aria-expanded="false"
+ *     aria-controls="popup-content"
+ *   >Open</button>
+ *   <div id="popup-content" role="dialog" aria-label="Popup content">...</div>
+ * </hx-popup>
+ * ```
+ *
+ * ```js
+ * // Drupal behavior for toggle interaction
+ * Drupal.behaviors.helixPopup = {
+ *   attach(context) {
+ *     context.querySelectorAll('hx-popup').forEach((popup) => {
+ *       const trigger = popup.querySelector('[slot="anchor"]');
+ *       if (!trigger) return;
+ *       trigger.addEventListener('click', () => {
+ *         popup.active = !popup.active;
+ *         trigger.setAttribute('aria-expanded', String(popup.active));
+ *       });
+ *     });
+ *   },
+ * };
+ * ```
+ *
+ * For Drupal-generated dynamic IDs, prefer the anchor **slot** over the `anchor` CSS selector
+ * attribute, since slot-based anchoring does not require knowing the element's ID at render time.
+ * If you must use the CSS selector form with dynamic IDs, pass the ID via a Twig variable:
+ * ```twig
+ * <hx-popup anchor="#{{ element['#id'] }}" placement="bottom">...</hx-popup>
  * ```
  */
 @customElement('hx-popup')
@@ -69,11 +144,17 @@ export class HelixPopup extends LitElement {
 
   /**
    * The reference element to anchor the popup to.
-   * Accepts a CSS selector string or an Element reference.
+   *
+   * - **Attribute form** (`anchor="#selector"`): Accepts a CSS selector string resolved via
+   *   `querySelector` from the component's root node. Use this in HTML/Twig markup.
+   * - **Property form** (`el.anchor = element`): Accepts an `Element` reference directly.
+   *   Setting an Element via JS property does NOT reflect to the attribute.
+   *
    * If not set, the element in the `anchor` slot is used.
+   *
    * @attr anchor
    */
-  @property()
+  @property({ attribute: 'anchor' })
   anchor: string | Element | null = null;
 
   /**
@@ -135,25 +216,32 @@ export class HelixPopup extends LitElement {
 
   /**
    * Fallback placements to try when flipping. Accepts a JSON array string.
+   *
+   * @example
+   * ```html
+   * <!-- Try "top" then "left" before giving up -->
+   * <hx-popup flip flip-fallback-placements='["top","left"]'>...</hx-popup>
+   * ```
+   *
    * @attr flip-fallback-placements
    */
   @property({
     attribute: 'flip-fallback-placements',
     converter: {
-      fromAttribute(value: string | null): string[] {
+      fromAttribute(value: string | null): PopupPlacement[] {
         if (!value) return [];
         try {
-          return JSON.parse(value) as string[];
+          return JSON.parse(value) as PopupPlacement[];
         } catch {
           return [];
         }
       },
-      toAttribute(value: string[]): string {
+      toAttribute(value: PopupPlacement[]): string {
         return JSON.stringify(value);
       },
     },
   })
-  flipFallbackPlacements: string[] = [];
+  flipFallbackPlacements: PopupPlacement[] = [];
 
   /**
    * When true, shifts the popup along the axis to remain in the viewport.
@@ -164,11 +252,24 @@ export class HelixPopup extends LitElement {
 
   /**
    * When true, resizes the popup to fit within the viewport.
-   * Sets --auto-size-available-width and --auto-size-available-height CSS custom properties.
+   * Sets --hx-auto-size-available-width and --hx-auto-size-available-height CSS custom
+   * properties on `:host` so they cascade into shadow DOM and are readable from light DOM.
    * @attr auto-size
    */
   @property({ type: Boolean, attribute: 'auto-size', reflect: true })
   autoSize = false;
+
+  /**
+   * Positioning strategy passed to floating-ui's `computePosition`.
+   *
+   * - `'fixed'` (default): works for most cases; positions relative to the viewport.
+   * - `'absolute'`: use inside `overflow: hidden` / scroll containers where the popup is
+   *   positioned relative to the nearest positioned ancestor instead of the viewport.
+   *
+   * @attr strategy
+   */
+  @property({ reflect: true })
+  strategy: 'fixed' | 'absolute' = 'fixed';
 
   // ─── Lifecycle ───
 
@@ -199,16 +300,28 @@ export class HelixPopup extends LitElement {
       changedProperties.has('flipFallbackPlacements') ||
       changedProperties.has('shift') ||
       changedProperties.has('autoSize') ||
-      changedProperties.has('anchor');
+      changedProperties.has('anchor') ||
+      changedProperties.has('strategy');
 
     if (activeChanged) {
       if (this.active) {
         this._startAutoUpdate();
       } else {
         this._stopAutoUpdate();
+        // Clean up autoSize custom properties when popup goes inactive
+        if (this.autoSize) {
+          this.style.removeProperty('--hx-auto-size-available-width');
+          this.style.removeProperty('--hx-auto-size-available-height');
+        }
       }
     } else if (positioningChanged && this.active) {
       void this._reposition();
+    }
+
+    // Remove stale autoSize properties when autoSize is disabled
+    if (changedProperties.has('autoSize') && !this.autoSize) {
+      this.style.removeProperty('--hx-auto-size-available-width');
+      this.style.removeProperty('--hx-auto-size-available-height');
     }
   }
 
@@ -286,8 +399,10 @@ export class HelixPopup extends LitElement {
       middleware.push(
         sizeMiddleware({
           apply: ({ availableWidth, availableHeight }) => {
-            popupEl.style.setProperty('--hx-auto-size-available-width', `${availableWidth}px`);
-            popupEl.style.setProperty('--hx-auto-size-available-height', `${availableHeight}px`);
+            // Set on :host so the custom properties cascade into shadow DOM and
+            // are accessible from light DOM consumers via CSS inheritance.
+            this.style.setProperty('--hx-auto-size-available-width', `${availableWidth}px`);
+            this.style.setProperty('--hx-auto-size-available-height', `${availableHeight}px`);
           },
         }),
       );
@@ -296,9 +411,12 @@ export class HelixPopup extends LitElement {
     const effectivePlacement: Placement =
       this.placement === 'auto' ? 'bottom' : (this.placement as Placement);
 
+    // Set position strategy before computing — inline style takes precedence over CSS
+    popupEl.style.position = this.strategy;
+
     const { x, y, placement, middlewareData } = await computePosition(anchorEl, popupEl, {
       placement: effectivePlacement,
-      strategy: 'fixed',
+      strategy: this.strategy,
       middleware,
     });
 
@@ -308,7 +426,7 @@ export class HelixPopup extends LitElement {
     });
 
     if (arrowEl) {
-      const arrowData = middlewareData.arrow as { x?: number; y?: number } | undefined;
+      const arrowData = middlewareData.arrow as ArrowData | undefined;
       this._positionArrow(arrowEl, placement, arrowData);
     }
 
@@ -318,7 +436,7 @@ export class HelixPopup extends LitElement {
   private _positionArrow(
     arrowEl: HTMLElement,
     placement: Placement,
-    arrowData: { x?: number; y?: number } | undefined,
+    arrowData: ArrowData | undefined,
   ): void {
     const basePlacement = placement.split('-')[0] as 'top' | 'right' | 'bottom' | 'left';
     const staticSides = {
@@ -368,7 +486,7 @@ export class HelixPopup extends LitElement {
   override render() {
     return html`
       <slot name="anchor" @slotchange=${this._handleAnchorSlotChange}></slot>
-      <div part="popup" aria-hidden=${String(!this.active)}>
+      <div part="popup" ?inert=${!this.active}>
         <slot></slot>
         ${this.arrow ? html`<div part="arrow"></div>` : ''}
       </div>
