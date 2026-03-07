@@ -27,9 +27,7 @@ describe('hx-grid', () => {
     });
 
     it('renders default slot', async () => {
-      const el = await fixture<HelixGrid>(
-        '<hx-grid><div id="child">content</div></hx-grid>',
-      );
+      const el = await fixture<HelixGrid>('<hx-grid><div id="child">content</div></hx-grid>');
       expect(el.querySelector('#child')).toBeTruthy();
     });
   });
