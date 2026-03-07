@@ -21,7 +21,7 @@ export const helixDataTableStyles = css`
     width: 100%;
     border-collapse: collapse;
     border-spacing: 0;
-    min-width: var(--hx-data-table-min-width, 600px);
+    min-width: 600px;
   }
 
   /* ─── Head ─── */
@@ -95,16 +95,6 @@ export const helixDataTableStyles = css`
     outline: var(--hx-focus-ring-width, 2px) solid
       var(--hx-focus-ring-color, var(--hx-color-primary-500, #2563eb));
     outline-offset: var(--hx-focus-ring-offset, 2px);
-    border-radius: var(--hx-border-radius-sm, 2px);
-  }
-
-  /* ─── Cell Focus ─── */
-
-  td:focus-visible,
-  th:focus-visible {
-    outline: var(--hx-focus-ring-width, 2px) solid
-      var(--hx-focus-ring-color, var(--hx-color-primary-500, #2563eb));
-    outline-offset: var(--hx-focus-ring-offset, -2px);
     border-radius: var(--hx-border-radius-sm, 2px);
   }
 
