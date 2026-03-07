@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/web-components';
 import { html } from 'lit';
+import { ifDefined } from 'lit/directives/if-defined.js';
 import './hx-focus-ring.js';
 
 // ─────────────────────────────────────────────────
@@ -77,9 +78,9 @@ export const Default: Story = {
     <hx-focus-ring
       ?visible=${args['visible']}
       shape=${args['shape']}
-      color=${args['color'] ?? ''}
-      width=${args['width'] ?? ''}
-      offset=${args['offset'] ?? ''}
+      color=${ifDefined(args['color'] || undefined)}
+      width=${ifDefined(args['width'] || undefined)}
+      offset=${ifDefined(args['offset'] || undefined)}
       style="margin: 1rem;"
     >
       <button>Focused Button</button>
@@ -143,11 +144,82 @@ export const WrappingHelixButton: Story = {
   name: 'Wrapping hx-button',
   render: () => {
     // Lazily import hx-button for the story
-    import('../hx-button/index.js').catch(() => undefined);
+    import('../hx-button/index.js').catch((e) =>
+      console.error('[hx-focus-ring story] Failed to load hx-button:', e),
+    );
     return html`
       <hx-focus-ring visible shape="box" style="margin: 1rem;">
         <hx-button>Click Me</hx-button>
       </hx-focus-ring>
     `;
   },
+};
+
+export const WrappingInput: Story = {
+  name: 'Wrapping Input',
+  render: () => html`
+    <div style="margin: 1rem;">
+      <hx-focus-ring visible shape="box">
+        <input type="text" placeholder="Text input" style="padding: 0.5rem; font-size: 1rem;" />
+      </hx-focus-ring>
+    </div>
+  `,
+};
+
+export const WrappingLink: Story = {
+  name: 'Wrapping Link',
+  render: () => html`
+    <div style="margin: 1rem;">
+      <hx-focus-ring visible shape="box">
+        <a href="#">Accessible link</a>
+      </hx-focus-ring>
+    </div>
+  `,
+};
+
+export const OffsetVariations: Story = {
+  name: 'Offset Variations',
+  render: () => html`
+    <div style="display: flex; gap: 2rem; padding: 1rem; align-items: center;">
+      <div>
+        <p style="font-size: 0.75rem; margin-bottom: 0.5rem;">2px (default)</p>
+        <hx-focus-ring visible shape="box" offset="2px">
+          <button>Small offset</button>
+        </hx-focus-ring>
+      </div>
+      <div>
+        <p style="font-size: 0.75rem; margin-bottom: 0.5rem;">4px</p>
+        <hx-focus-ring visible shape="box" offset="4px">
+          <button>Medium offset</button>
+        </hx-focus-ring>
+      </div>
+      <div>
+        <p style="font-size: 0.75rem; margin-bottom: 0.5rem;">8px</p>
+        <hx-focus-ring visible shape="box" offset="8px">
+          <button>Large offset</button>
+        </hx-focus-ring>
+      </div>
+    </div>
+  `,
+};
+
+export const DarkMode: Story = {
+  name: 'Dark Mode Contrast',
+  decorators: [
+    (story) => html`
+      <div
+        data-theme="dark"
+        style="background: #111827; padding: 2rem; border-radius: 0.5rem;"
+      >
+        ${story()}
+      </div>
+    `,
+  ],
+  render: () => html`
+    <hx-focus-ring visible shape="box" data-theme="dark" style="margin: 0.5rem;">
+      <button style="background: #1f2937; color: #f9fafb; border: 1px solid #374151; padding: 0.5rem 1rem; border-radius: 0.375rem; cursor: pointer;">
+        Button on dark surface
+      </button>
+    </hx-focus-ring>
+  `,
 };
