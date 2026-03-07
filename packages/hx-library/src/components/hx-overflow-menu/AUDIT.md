@@ -1,4 +1,4 @@
-# AUDIT: hx-overflow-menu (Deep Audit v2)
+# AUDIT: hx-overflow-menu (T2-11)
 
 Antagonistic quality review of all files in `packages/hx-library/src/components/hx-overflow-menu/`.
 
@@ -10,45 +10,56 @@ Files reviewed:
 - `hx-overflow-menu.stories.ts`
 - `index.ts`
 
-**wc-mcp Health Score:** 95/A
-**wc-mcp Accessibility Score:** 15/F (CEM documentation gap — implementation is correct)
-
 ---
 
 ## Summary
 
-| Severity | Count | Fixed |
-| -------- | ----- | ----- |
-| P0       | 1     | 1     |
-| P1       | 3     | 1     |
-| P2       | 10    | 2     |
+| Severity | Count |
+| -------- | ----- |
+| P0       | 1     |
+| P1       | 3     |
+| P2       | 10    |
 
 ---
 
 ## P0 — Critical (Blocking)
 
-### P0-01: Missing arrow-key navigation within the menu panel -- FIXED
+### P0-01: Missing arrow-key navigation within the menu panel
 
-**File:** `hx-overflow-menu.ts`
+**File:** `hx-overflow-menu.ts:179–189`
 
-**Fix applied:** Added full WAI-ARIA menu button keyboard navigation:
+The `_handleKeydown` handler only responds to `Escape` and `Tab`. It does not implement Up/Down arrow key navigation between `[role="menuitem"]` elements.
 
-- `ArrowDown` / `ArrowUp` with wrapping focus movement
-- `Home` / `End` to jump to first/last item
-- `ArrowDown` on closed trigger opens the menu
-- Disabled items (`aria-disabled="true"`) are skipped during navigation
-- Extracted `_getMenuItems()` helper and `_focusItemByOffset()` for roving focus
-- Added 9 new keyboard navigation tests + 2 disabled item tests (41 total tests)
+The WAI-ARIA Authoring Practices for the [Menu Button Pattern](https://www.w3.org/WAI/ARIA/apg/patterns/menu-button/) mandates:
+
+- `ArrowDown` — move focus to the next menu item; wrap from last to first.
+- `ArrowUp` — move focus to the previous menu item; wrap from first to last.
+- `Home` — move focus to the first menu item.
+- `End` — move focus to the last menu item.
+
+Without these, keyboard-only users and screen reader users cannot navigate the open menu in the expected manner. Screen readers announce the container as `role="menu"`, leading users to expect standard menu keyboard behavior that is not present.
+
+**Impact:** WCAG 2.1 SC 2.1.1 (Keyboard) failure. Healthcare mandate violation.
 
 ---
 
 ## P1 — High Priority
 
-### P1-01: `aria-haspopup="true"` should be `aria-haspopup="menu"` -- FIXED
+### P1-01: `aria-haspopup="true"` should be `aria-haspopup="menu"`
 
-**File:** `hx-overflow-menu.ts`
+**File:** `hx-overflow-menu.ts:259`
 
-**Fix applied:** Changed `aria-haspopup="true"` to `aria-haspopup="menu"`. Updated test to assert `"menu"`.
+```ts
+aria-haspopup="true"
+```
+
+ARIA 1.2 specifies that `aria-haspopup` should use the role token of the popup — `"menu"`, `"listbox"`, `"tree"`, `"grid"`, or `"dialog"`. Using `"true"` is the legacy ARIA 1.0 form, which browsers treat as equivalent to `"menu"`, but:
+
+1. Automated accessibility auditors (axe, WAVE, ARC) flag `"true"` as imprecise in strict-mode configurations.
+2. The value is semantically misleading to developers reading the markup.
+3. The companion test at `hx-overflow-menu.test.ts:162` asserts `'true'`, which will pass the wrong value.
+
+**Fix:** Change to `aria-haspopup="menu"`.
 
 ---
 
@@ -84,16 +95,17 @@ Additionally, if any other future component also uses `@floating-ui/dom`, it wil
 
 ## P2 — Medium Priority
 
-### P2-01: No tests for disabled menu items -- FIXED
+### P2-01: No tests for disabled menu items
 
-**Fix applied:**
+**File:** `hx-overflow-menu.test.ts`
 
-- Added `aria-disabled="true"` guard in `_handleSlotClick` — disabled items no longer fire `hx-select`
-- Added `::slotted([aria-disabled='true'])` CSS (opacity, cursor, pointer-events)
-- Added `::slotted(hr)` and `::slotted([role='separator'])` divider CSS
-- Added test: "does not fire hx-select for aria-disabled items"
-- Added test: "renders separator elements"
-- Added Storybook stories: WithDividers, DisabledItems, AllPlacements, KeyboardNavigation
+The feature spec explicitly lists "disabled items" as a required test case. No test exists that:
+
+- Renders a menu item with the `disabled` attribute.
+- Verifies the item is not focusable or clickable.
+- Verifies `hx-select` is NOT dispatched when a disabled item is interacted with.
+
+The current `_handleSlotClick` handler does not check for disabled state on the clicked item — it will emit `hx-select` even for a `disabled` button.
 
 ---
 
