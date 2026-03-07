@@ -47,6 +47,7 @@ export class HelixTabs extends LitElement {
 
   // ─── Internal ID ───
 
+  /** @internal */
   private _id = `hx-tabs-${Math.random().toString(36).slice(2, 9)}`;
 
   // ─── Properties ───
@@ -69,11 +70,14 @@ export class HelixTabs extends LitElement {
 
   // ─── State ───
 
+  /** @internal */
   @state() private _activePanel = '';
 
   // ─── Child Accessors ───
 
+  /** @internal */
   private _cachedTabs: HelixTab[] | null = null;
+  /** @internal */
   private _cachedPanels: HelixTabPanel[] | null = null;
 
   private _getTabs(): HelixTab[] {
@@ -201,6 +205,7 @@ export class HelixTabs extends LitElement {
 
   // ─── Event Handling ───
 
+  /** @internal */
   private _handleTabSelect = (e: CustomEvent<{ panel: string }>): void => {
     e.stopPropagation();
     const tab = e
@@ -211,12 +216,14 @@ export class HelixTabs extends LitElement {
     }
   };
 
+  /** @internal */
   private _handleSlotChange = (): void => {
     this._cachedTabs = null;
     this._cachedPanels = null;
     this._syncTabsAndPanels();
   };
 
+  /** @internal */
   private _handleKeydown = (e: KeyboardEvent): void => {
     const enabledTabs = this._getEnabledTabs();
     if (enabledTabs.length === 0) {
