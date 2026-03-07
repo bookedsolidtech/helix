@@ -31,9 +31,15 @@ import { helixTileStyles } from './hx-tile.styles.js';
  * @cssprop [--hx-tile-border-radius=var(--hx-border-radius-lg)] - Tile border radius.
  * @cssprop [--hx-tile-padding=var(--hx-space-5)] - Internal padding.
  * @cssprop [--hx-tile-gap=var(--hx-space-3)] - Gap between tile sections.
- * @cssprop [--hx-tile-icon-size=2.5rem] - Icon size.
+ * @cssprop [--hx-tile-icon-size=var(--hx-size-icon-lg)] - Icon size.
  * @cssprop [--hx-tile-label-color=var(--hx-color-neutral-800)] - Label text color.
  * @cssprop [--hx-tile-description-color=var(--hx-color-neutral-600)] - Description text color.
+ *
+ * @accessibility
+ * - **Button mode (no href)**: Uses `role="button"`, `tabindex="0"`, `aria-pressed` for toggle state, and `aria-disabled` when disabled.
+ * - **Link mode (href set)**: Renders a native `<a>` element with `aria-disabled` when disabled.
+ * - **Keyboard**: Activates on `Enter` and `Space` in both modes.
+ * - **Focus**: Visible focus ring via `:focus-visible` using `--hx-focus-ring-*` tokens.
  */
 @customElement('hx-tile')
 export class HelixTile extends LitElement {
@@ -70,26 +76,34 @@ export class HelixTile extends LitElement {
 
   // ─── Slot Detection ───
 
+  /** @internal */
   @state() private _hasIcon = false;
+  /** @internal */
   @state() private _hasLabel = false;
+  /** @internal */
   @state() private _hasDescription = false;
+  /** @internal */
   @state() private _hasBadge = false;
 
+  /** @internal */
   private _onIconSlotChange(e: Event): void {
     const slot = e.target as HTMLSlotElement;
     this._hasIcon = slot.assignedNodes({ flatten: true }).length > 0;
   }
 
+  /** @internal */
   private _onLabelSlotChange(e: Event): void {
     const slot = e.target as HTMLSlotElement;
     this._hasLabel = slot.assignedNodes({ flatten: true }).length > 0;
   }
 
+  /** @internal */
   private _onDescriptionSlotChange(e: Event): void {
     const slot = e.target as HTMLSlotElement;
     this._hasDescription = slot.assignedNodes({ flatten: true }).length > 0;
   }
 
+  /** @internal */
   private _onBadgeSlotChange(e: Event): void {
     const slot = e.target as HTMLSlotElement;
     this._hasBadge = slot.assignedNodes({ flatten: true }).length > 0;
@@ -97,6 +111,7 @@ export class HelixTile extends LitElement {
 
   // ─── Event Handling ───
 
+  /** @internal */
   private _handleClick(e: MouseEvent): void {
     if (this.disabled) return;
 
@@ -121,6 +136,7 @@ export class HelixTile extends LitElement {
     }
   }
 
+  /** @internal */
   private _handleKeyDown(e: KeyboardEvent): void {
     if (this.disabled) return;
     if (e.key !== 'Enter' && e.key !== ' ') return;
