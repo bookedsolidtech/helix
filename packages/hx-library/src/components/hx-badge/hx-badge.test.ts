@@ -403,9 +403,7 @@ describe('hx-badge', () => {
 
   describe('Property: dotLabel', () => {
     it('adds role=img and aria-label to dot indicator when dotLabel is set', async () => {
-      const el = await fixture<WcBadge>(
-        '<hx-badge pulse dot-label="New messages"></hx-badge>',
-      );
+      const el = await fixture<WcBadge>('<hx-badge pulse dot-label="New messages"></hx-badge>');
       await el.updateComplete;
       const badge = shadowQuery(el, 'span')!;
       expect(badge.getAttribute('role')).toBe('img');

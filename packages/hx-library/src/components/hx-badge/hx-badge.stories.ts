@@ -20,8 +20,7 @@ const meta = {
         category: 'Visual',
         defaultValue: { summary: 'primary' },
         type: {
-          summary:
-            "'primary' | 'secondary' | 'success' | 'warning' | 'error' | 'neutral' | 'info'",
+          summary: "'primary' | 'secondary' | 'success' | 'warning' | 'error' | 'neutral' | 'info'",
         },
       },
     },
@@ -304,30 +303,44 @@ export const Large: Story = {
 /** Badge with a numeric count. When count exceeds max, displays `${max}+`. */
 export const WithCount: Story = {
   render: () => html`
-    <div style="display: flex; gap: 1rem; align-items: center; font-family: var(--hx-font-family-sans, sans-serif);">
+    <div
+      style="display: flex; gap: 1rem; align-items: center; font-family: var(--hx-font-family-sans, sans-serif);"
+    >
       <div style="display: flex; flex-direction: column; align-items: center; gap: 0.25rem;">
         <hx-badge variant="error" pill count="3"></hx-badge>
-        <span style="font-size: 0.75rem; color: var(--hx-color-neutral-500, #6b7280);">count=3</span>
+        <span style="font-size: 0.75rem; color: var(--hx-color-neutral-500, #6b7280);"
+          >count=3</span
+        >
       </div>
       <div style="display: flex; flex-direction: column; align-items: center; gap: 0.25rem;">
         <hx-badge variant="warning" pill count="42"></hx-badge>
-        <span style="font-size: 0.75rem; color: var(--hx-color-neutral-500, #6b7280);">count=42</span>
+        <span style="font-size: 0.75rem; color: var(--hx-color-neutral-500, #6b7280);"
+          >count=42</span
+        >
       </div>
       <div style="display: flex; flex-direction: column; align-items: center; gap: 0.25rem;">
         <hx-badge variant="primary" pill count="99"></hx-badge>
-        <span style="font-size: 0.75rem; color: var(--hx-color-neutral-500, #6b7280);">count=99 (max)</span>
+        <span style="font-size: 0.75rem; color: var(--hx-color-neutral-500, #6b7280);"
+          >count=99 (max)</span
+        >
       </div>
       <div style="display: flex; flex-direction: column; align-items: center; gap: 0.25rem;">
         <hx-badge variant="error" pill count="150" max="99"></hx-badge>
-        <span style="font-size: 0.75rem; color: var(--hx-color-neutral-500, #6b7280);">count=150, max=99 → 99+</span>
+        <span style="font-size: 0.75rem; color: var(--hx-color-neutral-500, #6b7280);"
+          >count=150, max=99 → 99+</span
+        >
       </div>
       <div style="display: flex; flex-direction: column; align-items: center; gap: 0.25rem;">
         <hx-badge variant="success" pill count="5" max="9"></hx-badge>
-        <span style="font-size: 0.75rem; color: var(--hx-color-neutral-500, #6b7280);">count=5, max=9</span>
+        <span style="font-size: 0.75rem; color: var(--hx-color-neutral-500, #6b7280);"
+          >count=5, max=9</span
+        >
       </div>
       <div style="display: flex; flex-direction: column; align-items: center; gap: 0.25rem;">
         <hx-badge variant="info" pill count="10" max="9"></hx-badge>
-        <span style="font-size: 0.75rem; color: var(--hx-color-neutral-500, #6b7280);">count=10, max=9 → 9+</span>
+        <span style="font-size: 0.75rem; color: var(--hx-color-neutral-500, #6b7280);"
+          >count=10, max=9 → 9+</span
+        >
       </div>
     </div>
   `,
@@ -359,34 +372,23 @@ export const RemovableWithCount: Story = {
         Active Filters
       </p>
       <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
-        <hx-badge
-          variant="primary"
-          pill
-          removable
-          remove-label="Remove ICU filter"
-          count="12"
-        >ICU</hx-badge>
-        <hx-badge
-          variant="success"
-          pill
-          removable
-          remove-label="Remove Stable filter"
-          count="28"
-        >Stable</hx-badge>
+        <hx-badge variant="primary" pill removable remove-label="Remove ICU filter" count="12"
+          >ICU</hx-badge
+        >
+        <hx-badge variant="success" pill removable remove-label="Remove Stable filter" count="28"
+          >Stable</hx-badge
+        >
         <hx-badge
           variant="warning"
           pill
           removable
           remove-label="Remove Pending Review filter"
           count="5"
-        >Pending Review</hx-badge>
-        <hx-badge
-          variant="error"
-          pill
-          removable
-          remove-label="Remove Critical filter"
-          count="3"
-        >Critical</hx-badge>
+          >Pending Review</hx-badge
+        >
+        <hx-badge variant="error" pill removable remove-label="Remove Critical filter" count="3"
+          >Critical</hx-badge
+        >
         <hx-badge
           variant="neutral"
           pill
@@ -394,7 +396,8 @@ export const RemovableWithCount: Story = {
           remove-label="Remove Discharged filter"
           count="107"
           max="99"
-        >Discharged</hx-badge>
+          >Discharged</hx-badge
+        >
       </div>
     </div>
   `,
@@ -616,11 +619,7 @@ export const OnAButton: Story = {
     <div style="display: flex; gap: 2rem; align-items: center;">
       <div style="position: relative; display: inline-block;">
         <hx-button variant="secondary"> Inbox </hx-button>
-        <hx-badge
-          variant="error"
-          pill
-          size="sm"
-          style="position: absolute; top: -6px; right: -8px;"
+        <hx-badge variant="error" pill size="sm" style="position: absolute; top: -6px; right: -8px;"
           >7</hx-badge
         >
       </div>
