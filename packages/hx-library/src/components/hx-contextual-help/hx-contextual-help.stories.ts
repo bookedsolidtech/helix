@@ -158,7 +158,26 @@ export const NoHeading: Story = {
 };
 
 // ─────────────────────────────────────────────────
-// 5. RICH CONTENT
+// 5. WITH LINKS — verifies focus management with interactive slotted content
+// ─────────────────────────────────────────────────
+
+export const WithLinks: Story = {
+  args: { heading: 'Additional Resources' },
+  render: (args) => html`
+    <div style="display: flex; align-items: center; gap: 0.5rem; padding: 2rem;">
+      <hx-contextual-help placement=${args.placement} heading=${args.heading}>
+        <p style="margin: 0 0 var(--hx-spacing-2, 0.5rem);">For more information, see:</p>
+        <ul style="margin: 0; padding-left: 1.25rem;">
+          <li><a href="#">Provider enrollment documentation</a></li>
+          <li><a href="#">Contact system administrator</a></li>
+        </ul>
+      </hx-contextual-help>
+    </div>
+  `,
+};
+
+// ─────────────────────────────────────────────────
+// 6. RICH CONTENT
 // ─────────────────────────────────────────────────
 
 export const RichContent: Story = {
@@ -184,17 +203,23 @@ export const RichContent: Story = {
 
 export const FormFieldDemo: Story = {
   render: () => html`
-    <div style="max-width: 480px; padding: 2rem; font-family: sans-serif;">
-      <h3 style="margin: 0 0 1.5rem; font-size: 1rem; font-weight: 600; color: #111827;">
+    <div
+      style="max-width: 480px; padding: var(--hx-spacing-8, 2rem); font-family: var(--hx-font-family-sans, sans-serif);"
+    >
+      <h3
+        style="margin: 0 0 var(--hx-spacing-6, 1.5rem); font-size: var(--hx-font-size-md, 1rem); font-weight: var(--hx-font-weight-semibold, 600); color: var(--hx-color-neutral-900);"
+      >
         Patient Intake Form
       </h3>
 
       <!-- NPI Number field -->
-      <div style="margin-bottom: 1.25rem;">
-        <div style="display: flex; align-items: center; gap: 0.25rem; margin-bottom: 0.25rem;">
+      <div style="margin-bottom: var(--hx-spacing-5, 1.25rem);">
+        <div
+          style="display: flex; align-items: center; gap: var(--hx-spacing-1, 0.25rem); margin-bottom: var(--hx-spacing-1, 0.25rem);"
+        >
           <label
             for="npi-input"
-            style="font-size: 0.875rem; font-weight: 500; color: #374151;"
+            style="font-size: var(--hx-font-size-sm, 0.875rem); font-weight: var(--hx-font-weight-medium, 500); color: var(--hx-color-neutral-700);"
           >
             NPI Number
           </label>
@@ -207,24 +232,22 @@ export const FormFieldDemo: Story = {
           id="npi-input"
           type="text"
           placeholder="1234567890"
-          style="width: 100%; padding: 0.5rem 0.75rem; border: 1px solid #d1d5db; border-radius: 0.375rem; font-size: 0.875rem; box-sizing: border-box;"
+          style="width: 100%; padding: var(--hx-spacing-2, 0.5rem) var(--hx-spacing-3, 0.75rem); border: var(--hx-border-width-1, 1px) solid var(--hx-color-neutral-300); border-radius: var(--hx-border-radius-md); font-size: var(--hx-font-size-sm, 0.875rem); box-sizing: border-box;"
         />
       </div>
 
       <!-- Insurance ID field -->
-      <div style="margin-bottom: 1.25rem;">
-        <div style="display: flex; align-items: center; gap: 0.25rem; margin-bottom: 0.25rem;">
+      <div style="margin-bottom: var(--hx-spacing-5, 1.25rem);">
+        <div
+          style="display: flex; align-items: center; gap: var(--hx-spacing-1, 0.25rem); margin-bottom: var(--hx-spacing-1, 0.25rem);"
+        >
           <label
             for="insurance-input"
-            style="font-size: 0.875rem; font-weight: 500; color: #374151;"
+            style="font-size: var(--hx-font-size-sm, 0.875rem); font-weight: var(--hx-font-weight-medium, 500); color: var(--hx-color-neutral-700);"
           >
             Insurance Member ID
           </label>
-          <hx-contextual-help
-            placement="right"
-            heading="Where to find your Member ID"
-            hx-size="sm"
-          >
+          <hx-contextual-help placement="right" heading="Where to find your Member ID" hx-size="sm">
             Located on the front of your insurance card. It typically begins with a letter followed
             by digits (e.g., A123456789).
           </hx-contextual-help>
@@ -233,21 +256,23 @@ export const FormFieldDemo: Story = {
           id="insurance-input"
           type="text"
           placeholder="A123456789"
-          style="width: 100%; padding: 0.5rem 0.75rem; border: 1px solid #d1d5db; border-radius: 0.375rem; font-size: 0.875rem; box-sizing: border-box;"
+          style="width: 100%; padding: var(--hx-spacing-2, 0.5rem) var(--hx-spacing-3, 0.75rem); border: var(--hx-border-width-1, 1px) solid var(--hx-color-neutral-300); border-radius: var(--hx-border-radius-md); font-size: var(--hx-font-size-sm, 0.875rem); box-sizing: border-box;"
         />
       </div>
 
       <!-- DEA Number field -->
       <div>
-        <div style="display: flex; align-items: center; gap: 0.25rem; margin-bottom: 0.25rem;">
+        <div
+          style="display: flex; align-items: center; gap: var(--hx-spacing-1, 0.25rem); margin-bottom: var(--hx-spacing-1, 0.25rem);"
+        >
           <label
             for="dea-input"
-            style="font-size: 0.875rem; font-weight: 500; color: #374151;"
+            style="font-size: var(--hx-font-size-sm, 0.875rem); font-weight: var(--hx-font-weight-medium, 500); color: var(--hx-color-neutral-700);"
           >
             DEA Number
           </label>
           <hx-contextual-help placement="right" heading="DEA Registration Number">
-            <p style="margin: 0 0 0.5rem;">
+            <p style="margin: 0 0 var(--hx-spacing-2, 0.5rem);">
               Required only for providers authorized to prescribe controlled substances.
             </p>
             <p style="margin: 0;">Format: two letters followed by seven digits.</p>
@@ -257,7 +282,7 @@ export const FormFieldDemo: Story = {
           id="dea-input"
           type="text"
           placeholder="AB1234563"
-          style="width: 100%; padding: 0.5rem 0.75rem; border: 1px solid #d1d5db; border-radius: 0.375rem; font-size: 0.875rem; box-sizing: border-box;"
+          style="width: 100%; padding: var(--hx-spacing-2, 0.5rem) var(--hx-spacing-3, 0.75rem); border: var(--hx-border-width-1, 1px) solid var(--hx-color-neutral-300); border-radius: var(--hx-border-radius-md); font-size: var(--hx-font-size-sm, 0.875rem); box-sizing: border-box;"
         />
       </div>
     </div>
