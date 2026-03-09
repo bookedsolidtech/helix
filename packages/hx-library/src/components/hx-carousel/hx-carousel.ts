@@ -605,7 +605,9 @@ export class HelixCarousel extends LitElement {
         aria-roledescription="carousel"
         tabindex="0"
       >
-        <div class="live-region" aria-live="polite" aria-atomic="true">${this._liveText}</div>
+        <div class="live-region" role="status" aria-live="polite" aria-atomic="true">
+          ${this._liveText}
+        </div>
         ${this._renderNavigation()}
         <div class="scroll-container-wrapper">
           <div
