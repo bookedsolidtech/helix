@@ -98,8 +98,14 @@ export const helixSideNavStyles = css`
   }
 
   .side-nav__toggle:hover {
-    background-color: color-mix(in srgb, currentColor 15%, transparent);
+    background-color: rgba(255, 255, 255, 0.1); /* fallback for browsers without color-mix() */
     color: var(--hx-color-neutral-100, #f3f4f6);
+  }
+
+  @supports (color: color-mix(in srgb, red 50%, blue)) {
+    .side-nav__toggle:hover {
+      background-color: color-mix(in srgb, currentColor 15%, transparent);
+    }
   }
 
   .side-nav__toggle:focus-visible {
@@ -117,18 +123,6 @@ export const helixSideNavStyles = css`
 
   :host([collapsed]) .side-nav__toggle svg {
     transform: rotate(180deg);
-  }
-
-  /* ─── Responsive: auto-collapse on small screens ─── */
-
-  @media (max-width: 768px) {
-    :host {
-      --hx-side-nav-width: 3.5rem;
-    }
-
-    :host(:not([collapsed])) .side-nav {
-      width: var(--hx-side-nav-width, 3.5rem);
-    }
   }
 
   @media (prefers-reduced-motion: reduce) {
