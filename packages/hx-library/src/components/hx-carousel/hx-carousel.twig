@@ -1,0 +1,63 @@
+{#
+/**
+ * @file
+ * HELIX hx-carousel Drupal 11 Twig integration template.
+ *
+ * Renders a scrollable carousel/slider for images or content slides.
+ * Implements the carousel pattern with navigation, pagination, and optional autoplay.
+ *
+ * Usage in Drupal templates:
+ *   {% include '@my_theme/hx-carousel.twig' with {
+ *     label: 'Featured patient education resources',
+ *     loop: true,
+ *     autoplay: false,
+ *     autoplay_interval: 3000,
+ *     slides_per_page: 1,
+ *     slides_per_move: 1,
+ *     orientation: 'horizontal',
+ *     mouse_dragging: false,
+ *     items: [
+ *       '<hx-carousel-item>Slide 1 content</hx-carousel-item>',
+ *       '<hx-carousel-item>Slide 2 content</hx-carousel-item>',
+ *     ],
+ *   } %}
+ *
+ * Variables:
+ *   - label: string — Required. Unique label identifying this carousel to assistive technology.
+ *       When multiple carousels appear on the same page, each must have a unique label.
+ *       Example: 'Featured resources', 'Related articles'.
+ *   - loop: boolean — Whether the carousel wraps from last to first and vice-versa. (default: false)
+ *   - autoplay: boolean — Whether the carousel auto-advances slides. (default: false)
+ *       Automatically pauses on hover, focus, and when prefers-reduced-motion is active.
+ *   - autoplay_interval: integer — Milliseconds between auto-advance transitions. (default: 3000)
+ *   - slides_per_page: integer — Number of slides visible at once. (default: 1)
+ *   - slides_per_move: integer — Number of slides to advance per navigation action. (default: 1)
+ *   - orientation: 'horizontal' | 'vertical' — Scroll axis. (default: 'horizontal')
+ *   - mouse_dragging: boolean — Whether click-drag navigation is enabled. (default: false)
+ *   - items: array — Array of rendered hx-carousel-item HTML strings.
+ *   - attributes: Drupal attributes object — merged onto the hx-carousel element.
+ */
+#}
+{% set loop = loop|default(false) %}
+{% set autoplay = autoplay|default(false) %}
+{% set autoplay_interval = autoplay_interval|default(3000) %}
+{% set slides_per_page = slides_per_page|default(1) %}
+{% set slides_per_move = slides_per_move|default(1) %}
+{% set orientation = orientation|default('horizontal') %}
+{% set mouse_dragging = mouse_dragging|default(false) %}
+
+<hx-carousel
+  label="{{ label|default('Carousel') }}"
+  orientation="{{ orientation }}"
+  autoplay-interval="{{ autoplay_interval }}"
+  slides-per-page="{{ slides_per_page }}"
+  slides-per-move="{{ slides_per_move }}"
+  {% if loop %}loop{% endif %}
+  {% if autoplay %}autoplay{% endif %}
+  {% if mouse_dragging %}mouse-dragging{% endif %}
+  {% if attributes %}{{ attributes }}{% endif %}
+>
+  {% for item in items %}
+    {{ item }}
+  {% endfor %}
+</hx-carousel>

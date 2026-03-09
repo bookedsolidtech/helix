@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/web-components';
 import { html } from 'lit';
-import { expect, within, userEvent } from 'storybook/test';
+import { expect, userEvent } from 'storybook/test';
 import './hx-carousel.js';
 import './hx-carousel-item.js';
 
@@ -13,6 +13,15 @@ const meta = {
   component: 'hx-carousel',
   tags: ['autodocs'],
   argTypes: {
+    label: {
+      control: 'text',
+      description: 'Unique label identifying this carousel to assistive technology.',
+      table: {
+        category: 'Accessibility',
+        defaultValue: { summary: "'Carousel'" },
+        type: { summary: 'string' },
+      },
+    },
     loop: {
       control: 'boolean',
       description: 'Whether the carousel wraps around.',
@@ -83,6 +92,7 @@ const meta = {
     },
   },
   args: {
+    label: 'Carousel',
     loop: false,
     autoplay: false,
     autoplayInterval: 3000,
@@ -128,17 +138,75 @@ function demoSlide(i: number) {
 }
 
 // ─────────────────────────────────────────────────
+// Helper: inline SVG placeholder "image" slide
+// ─────────────────────────────────────────────────
+
+const imagePlaceholders = [
+  { bg: '#1e40af', label: 'Nature Landscape', icon: '🌿' },
+  { bg: '#065f46', label: 'City Skyline', icon: '🏙' },
+  { bg: '#7c2d12', label: 'Mountain View', icon: '⛰' },
+];
+
+function imagePlaceholderSlide(i: number) {
+  const p = imagePlaceholders[i % imagePlaceholders.length];
+  return html`
+    <hx-carousel-item>
+      <div
+        role="img"
+        aria-label="${p.label}"
+        style="
+          background: ${p.bg};
+          color: #fff;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          gap: 0.75rem;
+          width: 100%;
+          height: 300px;
+          border-radius: 0.5rem;
+          font-family: sans-serif;
+        "
+      >
+        <span style="font-size: 3rem; line-height: 1;">${p.icon}</span>
+        <span style="font-size: 1rem; font-weight: 600; letter-spacing: 0.05em;">${p.label}</span>
+      </div>
+    </hx-carousel-item>
+  `;
+}
+
+// ─────────────────────────────────────────────────
 // 1. DEFAULT — 3 slides, horizontal
 // ─────────────────────────────────────────────────
 
 export const Default: Story = {
-  render: () => html`
+  args: {
+    label: 'Demo carousel',
+    loop: false,
+    autoplay: false,
+    autoplayInterval: 3000,
+    slidesPerPage: 1,
+    slidesPerMove: 1,
+    orientation: 'horizontal',
+    mouseDragging: false,
+  },
+  render: (args) => html`
     <div style="max-width: 600px; margin: 2rem auto; font-family: sans-serif;">
-      <hx-carousel> ${demoSlide(0)} ${demoSlide(1)} ${demoSlide(2)} </hx-carousel>
+      <hx-carousel
+        label="${args.label}"
+        ?loop=${args.loop}
+        ?autoplay=${args.autoplay}
+        autoplay-interval="${args.autoplayInterval}"
+        slides-per-page="${args.slidesPerPage}"
+        slides-per-move="${args.slidesPerMove}"
+        orientation="${args.orientation}"
+        ?mouse-dragging=${args.mouseDragging}
+      >
+        ${demoSlide(0)} ${demoSlide(1)} ${demoSlide(2)}
+      </hx-carousel>
     </div>
   `,
   play: async ({ canvasElement }) => {
-    const _canvas = within(canvasElement);
     const el = canvasElement.querySelector('hx-carousel');
     await expect(el).toBeTruthy();
     await expect(el?.shadowRoot?.querySelector('[part="base"]')).toBeTruthy();
@@ -150,9 +218,22 @@ export const Default: Story = {
 // ─────────────────────────────────────────────────
 
 export const Looping: Story = {
-  render: () => html`
+  args: {
+    label: 'Looping carousel',
+    loop: true,
+  },
+  render: (args) => html`
     <div style="max-width: 600px; margin: 2rem auto; font-family: sans-serif;">
-      <hx-carousel loop>
+      <hx-carousel
+        label="${args.label}"
+        ?loop=${args.loop}
+        ?autoplay=${args.autoplay}
+        autoplay-interval="${args.autoplayInterval}"
+        slides-per-page="${args.slidesPerPage}"
+        slides-per-move="${args.slidesPerMove}"
+        orientation="${args.orientation}"
+        ?mouse-dragging=${args.mouseDragging}
+      >
         ${demoSlide(0)} ${demoSlide(1)} ${demoSlide(2)} ${demoSlide(3)}
       </hx-carousel>
     </div>
@@ -164,9 +245,24 @@ export const Looping: Story = {
 // ─────────────────────────────────────────────────
 
 export const Autoplay: Story = {
-  render: () => html`
+  args: {
+    label: 'Autoplaying carousel',
+    autoplay: true,
+    autoplayInterval: 2000,
+    loop: true,
+  },
+  render: (args) => html`
     <div style="max-width: 600px; margin: 2rem auto; font-family: sans-serif;">
-      <hx-carousel autoplay autoplay-interval="2000" loop>
+      <hx-carousel
+        label="${args.label}"
+        ?loop=${args.loop}
+        ?autoplay=${args.autoplay}
+        autoplay-interval="${args.autoplayInterval}"
+        slides-per-page="${args.slidesPerPage}"
+        slides-per-move="${args.slidesPerMove}"
+        orientation="${args.orientation}"
+        ?mouse-dragging=${args.mouseDragging}
+      >
         ${demoSlide(0)} ${demoSlide(1)} ${demoSlide(2)} ${demoSlide(3)}
       </hx-carousel>
     </div>
@@ -178,9 +274,23 @@ export const Autoplay: Story = {
 // ─────────────────────────────────────────────────
 
 export const MultiSlide: Story = {
-  render: () => html`
+  args: {
+    label: 'Multi-slide carousel',
+    slidesPerPage: 2,
+    slidesPerMove: 1,
+  },
+  render: (args) => html`
     <div style="max-width: 700px; margin: 2rem auto; font-family: sans-serif;">
-      <hx-carousel slides-per-page="2" slides-per-move="1">
+      <hx-carousel
+        label="${args.label}"
+        ?loop=${args.loop}
+        ?autoplay=${args.autoplay}
+        autoplay-interval="${args.autoplayInterval}"
+        slides-per-page="${args.slidesPerPage}"
+        slides-per-move="${args.slidesPerMove}"
+        orientation="${args.orientation}"
+        ?mouse-dragging=${args.mouseDragging}
+      >
         ${demoSlide(0)} ${demoSlide(1)} ${demoSlide(2)} ${demoSlide(3)} ${demoSlide(4)}
       </hx-carousel>
     </div>
@@ -188,34 +298,27 @@ export const MultiSlide: Story = {
 };
 
 // ─────────────────────────────────────────────────
-// 5. IMAGE CAROUSEL
+// 5. IMAGE CAROUSEL (inline SVG placeholders — no external URLs)
 // ─────────────────────────────────────────────────
 
 export const ImageCarousel: Story = {
-  render: () => html`
+  args: {
+    label: 'Image carousel',
+    loop: true,
+  },
+  render: (args) => html`
     <div style="max-width: 600px; margin: 2rem auto; font-family: sans-serif;">
-      <hx-carousel loop>
-        <hx-carousel-item>
-          <img
-            src="https://picsum.photos/seed/a/600/300"
-            alt="Nature landscape"
-            style="width: 100%; height: 300px; object-fit: cover; border-radius: 0.5rem; display: block;"
-          />
-        </hx-carousel-item>
-        <hx-carousel-item>
-          <img
-            src="https://picsum.photos/seed/b/600/300"
-            alt="City skyline"
-            style="width: 100%; height: 300px; object-fit: cover; border-radius: 0.5rem; display: block;"
-          />
-        </hx-carousel-item>
-        <hx-carousel-item>
-          <img
-            src="https://picsum.photos/seed/c/600/300"
-            alt="Mountain view"
-            style="width: 100%; height: 300px; object-fit: cover; border-radius: 0.5rem; display: block;"
-          />
-        </hx-carousel-item>
+      <hx-carousel
+        label="${args.label}"
+        ?loop=${args.loop}
+        ?autoplay=${args.autoplay}
+        autoplay-interval="${args.autoplayInterval}"
+        slides-per-page="${args.slidesPerPage}"
+        slides-per-move="${args.slidesPerMove}"
+        orientation="${args.orientation}"
+        ?mouse-dragging=${args.mouseDragging}
+      >
+        ${imagePlaceholderSlide(0)} ${imagePlaceholderSlide(1)} ${imagePlaceholderSlide(2)}
       </hx-carousel>
     </div>
   `,
@@ -226,9 +329,22 @@ export const ImageCarousel: Story = {
 // ─────────────────────────────────────────────────
 
 export const Vertical: Story = {
-  render: () => html`
+  args: {
+    label: 'Vertical carousel',
+    orientation: 'vertical',
+  },
+  render: (args) => html`
     <div style="max-width: 400px; margin: 2rem auto; font-family: sans-serif;">
-      <hx-carousel orientation="vertical">
+      <hx-carousel
+        label="${args.label}"
+        ?loop=${args.loop}
+        ?autoplay=${args.autoplay}
+        autoplay-interval="${args.autoplayInterval}"
+        slides-per-page="${args.slidesPerPage}"
+        slides-per-move="${args.slidesPerMove}"
+        orientation="${args.orientation}"
+        ?mouse-dragging=${args.mouseDragging}
+      >
         ${demoSlide(0)} ${demoSlide(1)} ${demoSlide(2)}
       </hx-carousel>
     </div>
@@ -240,12 +356,26 @@ export const Vertical: Story = {
 // ─────────────────────────────────────────────────
 
 export const MouseDragging: Story = {
-  render: () => html`
+  args: {
+    label: 'Draggable carousel',
+    mouseDragging: true,
+    loop: true,
+  },
+  render: (args) => html`
     <div style="max-width: 600px; margin: 2rem auto; font-family: sans-serif;">
       <p style="font-size: 0.875rem; color: #6b7280; margin-bottom: 1rem;">
         Click and drag to navigate slides.
       </p>
-      <hx-carousel mouse-dragging loop>
+      <hx-carousel
+        label="${args.label}"
+        ?loop=${args.loop}
+        ?autoplay=${args.autoplay}
+        autoplay-interval="${args.autoplayInterval}"
+        slides-per-page="${args.slidesPerPage}"
+        slides-per-move="${args.slidesPerMove}"
+        orientation="${args.orientation}"
+        ?mouse-dragging=${args.mouseDragging}
+      >
         ${demoSlide(0)} ${demoSlide(1)} ${demoSlide(2)} ${demoSlide(3)}
       </hx-carousel>
     </div>
@@ -253,13 +383,57 @@ export const MouseDragging: Story = {
 };
 
 // ─────────────────────────────────────────────────
-// 8. HEALTHCARE — Patient Education Slides
+// 8. WITH PAGINATION
+// ─────────────────────────────────────────────────
+
+export const WithPagination: Story = {
+  name: 'With Pagination',
+  args: {
+    label: 'Paginated carousel',
+    loop: true,
+  },
+  render: (args) => html`
+    <div style="max-width: 600px; margin: 2rem auto; font-family: sans-serif;">
+      <p style="font-size: 0.875rem; color: #6b7280; margin-bottom: 1rem;">
+        Use the pagination dots below to navigate directly to any slide.
+      </p>
+      <hx-carousel
+        label="${args.label}"
+        ?loop=${args.loop}
+        ?autoplay=${args.autoplay}
+        autoplay-interval="${args.autoplayInterval}"
+        slides-per-page="${args.slidesPerPage}"
+        slides-per-move="${args.slidesPerMove}"
+        orientation="${args.orientation}"
+        ?mouse-dragging=${args.mouseDragging}
+      >
+        ${demoSlide(0)} ${demoSlide(1)} ${demoSlide(2)} ${demoSlide(3)} ${demoSlide(4)}
+      </hx-carousel>
+    </div>
+  `,
+};
+
+// ─────────────────────────────────────────────────
+// 9. HEALTHCARE — Patient Education Slides
 // ─────────────────────────────────────────────────
 
 export const PatientEducation: Story = {
-  render: () => html`
+  args: {
+    label: 'Patient education carousel',
+    loop: true,
+  },
+  render: (args) => html`
     <div style="max-width: 600px; margin: 2rem auto; font-family: sans-serif;">
-      <hx-carousel loop>
+      <hx-carousel
+        label="${args.label}"
+        ?loop=${args.loop}
+        ?autoplay=${args.autoplay}
+        autoplay-interval="${args.autoplayInterval}"
+        slides-per-page="${args.slidesPerPage}"
+        slides-per-move="${args.slidesPerMove}"
+        orientation="${args.orientation}"
+        ?mouse-dragging=${args.mouseDragging}
+      >
         <hx-carousel-item>
           <div
             style="padding: 2rem; background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 0.5rem; min-height: 180px;"
