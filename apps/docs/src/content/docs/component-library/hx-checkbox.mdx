@@ -1,6 +1,6 @@
 ---
 title: 'hx-checkbox'
-description: A checkbox component with label, validation, and form association.
+description: Form-associated checkbox with built-in label, validation, indeterminate state, and ElementInternals form participation.
 ---
 
 import ComponentLoader from '../../../components/ComponentLoader.astro';
@@ -11,7 +11,16 @@ import ComponentDoc from '../../../components/ComponentDoc.astro';
 
 <ComponentDoc tagName="hx-checkbox" section="summary" />
 
-## Basic
+## Overview
+
+`hx-checkbox` is the primary boolean input element in Helix. It participates in native HTML forms via `ElementInternals` (form-associated custom element), supports three visual states (unchecked, checked, indeterminate), and surfaces validation with `checkValidity()` / `reportValidity()`. Label double-click is handled internally so the checkbox never fires twice.
+
+**Use `hx-checkbox` when:** the user needs to opt in or out of a single option, or when a "select all" indeterminate pattern is required.
+**Use `hx-checkbox-group` instead when:** presenting a list of related checkboxes with a shared legend.
+
+## Live Demo
+
+### Basic
 
 Simple checkbox with a label.
 
@@ -22,7 +31,7 @@ Simple checkbox with a label.
   </div>
 </ComponentDemo>
 
-## States
+### States
 
 Checked, indeterminate, disabled, and error states.
 
@@ -36,7 +45,19 @@ Checked, indeterminate, disabled, and error states.
   </div>
 </ComponentDemo>
 
-## Validation
+### Sizes
+
+Small, medium, and large checkbox sizes.
+
+<ComponentDemo title="Sizes">
+  <div style="display: grid; gap: 0.75rem; max-width: 400px;">
+    <hx-checkbox hx-size="sm" label="Small checkbox"></hx-checkbox>
+    <hx-checkbox hx-size="md" label="Medium checkbox (default)"></hx-checkbox>
+    <hx-checkbox hx-size="lg" label="Large checkbox"></hx-checkbox>
+  </div>
+</ComponentDemo>
+
+### Validation
 
 Required checkbox with error and help text.
 
@@ -50,6 +71,180 @@ Required checkbox with error and help text.
     <hx-checkbox label="Accept terms" error="This field is required."></hx-checkbox>
   </div>
 </ComponentDemo>
+
+### Rich Label via Slot
+
+Use the default slot for rich label content — links in consent labels are a common Drupal pattern.
+
+<ComponentDemo title="Rich Label">
+  <hx-checkbox>
+    I agree to the <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>
+  </hx-checkbox>
+</ComponentDemo>
+
+## Installation
+
+```bash
+# Full library
+npm install @helix/library
+
+# Or import only this component (tree-shaking friendly)
+import '@helix/library/components/hx-checkbox';
+```
+
+## Basic Usage
+
+```html
+<hx-checkbox name="agree" label="I accept the terms" required></hx-checkbox>
+```
+
+## Properties
+
+| Property        | Attribute       | Type                   | Default | Description                                                  |
+| --------------- | --------------- | ---------------------- | ------- | ------------------------------------------------------------ |
+| `checked`       | `checked`       | `boolean`              | `false` | Whether the checkbox is checked. Reflects to host attribute. |
+| `indeterminate` | `indeterminate` | `boolean`              | `false` | Indeterminate visual state (e.g., "select all" pattern).     |
+| `disabled`      | `disabled`      | `boolean`              | `false` | Prevents all interaction.                                    |
+| `required`      | `required`      | `boolean`              | `false` | Marks the checkbox as required for form submission.          |
+| `name`          | `name`          | `string`               | `''`    | Form field name used during form submission.                 |
+| `value`         | `value`         | `string`               | `'on'`  | Value submitted when the checkbox is checked.                |
+| `label`         | `label`         | `string`               | `''`    | Visible label text. Override with the default slot.          |
+| `error`         | `error`         | `string`               | `''`    | Error message. When set, checkbox enters error state.        |
+| `helpText`      | `help-text`     | `string`               | `''`    | Guidance text displayed below the checkbox.                  |
+| `hxSize`        | `hx-size`       | `'sm' \| 'md' \| 'lg'` | `'md'`  | Controls checkbox and label size.                            |
+
+## Events
+
+| Event       | Detail Type                           | Description                                                  |
+| ----------- | ------------------------------------- | ------------------------------------------------------------ |
+| `hx-change` | `{ checked: boolean, value: string }` | Fired when the checkbox is toggled. Bubbles and is composed. |
+
+## CSS Custom Properties
+
+| Property                             | Default                                | Description                                 |
+| ------------------------------------ | -------------------------------------- | ------------------------------------------- |
+| `--hx-checkbox-size`                 | `var(--hx-size-5, 1.25rem)`            | Checkbox width and height.                  |
+| `--hx-checkbox-bg`                   | `var(--hx-color-neutral-0, #ffffff)`   | Unchecked background color.                 |
+| `--hx-checkbox-border-color`         | `var(--hx-color-neutral-300, #ced4da)` | Border color in unchecked state.            |
+| `--hx-checkbox-border-radius`        | `var(--hx-border-radius-sm, 0.25rem)`  | Border radius of the box.                   |
+| `--hx-checkbox-checked-bg`           | `var(--hx-color-primary-500, #2563EB)` | Background when checked or indeterminate.   |
+| `--hx-checkbox-checked-border-color` | `var(--hx-color-primary-500, #2563EB)` | Border color when checked or indeterminate. |
+| `--hx-checkbox-checkmark-color`      | `var(--hx-color-neutral-0, #ffffff)`   | Checkmark / dash stroke color.              |
+| `--hx-checkbox-focus-ring-color`     | `var(--hx-focus-ring-color, #2563EB)`  | Focus ring color.                           |
+| `--hx-checkbox-label-color`          | `var(--hx-color-neutral-700, #343a40)` | Label text color.                           |
+| `--hx-checkbox-help-text-color`      | `var(--hx-color-neutral-500, #6c757d)` | Help text color.                            |
+| `--hx-checkbox-error-color`          | `var(--hx-color-error-500, #dc3545)`   | Error state color.                          |
+| `--hx-checkbox-hover-border-color`   | `var(--hx-color-primary-500, #2563EB)` | Border color on hover.                      |
+
+## CSS Parts
+
+| Part        | Description                                               |
+| ----------- | --------------------------------------------------------- |
+| `control`   | The `<label>` wrapper around the checkbox and label text. |
+| `checkbox`  | The visual checkbox box element.                          |
+| `checkmark` | The SVG checkmark icon inside the checkbox.               |
+| `label`     | The label text `<span>`.                                  |
+| `help-text` | The help text container `<div>`.                          |
+| `error`     | The error message container `<div>`.                      |
+
+## Slots
+
+| Slot        | Description                                                                                                     |
+| ----------- | --------------------------------------------------------------------------------------------------------------- |
+| _(default)_ | Custom label content. Overrides the `label` property. Accepts rich HTML — useful for consent labels with links. |
+| `error`     | Custom error content. Overrides the `error` property.                                                           |
+| `help-text` | Custom help text content. Overrides the `help-text` property.                                                   |
+
+## Accessibility
+
+| Topic              | Details                                                                                        |
+| ------------------ | ---------------------------------------------------------------------------------------------- |
+| ARIA role          | Uses a native `<input type="checkbox">` — role is implicit and correct for all assistive tech. |
+| `aria-invalid`     | Set to `"true"` on the input automatically when the `error` property or slot is populated.     |
+| `aria-describedby` | Wired to the error container when `error` is set; otherwise wired to the help text container.  |
+| `aria-labelledby`  | Points to the internal label `<span>` when no `aria-label` is set on the host.                 |
+| `aria-label`       | Forwarded from the host element to the inner input when set on the host.                       |
+| Indeterminate      | The native `input.indeterminate` property is synced; screen readers announce the mixed state.  |
+| Keyboard           | `Tab` to focus; `Space` to toggle. Label click is handled once — no double-fire.               |
+| Focus              | `focus()` method delegates to the inner input.                                                 |
+| Screen reader      | Required marker asterisk is `aria-hidden`; error live region uses `role="status"` (polite).    |
+| Form validation    | `checkValidity()` and `reportValidity()` delegate to `ElementInternals`.                       |
+| WCAG 2.1 AA        | Verified with axe-core across all states: default, checked, indeterminate, disabled, error.    |
+
+## Drupal Integration
+
+```twig
+{# my-module/templates/my-template.html.twig #}
+<hx-checkbox
+  name="{{ field_name }}"
+  label="{{ field_label }}"
+  value="{{ field_value|default('on') }}"
+  {% if field_required %}required{% endif %}
+  {% if field_disabled %}disabled{% endif %}
+  {% if field_error %}error="{{ field_error }}"{% endif %}
+  {% if field_help %}help-text="{{ field_help }}"{% endif %}
+></hx-checkbox>
+```
+
+Load the library in your module's `.libraries.yml`:
+
+```yaml
+helix-components:
+  js:
+    /libraries/helix/helix.min.js: { minified: true }
+```
+
+Listen for the `hx-change` event in Drupal behaviors:
+
+```javascript
+Drupal.behaviors.myCheckbox = {
+  attach(context) {
+    context.querySelectorAll('hx-checkbox').forEach((el) => {
+      el.addEventListener('hx-change', (e) => {
+        const { checked, value } = e.detail;
+        // update hidden field or trigger AJAX
+      });
+    });
+  },
+};
+```
+
+## Standalone HTML Example
+
+Copy-paste into a `.html` file and open in any browser — no build tool required:
+
+```html
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>hx-checkbox example</title>
+    <script
+      type="module"
+      src="https://cdn.jsdelivr.net/npm/@helix/library/dist/helix.min.js"
+    ></script>
+  </head>
+  <body style="font-family: sans-serif; padding: 2rem; display: grid; gap: 1rem; max-width: 400px;">
+    <hx-checkbox
+      id="terms"
+      name="terms"
+      label="I accept the terms and conditions"
+      required
+    ></hx-checkbox>
+    <hx-checkbox label="Subscribe to newsletter" checked></hx-checkbox>
+    <hx-checkbox label="Select all items" indeterminate></hx-checkbox>
+    <hx-checkbox label="Disabled option" disabled></hx-checkbox>
+    <hx-checkbox label="Error state" error="This field is required."></hx-checkbox>
+
+    <script>
+      document.getElementById('terms').addEventListener('hx-change', (e) => {
+        console.log('Checked:', e.detail.checked, 'Value:', e.detail.value);
+      });
+    </script>
+  </body>
+</html>
+```
 
 ## API Reference
 
