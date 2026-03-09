@@ -136,9 +136,7 @@ export const Bash: Story = {
   name: 'Language: Bash',
   render: () => html`
     <hx-code-snippet language="bash">
-npm install @wc-2026/library
-npm run build
-npm run test
+      npm install @wc-2026/library npm run build npm run test
     </hx-code-snippet>
   `,
 };
@@ -151,15 +149,9 @@ export const TypeScript: Story = {
   name: 'Language: TypeScript',
   render: () => html`
     <hx-code-snippet language="typescript">
-interface Patient {
-  id: string;
-  name: string;
-  dateOfBirth: string;
-}
-
-function getPatient(id: string): Promise&lt;Patient&gt; {
-  return fetch('/api/patients/' + id).then((res) => res.json() as Promise&lt;Patient&gt;);
-}
+      interface Patient { id: string; name: string; dateOfBirth: string; } function getPatient(id:
+      string): Promise&lt;Patient&gt; { return fetch('/api/patients/' + id).then((res) => res.json()
+      as Promise&lt;Patient&gt;); }
     </hx-code-snippet>
   `,
 };
@@ -200,9 +192,7 @@ export const Wrap: Story = {
 export const NoCopyButton: Story = {
   name: 'Copy: Disabled',
   render: () => html`
-    <hx-code-snippet language="javascript" ?copyable=${false}>
-      const x = 42;
-    </hx-code-snippet>
+    <hx-code-snippet language="javascript" ?copyable=${false}> const x = 42; </hx-code-snippet>
   `,
 };
 
@@ -214,16 +204,8 @@ export const MaxLines: Story = {
   name: 'Max Lines: Show More/Less',
   render: () => html`
     <hx-code-snippet language="javascript" max-lines="5">
-const a = 1;
-const b = 2;
-const c = 3;
-const d = 4;
-const e = 5;
-const f = 6;
-const g = 7;
-const h = 8;
-const i = 9;
-const j = 10;
+      const a = 1; const b = 2; const c = 3; const d = 4; const e = 5; const f = 6; const g = 7;
+      const h = 8; const i = 9; const j = 10;
     </hx-code-snippet>
   `,
   play: async ({ canvasElement }) => {

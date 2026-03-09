@@ -10,48 +10,36 @@ describe('hx-code-snippet', () => {
 
   describe('Rendering', () => {
     it('renders with shadow DOM', async () => {
-      const el = await fixture<HelixCodeSnippet>(
-        '<hx-code-snippet>const x = 1;</hx-code-snippet>',
-      );
+      const el = await fixture<HelixCodeSnippet>('<hx-code-snippet>const x = 1;</hx-code-snippet>');
       expect(el.shadowRoot).toBeTruthy();
     });
 
     it('renders block mode by default (pre element)', async () => {
-      const el = await fixture<HelixCodeSnippet>(
-        '<hx-code-snippet>const x = 1;</hx-code-snippet>',
-      );
+      const el = await fixture<HelixCodeSnippet>('<hx-code-snippet>const x = 1;</hx-code-snippet>');
       const pre = shadowQuery(el, 'pre');
       expect(pre).toBeTruthy();
     });
 
     it('exposes "base" CSS part in block mode', async () => {
-      const el = await fixture<HelixCodeSnippet>(
-        '<hx-code-snippet>const x = 1;</hx-code-snippet>',
-      );
+      const el = await fixture<HelixCodeSnippet>('<hx-code-snippet>const x = 1;</hx-code-snippet>');
       const base = shadowQuery(el, '[part~="base"]');
       expect(base).toBeTruthy();
     });
 
     it('exposes "code" CSS part in block mode', async () => {
-      const el = await fixture<HelixCodeSnippet>(
-        '<hx-code-snippet>const x = 1;</hx-code-snippet>',
-      );
+      const el = await fixture<HelixCodeSnippet>('<hx-code-snippet>const x = 1;</hx-code-snippet>');
       const code = shadowQuery(el, '[part~="code"]');
       expect(code).toBeTruthy();
     });
 
     it('exposes "copy-button" CSS part by default', async () => {
-      const el = await fixture<HelixCodeSnippet>(
-        '<hx-code-snippet>const x = 1;</hx-code-snippet>',
-      );
+      const el = await fixture<HelixCodeSnippet>('<hx-code-snippet>const x = 1;</hx-code-snippet>');
       const btn = shadowQuery(el, '[part~="copy-button"]');
       expect(btn).toBeTruthy();
     });
 
     it('pre has role="region" and default aria-label when no language set', async () => {
-      const el = await fixture<HelixCodeSnippet>(
-        '<hx-code-snippet>const x = 1;</hx-code-snippet>',
-      );
+      const el = await fixture<HelixCodeSnippet>('<hx-code-snippet>const x = 1;</hx-code-snippet>');
       const pre = shadowQuery(el, 'pre');
       expect(pre?.getAttribute('role')).toBe('region');
       expect(pre?.getAttribute('aria-label')).toBe('Code snippet');
@@ -66,9 +54,7 @@ describe('hx-code-snippet', () => {
     });
 
     it('exposes "header" CSS part in block mode', async () => {
-      const el = await fixture<HelixCodeSnippet>(
-        '<hx-code-snippet>const x = 1;</hx-code-snippet>',
-      );
+      const el = await fixture<HelixCodeSnippet>('<hx-code-snippet>const x = 1;</hx-code-snippet>');
       const header = shadowQuery(el, '[part~="header"]');
       expect(header).toBeTruthy();
     });
@@ -113,9 +99,7 @@ describe('hx-code-snippet', () => {
 
   describe('Property: copyable', () => {
     it('shows copy button by default (copyable=true)', async () => {
-      const el = await fixture<HelixCodeSnippet>(
-        '<hx-code-snippet>const x = 1;</hx-code-snippet>',
-      );
+      const el = await fixture<HelixCodeSnippet>('<hx-code-snippet>const x = 1;</hx-code-snippet>');
       const btn = shadowQuery(el, '[part~="copy-button"]');
       expect(btn).toBeTruthy();
     });
@@ -132,9 +116,7 @@ describe('hx-code-snippet', () => {
     });
 
     it('hides copy button when copyable set to false programmatically', async () => {
-      const el = await fixture<HelixCodeSnippet>(
-        '<hx-code-snippet>const x = 1;</hx-code-snippet>',
-      );
+      const el = await fixture<HelixCodeSnippet>('<hx-code-snippet>const x = 1;</hx-code-snippet>');
       el.copyable = false;
       await el.updateComplete;
       const btn = shadowQuery(el, '[part~="copy-button"]');
@@ -142,9 +124,7 @@ describe('hx-code-snippet', () => {
     });
 
     it('copy button has aria-label="Copy code" initially', async () => {
-      const el = await fixture<HelixCodeSnippet>(
-        '<hx-code-snippet>const x = 1;</hx-code-snippet>',
-      );
+      const el = await fixture<HelixCodeSnippet>('<hx-code-snippet>const x = 1;</hx-code-snippet>');
       const btn = shadowQuery(el, '[part~="copy-button"]');
       expect(btn?.getAttribute('aria-label')).toBe('Copy code');
     });
@@ -154,9 +134,7 @@ describe('hx-code-snippet', () => {
 
   describe('Copy Action', () => {
     it('dispatches hx-copy event on copy button click', async () => {
-      const el = await fixture<HelixCodeSnippet>(
-        '<hx-code-snippet>const x = 1;</hx-code-snippet>',
-      );
+      const el = await fixture<HelixCodeSnippet>('<hx-code-snippet>const x = 1;</hx-code-snippet>');
       const btn = shadowQuery<HTMLButtonElement>(el, '[part~="copy-button"]')!;
       const eventPromise = oneEvent<CustomEvent>(el, 'hx-copy');
       btn.click();
@@ -167,9 +145,7 @@ describe('hx-code-snippet', () => {
     });
 
     it('hx-copy event detail has text property', async () => {
-      const el = await fixture<HelixCodeSnippet>(
-        '<hx-code-snippet>const x = 1;</hx-code-snippet>',
-      );
+      const el = await fixture<HelixCodeSnippet>('<hx-code-snippet>const x = 1;</hx-code-snippet>');
       const btn = shadowQuery<HTMLButtonElement>(el, '[part~="copy-button"]')!;
       const eventPromise = oneEvent<CustomEvent>(el, 'hx-copy');
       btn.click();
@@ -178,9 +154,7 @@ describe('hx-code-snippet', () => {
     });
 
     it('copy button aria-label changes to "Copied!" after click', async () => {
-      const el = await fixture<HelixCodeSnippet>(
-        '<hx-code-snippet>const x = 1;</hx-code-snippet>',
-      );
+      const el = await fixture<HelixCodeSnippet>('<hx-code-snippet>const x = 1;</hx-code-snippet>');
       const btn = shadowQuery<HTMLButtonElement>(el, '[part~="copy-button"]')!;
       btn.click();
       await el.updateComplete;
@@ -188,9 +162,7 @@ describe('hx-code-snippet', () => {
     });
 
     it('copy button text changes to "Copied!" after click', async () => {
-      const el = await fixture<HelixCodeSnippet>(
-        '<hx-code-snippet>const x = 1;</hx-code-snippet>',
-      );
+      const el = await fixture<HelixCodeSnippet>('<hx-code-snippet>const x = 1;</hx-code-snippet>');
       const btn = shadowQuery<HTMLButtonElement>(el, '[part~="copy-button"]')!;
       btn.click();
       await el.updateComplete;
@@ -300,9 +272,7 @@ describe('hx-code-snippet', () => {
     });
 
     it('language prop defaults to empty string', async () => {
-      const el = await fixture<HelixCodeSnippet>(
-        '<hx-code-snippet>const x = 1;</hx-code-snippet>',
-      );
+      const el = await fixture<HelixCodeSnippet>('<hx-code-snippet>const x = 1;</hx-code-snippet>');
       expect(el.language).toBe('');
     });
   });
@@ -311,9 +281,7 @@ describe('hx-code-snippet', () => {
 
   describe('Property: lineNumbers', () => {
     it('lineNumbers defaults to false', async () => {
-      const el = await fixture<HelixCodeSnippet>(
-        '<hx-code-snippet>const x = 1;</hx-code-snippet>',
-      );
+      const el = await fixture<HelixCodeSnippet>('<hx-code-snippet>const x = 1;</hx-code-snippet>');
       expect(el.lineNumbers).toBe(false);
     });
 
@@ -331,9 +299,7 @@ describe('hx-code-snippet', () => {
 
   describe('Slots', () => {
     it('renders default slot content', async () => {
-      const el = await fixture<HelixCodeSnippet>(
-        '<hx-code-snippet>Hello World</hx-code-snippet>',
-      );
+      const el = await fixture<HelixCodeSnippet>('<hx-code-snippet>Hello World</hx-code-snippet>');
       expect(el.textContent?.trim()).toBe('Hello World');
     });
 
@@ -358,23 +324,17 @@ describe('hx-code-snippet', () => {
 
   describe('Defaults', () => {
     it('copyable defaults to true', async () => {
-      const el = await fixture<HelixCodeSnippet>(
-        '<hx-code-snippet>const x = 1;</hx-code-snippet>',
-      );
+      const el = await fixture<HelixCodeSnippet>('<hx-code-snippet>const x = 1;</hx-code-snippet>');
       expect(el.copyable).toBe(true);
     });
 
     it('inline defaults to false', async () => {
-      const el = await fixture<HelixCodeSnippet>(
-        '<hx-code-snippet>const x = 1;</hx-code-snippet>',
-      );
+      const el = await fixture<HelixCodeSnippet>('<hx-code-snippet>const x = 1;</hx-code-snippet>');
       expect(el.inline).toBe(false);
     });
 
     it('maxLines defaults to 0', async () => {
-      const el = await fixture<HelixCodeSnippet>(
-        '<hx-code-snippet>const x = 1;</hx-code-snippet>',
-      );
+      const el = await fixture<HelixCodeSnippet>('<hx-code-snippet>const x = 1;</hx-code-snippet>');
       expect(el.maxLines).toBe(0);
     });
   });
@@ -383,9 +343,7 @@ describe('hx-code-snippet', () => {
 
   describe('CSS Behavior', () => {
     it('pre element has overflow-x: auto for horizontal scroll', async () => {
-      const el = await fixture<HelixCodeSnippet>(
-        '<hx-code-snippet>const x = 1;</hx-code-snippet>',
-      );
+      const el = await fixture<HelixCodeSnippet>('<hx-code-snippet>const x = 1;</hx-code-snippet>');
       const pre = shadowQuery<HTMLElement>(el, 'pre');
       await el.updateComplete;
       const styles = getComputedStyle(pre!);
@@ -397,9 +355,7 @@ describe('hx-code-snippet', () => {
 
   describe('Keyboard Interaction', () => {
     it('copy button is activatable via Enter key', async () => {
-      const el = await fixture<HelixCodeSnippet>(
-        '<hx-code-snippet>const x = 1;</hx-code-snippet>',
-      );
+      const el = await fixture<HelixCodeSnippet>('<hx-code-snippet>const x = 1;</hx-code-snippet>');
       const btn = shadowQuery<HTMLButtonElement>(el, '[part~="copy-button"]')!;
       const eventPromise = oneEvent<CustomEvent>(el, 'hx-copy');
       btn.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
@@ -443,9 +399,7 @@ describe('hx-code-snippet', () => {
     });
 
     it('copyable=false has no axe violations', async () => {
-      const el = await fixture<HelixCodeSnippet>(
-        '<hx-code-snippet>const x = 1;</hx-code-snippet>',
-      );
+      const el = await fixture<HelixCodeSnippet>('<hx-code-snippet>const x = 1;</hx-code-snippet>');
       el.copyable = false;
       await el.updateComplete;
       const { violations } = await checkA11y(el);
@@ -482,9 +436,7 @@ describe('hx-code-snippet', () => {
     });
 
     it('clears copy timer on disconnect without post-disconnect mutation', async () => {
-      const el = await fixture<HelixCodeSnippet>(
-        '<hx-code-snippet>const x = 1;</hx-code-snippet>',
-      );
+      const el = await fixture<HelixCodeSnippet>('<hx-code-snippet>const x = 1;</hx-code-snippet>');
       const btn = shadowQuery<HTMLButtonElement>(el, '[part~="copy-button"]')!;
       btn.click();
       await el.updateComplete;
