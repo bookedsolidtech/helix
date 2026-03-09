@@ -176,6 +176,7 @@ Listen for events in Drupal behaviors using `once()` to prevent duplicate listen
 ```javascript
 Drupal.behaviors.myComponent = {
   attach(context) {
+    // once() is a Drupal core utility (no import needed) — prevents duplicate event binding during AJAX attach cycles
     once('myComponent', 'hx-<component-name>', context).forEach((el) => {
       el.addEventListener('hx-<event>', (e) => {
         // handle event
