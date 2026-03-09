@@ -187,3 +187,66 @@ export const HealthcareDrugHierarchy: Story = {
     </hx-tree-view>
   `,
 };
+
+// ─────────────────────────────────────────────────
+// WITH ICONS
+// ─────────────────────────────────────────────────
+
+export const WithIcons: Story = {
+  name: 'With Icons',
+  render: () => html`
+    <hx-tree-view label="Patient records" selection="single">
+      <hx-tree-item expanded>
+        <span slot="icon" style="font-size: 1rem;">&#128193;</span>
+        Patient Records
+        <hx-tree-item slot="children">
+          <span slot="icon" style="font-size: 1rem;">&#128196;</span>
+          Admission Notes
+        </hx-tree-item>
+        <hx-tree-item slot="children" expanded>
+          <span slot="icon" style="font-size: 1rem;">&#128193;</span>
+          Lab Results
+          <hx-tree-item slot="children">
+            <span slot="icon" style="font-size: 1rem;">&#128196;</span>
+            CBC Panel
+          </hx-tree-item>
+          <hx-tree-item slot="children">
+            <span slot="icon" style="font-size: 1rem;">&#128196;</span>
+            Metabolic Panel
+          </hx-tree-item>
+        </hx-tree-item>
+        <hx-tree-item slot="children">
+          <span slot="icon" style="font-size: 1rem;">&#128196;</span>
+          Discharge Summary
+        </hx-tree-item>
+      </hx-tree-item>
+    </hx-tree-view>
+  `,
+};
+
+// ─────────────────────────────────────────────────
+// DEEP NESTING
+// ─────────────────────────────────────────────────
+
+export const DeepNesting: Story = {
+  name: 'Deep Nesting (5 levels)',
+  render: () => html`
+    <hx-tree-view label="ICD-10 hierarchy" selection="single">
+      <hx-tree-item expanded>
+        Chapter I: Infectious Diseases (A00-B99)
+        <hx-tree-item slot="children" expanded>
+          Block A00-A09: Intestinal infections
+          <hx-tree-item slot="children" expanded>
+            A00: Cholera
+            <hx-tree-item slot="children" expanded>
+              A00.0: Cholera due to Vibrio cholerae 01, biovar cholerae
+              <hx-tree-item slot="children">A00.0.1: Classical cholera</hx-tree-item>
+              <hx-tree-item slot="children">A00.0.2: El Tor cholera</hx-tree-item>
+            </hx-tree-item>
+            <hx-tree-item slot="children">A00.1: Cholera due to Vibrio cholerae 01, biovar eltor</hx-tree-item>
+          </hx-tree-item>
+        </hx-tree-item>
+      </hx-tree-item>
+    </hx-tree-view>
+  `,
+};
