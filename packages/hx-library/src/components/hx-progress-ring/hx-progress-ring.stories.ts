@@ -14,10 +14,28 @@ const meta = {
   argTypes: {
     value: {
       control: { type: 'number', min: 0, max: 100 },
-      description: 'Progress value (0–100). Set to null for indeterminate mode.',
+      description: 'Progress value (0–100). Ignored when indeterminate is true.',
       table: {
         category: 'State',
         type: { summary: 'number | null' },
+      },
+    },
+    max: {
+      control: { type: 'number', min: 1 },
+      description: 'Maximum value for the progress range. Defaults to 100.',
+      table: {
+        category: 'State',
+        defaultValue: { summary: '100' },
+        type: { summary: 'number' },
+      },
+    },
+    indeterminate: {
+      control: { type: 'boolean' },
+      description: 'When true, renders in indeterminate (loading) mode regardless of value.',
+      table: {
+        category: 'State',
+        defaultValue: { summary: 'false' },
+        type: { summary: 'boolean' },
       },
     },
     size: {
@@ -60,6 +78,8 @@ const meta = {
   },
   args: {
     value: 65,
+    max: 100,
+    indeterminate: false,
     size: 'md',
     strokeWidth: 4,
     variant: 'default',
@@ -67,13 +87,14 @@ const meta = {
   },
   render: (args) => html`
     <hx-progress-ring
-      value=${args.value ?? null}
+      .value=${args.indeterminate ? null : (args.value ?? null)}
+      max=${args.max}
       size=${args.size}
       stroke-width=${args.strokeWidth}
       variant=${args.variant}
       label=${args.label}
     >
-      ${args.value !== null ? html`<span>${args.value}%</span>` : ''}
+      ${!args.indeterminate && args.value !== null ? html`<span>${args.value}%</span>` : ''}
     </hx-progress-ring>
   `,
 } satisfies Meta;
