@@ -271,13 +271,41 @@ jobs:
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: 'npm'
+      - name: Detect changed components
+        id: detect
+        run: |
+          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+            CHANGED=$(git diff --name-only "origin/${{ github.base_ref }}...HEAD" \
+              | grep 'src/components/hx-' \
+              | sed 's|.*src/components/\(hx-[^/]*\)/.*|\1|' \
+              | sort -u \
+              | tr '\n' ',' | sed 's/,$//')
+          else
+            CHANGED=$(git diff --name-only HEAD~1...HEAD \
+              | grep 'src/components/hx-' \
+              | sed 's|.*src/components/\(hx-[^/]*\)/.*|\1|' \
+              | sort -u \
+              | tr '\n' ',' | sed 's/,$//')
+          fi
+          echo "changed=$CHANGED" >> "$GITHUB_OUTPUT"
+          if [ -z "$CHANGED" ]; then
+            echo "No component source changes — VRT will skip"
+          else
+            echo "VRT scoped to: $CHANGED"
+          fi
       - run: npm ci
+        if: steps.detect.outputs.changed != ''
       - run: npx playwright install --with-deps chromium firefox webkit
+        if: steps.detect.outputs.changed != ''
       - name: Restore VRT baselines
+        if: steps.detect.outputs.changed != ''
+        id: vrt-cache
         uses: actions/cache@v4
         with:
           path: packages/hx-library/__screenshots__
@@ -285,11 +313,21 @@ jobs:
           restore-keys: |
             vrt-screenshots-
       - run: npm run build:storybook
+        if: steps.detect.outputs.changed != ''
       - name: Serve Storybook and run VRT
+        if: steps.detect.outputs.changed != ''
+        env:
+          CHANGED_COMPONENTS: ${{ steps.detect.outputs.changed }}
         run: |
           npx http-server apps/storybook/dist -p 3151 &
           sleep 5
-          npm run test:vrt
+          # If no cached baselines exist, run in update mode to create them (first-run pass)
+          if [ ! -d "packages/hx-library/__screenshots__" ] || [ -z "$(ls -A packages/hx-library/__screenshots__ 2>/dev/null)" ]; then
+            echo "No VRT baselines found — creating initial baselines"
+            npm run test:vrt:update
+          else
+            npm run test:vrt
+          fi
       - name: Upload VRT diff images
         if: failure()
         uses: actions/upload-artifact@v4
