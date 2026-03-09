@@ -141,9 +141,7 @@ export const Error: Story = {
 export const Closable: Story = {
   args: { closable: true },
   render: () => html`
-    <hx-message-bar closable>
-      This notification can be dismissed.
-    </hx-message-bar>
+    <hx-message-bar closable> This notification can be dismissed. </hx-message-bar>
   `,
 };
 
@@ -162,9 +160,7 @@ export const AllVariants: Story = {
       <hx-message-bar variant="info">
         Info: System update scheduled for this weekend.
       </hx-message-bar>
-      <hx-message-bar variant="success">
-        Success: All records have been saved.
-      </hx-message-bar>
+      <hx-message-bar variant="success"> Success: All records have been saved. </hx-message-bar>
       <hx-message-bar variant="warning" closable>
         Warning: Your session expires in 5 minutes.
       </hx-message-bar>
@@ -178,8 +174,13 @@ export const AllVariants: Story = {
 export const CustomIcon: Story = {
   render: () => html`
     <hx-message-bar variant="info">
-      <svg slot="icon" viewBox="0 0 20 20" aria-hidden="true" style="width: 1.25rem; height: 1.25rem; fill: currentColor;">
-        <path d="M10 2a8 8 0 100 16A8 8 0 0010 2zm0 14a6 6 0 110-12 6 6 0 010 12z"/>
+      <svg
+        slot="icon"
+        viewBox="0 0 20 20"
+        aria-hidden="true"
+        style="width: 1.25rem; height: 1.25rem; fill: currentColor;"
+      >
+        <path d="M10 2a8 8 0 100 16A8 8 0 0010 2zm0 14a6 6 0 110-12 6 6 0 010 12z" />
       </svg>
       Custom icon in the icon slot.
     </hx-message-bar>
@@ -192,9 +193,7 @@ export const Sticky: Story = {
       <hx-message-bar sticky>
         This message bar sticks to the top when the container scrolls.
       </hx-message-bar>
-      <div style="height: 600px; padding: 1rem;">
-        Scroll this area to see the sticky behavior.
-      </div>
+      <div style="height: 600px; padding: 1rem;">Scroll this area to see the sticky behavior.</div>
     </div>
   `,
 };
@@ -216,9 +215,7 @@ export const ClosedState: Story = {
       <p style="margin-bottom: 0.5rem; font-size: 0.875rem; color: #666;">
         The message bar below is closed (open=false) and not visible:
       </p>
-      <hx-message-bar ?open=${false}>
-        This message bar is not visible.
-      </hx-message-bar>
+      <hx-message-bar ?open=${false}> This message bar is not visible. </hx-message-bar>
       <p style="margin-top: 0.5rem; font-size: 0.875rem; color: #666;">
         Nothing appears above because open=false hides the element.
       </p>

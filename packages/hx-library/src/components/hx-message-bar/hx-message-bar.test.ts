@@ -41,22 +41,30 @@ describe('hx-message-bar', () => {
     });
 
     it('reflects variant attribute to property', async () => {
-      const el = await fixture<HelixMessageBar>('<hx-message-bar variant="error">Error</hx-message-bar>');
+      const el = await fixture<HelixMessageBar>(
+        '<hx-message-bar variant="error">Error</hx-message-bar>',
+      );
       expect(el.variant).toBe('error');
     });
 
     it('applies "success" variant via attribute', async () => {
-      const el = await fixture<HelixMessageBar>('<hx-message-bar variant="success">Success</hx-message-bar>');
+      const el = await fixture<HelixMessageBar>(
+        '<hx-message-bar variant="success">Success</hx-message-bar>',
+      );
       expect(el.getAttribute('variant')).toBe('success');
     });
 
     it('applies "warning" variant via attribute', async () => {
-      const el = await fixture<HelixMessageBar>('<hx-message-bar variant="warning">Warning</hx-message-bar>');
+      const el = await fixture<HelixMessageBar>(
+        '<hx-message-bar variant="warning">Warning</hx-message-bar>',
+      );
       expect(el.getAttribute('variant')).toBe('warning');
     });
 
     it('applies "error" variant via attribute', async () => {
-      const el = await fixture<HelixMessageBar>('<hx-message-bar variant="error">Error</hx-message-bar>');
+      const el = await fixture<HelixMessageBar>(
+        '<hx-message-bar variant="error">Error</hx-message-bar>',
+      );
       expect(el.getAttribute('variant')).toBe('error');
     });
   });
@@ -232,25 +240,33 @@ describe('hx-message-bar', () => {
 
   describe('Accessibility', () => {
     it('uses role="status" for info variant', async () => {
-      const el = await fixture<HelixMessageBar>('<hx-message-bar variant="info">Info</hx-message-bar>');
+      const el = await fixture<HelixMessageBar>(
+        '<hx-message-bar variant="info">Info</hx-message-bar>',
+      );
       const base = shadowQuery(el, '[role="status"]');
       expect(base).toBeTruthy();
     });
 
     it('uses role="status" for success variant', async () => {
-      const el = await fixture<HelixMessageBar>('<hx-message-bar variant="success">Success</hx-message-bar>');
+      const el = await fixture<HelixMessageBar>(
+        '<hx-message-bar variant="success">Success</hx-message-bar>',
+      );
       const base = shadowQuery(el, '[role="status"]');
       expect(base).toBeTruthy();
     });
 
     it('uses role="alert" for warning variant', async () => {
-      const el = await fixture<HelixMessageBar>('<hx-message-bar variant="warning">Warning</hx-message-bar>');
+      const el = await fixture<HelixMessageBar>(
+        '<hx-message-bar variant="warning">Warning</hx-message-bar>',
+      );
       const base = shadowQuery(el, '[role="alert"]');
       expect(base).toBeTruthy();
     });
 
     it('uses role="alert" for error variant', async () => {
-      const el = await fixture<HelixMessageBar>('<hx-message-bar variant="error">Error</hx-message-bar>');
+      const el = await fixture<HelixMessageBar>(
+        '<hx-message-bar variant="error">Error</hx-message-bar>',
+      );
       const base = shadowQuery(el, '[role="alert"]');
       expect(base).toBeTruthy();
     });
@@ -261,7 +277,9 @@ describe('hx-message-bar', () => {
     });
 
     it('has no axe violations when closable', async () => {
-      const el = await fixture<HelixMessageBar>('<hx-message-bar closable>Test message</hx-message-bar>');
+      const el = await fixture<HelixMessageBar>(
+        '<hx-message-bar closable>Test message</hx-message-bar>',
+      );
       await checkA11y(el);
     });
 
