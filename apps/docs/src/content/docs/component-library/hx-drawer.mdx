@@ -1,14 +1,563 @@
 ---
 title: 'hx-drawer'
-description: 'Slide-out panel for secondary content, navigation, or forms'
+description: 'Slide-in panel overlay from any viewport edge with full focus trapping, ARIA dialog semantics, and keyboard navigation for enterprise healthcare UIs.'
 ---
 
 import ComponentLoader from '../../../components/ComponentLoader.astro';
+import ComponentDemo from '../../../components/ComponentDemo.astro';
 import ComponentDoc from '../../../components/ComponentDoc.astro';
 
 <ComponentLoader />
 
 <ComponentDoc tagName="hx-drawer" section="summary" />
+
+## Overview
+
+`hx-drawer` renders a slide-in panel from any edge of the viewport (start, end, top, or bottom). It implements the ARIA dialog pattern: `role="dialog"`, `aria-modal="true"`, full focus trapping, Escape-to-close, and automatic focus return to the trigger element on close. Body scroll is locked while the drawer is open to prevent accidental background interaction.
+
+**Use `hx-drawer` when:** you need a secondary panel for contextual detail, forms, navigation trees, or filtered search results that overlay the primary content without fully leaving the page. Common healthcare use cases include patient detail panels, medication order forms, and care team navigation drawers.
+
+**Do not use** `hx-drawer` for confirmation dialogs that require an immediate decision — use a modal dialog instead. Do not use it for primary page navigation if the destination is a separate page — use standard anchor links.
+
+## Live Demo
+
+### Default (end placement)
+
+Drawer slides in from the right edge. Click the button to open.
+
+<ComponentDemo title="Default">
+  <div style="position: relative; min-height: 80px;">
+    <button
+      id="demo-open-default"
+      onclick="document.getElementById('demo-drawer-default').show()"
+      style="padding: 0.5rem 1rem; background: #2563eb; color: white; border: none; border-radius: 0.375rem; cursor: pointer; font-size: 0.875rem;"
+    >
+      Open Drawer
+    </button>
+    <hx-drawer id="demo-drawer-default" placement="end" size="md">
+      <span slot="label">Patient Details</span>
+      <p>Drawer body content. This area can contain forms, lists, or any secondary content.</p>
+      <p>Use the footer for primary actions like Save or Cancel.</p>
+      <button
+        slot="footer"
+        onclick="document.getElementById('demo-drawer-default').hide()"
+        style="padding: 0.5rem 1rem; border: 1px solid #d1d5db; border-radius: 0.375rem; cursor: pointer; background: white;"
+      >
+        Cancel
+      </button>
+      <button
+        slot="footer"
+        style="padding: 0.5rem 1rem; background: #2563eb; color: white; border: none; border-radius: 0.375rem; cursor: pointer;"
+      >
+        Save
+      </button>
+    </hx-drawer>
+  </div>
+</ComponentDemo>
+
+### Placement Variants
+
+All four placement options — start (left), end (right), top, and bottom.
+
+<ComponentDemo title="Placement Variants">
+  <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
+    <button
+      onclick="document.getElementById('demo-drawer-start').show()"
+      style="padding: 0.5rem 1rem; background: #2563eb; color: white; border: none; border-radius: 0.375rem; cursor: pointer; font-size: 0.875rem;"
+    >
+      Start (left)
+    </button>
+    <button
+      onclick="document.getElementById('demo-drawer-end').show()"
+      style="padding: 0.5rem 1rem; background: #2563eb; color: white; border: none; border-radius: 0.375rem; cursor: pointer; font-size: 0.875rem;"
+    >
+      End (right)
+    </button>
+    <button
+      onclick="document.getElementById('demo-drawer-top').show()"
+      style="padding: 0.5rem 1rem; background: #2563eb; color: white; border: none; border-radius: 0.375rem; cursor: pointer; font-size: 0.875rem;"
+    >
+      Top
+    </button>
+    <button
+      onclick="document.getElementById('demo-drawer-bottom').show()"
+      style="padding: 0.5rem 1rem; background: #2563eb; color: white; border: none; border-radius: 0.375rem; cursor: pointer; font-size: 0.875rem;"
+    >
+      Bottom
+    </button>
+  </div>
+  <hx-drawer id="demo-drawer-start" placement="start" size="md">
+    <span slot="label">Start Drawer</span>
+    <p>This drawer slides in from the left edge.</p>
+    <button
+      slot="footer"
+      onclick="document.getElementById('demo-drawer-start').hide()"
+      style="padding: 0.5rem 1rem; border: 1px solid #d1d5db; border-radius: 0.375rem; cursor: pointer;"
+    >
+      Close
+    </button>
+  </hx-drawer>
+  <hx-drawer id="demo-drawer-end" placement="end" size="md">
+    <span slot="label">End Drawer</span>
+    <p>This drawer slides in from the right edge.</p>
+    <button
+      slot="footer"
+      onclick="document.getElementById('demo-drawer-end').hide()"
+      style="padding: 0.5rem 1rem; border: 1px solid #d1d5db; border-radius: 0.375rem; cursor: pointer;"
+    >
+      Close
+    </button>
+  </hx-drawer>
+  <hx-drawer id="demo-drawer-top" placement="top" size="md">
+    <span slot="label">Top Drawer</span>
+    <p>This drawer slides in from the top edge.</p>
+    <button
+      slot="footer"
+      onclick="document.getElementById('demo-drawer-top').hide()"
+      style="padding: 0.5rem 1rem; border: 1px solid #d1d5db; border-radius: 0.375rem; cursor: pointer;"
+    >
+      Close
+    </button>
+  </hx-drawer>
+  <hx-drawer id="demo-drawer-bottom" placement="bottom" size="md">
+    <span slot="label">Bottom Drawer</span>
+    <p>This drawer slides in from the bottom edge.</p>
+    <button
+      slot="footer"
+      onclick="document.getElementById('demo-drawer-bottom').hide()"
+      style="padding: 0.5rem 1rem; border: 1px solid #d1d5db; border-radius: 0.375rem; cursor: pointer;"
+    >
+      Close
+    </button>
+  </hx-drawer>
+</ComponentDemo>
+
+### Size Variants
+
+Four preset sizes: `sm` (20rem), `md` (30rem, default), `lg` (40rem), and `full` (100% of edge dimension).
+
+<ComponentDemo title="Size Variants">
+  <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
+    <button
+      onclick="document.getElementById('demo-drawer-sm').show()"
+      style="padding: 0.5rem 1rem; background: #6b7280; color: white; border: none; border-radius: 0.375rem; cursor: pointer; font-size: 0.875rem;"
+    >
+      Small
+    </button>
+    <button
+      onclick="document.getElementById('demo-drawer-md2').show()"
+      style="padding: 0.5rem 1rem; background: #6b7280; color: white; border: none; border-radius: 0.375rem; cursor: pointer; font-size: 0.875rem;"
+    >
+      Medium
+    </button>
+    <button
+      onclick="document.getElementById('demo-drawer-lg').show()"
+      style="padding: 0.5rem 1rem; background: #6b7280; color: white; border: none; border-radius: 0.375rem; cursor: pointer; font-size: 0.875rem;"
+    >
+      Large
+    </button>
+  </div>
+  <hx-drawer id="demo-drawer-sm" placement="end" size="sm">
+    <span slot="label">Small Drawer (20rem)</span>
+    <p>Compact panel for quick actions or short forms.</p>
+    <button
+      slot="footer"
+      onclick="document.getElementById('demo-drawer-sm').hide()"
+      style="padding: 0.5rem 1rem; border: 1px solid #d1d5db; border-radius: 0.375rem; cursor: pointer;"
+    >
+      Close
+    </button>
+  </hx-drawer>
+  <hx-drawer id="demo-drawer-md2" placement="end" size="md">
+    <span slot="label">Medium Drawer (30rem)</span>
+    <p>Default size — suitable for most secondary content panels.</p>
+    <button
+      slot="footer"
+      onclick="document.getElementById('demo-drawer-md2').hide()"
+      style="padding: 0.5rem 1rem; border: 1px solid #d1d5db; border-radius: 0.375rem; cursor: pointer;"
+    >
+      Close
+    </button>
+  </hx-drawer>
+  <hx-drawer id="demo-drawer-lg" placement="end" size="lg">
+    <span slot="label">Large Drawer (40rem)</span>
+    <p>Wider panel for complex forms, data tables, or rich content.</p>
+    <button
+      slot="footer"
+      onclick="document.getElementById('demo-drawer-lg').hide()"
+      style="padding: 0.5rem 1rem; border: 1px solid #d1d5db; border-radius: 0.375rem; cursor: pointer;"
+    >
+      Close
+    </button>
+  </hx-drawer>
+</ComponentDemo>
+
+### Healthcare: Patient Chart Panel
+
+A real-world example — a clinical details panel that opens from the end of the viewport when a patient row is selected.
+
+<ComponentDemo title="Patient Chart Panel">
+  <div style="display: flex; align-items: center; gap: 1rem; padding: 0.75rem 1rem; background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 0.5rem;">
+    <div style="font-size: 0.875rem; color: #111827;">
+      <strong>Jane Doe</strong> &mdash; MRN 2026-7823-HD &mdash; Room 412
+    </div>
+    <button
+      onclick="document.getElementById('demo-drawer-patient').show()"
+      style="margin-left: auto; padding: 0.375rem 0.75rem; background: #2563eb; color: white; border: none; border-radius: 0.375rem; cursor: pointer; font-size: 0.8125rem;"
+    >
+      View Chart
+    </button>
+  </div>
+  <hx-drawer id="demo-drawer-patient" placement="end" size="lg">
+    <span slot="label">Patient Chart — Jane Doe</span>
+    <div style="display: grid; gap: 1rem;">
+      <section>
+        <h3 style="margin: 0 0 0.5rem; font-size: 0.875rem; font-weight: 600; color: #374151;">
+          Demographics
+        </h3>
+        <dl style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.25rem 1rem; font-size: 0.875rem; margin: 0;">
+          <dt style="color: #6b7280;">MRN</dt>
+          <dd style="margin: 0; font-weight: 500;">2026-7823-HD</dd>
+          <dt style="color: #6b7280;">DOB</dt>
+          <dd style="margin: 0; font-weight: 500;">1974-03-15</dd>
+          <dt style="color: #6b7280;">Room</dt>
+          <dd style="margin: 0; font-weight: 500;">412</dd>
+          <dt style="color: #6b7280;">Provider</dt>
+          <dd style="margin: 0; font-weight: 500;">Dr. A. Patel</dd>
+        </dl>
+      </section>
+      <section>
+        <h3 style="margin: 0 0 0.5rem; font-size: 0.875rem; font-weight: 600; color: #374151;">
+          Active Orders
+        </h3>
+        <ul style="margin: 0; padding: 0 0 0 1rem; font-size: 0.875rem; color: #374151;">
+          <li>Metformin 500mg BID</li>
+          <li>Lisinopril 10mg QD</li>
+          <li>CBC with Differential — STAT</li>
+        </ul>
+      </section>
+    </div>
+    <button
+      slot="footer"
+      onclick="document.getElementById('demo-drawer-patient').hide()"
+      style="padding: 0.5rem 1rem; border: 1px solid #d1d5db; border-radius: 0.375rem; cursor: pointer; background: white;"
+    >
+      Close
+    </button>
+    <button
+      slot="footer"
+      style="padding: 0.5rem 1rem; background: #2563eb; color: white; border: none; border-radius: 0.375rem; cursor: pointer;"
+    >
+      Open Full Chart
+    </button>
+  </hx-drawer>
+</ComponentDemo>
+
+## Installation
+
+```bash
+# Full library
+npm install @helix/library
+
+# Or import only this component (tree-shaking friendly)
+import '@helix/library/components/hx-drawer';
+```
+
+## Basic Usage
+
+```html
+<hx-drawer id="my-drawer" placement="end" size="md">
+  <span slot="label">Drawer Title</span>
+
+  <p>Body content goes here — forms, lists, or any secondary content.</p>
+
+  <button slot="footer" onclick="document.getElementById('my-drawer').hide()">Cancel</button>
+  <button slot="footer" onclick="handleSave()">Save</button>
+</hx-drawer>
+
+<!-- Trigger -->
+<button onclick="document.getElementById('my-drawer').show()">Open Drawer</button>
+```
+
+## Properties
+
+| Property    | Attribute   | Type                                       | Default | Description                                                                                 |
+| ----------- | ----------- | ------------------------------------------ | ------- | ------------------------------------------------------------------------------------------- |
+| `open`      | `open`      | `boolean`                                  | `false` | Controls whether the drawer is open. Reflects to the host element attribute.                |
+| `placement` | `placement` | `'start' \| 'end' \| 'top' \| 'bottom'`    | `'end'` | Which viewport edge the drawer slides in from.                                              |
+| `size`      | `size`      | `'sm' \| 'md' \| 'lg' \| 'full' \| string` | `'md'`  | Panel width (or height for top/bottom). Accepts preset keys or any valid CSS length string. |
+| `contained` | `contained` | `boolean`                                  | `false` | When true, the drawer is scoped to its positioned parent rather than the viewport.          |
+| `noHeader`  | `no-header` | `boolean`                                  | `false` | When true, hides the entire header region (title, header-actions, close button).            |
+| `noFooter`  | `no-footer` | `boolean`                                  | `false` | When true, hides the footer slot region.                                                    |
+| `label`     | `label`     | `string`                                   | `''`    | Accessible label string for `aria-label` when the `label` slot is not used.                 |
+
+## Events
+
+| Event              | Detail Type         | Description                                                                                                                                       |
+| ------------------ | ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `hx-show`          | `void`              | Fired immediately when the drawer begins to open (before animation).                                                                              |
+| `hx-after-show`    | `void`              | Fired after the open animation completes (300ms by default, 0ms with reduced-motion).                                                             |
+| `hx-hide`          | `void`              | Fired immediately when the drawer begins to close (before animation).                                                                             |
+| `hx-after-hide`    | `void`              | Fired after the close animation completes. Focus is returned to the trigger at this point.                                                        |
+| `hx-initial-focus` | `void` (cancelable) | Fired when the drawer is about to set initial focus. Call `event.preventDefault()` to override the default focus behavior and set focus manually. |
+
+## Slots
+
+| Slot             | Description                                                                                                 |
+| ---------------- | ----------------------------------------------------------------------------------------------------------- |
+| _(default)_      | The scrollable body region. Accepts any content: text, forms, lists, or nested components.                  |
+| `label`          | The drawer title text. When populated, `aria-labelledby` is applied automatically pointing to this element. |
+| `header-actions` | Optional action buttons rendered in the header row alongside the close button.                              |
+| `footer`         | Action buttons or footer content (e.g., Cancel / Save). Automatically hidden when empty.                    |
+
+## CSS Parts
+
+| Part           | Description                                                                                     |
+| -------------- | ----------------------------------------------------------------------------------------------- |
+| `overlay`      | The full-screen overlay container that holds the backdrop and panel. Fixed-position by default. |
+| `panel`        | The drawer panel itself. Use to override background, shadow, or border-radius.                  |
+| `header`       | The header region containing the title, header-actions slot, and close button.                  |
+| `title`        | The `<p>` element wrapping the `label` slot. Use to override typography.                        |
+| `close-button` | The built-in close button. Use to restyle or resize the icon button.                            |
+| `body`         | The scrollable body region wrapping the default slot.                                           |
+| `footer`       | The footer region wrapping the `footer` slot.                                                   |
+
+## CSS Custom Properties
+
+| Property                          | Default                                   | Description                                |
+| --------------------------------- | ----------------------------------------- | ------------------------------------------ |
+| `--hx-drawer-bg`                  | `var(--hx-color-neutral-0)`               | Drawer panel background color.             |
+| `--hx-drawer-color`               | `var(--hx-color-neutral-900)`             | Drawer panel text color.                   |
+| `--hx-drawer-shadow`              | `var(--hx-shadow-xl)`                     | Drawer panel box shadow.                   |
+| `--hx-drawer-backdrop-color`      | `var(--hx-color-neutral-900)`             | Backdrop overlay color.                    |
+| `--hx-drawer-backdrop-opacity`    | `0.5`                                     | Backdrop opacity (0–1).                    |
+| `--hx-drawer-header-padding`      | `var(--hx-spacing-5) var(--hx-spacing-6)` | Padding inside the header region.          |
+| `--hx-drawer-header-border-color` | `var(--hx-color-neutral-200)`             | Color of the border below the header.      |
+| `--hx-drawer-title-color`         | `var(--hx-color-neutral-900)`             | Title text color.                          |
+| `--hx-drawer-body-padding`        | `var(--hx-spacing-6)`                     | Padding inside the scrollable body region. |
+| `--hx-drawer-footer-padding`      | `var(--hx-spacing-4) var(--hx-spacing-6)` | Padding inside the footer region.          |
+| `--hx-drawer-footer-border-color` | `var(--hx-color-neutral-200)`             | Color of the border above the footer.      |
+
+## Accessibility
+
+| Topic             | Details                                                                                                                                                                                                                                                                              |
+| ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| ARIA role         | `role="dialog"` on the overlay container. This is the correct ARIA landmark for all modal and non-modal drawers per the ARIA Authoring Practices Guide (APG).                                                                                                                        |
+| `aria-modal`      | `aria-modal="true"` is set to signal that background content is inert. Additionally, all sibling elements in `document.body` receive `aria-hidden="true"` when the drawer opens, and are restored on close. This dual approach ensures compatibility with NVDA, JAWS, and VoiceOver. |
+| Accessible name   | When the `label` slot is populated, `aria-labelledby` points to the title element. When the slot is empty, `aria-label` falls back to the `label` property value, or "Drawer" if neither is provided. The dialog always has an accessible name.                                      |
+| Focus trap        | `Tab` and `Shift+Tab` cycle focus within the drawer panel — focus cannot escape to background content. Focus detection uses `document.activeElement` to correctly handle slotted (light DOM) elements.                                                                               |
+| Initial focus     | When the drawer opens, focus moves to the first focusable element inside the panel. Listen for `hx-initial-focus` and call `event.preventDefault()` to customize this behavior.                                                                                                      |
+| Focus restoration | When the drawer closes, focus returns to the element that was focused before the drawer opened (the trigger element).                                                                                                                                                                |
+| Escape key        | Pressing `Escape` closes the drawer from any focused element — including elements outside the Shadow DOM. The listener is registered on `document` immediately when the drawer opens (C-PATTERN-06).                                                                                 |
+| Body scroll lock  | `document.body.style.overflow = 'hidden'` is set on open and restored on close. Not applied in `contained` mode.                                                                                                                                                                     |
+| Close button      | The built-in close button has `aria-label="Close drawer"` and is keyboard-focusable.                                                                                                                                                                                                 |
+| Reduced motion    | Transitions use CSS `transition` with a 300ms default. When `prefers-reduced-motion: reduce` is set, transitions are disabled in CSS and the JavaScript animation duration resolves to 0ms.                                                                                          |
+| WCAG 2.1 AA       | Verified with axe-core: zero violations in both open (with label) and closed states.                                                                                                                                                                                                 |
+
+## Keyboard Navigation
+
+| Key               | Behavior                                                                               |
+| ----------------- | -------------------------------------------------------------------------------------- |
+| `Tab`             | Moves focus to the next focusable element inside the drawer. Wraps from last to first. |
+| `Shift + Tab`     | Moves focus to the previous focusable element. Wraps from first to last.               |
+| `Escape`          | Closes the drawer. Focus returns to the trigger element.                               |
+| `Enter` / `Space` | Activates the focused button (close button, footer actions, etc.).                     |
+
+## Drupal Integration
+
+Use `hx-drawer` in Twig templates after registering the Helix library:
+
+```twig
+{# my-module/templates/patient-detail.html.twig #}
+<button
+  data-hx-drawer-trigger
+  data-hx-drawer-target="patient-{{ patient.id }}-drawer"
+>
+  View Patient Details
+</button>
+
+<hx-drawer
+  id="patient-{{ patient.id }}-drawer"
+  placement="end"
+  size="lg"
+  label="{{ 'Patient Details'|t }}"
+>
+  <span slot="label">{{ patient.full_name|t }}</span>
+
+  <dl>
+    <dt>{{ 'MRN'|t }}</dt>
+    <dd>{{ patient.mrn|e('html') }}</dd>
+    <dt>{{ 'Room'|t }}</dt>
+    <dd>{{ patient.room|e('html') }}</dd>
+  </dl>
+
+  <button slot="footer" data-hx-drawer-close>{{ 'Close'|t }}</button>
+</hx-drawer>
+```
+
+Load the library in your module's `.libraries.yml`:
+
+```yaml
+helix-components:
+  js:
+    /libraries/helix/helix.min.js: { minified: true }
+```
+
+Wire open/close using Drupal behaviors:
+
+```javascript
+Drupal.behaviors.helixDrawer = {
+  attach(context) {
+    // Open trigger
+    context.querySelectorAll('[data-hx-drawer-trigger]').forEach((trigger) => {
+      const targetId = trigger.dataset.hxDrawerTarget;
+      const drawer = document.getElementById(targetId);
+      if (!drawer) return;
+
+      trigger.addEventListener('click', () => {
+        drawer.show();
+      });
+    });
+
+    // Close buttons inside the drawer
+    context.querySelectorAll('[data-hx-drawer-close]').forEach((btn) => {
+      const drawer = btn.closest('hx-drawer');
+      if (!drawer) return;
+
+      btn.addEventListener('click', () => {
+        drawer.hide();
+      });
+    });
+
+    // Optional: react to events
+    context.querySelectorAll('hx-drawer').forEach((drawer) => {
+      drawer.addEventListener('hx-show', () => {
+        // e.g., load content dynamically on open
+      });
+
+      drawer.addEventListener('hx-after-hide', () => {
+        // e.g., reset form state after close
+      });
+    });
+  },
+};
+```
+
+## Standalone HTML Example
+
+Copy-paste into a `.html` file and open in any browser — no build tool required:
+
+```html
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>hx-drawer example</title>
+    <script
+      type="module"
+      src="https://cdn.jsdelivr.net/npm/@helix/library/dist/helix.min.js"
+    ></script>
+    <style>
+      body {
+        font-family: sans-serif;
+        padding: 2rem;
+      }
+
+      .trigger-btn {
+        padding: 0.5rem 1.25rem;
+        background: #2563eb;
+        color: white;
+        border: none;
+        border-radius: 0.375rem;
+        font-size: 0.875rem;
+        cursor: pointer;
+      }
+
+      .footer-btn {
+        padding: 0.5rem 1rem;
+        border: 1px solid #d1d5db;
+        border-radius: 0.375rem;
+        cursor: pointer;
+        background: white;
+        font-size: 0.875rem;
+      }
+
+      .footer-btn.primary {
+        background: #2563eb;
+        color: white;
+        border-color: transparent;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Trigger button -->
+    <button class="trigger-btn" onclick="document.getElementById('demo').show()">
+      Open Patient Chart
+    </button>
+
+    <!-- Drawer component -->
+    <hx-drawer id="demo" placement="end" size="lg">
+      <span slot="label">Patient Chart — Jane Doe</span>
+
+      <div style="display: grid; gap: 1.5rem;">
+        <section>
+          <h3 style="margin: 0 0 0.5rem; font-size: 0.875rem; font-weight: 600;">Demographics</h3>
+          <dl
+            style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.25rem 1rem; font-size: 0.875rem; margin: 0;"
+          >
+            <dt style="color: #6b7280;">MRN</dt>
+            <dd style="margin: 0; font-weight: 500;">2026-7823-HD</dd>
+            <dt style="color: #6b7280;">DOB</dt>
+            <dd style="margin: 0; font-weight: 500;">1974-03-15</dd>
+            <dt style="color: #6b7280;">Room</dt>
+            <dd style="margin: 0; font-weight: 500;">412</dd>
+          </dl>
+        </section>
+
+        <section>
+          <h3 style="margin: 0 0 0.5rem; font-size: 0.875rem; font-weight: 600;">Active Orders</h3>
+          <ul style="margin: 0; padding-left: 1rem; font-size: 0.875rem;">
+            <li>Metformin 500mg BID</li>
+            <li>Lisinopril 10mg QD</li>
+            <li>CBC with Differential — STAT</li>
+          </ul>
+        </section>
+      </div>
+
+      <button class="footer-btn" slot="footer" onclick="document.getElementById('demo').hide()">
+        Close
+      </button>
+      <button class="footer-btn primary" slot="footer">Open Full Chart</button>
+    </hx-drawer>
+
+    <script>
+      const drawer = document.getElementById('demo');
+
+      drawer.addEventListener('hx-show', () => {
+        console.log('Drawer opening');
+      });
+
+      drawer.addEventListener('hx-after-show', () => {
+        console.log('Drawer fully open');
+      });
+
+      drawer.addEventListener('hx-hide', () => {
+        console.log('Drawer closing');
+      });
+
+      drawer.addEventListener('hx-after-hide', () => {
+        console.log('Drawer fully closed — focus returned to trigger');
+      });
+
+      // Customize initial focus (optional)
+      drawer.addEventListener('hx-initial-focus', (e) => {
+        // e.preventDefault(); // Uncomment to take control of initial focus
+      });
+    </script>
+  </body>
+</html>
+```
 
 ## API Reference
 
