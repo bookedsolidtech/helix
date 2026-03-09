@@ -1,5 +1,5 @@
 import { LitElement, html } from 'lit';
-import { customElement, property } from 'lit/decorators.js';
+import { customElement, property, state } from 'lit/decorators.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import { styleMap } from 'lit/directives/style-map.js';
 import { tokenStyles } from '@helix/tokens/lit';
@@ -16,9 +16,14 @@ type MeterState = 'optimum' | 'warning' | 'danger' | 'default';
  *
  * @tag hx-meter
  *
- * @slot label - Visible label rendered above the meter track.
+ * @slot label - Visible label rendered above the meter track. When using this
+ *   slot without the `label` attribute, the accessible name is derived from the
+ *   slot content via `aria-labelledby`. The `label` attribute is NOT required
+ *   when slot content is provided — the component detects slot content and
+ *   switches to `aria-labelledby` automatically.
  *
  * @csspart base - The outer wrapper element.
+ * @csspart track - The unfilled track bar element.
  * @csspart indicator - The filled bar indicating the current value.
  * @csspart label - The label wrapper element.
  *
@@ -78,11 +83,16 @@ export class HelixMeter extends LitElement {
   optimum?: number;
 
   /**
-   * Accessible label for the meter. Used as aria-label when no label slot is provided.
+   * Accessible label for the meter. Used as the visible label text and as
+   * the source for `aria-labelledby`. When only slot content is provided
+   * (no `label` attribute), the slot content is used for the accessible name.
    * @attr label
    */
   @property({ type: String })
   label?: string;
+
+  @state()
+  private _hasSlotContent = false;
 
   private _clampedValue(): number {
     return Math.min(Math.max(this.value, this.min), this.max);
@@ -118,18 +128,22 @@ export class HelixMeter extends LitElement {
 
     if (optimumInMiddle) {
       if (inMiddleZone) return 'optimum';
-      if (inLowZone || inHighZone) return 'warning';
+      return 'warning';
     } else if (optimumInLow) {
       if (inLowZone) return 'optimum';
       if (inMiddleZone) return 'warning';
-      if (inHighZone) return 'danger';
-    } else if (optimumInHigh) {
+      return 'danger';
+    } else {
+      // optimumInHigh
       if (inHighZone) return 'optimum';
       if (inMiddleZone) return 'warning';
-      if (inLowZone) return 'danger';
+      return 'danger';
     }
+  }
 
-    return 'default';
+  private _onLabelSlotChange(e: Event) {
+    const slot = e.target as HTMLSlotElement;
+    this._hasSlotContent = slot.assignedNodes({ flatten: true }).length > 0;
   }
 
   override updated() {
@@ -140,26 +154,28 @@ export class HelixMeter extends LitElement {
   override render() {
     const pct = this._percentage();
     const state = this._resolveState();
-    const ariaLabel = this.label ?? `${this._clampedValue()} of ${this.max}`;
-    const hasLabel = this.label !== undefined;
+    const clampedValue = this._clampedValue();
+    const stateLabel = state !== 'default' ? ` — ${state}` : '';
+    const ariaValuetext = `${clampedValue} of ${this.max}${stateLabel}`;
+    const hasVisibleLabel = this.label !== undefined || this._hasSlotContent;
 
     return html`
       <div
         part="base"
         class="meter"
         role="meter"
-        aria-valuenow=${this._clampedValue()}
+        tabindex="0"
+        aria-valuenow=${clampedValue}
         aria-valuemin=${this.min}
         aria-valuemax=${this.max}
-        aria-label=${ariaLabel}
-        data-state=${state}
+        aria-valuetext=${ariaValuetext}
+        aria-label=${ifDefined(!hasVisibleLabel ? `${clampedValue} of ${this.max}` : undefined)}
+        aria-labelledby=${ifDefined(hasVisibleLabel ? '__hx-meter-label' : undefined)}
       >
-        ${hasLabel
-          ? html`<span part="label" class="meter__label">
-              <slot name="label">${this.label}</slot>
-            </span>`
-          : html`<slot name="label"></slot>`}
-        <div class="meter__track">
+        <span id="__hx-meter-label" part="label" class="meter__label" ?hidden=${!hasVisibleLabel}>
+          <slot name="label" @slotchange=${this._onLabelSlotChange}>${this.label ?? ''}</slot>
+        </span>
+        <div class="meter__track" part="track">
           <div
             part="indicator"
             class="meter__indicator"
@@ -168,7 +184,7 @@ export class HelixMeter extends LitElement {
         </div>
         <meter
           class="meter__native"
-          value=${this._clampedValue()}
+          value=${clampedValue}
           min=${this.min}
           max=${this.max}
           low=${ifDefined(this.low)}
