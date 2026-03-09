@@ -1,14 +1,677 @@
 ---
 title: 'hx-image'
-description: 'Responsive image component with lazy loading and aspect ratio control'
+description: 'Accessible image wrapper with lazy loading, fallback support, aspect ratio control, responsive image (srcset/sizes) support, and optional caption.'
 ---
 
 import ComponentLoader from '../../../components/ComponentLoader.astro';
+import ComponentDemo from '../../../components/ComponentDemo.astro';
 import ComponentDoc from '../../../components/ComponentDoc.astro';
 
 <ComponentLoader />
 
 <ComponentDoc tagName="hx-image" section="summary" />
+
+## Overview
+
+`hx-image` is an accessible image wrapper that enforces alt-text discipline, handles image load failures gracefully, and integrates natively with Drupal responsive image styles. It wraps the browser's `<img>` element inside a `<figure>`/`<figcaption>` structure, providing slot-based caption support, aspect-ratio locking, and a CSS Parts API for external styling.
+
+**Use `hx-image` when:** you need an image that is accessible by default, handles broken sources gracefully, supports responsive `srcset`/`sizes`, and integrates cleanly with Drupal Twig templates.
+
+**Key behaviors:**
+
+- Alt text is required for informative images. Use the `decorative` prop to explicitly mark decorative images — this sets `alt=""` and `role="presentation"` on the inner `<img>`.
+- When an image fails to load, the component switches to a `fallback-src` if provided, then falls back to the `fallback` slot, announcing the failure via `role="alert"` to screen readers.
+- Aspect ratio is locked via CSS `aspect-ratio` using the `ratio` attribute, preventing layout shift during image load.
+- Lazy loading is enabled by default (`loading="lazy"`).
+
+## Live Demo
+
+### Basic Image
+
+<ComponentDemo title="Basic Image">
+  <hx-image
+    src="https://picsum.photos/seed/helix-demo/800/450"
+    alt="A sample landscape photograph from Picsum Photos"
+    ratio="16/9"
+    style="max-width: 480px;"
+  ></hx-image>
+</ComponentDemo>
+
+### With Caption
+
+<ComponentDemo title="Image with Caption">
+  <hx-image
+    src="https://picsum.photos/seed/helix-caption/800/450"
+    alt="A scenic landscape used to demonstrate caption support"
+    ratio="16/9"
+    style="max-width: 480px;"
+  >
+    <span slot="caption">
+      Figure 1: Sample landscape photograph demonstrating the caption slot.
+    </span>
+  </hx-image>
+</ComponentDemo>
+
+### Aspect Ratios
+
+Common aspect ratios for content and media images.
+
+<ComponentDemo title="Aspect Ratios">
+  <div style="display: flex; gap: 1rem; flex-wrap: wrap; align-items: flex-start;">
+    <div style="width: 200px;">
+      <hx-image
+        src="https://picsum.photos/seed/ratio-16-9/800/450"
+        alt="Landscape photograph in 16:9 ratio"
+        ratio="16/9"
+      ></hx-image>
+      <p style="font-size: 0.75rem; margin: 0.25rem 0 0; color: #6b7280;">16/9</p>
+    </div>
+    <div style="width: 200px;">
+      <hx-image
+        src="https://picsum.photos/seed/ratio-4-3/800/600"
+        alt="Photograph in 4:3 ratio"
+        ratio="4/3"
+      ></hx-image>
+      <p style="font-size: 0.75rem; margin: 0.25rem 0 0; color: #6b7280;">4/3</p>
+    </div>
+    <div style="width: 200px;">
+      <hx-image
+        src="https://picsum.photos/seed/ratio-1-1/400/400"
+        alt="Square photograph in 1:1 ratio"
+        ratio="1"
+        rounded="50%"
+      ></hx-image>
+      <p style="font-size: 0.75rem; margin: 0.25rem 0 0; color: #6b7280;">1/1 (circular)</p>
+    </div>
+  </div>
+</ComponentDemo>
+
+### Rounded Corners
+
+<ComponentDemo title="Rounded Corners">
+  <div style="display: flex; gap: 1rem; flex-wrap: wrap; align-items: flex-start;">
+    <hx-image
+      src="https://picsum.photos/seed/rounded-a/400/400"
+      alt="Image with theme border-radius"
+      ratio="1"
+      rounded
+      style="width: 160px;"
+    ></hx-image>
+    <hx-image
+      src="https://picsum.photos/seed/rounded-b/400/400"
+      alt="Image with 1rem border-radius"
+      ratio="1"
+      rounded="1rem"
+      style="width: 160px;"
+    ></hx-image>
+    <hx-image
+      src="https://picsum.photos/seed/rounded-c/400/400"
+      alt="Circular image with 50% border-radius"
+      ratio="1"
+      rounded="50%"
+      style="width: 160px;"
+    ></hx-image>
+  </div>
+</ComponentDemo>
+
+### Decorative Image
+
+Decorative images are hidden from screen readers. Use the `decorative` prop to make this intent explicit.
+
+<ComponentDemo title="Decorative Image">
+  <p style="margin-top: 0;">The image below is decorative and hidden from assistive technology:</p>
+  <hx-image
+    src="https://picsum.photos/seed/decorative/800/200"
+    decorative
+    ratio="4/1"
+    style="max-width: 480px;"
+  ></hx-image>
+</ComponentDemo>
+
+### Fallback State
+
+When an image fails to load and no `fallback-src` is available, the `fallback` slot is displayed with an accessible announcement.
+
+<ComponentDemo title="Fallback Slot">
+  <hx-image
+    src="https://broken.example.invalid/not-found.jpg"
+    alt="An image that fails to load"
+    ratio="16/9"
+    style="max-width: 320px;"
+  >
+    <span slot="fallback" style="font-size: 0.875rem; color: #6b7280;">
+      Image unavailable
+    </span>
+  </hx-image>
+</ComponentDemo>
+
+## Installation
+
+```bash
+# Full library
+npm install @helix/library
+
+# Or import only this component (tree-shaking friendly)
+import '@helix/library/components/hx-image';
+```
+
+## Basic Usage
+
+```html
+<!-- Informative image with alt text -->
+<hx-image
+  src="/images/patient-photo.jpg"
+  alt="Dr. Sarah Chen, Cardiology"
+  ratio="1"
+  rounded="50%"
+></hx-image>
+
+<!-- Decorative image — hidden from screen readers -->
+<hx-image src="/images/hero-background.jpg" decorative ratio="21/9"></hx-image>
+
+<!-- Image with caption -->
+<hx-image src="/images/anatomy-diagram.png" alt="Diagram of the human heart" ratio="4/3">
+  <span slot="caption">Figure 1: Anterior view of the human heart. Source: NIH.</span>
+</hx-image>
+
+<!-- Fallback on error -->
+<hx-image
+  src="/images/scan.jpg"
+  fallback-src="/images/scan-placeholder.jpg"
+  alt="MRI scan result"
+  ratio="1"
+>
+  <span slot="fallback">Scan image unavailable</span>
+</hx-image>
+
+<!-- Responsive image with srcset -->
+<hx-image
+  src="/images/hero-800.jpg"
+  srcset="/images/hero-400.jpg 400w, /images/hero-800.jpg 800w, /images/hero-1200.jpg 1200w"
+  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 80vw, 1200px"
+  alt="Hospital campus exterior"
+  ratio="16/9"
+></hx-image>
+```
+
+## Properties
+
+| Property      | Attribute      | Type                                                                    | Default     | Description                                                                                                                                 |
+| ------------- | -------------- | ----------------------------------------------------------------------- | ----------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
+| `src`         | `src`          | `string`                                                                | `''`        | URL of the image to display.                                                                                                                |
+| `alt`         | `alt`          | `string \| undefined`                                                   | `undefined` | Accessible text description. Required for informative images. Use `decorative` instead of `alt=""` to make decorative intent explicit.      |
+| `decorative`  | `decorative`   | `boolean`                                                               | `false`     | Marks the image as decorative. Sets `alt=""` and `role="presentation"` on the inner `<img>`. Takes precedence over `alt` when both are set. |
+| `loading`     | `loading`      | `'lazy' \| 'eager'`                                                     | `'lazy'`    | Loading strategy. `lazy` defers loading until the image enters the viewport. `eager` loads immediately.                                     |
+| `fit`         | `fit`          | `'contain' \| 'cover' \| 'fill' \| 'none' \| 'scale-down' \| undefined` | `undefined` | CSS `object-fit` behavior. Controls how the image fills its container.                                                                      |
+| `ratio`       | `ratio`        | `string \| undefined`                                                   | `undefined` | CSS `aspect-ratio` value (e.g. `"16/9"`, `"1"`, `"4/3"`). Prevents layout shift during image load.                                          |
+| `rounded`     | `rounded`      | `boolean \| string \| undefined`                                        | `undefined` | Border radius. Boolean/empty string applies the theme's medium radius token. A CSS string (e.g. `"1rem"`, `"50%"`) is used directly.        |
+| `width`       | `width`        | `number \| string \| undefined`                                         | `undefined` | Width of the image element. Numbers are converted to `px`. Used for layout hints and CLS prevention.                                        |
+| `height`      | `height`       | `number \| string \| undefined`                                         | `undefined` | Height of the image element. Numbers are converted to `px`.                                                                                 |
+| `fallbackSrc` | `fallback-src` | `string \| undefined`                                                   | `undefined` | Fallback image URL shown when the primary `src` fails to load. If this also fails, the `fallback` slot is shown.                            |
+| `srcset`      | `srcset`       | `string \| undefined`                                                   | `undefined` | Comma-separated list of image candidates for responsive images. Passed directly to the inner `<img>` `srcset` attribute.                    |
+| `sizes`       | `sizes`        | `string \| undefined`                                                   | `undefined` | Media conditions for responsive images. Works in conjunction with `srcset`.                                                                 |
+
+## Events
+
+| Event      | Detail | Description                                                                          |
+| ---------- | ------ | ------------------------------------------------------------------------------------ |
+| `hx-load`  | —      | Dispatched when the image has successfully loaded.                                   |
+| `hx-error` | —      | Dispatched when the image fails to load — including after `fallback-src` also fails. |
+
+```javascript
+const img = document.querySelector('hx-image');
+
+img.addEventListener('hx-load', () => {
+  console.log('Image loaded successfully');
+});
+
+img.addEventListener('hx-error', () => {
+  console.warn('Image failed to load — fallback displayed');
+});
+```
+
+## Slots
+
+| Slot       | Description                                                                                                                                                                              |
+| ---------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `fallback` | Content displayed when the image fails to load and no `fallback-src` is set (or when `fallback-src` also fails). The error container has `role="alert"` for screen reader announcements. |
+| `caption`  | Optional caption content rendered in a `<figcaption>` element below the image. Only visible when content is provided.                                                                    |
+
+```html
+<!-- Fallback slot -->
+<hx-image src="/images/scan.jpg" alt="MRI scan">
+  <span slot="fallback">Scan unavailable. Contact imaging.</span>
+</hx-image>
+
+<!-- Caption slot -->
+<hx-image src="/images/diagram.png" alt="Cardiac anatomy diagram">
+  <span slot="caption">Figure 3A: Cardiac anatomy. Reproduced with permission.</span>
+</hx-image>
+
+<!-- Both slots -->
+<hx-image src="/images/chart.png" alt="Patient trend chart">
+  <span slot="fallback">Chart data unavailable.</span>
+  <span slot="caption">Figure 2: 30-day vital sign trend.</span>
+</hx-image>
+```
+
+## CSS Parts
+
+| Part      | Element        | Description                                                                         |
+| --------- | -------------- | ----------------------------------------------------------------------------------- |
+| `base`    | `<img>`        | The inner image element. Target for `object-fit`, `object-position`, `filter`, etc. |
+| `caption` | `<figcaption>` | The caption container. Only visible when caption slot content is present.           |
+
+```css
+/* Apply a CSS filter to the image */
+hx-image::part(base) {
+  filter: grayscale(100%);
+  transition: filter 0.3s ease;
+}
+
+hx-image:hover::part(base) {
+  filter: none;
+}
+
+/* Style the caption */
+hx-image::part(caption) {
+  font-style: italic;
+  text-align: center;
+}
+```
+
+## CSS Custom Properties
+
+| Property                         | Default                                | Description                                                                    |
+| -------------------------------- | -------------------------------------- | ------------------------------------------------------------------------------ |
+| `--hx-image-object-fit`          | `cover`                                | Default `object-fit` for the inner `<img>`. Overridden by the `fit` attribute. |
+| `--hx-image-border-radius`       | `0`                                    | Default border radius. Overridden by the `rounded` attribute.                  |
+| `--hx-image-aspect-ratio`        | _(none)_                               | Default aspect ratio for the container. Overridden by the `ratio` attribute.   |
+| `--hx-image-caption-color`       | `var(--hx-color-neutral-600, #4b5563)` | Text color for the caption.                                                    |
+| `--hx-image-caption-font-size`   | `0.875rem`                             | Font size for the caption.                                                     |
+| `--hx-image-caption-padding`     | `0.5rem 0 0`                           | Padding for the caption element.                                               |
+| `--hx-image-fallback-min-height` | `3rem`                                 | Minimum height of the error/fallback container to prevent layout collapse.     |
+
+```css
+/* Apply a global default aspect ratio via token */
+hx-image {
+  --hx-image-aspect-ratio: 16/9;
+  --hx-image-object-fit: contain;
+}
+
+/* Restyle captions site-wide */
+hx-image {
+  --hx-image-caption-color: var(--hx-color-neutral-700);
+  --hx-image-caption-font-size: var(--hx-font-size-xs);
+}
+```
+
+## Accessibility
+
+`hx-image` enforces accessible image patterns at the component level, making it harder to ship inaccessible images by accident.
+
+| Topic                         | Details                                                                                                                                                                                                                                                |
+| ----------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Alt text enforcement          | The `alt` property is `undefined` by default, not `""`. Informative images without `alt` will render with `alt=""` on the inner `<img>`, which browsers and axe-core treat as decorative. Always provide meaningful `alt` text for informative images. |
+| Decorative images             | Use the `decorative` prop instead of `alt=""` to make decorative intent explicit. This sets `alt=""` and `role="presentation"` on the inner `<img>`, clearly communicating intent in markup and to CEM consumers.                                      |
+| Error state announcement      | When image loading fails, the fallback container receives `role="alert"` and `aria-live="polite"`. This ensures screen readers announce the failure without requiring user interaction.                                                                |
+| `role="presentation"` on img  | Applied automatically when `decorative` is `true` or when `alt=""` is explicitly provided. This hides the image from the accessibility tree entirely.                                                                                                  |
+| Figure/figcaption structure   | The component renders `<figure>`/`<figcaption>` semantics. Captions are associated with the image via native HTML semantics, not ARIA.                                                                                                                 |
+| WCAG 1.1.1 (Non-text Content) | Met. All informative images require `alt`. Decorative images must use `decorative` or `alt=""`.                                                                                                                                                        |
+| WCAG 1.4.1 (Use of Color)     | Not applicable to `hx-image` directly. Ensure image content itself meets this criterion.                                                                                                                                                               |
+| WCAG 2.1 AA                   | Verified. Zero axe-core violations with both informative and decorative image patterns.                                                                                                                                                                |
+
+### Alt text guidelines
+
+```html
+<!-- Informative: describes what the image shows -->
+<hx-image src="/photo.jpg" alt="Dr. Chen reviewing patient chart at nursing station"></hx-image>
+
+<!-- Decorative: explicitly marked, not described -->
+<hx-image src="/banner-bg.jpg" decorative></hx-image>
+
+<!-- Functional: describes the action (if image acts as a link) -->
+<!-- Wrap hx-image in an <a> and provide aria-label on the link -->
+<a href="/dashboard" aria-label="Go to dashboard">
+  <hx-image src="/icons/dashboard.png" decorative></hx-image>
+</a>
+
+<!-- Complex: reference a longer description elsewhere -->
+<hx-image
+  src="/charts/vitals.png"
+  alt="Bar chart of patient vital signs over 7 days"
+  aria-describedby="vitals-longdesc"
+></hx-image>
+<p id="vitals-longdesc" class="visually-hidden">
+  Heart rate averaged 72 BPM. Blood pressure ranged from 118/78 to 128/84...
+</p>
+```
+
+## Examples
+
+### Hero Image (16:9 with Eager Loading)
+
+```html
+<hx-image
+  src="/images/facility-exterior.jpg"
+  alt="Main entrance of Helix Medical Center on a sunny morning"
+  ratio="16/9"
+  loading="eager"
+  fit="cover"
+></hx-image>
+```
+
+### Profile Avatar (Circular)
+
+```html
+<hx-image
+  src="/avatars/dr-chen.jpg"
+  alt="Dr. Sarah Chen, Chief of Cardiology"
+  ratio="1"
+  rounded="50%"
+  width="64"
+  height="64"
+></hx-image>
+```
+
+### Responsive Image (Drupal srcset)
+
+```html
+<hx-image
+  src="/sites/default/files/styles/large/hero.jpg"
+  srcset="
+    /sites/default/files/styles/small/hero.jpg   480w,
+    /sites/default/files/styles/medium/hero.jpg  800w,
+    /sites/default/files/styles/large/hero.jpg  1200w
+  "
+  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 80vw, 1200px"
+  alt="Hospital atrium with natural light"
+  ratio="16/9"
+></hx-image>
+```
+
+### Image with Fallback Chain
+
+```html
+<hx-image
+  src="/images/patient-scan-001.jpg"
+  fallback-src="/images/scan-placeholder.jpg"
+  alt="CT scan result for patient visit 2026-03-01"
+  ratio="1"
+>
+  <span slot="fallback"> Scan image unavailable. Please contact the imaging department. </span>
+</hx-image>
+```
+
+### Card Thumbnail
+
+```html
+<div class="card">
+  <hx-image
+    src="/images/article-thumb.jpg"
+    alt="Nurse administering medication in a hospital room"
+    ratio="16/9"
+    fit="cover"
+    style="border-radius: 0.5rem 0.5rem 0 0;"
+  ></hx-image>
+  <div class="card__body">
+    <h3>Medication Safety Protocols</h3>
+    <p>Updated guidelines for inpatient medication administration...</p>
+  </div>
+</div>
+```
+
+### Image with Caption
+
+```html
+<hx-image
+  src="/images/anatomy-heart.png"
+  alt="Anterior view of the human heart showing the four chambers"
+  ratio="4/3"
+  fit="contain"
+>
+  <span slot="caption">
+    Figure 1: Anterior view of the human heart. Source: NIH National Library of Medicine.
+  </span>
+</hx-image>
+```
+
+## Best Practices
+
+**Always provide alt text for informative images.** In healthcare contexts, images may convey clinical information (scan results, anatomy diagrams, patient photos). Missing or inadequate alt text can constitute a patient safety concern for screen reader users.
+
+**Use `decorative` explicitly.** Avoid using `alt=""` directly — use the `decorative` prop. This makes decorative intent visible in markup, searchable in CEM, and lintable by tooling.
+
+**Lock aspect ratios to prevent layout shift.** Set `ratio` on all images whose dimensions are known at author-time. This eliminates Cumulative Layout Shift (CLS) during page load.
+
+**Use `loading="eager"` only for above-the-fold images.** The default `loading="lazy"` is the right choice for content below the fold. Only use `eager` for the primary content image visible on initial page load (e.g., a hero or page header image).
+
+**Provide a `fallback-src` for critical images.** In healthcare applications, images like patient photos or scan results may be critical to workflow. A low-resolution placeholder keeps the UI functional when the primary source fails.
+
+**Use `srcset` and `sizes` for responsive images.** On bandwidth-constrained devices (mobile, rural connectivity), serving appropriately sized images reduces load time and data usage — a healthcare accessibility concern for users in underserved areas.
+
+**Do not use `fit="fill"` without a fixed container.** `fill` stretches the image to fill the container without preserving aspect ratio. This typically distorts images. Use `cover` (crops) or `contain` (letterboxes) instead.
+
+## Related Components
+
+| Component     | Relationship                                                                                         |
+| ------------- | ---------------------------------------------------------------------------------------------------- |
+| `hx-card`     | `hx-image` is commonly used as a card thumbnail in the `hx-card` header slot.                        |
+| `hx-avatar`   | Use `hx-avatar` for user/patient profile photos — it provides built-in initials fallback and sizing. |
+| `hx-skeleton` | Use `hx-skeleton` as a loading placeholder while `hx-image` loads in lazy contexts.                  |
+| `hx-carousel` | `hx-image` slots into `hx-carousel-item` for image gallery and slideshow patterns.                   |
+
+## Drupal Integration
+
+`hx-image` is designed as a first-class Drupal component. The `srcset`/`sizes` attributes map directly to Drupal's Responsive Image module output.
+
+```twig
+{# my-module/templates/field--field-hero-image.html.twig #}
+{% set img = items[0].content['#item'] %}
+
+<hx-image
+  src="{{ img.entity.uri.value | image_style('large') }}"
+  srcset="{{ img | responsive_image_srcset('hero_responsive') }}"
+  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 80vw, 1200px"
+  alt="{{ img.alt }}"
+  ratio="16/9"
+></hx-image>
+```
+
+For Drupal media entities with caption support:
+
+```twig
+{# With caption from media field #}
+<hx-image
+  src="{{ file_url(item.entity.field_media_image.entity.uri.value) }}"
+  alt="{{ item.entity.field_media_image.alt }}"
+  ratio="4/3"
+  {% if item.entity.field_media_image.title %}
+  data-title="{{ item.entity.field_media_image.title }}"
+  {% endif %}
+>
+  {% if item.entity.field_caption.value %}
+    <span slot="caption">{{ item.entity.field_caption.value }}</span>
+  {% endif %}
+</hx-image>
+```
+
+Load the library in your module's `.libraries.yml`:
+
+```yaml
+helix-components:
+  js:
+    /libraries/helix/helix.min.js: { minified: true }
+```
+
+## Standalone HTML Example
+
+Copy-paste into a `.html` file and open in any browser — no build tool required:
+
+```html
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>hx-image example</title>
+    <script
+      type="module"
+      src="https://cdn.jsdelivr.net/npm/@helix/library/dist/helix.min.js"
+    ></script>
+    <style>
+      body {
+        font-family: sans-serif;
+        padding: 2rem;
+        max-width: 800px;
+        margin: 0 auto;
+        background: #f9fafb;
+      }
+
+      h1 {
+        font-size: 1.5rem;
+        margin-bottom: 2rem;
+      }
+
+      .gallery {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+        gap: 1.5rem;
+      }
+
+      .card {
+        background: white;
+        border-radius: 0.5rem;
+        overflow: hidden;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      }
+
+      .card__body {
+        padding: 0.75rem 1rem 1rem;
+      }
+
+      .card__title {
+        margin: 0 0 0.25rem;
+        font-size: 0.9rem;
+        font-weight: 600;
+      }
+
+      .card__desc {
+        margin: 0;
+        font-size: 0.8rem;
+        color: #6b7280;
+      }
+
+      .profile {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        padding: 1.5rem;
+        background: white;
+        border-radius: 0.5rem;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        margin-bottom: 2rem;
+      }
+
+      .profile__name {
+        font-size: 1rem;
+        font-weight: 600;
+        margin: 0 0 0.25rem;
+      }
+
+      .profile__role {
+        font-size: 0.875rem;
+        color: #6b7280;
+        margin: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Patient Care Team</h1>
+
+    <!-- Profile photo (circular) -->
+    <div class="profile">
+      <hx-image
+        src="https://picsum.photos/seed/dr-chen/200/200"
+        alt="Dr. Sarah Chen, Chief of Cardiology"
+        ratio="1"
+        rounded="50%"
+        width="64"
+        height="64"
+      ></hx-image>
+      <div>
+        <p class="profile__name">Dr. Sarah Chen</p>
+        <p class="profile__role">Chief of Cardiology</p>
+      </div>
+    </div>
+
+    <!-- Card gallery with fallback -->
+    <div class="gallery">
+      <div class="card">
+        <hx-image
+          src="https://picsum.photos/seed/card-1/400/300"
+          alt="Hospital atrium filled with natural light"
+          ratio="4/3"
+          fit="cover"
+        ></hx-image>
+        <div class="card__body">
+          <p class="card__title">Main Atrium</p>
+          <p class="card__desc">Level 1, Building A</p>
+        </div>
+      </div>
+
+      <div class="card">
+        <hx-image
+          src="https://broken.example.invalid/missing.jpg"
+          fallback-src="https://picsum.photos/seed/fallback/400/300"
+          alt="Cardiology department entrance"
+          ratio="4/3"
+          fit="cover"
+        >
+          <span slot="fallback">Image unavailable</span>
+        </hx-image>
+        <div class="card__body">
+          <p class="card__title">Cardiology — 3rd Floor</p>
+          <p class="card__desc">Building B, East Wing</p>
+        </div>
+      </div>
+
+      <div class="card">
+        <hx-image
+          src="https://picsum.photos/seed/card-3/400/300"
+          alt="Modern surgical suite with advanced equipment"
+          ratio="4/3"
+          fit="cover"
+        >
+          <span slot="caption">Surgical Suite B — renovated 2025.</span>
+        </hx-image>
+        <div class="card__body">
+          <p class="card__title">Surgical Suite B</p>
+          <p class="card__desc">Level 2, Building C</p>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // Listen for image load/error events
+      document.querySelectorAll('hx-image').forEach((img) => {
+        img.addEventListener('hx-load', () => {
+          console.log('Loaded:', img.src);
+        });
+        img.addEventListener('hx-error', () => {
+          console.warn('Failed to load:', img.src);
+        });
+      });
+    </script>
+  </body>
+</html>
+```
+
+## Changelog
+
+| Version | Change                                                                                                                                          |
+| ------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1.0.0   | Initial release. Lazy loading, `decorative` prop, `fallback-src`, `fallback` slot, `caption` slot, `ratio`, `rounded`, `fit`, `srcset`/`sizes`. |
 
 ## API Reference
 
