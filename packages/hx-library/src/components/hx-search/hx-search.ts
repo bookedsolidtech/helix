@@ -107,7 +107,7 @@ export class HelixSearch extends LitElement {
   // ─── Internal References ───
 
   @query('.field__input')
-  private _input: HTMLInputElement | null = null;
+  private _input!: HTMLInputElement;
 
   // ─── Debounce Timer ───
 
