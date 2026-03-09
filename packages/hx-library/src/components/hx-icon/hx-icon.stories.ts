@@ -296,16 +296,11 @@ export const InlineSvgMode: Story = {
   },
   render: (args) => html`
     <div style="display: flex; flex-direction: column; gap: 0.75rem;">
-      <hx-icon
-        src=${args.src ?? ''}
-        hx-size=${args.size}
-        label=${args.label}
-      ></hx-icon>
+      <hx-icon src=${args.src ?? ''} hx-size=${args.size} label=${args.label}></hx-icon>
       <p style="font-size: 0.875rem; color: #6b7280; margin: 0;">
-        The <code>src</code> attribute triggers inline fetch mode. The SVG is
-        fetched, sanitised, and embedded directly inside the shadow root.
-        Script elements, event-handler attributes, and style attributes are
-        stripped before rendering.
+        The <code>src</code> attribute triggers inline fetch mode. The SVG is fetched, sanitised,
+        and embedded directly inside the shadow root. Script elements, event-handler attributes, and
+        style attributes are stripped before rendering.
       </p>
     </div>
   `,
@@ -384,7 +379,9 @@ export const ColorVariants: Story = {
       </div>
 
       <div style="display: flex; flex-direction: column; align-items: center; gap: 0.5rem;">
-        <div style="background: var(--hx-color-primary-700, #005fa3); padding: 0.5rem; border-radius: 0.25rem;">
+        <div
+          style="background: var(--hx-color-primary-700, #005fa3); padding: 0.5rem; border-radius: 0.25rem;"
+        >
           <hx-icon
             name="check"
             hx-size="lg"
@@ -475,8 +472,8 @@ export const IconCatalog: Story = {
     return html`
       <div>
         <p style="font-size: 0.875rem; margin: 0 0 1rem; color: #6b7280;">
-          ${icons.length} icons — shown at <code>hx-size="md"</code> (1.5rem).
-          Connect a sprite sheet via <code>sprite-url</code> to render actual glyphs.
+          ${icons.length} icons — shown at <code>hx-size="md"</code> (1.5rem). Connect a sprite
+          sheet via <code>sprite-url</code> to render actual glyphs.
         </p>
         <div
           style="display: grid; grid-template-columns: repeat(auto-fill, minmax(7rem, 1fr)); gap: 0.5rem;"
@@ -487,7 +484,8 @@ export const IconCatalog: Story = {
                 style="display: flex; flex-direction: column; align-items: center; gap: 0.375rem; padding: 0.75rem 0.5rem; border: 1px solid #e5e7eb; border-radius: 0.375rem;"
               >
                 <hx-icon name=${name} hx-size="md" label=${name + ' icon'}></hx-icon>
-                <span style="font-size: 0.7rem; color: #374151; text-align: center; word-break: break-all;"
+                <span
+                  style="font-size: 0.7rem; color: #374151; text-align: center; word-break: break-all;"
                   >${name}</span
                 >
               </div>

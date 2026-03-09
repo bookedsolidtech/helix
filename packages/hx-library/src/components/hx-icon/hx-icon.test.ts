@@ -88,9 +88,7 @@ describe('hx-icon', () => {
     });
 
     it('renders a <title> element inside SVG when label is set', async () => {
-      const el = await fixture<HelixIcon>(
-        '<hx-icon name="check" label="Checkmark"></hx-icon>',
-      );
+      const el = await fixture<HelixIcon>('<hx-icon name="check" label="Checkmark"></hx-icon>');
       await el.updateComplete;
       const title = shadowQuery(el, 'svg[part="svg"] title');
       expect(title).toBeTruthy();

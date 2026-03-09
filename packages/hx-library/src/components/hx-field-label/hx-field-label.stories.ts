@@ -138,9 +138,7 @@ export const Required: Story = {
   args: {
     required: true,
   },
-  render: () => html`
-    <hx-field-label required for="mrn">Medical Record Number</hx-field-label>
-  `,
+  render: () => html` <hx-field-label required for="mrn">Medical Record Number</hx-field-label> `,
   play: async ({ canvasElement }) => {
     const host = getLabelHost(canvasElement);
     await expect(host.hasAttribute('required')).toBe(true);
@@ -161,9 +159,7 @@ export const Optional: Story = {
   args: {
     optional: true,
   },
-  render: () => html`
-    <hx-field-label optional for="notes">Additional Notes</hx-field-label>
-  `,
+  render: () => html` <hx-field-label optional for="notes">Additional Notes</hx-field-label> `,
   play: async ({ canvasElement }) => {
     const host = getLabelHost(canvasElement);
     await expect(host.hasAttribute('optional')).toBe(true);

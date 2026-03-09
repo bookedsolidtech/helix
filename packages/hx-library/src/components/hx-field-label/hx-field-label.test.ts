@@ -139,9 +139,7 @@ describe('hx-field-label', () => {
 
   describe('Slots', () => {
     it('default slot renders label text content', async () => {
-      const el = await fixture<HelixFieldLabel>(
-        '<hx-field-label>Patient Name</hx-field-label>',
-      );
+      const el = await fixture<HelixFieldLabel>('<hx-field-label>Patient Name</hx-field-label>');
       expect(el.textContent?.trim()).toBe('Patient Name');
     });
 
@@ -243,9 +241,7 @@ describe('hx-field-label', () => {
     });
 
     it('has no axe violations when optional', async () => {
-      const el = await fixture<HelixFieldLabel>(
-        '<hx-field-label optional>Notes</hx-field-label>',
-      );
+      const el = await fixture<HelixFieldLabel>('<hx-field-label optional>Notes</hx-field-label>');
       const { violations } = await checkA11y(el);
       expect(violations).toEqual([]);
     });
