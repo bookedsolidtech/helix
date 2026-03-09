@@ -35,7 +35,6 @@ const TAG_CATEGORY_MAP: Record<string, GalleryCategory> = {
   'hx-button': 'actions',
   'hx-button-group': 'actions',
   'hx-copy-button': 'actions',
-  'hx-icon-button': 'actions',
   'hx-split-button': 'actions',
   'hx-toggle-button': 'actions',
   'hx-link': 'actions',
@@ -59,7 +58,6 @@ const TAG_CATEGORY_MAP: Record<string, GalleryCategory> = {
   // Feedback
   'hx-alert': 'feedback',
   'hx-badge': 'feedback',
-  'hx-message-bar': 'feedback',
   'hx-progress-bar': 'feedback',
   'hx-progress-ring': 'feedback',
   'hx-meter': 'feedback',
@@ -88,7 +86,6 @@ const TAG_CATEGORY_MAP: Record<string, GalleryCategory> = {
   'hx-container': 'content',
   'hx-prose': 'content',
   'hx-text': 'content',
-  'hx-tile': 'content',
   'hx-image': 'content',
   'hx-avatar': 'content',
   'hx-icon': 'content',
@@ -109,13 +106,12 @@ const TAG_CATEGORY_MAP: Record<string, GalleryCategory> = {
   'hx-time-picker': 'form-controls',
   'hx-color-picker': 'form-controls',
   'hx-combobox': 'form-controls',
-  'hx-search': 'form-controls',
   'hx-file-upload': 'form-controls',
   'hx-field': 'form-controls',
   'hx-field-label': 'form-controls',
   'hx-help-text': 'form-controls',
   'hx-form': 'form-controls',
-  'hx-format-date': 'form-controls',
+  'hx-format-date': 'utility',
 
   // Overlays
   'hx-dialog': 'overlays',
@@ -124,12 +120,11 @@ const TAG_CATEGORY_MAP: Record<string, GalleryCategory> = {
   'hx-popover': 'overlays',
   'hx-popup': 'overlays',
   'hx-tooltip': 'overlays',
-  'hx-contextual-help': 'overlays',
   'hx-menu': 'overlays',
   'hx-menu-item': 'overlays',
   'hx-menu-divider': 'overlays',
   'hx-overflow-menu': 'overlays',
-  'hx-action-bar': 'overlays',
+  'hx-action-bar': 'navigation',
 
   // Layout
   'hx-grid': 'layout',
@@ -138,8 +133,6 @@ const TAG_CATEGORY_MAP: Record<string, GalleryCategory> = {
   'hx-split-panel': 'layout',
 
   // Utility
-  'hx-focus-ring': 'utility',
-  'hx-ripple': 'utility',
   'hx-theme': 'utility',
   'hx-visually-hidden': 'utility',
 };
