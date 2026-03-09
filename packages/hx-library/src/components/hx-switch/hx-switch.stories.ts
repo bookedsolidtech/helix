@@ -48,7 +48,7 @@ const meta = {
         type: { summary: 'string' },
       },
     },
-    size: {
+    hxSize: {
       control: { type: 'select' },
       options: ['sm', 'md', 'lg'],
       description: 'Size variant of the switch.',
@@ -100,7 +100,7 @@ const meta = {
     disabled: false,
     required: false,
     label: 'Enable notifications',
-    size: 'md',
+    hxSize: 'md',
     error: '',
     helpText: '',
     value: 'on',
@@ -109,7 +109,7 @@ const meta = {
   render: (args) => html`
     <hx-switch
       label=${args.label}
-      hx-size=${args.size}
+      hx-size=${args.hxSize}
       ?checked=${args.checked}
       ?disabled=${args.disabled}
       ?required=${args.required}
@@ -174,21 +174,21 @@ export const Default: Story = {
 export const SizeSmall: Story = {
   args: {
     label: 'Compact toggle',
-    size: 'sm',
+    hxSize: 'sm',
   },
 };
 
 export const SizeMedium: Story = {
   args: {
     label: 'Default toggle',
-    size: 'md',
+    hxSize: 'md',
   },
 };
 
 export const SizeLarge: Story = {
   args: {
     label: 'Large toggle',
-    size: 'lg',
+    hxSize: 'lg',
   },
 };
 
@@ -518,8 +518,14 @@ export const LongLabel: Story = {
   },
 };
 
+/**
+ * When no visible label text is desired, use the `label` property or slot content
+ * to provide an accessible name. `aria-label` on the host element does NOT propagate
+ * into the shadow DOM — the internal `<button role="switch">` will be unnamed.
+ * Use the `label` prop (visually hidden via CSS if needed) or slotted content instead.
+ */
 export const NoLabel: Story = {
-  render: () => html` <hx-switch aria-label="Toggle dark mode"></hx-switch> `,
+  render: () => html` <hx-switch label="Toggle dark mode"></hx-switch> `,
 };
 
 export const RapidToggle: Story = {
