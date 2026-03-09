@@ -323,10 +323,8 @@ Copy-paste into a `.html` file and open in any browser — no build tool require
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>hx-breadcrumb example</title>
-    <script
-      type="module"
-      src="https://cdn.jsdelivr.net/npm/@helix/library/dist/helix.min.js"
-    ></script>
+    <!-- @helix/library is a private package — install via npm workspace, not CDN -->
+    <!-- In your project: import '@helix/library'; in your bundler entry point -->
   </head>
   <body style="font-family: sans-serif; padding: 2rem; max-width: 800px; margin: 0 auto;">
     <h1>Patient Portal</h1>

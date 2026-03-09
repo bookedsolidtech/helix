@@ -218,10 +218,8 @@ Copy-paste into a `.html` file and open in any browser — no build tool require
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>hx-button example</title>
-    <script
-      type="module"
-      src="https://cdn.jsdelivr.net/npm/@helix/library/dist/helix.min.js"
-    ></script>
+    <!-- @helix/library is a private package — install via npm workspace, not CDN -->
+    <!-- In your project: import '@helix/library'; in your bundler entry point -->
   </head>
   <body style="font-family: sans-serif; padding: 2rem; display: flex; gap: 1rem; flex-wrap: wrap;">
     <hx-button variant="primary" id="save-btn">Save Changes</hx-button>
