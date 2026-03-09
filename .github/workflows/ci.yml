@@ -148,7 +148,7 @@ jobs:
             # General PR: extract changed component dirs from git diff
             CHANGED=$(git diff --name-only "origin/${{ github.base_ref }}...HEAD" \
               | grep 'src/components/hx-' \
-              | sed 's|src/components/\(hx-[^/]*\)/.*|\1|' \
+              | sed 's|.*src/components/\(hx-[^/]*\)/.*|\1|' \
               | sort -u)
             if [ -z "$CHANGED" ]; then
               echo "No component changes — skipping tests"
@@ -164,7 +164,7 @@ jobs:
         run: |
           CHANGED=$(git diff --name-only HEAD~1...HEAD \
             | grep 'src/components/hx-' \
-            | sed 's|src/components/\(hx-[^/]*\)/.*|\1|' \
+            | sed 's|.*src/components/\(hx-[^/]*\)/.*|\1|' \
             | sort -u)
           if [ -z "$CHANGED" ]; then
             echo "No component changes — skipping tests"
