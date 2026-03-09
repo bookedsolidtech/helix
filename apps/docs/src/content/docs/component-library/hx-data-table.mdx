@@ -22,34 +22,61 @@ import ComponentDoc from '../../../components/ComponentDoc.astro';
 ## Live Demo
 
 <ComponentDemo title="Basic Table">
-  <hx-data-table
-    columns='[{"key":"name","label":"Patient","sortable":true},{"key":"status","label":"Status","sortable":true},{"key":"date","label":"Admission Date","sortable":false}]'
-    rows='[{"name":"Jane Doe","status":"Active","date":"2024-01-15"},{"name":"John Smith","status":"Pending","date":"2024-01-16"},{"name":"Emily Chen","status":"Discharged","date":"2024-01-10"}]'
-  ></hx-data-table>
+  <hx-data-table id="demo-basic"></hx-data-table>
+  <script>
+    const basic = document.getElementById('demo-basic');
+    basic.columns = [
+      { key: 'name', label: 'Patient', sortable: true },
+      { key: 'status', label: 'Status', sortable: true },
+      { key: 'date', label: 'Admission Date', sortable: false },
+    ];
+    basic.rows = [
+      { name: 'Jane Doe', status: 'Active', date: '2024-01-15' },
+      { name: 'John Smith', status: 'Pending', date: '2024-01-16' },
+      { name: 'Emily Chen', status: 'Discharged', date: '2024-01-10' },
+    ];
+  </script>
 </ComponentDemo>
 
 <ComponentDemo title="Selectable Rows">
-  <hx-data-table
-    selectable
-    columns='[{"key":"name","label":"Patient","sortable":true},{"key":"status","label":"Status","sortable":false}]'
-    rows='[{"name":"Jane Doe","status":"Active"},{"name":"John Smith","status":"Pending"},{"name":"Emily Chen","status":"Discharged"}]'
-  ></hx-data-table>
+  <hx-data-table id="demo-select" selectable></hx-data-table>
+  <script>
+    const sel = document.getElementById('demo-select');
+    sel.columns = [
+      { key: 'name', label: 'Patient', sortable: true },
+      { key: 'status', label: 'Status', sortable: false },
+    ];
+    sel.rows = [
+      { name: 'Jane Doe', status: 'Active' },
+      { name: 'John Smith', status: 'Pending' },
+      { name: 'Emily Chen', status: 'Discharged' },
+    ];
+    sel.addEventListener('hx-select', (e) => console.log('Selected:', e.detail.selectedRows));
+  </script>
 </ComponentDemo>
 
 <ComponentDemo title="Loading State">
-  <hx-data-table
-    loading
-    columns='[{"key":"name","label":"Patient","sortable":true},{"key":"status","label":"Status","sortable":false}]'
-    rows="[]"
-  ></hx-data-table>
+  <hx-data-table id="demo-loading" loading></hx-data-table>
+  <script>
+    const loading = document.getElementById('demo-loading');
+    loading.columns = [
+      { key: 'name', label: 'Patient', sortable: true },
+      { key: 'status', label: 'Status', sortable: false },
+    ];
+    loading.rows = [];
+  </script>
 </ComponentDemo>
 
 <ComponentDemo title="Empty State">
-  <hx-data-table
-    empty-label="No patients found"
-    columns='[{"key":"name","label":"Patient","sortable":true},{"key":"status","label":"Status","sortable":false}]'
-    rows="[]"
-  ></hx-data-table>
+  <hx-data-table id="demo-empty" empty-label="No patients found"></hx-data-table>
+  <script>
+    const empty = document.getElementById('demo-empty');
+    empty.columns = [
+      { key: 'name', label: 'Patient', sortable: true },
+      { key: 'status', label: 'Status', sortable: false },
+    ];
+    empty.rows = [];
+  </script>
 </ComponentDemo>
 
 ## Installation
@@ -104,15 +131,6 @@ interface HxDataTableColumn {
   label: string; // Displayed in the column header
   sortable?: boolean; // Enables sort button and aria-sort
   width?: string; // CSS width value applied to the <th>
-}
-```
-
-### HxDataTableSortState shape
-
-```ts
-interface HxDataTableSortState {
-  key: string; // The column key being sorted
-  direction: 'asc' | 'desc'; // Sort direction
 }
 ```
 
@@ -188,8 +206,6 @@ interface HxDataTableSortState {
   empty-label="{{ empty_label|default('No data') }}"
 ></hx-data-table>
 ```
-
-**Note:** If `columns` or `rows` contains invalid JSON, the component falls back to an empty array and logs a console warning.
 
 Load the library in your module's `.libraries.yml`:
 
