@@ -723,6 +723,70 @@ export const EnterKeySearch: Story = {
   },
 };
 
+export const WithResultsCount: Story = {
+  name: 'With Results Count',
+  render: () => {
+    return html`
+      <div style="max-width: 480px; display: flex; flex-direction: column; gap: 1rem;">
+        <hx-search
+          id="results-count-search"
+          label="Medication Search"
+          placeholder="Search medications..."
+        ></hx-search>
+        <div
+          aria-live="polite"
+          aria-atomic="true"
+          id="results-count"
+          style="font-size: 0.875rem; color: var(--hx-color-neutral-600);"
+        >
+          5 results found
+        </div>
+        <ul
+          style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 0.5rem;"
+        >
+          <li
+            style="padding: 0.5rem; border: 1px solid var(--hx-color-neutral-200, #e9ecef); border-radius: 0.25rem;"
+          >
+            Metformin 500mg
+          </li>
+          <li
+            style="padding: 0.5rem; border: 1px solid var(--hx-color-neutral-200, #e9ecef); border-radius: 0.25rem;"
+          >
+            Metformin 850mg
+          </li>
+          <li
+            style="padding: 0.5rem; border: 1px solid var(--hx-color-neutral-200, #e9ecef); border-radius: 0.25rem;"
+          >
+            Metformin 1000mg
+          </li>
+          <li
+            style="padding: 0.5rem; border: 1px solid var(--hx-color-neutral-200, #e9ecef); border-radius: 0.25rem;"
+          >
+            Metformin ER 500mg
+          </li>
+          <li
+            style="padding: 0.5rem; border: 1px solid var(--hx-color-neutral-200, #e9ecef); border-radius: 0.25rem;"
+          >
+            Metformin ER 750mg
+          </li>
+        </ul>
+        <p style="font-size: 0.75rem; color: var(--hx-color-neutral-500);">
+          The <code>aria-live="polite"</code> region above announces the results count to screen
+          readers whenever it updates. This is the recommended pattern for communicating search
+          result counts in healthcare applications.
+        </p>
+      </div>
+    `;
+  },
+  play: async ({ canvasElement }) => {
+    const searchEl = canvasElement.querySelector('hx-search')!;
+    const countEl = canvasElement.querySelector('#results-count')!;
+
+    await expect(countEl.textContent?.trim()).toBe('5 results found');
+    await expect(searchEl).toBeTruthy();
+  },
+};
+
 export const FormDataParticipation: Story = {
   render: () => {
     const onSubmit = fn();
