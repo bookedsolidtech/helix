@@ -10,7 +10,7 @@
 
 ---
 
-```mdx
+````mdx
 ---
 title: 'hx-<component-name>'
 description: <!-- ONE-LINE DESCRIPTION: what the component does -->
@@ -21,9 +21,11 @@ import ComponentDemo from '../../../components/ComponentDemo.astro';
 import ComponentDoc from '../../../components/ComponentDoc.astro';
 
 <!-- Injects the component bundle into the page so live demos work. Required. -->
+
 <ComponentLoader />
 
 <!-- Renders the CEM-derived summary paragraph for this component. -->
+
 <ComponentDoc tagName="hx-<component-name>" section="summary" />
 
 ## Overview
@@ -59,6 +61,7 @@ npm install @helix/library
 # Or import only this component (tree-shaking friendly)
 import '@helix/library/components/hx-<component-name>';
 ```
+````
 
 ## Basic Usage
 
@@ -77,8 +80,8 @@ Minimal HTML snippet — no build tool required:
   Omit private/internal members.
 -->
 
-| Property | Attribute | Type | Default | Description |
-|----------|-----------|------|---------|-------------|
+| Property          | Attribute          | Type                  | Default        | Description          |
+| ----------------- | ------------------ | --------------------- | -------------- | -------------------- |
 | <!-- propName --> | <!-- attr-name --> | <!-- `'a' \| 'b'` --> | <!-- `'a'` --> | <!-- Description --> |
 
 ## Events
@@ -88,8 +91,8 @@ Minimal HTML snippet — no build tool required:
   Include every @fires / dispatchEvent call documented in the source.
 -->
 
-| Event | Detail Type | Description |
-|-------|-------------|-------------|
+| Event                    | Detail Type              | Description            |
+| ------------------------ | ------------------------ | ---------------------- |
 | <!-- `hx-event-name` --> | <!-- `{ key: Type }` --> | <!-- When it fires --> |
 
 ## CSS Custom Properties
@@ -99,8 +102,8 @@ Minimal HTML snippet — no build tool required:
   Document every @cssprop in the component JSDoc.
 -->
 
-| Property | Default | Description |
-|----------|---------|-------------|
+| Property                            | Default                  | Description               |
+| ----------------------------------- | ------------------------ | ------------------------- |
 | <!-- `--hx-<component>-<token>` --> | <!-- `var(--hx-...)` --> | <!-- What it controls --> |
 
 ## CSS Parts
@@ -110,8 +113,8 @@ Minimal HTML snippet — no build tool required:
   Document every @csspart in the component JSDoc.
 -->
 
-| Part | Description |
-|------|-------------|
+| Part                 | Description                      |
+| -------------------- | -------------------------------- |
 | <!-- `part-name` --> | <!-- What element it targets --> |
 
 ## Slots
@@ -121,10 +124,10 @@ Minimal HTML snippet — no build tool required:
   List the default (unnamed) slot first, then named slots.
 -->
 
-| Slot | Description |
-|------|-------------|
-| *(default)* | <!-- Content placed without a slot attribute --> |
-| <!-- `slot-name` --> | <!-- Purpose of named slot --> |
+| Slot                 | Description                                      |
+| -------------------- | ------------------------------------------------ |
+| _(default)_          | <!-- Content placed without a slot attribute --> |
+| <!-- `slot-name` --> | <!-- Purpose of named slot -->                   |
 
 ## Accessibility
 
@@ -138,12 +141,12 @@ Minimal HTML snippet — no build tool required:
   - Any WCAG 2.1 AA requirements specific to this component
 -->
 
-| Topic | Details |
-|-------|---------|
-| ARIA role | <!-- e.g. `button`, `combobox`, `dialog` --> |
-| Keyboard | <!-- Tab / Enter / Space / Arrow behavior --> |
-| Screen reader | <!-- What is announced and when --> |
-| Focus | <!-- Where focus moves on interaction --> |
+| Topic         | Details                                       |
+| ------------- | --------------------------------------------- |
+| ARIA role     | <!-- e.g. `button`, `combobox`, `dialog` -->  |
+| Keyboard      | <!-- Tab / Enter / Space / Arrow behavior --> |
+| Screen reader | <!-- What is announced and when -->           |
+| Focus         | <!-- Where focus moves on interaction -->     |
 
 ## Drupal Integration
 
@@ -168,6 +171,20 @@ helix-components:
     /libraries/helix/helix.min.js: { minified: true }
 ```
 
+Listen for events in Drupal behaviors using `once()` to prevent duplicate listeners on AJAX:
+
+```javascript
+Drupal.behaviors.myComponent = {
+  attach(context) {
+    once('myComponent', 'hx-<component-name>', context).forEach((el) => {
+      el.addEventListener('hx-<event>', (e) => {
+        // handle event
+      });
+    });
+  },
+};
+```
+
 ## Standalone HTML Example
 
 Copy-paste this into a `.html` file and open it in a browser — no build tool needed:
@@ -179,8 +196,8 @@ Copy-paste this into a `.html` file and open it in a browser — no build tool n
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>hx-<component-name> example</title>
-  <!-- Load the full Helix bundle from CDN -->
-  <script type="module" src="https://cdn.jsdelivr.net/npm/@helix/library/dist/helix.min.js"></script>
+  <!-- @helix/library is a private package — install via npm workspace, not CDN -->
+  <!-- In your project: import '@helix/library'; in your bundler entry point -->
 </head>
 <body>
   <!-- REPLACE with a complete, realistic usage example -->
