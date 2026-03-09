@@ -7,7 +7,6 @@ export const helixCopyButtonStyles = css`
 
   :host([disabled]) {
     pointer-events: none;
-    opacity: var(--hx-opacity-disabled);
   }
 
   .button {
@@ -41,11 +40,11 @@ export const helixCopyButtonStyles = css`
     outline-offset: var(--hx-focus-ring-offset);
   }
 
-  .button:hover:not([disabled]) {
+  .button:hover {
     filter: brightness(var(--hx-filter-brightness-hover, 0.9));
   }
 
-  .button:active:not([disabled]) {
+  .button:active {
     filter: brightness(var(--hx-filter-brightness-active, 0.8));
   }
 
@@ -76,6 +75,9 @@ export const helixCopyButtonStyles = css`
 
   .button--copied {
     color: var(--hx-color-success-500, var(--hx-color-primary-500));
+    /* Secondary non-color indicator required per WCAG 1.4.1 (use of color).
+       A border provides visual differentiation for users with color blindness. */
+    border-color: var(--hx-color-success-500, var(--hx-color-primary-500));
   }
 
   /* ─── Icon Container ─── */
