@@ -58,7 +58,7 @@ export default defineConfig({
         {
           icon: 'github',
           label: 'GitHub',
-          href: 'https://github.com/himerus/wc-2026',
+          href: 'https://github.com/bookedsolidtech/helix',
         },
       ],
       customCss: ['./src/styles/custom.css'],
@@ -196,7 +196,7 @@ export default defineConfig({
         {
           label: 'Component Library',
           collapsed: true,
-          badge: { text: '84', variant: 'success' },
+          badge: { text: '85', variant: 'success' },
           items: [
             { label: 'Overview', slug: 'component-library/overview' },
             {
