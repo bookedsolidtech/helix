@@ -9,11 +9,21 @@ import { helixIconStyles } from './hx-icon.styles.js';
  * Decorative icons are automatically hidden from assistive technology.
  * When a label is provided the icon is announced as an image with that label.
  *
+ * **Render modes:**
+ * - **Sprite mode** (recommended for Drupal/SSR): Set `name` and optionally `sprite-url`.
+ *   Renders an `<svg><use href="...#name">` — works server-side without JavaScript.
+ * - **Inline mode**: Set `src` to a URL of a standalone SVG file. The component fetches,
+ *   sanitizes, and embeds the SVG markup. Requires JavaScript; not server-side renderable.
+ *   For Drupal/Twig templates use sprite mode to avoid content shift before hydration.
+ *
  * @summary SVG icon with sprite and inline fetch modes for healthcare applications.
  *
  * @tag hx-icon
  *
- * @csspart svg - The SVG element rendered in sprite mode or the wrapper in inline mode.
+ * @csspart svg - The SVG element rendered in sprite mode, or the inline SVG container
+ *   in inline mode. In sprite mode this is an `<svg>` element; in inline mode it is a
+ *   `<span>` element wrapping the fetched SVG. Both expose the same `part` name for
+ *   consistent external styling via `::part(svg)`.
  *
  * @cssprop [--hx-icon-size=var(--hx-size-6,1.5rem)] - Width and height of the icon.
  * @cssprop [--hx-icon-color=currentColor] - Icon color.
@@ -36,6 +46,9 @@ export class HelixIcon extends LitElement {
   /**
    * URL of a standalone SVG file to fetch and render inline. Takes precedence
    * over sprite mode when both `src` and `spriteUrl`/`name` are set.
+   *
+   * **Note:** Inline mode requires browser JavaScript (`fetch` + `DOMParser`).
+   * It is not server-side renderable. For Drupal/Twig use sprite mode instead.
    * @attr src
    */
   @property({ type: String })
@@ -51,6 +64,14 @@ export class HelixIcon extends LitElement {
 
   /**
    * Size variant of the icon.
+   *
+   * Set via the `hx-size` HTML attribute (e.g. `hx-size="lg"`) or via the
+   * `size` JavaScript property (e.g. `el.size = 'lg'`). Both are equivalent —
+   * the `attribute: 'hx-size'` mapping is used to avoid colliding with the
+   * native `<input>` `size` attribute in Drupal attribute-passthrough scenarios.
+   * The CEM exposes both the JS property name (`size`) and the HTML attribute
+   * name (`hx-size`).
+   *
    * @attr hx-size
    */
   @property({ type: String, reflect: true, attribute: 'hx-size' })
@@ -104,31 +125,51 @@ export class HelixIcon extends LitElement {
       return;
     }
 
+    // Use module-level cache to avoid duplicate network requests for the same URL.
+    // Multiple hx-icon instances sharing the same src will share one in-flight fetch.
     try {
-      const response = await fetch(url);
+      let pending = _svgCache.get(url);
+      if (!pending) {
+        pending = fetch(url).then(async (response) => {
+          if (!response.ok) {
+            _svgCache.delete(url);
+            return '';
+          }
+          return response.text();
+        });
+        _svgCache.set(url, pending);
+      }
+
+      const text = await pending;
       if (seq !== this._fetchSeq) return;
-      if (!response.ok) {
+
+      if (!text) {
         this._inlineSvg = '';
         this._fetchedSrc = undefined;
         return;
       }
 
-      const text = await response.text();
-      if (seq !== this._fetchSeq) return;
       const sanitized = this._sanitizeSvg(text);
       this._inlineSvg = sanitized;
       this._fetchedSrc = url;
     } catch {
       if (seq !== this._fetchSeq) return;
+      _svgCache.delete(url);
       this._inlineSvg = '';
       this._fetchedSrc = undefined;
     }
   }
 
   /**
-   * Parses the raw SVG text, strips script elements and event-handler
-   * attributes, and returns the outer SVG markup safe for rendering via
-   * `unsafeHTML`.
+   * Parses the raw SVG text, strips dangerous content (script elements,
+   * foreignObject, on* event-handler attributes, javascript:/data: URIs,
+   * and style attributes that could carry CSS injection payloads), and
+   * returns the outer SVG markup safe for rendering via `unsafeHTML`.
+   *
+   * Additionally injects `focusable="false"` on the root SVG element to
+   * prevent IE11/old-Edge from making the SVG keyboard-focusable, and strips
+   * any ARIA attributes from the inner SVG to prevent conflicts with the
+   * wrapper's own ARIA semantics.
    */
   private _sanitizeSvg(raw: string): string {
     const parser = new DOMParser();
@@ -152,19 +193,30 @@ export class HelixIcon extends LitElement {
     // URL-bearing attributes that can carry javascript:/data: payloads.
     const urlAttrs = new Set(['href', 'xlink:href', 'src', 'action', 'formaction']);
 
+    // ARIA attributes that may conflict with the wrapper element's own semantics.
+    // The wrapper <span part="svg"> owns role/aria-label/aria-hidden — the inner
+    // SVG must not duplicate or contradict these.
+    const ariaAttrs = new Set(['role', 'aria-label', 'aria-labelledby', 'aria-hidden']);
+
     // Sanitize every element including the root svg.
     const allElements: Element[] = [svgEl, ...Array.from(svgEl.querySelectorAll('*'))];
     allElements.forEach((el) => {
       const attrs = Array.from(el.attributes);
       attrs.forEach((attr) => {
-        const name = attr.name.toLowerCase();
+        const attrName = attr.name.toLowerCase();
         // Strip event-handler attributes.
-        if (name.startsWith('on')) {
+        if (attrName.startsWith('on')) {
+          el.removeAttribute(attr.name);
+          return;
+        }
+        // Strip style attributes — CSS can carry injection payloads via
+        // url(javascript:...), expression(), or external filter/clip-path references.
+        if (attrName === 'style') {
           el.removeAttribute(attr.name);
           return;
         }
         // Strip javascript: and data: URIs from URL-bearing attributes.
-        if (urlAttrs.has(name)) {
+        if (urlAttrs.has(attrName)) {
           const val = attr.value.replace(/\s/g, '').toLowerCase();
           if (val.startsWith('javascript:') || val.startsWith('data:')) {
             el.removeAttribute(attr.name);
@@ -172,6 +224,13 @@ export class HelixIcon extends LitElement {
         }
       });
     });
+
+    // Strip ARIA attributes from the root SVG only — they conflict with the
+    // wrapper element's ARIA. Child elements' ARIA is left intact.
+    ariaAttrs.forEach((a) => svgEl.removeAttribute(a));
+
+    // Inject focusable="false" so IE11/old-Edge do not tab into the SVG.
+    svgEl.setAttribute('focusable', 'false');
 
     return svgEl.outerHTML;
   }
@@ -205,6 +264,7 @@ export class HelixIcon extends LitElement {
         aria-hidden=${isDecorative ? 'true' : nothing}
         focusable="false"
       >
+        ${isDecorative ? nothing : html`<title>${this.label}</title>`}
         <use href=${this._spriteHref()}></use>
       </svg>
     `;
@@ -217,9 +277,10 @@ export class HelixIcon extends LitElement {
 
     const isDecorative = !this.label.trim();
 
-    // The fetched SVG is rendered inside a wrapper div that carries the
+    // The fetched SVG is rendered inside a wrapper span that carries the
     // csspart and ARIA semantics. The inner SVG from unsafeHTML fills the
-    // container via the `.icon__inline svg` CSS rule.
+    // container via the `.icon__inline svg` CSS rule. ARIA attributes and
+    // focusable="false" are injected into the inner SVG by _sanitizeSvg.
     return html`
       <span
         part="svg"
@@ -249,6 +310,14 @@ export class HelixIcon extends LitElement {
     return nothing;
   }
 }
+
+/**
+ * Module-level SVG fetch cache. Shared across all `hx-icon` instances so that
+ * multiple icons sharing the same `src` URL issue only one network request.
+ * The cache stores in-flight `Promise<string>` values — resolved entries remain
+ * cached for the lifetime of the page to prevent redundant re-fetches.
+ */
+const _svgCache = new Map<string, Promise<string>>();
 
 declare global {
   interface HTMLElementTagNameMap {
