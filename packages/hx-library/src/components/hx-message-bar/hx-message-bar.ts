@@ -5,7 +5,7 @@ import { tokenStyles } from '@helix/tokens/lit';
 import { helixMessageBarStyles } from './hx-message-bar.styles.js';
 
 /** Message bar variant determines visual styling and ARIA semantics. */
-type MessageBarVariant = 'info' | 'success' | 'warning' | 'error';
+export type MessageBarVariant = 'info' | 'success' | 'warning' | 'error';
 
 /**
  * A full-width inline notification bar for page-level or section-level messages.
@@ -79,6 +79,24 @@ export class HelixMessageBar extends LitElement {
     return this._isAssertive ? 'alert' : 'status';
   }
 
+  override connectedCallback() {
+    super.connectedCallback();
+    this._updateHostRole();
+  }
+
+  override updated(changedProps: Map<string, unknown>) {
+    super.updated(changedProps);
+    if (changedProps.has('variant')) {
+      this._updateHostRole();
+    }
+  }
+
+  private _updateHostRole(): void {
+    this.setAttribute('role', this._role);
+    this.setAttribute('aria-live', this._isAssertive ? 'assertive' : 'polite');
+    this.setAttribute('aria-atomic', 'true');
+  }
+
   // ─── Default Icons ───
 
   private _renderInfoIcon() {
@@ -148,13 +166,6 @@ export class HelixMessageBar extends LitElement {
     );
   }
 
-  private _handleCloseKeydown(event: KeyboardEvent): void {
-    if (event.key === 'Enter' || event.key === ' ') {
-      event.preventDefault();
-      this._handleClose();
-    }
-  }
-
   // ─── Render ───
 
   override render() {
@@ -165,7 +176,7 @@ export class HelixMessageBar extends LitElement {
     };
 
     return html`
-      <div part="base" class=${classMap(classes)} role=${this._role}>
+      <div part="base" class=${classMap(classes)} role=${this._role} aria-atomic="true">
         <div part="icon" class="message-bar__icon">
           <slot name="icon">${this._renderDefaultIcon()}</slot>
         </div>
@@ -183,9 +194,8 @@ export class HelixMessageBar extends LitElement {
               <button
                 part="close-button"
                 class="message-bar__close-button"
-                aria-label="Close"
+                aria-label="Close notification"
                 @click=${this._handleClose}
-                @keydown=${this._handleCloseKeydown}
               >
                 ${this._renderCloseIcon()}
               </button>
@@ -201,5 +211,3 @@ declare global {
     'hx-message-bar': HelixMessageBar;
   }
 }
-
-export type { HelixMessageBar as WcMessageBar };
