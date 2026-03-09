@@ -19,7 +19,16 @@ const STATUS_LABELS: Record<StatusIndicatorStatus, string> = {
  * Purely visual — no slots. Supports an animated pulse ring.
  *
  * Uses `role="img"` with an auto-generated `aria-label` (e.g. "Status: Online").
- * Set `aria-hidden="true"` on the host when status is conveyed by adjacent text.
+ * When used decoratively alongside visible text that conveys the same status information
+ * (e.g. "Provider is available"), set `aria-hidden="true"` on the host element to prevent
+ * duplicate announcements to screen reader users. This is the recommended composition
+ * pattern in healthcare dashboards.
+ *
+ * @remarks
+ * The status vocabulary (`online`, `offline`, `away`, `busy`, `unknown`) is the intentional
+ * implementation canonical form for this component. Although a prior spec draft used
+ * `active/inactive/error/warning`, the current vocabulary was approved as a deliberate
+ * design decision for flexibility and UX clarity in healthcare dashboard contexts.
  *
  * @summary Status indicator dot component.
  *
@@ -38,6 +47,7 @@ const STATUS_LABELS: Record<StatusIndicatorStatus, string> = {
  * @cssproperty [--hx-status-indicator-size-lg] - Override size for the "lg" variant.
  * @cssproperty [--hx-status-indicator-pulse-duration] - Override pulse animation duration.
  * @cssproperty [--hx-status-indicator-pulse-scale] - Override pulse animation max scale.
+ * @cssproperty [--hx-status-indicator-pulse-color] - Override pulse ring color independently from dot color.
  */
 @customElement('hx-status-indicator')
 export class HelixStatusIndicator extends LitElement {
@@ -61,6 +71,9 @@ export class HelixStatusIndicator extends LitElement {
    * Whether to show an animated pulse ring around the dot.
    * Animation is suppressed when prefers-reduced-motion is active.
    * @attr pulse
+   * @remarks
+   * In Twig (Drupal) templates, render as a bare attribute: `pulse` — NOT `pulse="true"`.
+   * The value is ignored; only attribute presence matters.
    */
   @property({ type: Boolean, reflect: true })
   pulse = false;
