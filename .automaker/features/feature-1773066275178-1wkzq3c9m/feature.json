@@ -1,0 +1,33 @@
+{
+  "category": "Uncategorized",
+  "description": "Launch readiness audit for hx-divider. Checklist: (1) A11y — axe-core zero violations, separator role, WCAG 2.1 AA. (2) Astro doc page — all 12 template sections. (3) Individual export — standalone HTML works. (4) `npm run verify` passes. Files: `packages/hx-library/src/components/hx-divider/`, `apps/docs/src/content/docs/component-library/hx-divider.md`",
+  "title": "LAUNCH READY: hx-divider",
+  "status": "backlog",
+  "dependencies": [
+    "feature-1773066138511-g2pgj0rmm"
+  ],
+  "complexity": "medium",
+  "priority": 3,
+  "source": "api",
+  "trustTier": 1,
+  "quarantineStatus": "passed",
+  "quarantineId": "c081cf8c-bb96-4fde-aad9-1866a8bb9977",
+  "id": "feature-1773066275178-1wkzq3c9m",
+  "branchName": "feature/launch-ready-hx-divider",
+  "descriptionHistory": [
+    {
+      "description": "Launch readiness audit for hx-divider. Checklist: (1) A11y — axe-core zero violations, separator role, WCAG 2.1 AA. (2) Astro doc page — all 12 template sections. (3) Individual export — standalone HTML works. (4) `npm run verify` passes. Files: `packages/hx-library/src/components/hx-divider/`, `apps/docs/src/content/docs/component-library/hx-divider.md`",
+      "timestamp": "2026-03-09T14:24:35.178Z",
+      "source": "initial"
+    }
+  ],
+  "createdAt": "2026-03-09T14:24:35.178Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-03-09T14:24:35.178Z",
+      "reason": "Feature created"
+    }
+  ]
+}

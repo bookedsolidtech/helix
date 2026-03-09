@@ -1,0 +1,33 @@
+{
+  "category": "Uncategorized",
+  "description": "Launch readiness audit for hx-tree-view. Checklist: (1) A11y — axe-core zero violations, tree role, aria-level/posinset/setsize, arrow key navigation, Home/End, WCAG 2.1 AA. (2) Astro doc page — all 12 template sections. (3) Individual export — standalone HTML works. (4) `npm run verify` passes. Files: `packages/hx-library/src/components/hx-tree-view/`, `apps/docs/src/content/docs/component-library/hx-tree-view.md`",
+  "title": "LAUNCH READY: hx-tree-view",
+  "status": "backlog",
+  "dependencies": [
+    "feature-1773066138511-g2pgj0rmm"
+  ],
+  "complexity": "medium",
+  "priority": 3,
+  "source": "api",
+  "trustTier": 1,
+  "quarantineStatus": "passed",
+  "quarantineId": "aca2bd30-7f50-49d7-8aff-68cddd47fc63",
+  "id": "feature-1773066434370-nf63vj5lp",
+  "branchName": "feature/launch-ready-hx-tree-view",
+  "descriptionHistory": [
+    {
+      "description": "Launch readiness audit for hx-tree-view. Checklist: (1) A11y — axe-core zero violations, tree role, aria-level/posinset/setsize, arrow key navigation, Home/End, WCAG 2.1 AA. (2) Astro doc page — all 12 template sections. (3) Individual export — standalone HTML works. (4) `npm run verify` passes. Files: `packages/hx-library/src/components/hx-tree-view/`, `apps/docs/src/content/docs/component-library/hx-tree-view.md`",
+      "timestamp": "2026-03-09T14:27:14.370Z",
+      "source": "initial"
+    }
+  ],
+  "createdAt": "2026-03-09T14:27:14.370Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-03-09T14:27:14.370Z",
+      "reason": "Feature created"
+    }
+  ]
+}

@@ -1,0 +1,33 @@
+{
+  "category": "Uncategorized",
+  "description": "Launch readiness audit for hx-tabs. Checklist: (1) A11y — axe-core zero violations, tablist/tab/tabpanel pattern, arrow key navigation, WCAG 2.1 AA. (2) Astro doc page — all 12 template sections. (3) Individual export — standalone HTML works. (4) `npm run verify` passes. Files: `packages/hx-library/src/components/hx-tabs/`, `apps/docs/src/content/docs/component-library/hx-tabs.md`",
+  "title": "LAUNCH READY: hx-tabs",
+  "status": "backlog",
+  "dependencies": [
+    "feature-1773066138511-g2pgj0rmm"
+  ],
+  "complexity": "medium",
+  "priority": 3,
+  "source": "api",
+  "trustTier": 1,
+  "quarantineStatus": "passed",
+  "quarantineId": "3a6a148d-93da-405c-874b-76dd9feb5061",
+  "id": "feature-1773066396248-1333bg2tb",
+  "branchName": "feature/launch-ready-hx-tabs",
+  "descriptionHistory": [
+    {
+      "description": "Launch readiness audit for hx-tabs. Checklist: (1) A11y — axe-core zero violations, tablist/tab/tabpanel pattern, arrow key navigation, WCAG 2.1 AA. (2) Astro doc page — all 12 template sections. (3) Individual export — standalone HTML works. (4) `npm run verify` passes. Files: `packages/hx-library/src/components/hx-tabs/`, `apps/docs/src/content/docs/component-library/hx-tabs.md`",
+      "timestamp": "2026-03-09T14:26:36.248Z",
+      "source": "initial"
+    }
+  ],
+  "createdAt": "2026-03-09T14:26:36.248Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-03-09T14:26:36.248Z",
+      "reason": "Feature created"
+    }
+  ]
+}

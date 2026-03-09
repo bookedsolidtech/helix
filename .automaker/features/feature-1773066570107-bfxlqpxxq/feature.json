@@ -1,0 +1,30 @@
+{
+  "category": "Uncategorized",
+  "description": "## Objective\nComprehensive audit of the Astro/Starlight documentation site (apps/docs/) — NOT the individual component documentation pages (those are handled by LAUNCH READY tickets).\n\n## Scope\n\n### 1. Fact-Check All Content\n- Component count badge in sidebar says \"84\" — verify against actual component directories (currently 73 in packages/hx-library/src/components/)\n- Update `apps/docs/astro.config.mjs` sidebar badge to reflect accurate count\n- Verify all claims about features, capabilities, test counts, etc. are accurate\n- Check all internal links resolve correctly\n- Verify GitHub social link points to correct org/repo (bookedsolidtech/helix, not himerus/wc-2026)\n\n### 2. Tone Overhaul\n- Remove all \"interview prep\" language and tone throughout the site\n- Replace with \"lessons from the battlefield\" — practical, battle-tested, impactful\n- This is a production component library site, not a portfolio piece\n- Keep technical depth but shift framing from \"look what I can do\" to \"here's what works and why\"\n\n### 3. Showcase Pages\n- Review all existing showcase/architecture/prototype pages\n- Ensure each one is genuinely impactful and tells a compelling story\n- These should read like case studies or war stories, not feature demos\n- Verify code examples are accurate and runnable\n- Remove or rework any pages that feel thin or self-promotional\n\n### 4. Navigation & Structure\n- Verify sidebar categories match actual component organization\n- Ensure all navigation links work\n- Check that the site builds cleanly: `npm run build:docs`\n\n## Key Files\n- `apps/docs/astro.config.mjs` — sidebar config, badge counts, social links\n- `apps/docs/src/content/docs/` — all documentation pages\n- `apps/docs/src/components/` — custom Astro components used in docs\n\n## Acceptance Criteria\n- [ ] All factual claims verified or corrected\n- [ ] Component count badge accurate\n- [ ] GitHub link points to correct repo\n- [ ] Zero \"interview prep\" tone remaining\n- [ ] All showcase pages are impactful and accurate\n- [ ] `npm run build:docs` passes cleanly\n- [ ] `npm run verify` passes",
+  "title": "AUDIT: Astro/Starlight Documentation Site — Fact-Check, Tone Overhaul & Showcase Polish",
+  "status": "backlog",
+  "complexity": "large",
+  "priority": 2,
+  "source": "api",
+  "trustTier": 1,
+  "quarantineStatus": "passed",
+  "quarantineId": "98b403ff-c22b-4111-9af1-634c5e1cb6a9",
+  "id": "feature-1773066570107-bfxlqpxxq",
+  "branchName": "feature/audit-astrostarlight-documentation-site",
+  "descriptionHistory": [
+    {
+      "description": "## Objective\nComprehensive audit of the Astro/Starlight documentation site (apps/docs/) — NOT the individual component documentation pages (those are handled by LAUNCH READY tickets).\n\n## Scope\n\n### 1. Fact-Check All Content\n- Component count badge in sidebar says \"84\" — verify against actual component directories (currently 73 in packages/hx-library/src/components/)\n- Update `apps/docs/astro.config.mjs` sidebar badge to reflect accurate count\n- Verify all claims about features, capabilities, test counts, etc. are accurate\n- Check all internal links resolve correctly\n- Verify GitHub social link points to correct org/repo (bookedsolidtech/helix, not himerus/wc-2026)\n\n### 2. Tone Overhaul\n- Remove all \"interview prep\" language and tone throughout the site\n- Replace with \"lessons from the battlefield\" — practical, battle-tested, impactful\n- This is a production component library site, not a portfolio piece\n- Keep technical depth but shift framing from \"look what I can do\" to \"here's what works and why\"\n\n### 3. Showcase Pages\n- Review all existing showcase/architecture/prototype pages\n- Ensure each one is genuinely impactful and tells a compelling story\n- These should read like case studies or war stories, not feature demos\n- Verify code examples are accurate and runnable\n- Remove or rework any pages that feel thin or self-promotional\n\n### 4. Navigation & Structure\n- Verify sidebar categories match actual component organization\n- Ensure all navigation links work\n- Check that the site builds cleanly: `npm run build:docs`\n\n## Key Files\n- `apps/docs/astro.config.mjs` — sidebar config, badge counts, social links\n- `apps/docs/src/content/docs/` — all documentation pages\n- `apps/docs/src/components/` — custom Astro components used in docs\n\n## Acceptance Criteria\n- [ ] All factual claims verified or corrected\n- [ ] Component count badge accurate\n- [ ] GitHub link points to correct repo\n- [ ] Zero \"interview prep\" tone remaining\n- [ ] All showcase pages are impactful and accurate\n- [ ] `npm run build:docs` passes cleanly\n- [ ] `npm run verify` passes",
+      "timestamp": "2026-03-09T14:29:30.107Z",
+      "source": "initial"
+    }
+  ],
+  "createdAt": "2026-03-09T14:29:30.107Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-03-09T14:29:30.107Z",
+      "reason": "Feature created"
+    }
+  ]
+}
