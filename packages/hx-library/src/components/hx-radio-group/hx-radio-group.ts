@@ -104,7 +104,7 @@ export class HelixRadioGroup extends LitElement {
   orientation: 'vertical' | 'horizontal' = 'vertical';
 
   @query('.fieldset__group')
-  private _groupEl: HTMLElement | null = null;
+  private _groupEl!: HTMLElement;
 
   @state() private _hasErrorSlot = false;
 
