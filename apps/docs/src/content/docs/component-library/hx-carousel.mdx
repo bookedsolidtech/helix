@@ -1,14 +1,375 @@
 ---
 title: 'hx-carousel'
-description: 'Scrollable content carousel for cycling through slides or cards'
+description: Scrollable carousel with navigation, pagination, autoplay, and accessible slide announcements
 ---
 
 import ComponentLoader from '../../../components/ComponentLoader.astro';
+import ComponentDemo from '../../../components/ComponentDemo.astro';
 import ComponentDoc from '../../../components/ComponentDoc.astro';
 
 <ComponentLoader />
 
 <ComponentDoc tagName="hx-carousel" section="summary" />
+
+## Overview
+
+`hx-carousel` is a fully accessible slide carousel built on the WAI-ARIA APG carousel pattern. It supports horizontal and vertical scrolling, keyboard navigation, pagination dots, autoplay with play/pause controls, mouse and touch drag gestures, and looping. Individual slides are composed via `hx-carousel-item` sub-components.
+
+**Use `hx-carousel` when:** you need to cycle through a set of images, cards, or content panels in a space-constrained area.
+**Avoid `hx-carousel` when:** all content can be displayed at once — a carousel hides content from users by default.
+
+## Live Demo
+
+### Basic Carousel
+
+A three-slide carousel with navigation buttons and pagination dots.
+
+<ComponentDemo title="Basic Carousel">
+  <hx-carousel label="Featured content" style="max-width: 480px;">
+    <hx-carousel-item>
+      <div style="background: var(--hx-color-primary-100, #dbeafe); padding: 2rem; border-radius: 0.5rem; text-align: center;">
+        Slide 1
+      </div>
+    </hx-carousel-item>
+    <hx-carousel-item>
+      <div style="background: var(--hx-color-success-100, #dcfce7); padding: 2rem; border-radius: 0.5rem; text-align: center;">
+        Slide 2
+      </div>
+    </hx-carousel-item>
+    <hx-carousel-item>
+      <div style="background: var(--hx-color-warning-100, #fef9c3); padding: 2rem; border-radius: 0.5rem; text-align: center;">
+        Slide 3
+      </div>
+    </hx-carousel-item>
+  </hx-carousel>
+</ComponentDemo>
+
+### Loop
+
+With `loop`, navigation wraps from the last slide back to the first.
+
+<ComponentDemo title="Loop">
+  <hx-carousel label="Looping carousel" loop style="max-width: 480px;">
+    <hx-carousel-item>
+      <div style="background: var(--hx-color-primary-100, #dbeafe); padding: 2rem; border-radius: 0.5rem; text-align: center;">
+        Slide A
+      </div>
+    </hx-carousel-item>
+    <hx-carousel-item>
+      <div style="background: var(--hx-color-success-100, #dcfce7); padding: 2rem; border-radius: 0.5rem; text-align: center;">
+        Slide B
+      </div>
+    </hx-carousel-item>
+    <hx-carousel-item>
+      <div style="background: var(--hx-color-warning-100, #fef9c3); padding: 2rem; border-radius: 0.5rem; text-align: center;">
+        Slide C
+      </div>
+    </hx-carousel-item>
+  </hx-carousel>
+</ComponentDemo>
+
+### Autoplay
+
+With `autoplay`, slides advance automatically. A play/pause toggle is shown. Autoplay pauses on hover, focus, and when `prefers-reduced-motion` is active.
+
+<ComponentDemo title="Autoplay">
+  <hx-carousel
+    label="Auto-advancing carousel"
+    autoplay
+    autoplay-interval="2500"
+    loop
+    style="max-width: 480px;"
+  >
+    <hx-carousel-item>
+      <div style="background: var(--hx-color-primary-100, #dbeafe); padding: 2rem; border-radius: 0.5rem; text-align: center;">
+        Auto Slide 1
+      </div>
+    </hx-carousel-item>
+    <hx-carousel-item>
+      <div style="background: var(--hx-color-success-100, #dcfce7); padding: 2rem; border-radius: 0.5rem; text-align: center;">
+        Auto Slide 2
+      </div>
+    </hx-carousel-item>
+    <hx-carousel-item>
+      <div style="background: var(--hx-color-warning-100, #fef9c3); padding: 2rem; border-radius: 0.5rem; text-align: center;">
+        Auto Slide 3
+      </div>
+    </hx-carousel-item>
+  </hx-carousel>
+</ComponentDemo>
+
+### Multiple Slides Per Page
+
+Use `slides-per-page` to show multiple slides simultaneously.
+
+<ComponentDemo title="Multiple Slides Per Page">
+  <hx-carousel label="Multi-slide carousel" slides-per-page="2" loop style="max-width: 600px;">
+    <hx-carousel-item>
+      <div style="background: var(--hx-color-primary-100, #dbeafe); padding: 2rem; border-radius: 0.5rem; text-align: center; margin: 0 0.25rem;">
+        Slide 1
+      </div>
+    </hx-carousel-item>
+    <hx-carousel-item>
+      <div style="background: var(--hx-color-success-100, #dcfce7); padding: 2rem; border-radius: 0.5rem; text-align: center; margin: 0 0.25rem;">
+        Slide 2
+      </div>
+    </hx-carousel-item>
+    <hx-carousel-item>
+      <div style="background: var(--hx-color-warning-100, #fef9c3); padding: 2rem; border-radius: 0.5rem; text-align: center; margin: 0 0.25rem;">
+        Slide 3
+      </div>
+    </hx-carousel-item>
+    <hx-carousel-item>
+      <div style="background: var(--hx-color-danger-100, #fee2e2); padding: 2rem; border-radius: 0.5rem; text-align: center; margin: 0 0.25rem;">
+        Slide 4
+      </div>
+    </hx-carousel-item>
+  </hx-carousel>
+</ComponentDemo>
+
+### Vertical Orientation
+
+Set `orientation="vertical"` for a top-to-bottom carousel.
+
+<ComponentDemo title="Vertical Orientation">
+  <hx-carousel
+    label="Vertical carousel"
+    orientation="vertical"
+    style="max-width: 480px; height: 200px;"
+  >
+    <hx-carousel-item>
+      <div style="background: var(--hx-color-primary-100, #dbeafe); padding: 2rem; border-radius: 0.5rem; text-align: center;">
+        Top Slide
+      </div>
+    </hx-carousel-item>
+    <hx-carousel-item>
+      <div style="background: var(--hx-color-success-100, #dcfce7); padding: 2rem; border-radius: 0.5rem; text-align: center;">
+        Middle Slide
+      </div>
+    </hx-carousel-item>
+    <hx-carousel-item>
+      <div style="background: var(--hx-color-warning-100, #fef9c3); padding: 2rem; border-radius: 0.5rem; text-align: center;">
+        Bottom Slide
+      </div>
+    </hx-carousel-item>
+  </hx-carousel>
+</ComponentDemo>
+
+### Mouse Dragging
+
+Enable `mouse-dragging` to allow click-drag and touch-swipe navigation.
+
+<ComponentDemo title="Mouse Dragging">
+  <hx-carousel label="Draggable carousel" mouse-dragging loop style="max-width: 480px;">
+    <hx-carousel-item>
+      <div style="background: var(--hx-color-primary-100, #dbeafe); padding: 2rem; border-radius: 0.5rem; text-align: center;">
+        Drag me left or right
+      </div>
+    </hx-carousel-item>
+    <hx-carousel-item>
+      <div style="background: var(--hx-color-success-100, #dcfce7); padding: 2rem; border-radius: 0.5rem; text-align: center;">
+        Slide 2
+      </div>
+    </hx-carousel-item>
+    <hx-carousel-item>
+      <div style="background: var(--hx-color-warning-100, #fef9c3); padding: 2rem; border-radius: 0.5rem; text-align: center;">
+        Slide 3
+      </div>
+    </hx-carousel-item>
+  </hx-carousel>
+</ComponentDemo>
+
+## Installation
+
+```bash
+# Full library
+npm install @helix/library
+
+# Or import only this component (tree-shaking friendly)
+import '@helix/library/components/hx-carousel';
+```
+
+## Basic Usage
+
+```html
+<hx-carousel label="Featured slides">
+  <hx-carousel-item>
+    <img src="slide1.jpg" alt="Slide 1 description" />
+  </hx-carousel-item>
+  <hx-carousel-item>
+    <img src="slide2.jpg" alt="Slide 2 description" />
+  </hx-carousel-item>
+  <hx-carousel-item>
+    <img src="slide3.jpg" alt="Slide 3 description" />
+  </hx-carousel-item>
+</hx-carousel>
+```
+
+## hx-carousel Properties
+
+| Property           | Attribute           | Type                         | Default        | Description                                                               |
+| ------------------ | ------------------- | ---------------------------- | -------------- | ------------------------------------------------------------------------- |
+| `label`            | `label`             | `string`                     | `'Carousel'`   | Accessible label for the carousel region. Must be unique per page.        |
+| `loop`             | `loop`              | `boolean`                    | `false`        | Wraps navigation from last to first slide and vice-versa.                 |
+| `autoplay`         | `autoplay`          | `boolean`                    | `false`        | Auto-advances slides. Shows play/pause toggle. Pauses on hover and focus. |
+| `autoplayInterval` | `autoplay-interval` | `number`                     | `3000`         | Milliseconds between auto-advance transitions.                            |
+| `slidesPerPage`    | `slides-per-page`   | `number`                     | `1`            | Number of slides visible simultaneously.                                  |
+| `slidesPerMove`    | `slides-per-move`   | `number`                     | `1`            | Number of slides to advance per navigation action.                        |
+| `orientation`      | `orientation`       | `'horizontal' \| 'vertical'` | `'horizontal'` | Scroll axis of the carousel.                                              |
+| `mouseDragging`    | `mouse-dragging`    | `boolean`                    | `false`        | Enables click-drag (mouse) and touch-swipe navigation gestures.           |
+
+## hx-carousel-item Properties
+
+| Property      | Attribute      | Type     | Default | Description                                                                          |
+| ------------- | -------------- | -------- | ------- | ------------------------------------------------------------------------------------ |
+| `slideIndex`  | `slide-index`  | `number` | `0`     | 0-based index of this slide within the carousel. Set automatically by `hx-carousel`. |
+| `totalSlides` | `total-slides` | `number` | `0`     | Total number of slides. Set automatically by `hx-carousel`.                          |
+
+## Events
+
+| Event             | Detail Type                                   | Description                                                |
+| ----------------- | --------------------------------------------- | ---------------------------------------------------------- |
+| `hx-slide-change` | `{ index: number, slide: HelixCarouselItem }` | Fired when the active slide changes. Bubbles and composed. |
+
+## Public Methods
+
+| Method        | Signature                 | Description                                                              |
+| ------------- | ------------------------- | ------------------------------------------------------------------------ |
+| `goTo(index)` | `(index: number) => void` | Navigate to a specific slide index. Clamped or looped per configuration. |
+| `next()`      | `() => void`              | Advance to the next slide.                                               |
+| `previous()`  | `() => void`              | Go to the previous slide.                                                |
+
+## CSS Custom Properties
+
+| Property                            | Default                     | Description                               |
+| ----------------------------------- | --------------------------- | ----------------------------------------- |
+| `--hx-carousel-gap`                 | `0px`                       | Gap between slides.                       |
+| `--hx-carousel-slide-width`         | `100%`                      | Width override for each slide.            |
+| `--hx-carousel-nav-btn-size`        | `var(--hx-size-10, 2.5rem)` | Size of previous/next navigation buttons. |
+| `--hx-carousel-pagination-dot-size` | `0.5rem`                    | Diameter of pagination dot indicators.    |
+
+## CSS Parts
+
+### hx-carousel Parts
+
+| Part              | Description                                     |
+| ----------------- | ----------------------------------------------- |
+| `base`            | The outer wrapper `<div>` with `role="region"`. |
+| `slide-viewport`  | The slide overflow/clip container.              |
+| `pagination`      | The pagination dot container `<div>`.           |
+| `pagination-item` | Individual pagination dot `<button>` elements.  |
+| `navigation`      | The previous/next button wrapper `<div>`.       |
+| `prev-btn`        | The previous navigation `<button>`.             |
+| `next-btn`        | The next navigation `<button>`.                 |
+| `play-pause-btn`  | The autoplay play/pause toggle `<button>`.      |
+
+## Slots
+
+### hx-carousel Slots
+
+| Slot              | Description                                                     |
+| ----------------- | --------------------------------------------------------------- |
+| _(default)_       | `hx-carousel-item` elements (the slides).                       |
+| `next-button`     | Custom next navigation button. Replaces the default button.     |
+| `previous-button` | Custom previous navigation button. Replaces the default button. |
+
+### hx-carousel-item Slots
+
+| Slot        | Description    |
+| ----------- | -------------- |
+| _(default)_ | Slide content. |
+
+## Accessibility
+
+| Topic                 | Details                                                                                                     |
+| --------------------- | ----------------------------------------------------------------------------------------------------------- |
+| ARIA role             | `role="region"` with `aria-roledescription="carousel"` per WAI-ARIA APG carousel pattern.                   |
+| `aria-label`          | Required — set via the `label` property. Each carousel on a page must have a unique label.                  |
+| Slide groups          | Each `hx-carousel-item` renders `role="group"` with `aria-label="Slide N of M"` for screen reader context.  |
+| Live region           | An `aria-live="polite"` region announces slide changes (e.g., "Slide 2 of 3") to screen readers.            |
+| Keyboard (horizontal) | `ArrowLeft` / `ArrowRight` navigate previous/next. `Home` jumps to first. `End` jumps to last.              |
+| Keyboard (vertical)   | `ArrowUp` / `ArrowDown` navigate previous/next when `orientation="vertical"`.                               |
+| Tab order             | Navigation buttons, pagination dots, and play/pause button are all in the natural tab order.                |
+| Focus ring            | All interactive controls expose `:focus-visible` outlines using `--hx-focus-ring-*` tokens.                 |
+| Autoplay controls     | Play/pause button uses descriptive `aria-label` ("Pause autoplay" / "Play autoplay").                       |
+| Disabled buttons      | Previous/next buttons carry the native `disabled` attribute when at boundaries without `loop`.              |
+| Reduced motion        | Autoplay does not start and CSS transitions are suppressed when `prefers-reduced-motion: reduce` is active. |
+| Image slides          | Always provide meaningful `alt` text on `<img>` elements placed inside `hx-carousel-item`.                  |
+
+## Drupal Integration
+
+```twig
+{# my-module/templates/my-template.html.twig #}
+<hx-carousel
+  label="{{ label|default('Featured Content') }}"
+  {% if loop %}loop{% endif %}
+  {% if autoplay %}autoplay autoplay-interval="{{ autoplay_interval|default(3000) }}"{% endif %}
+>
+  {% for slide in slides %}
+    <hx-carousel-item>
+      {{ slide.content }}
+    </hx-carousel-item>
+  {% endfor %}
+</hx-carousel>
+```
+
+Load the library in your module's `.libraries.yml`:
+
+```yaml
+helix-components:
+  js:
+    /libraries/helix/helix.min.js: { minified: true }
+```
+
+## Standalone HTML Example
+
+Copy-paste into a `.html` file and open in any browser — no build tool required:
+
+```html
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>hx-carousel example</title>
+    <script
+      type="module"
+      src="https://cdn.jsdelivr.net/npm/@helix/library/dist/helix.min.js"
+    ></script>
+  </head>
+  <body style="font-family: sans-serif; padding: 2rem; max-width: 600px;">
+    <hx-carousel id="my-carousel" label="Product highlights" loop autoplay autoplay-interval="4000">
+      <hx-carousel-item>
+        <div
+          style="background: #dbeafe; padding: 3rem; border-radius: 0.5rem; text-align: center; font-size: 1.25rem;"
+        >
+          Slide 1: Welcome
+        </div>
+      </hx-carousel-item>
+      <hx-carousel-item>
+        <div
+          style="background: #dcfce7; padding: 3rem; border-radius: 0.5rem; text-align: center; font-size: 1.25rem;"
+        >
+          Slide 2: Features
+        </div>
+      </hx-carousel-item>
+      <hx-carousel-item>
+        <div
+          style="background: #fef9c3; padding: 3rem; border-radius: 0.5rem; text-align: center; font-size: 1.25rem;"
+        >
+          Slide 3: Get Started
+        </div>
+      </hx-carousel-item>
+    </hx-carousel>
+
+    <script>
+      document.getElementById('my-carousel').addEventListener('hx-slide-change', (e) => {
+        console.log('Active slide index:', e.detail.index);
+      });
+    </script>
+  </body>
+</html>
+```
 
 ## API Reference
 
