@@ -4,11 +4,377 @@ description: 'Navigation trail showing the current page location within a hierar
 ---
 
 import ComponentLoader from '../../../components/ComponentLoader.astro';
+import ComponentDemo from '../../../components/ComponentDemo.astro';
 import ComponentDoc from '../../../components/ComponentDoc.astro';
 
 <ComponentLoader />
 
 <ComponentDoc tagName="hx-breadcrumb" section="summary" />
+
+## Overview
+
+`hx-breadcrumb` renders a WAI-ARIA APG-compliant breadcrumb navigation trail that shows a user's current location within a site hierarchy. It pairs with `hx-breadcrumb-item` elements — each item either renders as a navigable link (when `href` is provided) or as static text for the current page.
+
+The component automatically marks the last item as the current page with `aria-current="page"` unless any item already has an explicit `current` attribute, which allows Drupal Twig templates and other consumers to override positional detection.
+
+**Use `hx-breadcrumb` when:** users navigate multi-level hierarchies — patient records, admin settings panels, clinical dashboards — and need a persistent wayfinding trail.
+
+**Key features:**
+
+- Automatic `aria-current="page"` management with Drupal override support
+- Configurable separator character (attribute, property, or slotted element)
+- Collapsible middle items via `max-items` with a keyboard-accessible expand button
+- Optional JSON-LD `BreadcrumbList` structured data injection for SEO (non-Drupal deployments)
+- Supports text truncation per item via `--hx-breadcrumb-item-max-width`
+
+## Live Demo
+
+### Basic Breadcrumb
+
+<ComponentDemo title="Basic Breadcrumb">
+  <hx-breadcrumb>
+    <hx-breadcrumb-item href="/">Home</hx-breadcrumb-item>
+    <hx-breadcrumb-item href="/patients">Patients</hx-breadcrumb-item>
+    <hx-breadcrumb-item>Patient Records</hx-breadcrumb-item>
+  </hx-breadcrumb>
+</ComponentDemo>
+
+### Custom Separator
+
+<ComponentDemo title="Custom Separator">
+  <hx-breadcrumb separator=">">
+    <hx-breadcrumb-item href="/">Home</hx-breadcrumb-item>
+    <hx-breadcrumb-item href="/clinical">Clinical</hx-breadcrumb-item>
+    <hx-breadcrumb-item>Lab Results</hx-breadcrumb-item>
+  </hx-breadcrumb>
+</ComponentDemo>
+
+### Collapsed with Max Items
+
+When the breadcrumb trail exceeds `max-items`, middle items are hidden behind a keyboard-accessible ellipsis button. Activating the button expands the full trail.
+
+<ComponentDemo title="Collapsed Breadcrumb">
+  <hx-breadcrumb max-items="3">
+    <hx-breadcrumb-item href="/">Home</hx-breadcrumb-item>
+    <hx-breadcrumb-item href="/admin">Admin</hx-breadcrumb-item>
+    <hx-breadcrumb-item href="/admin/users">Users</hx-breadcrumb-item>
+    <hx-breadcrumb-item href="/admin/users/roles">Roles</hx-breadcrumb-item>
+    <hx-breadcrumb-item>Permissions</hx-breadcrumb-item>
+  </hx-breadcrumb>
+</ComponentDemo>
+
+### Single Item
+
+A breadcrumb with a single item is valid — it marks itself as `aria-current="page"` automatically.
+
+<ComponentDemo title="Single Item">
+  <hx-breadcrumb>
+    <hx-breadcrumb-item>Dashboard</hx-breadcrumb-item>
+  </hx-breadcrumb>
+</ComponentDemo>
+
+## Installation
+
+```bash
+# Full library
+npm install @helix/library
+
+# Or import only this component (tree-shaking friendly)
+import '@helix/library/components/hx-breadcrumb';
+```
+
+## Basic Usage
+
+```html
+<hx-breadcrumb>
+  <hx-breadcrumb-item href="/">Home</hx-breadcrumb-item>
+  <hx-breadcrumb-item href="/patients">Patients</hx-breadcrumb-item>
+  <hx-breadcrumb-item>Patient Records</hx-breadcrumb-item>
+</hx-breadcrumb>
+```
+
+The last `hx-breadcrumb-item` in the default slot is automatically treated as the current page — it renders as static text and receives `aria-current="page"`.
+
+## Properties
+
+### hx-breadcrumb
+
+| Property    | Attribute   | Type      | Default        | Description                                                                                                                                                                                |
+| ----------- | ----------- | --------- | -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `label`     | `label`     | `string`  | `'Breadcrumb'` | Accessible label for the `nav` landmark. Passed directly to `aria-label`. Override when multiple breadcrumbs appear on the same page.                                                      |
+| `separator` | `separator` | `string`  | `'/'`          | Separator character rendered between items. Sets the `--hx-breadcrumb-separator-content` CSS custom property. NOTE: When overriding via CSS directly, the value must be quoted: `">"`.     |
+| `maxItems`  | `max-items` | `number`  | `0`            | Maximum visible items before collapsing middle items with an ellipsis. `0` shows all items. The ellipsis button is keyboard-accessible; activating it restores the full trail.             |
+| `jsonLd`    | `json-ld`   | `boolean` | `false`        | When true, injects a JSON-LD `BreadcrumbList` script into `document.head` for SEO. **Not recommended in Drupal** — use the Twig structured-data template instead (see Drupal Integration). |
+
+### hx-breadcrumb-item
+
+| Property     | Attribute      | Type                  | Default     | Description                                                                                                                                                                              |
+| ------------ | -------------- | --------------------- | ----------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `href`       | `href`         | `string \| undefined` | `undefined` | URL for the breadcrumb link. When omitted the item renders as static text. When `current` is set, `href` is ignored and the item always renders as text per WAI-ARIA APG guidance.       |
+| `current`    | `current`      | `boolean`             | `false`     | Marks this item as the current page. Renders as static text with `aria-current="page"` on the inner element. Set explicitly by consumers (e.g. Drupal) to override positional detection. |
+| `dataBcLast` | `data-bc-last` | `boolean`             | `false`     | Internal. Set by the parent `hx-breadcrumb` to hide the trailing separator on the last item. Consumers should not set this directly.                                                     |
+
+## Events
+
+`hx-breadcrumb` and `hx-breadcrumb-item` do not dispatch custom events. The component manages state entirely via observed attributes (`current`, `data-bc-last`) and the `slotchange` lifecycle.
+
+If you need to respond to navigation, listen to the native `click` event on the component or individual anchor elements.
+
+## Slots
+
+### hx-breadcrumb
+
+| Slot        | Description                                                                                                                                                             |
+| ----------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| _(default)_ | One or more `hx-breadcrumb-item` elements. The last item is automatically treated as the current page.                                                                  |
+| `separator` | Optional element whose text content overrides the `separator` property. The element is visually hidden — only its `textContent` is used to set the CSS custom property. |
+
+### hx-breadcrumb-item
+
+| Slot        | Description                                                              |
+| ----------- | ------------------------------------------------------------------------ |
+| _(default)_ | The link or page label text. Accepts plain text, HTML, or icon elements. |
+
+## CSS Parts
+
+### hx-breadcrumb
+
+| Part   | Element | Description                                         |
+| ------ | ------- | --------------------------------------------------- |
+| `nav`  | `<nav>` | The `nav` landmark element wrapping the breadcrumb. |
+| `list` | `<ol>`  | The ordered list containing the breadcrumb items.   |
+
+### hx-breadcrumb-item
+
+| Part        | Element  | Description                                                                    |
+| ----------- | -------- | ------------------------------------------------------------------------------ |
+| `item`      | `<span>` | Wrapper `<span>` around the link or text content (`display: contents`).        |
+| `link`      | `<a>`    | Anchor element rendered when `href` is provided and `current` is false.        |
+| `text`      | `<span>` | Static text `<span>` rendered when `current` is true or no `href` is provided. |
+| `separator` | `<span>` | Separator element rendered after non-last items (`aria-hidden="true"`).        |
+
+## CSS Custom Properties
+
+All custom properties cascade through Shadow DOM. Set them on `hx-breadcrumb` and they inherit into each `hx-breadcrumb-item`.
+
+### hx-breadcrumb
+
+| Property                            | Default                       | Description                                                                                                                                                                             |
+| ----------------------------------- | ----------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `--hx-breadcrumb-separator-content` | `'/'`                         | CSS `content` value for the separator pseudo-element. Must be a quoted string when set via CSS: `">"`. Set via the `separator` attribute or `separator` slot to avoid quoting pitfalls. |
+| `--hx-breadcrumb-separator-color`   | `var(--hx-color-neutral-400)` | Separator character color.                                                                                                                                                              |
+| `--hx-breadcrumb-separator-gap`     | `var(--hx-space-1)`           | Horizontal margin around each separator character.                                                                                                                                      |
+| `--hx-breadcrumb-font-size`         | `var(--hx-font-size-sm)`      | Font size for the entire breadcrumb trail.                                                                                                                                              |
+| `--hx-breadcrumb-link-color`        | `var(--hx-color-primary-600)` | Text color for navigable breadcrumb links.                                                                                                                                              |
+| `--hx-breadcrumb-link-hover-color`  | `var(--hx-color-primary-700)` | Text color for breadcrumb links on hover.                                                                                                                                               |
+| `--hx-breadcrumb-text-color`        | `var(--hx-color-neutral-700)` | Text color for the current-page item and items without an `href`.                                                                                                                       |
+| `--hx-breadcrumb-item-max-width`    | _(unset)_                     | Optional `max-width` for per-item text truncation with an ellipsis (e.g. `12rem`). Applies to both links and text spans.                                                                |
+
+## Accessibility
+
+`hx-breadcrumb` implements the [WAI-ARIA APG Breadcrumb Pattern](https://www.w3.org/WAI/ARIA/apg/patterns/breadcrumb/).
+
+| Topic             | Details                                                                                                                                                                                          |
+| ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| ARIA landmark     | Content is wrapped in a `<nav>` element. The `aria-label` attribute (default: `"Breadcrumb"`) identifies it to screen readers. Override `label` when multiple `<nav>` elements appear on a page. |
+| List semantics    | Items are rendered in an `<ol>` (ordered list). Each `hx-breadcrumb-item` receives `role="listitem"` when it detects an `hx-breadcrumb` ancestor, maintaining a valid list/listitem hierarchy.   |
+| `aria-current`    | Placed on the inner `<span part="text">` of the current-page item — not the host element — yielding the canonical AT announcement: "current page, Patient Records".                              |
+| Separator         | Each separator `<span part="separator">` carries `aria-hidden="true"` to prevent screen readers from announcing the separator character.                                                         |
+| Ellipsis button   | The collapse/expand ellipsis is a native `<button>` with `aria-label="Show all breadcrumb items"`. It is keyboard-reachable and activatable via `Enter` or `Space`.                              |
+| Current page link | When `current` is true, the item never renders as an `<a>` element — even if `href` is provided — per WAI-ARIA APG guidance that the current page item must not be a navigable link.             |
+| Keyboard          | `Tab` moves focus between interactive items and the ellipsis button. No additional keyboard handling is required by the breadcrumb pattern itself.                                               |
+| Reduced motion    | The breadcrumb has no animations. The `prefers-reduced-motion` preference requires no special handling.                                                                                          |
+| WCAG              | Meets WCAG 2.1 AA. Focus indicators on links meet minimum contrast ratios. Color is not the sole conveyor of state.                                                                              |
+
+## Drupal Integration
+
+`hx-breadcrumb` is designed for Drupal's breadcrumb system. The `current` attribute can be set explicitly in Twig to override positional last-item detection, which is essential when Drupal's breadcrumb trail does not end on the current page.
+
+```twig
+{# my-module/templates/breadcrumb.html.twig #}
+<hx-breadcrumb label="{{ label|default('Breadcrumb') }}">
+  {% for item in breadcrumb %}
+    <hx-breadcrumb-item
+      {% if item.url %}href="{{ item.url }}"{% endif %}
+      {% if item.in_active_trail and loop.last %}current{% endif %}
+    >
+      {{ item.text }}
+    </hx-breadcrumb-item>
+  {% endfor %}
+</hx-breadcrumb>
+```
+
+**Important:** Do not enable `json-ld` in Drupal. Use a dedicated Twig structured-data template or Drupal's `metatag` module to manage JSON-LD — injecting `<script>` tags via `document.head.appendChild()` bypasses Drupal's page cache and `hook_html_head_alter()`.
+
+Load the library in your module's `.libraries.yml`:
+
+```yaml
+helix-components:
+  js:
+    /libraries/helix/helix.min.js: { minified: true }
+```
+
+## Examples
+
+### Explicit `current` Attribute (Non-Last Item)
+
+In some Drupal breadcrumb builds the current page is not the last item. Set `current` explicitly to override positional detection:
+
+```html
+<hx-breadcrumb>
+  <hx-breadcrumb-item href="/">Home</hx-breadcrumb-item>
+  <hx-breadcrumb-item current>Department</hx-breadcrumb-item>
+  <hx-breadcrumb-item href="/next">Next Level</hx-breadcrumb-item>
+</hx-breadcrumb>
+```
+
+### Slotted Separator Element
+
+Use the `separator` slot when the separator character is dynamic or comes from content (e.g. an icon component):
+
+```html
+<hx-breadcrumb>
+  <span slot="separator">›</span>
+  <hx-breadcrumb-item href="/">Home</hx-breadcrumb-item>
+  <hx-breadcrumb-item>Records</hx-breadcrumb-item>
+</hx-breadcrumb>
+```
+
+The slotted element's `textContent` is extracted and applied as the CSS custom property value. The element itself is visually hidden.
+
+### JSON-LD Structured Data (Non-Drupal)
+
+Enable structured data injection for standalone pages or SPA deployments:
+
+```html
+<hx-breadcrumb json-ld>
+  <hx-breadcrumb-item href="/">Home</hx-breadcrumb-item>
+  <hx-breadcrumb-item href="/patients">Patients</hx-breadcrumb-item>
+  <hx-breadcrumb-item>Patient Records</hx-breadcrumb-item>
+</hx-breadcrumb>
+```
+
+This injects the following into `<head>` automatically:
+
+```json
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "Home", "item": "/" },
+    { "@type": "ListItem", "position": 2, "name": "Patients", "item": "/patients" },
+    { "@type": "ListItem", "position": 3, "name": "Patient Records" }
+  ]
+}
+```
+
+The script is automatically removed when the component is disconnected from the DOM.
+
+### Text Truncation
+
+Constrain long item labels with `--hx-breadcrumb-item-max-width`:
+
+```html
+<hx-breadcrumb style="--hx-breadcrumb-item-max-width: 10rem;">
+  <hx-breadcrumb-item href="/">Home</hx-breadcrumb-item>
+  <hx-breadcrumb-item href="/very-long-section-name">Very Long Section Name</hx-breadcrumb-item>
+  <hx-breadcrumb-item>An Even Longer Current Page Title</hx-breadcrumb-item>
+</hx-breadcrumb>
+```
+
+### Custom Separator via CSS Part
+
+Style the separator appearance using the `separator` CSS part on `hx-breadcrumb-item`:
+
+```css
+hx-breadcrumb-item::part(separator) {
+  font-weight: bold;
+  color: var(--hx-color-neutral-600);
+}
+```
+
+## Sub-Components
+
+### hx-breadcrumb-item
+
+`hx-breadcrumb-item` is the individual item within an `hx-breadcrumb`. It should always be used as a direct child of `hx-breadcrumb`.
+
+```html
+<!-- With href — renders as a navigable link -->
+<hx-breadcrumb-item href="/patients">Patients</hx-breadcrumb-item>
+
+<!-- Without href — renders as static text -->
+<hx-breadcrumb-item>Patient Records</hx-breadcrumb-item>
+
+<!-- Explicit current page (overrides positional detection) -->
+<hx-breadcrumb-item current>Current Page</hx-breadcrumb-item>
+```
+
+`hx-breadcrumb-item` detects whether it is inside an `hx-breadcrumb` ancestor in `connectedCallback`. When it is, it sets `role="listitem"` on itself to satisfy the list/listitem ARIA hierarchy. When used standalone (outside `hx-breadcrumb`), no `role` is set.
+
+## Standalone HTML Example
+
+Copy-paste into a `.html` file and open in any browser — no build tool required:
+
+```html
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>hx-breadcrumb example</title>
+    <script
+      type="module"
+      src="https://cdn.jsdelivr.net/npm/@helix/library/dist/helix.min.js"
+    ></script>
+  </head>
+  <body style="font-family: sans-serif; padding: 2rem; max-width: 800px; margin: 0 auto;">
+    <h1>Patient Portal</h1>
+
+    <!-- Basic breadcrumb -->
+    <hx-breadcrumb>
+      <hx-breadcrumb-item href="/">Home</hx-breadcrumb-item>
+      <hx-breadcrumb-item href="/patients">Patients</hx-breadcrumb-item>
+      <hx-breadcrumb-item>John Smith — Record #4821</hx-breadcrumb-item>
+    </hx-breadcrumb>
+
+    <hr style="margin: 2rem 0;" />
+
+    <!-- Collapsed breadcrumb with max-items -->
+    <h2>Deep Navigation (collapsed)</h2>
+    <hx-breadcrumb max-items="3" label="Page navigation">
+      <hx-breadcrumb-item href="/">Home</hx-breadcrumb-item>
+      <hx-breadcrumb-item href="/clinical">Clinical</hx-breadcrumb-item>
+      <hx-breadcrumb-item href="/clinical/oncology">Oncology</hx-breadcrumb-item>
+      <hx-breadcrumb-item href="/clinical/oncology/patients">Patients</hx-breadcrumb-item>
+      <hx-breadcrumb-item>John Smith</hx-breadcrumb-item>
+    </hx-breadcrumb>
+
+    <hr style="margin: 2rem 0;" />
+
+    <!-- Custom separator via attribute -->
+    <h2>Custom Separator</h2>
+    <hx-breadcrumb separator="›">
+      <hx-breadcrumb-item href="/">Home</hx-breadcrumb-item>
+      <hx-breadcrumb-item href="/admin">Admin</hx-breadcrumb-item>
+      <hx-breadcrumb-item>Settings</hx-breadcrumb-item>
+    </hx-breadcrumb>
+  </body>
+</html>
+```
+
+## Browser Support
+
+`hx-breadcrumb` uses standard Lit 3.x + Shadow DOM APIs. It is supported in all evergreen browsers:
+
+| Browser | Version |
+| ------- | ------- |
+| Chrome  | 88+     |
+| Firefox | 85+     |
+| Safari  | 14+     |
+| Edge    | 88+     |
+
+No polyfills are required for supported browsers.
 
 ## API Reference
 
