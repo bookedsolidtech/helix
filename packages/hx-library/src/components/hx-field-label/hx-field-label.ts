@@ -7,8 +7,11 @@ import { helixFieldLabelStyles } from './hx-field-label.styles.js';
  * Standardized label for form fields. Used as a consistent sub-component
  * for hx-field and other form field components.
  *
- * When the `for` attribute is set, renders a native `<label for="...">` element
- * for direct label association with a same-document form control.
+ * When the `for` attribute is set, renders a native `<label for="...">` element.
+ * **Note:** Due to the shadow DOM boundary, this label association only works
+ * when the associated input is in the **same shadow root**. For inputs in
+ * light DOM (the typical consumer deployment), use `aria-labelledby` pointing
+ * to the host element's `id` instead of the `for` attribute.
  *
  * When `for` is unset, renders a `<span>` that can be referenced via
  * `aria-labelledby` for labeling controls in a shadow DOM boundary.
@@ -25,6 +28,7 @@ import { helixFieldLabelStyles } from './hx-field-label.styles.js';
  * @csspart optional-indicator - The optional text indicator.
  *
  * @cssprop [--hx-field-label-color=var(--hx-color-neutral-700)] - Label text color.
+ * @cssprop [--hx-field-label-required-color=var(--hx-color-danger, var(--hx-color-error-500, #ef4444))] - Required indicator color.
  * @cssprop [--hx-font-label-size=var(--hx-font-size-sm)] - Label font size.
  * @cssprop [--hx-font-label-weight=var(--hx-font-weight-medium)] - Label font weight.
  * @cssprop [--hx-font-label-line-height=var(--hx-line-height-normal)] - Label line height.
@@ -58,8 +62,9 @@ export class HelixFieldLabel extends LitElement {
 
   override render() {
     const requiredIndicator = this.required
-      ? html`<span part="required-indicator" class="required-indicator" aria-hidden="true"
-          ><slot name="required-indicator">*</slot></span
+      ? html`<span part="required-indicator" class="required-indicator"
+          ><span aria-hidden="true"><slot name="required-indicator">*</slot></span
+          ><span class="visually-hidden">required</span></span
         >`
       : nothing;
 
