@@ -13,7 +13,7 @@ import { helixButtonGroupStyles } from './hx-button-group.styles.js';
  *
  * @tag hx-button-group
  *
- * @slot - Default slot accepting hx-button and hx-icon-button children.
+ * @slot - Default slot accepting hx-button children.
  *
  * @csspart group - The container div element wrapping all slotted buttons.
  *
