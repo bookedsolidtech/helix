@@ -192,7 +192,7 @@ export class HelixSwitch extends LitElement {
 
   /** Reference to the native button element acting as the switch track. */
   @query('.switch__track')
-  private _trackEl: HTMLButtonElement | null = null;
+  private _trackEl!: HTMLButtonElement;
 
   /** Whether the error slot has assigned content. */
   @state() private _hasErrorSlot = false;
