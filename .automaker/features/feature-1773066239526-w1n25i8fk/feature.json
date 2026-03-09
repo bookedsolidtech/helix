@@ -1,0 +1,33 @@
+{
+  "category": "Uncategorized",
+  "description": "Launch readiness audit for hx-carousel. Checklist: (1) A11y — axe-core zero violations, carousel APG pattern, arrow key navigation, live region for slide changes, WCAG 2.1 AA. (2) Astro doc page — all 12 template sections. (3) Individual export — standalone HTML works. (4) `npm run verify` passes. Known patterns: C-PATTERN-01, C-PATTERN-02, C-PATTERN-06. Files: `packages/hx-library/src/components/hx-carousel/`, `apps/docs/src/content/docs/component-library/hx-carousel.md`",
+  "title": "LAUNCH READY: hx-carousel",
+  "status": "backlog",
+  "dependencies": [
+    "feature-1773066138511-g2pgj0rmm"
+  ],
+  "complexity": "medium",
+  "priority": 3,
+  "source": "api",
+  "trustTier": 1,
+  "quarantineStatus": "passed",
+  "quarantineId": "31c2ea5b-2046-4838-8a65-95607e0cd34b",
+  "id": "feature-1773066239526-w1n25i8fk",
+  "branchName": "feature/launch-ready-hx-carousel",
+  "descriptionHistory": [
+    {
+      "description": "Launch readiness audit for hx-carousel. Checklist: (1) A11y — axe-core zero violations, carousel APG pattern, arrow key navigation, live region for slide changes, WCAG 2.1 AA. (2) Astro doc page — all 12 template sections. (3) Individual export — standalone HTML works. (4) `npm run verify` passes. Known patterns: C-PATTERN-01, C-PATTERN-02, C-PATTERN-06. Files: `packages/hx-library/src/components/hx-carousel/`, `apps/docs/src/content/docs/component-library/hx-carousel.md`",
+      "timestamp": "2026-03-09T14:23:59.526Z",
+      "source": "initial"
+    }
+  ],
+  "createdAt": "2026-03-09T14:23:59.526Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-03-09T14:23:59.526Z",
+      "reason": "Feature created"
+    }
+  ]
+}

@@ -1,0 +1,33 @@
+{
+  "category": "Uncategorized",
+  "description": "Launch readiness audit for hx-checkbox. Checklist: (1) A11y — axe-core zero violations, proper checkbox role, ElementInternals form participation, indeterminate state, WCAG 2.1 AA. (2) Astro doc page — all 12 template sections. (3) Individual export — standalone HTML works. (4) `npm run verify` passes. Known patterns: C-PATTERN-01, C-PATTERN-02, C-PATTERN-08 (label double-click). Files: `packages/hx-library/src/components/hx-checkbox/`, `apps/docs/src/content/docs/component-library/hx-checkbox.md`",
+  "title": "LAUNCH READY: hx-checkbox",
+  "status": "backlog",
+  "dependencies": [
+    "feature-1773066138511-g2pgj0rmm"
+  ],
+  "complexity": "medium",
+  "priority": 3,
+  "source": "api",
+  "trustTier": 1,
+  "quarantineStatus": "passed",
+  "quarantineId": "3b7c0105-ebcc-4f03-bb02-b4e5bcc5b9d4",
+  "id": "feature-1773066242462-bj8mh4uzm",
+  "branchName": "feature/launch-ready-hx-checkbox",
+  "descriptionHistory": [
+    {
+      "description": "Launch readiness audit for hx-checkbox. Checklist: (1) A11y — axe-core zero violations, proper checkbox role, ElementInternals form participation, indeterminate state, WCAG 2.1 AA. (2) Astro doc page — all 12 template sections. (3) Individual export — standalone HTML works. (4) `npm run verify` passes. Known patterns: C-PATTERN-01, C-PATTERN-02, C-PATTERN-08 (label double-click). Files: `packages/hx-library/src/components/hx-checkbox/`, `apps/docs/src/content/docs/component-library/hx-checkbox.md`",
+      "timestamp": "2026-03-09T14:24:02.462Z",
+      "source": "initial"
+    }
+  ],
+  "createdAt": "2026-03-09T14:24:02.462Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-03-09T14:24:02.462Z",
+      "reason": "Feature created"
+    }
+  ]
+}

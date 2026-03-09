@@ -1,0 +1,33 @@
+{
+  "category": "Uncategorized",
+  "description": "Launch readiness audit for hx-side-nav. Checklist: (1) A11y — axe-core zero violations, navigation landmark, WCAG 2.1 AA. (2) Astro doc page — all 12 template sections. (3) Individual export — standalone HTML works. (4) `npm run verify` passes. Files: `packages/hx-library/src/components/hx-side-nav/`, `apps/docs/src/content/docs/component-library/hx-side-nav.md`",
+  "title": "LAUNCH READY: hx-side-nav",
+  "status": "backlog",
+  "dependencies": [
+    "feature-1773066138511-g2pgj0rmm"
+  ],
+  "complexity": "medium",
+  "priority": 3,
+  "source": "api",
+  "trustTier": 1,
+  "quarantineStatus": "passed",
+  "quarantineId": "e558e0bd-18bd-48b6-a371-1e93c8a4c7b6",
+  "id": "feature-1773066366568-56mzp1w4o",
+  "branchName": "feature/launch-ready-hx-side-nav",
+  "descriptionHistory": [
+    {
+      "description": "Launch readiness audit for hx-side-nav. Checklist: (1) A11y — axe-core zero violations, navigation landmark, WCAG 2.1 AA. (2) Astro doc page — all 12 template sections. (3) Individual export — standalone HTML works. (4) `npm run verify` passes. Files: `packages/hx-library/src/components/hx-side-nav/`, `apps/docs/src/content/docs/component-library/hx-side-nav.md`",
+      "timestamp": "2026-03-09T14:26:06.568Z",
+      "source": "initial"
+    }
+  ],
+  "createdAt": "2026-03-09T14:26:06.568Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-03-09T14:26:06.568Z",
+      "reason": "Feature created"
+    }
+  ]
+}

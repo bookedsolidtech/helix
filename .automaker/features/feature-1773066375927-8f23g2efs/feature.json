@@ -1,0 +1,33 @@
+{
+  "category": "Uncategorized",
+  "description": "Launch readiness audit for hx-split-button. Checklist: (1) A11y — axe-core zero violations, menu button pattern, WCAG 2.1 AA. (2) Astro doc page — all 12 template sections. (3) Individual export — standalone HTML works. (4) `npm run verify` passes. Files: `packages/hx-library/src/components/hx-split-button/`, `apps/docs/src/content/docs/component-library/hx-split-button.md`",
+  "title": "LAUNCH READY: hx-split-button",
+  "status": "backlog",
+  "dependencies": [
+    "feature-1773066138511-g2pgj0rmm"
+  ],
+  "complexity": "medium",
+  "priority": 3,
+  "source": "api",
+  "trustTier": 1,
+  "quarantineStatus": "passed",
+  "quarantineId": "ec1bdfee-54c6-4a17-90ac-9ebbcb1ad305",
+  "id": "feature-1773066375927-8f23g2efs",
+  "branchName": "feature/launch-ready-hx-split-button",
+  "descriptionHistory": [
+    {
+      "description": "Launch readiness audit for hx-split-button. Checklist: (1) A11y — axe-core zero violations, menu button pattern, WCAG 2.1 AA. (2) Astro doc page — all 12 template sections. (3) Individual export — standalone HTML works. (4) `npm run verify` passes. Files: `packages/hx-library/src/components/hx-split-button/`, `apps/docs/src/content/docs/component-library/hx-split-button.md`",
+      "timestamp": "2026-03-09T14:26:15.927Z",
+      "source": "initial"
+    }
+  ],
+  "createdAt": "2026-03-09T14:26:15.927Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-03-09T14:26:15.927Z",
+      "reason": "Feature created"
+    }
+  ]
+}

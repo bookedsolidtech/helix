@@ -1,0 +1,33 @@
+{
+  "category": "Uncategorized",
+  "description": "Launch readiness audit for hx-breadcrumb. Using the documentation template, ensure production-ready. Checklist: (1) A11y — axe-core zero violations, proper nav landmark, aria-label, aria-current on last item, WCAG 2.1 AA. (2) Astro doc page — all 12 template sections. (3) Individual export — standalone HTML works. (4) `npm run verify` passes. Known patterns: C-PATTERN-01, C-PATTERN-02, C-PATTERN-05 (list role). Files: `packages/hx-library/src/components/hx-breadcrumb/`, `apps/docs/src/content/docs/component-library/hx-breadcrumb.md`",
+  "title": "LAUNCH READY: hx-breadcrumb",
+  "status": "backlog",
+  "dependencies": [
+    "feature-1773066138511-g2pgj0rmm"
+  ],
+  "complexity": "medium",
+  "priority": 3,
+  "source": "api",
+  "trustTier": 1,
+  "quarantineStatus": "passed",
+  "quarantineId": "80d99e2a-81d6-49be-9f84-c53eda631de7",
+  "id": "feature-1773066218427-mdne0o0j3",
+  "branchName": "feature/launch-ready-hx-breadcrumb",
+  "descriptionHistory": [
+    {
+      "description": "Launch readiness audit for hx-breadcrumb. Using the documentation template, ensure production-ready. Checklist: (1) A11y — axe-core zero violations, proper nav landmark, aria-label, aria-current on last item, WCAG 2.1 AA. (2) Astro doc page — all 12 template sections. (3) Individual export — standalone HTML works. (4) `npm run verify` passes. Known patterns: C-PATTERN-01, C-PATTERN-02, C-PATTERN-05 (list role). Files: `packages/hx-library/src/components/hx-breadcrumb/`, `apps/docs/src/content/docs/component-library/hx-breadcrumb.md`",
+      "timestamp": "2026-03-09T14:23:38.427Z",
+      "source": "initial"
+    }
+  ],
+  "createdAt": "2026-03-09T14:23:38.427Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-03-09T14:23:38.427Z",
+      "reason": "Feature created"
+    }
+  ]
+}
