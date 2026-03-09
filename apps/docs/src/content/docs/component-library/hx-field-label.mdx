@@ -76,6 +76,9 @@ association automatically.
 npm install @helix/library
 
 # Or import only this component (tree-shaking friendly)
+```
+
+```js
 import '@helix/library/components/hx-field-label';
 ```
 
@@ -88,7 +91,9 @@ Minimal HTML snippet — no build tool required:
 <hx-field-label id="lbl-name" required>Patient Name</hx-field-label>
 <input type="text" aria-labelledby="lbl-name" aria-required="true" />
 
-<!-- Pattern 2: native label association (within same shadow root only) -->
+<!-- Pattern 2: native label association (label and input must be in the same shadow root only) -->
+<!-- Note: The `for` attribute cannot cross shadow DOM boundaries. Use aria-labelledby for -->
+<!-- inputs outside the component's shadow DOM (see Pattern 1). -->
 <hx-field-label for="dob-input">Date of Birth</hx-field-label>
 <input id="dob-input" type="date" />
 
@@ -136,14 +141,14 @@ This component does not emit custom events.
 
 ## Accessibility
 
-| Topic               | Details                                                                                                                                                                                                                     |
-| ------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| ARIA role           | None applied — renders as a native `<label>` (with `for`) or `<span>` (without), inheriting their native semantics.                                                                                                         |
-| Keyboard            | No keyboard interaction. This is a semantic label element; consumers manage focus on the associated input.                                                                                                                  |
-| Screen reader       | When `required` is true, the visual asterisk is `aria-hidden="true"`. A visually-hidden `<span>required</span>` is included so screen readers announce "required" rather than reading `*`.                                  |
-| Focus               | No focus management. Associate inputs using `aria-labelledby` (light DOM) or the `for` attribute (same shadow root).                                                                                                        |
-| Shadow DOM labeling | The `for` attribute only associates labels to inputs **within the same shadow root**. For inputs in light DOM (standard Drupal pattern), set an `id` on the `<hx-field-label>` host and use `aria-labelledby` on the input. |
-| WCAG 2.1 AA         | Verified with axe-core: zero violations in default, required, optional, and `for`-attribute states.                                                                                                                         |
+| Topic               | Details                                                                                                                                                                                                                                                                                                        |
+| ------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| ARIA role           | Renders as a native `<label>` element when `for` is set, providing implicit label semantics for the associated input within the same shadow root. When `for` is omitted, renders as a generic `<span>` container — consumer must associate the input using `aria-labelledby` referencing the component's `id`. |
+| Keyboard            | No keyboard interaction. This is a semantic label element; consumers manage focus on the associated input.                                                                                                                                                                                                     |
+| Screen reader       | When `required` is true, the visual asterisk is `aria-hidden="true"`. A visually-hidden `<span>required</span>` is included so screen readers announce "required" rather than reading `*`.                                                                                                                     |
+| Focus               | No focus management. Associate inputs using `aria-labelledby` (light DOM) or the `for` attribute (same shadow root).                                                                                                                                                                                           |
+| Shadow DOM labeling | The `for` attribute only associates labels to inputs **within the same shadow root**. For inputs in light DOM (standard Drupal pattern), set an `id` on the `<hx-field-label>` host and use `aria-labelledby` on the input.                                                                                    |
+| WCAG 2.1 AA         | Checked with axe-core during development; no violations observed in tested states (default, required, optional, and `for`-attribute scenarios).                                                                                                                                                                |
 
 ## Drupal Integration
 
