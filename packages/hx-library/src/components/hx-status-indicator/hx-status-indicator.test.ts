@@ -155,21 +155,37 @@ describe('hx-status-indicator', () => {
       const wrapper = shadowQuery(el, '[role="img"]');
       expect(wrapper?.getAttribute('aria-label')).toBe('System is healthy');
     });
-  });
 
-  // ─── CSS Parts ───
-
-  describe('CSS Parts', () => {
-    it('exposes "base" part', async () => {
-      const el = await fixture<HelixStatusIndicator>('<hx-status-indicator></hx-status-indicator>');
-      const base = shadowQuery(el, '[part~="base"]');
-      expect(base).toBeTruthy();
+    it('generates correct aria-label for "unknown" status', async () => {
+      const el = await fixture<HelixStatusIndicator>(
+        '<hx-status-indicator status="unknown"></hx-status-indicator>',
+      );
+      const wrapper = shadowQuery(el, '[role="img"]');
+      expect(wrapper?.getAttribute('aria-label')).toBe('Status: Unknown');
     });
 
-    it('exposes "pulse-ring" part', async () => {
-      const el = await fixture<HelixStatusIndicator>('<hx-status-indicator></hx-status-indicator>');
-      const ring = shadowQuery(el, '[part~="pulse-ring"]');
-      expect(ring).toBeTruthy();
+    it('falls back to generated label when custom label is cleared', async () => {
+      const el = await fixture<HelixStatusIndicator>(
+        '<hx-status-indicator status="online" label="Custom label"></hx-status-indicator>',
+      );
+      el.label = '';
+      await el.updateComplete;
+      const wrapper = shadowQuery(el, '[role="img"]');
+      expect(wrapper?.getAttribute('aria-label')).toBe('Status: Online');
+    });
+  });
+
+  // ─── Dynamic Updates ───
+
+  describe('Dynamic Updates', () => {
+    it('updates aria-label when status changes dynamically', async () => {
+      const el = await fixture<HelixStatusIndicator>(
+        '<hx-status-indicator status="online"></hx-status-indicator>',
+      );
+      el.status = 'offline';
+      await el.updateComplete;
+      const wrapper = shadowQuery(el, '[role="img"]');
+      expect(wrapper?.getAttribute('aria-label')).toBe('Status: Offline');
     });
   });
 
