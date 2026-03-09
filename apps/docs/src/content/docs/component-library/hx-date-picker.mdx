@@ -51,15 +51,17 @@ Required, error, disabled, and help text states.
 
 Use `min` and `max` to restrict the selectable range.
 
+The dates below are illustrative examples.
+
 <ComponentDemo title="Date Constraints">
   <div style="display: grid; gap: 1.5rem; max-width: 360px;">
     <hx-date-picker
-      label="Appointment (next 90 days)"
+      label="Appointment (example constrained range)"
       min="2026-03-09"
       max="2026-06-07"
     ></hx-date-picker>
     <hx-date-picker
-      label="Date of birth (age 18+)"
+      label="Date of birth (example max date)"
       max="2008-03-09"
       format="MM/DD/YYYY"
     ></hx-date-picker>
@@ -194,7 +196,7 @@ import '@helix/library/components/hx-date-picker';
 | Focus trap         | `Tab` cycles focus within the calendar popup while it is open.                                                     |
 | Required marker    | The `*` asterisk is `aria-hidden="true"` — the label conveys required state via `aria-required`.                   |
 | Form validation    | `checkValidity()` and `reportValidity()` delegate to `ElementInternals`.                                           |
-| WCAG 2.1 AA        | Verified with axe-core across all states: default, error, disabled, required, and calendar open.                   |
+| WCAG 2.1 AA        | Supports ARIA patterns; axe-core verification in progress. See AUDIT.md for current status.                        |
 
 ## Drupal Integration
 
@@ -227,7 +229,7 @@ Listen for the `hx-change` event in Drupal behaviors:
 ```javascript
 Drupal.behaviors.myDatePicker = {
   attach(context) {
-    context.querySelectorAll('hx-date-picker').forEach((el) => {
+    once('myDatePicker', 'hx-date-picker', context).forEach((el) => {
       el.addEventListener('hx-change', (e) => {
         const { value, date } = e.detail;
         // value = ISO string, e.g. "2026-03-15"
@@ -251,10 +253,7 @@ Copy-paste into a `.html` file and open in any browser — no build tool require
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>hx-date-picker example</title>
-    <script
-      type="module"
-      src="https://cdn.jsdelivr.net/npm/@helix/library/dist/helix.min.js"
-    ></script>
+    <script type="module" src="https://cdn.jsdelivr.net/npm/@helix/library/dist/index.js"></script>
   </head>
   <body
     style="font-family: sans-serif; padding: 2rem; display: grid; gap: 1.5rem; max-width: 400px;"
