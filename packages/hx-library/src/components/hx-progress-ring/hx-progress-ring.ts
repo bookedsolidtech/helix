@@ -1,4 +1,4 @@
-import { LitElement, html, svg } from 'lit';
+import { LitElement, html, svg, TemplateResult } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { tokenStyles } from '@helix/tokens/lit';
 import { helixProgressRingStyles } from './hx-progress-ring.styles.js';
@@ -29,11 +29,18 @@ export class HelixProgressRing extends LitElement {
   // ─── Public Properties ───
 
   /**
-   * Current progress value (0–100). When null, renders in indeterminate mode.
+   * Current progress value (0–max). When null, renders in indeterminate mode.
    * @attr value
    */
   @property({ type: Number, reflect: true })
   value: number | null = null;
+
+  /**
+   * Maximum value for the progress range. Defaults to 100. Used for aria-valuemax.
+   * @attr max
+   */
+  @property({ type: Number, reflect: true })
+  max = 100;
 
   /**
    * Size of the ring. Controls SVG diameter.
@@ -58,6 +65,8 @@ export class HelixProgressRing extends LitElement {
 
   /**
    * Accessible label for the progressbar. Exposed as aria-label.
+   * Set this attribute to satisfy WCAG 4.1.2. When absent, aria-busy reflects
+   * indeterminate state and a console warning is emitted.
    * @attr label
    */
   @property({ type: String })
@@ -71,7 +80,7 @@ export class HelixProgressRing extends LitElement {
 
   private get _clampedValue(): number {
     if (this.value === null) return 0;
-    return Math.min(100, Math.max(0, this.value));
+    return Math.min(this.max, Math.max(0, this.value));
   }
 
   /**
@@ -86,20 +95,24 @@ export class HelixProgressRing extends LitElement {
   }
 
   private get _strokeDashoffset(): number {
-    return this._circumference * (1 - this._clampedValue / 100);
+    return this._circumference * (1 - this._clampedValue / this.max);
   }
 
   // ─── Lifecycle ───
 
-  override firstUpdated(): void {
+  override connectedCallback(): void {
+    super.connectedCallback();
     this.setAttribute('role', 'progressbar');
     this.setAttribute('aria-valuemin', '0');
-    this.setAttribute('aria-valuemax', '100');
+    this.setAttribute('aria-valuemax', String(this.max));
     this._syncState();
   }
 
   override updated(changed: Map<string, unknown>): void {
-    if (changed.has('value') || changed.has('label')) {
+    if (changed.has('value') || changed.has('label') || changed.has('max')) {
+      if (changed.has('max')) {
+        this.setAttribute('aria-valuemax', String(this.max));
+      }
       this._syncState();
     }
   }
@@ -107,9 +120,11 @@ export class HelixProgressRing extends LitElement {
   private _syncState(): void {
     if (this._isIndeterminate) {
       this.setAttribute('indeterminate', '');
+      this.setAttribute('aria-busy', 'true');
       this.removeAttribute('aria-valuenow');
     } else {
       this.removeAttribute('indeterminate');
+      this.removeAttribute('aria-busy');
       this.setAttribute('aria-valuenow', String(this._clampedValue));
     }
 
@@ -117,12 +132,15 @@ export class HelixProgressRing extends LitElement {
       this.setAttribute('aria-label', this.label);
     } else {
       this.removeAttribute('aria-label');
+      console.warn(
+        '[hx-progress-ring] Missing accessible label. Set the `label` attribute for WCAG 4.1.2 compliance.',
+      );
     }
   }
 
   // ─── Render ───
 
-  override render() {
+  override render(): TemplateResult {
     const cx = 50;
     const cy = 50;
     const r = this._radius;

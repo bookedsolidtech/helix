@@ -297,7 +297,10 @@ export const CSSCustomProperties: Story = {
         >
           --hx-field-label-color
         </p>
-        <hx-field-label required style="--hx-field-label-color: var(--hx-color-primary-600, #2563eb);">
+        <hx-field-label
+          required
+          style="--hx-field-label-color: var(--hx-color-primary-600, #2563eb);"
+        >
           Custom brand label color
         </hx-field-label>
       </div>
@@ -308,7 +311,10 @@ export const CSSCustomProperties: Story = {
         >
           --hx-field-label-required-color (required indicator)
         </p>
-        <hx-field-label required style="--hx-field-label-required-color: var(--hx-color-warning-600, #d97706);">
+        <hx-field-label
+          required
+          style="--hx-field-label-required-color: var(--hx-color-warning-600, #d97706);"
+        >
           Custom amber required indicator
         </hx-field-label>
       </div>

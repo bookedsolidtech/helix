@@ -14,10 +14,28 @@ const meta = {
   argTypes: {
     value: {
       control: { type: 'number', min: 0, max: 100 },
-      description: 'Progress value (0–100). Set to null for indeterminate mode.',
+      description: 'Progress value (0–100). Ignored when indeterminate is true.',
       table: {
         category: 'State',
         type: { summary: 'number | null' },
+      },
+    },
+    max: {
+      control: { type: 'number', min: 1 },
+      description: 'Maximum value for the progress range. Defaults to 100.',
+      table: {
+        category: 'State',
+        defaultValue: { summary: '100' },
+        type: { summary: 'number' },
+      },
+    },
+    indeterminate: {
+      control: { type: 'boolean' },
+      description: 'When true, renders in indeterminate (loading) mode regardless of value.',
+      table: {
+        category: 'State',
+        defaultValue: { summary: 'false' },
+        type: { summary: 'boolean' },
       },
     },
     size: {
@@ -60,6 +78,8 @@ const meta = {
   },
   args: {
     value: 65,
+    max: 100,
+    indeterminate: false,
     size: 'md',
     strokeWidth: 4,
     variant: 'default',
@@ -67,13 +87,14 @@ const meta = {
   },
   render: (args) => html`
     <hx-progress-ring
-      value=${args.value ?? null}
+      .value=${args.indeterminate ? null : (args.value ?? null)}
+      max=${args.max}
       size=${args.size}
       stroke-width=${args.strokeWidth}
       variant=${args.variant}
       label=${args.label}
     >
-      ${args.value !== null ? html`<span>${args.value}%</span>` : ''}
+      ${!args.indeterminate && args.value !== null ? html`<span>${args.value}%</span>` : ''}
     </hx-progress-ring>
   `,
 } satisfies Meta;
@@ -269,7 +290,9 @@ export const PatientFormCompletion: Story = {
 
 export const LabResultUpload: Story = {
   render: () => html`
-    <div style="display: flex; flex-direction: column; gap: 1rem; max-width: 280px; padding: 1rem; border: 1px solid #e5e7eb; border-radius: 0.5rem;">
+    <div
+      style="display: flex; flex-direction: column; gap: 1rem; max-width: 280px; padding: 1rem; border: 1px solid #e5e7eb; border-radius: 0.5rem;"
+    >
       <p style="margin: 0; font-weight: 600;">Uploading Lab Results</p>
       <div style="display: flex; align-items: center; gap: 1rem;">
         <hx-progress-ring size="md" label="Uploading, please wait"></hx-progress-ring>
@@ -282,21 +305,27 @@ export const LabResultUpload: Story = {
 export const MedicationAdherence: Story = {
   render: () => html`
     <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
-      <div style="display: flex; flex-direction: column; align-items: center; gap: 0.5rem; padding: 1rem; border: 1px solid #e5e7eb; border-radius: 0.5rem; min-width: 100px;">
+      <div
+        style="display: flex; flex-direction: column; align-items: center; gap: 0.5rem; padding: 1rem; border: 1px solid #e5e7eb; border-radius: 0.5rem; min-width: 100px;"
+      >
         <hx-progress-ring value="92" variant="success" size="lg" label="Adherence: 92%">
           <span style="font-size: 0.875rem; font-weight: 700; color: #16a34a;">92%</span>
         </hx-progress-ring>
         <span style="font-size: 0.75rem; font-weight: 600; color: #16a34a;">Excellent</span>
         <span style="font-size: 0.75rem; color: #6b7280;">Metformin</span>
       </div>
-      <div style="display: flex; flex-direction: column; align-items: center; gap: 0.5rem; padding: 1rem; border: 1px solid #e5e7eb; border-radius: 0.5rem; min-width: 100px;">
+      <div
+        style="display: flex; flex-direction: column; align-items: center; gap: 0.5rem; padding: 1rem; border: 1px solid #e5e7eb; border-radius: 0.5rem; min-width: 100px;"
+      >
         <hx-progress-ring value="67" variant="warning" size="lg" label="Adherence: 67%">
           <span style="font-size: 0.875rem; font-weight: 700; color: #d97706;">67%</span>
         </hx-progress-ring>
         <span style="font-size: 0.75rem; font-weight: 600; color: #d97706;">Fair</span>
         <span style="font-size: 0.75rem; color: #6b7280;">Lisinopril</span>
       </div>
-      <div style="display: flex; flex-direction: column; align-items: center; gap: 0.5rem; padding: 1rem; border: 1px solid #e5e7eb; border-radius: 0.5rem; min-width: 100px;">
+      <div
+        style="display: flex; flex-direction: column; align-items: center; gap: 0.5rem; padding: 1rem; border: 1px solid #e5e7eb; border-radius: 0.5rem; min-width: 100px;"
+      >
         <hx-progress-ring value="28" variant="danger" size="lg" label="Adherence: 28%">
           <span style="font-size: 0.875rem; font-weight: 700; color: #dc2626;">28%</span>
         </hx-progress-ring>

@@ -151,7 +151,9 @@ describe('hx-field-label', () => {
       const slotted = el.querySelector('[slot="required-indicator"]');
       expect(slotted?.textContent).toBe('(req)');
       // verify shadow DOM slot has assigned nodes
-      const slot = el.shadowRoot!.querySelector('slot[name="required-indicator"]') as HTMLSlotElement;
+      const slot = el.shadowRoot!.querySelector(
+        'slot[name="required-indicator"]',
+      ) as HTMLSlotElement;
       expect(slot).toBeTruthy();
       expect(slot.assignedNodes().length).toBeGreaterThan(0);
     });
