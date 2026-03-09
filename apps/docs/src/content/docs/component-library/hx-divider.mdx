@@ -1,14 +1,337 @@
 ---
 title: 'hx-divider'
-description: 'Visual separator for dividing content sections horizontally or vertically'
+description: 'Visual separator for dividing content sections horizontally or vertically, with optional centered label and full accessibility support.'
 ---
 
 import ComponentLoader from '../../../components/ComponentLoader.astro';
+import ComponentDemo from '../../../components/ComponentDemo.astro';
 import ComponentDoc from '../../../components/ComponentDoc.astro';
 
 <ComponentLoader />
 
 <ComponentDoc tagName="hx-divider" section="summary" />
+
+## Overview
+
+`hx-divider` is a visual separator that divides content into distinct sections. It supports horizontal and vertical orientations, four spacing scales, and an optional centered label rendered between two flanking lines. When a label is present the component acts as a semantic section boundary; when it is purely decorative the `decorative` attribute suppresses all screen reader announcements.
+
+**Use `hx-divider` when:**
+
+- You need a clear horizontal break between content sections (patient demographics, vitals, labs)
+- You need a vertical separator between inline metadata items (patient ID, DOB, MRN in a header bar)
+- You need a labeled section divider that communicates structure to assistive technology (e.g., "Allergies", "Current Medications")
+
+**Do not use** `hx-divider` for purely visual decoration in layouts where a CSS border on a parent element would suffice and no semantic separation is needed. Use `decorative` when the visual line adds no structural meaning.
+
+## Live Demo
+
+### Default
+
+A horizontal divider with default `md` spacing, separating two content areas.
+
+<ComponentDemo title="Default">
+  <div style="padding: 1rem; max-width: 480px;">
+    <p style="margin: 0;">Patient demographics</p>
+    <hx-divider></hx-divider>
+    <p style="margin: 0;">Vitals summary</p>
+  </div>
+</ComponentDemo>
+
+### Horizontal (explicit)
+
+The default orientation, useful for clearly separating stacked content blocks.
+
+<ComponentDemo title="Horizontal">
+  <div style="padding: 1rem; max-width: 480px;">
+    <p style="margin: 0;">Prior authorization requests</p>
+    <hx-divider orientation="horizontal"></hx-divider>
+    <p style="margin: 0;">Emergency access bypass</p>
+  </div>
+</ComponentDemo>
+
+### Vertical
+
+Separates inline items in a flex row. Stretches to fill the height of its flex container.
+
+<ComponentDemo title="Vertical">
+  <div style="display: flex; align-items: center; gap: 0; height: 2rem; padding: 0.5rem;">
+    <span>Patient ID: 10042</span>
+    <hx-divider orientation="vertical" spacing="sm"></hx-divider>
+    <span>DOB: 1982-03-15</span>
+    <hx-divider orientation="vertical" spacing="sm"></hx-divider>
+    <span>MRN: 885521</span>
+  </div>
+</ComponentDemo>
+
+### With Label (slot)
+
+Centered label text is placed between the two divider lines. Slotted content is accessible to screen readers as part of the document flow.
+
+<ComponentDemo title="With Label">
+  <div style="padding: 1rem; max-width: 480px;">
+    <p style="margin: 0;">Scheduled procedures</p>
+    <hx-divider>Or continue without scheduling</hx-divider>
+    <p style="margin: 0;">Emergency access bypass</p>
+  </div>
+</ComponentDemo>
+
+### With Label (attribute)
+
+The `label` attribute renders text between the lines and additionally sets `aria-label` on the separator element for assistive technologies.
+
+<ComponentDemo title="Label Attribute">
+  <div style="padding: 1rem; max-width: 480px;">
+    <p style="margin: 0;">Allergies</p>
+    <hx-divider label="Current Medications"></hx-divider>
+    <p style="margin: 0;">Metformin 500mg — twice daily</p>
+  </div>
+</ComponentDemo>
+
+### Spacing Variants
+
+Four spacing values control the block-axis margin for horizontal dividers and the inline-axis margin for vertical dividers.
+
+<ComponentDemo title="Spacing Variants">
+  <div style="padding: 1rem; max-width: 480px;">
+    <p style="margin: 0; font-size: 0.75rem; color: #6b7280;">spacing="none"</p>
+    <hx-divider spacing="none"></hx-divider>
+    <p style="margin: 0; font-size: 0.75rem; color: #6b7280;">spacing="sm"</p>
+    <hx-divider spacing="sm"></hx-divider>
+    <p style="margin: 0; font-size: 0.75rem; color: #6b7280;">spacing="md" (default)</p>
+    <hx-divider spacing="md"></hx-divider>
+    <p style="margin: 0; font-size: 0.75rem; color: #6b7280;">spacing="lg"</p>
+    <hx-divider spacing="lg"></hx-divider>
+    <p style="margin: 0;">End</p>
+  </div>
+</ComponentDemo>
+
+### Decorative
+
+When `decorative` is set, `role="presentation"` is applied and all ARIA attributes are removed. Screen readers skip the element entirely.
+
+<ComponentDemo title="Decorative">
+  <div style="padding: 1rem; max-width: 480px;">
+    <p style="margin: 0;">Visual section break — screen readers skip this line</p>
+    <hx-divider decorative></hx-divider>
+    <p style="margin: 0;">Content continues</p>
+  </div>
+</ComponentDemo>
+
+### Healthcare: Patient Record Sections
+
+Section dividers with labels communicate document structure in clinical record layouts.
+
+<ComponentDemo title="Patient Record">
+  <div style="padding: 1rem; max-width: 520px; font-family: sans-serif;">
+    <h3 style="margin: 0 0 0.5rem;">Patient Overview</h3>
+    <p style="margin: 0; color: #374151;">Jane Doe — MRN: 885521 — DOB: 1982-03-15</p>
+    <hx-divider>Allergies</hx-divider>
+    <ul style="margin: 0; padding-left: 1.25rem; color: #374151;">
+      <li>Penicillin (severe)</li>
+      <li>Shellfish (moderate)</li>
+    </ul>
+    <hx-divider>Current Medications</hx-divider>
+    <ul style="margin: 0; padding-left: 1.25rem; color: #374151;">
+      <li>Metformin 500mg — twice daily</li>
+      <li>Lisinopril 10mg — once daily</li>
+    </ul>
+    <hx-divider>Recent Labs</hx-divider>
+    <p style="margin: 0; color: #374151;">HbA1c: 6.8% — Collected 2026-02-15</p>
+  </div>
+</ComponentDemo>
+
+### Healthcare: Inline Patient Meta Bar
+
+Vertical dividers in a flex row separate compact metadata without consuming vertical space.
+
+<ComponentDemo title="Inline Patient Meta">
+  <div style="display: flex; align-items: center; padding: 0.75rem 1rem; background: #f9fafb; border-radius: 0.5rem; gap: 0;">
+    <span style="font-size: 0.875rem; color: #374151;">Jane Doe</span>
+    <hx-divider orientation="vertical" spacing="sm"></hx-divider>
+    <span style="font-size: 0.875rem; color: #374151;">Age: 44</span>
+    <hx-divider orientation="vertical" spacing="sm"></hx-divider>
+    <span style="font-size: 0.875rem; color: #374151;">Room 214-B</span>
+    <hx-divider orientation="vertical" spacing="sm"></hx-divider>
+    <span style="font-size: 0.875rem; color: #374151;">Dr. Patel</span>
+  </div>
+</ComponentDemo>
+
+## Installation
+
+```bash
+# Full library
+npm install @helix/library
+
+# Or import only this component (tree-shaking friendly)
+import '@helix/library/components/hx-divider';
+```
+
+## Basic Usage
+
+```html
+<!-- Horizontal (default) -->
+<hx-divider></hx-divider>
+
+<!-- Vertical — place in a flex row container -->
+<div style="display: flex; align-items: center; height: 2rem;">
+  <span>Item A</span>
+  <hx-divider orientation="vertical" spacing="sm"></hx-divider>
+  <span>Item B</span>
+</div>
+
+<!-- With centered label via slot -->
+<hx-divider>Section Title</hx-divider>
+
+<!-- With label via attribute (also sets aria-label) -->
+<hx-divider label="Section Title"></hx-divider>
+
+<!-- Decorative — hidden from screen readers -->
+<hx-divider decorative></hx-divider>
+```
+
+## Properties
+
+| Property      | Attribute     | Type                             | Default        | Description                                                                                                    |
+| ------------- | ------------- | -------------------------------- | -------------- | -------------------------------------------------------------------------------------------------------------- |
+| `orientation` | `orientation` | `'horizontal' \| 'vertical'`     | `'horizontal'` | Orientation of the divider. Horizontal applies block-axis margin; vertical applies inline-axis margin.         |
+| `spacing`     | `spacing`     | `'none' \| 'sm' \| 'md' \| 'lg'` | `'md'`         | Spacing applied around the divider on the appropriate axis.                                                    |
+| `decorative`  | `decorative`  | `boolean`                        | `false`        | When true, renders as `role="presentation"` and removes all ARIA attributes. Screen readers skip the element.  |
+| `label`       | `label`       | `string \| undefined`            | `undefined`    | Optional text rendered centered between the lines. Also sets `aria-label` on the separator for assistive tech. |
+
+## Events
+
+`hx-divider` does not emit any custom events. It is a purely presentational separator element.
+
+## CSS Parts
+
+| Part    | Description                                                                                    |
+| ------- | ---------------------------------------------------------------------------------------------- |
+| `base`  | The root `<div>` element with `role="separator"`.                                              |
+| `label` | The centered label wrapper `<span>`. Present only when a label or slotted content is provided. |
+
+## CSS Custom Properties
+
+| Property                       | Default                       | Description                                   |
+| ------------------------------ | ----------------------------- | --------------------------------------------- |
+| `--hx-divider-color`           | `var(--hx-color-neutral-200)` | Line color.                                   |
+| `--hx-divider-width`           | `var(--hx-border-width-thin)` | Line thickness.                               |
+| `--hx-divider-label-color`     | `var(--hx-color-neutral-500)` | Label text color.                             |
+| `--hx-divider-label-font-size` | `var(--hx-font-size-sm)`      | Label font size.                              |
+| `--hx-divider-label-gap`       | `var(--hx-space-3)`           | Gap between the flanking lines and the label. |
+
+## Slots
+
+| Slot        | Description                                                                                                                                                                                    |
+| ----------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| _(default)_ | Optional label text or element rendered centered between the two divider lines. When populated, `part="label"` appears and the slot content is accessible to screen readers via document flow. |
+
+## Accessibility
+
+| Topic              | Details                                                                                                                                                                                |
+| ------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| ARIA role          | `role="separator"` on the inner `[part="base"]` element communicates the structural boundary to assistive technology. When `decorative` is set, `role="presentation"` is used instead. |
+| `aria-orientation` | Set to `"horizontal"` or `"vertical"` to match the `orientation` property. Omitted entirely when `decorative` is true.                                                                 |
+| `aria-label`       | Applied to the separator only when the `label` attribute is set and `decorative` is false. Provides a name for the separator boundary without duplicating visible text.                |
+| Decorative mode    | `decorative` sets `role="presentation"` and strips `aria-orientation` and `aria-label`. Use this when the divider is visual-only and adds no structural meaning to the content.        |
+| Slotted label      | Text slotted into the default slot is rendered in the light DOM and is naturally accessible to screen readers as part of the document flow — no additional ARIA is required.           |
+| Keyboard           | `hx-divider` is not interactive and does not receive keyboard focus. It carries no tab stop.                                                                                           |
+| WCAG 2.1 AA        | Verified with axe-core: zero violations across horizontal default, vertical, with label (slot), with label (attribute), and decorative variants.                                       |
+
+## Drupal Integration
+
+```twig
+{# Horizontal separator between content sections #}
+<hx-divider spacing="{{ spacing|default('md') }}"></hx-divider>
+
+{# Section divider with label from a Drupal field #}
+<hx-divider label="{{ section_title|t }}">{{ section_title|t }}</hx-divider>
+
+{# Decorative separator — no screen reader announcement #}
+<hx-divider decorative></hx-divider>
+
+{# Vertical separator in an inline metadata bar #}
+<div style="display: flex; align-items: center; height: 2rem;">
+  <span>{{ patient.name }}</span>
+  <hx-divider orientation="vertical" spacing="sm" decorative></hx-divider>
+  <span>{{ patient.mrn }}</span>
+</div>
+```
+
+Load the library in your module's `.libraries.yml`:
+
+```yaml
+helix-components:
+  js:
+    /libraries/helix/helix.min.js: { minified: true }
+```
+
+## Standalone HTML Example
+
+Copy-paste into a `.html` file and open in any browser — no build tool required:
+
+```html
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>hx-divider example</title>
+    <script
+      type="module"
+      src="https://cdn.jsdelivr.net/npm/@helix/library/dist/helix.min.js"
+    ></script>
+    <style>
+      body {
+        font-family: sans-serif;
+        padding: 2rem;
+        max-width: 600px;
+      }
+      .meta-bar {
+        display: flex;
+        align-items: center;
+        padding: 0.75rem 1rem;
+        background: #f9fafb;
+        border: 1px solid #e5e7eb;
+        border-radius: 0.5rem;
+        font-size: 0.875rem;
+        color: #374151;
+        gap: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Horizontal default -->
+    <p>Patient demographics</p>
+    <hx-divider></hx-divider>
+    <p>Vitals summary</p>
+
+    <!-- With centered label -->
+    <p>Prior authorization requests</p>
+    <hx-divider>Or continue without authorization</hx-divider>
+    <p>Emergency access bypass</p>
+
+    <!-- Spacing variants -->
+    <hx-divider spacing="none"></hx-divider>
+    <hx-divider spacing="sm"></hx-divider>
+    <hx-divider spacing="md"></hx-divider>
+    <hx-divider spacing="lg"></hx-divider>
+
+    <!-- Decorative -->
+    <p>Visual only — screen readers skip this line</p>
+    <hx-divider decorative></hx-divider>
+    <p>Content continues</p>
+
+    <!-- Vertical in a flex row -->
+    <div class="meta-bar">
+      <span>Jane Doe</span>
+      <hx-divider orientation="vertical" spacing="sm"></hx-divider>
+      <span>Age: 44</span>
+      <hx-divider orientation="vertical" spacing="sm"></hx-divider>
+      <span>Room 214-B</span>
+    </div>
+  </body>
+</html>
+```
 
 ## API Reference
 
