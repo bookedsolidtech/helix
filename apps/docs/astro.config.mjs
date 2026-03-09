@@ -1,11 +1,23 @@
 // @ts-check
 import { defineConfig } from 'astro/config';
 import starlight from '@astrojs/starlight';
+import { fileURLToPath } from 'node:url';
+import path from 'node:path';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 // https://astro.build/config
 export default defineConfig({
   site: 'https://wc-2026.dev',
   vite: {
+    resolve: {
+      alias: {
+        '@helix/library/components/': path.resolve(
+          __dirname,
+          '../../packages/hx-library/dist/components/',
+        ),
+      },
+    },
     optimizeDeps: {
       include: [
         'lit',

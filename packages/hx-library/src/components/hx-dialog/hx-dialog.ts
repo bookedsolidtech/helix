@@ -80,7 +80,7 @@ export class HelixDialog extends LitElement {
   // ─── Queries ───
 
   @query('dialog')
-  declare private _dialogEl: HTMLDialogElement | null;
+  private _dialogEl!: HTMLDialogElement | null;
 
   // ─── Internal state ───
 
