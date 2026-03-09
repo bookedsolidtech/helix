@@ -31,7 +31,7 @@ export const helixToastStyles = css`
       0 2px 4px -2px rgb(0 0 0 / 0.1)
     );
     opacity: 0;
-    transform: translateY(var(--hx-space-2, 0.5rem));
+    transform: translateY(var(--hx-toast-enter-translate, var(--hx-space-2, 0.5rem)));
     transition:
       opacity var(--hx-transition-normal, 250ms ease),
       transform var(--hx-transition-normal, 250ms ease);
@@ -174,8 +174,7 @@ export const helixToastStackStyles = css`
     bottom: auto;
   }
 
-  :host([placement='bottom-start']),
-  :host(:not([placement])) {
+  :host([placement='bottom-start']) {
     bottom: 0;
     left: 0;
     right: auto;
@@ -199,8 +198,13 @@ export const helixToastStackStyles = css`
 
   /* ─── Bottom placements: reverse order so newest is on top ─── */
 
-  :host([placement^='bottom']) .toast-stack,
-  :host(:not([placement])) .toast-stack {
+  :host([placement^='bottom']) .toast-stack {
     flex-direction: column-reverse;
+  }
+
+  /* ─── Slide direction by placement ─── */
+
+  :host([placement^='top']) ::slotted(hx-toast) {
+    --hx-toast-enter-translate: calc(var(--hx-space-2, 0.5rem) * -1);
   }
 `;
