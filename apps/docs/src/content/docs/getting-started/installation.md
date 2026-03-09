@@ -13,7 +13,7 @@ description: How to install and set up the HELIX enterprise web component librar
 
 ```bash
 # Clone the repository
-git clone https://github.com/himerus/helix.git
+git clone https://github.com/bookedsolidtech/helix.git
 cd helix
 
 # Use the correct Node version
