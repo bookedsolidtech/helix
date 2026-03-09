@@ -25,13 +25,13 @@ import ComponentDoc from '../../../components/ComponentDoc.astro';
 A combobox with a label and a list of options.
 
 <ComponentDemo title="Basic">
-  <hx-combobox label="Country" placeholder="Search countries...">
-    <option value="us">United States</option>
-    <option value="ca">Canada</option>
-    <option value="gb">United Kingdom</option>
-    <option value="au">Australia</option>
-    <option value="de">Germany</option>
-    <option value="fr">France</option>
+  <hx-combobox label="Department" name="department" placeholder="Search departments...">
+    <option value="cardiology">Cardiology</option>
+    <option value="neurology">Neurology</option>
+    <option value="oncology">Oncology</option>
+    <option value="pediatrics">Pediatrics</option>
+    <option value="radiology">Radiology</option>
+    <option value="surgery">Surgery</option>
   </hx-combobox>
 </ComponentDemo>
 
@@ -230,22 +230,22 @@ import '@helix/library/components/hx-combobox';
 
 ## Accessibility
 
-| Topic                   | Details                                                                                         |
-| ----------------------- | ----------------------------------------------------------------------------------------------- |
-| ARIA role               | Input uses `role="combobox"`; listbox uses `role="listbox"`; each option uses `role="option"`.  |
-| `aria-expanded`         | Set to `true`/`false` on the input to reflect listbox open/closed state.                        |
-| `aria-autocomplete`     | Set to `list` — indicates the listbox filters based on user input.                              |
-| `aria-controls`         | Points to the listbox element ID for screen reader association.                                 |
-| `aria-activedescendant` | Updated to the focused option ID as the user navigates the list.                                |
-| `aria-labelledby`       | Points to the visible label element ID (C-PATTERN-04 compliant — not `label[for]`).             |
-| `aria-label`            | Set via the `aria-label` attribute when no visible label is used.                               |
-| `aria-invalid`          | Set to `true` when `error` is set.                                                              |
-| `aria-required`         | Set to `true` when `required` is set.                                                           |
-| `aria-busy`             | Set to `true` when `loading` is active.                                                         |
-| `aria-describedby`      | Links to help text and error message elements.                                                  |
-| Keyboard                | `↓`/`↑` navigate options; `Enter` selects; `Escape` closes; `Tab` moves focus out.              |
-| Screen reader           | Option selection and listbox open/close are announced via ARIA live regions and role semantics. |
-| Focus management        | Focus stays on the input; active option is tracked via `aria-activedescendant`.                 |
+| Topic                   | Details                                                                                                                                                   |
+| ----------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| ARIA role               | Input uses `role="combobox"`; listbox uses `role="listbox"`; each option uses `role="option"`.                                                            |
+| `aria-expanded`         | Set to `true`/`false` on the input to reflect listbox open/closed state.                                                                                  |
+| `aria-autocomplete`     | Set to `list` — indicates the listbox filters based on user input.                                                                                        |
+| `aria-controls`         | Points to the listbox element ID for screen reader association.                                                                                           |
+| `aria-activedescendant` | Updated to the focused option ID as the user navigates the list.                                                                                          |
+| `aria-labelledby`       | Points to the visible label element ID (C-PATTERN-04 compliant — not `label[for]`).                                                                       |
+| `aria-label`            | Set via the `ariaLabel` property (reflects as `aria-label`). Mutually exclusive with `aria-labelledby` — takes precedence when set to a non-empty string. |
+| `aria-invalid`          | Set to `true` when `error` is set.                                                                                                                        |
+| `aria-required`         | Set to `true` when `required` is set.                                                                                                                     |
+| `aria-busy`             | Set to `true` when `loading` is active.                                                                                                                   |
+| `aria-describedby`      | Links to help text and error message elements.                                                                                                            |
+| Keyboard                | `↓`/`↑` navigate options; `Enter` selects; `Escape` closes; `Tab` moves focus out.                                                                        |
+| Screen reader           | Option selection and listbox open/close are announced via ARIA live regions and role semantics.                                                           |
+| Focus management        | Focus stays on the input; active option is tracked via `aria-activedescendant`.                                                                           |
 
 ## Drupal Integration
 

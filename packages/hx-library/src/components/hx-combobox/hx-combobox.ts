@@ -701,7 +701,7 @@ export class HelixCombobox extends LitElement {
             aria-invalid=${hasError ? 'true' : nothing}
             aria-describedby=${ifDefined(describedBy)}
             aria-required=${this.required ? 'true' : nothing}
-            aria-label=${ifDefined(this.ariaLabel ?? undefined)}
+            aria-label=${ifDefined(this.ariaLabel || undefined)}
             aria-labelledby=${ifDefined(this.label && !this.ariaLabel ? this._labelId : undefined)}
             aria-busy=${this.loading ? 'true' : nothing}
             .value=${this._filterText || (this._open ? '' : this._displayValue)}
