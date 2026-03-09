@@ -172,7 +172,7 @@ The `swatches` property is a JavaScript array and cannot be serialized as an HTM
 // my-theme/js/color-picker-behavior.js
 Drupal.behaviors.helixColorPicker = {
   attach(context) {
-    context.querySelectorAll('hx-color-picker[data-swatches]').forEach((el) => {
+    once('helixColorPicker', 'hx-color-picker[data-swatches]', context).forEach((el) => {
       el.swatches = JSON.parse(el.dataset.swatches);
     });
   },
@@ -210,10 +210,8 @@ Copy-paste this into a `.html` file and open it in a browser — no build tool n
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>hx-color-picker example</title>
-    <script
-      type="module"
-      src="https://cdn.jsdelivr.net/npm/@helix/library/dist/helix.min.js"
-    ></script>
+    <!-- @helix/library is a private package — install via npm workspace, not CDN -->
+    <!-- In your project: import '@helix/library'; in your bundler entry point -->
   </head>
   <body
     style="font-family: sans-serif; padding: 2rem; display: flex; gap: 2rem; flex-wrap: wrap; align-items: flex-start;"

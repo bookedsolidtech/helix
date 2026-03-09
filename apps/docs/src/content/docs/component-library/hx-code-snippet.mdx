@@ -202,7 +202,7 @@ Listen for the `hx-copy` event in Drupal behaviors:
 ```javascript
 Drupal.behaviors.myCodeSnippet = {
   attach(context) {
-    context.querySelectorAll('hx-code-snippet').forEach((el) => {
+    once('myCodeSnippet', 'hx-code-snippet', context).forEach((el) => {
       el.addEventListener('hx-copy', (e) => {
         console.log('Copied:', e.detail.text);
       });
@@ -225,10 +225,8 @@ Copy-paste into a `.html` file and open in any browser — no build tool require
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>hx-code-snippet example</title>
-    <script
-      type="module"
-      src="https://cdn.jsdelivr.net/npm/@helix/library/dist/helix.min.js"
-    ></script>
+    <!-- @helix/library is a private package — install via npm workspace, not CDN -->
+    <!-- In your project: import '@helix/library'; in your bundler entry point -->
   </head>
   <body
     style="font-family: sans-serif; padding: 2rem; display: grid; gap: 1.5rem; max-width: 720px;"
