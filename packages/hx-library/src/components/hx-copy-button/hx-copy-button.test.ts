@@ -345,7 +345,9 @@ describe('hx-copy-button', () => {
       // Focus the button and dispatch a real Enter keydown event. Native
       // <button> elements activate on Enter (fires click internally).
       btn!.focus();
-      btn!.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true, cancelable: true }));
+      btn!.dispatchEvent(
+        new KeyboardEvent('keydown', { key: 'Enter', bubbles: true, cancelable: true }),
+      );
       // Native button keydown → click activation fires synchronously; our
       // async _performCopy follows. Trigger click to simulate full native flow.
       btn!.click();
@@ -363,7 +365,9 @@ describe('hx-copy-button', () => {
       // Focus the button and dispatch real Space keyup event. Native <button>
       // elements activate on Space keyup (fires click internally).
       btn!.focus();
-      btn!.dispatchEvent(new KeyboardEvent('keydown', { key: ' ', bubbles: true, cancelable: true }));
+      btn!.dispatchEvent(
+        new KeyboardEvent('keydown', { key: ' ', bubbles: true, cancelable: true }),
+      );
       btn!.dispatchEvent(new KeyboardEvent('keyup', { key: ' ', bubbles: true, cancelable: true }));
       // Simulate click as native button would after keyup.
       btn!.click();

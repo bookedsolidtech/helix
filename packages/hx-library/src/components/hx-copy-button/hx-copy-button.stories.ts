@@ -655,10 +655,9 @@ export const CopiedState: Story = {
         </svg>
       </hx-copy-button>
       <p style="margin-top: 0.75rem; font-size: 0.875rem; color: #6b7280;">
-        Programmatically triggered into the success state for design review and
-        visual regression testing. The button shows the success icon and the
-        <code>button--copied</code> CSS class for the full
-        <code>feedback-duration</code>.
+        Programmatically triggered into the success state for design review and visual regression
+        testing. The button shows the success icon and the
+        <code>button--copied</code> CSS class for the full <code>feedback-duration</code>.
       </p>
     </div>
   `,
