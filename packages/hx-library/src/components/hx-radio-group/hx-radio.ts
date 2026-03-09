@@ -28,12 +28,6 @@ import { helixRadioStyles } from './hx-radio.styles.js';
 export class HelixRadio extends LitElement {
   static override styles = [tokenStyles, helixRadioStyles];
 
-  constructor() {
-    super();
-    // Set role statically in constructor to eliminate the window before connectedCallback
-    this.setAttribute('role', 'radio');
-  }
-
   // ─── Properties ───
 
   /**
@@ -68,6 +62,7 @@ export class HelixRadio extends LitElement {
 
   override connectedCallback(): void {
     super.connectedCallback();
+    this.setAttribute('role', 'radio');
     this.setAttribute('aria-checked', String(this.checked));
     this.setAttribute('aria-disabled', String(this.disabled));
   }
