@@ -104,14 +104,23 @@ The `accent` attribute replaces the full border with a left-side accent stripe â
 
 ### Without Icon
 
-Set `show-icon` to false (absent attribute or `el.showIcon = false`) to hide the icon container.
+The `showIcon` property defaults to `true`. To hide the icon, set the property on the element instance via JavaScript:
 
-<ComponentDemo title="No Icon">
-  <div style="display: grid; gap: 0.75rem;">
-    <hx-alert variant="info">Standard alert with icon (default).</hx-alert>
-    <hx-alert variant="info" .showIcon=${false}>Alert with icon hidden.</hx-alert>
-  </div>
-</ComponentDemo>
+```javascript
+const alert = document.querySelector('hx-alert');
+alert.showIcon = false;
+```
+
+Or use the HTML attribute `show-icon` (without a value, following boolean attribute semantics):
+
+```html
+<hx-alert variant="info">Standard alert with icon (default).</hx-alert>
+<hx-alert variant="info" show-icon
+  >Alert with icon hidden (attribute present but false by default).</hx-alert
+>
+```
+
+Note: The HTML attribute `show-icon` presence-based, not value-based. `show-icon="false"` still renders the icon because the attribute is present.
 
 ## Installation
 
@@ -296,7 +305,7 @@ Override at the semantic level to retheme all alerts at once:
   variant="{{ variant|default('info') }}"
   {% if dismissible %}dismissible{% endif %}
   {% if accent %}accent{% endif %}
-  {% if not open %}open="false"{% endif %}
+  {% if open %}open{% endif %}
   {% if return_focus_to %}return-focus-to="{{ return_focus_to }}"{% endif %}
 >
   {% if title %}
@@ -351,7 +360,7 @@ Copy-paste into a `.html` file and open in any browser â€” no build tool require
       </hx-alert>
 
       <hx-alert variant="success">
-        Appointment confirmed for Monday, March 10 at 9:00 AM.
+        Appointment confirmed for Tuesday, March 10 at 9:00 AM.
       </hx-alert>
 
       <hx-alert variant="warning" dismissible id="session-warning" return-focus-to="#extend-btn">
