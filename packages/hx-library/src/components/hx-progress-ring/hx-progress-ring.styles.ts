@@ -72,6 +72,13 @@ export const helixProgressRingStyles = css`
     }
   }
 
+  /*
+   * Indeterminate spinner keyframes — values are tuned for default strokeWidth=4
+   * (radius ≈ 48, circumference ≈ 301). The gap value 200 is intentionally smaller
+   * than the full circumference; the repeating pattern is a standard CSS spinner
+   * technique that produces an arc of ~35% coverage. At non-default strokeWidths
+   * the arc coverage will vary slightly but remains visually acceptable.
+   */
   @keyframes hx-progress-ring-dash {
     0% {
       stroke-dasharray: 1, 200;
