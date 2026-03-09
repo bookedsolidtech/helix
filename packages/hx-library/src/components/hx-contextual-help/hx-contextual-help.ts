@@ -47,13 +47,13 @@ export class HelixContextualHelp extends LitElement {
   // ─── Queries ───
 
   @query('.trigger')
-  declare private _triggerEl: HTMLButtonElement | null;
+  private _triggerEl!: HTMLButtonElement | null;
 
   @query('.popover')
-  declare private _popoverEl: HTMLElement | null;
+  private _popoverEl!: HTMLElement | null;
 
   @query('.popover__close')
-  declare private _closeEl: HTMLButtonElement | null;
+  private _closeEl!: HTMLButtonElement | null;
 
   // ─── Internal state ───
 

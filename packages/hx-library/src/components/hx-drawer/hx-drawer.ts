@@ -72,13 +72,13 @@ export class HelixDrawer extends LitElement {
   // ─── Queries ───
 
   @query('.drawer-overlay')
-  declare private _overlayEl: HTMLElement | null;
+  private _overlayEl!: HTMLElement | null;
 
   @query('.drawer-panel')
-  declare private _panelEl: HTMLElement | null;
+  private _panelEl!: HTMLElement | null;
 
   @query('.drawer-close-button')
-  declare private _closeButtonEl: HTMLButtonElement | null;
+  private _closeButtonEl!: HTMLButtonElement | null;
 
   // ─── Internal state ───
 
