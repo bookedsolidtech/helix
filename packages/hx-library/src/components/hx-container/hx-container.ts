@@ -78,5 +78,3 @@ declare global {
     'hx-container': HelixContainer;
   }
 }
-
-export type WcContainer = HelixContainer;
