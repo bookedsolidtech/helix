@@ -1,0 +1,53 @@
+{
+  "category": "Uncategorized",
+  "description": "Resolve all defects found in the Deep Audit v2 for `hx-split-panel`.\nSource: `packages/hx-library/src/components/hx-split-panel/AUDIT.md`\n\n**Summary:** 19 defects — 1 P0, 7 P1, 11 P2, 0 P3\n\n### P0 — Critical\n- [ ] [P0] 01: Test coverage below 80% threshold\n\nReference the AUDIT.md in the component directory for full details and code locations.",
+  "title": "Audit Fix: hx-split-panel",
+  "status": "in_progress",
+  "complexity": "medium",
+  "priority": 3,
+  "source": "api",
+  "trustTier": 1,
+  "quarantineStatus": "passed",
+  "quarantineId": "1758fcbe-10e7-41f1-9d29-81832f4a2308",
+  "id": "feature-1772853776422-wsm38anjk",
+  "branchName": "feature/audit-fix-hx-split-panel",
+  "descriptionHistory": [
+    {
+      "description": "Resolve all defects found in the Deep Audit v2 for `hx-split-panel`.\nSource: `packages/hx-library/src/components/hx-split-panel/AUDIT.md`\n\n**Summary:** 19 defects — 1 P0, 7 P1, 11 P2, 0 P3\n\n### P0 — Critical\n- [ ] [P0] 01: Test coverage below 80% threshold\n\nReference the AUDIT.md in the component directory for full details and code locations.",
+      "timestamp": "2026-03-07T03:22:56.422Z",
+      "source": "initial"
+    }
+  ],
+  "createdAt": "2026-03-07T03:22:56.422Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-03-07T03:22:56.422Z",
+      "reason": "Feature created"
+    },
+    {
+      "from": "backlog",
+      "to": "in_progress",
+      "timestamp": "2026-03-07T09:53:19.015Z"
+    }
+  ],
+  "featureType": "code",
+  "model": "claude-sonnet-4-6",
+  "updatedAt": "2026-03-07T11:58:01.402Z",
+  "costUsd": 56.31532575,
+  "lastSessionId": "0129b648-c29c-467d-94a9-3499f46498e3",
+  "executionHistory": [
+    {
+      "id": "47d6fe06-a414-4ec7-b566-9483faea2c1e",
+      "startedAt": "2026-03-07T09:53:19.351Z",
+      "completedAt": "2026-03-07T11:57:54.833Z",
+      "durationMs": 7475482,
+      "costUsd": 55.62509275,
+      "model": "claude-sonnet-4-6",
+      "success": false,
+      "error": "Agent loop detected (TaskOutput:557c6212). Aborting for retry with recovery guidance.",
+      "trigger": "manual"
+    }
+  ]
+}
