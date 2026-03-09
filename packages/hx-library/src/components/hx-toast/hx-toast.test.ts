@@ -308,9 +308,7 @@ describe('hx-toast', () => {
     });
 
     it('icon slot accepts content', async () => {
-      const el = await fixture<HelixToast>(
-        '<hx-toast><span slot="icon">★</span>Test</hx-toast>',
-      );
+      const el = await fixture<HelixToast>('<hx-toast><span slot="icon">★</span>Test</hx-toast>');
       const icon = el.querySelector('[slot="icon"]');
       expect(icon).toBeTruthy();
     });

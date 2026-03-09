@@ -60,7 +60,9 @@ describe('hx-side-nav', () => {
     });
 
     it('sets aria-label on nav element', async () => {
-      const el = await fixture<WcSideNav>('<hx-side-nav label="Clinical Portal Nav"></hx-side-nav>');
+      const el = await fixture<WcSideNav>(
+        '<hx-side-nav label="Clinical Portal Nav"></hx-side-nav>',
+      );
       const nav = shadowQuery<HTMLElement>(el, 'nav');
       expect(nav?.getAttribute('aria-label')).toBe('Clinical Portal Nav');
     });
@@ -387,9 +389,7 @@ describe('hx-side-nav', () => {
     });
 
     it('has no axe violations in default state', async () => {
-      const el = await fixture<WcSideNav>(
-        '<hx-side-nav label="Main Navigation"></hx-side-nav>',
-      );
+      const el = await fixture<WcSideNav>('<hx-side-nav label="Main Navigation"></hx-side-nav>');
       const { violations } = await checkA11y(el);
       expect(violations).toHaveLength(0);
     });
