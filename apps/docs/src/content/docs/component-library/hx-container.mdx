@@ -129,16 +129,18 @@ Use `--hx-container-bg` to apply a full-bleed background while the inner content
 Install the full library or import the component individually:
 
 ```bash
-# Full library
 npm install @helix/library
+```
 
-# Or import only this component (tree-shaking friendly)
+Then register the component:
+
+```ts
 import '@helix/library/components/hx-container';
 ```
 
 ## Basic Usage
 
-Minimal component markup (requires the library to be loaded):
+After registering the component (via the import above or the CDN script below), use it in your HTML:
 
 ```html
 <hx-container>
@@ -216,7 +218,7 @@ Load the library in your module's `.libraries.yml`:
 ```yaml
 helix-components:
   js:
-    /libraries/helix/helix.min.js: { minified: true }
+    /libraries/helix/dist/index.js: {}
 ```
 
 Example usage from a Drupal paragraph template for a hero section:
