@@ -1,6 +1,7 @@
 import { LitElement, html, nothing } from 'lit';
 import { customElement, property, query, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
+import { ifDefined } from 'lit/directives/if-defined.js';
 import { tokenStyles } from '@helix/tokens/lit';
 import { helixDrawerStyles } from './hx-drawer.styles.js';
 
@@ -53,6 +54,8 @@ const FOCUSABLE_SELECTORS = [
  * @csspart body - The scrollable body region.
  * @csspart footer - The footer region.
  *
+ * @attr [label] - Accessible label for the dialog when no visible label slot is provided.
+ *
  * @cssprop [--hx-drawer-bg=var(--hx-color-neutral-0)] - Drawer panel background color.
  * @cssprop [--hx-drawer-color=var(--hx-color-neutral-900)] - Drawer panel text color.
  * @cssprop [--hx-drawer-shadow=var(--hx-shadow-xl)] - Drawer panel box shadow.
@@ -77,9 +80,6 @@ export class HelixDrawer extends LitElement {
   @query('.drawer-panel')
   private _panelEl!: HTMLElement | null;
 
-  @query('.drawer-close-button')
-  private _closeButtonEl!: HTMLButtonElement | null;
-
   // ─── Internal state ───
 
   @state()
@@ -98,6 +98,7 @@ export class HelixDrawer extends LitElement {
   private _triggerElement: HTMLElement | null = null;
   private _animationTimeout: ReturnType<typeof setTimeout> | null = null;
   private _previousBodyOverflow: string | null = null;
+  private _siblingAriaHiddenElements: Element[] = [];
 
   private readonly _titleId = `hx-drawer-title-${Math.random().toString(36).slice(2, 9)}`;
 
@@ -146,13 +147,15 @@ export class HelixDrawer extends LitElement {
   @property({ type: Boolean, reflect: true, attribute: 'no-footer' })
   noFooter = false;
 
-  // ─── Lifecycle ───
+  /**
+   * Accessible label for the dialog when the `label` slot is not populated.
+   * When the `label` slot is used, `aria-labelledby` takes precedence.
+   * @attr label
+   */
+  @property({ type: String })
+  label = '';
 
-  override firstUpdated(): void {
-    this._hasHeaderActionsSlot = this.querySelector('[slot="header-actions"]') !== null;
-    this._hasFooterSlot = this.querySelector('[slot="footer"]') !== null;
-    this._hasLabelSlot = this.querySelector('[slot="label"]') !== null;
-  }
+  // ─── Lifecycle ───
 
   override disconnectedCallback(): void {
     super.disconnectedCallback();
@@ -213,22 +216,33 @@ export class HelixDrawer extends LitElement {
   }
 
   private _openDrawer(): void {
-    // Capture trigger for focus restoration
-    this._triggerElement = document.activeElement as HTMLElement | null;
+    // Capture trigger for focus restoration (P2-04: use instanceof guard)
+    const active = document.activeElement;
+    this._triggerElement = active instanceof HTMLElement ? active : null;
+
+    // P1-05: clear any pending animation timeout before scheduling a new one
+    if (this._animationTimeout !== null) {
+      clearTimeout(this._animationTimeout);
+      this._animationTimeout = null;
+    }
 
     this._applySizeVar();
     this._lockBodyScroll();
+    this._hideBackgroundFromScreenReaders();
 
     // Dispatch hx-show before visual update
     this.dispatchEvent(new CustomEvent('hx-show', { bubbles: true, composed: true }));
 
     // Transition to open state
-    void this.updateComplete.then(() => {
-      this._isOpen = true;
-      this._addListeners();
+    void this.updateComplete
+      .then(() => {
+        this._isOpen = true;
+        this._addListeners();
 
-      // Set initial focus after next render
-      void this.updateComplete.then(() => {
+        // Set initial focus after next render
+        return this.updateComplete;
+      })
+      .then(() => {
         this._cachedFocusableElements = this._getFocusableElements();
         this._setInitialFocus();
 
@@ -237,15 +251,22 @@ export class HelixDrawer extends LitElement {
         this._animationTimeout = setTimeout(() => {
           this.dispatchEvent(new CustomEvent('hx-after-show', { bubbles: true, composed: true }));
         }, duration);
-      });
-    });
+      })
+      .catch(console.error);
   }
 
   private _closeDrawer(): void {
+    // P1-05: clear any pending animation timeout before scheduling a new one
+    if (this._animationTimeout !== null) {
+      clearTimeout(this._animationTimeout);
+      this._animationTimeout = null;
+    }
+
     this._isOpen = false;
     this._removeListeners();
     this._cachedFocusableElements = [];
     this._restoreBodyScroll();
+    this._restoreBackgroundForScreenReaders();
 
     this.dispatchEvent(new CustomEvent('hx-hide', { bubbles: true, composed: true }));
 
@@ -265,15 +286,34 @@ export class HelixDrawer extends LitElement {
     return 300;
   }
 
-  // ─── Event Listeners ───
+  // ─── Background aria-hidden management (P1-03) ───
+
+  private _hideBackgroundFromScreenReaders(): void {
+    if (this.contained) return;
+    this._siblingAriaHiddenElements = [];
+    Array.from(document.body.children).forEach((child) => {
+      if (child === this || child.contains(this)) return;
+      if (!child.hasAttribute('aria-hidden')) {
+        child.setAttribute('aria-hidden', 'true');
+        this._siblingAriaHiddenElements.push(child);
+      }
+    });
+  }
+
+  private _restoreBackgroundForScreenReaders(): void {
+    this._siblingAriaHiddenElements.forEach((el) => {
+      el.removeAttribute('aria-hidden');
+    });
+    this._siblingAriaHiddenElements = [];
+  }
+
+  // ─── Event Listeners (P1-01: use only document listener, not overlay) ───
 
   private _addListeners(): void {
-    this._overlayEl?.addEventListener('keydown', this._handleKeyDown);
     document.addEventListener('keydown', this._handleKeyDown);
   }
 
   private _removeListeners(): void {
-    this._overlayEl?.removeEventListener('keydown', this._handleKeyDown);
     document.removeEventListener('keydown', this._handleKeyDown);
   }
 
@@ -355,8 +395,9 @@ export class HelixDrawer extends LitElement {
 
     if (!first || !last) return;
 
-    const shadowActive = this.shadowRoot?.activeElement;
-    const active = (shadowActive ?? document.activeElement) as HTMLElement | null;
+    // P1-02: Use document.activeElement for reliable detection of slotted (light DOM) elements.
+    // shadowRoot.activeElement returns the <slot> host for slotted content, not the actual element.
+    const active = document.activeElement as HTMLElement | null;
 
     if (e.shiftKey) {
       if (active === first) {
@@ -466,13 +507,19 @@ export class HelixDrawer extends LitElement {
       'is-open': this._isOpen,
     };
 
+    // P1-06: ensure the dialog always has an accessible name.
+    // Priority: aria-labelledby (slot) > aria-label (prop) > aria-label (fallback "Drawer")
+    const ariaLabelledby = this._hasLabelSlot ? this._titleId : undefined;
+    const ariaLabel = !this._hasLabelSlot ? this.label || 'Drawer' : undefined;
+
     return html`
       <div
         part="overlay"
         class=${classMap(overlayClasses)}
         role="dialog"
         aria-modal="true"
-        aria-labelledby=${this._hasLabelSlot ? this._titleId : nothing}
+        aria-labelledby=${ifDefined(ariaLabelledby)}
+        aria-label=${ifDefined(ariaLabel)}
         tabindex="-1"
         @click=${this._handleOverlayClick}
       >
