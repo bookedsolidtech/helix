@@ -135,7 +135,7 @@ export class HelixAlert extends LitElement {
 
   override firstUpdated(): void {
     // Track actions slot content to avoid invisible spacing when no actions are slotted.
-    const actionsSlot = this.shadowRoot!.querySelector<HTMLSlotElement>('slot[name="actions"]');
+    const actionsSlot = this.renderRoot.querySelector<HTMLSlotElement>('slot[name="actions"]');
     if (actionsSlot) {
       actionsSlot.addEventListener('slotchange', () => {
         this._hasActions = actionsSlot.assignedNodes({ flatten: true }).length > 0;
@@ -143,7 +143,7 @@ export class HelixAlert extends LitElement {
     }
 
     // Track title slot content so the title container doesn't create dead space when empty.
-    const titleSlot = this.shadowRoot!.querySelector<HTMLSlotElement>('slot[name="title"]');
+    const titleSlot = this.renderRoot.querySelector<HTMLSlotElement>('slot[name="title"]');
     if (titleSlot) {
       titleSlot.addEventListener('slotchange', () => {
         this._hasTitle = titleSlot.assignedNodes({ flatten: true }).length > 0;
