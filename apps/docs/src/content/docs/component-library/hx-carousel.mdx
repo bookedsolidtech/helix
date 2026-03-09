@@ -103,24 +103,29 @@ With `autoplay`, slides advance automatically. A play/pause toggle is shown. Aut
 Use `slides-per-page` to show multiple slides simultaneously.
 
 <ComponentDemo title="Multiple Slides Per Page">
-  <hx-carousel label="Multi-slide carousel" slides-per-page="2" loop style="max-width: 600px;">
+  <hx-carousel
+    label="Multi-slide carousel"
+    slides-per-page="2"
+    loop
+    style="max-width: 600px; --hx-carousel-gap: 0.5rem;"
+  >
     <hx-carousel-item>
-      <div style="background: var(--hx-color-primary-100, #dbeafe); padding: 2rem; border-radius: 0.5rem; text-align: center; margin: 0 0.25rem;">
+      <div style="background: var(--hx-color-primary-100, #dbeafe); padding: 2rem; border-radius: 0.5rem; text-align: center;">
         Slide 1
       </div>
     </hx-carousel-item>
     <hx-carousel-item>
-      <div style="background: var(--hx-color-success-100, #dcfce7); padding: 2rem; border-radius: 0.5rem; text-align: center; margin: 0 0.25rem;">
+      <div style="background: var(--hx-color-success-100, #dcfce7); padding: 2rem; border-radius: 0.5rem; text-align: center;">
         Slide 2
       </div>
     </hx-carousel-item>
     <hx-carousel-item>
-      <div style="background: var(--hx-color-warning-100, #fef9c3); padding: 2rem; border-radius: 0.5rem; text-align: center; margin: 0 0.25rem;">
+      <div style="background: var(--hx-color-warning-100, #fef9c3); padding: 2rem; border-radius: 0.5rem; text-align: center;">
         Slide 3
       </div>
     </hx-carousel-item>
     <hx-carousel-item>
-      <div style="background: var(--hx-color-danger-100, #fee2e2); padding: 2rem; border-radius: 0.5rem; text-align: center; margin: 0 0.25rem;">
+      <div style="background: var(--hx-color-danger-100, #fee2e2); padding: 2rem; border-radius: 0.5rem; text-align: center;">
         Slide 4
       </div>
     </hx-carousel-item>
