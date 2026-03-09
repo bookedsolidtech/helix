@@ -129,6 +129,7 @@ export class HelixFileUpload extends LitElement {
   private readonly _labelId = `hx-file-upload-label-${Math.random().toString(36).slice(2, 9)}`;
   private readonly _errorId = `hx-file-upload-error-${Math.random().toString(36).slice(2, 9)}`;
   private readonly _dropzoneId = `hx-file-upload-dropzone-${Math.random().toString(36).slice(2, 9)}`;
+  private readonly _liveId = `hx-file-upload-live-${Math.random().toString(36).slice(2, 9)}`;
 
   // ─── Slot Handling ───
 
@@ -569,6 +570,10 @@ export class HelixFileUpload extends LitElement {
               </div>
             `
           : nothing}
+
+        <div id=${this._liveId} class="sr-only" aria-live="assertive" aria-atomic="true">
+          ${this._dragOver ? 'File detected. Release to upload.' : ''}
+        </div>
       </div>
     `;
   }
