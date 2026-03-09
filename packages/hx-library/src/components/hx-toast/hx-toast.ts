@@ -76,21 +76,36 @@ export class HelixToast extends LitElement {
   @property({ type: Boolean, reflect: true })
   open = false;
 
+  /**
+   * Accessible label for the close button. Override for localization.
+   * @attr close-label
+   */
+  @property({ attribute: 'close-label' })
+  closeLabel = 'Dismiss notification';
+
   // ─── Private State ───
 
   /** @internal */
   private _timer: ReturnType<typeof setTimeout> | null = null;
+
+  /** @internal */
+  private _timerStartedAt: number | null = null;
+
+  /** @internal */
+  private _timerRemaining: number | null = null;
 
   // ─── Lifecycle ───
 
   override updated(changedProperties: Map<PropertyKey, unknown>): void {
     if (changedProperties.has('open')) {
       if (this.open) {
+        this.removeAttribute('aria-hidden');
         this._emitShow();
         if (this.duration > 0) {
           this._startTimer();
         }
       } else {
+        this.setAttribute('aria-hidden', 'true');
         this._clearTimer();
         this._emitHide();
       }
@@ -121,19 +136,42 @@ export class HelixToast extends LitElement {
   // ─── Private Helpers ───
 
   /** @internal */
-  private _startTimer(): void {
-    this._clearTimer();
+  private _startTimer(remaining?: number): void {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      return;
+    }
+    this._clearTimerHandle();
+    const delay = remaining ?? this.duration;
+    this._timerStartedAt = Date.now();
+    this._timerRemaining = delay;
     this._timer = setTimeout(() => {
       this.open = false;
-    }, this.duration);
+    }, delay);
   }
 
   /** @internal */
-  private _clearTimer(): void {
+  private _pauseTimer(): void {
+    if (this._timer === null || this._timerStartedAt === null || this._timerRemaining === null) {
+      return;
+    }
+    const elapsed = Date.now() - this._timerStartedAt;
+    this._timerRemaining = Math.max(0, this._timerRemaining - elapsed);
+    this._clearTimerHandle();
+  }
+
+  /** @internal */
+  private _clearTimerHandle(): void {
     if (this._timer !== null) {
       clearTimeout(this._timer);
       this._timer = null;
     }
+  }
+
+  /** @internal */
+  private _clearTimer(): void {
+    this._clearTimerHandle();
+    this._timerStartedAt = null;
+    this._timerRemaining = null;
   }
 
   /** @internal */
@@ -166,25 +204,25 @@ export class HelixToast extends LitElement {
 
   /** @internal */
   private _handleMouseEnter(): void {
-    this._clearTimer();
+    this._pauseTimer();
   }
 
   /** @internal */
   private _handleMouseLeave(): void {
     if (this.open && this.duration > 0) {
-      this._startTimer();
+      this._startTimer(this._timerRemaining ?? undefined);
     }
   }
 
   /** @internal */
   private _handleFocusIn(): void {
-    this._clearTimer();
+    this._pauseTimer();
   }
 
   /** @internal */
   private _handleFocusOut(): void {
     if (this.open && this.duration > 0) {
-      this._startTimer();
+      this._startTimer(this._timerRemaining ?? undefined);
     }
   }
 
@@ -217,6 +255,7 @@ export class HelixToast extends LitElement {
         })}
         role=${this._role}
         aria-live=${this._ariaLive}
+        aria-atomic="true"
         @mouseenter=${this._handleMouseEnter}
         @mouseleave=${this._handleMouseLeave}
         @focusin=${this._handleFocusIn}
@@ -236,7 +275,7 @@ export class HelixToast extends LitElement {
               <button
                 part="close-button"
                 class="toast__close"
-                aria-label="Dismiss notification"
+                aria-label=${this.closeLabel}
                 @click=${this._handleClose}
               >
                 <svg
