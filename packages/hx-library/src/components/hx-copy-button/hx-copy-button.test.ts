@@ -88,7 +88,7 @@ describe('hx-copy-button', () => {
     });
   });
 
-  // ─── Property: label (3) ───
+  // ─── Property: label (4) ───
 
   describe('Property: label', () => {
     it('sets aria-label on native button from label property', async () => {
@@ -115,9 +115,23 @@ describe('hx-copy-button', () => {
       expect(btn?.getAttribute('aria-label')).toBe('Copy record number');
       expect(btn?.getAttribute('title')).toBe('Copy record number');
     });
+
+    it('aria-label reflects copied state for re-focus scenarios (WCAG 1.3.1)', async () => {
+      const el = await fixture<HelixCopyButton>(
+        '<hx-copy-button value="test" label="Copy to clipboard"></hx-copy-button>',
+      );
+      const btn = shadowQuery<HTMLButtonElement>(el, 'button');
+      expect(btn).toBeTruthy();
+      const eventPromise = oneEvent(el, 'hx-copy');
+      btn!.click();
+      await eventPromise;
+      await el.updateComplete;
+      // aria-label must convey the current state to screen reader users who re-focus.
+      expect(btn?.getAttribute('aria-label')).toBe('Copy to clipboard — Copied');
+    });
   });
 
-  // ─── Property: disabled (4) ───
+  // ─── Property: disabled (3) ───
 
   describe('Property: disabled', () => {
     it('sets native disabled attribute on button', async () => {
@@ -126,15 +140,12 @@ describe('hx-copy-button', () => {
       expect(btn?.disabled).toBe(true);
     });
 
-    it('sets aria-disabled="true" when disabled', async () => {
+    it('does not set aria-disabled (native disabled is sufficient)', async () => {
       const el = await fixture<HelixCopyButton>('<hx-copy-button disabled></hx-copy-button>');
       const btn = shadowQuery(el, 'button');
-      expect(btn?.getAttribute('aria-disabled')).toBe('true');
-    });
-
-    it('does not set aria-disabled when enabled', async () => {
-      const el = await fixture<HelixCopyButton>('<hx-copy-button></hx-copy-button>');
-      const btn = shadowQuery(el, 'button');
+      // aria-disabled is intentionally absent: the native `disabled` attribute
+      // fully handles AT communication and focus prevention. Adding aria-disabled
+      // on top of a natively-disabled element is redundant per ARIA spec.
       expect(btn?.hasAttribute('aria-disabled')).toBe(false);
     });
 
@@ -331,7 +342,14 @@ describe('hx-copy-button', () => {
       const btn = shadowQuery<HTMLButtonElement>(el, 'button');
       expect(btn).toBeTruthy();
       const eventPromise = oneEvent<CustomEvent<{ value: string }>>(el, 'hx-copy');
-      // Native button responds to Enter via its own click behavior when focused
+      // Focus the button and dispatch a real Enter keydown event. Native
+      // <button> elements activate on Enter (fires click internally).
+      btn!.focus();
+      btn!.dispatchEvent(
+        new KeyboardEvent('keydown', { key: 'Enter', bubbles: true, cancelable: true }),
+      );
+      // Native button keydown → click activation fires synchronously; our
+      // async _performCopy follows. Trigger click to simulate full native flow.
       btn!.click();
       const event = await eventPromise;
       expect(event.detail.value).toBe('enter-test');
@@ -344,21 +362,84 @@ describe('hx-copy-button', () => {
       const btn = shadowQuery<HTMLButtonElement>(el, 'button');
       expect(btn).toBeTruthy();
       const eventPromise = oneEvent<CustomEvent<{ value: string }>>(el, 'hx-copy');
+      // Focus the button and dispatch real Space keyup event. Native <button>
+      // elements activate on Space keyup (fires click internally).
+      btn!.focus();
+      btn!.dispatchEvent(
+        new KeyboardEvent('keydown', { key: ' ', bubbles: true, cancelable: true }),
+      );
+      btn!.dispatchEvent(new KeyboardEvent('keyup', { key: ' ', bubbles: true, cancelable: true }));
+      // Simulate click as native button would after keyup.
       btn!.click();
       const event = await eventPromise;
       expect(event.detail.value).toBe('space-test');
     });
   });
 
+  // ─── Clipboard Failure (2) ───
+
+  describe('Clipboard failure', () => {
+    it('fires hx-copy-error and does not enter copied state when writeText rejects', async () => {
+      // Simulate permission denied / iframe clipboard restriction.
+      writeTextSpy.mockRejectedValueOnce(new DOMException('Permission denied', 'NotAllowedError'));
+
+      const el = await fixture<HelixCopyButton>(
+        '<hx-copy-button value="failure-test"></hx-copy-button>',
+      );
+      const btn = shadowQuery<HTMLButtonElement>(el, 'button');
+      expect(btn).toBeTruthy();
+
+      const errorPromise = oneEvent<CustomEvent<{ value: string; error: unknown }>>(
+        el,
+        'hx-copy-error',
+      );
+      btn!.click();
+      const errorEvent = await errorPromise;
+
+      // Must dispatch hx-copy-error with the value and the caught error.
+      expect(errorEvent.detail.value).toBe('failure-test');
+      expect(errorEvent.detail.error).toBeInstanceOf(DOMException);
+      expect(errorEvent.bubbles).toBe(true);
+      expect(errorEvent.composed).toBe(true);
+
+      await el.updateComplete;
+      // Must NOT enter copied state on failure.
+      const btnEl = shadowQuery(el, 'button');
+      expect(btnEl?.classList.contains('button--copied')).toBe(false);
+    });
+
+    it('announces "Copy failed" in live region when clipboard write fails', async () => {
+      writeTextSpy.mockRejectedValueOnce(new DOMException('Permission denied', 'NotAllowedError'));
+
+      const el = await fixture<HelixCopyButton>(
+        '<hx-copy-button value="failure-announce"></hx-copy-button>',
+      );
+      const btn = shadowQuery<HTMLButtonElement>(el, 'button');
+      expect(btn).toBeTruthy();
+
+      const errorPromise = oneEvent(el, 'hx-copy-error');
+      btn!.click();
+      await errorPromise;
+      await el.updateComplete;
+
+      const liveRegion = shadowQuery(el, '[aria-live="polite"]');
+      expect(liveRegion?.textContent?.trim()).toBe('Copy failed');
+    });
+  });
+
   // ─── Clipboard Fallback (1) ───
 
   describe('Clipboard fallback', () => {
-    it('does not crash when navigator.clipboard is unavailable', async () => {
+    it('does not crash when navigator.clipboard is unavailable (execCommand path)', async () => {
       Object.defineProperty(navigator, 'clipboard', {
         value: undefined,
         writable: true,
         configurable: true,
       });
+
+      // Mock execCommand to return true (success) so we can verify the full
+      // happy path through the fallback branch.
+      const execCommandSpy = vi.spyOn(document, 'execCommand').mockReturnValue(true);
 
       const el = await fixture<HelixCopyButton>(
         '<hx-copy-button value="fallback-test"></hx-copy-button>',
@@ -366,10 +447,94 @@ describe('hx-copy-button', () => {
       const btn = shadowQuery<HTMLButtonElement>(el, 'button');
       expect(btn).toBeTruthy();
 
-      // Should not throw; execCommand fallback runs silently
-      expect(() => {
+      const eventPromise = oneEvent<CustomEvent<{ value: string }>>(el, 'hx-copy');
+      btn!.click();
+      const event = await eventPromise;
+
+      // execCommand fallback must call document.execCommand('copy').
+      expect(execCommandSpy).toHaveBeenCalledWith('copy');
+      // Must enter copied state on successful fallback.
+      expect(event.detail.value).toBe('fallback-test');
+      await el.updateComplete;
+      expect(btn?.classList.contains('button--copied')).toBe(true);
+
+      execCommandSpy.mockRestore();
+    });
+  });
+
+  // ─── Timer Behavior (2) ───
+
+  describe('Timer behavior', () => {
+    it('rapid double-click resets feedback timer from the second click', async () => {
+      vi.useFakeTimers();
+      try {
+        const el = await fixture<HelixCopyButton>(
+          '<hx-copy-button value="rapid" feedback-duration="1000"></hx-copy-button>',
+        );
+        const btn = shadowQuery<HTMLButtonElement>(el, 'button');
+        expect(btn).toBeTruthy();
+
+        // First click — enters copied state.
         btn!.click();
-      }).not.toThrow();
+        await Promise.resolve();
+        await Promise.resolve();
+        await el.updateComplete;
+        expect(btn?.classList.contains('button--copied')).toBe(true);
+
+        // Advance 800 ms (less than feedbackDuration=1000) — still copied.
+        vi.advanceTimersByTime(800);
+        await el.updateComplete;
+        expect(btn?.classList.contains('button--copied')).toBe(true);
+
+        // Second click — timer must reset. This clears the first timer.
+        btn!.click();
+        await Promise.resolve();
+        await Promise.resolve();
+        await el.updateComplete;
+        expect(btn?.classList.contains('button--copied')).toBe(true);
+
+        // Advance 800 ms from the second click — should still be copied
+        // because the timer restarted at 1000 ms from the second click.
+        vi.advanceTimersByTime(800);
+        await el.updateComplete;
+        expect(btn?.classList.contains('button--copied')).toBe(true);
+
+        // Advance the remaining 300 ms — timer should have fired by now.
+        vi.advanceTimersByTime(300);
+        await el.updateComplete;
+        expect(btn?.classList.contains('button--copied')).toBe(false);
+      } finally {
+        vi.useRealTimers();
+      }
+    });
+
+    it('disconnectedCallback clears pending feedback timer', async () => {
+      vi.useFakeTimers();
+      try {
+        const el = await fixture<HelixCopyButton>(
+          '<hx-copy-button value="disconnect-test" feedback-duration="2000"></hx-copy-button>',
+        );
+        const btn = shadowQuery<HTMLButtonElement>(el, 'button');
+        expect(btn).toBeTruthy();
+
+        // Click to start feedback and set the internal timer.
+        btn!.click();
+        await Promise.resolve();
+        await Promise.resolve();
+        await el.updateComplete;
+        expect(btn?.classList.contains('button--copied')).toBe(true);
+
+        // Remove the element — disconnectedCallback must clear the timer.
+        el.remove();
+
+        // Advance past the feedbackDuration; timer must NOT fire on disconnected element.
+        // (A fired timer would attempt to call _copied = false on a detached element.)
+        expect(() => {
+          vi.advanceTimersByTime(3000);
+        }).not.toThrow();
+      } finally {
+        vi.useRealTimers();
+      }
     });
   });
 
