@@ -8,10 +8,15 @@ import type { ComponentData } from './cem-utils';
 
 export type GalleryCategory =
   | 'actions'
+  | 'navigation'
   | 'feedback'
+  | 'data-display'
   | 'content'
   | 'form-controls'
-  | 'composition'
+  | 'overlays'
+  | 'layout'
+  | 'media'
+  | 'utility'
   | 'uncategorized';
 
 export interface GalleryStats {
@@ -26,45 +31,157 @@ export interface GalleryStats {
 // ── Category mapping ────────────────────────────────────────────────
 
 const TAG_CATEGORY_MAP: Record<string, GalleryCategory> = {
+  // Actions
   'hx-button': 'actions',
+  'hx-button-group': 'actions',
+  'hx-copy-button': 'actions',
+  'hx-icon-button': 'actions',
+  'hx-split-button': 'actions',
+  'hx-toggle-button': 'actions',
+  'hx-link': 'actions',
+
+  // Navigation
+  'hx-accordion': 'navigation',
+  'hx-accordion-item': 'navigation',
+  'hx-breadcrumb': 'navigation',
+  'hx-breadcrumb-item': 'navigation',
+  'hx-nav': 'navigation',
+  'hx-nav-item': 'navigation',
+  'hx-pagination': 'navigation',
+  'hx-side-nav': 'navigation',
+  'hx-steps': 'navigation',
+  'hx-step': 'navigation',
+  'hx-tabs': 'navigation',
+  'hx-tab': 'navigation',
+  'hx-tab-panel': 'navigation',
+  'hx-top-nav': 'navigation',
+
+  // Feedback
   'hx-alert': 'feedback',
   'hx-badge': 'feedback',
+  'hx-message-bar': 'feedback',
+  'hx-progress-bar': 'feedback',
+  'hx-progress-ring': 'feedback',
+  'hx-meter': 'feedback',
+  'hx-spinner': 'feedback',
+  'hx-skeleton': 'feedback',
+  'hx-status-indicator': 'feedback',
+  'hx-toast': 'feedback',
+  'hx-toast-stack': 'feedback',
+
+  // Data Display
+  'hx-data-table': 'data-display',
+  'hx-list': 'data-display',
+  'hx-list-item': 'data-display',
+  'hx-structured-list': 'data-display',
+  'hx-structured-list-row': 'data-display',
+  'hx-tree-view': 'data-display',
+  'hx-tree-item': 'data-display',
+  'hx-tag': 'data-display',
+  'hx-rating': 'data-display',
+  'hx-carousel': 'data-display',
+  'hx-carousel-item': 'data-display',
+  'hx-code-snippet': 'data-display',
+
+  // Content
   'hx-card': 'content',
   'hx-container': 'content',
   'hx-prose': 'content',
+  'hx-text': 'content',
+  'hx-tile': 'content',
+  'hx-image': 'content',
+  'hx-avatar': 'content',
+  'hx-icon': 'content',
+  'hx-divider': 'content',
+
+  // Form Controls
   'hx-text-input': 'form-controls',
   'hx-textarea': 'form-controls',
   'hx-select': 'form-controls',
   'hx-checkbox': 'form-controls',
+  'hx-checkbox-group': 'form-controls',
+  'hx-radio': 'form-controls',
   'hx-radio-group': 'form-controls',
   'hx-switch': 'form-controls',
-  'hx-form': 'composition',
+  'hx-number-input': 'form-controls',
+  'hx-slider': 'form-controls',
+  'hx-date-picker': 'form-controls',
+  'hx-time-picker': 'form-controls',
+  'hx-color-picker': 'form-controls',
+  'hx-combobox': 'form-controls',
+  'hx-search': 'form-controls',
+  'hx-file-upload': 'form-controls',
+  'hx-field': 'form-controls',
+  'hx-field-label': 'form-controls',
+  'hx-help-text': 'form-controls',
+  'hx-form': 'form-controls',
+  'hx-format-date': 'form-controls',
+
+  // Overlays
+  'hx-dialog': 'overlays',
+  'hx-drawer': 'overlays',
+  'hx-dropdown': 'overlays',
+  'hx-popover': 'overlays',
+  'hx-popup': 'overlays',
+  'hx-tooltip': 'overlays',
+  'hx-contextual-help': 'overlays',
+  'hx-menu': 'overlays',
+  'hx-menu-item': 'overlays',
+  'hx-menu-divider': 'overlays',
+  'hx-overflow-menu': 'overlays',
+  'hx-action-bar': 'overlays',
+
+  // Layout
+  'hx-grid': 'layout',
+  'hx-grid-item': 'layout',
+  'hx-stack': 'layout',
+  'hx-split-panel': 'layout',
+
+  // Utility
+  'hx-focus-ring': 'utility',
+  'hx-ripple': 'utility',
+  'hx-theme': 'utility',
+  'hx-visually-hidden': 'utility',
 };
 
 const CATEGORY_ORDER: GalleryCategory[] = [
   'actions',
+  'navigation',
+  'form-controls',
+  'data-display',
   'feedback',
   'content',
-  'form-controls',
-  'composition',
+  'overlays',
+  'layout',
+  'utility',
   'uncategorized',
 ];
 
 const CATEGORY_LABELS: Record<GalleryCategory, string> = {
   actions: 'Actions',
-  feedback: 'Feedback',
-  content: 'Content & Layout',
+  navigation: 'Navigation',
+  feedback: 'Feedback & Status',
+  'data-display': 'Data Display',
+  content: 'Content & Media',
   'form-controls': 'Form Controls',
-  composition: 'Composition',
+  overlays: 'Overlays & Menus',
+  layout: 'Layout',
+  media: 'Media',
+  utility: 'Utility',
   uncategorized: 'Uncategorized',
 };
 
 const CATEGORY_ACCENTS: Record<GalleryCategory, string> = {
   actions: 'electric',
+  navigation: 'purple',
   feedback: 'amber',
+  'data-display': 'teal',
   content: 'accent',
   'form-controls': 'cyan',
-  composition: 'green',
+  overlays: 'orange',
+  layout: 'green',
+  media: 'blue',
+  utility: 'neutral',
   uncategorized: 'pink',
 };
 
