@@ -26,12 +26,24 @@ A combobox with a label and a list of options.
 
 <ComponentDemo title="Basic">
   <hx-combobox label="Department" name="department" placeholder="Search departments...">
-    <option value="cardiology">Cardiology</option>
-    <option value="neurology">Neurology</option>
-    <option value="oncology">Oncology</option>
-    <option value="pediatrics">Pediatrics</option>
-    <option value="radiology">Radiology</option>
-    <option value="surgery">Surgery</option>
+    <option slot="option" value="cardiology">
+      Cardiology
+    </option>
+    <option slot="option" value="neurology">
+      Neurology
+    </option>
+    <option slot="option" value="oncology">
+      Oncology
+    </option>
+    <option slot="option" value="pediatrics">
+      Pediatrics
+    </option>
+    <option slot="option" value="radiology">
+      Radiology
+    </option>
+    <option slot="option" value="surgery">
+      Surgery
+    </option>
   </hx-combobox>
 </ComponentDemo>
 
@@ -42,16 +54,28 @@ Three size variants: `sm`, `md` (default), and `lg`.
 <ComponentDemo title="Sizes">
   <div style="display: flex; flex-direction: column; gap: 1rem;">
     <hx-combobox label="Small" hx-size="sm" placeholder="Small...">
-      <option value="a">Option A</option>
-      <option value="b">Option B</option>
+      <option slot="option" value="a">
+        Option A
+      </option>
+      <option slot="option" value="b">
+        Option B
+      </option>
     </hx-combobox>
     <hx-combobox label="Medium" hx-size="md" placeholder="Medium...">
-      <option value="a">Option A</option>
-      <option value="b">Option B</option>
+      <option slot="option" value="a">
+        Option A
+      </option>
+      <option slot="option" value="b">
+        Option B
+      </option>
     </hx-combobox>
     <hx-combobox label="Large" hx-size="lg" placeholder="Large...">
-      <option value="a">Option A</option>
-      <option value="b">Option B</option>
+      <option slot="option" value="a">
+        Option A
+      </option>
+      <option slot="option" value="b">
+        Option B
+      </option>
     </hx-combobox>
   </div>
 </ComponentDemo>
@@ -62,12 +86,24 @@ Set `multiple` to allow selecting more than one option. Selected values appear a
 
 <ComponentDemo title="Multiple">
   <hx-combobox label="Skills" multiple placeholder="Search skills...">
-    <option value="html">HTML</option>
-    <option value="css">CSS</option>
-    <option value="js">JavaScript</option>
-    <option value="ts">TypeScript</option>
-    <option value="react">React</option>
-    <option value="lit">Lit</option>
+    <option slot="option" value="html">
+      HTML
+    </option>
+    <option slot="option" value="css">
+      CSS
+    </option>
+    <option slot="option" value="js">
+      JavaScript
+    </option>
+    <option slot="option" value="ts">
+      TypeScript
+    </option>
+    <option slot="option" value="react">
+      React
+    </option>
+    <option slot="option" value="lit">
+      Lit
+    </option>
   </hx-combobox>
 </ComponentDemo>
 
@@ -77,9 +113,15 @@ Set `clearable` to show a clear button when a value is selected.
 
 <ComponentDemo title="Clearable">
   <hx-combobox label="Status" clearable placeholder="Select status...">
-    <option value="active">Active</option>
-    <option value="inactive">Inactive</option>
-    <option value="pending">Pending</option>
+    <option slot="option" value="active">
+      Active
+    </option>
+    <option slot="option" value="inactive">
+      Inactive
+    </option>
+    <option slot="option" value="pending">
+      Pending
+    </option>
   </hx-combobox>
 </ComponentDemo>
 
@@ -101,9 +143,15 @@ Set `error` to display a validation error message below the field.
     error="Please select a department."
     placeholder="Select department..."
   >
-    <option value="eng">Engineering</option>
-    <option value="design">Design</option>
-    <option value="product">Product</option>
+    <option slot="option" value="eng">
+      Engineering
+    </option>
+    <option slot="option" value="design">
+      Design
+    </option>
+    <option slot="option" value="product">
+      Product
+    </option>
   </hx-combobox>
 </ComponentDemo>
 
@@ -117,10 +165,18 @@ Set `help-text` to provide guidance below the field.
     help-text="Select the timezone for your account."
     placeholder="Search timezones..."
   >
-    <option value="utc">UTC</option>
-    <option value="est">Eastern (UTC-5)</option>
-    <option value="pst">Pacific (UTC-8)</option>
-    <option value="cet">Central European (UTC+1)</option>
+    <option slot="option" value="utc">
+      UTC
+    </option>
+    <option slot="option" value="est">
+      Eastern (UTC-5)
+    </option>
+    <option slot="option" value="pst">
+      Pacific (UTC-8)
+    </option>
+    <option slot="option" value="cet">
+      Central European (UTC+1)
+    </option>
   </hx-combobox>
 </ComponentDemo>
 
@@ -130,8 +186,12 @@ Set `disabled` to prevent all interaction.
 
 <ComponentDemo title="Disabled">
   <hx-combobox label="Category" disabled value="eng" placeholder="Select...">
-    <option value="eng">Engineering</option>
-    <option value="design">Design</option>
+    <option slot="option" value="eng">
+      Engineering
+    </option>
+    <option slot="option" value="design">
+      Design
+    </option>
   </hx-combobox>
 </ComponentDemo>
 
@@ -149,9 +209,9 @@ import '@helix/library/components/hx-combobox';
 
 ```html
 <hx-combobox label="Country" placeholder="Search countries...">
-  <option value="us">United States</option>
-  <option value="ca">Canada</option>
-  <option value="gb">United Kingdom</option>
+  <option slot="option" value="us">United States</option>
+  <option slot="option" value="ca">Canada</option>
+  <option slot="option" value="gb">United Kingdom</option>
 </hx-combobox>
 ```
 
@@ -217,16 +277,15 @@ import '@helix/library/components/hx-combobox';
 
 ## Slots
 
-| Slot          | Description                                                  |
-| ------------- | ------------------------------------------------------------ |
-| _(default)_   | Use `<option>` elements to populate the listbox.             |
-| `option`      | Named slot for `<option>` elements (alternative to default). |
-| `label`       | Custom label content (overrides the `label` property).       |
-| `prefix`      | Content displayed before the text input.                     |
-| `suffix`      | Content displayed after the text input.                      |
-| `empty-label` | Content shown when no options match the filter.              |
-| `error`       | Custom error content (overrides the `error` property).       |
-| `help-text`   | Custom help text (overrides the `helpText` property).        |
+| Slot          | Description                                                 |
+| ------------- | ----------------------------------------------------------- |
+| `option`      | Named slot for `<option>` elements to populate the listbox. |
+| `label`       | Custom label content (overrides the `label` property).      |
+| `prefix`      | Content displayed before the text input.                    |
+| `suffix`      | Content displayed after the text input.                     |
+| `empty-label` | Content shown when no options match the filter.             |
+| `error`       | Custom error content (overrides the `error` property).      |
+| `help-text`   | Custom help text (overrides the `helpText` property).       |
 
 ## Accessibility
 
@@ -263,7 +322,7 @@ import '@helix/library/components/hx-combobox';
   {% if error %}error="{{ error }}"{% endif %}
 >
   {% for option in options %}
-    <option value="{{ option.value }}"{% if option.selected %} selected{% endif %}>
+    <option slot="option" value="{{ option.value }}"{% if option.selected %} selected{% endif %}>
       {{ option.label }}
     </option>
   {% endfor %}
@@ -296,12 +355,12 @@ Copy-paste into a `.html` file and open in any browser — no build tool require
   </head>
   <body style="font-family: sans-serif; padding: 2rem; max-width: 400px;">
     <hx-combobox label="Country" placeholder="Search countries..." clearable id="country-select">
-      <option value="us">United States</option>
-      <option value="ca">Canada</option>
-      <option value="gb">United Kingdom</option>
-      <option value="au">Australia</option>
-      <option value="de">Germany</option>
-      <option value="fr">France</option>
+      <option slot="option" value="us">United States</option>
+      <option slot="option" value="ca">Canada</option>
+      <option slot="option" value="gb">United Kingdom</option>
+      <option slot="option" value="au">Australia</option>
+      <option slot="option" value="de">Germany</option>
+      <option slot="option" value="fr">France</option>
     </hx-combobox>
 
     <script>
