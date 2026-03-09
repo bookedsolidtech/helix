@@ -56,16 +56,53 @@ export class HelixTreeItem extends LitElement {
   @property({ type: Boolean, reflect: true })
   disabled = false;
 
-  /**
-   * Indentation level override. Normally auto-calculated via CSS inheritance.
-   * @attr indent
-   */
-  @property({ type: Number, reflect: true })
-  indent = 0;
-
   // ─── Internal State ───
 
   @state() private _hasChildren = false;
+
+  // ─── Computed ARIA ───
+
+  /** Whether this item has slotted children. */
+  get hasChildItems(): boolean {
+    return this._hasChildren;
+  }
+
+  /** Compute nesting depth by counting ancestor hx-tree-item elements. */
+  private _getLevel(): number {
+    let level = 1;
+    let el: Element | null = this.parentElement;
+    while (el) {
+      if (el.tagName.toLowerCase() === 'hx-tree-item') level++;
+      el = el.parentElement;
+    }
+    return level;
+  }
+
+  /** Compute position in set among siblings. */
+  private _getPosInSet(): number {
+    const parent = this.parentElement;
+    if (!parent) return 1;
+    const siblings = Array.from(parent.children).filter(
+      (c) => c.tagName.toLowerCase() === 'hx-tree-item',
+    );
+    return siblings.indexOf(this) + 1;
+  }
+
+  /** Compute set size among siblings. */
+  private _getSetSize(): number {
+    const parent = this.parentElement;
+    if (!parent) return 1;
+    return Array.from(parent.children).filter((c) => c.tagName.toLowerCase() === 'hx-tree-item')
+      .length;
+  }
+
+  /** Determine if selection is active on the parent tree. */
+  private _isSelectable(): boolean {
+    const tree = this.closest('hx-tree-view');
+    if (!tree) return false;
+    const selection = tree.getAttribute('selection');
+    return selection === 'single' || selection === 'multiple';
+  }
 
   // ─── Children Detection ───
 
@@ -155,6 +192,7 @@ export class HelixTreeItem extends LitElement {
 
   override render() {
     const ariaExpanded = this._hasChildren ? String(this.expanded) : nothing;
+    const ariaSelected = this._isSelectable() ? String(this.selected) : nothing;
 
     return html`
       <div part="item" class="item">
@@ -164,8 +202,11 @@ export class HelixTreeItem extends LitElement {
           role="treeitem"
           tabindex="-1"
           aria-expanded=${ariaExpanded}
-          aria-selected=${String(this.selected)}
+          aria-selected=${ariaSelected}
           aria-disabled=${this.disabled ? 'true' : nothing}
+          aria-level=${this._getLevel()}
+          aria-posinset=${this._getPosInSet()}
+          aria-setsize=${this._getSetSize()}
           @click=${this._handleRowClick}
           @keydown=${this._handleKeyDown}
         >

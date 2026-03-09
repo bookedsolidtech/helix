@@ -1,11 +1,11 @@
 import { LitElement, html, nothing } from 'lit';
-import { customElement, property } from 'lit/decorators.js';
+import { customElement, property, state } from 'lit/decorators.js';
 import { tokenStyles } from '@helix/tokens/lit';
 import { helixTreeViewStyles } from './hx-tree-view.styles.js';
 import type { HelixTreeItem } from './hx-tree-item.js';
 
 /** Selection mode for the tree. */
-type TreeSelection = 'none' | 'single' | 'multiple';
+export type TreeSelection = 'none' | 'single' | 'multiple';
 
 /**
  * A hierarchical tree component for navigating nested data structures.
@@ -52,6 +52,10 @@ export class HelixTreeView extends LitElement {
   @property({ type: String, reflect: true })
   selection: TreeSelection = 'none';
 
+  // ─── Internal State ───
+
+  @state() private _currentIndex = 0;
+
   // ─── Internal Helpers ───
 
   /**
@@ -68,13 +72,10 @@ export class HelixTreeView extends LitElement {
       if (child.tagName.toLowerCase() === 'hx-tree-item') {
         const item = child as HelixTreeItem;
         items.push(item);
-        // Only recurse into expanded items
         if (item.expanded) {
-          // Children with slot="children" are direct children of the item element
           items.push(...this._collectVisibleItems(item));
         }
       } else {
-        // Non-tree-item elements — skip but check their children
         items.push(...this._collectVisibleItems(child));
       }
     }
@@ -83,6 +84,14 @@ export class HelixTreeView extends LitElement {
 
   private _getSelectedItems(): HelixTreeItem[] {
     return Array.from(this.querySelectorAll<HelixTreeItem>('hx-tree-item[selected]'));
+  }
+
+  private _focusItem(index: number): void {
+    const items = this._getVisibleItems();
+    if (items.length === 0) return;
+    const clamped = Math.max(0, Math.min(index, items.length - 1));
+    this._currentIndex = clamped;
+    items[clamped]?.focus();
   }
 
   // ─── Event Handling ───
@@ -94,7 +103,6 @@ export class HelixTreeView extends LitElement {
     if (this.selection === 'none') return;
 
     if (this.selection === 'single') {
-      // Deselect all others, toggle this one
       const wasSelected = item.selected;
       this._getSelectedItems().forEach((i) => {
         i.selected = false;
@@ -117,14 +125,11 @@ export class HelixTreeView extends LitElement {
     const items = this._getVisibleItems();
     if (items.length === 0) return;
 
-    // Find the currently focused item
-    const focused = this.shadowRoot?.activeElement ?? document.activeElement;
-    let currentIndex = -1;
+    let currentIndex = this._currentIndex;
+    const focused = document.activeElement;
 
-    // The focused element could be the item-row div inside the shadow DOM of hx-tree-item.
-    // We need to find which hx-tree-item contains the focused element.
     for (let i = 0; i < items.length; i++) {
-      if (items[i]?.shadowRoot?.contains(focused) || items[i] === focused) {
+      if (items[i] === focused || items[i]?.shadowRoot?.activeElement) {
         currentIndex = i;
         break;
       }
@@ -134,36 +139,63 @@ export class HelixTreeView extends LitElement {
       case 'ArrowDown': {
         e.preventDefault();
         const next = currentIndex < items.length - 1 ? currentIndex + 1 : 0;
-        items[next]?.focus();
+        this._focusItem(next);
         break;
       }
       case 'ArrowUp': {
         e.preventDefault();
         const prev = currentIndex > 0 ? currentIndex - 1 : items.length - 1;
-        items[prev]?.focus();
+        this._focusItem(prev);
+        break;
+      }
+      case 'ArrowLeft': {
+        e.preventDefault();
+        const currentItem = items[currentIndex];
+        if (!currentItem) break;
+        if (currentItem.expanded && currentItem.hasChildItems) {
+          currentItem.expanded = false;
+        } else {
+          const parentItem = currentItem.parentElement?.closest('hx-tree-item') as
+            | HelixTreeItem
+            | undefined;
+          if (parentItem) {
+            const parentIndex = items.indexOf(parentItem);
+            if (parentIndex >= 0) {
+              this._focusItem(parentIndex);
+            }
+          }
+        }
+        break;
+      }
+      case 'ArrowRight': {
+        e.preventDefault();
+        const currentItem = items[currentIndex];
+        if (!currentItem) break;
+        if (currentItem.hasChildItems) {
+          if (!currentItem.expanded) {
+            currentItem.expanded = true;
+          } else {
+            this._focusItem(currentIndex + 1);
+          }
+        }
         break;
       }
       case 'Home': {
         e.preventDefault();
-        items[0]?.focus();
+        this._focusItem(0);
         break;
       }
       case 'End': {
         e.preventDefault();
-        items[items.length - 1]?.focus();
+        this._focusItem(items.length - 1);
         break;
       }
     }
   }
 
   private _handleFocusIn(e: FocusEvent): void {
-    // When focus enters the tree for the first time, focus the first item
-    // if focus landed on the tree root itself
     if (e.target === e.currentTarget) {
-      const items = this._getVisibleItems();
-      if (items.length > 0) {
-        items[0]?.focus();
-      }
+      this._focusItem(this._currentIndex);
     }
   }
 
@@ -175,6 +207,7 @@ export class HelixTreeView extends LitElement {
         part="tree"
         class="tree"
         role="tree"
+        tabindex="0"
         aria-label=${this.label || nothing}
         aria-multiselectable=${this.selection === 'multiple' ? 'true' : 'false'}
         @hx-tree-item-select=${this._handleTreeItemSelect}
