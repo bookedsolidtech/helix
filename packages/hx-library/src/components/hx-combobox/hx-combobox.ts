@@ -83,6 +83,7 @@ export class HelixCombobox extends LitElement {
   private _listboxId = `${this._id}-listbox`;
   private _helpTextId = `${this._id}-help`;
   private _errorId = `${this._id}-error`;
+  private _labelId = `${this._id}-label`;
 
   // ─── Public Properties ───
 
@@ -634,7 +635,7 @@ export class HelixCombobox extends LitElement {
         <!-- Label -->
         <slot name="label">
           ${this.label
-            ? html`<label part="label" class="field__label" for=${this._id}>
+            ? html`<label id=${this._labelId} part="label" class="field__label">
                 ${this.label}
                 ${this.required
                   ? html`<span class="field__required-marker" aria-hidden="true">*</span>`
@@ -700,7 +701,8 @@ export class HelixCombobox extends LitElement {
             aria-invalid=${hasError ? 'true' : nothing}
             aria-describedby=${ifDefined(describedBy)}
             aria-required=${this.required ? 'true' : nothing}
-            aria-label=${ifDefined(this.ariaLabel ?? undefined)}
+            aria-label=${ifDefined(this.ariaLabel || undefined)}
+            aria-labelledby=${ifDefined(this.label && !this.ariaLabel ? this._labelId : undefined)}
             aria-busy=${this.loading ? 'true' : nothing}
             .value=${this._filterText || (this._open ? '' : this._displayValue)}
             placeholder=${ifDefined(this.placeholder || undefined)}
