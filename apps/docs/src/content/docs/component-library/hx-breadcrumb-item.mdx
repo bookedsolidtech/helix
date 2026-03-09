@@ -10,6 +10,40 @@ import ComponentDoc from '../../../components/ComponentDoc.astro';
 
 <ComponentDoc tagName="hx-breadcrumb-item" section="summary" />
 
+`hx-breadcrumb-item` is a sub-component of [`hx-breadcrumb`](/component-library/hx-breadcrumb/). It should always be used as a direct child of `hx-breadcrumb`.
+
+For full documentation including usage examples, properties, CSS parts, CSS custom properties, accessibility notes, and Drupal integration, see the [hx-breadcrumb documentation](/component-library/hx-breadcrumb/).
+
+## Quick Reference
+
+```html
+<!-- Navigable link item -->
+<hx-breadcrumb-item href="/patients">Patients</hx-breadcrumb-item>
+
+<!-- Current page item (static text, aria-current="page") -->
+<hx-breadcrumb-item>Patient Records</hx-breadcrumb-item>
+
+<!-- Explicit current page override -->
+<hx-breadcrumb-item current>Current Page</hx-breadcrumb-item>
+```
+
+## Properties
+
+| Property     | Attribute      | Type                  | Default     | Description                                                                                                                                                                           |
+| ------------ | -------------- | --------------------- | ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `href`       | `href`         | `string \| undefined` | `undefined` | URL for the breadcrumb link. Omit for the current page item. When `current` is set, `href` is ignored and the item always renders as static text per WAI-ARIA APG guidance.           |
+| `current`    | `current`      | `boolean`             | `false`     | Marks this item as the current page. Renders as static text with `aria-current="page"` on the inner element. Set explicitly to override positional last-item detection in the parent. |
+| `dataBcLast` | `data-bc-last` | `boolean`             | `false`     | Internal. Managed by the parent `hx-breadcrumb` to hide the trailing separator on the last item. Consumers should not set this directly.                                              |
+
+## CSS Parts
+
+| Part        | Element  | Description                                                                    |
+| ----------- | -------- | ------------------------------------------------------------------------------ |
+| `item`      | `<span>` | Wrapper `<span>` around the link or text content (`display: contents`).        |
+| `link`      | `<a>`    | Anchor element rendered when `href` is provided and `current` is false.        |
+| `text`      | `<span>` | Static text `<span>` rendered when `current` is true or no `href` is provided. |
+| `separator` | `<span>` | Separator element rendered after non-last items (`aria-hidden="true"`).        |
+
 ## API Reference
 
 <ComponentDoc tagName="hx-breadcrumb-item" section="api" />
