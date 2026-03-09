@@ -1,14 +1,318 @@
 ---
 title: 'hx-combobox'
-description: 'Searchable dropdown combining text input with a filterable option list'
+description: Searchable dropdown combining a text input with a filterable option list
 ---
 
 import ComponentLoader from '../../../components/ComponentLoader.astro';
+import ComponentDemo from '../../../components/ComponentDemo.astro';
 import ComponentDoc from '../../../components/ComponentDoc.astro';
 
 <ComponentLoader />
 
 <ComponentDoc tagName="hx-combobox" section="summary" />
+
+## Overview
+
+`hx-combobox` is a searchable dropdown that combines a text input with a filterable listbox of options. It follows the [ARIA APG Combobox pattern](https://www.w3.org/WAI/ARIA/apg/patterns/combobox/) with full keyboard navigation, screen reader support, and form integration via `ElementInternals`.
+
+**Use `hx-combobox` when:** the user needs to select from a large list of options and benefits from filtering by typing.
+**Use `hx-select` instead when:** the option set is small and no filtering is required.
+
+## Live Demo
+
+### Basic
+
+A combobox with a label and a list of options.
+
+<ComponentDemo title="Basic">
+  <hx-combobox label="Country" placeholder="Search countries...">
+    <option value="us">United States</option>
+    <option value="ca">Canada</option>
+    <option value="gb">United Kingdom</option>
+    <option value="au">Australia</option>
+    <option value="de">Germany</option>
+    <option value="fr">France</option>
+  </hx-combobox>
+</ComponentDemo>
+
+### Sizes
+
+Three size variants: `sm`, `md` (default), and `lg`.
+
+<ComponentDemo title="Sizes">
+  <div style="display: flex; flex-direction: column; gap: 1rem;">
+    <hx-combobox label="Small" hx-size="sm" placeholder="Small...">
+      <option value="a">Option A</option>
+      <option value="b">Option B</option>
+    </hx-combobox>
+    <hx-combobox label="Medium" hx-size="md" placeholder="Medium...">
+      <option value="a">Option A</option>
+      <option value="b">Option B</option>
+    </hx-combobox>
+    <hx-combobox label="Large" hx-size="lg" placeholder="Large...">
+      <option value="a">Option A</option>
+      <option value="b">Option B</option>
+    </hx-combobox>
+  </div>
+</ComponentDemo>
+
+### Multiple Selection
+
+Set `multiple` to allow selecting more than one option. Selected values appear as chips.
+
+<ComponentDemo title="Multiple">
+  <hx-combobox label="Skills" multiple placeholder="Search skills...">
+    <option value="html">HTML</option>
+    <option value="css">CSS</option>
+    <option value="js">JavaScript</option>
+    <option value="ts">TypeScript</option>
+    <option value="react">React</option>
+    <option value="lit">Lit</option>
+  </hx-combobox>
+</ComponentDemo>
+
+### Clearable
+
+Set `clearable` to show a clear button when a value is selected.
+
+<ComponentDemo title="Clearable">
+  <hx-combobox label="Status" clearable placeholder="Select status...">
+    <option value="active">Active</option>
+    <option value="inactive">Inactive</option>
+    <option value="pending">Pending</option>
+  </hx-combobox>
+</ComponentDemo>
+
+### Loading
+
+Set `loading` to show a spinner while options are being fetched asynchronously.
+
+<ComponentDemo title="Loading">
+  <hx-combobox label="Users" loading placeholder="Loading users..."></hx-combobox>
+</ComponentDemo>
+
+### Error State
+
+Set `error` to display a validation error message below the field.
+
+<ComponentDemo title="Error">
+  <hx-combobox
+    label="Department"
+    error="Please select a department."
+    placeholder="Select department..."
+  >
+    <option value="eng">Engineering</option>
+    <option value="design">Design</option>
+    <option value="product">Product</option>
+  </hx-combobox>
+</ComponentDemo>
+
+### Help Text
+
+Set `help-text` to provide guidance below the field.
+
+<ComponentDemo title="Help Text">
+  <hx-combobox
+    label="Timezone"
+    help-text="Select the timezone for your account."
+    placeholder="Search timezones..."
+  >
+    <option value="utc">UTC</option>
+    <option value="est">Eastern (UTC-5)</option>
+    <option value="pst">Pacific (UTC-8)</option>
+    <option value="cet">Central European (UTC+1)</option>
+  </hx-combobox>
+</ComponentDemo>
+
+### Disabled
+
+Set `disabled` to prevent all interaction.
+
+<ComponentDemo title="Disabled">
+  <hx-combobox label="Category" disabled value="eng" placeholder="Select...">
+    <option value="eng">Engineering</option>
+    <option value="design">Design</option>
+  </hx-combobox>
+</ComponentDemo>
+
+## Installation
+
+```bash
+# Full library
+npm install @helix/library
+
+# Or import only this component (tree-shaking friendly)
+import '@helix/library/components/hx-combobox';
+```
+
+## Basic Usage
+
+```html
+<hx-combobox label="Country" placeholder="Search countries...">
+  <option value="us">United States</option>
+  <option value="ca">Canada</option>
+  <option value="gb">United Kingdom</option>
+</hx-combobox>
+```
+
+## Properties
+
+| Property         | Attribute         | Type                   | Default | Description                                                      |
+| ---------------- | ----------------- | ---------------------- | ------- | ---------------------------------------------------------------- |
+| `label`          | `label`           | `string`               | `''`    | Visible label text for the combobox.                             |
+| `placeholder`    | `placeholder`     | `string`               | `''`    | Placeholder text shown when no value is entered.                 |
+| `value`          | `value`           | `string`               | `''`    | Current value. Comma-separated list when `multiple` is set.      |
+| `name`           | `name`            | `string`               | `''`    | Form field name for submission.                                  |
+| `required`       | `required`        | `boolean`              | `false` | Marks the field as required for form submission.                 |
+| `disabled`       | `disabled`        | `boolean`              | `false` | Prevents all interaction.                                        |
+| `multiple`       | `multiple`        | `boolean`              | `false` | Allows selecting more than one option.                           |
+| `clearable`      | `clearable`       | `boolean`              | `false` | Shows a clear button when a value is selected.                   |
+| `loading`        | `loading`         | `boolean`              | `false` | Shows a spinner; announces `aria-busy` to screen readers.        |
+| `error`          | `error`           | `string`               | `''`    | Error message. When set, the field enters an error state.        |
+| `helpText`       | `help-text`       | `string`               | `''`    | Help text displayed below the field.                             |
+| `size`           | `hx-size`         | `'sm' \| 'md' \| 'lg'` | `'md'`  | Size variant.                                                    |
+| `filterDebounce` | `filter-debounce` | `number`               | `0`     | Debounce delay in milliseconds for the `hx-input` event.         |
+| `ariaLabel`      | `aria-label`      | `string \| null`       | `null`  | Accessible name for screen readers, overrides the visible label. |
+
+## Events
+
+| Event       | Detail Type         | Description                                     |
+| ----------- | ------------------- | ----------------------------------------------- |
+| `hx-input`  | `{ value: string }` | Dispatched on each keystroke as the user types. |
+| `hx-change` | `{ value: string }` | Dispatched when an option is selected.          |
+| `hx-clear`  | `void`              | Dispatched when the clear button is activated.  |
+| `hx-show`   | `void`              | Dispatched when the listbox opens.              |
+| `hx-hide`   | `void`              | Dispatched when the listbox closes.             |
+
+## CSS Custom Properties
+
+| Property                           | Default                       | Description                 |
+| ---------------------------------- | ----------------------------- | --------------------------- |
+| `--hx-combobox-bg`                 | `var(--hx-color-neutral-0)`   | Input background color.     |
+| `--hx-combobox-color`              | `var(--hx-color-neutral-800)` | Input text color.           |
+| `--hx-combobox-border-color`       | `var(--hx-color-neutral-300)` | Border color.               |
+| `--hx-combobox-border-radius`      | `var(--hx-border-radius-md)`  | Border radius.              |
+| `--hx-combobox-font-family`        | `var(--hx-font-family-sans)`  | Font family.                |
+| `--hx-combobox-focus-ring-color`   | `var(--hx-focus-ring-color)`  | Focus ring color.           |
+| `--hx-combobox-error-color`        | `var(--hx-color-error-500)`   | Error state color.          |
+| `--hx-combobox-label-color`        | `var(--hx-color-neutral-700)` | Label text color.           |
+| `--hx-combobox-listbox-bg`         | `var(--hx-color-neutral-0)`   | Listbox background color.   |
+| `--hx-combobox-option-hover-bg`    | `var(--hx-color-primary-50)`  | Option hover background.    |
+| `--hx-combobox-option-selected-bg` | `var(--hx-color-primary-100)` | Selected option background. |
+
+## CSS Parts
+
+| Part                | Description                                               |
+| ------------------- | --------------------------------------------------------- |
+| `field`             | The root wrapper `<div>` for the entire field.            |
+| `label`             | The `<label>` element (or label slot wrapper).            |
+| `trigger`           | The input wrapper `<div>` containing the input and icons. |
+| `input`             | The native `<input>` element with `role="combobox"`.      |
+| `clear-button`      | The clear `<button>` shown when `clearable` is set.       |
+| `loading-indicator` | The loading spinner container `<div>`.                    |
+| `listbox`           | The `<ul>` popup listbox element.                         |
+| `option`            | Each `<li>` option in the listbox.                        |
+| `error`             | The error message `<div>`.                                |
+| `help-text`         | The help text `<div>`.                                    |
+
+## Slots
+
+| Slot          | Description                                                  |
+| ------------- | ------------------------------------------------------------ |
+| _(default)_   | Use `<option>` elements to populate the listbox.             |
+| `option`      | Named slot for `<option>` elements (alternative to default). |
+| `label`       | Custom label content (overrides the `label` property).       |
+| `prefix`      | Content displayed before the text input.                     |
+| `suffix`      | Content displayed after the text input.                      |
+| `empty-label` | Content shown when no options match the filter.              |
+| `error`       | Custom error content (overrides the `error` property).       |
+| `help-text`   | Custom help text (overrides the `helpText` property).        |
+
+## Accessibility
+
+| Topic                   | Details                                                                                         |
+| ----------------------- | ----------------------------------------------------------------------------------------------- |
+| ARIA role               | Input uses `role="combobox"`; listbox uses `role="listbox"`; each option uses `role="option"`.  |
+| `aria-expanded`         | Set to `true`/`false` on the input to reflect listbox open/closed state.                        |
+| `aria-autocomplete`     | Set to `list` — indicates the listbox filters based on user input.                              |
+| `aria-controls`         | Points to the listbox element ID for screen reader association.                                 |
+| `aria-activedescendant` | Updated to the focused option ID as the user navigates the list.                                |
+| `aria-labelledby`       | Points to the visible label element ID (C-PATTERN-04 compliant — not `label[for]`).             |
+| `aria-label`            | Set via the `aria-label` attribute when no visible label is used.                               |
+| `aria-invalid`          | Set to `true` when `error` is set.                                                              |
+| `aria-required`         | Set to `true` when `required` is set.                                                           |
+| `aria-busy`             | Set to `true` when `loading` is active.                                                         |
+| `aria-describedby`      | Links to help text and error message elements.                                                  |
+| Keyboard                | `↓`/`↑` navigate options; `Enter` selects; `Escape` closes; `Tab` moves focus out.              |
+| Screen reader           | Option selection and listbox open/close are announced via ARIA live regions and role semantics. |
+| Focus management        | Focus stays on the input; active option is tracked via `aria-activedescendant`.                 |
+
+## Drupal Integration
+
+```twig
+{# my-module/templates/my-template.html.twig #}
+<hx-combobox
+  label="{{ label }}"
+  name="{{ field_name }}"
+  placeholder="{{ placeholder|default('Search...') }}"
+  {% if required %}required{% endif %}
+  {% if disabled %}disabled{% endif %}
+  {% if multiple %}multiple{% endif %}
+  {% if clearable %}clearable{% endif %}
+  {% if help_text %}help-text="{{ help_text }}"{% endif %}
+  {% if error %}error="{{ error }}"{% endif %}
+>
+  {% for option in options %}
+    <option value="{{ option.value }}"{% if option.selected %} selected{% endif %}>
+      {{ option.label }}
+    </option>
+  {% endfor %}
+</hx-combobox>
+```
+
+Load the library in your module's `.libraries.yml`:
+
+```yaml
+helix-components:
+  js:
+    /libraries/helix/helix.min.js: { minified: true }
+```
+
+## Standalone HTML Example
+
+Copy-paste into a `.html` file and open in any browser — no build tool required:
+
+```html
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>hx-combobox example</title>
+    <script
+      type="module"
+      src="https://cdn.jsdelivr.net/npm/@helix/library/dist/helix.min.js"
+    ></script>
+  </head>
+  <body style="font-family: sans-serif; padding: 2rem; max-width: 400px;">
+    <hx-combobox label="Country" placeholder="Search countries..." clearable id="country-select">
+      <option value="us">United States</option>
+      <option value="ca">Canada</option>
+      <option value="gb">United Kingdom</option>
+      <option value="au">Australia</option>
+      <option value="de">Germany</option>
+      <option value="fr">France</option>
+    </hx-combobox>
+
+    <script>
+      const combobox = document.getElementById('country-select');
+      combobox.addEventListener('hx-change', (e) => {
+        console.log('Selected:', e.detail.value);
+      });
+    </script>
+  </body>
+</html>
+```
 
 ## API Reference
 
