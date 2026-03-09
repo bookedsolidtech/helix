@@ -165,19 +165,13 @@ npm install @helix/library
 import '@helix/library/components/hx-icon';
 ```
 
-Then register the component:
-
-```ts
-import '@helix/library/components/hx-icon';
-```
-
 ## Basic Usage
 
 ```html
-<!-- Sprite mode (recommended) — no sprite-url needed for inline sprite refs -->
+<!-- Inline sprite mode (recommended) — sprite-url is optional when using inline SVG sprites -->
 <hx-icon name="check"></hx-icon>
 
-<!-- Sprite mode with explicit sprite sheet URL -->
+<!-- External sprite sheet — use sprite-url to point to a separate SVG sprite file -->
 <hx-icon name="check" sprite-url="/assets/icons/sprite.svg"></hx-icon>
 
 <!-- Informative icon — provides accessible name to screen readers -->
