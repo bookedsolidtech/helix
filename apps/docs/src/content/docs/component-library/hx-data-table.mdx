@@ -134,6 +134,15 @@ interface HxDataTableColumn {
 }
 ```
 
+### HxDataTableSortState shape
+
+```ts
+interface HxDataTableSortState {
+  key: string; // The column key being sorted
+  direction: 'asc' | 'desc'; // Sort direction
+}
+```
+
 ## Events
 
 | Event          | Detail Type                                       | Description                                                |
@@ -206,6 +215,8 @@ interface HxDataTableColumn {
   empty-label="{{ empty_label|default('No data') }}"
 ></hx-data-table>
 ```
+
+**Note:** If `columns` or `rows` contains invalid JSON, the component falls back to an empty array and logs a console warning.
 
 Load the library in your module's `.libraries.yml`:
 
