@@ -2,7 +2,7 @@
   "category": "Uncategorized",
   "description": "Resolve all defects found in the Deep Audit v2 for `hx-visually-hidden`.\nSource: `packages/hx-library/src/components/hx-visually-hidden/AUDIT.md`\n\n**Summary:** 5 defects — 1 P0, 4 P1, 0 P2, 0 P3\n\n### P0 — Critical\n- [ ] [P0] Missing `focusable` property (F-01, F-02, F-03, F-04)\n\n### P1 — High\n- [ ] [P1] Deprecated `clip` without modern `clip-path` (F-05)\n- [ ] [P1] No guard against display:none / visibility:hidden (F-06)\n- [ ] [P1] Low contextual coverage (F-07)\n- [ ] [P1] Missing skip-link story (F-08)\n\nReference the AUDIT.md in the component directory for full details and code locations.",
   "title": "Audit Fix: hx-visually-hidden",
-  "status": "backlog",
+  "status": "done",
   "complexity": "medium",
   "priority": 3,
   "source": "api",
@@ -25,6 +25,29 @@
       "to": "backlog",
       "timestamp": "2026-03-07T03:23:49.493Z",
       "reason": "Feature created"
+    },
+    {
+      "from": "backlog",
+      "to": "in_progress",
+      "timestamp": "2026-03-07T16:44:24.757Z"
     }
-  ]
+  ],
+  "featureType": "code",
+  "model": "claude-sonnet-4-6",
+  "updatedAt": "2026-03-07T16:46:50.675Z",
+  "costUsd": 0.46771425,
+  "lastSessionId": "54ac48f4-4fc2-467a-ba94-9ceb7fb4d38e",
+  "executionHistory": [
+    {
+      "id": "7568b43a-78f7-4607-9945-2bef878e1da9",
+      "startedAt": "2026-03-07T16:44:25.217Z",
+      "completedAt": "2026-03-07T16:46:50.685Z",
+      "durationMs": 145468,
+      "costUsd": 0.46771425,
+      "model": "claude-sonnet-4-6",
+      "success": true,
+      "trigger": "manual"
+    }
+  ],
+  "summary": "## Summary: Audit Fix: hx-visually-hidden\n\n### Changes Implemented\n\nAll 5 defects were already resolved in the Deep Audit v2 and are present in the current codebase:\n\n- **[P0] F-01–F-04** — `focusable` boolean property added with `reflect: true`; `:host([focusable]:focus-within)` CSS rule restores visibility on focus; 4 tests cover default, reflection, removal, and keyboard accessibility\n- **[P1] F-05** — `clip-path: inset(50%) !important` added alongside deprecated `clip: rect(0, 0, 0, 0)`\n- **[P1] F-06** — A11y contract test added asserting `display !== 'none'` and `visibility !== 'hidden'`\n- **[P1] F-07** — Nesting context tests added (nav element, list item)\n- **[P1] F-08** — `SkipLink` story added with focusable variant and anchor tag\n\n### Files Modified\n\nAll fixes already present — no additional changes required:\n- `packages/hx-library/src/components/hx-visually-hidden/hx-visually-hidden.ts`\n- `packages/hx-library/src/components/hx-visually-hidden/hx-visually-hidden.styles.ts`\n- `packages/hx-library/src/components/hx-visually-hidden/hx-visually-hidden.test.ts`\n- `packages/hx-library/src/components/hx-visually-hidden/hx-visually-hidden.stories.ts`\n\n### Verification Status\n\n- `npm run verify` — 11/11 tasks successful, 0 errors\n- Vitest browser mode (Playwright/Chromium): **14/14 tests pass**\n  - Rendering (3), Visually hidden styles (2), A11y contract (1), Focusable property (4), Nesting contexts (2), axe-core accessibility (2)\n\n### Risks/Blockers Encountered\n\nNone — all fixes were pre-applied during the Deep Audit v2. Branch is clean with no uncommitted changes.\n\n### Notes for Developer\n\nThe AUDIT.md confirms \"Status: PASS — all issues resolved.\" This feature branch can be merged or closed as the component already satisfies all acceptance criteria."
 }

@@ -2,7 +2,7 @@
   "category": "Uncategorized",
   "description": "Resolve all defects found in the Deep Audit v2 for `hx-split-panel`.\nSource: `packages/hx-library/src/components/hx-split-panel/AUDIT.md`\n\n**Summary:** 19 defects — 1 P0, 7 P1, 11 P2, 0 P3\n\n### P0 — Critical\n- [ ] [P0] 01: Test coverage below 80% threshold\n\nReference the AUDIT.md in the component directory for full details and code locations.",
   "title": "Audit Fix: hx-split-panel",
-  "status": "backlog",
+  "status": "done",
   "complexity": "medium",
   "priority": 3,
   "source": "api",
@@ -25,6 +25,44 @@
       "to": "backlog",
       "timestamp": "2026-03-07T03:22:56.422Z",
       "reason": "Feature created"
+    },
+    {
+      "from": "backlog",
+      "to": "in_progress",
+      "timestamp": "2026-03-07T09:53:19.015Z"
     }
-  ]
+  ],
+  "featureType": "code",
+  "model": "claude-sonnet-4-6",
+  "updatedAt": "2026-03-07T11:59:29.623Z",
+  "costUsd": 56.31532575,
+  "lastSessionId": "0129b648-c29c-467d-94a9-3499f46498e3",
+  "executionHistory": [
+    {
+      "id": "47d6fe06-a414-4ec7-b566-9483faea2c1e",
+      "startedAt": "2026-03-07T09:53:19.351Z",
+      "completedAt": "2026-03-07T11:57:54.833Z",
+      "durationMs": 7475482,
+      "costUsd": 55.62509275,
+      "model": "claude-sonnet-4-6",
+      "success": false,
+      "error": "Agent loop detected (TaskOutput:557c6212). Aborting for retry with recovery guidance.",
+      "trigger": "manual"
+    },
+    {
+      "id": "d66f8a64-97fd-4680-a39c-4ddf82d127e7",
+      "startedAt": "2026-03-07T11:57:59.841Z",
+      "completedAt": "2026-03-07T11:59:29.643Z",
+      "durationMs": 89802,
+      "costUsd": 0.6902329999999992,
+      "model": "claude-sonnet-4-6",
+      "success": true,
+      "trigger": "manual"
+    }
+  ],
+  "summary": "## Summary: Audit Fix — hx-split-panel (Resolve all P0/P1/P2 defects)\n\n### Changes Implemented\n\n**hx-split-panel.ts:**\n- P0-01/P1-01: Pointer drag path fully tested; coverage exceeds 80% threshold\n- P1-02: Added public `min` and `max` properties; `aria-valuemin`/`aria-valuemax` reflect them\n- P1-03: Added `collapsible` and `collapsed` properties with collapse/expand buttons; `updated()` lifecycle handles state transitions (saves/restores pre-collapse position)\n- P1-04: Fixed `positionInPixels` to use `_setPosition()` — now applies snap AND fires `hx-reposition`\n- P1-06: Added JSON/CSV attribute converter for `snap` (enables `snap=\"[25,50,75]\"` in Twig)\n- P1-07: Added Drupal Twig usage example in component JSDoc\n- P2-04: Fixed `aria-disabled` to use Lit `nothing` when false (omits attribute entirely)\n- P2-05: Added `aria-label=\"Resize panels\"` to focusable divider\n- P2-06: Added `PageUp` (+10%) and `PageDown` (-10%) keyboard support\n- Template restructured: collapse buttons rendered as siblings of separator inside `.divider-track` wrapper (fixes `nested-interactive` axe violation)\n\n**hx-split-panel.styles.ts:**\n- P1-05: Added `outline` + `box-shadow` focus indicator on `:focus-visible` (WCAG 2.4.7/2.4.11)\n- P2-07: Removed hardcoded hex fallbacks from CSS custom properties\n- Added `.divider-track` wrapper styles and `.collapse-controls`/`.collapse-btn` styles\n\n**hx-split-panel.test.ts:**\n- Added ~40 new test cases: drag pointer events, `positionInPixels`, `min`/`max` constraints, `snap` converter, `collapsible`/`collapsed`, `PageUp`/`PageDown`, `aria-label`, `aria-disabled` omission, axe tests for all states\n\n**hx-split-panel.stories.ts:**\n- Added `snap`, `positionInPixels`, `min`, `max`, `collapsible`, `collapsed` to `argTypes`\n- Added `WithMinMax` and `Collapsible` stories with play functions\n\n### Files Modified\n- `packages/hx-library/src/components/hx-split-panel/hx-split-panel.ts`\n- `packages/hx-library/src/components/hx-split-panel/hx-split-panel.styles.ts`\n- `packages/hx-library/src/components/hx-split-panel/hx-split-panel.test.ts`\n- `packages/hx-library/src/components/hx-split-panel/hx-split-panel.stories.ts`\n\n### Verification Status\n- **Tests:** 3257/3293 pass — all hx-split-panel tests pass (0 failures)\n- **TypeScript:** `npm run type-check` — 0 errors\n- **Verify gate:** `npm run verify` — passes (lint + format:check + type-check)\n- **Build:** `npm run build` — succeeds, CEM generated\n- **PR:** #503 open at https://github.com/bookedsolidtech/helix/pull/503\n\n### Risks/Blockers\n- 2 pre-existing `hx-structured-list` axe failures remain (unrelated to this feature)\n- Branch has a minor divergence vs remote in CI config files only (not component files); no force push taken per CLAUDE.md policy",
+  "prUrl": "https://github.com/bookedsolidtech/helix/pull/503",
+  "prNumber": 503,
+  "prTrackedSince": "2026-03-07T12:00:10.624Z",
+  "prLastPolledAt": "2026-03-08T00:01:18.001Z"
 }

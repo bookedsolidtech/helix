@@ -1,0 +1,11 @@
+{
+  "phase": "PLAN",
+  "summary": "Feature: Audit Fix: hx-structured-list\n\nResolve all defects found in the Deep Audit v2 for `hx-structured-list`.\nSource: `packages/hx-library/src/components/hx-structured-list/AUDIT.md`\n\n**Summary:** 15 defects — 3 P0, 5 P1, 7 P2, 0 P3\n\n### P0 — Critical\n- [ ] [P0] 1: `striped` prop declared but CSS never applied\n- [ ] [P0] 2: Hardcoded `1px` border in row — violates No-Hardcode rule\n- [ ] [P0] 3: Component not registered in main library `src/index.ts`\n\nReference the AUDIT.md in the component di",
+  "discoveries": [],
+  "modifiedFiles": [],
+  "outstandingQuestions": [],
+  "scopeLimits": [],
+  "testCoverage": "N/A — plan phase",
+  "verdict": "WARN",
+  "createdAt": "2026-03-07T10:02:25.704Z"
+}
