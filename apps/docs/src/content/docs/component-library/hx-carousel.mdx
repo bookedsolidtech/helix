@@ -311,22 +311,22 @@ Keyboard navigation is active when focus is anywhere within the `hx-carousel` el
 
 `hx-carousel` implements the [WAI-ARIA APG Carousel Pattern](https://www.w3.org/WAI/ARIA/apg/patterns/carousel/).
 
-| Topic               | Details                                                                                                                                                         |
-| ------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| ARIA role           | The carousel container has `role="region"` and `aria-roledescription="carousel"` per the WAI-ARIA APG carousel pattern.                                         |
-| `aria-label`        | Required — set via the `label` property. Each carousel on a page **must** have a unique label (e.g., `"Featured Resources"`, `"Related Articles"`).             |
-| Slide groups        | Each `hx-carousel-item` renders `role="group"` with `aria-label="Slide N of M"` so screen readers announce position within the set.                             |
-| Live region         | A visually hidden `aria-live="polite"` region updates its text content on every slide change (e.g., `"Slide 2 of 3"`), triggering a screen reader announcement. |
-| Keyboard navigation | See the Keyboard Navigation table above. Keyboard events are handled on the carousel container.                                                                 |
-| Tab order           | Navigation buttons, pagination dots, and the play/pause button are all in the natural tab order.                                                                |
-| Focus ring          | All interactive controls expose `:focus-visible` outlines using `--hx-focus-ring-*` design tokens.                                                              |
-| Programmatic focus  | Slide group elements (`tabindex="-1"`) show a visible focus ring on both `:focus` and `:focus-visible` to support programmatic `.focus()` calls.                |
-| Autoplay controls   | The play/pause button uses a descriptive `aria-label`: `"Pause autoplay"` when playing, `"Play autoplay"` when stopped.                                         |
-| Disabled buttons    | Previous/next buttons carry the native `disabled` attribute when at the boundary without `loop`, removing them from tab order automatically.                    |
-| Reduced motion      | Autoplay does not start and CSS transitions are suppressed when `prefers-reduced-motion: reduce` is active.                                                     |
-| Multiple carousels  | Always set a unique `label` when two or more `hx-carousel` elements appear on the same page. Without it, screen readers cannot distinguish them.                |
-| Image slides        | Always provide meaningful `alt` text on `<img>` elements placed inside `hx-carousel-item`.                                                                      |
-| WCAG                | Meets WCAG 2.1 AA. Focus indicators use sufficient contrast. No information is conveyed by color alone.                                                         |
+| Topic               | Details                                                                                                                                                                                 |
+| ------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| ARIA role           | The carousel container has `role="region"` and `aria-roledescription="carousel"` per the WAI-ARIA APG carousel pattern.                                                                 |
+| `aria-label`        | Required — set via the `label` property. Each carousel on a page **must** have a unique label (e.g., `"Featured Resources"`, `"Related Articles"`).                                     |
+| Slide groups        | Each `hx-carousel-item` renders `role="group"` with `aria-label="Slide N of M"` so screen readers announce position within the set.                                                     |
+| Live region         | A visually hidden `aria-live="polite"` region updates its text content on every slide change (e.g., `"Slide 2 of 3"`), triggering a screen reader announcement.                         |
+| Keyboard navigation | See the Keyboard Navigation table above. Keyboard events are handled on the carousel container.                                                                                         |
+| Tab order           | Navigation buttons, pagination dots, and the play/pause button are all in the natural tab order.                                                                                        |
+| Focus ring          | All interactive controls expose `:focus-visible` outlines using `--hx-focus-ring-*` design tokens.                                                                                      |
+| Programmatic focus  | Slide group elements (`tabindex="-1"`) show a visible focus ring on both `:focus` and `:focus-visible` to support programmatic `.focus()` calls.                                        |
+| Autoplay controls   | The play/pause button uses a descriptive `aria-label`: `"Pause autoplay"` when playing, `"Play autoplay"` when stopped.                                                                 |
+| Disabled buttons    | Previous/next buttons carry the native `disabled` attribute when at the boundary without `loop`, removing them from tab order automatically.                                            |
+| Reduced motion      | Autoplay does not start and CSS transitions are suppressed when `prefers-reduced-motion: reduce` is active.                                                                             |
+| Multiple carousels  | Always set a unique `label` when two or more `hx-carousel` elements appear on the same page. Without it, screen readers cannot distinguish them.                                        |
+| Image slides        | Always provide meaningful `alt` text on `<img>` elements placed inside `hx-carousel-item`.                                                                                              |
+| WCAG                | Aims to meet WCAG 2.1 AA. Focus indicators use sufficient contrast. See `AUDIT.md` for known P1 issues: pagination dot labels, hardcoded `aria-label`, and `aria-live` region behavior. |
 
 ## hx-carousel-item Sub-Component
 
