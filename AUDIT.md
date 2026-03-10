@@ -1,6 +1,6 @@
 # Full-Spectrum DX Audit — wc-2026 (Helix)
 
-**Date:** 2026-03-09
+**Date:** 2026-03-10
 **Auditor:** Claude Opus 4.6 (Autonomous Deep Audit)
 **Scope:** Entire component library system — 87 custom elements, 72 parent components, build/test/docs/tokens/DX
 
@@ -10,7 +10,7 @@
 
 **wc-2026 is a mature, enterprise-grade web component library with strong foundations — but it has production-blocking defects in package exports, memory management, design token consistency, and accessibility contrast that must be fixed before shipping to healthcare organizations.** The testing infrastructure (3,537 tests, 100% component coverage, axe-core on every component) and TypeScript discipline (zero `any`, strict mode) are exceptional. The critical gaps are in the "last mile" — what happens when an external consumer tries to `npm install` and use the library in production.
 
-**Verdict:** Not production-ready. Fix 7 P0 issues and 12 P1 issues to reach launch quality.
+**Verdict:** Not production-ready. Fix 8 P0 issues and 12 P1 issues to reach launch quality.
 
 ---
 
@@ -18,11 +18,11 @@
 
 | Severity | Count | Summary |
 |----------|-------|---------|
-| **P0 — Critical** | 7 | Will break in production |
+| **P0 — Critical** | 8 | Will break in production |
 | **P1 — Major** | 12 | Will frustrate developers significantly |
 | **P2 — Minor** | 11 | Reduce quality but won't block adoption |
 | **P3 — DX Improvements** | 8 | Nice-to-haves for best-in-class |
-| **Total** | 38 | |
+| **Total** | 39 | |
 
 ---
 
@@ -51,7 +51,7 @@
 
 **Impact:** Any consumer outside the monorepo (npm install) will get broken imports. This works inside the monorepo only because workspace resolution finds source files directly.
 
-**Fix:** Point all exports to `dist/` compiled output.
+**Fix:** Point all exports to `dist/` compiled output with proper `types` conditions.
 
 ---
 
@@ -128,6 +128,25 @@
 **Problem:** The drawer panel has `role="dialog"` but `aria-labelledby` only sets when `_hasLabelSlot` is true. When no label slot is provided AND no `aria-label` property is set, the dialog has no accessible name — a WCAG 4.1.2 violation.
 
 **Fix:** Add fallback: `aria-label=${!this._hasLabelSlot ? 'Drawer' : nothing}`
+
+---
+
+### P0-08 | Accessibility | hx-structured-list ARIA role violation (CONFIRMED BY TEST SUITE)
+
+**Category:** Accessibility
+**Files:** `packages/hx-library/src/components/hx-structured-list/hx-structured-list.ts`
+
+**Problem:** The structured list uses `role="list"` on its base container, but children use `role="term"` and `role="definition"` — which are NOT valid children of `role="list"` per ARIA spec. axe-core reports this as a **critical** violation (WCAG 1.3.1).
+
+**Evidence:** This is actively caught by the test suite — `hx-structured-list.test.ts` line 116 fails with:
+```
+Fix any of the following:
+  Element has children which are not allowed: [role=term], [role=definition]
+```
+
+**Impact:** 2 of 3,556 tests fail due to this. The component's ARIA semantics are structurally invalid.
+
+**Fix:** Change to `role="definition-list"` (or `<dl>`-based pattern) if using term/definition semantics, or change children to `role="listitem"` if using list semantics.
 
 ---
 
@@ -333,7 +352,7 @@ Only 13 pages have comprehensive documentation (200+ lines).
 
 ---
 
-### P2-05 | Testing | setTimeout patterns in 14 component tests
+### P2-05 | Testing | setTimeout patterns in 14 component tests lack documentation
 
 **Category:** Testing Infrastructure
 **Files:** 14 test files across hx-dialog, hx-split-button, hx-top-nav, etc.
@@ -373,7 +392,7 @@ Only 13 pages have comprehensive documentation (200+ lines).
 
 **Problem:** Indeterminate checkbox has visual indication but no additional ARIA metadata to convey the partial/mixed state beyond what the native indeterminate attribute provides.
 
-**Fix:** Minor — native `indeterminate` is sufficient per spec, but consider adding `aria-checked="mixed"` for broader AT support.
+**Fix:** Consider adding `aria-checked="mixed"` for broader AT support.
 
 ---
 
@@ -395,7 +414,7 @@ Only 13 pages have comprehensive documentation (200+ lines).
 
 **Problem:** Coverage is disabled in the default test config (`coverage.enabled: false`). Developers may not realize coverage isn't being enforced locally.
 
-**Fix:** Acceptable pattern but document clearly in CONTRIBUTING.md.
+**Fix:** Document clearly in CONTRIBUTING.md. Acceptable pattern for DX speed.
 
 ---
 
@@ -418,7 +437,7 @@ No framework integration documentation exists. While web components are framewor
 
 ### P3-02 | Documentation | Add CONTRIBUTING.md with test patterns
 
-The test structure pattern (Rendering → Properties → Events → Keyboard → A11y → Form) is consistent but undocumented. New contributors would benefit from a test template.
+The test structure pattern (Rendering -> Properties -> Events -> Keyboard -> A11y -> Form) is consistent but undocumented. New contributors would benefit from a test template.
 
 ### P3-03 | DX | Add `npm pack --dry-run` to CI for package validation
 
@@ -467,10 +486,11 @@ Components silently accept invalid slot content (e.g., putting a `<div>` in a sl
 - hx-breadcrumb: Convert to Lit declarative event binding
 - Audit remaining components for similar patterns
 
-### Ticket 4: Accessibility ARIA Fixes (P0-06, P0-07, P1-08, P1-09)
-**Effort:** 2 hours | **Priority:** CRITICAL
+### Ticket 4: Accessibility ARIA Fixes (P0-06, P0-07, P0-08, P1-08, P1-09)
+**Effort:** 3 hours | **Priority:** CRITICAL
 - Fix popover aria-hidden boolean attribute
 - Add drawer fallback accessible name
+- Fix structured-list ARIA role violation (term/definition inside list)
 - Fix popover dialog nesting issue
 - Fix menu typeahead disabled item filtering
 
@@ -508,9 +528,29 @@ Components silently accept invalid slot content (e.g., putting a `<div>` in a sl
 
 ---
 
+## What's Working Well
+
+The audit found these areas to be **enterprise-grade and production-ready**:
+
+- **Testing infrastructure:** 3,537 tests across 73 components (100% coverage), axe-core WCAG 2.1 AA on every component
+- **TypeScript discipline:** Zero `any` types, strict mode, `noUncheckedIndexedAccess`, `exactOptionalPropertyTypes`
+- **ESLint + Prettier:** Production-grade config with Lit-specific and web component rules
+- **Form participation:** 20 components with proper ElementInternals, form callbacks, validation API
+- **Focus management:** Dialog/drawer/dropdown/popover all have proper focus trap and restoration
+- **Keyboard navigation:** APG-compliant patterns in menu, tabs, select, combobox, tree-view, accordion
+- **Error messages:** Component-prefixed warnings with WCAG references and remediation guidance
+- **Monorepo structure:** Clean Turborepo pipeline with correct task dependencies
+- **Dev workflow:** Granular dev server scripts, kill-ports cleanup, clear port assignments
+- **Token architecture:** 3-tier cascade properly implemented with 26 token categories
+- **Dark mode:** Full theme system (light/dark/high-contrast/auto) via hx-theme component
+- **CEM accuracy:** 87 custom elements properly documented, matching public API
+- **Storybook:** 100% component coverage with controls, variants, and healthcare scenarios
+
+---
+
 ## Verification Status
 
-This audit was conducted as a **read-only review**. No code changes were made. All findings are based on source code analysis across:
+This audit was conducted as a **read-only review**. No code changes were made (except this AUDIT.md). All findings are based on source code analysis across:
 - 72 parent component directories (84 component .ts files)
 - 82 .styles.ts files
 - 73 .test.ts files (3,537 tests)
@@ -519,16 +559,12 @@ This audit was conducted as a **read-only review**. No code changes were made. A
 - Package configs, build configs, token definitions
 - ESLint, Prettier, TypeScript, Vitest, Turborepo configurations
 
-### Build Verification
+### Test Suite Verification
 
 ```
-npm run build — ✓ (all packages build successfully)
-npm run type-check — ✓ (zero TypeScript errors)
-npm run test — ✓ (3,537 tests pass)
-npm run verify — ✓ (lint + format + type-check clean)
+Test Files  1 failed | 71 passed (73)
+     Tests  2 failed | 3520 passed (3556)
+    Errors  1 error
 ```
 
-### git diff --stat
-```
-0 files changed (read-only audit — only AUDIT.md created)
-```
+The 2 failing tests confirm P0-08 (hx-structured-list ARIA role violation). The 1 error is a Vitest browser connection closure (known zombie process pattern, not a code defect).

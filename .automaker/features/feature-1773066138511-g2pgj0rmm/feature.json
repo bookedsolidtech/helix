@@ -2,7 +2,7 @@
   "category": "Uncategorized",
   "description": "Create a reusable Astro/Starlight documentation page template that every component doc page will follow. This template will be used by agents working on per-component launch readiness tickets.\n\nThe template should be placed at `apps/docs/src/content/docs/component-library/_TEMPLATE.md` (or similar discoverable location) and include:\n\n1. **Component overview** — Brief description, use cases, when to use vs alternatives\n2. **Live demo section** — Embedded web component with interactive example (import from `@helix/library`)\n3. **Installation** — How to import individually (`import '@helix/library/components/hx-foo'`)\n4. **Basic usage** — Minimal HTML snippet showing the component in a plain HTML page\n5. **Properties table** — All public properties with types, defaults, descriptions (pull from CEM)\n6. **Events table** — All custom events with detail types\n7. **CSS custom properties** — All `--hx-*` tokens the component exposes\n8. **CSS parts** — All `::part()` targets for external styling\n9. **Slots** — All named and default slots\n10. **Accessibility** — ARIA roles, keyboard interactions, screen reader behavior\n11. **Drupal integration** — Twig template example\n12. **Standalone HTML example** — Complete, copy-pasteable HTML page that loads the component via CDN/script tag and renders it\n\nThe template must be clear enough that an agent can fill it in for any component using the CEM data and component source. Include placeholder comments like ``, ``, etc.\n\nAlso update the existing component doc pages to reference this template pattern.\n\n**Acceptance criteria:**\n- Template file exists and is documented\n- Template covers all 12 sections above\n- At least 1 example component doc page (hx-button) is updated to match the template\n- The standalone HTML example section actually works when copy-pasted into a .html file\n\n**Files to modify:**\n- `apps/docs/src/content/docs/component-library/_TEMPLATE.md` (new)\n- `apps/docs/src/content/docs/component-library/hx-button.md` (update as reference impl)",
   "title": "FOUNDATION: Create Astro component documentation template",
-  "status": "backlog",
+  "status": "done",
   "complexity": "large",
   "priority": 1,
   "isFoundation": true,
@@ -26,6 +26,33 @@
       "to": "backlog",
       "timestamp": "2026-03-09T14:22:18.512Z",
       "reason": "Feature created"
+    },
+    {
+      "from": "backlog",
+      "to": "blocked",
+      "timestamp": "2026-03-10T12:14:49.663Z",
+      "reason": "Infrastructure failure (not retryable): Execution timed out after 30 minutes"
+    },
+    {
+      "from": "blocked",
+      "to": "done",
+      "timestamp": "2026-03-10T12:14:52.918Z"
     }
-  ]
+  ],
+  "featureType": "code",
+  "statusChangeReason": "Infrastructure failure (not retryable): Execution timed out after 30 minutes",
+  "failureCount": 1,
+  "failureClassification": {
+    "category": "transient",
+    "confidence": 0.9,
+    "recoveryStrategy": {
+      "type": "retry",
+      "delay": 5000
+    },
+    "retryable": true,
+    "timestamp": "2026-03-10T12:14:49.664Z"
+  },
+  "prNumber": 533,
+  "prMergedAt": "2026-03-09T15:34:22Z",
+  "completedAt": "2026-03-10T12:14:52.918Z"
 }
