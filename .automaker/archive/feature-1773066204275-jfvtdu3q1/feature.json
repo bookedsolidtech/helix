@@ -1,0 +1,60 @@
+{
+  "category": "Uncategorized",
+  "description": "Launch readiness audit for hx-action-bar. Using the documentation template from the FOUNDATION ticket, ensure this component is production-ready.\n\n## Checklist\n1. **A11y healthcare compliance** — Run axe-core, verify ARIA roles, keyboard nav, screen reader behavior. Zero WCAG 2.1 AA violations.\n2. **Astro documentation page** — Create/update doc page using standard template. All 12 sections filled.\n3. **Individual export test** — Verify isolated import and standalone HTML rendering.\n4. **Existing tests pass** — `npm run verify` clean.\n\n## Known Patterns (from HELIX-PLATFORM-PROTO-LESSONS.md)\n- C-PATTERN-01: Never `= null` on `@query` fields\n- C-PATTERN-02: No `setAttribute()` in constructor\n- C-PATTERN-06: Event listeners before `await`\n\n## Files\n- `packages/hx-library/src/components/hx-action-bar/`\n- `apps/docs/src/content/docs/component-library/hx-action-bar.md`\n\n## Acceptance Criteria\n- Zero axe-core violations, doc page complete, individual import works, verify passes",
+  "title": "LAUNCH READY: hx-action-bar",
+  "status": "done",
+  "dependencies": [
+    "feature-1773066138511-g2pgj0rmm"
+  ],
+  "complexity": "medium",
+  "priority": 3,
+  "source": "api",
+  "trustTier": 1,
+  "quarantineStatus": "passed",
+  "quarantineId": "7baf1b9a-bc3b-4c0b-9cf1-05c687ce606b",
+  "id": "feature-1773066204275-jfvtdu3q1",
+  "branchName": "feature/launch-ready-hx-action-bar",
+  "descriptionHistory": [
+    {
+      "description": "Launch readiness audit for hx-action-bar. Using the documentation template from the FOUNDATION ticket, ensure this component is production-ready.\n\n## Checklist\n1. **A11y healthcare compliance** — Run axe-core, verify ARIA roles, keyboard nav, screen reader behavior. Zero WCAG 2.1 AA violations.\n2. **Astro documentation page** — Create/update doc page using standard template. All 12 sections filled.\n3. **Individual export test** — Verify isolated import and standalone HTML rendering.\n4. **Existing tests pass** — `npm run verify` clean.\n\n## Known Patterns (from HELIX-PLATFORM-PROTO-LESSONS.md)\n- C-PATTERN-01: Never `= null` on `@query` fields\n- C-PATTERN-02: No `setAttribute()` in constructor\n- C-PATTERN-06: Event listeners before `await`\n\n## Files\n- `packages/hx-library/src/components/hx-action-bar/`\n- `apps/docs/src/content/docs/component-library/hx-action-bar.md`\n\n## Acceptance Criteria\n- Zero axe-core violations, doc page complete, individual import works, verify passes",
+      "timestamp": "2026-03-09T14:23:24.276Z",
+      "source": "initial"
+    }
+  ],
+  "createdAt": "2026-03-09T14:23:24.276Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-03-09T14:23:24.276Z",
+      "reason": "Feature created"
+    },
+    {
+      "from": "backlog",
+      "to": "blocked",
+      "timestamp": "2026-03-10T12:16:36.339Z",
+      "reason": "git workflow failed — uncommitted work in worktree at /Volumes/Development/booked/helix/.worktrees/feature-launch-ready-hx-action-bar: git workflow failed — uncommitted work in worktree at /Volumes/Development/booked/helix/.worktrees/feature-launch-ready-hx-action-bar: Command failed: git push --force-with-lease -u origin \"feature/launch-ready-hx-action-bar\"\nTo github.com:bookedsolidtech/helix.git\n ! [rejected]          feature/launch-ready-hx-action-bar -> feature/launch-ready-hx-action-bar (stale info)\nerror: failed to push some refs to 'github.com:bookedsolidtech/helix.git'\n | stderr: To github.com:bookedsolidtech/helix.git\n ! [rejected]          feature/launch-ready-hx-action-bar -> feature/launch-ready-hx-action-bar (stale info)\nerror: failed to push some refs to 'github.com:bookedsolidtech/helix.git'"
+    },
+    {
+      "from": "blocked",
+      "to": "done",
+      "timestamp": "2026-03-10T12:16:39.341Z"
+    }
+  ],
+  "featureType": "code",
+  "statusChangeReason": "git workflow failed — uncommitted work in worktree at /Volumes/Development/booked/helix/.worktrees/feature-launch-ready-hx-action-bar: git workflow failed — uncommitted work in worktree at /Volumes/Development/booked/helix/.worktrees/feature-launch-ready-hx-action-bar: Command failed: git push --force-with-lease -u origin \"feature/launch-ready-hx-action-bar\"\nTo github.com:bookedsolidtech/helix.git\n ! [rejected]          feature/launch-ready-hx-action-bar -> feature/launch-ready-hx-action-bar (stale info)\nerror: failed to push some refs to 'github.com:bookedsolidtech/helix.git'\n | stderr: To github.com:bookedsolidtech/helix.git\n ! [rejected]          feature/launch-ready-hx-action-bar -> feature/launch-ready-hx-action-bar (stale info)\nerror: failed to push some refs to 'github.com:bookedsolidtech/helix.git'",
+  "failureCount": 1,
+  "failureClassification": {
+    "category": "unknown",
+    "confidence": 0.5,
+    "recoveryStrategy": {
+      "type": "escalate_to_user",
+      "reason": "Unclassified failure - needs investigation: git workflow failed — uncommitted work in worktree at /Volumes/Development/booked/helix/.worktrees/feature-launch-ready-hx-action-bar: git workflow failed — uncommitted work in worktree at /Volumes/Development/booked/helix/.worktrees/feature-launch-ready-hx-action-bar: Command failed: git push --for"
+    },
+    "retryable": false,
+    "timestamp": "2026-03-10T12:16:36.340Z"
+  },
+  "prNumber": 538,
+  "prMergedAt": "2026-03-09T15:52:52Z",
+  "completedAt": "2026-03-10T12:16:39.341Z"
+}

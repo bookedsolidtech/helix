@@ -7,7 +7,7 @@ describe('MCP Tools - TypeScript Diagnostics', () => {
 
   beforeEach(() => {
     server = new Server(
-      { name: '@helix/mcp-typescript-diagnostics', version: '0.1.0' },
+      { name: '@helixui/mcp-typescript-diagnostics', version: '0.1.0' },
       { capabilities: { tools: {} } },
     );
   });

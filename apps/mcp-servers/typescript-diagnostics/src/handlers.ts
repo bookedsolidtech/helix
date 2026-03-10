@@ -1,7 +1,7 @@
 import { Project, DiagnosticCategory } from 'ts-morph';
 import { resolve } from 'node:path';
 import { z } from 'zod';
-import { SafeFileOperations, MCPError, ErrorCategory } from '@helix/mcp-shared';
+import { SafeFileOperations, MCPError, ErrorCategory } from '@helixui/mcp-shared';
 
 const PROJECT_ROOT = resolve(process.cwd(), '../..');
 const TSCONFIG_PATH = resolve(PROJECT_ROOT, 'tsconfig.base.json');

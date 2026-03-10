@@ -1,0 +1,88 @@
+{
+  "category": "Uncategorized",
+  "description": "Launch readiness audit for hx-split-panel. Checklist: (1) A11y — axe-core zero violations, separator role, keyboard resize, WCAG 2.1 AA. (2) Astro doc page — all 12 template sections. (3) Individual export — standalone HTML works. (4) `npm run verify` passes. Files: `packages/hx-library/src/components/hx-split-panel/`, `apps/docs/src/content/docs/component-library/hx-split-panel.md`",
+  "title": "LAUNCH READY: hx-split-panel",
+  "status": "done",
+  "dependencies": [],
+  "complexity": "medium",
+  "priority": 3,
+  "source": "api",
+  "trustTier": 1,
+  "quarantineStatus": "passed",
+  "quarantineId": "23ebadd2-b1d1-4c61-827d-bdf9554b3eb0",
+  "id": "feature-1773066378144-8q36x9p4f",
+  "branchName": "feature/launch-ready-hx-split-panel",
+  "descriptionHistory": [
+    {
+      "description": "Launch readiness audit for hx-split-panel. Checklist: (1) A11y — axe-core zero violations, separator role, keyboard resize, WCAG 2.1 AA. (2) Astro doc page — all 12 template sections. (3) Individual export — standalone HTML works. (4) `npm run verify` passes. Files: `packages/hx-library/src/components/hx-split-panel/`, `apps/docs/src/content/docs/component-library/hx-split-panel.md`",
+      "timestamp": "2026-03-09T14:26:18.145Z",
+      "source": "initial"
+    }
+  ],
+  "createdAt": "2026-03-09T14:26:18.145Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-03-09T14:26:18.145Z",
+      "reason": "Feature created"
+    },
+    {
+      "from": "backlog",
+      "to": "in_progress",
+      "timestamp": "2026-03-10T18:35:31.654Z"
+    },
+    {
+      "from": "in_progress",
+      "to": "verified",
+      "timestamp": "2026-03-10T18:46:43.075Z"
+    },
+    {
+      "from": "done",
+      "to": "blocked",
+      "timestamp": "2026-03-10T19:37:32.468Z",
+      "reason": "Max same-state transitions exceeded in REVIEW (100 loops)"
+    },
+    {
+      "from": "blocked",
+      "to": "done",
+      "timestamp": "2026-03-10T19:40:19.599Z"
+    }
+  ],
+  "featureType": "code",
+  "model": "claude-sonnet-4-6",
+  "updatedAt": "2026-03-10T18:46:43.075Z",
+  "costUsd": 4.231736999999999,
+  "lastSessionId": "43b22835-e6b5-4c29-90f3-6e3342e1412d",
+  "completedAt": "2026-03-10T18:46:43.075Z",
+  "executionHistory": [
+    {
+      "id": "85a5f6db-8c9f-4285-a53f-5e7f5a8bf820",
+      "startedAt": "2026-03-10T18:35:32.058Z",
+      "completedAt": "2026-03-10T18:46:43.080Z",
+      "durationMs": 671022,
+      "costUsd": 4.231736999999999,
+      "model": "claude-sonnet-4-6",
+      "success": true,
+      "trigger": "manual"
+    }
+  ],
+  "summary": "## Summary: Launch Readiness Audit — hx-split-panel\n\n### Changes Implemented\n- Expanded `hx-split-panel.mdx` from a 15-line stub to a complete 553-line doc page with all 12 required template sections\n\n### Files Modified\n- `apps/docs/src/content/docs/component-library/hx-split-panel.mdx`\n\n### Risks/Blockers Encountered\n- None — component source was already at full launch quality from prior work\n\n### Learnings\n- `hx-split-panel` had the most complete implementation of any component audited so far — the AUDIT.md issues had all been resolved prior to this feature running\n- The divider uses `role=\"separator\"` (ARIA splitter pattern) with `aria-valuenow/min/max/orientation` — this is the correct pattern for resizable panels per ARIA authoring practices\n\n### Notes for Developer\n- 79 tests, 97.6% statement coverage, zero axe-core violations — this component is in excellent shape\n- Doc page includes a healthcare patient record layout demo (PatientRecordLayout story) making it particularly relevant for the enterprise healthcare use case\n\n### Verification Status\n- All 7 quality gates pass: TypeScript strict, lint, format check, 79/79 tests, 4 axe-core zero-violation tests, 97.6% coverage",
+  "prUrl": "https://github.com/bookedsolidtech/helix/pull/620",
+  "prNumber": 620,
+  "prTrackedSince": "2026-03-10T18:47:32.172Z",
+  "prLastPolledAt": "2026-03-10T19:40:15.462Z",
+  "statusChangeReason": "Max same-state transitions exceeded in REVIEW (100 loops)",
+  "failureCount": 1,
+  "failureClassification": {
+    "category": "unknown",
+    "confidence": 0.5,
+    "recoveryStrategy": {
+      "type": "escalate_to_user",
+      "reason": "Unclassified failure - needs investigation: Max same-state transitions exceeded in REVIEW (100 loops)"
+    },
+    "retryable": false,
+    "timestamp": "2026-03-10T19:37:32.469Z"
+  },
+  "assignee": "jake"
+}

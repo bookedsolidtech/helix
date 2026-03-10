@@ -1,13 +1,13 @@
 ---
 title: Component Styling Fundamentals
-description: Deep dive into Shadow DOM styling with :host selectors, :host() functions, style encapsulation, CSS custom properties, and the wc-2026 design token system.
+description: Deep dive into Shadow DOM styling with :host selectors, :host() functions, style encapsulation, CSS custom properties, and the HELiX design token system.
 sidebar:
   order: 1
 ---
 
 Shadow DOM provides powerful style encapsulation for web components, creating a boundary where external styles cannot leak in and internal styles cannot leak out. This isolation is fundamental to building enterprise-grade component libraries where reliability and predictability are non-negotiable.
 
-This guide covers the Shadow DOM styling mechanisms that power wc-2026 components: the `:host` selector, `:host()` function, `:host-context()` pattern, style boundaries, CSS custom properties, and the three-tier design token architecture.
+This guide covers the Shadow DOM styling mechanisms that power HELiX components: the `:host` selector, `:host()` function, `:host-context()` pattern, style boundaries, CSS custom properties, and the three-tier design token architecture.
 
 ---
 
@@ -41,7 +41,7 @@ Shadow DOM creates a **style boundary** that separates component implementation 
 <button>Page Button</button>
 <!-- Red background -->
 
-<hx-button>
+<wc-button>
   #shadow-root
   <style>
     button {
@@ -50,7 +50,7 @@ Shadow DOM creates a **style boundary** that separates component implementation 
   </style>
   <button>Component Button</button>
   <!-- Blue background -->
-</hx-button>
+</wc-button>
 ```
 
 The page-level `button { background: red; }` rule has **no effect** inside the shadow DOM. The shadow boundary blocks external selector matching.
@@ -58,7 +58,7 @@ The page-level `button { background: red; }` rule has **no effect** inside the s
 **Rule 2: Internal styles cannot leak outside**
 
 ```html
-<hx-card>
+<wc-card>
   #shadow-root
   <style>
     p {
@@ -67,7 +67,7 @@ The page-level `button { background: red; }` rule has **no effect** inside the s
   </style>
   <p>Inside shadow DOM</p>
   <slot></slot>
-</hx-card>
+</wc-card>
 
 <p>Outside shadow DOM</p>
 <!-- NOT purple -->
@@ -88,7 +88,7 @@ While selector matching stops at the boundary, inheritable CSS properties pierce
   }
 </style>
 
-<hx-card>
+<wc-card>
   #shadow-root
   <style>
     :host {
@@ -96,7 +96,7 @@ While selector matching stops at the boundary, inheritable CSS properties pierce
     }
   </style>
   <p>This text inherits font-family, color, and line-height from body</p>
-</hx-card>
+</wc-card>
 ```
 
 **Properties that inherit:**
@@ -142,8 +142,8 @@ The `:host` pseudo-class selector targets the **shadow host element itself**—t
 import { LitElement, css, html } from 'lit';
 import { customElement } from 'lit/decorators.js';
 
-@customElement('hx-button')
-export class HxButton extends LitElement {
+@customElement('wc-button')
+export class WcButton extends LitElement {
   static styles = css`
     :host {
       display: inline-block;
@@ -152,7 +152,7 @@ export class HxButton extends LitElement {
 
     .button {
       padding: 0.5rem 1rem;
-      background: var(--hx-button-bg, var(--hx-color-primary-500, #2563eb));
+      background: var(--wc-button-bg, var(--wc-color-primary-500, #2563eb));
     }
   `;
 
@@ -164,10 +164,10 @@ export class HxButton extends LitElement {
 
 ```html
 <!-- Usage -->
-<hx-button>Click Me</hx-button>
+<wc-button>Click Me</wc-button>
 ```
 
-The `:host` selector applies styles to the `<hx-button>` element itself, not to elements inside the shadow DOM.
+The `:host` selector applies styles to the `<wc-button>` element itself, not to elements inside the shadow DOM.
 
 ### Why `:host` Matters
 
@@ -209,8 +209,8 @@ Accept CSS custom properties at the host level:
 
 ```css
 :host {
-  --_bg: var(--hx-button-bg, var(--hx-color-primary-500, #2563eb));
-  --_color: var(--hx-button-color, var(--hx-color-neutral-0, #ffffff));
+  --_bg: var(--wc-button-bg, var(--wc-color-primary-500, #2563eb));
+  --_color: var(--wc-button-color, var(--wc-color-neutral-0, #ffffff));
 }
 
 .button {
@@ -230,18 +230,18 @@ Accept CSS custom properties at the host level:
 }
 
 /* Page styles (higher specificity) */
-hx-button {
+wc-button {
   color: red; /* WINS — overrides :host */
 }
 
-hx-button.primary {
+wc-button.primary {
   color: green; /* ALSO WINS — two classes > one class */
 }
 ```
 
 **This is intentional.** Low specificity allows consumers to style the host element without needing `!important`. Component authors provide **default** host styles; consumers can override them naturally.
 
-### wc-2026 `:host` Patterns
+### HELiX `:host` Patterns
 
 **Pattern 1: Display mode + containment**
 
@@ -257,7 +257,7 @@ hx-button.primary {
 ```css
 :host([disabled]) {
   pointer-events: none;
-  opacity: var(--hx-opacity-disabled, 0.5);
+  opacity: var(--wc-opacity-disabled, 0.5);
 }
 ```
 
@@ -302,18 +302,18 @@ static styles = css`
   }
 
   :host([variant='primary']) .button {
-    background: var(--hx-color-primary-500, #2563eb);
+    background: var(--wc-color-primary-500, #2563eb);
     color: white;
   }
 
   :host([variant='secondary']) .button {
     background: transparent;
-    color: var(--hx-color-primary-500, #2563eb);
-    border: 1px solid var(--hx-color-primary-500, #2563eb);
+    color: var(--wc-color-primary-500, #2563eb);
+    border: 1px solid var(--wc-color-primary-500, #2563eb);
   }
 
   :host([variant='danger']) .button {
-    background: var(--hx-color-error-500, #dc3545);
+    background: var(--wc-color-error-500, #dc3545);
     color: white;
   }
 `;
@@ -321,10 +321,10 @@ static styles = css`
 
 ```html
 <!-- Usage -->
-<hx-button variant="primary">Save</hx-button>
-<hx-button variant="secondary">Cancel</hx-button>
-<hx-button variant="danger">Delete</hx-button>
-<hx-button disabled>Disabled</hx-button>
+<wc-button variant="primary">Save</wc-button>
+<wc-button variant="secondary">Cancel</wc-button>
+<wc-button variant="danger">Delete</wc-button>
+<wc-button disabled>Disabled</wc-button>
 ```
 
 ### Class-Based Styling
@@ -333,19 +333,19 @@ Style based on host classes:
 
 ```css
 :host(.large) {
-  --_font-size: var(--hx-font-size-lg, 1.125rem);
-  --_padding: var(--hx-space-3, 0.75rem) var(--hx-space-6, 1.5rem);
+  --_font-size: var(--wc-font-size-lg, 1.125rem);
+  --_padding: var(--wc-space-3, 0.75rem) var(--wc-space-6, 1.5rem);
 }
 
 :host(.compact) {
-  --_font-size: var(--hx-font-size-sm, 0.875rem);
-  --_padding: var(--hx-space-1, 0.25rem) var(--hx-space-2, 0.5rem);
+  --_font-size: var(--wc-font-size-sm, 0.875rem);
+  --_padding: var(--wc-space-1, 0.25rem) var(--wc-space-2, 0.5rem);
 }
 ```
 
 ```html
-<hx-button class="large">Large Button</hx-button>
-<hx-button class="compact">Compact Button</hx-button>
+<wc-button class="large">Large Button</wc-button>
+<wc-button class="compact">Compact Button</wc-button>
 ```
 
 ### Pseudo-Class Styling
@@ -358,7 +358,7 @@ Style based on host pseudo-classes:
 }
 
 :host(:focus-visible) {
-  outline: 2px solid var(--hx-focus-ring-color, #2563eb);
+  outline: 2px solid var(--wc-focus-ring-color, #2563eb);
   outline-offset: 2px;
 }
 
@@ -382,20 +382,20 @@ Combine multiple conditions:
 }
 ```
 
-### wc-2026 `:host()` Patterns
+### HELiX `:host()` Patterns
 
 **Pattern 1: Variant-driven token overrides**
 
 ```css
 :host([variant='primary']) {
-  --_bg: var(--hx-button-bg, var(--hx-color-primary-500, #2563eb));
-  --_color: var(--hx-button-color, var(--hx-color-neutral-0, #ffffff));
+  --_bg: var(--wc-button-bg, var(--wc-color-primary-500, #2563eb));
+  --_color: var(--wc-button-color, var(--wc-color-neutral-0, #ffffff));
 }
 
 :host([variant='secondary']) {
   --_bg: transparent;
-  --_color: var(--hx-color-primary-500, #2563eb);
-  --_border-color: var(--hx-color-primary-500, #2563eb);
+  --_color: var(--wc-color-primary-500, #2563eb);
+  --_border-color: var(--wc-color-primary-500, #2563eb);
 }
 ```
 
@@ -403,12 +403,12 @@ Combine multiple conditions:
 
 ```css
 :host([invalid]) .input-wrapper {
-  border-color: var(--hx-input-error-color, var(--hx-color-error-500, #dc3545));
+  border-color: var(--wc-input-error-color, var(--wc-color-error-500, #dc3545));
 }
 
 :host([invalid]) .error-message {
   display: block;
-  color: var(--hx-input-error-color, var(--hx-color-error-500, #dc3545));
+  color: var(--wc-input-error-color, var(--wc-color-error-500, #dc3545));
 }
 ```
 
@@ -440,13 +440,13 @@ The `selector` argument matches **against ancestors** of the shadow host, traver
 
 ```css
 :host-context(.theme-dark) {
-  --_bg: var(--hx-color-neutral-800, #212529);
-  --_color: var(--hx-color-neutral-0, #ffffff);
+  --_bg: var(--wc-color-neutral-800, #212529);
+  --_color: var(--wc-color-neutral-0, #ffffff);
 }
 
 :host-context(.theme-light) {
-  --_bg: var(--hx-color-neutral-0, #ffffff);
-  --_color: var(--hx-color-neutral-800, #212529);
+  --_bg: var(--wc-color-neutral-0, #ffffff);
+  --_color: var(--wc-color-neutral-800, #212529);
 }
 ```
 
@@ -470,21 +470,21 @@ Instead of relying on `:host-context()`, use CSS custom properties for theming:
 ```css
 /* Component stylesheet */
 :host {
-  background: var(--hx-card-bg, var(--hx-color-neutral-0, #ffffff));
-  color: var(--hx-card-color, var(--hx-color-neutral-800, #212529));
+  background: var(--wc-card-bg, var(--wc-color-neutral-0, #ffffff));
+  color: var(--wc-card-color, var(--wc-color-neutral-800, #212529));
 }
 ```
 
 ```css
 /* Consumer theme styles (works everywhere) */
 .theme-dark {
-  --hx-color-neutral-0: #212529; /* Swap light/dark */
-  --hx-color-neutral-800: #ffffff;
+  --wc-color-neutral-0: #212529; /* Swap light/dark */
+  --wc-color-neutral-800: #ffffff;
 }
 
 .theme-light {
-  --hx-color-neutral-0: #ffffff;
-  --hx-color-neutral-800: #212529;
+  --wc-color-neutral-0: #ffffff;
+  --wc-color-neutral-800: #212529;
 }
 ```
 
@@ -495,9 +495,9 @@ Instead of relying on `:host-context()`, use CSS custom properties for theming:
 - Explicit theming API (documented tokens vs. implicit context dependency)
 - Testable (override tokens in tests vs. wrapping in context divs)
 
-### wc-2026 Policy on `:host-context()`
+### HELiX Policy on `:host-context()`
 
-**Policy:** wc-2026 components **do not use `:host-context()`** for theming or critical functionality. All theming is CSS custom property-based to ensure Firefox compatibility.
+**Policy:** HELiX components **do not use `:host-context()`** for theming or critical functionality. All theming is CSS custom property-based to ensure Firefox compatibility.
 
 **Exception:** `:host-context()` may be used for **optional enhancements** in Chromium/Safari (e.g., experimental features, developer tools), but never for core component behavior.
 
@@ -522,7 +522,7 @@ Selectors defined inside shadow DOM **only match elements inside that shadow tre
 <div class="card">Page Card</div>
 <!-- Red border -->
 
-<hx-card>
+<wc-card>
   #shadow-root
   <style>
     .card {
@@ -531,7 +531,7 @@ Selectors defined inside shadow DOM **only match elements inside that shadow tre
   </style>
   <div class="card">Shadow Card</div>
   <!-- Blue border -->
-</hx-card>
+</wc-card>
 ```
 
 Neither selector affects the other's target. The shadow boundary creates **complete isolation**.
@@ -575,18 +575,18 @@ Component authors can use simple, semantic class names without worrying about pa
 Element IDs inside shadow DOM don't pollute the global document namespace:
 
 ```html
-<hx-dialog>
+<wc-dialog>
   #shadow-root
   <div id="header">Header 1</div>
   <div id="content">Content 1</div>
-</hx-dialog>
+</wc-dialog>
 
-<hx-dialog>
+<wc-dialog>
   #shadow-root
   <div id="header">Header 2</div>
   <!-- No conflict! -->
   <div id="content">Content 2</div>
-</hx-dialog>
+</wc-dialog>
 
 <script>
   document.getElementById('header'); // null (IDs scoped to shadow trees)
@@ -600,7 +600,7 @@ This allows components to use simple, semantic IDs without worrying about confli
 Lit uses **constructable stylesheets** (via `adoptedStyleSheets`) for optimal performance:
 
 ```typescript
-export class HxButton extends LitElement {
+export class WcButton extends LitElement {
   static styles = css`
     :host {
       display: inline-block;
@@ -635,51 +635,51 @@ CSS custom properties (CSS variables) are the **only mechanism** that allows ext
 ```html
 <style>
   :root {
-    --hx-color-primary-500: #007878;
-    --hx-font-family-sans: 'Inter', sans-serif;
+    --wc-color-primary-500: #007878;
+    --wc-font-family-sans: 'Inter', sans-serif;
   }
 </style>
 
-<hx-button>
+<wc-button>
   #shadow-root
   <style>
     .button {
-      background: var(--hx-color-primary-500, #2563eb); /* Inherits #007878 */
-      font-family: var(--hx-font-family-sans, sans-serif); /* Inherits 'Inter' */
+      background: var(--wc-color-primary-500, #2563eb); /* Inherits #007878 */
+      font-family: var(--wc-font-family-sans, sans-serif); /* Inherits 'Inter' */
     }
   </style>
   <button class="button">Click</button>
-</hx-button>
+</wc-button>
 ```
 
 Even though the shadow boundary blocks selector matching, CSS custom properties **inherit naturally** from parent to child, crossing shadow boundaries.
 
 ### The Fallback Pattern
 
-wc-2026 uses a **two-level fallback chain** for every CSS custom property:
+HELiX uses a **two-level fallback chain** for every CSS custom property:
 
 ```css
-property: var(--hx-component-token, var(--hx-semantic-token, primitive-value));
+property: var(--wc-component-token, var(--wc-semantic-token, primitive-value));
 ```
 
 **Example:**
 
 ```css
 .button {
-  background: var(--hx-button-bg, var(--hx-color-primary-500, #2563eb));
+  background: var(--wc-button-bg, var(--wc-color-primary-500, #2563eb));
 }
 ```
 
 **Resolution order:**
 
-1. `--hx-button-bg` (component-level override)
-2. `--hx-color-primary-500` (semantic token for global theming)
+1. `--wc-button-bg` (component-level override)
+2. `--wc-color-primary-500` (semantic token for global theming)
 3. `#2563eb` (primitive fallback, factory default)
 
 **Why two levels?**
 
-- **One level** (`var(--hx-button-bg, #2563eb)`) forces consumers to set per-component tokens for every component, duplicating work
-- **Two levels** allow global theming (override `--hx-color-primary-500` once) and per-component precision (override `--hx-button-bg` for surgical changes)
+- **One level** (`var(--wc-button-bg, #2563eb)`) forces consumers to set per-component tokens for every component, duplicating work
+- **Two levels** allow global theming (override `--wc-color-primary-500` once) and per-component precision (override `--wc-button-bg` for surgical changes)
 - **Three+ levels** create debugging complexity and performance overhead
 
 ### Private vs. Public Tokens
@@ -688,9 +688,9 @@ property: var(--hx-component-token, var(--hx-semantic-token, primitive-value));
 
 ```css
 /* Exposed to consumers, documented in JSDoc/CEM */
---hx-button-bg
---hx-button-color
---hx-button-border-radius
+--wc-button-bg
+--wc-button-color
+--wc-button-border-radius
 ```
 
 **Private tokens** (internal implementation):
@@ -706,8 +706,8 @@ property: var(--hx-component-token, var(--hx-semantic-token, primitive-value));
 ```css
 :host {
   /* Private tokens computed from public tokens */
-  --_bg: var(--hx-button-bg, var(--hx-color-primary-500, #2563eb));
-  --_color: var(--hx-button-color, var(--hx-color-neutral-0, #ffffff));
+  --_bg: var(--wc-button-bg, var(--wc-color-primary-500, #2563eb));
+  --_color: var(--wc-button-color, var(--wc-color-neutral-0, #ffffff));
 }
 
 .button {
@@ -722,18 +722,18 @@ Every public token is documented via JSDoc:
 
 ```typescript
 /**
- * @cssprop [--hx-button-bg=var(--hx-color-primary-500)] - Button background color.
- * @cssprop [--hx-button-color=var(--hx-color-neutral-0)] - Button text color.
- * @cssprop [--hx-button-border-color=transparent] - Button border color.
- * @cssprop [--hx-button-border-radius=var(--hx-border-radius-md)] - Button corner radius.
- * @cssprop [--hx-button-font-family=var(--hx-font-family-sans)] - Button font family.
- * @cssprop [--hx-button-font-weight=var(--hx-font-weight-semibold)] - Button font weight.
- * @cssprop [--hx-button-focus-ring-color=var(--hx-focus-ring-color)] - Focus ring color.
+ * @cssprop [--wc-button-bg=var(--wc-color-primary-500)] - Button background color.
+ * @cssprop [--wc-button-color=var(--wc-color-neutral-0)] - Button text color.
+ * @cssprop [--wc-button-border-color=transparent] - Button border color.
+ * @cssprop [--wc-button-border-radius=var(--wc-border-radius-md)] - Button corner radius.
+ * @cssprop [--wc-button-font-family=var(--wc-font-family-sans)] - Button font family.
+ * @cssprop [--wc-button-font-weight=var(--wc-font-weight-semibold)] - Button font weight.
+ * @cssprop [--wc-button-focus-ring-color=var(--wc-focus-ring-color)] - Focus ring color.
  *
  * @csspart button - The native button element.
  */
-@customElement('hx-button')
-export class HxButton extends LitElement {
+@customElement('wc-button')
+export class WcButton extends LitElement {
   // ...
 }
 ```
@@ -742,9 +742,9 @@ This JSDoc is processed by Custom Elements Manifest (CEM) to generate machine-re
 
 ---
 
-## wc-2026 Design Token System
+## HELiX Design Token System
 
-wc-2026 uses a **three-tier token architecture** that separates primitive values, semantic meaning, and component-specific overrides.
+HELiX uses a **three-tier token architecture** that separates primitive values, semantic meaning, and component-specific overrides.
 
 ### Three-Tier Architecture
 
@@ -756,12 +756,12 @@ wc-2026 uses a **three-tier token architecture** that separates primitive values
                         ↓
 ┌─────────────────────────────────────────────────────────┐
 │ Tier 2: SEMANTIC TOKENS (public API, global theming)   │
-│ --hx-color-primary-500, --hx-space-4, --hx-font-weight │
+│ --wc-color-primary-500, --wc-space-4, --wc-font-weight │
 └─────────────────────────────────────────────────────────┘
                         ↓
 ┌─────────────────────────────────────────────────────────┐
 │ Tier 3: COMPONENT TOKENS (optional, surgical overrides)│
-│ --hx-button-bg, --hx-card-padding, --hx-input-border   │
+│ --wc-button-bg, --wc-card-padding, --wc-input-border   │
 └─────────────────────────────────────────────────────────┘
 ```
 
@@ -770,17 +770,17 @@ wc-2026 uses a **three-tier token architecture** that separates primitive values
 All tokens follow a strict pattern:
 
 ```
---hx-{category}-{property}-{variant?}
+--wc-{category}-{property}-{variant?}
 ```
 
 **Examples:**
 
 ```css
---hx-color-primary-500           /* Color category, primary palette, 500 shade */
---hx-space-4                     /* Spacing category, scale position 4 */
---hx-font-size-md                /* Font category, medium size */
---hx-button-bg                   /* Component category, background property */
---hx-border-radius-lg            /* Border category, large radius */
+--wc-color-primary-500           /* Color category, primary palette, 500 shade */
+--wc-space-4                     /* Spacing category, scale position 4 */
+--wc-font-size-md                /* Font category, medium size */
+--wc-button-bg                   /* Component category, background property */
+--wc-border-radius-lg            /* Border category, large radius */
 ```
 
 ### Core Token Categories
@@ -789,104 +789,104 @@ All tokens follow a strict pattern:
 
 ```css
 /* Primary palette (blue) */
---hx-color-primary-50: #eff6ff;
---hx-color-primary-500: #2563eb; /* Base primary */
---hx-color-primary-700: #1e40af;
+--wc-color-primary-50: #eff6ff;
+--wc-color-primary-500: #2563eb; /* Base primary */
+--wc-color-primary-700: #1e40af;
 
 /* Neutral palette (grayscale) */
---hx-color-neutral-0: #ffffff;
---hx-color-neutral-100: #f1f5f9;
---hx-color-neutral-200: #dee2e6;
---hx-color-neutral-800: #212529;
+--wc-color-neutral-0: #ffffff;
+--wc-color-neutral-100: #f1f5f9;
+--wc-color-neutral-200: #dee2e6;
+--wc-color-neutral-800: #212529;
 
 /* Semantic colors */
---hx-color-success-500: #10b981;
---hx-color-error-500: #ef4444;
---hx-color-warning-500: #f59e0b;
---hx-color-info-500: #3b82f6;
+--wc-color-success-500: #10b981;
+--wc-color-error-500: #ef4444;
+--wc-color-warning-500: #f59e0b;
+--wc-color-info-500: #3b82f6;
 ```
 
 **Spacing:**
 
 ```css
---hx-space-1: 0.25rem; /* 4px */
---hx-space-2: 0.5rem; /* 8px */
---hx-space-3: 0.75rem; /* 12px */
---hx-space-4: 1rem; /* 16px */
---hx-space-6: 1.5rem; /* 24px */
---hx-space-8: 2rem; /* 32px */
+--wc-space-1: 0.25rem; /* 4px */
+--wc-space-2: 0.5rem; /* 8px */
+--wc-space-3: 0.75rem; /* 12px */
+--wc-space-4: 1rem; /* 16px */
+--wc-space-6: 1.5rem; /* 24px */
+--wc-space-8: 2rem; /* 32px */
 ```
 
 **Typography:**
 
 ```css
---hx-font-family-sans: system-ui, -apple-system, 'Segoe UI', sans-serif;
---hx-font-size-sm: 0.875rem; /* 14px */
---hx-font-size-md: 1rem; /* 16px */
---hx-font-size-lg: 1.125rem; /* 18px */
---hx-font-weight-normal: 400;
---hx-font-weight-semibold: 600;
---hx-line-height-tight: 1.25;
---hx-line-height-normal: 1.5;
+--wc-font-family-sans: system-ui, -apple-system, 'Segoe UI', sans-serif;
+--wc-font-size-sm: 0.875rem; /* 14px */
+--wc-font-size-md: 1rem; /* 16px */
+--wc-font-size-lg: 1.125rem; /* 18px */
+--wc-font-weight-normal: 400;
+--wc-font-weight-semibold: 600;
+--wc-line-height-tight: 1.25;
+--wc-line-height-normal: 1.5;
 ```
 
 **Borders:**
 
 ```css
---hx-border-width-thin: 1px;
---hx-border-width-medium: 2px;
---hx-border-radius-sm: 0.25rem; /* 4px */
---hx-border-radius-md: 0.375rem; /* 6px */
---hx-border-radius-lg: 0.5rem; /* 8px */
+--wc-border-width-thin: 1px;
+--wc-border-width-medium: 2px;
+--wc-border-radius-sm: 0.25rem; /* 4px */
+--wc-border-radius-md: 0.375rem; /* 6px */
+--wc-border-radius-lg: 0.5rem; /* 8px */
 ```
 
 **Shadows:**
 
 ```css
---hx-shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
---hx-shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
---hx-shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+--wc-shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+--wc-shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+--wc-shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
 ```
 
 **Transitions:**
 
 ```css
---hx-transition-fast: 150ms ease;
---hx-transition-normal: 250ms ease;
---hx-transition-slow: 350ms ease;
+--wc-transition-fast: 150ms ease;
+--wc-transition-normal: 250ms ease;
+--wc-transition-slow: 350ms ease;
 ```
 
 **Focus indicators:**
 
 ```css
---hx-focus-ring-width: 2px;
---hx-focus-ring-offset: 2px;
---hx-focus-ring-color: #2563eb;
---hx-focus-ring-opacity: 0.25;
+--wc-focus-ring-width: 2px;
+--wc-focus-ring-offset: 2px;
+--wc-focus-ring-color: #2563eb;
+--wc-focus-ring-opacity: 0.25;
 ```
 
 ### Component Token Examples
 
-**hx-button:**
+**wc-button:**
 
 ```css
---hx-button-bg: var(--hx-color-primary-500, #2563eb);
---hx-button-color: var(--hx-color-neutral-0, #ffffff);
---hx-button-border-color: transparent;
---hx-button-border-radius: var(--hx-border-radius-md, 0.375rem);
---hx-button-font-family: var(--hx-font-family-sans, sans-serif);
---hx-button-font-weight: var(--hx-font-weight-semibold, 600);
---hx-button-focus-ring-color: var(--hx-focus-ring-color, #2563eb);
+--wc-button-bg: var(--wc-color-primary-500, #2563eb);
+--wc-button-color: var(--wc-color-neutral-0, #ffffff);
+--wc-button-border-color: transparent;
+--wc-button-border-radius: var(--wc-border-radius-md, 0.375rem);
+--wc-button-font-family: var(--wc-font-family-sans, sans-serif);
+--wc-button-font-weight: var(--wc-font-weight-semibold, 600);
+--wc-button-focus-ring-color: var(--wc-focus-ring-color, #2563eb);
 ```
 
-**hx-card:**
+**wc-card:**
 
 ```css
---hx-card-bg: var(--hx-color-neutral-0, #ffffff);
---hx-card-color: var(--hx-color-neutral-800, #212529);
---hx-card-border-color: var(--hx-color-neutral-200, #dee2e6);
---hx-card-border-radius: var(--hx-border-radius-lg, 0.5rem);
---hx-card-padding: var(--hx-space-6, 1.5rem);
+--wc-card-bg: var(--wc-color-neutral-0, #ffffff);
+--wc-card-color: var(--wc-color-neutral-800, #212529);
+--wc-card-border-color: var(--wc-color-neutral-200, #dee2e6);
+--wc-card-border-radius: var(--wc-border-radius-lg, 0.5rem);
+--wc-card-padding: var(--wc-space-6, 1.5rem);
 ```
 
 ### Theming Example
@@ -897,29 +897,29 @@ All tokens follow a strict pattern:
 /* Consumer's theme file */
 :root {
   /* Override primary color (teal instead of blue) */
-  --hx-color-primary-50: #e6f7f7;
-  --hx-color-primary-500: #007878;
-  --hx-color-primary-700: #005555;
+  --wc-color-primary-50: #e6f7f7;
+  --wc-color-primary-500: #007878;
+  --wc-color-primary-700: #005555;
 
   /* Custom font stack */
-  --hx-font-family-sans: 'Inter', 'Helvetica Neue', sans-serif;
+  --wc-font-family-sans: 'Inter', 'Helvetica Neue', sans-serif;
 
   /* Tighter spacing */
-  --hx-space-4: 0.875rem;
-  --hx-space-6: 1.25rem;
+  --wc-space-4: 0.875rem;
+  --wc-space-6: 1.25rem;
 }
 ```
 
-**Result:** All wc-2026 components automatically adopt the new theme without code changes. Every component that uses `--hx-color-primary-500` now renders in teal. Every component using `--hx-font-family-sans` uses Inter.
+**Result:** All HELiX components automatically adopt the new theme without code changes. Every component that uses `--wc-color-primary-500` now renders in teal. Every component using `--wc-font-family-sans` uses Inter.
 
 **Component-specific override:**
 
 ```css
 /* Surgical styling for hero CTA button */
-hx-button.hero-cta {
-  --hx-button-bg: linear-gradient(135deg, #ff6b35, #f7931e);
-  --hx-button-font-size: 1.25rem;
-  --hx-button-border-radius: 2rem; /* Pill shape */
+wc-button.hero-cta {
+  --wc-button-bg: linear-gradient(135deg, #ff6b35, #f7931e);
+  --wc-button-font-size: 1.25rem;
+  --wc-button-border-radius: 2rem; /* Pill shape */
 }
 ```
 
@@ -954,9 +954,9 @@ hx-button.hero-cta {
 
 /* GOOD */
 .button {
-  background: var(--hx-button-bg, var(--hx-color-primary-500, #2563eb));
-  padding: var(--hx-space-2, 0.5rem) var(--hx-space-4, 1rem);
-  font-weight: var(--hx-button-font-weight, var(--hx-font-weight-semibold, 600));
+  background: var(--wc-button-bg, var(--wc-color-primary-500, #2563eb));
+  padding: var(--wc-space-2, 0.5rem) var(--wc-space-4, 1rem);
+  font-weight: var(--wc-button-font-weight, var(--wc-font-weight-semibold, 600));
 }
 ```
 
@@ -965,12 +965,12 @@ hx-button.hero-cta {
 ```css
 /* BAD (missing semantic fallback) */
 .card {
-  background: var(--hx-card-bg, #ffffff);
+  background: var(--wc-card-bg, #ffffff);
 }
 
 /* GOOD */
 .card {
-  background: var(--hx-card-bg, var(--hx-color-neutral-0, #ffffff));
+  background: var(--wc-card-bg, var(--wc-color-neutral-0, #ffffff));
 }
 ```
 
@@ -998,11 +998,11 @@ hx-button.hero-cta {
 
 ```typescript
 /**
- * @cssprop [--hx-button-bg=var(--hx-color-primary-500)] - Button background color.
- * @cssprop [--hx-button-color=var(--hx-color-neutral-0)] - Button text color.
+ * @cssprop [--wc-button-bg=var(--wc-color-primary-500)] - Button background color.
+ * @cssprop [--wc-button-color=var(--wc-color-neutral-0)] - Button text color.
  */
-@customElement('hx-button')
-export class HxButton extends LitElement {
+@customElement('wc-button')
+export class WcButton extends LitElement {
   /* ... */
 }
 ```
@@ -1012,12 +1012,12 @@ export class HxButton extends LitElement {
 ```css
 /* BAD — prevents consumer customization */
 :host {
-  background: var(--hx-card-bg, #ffffff) !important;
+  background: var(--wc-card-bg, #ffffff) !important;
 }
 
 /* GOOD — allows override cascade */
 :host {
-  background: var(--hx-card-bg, var(--hx-color-neutral-0, #ffffff));
+  background: var(--wc-card-bg, var(--wc-color-neutral-0, #ffffff));
 }
 ```
 
@@ -1032,8 +1032,8 @@ All token combinations must meet WCAG 2.1 AA contrast requirements:
 ```css
 /* VERIFY: Does this meet 4.5:1? */
 .button {
-  background: var(--hx-color-primary-500, #2563eb);
-  color: var(--hx-color-neutral-0, #ffffff);
+  background: var(--wc-color-primary-500, #2563eb);
+  color: var(--wc-color-neutral-0, #ffffff);
 }
 /* Answer: Yes — #2563eb on #ffffff = 7.2:1 ratio */
 ```
@@ -1051,7 +1051,7 @@ Shadow DOM styling provides the foundation for enterprise-grade component librar
 - **CSS custom properties** — The only mechanism for external styling, creating a theming API
 - **Three-tier tokens** — Primitive → Semantic → Component cascade for flexible, maintainable theming
 
-For wc-2026, these patterns are non-negotiable. Every component uses `:host` for display mode, `:host()` for variants, two-level token fallbacks, and complete JSDoc documentation for all CSS custom properties.
+For HELiX, these patterns are non-negotiable. Every component uses `:host` for display mode, `:host()` for variants, two-level token fallbacks, and complete JSDoc documentation for all CSS custom properties.
 
 **Key takeaways:**
 

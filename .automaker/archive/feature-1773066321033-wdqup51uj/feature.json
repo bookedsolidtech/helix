@@ -1,0 +1,90 @@
+{
+  "category": "Uncategorized",
+  "description": "Launch readiness audit for hx-list. Using the documentation template from the FOUNDATION ticket, ensure this component is production-ready.\n\n## SUB-COMPONENTS INCLUDED (MANDATORY)\nThis ticket also covers **hx-list-item** (`hx-list/hx-list-item.ts`). This is a registered custom element that must be validated for A11y, exports, and documentation alongside the parent. Do NOT skip it.\n\n## Checklist\n1. **A11y healthcare compliance** — Run axe-core audit on BOTH hx-list AND hx-list-item. Verify ARIA roles (list/listitem pattern), keyboard navigation, screen reader announcements. Zero WCAG 2.1 AA violations.\n2. **Astro documentation page** — Create/update doc page using the standard template. All 12 sections filled. Must document hx-list-item API too.\n3. **Individual export test** — Verify import works in isolation and exports BOTH elements.\n4. **Existing tests pass** — Run `npm run verify`. Do NOT run vitest directly.\n\n## Known Patterns (from HELIX-PLATFORM-PROTO-LESSONS.md)\n- C-PATTERN-01: Never add `= null` to `@query` fields — use `!` assertion\n- C-PATTERN-02: Never call `setAttribute()` in constructor — use `connectedCallback()`\n- C-PATTERN-05: Use `div[role=\"list\"]` instead of `<ul>/<ol>` with slotted web components\n- C-PATTERN-06: Register event listeners BEFORE any `await` calls\n\n## Files\n- `packages/hx-library/src/components/hx-list/` (includes hx-list-item.ts)\n- `apps/docs/src/content/docs/component-library/hx-list.md`\n\n## Acceptance Criteria\n- Zero axe-core violations (both parent and sub-component)\n- Doc page complete per template (sub-component API documented)\n- Individual import works in standalone HTML (both elements render)\n- `npm run verify` passes",
+  "title": "LAUNCH READY: hx-list",
+  "status": "done",
+  "dependencies": [],
+  "complexity": "medium",
+  "priority": 3,
+  "source": "api",
+  "trustTier": 1,
+  "quarantineStatus": "passed",
+  "quarantineId": "e01e7977-94fc-4c6e-8c52-d16d31a72ef7",
+  "id": "feature-1773066321033-wdqup51uj",
+  "branchName": "feature/launch-ready-hx-list",
+  "descriptionHistory": [
+    {
+      "description": "Launch readiness audit for hx-list. Checklist: (1) A11y — axe-core zero violations, WCAG 2.1 AA. C-PATTERN-05: use div[role=list] not ul/ol with slotted WC children. (2) Astro doc page — all 12 template sections. (3) Individual export — standalone HTML works. (4) `npm run verify` passes. Files: `packages/hx-library/src/components/hx-list/`, `apps/docs/src/content/docs/component-library/hx-list.md`",
+      "timestamp": "2026-03-09T14:25:21.033Z",
+      "source": "initial"
+    },
+    {
+      "description": "Launch readiness audit for hx-list. Using the documentation template from the FOUNDATION ticket, ensure this component is production-ready.\n\n## SUB-COMPONENTS INCLUDED (MANDATORY)\nThis ticket also covers **hx-list-item** (`hx-list/hx-list-item.ts`). This is a registered custom element that must be validated for A11y, exports, and documentation alongside the parent. Do NOT skip it.\n\n## Checklist\n1. **A11y healthcare compliance** — Run axe-core audit on BOTH hx-list AND hx-list-item. Verify ARIA roles (list/listitem pattern), keyboard navigation, screen reader announcements. Zero WCAG 2.1 AA violations.\n2. **Astro documentation page** — Create/update doc page using the standard template. All 12 sections filled. Must document hx-list-item API too.\n3. **Individual export test** — Verify import works in isolation and exports BOTH elements.\n4. **Existing tests pass** — Run `npm run verify`. Do NOT run vitest directly.\n\n## Known Patterns (from HELIX-PLATFORM-PROTO-LESSONS.md)\n- C-PATTERN-01: Never add `= null` to `@query` fields — use `!` assertion\n- C-PATTERN-02: Never call `setAttribute()` in constructor — use `connectedCallback()`\n- C-PATTERN-05: Use `div[role=\"list\"]` instead of `<ul>/<ol>` with slotted web components\n- C-PATTERN-06: Register event listeners BEFORE any `await` calls\n\n## Files\n- `packages/hx-library/src/components/hx-list/` (includes hx-list-item.ts)\n- `apps/docs/src/content/docs/component-library/hx-list.md`\n\n## Acceptance Criteria\n- Zero axe-core violations (both parent and sub-component)\n- Doc page complete per template (sub-component API documented)\n- Individual import works in standalone HTML (both elements render)\n- `npm run verify` passes",
+      "timestamp": "2026-03-09T14:32:54.087Z",
+      "source": "edit"
+    }
+  ],
+  "createdAt": "2026-03-09T14:25:21.033Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-03-09T14:25:21.033Z",
+      "reason": "Feature created"
+    },
+    {
+      "from": "backlog",
+      "to": "in_progress",
+      "timestamp": "2026-03-10T16:51:55.289Z"
+    },
+    {
+      "from": "in_progress",
+      "to": "review",
+      "timestamp": "2026-03-10T16:58:20.182Z"
+    },
+    {
+      "from": "review",
+      "to": "blocked",
+      "timestamp": "2026-03-10T17:03:24.733Z",
+      "reason": "Max remediation cycles exceeded (4)"
+    },
+    {
+      "from": "blocked",
+      "to": "review",
+      "timestamp": "2026-03-10T17:17:40.759Z"
+    },
+    {
+      "from": "review",
+      "to": "done",
+      "timestamp": "2026-03-10T17:17:55.186Z"
+    }
+  ],
+  "featureType": "code",
+  "model": "claude-sonnet-4-6",
+  "updatedAt": "2026-03-10T16:51:57.334Z",
+  "costUsd": 1.9179074999999999,
+  "lastSessionId": "4df7a51e-c809-4e6a-97f5-7d577fc3a587",
+  "prUrl": "https://github.com/bookedsolidtech/helix/pull/604",
+  "prNumber": 604,
+  "prCreatedAt": "2026-03-10T16:58:18.784Z",
+  "reviewStartedAt": "2026-03-10T16:58:20.182Z",
+  "prTrackedSince": "2026-03-10T16:58:20.183Z",
+  "prLastPolledAt": "2026-03-10T17:18:05.042Z",
+  "lastReviewFeedback": "coderabbitai: **Actionable comments posted: 2**\n\n<details>\n<summary>🤖 Prompt for all review comments with AI agents</summary>\n\n```\nVerify each finding against the current code and only fix it if needed.\n\nInline comments:\nIn `@apps/docs/src/content/docs/component-library/hx-list.mdx`:\n- Around line 310-341: The \"Standalone HTML Example\" for hx-list claims \"no\nbuild tool required\" but omits how to load the private `@helix/library`, so either\nremove this standalone section or change it to a clarified bundled example:\nupdate the heading/description to state the bundle must be pre-built and loaded,\nand add a sample <script type=\"module\"\nsrc=\"/path/to/your/helix-bundle.js\"></script> note showing how to load the\nbundled library before using hx-list and hx-list-item (or explicitly state the\nexample assumes the library is already globally available). Ensure the mdx text\naround \"Standalone HTML Example\" and the comments referencing `@helix/library` are\nupdated to reflect this change.\n- Around line 110-121: The interactive demo is missing the required label for\nthe hx-list element; update the <hx-list variant=\"interactive\"> instance used in\nthe \"Rich Items\" ComponentDemo by adding an accessible label attribute (for\nexample label=\"Select an item\" or a context-appropriate phrase) to satisfy WCAG\nName, Role, Value requirements; ensure the label text clearly describes the\nlist's purpose and keep it present on the hx-list element (the one containing\nhx-list-item children) so the interactive variant has a proper accessible name.\n```\n\n</details>\n\n---\n\n<details>\n<summary>ℹ️ Review info</summary>\n\n<details>\n<summary>⚙️ Run configuration</summary>\n\n**Configuration used**: Path: .coderabbit.yaml\n\n**Review profile**: ASSERTIVE\n\n**Plan**: Pro\n\n**Run ID**: `3e3c296e-d036-4b9d-9a19-63f38c072285`\n\n</details>\n\n<details>\n<summary>📥 Commits</summary>\n\nReviewing files that changed from the base of the PR and between 005cf3f83be23e638c7a89cca7286748b62d6dfa and 520b6c1321384266fd1d2ba5ae6d27bc7e",
+  "prIterationCount": 1,
+  "remediationCycleCount": 1,
+  "statusChangeReason": "Max remediation cycles exceeded (4)",
+  "failureCount": 1,
+  "failureClassification": {
+    "category": "unknown",
+    "confidence": 0.5,
+    "recoveryStrategy": {
+      "type": "escalate_to_user",
+      "reason": "Unclassified failure - needs investigation: Max remediation cycles exceeded (4)"
+    },
+    "retryable": false,
+    "timestamp": "2026-03-10T17:03:24.735Z"
+  },
+  "prMergedAt": "2026-03-10T17:17:30Z",
+  "completedAt": "2026-03-10T17:17:55.186Z"
+}

@@ -30,7 +30,7 @@ The `strict` flag is a master switch that enables all strict type-checking optio
 
 ### hx-library Configuration
 
-The hx-library extends strict mode with additional safety checks in `/Volumes/Development/wc-2026/tsconfig.base.json`:
+The hx-library extends strict mode with additional safety checks in `/Volumes/Development/HELiX/tsconfig.base.json`:
 
 ```json
 {
@@ -87,7 +87,7 @@ function handleInput(e: CustomEvent<HxInputDetail>): void {
 
 ### Real-World Example: hx-text-input
 
-From `/Volumes/Development/wc-2026/packages/hx-library/src/components/hx-text-input/hx-text-input.ts`:
+From `/Volumes/Development/HELiX/packages/hx-library/src/components/hx-text-input/hx-text-input.ts`:
 
 ```typescript
 private _handleInput(e: Event): void {
@@ -138,7 +138,7 @@ button?.click();
 
 ### Real-World Example: hx-checkbox
 
-From `/Volumes/Development/wc-2026/packages/hx-library/src/components/hx-checkbox/hx-checkbox.ts`:
+From `/Volumes/Development/HELiX/packages/hx-library/src/components/hx-checkbox/hx-checkbox.ts`:
 
 ```typescript
 private _updateValidity(): void {
@@ -203,7 +203,7 @@ class HxButton extends LitElement {
 
 ### Real-World Example: hx-button
 
-From `/Volumes/Development/wc-2026/packages/hx-library/src/components/hx-button/hx-button.ts`:
+From `/Volumes/Development/HELiX/packages/hx-library/src/components/hx-button/hx-button.ts`:
 
 ```typescript
 @property({ type: String, reflect: true })
@@ -263,7 +263,7 @@ if (item) {
 
 ### Real-World Example: Slot Handling
 
-From `/Volumes/Development/wc-2026/packages/hx-library/src/components/hx-text-input/hx-text-input.ts`:
+From `/Volumes/Development/HELiX/packages/hx-library/src/components/hx-text-input/hx-text-input.ts`:
 
 ```typescript
 private _handleLabelSlotChange(e: Event): void {
@@ -579,7 +579,7 @@ function processValueSafe(value: unknown): void {
 
 ## hx-library tsconfig
 
-The hx-library package extends the base configuration with component-specific settings in `/Volumes/Development/wc-2026/packages/hx-library/tsconfig.json`:
+The hx-library package extends the base configuration with component-specific settings in `/Volumes/Development/HELiX/packages/hx-library/tsconfig.json`:
 
 ```json
 {
@@ -732,7 +732,7 @@ Finally, add non-strict flags that provide additional safety:
 For monorepos, enable strict mode on new packages first, then migrate legacy packages incrementally.
 
 ```
-wc-2026/
+HELiX/
 ├── tsconfig.base.json (strict: false)
 ├── packages/
 │   ├── new-package/

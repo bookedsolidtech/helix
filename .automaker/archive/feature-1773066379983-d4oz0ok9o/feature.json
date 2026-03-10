@@ -1,0 +1,85 @@
+{
+  "category": "Uncategorized",
+  "description": "Launch readiness audit for hx-stack. Checklist: (1) A11y — axe-core zero violations, WCAG 2.1 AA. (2) Astro doc page — all 12 template sections. (3) Individual export — standalone HTML works. (4) `npm run verify` passes. Files: `packages/hx-library/src/components/hx-stack/`, `apps/docs/src/content/docs/component-library/hx-stack.md`",
+  "title": "LAUNCH READY: hx-stack",
+  "status": "done",
+  "dependencies": [],
+  "complexity": "medium",
+  "priority": 3,
+  "source": "api",
+  "trustTier": 1,
+  "quarantineStatus": "passed",
+  "quarantineId": "3eb3cd0c-0c87-4d10-aebf-5ec900898afd",
+  "id": "feature-1773066379983-d4oz0ok9o",
+  "branchName": "feature/launch-ready-hx-stack",
+  "descriptionHistory": [
+    {
+      "description": "Launch readiness audit for hx-stack. Checklist: (1) A11y — axe-core zero violations, WCAG 2.1 AA. (2) Astro doc page — all 12 template sections. (3) Individual export — standalone HTML works. (4) `npm run verify` passes. Files: `packages/hx-library/src/components/hx-stack/`, `apps/docs/src/content/docs/component-library/hx-stack.md`",
+      "timestamp": "2026-03-09T14:26:19.984Z",
+      "source": "initial"
+    }
+  ],
+  "createdAt": "2026-03-09T14:26:19.984Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-03-09T14:26:19.984Z",
+      "reason": "Feature created"
+    },
+    {
+      "from": "backlog",
+      "to": "in_progress",
+      "timestamp": "2026-03-10T18:47:36.323Z"
+    },
+    {
+      "from": "in_progress",
+      "to": "review",
+      "timestamp": "2026-03-10T18:59:50.392Z"
+    },
+    {
+      "from": "review",
+      "to": "blocked",
+      "timestamp": "2026-03-10T19:04:55.340Z",
+      "reason": "Max remediation cycles exceeded (4)"
+    },
+    {
+      "from": "blocked",
+      "to": "review",
+      "timestamp": "2026-03-10T19:05:25.681Z"
+    },
+    {
+      "from": "review",
+      "to": "done",
+      "timestamp": "2026-03-10T19:05:55.666Z"
+    }
+  ],
+  "featureType": "code",
+  "model": "claude-sonnet-4-6",
+  "updatedAt": "2026-03-10T18:47:38.380Z",
+  "costUsd": 2.7930435000000005,
+  "lastSessionId": "7d67a665-84d9-4a52-8e62-54f1d395b2fd",
+  "prUrl": "https://github.com/bookedsolidtech/helix/pull/621",
+  "prNumber": 621,
+  "prCreatedAt": "2026-03-10T18:59:49.198Z",
+  "reviewStartedAt": "2026-03-10T18:59:50.392Z",
+  "prTrackedSince": "2026-03-10T18:59:50.393Z",
+  "prLastPolledAt": "2026-03-10T19:06:18.510Z",
+  "lastReviewFeedback": "coderabbitai: **Actionable comments posted: 4**\n\n<details>\n<summary>🤖 Prompt for all review comments with AI agents</summary>\n\n```\nVerify each finding against the current code and only fix it if needed.\n\nInline comments:\nIn `@apps/docs/src/content/docs/component-library/hx-stack.mdx`:\n- Around line 330-345: The three example inputs (\"First name\", \"Last name\", and\n\"MRN\") currently rely only on placeholders and must have visible <label>\nelements for accessibility; update the markup around the inputs inside the\n<hx-stack> and the standalone MRN input to include explicit <label> elements\n(either wrap each input in a <label> or add a <label htmlFor=\"...\"> paired with\nan id on the corresponding <input>) so each input has a programmatically\nassociated, visible label rather than relying solely on placeholder text.\n- Line 236: Replace the hardcoded phrase \"Verified with 3 automated axe tests\"\nin the WCAG table cell with a generic statement (e.g., \"Verified with automated\naxe-core accessibility tests\" or \"Verified with automated accessibility tests\")\nso the docs keep the stable guarantee (\"WCAG 2.1 AA\", zero axe-core violations)\nwithout embedding a specific test count; locate the table row containing the\ntext \"Verified with 3 automated axe tests\" in hx-stack.mdx and update that cell\naccordingly.\n- Around line 123-147: The standalone HTML examples instantiate the custom\nelement hx-stack but do not load/register it; update both example blocks (the\nminimal snippets showing <hx-stack> and the nested/inline examples) to either\ninclude a loader/import step that registers the component (e.g., a script tag\nthat imports the `@helix/library` module) or add a short note above each snippet\nstating “assumes `@helix/library` is already loaded” so copy-pasting into a plain\n.html file will work; ensure the change is applied to the other similar snippet\nrange referenced in the comment as well.\n- Around line 111-119: The installation section currently mixes a shell and JS\nsnippet in one code ",
+  "prIterationCount": 1,
+  "remediationCycleCount": 1,
+  "statusChangeReason": "Max remediation cycles exceeded (4)",
+  "failureCount": 1,
+  "failureClassification": {
+    "category": "unknown",
+    "confidence": 0.5,
+    "recoveryStrategy": {
+      "type": "escalate_to_user",
+      "reason": "Unclassified failure - needs investigation: Max remediation cycles exceeded (4)"
+    },
+    "retryable": false,
+    "timestamp": "2026-03-10T19:04:55.342Z"
+  },
+  "prMergedAt": "2026-03-10T19:05:20Z",
+  "completedAt": "2026-03-10T19:05:55.666Z"
+}

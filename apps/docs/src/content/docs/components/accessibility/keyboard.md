@@ -1,13 +1,13 @@
 ---
 title: Keyboard Navigation
-description: Comprehensive guide to keyboard accessibility patterns in wc-2026 components
+description: Comprehensive guide to keyboard accessibility patterns in HELiX components
 sidebar:
   order: 3
 ---
 
 Keyboard accessibility is a cornerstone of inclusive web design. Users navigate interfaces without a mouse for many reasons: motor disabilities, vision impairments paired with screen readers, repetitive strain injuries, or personal preference. In healthcare enterprise environments, keyboard-first workflows are often faster and more accurate than mouse-based interactions.
 
-This guide covers the keyboard navigation patterns implemented across wc-2026 components, based on [W3C WAI-ARIA Authoring Practices Guide (APG)](https://www.w3.org/WAI/ARIA/apg/).
+This guide covers the keyboard navigation patterns implemented across HELiX components, based on [W3C WAI-ARIA Authoring Practices Guide (APG)](https://www.w3.org/WAI/ARIA/apg/).
 
 ## Prerequisites
 
@@ -19,7 +19,7 @@ Before reading this guide, review:
 
 ### 1. All Functionality Must Be Keyboard Accessible
 
-Every interactive element in wc-2026 components can be operated using only a keyboard. This satisfies [WCAG 2.1 Success Criterion 2.1.1 (Keyboard)](https://www.w3.org/WAI/WCAG21/Understanding/keyboard.html).
+Every interactive element in HELiX components can be operated using only a keyboard. This satisfies [WCAG 2.1 Success Criterion 2.1.1 (Keyboard)](https://www.w3.org/WAI/WCAG21/Understanding/keyboard.html).
 
 **Non-negotiable requirements:**
 
@@ -38,7 +38,7 @@ Users must be able to navigate to and away from all components using standard ke
 
 If keyboard interactions involve time limits, users must be able to turn off, adjust, or extend the time limit before it expires. This satisfies [WCAG 2.1 Success Criterion 2.2.1 (Timing Adjustable)](https://www.w3.org/WAI/WCAG21/Understanding/timing-adjustable.html).
 
-wc-2026 components avoid timing-dependent keyboard interactions except where essential (e.g., session timeouts), and these provide clear warnings and extension mechanisms.
+HELiX components avoid timing-dependent keyboard interactions except where essential (e.g., session timeouts), and these provide clear warnings and extension mechanisms.
 
 ## Tab Order Management
 
@@ -46,7 +46,7 @@ Tab order determines the sequence in which elements receive focus when users pre
 
 ### Natural Tab Order
 
-The best tab order is the natural DOM order. wc-2026 components are structured so that source order matches the intended focus order, requiring no explicit `tabindex` manipulation in most cases.
+The best tab order is the natural DOM order. HELiX components are structured so that source order matches the intended focus order, requiring no explicit `tabindex` manipulation in most cases.
 
 ```html
 <!-- Natural tab order: Button 1 → Button 2 → Button 3 -->
@@ -57,17 +57,17 @@ The best tab order is the natural DOM order. wc-2026 components are structured s
 
 ### Tabindex Values
 
-wc-2026 uses `tabindex` strategically:
+HELiX uses `tabindex` strategically:
 
 | Value    | Behavior                                                         | Usage                                             |
 | -------- | ---------------------------------------------------------------- | ------------------------------------------------- |
 | `0`      | Element is focusable and included in natural tab order           | Default for interactive elements                  |
 | `-1`     | Element is programmatically focusable but removed from tab order | Used in roving tabindex patterns, disabled states |
-| Positive | Element is focused before natural tab order (anti-pattern)       | **Never used** in wc-2026                         |
+| Positive | Element is focused before natural tab order (anti-pattern)       | **Never used** in HELiX                         |
 
 **Why we avoid positive tabindex values:**
 
-Positive `tabindex` values (1, 2, 3, etc.) disrupt the natural tab order, creating a confusing experience. They force elements out of their visual sequence, making keyboard navigation unpredictable. wc-2026 prohibits positive `tabindex` values.
+Positive `tabindex` values (1, 2, 3, etc.) disrupt the natural tab order, creating a confusing experience. They force elements out of their visual sequence, making keyboard navigation unpredictable. HELiX prohibits positive `tabindex` values.
 
 ### Shadow DOM and Tab Order
 
@@ -95,7 +95,7 @@ Focus management is the process of programmatically controlling which element re
 
 ### Setting Focus Programmatically
 
-wc-2026 components expose a `focus()` method for programmatic focus management:
+HELiX components expose a `focus()` method for programmatic focus management:
 
 ```typescript
 // Set focus to a button
@@ -248,7 +248,7 @@ export class WcRadioGroup extends LitElement {
 
 ### Arrow Key Conventions
 
-wc-2026 follows W3C WAI-ARIA arrow key conventions:
+HELiX follows W3C WAI-ARIA arrow key conventions:
 
 | Layout     | Key          | Action                      |
 | ---------- | ------------ | --------------------------- |
@@ -269,7 +269,7 @@ wc-2026 follows W3C WAI-ARIA arrow key conventions:
 
 ## Keyboard Shortcut Patterns
 
-Keyboard shortcuts accelerate workflows for power users. wc-2026 components implement shortcuts following platform conventions and WAI-ARIA guidelines.
+Keyboard shortcuts accelerate workflows for power users. HELiX components implement shortcuts following platform conventions and WAI-ARIA guidelines.
 
 ### Standard Keyboard Shortcuts
 
@@ -349,7 +349,7 @@ Native `<button>` elements handle `Enter` and `Space` automatically, but custom 
 
 ### Avoiding Conflicts with Browser Shortcuts
 
-wc-2026 avoids keyboard shortcuts that conflict with browser or operating system shortcuts:
+HELiX avoids keyboard shortcuts that conflict with browser or operating system shortcuts:
 
 **Avoided shortcuts:**
 
@@ -425,9 +425,9 @@ button:focus-visible {
 }
 ```
 
-### wc-2026 Focus Visible Implementation
+### HELiX Focus Visible Implementation
 
-All wc-2026 components use `:focus-visible` for focus indicators:
+All HELiX components use `:focus-visible` for focus indicators:
 
 ```css
 /* hx-button focus styles */
@@ -445,7 +445,7 @@ All wc-2026 components use `:focus-visible` for focus indicators:
 
 ### Focus Visible Polyfill
 
-Modern browsers support `:focus-visible`, but older browsers may not. wc-2026 includes a polyfill in the Storybook environment:
+Modern browsers support `:focus-visible`, but older browsers may not. HELiX includes a polyfill in the Storybook environment:
 
 ```html
 <script src="https://unpkg.com/focus-visible@5.2.0/dist/focus-visible.min.js"></script>
@@ -464,7 +464,7 @@ button.focus-visible {
 }
 ```
 
-wc-2026's production bundle does not include the polyfill (to minimize bundle size), but consumers can add it if they need to support older browsers.
+HELiX's production bundle does not include the polyfill (to minimize bundle size), but consumers can add it if they need to support older browsers.
 
 ## Focus Trap Patterns
 
@@ -580,7 +580,7 @@ This ensures compliance with WCAG 2.1 SC 2.1.2 (No Keyboard Trap).
 
 ### Accessible Focus Trap Libraries
 
-For complex focus trap scenarios, wc-2026 may integrate a library like [focus-trap](https://github.com/focus-trap/focus-trap):
+For complex focus trap scenarios, HELiX may integrate a library like [focus-trap](https://github.com/focus-trap/focus-trap):
 
 ```typescript
 import { createFocusTrap } from 'focus-trap';
@@ -604,7 +604,7 @@ private deactivateFocusTrap() {
 
 This approach handles edge cases like dynamically added focusable elements and nested focus traps.
 
-## wc-2026 Keyboard Navigation Examples
+## HELiX Keyboard Navigation Examples
 
 ### Example 1: Basic Button Navigation
 
@@ -763,7 +763,7 @@ The focus trap ensures users cannot accidentally tab outside the modal while it'
 
 ### Automated Testing
 
-wc-2026 uses Vitest browser mode and Playwright for automated keyboard testing:
+HELiX uses Vitest browser mode and Playwright for automated keyboard testing:
 
 ```typescript
 // hx-button.test.ts
@@ -976,7 +976,7 @@ Use this checklist when building or reviewing components:
 - [NVDA (Windows)](https://www.nvaccess.org/) — Free, open-source screen reader
 - [JAWS (Windows)](https://www.freedomscientific.com/products/software/jaws/) — Professional screen reader
 
-### wc-2026 Documentation
+### HELiX Documentation
 
 - [WCAG Compliance](/components/accessibility/wcag) — Overview of WCAG 2.1 AA requirements
 - [Focus Management](/components/accessibility/focus-management) — Advanced focus management patterns

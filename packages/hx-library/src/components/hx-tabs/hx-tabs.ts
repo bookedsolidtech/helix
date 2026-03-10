@@ -1,6 +1,6 @@
 import { LitElement, html, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
-import { tokenStyles } from '@helix/tokens/lit';
+import { tokenStyles } from '@helixui/tokens/lit';
 import { helixTabsStyles } from './hx-tabs.styles.js';
 import type { HelixTab } from './hx-tab.js';
 import type { HelixTabPanel } from './hx-tab-panel.js';

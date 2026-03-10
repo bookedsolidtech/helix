@@ -1,5 +1,8 @@
 # Dependencies
 node_modules/
+
+# Auth tokens (never commit)
+.npmrc
 .pnp
 .pnp.js
 
@@ -96,9 +99,7 @@ apps/admin/src/data/library-registry.json
 # MCP health scorer output (regenerated on demand)
 packages/.mcp-wc/
 .automaker-lock
-<<<<<<< HEAD
-=======
+.automaker/features/
 
 # Temp directory (not tracked)
 delete-me-HELiX/
->>>>>>> origin/dev

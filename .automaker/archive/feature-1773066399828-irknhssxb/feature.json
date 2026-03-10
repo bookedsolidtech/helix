@@ -1,0 +1,85 @@
+{
+  "category": "Uncategorized",
+  "description": "Launch readiness audit for hx-text. Checklist: (1) A11y — axe-core zero violations, WCAG 2.1 AA. (2) Astro doc page — all 12 template sections. (3) Individual export — standalone HTML works. (4) `npm run verify` passes. Files: `packages/hx-library/src/components/hx-text/`, `apps/docs/src/content/docs/component-library/hx-text.md`",
+  "title": "LAUNCH READY: hx-text",
+  "status": "done",
+  "dependencies": [],
+  "complexity": "medium",
+  "priority": 3,
+  "source": "api",
+  "trustTier": 1,
+  "quarantineStatus": "passed",
+  "quarantineId": "ca51491d-c2fa-470b-83eb-0a9a2f5cc661",
+  "id": "feature-1773066399828-irknhssxb",
+  "branchName": "feature/launch-ready-hx-text",
+  "descriptionHistory": [
+    {
+      "description": "Launch readiness audit for hx-text. Checklist: (1) A11y — axe-core zero violations, WCAG 2.1 AA. (2) Astro doc page — all 12 template sections. (3) Individual export — standalone HTML works. (4) `npm run verify` passes. Files: `packages/hx-library/src/components/hx-text/`, `apps/docs/src/content/docs/component-library/hx-text.md`",
+      "timestamp": "2026-03-09T14:26:39.829Z",
+      "source": "initial"
+    }
+  ],
+  "createdAt": "2026-03-09T14:26:39.829Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-03-09T14:26:39.829Z",
+      "reason": "Feature created"
+    },
+    {
+      "from": "backlog",
+      "to": "in_progress",
+      "timestamp": "2026-03-10T19:20:34.725Z"
+    },
+    {
+      "from": "in_progress",
+      "to": "review",
+      "timestamp": "2026-03-10T19:32:43.261Z"
+    },
+    {
+      "from": "review",
+      "to": "blocked",
+      "timestamp": "2026-03-10T19:37:46.604Z",
+      "reason": "Max remediation cycles exceeded (4)"
+    },
+    {
+      "from": "blocked",
+      "to": "review",
+      "timestamp": "2026-03-10T19:40:29.230Z"
+    },
+    {
+      "from": "review",
+      "to": "done",
+      "timestamp": "2026-03-10T19:41:40.540Z"
+    }
+  ],
+  "featureType": "code",
+  "model": "claude-sonnet-4-6",
+  "updatedAt": "2026-03-10T19:20:37.316Z",
+  "costUsd": 3.1512409999999997,
+  "lastSessionId": "4ccf82d2-fe0c-433a-8ce0-b6e40beedf9d",
+  "prUrl": "https://github.com/bookedsolidtech/helix/pull/629",
+  "prNumber": 629,
+  "prCreatedAt": "2026-03-10T19:32:41.914Z",
+  "reviewStartedAt": "2026-03-10T19:32:43.261Z",
+  "prTrackedSince": "2026-03-10T19:32:43.262Z",
+  "prLastPolledAt": "2026-03-10T19:41:21.588Z",
+  "lastReviewFeedback": "coderabbitai: **Actionable comments posted: 1**\n\n<details>\n<summary>🤖 Prompt for all review comments with AI agents</summary>\n\n```\nVerify each finding against the current code and only fix it if needed.\n\nInline comments:\nIn `@apps/docs/src/content/docs/component-library/hx-text.mdx`:\n- Around line 378-473: The standalone HTML example uses custom element <hx-text>\n(and IDs dynamic-status/toggle-btn) but doesn't load the Helix library, so the\nexample won't work; either add a module script tag that loads the built Helix\nbundle (e.g., a CDN/standalone build) before using <hx-text>, or change the\nsection heading/text from \"Standalone HTML Example\" to \"Usage Template\" and add\na short note that the snippet requires importing the '@helix/library' via a\nbundler (so readers know they must import the library in their project before\nthe custom elements like hx-text will be defined).\n```\n\n</details>\n\n---\n\n<details>\n<summary>ℹ️ Review info</summary>\n\n<details>\n<summary>⚙️ Run configuration</summary>\n\n**Configuration used**: Path: .coderabbit.yaml\n\n**Review profile**: ASSERTIVE\n\n**Plan**: Pro\n\n**Run ID**: `f9b077a6-b478-496c-ac06-b3f4b92f26b1`\n\n</details>\n\n<details>\n<summary>📥 Commits</summary>\n\nReviewing files that changed from the base of the PR and between ac109909b833bd4ac8a1959cc0c8773f80008c45 and 9da446e2c6c440a2db4d60496ad68bfb1ab60601.\n\n</details>\n\n<details>\n<summary>📒 Files selected for processing (1)</summary>\n\n* `apps/docs/src/content/docs/component-library/hx-text.mdx`\n\n</details>\n\n</details>\n\n<!-- This is an auto-generated comment by CodeRabbit for review status -->\n---\n### CodeRabbit Review (1 items)\n- [WARNING] <!-- This is an auto-generated comment: summarize by coderabbit.ai -->\n<!-- configuration_strict_warnings_start -->",
+  "prIterationCount": 1,
+  "remediationCycleCount": 1,
+  "statusChangeReason": "Max remediation cycles exceeded (4)",
+  "failureCount": 1,
+  "failureClassification": {
+    "category": "unknown",
+    "confidence": 0.5,
+    "recoveryStrategy": {
+      "type": "escalate_to_user",
+      "reason": "Unclassified failure - needs investigation: Max remediation cycles exceeded (4)"
+    },
+    "retryable": false,
+    "timestamp": "2026-03-10T19:37:46.605Z"
+  },
+  "prMergedAt": "2026-03-10T19:40:24Z",
+  "completedAt": "2026-03-10T19:41:40.540Z"
+}

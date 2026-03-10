@@ -8,7 +8,7 @@ import {
   handleToolError,
   createSuccessResponse,
   createErrorResponse,
-} from '@helix/mcp-shared';
+} from '@helixui/mcp-shared';
 import { scoreComponent, scoreAllComponents, getHealthTrend, getHealthDiff } from './handlers.js';
 
 const ScoreComponentArgsSchema = z.object({

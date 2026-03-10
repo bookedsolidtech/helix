@@ -8,8 +8,8 @@ helix:
   version: '0.0.1'
   js:
     # CDN pattern — replace with your actual CDN URL or local path
-    # When @helix/library is published to npm, use unpkg/jsdelivr:
-    # https://cdn.jsdelivr.net/npm/@helix/library@0.0.1/dist/index.js
+    # When @helixui/library is published to npm, use unpkg/jsdelivr:
+    # https://cdn.jsdelivr.net/npm/@helixui/library@0.0.1/dist/index.js
     # For local Drupal development, copy dist/ to your theme's js/ directory:
     js/helix/index.js:
       attributes:
@@ -21,7 +21,7 @@ helix-tokens:
   version: '0.0.1'
   css:
     theme:
-      # Copy @helix/tokens dist CSS to your theme
+      # Copy @helixui/tokens dist CSS to your theme
       css/helix-tokens.css: {}
   dependencies:
     - core/drupal

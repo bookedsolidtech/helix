@@ -1,0 +1,83 @@
+{
+  "category": "Uncategorized",
+  "description": "Launch readiness audit for hx-spinner. Checklist: (1) A11y — axe-core zero violations, status role, aria-label for loading state, WCAG 2.1 AA. (2) Astro doc page — all 12 template sections. (3) Individual export — standalone HTML works. (4) `npm run verify` passes. Files: `packages/hx-library/src/components/hx-spinner/`, `apps/docs/src/content/docs/component-library/hx-spinner.md`",
+  "title": "LAUNCH READY: hx-spinner",
+  "status": "done",
+  "dependencies": [],
+  "complexity": "medium",
+  "priority": 3,
+  "source": "api",
+  "trustTier": 1,
+  "quarantineStatus": "passed",
+  "quarantineId": "345dcc13-eaf9-4785-a615-b96f3656756c",
+  "id": "feature-1773066373271-1ilp2venj",
+  "branchName": "feature/launch-ready-hx-spinner",
+  "descriptionHistory": [
+    {
+      "description": "Launch readiness audit for hx-spinner. Checklist: (1) A11y — axe-core zero violations, status role, aria-label for loading state, WCAG 2.1 AA. (2) Astro doc page — all 12 template sections. (3) Individual export — standalone HTML works. (4) `npm run verify` passes. Files: `packages/hx-library/src/components/hx-spinner/`, `apps/docs/src/content/docs/component-library/hx-spinner.md`",
+      "timestamp": "2026-03-09T14:26:13.271Z",
+      "source": "initial"
+    }
+  ],
+  "createdAt": "2026-03-09T14:26:13.271Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-03-09T14:26:13.271Z",
+      "reason": "Feature created"
+    },
+    {
+      "from": "backlog",
+      "to": "in_progress",
+      "timestamp": "2026-03-10T18:30:26.309Z"
+    },
+    {
+      "from": "in_progress",
+      "to": "review",
+      "timestamp": "2026-03-10T18:35:29.922Z"
+    },
+    {
+      "from": "review",
+      "to": "done",
+      "timestamp": "2026-03-10T18:47:36.317Z"
+    },
+    {
+      "from": "done",
+      "to": "blocked",
+      "timestamp": "2026-03-10T19:25:30.276Z",
+      "reason": "Max same-state transitions exceeded in REVIEW (100 loops)"
+    },
+    {
+      "from": "blocked",
+      "to": "done",
+      "timestamp": "2026-03-10T19:25:56.499Z"
+    }
+  ],
+  "featureType": "code",
+  "model": "claude-sonnet-4-6",
+  "updatedAt": "2026-03-10T18:30:28.970Z",
+  "costUsd": 0.9881877499999999,
+  "lastSessionId": "2ec4238b-925f-4c2b-a496-352f2eca30dc",
+  "prUrl": "https://github.com/bookedsolidtech/helix/pull/619",
+  "prNumber": 619,
+  "prCreatedAt": "2026-03-10T18:35:28.704Z",
+  "reviewStartedAt": "2026-03-10T18:35:29.922Z",
+  "prTrackedSince": "2026-03-10T18:35:29.923Z",
+  "prLastPolledAt": "2026-03-10T19:25:13.345Z",
+  "prMergedAt": "2026-03-10T18:40:03Z",
+  "completedAt": "2026-03-10T18:47:36.317Z",
+  "statusChangeReason": "Max same-state transitions exceeded in REVIEW (100 loops)",
+  "failureCount": 1,
+  "failureClassification": {
+    "category": "unknown",
+    "confidence": 0.5,
+    "recoveryStrategy": {
+      "type": "escalate_to_user",
+      "reason": "Unclassified failure - needs investigation: Max same-state transitions exceeded in REVIEW (100 loops)"
+    },
+    "retryable": false,
+    "timestamp": "2026-03-10T19:25:30.278Z"
+  },
+  "assignee": "jake"
+}

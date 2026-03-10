@@ -1,5 +1,5 @@
 {
-  "name": "@helix/tokens",
+  "name": "@helixui/tokens",
   "version": "0.1.0",
   "description": "Design tokens for the WC-2026 enterprise healthcare web component library",
   "type": "module",

@@ -7,7 +7,7 @@ Every HELIX component dispatches custom events to communicate state changes to c
 
 ## The oneEvent Utility
 
-`oneEvent()` from `@helix/library/test-utils` wraps `addEventListener` in a `Promise` that resolves on the next occurrence of a named event. It is the primary tool for testing async event dispatch.
+`oneEvent()` from `@helixui/library/test-utils` wraps `addEventListener` in a `Promise` that resolves on the next occurrence of a named event. It is the primary tool for testing async event dispatch.
 
 ```typescript
 /**

@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 
 /**
- * Visual Regression Tests for HELiX (wc-2026) Components.
+ * Visual Regression Tests for HELiX Components.
  * Captures screenshots of each component variant in Storybook
  * and compares against committed baselines.
  *

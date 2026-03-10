@@ -7,7 +7,7 @@ sidebar:
 
 CSS performance is not just about faster page loads—it's about creating interfaces that feel instant, responsive, and predictable. In healthcare applications where every interaction matters, understanding how browsers process styles, trigger reflows, and paint pixels is essential for delivering enterprise-grade experiences.
 
-This guide covers the complete CSS performance optimization strategy for wc-2026 components, from style recalculation optimization to advanced containment techniques, with real-world examples tested in production environments.
+This guide covers the complete CSS performance optimization strategy for HELiX components, from style recalculation optimization to advanced containment techniques, with real-world examples tested in production environments.
 
 ---
 
@@ -36,7 +36,7 @@ Poor CSS performance manifests as:
 - **Layout thrashing** — Visible reflows, content jumping
 - **Render blocking** — Blank screens while styles load
 
-In Shadow DOM-based component libraries like wc-2026, CSS performance optimization requires understanding both browser rendering fundamentals and Web Components-specific patterns.
+In Shadow DOM-based component libraries like HELiX, CSS performance optimization requires understanding both browser rendering fundamentals and Web Components-specific patterns.
 
 ---
 
@@ -211,7 +211,7 @@ The `:host` pseudo-class is efficient for styling the component root:
 }
 ```
 
-**wc-2026 policy:** Avoid `:host-context()` for core functionality. Use CSS custom properties for theming instead.
+**HELiX policy:** Avoid `:host-context()` for core functionality. Use CSS custom properties for theming instead.
 
 ### Reducing Recalculation Scope
 
@@ -691,10 +691,10 @@ export class WcDocsSection extends LitElement {
 5. **Test with DevTools Paint Flashing** — Verify containment reduces paint areas (DevTools → Rendering → Paint flashing)
 6. **Test with DevTools Performance panel** — Verify layout recalculation times improve
 
-**wc-2026 pattern:** All independent components (cards, buttons, form controls) use `contain: content` on `:host`.
+**HELiX pattern:** All independent components (cards, buttons, form controls) use `contain: content` on `:host`.
 
 ```css
-/* Standard wc-2026 containment pattern */
+/* Standard HELiX containment pattern */
 :host {
   display: block;
   contain: content; /* layout + paint isolation */
@@ -842,7 +842,7 @@ connectedCallback() {
 }
 ```
 
-**wc-2026 pattern:** Use `ResizeObserver` and `IntersectionObserver` instead of manual layout reads.
+**HELiX pattern:** Use `ResizeObserver` and `IntersectionObserver` instead of manual layout reads.
 
 ---
 
@@ -988,13 +988,13 @@ Run Lighthouse (DevTools → Lighthouse) and check:
 - **Minimize main-thread work** — Highlights expensive style operations
 - **Reduce layout shifts** — CLS score (target: <0.1)
 
-**wc-2026 CI:** Lighthouse runs on every PR. Performance budget violations block merge.
+**HELiX CI:** Lighthouse runs on every PR. Performance budget violations block merge.
 
 ---
 
-## wc-2026 Performance Patterns
+## HELiX Performance Patterns
 
-These patterns are battle-tested in wc-2026 for maximum performance.
+These patterns are battle-tested in HELiX for maximum performance.
 
 ### Pattern 1: Contain Independent Components
 
@@ -1133,7 +1133,7 @@ Use this checklist when building or auditing components:
 
 ## Performance Budgets
 
-wc-2026 enforces these performance budgets in CI:
+HELiX enforces these performance budgets in CI:
 
 | Metric                        | Budget               | Measurement                 |
 | ----------------------------- | -------------------- | --------------------------- |
@@ -1161,7 +1161,7 @@ CSS performance optimization is about understanding the browser rendering pipeli
 4. **Containment** — Isolate components with `contain: content`, use `content-visibility: auto` for off-screen content
 5. **Layout thrashing** — Separate reads and writes, use `requestAnimationFrame`, prefer `ResizeObserver`/`IntersectionObserver`
 
-By applying these techniques, wc-2026 components deliver enterprise-grade performance: instant interactions (<200ms INP), smooth animations (60fps), and zero layout shifts (CLS < 0.1).
+By applying these techniques, HELiX components deliver enterprise-grade performance: instant interactions (<200ms INP), smooth animations (60fps), and zero layout shifts (CLS < 0.1).
 
 **Key takeaways:**
 

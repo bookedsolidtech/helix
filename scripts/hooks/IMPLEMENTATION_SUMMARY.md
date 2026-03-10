@@ -259,8 +259,8 @@ npm run hooks:dependency-audit || exit 1
       packages/lib2/package.json (^3.1.0)
 
    packages/lib2/package.json:1:1
-   Workspace package "@helix/tokens" should use "workspace:*" protocol instead of "^1.0.0"
-   💡 Change "@helix/tokens": "^1.0.0" to "@helix/tokens": "workspace:*"
+   Workspace package "@helixui/tokens" should use "workspace:*" protocol instead of "^1.0.0"
+   💡 Change "@helixui/tokens": "^1.0.0" to "@helixui/tokens": "workspace:*"
 
    package.json:1:1
    Overly broad version range for "some-package": *

@@ -1,7 +1,7 @@
 import { LitElement, html, nothing } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
-import { tokenStyles } from '@helix/tokens/lit';
+import { tokenStyles } from '@helixui/tokens/lit';
 import { helixListItemStyles } from './hx-list-item.styles.js';
 
 /**

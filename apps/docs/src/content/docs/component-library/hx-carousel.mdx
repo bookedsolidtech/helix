@@ -13,11 +13,10 @@ import ComponentDoc from '../../../components/ComponentDoc.astro';
 
 ## Overview
 
-`hx-carousel` is a fully accessible slide carousel built on the [WAI-ARIA APG Carousel Pattern](https://www.w3.org/WAI/ARIA/apg/patterns/carousel/). It supports horizontal and vertical scrolling, keyboard navigation, pagination dots, autoplay with play/pause controls, mouse and touch drag gestures, and looping. Individual slides are composed using `hx-carousel-item` sub-components.
+`hx-carousel` is a fully accessible slide carousel built on the WAI-ARIA APG carousel pattern. It supports horizontal and vertical scrolling, keyboard navigation, pagination dots, autoplay with play/pause controls, mouse and touch drag gestures, and looping. Individual slides are composed via `hx-carousel-item` sub-components.
 
-**Use `hx-carousel` when:** you need to cycle through a set of images, cards, or content panels in a space-constrained area — product highlights, patient education resources, and onboarding steps are common use cases.
-
-**Avoid `hx-carousel` when:** all content can be displayed at once. Carousels hide content from users by default and should only be used when the space trade-off is justified.
+**Use `hx-carousel` when:** you need to cycle through a set of images, cards, or content panels in a space-constrained area.
+**Avoid `hx-carousel` when:** all content can be displayed at once — a carousel hides content from users by default.
 
 ## Live Demo
 
@@ -189,10 +188,10 @@ Enable `mouse-dragging` to allow click-drag and touch-swipe navigation.
 
 ```bash
 # Full library
-npm install @helix/library
+npm install @helixui/library
 
 # Or import only this component (tree-shaking friendly)
-import '@helix/library/components/hx-carousel';
+import '@helixui/library/components/hx-carousel';
 ```
 
 ## Basic Usage
@@ -211,9 +210,7 @@ import '@helix/library/components/hx-carousel';
 </hx-carousel>
 ```
 
-## Properties
-
-### hx-carousel
+## hx-carousel Properties
 
 | Property           | Attribute           | Type                         | Default        | Description                                                               |
 | ------------------ | ------------------- | ---------------------------- | -------------- | ------------------------------------------------------------------------- |
@@ -226,7 +223,7 @@ import '@helix/library/components/hx-carousel';
 | `orientation`      | `orientation`       | `'horizontal' \| 'vertical'` | `'horizontal'` | Scroll axis of the carousel.                                              |
 | `mouseDragging`    | `mouse-dragging`    | `boolean`                    | `false`        | Enables click-drag (mouse) and touch-swipe navigation gestures.           |
 
-### hx-carousel-item
+## hx-carousel-item Properties
 
 | Property      | Attribute      | Type     | Default | Description                                                                          |
 | ------------- | -------------- | -------- | ------- | ------------------------------------------------------------------------------------ |
@@ -238,13 +235,6 @@ import '@helix/library/components/hx-carousel';
 | Event             | Detail Type                                   | Description                                                |
 | ----------------- | --------------------------------------------- | ---------------------------------------------------------- |
 | `hx-slide-change` | `{ index: number, slide: HelixCarouselItem }` | Fired when the active slide changes. Bubbles and composed. |
-
-```js
-document.querySelector('hx-carousel').addEventListener('hx-slide-change', (e) => {
-  console.log('Active slide index:', e.detail.index);
-  console.log('Active slide element:', e.detail.slide);
-});
-```
 
 ## Public Methods
 
@@ -265,7 +255,7 @@ document.querySelector('hx-carousel').addEventListener('hx-slide-change', (e) =>
 
 ## CSS Parts
 
-### hx-carousel
+### hx-carousel Parts
 
 | Part              | Description                                     |
 | ----------------- | ----------------------------------------------- |
@@ -280,7 +270,7 @@ document.querySelector('hx-carousel').addEventListener('hx-slide-change', (e) =>
 
 ## Slots
 
-### hx-carousel
+### hx-carousel Slots
 
 | Slot              | Description                                                     |
 | ----------------- | --------------------------------------------------------------- |
@@ -288,99 +278,33 @@ document.querySelector('hx-carousel').addEventListener('hx-slide-change', (e) =>
 | `next-button`     | Custom next navigation button. Replaces the default button.     |
 | `previous-button` | Custom previous navigation button. Replaces the default button. |
 
-### hx-carousel-item
+### hx-carousel-item Slots
 
 | Slot        | Description    |
 | ----------- | -------------- |
 | _(default)_ | Slide content. |
 
-## Keyboard Navigation
-
-| Key                        | Action                                                                            |
-| -------------------------- | --------------------------------------------------------------------------------- |
-| `ArrowLeft` / `ArrowRight` | Previous / next slide (horizontal orientation).                                   |
-| `ArrowUp` / `ArrowDown`    | Previous / next slide (vertical orientation).                                     |
-| `Home`                     | Jump to the first slide.                                                          |
-| `End`                      | Jump to the last slide.                                                           |
-| `Tab`                      | Move focus to the next interactive element (nav buttons, pagination, play/pause). |
-| `Enter` / `Space`          | Activate the focused navigation button or pagination dot.                         |
-
-Keyboard navigation is active when focus is anywhere within the `hx-carousel` element.
-
 ## Accessibility
 
-`hx-carousel` implements the [WAI-ARIA APG Carousel Pattern](https://www.w3.org/WAI/ARIA/apg/patterns/carousel/).
-
-| Topic               | Details                                                                                                                                                                                 |
-| ------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| ARIA role           | The carousel container has `role="region"` and `aria-roledescription="carousel"` per the WAI-ARIA APG carousel pattern.                                                                 |
-| `aria-label`        | Required — set via the `label` property. Each carousel on a page **must** have a unique label (e.g., `"Featured Resources"`, `"Related Articles"`).                                     |
-| Slide groups        | Each `hx-carousel-item` renders `role="group"` with `aria-label="Slide N of M"` so screen readers announce position within the set.                                                     |
-| Live region         | A visually hidden `aria-live="polite"` region updates its text content on every slide change (e.g., `"Slide 2 of 3"`), triggering a screen reader announcement.                         |
-| Keyboard navigation | See the Keyboard Navigation table above. Keyboard events are handled on the carousel container.                                                                                         |
-| Tab order           | Navigation buttons, pagination dots, and the play/pause button are all in the natural tab order.                                                                                        |
-| Focus ring          | All interactive controls expose `:focus-visible` outlines using `--hx-focus-ring-*` design tokens.                                                                                      |
-| Programmatic focus  | Slide group elements (`tabindex="-1"`) show a visible focus ring on both `:focus` and `:focus-visible` to support programmatic `.focus()` calls.                                        |
-| Autoplay controls   | The play/pause button uses a descriptive `aria-label`: `"Pause autoplay"` when playing, `"Play autoplay"` when stopped.                                                                 |
-| Disabled buttons    | Previous/next buttons carry the native `disabled` attribute when at the boundary without `loop`, removing them from tab order automatically.                                            |
-| Reduced motion      | Autoplay does not start and CSS transitions are suppressed when `prefers-reduced-motion: reduce` is active.                                                                             |
-| Multiple carousels  | Always set a unique `label` when two or more `hx-carousel` elements appear on the same page. Without it, screen readers cannot distinguish them.                                        |
-| Image slides        | Always provide meaningful `alt` text on `<img>` elements placed inside `hx-carousel-item`.                                                                                              |
-| WCAG                | Aims to meet WCAG 2.1 AA. Focus indicators use sufficient contrast. See `AUDIT.md` for known P1 issues: pagination dot labels, hardcoded `aria-label`, and `aria-live` region behavior. |
-
-## hx-carousel-item Sub-Component
-
-`hx-carousel-item` is the required slide wrapper for content within `hx-carousel`. It is a lightweight custom element that:
-
-- Establishes a `role="group"` landmark with `aria-label="Slide N of M"` for screen reader position announcements.
-- Receives `slideIndex` and `totalSlides` automatically from the parent `hx-carousel` — you do not need to set these manually.
-- Applies the correct slide width based on the parent's `slides-per-page` setting via a CSS custom property.
-- Exposes a `:focus-visible` / `:focus` outline so programmatic `.focus()` calls produce a visible indicator.
-
-### hx-carousel-item Properties
-
-| Property      | Attribute      | Type     | Default | Description                                                                          |
-| ------------- | -------------- | -------- | ------- | ------------------------------------------------------------------------------------ |
-| `slideIndex`  | `slide-index`  | `number` | `0`     | 0-based index of this slide within the carousel. Set automatically by `hx-carousel`. |
-| `totalSlides` | `total-slides` | `number` | `0`     | Total number of slides. Set automatically by `hx-carousel`.                          |
-
-### hx-carousel-item CSS Parts
-
-| Part     | Description                                     |
-| -------- | ----------------------------------------------- |
-| _(none)_ | No CSS parts are exposed by `hx-carousel-item`. |
-
-### hx-carousel-item Slots
-
-| Slot        | Description                                      |
-| ----------- | ------------------------------------------------ |
-| _(default)_ | Any slide content: images, cards, text, or HTML. |
+| Topic                 | Details                                                                                                     |
+| --------------------- | ----------------------------------------------------------------------------------------------------------- |
+| ARIA role             | `role="region"` with `aria-roledescription="carousel"` per WAI-ARIA APG carousel pattern.                   |
+| `aria-label`          | Required — set via the `label` property. Each carousel on a page must have a unique label.                  |
+| Slide groups          | Each `hx-carousel-item` renders `role="group"` with `aria-label="Slide N of M"` for screen reader context.  |
+| Live region           | An `aria-live="polite"` region announces slide changes (e.g., "Slide 2 of 3") to screen readers.            |
+| Keyboard (horizontal) | `ArrowLeft` / `ArrowRight` navigate previous/next. `Home` jumps to first. `End` jumps to last.              |
+| Keyboard (vertical)   | `ArrowUp` / `ArrowDown` navigate previous/next when `orientation="vertical"`.                               |
+| Tab order             | Navigation buttons, pagination dots, and play/pause button are all in the natural tab order.                |
+| Focus ring            | All interactive controls expose `:focus-visible` outlines using `--hx-focus-ring-*` tokens.                 |
+| Autoplay controls     | Play/pause button uses descriptive `aria-label` ("Pause autoplay" / "Play autoplay").                       |
+| Disabled buttons      | Previous/next buttons carry the native `disabled` attribute when at boundaries without `loop`.              |
+| Reduced motion        | Autoplay does not start and CSS transitions are suppressed when `prefers-reduced-motion: reduce` is active. |
+| Image slides          | Always provide meaningful `alt` text on `<img>` elements placed inside `hx-carousel-item`.                  |
 
 ## Drupal Integration
 
-The Twig template ships at `packages/hx-library/src/components/hx-carousel/hx-carousel.twig`.
-
 ```twig
 {# my-module/templates/my-template.html.twig #}
-{% include '@my_theme/hx-carousel.twig' with {
-  label: 'Featured patient education resources',
-  loop: true,
-  autoplay: false,
-  autoplay_interval: 3000,
-  slides_per_page: 1,
-  slides_per_move: 1,
-  orientation: 'horizontal',
-  mouse_dragging: false,
-  items: [
-    '<hx-carousel-item><img src="..." alt="..." /></hx-carousel-item>',
-    '<hx-carousel-item><img src="..." alt="..." /></hx-carousel-item>',
-  ],
-} %}
-```
-
-Or inline without the include helper:
-
-```twig
 <hx-carousel
   label="{{ label|default('Featured Content') }}"
   {% if loop %}loop{% endif %}
@@ -388,7 +312,7 @@ Or inline without the include helper:
 >
   {% for slide in slides %}
     <hx-carousel-item>
-      {{ slide.content|raw }}
+      {{ slide.content }}
     </hx-carousel-item>
   {% endfor %}
 </hx-carousel>
@@ -402,23 +326,6 @@ helix-components:
     /libraries/helix/helix.min.js: { minified: true }
 ```
 
-Listen for events in Drupal behaviors using `once()` to prevent duplicate listeners on AJAX:
-
-```javascript
-Drupal.behaviors.helixCarousel = {
-  attach(context) {
-    // once() is a Drupal core utility (no import needed) — prevents duplicate event binding during AJAX attach cycles
-    once('helixCarousel', 'hx-carousel', context).forEach((el) => {
-      el.addEventListener('hx-slide-change', (e) => {
-        // e.detail.index — 0-based index of the new active slide
-        // e.detail.slide — the hx-carousel-item element
-        console.log('Slide changed to:', e.detail.index);
-      });
-    });
-  },
-};
-```
-
 ## Standalone HTML Example
 
 Copy-paste into a `.html` file and open in any browser — no build tool required:
@@ -430,8 +337,10 @@ Copy-paste into a `.html` file and open in any browser — no build tool require
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>hx-carousel example</title>
-    <!-- @helix/library is a private package — install via npm workspace, not CDN -->
-    <!-- In your project: import '@helix/library'; in your bundler entry point -->
+    <script
+      type="module"
+      src="https://cdn.jsdelivr.net/npm/@helixui/library/dist/helix.min.js"
+    ></script>
   </head>
   <body style="font-family: sans-serif; padding: 2rem; max-width: 600px;">
     <hx-carousel id="my-carousel" label="Product highlights" loop autoplay autoplay-interval="4000">

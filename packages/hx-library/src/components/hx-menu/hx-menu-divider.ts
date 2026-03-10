@@ -1,7 +1,7 @@
 import { LitElement, html } from 'lit';
 import { customElement } from 'lit/decorators.js';
 import { css } from 'lit';
-import { tokenStyles } from '@helix/tokens/lit';
+import { tokenStyles } from '@helixui/tokens/lit';
 
 const helixMenuDividerStyles = css`
   :host {

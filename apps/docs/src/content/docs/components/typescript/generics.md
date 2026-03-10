@@ -325,7 +325,7 @@ interface HxSelectDetail {
 
 ### Dispatching Typed Events
 
-From `/Volumes/Development/wc-2026/packages/hx-library/src/components/hx-select/hx-select.ts`:
+From `/Volumes/Development/HELiX/packages/hx-library/src/components/hx-select/hx-select.ts`:
 
 ```typescript
 private _handleChange(e: Event): void {
@@ -693,7 +693,7 @@ const buttons = registry.getByType<HelixButton>('hx-button');
 
 ### Generic Query Methods
 
-From the hx-library test utilities (`/Volumes/Development/wc-2026/packages/hx-library/src/test-utils.ts`):
+From the hx-library test utilities (`/Volumes/Development/HELiX/packages/hx-library/src/test-utils.ts`):
 
 ```typescript
 /**

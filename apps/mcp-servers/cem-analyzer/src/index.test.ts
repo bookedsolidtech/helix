@@ -8,7 +8,7 @@ describe('MCP Server Lifecycle - CEM Analyzer', () => {
     it('creates server with correct metadata', () => {
       expect(() => {
         new Server(
-          { name: '@helix/mcp-cem-analyzer', version: '0.1.0' },
+          { name: '@helixui/mcp-cem-analyzer', version: '0.1.0' },
           { capabilities: { tools: {} } },
         );
       }).not.toThrow();
@@ -18,7 +18,7 @@ describe('MCP Server Lifecycle - CEM Analyzer', () => {
   describe('Tool Capabilities', () => {
     it('declares tools capability', () => {
       const server = new Server(
-        { name: '@helix/mcp-cem-analyzer', version: '0.1.0' },
+        { name: '@helixui/mcp-cem-analyzer', version: '0.1.0' },
         { capabilities: { tools: {} } },
       );
       expect(server).toBeInstanceOf(Server);
@@ -26,7 +26,7 @@ describe('MCP Server Lifecycle - CEM Analyzer', () => {
 
     it('tools are registered successfully', () => {
       const server = new Server(
-        { name: '@helix/mcp-cem-analyzer', version: '0.1.0' },
+        { name: '@helixui/mcp-cem-analyzer', version: '0.1.0' },
         { capabilities: { tools: {} } },
       );
       expect(() => registerCemTools(server)).not.toThrow();

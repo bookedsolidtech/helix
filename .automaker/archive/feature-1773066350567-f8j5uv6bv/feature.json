@@ -1,0 +1,85 @@
+{
+  "category": "Uncategorized",
+  "description": "Launch readiness audit for hx-prose. Checklist: (1) A11y — axe-core zero violations, WCAG 2.1 AA. (2) Astro doc page — all 12 template sections. (3) Individual export — standalone HTML works. (4) `npm run verify` passes. Files: `packages/hx-library/src/components/hx-prose/`, `apps/docs/src/content/docs/component-library/hx-prose.md`",
+  "title": "LAUNCH READY: hx-prose",
+  "status": "done",
+  "dependencies": [],
+  "complexity": "medium",
+  "priority": 3,
+  "source": "api",
+  "trustTier": 1,
+  "quarantineStatus": "passed",
+  "quarantineId": "ea3ccb5b-011e-431b-9ce9-4f306023c7e9",
+  "id": "feature-1773066350567-f8j5uv6bv",
+  "branchName": "feature/launch-ready-hx-prose",
+  "descriptionHistory": [
+    {
+      "description": "Launch readiness audit for hx-prose. Checklist: (1) A11y — axe-core zero violations, WCAG 2.1 AA. (2) Astro doc page — all 12 template sections. (3) Individual export — standalone HTML works. (4) `npm run verify` passes. Files: `packages/hx-library/src/components/hx-prose/`, `apps/docs/src/content/docs/component-library/hx-prose.md`",
+      "timestamp": "2026-03-09T14:25:50.567Z",
+      "source": "initial"
+    }
+  ],
+  "createdAt": "2026-03-09T14:25:50.568Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-03-09T14:25:50.568Z",
+      "reason": "Feature created"
+    },
+    {
+      "from": "backlog",
+      "to": "in_progress",
+      "timestamp": "2026-03-10T17:51:10.081Z"
+    },
+    {
+      "from": "in_progress",
+      "to": "review",
+      "timestamp": "2026-03-10T17:57:02.733Z"
+    },
+    {
+      "from": "review",
+      "to": "blocked",
+      "timestamp": "2026-03-10T18:02:37.292Z",
+      "reason": "Max remediation cycles exceeded (4)"
+    },
+    {
+      "from": "blocked",
+      "to": "review",
+      "timestamp": "2026-03-10T18:05:22.026Z"
+    },
+    {
+      "from": "review",
+      "to": "done",
+      "timestamp": "2026-03-10T18:16:05.561Z"
+    }
+  ],
+  "featureType": "code",
+  "model": "claude-sonnet-4-6",
+  "updatedAt": "2026-03-10T17:51:12.332Z",
+  "costUsd": 1.1569695,
+  "lastSessionId": "53d40d27-44b3-433c-aff6-24bdebc16b1e",
+  "prUrl": "https://github.com/bookedsolidtech/helix/pull/612",
+  "prNumber": 612,
+  "prCreatedAt": "2026-03-10T17:57:01.511Z",
+  "reviewStartedAt": "2026-03-10T17:57:02.733Z",
+  "prTrackedSince": "2026-03-10T17:57:02.734Z",
+  "prLastPolledAt": "2026-03-10T18:06:16.289Z",
+  "lastReviewFeedback": "coderabbitai: **Actionable comments posted: 3**\n\n<details>\n<summary>🤖 Prompt for all review comments with AI agents</summary>\n\n```\nVerify each finding against the current code and only fix it if needed.\n\nInline comments:\nIn `@apps/docs/src/content/docs/component-library/hx-prose.mdx`:\n- Around line 274-283: The example Drupal.behaviors.proseUpdate snippet\nreferences an undefined variable newContent which causes a ReferenceError;\nupdate the snippet so newContent is clearly defined and sanitized before\nassigning to el.innerHTML (e.g., show obtaining/sanitizing the HTML from a safe\nsource or from a passed-in variable), or mark the snippet as pseudocode and\nreplace el.innerHTML = newContent with a comment indicating \"insert sanitized\nHTML here\" to avoid presenting runnable, broken code; ensure you reference\nDrupal.behaviors.proseUpdate and the el.innerHTML assignment in the fix so\nreaders know what to change.\n- Around line 160-170: The example claims \"no build tool required\" but uses the\ncustom element <hx-prose> without registering it (and relies on a placeholder\nimport elsewhere), so provide a copy-paste runnable option or change the\nwording: either add a self-contained registration/import snippet that clearly\ndemonstrates how to load and define the hx-prose web component (e.g., a <script>\ntag pointing to a public CDN/bundled JS that calls customElements.define or\nimports the module that does), or update the prose around the minimal HTML\nsnippet and the placeholder import to state explicitly that the component must\nbe built/registered first and that the shown snippet only demonstrates markup,\nnot runtime registration; reference the hx-prose usage and the placeholder\nimport so readers know which parts to update.\n- Around line 233-245: Update the accessibility claims for the hx-prose\ncomponent to scope them to the wrapper itself rather than guaranteeing arbitrary\nchild markup; specifically edit the table rows that assert \"WCAG\" conformance\nand \"Zero axe-core violations",
+  "prIterationCount": 1,
+  "remediationCycleCount": 1,
+  "statusChangeReason": "Max remediation cycles exceeded (4)",
+  "failureCount": 1,
+  "failureClassification": {
+    "category": "unknown",
+    "confidence": 0.5,
+    "recoveryStrategy": {
+      "type": "escalate_to_user",
+      "reason": "Unclassified failure - needs investigation: Max remediation cycles exceeded (4)"
+    },
+    "retryable": false,
+    "timestamp": "2026-03-10T18:02:37.293Z"
+  },
+  "prMergedAt": "2026-03-10T18:05:19Z",
+  "completedAt": "2026-03-10T18:16:05.561Z"
+}

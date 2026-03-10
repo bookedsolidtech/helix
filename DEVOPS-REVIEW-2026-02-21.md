@@ -169,7 +169,7 @@
 
 - ✅ All use `"type": "module"` for ES modules
 - ✅ All have `bin` entry pointing to `build/index.js`
-- ✅ All depend on `@helix/mcp-shared`
+- ✅ All depend on `@helixui/mcp-shared`
 - ✅ All have consistent build scripts (`tsc && chmod 755 build/index.js`)
 
 ### ✅ MCP Server tsconfig.json Files
@@ -285,7 +285,7 @@ Gate 4.5: API breaking changes (H18)
 **Verified:**
 
 - All servers depend on `@modelcontextprotocol/sdk@^1.26.0`
-- All servers depend on `@helix/mcp-shared@file:../shared`
+- All servers depend on `@helixui/mcp-shared@file:../shared`
 - All servers use `zod@^3.22.0` for validation
 - typescript-diagnostics uses `ts-morph@^27.0.2`
 - health-scorer depends on Admin health scorer (via file reference)
@@ -341,7 +341,7 @@ npm run mcp:health
 **Framework:** Vitest
 **Status:** Tests exist for:
 
-- `@helix/mcp-shared` (git.test.ts)
+- `@helixui/mcp-shared` (git.test.ts)
 - Individual server tests in each package
 
 **Coverage:** Not measured (internal tooling)

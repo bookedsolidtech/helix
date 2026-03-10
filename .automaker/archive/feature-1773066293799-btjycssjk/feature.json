@@ -1,0 +1,61 @@
+{
+  "category": "Uncategorized",
+  "description": "Launch readiness audit for hx-field-label. Checklist: (1) A11y — axe-core zero violations, WCAG 2.1 AA. (2) Astro doc page — all 12 template sections. (3) Individual export — standalone HTML works. (4) `npm run verify` passes. Files: `packages/hx-library/src/components/hx-field-label/`, `apps/docs/src/content/docs/component-library/hx-field-label.md`",
+  "title": "LAUNCH READY: hx-field-label",
+  "status": "done",
+  "dependencies": [],
+  "complexity": "medium",
+  "priority": 3,
+  "source": "api",
+  "trustTier": 1,
+  "quarantineStatus": "passed",
+  "quarantineId": "f073f340-b0ba-4c88-b5fa-4d877f4a7c92",
+  "id": "feature-1773066293799-btjycssjk",
+  "branchName": "feature/launch-ready-hx-field-label",
+  "descriptionHistory": [
+    {
+      "description": "Launch readiness audit for hx-field-label. Checklist: (1) A11y — axe-core zero violations, WCAG 2.1 AA. (2) Astro doc page — all 12 template sections. (3) Individual export — standalone HTML works. (4) `npm run verify` passes. Files: `packages/hx-library/src/components/hx-field-label/`, `apps/docs/src/content/docs/component-library/hx-field-label.md`",
+      "timestamp": "2026-03-09T14:24:53.800Z",
+      "source": "initial"
+    }
+  ],
+  "createdAt": "2026-03-09T14:24:53.800Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-03-09T14:24:53.800Z",
+      "reason": "Feature created"
+    },
+    {
+      "from": "backlog",
+      "to": "in_progress",
+      "timestamp": "2026-03-10T15:17:15.102Z"
+    },
+    {
+      "from": "in_progress",
+      "to": "done",
+      "timestamp": "2026-03-10T16:16:05.267Z"
+    }
+  ],
+  "featureType": "code",
+  "model": "claude-sonnet-4-6",
+  "updatedAt": "2026-03-10T15:17:17.314Z",
+  "costUsd": 3.114624,
+  "lastSessionId": "e70ad296-ddec-420e-931e-47d722834ab4",
+  "assignee": "jake",
+  "completedAt": "2026-03-10T16:16:05.267Z",
+  "executionHistory": [
+    {
+      "id": "daa828bb-cd0f-4207-8b22-9361d4f231b1",
+      "startedAt": "2026-03-10T15:17:15.524Z",
+      "completedAt": "2026-03-10T16:16:05.468Z",
+      "durationMs": 3529944,
+      "costUsd": 3.114624,
+      "model": "claude-sonnet-4-6",
+      "success": false,
+      "error": "Operation was cancelled",
+      "trigger": "manual"
+    }
+  ]
+}

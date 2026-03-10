@@ -576,7 +576,7 @@ $config['system.performance']['csp'] = [
 **Generate SRI hash:**
 
 ```bash
-curl -s https://cdn.jsdelivr.net/npm/@helix/library@0.0.1/dist/helix.bundled.js | \
+curl -s https://cdn.jsdelivr.net/npm/@helixui/library@0.0.1/dist/helix.bundled.js | \
   openssl dgst -sha384 -binary | \
   openssl base64 -A
 ```
@@ -588,7 +588,7 @@ curl -s https://cdn.jsdelivr.net/npm/@helix/library@0.0.1/dist/helix.bundled.js 
 
 helix-cdn:
   js:
-    https://cdn.jsdelivr.net/npm/@helix/library@0.0.1/dist/helix.bundled.js:
+    https://cdn.jsdelivr.net/npm/@helixui/library@0.0.1/dist/helix.bundled.js:
       type: external
       minified: true
       preprocess: false
@@ -703,7 +703,7 @@ Drupal.behaviors.helixCard = {
 ```json
 {
   "dependencies": {
-    "@helix/library": "^0.0.1"
+    "@helixui/library": "^0.0.1"
   }
 }
 ```
@@ -713,9 +713,9 @@ Drupal.behaviors.helixCard = {
 ```json
 {
   "dependencies": {
-    "@helix/library": {
+    "@helixui/library": {
       "version": "0.0.1",
-      "resolved": "https://registry.npmjs.org/@helix/library/-/library-0.0.1.tgz",
+      "resolved": "https://registry.npmjs.org/@helixui/library/-/library-0.0.1.tgz",
       "integrity": "sha512-..."
     }
   }
@@ -937,7 +937,7 @@ export default meta;
 
 ### Adding New Components
 
-1. Install: `npm install @helix/library@latest`
+1. Install: `npm install @helixui/library@latest`
 2. Build: `npm run build`
 3. Define library in `mytheme.libraries.yml`
 4. Create Twig template in `templates/components/`

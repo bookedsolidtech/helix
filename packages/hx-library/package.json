@@ -1,5 +1,5 @@
 {
-  "name": "@helix/library",
+  "name": "@helixui/library",
   "version": "0.1.0",
   "description": "Enterprise Web Component Library built with Lit 3.x",
   "type": "module",
@@ -42,7 +42,7 @@
     "clean": "rm -rf dist custom-elements.json"
   },
   "dependencies": {
-    "@helix/tokens": "*",
+    "@helixui/tokens": "*",
     "lit": "^3.3.2"
   },
   "peerDependencies": {

@@ -170,8 +170,8 @@ The [Drupal Integration Guide](/pre-planning/drupal-guide/) is the reference for
 ```
 helix/
 ├── packages/
-│   ├── hx-library/           # @helix/library — Lit 3.x components
-│   └── hx-tokens/            # @helix/tokens — design token system
+│   ├── hx-library/           # @helixui/library — Lit 3.x components
+│   └── hx-tokens/            # @helixui/tokens — design token system
 │
 ├── apps/
 │   ├── docs/                 # Astro/Starlight documentation hub
@@ -202,7 +202,7 @@ CSS Custom Properties (--hx-*)
 ### Drupal Integration Points
 
 ```
-@helix/library (npm package)
+@helixui/library (npm package)
     ↓
 Drupal libraries.yml (per-component asset loading)
     ↓

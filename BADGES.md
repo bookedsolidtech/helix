@@ -1,10 +1,10 @@
-# WC-2026 Status Badges
+# HELiX Status Badges
 
-This file contains all status badges for the WC-2026 project. These badges are embedded in the README.md for at-a-glance project health.
+This file contains all status badges for the HELiX project. These badges are embedded in the README.md for at-a-glance project health.
 
 ## Build & Quality
 
-![CI Status](https://img.shields.io/github/actions/workflow/status/himerus/wc-2026/ci.yml?branch=main&label=CI&logo=github)
+![CI Status](https://img.shields.io/github/actions/workflow/status/bookedsolidtech/helix/ci.yml?branch=main&label=CI&logo=github)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.7.2-blue?logo=typescript)
 ![Node Version](https://img.shields.io/badge/node-%3E%3D20.0.0-brightgreen?logo=node.js)
 ![npm Version](https://img.shields.io/badge/npm-10.8.2-red?logo=npm)
@@ -37,7 +37,7 @@ This file contains all status badges for the WC-2026 project. These badges are e
 
 ## Package & License
 
-![npm version](https://img.shields.io/npm/v/@helix/library)
+![npm version](https://img.shields.io/npm/v/@helixui/library)
 ![License](https://img.shields.io/badge/license-MIT-blue)
 ![Private](https://img.shields.io/badge/status-private-orange)
 
@@ -64,4 +64,4 @@ This file contains all status badges for the WC-2026 project. These badges are e
 
 To add these badges to your README.md, copy the markdown from this file.
 
-Note: Replace `himerus/wc-2026` with your actual GitHub repository path and update version numbers as needed.
+Note: Replace `bookedsolidtech/helix` with your actual GitHub repository path and update version numbers as needed.

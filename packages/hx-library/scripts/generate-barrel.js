@@ -52,7 +52,7 @@ for (const component of components) {
 
 // Generate the barrel file
 const output = `/**
- * @helix/library - Enterprise Healthcare Web Component Library
+ * @helixui/library - Enterprise Healthcare Web Component Library
  *
  * Built with Lit 3.x. All components are custom elements that can be used
  * in any framework or vanilla HTML.

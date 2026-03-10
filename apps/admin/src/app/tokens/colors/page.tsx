@@ -1,6 +1,6 @@
 import { cn } from '@/lib/utils';
-import { tokenEntries, type TokenEntry } from '@helix/tokens';
-import { getColorSubgroups, isHexColor, getContrastColor } from '@helix/tokens/utils';
+import { tokenEntries, type TokenEntry } from '@helixui/tokens';
+import { getColorSubgroups, isHexColor, getContrastColor } from '@helixui/tokens/utils';
 import { Breadcrumb } from '@/components/dashboard/Breadcrumb';
 import { getTokenBreadcrumbs } from '@/lib/breadcrumb-utils';
 

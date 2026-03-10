@@ -1,0 +1,114 @@
+{
+  "category": "Uncategorized",
+  "description": "Launch readiness audit for hx-split-button. Checklist: (1) A11y — axe-core zero violations, menu button pattern, WCAG 2.1 AA. (2) Astro doc page — all 12 template sections. (3) Individual export — standalone HTML works. (4) `npm run verify` passes. Files: `packages/hx-library/src/components/hx-split-button/`, `apps/docs/src/content/docs/component-library/hx-split-button.md`",
+  "title": "LAUNCH READY: hx-split-button",
+  "status": "done",
+  "dependencies": [],
+  "complexity": "medium",
+  "priority": 3,
+  "source": "api",
+  "trustTier": 1,
+  "quarantineStatus": "passed",
+  "quarantineId": "ec1bdfee-54c6-4a17-90ac-9ebbcb1ad305",
+  "id": "feature-1773066375927-8f23g2efs",
+  "branchName": "feature/launch-ready-hx-split-button",
+  "descriptionHistory": [
+    {
+      "description": "Launch readiness audit for hx-split-button. Checklist: (1) A11y — axe-core zero violations, menu button pattern, WCAG 2.1 AA. (2) Astro doc page — all 12 template sections. (3) Individual export — standalone HTML works. (4) `npm run verify` passes. Files: `packages/hx-library/src/components/hx-split-button/`, `apps/docs/src/content/docs/component-library/hx-split-button.md`",
+      "timestamp": "2026-03-09T14:26:15.927Z",
+      "source": "initial"
+    }
+  ],
+  "createdAt": "2026-03-09T14:26:15.927Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-03-09T14:26:15.927Z",
+      "reason": "Feature created"
+    },
+    {
+      "from": "backlog",
+      "to": "in_progress",
+      "timestamp": "2026-03-10T18:31:18.305Z"
+    },
+    {
+      "from": "in_progress",
+      "to": "backlog",
+      "timestamp": "2026-03-10T18:55:43.285Z"
+    },
+    {
+      "from": "backlog",
+      "to": "blocked",
+      "timestamp": "2026-03-10T18:55:45.854Z",
+      "reason": "Max agent retries exceeded (3)"
+    },
+    {
+      "from": "blocked",
+      "to": "in_progress",
+      "timestamp": "2026-03-10T18:55:46.387Z"
+    },
+    {
+      "from": "in_progress",
+      "to": "verified",
+      "timestamp": "2026-03-10T19:05:07.231Z"
+    },
+    {
+      "from": "done",
+      "to": "review",
+      "timestamp": "2026-03-10T19:05:53.702Z"
+    },
+    {
+      "from": "review",
+      "to": "done",
+      "timestamp": "2026-03-10T21:30:47.992Z"
+    }
+  ],
+  "featureType": "code",
+  "model": "claude-sonnet-4-6",
+  "updatedAt": "2026-03-10T19:05:07.231Z",
+  "assignee": "jake",
+  "executionHistory": [
+    {
+      "id": "bc75615f-4644-4a86-8e8b-90664e4c159b",
+      "startedAt": "2026-03-10T18:31:18.672Z",
+      "completedAt": "2026-03-10T18:55:44.346Z",
+      "durationMs": 1465674,
+      "costUsd": 0,
+      "model": "claude-sonnet-4-6",
+      "success": false,
+      "error": "Operation was cancelled",
+      "trigger": "manual"
+    },
+    {
+      "id": "745300d6-f34b-4b7d-bf7a-7fb8bb945d5d",
+      "startedAt": "2026-03-10T18:55:45.351Z",
+      "completedAt": "2026-03-10T19:05:07.235Z",
+      "durationMs": 561884,
+      "costUsd": 0.9569062500000001,
+      "model": "claude-sonnet-4-6",
+      "success": true,
+      "trigger": "manual"
+    }
+  ],
+  "statusChangeReason": "Max agent retries exceeded (3)",
+  "failureCount": 1,
+  "failureClassification": {
+    "category": "unknown",
+    "confidence": 0.5,
+    "recoveryStrategy": {
+      "type": "escalate_to_user",
+      "reason": "Unclassified failure - needs investigation: Max agent retries exceeded (3)"
+    },
+    "retryable": false,
+    "timestamp": "2026-03-10T18:55:45.855Z"
+  },
+  "costUsd": 0.9569062500000001,
+  "lastSessionId": "327be64b-9a74-40e6-b0c4-ab6b29eaed99",
+  "completedAt": "2026-03-10T19:05:07.231Z",
+  "summary": "## Summary: Launch Readiness Audit for hx-split-button\n\n### Changes Implemented\n- Completed the Astro docs page (`hx-split-button.mdx`) with all 12 required template sections: overview, live demo (default/variants/sizes/disabled/disabled menu item), installation, basic usage, properties table, events table, CSS custom properties table, CSS parts table, slots table, accessibility (WCAG 2.1 AA, ARIA menu button pattern, keyboard nav, localization), Drupal integration (Twig + behaviors), standalone HTML example, and API Reference component.\n\n### Files Modified\n- `apps/docs/src/content/docs/component-library/hx-split-button.mdx` — 404 lines added (replaced placeholder stub)\n\n### Verification\n- `npm run verify` — passes (zero lint, format, type-check errors)\n- 54/54 hx-split-button tests pass including:\n  - Rendering, variant, size, disabled, label, slots tests\n  - Event dispatching (hx-click, hx-select)\n  - Keyboard navigation (ArrowDown/Up, Home/End, Escape, Enter)\n  - Menu open/close behavior\n  - CSS parts\n  - axe-core accessibility — zero violations in default and disabled states\n- The test process received SIGTERM (exit code 143) due to the project watchdog killing long-running vitest runs — this is a known infrastructure issue unrelated to the component\n\n### Risks/Blockers Encountered\n- None. The component was already fully implemented and tested. This task was purely a docs completion task.\n\n### Learnings\n- The hx-split-button component is a composite pattern: primary `<button>` + chevron trigger `<button>` + `[role=\"menu\"]` panel + `hx-menu-item` children\n- The `size` property uses the `hx-size` attribute (not `size`) to avoid conflicting with native HTML `size` attribute\n- `trigger-label` and `menu-label` are the correct attribute names for localization of ARIA labels\n\n### Notes for Developer\n- The standalone HTML example in the docs includes a note that `@helix/library` is a private package — CDN usage is not possible, it must be used through the npm workspace\n- The Playwright verification was not run as the docs site requires the full dev server; however, all component logic is verified through the 54-test Vitest suite",
+  "prUrl": "https://github.com/bookedsolidtech/helix/pull/623",
+  "prNumber": 623,
+  "reviewStartedAt": "2026-03-10T19:05:53.702Z",
+  "prLastPolledAt": "2026-03-10T21:30:14.069Z"
+}

@@ -1,6 +1,6 @@
 import { LitElement, html, nothing, type PropertyValues } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
-import { tokenStyles } from '@helix/tokens/lit';
+import { tokenStyles } from '@helixui/tokens/lit';
 import { helixDividerStyles } from './hx-divider.styles.js';
 
 /**

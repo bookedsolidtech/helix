@@ -30,7 +30,7 @@ The CDN (Content Delivery Network) approach loads HELIX components from an exter
 hx-library:
   version: 1.0.0
   js:
-    https://cdn.jsdelivr.net/npm/@helix/library@1.0.0/dist/helix.bundled.js:
+    https://cdn.jsdelivr.net/npm/@helixui/library@1.0.0/dist/helix.bundled.js:
       type: external
       attributes:
         type: module
@@ -43,7 +43,7 @@ hx-library:
 hx-library:
   version: 1.2.4
   js:
-    https://cdn.jsdelivr.net/npm/@helix/library@1.2.4/dist/helix.bundled.js:
+    https://cdn.jsdelivr.net/npm/@helixui/library@1.2.4/dist/helix.bundled.js:
       type: external
       attributes:
         type: module
@@ -66,7 +66,7 @@ libraries:
 hx-button:
   version: 1.2.4
   js:
-    https://cdn.jsdelivr.net/npm/@helix/library@1.2.4/dist/components/hx-button.js:
+    https://cdn.jsdelivr.net/npm/@helixui/library@1.2.4/dist/components/hx-button.js:
       type: external
       attributes:
         type: module
@@ -74,7 +74,7 @@ hx-button:
 hx-card:
   version: 1.2.4
   js:
-    https://cdn.jsdelivr.net/npm/@helix/library@1.2.4/dist/components/hx-card.js:
+    https://cdn.jsdelivr.net/npm/@helixui/library@1.2.4/dist/components/hx-card.js:
       type: external
       attributes:
         type: module
@@ -139,19 +139,19 @@ The npm approach installs HELIX as a package dependency in your theme's `package
 
 ```bash
 cd web/themes/custom/mytheme
-npm install @helix/library --save
+npm install @helixui/library --save
 ```
 
 **Import in Theme JavaScript** (`src/js/theme.js`):
 
 ```javascript
 // Import entire library
-import '@helix/library';
+import '@helixui/library';
 
 // Alternative: Import only needed components (tree-shaking)
-import '@helix/library/components/hx-button';
-import '@helix/library/components/hx-card';
-import '@helix/library/components/hx-text-input';
+import '@helixui/library/components/hx-button';
+import '@helixui/library/components/hx-card';
+import '@helixui/library/components/hx-text-input';
 ```
 
 **Vite Build Configuration** (`vite.config.js`):
@@ -171,7 +171,7 @@ export default defineConfig({
     rollupOptions: {
       output: {
         manualChunks: {
-          helix: ['@helix/library'],
+          helix: ['@helixui/library'],
         },
       },
     },
@@ -226,7 +226,7 @@ module.exports = {
     "prod": "vite build --mode production"
   },
   "dependencies": {
-    "@helix/library": "^1.2.4"
+    "@helixui/library": "^1.2.4"
   },
   "devDependencies": {
     "vite": "^6.0.0"
@@ -287,7 +287,7 @@ module.exports = {
 ```json
 {
   "dependencies": {
-    "@helix/library": "1.2.4"
+    "@helixui/library": "1.2.4"
   }
 }
 ```
@@ -641,7 +641,7 @@ This generates separate files that can be conditionally loaded, combining tree-s
 
 **npm**:
 
-- Run `npm update @helix/library`
+- Run `npm update @helixui/library`
 - Review changelog, test, rebuild, deploy
 - Controlled timeline
 
@@ -740,7 +740,7 @@ This generates separate files that can be conditionally loaded, combining tree-s
 
 ### CDN to npm
 
-1. Install library: `npm install @helix/library`
+1. Install library: `npm install @helixui/library`
 2. Import in theme JavaScript
 3. Build theme assets
 4. Update `libraries.yml` to reference built files
@@ -775,7 +775,7 @@ This generates separate files that can be conditionally loaded, combining tree-s
 
 ### Module to npm
 
-1. Add `@helix/library` to theme's `package.json`
+1. Add `@helixui/library` to theme's `package.json`
 2. Import in theme JavaScript
 3. Set up build pipeline
 4. Build theme assets

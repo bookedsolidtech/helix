@@ -1,10 +1,10 @@
-# WC-2026: Enterprise Healthcare Web Component Library
+# HELiX: Enterprise Healthcare Web Component Library
 
 **A production-ready Web Component library for healthcare organizations' content hubs, with seamless Drupal integration.**
 
 <!-- Badges -->
 
-![CI Status](https://img.shields.io/github/actions/workflow/status/himerus/wc-2026/ci.yml?branch=main&label=CI&logo=github)
+![CI Status](https://img.shields.io/github/actions/workflow/status/bookedsolidtech/helix/ci.yml?branch=main&label=CI&logo=github)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.7.2-blue?logo=typescript)
 ![Node Version](https://img.shields.io/badge/node-%3E%3D20.0.0-brightgreen?logo=node.js)
 ![Lit](https://img.shields.io/badge/Lit-3.3.2-324FFF?logo=lit)
@@ -16,7 +16,7 @@
 
 ## 🎯 Project Overview
 
-WC-2026 is an enterprise-grade Web Component library built with **Lit 3.x** and **TypeScript**, designed specifically for healthcare organizations building public-facing content hubs on **Drupal CMS**.
+HELiX is an enterprise-grade Web Component library built with **Lit 3.x** and **TypeScript**, designed specifically for healthcare organizations building public-facing content hubs on **Drupal CMS**.
 
 ### Key Features
 
@@ -101,7 +101,7 @@ The complete build plan is organized into 6 comprehensive documents:
 ## 🏗️ Project Structure
 
 ```
-wc-2026/
+helix/
 ├── README.md                 # This file
 ├── build-plan/               # Complete planning documents
 │   ├── index.md             # Executive summary & document index
@@ -112,15 +112,15 @@ wc-2026/
 │   └── 06-*.md              # Drupal integration guide
 │
 ├── packages/
-│   └── wc-library/              # Web Component library (@wc-2026/library)
+│   └── hx-library/              # Web Component library (@helixui/library)
 │       ├── src/
-│       │   ├── components/      # Lit components (wc-button, wc-card, wc-text-input)
+│       │   ├── components/      # Lit components (hx-button, hx-card, hx-text-input)
 │       │   └── styles/          # Design tokens (CSS custom properties)
 │       ├── dist/                # Build output (ES module, 24KB)
 │       └── custom-elements.json # Generated CEM (1051 lines)
 │
 ├── apps/
-│   ├── storybook/               # Storybook 10.x (@wc-2026/storybook)
+│   ├── storybook/               # Storybook 10.x (@helixui/storybook)
 │   │   └── .storybook/          # Config, theme, preview
 │   └── docs/                    # Astro/Starlight documentation hub
 │       ├── src/
@@ -145,8 +145,8 @@ wc-2026/
 ### Setup
 
 ```bash
-git clone https://github.com/himerus/wc-2026.git
-cd wc-2026
+git clone https://github.com/bookedsolidtech/helix.git
+cd helix
 npm install
 ```
 
@@ -462,9 +462,9 @@ MIT
 
 - ✅ **Planning Phase**: Complete (6 comprehensive documents, 10K+ lines)
 - ✅ **Phase 0 Prototype**: Complete (3 components validating architecture)
-  - `wc-button` - Form association, 3 variants, 3 sizes, ElementInternals
-  - `wc-card` - 5 slots, 3 variants, 3 elevations, interactive mode
-  - `wc-text-input` - Full form lifecycle, validation, prefix/suffix slots
+  - `hx-button` - Form association, 3 variants, 3 sizes, ElementInternals
+  - `hx-card` - 5 slots, 3 variants, 3 elevations, interactive mode
+  - `hx-text-input` - Full form lifecycle, validation, prefix/suffix slots
 - ✅ **Storybook**: Configured with addon-a11y, autodocs, custom theme
 - ✅ **Documentation Site**: 44 pages, 5 standalone showcase pages, Pagefind search
 - ⏳ **Testing Infrastructure**: Vitest Browser Mode (Phase 1)
