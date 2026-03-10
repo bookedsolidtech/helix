@@ -1,14 +1,365 @@
 ---
 title: 'hx-overflow-menu'
-description: 'Compact menu trigger for actions that overflow available space'
+description: 'Compact trigger button that reveals a floating menu of hidden actions — the kebab (⋮) or meatball (···) pattern'
 ---
 
 import ComponentLoader from '../../../components/ComponentLoader.astro';
+import ComponentDemo from '../../../components/ComponentDemo.astro';
 import ComponentDoc from '../../../components/ComponentDoc.astro';
 
 <ComponentLoader />
 
 <ComponentDoc tagName="hx-overflow-menu" section="summary" />
+
+## Overview
+
+`hx-overflow-menu` is an icon-button trigger that opens a floating action panel when activated. It implements the [WAI-ARIA Menu Button Pattern](https://www.w3.org/WAI/ARIA/apg/patterns/menu-button/) and is commonly used in data table rows, cards, and toolbars to surface contextual actions without cluttering the primary layout.
+
+The trigger renders either a vertical kebab icon (⋮) or a horizontal meatball icon (···). The floating panel is positioned automatically using Floating UI and supports all 12 placement variants. Menu items are slotted, giving consumers full control over content, icons, and disabled states.
+
+**Use `hx-overflow-menu` when:** actions overflow available space and need to be revealed on demand — patient row actions, record management, document options.
+
+**Use `hx-button` instead when:** the primary action should always be visible.
+
+## Live Demo
+
+### Default (Vertical Kebab)
+
+<ComponentDemo title="Default">
+  <hx-overflow-menu label="Patient actions">
+    <button role="menuitem" data-value="view">
+      View Details
+    </button>
+    <button role="menuitem" data-value="edit">
+      Edit Record
+    </button>
+    <button role="menuitem" data-value="archive">
+      Archive
+    </button>
+  </hx-overflow-menu>
+</ComponentDemo>
+
+### Horizontal (Meatball)
+
+<ComponentDemo title="Horizontal">
+  <hx-overflow-menu icon="horizontal" label="Appointment actions">
+    <button role="menuitem" data-value="reschedule">
+      Reschedule
+    </button>
+    <button role="menuitem" data-value="cancel">
+      Cancel Appointment
+    </button>
+    <button role="menuitem" data-value="notes">
+      Add Notes
+    </button>
+  </hx-overflow-menu>
+</ComponentDemo>
+
+### Size Variants
+
+<ComponentDemo title="Sizes">
+  <div style="display: flex; gap: 1rem; align-items: center;">
+    <hx-overflow-menu hx-size="sm" label="Small actions">
+      <button role="menuitem" data-value="edit">
+        Edit
+      </button>
+      <button role="menuitem" data-value="delete">
+        Delete
+      </button>
+    </hx-overflow-menu>
+    <hx-overflow-menu hx-size="md" label="Medium actions">
+      <button role="menuitem" data-value="edit">
+        Edit
+      </button>
+      <button role="menuitem" data-value="delete">
+        Delete
+      </button>
+    </hx-overflow-menu>
+    <hx-overflow-menu hx-size="lg" label="Large actions">
+      <button role="menuitem" data-value="edit">
+        Edit
+      </button>
+      <button role="menuitem" data-value="delete">
+        Delete
+      </button>
+    </hx-overflow-menu>
+  </div>
+</ComponentDemo>
+
+### With Disabled Item
+
+<ComponentDemo title="Disabled Item">
+  <hx-overflow-menu label="Record actions">
+    <button role="menuitem" data-value="view">
+      View Details
+    </button>
+    <button role="menuitem" data-value="edit">
+      Edit Record
+    </button>
+    <button role="menuitem" data-value="delete" disabled>
+      Delete (No Permission)
+    </button>
+  </hx-overflow-menu>
+</ComponentDemo>
+
+### Disabled Trigger
+
+<ComponentDemo title="Disabled Trigger">
+  <hx-overflow-menu disabled label="Actions unavailable">
+    <button role="menuitem" data-value="edit">
+      Edit
+    </button>
+    <button role="menuitem" data-value="delete">
+      Delete
+    </button>
+  </hx-overflow-menu>
+</ComponentDemo>
+
+### In a Table Row Context
+
+<ComponentDemo title="Table Row">
+  <table style="width: 100%; border-collapse: collapse; font-size: 0.875rem;">
+    <thead>
+      <tr style="border-bottom: 1px solid #e5e7eb;">
+        <th style="text-align: left; padding: 0.5rem 1rem;">Patient</th>
+        <th style="text-align: left; padding: 0.5rem 1rem;">MRN</th>
+        <th style="text-align: left; padding: 0.5rem 1rem;">Status</th>
+        <th style="padding: 0.5rem 1rem;"></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr style="border-bottom: 1px solid #f3f4f6;">
+        <td style="padding: 0.5rem 1rem;">John Smith</td>
+        <td style="padding: 0.5rem 1rem;">100293847</td>
+        <td style="padding: 0.5rem 1rem;">Active</td>
+        <td style="padding: 0.5rem 0.5rem; text-align: right;">
+          <hx-overflow-menu label="Actions for John Smith" placement="bottom-end">
+            <button role="menuitem" data-value="view">
+              View Chart
+            </button>
+            <button role="menuitem" data-value="schedule">
+              Schedule Appointment
+            </button>
+            <button role="menuitem" data-value="message">
+              Message Provider
+            </button>
+          </hx-overflow-menu>
+        </td>
+      </tr>
+      <tr>
+        <td style="padding: 0.5rem 1rem;">Jane Doe</td>
+        <td style="padding: 0.5rem 1rem;">200847361</td>
+        <td style="padding: 0.5rem 1rem;">Active</td>
+        <td style="padding: 0.5rem 0.5rem; text-align: right;">
+          <hx-overflow-menu label="Actions for Jane Doe" placement="bottom-end">
+            <button role="menuitem" data-value="view">
+              View Chart
+            </button>
+            <button role="menuitem" data-value="schedule">
+              Schedule Appointment
+            </button>
+            <button role="menuitem" data-value="message">
+              Message Provider
+            </button>
+          </hx-overflow-menu>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</ComponentDemo>
+
+## Installation
+
+```bash
+# Full library
+npm install @helix/library
+
+# Or import only this component (tree-shaking friendly)
+import '@helix/library/components/hx-overflow-menu';
+```
+
+## Basic Usage
+
+```html
+<hx-overflow-menu label="Patient actions">
+  <button role="menuitem" data-value="view">View Details</button>
+  <button role="menuitem" data-value="edit">Edit Record</button>
+  <button role="menuitem" data-value="delete">Delete</button>
+</hx-overflow-menu>
+```
+
+## Properties
+
+| Property    | Attribute   | Type                                                                                                                                                                 | Default          | Description                                                                                                                           |
+| ----------- | ----------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
+| `placement` | `placement` | `'top' \| 'top-start' \| 'top-end' \| 'bottom' \| 'bottom-start' \| 'bottom-end' \| 'left' \| 'left-start' \| 'left-end' \| 'right' \| 'right-start' \| 'right-end'` | `'bottom-end'`   | Preferred placement of the floating panel relative to the trigger. Floating UI will flip/shift automatically if space is constrained. |
+| `size`      | `hx-size`   | `'sm' \| 'md' \| 'lg'`                                                                                                                                               | `'md'`           | Size of the trigger button.                                                                                                           |
+| `disabled`  | `disabled`  | `boolean`                                                                                                                                                            | `false`          | Disables the trigger button and prevents the panel from opening.                                                                      |
+| `icon`      | `icon`      | `'vertical' \| 'horizontal'`                                                                                                                                         | `'vertical'`     | Icon orientation — vertical kebab (⋮) or horizontal meatball (···).                                                                   |
+| `label`     | `label`     | `string`                                                                                                                                                             | `'More actions'` | Accessible label applied as `aria-label` on the trigger button. Provide a unique, context-specific label for each instance in a list. |
+
+## Events
+
+| Event       | Detail Type         | Description                                                                                                                                     |
+| ----------- | ------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+| `hx-select` | `{ value: string }` | Dispatched when a menu item is selected. `value` is taken from the item's `data-value` attribute or its `textContent`. Bubbles and is composed. |
+| `hx-show`   | `void`              | Dispatched when the panel opens. Bubbles and is composed.                                                                                       |
+| `hx-hide`   | `void`              | Dispatched when the panel closes (Escape, Tab, outside click, or item selection). Bubbles and is composed.                                      |
+
+## CSS Custom Properties
+
+| Property                                 | Default                                          | Description                     |
+| ---------------------------------------- | ------------------------------------------------ | ------------------------------- |
+| `--hx-overflow-menu-panel-bg`            | `var(--hx-color-neutral-0, #fff)`                | Panel background color.         |
+| `--hx-overflow-menu-panel-border`        | `1px solid var(--hx-color-neutral-200, #e5e7eb)` | Panel border shorthand.         |
+| `--hx-overflow-menu-panel-border-radius` | `var(--hx-border-radius-md)`                     | Panel border radius.            |
+| `--hx-overflow-menu-panel-shadow`        | `0 4px 16px rgba(0,0,0,0.12)`                    | Panel box shadow.               |
+| `--hx-overflow-menu-panel-min-width`     | `160px`                                          | Minimum width of the panel.     |
+| `--hx-overflow-menu-panel-z-index`       | `1000`                                           | Panel stacking order (z-index). |
+| `--hx-overflow-menu-button-color`        | `var(--hx-color-neutral-600)`                    | Trigger icon color.             |
+
+## CSS Parts
+
+| Part      | Description                                            |
+| --------- | ------------------------------------------------------ |
+| `button`  | The trigger icon button element. Primary part name.    |
+| `trigger` | Alias for `button` — the trigger icon button element.  |
+| `panel`   | The floating menu panel container. Primary part name.  |
+| `menu`    | Alias for `panel` — the floating menu panel container. |
+
+## Slots
+
+| Slot        | Description                                                                                                                                                     |
+| ----------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| _(default)_ | Menu item elements. Use `<button role="menuitem">`, `<a role="menuitem">`, or `<hx-menu-item>` elements. Add `disabled` to skip focus and suppress `hx-select`. |
+
+## Accessibility
+
+`hx-overflow-menu` implements the [WAI-ARIA Menu Button Pattern](https://www.w3.org/WAI/ARIA/apg/patterns/menu-button/). The trigger is a native `<button>` with `aria-haspopup="menu"` and `aria-expanded` reflecting the open state. The panel has `role="menu"`.
+
+| Topic            | Details                                                                                                                                                                                                                  |
+| ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| ARIA role        | Trigger: native `button` with `aria-haspopup="menu"` and `aria-expanded`. Panel: `div[role="menu"]` with `aria-label="Actions"`.                                                                                         |
+| `aria-label`     | Set on the trigger button from the `label` property (default: `"More actions"`). Provide a unique, context-specific label for each instance in a list or table so screen reader users can distinguish repeated controls. |
+| `aria-expanded`  | Reflects open/closed state on the trigger button — `"true"` when open, `"false"` when closed.                                                                                                                            |
+| `aria-haspopup`  | Set to `"menu"` on the trigger button, satisfying ARIA 1.2 semantics.                                                                                                                                                    |
+| Keyboard         | See [Keyboard Navigation](#keyboard-navigation) section below.                                                                                                                                                           |
+| Screen reader    | When the trigger is focused, the accessible name, role (`button`), and expanded state are announced. When open, items are announced with their role (`menuitem`) and name.                                               |
+| Focus management | On open: focus moves to the first enabled menu item. On Escape: focus returns to the trigger button. On item selection or Tab: panel closes.                                                                             |
+| Disabled items   | Items with the `disabled` attribute are excluded from keyboard focus traversal and do not dispatch `hx-select`.                                                                                                          |
+| WCAG             | Meets WCAG 2.1 AA. SC 2.1.1 (Keyboard), SC 4.1.2 (Name, Role, Value), SC 1.4.11 (Non-text Contrast) satisfied. Zero axe-core violations in closed, open, and disabled states.                                            |
+
+## Keyboard Navigation
+
+| Key         | Behavior                                                                 |
+| ----------- | ------------------------------------------------------------------------ |
+| `Enter`     | Opens the menu and moves focus to the first enabled item.                |
+| `Space`     | Opens the menu and moves focus to the first enabled item.                |
+| `Escape`    | Closes the menu and returns focus to the trigger button.                 |
+| `Tab`       | Closes the menu; natural tab order continues from the trigger.           |
+| `ArrowDown` | Moves focus to the next enabled menu item; wraps from last to first.     |
+| `ArrowUp`   | Moves focus to the previous enabled menu item; wraps from first to last. |
+| `Home`      | Moves focus to the first enabled menu item.                              |
+| `End`       | Moves focus to the last enabled menu item.                               |
+
+## Drupal Integration
+
+```twig
+{# my-module/templates/patient-row-actions.html.twig #}
+<hx-overflow-menu
+  label="{{ label|default('Row actions') }}"
+  {% if placement %}placement="{{ placement }}"{% endif %}
+  {% if size %}hx-size="{{ size }}"{% endif %}
+  {% if disabled %}disabled{% endif %}
+>
+  {% for action in actions %}
+    <button
+      role="menuitem"
+      data-value="{{ action.value }}"
+      {% if action.disabled %}disabled{% endif %}
+    >
+      {{ action.label }}
+    </button>
+  {% endfor %}
+</hx-overflow-menu>
+```
+
+Load the library in your module's `.libraries.yml`:
+
+```yaml
+helix-components:
+  js:
+    /libraries/helix/helix.min.js: { minified: true }
+```
+
+Listen for selection events in Drupal behaviors using `once()` to prevent duplicate listeners on AJAX:
+
+```javascript
+Drupal.behaviors.helixOverflowMenu = {
+  attach(context) {
+    // once() is a Drupal core utility (no import needed) — prevents duplicate event binding during AJAX attach cycles
+    once('helixOverflowMenu', 'hx-overflow-menu', context).forEach((el) => {
+      el.addEventListener('hx-select', (e) => {
+        const { value } = e.detail;
+        // e.g. route to an edit form, trigger an AJAX action, or update Drupal state
+        console.log('Action selected:', value);
+      });
+    });
+  },
+};
+```
+
+## Standalone HTML Example
+
+Copy-paste into a `.html` file and open in any browser — no build tool required:
+
+```html
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>hx-overflow-menu example</title>
+    <!-- @helix/library is a private package — install via npm workspace, not CDN -->
+    <!-- In your project: import '@helix/library'; in your bundler entry point -->
+  </head>
+  <body style="font-family: sans-serif; padding: 2rem;">
+    <h2>Patient Row Actions</h2>
+
+    <table style="width: 100%; border-collapse: collapse; font-size: 0.875rem;">
+      <thead>
+        <tr style="border-bottom: 1px solid #e5e7eb;">
+          <th style="text-align: left; padding: 0.5rem 1rem;">Patient</th>
+          <th style="text-align: left; padding: 0.5rem 1rem;">MRN</th>
+          <th style="padding: 0.5rem 1rem;"></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td style="padding: 0.5rem 1rem;">John Smith</td>
+          <td style="padding: 0.5rem 1rem;">100293847</td>
+          <td style="padding: 0.5rem 0.5rem; text-align: right;">
+            <hx-overflow-menu id="menu-john" label="Actions for John Smith">
+              <button role="menuitem" data-value="view">View Chart</button>
+              <button role="menuitem" data-value="schedule">Schedule Appointment</button>
+              <button role="menuitem" data-value="discharge" disabled>
+                Discharge (No Permission)
+              </button>
+            </hx-overflow-menu>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <script>
+      document.getElementById('menu-john').addEventListener('hx-select', (e) => {
+        console.log('Action selected:', e.detail.value);
+        // e.g. navigate to /patients/100293847/edit
+      });
+    </script>
+  </body>
+</html>
+```
 
 ## API Reference
 
