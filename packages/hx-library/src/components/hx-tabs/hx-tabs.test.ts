@@ -654,6 +654,7 @@ describe('hx-tabs', () => {
       el.appendChild(newPanel);
       // Wait for slot change to propagate
       await el.updateComplete;
+      // Yield to event loop to allow slotchange/DOM mutation callbacks to run after tab insertion
       await new Promise((r) => setTimeout(r, 0));
       await el.updateComplete;
       const tabs = Array.from(el.querySelectorAll('hx-tab')) as HelixTab[];
@@ -672,6 +673,7 @@ describe('hx-tabs', () => {
       el.appendChild(newTab);
       el.appendChild(newPanel);
       await el.updateComplete;
+      // Yield to event loop to allow slotchange/DOM mutation callbacks to run after tab insertion
       await new Promise((r) => setTimeout(r, 0));
       await el.updateComplete;
       const tabs = Array.from(el.querySelectorAll('hx-tab')) as HelixTab[];
@@ -687,6 +689,7 @@ describe('hx-tabs', () => {
       const tabs = Array.from(el.querySelectorAll('hx-tab')) as HelixTab[];
       el.removeChild(tabs[2]);
       await el.updateComplete;
+      // Yield to event loop to allow slotchange/DOM mutation callbacks to run after tab removal
       await new Promise((r) => setTimeout(r, 0));
       await el.updateComplete;
       const remainingTabs = Array.from(el.querySelectorAll('hx-tab')) as HelixTab[];

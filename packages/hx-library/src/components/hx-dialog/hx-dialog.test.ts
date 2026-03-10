@@ -50,7 +50,7 @@ describe('hx-dialog', () => {
         '<hx-dialog open><button slot="footer">OK</button></hx-dialog>',
       );
       await el.updateComplete;
-      // Allow slotchange event to fire
+      // Wait for slotchange event to propagate so the footer part visibility is updated
       await new Promise((r) => setTimeout(r, 50));
       await el.updateComplete;
       const footerPart = shadowQuery(el, '[part="footer"]');
@@ -265,6 +265,7 @@ describe('hx-dialog', () => {
       const el = await fixture<HelixDialog>(
         '<hx-dialog open><span slot="header" class="custom-header">Custom</span></hx-dialog>',
       );
+      // Wait for slotchange event to propagate and component to re-render with header slot content
       await new Promise((r) => setTimeout(r, 50));
       await el.updateComplete;
       const slottedHeader = el.querySelector('span.custom-header');
@@ -276,6 +277,7 @@ describe('hx-dialog', () => {
       const el = await fixture<HelixDialog>(
         '<hx-dialog open><button slot="footer" class="confirm-btn">Confirm</button></hx-dialog>',
       );
+      // Wait for slotchange event to propagate and component to re-render with footer slot content
       await new Promise((r) => setTimeout(r, 50));
       await el.updateComplete;
       const slottedFooter = el.querySelector('button.confirm-btn');
@@ -325,6 +327,7 @@ describe('hx-dialog', () => {
       const el = await fixture<HelixDialog>(
         '<hx-dialog open><button slot="footer">OK</button></hx-dialog>',
       );
+      // Wait for slotchange event to propagate so the footer CSS part is rendered
       await new Promise((r) => setTimeout(r, 50));
       await el.updateComplete;
       const part = shadowQuery(el, '[part="footer"]');
@@ -354,7 +357,7 @@ describe('hx-dialog', () => {
       );
       el.modal = true;
       await el.updateComplete;
-      // Wait for focus cache to populate
+      // Allow brief settle time for the focus-trap focusable element cache to populate
       await new Promise((r) => setTimeout(r, 50));
 
       const dialogEl = shadowQuery<HTMLDialogElement>(el, 'dialog');
@@ -379,6 +382,7 @@ describe('hx-dialog', () => {
       );
       el.modal = true;
       await el.updateComplete;
+      // Allow brief settle time for the focus-trap focusable element cache to populate
       await new Promise((r) => setTimeout(r, 50));
 
       const dialogEl = shadowQuery<HTMLDialogElement>(el, 'dialog');
@@ -478,7 +482,7 @@ describe('hx-dialog', () => {
 
       el.showModal();
       await el.updateComplete;
-      // Allow updateComplete.then() callback to run (initial focus is set inside)
+      // Allow microtask queue to flush so the updateComplete.then() initial-focus callback runs
       await new Promise((r) => setTimeout(r, 50));
 
       const firstFocusable = el.querySelector('#first-focusable') as HTMLElement;
@@ -503,6 +507,7 @@ describe('hx-dialog', () => {
 
       el.showModal();
       await el.updateComplete;
+      // Allow microtask queue to flush so the updateComplete.then() initial-focus callback runs
       await new Promise((r) => setTimeout(r, 50));
 
       // Close the dialog

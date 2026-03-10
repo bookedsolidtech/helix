@@ -1,12 +1,6 @@
 import { describe, it, expect, afterEach } from 'vitest';
 import { page } from '@vitest/browser/context';
-import {
-  fixture,
-  shadowQuery,
-  oneEvent,
-  cleanup,
-  checkA11y,
-} from '../../test-utils.js';
+import { fixture, shadowQuery, oneEvent, cleanup, checkA11y } from '../../test-utils.js';
 import type { HelixCard } from './hx-card.js';
 import './index.js';
 
@@ -195,6 +189,7 @@ describe('hx-card', () => {
         fired = true;
       });
       card.click();
+      // Allow brief settle time to confirm hx-click is not dispatched on a non-interactive card
       await new Promise((r) => setTimeout(r, 50));
       expect(fired).toBe(false);
     });
@@ -229,6 +224,7 @@ describe('hx-card', () => {
         fired = true;
       });
       card.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
+      // Allow brief settle time to confirm hx-click is not dispatched on a non-interactive card
       await new Promise((r) => setTimeout(r, 50));
       expect(fired).toBe(false);
     });
@@ -249,7 +245,9 @@ describe('hx-card', () => {
 
   describe('Slot: heading', () => {
     it('heading content renders', async () => {
-      const el = await fixture<HelixCard>('<hx-card><span slot="heading">Title</span>Body</hx-card>');
+      const el = await fixture<HelixCard>(
+        '<hx-card><span slot="heading">Title</span>Body</hx-card>',
+      );
       const headingSlot = el.querySelector('[slot="heading"]');
       expect(headingSlot).toBeTruthy();
       expect(headingSlot?.textContent).toBe('Title');

@@ -431,6 +431,7 @@ describe('hx-number-input', () => {
   // ─── Long-press stepper (5) ───
 
   describe('Long-press stepper', () => {
+    // Helper to pause execution for async animation/transition waits
     const wait = (ms: number) => new Promise<void>((r) => setTimeout(r, ms));
 
     it('fires hx-change immediately on pointerdown', async () => {
@@ -929,6 +930,7 @@ describe('hx-number-input', () => {
     it('focus() moves focus to the native input', async () => {
       const el = await fixture<HelixNumberInput>('<hx-number-input></hx-number-input>');
       el.focus();
+      // Allow brief settle time for focus to propagate into the shadow DOM input
       await new Promise<void>((r) => setTimeout(r, 50));
       const input = shadowQuery<HTMLInputElement>(el, 'input')!;
       expect(el.shadowRoot?.activeElement).toBe(input);
