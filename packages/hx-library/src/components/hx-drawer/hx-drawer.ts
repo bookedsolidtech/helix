@@ -5,6 +5,9 @@ import { ifDefined } from 'lit/directives/if-defined.js';
 import { tokenStyles } from '@helix/tokens/lit';
 import { helixDrawerStyles } from './hx-drawer.styles.js';
 
+// Module-level counter for stable, SSR-safe IDs (avoids Math.random() hydration mismatch)
+let _hxDrawerIdCounter = 0;
+
 type DrawerPlacement = 'start' | 'end' | 'top' | 'bottom';
 type DrawerSize = 'sm' | 'md' | 'lg' | 'full';
 
@@ -100,7 +103,7 @@ export class HelixDrawer extends LitElement {
   private _previousBodyOverflow: string | null = null;
   private _siblingAriaHiddenElements: Element[] = [];
 
-  private readonly _titleId = `hx-drawer-title-${Math.random().toString(36).slice(2, 9)}`;
+  private readonly _titleId = `hx-drawer-title-${++_hxDrawerIdCounter}`;
 
   // ─── Public Properties ───
 

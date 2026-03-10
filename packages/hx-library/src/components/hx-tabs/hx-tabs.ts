@@ -5,6 +5,9 @@ import { helixTabsStyles } from './hx-tabs.styles.js';
 import type { HelixTab } from './hx-tab.js';
 import type { HelixTabPanel } from './hx-tab-panel.js';
 
+// Module-level counter for stable, SSR-safe IDs (avoids Math.random() hydration mismatch)
+let _hxTabsIdCounter = 0;
+
 /**
  * A tabbed content organizer that manages a set of `<hx-tab>` and `<hx-tab-panel>` children.
  * Supports horizontal and vertical orientations, automatic and manual activation modes,
@@ -48,7 +51,7 @@ export class HelixTabs extends LitElement {
   // ─── Internal ID ───
 
   /** @internal */
-  private _id = `hx-tabs-${Math.random().toString(36).slice(2, 9)}`;
+  private _id = `hx-tabs-${++_hxTabsIdCounter}`;
 
   // ─── Properties ───
 
