@@ -1,6 +1,6 @@
 {
   "name": "@helix/admin",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "private": true,
   "description": "Panopticon Platform — WC-2026 Component Library",
   "scripts": {

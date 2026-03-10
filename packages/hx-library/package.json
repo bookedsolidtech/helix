@@ -1,7 +1,6 @@
 {
   "name": "@helix/library",
-  "version": "0.0.1",
-  "private": true,
+  "version": "0.1.0",
   "description": "Enterprise Web Component Library built with Lit 3.x",
   "type": "module",
   "sideEffects": [
