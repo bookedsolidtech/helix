@@ -1,35 +1,28 @@
 ---
 title: Phase 0 Overview
-description: Rapid prototyping phase — validate core technology decisions before full implementation
+description: How we validated the HELIX architecture before committing to 85 components
 ---
 
 > **Status**: Complete
-> **Timeline**: February 2026
-> **Goal**: Validate core technology stack and architecture decisions through working prototypes
+> **Completed**: February 2026
 
 ---
 
-## Objectives
+## What Phase 0 Was For
 
-1. **Validate Technology Stack** — Confirm Lit 3.x + Storybook 10.x + Astro/Starlight work together seamlessly
-2. **Prove Component Architecture** — Build 2-3 proof-of-concept components that demonstrate the full pattern
-3. **Test Drupal Integration** — Verify web components render correctly in Drupal TWIG templates
-4. **Establish Build Pipeline** — Set up monorepo, TypeScript, build tooling, and CI/CD
-5. **Create Documentation Hub** — Stand up the Astro/Starlight docs site with initial content
+Before committing to a 85-component library, we built a thin vertical slice — three components that exercised every layer of the architecture. The goal was simple: find the hard problems before they became expensive problems.
 
-## What This Phase Covered
-
-Phase 0 was about **reducing risk** before committing to a full 85-component build. By building a small vertical slice (hx-button, hx-card, hx-text-input), every layer of the architecture was validated:
+Every integration point that could fail was stressed:
 
 - Component authoring (Lit 3.x with TypeScript)
-- Design tokens (CSS custom properties, three-tier cascade)
+- Design token consumption from the `hx-tokens` package
 - Storybook integration (autodocs, controls, a11y addon)
-- Documentation generation (CEM → Starlight API pages)
-- Drupal integration (TWIG templates, behaviors)
-- Testing (Vitest browser mode, axe-core)
-- Build & publish (Vite library mode, npm package)
+- CEM generation feeding API documentation
+- Drupal TWIG template rendering
+- Vitest browser mode tests against real Chromium
+- Vite library mode build and per-component entry points
 
-## Phase 0 Deliverables
+## What We Delivered
 
 | Deliverable               | Description                                                    | Status   |
 | ------------------------- | -------------------------------------------------------------- | -------- |
@@ -37,16 +30,17 @@ Phase 0 was about **reducing risk** before committing to a full 85-component bui
 | `hx-button` component     | First proof-of-concept component                               | Complete |
 | `hx-card` component       | Content card with slots and variants                           | Complete |
 | `hx-text-input` component | Form input with validation and ElementInternals                | Complete |
-| Design token pipeline     | CSS custom properties, three-tier cascade                      | Complete |
+| Design token pipeline     | `hx-tokens` package → CSS custom properties consumed by Lit    | Complete |
 | Storybook instance        | Stories, autodocs, a11y testing                                | Complete |
 | Docs site                 | Astro/Starlight with initial architecture docs                 | Complete |
-| Vitest testing            | Browser-mode unit testing                                      | Complete |
-| Drupal prototype          | TWIG template rendering web components                         | Complete |
+| Vitest testing            | Browser-mode unit testing via Playwright/Chromium              | Complete |
 
-## Outcome
+## What We Learned
 
-Phase 0 validated every architectural assumption before the full 85-component library build began. The tech stack held up under real conditions — Lit 3.x components work natively in Drupal TWIG with no framework adapter, Storybook 10.x autodocs generate from CEM without configuration, and Vitest browser mode runs in Chromium headlessly in CI.
+The prototype surface-tested the obvious failure modes but the real lessons came from edge cases. The Storybook 10.x + Vite + Lit integration worked first time — no surprises. The harder problem was Shadow DOM CSS isolation in Drupal's theming pipeline, which forced us to establish the `--hx-*` token convention early.
 
-## Next Phase
+For the full retrospective, see the [Architecture decisions](/architecture/overview/) and the [Build Pipeline documentation](/architecture/build-pipeline/).
 
-With Phase 0 complete, [Planning & Discovery](/pre-planning/overview) documents the comprehensive build plan for the full component library.
+## Where This Led
+
+Phase 0 proved the stack. Everything that came after — all 85 components — is built on the patterns we established here. The [Planning & Discovery](/pre-planning/overview/) documents capture the comprehensive build plan that followed.
