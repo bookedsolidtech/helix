@@ -23,7 +23,10 @@ export const helixPopoverStyles = css`
     line-height: var(--hx-line-height-normal, 1.5);
     border: 1px solid var(--hx-popover-border-color, var(--hx-color-neutral-200, #e5e7eb));
     border-radius: var(--hx-popover-border-radius, var(--hx-border-radius-md, 0.375rem));
-    box-shadow: var(--hx-popover-shadow, var(--hx-shadow-md, 0 4px 16px rgba(0, 0, 0, 0.12)));
+    box-shadow: var(
+      --hx-popover-shadow,
+      var(--hx-shadow-md, 0 4px 16px var(--hx-overlay-black-12, rgba(0, 0, 0, 0.12)))
+    );
     visibility: hidden;
     opacity: 0;
     transition:

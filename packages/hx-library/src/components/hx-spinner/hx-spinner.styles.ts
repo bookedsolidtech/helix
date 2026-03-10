@@ -101,7 +101,10 @@ export const helixSpinnerStyles = css`
     --_spinner-color: var(--hx-spinner-color, var(--hx-color-neutral-0, #ffffff));
     /* Fallback for browsers without color-mix() support (Chrome < 111, Firefox < 113, Safari < 16.2).
        rgba(255, 255, 255, 0.3) approximates the intended 30% white track color. */
-    --_spinner-track-color: var(--hx-spinner-track-color, rgba(255, 255, 255, 0.3));
+    --_spinner-track-color: var(
+      --hx-spinner-track-color,
+      var(--hx-overlay-white-30, rgba(255, 255, 255, 0.3))
+    );
   }
 
   @supports (color: color-mix(in srgb, white 30%, transparent)) {

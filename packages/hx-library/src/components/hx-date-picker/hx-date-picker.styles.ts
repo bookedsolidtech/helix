@@ -162,8 +162,8 @@ export const helixDatePickerStyles = css`
     border-radius: var(--hx-date-picker-calendar-border-radius, var(--hx-border-radius-lg, 0.5rem));
     box-shadow: var(
       --hx-date-picker-calendar-shadow,
-      0 4px 6px -1px rgba(0, 0, 0, 0.1),
-      0 2px 4px -2px rgba(0, 0, 0, 0.1)
+      0 4px 6px -1px var(--hx-overlay-black-10, rgba(0, 0, 0, 0.1)),
+      0 2px 4px -2px var(--hx-overlay-black-10, rgba(0, 0, 0, 0.1))
     );
     padding: var(--hx-space-3, 0.75rem);
     outline: none;

@@ -75,7 +75,10 @@ export const helixOverflowMenuStyles = css`
       --hx-overflow-menu-panel-border-radius,
       var(--hx-border-radius-md, 0.375rem)
     );
-    box-shadow: var(--hx-overflow-menu-panel-shadow, 0 4px 16px rgba(0, 0, 0, 0.12));
+    box-shadow: var(
+      --hx-overflow-menu-panel-shadow,
+      0 4px 16px var(--hx-overlay-black-12, rgba(0, 0, 0, 0.12))
+    );
     padding: var(--hx-space-1, 0.25rem) 0;
     outline: none;
   }
