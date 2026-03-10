@@ -61,7 +61,7 @@ export const helixSkeletonStyles = css`
     background: linear-gradient(
       90deg,
       transparent 0%,
-      var(--hx-skeleton-shimmer-color, rgba(255, 255, 255, 0.4)) 50%,
+      var(--hx-skeleton-shimmer-color, var(--hx-overlay-white-40, rgba(255, 255, 255, 0.4))) 50%,
       transparent 100%
     );
     background-size: var(--hx-skeleton-shimmer-width, 200%) 100%;

@@ -94,7 +94,10 @@ export const helixTreeItemStyles = css`
   }
 
   .expand-btn:hover {
-    background-color: var(--hx-tree-item-expand-hover-bg, rgba(0, 0, 0, 0.06));
+    background-color: var(
+      --hx-tree-item-expand-hover-bg,
+      var(--hx-overlay-black-6, rgba(0, 0, 0, 0.06))
+    );
   }
 
   .expand-btn svg {

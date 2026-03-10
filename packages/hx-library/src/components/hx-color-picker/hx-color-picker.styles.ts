@@ -42,7 +42,7 @@ export const helixColorPickerStyles = css`
     border-radius: var(--hx-border-radius-sm, 0.25rem);
     /* P1-6: was hardcoded rgba(0,0,0,0.1) */
     border: var(--hx-border-width-thin, 1px) solid
-      var(--hx-color-picker-swatch-border, rgba(0, 0, 0, 0.1));
+      var(--hx-color-picker-swatch-border, var(--hx-overlay-black-10, rgba(0, 0, 0, 0.1)));
     background: var(--_preview-color, #000);
     display: block;
     flex-shrink: 0;
@@ -67,7 +67,8 @@ export const helixColorPickerStyles = css`
     border: var(--hx-border-width-thin, 1px) solid var(--hx-color-neutral-200, #e5e7eb);
     border-radius: var(--hx-border-radius-lg, 0.5rem);
     /* P1-6: panel shadow uses component token */
-    box-shadow: 0 8px 24px var(--hx-color-picker-panel-shadow, rgba(0, 0, 0, 0.15));
+    box-shadow: 0 8px 24px
+      var(--hx-color-picker-panel-shadow, var(--hx-overlay-black-15, rgba(0, 0, 0, 0.15)));
     padding: var(--hx-space-4, 1rem);
     /* P2-8: panel width is now a CSS custom property */
     width: var(--hx-color-picker-width, 260px);
@@ -121,7 +122,8 @@ export const helixColorPickerStyles = css`
     /* P1-6: was hardcoded #fff */
     border: 2px solid var(--hx-color-picker-thumb-border, var(--hx-color-neutral-0, #fff));
     /* P1-6: was hardcoded rgba(0,0,0,0.3) */
-    box-shadow: 0 0 0 1px var(--hx-color-picker-thumb-shadow, rgba(0, 0, 0, 0.3));
+    box-shadow: 0 0 0 1px
+      var(--hx-color-picker-thumb-shadow, var(--hx-overlay-black-30, rgba(0, 0, 0, 0.3)));
     transform: translate(-50%, -50%);
     pointer-events: none;
     top: var(--_thumb-y, 0%);
@@ -179,7 +181,8 @@ export const helixColorPickerStyles = css`
     /* P1-6: was hardcoded #fff */
     border: 2px solid var(--hx-color-picker-thumb-border, var(--hx-color-neutral-0, #fff));
     /* P1-6: was hardcoded rgba(0,0,0,0.3) */
-    box-shadow: 0 0 0 1px var(--hx-color-picker-thumb-shadow, rgba(0, 0, 0, 0.3));
+    box-shadow: 0 0 0 1px
+      var(--hx-color-picker-thumb-shadow, var(--hx-overlay-black-30, rgba(0, 0, 0, 0.3)));
     transform: translate(-50%, -50%);
     pointer-events: none;
     left: var(--_slider-pct, 0%);
@@ -200,7 +203,7 @@ export const helixColorPickerStyles = css`
     border-radius: var(--hx-border-radius-sm, 0.25rem);
     /* P1-6: was hardcoded rgba(0,0,0,0.1) */
     border: var(--hx-border-width-thin, 1px) solid
-      var(--hx-color-picker-swatch-border, rgba(0, 0, 0, 0.1));
+      var(--hx-color-picker-swatch-border, var(--hx-overlay-black-10, rgba(0, 0, 0, 0.1)));
     cursor: pointer;
     padding: 0;
     flex-shrink: 0;
@@ -210,7 +213,10 @@ export const helixColorPickerStyles = css`
   .swatch-btn:hover {
     transform: scale(1.15);
     /* P1-6: was hardcoded rgba(0,0,0,0.3) */
-    border-color: var(--hx-color-picker-swatch-border-hover, rgba(0, 0, 0, 0.3));
+    border-color: var(
+      --hx-color-picker-swatch-border-hover,
+      var(--hx-overlay-black-30, rgba(0, 0, 0, 0.3))
+    );
   }
 
   .swatch-btn:focus-visible {
@@ -272,7 +278,7 @@ export const helixColorPickerStyles = css`
     border-radius: var(--hx-border-radius-sm, 0.25rem);
     /* P1-6: was hardcoded rgba(0,0,0,0.1) */
     border: var(--hx-border-width-thin, 1px) solid
-      var(--hx-color-picker-swatch-border, rgba(0, 0, 0, 0.1));
+      var(--hx-color-picker-swatch-border, var(--hx-overlay-black-10, rgba(0, 0, 0, 0.1)));
     background: var(--_preview-color, #000);
     flex-shrink: 0;
   }

@@ -54,7 +54,7 @@ export const helixNavItemStyles = css`
   .nav-item__link:hover {
     background-color: var(
       --hx-nav-item-hover-bg,
-      rgba(255, 255, 255, 0.08)
+      var(--hx-overlay-white-8, rgba(255, 255, 255, 0.08))
     ); /* fallback for browsers without color-mix() */
     color: var(--hx-nav-item-hover-color, var(--hx-color-neutral-100, #f3f4f6));
   }
