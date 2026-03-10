@@ -249,6 +249,27 @@ helix-components:
     /libraries/helix/helix.min.js: { minified: true }
 ```
 
+Listen for events in Drupal behaviors using `once()` to prevent duplicate listeners on AJAX:
+
+```javascript
+Drupal.behaviors.helixAccordion = {
+  attach(context) {
+    // once() is a Drupal core utility (no import needed) — prevents duplicate event binding during AJAX attach cycles
+    once('helixAccordion', 'hx-accordion', context).forEach((el) => {
+      el.addEventListener('hx-expand', (e) => {
+        // handle item expanded
+        console.log('Item expanded:', e.detail.itemId);
+      });
+
+      el.addEventListener('hx-collapse', (e) => {
+        // handle item collapsed
+        console.log('Item collapsed:', e.detail.itemId);
+      });
+    });
+  },
+};
+```
+
 ## Standalone HTML Example
 
 Copy-paste into a `.html` file and open in any browser — no build tool required:
