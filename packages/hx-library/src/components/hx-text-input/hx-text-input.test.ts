@@ -501,7 +501,7 @@ describe('hx-text-input', () => {
   describe('Property: hxSize', () => {
     it('defaults to md', async () => {
       const el = await fixture<WcTextInput>('<hx-text-input></hx-text-input>');
-      expect(el.hxSize).toBe('md');
+      expect(el.size).toBe('md');
     });
 
     it('applies field--size-sm class', async () => {

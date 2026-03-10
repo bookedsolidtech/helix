@@ -23,7 +23,7 @@ import { helixSliderStyles } from './hx-slider.styles.js';
  * @tag hx-slider
  *
  * @slot label - Custom label content (overrides the label property).
- * @slot help - Custom help text content (overrides the helpText property).
+ * @slot help-text - Custom help text content (overrides the helpText property).
  * @slot min-label - Label rendered at the minimum end of the slider.
  * @slot max-label - Label rendered at the maximum end of the slider.
  *
@@ -448,7 +448,7 @@ export class HelixSlider extends LitElement {
             `}
 
         <!-- Help text -->
-        <slot name="help" @slotchange=${this._handleHelpSlotChange}>
+        <slot name="help-text" @slotchange=${this._handleHelpSlotChange}>
           ${this.helpText
             ? html`<div part="help-text" class="slider__help-text" id=${this._helpId}>
                 ${this.helpText}

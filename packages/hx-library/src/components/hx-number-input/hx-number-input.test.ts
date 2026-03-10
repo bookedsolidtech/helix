@@ -859,11 +859,11 @@ describe('hx-number-input', () => {
       expect(suffix?.textContent).toBe('kg');
     });
 
-    it('help slot renders custom content inside help-text container', async () => {
+    it('help-text slot renders custom content inside help-text container', async () => {
       const el = await fixture<HelixNumberInput>(
-        '<hx-number-input help-text="fallback"><em slot="help">Custom help</em></hx-number-input>',
+        '<hx-number-input help-text="fallback"><em slot="help-text">Custom help</em></hx-number-input>',
       );
-      const helpSlot = el.querySelector('[slot="help"]');
+      const helpSlot = el.querySelector('[slot="help-text"]');
       expect(helpSlot).toBeTruthy();
       expect(helpSlot?.textContent).toBe('Custom help');
     });
@@ -877,9 +877,9 @@ describe('hx-number-input', () => {
       expect(field?.classList.contains('field--error')).toBe(true);
     });
 
-    it('slotted help sets aria-describedby without help-text prop', async () => {
+    it('slotted help-text sets aria-describedby without help-text prop', async () => {
       const el = await fixture<HelixNumberInput>(
-        '<hx-number-input label="Qty"><em slot="help">Enter a number</em></hx-number-input>',
+        '<hx-number-input label="Qty"><em slot="help-text">Enter a number</em></hx-number-input>',
       );
       await el.updateComplete;
       const input = shadowQuery<HTMLInputElement>(el, 'input')!;

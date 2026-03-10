@@ -17,7 +17,7 @@ import { helixNumberInputStyles } from './hx-number-input.styles.js';
  * @tag hx-number-input
  *
  * @slot label - Custom label content (overrides the label property). Use for Drupal Form API rendered labels.
- * @slot help - Custom help text content (overrides the helpText property).
+ * @slot help-text - Custom help text content (overrides the helpText property).
  * @slot error - Custom error content (overrides the error property). Use for Drupal Form API rendered errors.
  * @slot prefix - Content rendered before the input (e.g., a unit icon).
  * @slot suffix - Content rendered after the input and before the stepper buttons (e.g., a unit label).
@@ -153,7 +153,7 @@ export class HelixNumberInput extends LitElement {
    * @attr hx-size
    */
   @property({ type: String, attribute: 'hx-size' })
-  hxSize: 'sm' | 'md' | 'lg' = 'md';
+  size: 'sm' | 'md' | 'lg' = 'md';
 
   /**
    * When set, hides the +/- stepper buttons.
@@ -502,9 +502,9 @@ export class HelixNumberInput extends LitElement {
       'field--error': hasError,
       'field--disabled': this.disabled,
       'field--required': this.required,
-      'field--sm': this.hxSize === 'sm',
-      'field--md': this.hxSize === 'md',
-      'field--lg': this.hxSize === 'lg',
+      'field--sm': this.size === 'sm',
+      'field--md': this.size === 'md',
+      'field--lg': this.size === 'lg',
     };
 
     const describedBy =
@@ -618,7 +618,7 @@ export class HelixNumberInput extends LitElement {
           id=${this._helpTextId}
           ?hidden=${hasError || (!this.helpText && !this._hasHelpSlot)}
         >
-          <slot name="help" @slotchange=${this._handleHelpSlotChange}>${this.helpText}</slot>
+          <slot name="help-text" @slotchange=${this._handleHelpSlotChange}>${this.helpText}</slot>
         </div>
       </div>
     `;
