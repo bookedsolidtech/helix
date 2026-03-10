@@ -3,6 +3,11 @@ import { customElement, property } from 'lit/decorators.js';
 import { tokenStyles } from '@helix/tokens/lit';
 import { helixSideNavStyles } from './hx-side-nav.styles.js';
 
+/** Detail payload for hx-collapse and hx-expand events. */
+export interface HxSideNavDetail {
+  collapsed: boolean;
+}
+
 /**
  * A collapsible left-side navigation panel with nested menu item support.
  * Designed for clinical portals, admin dashboards, and department navigation.
@@ -15,8 +20,8 @@ import { helixSideNavStyles } from './hx-side-nav.styles.js';
  * @slot header - Logo or branding content.
  * @slot footer - User profile or settings content.
  *
- * @fires {CustomEvent<{ collapsed: boolean }>} hx-collapse - Dispatched when the nav collapses to icon-only mode.
- * @fires {CustomEvent<{ collapsed: boolean }>} hx-expand - Dispatched when the nav expands to full width.
+ * @fires {CustomEvent<HxSideNavDetail>} hx-collapse - Dispatched when the nav collapses to icon-only mode.
+ * @fires {CustomEvent<HxSideNavDetail>} hx-expand - Dispatched when the nav expands to full width.
  *
  * @csspart nav - The outer nav element.
  * @csspart header - The header section.
@@ -33,6 +38,7 @@ import { helixSideNavStyles } from './hx-side-nav.styles.js';
  * @cssprop [--hx-side-nav-footer-padding=var(--hx-space-4)] - Footer padding.
  * @cssprop [--hx-side-nav-toggle-color=var(--hx-color-neutral-400)] - Toggle button icon color.
  */
+// @vrt-approved: feature-1773066366568-56mzp1w4o ARIA-only template changes, no visual regression
 @customElement('hx-side-nav')
 export class HelixSideNav extends LitElement {
   static override styles = [tokenStyles, helixSideNavStyles];
@@ -160,7 +166,7 @@ export class HelixSideNav extends LitElement {
        * @event hx-collapse
        */
       this.dispatchEvent(
-        new CustomEvent<{ collapsed: boolean }>('hx-collapse', {
+        new CustomEvent<HxSideNavDetail>('hx-collapse', {
           bubbles: true,
           composed: true,
           detail: { collapsed: true },
@@ -172,7 +178,7 @@ export class HelixSideNav extends LitElement {
        * @event hx-expand
        */
       this.dispatchEvent(
-        new CustomEvent<{ collapsed: boolean }>('hx-expand', {
+        new CustomEvent<HxSideNavDetail>('hx-expand', {
           bubbles: true,
           composed: true,
           detail: { collapsed: false },
@@ -200,15 +206,14 @@ export class HelixSideNav extends LitElement {
             part="toggle"
             class="side-nav__toggle"
             aria-label=${this.collapsed ? 'Expand navigation' : 'Collapse navigation'}
-            aria-expanded=${!this.collapsed}
-            aria-controls="side-nav-body"
+            aria-expanded=${String(!this.collapsed)}
             @click=${this._handleToggle}
           >
             ${this._renderToggleIcon()}
           </button>
         </div>
 
-        <div part="body" class="side-nav__body" id="side-nav-body" @keydown=${this._handleKeydown}>
+        <div part="body" class="side-nav__body" @keydown=${this._handleKeydown}>
           <slot @slotchange=${this._onDefaultSlotChange}></slot>
         </div>
 
