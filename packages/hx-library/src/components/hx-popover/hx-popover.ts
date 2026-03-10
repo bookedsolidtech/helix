@@ -343,10 +343,10 @@ export class HelixPopover extends LitElement {
       <div
         part="body"
         id=${this._popoverId}
-        role="dialog"
+        role="region"
         aria-modal="false"
         aria-label=${this.label}
-        aria-hidden=${String(!this._visible)}
+        ?aria-hidden=${!this._visible}
         tabindex="-1"
         ?inert=${!this._visible}
         class=${this._visible ? 'visible' : ''}
