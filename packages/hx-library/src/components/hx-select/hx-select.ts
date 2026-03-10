@@ -5,6 +5,9 @@ import { ifDefined } from 'lit/directives/if-defined.js';
 import { tokenStyles } from '@helix/tokens/lit';
 import { helixSelectStyles } from './hx-select.styles.js';
 
+// Module-level counter for stable, SSR-safe IDs (avoids Math.random() hydration mismatch)
+let _hxSelectIdCounter = 0;
+
 // ─── Internal option model ───
 
 interface SelectOption {
@@ -82,7 +85,7 @@ export class HelixSelect extends LitElement {
 
   // ─── Stable IDs ───
 
-  private _selectId = `hx-select-${Math.random().toString(36).slice(2, 9)}`;
+  private _selectId = `hx-select-${++_hxSelectIdCounter}`;
   private _listboxId = `${this._selectId}-listbox`;
   private _labelId = `${this._selectId}-label`;
   private _helpTextId = `${this._selectId}-help`;

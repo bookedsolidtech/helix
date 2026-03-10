@@ -7,6 +7,9 @@ import { styleMap } from 'lit/directives/style-map.js';
 import { tokenStyles } from '@helix/tokens/lit';
 import { helixSliderStyles } from './hx-slider.styles.js';
 
+// Module-level counter for stable, SSR-safe IDs (avoids Math.random() hydration mismatch)
+let _hxSliderIdCounter = 0;
+
 /**
  * A range slider component for selecting a numeric value within a min/max boundary.
  * Supports tick marks, value display, range labels, and native form participation
@@ -174,7 +177,7 @@ export class HelixSlider extends LitElement {
   // ─── Unique IDs ───
 
   /** Unique ID for the native range input element. */
-  private readonly _sliderId = `hx-slider-${Math.random().toString(36).slice(2, 9)}`;
+  private readonly _sliderId = `hx-slider-${++_hxSliderIdCounter}`;
   /** Unique ID for the label element, derived from _sliderId. */
   private readonly _labelId = `${this._sliderId}-label`;
   /** Unique ID for the help text element, derived from _sliderId. */

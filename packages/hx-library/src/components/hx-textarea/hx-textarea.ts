@@ -6,6 +6,9 @@ import { live } from 'lit/directives/live.js';
 import { tokenStyles } from '@helix/tokens/lit';
 import { helixTextareaStyles } from './hx-textarea.styles.js';
 
+// Module-level counter for stable, SSR-safe IDs (avoids Math.random() hydration mismatch)
+let _hxTextareaIdCounter = 0;
+
 /**
  * A multi-line text area component with label, validation, and form association.
  *
@@ -328,7 +331,7 @@ export class HelixTextarea extends LitElement {
   // ─── Render ───
 
   /** @internal */
-  private _textareaId = `hx-textarea-${Math.random().toString(36).slice(2, 9)}`;
+  private _textareaId = `hx-textarea-${++_hxTextareaIdCounter}`;
   /** @internal */
   private _helpTextId = `${this._textareaId}-help`;
   /** @internal */

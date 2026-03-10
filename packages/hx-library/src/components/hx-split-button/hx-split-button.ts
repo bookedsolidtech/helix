@@ -5,6 +5,9 @@ import { tokenStyles } from '@helix/tokens/lit';
 import { helixSplitButtonStyles } from './hx-split-button.styles.js';
 import type { HelixMenuItem } from '../hx-menu/hx-menu-item.js';
 
+// Module-level counter for stable, SSR-safe IDs (avoids Math.random() hydration mismatch)
+let _hxSplitButtonIdCounter = 0;
+
 /**
  * A split button combining a primary action button with an attached dropdown
  * menu for secondary actions. Implements the ARIA menu button pattern for
@@ -103,7 +106,7 @@ export class HelixSplitButton extends LitElement {
 
   // ─── Unique IDs ───
 
-  private readonly _menuId = `hx-split-button-menu-${Math.random().toString(36).slice(2, 9)}`;
+  private readonly _menuId = `hx-split-button-menu-${++_hxSplitButtonIdCounter}`;
 
   // ─── Lifecycle ───
 

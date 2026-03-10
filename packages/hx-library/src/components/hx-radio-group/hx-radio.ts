@@ -4,6 +4,9 @@ import { classMap } from 'lit/directives/class-map.js';
 import { tokenStyles } from '@helix/tokens/lit';
 import { helixRadioStyles } from './hx-radio.styles.js';
 
+// Module-level counter for stable, SSR-safe IDs (avoids Math.random() hydration mismatch)
+let _hxRadioIdCounter = 0;
+
 /**
  * An individual radio button, designed to be used inside a `<hx-radio-group>`.
  *
@@ -79,7 +82,7 @@ export class HelixRadio extends LitElement {
 
   // ─── Internal IDs ───
 
-  private _inputId = `hx-radio-${Math.random().toString(36).slice(2, 9)}`;
+  private _inputId = `hx-radio-${++_hxRadioIdCounter}`;
 
   // ─── Event Handling ───
 

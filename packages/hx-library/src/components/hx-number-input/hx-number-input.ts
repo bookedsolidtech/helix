@@ -6,6 +6,9 @@ import { live } from 'lit/directives/live.js';
 import { tokenStyles } from '@helix/tokens/lit';
 import { helixNumberInputStyles } from './hx-number-input.styles.js';
 
+// Module-level counter for stable, SSR-safe IDs (avoids Math.random() hydration mismatch)
+let _hxNumberInputIdCounter = 0;
+
 /**
  * A numeric input component with stepper controls, label, validation, and
  * full form association. Designed for healthcare data-entry contexts where
@@ -184,7 +187,7 @@ export class HelixNumberInput extends LitElement {
 
   // ─── Stable IDs ───
 
-  private readonly _inputId = `hx-number-input-${Math.random().toString(36).slice(2, 9)}`;
+  private readonly _inputId = `hx-number-input-${++_hxNumberInputIdCounter}`;
   private readonly _helpTextId = `${this._inputId}-help`;
   private readonly _errorId = `${this._inputId}-error`;
 
