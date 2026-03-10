@@ -168,19 +168,19 @@ describe('hx-card', () => {
   // ─── Events (3) ───
 
   describe('Events', () => {
-    it('dispatches hx-card-click when hx-href + click', async () => {
+    it('dispatches hx-click when hx-href + click', async () => {
       const el = await fixture<HelixCard>('<hx-card hx-href="/test">Content</hx-card>');
       const card = shadowQuery(el, '.card')!;
-      const eventPromise = oneEvent(el, 'hx-card-click');
+      const eventPromise = oneEvent(el, 'hx-click');
       card.click();
       const event = await eventPromise;
       expect(event).toBeTruthy();
     });
 
-    it('hx-card-click detail contains href and originalEvent', async () => {
+    it('hx-click detail contains href and originalEvent', async () => {
       const el = await fixture<HelixCard>('<hx-card hx-href="/test">Content</hx-card>');
       const card = shadowQuery(el, '.card')!;
-      const eventPromise = oneEvent<CustomEvent>(el, 'hx-card-click');
+      const eventPromise = oneEvent<CustomEvent>(el, 'hx-click');
       card.click();
       const event = await eventPromise;
       expect(event.detail.href).toBe('/test');
@@ -191,7 +191,7 @@ describe('hx-card', () => {
       const el = await fixture<HelixCard>('<hx-card>Content</hx-card>');
       const card = shadowQuery(el, '.card')!;
       let fired = false;
-      el.addEventListener('hx-card-click', () => {
+      el.addEventListener('hx-click', () => {
         fired = true;
       });
       card.click();
@@ -203,19 +203,19 @@ describe('hx-card', () => {
   // ─── Keyboard (3) ───
 
   describe('Keyboard', () => {
-    it('Enter fires hx-card-click when interactive', async () => {
+    it('Enter fires hx-click when interactive', async () => {
       const el = await fixture<HelixCard>('<hx-card hx-href="/test">Content</hx-card>');
       const card = shadowQuery(el, '.card')!;
-      const eventPromise = oneEvent<CustomEvent>(el, 'hx-card-click');
+      const eventPromise = oneEvent<CustomEvent>(el, 'hx-click');
       card.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
       const event = await eventPromise;
       expect(event.detail.href).toBe('/test');
     });
 
-    it('Space fires hx-card-click when interactive', async () => {
+    it('Space fires hx-click when interactive', async () => {
       const el = await fixture<HelixCard>('<hx-card hx-href="/test">Content</hx-card>');
       const card = shadowQuery(el, '.card')!;
-      const eventPromise = oneEvent<CustomEvent>(el, 'hx-card-click');
+      const eventPromise = oneEvent<CustomEvent>(el, 'hx-click');
       card.dispatchEvent(new KeyboardEvent('keydown', { key: ' ', bubbles: true }));
       const event = await eventPromise;
       expect(event.detail.href).toBe('/test');
@@ -225,7 +225,7 @@ describe('hx-card', () => {
       const el = await fixture<HelixCard>('<hx-card>Content</hx-card>');
       const card = shadowQuery(el, '.card')!;
       let fired = false;
-      el.addEventListener('hx-card-click', () => {
+      el.addEventListener('hx-click', () => {
         fired = true;
       });
       card.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));

@@ -436,11 +436,11 @@ describe('hx-slider', () => {
       expect(slotContent?.textContent).toBe('Custom Label');
     });
 
-    it('help slot content is rendered and accessible in light DOM', async () => {
+    it('help-text slot content is rendered and accessible in light DOM', async () => {
       const el = await fixture<HelixSlider>(
-        '<hx-slider><em slot="help">Extra help</em></hx-slider>',
+        '<hx-slider><em slot="help-text">Extra help</em></hx-slider>',
       );
-      const slotContent = el.querySelector('[slot="help"]');
+      const slotContent = el.querySelector('[slot="help-text"]');
       expect(slotContent).toBeTruthy();
       expect(slotContent?.textContent).toBe('Extra help');
     });

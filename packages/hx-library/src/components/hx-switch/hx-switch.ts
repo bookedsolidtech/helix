@@ -108,7 +108,7 @@ export class HelixSwitch extends LitElement {
    * @attr hx-size
    */
   @property({ type: String, reflect: true, attribute: 'hx-size' })
-  hxSize: 'sm' | 'md' | 'lg' = 'md';
+  size: 'sm' | 'md' | 'lg' = 'md';
 
   /**
    * Error message to display. When set, the switch enters an error state.
@@ -271,7 +271,7 @@ export class HelixSwitch extends LitElement {
       'switch--disabled': this.disabled,
       'switch--required': this.required,
       'switch--error': hasError,
-      [`switch--${this.hxSize}`]: true,
+      [`switch--${this.size}`]: true,
     };
 
     const describedBy =

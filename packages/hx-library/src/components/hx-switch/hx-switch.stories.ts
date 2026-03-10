@@ -48,7 +48,7 @@ const meta = {
         type: { summary: 'string' },
       },
     },
-    hxSize: {
+    size: {
       control: { type: 'select' },
       options: ['sm', 'md', 'lg'],
       description: 'Size variant of the switch.',
@@ -100,7 +100,7 @@ const meta = {
     disabled: false,
     required: false,
     label: 'Enable notifications',
-    hxSize: 'md',
+    size: 'md',
     error: '',
     helpText: '',
     value: 'on',
@@ -109,7 +109,7 @@ const meta = {
   render: (args) => html`
     <hx-switch
       label=${args.label}
-      hx-size=${args.hxSize}
+      hx-size=${args.size}
       ?checked=${args.checked}
       ?disabled=${args.disabled}
       ?required=${args.required}
@@ -174,21 +174,21 @@ export const Default: Story = {
 export const SizeSmall: Story = {
   args: {
     label: 'Compact toggle',
-    hxSize: 'sm',
+    size: 'sm',
   },
 };
 
 export const SizeMedium: Story = {
   args: {
     label: 'Default toggle',
-    hxSize: 'md',
+    size: 'md',
   },
 };
 
 export const SizeLarge: Story = {
   args: {
     label: 'Large toggle',
-    hxSize: 'lg',
+    size: 'lg',
   },
 };
 
