@@ -16,7 +16,7 @@
 | `/components` | Component browser with cards | `getManifestStats()`, health scores, test results |
 | `/components/[tag]` | Single component detail | CEM parser, health scorer, tests |
 | `/tests` | Verification Suite — test runner UI | `getAllTestResults()`, `getTestCount()` |
-| `/tokens` | Design Tokens dashboard | `@helix/tokens` package |
+| `/tokens` | Design Tokens dashboard | `@helixui/tokens` package |
 | `/roadmap` | Issue Tracker | `.claude/issues/` filesystem |
 | `/audit/[id]` | Single audit report detail | Audit aggregation |
 | `/hooks` | Hooks & MCP infrastructure roadmap | Static data (`hooks-data.ts`) |
@@ -359,9 +359,9 @@ The `resolve_cdn_cem` tool already fetches CEM from jsDelivr/UNPKG. The `benchma
 ### 5.1 Current Monorepo Dependencies
 
 ```
-@helix/admin depends on:
-├── @helix/library (workspace:*)  — only for integration-test page
-├── @helix/tokens (workspace:*)   — only for tokens page
+@helixui/admin depends on:
+├── @helixui/library (workspace:*)  — only for integration-test page
+├── @helixui/tokens (workspace:*)   — only for tokens page
 ├── next (^15.3.3)                — framework
 ├── react (^19.1.0)               — UI
 ├── recharts (^2.15.3)            — charts
@@ -373,8 +373,8 @@ The `resolve_cdn_cem` tool already fetches CEM from jsDelivr/UNPKG. The `benchma
 ### 5.2 Extraction Strategy
 
 **Phase 1 — Decouple (in-monorepo)**
-1. Remove `@helix/library` dependency — integration-test page becomes optional
-2. Remove `@helix/tokens` dependency — tokens page reads from CEM or token JSON file
+1. Remove `@helixui/library` dependency — integration-test page becomes optional
+2. Remove `@helixui/tokens` dependency — tokens page reads from CEM or token JSON file
 3. Parameterize all hardcoded paths via `library-registry.ts`
 4. Replace HELIX branding with white-label theming (CSS custom properties)
 

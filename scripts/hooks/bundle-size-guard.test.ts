@@ -217,7 +217,7 @@ describe('getBuildArtifactPath', () => {
 
   it('finds build artifact for hx-button component', () => {
     const result = getBuildArtifactPath(
-      '/Volumes/Development/wc-2026/packages/hx-library/src/components/hx-button/hx-button.ts',
+      '/Volumes/Development/booked/helix/packages/hx-library/src/components/hx-button/hx-button.ts',
     );
     // Should find hx-button-*.js in dist/shared/
     if (result) {
@@ -243,7 +243,7 @@ describe('getFileSize', () => {
   });
 
   it('returns size for existing files', () => {
-    const result = getFileSize('/Volumes/Development/wc-2026/scripts/hooks/bundle-size-guard.ts');
+    const result = getFileSize('/Volumes/Development/booked/helix/scripts/hooks/bundle-size-guard.ts');
     expect(result).toBeGreaterThan(0);
   });
 });
@@ -257,7 +257,7 @@ describe('getGzipSize', () => {
   });
 
   it('returns smaller size than raw for compressible files', () => {
-    const filePath = '/Volumes/Development/wc-2026/scripts/hooks/bundle-size-guard.ts';
+    const filePath = '/Volumes/Development/booked/helix/scripts/hooks/bundle-size-guard.ts';
     const raw = getFileSize(filePath);
     const gzipped = getGzipSize(filePath);
 
@@ -283,7 +283,7 @@ describe('getBundleSizeInfo', () => {
       getGzipSize: () => 3072,
     });
     const result = getBundleSizeInfo(
-      '/Volumes/Development/wc-2026/scripts/hooks/bundle-size-guard.ts',
+      '/Volumes/Development/booked/helix/scripts/hooks/bundle-size-guard.ts',
       deps,
     );
 
@@ -296,7 +296,7 @@ describe('getBundleSizeInfo', () => {
 
   it('uses default dependencies when not provided', () => {
     const result = getBundleSizeInfo(
-      '/Volumes/Development/wc-2026/scripts/hooks/bundle-size-guard.ts',
+      '/Volumes/Development/booked/helix/scripts/hooks/bundle-size-guard.ts',
     );
     if (result) {
       expect(result.raw).toBeGreaterThan(0);
@@ -559,7 +559,7 @@ describe('readFile', () => {
   });
 
   it('returns file content for existing files', () => {
-    const result = readFile('/Volumes/Development/wc-2026/scripts/hooks/bundle-size-guard.ts');
+    const result = readFile('/Volumes/Development/booked/helix/scripts/hooks/bundle-size-guard.ts');
     expect(result.length).toBeGreaterThan(0);
     expect(result).toContain('bundle-size-guard');
   });
@@ -725,7 +725,7 @@ describe('validateBundleSizeGuard', () => {
       getStagedFiles: () => ['packages/hx-library/src/components/hx-button/hx-button.ts'],
       readFile: () => 'export class Test {}',
       getBuildArtifactPath: () =>
-        '/Volumes/Development/wc-2026/packages/hx-library/dist/shared/hx-button-Drd1Q6qC.js',
+        '/Volumes/Development/booked/helix/packages/hx-library/dist/shared/hx-button-Drd1Q6qC.js',
       getFileSize: (path: string) => {
         try {
           return statSync(path).size;

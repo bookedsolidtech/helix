@@ -1,0 +1,66 @@
+{
+  "category": "Uncategorized",
+  "description": "Comprehensive audit and content overhaul of the Astro/Starlight documentation site (apps/docs). This is NOT about the per-component documentation pages (those are handled by separate tickets). This covers the site-wide content, navigation accuracy, and showcase/planning sections.\n\n## Scope\n\n### 1. Fact-Check Everything\n- **Component count** — Sidebar badge says \"84\" but we have 73 component directories. Some sidebar entries are sub-components (hx-accordion-item, hx-carousel-item, etc.) that live inside parent directories. Reconcile and fix the badge count.\n- **Tech stack claims** — Verify all version numbers, library references, feature claims\n- **Architecture docs** — Verify monorepo structure, build pipeline, testing strategy descriptions match current reality\n- **Getting Started pages** — Verify installation instructions, quick start guide actually works\n- **API Reference** — Check if it's populated or placeholder\n\n### 2. Tone Overhaul — \"Interview Prep\" → \"Lessons from the Battlefield\"\nThe Discovery/Planning/Prototype sections currently read like a technical interview presentation. Transform the tone:\n- **Before:** Academic, theoretical, \"here's what we would do\" language\n- **After:** Practitioner voice, battle-tested, \"here's what we built and why it works\"\n- **Target sections:**\n  - `pre-planning/` — Overview, Architecture, Components, Design System, Docs Hub, Building Guide, Drupal Guide\n  - `prototype/` — Overview, Rapid Prototype, Tech Stack Validation\n  - `architecture/` — Overview, Monorepo, Build Pipeline, Testing\n\n### 3. Showcase Pages — Make Them Great\nThese planning/discovery/prototype pages ARE the showcases. They should demonstrate:\n- Real decisions with real tradeoffs (not hypothetical)\n- Actual metrics and results where possible\n- Code examples from the real codebase, not generic samples\n- The \"why\" behind every architectural choice\n- Lessons learned (reference HELIX-PLATFORM-PROTO-LESSONS.md where relevant)\n\n### 4. Navigation & Structure\n- Verify every sidebar link resolves to an actual page (no 404s)\n- Check for orphaned pages not in the sidebar\n- Ensure collapsed sections make logical sense\n- GitHub social link points to `himerus/wc-2026` — verify this is correct (or should it be `bookedsolidtech/helix`?)\n\n## Acceptance Criteria\n- Component count badge matches reality\n- All sidebar links resolve (zero 404s)\n- All fact claims verified or corrected\n- Discovery/Planning/Prototype sections rewritten in practitioner voice\n- No \"interview prep\" tone remains\n- All code examples tested or verified against actual codebase\n- `npm run verify` passes after all changes\n\n## Files to modify\n- `apps/docs/astro.config.mjs` (sidebar badge, any broken links)\n- `apps/docs/src/content/docs/pre-planning/*.md` (tone overhaul)\n- `apps/docs/src/content/docs/prototype/*.md` (tone overhaul)\n- `apps/docs/src/content/docs/architecture/*.md` (fact-check + tone)\n- `apps/docs/src/content/docs/getting-started/*.md` (fact-check)\n- `apps/docs/src/content/docs/index.mdx` (landing page accuracy)",
+  "title": "AUDIT: Astro/Starlight docs site — fact-check, tone overhaul, and showcase pages",
+  "status": "done",
+  "complexity": "large",
+  "priority": 2,
+  "source": "api",
+  "trustTier": 1,
+  "quarantineStatus": "passed",
+  "quarantineId": "f6967a1f-3dac-4db2-9dd9-e4c7e306c8a7",
+  "id": "feature-1773066176918-e539lwvvs",
+  "branchName": "feature/audit-astrostarlight-docs-site-fact",
+  "descriptionHistory": [
+    {
+      "description": "Comprehensive audit and content overhaul of the Astro/Starlight documentation site (apps/docs). This is NOT about the per-component documentation pages (those are handled by separate tickets). This covers the site-wide content, navigation accuracy, and showcase/planning sections.\n\n## Scope\n\n### 1. Fact-Check Everything\n- **Component count** — Sidebar badge says \"84\" but we have 73 component directories. Some sidebar entries are sub-components (hx-accordion-item, hx-carousel-item, etc.) that live inside parent directories. Reconcile and fix the badge count.\n- **Tech stack claims** — Verify all version numbers, library references, feature claims\n- **Architecture docs** — Verify monorepo structure, build pipeline, testing strategy descriptions match current reality\n- **Getting Started pages** — Verify installation instructions, quick start guide actually works\n- **API Reference** — Check if it's populated or placeholder\n\n### 2. Tone Overhaul — \"Interview Prep\" → \"Lessons from the Battlefield\"\nThe Discovery/Planning/Prototype sections currently read like a technical interview presentation. Transform the tone:\n- **Before:** Academic, theoretical, \"here's what we would do\" language\n- **After:** Practitioner voice, battle-tested, \"here's what we built and why it works\"\n- **Target sections:**\n  - `pre-planning/` — Overview, Architecture, Components, Design System, Docs Hub, Building Guide, Drupal Guide\n  - `prototype/` — Overview, Rapid Prototype, Tech Stack Validation\n  - `architecture/` — Overview, Monorepo, Build Pipeline, Testing\n\n### 3. Showcase Pages — Make Them Great\nThese planning/discovery/prototype pages ARE the showcases. They should demonstrate:\n- Real decisions with real tradeoffs (not hypothetical)\n- Actual metrics and results where possible\n- Code examples from the real codebase, not generic samples\n- The \"why\" behind every architectural choice\n- Lessons learned (reference HELIX-PLATFORM-PROTO-LESSONS.md where relevant)\n\n### 4. Navigation & Structure\n- Verify every sidebar link resolves to an actual page (no 404s)\n- Check for orphaned pages not in the sidebar\n- Ensure collapsed sections make logical sense\n- GitHub social link points to `himerus/wc-2026` — verify this is correct (or should it be `bookedsolidtech/helix`?)\n\n## Acceptance Criteria\n- Component count badge matches reality\n- All sidebar links resolve (zero 404s)\n- All fact claims verified or corrected\n- Discovery/Planning/Prototype sections rewritten in practitioner voice\n- No \"interview prep\" tone remains\n- All code examples tested or verified against actual codebase\n- `npm run verify` passes after all changes\n\n## Files to modify\n- `apps/docs/astro.config.mjs` (sidebar badge, any broken links)\n- `apps/docs/src/content/docs/pre-planning/*.md` (tone overhaul)\n- `apps/docs/src/content/docs/prototype/*.md` (tone overhaul)\n- `apps/docs/src/content/docs/architecture/*.md` (fact-check + tone)\n- `apps/docs/src/content/docs/getting-started/*.md` (fact-check)\n- `apps/docs/src/content/docs/index.mdx` (landing page accuracy)",
+      "timestamp": "2026-03-09T14:22:56.918Z",
+      "source": "initial"
+    }
+  ],
+  "createdAt": "2026-03-09T14:22:56.918Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-03-09T14:22:56.918Z",
+      "reason": "Feature created"
+    },
+    {
+      "from": "backlog",
+      "to": "in_progress",
+      "timestamp": "2026-03-10T12:15:26.472Z"
+    },
+    {
+      "from": "in_progress",
+      "to": "backlog",
+      "timestamp": "2026-03-10T12:18:31.468Z"
+    },
+    {
+      "from": "backlog",
+      "to": "in_progress",
+      "timestamp": "2026-03-10T12:20:01.463Z"
+    },
+    {
+      "from": "in_progress",
+      "to": "blocked",
+      "timestamp": "2026-03-10T12:28:41.082Z",
+      "reason": "git workflow failed — uncommitted work in worktree at /Volumes/Development/booked/helix/.worktrees/feature-audit-astrostarlight-docs-site-fact: git workflow failed — uncommitted work in worktree at /Volumes/Development/booked/helix/.worktrees/feature-audit-astrostarlight-docs-site-fact: Command failed: git push --force-with-lease -u origin \"feature/audit-astrostarlight-docs-site-fact\"\nTo github.com:bookedsolidtech/helix.git\n ! [rejected]          feature/audit-astrostarlight-docs-site-fact -> feature/audit-astrostarlight-docs-site-fact (stale info)\nerror: failed to push some refs to 'github.com:bookedsolidtech/helix.git'\n | stderr: To github.com:bookedsolidtech/helix.git\n ! [rejected]          feature/audit-astrostarlight-docs-site-fact -> feature/audit-astrostarlight-docs-site-fact (stale info)\nerror: failed to push some refs to 'github.com:bookedsolidtech/helix.git'"
+    },
+    {
+      "from": "blocked",
+      "to": "done",
+      "timestamp": "2026-03-10T12:28:42.513Z"
+    }
+  ],
+  "featureType": "code",
+  "model": "claude-sonnet-4-6",
+  "updatedAt": "2026-03-10T12:20:01.463Z",
+  "costUsd": 2.3304957500000008,
+  "lastSessionId": "8bb9ef14-4478-4bad-b5b7-4fe27d2aa74a",
+  "statusChangeReason": "git workflow failed — uncommitted work in worktree at /Volumes/Development/booked/helix/.worktrees/feature-audit-astrostarlight-docs-site-fact: git workflow failed — uncommitted work in worktree at /Volumes/Development/booked/helix/.worktrees/feature-audit-astrostarlight-docs-site-fact: Command failed: git push --force-with-lease -u origin \"feature/audit-astrostarlight-docs-site-fact\"\nTo github.com:bookedsolidtech/helix.git\n ! [rejected]          feature/audit-astrostarlight-docs-site-fact -> feature/audit-astrostarlight-docs-site-fact (stale info)\nerror: failed to push some refs to 'github.com:bookedsolidtech/helix.git'\n | stderr: To github.com:bookedsolidtech/helix.git\n ! [rejected]          feature/audit-astrostarlight-docs-site-fact -> feature/audit-astrostarlight-docs-site-fact (stale info)\nerror: failed to push some refs to 'github.com:bookedsolidtech/helix.git'",
+  "failureCount": 1,
+  "prNumber": 535,
+  "prMergedAt": "2026-03-10T02:42:49Z",
+  "completedAt": "2026-03-10T12:28:42.513Z"
+}

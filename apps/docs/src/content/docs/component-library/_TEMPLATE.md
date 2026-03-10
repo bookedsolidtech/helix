@@ -56,10 +56,10 @@ Install the full library or import the component individually:
 
 ```bash
 # Full library
-npm install @helix/library
+npm install @helixui/library
 
 # Or import only this component (tree-shaking friendly)
-import '@helix/library/components/hx-<component-name>';
+import '@helixui/library/components/hx-<component-name>';
 ```
 ````
 
@@ -197,8 +197,8 @@ Copy-paste this into a `.html` file and open it in a browser — no build tool n
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>hx-<component-name> example</title>
-  <!-- @helix/library is a private package — install via npm workspace, not CDN -->
-  <!-- In your project: import '@helix/library'; in your bundler entry point -->
+  <!-- @helixui/library is a private package — install via npm workspace, not CDN -->
+  <!-- In your project: import '@helixui/library'; in your bundler entry point -->
 </head>
 <body>
   <!-- REPLACE with a complete, realistic usage example -->

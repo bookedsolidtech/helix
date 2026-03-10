@@ -425,7 +425,7 @@ describe('hx-code-snippet', () => {
       });
 
       const el = await fixture<HelixCodeSnippet>(
-        '<hx-code-snippet>npm install @wc-2026/library</hx-code-snippet>',
+        '<hx-code-snippet>npm install @helixui/library</hx-code-snippet>',
       );
       await el.updateComplete;
       const btn = shadowQuery<HTMLButtonElement>(el, '[part~="copy-button"]')!;

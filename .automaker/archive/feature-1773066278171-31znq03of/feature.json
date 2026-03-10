@@ -1,0 +1,92 @@
+{
+  "category": "Uncategorized",
+  "description": "Launch readiness audit for hx-drawer. Checklist: (1) A11y — axe-core zero violations, dialog role, focus trap, Escape to close, WCAG 2.1 AA. C-PATTERN-06: register keydown before await. C-PATTERN-07: shadowRoot.activeElement. (2) Astro doc page — all 12 template sections. (3) Individual export — standalone HTML works. (4) `npm run verify` passes. Files: `packages/hx-library/src/components/hx-drawer/`, `apps/docs/src/content/docs/component-library/hx-drawer.md`",
+  "title": "LAUNCH READY: hx-drawer",
+  "status": "done",
+  "dependencies": [],
+  "complexity": "medium",
+  "priority": 3,
+  "source": "api",
+  "trustTier": 1,
+  "quarantineStatus": "passed",
+  "quarantineId": "af5434f4-c786-43c5-808a-2e096a851f77",
+  "id": "feature-1773066278171-31znq03of",
+  "branchName": "feature/launch-ready-hx-drawer",
+  "descriptionHistory": [
+    {
+      "description": "Launch readiness audit for hx-drawer. Checklist: (1) A11y — axe-core zero violations, dialog role, focus trap, Escape to close, WCAG 2.1 AA. C-PATTERN-06: register keydown before await. C-PATTERN-07: shadowRoot.activeElement. (2) Astro doc page — all 12 template sections. (3) Individual export — standalone HTML works. (4) `npm run verify` passes. Files: `packages/hx-library/src/components/hx-drawer/`, `apps/docs/src/content/docs/component-library/hx-drawer.md`",
+      "timestamp": "2026-03-09T14:24:38.171Z",
+      "source": "initial"
+    }
+  ],
+  "createdAt": "2026-03-09T14:24:38.171Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-03-09T14:24:38.171Z",
+      "reason": "Feature created"
+    },
+    {
+      "from": "backlog",
+      "to": "in_progress",
+      "timestamp": "2026-03-10T14:26:10.289Z"
+    },
+    {
+      "from": "in_progress",
+      "to": "done",
+      "timestamp": "2026-03-10T15:16:03.416Z"
+    },
+    {
+      "from": "done",
+      "to": "in_progress",
+      "timestamp": "2026-03-10T15:16:03.784Z"
+    },
+    {
+      "from": "in_progress",
+      "to": "blocked",
+      "timestamp": "2026-03-10T15:17:12.489Z",
+      "reason": "git workflow failed — uncommitted work in worktree at /Volumes/Development/booked/helix/.worktrees/feature-launch-ready-hx-drawer: git workflow failed — uncommitted work in worktree at /Volumes/Development/booked/helix/.worktrees/feature-launch-ready-hx-drawer: Command failed: git push --force-with-lease -u origin \"feature/launch-ready-hx-drawer\"\nTo github.com:bookedsolidtech/helix.git\n ! [rejected]          feature/launch-ready-hx-drawer -> feature/launch-ready-hx-drawer (stale info)\nerror: failed to push some refs to 'github.com:bookedsolidtech/helix.git'\n | stderr: To github.com:bookedsolidtech/helix.git\n ! [rejected]          feature/launch-ready-hx-drawer -> feature/launch-ready-hx-drawer (stale info)\nerror: failed to push some refs to 'github.com:bookedsolidtech/helix.git'"
+    },
+    {
+      "from": "blocked",
+      "to": "done",
+      "timestamp": "2026-03-10T15:17:15.034Z"
+    }
+  ],
+  "featureType": "code",
+  "model": "claude-sonnet-4-6",
+  "updatedAt": "2026-03-10T15:16:06.331Z",
+  "costUsd": 32.739622749999995,
+  "lastSessionId": "15e4c632-1f8f-4e58-85b7-e13e021d92fa",
+  "executionHistory": [
+    {
+      "id": "f49c6db1-7a1c-4245-93f6-92b14636e2f6",
+      "startedAt": "2026-03-10T14:26:10.720Z",
+      "completedAt": "2026-03-10T15:16:00.785Z",
+      "durationMs": 2990065,
+      "costUsd": 32.49449524999999,
+      "model": "claude-sonnet-4-6",
+      "success": false,
+      "error": "Operation was cancelled",
+      "trigger": "manual"
+    },
+    {
+      "id": "bdb2c453-cd27-4fcc-bee9-fa862aad52f0",
+      "startedAt": "2026-03-10T15:16:01.791Z",
+      "completedAt": "2026-03-10T15:16:04.624Z",
+      "durationMs": 2833,
+      "costUsd": 0,
+      "model": "claude-sonnet-4-6",
+      "success": false,
+      "error": "Operation was cancelled",
+      "trigger": "manual"
+    }
+  ],
+  "assignee": "jake",
+  "completedAt": "2026-03-10T15:16:03.416Z",
+  "statusChangeReason": "git workflow failed — uncommitted work in worktree at /Volumes/Development/booked/helix/.worktrees/feature-launch-ready-hx-drawer: git workflow failed — uncommitted work in worktree at /Volumes/Development/booked/helix/.worktrees/feature-launch-ready-hx-drawer: Command failed: git push --force-with-lease -u origin \"feature/launch-ready-hx-drawer\"\nTo github.com:bookedsolidtech/helix.git\n ! [rejected]          feature/launch-ready-hx-drawer -> feature/launch-ready-hx-drawer (stale info)\nerror: failed to push some refs to 'github.com:bookedsolidtech/helix.git'\n | stderr: To github.com:bookedsolidtech/helix.git\n ! [rejected]          feature/launch-ready-hx-drawer -> feature/launch-ready-hx-drawer (stale info)\nerror: failed to push some refs to 'github.com:bookedsolidtech/helix.git'",
+  "failureCount": 1,
+  "prNumber": 559,
+  "prMergedAt": "2026-03-09T21:00:14Z"
+}

@@ -7,7 +7,7 @@ sidebar:
 
 Events are the communication backbone of web applications. In Shadow DOM, event propagation follows special rules that preserve component encapsulation while enabling seamless interaction with the broader document. Understanding event retargeting, the `composed` flag, `composedPath()`, and cross-boundary communication patterns is essential for building enterprise-grade web components.
 
-This guide provides a comprehensive exploration of Shadow DOM event behavior, from fundamental propagation rules to advanced communication patterns, with real-world examples from wc-2026 components.
+This guide provides a comprehensive exploration of Shadow DOM event behavior, from fundamental propagation rules to advanced communication patterns, with real-world examples from HELiX components.
 
 ## Prerequisites
 
@@ -311,7 +311,7 @@ private _handleChange(e: Event): void {
 }
 ```
 
-This pattern appears consistently across all wc-2026 form components:
+This pattern appears consistently across all HELiX form components:
 
 - `hx-checkbox` — dispatches `hx-change` with `composed: true`
 - `hx-select` — dispatches `hx-change` with `composed: true`
@@ -524,13 +524,13 @@ document.addEventListener('click', (event) => {
 
 **Recommendation**: Always use `mode: 'open'` (the default for Lit) unless you have specific security requirements. Closed shadow roots complicate debugging and break `composedPath()` inspection without providing real security benefits (browser DevTools can bypass closed mode).
 
-### wc-2026 Convention
+### HELiX Convention
 
-All wc-2026 components use **open mode** shadow roots for maximum testability, accessibility tooling compatibility, and developer experience.
+All HELiX components use **open mode** shadow roots for maximum testability, accessibility tooling compatibility, and developer experience.
 
 ## Cross-Shadow Communication Patterns
 
-Web components need to communicate across shadow boundaries. Here are proven patterns used in wc-2026 components.
+Web components need to communicate across shadow boundaries. Here are proven patterns used in HELiX components.
 
 ### Pattern 1: Custom Events (Child → Parent)
 
@@ -803,12 +803,12 @@ class HxSelect extends LitElement {
 
 ## Best Practices for Custom Events
 
-After analyzing wc-2026 component patterns, these best practices emerge:
+After analyzing HELiX component patterns, these best practices emerge:
 
 ### 1. Always Use `bubbles` and `composed`
 
 ```typescript
-// ✓ CORRECT: All wc-2026 events follow this pattern
+// ✓ CORRECT: All HELiX events follow this pattern
 this.dispatchEvent(
   new CustomEvent('hx-change', {
     bubbles: true,

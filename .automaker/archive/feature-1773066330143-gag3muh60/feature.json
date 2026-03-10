@@ -1,0 +1,85 @@
+{
+  "category": "Uncategorized",
+  "description": "Launch readiness audit for hx-number-input. Checklist: (1) A11y — axe-core zero violations, spinbutton role, min/max/step, WCAG 2.1 AA. (2) Astro doc page — all 12 template sections. (3) Individual export — standalone HTML works. (4) `npm run verify` passes. Files: `packages/hx-library/src/components/hx-number-input/`, `apps/docs/src/content/docs/component-library/hx-number-input.md`",
+  "title": "LAUNCH READY: hx-number-input",
+  "status": "done",
+  "dependencies": [],
+  "complexity": "medium",
+  "priority": 3,
+  "source": "api",
+  "trustTier": 1,
+  "quarantineStatus": "passed",
+  "quarantineId": "c1c580db-49bd-4928-89c8-c6f9c8cd2432",
+  "id": "feature-1773066330143-gag3muh60",
+  "branchName": "feature/launch-ready-hx-number-input",
+  "descriptionHistory": [
+    {
+      "description": "Launch readiness audit for hx-number-input. Checklist: (1) A11y — axe-core zero violations, spinbutton role, min/max/step, WCAG 2.1 AA. (2) Astro doc page — all 12 template sections. (3) Individual export — standalone HTML works. (4) `npm run verify` passes. Files: `packages/hx-library/src/components/hx-number-input/`, `apps/docs/src/content/docs/component-library/hx-number-input.md`",
+      "timestamp": "2026-03-09T14:25:30.143Z",
+      "source": "initial"
+    }
+  ],
+  "createdAt": "2026-03-09T14:25:30.143Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-03-09T14:25:30.143Z",
+      "reason": "Feature created"
+    },
+    {
+      "from": "backlog",
+      "to": "in_progress",
+      "timestamp": "2026-03-10T17:12:56.065Z"
+    },
+    {
+      "from": "in_progress",
+      "to": "review",
+      "timestamp": "2026-03-10T17:17:50.075Z"
+    },
+    {
+      "from": "review",
+      "to": "blocked",
+      "timestamp": "2026-03-10T17:21:24.662Z",
+      "reason": "Max remediation cycles exceeded (4)"
+    },
+    {
+      "from": "blocked",
+      "to": "review",
+      "timestamp": "2026-03-10T17:25:21.293Z"
+    },
+    {
+      "from": "review",
+      "to": "done",
+      "timestamp": "2026-03-10T17:27:22.477Z"
+    }
+  ],
+  "featureType": "code",
+  "model": "claude-sonnet-4-6",
+  "updatedAt": "2026-03-10T17:12:59.316Z",
+  "costUsd": 1.261496,
+  "lastSessionId": "46b97e56-8348-42fe-821c-a3241936ba73",
+  "prUrl": "https://github.com/bookedsolidtech/helix/pull/607",
+  "prNumber": 607,
+  "prCreatedAt": "2026-03-10T17:17:48.439Z",
+  "reviewStartedAt": "2026-03-10T17:17:50.075Z",
+  "prTrackedSince": "2026-03-10T17:17:50.076Z",
+  "prLastPolledAt": "2026-03-10T17:26:14.731Z",
+  "lastReviewFeedback": "coderabbitai: **Actionable comments posted: 2**\n\n<details>\n<summary>🤖 Prompt for all review comments with AI agents</summary>\n\n```\nVerify each finding against the current code and only fix it if needed.\n\nInline comments:\nIn `@apps/docs/src/content/docs/component-library/hx-number-input.mdx`:\n- Around line 118-127: The demo uses \"mg\" in the prefix slot which is\nnonstandard; update the ComponentDemo example that renders <hx-number-input\nlabel=\"Dosage\" value=\"250\" min=\"0\" step=\"10\"> so that the unit appears in the\nsuffix slot (move the <span slot=\"prefix\">mg</span> to <span\nslot=\"suffix\">mg</span>) or alternatively replace the prefix with an appropriate\nsymbol (e.g., a currency symbol) to make the prefix/suffix usage consistent with\nthe \"Patient Weight\" example and standard unit notation.\n\nIn `@packages/hx-library/src/components/hx-number-input/hx-number-input.ts`:\n- Around line 563-565: Remove the redundant ARIA attributes from the native\nnumber input in the HxNumberInput component: delete the aria-valuenow,\naria-valuemin, and aria-valuemax bindings (the lines setting\naria-valuenow=${...}, aria-valuemin=${...}, aria-valuemax=${...}) inside the\nrender/template for hx-number-input so the native <input type=\"number\"> relies\non its built-in value/min/max semantics; keep the existing value, min, and max\nattributes and do not add a role, as the implicit spinbutton semantics are\nsufficient.\n```\n\n</details>\n\n---\n\n<details>\n<summary>ℹ️ Review info</summary>\n\n<details>\n<summary>⚙️ Run configuration</summary>\n\n**Configuration used**: Path: .coderabbit.yaml\n\n**Review profile**: ASSERTIVE\n\n**Plan**: Pro\n\n**Run ID**: `0f15b52f-4bd6-423a-aaf3-a5faa3ac4102`\n\n</details>\n\n<details>\n<summary>📥 Commits</summary>\n\nReviewing files that changed from the base of the PR and between ab0eb80994a1a1dc8c568850afd36155206dce4a and fbd1e93bcdb86f78a3731441e0a5fba9f79238c0.\n\n</details>\n\n<details>\n<summary>📒 Files selected for processing (2)</summary>\n\n* `apps/docs/src/content/docs/component-libra",
+  "prIterationCount": 1,
+  "remediationCycleCount": 1,
+  "statusChangeReason": "Max remediation cycles exceeded (4)",
+  "failureCount": 1,
+  "failureClassification": {
+    "category": "unknown",
+    "confidence": 0.5,
+    "recoveryStrategy": {
+      "type": "escalate_to_user",
+      "reason": "Unclassified failure - needs investigation: Max remediation cycles exceeded (4)"
+    },
+    "retryable": false,
+    "timestamp": "2026-03-10T17:21:24.663Z"
+  },
+  "prMergedAt": "2026-03-10T17:25:17Z",
+  "completedAt": "2026-03-10T17:27:22.477Z"
+}

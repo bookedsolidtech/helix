@@ -1,0 +1,71 @@
+{
+  "category": "Uncategorized",
+  "description": "Launch readiness audit for hx-help-text. Checklist: (1) A11y — axe-core zero violations, aria-describedby integration, WCAG 2.1 AA. (2) Astro doc page — all 12 template sections. (3) Individual export — standalone HTML works. (4) `npm run verify` passes. Files: `packages/hx-library/src/components/hx-help-text/`, `apps/docs/src/content/docs/component-library/hx-help-text.md`",
+  "title": "LAUNCH READY: hx-help-text",
+  "status": "done",
+  "dependencies": [],
+  "complexity": "medium",
+  "priority": 3,
+  "source": "api",
+  "trustTier": 1,
+  "quarantineStatus": "passed",
+  "quarantineId": "8369df20-29b7-43e8-80dc-180f240dc3cb",
+  "id": "feature-1773066305643-ttubwh38p",
+  "branchName": "feature/launch-ready-hx-help-text",
+  "descriptionHistory": [
+    {
+      "description": "Launch readiness audit for hx-help-text. Checklist: (1) A11y — axe-core zero violations, aria-describedby integration, WCAG 2.1 AA. (2) Astro doc page — all 12 template sections. (3) Individual export — standalone HTML works. (4) `npm run verify` passes. Files: `packages/hx-library/src/components/hx-help-text/`, `apps/docs/src/content/docs/component-library/hx-help-text.md`",
+      "timestamp": "2026-03-09T14:25:05.644Z",
+      "source": "initial"
+    }
+  ],
+  "createdAt": "2026-03-09T14:25:05.644Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-03-09T14:25:05.644Z",
+      "reason": "Feature created"
+    },
+    {
+      "from": "backlog",
+      "to": "in_progress",
+      "timestamp": "2026-03-10T16:45:36.658Z"
+    },
+    {
+      "from": "in_progress",
+      "to": "blocked",
+      "timestamp": "2026-03-10T17:00:19.232Z",
+      "reason": "git workflow failed — uncommitted work in worktree at /Volumes/Development/booked/helix/.worktrees/feature-launch-ready-hx-help-text: git workflow failed — uncommitted work in worktree at /Volumes/Development/booked/helix/.worktrees/feature-launch-ready-hx-help-text: Command failed: git push --force-with-lease -u origin \"feature/launch-ready-hx-help-text\"\nTo github.com:bookedsolidtech/helix.git\n ! [rejected]          feature/launch-ready-hx-help-text -> feature/launch-ready-hx-help-text (stale info)\nerror: failed to push some refs to 'github.com:bookedsolidtech/helix.git'\n | stderr: To github.com:bookedsolidtech/helix.git\n ! [rejected]          feature/launch-ready-hx-help-text -> feature/launch-ready-hx-help-text (stale info)\nerror: failed to push some refs to 'github.com:bookedsolidtech/helix.git'"
+    },
+    {
+      "from": "blocked",
+      "to": "done",
+      "timestamp": "2026-03-10T17:00:24.113Z"
+    }
+  ],
+  "featureType": "code",
+  "prLastPolledAt": "2026-03-10T19:05:00.553Z",
+  "model": "claude-sonnet-4-6",
+  "updatedAt": "2026-03-10T16:58:37.314Z",
+  "executionHistory": [
+    {
+      "id": "71914757-1b2c-4c12-b60c-e4d91424027b",
+      "startedAt": "2026-03-10T16:45:37.042Z",
+      "completedAt": "2026-03-10T16:58:30.697Z",
+      "durationMs": 773655,
+      "costUsd": 0,
+      "model": "claude-sonnet-4-6",
+      "success": false,
+      "error": "Agent loop detected (Bash:223c260c). Aborting for retry with recovery guidance.",
+      "trigger": "manual"
+    }
+  ],
+  "costUsd": 0.31126925,
+  "lastSessionId": "eb6687d4-ee17-46e7-9e1d-5811f575af65",
+  "statusChangeReason": "git workflow failed — uncommitted work in worktree at /Volumes/Development/booked/helix/.worktrees/feature-launch-ready-hx-help-text: git workflow failed — uncommitted work in worktree at /Volumes/Development/booked/helix/.worktrees/feature-launch-ready-hx-help-text: Command failed: git push --force-with-lease -u origin \"feature/launch-ready-hx-help-text\"\nTo github.com:bookedsolidtech/helix.git\n ! [rejected]          feature/launch-ready-hx-help-text -> feature/launch-ready-hx-help-text (stale info)\nerror: failed to push some refs to 'github.com:bookedsolidtech/helix.git'\n | stderr: To github.com:bookedsolidtech/helix.git\n ! [rejected]          feature/launch-ready-hx-help-text -> feature/launch-ready-hx-help-text (stale info)\nerror: failed to push some refs to 'github.com:bookedsolidtech/helix.git'",
+  "failureCount": 1,
+  "prNumber": 567,
+  "prMergedAt": "2026-03-09T21:49:36Z",
+  "completedAt": "2026-03-10T17:00:24.113Z"
+}

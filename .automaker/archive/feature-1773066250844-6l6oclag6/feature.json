@@ -1,0 +1,90 @@
+{
+  "category": "Uncategorized",
+  "description": "Launch readiness audit for hx-color-picker. Checklist: (1) A11y — axe-core zero violations, keyboard-operable color selection, aria-label on slider tracks, WCAG 2.1 AA. (2) Astro doc page — all 12 template sections. (3) Individual export — standalone HTML works. (4) `npm run verify` passes. Known patterns: C-PATTERN-01, C-PATTERN-04 (aria-input-field-name). Files: `packages/hx-library/src/components/hx-color-picker/`, `apps/docs/src/content/docs/component-library/hx-color-picker.md`",
+  "title": "LAUNCH READY: hx-color-picker",
+  "status": "done",
+  "dependencies": [],
+  "complexity": "medium",
+  "priority": 3,
+  "source": "api",
+  "trustTier": 1,
+  "quarantineStatus": "passed",
+  "quarantineId": "44c1cbd9-690c-4bc0-a056-22af9fd2486a",
+  "id": "feature-1773066250844-6l6oclag6",
+  "branchName": "feature/launch-ready-hx-color-picker",
+  "descriptionHistory": [
+    {
+      "description": "Launch readiness audit for hx-color-picker. Checklist: (1) A11y — axe-core zero violations, keyboard-operable color selection, aria-label on slider tracks, WCAG 2.1 AA. (2) Astro doc page — all 12 template sections. (3) Individual export — standalone HTML works. (4) `npm run verify` passes. Known patterns: C-PATTERN-01, C-PATTERN-04 (aria-input-field-name). Files: `packages/hx-library/src/components/hx-color-picker/`, `apps/docs/src/content/docs/component-library/hx-color-picker.md`",
+      "timestamp": "2026-03-09T14:24:10.844Z",
+      "source": "initial"
+    }
+  ],
+  "createdAt": "2026-03-09T14:24:10.844Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-03-09T14:24:10.844Z",
+      "reason": "Feature created"
+    },
+    {
+      "from": "backlog",
+      "to": "in_progress",
+      "timestamp": "2026-03-10T13:17:13.908Z"
+    },
+    {
+      "from": "in_progress",
+      "to": "backlog",
+      "timestamp": "2026-03-10T13:20:34.202Z"
+    },
+    {
+      "from": "backlog",
+      "to": "blocked",
+      "timestamp": "2026-03-10T13:42:18.045Z",
+      "reason": "Max agent retries exceeded (3)"
+    },
+    {
+      "from": "blocked",
+      "to": "done",
+      "timestamp": "2026-03-10T13:42:19.891Z"
+    },
+    {
+      "from": "done",
+      "to": "verified",
+      "timestamp": "2026-03-10T15:00:52.649Z"
+    }
+  ],
+  "featureType": "code",
+  "model": "claude-sonnet-4-6",
+  "updatedAt": "2026-03-10T15:00:52.649Z",
+  "costUsd": 3.4222842499999997,
+  "lastSessionId": "dae2e112-9a67-44df-9554-cc0e0e06de5f",
+  "statusChangeReason": "Max agent retries exceeded (3)",
+  "failureCount": 1,
+  "failureClassification": {
+    "category": "unknown",
+    "confidence": 0.5,
+    "recoveryStrategy": {
+      "type": "escalate_to_user",
+      "reason": "Unclassified failure - needs investigation: Max agent retries exceeded (3)"
+    },
+    "retryable": false,
+    "timestamp": "2026-03-10T13:42:18.048Z"
+  },
+  "prNumber": 550,
+  "prMergedAt": "2026-03-09T16:55:19Z",
+  "completedAt": "2026-03-10T13:42:19.891Z",
+  "executionHistory": [
+    {
+      "id": "fcb52272-ed48-4cf3-bcc7-e04145da5256",
+      "startedAt": "2026-03-10T13:17:14.278Z",
+      "completedAt": "2026-03-10T15:00:52.653Z",
+      "durationMs": 6218375,
+      "costUsd": 3.4222842499999997,
+      "model": "claude-sonnet-4-6",
+      "success": true,
+      "trigger": "manual"
+    }
+  ],
+  "summary": "## Summary: Launch readiness audit for hx-color-picker\n\n### Changes Implemented\n- No changes were required. The component was already in a fully launch-ready state.\n\n### Files Modified\n- None (working tree clean)\n\n### Risks/Blockers Encountered\n- None\n\n### Learnings\n- The hx-color-picker had already been through a full audit (AUDIT.md in the component dir documents the prior P0/P1/P2 findings and fixes)\n- All 4 required checklist items were already complete before this feature ran\n\n### Notes for Developer\n- `hx-color-picker.mdx` has 13 sections (not 12) — all template sections plus an extra \"Live Demo\" section\n- 42 tests cover: rendering, properties, events, value parsing, format cycling, text input, keyboard navigation, form participation, ARIA, CSS parts, slots, and axe-core\n- The component exports from both `src/components/hx-color-picker/index.ts` and main `src/index.ts`\n\n### Verification Status\n- All verification gates passed: `npm run verify` (11/11 tasks), `npm run test:library` (42 tests, 3,522 assertions), `npm run cem`, `git diff --stat` (clean)\n- No Playwright test was needed as the existing Vitest browser-mode tests with axe-core already cover all audit criteria"
+}

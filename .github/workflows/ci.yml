@@ -1,5 +1,5 @@
 # ============================================================================
-# CI Pipeline — wc-2026 Enterprise Healthcare Web Component Library
+# CI Pipeline — HELiX Enterprise Healthcare Web Component Library
 # ============================================================================
 # Parallel quality gates — each job runs independently for fast feedback:
 #   1. Lint (ESLint 9 flat config)

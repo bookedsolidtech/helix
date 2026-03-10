@@ -1177,9 +1177,9 @@ Consumers can read the current error:
 </script>
 ```
 
-## wc-2026 Validation Examples
+## HELiX Validation Examples
 
-The wc-2026 library (using `hx-` prefix) implements validation consistently across all form components.
+The HELiX library (using `hx-` prefix) implements validation consistently across all form components.
 
 ### Example: hx-text-input
 

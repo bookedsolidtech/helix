@@ -787,21 +787,21 @@ Add grid layout CSS:
 # mytheme.libraries.yml
 helix-card:
   js:
-    https://cdn.example.com/@helix/library/dist/hx-card.js:
+    https://cdn.example.com/@helixui/library/dist/hx-card.js:
       type: external
       attributes:
         type: module
 
 helix-badge:
   js:
-    https://cdn.example.com/@helix/library/dist/hx-badge.js:
+    https://cdn.example.com/@helixui/library/dist/hx-badge.js:
       type: external
       attributes:
         type: module
 
 helix-button:
   js:
-    https://cdn.example.com/@helix/library/dist/hx-button.js:
+    https://cdn.example.com/@helixui/library/dist/hx-button.js:
       type: external
       attributes:
         type: module

@@ -1,0 +1,100 @@
+{
+  "category": "Uncategorized",
+  "description": "Launch readiness audit for hx-pagination. Checklist: (1) A11y — axe-core zero violations, nav landmark, aria-label, current page indication, WCAG 2.1 AA. (2) Astro doc page — all 12 template sections. (3) Individual export — standalone HTML works. (4) `npm run verify` passes. Files: `packages/hx-library/src/components/hx-pagination/`, `apps/docs/src/content/docs/component-library/hx-pagination.md`",
+  "title": "LAUNCH READY: hx-pagination",
+  "status": "done",
+  "dependencies": [],
+  "complexity": "medium",
+  "priority": 3,
+  "source": "api",
+  "trustTier": 1,
+  "quarantineStatus": "passed",
+  "quarantineId": "f89e0ba9-597d-4f93-9572-386121b4e39e",
+  "id": "feature-1773066334766-19wkmoy1x",
+  "branchName": "feature/launch-ready-hx-pagination",
+  "descriptionHistory": [
+    {
+      "description": "Launch readiness audit for hx-pagination. Checklist: (1) A11y — axe-core zero violations, nav landmark, aria-label, current page indication, WCAG 2.1 AA. (2) Astro doc page — all 12 template sections. (3) Individual export — standalone HTML works. (4) `npm run verify` passes. Files: `packages/hx-library/src/components/hx-pagination/`, `apps/docs/src/content/docs/component-library/hx-pagination.md`",
+      "timestamp": "2026-03-09T14:25:34.766Z",
+      "source": "initial"
+    }
+  ],
+  "createdAt": "2026-03-09T14:25:34.766Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-03-09T14:25:34.766Z",
+      "reason": "Feature created"
+    },
+    {
+      "from": "backlog",
+      "to": "in_progress",
+      "timestamp": "2026-03-10T17:19:08.554Z"
+    },
+    {
+      "from": "in_progress",
+      "to": "verified",
+      "timestamp": "2026-03-10T17:26:27.986Z"
+    },
+    {
+      "from": "done",
+      "to": "review",
+      "timestamp": "2026-03-10T17:27:24.498Z"
+    },
+    {
+      "from": "review",
+      "to": "blocked",
+      "timestamp": "2026-03-10T17:31:29.526Z",
+      "reason": "Max remediation cycles exceeded (4)"
+    },
+    {
+      "from": "blocked",
+      "to": "review",
+      "timestamp": "2026-03-10T17:35:25.007Z"
+    },
+    {
+      "from": "review",
+      "to": "done",
+      "timestamp": "2026-03-10T17:51:03.111Z"
+    }
+  ],
+  "featureType": "code",
+  "model": "claude-sonnet-4-6",
+  "updatedAt": "2026-03-10T17:26:27.986Z",
+  "costUsd": 1.6748927500000004,
+  "lastSessionId": "ec111af3-eabb-4e0f-92d9-db4e9c28ed33",
+  "completedAt": "2026-03-10T17:26:27.986Z",
+  "executionHistory": [
+    {
+      "id": "0f02c7b5-6af2-4fc5-a91b-d35551f394ee",
+      "startedAt": "2026-03-10T17:19:09.083Z",
+      "completedAt": "2026-03-10T17:26:27.996Z",
+      "durationMs": 438913,
+      "costUsd": 1.6748927500000004,
+      "model": "claude-sonnet-4-6",
+      "success": true,
+      "trigger": "manual"
+    }
+  ],
+  "prUrl": "https://github.com/bookedsolidtech/helix/pull/609",
+  "prNumber": 609,
+  "reviewStartedAt": "2026-03-10T17:27:24.498Z",
+  "prLastPolledAt": "2026-03-10T17:36:07.653Z",
+  "lastReviewFeedback": "coderabbitai: **Actionable comments posted: 1**\n\n<details>\n<summary>🤖 Prompt for all review comments with AI agents</summary>\n\n```\nVerify each finding against the current code and only fix it if needed.\n\nInline comments:\nIn `@apps/docs/src/content/docs/component-library/hx-pagination.mdx`:\n- Around line 272-285: The \"Standalone HTML Example\" is contradictory: it claims\n\"no build tool needed\" but instructs to import '@helix/library' in a bundler\nentry, and the hx-pagination custom element won't render without loading the\ncomponent definition; either update the section title and copy to indicate this\nis for bundled projects (remove \"no build tool needed\" and keep the bundler note\n+ import '@helix/library') or make the example truly standalone by adding a\nscript tag that loads a UMD/IIFE build of the library (or point to the\nappropriate UMD build path) so the hx-pagination element is defined at runtime;\nreference the hx-pagination element and the import '@helix/library' instruction\nwhen making the change.\n```\n\n</details>\n\n---\n\n<details>\n<summary>ℹ️ Review info</summary>\n\n<details>\n<summary>⚙️ Run configuration</summary>\n\n**Configuration used**: Path: .coderabbit.yaml\n\n**Review profile**: ASSERTIVE\n\n**Plan**: Pro\n\n**Run ID**: `bf9ab62f-6556-4301-b26b-0eca19fa3cd6`\n\n</details>\n\n<details>\n<summary>📥 Commits</summary>\n\nReviewing files that changed from the base of the PR and between 9b15c253416662ef0d6c509f19f7ab89ecc5bd0a and 064515e74bc6bf6ffea7f0d1cac901c7041cb598.\n\n</details>\n\n<details>\n<summary>📒 Files selected for processing (1)</summary>\n\n* `apps/docs/src/content/docs/component-library/hx-pagination.mdx`\n\n</details>\n\n</details>\n\n<!-- This is an auto-generated comment by CodeRabbit for review status -->\n---\n### CodeRabbit Review (1 items)\n- [WARNING] <!-- This is an auto-generated comment: summarize by coderabbit.ai -->\n<!-- configuration_strict_warnings_start -->",
+  "prIterationCount": 1,
+  "remediationCycleCount": 1,
+  "statusChangeReason": "Max remediation cycles exceeded (4)",
+  "failureCount": 1,
+  "failureClassification": {
+    "category": "unknown",
+    "confidence": 0.5,
+    "recoveryStrategy": {
+      "type": "escalate_to_user",
+      "reason": "Unclassified failure - needs investigation: Max remediation cycles exceeded (4)"
+    },
+    "retryable": false,
+    "timestamp": "2026-03-10T17:31:29.528Z"
+  },
+  "prMergedAt": "2026-03-10T17:35:31Z"
+}

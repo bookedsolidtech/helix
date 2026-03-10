@@ -23,16 +23,16 @@ helix/
 │   ├── storybook/      # Storybook 10 web-components-vite adapter
 │   └── mcp-servers/    # Custom MCP tools (cem-analyzer, health-scorer, typescript-diagnostics)
 └── packages/
-    ├── hx-library/     # @helix/library — core Lit 3.x web components
-    └── hx-tokens/      # @helix/tokens — design token definitions (CSS, Lit, JSON)
+    ├── hx-library/     # @helixui/library — core Lit 3.x web components
+    └── hx-tokens/      # @helixui/tokens — design token definitions (CSS, Lit, JSON)
 ```
 
 ### Design Token System
 
 Design tokens are the single source of truth for all visual values:
 
-- `@helix/tokens` exports CSS custom properties, Lit CSS literals, and raw JSON
-- All components import tokens via `@helix/tokens/lit` — never hardcode values
+- `@helixui/tokens` exports CSS custom properties, Lit CSS literals, and raw JSON
+- All components import tokens via `@helixui/tokens/lit` — never hardcode values
 
 ### Web Component Conventions
 

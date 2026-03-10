@@ -1,13 +1,13 @@
 ---
 title: Complex Form Components
-description: Deep dive into building complex form patterns with wc-2026 components. Learn multi-value inputs, date pickers, file upload, rich text, form arrays, nested forms, and advanced validation strategies for enterprise healthcare applications.
+description: Deep dive into building complex form patterns with HELiX components. Learn multi-value inputs, date pickers, file upload, rich text, form arrays, nested forms, and advanced validation strategies for enterprise healthcare applications.
 sidebar:
   order: 4
 ---
 
 # Complex Form Components
 
-Real-world healthcare applications demand more than simple text inputs and checkboxes. You need dynamic field groups, repeating sections, conditional validation, nested data structures, date pickers, file uploads, and complex user interactions. This guide covers advanced form patterns using wc-2026 components: multi-value inputs, date/time handling, file management, form arrays, nested forms, dynamic field management, and strategies for handling complex state in enterprise applications.
+Real-world healthcare applications demand more than simple text inputs and checkboxes. You need dynamic field groups, repeating sections, conditional validation, nested data structures, date pickers, file uploads, and complex user interactions. This guide covers advanced form patterns using HELiX components: multi-value inputs, date/time handling, file management, form arrays, nested forms, dynamic field management, and strategies for handling complex state in enterprise applications.
 
 By the end of this guide, you'll understand how to build sophisticated form interfaces that maintain accessibility, validation integrity, and developer ergonomics at scale.
 
@@ -41,7 +41,7 @@ Complex forms arise from complex data models. In healthcare applications, you mi
 - **Document attachments** — File uploads with metadata (document type, date, description)
 - **Clinical notes** — Rich text editing with formatting, templates, and macros
 
-wc-2026 components provide the primitives. This guide shows you how to compose them into complex, maintainable patterns.
+HELiX components provide the primitives. This guide shows you how to compose them into complex, maintainable patterns.
 
 ### Prerequisites
 
@@ -2282,7 +2282,7 @@ export class LabResultsForm extends LitElement {
 
 ## Best Practices Summary
 
-1. **Start with primitives** — Build complex forms from simple, tested wc-2026 components
+1. **Start with primitives** — Build complex forms from simple, tested HELiX components
 2. **Use unique IDs** — Key repeating items with `crypto.randomUUID()` for stable rendering
 3. **Immutable state updates** — Always create new arrays/objects to trigger reactivity
 4. **Validate incrementally** — Real-time validation for individual fields, cross-field validation on blur/submit

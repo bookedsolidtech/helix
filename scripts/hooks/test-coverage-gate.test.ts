@@ -83,7 +83,7 @@ describe('hasApprovalComment', () => {
 describe('hasTestFile', () => {
   it('returns true when test file exists', () => {
     // Use the actual path from project root
-    const result = hasTestFile('/Volumes/Development/wc-2026/scripts/hooks/test-coverage-gate.ts');
+    const result = hasTestFile('/Volumes/Development/booked/helix/scripts/hooks/test-coverage-gate.ts');
     // Should look for test-coverage-gate.test.ts which exists
     expect(result).toBe(true);
   });
@@ -247,7 +247,7 @@ describe('checkFileCoverage', () => {
 
     // Pass undefined coverage data for a file that has tests
     checkFileCoverage(
-      '/Volumes/Development/wc-2026/scripts/hooks/test-coverage-gate.ts',
+      '/Volumes/Development/booked/helix/scripts/hooks/test-coverage-gate.ts',
       undefined,
       violations,
       content,
@@ -563,7 +563,7 @@ describe('getStagedFiles', () => {
 
 describe('readFile', () => {
   it('reads file contents', () => {
-    const content = readFile('/Volumes/Development/wc-2026/scripts/hooks/test-coverage-gate.ts');
+    const content = readFile('/Volumes/Development/booked/helix/scripts/hooks/test-coverage-gate.ts');
     expect(content).toContain('test-coverage-gate');
     expect(typeof content).toBe('string');
   });
@@ -660,7 +660,7 @@ describe('integration', () => {
   it('validates real coverage data structure', () => {
     const mockRealCoverage: CoverageSummary = {
       total: createCoverageData(),
-      '/Volumes/Development/wc-2026/packages/hx-library/src/components/hx-button/hx-button.ts': {
+      '/Volumes/Development/booked/helix/packages/hx-library/src/components/hx-button/hx-button.ts': {
         lines: { total: 57, covered: 53, skipped: 0, pct: 92.98 },
         functions: { total: 4, covered: 4, skipped: 0, pct: 100 },
         statements: { total: 57, covered: 53, skipped: 0, pct: 92.98 },

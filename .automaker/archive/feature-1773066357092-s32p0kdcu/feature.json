@@ -1,0 +1,85 @@
+{
+  "category": "Uncategorized",
+  "description": "Launch readiness audit for hx-rating. Checklist: (1) A11y — axe-core zero violations, slider or radiogroup pattern, keyboard operable, WCAG 2.1 AA. (2) Astro doc page — all 12 template sections. (3) Individual export — standalone HTML works. (4) `npm run verify` passes. Files: `packages/hx-library/src/components/hx-rating/`, `apps/docs/src/content/docs/component-library/hx-rating.md`",
+  "title": "LAUNCH READY: hx-rating",
+  "status": "done",
+  "dependencies": [],
+  "complexity": "medium",
+  "priority": 3,
+  "source": "api",
+  "trustTier": 1,
+  "quarantineStatus": "passed",
+  "quarantineId": "28e5f8d5-7961-4401-8568-bbc71fc3df35",
+  "id": "feature-1773066357092-s32p0kdcu",
+  "branchName": "feature/launch-ready-hx-rating",
+  "descriptionHistory": [
+    {
+      "description": "Launch readiness audit for hx-rating. Checklist: (1) A11y — axe-core zero violations, slider or radiogroup pattern, keyboard operable, WCAG 2.1 AA. (2) Astro doc page — all 12 template sections. (3) Individual export — standalone HTML works. (4) `npm run verify` passes. Files: `packages/hx-library/src/components/hx-rating/`, `apps/docs/src/content/docs/component-library/hx-rating.md`",
+      "timestamp": "2026-03-09T14:25:57.092Z",
+      "source": "initial"
+    }
+  ],
+  "createdAt": "2026-03-09T14:25:57.092Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-03-09T14:25:57.092Z",
+      "reason": "Feature created"
+    },
+    {
+      "from": "backlog",
+      "to": "in_progress",
+      "timestamp": "2026-03-10T17:57:06.390Z"
+    },
+    {
+      "from": "in_progress",
+      "to": "review",
+      "timestamp": "2026-03-10T18:01:48.115Z"
+    },
+    {
+      "from": "review",
+      "to": "blocked",
+      "timestamp": "2026-03-10T18:06:21.669Z",
+      "reason": "Max remediation cycles exceeded (4)"
+    },
+    {
+      "from": "blocked",
+      "to": "review",
+      "timestamp": "2026-03-10T18:10:19.145Z"
+    },
+    {
+      "from": "review",
+      "to": "done",
+      "timestamp": "2026-03-10T18:16:05.562Z"
+    }
+  ],
+  "featureType": "code",
+  "model": "claude-sonnet-4-6",
+  "updatedAt": "2026-03-10T17:57:09.396Z",
+  "costUsd": 0.9179664999999999,
+  "lastSessionId": "b37234ef-26de-42b9-baa3-9ab6a7cd4564",
+  "prUrl": "https://github.com/bookedsolidtech/helix/pull/613",
+  "prNumber": 613,
+  "prCreatedAt": "2026-03-10T18:01:46.682Z",
+  "reviewStartedAt": "2026-03-10T18:01:48.115Z",
+  "prTrackedSince": "2026-03-10T18:01:48.116Z",
+  "prLastPolledAt": "2026-03-10T18:11:11.155Z",
+  "lastReviewFeedback": "coderabbitai: **Actionable comments posted: 2**\n\n<details>\n<summary>🤖 Prompt for all review comments with AI agents</summary>\n\n````\nVerify each finding against the current code and only fix it if needed.\n\nInline comments:\nIn `@apps/docs/src/content/docs/component-library/hx-rating.mdx`:\n- Around line 81-87: The fenced code block in hx-rating.mdx mixes bash and\nJavaScript (an npm install and an import) under a single ```bash fence; split\nthis into two separate fenced blocks: keep the npm install line inside a ```bash\nblock and move the import '@helix/library/components/hx-rating'; into its own\n```js (or ```javascript) block with an explanatory comment. Update the content\naround the fences so both snippets are independently copyable and correctly\ntyped.\n- Around line 217-228: The standalone HTML example claims you can paste and open\na .html file but never loads the script that registers the <hx-rating> custom\nelement; update the example block around the commented `@helix/library` note so it\neither (A) includes a real standalone script tag that points to a shipped\nUMD/ESM bundle that registers <hx-rating> (or an inline script that imports and\nregisters the component) and demonstrates the element working, or (B) change the\nheading/text to say this is a bundler-based example and show the correct import\nstatement (e.g., \"import '@helix/library'\") and bundler entry instructions so\nreaders know the component must be registered by your package before <hx-rating>\nwill be upgraded.\n````\n\n</details>\n\n---\n\n<details>\n<summary>ℹ️ Review info</summary>\n\n<details>\n<summary>⚙️ Run configuration</summary>\n\n**Configuration used**: Path: .coderabbit.yaml\n\n**Review profile**: ASSERTIVE\n\n**Plan**: Pro\n\n**Run ID**: `96de12c9-9861-46f4-af3f-333b74ae7231`\n\n</details>\n\n<details>\n<summary>📥 Commits</summary>\n\nReviewing files that changed from the base of the PR and between 2e604ee76ec639b1761b84aef569d557b2583d21 and 186e0416786a0cf00d914cacd56de97ba1437856.\n\n</details>\n\n<details>\n<summary>\ud83d",
+  "prIterationCount": 1,
+  "remediationCycleCount": 1,
+  "statusChangeReason": "Max remediation cycles exceeded (4)",
+  "failureCount": 1,
+  "failureClassification": {
+    "category": "unknown",
+    "confidence": 0.5,
+    "recoveryStrategy": {
+      "type": "escalate_to_user",
+      "reason": "Unclassified failure - needs investigation: Max remediation cycles exceeded (4)"
+    },
+    "retryable": false,
+    "timestamp": "2026-03-10T18:06:21.670Z"
+  },
+  "prMergedAt": "2026-03-10T18:10:16Z",
+  "completedAt": "2026-03-10T18:16:05.562Z"
+}

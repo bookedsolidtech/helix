@@ -3,7 +3,7 @@ import { customElement, property, query } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import { live } from 'lit/directives/live.js';
-import { tokenStyles } from '@helix/tokens/lit';
+import { tokenStyles } from '@helixui/tokens/lit';
 import { helixTextInputStyles } from './hx-text-input.styles.js';
 
 // Module-level counter for stable, SSR-compatible IDs (avoids Math.random() hydration mismatch)

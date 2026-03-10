@@ -1,0 +1,59 @@
+{
+  "category": "Uncategorized",
+  "description": "Launch readiness audit for hx-card. Checklist: (1) A11y — axe-core zero violations, WCAG 2.1 AA. (2) Astro doc page — all 12 template sections. (3) Individual export — standalone HTML works. (4) `npm run verify` passes. Known patterns: C-PATTERN-01, C-PATTERN-02. Files: `packages/hx-library/src/components/hx-card/`, `apps/docs/src/content/docs/component-library/hx-card.md`",
+  "title": "LAUNCH READY: hx-card",
+  "status": "done",
+  "dependencies": [
+    "feature-1773066138511-g2pgj0rmm"
+  ],
+  "complexity": "medium",
+  "priority": 3,
+  "source": "api",
+  "trustTier": 1,
+  "quarantineStatus": "passed",
+  "quarantineId": "5c367294-f36d-4d88-ba6f-58b5f96189ec",
+  "id": "feature-1773066236564-8aov8g18q",
+  "branchName": "feature/launch-ready-hx-card",
+  "descriptionHistory": [
+    {
+      "description": "Launch readiness audit for hx-card. Checklist: (1) A11y — axe-core zero violations, WCAG 2.1 AA. (2) Astro doc page — all 12 template sections. (3) Individual export — standalone HTML works. (4) `npm run verify` passes. Known patterns: C-PATTERN-01, C-PATTERN-02. Files: `packages/hx-library/src/components/hx-card/`, `apps/docs/src/content/docs/component-library/hx-card.md`",
+      "timestamp": "2026-03-09T14:23:56.565Z",
+      "source": "initial"
+    }
+  ],
+  "createdAt": "2026-03-09T14:23:56.565Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-03-09T14:23:56.565Z",
+      "reason": "Feature created"
+    },
+    {
+      "from": "backlog",
+      "to": "in_progress",
+      "timestamp": "2026-03-10T12:38:22.104Z"
+    },
+    {
+      "from": "in_progress",
+      "to": "blocked",
+      "timestamp": "2026-03-10T12:41:49.216Z",
+      "reason": "git workflow failed — uncommitted work in worktree at /Volumes/Development/booked/helix/.worktrees/feature-launch-ready-hx-card: git workflow failed — uncommitted work in worktree at /Volumes/Development/booked/helix/.worktrees/feature-launch-ready-hx-card: Command failed: git push --force-with-lease -u origin \"feature/launch-ready-hx-card\"\nTo github.com:bookedsolidtech/helix.git\n ! [rejected]          feature/launch-ready-hx-card -> feature/launch-ready-hx-card (stale info)\nerror: failed to push some refs to 'github.com:bookedsolidtech/helix.git'\n | stderr: To github.com:bookedsolidtech/helix.git\n ! [rejected]          feature/launch-ready-hx-card -> feature/launch-ready-hx-card (stale info)\nerror: failed to push some refs to 'github.com:bookedsolidtech/helix.git'"
+    },
+    {
+      "from": "blocked",
+      "to": "done",
+      "timestamp": "2026-03-10T12:41:50.109Z"
+    }
+  ],
+  "featureType": "code",
+  "model": "claude-sonnet-4-6",
+  "updatedAt": "2026-03-10T12:38:24.394Z",
+  "costUsd": 1.1289365,
+  "lastSessionId": "2763736c-0a78-4cce-821d-f36570a2b8c6",
+  "statusChangeReason": "git workflow failed — uncommitted work in worktree at /Volumes/Development/booked/helix/.worktrees/feature-launch-ready-hx-card: git workflow failed — uncommitted work in worktree at /Volumes/Development/booked/helix/.worktrees/feature-launch-ready-hx-card: Command failed: git push --force-with-lease -u origin \"feature/launch-ready-hx-card\"\nTo github.com:bookedsolidtech/helix.git\n ! [rejected]          feature/launch-ready-hx-card -> feature/launch-ready-hx-card (stale info)\nerror: failed to push some refs to 'github.com:bookedsolidtech/helix.git'\n | stderr: To github.com:bookedsolidtech/helix.git\n ! [rejected]          feature/launch-ready-hx-card -> feature/launch-ready-hx-card (stale info)\nerror: failed to push some refs to 'github.com:bookedsolidtech/helix.git'",
+  "failureCount": 1,
+  "prNumber": 545,
+  "prMergedAt": "2026-03-09T16:27:59Z",
+  "completedAt": "2026-03-10T12:41:50.109Z"
+}

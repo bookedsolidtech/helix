@@ -859,7 +859,7 @@ CSS Shadow Parts provide the precision and control needed for enterprise compone
 - Combine parts (for structure) with custom properties (for values) for layered theming
 - Parts are a **contract**—document and version them carefully
 
-For wc-2026 (hx-library), parts are essential for integrating components into diverse healthcare design systems. They enable the **foundation** (the library) to serve **infinite variations** (client implementations) without sacrificing encapsulation or maintainability.
+For HELiX (hx-library), parts are essential for integrating components into diverse healthcare design systems. They enable the **foundation** (the library) to serve **infinite variations** (client implementations) without sacrificing encapsulation or maintainability.
 
 ## Next Steps
 

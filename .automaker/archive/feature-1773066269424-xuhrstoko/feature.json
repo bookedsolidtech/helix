@@ -1,0 +1,104 @@
+{
+  "category": "Uncategorized",
+  "description": "Launch readiness audit for hx-date-picker. Checklist: (1) A11y — axe-core zero violations, date picker APG, keyboard grid navigation, WCAG 2.1 AA. (2) Astro doc page — all 12 template sections. (3) Individual export — standalone HTML works. (4) `npm run verify` passes. Files: `packages/hx-library/src/components/hx-date-picker/`, `apps/docs/src/content/docs/component-library/hx-date-picker.md`",
+  "title": "LAUNCH READY: hx-date-picker",
+  "status": "done",
+  "dependencies": [],
+  "complexity": "medium",
+  "priority": 3,
+  "source": "api",
+  "trustTier": 1,
+  "quarantineStatus": "passed",
+  "quarantineId": "5247eb6f-a99b-4c8f-9618-5938826bf98b",
+  "id": "feature-1773066269424-xuhrstoko",
+  "branchName": "feature/launch-ready-hx-date-picker",
+  "descriptionHistory": [
+    {
+      "description": "Launch readiness audit for hx-date-picker. Checklist: (1) A11y — axe-core zero violations, date picker APG, keyboard grid navigation, WCAG 2.1 AA. (2) Astro doc page — all 12 template sections. (3) Individual export — standalone HTML works. (4) `npm run verify` passes. Files: `packages/hx-library/src/components/hx-date-picker/`, `apps/docs/src/content/docs/component-library/hx-date-picker.md`",
+      "timestamp": "2026-03-09T14:24:29.424Z",
+      "source": "initial"
+    }
+  ],
+  "createdAt": "2026-03-09T14:24:29.424Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-03-09T14:24:29.424Z",
+      "reason": "Feature created"
+    },
+    {
+      "from": "backlog",
+      "to": "in_progress",
+      "timestamp": "2026-03-10T13:50:34.097Z"
+    },
+    {
+      "from": "in_progress",
+      "to": "done",
+      "timestamp": "2026-03-10T14:25:34.962Z"
+    },
+    {
+      "from": "done",
+      "to": "in_progress",
+      "timestamp": "2026-03-10T14:25:36.328Z"
+    },
+    {
+      "from": "in_progress",
+      "to": "done",
+      "timestamp": "2026-03-10T14:26:05.856Z"
+    }
+  ],
+  "featureType": "code",
+  "model": "claude-sonnet-4-6",
+  "updatedAt": "2026-03-10T14:26:03.677Z",
+  "costUsd": 1.3317010000000002,
+  "lastSessionId": "08d996de-488e-4cbc-b79b-939b2283a89b",
+  "executionHistory": [
+    {
+      "id": "70812b7f-c0e4-4383-a8f9-5d873aeeb6d7",
+      "startedAt": "2026-03-10T13:50:34.438Z",
+      "completedAt": "2026-03-10T14:25:33.178Z",
+      "durationMs": 2098740,
+      "costUsd": 1.3317010000000002,
+      "model": "claude-sonnet-4-6",
+      "success": false,
+      "error": "Operation was cancelled",
+      "trigger": "manual"
+    },
+    {
+      "id": "4ef34cd8-6ab9-4c08-861c-ea46a5f0e0f7",
+      "startedAt": "2026-03-10T14:25:34.187Z",
+      "completedAt": "2026-03-10T14:25:37.194Z",
+      "durationMs": 3007,
+      "costUsd": 0,
+      "model": "claude-sonnet-4-6",
+      "success": false,
+      "error": "Operation was cancelled",
+      "trigger": "manual"
+    },
+    {
+      "id": "8d5b476a-d266-49e4-9016-c716588ff170",
+      "startedAt": "2026-03-10T14:25:38.199Z",
+      "completedAt": "2026-03-10T14:26:00.885Z",
+      "durationMs": 22686,
+      "costUsd": 0,
+      "model": "claude-sonnet-4-6",
+      "success": false,
+      "error": "Operation was cancelled",
+      "trigger": "manual"
+    },
+    {
+      "id": "3aa8d729-5d88-44f2-8c9f-d7ee229d9927",
+      "startedAt": "2026-03-10T14:26:01.912Z",
+      "completedAt": "2026-03-10T14:26:06.755Z",
+      "durationMs": 4843,
+      "costUsd": 0,
+      "model": "claude-sonnet-4-6",
+      "success": false,
+      "error": "Operation was cancelled",
+      "trigger": "manual"
+    }
+  ],
+  "completedAt": "2026-03-10T14:25:34.962Z",
+  "assignee": "jake"
+}

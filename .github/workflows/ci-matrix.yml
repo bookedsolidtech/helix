@@ -1,5 +1,5 @@
 # ============================================================================
-# Matrix CI Pipeline — wc-2026 Enterprise Healthcare Web Component Library
+# Matrix CI Pipeline — HELiX Enterprise Healthcare Web Component Library
 # ============================================================================
 # Tests across multiple Node.js versions and operating systems to ensure
 # compatibility and reliability across different environments.
@@ -61,10 +61,10 @@ jobs:
       - name: Format check
         run: npm run format:check
 
-      # ---- Build (must run before tests — @helix/tokens exports from dist/) ----
+      # ---- Build (must run before tests — @helixui/tokens exports from dist/) ----
 
       - name: Build
-        run: npx turbo run build --filter='!docs' --filter='!@helix/storybook'
+        run: npx turbo run build --filter='!docs' --filter='!@helixui/storybook'
 
       # ---- Tests ----
 

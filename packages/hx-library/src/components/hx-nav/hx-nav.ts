@@ -2,7 +2,7 @@ import { LitElement, html, nothing, svg } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { repeat } from 'lit/directives/repeat.js';
-import { tokenStyles } from '@helix/tokens/lit';
+import { tokenStyles } from '@helixui/tokens/lit';
 import { helixNavStyles } from './hx-nav.styles.js';
 
 /** A single navigation item, optionally with nested children. */

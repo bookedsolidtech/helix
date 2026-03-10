@@ -301,10 +301,10 @@ sudo -u www-data cat dist/js/helix.bundled.js
 helix-components:
   js:
     # WRONG (HTTP)
-    # http://cdn.jsdelivr.net/npm/@helix/library@0.0.1/dist/helix.bundled.js
+    # http://cdn.jsdelivr.net/npm/@helixui/library@0.0.1/dist/helix.bundled.js
 
     # CORRECT (HTTPS)
-    https://cdn.jsdelivr.net/npm/@helix/library@0.0.1/dist/helix.bundled.js:
+    https://cdn.jsdelivr.net/npm/@helixui/library@0.0.1/dist/helix.bundled.js:
       type: external
       attributes:
         type: module
@@ -1021,7 +1021,7 @@ helix-form:
 helix-components:
   js:
     # Primary: CDN
-    https://cdn.jsdelivr.net/npm/@helix/library@0.0.1/dist/helix.bundled.js:
+    https://cdn.jsdelivr.net/npm/@helixui/library@0.0.1/dist/helix.bundled.js:
       type: external
       preprocess: false
       attributes:
@@ -1420,7 +1420,7 @@ Create `test.html` in your theme:
     <hx-button variant="primary">Test Button</hx-button>
 
     <script type="module">
-      import 'https://cdn.jsdelivr.net/npm/@helix/library@0.0.1/dist/helix.bundled.js';
+      import 'https://cdn.jsdelivr.net/npm/@helixui/library@0.0.1/dist/helix.bundled.js';
     </script>
   </body>
 </html>

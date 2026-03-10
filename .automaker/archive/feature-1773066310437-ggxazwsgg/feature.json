@@ -1,0 +1,58 @@
+{
+  "category": "Uncategorized",
+  "description": "Launch readiness audit for hx-image. Checklist: (1) A11y — axe-core zero violations, alt text required, WCAG 2.1 AA. (2) Astro doc page — all 12 template sections. (3) Individual export — standalone HTML works. (4) `npm run verify` passes. Files: `packages/hx-library/src/components/hx-image/`, `apps/docs/src/content/docs/component-library/hx-image.md`",
+  "title": "LAUNCH READY: hx-image",
+  "status": "done",
+  "dependencies": [],
+  "complexity": "medium",
+  "priority": 3,
+  "source": "api",
+  "trustTier": 1,
+  "quarantineStatus": "passed",
+  "quarantineId": "ed5042bd-8785-4975-ab3d-258ae33cfc42",
+  "id": "feature-1773066310437-ggxazwsgg",
+  "branchName": "feature/launch-ready-hx-image",
+  "descriptionHistory": [
+    {
+      "description": "Launch readiness audit for hx-image. Checklist: (1) A11y — axe-core zero violations, alt text required, WCAG 2.1 AA. (2) Astro doc page — all 12 template sections. (3) Individual export — standalone HTML works. (4) `npm run verify` passes. Files: `packages/hx-library/src/components/hx-image/`, `apps/docs/src/content/docs/component-library/hx-image.md`",
+      "timestamp": "2026-03-09T14:25:10.437Z",
+      "source": "initial"
+    }
+  ],
+  "createdAt": "2026-03-09T14:25:10.437Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-03-09T14:25:10.437Z",
+      "reason": "Feature created"
+    },
+    {
+      "from": "backlog",
+      "to": "blocked",
+      "timestamp": "2026-03-10T16:46:44.004Z",
+      "reason": "git workflow failed — uncommitted work in worktree at /Volumes/Development/booked/helix/.worktrees/feature-launch-ready-hx-image: git workflow failed — uncommitted work in worktree at /Volumes/Development/booked/helix/.worktrees/feature-launch-ready-hx-image: Command failed: git add -A -- ':!.automaker/'\nThe following paths are ignored by one of your .gitignore files:\n.worktrees\nhint: Use -f if you really want to add them.\nhint: Disable this message with \"git config set advice.addIgnoredFile false\"\n | stderr: The following paths are ignored by one of your .gitignore files:\n.worktrees\nhint: Use -f if you really want to add them.\nhint: Disable this message with \"git config set advice.addIgnoredFile false\""
+    },
+    {
+      "from": "blocked",
+      "to": "done",
+      "timestamp": "2026-03-10T16:46:47.276Z"
+    }
+  ],
+  "featureType": "code",
+  "statusChangeReason": "git workflow failed — uncommitted work in worktree at /Volumes/Development/booked/helix/.worktrees/feature-launch-ready-hx-image: git workflow failed — uncommitted work in worktree at /Volumes/Development/booked/helix/.worktrees/feature-launch-ready-hx-image: Command failed: git add -A -- ':!.automaker/'\nThe following paths are ignored by one of your .gitignore files:\n.worktrees\nhint: Use -f if you really want to add them.\nhint: Disable this message with \"git config set advice.addIgnoredFile false\"\n | stderr: The following paths are ignored by one of your .gitignore files:\n.worktrees\nhint: Use -f if you really want to add them.\nhint: Disable this message with \"git config set advice.addIgnoredFile false\"",
+  "failureCount": 1,
+  "failureClassification": {
+    "category": "unknown",
+    "confidence": 0.5,
+    "recoveryStrategy": {
+      "type": "escalate_to_user",
+      "reason": "Unclassified failure - needs investigation: git workflow failed — uncommitted work in worktree at /Volumes/Development/booked/helix/.worktrees/feature-launch-ready-hx-image: git workflow failed — uncommitted work in worktree at /Volumes/Development/booked/helix/.worktrees/feature-launch-ready-hx-image: Command failed: git add -A -- ':!.automa"
+    },
+    "retryable": false,
+    "timestamp": "2026-03-10T16:46:44.010Z"
+  },
+  "prNumber": 569,
+  "prMergedAt": "2026-03-10T02:42:47Z",
+  "completedAt": "2026-03-10T16:46:47.276Z"
+}

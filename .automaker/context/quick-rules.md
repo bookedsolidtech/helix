@@ -10,7 +10,7 @@ If you need to verify exports, run `npm run generate:barrel` in the hx-library p
 ## Hard Constraints
 
 - No `any` types. No `!` assertions. TypeScript strict always.
-- No hardcoded colors/spacing/timing — use `@helix/tokens/lit` or `@helix/tokens`.
+- No hardcoded colors/spacing/timing — use `@helixui/tokens/lit` or `@helixui/tokens`.
 - Shadow DOM required. No `createRenderRoot()` returning `this`.
 - All CSS parts: `@csspart` JSDoc. All CSS props: `@cssprop` JSDoc. All events: `@fires` JSDoc.
 - CustomEvent dispatches: `bubbles: true, composed: true`.
@@ -22,7 +22,7 @@ If you need to verify exports, run `npm run generate:barrel` in the hx-library p
 ## Token Usage
 
 ```typescript
-import { colorPrimary, spacingMd } from '@helix/tokens/lit';
+import { colorPrimary, spacingMd } from '@helixui/tokens/lit';
 static styles = css`:host { color: ${colorPrimary}; padding: ${spacingMd}; }`;
 ```
 
