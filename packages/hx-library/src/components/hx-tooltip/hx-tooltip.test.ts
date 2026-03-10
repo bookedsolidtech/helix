@@ -300,7 +300,7 @@ describe('hx-tooltip', () => {
       );
       const wrapper = shadowQuery<HTMLElement>(el, '.trigger-wrapper')!;
       wrapper.dispatchEvent(new MouseEvent('mouseenter', { bubbles: true }));
-      // Allow the show-delay=0 timer to fire on the next tick
+      // Allow microtask queue to flush so the show-delay=0 timer fires and Lit reactive updates complete
       await new Promise<void>((resolve) => setTimeout(resolve, 0));
       await el.updateComplete;
       await page.screenshot();

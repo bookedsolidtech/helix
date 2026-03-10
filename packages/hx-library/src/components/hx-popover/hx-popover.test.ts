@@ -317,7 +317,7 @@ describe('hx-popover', () => {
       const body = shadowQuery(el, '[part="body"]');
       expect(body?.classList.contains('visible')).toBe(true);
 
-      // Wait for the deferred document listener to be attached
+      // Allow brief settle time for the deferred document click listener to be attached after open
       await new Promise((r) => setTimeout(r, 10));
 
       // Simulate click on an unrelated element outside the component
