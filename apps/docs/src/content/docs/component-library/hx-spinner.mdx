@@ -1,14 +1,369 @@
 ---
 title: 'hx-spinner'
-description: 'Animated loading spinner for indicating pending operations'
+description: 'Animated circular loading indicator for inline and overlay loading states with full WCAG 2.1 AA accessibility.'
 ---
 
 import ComponentLoader from '../../../components/ComponentLoader.astro';
+import ComponentDemo from '../../../components/ComponentDemo.astro';
 import ComponentDoc from '../../../components/ComponentDoc.astro';
 
 <ComponentLoader />
 
 <ComponentDoc tagName="hx-spinner" section="summary" />
+
+## Overview
+
+`hx-spinner` is a circular animated loading indicator designed for enterprise healthcare interfaces. It signals that an operation is in progress when the duration is unknown — for example, fetching patient records, submitting a prior authorization, or saving form data.
+
+The component announces its loading state to assistive technology users via `role="status"` and a customizable `aria-label`. When displayed alongside visible loading text, set `decorative` to suppress duplicate screen reader announcements.
+
+**Use `hx-spinner` when:** an operation of unknown duration is in progress and the UI needs to communicate "loading" without blocking user interaction.
+
+**Use `hx-progress-ring` instead when:** the percentage complete is known and should be communicated visually and to assistive technology.
+
+## Live Demo
+
+### Default
+
+<ComponentDemo title="Default Spinner">
+  <hx-spinner></hx-spinner>
+</ComponentDemo>
+
+### Size Variants
+
+<ComponentDemo title="Size Variants">
+  <div style="display: flex; gap: 1.5rem; align-items: center;">
+    <div style="display: flex; flex-direction: column; align-items: center; gap: 0.5rem;">
+      <hx-spinner size="sm" label="Loading small"></hx-spinner>
+      <span style="font-size: 0.75rem; color: #6b7280;">sm</span>
+    </div>
+    <div style="display: flex; flex-direction: column; align-items: center; gap: 0.5rem;">
+      <hx-spinner size="md" label="Loading medium"></hx-spinner>
+      <span style="font-size: 0.75rem; color: #6b7280;">md (default)</span>
+    </div>
+    <div style="display: flex; flex-direction: column; align-items: center; gap: 0.5rem;">
+      <hx-spinner size="lg" label="Loading large"></hx-spinner>
+      <span style="font-size: 0.75rem; color: #6b7280;">lg</span>
+    </div>
+  </div>
+</ComponentDemo>
+
+### Color Variants
+
+<ComponentDemo title="Color Variants">
+  <div style="display: flex; gap: 1.5rem; align-items: center; flex-wrap: wrap;">
+    <div style="display: flex; flex-direction: column; align-items: center; gap: 0.5rem;">
+      <hx-spinner variant="default" label="Loading"></hx-spinner>
+      <span style="font-size: 0.75rem; color: #6b7280;">default</span>
+    </div>
+    <div style="display: flex; flex-direction: column; align-items: center; gap: 0.5rem;">
+      <hx-spinner variant="primary" label="Loading"></hx-spinner>
+      <span style="font-size: 0.75rem; color: #6b7280;">primary</span>
+    </div>
+    <div style="background: #2563eb; padding: 0.75rem; border-radius: 0.375rem; display: flex; flex-direction: column; align-items: center; gap: 0.5rem;">
+      <hx-spinner variant="inverted" label="Loading"></hx-spinner>
+      <span style="font-size: 0.75rem; color: #fff;">inverted</span>
+    </div>
+  </div>
+</ComponentDemo>
+
+### Decorative (with visible loading text)
+
+<ComponentDemo title="Decorative Spinner">
+  <div style="display: flex; align-items: center; gap: 0.75rem; padding: 1rem; border: 1px solid #e5e7eb; border-radius: 0.5rem; max-width: 320px;">
+    <hx-spinner size="sm" variant="primary" decorative></hx-spinner>
+    <span style="color: #374151; font-size: 0.875rem;">Saving patient record...</span>
+  </div>
+</ComponentDemo>
+
+### Healthcare Example: Overlay Loading State
+
+<ComponentDemo title="Overlay Loading">
+  <div style="position: relative; width: 320px; height: 160px; border: 1px solid #e5e7eb; border-radius: 0.5rem; overflow: hidden;">
+    <div style="padding: 1.5rem; filter: blur(2px);">
+      <h3 style="margin: 0 0 0.5rem;">Patient Chart</h3>
+      <p style="margin: 0; color: #6b7280; font-size: 0.875rem;">Loading clinical data...</p>
+    </div>
+    <div style="position: absolute; inset: 0; background: rgba(255,255,255,0.8); display: flex; align-items: center; justify-content: center;">
+      <hx-spinner size="lg" variant="primary" label="Loading patient chart"></hx-spinner>
+    </div>
+  </div>
+</ComponentDemo>
+
+## Installation
+
+```bash
+# Full library
+npm install @helix/library
+
+# Or import only this component (tree-shaking friendly)
+import '@helix/library/components/hx-spinner';
+```
+
+## Basic Usage
+
+Minimal HTML snippet — no build tool required:
+
+```html
+<!-- Default loading spinner -->
+<hx-spinner></hx-spinner>
+
+<!-- Custom accessible label -->
+<hx-spinner label="Loading patient records"></hx-spinner>
+
+<!-- Decorative: suppress AT announcements when visible text is present -->
+<div style="display: flex; align-items: center; gap: 0.75rem;">
+  <hx-spinner size="sm" variant="primary" decorative></hx-spinner>
+  <span>Saving record...</span>
+</div>
+```
+
+Set properties via JavaScript for dynamic control:
+
+```javascript
+const spinner = document.querySelector('hx-spinner');
+
+// Change size at runtime
+spinner.size = 'lg';
+
+// Update the accessible label dynamically
+spinner.label = 'Fetching lab results';
+
+// Switch to decorative mode (e.g. when visible text is shown)
+spinner.decorative = true;
+```
+
+## Properties
+
+| Property     | Attribute    | Type                                   | Default     | Description                                                                                                                                                                               |
+| ------------ | ------------ | -------------------------------------- | ----------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `size`       | `size`       | `'sm' \| 'md' \| 'lg' \| string`       | `'md'`      | Size of the spinner. Use token values for standard sizing, or any valid CSS size string (e.g. `"3rem"`, `"48px"`) for custom sizes. Reflects to attribute.                                |
+| `variant`    | `variant`    | `'default' \| 'primary' \| 'inverted'` | `'default'` | Visual color variant. Use `inverted` on dark or colored backgrounds. Reflects to attribute.                                                                                               |
+| `label`      | `label`      | `string`                               | `'Loading'` | Accessible label announced to screen readers via `aria-label`. Reflects to attribute. An empty string suppresses `aria-label` (WCAG guard against empty names).                           |
+| `decorative` | `decorative` | `boolean`                              | `false`     | When true, sets `role="presentation"` and removes `aria-label`. Use when the spinner appears alongside visible loading text to prevent duplicate AT announcements. Reflects to attribute. |
+
+## Events
+
+`hx-spinner` is a display-only component. It does not dispatch any custom events.
+
+| Event    | Detail Type | Description       |
+| -------- | ----------- | ----------------- |
+| _(none)_ | —           | No custom events. |
+
+## CSS Custom Properties
+
+| Property                   | Default                                | Description                                         |
+| -------------------------- | -------------------------------------- | --------------------------------------------------- |
+| `--hx-spinner-color`       | `var(--hx-color-neutral-600, #475569)` | Spinner arc stroke color. Overridden per variant.   |
+| `--hx-spinner-track-color` | `var(--hx-color-neutral-200, #e2e8f0)` | Spinner track stroke color. Overridden per variant. |
+| `--hx-duration-spinner`    | `750ms`                                | Duration of the rotation animation.                 |
+
+Override at the semantic token level to theme all instances, or at the component level to style a single instance:
+
+```css
+/* Theme all spinners to a brand color */
+:root {
+  --hx-spinner-color: #0077b6;
+  --hx-spinner-track-color: #caf0f8;
+}
+
+/* Override a single instance inline */
+hx-spinner#my-spinner {
+  --hx-spinner-color: #059669;
+  --hx-spinner-track-color: #d1fae5;
+}
+```
+
+## CSS Parts
+
+| Part   | Description                                     |
+| ------ | ----------------------------------------------- |
+| `base` | The `<div>` container wrapping the SVG element. |
+
+Use CSS parts to style internals that CSS custom properties do not expose:
+
+```css
+hx-spinner::part(base) {
+  border-radius: 50%;
+  padding: 0.25rem;
+  background: rgba(0, 0, 0, 0.05);
+}
+```
+
+## Slots
+
+`hx-spinner` is a purely visual component and exposes no slots. All content is rendered internally via shadow DOM.
+
+| Slot     | Description |
+| -------- | ----------- |
+| _(none)_ | No slots.   |
+
+## Accessibility
+
+`hx-spinner` is built for WCAG 2.1 AA compliance in healthcare contexts where accurate loading state communication to assistive technology users is mandatory.
+
+| Topic           | Details                                                                                                                                                                                                                       |
+| --------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| ARIA role       | `role="status"` on the base container communicates an active loading state. When `decorative` is true, `role="presentation"` is used instead to suppress AT announcements entirely.                                           |
+| `aria-label`    | Set from the `label` property. Defaults to `"Loading"`. An empty `label` value suppresses `aria-label` to avoid WCAG failures caused by empty accessible names. Always provide a meaningful label describing what is loading. |
+| `aria-live`     | Implicit via `role="status"` — equivalent to `aria-live="polite"`. Screen readers announce the loading state without interrupting the user.                                                                                   |
+| SVG             | The inner `<svg>` has `aria-hidden="true"` and `focusable="false"`. The semantic meaning is carried by the container's ARIA attributes, not the SVG markup.                                                                   |
+| Decorative mode | When `decorative` is set, the spinner becomes presentational. Use this pattern whenever visible loading text is present in the same UI region to avoid duplicate announcements by screen readers.                             |
+| Focus           | `hx-spinner` is not interactive and does not receive keyboard focus.                                                                                                                                                          |
+| Reduced motion  | The rotation and dash animations are suppressed when `prefers-reduced-motion: reduce` is active. A static partial arc is displayed at full opacity to clearly communicate the in-progress state without motion.               |
+| WCAG            | Meets WCAG 2.1 AA. SC 4.1.2 (Name, Role, Value), SC 1.4.3 (Contrast), SC 2.3.3 (Animation from Interactions) satisfied. Zero axe-core violations across all size and variant combinations.                                    |
+
+### Accessible Label Best Practices
+
+Always provide a `label` that describes what is loading. Generic labels like "Loading" are acceptable for global states; context-specific labels provide a better experience:
+
+```html
+<!-- Preferred: context-specific label -->
+<hx-spinner label="Loading patient records"></hx-spinner>
+<hx-spinner label="Submitting prior authorization"></hx-spinner>
+<hx-spinner label="Saving medication schedule"></hx-spinner>
+
+<!-- Acceptable: generic label -->
+<hx-spinner label="Loading"></hx-spinner>
+
+<!-- Incorrect: empty label produces no accessible name -->
+<hx-spinner label=""></hx-spinner>
+```
+
+## Drupal Integration
+
+Use the component in a Twig template after registering the library. A pre-built Twig template is included at `packages/hx-library/src/components/hx-spinner/hx-spinner.twig`.
+
+```twig
+{# my-module/templates/my-template.html.twig #}
+
+{# Standalone — announces to screen readers #}
+<hx-spinner
+  size="{{ size|default('md') }}"
+  variant="{{ variant|default('default') }}"
+  label="{{ label|default('Loading') }}"
+></hx-spinner>
+
+{# Decorative — use when adjacent visible text describes the loading state #}
+<div style="display: flex; align-items: center; gap: 0.75rem;">
+  <hx-spinner
+    size="sm"
+    variant="primary"
+    decorative
+  ></hx-spinner>
+  <span>{{ loading_message|default('Loading...') }}</span>
+</div>
+```
+
+Load the library in your module's `.libraries.yml`:
+
+```yaml
+helix-components:
+  js:
+    /libraries/helix/helix.min.js: { minified: true }
+```
+
+Use `once()` to safely initialize spinner state in Drupal behaviors without duplicate bindings on AJAX:
+
+```javascript
+Drupal.behaviors.helixSpinner = {
+  attach(context) {
+    // once() is a Drupal core utility (no import needed) — prevents duplicate event binding during AJAX attach cycles
+    once('helixSpinner', '[data-hx-spinner-trigger]', context).forEach((trigger) => {
+      const spinnerId = trigger.dataset.hxSpinnerTrigger;
+      const spinner = document.getElementById(spinnerId);
+
+      trigger.addEventListener('click', () => {
+        if (spinner) {
+          spinner.label = `Loading ${trigger.dataset.loadingContext || 'data'}`;
+          spinner.removeAttribute('hidden');
+        }
+      });
+    });
+  },
+};
+```
+
+## Standalone HTML Example
+
+Copy-paste this into a `.html` file and open it in a browser — no build tool needed:
+
+```html
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>hx-spinner example</title>
+    <!-- @helix/library is a private package — install via npm workspace, not CDN -->
+    <!-- In your project: import '@helix/library'; in your bundler entry point -->
+  </head>
+  <body
+    style="font-family: sans-serif; padding: 2rem; display: flex; flex-direction: column; gap: 2rem;"
+  >
+    <!-- 1. Standalone spinner (announces to screen readers) -->
+    <section>
+      <h2>Fetching patient records</h2>
+      <hx-spinner
+        id="records-spinner"
+        size="md"
+        variant="primary"
+        label="Loading patient records"
+      ></hx-spinner>
+    </section>
+
+    <!-- 2. Spinner with visible loading text (decorative — no duplicate AT announcement) -->
+    <section>
+      <div
+        style="display: flex; align-items: center; gap: 0.75rem; padding: 1rem; border: 1px solid #e5e7eb; border-radius: 0.5rem; max-width: 320px;"
+      >
+        <hx-spinner id="save-spinner" size="sm" variant="primary" decorative></hx-spinner>
+        <span style="font-size: 0.875rem; color: #374151;">Saving medication schedule...</span>
+      </div>
+    </section>
+
+    <!-- 3. Overlay loading panel -->
+    <section
+      style="position: relative; width: 320px; height: 180px; border: 1px solid #e5e7eb; border-radius: 0.5rem; overflow: hidden;"
+    >
+      <div id="panel-content" style="padding: 1.5rem;">
+        <h3 style="margin: 0 0 0.5rem;">Lab Results</h3>
+        <p style="margin: 0; color: #6b7280; font-size: 0.875rem;">
+          HbA1c: 6.8% — Cholesterol: 185 mg/dL
+        </p>
+      </div>
+      <div
+        id="panel-overlay"
+        hidden
+        style="position: absolute; inset: 0; background: rgba(255,255,255,0.85); display: flex; align-items: center; justify-content: center;"
+      >
+        <hx-spinner size="lg" variant="primary" label="Refreshing lab results"></hx-spinner>
+      </div>
+    </section>
+
+    <button id="refresh-btn" style="width: fit-content; padding: 0.5rem 1.5rem; cursor: pointer;">
+      Refresh Lab Results
+    </button>
+
+    <script>
+      const overlay = document.getElementById('panel-overlay');
+      const refreshBtn = document.getElementById('refresh-btn');
+
+      refreshBtn.addEventListener('click', () => {
+        // Show overlay spinner
+        overlay.removeAttribute('hidden');
+        refreshBtn.disabled = true;
+
+        // Simulate an async data fetch (2 seconds)
+        setTimeout(() => {
+          overlay.setAttribute('hidden', '');
+          refreshBtn.disabled = false;
+        }, 2000);
+      });
+    </script>
+  </body>
+</html>
+```
 
 ## API Reference
 
