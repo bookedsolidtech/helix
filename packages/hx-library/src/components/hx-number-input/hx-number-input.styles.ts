@@ -38,7 +38,7 @@ export const helixNumberInputStyles = css`
   }
 
   .field__required-marker {
-    color: var(--hx-number-input-error-color, var(--hx-color-error-500));
+    color: var(--hx-number-input-error-color, var(--hx-color-error-text, #b91c1c));
     font-weight: var(--hx-font-weight-bold);
   }
 
@@ -71,15 +71,15 @@ export const helixNumberInputStyles = css`
   /* ─── Error State ─── */
 
   .field--error .field__input-wrapper {
-    border-color: var(--hx-number-input-error-color, var(--hx-color-error-500));
+    border-color: var(--hx-number-input-error-color, var(--hx-color-error-500, #dc2626));
   }
 
   .field--error .field__input-wrapper:focus-within {
-    border-color: var(--hx-number-input-error-color, var(--hx-color-error-500));
+    border-color: var(--hx-number-input-error-color, var(--hx-color-error-500, #dc2626));
     box-shadow: 0 0 0 var(--hx-focus-ring-width)
       color-mix(
         in srgb,
-        var(--hx-number-input-error-color, var(--hx-color-error-500))
+        var(--hx-number-input-error-color, var(--hx-color-error-500, #dc2626))
           calc(var(--hx-focus-ring-opacity) * 100%),
         transparent
       );
@@ -225,7 +225,7 @@ export const helixNumberInputStyles = css`
 
   .field__error {
     font-size: var(--hx-font-size-xs);
-    color: var(--hx-number-input-error-color, var(--hx-color-error-500));
+    color: var(--hx-number-input-error-color, var(--hx-color-error-text, #b91c1c));
     line-height: var(--hx-line-height-normal);
   }
 
