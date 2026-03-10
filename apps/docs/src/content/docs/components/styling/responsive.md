@@ -29,16 +29,16 @@ Traditional responsive design relies on viewport-based media queries, assuming c
 
 ```html
 <!-- Page A: Full-width hero -->
-<wc-card class="hero">
+<hx-card class="hero">
   <!-- Component sees 1440px viewport, renders large variant -->
-</wc-card>
+</hx-card>
 
 <!-- Page B: Sidebar widget -->
 <aside style="width: 300px;">
-  <wc-card class="widget">
+  <hx-card class="widget">
     <!-- PROBLEM: Component still sees 1440px viewport, renders large variant -->
     <!-- But card is only 300px wide — layout breaks -->
-  </wc-card>
+  </hx-card>
 </aside>
 ```
 
@@ -78,7 +78,7 @@ Container queries require two steps:
 ### Basic Container Query Pattern
 
 ```typescript
-// wc-card.styles.ts
+// hx-card.styles.ts
 import { css } from 'lit';
 
 export const cardStyles = css`
@@ -91,16 +91,16 @@ export const cardStyles = css`
   .card {
     display: flex;
     flex-direction: column;
-    gap: var(--wc-space-4, 1rem);
-    padding: var(--wc-card-padding, var(--wc-space-6, 1.5rem));
-    background: var(--wc-card-bg, var(--wc-color-neutral-0, #ffffff));
+    gap: var(--hx-space-4, 1rem);
+    padding: var(--hx-card-padding, var(--hx-space-6, 1.5rem));
+    background: var(--hx-card-bg, var(--hx-color-neutral-0, #ffffff));
   }
 
   /* Container query: When card is 600px or wider */
   @container (min-width: 600px) {
     .card {
       flex-direction: row; /* Switch to horizontal layout */
-      gap: var(--wc-space-6, 1.5rem);
+      gap: var(--hx-space-6, 1.5rem);
     }
 
     .card__content {
@@ -116,11 +116,11 @@ export const cardStyles = css`
   /* Container query: When card is 900px or wider */
   @container (min-width: 900px) {
     .card {
-      gap: var(--wc-space-8, 2rem);
+      gap: var(--hx-space-8, 2rem);
     }
 
     .card__heading {
-      font-size: var(--wc-font-size-2xl, 1.5rem);
+      font-size: var(--hx-font-size-2xl, 1.5rem);
     }
   }
 `;
@@ -273,16 +273,16 @@ Container queries provide new length units based on container dimensions:
 wc-2026 components use container queries for all layout-level responsiveness:
 
 ```typescript
-// wc-card.ts
+// hx-card.ts
 import { LitElement, html } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
-import { wcCardStyles } from './wc-card.styles.js';
+import { wcCardStyles } from './hx-card.styles.js';
 
 /**
  * A flexible card component with intrinsic responsive layout.
  *
- * @cssprop [--wc-card-bg=var(--wc-color-neutral-0)] - Card background color.
- * @cssprop [--wc-card-padding=var(--wc-space-6)] - Card padding.
+ * @cssprop [--hx-card-bg=var(--hx-color-neutral-0)] - Card background color.
+ * @cssprop [--hx-card-padding=var(--hx-space-6)] - Card padding.
  *
  * @csspart card - The card container element.
  *
@@ -291,8 +291,8 @@ import { wcCardStyles } from './wc-card.styles.js';
  * @slot heading - Card heading.
  * @slot actions - Card action buttons (footer).
  */
-@customElement('wc-card')
-export class WcCard extends LitElement {
+@customElement('hx-card')
+export class HxCard extends LitElement {
   static styles = wcCardStyles;
 
   @property({ reflect: true })
@@ -326,7 +326,7 @@ export class WcCard extends LitElement {
 ```
 
 ```typescript
-// wc-card.styles.ts
+// hx-card.styles.ts
 import { css } from 'lit';
 
 export const wcCardStyles = css`
@@ -339,17 +339,17 @@ export const wcCardStyles = css`
   .card {
     display: flex;
     flex-direction: column;
-    gap: var(--wc-space-4, 1rem);
-    padding: var(--wc-card-padding, var(--wc-space-6, 1.5rem));
-    background: var(--wc-card-bg, var(--wc-color-neutral-0, #ffffff));
-    border: var(--wc-border-width-thin, 1px) solid
-      var(--wc-card-border-color, var(--wc-color-neutral-200, #dee2e6));
-    border-radius: var(--wc-card-border-radius, var(--wc-border-radius-lg, 0.5rem));
+    gap: var(--hx-space-4, 1rem);
+    padding: var(--hx-card-padding, var(--hx-space-6, 1.5rem));
+    background: var(--hx-card-bg, var(--hx-color-neutral-0, #ffffff));
+    border: var(--hx-border-width-thin, 1px) solid
+      var(--hx-card-border-color, var(--hx-color-neutral-200, #dee2e6));
+    border-radius: var(--hx-card-border-radius, var(--hx-border-radius-lg, 0.5rem));
   }
 
   .card__image {
     overflow: hidden;
-    border-radius: var(--wc-border-radius-md, 0.375rem);
+    border-radius: var(--hx-border-radius-md, 0.375rem);
   }
 
   .card__image ::slotted(img) {
@@ -359,26 +359,26 @@ export const wcCardStyles = css`
   }
 
   .card__heading {
-    font-size: var(--wc-font-size-xl, 1.25rem);
-    font-weight: var(--wc-font-weight-semibold, 600);
-    line-height: var(--wc-line-height-tight, 1.25);
-    margin-bottom: var(--wc-space-2, 0.5rem);
+    font-size: var(--hx-font-size-xl, 1.25rem);
+    font-weight: var(--hx-font-weight-semibold, 600);
+    line-height: var(--hx-line-height-tight, 1.25);
+    margin-bottom: var(--hx-space-2, 0.5rem);
   }
 
   .card__body {
     flex: 1;
-    font-size: var(--wc-font-size-md, 1rem);
-    line-height: var(--wc-line-height-normal, 1.5);
-    color: var(--wc-color-neutral-600, #495057);
+    font-size: var(--hx-font-size-md, 1rem);
+    line-height: var(--hx-line-height-normal, 1.5);
+    color: var(--hx-color-neutral-600, #495057);
   }
 
   .card__actions {
     display: flex;
-    gap: var(--wc-space-2, 0.5rem);
-    padding-top: var(--wc-space-4, 1rem);
-    border-top: var(--wc-border-width-thin, 1px) solid
-      var(--wc-card-border-color, var(--wc-color-neutral-200, #dee2e6));
-    margin-top: var(--wc-space-4, 1rem);
+    gap: var(--hx-space-2, 0.5rem);
+    padding-top: var(--hx-space-4, 1rem);
+    border-top: var(--hx-border-width-thin, 1px) solid
+      var(--hx-card-border-color, var(--hx-color-neutral-200, #dee2e6));
+    margin-top: var(--hx-space-4, 1rem);
   }
 
   /* ─── RESPONSIVE: Horizontal layout at 600px+ ─── */
@@ -399,12 +399,12 @@ export const wcCardStyles = css`
 
     .card__actions {
       border-top: none;
-      border-left: var(--wc-border-width-thin, 1px) solid
-        var(--wc-card-border-color, var(--wc-color-neutral-200, #dee2e6));
-      padding-left: var(--wc-space-4, 1rem);
+      border-left: var(--hx-border-width-thin, 1px) solid
+        var(--hx-card-border-color, var(--hx-color-neutral-200, #dee2e6));
+      padding-left: var(--hx-space-4, 1rem);
       padding-top: 0;
       margin-top: 0;
-      margin-left: var(--wc-space-4, 1rem);
+      margin-left: var(--hx-space-4, 1rem);
       flex-direction: column;
     }
   }
@@ -412,16 +412,16 @@ export const wcCardStyles = css`
   /* ─── RESPONSIVE: Larger spacing at 900px+ ─── */
   @container card (min-width: 900px) {
     .card {
-      gap: var(--wc-space-8, 2rem);
-      padding: var(--wc-space-8, 2rem);
+      gap: var(--hx-space-8, 2rem);
+      padding: var(--hx-space-8, 2rem);
     }
 
     .card__heading {
-      font-size: var(--wc-font-size-2xl, 1.5rem);
+      font-size: var(--hx-font-size-2xl, 1.5rem);
     }
 
     .card__body {
-      font-size: var(--wc-font-size-lg, 1.125rem);
+      font-size: var(--hx-font-size-lg, 1.125rem);
     }
   }
 `;
@@ -432,23 +432,23 @@ export const wcCardStyles = css`
 ```html
 <!-- Narrow sidebar (300px) — vertical layout -->
 <aside style="width: 300px;">
-  <wc-card>
+  <hx-card>
     <img slot="image" src="thumb.jpg" alt="Thumbnail" />
     <h3 slot="heading">Recent Article</h3>
     <p>Lorem ipsum dolor sit amet...</p>
-  </wc-card>
+  </hx-card>
 </aside>
 
 <!-- Content area (800px) — horizontal layout -->
 <main style="max-width: 800px;">
-  <wc-card>
+  <hx-card>
     <img slot="image" src="featured.jpg" alt="Featured image" />
     <h3 slot="heading">Featured Post</h3>
     <p>Consectetur adipiscing elit...</p>
     <div slot="actions">
-      <wc-button>Read More</wc-button>
+      <hx-button>Read More</hx-button>
     </div>
-  </wc-card>
+  </hx-card>
 </main>
 ```
 
@@ -551,8 +551,8 @@ Media queries are appropriate for:
 ```css
 @media (prefers-color-scheme: dark) {
   :host {
-    --_bg: var(--wc-color-neutral-900, #1a1a1a);
-    --_color: var(--wc-color-neutral-0, #ffffff);
+    --_bg: var(--hx-color-neutral-900, #1a1a1a);
+    --_color: var(--hx-color-neutral-0, #ffffff);
   }
 }
 ```
@@ -579,7 +579,7 @@ You can combine both for nuanced responsive behavior:
 
 /* Mobile-first base styles */
 .card {
-  padding: var(--wc-space-4, 1rem);
+  padding: var(--hx-space-4, 1rem);
 }
 
 /* Container-based layout (intrinsic responsiveness) */
@@ -593,7 +593,7 @@ You can combine both for nuanced responsive behavior:
 /* Viewport-based spacing (global adjustment) */
 @media (min-width: 1024px) {
   .card {
-    padding: var(--wc-space-6, 1.5rem);
+    padding: var(--hx-space-6, 1.5rem);
   }
 }
 
@@ -624,7 +624,7 @@ For cases where CSS alone cannot solve responsive challenges, the ResizeObserver
 import { LitElement, html, css } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 
-@customElement('wc-responsive-grid')
+@customElement('hx-responsive-grid')
 export class WcResponsiveGrid extends LitElement {
   static styles = css`
     :host {
@@ -633,7 +633,7 @@ export class WcResponsiveGrid extends LitElement {
 
     .grid {
       display: grid;
-      gap: var(--wc-space-4, 1rem);
+      gap: var(--hx-space-4, 1rem);
     }
 
     .grid--small {
@@ -953,12 +953,12 @@ Use `clamp()` with container query units for proportional scaling:
 .heading {
   /* Minimum 1.25rem, scales with container, max 2.5rem */
   font-size: clamp(1.25rem, 5cqi, 2.5rem);
-  line-height: var(--wc-line-height-tight, 1.25);
+  line-height: var(--hx-line-height-tight, 1.25);
 }
 
 .body {
   font-size: clamp(0.875rem, 3cqi, 1.125rem);
-  line-height: var(--wc-line-height-normal, 1.5);
+  line-height: var(--hx-line-height-normal, 1.5);
 }
 ```
 
@@ -996,7 +996,7 @@ Allow flex items to wrap based on container width:
 .card__actions {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--wc-space-2, 0.5rem);
+  gap: var(--hx-space-2, 0.5rem);
 }
 
 /* Stack vertically in narrow containers */
@@ -1005,7 +1005,7 @@ Allow flex items to wrap based on container width:
     flex-direction: column;
   }
 
-  .card__actions ::slotted(wc-button) {
+  .card__actions ::slotted(hx-button) {
     width: 100%;
   }
 }
@@ -1020,7 +1020,7 @@ Use `auto-fit` for responsive grid columns without media queries:
   display: grid;
   /* Auto-fill columns at minimum 200px width */
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: var(--wc-space-4, 1rem);
+  gap: var(--hx-space-4, 1rem);
 }
 
 .card {
@@ -1083,18 +1083,18 @@ Scale padding with container size using `cqi` units:
 
 ```css
 .card {
-  padding: var(--wc-space-4, 1rem);
+  padding: var(--hx-space-4, 1rem);
 }
 
 @container (min-width: 600px) {
   .card {
-    padding: var(--wc-space-6, 1.5rem);
+    padding: var(--hx-space-6, 1.5rem);
   }
 }
 
 @container (min-width: 900px) {
   .card {
-    padding: var(--wc-space-8, 2rem);
+    padding: var(--hx-space-8, 2rem);
   }
 }
 ```
@@ -1137,34 +1137,34 @@ Test components at multiple container widths, not just viewport sizes:
 <div style="display: grid; gap: 2rem; margin: 2rem;">
   <!-- 300px (sidebar) -->
   <div style="width: 300px; border: 1px solid red;">
-    <wc-card>
+    <hx-card>
       <h3 slot="heading">300px Container</h3>
       <p>Content here...</p>
-    </wc-card>
+    </hx-card>
   </div>
 
   <!-- 600px (tablet) -->
   <div style="width: 600px; border: 1px solid orange;">
-    <wc-card>
+    <hx-card>
       <h3 slot="heading">600px Container</h3>
       <p>Content here...</p>
-    </wc-card>
+    </hx-card>
   </div>
 
   <!-- 900px (desktop) -->
   <div style="width: 900px; border: 1px solid green;">
-    <wc-card>
+    <hx-card>
       <h3 slot="heading">900px Container</h3>
       <p>Content here...</p>
-    </wc-card>
+    </hx-card>
   </div>
 
   <!-- 1200px (wide) -->
   <div style="width: 1200px; border: 1px solid blue;">
-    <wc-card>
+    <hx-card>
       <h3 slot="heading">1200px Container</h3>
       <p>Content here...</p>
-    </wc-card>
+    </hx-card>
   </div>
 </div>
 ```
@@ -1174,7 +1174,7 @@ Test components at multiple container widths, not just viewport sizes:
 Test responsive behavior at specific container widths:
 
 ```typescript
-// wc-card.test.ts
+// hx-card.test.ts
 import { test, expect } from '@playwright/test';
 
 test('card switches to horizontal layout at 600px', async ({ page }) => {
@@ -1183,15 +1183,15 @@ test('card switches to horizontal layout at 600px', async ({ page }) => {
       .container { width: 700px; }
     </style>
     <div class="container">
-      <wc-card>
+      <hx-card>
         <img slot="image" src="test.jpg" alt="Test" />
         <h3 slot="heading">Test Card</h3>
         <p>Content</p>
-      </wc-card>
+      </hx-card>
     </div>
   `);
 
-  const card = page.locator('wc-card');
+  const card = page.locator('hx-card');
   const shadowCard = card.locator('.card');
 
   // Check flex-direction changes at breakpoint
@@ -1206,15 +1206,15 @@ test('card uses vertical layout below 600px', async ({ page }) => {
       .container { width: 400px; }
     </style>
     <div class="container">
-      <wc-card>
+      <hx-card>
         <img slot="image" src="test.jpg" alt="Test" />
         <h3 slot="heading">Test Card</h3>
         <p>Content</p>
-      </wc-card>
+      </hx-card>
     </div>
   `);
 
-  const card = page.locator('wc-card');
+  const card = page.locator('hx-card');
   const shadowCard = card.locator('.card');
 
   const flexDirection = await shadowCard.evaluate((el) => getComputedStyle(el).flexDirection);
@@ -1231,15 +1231,15 @@ Capture screenshots at multiple container widths:
 // e2e/vrt.spec.ts
 import { test } from '@playwright/test';
 
-test('wc-card responsive layouts', async ({ page }) => {
-  await page.goto('/components/wc-card');
+test('hx-card responsive layouts', async ({ page }) => {
+  await page.goto('/components/hx-card');
 
   const widths = [300, 600, 900, 1200];
 
   for (const width of widths) {
     await page.setViewportSize({ width, height: 800 });
     await page.screenshot({
-      path: `screenshots/wc-card-${width}px.png`,
+      path: `screenshots/hx-card-${width}px.png`,
       fullPage: true,
     });
   }
@@ -1256,8 +1256,8 @@ Ensure focus rings remain visible at all container sizes:
 
 ```css
 .button:focus-visible {
-  outline: var(--wc-focus-ring-width, 2px) solid var(--wc-focus-ring-color, #2563eb);
-  outline-offset: var(--wc-focus-ring-offset, 2px);
+  outline: var(--hx-focus-ring-width, 2px) solid var(--hx-focus-ring-color, #2563eb);
+  outline-offset: var(--hx-focus-ring-offset, 2px);
 }
 
 /* Maintain focus visibility even in compact mode */
@@ -1276,14 +1276,14 @@ Maintain WCAG 2.1 minimum touch target size (44x44px):
 .button {
   min-height: 44px;
   min-width: 44px;
-  padding: var(--wc-space-2, 0.5rem) var(--wc-space-4, 1rem);
+  padding: var(--hx-space-2, 0.5rem) var(--hx-space-4, 1rem);
 }
 
 /* Larger touch targets on mobile */
 @media (pointer: coarse) {
   .button {
     min-height: 48px;
-    padding: var(--wc-space-3, 0.75rem) var(--wc-space-5, 1.25rem);
+    padding: var(--hx-space-3, 0.75rem) var(--hx-space-5, 1.25rem);
   }
 }
 ```
@@ -1296,7 +1296,7 @@ Ensure text remains readable at all container sizes:
 .card__body {
   /* Never smaller than 0.875rem (14px) */
   font-size: clamp(0.875rem, 3cqi, 1.125rem);
-  line-height: var(--wc-line-height-normal, 1.5); /* Maintain readability */
+  line-height: var(--hx-line-height-normal, 1.5); /* Maintain readability */
 }
 ```
 
@@ -1307,8 +1307,8 @@ Respect `prefers-reduced-motion` for all responsive transitions:
 ```css
 .card {
   transition:
-    flex-direction var(--wc-transition-normal, 250ms ease),
-    padding var(--wc-transition-normal, 250ms ease);
+    flex-direction var(--hx-transition-normal, 250ms ease),
+    padding var(--hx-transition-normal, 250ms ease);
 }
 
 @media (prefers-reduced-motion: reduce) {

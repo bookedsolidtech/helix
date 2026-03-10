@@ -1,4 +1,4 @@
-import { LitElement, html, nothing } from 'lit';
+import { LitElement, TemplateResult, html, nothing } from 'lit';
 import { customElement, property, query, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
@@ -6,6 +6,9 @@ import { live } from 'lit/directives/live.js';
 import { styleMap } from 'lit/directives/style-map.js';
 import { tokenStyles } from '@helix/tokens/lit';
 import { helixSliderStyles } from './hx-slider.styles.js';
+
+// Module-level counter for stable, SSR-safe IDs (avoids Math.random() hydration mismatch)
+let _hxSliderIdCounter = 0;
 
 /**
  * A range slider component for selecting a numeric value within a min/max boundary.
@@ -23,7 +26,7 @@ import { helixSliderStyles } from './hx-slider.styles.js';
  * @tag hx-slider
  *
  * @slot label - Custom label content (overrides the label property).
- * @slot help - Custom help text content (overrides the helpText property).
+ * @slot help-text - Custom help text content (overrides the helpText property).
  * @slot min-label - Label rendered at the minimum end of the slider.
  * @slot max-label - Label rendered at the maximum end of the slider.
  *
@@ -47,6 +50,8 @@ import { helixSliderStyles } from './hx-slider.styles.js';
  * @cssprop [--hx-slider-label-color=var(--hx-color-neutral-700)] - Label text color.
  * @cssprop [--hx-slider-value-color=var(--hx-color-neutral-600)] - Value display text color.
  * @cssprop [--hx-slider-tick-color=var(--hx-color-neutral-400)] - Tick mark color.
+ * @cssprop [--hx-slider-range-label-color=var(--hx-color-neutral-500)] - Range label text color.
+ * @cssprop [--hx-slider-help-text-color=var(--hx-color-neutral-500)] - Help text color.
  */
 @customElement('hx-slider')
 export class HelixSlider extends LitElement {
@@ -144,6 +149,14 @@ export class HelixSlider extends LitElement {
   @property({ type: String, reflect: true, attribute: 'hx-size' })
   size: 'sm' | 'md' | 'lg' = 'md';
 
+  /**
+   * Human-readable text alternative for the current value, announced by screen readers
+   * instead of the numeric value. For example, on a pain scale: "7 — Moderate-Severe".
+   * @attr aria-valuetext
+   */
+  @property({ type: String, attribute: 'aria-valuetext' })
+  valueText = '';
+
   // ─── Internal State ───
 
   /** Whether the label slot has assigned content. */
@@ -164,7 +177,7 @@ export class HelixSlider extends LitElement {
   // ─── Unique IDs ───
 
   /** Unique ID for the native range input element. */
-  private readonly _sliderId = `hx-slider-${Math.random().toString(36).slice(2, 9)}`;
+  private readonly _sliderId = `hx-slider-${++_hxSliderIdCounter}`;
   /** Unique ID for the label element, derived from _sliderId. */
   private readonly _labelId = `${this._sliderId}-label`;
   /** Unique ID for the help text element, derived from _sliderId. */
@@ -172,14 +185,15 @@ export class HelixSlider extends LitElement {
 
   // ─── Computed Values ───
 
-  private _fillPercent(): number {
-    const range = this.max - this.min;
-    if (range === 0) return 0;
-    return ((this.value - this.min) / range) * 100;
+  private _clamp(v: number): number {
+    return Math.min(Math.max(v, this.min), this.max);
   }
 
-  private _thumbPercent(): number {
-    return this._fillPercent();
+  private _fillPercent(): number {
+    const clamped = this._clamp(this.value);
+    const range = this.max - this.min;
+    if (range === 0) return 0;
+    return ((clamped - this.min) / range) * 100;
   }
 
   private _ticks(): number[] {
@@ -198,8 +212,28 @@ export class HelixSlider extends LitElement {
 
   override updated(changedProperties: Map<string, unknown>): void {
     super.updated(changedProperties);
-    if (changedProperties.has('value') || changedProperties.has('name')) {
+    // Clamp value to [min, max] after any relevant property change
+    if (
+      changedProperties.has('value') ||
+      changedProperties.has('min') ||
+      changedProperties.has('max')
+    ) {
+      const clamped = this._clamp(this.value);
+      if (clamped !== this.value) {
+        this.value = clamped;
+        return;
+      }
       this._internals.setFormValue(String(this.value));
+    } else if (changedProperties.has('name')) {
+      this._internals.setFormValue(String(this.value));
+    }
+    // Reflect aria-disabled on host for AT traversal
+    if (changedProperties.has('disabled')) {
+      if (this.disabled) {
+        this.setAttribute('aria-disabled', 'true');
+      } else {
+        this.removeAttribute('aria-disabled');
+      }
     }
   }
 
@@ -230,17 +264,24 @@ export class HelixSlider extends LitElement {
     return this._internals.reportValidity();
   }
 
-  /** Called by the form when it resets. */
+  /** Called by the form when it resets. Restores to the declared `value` attribute (default value). */
   formResetCallback(): void {
-    this.value = this.min;
-    this._internals.setFormValue(String(this.min));
+    const attrValue = this.getAttribute('value');
+    const defaultValue = attrValue !== null ? parseFloat(attrValue) : this.min;
+    const resetTo = this._clamp(!isNaN(defaultValue) ? defaultValue : this.min);
+    this.value = resetTo;
+    this._internals.setFormValue(String(resetTo));
   }
 
-  /** Called when the form restores state (e.g., back/forward navigation). */
-  formStateRestoreCallback(state: string): void {
+  /**
+   * Called when the form restores state (e.g., back/forward navigation or autofill).
+   * @param state - The serialized value to restore.
+   * @param _reason - Either "restore" (back/forward) or "autocomplete".
+   */
+  formStateRestoreCallback(state: string, _reason: string): void {
     const parsed = parseFloat(state);
     if (!isNaN(parsed)) {
-      this.value = parsed;
+      this.value = this._clamp(parsed);
     }
   }
 
@@ -315,9 +356,8 @@ export class HelixSlider extends LitElement {
 
   // ─── Render ───
 
-  override render() {
+  override render(): TemplateResult {
     const fillPct = this._fillPercent();
-    const thumbPct = this._thumbPercent();
     const ticks = this._ticks();
     const hasLabel = !!this.label || this._hasLabelSlot;
     const showRangeLabels = this._hasMinLabelSlot || this._hasMaxLabelSlot;
@@ -337,19 +377,16 @@ export class HelixSlider extends LitElement {
       <div part="slider" class=${classMap(containerClasses)}>
         <!-- Label row -->
         <div class="slider__label-row">
-          <slot name="label" @slotchange=${this._handleLabelSlotChange}>
-            ${this.label
-              ? html`<label
-                  part="label"
-                  class="slider__label"
-                  id=${this._labelId}
-                  for=${this._sliderId}
-                >
-                  ${this.label}
-                </label>`
-              : nothing}
-          </slot>
-
+          ${hasLabel
+            ? html`<label
+                part="label"
+                class="slider__label"
+                id=${this._labelId}
+                for=${this._sliderId}
+              >
+                <slot name="label" @slotchange=${this._handleLabelSlotChange}>${this.label}</slot>
+              </label>`
+            : html`<slot name="label" @slotchange=${this._handleLabelSlotChange}></slot>`}
           ${this.showValue
             ? html`<span part="value-display" class="slider__value-display"> ${this.value} </span>`
             : nothing}
@@ -370,22 +407,18 @@ export class HelixSlider extends LitElement {
               step=${this.step}
               ?disabled=${this.disabled}
               name=${ifDefined(this.name || undefined)}
-              role="slider"
-              aria-valuemin=${this.min}
-              aria-valuemax=${this.max}
-              aria-valuenow=${this.value}
-              aria-label=${ifDefined(!hasLabel ? this.label || undefined : undefined)}
               aria-labelledby=${ifDefined(hasLabel ? this._labelId : undefined)}
+              aria-valuetext=${ifDefined(this.valueText || undefined)}
               aria-describedby=${ifDefined(describedBy)}
               @input=${this._handleInput}
               @change=${this._handleChange}
             />
 
-            <!-- Visual thumb positioned by fill percentage -->
+            <!-- Visual thumb positioned by fill percentage (--fill-pct drives CSS calc) -->
             <span
               part="thumb"
               class="slider__thumb-visual"
-              style=${styleMap({ left: `${thumbPct}%` })}
+              style=${styleMap({ '--fill-pct': String(fillPct) })}
               aria-hidden="true"
             ></span>
           </div>
@@ -418,7 +451,7 @@ export class HelixSlider extends LitElement {
             `}
 
         <!-- Help text -->
-        <slot name="help" @slotchange=${this._handleHelpSlotChange}>
+        <slot name="help-text" @slotchange=${this._handleHelpSlotChange}>
           ${this.helpText
             ? html`<div part="help-text" class="slider__help-text" id=${this._helpId}>
                 ${this.helpText}

@@ -28,6 +28,10 @@ export const helixSpinnerStyles = css`
 
   .spinner__arc {
     stroke: var(--_spinner-color);
+    /* SVG arc math: viewBox is 24×24, r=10, circumference = 2π × 10 ≈ 62.83.
+       stroke-dasharray: 56 creates a visible arc of ~89% of circumference.
+       stroke-dashoffset: 14 shifts the arc start to produce the ~75% visible gap aesthetic.
+       Adjust both proportionally if r or viewBox dimensions change. */
     stroke-dasharray: 56;
     stroke-dashoffset: 14;
     animation: hx-spinner-dash 1.5s ease-in-out infinite;
@@ -59,8 +63,11 @@ export const helixSpinnerStyles = css`
 
     .spinner__arc {
       animation: none;
+      /* Maintain the static partial arc at full opacity so the loading state remains
+         clearly communicated without motion. A faded arc looks broken; full opacity
+         alongside the track ring unambiguously signals "in progress". */
       stroke-dashoffset: 14;
-      opacity: var(--hx-opacity-muted, 0.6);
+      opacity: 1;
     }
   }
 
@@ -92,23 +99,20 @@ export const helixSpinnerStyles = css`
 
   :host([variant='inverted']) {
     --_spinner-color: var(--hx-spinner-color, var(--hx-color-neutral-0, #ffffff));
+    /* Fallback for browsers without color-mix() support (Chrome < 111, Firefox < 113, Safari < 16.2).
+       rgba(255, 255, 255, 0.3) approximates the intended 30% white track color. */
     --_spinner-track-color: var(
       --hx-spinner-track-color,
-      color-mix(in srgb, var(--hx-color-neutral-0, #ffffff) 30%, transparent)
+      var(--hx-overlay-white-30, rgba(255, 255, 255, 0.3))
     );
   }
 
-  /* ─── Visually-hidden text for screen readers ─── */
-
-  .spinner__sr-text {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    padding: 0;
-    margin: -1px;
-    overflow: hidden;
-    clip: rect(0, 0, 0, 0);
-    white-space: nowrap;
-    border: 0;
+  @supports (color: color-mix(in srgb, white 30%, transparent)) {
+    :host([variant='inverted']) {
+      --_spinner-track-color: var(
+        --hx-spinner-track-color,
+        color-mix(in srgb, var(--hx-color-neutral-0, #ffffff) 30%, transparent)
+      );
+    }
   }
 `;

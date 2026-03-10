@@ -1,9 +1,12 @@
-import { LitElement, html, nothing } from 'lit';
+import { LitElement, html } from 'lit';
 import { customElement, property, state, query } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { tokenStyles } from '@helix/tokens/lit';
 import { helixSplitButtonStyles } from './hx-split-button.styles.js';
 import type { HelixMenuItem } from '../hx-menu/hx-menu-item.js';
+
+// Module-level counter for stable, SSR-safe IDs (avoids Math.random() hydration mismatch)
+let _hxSplitButtonIdCounter = 0;
 
 /**
  * A split button combining a primary action button with an attached dropdown
@@ -26,6 +29,7 @@ import type { HelixMenuItem } from '../hx-menu/hx-menu-item.js';
  * @csspart trigger - The dropdown trigger button element.
  * @csspart menu - The dropdown menu panel.
  *
+ * @cssprop [--hx-split-button-menu-max-height=18rem] - Maximum height of the dropdown menu panel before scrolling.
  * @cssprop [--hx-split-button-bg=var(--hx-color-primary-500)] - Background color for both buttons.
  * @cssprop [--hx-split-button-color=var(--hx-color-neutral-0)] - Text/icon color for both buttons.
  * @cssprop [--hx-split-button-border-color=transparent] - Border color.
@@ -50,9 +54,6 @@ export class HelixSplitButton extends LitElement {
 
   @query('.split-button__trigger')
   private _triggerButton!: HTMLButtonElement;
-
-  @query('.split-button__primary')
-  private _primaryButton!: HTMLButtonElement;
 
   // ─── Internal State ───
 
@@ -89,9 +90,23 @@ export class HelixSplitButton extends LitElement {
   @property({ type: String })
   label: string | undefined = undefined;
 
+  /**
+   * Accessible label for the dropdown trigger button. Override for localization.
+   * @attr trigger-label
+   */
+  @property({ type: String, attribute: 'trigger-label' })
+  triggerLabel = 'More actions';
+
+  /**
+   * Accessible label for the dropdown menu panel. Override for localization.
+   * @attr menu-label
+   */
+  @property({ type: String, attribute: 'menu-label' })
+  menuLabel = 'Secondary actions';
+
   // ─── Unique IDs ───
 
-  private readonly _menuId = `hx-split-button-menu-${Math.random().toString(36).slice(2, 9)}`;
+  private readonly _menuId = `hx-split-button-menu-${++_hxSplitButtonIdCounter}`;
 
   // ─── Lifecycle ───
 
@@ -181,11 +196,9 @@ export class HelixSplitButton extends LitElement {
     const items = this._getMenuItems();
     if (items.length === 0) return;
 
-    const focused = this.shadowRoot?.activeElement as HTMLElement | null;
-    // The shadow activeElement is the menu panel; actual focus is in light DOM.
-    // Use document.activeElement to find which item has focus.
-    const lightActive = document.activeElement as HTMLElement | null;
-    const currentIndex = items.findIndex((item) => item === lightActive);
+    // document.activeElement returns the hx-menu-item host element when its
+    // inner shadow DOM element has focus, which matches items[] directly.
+    const currentIndex = items.findIndex((item) => item === document.activeElement);
 
     switch (e.key) {
       case 'ArrowDown': {
@@ -216,10 +229,6 @@ export class HelixSplitButton extends LitElement {
         items[items.length - 1]?.focus();
         break;
       }
-      default:
-        // Suppress the unused-variable warning for the focused variable
-        void focused;
-        break;
     }
   }
 
@@ -273,10 +282,12 @@ export class HelixSplitButton extends LitElement {
   }
 
   /**
-   * Returns the focusable inner button elements of enabled hx-menu-item children
-   * assigned to the `menu` slot.
+   * Returns the enabled hx-menu-item host elements assigned to the `menu` slot.
+   * HelixMenuItem overrides focus() to delegate to its inner element, so calling
+   * .focus() on hosts works correctly. document.activeElement returns the host
+   * element when the inner shadow element has focus, enabling correct index tracking.
    */
-  private _getMenuItems(): HTMLElement[] {
+  private _getMenuItems(): HelixMenuItem[] {
     const slot = this.shadowRoot?.querySelector<HTMLSlotElement>('slot[name="menu"]');
     if (!slot) return [];
 
@@ -285,14 +296,7 @@ export class HelixSplitButton extends LitElement {
       .filter(
         (el): el is HelixMenuItem =>
           el.tagName.toLowerCase() === 'hx-menu-item' && !(el as HelixMenuItem).disabled,
-      )
-      .map(
-        (item) =>
-          item.shadowRoot?.querySelector<HTMLElement>('.menu-item') ??
-          item.shadowRoot?.querySelector<HTMLElement>('[role="menuitem"]') ??
-          null,
-      )
-      .filter((el): el is HTMLElement => el !== null);
+      );
   }
 
   // ─── Render ───
@@ -321,7 +325,6 @@ export class HelixSplitButton extends LitElement {
           part="button"
           class="split-button__primary"
           ?disabled=${this.disabled}
-          aria-disabled=${this.disabled ? 'true' : nothing}
           type="button"
           @click=${this._handlePrimaryClick}
           @keydown=${this._handlePrimaryKeydown}
@@ -334,11 +337,10 @@ export class HelixSplitButton extends LitElement {
           part="trigger"
           class="split-button__trigger"
           ?disabled=${this.disabled}
-          aria-disabled=${this.disabled ? 'true' : nothing}
           aria-haspopup="menu"
           aria-expanded=${this._open ? 'true' : 'false'}
           aria-controls=${this._menuId}
-          aria-label="More actions"
+          aria-label=${this.triggerLabel}
           type="button"
           @click=${this._handleTriggerClick}
           @keydown=${this._handleTriggerKeydown}
@@ -368,7 +370,7 @@ export class HelixSplitButton extends LitElement {
           id=${this._menuId}
           class=${classMap(menuClasses)}
           role="menu"
-          aria-label="Secondary actions"
+          aria-label=${this.menuLabel}
           @keydown=${this._handleMenuKeydown}
           @hx-item-select=${this._handleMenuItemSelect}
         >

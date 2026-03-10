@@ -1,0 +1,228 @@
+---
+title: 'hx-menu-item'
+description: 'Interactive item within an hx-menu with optional icon slots, keyboard shortcuts, checkbox/radio types, loading state, and submenu support.'
+---
+
+import ComponentLoader from '../../../components/ComponentLoader.astro';
+import ComponentDemo from '../../../components/ComponentDemo.astro';
+import ComponentDoc from '../../../components/ComponentDoc.astro';
+
+<ComponentLoader />
+
+<ComponentDoc tagName="hx-menu-item" section="summary" />
+
+## Overview
+
+`hx-menu-item` is the interactive item element for use inside `hx-menu`. It supports three operational types (`normal`, `checkbox`, `radio`), a loading state with animated spinner, prefix/suffix icon slots for shortcut display, and an optional nested `hx-menu` for submenu patterns.
+
+Always place `hx-menu-item` as a direct child of `hx-menu`. Never use it standalone outside of a menu context.
+
+## Live Demo
+
+### Item Types
+
+<ComponentDemo title="Item Types">
+  <hx-menu aria-label="Item types" style="max-width: 240px;">
+    <hx-menu-item value="normal">Normal item</hx-menu-item>
+    <hx-menu-item type="checkbox" value="check" checked>
+      Checkbox item
+    </hx-menu-item>
+    <hx-menu-item type="radio" value="radio" checked>
+      Radio item
+    </hx-menu-item>
+  </hx-menu>
+</ComponentDemo>
+
+### States
+
+<ComponentDemo title="States">
+  <hx-menu aria-label="Item states" style="max-width: 240px;">
+    <hx-menu-item value="enabled">Enabled</hx-menu-item>
+    <hx-menu-item value="disabled" disabled>
+      Disabled
+    </hx-menu-item>
+    <hx-menu-item value="loading" loading>
+      Loading...
+    </hx-menu-item>
+  </hx-menu>
+</ComponentDemo>
+
+### With Prefix and Suffix
+
+<ComponentDemo title="Prefix and Suffix Slots">
+  <hx-menu aria-label="Slotted items" style="max-width: 240px;">
+    <hx-menu-item value="save">
+      <span slot="prefix">&#128190;</span>
+      Save
+      <span slot="suffix" style="color: var(--hx-color-neutral-500); font-size: 0.75rem;">
+        Ctrl+S
+      </span>
+    </hx-menu-item>
+    <hx-menu-item value="print">
+      <span slot="prefix">&#128424;</span>
+      Print
+      <span slot="suffix" style="color: var(--hx-color-neutral-500); font-size: 0.75rem;">
+        Ctrl+P
+      </span>
+    </hx-menu-item>
+  </hx-menu>
+</ComponentDemo>
+
+## Installation
+
+```bash
+# Full library (includes hx-menu-item)
+npm install @helix/library
+
+# Or import only the menu family
+import '@helix/library/components/hx-menu';
+```
+
+## Basic Usage
+
+```html
+<hx-menu aria-label="Actions">
+  <hx-menu-item value="edit">Edit</hx-menu-item>
+  <hx-menu-item value="delete" disabled>Delete</hx-menu-item>
+</hx-menu>
+```
+
+## Properties
+
+| Property   | Attribute  | Type                                | Default    | Description                                                                                                                                         |
+| ---------- | ---------- | ----------------------------------- | ---------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `value`    | `value`    | `string`                            | `''`       | The value emitted in the `hx-select` event detail when this item is activated.                                                                      |
+| `disabled` | `disabled` | `boolean`                           | `false`    | Prevents interaction and removes the item from keyboard navigation.                                                                                 |
+| `checked`  | `checked`  | `boolean`                           | `false`    | Whether this item is checked. Meaningful only when `type` is `checkbox` or `radio`.                                                                 |
+| `type`     | `type`     | `'normal' \| 'checkbox' \| 'radio'` | `'normal'` | Controls the ARIA role and checked-state behavior. `checkbox` toggles on activation; `radio` performs mutual exclusion within the parent `hx-menu`. |
+| `loading`  | `loading`  | `boolean`                           | `false`    | Shows an animated spinner and prevents interaction. Sets `aria-busy="true"`.                                                                        |
+
+## Events
+
+| Event                  | Detail Type                              | Description                                                                                                                                           |
+| ---------------------- | ---------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `hx-item-select`       | `{ item: HelixMenuItem, value: string }` | Fired when the item is activated via click, Enter, or Space. Bubbles and is composed. Captured and re-emitted as `hx-select` by the parent `hx-menu`. |
+| `hx-item-submenu-open` | `{ item: HelixMenuItem }`                | Fired when `ArrowRight` is pressed on an item that has content in the `submenu` slot.                                                                 |
+
+## CSS Custom Properties
+
+| Property                  | Default                       | Description                                     |
+| ------------------------- | ----------------------------- | ----------------------------------------------- |
+| `--hx-menu-item-color`    | `var(--hx-color-neutral-900)` | Item text color.                                |
+| `--hx-menu-item-hover-bg` | `var(--hx-color-neutral-100)` | Background color on hover and `:focus-visible`. |
+
+## CSS Parts
+
+| Part           | Description                                                                                       |
+| -------------- | ------------------------------------------------------------------------------------------------- |
+| `base`         | The root interactive `<div>` with ARIA role applied.                                              |
+| `prefix`       | Wrapper `<span>` for the `prefix` slot.                                                           |
+| `label`        | Wrapper `<span>` for the default (label) slot.                                                    |
+| `suffix`       | Wrapper `<span>` for the `suffix` slot.                                                           |
+| `checked-icon` | Wrapper `<span>` containing the checkmark SVG. Present only when `type` is `checkbox` or `radio`. |
+| `submenu-icon` | Wrapper `<span>` containing the chevron SVG. Present only when the `submenu` slot is populated.   |
+
+## Slots
+
+| Slot        | Description                                                                                                          |
+| ----------- | -------------------------------------------------------------------------------------------------------------------- |
+| _(default)_ | The item label text or content.                                                                                      |
+| `prefix`    | Icon or content rendered before the label (e.g., action icon).                                                       |
+| `suffix`    | Shortcut label or icon rendered after the label (e.g., `Ctrl+S`).                                                    |
+| `submenu`   | A nested `hx-menu` element. When populated, adds a chevron icon and triggers `hx-item-submenu-open` on `ArrowRight`. |
+
+## Accessibility
+
+| Topic           | Details                                                                                                                          |
+| --------------- | -------------------------------------------------------------------------------------------------------------------------------- |
+| ARIA role       | `menuitem` by default; `menuitemcheckbox` when `type="checkbox"`; `menuitemradio` when `type="radio"`.                           |
+| `aria-disabled` | Set to `"true"` when `disabled` is active. The element remains in the DOM but is excluded from keyboard navigation by `hx-menu`. |
+| `aria-checked`  | Set to `"true"` or `"false"` when `type` is `checkbox` or `radio`. Omitted for `normal` items.                                   |
+| `aria-haspopup` | Set to `"true"` when the `submenu` slot has content.                                                                             |
+| `aria-busy`     | Set to `"true"` when `loading` is active.                                                                                        |
+| `tabindex`      | `"0"` when enabled; `"-1"` when disabled. Focus is managed programmatically by `hx-menu`.                                        |
+| Keyboard        | `Enter` / `Space` activate the item. `ArrowRight` on items with a submenu fires `hx-item-submenu-open`.                          |
+| SVG icons       | Checkmark and chevron SVGs are `aria-hidden="true"` — decorative only.                                                           |
+| Spinner         | The loading spinner SVG is `aria-hidden="true"`; state is announced via `aria-busy`.                                             |
+| Reduced motion  | Spinner animation is disabled when `prefers-reduced-motion: reduce` is set.                                                      |
+
+## Drupal Integration
+
+```twig
+{# my-module/templates/menu-item.html.twig #}
+<hx-menu-item
+  value="{{ item.value }}"
+  {% if item.disabled %}disabled{% endif %}
+  {% if item.type %}type="{{ item.type }}"{% endif %}
+  {% if item.checked %}checked{% endif %}
+>
+  {% if item.icon %}
+    <span slot="prefix">{{ item.icon }}</span>
+  {% endif %}
+  {{ item.label }}
+  {% if item.shortcut %}
+    <span slot="suffix">{{ item.shortcut }}</span>
+  {% endif %}
+</hx-menu-item>
+```
+
+Listen for events in Drupal behaviors:
+
+```javascript
+Drupal.behaviors.helixMenuItem = {
+  attach(context) {
+    once('helixMenuItem', 'hx-menu', context).forEach((menu) => {
+      menu.addEventListener('hx-select', (e) => {
+        const { value, item } = e.detail;
+        // item is the HelixMenuItem element; value is the string value
+      });
+    });
+  },
+};
+```
+
+## Standalone HTML Example
+
+```html
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>hx-menu-item example</title>
+    <!-- @helix/library is a private package — install via npm workspace, not CDN -->
+    <!-- In your project: import '@helix/library'; in your bundler entry point -->
+  </head>
+  <body style="font-family: sans-serif; padding: 2rem;">
+    <hx-menu id="action-menu" aria-label="Patient actions" style="max-width: 220px;">
+      <hx-menu-item value="view-record">
+        <span slot="prefix">&#128203;</span>
+        View Record
+      </hx-menu-item>
+      <hx-menu-item value="schedule">
+        <span slot="prefix">&#128197;</span>
+        Schedule Appointment
+      </hx-menu-item>
+      <hx-menu-item value="export">
+        <span slot="prefix">&#128190;</span>
+        Export
+        <span slot="suffix" style="font-size:0.75rem; opacity:0.6;">CSV</span>
+      </hx-menu-item>
+      <hx-menu-divider></hx-menu-divider>
+      <hx-menu-item type="checkbox" value="notify" checked>Email Notifications</hx-menu-item>
+    </hx-menu>
+
+    <div id="output" style="margin-top: 1rem; font-size: 0.875rem;"></div>
+
+    <script>
+      document.getElementById('action-menu').addEventListener('hx-select', (e) => {
+        document.getElementById('output').textContent = 'Selected: ' + e.detail.value;
+      });
+    </script>
+  </body>
+</html>
+```
+
+## API Reference
+
+<ComponentDoc tagName="hx-menu-item" section="api" />

@@ -22,7 +22,10 @@ export const helixDropdownStyles = css`
     background: var(--hx-dropdown-panel-bg, var(--hx-color-neutral-0, #ffffff));
     border: 1px solid var(--hx-dropdown-panel-border-color, var(--hx-color-neutral-200, #e5e7eb));
     border-radius: var(--hx-dropdown-panel-border-radius, var(--hx-border-radius-md, 0.375rem));
-    box-shadow: var(--hx-dropdown-panel-shadow, 0 4px 16px rgba(0, 0, 0, 0.12));
+    box-shadow: var(
+      --hx-dropdown-panel-shadow,
+      0 4px 16px var(--hx-overlay-black-12, rgba(0, 0, 0, 0.12))
+    );
     visibility: hidden;
     opacity: 0;
     pointer-events: none;

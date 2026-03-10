@@ -29,9 +29,9 @@ describe('hx-carousel', () => {
       expect(shadowQuery(el, '[part="base"]')).toBeTruthy();
     });
 
-    it('exposes "scroll-container" CSS part', async () => {
+    it('exposes "slide-viewport" CSS part', async () => {
       const el = await fixture<HelixCarousel>(threeSlides);
-      expect(shadowQuery(el, '[part="scroll-container"]')).toBeTruthy();
+      expect(shadowQuery(el, '[part="slide-viewport"]')).toBeTruthy();
     });
 
     it('exposes "navigation" CSS part', async () => {
@@ -42,6 +42,16 @@ describe('hx-carousel', () => {
     it('exposes "pagination" CSS part', async () => {
       const el = await fixture<HelixCarousel>(threeSlides);
       expect(shadowQuery(el, '[part="pagination"]')).toBeTruthy();
+    });
+
+    it('exposes "prev-btn" CSS part', async () => {
+      const el = await fixture<HelixCarousel>(threeSlides);
+      expect(shadowQuery(el, '[part="prev-btn"]')).toBeTruthy();
+    });
+
+    it('exposes "next-btn" CSS part', async () => {
+      const el = await fixture<HelixCarousel>(threeSlides);
+      expect(shadowQuery(el, '[part="next-btn"]')).toBeTruthy();
     });
   });
 
@@ -54,10 +64,18 @@ describe('hx-carousel', () => {
       expect(base?.getAttribute('role')).toBe('region');
     });
 
-    it('base element has aria-label="Carousel"', async () => {
+    it('base element has aria-label from label property (default: "Carousel")', async () => {
       const el = await fixture<HelixCarousel>(threeSlides);
       const base = shadowQuery(el, '[part="base"]');
       expect(base?.getAttribute('aria-label')).toBe('Carousel');
+    });
+
+    it('base element aria-label reflects label property', async () => {
+      const el = await fixture<HelixCarousel>(threeSlides);
+      el.label = 'Featured articles';
+      await el.updateComplete;
+      const base = shadowQuery(el, '[part="base"]');
+      expect(base?.getAttribute('aria-label')).toBe('Featured articles');
     });
 
     it('prev button has aria-label="Previous slide"', async () => {
@@ -72,10 +90,10 @@ describe('hx-carousel', () => {
       expect(next).toBeTruthy();
     });
 
-    it('pagination dots have aria-label="Slide N"', async () => {
+    it('pagination dots have aria-label="Slide N of M"', async () => {
       const el = await fixture<HelixCarousel>(threeSlides);
       await el.updateComplete;
-      const dot1 = shadowQuery(el, '[part="pagination-item"][aria-label="Slide 1"]');
+      const dot1 = shadowQuery(el, '[part="pagination-item"][aria-label="Slide 1 of 3"]');
       expect(dot1).toBeTruthy();
     });
   });
@@ -133,6 +151,21 @@ describe('hx-carousel', () => {
       (dots?.[2] as HTMLButtonElement)?.click();
       await el.updateComplete;
       expect(el['_currentIndex']).toBe(2);
+    });
+
+    it('goTo() same index does not fire hx-slide-change', async () => {
+      const el = await fixture<HelixCarousel>(threeSlides);
+      await el.updateComplete;
+      el.goTo(1);
+      await el.updateComplete;
+
+      let eventFired = false;
+      el.addEventListener('hx-slide-change', () => {
+        eventFired = true;
+      });
+      el.goTo(1); // same index
+      await el.updateComplete;
+      expect(eventFired).toBe(false);
     });
   });
 
@@ -237,6 +270,46 @@ describe('hx-carousel', () => {
       await el.updateComplete;
       const playPauseBtn = shadowQuery(el, '[aria-label="Pause autoplay"]');
       expect(playPauseBtn).toBeTruthy();
+    });
+
+    it('autoplay does not start when prefers-reduced-motion is active', async () => {
+      // Mock window.matchMedia to simulate prefers-reduced-motion: reduce
+      const original = window.matchMedia;
+      window.matchMedia = vi.fn().mockImplementation((query: string) => ({
+        matches: query === '(prefers-reduced-motion: reduce)',
+        media: query,
+        addEventListener: vi.fn(),
+        removeEventListener: vi.fn(),
+        addListener: vi.fn(),
+        removeListener: vi.fn(),
+        dispatchEvent: vi.fn(),
+        onchange: null,
+      }));
+
+      const el = await fixture<HelixCarousel>(`
+        <hx-carousel autoplay autoplay-interval="1000" loop>
+          <hx-carousel-item>1</hx-carousel-item>
+          <hx-carousel-item>2</hx-carousel-item>
+        </hx-carousel>
+      `);
+      await el.updateComplete;
+      expect(el['_isPlaying']).toBe(false);
+      expect(el['_autoplayTimer']).toBeNull();
+
+      window.matchMedia = original;
+    });
+
+    it('disconnectedCallback stops autoplay timer', async () => {
+      const el = await fixture<HelixCarousel>(`
+        <hx-carousel autoplay autoplay-interval="1000" loop>
+          <hx-carousel-item>1</hx-carousel-item>
+          <hx-carousel-item>2</hx-carousel-item>
+        </hx-carousel>
+      `);
+      await el.updateComplete;
+      expect(el['_autoplayTimer']).not.toBeNull();
+      el.remove();
+      expect(el['_autoplayTimer']).toBeNull();
     });
   });
 
@@ -515,7 +588,7 @@ describe('hx-carousel', () => {
       await el.updateComplete;
       el.goTo(2);
       await el.updateComplete;
-      const container = shadowQuery(el, '[part="scroll-container"]') as HTMLElement;
+      const container = shadowQuery(el, '[part="slide-viewport"]') as HTMLElement;
       container.dispatchEvent(
         new MouseEvent('mousedown', { clientX: 200, bubbles: true, cancelable: true }),
       );
@@ -534,7 +607,7 @@ describe('hx-carousel', () => {
         </hx-carousel>
       `);
       await el.updateComplete;
-      const container = shadowQuery(el, '[part="scroll-container"]') as HTMLElement;
+      const container = shadowQuery(el, '[part="slide-viewport"]') as HTMLElement;
       container.dispatchEvent(
         new MouseEvent('mousedown', { clientX: 200, bubbles: true, cancelable: true }),
       );
@@ -552,7 +625,7 @@ describe('hx-carousel', () => {
         </hx-carousel>
       `);
       await el.updateComplete;
-      const container = shadowQuery(el, '[part="scroll-container"]') as HTMLElement;
+      const container = shadowQuery(el, '[part="slide-viewport"]') as HTMLElement;
       container.dispatchEvent(
         new MouseEvent('mousedown', { clientX: 200, bubbles: true, cancelable: true }),
       );
@@ -560,6 +633,53 @@ describe('hx-carousel', () => {
       container.dispatchEvent(new MouseEvent('mouseup', { clientX: 210, bubbles: true }));
       await el.updateComplete;
       expect(el['_currentIndex']).toBe(0);
+    });
+
+    it('drag does not navigate when mouse-dragging is false (default)', async () => {
+      const el = await fixture<HelixCarousel>(`
+        <hx-carousel>
+          <hx-carousel-item>1</hx-carousel-item>
+          <hx-carousel-item>2</hx-carousel-item>
+          <hx-carousel-item>3</hx-carousel-item>
+        </hx-carousel>
+      `);
+      await el.updateComplete;
+      const container = shadowQuery(el, '[part="slide-viewport"]') as HTMLElement;
+      container.dispatchEvent(
+        new MouseEvent('mousedown', { clientX: 200, bubbles: true, cancelable: true }),
+      );
+      container.dispatchEvent(new MouseEvent('mousemove', { clientX: 140, bubbles: true }));
+      container.dispatchEvent(new MouseEvent('mouseup', { clientX: 140, bubbles: true }));
+      await el.updateComplete;
+      expect(el['_currentIndex']).toBe(0);
+    });
+  });
+
+  // ─── Single slide (2) ───
+
+  describe('Single slide', () => {
+    it('pagination is hidden for single-slide carousel', async () => {
+      const el = await fixture<HelixCarousel>(`
+        <hx-carousel>
+          <hx-carousel-item>Only slide</hx-carousel-item>
+        </hx-carousel>
+      `);
+      await el.updateComplete;
+      const pagination = shadowQuery(el, '[part="pagination"]');
+      expect(pagination).toBeNull();
+    });
+
+    it('prev and next buttons are disabled for single-slide carousel without loop', async () => {
+      const el = await fixture<HelixCarousel>(`
+        <hx-carousel>
+          <hx-carousel-item>Only slide</hx-carousel-item>
+        </hx-carousel>
+      `);
+      await el.updateComplete;
+      const prev = shadowQuery<HTMLButtonElement>(el, '[part="prev-btn"]');
+      const next = shadowQuery<HTMLButtonElement>(el, '[part="next-btn"]');
+      expect(prev?.disabled).toBe(true);
+      expect(next?.disabled).toBe(true);
     });
   });
 

@@ -58,11 +58,11 @@ export const helixContainerStyles = css`
   }
 
   .container__inner--content {
-    max-width: var(--hx-container-max-width, var(--hx-container-content, 72rem));
+    max-width: var(--hx-container-max-width, var(--hx-container-content, 1152px));
   }
 
   .container__inner--narrow {
-    max-width: var(--hx-container-max-width, var(--hx-container-narrow, 48rem));
+    max-width: var(--hx-container-max-width, var(--hx-container-narrow, 768px));
   }
 
   .container__inner--sm {

@@ -151,7 +151,7 @@ hx-form input[type='tel']:focus,
 hx-form input[type='url']:focus,
 hx-form input[type='search']:focus,
 hx-form input[type='number']:focus {
-  outline: none;
+  outline: 0;
   border-color: var(--hx-input-focus-ring-color, var(--hx-focus-ring-color, #2563eb));
   box-shadow: 0 0 0 var(--hx-focus-ring-width, 2px)
     color-mix(
@@ -160,6 +160,19 @@ hx-form input[type='number']:focus {
         calc(var(--hx-focus-ring-opacity, 0.25) * 100%),
       transparent
     );
+}
+
+@media (forced-colors: active) {
+  hx-form input[type='text']:focus,
+  hx-form input[type='email']:focus,
+  hx-form input[type='password']:focus,
+  hx-form input[type='tel']:focus,
+  hx-form input[type='url']:focus,
+  hx-form input[type='search']:focus,
+  hx-form input[type='number']:focus {
+    outline: var(--hx-focus-ring-width, 2px) solid ButtonText;
+    outline-offset: var(--hx-focus-ring-offset, 2px);
+  }
 }
 
 /* ─── Disabled State ─── */
@@ -207,7 +220,6 @@ hx-form input[type='number']::-webkit-outer-spin-button {
 
 hx-form input[type='number'] {
   appearance: textfield;
-  -moz-appearance: textfield;
 }
 
 /* ==========================================================================
@@ -238,7 +250,7 @@ hx-form textarea::placeholder {
 }
 
 hx-form textarea:focus {
-  outline: none;
+  outline: 0;
   border-color: var(--hx-input-focus-ring-color, var(--hx-focus-ring-color, #2563eb));
   box-shadow: 0 0 0 var(--hx-focus-ring-width, 2px)
     color-mix(
@@ -247,6 +259,13 @@ hx-form textarea:focus {
         calc(var(--hx-focus-ring-opacity, 0.25) * 100%),
       transparent
     );
+}
+
+@media (forced-colors: active) {
+  hx-form textarea:focus {
+    outline: var(--hx-focus-ring-width, 2px) solid ButtonText;
+    outline-offset: var(--hx-focus-ring-offset, 2px);
+  }
 }
 
 hx-form textarea:disabled {
@@ -291,7 +310,7 @@ hx-form select {
 }
 
 hx-form select:focus {
-  outline: none;
+  outline: 0;
   border-color: var(--hx-select-focus-ring-color, var(--hx-focus-ring-color, #2563eb));
   box-shadow: 0 0 0 var(--hx-focus-ring-width, 2px)
     color-mix(
@@ -300,6 +319,13 @@ hx-form select:focus {
         calc(var(--hx-focus-ring-opacity, 0.25) * 100%),
       transparent
     );
+}
+
+@media (forced-colors: active) {
+  hx-form select:focus {
+    outline: var(--hx-focus-ring-width, 2px) solid ButtonText;
+    outline-offset: var(--hx-focus-ring-offset, 2px);
+  }
 }
 
 hx-form select:disabled {

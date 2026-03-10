@@ -285,7 +285,7 @@ export const StackTopCenter: Story = {
       <p style="padding: 1rem; color: #6b7280; font-size: 0.875rem; margin: 0;">
         Top-center placement
       </p>
-      <hx-toast-stack placement="top-center" style="position: absolute; left: 0; right: 0; top: 0; transform: none;">
+      <hx-toast-stack placement="top-center" style="position: absolute; left: 0; right: 0; top: 0;">
         <hx-toast variant="info" ?open=${true} ?closable=${true}
           >Appointment confirmed for 3:00 PM.</hx-toast
         >

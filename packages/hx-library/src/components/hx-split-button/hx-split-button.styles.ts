@@ -253,28 +253,41 @@ export const helixSplitButtonStyles = css`
 
   /* ─── Dropdown Menu Panel ─── */
 
+  @keyframes hx-split-button-menu-open {
+    from {
+      opacity: 0;
+      transform: translateY(-4px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
   .split-button__menu {
     display: none;
     position: absolute;
     top: calc(100% + var(--hx-space-1, 0.25rem));
     inset-inline-end: 0;
     min-width: 100%;
+    max-height: var(--hx-split-button-menu-max-height, 18rem);
+    overflow-y: auto;
     background-color: var(--hx-split-button-menu-bg, var(--hx-color-neutral-0, #ffffff));
     border: var(--hx-border-width-thin, 1px) solid
       var(--hx-split-button-menu-border-color, var(--hx-color-neutral-200, #e2e8f0));
     border-radius: var(--hx-split-button-menu-border-radius, var(--hx-border-radius-md, 0.375rem));
     box-shadow: var(
       --hx-split-button-menu-shadow,
-      0 4px 6px -1px rgba(0, 0, 0, 0.1),
-      0 2px 4px -2px rgba(0, 0, 0, 0.1)
+      0 4px 6px -1px var(--hx-overlay-black-10, rgba(0, 0, 0, 0.1)),
+      0 2px 4px -2px var(--hx-overlay-black-10, rgba(0, 0, 0, 0.1))
     );
     padding: var(--hx-space-1, 0.25rem);
     z-index: var(--hx-z-index-dropdown, 200);
-    overflow: hidden;
   }
 
   .split-button__menu--open {
     display: block;
+    animation: hx-split-button-menu-open var(--hx-transition-fast, 150ms ease);
   }
 
   /* ─── Reduced Motion ─── */
@@ -284,6 +297,10 @@ export const helixSplitButtonStyles = css`
     .split-button__trigger,
     .split-button__chevron {
       transition: none;
+    }
+
+    .split-button__menu--open {
+      animation: none;
     }
   }
 `;

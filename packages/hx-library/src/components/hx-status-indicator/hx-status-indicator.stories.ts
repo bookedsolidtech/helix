@@ -123,6 +123,11 @@ export const PulseBusy: Story = {
   args: { status: 'busy', pulse: true },
 };
 
+export const CustomLabel: Story = {
+  name: 'Custom Accessible Label',
+  args: { status: 'online', label: 'EHR System is online' },
+};
+
 // ─────────────────────────────────────────────────
 // 4. ALL STATUSES
 // ─────────────────────────────────────────────────
@@ -177,6 +182,32 @@ export const AllSizes: Story = {
   `,
 };
 
+export const AllSizesWithPulse: Story = {
+  name: 'All Sizes With Pulse',
+  render: () => html`
+    <div style="display: flex; gap: var(--hx-spacing-6, 1.5rem); align-items: center;">
+      <div
+        style="display: flex; flex-direction: column; align-items: center; gap: var(--hx-spacing-2, 0.5rem);"
+      >
+        <hx-status-indicator status="online" size="sm" pulse></hx-status-indicator>
+        <small>sm + pulse</small>
+      </div>
+      <div
+        style="display: flex; flex-direction: column; align-items: center; gap: var(--hx-spacing-2, 0.5rem);"
+      >
+        <hx-status-indicator status="online" size="md" pulse></hx-status-indicator>
+        <small>md + pulse</small>
+      </div>
+      <div
+        style="display: flex; flex-direction: column; align-items: center; gap: var(--hx-spacing-2, 0.5rem);"
+      >
+        <hx-status-indicator status="online" size="lg" pulse></hx-status-indicator>
+        <small>lg + pulse</small>
+      </div>
+    </div>
+  `,
+};
+
 // ─────────────────────────────────────────────────
 // 6. HEALTHCARE SCENARIOS
 // ─────────────────────────────────────────────────
@@ -184,22 +215,24 @@ export const AllSizes: Story = {
 export const SystemHealthDashboard: Story = {
   name: 'System Health Dashboard',
   render: () => html`
-    <div style="display: flex; flex-direction: column; gap: 0.75rem; padding: 1rem; border: 1px solid #e5e7eb; border-radius: 0.5rem; max-width: 320px;">
-      <div style="display: flex; align-items: center; gap: 0.5rem;">
+    <div
+      style="display: flex; flex-direction: column; gap: var(--hx-spacing-3, 0.75rem); padding: var(--hx-spacing-4, 1rem); border: 1px solid var(--hx-color-neutral-200, #e5e7eb); border-radius: var(--hx-radius-md, 0.5rem); max-width: 320px;"
+    >
+      <div style="display: flex; align-items: center; gap: var(--hx-spacing-2, 0.5rem);">
         <hx-status-indicator status="online" size="sm" pulse></hx-status-indicator>
-        <span style="font-size: 0.875rem;">EHR System — Online</span>
+        <span style="font-size: var(--hx-font-size-sm, 0.875rem);">EHR System — Online</span>
       </div>
-      <div style="display: flex; align-items: center; gap: 0.5rem;">
+      <div style="display: flex; align-items: center; gap: var(--hx-spacing-2, 0.5rem);">
         <hx-status-indicator status="away" size="sm"></hx-status-indicator>
-        <span style="font-size: 0.875rem;">Lab Interface — Degraded</span>
+        <span style="font-size: var(--hx-font-size-sm, 0.875rem);">Lab Interface — Degraded</span>
       </div>
-      <div style="display: flex; align-items: center; gap: 0.5rem;">
+      <div style="display: flex; align-items: center; gap: var(--hx-spacing-2, 0.5rem);">
         <hx-status-indicator status="offline" size="sm"></hx-status-indicator>
-        <span style="font-size: 0.875rem;">Imaging System — Offline</span>
+        <span style="font-size: var(--hx-font-size-sm, 0.875rem);">Imaging System — Offline</span>
       </div>
-      <div style="display: flex; align-items: center; gap: 0.5rem;">
+      <div style="display: flex; align-items: center; gap: var(--hx-spacing-2, 0.5rem);">
         <hx-status-indicator status="busy" size="sm" pulse></hx-status-indicator>
-        <span style="font-size: 0.875rem;">Claims Processing — Busy</span>
+        <span style="font-size: var(--hx-font-size-sm, 0.875rem);">Claims Processing — Busy</span>
       </div>
     </div>
   `,

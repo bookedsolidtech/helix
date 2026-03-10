@@ -11,7 +11,17 @@ import ComponentDoc from '../../../components/ComponentDoc.astro';
 
 <ComponentDoc tagName="hx-alert" section="summary" />
 
-## Variants
+## Overview
+
+`hx-alert` is a feedback component for communicating status messages, warnings, and errors to users. It supports four semantic variants (`info`, `success`, `warning`, `error`) that drive both visual styling and ARIA live region semantics. Critical alerts (`error`, `warning`) use `role="alert"` for assertive announcement; informational alerts (`info`, `success`) use `role="status"` for polite announcement.
+
+**Use `hx-alert` when:** you need to surface system feedback — form validation errors, operation results, session warnings, or patient safety notices — in a way that is visually distinctive and reliably announced by screen readers.
+
+**Use a toast (`hx-toast`) instead when:** the notification is transient (auto-dismisses) and not tied to a specific page region.
+
+## Live Demo
+
+### Variants
 
 Info, success, warning, and error styles with appropriate ARIA semantics.
 
@@ -24,27 +34,44 @@ Info, success, warning, and error styles with appropriate ARIA semantics.
   </div>
 </ComponentDemo>
 
-## Closable
+### Dismissible
 
 Alerts with a dismiss button. Click the close icon to hide the alert.
 
-<ComponentDemo title="Closable">
+<ComponentDemo title="Dismissible">
   <div style="display: grid; gap: 0.75rem;">
-    <hx-alert variant="info" closable>
+    <hx-alert variant="info" dismissible>
       This alert can be dismissed by the user.
     </hx-alert>
-    <hx-alert variant="success" closable>
+    <hx-alert variant="success" dismissible>
       Success! You can close this notification.
     </hx-alert>
   </div>
 </ComponentDemo>
 
-## With Actions
+### With Title
+
+Use the `title` slot to add a headline above the message body.
+
+<ComponentDemo title="With Title">
+  <div style="display: grid; gap: 0.75rem;">
+    <hx-alert variant="warning" dismissible>
+      <span slot="title">Session Expiring Soon</span>
+      Your session will expire in 5 minutes due to inactivity.
+    </hx-alert>
+    <hx-alert variant="error">
+      <span slot="title">Medication Conflict Detected</span>
+      The prescribed dosage conflicts with an existing allergy on file.
+    </hx-alert>
+  </div>
+</ComponentDemo>
+
+### With Actions
 
 Use the `actions` slot to add action buttons inside the alert.
 
 <ComponentDemo title="With Actions">
-  <hx-alert variant="warning" closable>
+  <hx-alert variant="warning" dismissible>
     Your session is about to expire.
     <div slot="actions">
       <hx-button variant="secondary" size="sm">
@@ -53,6 +80,315 @@ Use the `actions` slot to add action buttons inside the alert.
     </div>
   </hx-alert>
 </ComponentDemo>
+
+### Accent Variant
+
+The `accent` attribute replaces the full border with a left-side accent stripe — a common healthcare dashboard pattern for dense information UIs.
+
+<ComponentDemo title="Accent">
+  <div style="display: grid; gap: 0.75rem;">
+    <hx-alert variant="info" accent>
+      Informational note with accent stripe.
+    </hx-alert>
+    <hx-alert variant="success" accent>
+      Record saved successfully.
+    </hx-alert>
+    <hx-alert variant="warning" accent>
+      Review required before submission.
+    </hx-alert>
+    <hx-alert variant="error" accent>
+      Critical: chart update failed.
+    </hx-alert>
+  </div>
+</ComponentDemo>
+
+### Without Icon
+
+The `showIcon` property defaults to `true`. To hide the icon, set the property on the element instance via JavaScript:
+
+```javascript
+const alert = document.querySelector('hx-alert');
+alert.showIcon = false;
+```
+
+Or use the HTML attribute `show-icon` (without a value, following boolean attribute semantics):
+
+```html
+<hx-alert variant="info">Standard alert with icon (default).</hx-alert>
+<hx-alert variant="info" show-icon
+  >Alert with icon hidden (attribute present but false by default).</hx-alert
+>
+```
+
+Note: The HTML attribute `show-icon` is presence-based, not value-based. `show-icon="false"` still renders the icon because the attribute is present. See the [Boolean Attributes guide](/guides/boolean-attributes) for correct usage patterns and framework-specific workarounds.
+
+## Installation
+
+```bash
+# Full library
+npm install @helix/library
+
+# Or import only this component (tree-shaking friendly)
+import '@helix/library/components/hx-alert';
+```
+
+## Basic Usage
+
+```html
+<hx-alert variant="info">Your form has been submitted.</hx-alert>
+
+<hx-alert variant="error" dismissible>
+  <span slot="title">Submission Failed</span>
+  Please correct the highlighted fields and try again.
+</hx-alert>
+```
+
+## Properties
+
+| Property        | Attribute         | Type                                          | Default  | Description                                                                                                                        |
+| --------------- | ----------------- | --------------------------------------------- | -------- | ---------------------------------------------------------------------------------------------------------------------------------- |
+| `variant`       | `variant`         | `'info' \| 'success' \| 'warning' \| 'error'` | `'info'` | Visual variant that determines colors and ARIA role (`alert` for error/warning, `status` for info/success).                        |
+| `dismissible`   | `dismissible`     | `boolean`                                     | `false`  | Renders a close button that hides the alert when clicked.                                                                          |
+| `open`          | `open`            | `boolean`                                     | `true`   | Controls alert visibility. Set to `false` to hide without removing from DOM.                                                       |
+| `showIcon`      | `show-icon`       | `boolean`                                     | `true`   | Whether to render the default variant icon container.                                                                              |
+| `accent`        | `accent`          | `boolean`                                     | `false`  | Applies a left border accent stripe instead of a full border.                                                                      |
+| `returnFocusTo` | `return-focus-to` | `string \| null`                              | `null`   | CSS selector for the element to return focus to after the alert is dismissed. If unset, callers manage focus via `hx-after-close`. |
+
+## Events
+
+| Event            | Detail Type          | Description                                           |
+| ---------------- | -------------------- | ----------------------------------------------------- |
+| `hx-close`       | `{ reason: 'user' }` | Dispatched when the user dismisses the alert.         |
+| `hx-after-close` | `undefined`          | Dispatched after the alert is dismissed (focus hook). |
+
+Both events bubble and are composed so they cross shadow DOM boundaries.
+
+```js
+const alert = document.querySelector('hx-alert');
+
+alert.addEventListener('hx-close', (e) => {
+  console.log('Alert closed by:', e.detail.reason);
+});
+
+alert.addEventListener('hx-after-close', () => {
+  // Return focus to trigger element
+  document.querySelector('#show-alert-btn').focus();
+});
+```
+
+## Slots
+
+| Slot        | Description                                                      |
+| ----------- | ---------------------------------------------------------------- |
+| _(default)_ | Alert message content. Accepts any inline or block content.      |
+| `title`     | Optional title/headline rendered above the default slot content. |
+| `icon`      | Custom icon that overrides the default variant icon.             |
+| `actions`   | Action buttons rendered below the message content.               |
+
+```html
+<hx-alert variant="warning" dismissible>
+  <span slot="title">Medication Alert</span>
+  <svg slot="icon" aria-hidden="true"><!-- custom icon --></svg>
+  Patient allergy on file conflicts with prescribed medication.
+  <div slot="actions">
+    <hx-button size="sm">View Allergy Record</hx-button>
+    <hx-button variant="ghost" size="sm">Dismiss</hx-button>
+  </div>
+</hx-alert>
+```
+
+## CSS Custom Properties
+
+| Property                   | Default                       | Description                                          |
+| -------------------------- | ----------------------------- | ---------------------------------------------------- |
+| `--hx-alert-bg`            | `var(--hx-color-info-50)`     | Alert background color.                              |
+| `--hx-alert-color`         | `var(--hx-color-info-800)`    | Alert text color.                                    |
+| `--hx-alert-border-color`  | `var(--hx-color-info-200)`    | Alert border / accent stripe color.                  |
+| `--hx-alert-border-radius` | `var(--hx-border-radius-md)`  | Alert border radius.                                 |
+| `--hx-alert-border-width`  | `var(--hx-border-width-thin)` | Alert border width.                                  |
+| `--hx-alert-padding`       | `var(--hx-space-4)`           | Internal padding.                                    |
+| `--hx-alert-gap`           | `var(--hx-space-3)`           | Gap between icon, message, and close button.         |
+| `--hx-alert-icon-color`    | `var(--hx-color-info-500)`    | Icon fill color.                                     |
+| `--hx-alert-font-family`   | `var(--hx-font-family-sans)`  | Alert font family.                                   |
+| `--hx-alert-accent-width`  | `4px`                         | Width of the left accent stripe (accent mode).       |
+| `--hx-touch-target-size`   | `44px`                        | Minimum close button touch target size (WCAG 2.5.8). |
+
+Each variant overrides the color tokens automatically. To customize a specific variant:
+
+```css
+/* Override error variant colors */
+hx-alert[variant='error'] {
+  --hx-alert-bg: #fff5f5;
+  --hx-alert-border-color: #fc8181;
+  --hx-alert-color: #742a2a;
+}
+```
+
+## CSS Parts
+
+| Part           | Description                                                                     |
+| -------------- | ------------------------------------------------------------------------------- |
+| `alert`        | The outer container `<div>` — controls layout, border, background, and padding. |
+| `icon`         | The icon container `<div>` wrapping the icon slot.                              |
+| `message`      | The message content area `<div>` containing title, default slot, and actions.   |
+| `title`        | The title container `<div>` shown when the `title` slot has content.            |
+| `actions`      | The actions container `<div>` shown when the `actions` slot has content.        |
+| `close-button` | The dismiss `<button>` element (only rendered when `dismissible` is true).      |
+
+```css
+/* Target specific structural parts */
+hx-alert::part(alert) {
+  border-radius: 0;
+}
+
+hx-alert::part(close-button) {
+  border-radius: 50%;
+}
+```
+
+## Accessibility
+
+`hx-alert` implements the [WAI-ARIA Live Region](https://www.w3.org/WAI/ARIA/apg/patterns/alert/) and [Alert](https://www.w3.org/WAI/ARIA/apg/patterns/alert/) patterns.
+
+| Topic                    | Details                                                                                                                                                                                            |
+| ------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| ARIA role                | Applied to the host element (not shadow DOM interior) for reliable AT support across JAWS+Chrome and VoiceOver+Safari. `role="alert"` for `error`/`warning`; `role="status"` for `info`/`success`. |
+| Live region              | `role="alert"` implies `aria-live="assertive"`; `role="status"` implies `aria-live="polite"`. `aria-live` is not set explicitly to prevent double-announcement in JAWS.                            |
+| `aria-hidden`            | Set to `"true"` on the host when `open=false`, ensuring hidden alerts are excluded from the accessibility tree.                                                                                    |
+| Dynamic role             | When `variant` changes at runtime, the host `role` attribute updates synchronously to reflect the new semantic urgency.                                                                            |
+| Close button             | The dismiss button uses `aria-label="Close"` and is a native `<button>` element, providing keyboard activation (Enter/Space) and focus management without custom handlers.                         |
+| Touch target             | The close button enforces a minimum 44px touch target (`--hx-touch-target-size`) per WCAG 2.5.8 and Apple HIG / Google Material guidelines.                                                        |
+| Focus management         | After dismiss, focus is returned to the element matching `return-focus-to` (if set). Otherwise, callers should manage focus via the `hx-after-close` event.                                        |
+| SVG icons                | All built-in icons have `aria-hidden="true"` — they are purely decorative; the role and text content convey meaning.                                                                               |
+| Color contrast           | All variant color combinations meet WCAG 2.1 AA minimum contrast ratio (4.5:1 for text).                                                                                                           |
+| `prefers-reduced-motion` | No transitions are applied to the alert itself. If animations are added by consumers, they should respect the media query.                                                                         |
+| WCAG                     | Meets WCAG 2.1 AA. Live region announcements, keyboard operability, focus management, and color contrast all verified.                                                                             |
+
+## Design Tokens
+
+`hx-alert` consumes tokens from three tiers of the design token cascade:
+
+| Tier      | Token                           | Usage                          |
+| --------- | ------------------------------- | ------------------------------ |
+| Semantic  | `--hx-color-info-50`            | Info variant background        |
+| Semantic  | `--hx-color-info-200`           | Info variant border            |
+| Semantic  | `--hx-color-info-500`           | Info variant icon              |
+| Semantic  | `--hx-color-info-800`           | Info variant text              |
+| Semantic  | `--hx-color-success-*`          | Success variant colors         |
+| Semantic  | `--hx-color-warning-*`          | Warning variant colors         |
+| Semantic  | `--hx-color-error-*`            | Error variant colors           |
+| Semantic  | `--hx-border-radius-md`         | Alert corner radius            |
+| Semantic  | `--hx-border-width-thin`        | Alert border width             |
+| Semantic  | `--hx-space-3` / `--hx-space-4` | Gap and padding                |
+| Semantic  | `--hx-font-family-sans`         | Alert typography               |
+| Semantic  | `--hx-font-size-sm`             | Alert font size                |
+| Semantic  | `--hx-focus-ring-color`         | Close button focus ring color  |
+| Semantic  | `--hx-focus-ring-width`         | Close button focus ring width  |
+| Component | `--hx-alert-bg`                 | Override alert background      |
+| Component | `--hx-alert-color`              | Override alert text color      |
+| Component | `--hx-alert-border-color`       | Override alert border / accent |
+
+Override at the semantic level to retheme all alerts at once:
+
+```css
+:root {
+  --hx-color-error-50: #fff0f0;
+  --hx-color-error-800: #7b0000;
+}
+```
+
+## Drupal Integration
+
+```twig
+{# my-module/templates/alert.html.twig #}
+<hx-alert
+  variant="{{ variant|default('info') }}"
+  {% if dismissible %}dismissible{% endif %}
+  {% if accent %}accent{% endif %}
+  {% if open %}open{% endif %}
+  {% if return_focus_to %}return-focus-to="{{ return_focus_to }}"{% endif %}
+>
+  {% if title %}
+    <span slot="title">{{ title }}</span>
+  {% endif %}
+  {{ message|raw }}
+  {% if actions %}
+    <div slot="actions">
+      {% for action in actions %}
+        <hx-button
+          variant="{{ action.variant|default('secondary') }}"
+          size="sm"
+          href="{{ action.href|default('') }}"
+        >{{ action.label }}</hx-button>
+      {% endfor %}
+    </div>
+  {% endif %}
+</hx-alert>
+```
+
+Load the library in your module's `.libraries.yml`:
+
+```yaml
+helix-components:
+  js:
+    /libraries/helix/helix.min.js: { minified: true }
+```
+
+## Standalone HTML Example
+
+Copy-paste into a `.html` file and open in any browser — no build tool required:
+
+```html
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>hx-alert example</title>
+    <script
+      type="module"
+      src="https://cdn.jsdelivr.net/npm/@helix/library/dist/helix.min.js"
+    ></script>
+  </head>
+  <body style="font-family: sans-serif; padding: 2rem; max-width: 640px; margin: 0 auto;">
+    <h1>Patient Notifications</h1>
+
+    <div style="display: grid; gap: 1rem;">
+      <hx-alert variant="info" id="session-alert">
+        <span slot="title">Upcoming Maintenance</span>
+        The system will be unavailable Saturday 2–4 AM for scheduled maintenance.
+      </hx-alert>
+
+      <hx-alert variant="success">
+        Appointment confirmed for Tuesday, March 10 at 9:00 AM.
+      </hx-alert>
+
+      <hx-alert variant="warning" dismissible id="session-warning" return-focus-to="#extend-btn">
+        <span slot="title">Session Expiring</span>
+        Your session will expire in 5 minutes.
+        <div slot="actions">
+          <hx-button id="extend-btn" variant="secondary" size="sm">Extend Session</hx-button>
+        </div>
+      </hx-alert>
+
+      <hx-alert variant="error" accent>
+        <span slot="title">Medication Alert</span>
+        Prescribed Amoxicillin conflicts with a documented penicillin allergy.
+      </hx-alert>
+    </div>
+
+    <script>
+      document.getElementById('session-warning').addEventListener('hx-close', (e) => {
+        console.log('Session warning dismissed by:', e.detail.reason);
+      });
+
+      document.getElementById('session-warning').addEventListener('hx-after-close', () => {
+        console.log('Alert closed, focus returned to trigger');
+      });
+    </script>
+  </body>
+</html>
+```
 
 ## API Reference
 

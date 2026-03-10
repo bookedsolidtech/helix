@@ -1,0 +1,263 @@
+---
+title: 'hx-code-snippet'
+description: 'Styled code block with optional copy-to-clipboard, line numbers, and expand/collapse for long content.'
+---
+
+import ComponentLoader from '../../../components/ComponentLoader.astro';
+import ComponentDemo from '../../../components/ComponentDemo.astro';
+import ComponentDoc from '../../../components/ComponentDoc.astro';
+
+<ComponentLoader />
+
+<ComponentDoc tagName="hx-code-snippet" section="summary" />
+
+## Overview
+
+`hx-code-snippet` renders formatted code in block or inline mode. It extracts text content from its default slot and displays it inside a `<pre><code>` block, with an optional copy-to-clipboard button, line numbers, and an expand/collapse control for long snippets.
+
+**Use `hx-code-snippet` when:** you need to display source code, CLI commands, or configuration snippets with consistent styling and a copy button.
+**Use the `inline` attribute when:** embedding a short code reference inside a sentence of prose text.
+**Do not use** this component as an interactive code editor — it is display-only.
+
+## Live Demo
+
+### Block Mode (Default)
+
+A JavaScript snippet with copy-to-clipboard enabled.
+
+<ComponentDemo title="Block Mode">
+  <hx-code-snippet language="javascript">
+    {`const greet = (name) => {
+  console.log(\`Hello, \${name}!\`);
+};
+
+greet('World');`}
+</hx-code-snippet>
+
+</ComponentDemo>
+
+### Inline Mode
+
+Embed a short identifier inside prose.
+
+<ComponentDemo title="Inline Mode">
+  <p>
+    Set the <hx-code-snippet inline>aria-label</hx-code-snippet> attribute to provide an accessible
+    name for screen readers.
+  </p>
+</ComponentDemo>
+
+### Line Numbers
+
+Display line numbers alongside each line of code.
+
+<ComponentDemo title="Line Numbers">
+  <hx-code-snippet language="typescript" line-numbers>
+    {`interface Patient {
+  id: string;
+  name: string;
+  dob: string;
+}
+
+function getPatient(id: string): Patient {
+return fetch(\`/api/patients/\${id}\`).then((r) => r.json());
+}`}
+</hx-code-snippet>
+
+</ComponentDemo>
+
+### Expand / Collapse
+
+Long snippets are truncated at `max-lines` lines and a "Show more" button reveals the rest.
+
+<ComponentDemo title="Expand / Collapse">
+  <hx-code-snippet language="bash" max-lines="4">
+    {`#!/usr/bin/env bash
+set -euo pipefail
+
+echo "Starting deployment..."
+npm ci
+npm run build
+npm run test
+echo "Deploying to production..."
+rsync -avz dist/ user@server:/var/www/html/
+echo "Done."`}
+</hx-code-snippet>
+
+</ComponentDemo>
+
+### No Copy Button
+
+Disable the copy button by setting `copyable` to `false` via JavaScript.
+
+<ComponentDemo title="No Copy Button">
+  <hx-code-snippet language="css" id="no-copy-demo">
+    {`:root {
+  --hx-color-primary: #2563eb;
+}`}
+  </hx-code-snippet>
+  <script>{`document.getElementById('no-copy-demo').copyable = false;`}</script>
+</ComponentDemo>
+
+## Installation
+
+```bash
+# Full library
+npm install @helix/library
+
+# Or import only this component (tree-shaking friendly)
+import '@helix/library/components/hx-code-snippet';
+```
+
+## Basic Usage
+
+```html
+<hx-code-snippet language="javascript"> const x = 42; </hx-code-snippet>
+```
+
+## Properties
+
+| Property      | Attribute      | Type      | Default | Description                                                                                                                                                                                                                              |
+| ------------- | -------------- | --------- | ------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `language`    | `language`     | `string`  | `''`    | Language hint applied as `language-*` class on the `<code>` element for external syntax highlighters (e.g. Prism, highlight.js). Does not affect visual rendering.                                                                       |
+| `inline`      | `inline`       | `boolean` | `false` | Renders as an inline `<code>` element instead of a `<pre><code>` block.                                                                                                                                                                  |
+| `wrap`        | `wrap`         | `boolean` | `false` | Enables word-wrap in block mode (`white-space: pre-wrap`).                                                                                                                                                                               |
+| `copyable`    | `copyable`     | `boolean` | `true`  | Shows a copy-to-clipboard button. **Note:** this is a boolean attribute — `copyable="false"` in HTML still enables the button. Set `el.copyable = false` via JavaScript. See the [Boolean Attributes guide](/guides/boolean-attributes). |
+| `maxLines`    | `max-lines`    | `number`  | `0`     | Maximum lines shown before a "Show more" button appears. Set to `0` to disable truncation.                                                                                                                                               |
+| `lineNumbers` | `line-numbers` | `boolean` | `false` | Prepends line numbers to each displayed line. Numbers are `aria-hidden` so screen readers skip them.                                                                                                                                     |
+
+## Events
+
+| Event     | Detail Type        | Description                                                                  |
+| --------- | ------------------ | ---------------------------------------------------------------------------- |
+| `hx-copy` | `{ text: string }` | Fired when the copy button is clicked. `text` is the full slot text content. |
+
+## CSS Custom Properties
+
+| Property                              | Default                                 | Description                                         |
+| ------------------------------------- | --------------------------------------- | --------------------------------------------------- |
+| `--hx-code-snippet-bg`                | `var(--hx-color-neutral-900, #0f172a)`  | Background color of the block container.            |
+| `--hx-code-snippet-color`             | `var(--hx-color-neutral-100, #f1f5f9)`  | Code text color.                                    |
+| `--hx-code-snippet-font-family`       | `var(--hx-font-family-mono, monospace)` | Font family for code text.                          |
+| `--hx-code-snippet-font-size`         | `var(--hx-font-size-sm, 0.875rem)`      | Font size for code text.                            |
+| `--hx-code-snippet-border-radius`     | `var(--hx-border-radius-md, 0.375rem)`  | Border radius of the block container.               |
+| `--hx-code-snippet-padding`           | `var(--hx-space-4, 1rem)`               | Inner padding for the `<pre>` element (block mode). |
+| `--hx-code-snippet-inline-bg`         | `var(--hx-color-neutral-100, #f1f5f9)`  | Background color of inline code.                    |
+| `--hx-code-snippet-inline-color`      | `var(--hx-color-neutral-900, #0f172a)`  | Text color of inline code.                          |
+| `--hx-code-snippet-inline-padding-y`  | `0.125em`                               | Vertical padding of inline code.                    |
+| `--hx-code-snippet-inline-padding-x`  | `0.375em`                               | Horizontal padding of inline code.                  |
+| `--hx-code-snippet-tab-size`          | `2`                                     | Tab character width in columns.                     |
+| `--hx-code-snippet-line-number-color` | `var(--hx-color-neutral-500, #64748b)`  | Color of line number characters.                    |
+
+## CSS Parts
+
+| Part            | Description                                                       |
+| --------------- | ----------------------------------------------------------------- |
+| `base`          | The outermost container — `<div>` in block mode, `<code>` inline. |
+| `header`        | The header bar that contains the copy button (block mode only).   |
+| `code`          | The `<code>` element that holds the displayed text.               |
+| `copy-button`   | The copy-to-clipboard `<button>`.                                 |
+| `expand-button` | The "Show more / Show less" `<button>` shown when truncated.      |
+
+## Slots
+
+| Slot        | Description                                                                                                                                                         |
+| ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| _(default)_ | Code content as plain text. The component extracts `textContent` from slotted nodes — HTML markup is stripped. Pre-highlighted HTML is not supported via this slot. |
+
+## Accessibility
+
+| Topic           | Details                                                                                                                                               |
+| --------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
+| ARIA role       | `<pre>` carries `role="region"` with an `aria-label` derived from the `language` attribute (e.g. "Code snippet: javascript") for landmark navigation. |
+| `aria-label`    | Copy button uses `aria-label="Copy code"` at rest and `aria-label="Copied!"` after a successful copy.                                                 |
+| Live region     | An `aria-live="polite"` visually-hidden span announces "Copied!" to screen readers when the copy button is activated.                                 |
+| `aria-expanded` | The expand/collapse button carries `aria-expanded="false"` / `aria-expanded="true"` to communicate state to assistive technology.                     |
+| Line numbers    | Line number `<span>` elements are `aria-hidden="true"` so screen readers read only the code text.                                                     |
+| Keyboard        | `Tab` to focus the copy or expand button; `Enter` / `Space` to activate. Focus ring is visible on all interactive controls.                           |
+| Screen reader   | Copy confirmation and expand state changes are announced via live region and attribute updates respectively.                                          |
+| WCAG 2.1 AA     | Verified with axe-core: zero violations across block, inline, line-numbers, and expand/collapse variants.                                             |
+
+## Drupal Integration
+
+```twig
+{# my-module/templates/my-template.html.twig #}
+<hx-code-snippet
+  language="{{ language|default('') }}"
+  {% if line_numbers %}line-numbers{% endif %}
+  {% if max_lines %}max-lines="{{ max_lines }}"{% endif %}
+>{{ code_content }}</hx-code-snippet>
+```
+
+Load the library in your module's `.libraries.yml`:
+
+```yaml
+helix-components:
+  js:
+    /libraries/helix/helix.min.js: { minified: true }
+```
+
+Listen for the `hx-copy` event in Drupal behaviors:
+
+```javascript
+Drupal.behaviors.myCodeSnippet = {
+  attach(context) {
+    once('myCodeSnippet', 'hx-code-snippet', context).forEach((el) => {
+      el.addEventListener('hx-copy', (e) => {
+        console.log('Copied:', e.detail.text);
+      });
+    });
+  },
+};
+```
+
+> **Note:** The `navigator.clipboard` API requires a secure context (HTTPS or localhost). On HTTP
+> Drupal staging environments the `hx-copy` event still fires but the clipboard is not populated.
+
+## Standalone HTML Example
+
+Copy-paste into a `.html` file and open in any browser — no build tool required:
+
+```html
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>hx-code-snippet example</title>
+    <!-- @helix/library is a private package — install via npm workspace, not CDN -->
+    <!-- In your project: import '@helix/library'; in your bundler entry point -->
+  </head>
+  <body
+    style="font-family: sans-serif; padding: 2rem; display: grid; gap: 1.5rem; max-width: 720px;"
+  >
+    <!-- Block mode with copy button -->
+    <hx-code-snippet language="javascript" id="block-demo">
+      const fetchPatient = async (id) => { const res = await fetch(`/api/patients/${id}`); if
+      (!res.ok) throw new Error(`HTTP ${res.status}`); return res.json(); };
+    </hx-code-snippet>
+
+    <!-- Line numbers -->
+    <hx-code-snippet language="bash" line-numbers>
+      npm install @helix/library npm run build npm run test
+    </hx-code-snippet>
+
+    <!-- Inline mode -->
+    <p>
+      Use the
+      <hx-code-snippet inline>aria-label</hx-code-snippet>
+      attribute to name unlabelled controls.
+    </p>
+
+    <script>
+      document.getElementById('block-demo').addEventListener('hx-copy', (e) => {
+        console.log('Copied to clipboard:', e.detail.text);
+      });
+    </script>
+  </body>
+</html>
+```
+
+## API Reference
+
+<ComponentDoc tagName="hx-code-snippet" section="api" />

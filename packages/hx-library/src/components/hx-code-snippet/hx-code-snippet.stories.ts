@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/web-components';
 import { html } from 'lit';
-import { expect, within } from 'storybook/test';
+import { expect } from 'storybook/test';
 import './hx-code-snippet.js';
 
 // ─────────────────────────────────────────────────
@@ -82,7 +82,6 @@ export const Default: Story = {
     </hx-code-snippet>
   `,
   play: async ({ canvasElement }) => {
-    const _canvas = within(canvasElement);
     const snippet = canvasElement.querySelector('hx-code-snippet');
     await expect(snippet).toBeTruthy();
     await expect(snippet!.shadowRoot).toBeTruthy();
@@ -130,7 +129,35 @@ export const CSS: Story = {
 };
 
 // ─────────────────────────────────────────────────
-// 5. INLINE MODE
+// 5. BASH EXAMPLE
+// ─────────────────────────────────────────────────
+
+export const Bash: Story = {
+  name: 'Language: Bash',
+  render: () => html`
+    <hx-code-snippet language="bash">
+      npm install @wc-2026/library npm run build npm run test
+    </hx-code-snippet>
+  `,
+};
+
+// ─────────────────────────────────────────────────
+// 6. TYPESCRIPT EXAMPLE
+// ─────────────────────────────────────────────────
+
+export const TypeScript: Story = {
+  name: 'Language: TypeScript',
+  render: () => html`
+    <hx-code-snippet language="typescript">
+      interface Patient { id: string; name: string; dateOfBirth: string; } function getPatient(id:
+      string): Promise&lt;Patient&gt; { return fetch('/api/patients/' + id).then((res) => res.json()
+      as Promise&lt;Patient&gt;); }
+    </hx-code-snippet>
+  `,
+};
+
+// ─────────────────────────────────────────────────
+// 7. INLINE MODE
 // ─────────────────────────────────────────────────
 
 export const Inline: Story = {
@@ -143,7 +170,7 @@ export const Inline: Story = {
 };
 
 // ─────────────────────────────────────────────────
-// 6. WRAP MODE
+// 8. WRAP MODE
 // ─────────────────────────────────────────────────
 
 export const Wrap: Story = {
@@ -159,35 +186,44 @@ export const Wrap: Story = {
 };
 
 // ─────────────────────────────────────────────────
-// 7. WITHOUT COPY BUTTON
+// 9. WITHOUT COPY BUTTON
 // ─────────────────────────────────────────────────
 
 export const NoCopyButton: Story = {
   name: 'Copy: Disabled',
   render: () => html`
-    <hx-code-snippet language="javascript" ?copyable=${false}>
-      const x = 42;
-    </hx-code-snippet>
+    <hx-code-snippet language="javascript" ?copyable=${false}> const x = 42; </hx-code-snippet>
   `,
 };
 
 // ─────────────────────────────────────────────────
-// 8. MAX LINES — Truncated
+// 10. MAX LINES — Truncated
 // ─────────────────────────────────────────────────
 
 export const MaxLines: Story = {
   name: 'Max Lines: Show More/Less',
   render: () => html`
     <hx-code-snippet language="javascript" max-lines="5">
-      line 1: const a = 1; line 2: const b = 2; line 3: const c = 3; line 4: const d = 4; line 5:
-      const e = 5; line 6: const f = 6; line 7: const g = 7; line 8: const h = 8; line 9: const i
-      = 9; line 10: const j = 10;
+      const a = 1; const b = 2; const c = 3; const d = 4; const e = 5; const f = 6; const g = 7;
+      const h = 8; const i = 9; const j = 10;
     </hx-code-snippet>
   `,
+  play: async ({ canvasElement }) => {
+    const snippet = canvasElement.querySelector('hx-code-snippet');
+    await expect(snippet).toBeTruthy();
+    // Wait for slot to be processed
+    await snippet!.updateComplete;
+    const expandBtn = snippet!.shadowRoot!.querySelector('[part="expand-button"]');
+    await expect(expandBtn).toBeTruthy();
+    await expect(expandBtn!.textContent?.trim()).toBe('Show more');
+    (expandBtn as HTMLButtonElement).click();
+    await snippet!.updateComplete;
+    await expect(expandBtn!.textContent?.trim()).toBe('Show less');
+  },
 };
 
 // ─────────────────────────────────────────────────
-// 9. COPY INTERACTION
+// 11. COPY INTERACTION
 // ─────────────────────────────────────────────────
 
 export const CopyInteraction: Story = {
@@ -206,7 +242,7 @@ export const CopyInteraction: Story = {
 };
 
 // ─────────────────────────────────────────────────
-// 10. CSS PARTS DEMO
+// 12. CSS PARTS DEMO
 // ─────────────────────────────────────────────────
 
 export const CSSParts: Story = {
@@ -228,7 +264,7 @@ export const CSSParts: Story = {
 };
 
 // ─────────────────────────────────────────────────
-// 11. HEALTHCARE SCENARIOS
+// 13. HEALTHCARE SCENARIOS
 // ─────────────────────────────────────────────────
 
 export const DrugDosageSnippet: Story = {

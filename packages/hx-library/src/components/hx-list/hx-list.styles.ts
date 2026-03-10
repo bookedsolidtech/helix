@@ -35,6 +35,13 @@ export const helixListStyles = css`
     padding: 0;
   }
 
+  /* ─── Variant: description ─── */
+
+  .list--description {
+    padding: 0;
+    list-style: none;
+  }
+
   /* ─── Dividers ─── */
 
   :host([divided]) .list > ::slotted(hx-list-item:not(:last-child)) {

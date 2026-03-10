@@ -135,7 +135,7 @@ function parseUserInput(raw: string): string | null {
  *
  * @tag hx-time-picker
  *
- * @slot - Default slot; overrides the rendered label element when used.
+ * @slot label - Custom label content; overrides the rendered label element when used.
  * @slot help - Help text displayed below the field.
  * @slot error - Custom error content; overrides the `error` property.
  *
@@ -143,6 +143,7 @@ function parseUserInput(raw: string): string | null {
  *
  * @csspart label - The label element.
  * @csspart input - The text input element.
+ * @csspart toggle - The clock icon toggle button.
  * @csspart listbox - The dropdown `<ul>` element.
  * @csspart option - Each `<li>` option in the listbox.
  *
@@ -157,6 +158,7 @@ function parseUserInput(raw: string): string | null {
  * @cssprop [--hx-time-picker-chevron-color=var(--hx-color-neutral-500)] - Toggle chevron color.
  * @cssprop [--hx-time-picker-listbox-bg=var(--hx-color-neutral-0)] - Listbox background.
  * @cssprop [--hx-time-picker-listbox-max-height=16rem] - Maximum height of the dropdown.
+ * @cssprop [--hx-time-picker-listbox-shadow=0 4px 16px color-mix(in srgb, var(--hx-color-neutral-900) 12%, transparent)] - Box shadow for the dropdown listbox.
  * @cssprop [--hx-time-picker-option-color=var(--hx-color-neutral-800)] - Option text color.
  * @cssprop [--hx-time-picker-option-hover-bg=var(--hx-color-primary-50)] - Option hover background.
  * @cssprop [--hx-time-picker-option-hover-color=var(--hx-color-primary-700)] - Option hover text color.
@@ -257,10 +259,13 @@ export class HelixTimePicker extends LitElement {
   @state() private _inputDisplayValue = '';
   @state() private _hasLabelSlot = false;
   @state() private _hasErrorSlot = false;
+  @state() private _slottedLabelId = '';
 
-  // ─── Stable IDs ───
+  // ─── Stable IDs (monotonically incrementing counter for SSR safety) ───
 
-  private readonly _id = `hx-time-picker-${Math.random().toString(36).slice(2, 9)}`;
+  private static _instanceCount = 0;
+
+  private readonly _id = `hx-time-picker-${++HelixTimePicker._instanceCount}`;
   private readonly _listboxId = `${this._id}-listbox`;
   private readonly _errorId = `${this._id}-error`;
   private readonly _helpId = `${this._id}-help`;
@@ -273,10 +278,18 @@ export class HelixTimePicker extends LitElement {
   @query('.field__listbox')
   private _listboxEl!: HTMLUListElement;
 
-  // ─── Computed Slots ───
+  // ─── Memoized slot generation (avoids regenerating on every render call) ───
+
+  private _cachedSlots: TimeSlot[] | null = null;
+  private _slotsKey = '';
 
   private get _slots(): TimeSlot[] {
-    return generateSlots(this.min, this.max, this.step, this.format);
+    const key = `${this.min}|${this.max}|${this.step}|${this.format}`;
+    if (this._cachedSlots === null || key !== this._slotsKey) {
+      this._slotsKey = key;
+      this._cachedSlots = generateSlots(this.min, this.max, this.step, this.format);
+    }
+    return this._cachedSlots;
   }
 
   // ─── Outside-click handler (bound reference for add/removeEventListener) ───
@@ -368,8 +381,15 @@ export class HelixTimePicker extends LitElement {
     this._closeListbox();
   }
 
-  formStateRestoreCallback(state: string): void {
-    this.value = state;
+  formStateRestoreCallback(
+    state: string | File | FormData,
+    _mode: 'restore' | 'autocomplete' = 'restore',
+  ): void {
+    // Only string states are valid for this component; ignore File/FormData
+    if (typeof state !== 'string') return;
+    // Validate and clamp before assigning; ignore out-of-spec values
+    const clamped = clampValue(state, this.min, this.max);
+    this.value = clamped;
   }
 
   // ─── Listbox helpers ───
@@ -405,7 +425,23 @@ export class HelixTimePicker extends LitElement {
 
   private _handleLabelSlotChange(e: Event): void {
     const slot = e.target as HTMLSlotElement;
-    this._hasLabelSlot = slot.assignedNodes({ flatten: true }).length > 0;
+    const nodes = slot.assignedNodes({ flatten: true });
+    this._hasLabelSlot = nodes.length > 0;
+    if (this._hasLabelSlot) {
+      // Forward aria-labelledby: ensure the slotted label element has an ID so
+      // the shadow-DOM input can reference it via aria-labelledby (A-03).
+      const labelEl = nodes.find((n) => n.nodeType === Node.ELEMENT_NODE) as
+        | HTMLElement
+        | undefined;
+      if (labelEl) {
+        if (!labelEl.id) {
+          labelEl.id = `${this._id}-slotted-label`;
+        }
+        this._slottedLabelId = labelEl.id;
+      }
+    } else {
+      this._slottedLabelId = '';
+    }
   }
 
   private _handleErrorSlotChange(e: Event): void {
@@ -510,6 +546,22 @@ export class HelixTimePicker extends LitElement {
         this._closeListbox();
         break;
 
+      case 'Home':
+        if (this._open) {
+          e.preventDefault();
+          this._activeIndex = 0;
+          this._scrollActiveOptionIntoView();
+        }
+        break;
+
+      case 'End':
+        if (this._open) {
+          e.preventDefault();
+          this._activeIndex = this._slots.length - 1;
+          this._scrollActiveOptionIntoView();
+        }
+        break;
+
       case 'Tab':
         this._closeListbox();
         break;
@@ -576,14 +628,8 @@ export class HelixTimePicker extends LitElement {
             : nothing}
         </slot>
 
-        <!-- Combobox wrapper (role=combobox lives on the wrapper div) -->
-        <div
-          class="field__combobox"
-          role="combobox"
-          aria-expanded=${this._open ? 'true' : 'false'}
-          aria-haspopup="listbox"
-          aria-owns=${ifDefined(this._open ? this._listboxId : undefined)}
-        >
+        <!-- Combobox wrapper; role="combobox" lives on the input per ARIA 1.2 -->
+        <div class="field__combobox">
           <input
             part="input"
             class="field__input"
@@ -592,6 +638,9 @@ export class HelixTimePicker extends LitElement {
             inputmode="text"
             autocomplete="off"
             spellcheck="false"
+            role="combobox"
+            aria-expanded=${this._open ? 'true' : 'false'}
+            aria-haspopup="listbox"
             .value=${live(this._inputDisplayValue)}
             placeholder=${placeholder}
             ?required=${this.required}
@@ -603,6 +652,9 @@ export class HelixTimePicker extends LitElement {
             aria-invalid=${hasError ? 'true' : nothing}
             aria-describedby=${ifDefined(describedBy)}
             aria-required=${this.required ? 'true' : nothing}
+            aria-labelledby=${ifDefined(
+              this._hasLabelSlot && this._slottedLabelId ? this._slottedLabelId : undefined,
+            )}
             @click=${this._handleInputClick}
             @input=${this._handleInputInput}
             @change=${this._handleInputChange}
@@ -611,6 +663,7 @@ export class HelixTimePicker extends LitElement {
 
           <!-- Toggle button -->
           <button
+            part="toggle"
             type="button"
             class="field__toggle"
             tabindex="-1"
@@ -683,13 +736,7 @@ export class HelixTimePicker extends LitElement {
         <slot name="error" @slotchange=${this._handleErrorSlotChange}>
           ${this.error
             ? html`
-                <div
-                  part="error"
-                  class="field__error"
-                  id=${this._errorId}
-                  role="alert"
-                  aria-live="polite"
-                >
+                <div part="error" class="field__error" id=${this._errorId} role="alert">
                   ${this.error}
                 </div>
               `

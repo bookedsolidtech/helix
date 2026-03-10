@@ -39,7 +39,7 @@ describe('hx-avatar', () => {
   describe('Fallback chain', () => {
     it('shows fallback icon when no src, no initials, no slot', async () => {
       const el = await fixture<HelixAvatar>('<hx-avatar></hx-avatar>');
-      await new Promise((r) => setTimeout(r, 50));
+      await el.updateComplete;
       await el.updateComplete;
       const icon = shadowQuery(el, '[part="fallback-icon"]');
       expect(icon).toBeTruthy();
@@ -65,12 +65,74 @@ describe('hx-avatar', () => {
 
     it('shows fallback icon when initials is empty string', async () => {
       const el = await fixture<HelixAvatar>('<hx-avatar initials=""></hx-avatar>');
-      await new Promise((r) => setTimeout(r, 50));
+      await el.updateComplete;
       await el.updateComplete;
       const icon = shadowQuery(el, '[part="fallback-icon"]');
       expect(icon).toBeTruthy();
       const initials = shadowQuery(el, '[part="initials"]');
       expect(initials).toBeNull();
+    });
+  });
+
+  // ─── Image error handling (3) — P1-4, P1-5 ───
+
+  describe('Image error handling', () => {
+    it('shows initials fallback when image fails to load', async () => {
+      const el = await fixture<HelixAvatar>(
+        '<hx-avatar src="https://invalid.example.com/broken.jpg" alt="John Doe" initials="JD"></hx-avatar>',
+      );
+      await el.updateComplete;
+
+      const img = shadowQuery(el, '[part="image"]') as HTMLImageElement;
+      expect(img).toBeTruthy();
+
+      img.dispatchEvent(new Event('error'));
+      await el.updateComplete;
+
+      const initials = shadowQuery(el, '[part="initials"]');
+      expect(initials).toBeTruthy();
+      expect(initials?.textContent?.trim()).toBe('JD');
+      expect(shadowQuery(el, '[part="image"]')).toBeNull();
+    });
+
+    it('shows icon fallback when image fails and no initials are set', async () => {
+      const el = await fixture<HelixAvatar>(
+        '<hx-avatar src="https://invalid.example.com/broken.jpg" alt="Unknown user"></hx-avatar>',
+      );
+      await el.updateComplete;
+
+      const img = shadowQuery(el, '[part="image"]') as HTMLImageElement;
+      expect(img).toBeTruthy();
+
+      img.dispatchEvent(new Event('error'));
+      await el.updateComplete;
+
+      expect(shadowQuery(el, '[part="fallback-icon"]')).toBeTruthy();
+      expect(shadowQuery(el, '[part="image"]')).toBeNull();
+    });
+
+    it('resets image error state when src property changes', async () => {
+      const el = await fixture<HelixAvatar>(
+        '<hx-avatar src="https://invalid.example.com/broken.jpg" alt="John Doe" initials="JD"></hx-avatar>',
+      );
+      await el.updateComplete;
+
+      // Simulate image load failure.
+      const img = shadowQuery(el, '[part="image"]') as HTMLImageElement;
+      img.dispatchEvent(new Event('error'));
+      await el.updateComplete;
+
+      // Verify fallback is active.
+      expect(shadowQuery(el, '[part="initials"]')).toBeTruthy();
+      expect(shadowQuery(el, '[part="image"]')).toBeNull();
+
+      // Update src — _imgError must reset so the new image renders.
+      el.src = 'https://example.com/new-avatar.png';
+      await el.updateComplete;
+      await el.updateComplete; // second await for the state change triggered in updated().
+
+      expect(shadowQuery(el, '[part="image"]')).toBeTruthy();
+      expect(shadowQuery(el, '[part="initials"]')).toBeNull();
     });
   });
 
@@ -141,7 +203,7 @@ describe('hx-avatar', () => {
       const el = await fixture<HelixAvatar>(
         '<hx-avatar><img src="https://example.com/custom.png" alt="Custom" /></hx-avatar>',
       );
-      await new Promise((r) => setTimeout(r, 50));
+      await el.updateComplete;
       await el.updateComplete;
       const avatar = shadowQuery(el, '[part="avatar"]');
       expect(avatar?.hasAttribute('role')).toBe(false);
@@ -151,7 +213,7 @@ describe('hx-avatar', () => {
       const el = await fixture<HelixAvatar>(
         '<hx-avatar><span class="custom-content">Custom</span></hx-avatar>',
       );
-      await new Promise((r) => setTimeout(r, 50));
+      await el.updateComplete;
       await el.updateComplete;
       const slottedContent = el.querySelector('span.custom-content');
       expect(slottedContent).toBeTruthy();
@@ -162,7 +224,7 @@ describe('hx-avatar', () => {
       const el = await fixture<HelixAvatar>(
         '<hx-avatar initials="JD"><span slot="badge" class="status-dot"></span></hx-avatar>',
       );
-      await new Promise((r) => setTimeout(r, 50));
+      await el.updateComplete;
       await el.updateComplete;
       const badge = el.querySelector('span.status-dot');
       expect(badge).toBeTruthy();
@@ -189,7 +251,7 @@ describe('hx-avatar', () => {
 
     it('exposes "fallback-icon" part when no src or initials', async () => {
       const el = await fixture<HelixAvatar>('<hx-avatar></hx-avatar>');
-      await new Promise((r) => setTimeout(r, 50));
+      await el.updateComplete;
       await el.updateComplete;
       const icon = shadowQuery(el, '[part="fallback-icon"]');
       expect(icon).toBeTruthy();
@@ -204,12 +266,12 @@ describe('hx-avatar', () => {
     });
   });
 
-  // ─── Accessibility (axe-core) (2) ───
+  // ─── Accessibility (axe-core) (5) — P2-8 ───
 
   describe('Accessibility (axe-core)', () => {
     it('has no axe violations in default state (fallback icon)', async () => {
-      const el = await fixture<HelixAvatar>('<hx-avatar></hx-avatar>');
-      await new Promise((r) => setTimeout(r, 50));
+      const el = await fixture<HelixAvatar>('<hx-avatar label="Anonymous user"></hx-avatar>');
+      await el.updateComplete;
       await el.updateComplete;
       await page.screenshot();
       const { violations } = await checkA11y(el);
@@ -217,7 +279,41 @@ describe('hx-avatar', () => {
     });
 
     it('has no axe violations with initials', async () => {
-      const el = await fixture<HelixAvatar>('<hx-avatar initials="JD"></hx-avatar>');
+      const el = await fixture<HelixAvatar>(
+        '<hx-avatar initials="JD" label="Dr. John Doe"></hx-avatar>',
+      );
+      await el.updateComplete;
+      await page.screenshot();
+      const { violations } = await checkA11y(el);
+      expect(violations).toEqual([]);
+    });
+
+    it('has no axe violations with image src and alt', async () => {
+      const el = await fixture<HelixAvatar>(
+        '<hx-avatar src="https://example.com/avatar.png" alt="Dr. Jane Doe"></hx-avatar>',
+      );
+      await el.updateComplete;
+      await page.screenshot();
+      const { violations } = await checkA11y(el);
+      expect(violations).toEqual([]);
+    });
+
+    it('has no axe violations with slotted content', async () => {
+      const el = await fixture<HelixAvatar>(
+        '<hx-avatar><img src="https://example.com/custom.png" alt="System avatar" /></hx-avatar>',
+      );
+      await el.updateComplete;
+      await el.updateComplete;
+      await page.screenshot();
+      const { violations } = await checkA11y(el);
+      expect(violations).toEqual([]);
+    });
+
+    it('has no axe violations with badge slot', async () => {
+      const el = await fixture<HelixAvatar>(
+        '<hx-avatar initials="JD" label="Dr. John Doe"><span slot="badge" role="img" aria-label="Online status: available"></span></hx-avatar>',
+      );
+      await el.updateComplete;
       await el.updateComplete;
       await page.screenshot();
       const { violations } = await checkA11y(el);

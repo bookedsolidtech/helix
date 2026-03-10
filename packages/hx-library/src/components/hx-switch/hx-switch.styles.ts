@@ -140,7 +140,7 @@ export const helixSwitchStyles = css`
   }
 
   .switch__required-marker {
-    color: var(--hx-switch-error-color, var(--hx-color-error-500, #dc3545));
+    color: var(--hx-switch-error-color, var(--hx-color-error-text, #b91c1c));
     font-weight: var(--hx-font-weight-bold, 700);
   }
 
@@ -148,13 +148,22 @@ export const helixSwitchStyles = css`
 
   .switch__help-text {
     font-size: var(--hx-font-size-xs, 0.75rem);
-    color: var(--hx-color-neutral-500, #6c757d);
+    color: var(--hx-switch-help-text-color, var(--hx-color-neutral-500, #6c757d));
     line-height: var(--hx-line-height-normal, 1.5);
   }
 
   .switch__error {
     font-size: var(--hx-font-size-xs, 0.75rem);
-    color: var(--hx-switch-error-color, var(--hx-color-error-500, #dc3545));
+    color: var(--hx-switch-error-color, var(--hx-color-error-text, #b91c1c));
     line-height: var(--hx-line-height-normal, 1.5);
+  }
+
+  /* --- Reduced Motion --- */
+
+  @media (prefers-reduced-motion: reduce) {
+    .switch__track,
+    .switch__thumb {
+      transition: none;
+    }
   }
 `;

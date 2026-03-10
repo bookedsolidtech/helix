@@ -1,12 +1,6 @@
 import { describe, it, expect, afterEach } from 'vitest';
 import { page } from '@vitest/browser/context';
-import {
-  fixture,
-  shadowQuery,
-  oneEvent,
-  cleanup,
-  checkA11y,
-} from '../../test-utils.js';
+import { fixture, shadowQuery, oneEvent, cleanup, checkA11y } from '../../test-utils.js';
 import type { HelixCard } from './hx-card.js';
 import './index.js';
 
@@ -106,10 +100,39 @@ describe('hx-card', () => {
       expect(card.getAttribute('tabindex')).toBe('0');
     });
 
-    it('has aria-label="Navigate to {hx-href}" when hx-href set', async () => {
+    it('has no aria-label by default when hx-href set (accessible name from content)', async () => {
       const el = await fixture<HelixCard>('<hx-card hx-href="/test">Content</hx-card>');
       const card = shadowQuery(el, '.card')!;
-      expect(card.getAttribute('aria-label')).toBe('Navigate to /test');
+      expect(card.hasAttribute('aria-label')).toBe(false);
+    });
+
+    it('uses hx-aria-label when provided on interactive card', async () => {
+      const el = await fixture<HelixCard>(
+        '<hx-card hx-href="/test" hx-aria-label="View patient record">Content</hx-card>',
+      );
+      const card = shadowQuery(el, '.card')!;
+      expect(card.getAttribute('aria-label')).toBe('View patient record');
+    });
+
+    it('updates interactive attributes when hxHref changes after initial render', async () => {
+      const el = await fixture<HelixCard>('<hx-card>Content</hx-card>');
+      const card = shadowQuery(el, '.card')!;
+      expect(card.hasAttribute('role')).toBe(false);
+      expect(card.hasAttribute('tabindex')).toBe(false);
+
+      el.hxHref = '/new-path';
+      await el.updateComplete;
+
+      expect(card.getAttribute('role')).toBe('link');
+      expect(card.getAttribute('tabindex')).toBe('0');
+      expect(card.classList.contains('card--interactive')).toBe(true);
+
+      el.hxHref = undefined;
+      await el.updateComplete;
+
+      expect(card.hasAttribute('role')).toBe(false);
+      expect(card.hasAttribute('tabindex')).toBe(false);
+      expect(card.classList.contains('card--interactive')).toBe(false);
     });
   });
 
@@ -139,19 +162,19 @@ describe('hx-card', () => {
   // ─── Events (3) ───
 
   describe('Events', () => {
-    it('dispatches hx-card-click when hx-href + click', async () => {
+    it('dispatches hx-click when hx-href + click', async () => {
       const el = await fixture<HelixCard>('<hx-card hx-href="/test">Content</hx-card>');
       const card = shadowQuery(el, '.card')!;
-      const eventPromise = oneEvent(el, 'hx-card-click');
+      const eventPromise = oneEvent(el, 'hx-click');
       card.click();
       const event = await eventPromise;
       expect(event).toBeTruthy();
     });
 
-    it('hx-card-click detail contains href and originalEvent', async () => {
+    it('hx-click detail contains href and originalEvent', async () => {
       const el = await fixture<HelixCard>('<hx-card hx-href="/test">Content</hx-card>');
       const card = shadowQuery(el, '.card')!;
-      const eventPromise = oneEvent<CustomEvent>(el, 'hx-card-click');
+      const eventPromise = oneEvent<CustomEvent>(el, 'hx-click');
       card.click();
       const event = await eventPromise;
       expect(event.detail.href).toBe('/test');
@@ -162,10 +185,11 @@ describe('hx-card', () => {
       const el = await fixture<HelixCard>('<hx-card>Content</hx-card>');
       const card = shadowQuery(el, '.card')!;
       let fired = false;
-      el.addEventListener('hx-card-click', () => {
+      el.addEventListener('hx-click', () => {
         fired = true;
       });
       card.click();
+      // Allow brief settle time to confirm hx-click is not dispatched on a non-interactive card
       await new Promise((r) => setTimeout(r, 50));
       expect(fired).toBe(false);
     });
@@ -174,19 +198,19 @@ describe('hx-card', () => {
   // ─── Keyboard (3) ───
 
   describe('Keyboard', () => {
-    it('Enter fires hx-card-click when interactive', async () => {
+    it('Enter fires hx-click when interactive', async () => {
       const el = await fixture<HelixCard>('<hx-card hx-href="/test">Content</hx-card>');
       const card = shadowQuery(el, '.card')!;
-      const eventPromise = oneEvent<CustomEvent>(el, 'hx-card-click');
+      const eventPromise = oneEvent<CustomEvent>(el, 'hx-click');
       card.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
       const event = await eventPromise;
       expect(event.detail.href).toBe('/test');
     });
 
-    it('Space fires hx-card-click when interactive', async () => {
+    it('Space fires hx-click when interactive', async () => {
       const el = await fixture<HelixCard>('<hx-card hx-href="/test">Content</hx-card>');
       const card = shadowQuery(el, '.card')!;
-      const eventPromise = oneEvent<CustomEvent>(el, 'hx-card-click');
+      const eventPromise = oneEvent<CustomEvent>(el, 'hx-click');
       card.dispatchEvent(new KeyboardEvent('keydown', { key: ' ', bubbles: true }));
       const event = await eventPromise;
       expect(event.detail.href).toBe('/test');
@@ -196,10 +220,11 @@ describe('hx-card', () => {
       const el = await fixture<HelixCard>('<hx-card>Content</hx-card>');
       const card = shadowQuery(el, '.card')!;
       let fired = false;
-      el.addEventListener('hx-card-click', () => {
+      el.addEventListener('hx-click', () => {
         fired = true;
       });
       card.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
+      // Allow brief settle time to confirm hx-click is not dispatched on a non-interactive card
       await new Promise((r) => setTimeout(r, 50));
       expect(fired).toBe(false);
     });
@@ -220,7 +245,9 @@ describe('hx-card', () => {
 
   describe('Slot: heading', () => {
     it('heading content renders', async () => {
-      const el = await fixture<HelixCard>('<hx-card><span slot="heading">Title</span>Body</hx-card>');
+      const el = await fixture<HelixCard>(
+        '<hx-card><span slot="heading">Title</span>Body</hx-card>',
+      );
       const headingSlot = el.querySelector('[slot="heading"]');
       expect(headingSlot).toBeTruthy();
       expect(headingSlot?.textContent).toBe('Title');
@@ -311,6 +338,22 @@ describe('hx-card', () => {
     });
   });
 
+  // ─── Interactive + Actions Anti-Pattern ───
+
+  describe('Interactive + Actions slot (known limitation)', () => {
+    it('renders both hx-href and actions slot content (ARIA anti-pattern — avoid in production)', async () => {
+      const el = await fixture<HelixCard>(
+        '<hx-card hx-href="/test"><span slot="heading">Title</span><button slot="actions">Action</button></hx-card>',
+      );
+      const card = shadowQuery(el, '.card')!;
+      // Card has role="link" when hx-href is set
+      expect(card.getAttribute('role')).toBe('link');
+      // Actions slot is populated (consumer's responsibility to avoid this combination)
+      const action = el.querySelector('[slot="actions"]');
+      expect(action).toBeTruthy();
+    });
+  });
+
   // ─── Accessibility (axe-core) ───
 
   describe('Accessibility (axe-core)', () => {
@@ -326,6 +369,15 @@ describe('hx-card', () => {
     it('has no axe violations when interactive', async () => {
       const el = await fixture<HelixCard>(
         '<hx-card hx-href="https://example.com"><span slot="heading">Title</span><p>Content</p></hx-card>',
+      );
+      await page.screenshot();
+      const { violations } = await checkA11y(el);
+      expect(violations).toEqual([]);
+    });
+
+    it('has no axe violations when interactive with hx-aria-label', async () => {
+      const el = await fixture<HelixCard>(
+        '<hx-card hx-href="https://example.com" hx-aria-label="View patient record"><span slot="heading">Title</span><p>Content</p></hx-card>',
       );
       await page.screenshot();
       const { violations } = await checkA11y(el);

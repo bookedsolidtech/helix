@@ -146,7 +146,7 @@ export const helixTextStyles = css`
     display: block;
   }
 
-  :host([lines]) {
+  :host([lines]:not([lines='0'])) {
     display: block;
   }
 `;

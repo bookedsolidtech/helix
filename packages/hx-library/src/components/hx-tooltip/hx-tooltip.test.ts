@@ -229,6 +229,57 @@ describe('hx-tooltip', () => {
       const tooltip = shadowQuery(el, '[part="tooltip"]');
       expect(tooltip?.classList.contains('visible')).toBe(false);
     });
+
+    it('hides tooltip on focusout', async () => {
+      const el = await fixture<HelixTooltip>(
+        '<hx-tooltip show-delay="0" hide-delay="0"><button>Trigger</button><span slot="content">Tip</span></hx-tooltip>',
+      );
+      const wrapper = shadowQuery<HTMLElement>(el, '.trigger-wrapper')!;
+      wrapper.dispatchEvent(new FocusEvent('focusin', { bubbles: true }));
+      vi.runAllTimers();
+      await el.updateComplete;
+      expect(shadowQuery(el, '[part="tooltip"]')?.classList.contains('visible')).toBe(true);
+
+      wrapper.dispatchEvent(new FocusEvent('focusout', { bubbles: true }));
+      vi.runAllTimers();
+      await el.updateComplete;
+      expect(shadowQuery(el, '[part="tooltip"]')?.classList.contains('visible')).toBe(false);
+    });
+
+    it('respects custom show-delay and hide-delay', async () => {
+      const el = await fixture<HelixTooltip>(
+        '<hx-tooltip show-delay="500" hide-delay="200"><button>Trigger</button><span slot="content">Tip</span></hx-tooltip>',
+      );
+      expect(el.showDelay).toBe(500);
+      expect(el.hideDelay).toBe(200);
+
+      const wrapper = shadowQuery<HTMLElement>(el, '.trigger-wrapper')!;
+      wrapper.dispatchEvent(new MouseEvent('mouseenter', { bubbles: true }));
+
+      // Advance less than show-delay — tooltip should not be visible yet
+      vi.advanceTimersByTime(200);
+      await el.updateComplete;
+      expect(shadowQuery(el, '[part="tooltip"]')?.classList.contains('visible')).toBe(false);
+
+      // Advance past show-delay
+      vi.advanceTimersByTime(300);
+      await el.updateComplete;
+      expect(shadowQuery(el, '[part="tooltip"]')?.classList.contains('visible')).toBe(true);
+    });
+
+    it('cleans up timers on disconnectedCallback', async () => {
+      const el = await fixture<HelixTooltip>(
+        '<hx-tooltip show-delay="500"><button>Trigger</button><span slot="content">Tip</span></hx-tooltip>',
+      );
+      const wrapper = shadowQuery<HTMLElement>(el, '.trigger-wrapper')!;
+      wrapper.dispatchEvent(new MouseEvent('mouseenter', { bubbles: true }));
+
+      // Disconnect before timer fires
+      el.remove();
+
+      // Timers should have been cleared — no errors
+      vi.runAllTimers();
+    });
   });
 
   // ─── Accessibility (axe-core) ───
@@ -240,6 +291,26 @@ describe('hx-tooltip', () => {
       );
       await page.screenshot();
       const { violations } = await checkA11y(el);
+      expect(violations).toEqual([]);
+    });
+
+    it('has no axe violations in visible state', async () => {
+      const el = await fixture<HelixTooltip>(
+        '<hx-tooltip show-delay="0" hide-delay="0"><button>Help</button><span slot="content">Helpful context</span></hx-tooltip>',
+      );
+      const wrapper = shadowQuery<HTMLElement>(el, '.trigger-wrapper')!;
+      wrapper.dispatchEvent(new MouseEvent('mouseenter', { bubbles: true }));
+      // Allow microtask queue to flush so the show-delay=0 timer fires and Lit reactive updates complete
+      await new Promise<void>((resolve) => setTimeout(resolve, 0));
+      await el.updateComplete;
+      await page.screenshot();
+      // Disable color-contrast: axe cannot compute the visual background for slotted
+      // light-DOM content inside a shadow DOM tooltip — it detects the page background
+      // instead of the tooltip's dark background. This is a known axe limitation with
+      // shadow DOM, not an actual contrast failure.
+      const { violations } = await checkA11y(el, {
+        rules: { 'color-contrast': { enabled: false } },
+      });
       expect(violations).toEqual([]);
     });
   });

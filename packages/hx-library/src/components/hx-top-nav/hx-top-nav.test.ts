@@ -7,7 +7,7 @@ import './index.js';
 afterEach(cleanup);
 
 describe('hx-top-nav', () => {
-  // ─── Rendering (3) ───
+  // ─── Rendering (4) ───
 
   describe('Rendering', () => {
     it('renders with shadow DOM', async () => {
@@ -15,7 +15,14 @@ describe('hx-top-nav', () => {
       expect(el.shadowRoot).toBeTruthy();
     });
 
-    it('exposes "nav" CSS part on <nav> element', async () => {
+    it('renders a <header> landmark wrapper', async () => {
+      const el = await fixture<HelixTopNav>('<hx-top-nav></hx-top-nav>');
+      const header = shadowQuery(el, '[part="header"]');
+      expect(header).toBeTruthy();
+      expect(header?.tagName.toLowerCase()).toBe('header');
+    });
+
+    it('exposes "nav" CSS part on <nav> element inside header', async () => {
       const el = await fixture<HelixTopNav>('<hx-top-nav></hx-top-nav>');
       const nav = shadowQuery(el, '[part="nav"]');
       expect(nav).toBeTruthy();
@@ -59,9 +66,15 @@ describe('hx-top-nav', () => {
     });
   });
 
-  // ─── CSS Parts (5) ───
+  // ─── CSS Parts (6) ───
 
   describe('CSS Parts', () => {
+    it('header part exposed', async () => {
+      const el = await fixture<HelixTopNav>('<hx-top-nav></hx-top-nav>');
+      const header = shadowQuery(el, '[part="header"]');
+      expect(header).toBeTruthy();
+    });
+
     it('nav part exposed', async () => {
       const el = await fixture<HelixTopNav>('<hx-top-nav></hx-top-nav>');
       const nav = shadowQuery(el, '[part="nav"]');
@@ -129,6 +142,69 @@ describe('hx-top-nav', () => {
     });
   });
 
+  // ─── Keyboard Navigation (4) ───
+
+  describe('Keyboard Navigation', () => {
+    it('pressing Escape closes the mobile menu and dispatches hx-mobile-toggle with open: false', async () => {
+      const el = await fixture<HelixTopNav>('<hx-top-nav><a href="/home">Home</a></hx-top-nav>');
+      const btn = shadowQuery(el, '[part="mobile-toggle"]')! as HTMLButtonElement;
+
+      // Open the menu
+      btn.click();
+      await el.updateComplete;
+      expect(btn.getAttribute('aria-expanded')).toBe('true');
+
+      // Listen for close event, then press Escape
+      const closeEventPromise = oneEvent<CustomEvent>(el, 'hx-mobile-toggle');
+      el.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+      await el.updateComplete;
+
+      expect(btn.getAttribute('aria-expanded')).toBe('false');
+
+      const closeEvent = await closeEventPromise;
+      expect(closeEvent.detail.open).toBe(false);
+    });
+
+    it('pressing Escape when menu is closed does nothing', async () => {
+      const el = await fixture<HelixTopNav>('<hx-top-nav><a href="/home">Home</a></hx-top-nav>');
+      const btn = shadowQuery(el, '[part="mobile-toggle"]')! as HTMLButtonElement;
+
+      expect(btn.getAttribute('aria-expanded')).toBe('false');
+
+      // Escape on closed menu should be a no-op
+      el.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+      await el.updateComplete;
+
+      expect(btn.getAttribute('aria-expanded')).toBe('false');
+    });
+
+    it('aria-expanded attribute reflects current open state as string', async () => {
+      const el = await fixture<HelixTopNav>('<hx-top-nav></hx-top-nav>');
+      const btn = shadowQuery(el, '[part="mobile-toggle"]')! as HTMLButtonElement;
+
+      expect(btn.getAttribute('aria-expanded')).toBe('false');
+
+      btn.click();
+      await el.updateComplete;
+
+      expect(btn.getAttribute('aria-expanded')).toBe('true');
+
+      btn.click();
+      await el.updateComplete;
+
+      expect(btn.getAttribute('aria-expanded')).toBe('false');
+    });
+
+    it('toggle button has aria-controls pointing to nav-menu', async () => {
+      const el = await fixture<HelixTopNav>('<hx-top-nav></hx-top-nav>');
+      const btn = shadowQuery(el, '[part="mobile-toggle"]')!;
+      const collapsible = shadowQuery(el, '#nav-menu');
+
+      expect(btn.getAttribute('aria-controls')).toBe('nav-menu');
+      expect(collapsible).toBeTruthy();
+    });
+  });
+
   // ─── Slots (3) ───
 
   describe('Slots', () => {
@@ -161,9 +237,9 @@ describe('hx-top-nav', () => {
   // ─── Accessibility (axe-core) ───
 
   describe('Accessibility (axe-core)', () => {
-    it('has no axe violations in default state', async () => {
+    it('has no axe violations in default state with bare link content', async () => {
       const el = await fixture<HelixTopNav>(
-        '<hx-top-nav><a href="/home">Home</a><button slot="actions">Sign In</button></hx-top-nav>',
+        '<hx-top-nav><a href="/home">Home</a><a href="/about">About</a><button slot="actions">Sign In</button></hx-top-nav>',
       );
       await page.screenshot();
       const { violations } = await checkA11y(el);
@@ -174,6 +250,22 @@ describe('hx-top-nav', () => {
       const el = await fixture<HelixTopNav>(
         '<hx-top-nav sticky><a href="/home">Home</a><button slot="actions">Sign In</button></hx-top-nav>',
       );
+      await page.screenshot();
+      const { violations } = await checkA11y(el);
+      expect(violations).toEqual([]);
+    });
+
+    it('has no axe violations when mobile menu is open', async () => {
+      // Provide explicit color to avoid browser-default link color contrast failures
+      const el = await fixture<HelixTopNav>(
+        '<hx-top-nav><a href="/home" style="color:#212529;">Home</a><a href="/about" style="color:#212529;">About</a></hx-top-nav>',
+      );
+      const btn = shadowQuery(el, '[part="mobile-toggle"]')! as HTMLButtonElement;
+      btn.click();
+      await el.updateComplete;
+      // Allow CSS transition/animation to complete so the mobile menu is fully visible for axe contrast checks
+      await new Promise((r) => setTimeout(r, 200));
+
       await page.screenshot();
       const { violations } = await checkA11y(el);
       expect(violations).toEqual([]);

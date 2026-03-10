@@ -1,0 +1,400 @@
+---
+title: 'hx-popup'
+description: 'Low-level positioning primitive for anchoring floating elements to a reference element using Floating UI'
+---
+
+import ComponentLoader from '../../../components/ComponentLoader.astro';
+import ComponentDemo from '../../../components/ComponentDemo.astro';
+import ComponentDoc from '../../../components/ComponentDoc.astro';
+
+<ComponentLoader />
+
+<ComponentDoc tagName="hx-popup" section="summary" />
+
+## Overview
+
+`hx-popup` is a low-level positioning primitive that anchors a floating panel to a reference element. It is the foundation that `hx-tooltip`, `hx-dropdown`, and `hx-popover` are built upon.
+
+It does not provide any visual styling, ARIA semantics, or interaction handling — it solely manages the floating position calculation using [Floating UI](https://floating-ui.com/). Consumers are responsible for all ARIA roles, keyboard behavior, and focus management appropriate to their use case.
+
+**Use `hx-popup` when:** you are building a custom overlay component (tooltip, menu, popover, combobox listbox) and need precise anchor-relative positioning with overflow handling.
+**Use `hx-tooltip` instead when:** you only need a simple hover or focus tooltip.
+**Use `hx-dropdown` instead when:** you need a complete trigger-and-panel dropdown with built-in toggle interaction.
+
+## Live Demo
+
+### Basic Popup
+
+A basic popup anchored below its trigger via the `anchor` slot.
+
+<ComponentDemo title="Basic Popup">
+  <hx-popup active distance="8">
+    <button slot="anchor" style="padding: 0.5rem 1rem;">
+      Anchor button
+    </button>
+    <div style="background: white; border: 1px solid #e5e7eb; border-radius: 0.375rem; padding: 0.75rem 1rem; box-shadow: 0 4px 12px rgba(0,0,0,0.1); font-size: 0.875rem;">
+      Popup content
+    </div>
+  </hx-popup>
+</ComponentDemo>
+
+### With Arrow
+
+Add the `arrow` attribute to render a directional arrow pointing toward the anchor.
+
+<ComponentDemo title="With Arrow">
+  <div style="display: flex; gap: 3rem; padding: 2rem; justify-content: center;">
+    <hx-popup active placement="top" distance="12" arrow style="--hx-arrow-color: #374151;">
+      <button slot="anchor" style="padding: 0.5rem 1rem;">
+        Top
+      </button>
+      <div style="background: #374151; color: white; border-radius: 0.375rem; padding: 0.5rem 0.75rem; font-size: 0.875rem;">
+        Above
+      </div>
+    </hx-popup>
+    <hx-popup active placement="bottom" distance="12" arrow style="--hx-arrow-color: #374151;">
+      <button slot="anchor" style="padding: 0.5rem 1rem;">
+        Bottom
+      </button>
+      <div style="background: #374151; color: white; border-radius: 0.375rem; padding: 0.5rem 0.75rem; font-size: 0.875rem;">
+        Below
+      </div>
+    </hx-popup>
+    <hx-popup active placement="right" distance="12" arrow style="--hx-arrow-color: #374151;">
+      <button slot="anchor" style="padding: 0.5rem 1rem;">
+        Right
+      </button>
+      <div style="background: #374151; color: white; border-radius: 0.375rem; padding: 0.5rem 0.75rem; font-size: 0.875rem;">
+        Right
+      </div>
+    </hx-popup>
+  </div>
+</ComponentDemo>
+
+### Interactive Toggle
+
+A complete example showing how to toggle the popup and manage `aria-expanded` on the trigger.
+
+<ComponentDemo title="Interactive Toggle">
+  <hx-popup id="demo-popup" placement="bottom" distance="8">
+    <button
+      id="demo-trigger"
+      slot="anchor"
+      aria-expanded="false"
+      aria-controls="demo-popup"
+      style="padding: 0.5rem 1rem;"
+      onclick="const popup = document.getElementById('demo-popup'); popup.active = !popup.active; this.setAttribute('aria-expanded', String(popup.active));"
+    >
+      Toggle Popup
+    </button>
+    <div
+      role="dialog"
+      aria-label="Example popup"
+      style="background: white; border: 1px solid #e5e7eb; border-radius: 0.375rem; padding: 0.75rem 1rem; box-shadow: 0 4px 12px rgba(0,0,0,0.1); font-size: 0.875rem; min-width: 12rem;"
+    >
+      Popup is open. Click the trigger again to close.
+    </div>
+  </hx-popup>
+</ComponentDemo>
+
+## Installation
+
+```bash
+# Full library
+npm install @helix/library
+
+# Or import only this component (tree-shaking friendly)
+import '@helix/library/components/hx-popup';
+```
+
+## Basic Usage
+
+Minimal HTML — place the trigger in the `anchor` slot and popup content in the default slot:
+
+```html
+<hx-popup placement="bottom" distance="8">
+  <button slot="anchor" aria-expanded="false" aria-controls="my-popup">Open</button>
+  <div id="my-popup" role="dialog" aria-label="My popup">Popup content</div>
+</hx-popup>
+```
+
+Toggle visibility by setting the `active` property:
+
+```js
+const popup = document.querySelector('hx-popup');
+const trigger = popup.querySelector('[slot="anchor"]');
+
+trigger.addEventListener('click', () => {
+  popup.active = !popup.active;
+  trigger.setAttribute('aria-expanded', String(popup.active));
+});
+```
+
+## Properties
+
+| Property                 | Attribute                  | Type                                                                                                                                                                           | Default    | Description                                                                                                                                             |
+| ------------------------ | -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `anchor`                 | `anchor`                   | `string \| Element \| null`                                                                                                                                                    | `null`     | Reference element or CSS selector. Falls back to the `anchor` slot when not set. String form resolves via `querySelector` from the component root node. |
+| `placement`              | `placement`                | `'top' \| 'top-start' \| 'top-end' \| 'right' \| 'right-start' \| 'right-end' \| 'bottom' \| 'bottom-start' \| 'bottom-end' \| 'left' \| 'left-start' \| 'left-end' \| 'auto'` | `'bottom'` | Preferred placement of the popup relative to the anchor.                                                                                                |
+| `active`                 | `active`                   | `boolean`                                                                                                                                                                      | `false`    | Whether the popup is visible. When `false`, the popup is hidden via `display: none` and marked `inert`.                                                 |
+| `distance`               | `distance`                 | `number`                                                                                                                                                                       | `0`        | Gap in pixels between the popup and the anchor element (main axis offset).                                                                              |
+| `skidding`               | `skidding`                 | `number`                                                                                                                                                                       | `0`        | Offset in pixels along the anchor element's axis (cross axis offset).                                                                                   |
+| `arrow`                  | `arrow`                    | `boolean`                                                                                                                                                                      | `false`    | Whether to render an arrow element pointing toward the anchor.                                                                                          |
+| `arrowPlacement`         | `arrow-placement`          | `'start' \| 'center' \| 'end' \| null`                                                                                                                                         | `null`     | Manual placement of the arrow along the popup edge. When `null`, Floating UI computes the optimal position.                                             |
+| `arrowPadding`           | `arrow-padding`            | `number`                                                                                                                                                                       | `10`       | Minimum padding in pixels from the popup edge to the arrow.                                                                                             |
+| `flip`                   | `flip`                     | `boolean`                                                                                                                                                                      | `false`    | When `true`, flips the popup to the opposite side to avoid viewport overflow.                                                                           |
+| `flipFallbackPlacements` | `flip-fallback-placements` | `PopupPlacement[]`                                                                                                                                                             | `[]`       | Ordered list of fallback placements to try when flipping. Accepts a JSON array string as the attribute value.                                           |
+| `shift`                  | `shift`                    | `boolean`                                                                                                                                                                      | `false`    | When `true`, shifts the popup along its axis to remain fully within the viewport.                                                                       |
+| `autoSize`               | `auto-size`                | `boolean`                                                                                                                                                                      | `false`    | When `true`, sets `--hx-auto-size-available-width` and `--hx-auto-size-available-height` on `:host` so slotted content can constrain its dimensions.    |
+| `strategy`               | `strategy`                 | `'fixed' \| 'absolute'`                                                                                                                                                        | `'fixed'`  | Floating UI positioning strategy. Use `'absolute'` inside `overflow: hidden` or scroll containers.                                                      |
+
+## Events
+
+| Event           | Detail Type | Description                                                                |
+| --------------- | ----------- | -------------------------------------------------------------------------- |
+| `hx-reposition` | _(none)_    | Emitted after the popup position is recalculated. Bubbles and is composed. |
+
+## CSS Custom Properties
+
+| Property                          | Default                                         | Description                                                                                               |
+| --------------------------------- | ----------------------------------------------- | --------------------------------------------------------------------------------------------------------- |
+| `--hx-popup-z-index`              | `9000`                                          | Z-index of the popup container.                                                                           |
+| `--hx-popup-transition`           | `none`                                          | CSS transition applied to the popup element. Override to add enter/exit animations (see note below).      |
+| `--hx-arrow-size`                 | `8px`                                           | Width and height of the arrow element.                                                                    |
+| `--hx-arrow-color`                | `var(--hx-color-surface-overlay, #ffffff)`      | Background color of the arrow element.                                                                    |
+| `--hx-auto-size-available-width`  | _(set by component when `auto-size` is active)_ | Available width set by the auto-size middleware. Read this in slotted content to constrain `max-width`.   |
+| `--hx-auto-size-available-height` | _(set by component when `auto-size` is active)_ | Available height set by the auto-size middleware. Read this in slotted content to constrain `max-height`. |
+
+### Enabling Transitions
+
+The default `display: none` hide mechanism cannot be transitioned. To add enter/exit animations, override the show/hide behavior via `::part(popup)`:
+
+```css
+hx-popup {
+  --hx-popup-transition: opacity 0.15s ease, transform 0.15s ease;
+}
+
+/* Keep the popup in the flow but invisible when inactive */
+hx-popup:not([active])::part(popup) {
+  display: block;
+  opacity: 0;
+  transform: translateY(-4px);
+  pointer-events: none;
+}
+
+hx-popup[active]::part(popup) {
+  opacity: 1;
+  transform: translateY(0);
+}
+```
+
+## CSS Parts
+
+| Part    | Description                                                                             |
+| ------- | --------------------------------------------------------------------------------------- |
+| `popup` | The floating panel container. Target this to style the popup's appearance.              |
+| `arrow` | The arrow indicator element. Only present in the DOM when the `arrow` attribute is set. |
+
+### CSS Parts Example
+
+```css
+/* Style the popup panel */
+hx-popup::part(popup) {
+  background: #1e293b;
+  color: white;
+  border-radius: 0.5rem;
+  padding: 0.75rem 1rem;
+  font-size: 0.875rem;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+}
+
+/* Match the arrow color to the panel */
+hx-popup {
+  --hx-arrow-color: #1e293b;
+}
+```
+
+## Slots
+
+| Slot        | Description                                                                     |
+| ----------- | ------------------------------------------------------------------------------- |
+| `anchor`    | The reference element the popup is anchored to. Typically a button or trigger.  |
+| _(default)_ | The popup content. Place any element here — it becomes the floating panel body. |
+
+## Accessibility
+
+`hx-popup` is a **positioning utility only**. It provides no ARIA roles or keyboard interaction. All accessibility semantics are the consumer's responsibility.
+
+| Topic            | Details                                                                                                                                                                                                                      |
+| ---------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| ARIA role        | None. Consumers must add the appropriate role to the slotted popup content: `role="tooltip"` for tooltip patterns, `role="dialog"` for popovers, `role="listbox"` for dropdowns.                                             |
+| `aria-expanded`  | The trigger element in the `anchor` slot **must** set `aria-expanded="true"` when the popup is open and `aria-expanded="false"` when closed.                                                                                 |
+| `aria-controls`  | The trigger element **should** set `aria-controls` pointing to the `id` of the popup content element to associate trigger and popup for assistive technology.                                                                |
+| Visibility       | Inactive popups are hidden via CSS `display: none` on `::part(popup)` and the `inert` attribute on the popup container. Both are reliable accessibility-tree hiding mechanisms across all browsers.                          |
+| Focus management | `hx-popup` does **not** trap focus or move focus on open/close. Consumers building dialogs or menus must implement focus trapping and `Escape` key dismissal themselves.                                                     |
+| Screen reader    | No announcements are made by this component. Consumers are responsible for live region announcements or focus-based announcements appropriate to their pattern.                                                              |
+| WCAG 2.1 AA      | This component passes axe-core audits in both active and inactive states. Composite patterns (tooltip, dialog, menu) built on top must be audited independently to confirm WCAG compliance for their specific ARIA patterns. |
+
+## Keyboard Navigation
+
+`hx-popup` itself does not handle keyboard events. The following patterns apply to consumer implementations:
+
+| Key      | Recommended Behavior for Consumer Patterns                                       |
+| -------- | -------------------------------------------------------------------------------- |
+| `Enter`  | Open / activate the popup from the anchor trigger.                               |
+| `Space`  | Open / activate the popup from the anchor trigger.                               |
+| `Escape` | Close the popup and return focus to the anchor trigger.                          |
+| `Tab`    | Move focus into the popup content when open (or close and advance, per pattern). |
+
+## Drupal Integration
+
+`hx-popup` is a JavaScript utility — Twig provides markup only. No Drupal behavior file is required for basic usage since the `anchor` slot and `active` attribute are sufficient.
+
+```twig
+{# my-module/templates/my-template.html.twig #}
+<hx-popup id="my-popup" placement="bottom" distance="8">
+  <button
+    slot="anchor"
+    aria-expanded="false"
+    aria-controls="popup-content"
+  >
+    {{ trigger_label }}
+  </button>
+  <div id="popup-content" role="dialog" aria-label="{{ popup_label }}">
+    {{ popup_content }}
+  </div>
+</hx-popup>
+```
+
+For Drupal-generated dynamic IDs, prefer the `anchor` **slot** over the `anchor` CSS selector attribute, since slot-based anchoring does not require knowing the element ID at render time. If you must use the CSS selector form with a dynamic ID, pass the ID via a Twig variable:
+
+```twig
+<hx-popup anchor="#{{ element['#id'] }}" placement="bottom">...</hx-popup>
+```
+
+Load the library in your module's `.libraries.yml`:
+
+```yaml
+helix-components:
+  js:
+    /libraries/helix/helix.min.js: { minified: true }
+```
+
+Wire toggle interaction in Drupal behaviors using `once()` to prevent duplicate listeners on AJAX:
+
+```javascript
+Drupal.behaviors.helixPopup = {
+  attach(context) {
+    // once() is a Drupal core utility — prevents duplicate binding during AJAX attach cycles
+    once('helixPopup', 'hx-popup', context).forEach((popup) => {
+      const trigger = popup.querySelector('[slot="anchor"]');
+      if (!trigger) return;
+
+      trigger.addEventListener('click', () => {
+        popup.active = !popup.active;
+        trigger.setAttribute('aria-expanded', String(popup.active));
+      });
+
+      // Close on Escape
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && popup.active) {
+          popup.active = false;
+          trigger.setAttribute('aria-expanded', 'false');
+          trigger.focus();
+        }
+      });
+    });
+  },
+};
+```
+
+## Standalone HTML Example
+
+Copy-paste this into a `.html` file and open it in a browser — no build tool needed:
+
+```html
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>hx-popup example</title>
+    <!--
+      @helix/library is a private package — install via npm workspace, not CDN.
+      In your project: import '@helix/library'; in your bundler entry point.
+    -->
+  </head>
+  <body style="font-family: sans-serif; padding: 4rem; display: flex; justify-content: center;">
+    <hx-popup id="my-popup" placement="bottom" distance="8" flip shift>
+      <button
+        id="trigger"
+        slot="anchor"
+        aria-expanded="false"
+        aria-controls="popup-panel"
+        style="padding: 0.5rem 1.25rem; font-size: 1rem; cursor: pointer;"
+      >
+        Open Popup
+      </button>
+      <div
+        id="popup-panel"
+        role="dialog"
+        aria-label="Patient actions"
+        style="
+          background: white;
+          border: 1px solid #e5e7eb;
+          border-radius: 0.5rem;
+          padding: 1rem 1.25rem;
+          box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+          min-width: 14rem;
+          font-size: 0.9rem;
+        "
+      >
+        <p style="margin: 0 0 0.75rem; font-weight: 600;">Patient Actions</p>
+        <ul
+          style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.5rem;"
+        >
+          <li><a href="#">Schedule Appointment</a></li>
+          <li><a href="#">View Lab Results</a></li>
+          <li><a href="#">Request Prescription Refill</a></li>
+        </ul>
+      </div>
+    </hx-popup>
+
+    <script>
+      const popup = document.getElementById('my-popup');
+      const trigger = document.getElementById('trigger');
+
+      trigger.addEventListener('click', () => {
+        popup.active = !popup.active;
+        trigger.setAttribute('aria-expanded', String(popup.active));
+      });
+
+      // Close on Escape
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && popup.active) {
+          popup.active = false;
+          trigger.setAttribute('aria-expanded', 'false');
+          trigger.focus();
+        }
+      });
+
+      // Close on outside click
+      document.addEventListener('click', (e) => {
+        if (!popup.contains(e.target) && popup.active) {
+          popup.active = false;
+          trigger.setAttribute('aria-expanded', 'false');
+        }
+      });
+
+      // Listen for reposition events
+      popup.addEventListener('hx-reposition', () => {
+        console.log('Popup repositioned');
+      });
+    </script>
+  </body>
+</html>
+```
+
+## API Reference
+
+<ComponentDoc tagName="hx-popup" section="api" />

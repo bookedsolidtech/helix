@@ -1,0 +1,600 @@
+---
+title: 'hx-format-date'
+description: 'Formats and displays dates and times according to locale and Intl API conventions.'
+---
+
+import ComponentLoader from '../../../components/ComponentLoader.astro';
+import ComponentDemo from '../../../components/ComponentDemo.astro';
+import ComponentDoc from '../../../components/ComponentDoc.astro';
+
+<ComponentLoader />
+
+<ComponentDoc tagName="hx-format-date" section="summary" />
+
+## Overview
+
+`hx-format-date` formats and displays a date or time value as an inline `<time>` element. The machine-readable `datetime` attribute is always populated for assistive technologies and microformat parsers, while the visible text is produced by the browser-native `Intl.DateTimeFormat` or `Intl.RelativeTimeFormat` API — giving you full locale awareness and IANA time zone support without shipping a date library.
+
+**Use `hx-format-date` when:** you need to display a date, time, or relative time string that adapts to the user's locale. Common healthcare use cases include appointment timestamps, medication administration records, lab result dates, audit log entries, and "last updated" labels.
+
+**Use a plain `<time>` element instead when:** the date text is already locale-formatted by the server and no client-side adaptation is needed.
+
+**Key behaviors:**
+
+- When no format options are set, defaults to `{ year: 'numeric', month: 'long', day: 'numeric' }` — a safe, human-readable baseline.
+- The `date` attribute accepts an ISO 8601 string, a Unix timestamp in milliseconds, or a `Date` object (set via property). When empty, defaults to the current date and time.
+- Invalid dates fall back to the current date/time rather than rendering an error state.
+- Invalid time zone identifiers return an empty string gracefully.
+- Formatter instances are cached by locale and option signature, so repeated renders on a page with shared locales are cheap.
+- Relative time (`relative` property) is computed once at render. For live countdowns or live "X minutes ago" labels, the consuming component must update the `date` property on an interval.
+
+## Live Demo
+
+### Default Format
+
+When no format properties are set, `hx-format-date` renders the full date in the current document locale using `{ year: 'numeric', month: 'long', day: 'numeric' }`.
+
+<ComponentDemo title="Default Format">
+  <hx-format-date date="2024-06-15T14:30:00.000Z" lang="en-US"></hx-format-date>
+</ComponentDemo>
+
+### Date Only
+
+Compose `month`, `year`, and `day` to render a standalone date string.
+
+<ComponentDemo title="Date Only">
+  <div style="display: grid; gap: 0.5rem;">
+    <hx-format-date
+      date="2024-06-15T14:30:00.000Z"
+      lang="en-US"
+      month="long"
+      year="numeric"
+      day="numeric"
+    ></hx-format-date>
+    <hx-format-date
+      date="2024-06-15T14:30:00.000Z"
+      lang="en-US"
+      month="short"
+      year="numeric"
+      day="2-digit"
+    ></hx-format-date>
+    <hx-format-date
+      date="2024-06-15T14:30:00.000Z"
+      lang="en-US"
+      month="numeric"
+      year="numeric"
+      day="numeric"
+    ></hx-format-date>
+  </div>
+</ComponentDemo>
+
+### With Weekday
+
+Include the `weekday` property to prepend the day of the week.
+
+<ComponentDemo title="With Weekday">
+  <div style="display: grid; gap: 0.5rem;">
+    <hx-format-date
+      date="2024-06-15T14:30:00.000Z"
+      lang="en-US"
+      weekday="long"
+      month="long"
+      year="numeric"
+      day="numeric"
+    ></hx-format-date>
+    <hx-format-date
+      date="2024-06-15T14:30:00.000Z"
+      lang="en-US"
+      weekday="short"
+      month="short"
+      day="numeric"
+    ></hx-format-date>
+    <hx-format-date
+      date="2024-06-15T14:30:00.000Z"
+      lang="en-US"
+      weekday="narrow"
+      month="numeric"
+      day="numeric"
+    ></hx-format-date>
+  </div>
+</ComponentDemo>
+
+### Time Display
+
+Use `hour`, `minute`, and optionally `second` to render a time string. Combine with `time-zone` and `time-zone-name` to make the offset explicit.
+
+<ComponentDemo title="Time Display">
+  <div style="display: grid; gap: 0.5rem;">
+    <hx-format-date
+      date="2024-06-15T14:30:00.000Z"
+      lang="en-US"
+      hour="numeric"
+      minute="2-digit"
+      hour-format="12"
+      time-zone="UTC"
+      time-zone-name="short"
+    ></hx-format-date>
+    <hx-format-date
+      date="2024-06-15T14:30:00.000Z"
+      lang="en-US"
+      hour="numeric"
+      minute="2-digit"
+      hour-format="12"
+      time-zone="America/New_York"
+      time-zone-name="short"
+    ></hx-format-date>
+    <hx-format-date
+      date="2024-06-15T14:30:00.000Z"
+      lang="en-US"
+      hour="2-digit"
+      minute="2-digit"
+      second="2-digit"
+      hour-format="24"
+    ></hx-format-date>
+  </div>
+</ComponentDemo>
+
+### Full Date and Time
+
+Combine date and time properties to render a complete timestamp — useful for audit logs and appointment records.
+
+<ComponentDemo title="Full Date and Time">
+  <div style="display: grid; gap: 0.5rem;">
+    <hx-format-date
+      date="2024-06-15T14:30:00.000Z"
+      lang="en-US"
+      weekday="long"
+      month="long"
+      year="numeric"
+      day="numeric"
+      hour="numeric"
+      minute="2-digit"
+      time-zone="America/Chicago"
+      time-zone-name="short"
+    ></hx-format-date>
+    <hx-format-date
+      date="2024-06-15T14:30:00.000Z"
+      lang="en-US"
+      month="short"
+      day="numeric"
+      year="numeric"
+      hour="2-digit"
+      minute="2-digit"
+      second="2-digit"
+      hour-format="24"
+      time-zone="UTC"
+      time-zone-name="short"
+    ></hx-format-date>
+  </div>
+</ComponentDemo>
+
+### Relative Time
+
+Set `relative` to display time relative to now ("2 hours ago", "in 3 days"). The `numeric` property controls whether natural language ("yesterday") or numeric phrasing ("1 day ago") is used.
+
+The examples below use a static past date. In a real application, relative display is most useful when the date is close to the current time and the containing component refreshes on an interval.
+
+<ComponentDemo title="Relative Time">
+  <div style="display: grid; gap: 0.5rem;">
+    <hx-format-date date="2024-06-15T14:30:00.000Z" lang="en-US" relative></hx-format-date>
+    <hx-format-date
+      date="2024-06-15T14:30:00.000Z"
+      lang="en-US"
+      relative
+      numeric="always"
+    ></hx-format-date>
+  </div>
+</ComponentDemo>
+
+### Locale Variants
+
+The `lang` attribute accepts any BCP 47 locale tag. When omitted, the component reads `document.documentElement.lang` and falls back to `navigator.language`.
+
+<ComponentDemo title="Locale Variants">
+  <div style="display: grid; gap: 0.5rem;">
+    <hx-format-date
+      date="2024-06-15T14:30:00.000Z"
+      lang="en-US"
+      month="long"
+      year="numeric"
+      day="numeric"
+    ></hx-format-date>
+    <hx-format-date
+      date="2024-06-15T14:30:00.000Z"
+      lang="en-GB"
+      month="long"
+      year="numeric"
+      day="numeric"
+    ></hx-format-date>
+    <hx-format-date
+      date="2024-06-15T14:30:00.000Z"
+      lang="de"
+      month="long"
+      year="numeric"
+      day="numeric"
+    ></hx-format-date>
+    <hx-format-date
+      date="2024-06-15T14:30:00.000Z"
+      lang="fr"
+      month="long"
+      year="numeric"
+      day="numeric"
+    ></hx-format-date>
+    <hx-format-date
+      date="2024-06-15T14:30:00.000Z"
+      lang="ja"
+      month="long"
+      year="numeric"
+      day="numeric"
+    ></hx-format-date>
+    <hx-format-date
+      date="2024-06-15T14:30:00.000Z"
+      lang="ar"
+      month="long"
+      year="numeric"
+      day="numeric"
+    ></hx-format-date>
+  </div>
+</ComponentDemo>
+
+## Installation
+
+```bash
+# Full library
+npm install @helix/library
+
+# Or import only this component (tree-shaking friendly)
+import '@helix/library/components/hx-format-date';
+```
+
+## Basic Usage
+
+```html
+<!-- Default: renders full date in document locale -->
+<hx-format-date date="2024-06-15T14:30:00.000Z"></hx-format-date>
+
+<!-- Explicit locale and format -->
+<hx-format-date
+  date="2024-06-15T14:30:00.000Z"
+  lang="en-US"
+  month="long"
+  year="numeric"
+  day="numeric"
+></hx-format-date>
+
+<!-- Time with explicit timezone -->
+<hx-format-date
+  date="2024-06-15T14:30:00.000Z"
+  lang="en-US"
+  hour="numeric"
+  minute="2-digit"
+  hour-format="12"
+  time-zone="America/New_York"
+  time-zone-name="short"
+></hx-format-date>
+
+<!-- Relative time ("X months ago") -->
+<hx-format-date date="2024-06-15T14:30:00.000Z" lang="en-US" relative></hx-format-date>
+
+<!-- Set date via JavaScript property (accepts Date object or number) -->
+<hx-format-date
+  id="appt-date"
+  lang="en-US"
+  month="long"
+  day="numeric"
+  year="numeric"
+></hx-format-date>
+<script>
+  document.getElementById('appt-date').date = new Date('2024-06-15T14:30:00.000Z');
+</script>
+```
+
+## Properties
+
+| Property       | Attribute        | Type                                                                                                 | Default     | Description                                                                                                                                                       |
+| -------------- | ---------------- | ---------------------------------------------------------------------------------------------------- | ----------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `date`         | `date`           | `string \| number \| Date`                                                                           | `''`        | The date/time value. Accepts an ISO 8601 string, a Unix timestamp in milliseconds, or a `Date` object (property only). Defaults to current date/time when empty.  |
+| `lang`         | `lang`           | `string`                                                                                             | `''`        | BCP 47 locale tag (e.g. `"en-US"`, `"de"`, `"ja"`). Defaults to `document.documentElement.lang`, then `navigator.language`.                                       |
+| `month`        | `month`          | `'narrow' \| 'short' \| 'long' \| 'numeric' \| '2-digit' \| undefined`                               | `undefined` | Month display format. Omit to exclude the month from the output.                                                                                                  |
+| `year`         | `year`           | `'numeric' \| '2-digit' \| undefined`                                                                | `undefined` | Year display format. Omit to exclude the year from the output.                                                                                                    |
+| `day`          | `day`            | `'numeric' \| '2-digit' \| undefined`                                                                | `undefined` | Day of month display format. Omit to exclude the day from the output.                                                                                             |
+| `weekday`      | `weekday`        | `'narrow' \| 'short' \| 'long' \| undefined`                                                         | `undefined` | Weekday display format. Omit to exclude the weekday from the output.                                                                                              |
+| `hour`         | `hour`           | `'numeric' \| '2-digit' \| undefined`                                                                | `undefined` | Hour display format. Omit to exclude hours from the output.                                                                                                       |
+| `minute`       | `minute`         | `'numeric' \| '2-digit' \| undefined`                                                                | `undefined` | Minute display format. Omit to exclude minutes from the output.                                                                                                   |
+| `second`       | `second`         | `'numeric' \| '2-digit' \| undefined`                                                                | `undefined` | Second display format. Omit to exclude seconds from the output.                                                                                                   |
+| `timeZoneName` | `time-zone-name` | `'short' \| 'long' \| 'shortOffset' \| 'longOffset' \| 'shortGeneric' \| 'longGeneric' \| undefined` | `undefined` | Time zone name appended to the formatted string.                                                                                                                  |
+| `timeZone`     | `time-zone`      | `string \| undefined`                                                                                | `undefined` | IANA time zone identifier (e.g. `"America/New_York"`, `"UTC"`). Defaults to the runtime's local time zone. Invalid identifiers return `""` gracefully.            |
+| `hourFormat`   | `hour-format`    | `'auto' \| '12' \| '24'`                                                                             | `'auto'`    | Clock format. `"auto"` defers to the locale default; `"12"` forces 12-hour; `"24"` forces 24-hour.                                                                |
+| `numeric`      | `numeric`        | `'always' \| 'auto'`                                                                                 | `'auto'`    | Relative time numeric mode. `"auto"` uses natural language ("yesterday"); `"always"` uses numeric phrasing ("1 day ago"). Only applies when `relative` is `true`. |
+| `relative`     | `relative`       | `boolean`                                                                                            | `false`     | When `true`, renders relative time ("2 hours ago", "in 3 days") using `Intl.RelativeTimeFormat` instead of `Intl.DateTimeFormat`.                                 |
+
+When none of `month`, `year`, `day`, `weekday`, `hour`, `minute`, or `second` are set and `relative` is `false`, the component applies a fallback format of `{ year: 'numeric', month: 'long', day: 'numeric' }` to prevent rendering an empty string.
+
+## CSS Parts
+
+| Part   | Description                        |
+| ------ | ---------------------------------- |
+| `base` | The inner `<time>` element itself. |
+
+```css
+/* Target the inner time element for typography overrides */
+hx-format-date::part(base) {
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+}
+```
+
+## Accessibility
+
+`hx-format-date` renders a native `<time>` element, which is the correct semantic element for machine-readable date and time values per the HTML specification.
+
+| Topic                | Details                                                                                                                                                                                                                      |
+| -------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `<time>` element     | The shadow root contains a `<time>` element whose `datetime` attribute is always set to an ISO 8601 string. This gives assistive technologies and microformat parsers a reliable, locale-neutral value.                      |
+| `datetime` attribute | Populated from the resolved `Date` instance regardless of the display format, ensuring screen readers and search engines receive an unambiguous machine-readable value even when the visible text is localized or relative.  |
+| No ARIA role needed  | The `<time>` element carries implicit semantics. No `role`, `aria-label`, or `aria-describedby` is required unless a consuming component wraps it in an interactive or landmark context.                                     |
+| Color contrast       | `hx-format-date` inherits `color` from the parent element and sets no colors internally. Ensure the surrounding context meets WCAG 2.1 AA contrast ratios (4.5:1 for normal text).                                           |
+| Font inheritance     | `font: inherit` is applied on `:host`. The component does not introduce its own font stack, integrating cleanly into any text context without creating size or weight inconsistencies.                                       |
+| Live relative time   | Relative strings such as "2 hours ago" are meaningful to screen readers. If the value updates on an interval, wrap the element in a container with `aria-live="polite"` so updates are announced without interrupting users. |
+| Internationalization | Locale-aware formatting via `Intl.DateTimeFormat` automatically applies the correct numeral systems, calendar ordering, and right-to-left text direction rules for the active locale.                                        |
+| WCAG                 | Meets WCAG 2.1 AA. No interactive affordances are present, so keyboard and pointer device requirements do not apply. Color contrast responsibility lies with the consuming context.                                          |
+
+## Design Tokens
+
+`hx-format-date` does not define any component-level CSS custom properties. It is an inline text element that intentionally inherits `font` and `color` from its parent context.
+
+```css
+/* The component applies these rules on :host */
+:host {
+  display: inline;
+  font: inherit;
+  color: inherit;
+}
+```
+
+To control appearance, style the surrounding context or target the `base` CSS part directly:
+
+```css
+/* Style format-date instances within a specific context */
+.appointment-card hx-format-date {
+  font-weight: 600;
+  color: var(--hx-color-primary-800);
+}
+
+/* Target the inner <time> element via CSS Part */
+hx-format-date::part(base) {
+  font-variant-numeric: tabular-nums;
+}
+```
+
+Because no `--hx-*` tokens are consumed internally, `hx-format-date` requires no token overrides and carries zero theming overhead. It automatically picks up any typography changes applied to its parent.
+
+## Drupal Integration
+
+```twig
+{# my-module/templates/format-date.html.twig #}
+<hx-format-date
+  date="{{ date_value }}"
+  {% if lang %}lang="{{ lang }}"{% endif %}
+  {% if month %}month="{{ month }}"{% endif %}
+  {% if year %}year="{{ year }}"{% endif %}
+  {% if day %}day="{{ day }}"{% endif %}
+  {% if weekday %}weekday="{{ weekday }}"{% endif %}
+  {% if hour %}hour="{{ hour }}"{% endif %}
+  {% if minute %}minute="{{ minute }}"{% endif %}
+  {% if second %}second="{{ second }}"{% endif %}
+  {% if time_zone %}time-zone="{{ time_zone }}"{% endif %}
+  {% if time_zone_name %}time-zone-name="{{ time_zone_name }}"{% endif %}
+  {% if hour_format %}hour-format="{{ hour_format }}"{% endif %}
+  {% if relative %}relative{% endif %}
+  {% if numeric %}numeric="{{ numeric }}"{% endif %}
+></hx-format-date>
+```
+
+A typical appointment timestamp using a Drupal datetime field:
+
+```twig
+{# Render a Drupal datetime field value as a localized appointment time #}
+<hx-format-date
+  date="{{ node.field_appointment_date.value }}"
+  lang="{{ language.id }}"
+  weekday="long"
+  month="long"
+  year="numeric"
+  day="numeric"
+  hour="numeric"
+  minute="2-digit"
+  time-zone="{{ site_timezone }}"
+  time-zone-name="short"
+></hx-format-date>
+```
+
+For audit log entries where machine-readability matters, pass the raw ISO value from the field storage:
+
+```twig
+{# Audit log row — preserves ISO datetime for scraping while showing locale string to users #}
+<td>
+  <hx-format-date
+    date="{{ log_entry.created|date('c') }}"
+    lang="{{ language.id }}"
+    month="short"
+    day="numeric"
+    year="numeric"
+    hour="2-digit"
+    minute="2-digit"
+    second="2-digit"
+    hour-format="24"
+    time-zone="UTC"
+    time-zone-name="short"
+  ></hx-format-date>
+</td>
+```
+
+Load the library in your module's `.libraries.yml`:
+
+```yaml
+helix-components:
+  js:
+    /libraries/helix/helix.min.js: { minified: true }
+```
+
+## Standalone HTML Example
+
+Copy-paste into a `.html` file and open in any browser — no build tool required:
+
+```html
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>hx-format-date example</title>
+    <script
+      type="module"
+      src="https://cdn.jsdelivr.net/npm/@helix/library/dist/helix.min.js"
+    ></script>
+    <style>
+      body {
+        font-family: sans-serif;
+        padding: 2rem;
+        max-width: 640px;
+        margin: 0 auto;
+        color: #1a1a2e;
+      }
+      h1 {
+        margin-bottom: 1.5rem;
+      }
+      dl {
+        display: grid;
+        grid-template-columns: max-content 1fr;
+        gap: 0.5rem 1.5rem;
+        align-items: baseline;
+      }
+      dt {
+        color: #6b7280;
+        font-size: 0.875rem;
+      }
+      dd {
+        margin: 0;
+        font-weight: 500;
+      }
+      h2 {
+        margin-top: 2rem;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Patient Appointment Record</h1>
+
+    <dl>
+      <dt>Appointment date</dt>
+      <dd>
+        <hx-format-date
+          date="2024-06-15T14:30:00.000Z"
+          lang="en-US"
+          weekday="long"
+          month="long"
+          year="numeric"
+          day="numeric"
+        ></hx-format-date>
+      </dd>
+
+      <dt>Appointment time</dt>
+      <dd>
+        <hx-format-date
+          date="2024-06-15T14:30:00.000Z"
+          lang="en-US"
+          hour="numeric"
+          minute="2-digit"
+          hour-format="12"
+          time-zone="America/Chicago"
+          time-zone-name="short"
+        ></hx-format-date>
+      </dd>
+
+      <dt>Last updated</dt>
+      <dd>
+        <!-- Relative time: set via JS property so it refreshes on interval -->
+        <hx-format-date id="last-updated" lang="en-US" relative numeric="auto"></hx-format-date>
+      </dd>
+
+      <dt>Record created</dt>
+      <dd>
+        <hx-format-date
+          date="2024-01-08T09:15:00.000Z"
+          lang="en-US"
+          month="short"
+          day="numeric"
+          year="numeric"
+        ></hx-format-date>
+      </dd>
+    </dl>
+
+    <h2>Locale Comparison</h2>
+    <dl>
+      <dt>English (US)</dt>
+      <dd>
+        <hx-format-date
+          date="2024-06-15T14:30:00.000Z"
+          lang="en-US"
+          weekday="long"
+          month="long"
+          year="numeric"
+          day="numeric"
+        ></hx-format-date>
+      </dd>
+
+      <dt>German</dt>
+      <dd>
+        <hx-format-date
+          date="2024-06-15T14:30:00.000Z"
+          lang="de"
+          weekday="long"
+          month="long"
+          year="numeric"
+          day="numeric"
+        ></hx-format-date>
+      </dd>
+
+      <dt>Japanese</dt>
+      <dd>
+        <hx-format-date
+          date="2024-06-15T14:30:00.000Z"
+          lang="ja"
+          weekday="long"
+          month="long"
+          year="numeric"
+          day="numeric"
+        ></hx-format-date>
+      </dd>
+
+      <dt>Arabic</dt>
+      <dd>
+        <hx-format-date
+          date="2024-06-15T14:30:00.000Z"
+          lang="ar"
+          weekday="long"
+          month="long"
+          year="numeric"
+          day="numeric"
+        ></hx-format-date>
+      </dd>
+    </dl>
+
+    <script>
+      // Set "last updated" to 90 minutes ago via property (accepts Date object)
+      const lastUpdated = document.getElementById('last-updated');
+      lastUpdated.date = new Date(Date.now() - 90 * 60 * 1000);
+
+      // Refresh relative time every 30 seconds to keep the label accurate
+      setInterval(() => {
+        lastUpdated.date = new Date(Date.now() - 90 * 60 * 1000);
+      }, 30_000);
+    </script>
+  </body>
+</html>
+```
+
+## API Reference
+
+<ComponentDoc tagName="hx-format-date" section="api" />

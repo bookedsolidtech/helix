@@ -112,6 +112,65 @@ describe('hx-divider', () => {
     });
   });
 
+  // ─── Property: decorative ───
+
+  describe('Property: decorative', () => {
+    it('defaults to false', async () => {
+      const el = await fixture<HelixDivider>('<hx-divider></hx-divider>');
+      expect(el.decorative).toBe(false);
+    });
+
+    it('reflects decorative to attribute', async () => {
+      const el = await fixture<HelixDivider>('<hx-divider decorative></hx-divider>');
+      expect(el.hasAttribute('decorative')).toBe(true);
+    });
+
+    it('sets role="presentation" on base when decorative', async () => {
+      const el = await fixture<HelixDivider>('<hx-divider decorative></hx-divider>');
+      const base = shadowQuery(el, '[part="base"]');
+      expect(base?.getAttribute('role')).toBe('presentation');
+    });
+
+    it('does not set aria-orientation when decorative', async () => {
+      const el = await fixture<HelixDivider>('<hx-divider decorative></hx-divider>');
+      const base = shadowQuery(el, '[part="base"]');
+      expect(base?.hasAttribute('aria-orientation')).toBe(false);
+    });
+
+    it('does not set aria-orientation when decorative vertical', async () => {
+      const el = await fixture<HelixDivider>(
+        '<hx-divider decorative orientation="vertical"></hx-divider>',
+      );
+      const base = shadowQuery(el, '[part="base"]');
+      expect(base?.hasAttribute('aria-orientation')).toBe(false);
+    });
+  });
+
+  // ─── Property: label ───
+
+  describe('Property: label', () => {
+    it('renders label part when label property is set', async () => {
+      const el = await fixture<HelixDivider>('<hx-divider label="Section Title"></hx-divider>');
+      await el.updateComplete;
+      const label = shadowQuery(el, '[part~="label"]');
+      expect(label).toBeTruthy();
+    });
+
+    it('sets aria-label on base when label property is provided', async () => {
+      const el = await fixture<HelixDivider>('<hx-divider label="Section Title"></hx-divider>');
+      const base = shadowQuery(el, '[part="base"]');
+      expect(base?.getAttribute('aria-label')).toBe('Section Title');
+    });
+
+    it('does not set aria-label when decorative', async () => {
+      const el = await fixture<HelixDivider>(
+        '<hx-divider label="Section Title" decorative></hx-divider>',
+      );
+      const base = shadowQuery(el, '[part="base"]');
+      expect(base?.hasAttribute('aria-label')).toBe(false);
+    });
+  });
+
   // ─── Accessibility (axe-core) ───
 
   describe('Accessibility (axe-core)', () => {
@@ -131,6 +190,21 @@ describe('hx-divider', () => {
 
     it('has no axe violations — with label', async () => {
       const el = await fixture<HelixDivider>('<hx-divider>Section</hx-divider>');
+      await el.updateComplete;
+      await page.screenshot();
+      const { violations } = await checkA11y(el);
+      expect(violations).toEqual([]);
+    });
+
+    it('has no axe violations — decorative', async () => {
+      const el = await fixture<HelixDivider>('<hx-divider decorative></hx-divider>');
+      await page.screenshot();
+      const { violations } = await checkA11y(el);
+      expect(violations).toEqual([]);
+    });
+
+    it('has no axe violations — label property', async () => {
+      const el = await fixture<HelixDivider>('<hx-divider label="Section Title"></hx-divider>');
       await el.updateComplete;
       await page.screenshot();
       const { violations } = await checkA11y(el);

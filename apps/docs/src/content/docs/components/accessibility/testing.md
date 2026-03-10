@@ -296,7 +296,7 @@ For every interactive component, verify:
 
 1. **Start outside the component** — Click in the address bar or another field
 2. **Tab into the component** — Press <kbd>Tab</kbd> until focus enters the component
-3. **Verify focus visibility** — Check for clear focus ring (use `--wc-focus-ring-color` token)
+3. **Verify focus visibility** — Check for clear focus ring (use `--hx-focus-ring-color` token)
 4. **Test activation** — Press <kbd>Enter</kbd> and <kbd>Space</kbd> to activate controls
 5. **Tab through internal elements** — If component has multiple focusable elements, verify tab order
 6. **Tab out** — Ensure focus exits cleanly to next external element

@@ -30,6 +30,10 @@ export const helixStructuredListStyles = css`
     border-radius: var(--hx-border-radius-md, 0.375rem);
     overflow: hidden;
   }
+
+  :host([striped]) ::slotted(hx-structured-list-row:nth-of-type(even)) {
+    background: var(--_bg-stripe);
+  }
 `;
 
 export const helixStructuredListRowStyles = css`
@@ -47,7 +51,8 @@ export const helixStructuredListRowStyles = css`
   }
 
   :host(:not(:last-of-type)) .row {
-    border-bottom: 1px solid var(--_border-color, var(--hx-color-neutral-200, #e2e8f0));
+    border-bottom: var(--_border-width, var(--hx-border-width-thin, 1px)) solid
+      var(--_border-color, var(--hx-color-neutral-200, #e2e8f0));
   }
 
   .row__label {

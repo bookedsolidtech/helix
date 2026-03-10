@@ -1,0 +1,227 @@
+---
+title: 'hx-action-bar'
+description: Horizontal toolbar container for grouping related action buttons and controls with roving tabindex keyboard navigation
+---
+
+import ComponentLoader from '../../../components/ComponentLoader.astro';
+import ComponentDemo from '../../../components/ComponentDemo.astro';
+import ComponentDoc from '../../../components/ComponentDoc.astro';
+
+<ComponentLoader />
+
+<ComponentDoc tagName="hx-action-bar" section="summary" />
+
+## Overview
+
+`hx-action-bar` is a horizontal toolbar container that groups related action buttons and controls. It implements the WAI-ARIA toolbar pattern with roving tabindex keyboard navigation, making it fully accessible for healthcare applications where keyboard-only workflows are common.
+
+**Use `hx-action-bar` when:** you need to group contextual actions together in a toolbar — page-level actions, bulk operations on selected items, or form action rows.
+**Use `hx-button-group` instead when:** you need tightly-coupled buttons that share a single visual boundary.
+
+## Live Demo
+
+### Variants
+
+Default, outlined, and filled visual styles.
+
+<ComponentDemo title="Variants">
+  <div style="display: flex; flex-direction: column; gap: 1rem;">
+    <hx-action-bar aria-label="Default actions" variant="default">
+      <button slot="start">Save</button>
+      <button slot="end">Cancel</button>
+    </hx-action-bar>
+    <hx-action-bar aria-label="Outlined actions" variant="outlined">
+      <button slot="start">Save</button>
+      <button slot="end">Cancel</button>
+    </hx-action-bar>
+    <hx-action-bar aria-label="Filled actions" variant="filled">
+      <button slot="start">Save</button>
+      <button slot="end">Cancel</button>
+    </hx-action-bar>
+  </div>
+</ComponentDemo>
+
+### Sizes
+
+Small, medium, and large action bar sizes.
+
+<ComponentDemo title="Sizes">
+  <div style="display: flex; flex-direction: column; gap: 1rem;">
+    <hx-action-bar aria-label="Small actions" size="sm" variant="outlined">
+      <button slot="start">Save</button>
+      <button slot="end">Cancel</button>
+    </hx-action-bar>
+    <hx-action-bar aria-label="Medium actions" size="md" variant="outlined">
+      <button slot="start">Save</button>
+      <button slot="end">Cancel</button>
+    </hx-action-bar>
+    <hx-action-bar aria-label="Large actions" size="lg" variant="outlined">
+      <button slot="start">Save</button>
+      <button slot="end">Cancel</button>
+    </hx-action-bar>
+  </div>
+</ComponentDemo>
+
+### Start, Center, and End Slots
+
+Use `start`, default (center), and `end` slots for flexible content placement.
+
+<ComponentDemo title="Three-section layout">
+  <hx-action-bar aria-label="Patient chart actions" variant="outlined">
+    <button slot="start">Save</button>
+    <button slot="start">Save &amp; Close</button>
+    <span>Patient: Jane Doe</span>
+    <button slot="end">Cancel</button>
+  </hx-action-bar>
+</ComponentDemo>
+
+### Sticky Position
+
+The action bar can stick to the top or bottom of its scroll container.
+
+<ComponentDemo title="Sticky top">
+  <hx-action-bar aria-label="Sticky actions" position="sticky" variant="filled">
+    <button slot="start">Save</button>
+    <button slot="end">Cancel</button>
+  </hx-action-bar>
+</ComponentDemo>
+
+### Overflow Slot
+
+Use the `overflow` slot for actions that appear when space is constrained.
+
+<ComponentDemo title="With overflow actions">
+  <hx-action-bar aria-label="Actions with overflow" variant="outlined">
+    <button slot="start">Primary</button>
+    <button slot="end">Secondary</button>
+    <button slot="overflow">More actions</button>
+  </hx-action-bar>
+</ComponentDemo>
+
+## Installation
+
+```bash
+# Full library
+npm install @helix/library
+
+# Or import only this component (tree-shaking friendly)
+import '@helix/library/components/hx-action-bar';
+```
+
+## Basic Usage
+
+```html
+<hx-action-bar aria-label="Patient actions">
+  <hx-button slot="start" variant="primary">Save</hx-button>
+  <hx-button slot="end" variant="ghost">Cancel</hx-button>
+</hx-action-bar>
+```
+
+## Properties
+
+| Property    | Attribute    | Type                                  | Default     | Description                                                                                 |
+| ----------- | ------------ | ------------------------------------- | ----------- | ------------------------------------------------------------------------------------------- |
+| `size`      | `size`       | `'sm' \| 'md' \| 'lg'`                | `'md'`      | Size of the action bar; propagated as a data attribute to slotted children.                 |
+| `variant`   | `variant`    | `'default' \| 'outlined' \| 'filled'` | `'default'` | Visual variant controlling the bar background and border.                                   |
+| `position`  | `position`   | `'top' \| 'bottom' \| 'sticky'`       | `'top'`     | Position and sticky behavior. `sticky` pins to top; `bottom` pins to bottom with safe-area. |
+| `sticky`    | `sticky`     | `boolean`                             | `false`     | **Deprecated.** Use `position="sticky"` instead.                                            |
+| `ariaLabel` | `aria-label` | `string`                              | `'Actions'` | Accessible label for the toolbar. Required when multiple toolbars appear on the same page.  |
+
+## Slots
+
+| Slot        | Description                                             |
+| ----------- | ------------------------------------------------------- |
+| `start`     | Left-aligned actions.                                   |
+| _(default)_ | Center content.                                         |
+| `end`       | Right-aligned actions.                                  |
+| `overflow`  | Actions revealed when the bar is constrained for space. |
+
+## CSS Custom Properties
+
+| Property                  | Default                               | Description                                 |
+| ------------------------- | ------------------------------------- | ------------------------------------------- |
+| `--hx-action-bar-bg`      | `transparent`                         | Bar background color (default variant).     |
+| `--hx-action-bar-border`  | `none`                                | Bar border (default variant).               |
+| `--hx-action-bar-padding` | `var(--hx-space-2) var(--hx-space-3)` | Inner padding.                              |
+| `--hx-action-bar-gap`     | `var(--hx-space-2)`                   | Gap between slotted items.                  |
+| `--hx-action-bar-z-index` | `10`                                  | Z-index when `sticky` or `bottom` position. |
+
+## CSS Parts
+
+| Part     | Description                         |
+| -------- | ----------------------------------- |
+| `base`   | The root toolbar container element. |
+| `start`  | The start (left) slot wrapper.      |
+| `center` | The center (default) slot wrapper.  |
+| `end`    | The end (right) slot wrapper.       |
+
+## Accessibility
+
+| Topic          | Details                                                                                                                |
+| -------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| ARIA role      | `role="toolbar"` on the inner container. Identifies the group to assistive technology.                                 |
+| `aria-label`   | Required. Set via the `aria-label` attribute on the host element. Must be unique when multiple toolbars are on a page. |
+| Keyboard       | `Tab` enters the toolbar and focuses the first item. `ArrowRight` / `ArrowLeft` move between items (roving tabindex).  |
+| `Home` / `End` | Jump directly to the first or last focusable item without visiting intermediate items.                                 |
+| Disabled items | Disabled buttons are excluded from keyboard navigation (skipped by `ArrowRight` / `ArrowLeft`).                        |
+| Screen reader  | Toolbar role and label are announced on focus entry. Items inside are announced individually.                          |
+| Safe area      | `position="bottom"` applies `env(safe-area-inset-bottom)` padding for iOS devices with a home indicator.               |
+
+## Drupal Integration
+
+```twig
+{# my-module/templates/my-template.html.twig #}
+<hx-action-bar
+  aria-label="{{ label|default('Actions') }}"
+  variant="{{ variant|default('default') }}"
+  {% if position %}position="{{ position }}"{% endif %}
+>
+  {% for action in start_actions %}
+    <hx-button slot="start" variant="{{ action.variant|default('primary') }}">
+      {{ action.label }}
+    </hx-button>
+  {% endfor %}
+  {% for action in end_actions %}
+    <hx-button slot="end" variant="{{ action.variant|default('ghost') }}">
+      {{ action.label }}
+    </hx-button>
+  {% endfor %}
+</hx-action-bar>
+```
+
+Load the library in your module's `.libraries.yml`:
+
+```yaml
+helix-components:
+  js:
+    /libraries/helix/helix.min.js: { minified: true }
+```
+
+## Standalone HTML Example
+
+Copy-paste into a `.html` file and open in any browser — no build tool required:
+
+```html
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>hx-action-bar example</title>
+    <!-- @helix/library is a private package — install via npm workspace, not CDN -->
+    <!-- In your project: import '@helix/library'; in your bundler entry point -->
+  </head>
+  <body style="font-family: sans-serif; padding: 2rem;">
+    <hx-action-bar aria-label="Patient chart actions" variant="outlined">
+      <hx-button slot="start" variant="primary">Save</hx-button>
+      <hx-button slot="start" variant="secondary">Save &amp; Close</hx-button>
+      <span>Record: Jane Doe</span>
+      <hx-button slot="end" variant="ghost">Cancel</hx-button>
+    </hx-action-bar>
+  </body>
+</html>
+```
+
+## API Reference
+
+<ComponentDoc tagName="hx-action-bar" section="api" />

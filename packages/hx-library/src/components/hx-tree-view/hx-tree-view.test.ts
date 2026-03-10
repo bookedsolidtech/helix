@@ -26,6 +26,12 @@ describe('hx-tree-view', () => {
       expect(tree?.getAttribute('role')).toBe('tree');
     });
 
+    it('tree container has tabindex="0" for keyboard access', async () => {
+      const el = await fixture<WcTreeView>('<hx-tree-view></hx-tree-view>');
+      const tree = shadowQuery(el, '.tree');
+      expect(tree?.getAttribute('tabindex')).toBe('0');
+    });
+
     it('sets aria-multiselectable="false" by default', async () => {
       const el = await fixture<WcTreeView>('<hx-tree-view></hx-tree-view>');
       const tree = shadowQuery(el, '.tree');
@@ -263,6 +269,42 @@ describe('hx-tree-view', () => {
     });
   });
 
+  // ─── Property: label ───
+
+  describe('Property: label', () => {
+    it('defaults to empty string', async () => {
+      const el = await fixture<WcTreeView>('<hx-tree-view></hx-tree-view>');
+      expect(el.label).toBe('');
+    });
+
+    it('reflects label attribute to property', async () => {
+      const el = await fixture<WcTreeView>('<hx-tree-view label="File browser"></hx-tree-view>');
+      expect(el.label).toBe('File browser');
+    });
+
+    it('sets aria-label on the tree container', async () => {
+      const el = await fixture<WcTreeView>('<hx-tree-view label="File browser"></hx-tree-view>');
+      const tree = shadowQuery(el, '.tree');
+      expect(tree?.getAttribute('aria-label')).toBe('File browser');
+    });
+
+    it('does not set aria-label when label is empty', async () => {
+      const el = await fixture<WcTreeView>('<hx-tree-view></hx-tree-view>');
+      const tree = shadowQuery(el, '.tree');
+      expect(tree?.getAttribute('aria-label')).toBeNull();
+    });
+  });
+
+  // ─── CSS Parts ───
+
+  describe('CSS Parts', () => {
+    it('exposes "tree" part on the container', async () => {
+      const el = await fixture<WcTreeView>('<hx-tree-view></hx-tree-view>');
+      const part = shadowQuery(el, '[part~="tree"]');
+      expect(part).toBeTruthy();
+    });
+  });
+
   // ─── Accessibility ───
 
   describe('Accessibility', () => {
@@ -270,6 +312,36 @@ describe('hx-tree-view', () => {
       const el = await fixture<WcTreeView>('<hx-tree-view></hx-tree-view>');
       const tree = shadowQuery(el, '[role="tree"]');
       expect(tree).toBeTruthy();
+    });
+
+    it('has no axe violations with labeled tree', async () => {
+      const el = await fixture<WcTreeView>(
+        `<hx-tree-view label="Test tree" selection="single">
+          <hx-tree-item>Label</hx-tree-item>
+          <hx-tree-item selected>Selected</hx-tree-item>
+          <hx-tree-item disabled>Disabled</hx-tree-item>
+        </hx-tree-view>`,
+      );
+      await el.updateComplete;
+      const { violations } = await checkA11y(el);
+      expect(violations).toHaveLength(0);
+    });
+
+    it('has no axe violations with nested items', async () => {
+      const el = await fixture<WcTreeView>(
+        `<hx-tree-view label="Nested tree" selection="single">
+          <hx-tree-item expanded>
+            Parent
+            <hx-tree-item slot="children">Child 1</hx-tree-item>
+            <hx-tree-item slot="children">Child 2</hx-tree-item>
+          </hx-tree-item>
+        </hx-tree-view>`,
+      );
+      // Allow microtask queue to flush and Lit reactive updates to complete before axe audit
+      await new Promise((r) => setTimeout(r, 0));
+      await el.updateComplete;
+      const { violations } = await checkA11y(el);
+      expect(violations).toHaveLength(0);
     });
   });
 });
@@ -367,16 +439,28 @@ describe('hx-tree-item', () => {
       expect(el.selected).toBe(true);
     });
 
-    it('sets aria-selected on item row', async () => {
-      const el = await fixture<WcTreeItem>('<hx-tree-item selected>Label</hx-tree-item>');
-      const row = shadowQuery(el, '.item-row');
+    it('sets aria-selected on item row when inside selectable tree', async () => {
+      const tree = await fixture<WcTreeView>(
+        `<hx-tree-view selection="single">
+          <hx-tree-item selected>Label</hx-tree-item>
+        </hx-tree-view>`,
+      );
+      await tree.updateComplete;
+      const item = tree.querySelector<WcTreeItem>('hx-tree-item')!;
+      const row = shadowQuery(item, '.item-row');
       expect(row?.getAttribute('aria-selected')).toBe('true');
     });
 
-    it('sets aria-selected="false" when not selected', async () => {
-      const el = await fixture<WcTreeItem>('<hx-tree-item>Label</hx-tree-item>');
-      const row = shadowQuery(el, '.item-row');
-      expect(row?.getAttribute('aria-selected')).toBe('false');
+    it('omits aria-selected when selection is "none"', async () => {
+      const tree = await fixture<WcTreeView>(
+        `<hx-tree-view selection="none">
+          <hx-tree-item>Label</hx-tree-item>
+        </hx-tree-view>`,
+      );
+      await tree.updateComplete;
+      const item = tree.querySelector<WcTreeItem>('hx-tree-item')!;
+      const row = shadowQuery(item, '.item-row');
+      expect(row?.getAttribute('aria-selected')).toBeNull();
     });
   });
 
@@ -406,17 +490,73 @@ describe('hx-tree-item', () => {
     });
   });
 
-  // ─── Property: indent ───
+  // ─── ARIA: level, posinset, setsize ───
 
-  describe('Property: indent', () => {
-    it('defaults to 0', async () => {
-      const el = await fixture<WcTreeItem>('<hx-tree-item>Label</hx-tree-item>');
-      expect(el.indent).toBe(0);
+  describe('ARIA tree semantics', () => {
+    it('sets aria-level="1" on top-level items', async () => {
+      const tree = await fixture<WcTreeView>(
+        `<hx-tree-view label="Test">
+          <hx-tree-item>Item</hx-tree-item>
+        </hx-tree-view>`,
+      );
+      await tree.updateComplete;
+      const item = tree.querySelector<WcTreeItem>('hx-tree-item')!;
+      const row = shadowQuery(item, '.item-row');
+      expect(row?.getAttribute('aria-level')).toBe('1');
     });
 
-    it('reflects indent attribute to property', async () => {
-      const el = await fixture<WcTreeItem>('<hx-tree-item indent="2">Label</hx-tree-item>');
-      expect(el.indent).toBe(2);
+    it('sets aria-level="2" on nested items', async () => {
+      const tree = await fixture<WcTreeView>(
+        `<hx-tree-view label="Test">
+          <hx-tree-item expanded>
+            Parent
+            <hx-tree-item slot="children">Child</hx-tree-item>
+          </hx-tree-item>
+        </hx-tree-view>`,
+      );
+      await tree.updateComplete;
+      const child = tree.querySelectorAll<WcTreeItem>('hx-tree-item')[1]!;
+      const row = shadowQuery(child, '.item-row');
+      expect(row?.getAttribute('aria-level')).toBe('2');
+    });
+
+    it('sets correct aria-posinset and aria-setsize for siblings', async () => {
+      const tree = await fixture<WcTreeView>(
+        `<hx-tree-view label="Test">
+          <hx-tree-item>First</hx-tree-item>
+          <hx-tree-item>Second</hx-tree-item>
+          <hx-tree-item>Third</hx-tree-item>
+        </hx-tree-view>`,
+      );
+      await tree.updateComplete;
+      const items = Array.from(tree.querySelectorAll<WcTreeItem>('hx-tree-item'));
+
+      const row0 = shadowQuery(items[0]!, '.item-row');
+      expect(row0?.getAttribute('aria-posinset')).toBe('1');
+      expect(row0?.getAttribute('aria-setsize')).toBe('3');
+
+      const row2 = shadowQuery(items[2]!, '.item-row');
+      expect(row2?.getAttribute('aria-posinset')).toBe('3');
+      expect(row2?.getAttribute('aria-setsize')).toBe('3');
+    });
+
+    it('hasChildItems reflects child slot state', async () => {
+      const el = await fixture<WcTreeItem>(
+        `<hx-tree-item>
+          Parent
+          <hx-tree-item slot="children">Child</hx-tree-item>
+        </hx-tree-item>`,
+      );
+      // Yield to event loop to allow slotchange callback to run so hasChildItems is updated
+      await new Promise((r) => setTimeout(r, 0));
+      await el.updateComplete;
+      expect(el.hasChildItems).toBe(true);
+    });
+
+    it('hasChildItems is false without children', async () => {
+      const el = await fixture<WcTreeItem>('<hx-tree-item>Leaf</hx-tree-item>');
+      await el.updateComplete;
+      expect(el.hasChildItems).toBe(false);
     });
   });
 
@@ -442,7 +582,7 @@ describe('hx-tree-item', () => {
           <hx-tree-item slot="children">Child</hx-tree-item>
         </hx-tree-item>`,
       );
-      // Wait for slotchange event to fire
+      // Yield to event loop to allow slotchange callback to run so the expand button is rendered
       await new Promise((r) => setTimeout(r, 0));
       await el.updateComplete;
       const btn = shadowQuery(el, '.expand-btn');
@@ -462,6 +602,19 @@ describe('hx-tree-item', () => {
     it('exposes "item" part', async () => {
       const el = await fixture<WcTreeItem>('<hx-tree-item>Label</hx-tree-item>');
       const part = shadowQuery(el, '[part~="item"]');
+      expect(part).toBeTruthy();
+    });
+
+    it('exposes "row" part on the interactive row', async () => {
+      const el = await fixture<WcTreeItem>('<hx-tree-item>Label</hx-tree-item>');
+      const part = shadowQuery(el, '[part~="row"]');
+      expect(part).toBeTruthy();
+      expect(part?.getAttribute('role')).toBe('treeitem');
+    });
+
+    it('exposes "label" part on the text content', async () => {
+      const el = await fixture<WcTreeItem>('<hx-tree-item>Label</hx-tree-item>');
+      const part = shadowQuery(el, '.item-label[part~="label"]');
       expect(part).toBeTruthy();
     });
 
@@ -522,6 +675,7 @@ describe('hx-tree-item', () => {
           <hx-tree-item slot="children">Child</hx-tree-item>
         </hx-tree-item>`,
       );
+      // Yield to event loop to allow slotchange callback to run so children are registered before key dispatch
       await new Promise((r) => setTimeout(r, 0));
       await el.updateComplete;
 
@@ -540,6 +694,7 @@ describe('hx-tree-item', () => {
           <hx-tree-item slot="children">Child</hx-tree-item>
         </hx-tree-item>`,
       );
+      // Yield to event loop to allow slotchange callback to run so children are registered before key dispatch
       await new Promise((r) => setTimeout(r, 0));
       await el.updateComplete;
 
@@ -571,23 +726,6 @@ describe('hx-tree-item', () => {
 
       const event = await eventPromise;
       expect(event.detail.item).toBe(el);
-    });
-  });
-
-  // ─── Accessibility (axe-core) ───
-
-  describe('Accessibility (axe-core)', () => {
-    it('has no axe violations in tree context', async () => {
-      const el = await fixture<WcTreeView>(
-        `<hx-tree-view selection="single">
-          <hx-tree-item>Label</hx-tree-item>
-          <hx-tree-item selected>Selected</hx-tree-item>
-          <hx-tree-item disabled>Disabled</hx-tree-item>
-        </hx-tree-view>`,
-      );
-      await el.updateComplete;
-      const { violations } = await checkA11y(el);
-      expect(violations).toHaveLength(0);
     });
   });
 });

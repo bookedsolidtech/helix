@@ -219,14 +219,14 @@ describe('hx-radio-group', () => {
       expect(errorDiv?.textContent?.trim()).toBe('Please select an option');
     });
 
-    it('error div has aria-live="polite"', async () => {
+    it('error div has role="alert"', async () => {
       const el = await fixture<WcRadioGroup>(`
         <hx-radio-group label="Test" error="Error">
           <hx-radio value="a" label="A"></hx-radio>
         </hx-radio-group>
       `);
       const errorDiv = shadowQuery(el, '.fieldset__error');
-      expect(errorDiv?.getAttribute('aria-live')).toBe('polite');
+      expect(errorDiv?.getAttribute('role')).toBe('alert');
     });
 
     it('renders help text below group', async () => {

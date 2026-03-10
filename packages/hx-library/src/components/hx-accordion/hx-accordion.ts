@@ -148,12 +148,27 @@ export class HelixAccordion extends LitElement {
     return triggers;
   }
 
+  // ─── Slot validation ───
+
+  private _handleSlotChange(e: Event): void {
+    const slot = e.target;
+    if (!(slot instanceof HTMLSlotElement)) return;
+    const invalid = slot
+      .assignedElements()
+      .filter((el) => el.tagName.toLowerCase() !== 'hx-accordion-item');
+    if (invalid.length > 0) {
+      console.warn(
+        `[hx-accordion] Default slot expects <hx-accordion-item> elements. Found unexpected: ${invalid.map((el) => `<${el.tagName.toLowerCase()}>`).join(', ')}`,
+      );
+    }
+  }
+
   // ─── Render ───
 
   override render() {
     return html`
       <div part="accordion" class="accordion">
-        <slot></slot>
+        <slot @slotchange=${this._handleSlotChange}></slot>
       </div>
     `;
   }

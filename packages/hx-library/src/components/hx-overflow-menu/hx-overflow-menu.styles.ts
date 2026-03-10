@@ -43,10 +43,6 @@ export const helixOverflowMenuStyles = css`
     background-color: var(--hx-color-neutral-100, #f3f4f6);
   }
 
-  .trigger[disabled] {
-    cursor: not-allowed;
-  }
-
   /* ─── Size Variants ─── */
 
   .trigger--sm {
@@ -79,7 +75,10 @@ export const helixOverflowMenuStyles = css`
       --hx-overflow-menu-panel-border-radius,
       var(--hx-border-radius-md, 0.375rem)
     );
-    box-shadow: var(--hx-overflow-menu-panel-shadow, 0 4px 16px rgba(0, 0, 0, 0.12));
+    box-shadow: var(
+      --hx-overflow-menu-panel-shadow,
+      0 4px 16px var(--hx-overlay-black-12, rgba(0, 0, 0, 0.12))
+    );
     padding: var(--hx-space-1, 0.25rem) 0;
     outline: none;
   }
@@ -112,7 +111,7 @@ export const helixOverflowMenuStyles = css`
   ::slotted([role='menuitemcheckbox']:focus-visible),
   ::slotted([role='menuitemradio']:focus-visible) {
     outline: var(--hx-focus-ring-width, 2px) solid var(--hx-focus-ring-color, #2563eb);
-    outline-offset: -2px;
+    outline-offset: 0;
   }
 
   /* ─── Reduced Motion ─── */

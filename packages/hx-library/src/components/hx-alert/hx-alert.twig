@@ -1,0 +1,54 @@
+{#
+  hx-alert — Drupal Twig template
+  --------------------------------
+  Server-side rendering for hx-alert in Drupal CMS contexts (form validation
+  summaries, status messages, SEO-visible notifications).
+
+  Variables:
+    variant     (string)  - 'info' | 'success' | 'warning' | 'error'. Default: 'info'.
+    message     (string)  - The alert message content (required).
+    title       (string)  - Optional title/headline for the alert.
+    dismissible (bool)    - Whether the alert can be dismissed. Default: false.
+    show_icon   (bool)    - Whether to show the variant icon. Default: true.
+    accent      (bool)    - Whether to apply left border accent variant. Default: false.
+    open        (bool)    - Whether the alert is visible. Default: true.
+    actions     (string)  - Optional HTML for action buttons.
+    attributes  (object)  - Additional HTML attributes to pass to the element.
+
+  Usage examples:
+    {% include 'hx-alert.twig' with {
+      variant: 'error',
+      title: 'Form submission failed',
+      message: 'Please correct the errors below.',
+      dismissible: false,
+    } %}
+
+    {% include 'hx-alert.twig' with {
+      variant: 'success',
+      message: 'Your changes have been saved.',
+      dismissible: true,
+    } %}
+#}
+
+{% set variant = variant|default('info') %}
+{% set show_icon = show_icon is defined ? show_icon : true %}
+{% set open = open is defined ? open : true %}
+
+<hx-alert
+  variant="{{ variant }}"
+  {% if dismissible %}dismissible{% endif %}
+  {% if open %}open{% endif %}
+  {% if not show_icon %}{% else %}show-icon{% endif %}
+  {% if accent %}accent{% endif %}
+  {% if attributes %}{{ attributes }}{% endif %}
+>
+  {% if title %}
+    <span slot="title">{{ title }}</span>
+  {% endif %}
+
+  {{ message }}
+
+  {% if actions %}
+    <span slot="actions">{{ actions }}</span>
+  {% endif %}
+</hx-alert>

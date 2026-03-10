@@ -173,7 +173,7 @@ export const helixFileUploadStyles = css`
   }
 
   .file-item__remove:hover {
-    color: var(--hx-file-upload-error-color, var(--hx-color-error-500, #dc3545));
+    color: var(--hx-file-upload-error-color, var(--hx-color-error-text, #b91c1c));
     background-color: color-mix(in srgb, var(--hx-color-error-500, #dc3545) 8%, transparent);
   }
 
@@ -212,11 +212,25 @@ export const helixFileUploadStyles = css`
     }
   }
 
+  /* ─── Screen-reader only utility ─── */
+
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+  }
+
   /* ─── Error message ─── */
 
   .field__error {
     font-size: var(--hx-font-size-xs, 0.75rem);
-    color: var(--hx-file-upload-error-color, var(--hx-color-error-500, #dc3545));
+    color: var(--hx-file-upload-error-color, var(--hx-color-error-text, #b91c1c));
     line-height: var(--hx-line-height-normal, 1.5);
   }
 `;

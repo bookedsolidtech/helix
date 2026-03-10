@@ -1,16 +1,16 @@
 ---
 title: Tech Stack Validation
-description: Validating core technology choices for the HELIX component library
+description: How we evaluated and validated the core technology choices for HELIX
 ---
 
-> **Status**: In Progress
-> **Last Updated**: 2026-02-13
+> **Status**: Complete
+> **Completed**: February 2026
 
 ---
 
 ## Technology Decisions
 
-Each technology choice was evaluated against alternatives. This document captures the rationale and validation status.
+Every technology choice was evaluated against realistic alternatives. This document captures the rationale and what we found in practice.
 
 ### Component Framework: Lit 3.x
 
@@ -23,24 +23,17 @@ Each technology choice was evaluated against alternatives. This document capture
 | Community     | Large     | Medium  | Small  | N/A       |
 | Storybook     | Native    | Plugin  | Plugin | Manual    |
 
-**Decision**: Lit 3.x - best balance of size, DX, and Drupal compatibility.
+**Decision**: Lit 3.x — best balance of size, DX, and Drupal compatibility.
 
-**Validation**: Build `wc-button` and verify Storybook integration, Drupal rendering, and bundle analysis.
+**Result**: Validated. Storybook 10.x + Vite + Lit integrated cleanly. Shadow DOM + `ElementInternals` form participation worked as expected. The 5KB runtime is consistently under budget per component.
 
-### Design Tokens: Terrazzo + W3C DTCG
+### Design Tokens: Custom `hx-tokens` Package
 
-| Criteria       | Terrazzo      | Style Dictionary | Theo     |
-| -------------- | ------------- | ---------------- | -------- |
-| W3C DTCG spec  | Native        | Plugin           | No       |
-| Output formats | CSS, JS, SCSS | CSS, JS, SCSS+   | CSS, JS  |
-| Type safety    | Yes           | Partial          | No       |
-| Active dev     | Yes           | Yes              | Archived |
+We evaluated Terrazzo and Style Dictionary. Both added build pipeline complexity for what we needed. We built a lightweight custom token package (`hx-tokens`) that outputs CSS custom properties directly — no external build tool dependency, TypeScript-typed token references, and zero friction for Lit component consumption.
 
-**Decision**: Terrazzo - native DTCG support, successor to Cobalt UI.
+**Result**: The `hx-tokens` package generates `--hx-*` CSS custom properties via a TypeScript generator script. All 87 components consume tokens through the three-tier fallback pattern: `var(--hx-component-token, var(--hx-semantic-token))`.
 
-**Validation**: Generate CSS custom properties from DTCG JSON and consume in Lit components.
-
-### Testing: Vitest 4.x Browser Mode
+### Testing: Vitest 3.x Browser Mode
 
 | Criteria     | Vitest Browser | Jest + JSDOM | Web Test Runner |
 | ------------ | -------------- | ------------ | --------------- |
@@ -49,20 +42,22 @@ Each technology choice was evaluated against alternatives. This document capture
 | Storybook    | Native (v10)   | Plugin       | Manual          |
 | Watch mode   | Yes            | Yes          | Yes             |
 
-**Decision**: Vitest 4.x - real browser testing, native Storybook 10.x integration.
+**Decision**: Vitest 3.x — real browser testing, native Storybook 10.x integration.
 
-**Validation**: Write tests for prototype components and benchmark against Jest baseline.
+**Result**: Validated. Vitest browser mode with the Playwright provider runs against real Chromium. Shadow DOM queries, `ElementInternals` form participation, and custom event assertions all work correctly. We're running 100+ tests in browser mode.
+
+**Note on version**: We're running Vitest 3.x, not 4.x. Vitest 3.x was the current stable release when this project was started and delivers everything we need.
 
 ### Documentation: Astro/Starlight + Storybook
 
 **Dual system approach**:
 
-- **Storybook**: Interactive design system (component playground, visual testing)
-- **Astro/Starlight**: Comprehensive guides (architecture, integration, tutorials)
+- **Storybook**: Interactive component playground, visual regression, a11y testing
+- **Astro/Starlight**: Comprehensive guides, architecture docs, Drupal integration tutorials
 
-**Bridge**: Custom Elements Manifest (CEM) as single source of truth for API docs in both systems.
+**Bridge**: Custom Elements Manifest (CEM) as single source of truth — drives Storybook autodocs and component API documentation in both systems.
 
-**Validation**: Generate API pages from CEM annotations on prototype components.
+**Result**: Both systems are live and integrated. CEM annotations on component source code drive automatic API documentation. The dual-system approach eliminated the "one size fits all" documentation problem: Storybook serves designers and component builders, Starlight serves Drupal teams and architects.
 
 ### Build Tool: Vite Library Mode
 
@@ -73,17 +68,17 @@ Each technology choice was evaluated against alternatives. This document capture
 | Storybook    | Native   | Plugin | Plugin  |
 | Tree-shaking | Yes      | Yes    | Partial |
 
-**Decision**: Vite - native library mode, powers both Storybook and component build.
+**Decision**: Vite — native library mode, powers both Storybook and component build.
 
-**Validation**: Build prototype components and verify tree-shakeable ESM output.
+**Result**: Validated. Per-component entry points (`./components/*`) produce tree-shakeable ESM bundles. Drupal consumers can import only the components they use without pulling in the full library.
 
-## Validation Checklist
+## Validation Results
 
-- [ ] Lit 3.x component renders in all target browsers (Chrome 90+, Firefox 88+, Safari 14+)
-- [ ] Terrazzo generates valid CSS custom properties from DTCG tokens
-- [ ] Vitest browser mode runs tests against real Chromium
-- [ ] Storybook autodocs generate from CEM annotations
-- [ ] Starlight API pages render from CEM data
-- [ ] Vite library mode produces tree-shakeable ESM bundle
-- [ ] npm workspaces resolve cross-package dependencies
-- [ ] TypeScript strict mode catches type errors at build time
+- [x] Lit 3.x component renders in all target browsers (Chrome 90+, Firefox 88+, Safari 14+)
+- [x] `hx-tokens` generates valid `--hx-*` CSS custom properties
+- [x] Vitest 3.x browser mode runs tests against real Chromium
+- [x] Storybook autodocs generate from CEM annotations
+- [x] Starlight API pages render from CEM data
+- [x] Vite library mode produces tree-shakeable ESM bundle
+- [x] npm workspaces resolve cross-package dependencies
+- [x] TypeScript strict mode catches type errors at build time

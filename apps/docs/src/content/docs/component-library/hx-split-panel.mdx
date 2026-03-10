@@ -1,0 +1,566 @@
+---
+title: 'hx-split-panel'
+description: 'Resizable split layout dividing space between two content panels with a draggable divider'
+---
+
+import ComponentLoader from '../../../components/ComponentLoader.astro';
+import ComponentDemo from '../../../components/ComponentDemo.astro';
+import ComponentDoc from '../../../components/ComponentDoc.astro';
+
+<ComponentLoader />
+
+<ComponentDoc tagName="hx-split-panel" section="summary" />
+
+## Overview
+
+`hx-split-panel` is a resizable two-pane layout component with a draggable divider. It splits available space between a start panel and an end panel, with full keyboard navigation, pointer drag support, snap points, min/max constraints, and optional panel collapse affordances.
+
+The component is designed for enterprise healthcare UIs where flexible workspace layouts are essential — patient list / detail views, navigation sidebars, document preview panes, and clinical dashboard arrangements. The draggable divider carries `role="separator"` with full ARIA slider semantics, ensuring assistive technology users can resize panels via keyboard.
+
+**Use `hx-split-panel` when:** you need a resizable two-pane layout where the user can adjust how space is divided between two content areas.
+
+**Use separate containers with fixed widths instead when:** the layout ratio is predetermined and should never be user-adjustable.
+
+## Live Demo
+
+### Default (Horizontal)
+
+<ComponentDemo title="Horizontal Split Panel">
+  <hx-split-panel
+    position="50"
+    style="height: 280px; border: 1px solid var(--hx-color-neutral-200, #e2e8f0); border-radius: 0.5rem; overflow: hidden;"
+  >
+    <div
+      slot="start"
+      style="padding: 1rem; background: var(--hx-color-neutral-50, #f8fafc); height: 100%; box-sizing: border-box;"
+    >
+      <strong>Start Panel</strong>
+      <p style="margin: 0.5rem 0 0; color: var(--hx-color-neutral-500, #64748b); font-size: 0.875rem;">
+        Patient list or navigation
+      </p>
+    </div>
+    <div
+      slot="end"
+      style="padding: 1rem; background: var(--hx-color-neutral-0, #ffffff); height: 100%; box-sizing: border-box;"
+    >
+      <strong>End Panel</strong>
+      <p style="margin: 0.5rem 0 0; color: var(--hx-color-neutral-500, #64748b); font-size: 0.875rem;">
+        Detail view or content area
+      </p>
+    </div>
+  </hx-split-panel>
+</ComponentDemo>
+
+### Vertical Split
+
+<ComponentDemo title="Vertical Split Panel">
+  <hx-split-panel
+    orientation="vertical"
+    position="40"
+    style="height: 320px; border: 1px solid var(--hx-color-neutral-200, #e2e8f0); border-radius: 0.5rem; overflow: hidden;"
+  >
+    <div
+      slot="start"
+      style="padding: 1rem; background: var(--hx-color-neutral-50, #f8fafc); box-sizing: border-box;"
+    >
+      <strong>Patient Summary</strong>
+      <p style="margin: 0.5rem 0 0; color: var(--hx-color-neutral-500, #64748b); font-size: 0.875rem;">
+        Jane Doe — MRN: 885521
+      </p>
+    </div>
+    <div
+      slot="end"
+      style="padding: 1rem; background: var(--hx-color-neutral-0, #ffffff); box-sizing: border-box;"
+    >
+      <strong>Clinical Notes</strong>
+      <p style="margin: 0.5rem 0 0; color: var(--hx-color-neutral-500, #64748b); font-size: 0.875rem;">
+        Vitals and lab results
+      </p>
+    </div>
+  </hx-split-panel>
+</ComponentDemo>
+
+### With Min/Max Constraints
+
+<ComponentDemo title="Min 20% / Max 80%">
+  <hx-split-panel
+    position="50"
+    min="20"
+    max="80"
+    style="height: 240px; border: 1px solid var(--hx-color-neutral-200, #e2e8f0); border-radius: 0.5rem; overflow: hidden;"
+  >
+    <div
+      slot="start"
+      style="padding: 1rem; background: var(--hx-color-neutral-50, #f8fafc); height: 100%; box-sizing: border-box;"
+    >
+      <strong>Navigation</strong>
+      <p style="margin: 0.5rem 0 0; color: var(--hx-color-neutral-500, #64748b); font-size: 0.875rem;">
+        Always at least 20% wide
+      </p>
+    </div>
+    <div
+      slot="end"
+      style="padding: 1rem; background: var(--hx-color-neutral-0, #ffffff); height: 100%; box-sizing: border-box;"
+    >
+      <strong>Content</strong>
+      <p style="margin: 0.5rem 0 0; color: var(--hx-color-neutral-500, #64748b); font-size: 0.875rem;">
+        Always at least 20% wide
+      </p>
+    </div>
+  </hx-split-panel>
+</ComponentDemo>
+
+### Collapsible
+
+<ComponentDemo title="Collapsible Panels">
+  <hx-split-panel
+    position="35"
+    collapsible
+    style="height: 240px; border: 1px solid var(--hx-color-neutral-200, #e2e8f0); border-radius: 0.5rem; overflow: hidden;"
+  >
+    <div
+      slot="start"
+      style="padding: 1rem; background: var(--hx-color-neutral-50, #f8fafc); height: 100%; box-sizing: border-box;"
+    >
+      <strong>Sidebar</strong>
+      <p style="margin: 0.5rem 0 0; color: var(--hx-color-neutral-500, #64748b); font-size: 0.875rem;">
+        Click the collapse buttons on the divider to hide this panel
+      </p>
+    </div>
+    <div
+      slot="end"
+      style="padding: 1rem; background: var(--hx-color-neutral-0, #ffffff); height: 100%; box-sizing: border-box;"
+    >
+      <strong>Main Content</strong>
+      <p style="margin: 0.5rem 0 0; color: var(--hx-color-neutral-500, #64748b); font-size: 0.875rem;">
+        More space when sidebar is collapsed
+      </p>
+    </div>
+  </hx-split-panel>
+</ComponentDemo>
+
+### With Snap Points
+
+<ComponentDemo title="Snap Points at 25%, 50%, 75%">
+  <hx-split-panel
+    id="snap-demo"
+    style="height: 240px; border: 1px solid var(--hx-color-neutral-200, #e2e8f0); border-radius: 0.5rem; overflow: hidden;"
+  >
+    <div
+      slot="start"
+      style="padding: 1rem; background: var(--hx-color-neutral-50, #f8fafc); height: 100%; box-sizing: border-box;"
+    >
+      <strong>Navigation</strong>
+      <p style="margin: 0.5rem 0 0; color: var(--hx-color-neutral-500, #64748b); font-size: 0.875rem;">
+        Snaps at 25%, 50%, 75%
+      </p>
+    </div>
+    <div
+      slot="end"
+      style="padding: 1rem; background: var(--hx-color-neutral-0, #ffffff); height: 100%; box-sizing: border-box;"
+    >
+      <strong>Content</strong>
+      <p style="margin: 0.5rem 0 0; color: var(--hx-color-neutral-500, #64748b); font-size: 0.875rem;">
+        Drag the divider near a snap point
+      </p>
+    </div>
+  </hx-split-panel>
+  <script>
+    const snapDemo = document.getElementById('snap-demo'); if (snapDemo) snapDemo.snap = [25, 50,
+    75];
+  </script>
+</ComponentDemo>
+
+### Disabled
+
+<ComponentDemo title="Disabled (Fixed Layout)">
+  <hx-split-panel
+    position="30"
+    disabled
+    style="height: 200px; border: 1px solid var(--hx-color-neutral-200, #e2e8f0); border-radius: 0.5rem; overflow: hidden;"
+  >
+    <div
+      slot="start"
+      style="padding: 1rem; background: var(--hx-color-neutral-50, #f8fafc); height: 100%; box-sizing: border-box;"
+    >
+      <strong>Fixed Panel</strong>
+      <p style="margin: 0.5rem 0 0; color: var(--hx-color-neutral-500, #64748b); font-size: 0.875rem;">
+        Divider is locked
+      </p>
+    </div>
+    <div
+      slot="end"
+      style="padding: 1rem; background: var(--hx-color-neutral-0, #ffffff); height: 100%; box-sizing: border-box;"
+    >
+      <strong>Main Content</strong>
+      <p style="margin: 0.5rem 0 0; color: var(--hx-color-neutral-500, #64748b); font-size: 0.875rem;">
+        Fixed layout, no resizing
+      </p>
+    </div>
+  </hx-split-panel>
+</ComponentDemo>
+
+### Healthcare — Patient Record Layout
+
+<ComponentDemo title="Patient Record Layout">
+  <hx-split-panel
+    position="35"
+    style="height: 400px; border: 1px solid var(--hx-color-neutral-200, #e2e8f0); border-radius: 0.5rem; overflow: hidden; font-family: sans-serif;"
+  >
+    <div
+      slot="start"
+      style="padding: 1rem; background: var(--hx-color-neutral-50, #f8fafc); height: 100%; box-sizing: border-box; overflow-y: auto;"
+    >
+      <h3 style="margin: 0 0 1rem; font-size: 0.875rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--hx-color-neutral-500, #64748b);">
+        Patient List
+      </h3>
+      <ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 0.5rem;">
+        <li style="padding: 0.5rem; background: #e0f2fe; border-radius: 0.25rem; font-size: 0.875rem; cursor: pointer;">
+          <strong>Jane Doe</strong>
+          <br />
+          <span style="color: var(--hx-color-neutral-500, #64748b);">MRN: 885521</span>
+        </li>
+        <li style="padding: 0.5rem; border-radius: 0.25rem; font-size: 0.875rem; cursor: pointer;">
+          <strong>John Smith</strong>
+          <br />
+          <span style="color: var(--hx-color-neutral-500, #64748b);">MRN: 442209</span>
+        </li>
+        <li style="padding: 0.5rem; border-radius: 0.25rem; font-size: 0.875rem; cursor: pointer;">
+          <strong>Maria Garcia</strong>
+          <br />
+          <span style="color: var(--hx-color-neutral-500, #64748b);">MRN: 771834</span>
+        </li>
+      </ul>
+    </div>
+    <div
+      slot="end"
+      style="padding: 1.5rem; background: var(--hx-color-neutral-0, #ffffff); height: 100%; box-sizing: border-box; overflow-y: auto;"
+    >
+      <h2 style="margin: 0 0 0.25rem; font-size: 1.125rem;">Jane Doe</h2>
+      <p style="margin: 0 0 1rem; color: var(--hx-color-neutral-500, #64748b); font-size: 0.875rem;">
+        DOB: 1982-03-15 — Room 214-B — Dr. Patel
+      </p>
+      <section>
+        <h3 style="margin: 0 0 0.5rem; font-size: 0.875rem;">Vitals</h3>
+        <p style="margin: 0; font-size: 0.875rem;">BP: 120/80 — HR: 72 bpm — Temp: 98.6°F</p>
+      </section>
+    </div>
+  </hx-split-panel>
+</ComponentDemo>
+
+## Installation
+
+```bash
+# Full library
+npm install @helix/library
+
+# Or import only this component (tree-shaking friendly)
+import '@helix/library/components/hx-split-panel';
+```
+
+## Basic Usage
+
+```html
+<!-- Horizontal split (default) -->
+<hx-split-panel position="50">
+  <div slot="start">Navigation or sidebar content</div>
+  <div slot="end">Main content area</div>
+</hx-split-panel>
+
+<!-- Vertical split -->
+<hx-split-panel orientation="vertical" position="40">
+  <div slot="start">Top panel content</div>
+  <div slot="end">Bottom panel content</div>
+</hx-split-panel>
+
+<!-- With min/max constraints and snap points -->
+<hx-split-panel position="50" min="20" max="80" snap="[25,50,75]">
+  <div slot="start">Left panel</div>
+  <div slot="end">Right panel</div>
+</hx-split-panel>
+
+<!-- Collapsible panels -->
+<hx-split-panel position="35" collapsible>
+  <div slot="start">Sidebar</div>
+  <div slot="end">Content</div>
+</hx-split-panel>
+```
+
+## Properties
+
+| Property           | Attribute            | Type                         | Default        | Description                                                                                                                    |
+| ------------------ | -------------------- | ---------------------------- | -------------- | ------------------------------------------------------------------------------------------------------------------------------ |
+| `position`         | `position`           | `number`                     | `50`           | Position of the divider as a percentage (0–100) of the start panel. Reflects to attribute.                                     |
+| `positionInPixels` | `position-in-pixels` | `number \| undefined`        | `undefined`    | Position of the divider in pixels. Converted to percentage after first paint. Overrides `position` on initial render.          |
+| `orientation`      | `orientation`        | `'horizontal' \| 'vertical'` | `'horizontal'` | Orientation of the split. Reflects to attribute.                                                                               |
+| `min`              | `min`                | `number`                     | `0`            | Minimum position as a percentage. Prevents full collapse of start panel. Reflects to attribute.                                |
+| `max`              | `max`                | `number`                     | `100`          | Maximum position as a percentage. Prevents full expansion of start panel. Reflects to attribute.                               |
+| `snap`             | `snap`               | `number[]`                   | `[]`           | Snap points as an array of percentages. Divider snaps within a 5% threshold. Accepts JSON string in HTML: `snap="[25,50,75]"`. |
+| `disabled`         | `disabled`           | `boolean`                    | `false`        | When true, the divider cannot be dragged. Reflects to attribute.                                                               |
+| `collapsible`      | `collapsible`        | `boolean`                    | `false`        | When true, collapse/expand buttons appear on the divider. Reflects to attribute.                                               |
+| `collapsed`        | `collapsed`          | `'start' \| 'end' \| null`   | `null`         | Which panel is collapsed. Set to `'start'` or `'end'` to collapse programmatically. Reflects to attribute.                     |
+
+## Events
+
+| Event           | Detail Type            | Description                                                                                                      |
+| --------------- | ---------------------- | ---------------------------------------------------------------------------------------------------------------- |
+| `hx-reposition` | `{ position: number }` | Fired when the divider is moved (drag or keyboard). Bubbles and composed. Not fired if position does not change. |
+
+```javascript
+const panel = document.querySelector('hx-split-panel');
+
+panel.addEventListener('hx-reposition', (e) => {
+  console.log('Divider moved to:', e.detail.position, '%');
+  // Persist the position to user preferences
+  localStorage.setItem('panelPosition', e.detail.position);
+});
+```
+
+## CSS Custom Properties
+
+| Property                               | Default                       | Description                                             |
+| -------------------------------------- | ----------------------------- | ------------------------------------------------------- |
+| `--hx-split-panel-divider-size`        | `4px`                         | Width (horizontal) or height (vertical) of the divider. |
+| `--hx-split-panel-divider-color`       | `var(--hx-color-neutral-200)` | Default divider background color.                       |
+| `--hx-split-panel-divider-hover-color` | `var(--hx-color-primary-500)` | Divider color on hover and keyboard focus.              |
+
+Theming example — brand the divider for a patient portal:
+
+```css
+hx-split-panel {
+  --hx-split-panel-divider-size: 6px;
+  --hx-split-panel-divider-color: var(--brand-border);
+  --hx-split-panel-divider-hover-color: var(--brand-clinical-blue);
+}
+```
+
+## CSS Parts
+
+| Part      | Description                                         |
+| --------- | --------------------------------------------------- |
+| `start`   | The start panel container `<div>`.                  |
+| `divider` | The draggable divider element (carries ARIA attrs). |
+| `end`     | The end panel container `<div>`.                    |
+
+```css
+/* Increase hit area around the divider */
+hx-split-panel::part(divider) {
+  width: 8px;
+}
+
+/* Highlight the active panel */
+hx-split-panel::part(start) {
+  border-right: 1px solid var(--hx-color-neutral-300);
+}
+```
+
+## Slots
+
+| Slot    | Description                          |
+| ------- | ------------------------------------ |
+| `start` | Content for the first (start) panel. |
+| `end`   | Content for the second (end) panel.  |
+
+```html
+<hx-split-panel>
+  <nav slot="start">
+    <!-- Navigation or sidebar content -->
+  </nav>
+  <main slot="end">
+    <!-- Primary content area -->
+  </main>
+</hx-split-panel>
+```
+
+## Accessibility
+
+`hx-split-panel` implements the ARIA splitter pattern. The divider carries `role="separator"` with full range semantics (`aria-valuenow`, `aria-valuemin`, `aria-valuemax`, `aria-orientation`) making it operable by assistive technology users via keyboard.
+
+| Topic              | Details                                                                                                                                                                                                                      |
+| ------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------- |
+| ARIA role          | The divider has `role="separator"`. This is the correct role for a splitter bar per the ARIA APG. `aria-valuenow`, `aria-valuemin`, `aria-valuemax`, and `aria-orientation` are set automatically from component properties. |
+| Accessible name    | The divider has `aria-label="Resize panels"` ensuring screen reader users understand its purpose.                                                                                                                            |
+| `aria-orientation` | Set to `"vertical"` for a horizontal split (the bar is vertical), and `"horizontal"` for a vertical split (the bar is horizontal). This matches the ARIA specification for separator orientation.                            |
+| `aria-disabled`    | Set to `"true"` when `disabled` is true. Omitted entirely when enabled (not set to `"false"`).                                                                                                                               |
+| Keyboard focus     | The divider is focusable (`tabindex="0"`) when enabled. When disabled, `tabindex="-1"` prevents keyboard access.                                                                                                             |
+| Focus indicator    | `:focus-visible` applies a `2px` solid outline with a `4px` color-mix box shadow, meeting WCAG 2.4.7 (Focus Visible) and WCAG 2.4.11 (Focus Appearance) requirements.                                                        |
+| Collapse buttons   | When `collapsible` is enabled, collapse/expand buttons have descriptive `aria-label` values: `"Collapse start panel"`, `"Collapse end panel"`, and `"Expand [start                                                           | end] panel"`. |
+| WCAG               | Meets WCAG 2.1 AA. SC 2.1.1 (Keyboard), SC 2.4.7 (Focus Visible), SC 4.1.2 (Name, Role, Value), SC 1.4.11 (Non-text Contrast). Zero axe-core violations across all variants.                                                 |
+
+## Keyboard Navigation
+
+The divider is keyboard operable once focused. All resize operations support the standard ARIA range widget key bindings:
+
+| Key          | Behavior                                           |
+| ------------ | -------------------------------------------------- |
+| `Tab`        | Moves focus to / from the divider.                 |
+| `ArrowRight` | Increases position by 1% (horizontal orientation). |
+| `ArrowDown`  | Increases position by 1% (vertical orientation).   |
+| `ArrowLeft`  | Decreases position by 1% (horizontal orientation). |
+| `ArrowUp`    | Decreases position by 1% (vertical orientation).   |
+| `PageUp`     | Increases position by 10%.                         |
+| `PageDown`   | Decreases position by 10%.                         |
+| `Home`       | Moves divider to the `min` value.                  |
+| `End`        | Moves divider to the `max` value.                  |
+
+All keyboard moves are clamped to `[min, max]` and apply snap logic when snap points are configured. No keyboard interaction occurs when `disabled` is true.
+
+## Drupal Integration
+
+```twig
+{# my-module/templates/patient-layout.html.twig #}
+<hx-split-panel
+  position="{{ position|default(50) }}"
+  orientation="{{ orientation|default('horizontal') }}"
+  min="{{ min|default(0) }}"
+  max="{{ max|default(100) }}"
+  {% if snap %}snap="{{ snap }}"{% endif %}
+  {% if collapsible %}collapsible{% endif %}
+  {% if collapsed %}collapsed="{{ collapsed }}"{% endif %}
+  {% if disabled %}disabled{% endif %}
+>
+  <div slot="start">{{ start_content }}</div>
+  <div slot="end">{{ end_content }}</div>
+</hx-split-panel>
+```
+
+**Note on the `snap` property:** Pass snap points as a JSON array string: `snap="[25,50,75]"`. The component's custom attribute converter handles both JSON arrays and comma-separated strings.
+
+**JS-only properties:** `positionInPixels` and programmatically-set `snap` arrays require JavaScript and cannot be set purely via Twig attributes. Use `position` (percentage) and `snap` (JSON string) for Twig-only rendering.
+
+Load the library in your module's `.libraries.yml`:
+
+```yaml
+helix-components:
+  js:
+    /libraries/helix/helix.min.js: { minified: true }
+```
+
+Listen for resize events in Drupal behaviors:
+
+```javascript
+Drupal.behaviors.helixSplitPanel = {
+  attach(context) {
+    once('helixSplitPanel', 'hx-split-panel', context).forEach((el) => {
+      el.addEventListener('hx-reposition', (e) => {
+        const { position } = e.detail;
+        // Persist panel position to user preferences via AJAX
+        Drupal.ajax({
+          url: '/api/preferences/panel-position',
+          base: false,
+          element: el,
+        }).execute({ position });
+      });
+    });
+  },
+};
+```
+
+## Standalone HTML Example
+
+Copy-paste into a `.html` file and open in any browser — no build tool required:
+
+```html
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>hx-split-panel — Patient Record Layout</title>
+    <!-- @helix/library is a private package — install via npm workspace, not CDN -->
+    <!-- In your project: import '@helix/library'; in your bundler entry point -->
+  </head>
+  <body
+    style="margin: 0; font-family: sans-serif; height: 100vh; display: flex; flex-direction: column;"
+  >
+    <header style="padding: 0.75rem 1rem; background: #1e3a5f; color: white; flex-shrink: 0;">
+      <h1 style="margin: 0; font-size: 1rem;">Clinical Dashboard</h1>
+    </header>
+
+    <hx-split-panel
+      id="main-panel"
+      position="30"
+      min="20"
+      max="70"
+      collapsible
+      style="flex: 1; overflow: hidden;"
+    >
+      <nav
+        slot="start"
+        style="padding: 1rem; background: #f8fafc; height: 100%; box-sizing: border-box; overflow-y: auto;"
+        aria-label="Patient list"
+      >
+        <h2
+          style="margin: 0 0 1rem; font-size: 0.875rem; text-transform: uppercase; letter-spacing: 0.05em; color: #64748b;"
+        >
+          Patients
+        </h2>
+        <ul
+          style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 0.5rem;"
+        >
+          <li>
+            <button
+              style="width: 100%; text-align: left; padding: 0.5rem; border: none; background: #e0f2fe; border-radius: 0.25rem; cursor: pointer; font-size: 0.875rem;"
+              aria-current="true"
+            >
+              <strong>Jane Doe</strong><br />
+              <span style="color: #64748b;">MRN: 885521</span>
+            </button>
+          </li>
+          <li>
+            <button
+              style="width: 100%; text-align: left; padding: 0.5rem; border: none; background: transparent; border-radius: 0.25rem; cursor: pointer; font-size: 0.875rem;"
+            >
+              <strong>John Smith</strong><br />
+              <span style="color: #64748b;">MRN: 442209</span>
+            </button>
+          </li>
+        </ul>
+      </nav>
+
+      <main
+        slot="end"
+        style="padding: 1.5rem; background: #ffffff; height: 100%; box-sizing: border-box; overflow-y: auto;"
+      >
+        <h2 style="margin: 0 0 0.25rem; font-size: 1.25rem;">Jane Doe</h2>
+        <p style="margin: 0 0 1.5rem; color: #64748b; font-size: 0.875rem;">
+          DOB: 1982-03-15 — Room 214-B — Dr. Patel
+        </p>
+
+        <section style="margin-bottom: 1.5rem;">
+          <h3 style="margin: 0 0 0.5rem; font-size: 0.875rem; font-weight: 600;">Current Vitals</h3>
+          <dl
+            style="margin: 0; display: grid; grid-template-columns: auto 1fr; gap: 0.25rem 1rem; font-size: 0.875rem;"
+          >
+            <dt style="color: #64748b;">Blood Pressure</dt>
+            <dd style="margin: 0;">120/80 mmHg</dd>
+            <dt style="color: #64748b;">Heart Rate</dt>
+            <dd style="margin: 0;">72 bpm</dd>
+            <dt style="color: #64748b;">Temperature</dt>
+            <dd style="margin: 0;">98.6°F</dd>
+            <dt style="color: #64748b;">SpO2</dt>
+            <dd style="margin: 0;">98%</dd>
+          </dl>
+        </section>
+      </main>
+    </hx-split-panel>
+
+    <script>
+      const panel = document.getElementById('main-panel');
+
+      // Restore position from localStorage
+      const saved = localStorage.getItem('clinicalPanelPosition');
+      if (saved) panel.position = Number(saved);
+
+      // Persist position on each resize
+      panel.addEventListener('hx-reposition', (e) => {
+        localStorage.setItem('clinicalPanelPosition', e.detail.position);
+      });
+    </script>
+  </body>
+</html>
+```
+
+## API Reference
+
+<ComponentDoc tagName="hx-split-panel" section="api" />

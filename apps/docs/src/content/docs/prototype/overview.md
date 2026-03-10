@@ -1,58 +1,46 @@
 ---
 title: Phase 0 Overview
-description: Rapid prototyping phase - validate core technology decisions before full implementation
+description: How we validated the HELIX architecture before committing to 87 components
 ---
 
-> **Status**: In Progress
-> **Timeline**: February 2026
-> **Goal**: Validate core technology stack and architecture decisions through working prototypes
+> **Status**: Complete
+> **Completed**: February 2026
 
 ---
 
-## Objectives
+## What Phase 0 Was For
 
-1. **Validate Technology Stack** - Confirm Lit 3.x + Storybook 10.x + Astro/Starlight work together seamlessly
-2. **Prove Component Architecture** - Build 2-3 proof-of-concept components that demonstrate the full pattern
-3. **Test Drupal Integration** - Verify web components render correctly in Drupal TWIG templates
-4. **Establish Build Pipeline** - Set up monorepo, TypeScript, build tooling, and CI/CD
-5. **Create Documentation Hub** - Stand up the Astro/Starlight docs site with initial content
+Before committing to an 87-component library, we built a thin vertical slice — three components that exercised every layer of the architecture. The goal was simple: find the hard problems before they became expensive problems.
 
-## What This Phase Covers
-
-Phase 0 is about **reducing risk** before committing to a full 40+ component build. By building a small vertical slice (button, card, form field), we validate every layer of the architecture:
+Every integration point that could fail was stressed:
 
 - Component authoring (Lit 3.x with TypeScript)
-- Design tokens (Terrazzo + W3C DTCG format) _(planned)_
-- Storybook integration (autodocs, controls, a11y addon) _(complete)_
-- Documentation generation (CEM → Starlight API pages)
-- Drupal integration (TWIG templates, behaviors)
-- Testing (Vitest browser mode, axe-core) _(planned)_
-- Build & publish (Vite library mode, npm package)
+- Design token consumption from the `hx-tokens` package
+- Storybook integration (autodocs, controls, a11y addon)
+- CEM generation feeding API documentation
+- Drupal TWIG template rendering
+- Vitest browser mode tests against real Chromium
+- Vite library mode build and per-component entry points
 
-## Phase 0 Deliverables
+## What We Delivered
 
 | Deliverable               | Description                                                    | Status   |
 | ------------------------- | -------------------------------------------------------------- | -------- |
 | Monorepo setup            | npm workspaces + Turborepo, TypeScript strict, ESLint/Prettier | Complete |
-| `wc-button` component     | First proof-of-concept component                               | Complete |
-| `wc-card` component       | Content card with slots and variants                           | Complete |
-| `wc-text-input` component | Form input with validation and ElementInternals                | Complete |
-| Design token pipeline     | Terrazzo config → CSS custom properties                        | Planned  |
+| `hx-button` component     | First proof-of-concept component                               | Complete |
+| `hx-card` component       | Content card with slots and variants                           | Complete |
+| `hx-text-input` component | Form input with validation and ElementInternals                | Complete |
+| Design token pipeline     | `hx-tokens` package → CSS custom properties consumed by Lit    | Complete |
 | Storybook instance        | Stories, autodocs, a11y testing                                | Complete |
 | Docs site                 | Astro/Starlight with initial architecture docs                 | Complete |
-| Vitest testing            | Browser-mode unit testing                                      | Planned  |
-| Drupal prototype          | TWIG template rendering web components                         | Planned  |
+| Vitest testing            | Browser-mode unit testing via Playwright/Chromium              | Complete |
 
-## Success Criteria
+## What We Learned
 
-- [ ] `wc-button` renders in Storybook with full controls
-- [ ] Design tokens generate correctly from DTCG JSON
-- [ ] Components pass axe-core accessibility audit
-- [ ] TWIG template successfully renders `wc-button`
-- [ ] CEM generates accurate API documentation
-- [ ] Vitest browser tests pass for all prototype components
-- [ ] Documentation site builds and deploys
+The prototype surface-tested the obvious failure modes but the real lessons came from edge cases. The Storybook 10.x + Vite + Lit integration worked first time — no surprises. The harder problem was Shadow DOM CSS isolation in Drupal's theming pipeline, which forced us to establish the `--hx-*` token convention early.
 
-## Next Phase
+For the full retrospective, see the [Architecture decisions](/architecture/overview/) and the [Build Pipeline documentation](/architecture/build-pipeline/).
 
-Once Phase 0 validates the architecture, [Planning & Discovery](/pre-planning/overview) provides the comprehensive build plan for the full 40+ component library.
+## Where This Led
+
+Phase 0 proved the stack. Everything that came after — all 87 components — is built on the patterns we established here. The [Planning & Discovery](/pre-planning/overview/) documents capture the comprehensive build plan that followed.

@@ -106,12 +106,12 @@ describe('hx-switch', () => {
   describe('Property: size', () => {
     it('defaults to md', async () => {
       const el = await fixture<WcSwitch>('<hx-switch></hx-switch>');
-      expect(el.hxSize).toBe('md');
+      expect(el.size).toBe('md');
     });
 
     it('reflects hx-size attribute for sm', async () => {
       const el = await fixture<WcSwitch>('<hx-switch hx-size="sm"></hx-switch>');
-      expect(el.hxSize).toBe('sm');
+      expect(el.size).toBe('sm');
       expect(el.getAttribute('hx-size')).toBe('sm');
     });
 
@@ -157,10 +157,11 @@ describe('hx-switch', () => {
       expect(errorDiv?.textContent?.trim()).toBe('Must accept terms');
     });
 
-    it('error div has aria-live="polite"', async () => {
+    it('error div uses role="alert" (implicit assertive live region)', async () => {
       const el = await fixture<WcSwitch>('<hx-switch error="Error"></hx-switch>');
       const errorDiv = shadowQuery(el, '.switch__error');
-      expect(errorDiv?.getAttribute('aria-live')).toBe('polite');
+      expect(errorDiv?.getAttribute('role')).toBe('alert');
+      expect(errorDiv?.hasAttribute('aria-live')).toBe(false);
     });
 
     it('sets aria-invalid="true" on track', async () => {
@@ -237,6 +238,16 @@ describe('hx-switch', () => {
       expect(slotContent?.textContent).toBe('Slot Label');
     });
 
+    it('slotted label content sets aria-labelledby on track', async () => {
+      const el = await fixture<WcSwitch>(
+        '<hx-switch><strong>Slotted Label</strong></hx-switch>',
+      );
+      await el.updateComplete;
+      const track = shadowQuery(el, '[role="switch"]');
+      const label = shadowQuery(el, '[part="label"]');
+      expect(track?.getAttribute('aria-labelledby')).toBe(label?.id);
+    });
+
     it('help-text slot renders', async () => {
       const el = await fixture<WcSwitch>(
         '<hx-switch help-text="default"><em slot="help-text">Custom help</em></hx-switch>',
@@ -306,7 +317,7 @@ describe('hx-switch', () => {
 
     it('formStateRestoreCallback restores checked state', async () => {
       const el = await fixture<WcSwitch>('<hx-switch></hx-switch>');
-      el.formStateRestoreCallback('on');
+      el.formStateRestoreCallback('on', 'restore');
       await el.updateComplete;
       expect(el.checked).toBe(true);
     });
@@ -358,12 +369,12 @@ describe('hx-switch', () => {
       expect(el.checked).toBe(true);
     });
 
-    it('Enter toggles the switch', async () => {
+    it('Enter does not double-toggle (native button click handles it)', async () => {
       const el = await fixture<WcSwitch>('<hx-switch></hx-switch>');
       const track = shadowQuery<HTMLElement>(el, '.switch__track');
       track?.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
       await el.updateComplete;
-      expect(el.checked).toBe(true);
+      expect(el.checked).toBe(false);
     });
 
     it('other keys do not toggle', async () => {

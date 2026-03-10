@@ -54,9 +54,18 @@ export const helixNavItemStyles = css`
   .nav-item__link:hover {
     background-color: var(
       --hx-nav-item-hover-bg,
-      color-mix(in srgb, currentColor 10%, transparent)
-    );
+      var(--hx-overlay-white-8, rgba(255, 255, 255, 0.08))
+    ); /* fallback for browsers without color-mix() */
     color: var(--hx-nav-item-hover-color, var(--hx-color-neutral-100, #f3f4f6));
+  }
+
+  @supports (color: color-mix(in srgb, red 50%, blue)) {
+    .nav-item__link:hover {
+      background-color: var(
+        --hx-nav-item-hover-bg,
+        color-mix(in srgb, currentColor 10%, transparent)
+      );
+    }
   }
 
   .nav-item__link:focus-visible {
@@ -139,13 +148,16 @@ export const helixNavItemStyles = css`
   /* ─── Children (sub-nav) ─── */
 
   .nav-item__children {
-    display: none;
+    display: flex;
     flex-direction: column;
     padding-left: var(--hx-space-6, 1.5rem);
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height var(--hx-transition-normal, 300ms) ease;
   }
 
   :host([expanded]) .nav-item__children {
-    display: flex;
+    max-height: 62.5rem; /* large enough for any submenu depth */
   }
 
   /* ─── Tooltip (collapsed mode) ─── */
@@ -164,8 +176,8 @@ export const helixNavItemStyles = css`
     pointer-events: none;
     opacity: 0;
     transition: opacity var(--hx-transition-fast, 150ms) ease;
-    z-index: 100;
-    box-shadow: 0 2px 8px rgb(0 0 0 / 0.2);
+    z-index: var(--hx-z-index-tooltip, 100);
+    box-shadow: var(--hx-shadow-md, 0 2px 8px rgb(0 0 0 / 0.2));
   }
 
   :host([data-collapsed]) .nav-item__link:hover .nav-item__tooltip,
@@ -205,6 +217,7 @@ export const helixNavItemStyles = css`
   @media (prefers-reduced-motion: reduce) {
     .nav-item__label,
     .nav-item__arrow,
+    .nav-item__children,
     .nav-item__tooltip {
       transition: none;
     }

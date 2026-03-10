@@ -1,0 +1,69 @@
+{#
+/**
+ * @file
+ * HELIX hx-action-bar Drupal 11 Twig integration template.
+ *
+ * Renders a horizontal toolbar with optional start, center, end, and overflow slots.
+ * Implements the ARIA toolbar pattern with roving tabindex keyboard navigation.
+ *
+ * Usage in Drupal templates:
+ *   {% include '@my_theme/hx-action-bar.html.twig' with {
+ *     aria_label: 'Patient record actions',
+ *     variant: 'outlined',
+ *     size: 'md',
+ *     position: 'top',
+ *     start_actions: '<hx-button>Save</hx-button><hx-button variant="ghost">Print</hx-button>',
+ *     center_content: '<span>Jane Doe — MRN 12345678</span>',
+ *     end_actions: '<hx-button variant="destructive">Discharge</hx-button>',
+ *   } %}
+ *
+ * Variables:
+ *   - aria_label: string — Required. Identifies the toolbar to assistive technology.
+ *       When multiple toolbars appear on the same page, each must have a unique label.
+ *   - variant: 'default' | 'outlined' | 'filled' (default: 'default')
+ *   - size: 'sm' | 'md' | 'lg' (default: 'md')
+ *   - position: 'top' | 'bottom' | 'sticky' (default: 'top')
+ *       - 'top': normal document flow
+ *       - 'sticky': sticks to the top of the scroll container
+ *       - 'bottom': sticks to the bottom with iOS safe-area-inset support
+ *   - start_actions: HTML string or render array — content for the `start` slot (left-aligned)
+ *   - center_content: HTML string or render array — content for the default/center slot
+ *   - end_actions: HTML string or render array — content for the `end` slot (right-aligned)
+ *   - overflow_actions: HTML string or render array — content for the `overflow` slot
+ *       (shown only when space is constrained)
+ *   - attributes: Drupal attributes object — merged onto the hx-action-bar element
+ */
+#}
+{% set variant = variant|default('default') %}
+{% set size = size|default('md') %}
+{% set position = position|default('top') %}
+
+<hx-action-bar
+  aria-label="{{ aria_label }}"
+  variant="{{ variant }}"
+  size="{{ size }}"
+  position="{{ position }}"
+  {% if attributes %}{{ attributes }}{% endif %}
+>
+  {% if start_actions %}
+    <div slot="start">
+      {{ start_actions }}
+    </div>
+  {% endif %}
+
+  {% if center_content %}
+    {{ center_content }}
+  {% endif %}
+
+  {% if end_actions %}
+    <div slot="end">
+      {{ end_actions }}
+    </div>
+  {% endif %}
+
+  {% if overflow_actions %}
+    <div slot="overflow">
+      {{ overflow_actions }}
+    </div>
+  {% endif %}
+</hx-action-bar>

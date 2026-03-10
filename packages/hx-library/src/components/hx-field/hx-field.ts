@@ -19,6 +19,12 @@ function isFormControl(el: Element): el is HTMLElement {
  *
  * This component is NOT form-associated — it is a pure visual layout wrapper.
  *
+ * **Light DOM side effect:** This component injects a visually-hidden `<span>`
+ * into its light DOM children for ARIA describedby linkage across the shadow
+ * DOM boundary. This span has `id="${fieldId}-desc"` and is removed on
+ * `disconnectedCallback`. This is an intentional, documented accessibility
+ * mechanism.
+ *
  * @summary Layout wrapper for label, control, help text, and error message.
  *
  * @tag hx-field
@@ -39,6 +45,8 @@ function isFormControl(el: Element): el is HTMLElement {
  * @cssprop [--hx-field-label-color=var(--hx-color-neutral-700)] - Label color.
  * @cssprop [--hx-field-error-color=var(--hx-color-error-500)] - Error color.
  * @cssprop [--hx-field-font-family=var(--hx-font-family-sans)] - Font family.
+ * @cssprop [--hx-field-gap=var(--hx-space-1, 0.25rem)] - Gap between field segments.
+ * @cssprop [--hx-field-help-text-color=var(--hx-color-neutral-500)] - Help text color.
  */
 @customElement('hx-field')
 export class HelixField extends LitElement {
@@ -89,6 +97,13 @@ export class HelixField extends LitElement {
   @property({ type: String, attribute: 'hx-size', reflect: true })
   hxSize: 'sm' | 'md' | 'lg' = 'md';
 
+  /**
+   * Layout variant. 'column' stacks label above control; 'inline' places them side-by-side.
+   * @attr layout
+   */
+  @property({ type: String, reflect: true })
+  layout: 'column' | 'inline' = 'column';
+
   // ─── Slot Tracking ───
 
   @state() private _hasLabelSlot = false;
@@ -112,7 +127,7 @@ export class HelixField extends LitElement {
 
   // ─── Unique IDs for Accessibility ───
 
-  private _fieldId = `hx-field-${Math.random().toString(36).slice(2, 9)}`;
+  private _fieldId = `hx-field-${crypto.randomUUID().slice(0, 8)}`;
   private _helpTextId = `${this._fieldId}-help`;
   private _errorId = `${this._fieldId}-error`;
   private _a11yDescId = `${this._fieldId}-desc`;
@@ -130,6 +145,12 @@ export class HelixField extends LitElement {
    * default slot). Because it lives in the same document as the slotted input,
    * `aria-describedby` can reference its ID without cross-shadow-root IDREF
    * limitations.
+   *
+   * **Documented side effect:** This element is intentionally injected into the
+   * component's light DOM children. It is invisible to users but present in the
+   * accessibility tree. It is removed in `disconnectedCallback`. Consumers
+   * should not remove or modify this span (identifiable by its `id` ending in
+   * `-desc`).
    */
   private _a11yDescEl: HTMLElement | null = null;
 
@@ -154,6 +175,17 @@ export class HelixField extends LitElement {
 
   override updated(changedProps: Map<string, unknown>): void {
     super.updated(changedProps);
+
+    // P2-01: Warn on invalid hxSize values
+    if (changedProps.has('hxSize')) {
+      const validSizes = ['sm', 'md', 'lg'];
+      if (!validSizes.includes(this.hxSize)) {
+        console.warn(
+          `[hx-field] Invalid hx-size value: "${this.hxSize}". Expected "sm" | "md" | "lg". Defaulting to "md".`,
+        );
+      }
+    }
+
     this._syncA11yDescEl();
     this._syncSlottedControl();
   }
@@ -192,6 +224,15 @@ export class HelixField extends LitElement {
   }
 
   /**
+   * Focuses the slotted form control when the shadow DOM label is clicked.
+   * The shadow `<label>` cannot use `for`/`id` to link to a slotted input
+   * across the shadow boundary, so we handle focus programmatically.
+   */
+  private _handleLabelClick(_e: Event): void {
+    this._slottedControl?.focus();
+  }
+
+  /**
    * Applies ARIA attributes to the slotted form control, bridging the
    * shadow DOM accessibility boundary.
    *
@@ -199,6 +240,11 @@ export class HelixField extends LitElement {
    * - aria-required: communicates required state to AT
    * - aria-invalid: communicates error state to AT
    * - aria-describedby: points to the light-DOM description span
+   *
+   * **Skip conditions:**
+   * - `HX-*` elements manage their own ARIA attributes; bridging is skipped.
+   * - Elements with `data-aria-managed` attribute opt out of ARIA mutation;
+   *   bridging is skipped entirely for those elements.
    */
   private _syncSlottedControl(): void {
     const control = this._slottedControl;
@@ -206,6 +252,9 @@ export class HelixField extends LitElement {
 
     // hx-* elements manage their own ARIA attributes; skip bridging for them
     if (control.tagName.startsWith('HX-')) return;
+
+    // Elements that declare data-aria-managed opt out of ARIA mutation
+    if (control.hasAttribute('data-aria-managed')) return;
 
     const hasError = !!this.error || this._hasErrorSlot;
     const hasDesc = !!(this.error || this.helpText || this._hasErrorSlot || this._hasHelpSlot);
@@ -253,6 +302,7 @@ export class HelixField extends LitElement {
       'field--size-sm': this.hxSize === 'sm',
       'field--size-md': this.hxSize === 'md',
       'field--size-lg': this.hxSize === 'lg',
+      'field--layout-inline': this.layout === 'inline',
     };
 
     return html`
@@ -262,7 +312,7 @@ export class HelixField extends LitElement {
           <slot name="label" @slotchange=${this._handleLabelSlotChange}>
             ${this.label && !this._hasLabelSlot
               ? html`
-                  <label part="label" class="field__label">
+                  <label part="label" class="field__label" @click=${this._handleLabelClick}>
                     ${this.label}
                     ${this.required
                       ? html`<span
@@ -290,18 +340,15 @@ export class HelixField extends LitElement {
         <slot name="error" @slotchange=${this._handleErrorSlotChange}>
           ${this.error
             ? html`
-                <div
-                  part="error-message"
-                  class="field__error"
-                  id=${this._errorId}
-                  role="alert"
-                  aria-live="polite"
-                >
+                <div part="error-message" class="field__error" id=${this._errorId} role="alert">
                   ${this.error}
                 </div>
               `
             : nothing}
         </slot>
+
+        <!-- Slotted error live region — ensures slotted error content is announced -->
+        <div aria-live="assertive" class="field__error-slot-announcer"></div>
 
         <!-- Help text (always in DOM so slot detection works; hidden when no help or error is shown) -->
         <div

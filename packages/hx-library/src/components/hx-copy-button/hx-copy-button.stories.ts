@@ -4,28 +4,6 @@ import { expect, within, userEvent, fn } from 'storybook/test';
 import './hx-copy-button.js';
 
 // ─────────────────────────────────────────────────
-// Shared SVG icon helpers
-// ─────────────────────────────────────────────────
-
-const iconCopy = html`
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    width="16"
-    height="16"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    stroke-width="2"
-    stroke-linecap="round"
-    stroke-linejoin="round"
-    aria-hidden="true"
-  >
-    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
-    <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"></path>
-  </svg>
-`;
-
-// ─────────────────────────────────────────────────
 // Meta Configuration
 // ─────────────────────────────────────────────────
 
@@ -101,7 +79,6 @@ const meta = {
       hx-size=${args.size}
       ?disabled=${args.disabled}
     >
-      ${iconCopy}
       <svg
         slot="copy-icon"
         xmlns="http://www.w3.org/2000/svg"
@@ -623,7 +600,88 @@ export const HealthcareMRN: Story = {
 };
 
 // ─────────────────────────────────────────────────
-// 7. ALL SIZES — Kitchen sink showing all sizes in a row
+// 7. COPIED STATE — Button locked in success/copied state for VRT
+// ─────────────────────────────────────────────────
+
+export const CopiedState: Story = {
+  name: 'Copied / Success State',
+  args: {
+    value: 'patient@example.com',
+    label: 'Copy to clipboard',
+    // feedbackDuration set very high so the success state persists for the
+    // duration of design review and visual regression testing.
+    feedbackDuration: 9999999,
+  },
+  render: (args) => html`
+    <div>
+      <hx-copy-button
+        id="copied-state-demo"
+        value=${args.value}
+        label=${args.label}
+        feedback-duration=${args.feedbackDuration}
+        hx-size=${args.size ?? 'md'}
+        ?disabled=${args.disabled}
+      >
+        <svg
+          slot="copy-icon"
+          xmlns="http://www.w3.org/2000/svg"
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+        >
+          <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+          <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"></path>
+        </svg>
+        <svg
+          slot="success-icon"
+          xmlns="http://www.w3.org/2000/svg"
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+        >
+          <polyline points="20 6 9 17 4 12"></polyline>
+        </svg>
+      </hx-copy-button>
+      <p style="margin-top: 0.75rem; font-size: 0.875rem; color: #6b7280;">
+        Programmatically triggered into the success state for design review and visual regression
+        testing. The button shows the success icon and the
+        <code>button--copied</code> CSS class for the full <code>feedback-duration</code>.
+      </p>
+    </div>
+  `,
+  play: async ({ canvasElement }) => {
+    // Mock clipboard and programmatically trigger the copied state.
+    Object.defineProperty(navigator, 'clipboard', {
+      value: { writeText: async () => {} },
+      configurable: true,
+    });
+
+    const el = canvasElement.querySelector('#copied-state-demo');
+    await expect(el).toBeTruthy();
+
+    const btn = el?.shadowRoot?.querySelector('button');
+    await expect(btn).toBeTruthy();
+
+    // Click to enter success state — feedbackDuration is near-infinite so it
+    // will persist for the lifetime of this story.
+    await userEvent.click(btn!);
+  },
+};
+
+// ─────────────────────────────────────────────────
+// 8. ALL SIZES — Kitchen sink showing all sizes in a row
 // ─────────────────────────────────────────────────
 
 export const AllSizes: Story = {

@@ -1,7 +1,6 @@
 {
   "name": "@helix/library",
-  "version": "0.0.1",
-  "private": true,
+  "version": "0.1.0",
   "description": "Enterprise Web Component Library built with Lit 3.x",
   "type": "module",
   "sideEffects": [
@@ -9,7 +8,6 @@
     "src/components/**/*.ts"
   ],
   "main": "./dist/index.js",
-  "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
@@ -35,6 +33,7 @@
     "build": "vite build && npm run cem",
     "type-check": "tsc --noEmit",
     "test": "vitest run",
+    "test:cross-browser": "vitest run --config vitest.config.cross-browser.ts",
     "test:coverage": "vitest run --coverage.enabled",
     "test:watch": "vitest",
     "test:ui": "vitest --ui",
@@ -43,9 +42,11 @@
     "clean": "rm -rf dist custom-elements.json"
   },
   "dependencies": {
-    "@floating-ui/dom": "^1.7.6",
     "@helix/tokens": "*",
     "lit": "^3.3.2"
+  },
+  "peerDependencies": {
+    "@floating-ui/dom": "^1.7.6"
   },
   "devDependencies": {
     "@custom-elements-manifest/analyzer": "^0.11.0",

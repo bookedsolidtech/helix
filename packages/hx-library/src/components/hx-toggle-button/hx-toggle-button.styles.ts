@@ -146,14 +146,15 @@ export const helixToggleButtonStyles = css`
     --hx-toggle-button-border-color: var(--hx-color-primary-500, #2563eb);
   }
 
-  /* Tertiary pressed: use neutral-200 as a subtle filled indicator. */
+  /* Tertiary pressed: use primary-100 bg + primary-700 text + border for WCAG 3:1 non-text contrast. */
   .button--tertiary.button--pressed {
-    --hx-toggle-button-bg: var(--hx-toggle-button-pressed-bg, var(--hx-color-neutral-200, #e2e8f0));
+    --hx-toggle-button-bg: var(--hx-toggle-button-pressed-bg, var(--hx-color-primary-100, #dbeafe));
     --hx-toggle-button-color: var(
       --hx-toggle-button-pressed-color,
-      var(--hx-color-neutral-900, #0f172a)
+      var(--hx-color-primary-700, #1d4ed8)
     );
-    --hx-toggle-button-border-color: transparent;
+    --hx-toggle-button-border-color: var(--hx-color-primary-400, #60a5fa);
+    box-shadow: inset 0 0 0 1px var(--hx-color-primary-400, #60a5fa);
   }
 
   /* Ghost pressed: subtle neutral fill, matching hover behavior as a baseline. */
@@ -166,7 +167,7 @@ export const helixToggleButtonStyles = css`
     --hx-toggle-button-border-color: transparent;
   }
 
-  /* Outline pressed: fills with a neutral tint and darkens the border. */
+  /* Outline pressed: fills with a neutral tint, darkens the border, and adds an inset shadow for WCAG 3:1 non-text contrast. */
   .button--outline.button--pressed {
     --hx-toggle-button-bg: var(--hx-toggle-button-pressed-bg, var(--hx-color-neutral-100, #f1f5f9));
     --hx-toggle-button-color: var(
@@ -174,13 +175,13 @@ export const helixToggleButtonStyles = css`
       var(--hx-color-neutral-900, #0f172a)
     );
     --hx-toggle-button-border-color: var(--hx-color-neutral-500, #64748b);
+    box-shadow: inset 0 0 0 1px var(--hx-color-neutral-500, #64748b);
   }
 
   /* ─── Disabled ─── */
 
   .button[disabled] {
     cursor: not-allowed;
-    opacity: var(--hx-opacity-disabled, 0.5);
   }
 
   /* ─── Prefix / Suffix / Label ─── */

@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/web-components';
 import { html } from 'lit';
+import { ifDefined } from 'lit/directives/if-defined.js';
 import './hx-text.js';
 
 // ─────────────────────────────────────────────────
@@ -64,6 +65,17 @@ const meta = {
         type: { summary: 'number' },
       },
     },
+    as: {
+      control: { type: 'select' },
+      options: ['span', 'p', 'strong', 'em', 'div'],
+      description:
+        'The HTML element to render as the inner base element. Use to produce semantically appropriate markup.',
+      table: {
+        category: 'Semantic',
+        defaultValue: { summary: 'span' },
+        type: { summary: "'span' | 'p' | 'strong' | 'em' | 'div'" },
+      },
+    },
     content: {
       control: 'text',
       description: 'Text content (passed via default slot).',
@@ -78,6 +90,7 @@ const meta = {
     color: 'default',
     truncate: false,
     lines: 0,
+    as: 'span',
     content: 'The quick brown fox jumps over the lazy dog.',
   },
   render: (args) => html`
@@ -86,7 +99,8 @@ const meta = {
       ?truncate=${args.truncate}
       lines=${args.lines > 0 ? args.lines : 0}
       color=${args.color}
-      weight=${args.weight ?? ''}
+      weight=${ifDefined(args.weight)}
+      as=${args.as}
     >
       ${args.content}
     </hx-text>
@@ -130,7 +144,9 @@ export const TypeScale: Story = {
       <div>
         <hx-text variant="caption" color="subtle">body</hx-text>
         <br />
-        <hx-text variant="body">Review the patient's current medications before proceeding.</hx-text>
+        <hx-text variant="body"
+          >Review the patient's current medications before proceeding.</hx-text
+        >
       </div>
       <div>
         <hx-text variant="caption" color="subtle">body-sm</hx-text>
@@ -264,8 +280,8 @@ export const MultiLineClamp: Story = {
     <div style="max-width: 320px; border: 1px dashed #d1d5db; padding: 1rem;">
       <hx-text lines="3">
         Patient: John Alexander Smith — Admitted 2026-01-15 — Diagnosis: Acute respiratory failure
-        with hypoxia. The patient was admitted via the emergency department following a rapid decline
-        in oxygen saturation. Family has been notified and is present at bedside.
+        with hypoxia. The patient was admitted via the emergency department following a rapid
+        decline in oxygen saturation. Family has been notified and is present at bedside.
       </hx-text>
     </div>
   `,
@@ -298,6 +314,91 @@ export const PatientRecord: Story = {
 
       <hx-text variant="label-sm" color="subtle">Notes</hx-text>
       <hx-text variant="caption" color="subtle">Last reviewed by Dr. Rivera on 2026-03-05</hx-text>
+    </div>
+  `,
+};
+
+// ─────────────────────────────────────────────────
+// 8. SEMANTIC ELEMENT OVERRIDE (as prop)
+// ─────────────────────────────────────────────────
+
+export const SemanticAs: Story = {
+  name: 'Semantic Element (as)',
+  render: () => html`
+    <div style="display: flex; flex-direction: column; gap: 1rem; max-width: 480px;">
+      <hx-text as="span" variant="body">Default span — inline content</hx-text>
+      <hx-text as="p" variant="body">Paragraph — block-level body text for prose content.</hx-text>
+      <hx-text as="strong" variant="label" weight="semibold">Strong — important label text</hx-text>
+      <hx-text as="em" variant="body" color="subtle">Em — emphasized supporting text</hx-text>
+      <hx-text as="div" variant="body-lg">Div — block container for rich content areas</hx-text>
+    </div>
+  `,
+};
+
+// ─────────────────────────────────────────────────
+// 9. DRUPAL / CDN INTEGRATION REFERENCE
+// ─────────────────────────────────────────────────
+
+/**
+ * Drupal Twig integration reference.
+ *
+ * Load the component via CDN in your Drupal theme's page.html.twig or a library definition:
+ *   <script type="module" src="https://cdn.example.com/@helix/library/hx-text.js"></script>
+ *
+ * Basic usage in Twig:
+ *   <hx-text variant="body" color="default">{{ patient.name }}</hx-text>
+ *   <hx-text variant="label" weight="semibold">Date of Birth</hx-text>
+ *   <hx-text variant="caption" color="subtle">{{ node.field_last_reviewed }}</hx-text>
+ *
+ * Boolean attributes (truncate) — include attribute to enable, omit to disable:
+ *   <hx-text truncate>{{ long_patient_note }}</hx-text>
+ *
+ * Numeric attribute (lines) — pass as a string; the component coerces to number:
+ *   <hx-text lines="3">{{ clinical_summary }}</hx-text>
+ *
+ * Semantic element override:
+ *   <hx-text as="p" variant="body">{{ body_text }}</hx-text>
+ *   <hx-text as="strong" variant="label">{{ field_label }}</hx-text>
+ */
+export const DrupalIntegration: Story = {
+  name: 'Drupal / CDN Integration',
+  render: () => html`
+    <div style="display: flex; flex-direction: column; gap: 1.5rem; max-width: 560px;">
+      <div>
+        <hx-text variant="overline" color="subtle">Basic attribute usage</hx-text>
+        <br />
+        <hx-text variant="body" color="default">Patient: Jane Marie Doe</hx-text>
+      </div>
+
+      <div>
+        <hx-text variant="overline" color="subtle">Boolean attribute (truncate)</hx-text>
+        <br />
+        <div style="max-width: 320px; border: 1px dashed #d1d5db; padding: 0.75rem;">
+          <hx-text truncate>
+            Long clinical summary that exceeds container width and clips with ellipsis
+          </hx-text>
+        </div>
+      </div>
+
+      <div>
+        <hx-text variant="overline" color="subtle">Numeric attribute (lines="3")</hx-text>
+        <br />
+        <div style="max-width: 320px; border: 1px dashed #d1d5db; padding: 0.75rem;">
+          <hx-text lines="3">
+            Patient admitted via emergency department following rapid decline in oxygen saturation.
+            Family has been notified and is present at bedside. Attending physician has ordered
+            further tests.
+          </hx-text>
+        </div>
+      </div>
+
+      <div>
+        <hx-text variant="overline" color="subtle">Semantic element (as="p")</hx-text>
+        <br />
+        <hx-text as="p" variant="body">
+          This renders as a paragraph element for block-level prose content in Twig templates.
+        </hx-text>
+      </div>
     </div>
   `,
 };

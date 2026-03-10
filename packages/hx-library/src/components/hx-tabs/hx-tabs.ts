@@ -1,9 +1,12 @@
-import { LitElement, html } from 'lit';
+import { LitElement, html, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { tokenStyles } from '@helix/tokens/lit';
 import { helixTabsStyles } from './hx-tabs.styles.js';
 import type { HelixTab } from './hx-tab.js';
 import type { HelixTabPanel } from './hx-tab-panel.js';
+
+// Module-level counter for stable, SSR-safe IDs (avoids Math.random() hydration mismatch)
+let _hxTabsIdCounter = 0;
 
 /**
  * A tabbed content organizer that manages a set of `<hx-tab>` and `<hx-tab-panel>` children.
@@ -47,7 +50,8 @@ export class HelixTabs extends LitElement {
 
   // ─── Internal ID ───
 
-  private _id = `hx-tabs-${Math.random().toString(36).slice(2, 9)}`;
+  /** @internal */
+  private _id = `hx-tabs-${++_hxTabsIdCounter}`;
 
   // ─── Properties ───
 
@@ -64,17 +68,47 @@ export class HelixTabs extends LitElement {
    * In `manual` mode, focus moves independently; Space or Enter activates.
    * @attr activation
    */
-  @property({ type: String, attribute: 'activation' })
+  @property({ type: String, attribute: 'activation', reflect: true })
   activation: 'manual' | 'automatic' = 'automatic';
+
+  /**
+   * Accessible label for the tablist. Rendered as `aria-label` on the tablist container.
+   * Provide a brief description of what the tabs represent (e.g., "Patient record sections").
+   * @attr label
+   */
+  @property({ type: String, reflect: true })
+  label = '';
 
   // ─── State ───
 
+  /** @internal */
   @state() private _activePanel = '';
 
   // ─── Child Accessors ───
 
+  /** @internal */
   private _cachedTabs: HelixTab[] | null = null;
+  /** @internal */
   private _cachedPanels: HelixTabPanel[] | null = null;
+  /** @internal */
+  private _observer: MutationObserver | null = null;
+
+  // ─── Public API ───
+
+  /**
+   * Gets or sets the zero-based index of the currently selected tab.
+   * Setting this programmatically activates the tab at the given index.
+   */
+  get selectedIndex(): number {
+    return this._getTabs().findIndex((tab) => tab.panel === this._activePanel);
+  }
+
+  set selectedIndex(index: number) {
+    const tab = this._getTabs()[index];
+    if (tab && !tab.disabled) {
+      this._activateTab(tab, true);
+    }
+  }
 
   private _getTabs(): HelixTab[] {
     if (!this._cachedTabs) {
@@ -102,12 +136,24 @@ export class HelixTabs extends LitElement {
     super.connectedCallback();
     this.addEventListener('hx-tab-select', this._handleTabSelect as EventListener);
     this.addEventListener('keydown', this._handleKeydown);
+    // Watch for panel/name attribute changes on child tabs and panels
+    this._observer = new MutationObserver(() => {
+      this._cachedTabs = null;
+      this._cachedPanels = null;
+      this._syncTabsAndPanels();
+    });
+    this._observer.observe(this, {
+      subtree: true,
+      attributeFilter: ['panel', 'name'],
+    });
   }
 
   override disconnectedCallback(): void {
     super.disconnectedCallback();
     this.removeEventListener('hx-tab-select', this._handleTabSelect as EventListener);
     this.removeEventListener('keydown', this._handleKeydown);
+    this._observer?.disconnect();
+    this._observer = null;
   }
 
   override firstUpdated(): void {
@@ -144,7 +190,8 @@ export class HelixTabs extends LitElement {
       if (panel) {
         const panelId = panel.id || `hx-panel-${this._id}-${i}`;
         panel.id = panelId;
-        tab.setAttribute('aria-controls', panelId);
+        // Set controls on the tab so aria-controls lands on the inner button (role="tab")
+        tab.controls = panelId;
         panel.setAttribute('aria-labelledby', tabId);
       }
     });
@@ -159,6 +206,9 @@ export class HelixTabs extends LitElement {
     tabs.forEach((tab) => {
       const isSelected = tab.panel === this._activePanel;
       tab.selected = isSelected;
+      // Tabindex is managed by the inner button in hx-tab via the `selected` property.
+      // We also set it on the host for the roving tabindex pattern so document.activeElement
+      // comparisons work correctly when the inner button is focused.
       tab.tabIndex = isSelected ? 0 : -1;
     });
 
@@ -166,8 +216,10 @@ export class HelixTabs extends LitElement {
       const isActive = panel.name === this._activePanel;
       if (isActive) {
         panel.removeAttribute('hidden');
+        panel.setAttribute('tabindex', '0');
       } else {
         panel.setAttribute('hidden', '');
+        panel.setAttribute('tabindex', '-1');
       }
     });
   }
@@ -201,6 +253,7 @@ export class HelixTabs extends LitElement {
 
   // ─── Event Handling ───
 
+  /** @internal */
   private _handleTabSelect = (e: CustomEvent<{ panel: string }>): void => {
     e.stopPropagation();
     const tab = e
@@ -211,12 +264,52 @@ export class HelixTabs extends LitElement {
     }
   };
 
+  /** @internal */
+  private _warnInvalidSlotContent(): void {
+    const tabSlot = this.shadowRoot?.querySelector<HTMLSlotElement>('slot[name="tab"]');
+    const panelSlot = this.shadowRoot?.querySelector<HTMLSlotElement>('slot:not([name])');
+    if (tabSlot) {
+      const invalid = tabSlot
+        .assignedElements()
+        .filter((el) => el.tagName.toLowerCase() !== 'hx-tab');
+      if (invalid.length > 0) {
+        console.warn(
+          `[hx-tabs] Slot "tab" expects <hx-tab> elements. Found unexpected: ${invalid.map((el) => `<${el.tagName.toLowerCase()}>`).join(', ')}`,
+        );
+      }
+    }
+    if (panelSlot) {
+      const invalid = panelSlot
+        .assignedElements()
+        .filter((el) => el.tagName.toLowerCase() !== 'hx-tab-panel');
+      if (invalid.length > 0) {
+        console.warn(
+          `[hx-tabs] Default slot expects <hx-tab-panel> elements. Found unexpected: ${invalid.map((el) => `<${el.tagName.toLowerCase()}>`).join(', ')}`,
+        );
+      }
+    }
+  }
+
+  /** @internal */
   private _handleSlotChange = (): void => {
+    this._warnInvalidSlotContent();
     this._cachedTabs = null;
     this._cachedPanels = null;
     this._syncTabsAndPanels();
+    // If the active panel was removed, fall back to the first enabled tab
+    const panels = this._getPanels();
+    const activePanelExists = panels.some((p) => p.name === this._activePanel);
+    if (!activePanelExists) {
+      const firstEnabled = this._getEnabledTabs()[0];
+      if (firstEnabled) {
+        this._activateTab(firstEnabled, false);
+      } else {
+        this._activePanel = '';
+      }
+    }
   };
 
+  /** @internal */
   private _handleKeydown = (e: KeyboardEvent): void => {
     const enabledTabs = this._getEnabledTabs();
     if (enabledTabs.length === 0) {
@@ -285,7 +378,13 @@ export class HelixTabs extends LitElement {
   override render() {
     return html`
       <div class="tabs">
-        <div part="tablist" class="tablist" role="tablist" aria-orientation=${this.orientation}>
+        <div
+          part="tablist"
+          class="tablist"
+          role="tablist"
+          aria-orientation=${this.orientation}
+          aria-label=${this.label || nothing}
+        >
           <slot name="tab" @slotchange=${this._handleSlotChange}></slot>
         </div>
         <div part="panels" class="panels">

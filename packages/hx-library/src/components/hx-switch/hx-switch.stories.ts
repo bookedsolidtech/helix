@@ -518,8 +518,14 @@ export const LongLabel: Story = {
   },
 };
 
+/**
+ * When no visible label text is desired, use the `label` property or slot content
+ * to provide an accessible name. `aria-label` on the host element does NOT propagate
+ * into the shadow DOM — the internal `<button role="switch">` will be unnamed.
+ * Use the `label` prop (visually hidden via CSS if needed) or slotted content instead.
+ */
 export const NoLabel: Story = {
-  render: () => html` <hx-switch aria-label="Toggle dark mode"></hx-switch> `,
+  render: () => html` <hx-switch label="Toggle dark mode"></hx-switch> `,
 };
 
 export const RapidToggle: Story = {
@@ -751,8 +757,8 @@ export const KeyboardToggle: Story = {
     await waitForUpdate(canvasElement);
     await expect(track.getAttribute('aria-checked')).toBe('true');
 
-    // Press Enter to toggle off
-    await userEvent.keyboard('{Enter}');
+    // Press Space again to toggle off
+    await userEvent.keyboard(' ');
     await waitForUpdate(canvasElement);
     await expect(track.getAttribute('aria-checked')).toBe('false');
   },

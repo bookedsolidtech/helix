@@ -1,6 +1,6 @@
 ---
 title: 'hx-select'
-description: "A select component that wraps a native select element with the library's form field pattern (label, error, help text). Options are provided via slotted option elements in the light DOM. The component observes slotted options via slotchange and clones them into the shadow DOM select for rendering."
+description: Form-associated custom select with label, error, help text, and keyboard navigation. Options are provided via slotted option and optgroup elements in the light DOM.
 ---
 
 import ComponentLoader from '../../../components/ComponentLoader.astro';
@@ -11,7 +11,17 @@ import ComponentDoc from '../../../components/ComponentDoc.astro';
 
 <ComponentDoc tagName="hx-select" section="summary" />
 
-## Basic
+## Overview
+
+`hx-select` is a fully custom, form-associated select control for healthcare and enterprise forms. It renders a combobox trigger and a custom listbox panel while keeping a hidden native `<select>` in the shadow DOM for standards-compliant form participation. Options are composed through the light DOM via standard `<option>` and `<optgroup>` elements — the same markup used with a native select.
+
+**Use `hx-select` when:** the user must pick exactly one value from a list (department, provider, diagnosis category).
+**Use `hx-combobox` instead when:** the list is very long and the user must be able to type to filter options.
+**Note:** Multi-select is intentionally not supported by this component. Use a dedicated multi-select component for that pattern.
+
+## Live Demo
+
+### Basic
 
 Select with label and placeholder.
 
@@ -26,7 +36,57 @@ Select with label and placeholder.
   </div>
 </ComponentDemo>
 
-## States
+### Variants
+
+The select displays a custom combobox trigger that opens a styled listbox panel with hover and focus states for individual options.
+
+<ComponentDemo title="With pre-selected value">
+  <div style="max-width: 400px;">
+    <hx-select label="Specialty" value="cardiology">
+      <option value="cardiology">Cardiology</option>
+      <option value="neurology">Neurology</option>
+      <option value="oncology">Oncology</option>
+    </hx-select>
+  </div>
+</ComponentDemo>
+
+<ComponentDemo title="With option groups">
+  <div style="max-width: 400px;">
+    <hx-select label="Provider" placeholder="Select a provider">
+      <optgroup label="Cardiology">
+        <option value="dr-smith">Dr. Smith</option>
+        <option value="dr-jones">Dr. Jones</option>
+      </optgroup>
+      <optgroup label="Neurology">
+        <option value="dr-patel">Dr. Patel</option>
+        <option value="dr-lee">Dr. Lee</option>
+      </optgroup>
+    </hx-select>
+  </div>
+</ComponentDemo>
+
+### Sizes
+
+Small, medium, and large select variants.
+
+<ComponentDemo title="Sizes">
+  <div style="display: grid; gap: 1rem; max-width: 400px;">
+    <hx-select label="Small" hx-size="sm" placeholder="Small select">
+      <option value="1">Option 1</option>
+      <option value="2">Option 2</option>
+    </hx-select>
+    <hx-select label="Medium" hx-size="md" placeholder="Medium select">
+      <option value="1">Option 1</option>
+      <option value="2">Option 2</option>
+    </hx-select>
+    <hx-select label="Large" hx-size="lg" placeholder="Large select">
+      <option value="1">Option 1</option>
+      <option value="2">Option 2</option>
+    </hx-select>
+  </div>
+</ComponentDemo>
+
+### States
 
 Required, disabled, and error states.
 
@@ -48,29 +108,222 @@ Required, disabled, and error states.
     <hx-select label="Disabled" disabled value="locked">
       <option value="locked">Locked selection</option>
     </hx-select>
-  </div>
-</ComponentDemo>
-
-## Sizes
-
-Small, medium, and large select variants.
-
-<ComponentDemo title="Sizes">
-  <div style="display: grid; gap: 1rem; max-width: 400px;">
-    <hx-select label="Small" hx-size="sm" placeholder="Small select">
-      <option value="1">Option 1</option>
-      <option value="2">Option 2</option>
-    </hx-select>
-    <hx-select label="Medium" hx-size="md" placeholder="Medium select">
-      <option value="1">Option 1</option>
-      <option value="2">Option 2</option>
-    </hx-select>
-    <hx-select label="Large" hx-size="lg" placeholder="Large select">
-      <option value="1">Option 1</option>
-      <option value="2">Option 2</option>
+    <hx-select
+      label="With help text"
+      help-text="Select the department closest to the patient's care team."
+    >
+      <option value="cardiology">Cardiology</option>
+      <option value="neurology">Neurology</option>
     </hx-select>
   </div>
 </ComponentDemo>
+
+## Installation
+
+```bash
+# Full library
+npm install @helix/library
+
+# Or import only this component (tree-shaking friendly)
+import '@helix/library/components/hx-select';
+```
+
+## Basic Usage
+
+```html
+<hx-select label="Department" placeholder="Choose a department" name="department">
+  <option value="cardiology">Cardiology</option>
+  <option value="neurology">Neurology</option>
+  <option value="oncology">Oncology</option>
+</hx-select>
+```
+
+## Properties
+
+| Property      | Attribute     | Type                   | Default | Description                                                              |
+| ------------- | ------------- | ---------------------- | ------- | ------------------------------------------------------------------------ |
+| `label`       | `label`       | `string`               | `''`    | Visible label text for the select field.                                 |
+| `placeholder` | `placeholder` | `string`               | `''`    | Placeholder text shown in the trigger when no option is selected.        |
+| `value`       | `value`       | `string`               | `''`    | The current selected value. Reflects to the `value` attribute.           |
+| `name`        | `name`        | `string`               | `''`    | Form field name used during form submission.                             |
+| `required`    | `required`    | `boolean`              | `false` | Marks the field as required for form validation.                         |
+| `disabled`    | `disabled`    | `boolean`              | `false` | Prevents interaction with the component.                                 |
+| `error`       | `error`       | `string`               | `''`    | Error message to display. Sets the field into an error state when set.   |
+| `helpText`    | `help-text`   | `string`               | `''`    | Help text shown below the field for guidance. Hidden when error is set.  |
+| `size`        | `hx-size`     | `'sm' \| 'md' \| 'lg'` | `'md'`  | Size variant of the select trigger.                                      |
+| `open`        | `open`        | `boolean`              | `false` | Controls whether the dropdown listbox is open.                           |
+| `ariaLabel`   | `aria-label`  | `string \| null`       | `null`  | Accessible name for screen readers, if different from the visible label. |
+
+## Events
+
+| Event       | Detail Type         | Description                                                        |
+| ----------- | ------------------- | ------------------------------------------------------------------ |
+| `hx-change` | `{ value: string }` | Dispatched when the selected option changes. Bubbles and composed. |
+
+## CSS Custom Properties
+
+| Property                         | Default                       | Description                       |
+| -------------------------------- | ----------------------------- | --------------------------------- |
+| `--hx-select-bg`                 | `var(--hx-color-neutral-0)`   | Select background color.          |
+| `--hx-select-color`              | `var(--hx-color-neutral-800)` | Select text color.                |
+| `--hx-select-border-color`       | `var(--hx-color-neutral-300)` | Select border color.              |
+| `--hx-select-border-radius`      | `var(--hx-border-radius-md)`  | Select border radius.             |
+| `--hx-select-font-family`        | `var(--hx-font-family-sans)`  | Select font family.               |
+| `--hx-select-focus-ring-color`   | `var(--hx-focus-ring-color)`  | Focus ring color.                 |
+| `--hx-select-error-color`        | `var(--hx-color-error-500)`   | Error state color.                |
+| `--hx-select-label-color`        | `var(--hx-color-neutral-700)` | Label text color.                 |
+| `--hx-select-chevron-color`      | `var(--hx-color-neutral-500)` | Chevron indicator color.          |
+| `--hx-select-listbox-bg`         | `var(--hx-color-neutral-0)`   | Listbox panel background color.   |
+| `--hx-select-option-hover-bg`    | `var(--hx-color-primary-50)`  | Option hover background color.    |
+| `--hx-select-option-selected-bg` | `var(--hx-color-primary-100)` | Selected option background color. |
+| `--hx-select-placeholder-color`  | `var(--hx-color-neutral-400)` | Placeholder text color.           |
+
+## CSS Parts
+
+| Part             | Description                                                    |
+| ---------------- | -------------------------------------------------------------- |
+| `field`          | The outer field container div.                                 |
+| `label`          | The label element.                                             |
+| `select-wrapper` | Wrapper containing the combobox trigger and the listbox panel. |
+| `trigger`        | The combobox div that opens and closes the dropdown.           |
+| `listbox`        | The dropdown panel containing option elements.                 |
+| `option`         | Individual option items in the listbox.                        |
+| `select`         | The hidden native select element (form participation only).    |
+| `help-text`      | The help text container below the field.                       |
+| `error`          | The error message container below the field.                   |
+
+## Slots
+
+| Slot        | Description                                                           |
+| ----------- | --------------------------------------------------------------------- |
+| _(default)_ | `<option>` and `<optgroup>` elements that populate the select.        |
+| `label`     | Custom label content. Overrides the `label` property when set.        |
+| `error`     | Custom error content. Overrides the `error` property when set.        |
+| `help-text` | Custom help text content. Overrides the `helpText` property when set. |
+
+## Accessibility
+
+| Topic                   | Details                                                                                                                                                                                                                                |
+| ----------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| ARIA role               | `role="combobox"` on the interactive trigger div; `role="listbox"` on the dropdown panel; `role="option"` on each option item.                                                                                                         |
+| `aria-expanded`         | Set to `"true"` when the dropdown is open, `"false"` when closed.                                                                                                                                                                      |
+| `aria-haspopup`         | Set to `"listbox"` on the trigger, indicating it opens a listbox popup.                                                                                                                                                                |
+| `aria-controls`         | References the listbox panel ID from the trigger.                                                                                                                                                                                      |
+| `aria-activedescendant` | Updated to the currently focused option ID during keyboard navigation. Cleared when the dropdown closes.                                                                                                                               |
+| `aria-labelledby`       | Points to the label element ID (C-PATTERN-04 compliant — `aria-labelledby`, not `label[for]`, is used to associate the label with the combobox trigger).                                                                               |
+| `aria-selected`         | Set to `"true"` on the currently selected option; `"false"` on all others.                                                                                                                                                             |
+| `aria-invalid`          | Set to `"true"` on the trigger when the `error` property is set.                                                                                                                                                                       |
+| `aria-required`         | Set to `"true"` when `required` is set.                                                                                                                                                                                                |
+| `aria-disabled`         | Set to `"true"` when `disabled` is set.                                                                                                                                                                                                |
+| `aria-describedby`      | References the error ID (when error is set) and/or help-text ID.                                                                                                                                                                       |
+| Keyboard                | `Tab` to focus trigger; `Enter`/`Space` to open or confirm selection; `ArrowDown`/`ArrowUp` to navigate options; `Home`/`End` to jump to first/last; `Escape` to close and return focus to trigger; printable character for typeahead. |
+| Screen reader           | Option selection announced via `aria-activedescendant` changes on the combobox. Error messages use `role="alert"` for assertive announcement.                                                                                          |
+| Focus management        | Focus stays on the combobox trigger at all times; virtual focus on options is communicated through `aria-activedescendant`. On Escape, focus is explicitly returned to the trigger.                                                    |
+| WCAG                    | Meets WCAG 2.1 AA. Focus ring is always visible via `:focus` and `:focus-visible` styles with fallback. Required marker uses `aria-hidden="true"` to prevent screen reader duplication.                                                |
+
+## Drupal Integration
+
+Use the component in a Twig template after registering the library:
+
+```twig
+{# my-module/templates/my-select.html.twig #}
+<hx-select
+  label="{{ label }}"
+  name="{{ name }}"
+  {% if placeholder %}placeholder="{{ placeholder }}"{% endif %}
+  {% if required %}required{% endif %}
+  {% if disabled %}disabled{% endif %}
+  {% if error %}error="{{ error }}"{% endif %}
+  {% if help_text %}help-text="{{ help_text }}"{% endif %}
+  {% if value %}value="{{ value }}"{% endif %}
+>
+  {% for option in options %}
+    <option value="{{ option.value }}"{% if option.disabled %} disabled{% endif %}>
+      {{ option.label }}
+    </option>
+  {% endfor %}
+</hx-select>
+```
+
+Load the library in your module's `.libraries.yml`:
+
+```yaml
+helix-components:
+  js:
+    /libraries/helix/helix.min.js: { minified: true }
+```
+
+Listen for selection changes in Drupal behaviors using `once()` to prevent duplicate listeners during AJAX:
+
+```javascript
+Drupal.behaviors.mySelect = {
+  attach(context) {
+    once('mySelect', 'hx-select', context).forEach((el) => {
+      el.addEventListener('hx-change', (e) => {
+        console.log('Selected value:', e.detail.value);
+      });
+    });
+  },
+};
+```
+
+## Standalone HTML Example
+
+Copy-paste this into a `.html` file and open it in any browser — no build tool required:
+
+```html
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>hx-select example</title>
+    <!-- @helix/library is a private package — install via npm workspace, not CDN -->
+    <!-- In your project: import '@helix/library'; in your bundler entry point -->
+  </head>
+  <body style="font-family: sans-serif; padding: 2rem; max-width: 480px;">
+    <form id="patient-form">
+      <hx-select
+        id="department-select"
+        label="Department"
+        name="department"
+        placeholder="Select a department"
+        required
+        help-text="Select the primary care department."
+      >
+        <option value="cardiology">Cardiology</option>
+        <option value="neurology">Neurology</option>
+        <option value="oncology">Oncology</option>
+        <option value="pediatrics">Pediatrics</option>
+      </hx-select>
+
+      <br />
+
+      <hx-select
+        id="specialty-select"
+        label="Specialty"
+        name="specialty"
+        placeholder="Select specialty"
+      >
+        <optgroup label="Medical">
+          <option value="internal-medicine">Internal Medicine</option>
+          <option value="family-medicine">Family Medicine</option>
+        </optgroup>
+        <optgroup label="Surgical">
+          <option value="general-surgery">General Surgery</option>
+          <option value="orthopedics">Orthopedics</option>
+        </optgroup>
+      </hx-select>
+    </form>
+
+    <script>
+      document.getElementById('department-select').addEventListener('hx-change', (e) => {
+        console.log('Department selected:', e.detail.value);
+      });
+    </script>
+  </body>
+</html>
+```
 
 ## API Reference
 

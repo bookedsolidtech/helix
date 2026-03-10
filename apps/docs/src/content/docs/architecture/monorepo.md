@@ -20,7 +20,7 @@ HELIX uses **Turborepo** with **npm workspaces** for monorepo management. This p
 helix (root)
 ├── apps/docs          # Documentation site
 ├── apps/storybook     # Component playground
-└── packages/wc-library # Component source code
+└── packages/hx-library # Component source code
 ```
 
 ## Task Pipeline
