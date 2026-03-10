@@ -1,14 +1,349 @@
 ---
 title: 'hx-time-picker'
-description: 'Time selection control with hour, minute, and period inputs'
+description: Form-associated time picker with 12h/24h format support, dropdown listbox, and keyboard navigation
 ---
 
 import ComponentLoader from '../../../components/ComponentLoader.astro';
+import ComponentDemo from '../../../components/ComponentDemo.astro';
 import ComponentDoc from '../../../components/ComponentDoc.astro';
 
 <ComponentLoader />
 
 <ComponentDoc tagName="hx-time-picker" section="summary" />
+
+## Overview
+
+`hx-time-picker` is a form-associated time selection control that combines a text input with a dropdown listbox of pre-generated time slots. It implements the ARIA combobox pattern and participates in HTML forms via the `ElementInternals` API — working identically to native inputs in any form, including Drupal Form API forms.
+
+Values are always stored and submitted as 24-hour `HH:MM` strings regardless of the display format. The `format` property controls how options appear to the user (`12h` with AM/PM or `24h` bare `HH:MM`). The `min`, `max`, and `step` properties define the selectable range and interval, making it suitable for appointment booking, medication scheduling, shift selection, and any clinical time-entry use case.
+
+**Use `hx-time-picker` when:** you need to capture a time of day from a constrained set of options with optional free-form entry.
+**Use a native `<input type="time">` instead when:** you need browser-native time picking without a custom dropdown.
+
+## Live Demo
+
+### Basic
+
+Simple time picker with a label and default 30-minute intervals in 12-hour format.
+
+<ComponentDemo title="Basic">
+  <hx-time-picker label="Appointment Time" name="appointmentTime"></hx-time-picker>
+</ComponentDemo>
+
+### 12h and 24h Format
+
+Toggle between 12-hour (AM/PM) and 24-hour display formats.
+
+<ComponentDemo title="Format Variants">
+  <div style="display: grid; gap: 1rem; max-width: 400px;">
+    <hx-time-picker label="12-hour format (default)" format="12h" value="14:30"></hx-time-picker>
+    <hx-time-picker label="24-hour format" format="24h" value="14:30"></hx-time-picker>
+  </div>
+</ComponentDemo>
+
+### Custom Range and Step
+
+Restrict options to a specific time range with a custom step interval.
+
+<ComponentDemo title="Custom Range">
+  <div style="display: grid; gap: 1rem; max-width: 400px;">
+    <hx-time-picker
+      label="Morning Slots (every 15 min)"
+      min="08:00"
+      max="12:00"
+      step="15"
+      format="12h"
+    ></hx-time-picker>
+    <hx-time-picker
+      label="Afternoon Slots (every 60 min)"
+      min="12:00"
+      max="18:00"
+      step="60"
+      format="12h"
+    ></hx-time-picker>
+  </div>
+</ComponentDemo>
+
+### States
+
+Default, required, error, and disabled states.
+
+<ComponentDemo title="States">
+  <div style="display: grid; gap: 1rem; max-width: 400px;">
+    <hx-time-picker label="Default" name="t1"></hx-time-picker>
+    <hx-time-picker label="Required" name="t2" required></hx-time-picker>
+    <hx-time-picker
+      label="Error"
+      name="t3"
+      value="09:00"
+      error="Appointment time conflicts with an existing booking."
+    ></hx-time-picker>
+    <hx-time-picker label="Disabled" name="t4" value="10:30" disabled></hx-time-picker>
+  </div>
+</ComponentDemo>
+
+### With Pre-selected Value
+
+Set a default time using the `value` property (always `HH:MM` 24-hour format).
+
+<ComponentDemo title="Pre-selected Value">
+  <div style="max-width: 400px;">
+    <hx-time-picker
+      label="Shift Start Time"
+      value="07:00"
+      format="12h"
+      name="shiftStart"
+    ></hx-time-picker>
+  </div>
+</ComponentDemo>
+
+### In a Form
+
+`hx-time-picker` participates in form submission via `ElementInternals`. Values appear in `FormData` under the `name` key as `HH:MM` (24-hour).
+
+<ComponentDemo title="Form Participation">
+  <form
+    onsubmit="event.preventDefault(); document.getElementById('tp-output').textContent = JSON.stringify(Object.fromEntries(new FormData(event.target).entries()), null, 2);"
+    style="display: flex; flex-direction: column; gap: 1rem; max-width: 400px;"
+  >
+    <hx-time-picker
+      label="Appointment Start"
+      name="startTime"
+      required
+      min="08:00"
+      max="17:00"
+      step="30"
+      format="12h"
+    ></hx-time-picker>
+    <hx-time-picker
+      label="Appointment End"
+      name="endTime"
+      required
+      min="08:30"
+      max="17:30"
+      step="30"
+      format="12h"
+    ></hx-time-picker>
+    <button
+      type="submit"
+      style="padding: 0.5rem 1rem; border: none; border-radius: 0.375rem; background: var(--hx-color-primary-500, #2563EB); color: white; cursor: pointer; font-size: 0.875rem; width: fit-content;"
+    >
+      Book Appointment
+    </button>
+    <pre
+      id="tp-output"
+      style="background: var(--hx-color-neutral-50, #f8f9fa); padding: 1rem; border-radius: 0.375rem; font-size: 0.75rem; min-height: 2rem; border: 1px solid var(--hx-color-neutral-200, #e9ecef);"
+    ></pre>
+  </form>
+</ComponentDemo>
+
+## Installation
+
+```bash
+# Full library
+npm install @helix/library
+
+# Or import only this component (tree-shaking friendly)
+import '@helix/library/components/hx-time-picker';
+```
+
+## Basic Usage
+
+```html
+<hx-time-picker label="Appointment Time" name="apptTime"></hx-time-picker>
+<hx-time-picker label="Surgery Start" min="06:00" max="18:00" step="15" required></hx-time-picker>
+<hx-time-picker label="Shift Start" value="07:00" format="12h" disabled></hx-time-picker>
+```
+
+## Properties
+
+| Property   | Attribute  | Type             | Default   | Description                                                                  |
+| ---------- | ---------- | ---------------- | --------- | ---------------------------------------------------------------------------- |
+| `name`     | `name`     | `string`         | `''`      | Form field name. The submitted value is always `HH:MM` (24-hour).            |
+| `value`    | `value`    | `string`         | `''`      | The current value in `HH:MM` 24-hour format. Reflects as attribute.          |
+| `min`      | `min`      | `string`         | `'00:00'` | Earliest selectable time in `HH:MM` format.                                  |
+| `max`      | `max`      | `string`         | `'23:59'` | Latest selectable time in `HH:MM` format.                                    |
+| `step`     | `step`     | `number`         | `30`      | Interval between dropdown options, in minutes.                               |
+| `label`    | `label`    | `string`         | `''`      | Visible label text. Can be overridden by the `label` slot.                   |
+| `format`   | `format`   | `'12h' \| '24h'` | `'12h'`   | Display format for the dropdown options and input placeholder.               |
+| `required` | `required` | `boolean`        | `false`   | Field must have a value for form validity. Reflects as attribute.            |
+| `disabled` | `disabled` | `boolean`        | `false`   | Prevents all interaction. Reflects as attribute.                             |
+| `error`    | `error`    | `string`         | `''`      | Error message. When set, enters error state. Overridden by the `error` slot. |
+
+## Events
+
+| Event       | Detail Type         | Description                                                                                                      |
+| ----------- | ------------------- | ---------------------------------------------------------------------------------------------------------------- |
+| `hx-change` | `{ value: string }` | Dispatched when the selected time changes. Detail `value` is always `HH:MM` (24-hour format). Bubbles, composed. |
+
+## CSS Custom Properties
+
+| Property                                 | Default                                                                       | Description                             |
+| ---------------------------------------- | ----------------------------------------------------------------------------- | --------------------------------------- |
+| `--hx-time-picker-bg`                    | `var(--hx-color-neutral-0)`                                                   | Input background color.                 |
+| `--hx-time-picker-color`                 | `var(--hx-color-neutral-800)`                                                 | Input text color.                       |
+| `--hx-time-picker-border-color`          | `var(--hx-color-neutral-300)`                                                 | Input border color.                     |
+| `--hx-time-picker-border-radius`         | `var(--hx-border-radius-md)`                                                  | Input border radius.                    |
+| `--hx-time-picker-font-family`           | `var(--hx-font-family-sans)`                                                  | Input font family.                      |
+| `--hx-time-picker-focus-ring-color`      | `var(--hx-focus-ring-color)`                                                  | Focus ring color.                       |
+| `--hx-time-picker-error-color`           | `var(--hx-color-error-500)`                                                   | Error state border and message color.   |
+| `--hx-time-picker-label-color`           | `var(--hx-color-neutral-700)`                                                 | Label text color.                       |
+| `--hx-time-picker-chevron-color`         | `var(--hx-color-neutral-500)`                                                 | Toggle button chevron/icon color.       |
+| `--hx-time-picker-listbox-bg`            | `var(--hx-color-neutral-0)`                                                   | Dropdown listbox background.            |
+| `--hx-time-picker-listbox-max-height`    | `16rem`                                                                       | Maximum height of the dropdown listbox. |
+| `--hx-time-picker-listbox-shadow`        | `0 4px 16px color-mix(in srgb, var(--hx-color-neutral-900) 12%, transparent)` | Box shadow for the dropdown listbox.    |
+| `--hx-time-picker-option-color`          | `var(--hx-color-neutral-800)`                                                 | Option text color.                      |
+| `--hx-time-picker-option-hover-bg`       | `var(--hx-color-primary-50)`                                                  | Option hover background.                |
+| `--hx-time-picker-option-hover-color`    | `var(--hx-color-primary-700)`                                                 | Option hover text color.                |
+| `--hx-time-picker-option-selected-bg`    | `var(--hx-color-primary-100)`                                                 | Selected option background.             |
+| `--hx-time-picker-option-selected-color` | `var(--hx-color-primary-800)`                                                 | Selected option text color.             |
+
+## CSS Parts
+
+| Part      | Description                                          |
+| --------- | ---------------------------------------------------- |
+| `label`   | The `<label>` element.                               |
+| `input`   | The text input element.                              |
+| `toggle`  | The clock icon toggle button that opens the listbox. |
+| `listbox` | The dropdown `<ul>` element.                         |
+| `option`  | Each `<li>` option inside the listbox.               |
+
+## Slots
+
+| Slot    | Description                                                                                          |
+| ------- | ---------------------------------------------------------------------------------------------------- |
+| `label` | Custom label content. Overrides the rendered label element. Use for Drupal Form API rendered labels. |
+| `help`  | Help text displayed below the field.                                                                 |
+| `error` | Custom error content. Overrides the `error` property. Use for Drupal Form API rendered errors.       |
+
+## Accessibility
+
+| Topic              | Details                                                                                                                                                     |
+| ------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| ARIA pattern       | Implements the ARIA combobox pattern. The text input has `role="combobox"` with `aria-haspopup="listbox"`, `aria-expanded`, and `aria-controls` attributes. |
+| Label association  | Native `<label for="…">` references the internal input ID. Correct across all browsers.                                                                     |
+| Listbox            | The dropdown `<ul>` has `role="listbox"`; each option has `role="option"` with `aria-selected`.                                                             |
+| `aria-invalid`     | Set to `"true"` on the input when `error` is set or the `error` slot has content.                                                                           |
+| `aria-describedby` | References the error element ID when in error state; references the help text element ID otherwise.                                                         |
+| Required fields    | Native `required` attribute on the internal input implicitly maps to `aria-required="true"`.                                                                |
+| Error announcement | Error message is surfaced via `aria-describedby` for screen reader announcement.                                                                            |
+| Disabled           | Native `disabled` attribute prevents all interaction; assistive technology announces the disabled state automatically.                                      |
+| Focus              | Visible focus ring on the input field; customizable via `--hx-time-picker-focus-ring-color`.                                                                |
+| Motion             | `@media (prefers-reduced-motion: reduce)` disables listbox entry animation.                                                                                 |
+| WCAG               | WCAG 2.1 AA compliant. Zero axe-core violations in default, error, disabled, and required states.                                                           |
+
+## Keyboard Navigation
+
+| Key         | Behavior                                                                   |
+| ----------- | -------------------------------------------------------------------------- |
+| `Tab`       | Moves focus to the input element; then to the toggle button.               |
+| `Shift+Tab` | Moves focus to the previous focusable element.                             |
+| `Enter`     | Confirms typed input; selects the focused option when the listbox is open. |
+| `Escape`    | Closes the dropdown listbox and returns focus to the input.                |
+| `ArrowDown` | Opens the listbox (if closed); moves focus to the next option.             |
+| `ArrowUp`   | Moves focus to the previous option in the listbox.                         |
+| `Home`      | Moves focus to the first option in the listbox.                            |
+| `End`       | Moves focus to the last option in the listbox.                             |
+
+## Drupal Integration
+
+```twig
+{# my-module/templates/appointment-time.html.twig #}
+<hx-time-picker
+  label="{{ label|default('') }}"
+  name="{{ name|default('') }}"
+  value="{{ value|default('') }}"
+  format="{{ format|default('12h') }}"
+  min="{{ min|default('00:00') }}"
+  max="{{ max|default('23:59') }}"
+  step="{{ step|default(30) }}"
+  {% if required %}required{% endif %}
+  {% if disabled %}disabled{% endif %}
+  {% if error %}error="{{ error }}"{% endif %}
+></hx-time-picker>
+```
+
+For Drupal Form API integration where the label and error are rendered server-side as HTML nodes, use the slot pattern:
+
+```twig
+<hx-time-picker name="{{ name }}" {% if required %}required{% endif %}>
+  {{ label_element }}
+  {% if errors %}
+    <div slot="error">{{ errors }}</div>
+  {% endif %}
+  {% if description %}
+    <div slot="help">{{ description }}</div>
+  {% endif %}
+</hx-time-picker>
+```
+
+Load the library in your module's `.libraries.yml`:
+
+```yaml
+helix-components:
+  js:
+    /libraries/helix/helix.min.js: { minified: true }
+```
+
+## Standalone HTML Example
+
+Copy-paste into a `.html` file and open in any browser — no build tool required:
+
+```html
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>hx-time-picker example</title>
+    <!-- @helix/library is a private package — install via npm workspace, not CDN -->
+    <!-- In your project: import '@helix/library'; in your bundler entry point -->
+  </head>
+  <body
+    style="font-family: sans-serif; padding: 2rem; display: flex; flex-direction: column; gap: 1.5rem; max-width: 480px;"
+  >
+    <hx-time-picker
+      id="appt-time"
+      label="Appointment Time"
+      name="appointmentTime"
+      min="08:00"
+      max="17:00"
+      step="30"
+      format="12h"
+      required
+    ></hx-time-picker>
+
+    <hx-time-picker
+      label="Surgery Start (15-min slots)"
+      name="surgeryStart"
+      min="06:00"
+      max="20:00"
+      step="15"
+      format="24h"
+    ></hx-time-picker>
+
+    <hx-time-picker
+      label="Shift Start (pre-set)"
+      name="shiftStart"
+      value="07:00"
+      format="12h"
+    ></hx-time-picker>
+
+    <hx-time-picker
+      label="Medication Time"
+      name="medTime"
+      value="08:00"
+      error="This time conflicts with another scheduled dose."
+    ></hx-time-picker>
+
+    <script>
+      document.getElementById('appt-time').addEventListener('hx-change', (e) => {
+        console.log('Appointment time selected:', e.detail.value);
+      });
+    </script>
+  </body>
+</html>
+```
 
 ## API Reference
 

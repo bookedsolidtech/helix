@@ -118,7 +118,7 @@ import { collectResult } from '@lit-labs/ssr/lib/render-result.js';
 import { html } from 'lit';
 
 // Import the component — this registers it with the SSR custom elements registry
-import '@wc-2026/library/components/hx-card';
+import '@helix/library/components/hx-card';
 
 const serverHtml = await collectResult(
   render(html`
@@ -206,7 +206,7 @@ npm install @lit-labs/ssr-client
 import '@lit-labs/ssr-client/lit-element-hydrate-support.js';
 
 // Then import components as normal
-import '@wc-2026/library/components/hx-card';
+import '@helix/library/components/hx-card';
 ```
 
 When `lit-element-hydrate-support.js` is loaded, Lit's `LitElement` base class detects existing DSD shadow roots and adopts them rather than creating new ones. The component binds its event listeners and reactive properties to the existing DOM without re-rendering.
@@ -258,7 +258,7 @@ if (!globalThis.ResizeObserver) {
 }
 ```
 
-Components in `@wc-2026/library` are written to avoid using browser APIs in constructors and `render()`. All browser API calls are in `connectedCallback()` or `firstUpdated()`, which do not run during SSR. This discipline is what makes the components SSR-compatible.
+Components in `@helix/library` are written to avoid using browser APIs in constructors and `render()`. All browser API calls are in `connectedCallback()` or `firstUpdated()`, which do not run during SSR. This discipline is what makes the components SSR-compatible.
 
 ---
 
@@ -332,7 +332,7 @@ For HELiX components that are SSR-safe, render them directly in your `.astro` fi
 ```astro
 ---
 // src/pages/patient-dashboard.astro
-import '@wc-2026/library/components/hx-card';
+import '@helix/library/components/hx-card';
 ---
 
 <html>
@@ -352,7 +352,7 @@ Some components are inherently client-only — they measure the DOM, use `canvas
 
 ```astro
 ---
-import HxChart from '@wc-2026/library/components/hx-chart';
+import HxChart from '@helix/library/components/hx-chart';
 ---
 
 <!--
@@ -394,7 +394,7 @@ import { describe, it, expect } from 'vitest';
 import { render } from '@lit-labs/ssr';
 import { collectResult } from '@lit-labs/ssr/lib/render-result.js';
 import { html } from 'lit';
-import '@wc-2026/library/components/hx-card';
+import '@helix/library/components/hx-card';
 
 describe('hx-card SSR', () => {
   it('produces DSD output with shadow root template', async () => {

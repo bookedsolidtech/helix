@@ -11,7 +11,18 @@ import ComponentDoc from '../../../components/ComponentDoc.astro';
 
 <ComponentDoc tagName="hx-text-input" section="summary" />
 
-## Basic
+## Overview
+
+`hx-text-input` is the primary single-line text entry element in Helix. It wraps a native `<input>` inside Shadow DOM with a built-in label, help text, and error message display. It participates in HTML forms via the `ElementInternals` API (form association, `FormData`, constraint validation), so it works identically to native inputs in any form — including Drupal Form API forms.
+
+Accessibility is first-class: the native `<input>` carries `aria-invalid`, `aria-describedby`, and proper label association by default. Error messages use `role="alert"` for immediate screen reader announcement. Three size variants (`sm`, `md`, `lg`), prefix/suffix icon slots, and eight CSS custom properties make it suitable for every clinical data-entry use case from patient search to medication dosage entry.
+
+**Use `hx-text-input` when:** you need a single-line text field with built-in label, validation, or Drupal slot integration.
+**Use `hx-textarea` instead when:** the user needs to enter multi-line free-form text.
+
+## Live Demo
+
+### Basic
 
 Simple text input with label.
 
@@ -19,9 +30,9 @@ Simple text input with label.
   <hx-text-input label="Full name" placeholder="Jane Doe"></hx-text-input>
 </ComponentDemo>
 
-## Input Types
+### Input Types
 
-Different native input types.
+Different native input types for structured data.
 
 <ComponentDemo title="Input Types">
   <div style="display: grid; gap: 1rem; max-width: 400px;">
@@ -29,99 +40,322 @@ Different native input types.
     <hx-text-input label="Password" type="password" placeholder="Enter password"></hx-text-input>
     <hx-text-input label="Phone" type="tel" placeholder="(555) 123-4567"></hx-text-input>
     <hx-text-input label="Search" type="search" placeholder="Search..."></hx-text-input>
-    <hx-text-input label="Number" type="number" placeholder="0"></hx-text-input>
+    <hx-text-input label="Dosage" type="number" placeholder="0"></hx-text-input>
   </div>
 </ComponentDemo>
 
-## Help Text
+### States
+
+Default, required, error, disabled, and read-only states.
+
+<ComponentDemo title="States">
+  <div style="display: grid; gap: 1rem; max-width: 400px;">
+    <hx-text-input label="Default" placeholder="No validation"></hx-text-input>
+    <hx-text-input
+      label="Required"
+      required
+      placeholder="Mandatory field"
+      help-text="This field is required."
+    ></hx-text-input>
+    <hx-text-input
+      label="Error"
+      value="not-an-email"
+      type="email"
+      error="Please enter a valid email address."
+    ></hx-text-input>
+    <hx-text-input label="Disabled" value="System-generated ID" disabled></hx-text-input>
+    <hx-text-input
+      label="Read-only"
+      value="Dr. Eleanor Vance"
+      readonly
+      help-text="Contact admin to change."
+    ></hx-text-input>
+  </div>
+</ComponentDemo>
+
+### Sizes
+
+Small, medium, and large input sizes.
+
+<ComponentDemo title="Sizes">
+  <div style="display: grid; gap: 1rem; max-width: 400px;">
+    <hx-text-input label="Small" hx-size="sm" placeholder="Compact input"></hx-text-input>
+    <hx-text-input
+      label="Medium (Default)"
+      hx-size="md"
+      placeholder="Standard input"
+    ></hx-text-input>
+    <hx-text-input label="Large" hx-size="lg" placeholder="Spacious input"></hx-text-input>
+  </div>
+</ComponentDemo>
+
+### With Help Text
 
 Guidance text below the input.
 
 <ComponentDemo title="Help Text">
   <div style="max-width: 400px;">
     <hx-text-input
-      label="Username"
-      placeholder="johndoe"
-      help-text="Choose a unique username. Letters, numbers, and underscores only."
+      label="Insurance ID"
+      placeholder="Enter insurance ID number"
+      help-text="Found on the front of your insurance card, typically 9–12 digits."
     ></hx-text-input>
   </div>
 </ComponentDemo>
 
-## Error State
+### Prefix and Suffix Slots
 
-Input with error message displayed.
-
-<ComponentDemo title="Error State">
-  <div style="max-width: 400px;">
-    <hx-text-input
-      label="Email address"
-      type="email"
-      value="not-an-email"
-      error="Please enter a valid email address."
-    ></hx-text-input>
-  </div>
-</ComponentDemo>
-
-## Required
-
-Required field indicator.
-
-<ComponentDemo title="Required">
-  <div style="max-width: 400px;">
-    <hx-text-input
-      label="Account ID"
-      required
-      placeholder="Enter account ID"
-      help-text="This field is required."
-    ></hx-text-input>
-  </div>
-</ComponentDemo>
-
-## Disabled
-
-Non-interactive disabled state.
-
-<ComponentDemo title="Disabled">
-  <div style="max-width: 400px;">
-    <hx-text-input label="Read-only field" value="Cannot edit this" disabled></hx-text-input>
-  </div>
-</ComponentDemo>
-
-## Prefix & Suffix Slots
-
-Content before and after the input.
+Content rendered before and after the input field.
 
 <ComponentDemo title="Prefix & Suffix Slots">
   <div style="display: grid; gap: 1rem; max-width: 400px;">
     <hx-text-input label="Website" placeholder="example.com">
       <span slot="prefix">https://</span>
     </hx-text-input>
-    <hx-text-input label="Price" type="number" placeholder="0.00">
+    <hx-text-input label="Copay Amount" type="number" placeholder="0.00">
       <span slot="prefix">$</span>
       <span slot="suffix">USD</span>
     </hx-text-input>
   </div>
 </ComponentDemo>
 
-## Validation States
+### In a Form
 
-Multiple states side by side.
+`hx-text-input` participates in form submission via `ElementInternals`. Values appear in `FormData` under the `name` key.
 
-<ComponentDemo title="Validation States">
-  <div style="display: grid; gap: 1rem; max-width: 400px;">
+<ComponentDemo title="Form Participation">
+  <form
+    onsubmit="event.preventDefault(); document.getElementById('ti-output').textContent = JSON.stringify(Object.fromEntries(new FormData(event.target).entries()), null, 2);"
+    style="display: flex; flex-direction: column; gap: 1rem; max-width: 400px;"
+  >
+    <hx-text-input label="First Name" name="firstName" placeholder="Jane" required></hx-text-input>
+    <hx-text-input label="Last Name" name="lastName" placeholder="Doe" required></hx-text-input>
     <hx-text-input
-      label="Valid input"
-      value="jane@example.com"
-      help-text="Looks good!"
+      label="Email"
+      name="email"
+      type="email"
+      placeholder="jane.doe@hospital.org"
+      required
+      help-text="A confirmation will be sent to this address."
     ></hx-text-input>
-    <hx-text-input
-      label="Error input"
-      value="bad"
-      error="Too short — minimum 8 characters."
-    ></hx-text-input>
-    <hx-text-input label="Disabled input" value="locked" disabled></hx-text-input>
-  </div>
+    <button
+      type="submit"
+      style="padding: 0.5rem 1rem; border: none; border-radius: 0.375rem; background: var(--hx-color-primary-500, #2563EB); color: white; cursor: pointer; font-size: 0.875rem; width: fit-content;"
+    >
+      Submit
+    </button>
+    <pre
+      id="ti-output"
+      style="background: var(--hx-color-neutral-50, #f8f9fa); padding: 1rem; border-radius: 0.375rem; font-size: 0.75rem; min-height: 2rem; border: 1px solid var(--hx-color-neutral-200, #e9ecef);"
+    ></pre>
+  </form>
 </ComponentDemo>
+
+## Installation
+
+```bash
+# Full library
+npm install @helix/library
+
+# Or import only this component (tree-shaking friendly)
+import '@helix/library/components/hx-text-input';
+```
+
+## Basic Usage
+
+```html
+<hx-text-input label="Patient Name" placeholder="Enter full name"></hx-text-input>
+<hx-text-input label="Email" type="email" required></hx-text-input>
+<hx-text-input label="Account ID" value="PAT-2026-00482" readonly></hx-text-input>
+```
+
+## Properties
+
+| Property       | Attribute      | Type                                                                                  | Default     | Description                                                           |
+| -------------- | -------------- | ------------------------------------------------------------------------------------- | ----------- | --------------------------------------------------------------------- |
+| `label`        | `label`        | `string`                                                                              | `''`        | Visible label text. Can be overridden by the `label` slot.            |
+| `placeholder`  | `placeholder`  | `string`                                                                              | `''`        | Placeholder text shown when the input is empty.                       |
+| `value`        | `value`        | `string`                                                                              | `''`        | The current value of the input.                                       |
+| `type`         | `type`         | `'text' \| 'email' \| 'password' \| 'tel' \| 'url' \| 'search' \| 'number' \| 'date'` | `'text'`    | Native input type.                                                    |
+| `required`     | `required`     | `boolean`                                                                             | `false`     | Input must have a value for form validity. Reflects as attribute.     |
+| `disabled`     | `disabled`     | `boolean`                                                                             | `false`     | Prevents all interaction. Reflects as attribute.                      |
+| `readonly`     | `readonly`     | `boolean`                                                                             | `false`     | Input is read-only. Reflects as attribute.                            |
+| `name`         | `name`         | `string`                                                                              | `''`        | Form field name used in `FormData`.                                   |
+| `error`        | `error`        | `string`                                                                              | `''`        | Error message. When set, enters error state and hides help text.      |
+| `helpText`     | `help-text`    | `string`                                                                              | `''`        | Guidance text displayed below the input.                              |
+| `size`         | `hx-size`      | `'sm' \| 'md' \| 'lg'`                                                                | `'md'`      | Size variant. Reflects as `hx-size` attribute.                        |
+| `minlength`    | `minlength`    | `number \| undefined`                                                                 | `undefined` | Minimum character count.                                              |
+| `maxlength`    | `maxlength`    | `number \| undefined`                                                                 | `undefined` | Maximum character count.                                              |
+| `pattern`      | `pattern`      | `string`                                                                              | `''`        | Regex pattern the value must match.                                   |
+| `autocomplete` | `autocomplete` | `string`                                                                              | `''`        | Browser autocomplete hint. Accepts standard HTML autocomplete values. |
+| `ariaLabel`    | `aria-label`   | `string \| null`                                                                      | `null`      | Accessible name when a visible label is not used.                     |
+
+## Events
+
+| Event       | Detail Type         | Description                                                                       |
+| ----------- | ------------------- | --------------------------------------------------------------------------------- |
+| `hx-input`  | `{ value: string }` | Dispatched on every keystroke as the user types. Bubbles, composed.               |
+| `hx-change` | `{ value: string }` | Dispatched when the input loses focus after its value changed. Bubbles, composed. |
+
+## CSS Custom Properties
+
+| Property                      | Default                       | Description                           |
+| ----------------------------- | ----------------------------- | ------------------------------------- |
+| `--hx-input-bg`               | `var(--hx-color-neutral-0)`   | Input background color.               |
+| `--hx-input-color`            | `var(--hx-color-neutral-800)` | Input text color.                     |
+| `--hx-input-border-color`     | `var(--hx-color-neutral-300)` | Input border color.                   |
+| `--hx-input-border-radius`    | `var(--hx-border-radius-md)`  | Input border radius.                  |
+| `--hx-input-font-family`      | `var(--hx-font-family-sans)`  | Input font family.                    |
+| `--hx-input-focus-ring-color` | `var(--hx-focus-ring-color)`  | Focus ring color.                     |
+| `--hx-input-error-color`      | `var(--hx-color-error-500)`   | Error state border and message color. |
+| `--hx-input-label-color`      | `var(--hx-color-neutral-700)` | Label text color.                     |
+| `--hx-input-sm-font-size`     | `0.875rem`                    | Font size for the `sm` size variant.  |
+| `--hx-input-lg-font-size`     | `1.125rem`                    | Font size for the `lg` size variant.  |
+
+## CSS Parts
+
+| Part            | Description                                           |
+| --------------- | ----------------------------------------------------- |
+| `field`         | The outer field container `<div>`.                    |
+| `label`         | The `<label>` element.                                |
+| `input-wrapper` | The wrapper `<div>` around prefix, input, and suffix. |
+| `input`         | The native `<input>` element.                         |
+| `help-text`     | The help text `<div>` container.                      |
+| `error`         | The error message `<div>` container.                  |
+
+## Slots
+
+| Slot        | Description                                                                                    |
+| ----------- | ---------------------------------------------------------------------------------------------- |
+| `label`     | Custom label content. Overrides the `label` property. Use for Drupal Form API rendered labels. |
+| `prefix`    | Content rendered before the input (e.g., icon or currency symbol).                             |
+| `suffix`    | Content rendered after the input (e.g., unit or icon).                                         |
+| `help-text` | Custom help text content. Overrides the `help-text` property.                                  |
+| `error`     | Custom error content. Overrides the `error` property. Use for Drupal Form API rendered errors. |
+
+## Accessibility
+
+| Topic              | Details                                                                                                                         |
+| ------------------ | ------------------------------------------------------------------------------------------------------------------------------- |
+| Label association  | Native `<label for="…">` references the internal input ID. Correct across all browsers.                                         |
+| `aria-label` slot  | When the `label` slot is used, `aria-labelledby` references the slotted element's ID instead.                                   |
+| `aria-invalid`     | Set to `"true"` on the native input when `error` is set or the `error` slot has content.                                        |
+| `aria-describedby` | References the error element ID when in error state; references the help text element ID otherwise. Both when both are present. |
+| Required fields    | Native `required` attribute on the `<input>` implicitly maps to `aria-required="true"` — no redundant explicit attribute set.   |
+| Error announcement | Error container uses `role="alert"` for immediate screen reader announcement when an error is displayed.                        |
+| Disabled           | Native `disabled` attribute prevents all interaction; AT announces the disabled state automatically.                            |
+| Read-only          | Native `readonly` attribute on the input; AT announces read-only state.                                                         |
+| Focus              | Focus ring is visible via `:focus-within` CSS on the wrapper; customizable via `--hx-input-focus-ring-color`.                   |
+| Motion             | `@media (prefers-reduced-motion: reduce)` disables border and box-shadow transitions.                                           |
+| WCAG               | WCAG 2.1 AA compliant. Zero axe-core violations in default, error, disabled, and required states.                               |
+
+## Keyboard Navigation
+
+| Key         | Behavior                                                        |
+| ----------- | --------------------------------------------------------------- |
+| `Tab`       | Moves focus to the input element.                               |
+| `Shift+Tab` | Moves focus to the previous focusable element.                  |
+| All keys    | Native browser input behavior applies inside the focused field. |
+
+## Drupal Integration
+
+```twig
+{# my-module/templates/my-template.html.twig #}
+<hx-text-input
+  label="{{ label|default('') }}"
+  name="{{ name|default('') }}"
+  type="{{ type|default('text') }}"
+  value="{{ value|default('') }}"
+  placeholder="{{ placeholder|default('') }}"
+  {% if required %}required{% endif %}
+  {% if disabled %}disabled{% endif %}
+  {% if readonly %}readonly{% endif %}
+  {% if error %}error="{{ error }}"{% endif %}
+  {% if help_text %}help-text="{{ help_text }}"{% endif %}
+  {% if hx_size %}hx-size="{{ hx_size }}"{% endif %}
+></hx-text-input>
+```
+
+For Drupal Form API integration where the label and error are rendered server-side as HTML nodes, use the slot pattern:
+
+```twig
+<hx-text-input name="{{ name }}" {% if required %}required{% endif %}>
+  {{ label_element }}
+  {% if errors %}
+    <div slot="error">{{ errors }}</div>
+  {% endif %}
+  {% if description %}
+    <div slot="help-text">{{ description }}</div>
+  {% endif %}
+</hx-text-input>
+```
+
+Load the library in your module's `.libraries.yml`:
+
+```yaml
+helix-components:
+  js:
+    /libraries/helix/helix.min.js: { minified: true }
+```
+
+## Standalone HTML Example
+
+Copy-paste into a `.html` file and open in any browser — no build tool required:
+
+```html
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>hx-text-input example</title>
+    <!-- @helix/library is a private package — install via npm workspace, not CDN -->
+    <!-- In your project: import '@helix/library'; in your bundler entry point -->
+  </head>
+  <body
+    style="font-family: sans-serif; padding: 2rem; display: flex; flex-direction: column; gap: 1.5rem; max-width: 480px;"
+  >
+    <hx-text-input
+      id="patient-name"
+      label="Patient Name"
+      placeholder="Enter full name"
+      name="patientName"
+      required
+    ></hx-text-input>
+
+    <hx-text-input
+      label="Email Address"
+      type="email"
+      placeholder="clinician@hospital.org"
+      name="email"
+      help-text="A confirmation will be sent to this address."
+    ></hx-text-input>
+
+    <hx-text-input
+      label="Medical Record Number"
+      value="PAT-2026-00482"
+      readonly
+      help-text="System-generated. Contact HIM to correct."
+    ></hx-text-input>
+
+    <hx-text-input
+      label="Insurance ID"
+      value="ABC"
+      error="Insurance ID must be 9–12 digits."
+    ></hx-text-input>
+
+    <script>
+      document.getElementById('patient-name').addEventListener('hx-input', (e) => {
+        console.log('Input value:', e.detail.value);
+      });
+
+      document.getElementById('patient-name').addEventListener('hx-change', (e) => {
+        console.log('Change committed:', e.detail.value);
+      });
+    </script>
+  </body>
+</html>
+```
 
 ## API Reference
 

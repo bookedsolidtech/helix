@@ -335,6 +335,11 @@ export class HelixDropdown extends LitElement {
       trigger.setAttribute('aria-expanded', String(this.open));
       // P1-02: Link trigger to panel for screen reader navigation.
       trigger.setAttribute('aria-controls', this._panelId);
+      // P2-06: Remove host fallback when a trigger element is present.
+      this.removeAttribute('aria-expanded');
+    } else {
+      // P2-06: Fallback — set aria-expanded on host when trigger slot is empty or unassigned.
+      this.setAttribute('aria-expanded', String(this.open));
     }
   }
 
@@ -345,6 +350,9 @@ export class HelixDropdown extends LitElement {
       const trigger = slot?.assignedElements()[0] as HTMLElement | undefined;
       if (trigger) {
         trigger.setAttribute('aria-expanded', String(this.open));
+      } else {
+        // P2-06: Fallback — keep host aria-expanded in sync when trigger slot is empty.
+        this.setAttribute('aria-expanded', String(this.open));
       }
     }
   }

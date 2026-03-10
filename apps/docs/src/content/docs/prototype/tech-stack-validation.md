@@ -31,7 +31,7 @@ Every technology choice was evaluated against realistic alternatives. This docum
 
 We evaluated Terrazzo and Style Dictionary. Both added build pipeline complexity for what we needed. We built a lightweight custom token package (`hx-tokens`) that outputs CSS custom properties directly — no external build tool dependency, TypeScript-typed token references, and zero friction for Lit component consumption.
 
-**Result**: The `hx-tokens` package generates `--hx-*` CSS custom properties via a TypeScript generator script. All 85 components consume tokens through the three-tier fallback pattern: `var(--hx-component-token, var(--hx-semantic-token))`.
+**Result**: The `hx-tokens` package generates `--hx-*` CSS custom properties via a TypeScript generator script. All 87 components consume tokens through the three-tier fallback pattern: `var(--hx-component-token, var(--hx-semantic-token))`.
 
 ### Testing: Vitest 3.x Browser Mode
 

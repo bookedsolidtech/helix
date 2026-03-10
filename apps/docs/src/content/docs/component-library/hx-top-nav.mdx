@@ -1,14 +1,470 @@
 ---
 title: 'hx-top-nav'
-description: 'Horizontal top-level navigation bar for application headers'
+description: Horizontal top-level navigation bar for application headers with logo, nav items, actions, and responsive hamburger menu.
 ---
 
 import ComponentLoader from '../../../components/ComponentLoader.astro';
+import ComponentDemo from '../../../components/ComponentDemo.astro';
 import ComponentDoc from '../../../components/ComponentDoc.astro';
 
 <ComponentLoader />
 
 <ComponentDoc tagName="hx-top-nav" section="summary" />
+
+## Overview
+
+`hx-top-nav` is the site-level navigation bar for Helix applications. It renders a `<header>` landmark containing a `<nav>` element with a three-zone layout: a **logo** area on the left, a **primary navigation** area in the center, and an **actions** area on the right.
+
+On narrow viewports (below 768 px), the center and right zones collapse behind a hamburger toggle button. Pressing the button opens a vertical stack of nav items and actions. On desktop (768 px and above), the hamburger is hidden and the full navigation is shown inline.
+
+All content is slot-driven — `hx-top-nav` imposes layout and accessibility structure; consumers supply the links, branding, and utility controls. The component is ready for Drupal Twig consumption with no modifications.
+
+**Use `hx-top-nav` when:** you need a top-of-page navigation bar with responsive collapse, sticky positioning, and accessible landmark structure for a healthcare portal, staff tool, or patient-facing application.
+
+**Do not place a `<nav>` element** inside any slot — the component already renders a `<nav>` landmark internally. Use a `<div>` or bare links in the default slot.
+
+## Live Demo
+
+### Default
+
+Full navigation with logo, menu items, and actions.
+
+<ComponentDemo title="Default">
+  <hx-top-nav label="Site Navigation">
+    <a
+      slot="logo"
+      href="/"
+      style="font-weight: 700; color: inherit; text-decoration: none; font-size: 1.125rem;"
+    >
+      HealthSystem
+    </a>
+    <div style="display: contents;">
+      <a href="/dashboard" style="color: inherit; text-decoration: none; padding: 0.5rem 0.75rem;">
+        Dashboard
+      </a>
+      <a href="/patients" style="color: inherit; text-decoration: none; padding: 0.5rem 0.75rem;">
+        Patients
+      </a>
+      <a href="/schedule" style="color: inherit; text-decoration: none; padding: 0.5rem 0.75rem;">
+        Schedule
+      </a>
+    </div>
+    <div slot="actions" style="display: flex; align-items: center; gap: 0.5rem;">
+      <button
+        type="button"
+        style="background: none; border: none; cursor: pointer; color: inherit; padding: 0.5rem;"
+        aria-label="Search"
+      >
+        Search
+      </button>
+      <button
+        type="button"
+        style="background: none; border: none; cursor: pointer; color: inherit; padding: 0.5rem;"
+        aria-label="User profile"
+      >
+        Profile
+      </button>
+    </div>
+  </hx-top-nav>
+</ComponentDemo>
+
+### With Active Page Indicator
+
+Use `aria-current="page"` on the active link. Style it as appropriate for your design.
+
+<ComponentDemo title="Active Page Indicator">
+  <hx-top-nav label="Site Navigation">
+    <a
+      slot="logo"
+      href="/"
+      style="font-weight: 700; color: inherit; text-decoration: none; font-size: 1.125rem;"
+    >
+      HealthSystem
+    </a>
+    <div style="display: contents;">
+      <a href="/dashboard" style="color: inherit; text-decoration: none; padding: 0.5rem 0.75rem;">
+        Dashboard
+      </a>
+      <a
+        href="/patients"
+        aria-current="page"
+        style="color: inherit; text-decoration: none; padding: 0.5rem 0.75rem; font-weight: 600; border-bottom: 2px solid currentColor;"
+      >
+        Patients
+      </a>
+      <a href="/schedule" style="color: inherit; text-decoration: none; padding: 0.5rem 0.75rem;">
+        Schedule
+      </a>
+    </div>
+  </hx-top-nav>
+</ComponentDemo>
+
+### Sticky Mode
+
+Set `sticky` to keep the nav fixed to the top of the viewport during scroll.
+
+<ComponentDemo title="Sticky Mode">
+  <div style="height: 200px; overflow-y: auto; border: 1px solid #dee2e6; border-radius: 0.5rem;">
+    <hx-top-nav sticky label="Site Navigation">
+      <a
+        slot="logo"
+        href="/"
+        style="font-weight: 700; color: inherit; text-decoration: none; font-size: 1.125rem;"
+      >
+        HealthSystem
+      </a>
+      <div style="display: contents;">
+        <a
+          href="/dashboard"
+          style="color: inherit; text-decoration: none; padding: 0.5rem 0.75rem;"
+        >
+          Dashboard
+        </a>
+        <a href="/patients" style="color: inherit; text-decoration: none; padding: 0.5rem 0.75rem;">
+          Patients
+        </a>
+      </div>
+    </hx-top-nav>
+    <div style="padding: 2rem; display: flex; flex-direction: column; gap: 0.75rem;">
+      <p style="margin: 0; color: #6c757d; font-size: 0.875rem;">
+        Scroll this container to see the nav remain fixed at the top.
+      </p>
+      <p style="margin: 0; padding: 0.75rem; background: #f8f9fa; border-radius: 0.25rem;">
+        Clinical workflow row 1
+      </p>
+      <p style="margin: 0; padding: 0.75rem; background: #f8f9fa; border-radius: 0.25rem;">
+        Clinical workflow row 2
+      </p>
+      <p style="margin: 0; padding: 0.75rem; background: #f8f9fa; border-radius: 0.25rem;">
+        Clinical workflow row 3
+      </p>
+      <p style="margin: 0; padding: 0.75rem; background: #f8f9fa; border-radius: 0.25rem;">
+        Clinical workflow row 4
+      </p>
+      <p style="margin: 0; padding: 0.75rem; background: #f8f9fa; border-radius: 0.25rem;">
+        Clinical workflow row 5
+      </p>
+    </div>
+  </div>
+</ComponentDemo>
+
+### Hospital Portal
+
+A real-world clinical staff navigation bar with logo, primary links, search, and notification indicator.
+
+<ComponentDemo title="Hospital Portal">
+  <hx-top-nav sticky label="Hospital Staff Navigation">
+    <a
+      slot="logo"
+      href="/"
+      style="display: flex; align-items: center; gap: 0.625rem; color: inherit; text-decoration: none;"
+    >
+      <span style="display: inline-flex; align-items: center; justify-content: center; width: 2rem; height: 2rem; background: var(--hx-color-primary-700, #1e40af); color: #fff; border-radius: 0.375rem; font-weight: 800; font-size: 0.875rem;">
+        M
+      </span>
+      <span style="font-weight: 700; font-size: 1.0625rem;">Memorial Health</span>
+    </a>
+    <div style="display: contents;">
+      <a
+        href="/dashboard"
+        aria-current="page"
+        style="color: inherit; text-decoration: none; padding: 0.5rem 0.75rem; font-weight: 600; border-bottom: 2px solid currentColor;"
+      >
+        Dashboard
+      </a>
+      <a href="/patients" style="color: inherit; text-decoration: none; padding: 0.5rem 0.75rem;">
+        Patients
+      </a>
+      <a href="/schedule" style="color: inherit; text-decoration: none; padding: 0.5rem 0.75rem;">
+        Schedule
+      </a>
+      <a
+        href="/lab-results"
+        style="color: inherit; text-decoration: none; padding: 0.5rem 0.75rem;"
+      >
+        Lab Results
+      </a>
+      <a href="/orders" style="color: inherit; text-decoration: none; padding: 0.5rem 0.75rem;">
+        Orders
+      </a>
+    </div>
+    <div slot="actions" style="display: flex; align-items: center; gap: 0.75rem;">
+      <input
+        type="search"
+        placeholder="Search patients, orders..."
+        aria-label="Search"
+        style="padding: 0.375rem 0.75rem; border: 1px solid var(--hx-color-neutral-300, #ced4da); border-radius: 0.375rem; font-size: 0.875rem; width: 14rem;"
+      />
+      <button
+        type="button"
+        aria-label="Notifications (3 unread)"
+        style="position: relative; background: none; border: none; cursor: pointer; color: inherit; padding: 0.375rem; font-size: 0.875rem;"
+      >
+        Alerts
+        <span style="position: absolute; top: 0; right: 0; background: var(--hx-color-error-500, #dc2626); color: #fff; border-radius: 9999px; font-size: 0.625rem; font-weight: 700; padding: 0 0.3rem; line-height: 1.4;">
+          3
+        </span>
+      </button>
+      <span style="font-size: 0.875rem;">Dr. Chen</span>
+    </div>
+  </hx-top-nav>
+</ComponentDemo>
+
+## Installation
+
+```bash
+# Full library
+npm install @helix/library
+
+# Or import only this component (tree-shaking friendly)
+import '@helix/library/components/hx-top-nav';
+```
+
+## Basic Usage
+
+```html
+<hx-top-nav label="Site Navigation">
+  <a slot="logo" href="/">My App</a>
+
+  <!-- Use bare links or <div style="display: contents;"> — NOT <nav> -->
+  <a href="/dashboard">Dashboard</a>
+  <a href="/patients">Patients</a>
+  <a href="/schedule">Schedule</a>
+
+  <div slot="actions">
+    <button type="button" aria-label="User profile">Profile</button>
+  </div>
+</hx-top-nav>
+```
+
+## Properties
+
+| Property | Attribute | Type      | Default             | Description                                                                                                            |
+| -------- | --------- | --------- | ------------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| `sticky` | `sticky`  | `boolean` | `false`             | When true, the navigation bar sticks to the top of the viewport during scroll. Reflects as attribute.                  |
+| `label`  | `label`   | `string`  | `'Site Navigation'` | Accessible label applied to the inner `<nav>` element via `aria-label`. Describes the landmark to screen reader users. |
+
+## Events
+
+| Event              | Detail Type         | Description                                                                                                                              |
+| ------------------ | ------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
+| `hx-mobile-toggle` | `{ open: boolean }` | Dispatched when the hamburger button is toggled. `detail.open` is `true` when the menu opens, `false` when it closes. Bubbles, composed. |
+
+```js
+document.querySelector('hx-top-nav').addEventListener('hx-mobile-toggle', (e) => {
+  console.log('Mobile menu is now:', e.detail.open ? 'open' : 'closed');
+});
+```
+
+## CSS Custom Properties
+
+| Property                    | Default                                | Description                        |
+| --------------------------- | -------------------------------------- | ---------------------------------- |
+| `--hx-top-nav-bg`           | `var(--hx-color-neutral-0, #ffffff)`   | Navigation bar background color.   |
+| `--hx-top-nav-color`        | `var(--hx-color-neutral-800, #212529)` | Navigation bar text color.         |
+| `--hx-top-nav-border-color` | `var(--hx-color-neutral-200, #dee2e6)` | Bottom border color.               |
+| `--hx-top-nav-height`       | `var(--hx-space-16, 4rem)`             | Navigation bar height.             |
+| `--hx-top-nav-padding-x`    | `var(--hx-space-6, 1.5rem)`            | Horizontal padding on the bar row. |
+| `--hx-top-nav-z-index`      | `var(--hx-z-index-sticky, 1000)`       | Z-index when `sticky` is true.     |
+| `--hx-top-nav-toggle-color` | `var(--hx-color-neutral-700, #343a40)` | Hamburger icon color.              |
+
+## CSS Parts
+
+| Part            | Description                                    |
+| --------------- | ---------------------------------------------- |
+| `header`        | The outer `<header>` landmark element.         |
+| `nav`           | The `<nav>` element inside the header.         |
+| `logo`          | The logo slot container `<div>`.               |
+| `menu`          | The primary navigation slot container `<div>`. |
+| `actions`       | The actions slot container `<div>`.            |
+| `mobile-toggle` | The hamburger toggle `<button>`.               |
+
+```css
+/* Example: custom brand bar */
+hx-top-nav::part(nav) {
+  background: #0f172a;
+  border-bottom-color: #334155;
+}
+
+hx-top-nav::part(mobile-toggle) {
+  border-radius: 0.5rem;
+}
+```
+
+## Slots
+
+| Slot        | Description                                                                                                                                                             |
+| ----------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `logo`      | Brand area rendered on the left side. Typically an `<a>` wrapping a logo image or styled text.                                                                          |
+| _(default)_ | Primary navigation items rendered in the center (desktop) or collapsible panel (mobile). Use bare links or `<div style="display: contents;">` — do NOT wrap in `<nav>`. |
+| `actions`   | Utility area on the right side. Suitable for search inputs, user profile menus, notification buttons, or sign-out links.                                                |
+
+## Accessibility
+
+`hx-top-nav` implements the [WAI-ARIA Navigation Landmark](https://www.w3.org/TR/wai-aria-1.2/#navigation) pattern and the [WAI-ARIA Button Pattern](https://www.w3.org/WAI/ARIA/apg/patterns/button/) for the mobile toggle.
+
+| Topic               | Details                                                                                                                                                                       |
+| ------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Navigation landmark | The inner `<nav>` element creates a navigation landmark, discoverable by screen reader quick navigation commands.                                                             |
+| `aria-label`        | The `label` property (default `"Site Navigation"`) is applied to the `<nav>` via `aria-label`. Always set a meaningful label to distinguish multiple nav landmarks on a page. |
+| `<header>` landmark | The outer `<header>` element creates a banner landmark when used outside of `<article>`, `<aside>`, `<main>`, `<nav>`, or `<section>`.                                        |
+| Mobile toggle       | The hamburger `<button>` carries `aria-expanded` (reflects current open state), `aria-controls` (references `id="nav-menu"`), and `aria-label="Toggle navigation"`.           |
+| `aria-expanded`     | Set to `"true"` when the mobile menu is open; `"false"` when collapsed. Screen readers announce the state change on button activation.                                        |
+| `aria-current`      | Not managed internally — mark the active page link with `aria-current="page"` in the consuming template (Drupal `in_active_trail`, etc.).                                     |
+| Keyboard — toggle   | The hamburger toggle is a native `<button>` — activatable with `Enter` or `Space`.                                                                                            |
+| Keyboard — escape   | Pressing `Escape` when the mobile menu is open closes the menu and returns focus to the toggle button.                                                                        |
+| Focus management    | When the mobile menu opens, focus moves to the first interactive element in the default slot.                                                                                 |
+| Touch target        | The hamburger button meets WCAG 2.5.5 (44×44 px minimum target size): 0.75 rem padding on all sides around a 24 px icon yields a 48×48 px touch target.                       |
+| Focus ring          | The hamburger button shows a visible focus ring via `:focus-visible` using `--hx-focus-ring-color`. All slotted interactive elements retain their own focus rings.            |
+| Reduced motion      | `@media (prefers-reduced-motion: reduce)` disables the mobile menu open animation.                                                                                            |
+| WCAG                | WCAG 2.1 AA compliant. Zero axe-core violations in default, sticky, and mobile-open states.                                                                                   |
+
+### Healthcare A11y Notes
+
+Always provide a meaningful `label` attribute. On complex clinical pages with multiple navigation landmarks (e.g., `hx-top-nav` + `hx-side-nav`), each landmark must have a distinct `aria-label` so screen reader users can distinguish between them.
+
+Use `aria-current="page"` on the currently active link. In Drupal, use `in_active_trail` from the menu system:
+
+```twig
+<a href="{{ item.url }}"
+   {% if item.in_active_trail %}aria-current="page"{% endif %}>
+  {{ item.title }}
+</a>
+```
+
+## Keyboard Navigation
+
+| Key             | Behavior                                                                                         |
+| --------------- | ------------------------------------------------------------------------------------------------ |
+| `Tab`           | Moves focus through focusable elements in the nav bar (logo link, toggle button, slotted items). |
+| `Enter`/`Space` | Activates the hamburger toggle button when it has focus (mobile viewports).                      |
+| `Escape`        | Closes the mobile menu and returns focus to the hamburger toggle button.                         |
+
+## Drupal Integration
+
+```twig
+{# my-module/templates/hx-top-nav.html.twig #}
+<hx-top-nav
+  label="{{ nav_label|default('Site Navigation') }}"
+  {% if sticky %}sticky{% endif %}
+>
+  <a slot="logo" href="{{ path('<front>') }}" class="logo-link">
+    {{ site_name }}
+  </a>
+
+  {# Use bare links or <div style="display: contents;"> — NOT <nav> #}
+  {% for item in main_menu_items %}
+    <a
+      href="{{ item.url }}"
+      {% if item.in_active_trail %}aria-current="page"{% endif %}
+      class="nav-link"
+    >{{ item.title }}</a>
+  {% endfor %}
+
+  <div slot="actions">
+    <a href="{{ path('user.page') }}">{{ 'My Account'|t }}</a>
+    <a href="{{ path('user.logout') }}">{{ 'Sign Out'|t }}</a>
+  </div>
+</hx-top-nav>
+```
+
+Load the library in your module's `.libraries.yml`:
+
+```yaml
+helix-components:
+  js:
+    /libraries/helix/helix.min.js: { minified: true }
+```
+
+Listen for mobile toggle events in Drupal behaviors:
+
+```javascript
+Drupal.behaviors.helixTopNav = {
+  attach(context) {
+    // once() prevents duplicate event binding during AJAX attach cycles
+    once('helixTopNav', 'hx-top-nav', context).forEach((el) => {
+      el.addEventListener('hx-mobile-toggle', (e) => {
+        console.log('Mobile menu state:', e.detail.open ? 'open' : 'closed');
+        // Example: update body class for CSS adjustments
+        document.body.classList.toggle('mobile-nav-open', e.detail.open);
+      });
+    });
+  },
+};
+```
+
+## Standalone HTML Example
+
+Copy-paste into a `.html` file and open in any browser — no build tool required:
+
+```html
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>hx-top-nav example</title>
+    <!-- @helix/library is a private package — install via npm workspace, not CDN -->
+    <!-- In your project: import '@helix/library'; in your bundler entry point -->
+  </head>
+  <body style="font-family: sans-serif; margin: 0; padding: 0;">
+    <hx-top-nav id="site-nav" sticky label="Hospital Staff Navigation">
+      <a
+        slot="logo"
+        href="/"
+        style="font-weight: 700; color: inherit; text-decoration: none; font-size: 1.125rem;"
+      >
+        Memorial Health
+      </a>
+
+      <!-- Bare links or <div style="display: contents;"> — NOT <nav> -->
+      <a
+        href="/dashboard"
+        aria-current="page"
+        style="color: inherit; text-decoration: none; padding: 0.5rem 0.75rem; font-weight: 600;"
+        >Dashboard</a
+      >
+      <a href="/patients" style="color: inherit; text-decoration: none; padding: 0.5rem 0.75rem;"
+        >Patients</a
+      >
+      <a href="/schedule" style="color: inherit; text-decoration: none; padding: 0.5rem 0.75rem;"
+        >Schedule</a
+      >
+      <a href="/lab-results" style="color: inherit; text-decoration: none; padding: 0.5rem 0.75rem;"
+        >Lab Results</a
+      >
+
+      <div slot="actions" style="display: flex; align-items: center; gap: 0.75rem;">
+        <input
+          type="search"
+          placeholder="Search patients..."
+          aria-label="Search patients"
+          style="padding: 0.375rem 0.75rem; border: 1px solid #ced4da; border-radius: 0.375rem; font-size: 0.875rem; width: 14rem;"
+        />
+        <button
+          type="button"
+          style="background: none; border: 1px solid currentColor; border-radius: 0.375rem; cursor: pointer; padding: 0.375rem 0.875rem; font-size: 0.875rem;"
+        >
+          Sign Out
+        </button>
+      </div>
+    </hx-top-nav>
+
+    <main style="padding: 2rem;">
+      <h1>Dashboard</h1>
+      <p>Clinical workflow content goes here.</p>
+    </main>
+
+    <script>
+      const nav = document.getElementById('site-nav');
+
+      nav.addEventListener('hx-mobile-toggle', (e) => {
+        console.log('Mobile menu is now:', e.detail.open ? 'open' : 'closed');
+      });
+    </script>
+  </body>
+</html>
+```
 
 ## API Reference
 

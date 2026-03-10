@@ -337,6 +337,7 @@ describe('hx-tree-view', () => {
           </hx-tree-item>
         </hx-tree-view>`,
       );
+      // Allow microtask queue to flush and Lit reactive updates to complete before axe audit
       await new Promise((r) => setTimeout(r, 0));
       await el.updateComplete;
       const { violations } = await checkA11y(el);
@@ -546,6 +547,7 @@ describe('hx-tree-item', () => {
           <hx-tree-item slot="children">Child</hx-tree-item>
         </hx-tree-item>`,
       );
+      // Yield to event loop to allow slotchange callback to run so hasChildItems is updated
       await new Promise((r) => setTimeout(r, 0));
       await el.updateComplete;
       expect(el.hasChildItems).toBe(true);
@@ -580,6 +582,7 @@ describe('hx-tree-item', () => {
           <hx-tree-item slot="children">Child</hx-tree-item>
         </hx-tree-item>`,
       );
+      // Yield to event loop to allow slotchange callback to run so the expand button is rendered
       await new Promise((r) => setTimeout(r, 0));
       await el.updateComplete;
       const btn = shadowQuery(el, '.expand-btn');
@@ -672,6 +675,7 @@ describe('hx-tree-item', () => {
           <hx-tree-item slot="children">Child</hx-tree-item>
         </hx-tree-item>`,
       );
+      // Yield to event loop to allow slotchange callback to run so children are registered before key dispatch
       await new Promise((r) => setTimeout(r, 0));
       await el.updateComplete;
 
@@ -690,6 +694,7 @@ describe('hx-tree-item', () => {
           <hx-tree-item slot="children">Child</hx-tree-item>
         </hx-tree-item>`,
       );
+      // Yield to event loop to allow slotchange callback to run so children are registered before key dispatch
       await new Promise((r) => setTimeout(r, 0));
       await el.updateComplete;
 

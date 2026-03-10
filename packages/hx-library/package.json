@@ -8,7 +8,6 @@
     "src/components/**/*.ts"
   ],
   "main": "./dist/index.js",
-  "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
@@ -34,6 +33,7 @@
     "build": "vite build && npm run cem",
     "type-check": "tsc --noEmit",
     "test": "vitest run",
+    "test:cross-browser": "vitest run --config vitest.config.cross-browser.ts",
     "test:coverage": "vitest run --coverage.enabled",
     "test:watch": "vitest",
     "test:ui": "vitest --ui",
@@ -48,6 +48,21 @@
   "peerDependencies": {
     "@floating-ui/dom": "^1.7.6"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/bookedsolidtech/helix.git",
+    "directory": "packages/hx-library"
+  },
+  "license": "MIT",
+  "homepage": "https://helix.bookedsolid.com",
+  "bugs": "https://github.com/bookedsolidtech/helix/issues",
+  "keywords": [
+    "web-components",
+    "lit",
+    "healthcare",
+    "design-system",
+    "custom-elements"
+  ],
   "devDependencies": {
     "@custom-elements-manifest/analyzer": "^0.11.0",
     "@vitest/browser": "^3.0.0",

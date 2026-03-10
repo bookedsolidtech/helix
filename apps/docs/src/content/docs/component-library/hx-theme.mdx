@@ -1,14 +1,437 @@
 ---
 title: 'hx-theme'
-description: 'Theme provider that applies design token overrides to child components'
+description: 'Infrastructure theme provider that injects --hx-* design tokens for a named theme scope. Supports light, dark, high-contrast, and auto (OS-preference) themes with zero layout impact.'
 ---
 
 import ComponentLoader from '../../../components/ComponentLoader.astro';
+import ComponentDemo from '../../../components/ComponentDemo.astro';
 import ComponentDoc from '../../../components/ComponentDoc.astro';
 
 <ComponentLoader />
 
 <ComponentDoc tagName="hx-theme" section="summary" />
+
+## Overview
+
+`hx-theme` is a pure infrastructure component that injects the full set of `--hx-*` design tokens onto a scoped host element. Wrapping any subtree with `<hx-theme>` causes all nested components to inherit the correct token values for the selected theme — light, dark, high-contrast, or automatic OS-preference detection.
+
+The component uses `display: contents` so it is invisible to layout engines. It does not add any boxes to the page; it only sets CSS custom properties via an adopted stylesheet on its shadow root host.
+
+**Use `hx-theme` when:** you need to apply a design token theme to a region of your page, scope a dark sidebar inside a light page, or let the OS color scheme preference drive your UI.
+
+**Do not use `hx-theme` for:** individual component color overrides. Use the `--hx-*` component-tier tokens directly on the element's `:host` or a parent selector for that.
+
+## Live Demo
+
+### Light Theme (Default)
+
+<ComponentDemo title="Light Theme">
+  <hx-theme theme="light">
+    <div style="padding: 1.5rem; border: 1px solid var(--hx-color-border-default, #e2e8f0); border-radius: 0.5rem; background: var(--hx-color-surface-default, #fff); color: var(--hx-color-text-primary, #0f172a); font-family: var(--hx-font-family-sans, sans-serif);">
+      <p style="margin: 0 0 0.5rem; font-weight: 600;">Light Theme</p>
+      <p style="margin: 0; color: var(--hx-color-text-secondary, #475569); font-size: 0.875rem;">
+        All --hx-* tokens are set to light-mode values.
+      </p>
+    </div>
+  </hx-theme>
+</ComponentDemo>
+
+### Dark Theme
+
+<ComponentDemo title="Dark Theme">
+  <div style="background: #0d1117; padding: 1.5rem; border-radius: 0.5rem;">
+    <hx-theme theme="dark">
+      <div style="padding: 1.5rem; border: 1px solid var(--hx-color-border-default, #374151); border-radius: 0.5rem; background: var(--hx-color-surface-default, #1f2937); color: var(--hx-color-text-primary, #f9fafb); font-family: var(--hx-font-family-sans, sans-serif);">
+        <p style="margin: 0 0 0.5rem; font-weight: 600;">Dark Theme</p>
+        <p style="margin: 0; color: var(--hx-color-text-secondary, #9ca3af); font-size: 0.875rem;">
+          Semantic tokens are overridden with dark-mode values.
+        </p>
+      </div>
+    </hx-theme>
+  </div>
+</ComponentDemo>
+
+### High-Contrast Theme
+
+<ComponentDemo title="High-Contrast Theme">
+  <div style="background: #000; padding: 1.5rem; border-radius: 0.5rem;">
+    <hx-theme theme="high-contrast">
+      <div style="padding: 1.5rem; border: 1px solid var(--hx-color-border-default, #fff); border-radius: 0.5rem; background: var(--hx-color-surface-default, #000); color: var(--hx-color-text-primary, #fff); font-family: var(--hx-font-family-sans, sans-serif);">
+        <p style="margin: 0 0 0.5rem; font-weight: 600;">High-Contrast Theme</p>
+        <p style="margin: 0; color: var(--hx-color-text-secondary, #e0e0e0); font-size: 0.875rem;">
+          WCAG 7:1+ contrast token overrides for low-vision users.
+        </p>
+      </div>
+    </hx-theme>
+  </div>
+</ComponentDemo>
+
+### Nested Theme Scoping
+
+<ComponentDemo title="Nested Theme Scoping">
+  <hx-theme theme="light">
+    <div style="padding: 1.5rem; border: 1px solid var(--hx-color-border-default, #e2e8f0); background: var(--hx-color-surface-default, #fff); color: var(--hx-color-text-primary, #0f172a); font-family: var(--hx-font-family-sans, sans-serif); border-radius: 0.5rem;">
+      <p style="margin: 0 0 1rem; font-weight: 600;">Light page (outer hx-theme)</p>
+      <hx-theme theme="dark">
+        <aside style="padding: 1rem; border: 1px solid var(--hx-color-border-default, #374151); background: var(--hx-color-surface-default, #1f2937); color: var(--hx-color-text-primary, #f9fafb); border-radius: 0.375rem;">
+          <p style="margin: 0; font-weight: 600;">Dark sidebar (nested hx-theme)</p>
+          <p style="margin: 0.5rem 0 0; color: var(--hx-color-text-secondary, #9ca3af); font-size: 0.875rem;">
+            Tokens scoped to this subtree only.
+          </p>
+        </aside>
+      </hx-theme>
+    </div>
+  </hx-theme>
+</ComponentDemo>
+
+### Auto (OS Preference)
+
+<ComponentDemo title="Auto Theme (OS Preference)">
+  <hx-theme theme="auto">
+    <div style="padding: 1.5rem; border: 1px solid var(--hx-color-border-default, #e2e8f0); border-radius: 0.5rem; background: var(--hx-color-surface-default, #fff); color: var(--hx-color-text-primary, #0f172a); font-family: var(--hx-font-family-sans, sans-serif);">
+      <p style="margin: 0 0 0.5rem; font-weight: 600;">Auto Theme</p>
+      <p style="margin: 0; font-size: 0.875rem; color: var(--hx-color-text-secondary, #475569);">
+        Follows your OS <code>prefers-color-scheme</code> setting.
+      </p>
+    </div>
+  </hx-theme>
+</ComponentDemo>
+
+## Installation
+
+```bash
+# Full library
+npm install @helix/library
+
+# Or import only this component (tree-shaking friendly)
+import '@helix/library/components/hx-theme';
+```
+
+## Basic Usage
+
+Wrap any content with `<hx-theme>` to apply a named token theme:
+
+```html
+<!-- Light theme (default) -->
+<hx-theme theme="light">
+  <main>...</main>
+</hx-theme>
+
+<!-- Dark theme -->
+<hx-theme theme="dark">
+  <aside>...</aside>
+</hx-theme>
+
+<!-- High-contrast theme for low-vision users -->
+<hx-theme theme="high-contrast">
+  <section>...</section>
+</hx-theme>
+
+<!-- Auto: follows OS prefers-color-scheme -->
+<hx-theme theme="auto">
+  <div>...</div>
+</hx-theme>
+
+<!-- Nested scoping: dark sidebar inside a light page -->
+<hx-theme theme="light">
+  <main>...</main>
+  <hx-theme theme="dark">
+    <aside>...</aside>
+  </hx-theme>
+</hx-theme>
+```
+
+Read the active theme at runtime via the `effectiveTheme` getter:
+
+```javascript
+const provider = document.querySelector('hx-theme');
+
+// Returns 'light', 'dark', or 'high-contrast'
+// When theme="auto", resolves to 'light' or 'dark' based on OS preference
+console.log(provider.effectiveTheme);
+
+// Switch theme programmatically
+provider.theme = 'dark';
+```
+
+## Properties
+
+| Property | Attribute | Type                                             | Default   | Description                                                                                                                                                                                                                 |
+| -------- | --------- | ------------------------------------------------ | --------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `theme`  | `theme`   | `'light' \| 'dark' \| 'high-contrast' \| 'auto'` | `'light'` | The theme to apply. Determines which set of `--hx-*` tokens are injected onto the host. `'auto'` follows the OS `prefers-color-scheme` media query and resolves to `'light'` or `'dark'` at runtime. Reflects to attribute. |
+| `system` | `system`  | `boolean`                                        | `false`   | **Deprecated.** Use `theme="auto"` instead. When `true`, auto-detects the preferred color scheme via `prefers-color-scheme`, overriding the `theme` prop. Reflects to attribute.                                            |
+
+**`effectiveTheme` (read-only getter)**
+
+Returns the currently active theme name as a string. When `system=true` or `theme="auto"`, reflects the OS preference (`'light'` or `'dark'`). Otherwise returns the `theme` property value.
+
+```javascript
+const provider = document.querySelector('hx-theme');
+console.log(provider.effectiveTheme); // 'light' | 'dark' | 'high-contrast'
+```
+
+## Events
+
+`hx-theme` does not dispatch custom events. It is a passive provider — no user interaction is expected directly on this element.
+
+The component maintains an internal `role="status"` live region that announces theme changes to assistive technology when the OS color scheme changes while `theme="auto"` is active. This announcement is internal and does not require application-level handling.
+
+## CSS Custom Properties
+
+`hx-theme` does not define component-scoped custom properties for consumer override. Instead, it **injects** the complete `--hx-*` token set for the active theme onto its host element. All nested components inherit these tokens via the CSS cascade.
+
+The three-tier token architecture:
+
+| Tier      | Prefix pattern            | Example                       | Set by                                           |
+| --------- | ------------------------- | ----------------------------- | ------------------------------------------------ |
+| Primitive | `--hx-color-primary-500`  | `#2563eb`                     | `hx-theme` (always injected)                     |
+| Semantic  | `--hx-color-text-primary` | `var(--hx-color-neutral-900)` | `hx-theme` (theme-sensitive overrides)           |
+| Component | `--hx-button-bg`          | `var(--hx-color-primary-500)` | Individual components; not managed by `hx-theme` |
+
+Override at the semantic tier to apply brand-specific theming while respecting theme scoping:
+
+```css
+/* Override semantic tokens on the hx-theme host to brand the primary color */
+hx-theme {
+  --hx-color-primary-500: #7c3aed;
+  --hx-color-primary-400: #8b5cf6;
+}
+
+/* Or scope overrides to a specific theme */
+hx-theme[theme='dark'] {
+  --hx-color-text-primary: #e2e8f0;
+}
+```
+
+## CSS Parts
+
+| Part   | Description                                                                                                                                                                   |
+| ------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `base` | The inner `<div>` element wrapping the default slot. Uses `display: contents` — no layout impact. Exposed for consumer targeting via `::part(base)` without affecting layout. |
+
+```css
+/* Target the slot wrapper if needed — does not affect layout */
+hx-theme::part(base) {
+  /* custom styles */
+}
+```
+
+## Slots
+
+| Slot        | Description                                                                                             |
+| ----------- | ------------------------------------------------------------------------------------------------------- |
+| _(default)_ | The themed content. All child elements receive `--hx-*` token values via CSS inheritance from the host. |
+
+```html
+<!-- Place any content in the default slot -->
+<hx-theme theme="dark">
+  <header>...</header>
+  <main>...</main>
+  <footer>...</footer>
+</hx-theme>
+```
+
+## Accessibility
+
+`hx-theme` is a transparent infrastructure wrapper with no interactive semantics. Its accessibility responsibilities are limited to its role as a theme provider.
+
+| Topic         | Details                                                                                                                                                                         |
+| ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| ARIA role     | None. The component renders `display: contents` and is invisible to the accessibility tree. It does not add any landmark, group, or interactive role.                           |
+| Live region   | An internal `role="status" aria-live="polite"` region announces theme changes to screen readers when the OS color scheme changes while `theme="auto"` is active.                |
+| Keyboard      | No keyboard interactions. The component is not focusable and does not intercept keyboard events.                                                                                |
+| Screen reader | No announcement on initial render. Theme change announcements are delivered via the internal live region only when OS preference changes.                                       |
+| High-contrast | `theme="high-contrast"` injects a WCAG 7:1+ token set targeting low-vision users. Text, border, and focus ring tokens are overridden to pure white/yellow on black.             |
+| Color scheme  | `color-scheme: dark` is injected in the dynamic stylesheet for `dark` and `high-contrast` themes, adapting browser-native form controls (scrollbars, inputs, selects) to match. |
+| WCAG          | Meets WCAG 2.1 AA. The component itself has zero axe-core violations across all theme modes.                                                                                    |
+
+### High-Contrast Token Guarantees
+
+The `high-contrast` theme injects the following minimum-contrast overrides targeting WCAG 1.4.6 Enhanced Contrast (7:1):
+
+| Token                        | Value     | Purpose                                  |
+| ---------------------------- | --------- | ---------------------------------------- |
+| `--hx-color-text-primary`    | `#FFFFFF` | Primary text on black background         |
+| `--hx-color-text-secondary`  | `#FFFFFF` | Secondary text on black background       |
+| `--hx-color-text-muted`      | `#E0E0E0` | Muted text (passes 7:1 on #000)          |
+| `--hx-color-text-link`       | `#FFFF00` | Link text — yellow on black exceeds 19:1 |
+| `--hx-color-surface-default` | `#000000` | Page background                          |
+| `--hx-color-border-default`  | `#FFFFFF` | Borders visible on black                 |
+| `--hx-color-border-focus`    | `#FFFF00` | Focus ring — high visibility             |
+| `--hx-color-focus-ring`      | `#FFFF00` | Unified focus ring color                 |
+
+## Drupal Integration
+
+Use `hx-theme` in Twig templates to apply a theme to a server-rendered region. The component requires JavaScript to inject tokens — it is not a static CSS class.
+
+```twig
+{# my-module/templates/page.html.twig #}
+
+{# Wrap the full page in the site theme — theme value from Drupal config #}
+<hx-theme theme="{{ site_theme|default('light') }}">
+  {{ page.content }}
+</hx-theme>
+
+{# Scope a dark sidebar within a light page #}
+<hx-theme theme="light">
+  <main>{{ page.content }}</main>
+  <hx-theme theme="dark">
+    <aside>{{ page.sidebar }}</aside>
+  </hx-theme>
+</hx-theme>
+
+{# Auto-detect OS preference #}
+<hx-theme theme="auto">
+  {{ page.content }}
+</hx-theme>
+```
+
+Load the library in your module's `.libraries.yml`:
+
+```yaml
+helix-components:
+  js:
+    /libraries/helix/helix.min.js: { minified: true }
+```
+
+Read the active theme in a Drupal behavior (for example, to update a theme toggle button label):
+
+```javascript
+Drupal.behaviors.helixTheme = {
+  attach(context) {
+    once('helixTheme', 'hx-theme', context).forEach((provider) => {
+      // Read the currently active theme
+      console.log(provider.effectiveTheme); // 'light' | 'dark' | 'high-contrast'
+
+      // Switch theme programmatically (e.g. from a toggle button)
+      const toggle = context.querySelector('[data-theme-toggle]');
+      if (toggle) {
+        toggle.addEventListener('click', () => {
+          provider.theme = provider.effectiveTheme === 'dark' ? 'light' : 'dark';
+        });
+      }
+    });
+  },
+};
+```
+
+**Important:** `hx-theme` requires the custom element to be instantiated. It cannot be applied as a plain HTML attribute (e.g., `data-theme="dark"` on `<body>`). If you need static CSS-only theming without JavaScript, apply `--hx-*` token overrides directly in a stylesheet.
+
+## Standalone HTML Example
+
+Copy-paste this into a `.html` file and open it in a browser — no build tool needed:
+
+```html
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>hx-theme example</title>
+    <!-- @helix/library is a private package — install via npm workspace, not CDN -->
+    <!-- In your project: import '@helix/library'; in your bundler entry point -->
+  </head>
+  <body style="font-family: sans-serif; margin: 0; padding: 0;">
+    <!-- 1. Light theme -->
+    <hx-theme theme="light">
+      <section
+        style="padding: 2rem; background: var(--hx-color-surface-default, #fff); color: var(--hx-color-text-primary, #0f172a);"
+      >
+        <h2 style="margin: 0 0 0.5rem;">Light Theme</h2>
+        <p style="margin: 0; color: var(--hx-color-text-secondary, #475569);">
+          Standard light-mode tokens applied.
+        </p>
+      </section>
+    </hx-theme>
+
+    <!-- 2. Dark theme -->
+    <hx-theme theme="dark">
+      <section
+        style="padding: 2rem; background: var(--hx-color-surface-default, #1f2937); color: var(--hx-color-text-primary, #f9fafb);"
+      >
+        <h2 style="margin: 0 0 0.5rem;">Dark Theme</h2>
+        <p style="margin: 0; color: var(--hx-color-text-secondary, #9ca3af);">
+          Dark-mode semantic token overrides applied.
+        </p>
+      </section>
+    </hx-theme>
+
+    <!-- 3. High-contrast theme -->
+    <hx-theme theme="high-contrast">
+      <section
+        style="padding: 2rem; background: var(--hx-color-surface-default, #000); color: var(--hx-color-text-primary, #fff);"
+      >
+        <h2 style="margin: 0 0 0.5rem;">High-Contrast Theme</h2>
+        <p style="margin: 0; color: var(--hx-color-text-secondary, #e0e0e0);">
+          WCAG 7:1+ contrast token overrides for low-vision users.
+        </p>
+        <a href="#" style="color: var(--hx-color-text-link, #ffff00);">Link color example</a>
+      </section>
+    </hx-theme>
+
+    <!-- 4. Auto theme — follows OS color scheme -->
+    <hx-theme theme="auto">
+      <section
+        style="padding: 2rem; background: var(--hx-color-surface-default, #fff); color: var(--hx-color-text-primary, #0f172a);"
+      >
+        <h2 style="margin: 0 0 0.5rem;">Auto Theme</h2>
+        <p style="margin: 0; color: var(--hx-color-text-secondary, #475569);">
+          Follows your OS prefers-color-scheme setting.
+        </p>
+        <p style="margin: 0.5rem 0 0; font-size: 0.875rem;" id="auto-label"></p>
+      </section>
+    </hx-theme>
+
+    <!-- 5. Nested scoping — dark sidebar inside a light page -->
+    <hx-theme theme="light">
+      <div style="display: grid; grid-template-columns: 1fr 280px; min-height: 200px;">
+        <main
+          style="padding: 2rem; background: var(--hx-color-surface-default, #fff); color: var(--hx-color-text-primary, #0f172a);"
+        >
+          <h2 style="margin: 0 0 0.5rem;">Main content (light)</h2>
+          <p style="margin: 0; color: var(--hx-color-text-secondary, #475569);">
+            This region uses light theme tokens.
+          </p>
+        </main>
+        <hx-theme theme="dark">
+          <aside
+            style="padding: 2rem; background: var(--hx-color-surface-default, #1f2937); color: var(--hx-color-text-primary, #f9fafb);"
+          >
+            <h2 style="margin: 0 0 0.5rem; font-size: 1rem;">Sidebar (dark)</h2>
+            <p
+              style="margin: 0; color: var(--hx-color-text-secondary, #9ca3af); font-size: 0.875rem;"
+            >
+              Nested hx-theme scopes dark tokens to this sidebar only.
+            </p>
+          </aside>
+        </hx-theme>
+      </div>
+    </hx-theme>
+
+    <script>
+      // Read effectiveTheme from the auto provider
+      const autoProvider = document.querySelector('hx-theme[theme="auto"]');
+      if (autoProvider) {
+        customElements.whenDefined('hx-theme').then(() => {
+          const label = document.getElementById('auto-label');
+          if (label) {
+            label.textContent = `effectiveTheme: "${autoProvider.effectiveTheme}"`;
+          }
+        });
+      }
+    </script>
+  </body>
+</html>
+```
+
+## Related Components
+
+| Component       | When to Use                                                                                      |
+| --------------- | ------------------------------------------------------------------------------------------------ |
+| `hx-button`     | Interactive actions — inherits `--hx-*` tokens from the nearest `hx-theme` ancestor.             |
+| `hx-card`       | Content containers — background and border colors adapt automatically to the active theme.       |
+| `hx-alert`      | Status messages — uses semantic color tokens that respond to theme changes.                      |
+| `hx-text-input` | Form fields — uses `color-scheme` from the active theme to adapt browser-native input rendering. |
 
 ## API Reference
 

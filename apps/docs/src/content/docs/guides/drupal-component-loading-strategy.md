@@ -1527,7 +1527,7 @@ The per-component `libraries.yml` configuration can be partially automated by re
 import { readFileSync, writeFileSync } from 'fs';
 import { resolve } from 'path';
 
-const cem = JSON.parse(readFileSync(resolve('packages/wc-library/custom-elements.json'), 'utf-8'));
+const cem = JSON.parse(readFileSync(resolve('packages/hx-library/custom-elements.json'), 'utf-8'));
 
 const libraries = {};
 

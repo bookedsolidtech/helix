@@ -1,14 +1,292 @@
 ---
 title: 'hx-meter'
-description: 'Visual gauge displaying a measured value within a known range'
+description: A scalar measurement gauge component for displaying a value within a defined range, with optional threshold markers for semantic color feedback.
 ---
 
 import ComponentLoader from '../../../components/ComponentLoader.astro';
+import ComponentDemo from '../../../components/ComponentDemo.astro';
 import ComponentDoc from '../../../components/ComponentDoc.astro';
 
 <ComponentLoader />
 
 <ComponentDoc tagName="hx-meter" section="summary" />
+
+## Overview
+
+`hx-meter` displays a scalar measurement within a known range — disk usage, health scores, oxygen saturation, or any numeric value with defined min/max bounds. It supports `low`, `high`, and `optimum` threshold markers that drive semantic color feedback (optimum / warning / danger), communicating not just the raw value but its qualitative meaning to both sighted users and screen readers.
+
+Use `hx-meter` when you need to show where a value stands within a bounded range and whether it is good, concerning, or critical. For unbounded or indeterminate progress, use `hx-progress-bar` instead.
+
+## Live Demo
+
+<ComponentDemo title="Default">
+  <hx-meter value="60" min="0" max="100" label="Storage usage"></hx-meter>
+</ComponentDemo>
+
+<ComponentDemo title="State: Optimum">
+  <hx-meter
+    value="60"
+    min="0"
+    max="100"
+    low="25"
+    high="75"
+    optimum="50"
+    label="Memory usage (optimal)"
+  ></hx-meter>
+</ComponentDemo>
+
+<ComponentDemo title="State: Warning">
+  <hx-meter
+    value="80"
+    min="0"
+    max="100"
+    low="25"
+    high="75"
+    optimum="50"
+    label="Memory usage (warning)"
+  ></hx-meter>
+</ComponentDemo>
+
+<ComponentDemo title="State: Danger">
+  <hx-meter
+    value="15"
+    min="0"
+    max="100"
+    low="25"
+    high="75"
+    optimum="90"
+    label="Battery level (danger)"
+  ></hx-meter>
+</ComponentDemo>
+
+<ComponentDemo title="Healthcare — Disk Usage">
+  <div style="display: flex; flex-direction: column; gap: 1rem; max-width: 400px;">
+    <hx-meter
+      value="25"
+      min="0"
+      max="100"
+      low="70"
+      high="90"
+      optimum="30"
+      label="System (/): 25 GB used"
+    ></hx-meter>
+    <hx-meter
+      value="78"
+      min="0"
+      max="100"
+      low="70"
+      high="90"
+      optimum="30"
+      label="Data (/data): 78 GB used"
+    ></hx-meter>
+    <hx-meter
+      value="95"
+      min="0"
+      max="100"
+      low="70"
+      high="90"
+      optimum="30"
+      label="Backup (/backup): 95 GB used"
+    ></hx-meter>
+  </div>
+</ComponentDemo>
+
+## Installation
+
+Install the full library or import the component individually:
+
+```bash
+# Full library
+npm install @helix/library
+```
+
+```js
+// Full library import (registers all components)
+import '@helix/library';
+
+// Or import only this component (tree-shaking friendly)
+import '@helix/library/components/hx-meter/index';
+```
+
+## Basic Usage
+
+Minimal HTML snippet — no build tool required:
+
+```html
+<hx-meter value="75" min="0" max="100" label="Storage usage"></hx-meter>
+```
+
+With threshold markers for semantic state feedback:
+
+```html
+<hx-meter
+  value="80"
+  min="0"
+  max="100"
+  low="25"
+  high="75"
+  optimum="50"
+  label="Memory usage"
+></hx-meter>
+```
+
+## Properties
+
+| Property  | Attribute | Type     | Default     | Description                                                                                        |
+| --------- | --------- | -------- | ----------- | -------------------------------------------------------------------------------------------------- |
+| `value`   | `value`   | `number` | `0`         | Current value of the meter. Clamped to `[min, max]`.                                               |
+| `min`     | `min`     | `number` | `0`         | Minimum value of the range.                                                                        |
+| `max`     | `max`     | `number` | `100`       | Maximum value of the range.                                                                        |
+| `low`     | `low`     | `number` | `undefined` | Threshold below which the value is suboptimal (lower-range warning boundary).                      |
+| `high`    | `high`    | `number` | `undefined` | Threshold above which the value is suboptimal (upper-range warning boundary).                      |
+| `optimum` | `optimum` | `number` | `undefined` | The optimal value within the range. Determines which zone is considered "good" for color feedback. |
+| `label`   | `label`   | `string` | `undefined` | Visible label text and accessible name source. Alternatively, use the `label` slot.                |
+
+## Events
+
+`hx-meter` is a read-only display component. It dispatches no custom events.
+
+## CSS Custom Properties
+
+| Property                     | Default                                | Description                                          |
+| ---------------------------- | -------------------------------------- | ---------------------------------------------------- |
+| `--hx-meter-track-height`    | `var(--hx-size-2, 0.5rem)`             | Height of the track bar.                             |
+| `--hx-meter-track-color`     | `var(--hx-color-neutral-200, #e5e7eb)` | Background color of the unfilled track.              |
+| `--hx-meter-track-radius`    | `var(--hx-radius-full, 9999px)`        | Border radius of the track.                          |
+| `--hx-meter-indicator-color` | `var(--hx-color-primary-500, #3b82f6)` | Default filled bar color (no thresholds configured). |
+| `--hx-meter-color-optimum`   | `var(--hx-color-success-500, #22c55e)` | Indicator color when value is in the optimum zone.   |
+| `--hx-meter-color-warning`   | `var(--hx-color-warning-500, #f59e0b)` | Indicator color when value is in a warning zone.     |
+| `--hx-meter-color-danger`    | `var(--hx-color-danger-500, #ef4444)`  | Indicator color when value is in the danger zone.    |
+| `--hx-meter-label-color`     | `var(--hx-color-neutral-700, #374151)` | Label text color.                                    |
+
+## CSS Parts
+
+| Part        | Description                                  |
+| ----------- | -------------------------------------------- |
+| `base`      | The outer wrapper element (`role="meter"`).  |
+| `track`     | The unfilled track bar element.              |
+| `indicator` | The filled bar indicating the current value. |
+| `label`     | The label wrapper element.                   |
+
+## Slots
+
+| Slot    | Description                                                                                                                                        |
+| ------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `label` | Visible label rendered above the meter track. When provided, the component uses `aria-labelledby` so the accessible name matches the visible text. |
+
+Using the label slot:
+
+```html
+<hx-meter value="45" min="0" max="200" label="Disk usage: 45 GB of 200 GB">
+  <span slot="label">Disk usage: <strong>45 GB</strong> of 200 GB</span>
+</hx-meter>
+```
+
+## Accessibility
+
+| Topic         | Details                                                                                                                                                       |
+| ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| ARIA role     | `meter` — applied to the visual track element. A visually-hidden native `<meter>` element is also rendered with `aria-hidden="true"` for browser semantics.   |
+| Keyboard      | `Tab` to reach the meter (`tabindex="0"`). Read-only — no key interactions required.                                                                          |
+| Screen reader | Announces `aria-valuenow`, `aria-valuemin`, `aria-valuemax`, and `aria-valuetext` (e.g. `"75 of 100 — warning"`). Qualitative state is always communicated.   |
+| Focus         | The `[part="base"]` element is focusable via Tab. No focus management on interaction (display-only component).                                                |
+| Label         | Set via `label` attribute (preferred) or `label` slot. Both produce a correct accessible name via `aria-labelledby`.                                          |
+| WCAG          | Meets WCAG 2.1 AA. Implements ARIA 1.2 `meter` role with all required range attributes. Color state is supplemented with `aria-valuetext` — never color-only. |
+
+State announcements via `aria-valuetext`:
+
+| State     | Example announcement    |
+| --------- | ----------------------- |
+| `default` | `"75 of 100"`           |
+| `optimum` | `"75 of 100 — optimum"` |
+| `warning` | `"80 of 100 — warning"` |
+| `danger`  | `"15 of 100 — danger"`  |
+
+## Drupal Integration
+
+Use the component in a Twig template after registering the library:
+
+```twig
+{# my-module/templates/my-template.html.twig #}
+
+<hx-meter
+  value="{{ value }}"
+  min="{{ min }}"
+  max="{{ max }}"
+  low="{{ low }}"
+  high="{{ high }}"
+  optimum="{{ optimum }}"
+  label="{{ label }}"
+></hx-meter>
+```
+
+Load the library in your module's `.libraries.yml`:
+
+```yaml
+helix-components:
+  js:
+    /libraries/helix/helix.min.js: { minified: true }
+```
+
+`hx-meter` is display-only and emits no events, so no Drupal behavior is required for basic usage. To update values dynamically via AJAX, set the `value` attribute directly:
+
+```javascript
+Drupal.behaviors.meterUpdate = {
+  attach(context) {
+    once('meterUpdate', 'hx-meter[data-live]', context).forEach((el) => {
+      // Update value attribute directly — component reactively re-renders
+      el.setAttribute('value', String(newValue));
+    });
+  },
+};
+```
+
+## Standalone HTML Example
+
+Copy-paste this into a `.html` file and open it in a browser — no build tool needed:
+
+```html
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>hx-meter example</title>
+    <script type="module">
+      // @helix/library is a private package — install via npm workspace.
+      // In your project: import '@helix/library/components/hx-meter/index'
+      // in your bundler entry point, then reference the built output here.
+      import '/path/to/dist/components/hx-meter/index.js';
+    </script>
+  </head>
+  <body style="font-family: sans-serif; padding: 2rem; max-width: 480px;">
+    <h2>Default (no thresholds)</h2>
+    <hx-meter value="60" min="0" max="100" label="Storage usage"></hx-meter>
+
+    <h2 style="margin-top: 1.5rem;">With Thresholds</h2>
+    <hx-meter
+      value="80"
+      min="0"
+      max="100"
+      low="25"
+      high="75"
+      optimum="50"
+      label="Memory usage"
+    ></hx-meter>
+
+    <h2 style="margin-top: 1.5rem;">Danger State</h2>
+    <hx-meter
+      value="15"
+      min="0"
+      max="100"
+      low="25"
+      high="75"
+      optimum="90"
+      label="Battery level"
+    ></hx-meter>
+  </body>
+</html>
+```
 
 ## API Reference
 

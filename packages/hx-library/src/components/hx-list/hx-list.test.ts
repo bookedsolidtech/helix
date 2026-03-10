@@ -146,6 +146,7 @@ describe('hx-list', () => {
       const liEl = shadowQuery<HTMLElement>(item, '[part~="base"]')!;
       liEl.click();
       // Use a proper async tick to ensure all microtasks are flushed (not just updateComplete)
+      // Allow microtask queue to flush and Lit reactive updates to complete before asserting no event fired
       await new Promise((resolve) => setTimeout(resolve, 0));
       expect(fired).toBe(false);
     });
@@ -400,6 +401,7 @@ describe('hx-list-item', () => {
       });
       const liEl = shadowQuery<HTMLElement>(el, '[part~="base"]')!;
       liEl.click();
+      // Allow microtask queue to flush and Lit reactive updates to complete before asserting no event fired
       await new Promise((resolve) => setTimeout(resolve, 0));
       expect(fired).toBe(false);
     });
