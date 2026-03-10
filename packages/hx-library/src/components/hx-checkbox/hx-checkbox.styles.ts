@@ -153,7 +153,7 @@ export const helixCheckboxStyles = css`
   }
 
   .checkbox__required-marker {
-    color: var(--hx-checkbox-error-color, var(--hx-color-error-500, #dc3545));
+    color: var(--hx-checkbox-error-color, var(--hx-color-error-text, #b91c1c));
     font-weight: var(--hx-font-weight-bold, 700);
   }
 
@@ -170,7 +170,7 @@ export const helixCheckboxStyles = css`
 
   .checkbox__error {
     font-size: var(--hx-font-size-xs, 0.75rem);
-    color: var(--hx-checkbox-error-color, var(--hx-color-error-500, #dc3545));
+    color: var(--hx-checkbox-error-color, var(--hx-color-error-text, #b91c1c));
     line-height: var(--hx-line-height-normal, 1.5);
     padding-left: calc(
       var(--hx-checkbox-size, var(--hx-size-5, 1.25rem)) + var(--hx-space-2, 0.5rem)
