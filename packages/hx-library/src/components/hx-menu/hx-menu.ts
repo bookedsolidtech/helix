@@ -119,6 +119,7 @@ export class HelixMenu extends LitElement {
     }, 500);
 
     const match = items.findIndex((item) => {
+      if (item.disabled || item.hasAttribute('disabled')) return false;
       const text = item.textContent?.trim().toLowerCase() ?? '';
       return text.startsWith(this._typeaheadBuffer);
     });

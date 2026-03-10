@@ -25,13 +25,13 @@ describe('hx-popover', () => {
       expect(wrapper).toBeTruthy();
     });
 
-    it('renders body with role=dialog', async () => {
+    it('renders body with role=region', async () => {
       const el = await fixture<HelixPopover>(
         '<hx-popover><button slot="anchor">Trigger</button><p>Content</p></hx-popover>',
       );
-      const body = shadowQuery(el, '[role="dialog"]');
+      const body = shadowQuery(el, '[role="region"]');
       expect(body).toBeTruthy();
-      expect(body?.getAttribute('role')).toBe('dialog');
+      expect(body?.getAttribute('role')).toBe('region');
     });
 
     it('body is hidden by default', async () => {
