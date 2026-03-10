@@ -172,15 +172,15 @@ export class HelixTopNav extends LitElement {
             >
               ${this._renderHamburgerIcon()}
             </button>
+          </div>
 
-            <div id="nav-menu" class=${classMap(menuClasses)}>
-              <div part="menu" class="nav__menu">
-                <slot></slot>
-              </div>
+          <div id="nav-menu" class=${classMap(menuClasses)}>
+            <div part="menu" class="nav__menu">
+              <slot></slot>
+            </div>
 
-              <div part="actions" class="nav__actions">
-                <slot name="actions"></slot>
-              </div>
+            <div part="actions" class="nav__actions">
+              <slot name="actions"></slot>
             </div>
           </div>
         </nav>

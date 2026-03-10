@@ -38,7 +38,6 @@ export const helixTopNavStyles = css`
 
   .nav__bar {
     display: flex;
-    flex-wrap: wrap;
     align-items: center;
     min-height: var(--hx-top-nav-height, var(--hx-space-16, 4rem));
     padding-inline: var(--hx-top-nav-padding-x, var(--hx-space-6, 1.5rem));
@@ -123,13 +122,22 @@ export const helixTopNavStyles = css`
   /* NOTE: CSS @media queries do not support custom properties.
      This value corresponds to --hx-breakpoint-md (768px). */
   @media (min-width: 768px) {
-    /* Hide hamburger on desktop */
-    .mobile-toggle {
-      display: none;
+    /* Make nav a flex row so bar and collapsible sit side-by-side */
+    .nav {
+      display: flex;
+      align-items: center;
+      padding-inline: var(--hx-top-nav-padding-x, var(--hx-space-6, 1.5rem));
     }
 
     .nav__bar {
-      flex-wrap: nowrap;
+      flex-shrink: 0;
+      padding-inline: 0;
+      min-height: var(--hx-top-nav-height, var(--hx-space-16, 4rem));
+    }
+
+    /* Hide hamburger on desktop */
+    .mobile-toggle {
+      display: none;
     }
 
     /* Collapsible becomes a standard inline flex row */
@@ -137,7 +145,6 @@ export const helixTopNavStyles = css`
       display: flex;
       flex-direction: row;
       align-items: center;
-      width: auto;
       flex: 1;
       padding-block: 0;
       border-top: none;
