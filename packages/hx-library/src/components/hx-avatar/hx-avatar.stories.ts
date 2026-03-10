@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/web-components';
 import { html } from 'lit';
+import { ifDefined } from 'lit/directives/if-defined.js';
 import { expect } from 'storybook/test';
 import './hx-avatar.js';
 
@@ -23,7 +24,17 @@ const meta = {
     },
     alt: {
       control: 'text',
-      description: 'Accessible label for the image or avatar.',
+      description: 'Accessible label for the image. Required when src is provided.',
+      table: {
+        category: 'Accessibility',
+        defaultValue: { summary: "''" },
+        type: { summary: 'string' },
+      },
+    },
+    label: {
+      control: 'text',
+      description:
+        'Human-readable accessible name for non-image states (initials, fallback icon). In healthcare contexts, provide the full person name (e.g., "Dr. Jane Doe") so screen readers announce a meaningful name rather than raw initials.',
       table: {
         category: 'Accessibility',
         defaultValue: { summary: "''" },
@@ -66,14 +77,17 @@ const meta = {
   args: {
     src: undefined,
     alt: '',
+    label: '',
     initials: '',
     size: 'md',
     shape: 'circle',
   },
+  // P1-6: Use ifDefined so undefined src is omitted from the DOM entirely rather than src="".
   render: (args) => html`
     <hx-avatar
-      src=${args.src ?? ''}
+      src=${ifDefined(args.src)}
       alt=${args.alt}
+      label=${args.label}
       initials=${args.initials}
       hx-size=${args.size}
       shape=${args.shape}
@@ -141,13 +155,14 @@ export const WithImage: Story = {
 
 /**
  * Avatar displaying user initials as the primary identifier when no image src is set.
- * Useful for users without a profile photo, common in enterprise healthcare workflows.
+ * The `label` attribute provides a human-readable name for screen readers ("Dr. John Doe")
+ * instead of announcing raw initials ("J D").
  */
 export const WithInitials: Story = {
   args: {
     src: undefined,
     initials: 'JD',
-    alt: 'John Doe',
+    label: 'Dr. John Doe',
   },
   play: async ({ canvasElement }) => {
     const avatar = canvasElement.querySelector('hx-avatar');
@@ -166,28 +181,30 @@ export const WithInitials: Story = {
 /**
  * All five size variants displayed side-by-side.
  * Sizes range from `xs` (compact list views) to `xl` (profile headers).
+ * Each avatar uses `label` to provide a descriptive accessible name instead of
+ * raw size abbreviations that screen readers pronounce as individual letters.
  */
 export const Sizes: Story = {
   render: () => html`
     <div style="display: flex; align-items: center; gap: 1.5rem; flex-wrap: wrap;">
       <div style="display: flex; flex-direction: column; align-items: center; gap: 0.5rem;">
-        <hx-avatar hx-size="xs" initials="XS"></hx-avatar>
+        <hx-avatar hx-size="xs" initials="XS" label="Extra small"></hx-avatar>
         <span style="font-size: 0.75rem; color: #6b7280;">xs</span>
       </div>
       <div style="display: flex; flex-direction: column; align-items: center; gap: 0.5rem;">
-        <hx-avatar hx-size="sm" initials="SM"></hx-avatar>
+        <hx-avatar hx-size="sm" initials="SM" label="Small"></hx-avatar>
         <span style="font-size: 0.75rem; color: #6b7280;">sm</span>
       </div>
       <div style="display: flex; flex-direction: column; align-items: center; gap: 0.5rem;">
-        <hx-avatar hx-size="md" initials="MD"></hx-avatar>
+        <hx-avatar hx-size="md" initials="MD" label="Medium"></hx-avatar>
         <span style="font-size: 0.75rem; color: #6b7280;">md</span>
       </div>
       <div style="display: flex; flex-direction: column; align-items: center; gap: 0.5rem;">
-        <hx-avatar hx-size="lg" initials="LG"></hx-avatar>
+        <hx-avatar hx-size="lg" initials="LG" label="Large"></hx-avatar>
         <span style="font-size: 0.75rem; color: #6b7280;">lg</span>
       </div>
       <div style="display: flex; flex-direction: column; align-items: center; gap: 0.5rem;">
-        <hx-avatar hx-size="xl" initials="XL"></hx-avatar>
+        <hx-avatar hx-size="xl" initials="XL" label="Extra large"></hx-avatar>
         <span style="font-size: 0.75rem; color: #6b7280;">xl</span>
       </div>
     </div>
@@ -206,11 +223,11 @@ export const Shapes: Story = {
   render: () => html`
     <div style="display: flex; align-items: center; gap: 2rem;">
       <div style="display: flex; flex-direction: column; align-items: center; gap: 0.5rem;">
-        <hx-avatar hx-size="lg" shape="circle" initials="RN"></hx-avatar>
+        <hx-avatar hx-size="lg" shape="circle" initials="RN" label="Registered Nurse"></hx-avatar>
         <span style="font-size: 0.75rem; color: #6b7280;">circle</span>
       </div>
       <div style="display: flex; flex-direction: column; align-items: center; gap: 0.5rem;">
-        <hx-avatar hx-size="lg" shape="square" initials="RN"></hx-avatar>
+        <hx-avatar hx-size="lg" shape="square" initials="RN" label="Registered Nurse"></hx-avatar>
         <span style="font-size: 0.75rem; color: #6b7280;">square</span>
       </div>
     </div>
@@ -223,7 +240,7 @@ export const Shapes: Story = {
 
 /**
  * Avatar with a status indicator slotted into the `badge` slot.
- * The badge is positioned at the bottom-right of the avatar container.
+ * The badge is positioned at the bottom-right of the avatar, outside the overflow clip boundary.
  * Common in healthcare UIs to indicate clinician availability or patient alert status.
  */
 export const WithBadge: Story = {
@@ -233,9 +250,10 @@ export const WithBadge: Story = {
     initials: 'MC',
     size: 'lg',
   },
+  // P1-6: Use ifDefined so undefined src omits the attribute entirely.
   render: (args) => html`
     <hx-avatar
-      src=${args.src ?? ''}
+      src=${ifDefined(args.src)}
       alt=${args.alt}
       initials=${args.initials}
       hx-size=${args.size}
@@ -251,6 +269,7 @@ export const WithBadge: Story = {
           background-color: #22c55e;
           border: 2px solid #ffffff;
         "
+        role="img"
         aria-label="Online"
       ></span>
     </hx-avatar>
@@ -290,11 +309,11 @@ export const FallbackChain: Story = {
         <span style="font-size: 0.75rem; color: #6b7280;">Image loaded</span>
       </div>
       <div style="display: flex; flex-direction: column; align-items: center; gap: 0.5rem;">
-        <hx-avatar hx-size="lg" initials="AB" alt="User with initials"></hx-avatar>
+        <hx-avatar hx-size="lg" initials="AB" label="User with initials"></hx-avatar>
         <span style="font-size: 0.75rem; color: #6b7280;">Initials fallback</span>
       </div>
       <div style="display: flex; flex-direction: column; align-items: center; gap: 0.5rem;">
-        <hx-avatar hx-size="lg" alt="Anonymous user"></hx-avatar>
+        <hx-avatar hx-size="lg" label="Anonymous user"></hx-avatar>
         <span style="font-size: 0.75rem; color: #6b7280;">Icon fallback</span>
       </div>
     </div>
@@ -302,7 +321,47 @@ export const FallbackChain: Story = {
 };
 
 // ════════════════════════════════════════════════════════════════════════════
-// 8. SLOTTED CONTENT
+// 8. BROKEN SRC FALLBACK
+// ════════════════════════════════════════════════════════════════════════════
+
+/**
+ * Demonstrates the image-error recovery path: a broken `src` that cannot load triggers
+ * the fallback chain automatically. If initials are present, initials render; otherwise
+ * the generic icon renders. This is the critical path for healthcare UIs where avatar
+ * images may be unavailable, and the component must degrade gracefully.
+ *
+ * The browser fires an error event on the `<img>`, which sets `_imgError = true` and
+ * re-renders to show the appropriate fallback. If `src` is later updated to a valid URL,
+ * `_imgError` resets and the image renders again without a page reload.
+ */
+export const BrokenSrc: Story = {
+  render: () => html`
+    <div style="display: flex; align-items: center; gap: 2rem; flex-wrap: wrap;">
+      <div style="display: flex; flex-direction: column; align-items: center; gap: 0.5rem;">
+        <hx-avatar
+          hx-size="lg"
+          src="/this-image-does-not-exist.jpg"
+          alt="Dr. Jane Doe"
+          initials="JD"
+          label="Dr. Jane Doe"
+        ></hx-avatar>
+        <span style="font-size: 0.75rem; color: #6b7280;">Broken src → initials</span>
+      </div>
+      <div style="display: flex; flex-direction: column; align-items: center; gap: 0.5rem;">
+        <hx-avatar
+          hx-size="lg"
+          src="/this-image-does-not-exist.jpg"
+          alt="Unknown user"
+          label="Unknown user"
+        ></hx-avatar>
+        <span style="font-size: 0.75rem; color: #6b7280;">Broken src → icon</span>
+      </div>
+    </div>
+  `,
+};
+
+// ════════════════════════════════════════════════════════════════════════════
+// 9. SLOTTED CONTENT
 // ════════════════════════════════════════════════════════════════════════════
 
 /**

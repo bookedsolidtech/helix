@@ -1,0 +1,33 @@
+{
+  "category": "Uncategorized",
+  "description": "Launch readiness audit for hx-button. Using the documentation template, ensure production-ready. Checklist: (1) A11y — axe-core zero violations, proper button role, disabled state, keyboard activation (Enter/Space), WCAG 2.1 AA. (2) Astro doc page — all 12 template sections. (3) Individual export — standalone HTML works. (4) `npm run verify` passes. Known patterns: C-PATTERN-01, C-PATTERN-02. Files: `packages/hx-library/src/components/hx-button/`, `apps/docs/src/content/docs/component-library/hx-button.md`",
+  "title": "LAUNCH READY: hx-button",
+  "status": "backlog",
+  "dependencies": [
+    "feature-1773066138511-g2pgj0rmm"
+  ],
+  "complexity": "medium",
+  "priority": 3,
+  "source": "api",
+  "trustTier": 1,
+  "quarantineStatus": "passed",
+  "quarantineId": "5a0efca5-9ae8-48e5-a5cc-bfd995eb69df",
+  "id": "feature-1773066221570-zp3fwxr4s",
+  "branchName": "feature/launch-ready-hx-button",
+  "descriptionHistory": [
+    {
+      "description": "Launch readiness audit for hx-button. Using the documentation template, ensure production-ready. Checklist: (1) A11y — axe-core zero violations, proper button role, disabled state, keyboard activation (Enter/Space), WCAG 2.1 AA. (2) Astro doc page — all 12 template sections. (3) Individual export — standalone HTML works. (4) `npm run verify` passes. Known patterns: C-PATTERN-01, C-PATTERN-02. Files: `packages/hx-library/src/components/hx-button/`, `apps/docs/src/content/docs/component-library/hx-button.md`",
+      "timestamp": "2026-03-09T14:23:41.571Z",
+      "source": "initial"
+    }
+  ],
+  "createdAt": "2026-03-09T14:23:41.571Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-03-09T14:23:41.571Z",
+      "reason": "Feature created"
+    }
+  ]
+}

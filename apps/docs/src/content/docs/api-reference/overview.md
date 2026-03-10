@@ -7,7 +7,7 @@ The HELIX API reference is auto-generated from the **Custom Elements Manifest** 
 
 ## Custom Elements Manifest
 
-The CEM is generated from JSDoc comments in component source code using the `@custom-elements-manifest/analyzer`. This ensures documentation is always in sync with implementation.
+The CEM is generated from JSDoc comments in component source code using the `@custom-elements-manifest/analyzer`. Documentation stays in sync with implementation automatically — no manual updates required.
 
 ## Reference Format
 
@@ -26,7 +26,7 @@ Each component's API reference includes:
 ## Example Entry
 
 ```
-wc-button
+hx-button
 =========
 
 Properties:
@@ -35,7 +35,7 @@ Properties:
   disabled: boolean                             (default: false)
 
 Events:
-  wc-click: { originalEvent: MouseEvent }
+  hx-click: { originalEvent: MouseEvent }
 
 Slots:
   (default): Button label content
@@ -44,20 +44,25 @@ CSS Parts:
   button: The inner <button> element
 
 CSS Properties:
-  --wc-button-bg: Background color
-  --wc-button-color: Text color
-  --wc-button-border-radius: Border radius
+  --hx-button-bg: Background color
+  --hx-button-color: Text color
+  --hx-button-border-radius: Border radius
 ```
 
 ## Generating the Reference
 
-The API reference will be auto-generated when the component library is implemented in Phase 2. The generation pipeline:
+```bash
+# Regenerate CEM from source JSDoc annotations
+npm run cem
+```
 
-1. Source code JSDoc comments
-2. CEM Analyzer extracts metadata
+The pipeline:
+
+1. Component source code JSDoc comments
+2. CEM Analyzer extracts metadata → `custom-elements.json`
 3. Custom Astro plugin renders reference pages
-4. Storybook ArgsTable uses same CEM data
+4. Storybook ArgsTable uses the same CEM data
 
 ## Component Catalog
 
-For the planned component list and specifications, see [Components Overview](/components/overview/).
+For the complete component list and API documentation, see the [Component Library](/component-library/overview/).

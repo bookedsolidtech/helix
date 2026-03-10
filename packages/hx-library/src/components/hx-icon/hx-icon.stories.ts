@@ -275,16 +275,11 @@ export const InlineSvgMode: Story = {
   },
   render: (args) => html`
     <div style="display: flex; flex-direction: column; gap: 0.75rem;">
-      <hx-icon
-        src=${args.src ?? ''}
-        hx-size=${args.size}
-        label=${args.label}
-      ></hx-icon>
+      <hx-icon src=${args.src ?? ''} hx-size=${args.size} label=${args.label}></hx-icon>
       <p style="font-size: 0.875rem; color: #6b7280; margin: 0;">
-        The <code>src</code> attribute triggers inline fetch mode. The SVG is
-        fetched, sanitised, and embedded directly inside the shadow root.
-        Script elements and event-handler attributes are stripped before
-        rendering.
+        The <code>src</code> attribute triggers inline fetch mode. The SVG is fetched, sanitised,
+        and embedded directly inside the shadow root. Script elements and event-handler attributes
+        are stripped before rendering.
       </p>
     </div>
   `,

@@ -1,4 +1,4 @@
-import { describe, it, expect, afterEach } from 'vitest';
+import { describe, it, expect, afterEach, vi } from 'vitest';
 import { fixture, shadowQuery, cleanup, checkA11y } from '../../test-utils.js';
 import type { HelixField } from './hx-field.js';
 import './index.js';
@@ -115,11 +115,11 @@ describe('hx-field', () => {
       expect(errorDiv?.textContent?.trim()).toBe('This field is required');
     });
 
-    it('error container has role="alert" and aria-live="polite"', async () => {
+    it('error container has role="alert" without conflicting aria-live attribute', async () => {
       const el = await fixture<HelixField>('<hx-field error="Invalid input"></hx-field>');
       const errorDiv = shadowQuery(el, '[role="alert"]');
       expect(errorDiv).toBeTruthy();
-      expect(errorDiv?.getAttribute('aria-live')).toBe('polite');
+      expect(errorDiv?.hasAttribute('aria-live')).toBe(false);
     });
 
     it('field container gets field--error class when error is set', async () => {
@@ -215,6 +215,25 @@ describe('hx-field', () => {
       const el = await fixture<HelixField>('<hx-field hx-size="lg"></hx-field>');
       const field = shadowQuery(el, '[part="field"]');
       expect(field?.classList.contains('field--size-lg')).toBe(true);
+    });
+
+    it('logs a console warning when an invalid hx-size value is set', async () => {
+      const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+      const el = await fixture<HelixField>('<hx-field hx-size="xl"></hx-field>');
+      await el.updateComplete;
+      expect(warnSpy).toHaveBeenCalledWith(
+        expect.stringContaining('[hx-field] Invalid hx-size value: "xl"'),
+      );
+      warnSpy.mockRestore();
+    });
+
+    it('applies no size class when an invalid hx-size value is set', async () => {
+      const el = await fixture<HelixField>('<hx-field hx-size="xl"></hx-field>');
+      await el.updateComplete;
+      const field = shadowQuery(el, '[part="field"]');
+      expect(field?.classList.contains('field--size-sm')).toBe(false);
+      expect(field?.classList.contains('field--size-md')).toBe(false);
+      expect(field?.classList.contains('field--size-lg')).toBe(false);
     });
   });
 
@@ -548,6 +567,15 @@ describe('hx-field', () => {
       expect(input?.hasAttribute('aria-describedby')).toBe(false);
     });
 
+    it('sets aria-invalid="true" on slotted input when error slot has content', async () => {
+      const el = await fixture<HelixField>(
+        '<hx-field><input type="text" /><span slot="error">Slot error</span></hx-field>',
+      );
+      await el.updateComplete;
+      const input = el.querySelector('input');
+      expect(input?.getAttribute('aria-invalid')).toBe('true');
+    });
+
     it('does not set aria attributes on slotted hx-* custom elements', async () => {
       const el = await fixture<HelixField>(
         '<hx-field label="Name" required error="Required"><hx-text-input></hx-text-input></hx-field>',
@@ -557,6 +585,46 @@ describe('hx-field', () => {
       expect(hxInput?.hasAttribute('aria-label')).toBe(false);
       expect(hxInput?.hasAttribute('aria-required')).toBe(false);
       expect(hxInput?.hasAttribute('aria-invalid')).toBe(false);
+    });
+  });
+
+  // ─── ARIA management: native textarea and select (4) ───
+
+  describe('ARIA management: native textarea and select', () => {
+    it('sets aria-label on slotted textarea when label prop is set', async () => {
+      const el = await fixture<HelixField>(
+        '<hx-field label="Clinical Notes"><textarea></textarea></hx-field>',
+      );
+      await el.updateComplete;
+      const textarea = el.querySelector('textarea');
+      expect(textarea?.getAttribute('aria-label')).toBe('Clinical Notes');
+    });
+
+    it('sets aria-invalid on slotted textarea when error is set', async () => {
+      const el = await fixture<HelixField>(
+        '<hx-field error="This field is required"><textarea></textarea></hx-field>',
+      );
+      await el.updateComplete;
+      const textarea = el.querySelector('textarea');
+      expect(textarea?.getAttribute('aria-invalid')).toBe('true');
+    });
+
+    it('sets aria-label on slotted select when label prop is set', async () => {
+      const el = await fixture<HelixField>(
+        '<hx-field label="Department"><select><option>Option A</option></select></hx-field>',
+      );
+      await el.updateComplete;
+      const select = el.querySelector('select');
+      expect(select?.getAttribute('aria-label')).toBe('Department');
+    });
+
+    it('sets aria-required on slotted select when required is set', async () => {
+      const el = await fixture<HelixField>(
+        '<hx-field label="Department" required><select><option>Option A</option></select></hx-field>',
+      );
+      await el.updateComplete;
+      const select = el.querySelector('select');
+      expect(select?.getAttribute('aria-required')).toBe('true');
     });
   });
 

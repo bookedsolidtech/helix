@@ -1,4 +1,4 @@
-import { LitElement, html } from 'lit';
+import { LitElement, html, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { tokenStyles } from '@helix/tokens/lit';
 import { helixTabStyles } from './hx-tab.styles.js';
@@ -16,6 +16,8 @@ import { helixTabStyles } from './hx-tab.styles.js';
  * @slot suffix - Icon or content rendered after the label.
  *
  * @csspart tab - The underlying button element.
+ * @csspart prefix - The container for prefix slot content (e.g. icons).
+ * @csspart suffix - The container for suffix slot content (e.g. badges).
  *
  * @cssprop [--hx-tabs-tab-color=var(--hx-color-neutral-600, #495057)] - Inactive tab text color.
  * @cssprop [--hx-tabs-tab-active-color=var(--hx-color-primary-600, #1d4ed8)] - Active tab text color.
@@ -58,9 +60,19 @@ export class HelixTab extends LitElement {
   @property({ type: Boolean, reflect: true })
   disabled = false;
 
+  /**
+   * The id of the panel this tab controls. Set by the parent `<hx-tabs>` to establish the
+   * aria-controls relationship on the inner button element (which carries role="tab").
+   * @internal
+   */
+  @property({ type: String, attribute: false })
+  controls = '';
+
   // ─── Slot Visibility ───
 
+  /** @internal */
   @state() private _hasPrefixSlot = false;
+  /** @internal */
   @state() private _hasSuffixSlot = false;
 
   // ─── Event Handling ───
@@ -102,7 +114,8 @@ export class HelixTab extends LitElement {
         class="tab"
         role="tab"
         aria-selected=${this.selected ? 'true' : 'false'}
-        ?disabled=${this.disabled}
+        aria-disabled=${this.disabled ? 'true' : 'false'}
+        aria-controls=${this.controls || nothing}
         tabindex=${this.selected ? '0' : '-1'}
         @click=${this._handleClick}
       >

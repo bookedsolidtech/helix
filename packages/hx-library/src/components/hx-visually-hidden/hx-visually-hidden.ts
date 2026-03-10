@@ -1,5 +1,5 @@
 import { LitElement, html } from 'lit';
-import { customElement } from 'lit/decorators.js';
+import { customElement, property } from 'lit/decorators.js';
 import { tokenStyles } from '@helix/tokens/lit';
 import { helixVisuallyHiddenStyles } from './hx-visually-hidden.styles.js';
 
@@ -17,17 +17,32 @@ import { helixVisuallyHiddenStyles } from './hx-visually-hidden.styles.js';
  *
  * @csspart base - The inner wrapper element containing the slotted content.
  *
- * @example
+ * @example Basic usage — accessible label for an icon button
  * ```html
  * <button>
  *   <hx-icon name="close"></hx-icon>
  *   <hx-visually-hidden>Close dialog</hx-visually-hidden>
  * </button>
  * ```
+ *
+ * @example Skip link — becomes visible when focused
+ * ```html
+ * <hx-visually-hidden focusable>
+ *   <a href="#main-content">Skip to main content</a>
+ * </hx-visually-hidden>
+ * ```
  */
 @customElement('hx-visually-hidden')
 export class HelixVisuallyHidden extends LitElement {
   static override styles = [tokenStyles, helixVisuallyHiddenStyles];
+
+  /**
+   * When true, the component becomes visible when a focusable child
+   * (such as a skip link) receives focus. This enables the standard
+   * "skip to content" accessibility pattern.
+   */
+  @property({ type: Boolean, reflect: true })
+  focusable = false;
 
   override render() {
     return html`<span part="base"><slot></slot></span>`;

@@ -8,7 +8,7 @@ export const helixTagStyles = css`
   :host([disabled]) {
     opacity: 0.5;
     pointer-events: none;
-    cursor: not-allowed;
+    /* cursor: not-allowed is intentionally omitted — pointer-events: none prevents cursor display */
   }
 
   .tag {
@@ -80,8 +80,10 @@ export const helixTagStyles = css`
 
   /* ─── Pill Mode ─── */
 
+  /* Uses --hx-tag-border-radius-pill (separate from --hx-tag-border-radius) so consumer
+     overrides to --hx-tag-border-radius don't break pill shape. */
   .tag--pill {
-    border-radius: var(--hx-tag-border-radius, var(--hx-border-radius-full, 9999px));
+    border-radius: var(--hx-tag-border-radius-pill, var(--hx-border-radius-full, 9999px));
   }
 
   /* ─── Prefix / Suffix slots ─── */
@@ -93,6 +95,12 @@ export const helixTagStyles = css`
     flex-shrink: 0;
   }
 
+  /* Hide wrappers when slots have no assigned content */
+  .tag__prefix--hidden,
+  .tag__suffix--hidden {
+    display: none;
+  }
+
   /* ─── Remove Button ─── */
 
   .tag__remove-button {
@@ -101,6 +109,9 @@ export const helixTagStyles = css`
     justify-content: center;
     background: none;
     border: none;
+    /* WCAG 2.5.8 (Level AA): minimum 24×24 CSS pixel touch target */
+    min-width: 24px;
+    min-height: 24px;
     padding: 0;
     margin-inline-start: var(--hx-space-1, 0.25rem);
     cursor: pointer;

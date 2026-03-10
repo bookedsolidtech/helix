@@ -95,19 +95,19 @@ describe('hx-badge', () => {
 
   describe('Property: size', () => {
     it('applies sm class', async () => {
-      const el = await fixture<WcBadge>('<hx-badge hx-size="sm">S</hx-badge>');
+      const el = await fixture<WcBadge>('<hx-badge size="sm">S</hx-badge>');
       const badge = shadowQuery(el, 'span')!;
       expect(badge.classList.contains('badge--sm')).toBe(true);
     });
 
     it('applies md class', async () => {
-      const el = await fixture<WcBadge>('<hx-badge hx-size="md">M</hx-badge>');
+      const el = await fixture<WcBadge>('<hx-badge size="md">M</hx-badge>');
       const badge = shadowQuery(el, 'span')!;
       expect(badge.classList.contains('badge--md')).toBe(true);
     });
 
     it('applies lg class', async () => {
-      const el = await fixture<WcBadge>('<hx-badge hx-size="lg">L</hx-badge>');
+      const el = await fixture<WcBadge>('<hx-badge size="lg">L</hx-badge>');
       const badge = shadowQuery(el, 'span')!;
       expect(badge.classList.contains('badge--lg')).toBe(true);
     });
@@ -315,7 +315,7 @@ describe('hx-badge', () => {
     });
 
     it('updates size class when property changes', async () => {
-      const el = await fixture<WcBadge>('<hx-badge hx-size="sm">S</hx-badge>');
+      const el = await fixture<WcBadge>('<hx-badge size="sm">S</hx-badge>');
       el.size = 'lg';
       await el.updateComplete;
       const badge = shadowQuery(el, 'span')!;
@@ -350,6 +350,154 @@ describe('hx-badge', () => {
         expect(violations, `variant="${variant}" should have no violations`).toEqual([]);
         el.remove();
       }
+    });
+  });
+
+  // ─── Property: count / max (6) ───
+
+  describe('Property: count / max', () => {
+    it('displays count value when count is set', async () => {
+      const el = await fixture<WcBadge>('<hx-badge count="5">ignored</hx-badge>');
+      await el.updateComplete;
+      const badge = shadowQuery(el, 'span')!;
+      expect(badge.textContent?.trim()).toBe('5');
+    });
+
+    it('displays count when count is 0', async () => {
+      const el = await fixture<WcBadge>('<hx-badge count="0"></hx-badge>');
+      await el.updateComplete;
+      const badge = shadowQuery(el, 'span')!;
+      expect(badge.textContent?.trim()).toBe('0');
+    });
+
+    it('truncates count to max+ when count exceeds max', async () => {
+      const el = await fixture<WcBadge>('<hx-badge count="150" max="99"></hx-badge>');
+      await el.updateComplete;
+      const badge = shadowQuery(el, 'span')!;
+      expect(badge.textContent?.trim()).toBe('99+');
+    });
+
+    it('does not truncate when count equals max', async () => {
+      const el = await fixture<WcBadge>('<hx-badge count="99" max="99"></hx-badge>');
+      await el.updateComplete;
+      const badge = shadowQuery(el, 'span')!;
+      expect(badge.textContent?.trim()).toBe('99');
+    });
+
+    it('uses custom max value for truncation', async () => {
+      const el = await fixture<WcBadge>('<hx-badge count="10" max="9"></hx-badge>');
+      await el.updateComplete;
+      const badge = shadowQuery(el, 'span')!;
+      expect(badge.textContent?.trim()).toBe('9+');
+    });
+
+    it('does not render as dot when count is set with pulse', async () => {
+      const el = await fixture<WcBadge>('<hx-badge count="3" pulse></hx-badge>');
+      await el.updateComplete;
+      const badge = shadowQuery(el, 'span')!;
+      expect(badge.classList.contains('badge--dot')).toBe(false);
+    });
+  });
+
+  // ─── Property: dotLabel (3) ───
+
+  describe('Property: dotLabel', () => {
+    it('adds role=img and aria-label to dot indicator when dotLabel is set', async () => {
+      const el = await fixture<WcBadge>('<hx-badge pulse dot-label="New messages"></hx-badge>');
+      await el.updateComplete;
+      const badge = shadowQuery(el, 'span')!;
+      expect(badge.getAttribute('role')).toBe('img');
+      expect(badge.getAttribute('aria-label')).toBe('New messages');
+    });
+
+    it('does not add role or aria-label without dotLabel', async () => {
+      const el = await fixture<WcBadge>('<hx-badge pulse></hx-badge>');
+      await el.updateComplete;
+      const badge = shadowQuery(el, 'span')!;
+      expect(badge.hasAttribute('role')).toBe(false);
+      expect(badge.hasAttribute('aria-label')).toBe(false);
+    });
+
+    it('does not add dot role when dotLabel is set but not in dot mode', async () => {
+      const el = await fixture<WcBadge>('<hx-badge dot-label="test">Content</hx-badge>');
+      await el.updateComplete;
+      const badge = shadowQuery(el, 'span')!;
+      expect(badge.hasAttribute('role')).toBe(false);
+    });
+  });
+
+  // ─── Property: removeLabel (2) ───
+
+  describe('Property: removeLabel', () => {
+    it('uses default "Remove" aria-label on remove button', async () => {
+      const el = await fixture<WcBadge>('<hx-badge removable>Tag</hx-badge>');
+      const btn = shadowQuery(el, '[part="remove-button"]') as HTMLButtonElement;
+      expect(btn.getAttribute('aria-label')).toBe('Remove');
+    });
+
+    it('uses custom removeLabel on remove button', async () => {
+      const el = await fixture<WcBadge>(
+        '<hx-badge removable remove-label="Remove Critical badge">Critical</hx-badge>',
+      );
+      const btn = shadowQuery(el, '[part="remove-button"]') as HTMLButtonElement;
+      expect(btn.getAttribute('aria-label')).toBe('Remove Critical badge');
+    });
+  });
+
+  // ─── Accessibility: aria-live (2) ───
+
+  describe('Accessibility: aria-live', () => {
+    it('adds aria-live=polite to badge span when count is set', async () => {
+      const el = await fixture<WcBadge>('<hx-badge count="3">Alerts</hx-badge>');
+      await el.updateComplete;
+      const badge = shadowQuery(el, 'span')!;
+      expect(badge.getAttribute('aria-live')).toBe('polite');
+    });
+
+    it('does not add aria-live when count is not set', async () => {
+      const el = await fixture<WcBadge>('<hx-badge>Alerts</hx-badge>');
+      const badge = shadowQuery(el, 'span')!;
+      expect(badge.hasAttribute('aria-live')).toBe(false);
+    });
+  });
+
+  // ─── Edge Cases: slot whitespace (2) ───
+
+  describe('Edge Cases: slot whitespace', () => {
+    it('treats whitespace-only slot content as empty for dot mode', async () => {
+      const el = await fixture<WcBadge>('<hx-badge pulse>   </hx-badge>');
+      await el.updateComplete;
+      const badge = shadowQuery(el, 'span')!;
+      expect(badge.classList.contains('badge--dot')).toBe(true);
+    });
+
+    it('treats newline-only slot content as empty for dot mode', async () => {
+      const el = await fixture<WcBadge>('<hx-badge pulse>\n</hx-badge>');
+      await el.updateComplete;
+      const badge = shadowQuery(el, 'span')!;
+      expect(badge.classList.contains('badge--dot')).toBe(true);
+    });
+  });
+
+  // ─── Accessibility: prefers-reduced-motion (1) ───
+
+  describe('Accessibility: prefers-reduced-motion', () => {
+    it('pulse animation CSS rule is defined with prefers-reduced-motion override', async () => {
+      const el = await fixture<WcBadge>('<hx-badge pulse>3 Stat</hx-badge>');
+      await el.updateComplete;
+      // Verify the element has the pulse class (animation class present)
+      const badge = shadowQuery(el, 'span')!;
+      expect(badge.classList.contains('badge--pulse')).toBe(true);
+      // Verify the component stylesheet contains the prefers-reduced-motion media query
+      const sheets = el.shadowRoot?.adoptedStyleSheets ?? [];
+      const cssText = sheets
+        .map((sheet) =>
+          Array.from(sheet.cssRules)
+            .map((r) => r.cssText)
+            .join(' '),
+        )
+        .join(' ');
+      expect(cssText).toContain('prefers-reduced-motion');
     });
   });
 });

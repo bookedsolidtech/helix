@@ -6,6 +6,9 @@ import { live } from 'lit/directives/live.js';
 import { tokenStyles } from '@helix/tokens/lit';
 import { helixCheckboxStyles } from './hx-checkbox.styles.js';
 
+// P2-05: monotonic counter — collision-free, deterministic, SSR-safe
+let _checkboxCounter = 0;
+
 /**
  * A checkbox component with label, validation, and form association.
  *
@@ -20,12 +23,14 @@ import { helixCheckboxStyles } from './hx-checkbox.styles.js';
  * @fires {CustomEvent<{checked: boolean, value: string}>} hx-change - Dispatched when the checkbox is toggled.
  *
  * @csspart checkbox - The visual checkbox element.
+ * @csspart checkmark - The SVG checkmark icon inside the checkbox.
  * @csspart label - The label element.
  * @csspart help-text - The help text container.
  * @csspart error - The error message container.
  * @csspart control - The wrapper around checkbox and label.
  *
  * @cssprop [--hx-checkbox-size=var(--hx-size-5, 1.25rem)] - Checkbox dimensions.
+ * @cssprop [--hx-checkbox-bg=var(--hx-color-neutral-0, #ffffff)] - Unchecked background color.
  * @cssprop [--hx-checkbox-border-color=var(--hx-color-neutral-300, #ced4da)] - Checkbox border color.
  * @cssprop [--hx-checkbox-border-radius=var(--hx-border-radius-sm, 0.25rem)] - Checkbox border radius.
  * @cssprop [--hx-checkbox-checked-bg=var(--hx-color-primary-500, #2563EB)] - Checked background color.
@@ -33,11 +38,22 @@ import { helixCheckboxStyles } from './hx-checkbox.styles.js';
  * @cssprop [--hx-checkbox-checkmark-color=var(--hx-color-neutral-0, #ffffff)] - Checkmark color.
  * @cssprop [--hx-checkbox-focus-ring-color=var(--hx-focus-ring-color, #2563EB)] - Focus ring color.
  * @cssprop [--hx-checkbox-label-color=var(--hx-color-neutral-700, #343a40)] - Label text color.
+ * @cssprop [--hx-checkbox-help-text-color=var(--hx-color-neutral-500, #6c757d)] - Help text color.
  * @cssprop [--hx-checkbox-error-color=var(--hx-color-error-500, #dc3545)] - Error state color.
  */
 @customElement('hx-checkbox')
 export class HelixCheckbox extends LitElement {
   static override styles = [tokenStyles, helixCheckboxStyles];
+
+  // P0-02: observe aria-label on host to forward to inner input
+  static override get observedAttributes(): string[] {
+    return [...(super.observedAttributes ?? []), 'aria-label'];
+  }
+
+  override attributeChangedCallback(name: string, old: string | null, next: string | null): void {
+    super.attributeChangedCallback(name, old, next);
+    if (name === 'aria-label') this.requestUpdate();
+  }
 
   // ─── Form Association ───
 
@@ -63,7 +79,7 @@ export class HelixCheckbox extends LitElement {
    * Whether the checkbox is in an indeterminate state (e.g., for "select all" patterns).
    * @attr indeterminate
    */
-  @property({ type: Boolean })
+  @property({ type: Boolean, reflect: true })
   indeterminate = false;
 
   /**
@@ -120,7 +136,7 @@ export class HelixCheckbox extends LitElement {
    * @attr hx-size
    */
   @property({ type: String, attribute: 'hx-size', reflect: true })
-  hxSize: 'sm' | 'md' | 'lg' = 'md';
+  size: 'sm' | 'md' | 'lg' = 'md';
 
   @query('.checkbox__input')
   private _inputEl!: HTMLInputElement;
@@ -194,8 +210,8 @@ export class HelixCheckbox extends LitElement {
   }
 
   /** Called when the form restores state (e.g., back/forward navigation). */
-  formStateRestoreCallback(state: string): void {
-    this.checked = state === this.value;
+  formStateRestoreCallback(state: string | File | FormData | null, _reason: string): void {
+    this.checked = typeof state === 'string' && state === this.value;
   }
 
   // ─── Event Handling ───
@@ -239,7 +255,8 @@ export class HelixCheckbox extends LitElement {
 
   // ─── Render ───
 
-  private _id = `hx-checkbox-${Math.random().toString(36).slice(2, 9)}`;
+  // P2-05: monotonic counter — collision-free and deterministic
+  private _id = `hx-checkbox-${++_checkboxCounter}`;
   private _helpTextId = `${this._id}-help`;
   private _errorId = `${this._id}-error`;
   private _labelId = `${this._id}-label`;
@@ -254,18 +271,19 @@ export class HelixCheckbox extends LitElement {
       'checkbox--error': hasError,
       'checkbox--disabled': this.disabled,
       'checkbox--required': this.required,
-      'checkbox--sm': this.hxSize === 'sm',
-      'checkbox--md': this.hxSize === 'md',
-      'checkbox--lg': this.hxSize === 'lg',
+      'checkbox--sm': this.size === 'sm',
+      'checkbox--md': this.size === 'md',
+      'checkbox--lg': this.size === 'lg',
     };
 
+    // P2-06: simplified — hasError already includes _hasErrorSlot
     const describedBy =
-      [
-        hasError || this._hasErrorSlot ? this._errorId : null,
-        this.helpText && !hasError ? this._helpTextId : null,
-      ]
+      [hasError ? this._errorId : null, this.helpText && !hasError ? this._helpTextId : null]
         .filter(Boolean)
         .join(' ') || undefined;
+
+    // P0-02: forward aria-label from host to inner input
+    const hostAriaLabel = this.getAttribute('aria-label') ?? undefined;
 
     return html`
       <div class=${classMap(containerClasses)}>
@@ -280,17 +298,22 @@ export class HelixCheckbox extends LitElement {
             ?required=${this.required}
             name=${ifDefined(this.name || undefined)}
             .value=${this.value}
+            aria-checked=${this.indeterminate ? 'mixed' : nothing}
             aria-invalid=${hasError ? 'true' : nothing}
             aria-describedby=${ifDefined(describedBy)}
-            aria-labelledby=${this._labelId}
-            tabindex="0"
+            aria-label=${ifDefined(hostAriaLabel)}
+            aria-labelledby=${ifDefined(!hostAriaLabel ? this._labelId : undefined)}
             @keydown=${this._handleKeyDown}
-            @click=${(e: Event) => e.preventDefault()}
+            @click=${(e: Event) => {
+              e.preventDefault();
+              e.stopPropagation();
+            }}
             @change=${(e: Event) => e.stopPropagation()}
           />
 
           <span part="checkbox" class="checkbox__box">
             <svg
+              part="checkmark"
               class="checkbox__icon checkbox__icon--check"
               viewBox="0 0 16 16"
               aria-hidden="true"
@@ -314,19 +337,21 @@ export class HelixCheckbox extends LitElement {
           </span>
         </label>
 
-        <slot name="error" @slotchange=${this._handleErrorSlotChange}>
-          ${hasError
-            ? html`<div
-                part="error"
-                class="checkbox__error"
-                id=${this._errorId}
-                role="alert"
-                aria-live="polite"
-              >
-                ${this.error}
-              </div>`
-            : nothing}
-        </slot>
+        <!--
+          P0-01: wrapper div always owns _errorId so aria-describedby works regardless
+          of whether error content comes from the .error property or the named slot.
+          P1-02: role="status" (implicit aria-live="polite") replaces role="alert" +
+          aria-live="polite" which was semantically contradictory.
+        -->
+        <div
+          part="error"
+          class="checkbox__error"
+          id=${this._errorId}
+          role="status"
+          ?hidden=${!hasError}
+        >
+          <slot name="error" @slotchange=${this._handleErrorSlotChange}> ${this.error} </slot>
+        </div>
 
         ${this.helpText && !hasError
           ? html`

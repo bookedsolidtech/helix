@@ -135,7 +135,7 @@ npx changeset add
 
 The CLI walks you through:
 
-1. **Select packages to release** — Select `@wc-2026/library` (and any other affected packages)
+1. **Select packages to release** — Select `@helix/library` (and any other affected packages)
 2. **Select bump type** — `major`, `minor`, or `patch`
 3. **Write a summary** — This becomes the changelog entry (see writing guidelines below)
 
@@ -143,7 +143,7 @@ The command creates a file like `.changeset/purple-dolphins-jump.md`:
 
 ```markdown
 ---
-'@wc-2026/library': minor
+'@helix/library': minor
 ---
 
 Add `icon` slot to `hx-button` for optional leading icon support.

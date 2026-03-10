@@ -1,0 +1,40 @@
+{#
+  hx-steps — Multi-step progress indicator
+  =========================================
+
+  Properties managed by <hx-steps> (set on the container, NOT on individual <hx-step> children):
+    - orientation: 'horizontal' | 'vertical'  (default: 'horizontal')
+    - size:        'sm' | 'md' | 'lg'          (default: 'md')
+
+  Properties set on each <hx-step>:
+    - label:       Step label text (required)
+    - status:      'pending' | 'active' | 'complete' | 'error'  (required)
+    - description: Optional description text shown below the label
+    - disabled:    Boolean — marks step as non-interactive
+
+  Do NOT set `orientation`, `size`, or `index` directly on <hx-step>.
+  These are managed by the parent <hx-steps> container and will be overridden.
+
+  Accessibility:
+    - Always provide an aria-label on <hx-steps> describing the step process.
+    - Example: aria-label="Checkout progress"
+#}
+
+<hx-steps
+  orientation="{{ orientation|default('horizontal') }}"
+  size="{{ size|default('md') }}"
+  aria-label="{{ aria_label|default('Progress steps') }}"
+>
+  {% for step in steps %}
+    <hx-step
+      label="{{ step.label }}"
+      status="{{ step.status|default('pending') }}"
+      {% if step.description is defined and step.description %}
+        description="{{ step.description }}"
+      {% endif %}
+      {% if step.disabled is defined and step.disabled %}
+        disabled
+      {% endif %}
+    ></hx-step>
+  {% endfor %}
+</hx-steps>

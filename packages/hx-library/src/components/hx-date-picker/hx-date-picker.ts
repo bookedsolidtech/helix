@@ -2,7 +2,6 @@ import { LitElement, html, nothing } from 'lit';
 import { customElement, property, state, query } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
-import { live } from 'lit/directives/live.js';
 import { tokenStyles } from '@helix/tokens/lit';
 import { helixDatePickerStyles } from './hx-date-picker.styles.js';
 
@@ -46,7 +45,11 @@ import { helixDatePickerStyles } from './hx-date-picker.styles.js';
  * @cssprop [--hx-date-picker-selected-bg=var(--hx-color-primary-500)] - Selected day background.
  * @cssprop [--hx-date-picker-selected-color=var(--hx-color-neutral-0)] - Selected day text color.
  * @cssprop [--hx-date-picker-today-color=var(--hx-color-primary-600)] - Today indicator color.
+ * @cssprop [--hx-date-picker-calendar-shadow=0 4px 6px -1px rgba(0,0,0,0.1),0 2px 4px -2px rgba(0,0,0,0.1)] - Calendar popup box shadow.
  */
+
+let _instanceCounter = 0;
+
 @customElement('hx-date-picker')
 export class HelixDatePicker extends LitElement {
   static override styles = [tokenStyles, helixDatePickerStyles];
@@ -162,7 +165,7 @@ export class HelixDatePicker extends LitElement {
 
   // ─── Unique IDs ───
 
-  private _id = `hx-date-picker-${Math.random().toString(36).slice(2, 9)}`;
+  private _id = `hx-date-picker-${++_instanceCounter}`;
   private _inputId = `${this._id}-input`;
   private _helpTextId = `${this._id}-help`;
   private _errorId = `${this._id}-error`;
@@ -793,10 +796,9 @@ export class HelixDatePicker extends LitElement {
             id=${this._inputId}
             type="text"
             readonly
-            .value=${live(displayValue)}
+            .value=${displayValue}
             placeholder=${ifDefined(this.format || undefined)}
             ?disabled=${this.disabled}
-            name=${ifDefined(this.name || undefined)}
             aria-labelledby=${ifDefined(
               this._hasLabelSlot ? `${this._inputId}-slotted-label` : undefined,
             )}

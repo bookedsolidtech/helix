@@ -538,11 +538,13 @@ describe('hx-tabs', () => {
       expect(btn?.getAttribute('aria-selected')).toBe('false');
     });
 
-    it('tab has aria-controls referencing its panel id', async () => {
+    it('tab button has aria-controls referencing its panel id', async () => {
       const el = await fixture<HelixTabs>(DEFAULT_TABS_HTML);
       const tabs = Array.from(el.querySelectorAll('hx-tab')) as HelixTab[];
       const panels = Array.from(el.querySelectorAll('hx-tab-panel')) as HelixTabPanel[];
-      const controlsAttr = tabs[0].getAttribute('aria-controls');
+      // aria-controls belongs on the button (role="tab"), not the host element
+      const btn = shadowQuery<HTMLButtonElement>(tabs[0], 'button');
+      const controlsAttr = btn?.getAttribute('aria-controls');
       expect(controlsAttr).toBeTruthy();
       expect(controlsAttr).toBe(panels[0].id);
     });
@@ -652,6 +654,7 @@ describe('hx-tabs', () => {
       el.appendChild(newPanel);
       // Wait for slot change to propagate
       await el.updateComplete;
+      // Yield to event loop to allow slotchange/DOM mutation callbacks to run after tab insertion
       await new Promise((r) => setTimeout(r, 0));
       await el.updateComplete;
       const tabs = Array.from(el.querySelectorAll('hx-tab')) as HelixTab[];
@@ -670,6 +673,7 @@ describe('hx-tabs', () => {
       el.appendChild(newTab);
       el.appendChild(newPanel);
       await el.updateComplete;
+      // Yield to event loop to allow slotchange/DOM mutation callbacks to run after tab insertion
       await new Promise((r) => setTimeout(r, 0));
       await el.updateComplete;
       const tabs = Array.from(el.querySelectorAll('hx-tab')) as HelixTab[];
@@ -685,6 +689,7 @@ describe('hx-tabs', () => {
       const tabs = Array.from(el.querySelectorAll('hx-tab')) as HelixTab[];
       el.removeChild(tabs[2]);
       await el.updateComplete;
+      // Yield to event loop to allow slotchange/DOM mutation callbacks to run after tab removal
       await new Promise((r) => setTimeout(r, 0));
       await el.updateComplete;
       const remainingTabs = Array.from(el.querySelectorAll('hx-tab')) as HelixTab[];

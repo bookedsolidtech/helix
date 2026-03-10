@@ -1,4 +1,4 @@
-import { LitElement, html } from 'lit';
+import { LitElement, html, nothing, type PropertyValues } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { tokenStyles } from '@helix/tokens/lit';
 import { helixSplitPanelStyles } from './hx-split-panel.styles.js';
@@ -22,6 +22,24 @@ import { helixSplitPanelStyles } from './hx-split-panel.styles.js';
  * @cssprop [--hx-split-panel-divider-size=4px] - Width (horizontal) or height (vertical) of the divider.
  * @cssprop [--hx-split-panel-divider-color=var(--hx-color-neutral-200)] - Default divider color.
  * @cssprop [--hx-split-panel-divider-hover-color=var(--hx-color-primary-500)] - Divider color on hover/focus.
+ *
+ * @example Drupal Twig usage:
+ * ```twig
+ * <hx-split-panel
+ *   position="50"
+ *   orientation="horizontal"
+ *   min="10"
+ *   max="90"
+ *   collapsible
+ * >
+ *   <div slot="start">{{ start_content }}</div>
+ *   <div slot="end">{{ end_content }}</div>
+ * </hx-split-panel>
+ *
+ * Attribute-settable: position, position-in-pixels, orientation, disabled, min, max, collapsible, collapsed
+ * JS-only (complex types): snap (use .snap=${[25, 50, 75]} in Lit templates,
+ *   or snap="[25,50,75]" as JSON string in Twig)
+ * ```
  */
 @customElement('hx-split-panel')
 export class HelixSplitPanel extends LitElement {
@@ -50,11 +68,46 @@ export class HelixSplitPanel extends LitElement {
   orientation: 'horizontal' | 'vertical' = 'horizontal';
 
   /**
+   * Minimum position as a percentage (0–100). Prevents full collapse of start panel.
+   * @attr min
+   */
+  @property({ type: Number, reflect: true })
+  min = 0;
+
+  /**
+   * Maximum position as a percentage (0–100). Prevents full expansion of start panel.
+   * @attr max
+   */
+  @property({ type: Number, reflect: true })
+  max = 100;
+
+  /**
    * Snap points as an array of percentages. The divider snaps to the
    * nearest point within a 5% threshold.
+   * Accepts JSON array string in HTML: snap="[25, 50, 75]"
    * @attr snap
    */
-  @property({ type: Array })
+  @property({
+    attribute: 'snap',
+    converter: {
+      fromAttribute(value: string | null): number[] {
+        if (!value) return [];
+        try {
+          const parsed = JSON.parse(value) as unknown;
+          if (Array.isArray(parsed)) return (parsed as unknown[]).map(Number);
+          return [];
+        } catch {
+          return value
+            .split(',')
+            .map((s) => Number(s.trim()))
+            .filter((n) => !isNaN(n));
+        }
+      },
+      toAttribute(value: number[]): string {
+        return JSON.stringify(value);
+      },
+    },
+  })
   snap: number[] = [];
 
   /**
@@ -64,16 +117,27 @@ export class HelixSplitPanel extends LitElement {
   @property({ type: Boolean, reflect: true })
   disabled = false;
 
-  // Minimum panel size as a percentage to prevent full collapse
-  private readonly _minPercent = 0;
-  private readonly _maxPercent = 100;
+  /**
+   * When true, collapse/expand buttons appear on the divider.
+   * @attr collapsible
+   */
+  @property({ type: Boolean, reflect: true })
+  collapsible = false;
+
+  /**
+   * Which panel is collapsed: 'start', 'end', or null (not collapsed).
+   * @attr collapsed
+   */
+  @property({ type: String, reflect: true })
+  collapsed: 'start' | 'end' | null = null;
 
   private _dragging = false;
   private _dragStart = 0;
   private _positionAtDragStart = 0;
+  private _positionBeforeCollapse = 50;
 
   private _clamp(value: number): number {
-    return Math.min(this._maxPercent, Math.max(this._minPercent, value));
+    return Math.min(this.max, Math.max(this.min, value));
   }
 
   private _snapToPoint(value: number): number {
@@ -142,16 +206,55 @@ export class HelixSplitPanel extends LitElement {
         e.preventDefault();
         this._setPosition(this.position + 1);
         break;
+      case 'PageUp':
+        e.preventDefault();
+        this._setPosition(this.position + 10);
+        break;
+      case 'PageDown':
+        e.preventDefault();
+        this._setPosition(this.position - 10);
+        break;
       case 'Home':
         e.preventDefault();
-        this._setPosition(this._minPercent);
+        this._setPosition(this.min);
         break;
       case 'End':
         e.preventDefault();
-        this._setPosition(this._maxPercent);
+        this._setPosition(this.max);
         break;
     }
   };
+
+  private _collapseStart = (): void => {
+    this.collapsed = 'start';
+  };
+
+  private _collapseEnd = (): void => {
+    this.collapsed = 'end';
+  };
+
+  private _expand = (): void => {
+    this.collapsed = null;
+  };
+
+  override updated(changedProperties: PropertyValues): void {
+    super.updated(changedProperties);
+    if (!changedProperties.has('collapsed')) return;
+
+    const prev = changedProperties.get('collapsed');
+
+    if (this.collapsed === 'start') {
+      // Save restore point when transitioning from non-collapsed state (or initial render)
+      if (prev === null || prev === undefined) this._positionBeforeCollapse = this.position;
+      this._setPosition(this.min);
+    } else if (this.collapsed === 'end') {
+      if (prev === null || prev === undefined) this._positionBeforeCollapse = this.position;
+      this._setPosition(this.max);
+    } else if (this.collapsed === null && prev !== null && prev !== undefined) {
+      // Only expand when transitioning from an explicitly collapsed state (not first render)
+      this._setPosition(this._positionBeforeCollapse);
+    }
+  }
 
   override connectedCallback(): void {
     super.connectedCallback();
@@ -161,7 +264,7 @@ export class HelixSplitPanel extends LitElement {
         if (this.positionInPixels !== undefined) {
           const hostSize = this._getHostSize();
           if (hostSize > 0) {
-            this.position = this._clamp((this.positionInPixels / hostSize) * 100);
+            this._setPosition((this.positionInPixels / hostSize) * 100);
           }
         }
       });
@@ -180,21 +283,55 @@ export class HelixSplitPanel extends LitElement {
       <div part="start" class="panel panel--start" style=${this._startPanelStyle()}>
         <slot name="start"></slot>
       </div>
-      <div
-        part="divider"
-        class="divider"
-        role="separator"
-        aria-orientation=${this.orientation === 'horizontal' ? 'vertical' : 'horizontal'}
-        aria-valuenow=${this.position}
-        aria-valuemin="0"
-        aria-valuemax="100"
-        aria-disabled=${this.disabled ? 'true' : 'false'}
-        tabindex=${this.disabled ? '-1' : '0'}
-        @pointerdown=${this._onPointerDown}
-        @pointermove=${this._onPointerMove}
-        @pointerup=${this._onPointerUp}
-        @keydown=${this._onKeyDown}
-      ></div>
+      <div class="divider-track">
+        <div
+          part="divider"
+          class="divider"
+          role="separator"
+          aria-label="Resize panels"
+          aria-orientation=${this.orientation === 'horizontal' ? 'vertical' : 'horizontal'}
+          aria-valuenow=${this.position}
+          aria-valuemin=${this.min}
+          aria-valuemax=${this.max}
+          aria-disabled=${this.disabled ? 'true' : nothing}
+          tabindex=${this.disabled ? '-1' : '0'}
+          @pointerdown=${this._onPointerDown}
+          @pointermove=${this._onPointerMove}
+          @pointerup=${this._onPointerUp}
+          @keydown=${this._onKeyDown}
+        ></div>
+        ${this.collapsible
+          ? this.collapsed
+            ? html`<div class="collapse-controls">
+                <button
+                  type="button"
+                  class="collapse-btn"
+                  aria-label=${`Expand ${this.collapsed} panel`}
+                  @click=${this._expand}
+                >
+                  ${this.collapsed === 'start' ? '▶' : '◀'}
+                </button>
+              </div>`
+            : html`<div class="collapse-controls">
+                <button
+                  type="button"
+                  class="collapse-btn"
+                  aria-label="Collapse start panel"
+                  @click=${this._collapseStart}
+                >
+                  ◀
+                </button>
+                <button
+                  type="button"
+                  class="collapse-btn"
+                  aria-label="Collapse end panel"
+                  @click=${this._collapseEnd}
+                >
+                  ▶
+                </button>
+              </div>`
+          : nothing}
+      </div>
       <div part="end" class="panel panel--end">
         <slot name="end"></slot>
       </div>

@@ -1,0 +1,92 @@
+{#
+/**
+ * hx-breadcrumb — Drupal Twig integration template
+ *
+ * Renders the hx-breadcrumb web component from Drupal's breadcrumb render array.
+ *
+ * USAGE
+ * -----
+ * Override this template in your theme or module by copying it to:
+ *   templates/navigation/hx-breadcrumb.html.twig
+ *
+ * Pass the breadcrumb links from a BreadcrumbBuilderInterface implementation:
+ *
+ *   $breadcrumb = \Drupal::service('breadcrumb')
+ *     ->build(\Drupal::routeMatch())
+ *     ->getLinks();
+ *
+ * VARIABLES
+ * ---------
+ * @var links       array  Array of Drupal\Core\Link objects or plain arrays with
+ *                         'text' and 'url' keys. The last item is the current page.
+ * @var label       string Accessible aria-label for the nav landmark. Default: 'Breadcrumb'.
+ * @var separator   string Separator character. Default: '/'.
+ * @var max_items   int    Maximum visible items (0 = show all). Default: 0.
+ * @var current_key string|int Key of the item to mark as current. If omitted, the last
+ *                         item is used (default behaviour). Use this when the current-page
+ *                         item is NOT the last in the array (e.g. when Drupal appends extra
+ *                         items after the current page in a custom breadcrumb builder).
+ *
+ * DRUPAL HEAD MANAGEMENT NOTE
+ * ---------------------------
+ * Do NOT set json-ld="true" on the hx-breadcrumb element in Drupal templates.
+ * The component's json-ld feature injects a <script> tag via document.head.appendChild(),
+ * which:
+ *   1. Bypasses Drupal's deduplication and hook_html_head_alter().
+ *   2. Is NOT cacheable by Drupal's page cache.
+ *   3. Will be wiped on BigPipe partial page replacements.
+ *
+ * Instead, use Drupal's structured data API (e.g. schema_metatag module) or add
+ * the JSON-LD block via hook_page_attachments() for proper head management.
+ *
+ * SERVER-SIDE ARIA NOTE
+ * ---------------------
+ * The component marks the current-page item (aria-current="page") only after
+ * JavaScript initialises. If your Drupal setup serves pages without JS (e.g. for
+ * crawlers or progressive enhancement), set the `current` attribute explicitly on
+ * the appropriate item in this template so screen readers see it even before JS.
+ * This template already does this by default via the `current_key` logic below.
+ */
+#}
+
+{% set label = label|default('Breadcrumb') %}
+{% set separator = separator|default('/') %}
+{% set max_items = max_items|default(0) %}
+
+{% if links|length %}
+  <hx-breadcrumb
+    label="{{ label|e('html_attr') }}"
+    separator="{{ separator|e('html_attr') }}"
+    {% if max_items > 0 %}max-items="{{ max_items }}"{% endif %}
+  >
+    {% for key, link in links %}
+      {#
+        Determine if this item is the current page.
+        Priority: explicit current_key > last item (default).
+      #}
+      {% if current_key is defined %}
+        {% set is_current = (key == current_key) %}
+      {% else %}
+        {% set is_current = loop.last %}
+      {% endif %}
+
+      {#
+        Resolve href. Supports both Drupal\Core\Link objects and plain arrays.
+        The current-page item never gets an href — it must not be a navigable link
+        per WAI-ARIA APG breadcrumb guidance (SC 2.4.4 Link Purpose).
+      #}
+      {% if link.url is defined %}
+        {% set href = is_current ? null : link.url.toString() %}
+        {% set text = link.text %}
+      {% else %}
+        {% set href = is_current ? null : link.url %}
+        {% set text = link.text %}
+      {% endif %}
+
+      <hx-breadcrumb-item
+        {% if href %}href="{{ href|e('html_attr') }}"{% endif %}
+        {% if is_current %}current{% endif %}
+      >{{ text }}</hx-breadcrumb-item>
+    {% endfor %}
+  </hx-breadcrumb>
+{% endif %}

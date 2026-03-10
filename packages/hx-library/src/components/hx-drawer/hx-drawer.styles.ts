@@ -1,6 +1,11 @@
 import { css } from 'lit';
 
 export const helixDrawerStyles = css`
+  /* P2-03: Explicit [hidden] rule to survive CSS resets that may override the UA stylesheet. */
+  [hidden] {
+    display: none !important;
+  }
+
   :host {
     display: contents;
   }

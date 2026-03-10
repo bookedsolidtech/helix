@@ -1,0 +1,33 @@
+{
+  "category": "Uncategorized",
+  "description": "Launch readiness audit for hx-button-group. Using the documentation template, ensure production-ready. Checklist: (1) A11y — axe-core zero violations, proper group role, WCAG 2.1 AA. (2) Astro doc page — all 12 template sections. (3) Individual export — standalone HTML works. (4) `npm run verify` passes. Files: `packages/hx-library/src/components/hx-button-group/`, `apps/docs/src/content/docs/component-library/hx-button-group.md`",
+  "title": "LAUNCH READY: hx-button-group",
+  "status": "backlog",
+  "dependencies": [
+    "feature-1773066138511-g2pgj0rmm"
+  ],
+  "complexity": "medium",
+  "priority": 3,
+  "source": "api",
+  "trustTier": 1,
+  "quarantineStatus": "passed",
+  "quarantineId": "c36eff51-e1a7-4d12-b242-3e6d90423c71",
+  "id": "feature-1773066223359-vmsipfnem",
+  "branchName": "feature/launch-ready-hx-button-group",
+  "descriptionHistory": [
+    {
+      "description": "Launch readiness audit for hx-button-group. Using the documentation template, ensure production-ready. Checklist: (1) A11y — axe-core zero violations, proper group role, WCAG 2.1 AA. (2) Astro doc page — all 12 template sections. (3) Individual export — standalone HTML works. (4) `npm run verify` passes. Files: `packages/hx-library/src/components/hx-button-group/`, `apps/docs/src/content/docs/component-library/hx-button-group.md`",
+      "timestamp": "2026-03-09T14:23:43.359Z",
+      "source": "initial"
+    }
+  ],
+  "createdAt": "2026-03-09T14:23:43.359Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-03-09T14:23:43.359Z",
+      "reason": "Feature created"
+    }
+  ]
+}

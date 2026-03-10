@@ -1,0 +1,33 @@
+{
+  "category": "Uncategorized",
+  "description": "Launch readiness audit for hx-tooltip. Checklist: (1) A11y — axe-core zero violations, tooltip role, Escape to dismiss, hover+focus trigger, WCAG 2.1 AA (1.4.13 Content on Hover or Focus). (2) Astro doc page — all 12 template sections. (3) Individual export — standalone HTML works. (4) `npm run verify` passes. Files: `packages/hx-library/src/components/hx-tooltip/`, `apps/docs/src/content/docs/component-library/hx-tooltip.md`",
+  "title": "LAUNCH READY: hx-tooltip",
+  "status": "backlog",
+  "dependencies": [
+    "feature-1773066138511-g2pgj0rmm"
+  ],
+  "complexity": "medium",
+  "priority": 3,
+  "source": "api",
+  "trustTier": 1,
+  "quarantineStatus": "passed",
+  "quarantineId": "e7f70160-8efa-4be9-b4ab-2a2633928736",
+  "id": "feature-1773066428129-6slsjrrwt",
+  "branchName": "feature/launch-ready-hx-tooltip",
+  "descriptionHistory": [
+    {
+      "description": "Launch readiness audit for hx-tooltip. Checklist: (1) A11y — axe-core zero violations, tooltip role, Escape to dismiss, hover+focus trigger, WCAG 2.1 AA (1.4.13 Content on Hover or Focus). (2) Astro doc page — all 12 template sections. (3) Individual export — standalone HTML works. (4) `npm run verify` passes. Files: `packages/hx-library/src/components/hx-tooltip/`, `apps/docs/src/content/docs/component-library/hx-tooltip.md`",
+      "timestamp": "2026-03-09T14:27:08.129Z",
+      "source": "initial"
+    }
+  ],
+  "createdAt": "2026-03-09T14:27:08.129Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-03-09T14:27:08.129Z",
+      "reason": "Feature created"
+    }
+  ]
+}

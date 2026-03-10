@@ -19,8 +19,8 @@ import { helixBadgeStyles } from './hx-badge.styles.js';
  * @csspart badge - The badge element.
  * @csspart remove-button - The remove/dismiss button.
  *
- * @cssprop [--hx-badge-bg=var(--hx-color-primary-500)] - Badge background color.
- * @cssprop [--hx-badge-color=var(--hx-color-neutral-0)] - Badge text color.
+ * @cssprop [--hx-badge-bg=var(--hx-color-primary-500)] - Badge background color. The primary override point.
+ * @cssprop [--hx-badge-color=var(--hx-color-neutral-0)] - Badge text color. The primary override point.
  * @cssprop [--hx-badge-font-size] - Badge font size (set per size variant).
  * @cssprop [--hx-badge-font-weight=var(--hx-font-weight-semibold)] - Badge font weight.
  * @cssprop [--hx-badge-font-family=var(--hx-font-family-sans)] - Badge font family.
@@ -48,9 +48,9 @@ export class HelixBadge extends LitElement {
 
   /**
    * Size of the badge.
-   * @attr hx-size
+   * @attr size
    */
-  @property({ type: String, reflect: true, attribute: 'hx-size' })
+  @property({ type: String, reflect: true })
   size: 'sm' | 'md' | 'lg' = 'md';
 
   /**
@@ -73,6 +73,38 @@ export class HelixBadge extends LitElement {
    */
   @property({ type: Boolean, reflect: true })
   removable = false;
+
+  /**
+   * Numeric count to display. When set, renders the count as badge content.
+   * When count exceeds `max`, displays `${max}+` (e.g. `99+`).
+   * @attr count
+   */
+  @property({ type: Number, reflect: true })
+  count: number | undefined = undefined;
+
+  /**
+   * Maximum count value before truncation to `${max}+`. Defaults to 99.
+   * @attr max
+   */
+  @property({ type: Number, reflect: true })
+  max = 99;
+
+  /**
+   * Accessible label for the dot indicator mode (pulse + empty slot).
+   * Required for WCAG 4.1.2 compliance when using the dot indicator pattern.
+   * Example: `dot-label="3 new messages"`.
+   * @attr dot-label
+   */
+  @property({ type: String, attribute: 'dot-label' })
+  dotLabel = '';
+
+  /**
+   * Accessible label for the remove button. Should describe what is being removed.
+   * Defaults to "Remove". For better accessibility, include context: e.g. "Remove Critical badge".
+   * @attr remove-label
+   */
+  @property({ type: String, attribute: 'remove-label' })
+  removeLabel = 'Remove';
 
   /**
    * Tracks whether the default slot has assigned content.
@@ -106,10 +138,18 @@ export class HelixBadge extends LitElement {
     );
   }
 
+  // ─── Count Display ───
+
+  private get _countDisplay(): string {
+    if (this.count === undefined) return '';
+    return this.count > this.max ? `${this.max}+` : String(this.count);
+  }
+
   // ─── Render ───
 
   override render() {
-    const isDot = !this._hasSlotContent && this.pulse;
+    const hasCount = this.count !== undefined;
+    const isDot = !this._hasSlotContent && !hasCount && this.pulse;
 
     const classes = {
       badge: true,
@@ -121,14 +161,20 @@ export class HelixBadge extends LitElement {
     };
 
     return html`
-      <span part="badge" class=${classMap(classes)}>
+      <span
+        part="badge"
+        class=${classMap(classes)}
+        role=${isDot && this.dotLabel ? 'img' : nothing}
+        aria-label=${isDot && this.dotLabel ? this.dotLabel : nothing}
+        aria-live=${hasCount ? 'polite' : nothing}
+      >
         <slot name="prefix"></slot>
-        <slot @slotchange=${this._handleSlotChange}></slot>
+        ${hasCount ? this._countDisplay : html`<slot @slotchange=${this._handleSlotChange}></slot>`}
         ${this.removable
           ? html`<button
               part="remove-button"
               class="badge__remove-button"
-              aria-label="Remove"
+              aria-label=${this.removeLabel}
               @click=${this._handleRemove}
             >
               <svg viewBox="0 0 12 12" aria-hidden="true" width="10" height="10">

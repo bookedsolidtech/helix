@@ -19,11 +19,33 @@ export const helixActionBarStyles = css`
     width: 100%;
   }
 
-  /* ─── Sticky ─── */
+  /* ─── Sticky (top) ─── */
 
   .base--sticky {
     position: sticky;
     top: 0;
+    padding-top: max(var(--hx-action-bar-padding-block-start, 0px), env(safe-area-inset-top, 0px));
+    z-index: var(--hx-action-bar-z-index, 10);
+    /*
+     * Consumers: when this bar is sticky, add scroll-padding-top to the scroll container
+     * equal to the bar's rendered height so anchor targets are not hidden behind the bar.
+     * Example: .scroll-container { scroll-padding-top: 2.5rem; }
+     */
+  }
+
+  /* ─── Bottom sticky ─── */
+
+  .base--bottom {
+    position: sticky;
+    bottom: 0;
+    /*
+     * Respect iOS home-indicator safe area on devices with notch/home bar.
+     * Falls back to 0px on devices that do not support env().
+     */
+    padding-bottom: max(
+      var(--hx-action-bar-padding-block-end, 0px),
+      env(safe-area-inset-bottom, 0px)
+    );
     z-index: var(--hx-action-bar-z-index, 10);
   }
 
@@ -71,32 +93,28 @@ export const helixActionBarStyles = css`
     gap: inherit;
   }
 
+  /*
+   * Equal flex-basis on start and end guarantees the center section is visually centered
+   * within the full bar width, regardless of how wide start and end content are.
+   */
   .section--start {
-    flex: 0 0 auto;
-    margin-inline-end: auto;
+    flex: 1 1 0;
+    justify-content: flex-start;
   }
 
   .section--center {
-    flex: 1 1 auto;
+    flex: 0 0 auto;
     justify-content: center;
   }
 
   .section--end {
-    flex: 0 0 auto;
-    margin-inline-start: auto;
+    flex: 1 1 0;
+    justify-content: flex-end;
   }
 
   /* ─── Slotted content ─── */
 
   ::slotted(*) {
     flex-shrink: 0;
-  }
-
-  /* ─── Reduced Motion ─── */
-
-  @media (prefers-reduced-motion: reduce) {
-    .base {
-      transition: none;
-    }
   }
 `;

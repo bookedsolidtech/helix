@@ -64,7 +64,7 @@ export class HelixButton extends LitElement {
    * @attr hx-size
    */
   @property({ type: String, reflect: true, attribute: 'hx-size' })
-  hxSize: 'sm' | 'md' | 'lg' = 'md';
+  size: 'sm' | 'md' | 'lg' = 'md';
 
   /**
    * Whether the button is disabled. Prevents all interaction and form actions.
@@ -207,7 +207,7 @@ export class HelixButton extends LitElement {
     const classes = {
       button: true,
       [`button--${this.variant}`]: true,
-      [`button--${this.hxSize}`]: true,
+      [`button--${this.size}`]: true,
       'button--loading': this.loading,
     };
 

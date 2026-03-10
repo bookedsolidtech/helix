@@ -406,6 +406,130 @@ describe('hx-number-input', () => {
     });
   });
 
+  // ─── Stepper event contract (1) ───
+
+  describe('Stepper event contract', () => {
+    it('stepper fires only hx-change, not hx-input', async () => {
+      const el = await fixture<HelixNumberInput>('<hx-number-input value="5"></hx-number-input>');
+      const increment = shadowQuery<HTMLButtonElement>(el, '[part="increment"]')!;
+
+      let inputFired = false;
+      el.addEventListener('hx-input', () => {
+        inputFired = true;
+      });
+
+      const eventPromise = oneEvent<CustomEvent<{ value: number | null }>>(el, 'hx-change');
+      increment.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true }));
+      await eventPromise;
+      increment.dispatchEvent(new PointerEvent('pointerup', { bubbles: true }));
+
+      expect(inputFired).toBe(false);
+      expect(el.value).toBe(6);
+    });
+  });
+
+  // ─── Long-press stepper (5) ───
+
+  describe('Long-press stepper', () => {
+    // Helper to pause execution for async animation/transition waits
+    const wait = (ms: number) => new Promise<void>((r) => setTimeout(r, ms));
+
+    it('fires hx-change immediately on pointerdown', async () => {
+      const el = await fixture<HelixNumberInput>('<hx-number-input value="0"></hx-number-input>');
+      const increment = shadowQuery<HTMLButtonElement>(el, '[part="increment"]')!;
+      let changeCount = 0;
+      el.addEventListener('hx-change', () => changeCount++);
+
+      increment.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true }));
+      await el.updateComplete;
+      expect(changeCount).toBe(1);
+      expect(el.value).toBe(1);
+
+      // Clean up: stop long-press before delay fires
+      increment.dispatchEvent(new PointerEvent('pointerup', { bubbles: true }));
+    });
+
+    it('fires hx-change repeatedly after 400ms hold', async () => {
+      const el = await fixture<HelixNumberInput>('<hx-number-input value="0"></hx-number-input>');
+      const increment = shadowQuery<HTMLButtonElement>(el, '[part="increment"]')!;
+      let changeCount = 0;
+      el.addEventListener('hx-change', () => changeCount++);
+
+      increment.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true }));
+      await el.updateComplete;
+      expect(changeCount).toBe(1);
+
+      // Wait past 400ms delay + at least one 100ms interval
+      await wait(550);
+      await el.updateComplete;
+      expect(changeCount).toBeGreaterThanOrEqual(2);
+
+      increment.dispatchEvent(new PointerEvent('pointerup', { bubbles: true }));
+    });
+
+    it('pointerup stops repeat before delay fires', async () => {
+      const el = await fixture<HelixNumberInput>('<hx-number-input value="0"></hx-number-input>');
+      const increment = shadowQuery<HTMLButtonElement>(el, '[part="increment"]')!;
+      let changeCount = 0;
+      el.addEventListener('hx-change', () => changeCount++);
+
+      increment.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true }));
+      await el.updateComplete;
+      // Immediately stop — no repeat should have started
+      increment.dispatchEvent(new PointerEvent('pointerup', { bubbles: true }));
+      const countAfterUp = changeCount;
+
+      // Wait past delay + interval — no more events should fire
+      await wait(550);
+      expect(changeCount).toBe(countAfterUp);
+    });
+
+    it('pointerleave stops repeat', async () => {
+      const el = await fixture<HelixNumberInput>('<hx-number-input value="0"></hx-number-input>');
+      const increment = shadowQuery<HTMLButtonElement>(el, '[part="increment"]')!;
+      let changeCount = 0;
+      el.addEventListener('hx-change', () => changeCount++);
+
+      increment.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true }));
+      await el.updateComplete;
+      increment.dispatchEvent(new PointerEvent('pointerleave', { bubbles: true }));
+      const countAfterLeave = changeCount;
+
+      await wait(550);
+      expect(changeCount).toBe(countAfterLeave);
+    });
+
+    it('pointercancel stops repeat', async () => {
+      const el = await fixture<HelixNumberInput>('<hx-number-input value="0"></hx-number-input>');
+      const increment = shadowQuery<HTMLButtonElement>(el, '[part="increment"]')!;
+      let changeCount = 0;
+      el.addEventListener('hx-change', () => changeCount++);
+
+      increment.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true }));
+      await el.updateComplete;
+      increment.dispatchEvent(new PointerEvent('pointercancel', { bubbles: true }));
+      const countAfterCancel = changeCount;
+
+      await wait(550);
+      expect(changeCount).toBe(countAfterCancel);
+    });
+
+    it('disconnectedCallback clears long-press timer', async () => {
+      const el = await fixture<HelixNumberInput>('<hx-number-input value="0"></hx-number-input>');
+      const increment = shadowQuery<HTMLButtonElement>(el, '[part="increment"]')!;
+      let changeCount = 0;
+      el.addEventListener('hx-change', () => changeCount++);
+
+      increment.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true }));
+      await el.updateComplete;
+      const countBeforeDisconnect = changeCount;
+
+      el.remove();
+      await wait(550);
+      expect(changeCount).toBe(countBeforeDisconnect);
+    });
+  });
+
   // ─── Keyboard (4) ───
 
   describe('Keyboard', () => {
@@ -540,12 +664,18 @@ describe('hx-number-input', () => {
     });
 
     it('form getter returns associated form element', async () => {
-      const form = document.createElement('form');
-      form.innerHTML = '<hx-number-input name="dosage"></hx-number-input>';
-      document.getElementById('test-fixture-container')!.appendChild(form);
-      const el = form.querySelector('hx-number-input') as HelixNumberInput;
-      await el.updateComplete;
-      expect(el.form).toBe(form);
+      const container = document.createElement('div');
+      document.body.appendChild(container);
+      try {
+        const form = document.createElement('form');
+        form.innerHTML = '<hx-number-input name="dosage"></hx-number-input>';
+        container.appendChild(form);
+        const el = form.querySelector('hx-number-input') as HelixNumberInput;
+        await el.updateComplete;
+        expect(el.form).toBe(form);
+      } finally {
+        document.body.removeChild(container);
+      }
     });
 
     it('formResetCallback restores value to default', async () => {
@@ -730,11 +860,11 @@ describe('hx-number-input', () => {
       expect(suffix?.textContent).toBe('kg');
     });
 
-    it('help slot renders custom content inside help-text container', async () => {
+    it('help-text slot renders custom content inside help-text container', async () => {
       const el = await fixture<HelixNumberInput>(
-        '<hx-number-input help-text="fallback"><em slot="help">Custom help</em></hx-number-input>',
+        '<hx-number-input help-text="fallback"><em slot="help-text">Custom help</em></hx-number-input>',
       );
-      const helpSlot = el.querySelector('[slot="help"]');
+      const helpSlot = el.querySelector('[slot="help-text"]');
       expect(helpSlot).toBeTruthy();
       expect(helpSlot?.textContent).toBe('Custom help');
     });
@@ -748,9 +878,9 @@ describe('hx-number-input', () => {
       expect(field?.classList.contains('field--error')).toBe(true);
     });
 
-    it('slotted help sets aria-describedby without help-text prop', async () => {
+    it('slotted help-text sets aria-describedby without help-text prop', async () => {
       const el = await fixture<HelixNumberInput>(
-        '<hx-number-input label="Qty"><em slot="help">Enter a number</em></hx-number-input>',
+        '<hx-number-input label="Qty"><em slot="help-text">Enter a number</em></hx-number-input>',
       );
       await el.updateComplete;
       const input = shadowQuery<HTMLInputElement>(el, 'input')!;
@@ -800,6 +930,7 @@ describe('hx-number-input', () => {
     it('focus() moves focus to the native input', async () => {
       const el = await fixture<HelixNumberInput>('<hx-number-input></hx-number-input>');
       el.focus();
+      // Allow brief settle time for focus to propagate into the shadow DOM input
       await new Promise<void>((r) => setTimeout(r, 50));
       const input = shadowQuery<HTMLInputElement>(el, 'input')!;
       expect(el.shadowRoot?.activeElement).toBe(input);

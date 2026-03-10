@@ -104,6 +104,17 @@ const meta = {
         type: { summary: "'sm' | 'md' | 'lg'" },
       },
     },
+    layout: {
+      control: { type: 'select' },
+      options: ['column', 'inline'],
+      description:
+        "Layout variant. 'column' stacks label above control; 'inline' places them side-by-side.",
+      table: {
+        category: 'Appearance',
+        defaultValue: { summary: "'column'" },
+        type: { summary: "'column' | 'inline'" },
+      },
+    },
   },
   args: {
     label: 'Email Address',
@@ -112,6 +123,7 @@ const meta = {
     required: false,
     disabled: false,
     hxSize: 'md',
+    layout: 'column',
   },
   render: (args) => html`
     <hx-field
@@ -121,6 +133,7 @@ const meta = {
       ?required=${args.required}
       ?disabled=${args.disabled}
       hx-size=${args.hxSize}
+      layout=${args.layout}
     >
       <input
         type="email"
@@ -288,6 +301,7 @@ export const SlottedLabel: Story = {
     <hx-field>
       <label
         slot="label"
+        for="known-allergies"
         style="display: flex; align-items: center; gap: 0.375rem; font-size: 0.875rem; font-weight: 500; color: var(--hx-color-neutral-700, #343a40);"
       >
         Known Allergies
@@ -302,6 +316,7 @@ export const SlottedLabel: Story = {
         >
       </label>
       <input
+        id="known-allergies"
         type="text"
         placeholder="List known drug, food, or environmental allergies"
         required
@@ -309,6 +324,12 @@ export const SlottedLabel: Story = {
       />
     </hx-field>
   `,
+  play: async ({ canvasElement }) => {
+    const label = canvasElement.querySelector('[slot="label"]') as HTMLLabelElement;
+    const input = canvasElement.querySelector('input');
+    await expect(label.htmlFor).toBe(input?.id);
+    await expect(label.htmlFor).toBeTruthy();
+  },
 };
 
 // ─────────────────────────────────────────────────
@@ -328,7 +349,6 @@ export const SlottedError: Story = {
         slot="error"
         style="display: flex; align-items: center; gap: 0.375rem; color: var(--hx-color-error-500, #dc3545); font-size: 0.75rem;"
         role="alert"
-        aria-live="polite"
       >
         <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
           <path
@@ -371,7 +391,33 @@ export const WrappingNativeSelect: Story = {
 };
 
 // ─────────────────────────────────────────────────
-// 10. WRAPPING CUSTOM ELEMENT + DESCRIPTION SLOT
+// 10. WRAPPING NATIVE TEXTAREA
+// ─────────────────────────────────────────────────
+
+export const WrappingTextarea: Story = {
+  name: 'Wrapping Native Textarea',
+  render: () => html`
+    <hx-field
+      label="Clinical Notes"
+      help-text="Document relevant observations, symptoms, or care instructions. Plain text only."
+    >
+      <textarea
+        rows="4"
+        placeholder="Enter clinical notes here..."
+        style="width: 100%; padding: 0.5rem 0.75rem; border: 1px solid var(--hx-color-neutral-300, #dee2e6); border-radius: 0.375rem; font-size: 0.875rem; line-height: 1.5; resize: vertical; font-family: inherit;"
+      ></textarea>
+    </hx-field>
+  `,
+  play: async ({ canvasElement }) => {
+    const host = getFieldHost(canvasElement);
+    await expect(host).toBeTruthy();
+    const textarea = canvasElement.querySelector('textarea');
+    await expect(textarea?.getAttribute('aria-label')).toBe('Clinical Notes');
+  },
+};
+
+// ─────────────────────────────────────────────────
+// 11. WRAPPING CUSTOM ELEMENT + DESCRIPTION SLOT
 // ─────────────────────────────────────────────────
 
 export const WrappingCustomElement: Story = {
@@ -397,6 +443,40 @@ export const WrappingCustomElement: Story = {
         style="width: 100%; padding: 0.5rem 0.75rem; border: 1px solid var(--hx-color-neutral-300, #dee2e6); border-radius: 0.375rem; font-size: 0.875rem; line-height: 1.5;"
       />
     </hx-field>
+  `,
+};
+
+// ─────────────────────────────────────────────────
+// INLINE LAYOUT
+// ─────────────────────────────────────────────────
+
+export const InlineLayout: Story = {
+  name: 'Layout: Inline',
+  render: () => html`
+    <div style="display: flex; flex-direction: column; gap: 1rem; max-width: 520px;">
+      <hx-field label="Patient Name" layout="inline">
+        <input
+          type="text"
+          placeholder="First Last"
+          style="width: 100%; padding: 0.5rem 0.75rem; border: 1px solid var(--hx-color-neutral-300, #dee2e6); border-radius: 0.375rem; font-size: 0.875rem;"
+        />
+      </hx-field>
+      <hx-field label="Date of Birth" layout="inline" required>
+        <input
+          type="date"
+          style="width: 100%; padding: 0.5rem 0.75rem; border: 1px solid var(--hx-color-neutral-300, #dee2e6); border-radius: 0.375rem; font-size: 0.875rem;"
+        />
+      </hx-field>
+      <hx-field label="Department" layout="inline" help-text="Select the admitting department.">
+        <select
+          style="width: 100%; padding: 0.5rem 0.75rem; border: 1px solid var(--hx-color-neutral-300, #dee2e6); border-radius: 0.375rem; font-size: 0.875rem; background: white;"
+        >
+          <option value="">Select...</option>
+          <option value="cardiology">Cardiology</option>
+          <option value="emergency">Emergency Medicine</option>
+        </select>
+      </hx-field>
+    </div>
   `,
 };
 

@@ -1,0 +1,33 @@
+{
+  "category": "Uncategorized",
+  "description": "Launch readiness audit for hx-tag. Checklist: (1) A11y — axe-core zero violations, WCAG 2.1 AA. (2) Astro doc page — all 12 template sections. (3) Individual export — standalone HTML works. (4) `npm run verify` passes. Files: `packages/hx-library/src/components/hx-tag/`, `apps/docs/src/content/docs/component-library/hx-tag.md`",
+  "title": "LAUNCH READY: hx-tag",
+  "status": "backlog",
+  "dependencies": [
+    "feature-1773066138511-g2pgj0rmm"
+  ],
+  "complexity": "medium",
+  "priority": 3,
+  "source": "api",
+  "trustTier": 1,
+  "quarantineStatus": "passed",
+  "quarantineId": "a21ec170-14a0-4702-8b83-872a757a3ccc",
+  "id": "feature-1773066398033-fvybnb8u1",
+  "branchName": "feature/launch-ready-hx-tag",
+  "descriptionHistory": [
+    {
+      "description": "Launch readiness audit for hx-tag. Checklist: (1) A11y — axe-core zero violations, WCAG 2.1 AA. (2) Astro doc page — all 12 template sections. (3) Individual export — standalone HTML works. (4) `npm run verify` passes. Files: `packages/hx-library/src/components/hx-tag/`, `apps/docs/src/content/docs/component-library/hx-tag.md`",
+      "timestamp": "2026-03-09T14:26:38.033Z",
+      "source": "initial"
+    }
+  ],
+  "createdAt": "2026-03-09T14:26:38.033Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-03-09T14:26:38.033Z",
+      "reason": "Feature created"
+    }
+  ]
+}

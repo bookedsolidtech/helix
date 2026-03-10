@@ -1,0 +1,140 @@
+---
+title: 'hx-menu-divider'
+description: 'Visual horizontal separator for grouping related items within an hx-menu.'
+---
+
+import ComponentLoader from '../../../components/ComponentLoader.astro';
+import ComponentDemo from '../../../components/ComponentDemo.astro';
+import ComponentDoc from '../../../components/ComponentDoc.astro';
+
+<ComponentLoader />
+
+<ComponentDoc tagName="hx-menu-divider" section="summary" />
+
+## Overview
+
+`hx-menu-divider` is a visual horizontal separator for use inside `hx-menu`. It applies `role="separator"` and `aria-orientation="horizontal"` to meet WAI-ARIA APG requirements, so screen readers announce it as a section boundary when navigating through menu items.
+
+Always place `hx-menu-divider` as a direct child of `hx-menu`, between logical groups of `hx-menu-item` elements.
+
+## Live Demo
+
+<ComponentDemo title="Menu with Dividers">
+  <hx-menu aria-label="Document actions" style="max-width: 220px;">
+    <hx-menu-item value="undo">Undo</hx-menu-item>
+    <hx-menu-item value="redo">Redo</hx-menu-item>
+    <hx-menu-divider></hx-menu-divider>
+    <hx-menu-item value="cut">Cut</hx-menu-item>
+    <hx-menu-item value="copy">Copy</hx-menu-item>
+    <hx-menu-item value="paste">Paste</hx-menu-item>
+    <hx-menu-divider></hx-menu-divider>
+    <hx-menu-item value="select-all">Select All</hx-menu-item>
+  </hx-menu>
+</ComponentDemo>
+
+## Installation
+
+```bash
+# Full library (includes hx-menu-divider)
+npm install @helix/library
+
+# Or import the menu family
+import '@helix/library/components/hx-menu';
+```
+
+## Basic Usage
+
+```html
+<hx-menu aria-label="Actions">
+  <hx-menu-item value="edit">Edit</hx-menu-item>
+  <hx-menu-divider></hx-menu-divider>
+  <hx-menu-item value="delete">Delete</hx-menu-item>
+</hx-menu>
+```
+
+## Properties
+
+`hx-menu-divider` has no properties. It is a purely presentational separator.
+
+## Events
+
+`hx-menu-divider` does not dispatch any events.
+
+## CSS Custom Properties
+
+| Property                  | Default                       | Description                |
+| ------------------------- | ----------------------------- | -------------------------- |
+| `--hx-menu-divider-color` | `var(--hx-color-neutral-200)` | Color of the divider line. |
+
+## CSS Parts
+
+| Part   | Description                                |
+| ------ | ------------------------------------------ |
+| `base` | The root `<div role="separator">` element. |
+
+## Slots
+
+`hx-menu-divider` has no slots.
+
+## Accessibility
+
+| Topic         | Details                                                                            |
+| ------------- | ---------------------------------------------------------------------------------- |
+| ARIA role     | `role="separator"` — announces a section boundary between menu items.              |
+| Orientation   | `aria-orientation="horizontal"` is set automatically.                              |
+| Keyboard      | Not focusable. The divider is skipped by `hx-menu`'s keyboard navigation logic.    |
+| Screen reader | Announced as a separator when a screen reader reads through the menu sequentially. |
+
+## Drupal Integration
+
+```twig
+{# Render a divider between item groups #}
+<hx-menu aria-label="{{ menu_label }}">
+  {% for group in item_groups %}
+    {% for item in group %}
+      <hx-menu-item value="{{ item.value }}">{{ item.label }}</hx-menu-item>
+    {% endfor %}
+    {% if not loop.last %}
+      <hx-menu-divider></hx-menu-divider>
+    {% endif %}
+  {% endfor %}
+</hx-menu>
+```
+
+Load the library in your module's `.libraries.yml`:
+
+```yaml
+helix-components:
+  js:
+    /libraries/helix/helix.min.js: { minified: true }
+```
+
+## Standalone HTML Example
+
+```html
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>hx-menu-divider example</title>
+    <!-- @helix/library is a private package — install via npm workspace, not CDN -->
+    <!-- In your project: import '@helix/library'; in your bundler entry point -->
+  </head>
+  <body style="font-family: sans-serif; padding: 2rem;">
+    <hx-menu aria-label="Patient record actions" style="max-width: 220px;">
+      <hx-menu-item value="view">View Record</hx-menu-item>
+      <hx-menu-item value="edit">Edit Record</hx-menu-item>
+      <hx-menu-divider></hx-menu-divider>
+      <hx-menu-item value="print">Print Summary</hx-menu-item>
+      <hx-menu-item value="export">Export to PDF</hx-menu-item>
+      <hx-menu-divider></hx-menu-divider>
+      <hx-menu-item value="archive">Archive</hx-menu-item>
+    </hx-menu>
+  </body>
+</html>
+```
+
+## API Reference
+
+<ComponentDoc tagName="hx-menu-divider" section="api" />

@@ -5,6 +5,10 @@ export const helixSkeletonStyles = css`
     display: block;
   }
 
+  :host([loaded]) {
+    display: none;
+  }
+
   /* ─── Base ─── */
 
   .skeleton {
@@ -24,7 +28,7 @@ export const helixSkeletonStyles = css`
   }
 
   .skeleton--circle {
-    border-radius: 50%;
+    border-radius: var(--hx-skeleton-circle-radius, 50%);
     aspect-ratio: var(--_circle-aspect-ratio, 1);
     width: var(--_width, 2.5rem);
     height: var(--_height, var(--_width, 2.5rem));
@@ -40,6 +44,14 @@ export const helixSkeletonStyles = css`
     height: var(--_height, 2.5rem);
   }
 
+  .skeleton--paragraph {
+    border-radius: var(--hx-skeleton-text-radius, var(--hx-border-radius-full, 9999px));
+    height: var(--_height, auto);
+    display: flex;
+    flex-direction: column;
+    gap: 0.5em;
+  }
+
   /* ─── Shimmer Animation ─── */
 
   .skeleton--animated::after {
@@ -49,10 +61,10 @@ export const helixSkeletonStyles = css`
     background: linear-gradient(
       90deg,
       transparent 0%,
-      var(--hx-skeleton-shimmer-color, rgba(255, 255, 255, 0.4)) 50%,
+      var(--hx-skeleton-shimmer-color, var(--hx-overlay-white-40, rgba(255, 255, 255, 0.4))) 50%,
       transparent 100%
     );
-    background-size: 200% 100%;
+    background-size: var(--hx-skeleton-shimmer-width, 200%) 100%;
     animation: hx-skeleton-shimmer var(--hx-skeleton-duration, 1.5s) ease-in-out infinite;
   }
 
@@ -67,7 +79,7 @@ export const helixSkeletonStyles = css`
 
   @media (prefers-reduced-motion: reduce) {
     .skeleton--animated::after {
-      animation: none;
+      display: none;
     }
   }
 `;

@@ -35,8 +35,8 @@ export const helixCarouselStyles = css`
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: var(--hx-size-10, 2.5rem);
-    height: var(--hx-size-10, 2.5rem);
+    width: var(--hx-carousel-nav-btn-size, var(--hx-size-10, 2.5rem));
+    height: var(--hx-carousel-nav-btn-size, var(--hx-size-10, 2.5rem));
     border: var(--hx-border-width-thin, 1px) solid var(--hx-color-neutral-200, #e5e7eb);
     border-radius: var(--hx-border-radius-full, 9999px);
     background: var(--hx-color-neutral-0, #fff);
@@ -105,7 +105,7 @@ export const helixCarouselStyles = css`
     overflow: hidden;
   }
 
-  .scroll-container {
+  .slide-viewport {
     overflow: hidden;
     border-radius: var(--hx-border-radius-md, 0.375rem);
   }
@@ -144,8 +144,8 @@ export const helixCarouselStyles = css`
 
   .pagination-dot {
     display: block;
-    width: 0.5rem;
-    height: 0.5rem;
+    width: var(--hx-carousel-pagination-dot-size, 0.5rem);
+    height: var(--hx-carousel-pagination-dot-size, 0.5rem);
     border-radius: var(--hx-border-radius-full, 9999px);
     background: var(--hx-color-neutral-300, #d1d5db);
     transition:
@@ -172,6 +172,19 @@ export const helixCarouselStyles = css`
     align-items: center;
     justify-content: center;
     gap: var(--hx-space-3, 0.75rem);
+  }
+
+  /* ─── Live Region ─── */
+
+  .live-region {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
   }
 
   /* ─── Reduced Motion ─── */

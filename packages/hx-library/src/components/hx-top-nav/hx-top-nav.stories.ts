@@ -42,7 +42,8 @@ const meta = {
         style="font-weight: 700; color: inherit; text-decoration: none; font-size: 1.125rem;"
         >HealthSystem</a
       >
-      <nav style="display: contents;">
+      <!-- Use <div style="display: contents;"> or bare links — NOT <nav> — the component renders a <nav> landmark internally -->
+      <div style="display: contents;">
         <a href="/dashboard" style="color: inherit; text-decoration: none; padding: 0.5rem 0.75rem;"
           >Dashboard</a
         >
@@ -57,7 +58,7 @@ const meta = {
           style="color: inherit; text-decoration: none; padding: 0.5rem 0.75rem;"
           >Lab Results</a
         >
-      </nav>
+      </div>
       <div slot="actions" style="display: flex; align-items: center; gap: 0.5rem;">
         <button
           type="button"
@@ -92,6 +93,7 @@ export const Default: Story = {
 
     // Verify shadow DOM structure
     const shadow = nav?.shadowRoot;
+    await expect(shadow?.querySelector('[part="header"]')).toBeTruthy();
     await expect(shadow?.querySelector('[part="nav"]')).toBeTruthy();
     await expect(shadow?.querySelector('[part="logo"]')).toBeTruthy();
     await expect(shadow?.querySelector('[part="menu"]')).toBeTruthy();
@@ -133,7 +135,7 @@ export const WithLogoSlot: Story = {
         >
         <span style="font-weight: 700; font-size: 1.125rem;">HealthSystem</span>
       </a>
-      <nav style="display: contents;">
+      <div style="display: contents;">
         <a href="/dashboard" style="color: inherit; text-decoration: none; padding: 0.5rem 0.75rem;"
           >Dashboard</a
         >
@@ -143,7 +145,7 @@ export const WithLogoSlot: Story = {
         <a href="/schedule" style="color: inherit; text-decoration: none; padding: 0.5rem 0.75rem;"
           >Schedule</a
         >
-      </nav>
+      </div>
     </hx-top-nav>
   `,
 };
@@ -161,7 +163,7 @@ export const WithActionsSlot: Story = {
         style="font-weight: 700; color: inherit; text-decoration: none; font-size: 1.125rem;"
         >HealthSystem</a
       >
-      <nav style="display: contents;">
+      <div style="display: contents;">
         <a href="/dashboard" style="color: inherit; text-decoration: none; padding: 0.5rem 0.75rem;"
           >Dashboard</a
         >
@@ -171,7 +173,7 @@ export const WithActionsSlot: Story = {
         <a href="/orders" style="color: inherit; text-decoration: none; padding: 0.5rem 0.75rem;"
           >Orders</a
         >
-      </nav>
+      </div>
       <div slot="actions" style="display: flex; align-items: center; gap: 0.75rem;">
         <input
           type="search"
@@ -205,7 +207,103 @@ export const WithActionsSlot: Story = {
 };
 
 // ─────────────────────────────────────────────────
-// 4. STICKY MODE
+// 4. WITH SEARCH
+// ─────────────────────────────────────────────────
+
+export const WithSearch: Story = {
+  name: 'With Search',
+  render: (args) => html`
+    <hx-top-nav ?sticky=${args.sticky} label=${args.label}>
+      <a
+        slot="logo"
+        href="/"
+        style="font-weight: 700; color: inherit; text-decoration: none; font-size: 1.125rem;"
+        >HealthSystem</a
+      >
+      <div style="display: contents;">
+        <a href="/dashboard" style="color: inherit; text-decoration: none; padding: 0.5rem 0.75rem;"
+          >Dashboard</a
+        >
+        <a href="/patients" style="color: inherit; text-decoration: none; padding: 0.5rem 0.75rem;"
+          >Patients</a
+        >
+        <a href="/schedule" style="color: inherit; text-decoration: none; padding: 0.5rem 0.75rem;"
+          >Schedule</a
+        >
+      </div>
+      <div slot="actions" style="display: flex; align-items: center; gap: 0.75rem;">
+        <input
+          type="search"
+          placeholder="Search patients, orders..."
+          aria-label="Search"
+          style="
+            padding: 0.375rem 0.75rem;
+            border: 1px solid var(--hx-color-neutral-300, #ced4da);
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            width: 16rem;
+          "
+        />
+      </div>
+    </hx-top-nav>
+  `,
+};
+
+// ─────────────────────────────────────────────────
+// 5. WITH ARIA-CURRENT (Active Page Indicator)
+// ─────────────────────────────────────────────────
+
+export const WithAriaCurrent: Story = {
+  name: 'With aria-current (Active Page)',
+  render: (args) => html`
+    <!--
+      Mark the current page link with aria-current="page".
+
+      In Drupal Twig, use the in_active_trail variable:
+        <a href="{{ item.url }}"
+           {% if item.in_active_trail %}aria-current="page"{% endif %}>
+          {{ item.title }}
+        </a>
+    -->
+    <hx-top-nav ?sticky=${args.sticky} label=${args.label}>
+      <a
+        slot="logo"
+        href="/"
+        style="font-weight: 700; color: inherit; text-decoration: none; font-size: 1.125rem;"
+        >HealthSystem</a
+      >
+      <div style="display: contents;">
+        <a href="/dashboard" style="color: inherit; text-decoration: none; padding: 0.5rem 0.75rem;"
+          >Dashboard</a
+        >
+        <!-- aria-current="page" marks the active link for screen readers -->
+        <a
+          href="/patients"
+          aria-current="page"
+          style="
+            color: inherit;
+            text-decoration: none;
+            padding: 0.5rem 0.75rem;
+            font-weight: 600;
+            border-bottom: 2px solid currentColor;
+          "
+          >Patients</a
+        >
+        <a href="/schedule" style="color: inherit; text-decoration: none; padding: 0.5rem 0.75rem;"
+          >Schedule</a
+        >
+        <a
+          href="/lab-results"
+          style="color: inherit; text-decoration: none; padding: 0.5rem 0.75rem;"
+          >Lab Results</a
+        >
+      </div>
+    </hx-top-nav>
+  `,
+};
+
+// ─────────────────────────────────────────────────
+// 6. STICKY MODE
 // ─────────────────────────────────────────────────
 
 export const StickyMode: Story = {
@@ -219,7 +317,7 @@ export const StickyMode: Story = {
           style="font-weight: 700; color: inherit; text-decoration: none; font-size: 1.125rem;"
           >HealthSystem</a
         >
-        <nav style="display: contents;">
+        <div style="display: contents;">
           <a
             href="/dashboard"
             style="color: inherit; text-decoration: none; padding: 0.5rem 0.75rem;"
@@ -235,7 +333,7 @@ export const StickyMode: Story = {
             style="color: inherit; text-decoration: none; padding: 0.5rem 0.75rem;"
             >Schedule</a
           >
-        </nav>
+        </div>
         <div slot="actions" style="display: flex; align-items: center; gap: 0.5rem;">
           <button
             type="button"
@@ -274,7 +372,7 @@ export const StickyMode: Story = {
 };
 
 // ─────────────────────────────────────────────────
-// 5. MOBILE TOGGLE
+// 7. MOBILE TOGGLE
 // ─────────────────────────────────────────────────
 
 const mobileToggleHandler = fn();
@@ -297,7 +395,7 @@ export const MobileToggle: Story = {
           style="font-weight: 700; color: inherit; text-decoration: none; font-size: 1.125rem;"
           >HealthSystem</a
         >
-        <nav style="display: contents;">
+        <div style="display: contents;">
           <a
             href="/dashboard"
             style="color: inherit; text-decoration: none; padding: 0.5rem 0.75rem; display: block;"
@@ -313,7 +411,7 @@ export const MobileToggle: Story = {
             style="color: inherit; text-decoration: none; padding: 0.5rem 0.75rem; display: block;"
             >Schedule</a
           >
-        </nav>
+        </div>
         <div slot="actions">
           <button
             type="button"
@@ -351,7 +449,79 @@ export const MobileToggle: Story = {
 };
 
 // ─────────────────────────────────────────────────
-// 6. HOSPITAL PORTAL
+// 8. MOBILE VIEWPORT (Responsive)
+// ─────────────────────────────────────────────────
+
+export const MobileViewport: Story = {
+  name: 'Mobile Viewport',
+  parameters: {
+    viewport: {
+      defaultViewport: 'mobile1',
+    },
+  },
+  render: (args) => html`
+    <!--
+      This story demonstrates mobile layout with the hamburger menu.
+      The nav items are hidden until the hamburger button is clicked.
+    -->
+    <hx-top-nav ?sticky=${args.sticky} label=${args.label}>
+      <a
+        slot="logo"
+        href="/"
+        style="font-weight: 700; color: inherit; text-decoration: none; font-size: 1.125rem;"
+        >HealthSystem</a
+      >
+      <div style="display: contents;">
+        <a
+          href="/dashboard"
+          aria-current="page"
+          style="
+            color: inherit;
+            text-decoration: none;
+            padding: 0.75rem;
+            display: block;
+            font-weight: 600;
+          "
+          >Dashboard</a
+        >
+        <a
+          href="/patients"
+          style="color: inherit; text-decoration: none; padding: 0.75rem; display: block;"
+          >Patients</a
+        >
+        <a
+          href="/schedule"
+          style="color: inherit; text-decoration: none; padding: 0.75rem; display: block;"
+          >Schedule</a
+        >
+        <a
+          href="/lab-results"
+          style="color: inherit; text-decoration: none; padding: 0.75rem; display: block;"
+          >Lab Results</a
+        >
+      </div>
+      <div slot="actions">
+        <button
+          type="button"
+          style="
+            background: none;
+            border: 1px solid currentColor;
+            border-radius: 0.375rem;
+            cursor: pointer;
+            color: inherit;
+            padding: 0.375rem 0.75rem;
+            font-size: 0.875rem;
+          "
+        >
+          Sign Out
+        </button>
+      </div>
+    </hx-top-nav>
+  `,
+};
+
+// ─────────────────────────────────────────────────
+// 9. HOSPITAL PORTAL
 // ─────────────────────────────────────────────────
 
 export const HospitalPortal: Story = {
@@ -374,6 +544,8 @@ export const HospitalPortal: Story = {
           <a href="{{ path('user.page') }}" class="user-menu-link">My Account</a>
         </div>
       </hx-top-nav>
+
+      NOTE: Use bare <a> links or <div style="display: contents;"> — do NOT wrap in <nav>.
     -->
     <hx-top-nav sticky label="Hospital Staff Navigation">
       <a
@@ -398,7 +570,7 @@ export const HospitalPortal: Story = {
         >
         <span style="font-weight: 700; font-size: 1.0625rem;">Memorial Health</span>
       </a>
-      <nav style="display: contents;">
+      <div style="display: contents;">
         <a
           href="/dashboard"
           aria-current="page"
@@ -428,7 +600,7 @@ export const HospitalPortal: Story = {
         <a href="/reports" style="color: inherit; text-decoration: none; padding: 0.5rem 0.75rem;"
           >Reports</a
         >
-      </nav>
+      </div>
       <div slot="actions" style="display: flex; align-items: center; gap: 0.75rem;">
         <input
           type="search"
@@ -489,7 +661,7 @@ export const HospitalPortal: Story = {
 };
 
 // ─────────────────────────────────────────────────
-// 7. PATIENT PORTAL
+// 10. PATIENT PORTAL
 // ─────────────────────────────────────────────────
 
 export const PatientPortal: Story = {
@@ -504,7 +676,11 @@ export const PatientPortal: Story = {
           {{ site_name }} Patient Portal
         </a>
         {% for item in main_menu %}
-          <a href="{{ item.url }}" class="nav-link">{{ item.title }}</a>
+          <a
+            href="{{ item.url }}"
+            {% if item.in_active_trail %}aria-current="page"{% endif %}
+            class="nav-link"
+          >{{ item.title }}</a>
         {% endfor %}
         <div slot="actions">
           <a href="{{ path('user.logout') }}">Sign Out</a>
@@ -519,7 +695,7 @@ export const PatientPortal: Story = {
       >
         MyHealth Portal
       </a>
-      <nav style="display: contents;">
+      <div style="display: contents;">
         <a href="/home" style="color: inherit; text-decoration: none; padding: 0.5rem 0.75rem;"
           >Home</a
         >
@@ -546,7 +722,7 @@ export const PatientPortal: Story = {
           style="color: inherit; text-decoration: none; padding: 0.5rem 0.75rem;"
           >Prescriptions</a
         >
-      </nav>
+      </div>
       <div slot="actions" style="display: flex; align-items: center; gap: 0.75rem;">
         <button
           type="button"
@@ -568,7 +744,7 @@ export const PatientPortal: Story = {
 };
 
 // ─────────────────────────────────────────────────
-// 8. CSS CUSTOM PROPERTIES
+// 11. CSS CUSTOM PROPERTIES
 // ─────────────────────────────────────────────────
 
 export const CSSCustomProperties: Story = {
@@ -594,7 +770,7 @@ export const CSSCustomProperties: Story = {
             style="font-weight: 700; color: inherit; text-decoration: none; font-size: 1.125rem;"
             >HealthSystem</a
           >
-          <nav style="display: contents;">
+          <div style="display: contents;">
             <a
               href="/dashboard"
               style="color: inherit; text-decoration: none; padding: 0.5rem 0.75rem;"
@@ -610,7 +786,7 @@ export const CSSCustomProperties: Story = {
               style="color: inherit; text-decoration: none; padding: 0.5rem 0.75rem;"
               >Schedule</a
             >
-          </nav>
+          </div>
           <div slot="actions">
             <button
               type="button"
@@ -643,7 +819,7 @@ export const CSSCustomProperties: Story = {
             style="font-weight: 700; color: inherit; text-decoration: none; font-size: 1.125rem;"
             >CareConnect</a
           >
-          <nav style="display: contents;">
+          <div style="display: contents;">
             <a href="/home" style="color: inherit; text-decoration: none; padding: 0.5rem 0.75rem;"
               >Home</a
             >
@@ -657,7 +833,7 @@ export const CSSCustomProperties: Story = {
               style="color: inherit; text-decoration: none; padding: 0.5rem 0.75rem;"
               >Messages</a
             >
-          </nav>
+          </div>
           <div slot="actions">
             <button
               type="button"
@@ -713,7 +889,7 @@ hx-top-nav {
 };
 
 // ─────────────────────────────────────────────────
-// 9. CSS PARTS
+// 12. CSS PARTS
 // ─────────────────────────────────────────────────
 
 export const CSSParts: Story = {
@@ -754,7 +930,7 @@ export const CSSParts: Story = {
             style="font-weight: 700; color: inherit; text-decoration: none; font-size: 1.0625rem;"
             >::part(logo)</a
           >
-          <nav style="display: contents;">
+          <div style="display: contents;">
             <a
               href="/dashboard"
               style="color: inherit; text-decoration: none; padding: 0.5rem 0.75rem;"
@@ -770,7 +946,7 @@ export const CSSParts: Story = {
               style="color: inherit; text-decoration: none; padding: 0.5rem 0.75rem;"
               >Menu Item 3</a
             >
-          </nav>
+          </div>
           <div slot="actions">
             <span style="font-size: 0.875rem; color: #4338ca;">::part(actions)</span>
           </div>
@@ -785,7 +961,8 @@ export const CSSParts: Story = {
           style="background: #f8f9fa; padding: 1rem; border-radius: 0.5rem; font-size: 0.8125rem; overflow-x: auto; line-height: 1.6;"
         >
 /* Available CSS Parts */
-hx-top-nav::part(nav)           { /* The outer &lt;nav&gt; element */ }
+hx-top-nav::part(header)        { /* The outer &lt;header&gt; landmark element */ }
+hx-top-nav::part(nav)           { /* The &lt;nav&gt; element inside the header */ }
 hx-top-nav::part(logo)          { /* The logo slot container */ }
 hx-top-nav::part(menu)          { /* The primary navigation slot container */ }
 hx-top-nav::part(actions)       { /* The actions slot container */ }
@@ -810,7 +987,7 @@ export const MobileToggleOpen: Story = {
         <a slot="logo" href="/" style="font-weight: 700; color: inherit; text-decoration: none;"
           >HealthSystem</a
         >
-        <nav style="display: contents;">
+        <div style="display: contents;">
           <a
             href="/patients"
             style="color: inherit; text-decoration: none; padding: 0.5rem 0.75rem;"
@@ -821,7 +998,7 @@ export const MobileToggleOpen: Story = {
             style="color: inherit; text-decoration: none; padding: 0.5rem 0.75rem;"
             >Schedule</a
           >
-        </nav>
+        </div>
       </hx-top-nav>
     </div>
   `,
@@ -862,13 +1039,13 @@ export const MobileToggleClose: Story = {
         <a slot="logo" href="/" style="font-weight: 700; color: inherit; text-decoration: none;"
           >HealthSystem</a
         >
-        <nav style="display: contents;">
+        <div style="display: contents;">
           <a
             href="/patients"
             style="color: inherit; text-decoration: none; padding: 0.5rem 0.75rem;"
             >Patients</a
           >
-        </nav>
+        </div>
       </hx-top-nav>
     </div>
   `,
@@ -926,13 +1103,13 @@ export const MobileToggleKeyboard: Story = {
         <a slot="logo" href="/" style="font-weight: 700; color: inherit; text-decoration: none;"
           >HealthSystem</a
         >
-        <nav style="display: contents;">
+        <div style="display: contents;">
           <a
             href="/patients"
             style="color: inherit; text-decoration: none; padding: 0.5rem 0.75rem;"
             >Patients</a
           >
-        </nav>
+        </div>
       </hx-top-nav>
     </div>
   `,
@@ -951,5 +1128,44 @@ export const MobileToggleKeyboard: Story = {
     // Activate again with Space to close
     await userEvent.keyboard(' ');
     await expect(toggleBtn?.getAttribute('aria-expanded')).toBe('false');
+  },
+};
+
+export const EscapeClosesMenu: Story = {
+  name: 'Test: Escape Key Closes Mobile Menu',
+  render: () => html`
+    <div style="max-width: 480px;">
+      <hx-top-nav label="Test Navigation">
+        <a slot="logo" href="/" style="font-weight: 700; color: inherit; text-decoration: none;"
+          >HealthSystem</a
+        >
+        <div style="display: contents;">
+          <a
+            href="/patients"
+            style="color: inherit; text-decoration: none; padding: 0.5rem 0.75rem;"
+            >Patients</a
+          >
+          <a
+            href="/schedule"
+            style="color: inherit; text-decoration: none; padding: 0.5rem 0.75rem;"
+            >Schedule</a
+          >
+        </div>
+      </hx-top-nav>
+    </div>
+  `,
+  play: async ({ canvasElement }) => {
+    const nav = canvasElement.querySelector('hx-top-nav');
+    const toggleBtn = nav?.shadowRoot?.querySelector<HTMLButtonElement>('[part="mobile-toggle"]');
+    await expect(toggleBtn).toBeTruthy();
+
+    // Open the menu
+    await userEvent.click(toggleBtn!);
+    await expect(toggleBtn?.getAttribute('aria-expanded')).toBe('true');
+
+    // Press Escape — menu should close and focus should return to toggle
+    await userEvent.keyboard('{Escape}');
+    await expect(toggleBtn?.getAttribute('aria-expanded')).toBe('false');
+    await expect(toggleBtn).toHaveFocus();
   },
 };

@@ -1,0 +1,49 @@
+{#
+  hx-spinner — Drupal Twig Template
+  ==================================
+  Renders the <hx-spinner> web component for use in Drupal themes.
+
+  Variables:
+    - size      (string, optional): 'sm' | 'md' | 'lg' or a CSS size string (e.g. '3rem'). Defaults to 'md'.
+    - variant   (string, optional): 'default' | 'primary' | 'inverted'. Defaults to 'default'.
+    - label     (string, optional): Accessible label announced to screen readers. Defaults to 'Loading'.
+    - decorative (boolean, optional): When true, suppresses ARIA announcements. Use alongside visible
+                  loading text to prevent duplicate announcements. Defaults to false.
+
+  Usage:
+    Standalone (announces to screen readers):
+      {{ include('@theme/hx-spinner/hx-spinner.twig', {
+        size: 'md',
+        variant: 'primary',
+        label: 'Loading patient records',
+      }) }}
+
+    Decorative (with adjacent visible text — suppresses AT):
+      <div style="display: flex; align-items: center; gap: 0.75rem;">
+        {{ include('@theme/hx-spinner/hx-spinner.twig', { decorative: true, size: 'sm' }) }}
+        <span>Saving patient record...</span>
+      </div>
+
+  Registration:
+    Load the component script in your theme's .libraries.yml:
+      hx-spinner:
+        js:
+          path/to/@wc-2026/library/dist/hx-spinner.js: { attributes: { type: module } }
+
+    Attach the library in your template:
+      {{ attach_library('mytheme/hx-spinner') }}
+#}
+
+{% set _size = size|default('md') %}
+{% set _variant = variant|default('default') %}
+{% set _label = label|default('Loading') %}
+
+<hx-spinner
+  size="{{ _size }}"
+  variant="{{ _variant }}"
+  {% if not decorative %}
+    label="{{ _label }}"
+  {% else %}
+    decorative
+  {% endif %}
+></hx-spinner>

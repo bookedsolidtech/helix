@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/web-components';
 import { html } from 'lit';
+import { ifDefined } from 'lit/directives/if-defined.js';
 import { expect, within } from 'storybook/test';
 import './index.js';
 
@@ -157,17 +158,17 @@ const meta = {
   },
   render: (args) => html`
     <hx-format-date
-      date=${args.date}
+      date=${ifDefined(args.date)}
       lang=${args.lang ?? ''}
-      month=${args.month ?? ''}
-      year=${args.year ?? ''}
-      day=${args.day ?? ''}
-      weekday=${args.weekday ?? ''}
-      hour=${args.hour ?? ''}
-      minute=${args.minute ?? ''}
-      second=${args.second ?? ''}
-      time-zone-name=${args.timeZoneName ?? ''}
-      time-zone=${args.timeZone ?? ''}
+      month=${ifDefined(args.month)}
+      year=${ifDefined(args.year)}
+      day=${ifDefined(args.day)}
+      weekday=${ifDefined(args.weekday)}
+      hour=${ifDefined(args.hour)}
+      minute=${ifDefined(args.minute)}
+      second=${ifDefined(args.second)}
+      time-zone-name=${ifDefined(args.timeZoneName)}
+      time-zone=${ifDefined(args.timeZone)}
       hour-format=${args.hourFormat}
       numeric=${args.numeric}
       ?relative=${args.relative}
@@ -301,6 +302,17 @@ export const TimeWithZone: Story = {
 
 export const MultipleLocales: Story = {
   name: 'Multiple Locales',
+  play: async ({ canvasElement }) => {
+    const els = canvasElement.querySelectorAll('hx-format-date');
+    for (const el of els) {
+      const time = el.shadowRoot!.querySelector('time');
+      await expect(time!.textContent!.trim().length).toBeGreaterThan(0);
+    }
+    // en-US long month for June should contain "June"
+    const enEl = els[0];
+    const enTime = enEl!.shadowRoot!.querySelector('time');
+    await expect(enTime!.textContent).toContain('June');
+  },
   render: () => html`
     <div style="display: flex; flex-direction: column; gap: 0.5rem; font-family: sans-serif;">
       <div>
@@ -373,6 +385,17 @@ export const MultipleLocales: Story = {
 
 export const RelativeTimeAuto: Story = {
   name: 'Relative Time (auto)',
+  play: async ({ canvasElement }) => {
+    const els = canvasElement.querySelectorAll('hx-format-date');
+    for (const el of els) {
+      const time = el.shadowRoot!.querySelector('time');
+      await expect(time!.textContent!.trim().length).toBeGreaterThan(0);
+    }
+    // All relative time elements should contain "ago" or "in" (past/future)
+    const firstEl = els[0];
+    const firstTime = firstEl!.shadowRoot!.querySelector('time');
+    await expect(firstTime!.textContent).toMatch(/ago|in/i);
+  },
   render: () => {
     const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000).toISOString();
     const twoHoursAgo = new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString();
@@ -381,10 +404,22 @@ export const RelativeTimeAuto: Story = {
 
     return html`
       <div style="display: flex; flex-direction: column; gap: 0.5rem; font-family: sans-serif;">
-        <div><strong>5 minutes ago:</strong> <hx-format-date date=${fiveMinutesAgo} relative lang="en-US"></hx-format-date></div>
-        <div><strong>2 hours ago:</strong> <hx-format-date date=${twoHoursAgo} relative lang="en-US"></hx-format-date></div>
-        <div><strong>3 days ago:</strong> <hx-format-date date=${threeDaysAgo} relative lang="en-US"></hx-format-date></div>
-        <div><strong>In 2 weeks:</strong> <hx-format-date date=${inTwoWeeks} relative lang="en-US"></hx-format-date></div>
+        <div>
+          <strong>5 minutes ago:</strong>
+          <hx-format-date date=${fiveMinutesAgo} relative lang="en-US"></hx-format-date>
+        </div>
+        <div>
+          <strong>2 hours ago:</strong>
+          <hx-format-date date=${twoHoursAgo} relative lang="en-US"></hx-format-date>
+        </div>
+        <div>
+          <strong>3 days ago:</strong>
+          <hx-format-date date=${threeDaysAgo} relative lang="en-US"></hx-format-date>
+        </div>
+        <div>
+          <strong>In 2 weeks:</strong>
+          <hx-format-date date=${inTwoWeeks} relative lang="en-US"></hx-format-date>
+        </div>
       </div>
     `;
   },
@@ -415,10 +450,22 @@ export const RelativeTimeLocales: Story = {
     const twoHoursAgo = new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString();
     return html`
       <div style="display: flex; flex-direction: column; gap: 0.5rem; font-family: sans-serif;">
-        <div><strong>en-US:</strong> <hx-format-date date=${twoHoursAgo} relative lang="en-US"></hx-format-date></div>
-        <div><strong>de:</strong> <hx-format-date date=${twoHoursAgo} relative lang="de"></hx-format-date></div>
-        <div><strong>ja:</strong> <hx-format-date date=${twoHoursAgo} relative lang="ja"></hx-format-date></div>
-        <div><strong>fr:</strong> <hx-format-date date=${twoHoursAgo} relative lang="fr"></hx-format-date></div>
+        <div>
+          <strong>en-US:</strong>
+          <hx-format-date date=${twoHoursAgo} relative lang="en-US"></hx-format-date>
+        </div>
+        <div>
+          <strong>de:</strong>
+          <hx-format-date date=${twoHoursAgo} relative lang="de"></hx-format-date>
+        </div>
+        <div>
+          <strong>ja:</strong>
+          <hx-format-date date=${twoHoursAgo} relative lang="ja"></hx-format-date>
+        </div>
+        <div>
+          <strong>fr:</strong>
+          <hx-format-date date=${twoHoursAgo} relative lang="fr"></hx-format-date>
+        </div>
       </div>
     `;
   },
@@ -430,6 +477,12 @@ export const RelativeTimeLocales: Story = {
 
 export const AppointmentTimestamp: Story = {
   name: 'Appointment Timestamp',
+  play: async ({ canvasElement }) => {
+    const el = canvasElement.querySelector('hx-format-date');
+    const time = el!.shadowRoot!.querySelector('time');
+    await expect(time!.textContent).toContain('September');
+    await expect(time!.getAttribute('datetime')).toBeTruthy();
+  },
   render: () => html`
     <div style="font-family: sans-serif; max-width: 400px;">
       <p style="margin: 0 0 0.5rem; font-weight: 600;">Next Appointment</p>
@@ -473,7 +526,9 @@ export const DischargeDate: Story = {
     <div style="font-family: sans-serif;">
       <table style="border-collapse: collapse; font-size: 0.875rem;">
         <tr>
-          <td style="padding: 0.5rem 1rem 0.5rem 0; color: #6b7280; font-weight: 500;">Admitted:</td>
+          <td style="padding: 0.5rem 1rem 0.5rem 0; color: #6b7280; font-weight: 500;">
+            Admitted:
+          </td>
           <td style="padding: 0.5rem 0;">
             <hx-format-date
               date="2024-06-10T08:30:00.000Z"
@@ -487,7 +542,9 @@ export const DischargeDate: Story = {
           </td>
         </tr>
         <tr>
-          <td style="padding: 0.5rem 1rem 0.5rem 0; color: #6b7280; font-weight: 500;">Discharged:</td>
+          <td style="padding: 0.5rem 1rem 0.5rem 0; color: #6b7280; font-weight: 500;">
+            Discharged:
+          </td>
           <td style="padding: 0.5rem 0;">
             <hx-format-date
               date="2024-06-15T14:30:00.000Z"
@@ -501,7 +558,9 @@ export const DischargeDate: Story = {
           </td>
         </tr>
         <tr>
-          <td style="padding: 0.5rem 1rem 0.5rem 0; color: #6b7280; font-weight: 500;">Duration:</td>
+          <td style="padding: 0.5rem 1rem 0.5rem 0; color: #6b7280; font-weight: 500;">
+            Duration:
+          </td>
           <td style="padding: 0.5rem 0;">5 days</td>
         </tr>
       </table>
@@ -532,7 +591,86 @@ export const InlineParagraph: Story = {
         month="long"
         day="numeric"
         year="numeric"
-      ></hx-format-date>.
+      ></hx-format-date
+      >.
     </p>
   `,
+};
+
+// ─────────────────────────────────────────────────
+// 8. EDGE CASES
+// ─────────────────────────────────────────────────
+
+export const InvalidDate: Story = {
+  name: 'Invalid Date (fallback to current time)',
+  render: () => html`
+    <div style="font-family: sans-serif; display: flex; flex-direction: column; gap: 0.5rem;">
+      <div>
+        <strong>date="not-a-date":</strong>
+        <hx-format-date date="not-a-date" lang="en-US" month="long" year="numeric" day="numeric">
+        </hx-format-date>
+        <em style="color:#6b7280; font-size:0.8em;">(falls back to current time)</em>
+      </div>
+      <div>
+        <strong>date="" (empty):</strong>
+        <hx-format-date lang="en-US" month="long" year="numeric" day="numeric"></hx-format-date>
+        <em style="color:#6b7280; font-size:0.8em;">(current time by design)</em>
+      </div>
+    </div>
+  `,
+};
+
+export const TimezoneComparison: Story = {
+  name: 'Timezone Comparison',
+  render: () => {
+    const utcDate = '2024-09-20T13:00:00.000Z';
+    return html`
+      <div style="font-family: sans-serif; display: flex; flex-direction: column; gap: 0.5rem;">
+        <div>
+          <strong>UTC:</strong>
+          <hx-format-date
+            date=${utcDate}
+            lang="en-US"
+            hour="numeric"
+            minute="2-digit"
+            time-zone="UTC"
+            time-zone-name="short"
+          ></hx-format-date>
+        </div>
+        <div>
+          <strong>America/New_York:</strong>
+          <hx-format-date
+            date=${utcDate}
+            lang="en-US"
+            hour="numeric"
+            minute="2-digit"
+            time-zone="America/New_York"
+            time-zone-name="short"
+          ></hx-format-date>
+        </div>
+        <div>
+          <strong>Asia/Tokyo:</strong>
+          <hx-format-date
+            date=${utcDate}
+            lang="en-US"
+            hour="numeric"
+            minute="2-digit"
+            time-zone="Asia/Tokyo"
+            time-zone-name="short"
+          ></hx-format-date>
+        </div>
+        <div>
+          <strong>Europe/London:</strong>
+          <hx-format-date
+            date=${utcDate}
+            lang="en-US"
+            hour="numeric"
+            minute="2-digit"
+            time-zone="Europe/London"
+            time-zone-name="short"
+          ></hx-format-date>
+        </div>
+      </div>
+    `;
+  },
 };

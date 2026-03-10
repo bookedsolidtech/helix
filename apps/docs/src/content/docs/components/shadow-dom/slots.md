@@ -1051,7 +1051,7 @@ export class HelixTabGroup extends LitElement {
 ```typescript
 // ❌ BAD: Event doesn't cross shadow boundary
 this.dispatchEvent(
-  new CustomEvent('wc-change', {
+  new CustomEvent('hx-change', {
     bubbles: true,
     // Missing composed: true!
     detail: { value: this.value },
@@ -1060,7 +1060,7 @@ this.dispatchEvent(
 
 // ✅ GOOD: Event crosses shadow boundary
 this.dispatchEvent(
-  new CustomEvent('wc-change', {
+  new CustomEvent('hx-change', {
     bubbles: true,
     composed: true, // Required to bubble through shadow DOM
     detail: { value: this.value },

@@ -1320,3 +1320,39 @@ export const PriorityLevel: Story = {
     </div>
   `,
 };
+
+// ─────────────────────────────────────────────────
+// OPEN / INTERACTIVE LISTBOX STATE
+// ─────────────────────────────────────────────────
+
+export const OpenInteractive: Story = {
+  name: 'Open / Interactive Listbox',
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Shows the select with its dropdown listbox open, demonstrating option hover/focus states, ' +
+          'keyboard navigation indicators, and the selected option highlight. ' +
+          'This is the primary interactive state for visual regression testing.',
+      },
+    },
+  },
+  render: () => html`
+    <div style="padding: 1rem; min-height: 20rem;">
+      <hx-select
+        label="Admitting Department"
+        value="neurology"
+        open
+        name="department"
+        help-text="Use arrow keys to navigate, Enter or Space to select, Escape to close."
+      >
+        <option value="cardiology">Cardiology</option>
+        <option value="neurology">Neurology</option>
+        <option value="oncology">Oncology</option>
+        <option value="orthopedics">Orthopedics</option>
+        <option value="pediatrics">Pediatrics</option>
+        <option value="radiology" disabled>Radiology (unavailable)</option>
+      </hx-select>
+    </div>
+  `,
+};

@@ -49,6 +49,14 @@ describe('hx-pagination', () => {
       expect(list).toBeTruthy();
     });
 
+    it('adds role="list" to the <ul> for Safari VoiceOver compatibility', async () => {
+      const el = await fixture<HelixPagination>(
+        '<hx-pagination total-pages="5" current-page="1"></hx-pagination>',
+      );
+      const list = shadowQuery(el, 'ul');
+      expect(list?.getAttribute('role')).toBe('list');
+    });
+
     it('marks current page button with aria-current="page"', async () => {
       const el = await fixture<HelixPagination>(
         '<hx-pagination total-pages="5" current-page="3"></hx-pagination>',
@@ -174,17 +182,100 @@ describe('hx-pagination', () => {
       expect((event as CustomEvent<{ page: number }>).detail.page).toBe(3);
     });
 
-    it('does not fire hx-page-change when clicking current page', async () => {
+    it('does not fire hx-page-change when clicking current page button', async () => {
       const el = await fixture<HelixPagination>(
-        '<hx-pagination total-pages="5" current-page="1"></hx-pagination>',
+        '<hx-pagination total-pages="5" current-page="3"></hx-pagination>',
       );
       let fired = false;
       el.addEventListener('hx-page-change', () => {
         fired = true;
       });
-      // current page button is disabled, so no click
-      await new Promise((r) => setTimeout(r, 50));
+      const currentPageBtn = shadowQuery(el, 'button[aria-current="page"]') as HTMLButtonElement;
+      currentPageBtn.click();
+      await el.updateComplete;
       expect(fired).toBe(false);
+    });
+
+    it('hx-page-change event has bubbles=true and composed=true', async () => {
+      const el = await fixture<HelixPagination>(
+        '<hx-pagination total-pages="5" current-page="2"></hx-pagination>',
+      );
+      const nextBtn = shadowQuery(el, 'button[aria-label="Next page"]') as HTMLButtonElement;
+      const [event] = await Promise.all([
+        oneEvent(el, 'hx-page-change'),
+        Promise.resolve(nextBtn.click()),
+      ]);
+      expect((event as CustomEvent).bubbles).toBe(true);
+      expect((event as CustomEvent).composed).toBe(true);
+    });
+  });
+
+  // ─── Page Size ───
+
+  describe('Page Size', () => {
+    it('does not show page-size selector by default', async () => {
+      const el = await fixture<HelixPagination>(
+        '<hx-pagination total-pages="5" current-page="1"></hx-pagination>',
+      );
+      const select = el.shadowRoot!.querySelector('select');
+      expect(select).toBeNull();
+    });
+
+    it('shows page-size selector when show-page-size is set', async () => {
+      const el = await fixture<HelixPagination>(
+        '<hx-pagination total-pages="5" current-page="1" show-page-size page-size="25"></hx-pagination>',
+      );
+      const select = el.shadowRoot!.querySelector('select');
+      expect(select).toBeTruthy();
+    });
+
+    it('reflects page-size attribute to pageSize property', async () => {
+      const el = await fixture<HelixPagination>(
+        '<hx-pagination total-pages="5" current-page="1" page-size="50"></hx-pagination>',
+      );
+      expect(el.pageSize).toBe(50);
+    });
+
+    it('fires hx-page-size-change when page size changes', async () => {
+      const el = await fixture<HelixPagination>(
+        '<hx-pagination total-pages="5" current-page="1" show-page-size page-size="25"></hx-pagination>',
+      );
+      const select = el.shadowRoot!.querySelector<HTMLSelectElement>('select')!;
+      const [event] = await Promise.all([
+        oneEvent(el, 'hx-page-size-change'),
+        Promise.resolve().then(() => {
+          select.value = '50';
+          select.dispatchEvent(new Event('change', { bubbles: true }));
+        }),
+      ]);
+      expect((event as CustomEvent<{ pageSize: number }>).detail.pageSize).toBe(50);
+    });
+
+    it('hx-page-size-change event has bubbles=true and composed=true', async () => {
+      const el = await fixture<HelixPagination>(
+        '<hx-pagination total-pages="5" current-page="1" show-page-size page-size="25"></hx-pagination>',
+      );
+      const select = el.shadowRoot!.querySelector<HTMLSelectElement>('select')!;
+      const [event] = await Promise.all([
+        oneEvent(el, 'hx-page-size-change'),
+        Promise.resolve().then(() => {
+          select.value = '10';
+          select.dispatchEvent(new Event('change', { bubbles: true }));
+        }),
+      ]);
+      expect((event as CustomEvent).bubbles).toBe(true);
+      expect((event as CustomEvent).composed).toBe(true);
+    });
+
+    it('updates pageSize property when select changes', async () => {
+      const el = await fixture<HelixPagination>(
+        '<hx-pagination total-pages="5" current-page="1" show-page-size page-size="25"></hx-pagination>',
+      );
+      const select = el.shadowRoot!.querySelector<HTMLSelectElement>('select')!;
+      select.value = '100';
+      select.dispatchEvent(new Event('change', { bubbles: true }));
+      await el.updateComplete;
+      expect(el.pageSize).toBe(100);
     });
   });
 
@@ -275,6 +366,43 @@ describe('hx-pagination', () => {
       nextBtn.click();
       await el.updateComplete;
       expect(el.currentPage).toBe(3);
+    });
+
+    it('sibling-count=2 expands visible page range', async () => {
+      const el = await fixture<HelixPagination>(
+        '<hx-pagination total-pages="20" current-page="10" sibling-count="2"></hx-pagination>',
+      );
+      // With siblingCount=2, pages 8-12 should all be visible (current ± 2)
+      const btn8 = shadowQuery(el, 'button[aria-label="Page 8"]');
+      const btn12 = shadowQuery(el, 'button[aria-label="Page 12"]');
+      expect(btn8).toBeTruthy();
+      expect(btn12).toBeTruthy();
+    });
+
+    it('sibling-count=1 shows fewer surrounding pages than sibling-count=2', async () => {
+      const el1 = await fixture<HelixPagination>(
+        '<hx-pagination total-pages="20" current-page="10" sibling-count="1"></hx-pagination>',
+      );
+      const el2 = await fixture<HelixPagination>(
+        '<hx-pagination total-pages="20" current-page="10" sibling-count="2"></hx-pagination>',
+      );
+      const buttons1 = el1.shadowRoot!.querySelectorAll('button[aria-label^="Page "]').length;
+      const buttons2 = el2.shadowRoot!.querySelectorAll('button[aria-label^="Page "]').length;
+      expect(buttons2).toBeGreaterThan(buttons1);
+    });
+
+    it('boundary-count=2 shows two boundary pages at each end', async () => {
+      const el = await fixture<HelixPagination>(
+        '<hx-pagination total-pages="20" current-page="10" boundary-count="2"></hx-pagination>',
+      );
+      const btn1 = shadowQuery(el, 'button[aria-label="Page 1"]');
+      const btn2 = shadowQuery(el, 'button[aria-label="Page 2"]');
+      const btn19 = shadowQuery(el, 'button[aria-label="Page 19"]');
+      const btn20 = shadowQuery(el, 'button[aria-label="Page 20"]');
+      expect(btn1).toBeTruthy();
+      expect(btn2).toBeTruthy();
+      expect(btn19).toBeTruthy();
+      expect(btn20).toBeTruthy();
     });
   });
 

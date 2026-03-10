@@ -1,0 +1,39 @@
+{
+  "category": "Uncategorized",
+  "description": "Launch readiness audit for hx-side-nav. Using the documentation template from the FOUNDATION ticket, ensure this component is production-ready.\n\n## SUB-COMPONENTS INCLUDED (MANDATORY)\nThis ticket also covers **hx-nav-item** (`hx-side-nav/hx-nav-item.ts`). This is a registered custom element that must be validated for A11y, exports, and documentation alongside the parent. Do NOT skip it.\n\n## Checklist\n1. **A11y healthcare compliance** — Run axe-core audit on BOTH hx-side-nav AND hx-nav-item. Verify ARIA roles (navigation/menu pattern per WAI-ARIA APG), keyboard navigation, screen reader announcements. Zero WCAG 2.1 AA violations.\n2. **Astro documentation page** — Create/update doc page using the standard template. All 12 sections filled. Must document hx-nav-item API too.\n3. **Individual export test** — Verify import works in isolation and exports BOTH elements.\n4. **Existing tests pass** — Run `npm run verify`. Do NOT run vitest directly.\n\n## Known Patterns (from HELIX-PLATFORM-PROTO-LESSONS.md)\n- C-PATTERN-01: Never add `= null` to `@query` fields — use `!` assertion\n- C-PATTERN-02: Never call `setAttribute()` in constructor — use `connectedCallback()`\n- C-PATTERN-06: Register event listeners BEFORE any `await` calls\n\n## Files\n- `packages/hx-library/src/components/hx-side-nav/` (includes hx-nav-item.ts)\n- `apps/docs/src/content/docs/component-library/hx-side-nav.md`\n\n## Acceptance Criteria\n- Zero axe-core violations (both parent and sub-component)\n- Doc page complete per template (sub-component API documented)\n- Individual import works in standalone HTML (both elements render)\n- `npm run verify` passes",
+  "title": "LAUNCH READY: hx-side-nav",
+  "status": "backlog",
+  "dependencies": [
+    "feature-1773066138511-g2pgj0rmm"
+  ],
+  "complexity": "medium",
+  "priority": 3,
+  "source": "api",
+  "trustTier": 1,
+  "quarantineStatus": "passed",
+  "quarantineId": "e558e0bd-18bd-48b6-a371-1e93c8a4c7b6",
+  "id": "feature-1773066366568-56mzp1w4o",
+  "branchName": "feature/launch-ready-hx-side-nav",
+  "descriptionHistory": [
+    {
+      "description": "Launch readiness audit for hx-side-nav. Checklist: (1) A11y — axe-core zero violations, navigation landmark, WCAG 2.1 AA. (2) Astro doc page — all 12 template sections. (3) Individual export — standalone HTML works. (4) `npm run verify` passes. Files: `packages/hx-library/src/components/hx-side-nav/`, `apps/docs/src/content/docs/component-library/hx-side-nav.md`",
+      "timestamp": "2026-03-09T14:26:06.568Z",
+      "source": "initial"
+    },
+    {
+      "description": "Launch readiness audit for hx-side-nav. Using the documentation template from the FOUNDATION ticket, ensure this component is production-ready.\n\n## SUB-COMPONENTS INCLUDED (MANDATORY)\nThis ticket also covers **hx-nav-item** (`hx-side-nav/hx-nav-item.ts`). This is a registered custom element that must be validated for A11y, exports, and documentation alongside the parent. Do NOT skip it.\n\n## Checklist\n1. **A11y healthcare compliance** — Run axe-core audit on BOTH hx-side-nav AND hx-nav-item. Verify ARIA roles (navigation/menu pattern per WAI-ARIA APG), keyboard navigation, screen reader announcements. Zero WCAG 2.1 AA violations.\n2. **Astro documentation page** — Create/update doc page using the standard template. All 12 sections filled. Must document hx-nav-item API too.\n3. **Individual export test** — Verify import works in isolation and exports BOTH elements.\n4. **Existing tests pass** — Run `npm run verify`. Do NOT run vitest directly.\n\n## Known Patterns (from HELIX-PLATFORM-PROTO-LESSONS.md)\n- C-PATTERN-01: Never add `= null` to `@query` fields — use `!` assertion\n- C-PATTERN-02: Never call `setAttribute()` in constructor — use `connectedCallback()`\n- C-PATTERN-06: Register event listeners BEFORE any `await` calls\n\n## Files\n- `packages/hx-library/src/components/hx-side-nav/` (includes hx-nav-item.ts)\n- `apps/docs/src/content/docs/component-library/hx-side-nav.md`\n\n## Acceptance Criteria\n- Zero axe-core violations (both parent and sub-component)\n- Doc page complete per template (sub-component API documented)\n- Individual import works in standalone HTML (both elements render)\n- `npm run verify` passes",
+      "timestamp": "2026-03-09T14:33:07.996Z",
+      "source": "edit"
+    }
+  ],
+  "createdAt": "2026-03-09T14:26:06.568Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-03-09T14:26:06.568Z",
+      "reason": "Feature created"
+    }
+  ],
+  "featureType": "code"
+}

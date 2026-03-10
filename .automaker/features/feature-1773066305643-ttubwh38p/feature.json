@@ -1,0 +1,35 @@
+{
+  "category": "Uncategorized",
+  "description": "Launch readiness audit for hx-help-text. Checklist: (1) A11y — axe-core zero violations, aria-describedby integration, WCAG 2.1 AA. (2) Astro doc page — all 12 template sections. (3) Individual export — standalone HTML works. (4) `npm run verify` passes. Files: `packages/hx-library/src/components/hx-help-text/`, `apps/docs/src/content/docs/component-library/hx-help-text.md`",
+  "title": "LAUNCH READY: hx-help-text",
+  "status": "backlog",
+  "dependencies": [
+    "feature-1773066138511-g2pgj0rmm"
+  ],
+  "complexity": "medium",
+  "priority": 3,
+  "source": "api",
+  "trustTier": 1,
+  "quarantineStatus": "passed",
+  "quarantineId": "8369df20-29b7-43e8-80dc-180f240dc3cb",
+  "id": "feature-1773066305643-ttubwh38p",
+  "branchName": "feature/launch-ready-hx-help-text",
+  "descriptionHistory": [
+    {
+      "description": "Launch readiness audit for hx-help-text. Checklist: (1) A11y — axe-core zero violations, aria-describedby integration, WCAG 2.1 AA. (2) Astro doc page — all 12 template sections. (3) Individual export — standalone HTML works. (4) `npm run verify` passes. Files: `packages/hx-library/src/components/hx-help-text/`, `apps/docs/src/content/docs/component-library/hx-help-text.md`",
+      "timestamp": "2026-03-09T14:25:05.644Z",
+      "source": "initial"
+    }
+  ],
+  "createdAt": "2026-03-09T14:25:05.644Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-03-09T14:25:05.644Z",
+      "reason": "Feature created"
+    }
+  ],
+  "featureType": "code",
+  "prLastPolledAt": "2026-03-10T12:15:17.795Z"
+}

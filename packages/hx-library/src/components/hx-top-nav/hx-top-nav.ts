@@ -1,4 +1,4 @@
-import { LitElement, html } from 'lit';
+import { LitElement, html, svg } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { tokenStyles } from '@helix/tokens/lit';
@@ -15,12 +15,15 @@ import { helixTopNavStyles } from './hx-top-nav.styles.js';
  *
  * @slot logo - Brand area rendered on the left side.
  * @slot - Default slot for primary navigation items rendered in the center.
+ *   IMPORTANT: Do NOT place a `<nav>` element in this slot — the component
+ *   already renders a `<nav>` landmark internally. Use a `<div>` or bare links.
  * @slot actions - Utility area rendered on the right side (search, user menu, etc.).
  *
  * @fires {CustomEvent<{open: boolean}>} hx-mobile-toggle - Dispatched when the
  *   hamburger button is toggled. Detail contains the new open state.
  *
- * @csspart nav - The outer `<nav>` element.
+ * @csspart header - The outer `<header>` landmark element.
+ * @csspart nav - The `<nav>` element inside the header.
  * @csspart logo - The logo slot container.
  * @csspart menu - The primary navigation slot container.
  * @csspart actions - The actions slot container.
@@ -56,7 +59,20 @@ export class HelixTopNav extends LitElement {
 
   // ─── Private State ───
 
+  /** Whether the mobile collapsible menu is currently open. */
   @state() private _mobileOpen = false;
+
+  // ─── Lifecycle ───
+
+  override connectedCallback(): void {
+    super.connectedCallback();
+    this.addEventListener('keydown', this._handleKeydown);
+  }
+
+  override disconnectedCallback(): void {
+    super.disconnectedCallback();
+    this.removeEventListener('keydown', this._handleKeydown);
+  }
 
   // ─── Event Handling ───
 
@@ -74,7 +90,32 @@ export class HelixTopNav extends LitElement {
         detail: { open: this._mobileOpen },
       }),
     );
+
+    if (this._mobileOpen) {
+      // Move focus to first interactive element in the default slot
+      this.updateComplete.then(() => {
+        const slot = this.shadowRoot?.querySelector<HTMLSlotElement>('slot:not([name])');
+        const assigned = slot?.assignedElements({ flatten: true }) ?? [];
+        const firstFocusable = assigned.find((el): el is HTMLElement => el instanceof HTMLElement);
+        firstFocusable?.focus();
+      });
+    }
   }
+
+  private _handleKeydown = (e: KeyboardEvent): void => {
+    if (e.key === 'Escape' && this._mobileOpen) {
+      this._mobileOpen = false;
+      this.dispatchEvent(
+        new CustomEvent<{ open: boolean }>('hx-mobile-toggle', {
+          bubbles: true,
+          composed: true,
+          detail: { open: false },
+        }),
+      );
+      // Return focus to the toggle button
+      this.shadowRoot?.querySelector<HTMLButtonElement>('[part="mobile-toggle"]')?.focus();
+    }
+  };
 
   // ─── Render Helpers ───
 
@@ -91,11 +132,11 @@ export class HelixTopNav extends LitElement {
         stroke-linejoin="round"
       >
         ${this._mobileOpen
-          ? html`
+          ? svg`
               <line x1="18" y1="6" x2="6" y2="18"></line>
               <line x1="6" y1="6" x2="18" y2="18"></line>
             `
-          : html`
+          : svg`
               <line x1="3" y1="6" x2="21" y2="6"></line>
               <line x1="3" y1="12" x2="21" y2="12"></line>
               <line x1="3" y1="18" x2="21" y2="18"></line>
@@ -113,23 +154,25 @@ export class HelixTopNav extends LitElement {
     };
 
     return html`
-      <nav part="nav" class="nav" aria-label=${this.label}>
-        <div class="nav__bar">
-          <div part="logo" class="nav__logo">
-            <slot name="logo"></slot>
-          </div>
+      <header part="header">
+        <nav part="nav" class="nav" aria-label=${this.label}>
+          <div class="nav__bar">
+            <div part="logo" class="nav__logo">
+              <slot name="logo"></slot>
+            </div>
 
-          <button
-            part="mobile-toggle"
-            class="mobile-toggle"
-            type="button"
-            aria-expanded=${this._mobileOpen ? 'true' : 'false'}
-            aria-controls="nav-menu"
-            aria-label="Toggle navigation"
-            @click=${this._handleMobileToggle}
-          >
-            ${this._renderHamburgerIcon()}
-          </button>
+            <button
+              part="mobile-toggle"
+              class="mobile-toggle"
+              type="button"
+              aria-expanded=${String(this._mobileOpen)}
+              aria-controls="nav-menu"
+              aria-label="Toggle navigation"
+              @click=${this._handleMobileToggle}
+            >
+              ${this._renderHamburgerIcon()}
+            </button>
+          </div>
 
           <div id="nav-menu" class=${classMap(menuClasses)}>
             <div part="menu" class="nav__menu">
@@ -140,8 +183,8 @@ export class HelixTopNav extends LitElement {
               <slot name="actions"></slot>
             </div>
           </div>
-        </div>
-      </nav>
+        </nav>
+      </header>
     `;
   }
 }

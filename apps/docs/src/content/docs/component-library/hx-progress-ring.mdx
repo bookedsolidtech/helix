@@ -1,0 +1,383 @@
+---
+title: 'hx-progress-ring'
+description: 'SVG-based circular progress indicator with determinate and indeterminate modes, semantic color variants, and full WCAG 2.1 AA accessibility.'
+---
+
+import ComponentLoader from '../../../components/ComponentLoader.astro';
+import ComponentDemo from '../../../components/ComponentDemo.astro';
+import ComponentDoc from '../../../components/ComponentDoc.astro';
+
+<ComponentLoader />
+
+<ComponentDoc tagName="hx-progress-ring" section="summary" />
+
+## Overview
+
+`hx-progress-ring` is a circular SVG-based progress indicator designed for enterprise healthcare interfaces. It supports two operating modes: determinate (a known percentage is displayed as a filled arc) and indeterminate (an animated spinner for operations whose duration is unknown). Four semantic color variants — `default`, `success`, `warning`, and `danger` — map directly to clinical status signals such as medication adherence ratings or form completion thresholds.
+
+Use `hx-progress-ring` when a compact, circular indicator fits the available layout space — for example, inside a card widget showing a patient's intake form completion. Use `hx-progress-bar` when a horizontal bar better suits the layout or when horizontal space is plentiful.
+
+## Live Demo
+
+### Determinate Progress
+
+<ComponentDemo title="Determinate Progress">
+  <div style="display: flex; gap: 1.5rem; align-items: center; flex-wrap: wrap;">
+    <hx-progress-ring value="65" label="Task completion: 65%">
+      <span style="font-size: 0.75rem; font-weight: 600;">65%</span>
+    </hx-progress-ring>
+  </div>
+</ComponentDemo>
+
+### Indeterminate (Loading)
+
+<ComponentDemo title="Indeterminate Loading">
+  <hx-progress-ring label="Loading, please wait"></hx-progress-ring>
+</ComponentDemo>
+
+### Semantic Variants
+
+<ComponentDemo title="Semantic Color Variants">
+  <div style="display: flex; gap: 1.5rem; align-items: center; flex-wrap: wrap;">
+    <div style="display: flex; flex-direction: column; align-items: center; gap: 0.5rem;">
+      <hx-progress-ring variant="default" value="65" label="Default: 65%">
+        <span style="font-size: 0.75rem; font-weight: 600;">65%</span>
+      </hx-progress-ring>
+      <span style="font-size: 0.75rem; color: #6b7280;">default</span>
+    </div>
+    <div style="display: flex; flex-direction: column; align-items: center; gap: 0.5rem;">
+      <hx-progress-ring variant="success" value="100" label="Complete: 100%">
+        <span style="font-size: 0.75rem; font-weight: 600; color: #16a34a;">100%</span>
+      </hx-progress-ring>
+      <span style="font-size: 0.75rem; color: #6b7280;">success</span>
+    </div>
+    <div style="display: flex; flex-direction: column; align-items: center; gap: 0.5rem;">
+      <hx-progress-ring variant="warning" value="45" label="Warning: 45%">
+        <span style="font-size: 0.75rem; font-weight: 600; color: #d97706;">45%</span>
+      </hx-progress-ring>
+      <span style="font-size: 0.75rem; color: #6b7280;">warning</span>
+    </div>
+    <div style="display: flex; flex-direction: column; align-items: center; gap: 0.5rem;">
+      <hx-progress-ring variant="danger" value="90" label="Critical: 90%">
+        <span style="font-size: 0.75rem; font-weight: 600; color: #dc2626;">90%</span>
+      </hx-progress-ring>
+      <span style="font-size: 0.75rem; color: #6b7280;">danger</span>
+    </div>
+  </div>
+</ComponentDemo>
+
+### Size Variants
+
+<ComponentDemo title="Size Variants">
+  <div style="display: flex; gap: 1.5rem; align-items: center;">
+    <div style="display: flex; flex-direction: column; align-items: center; gap: 0.5rem;">
+      <hx-progress-ring size="sm" value="65" label="Small: 65%"></hx-progress-ring>
+      <span style="font-size: 0.75rem; color: #6b7280;">sm</span>
+    </div>
+    <div style="display: flex; flex-direction: column; align-items: center; gap: 0.5rem;">
+      <hx-progress-ring size="md" value="65" label="Medium: 65%">
+        <span style="font-size: 0.75rem; font-weight: 600;">65%</span>
+      </hx-progress-ring>
+      <span style="font-size: 0.75rem; color: #6b7280;">md (default)</span>
+    </div>
+    <div style="display: flex; flex-direction: column; align-items: center; gap: 0.5rem;">
+      <hx-progress-ring size="lg" value="65" label="Large: 65%">
+        <span style="font-size: 0.875rem; font-weight: 600;">65%</span>
+      </hx-progress-ring>
+      <span style="font-size: 0.75rem; color: #6b7280;">lg</span>
+    </div>
+  </div>
+</ComponentDemo>
+
+### Healthcare Example: Medication Adherence Dashboard
+
+<ComponentDemo title="Medication Adherence">
+  <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+    <div style="display: flex; flex-direction: column; align-items: center; gap: 0.5rem; padding: 1rem; border: 1px solid #e5e7eb; border-radius: 0.5rem; min-width: 100px;">
+      <hx-progress-ring value="92" variant="success" size="lg" label="Adherence: 92%">
+        <span style="font-size: 0.875rem; font-weight: 700; color: #16a34a;">92%</span>
+      </hx-progress-ring>
+      <span style="font-size: 0.75rem; font-weight: 600; color: #16a34a;">Excellent</span>
+      <span style="font-size: 0.75rem; color: #6b7280;">Metformin</span>
+    </div>
+    <div style="display: flex; flex-direction: column; align-items: center; gap: 0.5rem; padding: 1rem; border: 1px solid #e5e7eb; border-radius: 0.5rem; min-width: 100px;">
+      <hx-progress-ring value="67" variant="warning" size="lg" label="Adherence: 67%">
+        <span style="font-size: 0.875rem; font-weight: 700; color: #d97706;">67%</span>
+      </hx-progress-ring>
+      <span style="font-size: 0.75rem; font-weight: 600; color: #d97706;">Fair</span>
+      <span style="font-size: 0.75rem; color: #6b7280;">Lisinopril</span>
+    </div>
+    <div style="display: flex; flex-direction: column; align-items: center; gap: 0.5rem; padding: 1rem; border: 1px solid #e5e7eb; border-radius: 0.5rem; min-width: 100px;">
+      <hx-progress-ring value="28" variant="danger" size="lg" label="Adherence: 28%">
+        <span style="font-size: 0.875rem; font-weight: 700; color: #dc2626;">28%</span>
+      </hx-progress-ring>
+      <span style="font-size: 0.75rem; font-weight: 600; color: #dc2626;">Poor</span>
+      <span style="font-size: 0.75rem; color: #6b7280;">Atorvastatin</span>
+    </div>
+  </div>
+</ComponentDemo>
+
+## Installation
+
+```bash
+# Full library
+npm install @helix/library
+
+# Or import only this component (tree-shaking friendly)
+import '@helix/library/components/hx-progress-ring';
+```
+
+## Basic Usage
+
+Minimal HTML snippet — no build tool required:
+
+```html
+<!-- Determinate: show 65% progress -->
+<hx-progress-ring value="65" label="Upload progress: 65%">
+  <span>65%</span>
+</hx-progress-ring>
+
+<!-- Indeterminate: spinner, unknown duration -->
+<hx-progress-ring label="Loading patient records"></hx-progress-ring>
+```
+
+Set properties via JavaScript for dynamic updates:
+
+```javascript
+const ring = document.querySelector('hx-progress-ring');
+
+// Update progress value
+ring.value = 80;
+
+// Switch to indeterminate mode
+ring.value = null;
+
+// Switch back to determinate
+ring.value = 100;
+ring.variant = 'success';
+```
+
+## Properties
+
+| Property      | Attribute      | Type                                              | Default     | Description                                                                                             |
+| ------------- | -------------- | ------------------------------------------------- | ----------- | ------------------------------------------------------------------------------------------------------- |
+| `value`       | `value`        | `number \| null`                                  | `null`      | Current progress value (0–`max`). When `null`, the component renders in indeterminate (spinning) mode.  |
+| `max`         | `max`          | `number`                                          | `100`       | Maximum value for the progress range. Used for `aria-valuemax` and for computing the filled arc length. |
+| `size`        | `size`         | `'sm' \| 'md' \| 'lg'`                            | `'md'`      | Controls the SVG diameter. `sm` = 2rem, `md` = 3rem, `lg` = 4rem. Reflects to attribute.                |
+| `strokeWidth` | `stroke-width` | `number`                                          | `4`         | Stroke width of the ring circles in SVG user units. Reflects to attribute.                              |
+| `variant`     | `variant`      | `'default' \| 'success' \| 'warning' \| 'danger'` | `'default'` | Semantic color variant applied to the indicator arc. Reflects to attribute.                             |
+| `label`       | `label`        | `string`                                          | `''`        | Accessible name applied as `aria-label` on the host element. Required for WCAG 4.1.2 compliance.        |
+
+## Events
+
+`hx-progress-ring` is a display-only component. It does not dispatch any custom events. React to progress changes in your application logic by updating the `value` property directly.
+
+| Event    | Detail Type | Description       |
+| -------- | ----------- | ----------------- |
+| _(none)_ | —           | No custom events. |
+
+## CSS Custom Properties
+
+| Property                             | Default                       | Description                                                |
+| ------------------------------------ | ----------------------------- | ---------------------------------------------------------- |
+| `--hx-progress-ring-track-color`     | `var(--hx-color-neutral-200)` | Stroke color of the background track circle.               |
+| `--hx-progress-ring-indicator-color` | `var(--hx-color-primary-500)` | Stroke color of the progress arc. Overridden by `variant`. |
+| `--hx-progress-ring-label-color`     | `var(--hx-color-neutral-900)` | Text color of center label slot content.                   |
+
+Override at the semantic token level to theme all instances, or at the component level to style a single instance:
+
+```css
+/* Theme all progress rings to your brand color */
+:root {
+  --hx-progress-ring-indicator-color: #0077b6;
+}
+
+/* Override a single instance inline */
+hx-progress-ring#my-ring {
+  --hx-progress-ring-track-color: #f0f4ff;
+  --hx-progress-ring-indicator-color: #3b82f6;
+}
+```
+
+## CSS Parts
+
+| Part        | Description                                                     |
+| ----------- | --------------------------------------------------------------- |
+| `base`      | The `<svg>` element containing the track and indicator circles. |
+| `track`     | The background `<circle>` that forms the full ring track.       |
+| `indicator` | The `<circle>` that renders the progress arc.                   |
+| `label`     | The `<div>` wrapper centered over the SVG for the default slot. |
+
+Use CSS parts to style internals that CSS custom properties do not expose:
+
+```css
+hx-progress-ring::part(track) {
+  stroke-dasharray: 4 4; /* dashed track */
+}
+
+hx-progress-ring::part(indicator) {
+  stroke-linecap: square; /* flat arc ends */
+}
+```
+
+## Slots
+
+| Slot        | Description                                                                                               |
+| ----------- | --------------------------------------------------------------------------------------------------------- |
+| _(default)_ | Content rendered at the center of the ring, overlaid on the SVG. Typically a percentage label or an icon. |
+
+The center slot content is positioned absolutely over the SVG using `position: absolute; inset: 0`. For best results, use a single inline element (e.g., `<span>`) with a small font size. Avoid block elements that may overflow the ring bounds.
+
+```html
+<!-- Percentage label -->
+<hx-progress-ring value="72" label="Form completion: 72%">
+  <span>72%</span>
+</hx-progress-ring>
+
+<!-- Icon (decorative, aria-hidden because the label carries meaning) -->
+<hx-progress-ring value="100" variant="success" label="Upload complete">
+  <svg aria-hidden="true" width="16" height="16"><!-- checkmark --></svg>
+</hx-progress-ring>
+```
+
+## Accessibility
+
+`hx-progress-ring` is built for WCAG 2.1 AA compliance in healthcare contexts where accurate status communication to assistive technology users is mandatory.
+
+| Topic           | Details                                                                                                                                                                                                                                     |
+| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| ARIA role       | `role="progressbar"` is set on the host element in `connectedCallback()`, ensuring the role is present before JavaScript renders, which is critical for Drupal server-side HTML delivery.                                                   |
+| `aria-valuemin` | Always `0`. Set in `connectedCallback()`.                                                                                                                                                                                                   |
+| `aria-valuemax` | Reflects the `max` property. Updated reactively when `max` changes.                                                                                                                                                                         |
+| `aria-valuenow` | Set to the clamped numeric value in determinate mode. Removed in indeterminate mode per the ARIA spec for progressbar widgets with unknown progress.                                                                                        |
+| `aria-busy`     | Set to `"true"` in indeterminate mode to signal to assistive technologies that a region is actively loading. Removed in determinate mode.                                                                                                   |
+| `aria-label`    | Set from the `label` property. **Always provide a label.** When absent, the host has no accessible name, which violates WCAG 4.1.2 (Name, Role, Value). A console warning is emitted to surface this during development.                    |
+| SVG             | The inner `<svg>` has `aria-hidden="true"` and `focusable="false"` — the semantic meaning is carried by the host element's ARIA attributes, not the SVG markup.                                                                             |
+| Focus           | `hx-progress-ring` is not interactive and does not receive keyboard focus.                                                                                                                                                                  |
+| Reduced motion  | The indeterminate spinner animation is suppressed when `prefers-reduced-motion: reduce` is active. A static partial arc is displayed instead.                                                                                               |
+| Screen reader   | Screen readers announce the element using its `role`, `aria-label`, and `aria-valuenow`/`aria-valuemax` in determinate mode (e.g., "Upload progress: 65%: 65 of 100"). In indeterminate mode, `aria-busy="true"` conveys the loading state. |
+
+### Required: Accessible Label
+
+Every `hx-progress-ring` instance must have an accessible name. Provide one via the `label` attribute:
+
+```html
+<!-- Correct: label describes the specific progress context -->
+<hx-progress-ring value="40" label="Patient intake form: 40% complete"></hx-progress-ring>
+
+<!-- Incorrect: no label — screen readers cannot identify what is progressing -->
+<hx-progress-ring value="40"></hx-progress-ring>
+```
+
+## Drupal Integration
+
+Use the component in a Twig template after registering the library:
+
+```twig
+{# my-module/templates/my-template.html.twig #}
+
+<hx-progress-ring
+  value="{{ progress_value }}"
+  max="{{ progress_max|default(100) }}"
+  variant="{{ progress_variant|default('default') }}"
+  size="{{ progress_size|default('md') }}"
+  label="{{ progress_label }}"
+>
+  {% if progress_value is not null %}
+    <span>{{ ((progress_value / progress_max) * 100)|round }}%</span>
+  {% endif %}
+</hx-progress-ring>
+```
+
+Load the library in your module's `.libraries.yml`:
+
+```yaml
+helix-components:
+  js:
+    /libraries/helix/helix.min.js: { minified: true }
+```
+
+Update progress dynamically in Drupal behaviors:
+
+```javascript
+Drupal.behaviors.helixProgressRing = {
+  attach(context) {
+    // once() prevents duplicate event binding during AJAX attach cycles
+    once('helixProgressRing', 'hx-progress-ring[data-ajax-progress]', context).forEach((el) => {
+      const endpoint = el.dataset.progressEndpoint;
+
+      function poll() {
+        fetch(endpoint)
+          .then((r) => r.json())
+          .then(({ value, complete }) => {
+            el.value = value;
+            if (complete) {
+              el.variant = 'success';
+            } else {
+              setTimeout(poll, 1000);
+            }
+          });
+      }
+
+      poll();
+    });
+  },
+};
+```
+
+## Standalone HTML Example
+
+Copy-paste this into a `.html` file and open it in a browser — no build tool needed:
+
+```html
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>hx-progress-ring example</title>
+    <!-- @helix/library is a private package — install via npm workspace, not CDN -->
+    <!-- In your project: import '@helix/library'; in your bundler entry point -->
+  </head>
+  <body
+    style="font-family: sans-serif; padding: 2rem; display: flex; gap: 2rem; align-items: center;"
+  >
+    <!-- Determinate progress ring -->
+    <hx-progress-ring
+      id="upload-ring"
+      value="0"
+      variant="default"
+      size="lg"
+      label="File upload: 0% complete"
+    >
+      <span id="upload-label" style="font-size: 0.875rem; font-weight: 700;">0%</span>
+    </hx-progress-ring>
+
+    <!-- Indeterminate (loading) state -->
+    <hx-progress-ring id="loading-ring" size="md" label="Loading patient data"></hx-progress-ring>
+
+    <script>
+      const ring = document.getElementById('upload-ring');
+      const label = document.getElementById('upload-label');
+      let progress = 0;
+
+      // Simulate a file upload progressing from 0% to 100%
+      const interval = setInterval(() => {
+        progress += 5;
+        ring.value = progress;
+        ring.setAttribute('label', `File upload: ${progress}% complete`);
+        label.textContent = `${progress}%`;
+
+        if (progress >= 100) {
+          clearInterval(interval);
+          ring.variant = 'success';
+        }
+      }, 200);
+    </script>
+  </body>
+</html>
+```
+
+## API Reference
+
+<ComponentDoc tagName="hx-progress-ring" section="api" />

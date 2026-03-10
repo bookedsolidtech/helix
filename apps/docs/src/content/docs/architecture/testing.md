@@ -1,6 +1,6 @@
 ---
 title: Testing Strategy
-description: Enterprise testing approach with Vitest 4.x, Chromatic, and axe-core for HELIX
+description: Enterprise testing approach with Vitest 3.x, Playwright, and axe-core for HELIX
 ---
 
 HELIX follows a comprehensive testing strategy designed for enterprise compliance.
@@ -10,23 +10,25 @@ HELIX follows a comprehensive testing strategy designed for enterprise complianc
 ```
           ╱╲
          ╱  ╲         E2E Tests (Playwright)
-        ╱────╲        Visual Regression (Chromatic)
+        ╱────╲        Visual Regression (Playwright VRT)
        ╱      ╲
       ╱────────╲      Integration Tests
      ╱          ╲     Accessibility Audits (axe-core)
     ╱────────────╲
-   ╱              ╲   Unit Tests (Vitest 4.x Browser Mode)
+   ╱              ╲   Unit Tests (Vitest 3.x Browser Mode)
   ╱────────────────╲
 ```
 
 ## Test Types
 
-### Unit Tests - Vitest 4.x Browser Mode
+### Unit Tests - Vitest 3.x Browser Mode
 
-- Real DOM testing (not jsdom)
+- Real DOM testing (not jsdom) — Shadow DOM queries work correctly
 - Component lifecycle testing
 - Reactive property testing
 - Event handling verification
+
+Vitest 3.x browser mode runs tests against real Chromium via the Playwright provider. Shadow DOM queries, `ElementInternals` form participation, and custom event assertions all behave identically to production. This is a hard requirement for healthcare components where JSDOM approximations are not acceptable.
 
 ### Visual Regression Testing
 
@@ -104,7 +106,7 @@ To add VRT coverage for a new component or variant:
 
 | Category          | Target                 |
 | ----------------- | ---------------------- |
-| Unit tests        | >90% line coverage     |
+| Unit tests        | >80% line coverage     |
 | Accessibility     | 100% axe-core pass     |
 | Visual regression | All component variants |
 | Integration       | Critical user flows    |

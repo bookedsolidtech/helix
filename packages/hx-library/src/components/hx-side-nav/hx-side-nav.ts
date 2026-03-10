@@ -1,5 +1,5 @@
 import { LitElement, html, type PropertyValues } from 'lit';
-import { customElement, property, query } from 'lit/decorators.js';
+import { customElement, property } from 'lit/decorators.js';
 import { tokenStyles } from '@helix/tokens/lit';
 import { helixSideNavStyles } from './hx-side-nav.styles.js';
 
@@ -22,6 +22,7 @@ import { helixSideNavStyles } from './hx-side-nav.styles.js';
  * @csspart header - The header section.
  * @csspart body - The scrollable body section.
  * @csspart footer - The footer section.
+ * @csspart toggle - The collapse/expand toggle button.
  *
  * @cssprop [--hx-side-nav-width=16rem] - Full expanded width.
  * @cssprop [--hx-side-nav-collapsed-width=3.5rem] - Collapsed icon-only width.
@@ -30,6 +31,7 @@ import { helixSideNavStyles } from './hx-side-nav.styles.js';
  * @cssprop [--hx-side-nav-border-color=var(--hx-color-neutral-700)] - Border color.
  * @cssprop [--hx-side-nav-header-padding=var(--hx-space-4)] - Header padding.
  * @cssprop [--hx-side-nav-footer-padding=var(--hx-space-4)] - Footer padding.
+ * @cssprop [--hx-side-nav-toggle-color=var(--hx-color-neutral-400)] - Toggle button icon color.
  */
 @customElement('hx-side-nav')
 export class HelixSideNav extends LitElement {
@@ -50,11 +52,6 @@ export class HelixSideNav extends LitElement {
    */
   @property({ type: String })
   label = 'Main Navigation';
-
-  // ─── Queries ───
-
-  @query('.side-nav__body')
-  private _bodyEl!: HTMLDivElement;
 
   // ─── Lifecycle ───
 
@@ -200,6 +197,7 @@ export class HelixSideNav extends LitElement {
         <div part="header" class="side-nav__header">
           <slot name="header"></slot>
           <button
+            part="toggle"
             class="side-nav__toggle"
             aria-label=${this.collapsed ? 'Expand navigation' : 'Collapse navigation'}
             aria-expanded=${!this.collapsed}
@@ -228,4 +226,4 @@ declare global {
   }
 }
 
-export type { HelixSideNav as WcSideNav };
+export type { HelixSideNav as HxSideNav };

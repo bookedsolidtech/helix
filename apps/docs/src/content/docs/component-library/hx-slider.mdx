@@ -1,0 +1,513 @@
+---
+title: 'hx-slider'
+description: 'Range slider control for selecting a numeric value within a defined min/max boundary'
+---
+
+import ComponentLoader from '../../../components/ComponentLoader.astro';
+import ComponentDemo from '../../../components/ComponentDemo.astro';
+import ComponentDoc from '../../../components/ComponentDoc.astro';
+
+<ComponentLoader />
+
+<ComponentDoc tagName="hx-slider" section="summary" />
+
+## Overview
+
+`hx-slider` is a form-associated range slider for selecting a numeric value within a defined boundary. It wraps a native `<input type="range">` inside Shadow DOM, preserving all native keyboard behavior and ARIA semantics while layering a custom visual design on top.
+
+The component participates in HTML forms via `ElementInternals`, supports tick marks, range labels, a live value display, three size variants, and contextual help text. It is designed for healthcare contexts such as pain scale assessment, dosage adjustment, and vital-sign threshold configuration.
+
+**Use `hx-slider` when:** the user needs to select a value along a continuous or stepped range and an approximate value is acceptable. Ideal for pain scales, volume controls, percentage adjustments, and preference sliders.
+
+**Use `hx-number-input` instead when:** the user must enter a precise numeric value or when the range is large and visual dragging would be impractical.
+
+## Live Demo
+
+### Default
+
+<ComponentDemo title="Default Slider">
+  <hx-slider label="Volume" value="40" min="0" max="100"></hx-slider>
+</ComponentDemo>
+
+### With Value Display
+
+<ComponentDemo title="Value Display">
+  <hx-slider label="Brightness" value="65" min="0" max="100" show-value></hx-slider>
+</ComponentDemo>
+
+### With Tick Marks
+
+<ComponentDemo title="Tick Marks">
+  <hx-slider
+    label="Step Level"
+    value="3"
+    min="0"
+    max="5"
+    step="1"
+    show-ticks
+    show-value
+  ></hx-slider>
+</ComponentDemo>
+
+### With Range Labels
+
+<ComponentDemo title="Range Labels">
+  <hx-slider label="Pain Scale" value="4" min="0" max="10" show-value>
+    <span slot="min-label">No pain</span>
+    <span slot="max-label">Worst pain</span>
+  </hx-slider>
+</ComponentDemo>
+
+### With Help Text
+
+<ComponentDemo title="Help Text">
+  <hx-slider
+    label="Dosage (mg)"
+    value="250"
+    min="0"
+    max="500"
+    step="25"
+    show-value
+    help-text="Adjust to the nearest 25mg increment as prescribed."
+  ></hx-slider>
+</ComponentDemo>
+
+### Size Variants
+
+<ComponentDemo title="Size Variants">
+  <div style="display: flex; flex-direction: column; gap: 1.5rem; max-width: 400px;">
+    <hx-slider label="Small (sm)" value="50" hx-size="sm"></hx-slider>
+    <hx-slider label="Medium (md) — default" value="50" hx-size="md"></hx-slider>
+    <hx-slider label="Large (lg)" value="50" hx-size="lg"></hx-slider>
+  </div>
+</ComponentDemo>
+
+### Disabled
+
+<ComponentDemo title="Disabled">
+  <hx-slider label="Contrast (disabled)" value="70" disabled></hx-slider>
+</ComponentDemo>
+
+### Healthcare — Pain Assessment
+
+<ComponentDemo title="Pain Assessment Scale">
+  <hx-slider
+    label="Current pain level"
+    id="pain-slider"
+    value="0"
+    min="0"
+    max="10"
+    step="1"
+    show-ticks
+    show-value
+    aria-valuetext="0 — No pain"
+  >
+    <span slot="min-label">0 — No pain</span>
+    <span slot="max-label">10 — Worst</span>
+  </hx-slider>
+  <script>
+    const painSlider = document.getElementById('pain-slider');
+    const painLabels = [
+      '0 — No pain', '1 — Very mild', '2 — Mild', '3 — Moderate',
+      '4 — Moderate', '5 — Moderate-Severe', '6 — Severe',
+      '7 — Severe', '8 — Intense', '9 — Intense', '10 — Worst'
+    ];
+    painSlider?.addEventListener('hx-input', (e) => {
+      const v = e.detail.value;
+      painSlider.setAttribute('aria-valuetext', painLabels[v] ?? String(v));
+    });
+  </script>
+</ComponentDemo>
+
+### In a Form
+
+<ComponentDemo title="Form Participation">
+  <form id="slider-form" style="display: flex; flex-direction: column; gap: 1rem; max-width: 400px;">
+    <hx-slider name="dosage" label="Dosage (mg)" value="250" min="0" max="500" step="25" show-value></hx-slider>
+    <button type="submit" style="width: fit-content; padding: 0.5rem 1rem;">Submit</button>
+  </form>
+  <script>
+    document.getElementById('slider-form')?.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const data = new FormData(e.target);
+      console.log('dosage:', data.get('dosage'));
+    });
+  </script>
+</ComponentDemo>
+
+## Installation
+
+```bash
+# Full library
+npm install @helix/library
+
+# Or import only this component (tree-shaking friendly)
+import '@helix/library/components/hx-slider';
+```
+
+## Basic Usage
+
+```html
+<!-- Basic slider with label -->
+<hx-slider label="Volume" value="50" min="0" max="100"></hx-slider>
+
+<!-- Stepped slider with ticks and value display -->
+<hx-slider label="Pain Level" value="3" min="0" max="10" step="1" show-ticks show-value></hx-slider>
+
+<!-- In a form -->
+<form>
+  <hx-slider name="dosage" label="Dosage (mg)" value="250" min="0" max="500" step="25"></hx-slider>
+  <button type="submit">Submit</button>
+</form>
+```
+
+## Properties
+
+| Property    | Attribute        | Type                   | Default | Description                                                                       |
+| ----------- | ---------------- | ---------------------- | ------- | --------------------------------------------------------------------------------- |
+| `name`      | `name`           | `string`               | `''`    | The name submitted with the form via `ElementInternals`.                          |
+| `value`     | `value`          | `number`               | `0`     | The current numeric value. Clamped to `[min, max]` automatically.                 |
+| `min`       | `min`            | `number`               | `0`     | The minimum allowed value.                                                        |
+| `max`       | `max`            | `number`               | `100`   | The maximum allowed value.                                                        |
+| `step`      | `step`           | `number`               | `1`     | The stepping interval between values.                                             |
+| `disabled`  | `disabled`       | `boolean`              | `false` | Disables the slider. Reflects as `aria-disabled="true"` on the host.              |
+| `label`     | `label`          | `string`               | `''`    | Visible label text above the slider. Overridden by the `label` slot.              |
+| `helpText`  | `help-text`      | `string`               | `''`    | Help text displayed below the slider. Linked to the input via `aria-describedby`. |
+| `showValue` | `show-value`     | `boolean`              | `false` | When true, the current numeric value is rendered next to the label.               |
+| `showTicks` | `show-ticks`     | `boolean`              | `false` | When true, tick marks are rendered at each step interval below the track.         |
+| `size`      | `hx-size`        | `'sm' \| 'md' \| 'lg'` | `'md'`  | Size variant controlling track height and thumb size.                             |
+| `valueText` | `aria-valuetext` | `string`               | `''`    | Human-readable alternative for the current value announced by screen readers.     |
+
+## Events
+
+| Event       | Detail Type         | Description                                                                |
+| ----------- | ------------------- | -------------------------------------------------------------------------- |
+| `hx-input`  | `{ value: number }` | Dispatched continuously while the user drags the thumb. Bubbles, composed. |
+| `hx-change` | `{ value: number }` | Dispatched when the user releases the thumb. Bubbles, composed.            |
+
+```javascript
+const slider = document.querySelector('hx-slider');
+
+// Continuous feedback during drag
+slider.addEventListener('hx-input', (e) => {
+  console.log('Dragging:', e.detail.value);
+});
+
+// Final committed value when thumb is released
+slider.addEventListener('hx-change', (e) => {
+  console.log('Committed:', e.detail.value);
+});
+```
+
+## CSS Custom Properties
+
+| Property                         | Default                       | Description                     |
+| -------------------------------- | ----------------------------- | ------------------------------- |
+| `--hx-slider-track-bg`           | `var(--hx-color-neutral-200)` | Track background color.         |
+| `--hx-slider-fill-bg`            | `var(--hx-color-primary-500)` | Filled/progress portion color.  |
+| `--hx-slider-thumb-bg`           | `var(--hx-color-neutral-0)`   | Thumb background color.         |
+| `--hx-slider-thumb-border-color` | `var(--hx-color-primary-500)` | Thumb border color.             |
+| `--hx-slider-thumb-shadow`       | `var(--hx-shadow-sm)`         | Thumb box-shadow.               |
+| `--hx-slider-focus-ring-color`   | `var(--hx-focus-ring-color)`  | Focus ring color on the thumb.  |
+| `--hx-slider-label-color`        | `var(--hx-color-neutral-700)` | Label text color.               |
+| `--hx-slider-value-color`        | `var(--hx-color-neutral-600)` | Value display text color.       |
+| `--hx-slider-tick-color`         | `var(--hx-color-neutral-400)` | Tick mark color.                |
+| `--hx-slider-range-label-color`  | `var(--hx-color-neutral-500)` | Min/max range label text color. |
+| `--hx-slider-help-text-color`    | `var(--hx-color-neutral-500)` | Help text color.                |
+
+Theming example — brand a slider for a patient portal:
+
+```css
+hx-slider {
+  --hx-slider-fill-bg: var(--brand-clinical-blue);
+  --hx-slider-thumb-border-color: var(--brand-clinical-blue);
+  --hx-slider-focus-ring-color: var(--brand-focus-ring);
+}
+```
+
+## CSS Parts
+
+| Part            | Description                                               |
+| --------------- | --------------------------------------------------------- |
+| `slider`        | The outer container element.                              |
+| `track`         | The full-width track background element.                  |
+| `fill`          | The filled portion of the track showing progress.         |
+| `thumb`         | The draggable thumb overlay element (visual only).        |
+| `label`         | The `<label>` element (present when `label` prop is set). |
+| `value-display` | The element displaying the current numeric value.         |
+| `tick`          | Each individual tick mark element.                        |
+
+```css
+/* Example: custom track appearance */
+hx-slider::part(track) {
+  border-radius: 0;
+}
+
+hx-slider::part(fill) {
+  background: linear-gradient(to right, #2563eb, #7c3aed);
+}
+
+hx-slider::part(thumb) {
+  border-radius: 4px;
+}
+```
+
+## Slots
+
+| Slot        | Description                                                                        |
+| ----------- | ---------------------------------------------------------------------------------- |
+| `label`     | Custom label content. Overrides the `label` property when used.                    |
+| `help-text` | Custom help text content. Overrides the `help-text` property when used.            |
+| `min-label` | Label rendered at the minimum (left) end of the slider. Triggers range label row.  |
+| `max-label` | Label rendered at the maximum (right) end of the slider. Triggers range label row. |
+
+```html
+<!-- Custom label with icon -->
+<hx-slider value="5" min="0" max="10">
+  <span slot="label">
+    <svg aria-hidden="true">...</svg>
+    Pain Level
+  </span>
+</hx-slider>
+
+<!-- Range labels (activate range label row) -->
+<hx-slider label="Volume" value="50">
+  <span slot="min-label">Mute</span>
+  <span slot="max-label">Max</span>
+</hx-slider>
+```
+
+## Accessibility
+
+`hx-slider` delegates all interactive ARIA semantics to the native `<input type="range">` inside Shadow DOM, which provides the `slider` role, `aria-valuemin`, `aria-valuemax`, and `aria-valuenow` implicitly from `min`, `max`, and `value` attributes. No redundant ARIA attributes are added.
+
+| Topic              | Details                                                                                                                                                                      |
+| ------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| ARIA role          | Native `<input type="range">` carries implicit `role="slider"`, `aria-valuemin`, `aria-valuemax`, and `aria-valuenow` — no manual ARIA override needed.                      |
+| Accessible name    | Set via `aria-labelledby` pointing to the rendered `<label>` when `label` prop or `label` slot is used. Absent when neither is provided.                                     |
+| `aria-valuetext`   | Set via the `aria-valuetext` attribute / `valueText` property. Use this for healthcare scales: `"7 — Moderate-Severe"` instead of just `"7"`.                                |
+| `aria-describedby` | Links the input to the help text element when `help-text` prop or `help-text` slot is used.                                                                                  |
+| `aria-disabled`    | Reflected as `aria-disabled="true"` on the host element when `disabled` is true, enabling AT traversal to announce the disabled state.                                       |
+| Focus visible      | The visual thumb receives a focus ring via `:focus-visible` on the underlying input element. In forced-color (Windows High Contrast) mode, the native outline is restored.   |
+| WCAG               | Meets WCAG 2.1 AA. SC 2.1.1 (Keyboard), SC 4.1.2 (Name, Role, Value), SC 1.4.11 (Non-text Contrast). Zero axe-core violations in default, full-options, and disabled states. |
+
+### Healthcare Context: `aria-valuetext`
+
+For any slider used in a clinical context where the numeric value alone is insufficient for comprehension, set `aria-valuetext` to describe what the value means:
+
+```html
+<hx-slider
+  label="Pain level"
+  value="7"
+  min="0"
+  max="10"
+  aria-valuetext="7 — Moderate-Severe"
+></hx-slider>
+```
+
+Update `aria-valuetext` reactively as the user drags:
+
+```javascript
+const painLabels = [
+  '0 — No pain',
+  '1 — Very mild',
+  '2 — Mild',
+  '3 — Moderate',
+  '4 — Moderate',
+  '5 — Moderate-Severe',
+  '6 — Severe',
+  '7 — Severe',
+  '8 — Intense',
+  '9 — Intense',
+  '10 — Worst',
+];
+
+slider.addEventListener('hx-input', (e) => {
+  slider.setAttribute('aria-valuetext', painLabels[e.detail.value]);
+});
+```
+
+## Keyboard Navigation
+
+The native `<input type="range">` handles all keyboard interactions. No custom key handlers are needed.
+
+| Key          | Behavior                                          |
+| ------------ | ------------------------------------------------- |
+| `Tab`        | Moves focus to / from the slider.                 |
+| `ArrowRight` | Increases the value by one `step`.                |
+| `ArrowUp`    | Increases the value by one `step`.                |
+| `ArrowLeft`  | Decreases the value by one `step`.                |
+| `ArrowDown`  | Decreases the value by one `step`.                |
+| `Home`       | Jumps the value to `min`.                         |
+| `End`        | Jumps the value to `max`.                         |
+| `PageUp`     | Increases by a large step (browser default ~10%). |
+| `PageDown`   | Decreases by a large step (browser default ~10%). |
+
+## Drupal Integration
+
+```twig
+{# my-module/templates/pain-assessment.html.twig #}
+<hx-slider
+  name="{{ name|default('pain_level') }}"
+  label="{{ label|default('Current pain level') }}"
+  value="{{ value|default(0) }}"
+  min="{{ min|default(0) }}"
+  max="{{ max|default(10) }}"
+  step="{{ step|default(1) }}"
+  {% if show_ticks %}show-ticks{% endif %}
+  {% if show_value %}show-value{% endif %}
+  {% if help_text %}help-text="{{ help_text }}"{% endif %}
+  {% if disabled %}disabled{% endif %}
+>
+  {% if min_label %}<span slot="min-label">{{ min_label }}</span>{% endif %}
+  {% if max_label %}<span slot="max-label">{{ max_label }}</span>{% endif %}
+</hx-slider>
+```
+
+Load the library in your module's `.libraries.yml`:
+
+```yaml
+helix-components:
+  js:
+    /libraries/helix/helix.min.js: { minified: true }
+```
+
+Listen for changes in Drupal behaviors:
+
+```javascript
+Drupal.behaviors.helixSlider = {
+  attach(context) {
+    once('helixSlider', 'hx-slider', context).forEach((el) => {
+      el.addEventListener('hx-change', (e) => {
+        const { value } = e.detail;
+        // Sync to a hidden Drupal field, update AJAX state, etc.
+        const hiddenField = document.querySelector(`input[name="${el.name}_raw"]`);
+        if (hiddenField) hiddenField.value = value;
+      });
+    });
+  },
+};
+```
+
+## Standalone HTML Example
+
+Copy-paste into a `.html` file and open in any browser — no build tool required:
+
+```html
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>hx-slider — Pain Assessment</title>
+    <!-- @helix/library is a private package — install via npm workspace, not CDN -->
+    <!-- In your project: import '@helix/library'; in your bundler entry point -->
+  </head>
+  <body style="font-family: sans-serif; padding: 2rem;">
+    <h2>Patient Pain Assessment</h2>
+
+    <form
+      id="pain-form"
+      style="display: flex; flex-direction: column; gap: 2rem; max-width: 480px;"
+    >
+      <hx-slider
+        id="pain-slider"
+        name="pain_level"
+        label="Current pain level"
+        value="0"
+        min="0"
+        max="10"
+        step="1"
+        show-ticks
+        show-value
+        aria-valuetext="0 — No pain"
+        help-text="Rate your pain on a scale of 0 (no pain) to 10 (worst imaginable)."
+      >
+        <span slot="min-label">0 — No pain</span>
+        <span slot="max-label">10 — Worst</span>
+      </hx-slider>
+
+      <hx-slider
+        id="fatigue-slider"
+        name="fatigue_level"
+        label="Fatigue level"
+        value="0"
+        min="0"
+        max="10"
+        step="1"
+        show-ticks
+        show-value
+        aria-valuetext="0 — No fatigue"
+        help-text="Rate your fatigue on a scale of 0 (no fatigue) to 10 (completely exhausted)."
+      >
+        <span slot="min-label">0 — None</span>
+        <span slot="max-label">10 — Exhausted</span>
+      </hx-slider>
+
+      <button type="submit" style="width: fit-content; padding: 0.5rem 1.5rem; cursor: pointer;">
+        Submit Assessment
+      </button>
+    </form>
+
+    <script>
+      const painLabels = [
+        '0 — No pain',
+        '1 — Very mild',
+        '2 — Mild',
+        '3 — Moderate',
+        '4 — Moderate',
+        '5 — Moderate-Severe',
+        '6 — Severe',
+        '7 — Severe',
+        '8 — Intense',
+        '9 — Intense',
+        '10 — Worst',
+      ];
+      const fatigueLabels = [
+        '0 — No fatigue',
+        '1 — Very mild',
+        '2 — Mild',
+        '3 — Noticeable',
+        '4 — Moderate',
+        '5 — Significant',
+        '6 — Considerable',
+        '7 — Severe',
+        '8 — Very severe',
+        '9 — Debilitating',
+        '10 — Exhausted',
+      ];
+
+      const painSlider = document.getElementById('pain-slider');
+      const fatigueSlider = document.getElementById('fatigue-slider');
+
+      painSlider.addEventListener('hx-input', (e) => {
+        painSlider.setAttribute(
+          'aria-valuetext',
+          painLabels[e.detail.value] ?? String(e.detail.value),
+        );
+      });
+
+      fatigueSlider.addEventListener('hx-input', (e) => {
+        fatigueSlider.setAttribute(
+          'aria-valuetext',
+          fatigueLabels[e.detail.value] ?? String(e.detail.value),
+        );
+      });
+
+      document.getElementById('pain-form').addEventListener('submit', (e) => {
+        e.preventDefault();
+        const data = new FormData(e.target);
+        console.log('pain_level:', data.get('pain_level'));
+        console.log('fatigue_level:', data.get('fatigue_level'));
+        alert(
+          `Assessment submitted.\nPain: ${data.get('pain_level')}/10\nFatigue: ${data.get('fatigue_level')}/10`,
+        );
+      });
+    </script>
+  </body>
+</html>
+```
+
+## API Reference
+
+<ComponentDoc tagName="hx-slider" section="api" />

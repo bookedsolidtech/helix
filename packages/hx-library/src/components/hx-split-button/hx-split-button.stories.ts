@@ -138,7 +138,12 @@ export const Danger: Story = {
     label: 'Delete Record',
   },
   render: (args) => html`
-    <hx-split-button variant=${args.variant} hx-size=${args.size} ?disabled=${args.disabled}>
+    <hx-split-button
+      variant=${args.variant}
+      hx-size=${args.size}
+      ?disabled=${args.disabled}
+      .label=${args.label}
+    >
       <hx-menu-item slot="menu" value="archive">Archive Record</hx-menu-item>
       <hx-menu-item slot="menu" value="flag">Flag for Review</hx-menu-item>
       <hx-menu-item slot="menu" value="delete-all">Delete All Related</hx-menu-item>

@@ -6,6 +6,9 @@ import { repeat } from 'lit/directives/repeat.js';
 import { tokenStyles } from '@helix/tokens/lit';
 import { helixFileUploadStyles } from './hx-file-upload.styles.js';
 
+// Module-level counter for stable, SSR-safe IDs (avoids Math.random() hydration mismatch)
+let _hxFileUploadIdCounter = 0;
+
 interface FileEntry {
   file: File;
   progress: number;
@@ -122,13 +125,15 @@ export class HelixFileUpload extends LitElement {
   // ─── Internal References ───
 
   @query('.file-input')
-  declare private _fileInput: HTMLInputElement | null;
+  private _fileInput!: HTMLInputElement | null;
 
   // ─── Stable IDs ───
 
-  private readonly _labelId = `hx-file-upload-label-${Math.random().toString(36).slice(2, 9)}`;
-  private readonly _errorId = `hx-file-upload-error-${Math.random().toString(36).slice(2, 9)}`;
-  private readonly _dropzoneId = `hx-file-upload-dropzone-${Math.random().toString(36).slice(2, 9)}`;
+  private readonly _baseId = `hx-file-upload-${++_hxFileUploadIdCounter}`;
+  private readonly _labelId = `${this._baseId}-label`;
+  private readonly _errorId = `${this._baseId}-error`;
+  private readonly _dropzoneId = `${this._baseId}-dropzone`;
+  private readonly _liveId = `${this._baseId}-live`;
 
   // ─── Slot Handling ───
 
@@ -569,6 +574,10 @@ export class HelixFileUpload extends LitElement {
               </div>
             `
           : nothing}
+
+        <div id=${this._liveId} class="sr-only" aria-live="assertive" aria-atomic="true">
+          ${this._dragOver ? 'File detected. Release to upload.' : ''}
+        </div>
       </div>
     `;
   }

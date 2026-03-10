@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/web-components';
 import { html } from 'lit';
+import { ifDefined } from 'lit/directives/if-defined.js';
 import { expect, within } from 'storybook/test';
 import './hx-meter.js';
 
@@ -84,6 +85,9 @@ const meta = {
       min=${args.min}
       max=${args.max}
       label=${args.label ?? ''}
+      low=${ifDefined(args.low)}
+      high=${ifDefined(args.high)}
+      optimum=${ifDefined(args.optimum)}
     ></hx-meter>
   `,
 } satisfies Meta;
@@ -229,23 +233,75 @@ export const CustomRange: Story = {
 export const LabelSlot: Story = {
   name: 'Label via slot',
   render: () => html`
-    <hx-meter value="45" min="0" max="200">
+    <hx-meter value="45" min="0" max="200" label="Disk usage: 45 GB of 200 GB">
       <span slot="label">Disk usage: 45 GB of 200 GB</span>
     </hx-meter>
   `,
 };
 
 // ─────────────────────────────────────────────────
-// 6. HEALTHCARE SCENARIOS
+// 6. ARIA-LABEL ONLY (NO VISIBLE LABEL)
+// ─────────────────────────────────────────────────
+
+export const AriaLabelOnly: Story = {
+  name: 'Aria-label only (no visible label)',
+  render: () => html`
+    <p style="font-family: sans-serif; font-size: 0.875rem; color: #374151;">
+      Patient oxygen saturation:
+      <hx-meter
+        value="95"
+        min="0"
+        max="100"
+        low="90"
+        high="100"
+        optimum="98"
+        label="Oxygen saturation: 95%"
+        style="display: inline-block; width: 120px; vertical-align: middle;"
+      ></hx-meter>
+      95%
+    </p>
+    <p style="font-family: sans-serif; font-size: 0.75rem; color: #6b7280; margin-top: 0.5rem;">
+      Use the <code>label</code> attribute (without a visible label element) for inline meters
+      embedded in running text. The label is announced to screen readers but not rendered visually.
+    </p>
+  `,
+};
+
+// ─────────────────────────────────────────────────
+// 7. HEALTHCARE SCENARIOS
 // ─────────────────────────────────────────────────
 
 export const DiskUsage: Story = {
   name: 'Disk Usage',
   render: () => html`
     <div style="display: flex; flex-direction: column; gap: 1rem; max-width: 400px;">
-      <hx-meter value="25" min="0" max="100" low="70" high="90" optimum="30" label="System (/): 25 GB used"></hx-meter>
-      <hx-meter value="78" min="0" max="100" low="70" high="90" optimum="30" label="Data (/data): 78 GB used"></hx-meter>
-      <hx-meter value="95" min="0" max="100" low="70" high="90" optimum="30" label="Backup (/backup): 95 GB used"></hx-meter>
+      <hx-meter
+        value="25"
+        min="0"
+        max="100"
+        low="70"
+        high="90"
+        optimum="30"
+        label="System (/): 25 GB used"
+      ></hx-meter>
+      <hx-meter
+        value="78"
+        min="0"
+        max="100"
+        low="70"
+        high="90"
+        optimum="30"
+        label="Data (/data): 78 GB used"
+      ></hx-meter>
+      <hx-meter
+        value="95"
+        min="0"
+        max="100"
+        low="70"
+        high="90"
+        optimum="30"
+        label="Backup (/backup): 95 GB used"
+      ></hx-meter>
     </div>
   `,
 };
@@ -254,15 +310,39 @@ export const HealthScore: Story = {
   name: 'Patient Health Score',
   render: () => html`
     <div style="display: flex; flex-direction: column; gap: 1rem; max-width: 400px;">
-      <hx-meter value="85" min="0" max="100" low="40" high="60" optimum="100" label="Cardiovascular score: 85/100"></hx-meter>
-      <hx-meter value="55" min="0" max="100" low="40" high="60" optimum="100" label="Respiratory score: 55/100"></hx-meter>
-      <hx-meter value="30" min="0" max="100" low="40" high="60" optimum="100" label="Hydration score: 30/100"></hx-meter>
+      <hx-meter
+        value="85"
+        min="0"
+        max="100"
+        low="40"
+        high="60"
+        optimum="100"
+        label="Cardiovascular score: 85/100"
+      ></hx-meter>
+      <hx-meter
+        value="55"
+        min="0"
+        max="100"
+        low="40"
+        high="60"
+        optimum="100"
+        label="Respiratory score: 55/100"
+      ></hx-meter>
+      <hx-meter
+        value="30"
+        min="0"
+        max="100"
+        low="40"
+        high="60"
+        optimum="100"
+        label="Hydration score: 30/100"
+      ></hx-meter>
     </div>
   `,
 };
 
 // ─────────────────────────────────────────────────
-// 7. NO THRESHOLDS
+// 8. NO THRESHOLDS
 // ─────────────────────────────────────────────────
 
 export const NoThresholds: Story = {

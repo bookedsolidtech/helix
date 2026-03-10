@@ -1,0 +1,332 @@
+---
+title: 'hx-pagination'
+description: 'Page navigation controls with page numbers, prev/next, ellipsis, and optional page-size selector for paginated data sets'
+---
+
+import ComponentLoader from '../../../components/ComponentLoader.astro';
+import ComponentDemo from '../../../components/ComponentDemo.astro';
+import ComponentDoc from '../../../components/ComponentDoc.astro';
+
+<ComponentLoader />
+
+<ComponentDoc tagName="hx-pagination" section="summary" />
+
+## Overview
+
+`hx-pagination` is the standard pagination control for navigating large data sets in Helix. It renders a semantic `<nav>` landmark wrapping a roving-tabindex button group. It supports configurable boundary/sibling page counts, optional First/Last jump buttons, an optional page-size selector, and an `aria-live` status region that announces navigation results to screen readers.
+
+Use `hx-pagination` when you need numbered page navigation for a table, list, or any server-paginated data set. Pair it with `hx-data-table` for full table pagination or use it standalone with any content region.
+
+## Live Demo
+
+### Default (10 pages, page 5)
+
+<ComponentDemo title="Default Pagination">
+  <hx-pagination total-pages="10" current-page="5"></hx-pagination>
+</ComponentDemo>
+
+### First Page
+
+Prev button is disabled on the first page.
+
+<ComponentDemo title="First Page">
+  <hx-pagination total-pages="10" current-page="1"></hx-pagination>
+</ComponentDemo>
+
+### Last Page
+
+Next button is disabled on the last page.
+
+<ComponentDemo title="Last Page">
+  <hx-pagination total-pages="10" current-page="10"></hx-pagination>
+</ComponentDemo>
+
+### With First / Last Buttons
+
+Show jump-to-first and jump-to-last buttons using `show-first-last`.
+
+<ComponentDemo title="With First and Last Buttons">
+  <hx-pagination total-pages="20" current-page="10" show-first-last></hx-pagination>
+</ComponentDemo>
+
+### With Page Size Selector
+
+Add a "Rows per page" dropdown using `show-page-size`.
+
+<ComponentDemo title="With Page Size Selector">
+  <hx-pagination total-pages="10" current-page="1" show-page-size page-size="25"></hx-pagination>
+</ComponentDemo>
+
+### Many Pages
+
+Ellipsis characters appear between page groups when the total exceeds the visible window.
+
+<ComponentDemo title="Many Pages with Ellipsis">
+  <hx-pagination total-pages="50" current-page="25"></hx-pagination>
+</ComponentDemo>
+
+### Custom Theme
+
+Override CSS custom properties to match your brand.
+
+<ComponentDemo title="Custom Themed Pagination">
+  <hx-pagination
+    total-pages="10"
+    current-page="5"
+    style="--hx-pagination-active-bg: #7c3aed; --hx-pagination-hover-border-color: #7c3aed;"
+  ></hx-pagination>
+</ComponentDemo>
+
+## Installation
+
+```bash
+# Full library
+npm install @helix/library
+
+# Or import only this component (tree-shaking friendly)
+import '@helix/library/components/hx-pagination';
+```
+
+## Basic Usage
+
+Minimal HTML snippet — no build tool required:
+
+```html
+<hx-pagination total-pages="10" current-page="1"></hx-pagination>
+```
+
+Listen for page changes in JavaScript:
+
+```javascript
+const pagination = document.querySelector('hx-pagination');
+
+pagination.addEventListener('hx-page-change', (e) => {
+  console.log('Navigated to page:', e.detail.page);
+  // fetch page data, update URL, etc.
+});
+
+pagination.addEventListener('hx-page-size-change', (e) => {
+  console.log('Page size changed to:', e.detail.pageSize);
+});
+```
+
+## Properties
+
+| Property        | Attribute         | Type      | Default        | Description                                                                                      |
+| --------------- | ----------------- | --------- | -------------- | ------------------------------------------------------------------------------------------------ |
+| `totalPages`    | `total-pages`     | `number`  | `1`            | Total number of pages. Reflects to attribute.                                                    |
+| `currentPage`   | `current-page`    | `number`  | `1`            | The currently active page (1-based).                                                             |
+| `siblingCount`  | `sibling-count`   | `number`  | `1`            | Number of page buttons shown on each side of the current page. Reflects to attribute.            |
+| `boundaryCount` | `boundary-count`  | `number`  | `1`            | Number of pages always shown at the start and end of the list. Reflects to attribute.            |
+| `showFirstLast` | `show-first-last` | `boolean` | `false`        | Whether to show First (`«`) and Last (`»`) page jump buttons. Reflects to attribute.             |
+| `label`         | `label`           | `string`  | `'Pagination'` | Accessible label applied as `aria-label` on the `<nav>` element. Reflects to attribute.          |
+| `pageSize`      | `page-size`       | `number`  | `25`           | Number of items per page. Used by the page-size selector when `show-page-size` is set. Reflects. |
+| `showPageSize`  | `show-page-size`  | `boolean` | `false`        | Whether to render the "Rows per page" `<select>` UI. Reflects to attribute.                      |
+
+## Events
+
+| Event                 | Detail Type            | Description                                                                   |
+| --------------------- | ---------------------- | ----------------------------------------------------------------------------- |
+| `hx-page-change`      | `{ page: number }`     | Fired when the user navigates to a new page. `bubbles: true, composed: true`. |
+| `hx-page-size-change` | `{ pageSize: number }` | Fired when the user selects a new page size. `bubbles: true, composed: true`. |
+
+## CSS Custom Properties
+
+| Property                              | Default                                   | Description                                         |
+| ------------------------------------- | ----------------------------------------- | --------------------------------------------------- |
+| `--hx-pagination-gap`                 | `var(--hx-spacing-1, 0.25rem)`            | Gap between pagination buttons.                     |
+| `--hx-pagination-button-size`         | `2.25rem`                                 | Minimum width and height of each button.            |
+| `--hx-pagination-border-color`        | `var(--hx-color-border, #d1d5db)`         | Border color of buttons.                            |
+| `--hx-pagination-border-radius`       | `var(--hx-border-radius-md, 0.375rem)`    | Border radius of buttons.                           |
+| `--hx-pagination-bg`                  | `var(--hx-color-surface, #ffffff)`        | Background color of buttons.                        |
+| `--hx-pagination-color`               | `var(--hx-color-text-primary, #111827)`   | Text color of buttons.                              |
+| `--hx-pagination-hover-bg`            | `var(--hx-color-surface-hover, #f3f4f6)`  | Background color of buttons on hover.               |
+| `--hx-pagination-hover-border-color`  | `var(--hx-color-primary, #2563eb)`        | Border color of buttons on hover.                   |
+| `--hx-pagination-active-bg`           | `var(--hx-color-primary, #2563eb)`        | Background color of the active/current page button. |
+| `--hx-pagination-active-color`        | `var(--hx-color-surface, #ffffff)`        | Text color of the active/current page button.       |
+| `--hx-pagination-active-border-color` | `var(--hx-pagination-active-bg)`          | Border color of the active/current page button.     |
+| `--hx-pagination-ellipsis-color`      | `var(--hx-color-text-secondary, #6b7280)` | Color of ellipsis characters.                       |
+| `--hx-transition-fast`                | `150ms`                                   | Duration used for hover/focus transitions.          |
+
+## CSS Parts
+
+| Part                | Description                                            |
+| ------------------- | ------------------------------------------------------ |
+| `nav`               | The wrapping `<nav>` landmark element.                 |
+| `list`              | The `<ul>` containing all pagination items.            |
+| `item`              | Each `<li>` wrapper around a button or ellipsis.       |
+| `button`            | Each page button or prev/next/first/last control.      |
+| `ellipsis`          | The ellipsis (`…`) span displayed between page groups. |
+| `page-size-wrapper` | The `<div>` wrapper around the page-size selector.     |
+| `page-size-label`   | The `<label>` element for the page-size selector.      |
+| `page-size-select`  | The `<select>` element for choosing items per page.    |
+
+## Slots
+
+`hx-pagination` does not use slots — all content is rendered internally from component properties.
+
+| Slot     | Description          |
+| -------- | -------------------- |
+| _(none)_ | No slots. Use props. |
+
+## Accessibility
+
+`hx-pagination` is designed to meet WCAG 2.1 AA requirements for navigation landmarks, keyboard operability, and screen reader compatibility.
+
+| Topic                | Details                                                                                                                                                             |
+| -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| ARIA role            | Uses a native `<nav>` element — the landmark role is implicit. No additional `role` attribute needed.                                                               |
+| `aria-label`         | Applied to `<nav>` from the `label` property (default: `"Pagination"`). Required for unique landmark identification when multiple `<nav>` elements exist on a page. |
+| `aria-current`       | Set to `"page"` on the active page button. Screen readers announce the current page position.                                                                       |
+| `aria-disabled`      | Applied to the active page button to prevent re-navigation while preserving keyboard reachability via the roving tabindex.                                          |
+| `aria-live`          | A `role="status"` region with `aria-live="polite"` announces the new page after each navigation (e.g., "Page 5 of 94").                                             |
+| `role="list"`        | Explicitly set on the `<ul>` to preserve list semantics in Safari/VoiceOver, which strips list semantics when `list-style: none` is applied.                        |
+| `disabled` attribute | Applied to Prev/Next/First/Last buttons at boundaries — communicates disabled state natively to AT without relying only on CSS.                                     |
+| Keyboard             | Arrow keys (`ArrowLeft` / `ArrowRight`) move focus between buttons using the roving tabindex pattern. `Tab` enters/exits the pagination control.                    |
+| Focus ring           | All interactive elements expose a visible `:focus-visible` outline using `--hx-color-focus`.                                                                        |
+| Reduced motion       | Hover/focus transitions are suppressed when `prefers-reduced-motion: reduce` is set.                                                                                |
+| High contrast        | `@media (forced-colors: active)` block uses system color keywords (`ButtonText`, `Highlight`, `GrayText`) for Windows High Contrast mode support.                   |
+
+## Keyboard Navigation
+
+| Key          | Behavior                                                    |
+| ------------ | ----------------------------------------------------------- |
+| `Tab`        | Enters or exits the pagination control.                     |
+| `ArrowRight` | Moves focus to the next button in the pagination list.      |
+| `ArrowLeft`  | Moves focus to the previous button in the pagination list.  |
+| `Enter`      | Activates the focused page button, navigating to that page. |
+| `Space`      | Activates the focused page button, navigating to that page. |
+
+## Multiple Controls on One Page
+
+Healthcare views often display pagination at both the top and bottom of a table. Each `<hx-pagination>` must have a distinct `label` attribute so screen readers can differentiate the two `<nav>` landmarks.
+
+```html
+<hx-pagination
+  total-pages="10"
+  current-page="3"
+  label="Patient list pagination, top"
+></hx-pagination>
+
+<!-- table content -->
+
+<hx-pagination
+  total-pages="10"
+  current-page="3"
+  label="Patient list pagination, bottom"
+></hx-pagination>
+```
+
+## Drupal Integration
+
+Use the component in a Twig template after registering the library:
+
+```twig
+{#
+  Drupal's pager uses 0-based page index in the URL (?page=N).
+  This component is 1-based, so add 1 to the Drupal page value.
+#}
+<hx-pagination
+  total-pages="{{ total_pages }}"
+  current-page="{{ pager.current_page + 1 }}"
+  label="{{ 'Pagination'|t }}"
+  {{ show_first_last ? 'show-first-last' : '' }}
+></hx-pagination>
+```
+
+Wire the `hx-page-change` event and URL update in a Drupal behavior:
+
+```javascript
+Drupal.behaviors.helixPagination = {
+  attach(context) {
+    once('helixPagination', 'hx-pagination', context).forEach((el) => {
+      el.addEventListener('hx-page-change', (e) => {
+        // Drupal pages are 0-indexed; convert back from 1-based
+        const params = new URLSearchParams(location.search);
+        params.set('page', String(e.detail.page - 1));
+        history.pushState({}, '', '?' + params.toString());
+
+        // Trigger a Drupal AJAX refresh if needed:
+        // Drupal.ajax({ url: location.href }).execute();
+      });
+
+      el.addEventListener('hx-page-size-change', (e) => {
+        const params = new URLSearchParams(location.search);
+        params.set('items_per_page', String(e.detail.pageSize));
+        params.set('page', '0'); // reset to first page on size change
+        history.pushState({}, '', '?' + params.toString());
+      });
+    });
+  },
+};
+```
+
+Load the library in your module's `.libraries.yml`:
+
+```yaml
+helix-components:
+  js:
+    /libraries/helix/helix.min.js: { minified: true }
+```
+
+## Standalone HTML Example
+
+Copy-paste this into a `.html` file and open it in a browser — no build tool needed:
+
+```html
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>hx-pagination example</title>
+    <!-- @helix/library is a private package — install via npm workspace, not CDN -->
+    <!-- In your project: import '@helix/library'; in your bundler entry point -->
+  </head>
+  <body style="font-family: sans-serif; padding: 2rem;">
+    <div style="margin-bottom: 1rem; font-size: 0.875rem; color: #6b7280;">
+      Showing 1–25 of 2,341 patients
+    </div>
+
+    <hx-pagination
+      id="patient-pagination"
+      total-pages="94"
+      current-page="1"
+      show-first-last
+      show-page-size
+      page-size="25"
+      label="Patient list pagination"
+    ></hx-pagination>
+
+    <div id="status" style="margin-top: 1rem; font-size: 0.875rem; color: #374151;"></div>
+
+    <script>
+      const pagination = document.getElementById('patient-pagination');
+      const status = document.getElementById('status');
+
+      pagination.addEventListener('hx-page-change', (e) => {
+        status.textContent = `Navigated to page ${e.detail.page} of ${pagination.totalPages}`;
+        // fetch new data for this page
+      });
+
+      pagination.addEventListener('hx-page-size-change', (e) => {
+        status.textContent = `Page size changed to ${e.detail.pageSize} items`;
+        // recalculate total pages and reset to page 1
+      });
+    </script>
+  </body>
+</html>
+```
+
+## Related Components
+
+| Component       | When to use                                                                           |
+| --------------- | ------------------------------------------------------------------------------------- |
+| `hx-data-table` | Full data table with built-in column sorting and integrated pagination.               |
+| `hx-list`       | Structured list of items without pagination; use for short, fully-rendered item sets. |
+| `hx-select`     | Single-item selector; use for filter dropdowns rather than page navigation.           |
+| `hx-button`     | Standalone action button; use when you need a single navigation trigger, not a range. |
+
+## API Reference
+
+<ComponentDoc tagName="hx-pagination" section="api" />

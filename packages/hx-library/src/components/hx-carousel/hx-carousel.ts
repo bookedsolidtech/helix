@@ -5,10 +5,87 @@ import { tokenStyles } from '@helix/tokens/lit';
 import { helixCarouselStyles } from './hx-carousel.styles.js';
 import type { HelixCarouselItem } from './hx-carousel-item.js';
 
+// ─── Module-level SVG icon constants ───
+
+const _svgChevronLeft = html`<svg
+  xmlns="http://www.w3.org/2000/svg"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+  aria-hidden="true"
+>
+  <polyline points="15 18 9 12 15 6"></polyline>
+</svg>`;
+
+const _svgChevronUp = html`<svg
+  xmlns="http://www.w3.org/2000/svg"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+  aria-hidden="true"
+>
+  <polyline points="18 15 12 9 6 15"></polyline>
+</svg>`;
+
+const _svgChevronRight = html`<svg
+  xmlns="http://www.w3.org/2000/svg"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+  aria-hidden="true"
+>
+  <polyline points="9 18 15 12 9 6"></polyline>
+</svg>`;
+
+const _svgChevronDown = html`<svg
+  xmlns="http://www.w3.org/2000/svg"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+  aria-hidden="true"
+>
+  <polyline points="6 9 12 15 18 9"></polyline>
+</svg>`;
+
+const _svgPlay = html`<svg
+  xmlns="http://www.w3.org/2000/svg"
+  viewBox="0 0 24 24"
+  fill="currentColor"
+  aria-hidden="true"
+  width="1em"
+  height="1em"
+>
+  <polygon points="5 3 19 12 5 21 5 3"></polygon>
+</svg>`;
+
+const _svgPause = html`<svg
+  xmlns="http://www.w3.org/2000/svg"
+  viewBox="0 0 24 24"
+  fill="currentColor"
+  aria-hidden="true"
+  width="1em"
+  height="1em"
+>
+  <rect x="6" y="4" width="4" height="16"></rect>
+  <rect x="14" y="4" width="4" height="16"></rect>
+</svg>`;
+
 /**
  * A scrollable carousel/slider for images or content slides.
  *
- * @summary Scrollable carousel with navigation, pagination, and autoplay.
+ * @summary Scrollable carousel with navigation, pagination, autoplay, and an accessible label.
  *
  * @tag hx-carousel
  *
@@ -19,17 +96,30 @@ import type { HelixCarouselItem } from './hx-carousel-item.js';
  * @fires {CustomEvent<{index: number, slide: HelixCarouselItem}>} hx-slide-change - Dispatched when the active slide changes.
  *
  * @csspart base - The outer wrapper element.
- * @csspart scroll-container - The slide viewport/overflow container.
+ * @csspart slide-viewport - The slide viewport/overflow container.
  * @csspart pagination - The pagination dot container.
  * @csspart pagination-item - Individual pagination dot button.
  * @csspart navigation - The previous/next button wrapper.
+ * @csspart prev-btn - The previous navigation button.
+ * @csspart next-btn - The next navigation button.
+ * @csspart play-pause-btn - The autoplay play/pause toggle button.
  *
  * @cssprop [--hx-carousel-gap=0px] - Gap between slides.
  * @cssprop [--hx-carousel-slide-width=100%] - Width override for each slide.
+ * @cssprop [--hx-carousel-nav-btn-size=2.5rem] - Size of previous/next navigation buttons.
+ * @cssprop [--hx-carousel-pagination-dot-size=0.5rem] - Size of pagination dots.
  */
 @customElement('hx-carousel')
 export class HelixCarousel extends LitElement {
   static override styles = [tokenStyles, helixCarouselStyles];
+
+  /**
+   * Accessible label identifying this carousel to assistive technology.
+   * When multiple carousels appear on the same page, each must have a unique label.
+   * @attr label
+   */
+  @property({ type: String, reflect: true })
+  label = 'Carousel';
 
   /**
    * Whether the carousel wraps around from last to first slide and vice-versa.
@@ -78,12 +168,13 @@ export class HelixCarousel extends LitElement {
    * Whether click-drag scrolling is enabled.
    * @attr mouse-dragging
    */
-  @property({ type: Boolean, attribute: 'mouse-dragging' })
+  @property({ type: Boolean, attribute: 'mouse-dragging', reflect: true })
   mouseDragging = false;
 
   @state() private _currentIndex = 0;
   @state() private _slides: HelixCarouselItem[] = [];
   @state() private _isPlaying = false;
+  @state() private _liveText = '';
 
   private _autoplayTimer: ReturnType<typeof setInterval> | null = null;
   private _reducedMotion = false;
@@ -95,6 +186,8 @@ export class HelixCarousel extends LitElement {
   private _dragStartCoord = 0;
   private _isDragging = false;
   private _dragMoved = false;
+  private _touchStartCoord = 0;
+  private _touchMoved = false;
 
   // ─── Lifecycle ───
 
@@ -109,6 +202,7 @@ export class HelixCarousel extends LitElement {
     this.addEventListener('focusin', this._handleFocusIn);
     this.addEventListener('focusout', this._handleFocusOut);
     this.addEventListener('keydown', this._handleKeydown);
+    // Touch events are registered directly on the scroll-container in the template
   }
 
   override disconnectedCallback(): void {
@@ -178,6 +272,7 @@ export class HelixCarousel extends LitElement {
     if (next === this._currentIndex) return;
 
     this._currentIndex = next;
+    this._liveText = `Slide ${next + 1} of ${this._slides.length}`;
     this.dispatchEvent(
       new CustomEvent('hx-slide-change', {
         bubbles: true,
@@ -205,18 +300,20 @@ export class HelixCarousel extends LitElement {
 
   // ─── Autoplay ───
 
+  private _autoplayTick = (): void => {
+    if (this.loop) {
+      this.goTo(this._currentIndex + this.slidesPerMove);
+    } else if (this._currentIndex < this._maxIndex) {
+      this.goTo(this._currentIndex + this.slidesPerMove);
+    } else {
+      this.goTo(0);
+    }
+  };
+
   private _startAutoplay(): void {
     if (this._autoplayTimer !== null) return;
     this._isPlaying = true;
-    this._autoplayTimer = setInterval(() => {
-      if (this.loop) {
-        this.goTo(this._currentIndex + this.slidesPerMove);
-      } else if (this._currentIndex < this._maxIndex) {
-        this.goTo(this._currentIndex + this.slidesPerMove);
-      } else {
-        this.goTo(0);
-      }
-    }, this.autoplayInterval);
+    this._autoplayTimer = setInterval(this._autoplayTick, this.autoplayInterval);
   }
 
   private _stopAutoplay(): void {
@@ -244,15 +341,7 @@ export class HelixCarousel extends LitElement {
   private _resumeAutoplay(): void {
     if (!this.autoplay || !this._isPlaying || this._reducedMotion) return;
     if (this._autoplayTimer !== null) return;
-    this._autoplayTimer = setInterval(() => {
-      if (this.loop) {
-        this.goTo(this._currentIndex + this.slidesPerMove);
-      } else if (this._currentIndex < this._maxIndex) {
-        this.goTo(this._currentIndex + this.slidesPerMove);
-      } else {
-        this.goTo(0);
-      }
-    }, this.autoplayInterval);
+    this._autoplayTimer = setInterval(this._autoplayTick, this.autoplayInterval);
   }
 
   // ─── Event Handlers ───
@@ -355,6 +444,46 @@ export class HelixCarousel extends LitElement {
     (e.currentTarget as HTMLElement).style.cursor = '';
   }
 
+  // ─── Touch Handlers ───
+
+  private _handleTouchStart(e: TouchEvent): void {
+    if (!this.mouseDragging) return;
+    const touch = e.touches[0];
+    if (!touch) return;
+    this._isDragging = true;
+    this._touchMoved = false;
+    this._touchStartCoord = this.orientation === 'horizontal' ? touch.clientX : touch.clientY;
+  }
+
+  private _handleTouchMove(e: TouchEvent): void {
+    if (!this._isDragging) return;
+    const touch = e.touches[0];
+    if (!touch) return;
+    const current = this.orientation === 'horizontal' ? touch.clientX : touch.clientY;
+    const diff = current - this._touchStartCoord;
+    if (Math.abs(diff) > 5) {
+      this._touchMoved = true;
+    }
+  }
+
+  private _handleTouchEnd(e: TouchEvent): void {
+    if (!this._isDragging) return;
+    const touch = e.changedTouches[0];
+    if (!touch) return;
+    const current = this.orientation === 'horizontal' ? touch.clientX : touch.clientY;
+    const diff = current - this._touchStartCoord;
+    const threshold = 50;
+    if (this._touchMoved) {
+      if (diff > threshold) {
+        this.previous();
+      } else if (diff < -threshold) {
+        this.next();
+      }
+    }
+    this._isDragging = false;
+    this._touchMoved = false;
+  }
+
   // ─── Computed ───
 
   private get _trackTransform(): string {
@@ -381,6 +510,7 @@ export class HelixCarousel extends LitElement {
         <slot name="previous-button">
           <button
             class="nav-btn"
+            part="prev-btn"
             type="button"
             aria-label="Previous slide"
             ?disabled=${!this._canGoPrev}
@@ -393,6 +523,7 @@ export class HelixCarousel extends LitElement {
           ? html`
               <button
                 class="play-pause-btn"
+                part="play-pause-btn"
                 type="button"
                 aria-label=${this._isPlaying ? 'Pause autoplay' : 'Play autoplay'}
                 @click=${() => this._toggleAutoplay()}
@@ -404,6 +535,7 @@ export class HelixCarousel extends LitElement {
         <slot name="next-button">
           <button
             class="nav-btn"
+            part="next-btn"
             type="button"
             aria-label="Next slide"
             ?disabled=${!this._canGoNext}
@@ -432,7 +564,7 @@ export class HelixCarousel extends LitElement {
                 })}
                 part="pagination-item"
                 type="button"
-                aria-label="Slide ${i + 1}"
+                aria-label="Slide ${i + 1} of ${count}"
                 aria-current=${i === this._currentIndex ? 'true' : 'false'}
                 @click=${() => this.goTo(i)}
               >
@@ -446,123 +578,48 @@ export class HelixCarousel extends LitElement {
   }
 
   private _renderPrevIcon() {
-    return this.orientation === 'horizontal'
-      ? html`
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            aria-hidden="true"
-          >
-            <polyline points="15 18 9 12 15 6"></polyline>
-          </svg>
-        `
-      : html`
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            aria-hidden="true"
-          >
-            <polyline points="18 15 12 9 6 15"></polyline>
-          </svg>
-        `;
+    return this.orientation === 'horizontal' ? _svgChevronLeft : _svgChevronUp;
   }
 
   private _renderNextIcon() {
-    return this.orientation === 'horizontal'
-      ? html`
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            aria-hidden="true"
-          >
-            <polyline points="9 18 15 12 9 6"></polyline>
-          </svg>
-        `
-      : html`
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            aria-hidden="true"
-          >
-            <polyline points="6 9 12 15 18 9"></polyline>
-          </svg>
-        `;
+    return this.orientation === 'horizontal' ? _svgChevronRight : _svgChevronDown;
   }
 
   private _renderPlayIcon() {
-    return html`
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        viewBox="0 0 24 24"
-        fill="currentColor"
-        aria-hidden="true"
-        width="1em"
-        height="1em"
-      >
-        <polygon points="5 3 19 12 5 21 5 3"></polygon>
-      </svg>
-    `;
+    return _svgPlay;
   }
 
   private _renderPauseIcon() {
-    return html`
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        viewBox="0 0 24 24"
-        fill="currentColor"
-        aria-hidden="true"
-        width="1em"
-        height="1em"
-      >
-        <rect x="6" y="4" width="4" height="16"></rect>
-        <rect x="14" y="4" width="4" height="16"></rect>
-      </svg>
-    `;
+    return _svgPause;
   }
 
   // ─── Render ───
 
   override render() {
-    const isAutoplayStopped = this.autoplay && !this._isPlaying;
     return html`
       <div
         class="base"
         part="base"
         role="region"
-        aria-label="Carousel"
+        aria-label=${this.label}
         aria-roledescription="carousel"
         tabindex="0"
       >
+        <div class="live-region" role="status" aria-live="polite" aria-atomic="true">
+          ${this._liveText}
+        </div>
         ${this._renderNavigation()}
         <div class="scroll-container-wrapper">
           <div
-            class="scroll-container"
-            part="scroll-container"
-            aria-live=${isAutoplayStopped ? 'polite' : 'off'}
+            class="slide-viewport"
+            part="slide-viewport"
             @mousedown=${this._handleDragStart}
             @mousemove=${this._handleDragMove}
             @mouseup=${this._handleDragEnd}
             @mouseleave=${this._handleDragEnd}
+            @touchstart=${this._handleTouchStart}
+            @touchmove=${this._handleTouchMove}
+            @touchend=${this._handleTouchEnd}
           >
             <div class="track" style="transform: ${this._trackTransform};">
               <slot @slotchange=${this._handleSlotChange}></slot>

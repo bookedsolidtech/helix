@@ -334,7 +334,106 @@ export const AllSizes: Story = {
 };
 
 // ─────────────────────────────────────────────────
-// 10. WITH PREFIX SLOT
+// 10. ICON ONLY — accessible name via label attribute
+// ─────────────────────────────────────────────────
+
+export const IconOnly: Story = {
+  name: 'Icon Only (accessible name via label)',
+  render: () => html`
+    <div style="display: flex; flex-direction: column; gap: 1rem;">
+      <p style="margin: 0; font-size: 0.875rem; color: #6b7280;">
+        Icon-only toggle buttons require a <code>label</code> attribute so the inner
+        <code>&lt;button&gt;</code> has an accessible name for screen readers.
+      </p>
+      <div style="display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap;">
+        <hx-toggle-button variant="outline" hx-size="sm" label="Grid view">
+          <svg
+            slot="prefix"
+            xmlns="http://www.w3.org/2000/svg"
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+          >
+            <rect x="3" y="3" width="7" height="7" />
+            <rect x="14" y="3" width="7" height="7" />
+            <rect x="14" y="14" width="7" height="7" />
+            <rect x="3" y="14" width="7" height="7" />
+          </svg>
+        </hx-toggle-button>
+
+        <hx-toggle-button variant="outline" hx-size="sm" pressed label="List view">
+          <svg
+            slot="prefix"
+            xmlns="http://www.w3.org/2000/svg"
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+          >
+            <line x1="8" y1="6" x2="21" y2="6" />
+            <line x1="8" y1="12" x2="21" y2="12" />
+            <line x1="8" y1="18" x2="21" y2="18" />
+            <line x1="3" y1="6" x2="3.01" y2="6" />
+            <line x1="3" y1="12" x2="3.01" y2="12" />
+            <line x1="3" y1="18" x2="3.01" y2="18" />
+          </svg>
+        </hx-toggle-button>
+
+        <hx-toggle-button variant="ghost" hx-size="sm" label="Mute audio">
+          <svg
+            slot="prefix"
+            xmlns="http://www.w3.org/2000/svg"
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+          >
+            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
+            <line x1="23" y1="9" x2="17" y2="15" />
+            <line x1="17" y1="9" x2="23" y2="15" />
+          </svg>
+        </hx-toggle-button>
+
+        <hx-toggle-button variant="ghost" hx-size="sm" disabled label="Bookmark (disabled)">
+          <svg
+            slot="prefix"
+            xmlns="http://www.w3.org/2000/svg"
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+          >
+            <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" />
+          </svg>
+        </hx-toggle-button>
+      </div>
+    </div>
+  `,
+};
+
+// ─────────────────────────────────────────────────
+// 12. WITH PREFIX SLOT
 // ─────────────────────────────────────────────────
 
 export const WithPrefixSlot: Story = {
@@ -480,7 +579,7 @@ export const WithSuffixSlot: Story = {
 };
 
 // ─────────────────────────────────────────────────
-// 12. TOGGLE INTERACTION — play function clicks and verifies state change
+// 13. TOGGLE INTERACTION — play function clicks and verifies state change
 // ─────────────────────────────────────────────────
 
 export const ToggleInteraction: Story = {
@@ -525,7 +624,7 @@ export const ToggleInteraction: Story = {
 };
 
 // ─────────────────────────────────────────────────
-// 13. KEYBOARD ACTIVATION — Space and Enter toggle the pressed state
+// 14. KEYBOARD ACTIVATION — Space and Enter toggle the pressed state
 // ─────────────────────────────────────────────────
 
 export const KeyboardActivation: Story = {
@@ -577,7 +676,7 @@ export const KeyboardActivation: Story = {
 };
 
 // ─────────────────────────────────────────────────
-// 14. VIEW MODE TOGGLE — Healthcare scenario: Grid/List view toolbar
+// 15. VIEW MODE TOGGLE — Healthcare scenario: Grid/List view toolbar
 // ─────────────────────────────────────────────────
 
 export const ViewModeToggle: Story = {
@@ -648,7 +747,7 @@ export const ViewModeToggle: Story = {
 };
 
 // ─────────────────────────────────────────────────
-// 15. FILTER TOGGLE — Healthcare scenario: Active Patients filter
+// 16. FILTER TOGGLE — Healthcare scenario: Active Patients filter
 // ─────────────────────────────────────────────────
 
 export const FilterToggle: Story = {
@@ -763,7 +862,7 @@ export const FilterToggle: Story = {
 };
 
 // ─────────────────────────────────────────────────
-// 16. FORM PARTICIPATION — Toggle button in a form with name/value
+// 17. FORM PARTICIPATION — Toggle button in a form with name/value
 // ─────────────────────────────────────────────────
 
 export const FormParticipation: Story = {
@@ -865,7 +964,7 @@ export const FormParticipation: Story = {
 };
 
 // ─────────────────────────────────────────────────
-// 17. DISABLED NO EVENT — disabled toggle fires no hx-toggle
+// 18. DISABLED NO EVENT — disabled toggle fires no hx-toggle
 // ─────────────────────────────────────────────────
 
 export const DisabledNoEvent: Story = {
@@ -897,7 +996,7 @@ export const DisabledNoEvent: Story = {
 };
 
 // ─────────────────────────────────────────────────
-// 18. CSS CUSTOM PROPERTIES DEMO
+// 19. CSS CUSTOM PROPERTIES DEMO
 // ─────────────────────────────────────────────────
 
 export const CSSCustomProperties: Story = {
@@ -967,7 +1066,7 @@ hx-toggle-button {
 };
 
 // ─────────────────────────────────────────────────
-// 19. CSS PARTS DEMO
+// 20. CSS PARTS DEMO
 // ─────────────────────────────────────────────────
 
 export const CSSParts: Story = {

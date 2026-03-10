@@ -166,10 +166,12 @@ describe('hx-textarea', () => {
       expect(textarea.required).toBe(true);
     });
 
-    it('sets aria-required="true" on native textarea', async () => {
+    it('sets required attribute on native textarea without redundant aria-required', async () => {
       const el = await fixture<WcTextarea>('<hx-textarea required></hx-textarea>');
       const textarea = shadowQuery<HTMLTextAreaElement>(el, 'textarea')!;
-      expect(textarea.getAttribute('aria-required')).toBe('true');
+      expect(textarea.hasAttribute('required')).toBe(true);
+      // aria-required is redundant with native required per HTML-AAM spec (P1-05 fix)
+      expect(textarea.getAttribute('aria-required')).toBeNull();
     });
   });
 
@@ -208,10 +210,12 @@ describe('hx-textarea', () => {
       expect(errorDiv?.textContent?.trim()).toBe('Required field');
     });
 
-    it('error div has aria-live="polite"', async () => {
+    it('error div uses role="alert" without conflicting aria-live', async () => {
       const el = await fixture<WcTextarea>('<hx-textarea error="Required"></hx-textarea>');
       const errorDiv = shadowQuery(el, '.field__error');
-      expect(errorDiv?.getAttribute('aria-live')).toBe('polite');
+      // role="alert" implies aria-live="assertive"; explicit aria-live="polite" was removed (P1-03 fix)
+      expect(errorDiv?.getAttribute('role')).toBe('alert');
+      expect(errorDiv?.getAttribute('aria-live')).toBeNull();
     });
 
     it('sets aria-invalid="true" on textarea', async () => {

@@ -13,12 +13,12 @@ const meta = {
   argTypes: {
     variant: {
       control: { type: 'select' },
-      options: ['text', 'circle', 'rect', 'button'],
+      options: ['text', 'circle', 'rect', 'button', 'paragraph'],
       description: 'Shape variant of the skeleton placeholder.',
       table: {
         category: 'Visual',
         defaultValue: { summary: 'rect' },
-        type: { summary: "'text' | 'circle' | 'rect' | 'button'" },
+        type: { summary: "'text' | 'circle' | 'rect' | 'button' | 'paragraph'" },
       },
     },
     width: {
@@ -48,11 +48,22 @@ const meta = {
         type: { summary: 'boolean' },
       },
     },
+    loaded: {
+      control: 'boolean',
+      description:
+        'When true, hides the skeleton and dispatches an `hx-loaded` event. Pair with an external aria-live region.',
+      table: {
+        category: 'State',
+        defaultValue: { summary: 'false' },
+        type: { summary: 'boolean' },
+      },
+    },
   },
   args: {
     variant: 'rect',
     width: '100%',
     animated: true,
+    loaded: false,
   },
 } satisfies Meta;
 
@@ -122,6 +133,20 @@ export const ButtonVariant: Story = {
   `,
 };
 
+export const ParagraphVariant: Story = {
+  name: 'Variant: Paragraph',
+  render: () => html`
+    <div style="width: 300px;">
+      <hx-skeleton variant="paragraph" width="100%">
+        <hx-skeleton variant="text" width="100%"></hx-skeleton>
+        <hx-skeleton variant="text" width="90%"></hx-skeleton>
+        <hx-skeleton variant="text" width="80%"></hx-skeleton>
+        <hx-skeleton variant="text" width="60%"></hx-skeleton>
+      </hx-skeleton>
+    </div>
+  `,
+};
+
 export const StaticNoAnimation: Story = {
   name: 'Static (No Animation)',
   render: () => html`
@@ -130,6 +155,52 @@ export const StaticNoAnimation: Story = {
       <hx-skeleton variant="rect" width="100%" height="80px" ?animated=${false}></hx-skeleton>
     </div>
   `,
+};
+
+export const LoadingToLoaded: Story = {
+  name: 'State: Loading → Loaded',
+  render: () => {
+    const id = 'skeleton-transition-demo';
+
+    const triggerLoad = () => {
+      const container = document.getElementById(id);
+      if (!container) return;
+      const skeleton = container.querySelector('hx-skeleton') as HTMLElement & { loaded: boolean };
+      const content = container.querySelector('[data-content]') as HTMLElement;
+      const status = container.querySelector('[data-status]') as HTMLElement;
+      if (skeleton) skeleton.loaded = true;
+      if (content) content.hidden = false;
+      if (status) status.textContent = 'Content has loaded.';
+    };
+
+    return html`
+      <div id=${id} style="width: 300px; display: flex; flex-direction: column; gap: 1rem;">
+        <!-- Screen-reader live region: update its text on hx-loaded to announce state change -->
+        <div
+          data-status
+          aria-live="polite"
+          aria-atomic="true"
+          style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0);"
+        ></div>
+
+        <!-- Skeleton placeholder — sets loaded=true to hide and fire hx-loaded -->
+        <hx-skeleton variant="rect" width="100%" height="80px"></hx-skeleton>
+
+        <!-- Real content revealed after skeleton is dismissed -->
+        <div data-content hidden>
+          <p
+            style="margin: 0; padding: 1rem; background: #f0fdf4; border-radius: 0.5rem; border: 1px solid #86efac;"
+          >
+            Content loaded successfully!
+          </p>
+        </div>
+
+        <button type="button" style="width: fit-content;" @click=${triggerLoad}>
+          Simulate content loaded
+        </button>
+      </div>
+    `;
+  },
 };
 
 export const CardSkeleton: Story = {

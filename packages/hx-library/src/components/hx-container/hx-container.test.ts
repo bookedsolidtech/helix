@@ -30,10 +30,11 @@ describe('hx-container', () => {
   // ─── Property: width (7) ───
 
   describe('Property: width', () => {
-    it('defaults to "content" width class', async () => {
+    it('defaults to "content" width class and correct max-width', async () => {
       const el = await fixture<WcContainer>('<hx-container>Content</hx-container>');
       const inner = shadowQuery(el, '.container__inner')!;
       expect(inner.classList.contains('container__inner--content')).toBe(true);
+      expect(getComputedStyle(inner).maxWidth).toBe('1152px');
     });
 
     it('width="full" applies full class', async () => {
@@ -42,34 +43,39 @@ describe('hx-container', () => {
       expect(inner.classList.contains('container__inner--full')).toBe(true);
     });
 
-    it('width="narrow" applies narrow class', async () => {
+    it('width="narrow" applies narrow class and correct max-width', async () => {
       const el = await fixture<WcContainer>('<hx-container width="narrow">Content</hx-container>');
       const inner = shadowQuery(el, '.container__inner')!;
       expect(inner.classList.contains('container__inner--narrow')).toBe(true);
+      expect(getComputedStyle(inner).maxWidth).toBe('768px');
     });
 
-    it('width="sm" applies sm class', async () => {
+    it('width="sm" applies sm class and correct max-width', async () => {
       const el = await fixture<WcContainer>('<hx-container width="sm">Content</hx-container>');
       const inner = shadowQuery(el, '.container__inner')!;
       expect(inner.classList.contains('container__inner--sm')).toBe(true);
+      expect(getComputedStyle(inner).maxWidth).toBe('640px');
     });
 
-    it('width="md" applies md class', async () => {
+    it('width="md" applies md class and correct max-width', async () => {
       const el = await fixture<WcContainer>('<hx-container width="md">Content</hx-container>');
       const inner = shadowQuery(el, '.container__inner')!;
       expect(inner.classList.contains('container__inner--md')).toBe(true);
+      expect(getComputedStyle(inner).maxWidth).toBe('768px');
     });
 
-    it('width="lg" applies lg class', async () => {
+    it('width="lg" applies lg class and correct max-width', async () => {
       const el = await fixture<WcContainer>('<hx-container width="lg">Content</hx-container>');
       const inner = shadowQuery(el, '.container__inner')!;
       expect(inner.classList.contains('container__inner--lg')).toBe(true);
+      expect(getComputedStyle(inner).maxWidth).toBe('1024px');
     });
 
-    it('width="xl" applies xl class', async () => {
+    it('width="xl" applies xl class and correct max-width', async () => {
       const el = await fixture<WcContainer>('<hx-container width="xl">Content</hx-container>');
       const inner = shadowQuery(el, '.container__inner')!;
       expect(inner.classList.contains('container__inner--xl')).toBe(true);
+      expect(getComputedStyle(inner).maxWidth).toBe('1280px');
     });
   });
 
@@ -191,12 +197,23 @@ describe('hx-container', () => {
       expect(styles.display).toBe('block');
     });
 
-    it('.container__inner has auto horizontal margins for centering', async () => {
+    it('.container__inner uses auto horizontal margins for centering', async () => {
+      // getComputedStyle resolves 'auto' to px, so read from the adopted CSS stylesheet
+      // directly — the only reliable way to assert that margin-left: auto is declared.
       const el = await fixture<WcContainer>('<hx-container>Content</hx-container>');
-      const inner = shadowQuery(el, '.container__inner')!;
-      const styles = getComputedStyle(inner);
-      expect(styles.marginLeft).toBe('0px');
-      expect(styles.marginRight).toBe('0px');
+      const sheets = [...(el.shadowRoot?.adoptedStyleSheets ?? [])];
+      let marginLeftIsAuto = false;
+      for (const sheet of sheets) {
+        for (const rule of [...sheet.cssRules]) {
+          if (rule instanceof CSSStyleRule && rule.selectorText === '.container__inner') {
+            if (rule.style.marginLeft === 'auto') {
+              marginLeftIsAuto = true;
+              break;
+            }
+          }
+        }
+      }
+      expect(marginLeftIsAuto).toBe(true);
     });
 
     it('width="full" inner has no max-width constraint', async () => {

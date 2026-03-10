@@ -1,0 +1,33 @@
+{
+  "category": "Uncategorized",
+  "description": "Launch readiness audit for hx-popup. Checklist: (1) A11y — axe-core zero violations, WCAG 2.1 AA. (2) Astro doc page — all 12 template sections. (3) Individual export — standalone HTML works. (4) `npm run verify` passes. Files: `packages/hx-library/src/components/hx-popup/`, `apps/docs/src/content/docs/component-library/hx-popup.md`",
+  "title": "LAUNCH READY: hx-popup",
+  "status": "backlog",
+  "dependencies": [
+    "feature-1773066138511-g2pgj0rmm"
+  ],
+  "complexity": "medium",
+  "priority": 3,
+  "source": "api",
+  "trustTier": 1,
+  "quarantineStatus": "passed",
+  "quarantineId": "27d183b1-0eaa-4a9d-941f-7f72cd8437bb",
+  "id": "feature-1773066344371-j9eft8dje",
+  "branchName": "feature/launch-ready-hx-popup",
+  "descriptionHistory": [
+    {
+      "description": "Launch readiness audit for hx-popup. Checklist: (1) A11y — axe-core zero violations, WCAG 2.1 AA. (2) Astro doc page — all 12 template sections. (3) Individual export — standalone HTML works. (4) `npm run verify` passes. Files: `packages/hx-library/src/components/hx-popup/`, `apps/docs/src/content/docs/component-library/hx-popup.md`",
+      "timestamp": "2026-03-09T14:25:44.371Z",
+      "source": "initial"
+    }
+  ],
+  "createdAt": "2026-03-09T14:25:44.371Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-03-09T14:25:44.371Z",
+      "reason": "Feature created"
+    }
+  ]
+}

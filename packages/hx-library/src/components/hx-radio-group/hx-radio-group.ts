@@ -5,6 +5,8 @@ import { tokenStyles } from '@helix/tokens/lit';
 import { helixRadioGroupStyles } from './hx-radio-group.styles.js';
 import type { HelixRadio } from './hx-radio.js';
 
+let _groupCounter = 0;
+
 /**
  * A form-associated radio group that manages a set of `<hx-radio>` children.
  *
@@ -16,7 +18,7 @@ import type { HelixRadio } from './hx-radio.js';
  * @slot error - Custom error content (overrides the error property).
  * @slot help-text - Custom help text content (overrides the helpText property).
  *
- * @fires {CustomEvent<{value: string}>} hx-change - Dispatched when the selected radio changes.
+ * @fires {CustomEvent<{value: string, checked: boolean}>} hx-change - Dispatched when the selected radio changes.
  *
  * @csspart fieldset - The fieldset wrapper.
  * @csspart legend - The legend/label.
@@ -108,7 +110,7 @@ export class HelixRadioGroup extends LitElement {
 
   // ─── Internal IDs ───
 
-  private _groupId = `hx-radio-group-${Math.random().toString(36).slice(2, 9)}`;
+  private _groupId = `hx-radio-group-${++_groupCounter}`;
   private _helpTextId = `${this._groupId}-help`;
   private _errorId = `${this._groupId}-error`;
 
@@ -148,11 +150,13 @@ export class HelixRadioGroup extends LitElement {
   override firstUpdated(changedProperties: Map<string, unknown>): void {
     super.firstUpdated(changedProperties);
     this._syncRadios();
+    this._updateValidity();
   }
 
   // ─── Radio Management ───
 
   private _cachedRadios: HelixRadio[] | null = null;
+  private _individualDisabledStates = new WeakMap<HelixRadio, boolean>();
 
   private _getRadios(): HelixRadio[] {
     if (!this._cachedRadios) {
@@ -174,7 +178,18 @@ export class HelixRadioGroup extends LitElement {
       radio.checked = isChecked;
 
       if (this.disabled) {
+        // Store individual disabled state before overriding with group disabled
+        if (!this._individualDisabledStates.has(radio)) {
+          this._individualDisabledStates.set(radio, radio.disabled);
+        }
         radio.disabled = true;
+      } else {
+        // Restore individual disabled state when group is re-enabled
+        const originalDisabled = this._individualDisabledStates.get(radio);
+        if (originalDisabled !== undefined) {
+          radio.disabled = originalDisabled;
+          this._individualDisabledStates.delete(radio);
+        }
       }
     });
 
@@ -205,9 +220,7 @@ export class HelixRadioGroup extends LitElement {
     }
 
     this.value = newValue;
-    this._internals.setFormValue(this.value);
-    this._syncRadios();
-    this._updateValidity();
+    // Reactive update in updated() will call setFormValue, _syncRadios, _updateValidity
 
     /**
      * Dispatched when the selected radio changes.
@@ -217,7 +230,7 @@ export class HelixRadioGroup extends LitElement {
       new CustomEvent('hx-change', {
         bubbles: true,
         composed: true,
-        detail: { value: this.value },
+        detail: { value: this.value, checked: true },
       }),
     );
   };
@@ -228,12 +241,35 @@ export class HelixRadioGroup extends LitElement {
       return;
     }
 
-    const isNavigationKey = ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key);
-    if (!isNavigationKey) {
+    const isHandledKey = [
+      'ArrowUp',
+      'ArrowDown',
+      'ArrowLeft',
+      'ArrowRight',
+      ' ',
+      'Home',
+      'End',
+    ].includes(e.key);
+    if (!isHandledKey) {
       return;
     }
 
     e.preventDefault();
+
+    // Space: select the currently focused radio without moving focus
+    if (e.key === ' ') {
+      const targetRadio = (e.target as Element)?.closest?.('hx-radio') as HelixRadio | null;
+      if (targetRadio && !targetRadio.disabled) {
+        targetRadio.dispatchEvent(
+          new CustomEvent('hx-radio-select', {
+            bubbles: true,
+            composed: true,
+            detail: { value: targetRadio.value },
+          }),
+        );
+      }
+      return;
+    }
 
     const targetRadio = (e.target as Element)?.closest?.('hx-radio') as HelixRadio | null;
     const currentIndex = targetRadio
@@ -241,7 +277,11 @@ export class HelixRadioGroup extends LitElement {
       : enabledRadios.findIndex((radio) => radio.checked);
 
     let nextIndex: number;
-    if (e.key === 'ArrowDown' || e.key === 'ArrowRight') {
+    if (e.key === 'Home') {
+      nextIndex = 0;
+    } else if (e.key === 'End') {
+      nextIndex = enabledRadios.length - 1;
+    } else if (e.key === 'ArrowDown' || e.key === 'ArrowRight') {
       nextIndex = currentIndex === -1 ? 0 : (currentIndex + 1) % enabledRadios.length;
     } else {
       nextIndex = currentIndex <= 0 ? enabledRadios.length - 1 : currentIndex - 1;
@@ -312,14 +352,20 @@ export class HelixRadioGroup extends LitElement {
   }
 
   /** Called when the form restores state (e.g., back/forward navigation). */
-  formStateRestoreCallback(state: string): void {
-    this.value = state;
+  formStateRestoreCallback(
+    state: string | File | FormData,
+    _mode: 'restore' | 'autocomplete',
+  ): void {
+    if (typeof state === 'string') {
+      this.value = state;
+    }
   }
 
   // ─── Render ───
 
   override render() {
     const hasError = !!this.error;
+    const legendId = `${this._groupId}-legend`;
 
     const fieldsetClasses = {
       fieldset: true,
@@ -328,18 +374,23 @@ export class HelixRadioGroup extends LitElement {
       'fieldset--required': this.required,
     };
 
-    const describedBy = hasError ? this._errorId : this.helpText ? this._helpTextId : nothing;
+    // Use _errorId only when there is no slotted error content replacing the internal error div
+    const errorDescribedBy = !this._hasErrorSlot && hasError ? this._errorId : nothing;
+    const describedBy =
+      errorDescribedBy !== nothing ? errorDescribedBy : this.helpText ? this._helpTextId : nothing;
 
     return html`
       <fieldset
         part="fieldset"
         class=${classMap(fieldsetClasses)}
         role="radiogroup"
+        aria-labelledby=${this.label ? legendId : nothing}
         aria-describedby=${describedBy}
+        aria-required=${this.required ? 'true' : nothing}
       >
         ${this.label
           ? html`
-              <legend part="legend" class="fieldset__legend">
+              <legend part="legend" class="fieldset__legend" id=${legendId}>
                 ${this.label}
                 ${this.required
                   ? html`<span class="fieldset__required-marker" aria-hidden="true">*</span>`
@@ -354,13 +405,7 @@ export class HelixRadioGroup extends LitElement {
 
         <slot name="error" @slotchange=${this._handleErrorSlotChange}>
           ${hasError
-            ? html`<div
-                part="error"
-                class="fieldset__error"
-                id=${this._errorId}
-                role="alert"
-                aria-live="polite"
-              >
+            ? html`<div part="error" class="fieldset__error" id=${this._errorId} role="alert">
                 ${this.error}
               </div>`
             : nothing}

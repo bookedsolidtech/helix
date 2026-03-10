@@ -9,10 +9,10 @@ This guide walks you through creating your first HELIX component and using it in
 
 ```bash
 # From the repository root
-turbo run dev --filter=docs
+npm run dev
 ```
 
-The documentation site will be available at `http://localhost:4321`.
+The documentation site will be available at `http://localhost:3150`, Storybook at `http://localhost:3151`.
 
 ## Using Components
 
@@ -21,19 +21,18 @@ HELIX components are standard Web Components. They work in any HTML page:
 ```html
 <script type="module" src="@helix/library"></script>
 
-<wc-card variant="elevated">
-  <wc-heading level="2">Featured Articles</wc-heading>
-  <wc-text>Browse our latest content and support resources.</wc-text>
-  <wc-button slot="actions" variant="primary">Learn More</wc-button>
-</wc-card>
+<hx-card variant="elevated">
+  <hx-text>Browse our latest content and support resources.</hx-text>
+  <hx-button slot="actions" variant="primary">Learn More</hx-button>
+</hx-card>
 ```
 
-## Component Library (Coming in Phase 2)
+## Explore the Component Library
 
-The component library is under active development. See the [Pre-Planning documents](/pre-planning/) for the complete architecture and component specifications.
+The [Component Library](/component-library/overview/) documents all 87 components with API references, usage examples, and Storybook previews.
 
 ## Next Steps
 
 - [Project Structure](/getting-started/project-structure/) - Understand the codebase
-- [Component Architecture](/pre-planning/components/) - Deep dive into component design
+- [Component Library](/component-library/overview/) - Browse all 87 components
 - [Design Tokens](/design-tokens/overview/) - Learn the token system

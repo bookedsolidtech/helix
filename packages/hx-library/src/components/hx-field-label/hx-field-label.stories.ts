@@ -89,9 +89,8 @@ export const Default: Story = {
     const host = getLabelHost(canvasElement);
     await expect(host).toBeTruthy();
 
-    const shadow = within(getShadowRoot(host));
-    const base = shadow.getByRole('generic', { hidden: true });
-    await expect(base.tagName.toLowerCase()).toBe('span');
+    const base = host.shadowRoot!.querySelector('[part="base"]');
+    await expect(base?.tagName.toLowerCase()).toBe('span');
   },
 };
 
@@ -112,14 +111,21 @@ export const WithFor: Story = {
       />
     </div>
   `,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "**Note:** Due to the shadow DOM boundary, the `for` attribute on `hx-field-label` only creates a label association when the input is in the same shadow root. For inputs in light DOM, use `aria-labelledby` pointing to the `hx-field-label` host's `id` instead.",
+      },
+    },
+  },
   play: async ({ canvasElement }) => {
     const host = getLabelHost(canvasElement);
     await expect(host).toBeTruthy();
 
-    const shadow = within(getShadowRoot(host));
-    const label = shadow.getByRole('generic', { hidden: true });
-    await expect(label.tagName.toLowerCase()).toBe('label');
-    await expect(label.getAttribute('for')).toBe('patient-email');
+    const base = host.shadowRoot!.querySelector('[part="base"]');
+    await expect(base?.tagName.toLowerCase()).toBe('label');
+    await expect(base?.getAttribute('for')).toBe('patient-email');
   },
 };
 
@@ -132,9 +138,7 @@ export const Required: Story = {
   args: {
     required: true,
   },
-  render: () => html`
-    <hx-field-label required for="mrn">Medical Record Number</hx-field-label>
-  `,
+  render: () => html` <hx-field-label required for="mrn">Medical Record Number</hx-field-label> `,
   play: async ({ canvasElement }) => {
     const host = getLabelHost(canvasElement);
     await expect(host.hasAttribute('required')).toBe(true);
@@ -155,9 +159,7 @@ export const Optional: Story = {
   args: {
     optional: true,
   },
-  render: () => html`
-    <hx-field-label optional for="notes">Additional Notes</hx-field-label>
-  `,
+  render: () => html` <hx-field-label optional for="notes">Additional Notes</hx-field-label> `,
   play: async ({ canvasElement }) => {
     const host = getLabelHost(canvasElement);
     await expect(host.hasAttribute('optional')).toBe(true);
@@ -196,16 +198,16 @@ export const CSSParts: Story = {
         font-size: 0.6875rem;
         text-transform: uppercase;
         letter-spacing: 0.08em;
-        color: #0d6efd;
+        color: var(--hx-color-primary-600, #0d6efd);
         font-weight: 700;
       }
       .parts-demo hx-field-label::part(required-indicator) {
         font-size: 1rem;
-        color: #dc3545;
+        color: var(--hx-color-error-600, #dc3545);
       }
       .parts-demo hx-field-label::part(optional-indicator) {
         font-style: italic;
-        color: #6c757d;
+        color: var(--hx-color-neutral-500, #6c757d);
       }
     </style>
     <div class="parts-demo" style="display: flex; flex-direction: column; gap: 1rem;">
@@ -228,37 +230,48 @@ export const HealthcareFormLabels: Story = {
   render: () => html`
     <form style="display: flex; flex-direction: column; gap: 1.25rem; max-width: 400px;">
       <div>
-        <hx-field-label required for="patient-name">Full Name</hx-field-label>
+        <hx-field-label id="label-patient-name" required>Full Name</hx-field-label>
         <input
           id="patient-name"
           type="text"
           placeholder="First Middle Last"
           required
+          aria-labelledby="label-patient-name"
           style="display: block; width: 100%; margin-top: 0.25rem; padding: 0.5rem 0.75rem; border: 1px solid var(--hx-color-neutral-300, #dee2e6); border-radius: 0.375rem; font-size: 0.875rem;"
         />
       </div>
 
       <div>
-        <hx-field-label required for="dob">Date of Birth</hx-field-label>
+        <hx-field-label id="label-dob" required>Date of Birth</hx-field-label>
         <input
           id="dob"
           type="date"
           required
+          aria-labelledby="label-dob"
           style="display: block; width: 100%; margin-top: 0.25rem; padding: 0.5rem 0.75rem; border: 1px solid var(--hx-color-neutral-300, #dee2e6); border-radius: 0.375rem; font-size: 0.875rem;"
         />
       </div>
 
       <div>
-        <hx-field-label optional for="pcp">Primary Care Provider</hx-field-label>
+        <hx-field-label id="label-pcp" optional>Primary Care Provider</hx-field-label>
         <input
           id="pcp"
           type="text"
           placeholder="Dr. Eleanor Vance, MD"
+          aria-labelledby="label-pcp"
           style="display: block; width: 100%; margin-top: 0.25rem; padding: 0.5rem 0.75rem; border: 1px solid var(--hx-color-neutral-300, #dee2e6); border-radius: 0.375rem; font-size: 0.875rem;"
         />
       </div>
     </form>
   `,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Healthcare form labels using the `aria-labelledby` pattern — the correct approach when the input is in light DOM outside the shadow root.',
+      },
+    },
+  },
 };
 
 // ─────────────────────────────────────────────────
@@ -284,7 +297,10 @@ export const CSSCustomProperties: Story = {
         >
           --hx-field-label-color
         </p>
-        <hx-field-label required style="--hx-field-label-color: #2563eb;">
+        <hx-field-label
+          required
+          style="--hx-field-label-color: var(--hx-color-primary-600, #2563eb);"
+        >
           Custom brand label color
         </hx-field-label>
       </div>
@@ -293,9 +309,12 @@ export const CSSCustomProperties: Story = {
         <p
           style="margin: 0 0 0.5rem; font-size: 0.75rem; color: var(--hx-color-neutral-500, #6c757d); text-transform: uppercase; letter-spacing: 0.05em;"
         >
-          --hx-color-danger (required indicator)
+          --hx-field-label-required-color (required indicator)
         </p>
-        <hx-field-label required style="--hx-color-danger: #d97706;">
+        <hx-field-label
+          required
+          style="--hx-field-label-required-color: var(--hx-color-warning-600, #d97706);"
+        >
           Custom amber required indicator
         </hx-field-label>
       </div>

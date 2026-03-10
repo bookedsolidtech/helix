@@ -28,6 +28,7 @@ import { helixNavItemStyles } from './hx-nav-item.styles.js';
  * @cssprop [--hx-nav-item-active-bg=var(--hx-color-primary-600)] - Active item background.
  * @cssprop [--hx-nav-item-active-color=var(--hx-color-neutral-50)] - Active item text color.
  * @cssprop [--hx-nav-item-padding] - Item padding.
+ * @cssprop [--hx-nav-item-host-bg=var(--hx-color-neutral-900)] - Component host background color.
  */
 @customElement('hx-nav-item')
 export class HelixNavItem extends LitElement {
@@ -69,8 +70,19 @@ export class HelixNavItem extends LitElement {
   @state() private _hasChildren = false;
 
   /** Whether this item is in collapsed mode. Set externally by hx-side-nav via data-collapsed attribute. */
-  private get _isCollapsed(): boolean {
-    return this.hasAttribute('data-collapsed');
+  @state() private _isCollapsed = false;
+
+  // ─── Attribute Observer ───
+
+  static override get observedAttributes(): string[] {
+    return [...super.observedAttributes, 'data-collapsed'];
+  }
+
+  override attributeChangedCallback(name: string, old: string | null, value: string | null): void {
+    super.attributeChangedCallback(name, old, value);
+    if (name === 'data-collapsed') {
+      this._isCollapsed = value !== null;
+    }
   }
 
   // ─── Slot Change Handler ───
@@ -81,6 +93,14 @@ export class HelixNavItem extends LitElement {
   }
 
   // ─── Private Helpers ───
+
+  private _getDirectText(): string {
+    return Array.from(this.childNodes)
+      .filter((n) => n.nodeType === Node.TEXT_NODE)
+      .map((n) => n.textContent?.trim() ?? '')
+      .filter(Boolean)
+      .join(' ');
+  }
 
   private _handleToggle(e: Event): void {
     if (this.disabled) return;
@@ -101,7 +121,7 @@ export class HelixNavItem extends LitElement {
   // ─── Render ───
 
   override render() {
-    const label = this.textContent?.trim() ?? '';
+    const label = this._getDirectText();
 
     const innerContent = html`
       <span part="icon" class="nav-item__icon">
@@ -115,7 +135,7 @@ export class HelixNavItem extends LitElement {
       </span>
       ${this._hasChildren ? this._renderExpandArrow() : nothing}
       ${this._isCollapsed
-        ? html`<span class="nav-item__tooltip" role="tooltip">${label}</span>`
+        ? html`<span id="nav-item-tooltip" class="nav-item__tooltip" role="tooltip">${label}</span>`
         : nothing}
     `;
 
@@ -128,6 +148,7 @@ export class HelixNavItem extends LitElement {
             href=${this.href}
             aria-current=${this.active ? 'page' : nothing}
             aria-disabled=${this.disabled ? 'true' : nothing}
+            aria-describedby=${this._isCollapsed ? 'nav-item-tooltip' : nothing}
             tabindex=${this.disabled ? '-1' : '0'}
           >
             ${innerContent}
@@ -135,9 +156,9 @@ export class HelixNavItem extends LitElement {
         : html`<button
             part="link"
             class="nav-item__link"
-            aria-current=${this.active ? 'page' : nothing}
             aria-disabled=${this.disabled ? 'true' : nothing}
             aria-expanded=${this._hasChildren ? String(this.expanded) : nothing}
+            aria-describedby=${this._isCollapsed ? 'nav-item-tooltip' : nothing}
             tabindex=${this.disabled ? '-1' : '0'}
             @click=${this._handleToggle}
           >
@@ -161,4 +182,4 @@ declare global {
   }
 }
 
-export type { HelixNavItem as WcNavItem };
+export type { HelixNavItem as HxNavItem };

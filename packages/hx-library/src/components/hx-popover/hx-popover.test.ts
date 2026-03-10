@@ -25,13 +25,13 @@ describe('hx-popover', () => {
       expect(wrapper).toBeTruthy();
     });
 
-    it('renders body with role=dialog', async () => {
+    it('renders body with role=region', async () => {
       const el = await fixture<HelixPopover>(
         '<hx-popover><button slot="anchor">Trigger</button><p>Content</p></hx-popover>',
       );
-      const body = shadowQuery(el, '[role="dialog"]');
+      const body = shadowQuery(el, '[role="region"]');
       expect(body).toBeTruthy();
-      expect(body?.getAttribute('role')).toBe('dialog');
+      expect(body?.getAttribute('role')).toBe('region');
     });
 
     it('body is hidden by default', async () => {
@@ -49,6 +49,31 @@ describe('hx-popover', () => {
       );
       const arrowEl = shadowQuery(el, '[part="arrow"]');
       expect(arrowEl).toBeNull();
+    });
+
+    it('body has tabindex="-1" for focus management', async () => {
+      const el = await fixture<HelixPopover>(
+        '<hx-popover><button slot="anchor">Trigger</button><p>Content</p></hx-popover>',
+      );
+      const body = shadowQuery(el, '[part="body"]');
+      expect(body?.getAttribute('tabindex')).toBe('-1');
+    });
+
+    it('body has inert attribute when hidden', async () => {
+      const el = await fixture<HelixPopover>(
+        '<hx-popover><button slot="anchor">Trigger</button><p>Content</p></hx-popover>',
+      );
+      const body = shadowQuery(el, '[part="body"]');
+      expect(body?.hasAttribute('inert')).toBe(true);
+    });
+
+    it('body does not have inert attribute when visible', async () => {
+      const el = await fixture<HelixPopover>(
+        '<hx-popover open><button slot="anchor">Trigger</button><p>Content</p></hx-popover>',
+      );
+      await el.updateComplete;
+      const body = shadowQuery(el, '[part="body"]');
+      expect(body?.hasAttribute('inert')).toBe(false);
     });
   });
 
@@ -197,6 +222,34 @@ describe('hx-popover', () => {
       const trigger = el.querySelector('#trig');
       expect(trigger?.getAttribute('aria-expanded')).toBe('false');
     });
+
+    // P1-04: aria-expanded must track the full open → close cycle
+    it('aria-expanded cycles false → true → false across open/close', async () => {
+      const el = await fixture<HelixPopover>(
+        '<hx-popover trigger="click"><button slot="anchor" id="trig">Trigger</button><p>Content</p></hx-popover>',
+      );
+      await el.updateComplete;
+      const trigger = el.querySelector('#trig');
+      expect(trigger?.getAttribute('aria-expanded')).toBe('false');
+
+      const wrapper = shadowQuery<HTMLElement>(el, '.trigger-wrapper')!;
+      wrapper.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+      await el.updateComplete;
+      expect(trigger?.getAttribute('aria-expanded')).toBe('true');
+
+      wrapper.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+      await el.updateComplete;
+      expect(trigger?.getAttribute('aria-expanded')).toBe('false');
+    });
+
+    // P1-01: label property drives aria-label on the dialog body
+    it('uses custom label property for aria-label', async () => {
+      const el = await fixture<HelixPopover>(
+        '<hx-popover label="Patient details"><button slot="anchor">Trigger</button><p>Content</p></hx-popover>',
+      );
+      const body = shadowQuery(el, '[part="body"]');
+      expect(body?.getAttribute('aria-label')).toBe('Patient details');
+    });
   });
 
   // ─── Behavior: Show/Hide (4) ───
@@ -245,10 +298,72 @@ describe('hx-popover', () => {
       wrapper.dispatchEvent(new MouseEvent('click', { bubbles: true }));
       await el.updateComplete;
 
-      el.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+      // P1-03: Escape listener is now on document so it fires regardless of focus location
+      document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
       await el.updateComplete;
       const body = shadowQuery(el, '[part="body"]');
       expect(body?.classList.contains('visible')).toBe(false);
+    });
+
+    // P0-01: click outside the component closes the popover
+    it('closes on click outside when trigger="click"', async () => {
+      const el = await fixture<HelixPopover>(
+        '<hx-popover trigger="click"><button slot="anchor">Trigger</button><p>Content</p></hx-popover>',
+      );
+      const wrapper = shadowQuery<HTMLElement>(el, '.trigger-wrapper')!;
+      wrapper.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+      await el.updateComplete;
+
+      const body = shadowQuery(el, '[part="body"]');
+      expect(body?.classList.contains('visible')).toBe(true);
+
+      // Allow brief settle time for the deferred document click listener to be attached after open
+      await new Promise((r) => setTimeout(r, 10));
+
+      // Simulate click on an unrelated element outside the component
+      document.body.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+      await el.updateComplete;
+      expect(body?.classList.contains('visible')).toBe(false);
+    });
+
+    // P1-05: hover trigger — mouseleave hides the popover
+    it('hides on mouseleave when trigger="hover"', async () => {
+      const el = await fixture<HelixPopover>(
+        '<hx-popover trigger="hover"><button slot="anchor">Trigger</button><p>Content</p></hx-popover>',
+      );
+      const wrapper = shadowQuery<HTMLElement>(el, '.trigger-wrapper')!;
+      wrapper.dispatchEvent(new MouseEvent('mouseenter', { bubbles: true }));
+      await el.updateComplete;
+      expect(shadowQuery(el, '[part="body"]')?.classList.contains('visible')).toBe(true);
+
+      wrapper.dispatchEvent(new MouseEvent('mouseleave', { bubbles: true }));
+      await el.updateComplete;
+      expect(shadowQuery(el, '[part="body"]')?.classList.contains('visible')).toBe(false);
+    });
+
+    // P1-06: focus trigger — focusin shows, focusout hides
+    it('shows on focusin when trigger="focus"', async () => {
+      const el = await fixture<HelixPopover>(
+        '<hx-popover trigger="focus"><button slot="anchor">Trigger</button><p>Content</p></hx-popover>',
+      );
+      const wrapper = shadowQuery<HTMLElement>(el, '.trigger-wrapper')!;
+      wrapper.dispatchEvent(new FocusEvent('focusin', { bubbles: true }));
+      await el.updateComplete;
+      expect(shadowQuery(el, '[part="body"]')?.classList.contains('visible')).toBe(true);
+    });
+
+    it('hides on focusout when trigger="focus"', async () => {
+      const el = await fixture<HelixPopover>(
+        '<hx-popover trigger="focus"><button slot="anchor">Trigger</button><p>Content</p></hx-popover>',
+      );
+      const wrapper = shadowQuery<HTMLElement>(el, '.trigger-wrapper')!;
+      wrapper.dispatchEvent(new FocusEvent('focusin', { bubbles: true }));
+      await el.updateComplete;
+      expect(shadowQuery(el, '[part="body"]')?.classList.contains('visible')).toBe(true);
+
+      wrapper.dispatchEvent(new FocusEvent('focusout', { bubbles: true }));
+      await el.updateComplete;
+      expect(shadowQuery(el, '[part="body"]')?.classList.contains('visible')).toBe(false);
     });
   });
 
@@ -283,6 +398,38 @@ describe('hx-popover', () => {
         fired = true;
       });
       // Close
+      wrapper.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+      await el.updateComplete;
+      expect(fired).toBe(true);
+    });
+
+    // P1-07: after-show and after-hide events
+    it('dispatches hx-after-show after the popover is fully visible', async () => {
+      const el = await fixture<HelixPopover>(
+        '<hx-popover trigger="click"><button slot="anchor">Trigger</button><p>Content</p></hx-popover>',
+      );
+      let fired = false;
+      el.addEventListener('hx-after-show', () => {
+        fired = true;
+      });
+      const wrapper = shadowQuery<HTMLElement>(el, '.trigger-wrapper')!;
+      wrapper.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+      await el.updateComplete;
+      expect(fired).toBe(true);
+    });
+
+    it('dispatches hx-after-hide after the popover is fully hidden', async () => {
+      const el = await fixture<HelixPopover>(
+        '<hx-popover trigger="click"><button slot="anchor">Trigger</button><p>Content</p></hx-popover>',
+      );
+      const wrapper = shadowQuery<HTMLElement>(el, '.trigger-wrapper')!;
+      wrapper.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+      await el.updateComplete;
+
+      let fired = false;
+      el.addEventListener('hx-after-hide', () => {
+        fired = true;
+      });
       wrapper.dispatchEvent(new MouseEvent('click', { bubbles: true }));
       await el.updateComplete;
       expect(fired).toBe(true);
