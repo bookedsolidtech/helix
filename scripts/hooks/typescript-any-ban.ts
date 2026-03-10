@@ -502,7 +502,9 @@ export async function validateTypeScriptAnyBan(
   const allStagedFiles = deps.getStagedFiles();
 
   // Apply filtering (exclude test files, stories, etc.)
-  const stagedFiles = allStagedFiles.filter((file) => !excludeRegexes.some((regex) => regex.test(file)));
+  const stagedFiles = allStagedFiles.filter(
+    (file) => !excludeRegexes.some((regex) => regex.test(file)),
+  );
 
   if (stagedFiles.length === 0) {
     if (!silent) {
@@ -534,7 +536,9 @@ export async function validateTypeScriptAnyBan(
   for (const filePath of stagedFiles) {
     // Timeout check
     if (Date.now() - startTime > CONFIG.timeoutMs) {
-      console.warn(`[WARNING] Timeout reached (${CONFIG.timeoutMs}ms). Remaining files not checked.`);
+      console.warn(
+        `[WARNING] Timeout reached (${CONFIG.timeoutMs}ms). Remaining files not checked.`,
+      );
       break;
     }
 

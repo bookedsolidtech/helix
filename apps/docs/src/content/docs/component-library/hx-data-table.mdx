@@ -1,0 +1,289 @@
+---
+title: 'hx-data-table'
+description: 'Enterprise data table with sorting, row selection, keyboard navigation, and responsive horizontal scrolling'
+---
+
+import ComponentLoader from '../../../components/ComponentLoader.astro';
+import ComponentDemo from '../../../components/ComponentDemo.astro';
+import ComponentDoc from '../../../components/ComponentDoc.astro';
+
+<ComponentLoader />
+
+<ComponentDoc tagName="hx-data-table" section="summary" />
+
+## Overview
+
+`hx-data-table` is a full-featured enterprise data table for healthcare and enterprise UIs. It renders structured data with configurable columns, supports client-side sorting with `aria-sort` announcements, multi-row selection via checkboxes, full keyboard grid navigation (arrow keys, Home, End, Space), a sticky header option, and a loading skeleton state. The table scrolls horizontally when content exceeds available width.
+
+**Use `hx-data-table` when:** you need to display tabular datasets with interactive sorting, row selection, or keyboard navigation — for example, patient lists, appointment schedules, or audit logs.
+
+**Use a plain `<table>` instead when:** the data is purely presentational with no sorting, selection, or interaction required.
+
+## Live Demo
+
+<ComponentDemo title="Basic Table">
+  <hx-data-table id="demo-basic"></hx-data-table>
+  <script>
+    const basic = document.getElementById('demo-basic');
+    basic.columns = [
+      { key: 'name', label: 'Patient', sortable: true },
+      { key: 'status', label: 'Status', sortable: true },
+      { key: 'date', label: 'Admission Date', sortable: false },
+    ];
+    basic.rows = [
+      { name: 'Jane Doe', status: 'Active', date: '2024-01-15' },
+      { name: 'John Smith', status: 'Pending', date: '2024-01-16' },
+      { name: 'Emily Chen', status: 'Discharged', date: '2024-01-10' },
+    ];
+  </script>
+</ComponentDemo>
+
+<ComponentDemo title="Selectable Rows">
+  <hx-data-table id="demo-select" selectable></hx-data-table>
+  <script>
+    const sel = document.getElementById('demo-select');
+    sel.columns = [
+      { key: 'name', label: 'Patient', sortable: true },
+      { key: 'status', label: 'Status', sortable: false },
+    ];
+    sel.rows = [
+      { name: 'Jane Doe', status: 'Active' },
+      { name: 'John Smith', status: 'Pending' },
+      { name: 'Emily Chen', status: 'Discharged' },
+    ];
+    sel.addEventListener('hx-select', (e) => console.log('Selected:', e.detail.selectedRows));
+  </script>
+</ComponentDemo>
+
+<ComponentDemo title="Loading State">
+  <hx-data-table id="demo-loading" loading></hx-data-table>
+  <script>
+    const loading = document.getElementById('demo-loading');
+    loading.columns = [
+      { key: 'name', label: 'Patient', sortable: true },
+      { key: 'status', label: 'Status', sortable: false },
+    ];
+    loading.rows = [];
+  </script>
+</ComponentDemo>
+
+<ComponentDemo title="Empty State">
+  <hx-data-table id="demo-empty" empty-label="No patients found"></hx-data-table>
+  <script>
+    const empty = document.getElementById('demo-empty');
+    empty.columns = [
+      { key: 'name', label: 'Patient', sortable: true },
+      { key: 'status', label: 'Status', sortable: false },
+    ];
+    empty.rows = [];
+  </script>
+</ComponentDemo>
+
+## Installation
+
+```bash
+# Full library
+npm install @helix/library
+
+# Or import only this component (tree-shaking friendly)
+import '@helix/library/components/hx-data-table';
+```
+
+## Basic Usage
+
+Minimal HTML snippet — columns and rows must be set via JavaScript because they are arrays:
+
+```html
+<hx-data-table id="my-table"></hx-data-table>
+<script>
+  const table = document.getElementById('my-table');
+  table.columns = [
+    { key: 'name', label: 'Name', sortable: true },
+    { key: 'role', label: 'Role', sortable: false },
+  ];
+  table.rows = [
+    { name: 'Jane Doe', role: 'Nurse' },
+    { name: 'John Smith', role: 'Physician' },
+  ];
+</script>
+```
+
+## Properties
+
+| Property        | Attribute        | Type                        | Default     | Description                                                                         |
+| --------------- | ---------------- | --------------------------- | ----------- | ----------------------------------------------------------------------------------- |
+| `columns`       | `columns`        | `HxDataTableColumn[]`       | `[]`        | Column definitions. Accepts a JS array or a JSON string (Drupal/Twig integration).  |
+| `rows`          | `rows`           | `Record<string, unknown>[]` | `[]`        | Row data objects keyed by column `key` values. Accepts a JS array or a JSON string. |
+| `selectable`    | `selectable`     | `boolean`                   | `false`     | When true, renders a checkbox column for multi-row selection.                       |
+| `sortKey`       | `sort-key`       | `string`                    | `''`        | The column key currently used for sorting.                                          |
+| `sortDirection` | `sort-direction` | `'asc' \| 'desc'`           | `'asc'`     | Current sort direction.                                                             |
+| `loading`       | `loading`        | `boolean`                   | `false`     | When true, renders a loading skeleton and sets `aria-busy="true"` on the table.     |
+| `emptyLabel`    | `empty-label`    | `string`                    | `'No data'` | Text displayed in the default empty state when `rows` is empty and not loading.     |
+| `stickyHeader`  | `sticky-header`  | `boolean`                   | `false`     | When true, the header row is sticky (`position: sticky; top: 0`).                   |
+| `page`          | `page`           | `number`                    | `1`         | Current page (1-based). Ignored when `pageSize` is `0`.                             |
+| `pageSize`      | `page-size`      | `number`                    | `0`         | Rows per page. Set to `0` to disable pagination and show all rows.                  |
+
+### HxDataTableColumn shape
+
+```ts
+interface HxDataTableColumn {
+  key: string; // Matches a key in each row object
+  label: string; // Displayed in the column header
+  sortable?: boolean; // Enables sort button and aria-sort
+  width?: string; // CSS width value applied to the <th>
+}
+```
+
+### HxDataTableSortState shape
+
+```ts
+interface HxDataTableSortState {
+  key: string; // The column key being sorted
+  direction: 'asc' | 'desc'; // Sort direction
+}
+```
+
+## Events
+
+| Event          | Detail Type                                       | Description                                                |
+| -------------- | ------------------------------------------------- | ---------------------------------------------------------- |
+| `hx-sort`      | `{ key: string; direction: 'asc' \| 'desc' }`     | Dispatched when a sortable column header is clicked.       |
+| `hx-select`    | `{ selectedRows: Record<string, unknown>[] }`     | Dispatched when row selection changes (checkbox or Space). |
+| `hx-row-click` | `{ row: Record<string, unknown>; index: number }` | Dispatched when a data row is clicked.                     |
+
+## CSS Custom Properties
+
+| Property                          | Default                       | Description                                   |
+| --------------------------------- | ----------------------------- | --------------------------------------------- |
+| `--hx-data-table-header-bg`       | `var(--hx-color-neutral-50)`  | Header background color.                      |
+| `--hx-data-table-header-color`    | `var(--hx-color-neutral-700)` | Header text color.                            |
+| `--hx-data-table-cell-color`      | `var(--hx-color-neutral-900)` | Cell text color.                              |
+| `--hx-data-table-border-color`    | `var(--hx-color-neutral-200)` | Row border color.                             |
+| `--hx-data-table-row-hover-bg`    | `var(--hx-color-neutral-50)`  | Row hover background.                         |
+| `--hx-data-table-row-selected-bg` | `var(--hx-color-primary-50)`  | Selected row background.                      |
+| `--hx-data-table-empty-color`     | `var(--hx-color-neutral-600)` | Empty state text color.                       |
+| `--hx-data-table-min-width`       | `600px`                       | Minimum table width before horizontal scroll. |
+
+## CSS Parts
+
+| Part        | Description                                          |
+| ----------- | ---------------------------------------------------- |
+| `table`     | The `<table>` element.                               |
+| `thead`     | The `<thead>` element.                               |
+| `tbody`     | The `<tbody>` element.                               |
+| `tr`        | Each `<tr>` element.                                 |
+| `th`        | Each `<th>` element.                                 |
+| `td`        | Each `<td>` element.                                 |
+| `sort-icon` | The sort indicator `<span>` inside sortable headers. |
+| `checkbox`  | Each `<input type="checkbox">` element.              |
+
+## Slots
+
+| Slot      | Description                                                            |
+| --------- | ---------------------------------------------------------------------- |
+| `toolbar` | Content rendered above the table (e.g., search field, action buttons). |
+| `empty`   | Custom empty-state content shown when `rows` is empty and not loading. |
+| `loading` | Custom loading content shown when `loading` is true.                   |
+
+## Accessibility
+
+| Topic           | Details                                                                                                                                                                           |
+| --------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| ARIA role       | `role="grid"` on the `<table>` element to indicate interactive grid semantics.                                                                                                    |
+| `aria-sort`     | Set to `"ascending"`, `"descending"`, or `"none"` on sortable `<th>` elements. Omitted entirely on non-sortable columns.                                                          |
+| `aria-busy`     | `aria-busy="true"` set on the `<table>` when `loading` is true; removed when data is present.                                                                                     |
+| `aria-selected` | Set on each `<tr>` when `selectable` is true, reflecting the current selection state.                                                                                             |
+| `aria-hidden`   | Loading skeleton rows have `aria-hidden="true"` so screen readers skip placeholder content.                                                                                       |
+| Sort button     | `aria-label` on the sort `<button>` announces the current state: e.g. `"Sort by Name, currently sorted ascending"`.                                                               |
+| Checkboxes      | Header checkbox has `aria-label="Select all rows"`. Row checkboxes have `aria-label="Select row N"`. Indeterminate state is set via `.indeterminate` when partially selected.     |
+| Keyboard        | Full grid navigation: **Arrow keys** move between cells; **Home** jumps to first cell in row; **End** jumps to last cell; **Space** toggles row selection on a focused data cell. |
+| Focus           | `tabindex` roving — the focused cell holds `tabindex="0"`, all others hold `tabindex="-1"`. Arrow navigation updates `tabindex` accordingly.                                      |
+| WCAG            | Meets WCAG 2.1 AA. All interactive elements are keyboard-operable (SC 2.1.1). Focus indicators are visible (SC 2.4.7). Sort state is programmatically determinable (SC 1.3.1).    |
+
+## Drupal Integration
+
+`columns` and `rows` accept JSON strings, so they can be set directly from Twig attributes — no JavaScript Behavior required for basic usage:
+
+```twig
+{# my-module/templates/my-template.html.twig #}
+<hx-data-table
+  columns='{{ columns|json_encode }}'
+  rows='{{ rows|json_encode }}'
+  {% if selectable %}selectable{% endif %}
+  {% if loading %}loading{% endif %}
+  {% if sticky_header %}sticky-header{% endif %}
+  empty-label="{{ empty_label|default('No data') }}"
+></hx-data-table>
+```
+
+**Note:** If `columns` or `rows` contains invalid JSON, the component falls back to an empty array and logs a console warning.
+
+Load the library in your module's `.libraries.yml`:
+
+```yaml
+helix-components:
+  js:
+    /libraries/helix/helix.min.js: { minified: true }
+```
+
+## Standalone HTML Example
+
+Copy-paste this into a `.html` file and open it in a browser — no build tool needed:
+
+```html
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>hx-data-table example</title>
+    <script
+      type="module"
+      src="https://cdn.jsdelivr.net/npm/@helix/library/dist/helix.min.js"
+    ></script>
+  </head>
+  <body style="font-family: sans-serif; padding: 2rem;">
+    <hx-data-table id="table" selectable sticky-header></hx-data-table>
+
+    <script>
+      const table = document.getElementById('table');
+
+      table.columns = [
+        { key: 'name', label: 'Patient', sortable: true },
+        { key: 'status', label: 'Status', sortable: true },
+        { key: 'ward', label: 'Ward', sortable: false },
+        { key: 'date', label: 'Admission Date', sortable: true },
+      ];
+
+      table.rows = [
+        { name: 'Jane Doe', status: 'Active', ward: '3A', date: '2024-01-15' },
+        { name: 'John Smith', status: 'Pending', ward: '2B', date: '2024-01-16' },
+        { name: 'Emily Chen', status: 'Discharged', ward: '1C', date: '2024-01-10' },
+        { name: 'Omar Hassan', status: 'Active', ward: '4D', date: '2024-01-18' },
+      ];
+
+      // Client-side sort on hx-sort event
+      table.addEventListener('hx-sort', (e) => {
+        const { key, direction } = e.detail;
+        table.rows = [...table.rows].sort((a, b) => {
+          const av = String(a[key] ?? '');
+          const bv = String(b[key] ?? '');
+          return direction === 'asc' ? av.localeCompare(bv) : bv.localeCompare(av);
+        });
+      });
+
+      table.addEventListener('hx-select', (e) => {
+        console.log('Selected rows:', e.detail.selectedRows);
+      });
+
+      table.addEventListener('hx-row-click', (e) => {
+        console.log('Row clicked:', e.detail.row, 'at index', e.detail.index);
+      });
+    </script>
+  </body>
+</html>
+```
+
+## API Reference
+
+<ComponentDoc tagName="hx-data-table" section="api" />

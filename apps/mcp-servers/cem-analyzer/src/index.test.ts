@@ -6,27 +6,12 @@ import { registerCemTools } from './tools.js';
 describe('MCP Server Lifecycle - CEM Analyzer', () => {
   describe('Server Creation', () => {
     it('creates server with correct metadata', () => {
-      const server = new Server(
-        { name: '@helix/mcp-cem-analyzer', version: '0.1.0' },
-        { capabilities: { tools: {} } }
-      );
-      expect(server).toBeDefined();
-    });
-
-    it('server has correct name', () => {
-      const server = new Server(
-        { name: '@helix/mcp-cem-analyzer', version: '0.1.0' },
-        { capabilities: { tools: {} } }
-      );
-      expect(server).toBeDefined();
-    });
-
-    it('server has correct version', () => {
-      const server = new Server(
-        { name: '@helix/mcp-cem-analyzer', version: '0.1.0' },
-        { capabilities: { tools: {} } }
-      );
-      expect(server).toBeDefined();
+      expect(() => {
+        new Server(
+          { name: '@helix/mcp-cem-analyzer', version: '0.1.0' },
+          { capabilities: { tools: {} } },
+        );
+      }).not.toThrow();
     });
   });
 
@@ -34,15 +19,15 @@ describe('MCP Server Lifecycle - CEM Analyzer', () => {
     it('declares tools capability', () => {
       const server = new Server(
         { name: '@helix/mcp-cem-analyzer', version: '0.1.0' },
-        { capabilities: { tools: {} } }
+        { capabilities: { tools: {} } },
       );
-      expect(server).toBeDefined();
+      expect(server).toBeInstanceOf(Server);
     });
 
     it('tools are registered successfully', () => {
       const server = new Server(
         { name: '@helix/mcp-cem-analyzer', version: '0.1.0' },
-        { capabilities: { tools: {} } }
+        { capabilities: { tools: {} } },
       );
       expect(() => registerCemTools(server)).not.toThrow();
     });
@@ -50,8 +35,7 @@ describe('MCP Server Lifecycle - CEM Analyzer', () => {
 
   describe('Transport', () => {
     it('can create stdio transport', () => {
-      const transport = new StdioServerTransport();
-      expect(transport).toBeDefined();
+      expect(() => new StdioServerTransport()).not.toThrow();
     });
 
     it('transport has required methods', () => {
@@ -64,10 +48,7 @@ describe('MCP Server Lifecycle - CEM Analyzer', () => {
   describe('Error Handling', () => {
     it('handles initialization errors gracefully', () => {
       expect(() => {
-        new Server(
-          { name: '', version: '' },
-          { capabilities: {} }
-        );
+        new Server({ name: '', version: '' }, { capabilities: {} });
       }).not.toThrow();
     });
   });

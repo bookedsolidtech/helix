@@ -1,0 +1,454 @@
+{
+  "component": "hx-switch",
+  "date": "2026-03-03",
+  "score": 90,
+  "breakdown": {
+    "API Documentation": {
+      "score": 100,
+      "weight": 15,
+      "details": {
+        "confidence": "verified",
+        "methodology": "JSDoc source parsing",
+        "measured": true,
+        "phase": "Phase 1"
+      }
+    },
+    "CEM Completeness": {
+      "score": 100,
+      "weight": 15,
+      "details": {
+        "confidence": "verified",
+        "methodology": "CEM field validation",
+        "measured": true,
+        "phase": "Phase 1"
+      }
+    },
+    "Story Coverage": {
+      "score": 100,
+      "weight": 10,
+      "details": {
+        "confidence": "verified",
+        "methodology": "Story count vs variant analysis",
+        "measured": true,
+        "phase": "Phase 1"
+      }
+    },
+    "Docs Coverage": {
+      "score": 100,
+      "weight": 5,
+      "details": {
+        "confidence": "verified",
+        "methodology": "Docs page existence",
+        "measured": true,
+        "phase": "Phase 1"
+      }
+    },
+    "Type Safety": {
+      "score": 75,
+      "weight": 10,
+      "details": {
+        "confidence": "heuristic",
+        "methodology": "Static pattern analysis",
+        "measured": true,
+        "phase": "Phase 2",
+        "subMetrics": [
+          {
+            "name": "No `any` types",
+            "score": 100,
+            "weight": 1,
+            "passed": true
+          },
+          {
+            "name": "No @ts-ignore",
+            "score": 100,
+            "weight": 1,
+            "passed": true
+          },
+          {
+            "name": "No unsafe casts",
+            "score": 100,
+            "weight": 1,
+            "passed": true
+          },
+          {
+            "name": "Properties typed",
+            "score": 0,
+            "weight": 1,
+            "passed": false
+          },
+          {
+            "name": "Typed events",
+            "score": 100,
+            "weight": 1,
+            "passed": true
+          },
+          {
+            "name": "Strict fields",
+            "score": 100,
+            "weight": 1,
+            "passed": true
+          },
+          {
+            "name": "Internals typed",
+            "score": 100,
+            "weight": 1,
+            "passed": true
+          },
+          {
+            "name": "Return types",
+            "score": 0,
+            "weight": 1,
+            "passed": false
+          }
+        ]
+      }
+    },
+    "Test Coverage": {
+      "score": 99,
+      "weight": 10,
+      "details": {
+        "confidence": "verified",
+        "methodology": "Vitest pass rate + V8 code coverage",
+        "measured": true,
+        "phase": "Phase 2"
+      }
+    },
+    "Accessibility": {
+      "score": 98,
+      "weight": 10,
+      "details": {
+        "confidence": "verified",
+        "methodology": "axe-core WCAG 2.1 AA runtime audit + static analysis",
+        "measured": true,
+        "phase": "Phase 2",
+        "subMetrics": [
+          {
+            "name": "Keyboard support",
+            "score": 100,
+            "weight": 2,
+            "passed": true
+          },
+          {
+            "name": "ARIA attributes",
+            "score": 100,
+            "weight": 2,
+            "passed": true
+          },
+          {
+            "name": "Semantic roles",
+            "score": 100,
+            "weight": 1,
+            "passed": true
+          },
+          {
+            "name": "Focus management",
+            "score": 100,
+            "weight": 2,
+            "passed": true
+          },
+          {
+            "name": "Disabled state",
+            "score": 100,
+            "weight": 1,
+            "passed": true
+          },
+          {
+            "name": "Screen reader support",
+            "score": 100,
+            "weight": 2,
+            "passed": true
+          },
+          {
+            "name": "Token-based colors",
+            "score": 0,
+            "weight": 1,
+            "passed": false
+          },
+          {
+            "name": "Form association",
+            "score": 100,
+            "weight": 1,
+            "passed": true
+          }
+        ]
+      }
+    },
+    "Bundle Size": {
+      "score": 0,
+      "weight": 5,
+      "details": {
+        "confidence": "untested",
+        "methodology": "Gzip size measurement vs 5KB budget",
+        "measured": false,
+        "phase": "Future"
+      }
+    },
+    "Token Compliance": {
+      "score": 100,
+      "weight": 5,
+      "details": {
+        "confidence": "heuristic",
+        "methodology": "CSS custom property reference analysis",
+        "measured": true,
+        "phase": "Phase 2"
+      }
+    },
+    "Visual Regression": {
+      "score": 100,
+      "weight": 5,
+      "details": {
+        "confidence": "verified",
+        "methodology": "Playwright cross-browser screenshot comparison",
+        "measured": true,
+        "phase": "Phase 3"
+      }
+    },
+    "Cross-Browser": {
+      "score": 100,
+      "weight": 5,
+      "details": {
+        "confidence": "verified",
+        "methodology": "Playwright multi-browser test results",
+        "measured": true,
+        "phase": "Phase 3"
+      }
+    },
+    "Drupal Readiness": {
+      "score": 100,
+      "weight": 5,
+      "details": {
+        "confidence": "heuristic",
+        "methodology": "Drupal compatibility pattern analysis",
+        "measured": true,
+        "phase": "Phase 2"
+      }
+    },
+    "Code Quality": {
+      "score": 99,
+      "weight": 5,
+      "details": {
+        "confidence": "heuristic",
+        "methodology": "Static code analysis (complexity, duplication, magic numbers)",
+        "measured": true,
+        "phase": "Phase 0",
+        "subMetrics": [
+          {
+            "name": "Cyclomatic Complexity",
+            "score": 100,
+            "weight": 20,
+            "passed": true
+          },
+          {
+            "name": "No Code Duplication",
+            "score": 100,
+            "weight": 15,
+            "passed": true
+          },
+          {
+            "name": "No Magic Numbers",
+            "score": 100,
+            "weight": 10,
+            "passed": true
+          },
+          {
+            "name": "Naming Conventions",
+            "score": 90,
+            "weight": 10,
+            "passed": false
+          },
+          {
+            "name": "No Dead Code",
+            "score": 100,
+            "weight": 15,
+            "passed": true
+          },
+          {
+            "name": "Comment Quality",
+            "score": 100,
+            "weight": 10,
+            "passed": true
+          }
+        ]
+      }
+    },
+    "Lit Best Practices": {
+      "score": 95,
+      "weight": 5,
+      "details": {
+        "confidence": "heuristic",
+        "methodology": "Lit framework best practices validation",
+        "measured": true,
+        "phase": "Phase 0",
+        "subMetrics": [
+          {
+            "name": "super() in Lifecycle",
+            "score": 100,
+            "weight": 20,
+            "passed": true
+          },
+          {
+            "name": "@state vs @property",
+            "score": 100,
+            "weight": 15,
+            "passed": true
+          },
+          {
+            "name": "Reactive Updates",
+            "score": 90,
+            "weight": 15,
+            "passed": false
+          },
+          {
+            "name": "No DOM Manipulation in render()",
+            "score": 100,
+            "weight": 20,
+            "passed": true
+          },
+          {
+            "name": "Separate Styles File",
+            "score": 100,
+            "weight": 15,
+            "passed": true
+          },
+          {
+            "name": "Slot Documentation",
+            "score": 75,
+            "weight": 15,
+            "passed": false
+          }
+        ]
+      }
+    },
+    "Security": {
+      "score": 80,
+      "weight": 5,
+      "details": {
+        "confidence": "heuristic",
+        "methodology": "Security vulnerability scanning (XSS, injection, secrets)",
+        "measured": true,
+        "phase": "Phase 0",
+        "subMetrics": [
+          {
+            "name": "No innerHTML (XSS)",
+            "score": 100,
+            "weight": 30,
+            "passed": true
+          },
+          {
+            "name": "Input Sanitization",
+            "score": 0,
+            "weight": 20,
+            "passed": false
+          },
+          {
+            "name": "No eval()",
+            "score": 100,
+            "weight": 25,
+            "passed": true
+          },
+          {
+            "name": "No Hardcoded Secrets",
+            "score": 100,
+            "weight": 15,
+            "passed": true
+          },
+          {
+            "name": "CSP Compatibility",
+            "score": 100,
+            "weight": 10,
+            "passed": true
+          }
+        ]
+      }
+    },
+    "Maintainability": {
+      "score": 93,
+      "weight": 5,
+      "details": {
+        "confidence": "heuristic",
+        "methodology": "Maintainability metrics (file size, test ratio, dependencies)",
+        "measured": true,
+        "phase": "Phase 0",
+        "subMetrics": [
+          {
+            "name": "File Size",
+            "score": 100,
+            "weight": 20,
+            "passed": true
+          },
+          {
+            "name": "Test-to-Code Ratio",
+            "score": 95,
+            "weight": 25,
+            "passed": false
+          },
+          {
+            "name": "No Circular Dependencies",
+            "score": 70,
+            "weight": 20,
+            "passed": false
+          },
+          {
+            "name": "Separation of Concerns",
+            "score": 100,
+            "weight": 20,
+            "passed": true
+          },
+          {
+            "name": "API Stability",
+            "score": 100,
+            "weight": 15,
+            "passed": true
+          }
+        ]
+      }
+    },
+    "Developer Experience": {
+      "score": 49,
+      "weight": 5,
+      "details": {
+        "confidence": "heuristic",
+        "methodology": "DX quality (Intellisense, error messages, examples)",
+        "measured": true,
+        "phase": "Phase 0",
+        "subMetrics": [
+          {
+            "name": "Intellisense Support",
+            "score": 80,
+            "weight": 30,
+            "passed": false
+          },
+          {
+            "name": "Error Messages",
+            "score": 70,
+            "weight": 15,
+            "passed": true
+          },
+          {
+            "name": "Debugging Ease",
+            "score": 30,
+            "weight": 15,
+            "passed": false
+          },
+          {
+            "name": "Fast Rebuild",
+            "score": 100,
+            "weight": 10,
+            "passed": true
+          },
+          {
+            "name": "Clear Examples",
+            "score": 0,
+            "weight": 30,
+            "passed": false
+          }
+        ]
+      }
+    }
+  },
+  "issues": [
+    {
+      "message": "Developer Experience below threshold: 49%"
+    }
+  ]
+}

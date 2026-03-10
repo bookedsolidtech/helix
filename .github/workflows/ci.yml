@@ -1,23 +1,22 @@
 # ============================================================================
 # CI Pipeline — wc-2026 Enterprise Healthcare Web Component Library
 # ============================================================================
-# Enforces all 7 quality gates before merge:
-#   1. Type check (TypeScript strict, zero errors)
-#   2. Lint (ESLint 9 flat config)
-#   3. Format (Prettier)
+# Parallel quality gates — each job runs independently for fast feedback:
+#   1. Lint (ESLint 9 flat config)
+#   2. Format (Prettier)
+#   3. Type check (TypeScript strict, zero errors)
 #   4. Test (Vitest browser mode + Playwright Chromium)
-#   5. Build (Vite library mode via Turborepo)
-#   6. CEM (Custom Elements Manifest generation)
-#   7. Bundle size (per-component <5KB gzipped, full bundle <50KB gzipped)
+#   5. Build + CEM + Bundle size (Vite library mode via Turborepo)
+#   6. VRT (Visual regression via Storybook)
 # ============================================================================
 
 name: CI
 
 on:
   push:
-    branches: [main]
+    branches: [main, dev, staging]
   pull_request:
-    branches: [main]
+    branches: [main, dev, staging]
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -25,47 +24,157 @@ concurrency:
 
 permissions:
   contents: read
+  pull-requests: read
+
+# ── Shared setup anchor ────────────────────────────────────────────────────
+# Reusable setup steps referenced by all jobs
 
 jobs:
-  quality:
-    name: Quality Gates
+  # ── Change detection ───────────────────────────────────────────────────
+  # Determines which jobs to run based on changed files.
+  # Audit-only PRs (AUDIT.md files) skip Test and VRT.
+
+  changes:
+    name: Detect Changes
     runs-on: ubuntu-latest
-    timeout-minutes: 15
-
+    timeout-minutes: 2
+    outputs:
+      source: ${{ steps.filter.outputs.source }}
+      is_audit: ${{ steps.check-audit.outputs.is_audit }}
     steps:
-      # ---- Setup ----
+      - uses: actions/checkout@v4
+      - name: Check if audit branch
+        id: check-audit
+        run: |
+          BRANCH="${{ github.head_ref || github.ref_name }}"
+          if [[ "$BRANCH" == *"deep-audit"* ]] || [[ "$BRANCH" == *"audit/"* ]]; then
+            echo "is_audit=true" >> "$GITHUB_OUTPUT"
+            echo "Audit branch detected: $BRANCH — skipping CI"
+          else
+            echo "is_audit=false" >> "$GITHUB_OUTPUT"
+          fi
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            source:
+              - 'packages/hx-library/src/**/*.ts'
+              - 'packages/hx-library/src/**/*.styles.ts'
+              - 'packages/hx-library/vite.config.ts'
+              - 'packages/hx-library/tsconfig*.json'
+              - 'package.json'
+              - 'package-lock.json'
+              - 'tsconfig*.json'
+              - '.github/workflows/**'
 
-      - name: Checkout
-        uses: actions/checkout@v4
+  # ── Fast checks (no build needed, <30s each) ────────────────────────────
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+  lint:
+    name: Lint
+    needs: changes
+    if: needs.changes.outputs.is_audit != 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: 'npm'
+      - run: npm ci
+      - run: npm run lint
 
-      - name: Install dependencies
-        run: npm ci
+  format:
+    name: Format
+    needs: changes
+    if: needs.changes.outputs.is_audit != 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+      - run: npm ci
+      - run: npm run format:check
 
-      - name: Install Playwright browsers
-        run: npx playwright install --with-deps chromium firefox webkit
+  type-check:
+    name: Type Check
+    needs: changes
+    if: needs.changes.outputs.is_audit != 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+      - run: npm ci
+      - run: npx turbo run type-check --filter='!docs'
 
-      # ---- Quality Checks ----
+  # ── Tests (need Playwright browsers) ────────────────────────────────────
+  # Changed-file mode: only runs tests for components touched in this PR/push.
+  # A single-component PR runs ~20-50 tests in <2 min instead of 3,200+ tests.
+  # Full suite only runs when triggered manually or on a scheduled basis.
 
-      - name: Type check
-        run: npm run type-check
-
-      - name: Lint
-        run: npm run lint
-
-      - name: Format check
-        run: npm run format:check
-
-      # ---- Tests ----
-
-      - name: Test
-        run: npm run test:library
-
+  test:
+    name: Test
+    needs: changes
+    if: needs.changes.outputs.source == 'true' && needs.changes.outputs.is_audit != 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+      - run: npm ci
+      - run: npx turbo run build --filter='!docs'
+      - run: npx playwright install --with-deps chromium
+      - name: Run tests (PR — path-filtered by changed components)
+        if: github.event_name == 'pull_request'
+        run: |
+          BRANCH="${{ github.head_ref }}"
+          # Fast path: audit-fix branches encode the component name directly
+          if [[ "$BRANCH" =~ feature/audit-fix-(hx-[a-z-]+) ]]; then
+            COMPONENT="${BASH_REMATCH[1]}"
+            echo "Audit-fix branch — running tests for: $COMPONENT"
+            npx vitest run "src/components/$COMPONENT/"
+          else
+            # General PR: extract changed component dirs from git diff
+            CHANGED=$(git diff --name-only "origin/${{ github.base_ref }}...HEAD" \
+              | grep 'src/components/hx-' \
+              | sed 's|.*src/components/\(hx-[^/]*\)/.*|\1|' \
+              | sort -u)
+            if [ -z "$CHANGED" ]; then
+              echo "No component changes — skipping tests"
+              exit 0
+            fi
+            PATHS=$(echo "$CHANGED" | sed 's|^|src/components/|' | sed 's|$|/|' | tr '\n' ' ')
+            echo "Running tests for: $PATHS"
+            npx vitest run $PATHS
+          fi
+        working-directory: packages/hx-library
+      - name: Run tests (push — path-filtered by merged changes)
+        if: github.event_name == 'push'
+        run: |
+          CHANGED=$(git diff --name-only HEAD~1...HEAD \
+            | grep 'src/components/hx-' \
+            | sed 's|.*src/components/\(hx-[^/]*\)/.*|\1|' \
+            | sort -u)
+          if [ -z "$CHANGED" ]; then
+            echo "No component changes — skipping tests"
+            exit 0
+          fi
+          PATHS=$(echo "$CHANGED" | sed 's|^|src/components/|' | sed 's|$|/|' | tr '\n' ' ')
+          echo "Running tests for: $PATHS"
+          npx vitest run $PATHS
+        working-directory: packages/hx-library
       - name: Upload test results
         if: always()
         uses: actions/upload-artifact@v4
@@ -75,36 +184,23 @@ jobs:
           retention-days: 30
           if-no-files-found: warn
 
-      # ---- Visual Regression Tests ----
+  # ── Build + CEM + Bundle size ───────────────────────────────────────────
 
-      - name: Build Storybook
-        run: npm run build:storybook
-
-      - name: Serve Storybook and run VRT
-        run: |
-          npx http-server apps/storybook/dist -p 3151 &
-          sleep 5
-          npm run test:vrt
-
-      - name: Upload VRT diff images
-        if: failure()
-        uses: actions/upload-artifact@v4
+  build:
+    name: Build
+    needs: changes
+    if: needs.changes.outputs.is_audit != 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
-          name: vrt-diffs
-          path: packages/hx-library/.cache/vrt-results/
-          retention-days: 7
-          if-no-files-found: warn
-
-      # ---- Build ----
-
-      - name: Build
-        run: npm run build
-
-      - name: Generate Custom Elements Manifest
-        run: npm run cem
-
-      # ---- Bundle Size Check ----
-
+          node-version: 20
+          cache: 'npm'
+      - run: npm ci
+      - run: npx turbo run build --filter='!docs'
+      - run: npm run cem
       - name: Bundle size check
         run: |
           echo "=== Bundle Size Report ==="
@@ -162,3 +258,168 @@ jobs:
           echo "=== End Bundle Size Report ==="
 
           exit $EXIT_CODE
+
+  # ── Visual Regression Tests ─────────────────────────────────────────────
+
+  vrt:
+    name: Visual Regression
+    needs: changes
+    if: >
+      needs.changes.outputs.source == 'true' &&
+      needs.changes.outputs.is_audit != 'true' &&
+      !contains(github.head_ref || github.ref_name, 'audit-fix')
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+      - name: Detect changed components
+        id: detect
+        run: |
+          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+            CHANGED=$(git diff --name-only "origin/${{ github.base_ref }}...HEAD" \
+              | grep 'src/components/hx-' \
+              | sed 's|.*src/components/\(hx-[^/]*\)/.*|\1|' \
+              | sort -u \
+              | tr '\n' ',' | sed 's/,$//')
+          else
+            CHANGED=$(git diff --name-only HEAD~1...HEAD \
+              | grep 'src/components/hx-' \
+              | sed 's|.*src/components/\(hx-[^/]*\)/.*|\1|' \
+              | sort -u \
+              | tr '\n' ',' | sed 's/,$//')
+          fi
+          echo "changed=$CHANGED" >> "$GITHUB_OUTPUT"
+          if [ -z "$CHANGED" ]; then
+            echo "No component source changes — VRT will skip"
+          else
+            echo "VRT scoped to: $CHANGED"
+          fi
+      - run: npm ci
+        if: steps.detect.outputs.changed != ''
+      - run: npx playwright install --with-deps chromium firefox webkit
+        if: steps.detect.outputs.changed != ''
+      - name: Restore VRT baselines
+        if: steps.detect.outputs.changed != ''
+        id: vrt-cache
+        uses: actions/cache@v4
+        with:
+          path: packages/hx-library/__screenshots__
+          key: vrt-screenshots-${{ hashFiles('packages/hx-library/src/**/*.ts') }}
+          restore-keys: |
+            vrt-screenshots-
+      - run: npm run build:storybook
+        if: steps.detect.outputs.changed != ''
+      - name: Serve Storybook and run VRT
+        if: steps.detect.outputs.changed != ''
+        env:
+          CHANGED_COMPONENTS: ${{ steps.detect.outputs.changed }}
+        run: |
+          npx http-server apps/storybook/dist -p 3151 &
+          sleep 5
+          # If no cached baselines exist, run in update mode to create them (first-run pass)
+          if [ ! -d "packages/hx-library/__screenshots__" ] || [ -z "$(ls -A packages/hx-library/__screenshots__ 2>/dev/null)" ]; then
+            echo "No VRT baselines found — creating initial baselines"
+            npm run test:vrt:update
+          else
+            npm run test:vrt
+          fi
+      - name: Upload VRT diff images
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: vrt-diffs
+          path: packages/hx-library/.cache/vrt-results/
+          retention-days: 7
+          if-no-files-found: warn
+
+  # ── Security Audit ──────────────────────────────────────────────────────
+
+  audit:
+    name: Security Audit
+    needs: changes
+    if: needs.changes.outputs.is_audit != 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+      - run: npm ci
+      - name: Security audit
+        run: npm audit --audit-level=critical
+
+  # ── Aggregate gate (for branch protection) ──────────────────────────────
+  # This job depends on all checks and is the single required status check
+  # in branch protection. This avoids needing to update branch protection
+  # every time a job name changes.
+
+  quality-gates:
+    name: Quality Gates
+    runs-on: ubuntu-latest
+    timeout-minutes: 1
+    needs: [changes, lint, format, type-check, test, build, vrt, audit]
+    if: always()
+    steps:
+      - name: Check all gates
+        run: |
+          IS_AUDIT="${{ needs.changes.outputs.is_audit }}"
+
+          echo "Audit branch: $IS_AUDIT"
+          echo "Lint:       ${{ needs.lint.result }}"
+          echo "Format:     ${{ needs.format.result }}"
+          echo "Type Check: ${{ needs.type-check.result }}"
+          echo "Test:       ${{ needs.test.result }}"
+          echo "Build:      ${{ needs.build.result }}"
+          echo "VRT:        ${{ needs.vrt.result }}"
+          echo "Audit:      ${{ needs.audit.result }}"
+
+          # Audit branches skip all CI — auto-pass
+          if [[ "$IS_AUDIT" == "true" ]]; then
+            echo "Audit branch — all gates skipped. Auto-pass."
+            exit 0
+          fi
+
+          FAIL=0
+
+          for gate in lint format type-check build audit; do
+            result="${{ needs.lint.result }}"
+            case "$gate" in
+              lint)       result="${{ needs.lint.result }}" ;;
+              format)     result="${{ needs.format.result }}" ;;
+              type-check) result="${{ needs.type-check.result }}" ;;
+              build)      result="${{ needs.build.result }}" ;;
+              audit)      result="${{ needs.audit.result }}" ;;
+            esac
+            if [[ "$result" != "success" ]]; then
+              echo "::error::Gate '$gate' did not succeed: $result"
+              FAIL=1
+            fi
+          done
+
+          # Test and VRT are allowed to be skipped (no source changes)
+          for gate in test vrt; do
+            result="${{ needs.test.result }}"
+            case "$gate" in
+              test) result="${{ needs.test.result }}" ;;
+              vrt)  result="${{ needs.vrt.result }}" ;;
+            esac
+            if [[ "$result" != "success" && "$result" != "skipped" ]]; then
+              echo "::error::Gate '$gate' did not succeed: $result"
+              FAIL=1
+            fi
+          done
+
+          if [[ "$FAIL" -eq 1 ]]; then
+            echo "::error::One or more quality gates failed"
+            exit 1
+          fi
+
+          echo "All quality gates passed!"

@@ -1,0 +1,33 @@
+{
+  "category": "Uncategorized",
+  "description": "Launch readiness audit for hx-switch. Checklist: (1) A11y — axe-core zero violations, switch role, Space to toggle, WCAG 2.1 AA. C-PATTERN-01: @query uses ! not = null. (2) Astro doc page — all 12 template sections. (3) Individual export — standalone HTML works. (4) `npm run verify` passes. Files: `packages/hx-library/src/components/hx-switch/`, `apps/docs/src/content/docs/component-library/hx-switch.md`",
+  "title": "LAUNCH READY: hx-switch",
+  "status": "backlog",
+  "dependencies": [
+    "feature-1773066138511-g2pgj0rmm"
+  ],
+  "complexity": "medium",
+  "priority": 3,
+  "source": "api",
+  "trustTier": 1,
+  "quarantineStatus": "passed",
+  "quarantineId": "a0773fef-d24a-489f-a122-8629df300078",
+  "id": "feature-1773066393415-hygfoyro1",
+  "branchName": "feature/launch-ready-hx-switch",
+  "descriptionHistory": [
+    {
+      "description": "Launch readiness audit for hx-switch. Checklist: (1) A11y — axe-core zero violations, switch role, Space to toggle, WCAG 2.1 AA. C-PATTERN-01: @query uses ! not = null. (2) Astro doc page — all 12 template sections. (3) Individual export — standalone HTML works. (4) `npm run verify` passes. Files: `packages/hx-library/src/components/hx-switch/`, `apps/docs/src/content/docs/component-library/hx-switch.md`",
+      "timestamp": "2026-03-09T14:26:33.415Z",
+      "source": "initial"
+    }
+  ],
+  "createdAt": "2026-03-09T14:26:33.415Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-03-09T14:26:33.415Z",
+      "reason": "Feature created"
+    }
+  ]
+}

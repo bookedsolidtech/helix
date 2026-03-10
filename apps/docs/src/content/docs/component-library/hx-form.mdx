@@ -1,6 +1,6 @@
 ---
 title: 'hx-form'
-description: "A Light DOM form wrapper that styles native HTML form elements and hx-* components with the design system's form styles. When action is set, renders a form wrapper around slotted content. When no action is set (the Drupal pattern), renders only a slot so Drupal can provide its own form tag. Uses adopted stylesheets to inject scoped CSS into the document without Shadow DOM, keeping native form participation and Drupal compatibility."
+description: Light DOM form wrapper that applies design system styles to native and hx-* form elements, with client-side validation orchestration and Drupal-compatible dual-mode rendering.
 ---
 
 import ComponentLoader from '../../../components/ComponentLoader.astro';
@@ -11,9 +11,23 @@ import ComponentDoc from '../../../components/ComponentDoc.astro';
 
 <ComponentDoc tagName="hx-form" section="summary" />
 
-## Basic Form
+## Overview
 
-A form with multiple field types. The `hx-form` wrapper applies consistent spacing and styles.
+`hx-form` is a Light DOM orchestration wrapper that applies the design system's form styles to any mix of native HTML form elements and `hx-*` components placed inside it. Unlike Shadow DOM components, it injects scoped CSS via adopted stylesheets so native form participation (file uploads, constraint validation, browser autofill) works without modification.
+
+It operates in two modes:
+
+- **Standalone mode** — set `action` to render a `<form>` wrapper with client-side validation and `hx-submit`/`hx-invalid` events.
+- **Drupal mode** — omit `action` so Drupal provides its own `<form>` tag; `hx-form` contributes only styles and validation orchestration.
+
+**Use `hx-form` when:** you need consistent form layout, spacing, validation error display, or server-side error surfacing across an entire form.
+**Use individual `hx-*` field components directly** when styling a single isolated field without form-level orchestration.
+
+## Live Demo
+
+### Basic Form
+
+A contact form combining multiple `hx-*` field types within a single `hx-form` wrapper.
 
 <ComponentDemo title="Basic Form">
   <hx-form style="max-width: 480px;">
@@ -42,9 +56,9 @@ A form with multiple field types. The `hx-form` wrapper applies consistent spaci
   </hx-form>
 </ComponentDemo>
 
-## Form with Validation
+### Form with Validation Errors
 
-Fields with error states and help text.
+Fields with `error` attributes set demonstrate the inline error state alongside the form-level layout.
 
 <ComponentDemo title="Form with Validation">
   <hx-form style="max-width: 480px;">
@@ -67,6 +81,270 @@ Fields with error states and help text.
     </hx-button>
   </hx-form>
 </ComponentDemo>
+
+### Standalone Mode with Action
+
+Set `action` to enable native browser form submission. The component wraps its children in a `<form>` element.
+
+<ComponentDemo title="Standalone (with action)">
+  <hx-form action="/api/contact" method="post" style="max-width: 480px;">
+    <hx-text-input label="Full name" name="name" placeholder="Jane Doe" required></hx-text-input>
+    <hx-text-input
+      label="Email"
+      name="email"
+      type="email"
+      placeholder="jane@example.com"
+      required
+    ></hx-text-input>
+    <hx-button variant="primary" type="submit">
+      Submit
+    </hx-button>
+  </hx-form>
+</ComponentDemo>
+
+### File Upload Form
+
+Use `enctype="multipart/form-data"` when the form contains file inputs.
+
+<ComponentDemo title="File Upload">
+  <hx-form action="/api/upload" enctype="multipart/form-data" style="max-width: 480px;">
+    <hx-text-input label="Document title" name="title" required></hx-text-input>
+    <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+      <label
+        for="file-upload"
+        style="font-size: 0.875rem; font-weight: 500; color: var(--hx-color-neutral-700);"
+      >
+        File
+      </label>
+      <input id="file-upload" type="file" name="document" accept=".pdf,.doc,.docx" />
+    </div>
+    <hx-button variant="primary" type="submit">
+      Upload
+    </hx-button>
+  </hx-form>
+</ComponentDemo>
+
+## Installation
+
+```bash
+# Full library
+npm install @helix/library
+
+# Or import only this component (tree-shaking friendly)
+import '@helix/library/components/hx-form';
+```
+
+## Basic Usage
+
+```html
+<hx-form action="/api/submit">
+  <hx-text-input label="Name" name="name" required></hx-text-input>
+  <hx-button variant="primary" type="submit">Submit</hx-button>
+</hx-form>
+```
+
+## Properties
+
+| Property     | Attribute    | Type                                                                           | Default                               | Description                                                                           |
+| ------------ | ------------ | ------------------------------------------------------------------------------ | ------------------------------------- | ------------------------------------------------------------------------------------- |
+| `action`     | `action`     | `string`                                                                       | `''`                                  | URL to submit to. When empty, submission is handled client-side via `hx-submit`.      |
+| `method`     | `method`     | `'get' \| 'post'`                                                              | `'post'`                              | HTTP method used on native form submission.                                           |
+| `novalidate` | `novalidate` | `boolean`                                                                      | `false`                               | Disables browser constraint validation on submit.                                     |
+| `name`       | `name`       | `string`                                                                       | `''`                                  | Identifies the form for scripting and form association.                               |
+| `enctype`    | `enctype`    | `'application/x-www-form-urlencoded' \| 'multipart/form-data' \| 'text/plain'` | `'application/x-www-form-urlencoded'` | Encoding type for native form submission. Use `multipart/form-data` for file uploads. |
+
+## Events
+
+| Event        | Detail Type                                                                                                  | Description                                                     |
+| ------------ | ------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------- |
+| `hx-submit`  | `{ valid: boolean, values: Record<string, FormDataEntryValue \| FormDataEntryValue[]>, formData: FormData }` | Dispatched on valid client-side submit when no `action` is set. |
+| `hx-invalid` | `{ errors: Array<{ name: string, message: string }> }`                                                       | Dispatched when validation fails on submit.                     |
+| `hx-reset`   | `void`                                                                                                       | Dispatched when the form is reset.                              |
+
+## CSS Custom Properties
+
+| Property              | Default             | Description                   |
+| --------------------- | ------------------- | ----------------------------- |
+| `--hx-form-gap`       | `var(--hx-space-4)` | Gap between form fields.      |
+| `--hx-form-max-width` | `none`              | Maximum width of the form.    |
+| `--hx-form-padding`   | `0`                 | Internal padding of the form. |
+
+## CSS Parts
+
+`hx-form` is a **Light DOM** component and does not use Shadow DOM. It has no `::part()` targets. Apply styles directly to `hx-form` or use the CSS custom properties above.
+
+## Slots
+
+| Slot        | Description                                        |
+| ----------- | -------------------------------------------------- |
+| _(default)_ | Form fields, controls, and any other form content. |
+
+## Public Methods
+
+`hx-form` exposes imperative methods for validation orchestration and server-side error surfacing:
+
+| Method                                                        | Returns                                                                                    | Description                                                                                        |
+| ------------------------------------------------------------- | ------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------- |
+| `checkValidity()`                                             | `boolean`                                                                                  | Checks validity of all child elements without showing UI. Returns `true` if all valid.             |
+| `reportValidity()`                                            | `boolean`                                                                                  | Checks validity and triggers browser constraint validation UI. Returns `true` if all valid.        |
+| `getFormData()`                                               | `FormData`                                                                                 | Collects form data from all native and `hx-*` child elements.                                      |
+| `getFormElements()`                                           | `HTMLElement[]`                                                                            | Returns all `hx-*` form components within the form.                                                |
+| `getNativeFormElements()`                                     | `Array<HTMLInputElement \| HTMLSelectElement \| HTMLTextAreaElement \| HTMLButtonElement>` | Returns all native form elements.                                                                  |
+| `setErrors(errors: Array<{ name: string, message: string }>)` | `void`                                                                                     | Sets server-side validation errors. Renders error summary and sets `aria-invalid` on named fields. |
+| `setFieldError(name: string, message: string)`                | `void`                                                                                     | Sets a single field error, merging with existing errors.                                           |
+| `clearErrors()`                                               | `void`                                                                                     | Clears all validation errors and removes `aria-invalid` from all fields.                           |
+
+## Accessibility
+
+| Topic                | Details                                                                                                                                                                   |
+| -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Form landmark        | When `action` is set, renders a native `<form>` element — automatically recognized as a form landmark by screen readers.                                                  |
+| Error summary        | Validation errors render in a `<div role="alert" aria-live="assertive" aria-atomic="true">` error summary, announced immediately to screen readers on validation failure. |
+| `aria-invalid`       | Set to `true` on each invalid field automatically — both on client-side validation failure and via `setErrors()` for server-side errors.                                  |
+| `aria-invalid` clear | Removed from all fields when `clearErrors()` is called or on successful submit.                                                                                           |
+| Keyboard             | Inherits native form keyboard behavior — `Tab` moves between fields, `Enter` submits, `Escape` behavior delegated to individual field components.                         |
+| Screen reader        | Error summary is announced as an assertive live region. Individual field errors are announced by the field components (`hx-text-input`, etc.).                            |
+| Focus management     | On validation failure, focus is not moved automatically — individual field components manage their own focus and error announcement.                                      |
+| WCAG 2.1 AA          | Error identification (1.3.1, 3.3.1), error suggestion (3.3.3), and labels (1.3.1) are all satisfied through field components and the form-level error summary.            |
+
+## Drupal Integration
+
+`hx-form` has a dedicated **Drupal mode**: omit the `action` attribute so Drupal provides its own `<form>` tag. The component contributes styles and validation orchestration around the Drupal-rendered form.
+
+```twig
+{# my-module/templates/my-template.html.twig #}
+
+{# Drupal mode — no action attribute; Drupal provides <form> wrapper #}
+<hx-form>
+  {{ form }}
+</hx-form>
+```
+
+For standalone forms with explicit submission targets:
+
+```twig
+{# my-module/templates/my-form.html.twig #}
+<hx-form
+  action="{{ path('my_module.submit') }}"
+  method="post"
+  {% if form_novalidate %}novalidate{% endif %}
+>
+  <hx-text-input
+    label="{{ 'Full name'|t }}"
+    name="name"
+    required
+  ></hx-text-input>
+
+  <hx-select label="{{ 'Department'|t }}" name="department">
+    {% for option in department_options %}
+      <option value="{{ option.value }}">{{ option.label }}</option>
+    {% endfor %}
+  </hx-select>
+
+  <hx-button variant="primary" type="submit">{{ 'Submit'|t }}</hx-button>
+</hx-form>
+```
+
+Load the library in your module's `.libraries.yml`:
+
+```yaml
+helix-components:
+  js:
+    /libraries/helix/helix.min.js: { minified: true }
+```
+
+Surface Drupal server-side validation errors using `setErrors()` in a Drupal behavior:
+
+```javascript
+Drupal.behaviors.myFormValidation = {
+  attach(context) {
+    // once() is a Drupal core utility — prevents duplicate binding during AJAX attach cycles
+    once('myFormValidation', 'hx-form', context).forEach((formEl) => {
+      // Surface Drupal server-side validation errors
+      const serverErrors = drupalSettings.myModule?.formErrors ?? [];
+      if (serverErrors.length > 0) {
+        formEl.setErrors(serverErrors);
+      }
+
+      formEl.addEventListener('hx-submit', (e) => {
+        console.log('Form submitted:', e.detail.values);
+      });
+
+      formEl.addEventListener('hx-invalid', (e) => {
+        console.warn('Validation failed:', e.detail.errors);
+      });
+    });
+  },
+};
+```
+
+## Standalone HTML Example
+
+Copy-paste into a `.html` file and open in any browser — no build tool required:
+
+```html
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>hx-form example</title>
+    <!-- @helix/library is a private package — install via npm workspace, not CDN -->
+    <!-- In your project: import '@helix/library'; in your bundler entry point -->
+  </head>
+  <body style="font-family: sans-serif; padding: 2rem; max-width: 500px;">
+    <hx-form id="contact-form" style="--hx-form-gap: 1.25rem;">
+      <hx-text-input label="Full name" name="name" placeholder="Jane Doe" required></hx-text-input>
+
+      <hx-text-input
+        label="Email"
+        name="email"
+        type="email"
+        placeholder="jane@example.com"
+        required
+      ></hx-text-input>
+
+      <hx-select label="Department" name="department">
+        <option value="">Select a department</option>
+        <option value="eng">Engineering</option>
+        <option value="design">Design</option>
+        <option value="product">Product</option>
+      </hx-select>
+
+      <hx-textarea
+        label="Message"
+        name="message"
+        placeholder="Tell us more..."
+        rows="4"
+        required
+      ></hx-textarea>
+
+      <div style="display: flex; gap: 0.75rem;">
+        <hx-button variant="primary" type="submit">Send message</hx-button>
+        <hx-button variant="secondary" type="reset">Clear</hx-button>
+      </div>
+    </hx-form>
+
+    <script type="module">
+      const form = document.getElementById('contact-form');
+
+      form.addEventListener('hx-submit', (e) => {
+        console.log('Submitted values:', e.detail.values);
+        // Simulate a server error response
+        form.setErrors([{ name: 'email', message: 'This email is already registered.' }]);
+      });
+
+      form.addEventListener('hx-invalid', (e) => {
+        console.warn('Validation errors:', e.detail.errors);
+      });
+
+      form.addEventListener('hx-reset', () => {
+        form.clearErrors();
+      });
+    </script>
+  </body>
+</html>
+```
 
 ## API Reference
 

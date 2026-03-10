@@ -288,11 +288,7 @@
     "patterns": [
       "^(?:\\-\\-hx\\-input\\-height\\-lg|\\-\\-hx\\-input\\-height\\-md|\\-\\-hx\\-input\\-height\\-sm)$"
     ],
-    "tokens": [
-      "--hx-input-height-lg",
-      "--hx-input-height-md",
-      "--hx-input-height-sm"
-    ]
+    "tokens": ["--hx-input-height-lg", "--hx-input-height-md", "--hx-input-height-sm"]
   },
   "all": [
     "--hx-aspect-ratio-auto",

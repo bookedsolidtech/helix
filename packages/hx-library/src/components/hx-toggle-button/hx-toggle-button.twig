@@ -1,0 +1,81 @@
+{#
+  hx-toggle-button — Drupal Twig Template
+  ========================================
+
+  Server-renders the hx-toggle-button custom element with correct attributes.
+  JavaScript enhancement is handled by Drupal behaviors (see below).
+
+  Parameters:
+    label      (string)  Required. Visible button label text. Provide a non-empty string
+                         for icon+text usage, or omit and supply aria_label for icon-only.
+    aria_label (string)  Optional. Forwarded to the inner <button> via the `label` attribute.
+                         Required when no visible label text is present (icon-only usage).
+    variant    (string)  Optional. One of: primary | secondary | tertiary | ghost | outline.
+                         Defaults to 'secondary'.
+    size       (string)  Optional. One of: sm | md | lg. Defaults to 'md'.
+    pressed    (bool)    Optional. Pre-renders the button in the pressed state. Useful for
+                         server-side persistence of toggle state. Defaults to false.
+    disabled   (bool)    Optional. Renders the button in a disabled, non-interactive state.
+                         Defaults to false.
+    name       (string)  Optional. Form field name. Submitted via ElementInternals when pressed.
+    value      (string)  Optional. Form field value. Submitted when the button is pressed.
+    attributes (object)  Optional. Additional HTML attributes to spread onto the element.
+
+  Usage examples:
+
+    Basic toggle button:
+      {% include 'hx-toggle-button.twig' with {
+        label: 'Active Patients',
+        name: 'filter',
+        value: 'active',
+        pressed: true,
+      } %}
+
+    Icon-only toggle button (accessible name via aria_label):
+      {% include 'hx-toggle-button.twig' with {
+        aria_label: 'Grid view',
+        variant: 'outline',
+        size: 'sm',
+        pressed: drupal_settings.view_mode == 'grid',
+      } %}
+
+  Drupal behavior for JS enhancement:
+    The pressed state can be toggled from JavaScript using:
+      element.pressed = true;   // or false
+    The element dispatches an 'hx-toggle' CustomEvent (bubbles, composed) on state change.
+
+    Example Drupal behavior:
+      (function (Drupal) {
+        Drupal.behaviors.helixToggleButton = {
+          attach: function (context) {
+            context.querySelectorAll('hx-toggle-button[data-toggle-group]').forEach((btn) => {
+              btn.addEventListener('hx-toggle', (e) => {
+                const group = btn.dataset.toggleGroup;
+                // Enforce exclusive selection within the same group.
+                if (e.detail.pressed) {
+                  context.querySelectorAll(`hx-toggle-button[data-toggle-group="${group}"]`)
+                    .forEach((sibling) => {
+                      if (sibling !== btn) sibling.pressed = false;
+                    });
+                }
+              });
+            });
+          },
+        };
+      })(Drupal);
+#}
+
+<hx-toggle-button
+  variant="{{ variant|default('secondary') }}"
+  hx-size="{{ size|default('md') }}"
+  {% if pressed %}pressed{% endif %}
+  {% if disabled %}disabled{% endif %}
+  {% if name %}name="{{ name }}"{% endif %}
+  {% if value %}value="{{ value }}"{% endif %}
+  {% if aria_label %}label="{{ aria_label }}"{% endif %}
+  {% for key, val in attributes|default({}) %}{{ key }}="{{ val }}" {% endfor %}
+>
+  {% block prefix %}{% endblock %}
+  {%- if label %}{{ label }}{% endif -%}
+  {% block suffix %}{% endblock %}
+</hx-toggle-button>

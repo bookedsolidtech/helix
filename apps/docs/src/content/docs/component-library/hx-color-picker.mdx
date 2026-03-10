@@ -1,0 +1,266 @@
+---
+title: 'hx-color-picker'
+description: 'Interactive color selection control with gradient picker, hue/opacity sliders, swatches, and formatted text input'
+---
+
+import ComponentLoader from '../../../components/ComponentLoader.astro';
+import ComponentDemo from '../../../components/ComponentDemo.astro';
+import ComponentDoc from '../../../components/ComponentDoc.astro';
+
+<ComponentLoader />
+
+<ComponentDoc tagName="hx-color-picker" section="summary" />
+
+## Overview
+
+`hx-color-picker` is a full-featured color selection control for healthcare and enterprise UIs. It provides a 2D gradient grid for saturation/value selection, a hue slider, an optional opacity (alpha) slider, a row of preset swatches, and a formatted text input that supports hex, rgb, hsl, and hsv output formats. The panel opens from a trigger button in popover mode or renders inline for always-visible placement.
+
+**Use `hx-color-picker` when:** users need to select or adjust a specific color value — for example, theme customization, annotation tools, or patient chart color coding.
+
+**Use a plain `<input type="color">` instead when:** the UI requires only OS-native color selection without custom formatting or swatches.
+
+## Live Demo
+
+### Default (Popover)
+
+Click the trigger swatch to open the picker panel.
+
+<ComponentDemo title="Default">
+  <hx-color-picker value="#3b82f6" format="hex"></hx-color-picker>
+</ComponentDemo>
+
+### Inline
+
+Render the picker panel always-visible with the `inline` attribute.
+
+<ComponentDemo title="Inline">
+  <hx-color-picker value="#10b981" format="hex" inline></hx-color-picker>
+</ComponentDemo>
+
+### With Opacity Slider
+
+Add the `opacity` attribute to reveal the alpha channel slider and include alpha in the output value.
+
+<ComponentDemo title="With Opacity">
+  <hx-color-picker value="#3b82f6" format="rgb" opacity inline></hx-color-picker>
+</ComponentDemo>
+
+### With Preset Swatches
+
+Swatches must be set via JavaScript because arrays cannot be serialized as HTML attributes.
+
+<ComponentDemo title="With Swatches">
+  <hx-color-picker id="demo-swatches" value="#ef4444" format="hex" inline></hx-color-picker>
+  <script>
+    document.getElementById('demo-swatches').swatches = [ '#ef4444', '#f97316', '#eab308',
+    '#22c55e', '#3b82f6', '#8b5cf6', '#ec4899', ];
+  </script>
+</ComponentDemo>
+
+### Swatches Only
+
+Use `swatches-only` with swatches to hide the gradient grid and sliders.
+
+<ComponentDemo title="Swatches Only">
+  <hx-color-picker
+    id="demo-swatches-only"
+    value="#22c55e"
+    format="hex"
+    swatches-only
+    inline
+  ></hx-color-picker>
+  <script>
+    document.getElementById('demo-swatches-only').swatches = [ '#ef4444', '#f97316', '#eab308',
+    '#22c55e', '#3b82f6', '#8b5cf6', ];
+  </script>
+</ComponentDemo>
+
+### Disabled
+
+<ComponentDemo title="Disabled">
+  <hx-color-picker value="#6366f1" format="hex" disabled></hx-color-picker>
+</ComponentDemo>
+
+## Installation
+
+```bash
+# Full library
+npm install @helix/library
+
+# Or import only this component (tree-shaking friendly)
+import '@helix/library/components/hx-color-picker';
+```
+
+## Basic Usage
+
+```html
+<hx-color-picker value="#3b82f6" format="hex"></hx-color-picker>
+```
+
+## Properties
+
+| Property       | Attribute       | Type                               | Default     | Description                                                                             |
+| -------------- | --------------- | ---------------------------------- | ----------- | --------------------------------------------------------------------------------------- |
+| `value`        | `value`         | `string`                           | `'#000000'` | Current color value as a CSS color string. Reflects to the attribute.                   |
+| `format`       | `format`        | `'hex' \| 'rgb' \| 'hsl' \| 'hsv'` | `'hex'`     | Output format for the emitted color value and text input.                               |
+| `opacity`      | `opacity`       | `boolean`                          | `false`     | When true, shows the alpha slider and includes alpha in the output.                     |
+| `swatches`     | —               | `string[]`                         | `[]`        | Array of preset swatch color strings. Set via JS property only.                         |
+| `swatchesOnly` | `swatches-only` | `boolean`                          | `false`     | When true, hides the gradient grid and sliders; shows only swatches and the text input. |
+| `disabled`     | `disabled`      | `boolean`                          | `false`     | Prevents all interaction and dims the control.                                          |
+| `name`         | `name`          | `string`                           | `''`        | Form field name for form participation via `ElementInternals`.                          |
+| `inline`       | `inline`        | `boolean`                          | `false`     | When true, renders the picker panel inline instead of in a popover.                     |
+
+## Events
+
+| Event       | Detail Type         | Description                                                                          |
+| ----------- | ------------------- | ------------------------------------------------------------------------------------ |
+| `hx-input`  | `{ value: string }` | Dispatched continuously while dragging sliders or the gradient grid.                 |
+| `hx-change` | `{ value: string }` | Dispatched when a color is committed (pointer up, swatch click, or text input blur). |
+
+## CSS Custom Properties
+
+| Property                                | Default            | Description                                   |
+| --------------------------------------- | ------------------ | --------------------------------------------- |
+| `--hx-color-picker-z-index`             | `1000`             | z-index of the popover panel.                 |
+| `--hx-color-picker-width`               | `260px`            | Width of the picker panel.                    |
+| `--hx-color-picker-grid-height`         | `160px`            | Height of the saturation/value gradient grid. |
+| `--hx-color-picker-thumb-border`        | `#fff`             | Border color of slider and grid thumbs.       |
+| `--hx-color-picker-thumb-shadow`        | `rgba(0,0,0,0.3)`  | Shadow color of slider and grid thumbs.       |
+| `--hx-color-picker-panel-shadow`        | `rgba(0,0,0,0.15)` | Drop-shadow color of the picker panel.        |
+| `--hx-color-picker-swatch-border`       | `rgba(0,0,0,0.1)`  | Border color of swatch buttons.               |
+| `--hx-color-picker-swatch-border-hover` | `rgba(0,0,0,0.3)`  | Border color of swatch buttons on hover.      |
+
+## CSS Parts
+
+| Part             | Description                                                       |
+| ---------------- | ----------------------------------------------------------------- |
+| `trigger`        | The trigger button that opens the picker panel.                   |
+| `grid`           | The 2D saturation/value gradient picker area.                     |
+| `slider`         | Shared part applied to both hue and opacity slider tracks.        |
+| `hue-slider`     | The hue slider track element.                                     |
+| `opacity-slider` | The alpha/opacity slider track element.                           |
+| `swatches`       | The preset swatch button container.                               |
+| `input`          | The text input area containing the format button and color input. |
+
+## Slots
+
+| Slot      | Description                                                       |
+| --------- | ----------------------------------------------------------------- |
+| `trigger` | Custom trigger element replacing the default color swatch button. |
+
+## Accessibility
+
+| Topic                          | Details                                                                                                                                                                                       |
+| ------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| ARIA role                      | Trigger: native `button` with `aria-haspopup="dialog"` and `aria-expanded`. Panel: `role="dialog"` with `aria-label="Color picker"` and `aria-modal="true"`.                                  |
+| Gradient grid                  | `role="slider"` with `tabindex="0"`, `aria-label="Color gradient"`, `aria-valuemin`, `aria-valuemax`, `aria-valuenow`, and `aria-valuetext` announcing both saturation and value percentages. |
+| Hue slider                     | `role="slider"` with `aria-label="Hue"`, `aria-valuemin="0"`, `aria-valuemax="360"`, and `aria-valuetext` announcing the degree value (e.g. `"180°"`).                                        |
+| Opacity slider                 | `role="slider"` with `aria-label="Opacity"`, `aria-valuemin="0"`, `aria-valuemax="100"`, and `aria-valuetext` announcing the percentage (e.g. `"75%"`).                                       |
+| Trigger label                  | `aria-label` includes the current color value: `"Choose color: #3b82f6"`.                                                                                                                     |
+| Keyboard — gradient grid       | `ArrowLeft`/`ArrowRight` adjust saturation; `ArrowUp`/`ArrowDown` adjust value; `PageUp`/`PageDown` adjust value by 10; `Home` resets to white; `End` resets to black.                        |
+| Keyboard — hue/opacity sliders | `ArrowLeft`/`ArrowDown` decrease; `ArrowRight`/`ArrowUp` increase; `PageDown`/`PageUp` step by 10; `Home`/`End` jump to minimum/maximum.                                                      |
+| Keyboard — panel               | `Escape` closes the panel and returns focus to the trigger button.                                                                                                                            |
+| Screen reader                  | Slider `aria-valuetext` provides human-readable announcements for hue (degrees) and opacity (percentage). Swatch buttons have `aria-label` set to the color value string.                     |
+| Focus                          | On panel close via `Escape`, focus returns to the trigger button.                                                                                                                             |
+| WCAG                           | Meets WCAG 2.1 AA. All interactive controls are keyboard-operable (SC 2.1.1). Focus indicators are visible (SC 2.4.7).                                                                        |
+
+## Drupal Integration
+
+The `swatches` property is a JavaScript array and cannot be serialized as an HTML attribute. In Drupal, use a Behavior to read a `data-swatches` attribute and set the JS property:
+
+```js
+// my-theme/js/color-picker-behavior.js
+Drupal.behaviors.helixColorPicker = {
+  attach(context) {
+    once('helixColorPicker', 'hx-color-picker[data-swatches]', context).forEach((el) => {
+      el.swatches = JSON.parse(el.dataset.swatches);
+    });
+  },
+};
+```
+
+```twig
+{# my-module/templates/my-template.html.twig #}
+<hx-color-picker
+  value="{{ color|default('#000000') }}"
+  format="{{ format|default('hex') }}"
+  {% if opacity %}opacity{% endif %}
+  {% if inline %}inline{% endif %}
+  {% if disabled %}disabled{% endif %}
+  {% if swatches %}data-swatches='{{ swatches|json_encode }}'{% endif %}
+></hx-color-picker>
+```
+
+Load the library in your module's `.libraries.yml`:
+
+```yaml
+helix-components:
+  js:
+    /libraries/helix/helix.min.js: { minified: true }
+```
+
+## Standalone HTML Example
+
+Copy-paste this into a `.html` file and open it in a browser — no build tool needed:
+
+```html
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>hx-color-picker example</title>
+    <!-- @helix/library is a private package — install via npm workspace, not CDN -->
+    <!-- In your project: import '@helix/library'; in your bundler entry point -->
+  </head>
+  <body
+    style="font-family: sans-serif; padding: 2rem; display: flex; gap: 2rem; flex-wrap: wrap; align-items: flex-start;"
+  >
+    <!-- Popover mode (default) -->
+    <div>
+      <p style="margin: 0 0 0.5rem; font-size: 0.875rem; color: #6b7280;">Popover</p>
+      <hx-color-picker id="popover-picker" value="#3b82f6" format="hex"></hx-color-picker>
+    </div>
+
+    <!-- Inline with opacity and swatches -->
+    <div>
+      <p style="margin: 0 0 0.5rem; font-size: 0.875rem; color: #6b7280;">
+        Inline + Opacity + Swatches
+      </p>
+      <hx-color-picker
+        id="inline-picker"
+        value="#ef4444"
+        format="rgb"
+        opacity
+        inline
+      ></hx-color-picker>
+    </div>
+
+    <script>
+      // Swatches must be set via JS property (arrays cannot be serialized as HTML attributes)
+      document.getElementById('inline-picker').swatches = [
+        '#ef4444',
+        '#f97316',
+        '#eab308',
+        '#22c55e',
+        '#3b82f6',
+        '#8b5cf6',
+        '#ec4899',
+      ];
+
+      // Listen for color changes
+      document.getElementById('popover-picker').addEventListener('hx-change', (e) => {
+        console.log('Color selected:', e.detail.value);
+      });
+
+      document.getElementById('inline-picker').addEventListener('hx-input', (e) => {
+        console.log('Color dragging:', e.detail.value);
+      });
+    </script>
+  </body>
+</html>
+```
+
+## API Reference
+
+<ComponentDoc tagName="hx-color-picker" section="api" />

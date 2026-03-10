@@ -1,0 +1,240 @@
+---
+title: 'hx-file-upload'
+description: 'Drag-and-drop file upload dropzone with client-side validation, file list management, per-file progress tracking, and native form association.'
+---
+
+import ComponentLoader from '../../../components/ComponentLoader.astro';
+import ComponentDemo from '../../../components/ComponentDemo.astro';
+import ComponentDoc from '../../../components/ComponentDoc.astro';
+
+<ComponentLoader />
+
+<ComponentDoc tagName="hx-file-upload" section="summary" />
+
+## Overview
+
+`hx-file-upload` is a form-associated drag-and-drop file upload control for Helix. It provides a visually distinct drop zone that accepts file selections via drag-and-drop or the system file picker, validates files against MIME type and size constraints, renders a live file list with per-file progress bars, and participates in native `<form>` submission via `ElementInternals`.
+
+**Use `hx-file-upload` when:** a form field requires one or more file attachments — for example, uploading a patient photo, attaching a lab report, or submitting supporting documents.
+
+**Use a plain `<input type="file">` instead when:** a fully bare-bones, un-styled file picker without the drag-drop affordance is acceptable and the broader Helix design language is not required.
+
+## Live Demo
+
+### Default
+
+<ComponentDemo title="Default">
+  <hx-file-upload label="Attach files" name="attachments"></hx-file-upload>
+</ComponentDemo>
+
+### Multiple Files
+
+<ComponentDemo title="Multiple Files">
+  <hx-file-upload
+    label="Upload reports (PDF only)"
+    name="reports"
+    multiple
+    accept=".pdf"
+  ></hx-file-upload>
+</ComponentDemo>
+
+### With Error
+
+<ComponentDemo title="Error State">
+  <hx-file-upload
+    label="Patient photo"
+    name="photo"
+    error="File must be an image (JPG or PNG) under 5 MB."
+  ></hx-file-upload>
+</ComponentDemo>
+
+### Disabled
+
+<ComponentDemo title="Disabled">
+  <hx-file-upload label="Upload (disabled)" name="doc" disabled></hx-file-upload>
+</ComponentDemo>
+
+## Installation
+
+```bash
+# Full library
+npm install @helix/library
+
+# Or import only this component (tree-shaking friendly)
+import '@helix/library/components/hx-file-upload';
+```
+
+## Basic Usage
+
+```html
+<hx-file-upload
+  label="Attach supporting documents"
+  name="documents"
+  multiple
+  accept=".pdf,.docx"
+  max-size="10485760"
+></hx-file-upload>
+```
+
+## Properties
+
+| Property   | Attribute   | Type      | Default | Description                                                                                     |
+| ---------- | ----------- | --------- | ------- | ----------------------------------------------------------------------------------------------- |
+| `name`     | `name`      | `string`  | `''`    | Form field name used during form submission.                                                    |
+| `accept`   | `accept`    | `string`  | `''`    | Accepted MIME types or extensions (comma-separated). Mirrors native `<input accept>`.           |
+| `maxSize`  | `max-size`  | `number`  | `0`     | Maximum file size in bytes. `0` means unlimited.                                                |
+| `maxFiles` | `max-files` | `number`  | `0`     | Maximum number of files. `0` means unlimited.                                                   |
+| `multiple` | `multiple`  | `boolean` | `false` | Allows selecting more than one file at a time.                                                  |
+| `label`    | `label`     | `string`  | `''`    | Visible label text rendered above the drop zone.                                                |
+| `disabled` | `disabled`  | `boolean` | `false` | Disables all interaction. Reflected as an attribute.                                            |
+| `error`    | `error`     | `string`  | `''`    | Error message displayed below the drop zone; also applies the error visual state to the border. |
+
+## Events
+
+| Event       | Detail Type                          | Description                                                                  |
+| ----------- | ------------------------------------ | ---------------------------------------------------------------------------- |
+| `hx-upload` | `{ files: File[] }`                  | Dispatched when valid files are added via drag-and-drop or the file picker.  |
+| `hx-remove` | `{ file: File, index: number }`      | Dispatched when a file is removed from the list.                             |
+| `hx-error`  | `{ message: string, files: File[] }` | Dispatched when file validation fails (type, size, or max-files constraint). |
+
+## Slots
+
+| Slot        | Description                                                                                   |
+| ----------- | --------------------------------------------------------------------------------------------- |
+| _(default)_ | Drop zone content. Replaces the built-in "Drag files here or click to browse" prompt.         |
+| `file-list` | Custom file list display. When provided, the built-in file list and progress bars are hidden. |
+
+## CSS Parts
+
+| Part        | Description                                            |
+| ----------- | ------------------------------------------------------ |
+| `dropzone`  | The drag-and-drop target area.                         |
+| `file-list` | The `<ul>` wrapping the list of selected files.        |
+| `file-item` | An individual `<li>` file entry in the list.           |
+| `progress`  | The progress bar track `<div>` for a file item.        |
+| `label`     | The visible `<label>` element above the drop zone.     |
+| `error`     | The error message `<div>` rendered below the dropzone. |
+
+## Accessibility
+
+| Topic              | Details                                                                                                                                   |
+| ------------------ | ----------------------------------------------------------------------------------------------------------------------------------------- |
+| ARIA role          | The drop zone has `role="button"` so assistive technologies announce it as an interactive button.                                         |
+| `aria-label`       | Automatically set to the combined label text and action hint, e.g. `"Patient photo — Drag files here or click to browse"`.                |
+| `aria-labelledby`  | When a `label` is provided, the drop zone is additionally associated with the rendered `<label>` element via `aria-labelledby`.           |
+| `aria-disabled`    | Set to `"true"` on the drop zone when `disabled` is active.                                                                               |
+| `aria-describedby` | When `error` is set, the drop zone is associated with the error message element via `aria-describedby`.                                   |
+| Keyboard           | `Tab` to focus the drop zone; `Enter` or `Space` to open the system file picker. Remove buttons are individually focusable.               |
+| Drag-over          | An `aria-live="assertive"` region announces "File detected. Release to upload." when a file is dragged over the drop zone.                |
+| Screen reader      | Error messages use `role="alert"` and `aria-live="polite"` for immediate announcements. The hidden `<input>` is `aria-hidden="true"`.     |
+| Progress bars      | Each progress bar has `role="progressbar"` with `aria-valuenow`, `aria-valuemin`, `aria-valuemax`, and a descriptive `aria-label`.        |
+| Remove button      | Each remove button has an `aria-label` identifying the specific file, e.g. `"Remove report.pdf"`.                                         |
+| File list          | The `<ul>` has `aria-label="Selected files"` so screen readers identify the list purpose.                                                 |
+| Focus              | After opening the file picker via keyboard and completing selection, focus returns to the drop zone.                                      |
+| WCAG               | Meets WCAG 2.1 AA: sufficient color contrast, keyboard-operable controls, programmatically determinable labels, and status announcements. |
+
+## Drupal Integration
+
+```twig
+{# my-module/templates/file-upload-field.html.twig #}
+<hx-file-upload
+  label="{{ label }}"
+  name="{{ field_name }}"
+  {% if multiple %}multiple{% endif %}
+  {% if accept %}accept="{{ accept }}"{% endif %}
+  {% if max_size %}max-size="{{ max_size }}"{% endif %}
+  {% if disabled %}disabled{% endif %}
+  {% if error %}error="{{ error }}"{% endif %}
+></hx-file-upload>
+```
+
+Load the library in your module's `.libraries.yml`:
+
+```yaml
+helix-components:
+  js:
+    /libraries/helix/helix.min.js: { minified: true }
+```
+
+Listen for events in Drupal behaviors using `once()` to prevent duplicate listeners on AJAX:
+
+```javascript
+Drupal.behaviors.fileUpload = {
+  attach(context) {
+    // once() is a Drupal core utility (no import needed) — prevents duplicate event binding during AJAX attach cycles
+    once('fileUpload', 'hx-file-upload', context).forEach((el) => {
+      el.addEventListener('hx-upload', (e) => {
+        console.log('Files selected:', e.detail.files);
+      });
+      el.addEventListener('hx-error', (e) => {
+        console.warn('Validation error:', e.detail.message);
+      });
+    });
+  },
+};
+```
+
+## Standalone HTML Example
+
+Copy-paste this into a `.html` file and open it in a browser — no build tool needed:
+
+```html
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>hx-file-upload example</title>
+    <!-- @helix/library is a private package — install via npm workspace, not CDN -->
+    <!-- In your project: import '@helix/library'; in your bundler entry point -->
+  </head>
+  <body style="font-family: sans-serif; padding: 2rem; max-width: 480px;">
+    <form id="upload-form">
+      <hx-file-upload
+        id="doc-upload"
+        label="Attach patient documents"
+        name="documents"
+        multiple
+        accept=".pdf,.jpg,.png"
+        max-size="5242880"
+        max-files="5"
+      ></hx-file-upload>
+
+      <button type="submit" style="margin-top: 1rem;">Submit</button>
+    </form>
+
+    <script>
+      const uploader = document.getElementById('doc-upload');
+
+      uploader.addEventListener('hx-upload', (e) => {
+        console.log(
+          'Valid files added:',
+          e.detail.files.map((f) => f.name),
+        );
+      });
+
+      uploader.addEventListener('hx-error', (e) => {
+        console.warn('Validation error:', e.detail.message);
+      });
+
+      uploader.addEventListener('hx-remove', (e) => {
+        console.log('File removed:', e.detail.file.name, 'at index', e.detail.index);
+      });
+
+      // Simulate progress for the first file after upload
+      uploader.addEventListener('hx-upload', (e) => {
+        let progress = 0;
+        const interval = setInterval(() => {
+          progress += 10;
+          uploader.setProgress(0, progress);
+          if (progress >= 100) clearInterval(interval);
+        }, 200);
+      });
+    </script>
+  </body>
+</html>
+```
+
+## API Reference
+
+<ComponentDoc tagName="hx-file-upload" section="api" />

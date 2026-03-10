@@ -30,6 +30,17 @@ export const helixAlertStyles = css`
     line-height: var(--hx-line-height-normal, 1.5);
   }
 
+  /* ─── Accent Variant (left border stripe) ─── */
+  /* Removes full border and replaces with a left-side accent stripe.         */
+  /* Common healthcare/enterprise dashboard pattern for dense information UIs. */
+
+  .alert--accent {
+    border-width: 0;
+    border-left: var(--hx-alert-accent-width, 4px) solid
+      var(--hx-alert-border-color, var(--hx-color-info-200, #b3d9ef));
+    border-radius: 0;
+  }
+
   /* ─── Icon ─── */
 
   .alert__icon {
@@ -45,6 +56,18 @@ export const helixAlertStyles = css`
     fill: currentColor;
   }
 
+  /* ─── Title ─── */
+
+  .alert__title {
+    display: none;
+    font-weight: var(--hx-font-weight-semibold, 600);
+    margin-bottom: var(--hx-space-1, 0.25rem);
+  }
+
+  .alert__title--visible {
+    display: block;
+  }
+
   /* ─── Message ─── */
 
   .alert__message {
@@ -53,23 +76,32 @@ export const helixAlertStyles = css`
   }
 
   /* ─── Actions ─── */
+  /* Hidden by default; shown via JS slotchange detection to avoid invisible  */
+  /* margin-top spacing when no actions are slotted.                          */
 
   .alert__actions {
-    display: flex;
+    display: none;
     align-items: center;
     gap: var(--hx-space-2, 0.5rem);
     margin-top: var(--hx-space-2, 0.5rem);
   }
 
+  .alert__actions--visible {
+    display: flex;
+  }
+
   /* ─── Close Button ─── */
+  /* Minimum 44px touch target per WCAG 2.5.8 (Target Size Minimum, AA) and */
+  /* Apple HIG / Google Material guidelines. Uses absolute px units to ensure */
+  /* the target size is independent of the consumer's base font size.         */
 
   .alert__close-button {
     display: inline-flex;
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
-    width: var(--hx-space-6, 1.5rem);
-    height: var(--hx-space-6, 1.5rem);
+    min-width: var(--hx-touch-target-size, 44px);
+    min-height: var(--hx-touch-target-size, 44px);
     margin-left: auto;
     padding: 0;
     border: none;
@@ -87,6 +119,8 @@ export const helixAlertStyles = css`
 
   .alert__close-button:hover {
     opacity: 1;
+    /* color-mix() is supported in Chrome 111+, Firefox 113+, Safari 16.2+.   */
+    /* Falls back to transparent (no hover background) in older environments.  */
     background-color: color-mix(in srgb, currentColor 10%, transparent);
   }
 

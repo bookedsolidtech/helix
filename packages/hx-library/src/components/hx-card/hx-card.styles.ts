@@ -8,6 +8,7 @@ export const helixCardStyles = css`
   .card {
     display: flex;
     flex-direction: column;
+    gap: var(--hx-card-gap, var(--hx-space-4, 1rem));
     background-color: var(--hx-card-bg, var(--hx-color-neutral-0, #ffffff));
     color: var(--hx-card-color, var(--hx-color-neutral-800, #212529));
     border: var(--hx-border-width-thin, 1px) solid
@@ -49,6 +50,24 @@ export const helixCardStyles = css`
     padding: var(--hx-space-3, 0.75rem);
   }
 
+  .card--compact .card__heading {
+    padding-top: var(--hx-space-3, 0.75rem);
+    padding-right: var(--hx-space-3, 0.75rem);
+    padding-left: var(--hx-space-3, 0.75rem);
+  }
+
+  .card--compact .card__footer {
+    padding-right: var(--hx-space-3, 0.75rem);
+    padding-bottom: var(--hx-space-3, 0.75rem);
+    padding-left: var(--hx-space-3, 0.75rem);
+  }
+
+  .card--compact .card__actions {
+    padding-right: var(--hx-space-3, 0.75rem);
+    padding-bottom: var(--hx-space-3, 0.75rem);
+    padding-left: var(--hx-space-3, 0.75rem);
+  }
+
   /* ─── Interactive ─── */
 
   .card--interactive {
@@ -57,7 +76,7 @@ export const helixCardStyles = css`
 
   .card--interactive:hover {
     box-shadow: var(--hx-shadow-lg, 0 10px 15px -3px rgb(0 0 0 / 0.1));
-    transform: translateY(var(--hx-transform-lift-md, -2px));
+    transform: translateY(var(--hx-lift-md, -2px));
   }
 
   .card--interactive:focus-visible {
@@ -67,6 +86,20 @@ export const helixCardStyles = css`
 
   .card--interactive:active {
     transform: translateY(0);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .card {
+      transition: none;
+    }
+
+    .card--interactive:hover {
+      transform: none;
+    }
+
+    .card--interactive:active {
+      transform: none;
+    }
   }
 
   /* ─── Hidden empty slot wrappers ─── */
@@ -84,7 +117,7 @@ export const helixCardStyles = css`
 
   .card__image ::slotted(img) {
     width: 100%;
-    height: auto;
+    aspect-ratio: var(--hx-card-image-aspect-ratio, 16 / 9);
     display: block;
     object-fit: cover;
   }

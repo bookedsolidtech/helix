@@ -1,0 +1,33 @@
+{
+  "category": "Uncategorized",
+  "description": "Launch readiness audit for hx-select. Checklist: (1) A11y — axe-core zero violations, listbox pattern, aria-expanded, aria-activedescendant, WCAG 2.1 AA. C-PATTERN-04: aria-labelledby not label[for]. (2) Astro doc page — all 12 template sections. (3) Individual export — standalone HTML works. (4) `npm run verify` passes. Files: `packages/hx-library/src/components/hx-select/`, `apps/docs/src/content/docs/component-library/hx-select.md`",
+  "title": "LAUNCH READY: hx-select",
+  "status": "backlog",
+  "dependencies": [
+    "feature-1773066138511-g2pgj0rmm"
+  ],
+  "complexity": "medium",
+  "priority": 3,
+  "source": "api",
+  "trustTier": 1,
+  "quarantineStatus": "passed",
+  "quarantineId": "0f564616-af0b-4be3-815b-11f67534b311",
+  "id": "feature-1773066359071-iopwg7u8v",
+  "branchName": "feature/launch-ready-hx-select",
+  "descriptionHistory": [
+    {
+      "description": "Launch readiness audit for hx-select. Checklist: (1) A11y — axe-core zero violations, listbox pattern, aria-expanded, aria-activedescendant, WCAG 2.1 AA. C-PATTERN-04: aria-labelledby not label[for]. (2) Astro doc page — all 12 template sections. (3) Individual export — standalone HTML works. (4) `npm run verify` passes. Files: `packages/hx-library/src/components/hx-select/`, `apps/docs/src/content/docs/component-library/hx-select.md`",
+      "timestamp": "2026-03-09T14:25:59.072Z",
+      "source": "initial"
+    }
+  ],
+  "createdAt": "2026-03-09T14:25:59.072Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-03-09T14:25:59.072Z",
+      "reason": "Feature created"
+    }
+  ]
+}

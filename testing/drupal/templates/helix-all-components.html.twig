@@ -1,0 +1,117 @@
+{#
+/**
+ * @file
+ * HELIX — All 19 components rendered in Drupal 11 Twig.
+ *
+ * This template demonstrates all HELIX components for integration verification.
+ * Requires @attach: { library: ['my_theme/helix', 'my_theme/helix-tokens'] }
+ */
+#}
+
+{# Display Components #}
+<section class="helix-integration-test">
+
+  {# hx-alert #}
+  <hx-alert variant="info">
+    <span slot="title">Alert Component</span>
+    All HELIX components loaded successfully in Drupal 11.
+  </hx-alert>
+
+  {# hx-avatar #}
+  <hx-avatar initials="{{ user.initials|default('JD') }}" size="md"></hx-avatar>
+
+  {# hx-badge #}
+  <hx-badge variant="default">New</hx-badge>
+  <hx-badge variant="secondary">Beta</hx-badge>
+  <hx-badge variant="destructive">Error</hx-badge>
+
+  {# hx-breadcrumb #}
+  <hx-breadcrumb>
+    <hx-breadcrumb-item href="{{ path('<front>') }}">{{ 'Home'|t }}</hx-breadcrumb-item>
+    {% for crumb in breadcrumb %}
+      <hx-breadcrumb-item href="{{ crumb.url }}">{{ crumb.text }}</hx-breadcrumb-item>
+    {% endfor %}
+    <hx-breadcrumb-item>{{ page.title }}</hx-breadcrumb-item>
+  </hx-breadcrumb>
+
+  {# hx-button + hx-button-group #}
+  <hx-button-group>
+    <hx-button variant="primary">{{ 'Save'|t }}</hx-button>
+    <hx-button variant="secondary">{{ 'Cancel'|t }}</hx-button>
+    <hx-button variant="ghost">{{ 'Delete'|t }}</hx-button>
+  </hx-button-group>
+
+  {# hx-card #}
+  <hx-card>
+    <span slot="header">{{ node.label }}</span>
+    <div slot="body">{{ content.body }}</div>
+    <div slot="footer">
+      <hx-button size="sm">{{ 'Read More'|t }}</hx-button>
+    </div>
+  </hx-card>
+
+  {# hx-container + hx-prose #}
+  <hx-container>
+    <hx-prose>
+      {{ content.field_body }}
+    </hx-prose>
+  </hx-container>
+
+  {# hx-icon-button #}
+  <hx-icon-button aria-label="{{ 'Edit'|t }}">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16">
+      <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+      <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+    </svg>
+  </hx-icon-button>
+
+  {# Form-associated components #}
+  <form method="post">
+    <hx-field>
+      <hx-text-input
+        name="search"
+        label="{{ 'Search'|t }}"
+        placeholder="{{ 'Enter search term...'|t }}"
+        slot="input"
+      ></hx-text-input>
+    </hx-field>
+
+    <hx-field>
+      <hx-textarea
+        name="comment"
+        label="{{ 'Comment'|t }}"
+        rows="4"
+        slot="input"
+      ></hx-textarea>
+    </hx-field>
+
+    <hx-field>
+      <hx-select name="status" label="{{ 'Status'|t }}" slot="input">
+        <option value="">{{ 'Select status'|t }}</option>
+        <option value="active">{{ 'Active'|t }}</option>
+        <option value="inactive">{{ 'Inactive'|t }}</option>
+      </hx-select>
+    </hx-field>
+
+    <hx-checkbox name="subscribe" label="{{ 'Subscribe to newsletter'|t }}"></hx-checkbox>
+
+    <hx-switch name="dark_mode" label="{{ 'Dark mode'|t }}"></hx-switch>
+
+    <hx-radio-group name="frequency" label="{{ 'Email frequency'|t }}">
+      <hx-radio value="daily" label="{{ 'Daily'|t }}"></hx-radio>
+      <hx-radio value="weekly" label="{{ 'Weekly'|t }}"></hx-radio>
+      <hx-radio value="monthly" label="{{ 'Monthly'|t }}"></hx-radio>
+    </hx-radio-group>
+
+    <hx-slider
+      name="importance"
+      label="{{ 'Importance'|t }}"
+      min="1"
+      max="10"
+      value="5"
+    ></hx-slider>
+
+    <hx-button type="submit">{{ 'Submit'|t }}</hx-button>
+  </form>
+
+</section>

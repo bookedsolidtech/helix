@@ -1,0 +1,395 @@
+---
+title: 'hx-help-text'
+description: 'Descriptive or validation text displayed below form controls. Supports error, warning, and success variants with ARIA live region semantics.'
+---
+
+import ComponentLoader from '../../../components/ComponentLoader.astro';
+import ComponentDemo from '../../../components/ComponentDemo.astro';
+import ComponentDoc from '../../../components/ComponentDoc.astro';
+
+<ComponentLoader />
+
+<ComponentDoc tagName="hx-help-text" section="summary" />
+
+## Overview
+
+`hx-help-text` is a sub-component that displays descriptive or validation text below form controls. It supports four semantic variants (`default`, `error`, `warning`, `success`) that drive both visual styling and ARIA live region semantics. The `error` variant uses `role="alert"` for immediate screen-reader announcement; `warning` and `success` use `aria-live="polite"` for non-intrusive announcements.
+
+**Use `hx-help-text` when:** you need to surface inline guidance, hint text, or validation feedback beneath a form control in a way that is visually distinctive and reliably announced by screen readers.
+
+**Key behaviors:**
+
+- Non-default variants render an inline icon alongside the text to satisfy WCAG 1.4.1 (color is not the sole visual indicator).
+- The component is designed to be referenced via `aria-describedby` on a sibling form control, linking accessible descriptions to inputs without markup overhead.
+- Variant and its associated ARIA semantics update reactively — changing `variant` at runtime immediately updates the live region role.
+
+## Live Demo
+
+### Variants
+
+All four visual variants with their color and icon treatments.
+
+<ComponentDemo title="Variants">
+  <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+    <hx-help-text variant="default">
+      Default: Enter your full name as it appears on your ID.
+    </hx-help-text>
+    <hx-help-text variant="error">Error: This field is required.</hx-help-text>
+    <hx-help-text variant="warning">
+      Warning: This value will be visible to other users.
+    </hx-help-text>
+    <hx-help-text variant="success">Success: Your password meets all requirements.</hx-help-text>
+  </div>
+</ComponentDemo>
+
+### Form Field Integration
+
+`hx-help-text` is designed to sit below a form control and be linked via `aria-describedby`.
+
+<ComponentDemo title="Form Field Integration">
+  <div style="display: flex; flex-direction: column; gap: 1.5rem; max-width: 400px;">
+    <div>
+      <label for="email-demo" style="display: block; margin-bottom: 0.25rem; font-weight: 500;">
+        Email address
+      </label>
+      <input
+        id="email-demo"
+        type="email"
+        aria-describedby="email-demo-help"
+        style="display: block; width: 100%; padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 0.375rem;"
+        placeholder="you@example.com"
+      />
+      <hx-help-text id="email-demo-help" style="margin-top: 0.25rem;">
+        We'll never share your email with anyone else.
+      </hx-help-text>
+    </div>
+    <div>
+      <label for="password-demo" style="display: block; margin-bottom: 0.25rem; font-weight: 500;">
+        Password
+      </label>
+      <input
+        id="password-demo"
+        type="password"
+        aria-describedby="password-demo-error"
+        aria-invalid="true"
+        style="display: block; width: 100%; padding: 0.5rem; border: 1px solid #dc2626; border-radius: 0.375rem;"
+      />
+      <hx-help-text id="password-demo-error" variant="error" style="margin-top: 0.25rem;">
+        Password must be at least 8 characters.
+      </hx-help-text>
+    </div>
+    <div>
+      <label for="username-demo" style="display: block; margin-bottom: 0.25rem; font-weight: 500;">
+        Username
+      </label>
+      <input
+        id="username-demo"
+        type="text"
+        aria-describedby="username-demo-success"
+        style="display: block; width: 100%; padding: 0.5rem; border: 1px solid #15803d; border-radius: 0.375rem;"
+        value="john_doe"
+      />
+      <hx-help-text id="username-demo-success" variant="success" style="margin-top: 0.25rem;">
+        Username is available!
+      </hx-help-text>
+    </div>
+  </div>
+</ComponentDemo>
+
+## Installation
+
+```bash
+# Full library
+npm install @helix/library
+
+# Or import only this component (tree-shaking friendly)
+import '@helix/library/components/hx-help-text';
+```
+
+## Basic Usage
+
+```html
+<!-- Default hint text -->
+<label for="name">Full Name</label>
+<input id="name" type="text" aria-describedby="name-help" />
+<hx-help-text id="name-help">Enter your name as it appears on your ID.</hx-help-text>
+
+<!-- Error validation feedback -->
+<label for="email">Email</label>
+<input id="email" type="email" aria-describedby="email-error" aria-invalid="true" />
+<hx-help-text id="email-error" variant="error">Please enter a valid email address.</hx-help-text>
+
+<!-- Success confirmation -->
+<label for="username">Username</label>
+<input id="username" type="text" aria-describedby="username-status" />
+<hx-help-text id="username-status" variant="success">Username is available!</hx-help-text>
+```
+
+## Properties
+
+| Property  | Attribute | Type                                             | Default     | Description                                                                                              |
+| --------- | --------- | ------------------------------------------------ | ----------- | -------------------------------------------------------------------------------------------------------- |
+| `variant` | `variant` | `'default' \| 'error' \| 'warning' \| 'success'` | `'default'` | Visual variant that determines the text color and icon. Also drives ARIA semantics (role and aria-live). |
+
+## Events
+
+`hx-help-text` does not dispatch any custom events. It is a purely presentational sub-component.
+
+## Slots
+
+| Slot        | Description                                                                   |
+| ----------- | ----------------------------------------------------------------------------- |
+| _(default)_ | The help text content. Accepts plain text or inline HTML (e.g., `<a>` links). |
+
+```html
+<!-- Plain text -->
+<hx-help-text>Your password must be at least 8 characters.</hx-help-text>
+
+<!-- Inline link in help text -->
+<hx-help-text> Forgot your password? <a href="/reset">Reset it here</a>. </hx-help-text>
+```
+
+## CSS Parts
+
+| Part   | Element  | Description                                                             |
+| ------ | -------- | ----------------------------------------------------------------------- |
+| `base` | `<span>` | The root element. Carries the ARIA role and live region attribute.      |
+| `icon` | `<span>` | The icon wrapper (only rendered for `error`, `warning`, and `success`). |
+| `text` | `<span>` | The text wrapper containing the default slot.                           |
+
+```css
+/* Customize the error icon color */
+hx-help-text[variant='error']::part(icon) {
+  color: hotpink;
+}
+
+/* Increase the text size for a specific field */
+#dob-help::part(text) {
+  font-size: 1rem;
+}
+```
+
+## CSS Custom Properties
+
+| Property                     | Default                        | Description                                    |
+| ---------------------------- | ------------------------------ | ---------------------------------------------- |
+| `--hx-help-text-color`       | `var(--hx-color-neutral-500)`  | Text (and icon) color. Overridden per variant. |
+| `--hx-help-text-font-family` | `var(--hx-font-family-sans)`   | Font family.                                   |
+| `--hx-help-text-font-size`   | `var(--hx-font-size-sm)`       | Font size (defaults to 0.875rem).              |
+| `--hx-help-text-font-weight` | `var(--hx-font-weight-normal)` | Font weight.                                   |
+| `--hx-help-text-line-height` | `var(--hx-line-height-normal)` | Line height.                                   |
+| `--hx-help-text-icon-gap`    | `0.375rem`                     | Gap between the icon and text.                 |
+
+Variant color overrides are applied automatically. To override a specific variant's color:
+
+```css
+/* Override error color system-wide */
+hx-help-text[variant='error'] {
+  --hx-help-text-color: #7b0000;
+}
+```
+
+## Accessibility
+
+`hx-help-text` implements the [WAI-ARIA Live Regions](https://www.w3.org/TR/wai-aria-1.2/#live_region_roles) pattern with variant-driven semantics.
+
+| Topic                  | Details                                                                                                                                       |
+| ---------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| `aria-describedby`     | The primary pattern for connecting `hx-help-text` to a form control. Assign an `id` to `hx-help-text` and reference it on the input element.  |
+| `role="alert"`         | Applied to the internal `[part="base"]` span when `variant="error"`. Triggers an assertive screen-reader announcement when content changes.   |
+| `aria-live="polite"`   | Applied to `[part="base"]` when `variant="warning"` or `variant="success"`. Announces changes without interrupting the user.                  |
+| Default variant        | No ARIA role or live region attribute. Static hint text read only when focus reaches the linked control (via `aria-describedby`).             |
+| SVG icons              | All inline SVG icons have `aria-hidden="true"` — they are decorative. The ARIA role and text content convey meaning independently.            |
+| Color + icon           | Non-default variants render both a color change and an icon, satisfying WCAG 1.4.1 (Use of Color) — color is never the sole differentiator.   |
+| Color contrast         | All variant color combinations meet WCAG 2.1 AA minimum contrast ratio (4.5:1 for text, 3:1 for UI components).                               |
+| Dynamic variant change | Changing `variant` at runtime updates ARIA attributes reactively. `error` → `default` removes `role="alert"` to stop assertive interruptions. |
+| WCAG                   | Meets WCAG 2.1 AA. Verified against: 1.4.1 (Use of Color), 1.4.3 (Contrast Minimum), 4.1.3 (Status Messages).                                 |
+
+### Connecting help text to a form control
+
+```html
+<label for="dob">Date of Birth</label>
+<input id="dob" type="date" aria-describedby="dob-help" aria-invalid="true" />
+<hx-help-text id="dob-help" variant="error">
+  Please enter a date in MM/DD/YYYY format.
+</hx-help-text>
+```
+
+The browser reads the `aria-describedby` value as an IDREF, looks up `#dob-help` in the light DOM, and includes the help text component's accessible text in the input's accessible description. This works across the shadow DOM boundary because `aria-describedby` resolves IDs in the light DOM.
+
+## Design Tokens
+
+`hx-help-text` consumes tokens from the semantic tier of the design token cascade:
+
+| Tier      | Token                      | Usage                      |
+| --------- | -------------------------- | -------------------------- |
+| Semantic  | `--hx-color-neutral-500`   | Default variant text color |
+| Semantic  | `--hx-color-error-600`     | Error variant color        |
+| Semantic  | `--hx-color-warning-700`   | Warning variant color      |
+| Semantic  | `--hx-color-success-700`   | Success variant color      |
+| Semantic  | `--hx-font-family-sans`    | Typography                 |
+| Semantic  | `--hx-font-size-sm`        | Font size                  |
+| Semantic  | `--hx-font-weight-normal`  | Font weight                |
+| Semantic  | `--hx-line-height-normal`  | Line height                |
+| Component | `--hx-help-text-color`     | Override text/icon color   |
+| Component | `--hx-help-text-font-size` | Override font size         |
+| Component | `--hx-help-text-icon-gap`  | Override icon-to-text gap  |
+
+Override at the semantic level to retheme all help text at once:
+
+```css
+:root {
+  --hx-color-error-600: #b91c1c;
+  --hx-color-success-700: #166534;
+}
+```
+
+## Drupal Integration
+
+```twig
+{# my-module/templates/form-field.html.twig #}
+{% if help_text %}
+  <hx-help-text
+    {% if help_text_variant %}variant="{{ help_text_variant }}"{% endif %}
+    {% if help_text_id %}id="{{ help_text_id }}"{% endif %}
+  >
+    {{ help_text }}
+  </hx-help-text>
+{% endif %}
+```
+
+A complete field pattern with `aria-describedby` linking:
+
+```twig
+{# Accessible form field with help text #}
+<div class="field-wrapper">
+  <label for="{{ field_id }}">{{ label }}</label>
+  <input
+    id="{{ field_id }}"
+    type="{{ input_type|default('text') }}"
+    {% if help_text_id %}aria-describedby="{{ help_text_id }}"{% endif %}
+    {% if invalid %}aria-invalid="true"{% endif %}
+  />
+  {% if help_text %}
+    <hx-help-text
+      id="{{ help_text_id }}"
+      {% if help_text_variant %}variant="{{ help_text_variant }}"{% endif %}
+    >
+      {{ help_text }}
+    </hx-help-text>
+  {% endif %}
+</div>
+```
+
+Load the library in your module's `.libraries.yml`:
+
+```yaml
+helix-components:
+  js:
+    /libraries/helix/helix.min.js: { minified: true }
+```
+
+## Standalone HTML Example
+
+Copy-paste into a `.html` file and open in any browser — no build tool required:
+
+```html
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>hx-help-text example</title>
+    <script
+      type="module"
+      src="https://cdn.jsdelivr.net/npm/@helix/library/dist/helix.min.js"
+    ></script>
+    <style>
+      body {
+        font-family: sans-serif;
+        padding: 2rem;
+        max-width: 480px;
+        margin: 0 auto;
+      }
+      .field {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+        margin-bottom: 1.5rem;
+      }
+      label {
+        font-weight: 500;
+      }
+      input {
+        padding: 0.5rem;
+        border: 1px solid #d1d5db;
+        border-radius: 0.375rem;
+        font-size: 1rem;
+      }
+      input[aria-invalid='true'] {
+        border-color: #dc2626;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Patient Registration</h1>
+
+    <div class="field">
+      <label for="full-name">Full Name</label>
+      <input id="full-name" type="text" aria-describedby="name-help" placeholder="Jane Smith" />
+      <hx-help-text id="name-help">
+        Enter your name as it appears on your government-issued ID.
+      </hx-help-text>
+    </div>
+
+    <div class="field">
+      <label for="dob">Date of Birth</label>
+      <input id="dob" type="date" aria-describedby="dob-error" aria-invalid="true" />
+      <hx-help-text id="dob-error" variant="error">
+        Please enter a valid date of birth.
+      </hx-help-text>
+    </div>
+
+    <div class="field">
+      <label for="mrn">Medical Record Number</label>
+      <input id="mrn" type="text" aria-describedby="mrn-warning" value="MRN-00123" />
+      <hx-help-text id="mrn-warning" variant="warning">
+        This MRN will be visible to all care team members.
+      </hx-help-text>
+    </div>
+
+    <div class="field">
+      <label for="insurance">Insurance ID</label>
+      <input id="insurance" type="text" aria-describedby="insurance-success" value="INS-987654" />
+      <hx-help-text id="insurance-success" variant="success">
+        Insurance verified successfully.
+      </hx-help-text>
+    </div>
+
+    <script>
+      // Dynamically update variant based on user input
+      const dob = document.getElementById('dob');
+      const dobHelp = document.getElementById('dob-error');
+
+      dob.addEventListener('change', () => {
+        const isValid = dob.value !== '';
+        dob.setAttribute('aria-invalid', String(!isValid));
+        dobHelp.variant = isValid ? 'success' : 'error';
+        dobHelp.textContent = isValid
+          ? 'Date of birth confirmed.'
+          : 'Please enter a valid date of birth.';
+      });
+    </script>
+  </body>
+</html>
+```
+
+## Changelog
+
+| Version | Change                                                                                         |
+| ------- | ---------------------------------------------------------------------------------------------- |
+| 1.0.0   | Initial release. Four variants (`default`, `error`, `warning`, `success`) with ARIA semantics. |
+
+## API Reference
+
+<ComponentDoc tagName="hx-help-text" section="api" />

@@ -1,6 +1,35 @@
 import { defineConfig } from 'vite';
 import { resolve } from 'path';
+import { readdirSync, existsSync } from 'fs';
+import { fileURLToPath } from 'url';
 import dts from 'vite-plugin-dts';
+
+const __dirname = fileURLToPath(new URL('.', import.meta.url));
+
+// Auto-discover component entry points from src/components/hx-*/index.ts
+// Eliminates merge conflicts when multiple component PRs modify this file.
+function discoverEntryPoints() {
+  const componentsDir = resolve(__dirname, 'src/components');
+  const entries: Record<string, string> = {
+    index: resolve(__dirname, 'src/index.ts'),
+  };
+
+  if (!existsSync(componentsDir)) return entries;
+
+  const dirs = readdirSync(componentsDir, { withFileTypes: true })
+    .filter((d) => d.isDirectory() && d.name.startsWith('hx-'))
+    .map((d) => d.name)
+    .sort();
+
+  for (const dir of dirs) {
+    const indexPath = resolve(componentsDir, dir, 'index.ts');
+    if (existsSync(indexPath)) {
+      entries[`components/${dir}/index`] = indexPath;
+    }
+  }
+
+  return entries;
+}
 
 export default defineConfig({
   plugins: [
@@ -11,34 +40,13 @@ export default defineConfig({
   ],
   build: {
     lib: {
-      entry: {
-        index: resolve(__dirname, 'src/index.ts'),
-        'components/hx-button/index': resolve(__dirname, 'src/components/hx-button/index.ts'),
-        'components/hx-card/index': resolve(__dirname, 'src/components/hx-card/index.ts'),
-        'components/hx-container/index': resolve(__dirname, 'src/components/hx-container/index.ts'),
-        'components/hx-text-input/index': resolve(
-          __dirname,
-          'src/components/hx-text-input/index.ts',
-        ),
-        'components/hx-checkbox/index': resolve(__dirname, 'src/components/hx-checkbox/index.ts'),
-        'components/hx-select/index': resolve(__dirname, 'src/components/hx-select/index.ts'),
-        'components/hx-radio-group/index': resolve(
-          __dirname,
-          'src/components/hx-radio-group/index.ts',
-        ),
-        'components/hx-alert/index': resolve(__dirname, 'src/components/hx-alert/index.ts'),
-        'components/hx-textarea/index': resolve(__dirname, 'src/components/hx-textarea/index.ts'),
-        'components/hx-badge/index': resolve(__dirname, 'src/components/hx-badge/index.ts'),
-        'components/hx-switch/index': resolve(__dirname, 'src/components/hx-switch/index.ts'),
-        'components/hx-form/index': resolve(__dirname, 'src/components/hx-form/index.ts'),
-        'components/hx-prose/index': resolve(__dirname, 'src/components/hx-prose/index.ts'),
-      },
+      entry: discoverEntryPoints(),
       formats: ['es'],
     },
     outDir: 'dist',
     rollupOptions: {
       // Externalize Lit and workspace dependencies
-      external: [/^lit/, /^@lit/, /^@helix\/tokens/],
+      external: [/^lit/, /^@lit/, /^@helix\/tokens/, /^@floating-ui/],
       output: {
         // Place entry points at their expected paths
         entryFileNames: '[name].js',

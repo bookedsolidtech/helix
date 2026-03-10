@@ -16,6 +16,7 @@ Comprehensive dependency audit hook that blocks commits adding vulnerable or dup
 ### Capabilities
 
 **Detects**:
+
 1. ✅ Security vulnerabilities (npm audit integration)
 2. ✅ Duplicate dependencies across workspace packages (same package, different versions)
 3. ✅ Overly broad version ranges (`*`, `^*`)
@@ -23,6 +24,7 @@ Comprehensive dependency audit hook that blocks commits adding vulnerable or dup
 5. ✅ Workspace protocol violations (internal packages should use `workspace:*`)
 
 **Features**:
+
 - Monorepo-aware duplicate detection across all workspace packages
 - npm audit integration (workspace root only, within budget)
 - Peer dependency validation
@@ -35,6 +37,7 @@ Comprehensive dependency audit hook that blocks commits adding vulnerable or dup
 ### Implementation Details
 
 **Monorepo Structure**:
+
 ```
 wc-2026/
 ├── package.json (root workspace)
@@ -48,6 +51,7 @@ wc-2026/
 ```
 
 **Duplicate Detection Algorithm**:
+
 1. Scan all workspace packages (`{packages,apps}/**/package.json`)
 2. Build dependency map: `Map<packageName, Array<{version, source, isDev}>>`
 3. Flag packages with multiple versions
@@ -55,6 +59,7 @@ wc-2026/
 5. Report all duplicates with sources
 
 **Validation Workflow**:
+
 ```
 Staged package.json files
   ↓
@@ -75,12 +80,7 @@ Pass/Fail (critical only, warnings don't block)
 ```typescript
 const CONFIG = {
   includePatterns: ['**/package.json'],
-  excludePatterns: [
-    '**/node_modules/**',
-    '**/dist/**',
-    '**/.next/**',
-    '**/.cache/**',
-  ],
+  excludePatterns: ['**/node_modules/**', '**/dist/**', '**/.next/**', '**/.cache/**'],
   approvalComment: '@dependency-approved',
   timeoutMs: 8000,
   performanceBudgetMs: 8000,
@@ -93,29 +93,35 @@ const CONFIG = {
 **23 comprehensive tests**:
 
 #### Basic Functionality (2 tests)
+
 - No staged package.json files
 - Valid package.json
 
 #### Version Range Validation (3 tests)
+
 - Detect `*` and `^*`
 - Allow approved broad ranges
 - Pin to specific versions
 
 #### Duplicate Detection (3 tests)
+
 - Detect different versions across workspace
 - Pass when versions aligned
 - Skip workspace protocol deps
 
 #### Peer Dependencies (3 tests)
+
 - Detect missing peer deps
 - Pass when satisfied in dependencies
 - Pass when satisfied in devDependencies
 
 #### Workspace Protocol (2 tests)
+
 - Detect workspace packages not using `workspace:*`
 - Pass when using workspace protocol
 
 #### Edge Cases (4 tests)
+
 - Invalid JSON detection
 - JSON output mode
 - Empty dependencies
@@ -124,10 +130,12 @@ const CONFIG = {
 - Bail-fast mode
 
 #### Approval Mechanism (2 tests)
+
 - Version range approvals
 - Workspace protocol approvals
 
 #### Stats Reporting (1 test)
+
 - Comprehensive stats output
 
 ### Violation Categories
@@ -144,10 +152,12 @@ category:
 ### Severity Levels
 
 **Critical** (blocks commit):
+
 - Invalid JSON in package.json
 - High/critical security vulnerabilities
 
 **Warnings** (don't block):
+
 - Broad version ranges
 - Duplicate dependencies
 - Low/moderate vulnerabilities
@@ -159,11 +169,13 @@ category:
 **Budget**: <8000ms
 
 **Typical Execution**:
+
 - No vulnerabilities: 200-300ms
 - With npm audit: 2000-4000ms (npm audit is slow)
 - Monorepo duplicate scan: <100ms
 
 **Optimizations**:
+
 - npm audit runs once at workspace root
 - Duplicate detection uses in-memory map
 - Staged file filtering before processing
@@ -172,6 +184,7 @@ category:
 ### Approval Mechanism
 
 **Format**: Add to package.json description field
+
 ```json
 {
   "name": "@example/lib",
@@ -183,6 +196,7 @@ category:
 ```
 
 **Why description field?**
+
 - JSON doesn't support comments
 - Node's package.json parser rejects invalid JSON
 - Description is standard, won't break tooling
@@ -191,6 +205,7 @@ category:
 ### Integration
 
 **npm script**:
+
 ```json
 {
   "scripts": {
@@ -200,6 +215,7 @@ category:
 ```
 
 **Pre-commit hook**:
+
 ```bash
 #!/bin/sh
 npm run hooks:dependency-audit || exit 1
@@ -208,6 +224,7 @@ npm run hooks:dependency-audit || exit 1
 ### Example Output
 
 **Success**:
+
 ```
 ╔═══════════════════════════════════════════════════════════════╗
 ║          🔒 Dependency Audit (H21)                           ║
@@ -229,6 +246,7 @@ npm run hooks:dependency-audit || exit 1
 ```
 
 **Violations**:
+
 ```
 ❌ Violations:
 
@@ -291,7 +309,7 @@ npx tsx /path/to/dependency-audit.ts
 
 ## H23: Semantic Versioning Hook
 
-*(Previous implementation summary preserved below...)*
+_(Previous implementation summary preserved below...)_
 
 **Status**: ✅ GOLD STANDARD - Production Ready
 **Tests**: 75/75 passing

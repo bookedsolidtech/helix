@@ -18,7 +18,10 @@ describe('animation-budget-check (H20)', () => {
     it('should match files in packages/.../src/.../  with .ts extension', () => {
       expect(matchesPattern('packages/lib/src/button.styles.ts', includePatterns)).toBe(true);
       expect(
-        matchesPattern('packages/hx-library/src/components/hx-button/hx-button.styles.ts', includePatterns),
+        matchesPattern(
+          'packages/hx-library/src/components/hx-button/hx-button.styles.ts',
+          includePatterns,
+        ),
       ).toBe(true);
     });
 

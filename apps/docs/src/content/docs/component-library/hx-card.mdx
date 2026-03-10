@@ -1,6 +1,6 @@
 ---
 title: 'hx-card'
-description: Flexible card component for displaying grouped content with multiple slots
+description: Flexible card component for displaying grouped content with image, heading, body, footer, and action slots.
 ---
 
 import ComponentLoader from '../../../components/ComponentLoader.astro';
@@ -11,7 +11,17 @@ import ComponentDoc from '../../../components/ComponentDoc.astro';
 
 <ComponentDoc tagName="hx-card" section="summary" />
 
-## Variants
+## Overview
+
+`hx-card` is a flexible content container that groups related information into a visually distinct surface. It supports five named slots (image, heading, body, footer, actions), three visual style variants, three elevation levels, and an interactive link mode via `hx-href`.
+
+**Use `hx-card` when:** you need to present a self-contained piece of content — a patient summary, a clinical record, a feature callout — with optional media, a title, body copy, footer metadata, and action buttons.
+
+**Use `hx-card` with `hx-href` when:** the entire card should act as a navigable link. Note: do not combine `hx-href` with the `actions` slot — nesting focusable controls inside `role="link"` is an ARIA anti-pattern.
+
+## Live Demo
+
+### Variants
 
 Default, featured, and compact card styles.
 
@@ -32,7 +42,7 @@ Default, featured, and compact card styles.
   </div>
 </ComponentDemo>
 
-## Elevations
+### Elevations
 
 Flat, raised, and floating shadow depths.
 
@@ -53,7 +63,7 @@ Flat, raised, and floating shadow depths.
   </div>
 </ComponentDemo>
 
-## Full Slot Usage
+### Full Slot Usage
 
 All available slots: image, heading, body, footer, and actions.
 
@@ -79,18 +89,210 @@ All available slots: image, heading, body, footer, and actions.
   </hx-card>
 </ComponentDemo>
 
-## Interactive Card
+### Interactive Card
 
 Card with `hx-href` becomes clickable. Uses the `hx-` prefix to avoid conflicting with the native HTML `href` attribute.
 
 <ComponentDemo title="Interactive Card">
-  <hx-card variant="default" elevation="raised" hx-href="https://helix.dev">
+  <hx-card
+    variant="default"
+    elevation="raised"
+    hx-href="https://helix.dev"
+    hx-aria-label="Learn more about Helix"
+  >
     <span slot="heading">Clickable Card</span>
     <p>
-      This card has a <code>hx-href</code> attribute — click anywhere to navigate.
+      This card has a <code>hx-href</code> attribute — click anywhere or press Enter/Space to
+      navigate.
     </p>
   </hx-card>
 </ComponentDemo>
+
+## Installation
+
+Install the full library or import the component individually:
+
+```bash
+# Full library
+npm install @helix/library
+
+# Or import only this component (tree-shaking friendly)
+import '@helix/library/components/hx-card';
+```
+
+## Basic Usage
+
+Minimal HTML snippet — no build tool required:
+
+```html
+<hx-card>
+  <span slot="heading">Card Title</span>
+  <p>Card body content goes here.</p>
+</hx-card>
+```
+
+## Properties
+
+| Property      | Attribute       | Type                                   | Default     | Description                                                                                                                                                                           |
+| ------------- | --------------- | -------------------------------------- | ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `variant`     | `variant`       | `'default' \| 'featured' \| 'compact'` | `'default'` | Visual style variant of the card. `featured` adds a primary-colored border; `compact` reduces internal padding.                                                                       |
+| `elevation`   | `elevation`     | `'flat' \| 'raised' \| 'floating'`     | `'flat'`    | Shadow depth of the card. `flat` has no shadow; `raised` adds a subtle shadow; `floating` adds a prominent shadow.                                                                    |
+| `hxHref`      | `hx-href`       | `string \| undefined`                  | `undefined` | Optional URL. When set, the card becomes interactive — it gains `role="link"`, `tabindex="0"`, and fires `hx-card-click` on click or Enter/Space. Do not combine with `actions` slot. |
+| `hxAriaLabel` | `hx-aria-label` | `string \| undefined`                  | `undefined` | Accessible label for interactive cards. Provides a meaningful description beyond the visible content. Only applied when `hx-href` is set.                                             |
+
+## Events
+
+| Event           | Detail Type                                                    | Description                                                                                                                 |
+| --------------- | -------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
+| `hx-card-click` | `{ href: string; originalEvent: MouseEvent \| KeyboardEvent }` | Dispatched when an interactive card (with `hx-href`) is clicked or activated via keyboard. `bubbles: true, composed: true`. |
+
+## Slots
+
+| Slot        | Description                                                                                                                                                                                                              |
+| ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `image`     | Optional image or media content at the top of the card. The slot wrapper is hidden when empty. Use a native `<img>` for best results — it will fill the container with `object-fit: cover`.                              |
+| `heading`   | The card heading/title content. Use a semantic heading element (`<h2>`, `<h3>`, etc.) for proper document outline. The slot wrapper is hidden when empty.                                                                |
+| _(default)_ | Default slot for the card body content. Always visible. Accepts any flow content.                                                                                                                                        |
+| `footer`    | Optional footer content rendered below the body — metadata, timestamps, attribution. The slot wrapper is hidden when empty.                                                                                              |
+| `actions`   | Optional action buttons rendered with a top border separator. The slot wrapper is hidden when empty. **Do not use together with `hx-href`** — nesting interactive controls inside `role="link"` is an ARIA anti-pattern. |
+
+## CSS Parts
+
+| Part      | Element | Description                                                                                      |
+| --------- | ------- | ------------------------------------------------------------------------------------------------ |
+| `card`    | `<div>` | The outer card container element. Target for border and shadow overrides.                        |
+| `image`   | `<div>` | The image slot container. Hidden when no image content is slotted.                               |
+| `heading` | `<div>` | The heading slot container. Hidden when no heading content is slotted.                           |
+| `body`    | `<div>` | The body slot container. Always present.                                                         |
+| `footer`  | `<div>` | The footer slot container. Hidden when no footer content is slotted.                             |
+| `actions` | `<div>` | The actions slot container. Includes a top border separator. Hidden when no actions are slotted. |
+
+## CSS Custom Properties
+
+| Property                       | Default                       | Description                                                       |
+| ------------------------------ | ----------------------------- | ----------------------------------------------------------------- |
+| `--hx-card-bg`                 | `var(--hx-color-neutral-0)`   | Card background color.                                            |
+| `--hx-card-color`              | `var(--hx-color-neutral-800)` | Card text color.                                                  |
+| `--hx-card-border-color`       | `var(--hx-color-neutral-200)` | Card border and actions-separator color.                          |
+| `--hx-card-border-radius`      | `var(--hx-border-radius-lg)`  | Card border radius.                                               |
+| `--hx-card-padding`            | `var(--hx-space-6)`           | Internal padding for heading, body, footer, and actions sections. |
+| `--hx-card-gap`                | `var(--hx-space-4)`           | Vertical gap between card sections.                               |
+| `--hx-card-image-aspect-ratio` | `16/9`                        | Aspect ratio applied to `<img>` elements in the image slot.       |
+
+## Accessibility
+
+| Topic            | Details                                                                                                                                                                                                                            |
+| ---------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Static card      | When `hx-href` is not set, the card is a non-interactive `<div>`. No ARIA role is applied. Screen readers encounter the card content in document order.                                                                            |
+| Interactive card | When `hx-href` is set, the inner container receives `role="link"` and `tabindex="0"`. The card is keyboard-reachable and activatable via `Enter` or `Space`. This matches the WAI-ARIA link pattern.                               |
+| `aria-label`     | Use `hx-aria-label` on interactive cards to provide a meaningful accessible name beyond the visible content. Example: `hx-aria-label="View patient record for John Smith"`.                                                        |
+| Heading slot     | Always use a semantic heading element (`<h2>`, `<h3>`, etc.) in the `heading` slot to maintain a correct document outline. Avoid using `<span>` for headings in production.                                                        |
+| Actions slot     | Do **not** use the `actions` slot together with `hx-href`. Nesting focusable controls (buttons, links) inside `role="link"` creates unreachable elements and violates WCAG 4.1.2. A console warning is issued if both are present. |
+| Focus indicator  | Interactive cards display a visible `:focus-visible` outline styled with `--hx-focus-ring-width` and `--hx-focus-ring-color`, meeting WCAG 2.4.7.                                                                                  |
+| Reduced motion   | The hover lift and shadow transition animations are suppressed when `prefers-reduced-motion: reduce` is active, meeting WCAG 2.3.3.                                                                                                |
+| Color contrast   | Card text color pairings against background meet WCAG 2.1 AA 4.5:1 minimum contrast ratio.                                                                                                                                         |
+| WCAG             | Meets WCAG 2.1 AA when used correctly. Verify that heading slot content uses appropriate heading levels for the page context.                                                                                                      |
+
+## Drupal Integration
+
+Use the component in a Twig template after registering the library:
+
+```twig
+{# my-module/templates/card.html.twig #}
+<hx-card
+  variant="{{ variant|default('default') }}"
+  elevation="{{ elevation|default('flat') }}"
+  {% if hx_href %}
+    hx-href="{{ hx_href }}"
+    hx-aria-label="{{ hx_aria_label|default('') }}"
+  {% endif %}
+>
+  {% if image_url %}
+    <img slot="image" src="{{ image_url }}" alt="{{ image_alt|default('') }}" />
+  {% endif %}
+  {% if heading %}
+    <h3 slot="heading">{{ heading }}</h3>
+  {% endif %}
+  {{ body }}
+  {% if footer %}
+    <span slot="footer">{{ footer }}</span>
+  {% endif %}
+  {% if actions %}
+    <div slot="actions">{{ actions }}</div>
+  {% endif %}
+</hx-card>
+```
+
+Load the library in your module's `.libraries.yml`:
+
+```yaml
+helix-components:
+  js:
+    /libraries/helix/helix.min.js: { minified: true }
+```
+
+## Standalone HTML Example
+
+Copy-paste this into a `.html` file and open it in a browser — no build tool needed:
+
+```html
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>hx-card example</title>
+    <!-- @helix/library is a private package — install via npm workspace, not CDN -->
+    <!-- In your project: import '@helix/library'; in your bundler entry point -->
+  </head>
+  <body style="font-family: sans-serif; padding: 2rem; max-width: 900px; margin: 0 auto;">
+    <!-- Grid of cards -->
+    <div
+      style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem;"
+    >
+      <!-- Static card with all slots -->
+      <hx-card variant="default" elevation="raised">
+        <img slot="image" src="https://placehold.co/640x360" alt="Patient overview" />
+        <h3 slot="heading">Patient Overview</h3>
+        <p>John Smith, DOB: 1982-04-15. Last visit: 2026-02-28.</p>
+        <span slot="footer">Last updated: 2026-03-01</span>
+        <div slot="actions">
+          <hx-button variant="primary" size="sm">View Record</hx-button>
+          <hx-button variant="ghost" size="sm">Dismiss</hx-button>
+        </div>
+      </hx-card>
+
+      <!-- Featured card -->
+      <hx-card variant="featured" elevation="raised">
+        <h3 slot="heading">Critical Alert</h3>
+        <p>Lab results require immediate review for Patient #4821.</p>
+        <div slot="actions">
+          <hx-button variant="primary" size="sm">Review Now</hx-button>
+        </div>
+      </hx-card>
+
+      <!-- Interactive card (entire surface is a link) -->
+      <hx-card
+        variant="default"
+        elevation="flat"
+        hx-href="/patients/4821"
+        hx-aria-label="Open patient record for John Smith"
+        id="interactive-card"
+      >
+        <h3 slot="heading">Clickable Card</h3>
+        <p>Click anywhere on this card to navigate to the patient record.</p>
+      </hx-card>
+    </div>
+
+    <script>
+      document.getElementById('interactive-card').addEventListener('hx-card-click', (e) => {
+        console.log('Card clicked, href:', e.detail.href);
+        // Handle navigation here or let the browser follow the href
+      });
+    </script>
+  </body>
+</html>
+```
 
 ## API Reference
 

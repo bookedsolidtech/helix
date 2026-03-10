@@ -6,9 +6,8 @@ import { join } from 'path';
 describe('dependency-audit (H21)', () => {
   // Find project root
   const cwd = process.cwd();
-  const PROJECT_ROOT = cwd.endsWith('scripts/hooks') || cwd.endsWith('scripts\\hooks')
-    ? join(cwd, '../..')
-    : cwd;
+  const PROJECT_ROOT =
+    cwd.endsWith('scripts/hooks') || cwd.endsWith('scripts\\hooks') ? join(cwd, '../..') : cwd;
   const TMP_DIR = join(PROJECT_ROOT, '.tmp-dependency-audit-test');
   const hookScript = join(PROJECT_ROOT, 'scripts/hooks/dependency-audit.ts');
 
@@ -50,7 +49,7 @@ describe('dependency-audit (H21)', () => {
       name: 'test-package',
       version: '1.0.0',
       dependencies: {
-        'lit': '^3.0.0',
+        lit: '^3.0.0',
       },
     };
 
@@ -170,27 +169,48 @@ describe('dependency-audit (H21)', () => {
     mkdirSync(join(TMP_DIR, 'packages/lib1'), { recursive: true });
     mkdirSync(join(TMP_DIR, 'packages/lib2'), { recursive: true });
 
-    writeFileSync(rootPkg, JSON.stringify({
-      name: 'workspace-root',
-      private: true,
-      workspaces: ['packages/*'],
-    }, null, 2));
+    writeFileSync(
+      rootPkg,
+      JSON.stringify(
+        {
+          name: 'workspace-root',
+          private: true,
+          workspaces: ['packages/*'],
+        },
+        null,
+        2,
+      ),
+    );
 
-    writeFileSync(pkg1, JSON.stringify({
-      name: '@test/lib1',
-      version: '1.0.0',
-      dependencies: {
-        'lit': '^3.0.0',
-      },
-    }, null, 2));
+    writeFileSync(
+      pkg1,
+      JSON.stringify(
+        {
+          name: '@test/lib1',
+          version: '1.0.0',
+          dependencies: {
+            lit: '^3.0.0',
+          },
+        },
+        null,
+        2,
+      ),
+    );
 
-    writeFileSync(pkg2, JSON.stringify({
-      name: '@test/lib2',
-      version: '1.0.0',
-      dependencies: {
-        'lit': '^3.1.0', // Different version
-      },
-    }, null, 2));
+    writeFileSync(
+      pkg2,
+      JSON.stringify(
+        {
+          name: '@test/lib2',
+          version: '1.0.0',
+          dependencies: {
+            lit: '^3.1.0', // Different version
+          },
+        },
+        null,
+        2,
+      ),
+    );
 
     execSync('git add -A', { cwd: TMP_DIR });
 
@@ -213,27 +233,48 @@ describe('dependency-audit (H21)', () => {
     mkdirSync(join(TMP_DIR, 'packages/lib1'), { recursive: true });
     mkdirSync(join(TMP_DIR, 'packages/lib2'), { recursive: true });
 
-    writeFileSync(rootPkg, JSON.stringify({
-      name: 'workspace-root',
-      private: true,
-      workspaces: ['packages/*'],
-    }, null, 2));
+    writeFileSync(
+      rootPkg,
+      JSON.stringify(
+        {
+          name: 'workspace-root',
+          private: true,
+          workspaces: ['packages/*'],
+        },
+        null,
+        2,
+      ),
+    );
 
-    writeFileSync(pkg1, JSON.stringify({
-      name: '@test/lib1',
-      version: '1.0.0',
-      dependencies: {
-        'lit': '^3.0.0',
-      },
-    }, null, 2));
+    writeFileSync(
+      pkg1,
+      JSON.stringify(
+        {
+          name: '@test/lib1',
+          version: '1.0.0',
+          dependencies: {
+            lit: '^3.0.0',
+          },
+        },
+        null,
+        2,
+      ),
+    );
 
-    writeFileSync(pkg2, JSON.stringify({
-      name: '@test/lib2',
-      version: '1.0.0',
-      dependencies: {
-        'lit': '^3.0.0', // Same version
-      },
-    }, null, 2));
+    writeFileSync(
+      pkg2,
+      JSON.stringify(
+        {
+          name: '@test/lib2',
+          version: '1.0.0',
+          dependencies: {
+            lit: '^3.0.0', // Same version
+          },
+        },
+        null,
+        2,
+      ),
+    );
 
     execSync('git add -A', { cwd: TMP_DIR });
 
@@ -253,24 +294,45 @@ describe('dependency-audit (H21)', () => {
     mkdirSync(join(TMP_DIR, 'packages/lib1'), { recursive: true });
     mkdirSync(join(TMP_DIR, 'apps/app1'), { recursive: true });
 
-    writeFileSync(rootPkg, JSON.stringify({
-      name: 'workspace-root',
-      private: true,
-      workspaces: ['packages/*', 'apps/*'],
-    }, null, 2));
+    writeFileSync(
+      rootPkg,
+      JSON.stringify(
+        {
+          name: 'workspace-root',
+          private: true,
+          workspaces: ['packages/*', 'apps/*'],
+        },
+        null,
+        2,
+      ),
+    );
 
-    writeFileSync(pkg1, JSON.stringify({
-      name: '@test/lib1',
-      version: '1.0.0',
-    }, null, 2));
+    writeFileSync(
+      pkg1,
+      JSON.stringify(
+        {
+          name: '@test/lib1',
+          version: '1.0.0',
+        },
+        null,
+        2,
+      ),
+    );
 
-    writeFileSync(pkg2, JSON.stringify({
-      name: '@test/app1',
-      version: '1.0.0',
-      dependencies: {
-        '@test/lib1': 'workspace:*',
-      },
-    }, null, 2));
+    writeFileSync(
+      pkg2,
+      JSON.stringify(
+        {
+          name: '@test/app1',
+          version: '1.0.0',
+          dependencies: {
+            '@test/lib1': 'workspace:*',
+          },
+        },
+        null,
+        2,
+      ),
+    );
 
     execSync('git add -A', { cwd: TMP_DIR });
 
@@ -290,7 +352,7 @@ describe('dependency-audit (H21)', () => {
       name: 'test-package',
       version: '1.0.0',
       peerDependencies: {
-        'react': '^18.0.0',
+        react: '^18.0.0',
       },
       dependencies: {},
     };
@@ -314,10 +376,10 @@ describe('dependency-audit (H21)', () => {
       name: 'test-package',
       version: '1.0.0',
       peerDependencies: {
-        'react': '^18.0.0',
+        react: '^18.0.0',
       },
       dependencies: {
-        'react': '^18.2.0',
+        react: '^18.2.0',
       },
     };
 
@@ -338,10 +400,10 @@ describe('dependency-audit (H21)', () => {
       name: 'test-package',
       version: '1.0.0',
       peerDependencies: {
-        'typescript': '^5.0.0',
+        typescript: '^5.0.0',
       },
       devDependencies: {
-        'typescript': '^5.7.2',
+        typescript: '^5.7.2',
       },
     };
 
@@ -366,24 +428,45 @@ describe('dependency-audit (H21)', () => {
     mkdirSync(join(TMP_DIR, 'packages/lib1'), { recursive: true });
     mkdirSync(join(TMP_DIR, 'packages/lib2'), { recursive: true });
 
-    writeFileSync(rootPkg, JSON.stringify({
-      name: 'workspace-root',
-      private: true,
-      workspaces: ['packages/*'],
-    }, null, 2));
+    writeFileSync(
+      rootPkg,
+      JSON.stringify(
+        {
+          name: 'workspace-root',
+          private: true,
+          workspaces: ['packages/*'],
+        },
+        null,
+        2,
+      ),
+    );
 
-    writeFileSync(pkg1, JSON.stringify({
-      name: '@test/lib1',
-      version: '1.0.0',
-    }, null, 2));
+    writeFileSync(
+      pkg1,
+      JSON.stringify(
+        {
+          name: '@test/lib1',
+          version: '1.0.0',
+        },
+        null,
+        2,
+      ),
+    );
 
-    writeFileSync(pkg2, JSON.stringify({
-      name: '@test/lib2',
-      version: '1.0.0',
-      dependencies: {
-        '@test/lib1': '^1.0.0', // Should use workspace:*
-      },
-    }, null, 2));
+    writeFileSync(
+      pkg2,
+      JSON.stringify(
+        {
+          name: '@test/lib2',
+          version: '1.0.0',
+          dependencies: {
+            '@test/lib1': '^1.0.0', // Should use workspace:*
+          },
+        },
+        null,
+        2,
+      ),
+    );
 
     execSync('git add -A', { cwd: TMP_DIR });
 
@@ -405,24 +488,45 @@ describe('dependency-audit (H21)', () => {
     mkdirSync(join(TMP_DIR, 'packages/lib1'), { recursive: true });
     mkdirSync(join(TMP_DIR, 'packages/lib2'), { recursive: true });
 
-    writeFileSync(rootPkg, JSON.stringify({
-      name: 'workspace-root',
-      private: true,
-      workspaces: ['packages/*'],
-    }, null, 2));
+    writeFileSync(
+      rootPkg,
+      JSON.stringify(
+        {
+          name: 'workspace-root',
+          private: true,
+          workspaces: ['packages/*'],
+        },
+        null,
+        2,
+      ),
+    );
 
-    writeFileSync(pkg1, JSON.stringify({
-      name: '@test/lib1',
-      version: '1.0.0',
-    }, null, 2));
+    writeFileSync(
+      pkg1,
+      JSON.stringify(
+        {
+          name: '@test/lib1',
+          version: '1.0.0',
+        },
+        null,
+        2,
+      ),
+    );
 
-    writeFileSync(pkg2, JSON.stringify({
-      name: '@test/lib2',
-      version: '1.0.0',
-      dependencies: {
-        '@test/lib1': 'workspace:*',
-      },
-    }, null, 2));
+    writeFileSync(
+      pkg2,
+      JSON.stringify(
+        {
+          name: '@test/lib2',
+          version: '1.0.0',
+          dependencies: {
+            '@test/lib1': 'workspace:*',
+          },
+        },
+        null,
+        2,
+      ),
+    );
 
     execSync('git add -A', { cwd: TMP_DIR });
 
@@ -458,7 +562,7 @@ describe('dependency-audit (H21)', () => {
       name: 'test-package',
       version: '1.0.0',
       dependencies: {
-        'lit': '^3.0.0',
+        lit: '^3.0.0',
       },
     };
 
@@ -533,16 +637,30 @@ describe('dependency-audit (H21)', () => {
     mkdirSync(join(TMP_DIR, 'packages/lib1'), { recursive: true });
     mkdirSync(join(TMP_DIR, 'packages/lib2'), { recursive: true });
 
-    writeFileSync(rootPkg, JSON.stringify({
-      name: 'workspace-root',
-      private: true,
-      workspaces: ['packages/*'],
-    }, null, 2));
+    writeFileSync(
+      rootPkg,
+      JSON.stringify(
+        {
+          name: 'workspace-root',
+          private: true,
+          workspaces: ['packages/*'],
+        },
+        null,
+        2,
+      ),
+    );
 
-    writeFileSync(pkg1, JSON.stringify({
-      name: '@test/lib1',
-      version: '1.0.0',
-    }, null, 2));
+    writeFileSync(
+      pkg1,
+      JSON.stringify(
+        {
+          name: '@test/lib1',
+          version: '1.0.0',
+        },
+        null,
+        2,
+      ),
+    );
 
     const pkg2Json = {
       name: '@test/lib2',
@@ -572,16 +690,30 @@ describe('dependency-audit (H21)', () => {
     mkdirSync(join(TMP_DIR, 'packages/lib1'), { recursive: true });
     mkdirSync(join(TMP_DIR, 'packages/lib2'), { recursive: true });
 
-    writeFileSync(rootPkg, JSON.stringify({
-      name: 'workspace-root',
-      private: true,
-      workspaces: ['packages/*'],
-    }, null, 2));
+    writeFileSync(
+      rootPkg,
+      JSON.stringify(
+        {
+          name: 'workspace-root',
+          private: true,
+          workspaces: ['packages/*'],
+        },
+        null,
+        2,
+      ),
+    );
 
-    writeFileSync(pkg1, JSON.stringify({
-      name: '@test/lib1',
-      version: '1.0.0',
-    }, null, 2));
+    writeFileSync(
+      pkg1,
+      JSON.stringify(
+        {
+          name: '@test/lib1',
+          version: '1.0.0',
+        },
+        null,
+        2,
+      ),
+    );
 
     const pkg2Json = {
       name: '@test/lib2',
@@ -614,7 +746,7 @@ describe('dependency-audit (H21)', () => {
         'some-package': '*', // Broad range
       },
       peerDependencies: {
-        'react': '^18.0.0', // Missing peer dep
+        react: '^18.0.0', // Missing peer dep
       },
     };
 
@@ -674,28 +806,49 @@ describe('dependency-audit (H21)', () => {
     mkdirSync(join(TMP_DIR, 'packages/lib'), { recursive: true });
     mkdirSync(join(TMP_DIR, 'apps/web'), { recursive: true });
 
-    writeFileSync(rootPkg, JSON.stringify({
-      name: 'monorepo-root',
-      private: true,
-      workspaces: ['packages/*', 'apps/*'],
-    }, null, 2));
+    writeFileSync(
+      rootPkg,
+      JSON.stringify(
+        {
+          name: 'monorepo-root',
+          private: true,
+          workspaces: ['packages/*', 'apps/*'],
+        },
+        null,
+        2,
+      ),
+    );
 
-    writeFileSync(pkg1, JSON.stringify({
-      name: '@test/lib',
-      version: '1.0.0',
-      dependencies: {
-        'lit': '^3.0.0',
-      },
-    }, null, 2));
+    writeFileSync(
+      pkg1,
+      JSON.stringify(
+        {
+          name: '@test/lib',
+          version: '1.0.0',
+          dependencies: {
+            lit: '^3.0.0',
+          },
+        },
+        null,
+        2,
+      ),
+    );
 
-    writeFileSync(app1, JSON.stringify({
-      name: '@test/web',
-      version: '1.0.0',
-      dependencies: {
-        '@test/lib': 'workspace:*',
-        'lit': '^3.0.0',
-      },
-    }, null, 2));
+    writeFileSync(
+      app1,
+      JSON.stringify(
+        {
+          name: '@test/web',
+          version: '1.0.0',
+          dependencies: {
+            '@test/lib': 'workspace:*',
+            lit: '^3.0.0',
+          },
+        },
+        null,
+        2,
+      ),
+    );
 
     execSync('git add -A', { cwd: TMP_DIR });
 
@@ -715,10 +868,17 @@ describe('dependency-audit (H21)', () => {
     mkdirSync(join(TMP_DIR, 'node_modules/some-lib'), { recursive: true });
     mkdirSync(join(TMP_DIR, 'dist'), { recursive: true });
 
-    writeFileSync(packagePath, JSON.stringify({
-      name: 'test-package',
-      version: '1.0.0',
-    }, null, 2));
+    writeFileSync(
+      packagePath,
+      JSON.stringify(
+        {
+          name: 'test-package',
+          version: '1.0.0',
+        },
+        null,
+        2,
+      ),
+    );
 
     // These should be ignored even with violations
     writeFileSync(nodeModulesPkg, '{ invalid }');
@@ -745,31 +905,52 @@ describe('dependency-audit (H21)', () => {
     mkdirSync(join(TMP_DIR, 'packages/lib1'), { recursive: true });
     mkdirSync(join(TMP_DIR, 'packages/lib2'), { recursive: true });
 
-    writeFileSync(rootPkg, JSON.stringify({
-      name: 'test-root',
-      private: true,
-      workspaces: ['packages/*'],
-    }, null, 2));
+    writeFileSync(
+      rootPkg,
+      JSON.stringify(
+        {
+          name: 'test-root',
+          private: true,
+          workspaces: ['packages/*'],
+        },
+        null,
+        2,
+      ),
+    );
 
-    writeFileSync(pkg1, JSON.stringify({
-      name: '@test/lib1',
-      version: '1.0.0',
-      dependencies: {
-        'lit': '^3.0.0',
-        'some-pkg': '*', // Broad range
-      },
-    }, null, 2));
+    writeFileSync(
+      pkg1,
+      JSON.stringify(
+        {
+          name: '@test/lib1',
+          version: '1.0.0',
+          dependencies: {
+            lit: '^3.0.0',
+            'some-pkg': '*', // Broad range
+          },
+        },
+        null,
+        2,
+      ),
+    );
 
-    writeFileSync(pkg2, JSON.stringify({
-      name: '@test/lib2',
-      version: '1.0.0',
-      dependencies: {
-        'lit': '^3.1.0', // Duplicate
-      },
-      peerDependencies: {
-        'react': '^18.0.0', // Missing peer
-      },
-    }, null, 2));
+    writeFileSync(
+      pkg2,
+      JSON.stringify(
+        {
+          name: '@test/lib2',
+          version: '1.0.0',
+          dependencies: {
+            lit: '^3.1.0', // Duplicate
+          },
+          peerDependencies: {
+            react: '^18.0.0', // Missing peer
+          },
+        },
+        null,
+        2,
+      ),
+    );
 
     execSync('git add -A', { cwd: TMP_DIR });
 
@@ -792,7 +973,7 @@ describe('dependency-audit (H21)', () => {
       name: 'test-package',
       version: '1.0.0',
       dependencies: {
-        'lit': '^3.0.0',
+        lit: '^3.0.0',
       },
     };
 
@@ -818,27 +999,48 @@ describe('dependency-audit (H21)', () => {
     mkdirSync(join(TMP_DIR, 'packages/lib1'), { recursive: true });
     mkdirSync(join(TMP_DIR, 'packages/lib2'), { recursive: true });
 
-    writeFileSync(rootPkg, JSON.stringify({
-      name: 'workspace-root',
-      private: true,
-      workspaces: ['packages/*'],
-    }, null, 2));
+    writeFileSync(
+      rootPkg,
+      JSON.stringify(
+        {
+          name: 'workspace-root',
+          private: true,
+          workspaces: ['packages/*'],
+        },
+        null,
+        2,
+      ),
+    );
 
-    writeFileSync(pkg1, JSON.stringify({
-      name: '@test/lib1',
-      version: '1.0.0',
-      dependencies: {
-        'lit': '^3.0.0',
-      },
-    }, null, 2));
+    writeFileSync(
+      pkg1,
+      JSON.stringify(
+        {
+          name: '@test/lib1',
+          version: '1.0.0',
+          dependencies: {
+            lit: '^3.0.0',
+          },
+        },
+        null,
+        2,
+      ),
+    );
 
-    writeFileSync(pkg2, JSON.stringify({
-      name: '@test/lib2',
-      version: '1.0.0',
-      dependencies: {
-        'lit': '^3.1.0', // Different version
-      },
-    }, null, 2));
+    writeFileSync(
+      pkg2,
+      JSON.stringify(
+        {
+          name: '@test/lib2',
+          version: '1.0.0',
+          dependencies: {
+            lit: '^3.1.0', // Different version
+          },
+        },
+        null,
+        2,
+      ),
+    );
 
     // Only stage pkg1
     execSync('git add packages/lib1/package.json', { cwd: TMP_DIR });
@@ -874,11 +1076,12 @@ describe('dependency-audit (H21)', () => {
     const packageJson = {
       name: 'test-package',
       version: '1.0.0',
-      description: '@dependency-approved:pkg1 TICKET-100 Reason1 @dependency-approved:pkg2 TICKET-101 Reason2',
+      description:
+        '@dependency-approved:pkg1 TICKET-100 Reason1 @dependency-approved:pkg2 TICKET-101 Reason2',
       dependencies: {
-        'pkg1': '*',
-        'pkg2': '*',
-        'pkg3': '*', // Not approved
+        pkg1: '*',
+        pkg2: '*',
+        pkg3: '*', // Not approved
       },
     };
 

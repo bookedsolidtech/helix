@@ -6,28 +6,12 @@ import { registerHealthTools } from './tools.js';
 describe('MCP Server Lifecycle - Health Scorer', () => {
   describe('Server Creation', () => {
     it('creates server with correct metadata', () => {
-      const server = new Server(
-        { name: '@helix/mcp-health-scorer', version: '0.1.0' },
-        { capabilities: { tools: {} } }
-      );
-      expect(server).toBeDefined();
-    });
-
-    it('server has correct name', () => {
-      const server = new Server(
-        { name: '@helix/mcp-health-scorer', version: '0.1.0' },
-        { capabilities: { tools: {} } }
-      );
-      expect(server).toBeDefined();
-      // Server info is accessible via protocol methods
-    });
-
-    it('server has correct version', () => {
-      const server = new Server(
-        { name: '@helix/mcp-health-scorer', version: '0.1.0' },
-        { capabilities: { tools: {} } }
-      );
-      expect(server).toBeDefined();
+      expect(() => {
+        new Server(
+          { name: '@helix/mcp-health-scorer', version: '0.1.0' },
+          { capabilities: { tools: {} } },
+        );
+      }).not.toThrow();
     });
   });
 
@@ -35,15 +19,15 @@ describe('MCP Server Lifecycle - Health Scorer', () => {
     it('declares tools capability', () => {
       const server = new Server(
         { name: '@helix/mcp-health-scorer', version: '0.1.0' },
-        { capabilities: { tools: {} } }
+        { capabilities: { tools: {} } },
       );
-      expect(server).toBeDefined();
+      expect(server).toBeInstanceOf(Server);
     });
 
     it('tools are registered successfully', () => {
       const server = new Server(
         { name: '@helix/mcp-health-scorer', version: '0.1.0' },
-        { capabilities: { tools: {} } }
+        { capabilities: { tools: {} } },
       );
       expect(() => registerHealthTools(server)).not.toThrow();
     });
@@ -51,8 +35,7 @@ describe('MCP Server Lifecycle - Health Scorer', () => {
 
   describe('Transport', () => {
     it('can create stdio transport', () => {
-      const transport = new StdioServerTransport();
-      expect(transport).toBeDefined();
+      expect(() => new StdioServerTransport()).not.toThrow();
     });
 
     it('transport has required methods', () => {
@@ -65,10 +48,7 @@ describe('MCP Server Lifecycle - Health Scorer', () => {
   describe('Error Handling', () => {
     it('handles initialization errors gracefully', () => {
       expect(() => {
-        new Server(
-          { name: '', version: '' },
-          { capabilities: {} }
-        );
+        new Server({ name: '', version: '' }, { capabilities: {} });
       }).not.toThrow();
     });
   });

@@ -1,0 +1,6 @@
+{
+  "cemPath": "./packages/hx-library/custom-elements.json",
+  "projectRoot": "/Volumes/Development/booked/helix",
+  "componentPrefix": "hx",
+  "tsconfigPath": "./tsconfig.base.json"
+}

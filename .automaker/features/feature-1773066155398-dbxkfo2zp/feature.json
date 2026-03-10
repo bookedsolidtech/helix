@@ -1,0 +1,30 @@
+{
+  "category": "Uncategorized",
+  "description": "Conduct a comprehensive audit of the Panopticon admin dashboard (apps/admin) and the wc-tools MCP server to understand the current state and design the path to a standalone, publishable admin tool for ANY web component library.\n\n## Current State Analysis\n1. **Inventory apps/admin** — Map every page, analyzer, scorer, and data source:\n   - `apps/admin/src/lib/` — health-scorer.ts, cem-parser.ts, bundle-analyzer.ts, a11y-analyzer.ts, code-quality-analyzer.ts, drupal-readiness-analyzer.ts, dx-analyzer.ts, jsdoc-analyzer.ts, lit-best-practices-analyzer.ts, maintainability-analyzer.ts, library-registry.ts\n   - `apps/admin/src/app/` — health, audit, components, tokens, pipeline, roadmap, tests, mcp pages\n2. **Inventory wc-tools MCP server** — Map all tools: find_component, get_component, score_component, analyze_accessibility, estimate_bundle_size, validate_cem, etc.\n3. **Identify coupling** — What is HELiX-specific vs what is generic WC library analysis?\n4. **Document the gap** — What would need to change for Panopticon to scan Shoelace, Lion, Spectrum, or any CEM-compliant library?\n\n## Vision Document\nProduce a vision document (`.automaker/context/panopticon-vision.md`) that covers:\n- **Universal scanner architecture** — Point Panopticon at any directory with `custom-elements.json` and get full health scoring\n- **Competitive analysis mode** — Load multiple libraries simultaneously, generate comparative charts (\"HELiX vs Shoelace: a11y score, bundle size, CEM completeness\")\n- **Standalone packaging plan** — How to extract from the turbo monorepo into its own publishable npm package / standalone app\n- **Data model** — What the library-registry.ts needs to become (multi-library, pluggable analyzers)\n- **MCP integration** — How wc-tools MCP already enables this and what's missing\n\n## Acceptance Criteria\n- Complete inventory of all admin pages, analyzers, and MCP tools with descriptions\n- Coupling analysis: what's generic vs HELiX-specific\n- Vision document with architectural diagrams (ASCII/Mermaid)\n- Concrete next-steps list (what to build first)\n- Filed as `.automaker/context/panopticon-vision.md`",
+  "title": "AUDIT: Panopticon admin dashboard — architecture review and universal WC scanner vision",
+  "status": "backlog",
+  "complexity": "architectural",
+  "priority": 2,
+  "source": "api",
+  "trustTier": 1,
+  "quarantineStatus": "passed",
+  "quarantineId": "74feeed5-704e-4983-a141-a5a9c1779ed1",
+  "id": "feature-1773066155398-dbxkfo2zp",
+  "branchName": "feature/audit-panopticon-admin-dashboard",
+  "descriptionHistory": [
+    {
+      "description": "Conduct a comprehensive audit of the Panopticon admin dashboard (apps/admin) and the wc-tools MCP server to understand the current state and design the path to a standalone, publishable admin tool for ANY web component library.\n\n## Current State Analysis\n1. **Inventory apps/admin** — Map every page, analyzer, scorer, and data source:\n   - `apps/admin/src/lib/` — health-scorer.ts, cem-parser.ts, bundle-analyzer.ts, a11y-analyzer.ts, code-quality-analyzer.ts, drupal-readiness-analyzer.ts, dx-analyzer.ts, jsdoc-analyzer.ts, lit-best-practices-analyzer.ts, maintainability-analyzer.ts, library-registry.ts\n   - `apps/admin/src/app/` — health, audit, components, tokens, pipeline, roadmap, tests, mcp pages\n2. **Inventory wc-tools MCP server** — Map all tools: find_component, get_component, score_component, analyze_accessibility, estimate_bundle_size, validate_cem, etc.\n3. **Identify coupling** — What is HELiX-specific vs what is generic WC library analysis?\n4. **Document the gap** — What would need to change for Panopticon to scan Shoelace, Lion, Spectrum, or any CEM-compliant library?\n\n## Vision Document\nProduce a vision document (`.automaker/context/panopticon-vision.md`) that covers:\n- **Universal scanner architecture** — Point Panopticon at any directory with `custom-elements.json` and get full health scoring\n- **Competitive analysis mode** — Load multiple libraries simultaneously, generate comparative charts (\"HELiX vs Shoelace: a11y score, bundle size, CEM completeness\")\n- **Standalone packaging plan** — How to extract from the turbo monorepo into its own publishable npm package / standalone app\n- **Data model** — What the library-registry.ts needs to become (multi-library, pluggable analyzers)\n- **MCP integration** — How wc-tools MCP already enables this and what's missing\n\n## Acceptance Criteria\n- Complete inventory of all admin pages, analyzers, and MCP tools with descriptions\n- Coupling analysis: what's generic vs HELiX-specific\n- Vision document with architectural diagrams (ASCII/Mermaid)\n- Concrete next-steps list (what to build first)\n- Filed as `.automaker/context/panopticon-vision.md`",
+      "timestamp": "2026-03-09T14:22:35.398Z",
+      "source": "initial"
+    }
+  ],
+  "createdAt": "2026-03-09T14:22:35.399Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-03-09T14:22:35.399Z",
+      "reason": "Feature created"
+    }
+  ]
+}

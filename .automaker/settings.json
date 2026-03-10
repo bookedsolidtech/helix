@@ -11,5 +11,32 @@
     "enabled": false,
     "disabled_reason": "Project deactivated"
   },
-  "autoModeEnabled": false
+  "autoModeEnabled": false,
+  "discord": {
+    "devChannelId": "1478216123265847428",
+    "generalChannelId": "1478215835901362198",
+    "updatesChannelId": "1478216123265847428",
+    "botToken": "MTQ3ODIxOTU1MTY5ODA1OTM1Ng.GV9L0a.oLBg4vNxhUpr0jGNNteG1V6v9e55LCy2L-nuG4"
+  },
+  "integrations": {
+    "discord": {
+      "enabled": true,
+      "serverId": "1478215835133939966",
+      "channelId": "1478216123265847428",
+      "createThreadsForAgents": true,
+      "notifyOnCompletion": true,
+      "notifyOnError": true,
+      "notifyOnAutoModeComplete": true,
+      "useWebhook": false,
+      "channels": {
+        "primary": "1478216123265847428",
+        "dev": "1478216123265847428",
+        "infra": "1480582273198723294",
+        "bugs": "1478216352094224496",
+        "suggestions": "1478215835901362198",
+        "agentLogs": "1480582601352679566",
+        "ceremonies": "1478227528412958810"
+      }
+    }
+  }
 }

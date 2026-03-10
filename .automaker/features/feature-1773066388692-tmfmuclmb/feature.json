@@ -1,0 +1,39 @@
+{
+  "category": "Uncategorized",
+  "description": "Launch readiness audit for hx-steps. Using the documentation template from the FOUNDATION ticket, ensure this component is production-ready.\n\n## SUB-COMPONENTS INCLUDED (MANDATORY)\nThis ticket also covers **hx-step** (`hx-steps/hx-step.ts`). This is a registered custom element that must be validated for A11y, exports, and documentation alongside the parent. Do NOT skip it.\n\n## Checklist\n1. **A11y healthcare compliance** — Run axe-core audit on BOTH hx-steps AND hx-step. Verify ARIA roles (tablist/tab or list/listitem pattern), keyboard navigation, screen reader announcements. Zero WCAG 2.1 AA violations.\n2. **Astro documentation page** — Create/update doc page using the standard template. All 12 sections filled. Must document hx-step API too.\n3. **Individual export test** — Verify import works in isolation and exports BOTH elements.\n4. **Existing tests pass** — Run `npm run verify`. Do NOT run vitest directly.\n\n## Known Patterns (from HELIX-PLATFORM-PROTO-LESSONS.md)\n- C-PATTERN-01: Never add `= null` to `@query` fields — use `!` assertion\n- C-PATTERN-02: Never call `setAttribute()` in constructor — use `connectedCallback()`\n- C-PATTERN-06: Register event listeners BEFORE any `await` calls\n\n## Files\n- `packages/hx-library/src/components/hx-steps/` (includes hx-step.ts)\n- `apps/docs/src/content/docs/component-library/hx-steps.md`\n\n## Acceptance Criteria\n- Zero axe-core violations (both parent and sub-component)\n- Doc page complete per template (sub-component API documented)\n- Individual import works in standalone HTML (both elements render)\n- `npm run verify` passes",
+  "title": "LAUNCH READY: hx-steps",
+  "status": "backlog",
+  "dependencies": [
+    "feature-1773066138511-g2pgj0rmm"
+  ],
+  "complexity": "medium",
+  "priority": 3,
+  "source": "api",
+  "trustTier": 1,
+  "quarantineStatus": "passed",
+  "quarantineId": "5c47ea93-6878-4ca3-bd5b-778c227c17d5",
+  "id": "feature-1773066388692-tmfmuclmb",
+  "branchName": "feature/launch-ready-hx-steps",
+  "descriptionHistory": [
+    {
+      "description": "Launch readiness audit for hx-steps. Checklist: (1) A11y — axe-core zero violations, WCAG 2.1 AA. (2) Astro doc page — all 12 template sections. (3) Individual export — standalone HTML works. (4) `npm run verify` passes. Files: `packages/hx-library/src/components/hx-steps/`, `apps/docs/src/content/docs/component-library/hx-steps.md`",
+      "timestamp": "2026-03-09T14:26:28.692Z",
+      "source": "initial"
+    },
+    {
+      "description": "Launch readiness audit for hx-steps. Using the documentation template from the FOUNDATION ticket, ensure this component is production-ready.\n\n## SUB-COMPONENTS INCLUDED (MANDATORY)\nThis ticket also covers **hx-step** (`hx-steps/hx-step.ts`). This is a registered custom element that must be validated for A11y, exports, and documentation alongside the parent. Do NOT skip it.\n\n## Checklist\n1. **A11y healthcare compliance** — Run axe-core audit on BOTH hx-steps AND hx-step. Verify ARIA roles (tablist/tab or list/listitem pattern), keyboard navigation, screen reader announcements. Zero WCAG 2.1 AA violations.\n2. **Astro documentation page** — Create/update doc page using the standard template. All 12 sections filled. Must document hx-step API too.\n3. **Individual export test** — Verify import works in isolation and exports BOTH elements.\n4. **Existing tests pass** — Run `npm run verify`. Do NOT run vitest directly.\n\n## Known Patterns (from HELIX-PLATFORM-PROTO-LESSONS.md)\n- C-PATTERN-01: Never add `= null` to `@query` fields — use `!` assertion\n- C-PATTERN-02: Never call `setAttribute()` in constructor — use `connectedCallback()`\n- C-PATTERN-06: Register event listeners BEFORE any `await` calls\n\n## Files\n- `packages/hx-library/src/components/hx-steps/` (includes hx-step.ts)\n- `apps/docs/src/content/docs/component-library/hx-steps.md`\n\n## Acceptance Criteria\n- Zero axe-core violations (both parent and sub-component)\n- Doc page complete per template (sub-component API documented)\n- Individual import works in standalone HTML (both elements render)\n- `npm run verify` passes",
+      "timestamp": "2026-03-09T14:33:12.419Z",
+      "source": "edit"
+    }
+  ],
+  "createdAt": "2026-03-09T14:26:28.692Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-03-09T14:26:28.692Z",
+      "reason": "Feature created"
+    }
+  ],
+  "featureType": "code"
+}

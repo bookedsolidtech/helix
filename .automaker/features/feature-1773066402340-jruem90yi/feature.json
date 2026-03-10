@@ -1,0 +1,33 @@
+{
+  "category": "Uncategorized",
+  "description": "Launch readiness audit for hx-text-input. Checklist: (1) A11y — axe-core zero violations, proper labeling, error states, WCAG 2.1 AA. (2) Astro doc page — all 12 template sections. (3) Individual export — standalone HTML works. (4) `npm run verify` passes. Files: `packages/hx-library/src/components/hx-text-input/`, `apps/docs/src/content/docs/component-library/hx-text-input.md`",
+  "title": "LAUNCH READY: hx-text-input",
+  "status": "backlog",
+  "dependencies": [
+    "feature-1773066138511-g2pgj0rmm"
+  ],
+  "complexity": "medium",
+  "priority": 3,
+  "source": "api",
+  "trustTier": 1,
+  "quarantineStatus": "passed",
+  "quarantineId": "9b8315dc-3506-4b42-9b2b-a747f7f2344e",
+  "id": "feature-1773066402340-jruem90yi",
+  "branchName": "feature/launch-ready-hx-text-input",
+  "descriptionHistory": [
+    {
+      "description": "Launch readiness audit for hx-text-input. Checklist: (1) A11y — axe-core zero violations, proper labeling, error states, WCAG 2.1 AA. (2) Astro doc page — all 12 template sections. (3) Individual export — standalone HTML works. (4) `npm run verify` passes. Files: `packages/hx-library/src/components/hx-text-input/`, `apps/docs/src/content/docs/component-library/hx-text-input.md`",
+      "timestamp": "2026-03-09T14:26:42.340Z",
+      "source": "initial"
+    }
+  ],
+  "createdAt": "2026-03-09T14:26:42.340Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-03-09T14:26:42.340Z",
+      "reason": "Feature created"
+    }
+  ]
+}
