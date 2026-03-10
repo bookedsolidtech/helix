@@ -13,3 +13,7 @@ import ComponentDoc from '../../../components/ComponentDoc.astro';
 ## API Reference
 
 <ComponentDoc tagName="hx-skeleton" section="api" />
+
+## Boolean Attribute Note
+
+The `animated` property defaults to `true`. To disable the pulse animation, set the property via JavaScript — `el.animated = false` — rather than using `animated="false"` in HTML (attribute presence always means `true`). See the [Boolean Attributes guide](/guides/boolean-attributes) for all patterns.
