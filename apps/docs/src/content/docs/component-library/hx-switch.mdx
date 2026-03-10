@@ -11,7 +11,16 @@ import ComponentDoc from '../../../components/ComponentDoc.astro';
 
 <ComponentDoc tagName="hx-switch" section="summary" />
 
-## Basic
+## Overview
+
+`hx-switch` is the primary on/off toggle element in Helix. It uses `role="switch"` with `aria-checked` to convey toggle state, supports full keyboard interaction (Space to toggle), and participates in forms via `ElementInternals`. Three sizes (`sm`, `md`, `lg`), error/help text display, and slot-based label composition make it suitable for patient preference panels, clinical alert configuration, and any binary settings toggle.
+
+**Use `hx-switch` when:** the setting takes effect immediately or represents a persistent on/off preference.
+**Use `hx-checkbox` instead when:** the value is submitted as part of a batch form rather than applied immediately.
+
+## Live Demo
+
+### Basic
 
 Simple toggle switches with labels.
 
@@ -22,7 +31,7 @@ Simple toggle switches with labels.
   </div>
 </ComponentDemo>
 
-## States
+### States
 
 Off, on, disabled, and error states.
 
@@ -37,7 +46,7 @@ Off, on, disabled, and error states.
   </div>
 </ComponentDemo>
 
-## Sizes
+### Sizes
 
 Small, medium, and large switch sizes.
 
@@ -48,6 +57,204 @@ Small, medium, and large switch sizes.
     <hx-switch label="Large" hx-size="lg" checked></hx-switch>
   </div>
 </ComponentDemo>
+
+### With Help Text
+
+<ComponentDemo title="Help Text">
+  <div style="display: grid; gap: 0.75rem; max-width: 400px;">
+    <hx-switch
+      label="Appointment reminders"
+      help-text="Receive reminders 24 hours before scheduled appointments."
+      checked
+    ></hx-switch>
+    <hx-switch
+      label="Lab result notifications"
+      help-text="Get notified when new lab results are available."
+    ></hx-switch>
+  </div>
+</ComponentDemo>
+
+### In a Form
+
+Switches participate in form submission via `ElementInternals`. When checked, the `value` attribute (default `"on"`) is submitted under the `name` key.
+
+<ComponentDemo title="Form Participation">
+  <form
+    onsubmit="event.preventDefault(); document.getElementById('sw-output').textContent = JSON.stringify(Object.fromEntries(new FormData(event.target).entries()), null, 2);"
+    style="display: flex; flex-direction: column; gap: 1rem; max-width: 400px;"
+  >
+    <hx-switch
+      label="Accept HIPAA authorization"
+      name="hipaaAuth"
+      required
+      help-text="Required to access protected health information."
+    ></hx-switch>
+    <hx-switch label="Subscribe to care plan updates" name="carePlanUpdates" checked></hx-switch>
+    <button
+      type="submit"
+      style="padding: 0.5rem 1rem; border: none; border-radius: 0.375rem; background: var(--hx-color-primary-500, #2563EB); color: white; cursor: pointer; font-size: 0.875rem; width: fit-content;"
+    >
+      Submit
+    </button>
+    <pre
+      id="sw-output"
+      style="background: var(--hx-color-neutral-50, #f8f9fa); padding: 1rem; border-radius: 0.375rem; font-size: 0.75rem; min-height: 2rem; border: 1px solid var(--hx-color-neutral-200, #e9ecef);"
+    ></pre>
+  </form>
+</ComponentDemo>
+
+## Installation
+
+```bash
+# Full library
+npm install @helix/library
+
+# Or import only this component (tree-shaking friendly)
+import '@helix/library/components/hx-switch';
+```
+
+## Basic Usage
+
+```html
+<hx-switch label="Enable notifications"></hx-switch>
+<hx-switch label="Dark mode" checked></hx-switch>
+<hx-switch label="System setting" disabled></hx-switch>
+```
+
+## Properties
+
+| Property   | Attribute   | Type                   | Default | Description                                                      |
+| ---------- | ----------- | ---------------------- | ------- | ---------------------------------------------------------------- |
+| `checked`  | `checked`   | `boolean`              | `false` | Whether the switch is toggled on. Reflects as attribute.         |
+| `disabled` | `disabled`  | `boolean`              | `false` | Prevents all interaction. Reflects as attribute.                 |
+| `required` | `required`  | `boolean`              | `false` | Switch must be checked for form submission validity.             |
+| `name`     | `name`      | `string`               | `''`    | Form field name used for form submission.                        |
+| `value`    | `value`     | `string`               | `'on'`  | Value submitted when the switch is checked.                      |
+| `label`    | `label`     | `string`               | `''`    | Visible label text. Can be overridden by the default slot.       |
+| `size`     | `hx-size`   | `'sm' \| 'md' \| 'lg'` | `'md'`  | Size variant. Reflects as `hx-size` attribute.                   |
+| `error`    | `error`     | `string`               | `''`    | Error message. When set, enters error state and hides help text. |
+| `helpText` | `help-text` | `string`               | `''`    | Guidance text displayed below the switch.                        |
+
+## Events
+
+| Event       | Detail Type                           | Description                                                     |
+| ----------- | ------------------------------------- | --------------------------------------------------------------- |
+| `hx-change` | `{ checked: boolean, value: string }` | Dispatched when the switch is toggled. Bubbles and is composed. |
+
+## CSS Custom Properties
+
+| Property                       | Default                       | Description                              |
+| ------------------------------ | ----------------------------- | ---------------------------------------- |
+| `--hx-switch-track-bg`         | `var(--hx-color-neutral-300)` | Track background color when unchecked.   |
+| `--hx-switch-track-checked-bg` | `var(--hx-color-primary-500)` | Track background color when checked.     |
+| `--hx-switch-thumb-bg`         | `var(--hx-color-neutral-0)`   | Thumb background color.                  |
+| `--hx-switch-thumb-shadow`     | `var(--hx-shadow-sm)`         | Thumb box shadow.                        |
+| `--hx-switch-focus-ring-color` | `var(--hx-focus-ring-color)`  | Focus ring color.                        |
+| `--hx-switch-label-color`      | `var(--hx-color-neutral-700)` | Label text color.                        |
+| `--hx-switch-error-color`      | `var(--hx-color-error-500)`   | Error message and required marker color. |
+| `--hx-switch-help-text-color`  | `var(--hx-color-neutral-500)` | Help text color.                         |
+
+## CSS Parts
+
+| Part        | Description                                              |
+| ----------- | -------------------------------------------------------- |
+| `switch`    | The outermost container `<div>` (track + thumb wrapper). |
+| `track`     | The `<button role="switch">` track element.              |
+| `thumb`     | The sliding `<span>` thumb element.                      |
+| `label`     | The `<span>` label text element.                         |
+| `help-text` | The help text `<div>` container.                         |
+| `error`     | The error message `<div>` container.                     |
+
+## Slots
+
+| Slot        | Description                                                   |
+| ----------- | ------------------------------------------------------------- |
+| _(default)_ | Custom label content. Overrides the `label` property.         |
+| `error`     | Custom error content. Overrides the `error` property.         |
+| `help-text` | Custom help text content. Overrides the `help-text` property. |
+
+## Accessibility
+
+| Topic              | Details                                                                                                   |
+| ------------------ | --------------------------------------------------------------------------------------------------------- |
+| ARIA role          | Uses `role="switch"` on the internal `<button>` element per ARIA APG Switch Pattern.                      |
+| `aria-checked`     | Always present, set to `"true"` or `"false"` to reflect toggle state.                                     |
+| `aria-labelledby`  | References the internal label element ID. Automatically set when `label` prop or slot content is present. |
+| `aria-describedby` | References the error element ID when `error` is set; references help text element ID otherwise.           |
+| `aria-invalid`     | Set to `"true"` on the track when an error is present.                                                    |
+| `aria-required`    | Set to `"true"` on the track when `required` is set.                                                      |
+| Keyboard           | `Tab` to focus the switch track; `Space` to toggle on or off.                                             |
+| Disabled           | Native `disabled` attribute on the `<button>` prevents all interaction and AT announces state.            |
+| Error              | Error container uses `role="alert"` for immediate screen reader announcement on error display.            |
+| Focus              | Focus ring is visible via `:focus-visible` CSS; customizable via `--hx-switch-focus-ring-color`.          |
+
+## Keyboard Navigation
+
+| Key     | Behavior                         |
+| ------- | -------------------------------- |
+| `Tab`   | Moves focus to the switch track. |
+| `Space` | Toggles the switch on or off.    |
+
+> Note: `Enter` does not toggle the switch. Per the ARIA APG Switch Pattern, only `Space` activates a switch. The native button's click handler serves pointer and assistive technology activation.
+
+## Drupal Integration
+
+```twig
+{# my-module/templates/my-template.html.twig #}
+<hx-switch
+  label="{{ label|default('') }}"
+  name="{{ name|default('') }}"
+  value="{{ value|default('on') }}"
+  {% if checked %}checked{% endif %}
+  {% if disabled %}disabled{% endif %}
+  {% if required %}required{% endif %}
+  {% if error %}error="{{ error }}"{% endif %}
+  {% if help_text %}help-text="{{ help_text }}"{% endif %}
+></hx-switch>
+```
+
+Load the library in your module's `.libraries.yml`:
+
+```yaml
+helix-components:
+  js:
+    /libraries/helix/helix.min.js: { minified: true }
+```
+
+## Standalone HTML Example
+
+Copy-paste into a `.html` file and open in any browser — no build tool required:
+
+```html
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>hx-switch example</title>
+    <!-- @helix/library is a private package — install via npm workspace, not CDN -->
+    <!-- In your project: import '@helix/library'; in your bundler entry point -->
+  </head>
+  <body
+    style="font-family: sans-serif; padding: 2rem; display: flex; flex-direction: column; gap: 1rem;"
+  >
+    <hx-switch label="Enable notifications" id="notif-switch"></hx-switch>
+    <hx-switch label="Dark mode" checked></hx-switch>
+    <hx-switch label="System-managed setting" disabled></hx-switch>
+    <hx-switch
+      label="Accept HIPAA authorization"
+      required
+      help-text="You must accept before accessing patient records."
+    ></hx-switch>
+
+    <script>
+      document.getElementById('notif-switch').addEventListener('hx-change', (e) => {
+        console.log('Switch changed:', e.detail.checked, e.detail.value);
+      });
+    </script>
+  </body>
+</html>
+```
 
 ## API Reference
 
