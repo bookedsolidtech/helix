@@ -34,6 +34,7 @@
     "build:admin": "turbo build --filter=@helix/admin",
     "test": "turbo test",
     "test:library": "turbo test --filter=@helix/library",
+    "test:cross-browser": "npm run test:cross-browser --workspace=packages/hx-library",
     "test:vrt": "playwright test",
     "test:vrt:update": "playwright test --update-snapshots",
     "format": "prettier --write .",
