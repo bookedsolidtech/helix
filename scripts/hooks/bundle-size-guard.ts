@@ -24,7 +24,7 @@
 
 import { execSync } from 'child_process';
 import { existsSync, readFileSync, statSync } from 'fs';
-import minimatch from 'minimatch';
+import { minimatch } from 'minimatch';
 import { resolve, join, basename, dirname } from 'path';
 import { tmpdir } from 'os';
 
