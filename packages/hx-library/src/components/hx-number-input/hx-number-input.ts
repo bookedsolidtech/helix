@@ -560,6 +560,9 @@ export class HelixNumberInput extends LitElement {
             )}
             aria-invalid=${hasError ? 'true' : nothing}
             aria-describedby=${ifDefined(describedBy)}
+            aria-valuenow=${ifDefined(this.value !== null ? this.value : undefined)}
+            aria-valuemin=${ifDefined(this.min)}
+            aria-valuemax=${ifDefined(this.max)}
             @input=${this._handleInput}
             @change=${this._handleChange}
             @keydown=${this._handleKeyDown}
