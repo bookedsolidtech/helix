@@ -1,19 +1,349 @@
 ---
 title: 'hx-skeleton'
-description: 'Placeholder loading indicator that mimics content layout'
+description: 'Animated shimmer placeholder for loading states — purely decorative and hidden from assistive technology'
 ---
 
 import ComponentLoader from '../../../components/ComponentLoader.astro';
+import ComponentDemo from '../../../components/ComponentDemo.astro';
 import ComponentDoc from '../../../components/ComponentDoc.astro';
 
 <ComponentLoader />
 
 <ComponentDoc tagName="hx-skeleton" section="summary" />
 
-## API Reference
+## Overview
 
-<ComponentDoc tagName="hx-skeleton" section="api" />
+`hx-skeleton` is an animated shimmer placeholder used to indicate loading content. It is **purely decorative** and hidden from the accessibility tree — `aria-hidden="true"` is set on the host element automatically.
+
+When content finishes loading, set the `loaded` property to `true`. The skeleton hides itself and dispatches an `hx-loaded` event. Pair this with an external `aria-live` region to announce content availability to assistive technology users. This pattern satisfies WCAG 2.1 AA SC 4.1.3 (Status Messages).
+
+**Use `hx-skeleton` when:** content is fetching from an API and you want to preserve layout while data loads.
+
+**Use a spinner instead when:** loading time is unpredictable or no layout preview is possible.
+
+## Live Demo
+
+### Default (Rect)
+
+<ComponentDemo title="Rectangle Skeleton">
+  <hx-skeleton width="300px" height="1.5rem"></hx-skeleton>
+</ComponentDemo>
+
+### Text
+
+<ComponentDemo title="Text Line">
+  <hx-skeleton variant="text" width="80%" height="1em"></hx-skeleton>
+</ComponentDemo>
+
+### Circle (Avatar)
+
+<ComponentDemo title="Circle Avatar">
+  <hx-skeleton variant="circle" width="3rem" height="3rem"></hx-skeleton>
+</ComponentDemo>
+
+### Button
+
+<ComponentDemo title="Button Placeholder">
+  <hx-skeleton variant="button" width="120px"></hx-skeleton>
+</ComponentDemo>
+
+### Paragraph
+
+<ComponentDemo title="Paragraph Block">
+  <div style="display: flex; flex-direction: column; gap: 0.5rem; width: 320px;">
+    <hx-skeleton variant="text" width="100%"></hx-skeleton>
+    <hx-skeleton variant="text" width="92%"></hx-skeleton>
+    <hx-skeleton variant="text" width="85%"></hx-skeleton>
+    <hx-skeleton variant="text" width="60%"></hx-skeleton>
+  </div>
+</ComponentDemo>
+
+### Card Layout Composite
+
+<ComponentDemo title="Card Layout">
+  <div style="display: flex; gap: 1rem; align-items: flex-start; width: 320px;">
+    <hx-skeleton variant="circle" width="3rem" height="3rem"></hx-skeleton>
+    <div style="flex: 1; display: flex; flex-direction: column; gap: 0.5rem;">
+      <hx-skeleton variant="text" width="70%"></hx-skeleton>
+      <hx-skeleton variant="text" width="50%"></hx-skeleton>
+      <hx-skeleton variant="rect" width="100%" height="8rem"></hx-skeleton>
+    </div>
+  </div>
+</ComponentDemo>
+
+### Static (No Animation)
+
+<ComponentDemo title="Static (animated=false)">
+  <hx-skeleton width="200px" height="1rem" id="static-skeleton"></hx-skeleton>
+  <script>document.getElementById('static-skeleton').animated = false;</script>
+</ComponentDemo>
+
+## Installation
+
+```bash
+# Full library
+npm install @helix/library
+
+# Or import only this component (tree-shaking friendly)
+import '@helix/library/components/hx-skeleton';
+```
+
+## Basic Usage
+
+```html
+<!-- Simple rectangle -->
+<hx-skeleton width="300px" height="1.5rem"></hx-skeleton>
+
+<!-- Circle avatar placeholder -->
+<hx-skeleton variant="circle" width="3rem" height="3rem"></hx-skeleton>
+
+<!-- Text line -->
+<hx-skeleton variant="text" width="80%"></hx-skeleton>
+
+<!-- Button placeholder -->
+<hx-skeleton variant="button" width="120px"></hx-skeleton>
+
+<!-- Loaded state with live region announcement -->
+<div aria-live="polite" aria-atomic="true" id="status" class="sr-only"></div>
+<hx-skeleton id="sk" width="200px" height="1rem"></hx-skeleton>
+<script>
+  document.getElementById('sk').addEventListener('hx-loaded', () => {
+    document.getElementById('status').textContent = 'Content has loaded.';
+  });
+  // Later, when data arrives:
+  document.getElementById('sk').loaded = true;
+</script>
+```
+
+## Properties
+
+| Property   | Attribute  | Type                                                      | Default     | Description                                                                                          |
+| ---------- | ---------- | --------------------------------------------------------- | ----------- | ---------------------------------------------------------------------------------------------------- |
+| `variant`  | `variant`  | `'text' \| 'circle' \| 'rect' \| 'button' \| 'paragraph'` | `'rect'`    | Shape variant of the skeleton placeholder.                                                           |
+| `width`    | `width`    | `string`                                                  | `'100%'`    | CSS width. Accepts any valid CSS width value (e.g., `200px`, `50%`, `12rem`).                        |
+| `height`   | `height`   | `string \| undefined`                                     | `undefined` | CSS height. Defaults vary by variant when not set.                                                   |
+| `animated` | `animated` | `boolean`                                                 | `true`      | Whether the shimmer wave animation is active. See [Boolean Attribute Note](#boolean-attribute-note). |
+| `loaded`   | `loaded`   | `boolean`                                                 | `false`     | When true, hides the skeleton and dispatches an `hx-loaded` event.                                   |
+
+## Events
+
+| Event       | Detail Type | Description                                                                                                                                                              |
+| ----------- | ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `hx-loaded` | `undefined` | Dispatched when the `loaded` property transitions to `true`. Bubbles and is composed. Use this to update an external `aria-live` region announcing content availability. |
+
+## CSS Custom Properties
+
+| Property                      | Default                                | Description                                        |
+| ----------------------------- | -------------------------------------- | -------------------------------------------------- |
+| `--hx-skeleton-bg`            | `var(--hx-color-neutral-200, #e2e8f0)` | Skeleton background color.                         |
+| `--hx-skeleton-shimmer-color` | `rgba(255,255,255,0.4)`                | Shimmer highlight color.                           |
+| `--hx-skeleton-shimmer-width` | `200%`                                 | Shimmer sweep width (background-size X axis).      |
+| `--hx-skeleton-duration`      | `1.5s`                                 | Shimmer animation duration.                        |
+| `--hx-skeleton-text-radius`   | `var(--hx-border-radius-full, 9999px)` | Border radius for `text` and `paragraph` variants. |
+| `--hx-skeleton-rect-radius`   | `var(--hx-border-radius-sm, 0.25rem)`  | Border radius for `rect` variant.                  |
+| `--hx-skeleton-button-radius` | `var(--hx-border-radius-md, 0.375rem)` | Border radius for `button` variant.                |
+| `--hx-skeleton-circle-radius` | `50%`                                  | Border radius for `circle` variant.                |
+
+## CSS Parts
+
+| Part   | Description                                                                                 |
+| ------ | ------------------------------------------------------------------------------------------- |
+| `base` | The inner skeleton `<span>` element. Target this for custom sizing or appearance overrides. |
+
+## Slots
+
+`hx-skeleton` has no slots. It is a self-contained visual placeholder with no user-projected content.
+
+## Accessibility
+
+`hx-skeleton` is **purely decorative** and fully hidden from the accessibility tree.
+
+| Topic          | Details                                                                                                                                                                                     |
+| -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `aria-hidden`  | Set to `"true"` on the host element via `connectedCallback`, hiding both the host and its shadow content from all assistive technology.                                                     |
+| `role`         | The inner shadow `<span>` carries `role="presentation"` as a belt-and-suspenders measure for AT that traverses shadow DOM.                                                                  |
+| Loading state  | No ARIA role or live region is rendered inside the component. Consumers are responsible for maintaining an external `aria-live` region and updating it when `hx-loaded` fires.              |
+| `aria-busy`    | Wrap skeleton groups in an `aria-busy="true"` container while loading. Set `aria-busy="false"` when content is ready. This communicates the loading state to AT at the section level.       |
+| Reduced motion | `@media (prefers-reduced-motion: reduce)` removes the `::after` shimmer pseudo-element entirely (`display: none`), eliminating all animation artifacts for users with vestibular disorders. |
+| WCAG           | Meets WCAG 2.1 AA. SC 1.4.5 (Images of Text) N/A, SC 2.3.3 (Animation from Interactions) satisfied via reduced-motion handling. Zero axe-core violations in all variants.                   |
+
+### aria-busy Pattern
+
+Use `aria-busy` on a wrapper element to communicate loading status at the section or region level:
+
+```html
+<!-- Container signals "loading" to AT -->
+<div aria-busy="true" aria-label="Patient profile loading">
+  <hx-skeleton variant="circle" width="3rem" height="3rem"></hx-skeleton>
+  <hx-skeleton variant="text" width="60%"></hx-skeleton>
+</div>
+
+<script>
+  const container = document.querySelector('[aria-busy]');
+  const skeletons = container.querySelectorAll('hx-skeleton');
+  const liveRegion = document.getElementById('status');
+
+  // When all skeletons finish loading:
+  skeletons[skeletons.length - 1].addEventListener('hx-loaded', () => {
+    container.setAttribute('aria-busy', 'false');
+    liveRegion.textContent = 'Patient profile loaded.';
+  });
+</script>
+```
 
 ## Boolean Attribute Note
 
 The `animated` property defaults to `true`. To disable the pulse animation, set the property via JavaScript — `el.animated = false` — rather than using `animated="false"` in HTML (attribute presence always means `true`). See the [Boolean Attributes guide](/guides/boolean-attributes) for all patterns.
+
+## Drupal Integration
+
+```twig
+{# my-module/templates/patient-card-skeleton.html.twig #}
+<div
+  aria-busy="true"
+  aria-label="{{ label|default('Content loading') }}"
+  class="patient-card-skeleton"
+>
+  <hx-skeleton variant="circle" width="3rem" height="3rem"></hx-skeleton>
+  <hx-skeleton
+    variant="text"
+    width="{{ width|default('60%') }}"
+    {% if height %}height="{{ height }}"{% endif %}
+  ></hx-skeleton>
+  {% if show_button %}
+    <hx-skeleton variant="button" width="120px"></hx-skeleton>
+  {% endif %}
+</div>
+```
+
+Load the library in your module's `.libraries.yml`:
+
+```yaml
+helix-components:
+  js:
+    /libraries/helix/helix.min.js: { minified: true }
+```
+
+Handle the loaded transition in Drupal behaviors using `once()` to prevent duplicate listeners on AJAX:
+
+```javascript
+Drupal.behaviors.helixSkeleton = {
+  attach(context) {
+    // once() prevents duplicate event binding during AJAX attach cycles
+    once('helixSkeleton', '[aria-busy="true"]', context).forEach((container) => {
+      const lastSkeleton = container.querySelector('hx-skeleton:last-of-type');
+      const liveRegion = document.getElementById('status-region');
+
+      if (!lastSkeleton || !liveRegion) return;
+
+      lastSkeleton.addEventListener('hx-loaded', () => {
+        container.setAttribute('aria-busy', 'false');
+        liveRegion.textContent = Drupal.t('Content has loaded.');
+      });
+    });
+  },
+};
+```
+
+## Standalone HTML Example
+
+Copy-paste into a `.html` file and open in any browser — no build tool required:
+
+```html
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>hx-skeleton example</title>
+    <!-- @helix/library is a private package — install via npm workspace, not CDN -->
+    <!-- In your project: import '@helix/library'; in your bundler entry point -->
+    <style>
+      body {
+        font-family: sans-serif;
+        padding: 2rem;
+      }
+      .card {
+        display: flex;
+        gap: 1rem;
+        align-items: flex-start;
+        max-width: 400px;
+        padding: 1rem;
+        border: 1px solid #e2e8f0;
+        border-radius: 0.5rem;
+      }
+      .card-body {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+      }
+      .content {
+        display: none;
+      }
+      .sr-only {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- aria-live region: AT users hear this when content loads -->
+    <div id="status" aria-live="polite" aria-atomic="true" class="sr-only"></div>
+
+    <h2>Patient Profile</h2>
+
+    <!-- aria-busy signals loading state to AT at the section level -->
+    <div id="profile-card" class="card" aria-busy="true" aria-label="Patient profile loading">
+      <hx-skeleton id="avatar-sk" variant="circle" width="3rem" height="3rem"></hx-skeleton>
+
+      <div class="card-body">
+        <hx-skeleton id="name-sk" variant="text" width="70%"></hx-skeleton>
+        <hx-skeleton id="dob-sk" variant="text" width="50%"></hx-skeleton>
+        <hx-skeleton id="action-sk" variant="button" width="120px"></hx-skeleton>
+      </div>
+    </div>
+
+    <!-- Real content, shown after load -->
+    <div id="real-content" class="content card">
+      <div
+        style="width: 3rem; height: 3rem; border-radius: 50%; background: #6366f1; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold;"
+      >
+        JD
+      </div>
+      <div>
+        <p style="margin: 0; font-weight: 600;">Jane Doe</p>
+        <p style="margin: 0; color: #64748b;">DOB: 1985-04-12</p>
+        <button style="margin-top: 0.5rem; padding: 0.5rem 1rem;">View Record</button>
+      </div>
+    </div>
+
+    <script>
+      const card = document.getElementById('profile-card');
+      const liveRegion = document.getElementById('status');
+      const realContent = document.getElementById('real-content');
+      const skeletons = ['avatar-sk', 'name-sk', 'dob-sk', 'action-sk'].map((id) =>
+        document.getElementById(id),
+      );
+
+      // Simulate data arriving after 2 seconds
+      setTimeout(() => {
+        skeletons.forEach((sk) => {
+          sk.loaded = true;
+        });
+        card.setAttribute('aria-busy', 'false');
+        liveRegion.textContent = 'Patient profile has loaded.';
+        realContent.style.display = 'flex';
+      }, 2000);
+    </script>
+  </body>
+</html>
+```
+
+## API Reference
+
+<ComponentDoc tagName="hx-skeleton" section="api" />
