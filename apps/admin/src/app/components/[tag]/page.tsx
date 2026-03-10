@@ -10,6 +10,8 @@ import { generateSnippetsWithOverrides } from '@/lib/snippet-generator';
 import { getOverridesForComponent } from '@/data/snippet-overrides';
 import { highlightCode } from '@/lib/syntax-highlighter';
 import { getStorybookUrl, getDocsUrl } from '@/lib/env';
+import { mcpGetHealthDiff, mcpAnalyzeAccessibility } from '@/lib/mcp-client';
+import type { McpAccessibilityProfile } from '@/lib/mcp-client';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import {
@@ -26,6 +28,8 @@ import { ScoreBar } from '@/components/dashboard/ScoreBadge';
 import { SplitButtonDropdown } from '@/components/dashboard/SplitButtonDropdown';
 import { Breadcrumb } from '@/components/dashboard/Breadcrumb';
 import { CodeSnippets } from '@/components/dashboard/CodeSnippets';
+import { BranchDiffView } from '@/components/health/BranchDiffView';
+import { McpA11yComparison } from '@/components/health/McpA11yComparison';
 import { getComponentBreadcrumbs } from '@/lib/breadcrumb-utils';
 import { cn } from '@/lib/utils';
 
@@ -49,6 +53,13 @@ export default async function ComponentDetailPage({
   const source = getSourceInfo(tag);
   const testResults = getTestResultsForComponent(tag);
   const a11y = analyzeAccessibility(tag);
+
+  // MCP data — fetched in parallel, graceful degradation when unavailable
+  const [mcpDiff, mcpA11yRaw] = await Promise.all([
+    mcpGetHealthDiff(tag).catch(() => null),
+    mcpAnalyzeAccessibility(tag).catch(() => null),
+  ]);
+  const mcpA11y = mcpA11yRaw as McpAccessibilityProfile | null;
 
   // Generate CEM-driven code snippets with optional manual overrides
   const overrides = getOverridesForComponent(tag);
@@ -186,6 +197,19 @@ export default async function ComponentDetailPage({
           </Card>
         )}
       </div>
+
+      {/* Branch Health Diff (MCP) */}
+      {mcpDiff && <BranchDiffView diff={mcpDiff} />}
+
+      {/* A11y Comparison: Admin vs MCP */}
+      {a11y && mcpA11y && (
+        <McpA11yComparison
+          adminChecks={a11y.checks}
+          adminScore={a11y.score}
+          hasAxeResults={a11y.hasAxeResults}
+          mcpProfile={mcpA11y}
+        />
+      )}
 
       {/* JSDoc + Drift */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

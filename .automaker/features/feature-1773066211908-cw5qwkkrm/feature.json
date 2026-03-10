@@ -1,0 +1,33 @@
+{
+  "category": "Uncategorized",
+  "description": "Launch readiness audit for hx-avatar. Using the documentation template, ensure production-ready. Checklist: (1) A11y — axe-core zero violations, proper alt text handling, WCAG 2.1 AA. (2) Astro doc page — all 12 template sections. (3) Individual export — standalone HTML works. (4) `npm run verify` passes. Known patterns: C-PATTERN-01 (@query !), C-PATTERN-02 (no constructor setAttribute). Files: `packages/hx-library/src/components/hx-avatar/`, `apps/docs/src/content/docs/component-library/hx-avatar.md`",
+  "title": "LAUNCH READY: hx-avatar",
+  "status": "backlog",
+  "dependencies": [
+    "feature-1773066138511-g2pgj0rmm"
+  ],
+  "complexity": "medium",
+  "priority": 3,
+  "source": "api",
+  "trustTier": 1,
+  "quarantineStatus": "passed",
+  "quarantineId": "49c31a2a-1a43-45cf-8a97-b45573c89752",
+  "id": "feature-1773066211908-cw5qwkkrm",
+  "branchName": "feature/launch-ready-hx-avatar",
+  "descriptionHistory": [
+    {
+      "description": "Launch readiness audit for hx-avatar. Using the documentation template, ensure production-ready. Checklist: (1) A11y — axe-core zero violations, proper alt text handling, WCAG 2.1 AA. (2) Astro doc page — all 12 template sections. (3) Individual export — standalone HTML works. (4) `npm run verify` passes. Known patterns: C-PATTERN-01 (@query !), C-PATTERN-02 (no constructor setAttribute). Files: `packages/hx-library/src/components/hx-avatar/`, `apps/docs/src/content/docs/component-library/hx-avatar.md`",
+      "timestamp": "2026-03-09T14:23:31.908Z",
+      "source": "initial"
+    }
+  ],
+  "createdAt": "2026-03-09T14:23:31.908Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-03-09T14:23:31.908Z",
+      "reason": "Feature created"
+    }
+  ]
+}

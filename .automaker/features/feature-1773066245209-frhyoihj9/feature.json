@@ -1,0 +1,33 @@
+{
+  "category": "Uncategorized",
+  "description": "Launch readiness audit for hx-checkbox-group. Checklist: (1) A11y — axe-core zero violations, group role, aria-labelledby, WCAG 2.1 AA. C-PATTERN-03: do NOT put aria-required on fieldset. (2) Astro doc page — all 12 template sections. (3) Individual export — standalone HTML works. (4) `npm run verify` passes. Files: `packages/hx-library/src/components/hx-checkbox-group/`, `apps/docs/src/content/docs/component-library/hx-checkbox-group.md`",
+  "title": "LAUNCH READY: hx-checkbox-group",
+  "status": "backlog",
+  "dependencies": [
+    "feature-1773066138511-g2pgj0rmm"
+  ],
+  "complexity": "medium",
+  "priority": 3,
+  "source": "api",
+  "trustTier": 1,
+  "quarantineStatus": "passed",
+  "quarantineId": "f3c23f99-7a73-4718-9d36-ee4573d8d523",
+  "id": "feature-1773066245209-frhyoihj9",
+  "branchName": "feature/launch-ready-hx-checkbox-group",
+  "descriptionHistory": [
+    {
+      "description": "Launch readiness audit for hx-checkbox-group. Checklist: (1) A11y — axe-core zero violations, group role, aria-labelledby, WCAG 2.1 AA. C-PATTERN-03: do NOT put aria-required on fieldset. (2) Astro doc page — all 12 template sections. (3) Individual export — standalone HTML works. (4) `npm run verify` passes. Files: `packages/hx-library/src/components/hx-checkbox-group/`, `apps/docs/src/content/docs/component-library/hx-checkbox-group.md`",
+      "timestamp": "2026-03-09T14:24:05.209Z",
+      "source": "initial"
+    }
+  ],
+  "createdAt": "2026-03-09T14:24:05.210Z",
+  "statusHistory": [
+    {
+      "from": null,
+      "to": "backlog",
+      "timestamp": "2026-03-09T14:24:05.210Z",
+      "reason": "Feature created"
+    }
+  ]
+}

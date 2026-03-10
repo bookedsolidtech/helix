@@ -1,0 +1,317 @@
+---
+title: 'hx-accordion'
+description: Expandable accordion container for organizing content into collapsible sections
+---
+
+import ComponentLoader from '../../../components/ComponentLoader.astro';
+import ComponentDemo from '../../../components/ComponentDemo.astro';
+import ComponentDoc from '../../../components/ComponentDoc.astro';
+
+<ComponentLoader />
+
+<ComponentDoc tagName="hx-accordion" section="summary" />
+
+## Overview
+
+`hx-accordion` is a container for `hx-accordion-item` elements that manages collapsible content sections. It supports single-expand mode (only one item open at a time) and multi-expand mode (multiple items can be open simultaneously). Each `hx-accordion-item` renders an interactive trigger that reveals or hides its body content with an animated transition.
+
+**Use `hx-accordion` when:** you need to present multiple sections of content in a compact vertical layout and users are likely to need only one or two sections at a time — FAQs, settings panels, and navigation menus are common healthcare UI use cases.
+
+**Use a plain disclosure (`<details>`/`<summary>`) instead when:** you have a single standalone collapsible section with no coordination logic required.
+
+## Live Demo
+
+### Single-Expand Mode
+
+Only one item may be open at a time. Opening a second item automatically closes the first.
+
+<ComponentDemo title="Single Expand">
+  <hx-accordion mode="single">
+    <hx-accordion-item expanded>
+      <span slot="trigger">What is a care plan?</span>
+      <p>
+        A care plan is a written record of a patient's needs, goals, and the steps the care team
+        will take to meet them.
+      </p>
+    </hx-accordion-item>
+    <hx-accordion-item>
+      <span slot="trigger">How do I request a referral?</span>
+      <p>
+        Contact your primary care provider through the patient portal or call the office directly to
+        request a specialist referral.
+      </p>
+    </hx-accordion-item>
+    <hx-accordion-item>
+      <span slot="trigger">What should I bring to my appointment?</span>
+      <p>
+        Bring a photo ID, your insurance card, a list of current medications, and any recent test
+        results or medical records.
+      </p>
+    </hx-accordion-item>
+  </hx-accordion>
+</ComponentDemo>
+
+### Multi-Expand Mode
+
+Multiple items may be open simultaneously.
+
+<ComponentDemo title="Multi Expand">
+  <hx-accordion mode="multi">
+    <hx-accordion-item expanded>
+      <span slot="trigger">Patient History</span>
+      <p>
+        Review complete medical history including past diagnoses, surgeries, and family history.
+      </p>
+    </hx-accordion-item>
+    <hx-accordion-item expanded>
+      <span slot="trigger">Current Medications</span>
+      <p>Lisinopril 10mg daily, Metformin 500mg twice daily, Atorvastatin 20mg at bedtime.</p>
+    </hx-accordion-item>
+    <hx-accordion-item>
+      <span slot="trigger">Upcoming Appointments</span>
+      <p>Follow-up with cardiology scheduled for next Thursday at 2:00 PM.</p>
+    </hx-accordion-item>
+  </hx-accordion>
+</ComponentDemo>
+
+### Disabled Item
+
+Individual items can be disabled to prevent interaction.
+
+<ComponentDemo title="Disabled Item">
+  <hx-accordion mode="single">
+    <hx-accordion-item>
+      <span slot="trigger">Available Section</span>
+      <p>This section is available for interaction.</p>
+    </hx-accordion-item>
+    <hx-accordion-item disabled>
+      <span slot="trigger">Restricted Section</span>
+      <p>This content is restricted and cannot be expanded.</p>
+    </hx-accordion-item>
+    <hx-accordion-item>
+      <span slot="trigger">Another Available Section</span>
+      <p>This section is also available for interaction.</p>
+    </hx-accordion-item>
+  </hx-accordion>
+</ComponentDemo>
+
+## Installation
+
+```bash
+# Full library
+npm install @helix/library
+
+# Or import only this component (tree-shaking friendly)
+import '@helix/library/components/hx-accordion';
+```
+
+## Basic Usage
+
+```html
+<hx-accordion mode="single">
+  <hx-accordion-item>
+    <span slot="trigger">Section One</span>
+    <p>Content for section one.</p>
+  </hx-accordion-item>
+  <hx-accordion-item>
+    <span slot="trigger">Section Two</span>
+    <p>Content for section two.</p>
+  </hx-accordion-item>
+</hx-accordion>
+```
+
+## Properties
+
+### hx-accordion
+
+| Property | Attribute | Type                  | Default    | Description                                                                                                                 |
+| -------- | --------- | --------------------- | ---------- | --------------------------------------------------------------------------------------------------------------------------- |
+| `mode`   | `mode`    | `'single' \| 'multi'` | `'single'` | Expansion mode. `'single'` collapses all other items when one expands; `'multi'` allows multiple items open simultaneously. |
+
+### hx-accordion-item
+
+| Property   | Attribute  | Type      | Default | Description                                       |
+| ---------- | ---------- | --------- | ------- | ------------------------------------------------- |
+| `expanded` | `expanded` | `boolean` | `false` | Whether this item is currently expanded (open).   |
+| `disabled` | `disabled` | `boolean` | `false` | Prevents the item from being toggled by the user. |
+
+## Events
+
+`hx-accordion-item` dispatches the following events. Both events bubble and are composed so they can be listened to on the `hx-accordion` container.
+
+| Event         | Detail Type                             | Description                                                    |
+| ------------- | --------------------------------------- | -------------------------------------------------------------- |
+| `hx-expand`   | `{ expanded: boolean, itemId: string }` | Fired when the item transitions to an expanded (open) state.   |
+| `hx-collapse` | `{ expanded: boolean, itemId: string }` | Fired when the item transitions to a collapsed (closed) state. |
+
+```js
+document.querySelector('hx-accordion').addEventListener('hx-expand', (e) => {
+  console.log('Item expanded:', e.detail.itemId);
+});
+
+document.querySelector('hx-accordion').addEventListener('hx-collapse', (e) => {
+  console.log('Item collapsed:', e.detail.itemId);
+});
+```
+
+## CSS Custom Properties
+
+### hx-accordion
+
+| Property                       | Default                      | Description                                     |
+| ------------------------------ | ---------------------------- | ----------------------------------------------- |
+| `--hx-accordion-border-radius` | `var(--hx-border-radius-md)` | Outer border radius of the accordion container. |
+
+### hx-accordion-item
+
+| Property                          | Default                                 | Description                         |
+| --------------------------------- | --------------------------------------- | ----------------------------------- |
+| `--hx-accordion-border-color`     | `var(--hx-color-neutral-200)`           | Border color between items.         |
+| `--hx-accordion-trigger-padding`  | `var(--hx-space-4)`                     | Padding inside the trigger button.  |
+| `--hx-accordion-trigger-color`    | `var(--hx-color-neutral-800)`           | Trigger text color.                 |
+| `--hx-accordion-trigger-bg`       | `transparent`                           | Trigger background color.           |
+| `--hx-accordion-trigger-hover-bg` | `var(--hx-color-neutral-50)`            | Trigger background on hover.        |
+| `--hx-accordion-icon-color`       | `var(--hx-color-neutral-500)`           | Expand/collapse chevron icon color. |
+| `--hx-accordion-content-padding`  | `0 var(--hx-space-4) var(--hx-space-4)` | Padding inside the content area.    |
+| `--hx-accordion-content-color`    | `var(--hx-color-neutral-600)`           | Content area text color.            |
+
+## CSS Parts
+
+### hx-accordion
+
+| Part        | Description                                                   |
+| ----------- | ------------------------------------------------------------- |
+| `accordion` | The outer `<div>` wrapper inside the accordion's shadow root. |
+
+### hx-accordion-item
+
+| Part      | Description                                            |
+| --------- | ------------------------------------------------------ |
+| `item`    | The outer `<details>` element containing the item.     |
+| `trigger` | The `<summary>` element that serves as the trigger.    |
+| `content` | The collapsible content `<div>` (has `role="region"`). |
+| `icon`    | The `<span>` containing the expand/collapse chevron.   |
+
+## Slots
+
+### hx-accordion
+
+| Slot        | Description                               |
+| ----------- | ----------------------------------------- |
+| _(default)_ | One or more `hx-accordion-item` elements. |
+
+### hx-accordion-item
+
+| Slot        | Description                                                  |
+| ----------- | ------------------------------------------------------------ |
+| `trigger`   | The heading or label content for this item's trigger button. |
+| _(default)_ | The collapsible body content revealed when the item is open. |
+
+## Accessibility
+
+`hx-accordion` implements the [WAI-ARIA Accordion Pattern](https://www.w3.org/WAI/ARIA/apg/patterns/accordion/) using the native `<details>`/`<summary>` HTML elements, augmented with ARIA attributes for maximum compatibility.
+
+| Topic           | Details                                                                                                                                                                                                |
+| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| ARIA role       | `<summary>` has implicit `button` role; content `<div>` has `role="region"` labelled by the trigger via `aria-labelledby`.                                                                             |
+| `aria-expanded` | Set to `'true'`/`'false'` on the trigger reflecting the current expanded state.                                                                                                                        |
+| `aria-disabled` | Set to `'true'` on the trigger when the item is disabled.                                                                                                                                              |
+| `aria-hidden`   | Set to `'true'` on collapsed content panels to remove them from the accessibility tree.                                                                                                                |
+| Keyboard        | `Tab` moves focus between triggers; `Enter` / `Space` toggles the focused item; `ArrowDown` / `ArrowUp` move focus between enabled triggers; `Home` / `End` jump to the first or last enabled trigger. |
+| Screen reader   | State changes (open/closed) are announced via `aria-expanded`. Disabled state is announced via `aria-disabled`.                                                                                        |
+| Focus           | Focus remains on the trigger after toggle; no focus is moved to content.                                                                                                                               |
+| Motion          | Content transitions are suppressed when `prefers-reduced-motion: reduce` is set.                                                                                                                       |
+| WCAG            | Meets WCAG 2.1 AA. No color is the sole conveyor of information; focus rings meet minimum contrast ratios.                                                                                             |
+
+## Drupal Integration
+
+```twig
+{# my-module/templates/my-template.html.twig #}
+<hx-accordion mode="{{ mode|default('single') }}">
+  {% for item in items %}
+    <hx-accordion-item
+      {% if item.expanded %}expanded{% endif %}
+      {% if item.disabled %}disabled{% endif %}
+      {% if item.id %}id="{{ item.id }}"{% endif %}
+    >
+      <span slot="trigger">{{ item.label }}</span>
+      <div>{{ item.body|raw }}</div>
+    </hx-accordion-item>
+  {% endfor %}
+</hx-accordion>
+```
+
+Load the library in your module's `.libraries.yml`:
+
+```yaml
+helix-components:
+  js:
+    /libraries/helix/helix.min.js: { minified: true }
+```
+
+## Standalone HTML Example
+
+Copy-paste into a `.html` file and open in any browser — no build tool required:
+
+```html
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>hx-accordion example</title>
+    <!-- @helix/library is a private package — install via npm workspace, not CDN -->
+    <!-- In your project: import '@helix/library'; in your bundler entry point -->
+  </head>
+  <body style="font-family: sans-serif; padding: 2rem; max-width: 600px; margin: 0 auto;">
+    <h1>Patient FAQ</h1>
+
+    <hx-accordion mode="single" id="faq-accordion">
+      <hx-accordion-item id="item-care-plan" expanded>
+        <span slot="trigger">What is a care plan?</span>
+        <p>
+          A care plan is a written record of your health needs, goals, and the steps your care team
+          will take to support you.
+        </p>
+      </hx-accordion-item>
+
+      <hx-accordion-item id="item-referral">
+        <span slot="trigger">How do I request a referral?</span>
+        <p>
+          Log in to the patient portal and select "Request Referral," or call your primary care
+          office directly.
+        </p>
+      </hx-accordion-item>
+
+      <hx-accordion-item id="item-appointment">
+        <span slot="trigger">What should I bring to my appointment?</span>
+        <p>
+          Bring a photo ID, your insurance card, a list of current medications, and any relevant
+          medical records or test results.
+        </p>
+      </hx-accordion-item>
+
+      <hx-accordion-item id="item-restricted" disabled>
+        <span slot="trigger">Billing (staff only)</span>
+        <p>This section is restricted to staff members.</p>
+      </hx-accordion-item>
+    </hx-accordion>
+
+    <script>
+      const accordion = document.getElementById('faq-accordion');
+
+      accordion.addEventListener('hx-expand', (e) => {
+        console.log('Expanded:', e.detail.itemId);
+      });
+
+      accordion.addEventListener('hx-collapse', (e) => {
+        console.log('Collapsed:', e.detail.itemId);
+      });
+    </script>
+  </body>
+</html>
+```
+
+## API Reference
+
+<ComponentDoc tagName="hx-accordion" section="api" />

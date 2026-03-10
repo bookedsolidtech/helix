@@ -1,0 +1,547 @@
+---
+title: 'hx-dialog'
+description: 'Accessible modal and non-modal dialog built on the native HTML dialog element, with focus trapping, backdrop, keyboard navigation, and full ARIA labelling for enterprise healthcare.'
+---
+
+import ComponentLoader from '../../../components/ComponentLoader.astro';
+import ComponentDemo from '../../../components/ComponentDemo.astro';
+import ComponentDoc from '../../../components/ComponentDoc.astro';
+
+<ComponentLoader />
+
+<ComponentDoc tagName="hx-dialog" section="summary" />
+
+## Overview
+
+`hx-dialog` is a fully accessible dialog overlay built on the native HTML `<dialog>` element. It supports both modal and non-modal modes, focus trapping, keyboard navigation (Escape to close, Tab cycling within the dialog), and programmatic open/close via properties or methods.
+
+**Use `hx-dialog` when:** you need to interrupt the user with a confirmation, a data entry form, or detailed content that requires focused attention before proceeding.
+
+**Healthcare context:** This component is used for medication order confirmations, critical lab alerts, discharge approvals, prior authorization submissions, and any workflow step requiring explicit clinician action. For urgent alerts requiring immediate attention, use `variant="alertdialog"`.
+
+**Design patterns supported:**
+
+- Modal dialog with backdrop (default)
+- Non-modal dialog (inline overlay, no focus lock)
+- Alert dialog (`variant="alertdialog"`) for urgently important content
+- Trigger-button pattern with automatic focus restoration
+
+## Live Demo
+
+### Basic Modal Dialog
+
+A simple modal dialog opened via the `open` attribute.
+
+<ComponentDemo title="Basic Modal">
+  <hx-dialog open heading="Confirm Action">
+    <p style="margin: 0;">Are you sure you want to proceed? This action cannot be undone.</p>
+    <div slot="footer" style="display: flex; gap: 0.75rem; justify-content: flex-end;">
+      <button style="padding: 0.5rem 1rem; border: 1px solid #d1d5db; border-radius: 0.375rem; background: #fff; cursor: pointer;">
+        Cancel
+      </button>
+      <button style="padding: 0.5rem 1rem; border: none; border-radius: 0.375rem; background: #2563eb; color: #fff; cursor: pointer; font-weight: 600;">
+        Confirm
+      </button>
+    </div>
+  </hx-dialog>
+</ComponentDemo>
+
+### Alert Dialog
+
+Use `variant="alertdialog"` for urgent clinical notifications such as drug interaction warnings.
+
+<ComponentDemo title="Alert Dialog">
+  <hx-dialog
+    open
+    variant="alertdialog"
+    heading="Critical Drug Interaction Warning"
+    description="Immediate attention required before proceeding with the medication order."
+  >
+    <p style="margin: 0 0 0.5rem; color: #991b1b; font-weight: 600;">
+      Contraindicated combination detected: Warfarin + Aspirin.
+    </p>
+    <p style="margin: 0; font-size: 0.875rem;">
+      This order requires attending physician sign-off before proceeding.
+    </p>
+    <div slot="footer" style="display: flex; gap: 0.75rem; justify-content: flex-end;">
+      <button style="padding: 0.5rem 1rem; border: 1px solid #d1d5db; border-radius: 0.375rem; background: #fff; cursor: pointer;">
+        Cancel Order
+      </button>
+      <button style="padding: 0.5rem 1rem; border: none; border-radius: 0.375rem; background: #dc2626; color: #fff; cursor: pointer; font-weight: 600;">
+        Override with Justification
+      </button>
+    </div>
+  </hx-dialog>
+</ComponentDemo>
+
+### No Backdrop Close
+
+Setting `close-on-backdrop="false"` prevents accidental dismissal during critical workflows.
+
+<ComponentDemo title="No Backdrop Close">
+  <hx-dialog open heading="Required: Complete Patient Intake" close-on-backdrop="false">
+    <p style="margin: 0; font-size: 0.875rem;">
+      This form must be completed before the appointment can be confirmed. You cannot dismiss this
+      dialog by clicking outside.
+    </p>
+    <div slot="footer" style="display: flex; gap: 0.75rem; justify-content: flex-end;">
+      <button style="padding: 0.5rem 1rem; border: 1px solid #d1d5db; border-radius: 0.375rem; background: #fff; cursor: pointer;">
+        Cancel
+      </button>
+      <button style="padding: 0.5rem 1rem; border: none; border-radius: 0.375rem; background: #2563eb; color: #fff; cursor: pointer; font-weight: 600;">
+        Save and Continue
+      </button>
+    </div>
+  </hx-dialog>
+</ComponentDemo>
+
+## Installation
+
+```bash
+# Full library
+npm install @helix/library
+
+# Or import only this component (tree-shaking friendly)
+import '@helix/library/components/hx-dialog';
+```
+
+## Basic Usage
+
+```html
+<!-- Modal dialog opened by default -->
+<hx-dialog heading="Confirm Discharge" open>
+  <p>Please review the discharge summary before confirming.</p>
+  <div slot="footer">
+    <button>Cancel</button>
+    <button>Confirm</button>
+  </div>
+</hx-dialog>
+```
+
+```javascript
+// Open and close programmatically
+const dialog = document.querySelector('hx-dialog');
+
+// Open as modal (captures focus, shows backdrop)
+dialog.showModal();
+
+// Open as non-modal
+dialog.show();
+
+// Close (optionally with a return value)
+dialog.close('confirmed');
+```
+
+## Properties
+
+| Property          | Attribute           | Type                        | Default    | Description                                                                                                 |
+| ----------------- | ------------------- | --------------------------- | ---------- | ----------------------------------------------------------------------------------------------------------- |
+| `open`            | `open`              | `boolean`                   | `false`    | Controls whether the dialog is open. Reflects to attribute.                                                 |
+| `modal`           | `modal`             | `boolean`                   | `true`     | When `true`, renders as a modal with backdrop and focus trap. When `false`, renders as a non-modal.         |
+| `closeOnBackdrop` | `close-on-backdrop` | `boolean`                   | `true`     | When `true`, clicking the backdrop closes the dialog. Disable for required workflows.                       |
+| `heading`         | `heading`           | `string`                    | `''`       | Text for the dialog heading. Linked via `aria-labelledby` for accessible name.                              |
+| `variant`         | `variant`           | `'dialog' \| 'alertdialog'` | `'dialog'` | ARIA role variant. Use `'alertdialog'` for urgent dialogs requiring immediate attention.                    |
+| `description`     | `description`       | `string`                    | `''`       | Optional description linked via `aria-describedby`. Recommended for critical clinical information.          |
+| `returnValue`     | —                   | `string` (read-only getter) | `''`       | The dialog's return value from the last `close(returnValue)` call. Mirrors `HTMLDialogElement.returnValue`. |
+
+## Events
+
+| Event       | Detail Type | Description                                                                                   |
+| ----------- | ----------- | --------------------------------------------------------------------------------------------- |
+| `hx-open`   | `void`      | Fired when the dialog opens. Bubbles and is composed.                                         |
+| `hx-close`  | `void`      | Fired when the dialog closes for any reason. Bubbles and is composed.                         |
+| `hx-cancel` | `void`      | Fired when the dialog is dismissed via Escape key or backdrop click. Bubbles and is composed. |
+
+```javascript
+const dialog = document.querySelector('hx-dialog');
+
+dialog.addEventListener('hx-open', () => {
+  console.log('Dialog opened');
+});
+
+dialog.addEventListener('hx-close', () => {
+  console.log('Dialog closed');
+});
+
+dialog.addEventListener('hx-cancel', () => {
+  console.log('Dialog cancelled by user');
+});
+```
+
+## Slots
+
+| Slot        | Description                                                                                                                                                          |
+| ----------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| _(default)_ | The dialog body content. Scrollable when content exceeds the available height.                                                                                       |
+| `header`    | Custom header content. When provided, renders alongside the built-in close button. When no `heading` attribute and no header slot, provide `aria-label` on the host. |
+| `footer`    | Action buttons or supplementary footer content. The footer region is only visible when this slot has assigned content.                                               |
+
+## CSS Parts
+
+| Part           | Element    | Description                                                           |
+| -------------- | ---------- | --------------------------------------------------------------------- |
+| `dialog`       | `<div>`    | The inner content container holding header, body, and footer regions. |
+| `backdrop`     | `<div>`    | The non-modal backdrop overlay (only rendered in non-modal mode).     |
+| `header`       | `<div>`    | The header region containing the heading element and header slot.     |
+| `close-button` | `<button>` | The built-in close button in the dialog header.                       |
+| `body`         | `<div>`    | The scrollable body region containing the default slot.               |
+| `footer`       | `<div>`    | The footer region containing the footer slot.                         |
+
+```css
+/* Style the dialog container */
+hx-dialog::part(dialog) {
+  border: 2px solid var(--hx-color-primary-500);
+}
+
+/* Style the close button */
+hx-dialog::part(close-button) {
+  color: var(--hx-color-primary-600);
+}
+
+/* Style the footer */
+hx-dialog::part(footer) {
+  background-color: var(--hx-color-neutral-50);
+}
+```
+
+## CSS Custom Properties
+
+| Property                          | Default                                   | Description                                                           |
+| --------------------------------- | ----------------------------------------- | --------------------------------------------------------------------- |
+| `--hx-dialog-bg`                  | `var(--hx-color-neutral-0)`               | Dialog background color.                                              |
+| `--hx-dialog-color`               | `var(--hx-color-neutral-900)`             | Dialog text color.                                                    |
+| `--hx-dialog-border-radius`       | `var(--hx-border-radius-lg)`              | Dialog corner radius.                                                 |
+| `--hx-dialog-shadow`              | `var(--hx-shadow-xl)`                     | Dialog box shadow.                                                    |
+| `--hx-dialog-width`               | `32rem`                                   | Dialog width. Automatically constrained to viewport on small screens. |
+| `--hx-dialog-backdrop-color`      | `var(--hx-color-neutral-900)`             | Backdrop overlay color.                                               |
+| `--hx-dialog-backdrop-opacity`    | `0.5`                                     | Backdrop overlay opacity. Set to `0` to hide.                         |
+| `--hx-dialog-header-padding`      | `var(--hx-spacing-5) var(--hx-spacing-6)` | Padding inside the header region.                                     |
+| `--hx-dialog-header-border-color` | `var(--hx-color-neutral-200)`             | Color of the border separating header from body.                      |
+| `--hx-dialog-heading-color`       | `var(--hx-color-neutral-900)`             | Heading text color.                                                   |
+| `--hx-dialog-body-padding`        | `var(--hx-spacing-6)`                     | Padding inside the scrollable body region.                            |
+| `--hx-dialog-footer-padding`      | `var(--hx-spacing-4) var(--hx-spacing-6)` | Padding inside the footer region.                                     |
+| `--hx-dialog-footer-border-color` | `var(--hx-color-neutral-200)`             | Color of the border separating footer from body.                      |
+
+```css
+/* Dark-themed dialog */
+.dark-dialog {
+  --hx-dialog-bg: #1e293b;
+  --hx-dialog-color: #f1f5f9;
+  --hx-dialog-heading-color: #38bdf8;
+  --hx-dialog-header-border-color: #334155;
+  --hx-dialog-footer-border-color: #334155;
+  --hx-dialog-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.6);
+  --hx-dialog-width: 28rem;
+}
+```
+
+## Accessibility
+
+| Topic              | Details                                                                                                                                              |
+| ------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
+| ARIA role          | Uses native `<dialog>` element — implicit `role="dialog"`. Use `variant="alertdialog"` to set `role="alertdialog"` for urgent notifications.         |
+| `aria-modal`       | Set to `"true"` automatically in modal mode. Omitted in non-modal mode.                                                                              |
+| `aria-labelledby`  | Automatically linked to the heading element when the `heading` attribute is provided.                                                                |
+| `aria-label`       | Forward directly on the host when using a custom header slot without the `heading` attribute to ensure an accessible name is present.                |
+| `aria-describedby` | Wired to a visually-hidden description element when the `description` attribute is provided. Recommended for clinical context (drug warnings, etc.). |
+| Focus trap         | In modal mode, Tab and Shift+Tab cycle focus within dialog content. Focus cannot escape to page elements behind the modal.                           |
+| Initial focus      | When opened, focus moves to the first focusable element inside the dialog (links, buttons, inputs). No additional wiring required.                   |
+| Focus restoration  | When closed, focus automatically returns to the element that was focused when the dialog opened (WCAG 2.4.3).                                        |
+| Escape key         | Closes the dialog and fires `hx-cancel`, then `hx-close`. The native browser cancel event is intercepted to allow orderly event sequencing.          |
+| Body scroll lock   | In modal mode, `document.body.overflow` is set to `hidden` while the dialog is open and restored on close.                                           |
+| WCAG 2.1 AA        | Verified with axe-core across closed, open-with-heading, and open-with-custom-header states.                                                         |
+
+### Accessible Name Requirements
+
+The dialog **must** have an accessible name. Provide one via:
+
+1. **`heading` attribute** (recommended) — automatically wired via `aria-labelledby`.
+2. **`aria-label` on the host** — use when the heading is provided via the `header` slot.
+
+```html
+<!-- Option 1: heading attribute (preferred) -->
+<hx-dialog heading="Confirm Discharge">...</hx-dialog>
+
+<!-- Option 2: aria-label when using header slot -->
+<hx-dialog aria-label="Critical Alert">
+  <div slot="header">
+    <strong>Critical Alert</strong>
+    <span>Patient: Jane Doe — Room 4B</span>
+  </div>
+  ...
+</hx-dialog>
+```
+
+## Keyboard Navigation
+
+| Key           | Behavior                                                                       |
+| ------------- | ------------------------------------------------------------------------------ |
+| `Tab`         | Move focus to the next focusable element within the dialog.                    |
+| `Shift + Tab` | Move focus to the previous focusable element within the dialog.                |
+| `Escape`      | Close the dialog. Fires `hx-cancel` then `hx-close`. Focus returns to trigger. |
+
+In non-modal mode, the Tab key cycles normally without restriction — focus is not trapped.
+
+## Examples
+
+### Trigger Button with Focus Restoration
+
+The recommended pattern for most use cases: a trigger button opens the dialog, and focus returns automatically on close.
+
+```html
+<button id="open-btn">Schedule Appointment</button>
+
+<hx-dialog id="appt-dialog" heading="Schedule Appointment">
+  <label>
+    Preferred Date
+    <input type="date" name="date" />
+  </label>
+  <div slot="footer">
+    <button id="cancel-btn">Cancel</button>
+    <button>Book Appointment</button>
+  </div>
+</hx-dialog>
+
+<script>
+  const dialog = document.getElementById('appt-dialog');
+  document.getElementById('open-btn').addEventListener('click', () => {
+    dialog.showModal();
+  });
+  document.getElementById('cancel-btn').addEventListener('click', () => {
+    dialog.close();
+  });
+</script>
+```
+
+### Alert Dialog for Drug Interaction Warning
+
+Use `variant="alertdialog"` for urgent dialogs requiring immediate clinician attention. Pair with the `description` attribute to provide additional context for screen readers.
+
+```html
+<hx-dialog
+  id="drug-alert"
+  open
+  variant="alertdialog"
+  heading="Critical Drug Interaction Warning"
+  description="This alert requires immediate attention before proceeding with the medication order."
+>
+  <p>Warfarin (current) + Aspirin (new order) — high risk of bleeding.</p>
+  <div slot="footer">
+    <button id="cancel-order">Cancel Order</button>
+    <button id="override">Override with Justification</button>
+  </div>
+</hx-dialog>
+```
+
+### Form Inside Dialog
+
+For data entry workflows, place a form in the default slot. Use `method="dialog"` or programmatic close after validation.
+
+```html
+<hx-dialog id="referral-dialog" heading="New Patient Referral">
+  <form id="referral-form">
+    <label>
+      Patient Name
+      <input type="text" name="name" required />
+    </label>
+    <label>
+      Date of Birth
+      <input type="date" name="dob" required />
+    </label>
+  </form>
+  <div slot="footer">
+    <button type="button" id="cancel-referral">Cancel</button>
+    <button type="submit" form="referral-form">Submit Referral</button>
+  </div>
+</hx-dialog>
+
+<script>
+  const dialog = document.getElementById('referral-dialog');
+  document.getElementById('cancel-referral').addEventListener('click', () => dialog.close());
+
+  document.getElementById('referral-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const data = new FormData(e.target);
+    await submitReferral(data);
+    dialog.close('submitted');
+  });
+</script>
+```
+
+### Danger Confirmation (Required Workflow)
+
+For destructive, irreversible actions, disable backdrop close to force explicit user action.
+
+```html
+<hx-dialog id="delete-dialog" heading="Delete Patient Record" close-on-backdrop="false">
+  <p>This action is permanent and cannot be undone. Please type the patient's MRN to confirm.</p>
+  <input
+    type="text"
+    placeholder="Enter MRN to confirm"
+    aria-label="Enter MRN to confirm deletion"
+  />
+  <div slot="footer">
+    <button id="cancel-delete">Cancel</button>
+    <button id="confirm-delete" style="background: #dc2626; color: white;">
+      Delete Record Permanently
+    </button>
+  </div>
+</hx-dialog>
+```
+
+### Responding to Events
+
+```javascript
+const dialog = document.querySelector('hx-dialog');
+
+dialog.addEventListener('hx-open', () => {
+  analytics.track('dialog_opened', { id: dialog.id });
+});
+
+dialog.addEventListener('hx-close', () => {
+  const rv = dialog.returnValue;
+  if (rv === 'confirmed') {
+    processOrder();
+  }
+});
+
+dialog.addEventListener('hx-cancel', () => {
+  console.log('User dismissed the dialog');
+});
+```
+
+## Drupal Integration
+
+```twig
+{# my-module/templates/hx-dialog.html.twig #}
+<hx-dialog
+  id="{{ dialog_id }}"
+  heading="{{ dialog_heading }}"
+  {% if dialog_open %}open{% endif %}
+  {% if not dialog_modal %}modal="false"{% endif %}
+  {% if not dialog_close_on_backdrop %}close-on-backdrop="false"{% endif %}
+  {% if dialog_variant %}variant="{{ dialog_variant }}"{% endif %}
+  {% if dialog_description %}description="{{ dialog_description }}"{% endif %}
+>
+  {{ content }}
+  {% if footer_content %}
+    <div slot="footer">{{ footer_content }}</div>
+  {% endif %}
+</hx-dialog>
+```
+
+Wire triggers in Drupal behaviors:
+
+```javascript
+Drupal.behaviors.hxDialog = {
+  attach(context) {
+    context.querySelectorAll('[data-hx-dialog-trigger]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const id = btn.getAttribute('data-hx-dialog-trigger');
+        const dialog = document.getElementById(id);
+        dialog?.showModal();
+      });
+    });
+
+    context.querySelectorAll('hx-dialog').forEach((dialog) => {
+      dialog.addEventListener('hx-close', (e) => {
+        // e.g., trigger AJAX or reload section
+        Drupal.ajax({ url: '/update-dialog-state' }).execute();
+      });
+    });
+  },
+};
+```
+
+Load the library in your module's `.libraries.yml`:
+
+```yaml
+helix-components:
+  js:
+    /libraries/helix/helix.min.js: { minified: true }
+```
+
+## Standalone HTML Example
+
+Copy-paste into a `.html` file and open in any browser — no build tool required:
+
+```html
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>hx-dialog example</title>
+    <script
+      type="module"
+      src="https://cdn.jsdelivr.net/npm/@helix/library/dist/helix.min.js"
+    ></script>
+  </head>
+  <body style="font-family: sans-serif; padding: 2rem;">
+    <button
+      id="open-btn"
+      style="padding: 0.5rem 1rem; background: #2563eb; color: white; border: none; border-radius: 0.375rem; cursor: pointer; font-size: 1rem;"
+    >
+      Open Dialog
+    </button>
+
+    <hx-dialog id="demo-dialog" heading="Confirm Medication Order">
+      <p style="margin: 0 0 0.5rem; font-weight: 600;">Amoxicillin 500mg — 3x daily for 7 days</p>
+      <p style="margin: 0; font-size: 0.875rem; color: #6b7280;">
+        Please review the prescription details before confirming.
+      </p>
+      <div slot="footer" style="display: flex; gap: 0.75rem; justify-content: flex-end;">
+        <button
+          id="cancel-btn"
+          style="padding: 0.5rem 1rem; border: 1px solid #d1d5db; border-radius: 0.375rem; background: #fff; cursor: pointer;"
+        >
+          Cancel
+        </button>
+        <button
+          id="confirm-btn"
+          style="padding: 0.5rem 1rem; border: none; border-radius: 0.375rem; background: #2563eb; color: #fff; cursor: pointer; font-weight: 600;"
+        >
+          Confirm Order
+        </button>
+      </div>
+    </hx-dialog>
+
+    <script>
+      const dialog = document.getElementById('demo-dialog');
+      const openBtn = document.getElementById('open-btn');
+      const cancelBtn = document.getElementById('cancel-btn');
+      const confirmBtn = document.getElementById('confirm-btn');
+
+      openBtn.addEventListener('click', () => dialog.showModal());
+      cancelBtn.addEventListener('click', () => dialog.close('cancelled'));
+      confirmBtn.addEventListener('click', () => dialog.close('confirmed'));
+
+      dialog.addEventListener('hx-close', () => {
+        if (dialog.returnValue === 'confirmed') {
+          console.log('Order confirmed!');
+        }
+      });
+    </script>
+  </body>
+</html>
+```
+
+## Browser Support
+
+| Feature                   | Chrome | Firefox | Safari | Edge |
+| ------------------------- | ------ | ------- | ------ | ---- |
+| Native `<dialog>` element | 37+    | 98+     | 15.4+  | 79+  |
+| `dialog::backdrop`        | 37+    | 122+    | 15.4+  | 79+  |
+| `showModal()` / `show()`  | 37+    | 98+     | 15.4+  | 79+  |
+| Shadow DOM / Lit 3.x      | 67+    | 63+     | 10.1+  | 79+  |
+
+**Notes:**
+
+- `dialog::backdrop` animation inside Shadow DOM is supported in Chrome/Chromium and Firefox 122+. Firefox < 122 falls back to a non-animated backdrop silently.
+- In non-modal mode (`modal="false"`), a fallback `<div>` backdrop element is rendered in the shadow DOM and styled via `--hx-dialog-backdrop-*` tokens.
+- The component locks `document.body.overflow` in modal mode. If your application already manages body scroll, coordinate this via the `hx-open` and `hx-close` events.
+- Body scroll lock is removed when the component disconnects from the DOM (e.g., component teardown or page navigation).
+
+## API Reference
+
+<ComponentDoc tagName="hx-dialog" section="api" />

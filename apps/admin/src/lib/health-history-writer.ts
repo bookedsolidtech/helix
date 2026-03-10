@@ -5,6 +5,7 @@
 import { writeFileSync, existsSync, mkdirSync } from 'node:fs';
 import { resolve } from 'node:path';
 import type { ComponentHealth } from './health-scorer';
+import { syncToMcpHealthHistory } from './mcp-health-writer';
 
 export interface HealthSnapshot {
   date: string; // ISO 8601 date: YYYY-MM-DD
@@ -82,6 +83,13 @@ export function saveHealthSnapshot(components: ComponentHealth[], date?: Date): 
 
   const filePath = resolve(historyDir, `${dateStr}.json`);
   writeFileSync(filePath, JSON.stringify(snapshot, null, 2), 'utf-8');
+
+  // Fire-and-forget: push admin scores to wc-tools history format
+  try {
+    syncToMcpHealthHistory(components, now);
+  } catch {
+    // Never block admin history saving
+  }
 }
 
 /**

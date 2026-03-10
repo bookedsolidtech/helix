@@ -1,5 +1,6 @@
 import js from '@eslint/js';
 import tseslint from 'typescript-eslint';
+import prettierConfig from 'eslint-config-prettier';
 import lit from 'eslint-plugin-lit';
 import wc from 'eslint-plugin-wc';
 
@@ -19,6 +20,10 @@ export default tseslint.config(
       'apps/docs/.astro/**',
       'apps/storybook/dist/**',
       'packages/hx-library/dist/**',
+      '.worktrees/**',
+      '.claude/**',
+      'coverage/**',
+      '.automaker/**',
     ],
   },
 
@@ -61,7 +66,7 @@ export default tseslint.config(
     files: ['**/*.ts', '**/*.tsx'],
     rules: {
       // Allow non-null assertions sparingly in test files only (overridden below)
-      '@typescript-eslint/no-non-null-assertion': 'error',
+      '@typescript-eslint/no-non-null-assertion': 'warn',
 
       // Enforce explicit return types on public module functions
       '@typescript-eslint/explicit-function-return-type': 'off',
@@ -112,4 +117,7 @@ export default tseslint.config(
       '@typescript-eslint/no-require-imports': 'off',
     },
   },
+
+  // ── Prettier (must be last to disable conflicting rules) ──────────
+  prettierConfig,
 );

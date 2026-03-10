@@ -39,6 +39,7 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "format:all": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md,css,html,astro}\"",
+    "verify": "npm run lint && npm run format:check && npm run type-check",
     "pre-commit-check": "bash scripts/pre-commit-check.sh",
     "pre-push-check": "bash scripts/pre-push-check.sh",
     "hooks:type-check-strict": "tsx scripts/hooks/type-check-strict.ts",
@@ -69,28 +70,32 @@
     "changeset": "changeset",
     "changeset:version": "changeset version",
     "changeset:publish": "changeset publish",
-    "prepare": "node -e \"try { require('husky').install() } catch (e) {}\""
+    "prepare": "husky"
   },
   "lint-staged": {
     "*.{ts,tsx,js,jsx}": [
       "eslint --fix",
       "prettier --write"
     ],
-    "*.{json,md,css,html}": [
+    "*.{json,css,html}": [
       "prettier --write"
     ]
   },
   "devDependencies": {
     "@changesets/cli": "^2.29.8",
+    "@commitlint/cli": "^20.4.3",
+    "@commitlint/config-conventional": "^20.4.3",
     "@eslint/js": "^9.0.0",
     "@playwright/test": "^1.58.2",
     "chrome-launcher": "^1.1.2",
     "eslint": "^9.0.0",
+    "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-lit": "^1.15.0",
     "eslint-plugin-wc": "^2.2.0",
     "glob": "^11.0.0",
-    "husky": "^9.0.0",
+    "husky": "^9.1.7",
     "lighthouse": "~12.8.0",
+    "lightningcss": "^1.30.2",
     "lint-staged": "^15.0.0",
     "minimatch": "^10.2.2",
     "prettier": "^3.0.0",

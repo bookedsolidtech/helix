@@ -1,12 +1,5 @@
 import { describe, it, expect, afterEach } from 'vitest';
-import {
-  fixture,
-  shadowQuery,
-  _shadowQueryAll,
-  oneEvent,
-  cleanup,
-  checkA11y,
-} from '../../test-utils.js';
+import { fixture, shadowQuery, oneEvent, cleanup, checkA11y } from '../../test-utils.js';
 import type { WcRadioGroup } from './hx-radio-group.js';
 import type { WcRadio } from './hx-radio.js';
 import './index.js';
@@ -56,13 +49,14 @@ describe('hx-radio-group', () => {
       expect(legend).toBeNull();
     });
 
-    it('has role="radiogroup" on host', async () => {
+    it('has role="radiogroup" on shadow fieldset', async () => {
       const el = await fixture<WcRadioGroup>(`
         <hx-radio-group label="Test">
           <hx-radio value="a" label="A"></hx-radio>
         </hx-radio-group>
       `);
-      expect(el.getAttribute('role')).toBe('radiogroup');
+      const fieldset = shadowQuery(el, 'fieldset');
+      expect(fieldset?.getAttribute('role')).toBe('radiogroup');
     });
   });
 
@@ -225,14 +219,14 @@ describe('hx-radio-group', () => {
       expect(errorDiv?.textContent?.trim()).toBe('Please select an option');
     });
 
-    it('error div has aria-live="polite"', async () => {
+    it('error div has role="alert"', async () => {
       const el = await fixture<WcRadioGroup>(`
         <hx-radio-group label="Test" error="Error">
           <hx-radio value="a" label="A"></hx-radio>
         </hx-radio-group>
       `);
       const errorDiv = shadowQuery(el, '.fieldset__error');
-      expect(errorDiv?.getAttribute('aria-live')).toBe('polite');
+      expect(errorDiv?.getAttribute('role')).toBe('alert');
     });
 
     it('renders help text below group', async () => {
@@ -260,7 +254,7 @@ describe('hx-radio-group', () => {
   // ─── Events (3) ───
 
   describe('Events', () => {
-    it('dispatches wc-change when a radio is selected', async () => {
+    it('dispatches hx-change when a radio is selected', async () => {
       const el = await fixture<WcRadioGroup>(`
         <hx-radio-group label="Test">
           <hx-radio value="a" label="A"></hx-radio>
@@ -292,7 +286,7 @@ describe('hx-radio-group', () => {
       expect(event.composed).toBe(true);
     });
 
-    it('does not dispatch wc-change when selecting the already-selected radio', async () => {
+    it('does not dispatch hx-change when selecting the already-selected radio', async () => {
       const el = await fixture<WcRadioGroup>(`
         <hx-radio-group label="Test" value="a">
           <hx-radio value="a" label="A"></hx-radio>
@@ -306,7 +300,7 @@ describe('hx-radio-group', () => {
       const radioA = el.querySelector('hx-radio[value="a"]') as WcRadio;
       const label = shadowQuery(radioA, '.radio') as HTMLDivElement;
       label.click();
-      await new Promise((r) => setTimeout(r, 50));
+      await el.updateComplete;
       expect(eventFired).toBe(false);
     });
   });
@@ -532,22 +526,24 @@ describe('hx-radio-group', () => {
   // ─── Accessibility (4) ───
 
   describe('Accessibility', () => {
-    it('host has role="radiogroup"', async () => {
+    it('shadow fieldset has role="radiogroup"', async () => {
       const el = await fixture<WcRadioGroup>(`
         <hx-radio-group label="Test">
           <hx-radio value="a" label="A"></hx-radio>
         </hx-radio-group>
       `);
-      expect(el.getAttribute('role')).toBe('radiogroup');
+      const fieldset = shadowQuery(el, 'fieldset');
+      expect(fieldset?.getAttribute('role')).toBe('radiogroup');
     });
 
-    it('sets aria-label on host from label property', async () => {
+    it('legend renders label text for accessible grouping', async () => {
       const el = await fixture<WcRadioGroup>(`
         <hx-radio-group label="My Group">
           <hx-radio value="a" label="A"></hx-radio>
         </hx-radio-group>
       `);
-      expect(el.getAttribute('aria-label')).toBe('My Group');
+      const legend = shadowQuery(el, 'legend');
+      expect(legend?.textContent?.trim()).toContain('My Group');
     });
 
     it('hx-radio contains a hidden native radio input', async () => {
@@ -605,7 +601,7 @@ describe('hx-radio-group', () => {
       const radioA = el.querySelector('hx-radio[value="a"]') as WcRadio;
       const label = shadowQuery(radioA, '.radio') as HTMLDivElement;
       label.click();
-      await new Promise((r) => setTimeout(r, 50));
+      await el.updateComplete;
       expect(eventFired).toBe(false);
     });
 

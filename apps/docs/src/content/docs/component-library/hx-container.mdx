@@ -1,6 +1,6 @@
 ---
 title: 'hx-container'
-description: 'A layout container that constrains content width and provides consistent vertical spacing and horizontal gutters. Uses a two-layer model: the outer host spans full width (background, vertical padding), while the inner wrapper constrains max-width, centers content, and applies horizontal gutters.'
+description: 'Layout primitive that constrains content width and provides consistent vertical spacing and horizontal gutters via a two-layer host/inner model.'
 ---
 
 import ComponentLoader from '../../../components/ComponentLoader.astro';
@@ -11,7 +11,19 @@ import ComponentDoc from '../../../components/ComponentDoc.astro';
 
 <ComponentDoc tagName="hx-container" section="summary" />
 
-## Width Presets
+## Overview
+
+`hx-container` is a layout primitive that solves a universal problem in page composition: constraining content to a readable max-width while allowing the background and vertical spacing to extend edge-to-edge. It uses a two-layer model — the outer `:host` spans the full viewport width (carrying background color and vertical padding), while the inner `[part="inner"]` div constrains the max-width, centers content horizontally, and applies consistent horizontal gutters.
+
+**Use `hx-container` when:** you need a page section that has a full-bleed background with constrained inner content — hero sections, feature bands, alert banners, or any layout section in a healthcare portal that needs consistent margins.
+
+**Choose the right `width` preset:** use `content` (72rem) for standard page text, `narrow` (48rem) for focused forms or dialogs, and `sm`/`md`/`lg`/`xl` for pixel-precise breakpoint-aligned layouts.
+
+**Do not use `hx-container`** as a generic `<div>` wrapper for small UI regions. It is a page-level layout primitive. For card-sized groupings of content, use `hx-card`.
+
+## Live Demo
+
+### Width Presets
 
 Different max-width constraints for the inner content wrapper.
 
@@ -42,6 +54,11 @@ Different max-width constraints for the inner content wrapper.
         <strong>content</strong> — 72rem max-width (default)
       </p>
     </hx-container>
+    <hx-container width="narrow" style="--hx-container-bg: #fff7ed;">
+      <p>
+        <strong>narrow</strong> — 48rem max-width
+      </p>
+    </hx-container>
     <hx-container width="full" style="--hx-container-bg: #fdf4ff;">
       <p>
         <strong>full</strong> — No max-width constraint
@@ -50,34 +67,216 @@ Different max-width constraints for the inner content wrapper.
   </div>
 </ComponentDemo>
 
-## Vertical Padding
+### Vertical Padding
 
-Different vertical padding options applied to the outer wrapper.
+Different vertical padding options applied to the outer wrapper, useful for full-bleed section bands.
 
 <ComponentDemo title="Vertical Padding">
   <div style="display: grid; gap: 0.75rem;">
     <hx-container width="lg" padding="none" style="--hx-container-bg: #f0f9ff;">
       <p>
-        <strong>none</strong> — No vertical padding
+        <strong>none</strong> — No vertical padding (default)
       </p>
     </hx-container>
     <hx-container width="lg" padding="sm" style="--hx-container-bg: #ecfdf5;">
       <p>
-        <strong>sm</strong> — Small vertical padding
+        <strong>sm</strong> — Small vertical padding (1.5rem / 24px)
       </p>
     </hx-container>
     <hx-container width="lg" padding="md" style="--hx-container-bg: #fffbeb;">
       <p>
-        <strong>md</strong> — Medium vertical padding
+        <strong>md</strong> — Medium vertical padding (3rem / 48px)
       </p>
     </hx-container>
     <hx-container width="lg" padding="lg" style="--hx-container-bg: #fef2f2;">
       <p>
-        <strong>lg</strong> — Large vertical padding
+        <strong>lg</strong> — Large vertical padding (4rem / 64px)
+      </p>
+    </hx-container>
+    <hx-container width="lg" padding="xl" style="--hx-container-bg: #f5f3ff;">
+      <p>
+        <strong>xl</strong> — Extra large vertical padding (6rem / 96px)
+      </p>
+    </hx-container>
+    <hx-container width="lg" padding="2xl" style="--hx-container-bg: #fdf4ff;">
+      <p>
+        <strong>2xl</strong> — 2x extra large vertical padding (8rem / 128px)
       </p>
     </hx-container>
   </div>
 </ComponentDemo>
+
+### Background Color
+
+Use `--hx-container-bg` to apply a full-bleed background while the inner content remains constrained.
+
+<ComponentDemo title="Background Color">
+  <hx-container
+    width="content"
+    padding="lg"
+    style="--hx-container-bg: var(--hx-color-primary, #2563eb); color: white;"
+  >
+    <h2 style="margin: 0 0 0.5rem;">Hero Section</h2>
+    <p style="margin: 0;">
+      Full-bleed background with constrained inner content. The background extends edge-to-edge
+      while text stays within the content max-width.
+    </p>
+  </hx-container>
+</ComponentDemo>
+
+## Installation
+
+Install the full library or import the component individually:
+
+```bash
+npm install @helix/library
+```
+
+Then register the component:
+
+```ts
+import '@helix/library/components/hx-container';
+```
+
+## Basic Usage
+
+After registering the component (via the import above or the CDN script below), use it in your HTML:
+
+```html
+<hx-container>
+  <p>Content constrained to 72rem (1152px) by default.</p>
+</hx-container>
+```
+
+## Properties
+
+| Property  | Attribute | Type                                                              | Default     | Description                                                                                                                                                 |
+| --------- | --------- | ----------------------------------------------------------------- | ----------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `width`   | `width`   | `'full' \| 'content' \| 'narrow' \| 'sm' \| 'md' \| 'lg' \| 'xl'` | `'content'` | Controls the max-width of the inner content wrapper. `full` removes all max-width constraints. Override the resolved value with `--hx-container-max-width`. |
+| `padding` | `padding` | `'none' \| 'sm' \| 'md' \| 'lg' \| 'xl' \| '2xl'`                 | `'none'`    | Vertical padding applied to the outer `:host` element. Useful for creating full-bleed section bands with consistent top/bottom spacing.                     |
+
+## Events
+
+`hx-container` is a structural layout element and does not dispatch any custom events.
+
+## CSS Custom Properties
+
+| Property                   | Default                     | Description                                                                                            |
+| -------------------------- | --------------------------- | ------------------------------------------------------------------------------------------------------ |
+| `--hx-container-bg`        | `transparent`               | Background color on the outer `:host`. Extends edge-to-edge across the full viewport width.            |
+| `--hx-container-gutter`    | `var(--hx-space-6, 1.5rem)` | Horizontal padding applied to both sides of the inner wrapper. Keeps content away from viewport edges. |
+| `--hx-container-max-width` | _(unset)_                   | Override the max-width set by the `width` property. Takes precedence over all width presets.           |
+| `--hx-container-content`   | `72rem`                     | Max-width resolved when `width="content"`.                                                             |
+| `--hx-container-narrow`    | `48rem`                     | Max-width resolved when `width="narrow"`.                                                              |
+| `--hx-container-sm`        | `640px`                     | Max-width resolved when `width="sm"`.                                                                  |
+| `--hx-container-md`        | `768px`                     | Max-width resolved when `width="md"`.                                                                  |
+| `--hx-container-lg`        | `1024px`                    | Max-width resolved when `width="lg"`.                                                                  |
+| `--hx-container-xl`        | `1280px`                    | Max-width resolved when `width="xl"`.                                                                  |
+
+## CSS Parts
+
+| Part    | Description                                                                                                                                                                           |
+| ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `inner` | The inner `<div>` that constrains max-width, centers content, and applies horizontal gutters. Target this part to override margin, padding, or max-width from outside the shadow DOM. |
+
+## Slots
+
+| Slot        | Description                                                                                                                                       |
+| ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
+| _(default)_ | Any flow content — text, headings, other components, or nested layout elements. Content is placed inside the max-width–constrained inner wrapper. |
+
+## Accessibility
+
+`hx-container` is a transparent layout primitive with no semantic meaning. It does not add ARIA roles, attributes, or keyboard interactions of its own.
+
+| Topic         | Details                                                                                                                                                                  |
+| ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| ARIA role     | None. The component renders as an unstyled custom element in the accessibility tree. Screen readers encounter slotted content in document order.                         |
+| Keyboard      | No keyboard interactions. The component is not focusable.                                                                                                                |
+| Screen reader | Content placed in the default slot is read in source order. No additional announcements are made by the component itself.                                                |
+| Focus         | Focus management is not handled by this component. Focusable elements placed inside the slot behave normally.                                                            |
+| Headings      | When using `hx-container` to wrap page sections, ensure slotted content contains correctly nested heading levels (`<h1>` through `<h6>`) for a logical document outline. |
+| WCAG 2.1 AA   | Verified with axe-core: zero violations in default state and with rich slotted content. The component is layout-only and does not introduce accessibility barriers.      |
+
+## Drupal Integration
+
+Use the component in a Twig template after registering the library:
+
+```twig
+{# my-module/templates/section.html.twig #}
+<hx-container
+  width="{{ width|default('content') }}"
+  padding="{{ padding|default('none') }}"
+  {% if bg_color %}style="--hx-container-bg: {{ bg_color }};"{% endif %}
+>
+  {{ content }}
+</hx-container>
+```
+
+Load the library in your module's `.libraries.yml`:
+
+```yaml
+helix-components:
+  js:
+    /libraries/helix/dist/index.js: {}
+```
+
+Example usage from a Drupal paragraph template for a hero section:
+
+```twig
+{# paragraph--hero-section.html.twig #}
+<hx-container
+  width="content"
+  padding="xl"
+  style="--hx-container-bg: var(--hx-color-primary);"
+>
+  {% if content.field_heading %}
+    <h2>{{ content.field_heading }}</h2>
+  {% endif %}
+  {{ content.field_body }}
+</hx-container>
+```
+
+## Standalone HTML Example
+
+Copy-paste this into a `.html` file and open it in a browser — no build tool needed:
+
+```html
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>hx-container example</title>
+    <script type="module" src="https://cdn.jsdelivr.net/npm/@helix/library/dist/index.js"></script>
+    <style>
+      body {
+        margin: 0;
+        font-family: sans-serif;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Hero band: full-bleed background, constrained text -->
+    <hx-container width="content" padding="xl" style="--hx-container-bg: #1e40af; color: white;">
+      <h1>Patient Portal</h1>
+      <p>Secure access to your health records, appointments, and care team.</p>
+    </hx-container>
+
+    <!-- Standard content section -->
+    <hx-container width="content" padding="md">
+      <h2>Recent Activity</h2>
+      <p>Your upcoming appointment is on March 15 at 10:00 AM.</p>
+    </hx-container>
+
+    <!-- Narrow form section -->
+    <hx-container width="narrow" padding="md" style="--hx-container-bg: #f8fafc;">
+      <h2>Update Contact Info</h2>
+      <p>Keep your information current for appointment reminders and emergency contact.</p>
+    </hx-container>
+  </body>
+</html>
+```
 
 ## API Reference
 

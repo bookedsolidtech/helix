@@ -8,6 +8,7 @@ import {
   Activity,
   ShieldCheck,
   Component,
+  Cpu,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { BreadcrumbIconType } from '@/lib/breadcrumb-utils';
@@ -46,6 +47,8 @@ function getIconComponent(iconType?: BreadcrumbIconType): React.ReactNode {
       return <ShieldCheck {...iconProps} />;
     case 'component-tag':
       return <Component {...iconProps} />;
+    case 'mcp':
+      return <Cpu {...iconProps} />;
     default:
       return null;
   }

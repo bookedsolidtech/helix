@@ -22,7 +22,7 @@ const meta = {
         type: { summary: "'info' | 'success' | 'warning' | 'error'" },
       },
     },
-    closable: {
+    dismissible: {
       control: 'boolean',
       description: 'Whether the alert can be dismissed by the user via a close button.',
       table: {
@@ -40,6 +40,15 @@ const meta = {
         type: { summary: 'boolean' },
       },
     },
+    icon: {
+      control: 'boolean',
+      description: 'Whether to show the default variant icon. Set to false to hide the icon.',
+      table: {
+        category: 'Visual',
+        defaultValue: { summary: 'true' },
+        type: { summary: 'boolean' },
+      },
+    },
     message: {
       control: 'text',
       description: 'Alert message text passed via the default slot.',
@@ -51,12 +60,18 @@ const meta = {
   },
   args: {
     variant: 'info',
-    closable: false,
+    dismissible: false,
     open: true,
+    icon: true,
     message: 'Your session will expire in 15 minutes. Please save your work.',
   },
   render: (args) => html`
-    <hx-alert variant=${args.variant} ?closable=${args.closable} ?open=${args.open}>
+    <hx-alert
+      variant=${args.variant}
+      ?dismissible=${args.dismissible}
+      ?open=${args.open}
+      ?icon=${args.icon}
+    >
       ${args.message}
     </hx-alert>
   `,
@@ -179,17 +194,17 @@ export const Error: Story = {
 // 3. EVERY STATE
 // ─────────────────────────────────────────────────
 
-/** A closable alert with the dismiss button visible. */
-export const Closable: Story = {
+/** A dismissible alert with the dismiss button visible. */
+export const Dismissible: Story = {
   args: {
     variant: 'info',
-    closable: true,
+    dismissible: true,
     message:
       'New clinical guidelines for sepsis management are now available. Dismiss to acknowledge.',
   },
   play: async ({ canvasElement }) => {
     const alert = canvasElement.querySelector('hx-alert');
-    await expect(alert?.closable).toBe(true);
+    await expect(alert?.dismissible).toBe(true);
 
     const closeBtn = alert?.shadowRoot?.querySelector('[part="close-button"]');
     await expect(closeBtn).toBeTruthy();
@@ -197,17 +212,17 @@ export const Closable: Story = {
   },
 };
 
-/** A non-closable alert without a dismiss button. Used for persistent system messages. */
-export const NonClosable: Story = {
+/** A non-dismissible alert without a dismiss button. Used for persistent system messages. */
+export const NonDismissible: Story = {
   args: {
     variant: 'error',
-    closable: false,
+    dismissible: false,
     message:
       'CRITICAL: Electronic health record system is undergoing emergency maintenance. Do not enter new orders.',
   },
   play: async ({ canvasElement }) => {
     const alert = canvasElement.querySelector('hx-alert');
-    await expect(alert?.closable).toBe(false);
+    await expect(alert?.dismissible).toBe(false);
 
     const closeBtn = alert?.shadowRoot?.querySelector('[part="close-button"]');
     await expect(closeBtn).toBeNull();
@@ -264,7 +279,7 @@ export const WithCustomIcon: Story = {
 export const WithActions: Story = {
   render: () => html`
     <div style="max-width: 600px;">
-      <hx-alert variant="warning" closable>
+      <hx-alert variant="warning" dismissible>
         This patient has a pending lab result that may affect the current treatment plan. Review
         results before continuing.
         <button
@@ -346,20 +361,20 @@ export const AllVariants: Story = {
   },
 };
 
-/** All state combinations: closable, non-closable, with actions, with custom icon. */
+/** All state combinations: dismissible, non-dismissible, with actions, with custom icon. */
 export const AllStates: Story = {
   render: () => html`
     <div style="display: flex; flex-direction: column; gap: 1rem; max-width: 600px;">
       <hx-alert variant="info">
-        <strong>Default:</strong> Non-closable, no actions, default icon.
+        <strong>Default:</strong> Non-dismissible, no actions, default icon.
       </hx-alert>
 
-      <hx-alert variant="success" closable>
-        <strong>Closable:</strong> Vitals have been recorded. Click the X to dismiss this
+      <hx-alert variant="success" dismissible>
+        <strong>Dismissible:</strong> Vitals have been recorded. Click the X to dismiss this
         notification.
       </hx-alert>
 
-      <hx-alert variant="warning" closable>
+      <hx-alert variant="warning" dismissible>
         <strong>With actions:</strong> Abnormal lab value detected for BMP panel.
         <button
           slot="actions"
@@ -418,15 +433,15 @@ export const AllStates: Story = {
 export const StackedAlerts: Story = {
   render: () => html`
     <div style="display: flex; flex-direction: column; gap: 0.5rem; max-width: 600px;">
-      <hx-alert variant="error" closable>
+      <hx-alert variant="error" dismissible>
         <strong>Drug-Drug Interaction (Severity: Major):</strong> Warfarin + Aspirin. Increased risk
         of bleeding. Consider alternative antiplatelet therapy.
       </hx-alert>
-      <hx-alert variant="warning" closable>
+      <hx-alert variant="warning" dismissible>
         <strong>Drug-Allergy Interaction:</strong> Patient has documented sensitivity to
         Sulfonamides. Prescribed Sulfamethoxazole requires physician override.
       </hx-alert>
-      <hx-alert variant="warning" closable>
+      <hx-alert variant="warning" dismissible>
         <strong>Duplicate Therapy:</strong> Lisinopril 10mg is already active. New order for
         Enalapril 5mg may be a duplicate ACE inhibitor.
       </hx-alert>
@@ -443,9 +458,9 @@ export const StackedAlerts: Story = {
     // First alert should be the most severe
     await expect(alerts[0].variant).toBe('error');
 
-    // Closable alerts should have close buttons
-    const closableAlerts = canvasElement.querySelectorAll('hx-alert[closable]');
-    await expect(closableAlerts.length).toBe(3);
+    // Dismissible alerts should have close buttons
+    const dismissibleAlerts = canvasElement.querySelectorAll('hx-alert[dismissible]');
+    await expect(dismissibleAlerts.length).toBe(3);
   },
 };
 
@@ -453,7 +468,7 @@ export const StackedAlerts: Story = {
 export const InAContainer: Story = {
   render: () => html`
     <hx-container width="content" padding="md">
-      <hx-alert variant="warning" closable>
+      <hx-alert variant="warning" dismissible>
         <strong>System Maintenance:</strong> The radiology PACS system will be unavailable for
         scheduled maintenance on Saturday, February 21st from 02:00-06:00 EST. Please plan imaging
         workflows accordingly.
@@ -492,7 +507,7 @@ export const InAContainer: Story = {
 export const LongContent: Story = {
   render: () => html`
     <div style="max-width: 600px;">
-      <hx-alert variant="warning" closable>
+      <hx-alert variant="warning" dismissible>
         <strong>Clinical Decision Support Alert:</strong> Based on the patient's current medication
         list (Metformin 1000mg BID, Glipizide 10mg daily, Insulin Glargine 30 units at bedtime,
         Lisinopril 20mg daily, Amlodipine 5mg daily, Atorvastatin 40mg daily, Aspirin 81mg daily,
@@ -703,7 +718,7 @@ export const CSSCustomProperties: Story = {
         </p>
         <hx-alert
           variant="info"
-          closable
+          dismissible
           style="
             --hx-alert-bg: #1e1b4b;
             --hx-alert-color: #e0e7ff;
@@ -754,7 +769,7 @@ export const CSSCustomProperties: Story = {
     // Verify the fully-customized alert renders correctly
     const customAlert = alerts[6];
     await expect(customAlert).toBeTruthy();
-    await expect(customAlert.closable).toBe(true);
+    await expect(customAlert.dismissible).toBe(true);
   },
 };
 
@@ -807,7 +822,7 @@ export const CSSParts: Story = {
         <p style="margin: 0 0 0.5rem; font-weight: 600; font-size: 0.875rem;">
           All parts styled externally via ::part()
         </p>
-        <hx-alert variant="info" closable>
+        <hx-alert variant="info" dismissible>
           This alert has all 5 CSS parts styled externally:
           <code>::part(alert)</code>, <code>::part(icon)</code>, <code>::part(message)</code>,
           <code>::part(close-button)</code>, and <code>::part(actions)</code>.
@@ -903,11 +918,11 @@ hx-alert::part(actions) {
 // 9. INTERACTION TESTS
 // ─────────────────────────────────────────────────
 
-/** Verifies that clicking the close button hides the alert and fires the `hx-close` event. */
+/** Verifies that clicking the close button hides the alert and fires the `hx-dismiss` event. */
 export const CloseBehavior: Story = {
   render: () => html`
     <div style="max-width: 600px;">
-      <hx-alert variant="info" closable>
+      <hx-alert variant="info" dismissible>
         Click the close button to dismiss this medication reminder alert.
       </hx-alert>
     </div>
@@ -917,17 +932,17 @@ export const CloseBehavior: Story = {
     await expect(alert.open).toBe(true);
 
     // Set up event listener before clicking
-    let closeEventFired = false;
-    let closeEventDetail: Record<string, unknown> | null = null;
-    let afterCloseEventFired = false;
+    let dismissEventFired = false;
+    let dismissEventDetail: Record<string, unknown> | null = null;
+    let afterDismissEventFired = false;
 
-    alert.addEventListener('hx-close', ((e: CustomEvent) => {
-      closeEventFired = true;
-      closeEventDetail = e.detail;
+    alert.addEventListener('hx-dismiss', ((e: CustomEvent) => {
+      dismissEventFired = true;
+      dismissEventDetail = e.detail;
     }) as EventListener);
 
-    alert.addEventListener('hx-after-close', (() => {
-      afterCloseEventFired = true;
+    alert.addEventListener('hx-after-dismiss', (() => {
+      afterDismissEventFired = true;
     }) as EventListener);
 
     // Click the close button
@@ -942,12 +957,12 @@ export const CloseBehavior: Story = {
     await expect(alert.open).toBe(false);
     await expect(getComputedStyle(alert).display).toBe('none');
 
-    // Verify hx-close event fired with correct detail
-    await expect(closeEventFired).toBe(true);
-    await expect(closeEventDetail).toEqual({ reason: 'user' });
+    // Verify hx-dismiss event fired with correct detail
+    await expect(dismissEventFired).toBe(true);
+    await expect(dismissEventDetail).toEqual({ reason: 'user' });
 
-    // Verify hx-after-close event fired
-    await expect(afterCloseEventFired).toBe(true);
+    // Verify hx-after-dismiss event fired
+    await expect(afterDismissEventFired).toBe(true);
   },
 };
 
@@ -955,7 +970,7 @@ export const CloseBehavior: Story = {
 export const KeyboardDismiss: Story = {
   render: () => html`
     <div style="max-width: 600px;">
-      <hx-alert variant="warning" closable>
+      <hx-alert variant="warning" dismissible>
         Use Tab to focus the close button, then press Enter to dismiss this patient safety alert.
       </hx-alert>
     </div>
@@ -968,9 +983,9 @@ export const KeyboardDismiss: Story = {
     await expect(closeBtn).toBeTruthy();
 
     // Set up event listener
-    let closeEventFired = false;
-    alert.addEventListener('hx-close', (() => {
-      closeEventFired = true;
+    let dismissEventFired = false;
+    alert.addEventListener('hx-dismiss', (() => {
+      dismissEventFired = true;
     }) as EventListener);
 
     // Focus the close button directly (Tab behavior depends on browser focus management)
@@ -985,7 +1000,7 @@ export const KeyboardDismiss: Story = {
 
     // Verify dismissal
     await expect(alert.open).toBe(false);
-    await expect(closeEventFired).toBe(true);
+    await expect(dismissEventFired).toBe(true);
   },
 };
 
@@ -1050,7 +1065,7 @@ export const AriaRoles: Story = {
 export const DrugAllergyWarning: Story = {
   render: () => html`
     <div style="max-width: 600px;">
-      <hx-alert variant="error" closable>
+      <hx-alert variant="error" dismissible>
         <strong>ALLERGY ALERT - Penicillin (Anaphylaxis)</strong>
         <br />
         <span style="display: block; margin-top: 0.25rem;">
@@ -1107,8 +1122,8 @@ export const DrugAllergyWarning: Story = {
     await expect(container?.getAttribute('role')).toBe('alert');
     await expect(container?.getAttribute('aria-live')).toBe('assertive');
 
-    // Must be closable so clinicians can acknowledge
-    await expect(alert.closable).toBe(true);
+    // Must be dismissible so clinicians can acknowledge
+    await expect(alert.dismissible).toBe(true);
 
     // Must have action buttons for workflow
     const actions = alert.querySelectorAll('[slot="actions"]');
@@ -1147,7 +1162,7 @@ export const PatientSafetyStack: Story = {
           padding: 1rem;
         "
       >
-        <hx-alert variant="error" closable>
+        <hx-alert variant="error" dismissible>
           <strong>Fall Risk - High (Morse Score: 65):</strong> Patient has a history of falls within
           the past 90 days. Implement fall prevention protocol. Bed alarm must remain active.
         </hx-alert>
@@ -1157,7 +1172,7 @@ export const PatientSafetyStack: Story = {
           reviewed 2025-11-20 by attending. Do not remove this alert.
         </hx-alert>
 
-        <hx-alert variant="warning" closable>
+        <hx-alert variant="warning" dismissible>
           <strong>Isolation Precautions - Contact:</strong> Active MRSA colonization. Gown and
           gloves required for all direct patient contact.
           <button
@@ -1176,7 +1191,7 @@ export const PatientSafetyStack: Story = {
           </button>
         </hx-alert>
 
-        <hx-alert variant="warning" closable>
+        <hx-alert variant="warning" dismissible>
           <strong>Allergies (3):</strong> Penicillin (Anaphylaxis), Sulfonamides (Rash), Latex
           (Contact Dermatitis). Review allergy list before any procedure or medication
           administration.
@@ -1187,7 +1202,7 @@ export const PatientSafetyStack: Story = {
           Pre-authorization required for outpatient imaging.
         </hx-alert>
 
-        <hx-alert variant="success" closable>
+        <hx-alert variant="success" dismissible>
           <strong>Care Team Updated:</strong> Dr. Patricia Williams (Hospitalist) has been assigned
           as the attending physician for this encounter effective 2026-02-16 07:00 EST.
         </hx-alert>
@@ -1206,8 +1221,8 @@ export const PatientSafetyStack: Story = {
     await expect(alerts[4].variant).toBe('info');
     await expect(alerts[5].variant).toBe('success');
 
-    // The DNR/DNI alert (alerts[1]) must NOT be closable
-    await expect(alerts[1].closable).toBe(false);
+    // The DNR/DNI alert (alerts[1]) must NOT be dismissible
+    await expect(alerts[1].dismissible).toBe(false);
     const closeBtn = alerts[1].shadowRoot?.querySelector('[part="close-button"]');
     await expect(closeBtn).toBeNull();
 

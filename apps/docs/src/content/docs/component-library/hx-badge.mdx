@@ -11,35 +11,46 @@ import ComponentDoc from '../../../components/ComponentDoc.astro';
 
 <ComponentDoc tagName="hx-badge" section="summary" />
 
-## Variants
+## Overview
 
-Visual styles for different semantic contexts.
+`hx-badge` is a compact status indicator used to communicate semantic state, notification counts, or categorical labels. It supports seven color variants, three sizes, pill styling, an animated pulse effect, dismissible behavior, and a dot indicator mode for unread/alert states.
+
+**Use `hx-badge` when:** you need to annotate an item with a status label, display a notification count, or draw attention to a live state change.
+**Use `hx-tag` instead when:** the user needs to interact with or remove a filterable category label.
+
+## Live Demo
+
+### Variants
+
+Seven semantic color variants covering the full status range.
 
 <ComponentDemo title="Variants">
   <div style="display: flex; gap: 0.75rem; flex-wrap: wrap; align-items: center;">
     <hx-badge variant="primary">Primary</hx-badge>
+    <hx-badge variant="secondary">Secondary</hx-badge>
     <hx-badge variant="success">Success</hx-badge>
     <hx-badge variant="warning">Warning</hx-badge>
     <hx-badge variant="error">Error</hx-badge>
     <hx-badge variant="neutral">Neutral</hx-badge>
+    <hx-badge variant="info">Info</hx-badge>
   </div>
 </ComponentDemo>
 
-## Sizes
+### Sizes
 
 Small, medium, and large badge sizes.
 
 <ComponentDemo title="Sizes">
   <div style="display: flex; gap: 0.75rem; flex-wrap: wrap; align-items: center;">
-    <hx-badge hx-size="sm">Small</hx-badge>
-    <hx-badge hx-size="md">Medium</hx-badge>
-    <hx-badge hx-size="lg">Large</hx-badge>
+    <hx-badge size="sm">Small</hx-badge>
+    <hx-badge size="md">Medium</hx-badge>
+    <hx-badge size="lg">Large</hx-badge>
   </div>
 </ComponentDemo>
 
-## Pill Shape
+### Pill Shape
 
-Fully rounded pill badges.
+Fully rounded pill badges for softer visual treatments.
 
 <ComponentDemo title="Pill Shape">
   <div style="display: flex; gap: 0.75rem; flex-wrap: wrap; align-items: center;">
@@ -52,12 +63,15 @@ Fully rounded pill badges.
     <hx-badge variant="error" pill>
       Critical
     </hx-badge>
+    <hx-badge variant="info" pill>
+      Info
+    </hx-badge>
   </div>
 </ComponentDemo>
 
-## Pulse Animation
+### Pulse Animation
 
-Animated pulse effect for attention-demanding indicators.
+Animated pulse effect for live or attention-demanding indicators. Respects `prefers-reduced-motion`.
 
 <ComponentDemo title="Pulse Animation">
   <div style="display: flex; gap: 0.75rem; flex-wrap: wrap; align-items: center;">
@@ -72,6 +86,209 @@ Animated pulse effect for attention-demanding indicators.
     </hx-badge>
   </div>
 </ComponentDemo>
+
+### Dot Indicator
+
+When `pulse` is set and no slot content is provided, the badge renders as a minimal dot indicator. Use `dot-label` to provide an accessible label for screen readers.
+
+<ComponentDemo title="Dot Indicator">
+  <div style="display: flex; gap: 1rem; flex-wrap: wrap; align-items: center;">
+    <hx-badge variant="error" pulse dot-label="3 unread alerts"></hx-badge>
+    <hx-badge variant="success" pulse dot-label="System online"></hx-badge>
+    <hx-badge variant="warning" pulse dot-label="Degraded performance"></hx-badge>
+  </div>
+</ComponentDemo>
+
+### Notification Count
+
+Use the `count` and `max` properties to display a numeric count that automatically truncates to `${max}+` when exceeded.
+
+<ComponentDemo title="Notification Count">
+  <div style="display: flex; gap: 0.75rem; flex-wrap: wrap; align-items: center;">
+    <hx-badge variant="error" count="5"></hx-badge>
+    <hx-badge variant="error" count="42"></hx-badge>
+    <hx-badge variant="error" count="150" max="99"></hx-badge>
+    <hx-badge variant="primary" count="0"></hx-badge>
+  </div>
+</ComponentDemo>
+
+### Removable
+
+Add a dismiss button with `removable`. Provide context in `remove-label` for screen readers.
+
+<ComponentDemo title="Removable Badges">
+  <div style="display: flex; gap: 0.75rem; flex-wrap: wrap; align-items: center;">
+    <hx-badge variant="primary" removable remove-label="Remove Primary badge">
+      Primary
+    </hx-badge>
+    <hx-badge variant="error" removable remove-label="Remove Critical badge">
+      Critical
+    </hx-badge>
+    <hx-badge variant="neutral" removable remove-label="Remove Neutral badge">
+      Neutral
+    </hx-badge>
+  </div>
+</ComponentDemo>
+
+## Installation
+
+Install the full library or import the component individually:
+
+```bash
+# Full library
+npm install @helix/library
+
+# Or import only this component (tree-shaking friendly)
+import '@helix/library/components/hx-badge';
+```
+
+## Basic Usage
+
+Minimal HTML snippet — no build tool required:
+
+```html
+<hx-badge variant="success">Active</hx-badge>
+```
+
+## Properties
+
+| Property      | Attribute      | Type                                                                                   | Default     | Description                                                                                                             |
+| ------------- | -------------- | -------------------------------------------------------------------------------------- | ----------- | ----------------------------------------------------------------------------------------------------------------------- |
+| `variant`     | `variant`      | `'primary' \| 'secondary' \| 'success' \| 'warning' \| 'error' \| 'neutral' \| 'info'` | `'primary'` | Visual style variant that determines badge color scheme.                                                                |
+| `size`        | `size`         | `'sm' \| 'md' \| 'lg'`                                                                 | `'md'`      | Controls font size and padding.                                                                                         |
+| `pill`        | `pill`         | `boolean`                                                                              | `false`     | Applies fully rounded (pill) border-radius styling.                                                                     |
+| `pulse`       | `pulse`        | `boolean`                                                                              | `false`     | Enables an animated pulse effect. When set with no slot content, renders as a dot indicator.                            |
+| `removable`   | `removable`    | `boolean`                                                                              | `false`     | Renders a dismiss button inside the badge.                                                                              |
+| `count`       | `count`        | `number \| undefined`                                                                  | `undefined` | Numeric count to display. When `count` exceeds `max`, displays `${max}+`.                                               |
+| `max`         | `max`          | `number`                                                                               | `99`        | Maximum count value before truncation to `${max}+`.                                                                     |
+| `dotLabel`    | `dot-label`    | `string`                                                                               | `''`        | Accessible label for the dot indicator mode. Required for WCAG 4.1.2 when using the dot pattern (`pulse` + empty slot). |
+| `removeLabel` | `remove-label` | `string`                                                                               | `'Remove'`  | Accessible label for the remove button. Include context: e.g. `"Remove Critical badge"`.                                |
+
+## Events
+
+| Event       | Detail Type | Description                                                                         |
+| ----------- | ----------- | ----------------------------------------------------------------------------------- |
+| `hx-remove` | `void`      | Dispatched when the user clicks the remove button. `bubbles: true, composed: true`. |
+
+## CSS Custom Properties
+
+| Property                     | Default                          | Description                                                   |
+| ---------------------------- | -------------------------------- | ------------------------------------------------------------- |
+| `--hx-badge-bg`              | `var(--hx-color-primary-500)`    | Badge background color. Primary override point.               |
+| `--hx-badge-color`           | `var(--hx-color-neutral-0)`      | Badge text color. Primary override point.                     |
+| `--hx-badge-font-size`       | _(set per size variant)_         | Badge font size.                                              |
+| `--hx-badge-font-weight`     | `var(--hx-font-weight-semibold)` | Badge font weight.                                            |
+| `--hx-badge-font-family`     | `var(--hx-font-family-sans)`     | Badge font family.                                            |
+| `--hx-badge-border-radius`   | `var(--hx-border-radius-md)`     | Badge border radius. Overridden to `full` when `pill` is set. |
+| `--hx-badge-padding-x`       | _(set per size variant)_         | Badge horizontal padding.                                     |
+| `--hx-badge-padding-y`       | _(set per size variant)_         | Badge vertical padding.                                       |
+| `--hx-badge-pulse-color`     | _(variant background color)_     | Pulse ring color.                                             |
+| `--hx-badge-dot-size`        | `var(--hx-size-2)`               | Dot indicator diameter when in dot mode.                      |
+| `--hx-badge-secondary-bg`    | `var(--hx-color-neutral-100)`    | Background for the secondary variant.                         |
+| `--hx-badge-secondary-color` | `var(--hx-color-neutral-700)`    | Text color for the secondary variant.                         |
+| `--hx-badge-info-bg`         | `var(--hx-color-info-700)`       | Background for the info variant.                              |
+| `--hx-badge-info-color`      | `var(--hx-color-neutral-0)`      | Text color for the info variant.                              |
+
+## CSS Parts
+
+| Part            | Description                                                |
+| --------------- | ---------------------------------------------------------- |
+| `badge`         | The root `<span>` element wrapping all badge content.      |
+| `remove-button` | The dismiss `<button>` element (present when `removable`). |
+
+## Slots
+
+| Slot        | Description                                                                                             |
+| ----------- | ------------------------------------------------------------------------------------------------------- |
+| _(default)_ | Badge content — text, numbers, or inline elements. When empty with `pulse`, renders as a dot indicator. |
+| `prefix`    | Icon or content rendered before the badge text.                                                         |
+
+## Accessibility
+
+| Topic            | Details                                                                                                                                                                   |
+| ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| ARIA role        | No interactive role. The badge is a presentational `<span>` by default. When `dot-label` is set in dot mode, `role="img"` and `aria-label` are applied to the inner span. |
+| `aria-live`      | When `count` is set, `aria-live="polite"` is applied to the inner span so screen readers announce count updates.                                                          |
+| `aria-label`     | The remove button always has an accessible label via `remove-label` (defaults to `"Remove"`). Provide context: `remove-label="Remove Critical badge"`.                    |
+| Keyboard         | The remove button is a native `<button>` — responds to `Enter` and `Space` natively. No custom keyboard handling required.                                                |
+| Dot indicator    | When using the dot indicator pattern (`pulse` + empty slot), always set `dot-label` with a descriptive message for screen readers (e.g. `"3 unread alerts"`).             |
+| Reduced motion   | The pulse animation is suppressed when `prefers-reduced-motion: reduce` is active.                                                                                        |
+| Color contrast   | All variant color pairings meet WCAG 2.1 AA contrast ratio requirements (4.5:1 minimum for normal text).                                                                  |
+| Focus management | The remove button receives a visible `outline` focus ring via `:focus-visible`, styled with `--hx-focus-ring-width` and `--hx-focus-ring-color`.                          |
+
+## Drupal Integration
+
+Use the component in a Twig template after registering the library:
+
+```twig
+{# my-module/templates/my-template.html.twig #}
+<hx-badge
+  variant="{{ variant|default('primary') }}"
+  size="{{ size|default('md') }}"
+  {% if pill %}pill{% endif %}
+  {% if pulse %}pulse{% endif %}
+  {% if removable %}
+    removable
+    remove-label="{{ remove_label|default('Remove') }}"
+  {% endif %}
+  {% if count is defined %}count="{{ count }}"{% endif %}
+>
+  {{ label }}
+</hx-badge>
+```
+
+Load the library in your module's `.libraries.yml`:
+
+```yaml
+helix-components:
+  js:
+    /libraries/helix/helix.min.js: { minified: true }
+```
+
+## Standalone HTML Example
+
+Copy-paste this into a `.html` file and open it in a browser — no build tool needed:
+
+```html
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>hx-badge example</title>
+    <!-- @helix/library is a private package — install via npm workspace, not CDN -->
+    <!-- In your project: import '@helix/library'; in your bundler entry point -->
+  </head>
+  <body
+    style="font-family: sans-serif; padding: 2rem; display: flex; flex-direction: column; gap: 1rem;"
+  >
+    <!-- Status badges -->
+    <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center;">
+      <hx-badge variant="success">Active</hx-badge>
+      <hx-badge variant="warning">Pending</hx-badge>
+      <hx-badge variant="error" pulse count="3"></hx-badge>
+      <hx-badge variant="neutral" pill>Draft</hx-badge>
+    </div>
+
+    <!-- Removable badge -->
+    <hx-badge
+      variant="primary"
+      removable
+      remove-label="Remove filter: Critical"
+      id="removable-demo"
+    >
+      Critical
+    </hx-badge>
+
+    <script>
+      document.getElementById('removable-demo').addEventListener('hx-remove', (e) => {
+        console.log('Badge removed:', e);
+        e.target.remove();
+      });
+    </script>
+  </body>
+</html>
+```
 
 ## API Reference
 

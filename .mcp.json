@@ -1,34 +1,10 @@
 {
   "mcpServers": {
-    "github": {
-      "type": "http",
-      "url": "https://api.githubcopilot.com/mcp/"
-    },
-    "vercel": {
-      "type": "http",
-      "url": "https://mcp.vercel.com/mcp/"
-    },
-    "cem-analyzer": {
+    "wc-mcp": {
       "command": "node",
-      "args": ["/Volumes/Development/wc-2026/apps/mcp-servers/cem-analyzer/build/index.js"],
+      "args": ["/Volumes/Development/booked/wc-tools/build/src/index.js"],
       "env": {
-        "DEBUG": "mcp:*"
-      }
-    },
-    "health-scorer": {
-      "command": "node",
-      "args": ["/Volumes/Development/wc-2026/apps/mcp-servers/health-scorer/build/index.js"],
-      "env": {
-        "DEBUG": "mcp:*"
-      }
-    },
-    "typescript-diagnostics": {
-      "command": "node",
-      "args": [
-        "/Volumes/Development/wc-2026/apps/mcp-servers/typescript-diagnostics/build/index.js"
-      ],
-      "env": {
-        "DEBUG": "mcp:*"
+        "MCP_WC_PROJECT_ROOT": "/Volumes/Development/booked/helix"
       }
     }
   }

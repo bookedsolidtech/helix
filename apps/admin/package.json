@@ -5,29 +5,35 @@
   "description": "Panopticon Platform — WC-2026 Component Library",
   "scripts": {
     "dev": "next dev --port 3159 --turbopack",
-    "build": "next build",
+    "copy-helix-dist": "cp -r ../../packages/hx-library/dist/. ./public/helix/",
+    "build": "npm run copy-helix-dist && next build",
     "start": "next start --port 3159",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "type-check": "tsc --noEmit",
     "lint": "next lint"
   },
   "dependencies": {
+    "@helix/library": "*",
     "@helix/tokens": "*",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "lucide-react": "^0.511.0",
     "next": "^15.3.3",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "recharts": "^2.15.3",
-    "clsx": "^2.1.1",
-    "tailwind-merge": "^3.3.0",
-    "class-variance-authority": "^0.7.1",
-    "lucide-react": "^0.511.0",
-    "shiki": "^3.22.0"
+    "shiki": "^3.22.0",
+    "tailwind-merge": "^3.3.0"
   },
   "devDependencies": {
+    "@tailwindcss/postcss": "^4.1.8",
     "@types/node": "^22.15.0",
     "@types/react": "^19.1.0",
     "@types/react-dom": "^19.1.0",
+    "@vitest/coverage-v8": "^3.2.4",
+    "tailwindcss": "^4.1.8",
     "typescript": "^5.7.2",
-    "@tailwindcss/postcss": "^4.1.8",
-    "tailwindcss": "^4.1.8"
+    "vitest": "^3.2.4"
   }
 }

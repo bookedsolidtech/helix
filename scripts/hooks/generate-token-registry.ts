@@ -81,9 +81,7 @@ function categorizeToken(token: string): 'primitive' | 'semantic' | 'component' 
   }
 
   // Component tokens - specific component overrides
-  const componentPatterns = [
-    /^--hx-(?:input|button|card|modal|dropdown|tooltip)-/,
-  ];
+  const componentPatterns = [/^--hx-(?:input|button|card|modal|dropdown|tooltip)-/];
 
   for (const pattern of componentPatterns) {
     if (pattern.test(token)) {
@@ -104,9 +102,7 @@ function generatePatterns(tokens: string[]): string[] {
 
   // For efficiency with large token lists, create a single alternation pattern
   // Escape special regex characters in token names
-  const escapedTokens = tokens.map((t) =>
-    t.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&')
-  );
+  const escapedTokens = tokens.map((t) => t.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&'));
 
   // Create exact match pattern
   const pattern = `^(?:${escapedTokens.join('|')})$`;
@@ -181,14 +177,8 @@ export function writeRegistry(registry: TokenRegistry, outputPath: string): void
  * CLI entry point
  */
 async function main(): Promise<void> {
-  const tokensPath = join(
-    process.cwd(),
-    'packages/hx-tokens/dist/tokens.css'
-  );
-  const outputPath = join(
-    process.cwd(),
-    'scripts/hooks/token-registry.json'
-  );
+  const tokensPath = join(process.cwd(), 'packages/hx-tokens/dist/tokens.css');
+  const outputPath = join(process.cwd(), 'scripts/hooks/token-registry.json');
 
   console.log('[INFO] Generating token registry from source of truth...');
   console.log(`[INFO] Source: ${tokensPath}`);

@@ -14,12 +14,12 @@ const meta = {
   argTypes: {
     variant: {
       control: { type: 'select' },
-      options: ['primary', 'secondary', 'ghost'],
+      options: ['primary', 'secondary', 'tertiary', 'danger', 'ghost', 'outline'],
       description: 'Visual style variant of the button.',
       table: {
         category: 'Visual',
         defaultValue: { summary: 'primary' },
-        type: { summary: "'primary' | 'secondary' | 'ghost'" },
+        type: { summary: "'primary' | 'secondary' | 'tertiary' | 'danger' | 'ghost' | 'outline'" },
       },
     },
     size: {
@@ -41,6 +41,16 @@ const meta = {
         type: { summary: 'boolean' },
       },
     },
+    loading: {
+      control: 'boolean',
+      description:
+        'When true, shows an inline spinner and prevents double-click submission. The button remains in the DOM flow and retains its dimensions.',
+      table: {
+        category: 'State',
+        defaultValue: { summary: 'false' },
+        type: { summary: 'boolean' },
+      },
+    },
     type: {
       control: { type: 'select' },
       options: ['button', 'submit', 'reset'],
@@ -50,6 +60,40 @@ const meta = {
         category: 'Form',
         defaultValue: { summary: 'button' },
         type: { summary: "'button' | 'submit' | 'reset'" },
+      },
+    },
+    href: {
+      control: 'text',
+      description:
+        'When set, the component renders as an anchor (<a>) element instead of a <button>. Navigates to the given URL on click.',
+      table: {
+        category: 'Navigation',
+        type: { summary: 'string' },
+      },
+    },
+    target: {
+      control: 'text',
+      description:
+        'Anchor target attribute. Only applies when href is set. Use "_blank" to open in a new tab.',
+      table: {
+        category: 'Navigation',
+        type: { summary: 'string' },
+      },
+    },
+    name: {
+      control: 'text',
+      description: 'Form field name submitted with the form data.',
+      table: {
+        category: 'Form',
+        type: { summary: 'string' },
+      },
+    },
+    value: {
+      control: 'text',
+      description: 'Form field value submitted with the form data.',
+      table: {
+        category: 'Form',
+        type: { summary: 'string' },
       },
     },
     label: {
@@ -65,6 +109,7 @@ const meta = {
     variant: 'primary',
     size: 'md',
     disabled: false,
+    loading: false,
     type: 'button',
     label: 'Schedule Appointment',
   },
@@ -73,6 +118,7 @@ const meta = {
       variant=${args.variant}
       hx-size=${args.size}
       ?disabled=${args.disabled}
+      ?loading=${args.loading}
       type=${args.type}
     >
       ${args.label}
@@ -114,7 +160,7 @@ export const Default: Story = {
 };
 
 // ─────────────────────────────────────────────────
-// 2. VARIANT STORIES — Primary, Secondary, Ghost
+// 2. VARIANT STORIES — Primary, Secondary, Tertiary, Danger, Ghost, Outline
 // ─────────────────────────────────────────────────
 
 export const Primary: Story = {
@@ -131,10 +177,31 @@ export const Secondary: Story = {
   },
 };
 
+export const Tertiary: Story = {
+  args: {
+    variant: 'tertiary',
+    label: 'Options',
+  },
+};
+
+export const Danger: Story = {
+  args: {
+    variant: 'danger',
+    label: 'Delete Record',
+  },
+};
+
 export const Ghost: Story = {
   args: {
     variant: 'ghost',
     label: 'Cancel',
+  },
+};
+
+export const Outline: Story = {
+  args: {
+    variant: 'outline',
+    label: 'Export Report',
   },
 };
 
@@ -164,13 +231,30 @@ export const Large: Story = {
 };
 
 // ─────────────────────────────────────────────────
-// 4. STATE STORIES — Disabled
+// 4. STATE STORIES — Disabled, Loading
 // ─────────────────────────────────────────────────
 
 export const Disabled: Story = {
   args: {
     disabled: true,
     label: 'Unavailable',
+  },
+};
+
+export const Loading: Story = {
+  name: 'Loading',
+  args: {
+    loading: true,
+    label: 'Saving...',
+  },
+};
+
+export const LoadingDanger: Story = {
+  name: 'Loading (Danger)',
+  args: {
+    variant: 'danger',
+    loading: true,
+    label: 'Deleting...',
   },
 };
 
@@ -202,7 +286,252 @@ export const TypeReset: Story = {
 };
 
 // ─────────────────────────────────────────────────
-// 6. KITCHEN SINKS
+// 6. LINK / ANCHOR MODE
+// ─────────────────────────────────────────────────
+
+export const LinkDefault: Story = {
+  name: 'Link (Same Tab)',
+  render: () => html`
+    <hx-button variant="primary" href="https://example.com">Open Patient Portal</hx-button>
+  `,
+};
+
+export const LinkNewTab: Story = {
+  name: 'Link (New Tab)',
+  render: () => html`
+    <hx-button variant="secondary" href="https://example.com" target="_blank">
+      View Lab Results
+    </hx-button>
+  `,
+};
+
+export const LinkOutline: Story = {
+  name: 'Link (Outline variant)',
+  render: () => html`
+    <hx-button variant="outline" href="https://example.com" target="_blank">
+      Download Discharge Summary
+    </hx-button>
+  `,
+};
+
+// ─────────────────────────────────────────────────
+// 7. PREFIX / SUFFIX SLOT STORIES
+// ─────────────────────────────────────────────────
+
+export const WithPrefixSlot: Story = {
+  name: 'Prefix Slot (icon before label)',
+  render: () => html`
+    <div style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;">
+      <hx-button variant="primary">
+        <svg
+          slot="prefix"
+          xmlns="http://www.w3.org/2000/svg"
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+        >
+          <path d="M12 5v14M5 12h14" />
+        </svg>
+        Add Patient
+      </hx-button>
+
+      <hx-button variant="secondary">
+        <svg
+          slot="prefix"
+          xmlns="http://www.w3.org/2000/svg"
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+        >
+          <circle cx="11" cy="11" r="8" />
+          <line x1="21" y1="21" x2="16.65" y2="16.65" />
+        </svg>
+        Search Records
+      </hx-button>
+
+      <hx-button variant="danger">
+        <svg
+          slot="prefix"
+          xmlns="http://www.w3.org/2000/svg"
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+        >
+          <polyline points="3 6 5 6 21 6" />
+          <path d="M19 6l-1 14H6L5 6" />
+          <path d="M10 11v6M14 11v6" />
+          <path d="M9 6V4h6v2" />
+        </svg>
+        Delete Record
+      </hx-button>
+    </div>
+  `,
+};
+
+export const WithSuffixSlot: Story = {
+  name: 'Suffix Slot (icon after label)',
+  render: () => html`
+    <div style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;">
+      <hx-button variant="primary">
+        Continue
+        <svg
+          slot="suffix"
+          xmlns="http://www.w3.org/2000/svg"
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+        >
+          <path d="M5 12h14M12 5l7 7-7 7" />
+        </svg>
+      </hx-button>
+
+      <hx-button variant="outline">
+        Export
+        <svg
+          slot="suffix"
+          xmlns="http://www.w3.org/2000/svg"
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+        >
+          <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" />
+          <polyline points="7 10 12 15 17 10" />
+          <line x1="12" y1="15" x2="12" y2="3" />
+        </svg>
+      </hx-button>
+
+      <hx-button variant="ghost">
+        Open in Portal
+        <svg
+          slot="suffix"
+          xmlns="http://www.w3.org/2000/svg"
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+        >
+          <path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6" />
+          <polyline points="15 3 21 3 21 9" />
+          <line x1="10" y1="14" x2="21" y2="3" />
+        </svg>
+      </hx-button>
+    </div>
+  `,
+};
+
+export const WithPrefixAndSuffixSlots: Story = {
+  name: 'Prefix + Suffix Slots',
+  render: () => html`
+    <div style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;">
+      <hx-button variant="primary">
+        <svg
+          slot="prefix"
+          xmlns="http://www.w3.org/2000/svg"
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+        >
+          <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2M12 11a4 4 0 100-8 4 4 0 000 8z" />
+        </svg>
+        Assign Clinician
+        <svg
+          slot="suffix"
+          xmlns="http://www.w3.org/2000/svg"
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+        >
+          <polyline points="6 9 12 15 18 9" />
+        </svg>
+      </hx-button>
+
+      <hx-button variant="tertiary">
+        <svg
+          slot="prefix"
+          xmlns="http://www.w3.org/2000/svg"
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+        >
+          <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7" />
+          <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" />
+        </svg>
+        Edit Note
+        <svg
+          slot="suffix"
+          xmlns="http://www.w3.org/2000/svg"
+          width="14"
+          height="14"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+        >
+          <path d="M5 12h14M12 5l7 7-7 7" />
+        </svg>
+      </hx-button>
+    </div>
+  `,
+};
+
+// ─────────────────────────────────────────────────
+// 8. KITCHEN SINKS
 // ─────────────────────────────────────────────────
 
 export const AllVariants: Story = {
@@ -210,7 +539,10 @@ export const AllVariants: Story = {
     <div style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;">
       <hx-button variant="primary">Primary</hx-button>
       <hx-button variant="secondary">Secondary</hx-button>
+      <hx-button variant="tertiary">Tertiary</hx-button>
+      <hx-button variant="danger">Danger</hx-button>
       <hx-button variant="ghost">Ghost</hx-button>
+      <hx-button variant="outline">Outline</hx-button>
     </div>
   `,
 };
@@ -245,10 +577,25 @@ export const AllCombinations: Story = {
       <hx-button variant="secondary" hx-size="md">Secondary MD</hx-button>
       <hx-button variant="secondary" hx-size="lg">Secondary LG</hx-button>
 
+      <!-- Tertiary -->
+      <hx-button variant="tertiary" hx-size="sm">Tertiary SM</hx-button>
+      <hx-button variant="tertiary" hx-size="md">Tertiary MD</hx-button>
+      <hx-button variant="tertiary" hx-size="lg">Tertiary LG</hx-button>
+
+      <!-- Danger -->
+      <hx-button variant="danger" hx-size="sm">Danger SM</hx-button>
+      <hx-button variant="danger" hx-size="md">Danger MD</hx-button>
+      <hx-button variant="danger" hx-size="lg">Danger LG</hx-button>
+
       <!-- Ghost -->
       <hx-button variant="ghost" hx-size="sm">Ghost SM</hx-button>
       <hx-button variant="ghost" hx-size="md">Ghost MD</hx-button>
       <hx-button variant="ghost" hx-size="lg">Ghost LG</hx-button>
+
+      <!-- Outline -->
+      <hx-button variant="outline" hx-size="sm">Outline SM</hx-button>
+      <hx-button variant="outline" hx-size="md">Outline MD</hx-button>
+      <hx-button variant="outline" hx-size="lg">Outline LG</hx-button>
     </div>
   `,
 };
@@ -256,30 +603,48 @@ export const AllCombinations: Story = {
 export const AllStates: Story = {
   render: () => html`
     <div
-      style="display: grid; grid-template-columns: repeat(3, auto); gap: 1rem; align-items: center; justify-items: start;"
+      style="display: grid; grid-template-columns: repeat(6, auto); gap: 1rem; align-items: center; justify-items: start;"
     >
       <strong>Primary</strong>
       <strong>Secondary</strong>
+      <strong>Tertiary</strong>
+      <strong>Danger</strong>
       <strong>Ghost</strong>
+      <strong>Outline</strong>
 
       <!-- Default -->
       <hx-button variant="primary">Default</hx-button>
       <hx-button variant="secondary">Default</hx-button>
+      <hx-button variant="tertiary">Default</hx-button>
+      <hx-button variant="danger">Default</hx-button>
       <hx-button variant="ghost">Default</hx-button>
+      <hx-button variant="outline">Default</hx-button>
 
       <!-- Disabled -->
       <hx-button variant="primary" disabled>Disabled</hx-button>
       <hx-button variant="secondary" disabled>Disabled</hx-button>
+      <hx-button variant="tertiary" disabled>Disabled</hx-button>
+      <hx-button variant="danger" disabled>Disabled</hx-button>
       <hx-button variant="ghost" disabled>Disabled</hx-button>
+      <hx-button variant="outline" disabled>Disabled</hx-button>
+
+      <!-- Loading -->
+      <hx-button variant="primary" loading>Loading...</hx-button>
+      <hx-button variant="secondary" loading>Loading...</hx-button>
+      <hx-button variant="tertiary" loading>Loading...</hx-button>
+      <hx-button variant="danger" loading>Loading...</hx-button>
+      <hx-button variant="ghost" loading>Loading...</hx-button>
+      <hx-button variant="outline" loading>Loading...</hx-button>
     </div>
     <p style="margin-top: 1rem; font-size: 0.875rem; color: #6b7280;">
       Hover and focus states are visible on interaction. Disabled buttons render at reduced opacity.
+      Loading buttons show an inline spinner and suppress click events.
     </p>
   `,
 };
 
 // ─────────────────────────────────────────────────
-// 7. COMPOSITION STORIES
+// 9. COMPOSITION STORIES
 // ─────────────────────────────────────────────────
 
 export const ButtonGroup: Story = {
@@ -423,7 +788,7 @@ export const InACard: Story = {
 };
 
 // ─────────────────────────────────────────────────
-// 8. EDGE CASES
+// 10. EDGE CASES
 // ─────────────────────────────────────────────────
 
 export const LongLabel: Story = {
@@ -468,7 +833,7 @@ export const DisabledInteraction: Story = {
 };
 
 // ─────────────────────────────────────────────────
-// 9. CSS CUSTOM PROPERTIES DEMO
+// 11. CSS CUSTOM PROPERTIES DEMO
 // ─────────────────────────────────────────────────
 
 export const CSSCustomProperties: Story = {
@@ -548,7 +913,7 @@ hx-button {
 };
 
 // ─────────────────────────────────────────────────
-// 10. CSS PARTS DEMO
+// 12. CSS PARTS DEMO
 // ─────────────────────────────────────────────────
 
 export const CSSParts: Story = {
@@ -596,7 +961,7 @@ export const CSSParts: Story = {
 };
 
 // ─────────────────────────────────────────────────
-// 11. INTERACTION TESTS
+// 13. INTERACTION TESTS
 // ─────────────────────────────────────────────────
 
 export const ClickEvent: Story = {
@@ -738,7 +1103,7 @@ export const FocusRing: Story = {
 };
 
 // ─────────────────────────────────────────────────
-// 12. HEALTHCARE SCENARIOS
+// 14. HEALTHCARE SCENARIOS
 // ─────────────────────────────────────────────────
 
 export const PatientActions: Story = {
@@ -832,5 +1197,146 @@ export const EmergencyAction: Story = {
       </svg>
       Code Blue - Emergency Response
     </hx-button>
+  `,
+};
+
+export const DangerConfirmationFlow: Story = {
+  name: 'Danger — Confirmation Flow',
+  render: () => html`
+    <div
+      style="display: flex; flex-direction: column; gap: 1rem; max-width: 420px; padding: 1.5rem; border: 1px solid #fca5a5; border-radius: 0.5rem; background: #fff7f7;"
+    >
+      <p style="margin: 0; font-weight: 600; color: #991b1b;">
+        Permanently delete this patient record?
+      </p>
+      <p style="margin: 0; font-size: 0.875rem; color: #6b7280;">
+        This action cannot be undone. All associated notes, orders, and attachments will be removed.
+      </p>
+      <div style="display: flex; gap: 0.75rem;">
+        <hx-button variant="danger">Delete Record</hx-button>
+        <hx-button variant="ghost">Cancel</hx-button>
+      </div>
+    </div>
+  `,
+};
+
+export const LoadingSubmissionFlow: Story = {
+  name: 'Loading — Submission Flow',
+  render: () => html`
+    <div
+      style="display: flex; flex-direction: column; gap: 1rem; max-width: 360px; padding: 1.5rem; border: 1px solid #e5e7eb; border-radius: 0.5rem;"
+    >
+      <p style="margin: 0; font-weight: 600;">Submit Prior Authorization</p>
+      <p style="margin: 0; font-size: 0.875rem; color: #6b7280;">
+        Sending request to payer network. This may take a few seconds.
+      </p>
+      <div style="display: flex; gap: 0.75rem;">
+        <hx-button variant="primary" loading>Submitting...</hx-button>
+        <hx-button variant="ghost" disabled>Cancel</hx-button>
+      </div>
+    </div>
+  `,
+};
+
+export const OutlineInToolbar: Story = {
+  name: 'Outline — Toolbar Actions',
+  render: () => html`
+    <div
+      style="display: flex; gap: 0.5rem; padding: 0.75rem; background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 0.375rem;"
+      role="toolbar"
+      aria-label="Chart actions"
+    >
+      <hx-button variant="outline" hx-size="sm">
+        <svg
+          slot="prefix"
+          xmlns="http://www.w3.org/2000/svg"
+          width="14"
+          height="14"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+        >
+          <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" />
+          <polyline points="7 10 12 15 17 10" />
+          <line x1="12" y1="15" x2="12" y2="3" />
+        </svg>
+        Export
+      </hx-button>
+      <hx-button variant="outline" hx-size="sm">
+        <svg
+          slot="prefix"
+          xmlns="http://www.w3.org/2000/svg"
+          width="14"
+          height="14"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+        >
+          <polyline points="6 9 6 2 18 2 18 9" />
+          <path d="M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2" />
+          <rect x="6" y="14" width="12" height="8" />
+        </svg>
+        Print
+      </hx-button>
+      <hx-button variant="outline" hx-size="sm">
+        <svg
+          slot="prefix"
+          xmlns="http://www.w3.org/2000/svg"
+          width="14"
+          height="14"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+        >
+          <circle cx="18" cy="5" r="3" />
+          <circle cx="6" cy="12" r="3" />
+          <circle cx="18" cy="19" r="3" />
+          <line x1="8.59" y1="13.51" x2="15.42" y2="17.49" />
+          <line x1="15.41" y1="6.51" x2="8.59" y2="10.49" />
+        </svg>
+        Share
+      </hx-button>
+    </div>
+  `,
+};
+
+export const TertiaryOptionsMenu: Story = {
+  name: 'Tertiary — Options Pattern',
+  render: () => html`
+    <div
+      style="display: flex; gap: 0.5rem; align-items: center; padding: 1rem; background: #f9fafb; border-radius: 0.5rem;"
+    >
+      <hx-button variant="primary" hx-size="sm">Save Changes</hx-button>
+      <hx-button variant="tertiary" hx-size="sm">
+        More Options
+        <svg
+          slot="suffix"
+          xmlns="http://www.w3.org/2000/svg"
+          width="14"
+          height="14"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+        >
+          <polyline points="6 9 12 15 18 9" />
+        </svg>
+      </hx-button>
+    </div>
   `,
 };

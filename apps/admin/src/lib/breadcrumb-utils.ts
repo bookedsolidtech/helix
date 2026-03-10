@@ -19,6 +19,7 @@ const ROUTE_LABELS: Record<string, string> = {
   '/roadmap': 'Issue Tracker',
   '/architecture': 'Architecture',
   '/hooks': 'Hooks & MCP Servers',
+  '/mcp': 'MCP Server',
 };
 
 /**
@@ -34,6 +35,7 @@ export type BreadcrumbIconType =
   | 'roadmap'
   | 'architecture'
   | 'hooks'
+  | 'mcp'
   | 'component-tag';
 
 /**
@@ -70,6 +72,8 @@ function getIconTypeForRoute(
       return 'architecture';
     case '/hooks':
       return 'hooks';
+    case '/mcp':
+      return 'mcp';
     default:
       return undefined;
   }

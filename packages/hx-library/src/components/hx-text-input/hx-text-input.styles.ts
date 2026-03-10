@@ -91,9 +91,17 @@ export const helixTextInputStyles = css`
   .field__suffix {
     display: flex;
     align-items: center;
-    padding: 0 var(--hx-space-3, 0.75rem);
     color: var(--hx-color-neutral-500, #6c757d);
     flex-shrink: 0;
+  }
+
+  /* Only add padding when slot has content — avoids phantom space on empty slots */
+  .field__prefix--filled {
+    padding: 0 var(--hx-space-3, 0.75rem);
+  }
+
+  .field__suffix--filled {
+    padding: 0 var(--hx-space-3, 0.75rem);
   }
 
   /* ─── Native Input ─── */
@@ -120,6 +128,24 @@ export const helixTextInputStyles = css`
     cursor: not-allowed;
   }
 
+  /* ─── Size Variants ─── */
+
+  .field--size-sm .field__input {
+    padding: var(--hx-space-1, 0.25rem) var(--hx-space-2, 0.5rem);
+    min-height: var(--hx-size-8, 2rem);
+    font-size: var(--hx-input-sm-font-size, 0.875rem);
+  }
+
+  .field--size-md .field__input {
+    /* md is the default — no overrides needed */
+  }
+
+  .field--size-lg .field__input {
+    padding: var(--hx-space-3, 0.75rem) var(--hx-space-4, 1rem);
+    min-height: var(--hx-size-12, 3rem);
+    font-size: var(--hx-input-lg-font-size, 1.125rem);
+  }
+
   /* ─── Help Text & Error Messages ─── */
 
   .field__help-text {
@@ -132,5 +158,13 @@ export const helixTextInputStyles = css`
     font-size: var(--hx-font-size-xs, 0.75rem);
     color: var(--hx-input-error-color, var(--hx-color-error-500, #dc3545));
     line-height: var(--hx-line-height-normal, 1.5);
+  }
+
+  /* ─── Motion ─── */
+
+  @media (prefers-reduced-motion: reduce) {
+    .field__input-wrapper {
+      transition: none;
+    }
   }
 `;

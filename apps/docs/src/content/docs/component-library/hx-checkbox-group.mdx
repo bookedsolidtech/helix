@@ -1,0 +1,254 @@
+---
+title: 'hx-checkbox-group'
+description: Form-associated checkbox group with label, validation, help text, and multi-value form submission.
+---
+
+import ComponentLoader from '../../../components/ComponentLoader.astro';
+import ComponentDemo from '../../../components/ComponentDemo.astro';
+import ComponentDoc from '../../../components/ComponentDoc.astro';
+
+<ComponentLoader />
+
+<ComponentDoc tagName="hx-checkbox-group" section="summary" />
+
+## Overview
+
+`hx-checkbox-group` wraps a set of `<hx-checkbox>` elements in a semantically correct `<fieldset>` + `<legend>` structure, providing shared labelling, group-level validation, and multi-value form submission via `ElementInternals`. It automatically propagates `name` and `disabled` state to all child checkboxes, so Drupal and plain-HTML consumers do not need to repeat attributes on every option.
+
+**Use `hx-checkbox-group` when:** users must select zero or more options from a discrete set (e.g., notification channels, permissions, filter categories).
+**Use `hx-radio-group` instead when:** only one option may be selected at a time.
+
+## Live Demo
+
+### Vertical Layout (Default)
+
+Standard stacked layout — the default orientation for most form contexts.
+
+<ComponentDemo title="Vertical Layout">
+  <hx-checkbox-group label="Notification channels" name="channels">
+    <hx-checkbox value="email" label="Email"></hx-checkbox>
+    <hx-checkbox value="sms" label="SMS"></hx-checkbox>
+    <hx-checkbox value="push" label="Push notification"></hx-checkbox>
+  </hx-checkbox-group>
+</ComponentDemo>
+
+### Horizontal Layout
+
+Compact side-by-side layout for short option lists.
+
+<ComponentDemo title="Horizontal Layout">
+  <hx-checkbox-group label="Days available" name="days" orientation="horizontal">
+    <hx-checkbox value="mon" label="Mon"></hx-checkbox>
+    <hx-checkbox value="tue" label="Tue"></hx-checkbox>
+    <hx-checkbox value="wed" label="Wed"></hx-checkbox>
+    <hx-checkbox value="thu" label="Thu"></hx-checkbox>
+    <hx-checkbox value="fri" label="Fri"></hx-checkbox>
+  </hx-checkbox-group>
+</ComponentDemo>
+
+### Required with Validation Error
+
+Group-level `required` and `error` state with an accessible alert region.
+
+<ComponentDemo title="Validation">
+  <div style="display: grid; gap: 1.5rem; max-width: 400px;">
+    <hx-checkbox-group
+      label="Preferred contact method"
+      name="contact"
+      required
+      error="Please select at least one contact method."
+    >
+      <hx-checkbox value="email" label="Email"></hx-checkbox>
+      <hx-checkbox value="phone" label="Phone"></hx-checkbox>
+      <hx-checkbox value="mail" label="Mail"></hx-checkbox>
+    </hx-checkbox-group>
+  </div>
+</ComponentDemo>
+
+### Disabled State
+
+All child checkboxes inherit `disabled` from the group.
+
+<ComponentDemo title="Disabled">
+  <hx-checkbox-group label="Access permissions" name="permissions" disabled>
+    <hx-checkbox value="read" label="Read" checked></hx-checkbox>
+    <hx-checkbox value="write" label="Write"></hx-checkbox>
+    <hx-checkbox value="admin" label="Admin"></hx-checkbox>
+  </hx-checkbox-group>
+</ComponentDemo>
+
+### With Help Text
+
+Group-level help text via the `help` slot.
+
+<ComponentDemo title="With Help Text">
+  <hx-checkbox-group label="Appointment reminders" name="reminders">
+    <hx-checkbox value="24h" label="24 hours before"></hx-checkbox>
+    <hx-checkbox value="1h" label="1 hour before"></hx-checkbox>
+    <hx-checkbox value="15m" label="15 minutes before"></hx-checkbox>
+    <span slot="help">You will receive reminders for each selected interval.</span>
+  </hx-checkbox-group>
+</ComponentDemo>
+
+## Installation
+
+Install the full library or import the component individually:
+
+```bash
+# Full library
+npm install @helix/library
+
+# Or import only this component (tree-shaking friendly)
+import '@helix/library/components/hx-checkbox-group';
+```
+
+## Basic Usage
+
+Minimal HTML snippet — no build tool required:
+
+```html
+<hx-checkbox-group label="Notification channels" name="channels">
+  <hx-checkbox value="email" label="Email"></hx-checkbox>
+  <hx-checkbox value="sms" label="SMS"></hx-checkbox>
+  <hx-checkbox value="push" label="Push notification"></hx-checkbox>
+</hx-checkbox-group>
+```
+
+## Properties
+
+| Property      | Attribute     | Type                         | Default      | Description                                                                                  |
+| ------------- | ------------- | ---------------------------- | ------------ | -------------------------------------------------------------------------------------------- |
+| `name`        | `name`        | `string`                     | `''`         | Form submission name. Propagated automatically to all child `hx-checkbox` elements.          |
+| `label`       | `label`       | `string`                     | `''`         | Legend/label text for the group. Overridden by content in the `label` slot.                  |
+| `required`    | `required`    | `boolean`                    | `false`      | When `true`, at least one checkbox must be checked for the form to be valid.                 |
+| `disabled`    | `disabled`    | `boolean`                    | `false`      | Disables the entire group and propagates to all child checkboxes.                            |
+| `error`       | `error`       | `string`                     | `''`         | Error message text. When set, the group enters an error state with an `role="alert"` region. |
+| `orientation` | `orientation` | `'vertical' \| 'horizontal'` | `'vertical'` | Layout direction of the checkbox items. Reflects to host attribute for CSS targeting.        |
+
+## Events
+
+| Event       | Detail Type            | Description                                                                                                              |
+| ----------- | ---------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| `hx-change` | `{ values: string[] }` | Dispatched whenever any child checkbox changes. `values` contains all currently checked values. Bubbles and is composed. |
+
+## CSS Custom Properties
+
+| Property                          | Default                                | Description                     |
+| --------------------------------- | -------------------------------------- | ------------------------------- |
+| `--hx-checkbox-group-gap`         | `var(--hx-space-3, 0.75rem)`           | Gap between checkbox items.     |
+| `--hx-checkbox-group-label-color` | `var(--hx-color-neutral-700, #343a40)` | Label/legend text color.        |
+| `--hx-checkbox-group-error-color` | `var(--hx-color-error-500, #dc3545)`   | Error message and marker color. |
+
+## CSS Parts
+
+| Part            | Description                                              |
+| --------------- | -------------------------------------------------------- |
+| `group`         | The `<fieldset>` wrapper element.                        |
+| `label`         | The `<legend>` element containing the group label.       |
+| `help-text`     | The help text container `<div>`.                         |
+| `error-message` | The error message container `<div>` (rendered on error). |
+
+## Slots
+
+| Slot        | Description                                                                                 |
+| ----------- | ------------------------------------------------------------------------------------------- |
+| _(default)_ | `<hx-checkbox>` elements. The group manages name, disabled state, and form value for these. |
+| `label`     | Rich HTML group label. Overrides the `label` property when used.                            |
+| `error`     | Custom error content. Overrides the `error` property when used.                             |
+| `help`      | Group-level help text rendered below the checkbox list.                                     |
+
+## Accessibility
+
+`hx-checkbox-group` is built on the native `<fieldset>` + `<legend>` pattern, which provides the correct implicit ARIA grouping role without needing explicit `role="group"`. This is the WCAG 2.1 AA recommended approach for checkbox groups.
+
+| Topic          | Details                                                                                                                                                                                                          |
+| -------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| ARIA role      | `group` (implicit via `<fieldset>`). The `<legend>` provides the accessible group label.                                                                                                                         |
+| Required state | A visual `*` marker is rendered in the legend with `aria-hidden="true"`. The form constraint API (`ElementInternals`) signals invalidity — `aria-required` is **not** placed on the `<fieldset>` (C-PATTERN-03). |
+| Error          | Error messages appear in a `role="alert"` region linked via `aria-describedby` on the fieldset. Announced immediately on inject.                                                                                 |
+| Help text      | Help slot content is linked to the fieldset via `aria-describedby` when the slot is populated.                                                                                                                   |
+| Keyboard       | `Tab` moves focus between checkboxes; `Space` toggles the focused checkbox.                                                                                                                                      |
+| Screen reader  | Group label is announced before each checkbox (via `<legend>`). Error is announced via live region.                                                                                                              |
+| Focus          | Focus is not managed by the group — each `hx-checkbox` manages its own focus indicator.                                                                                                                          |
+| Disabled       | `disabled` on the group disables all child checkboxes. The host element receives `[disabled]` for CSS targeting.                                                                                                 |
+
+## Drupal Integration
+
+Use the component in a Twig template after registering the Helix library:
+
+```twig
+{# my-module/templates/my-template.html.twig #}
+
+<hx-checkbox-group
+  name="{{ field_name }}"
+  label="{{ label }}"
+  {{ required ? 'required' : '' }}
+  {{ error ? 'error="' ~ error ~ '"' : '' }}
+>
+  {% for option in options %}
+    <hx-checkbox
+      value="{{ option.value }}"
+      label="{{ option.label }}"
+      {{ option.checked ? 'checked' : '' }}
+    ></hx-checkbox>
+  {% endfor %}
+</hx-checkbox-group>
+```
+
+The `name` attribute propagates automatically to child checkboxes — no Drupal behavior required.
+
+Load the library in your module's `.libraries.yml`:
+
+```yaml
+helix-components:
+  js:
+    /libraries/helix/helix.min.js: { minified: true }
+```
+
+## Standalone HTML Example
+
+Copy-paste this into a `.html` file and open it in a browser — no build tool needed:
+
+```html
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>hx-checkbox-group example</title>
+    <!-- @helix/library is a private package — install via npm workspace, not CDN -->
+    <!-- In your project: import '@helix/library'; in your bundler entry point -->
+  </head>
+  <body style="font-family: sans-serif; padding: 2rem; max-width: 480px;">
+    <form id="preferences-form">
+      <hx-checkbox-group id="channels" label="Notification channels" name="channels" required>
+        <hx-checkbox value="email" label="Email" checked></hx-checkbox>
+        <hx-checkbox value="sms" label="SMS"></hx-checkbox>
+        <hx-checkbox value="push" label="Push notification"></hx-checkbox>
+        <span slot="help">Select all channels you want to receive alerts on.</span>
+      </hx-checkbox-group>
+
+      <br />
+      <button type="submit" style="margin-top: 1rem;">Save preferences</button>
+    </form>
+
+    <script>
+      const group = document.getElementById('channels');
+
+      group.addEventListener('hx-change', (e) => {
+        console.log('Selected values:', e.detail.values);
+      });
+
+      document.getElementById('preferences-form').addEventListener('submit', (e) => {
+        e.preventDefault();
+        const data = new FormData(e.target);
+        console.log('Form values:', data.getAll('channels'));
+      });
+    </script>
+  </body>
+</html>
+```
+
+## API Reference
+
+<ComponentDoc tagName="hx-checkbox-group" section="api" />

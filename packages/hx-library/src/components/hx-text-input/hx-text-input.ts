@@ -6,8 +6,14 @@ import { live } from 'lit/directives/live.js';
 import { tokenStyles } from '@helix/tokens/lit';
 import { helixTextInputStyles } from './hx-text-input.styles.js';
 
+// Module-level counter for stable, SSR-compatible IDs (avoids Math.random() hydration mismatch)
+let _hxTextInputIdCounter = 0;
+
 /**
  * A text input component with label, validation, and form association.
+ * Supports accessible labeling via `label` property, `aria-label` attribute, or the `label` slot.
+ * Uses `aria-invalid`, `aria-describedby`, and `aria-required` on the native input for screen reader support.
+ * Error messages are announced via `role="alert"`. Keyboard navigation follows native input behavior.
  *
  * @summary Form-associated text input with built-in label, error, and help text.
  *
@@ -37,6 +43,8 @@ import { helixTextInputStyles } from './hx-text-input.styles.js';
  * @cssprop [--hx-input-focus-ring-color=var(--hx-focus-ring-color)] - Focus ring color.
  * @cssprop [--hx-input-error-color=var(--hx-color-error-500)] - Error state color.
  * @cssprop [--hx-input-label-color=var(--hx-color-neutral-700)] - Label text color.
+ * @cssprop [--hx-input-sm-font-size=0.875rem] - Font size for the sm size variant.
+ * @cssprop [--hx-input-lg-font-size=1.125rem] - Font size for the lg size variant.
  */
 @customElement('hx-text-input')
 export class HelixTextInput extends LitElement {
@@ -44,8 +52,10 @@ export class HelixTextInput extends LitElement {
 
   // ─── Form Association ───
 
+  /** @internal */
   static formAssociated = true;
 
+  /** @internal */
   private _internals: ElementInternals;
 
   constructor() {
@@ -81,7 +91,7 @@ export class HelixTextInput extends LitElement {
    * @attr type
    */
   @property({ type: String })
-  type: 'text' | 'email' | 'password' | 'tel' | 'url' | 'search' | 'number' = 'text';
+  type: 'text' | 'email' | 'password' | 'tel' | 'url' | 'search' | 'number' | 'date' = 'text';
 
   /**
    * Whether the input is required for form submission.
@@ -125,16 +135,68 @@ export class HelixTextInput extends LitElement {
   @property({ type: String, attribute: 'aria-label' })
   override ariaLabel: string | null = null;
 
+  /**
+   * Whether the input is read-only.
+   * @attr readonly
+   */
+  @property({ type: Boolean, reflect: true })
+  readonly = false;
+
+  /**
+   * Minimum number of characters allowed.
+   * @attr minlength
+   */
+  @property({ type: Number })
+  minlength: number | undefined = undefined;
+
+  /**
+   * Maximum number of characters allowed.
+   * @attr maxlength
+   */
+  @property({ type: Number })
+  maxlength: number | undefined = undefined;
+
+  /**
+   * A regular expression pattern the value must match for form validation.
+   * @attr pattern
+   */
+  @property({ type: String })
+  pattern = '';
+
+  /**
+   * Hint for the browser's autocomplete feature. Accepts standard HTML autocomplete values.
+   * @attr autocomplete
+   */
+  @property({ type: String })
+  autocomplete = '';
+
+  /**
+   * Visual size of the input field.
+   * @attr hx-size
+   */
+  @property({ type: String, attribute: 'hx-size', reflect: true })
+  hxSize: 'sm' | 'md' | 'lg' = 'md';
+
   // ─── Internal References ───
 
+  /** @internal */
   @query('.field__input')
   private _input!: HTMLInputElement;
 
   // ─── Slot Tracking ───
 
+  /** @internal */
   private _hasLabelSlot = false;
+  /** @internal */
   private _hasErrorSlot = false;
+  /** @internal */
+  private _hasPrefixSlot = false;
+  /** @internal */
+  private _hasSuffixSlot = false;
+  /** @internal */
+  private _hasHelpTextSlot = false;
 
+  /** @internal */
   private _handleLabelSlotChange(e: Event): void {
     const slot = e.target as HTMLSlotElement;
     this._hasLabelSlot = slot.assignedElements().length > 0;
@@ -147,9 +209,31 @@ export class HelixTextInput extends LitElement {
     this.requestUpdate();
   }
 
+  /** @internal */
   private _handleErrorSlotChange(e: Event): void {
     const slot = e.target as HTMLSlotElement;
     this._hasErrorSlot = slot.assignedElements().length > 0;
+    this.requestUpdate();
+  }
+
+  /** @internal */
+  private _handlePrefixSlotChange(e: Event): void {
+    const slot = e.target as HTMLSlotElement;
+    this._hasPrefixSlot = slot.assignedElements().length > 0;
+    this.requestUpdate();
+  }
+
+  /** @internal */
+  private _handleSuffixSlotChange(e: Event): void {
+    const slot = e.target as HTMLSlotElement;
+    this._hasSuffixSlot = slot.assignedElements().length > 0;
+    this.requestUpdate();
+  }
+
+  /** @internal */
+  private _handleHelpTextSlotChange(e: Event): void {
+    const slot = e.target as HTMLSlotElement;
+    this._hasHelpTextSlot = slot.assignedElements().length > 0;
     this.requestUpdate();
   }
 
@@ -159,6 +243,13 @@ export class HelixTextInput extends LitElement {
     super.updated(changedProperties);
     if (changedProperties.has('value')) {
       this._internals.setFormValue(this.value);
+    }
+    if (
+      changedProperties.has('value') ||
+      changedProperties.has('required') ||
+      changedProperties.has('minlength') ||
+      changedProperties.has('maxlength')
+    ) {
       this._updateValidity();
     }
   }
@@ -190,11 +281,28 @@ export class HelixTextInput extends LitElement {
     return this._internals.reportValidity();
   }
 
+  /** @internal */
   private _updateValidity(): void {
     if (this.required && !this.value) {
       this._internals.setValidity(
         { valueMissing: true },
         this.error || 'This field is required.',
+        this._input,
+      );
+    } else if (
+      this.minlength !== undefined &&
+      this.value.length > 0 &&
+      this.value.length < this.minlength
+    ) {
+      this._internals.setValidity(
+        { tooShort: true },
+        this.error || `Please lengthen this text to ${this.minlength} characters or more.`,
+        this._input,
+      );
+    } else if (this.maxlength !== undefined && this.value.length > this.maxlength) {
+      this._internals.setValidity(
+        { tooLong: true },
+        this.error || `Please shorten this text to ${this.maxlength} characters or fewer.`,
         this._input,
       );
     } else {
@@ -215,6 +323,7 @@ export class HelixTextInput extends LitElement {
 
   // ─── Event Handling ───
 
+  /** @internal */
   private _handleInput(e: Event): void {
     const target = e.target as HTMLInputElement;
     this.value = target.value;
@@ -233,6 +342,7 @@ export class HelixTextInput extends LitElement {
     );
   }
 
+  /** @internal */
   private _handleChange(e: Event): void {
     const target = e.target as HTMLInputElement;
     this.value = target.value;
@@ -266,8 +376,11 @@ export class HelixTextInput extends LitElement {
 
   // ─── Render ───
 
-  private _inputId = `hx-text-input-${Math.random().toString(36).slice(2, 9)}`;
+  /** @internal */
+  private _inputId = `hx-text-input-${++_hxTextInputIdCounter}`;
+  /** @internal */
   private _helpTextId = `${this._inputId}-help`;
+  /** @internal */
   private _errorId = `${this._inputId}-error`;
 
   override render() {
@@ -278,10 +391,14 @@ export class HelixTextInput extends LitElement {
       'field--error': hasError,
       'field--disabled': this.disabled,
       'field--required': this.required,
+      [`field--size-${this.hxSize}`]: true,
     };
 
     const describedBy =
-      [hasError ? this._errorId : null, this.helpText ? this._helpTextId : null]
+      [
+        hasError ? this._errorId : null,
+        this.helpText || this._hasHelpTextSlot ? this._helpTextId : null,
+      ]
         .filter(Boolean)
         .join(' ') || undefined;
 
@@ -303,8 +420,13 @@ export class HelixTextInput extends LitElement {
         </div>
 
         <div part="input-wrapper" class="field__input-wrapper">
-          <span class="field__prefix">
-            <slot name="prefix"></slot>
+          <span
+            class=${classMap({
+              field__prefix: true,
+              'field__prefix--filled': this._hasPrefixSlot,
+            })}
+          >
+            <slot name="prefix" @slotchange=${this._handlePrefixSlotChange}></slot>
           </span>
 
           <input
@@ -316,46 +438,48 @@ export class HelixTextInput extends LitElement {
             placeholder=${ifDefined(this.placeholder || undefined)}
             ?required=${this.required}
             ?disabled=${this.disabled}
+            ?readonly=${this.readonly}
             name=${ifDefined(this.name || undefined)}
-            aria-label=${ifDefined(this.ariaLabel ?? undefined)}
+            minlength=${ifDefined(this.minlength)}
+            maxlength=${ifDefined(this.maxlength)}
+            pattern=${ifDefined(this.pattern || undefined)}
+            autocomplete=${ifDefined(this.autocomplete || undefined)}
+            aria-label=${ifDefined(this.ariaLabel || undefined)}
             aria-labelledby=${ifDefined(
               this._hasLabelSlot ? `${this._inputId}-slotted-label` : undefined,
             )}
             aria-invalid=${hasError ? 'true' : nothing}
             aria-describedby=${ifDefined(describedBy)}
-            aria-required=${this.required ? 'true' : nothing}
             @input=${this._handleInput}
             @change=${this._handleChange}
           />
 
-          <span class="field__suffix">
-            <slot name="suffix"></slot>
+          <span
+            class=${classMap({
+              field__suffix: true,
+              'field__suffix--filled': this._hasSuffixSlot,
+            })}
+          >
+            <slot name="suffix" @slotchange=${this._handleSuffixSlotChange}></slot>
           </span>
         </div>
 
-        <slot name="error" @slotchange=${this._handleErrorSlotChange}>
-          ${this.error
-            ? html`
-                <div
-                  part="error"
-                  class="field__error"
-                  id=${this._errorId}
-                  role="alert"
-                  aria-live="polite"
-                >
-                  ${this.error}
-                </div>
-              `
-            : nothing}
-        </slot>
-
-        ${this.helpText && !hasError
+        ${hasError
           ? html`
-              <div part="help-text" class="field__help-text" id=${this._helpTextId}>
-                <slot name="help-text">${this.helpText}</slot>
+              <div part="error" class="field__error" id=${this._errorId} role="alert">
+                <slot name="error" @slotchange=${this._handleErrorSlotChange}> ${this.error} </slot>
               </div>
             `
-          : nothing}
+          : html`<slot name="error" @slotchange=${this._handleErrorSlotChange}></slot>`}
+        ${(this.helpText || this._hasHelpTextSlot) && !hasError
+          ? html`
+              <div part="help-text" class="field__help-text" id=${this._helpTextId}>
+                <slot name="help-text" @slotchange=${this._handleHelpTextSlotChange}>
+                  ${this.helpText}
+                </slot>
+              </div>
+            `
+          : html`<slot name="help-text" @slotchange=${this._handleHelpTextSlotChange}></slot>`}
       </div>
     `;
   }
@@ -366,3 +490,9 @@ declare global {
     'hx-text-input': HelixTextInput;
   }
 }
+
+/** Primary type alias for hx-text-input */
+export type HxTextInput = HelixTextInput;
+
+/** @deprecated Use HxTextInput instead */
+export type WcTextInput = HelixTextInput;

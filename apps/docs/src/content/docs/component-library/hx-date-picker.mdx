@@ -1,0 +1,293 @@
+---
+title: 'hx-date-picker'
+description: Form-associated date picker with calendar popup, keyboard grid navigation, min/max constraints, and WCAG 2.1 AA accessibility.
+---
+
+import ComponentLoader from '../../../components/ComponentLoader.astro';
+import ComponentDemo from '../../../components/ComponentDemo.astro';
+import ComponentDoc from '../../../components/ComponentDoc.astro';
+
+<ComponentLoader />
+
+<ComponentDoc tagName="hx-date-picker" section="summary" />
+
+## Overview
+
+`hx-date-picker` is a fully accessible calendar-based date input for Helix. It opens a month-view calendar popup with full keyboard grid navigation (arrow keys, Page Up/Down, Home/End), participates in native HTML forms via `ElementInternals`, and enforces min/max date constraints. Dates are stored internally as ISO 8601 strings (`YYYY-MM-DD`) and displayed using locale-aware formatting.
+
+**Use `hx-date-picker` when:** the user must select a specific calendar date — appointments, discharge dates, date of birth, or any date-constrained healthcare field.
+**Prefer a plain `<input type="date">` instead when:** the UI is minimal and native browser date picker behavior is sufficient and no custom styling or healthcare-grade validation is required.
+
+## Live Demo
+
+### Basic
+
+Simple date picker with a label.
+
+<ComponentDemo title="Basic">
+  <div style="display: grid; gap: 1.5rem; max-width: 360px;">
+    <hx-date-picker label="Appointment date"></hx-date-picker>
+    <hx-date-picker label="Discharge date" value="2026-04-15"></hx-date-picker>
+  </div>
+</ComponentDemo>
+
+### States
+
+Required, error, disabled, and help text states.
+
+<ComponentDemo title="States">
+  <div style="display: grid; gap: 1.5rem; max-width: 360px;">
+    <hx-date-picker label="Date of birth" required></hx-date-picker>
+    <hx-date-picker label="Appointment date" error="Please select a valid date."></hx-date-picker>
+    <hx-date-picker label="Discharge date" disabled value="2026-03-01"></hx-date-picker>
+    <hx-date-picker
+      label="Follow-up date"
+      help-text="Select a date within the next 30 days."
+    ></hx-date-picker>
+  </div>
+</ComponentDemo>
+
+### Date Constraints
+
+Use `min` and `max` to restrict the selectable range.
+
+The dates below are illustrative examples.
+
+<ComponentDemo title="Date Constraints">
+  <div style="display: grid; gap: 1.5rem; max-width: 360px;">
+    <hx-date-picker
+      label="Appointment (example constrained range)"
+      min="2026-03-09"
+      max="2026-06-07"
+    ></hx-date-picker>
+    <hx-date-picker
+      label="Date of birth (example max date)"
+      max="2008-03-09"
+      format="MM/DD/YYYY"
+    ></hx-date-picker>
+  </div>
+</ComponentDemo>
+
+### Locale Variants
+
+Set the `locale` attribute to display dates in regional formats.
+
+<ComponentDemo title="Locale Variants">
+  <div style="display: grid; gap: 1.5rem; max-width: 360px;">
+    <hx-date-picker
+      label="en-US"
+      locale="en-US"
+      value="2026-03-15"
+      format="MM/DD/YYYY"
+    ></hx-date-picker>
+    <hx-date-picker
+      label="en-GB"
+      locale="en-GB"
+      value="2026-03-15"
+      format="DD/MM/YYYY"
+    ></hx-date-picker>
+    <hx-date-picker
+      label="de-DE"
+      locale="de-DE"
+      value="2026-03-15"
+      format="DD.MM.YYYY"
+    ></hx-date-picker>
+  </div>
+</ComponentDemo>
+
+## Installation
+
+```bash
+# Full library
+npm install @helix/library
+
+# Or import only this component (tree-shaking friendly)
+import '@helix/library/components/hx-date-picker';
+```
+
+## Basic Usage
+
+```html
+<hx-date-picker name="appointment" label="Appointment date" required></hx-date-picker>
+```
+
+## Properties
+
+| Property   | Attribute   | Type      | Default        | Description                                                                            |
+| ---------- | ----------- | --------- | -------------- | -------------------------------------------------------------------------------------- |
+| `value`    | `value`     | `string`  | `''`           | Current value as an ISO 8601 date string (e.g. `2026-03-04`).                          |
+| `name`     | `name`      | `string`  | `''`           | Form field name used during form submission.                                           |
+| `label`    | `label`     | `string`  | `''`           | Visible label text. Override with the `label` slot.                                    |
+| `min`      | `min`       | `string`  | `''`           | Minimum selectable date as an ISO 8601 string. Days before this are disabled.          |
+| `max`      | `max`       | `string`  | `''`           | Maximum selectable date as an ISO 8601 string. Days after this are disabled.           |
+| `required` | `required`  | `boolean` | `false`        | Marks the field as required for form submission. Shows `*` marker.                     |
+| `disabled` | `disabled`  | `boolean` | `false`        | Prevents all interaction and disables the calendar trigger.                            |
+| `error`    | `error`     | `string`  | `''`           | Error message. When set, the field enters error state. Override with the `error` slot. |
+| `helpText` | `help-text` | `string`  | `''`           | Guidance text displayed below the field. Hidden when `error` is set.                   |
+| `format`   | `format`    | `string`  | `'MM/DD/YYYY'` | Placeholder format hint shown in the text input when no date is selected.              |
+| `locale`   | `locale`    | `string`  | `'en-US'`      | Locale string used for display formatting (e.g. `en-GB`, `de-DE`, `fr-FR`).            |
+
+## Events
+
+| Event       | Detail Type                             | Description                                                                             |
+| ----------- | --------------------------------------- | --------------------------------------------------------------------------------------- |
+| `hx-change` | `{ value: string, date: Date \| null }` | Fired when the user selects a date. `value` is the ISO string. Bubbles and is composed. |
+
+## CSS Custom Properties
+
+| Property                                 | Default                                                          | Description                             |
+| ---------------------------------------- | ---------------------------------------------------------------- | --------------------------------------- |
+| `--hx-date-picker-bg`                    | `var(--hx-color-neutral-0)`                                      | Input background color.                 |
+| `--hx-date-picker-color`                 | `var(--hx-color-neutral-800)`                                    | Input text color.                       |
+| `--hx-date-picker-border-color`          | `var(--hx-color-neutral-300)`                                    | Input border color.                     |
+| `--hx-date-picker-border-radius`         | `var(--hx-border-radius-md)`                                     | Input border radius.                    |
+| `--hx-date-picker-font-family`           | `var(--hx-font-family-sans)`                                     | Font family for input and calendar.     |
+| `--hx-date-picker-focus-ring-color`      | `var(--hx-focus-ring-color)`                                     | Focus ring color on the trigger button. |
+| `--hx-date-picker-error-color`           | `var(--hx-color-error-500)`                                      | Error state border and text color.      |
+| `--hx-date-picker-label-color`           | `var(--hx-color-neutral-700)`                                    | Label text color.                       |
+| `--hx-date-picker-trigger-color`         | `var(--hx-color-neutral-500)`                                    | Calendar icon button color.             |
+| `--hx-date-picker-calendar-bg`           | `var(--hx-color-neutral-0)`                                      | Calendar popup background color.        |
+| `--hx-date-picker-calendar-border-color` | `var(--hx-color-neutral-200)`                                    | Calendar popup border color.            |
+| `--hx-date-picker-calendar-min-width`    | `18rem`                                                          | Calendar popup minimum width.           |
+| `--hx-date-picker-selected-bg`           | `var(--hx-color-primary-500)`                                    | Selected day button background.         |
+| `--hx-date-picker-selected-color`        | `var(--hx-color-neutral-0)`                                      | Selected day button text color.         |
+| `--hx-date-picker-today-color`           | `var(--hx-color-primary-600)`                                    | Today indicator text color.             |
+| `--hx-date-picker-calendar-shadow`       | `0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -2px rgba(0,0,0,0.1)` | Calendar popup box shadow.              |
+
+## CSS Parts
+
+| Part            | Description                                              |
+| --------------- | -------------------------------------------------------- |
+| `field`         | The outer field container `<div>`.                       |
+| `label`         | The `<label>` element.                                   |
+| `input-wrapper` | The wrapper `<div>` around the input and trigger button. |
+| `input`         | The readonly text input displaying the formatted date.   |
+| `trigger`       | The calendar icon `<button>`.                            |
+| `calendar`      | The calendar popup `<div>` (role="dialog").              |
+| `month-nav`     | The month navigation header bar.                         |
+| `day`           | An individual day `<button>` in the calendar grid.       |
+| `help-text`     | The help text container `<div>`.                         |
+| `error`         | The error message container `<div>`.                     |
+
+## Slots
+
+| Slot    | Description                                                                                  |
+| ------- | -------------------------------------------------------------------------------------------- |
+| `label` | Custom label content. Overrides the `label` property. Useful for rich label markup.          |
+| `help`  | Custom help text content. Overrides the `help-text` property.                                |
+| `error` | Custom error content. Overrides the `error` property. Accepts rich HTML for Drupal patterns. |
+
+## Accessibility
+
+| Topic              | Details                                                                                                            |
+| ------------------ | ------------------------------------------------------------------------------------------------------------------ |
+| ARIA role          | The calendar popup uses `role="dialog"` with `aria-modal="true"` and `aria-label="Choose a date"`.                 |
+| Grid navigation    | The day grid uses `role="grid"` with `role="row"` / `role="gridcell"` per the ARIA APG date picker pattern.        |
+| Keyboard           | Arrow keys move day focus; `PageUp`/`PageDown` change month; `Home`/`End` move to week edges; `Escape` closes.     |
+| `aria-invalid`     | Set to `"true"` on the text input automatically when the `error` property or slot is set.                          |
+| `aria-describedby` | Wired to the error container when `error` is set; otherwise to the help text container.                            |
+| `aria-required`    | Set to `"true"` on the text input when `required` is `true`.                                                       |
+| `aria-haspopup`    | Set to `"dialog"` on both the text input and the trigger button.                                                   |
+| `aria-expanded`    | Reflects the open/closed state on the trigger button.                                                              |
+| `aria-current`     | Set to `"date"` on today's button for screen reader identification.                                                |
+| `aria-disabled`    | Set on individual day buttons when they fall outside the `min`/`max` range.                                        |
+| Live region        | Month name is announced via `aria-live="polite"` when navigating between months.                                   |
+| Focus management   | Calendar open → focus moves to the selected day, today, or first enabled day. `Escape` → focus returns to trigger. |
+| Focus trap         | `Tab` cycles focus within the calendar popup while it is open.                                                     |
+| Required marker    | The `*` asterisk is `aria-hidden="true"` — the label conveys required state via `aria-required`.                   |
+| Form validation    | `checkValidity()` and `reportValidity()` delegate to `ElementInternals`.                                           |
+| WCAG 2.1 AA        | Supports ARIA patterns; axe-core verification in progress. See AUDIT.md for current status.                        |
+
+## Drupal Integration
+
+```twig
+{# my-module/templates/my-template.html.twig #}
+<hx-date-picker
+  name="{{ field_name }}"
+  label="{{ field_label }}"
+  {% if field_value %}value="{{ field_value }}"{% endif %}
+  {% if field_min %}min="{{ field_min }}"{% endif %}
+  {% if field_max %}max="{{ field_max }}"{% endif %}
+  {% if field_required %}required{% endif %}
+  {% if field_disabled %}disabled{% endif %}
+  {% if field_error %}error="{{ field_error }}"{% endif %}
+  {% if field_help %}help-text="{{ field_help }}"{% endif %}
+  locale="{{ field_locale|default('en-US') }}"
+></hx-date-picker>
+```
+
+Load the library in your module's `.libraries.yml`:
+
+```yaml
+helix-components:
+  js:
+    /libraries/helix/helix.min.js: { minified: true }
+```
+
+Listen for the `hx-change` event in Drupal behaviors:
+
+```javascript
+Drupal.behaviors.myDatePicker = {
+  attach(context) {
+    once('myDatePicker', 'hx-date-picker', context).forEach((el) => {
+      el.addEventListener('hx-change', (e) => {
+        const { value, date } = e.detail;
+        // value = ISO string, e.g. "2026-03-15"
+        // date  = Date object
+        const hiddenField = document.querySelector(`input[name="${el.name}"]`);
+        if (hiddenField) hiddenField.value = value;
+      });
+    });
+  },
+};
+```
+
+## Standalone HTML Example
+
+Copy-paste into a `.html` file and open in any browser — no build tool required:
+
+```html
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>hx-date-picker example</title>
+    <script type="module" src="https://cdn.jsdelivr.net/npm/@helix/library/dist/index.js"></script>
+  </head>
+  <body
+    style="font-family: sans-serif; padding: 2rem; display: grid; gap: 1.5rem; max-width: 400px;"
+  >
+    <hx-date-picker
+      id="appointment"
+      name="appointment"
+      label="Appointment date"
+      required
+      help-text="Select a future date."
+    ></hx-date-picker>
+
+    <hx-date-picker
+      id="dob"
+      name="dob"
+      label="Date of birth"
+      max="2008-01-01"
+      format="MM/DD/YYYY"
+    ></hx-date-picker>
+
+    <hx-date-picker label="Discharge date (read-only)" value="2026-03-01" disabled></hx-date-picker>
+
+    <script>
+      document.getElementById('appointment').addEventListener('hx-change', (e) => {
+        console.log('Appointment selected:', e.detail.value, e.detail.date);
+      });
+      document.getElementById('dob').addEventListener('hx-change', (e) => {
+        console.log('Date of birth selected:', e.detail.value);
+      });
+    </script>
+  </body>
+</html>
+```
+
+## API Reference
+
+<ComponentDoc tagName="hx-date-picker" section="api" />
