@@ -7,15 +7,15 @@ All HELIX components follow consistent API conventions for predictable usage and
 
 ## Naming Conventions
 
-| Type                  | Convention                  | Example                    |
-| --------------------- | --------------------------- | -------------------------- |
-| Tag name              | `wc-` prefix, kebab-case    | `wc-card`, `wc-button`     |
-| Properties            | camelCase                   | `variant`, `disabled`      |
-| Attributes            | kebab-case (auto-reflected) | `variant`, `disabled`      |
-| Events                | `wc-` prefix                | `wc-click`, `wc-change`    |
-| CSS Parts             | kebab-case                  | `container`, `header-text` |
-| CSS Custom Properties | `--wc-` prefix              | `--wc-card-padding`        |
-| Slots                 | kebab-case                  | `header`, `actions`        |
+| Type                  | Convention                  | Example                      |
+| --------------------- | --------------------------- | ---------------------------- |
+| Tag name              | `hx-` prefix, kebab-case    | `hx-card`, `hx-button`       |
+| Properties            | camelCase                   | `variant`, `disabled`        |
+| Attributes            | kebab-case (auto-reflected) | `variant`, `disabled`        |
+| Events                | `hx-` prefix                | `hx-click`, `hx-change`      |
+| CSS Parts             | kebab-case                  | `container`, `header-text`   |
+| CSS Custom Properties | `--hx-` prefix              | `--hx-card-padding`          |
+| Slots                 | kebab-case                  | `header`, `actions`          |
 
 ## Property Types
 
@@ -45,7 +45,7 @@ All custom events follow this pattern:
 
 ```typescript
 this.dispatchEvent(
-  new CustomEvent('wc-change', {
+  new CustomEvent('hx-change', {
     detail: { value: this.value },
     bubbles: true,
     composed: true,
@@ -53,8 +53,15 @@ this.dispatchEvent(
 );
 ```
 
+The `bubbles: true, composed: true` combination is required so events cross the Shadow DOM boundary and reach Drupal Behaviors attached to the document or a host element.
+
 ## Custom Elements Manifest
 
 The API is documented via **Custom Elements Manifest** (CEM), which serves as the single source of truth for Storybook args, IDE autocomplete, and documentation.
+
+```bash
+# Regenerate CEM from JSDoc annotations
+npm run cem
+```
 
 See the [Pre-Planning: Component Architecture](/pre-planning/components/) for the complete API specification.

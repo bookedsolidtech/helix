@@ -58,14 +58,14 @@ Understanding Shadow DOM requires precise terminology:
 ```
 ┌─ Document ─────────────────────────────────────────┐
 │                                                     │
-│  <wc-button id="my-btn" variant="primary">         │  ← Shadow Host
+│  <hx-button id="my-btn" variant="primary">         │  ← Shadow Host
 │    Click Me                                        │  ← Light DOM (child)
-│  </wc-button>                                      │
+│  </hx-button>                                      │
 │                                                     │
-│  ┌─ #shadow-root (attached to wc-button) ────┐    │
+│  ┌─ #shadow-root (attached to hx-button) ────┐    │
 │  │                                             │    │
 │  │  <style>                                    │    │  ← Shadow Tree
-│  │    button { background: var(--wc-primary) }│    │
+│  │    button { background: var(--hx-primary) }│    │
 │  │  </style>                                   │    │
 │  │                                             │    │
 │  │  <button part="button">                    │    │
@@ -90,13 +90,13 @@ Every shadow host manages three conceptual DOM trees:
 
 ```javascript
 // HTML
-<wc-card>
+<hx-card>
   <h2 slot="title">Patient Overview</h2>
   <p>Content goes here</p>
-</wc-card>
+</hx-card>
 
 // Light DOM (what developer writes)
-wc-card
+hx-card
   ├─ h2[slot="title"]: "Patient Overview"
   └─ p: "Content goes here"
 
@@ -108,7 +108,7 @@ wc-card
       └─ slot
 
 // Flattened DOM (what browser renders)
-wc-card
+hx-card
   └─ #shadow-root
       ├─ header
       │   └─ slot[name="title"]
@@ -169,7 +169,7 @@ console.log(host.shadowRoot); // null
 All wc-2026 components use **open mode** for testability, accessibility tooling compatibility, and developer experience:
 
 ```typescript
-export class WcButton extends LitElement {
+export class HxButton extends LitElement {
   constructor() {
     super();
     // Lit creates open shadow root automatically
@@ -182,7 +182,7 @@ export class WcButton extends LitElement {
 Create shadow roots as early as possible, ideally in the constructor:
 
 ```typescript
-class WcCard extends HTMLElement {
+class HxCard extends HTMLElement {
   constructor() {
     super();
 
@@ -232,9 +232,9 @@ The shadow boundary blocks `document.querySelector()` and friends:
 
 ```javascript
 // HTML
-<wc-button>
+<hx-button>
   <span class="label">Click Me</span>
-</wc-button>;
+</hx-button>;
 
 // Component shadow DOM contains:
 // #shadow-root
@@ -247,7 +247,7 @@ document.querySelectorAll('button'); // [] (empty)
 document.querySelectorAll('.label'); // [span.label] (light DOM only)
 
 // Must query shadow root explicitly
-const wcButton = document.querySelector('wc-button');
+const wcButton = document.querySelector('hx-button');
 wcButton.shadowRoot.querySelectorAll('button'); // [button]
 ```
 
@@ -259,18 +259,18 @@ Element IDs inside shadow DOM don't pollute the global document namespace:
 
 ```html
 <!-- Multiple components with same internal IDs -->
-<wc-dialog>
+<hx-dialog>
   #shadow-root
   <div id="header">...</div>
   <div id="content">...</div>
-</wc-dialog>
+</hx-dialog>
 
-<wc-dialog>
+<hx-dialog>
   #shadow-root
   <div id="header">...</div>
   ← No conflict!
   <div id="content">...</div>
-</wc-dialog>
+</hx-dialog>
 
 <script>
   // This finds nothing—IDs are scoped to shadow trees
@@ -286,7 +286,7 @@ Events **do cross** the shadow boundary, but the `event.target` is **retargeted*
 
 ```javascript
 // Component implementation
-class WcButton extends LitElement {
+class HxButton extends LitElement {
   render() {
     return html`
       <button @click=${this._handleClick}>
@@ -302,8 +302,8 @@ class WcButton extends LitElement {
 }
 
 // Page code
-document.querySelector('wc-button').addEventListener('click', (e) => {
-  console.log(e.target); // <wc-button> (shadow host, not <button>)
+document.querySelector('hx-button').addEventListener('click', (e) => {
+  console.log(e.target); // <hx-button> (shadow host, not <button>)
   console.log(e.composedPath()[0]); // <button> (original target)
 });
 ```
@@ -317,7 +317,7 @@ Events must explicitly opt into crossing shadow boundaries:
 ```typescript
 // Event that ESCAPES shadow DOM
 this.dispatchEvent(
-  new CustomEvent('wc-change', {
+  new CustomEvent('hx-change', {
     bubbles: true,
     composed: true, // ← Crosses shadow boundaries
     detail: { value: this.value },
@@ -370,7 +370,7 @@ CSS defined inside shadow DOM **only affects** that shadow tree. CSS defined out
 <button>Page Button</button>
 <!-- Red background -->
 
-<wc-button>
+<hx-button>
   #shadow-root
   <style>
     button {
@@ -379,7 +379,7 @@ CSS defined inside shadow DOM **only affects** that shadow tree. CSS defined out
   </style>
   <button>Component Button</button>
   <!-- Blue background -->
-</wc-button>
+</hx-button>
 ```
 
 The page `button { background: red; }` rule has **no effect** inside the shadow DOM.
@@ -404,7 +404,7 @@ While selector matching stops at the shadow boundary, **inheritable CSS properti
   }
 </style>
 
-<wc-card>
+<hx-card>
   #shadow-root
   <style>
     /* Inherits font-family and color from body */
@@ -413,7 +413,7 @@ While selector matching stops at the shadow boundary, **inheritable CSS properti
     }
   </style>
   <p>This text is Arial, #333 color</p>
-</wc-card>
+</hx-card>
 ```
 
 **Resetting inheritance**:
@@ -436,13 +436,13 @@ Three primary methods:
 ```typescript
 import { LitElement, css } from 'lit';
 
-export class WcButton extends LitElement {
+export class HxButton extends LitElement {
   static styles = css`
     :host {
       display: inline-block;
     }
     button {
-      background: var(--wc-button-bg, var(--wc-color-primary));
+      background: var(--hx-button-bg, var(--hx-color-primary));
     }
   `;
 }
@@ -468,7 +468,7 @@ template.innerHTML = `
   <button><slot></slot></button>
 `;
 
-class WcButton extends HTMLElement {
+class HxButton extends HTMLElement {
   constructor() {
     super();
     this.attachShadow({ mode: 'open' });
@@ -510,7 +510,7 @@ shadowRoot.appendChild(linkElem);
 }
 ```
 
-The `:host` selector targets the shadow host element itself (the `<wc-button>` tag).
+The `:host` selector targets the shadow host element itself (the `<hx-button>` tag).
 
 **Important**: `:host` has **low specificity**. External styles can override:
 
@@ -521,7 +521,7 @@ The `:host` selector targets the shadow host element itself (the `<wc-button>` t
 }
 
 /* Page styles (higher specificity) */
-wc-button {
+hx-button {
   color: red;
 } /* Wins! */
 ```
@@ -530,11 +530,11 @@ wc-button {
 
 ```css
 :host(.primary) {
-  --_bg: var(--wc-color-primary);
+  --_bg: var(--hx-color-primary);
 }
 
 :host(.secondary) {
-  --_bg: var(--wc-color-secondary);
+  --_bg: var(--hx-color-secondary);
 }
 
 :host([disabled]) {
@@ -592,20 +592,20 @@ wc-2026 uses a **three-tier cascade** for theming:
 ```css
 /* Tier 1: Primitive tokens (defined globally) */
 :root {
-  --wc-blue-500: #3b82f6;
-  --wc-spacing-md: 1rem;
+  --hx-blue-500: #3b82f6;
+  --hx-spacing-md: 1rem;
 }
 
 /* Tier 2: Semantic tokens (defined globally) */
 :root {
-  --wc-color-primary: var(--wc-blue-500);
-  --wc-button-padding: var(--wc-spacing-md);
+  --hx-color-primary: var(--hx-blue-500);
+  --hx-button-padding: var(--hx-spacing-md);
 }
 
 /* Tier 3: Component-local tokens (inside shadow DOM) */
 :host {
-  --_bg: var(--wc-button-bg, var(--wc-color-primary));
-  --_padding: var(--wc-button-padding, 0.5rem 1rem);
+  --_bg: var(--hx-button-bg, var(--hx-color-primary));
+  --_padding: var(--hx-button-padding, 0.5rem 1rem);
 }
 
 button {
@@ -614,7 +614,7 @@ button {
 }
 ```
 
-**Pattern**: Internal variables prefixed with `--_` are private. Public `--wc-*` variables are the theming API.
+**Pattern**: Internal variables prefixed with `--_` are private. Public `--hx-*` variables are the theming API.
 
 ## Slots: Light DOM Composition
 
@@ -624,7 +624,7 @@ Slots are the mechanism for projecting light DOM into shadow DOM. They create **
 
 ```typescript
 // Component definition
-class WcCard extends LitElement {
+class HxCard extends LitElement {
   render() {
     return html`
       <div class="card">
@@ -635,19 +635,19 @@ class WcCard extends LitElement {
 }
 
 // Usage
-<wc-card>
+<hx-card>
   <p>This content projects into the slot.</p>
-</wc-card>
+</hx-card>
 
 // Rendered result (flattened DOM)
-<wc-card>
+<hx-card>
   #shadow-root
     <div class="card">
       <slot>
         <p>This content projects into the slot.</p>
       </slot>
     </div>
-</wc-card>
+</hx-card>
 ```
 
 ### Named Slots
@@ -663,12 +663,12 @@ render() {
 ```
 
 ```html
-<wc-card>
+<hx-card>
   <h2 slot="title">Patient Record</h2>
   <p>Patient details go here.</p>
   <button slot="actions">Save</button>
   <button slot="actions">Cancel</button>
-</wc-card>
+</hx-card>
 ```
 
 **Key points**:
@@ -696,7 +696,7 @@ render() {
 
 ```css
 /* External styles */
-wc-button::part(button) {
+hx-button::part(button) {
   border-radius: 0;
   text-transform: uppercase;
 }
@@ -715,9 +715,9 @@ Shadow DOM must preserve accessibility:
 ARIA attributes work across shadow boundaries:
 
 ```html
-<wc-button aria-label="Close dialog">
+<hx-button aria-label="Close dialog">
   <svg>...</svg>
-</wc-button>
+</hx-button>
 ```
 
 ```typescript
@@ -932,8 +932,8 @@ Use Shadow DOM for:
 Form controls, buttons, dialogs, tooltips—anything with behavior and internal state:
 
 ```html
-<wc-button variant="primary">Save</wc-button>
-<wc-text-input label="Email" type="email"></wc-text-input>
+<hx-button variant="primary">Save</hx-button>
+<hx-text-input label="Email" type="email"></hx-text-input>
 ```
 
 ### 2. Complex Widgets
@@ -950,7 +950,7 @@ Components that must look consistent regardless of page styles:
 
 ```html
 <!-- Always renders correctly, even with aggressive global CSS -->
-<wc-modal>...</wc-modal>
+<hx-modal>...</hx-modal>
 ```
 
 ### 4. Third-Party Embeds
@@ -968,9 +968,9 @@ Library components consumed across multiple applications:
 
 ```html
 <!-- wc-2026 use case -->
-<wc-card>
-  <wc-button>Action</wc-button>
-</wc-card>
+<hx-card>
+  <hx-button>Action</hx-button>
+</hx-card>
 ```
 
 ## Shadow DOM Debugging
@@ -1019,7 +1019,7 @@ shadowRoot.adoptedStyleSheets = [sheet]; ✅
 ```javascript
 // Custom events need composed: true
 this.dispatchEvent(
-  new CustomEvent('wc-change', {
+  new CustomEvent('hx-change', {
     composed: true, // ← Required
     bubbles: true,
   }),
@@ -1043,15 +1043,15 @@ element.shadowRoot.querySelector('.internal-button'); ✅
 Shadow roots can contain elements that themselves have shadow roots:
 
 ```html
-<wc-dialog>
+<hx-dialog>
   #shadow-root
-  <wc-button>Close</wc-button>
+  <hx-button>Close</hx-button>
   #shadow-root (nested)
   <button>...</button>
-</wc-dialog>
+</hx-dialog>
 ```
 
-**Style isolation**: Each shadow boundary creates a new scope. wc-button styles are isolated from wc-dialog styles.
+**Style isolation**: Each shadow boundary creates a new scope. hx-button styles are isolated from hx-dialog styles.
 
 ### Imperative Slot Assignment
 
@@ -1087,7 +1087,7 @@ class WcTextInput extends HTMLElement {
 }
 ```
 
-Full pattern in wc-text-input implementation.
+Full pattern in hx-text-input implementation.
 
 ## Summary
 

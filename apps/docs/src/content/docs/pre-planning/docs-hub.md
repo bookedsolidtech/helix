@@ -485,7 +485,7 @@ const docs = defineCollection({
 // Component API collection (loaded from custom-elements.json)
 const components = defineCollection({
   loader: cemLoader({
-    manifestPath: '../../packages/wc-library/custom-elements.json',
+    manifestPath: '../../packages/hx-library/custom-elements.json',
   }),
   schema: z.object({
     tagName: z.string(),
@@ -543,8 +543,8 @@ const components = defineCollection({
 const tokens = defineCollection({
   loader: tokenLoader({
     tokenPaths: [
-      '../../packages/wc-library/src/tokens/semantic.tokens.json',
-      '../../packages/wc-library/src/tokens/component.tokens.json',
+      '../../packages/hx-library/src/tokens/semantic.tokens.json',
+      '../../packages/hx-library/src/tokens/component.tokens.json',
     ],
   }),
   schema: z.object({
@@ -682,7 +682,7 @@ A build script reads the content collection and generates markdown pages for eac
 import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 import { resolve, join } from 'node:path';
 
-const manifestPath = resolve('../../packages/wc-library/custom-elements.json');
+const manifestPath = resolve('../../packages/hx-library/custom-elements.json');
 const manifest = JSON.parse(readFileSync(manifestPath, 'utf-8'));
 const outputDir = resolve('src/content/docs/components');
 
@@ -1476,7 +1476,7 @@ on:
   pull_request:
     branches: [main]
     paths:
-      - 'packages/wc-library/**'
+      - 'packages/hx-library/**'
       - 'apps/storybook/**'
       - 'apps/docs/**'
 
