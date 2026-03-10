@@ -11,9 +11,19 @@ import ComponentDoc from '../../../components/ComponentDoc.astro';
 
 <ComponentDoc tagName="hx-prose" section="summary" />
 
-## Rich Content
+## Overview
 
-Prose container with headings, paragraphs, lists, and inline formatting.
+`hx-prose` is a Light DOM typography wrapper for rich text content produced by CMS editors, Markdown renderers, or any source that outputs structured HTML body copy. It injects scoped typographic styles — headings, paragraphs, lists, blockquotes, tables, code blocks, and media — without leaking those styles to the rest of the page.
+
+Unlike most components in this library, `hx-prose` intentionally does **not** use Shadow DOM. This makes it the correct choice for CMS-injected content where axe-core accessibility scanning, global heading hierarchy, and Drupal CKEditor output all need to remain fully accessible to the DOM. For purely decorative or self-contained UI, use `hx-card` or `hx-container` instead.
+
+Use `hx-prose` when wrapping:
+
+- CKEditor or WYSIWYG output from Drupal
+- Markdown-rendered HTML from static content pipelines
+- Patient care documentation, clinical protocols, or any structured body copy
+
+## Live Demo
 
 <ComponentDemo title="Rich Content">
   <hx-prose>
@@ -40,10 +50,6 @@ Prose container with headings, paragraphs, lists, and inline formatting.
   </hx-prose>
 </ComponentDemo>
 
-## Typography Scale
-
-Small, base, and large sizes for different content contexts.
-
 <ComponentDemo title="Typography Scale">
   <div style="display: grid; gap: 1.5rem;">
     <hx-prose size="sm">
@@ -69,6 +75,322 @@ Small, base, and large sizes for different content contexts.
     </hx-prose>
   </div>
 </ComponentDemo>
+
+<ComponentDemo title="Code and Preformatted">
+  <hx-prose>
+    <h3>Inline and Block Code</h3>
+    <p>
+      Use <code>addEventListener()</code> to attach event listeners. Press <kbd>Ctrl</kbd> +
+      <kbd>C</kbd> to copy.
+    </p>
+    <pre>
+      <code>
+        const el = document.querySelector('hx-prose'); el.size = 'lg'; el.maxWidth = '72ch';
+      </code>
+    </pre>
+  </hx-prose>
+</ComponentDemo>
+
+<ComponentDemo title="Data Table">
+  <hx-prose>
+    <h3>Lab Results</h3>
+    <table>
+      <caption>Patient Lab Values — 2026-03-10</caption>
+      <thead>
+        <tr>
+          <th scope="col">Test</th>
+          <th scope="col">Result</th>
+          <th scope="col">Reference Range</th>
+          <th scope="col">Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Hemoglobin</td>
+          <td>13.2 g/dL</td>
+          <td>13.5–17.5 g/dL</td>
+          <td>Low</td>
+        </tr>
+        <tr>
+          <td>WBC</td>
+          <td>7.4 × 10³/μL</td>
+          <td>4.5–11.0 × 10³/μL</td>
+          <td>Normal</td>
+        </tr>
+        <tr>
+          <td>Platelets</td>
+          <td>245 × 10³/μL</td>
+          <td>150–400 × 10³/μL</td>
+          <td>Normal</td>
+        </tr>
+      </tbody>
+    </table>
+  </hx-prose>
+</ComponentDemo>
+
+<ComponentDemo title="Max Width Constraint">
+  <hx-prose max-width="60ch">
+    <h3>Constrained Width</h3>
+    <p>
+      This prose block is constrained to 60 characters wide using the <code>max-width</code>{' '}
+      attribute. Optimal line length for reading is 45–75 characters — roughly 60ch for body copy.
+    </p>
+  </hx-prose>
+</ComponentDemo>
+
+## Installation
+
+Install the full library or import the component individually:
+
+```bash
+# Full library
+npm install @helix/library
+```
+
+```js
+// Full library import (registers all components)
+import '@helix/library';
+
+// Or import only this component (tree-shaking friendly)
+import '@helix/library/components/hx-prose/index';
+```
+
+## Basic Usage
+
+Minimal HTML snippet — no build tool required:
+
+```html
+<hx-prose>
+  <h2>Patient Care Guidelines</h2>
+  <p>Effective patient care requires a systematic approach to assessment and planning.</p>
+  <ul>
+    <li>Patient safety is the top priority</li>
+    <li>Evidence-based practice guides all decisions</li>
+  </ul>
+</hx-prose>
+```
+
+With size and max-width:
+
+```html
+<hx-prose size="lg" max-width="72ch">
+  <h1>Clinical Protocol Overview</h1>
+  <p>This document outlines the standard operating procedures for the ICU.</p>
+</hx-prose>
+```
+
+## Properties
+
+| Property   | Attribute   | Type                     | Default  | Description                                                                                                                 |
+| ---------- | ----------- | ------------------------ | -------- | --------------------------------------------------------------------------------------------------------------------------- |
+| `size`     | `size`      | `'sm' \| 'base' \| 'lg'` | `'base'` | Typography scale for the prose content. Sets `--hx-prose-font-size` to the corresponding size token.                        |
+| `maxWidth` | `max-width` | `string`                 | `''`     | Maximum content width. Accepts any valid CSS width value (`'640px'`, `'80ch'`, `'100%'`). Overrides `--hx-prose-max-width`. |
+
+## Events
+
+`hx-prose` is a transparent layout container. It dispatches no custom events.
+
+## CSS Custom Properties
+
+| Property                            | Default                                    | Description                                                                               |
+| ----------------------------------- | ------------------------------------------ | ----------------------------------------------------------------------------------------- |
+| `--hx-prose-max-width`              | `720px`                                    | Maximum content width. Override with the `max-width` attribute or directly on `hx-prose`. |
+| `--hx-prose-font-size`              | `var(--hx-font-size-base)`                 | Base font size for body copy. Overridden by the `size` property.                          |
+| `--hx-prose-line-height`            | `var(--hx-line-height-relaxed)`            | Base line height for paragraphs. Healthcare mandate: minimum 1.5.                         |
+| `--hx-prose-color`                  | `var(--hx-color-text)`                     | Body text color.                                                                          |
+| `--hx-prose-heading-color`          | `var(--hx-color-text-strong)`              | Heading text color.                                                                       |
+| `--hx-prose-link-color`             | `var(--hx-color-primary)`                  | Link text color.                                                                          |
+| `--hx-prose-h1-font-size`           | `var(--hx-font-size-4xl, 2.25rem)`         | H1 font size override.                                                                    |
+| `--hx-prose-h2-font-size`           | `var(--hx-font-size-3xl, 1.875rem)`        | H2 font size override.                                                                    |
+| `--hx-prose-h3-font-size`           | `var(--hx-font-size-2xl, 1.5rem)`          | H3 font size override.                                                                    |
+| `--hx-prose-h4-font-size`           | `var(--hx-font-size-xl, 1.25rem)`          | H4 font size override.                                                                    |
+| `--hx-prose-h5-font-size`           | `var(--hx-font-size-lg, 1.125rem)`         | H5 font size override.                                                                    |
+| `--hx-prose-h6-font-size`           | `var(--hx-font-size-md, 1rem)`             | H6 font size override.                                                                    |
+| `--hx-prose-lead-font-size`         | `var(--hx-font-size-lg, 1.125rem)`         | Lead paragraph font size (opt-in via `.lead` class).                                      |
+| `--hx-prose-lead-color`             | `var(--hx-color-neutral-600, #495057)`     | Lead paragraph text color.                                                                |
+| `--hx-prose-heading-font-family`    | `var(--hx-font-family-sans, sans-serif)`   | Heading font family.                                                                      |
+| `--hx-prose-heading-font-weight`    | `var(--hx-font-weight-bold, 700)`          | Heading font weight.                                                                      |
+| `--hx-prose-heading-line-height`    | `var(--hx-line-height-tight, 1.25)`        | Heading line height.                                                                      |
+| `--hx-prose-heading-letter-spacing` | `var(--hx-letter-spacing-tight, -0.025em)` | Heading letter spacing.                                                                   |
+
+## CSS Parts
+
+`hx-prose` renders in the **Light DOM** (no Shadow DOM). CSS `::part()` selectors do not apply because there is no shadow root. Theming is accomplished via:
+
+1. **CSS custom properties** on `hx-prose` or any ancestor (see table above)
+2. **Standard CSS descendant selectors** — `hx-prose p`, `hx-prose h2`, etc.
+
+This is intentional: Light DOM rendering ensures CMS-injected content (Drupal CKEditor output) remains fully styleable and accessible without shadow boundary constraints.
+
+## Slots
+
+| Slot        | Description                                                                                    |
+| ----------- | ---------------------------------------------------------------------------------------------- |
+| _(default)_ | Rich text content: headings, paragraphs, lists, tables, blockquotes, code blocks, images, etc. |
+
+`hx-prose` is a transparent container — all slotted content renders directly in the Light DOM, making it selectable by standard CSS and scannable by accessibility tools including axe-core.
+
+## Accessibility
+
+| Topic         | Details                                                                                                                                                                                                                                      |
+| ------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| ARIA role     | None — `hx-prose` is a generic block container (`display: block`). It does not add any ARIA role. Content within it must supply their own appropriate semantics (`<h1>`–`<h6>`, `<table>`, `<ul>`, etc.).                                    |
+| Keyboard      | `hx-prose` is not interactive and adds no keyboard behavior. Standard browser keyboard navigation applies to slotted links, form controls, and focusable elements.                                                                           |
+| Screen reader | Slotted content is read in DOM order. Table captions are positioned `top` (default) so screen reader announcement order matches visual order — compliant with WCAG 2.1 Technique H39.                                                        |
+| Focus         | No focus management. Focusable descendants (links, buttons, inputs) retain their natural tab order.                                                                                                                                          |
+| Light DOM     | `hx-prose` uses Light DOM deliberately so axe-core can scan all child content without shadow boundary limitations. All accessibility violations inside `hx-prose` — such as `<img>` without `alt` — are detectable and reported by axe-core. |
+| Images        | Consumer responsibility: every `<img>` inside `hx-prose` must have an `alt` attribute. Decorative images use `alt=""`. Informational images require descriptive alt text. Missing `alt` is a WCAG 2.1 AA violation (SC 1.1.1).               |
+| Line height   | Body copy enforces a minimum 1.5 line-height ratio via `--hx-prose-line-height` — a healthcare readability mandate for patient-facing content.                                                                                               |
+| WCAG          | Meets WCAG 2.1 AA for typography container requirements. Zero axe-core violations for well-formed content.                                                                                                                                   |
+
+## Drupal Integration
+
+`hx-prose` is purpose-built for Drupal CKEditor output. Wrap any text field or body field output in `hx-prose` to apply consistent typographic styles.
+
+```twig
+{# my-module/templates/node--article.html.twig #}
+
+<hx-prose>
+  {{ content.body }}
+</hx-prose>
+```
+
+With size variant for a callout block:
+
+```twig
+<hx-prose size="sm">
+  {{ content.field_sidebar_text }}
+</hx-prose>
+```
+
+Load the library in your module's `.libraries.yml`:
+
+```yaml
+helix-components:
+  js:
+    /libraries/helix/helix.min.js: { minified: true }
+```
+
+`hx-prose` dispatches no events and requires no Drupal behaviors for standard usage. If dynamic content updates are required (e.g., AJAX-loaded body copy), replace the inner content directly — the component will re-apply all prose styles automatically:
+
+```javascript
+Drupal.behaviors.proseUpdate = {
+  attach(context) {
+    // hx-prose styles are applied via adopted stylesheets — no re-init needed.
+    // Simply update the DOM content and styles remain active.
+    once('proseUpdate', 'hx-prose[data-live]', context).forEach((el) => {
+      el.innerHTML = newContent;
+    });
+  },
+};
+```
+
+## Standalone HTML Example
+
+Copy-paste this into a `.html` file and open it in a browser — no build tool needed:
+
+```html
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>hx-prose example</title>
+    <script type="module">
+      // @helix/library is a private package — install via npm workspace.
+      // In your project: import '@helix/library/components/hx-prose/index'
+      // in your bundler entry point, then reference the built output here.
+      import '/path/to/dist/components/hx-prose/index.js';
+    </script>
+  </head>
+  <body style="font-family: sans-serif; padding: 2rem; max-width: 960px;">
+    <h1 style="margin-bottom: 1.5rem;">hx-prose Examples</h1>
+
+    <h2>Base Size (default)</h2>
+    <hx-prose>
+      <h2>Patient Care Guidelines</h2>
+      <p>
+        Effective patient care requires a <strong>systematic approach</strong> to assessment,
+        planning, and intervention. The following guidelines ensure <em>consistent quality</em>.
+      </p>
+      <ul>
+        <li>Patient safety is the top priority</li>
+        <li>Evidence-based practice guides all decisions</li>
+        <li>Clear documentation supports continuity of care</li>
+      </ul>
+      <blockquote>
+        <p>"Quality is never an accident; it is always the result of intelligent effort."</p>
+        <cite>John Ruskin</cite>
+      </blockquote>
+    </hx-prose>
+
+    <hr style="margin: 2rem 0;" />
+
+    <h2>Small Size — Sidebar or Footnote</h2>
+    <hx-prose size="sm" max-width="480px">
+      <h3>Reference Notes</h3>
+      <p>
+        These compact notes provide supplemental context for clinical staff. Font size is reduced to
+        <code>0.875rem</code> via the <code>size="sm"</code> attribute.
+      </p>
+    </hx-prose>
+
+    <hr style="margin: 2rem 0;" />
+
+    <h2>Large Size — Featured Content</h2>
+    <hx-prose size="lg" max-width="720px">
+      <h1>Annual Health Report</h1>
+      <p class="lead">
+        This report summarizes key health metrics for the 2025 fiscal year across all participating
+        facilities.
+      </p>
+      <p>
+        Outcomes improved by 12% year-over-year, driven by new care protocols and investment in
+        staff training programs.
+      </p>
+    </hx-prose>
+
+    <hr style="margin: 2rem 0;" />
+
+    <h2>Data Table</h2>
+    <hx-prose>
+      <table>
+        <caption>
+          Lab Results — Patient #1042
+        </caption>
+        <thead>
+          <tr>
+            <th scope="col">Test</th>
+            <th scope="col">Result</th>
+            <th scope="col">Reference Range</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Hemoglobin</td>
+            <td>13.2 g/dL</td>
+            <td>13.5–17.5 g/dL</td>
+          </tr>
+          <tr>
+            <td>WBC</td>
+            <td>7.4 × 10³/μL</td>
+            <td>4.5–11.0 × 10³/μL</td>
+          </tr>
+        </tbody>
+      </table>
+    </hx-prose>
+  </body>
+</html>
+```
+
+## Related Components
+
+| Component         | When to use instead                                                                                            |
+| ----------------- | -------------------------------------------------------------------------------------------------------------- |
+| `hx-card`         | For structured UI containers with header/body/footer slots — not for CMS body copy.                            |
+| `hx-container`    | For layout width constraints without typographic styling.                                                      |
+| `hx-text`         | For a single line or short inline text with typographic variant control (`body`, `caption`, `overline`, etc.). |
+| `hx-code-snippet` | For interactive, copyable code blocks — not raw `<pre><code>` content.                                         |
 
 ## API Reference
 
