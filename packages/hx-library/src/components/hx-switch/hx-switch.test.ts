@@ -106,12 +106,12 @@ describe('hx-switch', () => {
   describe('Property: size', () => {
     it('defaults to md', async () => {
       const el = await fixture<WcSwitch>('<hx-switch></hx-switch>');
-      expect(el.hxSize).toBe('md');
+      expect(el.size).toBe('md');
     });
 
     it('reflects hx-size attribute for sm', async () => {
       const el = await fixture<WcSwitch>('<hx-switch hx-size="sm"></hx-switch>');
-      expect(el.hxSize).toBe('sm');
+      expect(el.size).toBe('sm');
       expect(el.getAttribute('hx-size')).toBe('sm');
     });
 

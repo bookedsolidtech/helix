@@ -17,7 +17,7 @@ import { helixCardStyles } from './hx-card.styles.js';
  * @slot footer - Optional footer content below the body.
  * @slot actions - Optional action buttons, rendered with a top border separator. Do NOT use together with hx-href (interactive card + focusable actions is an ARIA anti-pattern).
  *
- * @fires {CustomEvent<{href: string, originalEvent: MouseEvent | KeyboardEvent}>} hx-card-click - Dispatched when an interactive card (with hx-href) is clicked.
+ * @fires {CustomEvent<{href: string, originalEvent: MouseEvent | KeyboardEvent}>} hx-click - Dispatched when an interactive card (with hx-href) is clicked.
  *
  * @csspart card - The outer card container element.
  * @csspart image - The image slot container.
@@ -112,17 +112,14 @@ export class HelixCard extends LitElement {
     /**
      * Dispatched when an interactive card is clicked.
      * Includes the target href in the detail.
-     * @event hx-card-click
+     * @event hx-click
      */
     this.dispatchEvent(
-      new CustomEvent<{ href: string; originalEvent: MouseEvent | KeyboardEvent }>(
-        'hx-card-click',
-        {
-          bubbles: true,
-          composed: true,
-          detail: { href: this.hxHref, originalEvent },
-        },
-      ),
+      new CustomEvent<{ href: string; originalEvent: MouseEvent | KeyboardEvent }>('hx-click', {
+        bubbles: true,
+        composed: true,
+        detail: { href: this.hxHref, originalEvent },
+      }),
     );
   }
 

@@ -309,7 +309,7 @@ export const Interactive: Story = {
       hx-href="https://ehr.example.com/patient/12345"
       elevation="raised"
       style="max-width: 400px;"
-      @hx-card-click=${cardClickHandler}
+      @hx-click=${cardClickHandler}
     >
       <span slot="heading">Patient Record: James Wilson</span>
       <p>
@@ -830,10 +830,10 @@ export const InteractiveClickTest: Story = {
       hx-href="https://ehr.example.com/patient/67890"
       elevation="raised"
       style="max-width: 400px;"
-      @hx-card-click=${interactiveClickHandler}
+      @hx-click=${interactiveClickHandler}
     >
       <span slot="heading">Clickable Patient Card</span>
-      <p>Click this card to verify the hx-card-click event fires correctly.</p>
+      <p>Click this card to verify the hx-click event fires correctly.</p>
     </hx-card>
   `,
   play: async ({ canvasElement }) => {
@@ -865,7 +865,7 @@ export const InteractiveKeyboardEnter: Story = {
       hx-href="https://ehr.example.com/orders"
       elevation="raised"
       style="max-width: 400px;"
-      @hx-card-click=${keyboardEnterHandler}
+      @hx-click=${keyboardEnterHandler}
     >
       <span slot="heading">Keyboard Navigation Test</span>
       <p>Focus this card and press Enter to activate it.</p>
@@ -898,7 +898,7 @@ export const InteractiveKeyboardSpace: Story = {
       hx-href="https://ehr.example.com/labs"
       elevation="raised"
       style="max-width: 400px;"
-      @hx-card-click=${keyboardSpaceHandler}
+      @hx-click=${keyboardSpaceHandler}
     >
       <span slot="heading">Space Key Activation Test</span>
       <p>Focus this card and press Space to activate it.</p>
@@ -932,7 +932,7 @@ export const InteractiveFocusManagement: Story = {
       <hx-card
         hx-href="https://ehr.example.com/vitals"
         elevation="raised"
-        @hx-card-click=${focusTestHandler}
+        @hx-click=${focusTestHandler}
       >
         <span slot="heading">Focus Target Card</span>
         <p>Tab to this card to verify it receives focus in the tab order.</p>
