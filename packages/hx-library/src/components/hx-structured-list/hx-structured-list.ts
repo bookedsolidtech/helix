@@ -54,7 +54,7 @@ export class HelixStructuredList extends LitElement {
 
   override render() {
     return html`
-      <div part="base" class="list" role="list">
+      <div part="base" class="list">
         <slot></slot>
       </div>
     `;
