@@ -175,7 +175,7 @@ export class HelixTextInput extends LitElement {
    * @attr hx-size
    */
   @property({ type: String, attribute: 'hx-size', reflect: true })
-  hxSize: 'sm' | 'md' | 'lg' = 'md';
+  size: 'sm' | 'md' | 'lg' = 'md';
 
   // ─── Internal References ───
 
@@ -391,7 +391,7 @@ export class HelixTextInput extends LitElement {
       'field--error': hasError,
       'field--disabled': this.disabled,
       'field--required': this.required,
-      [`field--size-${this.hxSize}`]: true,
+      [`field--size-${this.size}`]: true,
     };
 
     const describedBy =

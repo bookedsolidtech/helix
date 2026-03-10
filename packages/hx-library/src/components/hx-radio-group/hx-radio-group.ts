@@ -18,7 +18,7 @@ let _groupCounter = 0;
  * @slot error - Custom error content (overrides the error property).
  * @slot help-text - Custom help text content (overrides the helpText property).
  *
- * @fires {CustomEvent<{value: string}>} hx-change - Dispatched when the selected radio changes.
+ * @fires {CustomEvent<{value: string, checked: boolean}>} hx-change - Dispatched when the selected radio changes.
  *
  * @csspart fieldset - The fieldset wrapper.
  * @csspart legend - The legend/label.
@@ -230,7 +230,7 @@ export class HelixRadioGroup extends LitElement {
       new CustomEvent('hx-change', {
         bubbles: true,
         composed: true,
-        detail: { value: this.value },
+        detail: { value: this.value, checked: true },
       }),
     );
   };

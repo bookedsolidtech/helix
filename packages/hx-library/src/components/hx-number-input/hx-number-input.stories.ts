@@ -376,7 +376,7 @@ export const SmallSize: Story = {
   args: {
     label: 'Count',
     value: 3,
-    hxSize: 'sm',
+    size: 'sm',
   },
   parameters: {
     docs: {
@@ -395,7 +395,7 @@ export const LargeSize: Story = {
   args: {
     label: 'Count',
     value: 3,
-    hxSize: 'lg',
+    size: 'lg',
   },
   parameters: {
     docs: {
