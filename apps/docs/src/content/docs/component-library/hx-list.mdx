@@ -1,14 +1,344 @@
 ---
 title: 'hx-list'
-description: 'Ordered or unordered list container for structured list content'
+description: Versatile list container supporting plain, bulleted, numbered, description, and interactive selection variants
 ---
 
 import ComponentLoader from '../../../components/ComponentLoader.astro';
+import ComponentDemo from '../../../components/ComponentDemo.astro';
 import ComponentDoc from '../../../components/ComponentDoc.astro';
 
 <ComponentLoader />
 
 <ComponentDoc tagName="hx-list" section="summary" />
+
+## Overview
+
+`hx-list` is a flexible list container for displaying structured content in healthcare and enterprise UIs. It supports five variants: plain (simple list), bulleted (unordered with markers), numbered (ordered steps), description (key–value pairs via `<dl>`), and interactive (selectable listbox for single-select workflows).
+
+Items are rendered as `hx-list-item` elements placed in the default slot. The parent `hx-list` propagates interactive state down to child items automatically — no manual wiring required.
+
+**Use `hx-list` when:** you need a structured list of content items, navigation options, or a single-select picker.
+**Use `hx-menu` instead when:** you need a floating dropdown menu triggered by a button.
+
+## Live Demo
+
+### Plain List
+
+A simple unstyled list for structured content.
+
+<ComponentDemo title="Plain">
+  <hx-list variant="plain">
+    <hx-list-item>Schedule Appointment</hx-list-item>
+    <hx-list-item>View Lab Results</hx-list-item>
+    <hx-list-item>Request Prescription Refill</hx-list-item>
+  </hx-list>
+</ComponentDemo>
+
+### Bulleted List
+
+Unordered list with bullet markers.
+
+<ComponentDemo title="Bulleted">
+  <hx-list variant="bulleted">
+    <hx-list-item>Complete intake form</hx-list-item>
+    <hx-list-item>Verify insurance coverage</hx-list-item>
+    <hx-list-item>Schedule follow-up appointment</hx-list-item>
+  </hx-list>
+</ComponentDemo>
+
+### Numbered List
+
+Ordered list with numeric markers for step-by-step instructions.
+
+<ComponentDemo title="Numbered">
+  <hx-list variant="numbered">
+    <hx-list-item>Check in at reception</hx-list-item>
+    <hx-list-item>Confirm personal details</hx-list-item>
+    <hx-list-item>Wait for nurse to call your name</hx-list-item>
+    <hx-list-item>Proceed to examination room</hx-list-item>
+  </hx-list>
+</ComponentDemo>
+
+### Description List
+
+Key–value pairs rendered as a semantic `<dl>`. Use `type="term"` for keys and `type="definition"` for values.
+
+<ComponentDemo title="Description List">
+  <hx-list variant="description" style="max-width: 400px;">
+    <hx-list-item type="term">Allergies</hx-list-item>
+    <hx-list-item type="definition">Penicillin, Sulfa drugs</hx-list-item>
+    <hx-list-item type="term">Blood Type</hx-list-item>
+    <hx-list-item type="definition">O positive</hx-list-item>
+    <hx-list-item type="term">Primary Diagnosis</hx-list-item>
+    <hx-list-item type="definition">Type 2 Diabetes Mellitus (E11.9)</hx-list-item>
+  </hx-list>
+</ComponentDemo>
+
+### Interactive (Listbox)
+
+Selectable list with keyboard navigation. Always provide a `label` attribute for accessibility.
+
+<ComponentDemo title="Interactive">
+  <hx-list variant="interactive" label="Patient actions" style="max-width: 320px;">
+    <hx-list-item value="schedule">Schedule Appointment</hx-list-item>
+    <hx-list-item value="labs" selected>
+      View Lab Results
+    </hx-list-item>
+    <hx-list-item value="refill">Request Prescription Refill</hx-list-item>
+    <hx-list-item value="message" disabled>
+      Message Your Doctor (Unavailable)
+    </hx-list-item>
+  </hx-list>
+</ComponentDemo>
+
+### With Dividers
+
+Add `divided` to render a separator line between items.
+
+<ComponentDemo title="Divided">
+  <hx-list variant="plain" divided style="max-width: 320px;">
+    <hx-list-item>John Smith — Primary Care</hx-list-item>
+    <hx-list-item>Dr. Emily Chen — Cardiologist</hx-list-item>
+    <hx-list-item>Dr. Marcus Williams — Orthopedics</hx-list-item>
+  </hx-list>
+</ComponentDemo>
+
+### Rich Items
+
+Combine `prefix`, `description`, and `suffix` slots for rich list rows.
+
+<ComponentDemo title="Rich Items">
+  <hx-list variant="interactive" divided style="max-width: 460px;">
+    <hx-list-item value="john">
+      John Smith
+      <span slot="description">DOB: 03/14/1965 · MRN: 100293847</span>
+    </hx-list-item>
+    <hx-list-item value="jane">
+      Jane Doe
+      <span slot="description">DOB: 07/22/1980 · MRN: 200847361</span>
+    </hx-list-item>
+  </hx-list>
+</ComponentDemo>
+
+### Link Items
+
+Set `href` on `hx-list-item` to render the item as a navigable link.
+
+<ComponentDemo title="Link Items">
+  <hx-list variant="plain" divided style="max-width: 320px;">
+    <hx-list-item href="https://example.com/appointments">Schedule Appointment</hx-list-item>
+    <hx-list-item href="https://example.com/records">View Medical Records</hx-list-item>
+    <hx-list-item href="https://example.com/billing">Billing and Insurance</hx-list-item>
+  </hx-list>
+</ComponentDemo>
+
+## Installation
+
+```bash
+# Full library
+npm install @helix/library
+
+# Or import only this component (tree-shaking friendly)
+import '@helix/library/components/hx-list';
+```
+
+## Basic Usage
+
+```html
+<hx-list variant="plain">
+  <hx-list-item>Item one</hx-list-item>
+  <hx-list-item>Item two</hx-list-item>
+</hx-list>
+```
+
+## Properties
+
+### hx-list
+
+| Property  | Attribute | Type                                                                    | Default     | Description                                                                      |
+| --------- | --------- | ----------------------------------------------------------------------- | ----------- | -------------------------------------------------------------------------------- |
+| `variant` | `variant` | `'plain' \| 'bulleted' \| 'numbered' \| 'description' \| 'interactive'` | `'plain'`   | Visual style variant of the list.                                                |
+| `divided` | `divided` | `boolean`                                                               | `false`     | Renders a divider line between items.                                            |
+| `label`   | `label`   | `string \| undefined`                                                   | `undefined` | Accessible label applied as `aria-label`. Required when `variant="interactive"`. |
+
+### hx-list-item
+
+| Property      | Attribute     | Type                                  | Default     | Description                                                                                  |
+| ------------- | ------------- | ------------------------------------- | ----------- | -------------------------------------------------------------------------------------------- |
+| `disabled`    | `disabled`    | `boolean`                             | `false`     | Prevents interaction. Applies `aria-disabled` and removes from tab order.                    |
+| `selected`    | `selected`    | `boolean`                             | `false`     | Marks the item as selected (interactive mode only).                                          |
+| `href`        | `href`        | `string \| undefined`                 | `undefined` | When set (and not disabled), renders the item as an `<a>` link element.                      |
+| `value`       | `value`       | `string \| undefined`                 | `undefined` | The value included in the `hx-select` and `hx-list-item-click` event detail.                 |
+| `interactive` | `interactive` | `boolean`                             | `false`     | Set automatically by the parent `hx-list`. Controls ARIA role and focus behavior.            |
+| `type`        | `type`        | `'default' \| 'term' \| 'definition'` | `'default'` | Item type for `description` variant. `'term'` renders `<dt>`, `'definition'` renders `<dd>`. |
+
+## Events
+
+### hx-list
+
+| Event       | Detail Type                                           | Description                                                                        |
+| ----------- | ----------------------------------------------------- | ---------------------------------------------------------------------------------- |
+| `hx-select` | `{ item: HelixListItem, value: string \| undefined }` | Dispatched when an item is clicked in `interactive` mode. Bubbles and is composed. |
+
+### hx-list-item
+
+| Event                | Detail Type                                           | Description                                                                                                                      |
+| -------------------- | ----------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
+| `hx-list-item-click` | `{ item: HelixListItem, value: string \| undefined }` | Dispatched when the item is clicked and not disabled. Bubbles and is composed. Used internally by `hx-list` to emit `hx-select`. |
+
+## CSS Custom Properties
+
+### hx-list
+
+| Property                  | Default                       | Description                 |
+| ------------------------- | ----------------------------- | --------------------------- |
+| `--hx-list-gap`           | `0`                           | Gap between list items.     |
+| `--hx-list-divider-color` | `var(--hx-color-neutral-200)` | Color of the divider lines. |
+
+### hx-list-item
+
+| Property                           | Default                       | Description                                   |
+| ---------------------------------- | ----------------------------- | --------------------------------------------- |
+| `--hx-list-item-padding`           | `var(--hx-space-3)`           | Padding inside each list item.                |
+| `--hx-list-item-color`             | `var(--hx-color-neutral-900)` | Item text color.                              |
+| `--hx-list-item-bg-hover`          | `var(--hx-color-neutral-50)`  | Background color on hover (interactive only). |
+| `--hx-list-item-bg-selected`       | `var(--hx-color-primary-50)`  | Background color when selected.               |
+| `--hx-list-item-color-selected`    | `var(--hx-color-primary-700)` | Text color when selected.                     |
+| `--hx-list-item-description-color` | `var(--hx-color-neutral-500)` | Color of the description slot text.           |
+
+## CSS Parts
+
+### hx-list
+
+| Part   | Description                            |
+| ------ | -------------------------------------- |
+| `base` | The root list element (`div` or `dl`). |
+
+### hx-list-item
+
+| Part          | Description                                  |
+| ------------- | -------------------------------------------- |
+| `base`        | The root item element (`li`, `dt`, or `dd`). |
+| `prefix`      | The prefix slot container `<span>`.          |
+| `label`       | The label slot container `<span>`.           |
+| `description` | The description slot container `<span>`.     |
+| `suffix`      | The suffix slot container `<span>`.          |
+
+## Slots
+
+### hx-list
+
+| Slot        | Description                          |
+| ----------- | ------------------------------------ |
+| _(default)_ | One or more `hx-list-item` elements. |
+
+### hx-list-item
+
+| Slot          | Description                                          |
+| ------------- | ---------------------------------------------------- |
+| _(default)_   | The primary label text or content.                   |
+| `prefix`      | Icon, avatar, or content rendered before the label.  |
+| `suffix`      | Icon, badge, or text rendered after the label.       |
+| `description` | Secondary descriptive text rendered below the label. |
+
+## Accessibility
+
+`hx-list` follows the [WAI-ARIA Listbox Pattern](https://www.w3.org/WAI/ARIA/apg/patterns/listbox/) for the interactive variant and standard list semantics for all other variants.
+
+| Topic                  | Details                                                                                                                                                             |
+| ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| ARIA role              | `div[role="list"]` for plain, bulleted, and numbered variants; `div[role="listbox"]` for interactive; `<dl>` (implicit) for description variant.                    |
+| `aria-label`           | Set on the container from the `label` property. Required for `role="listbox"` (WCAG 2.1 SC 4.1.2).                                                                  |
+| `aria-multiselectable` | Set to `false` on the listbox to indicate single-select behavior.                                                                                                   |
+| Item role              | `role="listitem"` on the inner `<li>` for non-interactive items; `role="option"` on the `hx-list-item` host element for interactive mode (correct ARIA ownership).  |
+| `aria-selected`        | Set on the `hx-list-item` host in interactive mode; reflects the `selected` property.                                                                               |
+| `aria-disabled`        | Set on disabled items in all variants.                                                                                                                              |
+| Keyboard               | In interactive mode: `ArrowDown` / `ArrowUp` move focus between options; `Home` / `End` jump to first / last option; `Enter` / `Space` activate the focused option. |
+| Screen reader          | List type and item count are announced. Selected and disabled states are announced via ARIA attributes.                                                             |
+| Focus                  | Interactive items receive `tabindex="0"` and are individually focusable. Disabled items are removed from the tab order.                                             |
+| WCAG                   | Meets WCAG 2.1 AA. The `label` attribute is required for interactive lists to satisfy SC 4.1.2 (Name, Role, Value).                                                 |
+
+## Drupal Integration
+
+```twig
+{# my-module/templates/my-template.html.twig #}
+<hx-list
+  variant="{{ variant|default('plain') }}"
+  {% if divided %}divided{% endif %}
+  {% if label %}label="{{ label }}"{% endif %}
+>
+  {% for item in items %}
+    <hx-list-item
+      value="{{ item.value }}"
+      {% if item.selected %}selected{% endif %}
+      {% if item.disabled %}disabled{% endif %}
+      {% if item.href %}href="{{ item.href }}"{% endif %}
+    >
+      {{ item.label }}
+      {% if item.description %}
+        <span slot="description">{{ item.description }}</span>
+      {% endif %}
+    </hx-list-item>
+  {% endfor %}
+</hx-list>
+```
+
+Load the library in your module's `.libraries.yml`:
+
+```yaml
+helix-components:
+  js:
+    /libraries/helix/helix.min.js: { minified: true }
+```
+
+Listen for selection events in Drupal behaviors using `once()` to prevent duplicate listeners on AJAX:
+
+```javascript
+Drupal.behaviors.helixList = {
+  attach(context) {
+    // once() is a Drupal core utility (no import needed) — prevents duplicate event binding during AJAX attach cycles
+    once('helixList', 'hx-list[variant="interactive"]', context).forEach((el) => {
+      el.addEventListener('hx-select', (e) => {
+        console.log('Selected:', e.detail.value);
+        // e.g. navigate, update form field, highlight content
+      });
+    });
+  },
+};
+```
+
+## Standalone HTML Example
+
+Copy-paste into a `.html` file and open in any browser — no build tool required:
+
+```html
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>hx-list example</title>
+    <!-- @helix/library is a private package — install via npm workspace, not CDN -->
+    <!-- In your project: import '@helix/library'; in your bundler entry point -->
+  </head>
+  <body style="font-family: sans-serif; padding: 2rem; max-width: 400px;">
+    <h2>Patient Actions</h2>
+
+    <hx-list variant="interactive" label="Patient actions" id="patient-list" divided>
+      <hx-list-item value="schedule">Schedule Appointment</hx-list-item>
+      <hx-list-item value="labs" selected>View Lab Results</hx-list-item>
+      <hx-list-item value="refill">Request Prescription Refill</hx-list-item>
+      <hx-list-item value="message" disabled>Message Your Doctor (Unavailable)</hx-list-item>
+    </hx-list>
+
+    <script>
+      document.getElementById('patient-list').addEventListener('hx-select', (e) => {
+        console.log('Selected action:', e.detail.value);
+      });
+    </script>
+  </body>
+</html>
+```
 
 ## API Reference
 
