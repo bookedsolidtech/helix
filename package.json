@@ -28,6 +28,7 @@
     "lint:fix": "turbo lint --fix",
     "clean": "turbo clean",
     "cem": "turbo cem --filter=@helix/library",
+    "create:component": "tsx scripts/create-component.ts",
     "generate-docs": "tsx scripts/generate-component-docs.ts",
     "preview:docs": "turbo preview --filter=docs",
     "dev:admin": "turbo dev --filter=@helix/admin",
