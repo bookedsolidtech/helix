@@ -63,15 +63,15 @@ jobs:
       - name: Format check
         run: npm run format:check
 
+      # ---- Build (must run before tests — @helix/tokens exports from dist/) ----
+
+      - name: Build
+        run: npx turbo run build --filter='!docs'
+
       # ---- Tests ----
 
       - name: Test
         run: npm run test
-
-      # ---- Build ----
-
-      - name: Build
-        run: npm run build
 
       - name: Generate Custom Elements Manifest
         run: npm run cem
