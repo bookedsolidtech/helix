@@ -104,6 +104,11 @@ export class HelixAlert extends LitElement {
   @state()
   private _hasTitle = false;
 
+  // ─── Private Handler References ───
+
+  private _actionsSlotChangeHandler: (() => void) | null = null;
+  private _titleSlotChangeHandler: (() => void) | null = null;
+
   // ─── Private Helpers ───
 
   /** Returns true when the variant requires assertive announcement. */
@@ -133,21 +138,35 @@ export class HelixAlert extends LitElement {
     }
   }
 
+  override disconnectedCallback(): void {
+    super.disconnectedCallback();
+    const actionsSlot = this.renderRoot.querySelector<HTMLSlotElement>('slot[name="actions"]');
+    if (actionsSlot && this._actionsSlotChangeHandler) {
+      actionsSlot.removeEventListener('slotchange', this._actionsSlotChangeHandler);
+    }
+    const titleSlot = this.renderRoot.querySelector<HTMLSlotElement>('slot[name="title"]');
+    if (titleSlot && this._titleSlotChangeHandler) {
+      titleSlot.removeEventListener('slotchange', this._titleSlotChangeHandler);
+    }
+  }
+
   override firstUpdated(): void {
     // Track actions slot content to avoid invisible spacing when no actions are slotted.
     const actionsSlot = this.renderRoot.querySelector<HTMLSlotElement>('slot[name="actions"]');
     if (actionsSlot) {
-      actionsSlot.addEventListener('slotchange', () => {
+      this._actionsSlotChangeHandler = () => {
         this._hasActions = actionsSlot.assignedNodes({ flatten: true }).length > 0;
-      });
+      };
+      actionsSlot.addEventListener('slotchange', this._actionsSlotChangeHandler);
     }
 
     // Track title slot content so the title container doesn't create dead space when empty.
     const titleSlot = this.renderRoot.querySelector<HTMLSlotElement>('slot[name="title"]');
     if (titleSlot) {
-      titleSlot.addEventListener('slotchange', () => {
+      this._titleSlotChangeHandler = () => {
         this._hasTitle = titleSlot.assignedNodes({ flatten: true }).length > 0;
-      });
+      };
+      titleSlot.addEventListener('slotchange', this._titleSlotChangeHandler);
     }
   }
 
