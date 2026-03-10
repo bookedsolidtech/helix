@@ -7,15 +7,15 @@ All HELIX components follow consistent API conventions for predictable usage and
 
 ## Naming Conventions
 
-| Type                  | Convention                  | Example                      |
-| --------------------- | --------------------------- | ---------------------------- |
-| Tag name              | `hx-` prefix, kebab-case    | `hx-card`, `hx-button`       |
-| Properties            | camelCase                   | `variant`, `disabled`        |
-| Attributes            | kebab-case (auto-reflected) | `variant`, `disabled`        |
-| Events                | `hx-` prefix                | `hx-click`, `hx-change`      |
-| CSS Parts             | kebab-case                  | `container`, `header-text`   |
-| CSS Custom Properties | `--hx-` prefix              | `--hx-card-padding`          |
-| Slots                 | kebab-case                  | `header`, `actions`          |
+| Type                  | Convention                  | Example                    |
+| --------------------- | --------------------------- | -------------------------- |
+| Tag name              | `hx-` prefix, kebab-case    | `hx-card`, `hx-button`     |
+| Properties            | camelCase                   | `variant`, `disabled`      |
+| Attributes            | kebab-case (auto-reflected) | `variant`, `disabled`      |
+| Events                | `hx-` prefix                | `hx-click`, `hx-change`    |
+| CSS Parts             | kebab-case                  | `container`, `header-text` |
+| CSS Custom Properties | `--hx-` prefix              | `--hx-card-padding`        |
+| Slots                 | kebab-case                  | `header`, `actions`        |
 
 ## Property Types
 

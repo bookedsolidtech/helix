@@ -864,11 +864,11 @@ Current bundle size metrics for wc-2026 (as of latest build):
 
 ### Dependency Breakdown
 
-| Dependency      | Size (min+gz) | Percentage |
-| --------------- | ------------- | ---------- |
-| Lit core        | 5.1 KB        | 28%        |
-| @helix/tokens | 1.8 KB        | 10%        |
-| Component code  | 11.1 KB       | 62%        |
+| Dependency     | Size (min+gz) | Percentage |
+| -------------- | ------------- | ---------- |
+| Lit core       | 5.1 KB        | 28%        |
+| @helix/tokens  | 1.8 KB        | 10%        |
+| Component code | 11.1 KB       | 62%        |
 
 **Note:** Lit is externalized and only loaded once, even when using multiple components.
 

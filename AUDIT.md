@@ -16,13 +16,13 @@
 
 ## Findings Index
 
-| Severity | Count | Summary |
-|----------|-------|---------|
-| **P0 — Critical** | 7 | Will break in production |
-| **P1 — Major** | 12 | Will frustrate developers significantly |
-| **P2 — Minor** | 11 | Reduce quality but won't block adoption |
-| **P3 — DX Improvements** | 8 | Nice-to-haves for best-in-class |
-| **Total** | 38 | |
+| Severity                 | Count | Summary                                 |
+| ------------------------ | ----- | --------------------------------------- |
+| **P0 — Critical**        | 7     | Will break in production                |
+| **P1 — Major**           | 12    | Will frustrate developers significantly |
+| **P2 — Minor**           | 11    | Reduce quality but won't block adoption |
+| **P3 — DX Improvements** | 8     | Nice-to-haves for best-in-class         |
+| **Total**                | 38    |                                         |
 
 ---
 
@@ -45,7 +45,7 @@
     "./css": { "import": "./src/css.ts" },
     "./lit": { "import": "./src/lit.ts" }
   },
-  "files": ["dist", "src/tokens.json"]  // src/*.ts NOT included!
+  "files": ["dist", "src/tokens.json"] // src/*.ts NOT included!
 }
 ```
 
@@ -61,6 +61,7 @@
 **Files:** `packages/hx-tokens/src/tokens.json`
 
 **Problem:** Two semantic color tokens fail WCAG AA minimum contrast ratio (4.5:1) for normal text on white backgrounds:
+
 - `error-500` (#DC2626) on white = **3.8:1** (FAIL AA)
 - `success-500` (#16A34A) on white = **3.6:1** (FAIL AA)
 
@@ -139,6 +140,7 @@
 **Files:** Multiple component .ts files
 
 **Problem:** Components use two incompatible patterns for the same concept:
+
 - **Pattern A (`hxSize`):** hx-button, hx-checkbox, hx-text-input, hx-switch, hx-number-input
 - **Pattern B (`size`):** hx-select, hx-combobox, hx-slider, hx-copy-button, hx-icon
 
@@ -165,6 +167,7 @@ Both map to the same HTML attribute (`hx-size`), but the JavaScript property nam
 **Files:** 14 component .styles.ts files
 
 **Problem:** 31 instances of hardcoded `rgba()` values across 14 components bypass the token system:
+
 - `rgba(0, 0, 0, 0.1)` — 7 instances (invisible on dark backgrounds)
 - `rgba(0, 0, 0, 0.3)` — 6 instances (invisible on dark backgrounds)
 - `rgba(255, 255, 255, 0.08-0.4)` — 4 instances (invisible on light backgrounds)
@@ -204,6 +207,7 @@ Both map to the same HTML attribute (`hx-size`), but the JavaScript property nam
 **Files:** Multiple component .ts files
 
 **Problem:** Event detail payloads are not standardized:
+
 - `hx-button` emits `{originalEvent: MouseEvent}` for `hx-click`
 - `hx-text-input` emits `{value: string}` for `hx-change`
 - `hx-checkbox` emits `{checked: boolean, value: string}` for `hx-change`
@@ -220,6 +224,7 @@ Both map to the same HTML attribute (`hx-size`), but the JavaScript property nam
 **Files:** `apps/docs/src/content/docs/component-library/*.mdx`
 
 **Problem:** 74 of 87 component doc pages are 15-line stubs containing only CEM auto-generated API tables. They lack:
+
 - Overview sections explaining when/why to use the component
 - Live demo examples
 - Healthcare use case guidance
@@ -449,58 +454,76 @@ Components silently accept invalid slot content (e.g., putting a `<div>` in a sl
 ## Recommended Fix Tickets
 
 ### Ticket 1: Package Export Fix (P0-01)
+
 **Effort:** 30 min | **Priority:** CRITICAL
+
 - Fix hx-tokens package.json exports to point to dist/
 - Add `npm pack --dry-run` validation to CI
 - Verify external consumer import works
 
 ### Ticket 2: Accessibility Color Contrast (P0-02)
+
 **Effort:** 2 hours | **Priority:** CRITICAL
+
 - Darken error-500 and success-500 tokens for text usage
 - Create separate text-on-light semantic tokens
 - Run contrast verification across all alert/badge/status components
 
 ### Ticket 3: Memory Leak Fixes (P0-03, P0-04, P0-05)
+
 **Effort:** 2 hours | **Priority:** CRITICAL
+
 - hx-alert: Add disconnectedCallback with listener cleanup
 - hx-date-picker: Remove document listeners in disconnectedCallback
 - hx-breadcrumb: Convert to Lit declarative event binding
 - Audit remaining components for similar patterns
 
 ### Ticket 4: Accessibility ARIA Fixes (P0-06, P0-07, P1-08, P1-09)
+
 **Effort:** 2 hours | **Priority:** CRITICAL
+
 - Fix popover aria-hidden boolean attribute
 - Add drawer fallback accessible name
 - Fix popover dialog nesting issue
 - Fix menu typeahead disabled item filtering
 
 ### Ticket 5: API Consistency — Property Naming (P1-01, P1-02, P1-06)
+
 **Effort:** 4 hours | **Priority:** HIGH (breaking change)
+
 - Standardize size property naming across all components
 - Standardize help text slot naming
 - Standardize event detail shapes
 - Document chosen conventions
 
 ### Ticket 6: Design Token Hardcoded Values (P1-03, P1-04, P1-10, P2-03)
+
 **Effort:** 6 hours | **Priority:** HIGH
+
 - Replace 31 rgba() values with token-based alternatives
 - Add missing intermediate size tokens
 - Tokenize color picker dimensions
 - Create overlay color token system
 
 ### Ticket 7: ID Generation Standardization (P1-05)
+
 **Effort:** 2 hours | **Priority:** HIGH
+
 - Replace Math.random() with monotonic counters in all components
 - Verify SSR compatibility
 
 ### Ticket 8: Documentation Expansion (P1-07, P1-11)
+
 **Effort:** 40+ hours | **Priority:** HIGH
+
 - Expand 74 minimal doc pages to comprehensive format
 - Add interaction tests to 5 missing Storybook stories
 - Create framework integration guides
 
 ### Ticket 9: Minor Consistency Fixes (P2-01 through P2-11)
+
 **Effort:** 4 hours | **Priority:** MEDIUM
+
 - CSS parts naming standardization
 - Dialog variant property rename consideration
 - Boolean attribute documentation
@@ -511,6 +534,7 @@ Components silently accept invalid slot content (e.g., putting a `<div>` in a sl
 ## Verification Status
 
 This audit was conducted as a **read-only review**. No code changes were made. All findings are based on source code analysis across:
+
 - 72 parent component directories (84 component .ts files)
 - 82 .styles.ts files
 - 73 .test.ts files (3,537 tests)
@@ -529,6 +553,7 @@ npm run verify — ✓ (lint + format + type-check clean)
 ```
 
 ### git diff --stat
+
 ```
 0 files changed (read-only audit — only AUDIT.md created)
 ```
