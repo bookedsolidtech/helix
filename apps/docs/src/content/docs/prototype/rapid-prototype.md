@@ -96,5 +96,5 @@ Week 4: Integration validation
 
 1. A working monorepo with 3 published components
 2. A validated build pipeline: author → test → build → publish → integrate
-3. Established patterns documented for all 85 subsequent components
+3. Established patterns documented for all 87 subsequent components
 4. Three concrete integration issues found and resolved before they scaled

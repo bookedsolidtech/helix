@@ -3,15 +3,15 @@ title: Component Examples
 description: Working examples of HELIX enterprise web components
 ---
 
-Live component examples will be available once the component library is implemented in Phase 2. Below are usage patterns from the specification.
+The following examples show common composition patterns for HELIX components. For live interactive demos, see the [Component Library](/component-library/overview/).
 
 ## Card Component
 
 ```html
 <hx-card variant="elevated">
-  <hx-heading level="3" slot="header"> Featured Resources </hx-heading>
-  <hx-text> Access our latest articles, resources, and support services. </hx-text>
-  <hx-button slot="actions" variant="primary"> Learn More </hx-button>
+  <span slot="heading">Featured Resources</span>
+  <hx-text>Access our latest articles, resources, and support services.</hx-text>
+  <hx-button slot="actions" variant="primary">Learn More</hx-button>
 </hx-card>
 ```
 
@@ -45,8 +45,8 @@ Live component examples will be available once the component library is implemen
 ## Form Components
 
 ```html
-<form>
-  <hx-input label="Full Name" required error-message="Please enter your name"></hx-input>
+<hx-form>
+  <hx-text-input label="Full Name" required></hx-text-input>
 
   <hx-select label="Category" required>
     <option value="">Select a category</option>
@@ -57,8 +57,8 @@ Live component examples will be available once the component library is implemen
 
   <hx-textarea label="Additional Notes" rows="4" maxlength="500"></hx-textarea>
 
-  <hx-button type="submit" variant="primary"> Submit Request </hx-button>
-</form>
+  <hx-button type="submit" variant="primary">Submit Request</hx-button>
+</hx-form>
 ```
 
 ## Drupal TWIG Integration
@@ -66,9 +66,9 @@ Live component examples will be available once the component library is implemen
 ```twig
 {# Drupal template using HELIX components #}
 <hx-card variant="{{ content.field_card_variant.0['#markup'] }}">
-  <hx-heading level="3" slot="header">
+  <span slot="heading">
     {{ content.field_title }}
-  </hx-heading>
+  </span>
   {{ content.field_body }}
   {% if content.field_cta_url %}
     <hx-button slot="actions" variant="primary"

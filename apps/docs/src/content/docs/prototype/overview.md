@@ -1,6 +1,6 @@
 ---
 title: Phase 0 Overview
-description: How we validated the HELIX architecture before committing to 85 components
+description: How we validated the HELIX architecture before committing to 87 components
 ---
 
 > **Status**: Complete
@@ -10,7 +10,7 @@ description: How we validated the HELIX architecture before committing to 85 com
 
 ## What Phase 0 Was For
 
-Before committing to a 85-component library, we built a thin vertical slice — three components that exercised every layer of the architecture. The goal was simple: find the hard problems before they became expensive problems.
+Before committing to an 87-component library, we built a thin vertical slice — three components that exercised every layer of the architecture. The goal was simple: find the hard problems before they became expensive problems.
 
 Every integration point that could fail was stressed:
 
@@ -43,4 +43,4 @@ For the full retrospective, see the [Architecture decisions](/architecture/overv
 
 ## Where This Led
 
-Phase 0 proved the stack. Everything that came after — all 85 components — is built on the patterns we established here. The [Planning & Discovery](/pre-planning/overview/) documents capture the comprehensive build plan that followed.
+Phase 0 proved the stack. Everything that came after — all 87 components — is built on the patterns we established here. The [Planning & Discovery](/pre-planning/overview/) documents capture the comprehensive build plan that followed.

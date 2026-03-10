@@ -67,7 +67,7 @@ Before diving into complex patterns, ensure you understand:
 
 Multi-value inputs allow users to select or enter multiple discrete values. Common patterns include multi-select dropdowns, tag inputs, checkbox groups, and token fields.
 
-### Multi-Select with `wc-checkbox`
+### Multi-Select with `hx-checkbox`
 
 For a small, known set of options, a checkbox group provides the most accessible multi-select experience.
 
@@ -75,13 +75,13 @@ For a small, known set of options, a checkbox group provides the most accessible
 <form>
   <fieldset>
     <legend>Allergies</legend>
-    <wc-checkbox name="allergies[]" value="penicillin" label="Penicillin"></wc-checkbox>
-    <wc-checkbox name="allergies[]" value="latex" label="Latex"></wc-checkbox>
-    <wc-checkbox name="allergies[]" value="shellfish" label="Shellfish"></wc-checkbox>
-    <wc-checkbox name="allergies[]" value="peanuts" label="Peanuts"></wc-checkbox>
+    <hx-checkbox name="allergies[]" value="penicillin" label="Penicillin"></hx-checkbox>
+    <hx-checkbox name="allergies[]" value="latex" label="Latex"></hx-checkbox>
+    <hx-checkbox name="allergies[]" value="shellfish" label="Shellfish"></hx-checkbox>
+    <hx-checkbox name="allergies[]" value="peanuts" label="Peanuts"></hx-checkbox>
   </fieldset>
 
-  <wc-button type="submit">Save Allergies</wc-button>
+  <hx-button type="submit">Save Allergies</hx-button>
 </form>
 ```
 
@@ -103,12 +103,12 @@ const allergies = formData.getAll('allergies[]');
 console.log(allergies); // ['penicillin', 'peanuts']
 ```
 
-### Multi-Select with `wc-select`
+### Multi-Select with `hx-select`
 
-For longer lists, a native `<select multiple>` inside `wc-select` provides a compact multi-select:
+For longer lists, a native `<select multiple>` inside `hx-select` provides a compact multi-select:
 
 ```html
-<wc-select
+<hx-select
   label="Care Team Members"
   name="careTeam"
   help-text="Hold Ctrl (Cmd on Mac) to select multiple"
@@ -120,7 +120,7 @@ For longer lists, a native `<select multiple>` inside `wc-select` provides a com
     <option value="sw-martinez">SW Martinez (Social Work)</option>
     <option value="pharm-lee">Pharm. Lee (Pharmacy)</option>
   </select>
-</wc-select>
+</hx-select>
 ```
 
 **Limitations:**
@@ -143,7 +143,7 @@ import { repeat } from 'lit/directives/repeat.js';
  * @summary Form-associated tag input with keyboard support.
  * @tag wc-tag-input
  */
-@customElement('wc-tag-input')
+@customElement('hx-tag-input')
 export class WcTagInput extends LitElement {
   static formAssociated = true;
   private _internals: ElementInternals;
@@ -199,7 +199,7 @@ export class WcTagInput extends LitElement {
     this._error = '';
 
     this.dispatchEvent(
-      new CustomEvent('wc-tag-add', {
+      new CustomEvent('hx-tag-add', {
         bubbles: true,
         composed: true,
         detail: { tag: trimmed, tags: this.value },
@@ -212,7 +212,7 @@ export class WcTagInput extends LitElement {
     this._error = '';
 
     this.dispatchEvent(
-      new CustomEvent('wc-tag-remove', {
+      new CustomEvent('hx-tag-remove', {
         bubbles: true,
         composed: true,
         detail: { tag, tags: this.value },
@@ -286,16 +286,16 @@ export class WcTagInput extends LitElement {
       flex-wrap: wrap;
       gap: 0.5rem;
       padding: 0.5rem;
-      border: 1px solid var(--wc-color-neutral-300);
-      border-radius: var(--wc-border-radius-md);
+      border: 1px solid var(--hx-color-neutral-300);
+      border-radius: var(--hx-border-radius-md);
     }
     .tag {
       display: inline-flex;
       align-items: center;
       gap: 0.25rem;
       padding: 0.25rem 0.5rem;
-      background: var(--wc-color-primary-100);
-      border-radius: var(--wc-border-radius-sm);
+      background: var(--hx-color-primary-100);
+      border-radius: var(--hx-border-radius-sm);
       font-size: 0.875rem;
     }
     .tag button {
@@ -304,10 +304,10 @@ export class WcTagInput extends LitElement {
       cursor: pointer;
       font-size: 1.25rem;
       line-height: 1;
-      color: var(--wc-color-neutral-600);
+      color: var(--hx-color-neutral-600);
     }
     .tag button:hover {
-      color: var(--wc-color-error-500);
+      color: var(--hx-color-error-500);
     }
     input {
       flex: 1;
@@ -317,7 +317,7 @@ export class WcTagInput extends LitElement {
       font-size: 1rem;
     }
     .error {
-      color: var(--wc-color-error-500);
+      color: var(--hx-color-error-500);
       font-size: 0.875rem;
       margin-top: 0.25rem;
     }
@@ -326,7 +326,7 @@ export class WcTagInput extends LitElement {
 
 declare global {
   interface HTMLElementTagNameMap {
-    'wc-tag-input': WcTagInput;
+    'hx-tag-input': WcTagInput;
   }
 }
 ```
@@ -359,18 +359,18 @@ Date and time inputs are ubiquitous in healthcare: appointment scheduling, medic
 
 ### Native Date Input (Recommended for MVP)
 
-Start with native date inputs wrapped in `wc-text-input`:
+Start with native date inputs wrapped in `hx-text-input`:
 
 ```html
-<wc-text-input
+<hx-text-input
   label="Date of Birth"
   name="dateOfBirth"
   type="date"
   required
   max="2026-02-16"
-></wc-text-input>
+></hx-text-input>
 
-<wc-text-input label="Appointment Time" name="appointmentTime" type="time" required></wc-text-input>
+<hx-text-input label="Appointment Time" name="appointmentTime" type="time" required></hx-text-input>
 ```
 
 **Pros:**
@@ -398,7 +398,7 @@ import { customElement, property, state } from 'lit/decorators.js';
  * @summary Form-associated date picker with accessible calendar.
  * @tag wc-date-picker
  */
-@customElement('wc-date-picker')
+@customElement('hx-date-picker')
 export class WcDatePicker extends LitElement {
   static formAssociated = true;
   private _internals: ElementInternals;
@@ -466,7 +466,7 @@ export class WcDatePicker extends LitElement {
     this._isOpen = false;
 
     this.dispatchEvent(
-      new CustomEvent('wc-change', {
+      new CustomEvent('hx-change', {
         bubbles: true,
         composed: true,
         detail: { value: this.value },
@@ -644,9 +644,9 @@ export class WcDatePicker extends LitElement {
     .date-picker__trigger {
       width: 100%;
       padding: 0.5rem;
-      border: 1px solid var(--wc-color-neutral-300);
-      border-radius: var(--wc-border-radius-md);
-      background: var(--wc-color-neutral-0);
+      border: 1px solid var(--hx-color-neutral-300);
+      border-radius: var(--hx-border-radius-md);
+      background: var(--hx-color-neutral-0);
       text-align: left;
       cursor: pointer;
     }
@@ -657,10 +657,10 @@ export class WcDatePicker extends LitElement {
       z-index: 1000;
       margin-top: 0.25rem;
       padding: 1rem;
-      background: var(--wc-color-neutral-0);
-      border: 1px solid var(--wc-color-neutral-300);
-      border-radius: var(--wc-border-radius-md);
-      box-shadow: var(--wc-shadow-lg);
+      background: var(--hx-color-neutral-0);
+      border: 1px solid var(--hx-color-neutral-300);
+      border-radius: var(--hx-border-radius-md);
+      box-shadow: var(--hx-shadow-lg);
     }
     .calendar__header {
       display: flex;
@@ -693,24 +693,24 @@ export class WcDatePicker extends LitElement {
       border: none;
       background: transparent;
       cursor: pointer;
-      border-radius: var(--wc-border-radius-sm);
+      border-radius: var(--hx-border-radius-sm);
     }
     .calendar__day:hover {
-      background: var(--wc-color-primary-100);
+      background: var(--hx-color-primary-100);
     }
     .calendar__day--today {
       font-weight: 700;
-      color: var(--wc-color-primary-500);
+      color: var(--hx-color-primary-500);
     }
     .calendar__day--selected {
-      background: var(--wc-color-primary-500);
-      color: var(--wc-color-neutral-0);
+      background: var(--hx-color-primary-500);
+      color: var(--hx-color-neutral-0);
     }
     .calendar__day--other-month {
-      color: var(--wc-color-neutral-400);
+      color: var(--hx-color-neutral-400);
     }
     .calendar__day:disabled {
-      color: var(--wc-color-neutral-300);
+      color: var(--hx-color-neutral-300);
       cursor: not-allowed;
     }
   `;
@@ -718,7 +718,7 @@ export class WcDatePicker extends LitElement {
 
 declare global {
   interface HTMLElementTagNameMap {
-    'wc-date-picker': WcDatePicker;
+    'hx-date-picker': WcDatePicker;
   }
 }
 ```
@@ -753,7 +753,7 @@ For date ranges (e.g., prescription start/end dates), use two date pickers with 
   name="startDate"
   label="Start Date"
   .value="${this.startDate}"
-  @wc-change="${(e:"
+  @hx-change="${(e:"
   CustomEvent)=""
 >
   { this.startDate = e.detail.value; this._validateDateRange(); }} required ></wc-date-picker
@@ -764,7 +764,7 @@ For date ranges (e.g., prescription start/end dates), use two date pickers with 
   label="End Date"
   .value="${this.endDate}"
   .min="${this.startDate}"
-  @wc-change="${(e:"
+  @hx-change="${(e:"
   CustomEvent)=""
 >
   { this.endDate = e.detail.value; this._validateDateRange(); }} required ></wc-date-picker
@@ -788,7 +788,7 @@ import { customElement, property, state, query } from 'lit/decorators.js';
  * @summary Form-associated file input with validation.
  * @tag wc-file-input
  */
-@customElement('wc-file-input')
+@customElement('hx-file-input')
 export class WcFileInput extends LitElement {
   static formAssociated = true;
   private _internals: ElementInternals;
@@ -1030,15 +1030,15 @@ export class WcFileInput extends LitElement {
       display: block;
     }
     .file-input__dropzone {
-      border: 2px dashed var(--wc-color-neutral-300);
-      border-radius: var(--wc-border-radius-md);
+      border: 2px dashed var(--hx-color-neutral-300);
+      border-radius: var(--hx-border-radius-md);
       padding: 2rem;
       text-align: center;
       transition: border-color 0.2s;
     }
     .file-input__dropzone--dragging {
-      border-color: var(--wc-color-primary-500);
-      background: var(--wc-color-primary-50);
+      border-color: var(--hx-color-primary-500);
+      background: var(--hx-color-primary-50);
     }
     .file-input__prompt {
       display: flex;
@@ -1046,11 +1046,11 @@ export class WcFileInput extends LitElement {
       align-items: center;
       gap: 0.5rem;
       cursor: pointer;
-      color: var(--wc-color-neutral-600);
+      color: var(--hx-color-neutral-600);
     }
     .file-input__hint {
       font-size: 0.875rem;
-      color: var(--wc-color-neutral-500);
+      color: var(--hx-color-neutral-500);
     }
     .file-input__files {
       display: flex;
@@ -1062,8 +1062,8 @@ export class WcFileInput extends LitElement {
       justify-content: space-between;
       align-items: center;
       padding: 0.75rem;
-      background: var(--wc-color-neutral-50);
-      border-radius: var(--wc-border-radius-sm);
+      background: var(--hx-color-neutral-50);
+      border-radius: var(--hx-border-radius-sm);
     }
     .file-item__info {
       display: flex;
@@ -1075,28 +1075,28 @@ export class WcFileInput extends LitElement {
     }
     .file-item__size {
       font-size: 0.875rem;
-      color: var(--wc-color-neutral-600);
+      color: var(--hx-color-neutral-600);
     }
     .file-item button {
       border: none;
       background: transparent;
       font-size: 1.5rem;
       cursor: pointer;
-      color: var(--wc-color-neutral-500);
+      color: var(--hx-color-neutral-500);
     }
     .file-item button:hover {
-      color: var(--wc-color-error-500);
+      color: var(--hx-color-error-500);
     }
     .file-input__add-more {
       display: inline-block;
       margin-top: 1rem;
-      color: var(--wc-color-primary-500);
+      color: var(--hx-color-primary-500);
       cursor: pointer;
       text-decoration: underline;
     }
     .file-input__error {
       margin-top: 0.5rem;
-      color: var(--wc-color-error-500);
+      color: var(--hx-color-error-500);
       font-size: 0.875rem;
     }
   `;
@@ -1104,7 +1104,7 @@ export class WcFileInput extends LitElement {
 
 declare global {
   interface HTMLElementTagNameMap {
-    'wc-file-input': WcFileInput;
+    'hx-file-input': WcFileInput;
   }
 }
 ```
@@ -1150,7 +1150,7 @@ import 'quill/dist/quill.snow.css';
  * @summary Form-associated rich text editor powered by Quill.
  * @tag wc-rich-text-editor
  */
-@customElement('wc-rich-text-editor')
+@customElement('hx-rich-text-editor')
 export class WcRichTextEditor extends LitElement {
   static formAssociated = true;
   private _internals: ElementInternals;
@@ -1199,7 +1199,7 @@ export class WcRichTextEditor extends LitElement {
       this._updateValidity();
 
       this.dispatchEvent(
-        new CustomEvent('wc-input', {
+        new CustomEvent('hx-input', {
           bubbles: true,
           composed: true,
           detail: { value: this.value },
@@ -1261,7 +1261,7 @@ export class WcRichTextEditor extends LitElement {
     }
     .error {
       margin-top: 0.5rem;
-      color: var(--wc-color-error-500);
+      color: var(--hx-color-error-500);
       font-size: 0.875rem;
     }
   `;
@@ -1269,7 +1269,7 @@ export class WcRichTextEditor extends LitElement {
 
 declare global {
   interface HTMLElementTagNameMap {
-    'wc-rich-text-editor': WcRichTextEditor;
+    'hx-rich-text-editor': WcRichTextEditor;
   }
 }
 ```
@@ -1329,7 +1329,7 @@ export class MedicationListForm extends LitElement {
 
     // Announce to screen readers
     this.dispatchEvent(
-      new CustomEvent('wc-medication-added', {
+      new CustomEvent('hx-medication-added', {
         bubbles: true,
         composed: true,
         detail: { count: this.medications.length },
@@ -1341,7 +1341,7 @@ export class MedicationListForm extends LitElement {
     this.medications = this.medications.filter((m) => m.id !== id);
 
     this.dispatchEvent(
-      new CustomEvent('wc-medication-removed', {
+      new CustomEvent('hx-medication-removed', {
         bubbles: true,
         composed: true,
         detail: { count: this.medications.length },
@@ -1358,7 +1358,7 @@ export class MedicationListForm extends LitElement {
     const form = e.target as HTMLFormElement;
 
     // Validate all fields
-    const inputs = form.querySelectorAll('wc-text-input, wc-select');
+    const inputs = form.querySelectorAll('hx-text-input, hx-select');
     let isValid = true;
     inputs.forEach((input: any) => {
       if (!input.checkValidity()) {
@@ -1389,30 +1389,30 @@ export class MedicationListForm extends LitElement {
             <fieldset class="medication-item">
               <legend>Medication ${index + 1}</legend>
 
-              <wc-text-input
+              <hx-text-input
                 label="Medication Name"
                 name="medications[${index}][name]"
                 .value=${med.name}
-                @wc-input=${(e: CustomEvent) =>
+                @hx-input=${(e: CustomEvent) =>
                   this._updateMedication(med.id, 'name', e.detail.value)}
                 required
-              ></wc-text-input>
+              ></hx-text-input>
 
-              <wc-text-input
+              <hx-text-input
                 label="Dose"
                 name="medications[${index}][dose]"
                 .value=${med.dose}
-                @wc-input=${(e: CustomEvent) =>
+                @hx-input=${(e: CustomEvent) =>
                   this._updateMedication(med.id, 'dose', e.detail.value)}
                 placeholder="e.g., 10mg"
                 required
-              ></wc-text-input>
+              ></hx-text-input>
 
-              <wc-select
+              <hx-select
                 label="Frequency"
                 name="medications[${index}][frequency]"
                 .value=${med.frequency}
-                @wc-change=${(e: CustomEvent) =>
+                @hx-change=${(e: CustomEvent) =>
                   this._updateMedication(med.id, 'frequency', e.detail.value)}
                 required
               >
@@ -1421,34 +1421,34 @@ export class MedicationListForm extends LitElement {
                 <option value="twice-daily">Twice Daily</option>
                 <option value="three-times-daily">Three Times Daily</option>
                 <option value="as-needed">As Needed</option>
-              </wc-select>
+              </hx-select>
 
               ${this.medications.length > 1
                 ? html`
-                    <wc-button
+                    <hx-button
                       type="button"
                       variant="secondary"
                       @click=${() => this._removeMedication(med.id)}
                     >
                       Remove
-                    </wc-button>
+                    </hx-button>
                   `
                 : ''}
             </fieldset>
           `,
         )}
 
-        <wc-button type="button" @click=${this._addMedication}> Add Medication </wc-button>
+        <hx-button type="button" @click=${this._addMedication}> Add Medication </hx-button>
 
-        <wc-button type="submit">Save Medication List</wc-button>
+        <hx-button type="submit">Save Medication List</hx-button>
       </form>
     `;
   }
 
   static styles = css`
     .medication-item {
-      border: 1px solid var(--wc-color-neutral-300);
-      border-radius: var(--wc-border-radius-md);
+      border: 1px solid var(--hx-color-neutral-300);
+      border-radius: var(--hx-border-radius-md);
       padding: 1rem;
       margin-bottom: 1rem;
     }
@@ -1529,13 +1529,13 @@ private _moveDown(id: string): void {
 **Render buttons:**
 
 ```html
-<wc-button type="button" @click="${()" ="">
+<hx-button type="button" @click="${()" ="">
   this._moveUp(med.id)} ?disabled=${index === 0} aria-label="Move medication up" > ↑
-</wc-button>
-<wc-button type="button" @click="${()" ="">
+</hx-button>
+<hx-button type="button" @click="${()" ="">
   this._moveDown(med.id)} ?disabled=${index === this.medications.length - 1} aria-label="Move
   medication down" > ↓
-</wc-button>
+</hx-button>
 ```
 
 ---
@@ -1596,69 +1596,69 @@ export class PatientDemographicsForm extends LitElement {
         <fieldset>
           <legend>Patient Information</legend>
 
-          <wc-text-input
+          <hx-text-input
             label="First Name"
             name="firstName"
             .value=${this.patient.firstName}
-            @wc-input=${(e: CustomEvent) => this._updateField('firstName', e.detail.value)}
+            @hx-input=${(e: CustomEvent) => this._updateField('firstName', e.detail.value)}
             required
-          ></wc-text-input>
+          ></hx-text-input>
 
-          <wc-text-input
+          <hx-text-input
             label="Last Name"
             name="lastName"
             .value=${this.patient.lastName}
-            @wc-input=${(e: CustomEvent) => this._updateField('lastName', e.detail.value)}
+            @hx-input=${(e: CustomEvent) => this._updateField('lastName', e.detail.value)}
             required
-          ></wc-text-input>
+          ></hx-text-input>
 
-          <wc-text-input
+          <hx-text-input
             label="Date of Birth"
             name="dateOfBirth"
             type="date"
             .value=${this.patient.dateOfBirth}
-            @wc-input=${(e: CustomEvent) => this._updateField('dateOfBirth', e.detail.value)}
+            @hx-input=${(e: CustomEvent) => this._updateField('dateOfBirth', e.detail.value)}
             required
-          ></wc-text-input>
+          ></hx-text-input>
         </fieldset>
 
         <fieldset>
           <legend>Address</legend>
 
-          <wc-text-input
+          <hx-text-input
             label="Street Address"
             name="address.street"
             .value=${this.patient.address.street}
-            @wc-input=${(e: CustomEvent) => this._updateField('address.street', e.detail.value)}
+            @hx-input=${(e: CustomEvent) => this._updateField('address.street', e.detail.value)}
             required
-          ></wc-text-input>
+          ></hx-text-input>
 
-          <wc-text-input
+          <hx-text-input
             label="City"
             name="address.city"
             .value=${this.patient.address.city}
-            @wc-input=${(e: CustomEvent) => this._updateField('address.city', e.detail.value)}
+            @hx-input=${(e: CustomEvent) => this._updateField('address.city', e.detail.value)}
             required
-          ></wc-text-input>
+          ></hx-text-input>
 
-          <wc-text-input
+          <hx-text-input
             label="State"
             name="address.state"
             .value=${this.patient.address.state}
-            @wc-input=${(e: CustomEvent) => this._updateField('address.state', e.detail.value)}
+            @hx-input=${(e: CustomEvent) => this._updateField('address.state', e.detail.value)}
             required
-          ></wc-text-input>
+          ></hx-text-input>
 
-          <wc-text-input
+          <hx-text-input
             label="ZIP Code"
             name="address.zip"
             .value=${this.patient.address.zip}
-            @wc-input=${(e: CustomEvent) => this._updateField('address.zip', e.detail.value)}
+            @hx-input=${(e: CustomEvent) => this._updateField('address.zip', e.detail.value)}
             required
-          ></wc-text-input>
+          ></hx-text-input>
         </fieldset>
 
-        <wc-button type="submit">Save Demographics</wc-button>
+        <hx-button type="submit">Save Demographics</hx-button>
       </form>
     `;
   }
@@ -1710,7 +1710,7 @@ export class InsuranceForm extends LitElement {
           label="Do you have health insurance?"
           name="hasInsurance"
           .value=${this.hasInsurance ? 'yes' : 'no'}
-          @wc-change=${(e: CustomEvent) => {
+          @hx-change=${(e: CustomEvent) => {
             this.hasInsurance = e.detail.value === 'yes';
             if (!this.hasInsurance) this.insuranceType = '';
           }}
@@ -1726,11 +1726,11 @@ export class InsuranceForm extends LitElement {
                 Insurance details section now visible
               </div>
 
-              <wc-select
+              <hx-select
                 label="Insurance Type"
                 name="insuranceType"
                 .value=${this.insuranceType}
-                @wc-change=${(e: CustomEvent) => (this.insuranceType = e.detail.value)}
+                @hx-change=${(e: CustomEvent) => (this.insuranceType = e.detail.value)}
                 required
               >
                 <option value="">Select type</option>
@@ -1738,30 +1738,30 @@ export class InsuranceForm extends LitElement {
                 <option value="medicare">Medicare</option>
                 <option value="medicaid">Medicaid</option>
                 <option value="other">Other</option>
-              </wc-select>
+              </hx-select>
 
               ${this.insuranceType === 'private'
                 ? html`
-                    <wc-text-input
+                    <hx-text-input
                       label="Insurance Provider"
                       name="insuranceProvider"
                       required
-                    ></wc-text-input>
+                    ></hx-text-input>
 
-                    <wc-text-input
+                    <hx-text-input
                       label="Policy Number"
                       name="policyNumber"
                       required
-                    ></wc-text-input>
+                    ></hx-text-input>
                   `
                 : ''}
               ${this.insuranceType === 'medicare' || this.insuranceType === 'medicaid'
-                ? html` <wc-text-input label="Member ID" name="memberId" required></wc-text-input> `
+                ? html` <hx-text-input label="Member ID" name="memberId" required></hx-text-input> `
                 : ''}
             `
           : ''}
 
-        <wc-button type="submit">Continue</wc-button>
+        <hx-button type="submit">Continue</hx-button>
       </form>
     `;
   }
@@ -1793,11 +1793,11 @@ export class LocationSelector extends LitElement {
     const cities = this.selectedState ? this.stateCities[this.selectedState] : [];
 
     return html`
-      <wc-select
+      <hx-select
         label="State"
         name="state"
         .value=${this.selectedState}
-        @wc-change=${(e: CustomEvent) => {
+        @hx-change=${(e: CustomEvent) => {
           this.selectedState = e.detail.value;
           this.selectedCity = ''; // Reset dependent field
         }}
@@ -1807,20 +1807,20 @@ export class LocationSelector extends LitElement {
         <option value="CA">California</option>
         <option value="NY">New York</option>
         <option value="TX">Texas</option>
-      </wc-select>
+      </hx-select>
 
       ${this.selectedState
         ? html`
-            <wc-select
+            <hx-select
               label="City"
               name="city"
               .value=${this.selectedCity}
-              @wc-change=${(e: CustomEvent) => (this.selectedCity = e.detail.value)}
+              @hx-change=${(e: CustomEvent) => (this.selectedCity = e.detail.value)}
               required
             >
               <option value="">Select city</option>
               ${cities!.map((city) => html` <option value=${city}>${city}</option> `)}
-            </wc-select>
+            </hx-select>
           `
         : ''}
     `;
@@ -1864,32 +1864,32 @@ export class DateRangeForm extends LitElement {
   render() {
     return html`
       <form>
-        <wc-text-input
+        <hx-text-input
           label="Start Date"
           name="startDate"
           type="date"
           .value=${this.startDate}
-          @wc-change=${(e: CustomEvent) => {
+          @hx-change=${(e: CustomEvent) => {
             this.startDate = e.detail.value;
             this._validateDateRange();
           }}
           required
-        ></wc-text-input>
+        ></hx-text-input>
 
-        <wc-text-input
+        <hx-text-input
           label="End Date"
           name="endDate"
           type="date"
           .value=${this.endDate}
           .error=${this.dateError}
-          @wc-change=${(e: CustomEvent) => {
+          @hx-change=${(e: CustomEvent) => {
             this.endDate = e.detail.value;
             this._validateDateRange();
           }}
           required
-        ></wc-text-input>
+        ></hx-text-input>
 
-        <wc-button type="submit">Submit</wc-button>
+        <hx-button type="submit">Submit</hx-button>
       </form>
     `;
   }
@@ -1943,19 +1943,19 @@ export class UsernameForm extends LitElement {
 
   render() {
     return html`
-      <wc-text-input
+      <hx-text-input
         label="Username"
         name="username"
         .value=${this.username}
         .error=${this.usernameError}
-        @wc-input=${(e: CustomEvent) => {
+        @hx-input=${(e: CustomEvent) => {
           this.username = e.detail.value;
           this._checkUsernameDebounced();
         }}
         required
       >
         ${this.isChecking ? html` <span slot="suffix">Checking...</span> ` : ''}
-      </wc-text-input>
+      </hx-text-input>
     `;
   }
 }
@@ -2142,7 +2142,7 @@ private async _addMedication(): Promise<void> {
 
   // Focus first input in new row
   const newRow = this.shadowRoot?.querySelector(
-    `.medication-item:last-child wc-text-input`
+    `.medication-item:last-child hx-text-input`
   );
   (newRow as HTMLElement)?.focus();
 }
@@ -2199,10 +2199,10 @@ export class PatientIntakeWizard extends LitElement {
         </div>
 
         <div class="wizard__actions">
-          ${this.step > 1 ? html` <wc-button @click=${() => this.step--}>Back</wc-button> ` : ''}
+          ${this.step > 1 ? html` <hx-button @click=${() => this.step--}>Back</hx-button> ` : ''}
           ${this.step < 4
-            ? html` <wc-button @click=${() => this.step++}>Next</wc-button> `
-            : html` <wc-button type="submit">Submit</wc-button> `}
+            ? html` <hx-button @click=${() => this.step++}>Next</hx-button> `
+            : html` <hx-button type="submit">Submit</hx-button> `}
         </div>
       </div>
     `;
@@ -2245,24 +2245,24 @@ export class LabResultsForm extends LitElement {
               (result, index) => html`
                 <tr>
                   <td>
-                    <wc-select name="results[${index}][test]" required>
+                    <hx-select name="results[${index}][test]" required>
                       <option value="">Select test</option>
                       <option value="glucose">Glucose</option>
                       <option value="hemoglobin">Hemoglobin</option>
                       <option value="wbc">WBC Count</option>
-                    </wc-select>
+                    </hx-select>
                   </td>
                   <td>
-                    <wc-text-input name="results[${index}][result]" required></wc-text-input>
+                    <hx-text-input name="results[${index}][result]" required></hx-text-input>
                   </td>
                   <td>
-                    <wc-text-input name="results[${index}][unit]" required></wc-text-input>
+                    <hx-text-input name="results[${index}][unit]" required></hx-text-input>
                   </td>
                   <td>
-                    <wc-text-input name="results[${index}][refRange]"></wc-text-input>
+                    <hx-text-input name="results[${index}][refRange]"></hx-text-input>
                   </td>
                   <td>
-                    <wc-button @click=${() => this._removeResult(result.id)}>Remove</wc-button>
+                    <hx-button @click=${() => this._removeResult(result.id)}>Remove</hx-button>
                   </td>
                 </tr>
               `,
@@ -2270,8 +2270,8 @@ export class LabResultsForm extends LitElement {
           </tbody>
         </table>
 
-        <wc-button @click=${this._addResult}>Add Row</wc-button>
-        <wc-button type="submit">Save Results</wc-button>
+        <hx-button @click=${this._addResult}>Add Row</hx-button>
+        <hx-button type="submit">Save Results</hx-button>
       </form>
     `;
   }

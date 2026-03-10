@@ -51,7 +51,7 @@ The architecture prioritizes:
 |                   MONOREPO (npm workspaces + Turborepo)           |
 |                                                                  |
 |  +-------------------------+    +----------------------------+   |
-|  |  packages/wc-library    |    |  apps/storybook            |   |
+|  |  packages/hx-library    |    |  apps/storybook            |   |
 |  |                         |    |                            |   |
 |  |  - Lit Web Components   |    |  - Storybook 10.x           |   |
 |  |  - Design Tokens        |    |  - @storybook/web-         |   |
@@ -224,7 +224,7 @@ npm workspaces are declared in the root `package.json` (no separate workspace co
 
 Turborepo handles all task orchestration with intelligent caching and dependency-aware parallel execution. Run `turbo run dev` to start all apps, or `turbo run dev --filter=docs` to target a specific workspace.
 
-### Library `package.json` (`packages/wc-library/package.json`)
+### Library `package.json` (`packages/hx-library/package.json`)
 
 ```json
 {
@@ -721,12 +721,12 @@ Style Dictionary 4.x transforms the DTCG JSON tokens into platform-specific outp
 import StyleDictionary from 'style-dictionary';
 
 export default {
-  source: ['packages/wc-library/src/tokens/**/*.tokens.json'],
+  source: ['packages/hx-library/src/tokens/**/*.tokens.json'],
   platforms: {
     css: {
       transformGroup: 'css',
       prefix: 'org',
-      buildPath: 'packages/wc-library/src/styles/',
+      buildPath: 'packages/hx-library/src/styles/',
       files: [
         {
           destination: 'tokens.css',
@@ -1044,8 +1044,8 @@ This works because CSS custom properties cascade from the document root through 
 
 | Factor                    | @web/test-runner                      | Vitest Browser Mode                                                     |
 | ------------------------- | ------------------------------------- | ----------------------------------------------------------------------- |
-| **Industry momentum**     | Stable but stagnant (Open WC project) | Vitest 4 marked Browser Mode stable; rapidly growing adoption           |
-| **Lit support**           | Native, purpose-built for WC          | Community package available; Vitest 4 added Lit to supported frameworks |
+| **Industry momentum**     | Stable but stagnant (Open WC project) | Vitest 3 marked Browser Mode stable; rapidly growing adoption           |
+| **Lit support**           | Native, purpose-built for WC          | Community package available; Vitest 3 added Lit to supported frameworks |
 | **Performance**           | Good (real browser)                   | 2-10x faster than Jest; real browser via Playwright                     |
 | **Storybook integration** | None                                  | Storybook 10 has native Vitest integration ("Storybook Test")           |
 | **Ecosystem alignment**   | Separate toolchain                    | Same test runner for unit + browser + Storybook tests                   |
@@ -1345,7 +1345,7 @@ jobs:
           registry-url: https://registry.npmjs.org
       - run: npm ci
       - run: npm run build:tokens && npm run build && npx turbo build:cem
-      - run: cd packages/wc-library && npm publish --access public
+      - run: cd packages/hx-library && npm publish --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 ```
@@ -1363,7 +1363,7 @@ jobs:
 | **Storybook helpers**        | `@wc-toolkit/storybook-helpers`        | Manual argTypes, custom helpers       | Eliminates hundreds of lines of boilerplate; two-way binding; maintained by the WC community                                                                                                                |
 | **Build tool (library)**     | `tsc` only (no bundler)                | Rollup, Vite lib mode, esbuild        | Lit's official guidance: do not bundle libraries. Plain `tsc` output is the cleanest distribution format.                                                                                                   |
 | **Build tool (Storybook)**   | Vite (built into Storybook)            | Webpack                               | Default for Storybook 10; faster builds and HMR                                                                                                                                                             |
-| **Test runner**              | Vitest 4.x (Browser Mode)              | @web/test-runner, Jest, Playwright CT | Unified test runner for unit + browser + Storybook tests; 2-10x faster than Jest; Storybook 10 native integration; Browser Mode stable since Vitest 4                                                       |
+| **Test runner**              | Vitest 3.x (Browser Mode)              | @web/test-runner, Jest, Playwright CT | Unified test runner for unit + browser + Storybook tests; 2-10x faster than Jest; Storybook 10 native integration; Browser Mode stable since Vitest 3                                                       |
 | **Browser provider (tests)** | Playwright                             | WebDriverIO                           | Parallel execution support; richer API; industry standard                                                                                                                                                   |
 | **Design tokens format**     | DTCG (W3C 2025.10 stable)              | Style Dictionary legacy format        | Standards-aligned; future-proof; supported by Style Dictionary 4, Tokens Studio, Figma                                                                                                                      |
 | **Token build tool**         | Style Dictionary 4.x                   | Theo, custom scripts                  | Industry standard; DTCG support; multi-platform output; extensible                                                                                                                                          |

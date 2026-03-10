@@ -29,10 +29,10 @@ HELIX components are standard Web Components. They work in any HTML page:
 
 ## Explore the Component Library
 
-The [Component Library](/component-library/overview/) documents all 85 components with API references, usage examples, and Storybook previews.
+The [Component Library](/component-library/overview/) documents all 87 components with API references, usage examples, and Storybook previews.
 
 ## Next Steps
 
 - [Project Structure](/getting-started/project-structure/) - Understand the codebase
-- [Component Library](/component-library/overview/) - Browse all 85 components
+- [Component Library](/component-library/overview/) - Browse all 87 components
 - [Design Tokens](/design-tokens/overview/) - Learn the token system
