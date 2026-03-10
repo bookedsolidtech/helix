@@ -4,28 +4,28 @@
   "private": true,
   "description": "Design tokens for the WC-2026 enterprise healthcare web component library",
   "type": "module",
-  "main": "./src/index.ts",
-  "types": "./src/index.ts",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "exports": {
     ".": {
-      "types": "./src/index.ts",
-      "import": "./src/index.ts",
-      "default": "./src/index.ts"
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
     },
     "./css": {
-      "types": "./src/css.ts",
-      "import": "./src/css.ts",
-      "default": "./src/css.ts"
+      "types": "./dist/css.d.ts",
+      "import": "./dist/css.js",
+      "default": "./dist/css.js"
     },
     "./lit": {
-      "types": "./src/lit.ts",
-      "import": "./src/lit.ts",
-      "default": "./src/lit.ts"
+      "types": "./dist/lit.d.ts",
+      "import": "./dist/lit.js",
+      "default": "./dist/lit.js"
     },
     "./utils": {
-      "types": "./src/utils.ts",
-      "import": "./src/utils.ts",
-      "default": "./src/utils.ts"
+      "types": "./dist/utils.d.ts",
+      "import": "./dist/utils.js",
+      "default": "./dist/utils.js"
     },
     "./tokens.css": "./dist/tokens.css",
     "./tokens.json": "./src/tokens.json"
