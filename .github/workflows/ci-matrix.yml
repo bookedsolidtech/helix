@@ -66,7 +66,7 @@ jobs:
       # ---- Build (must run before tests — @helix/tokens exports from dist/) ----
 
       - name: Build
-        run: npx turbo run build --filter='!docs'
+        run: npx turbo run build --filter='!docs' --filter='!@helix/storybook'
 
       # ---- Tests ----
 
