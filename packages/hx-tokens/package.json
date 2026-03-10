@@ -1,7 +1,6 @@
 {
   "name": "@helix/tokens",
-  "version": "0.0.1",
-  "private": true,
+  "version": "0.1.0",
   "description": "Design tokens for the WC-2026 enterprise healthcare web component library",
   "type": "module",
   "main": "./dist/index.js",

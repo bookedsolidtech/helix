@@ -98,7 +98,10 @@ export const helixSideNavStyles = css`
   }
 
   .side-nav__toggle:hover {
-    background-color: rgba(255, 255, 255, 0.1); /* fallback for browsers without color-mix() */
+    background-color: var(
+      --hx-overlay-white-10,
+      rgba(255, 255, 255, 0.1)
+    ); /* fallback for browsers without color-mix() */
     color: var(--hx-color-neutral-100, #f3f4f6);
   }
 

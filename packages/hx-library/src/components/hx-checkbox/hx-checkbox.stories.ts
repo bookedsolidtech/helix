@@ -95,7 +95,7 @@ const meta = {
         type: { summary: 'string' },
       },
     },
-    hxSize: {
+    size: {
       control: 'select',
       options: ['sm', 'md', 'lg'],
       description: 'The size of the checkbox.',
@@ -116,7 +116,7 @@ const meta = {
     error: '',
     helpText: '',
     name: '',
-    hxSize: 'md',
+    size: 'md',
   },
   render: (args) => html`
     <hx-checkbox
@@ -129,7 +129,7 @@ const meta = {
       error=${ifDefined(args.error || undefined)}
       help-text=${ifDefined(args.helpText || undefined)}
       name=${ifDefined(args.name || undefined)}
-      hx-size=${args.hxSize}
+      hx-size=${args.size}
     ></hx-checkbox>
   `,
 } satisfies Meta;

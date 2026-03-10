@@ -114,7 +114,7 @@ const meta = {
         type: { summary: 'boolean' },
       },
     },
-    hxSize: {
+    size: {
       control: { type: 'select' },
       options: ['sm', 'md', 'lg'],
       description: 'Visual size of the input field.',

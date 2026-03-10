@@ -37,7 +37,7 @@ export const helixSelectStyles = css`
   }
 
   .field__required-marker {
-    color: var(--hx-select-error-color, var(--hx-color-error-500, #dc3545));
+    color: var(--hx-select-error-color, var(--hx-color-error-text, #b91c1c));
     font-weight: var(--hx-font-weight-bold, 700);
   }
 
@@ -213,7 +213,10 @@ export const helixSelectStyles = css`
     border: var(--hx-border-width-thin, 1px) solid
       var(--hx-select-border-color, var(--hx-color-neutral-300, #ced4da));
     border-radius: var(--hx-select-border-radius, var(--hx-border-radius-md, 0.375rem));
-    box-shadow: var(--hx-select-listbox-shadow, 0 4px 16px rgba(13, 17, 23, 0.12));
+    box-shadow: var(
+      --hx-select-listbox-shadow,
+      0 4px 16px var(--hx-overlay-neutral-12, rgba(13, 17, 23, 0.12))
+    );
     max-height: var(--hx-select-listbox-max-height, 16rem);
     overflow: hidden;
     display: flex;
@@ -327,7 +330,7 @@ export const helixSelectStyles = css`
 
   .field__error {
     font-size: var(--hx-font-size-xs, 0.75rem);
-    color: var(--hx-select-error-color, var(--hx-color-error-500, #dc3545));
+    color: var(--hx-select-error-color, var(--hx-color-error-text, #b91c1c));
     line-height: var(--hx-line-height-normal, 1.5);
   }
 

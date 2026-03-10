@@ -136,7 +136,7 @@ export class HelixCheckbox extends LitElement {
    * @attr hx-size
    */
   @property({ type: String, attribute: 'hx-size', reflect: true })
-  hxSize: 'sm' | 'md' | 'lg' = 'md';
+  size: 'sm' | 'md' | 'lg' = 'md';
 
   @query('.checkbox__input')
   private _inputEl!: HTMLInputElement;
@@ -271,9 +271,9 @@ export class HelixCheckbox extends LitElement {
       'checkbox--error': hasError,
       'checkbox--disabled': this.disabled,
       'checkbox--required': this.required,
-      'checkbox--sm': this.hxSize === 'sm',
-      'checkbox--md': this.hxSize === 'md',
-      'checkbox--lg': this.hxSize === 'lg',
+      'checkbox--sm': this.size === 'sm',
+      'checkbox--md': this.size === 'md',
+      'checkbox--lg': this.size === 'lg',
     };
 
     // P2-06: simplified — hasError already includes _hasErrorSlot
