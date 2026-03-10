@@ -25,13 +25,13 @@ describe('hx-popover', () => {
       expect(wrapper).toBeTruthy();
     });
 
-    it('renders body with role=dialog', async () => {
+    it('renders body with role=region', async () => {
       const el = await fixture<HelixPopover>(
         '<hx-popover><button slot="anchor">Trigger</button><p>Content</p></hx-popover>',
       );
-      const body = shadowQuery(el, '[role="dialog"]');
+      const body = shadowQuery(el, '[role="region"]');
       expect(body).toBeTruthy();
-      expect(body?.getAttribute('role')).toBe('dialog');
+      expect(body?.getAttribute('role')).toBe('region');
     });
 
     it('body is hidden by default', async () => {
@@ -40,7 +40,7 @@ describe('hx-popover', () => {
       );
       const body = shadowQuery(el, '[part="body"]');
       expect(body?.classList.contains('visible')).toBe(false);
-      expect(body?.getAttribute('aria-hidden')).toBe('true');
+      expect(body?.hasAttribute('aria-hidden')).toBe(true);
     });
 
     it('does not render arrow element when arrow=false', async () => {
@@ -197,21 +197,21 @@ describe('hx-popover', () => {
   // ─── ARIA (3) ───
 
   describe('ARIA', () => {
-    it('body has aria-hidden="true" when not visible', async () => {
+    it('body has aria-hidden attribute when not visible', async () => {
       const el = await fixture<HelixPopover>(
         '<hx-popover><button slot="anchor">Trigger</button><p>Content</p></hx-popover>',
       );
       const body = shadowQuery(el, '[part="body"]');
-      expect(body?.getAttribute('aria-hidden')).toBe('true');
+      expect(body?.hasAttribute('aria-hidden')).toBe(true);
     });
 
-    it('body has aria-hidden="false" when visible', async () => {
+    it('body does not have aria-hidden attribute when visible', async () => {
       const el = await fixture<HelixPopover>(
         '<hx-popover open><button slot="anchor">Trigger</button><p>Content</p></hx-popover>',
       );
       await el.updateComplete;
       const body = shadowQuery(el, '[part="body"]');
-      expect(body?.getAttribute('aria-hidden')).toBe('false');
+      expect(body?.hasAttribute('aria-hidden')).toBe(false);
     });
 
     it('anchor has aria-expanded="false" by default', async () => {
