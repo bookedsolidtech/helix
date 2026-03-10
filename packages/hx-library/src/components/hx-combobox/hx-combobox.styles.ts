@@ -59,7 +59,8 @@ export const helixComboboxStyles = css`
   .field__input-wrapper:focus-within {
     border-color: var(--hx-combobox-focus-ring-color, var(--hx-focus-ring-color, #2563eb));
     /* P2-7: Solid fallback for browsers without color-mix() (Chrome <111, Safari <16.2) */
-    box-shadow: 0 0 0 var(--hx-focus-ring-width, 2px) rgba(37, 99, 235, 0.25);
+    box-shadow: 0 0 0 var(--hx-focus-ring-width, 2px)
+      var(--hx-overlay-primary-25, rgba(37, 99, 235, 0.25));
     box-shadow: 0 0 0 var(--hx-focus-ring-width, 2px)
       color-mix(
         in srgb,
@@ -76,7 +77,8 @@ export const helixComboboxStyles = css`
   .field--error .field__input-wrapper:focus-within {
     border-color: var(--hx-combobox-error-color, var(--hx-color-error-500, #dc3545));
     /* P2-7: Solid fallback for browsers without color-mix() */
-    box-shadow: 0 0 0 var(--hx-focus-ring-width, 2px) rgba(220, 53, 69, 0.25);
+    box-shadow: 0 0 0 var(--hx-focus-ring-width, 2px)
+      var(--hx-overlay-error-25, rgba(220, 53, 69, 0.25));
     box-shadow: 0 0 0 var(--hx-focus-ring-width, 2px)
       color-mix(
         in srgb,
@@ -211,7 +213,7 @@ export const helixComboboxStyles = css`
       var(--hx-combobox-border-color, var(--hx-color-neutral-300, #ced4da));
     border-radius: var(--hx-combobox-border-radius, var(--hx-border-radius-md, 0.375rem));
     /* P2-7: Solid fallback for browsers without color-mix() */
-    box-shadow: 0 4px 16px rgba(13, 17, 23, 0.12);
+    box-shadow: 0 4px 16px var(--hx-overlay-neutral-12, rgba(13, 17, 23, 0.12));
     box-shadow: var(
       --hx-combobox-listbox-shadow,
       0 4px 16px color-mix(in srgb, var(--hx-color-neutral-900, #0d1117) 12%, transparent)
