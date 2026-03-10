@@ -1,14 +1,286 @@
 ---
 title: 'hx-nav'
-description: 'Horizontal or vertical navigation container for organizing nav items'
+description: 'Horizontal menu bar or vertical sidebar navigation with nested submenus, mobile hamburger toggle, and full keyboard support.'
 ---
 
 import ComponentLoader from '../../../components/ComponentLoader.astro';
+import ComponentDemo from '../../../components/ComponentDemo.astro';
 import ComponentDoc from '../../../components/ComponentDoc.astro';
 
 <ComponentLoader />
 
 <ComponentDoc tagName="hx-nav" section="summary" />
+
+## Overview
+
+`hx-nav` is the primary navigation component for Helix. It renders a semantic `<nav>` landmark and supports two layout orientations: a horizontal top-bar (default) and a vertical sidebar. Each orientation supports nested submenus that expand inline (vertical) or as dropdown panels (horizontal). A mobile-responsive hamburger toggle collapses the list on small viewports.
+
+Use `hx-nav` when you need a full navigation structure with multiple items, submenus, or a mobile-responsive toggle. Use `hx-side-nav` for a standalone sidebar that manages its own routing state, or `hx-breadcrumb` for path-based secondary navigation.
+
+## Live Demo
+
+### Default Horizontal Nav
+
+<ComponentDemo title="Horizontal Navigation">
+  <hx-nav
+    label="Main navigation"
+    items='[{"label":"Dashboard","href":"/dashboard","current":true},{"label":"Patients","href":"/patients"},{"label":"Appointments","href":"/appointments"},{"label":"Reports","href":"/reports"}]'
+  ></hx-nav>
+</ComponentDemo>
+
+### With Submenus
+
+Items that have `children` render as dropdown triggers with `aria-haspopup="menu"`.
+
+<ComponentDemo title="Navigation with Submenus">
+  <hx-nav
+    label="Main navigation"
+    items='[{"label":"Dashboard","href":"/dashboard","current":true},{"label":"Patients","children":[{"label":"All Patients","href":"/patients"},{"label":"New Intake","href":"/patients/new"},{"label":"Discharge","href":"/patients/discharge"}]},{"label":"Clinical","children":[{"label":"Lab Results","href":"/clinical/lab"},{"label":"Medications","href":"/clinical/meds"},{"label":"Vitals","href":"/clinical/vitals"}]},{"label":"Reports","href":"/reports"}]'
+  ></hx-nav>
+</ComponentDemo>
+
+### Vertical Sidebar
+
+<ComponentDemo title="Vertical Sidebar Navigation">
+  <div style="width: 240px; height: 400px;">
+    <hx-nav
+      orientation="vertical"
+      label="Sidebar navigation"
+      items='[{"label":"Dashboard","href":"/dashboard","current":true},{"label":"Patients","children":[{"label":"All Patients","href":"/patients"},{"label":"New Intake","href":"/patients/new"}]},{"label":"Reports","href":"/reports"}]'
+    ></hx-nav>
+  </div>
+</ComponentDemo>
+
+### Custom Theme
+
+Override CSS custom properties to match your brand colors.
+
+<ComponentDemo title="Custom Themed Navigation">
+  <hx-nav
+    label="Main navigation"
+    items='[{"label":"Dashboard","href":"/dashboard","current":true},{"label":"Patients","href":"/patients"},{"label":"Reports","href":"/reports"}]'
+    style="--hx-nav-bg: #1e3a5f; --hx-nav-link-hover-bg: #2d5986; --hx-nav-link-active-bg: #0ea5e9;"
+  ></hx-nav>
+</ComponentDemo>
+
+## Installation
+
+```bash
+# Full library
+npm install @helix/library
+
+# Or import only this component (tree-shaking friendly)
+import '@helix/library/components/hx-nav';
+```
+
+## Basic Usage
+
+Minimal HTML snippet — no build tool required:
+
+```html
+<hx-nav
+  label="Main navigation"
+  items='[
+    {"label": "Home", "href": "/", "current": true},
+    {"label": "Patients", "href": "/patients"},
+    {"label": "Reports", "href": "/reports"}
+  ]'
+></hx-nav>
+```
+
+Pass items as a property in JavaScript for full type safety:
+
+```javascript
+const nav = document.querySelector('hx-nav');
+nav.items = [
+  { label: 'Home', href: '/', current: true },
+  { label: 'Patients', href: '/patients' },
+  {
+    label: 'Clinical',
+    children: [
+      { label: 'Lab Results', href: '/clinical/lab' },
+      { label: 'Medications', href: '/clinical/meds' },
+    ],
+  },
+];
+```
+
+## Properties
+
+| Property      | Attribute     | Type                         | Default             | Description                                                                                                   |
+| ------------- | ------------- | ---------------------------- | ------------------- | ------------------------------------------------------------------------------------------------------------- |
+| `items`       | `items`       | `NavItem[]`                  | `[]`                | Navigation items array. Each item may have `label`, `href`, `current`, and `children`.                        |
+| `orientation` | `orientation` | `'horizontal' \| 'vertical'` | `'horizontal'`      | Layout orientation. `horizontal` renders a top menu bar; `vertical` renders a sidebar. Reflects to attribute. |
+| `label`       | `label`       | `string`                     | `'Main navigation'` | Accessible label applied as `aria-label` on the `<nav>` element.                                              |
+
+### NavItem Interface
+
+```typescript
+interface NavItem {
+  /** Display label for the item. */
+  label: string;
+  /** Href for the item link. Required unless children are provided. */
+  href?: string;
+  /** Whether this item represents the current page. */
+  current?: boolean;
+  /** Nested sub-menu items. */
+  children?: NavItem[];
+}
+```
+
+## Events
+
+| Event           | Detail Type         | Description                                                                                          |
+| --------------- | ------------------- | ---------------------------------------------------------------------------------------------------- |
+| `hx-nav-select` | `{ item: NavItem }` | Dispatched when a leaf navigation item (one without children) is activated. Bubbles and is composed. |
+
+## CSS Custom Properties
+
+| Property                     | Default                               | Description                        |
+| ---------------------------- | ------------------------------------- | ---------------------------------- |
+| `--hx-nav-bg`                | `var(--hx-color-neutral-900)`         | Navigation background color.       |
+| `--hx-nav-color`             | `var(--hx-color-neutral-100)`         | Navigation text color.             |
+| `--hx-nav-link-color`        | `var(--hx-color-neutral-100)`         | Link text color.                   |
+| `--hx-nav-link-hover-bg`     | `var(--hx-color-neutral-700)`         | Link hover background color.       |
+| `--hx-nav-link-hover-color`  | `var(--hx-color-white)`               | Link hover text color.             |
+| `--hx-nav-link-active-bg`    | `var(--hx-color-primary-600)`         | Active link background color.      |
+| `--hx-nav-link-active-color` | `var(--hx-color-white)`               | Active link text color.            |
+| `--hx-nav-submenu-bg`        | `var(--hx-color-neutral-800)`         | Submenu dropdown background color. |
+| `--hx-nav-font-size`         | `var(--hx-font-size-sm)`              | Navigation font size.              |
+| `--hx-nav-padding`           | `var(--hx-space-2) var(--hx-space-4)` | Padding around the nav container.  |
+| `--hx-nav-item-padding`      | `var(--hx-space-2) var(--hx-space-3)` | Padding inside each nav item link. |
+| `--hx-nav-border-radius`     | `var(--hx-border-radius-sm)`          | Border radius for item links.      |
+
+## CSS Parts
+
+| Part     | Description                                       |
+| -------- | ------------------------------------------------- |
+| `nav`    | The `<nav>` landmark element.                     |
+| `list`   | The top-level `<ul>` list of navigation items.    |
+| `item`   | Each `<li>` wrapper around a navigation item.     |
+| `link`   | The `<a>` or `<button>` element inside each item. |
+| `toggle` | The mobile hamburger `<button>` toggle.           |
+
+## Slots
+
+`hx-nav` does not use slots — all content is driven by the `items` property. This ensures consistent rendering across orientations and mobile breakpoints.
+
+| Slot     | Description                     |
+| -------- | ------------------------------- |
+| _(none)_ | No slots. Use the `items` prop. |
+
+## Accessibility
+
+`hx-nav` is designed to meet WCAG 2.1 AA requirements for navigation landmarks and keyboard operability.
+
+| Topic           | Details                                                                                                                                                                  |
+| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| ARIA role       | Uses a native `<nav>` element — the landmark role is implicit. No additional `role` needed.                                                                              |
+| `aria-label`    | Applied to `<nav>` from the `label` property (default: `"Main navigation"`). Required for unique landmark identification when multiple `<nav>` elements exist on a page. |
+| `aria-current`  | Set to `"page"` on the active item's `<a>` link when `current: true` in the item data.                                                                                   |
+| `aria-expanded` | Applied to submenu trigger `<button>` elements. Updates to `"true"` when the submenu is open.                                                                            |
+| `aria-haspopup` | Set to `"menu"` on `<button>` elements that control a submenu.                                                                                                           |
+| `aria-controls` | The mobile toggle button sets `aria-controls="nav-list"`, linked to the `<ul id="nav-list">`.                                                                            |
+| Focus ring      | All interactive elements expose a visible `:focus-visible` outline using `--hx-focus-ring-color`.                                                                        |
+| Screen reader   | SVG icons (hamburger, chevron) carry `aria-hidden="true"` so they are not read aloud.                                                                                    |
+| Reduced motion  | Transitions and animations are suppressed when `prefers-reduced-motion: reduce` is set.                                                                                  |
+
+## Keyboard Navigation
+
+| Key                        | Context                    | Behavior                                                         |
+| -------------------------- | -------------------------- | ---------------------------------------------------------------- |
+| `Tab`                      | Any                        | Moves focus to the next focusable element in the page tab order. |
+| `Enter` / `Space`          | Submenu trigger button     | Toggles the submenu open or closed.                              |
+| `ArrowRight` / `ArrowDown` | Top-level item             | Moves focus to the next top-level nav item (wraps).              |
+| `ArrowLeft` / `ArrowUp`    | Top-level item             | Moves focus to the previous top-level nav item (wraps).          |
+| `ArrowDown`                | Horizontal submenu trigger | Opens the submenu and focuses the first submenu item.            |
+| `ArrowDown`                | Open submenu               | Moves focus to the next submenu item (wraps).                    |
+| `ArrowUp`                  | Open submenu               | Moves focus to the previous submenu item (wraps).                |
+| `Escape`                   | Open submenu               | Closes the submenu and returns focus to the parent trigger.      |
+
+## Drupal Integration
+
+Use the component in a Twig template after registering the library:
+
+```twig
+{# my-module/templates/my-template.html.twig #}
+
+<hx-nav
+  label="{{ nav_label|default('Main navigation') }}"
+  orientation="{{ orientation|default('horizontal') }}"
+></hx-nav>
+```
+
+Set the `items` property via a Drupal behavior — the attribute accepts a JSON string:
+
+```javascript
+Drupal.behaviors.helixNav = {
+  attach(context) {
+    once('helixNav', 'hx-nav', context).forEach((el) => {
+      // Set items as a property (preferred over JSON attribute for complex trees)
+      el.items = drupalSettings.helixNav.items;
+
+      el.addEventListener('hx-nav-select', (e) => {
+        // e.detail.item contains the selected NavItem
+        Drupal.ajax({ url: e.detail.item.href }).execute();
+      });
+    });
+  },
+};
+```
+
+Load the library in your module's `.libraries.yml`:
+
+```yaml
+helix-components:
+  js:
+    /libraries/helix/helix.min.js: { minified: true }
+```
+
+## Standalone HTML Example
+
+Copy-paste this into a `.html` file and open it in a browser — no build tool needed:
+
+```html
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>hx-nav example</title>
+    <!-- @helix/library is a private package — install via npm workspace, not CDN -->
+    <!-- In your project: import '@helix/library'; in your bundler entry point -->
+  </head>
+  <body style="margin: 0; font-family: sans-serif;">
+    <hx-nav id="main-nav" label="Main navigation"></hx-nav>
+
+    <main style="padding: 2rem;">
+      <p>Selected page will appear here.</p>
+    </main>
+
+    <script>
+      const nav = document.getElementById('main-nav');
+
+      nav.items = [
+        { label: 'Dashboard', href: '/dashboard', current: true },
+        {
+          label: 'Patients',
+          children: [
+            { label: 'All Patients', href: '/patients' },
+            { label: 'New Intake', href: '/patients/new' },
+          ],
+        },
+        { label: 'Reports', href: '/reports' },
+        { label: 'Settings', href: '/settings' },
+      ];
+
+      nav.addEventListener('hx-nav-select', (e) => {
+        console.log('Navigating to:', e.detail.item.href);
+      });
+    </script>
+  </body>
+</html>
+```
 
 ## API Reference
 

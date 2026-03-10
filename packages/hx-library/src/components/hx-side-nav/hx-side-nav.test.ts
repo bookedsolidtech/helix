@@ -244,7 +244,7 @@ describe('hx-side-nav', () => {
       newItem.textContent = 'New Item';
       el.appendChild(newItem);
 
-      // Wait for slotchange to fire and propagate
+      // Yield to event loop to allow slotchange callback to run and component to re-render with new item
       await new Promise<void>((resolve) => setTimeout(resolve, 0));
       await (el as HxSideNav & { updateComplete: Promise<boolean> }).updateComplete;
 

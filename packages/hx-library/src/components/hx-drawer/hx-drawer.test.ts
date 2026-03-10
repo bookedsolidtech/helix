@@ -96,6 +96,7 @@ describe('hx-drawer', () => {
     it('dispatches hx-hide when open is set to false', async () => {
       const el = await fixture<HelixDrawer>('<hx-drawer open></hx-drawer>');
       await el.updateComplete;
+      // Allow open animation to complete before toggling open to false
       await new Promise((r) => setTimeout(r, 50));
       const eventPromise = oneEvent<CustomEvent>(el, 'hx-hide');
       el.open = false;
@@ -121,6 +122,7 @@ describe('hx-drawer', () => {
       el.addEventListener('hx-after-show', () => events.push('hx-after-show'));
 
       el.open = true;
+      // Allow CSS transition/animation to complete so hx-after-show fires after hx-show
       await new Promise((r) => setTimeout(r, 400));
 
       expect(events).toContain('hx-show');
@@ -131,6 +133,7 @@ describe('hx-drawer', () => {
     it('dispatches hx-hide and then hx-after-hide', async () => {
       const el = await fixture<HelixDrawer>('<hx-drawer open></hx-drawer>');
       await el.updateComplete;
+      // Allow open animation to complete before triggering close
       await new Promise((r) => setTimeout(r, 100));
 
       const events: string[] = [];
@@ -138,6 +141,7 @@ describe('hx-drawer', () => {
       el.addEventListener('hx-after-hide', () => events.push('hx-after-hide'));
 
       el.open = false;
+      // Allow CSS transition/animation to complete so hx-after-hide fires after hx-hide
       await new Promise((r) => setTimeout(r, 400));
 
       expect(events).toContain('hx-hide');
@@ -194,6 +198,7 @@ describe('hx-drawer', () => {
       const el = await fixture<HelixDrawer>(
         '<hx-drawer open><button slot="footer" class="confirm-btn">Confirm</button></hx-drawer>',
       );
+      // Wait for slotchange event to propagate and component to re-render with footer slot content
       await new Promise((r) => setTimeout(r, 50));
       await el.updateComplete;
       const slottedFooter = el.querySelector('button.confirm-btn');
@@ -252,6 +257,7 @@ describe('hx-drawer', () => {
     it('Escape key closes the drawer when open', async () => {
       const el = await fixture<HelixDrawer>('<hx-drawer open></hx-drawer>');
       await el.updateComplete;
+      // Allow open animation to complete before testing Escape-key close
       await new Promise((r) => setTimeout(r, 50));
 
       expect(el.open).toBe(true);
@@ -283,6 +289,7 @@ describe('hx-drawer', () => {
     it('clicking the overlay backdrop closes the drawer', async () => {
       const el = await fixture<HelixDrawer>('<hx-drawer open></hx-drawer>');
       await el.updateComplete;
+      // Allow open animation to complete before testing overlay-click close
       await new Promise((r) => setTimeout(r, 50));
 
       expect(el.open).toBe(true);
@@ -363,6 +370,7 @@ describe('hx-drawer', () => {
     it('clicking close button closes the drawer', async () => {
       const el = await fixture<HelixDrawer>('<hx-drawer open></hx-drawer>');
       await el.updateComplete;
+      // Allow open animation to complete before testing close-button click
       await new Promise((r) => setTimeout(r, 50));
 
       expect(el.open).toBe(true);

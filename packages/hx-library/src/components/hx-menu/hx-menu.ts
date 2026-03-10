@@ -129,6 +129,20 @@ export class HelixMenu extends LitElement {
     }
   }
 
+  private _handleSlotChange(e: Event): void {
+    const slot = e.target;
+    if (!(slot instanceof HTMLSlotElement)) return;
+    const validTags = new Set(['hx-menu-item', 'hx-menu-divider']);
+    const invalid = slot
+      .assignedElements()
+      .filter((el) => !validTags.has(el.tagName.toLowerCase()));
+    if (invalid.length > 0) {
+      console.warn(
+        `[hx-menu] Default slot expects <hx-menu-item> or <hx-menu-divider> elements. Found unexpected: ${invalid.map((el) => `<${el.tagName.toLowerCase()}>`).join(', ')}`,
+      );
+    }
+  }
+
   private _handleItemSelect(e: Event): void {
     const detail = (e as CustomEvent<{ item: HelixMenuItem; value: string }>).detail;
     const items = this._getItems();
@@ -152,7 +166,7 @@ export class HelixMenu extends LitElement {
         @keydown=${this._handleKeyDown}
         @hx-item-select=${this._handleItemSelect}
       >
-        <slot></slot>
+        <slot @slotchange=${this._handleSlotChange}></slot>
       </div>
     `;
   }

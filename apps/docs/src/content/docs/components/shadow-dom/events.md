@@ -51,19 +51,19 @@ Event retargeting is Shadow DOM's mechanism for preserving implementation detail
 
 Without retargeting, external event listeners would receive `event.target` references pointing to elements inside the shadow tree. This would violate encapsulation by exposing internal implementation details that consumers should not depend on.
 
-Consider a button component. The consumer interacts with `<wc-button>`, not the internal `<button>` element inside its shadow DOM. If `event.target` exposed the internal button, consumers could:
+Consider a button component. The consumer interacts with `<hx-button>`, not the internal `<button>` element inside its shadow DOM. If `event.target` exposed the internal button, consumers could:
 
 - Query its classes and attributes (implementation details)
 - Manipulate its DOM structure (breaking the component)
 - Depend on its existence (preventing refactoring)
 
-Retargeting prevents these issues by presenting `<wc-button>` as the event target when listeners observe from outside the shadow boundary.
+Retargeting prevents these issues by presenting `<hx-button>` as the event target when listeners observe from outside the shadow boundary.
 
 ### How Retargeting Works
 
 ```javascript
 // Component implementation
-class WcButton extends LitElement {
+class HxButton extends LitElement {
   render() {
     return html`
       <button @click=${this._handleClick} part="button">
@@ -82,13 +82,13 @@ class WcButton extends LitElement {
 }
 
 // Consumer code (light DOM)
-const wcButton = document.querySelector('wc-button');
+const wcButton = document.querySelector('hx-button');
 wcButton.addEventListener('click', (event) => {
   console.log('Outside shadow DOM:');
   console.log('  event.target =', event.target);
-  // → <wc-button> (retargeted!)
+  // → <hx-button> (retargeted!)
   console.log('  event.currentTarget =', event.currentTarget);
-  // → <wc-button>
+  // → <hx-button>
 });
 ```
 
@@ -108,23 +108,23 @@ Event retargeting follows these precise rules:
 ```
 Document:
   <body>
-    <wc-card id="card1">
+    <hx-card id="card1">
       #shadow-root
         <div class="card-wrapper">
           <button class="internal-btn">Click</button>
         </div>
-    </wc-card>
+    </hx-card>
   </body>
 
 Event Listener Locations:
 ┌─────────────────────────────────────────────────────────────────┐
 │ Listener on document:                                           │
-│   event.target → wc-card                    (retargeted)        │
+│   event.target → hx-card                    (retargeted)        │
 │   event.currentTarget → document                                │
 ├─────────────────────────────────────────────────────────────────┤
-│ Listener on wc-card (shadow host):                              │
-│   event.target → wc-card                    (retargeted)        │
-│   event.currentTarget → wc-card                                 │
+│ Listener on hx-card (shadow host):                              │
+│   event.target → hx-card                    (retargeted)        │
+│   event.currentTarget → hx-card                                 │
 ├─────────────────────────────────────────────────────────────────┤
 │ Listener inside shadow DOM (on .card-wrapper):                  │
 │   event.target → button.internal-btn        (original)          │
@@ -137,13 +137,13 @@ Event Listener Locations:
 Slotted elements are a special case. Because they physically live in the light DOM (they are projected into shadow DOM via `<slot>` elements), events originating from slotted content are **not retargeted**.
 
 ```html
-<wc-card>
+<hx-card>
   <button slot="action">Save</button>
   <!--        ↑
        This button lives in light DOM,
        even though it renders inside the shadow tree
   -->
-</wc-card>
+</hx-card>
 ```
 
 ```javascript
@@ -186,7 +186,7 @@ this.dispatchEvent(
 
 // Event CROSSES shadow boundaries
 this.dispatchEvent(
-  new CustomEvent('wc-change', {
+  new CustomEvent('hx-change', {
     bubbles: true,
     composed: true, // ← Event can escape shadow DOM
   }),
@@ -228,7 +228,7 @@ When you dispatch a custom event from a web component, you must explicitly set `
 ```typescript
 // ✗ WRONG: Event trapped inside shadow tree
 this.dispatchEvent(
-  new CustomEvent('wc-change', {
+  new CustomEvent('hx-change', {
     bubbles: true,
     // composed defaults to false
     detail: { value: this.value },
@@ -237,7 +237,7 @@ this.dispatchEvent(
 
 // ✓ CORRECT: Event crosses shadow boundaries
 this.dispatchEvent(
-  new CustomEvent('wc-change', {
+  new CustomEvent('hx-change', {
     bubbles: true,
     composed: true, // ← Required for cross-boundary propagation
     detail: { value: this.value },
@@ -258,38 +258,38 @@ For web components, you almost always want **both** flags set to `true`:
 
 ```typescript
 // ✓ BEST: Bubbles AND composed
-new CustomEvent('wc-change', {
+new CustomEvent('hx-change', {
   bubbles: true,
   composed: true,
   detail: { value: this.value },
 });
 
 // ✗ Event bubbles but is trapped inside shadow tree
-new CustomEvent('wc-change', {
+new CustomEvent('hx-change', {
   bubbles: true,
   composed: false, // default
   detail: { value },
 });
 
 // ✗ Event crosses shadow boundary but doesn't propagate up
-new CustomEvent('wc-change', {
+new CustomEvent('hx-change', {
   bubbles: false,
   composed: true,
   detail: { value },
 });
 ```
 
-### Real-World Example: wc-text-input
+### Real-World Example: hx-text-input
 
 ```typescript
-// From packages/wc-library/src/components/wc-text-input/wc-text-input.ts
+// From packages/hx-library/src/components/hx-text-input/hx-text-input.ts
 private _handleInput(e: Event): void {
   const target = e.target as HTMLInputElement;
   this.value = target.value;
   this._internals.setFormValue(this.value);
 
   // Dispatched on every keystroke
-  this.dispatchEvent(new CustomEvent('wc-input', {
+  this.dispatchEvent(new CustomEvent('hx-input', {
     bubbles: true,      // ✓ Propagates up the tree
     composed: true,     // ✓ Crosses shadow boundaries
     detail: { value: this.value }
@@ -303,7 +303,7 @@ private _handleChange(e: Event): void {
   this._updateValidity();
 
   // Dispatched on blur after value changed
-  this.dispatchEvent(new CustomEvent('wc-change', {
+  this.dispatchEvent(new CustomEvent('hx-change', {
     bubbles: true,
     composed: true,
     detail: { value: this.value }
@@ -313,10 +313,10 @@ private _handleChange(e: Event): void {
 
 This pattern appears consistently across all wc-2026 form components:
 
-- `wc-checkbox` — dispatches `wc-change` with `composed: true`
-- `wc-select` — dispatches `wc-change` with `composed: true`
-- `wc-radio-group` — dispatches `wc-change` with `composed: true`
-- `wc-textarea` — dispatches `wc-input` and `wc-change` with `composed: true`
+- `hx-checkbox` — dispatches `hx-change` with `composed: true`
+- `hx-select` — dispatches `hx-change` with `composed: true`
+- `wc-radio-group` — dispatches `hx-change` with `composed: true`
+- `wc-textarea` — dispatches `hx-input` and `hx-change` with `composed: true`
 
 ## Event Bubbling Through Shadow Boundaries
 
@@ -327,21 +327,21 @@ Understanding how events bubble through shadow trees is essential for effective 
 ```
 Light DOM:
   <body>
-    <wc-button>  ← shadow host
+    <hx-button>  ← shadow host
       #shadow-root
         <button>  ← native button (original target)
           <slot></slot>
         </button>
-    </wc-button>
+    </hx-button>
   </body>
 ```
 
-When the native `<button>` inside `wc-button` is clicked:
+When the native `<button>` inside `hx-button` is clicked:
 
 **Capture phase** (top-down):
 
 ```
-window → document → body → wc-button → #shadow-root → button
+window → document → body → hx-button → #shadow-root → button
 ```
 
 **Target phase**:
@@ -353,10 +353,10 @@ Event fires on <button>
 **Bubble phase** (bottom-up):
 
 ```
-button → #shadow-root → wc-button → body → document → window
+button → #shadow-root → hx-button → body → document → window
 ```
 
-Event listeners in the light DOM see `event.target` as `<wc-button>`, not `<button>`.
+Event listeners in the light DOM see `event.target` as `<hx-button>`, not `<button>`.
 
 ### Nested Shadow Roots
 
@@ -367,20 +367,20 @@ Light DOM:
   <wc-form>               ← outer shadow host
     #shadow-root
       <form>
-        <slot></slot>     ← Projects wc-text-input
+        <slot></slot>     ← Projects hx-text-input
       </form>
 
-    <wc-text-input>       ← inner shadow host (slotted into wc-form)
+    <hx-text-input>       ← inner shadow host (slotted into wc-form)
       #shadow-root
         <input>           ← native input (original target)
-      </wc-text-input>
+      </hx-text-input>
   </wc-form>
 ```
 
 When the native `<input>` fires a `change` event:
 
-1. Event bubbles through `wc-text-input`'s shadow root
-2. Event is retargeted to `<wc-text-input>` when crossing that shadow boundary
+1. Event bubbles through `hx-text-input`'s shadow root
+2. Event is retargeted to `<hx-text-input>` when crossing that shadow boundary
 3. Event propagates through `wc-form`'s shadow root (via the `<slot>`)
 4. Event is retargeted to `<wc-form>` when crossing that shadow boundary
 5. Event continues bubbling through light DOM
@@ -389,16 +389,16 @@ When the native `<input>` fires a `change` event:
 
 | Listener Location             | `event.target` Value                             |
 | ----------------------------- | ------------------------------------------------ |
-| Inside `wc-text-input` shadow | `<input>` (original)                             |
-| On `wc-text-input` element    | `<wc-text-input>` (retargeted at first boundary) |
-| Inside `wc-form` shadow       | `<wc-text-input>` (slotted element)              |
+| Inside `hx-text-input` shadow | `<input>` (original)                             |
+| On `hx-text-input` element    | `<hx-text-input>` (retargeted at first boundary) |
+| Inside `wc-form` shadow       | `<hx-text-input>` (slotted element)              |
 | On `wc-form` element          | `<wc-form>` (retargeted at second boundary)      |
 | On `document`                 | `<wc-form>` (final retargeted value)             |
 
 ### Propagation Visualization
 
 ```
-EVENT: click on <input> inside <wc-text-input> inside <wc-form>
+EVENT: click on <input> inside <hx-text-input> inside <wc-form>
 
 ┌─ Capture Phase ────────────────────────────────────────────────┐
 │                                                                 │
@@ -410,9 +410,9 @@ EVENT: click on <input> inside <wc-text-input> inside <wc-form>
 │    ↓                                                            │
 │  <form> → <slot>                                                │
 │    ↓                                                            │
-│  wc-text-input (event.target = wc-text-input)                   │
+│  hx-text-input (event.target = hx-text-input)                   │
 │    ↓                                                            │
-│  [crosses shadow boundary into wc-text-input's shadow]          │
+│  [crosses shadow boundary into hx-text-input's shadow]          │
 │    ↓                                                            │
 │  <input> (event.target = input)                                 │
 │                                                                 │
@@ -424,9 +424,9 @@ EVENT: click on <input> inside <wc-text-input> inside <wc-form>
 │                                                                 │
 │  <input> (event.target = input)                                 │
 │    ↑                                                            │
-│  [crosses shadow boundary exiting wc-text-input's shadow]       │
+│  [crosses shadow boundary exiting hx-text-input's shadow]       │
 │    ↑                                                            │
-│  wc-text-input (event.target = wc-text-input) ← retargeted     │
+│  hx-text-input (event.target = hx-text-input) ← retargeted     │
 │    ↑                                                            │
 │  <slot> → <form>                                                │
 │    ↑                                                            │
@@ -452,7 +452,7 @@ document.addEventListener('click', (event) => {
 });
 ```
 
-**Example output when clicking a button inside `<wc-checkbox>`**:
+**Example output when clicking a button inside `<hx-checkbox>`**:
 
 ```javascript
 // Retargeted target:
@@ -545,7 +545,7 @@ class WcTextInput extends LitElement {
     this.value = target.value;
 
     this.dispatchEvent(
-      new CustomEvent('wc-input', {
+      new CustomEvent('hx-input', {
         bubbles: true,
         composed: true,
         detail: { value: this.value },
@@ -558,8 +558,8 @@ class WcTextInput extends LitElement {
 **Parent component or application listens:**
 
 ```typescript
-const input = document.querySelector('wc-text-input');
-input.addEventListener('wc-input', (event) => {
+const input = document.querySelector('hx-text-input');
+input.addEventListener('hx-input', (event) => {
   console.log('User typed:', event.detail.value);
 });
 ```
@@ -584,18 +584,18 @@ The parent sets properties or attributes on child components to pass data down.
 **Declarative (HTML attributes):**
 
 ```html
-<wc-text-input
+<hx-text-input
   label="Email Address"
   required
   value="user@example.com"
   error="Invalid email format"
-></wc-text-input>
+></hx-text-input>
 ```
 
 **Programmatic (JavaScript properties):**
 
 ```typescript
-const input = document.querySelector('wc-text-input');
+const input = document.querySelector('hx-text-input');
 input.label = 'Email Address';
 input.required = true;
 input.value = 'user@example.com';
@@ -620,8 +620,8 @@ input.error = 'Invalid email format';
 For imperative interactions, components expose public methods:
 
 ```typescript
-// wc-text-input exposes focus() and select()
-const input = document.querySelector('wc-text-input');
+// hx-text-input exposes focus() and select()
+const input = document.querySelector('hx-text-input');
 input.focus(); // ← Calls the component's focus() method
 input.select(); // ← Calls the component's select() method
 ```
@@ -662,12 +662,12 @@ class WcTextInput extends LitElement {
 Listen for events at a higher level in the DOM tree, even if the actual target is inside a shadow root:
 
 ```typescript
-// Listen on document for all wc-change events
-document.addEventListener('wc-change', (event) => {
+// Listen on document for all hx-change events
+document.addEventListener('hx-change', (event) => {
   const component = event.target; // Retargeted to shadow host
   console.log('Component changed:', component.tagName, event.detail);
 
-  if (component.matches('wc-text-input')) {
+  if (component.matches('hx-text-input')) {
     console.log('Text input changed to:', event.detail.value);
   }
 });
@@ -684,11 +684,11 @@ This works because:
 ```typescript
 class FormController {
   constructor(formElement) {
-    formElement.addEventListener('wc-change', this._handleChange);
+    formElement.addEventListener('hx-change', this._handleChange);
   }
 
   _handleChange = (event) => {
-    // Works for wc-text-input, wc-checkbox, wc-select, etc.
+    // Works for hx-text-input, hx-checkbox, hx-select, etc.
     const field = event.target;
     const value = event.detail.value;
 
@@ -719,7 +719,7 @@ Components coordinate with their children using internal events that are stopped
 class WcRadioGroup extends LitElement {
   override connectedCallback(): void {
     super.connectedCallback();
-    this.addEventListener('wc-radio-select', this._handleRadioSelect);
+    this.addEventListener('hx-radio-select', this._handleRadioSelect);
   }
 
   private _handleRadioSelect = (e: CustomEvent<{ value: string }>) => {
@@ -732,7 +732,7 @@ class WcRadioGroup extends LitElement {
 
     // Dispatch public event for external consumers
     this.dispatchEvent(
-      new CustomEvent('wc-change', {
+      new CustomEvent('hx-change', {
         bubbles: true,
         composed: true,
         detail: { value: this.value },
@@ -760,7 +760,7 @@ class WcRadioGroup extends LitElement {
 Monitor when slotted content changes and react accordingly:
 
 ```typescript
-class WcSelect extends LitElement {
+class HxSelect extends LitElement {
   render() {
     return html`
       <select @change=${this._handleNativeChange}>
@@ -810,7 +810,7 @@ After analyzing wc-2026 component patterns, these best practices emerge:
 ```typescript
 // ✓ CORRECT: All wc-2026 events follow this pattern
 this.dispatchEvent(
-  new CustomEvent('wc-change', {
+  new CustomEvent('hx-change', {
     bubbles: true,
     composed: true,
     detail: { value: this.value },
@@ -819,7 +819,7 @@ this.dispatchEvent(
 
 // ✗ WRONG: Event trapped in shadow tree
 this.dispatchEvent(
-  new CustomEvent('wc-change', {
+  new CustomEvent('hx-change', {
     bubbles: true,
     // composed defaults to false
   }),
@@ -832,7 +832,7 @@ Prefix event names with your library prefix to avoid collisions:
 
 ```typescript
 // ✓ CORRECT: wc- prefix avoids collision with native events
-new CustomEvent('wc-change', {
+new CustomEvent('hx-change', {
   /* ... */
 });
 
@@ -846,7 +846,7 @@ new CustomEvent('change', {
 
 ```typescript
 // ✓ CORRECT: Provides all context consumers need
-new CustomEvent('wc-change', {
+new CustomEvent('hx-change', {
   detail: {
     value: this.value,
     checked: this.checked,
@@ -854,7 +854,7 @@ new CustomEvent('wc-change', {
 });
 
 // ✗ WRONG: Forces consumers to query the component
-new CustomEvent('wc-change', {
+new CustomEvent('hx-change', {
   detail: {},
 });
 ```
@@ -864,11 +864,11 @@ new CustomEvent('wc-change', {
 ```typescript
 /**
  * Dispatched when the checkbox is toggled.
- * @event wc-change
+ * @event hx-change
  * @type {CustomEvent<{checked: boolean, value: string}>}
  */
 this.dispatchEvent(
-  new CustomEvent('wc-change', {
+  new CustomEvent('hx-change', {
     bubbles: true,
     composed: true,
     detail: { checked: this.checked, value: this.value },
@@ -893,7 +893,7 @@ private _handleRadioSelect = (e: CustomEvent<{ value: string }>) => {
   // Handle internally, then dispatch public event
   this.value = e.detail.value;
 
-  this.dispatchEvent(new CustomEvent('wc-change', {
+  this.dispatchEvent(new CustomEvent('hx-change', {
     bubbles: true,
     composed: true,
     detail: { value: this.value }
@@ -910,7 +910,7 @@ private _handleClick(): void {
   this._internals.setFormValue(this.checked ? this.value : null);
 
   // State is consistent when event fires
-  this.dispatchEvent(new CustomEvent('wc-change', {
+  this.dispatchEvent(new CustomEvent('hx-change', {
     bubbles: true,
     composed: true,
     detail: { checked: this.checked }
@@ -919,7 +919,7 @@ private _handleClick(): void {
 
 // ✗ WRONG: Event dispatched before state update
 private _handleClick(): void {
-  this.dispatchEvent(new CustomEvent('wc-change', {
+  this.dispatchEvent(new CustomEvent('hx-change', {
     bubbles: true,
     composed: true,
     detail: { checked: this.checked }  // ← Old value!
@@ -938,7 +938,7 @@ private _handleClick(): void {
 ```typescript
 // ✗ WRONG: Event trapped inside shadow DOM
 this.dispatchEvent(
-  new CustomEvent('wc-change', {
+  new CustomEvent('hx-change', {
     bubbles: true,
     // composed defaults to false
   }),
@@ -950,7 +950,7 @@ this.dispatchEvent(
 ```typescript
 // ✓ CORRECT
 this.dispatchEvent(
-  new CustomEvent('wc-change', {
+  new CustomEvent('hx-change', {
     bubbles: true,
     composed: true,
   }),
@@ -988,7 +988,7 @@ document.addEventListener('click', (event) => {
 // ✗ WRONG: Prevents event from reaching parent
 private _handleClick(event: Event): void {
   event.stopPropagation();  // ← Blocks all external listeners
-  this.dispatchEvent(new CustomEvent('wc-click', {
+  this.dispatchEvent(new CustomEvent('hx-click', {
     bubbles: true,
     composed: true
   }));
@@ -1001,7 +1001,7 @@ private _handleClick(event: Event): void {
 // ✓ CORRECT: Let events propagate naturally
 private _handleClick(event: Event): void {
   // Don't call stopPropagation() unless necessary
-  this.dispatchEvent(new CustomEvent('wc-click', {
+  this.dispatchEvent(new CustomEvent('hx-click', {
     bubbles: true,
     composed: true
   }));
@@ -1025,7 +1025,7 @@ constructor() {
 ```typescript
 // ✓ CORRECT: Wait until component is ready
 override firstUpdated(): void {
-  this.dispatchEvent(new CustomEvent('wc-ready', {
+  this.dispatchEvent(new CustomEvent('hx-ready', {
     bubbles: true,
     composed: true
   }));
@@ -1078,8 +1078,8 @@ document.querySelector('.component-container').addEventListener('click', (event)
   // event.target may be retargeted to a shadow host
   const target = event.target;
 
-  if (target.matches('wc-button')) {
-    // Clicked on wc-button (retargeted from internal <button>)
+  if (target.matches('hx-button')) {
+    // Clicked on hx-button (retargeted from internal <button>)
     console.log('Button clicked:', target);
   }
 });
@@ -1119,7 +1119,7 @@ Shadow DOM events follow these core principles:
 **Best practices for web component events:**
 
 - Always use `bubbles: true` and `composed: true` for public custom events
-- Use namespaced event names (`wc-change`, not `change`)
+- Use namespaced event names (`hx-change`, not `change`)
 - Include relevant data in `event.detail`
 - Document events in JSDoc for CEM generation
 - Stop propagation only for internal coordination events
