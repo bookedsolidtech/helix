@@ -22,7 +22,8 @@
   },
   "files": [
     "dist",
-    "custom-elements.json"
+    "custom-elements.json",
+    "README.md"
   ],
   "customElements": "custom-elements.json",
   "scripts": {
