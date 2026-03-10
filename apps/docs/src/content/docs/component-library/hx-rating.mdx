@@ -1,14 +1,309 @@
 ---
 title: 'hx-rating'
-description: 'Interactive star-based rating input and display'
+description: 'Interactive star-based rating input and display for user feedback collection'
 ---
 
 import ComponentLoader from '../../../components/ComponentLoader.astro';
+import ComponentDemo from '../../../components/ComponentDemo.astro';
 import ComponentDoc from '../../../components/ComponentDoc.astro';
 
 <ComponentLoader />
 
 <ComponentDoc tagName="hx-rating" section="summary" />
+
+## Overview
+
+`hx-rating` is a star-based rating input that supports both interactive and read-only display modes. It implements the [WAI-ARIA Radio Group Pattern](https://www.w3.org/WAI/ARIA/apg/patterns/radio/) in interactive mode and `role="img"` in read-only mode, ensuring screen reader users receive full context regardless of usage.
+
+The component supports whole and half-star precision, keyboard navigation, hover preview, and native form participation via `ElementInternals`. It integrates naturally with Drupal's Fivestar module and standard HTML forms.
+
+**Use `hx-rating` when:** collecting a user's star rating for feedback forms, product reviews, appointment satisfaction, or survey responses.
+
+**Use a plain text field instead when:** free-form numeric input is required or the scale is not star-based.
+
+## Live Demo
+
+### Default (Interactive)
+
+<ComponentDemo title="Interactive Rating">
+  <hx-rating label="Product rating" value="3" max="5"></hx-rating>
+</ComponentDemo>
+
+### Read-only Display
+
+<ComponentDemo title="Read-only">
+  <hx-rating value="4" max="5" label="Average rating" readonly></hx-rating>
+</ComponentDemo>
+
+### Half-Star Precision
+
+<ComponentDemo title="Half-Star">
+  <hx-rating value="3.5" max="5" precision="0.5" label="Satisfaction score"></hx-rating>
+</ComponentDemo>
+
+### Half-Star Read-only
+
+<ComponentDemo title="Half-Star Read-only">
+  <hx-rating value="4.5" max="5" precision="0.5" label="Overall rating" readonly></hx-rating>
+</ComponentDemo>
+
+### Disabled
+
+<ComponentDemo title="Disabled">
+  <hx-rating value="2" max="5" label="Rating (disabled)" disabled></hx-rating>
+</ComponentDemo>
+
+### Custom Max (10 Stars)
+
+<ComponentDemo title="10-Star Scale">
+  <hx-rating value="7" max="10" label="Pain scale (0–10)"></hx-rating>
+</ComponentDemo>
+
+### In a Form
+
+<ComponentDemo title="Form Participation">
+  <form id="rating-form" style="display: flex; flex-direction: column; gap: 1rem; max-width: 320px;">
+    <label style="font-weight: 600;">How would you rate your visit?</label>
+    <hx-rating name="visit_rating" value="0" max="5" label="Visit rating"></hx-rating>
+    <button type="submit" style="width: fit-content; padding: 0.5rem 1rem;">Submit</button>
+  </form>
+  <script>
+    document.getElementById('rating-form')?.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const data = new FormData(e.target);
+      console.log('visit_rating:', data.get('visit_rating'));
+    });
+  </script>
+</ComponentDemo>
+
+## Installation
+
+```bash
+# Full library
+npm install @helix/library
+
+# Or import only this component (tree-shaking friendly)
+import '@helix/library/components/hx-rating';
+```
+
+## Basic Usage
+
+```html
+<!-- Interactive rating -->
+<hx-rating value="3" max="5" label="Product rating"></hx-rating>
+
+<!-- Read-only display -->
+<hx-rating value="4.5" max="5" precision="0.5" label="Average score" readonly></hx-rating>
+
+<!-- In a form -->
+<form>
+  <hx-rating name="rating" value="0" max="5" label="Your rating"></hx-rating>
+  <button type="submit">Submit</button>
+</form>
+```
+
+## Properties
+
+| Property    | Attribute   | Type       | Default | Description                                                                      |
+| ----------- | ----------- | ---------- | ------- | -------------------------------------------------------------------------------- |
+| `value`     | `value`     | `number`   | `0`     | The current rating value (0 to `max`). Reflects to attribute.                    |
+| `max`       | `max`       | `number`   | `5`     | The maximum number of stars to display.                                          |
+| `precision` | `precision` | `0.5 \| 1` | `1`     | Minimum selectable increment. Use `0.5` for half-star ratings.                   |
+| `readonly`  | `readonly`  | `boolean`  | `false` | When true, the rating is display-only and cannot be changed.                     |
+| `disabled`  | `disabled`  | `boolean`  | `false` | When true, the rating is disabled and cannot be interacted with.                 |
+| `name`      | `name`      | `string`   | `''`    | The name submitted with the form when using `ElementInternals` form association. |
+| `label`     | `label`     | `string`   | `''`    | Accessible label for the rating group. Defaults to "Rating" if not set.          |
+
+## Events
+
+| Event       | Detail Type         | Description                                                                              |
+| ----------- | ------------------- | ---------------------------------------------------------------------------------------- |
+| `hx-change` | `{ value: number }` | Dispatched when the rating value changes via click or keyboard. Bubbles and is composed. |
+| `hx-hover`  | `{ value: number }` | Dispatched while hovering over a star for preview. Bubbles and is composed.              |
+
+## CSS Custom Properties
+
+| Property                  | Default                                | Description          |
+| ------------------------- | -------------------------------------- | -------------------- |
+| `--hx-rating-color`       | `var(--hx-color-warning-400, #fbbf24)` | Filled star color.   |
+| `--hx-rating-empty-color` | `var(--hx-color-neutral-300, #d1d5db)` | Empty star color.    |
+| `--hx-rating-hover-color` | `var(--hx-color-warning-300, #fcd34d)` | Star color on hover. |
+| `--hx-rating-size`        | `var(--hx-font-size-xl, 1.25rem)`      | Star icon size.      |
+| `--hx-rating-gap`         | `var(--hx-space-1, 0.25rem)`           | Gap between stars.   |
+
+## CSS Parts
+
+| Part     | Description                                      |
+| -------- | ------------------------------------------------ |
+| `base`   | The outer container element (radiogroup or img). |
+| `symbol` | Each individual star/icon element.               |
+
+## Slots
+
+| Slot   | Description                                                                                                      |
+| ------ | ---------------------------------------------------------------------------------------------------------------- |
+| `icon` | Custom rating icon. Receives a `data-state` attribute with value `"full"`, `"half"`, or `"empty"` for each star. |
+
+## Accessibility
+
+`hx-rating` implements distinct ARIA patterns for interactive and read-only modes to ensure screen reader users receive accurate, contextual information.
+
+| Topic                   | Details                                                                                                                                                                                    |
+| ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| ARIA role (interactive) | `role="radiogroup"` on the container; each star has `role="radio"`, `aria-label` ("1 star", "2 stars", etc.), and `aria-checked`.                                                          |
+| ARIA role (readonly)    | `role="img"` with a descriptive `aria-label` ("Rating: 4 out of 5").                                                                                                                       |
+| `aria-label`            | Set from the `label` property on the radiogroup; falls back to "Rating". In read-only mode, automatically formats as "[label]: [value] out of [max]".                                      |
+| `aria-checked`          | Set on the star whose integer or half-integer value matches the current `value`. Only one star is checked at a time.                                                                       |
+| `aria-disabled`         | Set to `"true"` on the group container when the `disabled` property is true. Prevents interaction without removing focus affordance.                                                       |
+| Keyboard                | See [Keyboard Navigation](#keyboard-navigation) below.                                                                                                                                     |
+| Screen reader           | Interactive: announces each star as "1 star, radio button, checked/not checked, out of 5". Readonly: announces as an image with the full label string.                                     |
+| Focus management        | The active tab stop is the currently selected star (or star 1 if no selection). Arrow keys move focus within the group. Focus is restored to the active star after keyboard change.        |
+| WCAG                    | Meets WCAG 2.1 AA. SC 2.1.1 (Keyboard), SC 4.1.2 (Name, Role, Value), SC 1.4.11 (Non-text Contrast) satisfied. Zero axe-core violations in default, rated, read-only, and disabled states. |
+
+## Keyboard Navigation
+
+| Key          | Behavior                                                |
+| ------------ | ------------------------------------------------------- |
+| `Tab`        | Moves focus to/from the rating group (single tab stop). |
+| `ArrowRight` | Increases the rating by one `precision` step.           |
+| `ArrowUp`    | Increases the rating by one `precision` step.           |
+| `ArrowLeft`  | Decreases the rating by one `precision` step.           |
+| `ArrowDown`  | Decreases the rating by one `precision` step.           |
+| `Home`       | Sets the rating to 0 (no stars).                        |
+| `End`        | Sets the rating to `max` (all stars).                   |
+
+## Drupal Integration
+
+```twig
+{# my-module/templates/feedback-rating.html.twig #}
+<hx-rating
+  name="{{ name|default('rating') }}"
+  value="{{ value|default(0) }}"
+  max="{{ max|default(5) }}"
+  label="{{ label|default('Your rating') }}"
+  {% if precision %}precision="{{ precision }}"{% endif %}
+  {% if readonly %}readonly{% endif %}
+  {% if disabled %}disabled{% endif %}
+></hx-rating>
+```
+
+Load the library in your module's `.libraries.yml`:
+
+```yaml
+helix-components:
+  js:
+    /libraries/helix/helix.min.js: { minified: true }
+```
+
+Listen for rating changes in Drupal behaviors using `once()` to prevent duplicate listeners on AJAX:
+
+```javascript
+Drupal.behaviors.helixRating = {
+  attach(context) {
+    // once() is a Drupal core utility (no import needed) — prevents duplicate event binding during AJAX attach cycles
+    once('helixRating', 'hx-rating', context).forEach((el) => {
+      el.addEventListener('hx-change', (e) => {
+        const { value } = e.detail;
+        // e.g. save to Drupal state, update a hidden field, or submit via AJAX
+        console.log('Rating changed:', value);
+      });
+    });
+  },
+};
+```
+
+## Standalone HTML Example
+
+Copy-paste into a `.html` file and open in any browser — no build tool required:
+
+```html
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>hx-rating example</title>
+    <!-- @helix/library is a private package — install via npm workspace, not CDN -->
+    <!-- In your project: import '@helix/library'; in your bundler entry point -->
+  </head>
+  <body style="font-family: sans-serif; padding: 2rem;">
+    <h2>Patient Satisfaction Survey</h2>
+
+    <form
+      id="survey-form"
+      style="display: flex; flex-direction: column; gap: 1.5rem; max-width: 400px;"
+    >
+      <div>
+        <label style="display: block; font-weight: 600; margin-bottom: 0.5rem;">
+          How would you rate your overall visit?
+        </label>
+        <hx-rating
+          id="visit-rating"
+          name="visit_rating"
+          value="0"
+          max="5"
+          label="Overall visit rating"
+        ></hx-rating>
+      </div>
+
+      <div>
+        <label style="display: block; font-weight: 600; margin-bottom: 0.5rem;">
+          How would you rate the care you received?
+        </label>
+        <hx-rating
+          id="care-rating"
+          name="care_rating"
+          value="0"
+          max="5"
+          label="Quality of care rating"
+        ></hx-rating>
+      </div>
+
+      <div>
+        <label style="display: block; font-weight: 600; margin-bottom: 0.5rem;">
+          Average score
+        </label>
+        <hx-rating
+          id="avg-rating"
+          value="0"
+          max="5"
+          precision="0.5"
+          label="Average score"
+          readonly
+        ></hx-rating>
+      </div>
+
+      <button type="submit" style="width: fit-content; padding: 0.5rem 1.5rem; cursor: pointer;">
+        Submit Feedback
+      </button>
+    </form>
+
+    <script>
+      const visitRating = document.getElementById('visit-rating');
+      const careRating = document.getElementById('care-rating');
+      const avgRating = document.getElementById('avg-rating');
+
+      function updateAverage() {
+        const avg = (visitRating.value + careRating.value) / 2;
+        avgRating.value = Math.round(avg * 2) / 2; // snap to 0.5
+      }
+
+      visitRating.addEventListener('hx-change', updateAverage);
+      careRating.addEventListener('hx-change', updateAverage);
+
+      document.getElementById('survey-form').addEventListener('submit', (e) => {
+        e.preventDefault();
+        const data = new FormData(e.target);
+        console.log('visit_rating:', data.get('visit_rating'));
+        console.log('care_rating:', data.get('care_rating'));
+        alert(
+          `Thank you! Visit: ${data.get('visit_rating')} stars, Care: ${data.get('care_rating')} stars`,
+        );
+      });
+    </script>
+  </body>
+</html>
+```
 
 ## API Reference
 
