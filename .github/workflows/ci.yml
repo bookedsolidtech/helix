@@ -134,6 +134,7 @@ jobs:
           node-version: 20
           cache: 'npm'
       - run: npm ci
+      - run: npx turbo run build --filter='!docs'
       - run: npx playwright install --with-deps chromium
       - name: Run tests (PR — path-filtered by changed components)
         if: github.event_name == 'pull_request'
