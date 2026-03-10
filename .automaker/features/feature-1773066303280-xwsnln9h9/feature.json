@@ -29,5 +29,7 @@
       "timestamp": "2026-03-09T14:25:03.280Z",
       "reason": "Feature created"
     }
-  ]
+  ],
+  "featureType": "code",
+  "prLastPolledAt": "2026-03-10T12:15:17.211Z"
 }
