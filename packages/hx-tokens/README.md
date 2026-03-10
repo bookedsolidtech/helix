@@ -1,91 +1,80 @@
-# @helix/tokens
+# @helixui/tokens
 
-**Design tokens for the HELiX component library** — a structured set of CSS custom properties, JavaScript constants, and Lit CSS utilities that power the `@helix/library` components.
-
-[![npm version](https://img.shields.io/npm/v/@helix/tokens)](https://www.npmjs.com/package/@helix/tokens)
+[![npm version](https://img.shields.io/npm/v/@helixui/tokens)](https://www.npmjs.com/package/@helixui/tokens)
+[![npm downloads](https://img.shields.io/npm/dm/@helixui/tokens)](https://www.npmjs.com/package/@helixui/tokens)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![TypeScript](https://img.shields.io/badge/TypeScript-strict-blue?logo=typescript)](https://www.typescriptlang.org/)
+
+Design tokens for the HELiX enterprise healthcare component library.
 
 ---
 
 ## Installation
 
 ```bash
-npm install @helix/tokens
+npm install @helixui/tokens
 ```
-
-> **Note:** This package is automatically installed as a dependency of `@helix/library`. You only need to install it directly if you are consuming tokens without the component library.
 
 ---
 
 ## Usage
 
-### JavaScript / TypeScript (token constants)
+### CSS custom properties
 
 ```js
-import { tokens } from '@helix/tokens';
-
-console.log(tokens.colorPrimary); // '#0057b8'
+import '@helixui/tokens/css';
 ```
 
-### Lit CSS utilities (for Lit component authors)
-
-```ts
-import { css } from 'lit';
-import { colorPrimary, spacingMd } from '@helix/tokens/lit';
-
-const styles = css`
-  :host {
-    color: ${colorPrimary};
-    padding: ${spacingMd};
-  }
-`;
-```
-
-### CSS custom properties (global stylesheet)
-
-```js
-import '@helix/tokens/css';
-```
-
-Or in CSS:
+Injects all `--hx-*` custom properties into the document. Then use them anywhere in your CSS:
 
 ```css
-@import '@helix/tokens/tokens.css';
-
 .my-element {
-  color: var(--hx-color-primary);
+  color: var(--hx-color-primary-500);
   padding: var(--hx-spacing-md);
 }
 ```
 
-### JSON token source
+### Lit (Shadow DOM)
 
-```js
-import tokens from '@helix/tokens/tokens.json';
+```ts
+import { tokenStyles } from '@helixui/tokens/lit';
+
+class MyComponent extends LitElement {
+  static styles = [tokenStyles, css`...`];
+}
 ```
 
-Useful for build tooling, style dictionaries, or design tool integrations.
+Provides a `CSSResult` containing all `--hx-*` custom properties — ready for Shadow DOM adoption.
 
-### Utility helpers
+### JavaScript / TypeScript
+
+```ts
+import { tokens } from '@helixui/tokens';
+
+console.log(tokens.color.primary[500].value); // '#2563EB'
+```
+
+Fully typed token objects — no magic strings.
+
+### JSON
 
 ```js
-import { toCssVar, resolveToken } from '@helix/tokens/utils';
-
-toCssVar('color-primary'); // 'var(--hx-color-primary)'
+import tokens from '@helixui/tokens/tokens.json';
 ```
+
+Raw token definitions for build tooling, style dictionaries, or design tool integrations.
 
 ---
 
 ## Export Paths
 
-| Import path | Contents |
-|---|---|
-| `@helix/tokens` | JavaScript token constants (default export) |
-| `@helix/tokens/lit` | Lit CSS tagged template values |
-| `@helix/tokens/css` | Side-effect import — injects CSS custom properties |
-| `@helix/tokens/tokens.css` | Raw CSS file with all `--hx-*` custom properties |
-| `@helix/tokens/tokens.json` | Source token definitions as JSON |
-| `@helix/tokens/utils` | Helper utilities (`toCssVar`, etc.) |
+| Import path                   | Contents                                           |
+| ----------------------------- | -------------------------------------------------- |
+| `@helixui/tokens`             | TypeScript token objects                           |
+| `@helixui/tokens/lit`         | Lit `CSSResult` for Shadow DOM adoption            |
+| `@helixui/tokens/css`         | Side-effect import — injects CSS custom properties |
+| `@helixui/tokens/tokens.css`  | Raw CSS file with all `--hx-*` custom properties   |
+| `@helixui/tokens/tokens.json` | Source token definitions as JSON                   |
 
 ---
 
@@ -93,35 +82,67 @@ toCssVar('color-primary'); // 'var(--hx-color-primary)'
 
 All CSS custom properties use the `--hx-` prefix:
 
-- **Color** — `--hx-color-primary`, `--hx-color-neutral-*`, `--hx-color-error`, etc.
-- **Spacing** — `--hx-spacing-xs` through `--hx-spacing-2xl`
-- **Typography** — `--hx-font-family-base`, `--hx-font-size-*`, `--hx-font-weight-*`
-- **Border** — `--hx-border-radius-*`, `--hx-border-width-*`
-- **Shadow** — `--hx-shadow-sm`, `--hx-shadow-md`, `--hx-shadow-lg`
-- **Motion** — `--hx-duration-fast`, `--hx-easing-standard`
-- **Z-index** — `--hx-z-dropdown`, `--hx-z-modal`, `--hx-z-toast`
+| Category       | Example tokens                                                                                                    |
+| -------------- | ----------------------------------------------------------------------------------------------------------------- |
+| **Color**      | `--hx-color-primary-500`, `--hx-color-neutral-100`, `--hx-color-error-500`                                        |
+| **Spacing**    | `--hx-spacing-xs`, `--hx-spacing-sm`, `--hx-spacing-md`, `--hx-spacing-lg`, `--hx-spacing-xl`, `--hx-spacing-2xl` |
+| **Typography** | `--hx-font-family-base`, `--hx-font-size-sm`, `--hx-font-weight-medium`                                           |
+| **Border**     | `--hx-border-radius-sm`, `--hx-border-radius-md`, `--hx-border-width-base`                                        |
+| **Shadow**     | `--hx-shadow-sm`, `--hx-shadow-md`, `--hx-shadow-lg`                                                              |
+| **Motion**     | `--hx-duration-fast`, `--hx-duration-base`, `--hx-easing-standard`                                                |
+| **Z-index**    | `--hx-z-dropdown`, `--hx-z-modal`, `--hx-z-toast`                                                                 |
 
 ---
 
-## Theming
+## Dark Mode
 
-Override semantic tokens at the `:root` level to apply a custom theme across all HELiX components:
+Two dark mode strategies are available:
+
+```js
+// Auto — respects prefers-color-scheme
+import '@helixui/tokens/tokens-dark-auto.css';
+
+// Manual — activate by adding class="dark" to <html>
+import '@helixui/tokens/tokens-dark-manual.css';
+```
+
+---
+
+## Drupal / Twig Integration
+
+HELiX tokens ship as CSS custom properties, making them compatible with any Twig template. After loading the token stylesheet via a Drupal library, use the `--hx-*` variables directly:
+
+```twig
+{# my-block.html.twig #}
+<div class="my-block" style="color: var(--hx-color-primary-500);">
+  {{ content }}
+</div>
+```
+
+Or override tokens per-theme in your Drupal theme CSS:
 
 ```css
 :root {
-  --hx-color-primary: #005eb8;
-  --hx-color-primary-hover: #004f9f;
-  --hx-font-family-base: 'Roboto', sans-serif;
+  --hx-color-primary-500: #005eb8;
 }
 ```
 
 ---
 
-## Documentation
+## Companion Package
 
-Full token reference and theming guide:
+This package provides the design token foundation for the HELiX component library:
 
-> **Docs site coming soon**
+- **[`@helixui/library`](https://www.npmjs.com/package/@helixui/library)** — Pre-built Lit 3.x web components for enterprise healthcare UIs
+
+---
+
+## Links
+
+- [GitHub](https://github.com/bookedsolidtech/helix)
+- [Documentation](https://helix.bookedsolid.com)
+- [npm](https://www.npmjs.com/package/@helixui/tokens)
+- [Issues](https://github.com/bookedsolidtech/helix/issues)
 
 ---
 
