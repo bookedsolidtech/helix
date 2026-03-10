@@ -265,7 +265,34 @@ export class HelixTabs extends LitElement {
   };
 
   /** @internal */
+  private _warnInvalidSlotContent(): void {
+    const tabSlot = this.shadowRoot?.querySelector<HTMLSlotElement>('slot[name="tab"]');
+    const panelSlot = this.shadowRoot?.querySelector<HTMLSlotElement>('slot:not([name])');
+    if (tabSlot) {
+      const invalid = tabSlot
+        .assignedElements()
+        .filter((el) => el.tagName.toLowerCase() !== 'hx-tab');
+      if (invalid.length > 0) {
+        console.warn(
+          `[hx-tabs] Slot "tab" expects <hx-tab> elements. Found unexpected: ${invalid.map((el) => `<${el.tagName.toLowerCase()}>`).join(', ')}`,
+        );
+      }
+    }
+    if (panelSlot) {
+      const invalid = panelSlot
+        .assignedElements()
+        .filter((el) => el.tagName.toLowerCase() !== 'hx-tab-panel');
+      if (invalid.length > 0) {
+        console.warn(
+          `[hx-tabs] Default slot expects <hx-tab-panel> elements. Found unexpected: ${invalid.map((el) => `<${el.tagName.toLowerCase()}>`).join(', ')}`,
+        );
+      }
+    }
+  }
+
+  /** @internal */
   private _handleSlotChange = (): void => {
+    this._warnInvalidSlotContent();
     this._cachedTabs = null;
     this._cachedPanels = null;
     this._syncTabsAndPanels();

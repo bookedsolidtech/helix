@@ -201,6 +201,9 @@ jobs:
       - run: npm ci
       - run: npx turbo run build --filter='!docs'
       - run: npm run cem
+      - name: Validate package exports (npm pack --dry-run)
+        run: npm pack --dry-run
+        working-directory: packages/hx-library
       - name: Bundle size check
         run: |
           echo "=== Bundle Size Report ==="
