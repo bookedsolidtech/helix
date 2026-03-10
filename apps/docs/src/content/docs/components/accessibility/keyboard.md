@@ -50,9 +50,9 @@ The best tab order is the natural DOM order. wc-2026 components are structured s
 
 ```html
 <!-- Natural tab order: Button 1 → Button 2 → Button 3 -->
-<wc-button>Button 1</wc-button>
-<wc-button>Button 2</wc-button>
-<wc-button>Button 3</wc-button>
+<hx-button>Button 1</hx-button>
+<hx-button>Button 2</hx-button>
+<hx-button>Button 3</hx-button>
 ```
 
 ### Tabindex Values
@@ -74,8 +74,8 @@ Positive `tabindex` values (1, 2, 3, etc.) disrupt the natural tab order, creati
 Web components using Shadow DOM participate in tab order based on the `delegatesFocus` property:
 
 ```typescript
-// wc-button implementation
-export class WcButton extends LitElement {
+// hx-button implementation
+export class HxButton extends LitElement {
   static shadowRootOptions = {
     ...LitElement.shadowRootOptions,
     delegatesFocus: true, // Focus moves to first focusable element in shadow DOM
@@ -99,18 +99,18 @@ wc-2026 components expose a `focus()` method for programmatic focus management:
 
 ```typescript
 // Set focus to a button
-const button = document.querySelector('wc-button');
+const button = document.querySelector('hx-button');
 button.focus();
 
 // Set focus to a text input
-const input = document.querySelector('wc-text-input');
+const input = document.querySelector('hx-text-input');
 input.focus();
 ```
 
 Internally, components delegate to their focusable elements:
 
 ```typescript
-// Inside wc-text-input
+// Inside hx-text-input
 focus() {
   this.inputElement?.focus();
 }
@@ -121,7 +121,7 @@ focus() {
 Some components need to capture focus when they appear. Modal dialogs are the most common example:
 
 ```typescript
-// Focus management in wc-modal (future component)
+// Focus management in hx-modal (future component)
 async firstUpdated() {
   await this.updateComplete;
   if (this.open) {
@@ -141,7 +141,7 @@ private focusFirstElement() {
 When a component closes or a temporary state ends, focus should return to the element that triggered the action:
 
 ```typescript
-// Focus restoration pattern (wc-modal example)
+// Focus restoration pattern (hx-modal example)
 private previousFocus: HTMLElement | null = null;
 
 open() {
@@ -163,7 +163,7 @@ This pattern is essential for modal dialogs, dropdown menus, and context menus.
 Focus management across shadow boundaries requires explicit methods:
 
 ```typescript
-// wc-text-input exposes a public focus() method
+// hx-text-input exposes a public focus() method
 export class WcTextInput extends LitElement {
   @query('input') private inputElement!: HTMLInputElement;
 
@@ -180,7 +180,7 @@ export class WcTextInput extends LitElement {
 Consumers can now focus the component as if it were a native element:
 
 ```typescript
-document.querySelector('wc-text-input').focus();
+document.querySelector('hx-text-input').focus();
 ```
 
 ## Roving Tabindex Pattern
@@ -212,7 +212,7 @@ Roving tabindex is appropriate for:
 ```typescript
 // Simplified wc-radio-group roving tabindex implementation
 export class WcRadioGroup extends LitElement {
-  @queryAssignedElements({ selector: 'wc-radio' })
+  @queryAssignedElements({ selector: 'hx-radio' })
   private radios!: Array<WcRadio>;
 
   private handleKeyDown(e: KeyboardEvent) {
@@ -287,7 +287,7 @@ Keyboard shortcuts accelerate workflows for power users. wc-2026 components impl
 
 ### Component-Specific Shortcuts
 
-#### wc-button
+#### hx-button
 
 ```typescript
 @keydown=${(e: KeyboardEvent) => {
@@ -300,7 +300,7 @@ Keyboard shortcuts accelerate workflows for power users. wc-2026 components impl
 
 Native `<button>` elements handle `Enter` and `Space` automatically, but custom buttons must implement this explicitly.
 
-#### wc-text-input
+#### hx-text-input
 
 ```typescript
 @keydown=${(e: KeyboardEvent) => {
@@ -313,7 +313,7 @@ Native `<button>` elements handle `Enter` and `Space` automatically, but custom 
 
 `Escape` clears the input if the `clearable` property is set.
 
-#### wc-select (future component)
+#### hx-select (future component)
 
 ```typescript
 @keydown=${(e: KeyboardEvent) => {
@@ -430,18 +430,18 @@ button:focus-visible {
 All wc-2026 components use `:focus-visible` for focus indicators:
 
 ```css
-/* wc-button focus styles */
+/* hx-button focus styles */
 :host(:focus-visible) {
-  outline: var(--wc-focus-ring-width, 2px) solid var(--wc-focus-ring-color, var(--wc-color-primary));
-  outline-offset: var(--wc-focus-ring-offset, 2px);
+  outline: var(--hx-focus-ring-width, 2px) solid var(--hx-focus-ring-color, var(--hx-color-primary));
+  outline-offset: var(--hx-focus-ring-offset, 2px);
 }
 ```
 
 **Design tokens for focus indicators:**
 
-- `--wc-focus-ring-width` — Thickness of focus ring (default: `2px`)
-- `--wc-focus-ring-color` — Color of focus ring (default: `--wc-color-primary`)
-- `--wc-focus-ring-offset` — Spacing between element and focus ring (default: `2px`)
+- `--hx-focus-ring-width` — Thickness of focus ring (default: `2px`)
+- `--hx-focus-ring-color` — Color of focus ring (default: `--hx-color-primary`)
+- `--hx-focus-ring-offset` — Spacing between element and focus ring (default: `2px`)
 
 ### Focus Visible Polyfill
 
@@ -494,7 +494,7 @@ Focus traps are **not** appropriate for:
 5. When focus reaches the first element and user presses `Shift+Tab`, move focus to the last element
 6. When the trap deactivates, restore focus to the stored element
 
-### Example: wc-modal (Future Component)
+### Example: hx-modal (Future Component)
 
 ```typescript
 export class WcModal extends LitElement {
@@ -609,9 +609,9 @@ This approach handles edge cases like dynamically added focusable elements and n
 ### Example 1: Basic Button Navigation
 
 ```html
-<wc-button>Save</wc-button>
-<wc-button variant="secondary">Cancel</wc-button>
-<wc-button variant="danger">Delete</wc-button>
+<hx-button>Save</hx-button>
+<hx-button variant="secondary">Cancel</hx-button>
+<hx-button variant="danger">Delete</hx-button>
 ```
 
 **Keyboard interaction:**
@@ -627,10 +627,10 @@ This approach handles edge cases like dynamically added focusable elements and n
 
 ```html
 <form>
-  <wc-text-input label="Email" type="email" required></wc-text-input>
-  <wc-text-input label="Password" type="password" required></wc-text-input>
-  <wc-checkbox>Remember me</wc-checkbox>
-  <wc-button type="submit">Log In</wc-button>
+  <hx-text-input label="Email" type="email" required></hx-text-input>
+  <hx-text-input label="Password" type="password" required></hx-text-input>
+  <hx-checkbox>Remember me</hx-checkbox>
+  <hx-button type="submit">Log In</hx-button>
 </form>
 ```
 
@@ -673,11 +673,11 @@ Only one radio is in the tab order at a time, but all radios are navigable with 
 ### Example 4: Interactive Card
 
 ```html
-<wc-card href="/patient/12345" interactive>
+<hx-card href="/patient/12345" interactive>
   <h3 slot="header">John Doe</h3>
   <p>Patient ID: 12345</p>
   <p>Last visit: 2026-02-10</p>
-</wc-card>
+</hx-card>
 ```
 
 **Keyboard interaction:**
@@ -686,17 +686,17 @@ Only one radio is in the tab order at a time, but all radios are navigable with 
 2. `Enter` — Navigates to `/patient/12345`
 3. Focus indicator surrounds entire card
 
-Internally, wc-card uses `role="link"` and `tabindex="0"` when `href` is provided.
+Internally, hx-card uses `role="link"` and `tabindex="0"` when `href` is provided.
 
 ### Example 5: Select with Typeahead (Future Component)
 
 ```html
-<wc-select label="Select a state">
+<hx-select label="Select a state">
   <wc-option value="AL">Alabama</wc-option>
   <wc-option value="AK">Alaska</wc-option>
   <wc-option value="AZ">Arizona</wc-option>
   <!-- ... 47 more states ... -->
-</wc-select>
+</hx-select>
 ```
 
 **Keyboard interaction:**
@@ -715,18 +715,18 @@ Internally, wc-card uses `role="link"` and `tabindex="0"` when `href` is provide
 ### Example 6: Modal Dialog with Focus Trap
 
 ```html
-<wc-button onclick="document.querySelector('wc-modal').open = true"> Open Modal </wc-button>
+<hx-button onclick="document.querySelector('hx-modal').open = true"> Open Modal </hx-button>
 
-<wc-modal id="confirm-modal">
+<hx-modal id="confirm-modal">
   <h2 slot="header">Confirm Action</h2>
   <p>Are you sure you want to delete this record?</p>
   <div slot="footer">
-    <wc-button variant="danger">Delete</wc-button>
-    <wc-button variant="secondary" onclick="document.querySelector('wc-modal').open = false">
+    <hx-button variant="danger">Delete</hx-button>
+    <hx-button variant="secondary" onclick="document.querySelector('hx-modal').open = false">
       Cancel
-    </wc-button>
+    </hx-button>
   </div>
-</wc-modal>
+</hx-modal>
 ```
 
 **Keyboard interaction:**
@@ -766,12 +766,12 @@ The focus trap ensures users cannot accidentally tab outside the modal while it'
 wc-2026 uses Vitest browser mode and Playwright for automated keyboard testing:
 
 ```typescript
-// wc-button.test.ts
+// hx-button.test.ts
 import { expect, test } from 'vitest';
 import { fixture, oneEvent } from '../../test-utils';
 
 test('activates on Enter key', async () => {
-  const el = await fixture<WcButton>('<wc-button>Click me</wc-button>');
+  const el = await fixture<HxButton>('<hx-button>Click me</hx-button>');
   const clickPromise = oneEvent(el, 'click');
 
   el.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter' }));
@@ -781,7 +781,7 @@ test('activates on Enter key', async () => {
 });
 
 test('activates on Space key', async () => {
-  const el = await fixture<WcButton>('<wc-button>Click me</wc-button>');
+  const el = await fixture<HxButton>('<hx-button>Click me</hx-button>');
   const clickPromise = oneEvent(el, 'click');
 
   el.dispatchEvent(new KeyboardEvent('keydown', { key: ' ' }));
@@ -791,7 +791,7 @@ test('activates on Space key', async () => {
 });
 
 test('is focusable', async () => {
-  const el = await fixture<WcButton>('<wc-button>Click me</wc-button>');
+  const el = await fixture<HxButton>('<hx-button>Click me</hx-button>');
   el.focus();
   expect(document.activeElement).toBe(el);
 });
@@ -829,7 +829,7 @@ This element is not keyboard accessible. It has no `tabindex`, no default keyboa
 Or, if a custom element is required:
 
 ```html
-<wc-button onclick="submit()">Submit</wc-button>
+<hx-button onclick="submit()">Submit</hx-button>
 ```
 
 ### 2. Forgetting `tabindex="0"` on Custom Interactive Elements
@@ -850,7 +850,7 @@ Spans are not focusable by default. Keyboard users cannot access this element.
 </span>
 ```
 
-Better: use a `<button>` or `<wc-button>`.
+Better: use a `<button>` or `<hx-button>`.
 
 ### 3. Using Positive `tabindex` Values
 

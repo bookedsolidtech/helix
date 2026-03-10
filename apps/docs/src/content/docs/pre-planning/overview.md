@@ -17,7 +17,7 @@ If you want to understand **why** HELIX works the way it does, this is the right
 
 ## What Was Built
 
-85 production-ready web components (73 standalone + 12 sub-components) in a Turborepo monorepo with:
+87 production-ready web components (72 standalone + 15 sub-components) in a Turborepo monorepo with:
 
 - **Lit 3.x** for component authoring — 5KB runtime, native TypeScript, Shadow DOM encapsulation
 - **`hx-tokens` package** — custom CSS custom property generation, three-tier token cascade
@@ -94,7 +94,7 @@ The [Architecture & System Design](/pre-planning/architecture/) document covers:
 
 [Component Architecture & Storybook Integration](/pre-planning/components/) covers:
 
-- Component library structure (85 components across 9 categories)
+- Component library structure (87 components across 9 categories)
 - Storybook story configuration and variant strategy
 - TypeScript and JSDoc strategy — 100% coverage requirement
 - Drupal integration documentation strategy
@@ -219,7 +219,7 @@ Drupal libraries.yml (per-component asset loading)
 
 **Form-associated custom elements** — The `ElementInternals` API for form participation was the least documented part of the Web Components spec when this project started. We invested heavily in getting it right because healthcare applications have non-negotiable form accessibility requirements.
 
-**85 components, one quality bar** — Scaling from 3 prototype components to 85 production components while maintaining test coverage, accessibility audits, Storybook stories, and CEM accuracy required systematic tooling. The Admin Dashboard health scorer tracks component quality across all dimensions.
+**87 components, one quality bar** — Scaling from 3 prototype components to 87 production components while maintaining test coverage, accessibility audits, Storybook stories, and CEM accuracy required systematic tooling. The Admin Dashboard health scorer tracks component quality across all dimensions.
 
 ---
 
