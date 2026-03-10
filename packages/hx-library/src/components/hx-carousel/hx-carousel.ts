@@ -597,13 +597,15 @@ export class HelixCarousel extends LitElement {
 
   override render() {
     return html`
-      <div class="base" part="base" role="region" aria-label=${this.label} tabindex="0">
-        <div
-          class="live-region"
-          aria-live="polite"
-          aria-atomic="true"
-          aria-relevant="additions text"
-        >
+      <div
+        class="base"
+        part="base"
+        role="region"
+        aria-label=${this.label}
+        aria-roledescription="carousel"
+        tabindex="0"
+      >
+        <div class="live-region" role="status" aria-live="polite" aria-atomic="true">
           ${this._liveText}
         </div>
         ${this._renderNavigation()}

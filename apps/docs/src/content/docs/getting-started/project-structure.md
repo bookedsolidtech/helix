@@ -15,19 +15,22 @@ helix/
 ├── .nvmrc                    # Node.js version (20.x)
 │
 ├── apps/
-│   ├── docs/                 # Astro/Starlight documentation
+│   ├── docs/                 # Astro/Starlight documentation (port 3150)
 │   │   ├── astro.config.mjs  # Starlight configuration
 │   │   └── src/
 │   │       ├── content/docs/ # Documentation pages (Markdown/MDX)
 │   │       ├── components/   # Custom Astro components
 │   │       └── styles/       # Custom CSS
 │   │
-│   └── storybook/            # Component playground (Phase 3)
+│   ├── storybook/            # Storybook component playground (port 3151)
+│   │
+│   └── admin/                # Admin Dashboard — health scoring (port 3159)
 │
 ├── packages/
-│   └── wc-library/           # Lit 3.x components (Phase 2)
+│   ├── hx-library/           # @helix/library — Lit 3.x components
+│   └── hx-tokens/            # @helix/tokens — design token system
 │
-└── build-plan/               # Original planning documents
+└── .claude/agents/           # Specialized engineering agents
 ```
 
 ## Key Configuration Files
@@ -39,14 +42,16 @@ helix/
 | `.nvmrc`                     | Pins Node.js to version 20.x                   |
 | `apps/docs/astro.config.mjs` | Starlight sidebar, theme, and plugins          |
 
-## Turborepo Commands
+## npm Scripts
 
 ```bash
-turbo run dev            # Start all apps in dev mode
-turbo run dev --filter=docs  # Start only the docs site
-turbo run build          # Build all packages and apps
-turbo run type-check     # Run TypeScript checking across all packages
-turbo run clean          # Remove all build artifacts
+npm run dev              # Start all apps in dev mode
+npm run dev:docs         # Start only the docs site
+npm run dev:storybook    # Start Storybook
+npm run build            # Build all packages and apps
+npm run type-check       # Run TypeScript checking across all packages
+npm run test             # Run Vitest browser tests
+npm run verify           # lint + format:check + type-check (pre-push gate)
 ```
 
 ## Next Steps

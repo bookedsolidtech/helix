@@ -173,7 +173,7 @@ export const helixFileUploadStyles = css`
   }
 
   .file-item__remove:hover {
-    color: var(--hx-file-upload-error-color, var(--hx-color-error-500, #dc3545));
+    color: var(--hx-file-upload-error-color, var(--hx-color-error-text, #b91c1c));
     background-color: color-mix(in srgb, var(--hx-color-error-500, #dc3545) 8%, transparent);
   }
 
@@ -230,7 +230,7 @@ export const helixFileUploadStyles = css`
 
   .field__error {
     font-size: var(--hx-font-size-xs, 0.75rem);
-    color: var(--hx-file-upload-error-color, var(--hx-color-error-500, #dc3545));
+    color: var(--hx-file-upload-error-color, var(--hx-color-error-text, #b91c1c));
     line-height: var(--hx-line-height-normal, 1.5);
   }
 `;
