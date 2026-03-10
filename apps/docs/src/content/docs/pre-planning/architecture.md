@@ -30,7 +30,7 @@ description: Complete system architecture, technology decisions, and infrastruct
 
 This document defines the architecture for an enterprise-grade Web Component library targeting an organization's public-facing content platform. The system is designed as two independent but complementary artifacts:
 
-1. **`@org/wc-library`** -- A standalone, framework-agnostic Web Component package built with Lit and TypeScript, distributable via npm or CDN
+1. **`@helix/library`** -- A standalone, framework-agnostic Web Component package built with Lit and TypeScript, distributable via npm or CDN
 2. **Storybook** -- A development and documentation environment that consumes the library as a dependency, providing interactive component previews, automated API documentation, and visual testing
 
 The architecture prioritizes:
@@ -51,7 +51,7 @@ The architecture prioritizes:
 |                   MONOREPO (npm workspaces + Turborepo)           |
 |                                                                  |
 |  +-------------------------+    +----------------------------+   |
-|  |  packages/wc-library    |    |  apps/storybook            |   |
+|  |  packages/hx-library    |    |  apps/storybook            |   |
 |  |                         |    |                            |   |
 |  |  - Lit Web Components   |    |  - Storybook 10.x           |   |
 |  |  - Design Tokens        |    |  - @storybook/web-         |   |
@@ -61,7 +61,7 @@ The architecture prioritizes:
 |  |                         |    |  - Visual regression tests  |   |
 |  |  OUTPUT:                |    |                            |   |
 |  |  - ES modules (.js)     |    |  CONSUMES:                 |   |
-|  |  - Type defs (.d.ts)    |    |  - @org/wc-library         |   |
+|  |  - Type defs (.d.ts)    |    |  - @helix/library         |   |
 |  |  - CEM (JSON)           |    |    (npm workspace link)    |   |
 |  |  - CSS token files      |    |  - custom-elements.json    |   |
 |  |  - npm package          |    |                            |   |
@@ -76,7 +76,7 @@ The architecture prioritizes:
 |                                                                  |
 |  +----------------------------+  +---------------------------+   |
 |  |  libraries.yml             |  |  Twig Templates           |   |
-|  |  - @org/wc-library entry   |  |  - <org-card>             |   |
+|  |  - @helix/library entry   |  |  - <org-card>             |   |
 |  |  - ES module import        |  |  - <org-hero>             |   |
 |  |  - CSS token stylesheet    |  |  - SDC wrapping (opt.)    |   |
 |  +----------------------------+  +---------------------------+   |
@@ -133,7 +133,7 @@ helix/
 |
 +-- packages/
 |   +-- wc-library/
-|       +-- package.json              # @org/wc-library
+|       +-- package.json              # @helix/library
 |       +-- tsconfig.json             # Extends ../tsconfig.base.json
 |       +-- custom-elements-manifest.config.mjs
 |       +-- src/
@@ -224,11 +224,11 @@ npm workspaces are declared in the root `package.json` (no separate workspace co
 
 Turborepo handles all task orchestration with intelligent caching and dependency-aware parallel execution. Run `turbo run dev` to start all apps, or `turbo run dev --filter=docs` to target a specific workspace.
 
-### Library `package.json` (`packages/wc-library/package.json`)
+### Library `package.json` (`packages/hx-library/package.json`)
 
 ```json
 {
-  "name": "@org/wc-library",
+  "name": "@helix/library",
   "version": "0.1.0",
   "type": "module",
   "main": "dist/index.js",
@@ -401,7 +401,7 @@ export default config;
 import type { Preview } from '@storybook/web-components-vite';
 import { setCustomElementsManifest } from '@storybook/web-components-vite';
 import { setStorybookHelpersConfig } from '@wc-toolkit/storybook-helpers';
-import customElementsManifest from '@org/wc-library/custom-elements.json';
+import customElementsManifest from '@helix/library/custom-elements.json';
 
 // Load the Custom Elements Manifest for autodocs
 setCustomElementsManifest(customElementsManifest);
@@ -441,10 +441,10 @@ Each component story follows this pattern, using `@wc-toolkit/storybook-helpers`
 import type { Meta, StoryObj } from '@storybook/web-components-vite';
 import { getStorybookHelpers } from '@wc-toolkit/storybook-helpers';
 import { html } from 'lit';
-import type { OrgCard } from '@org/wc-library/components/card';
+import type { OrgCard } from '@helix/library/components/card';
 
 // Side-effect import to register the custom element
-import '@org/wc-library/components/card';
+import '@helix/library/components/card';
 
 const { args, argTypes, template } = getStorybookHelpers<OrgCard>('org-card');
 
@@ -721,12 +721,12 @@ Style Dictionary 4.x transforms the DTCG JSON tokens into platform-specific outp
 import StyleDictionary from 'style-dictionary';
 
 export default {
-  source: ['packages/wc-library/src/tokens/**/*.tokens.json'],
+  source: ['packages/hx-library/src/tokens/**/*.tokens.json'],
   platforms: {
     css: {
       transformGroup: 'css',
       prefix: 'org',
-      buildPath: 'packages/wc-library/src/styles/',
+      buildPath: 'packages/hx-library/src/styles/',
       files: [
         {
           destination: 'tokens.css',
@@ -858,7 +858,7 @@ The Web Component library has **zero knowledge of Drupal**. All integration is t
 **Primary: npm package**
 
 ```bash
-npm install @org/wc-library
+npm install @helix/library
 ```
 
 The client team's Drupal build process (Composer + npm via Asset Packagist, or a custom Node build step) pulls the package and copies the dist files into the Drupal theme's asset directory.
@@ -868,8 +868,8 @@ The client team's Drupal build process (Composer + npm via Asset Packagist, or a
 The built package is also published to a CDN (jsDelivr auto-syncs from npm, or a dedicated CloudFront distribution for enterprise SLA requirements):
 
 ```
-https://cdn.jsdelivr.net/npm/@org/wc-library@latest/dist/index.js
-https://cdn.jsdelivr.net/npm/@org/wc-library@latest/dist/styles/tokens.css
+https://cdn.jsdelivr.net/npm/@helix/library@latest/dist/index.js
+https://cdn.jsdelivr.net/npm/@helix/library@latest/dist/styles/tokens.css
 ```
 
 Note: For production enterprise deployments, a self-hosted CDN (e.g., CloudFront) is recommended over public CDNs for security and availability guarantees.
@@ -886,12 +886,12 @@ helix:
   css:
     theme:
       # Design tokens (CSS custom properties)
-      node_modules/@org/wc-library/dist/styles/tokens.css: { minified: true }
+      node_modules/@helix/library/dist/styles/tokens.css: { minified: true }
       # Optional: dark mode overrides
       css/tokens-dark.css: {}
   js:
     # ES module entry point
-    node_modules/@org/wc-library/dist/index.js:
+    node_modules/@helix/library/dist/index.js:
       type: module
       minified: true
       preprocess: false
@@ -1345,7 +1345,7 @@ jobs:
           registry-url: https://registry.npmjs.org
       - run: npm ci
       - run: npm run build:tokens && npm run build && npx turbo build:cem
-      - run: cd packages/wc-library && npm publish --access public
+      - run: cd packages/hx-library && npm publish --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 ```

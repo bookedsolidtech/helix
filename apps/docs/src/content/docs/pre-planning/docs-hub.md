@@ -485,7 +485,7 @@ const docs = defineCollection({
 // Component API collection (loaded from custom-elements.json)
 const components = defineCollection({
   loader: cemLoader({
-    manifestPath: '../../packages/wc-library/custom-elements.json',
+    manifestPath: '../../packages/hx-library/custom-elements.json',
   }),
   schema: z.object({
     tagName: z.string(),
@@ -543,8 +543,8 @@ const components = defineCollection({
 const tokens = defineCollection({
   loader: tokenLoader({
     tokenPaths: [
-      '../../packages/wc-library/src/tokens/semantic.tokens.json',
-      '../../packages/wc-library/src/tokens/component.tokens.json',
+      '../../packages/hx-library/src/tokens/semantic.tokens.json',
+      '../../packages/hx-library/src/tokens/component.tokens.json',
     ],
   }),
   schema: z.object({
@@ -682,7 +682,7 @@ A build script reads the content collection and generates markdown pages for eac
 import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 import { resolve, join } from 'node:path';
 
-const manifestPath = resolve('../../packages/wc-library/custom-elements.json');
+const manifestPath = resolve('../../packages/hx-library/custom-elements.json');
 const manifest = JSON.parse(readFileSync(manifestPath, 'utf-8'));
 const outputDir = resolve('src/content/docs/components');
 
@@ -1433,7 +1433,7 @@ The documentation build depends on artifacts from the library build:
 
 ```
 [1. Build Library]
-    npx turbo build --filter=@org/wc-library
+    npx turbo build --filter=@helix/library
     |
     +-- dist/          (compiled JS, CSS, type declarations)
     +-- custom-elements.json   (CEM, regenerated)
@@ -1476,7 +1476,7 @@ on:
   pull_request:
     branches: [main]
     paths:
-      - 'packages/wc-library/**'
+      - 'packages/hx-library/**'
       - 'apps/storybook/**'
       - 'apps/docs/**'
 
@@ -1493,8 +1493,8 @@ jobs:
       - run: npm ci
 
       # 1. Build library (produces CEM + dist)
-      - run: npx turbo build --filter=@org/wc-library
-      - run: npx turbo cem --filter=@org/wc-library
+      - run: npx turbo build --filter=@helix/library
+      - run: npx turbo cem --filter=@helix/library
 
       # 2. Build Storybook
       - run: npx turbo build --filter=storybook
@@ -1572,7 +1572,7 @@ Every pull request that modifies library source, Storybook stories, or documenta
     "@astrojs/lit": "^5.0.0"
   },
   "devDependencies": {
-    "@org/wc-library": "*"
+    "@helix/library": "*"
   }
 }
 ```
@@ -1620,11 +1620,11 @@ Turborepo orchestrates all cross-package tasks via `turbo.json`. The root `packa
 ### Dependency Graph
 
 ```
-@org/wc-library  (no external deps except Lit)
+@helix/library  (no external deps except Lit)
        |
-       +-- apps/storybook   (depends on @org/wc-library via workspace:*)
+       +-- apps/storybook   (depends on @helix/library via workspace:*)
        |
-       +-- apps/docs         (depends on @org/wc-library via workspace:*)
+       +-- apps/docs         (depends on @helix/library via workspace:*)
                               (reads custom-elements.json at build time)
                               (embeds storybook static build at build time)
 ```

@@ -155,7 +155,7 @@ The [Drupal Integration Guide](/pre-planning/drupal-guide/) is the reference for
 | **Storybook**  | 10.x    | Component playground, design system   |
 | **Vitest**     | 3.x     | Testing framework (Browser Mode)      |
 | **Astro**      | 5.x     | Documentation site generator          |
-| **Starlight**  | 0.32+   | Documentation theme                   |
+| **Starlight**  | 0.37+   | Documentation theme                   |
 | **hx-tokens**  | —       | Custom design token system            |
 | **npm**        | 10.x    | Monorepo package manager              |
 | **Turborepo**  | —       | Monorepo build orchestration          |

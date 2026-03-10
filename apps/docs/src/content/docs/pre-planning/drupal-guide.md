@@ -33,7 +33,7 @@ description: Complete guide for integrating HELIX web components with Drupal CMS
 
 ### What This Guide Covers
 
-This guide is the definitive reference for Drupal teams consuming the `@org/wc-library` Web Component library. It covers every aspect of integration: installation, TWIG templating, field and views integration, form participation, JavaScript behaviors, theming, performance, accessibility, and maintenance.
+This guide is the definitive reference for Drupal teams consuming the `@helix/library` Web Component library. It covers every aspect of integration: installation, TWIG templating, field and views integration, form participation, JavaScript behaviors, theming, performance, accessibility, and maintenance.
 
 ### Architecture Boundary
 
@@ -41,7 +41,7 @@ The Web Component library has **zero knowledge of Drupal**. It is a standalone p
 
 ```
 +------------------------------------------+     +----------------------------------+
-|          @org/wc-library                 |     |         Drupal CMS               |
+|          @helix/library                 |     |         Drupal CMS               |
 |                                          |     |                                  |
 |  - Lit Web Components (ES modules)       |     |  - libraries.yml (asset loading) |
 |  - CSS custom properties (tokens)        |     |  - TWIG templates (markup)       |
@@ -90,10 +90,10 @@ This is the recommended approach for production deployments. It provides version
 cd web/themes/custom/mytheme
 
 # Install via npm
-npm install @org/wc-library
+npm install @helix/library
 
 # Or install a specific version
-npm install @org/wc-library@1.0.0
+npm install @helix/library@1.0.0
 ```
 
 #### Step 2: Configure `libraries.yml`
@@ -108,7 +108,7 @@ hds-tokens:
   version: VERSION
   css:
     theme:
-      node_modules/@org/wc-library/dist/styles/tokens.css:
+      node_modules/@helix/library/dist/styles/tokens.css:
         minified: true
         preprocess: false
 
@@ -116,7 +116,7 @@ hds-tokens:
 hds-components:
   version: VERSION
   js:
-    node_modules/@org/wc-library/dist/index.js:
+    node_modules/@helix/library/dist/index.js:
       type: module
       minified: true
       preprocess: false
@@ -245,11 +245,11 @@ hds-components-jsdelivr:
   version: 1.0.0
   css:
     theme:
-      https://cdn.jsdelivr.net/npm/@org/wc-library@1.0.0/dist/styles/tokens.css:
+      https://cdn.jsdelivr.net/npm/@helix/library@1.0.0/dist/styles/tokens.css:
         type: external
         minified: true
   js:
-    https://cdn.jsdelivr.net/npm/@org/wc-library@1.0.0/dist/index.js:
+    https://cdn.jsdelivr.net/npm/@helix/library@1.0.0/dist/index.js:
       type: external
       attributes:
         type: module
@@ -265,7 +265,7 @@ For resilience, implement a fallback that loads from a local copy if the CDN is 
 ```html
 {# In html.html.twig or a preprocess function #}
 <script type="module">
-  import('@org/wc-library').catch(() => {
+  import('@helix/library').catch(() => {
     // CDN failed, load local fallback
     const script = document.createElement('script');
     script.type = 'module';
@@ -287,9 +287,9 @@ modules/custom/helix_components/
   helix_components.libraries.yml
   helix_components.module
   dist/
-    index.js                    # Copied from @org/wc-library/dist
+    index.js                    # Copied from @helix/library/dist
     styles/
-      tokens.css                # Copied from @org/wc-library/dist/styles
+      tokens.css                # Copied from @helix/library/dist/styles
   config/
     install/
       helix_components.settings.yml
@@ -2190,11 +2190,11 @@ For components that appear above the fold on every page, preload the module:
   section #}
   <link
     rel="modulepreload"
-    href="/themes/custom/mytheme/node_modules/@org/wc-library/dist/index.js"
+    href="/themes/custom/mytheme/node_modules/@helix/library/dist/index.js"
   />
   <link
     rel="preload"
-    href="/themes/custom/mytheme/node_modules/@org/wc-library/dist/styles/tokens.css"
+    href="/themes/custom/mytheme/node_modules/@helix/library/dist/styles/tokens.css"
     as="style"
   />
 </head>
@@ -2211,17 +2211,17 @@ If your site only uses a subset of components, import individual components inst
 hds-cards:
   version: VERSION
   js:
-    node_modules/@org/wc-library/dist/components/card/index.js:
+    node_modules/@helix/library/dist/components/card/index.js:
       type: module
       minified: true
       preprocess: false
-    node_modules/@org/wc-library/dist/components/button/index.js:
+    node_modules/@helix/library/dist/components/button/index.js:
       type: module
       minified: true
       preprocess: false
   css:
     theme:
-      node_modules/@org/wc-library/dist/styles/tokens.css:
+      node_modules/@helix/library/dist/styles/tokens.css:
         minified: true
         preprocess: false
 ```
@@ -2289,7 +2289,7 @@ Usage in TWIG:
 ```twig
 {# Lazy-load the media gallery component #}
 <hx-media-gallery
-  data-hx-lazy="/themes/custom/mytheme/node_modules/@org/wc-library/dist/components/media-gallery/index.js"
+  data-hx-lazy="/themes/custom/mytheme/node_modules/@helix/library/dist/components/media-gallery/index.js"
 >
   {# Fallback content shown before component loads #}
   <div class="gallery-fallback">
@@ -2355,8 +2355,8 @@ If your site uses a service worker (e.g., via the Drupal PWA module), precache t
 ```javascript
 // service-worker.js
 const WC_ASSETS = [
-  '/themes/custom/mytheme/node_modules/@org/wc-library/dist/index.js',
-  '/themes/custom/mytheme/node_modules/@org/wc-library/dist/styles/tokens.css',
+  '/themes/custom/mytheme/node_modules/@helix/library/dist/index.js',
+  '/themes/custom/mytheme/node_modules/@helix/library/dist/styles/tokens.css',
 ];
 
 self.addEventListener('install', (event) => {
@@ -2619,7 +2619,7 @@ inspectTokens(document.querySelector('hx-content-card')); // Check component tok
 
 ### 13.1 Semantic Versioning Strategy
 
-The `@org/wc-library` package follows strict semantic versioning:
+The `@helix/library` package follows strict semantic versioning:
 
 | Version Type      | Change Examples                                                                                       | Action Required                                                           |
 | ----------------- | ----------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------- |
@@ -2635,7 +2635,7 @@ Before any upgrade, read the changelog:
 
 ```bash
 # View changelog
-cat node_modules/@org/wc-library/CHANGELOG.md
+cat node_modules/@helix/library/CHANGELOG.md
 
 # Or check the Storybook for the new version
 ```
@@ -2644,13 +2644,13 @@ cat node_modules/@org/wc-library/CHANGELOG.md
 
 ```bash
 # Update to latest within semver range
-npm update @org/wc-library
+npm update @helix/library
 
 # Or update to a specific version
-npm install @org/wc-library@1.2.0
+npm install @helix/library@1.2.0
 
 # For major version upgrades
-npm install @org/wc-library@2.0.0
+npm install @helix/library@2.0.0
 ```
 
 #### Step 3: Clear Caches
@@ -2692,7 +2692,7 @@ For major version upgrades, the migration guide will list all breaking changes. 
 ```json
 {
   "dependencies": {
-    "@org/wc-library": "~1.2.0"
+    "@helix/library": "~1.2.0"
   }
 }
 ```
@@ -2702,7 +2702,7 @@ This allows patch updates (1.2.1, 1.2.2) but requires explicit action for minor 
 ```json
 {
   "dependencies": {
-    "@org/wc-library": "1.2.0"
+    "@helix/library": "1.2.0"
   }
 }
 ```
@@ -2714,7 +2714,7 @@ If an upgrade causes issues in production:
 1. **Revert the package version**:
 
    ```bash
-   npm install @org/wc-library@1.1.0  # Previous version
+   npm install @helix/library@1.1.0  # Previous version
    ```
 
 2. **Clear all caches**:
@@ -2790,7 +2790,7 @@ Set up monitoring for Web Component-related issues in production:
 
 ### "Regional Content Partners" -- A Complete Integration
 
-This section provides a complete, working example of an enterprise blog site integrating the `@org/wc-library` Web Component library with Drupal.
+This section provides a complete, working example of an enterprise blog site integrating the `@helix/library` Web Component library with Drupal.
 
 ### 14.1 Site Overview
 
@@ -2808,7 +2808,7 @@ themes/custom/rhp_theme/
   rhp_theme.theme                          # Preprocess functions
   package.json
   node_modules/
-    @org/wc-library/                       # Installed via npm
+    @helix/library/                       # Installed via npm
   css/
     base.css                               # Base theme styles
     token-overrides.css                    # Brand token overrides
@@ -2874,14 +2874,14 @@ hds-tokens:
   version: VERSION
   css:
     theme:
-      node_modules/@org/wc-library/dist/styles/tokens.css:
+      node_modules/@helix/library/dist/styles/tokens.css:
         minified: true
         preprocess: false
 
 hds-components:
   version: VERSION
   js:
-    node_modules/@org/wc-library/dist/index.js:
+    node_modules/@helix/library/dist/index.js:
       type: module
       minified: true
       preprocess: false
@@ -3208,7 +3208,7 @@ function rhp_theme_preprocess_node__article__full(array &$variables): void {
 
 Use this checklist to verify your integration is complete and correct:
 
-- [ ] `npm install @org/wc-library` completed successfully
+- [ ] `npm install @helix/library` completed successfully
 - [ ] `libraries.yml` declares both `hds-tokens` (CSS) and `hds-components` (JS)
 - [ ] Component JS entry uses `type: module` and `preprocess: false`
 - [ ] Libraries attached globally in `.info.yml` or per-template via `attach_library()`
