@@ -33,6 +33,7 @@
     "build": "vite build && npm run cem",
     "type-check": "tsc --noEmit",
     "test": "vitest run",
+    "test:cross-browser": "vitest run --config vitest.config.cross-browser.ts",
     "test:coverage": "vitest run --coverage.enabled",
     "test:watch": "vitest",
     "test:ui": "vitest --ui",
