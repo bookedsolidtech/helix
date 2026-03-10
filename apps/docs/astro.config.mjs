@@ -634,6 +634,10 @@ export default defineConfig({
                 },
               ],
             },
+            {
+              label: 'Boolean Attributes',
+              slug: 'guides/boolean-attributes',
+            },
           ],
         },
         {

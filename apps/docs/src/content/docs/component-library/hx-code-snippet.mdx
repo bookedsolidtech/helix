@@ -117,14 +117,14 @@ import '@helix/library/components/hx-code-snippet';
 
 ## Properties
 
-| Property      | Attribute      | Type      | Default | Description                                                                                                                                                              |
-| ------------- | -------------- | --------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `language`    | `language`     | `string`  | `''`    | Language hint applied as `language-*` class on the `<code>` element for external syntax highlighters (e.g. Prism, highlight.js). Does not affect visual rendering.       |
-| `inline`      | `inline`       | `boolean` | `false` | Renders as an inline `<code>` element instead of a `<pre><code>` block.                                                                                                  |
-| `wrap`        | `wrap`         | `boolean` | `false` | Enables word-wrap in block mode (`white-space: pre-wrap`).                                                                                                               |
-| `copyable`    | `copyable`     | `boolean` | `true`  | Shows a copy-to-clipboard button. **Note:** this is a boolean attribute — `copyable="false"` in HTML still enables the button. Set `el.copyable = false` via JavaScript. |
-| `maxLines`    | `max-lines`    | `number`  | `0`     | Maximum lines shown before a "Show more" button appears. Set to `0` to disable truncation.                                                                               |
-| `lineNumbers` | `line-numbers` | `boolean` | `false` | Prepends line numbers to each displayed line. Numbers are `aria-hidden` so screen readers skip them.                                                                     |
+| Property      | Attribute      | Type      | Default | Description                                                                                                                                                                                                                              |
+| ------------- | -------------- | --------- | ------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `language`    | `language`     | `string`  | `''`    | Language hint applied as `language-*` class on the `<code>` element for external syntax highlighters (e.g. Prism, highlight.js). Does not affect visual rendering.                                                                       |
+| `inline`      | `inline`       | `boolean` | `false` | Renders as an inline `<code>` element instead of a `<pre><code>` block.                                                                                                                                                                  |
+| `wrap`        | `wrap`         | `boolean` | `false` | Enables word-wrap in block mode (`white-space: pre-wrap`).                                                                                                                                                                               |
+| `copyable`    | `copyable`     | `boolean` | `true`  | Shows a copy-to-clipboard button. **Note:** this is a boolean attribute — `copyable="false"` in HTML still enables the button. Set `el.copyable = false` via JavaScript. See the [Boolean Attributes guide](/guides/boolean-attributes). |
+| `maxLines`    | `max-lines`    | `number`  | `0`     | Maximum lines shown before a "Show more" button appears. Set to `0` to disable truncation.                                                                                                                                               |
+| `lineNumbers` | `line-numbers` | `boolean` | `false` | Prepends line numbers to each displayed line. Numbers are `aria-hidden` so screen readers skip them.                                                                                                                                     |
 
 ## Events
 
