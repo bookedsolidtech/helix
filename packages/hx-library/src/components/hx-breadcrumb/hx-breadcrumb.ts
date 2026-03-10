@@ -81,6 +81,8 @@ export class HelixBreadcrumb extends LitElement {
 
   private _ellipsisItem: Element | null = null;
   private _jsonLdScript: HTMLScriptElement | null = null;
+  private _boundEllipsisClick: (e: Event) => void = () => undefined;
+  private _boundEllipsisKeydown: (e: KeyboardEvent) => void = () => undefined;
 
   /**
    * Tracks which items had their `current` attribute set by this component
@@ -210,19 +212,12 @@ export class HelixBreadcrumb extends LitElement {
       const ellipsis = document.createElement('hx-breadcrumb-item');
       ellipsis.classList.add('hx-bc-ellipsis');
 
-      // Keyboard-accessible expand button. Slotted into hx-breadcrumb-item's
-      // default slot so it renders inside the item wrapper with correct styles.
+      // Keyboard-accessible expand button. Events handled via host-level delegation
+      // in _handleEllipsisClick / _handleEllipsisKeydown.
       const btn = document.createElement('button');
       btn.type = 'button';
       btn.textContent = '…';
       btn.setAttribute('aria-label', 'Show all breadcrumb items');
-      btn.addEventListener('click', () => this._expandBreadcrumb());
-      btn.addEventListener('keydown', (e: KeyboardEvent) => {
-        if (e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault();
-          this._expandBreadcrumb();
-        }
-      });
       ellipsis.appendChild(btn);
 
       this._ellipsisItem = ellipsis;
@@ -243,6 +238,21 @@ export class HelixBreadcrumb extends LitElement {
 
     if (this._ellipsisItem?.isConnected) {
       this._ellipsisItem.remove();
+    }
+  }
+
+  private _handleEllipsisClick(e: Event): void {
+    if ((e.target as Element)?.closest?.('.hx-bc-ellipsis')) {
+      this._expandBreadcrumb();
+    }
+  }
+
+  private _handleEllipsisKeydown(e: KeyboardEvent): void {
+    if (e.key === 'Enter' || e.key === ' ') {
+      if ((e.target as Element)?.closest?.('.hx-bc-ellipsis')) {
+        e.preventDefault();
+        this._expandBreadcrumb();
+      }
     }
   }
 
@@ -306,8 +316,18 @@ export class HelixBreadcrumb extends LitElement {
 
   // ─── Lifecycle ───
 
+  override connectedCallback(): void {
+    super.connectedCallback();
+    this._boundEllipsisClick = this._handleEllipsisClick.bind(this);
+    this._boundEllipsisKeydown = this._handleEllipsisKeydown.bind(this);
+    this.addEventListener('click', this._boundEllipsisClick);
+    this.addEventListener('keydown', this._boundEllipsisKeydown as EventListener);
+  }
+
   override disconnectedCallback(): void {
     super.disconnectedCallback();
+    this.removeEventListener('click', this._boundEllipsisClick);
+    this.removeEventListener('keydown', this._boundEllipsisKeydown as EventListener);
     this._removeJsonLd();
   }
 
