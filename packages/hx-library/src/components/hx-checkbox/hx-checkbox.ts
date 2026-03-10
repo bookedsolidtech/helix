@@ -22,7 +22,8 @@ let _checkboxCounter = 0;
  *
  * @fires {CustomEvent<{checked: boolean, value: string}>} hx-change - Dispatched when the checkbox is toggled.
  *
- * @csspart checkbox - The visual checkbox element.
+ * @csspart checkbox - The outer checkbox wrapper container.
+ * @csspart box - The visual checkbox element.
  * @csspart checkmark - The SVG checkmark icon inside the checkbox.
  * @csspart label - The label element.
  * @csspart help-text - The help text container.
@@ -147,7 +148,7 @@ export class HelixCheckbox extends LitElement {
 
   private _handleErrorSlotChange(e: Event): void {
     const slot = e.target as HTMLSlotElement;
-    this._hasErrorSlot = slot.assignedNodes({ flatten: true }).length > 0;
+    this._hasErrorSlot = slot.assignedElements({ flatten: true }).length > 0;
   }
 
   // ─── Lifecycle ───
@@ -286,7 +287,7 @@ export class HelixCheckbox extends LitElement {
     const hostAriaLabel = this.getAttribute('aria-label') ?? undefined;
 
     return html`
-      <div class=${classMap(containerClasses)}>
+      <div part="checkbox" class=${classMap(containerClasses)}>
         <label part="control" class="checkbox__control" @click=${this._handleChange}>
           <input
             class="checkbox__input"
@@ -310,7 +311,7 @@ export class HelixCheckbox extends LitElement {
             @change=${(e: Event) => e.stopPropagation()}
           />
 
-          <span part="checkbox" class="checkbox__box">
+          <span part="box" class="checkbox__box">
             <svg
               part="checkmark"
               class="checkbox__icon checkbox__icon--check"

@@ -79,22 +79,22 @@ export class HelixCard extends LitElement {
 
   private _onImageSlotChange(e: Event): void {
     const slot = e.target as HTMLSlotElement;
-    this._hasImage = slot.assignedNodes({ flatten: true }).length > 0;
+    this._hasImage = slot.assignedElements({ flatten: true }).length > 0;
   }
 
   private _onHeadingSlotChange(e: Event): void {
     const slot = e.target as HTMLSlotElement;
-    this._hasHeading = slot.assignedNodes({ flatten: true }).length > 0;
+    this._hasHeading = slot.assignedElements({ flatten: true }).length > 0;
   }
 
   private _onFooterSlotChange(e: Event): void {
     const slot = e.target as HTMLSlotElement;
-    this._hasFooter = slot.assignedNodes({ flatten: true }).length > 0;
+    this._hasFooter = slot.assignedElements({ flatten: true }).length > 0;
   }
 
   private _onActionsSlotChange(e: Event): void {
     const slot = e.target as HTMLSlotElement;
-    this._hasActions = slot.assignedNodes({ flatten: true }).length > 0;
+    this._hasActions = slot.assignedElements({ flatten: true }).length > 0;
     if (this._hasActions && this.hxHref) {
       console.warn(
         '[hx-card] Using hx-href (interactive card) together with the actions slot is an ARIA anti-pattern: ' +

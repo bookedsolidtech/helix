@@ -118,6 +118,12 @@ export class HelixDialog extends LitElement {
   /**
    * When true, renders as a modal dialog with a backdrop and focus trap.
    * When false, renders as a non-modal dialog.
+   *
+   * **Note:** Because this uses standard boolean attribute semantics, setting
+   * `modal="false"` in HTML still results in `modal = true` (attribute presence
+   * = true). To disable modal mode from HTML, remove the `modal` attribute entirely.
+   * From JavaScript: `dialog.modal = false`.
+   *
    * @attr modal
    */
   @property({ type: Boolean, reflect: true })
@@ -125,6 +131,12 @@ export class HelixDialog extends LitElement {
 
   /**
    * When true, clicking the backdrop closes the dialog.
+   *
+   * **Note:** Unlike standard boolean attributes, this property uses a custom converter so
+   * `close-on-backdrop="false"` in HTML correctly sets `closeOnBackdrop = false`. This is
+   * intentional — it diverges from standard boolean attribute semantics to allow HTML-only
+   * opt-out without JavaScript.
+   *
    * @attr close-on-backdrop
    */
   @property({
@@ -145,9 +157,15 @@ export class HelixDialog extends LitElement {
   heading = '';
 
   /**
-   * ARIA role variant. Use `'alertdialog'` for urgent dialogs requiring immediate attention
-   * (e.g., drug interaction warnings, critical lab alerts). Defaults to `'dialog'`.
+   * ARIA role for the dialog. Use `'alertdialog'` for urgent dialogs requiring immediate
+   * attention (e.g., drug interaction warnings, critical lab alerts). Defaults to `'dialog'`.
+   *
+   * **Important:** This property controls the ARIA `role` attribute — not visual appearance.
+   * Unlike `variant` on other components, this does not change the dialog's visual style.
+   * Use `'alertdialog'` only for dialogs that interrupt workflow and require an explicit response.
+   *
    * @attr variant
+   * @default 'dialog'
    */
   @property({ type: String, reflect: true })
   variant: 'dialog' | 'alertdialog' = 'dialog';
@@ -459,12 +477,12 @@ export class HelixDialog extends LitElement {
 
   private _handleHeaderSlotChange(e: Event): void {
     const slot = e.target as HTMLSlotElement;
-    this._hasHeaderSlot = slot.assignedNodes({ flatten: true }).length > 0;
+    this._hasHeaderSlot = slot.assignedElements({ flatten: true }).length > 0;
   }
 
   private _handleFooterSlotChange(e: Event): void {
     const slot = e.target as HTMLSlotElement;
-    this._hasFooterSlot = slot.assignedNodes({ flatten: true }).length > 0;
+    this._hasFooterSlot = slot.assignedElements({ flatten: true }).length > 0;
   }
 
   // ─── Render Helpers ───

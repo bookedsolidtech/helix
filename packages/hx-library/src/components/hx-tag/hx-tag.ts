@@ -125,13 +125,13 @@ export class HelixTag extends LitElement {
   /** @internal */
   private _onPrefixSlotChange(e: Event): void {
     const slot = e.target as HTMLSlotElement;
-    this._hasPrefix = slot.assignedNodes({ flatten: true }).length > 0;
+    this._hasPrefix = slot.assignedElements({ flatten: true }).length > 0;
   }
 
   /** @internal */
   private _onSuffixSlotChange(e: Event): void {
     const slot = e.target as HTMLSlotElement;
-    this._hasSuffix = slot.assignedNodes({ flatten: true }).length > 0;
+    this._hasSuffix = slot.assignedElements({ flatten: true }).length > 0;
   }
 
   // ─── Render ───

@@ -114,12 +114,12 @@ export class HelixCheckboxGroup extends LitElement {
 
   private _handleErrorSlotChange(e: Event): void {
     const slot = e.target as HTMLSlotElement;
-    this._hasErrorSlot = slot.assignedNodes({ flatten: true }).length > 0;
+    this._hasErrorSlot = slot.assignedElements({ flatten: true }).length > 0;
   }
 
   private _handleHelpSlotChange(e: Event): void {
     const slot = e.target as HTMLSlotElement;
-    this._hasHelpSlot = slot.assignedNodes({ flatten: true }).length > 0;
+    this._hasHelpSlot = slot.assignedElements({ flatten: true }).length > 0;
   }
 
   // ─── Lifecycle ───

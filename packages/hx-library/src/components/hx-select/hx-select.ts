@@ -347,7 +347,7 @@ export class HelixSelect extends LitElement {
 
   private _handleErrorSlotChange(e: Event): void {
     const slot = e.target as HTMLSlotElement;
-    this._hasErrorSlot = slot.assignedNodes({ flatten: true }).length > 0;
+    this._hasErrorSlot = slot.assignedElements({ flatten: true }).length > 0;
   }
 
   // ─── Dropdown Control ───

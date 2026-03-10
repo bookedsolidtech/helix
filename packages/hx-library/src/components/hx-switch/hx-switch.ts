@@ -205,13 +205,13 @@ export class HelixSwitch extends LitElement {
   /** Updates _hasErrorSlot when error slot content changes. */
   private _handleErrorSlotChange(e: Event): void {
     const slot = e.target as HTMLSlotElement;
-    this._hasErrorSlot = slot.assignedNodes({ flatten: true }).length > 0;
+    this._hasErrorSlot = slot.assignedElements({ flatten: true }).length > 0;
   }
 
   /** Updates _hasDefaultSlot when default slot content changes. */
   private _handleDefaultSlotChange(e: Event): void {
     const slot = e.target as HTMLSlotElement;
-    this._hasDefaultSlot = slot.assignedNodes({ flatten: true }).length > 0;
+    this._hasDefaultSlot = slot.assignedElements({ flatten: true }).length > 0;
   }
 
   // ─── Event Handling ───

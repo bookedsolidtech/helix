@@ -30,7 +30,7 @@ export type ToastStackPlacement =
  * @fires {CustomEvent} hx-hide - Dispatched when the toast begins hiding.
  * @fires {CustomEvent} hx-after-hide - Dispatched after the hide animation completes.
  *
- * @csspart base - The inner toast container div.
+ * @csspart toast - The inner toast container div.
  * @csspart icon - The icon slot wrapper.
  * @csspart message - The message slot wrapper.
  * @csspart close-button - The dismiss button (only when closable).
@@ -248,7 +248,7 @@ export class HelixToast extends LitElement {
   override render() {
     return html`
       <div
-        part="base"
+        part="toast"
         class=${classMap({
           toast: true,
           [`toast--${this.variant}`]: true,
@@ -309,7 +309,7 @@ export class HelixToast extends LitElement {
  *
  * @slot - Accepts `hx-toast` elements.
  *
- * @csspart base - The inner stack container div.
+ * @csspart toast-stack - The inner stack container div.
  *
  * @cssprop [--hx-z-index-toast=9000] - Z-index for the fixed stack.
  */
@@ -334,7 +334,7 @@ export class HelixToastStack extends LitElement {
   override render() {
     return html`
       <div
-        part="base"
+        part="toast-stack"
         class=${classMap({
           'toast-stack': true,
           [`toast-stack--${this.placement}`]: true,

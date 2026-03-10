@@ -143,7 +143,7 @@ export class HelixMeter extends LitElement {
 
   private _onLabelSlotChange(e: Event) {
     const slot = e.target as HTMLSlotElement;
-    this._hasSlotContent = slot.assignedNodes({ flatten: true }).length > 0;
+    this._hasSlotContent = slot.assignedElements({ flatten: true }).length > 0;
   }
 
   override updated() {

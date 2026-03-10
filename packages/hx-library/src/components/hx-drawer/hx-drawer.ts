@@ -429,17 +429,17 @@ export class HelixDrawer extends LitElement {
 
   private _handleHeaderActionsSlotChange(e: Event): void {
     const slot = e.target as HTMLSlotElement;
-    this._hasHeaderActionsSlot = slot.assignedNodes({ flatten: true }).length > 0;
+    this._hasHeaderActionsSlot = slot.assignedElements({ flatten: true }).length > 0;
   }
 
   private _handleFooterSlotChange(e: Event): void {
     const slot = e.target as HTMLSlotElement;
-    this._hasFooterSlot = slot.assignedNodes({ flatten: true }).length > 0;
+    this._hasFooterSlot = slot.assignedElements({ flatten: true }).length > 0;
   }
 
   private _handleLabelSlotChange(e: Event): void {
     const slot = e.target as HTMLSlotElement;
-    this._hasLabelSlot = slot.assignedNodes({ flatten: true }).length > 0;
+    this._hasLabelSlot = slot.assignedElements({ flatten: true }).length > 0;
   }
 
   // ─── Render Helpers ───

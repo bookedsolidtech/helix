@@ -155,7 +155,7 @@ export class HelixAlert extends LitElement {
     const actionsSlot = this.renderRoot.querySelector<HTMLSlotElement>('slot[name="actions"]');
     if (actionsSlot) {
       this._actionsSlotChangeHandler = () => {
-        this._hasActions = actionsSlot.assignedNodes({ flatten: true }).length > 0;
+        this._hasActions = actionsSlot.assignedElements({ flatten: true }).length > 0;
       };
       actionsSlot.addEventListener('slotchange', this._actionsSlotChangeHandler);
     }
@@ -164,7 +164,7 @@ export class HelixAlert extends LitElement {
     const titleSlot = this.renderRoot.querySelector<HTMLSlotElement>('slot[name="title"]');
     if (titleSlot) {
       this._titleSlotChangeHandler = () => {
-        this._hasTitle = titleSlot.assignedNodes({ flatten: true }).length > 0;
+        this._hasTitle = titleSlot.assignedElements({ flatten: true }).length > 0;
       };
       titleSlot.addEventListener('slotchange', this._titleSlotChangeHandler);
     }

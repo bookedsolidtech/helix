@@ -296,22 +296,22 @@ export class HelixSlider extends LitElement {
 
   private _handleLabelSlotChange(e: Event): void {
     const slot = e.target as HTMLSlotElement;
-    this._hasLabelSlot = slot.assignedNodes({ flatten: true }).length > 0;
+    this._hasLabelSlot = slot.assignedElements({ flatten: true }).length > 0;
   }
 
   private _handleHelpSlotChange(e: Event): void {
     const slot = e.target as HTMLSlotElement;
-    this._hasHelpSlot = slot.assignedNodes({ flatten: true }).length > 0;
+    this._hasHelpSlot = slot.assignedElements({ flatten: true }).length > 0;
   }
 
   private _handleMinLabelSlotChange(e: Event): void {
     const slot = e.target as HTMLSlotElement;
-    this._hasMinLabelSlot = slot.assignedNodes({ flatten: true }).length > 0;
+    this._hasMinLabelSlot = slot.assignedElements({ flatten: true }).length > 0;
   }
 
   private _handleMaxLabelSlotChange(e: Event): void {
     const slot = e.target as HTMLSlotElement;
-    this._hasMaxLabelSlot = slot.assignedNodes({ flatten: true }).length > 0;
+    this._hasMaxLabelSlot = slot.assignedElements({ flatten: true }).length > 0;
   }
 
   // ─── Event Handling ───

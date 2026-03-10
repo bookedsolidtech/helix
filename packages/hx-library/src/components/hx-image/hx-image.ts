@@ -159,7 +159,7 @@ export class HelixImage extends LitElement {
 
   private _onCaptionSlotChange(e: Event): void {
     const slot = e.target as HTMLSlotElement;
-    this._hasCaptionSlot = slot.assignedNodes({ flatten: true }).length > 0;
+    this._hasCaptionSlot = slot.assignedElements({ flatten: true }).length > 0;
   }
 
   private _computeBorderRadius(): string | undefined {

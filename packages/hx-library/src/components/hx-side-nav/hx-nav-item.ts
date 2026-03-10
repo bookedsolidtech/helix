@@ -89,7 +89,7 @@ export class HelixNavItem extends LitElement {
 
   private _onChildrenSlotChange(e: Event): void {
     const slot = e.target as HTMLSlotElement;
-    this._hasChildren = slot.assignedNodes({ flatten: true }).length > 0;
+    this._hasChildren = slot.assignedElements({ flatten: true }).length > 0;
   }
 
   // ─── Private Helpers ───

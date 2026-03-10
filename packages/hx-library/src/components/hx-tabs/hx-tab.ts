@@ -97,12 +97,12 @@ export class HelixTab extends LitElement {
 
   private _handlePrefixSlotChange(e: Event): void {
     const slot = e.target as HTMLSlotElement;
-    this._hasPrefixSlot = slot.assignedNodes({ flatten: true }).length > 0;
+    this._hasPrefixSlot = slot.assignedElements({ flatten: true }).length > 0;
   }
 
   private _handleSuffixSlotChange(e: Event): void {
     const slot = e.target as HTMLSlotElement;
-    this._hasSuffixSlot = slot.assignedNodes({ flatten: true }).length > 0;
+    this._hasSuffixSlot = slot.assignedElements({ flatten: true }).length > 0;
   }
 
   // ─── Render ───
