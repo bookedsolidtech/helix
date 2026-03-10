@@ -74,7 +74,7 @@ export const helixCopyButtonStyles = css`
   /* ─── Copied / Success State ─── */
 
   .button--copied {
-    color: var(--hx-color-success-500, var(--hx-color-primary-500));
+    color: var(--hx-color-success-text, var(--hx-color-primary-500));
     /* Secondary non-color indicator required per WCAG 1.4.1 (use of color).
        A border provides visual differentiation for users with color blindness. */
     border-color: var(--hx-color-success-500, var(--hx-color-primary-500));

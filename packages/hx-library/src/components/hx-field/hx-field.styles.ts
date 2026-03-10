@@ -54,7 +54,7 @@ export const helixFieldStyles = css`
   }
 
   .field__required-marker {
-    color: var(--hx-field-error-color, var(--hx-color-error-500, #ef4444));
+    color: var(--hx-field-error-color, var(--hx-color-error-text, #b91c1c));
     font-weight: var(--hx-font-weight-bold, 700);
   }
 
@@ -104,14 +104,14 @@ export const helixFieldStyles = css`
 
   .field__error {
     font-size: var(--hx-font-size-xs, 0.75rem);
-    color: var(--hx-field-error-color, var(--hx-color-error-500, #ef4444));
+    color: var(--hx-field-error-color, var(--hx-color-error-text, #b91c1c));
     line-height: var(--hx-line-height-normal, 1.5);
   }
 
   /* ─── Error State ─── */
 
   .field--error .field__label {
-    color: var(--hx-field-error-color, var(--hx-color-error-500, #ef4444));
+    color: var(--hx-field-error-color, var(--hx-color-error-text, #b91c1c));
   }
 
   .field--error .field__control {
