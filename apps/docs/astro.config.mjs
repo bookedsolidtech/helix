@@ -641,6 +641,18 @@ export default defineConfig({
           ],
         },
         {
+          label: 'Framework Integration',
+          collapsed: true,
+          items: [
+            { label: 'Overview', slug: 'framework-integration' },
+            { label: 'React', slug: 'framework-integration/react' },
+            { label: 'Vue', slug: 'framework-integration/vue' },
+            { label: 'Angular', slug: 'framework-integration/angular' },
+            { label: 'Plain HTML / CDN', slug: 'framework-integration/html' },
+            { label: 'Drupal', slug: 'framework-integration/drupal' },
+          ],
+        },
+        {
           label: 'Architecture',
           collapsed: true,
           items: [
