@@ -108,14 +108,14 @@ Key metrics to monitor:
 
 **How to use:**
 
-1. Publish a pre-release version of `@wc-2026/library`
+1. Publish a pre-release version of `@helix/library`
 2. Enter package name at bundlephobia.com
 3. View per-component tree-shaking impact
 
-**Example analysis for wc-button:**
+**Example analysis for hx-button:**
 
 ```
-Import: import { WcButton } from '@wc-2026/library'
+Import: import { HxButton } from '@helix/library'
 Bundle size: 8.2 KB (minified)
 Gzipped: 3.1 KB
 Tree-shakeable: ✅
@@ -265,11 +265,11 @@ export default defineConfig({
 **Consumer usage:**
 
 ```typescript
-// ✅ Tree-shakeable (only loads wc-button)
-import '@wc-2026/library/components/wc-button';
+// ✅ Tree-shakeable (only loads hx-button)
+import '@helix/library/components/hx-button';
 
 // ❌ NOT tree-shakeable (loads entire library)
-import '@wc-2026/library';
+import '@helix/library';
 ```
 
 #### 4. No Barrel Exports
@@ -280,23 +280,23 @@ Barrel exports (re-exporting everything from `index.ts`) defeat tree-shaking.
 
 ```typescript
 // ❌ src/index.ts (barrel export)
-export * from './components/wc-button/index.js';
-export * from './components/wc-card/index.js';
-export * from './components/wc-text-input/index.js';
+export * from './components/hx-button/index.js';
+export * from './components/hx-card/index.js';
+export * from './components/hx-text-input/index.js';
 // ... (all components)
 
 // Consumer can't tree-shake this
-import { WcButton } from '@wc-2026/library';
+import { HxButton } from '@helix/library';
 ```
 
 **wc-2026 approach:**
 
 ```typescript
-// ✅ src/components/wc-button/index.ts
-export { WcButton } from './wc-button.js';
+// ✅ src/components/hx-button/index.ts
+export { HxButton } from './hx-button.js';
 
 // Consumer imports directly
-import { WcButton } from '@wc-2026/library/components/wc-button';
+import { HxButton } from '@helix/library/components/hx-button';
 ```
 
 ### Verifying Tree-Shaking
@@ -310,12 +310,12 @@ import { WcButton } from '@wc-2026/library/components/wc-button';
 
 ```typescript
 // test-app/src/main.ts
-import '@wc-2026/library/components/wc-button';
+import '@helix/library/components/hx-button';
 
-document.body.innerHTML = '<wc-button>Test</wc-button>';
+document.body.innerHTML = '<hx-button>Test</hx-button>';
 ```
 
-**Expected bundle size:** ~8-10 KB (5 KB Lit + 3-5 KB wc-button)
+**Expected bundle size:** ~8-10 KB (5 KB Lit + 3-5 KB hx-button)
 
 **If larger:** Tree-shaking is broken. Common causes:
 
@@ -349,7 +349,7 @@ function App() {
 }
 ```
 
-**Impact:** If Dashboard uses `wc-card` and Profile uses `wc-form`, each route only loads the components it needs.
+**Impact:** If Dashboard uses `hx-card` and Profile uses `wc-form`, each route only loads the components it needs.
 
 ### Component-Level Code Splitting
 
@@ -366,8 +366,8 @@ For heavy components used in specific contexts, split them into separate chunks.
 ```typescript
 // Dynamically import heavy component
 async function loadDataTable() {
-  const { WcDataTable } = await import('@wc-2026/library/components/wc-data-table');
-  customElements.define('wc-data-table', WcDataTable);
+  const { WcDataTable } = await import('@helix/library/components/wc-data-table');
+  customElements.define('hx-data-table', WcDataTable);
 }
 
 // Load only when needed
@@ -389,7 +389,7 @@ export default defineConfig({
       output: {
         manualChunks: {
           'vendor-lit': ['lit', '@lit/reactive-element'],
-          'vendor-wc': ['@wc-2026/tokens'],
+          'vendor-hx': ['@helix/tokens'],
         },
       },
     },
@@ -424,8 +424,8 @@ Load components when they enter the viewport.
 ```typescript
 // Register observer for lazy components
 const lazyComponents = new Map([
-  ['wc-data-table', () => import('@wc-2026/library/components/wc-data-table')],
-  ['wc-chart', () => import('@wc-2026/library/components/wc-chart')],
+  ['hx-data-table', () => import('@helix/library/components/wc-data-table')],
+  ['hx-chart', () => import('@helix/library/components/wc-chart')],
 ]);
 
 const observer = new IntersectionObserver((entries) => {
@@ -444,7 +444,7 @@ const observer = new IntersectionObserver((entries) => {
 
 // Observe all lazy component placeholders
 document
-  .querySelectorAll('wc-data-table:not(:defined), wc-chart:not(:defined)')
+  .querySelectorAll('hx-data-table:not(:defined), wc-chart:not(:defined)')
   .forEach((el) => observer.observe(el));
 ```
 
@@ -461,9 +461,9 @@ Load components when the user interacts with a trigger.
 ```typescript
 // Load modal component on button click
 document.getElementById('open-modal')?.addEventListener('click', async () => {
-  await import('@wc-2026/library/components/wc-modal');
+  await import('@helix/library/components/hx-modal');
 
-  const modal = document.createElement('wc-modal');
+  const modal = document.createElement('hx-modal');
   modal.innerHTML = '<p>Modal content</p>';
   document.body.appendChild(modal);
 });
@@ -485,7 +485,7 @@ if ('requestIdleCallback' in window) {
   requestIdleCallback(() => {
     const link = document.createElement('link');
     link.rel = 'prefetch';
-    link.href = '/dist/components/wc-modal/index.js';
+    link.href = '/dist/components/hx-modal/index.js';
     document.head.appendChild(link);
   });
 }
@@ -499,10 +499,10 @@ if ('requestIdleCallback' in window) {
 
 ```html
 <!-- Preload critical component -->
-<link rel="modulepreload" href="/dist/components/wc-button/index.js" />
+<link rel="modulepreload" href="/dist/components/hx-button/index.js" />
 
 <!-- Prefetch likely-needed component -->
-<link rel="prefetch" href="/dist/components/wc-modal/index.js" />
+<link rel="prefetch" href="/dist/components/hx-modal/index.js" />
 ```
 
 ## Minification
@@ -548,7 +548,7 @@ export default defineConfig({
 
 ### Minification Impact
 
-**Example: wc-button component**
+**Example: hx-button component**
 
 | Version            | Size                   |
 | ------------------ | ---------------------- |
@@ -671,9 +671,9 @@ export default defineConfig({
 **Output:**
 
 ```
-dist/components/wc-button/index.js      (4.2 KB)
-dist/components/wc-button/index.js.gz   (1.8 KB) - 57% smaller
-dist/components/wc-button/index.js.br   (1.6 KB) - 62% smaller
+dist/components/hx-button/index.js      (4.2 KB)
+dist/components/hx-button/index.js.gz   (1.8 KB) - 57% smaller
+dist/components/hx-button/index.js.br   (1.6 KB) - 62% smaller
 ```
 
 **Server configuration (Nginx):**
@@ -723,12 +723,12 @@ jobs:
         run: npm ci
 
       - name: Build library
-        run: npm run build --workspace=@wc-2026/library
+        run: npm run build --workspace=@helix/library
 
       - name: Analyze bundle size
         run: |
           # Check total bundle size
-          TOTAL_SIZE=$(du -sb packages/wc-library/dist | awk '{print $1}')
+          TOTAL_SIZE=$(du -sb packages/hx-library/dist | awk '{print $1}')
           MAX_SIZE=$((50 * 1024)) # 50 KB
 
           if [ "$TOTAL_SIZE" -gt "$MAX_SIZE" ]; then
@@ -794,12 +794,12 @@ npm install --save-dev bundlesize
 {
   "bundlesize": [
     {
-      "path": "packages/wc-library/dist/components/wc-button/index.js",
+      "path": "packages/hx-library/dist/components/hx-button/index.js",
       "maxSize": "5 KB",
       "compression": "gzip"
     },
     {
-      "path": "packages/wc-library/dist/index.js",
+      "path": "packages/hx-library/dist/index.js",
       "maxSize": "50 KB",
       "compression": "gzip"
     }
@@ -852,23 +852,23 @@ Current bundle size metrics for wc-2026 (as of latest build):
 
 | Component     | Minified | Gzipped | Brotli |
 | ------------- | -------- | ------- | ------ |
-| wc-button     | 4.2 KB   | 1.8 KB  | 1.6 KB |
-| wc-card       | 3.8 KB   | 1.6 KB  | 1.4 KB |
-| wc-text-input | 5.1 KB   | 2.1 KB  | 1.9 KB |
-| wc-checkbox   | 3.9 KB   | 1.7 KB  | 1.5 KB |
-| wc-select     | 4.8 KB   | 2.0 KB  | 1.8 KB |
-| wc-alert      | 3.2 KB   | 1.4 KB  | 1.2 KB |
-| wc-badge      | 2.8 KB   | 1.2 KB  | 1.1 KB |
+| hx-button     | 4.2 KB   | 1.8 KB  | 1.6 KB |
+| hx-card       | 3.8 KB   | 1.6 KB  | 1.4 KB |
+| hx-text-input | 5.1 KB   | 2.1 KB  | 1.9 KB |
+| hx-checkbox   | 3.9 KB   | 1.7 KB  | 1.5 KB |
+| hx-select     | 4.8 KB   | 2.0 KB  | 1.8 KB |
+| hx-alert      | 3.2 KB   | 1.4 KB  | 1.2 KB |
+| hx-badge      | 2.8 KB   | 1.2 KB  | 1.1 KB |
 
 **Status:** ✅ All components under 5 KB budget (minified)
 
 ### Dependency Breakdown
 
-| Dependency      | Size (min+gz) | Percentage |
-| --------------- | ------------- | ---------- |
-| Lit core        | 5.1 KB        | 28%        |
-| @wc-2026/tokens | 1.8 KB        | 10%        |
-| Component code  | 11.1 KB       | 62%        |
+| Dependency     | Size (min+gz) | Percentage |
+| -------------- | ------------- | ---------- |
+| Lit core       | 5.1 KB        | 28%        |
+| @helix/tokens  | 1.8 KB        | 10%        |
+| Component code | 11.1 KB       | 62%        |
 
 **Note:** Lit is externalized and only loaded once, even when using multiple components.
 
@@ -929,10 +929,10 @@ If bundle size exceeds budgets, use this debugging workflow:
 
 ```bash
 # Build with analysis
-npm run build --workspace=@wc-2026/library
+npm run build --workspace=@helix/library
 
 # Check component sizes
-ls -lh packages/wc-library/dist/components/**/index.js
+ls -lh packages/hx-library/dist/components/**/index.js
 ```
 
 ### Step 2: Analyze Dependencies
@@ -956,12 +956,12 @@ open packages/hx-library/dist/stats.html
 
 ```typescript
 // Create minimal test app
-import '@wc-2026/library/components/wc-button';
+import '@helix/library/components/hx-button';
 
 // Build and measure
 npm run build
 
-// Expected: ~8 KB (Lit + wc-button)
+// Expected: ~8 KB (Lit + hx-button)
 // Actual: ??? KB
 ```
 
@@ -976,7 +976,7 @@ npm run build
 ```javascript
 // Measure component load time
 const start = performance.now();
-await import('@wc-2026/library/components/wc-button');
+await import('@helix/library/components/hx-button');
 const end = performance.now();
 console.log(`Load time: ${end - start}ms`);
 ```
@@ -991,14 +991,14 @@ git checkout main
 npm run build
 
 # Measure baseline size
-BASELINE=$(du -sb packages/wc-library/dist | awk '{print $1}')
+BASELINE=$(du -sb packages/hx-library/dist | awk '{print $1}')
 
 # Checkout PR branch
 git checkout feature-branch
 npm run build
 
 # Measure PR size
-PR_SIZE=$(du -sb packages/wc-library/dist | awk '{print $1}')
+PR_SIZE=$(du -sb packages/hx-library/dist | awk '{print $1}')
 
 # Calculate delta
 echo "Size change: $((PR_SIZE - BASELINE)) bytes"

@@ -196,7 +196,7 @@ export default defineConfig({
         {
           label: 'Component Library',
           collapsed: true,
-          badge: { text: '85', variant: 'success' },
+          badge: { text: '87', variant: 'success' },
           items: [
             { label: 'Overview', slug: 'component-library/overview' },
             {
