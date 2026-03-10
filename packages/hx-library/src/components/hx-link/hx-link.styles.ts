@@ -59,7 +59,7 @@ export const helixLinkStyles = css`
   /* --- Variant: danger --- */
 
   .link--danger {
-    color: var(--hx-link-color-danger, var(--hx-color-error-500, #dc2626));
+    color: var(--hx-link-color-danger, var(--hx-color-error-text, #b91c1c));
   }
 
   .link--danger:hover {
