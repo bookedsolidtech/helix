@@ -243,6 +243,7 @@ describe('hx-copy-button', () => {
         fired = true;
       });
       btn!.click();
+      // Allow brief settle time to confirm hx-copy is not dispatched on a disabled button
       await new Promise((r) => setTimeout(r, 50));
       expect(fired).toBe(false);
       expect(writeTextSpy).not.toHaveBeenCalled();

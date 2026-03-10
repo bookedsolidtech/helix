@@ -671,7 +671,7 @@ describe('hx-date-picker', () => {
 
       document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
       await el.updateComplete;
-      // Wait for updateComplete.then() focus scheduling
+      // Allow microtask queue to flush so the updateComplete.then() focus-restoration callback runs
       await new Promise((r) => setTimeout(r, 0));
 
       const trigger = getTriggerButton(el);
