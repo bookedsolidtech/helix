@@ -386,6 +386,53 @@ describe('hx-radio-group', () => {
       const event = await eventPromise;
       expect(event.detail.value).toBe('c');
     });
+
+    it('Space selects the focused radio', async () => {
+      const el = await fixture<WcRadioGroup>(`
+        <hx-radio-group label="Test">
+          <hx-radio value="a" label="A"></hx-radio>
+          <hx-radio value="b" label="B"></hx-radio>
+        </hx-radio-group>
+      `);
+      const radioA = el.querySelector('hx-radio[value="a"]') as WcRadio;
+      radioA.focus();
+      const eventPromise = oneEvent<CustomEvent>(el, 'hx-change');
+      radioA.dispatchEvent(new KeyboardEvent('keydown', { key: ' ', bubbles: true }));
+      const event = await eventPromise;
+      expect(event.detail.value).toBe('a');
+    });
+
+    it('Home moves to and selects first radio', async () => {
+      const el = await fixture<WcRadioGroup>(`
+        <hx-radio-group label="Test" value="c">
+          <hx-radio value="a" label="A"></hx-radio>
+          <hx-radio value="b" label="B"></hx-radio>
+          <hx-radio value="c" label="C"></hx-radio>
+        </hx-radio-group>
+      `);
+      const radioC = el.querySelector('hx-radio[value="c"]') as WcRadio;
+      radioC.focus();
+      const eventPromise = oneEvent<CustomEvent>(el, 'hx-change');
+      radioC.dispatchEvent(new KeyboardEvent('keydown', { key: 'Home', bubbles: true }));
+      const event = await eventPromise;
+      expect(event.detail.value).toBe('a');
+    });
+
+    it('End moves to and selects last radio', async () => {
+      const el = await fixture<WcRadioGroup>(`
+        <hx-radio-group label="Test" value="a">
+          <hx-radio value="a" label="A"></hx-radio>
+          <hx-radio value="b" label="B"></hx-radio>
+          <hx-radio value="c" label="C"></hx-radio>
+        </hx-radio-group>
+      `);
+      const radioA = el.querySelector('hx-radio[value="a"]') as WcRadio;
+      radioA.focus();
+      const eventPromise = oneEvent<CustomEvent>(el, 'hx-change');
+      radioA.dispatchEvent(new KeyboardEvent('keydown', { key: 'End', bubbles: true }));
+      const event = await eventPromise;
+      expect(event.detail.value).toBe('c');
+    });
   });
 
   // ─── Roving Tabindex (3) ───
@@ -558,6 +605,65 @@ describe('hx-radio-group', () => {
       expect(input?.getAttribute('aria-hidden')).toBe('true');
     });
 
+    it('sets aria-required on radiogroup when required', async () => {
+      const el = await fixture<WcRadioGroup>(`
+        <hx-radio-group label="Test" required>
+          <hx-radio value="a" label="A"></hx-radio>
+        </hx-radio-group>
+      `);
+      const fieldset = shadowQuery(el, 'fieldset');
+      expect(fieldset?.getAttribute('aria-required')).toBe('true');
+    });
+
+    it('does not set aria-required when not required', async () => {
+      const el = await fixture<WcRadioGroup>(`
+        <hx-radio-group label="Test">
+          <hx-radio value="a" label="A"></hx-radio>
+        </hx-radio-group>
+      `);
+      const fieldset = shadowQuery(el, 'fieldset');
+      expect(fieldset?.hasAttribute('aria-required')).toBe(false);
+    });
+
+    it('sets aria-labelledby pointing to legend id', async () => {
+      const el = await fixture<WcRadioGroup>(`
+        <hx-radio-group label="My Group">
+          <hx-radio value="a" label="A"></hx-radio>
+        </hx-radio-group>
+      `);
+      const fieldset = shadowQuery(el, 'fieldset');
+      const legend = shadowQuery(el, 'legend');
+      const labelledBy = fieldset?.getAttribute('aria-labelledby');
+      expect(labelledBy).toBeTruthy();
+      expect(legend?.id).toBe(labelledBy);
+    });
+
+    it('sets aria-describedby to error id when error is present', async () => {
+      const el = await fixture<WcRadioGroup>(`
+        <hx-radio-group label="Test" error="Required field">
+          <hx-radio value="a" label="A"></hx-radio>
+        </hx-radio-group>
+      `);
+      const fieldset = shadowQuery(el, 'fieldset');
+      const describedBy = fieldset?.getAttribute('aria-describedby');
+      const errorDiv = shadowQuery(el, '.fieldset__error');
+      expect(describedBy).toBeTruthy();
+      expect(errorDiv?.id).toBe(describedBy);
+    });
+
+    it('sets aria-describedby to help-text id when help text is present', async () => {
+      const el = await fixture<WcRadioGroup>(`
+        <hx-radio-group label="Test" help-text="Select one">
+          <hx-radio value="a" label="A"></hx-radio>
+        </hx-radio-group>
+      `);
+      const fieldset = shadowQuery(el, 'fieldset');
+      const describedBy = fieldset?.getAttribute('aria-describedby');
+      const helpText = shadowQuery(el, '.fieldset__help-text');
+      expect(describedBy).toBeTruthy();
+      expect(helpText?.id).toBe(describedBy);
+    });
+
     it('checked radio has checked attribute reflected', async () => {
       const el = await fixture<WcRadioGroup>(`
         <hx-radio-group label="Test" value="a">
@@ -603,6 +709,29 @@ describe('hx-radio-group', () => {
       label.click();
       await el.updateComplete;
       expect(eventFired).toBe(false);
+    });
+
+    it('group re-enable restores individual radio disabled states', async () => {
+      const el = await fixture<WcRadioGroup>(`
+        <hx-radio-group label="Test">
+          <hx-radio value="a" label="A" disabled></hx-radio>
+          <hx-radio value="b" label="B"></hx-radio>
+        </hx-radio-group>
+      `);
+      const radioA = el.querySelector('hx-radio[value="a"]') as WcRadio;
+      const radioB = el.querySelector('hx-radio[value="b"]') as WcRadio;
+
+      // Group disable overrides all
+      el.disabled = true;
+      await el.updateComplete;
+      expect(radioA.disabled).toBe(true);
+      expect(radioB.disabled).toBe(true);
+
+      // Group re-enable restores individual states
+      el.disabled = false;
+      await el.updateComplete;
+      expect(radioA.disabled).toBe(true); // was individually disabled
+      expect(radioB.disabled).toBe(false); // was individually enabled
     });
 
     it('individual radio can be disabled while group is enabled', async () => {
