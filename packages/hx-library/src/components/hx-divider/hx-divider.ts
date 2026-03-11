@@ -86,7 +86,7 @@ export class HelixDivider extends LitElement {
     return html`
       <div
         part="base"
-        class="divider"
+        class="divider${showLabel ? ' divider--labeled' : ''}"
         role="${isDecorative ? 'presentation' : 'separator'}"
         aria-orientation="${isDecorative ? nothing : this.orientation}"
         aria-label="${!isDecorative && this.label ? this.label : nothing}"
