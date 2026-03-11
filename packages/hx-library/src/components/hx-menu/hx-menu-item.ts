@@ -36,6 +36,18 @@ export class HelixMenuItem extends LitElement {
   static override styles = [tokenStyles, helixMenuItemStyles];
 
   /**
+   * @internal Managed by parent hx-menu for roving tabindex.
+   * Only the active item in the menu has tabindex=0; all others have -1.
+   */
+  @state()
+  private _rovingTabIndex = -1;
+
+  /** @internal Set the roving tabindex value. Called by parent hx-menu. */
+  setRovingTabIndex(value: number): void {
+    this._rovingTabIndex = value;
+  }
+
+  /**
    * The value associated with this item, emitted in the hx-select event.
    * @attr value
    */
@@ -215,7 +227,7 @@ export class HelixMenuItem extends LitElement {
         part="base"
         class=${classMap(classes)}
         role=${role}
-        tabindex=${this.disabled ? '-1' : '0'}
+        tabindex=${this.disabled ? '-1' : String(this._rovingTabIndex)}
         aria-disabled=${this.disabled ? 'true' : nothing}
         aria-checked=${hasCheckableRole ? (this.checked ? 'true' : 'false') : nothing}
         aria-haspopup=${this._hasSubmenu ? 'true' : nothing}
