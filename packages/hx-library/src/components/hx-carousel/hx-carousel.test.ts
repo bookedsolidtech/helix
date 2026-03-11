@@ -381,7 +381,7 @@ describe('hx-carousel', () => {
     });
   });
 
-  // ─── hx-carousel-item (3) ───
+  // ─── hx-carousel-item (10) ───
 
   describe('hx-carousel-item', () => {
     it('renders with shadow DOM', async () => {
@@ -401,6 +401,55 @@ describe('hx-carousel', () => {
       );
       const group = el.shadowRoot?.querySelector('[role="group"]');
       expect(group?.getAttribute('aria-label')).toBe('Slide 2 of 5');
+    });
+
+    it('slideIndex defaults to 0', async () => {
+      const el = await fixture<HelixCarouselItem>('<hx-carousel-item>Content</hx-carousel-item>');
+      expect(el.slideIndex).toBe(0);
+    });
+
+    it('totalSlides defaults to 0', async () => {
+      const el = await fixture<HelixCarouselItem>('<hx-carousel-item>Content</hx-carousel-item>');
+      expect(el.totalSlides).toBe(0);
+    });
+
+    it('default aria-label shows "Slide 1 of 0" with default properties', async () => {
+      const el = await fixture<HelixCarouselItem>('<hx-carousel-item>Content</hx-carousel-item>');
+      const group = el.shadowRoot?.querySelector('[role="group"]');
+      expect(group?.getAttribute('aria-label')).toBe('Slide 1 of 0');
+    });
+
+    it('renders default slot content', async () => {
+      const el = await fixture<HelixCarouselItem>(
+        '<hx-carousel-item><p>Slide content</p></hx-carousel-item>',
+      );
+      const slot = el.shadowRoot?.querySelector('slot');
+      expect(slot).toBeTruthy();
+      const assigned = slot?.assignedElements({ flatten: true });
+      expect(assigned?.length).toBe(1);
+      expect(assigned?.[0].textContent).toBe('Slide content');
+    });
+
+    it('slide group has tabindex="-1" for programmatic focus', async () => {
+      const el = await fixture<HelixCarouselItem>('<hx-carousel-item>Content</hx-carousel-item>');
+      const group = el.shadowRoot?.querySelector('[role="group"]');
+      expect(group?.getAttribute('tabindex')).toBe('-1');
+    });
+
+    it('host element has display: block', async () => {
+      const el = await fixture<HelixCarouselItem>('<hx-carousel-item>Content</hx-carousel-item>');
+      const style = getComputedStyle(el);
+      expect(style.display).toBe('block');
+    });
+
+    it('has no axe violations', async () => {
+      const el = await fixture<HelixCarouselItem>(
+        '<hx-carousel-item slide-index="0" total-slides="3">Accessible content</hx-carousel-item>',
+      );
+      await el.updateComplete;
+      await page.screenshot();
+      const { violations } = await checkA11y(el);
+      expect(violations).toEqual([]);
     });
   });
 
@@ -680,6 +729,52 @@ describe('hx-carousel', () => {
       const next = shadowQuery<HTMLButtonElement>(el, '[part="next-btn"]');
       expect(prev?.disabled).toBe(true);
       expect(next?.disabled).toBe(true);
+    });
+  });
+
+  // ─── Slides Per Page / Move (4) ───
+
+  describe('Slides Per Page / Move', () => {
+    it('slidesPerPage defaults to 1', async () => {
+      const el = await fixture<HelixCarousel>(threeSlides);
+      expect(el.slidesPerPage).toBe(1);
+    });
+
+    it('slidesPerMove defaults to 1', async () => {
+      const el = await fixture<HelixCarousel>(threeSlides);
+      expect(el.slidesPerMove).toBe(1);
+    });
+
+    it('with slidesPerPage=2, maxIndex is slides.length - slidesPerPage', async () => {
+      const el = await fixture<HelixCarousel>(`
+        <hx-carousel slides-per-page="2">
+          <hx-carousel-item>1</hx-carousel-item>
+          <hx-carousel-item>2</hx-carousel-item>
+          <hx-carousel-item>3</hx-carousel-item>
+          <hx-carousel-item>4</hx-carousel-item>
+        </hx-carousel>
+      `);
+      await el.updateComplete;
+      // maxIndex should be 4 - 2 = 2
+      el.goTo(10);
+      await el.updateComplete;
+      expect(el['_currentIndex']).toBe(2);
+    });
+
+    it('with slidesPerMove=2, next() advances by 2', async () => {
+      const el = await fixture<HelixCarousel>(`
+        <hx-carousel slides-per-move="2">
+          <hx-carousel-item>1</hx-carousel-item>
+          <hx-carousel-item>2</hx-carousel-item>
+          <hx-carousel-item>3</hx-carousel-item>
+          <hx-carousel-item>4</hx-carousel-item>
+          <hx-carousel-item>5</hx-carousel-item>
+        </hx-carousel>
+      `);
+      await el.updateComplete;
+      el.next();
+      await el.updateComplete;
+      expect(el['_currentIndex']).toBe(2);
     });
   });
 
