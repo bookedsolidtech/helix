@@ -41,7 +41,7 @@ The feature spec requires `color-scheme (light/dark/auto)` typed. The component 
 
 **File:** `index.ts:1-2`
 
-The feature spec requires "all token override types exported." `TokenEntry` and `TokenDefinition` types exist in `@helix/tokens` but are not re-exported from this component. Consumers wanting to pass partial token overrides have no typed interface to program against.
+The feature spec requires "all token override types exported." `TokenEntry` and `TokenDefinition` types exist in `@helixui/tokens` but are not re-exported from this component. Consumers wanting to pass partial token overrides have no typed interface to program against.
 
 ### P1 — `firstUpdated()` does not call `super.firstUpdated()`
 
@@ -183,7 +183,7 @@ The `flattenTokens` function joins all path segments with `-`. This means `font.
 
 **File:** `hx-theme.ts:3`
 
-The component imports `tokenEntries` and `darkTokenEntries` from `@helix/tokens`. These are fully materialized JavaScript arrays containing all token entries with metadata (`name`, `value`, `category`, `group`, `key`, `path`, `description`). The full token array spans ~360 entries (based on `tokens.json`). Each `TokenEntry` has 6-7 fields. The entire `tokens.json` (non-minified) is ~14KB; the JS arrays will be comparable. The CLAUDE.md and feature spec both mandate `<5KB per component (min+gz)`. This component will exceed that budget at import time with near certainty.
+The component imports `tokenEntries` and `darkTokenEntries` from `@helixui/tokens`. These are fully materialized JavaScript arrays containing all token entries with metadata (`name`, `value`, `category`, `group`, `key`, `path`, `description`). The full token array spans ~360 entries (based on `tokens.json`). Each `TokenEntry` has 6-7 fields. The entire `tokens.json` (non-minified) is ~14KB; the JS arrays will be comparable. The CLAUDE.md and feature spec both mandate `<5KB per component (min+gz)`. This component will exceed that budget at import time with near certainty.
 
 The `_buildTokenCss` implementation only needs `name` and `value` fields. Importing the full `TokenEntry` metadata array (with `category`, `group`, `key`, `path`, `description`) is pure bundle overhead.
 

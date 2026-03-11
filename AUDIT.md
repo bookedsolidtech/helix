@@ -33,7 +33,7 @@
 **Category:** Build & Bundle
 **Files:** `packages/hx-tokens/package.json` (lines 7-8, 14-30, 33-36)
 
-**Problem:** The `@helix/tokens` package exports TypeScript source files (`src/*.ts`) instead of compiled distribution files (`dist/*.js`). The `files` array includes only `dist/` and `src/tokens.json` — meaning the files referenced by `main`, `types`, and `exports` will NOT exist in the published npm package.
+**Problem:** The `@helixui/tokens` package exports TypeScript source files (`src/*.ts`) instead of compiled distribution files (`dist/*.js`). The `files` array includes only `dist/` and `src/tokens.json` — meaning the files referenced by `main`, `types`, and `exports` will NOT exist in the published npm package.
 
 ```json
 // CURRENT (BROKEN for external consumers)

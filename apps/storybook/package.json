@@ -15,6 +15,7 @@
     "@helixui/tokens": "*"
   },
   "devDependencies": {
+    "@mdx-js/react": "^3.0.0",
     "@storybook/addon-a11y": "^10.2.8",
     "@storybook/addon-docs": "^10.2.8",
     "@storybook/addon-links": "^10.2.8",
