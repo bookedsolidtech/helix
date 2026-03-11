@@ -57,6 +57,15 @@ const meta = {
         type: { summary: 'number' },
       },
     },
+    lineNumbers: {
+      control: 'boolean',
+      description: 'Prepends line numbers to each displayed line in block mode.',
+      table: {
+        category: 'Visual',
+        defaultValue: { summary: 'false' },
+        type: { summary: 'boolean' },
+      },
+    },
   },
   args: {
     language: 'javascript',
@@ -64,6 +73,7 @@ const meta = {
     wrap: false,
     copyable: true,
     maxLines: 0,
+    lineNumbers: false,
   },
 } satisfies Meta;
 
@@ -197,7 +207,28 @@ export const NoCopyButton: Story = {
 };
 
 // ─────────────────────────────────────────────────
-// 10. MAX LINES — Truncated
+// 10. LINE NUMBERS
+// ─────────────────────────────────────────────────
+
+export const LineNumbers: Story = {
+  name: 'Line Numbers',
+  render: () => html`
+    <hx-code-snippet language="typescript" line-numbers>
+      interface Patient { id: string; name: string; dob: string; } function getPatient(id: string):
+      Patient { return fetch('/api/patients/' + id).then((r) => r.json()); }
+    </hx-code-snippet>
+  `,
+  play: async ({ canvasElement }) => {
+    const snippet = canvasElement.querySelector('hx-code-snippet');
+    await expect(snippet).toBeTruthy();
+    await snippet!.updateComplete;
+    const lineNums = snippet!.shadowRoot!.querySelectorAll('.code-snippet__line-number');
+    await expect(lineNums.length).toBeGreaterThan(0);
+  },
+};
+
+// ─────────────────────────────────────────────────
+// 11. MAX LINES — Truncated
 // ─────────────────────────────────────────────────
 
 export const MaxLines: Story = {

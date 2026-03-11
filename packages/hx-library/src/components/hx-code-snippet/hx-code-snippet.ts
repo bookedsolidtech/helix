@@ -180,7 +180,8 @@ export class HelixCodeSnippet extends LitElement {
     }
     return html`${lines.map(
       (line, i) =>
-        html`<span aria-hidden="true" class="code-snippet__line-number">${i + 1}</span>${line} `,
+        html`<span aria-hidden="true" class="code-snippet__line-number">${i + 1}</span>${line +
+          '\n'}`,
     )}`;
   }
 
