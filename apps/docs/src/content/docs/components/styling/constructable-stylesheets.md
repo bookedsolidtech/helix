@@ -7,7 +7,7 @@ sidebar:
 
 Constructable Stylesheets represent a paradigm shift in how styles are applied to Shadow DOM web components. Instead of parsing CSS strings on every component instantiation, the browser parses a stylesheet **once** at creation time and reuses the same stylesheet object across thousands of component instances. This architectural change delivers measurable performance improvements, dramatically reduced memory overhead, and powerful dynamic styling capabilities that are impossible with traditional `<style>` elements.
 
-For wc-2026, Constructable Stylesheets are the **foundation** of our styling architecture. Every component leverages them through Lit's `css` tagged template, and understanding their mechanics, performance characteristics, and composition patterns is essential for building enterprise-grade healthcare components that scale.
+For HELiX, Constructable Stylesheets are the **foundation** of our styling architecture. Every component leverages them through Lit's `css` tagged template, and understanding their mechanics, performance characteristics, and composition patterns is essential for building enterprise-grade healthcare components that scale.
 
 ---
 
@@ -394,7 +394,7 @@ theme.replace(`:host { --hx-color-primary-500: #60a5fa; }`);
 | Constructable Stylesheet `replace()`         | ~8ms (parse + propagate)                 |
 | Per-component `<style>` modification         | ~200ms (find + modify + re-parse × 1000) |
 
-Constructable Stylesheets are 25× faster than per-component updates, though slightly slower than CSS custom property overrides (which is why wc-2026 uses **both** in combination).
+Constructable Stylesheets are 25× faster than per-component updates, though slightly slower than CSS custom property overrides (which is why HELiX uses **both** in combination).
 
 ---
 
@@ -404,7 +404,7 @@ Constructable Stylesheets enable sophisticated style-sharing patterns that reduc
 
 ### Pattern 1: Shared Token Stylesheet
 
-wc-2026 components share a base token stylesheet that defines all design tokens:
+HELiX components share a base token stylesheet that defines all design tokens:
 
 ```typescript
 // packages/hx-library/src/styles/tokens.ts
@@ -772,7 +772,7 @@ Lit automatically:
 
 ---
 
-## wc-2026 Conventions
+## HELiX Conventions
 
 ### Separate .styles.ts Files
 
@@ -847,7 +847,7 @@ This documentation appears in:
 | Safari  | 16.4+   | March 2023   |
 | Firefox | 101+    | June 2022    |
 
-**wc-2026 policy:** No polyfill required. Target browsers include Safari 16.4+ (March 2023 baseline).
+**HELiX policy:** No polyfill required. Target browsers include Safari 16.4+ (March 2023 baseline).
 
 ---
 
@@ -945,7 +945,7 @@ Constructable Stylesheets fundamentally improve Shadow DOM styling through:
 - **Dynamic updates** — Runtime theme switching without re-rendering
 - **Composition** — Mix token stylesheets, utilities, and component styles
 
-wc-2026 leverages Constructable Stylesheets through Lit's `css` tag to deliver enterprise-grade performance, maintainability, and developer experience. Understanding this architecture is essential for building healthcare components that scale to thousands of instances.
+HELiX leverages Constructable Stylesheets through Lit's `css` tag to deliver enterprise-grade performance, maintainability, and developer experience. Understanding this architecture is essential for building healthcare components that scale to thousands of instances.
 
 ---
 

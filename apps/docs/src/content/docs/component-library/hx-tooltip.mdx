@@ -1,14 +1,571 @@
 ---
 title: 'hx-tooltip'
-description: 'Small informational popup displayed on hover or focus'
+description: 'Small informational popup displayed on hover or focus. WCAG 1.4.13 compliant with Floating UI smart positioning, Escape to dismiss, and full keyboard + screen reader support.'
 ---
 
 import ComponentLoader from '../../../components/ComponentLoader.astro';
+import ComponentDemo from '../../../components/ComponentDemo.astro';
 import ComponentDoc from '../../../components/ComponentDoc.astro';
 
 <ComponentLoader />
 
 <ComponentDoc tagName="hx-tooltip" section="summary" />
+
+## Overview
+
+`hx-tooltip` is a small informational popup that appears on hover or keyboard focus to provide contextual help, abbreviation expansions, and supplemental guidance in enterprise healthcare interfaces. It uses [Floating UI](https://floating-ui.com/) for smart collision-aware positioning across all four cardinal placements with automatic flip and shift behavior.
+
+The component meets **WCAG 1.4.13 (Content on Hover or Focus) — Level AA**: tooltip content is **persistent** (stays open while the pointer rests on it), **dismissable** via the Escape key, and **hoverable** (the pointer can move from the trigger onto the tooltip without it disappearing). The `aria-describedby` pattern is implemented via a visually-hidden light-DOM element to cross the Shadow DOM boundary correctly — a requirement that naive shadow-root tooltip implementations miss.
+
+**Use `hx-tooltip` when:** you need to expose abbreviation definitions, field-level clinical guidance, or supplemental context without cluttering the primary UI. The trigger can be any focusable element: a button, an icon, an `<abbr>`, or a form field help indicator.
+
+**Use `hx-popover` instead when:** the content is rich (interactive links, structured data, multi-line forms) or requires persistent interaction after it opens.
+
+## Live Demo
+
+### Default
+
+<ComponentDemo title="Default Tooltip">
+  <hx-tooltip>
+    <button>Hover or focus me</button>
+    <span slot="content">Contextual help text</span>
+  </hx-tooltip>
+</ComponentDemo>
+
+### Placement Variants
+
+<ComponentDemo title="Placement Variants">
+  <div style="display: flex; gap: 4rem; flex-wrap: wrap; align-items: center; justify-content: center; padding: 3rem;">
+    <hx-tooltip placement="top">
+      <button>Top</button>
+      <span slot="content">Appears above</span>
+    </hx-tooltip>
+    <hx-tooltip placement="bottom">
+      <button>Bottom</button>
+      <span slot="content">Appears below</span>
+    </hx-tooltip>
+    <hx-tooltip placement="left">
+      <button>Left</button>
+      <span slot="content">Appears to the left</span>
+    </hx-tooltip>
+    <hx-tooltip placement="right">
+      <button>Right</button>
+      <span slot="content">Appears to the right</span>
+    </hx-tooltip>
+  </div>
+</ComponentDemo>
+
+### Icon Trigger
+
+<ComponentDemo title="Icon Button Trigger">
+  <hx-tooltip placement="right">
+    <button
+      aria-label="Help"
+      style="width: 2rem; height: 2rem; border-radius: 50%; border: 1px solid #ccc; cursor: pointer; font-size: 0.875rem;"
+    >
+      ?
+    </button>
+    <span slot="content">Click for additional help resources</span>
+  </hx-tooltip>
+</ComponentDemo>
+
+### Long Content
+
+<ComponentDemo title="Long Content">
+  <div style="padding: 3rem; display: flex; justify-content: center;">
+    <hx-tooltip>
+      <button>View medication info</button>
+      <span slot="content">
+        Lisinopril is an ACE inhibitor used to treat high blood pressure and heart failure. Monitor
+        for cough, hyperkalemia, and renal impairment.
+      </span>
+    </hx-tooltip>
+  </div>
+</ComponentDemo>
+
+### Healthcare: Contextual Field Help
+
+<ComponentDemo title="Clinical Field Help">
+  <div style="max-width: 420px; padding: 1.5rem; display: flex; flex-direction: column; gap: 1rem;">
+    <div style="display: flex; align-items: center; gap: 0.5rem;">
+      <span style="font-size: 0.875rem; font-weight: 500;">Blood Pressure</span>
+      <hx-tooltip placement="right">
+        <button
+          aria-label="Blood pressure help"
+          style="width: 1.25rem; height: 1.25rem; border-radius: 50%; border: 1px solid #6366f1; background: #ede9fe; color: #4338ca; font-size: 0.625rem; cursor: pointer;"
+        >
+          ?
+        </button>
+        <span slot="content">
+          Enter systolic/diastolic values (e.g., 120/80 mmHg). Normal range: below 120/80. Alert
+          threshold: above 140/90.
+        </span>
+      </hx-tooltip>
+    </div>
+    <div style="display: flex; align-items: center; gap: 0.5rem;">
+      <span style="font-size: 0.875rem; font-weight: 500;">SpO2</span>
+      <hx-tooltip placement="right">
+        <button
+          aria-label="SpO2 help"
+          style="width: 1.25rem; height: 1.25rem; border-radius: 50%; border: 1px solid #6366f1; background: #ede9fe; color: #4338ca; font-size: 0.625rem; cursor: pointer;"
+        >
+          ?
+        </button>
+        <span slot="content">
+          Oxygen saturation percentage. Normal: 95–100%. Critical alert: below 90%. Initiate
+          supplemental oxygen if below 92%.
+        </span>
+      </hx-tooltip>
+    </div>
+    <div style="display: flex; align-items: center; gap: 0.5rem;">
+      <span style="font-size: 0.875rem; font-weight: 500;">eGFR</span>
+      <hx-tooltip placement="right">
+        <abbr
+          title="Estimated Glomerular Filtration Rate"
+          tabindex="0"
+          style="cursor: help; font-size: 0.875rem; border-bottom: 1px dashed #6366f1; text-decoration: none;"
+        >
+          eGFR
+        </abbr>
+        <span slot="content">
+          Estimated Glomerular Filtration Rate — measures kidney function. Normal: ≥60
+          mL/min/1.73m². Stage 3 CKD: 30–59. Stage 4: 15–29.
+        </span>
+      </hx-tooltip>
+    </div>
+  </div>
+</ComponentDemo>
+
+## Installation
+
+```bash
+# Full library
+npm install @helix/library
+
+# Or import only this component (tree-shaking friendly)
+import '@helix/library/components/hx-tooltip';
+```
+
+## Basic Usage
+
+Minimal HTML — no build tool required:
+
+```html
+<!-- Default tooltip -->
+<hx-tooltip>
+  <button>Hover me</button>
+  <span slot="content">Contextual help text</span>
+</hx-tooltip>
+
+<!-- Placement variants -->
+<hx-tooltip placement="top">
+  <button>Top</button>
+  <span slot="content">Appears above</span>
+</hx-tooltip>
+
+<hx-tooltip placement="bottom">
+  <button>Bottom</button>
+  <span slot="content">Appears below</span>
+</hx-tooltip>
+
+<hx-tooltip placement="left">
+  <button>Left</button>
+  <span slot="content">Appears to the left</span>
+</hx-tooltip>
+
+<hx-tooltip placement="right">
+  <button>Right</button>
+  <span slot="content">Appears to the right</span>
+</hx-tooltip>
+
+<!-- Custom delays (milliseconds) -->
+<hx-tooltip show-delay="500" hide-delay="200">
+  <button>Delayed tooltip</button>
+  <span slot="content">Shows after 500ms, hides after 200ms</span>
+</hx-tooltip>
+
+<!-- Instant (no delay) -->
+<hx-tooltip show-delay="0" hide-delay="0">
+  <button>Instant</button>
+  <span slot="content">Appears immediately</span>
+</hx-tooltip>
+
+<!-- Icon button trigger -->
+<hx-tooltip placement="right">
+  <button aria-label="Field help">?</button>
+  <span slot="content">Enter the patient's date of birth in MM/DD/YYYY format.</span>
+</hx-tooltip>
+
+<!-- Abbreviation trigger -->
+<hx-tooltip>
+  <abbr title="Estimated Glomerular Filtration Rate" tabindex="0">eGFR</abbr>
+  <span slot="content">Estimated Glomerular Filtration Rate — measures kidney function.</span>
+</hx-tooltip>
+```
+
+Control via JavaScript:
+
+```javascript
+const tooltip = document.querySelector('hx-tooltip');
+
+// Update placement at runtime
+tooltip.placement = 'bottom';
+
+// Adjust delays
+tooltip.showDelay = 500;
+tooltip.hideDelay = 200;
+```
+
+## Properties
+
+| Property    | Attribute    | Type        | Default | Description                                                                                                                                                                                                                                                  |
+| ----------- | ------------ | ----------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `placement` | `placement`  | `Placement` | `'top'` | Preferred placement of the tooltip relative to the trigger. Supports all Floating UI placement values including alignment variants (`'top-start'`, `'bottom-end'`, etc.). Automatically flips if the viewport has insufficient space. Reflects to attribute. |
+| `showDelay` | `show-delay` | `number`    | `300`   | Delay in milliseconds before the tooltip appears on hover or focus. Set to `0` for instant display. A short delay (100–300ms) prevents accidental triggers during mouse traversal.                                                                           |
+| `hideDelay` | `hide-delay` | `number`    | `100`   | Delay in milliseconds before the tooltip hides on mouseleave or focusout. A short delay gives the pointer time to move from the trigger to the tooltip without it closing (required by WCAG 1.4.13).                                                         |
+
+**Note on `placement`:** The component imports the `Placement` type from `@floating-ui/dom`, which supports all cardinal directions (`top`, `bottom`, `left`, `right`) and their alignment variants (`top-start`, `top-end`, `bottom-start`, `bottom-end`, `left-start`, `left-end`, `right-start`, `right-end`). The Floating UI `flip()` middleware automatically selects the best available placement when the preferred one collides with viewport edges.
+
+## Slots
+
+| Slot        | Description                                                                                                                                                                                                           |
+| ----------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| _(default)_ | The trigger element that activates the tooltip on hover and focus. Should be a focusable element (button, a, abbr with tabindex, input, etc.). The trigger receives `aria-describedby` pointing to the tooltip.       |
+| `content`   | The content to display inside the tooltip popup. Plain text is recommended. The text is mirrored to a visually-hidden light-DOM element so that `aria-describedby` resolves correctly across the Shadow DOM boundary. |
+
+```html
+<!-- Default slot: trigger element -->
+<hx-tooltip>
+  <button>Trigger element</button>
+  <span slot="content">Tooltip text</span>
+</hx-tooltip>
+
+<!-- Any focusable element works as trigger -->
+<hx-tooltip>
+  <a href="#more-info">Learn more</a>
+  <span slot="content">Opens the full documentation section</span>
+</hx-tooltip>
+
+<!-- Abbreviation with keyboard access -->
+<hx-tooltip>
+  <abbr tabindex="0" title="Do Not Resuscitate">DNR</abbr>
+  <span slot="content">Do Not Resuscitate — a medical order indicating no CPR.</span>
+</hx-tooltip>
+```
+
+## CSS Parts
+
+| Part      | Description                                                   |
+| --------- | ------------------------------------------------------------- |
+| `tooltip` | The tooltip popup container element.                          |
+| `arrow`   | The arrow indicator pointing from the tooltip to the trigger. |
+
+Use CSS parts to style internals not exposed by CSS custom properties:
+
+```css
+/* Custom themed tooltip */
+hx-tooltip::part(tooltip) {
+  background: #4338ca;
+  border: 1px solid #6366f1;
+  font-size: 0.8125rem;
+}
+
+/* Match arrow color to custom background */
+hx-tooltip::part(arrow) {
+  background: #4338ca;
+}
+
+/* High-contrast override for critical clinical contexts */
+.critical-zone hx-tooltip::part(tooltip) {
+  background: #1a1a1a;
+  color: #ffffff;
+  font-weight: 600;
+}
+```
+
+## CSS Custom Properties
+
+| Property                           | Default                               | Description                                                        |
+| ---------------------------------- | ------------------------------------- | ------------------------------------------------------------------ |
+| `--hx-tooltip-bg`                  | `var(--hx-color-neutral-900)`         | Tooltip background color.                                          |
+| `--hx-tooltip-color`               | `var(--hx-color-neutral-50)`          | Tooltip text color.                                                |
+| `--hx-tooltip-font-size`           | `var(--hx-font-size-xs)`              | Tooltip font size.                                                 |
+| `--hx-tooltip-max-width`           | `280px`                               | Maximum tooltip width before text wraps.                           |
+| `--hx-tooltip-padding`             | `var(--hx-space-1) var(--hx-space-2)` | Tooltip internal padding (vertical horizontal).                    |
+| `--hx-tooltip-border-radius`       | `var(--hx-border-radius-sm)`          | Tooltip corner radius.                                             |
+| `--hx-tooltip-shadow`              | `var(--hx-shadow-sm)`                 | Tooltip box shadow.                                                |
+| `--hx-tooltip-z-index`             | `9999`                                | Tooltip stacking order. Increase if tooltips appear behind modals. |
+| `--hx-tooltip-transition-duration` | `0.15s`                               | Show/hide fade transition duration.                                |
+| `--hx-tooltip-arrow-size`          | `8px`                                 | Width and height of the directional arrow.                         |
+
+Override at the `:root` level to theme all instances, or on a specific selector:
+
+```css
+/* Lighter tooltip for a light-mode context */
+:root {
+  --hx-tooltip-bg: var(--hx-color-neutral-800);
+  --hx-tooltip-color: var(--hx-color-neutral-50);
+  --hx-tooltip-max-width: 320px;
+}
+
+/* Larger tooltip for a dense data table */
+.data-table hx-tooltip {
+  --hx-tooltip-font-size: var(--hx-font-size-sm);
+  --hx-tooltip-padding: var(--hx-space-2) var(--hx-space-3);
+}
+
+/* Disable animation in a high-density workflow UI */
+.no-motion hx-tooltip {
+  --hx-tooltip-transition-duration: 0s;
+}
+```
+
+## Accessibility
+
+`hx-tooltip` is built for WCAG 2.1 AA compliance with particular attention to the requirements of WCAG 1.4.13 (Content on Hover or Focus) — a standard that many tooltip implementations fail.
+
+| Topic                     | Details                                                                                                                                                                                                                                                                                       |
+| ------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Role                      | The tooltip popup element has `role="tooltip"`. This is the correct ARIA role for supplemental descriptive content triggered by hover or focus — not for interactive popovers or dialogs.                                                                                                     |
+| `aria-describedby`        | The trigger element in the default slot receives `aria-describedby` pointing to the tooltip's ID. Because ARIA ID references cannot cross Shadow DOM boundaries, the tooltip text is mirrored to a visually-hidden `<span>` element in light DOM so screen readers can resolve the reference. |
+| `aria-hidden`             | The tooltip popup element has `aria-hidden="true"` when not visible and `aria-hidden="false"` when visible. This prevents screen readers from announcing the tooltip content until it is triggered.                                                                                           |
+| WCAG 1.4.13 — Persistent  | The tooltip remains visible when the pointer moves from the trigger onto the tooltip. The tooltip element itself has `@mouseenter`/`@mouseleave` handlers that cancel the hide timer.                                                                                                         |
+| WCAG 1.4.13 — Dismissable | Pressing `Escape` dismisses the tooltip immediately. The Escape handler is attached to the host element and fires regardless of which child has focus.                                                                                                                                        |
+| WCAG 1.4.13 — Hoverable   | The `hideDelay` default of 100ms provides a grace window for the pointer to travel from the trigger to the tooltip content without triggering dismissal. This satisfies the "hoverable" requirement for users who move the pointer to read long content.                                      |
+| Keyboard / mouse mix      | When a keyboard user focuses the trigger (tooltip shows via `focusin`), an accidental mouse-over and mouse-out of the trigger does NOT hide the tooltip. The `mouseleave` handler checks `document.activeElement` and skips the hide schedule if the trigger still has focus.                 |
+| `prefers-reduced-motion`  | The show/hide CSS transition is disabled when the user has enabled `prefers-reduced-motion: reduce`. The tooltip still appears and disappears — only the animation is removed.                                                                                                                |
+| WCAG                      | Meets WCAG 2.1 AA. SC 1.4.13 (Content on Hover or Focus), SC 1.3.1 (Info and Relationships), SC 4.1.2 (Name, Role, Value) satisfied. Zero axe-core violations in both hidden and visible states.                                                                                              |
+
+### Keyboard Navigation
+
+| Key      | Target      | Action                                                       |
+| -------- | ----------- | ------------------------------------------------------------ |
+| `Tab`    | Trigger     | Moves focus to the trigger element, showing the tooltip.     |
+| `Escape` | Host        | Dismisses the tooltip immediately (WCAG 1.4.13 requirement). |
+| `Tab`    | Next target | Moving focus away from the trigger hides the tooltip.        |
+
+The tooltip itself is not interactive and does not receive keyboard focus. If you need interactive content (links, buttons) inside a tooltip-like surface, use `hx-popover` instead.
+
+### Screen Reader Guidance
+
+```html
+<!-- The trigger announces as: "Hover me, [tooltip text]" via aria-describedby -->
+<hx-tooltip>
+  <button>Hover me</button>
+  <span slot="content">Contextual help text</span>
+</hx-tooltip>
+
+<!-- Abbreviation: announces as "eGFR, Estimated Glomerular Filtration Rate..." -->
+<hx-tooltip>
+  <abbr tabindex="0" title="Estimated Glomerular Filtration Rate">eGFR</abbr>
+  <span slot="content">Estimated Glomerular Filtration Rate — measures kidney function.</span>
+</hx-tooltip>
+
+<!-- Icon button: aria-label provides the button name, tooltip provides the description -->
+<hx-tooltip placement="right">
+  <button aria-label="Blood pressure help">?</button>
+  <span slot="content">Enter systolic/diastolic values (e.g., 120/80 mmHg).</span>
+</hx-tooltip>
+```
+
+**Important:** Icon-only trigger buttons must have an `aria-label`. Without it, the button's accessible name will be empty and screen readers will announce only the description from `aria-describedby`.
+
+## Drupal Integration
+
+Use `hx-tooltip` in a Twig template after registering the library.
+
+```twig
+{# my-module/templates/my-template.html.twig #}
+
+{# Basic tooltip on a button trigger #}
+<hx-tooltip placement="{{ placement|default('top') }}">
+  <button type="button">{{ trigger_label }}</button>
+  <span slot="content">{{ tooltip_text }}</span>
+</hx-tooltip>
+
+{# Icon help button (requires aria-label on the button) #}
+<hx-tooltip placement="right">
+  <button
+    type="button"
+    aria-label="{{ field_name }} help"
+    class="hx-field-help-btn"
+  >?</button>
+  <span slot="content">{{ help_text }}</span>
+</hx-tooltip>
+
+{# Abbreviation tooltip #}
+<hx-tooltip>
+  <abbr tabindex="0" title="{{ full_term }}">{{ abbreviation }}</abbr>
+  <span slot="content">{{ full_term }} — {{ definition }}</span>
+</hx-tooltip>
+
+{# With custom delays #}
+<hx-tooltip
+  placement="{{ placement|default('top') }}"
+  show-delay="{{ show_delay|default(300) }}"
+  hide-delay="{{ hide_delay|default(100) }}"
+>
+  <button type="button">{{ trigger_label }}</button>
+  <span slot="content">{{ tooltip_text }}</span>
+</hx-tooltip>
+```
+
+Load the library in your module's `.libraries.yml`:
+
+```yaml
+helix-components:
+  js:
+    /libraries/helix/helix.min.js: { minified: true }
+```
+
+No Drupal behavior is required — `hx-tooltip` manages all interaction and ARIA state internally. The component self-initializes when the custom element is defined.
+
+## Standalone HTML Example
+
+Copy-paste this into a `.html` file and open it in a browser — no build tool needed:
+
+```html
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>hx-tooltip example</title>
+    <!-- @helix/library is a private package — install via npm workspace, not CDN -->
+    <!-- In your project: import '@helix/library'; in your bundler entry point -->
+  </head>
+  <body
+    style="font-family: sans-serif; padding: 3rem; display: flex; flex-direction: column; gap: 3rem;"
+  >
+    <!-- 1. Default tooltip -->
+    <section>
+      <h2 style="margin: 0 0 1.5rem;">Default Tooltip</h2>
+      <hx-tooltip>
+        <button>Hover or focus me</button>
+        <span slot="content">Contextual help text</span>
+      </hx-tooltip>
+    </section>
+
+    <!-- 2. Placement variants -->
+    <section>
+      <h2 style="margin: 0 0 1.5rem;">Placement Variants</h2>
+      <div style="display: flex; gap: 3rem; flex-wrap: wrap; padding: 2rem;">
+        <hx-tooltip placement="top">
+          <button>Top</button>
+          <span slot="content">Appears above</span>
+        </hx-tooltip>
+        <hx-tooltip placement="bottom">
+          <button>Bottom</button>
+          <span slot="content">Appears below</span>
+        </hx-tooltip>
+        <hx-tooltip placement="left">
+          <button>Left</button>
+          <span slot="content">Appears to the left</span>
+        </hx-tooltip>
+        <hx-tooltip placement="right">
+          <button>Right</button>
+          <span slot="content">Appears to the right</span>
+        </hx-tooltip>
+      </div>
+    </section>
+
+    <!-- 3. Icon button trigger (requires aria-label) -->
+    <section>
+      <h2 style="margin: 0 0 1.5rem;">Icon Button Trigger</h2>
+      <hx-tooltip placement="right">
+        <button
+          aria-label="Help"
+          style="width: 2rem; height: 2rem; border-radius: 50%; border: 1px solid #ccc; cursor: pointer;"
+        >
+          ?
+        </button>
+        <span slot="content">Additional help resources are available in the sidebar.</span>
+      </hx-tooltip>
+    </section>
+
+    <!-- 4. Abbreviation trigger -->
+    <section>
+      <h2 style="margin: 0 0 1.5rem;">Abbreviation Trigger</h2>
+      <p style="font-size: 0.875rem;">
+        The patient's
+        <hx-tooltip>
+          <abbr
+            tabindex="0"
+            title="Estimated Glomerular Filtration Rate"
+            style="border-bottom: 1px dashed #6366f1; text-decoration: none; cursor: help;"
+            >eGFR</abbr
+          >
+          <span slot="content"
+            >Estimated Glomerular Filtration Rate — measures kidney function. Normal: ≥60
+            mL/min/1.73m².</span
+          >
+        </hx-tooltip>
+        was recorded as 72 mL/min/1.73m².
+      </p>
+    </section>
+
+    <!-- 5. Healthcare: clinical field help -->
+    <section>
+      <h2 style="margin: 0 0 1.5rem;">Clinical Field Help</h2>
+      <div style="display: flex; flex-direction: column; gap: 1rem; max-width: 360px;">
+        <div style="display: flex; align-items: center; gap: 0.5rem;">
+          <label style="font-size: 0.875rem; font-weight: 500; min-width: 120px;"
+            >Blood Pressure</label
+          >
+          <input
+            type="text"
+            placeholder="120/80"
+            style="border: 1px solid #d1d5db; border-radius: 0.25rem; padding: 0.25rem 0.5rem; font-size: 0.875rem; width: 80px;"
+          />
+          <hx-tooltip placement="right">
+            <button
+              aria-label="Blood pressure help"
+              style="width: 1.25rem; height: 1.25rem; border-radius: 50%; border: 1px solid #6366f1; background: #ede9fe; color: #4338ca; font-size: 0.625rem; cursor: pointer;"
+            >
+              ?
+            </button>
+            <span slot="content"
+              >Enter systolic/diastolic values (e.g., 120/80 mmHg). Normal range: below 120/80.
+              Alert threshold: above 140/90.</span
+            >
+          </hx-tooltip>
+        </div>
+        <div style="display: flex; align-items: center; gap: 0.5rem;">
+          <label style="font-size: 0.875rem; font-weight: 500; min-width: 120px;">SpO2 (%)</label>
+          <input
+            type="number"
+            min="0"
+            max="100"
+            placeholder="98"
+            style="border: 1px solid #d1d5db; border-radius: 0.25rem; padding: 0.25rem 0.5rem; font-size: 0.875rem; width: 80px;"
+          />
+          <hx-tooltip placement="right">
+            <button
+              aria-label="SpO2 help"
+              style="width: 1.25rem; height: 1.25rem; border-radius: 50%; border: 1px solid #6366f1; background: #ede9fe; color: #4338ca; font-size: 0.625rem; cursor: pointer;"
+            >
+              ?
+            </button>
+            <span slot="content"
+              >Oxygen saturation percentage. Normal: 95–100%. Critical alert: below 90%. Initiate
+              supplemental oxygen if below 92%.</span
+            >
+          </hx-tooltip>
+        </div>
+      </div>
+    </section>
+  </body>
+</html>
+```
+
+## Related Components
+
+| Component    | When to Use                                                                                                                        |
+| ------------ | ---------------------------------------------------------------------------------------------------------------------------------- |
+| `hx-popover` | When content is rich (interactive links, structured data, multi-line text) or must persist after the trigger is no longer focused. |
+| `hx-dialog`  | When the content requires explicit user acknowledgment or contains a form that must be submitted or cancelled.                     |
+| `hx-alert`   | When status information requires a persistent, prominent callout that is always visible in the layout.                             |
+| `hx-badge`   | When you need a compact inline label that is always visible — not triggered by interaction.                                        |
 
 ## API Reference
 

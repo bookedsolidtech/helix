@@ -15,7 +15,7 @@ libraries:
 # mytheme.libraries.yml
 helix:
   js:
-    https://cdn.jsdelivr.net/npm/@helix/library@latest/dist/helix.bundled.js:
+    https://cdn.jsdelivr.net/npm/@helixui/library@latest/dist/helix.bundled.js:
       type: external
       attributes:
         type: module
@@ -27,14 +27,14 @@ Install via npm and include in your theme's build process:
 
 ```bash
 cd web/themes/custom/mytheme
-npm install @helix/library
+npm install @helixui/library
 ```
 
 Then import in your theme's JavaScript:
 
 ```javascript
 // mytheme.js
-import '@helix/library';
+import '@helixui/library';
 ```
 
 ## Method 3: Drupal Library (Enterprise)

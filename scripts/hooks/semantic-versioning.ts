@@ -121,12 +121,12 @@ const CONFIG = {
   changesetDir: '.changeset',
 
   // Workspace packages
-  workspacePackages: ['@helix/library', '@helix/tokens'],
+  workspacePackages: ['@helixui/library', '@helixui/tokens'],
 
   // Package directory mapping
   packageDirs: {
-    '@helix/library': 'packages/hx-library',
-    '@helix/tokens': 'packages/hx-tokens',
+    '@helixui/library': 'packages/hx-library',
+    '@helixui/tokens': 'packages/hx-tokens',
   } as Record<string, string>,
 
   // Approval mechanism
@@ -255,7 +255,7 @@ function parseChangeset(filePath: string): ChangesetContent | null {
 
     // Changeset format:
     // ---
-    // "@helix/library": minor
+    // "@helixui/library": minor
     // ---
     //
     // Summary text here
@@ -604,7 +604,7 @@ function validateLinkedPackages(changesets: string[]): Violation[] {
   // Priority 2: Linked package enforcement (Issue #1.2 from principal-engineer)
   const violations: Violation[] = [];
 
-  // If @helix/library has breaking changes, @helix/tokens should be included
+  // If @helixui/library has breaking changes, @helixui/tokens should be included
   // (This is a simple heuristic; can be expanded based on actual dependencies)
   let hasLibraryMajor = false;
   const changesetPackages = new Set<string>();
@@ -615,19 +615,19 @@ function validateLinkedPackages(changesets: string[]): Violation[] {
 
     parsed.packages.forEach((pkg) => changesetPackages.add(pkg));
 
-    if (parsed.packages.includes('@helix/library') && parsed.bump === 'major') {
+    if (parsed.packages.includes('@helixui/library') && parsed.bump === 'major') {
       hasLibraryMajor = true;
     }
   }
 
-  if (hasLibraryMajor && !changesetPackages.has('@helix/tokens')) {
+  if (hasLibraryMajor && !changesetPackages.has('@helixui/tokens')) {
     violations.push({
       file: changesets[0],
       line: 1,
       column: 1,
-      message: 'Breaking change in @helix/library may require @helix/tokens update',
+      message: 'Breaking change in @helixui/library may require @helixui/tokens update',
       suggestion:
-        'Consider including @helix/tokens in changeset if design token changes are needed',
+        'Consider including @helixui/tokens in changeset if design token changes are needed',
       severity: 'warning',
     });
   }

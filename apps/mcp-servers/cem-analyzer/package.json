@@ -1,5 +1,5 @@
 {
-  "name": "@helix/mcp-cem-analyzer",
+  "name": "@helixui/mcp-cem-analyzer",
   "version": "0.1.0",
   "private": true,
   "type": "module",
@@ -14,7 +14,7 @@
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.26.0",
-    "@helix/mcp-shared": "file:../shared",
+    "@helixui/mcp-shared": "file:../shared",
     "zod": "^3.22.0"
   },
   "devDependencies": {

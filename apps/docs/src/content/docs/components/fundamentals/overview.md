@@ -7,7 +7,7 @@ sidebar:
 
 # Component Fundamentals Overview
 
-Web components represent a paradigm shift in how we build reusable user interface elements. Rather than relying on framework-specific abstractions, web components are built on open web standards that work in any JavaScript environment—with or without a framework. This guide introduces the core concepts you'll use when building components in wc-2026.
+Web components represent a paradigm shift in how we build reusable user interface elements. Rather than relying on framework-specific abstractions, web components are built on open web standards that work in any JavaScript environment—with or without a framework. This guide introduces the core concepts you'll use when building components in HELiX.
 
 ## Web Components Standards
 
@@ -102,7 +102,7 @@ class MyCard extends HTMLElement {
 
 ### Styling with Design Tokens
 
-Shadow DOM enables style encapsulation, but components still need to be themeable. In wc-2026, we use CSS custom properties (design tokens) with the `--hx-` prefix to allow consumers to customize appearance:
+Shadow DOM enables style encapsulation, but components still need to be themeable. In HELiX, we use CSS custom properties (design tokens) with the `--hx-` prefix to allow consumers to customize appearance:
 
 ```typescript
 const styles = css`
@@ -190,7 +190,7 @@ static styles = css`
 
 ## Interoperability
 
-Because wc-2026 components are built on web standards, they work everywhere HTML works—in React, Vue, Angular, Next.js, or vanilla JavaScript. No framework-specific wrappers needed.
+Because HELiX components are built on web standards, they work everywhere HTML works—in React, Vue, Angular, Next.js, or vanilla JavaScript. No framework-specific wrappers needed.
 
 ```html
 <!-- Works in any context -->
@@ -207,9 +207,9 @@ Because wc-2026 components are built on web standards, they work everywhere HTML
 
 Now that you understand the foundations, explore the related documentation:
 
-- **[Building Components](/components/building/)** — Walk through creating your first Lit component with wc-2026 conventions
+- **[Building Components](/components/building/)** — Walk through creating your first Lit component with HELiX conventions
 - **[Component Lifecycle](/components/lifecycle/)** — Deep dive into Lit's lifecycle hooks and when to use them
-- **Styling & Design Tokens** — Learn how to use the wc-2026 design token system for theming and customization
+- **Styling & Design Tokens** — Learn how to use the HELiX design token system for theming and customization
 
 ## References
 

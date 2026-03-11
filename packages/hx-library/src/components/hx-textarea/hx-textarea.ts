@@ -3,7 +3,7 @@ import { customElement, property, query, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import { live } from 'lit/directives/live.js';
-import { tokenStyles } from '@helix/tokens/lit';
+import { tokenStyles } from '@helixui/tokens/lit';
 import { helixTextareaStyles } from './hx-textarea.styles.js';
 
 // Module-level counter for stable, SSR-safe IDs (avoids Math.random() hydration mismatch)
@@ -161,7 +161,7 @@ export class HelixTextarea extends LitElement {
 
   /** @internal */
   @query('.field__textarea')
-  private _textarea!: HTMLTextAreaElement | undefined;
+  private _textarea: HTMLTextAreaElement | undefined;
 
   // ─── Slot Tracking ───
 
@@ -209,6 +209,11 @@ export class HelixTextarea extends LitElement {
       changedProperties.has('maxlength')
     ) {
       this._updateValidity();
+    }
+    // Auto-grow: respond to programmatic value changes
+    if (changedProperties.has('value') && this.resize === 'auto' && this._textarea) {
+      this._textarea.style.height = 'auto';
+      this._textarea.style.height = `${this._textarea.scrollHeight}px`;
     }
   }
 
@@ -276,6 +281,7 @@ export class HelixTextarea extends LitElement {
   private _handleInput(e: Event): void {
     const target = e.target as HTMLTextAreaElement;
     this.value = target.value;
+    // Note: setFormValue is called in updated() via the value change — no double-call here (P1-06 fix)
 
     // Auto-grow: reset height then set to scrollHeight
     if (this.resize === 'auto') {
@@ -363,7 +369,9 @@ export class HelixTextarea extends LitElement {
       'field--required': this.required,
     };
 
+    // P0-02 fix: help text container renders when slot is used OR property is set
     const hasHelpText = (!!this.helpText || this._hasHelpTextSlot) && !hasError;
+
     const describedBy =
       [
         hasError ? this._errorId : null,
@@ -417,7 +425,7 @@ export class HelixTextarea extends LitElement {
         ${hasError
           ? html`
               <div part="error" class="field__error" id=${this._errorId} role="alert">
-                <slot name="error" @slotchange=${this._handleErrorSlotChange}> ${this.error} </slot>
+                <slot name="error" @slotchange=${this._handleErrorSlotChange}>${this.error}</slot>
               </div>
             `
           : html`<slot name="error" @slotchange=${this._handleErrorSlotChange}></slot>`}

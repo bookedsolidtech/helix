@@ -7,7 +7,7 @@ import {
   handleToolError,
   createSuccessResponse,
   createErrorResponse,
-} from '@helix/mcp-shared';
+} from '@helixui/mcp-shared';
 import { parseCem, diffCem, validateCompleteness, listAllComponents } from './handlers.js';
 
 const AnalyzeCEMArgsSchema = z.object({

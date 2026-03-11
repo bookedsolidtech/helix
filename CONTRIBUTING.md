@@ -259,7 +259,7 @@ All PRs must pass:
 
 ### After Approval
 
-PRs are merged by maintainers using **squash and merge** strategy.
+PRs are merged by maintainers using **merge commits** strategy (squash merging is disabled to preserve conventional commit messages for semantic-release).
 
 ## Component Development
 

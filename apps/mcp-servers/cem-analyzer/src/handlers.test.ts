@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
-import { MCPError, ErrorCategory } from '@helix/mcp-shared';
+import { MCPError, ErrorCategory } from '@helixui/mcp-shared';
 
 // Create shared mock objects
 const mockFileOps = {
@@ -14,8 +14,8 @@ const mockGit = {
 };
 
 // Mock dependencies BEFORE importing handlers
-vi.mock('@helix/mcp-shared', async () => {
-  const actual = await vi.importActual('@helix/mcp-shared');
+vi.mock('@helixui/mcp-shared', async () => {
+  const actual = await vi.importActual('@helixui/mcp-shared');
 
   return {
     ...actual,

@@ -1,5 +1,5 @@
 {
-  "name": "@helix/admin",
+  "name": "@helixui/admin",
   "version": "0.1.0",
   "private": true,
   "description": "Panopticon Platform — WC-2026 Component Library",
@@ -14,8 +14,8 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@helix/library": "*",
-    "@helix/tokens": "*",
+    "@helixui/library": "*",
+    "@helixui/tokens": "*",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "lucide-react": "^0.511.0",

@@ -1,4 +1,4 @@
-# CLAUDE.md — wc-2026
+# CLAUDE.md — HELiX
 
 Core guidance for Claude Code when working in this monorepo. **Default behavior: ALWAYS delegate to specialized agents.**
 
@@ -6,7 +6,7 @@ Core guidance for Claude Code when working in this monorepo. **Default behavior:
 
 ## Mission Statement
 
-**wc-2026 is the foundation that enterprise healthcare organizations build their million-dollar design systems on.** This is not a component library — it is infrastructure. Every line of code, every token, every test exists to serve organizations where software failures can impact patient care.
+**HELiX is the foundation that enterprise healthcare organizations build their million-dollar design systems on.** This is not a component library — it is infrastructure. Every line of code, every token, every test exists to serve organizations where software failures can impact patient care.
 
 We build the factory, not the furniture. The quality bar is not "good enough" — it is "unbreakable."
 
@@ -122,12 +122,12 @@ This applies to ANY change that would require a restart: new story files, config
 
 ## Project Overview
 
-**wc-2026** is an enterprise healthcare web component library.
+**HELiX** is an enterprise healthcare web component library.
 
 ```
-wc-2026/
+helix/
 ├── packages/
-│   └── hx-library/          # @wc-2026/library — Lit 3.x components (CORE)
+│   └── hx-library/          # @helixui/library — Lit 3.x components (CORE)
 │       └── src/components/   # hx-button, hx-card, hx-text-input
 ├── apps/
 │   ├── admin/                # Admin Dashboard — health scoring, test theater (Next.js 15, port 3159)
@@ -205,7 +205,7 @@ npm run verify                 # MANDATORY before push: lint + format:check + ty
 npm run build                  # Build everything (Turborepo)
 npm run type-check             # TypeScript strict
 npm run test                   # Vitest browser mode (112 tests)
-npm run test:library           # Tests for @wc-2026/library only
+npm run test:library           # Tests for @helixui/library only
 npm run cem                    # Generate Custom Elements Manifest
 npm run lint                   # ESLint
 npm run format                 # Auto-fix formatting

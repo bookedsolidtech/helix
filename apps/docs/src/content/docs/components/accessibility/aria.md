@@ -1,13 +1,13 @@
 ---
 title: ARIA Patterns for Components
-description: Comprehensive guide to ARIA roles, attributes, state management, and labeling strategies for accessible web components in the wc-2026 component library
+description: Comprehensive guide to ARIA roles, attributes, state management, and labeling strategies for accessible web components in the HELiX component library
 sidebar:
   order: 2
 ---
 
 # ARIA Patterns for Components
 
-Accessible Rich Internet Applications (ARIA) is a W3C specification that defines how to make web content and applications more accessible to people with disabilities. In the context of web components, ARIA bridges the gap between custom UI patterns and assistive technology expectations. This guide provides a comprehensive reference for implementing ARIA patterns in wc-2026 components, with real-world examples from the hx-library.
+Accessible Rich Internet Applications (ARIA) is a W3C specification that defines how to make web content and applications more accessible to people with disabilities. In the context of web components, ARIA bridges the gap between custom UI patterns and assistive technology expectations. This guide provides a comprehensive reference for implementing ARIA patterns in HELiX components, with real-world examples from the hx-library.
 
 ## ARIA Overview
 
@@ -78,7 +78,7 @@ A clickable element that triggers an action. Always prefer native `<button>` ele
 <div role="button" tabindex="0">Submit</div>
 ```
 
-**wc-2026 usage**: `hx-button` uses a native `<button>` element and does not apply `role="button"` because it's redundant.
+**HELiX usage**: `hx-button` uses a native `<button>` element and does not apply `role="button"` because it's redundant.
 
 #### checkbox
 
@@ -88,7 +88,7 @@ A checkable input in one of two states: checked or unchecked.
 <div role="checkbox" aria-checked="false" tabindex="0">Accept terms</div>
 ```
 
-**wc-2026 usage**: `hx-checkbox` uses a native `<input type="checkbox">` and manages `aria-invalid`, `aria-describedby`, and `aria-labelledby`:
+**HELiX usage**: `hx-checkbox` uses a native `<input type="checkbox">` and manages `aria-invalid`, `aria-describedby`, and `aria-labelledby`:
 
 ```typescript
 <input
@@ -110,7 +110,7 @@ A checkable input in a group of radio buttons where only one can be checked at a
 <div role="radio" aria-checked="false" tabindex="-1">Option 2</div>
 ```
 
-**wc-2026 usage**: `hx-radio` uses a native `<input type="radio">` and is managed by `hx-radio-group`, which implements roving tabindex.
+**HELiX usage**: `hx-radio` uses a native `<input type="radio">` and is managed by `hx-radio-group`, which implements roving tabindex.
 
 #### radiogroup
 
@@ -124,7 +124,7 @@ A group of radio buttons.
 </div>
 ```
 
-**wc-2026 usage**: `hx-radio-group` sets `role="radiogroup"` on the host element:
+**HELiX usage**: `hx-radio-group` sets `role="radiogroup"` on the host element:
 
 ```typescript
 override connectedCallback(): void {
@@ -143,7 +143,7 @@ A type of checkbox representing on/off values.
 </button>
 ```
 
-**wc-2026 usage**: `hx-switch` uses a native `<button>` with `role="switch"` and manages `aria-checked`:
+**HELiX usage**: `hx-switch` uses a native `<button>` with `role="switch"` and manages `aria-checked`:
 
 ```typescript
 <button
@@ -176,7 +176,7 @@ A composite widget containing a single-line textbox and a listbox popup.
 </ul>
 ```
 
-**wc-2026 usage**: Not yet implemented. Planned for `hx-combobox`.
+**HELiX usage**: Not yet implemented. Planned for `hx-combobox`.
 
 #### textbox
 
@@ -186,7 +186,7 @@ A single-line text input (implicit role for `<input type="text">`).
 <input type="text" aria-label="Search" />
 ```
 
-**wc-2026 usage**: `hx-text-input` uses a native `<input>` element and augments it with validation attributes:
+**HELiX usage**: `hx-text-input` uses a native `<input>` element and augments it with validation attributes:
 
 ```typescript
 <input
@@ -210,7 +210,7 @@ An important, usually time-sensitive message. Screen readers announce alerts imm
 <div role="alert">Your session will expire in 5 minutes.</div>
 ```
 
-**wc-2026 usage**: `hx-alert` dynamically determines whether to use `role="alert"` or `role="status"` based on the variant:
+**HELiX usage**: `hx-alert` dynamically determines whether to use `role="alert"` or `role="status"` based on the variant:
 
 ```typescript
 private get _role(): string {
@@ -236,7 +236,7 @@ An advisory message that is not urgent.
 <div role="status" aria-live="polite">File saved successfully.</div>
 ```
 
-**wc-2026 usage**: Used in `hx-alert` for non-critical messages (info, success).
+**HELiX usage**: Used in `hx-alert` for non-critical messages (info, success).
 
 #### dialog
 
@@ -249,7 +249,7 @@ A modal window that requires user interaction.
 </div>
 ```
 
-**wc-2026 usage**: Not yet implemented. Planned for `hx-modal`.
+**HELiX usage**: Not yet implemented. Planned for `hx-modal`.
 
 ### Landmark Roles
 
@@ -264,7 +264,7 @@ A region containing form controls.
 </form>
 ```
 
-**wc-2026 usage**: `hx-form` uses a native `<form>` element. The `role="form"` is implicit but can be added for clarity.
+**HELiX usage**: `hx-form` uses a native `<form>` element. The `role="form"` is implicit but can be added for clarity.
 
 ## ARIA Attributes Reference
 
@@ -285,7 +285,7 @@ Indicates the checked state of checkboxes, radio buttons, and switches.
 <div role="checkbox" aria-checked="mixed">Select all</div>
 ```
 
-**wc-2026 usage**: In `hx-checkbox`, we use the native `checked` property and add `aria-checked` indirectly through the native input. In `hx-switch`, we explicitly manage it:
+**HELiX usage**: In `hx-checkbox`, we use the native `checked` property and add `aria-checked` indirectly through the native input. In `hx-switch`, we explicitly manage it:
 
 ```typescript
 <button role="switch" aria-checked=${this.checked ? 'true' : 'false'}>
@@ -303,7 +303,7 @@ Indicates that the element is perceivable but not interactive.
 <button disabled aria-disabled="true">Submit</button>
 ```
 
-**wc-2026 usage**: In `hx-button`:
+**HELiX usage**: In `hx-button`:
 
 ```typescript
 <button
@@ -329,7 +329,7 @@ Indicates whether a collapsible element is expanded or collapsed.
 </ul>
 ```
 
-**wc-2026 usage**: Not yet implemented. Planned for `hx-accordion`, `hx-select` (dropdown state), and `hx-disclosure`.
+**HELiX usage**: Not yet implemented. Planned for `hx-accordion`, `hx-select` (dropdown state), and `hx-disclosure`.
 
 #### aria-invalid
 
@@ -342,7 +342,7 @@ Indicates that the value entered does not conform to the expected format.
 <div id="email-error" role="alert">Please enter a valid email.</div>
 ```
 
-**wc-2026 usage**: In all form components (`hx-text-input`, `hx-select`, `hx-checkbox`, etc.):
+**HELiX usage**: In all form components (`hx-text-input`, `hx-select`, `hx-checkbox`, etc.):
 
 ```typescript
 <input
@@ -363,7 +363,7 @@ Indicates the pressed state of toggle buttons.
 <button aria-pressed="false">Bold</button>
 ```
 
-**wc-2026 usage**: Not yet implemented. Planned for `hx-toggle-button`.
+**HELiX usage**: Not yet implemented. Planned for `hx-toggle-button`.
 
 #### aria-selected
 
@@ -376,7 +376,7 @@ Indicates the selected state of options in a listbox, tab, or tree.
 <div role="tab" aria-selected="false">Tab 2</div>
 ```
 
-**wc-2026 usage**: Not yet implemented. Planned for `hx-tabs`.
+**HELiX usage**: Not yet implemented. Planned for `hx-tabs`.
 
 ### Property Attributes
 
@@ -394,7 +394,7 @@ Provides a text label for an element when no visible label exists.
 </button>
 ```
 
-**wc-2026 usage**: In `hx-alert`, the close button uses `aria-label`:
+**HELiX usage**: In `hx-alert`, the close button uses `aria-label`:
 
 ```typescript
 <button
@@ -431,7 +431,7 @@ References one or more elements that label the current element.
 </div>
 ```
 
-**wc-2026 usage**: In `hx-checkbox`, the label is associated with the input via `aria-labelledby`:
+**HELiX usage**: In `hx-checkbox`, the label is associated with the input via `aria-labelledby`:
 
 ```typescript
 <input
@@ -470,7 +470,7 @@ References one or more elements that describe the current element.
 <div id="email-error" role="alert">Invalid email format.</div>
 ```
 
-**wc-2026 usage**: All form components use `aria-describedby` to link to help text and error messages:
+**HELiX usage**: All form components use `aria-describedby` to link to help text and error messages:
 
 ```typescript
 const describedBy =
@@ -498,7 +498,7 @@ Indicates that user input is required before form submission.
 <input type="text" required aria-required="true" />
 ```
 
-**wc-2026 usage**: All form components augment the native `required` attribute with `aria-required`:
+**HELiX usage**: All form components augment the native `required` attribute with `aria-required`:
 
 ```typescript
 <input
@@ -528,7 +528,7 @@ Removes an element from the accessibility tree.
 </button>
 ```
 
-**wc-2026 usage**: In `hx-checkbox`, the visual checkmark SVG is marked as `aria-hidden`:
+**HELiX usage**: In `hx-checkbox`, the visual checkmark SVG is marked as `aria-hidden`:
 
 ```typescript
 <svg
@@ -566,7 +566,7 @@ Indicates that an element will be updated and describes the urgency of updates.
 <div aria-live="polite" role="status">Loading...</div>
 ```
 
-**wc-2026 usage**: In `hx-alert`:
+**HELiX usage**: In `hx-alert`:
 
 ```typescript
 private get _ariaLive(): string {
@@ -612,7 +612,7 @@ Indicates whether assistive technologies should present all or part of the chang
 
 When `aria-atomic="true"`, screen readers announce "Items: 5" instead of just "5" when the count changes.
 
-**wc-2026 usage**: Not explicitly used. The default behavior (atomic by role) is sufficient for our components.
+**HELiX usage**: Not explicitly used. The default behavior (atomic by role) is sufficient for our components.
 
 ## State Management
 
@@ -738,7 +738,7 @@ Use `role="status"` (implicit `aria-live="polite"`) for non-critical status upda
 <div role="status">Draft saved at 3:42 PM.</div>
 ```
 
-**wc-2026 usage**: `hx-alert` dynamically selects the appropriate role:
+**HELiX usage**: `hx-alert` dynamically selects the appropriate role:
 
 ```typescript
 private get _isAssertive(): boolean {
@@ -782,7 +782,7 @@ When loading completes, update the region:
 <div role="status" aria-live="polite" aria-busy="false">Loaded 42 results.</div>
 ```
 
-**wc-2026 usage**: Not yet implemented. Planned for `hx-spinner` and async data components.
+**HELiX usage**: Not yet implemented. Planned for `hx-spinner` and async data components.
 
 ## Descriptions
 
@@ -803,7 +803,7 @@ When loading completes, update the region:
 </div>
 ```
 
-**wc-2026 usage**: All form components support help text:
+**HELiX usage**: All form components support help text:
 
 ```typescript
 @property({ type: String, attribute: 'help-text' })
@@ -891,7 +891,7 @@ In shadow DOM, the native `<label for="...">` pattern doesn't work across shadow
 <input aria-labelledby="label" />
 ```
 
-**wc-2026 usage**: All form components use this pattern:
+**HELiX usage**: All form components use this pattern:
 
 ```typescript
 <label id=${this._labelId}>
@@ -957,7 +957,7 @@ For groups of form controls, use `<fieldset>` and `<legend>`:
 </fieldset>
 ```
 
-**wc-2026 usage**: `hx-radio-group` uses this pattern:
+**HELiX usage**: `hx-radio-group` uses this pattern:
 
 ```typescript
 <fieldset part="fieldset">
@@ -1038,7 +1038,7 @@ static shadowRootOptions = {
 
 **When to use**: When the host element should receive focus but needs to forward it to an internal element (e.g., a wrapper around an `<input>`).
 
-**wc-2026 usage**: Not currently used, but may be adopted for complex composite widgets.
+**HELiX usage**: Not currently used, but may be adopted for complex composite widgets.
 
 ## Common Patterns
 
@@ -1120,7 +1120,7 @@ static shadowRootOptions = {
 
 ### Form Field Pattern
 
-All form components in wc-2026 follow this pattern:
+All form components in HELiX follow this pattern:
 
 ```typescript
 <div class="field">
@@ -1294,4 +1294,4 @@ ARIA is a powerful tool for building accessible web components, but it requires 
 4. **Test with real tools** — Screen readers reveal issues automated tests miss
 5. **Follow established patterns** — The W3C APG provides battle-tested solutions
 
-By following the patterns demonstrated in wc-2026 components and referring to the W3C ARIA Authoring Practices Guide, you can build accessible components that work seamlessly with assistive technology.
+By following the patterns demonstrated in HELiX components and referring to the W3C ARIA Authoring Practices Guide, you can build accessible components that work seamlessly with assistive technology.

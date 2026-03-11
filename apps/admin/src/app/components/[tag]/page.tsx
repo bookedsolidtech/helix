@@ -1,5 +1,5 @@
 import { notFound } from 'next/navigation';
-import { getComponentData, getAllComponentNames } from '@/lib/cem-parser';
+import { getComponentData } from '@/lib/cem-parser';
 import { validateComponent } from '@/lib/cem-validator';
 import { analyzeJsDoc, detectDrift } from '@/lib/jsdoc-analyzer';
 import { scoreComponent } from '@/lib/health-scorer';
@@ -33,8 +33,10 @@ import { McpA11yComparison } from '@/components/health/McpA11yComparison';
 import { getComponentBreadcrumbs } from '@/lib/breadcrumb-utils';
 import { cn } from '@/lib/utils';
 
+export const dynamic = 'force-dynamic';
+
 export function generateStaticParams() {
-  return getAllComponentNames().map((tag) => ({ tag }));
+  return [];
 }
 
 export default async function ComponentDetailPage({
@@ -46,7 +48,8 @@ export default async function ComponentDetailPage({
   const data = getComponentData(tag);
   if (!data) notFound();
 
-  const health = scoreComponent(tag);
+  const healthRaw = scoreComponent(tag);
+  const health = healthRaw && Array.isArray(healthRaw.dimensions) ? healthRaw : null;
   const validation = validateComponent(tag);
   const jsDoc = analyzeJsDoc(tag);
   const drift = detectDrift(tag);

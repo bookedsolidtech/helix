@@ -1,5 +1,5 @@
 {
-  "name": "@helix/mcp-health-scorer",
+  "name": "@helixui/mcp-health-scorer",
   "version": "0.1.0",
   "private": true,
   "type": "module",
@@ -13,7 +13,7 @@
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
-    "@helix/mcp-shared": "file:../shared",
+    "@helixui/mcp-shared": "file:../shared",
     "@modelcontextprotocol/sdk": "^1.26.0",
     "zod": "^3.22.0"
   },

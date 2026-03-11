@@ -26,7 +26,7 @@ This guide covers everything you need to build WCAG 2.1 AA compliant forms with 
 9. [Keyboard Navigation in Forms](#keyboard-navigation-in-forms)
 10. [Screen Reader Testing](#screen-reader-testing)
 11. [Healthcare Compliance (WCAG 2.1 AA)](#healthcare-compliance-wcag-21-aa)
-12. [wc-2026 Form Accessibility Patterns](#wc-2026-form-accessibility-patterns)
+12. [HELiX Form Accessibility Patterns](#HELiX-form-accessibility-patterns)
 13. [Real-World Examples](#real-world-examples)
 14. [Common Accessibility Failures](#common-accessibility-failures)
 15. [Testing Checklist](#testing-checklist)
@@ -128,7 +128,7 @@ Most form components use native HTML elements (no role needed), but custom contr
 | Switch (toggle) | `<input type="checkbox">` + styles | `role="switch"`                       |
 | Slider          | `<input type="range">`             | `role="slider"`                       |
 
-**wc-2026 approach:** All components wrap native HTML elements (no custom roles needed):
+**HELiX approach:** All components wrap native HTML elements (no custom roles needed):
 
 ```typescript
 // hx-text-input: wraps <input> (native semantics preserved)
@@ -227,7 +227,7 @@ Use **both** for maximum compatibility:
 - **NVDA (Windows):** "Username, edit, required, blank"
 - **JAWS (Windows):** "Username, edit, required"
 
-**wc-2026 pattern:**
+**HELiX pattern:**
 
 ```typescript
 // hx-text-input
@@ -268,7 +268,7 @@ Use `aria-invalid="true"` to indicate validation errors:
 - **On submit** — After form submission attempt
 - **On input** — For real-time validation (use sparingly, can be disruptive)
 
-**wc-2026 pattern:**
+**HELiX pattern:**
 
 ```typescript
 // hx-text-input
@@ -305,7 +305,7 @@ render() {
 - **Screen reader behavior** — Some screen readers announce differently ("Error: ..." vs. "Described by...")
 - **Browser support** — Newer (Chrome 90+, Firefox 93+, Safari 16+)
 
-**wc-2026 approach:** Use `aria-describedby` for broader compatibility (works in older browsers).
+**HELiX approach:** Use `aria-describedby` for broader compatibility (works in older browsers).
 
 ---
 
@@ -388,7 +388,7 @@ When the label and input are in the **same shadow root**:
 - A visible label exists (use `aria-labelledby` or native `<label>` instead)
 - Label needs to be translatable (use native labels)
 
-### Pattern 5: Slotted Labels (wc-2026 Pattern)
+### Pattern 5: Slotted Labels (HELiX Pattern)
 
 Web components with slotted labels inside the shadow DOM:
 
@@ -409,7 +409,7 @@ Web components with slotted labels inside the shadow DOM:
 
 **Solution:** Use `aria-label` with the slotted text content, or keep label and input in the same shadow root.
 
-**wc-2026 approach:**
+**HELiX approach:**
 
 ```typescript
 // hx-text-input: Label and input in same shadow root
@@ -486,7 +486,7 @@ private _handleLabelSlotChange(e: Event): void {
 - Visual `*` is redundant for screen reader users
 - Announcing "asterisk" adds noise
 
-**wc-2026 pattern:**
+**HELiX pattern:**
 
 ```typescript
 // hx-text-input
@@ -707,9 +707,9 @@ private _handleSubmit(e: Event): void {
 - Data loss warnings
 - Security alerts
 
-### wc-2026 Error Announcement Pattern
+### HELiX Error Announcement Pattern
 
-All wc-2026 form components use this pattern:
+All HELiX form components use this pattern:
 
 ```typescript
 // hx-text-input
@@ -837,7 +837,7 @@ For forms where most fields are required, mark optional fields instead:
 
 - Less common convention
 
-### wc-2026 Pattern (Asterisk)
+### HELiX Pattern (Asterisk)
 
 ```typescript
 // hx-text-input
@@ -960,7 +960,7 @@ private _validateContactMethod(): void {
 - Focuses user on the problem (error) rather than guidance (help text)
 - Error messages typically include corrective guidance
 
-**wc-2026 pattern:**
+**HELiX pattern:**
 
 ```typescript
 // hx-text-input
@@ -1006,7 +1006,7 @@ render() {
 - `aria-atomic="true"` announces full message ("42 characters remaining") not just the number
 - Update `char-remaining` on `input` event
 
-**wc-2026 textarea pattern:**
+**HELiX textarea pattern:**
 
 ```typescript
 // hx-textarea
@@ -1047,7 +1047,7 @@ Form accessibility is non-negotiable in healthcare applications. Every form cont
 7. **Focus indicator** — Visible focus ring on all interactive elements
 8. **Screen reader testing** — Manually tested with NVDA and VoiceOver
 
-**wc-2026 guarantees:** All form components meet WCAG 2.1 AA out of the box. No configuration needed. Zero accessibility regressions.
+**HELiX guarantees:** All form components meet WCAG 2.1 AA out of the box. No configuration needed. Zero accessibility regressions.
 
 ---
 

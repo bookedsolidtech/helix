@@ -343,7 +343,7 @@ export const SemanticAs: Story = {
  * Drupal Twig integration reference.
  *
  * Load the component via CDN in your Drupal theme's page.html.twig or a library definition:
- *   <script type="module" src="https://cdn.example.com/@helix/library/hx-text.js"></script>
+ *   <script type="module" src="https://cdn.example.com/@helixui/library/hx-text.js"></script>
  *
  * Basic usage in Twig:
  *   <hx-text variant="body" color="default">{{ patient.name }}</hx-text>

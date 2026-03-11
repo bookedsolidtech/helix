@@ -3,9 +3,17 @@
   "changelog": "@changesets/cli/changelog",
   "commit": false,
   "fixed": [],
-  "linked": [["@helix/library", "@helix/tokens"]],
-  "access": "restricted",
+  "linked": [["@helixui/library", "@helixui/tokens"]],
+  "access": "public",
   "baseBranch": "main",
   "updateInternalDependencies": "patch",
-  "ignore": []
+  "ignore": [
+    "@helixui/mcp-shared",
+    "@helixui/mcp-health-scorer",
+    "@helixui/mcp-cem-analyzer",
+    "@helixui/mcp-typescript-diagnostics",
+    "@helixui/admin",
+    "@helixui/storybook",
+    "docs"
+  ]
 }

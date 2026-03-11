@@ -1,14 +1,486 @@
 ---
 title: 'hx-status-indicator'
-description: 'Colored dot or badge conveying operational status'
+description: 'Colored dot badge conveying operational status for healthcare dashboards. Supports five status states, three sizes, animated pulse ring, and full WCAG 2.1 AA accessibility.'
 ---
 
 import ComponentLoader from '../../../components/ComponentLoader.astro';
+import ComponentDemo from '../../../components/ComponentDemo.astro';
 import ComponentDoc from '../../../components/ComponentDoc.astro';
 
 <ComponentLoader />
 
 <ComponentDoc tagName="hx-status-indicator" section="summary" />
+
+## Overview
+
+`hx-status-indicator` is a colored dot badge that communicates operational status in enterprise healthcare dashboards. It supports five semantic status values — `online`, `offline`, `away`, `busy`, and `unknown` — as well as three sizes and an optional animated pulse ring.
+
+The component uses `role="img"` with an auto-generated `aria-label` (e.g. `"Status: Online"`) so that status is communicated to screen reader users without additional markup. When the same status information is already conveyed by adjacent visible text, set `aria-hidden="true"` on the host element to suppress duplicate announcements.
+
+**Use `hx-status-indicator` when:** you need a compact, at-a-glance signal of an entity's or system's operational state — for example, provider availability, EHR system health, or a service's uptime in a monitoring dashboard.
+
+**Use `hx-badge` instead when:** you need a text label with optional count or icon, where the primary output is readable text rather than a color-coded dot.
+
+## Live Demo
+
+### Default
+
+<ComponentDemo title="Default Status Indicator">
+  <hx-status-indicator status="online"></hx-status-indicator>
+</ComponentDemo>
+
+### All Status Values
+
+<ComponentDemo title="All Status Values">
+  <div style="display: flex; gap: 1.5rem; align-items: center; flex-wrap: wrap;">
+    <div style="display: flex; flex-direction: column; align-items: center; gap: 0.5rem;">
+      <hx-status-indicator status="online" size="md"></hx-status-indicator>
+      <span style="font-size: 0.75rem; color: #6b7280;">online</span>
+    </div>
+    <div style="display: flex; flex-direction: column; align-items: center; gap: 0.5rem;">
+      <hx-status-indicator status="offline" size="md"></hx-status-indicator>
+      <span style="font-size: 0.75rem; color: #6b7280;">offline</span>
+    </div>
+    <div style="display: flex; flex-direction: column; align-items: center; gap: 0.5rem;">
+      <hx-status-indicator status="away" size="md"></hx-status-indicator>
+      <span style="font-size: 0.75rem; color: #6b7280;">away</span>
+    </div>
+    <div style="display: flex; flex-direction: column; align-items: center; gap: 0.5rem;">
+      <hx-status-indicator status="busy" size="md"></hx-status-indicator>
+      <span style="font-size: 0.75rem; color: #6b7280;">busy</span>
+    </div>
+    <div style="display: flex; flex-direction: column; align-items: center; gap: 0.5rem;">
+      <hx-status-indicator status="unknown" size="md"></hx-status-indicator>
+      <span style="font-size: 0.75rem; color: #6b7280;">unknown</span>
+    </div>
+  </div>
+</ComponentDemo>
+
+### Size Variants
+
+<ComponentDemo title="Size Variants">
+  <div style="display: flex; gap: 1.5rem; align-items: center;">
+    <div style="display: flex; flex-direction: column; align-items: center; gap: 0.5rem;">
+      <hx-status-indicator status="online" size="sm"></hx-status-indicator>
+      <span style="font-size: 0.75rem; color: #6b7280;">sm</span>
+    </div>
+    <div style="display: flex; flex-direction: column; align-items: center; gap: 0.5rem;">
+      <hx-status-indicator status="online" size="md"></hx-status-indicator>
+      <span style="font-size: 0.75rem; color: #6b7280;">md (default)</span>
+    </div>
+    <div style="display: flex; flex-direction: column; align-items: center; gap: 0.5rem;">
+      <hx-status-indicator status="online" size="lg"></hx-status-indicator>
+      <span style="font-size: 0.75rem; color: #6b7280;">lg</span>
+    </div>
+  </div>
+</ComponentDemo>
+
+### Pulse Animation
+
+<ComponentDemo title="Pulse Animation">
+  <div style="display: flex; gap: 1.5rem; align-items: center; padding: 1rem;">
+    <hx-status-indicator status="online" size="md" pulse></hx-status-indicator>
+    <hx-status-indicator status="busy" size="md" pulse></hx-status-indicator>
+    <hx-status-indicator status="away" size="md" pulse></hx-status-indicator>
+  </div>
+</ComponentDemo>
+
+### Decorative (with visible status text)
+
+<ComponentDemo title="Decorative Usage">
+  <div style="display: flex; align-items: center; gap: 0.5rem;">
+    <hx-status-indicator status="online" size="sm" aria-hidden="true"></hx-status-indicator>
+    <span>Provider is available</span>
+  </div>
+</ComponentDemo>
+
+### Healthcare System Health Dashboard
+
+<ComponentDemo title="System Health Dashboard">
+  <div style="display: flex; flex-direction: column; gap: 0.75rem; padding: 1rem; border: 1px solid #e5e7eb; border-radius: 0.5rem; max-width: 320px;">
+    <div style="display: flex; align-items: center; gap: 0.5rem;">
+      <hx-status-indicator status="online" size="sm" pulse></hx-status-indicator>
+      <span style="font-size: 0.875rem;">EHR System — Online</span>
+    </div>
+    <div style="display: flex; align-items: center; gap: 0.5rem;">
+      <hx-status-indicator status="away" size="sm"></hx-status-indicator>
+      <span style="font-size: 0.875rem;">Lab Interface — Degraded</span>
+    </div>
+    <div style="display: flex; align-items: center; gap: 0.5rem;">
+      <hx-status-indicator status="offline" size="sm"></hx-status-indicator>
+      <span style="font-size: 0.875rem;">Imaging System — Offline</span>
+    </div>
+    <div style="display: flex; align-items: center; gap: 0.5rem;">
+      <hx-status-indicator status="busy" size="sm" pulse></hx-status-indicator>
+      <span style="font-size: 0.875rem;">Claims Processing — Busy</span>
+    </div>
+  </div>
+</ComponentDemo>
+
+## Installation
+
+```bash
+# Full library
+npm install @helix/library
+
+# Or import only this component (tree-shaking friendly)
+import '@helix/library/components/hx-status-indicator';
+```
+
+## Basic Usage
+
+Minimal HTML snippet — no build tool required:
+
+```html
+<!-- Default: unknown status -->
+<hx-status-indicator></hx-status-indicator>
+
+<!-- Specific status values -->
+<hx-status-indicator status="online"></hx-status-indicator>
+<hx-status-indicator status="offline"></hx-status-indicator>
+<hx-status-indicator status="away"></hx-status-indicator>
+<hx-status-indicator status="busy"></hx-status-indicator>
+
+<!-- Size variants -->
+<hx-status-indicator status="online" size="sm"></hx-status-indicator>
+<hx-status-indicator status="online" size="lg"></hx-status-indicator>
+
+<!-- Pulse animation (suppressed by prefers-reduced-motion) -->
+<hx-status-indicator status="online" pulse></hx-status-indicator>
+
+<!-- Custom accessible label -->
+<hx-status-indicator status="online" label="EHR system is online"></hx-status-indicator>
+
+<!-- Decorative: suppress AT announcement when visible text conveys the same status -->
+<div style="display: flex; align-items: center; gap: 0.5rem;">
+  <hx-status-indicator status="online" size="sm" aria-hidden="true"></hx-status-indicator>
+  <span>Provider is available</span>
+</div>
+```
+
+Set properties via JavaScript for dynamic control:
+
+```javascript
+const indicator = document.querySelector('hx-status-indicator');
+
+// Update status at runtime
+indicator.status = 'busy';
+
+// Change size
+indicator.size = 'lg';
+
+// Enable pulse animation
+indicator.pulse = true;
+
+// Override the accessible label
+indicator.label = 'Payment processor is busy';
+```
+
+## Properties
+
+| Property | Attribute | Type                                                     | Default     | Description                                                                                                                                                                                            |
+| -------- | --------- | -------------------------------------------------------- | ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `status` | `status`  | `'online' \| 'offline' \| 'away' \| 'busy' \| 'unknown'` | `'unknown'` | The operational status to display. Controls dot color. Reflects to attribute.                                                                                                                          |
+| `size`   | `size`    | `'sm' \| 'md' \| 'lg'`                                   | `'md'`      | Size of the indicator dot. Maps to design tokens. Reflects to attribute.                                                                                                                               |
+| `pulse`  | `pulse`   | `boolean`                                                | `false`     | When true, shows an animated pulse ring around the dot. Suppressed automatically when `prefers-reduced-motion: reduce` is active. In Twig, render as a bare attribute: `pulse`. Reflects to attribute. |
+| `label`  | `label`   | `string`                                                 | `''`        | Custom accessible label. When empty, defaults to `"Status: {Status}"` (e.g. `"Status: Online"`). Set `aria-hidden="true"` on the host when status is conveyed by adjacent visible text instead.        |
+
+## Events
+
+`hx-status-indicator` is a display-only component. It does not dispatch any custom events.
+
+| Event    | Detail Type | Description       |
+| -------- | ----------- | ----------------- |
+| _(none)_ | —           | No custom events. |
+
+## CSS Custom Properties
+
+| Property                               | Default                       | Description                                       |
+| -------------------------------------- | ----------------------------- | ------------------------------------------------- |
+| `--hx-status-indicator-color-online`   | `var(--hx-color-success-500)` | Dot color for the `online` status.                |
+| `--hx-status-indicator-color-offline`  | `var(--hx-color-neutral-400)` | Dot color for the `offline` status.               |
+| `--hx-status-indicator-color-away`     | `var(--hx-color-warning-500)` | Dot color for the `away` status.                  |
+| `--hx-status-indicator-color-busy`     | `var(--hx-color-danger-500)`  | Dot color for the `busy` status.                  |
+| `--hx-status-indicator-color-unknown`  | `var(--hx-color-neutral-300)` | Dot color for the `unknown` status.               |
+| `--hx-status-indicator-size-sm`        | `var(--hx-size-2)`            | Dot diameter for the `sm` size variant.           |
+| `--hx-status-indicator-size-md`        | `var(--hx-size-3)`            | Dot diameter for the `md` size variant.           |
+| `--hx-status-indicator-size-lg`        | `var(--hx-size-4)`            | Dot diameter for the `lg` size variant.           |
+| `--hx-status-indicator-pulse-duration` | `1.5s`                        | Duration of the pulse ring animation cycle.       |
+| `--hx-status-indicator-pulse-scale`    | `2.5`                         | Maximum scale of the pulse ring at animation end. |
+| `--hx-status-indicator-pulse-color`    | _(inherits dot color)_        | Pulse ring color, independent from the dot color. |
+
+Override at the semantic token level to theme all instances, or at the component level to style a single instance:
+
+```css
+/* Theme all online indicators to a custom brand green */
+:root {
+  --hx-status-indicator-color-online: #00875a;
+}
+
+/* Slower pulse for a less urgent feel */
+hx-status-indicator#ehr-status {
+  --hx-status-indicator-pulse-duration: 2.5s;
+  --hx-status-indicator-pulse-scale: 2;
+}
+
+/* Custom pulse ring color independent from dot */
+hx-status-indicator.alert-ring {
+  --hx-status-indicator-pulse-color: #fbbf24;
+}
+```
+
+## CSS Parts
+
+| Part         | Description                                     |
+| ------------ | ----------------------------------------------- |
+| `base`       | The dot element (`<div>` rendered as a circle). |
+| `pulse-ring` | The animated pulse ring element (`<div>`).      |
+
+Use CSS parts to style internals that CSS custom properties do not expose:
+
+```css
+/* Add a border to the dot */
+hx-status-indicator::part(base) {
+  border: 2px solid white;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.1);
+}
+
+/* Style the pulse ring independently */
+hx-status-indicator::part(pulse-ring) {
+  opacity: 0.3;
+}
+```
+
+## Slots
+
+`hx-status-indicator` is a purely visual component and exposes no slots. All content is rendered internally via shadow DOM.
+
+| Slot     | Description |
+| -------- | ----------- |
+| _(none)_ | No slots.   |
+
+## Accessibility
+
+`hx-status-indicator` is built for WCAG 2.1 AA compliance in healthcare contexts where accurate status communication to assistive technology users is mandatory.
+
+| Topic           | Details                                                                                                                                                                                                                 |
+| --------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| ARIA role       | `role="img"` on the inner wrapper communicates that the dot is a meaningful image conveying status information, not decorative content.                                                                                 |
+| `aria-label`    | Auto-generated from the `status` property as `"Status: {Status}"` (e.g. `"Status: Online"`). Can be overridden with the `label` property for context-specific announcements (e.g. `"EHR system is online"`).            |
+| Decorative mode | When the same status information is already conveyed by adjacent visible text, set `aria-hidden="true"` on the `<hx-status-indicator>` host element. This suppresses the duplicate announcement to screen reader users. |
+| Focus           | `hx-status-indicator` is not interactive and does not receive keyboard focus.                                                                                                                                           |
+| Reduced motion  | The pulse ring animation is suppressed and hidden when `prefers-reduced-motion: reduce` is active. The static dot remains fully visible to communicate status without motion.                                           |
+| Color alone     | Status is not conveyed by color alone — the `aria-label` (or adjacent visible text) provides the semantic meaning. This satisfies WCAG 1.4.1 (Use of Color).                                                            |
+| WCAG            | Meets WCAG 2.1 AA. SC 1.4.1 (Use of Color), SC 4.1.2 (Name, Role, Value), SC 2.3.3 (Animation from Interactions) satisfied. Zero axe-core violations across all status and size combinations.                           |
+
+### Screen Reader Label Best Practices
+
+Always ensure status is communicated semantically — either via the component's auto-generated label or via visible adjacent text:
+
+```html
+<!-- Preferred: component announces its own status -->
+<hx-status-indicator status="online"></hx-status-indicator>
+<!-- Announces: "Status: Online" -->
+
+<!-- Preferred: context-specific label for richer announcements -->
+<hx-status-indicator status="online" label="EHR system is online"></hx-status-indicator>
+
+<!-- Correct: decorative dot when visible text already describes status -->
+<div style="display: flex; align-items: center; gap: 0.5rem;">
+  <hx-status-indicator status="online" size="sm" aria-hidden="true"></hx-status-indicator>
+  <span>Provider is available</span>
+</div>
+
+<!-- Incorrect: do NOT use empty label — the default auto-label is sufficient -->
+<!-- The default "Status: Unknown" is always generated when label is empty -->
+```
+
+## Drupal Integration
+
+Use the component in a Twig template after registering the library.
+
+```twig
+{# my-module/templates/my-template.html.twig #}
+
+{# Standalone — announces status to screen readers #}
+<hx-status-indicator
+  status="{{ status|default('unknown') }}"
+  size="{{ size|default('md') }}"
+></hx-status-indicator>
+
+{# With pulse — use bare attribute (value is ignored) #}
+<hx-status-indicator
+  status="{{ status|default('online') }}"
+  size="{{ size|default('sm') }}"
+  {% if pulse %}pulse{% endif %}
+></hx-status-indicator>
+
+{# Decorative — use when adjacent text conveys the status #}
+<div style="display: flex; align-items: center; gap: 0.5rem;">
+  <hx-status-indicator
+    status="{{ status|default('online') }}"
+    size="sm"
+    aria-hidden="true"
+  ></hx-status-indicator>
+  <span>{{ status_label }}</span>
+</div>
+```
+
+Load the library in your module's `.libraries.yml`:
+
+```yaml
+helix-components:
+  js:
+    /libraries/helix/helix.min.js: { minified: true }
+```
+
+Use `once()` to update status indicator states in response to Drupal AJAX events:
+
+```javascript
+Drupal.behaviors.helixStatusIndicator = {
+  attach(context) {
+    // once() is a Drupal core utility — prevents duplicate binding during AJAX attach cycles
+    once('helixStatusIndicator', '[data-hx-status-target]', context).forEach((indicator) => {
+      const sourceId = indicator.dataset.hxStatusTarget;
+      const source = document.getElementById(sourceId);
+
+      if (source) {
+        // Sync status from a data attribute set by Drupal server-side rendering
+        indicator.status = source.dataset.currentStatus ?? 'unknown';
+      }
+    });
+  },
+};
+```
+
+## Standalone HTML Example
+
+Copy-paste this into a `.html` file and open it in a browser — no build tool needed:
+
+```html
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>hx-status-indicator example</title>
+    <!-- @helix/library is a private package — install via npm workspace, not CDN -->
+    <!-- In your project: import '@helix/library'; in your bundler entry point -->
+  </head>
+  <body
+    style="font-family: sans-serif; padding: 2rem; display: flex; flex-direction: column; gap: 2rem;"
+  >
+    <!-- 1. All status values with labels -->
+    <section>
+      <h2 style="margin: 0 0 1rem;">Status Values</h2>
+      <div style="display: flex; gap: 1.5rem; align-items: center; flex-wrap: wrap;">
+        <div style="display: flex; flex-direction: column; align-items: center; gap: 0.5rem;">
+          <hx-status-indicator status="online" size="md"></hx-status-indicator>
+          <small>online</small>
+        </div>
+        <div style="display: flex; flex-direction: column; align-items: center; gap: 0.5rem;">
+          <hx-status-indicator status="offline" size="md"></hx-status-indicator>
+          <small>offline</small>
+        </div>
+        <div style="display: flex; flex-direction: column; align-items: center; gap: 0.5rem;">
+          <hx-status-indicator status="away" size="md"></hx-status-indicator>
+          <small>away</small>
+        </div>
+        <div style="display: flex; flex-direction: column; align-items: center; gap: 0.5rem;">
+          <hx-status-indicator status="busy" size="md"></hx-status-indicator>
+          <small>busy</small>
+        </div>
+        <div style="display: flex; flex-direction: column; align-items: center; gap: 0.5rem;">
+          <hx-status-indicator status="unknown" size="md"></hx-status-indicator>
+          <small>unknown</small>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2. Healthcare system health dashboard -->
+    <section>
+      <h2 style="margin: 0 0 1rem;">System Health Dashboard</h2>
+      <div
+        style="display: flex; flex-direction: column; gap: 0.75rem; padding: 1rem; border: 1px solid #e5e7eb; border-radius: 0.5rem; max-width: 320px;"
+      >
+        <div style="display: flex; align-items: center; gap: 0.5rem;">
+          <hx-status-indicator
+            id="ehr-status"
+            status="online"
+            size="sm"
+            pulse
+          ></hx-status-indicator>
+          <span style="font-size: 0.875rem;">EHR System — Online</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 0.5rem;">
+          <hx-status-indicator status="away" size="sm"></hx-status-indicator>
+          <span style="font-size: 0.875rem;">Lab Interface — Degraded</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 0.5rem;">
+          <hx-status-indicator status="offline" size="sm"></hx-status-indicator>
+          <span style="font-size: 0.875rem;">Imaging System — Offline</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 0.5rem;">
+          <hx-status-indicator status="busy" size="sm" pulse></hx-status-indicator>
+          <span style="font-size: 0.875rem;">Claims Processing — Busy</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. Dynamic status update -->
+    <section>
+      <h2 style="margin: 0 0 1rem;">Dynamic Status Update</h2>
+      <div style="display: flex; align-items: center; gap: 1rem;">
+        <hx-status-indicator
+          id="dynamic-indicator"
+          status="unknown"
+          size="lg"
+        ></hx-status-indicator>
+        <span id="dynamic-label" style="font-size: 0.875rem; color: #6b7280;"
+          >No status selected</span
+        >
+      </div>
+      <div style="display: flex; gap: 0.5rem; margin-top: 1rem; flex-wrap: wrap;">
+        <button onclick="setStatus('online')" style="padding: 0.375rem 0.75rem; cursor: pointer;">
+          Online
+        </button>
+        <button onclick="setStatus('offline')" style="padding: 0.375rem 0.75rem; cursor: pointer;">
+          Offline
+        </button>
+        <button onclick="setStatus('away')" style="padding: 0.375rem 0.75rem; cursor: pointer;">
+          Away
+        </button>
+        <button onclick="setStatus('busy')" style="padding: 0.375rem 0.75rem; cursor: pointer;">
+          Busy
+        </button>
+        <button onclick="setStatus('unknown')" style="padding: 0.375rem 0.75rem; cursor: pointer;">
+          Unknown
+        </button>
+      </div>
+    </section>
+
+    <script>
+      const indicator = document.getElementById('dynamic-indicator');
+      const label = document.getElementById('dynamic-label');
+
+      function setStatus(status) {
+        indicator.status = status;
+        label.textContent = `Current status: ${status}`;
+      }
+    </script>
+  </body>
+</html>
+```
+
+## Related Components
+
+| Component         | When to Use                                                                              |
+| ----------------- | ---------------------------------------------------------------------------------------- |
+| `hx-badge`        | When status needs a text label, count, or icon — richer than a dot indicator.            |
+| `hx-spinner`      | When communicating an active loading or in-progress state of unknown duration.           |
+| `hx-progress-bar` | When communicating a known percentage-complete progress value.                           |
+| `hx-alert`        | When status requires a persistent, prominent callout with a message body.                |
+| `hx-meter`        | When displaying a scalar measurement within a known range (e.g., capacity, utilization). |
 
 ## API Reference
 

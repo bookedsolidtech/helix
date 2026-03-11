@@ -1,13 +1,13 @@
 ---
 title: Design Token Architecture
-description: Complete guide to the three-tier design token system powering wc-2026 components, including primitive tokens, semantic tokens, component tokens, token naming conventions, fallback chains, and theming strategies.
+description: Complete guide to the three-tier design token system powering HELiX components, including primitive tokens, semantic tokens, component tokens, token naming conventions, fallback chains, and theming strategies.
 sidebar:
   order: 3
 ---
 
-Design tokens are the **single source of truth** for all visual design decisions in wc-2026. They form a cascading three-tier system that enables global theming, component-level customization, and multi-brand deployments without modifying component internals.
+Design tokens are the **single source of truth** for all visual design decisions in HELiX. They form a cascading three-tier system that enables global theming, component-level customization, and multi-brand deployments without modifying component internals.
 
-This guide covers the complete token architecture: primitive tokens, semantic tokens, component tokens, naming conventions, fallback chains, token categories (color, spacing, typography, timing), real-world examples from wc-2026, and theming strategies for consumers.
+This guide covers the complete token architecture: primitive tokens, semantic tokens, component tokens, naming conventions, fallback chains, token categories (color, spacing, typography, timing), real-world examples from HELiX, and theming strategies for consumers.
 
 ---
 
@@ -94,7 +94,7 @@ Even though the shadow boundary blocks external selectors from reaching into the
 
 ## Three-Tier Token Architecture
 
-wc-2026 uses a **three-tier cascade** that separates raw values (primitives), purpose-based values (semantic), and component-specific overrides (component tokens).
+HELiX uses a **three-tier cascade** that separates raw values (primitives), purpose-based values (semantic), and component-specific overrides (component tokens).
 
 ### Architecture Overview
 
@@ -608,7 +608,7 @@ export const wcButtonStyles = css`
 
 ## Token Naming Conventions
 
-All wc-2026 tokens follow a strict naming pattern for consistency and discoverability.
+All HELiX tokens follow a strict naming pattern for consistency and discoverability.
 
 ### Naming Structure
 
@@ -711,7 +711,7 @@ All wc-2026 tokens follow a strict naming pattern for consistency and discoverab
 
 ## Fallback Chains
 
-Every CSS custom property in wc-2026 uses a **two-level fallback chain** (or three-level for component tokens).
+Every CSS custom property in HELiX uses a **two-level fallback chain** (or three-level for component tokens).
 
 ### The Two-Level Pattern
 
@@ -1227,7 +1227,7 @@ Design tokens are versioned independently from components using semantic version
 
 ## Summary
 
-Design tokens are the foundation of wc-2026's theming architecture. They provide:
+Design tokens are the foundation of HELiX's theming architecture. They provide:
 
 - **Consistency** — All components use the same visual language
 - **Flexibility** — Global theming and component-level customization

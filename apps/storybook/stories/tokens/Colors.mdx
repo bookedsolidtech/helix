@@ -1,14 +1,14 @@
 {/* Colors.mdx — HELIX Design Token Colors Documentation */}
 
 import { Meta } from '@storybook/addon-docs/blocks';
-import { tokenEntries, tokenMap, darkTokenEntries } from '@helix/tokens';
+import { tokenEntries, tokenMap, darkTokenEntries } from '@helixui/tokens';
 import {
   getColorSubgroups,
   isHexColor,
   getContrastColor,
   resolveTokenRef,
   getTokenStats,
-} from '@helix/tokens/utils';
+} from '@helixui/tokens/utils';
 
 <Meta
   title="Design Tokens/Colors"
@@ -463,8 +463,8 @@ export function copyToClipboard(text) {
 ## All Color Palettes
 
 <div className="hx-colors-section-desc">
-  Every color ramp in the design system, dynamically rendered from the @helix/tokens package. Click
-  any token name to copy its CSS custom property to the clipboard.
+  Every color ramp in the design system, dynamically rendered from the @helixui/tokens package.
+  Click any token name to copy its CSS custom property to the clipboard.
 </div>
 
 {allSubgroups.filter(sg => !['text', 'surface', 'border', 'focus-ring', 'selection'].includes(sg.label.toLowerCase())).map(subgroup => {

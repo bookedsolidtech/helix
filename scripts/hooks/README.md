@@ -518,7 +518,7 @@ setCachedResult('no-any-types', stagedFiles, result);
 Run from repo root:
 
 ```bash
-cd /Volumes/Development/wc-2026
+cd <project-root>
 tsx scripts/hooks/example-no-any-types.ts
 ```
 
