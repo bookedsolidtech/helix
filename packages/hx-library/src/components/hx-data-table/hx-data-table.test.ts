@@ -731,4 +731,90 @@ describe('hx-data-table', () => {
       expect(focused).toBe(ths[1]);
     });
   });
+
+  // ─── Non-sortable Column ───
+
+  describe('Non-sortable Column', () => {
+    it('does not render a sort button for non-sortable columns', async () => {
+      const el = await fixture<HelixDataTable>('<hx-data-table></hx-data-table>');
+      el.columns = COLUMNS;
+      el.rows = ROWS;
+      await el.updateComplete;
+
+      const ths = el.shadowRoot!.querySelectorAll('th[part~="th"]');
+      // First column (Name) is sortable — has a button
+      expect(ths[0].querySelector('.sort-btn')).toBeTruthy();
+      // Second column (Status) is non-sortable — no button
+      expect(ths[1].querySelector('.sort-btn')).toBeNull();
+    });
+  });
+
+  // ─── Slots ───
+
+  describe('Slots', () => {
+    it('renders toolbar slot content', async () => {
+      const el = await fixture<HelixDataTable>(
+        '<hx-data-table><div slot="toolbar" id="tb">Toolbar</div></hx-data-table>',
+      );
+      el.columns = COLUMNS;
+      el.rows = ROWS;
+      await el.updateComplete;
+
+      const slot = el.shadowRoot!.querySelector<HTMLSlotElement>('slot[name="toolbar"]');
+      expect(slot).toBeTruthy();
+      const assigned = slot!.assignedElements();
+      expect(assigned.length).toBe(1);
+      expect(assigned[0].id).toBe('tb');
+    });
+
+    it('renders custom empty slot when rows are empty', async () => {
+      const el = await fixture<HelixDataTable>(
+        '<hx-data-table><span slot="empty" id="custom-empty">Custom empty</span></hx-data-table>',
+      );
+      el.columns = COLUMNS;
+      el.rows = [];
+      await el.updateComplete;
+
+      const slot = el.shadowRoot!.querySelector<HTMLSlotElement>('slot[name="empty"]');
+      expect(slot).toBeTruthy();
+      const assigned = slot!.assignedElements();
+      expect(assigned.length).toBe(1);
+      expect(assigned[0].id).toBe('custom-empty');
+    });
+
+    it('renders custom loading slot when loading', async () => {
+      const el = await fixture<HelixDataTable>(
+        '<hx-data-table loading><div slot="loading" id="custom-loader">Loading…</div></hx-data-table>',
+      );
+      el.columns = COLUMNS;
+      el.rows = [];
+      await el.updateComplete;
+
+      const slot = el.shadowRoot!.querySelector<HTMLSlotElement>('slot[name="loading"]');
+      expect(slot).toBeTruthy();
+      const assigned = slot!.assignedElements();
+      expect(assigned.length).toBe(1);
+      expect(assigned[0].id).toBe('custom-loader');
+    });
+  });
+
+  // ─── CSS Parts Verification ───
+
+  describe('CSS Parts', () => {
+    it('exposes all documented CSS parts on a populated table', async () => {
+      const el = await fixture<HelixDataTable>('<hx-data-table selectable></hx-data-table>');
+      el.columns = COLUMNS;
+      el.rows = ROWS;
+      await el.updateComplete;
+
+      expect(shadowQuery(el, '[part~="table"]')).toBeTruthy();
+      expect(shadowQuery(el, '[part~="thead"]')).toBeTruthy();
+      expect(shadowQuery(el, '[part~="tbody"]')).toBeTruthy();
+      expect(shadowQuery(el, '[part~="tr"]')).toBeTruthy();
+      expect(shadowQuery(el, '[part~="th"]')).toBeTruthy();
+      expect(shadowQuery(el, '[part~="td"]')).toBeTruthy();
+      expect(shadowQuery(el, '[part~="sort-icon"]')).toBeTruthy();
+      expect(shadowQuery(el, '[part~="checkbox"]')).toBeTruthy();
+    });
+  });
 });
