@@ -8,10 +8,10 @@
   "baseBranch": "main",
   "updateInternalDependencies": "patch",
   "ignore": [
-    "@helixui/mcp-shared",
-    "@helixui/mcp-health-scorer",
     "@helixui/mcp-cem-analyzer",
+    "@helixui/mcp-health-scorer",
     "@helixui/mcp-typescript-diagnostics",
+    "@helixui/mcp-shared",
     "@helixui/admin",
     "@helixui/storybook",
     "docs"
