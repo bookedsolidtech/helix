@@ -33,9 +33,11 @@ export {
 export { HelixContainer } from './components/hx-container/index.js';
 export { HelixCopyButton } from './components/hx-copy-button/index.js';
 export { HelixDataTable } from './components/hx-data-table/index.js';
+export type { HxDataTableColumn, HxDataTableSortState } from './components/hx-data-table/index.js';
 export { HelixDatePicker } from './components/hx-date-picker/index.js';
 export { HelixDialog } from './components/hx-dialog/index.js';
 export { HelixDivider } from './components/hx-divider/index.js';
+export type { WcDivider } from './components/hx-divider/index.js';
 export { HelixDrawer } from './components/hx-drawer/index.js';
 export { HelixDropdown, type DropdownPlacement } from './components/hx-dropdown/index.js';
 export { HelixField } from './components/hx-field/index.js';
@@ -48,6 +50,7 @@ export { HelixHelpText } from './components/hx-help-text/index.js';
 export { HelixIcon } from './components/hx-icon/index.js';
 export { HelixImage } from './components/hx-image/index.js';
 export { HelixLink } from './components/hx-link/index.js';
+export type { LinkVariant } from './components/hx-link/index.js';
 export { HelixList } from './components/hx-list/index.js';
 export { HelixListItem } from './components/hx-list/index.js';
 export { HelixMenu } from './components/hx-menu/index.js';
@@ -75,10 +78,10 @@ export { HelixSpinner } from './components/hx-spinner/index.js';
 export { HelixSplitButton } from './components/hx-split-button/index.js';
 export { HelixSplitPanel } from './components/hx-split-panel/index.js';
 export { HelixStack } from './components/hx-stack/index.js';
-export {
-  HelixStatusIndicator,
-  type StatusIndicatorStatus,
-  type StatusIndicatorSize,
+export { HelixStatusIndicator } from './components/hx-status-indicator/index.js';
+export type {
+  StatusIndicatorStatus,
+  StatusIndicatorSize,
 } from './components/hx-status-indicator/index.js';
 export { HelixSteps } from './components/hx-steps/index.js';
 export { HelixStep } from './components/hx-steps/index.js';
@@ -95,11 +98,18 @@ export { HelixText } from './components/hx-text/index.js';
 export { HelixTextInput } from './components/hx-text-input/index.js';
 export { HelixTextarea } from './components/hx-textarea/index.js';
 export { HelixTheme } from './components/hx-theme/index.js';
+export type { ThemeName, TokenDefinition, TokenEntry } from './components/hx-theme/index.js';
 export { HelixTimePicker } from './components/hx-time-picker/index.js';
 export { HelixToast, HelixToastStack, toast } from './components/hx-toast/index.js';
+export type {
+  ToastVariant,
+  ToastStackPlacement,
+  ToastOptions,
+} from './components/hx-toast/index.js';
 export { HelixToggleButton } from './components/hx-toggle-button/index.js';
 export { HelixTooltip } from './components/hx-tooltip/index.js';
 export { HelixTopNav } from './components/hx-top-nav/index.js';
 export { HelixTreeView } from './components/hx-tree-view/index.js';
 export { HelixTreeItem } from './components/hx-tree-view/index.js';
+export type { TreeSelection } from './components/hx-tree-view/index.js';
 export { HelixVisuallyHidden } from './components/hx-visually-hidden/index.js';
