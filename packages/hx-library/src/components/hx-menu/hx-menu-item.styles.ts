@@ -35,6 +35,12 @@ export const helixMenuItemStyles = css`
     background-color: var(--hx-menu-item-hover-bg, var(--hx-color-neutral-100, #f1f5f9));
   }
 
+  .menu-item:focus-visible {
+    outline: var(--hx-focus-ring-width, 2px) solid
+      var(--hx-focus-ring-color, var(--hx-color-primary-500, #3b82f6));
+    outline-offset: calc(-1 * var(--hx-focus-ring-width, 2px));
+  }
+
   .menu-item__prefix,
   .menu-item__suffix {
     display: inline-flex;
