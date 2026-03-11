@@ -2,7 +2,7 @@
 /**
  * Token Explorer -- Interactive Design Token Reference
  *
- * Imports live token data from @helix/tokens and renders an interactive
+ * Imports live token data from @helixui/tokens and renders an interactive
  * reference page with color swatches, spacing visualization, typography
  * specimens, shadow cards, border previews, motion tokens, and dark mode
  * override tables.
@@ -10,8 +10,8 @@
  * Uses ShowcaseLayout for consistent dark-theme aesthetic.
  */
 import ShowcaseLayout from '../layouts/ShowcaseLayout.astro';
-import { tokenEntries, tokensByCategory, tokenMap, darkTokenEntries } from '@helix/tokens';
-import { getTokenStats, getColorSubgroups, isHexColor, resolveTokenRef, getContrastColor } from '@helix/tokens/utils';
+import { tokenEntries, tokensByCategory, tokenMap, darkTokenEntries } from '@helixui/tokens';
+import { getTokenStats, getColorSubgroups, isHexColor, resolveTokenRef, getContrastColor } from '@helixui/tokens/utils';
 
 const stats = getTokenStats(tokenEntries);
 const colorSubgroups = getColorSubgroups(tokenEntries);
@@ -523,7 +523,7 @@ const transitionTokens = tokensByCategory['transition'] ?? [];
       </h1>
       <p class="te-hero-subtitle">
         Interactive reference for every design token in the HELIX system.
-        All values are live from <code style="color: var(--wc-cyan); background: rgba(6,182,212,0.08); padding: 0.1em 0.4em; border-radius: 4px; font-size: 0.9em;">@helix/tokens</code>.
+        All values are live from <code style="color: var(--wc-cyan); background: rgba(6,182,212,0.08); padding: 0.1em 0.4em; border-radius: 4px; font-size: 0.9em;">@helixui/tokens</code>.
       </p>
 
       <div class="te-stats">
