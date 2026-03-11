@@ -1,8 +1,8 @@
-# @helix/tokens
+# @helixui/tokens
 
-**Design tokens for the HELiX component library** — a structured set of CSS custom properties, JavaScript constants, and Lit CSS utilities that power the `@helix/library` components.
+**Design tokens for the HELiX component library** — a structured set of CSS custom properties, JavaScript constants, and Lit CSS utilities that power the `@helixui/library` components.
 
-[![npm version](https://img.shields.io/npm/v/@helix/tokens)](https://www.npmjs.com/package/@helix/tokens)
+[![npm version](https://img.shields.io/npm/v/@helixui/tokens)](https://www.npmjs.com/package/@helixui/tokens)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
 ---
@@ -10,10 +10,10 @@
 ## Installation
 
 ```bash
-npm install @helix/tokens
+npm install @helixui/tokens
 ```
 
-> **Note:** This package is automatically installed as a dependency of `@helix/library`. You only need to install it directly if you are consuming tokens without the component library.
+> **Note:** This package is automatically installed as a dependency of `@helixui/library`. You only need to install it directly if you are consuming tokens without the component library.
 
 ---
 
@@ -22,7 +22,7 @@ npm install @helix/tokens
 ### JavaScript / TypeScript (token constants)
 
 ```js
-import { tokens } from '@helix/tokens';
+import { tokens } from '@helixui/tokens';
 
 console.log(tokens.colorPrimary); // '#0057b8'
 ```
@@ -31,7 +31,7 @@ console.log(tokens.colorPrimary); // '#0057b8'
 
 ```ts
 import { css } from 'lit';
-import { colorPrimary, spacingMd } from '@helix/tokens/lit';
+import { colorPrimary, spacingMd } from '@helixui/tokens/lit';
 
 const styles = css`
   :host {
@@ -44,13 +44,13 @@ const styles = css`
 ### CSS custom properties (global stylesheet)
 
 ```js
-import '@helix/tokens/css';
+import '@helixui/tokens/css';
 ```
 
 Or in CSS:
 
 ```css
-@import '@helix/tokens/tokens.css';
+@import '@helixui/tokens/tokens.css';
 
 .my-element {
   color: var(--hx-color-primary);
@@ -61,7 +61,7 @@ Or in CSS:
 ### JSON token source
 
 ```js
-import tokens from '@helix/tokens/tokens.json';
+import tokens from '@helixui/tokens/tokens.json';
 ```
 
 Useful for build tooling, style dictionaries, or design tool integrations.
@@ -69,7 +69,7 @@ Useful for build tooling, style dictionaries, or design tool integrations.
 ### Utility helpers
 
 ```js
-import { toCssVar, resolveToken } from '@helix/tokens/utils';
+import { toCssVar, resolveToken } from '@helixui/tokens/utils';
 
 toCssVar('color-primary'); // 'var(--hx-color-primary)'
 ```
@@ -80,12 +80,12 @@ toCssVar('color-primary'); // 'var(--hx-color-primary)'
 
 | Import path | Contents |
 |---|---|
-| `@helix/tokens` | JavaScript token constants (default export) |
-| `@helix/tokens/lit` | Lit CSS tagged template values |
-| `@helix/tokens/css` | Side-effect import — injects CSS custom properties |
-| `@helix/tokens/tokens.css` | Raw CSS file with all `--hx-*` custom properties |
-| `@helix/tokens/tokens.json` | Source token definitions as JSON |
-| `@helix/tokens/utils` | Helper utilities (`toCssVar`, etc.) |
+| `@helixui/tokens` | JavaScript token constants (default export) |
+| `@helixui/tokens/lit` | Lit CSS tagged template values |
+| `@helixui/tokens/css` | Side-effect import — injects CSS custom properties |
+| `@helixui/tokens/tokens.css` | Raw CSS file with all `--hx-*` custom properties |
+| `@helixui/tokens/tokens.json` | Source token definitions as JSON |
+| `@helixui/tokens/utils` | Helper utilities (`toCssVar`, etc.) |
 
 ---
 
