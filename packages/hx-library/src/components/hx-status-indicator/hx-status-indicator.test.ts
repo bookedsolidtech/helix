@@ -156,6 +156,30 @@ describe('hx-status-indicator', () => {
       expect(wrapper?.getAttribute('aria-label')).toBe('System is healthy');
     });
 
+    it('generates correct aria-label for "offline" status', async () => {
+      const el = await fixture<HelixStatusIndicator>(
+        '<hx-status-indicator status="offline"></hx-status-indicator>',
+      );
+      const wrapper = shadowQuery(el, '[role="img"]');
+      expect(wrapper?.getAttribute('aria-label')).toBe('Status: Offline');
+    });
+
+    it('generates correct aria-label for "away" status', async () => {
+      const el = await fixture<HelixStatusIndicator>(
+        '<hx-status-indicator status="away"></hx-status-indicator>',
+      );
+      const wrapper = shadowQuery(el, '[role="img"]');
+      expect(wrapper?.getAttribute('aria-label')).toBe('Status: Away');
+    });
+
+    it('generates correct aria-label for "busy" status', async () => {
+      const el = await fixture<HelixStatusIndicator>(
+        '<hx-status-indicator status="busy"></hx-status-indicator>',
+      );
+      const wrapper = shadowQuery(el, '[role="img"]');
+      expect(wrapper?.getAttribute('aria-label')).toBe('Status: Busy');
+    });
+
     it('generates correct aria-label for "unknown" status', async () => {
       const el = await fixture<HelixStatusIndicator>(
         '<hx-status-indicator status="unknown"></hx-status-indicator>',
