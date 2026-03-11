@@ -32,6 +32,7 @@ This filter only captures top-level `<option>` elements. `<optgroup>` children a
 **Drupal impact:** Drupal Twig templates using `<optgroup>` are a standard HTML pattern. They will silently fail to participate in form submission.
 
 **Reproduction:**
+
 ```html
 <hx-select name="country">
   <optgroup label="North America">
@@ -40,6 +41,7 @@ This filter only captures top-level `<option>` elements. `<optgroup>` children a
   </optgroup>
 </hx-select>
 ```
+
 Form submits with `country=` (empty) regardless of selection.
 
 ---
@@ -49,13 +51,7 @@ Form submits with `country=` (empty) regardless of selection.
 **File:** `hx-select.ts:615-621`
 
 ```html
-<div
-  part="error"
-  class="field__error"
-  id=${this._errorId}
-  role="alert"
-  aria-live="polite"
->
+<div part="error" class="field__error" id="${this._errorId}" role="alert" aria-live="polite"></div>
 ```
 
 `role="alert"` implies `aria-live="assertive"` per the ARIA spec. Explicitly overriding it with `aria-live="polite"` creates contradictory instructions. AT behavior is undefined — some screen readers honor the explicit attribute (polite), others honor the implicit role semantics (assertive), and some may double-announce.
@@ -71,13 +67,7 @@ For a healthcare error message this is unacceptable: the user must always receiv
 **File:** `hx-select.ts:552-574`
 
 ```html
-<button
-  ...
-  role="combobox"
-  aria-haspopup="listbox"
-  aria-controls=${this._listboxId}
-  ...
->
+<button ... role="combobox" aria-haspopup="listbox" aria-controls="${this._listboxId}" ...></button>
 ```
 
 The ARIA 1.2 combobox pattern (select-only variant) is designed for a `div` or similar non-interactive container, not a native `<button>`. Assigning `role="combobox"` to a `<button>` overrides its implicit native role. Consequences:
@@ -248,11 +238,7 @@ The stories include default, sizes, error, disabled, required, grouped, and form
 
 ```css
 box-shadow: 0 0 0 var(--hx-focus-ring-width, 2px)
-  color-mix(
-    in srgb,
-    var(--hx-select-focus-ring-color, ...) calc(...),
-    transparent
-  );
+  color-mix(in srgb, var(--hx-select-focus-ring-color, ...) calc(...), transparent);
 ```
 
 `color-mix()` has baseline support from 2023 (Chrome 111, Firefox 113, Safari 16.2). Healthcare organizations often have enterprise browser policy that constrains browser versions. There is no `@supports` guard or non-`color-mix` fallback. The focus ring box-shadow will silently fail (disappear) in unsupported environments, which is a P1 accessibility issue in those environments.
@@ -287,6 +273,7 @@ Both methods independently query the same slot. They could share one traversal p
 **File:** `hx-select.test.ts:315-339`
 
 The CSS Parts test suite validates `label`, `select-wrapper`, `error`, and `help-text`. It does not test:
+
 - `part="trigger"` (the combobox button — the primary interactive element)
 - `part="listbox"` (the dropdown panel)
 - `part="option"` (individual options)
@@ -317,15 +304,15 @@ If a consumer sets `hx-size="xl"` or `hx-size="foobar"`, the CSS class `field__t
 
 ## Audit Coverage Matrix
 
-| Area             | Status | P0 | P1 | P2 |
-|------------------|--------|----|----|----|
-| TypeScript       | ⚠️ Issues | — | — | 2 |
-| Accessibility    | 🔴 Blocked | 1 | 5 | 1 |
-| Tests            | ⚠️ Issues | — | 1 | 3 |
-| Storybook        | ⚠️ Issues | — | — | 1 |
-| CSS              | ⚠️ Issues | — | 2 | 2 |
-| Performance      | ✅ OK | — | — | 1 |
-| Drupal           | 🔴 Blocked | 1 | — | — |
+| Area          | Status     | P0  | P1  | P2  |
+| ------------- | ---------- | --- | --- | --- |
+| TypeScript    | ⚠️ Issues  | —   | —   | 2   |
+| Accessibility | 🔴 Blocked | 1   | 5   | 1   |
+| Tests         | ⚠️ Issues  | —   | 1   | 3   |
+| Storybook     | ⚠️ Issues  | —   | —   | 1   |
+| CSS           | ⚠️ Issues  | —   | 2   | 2   |
+| Performance   | ✅ OK      | —   | —   | 1   |
+| Drupal        | 🔴 Blocked | 1   | —   | —   |
 
 **Total: 2 P0, 7 P1, 11 P2**
 
