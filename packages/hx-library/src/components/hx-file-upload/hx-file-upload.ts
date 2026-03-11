@@ -34,6 +34,7 @@ interface FileEntry {
  * @csspart file-item - An individual file entry in the list.
  * @csspart progress - The progress bar track for a file item.
  * @csspart label - The visible label element.
+ * @csspart error - The error message container below the dropzone.
  *
  * @cssprop [--hx-file-upload-dropzone-bg=var(--hx-color-neutral-50)] - Dropzone background color.
  * @cssprop [--hx-file-upload-dropzone-border-color=var(--hx-color-neutral-300)] - Dropzone border color.

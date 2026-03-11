@@ -185,6 +185,14 @@ describe('hx-file-upload', () => {
       const part = shadowQuery(el, '[part="progress"]');
       expect(part).toBeTruthy();
     });
+
+    it('exposes "error" part when error is set', async () => {
+      const el = await fixture<HelixFileUpload>(
+        '<hx-file-upload error="Something failed"></hx-file-upload>',
+      );
+      const part = shadowQuery(el, '[part="error"]');
+      expect(part).toBeTruthy();
+    });
   });
 
   // ─── Dropzone Behavior (4) ───
@@ -612,6 +620,67 @@ describe('hx-file-upload', () => {
     });
   });
 
+  // ─── File Size Display (3) ───
+
+  describe('File Size Display', () => {
+    it('displays bytes for files under 1 KB', async () => {
+      const el = await fixture<HelixFileUpload>('<hx-file-upload></hx-file-upload>');
+      simulateFileInput(el, [makeFile('tiny.txt', 500, 'text/plain')]);
+      await el.updateComplete;
+      const sizeEl = shadowQuery(el, '.file-item__size');
+      expect(sizeEl?.textContent?.trim()).toBe('500 B');
+    });
+
+    it('displays KB for files between 1 KB and 1 MB', async () => {
+      const el = await fixture<HelixFileUpload>('<hx-file-upload></hx-file-upload>');
+      simulateFileInput(el, [makeFile('medium.pdf', 51200, 'application/pdf')]);
+      await el.updateComplete;
+      const sizeEl = shadowQuery(el, '.file-item__size');
+      expect(sizeEl?.textContent?.trim()).toBe('50.0 KB');
+    });
+
+    it('displays MB for files 1 MB or larger', async () => {
+      const el = await fixture<HelixFileUpload>('<hx-file-upload></hx-file-upload>');
+      simulateFileInput(el, [makeFile('large.zip', 2621440, 'application/zip')]);
+      await el.updateComplete;
+      const sizeEl = shadowQuery(el, '.file-item__size');
+      expect(sizeEl?.textContent?.trim()).toBe('2.5 MB');
+    });
+  });
+
+  // ─── Accept Validation Edge Cases (3) ───
+
+  describe('Accept Validation Edge Cases', () => {
+    it('accepts files matching extension regardless of case', async () => {
+      const el = await fixture<HelixFileUpload>('<hx-file-upload accept=".pdf"></hx-file-upload>');
+      simulateFileInput(el, [makeFile('REPORT.PDF', 1024, 'application/pdf')]);
+      await el.updateComplete;
+      expect(el.files).toHaveLength(1);
+    });
+
+    it('accepts files matching wildcard MIME type', async () => {
+      const el = await fixture<HelixFileUpload>(
+        '<hx-file-upload accept="image/*"></hx-file-upload>',
+      );
+      simulateFileInput(el, [makeFile('photo.webp', 1024, 'image/webp')]);
+      await el.updateComplete;
+      expect(el.files).toHaveLength(1);
+    });
+
+    it('rejects files not matching any accept token', async () => {
+      const el = await fixture<HelixFileUpload>(
+        '<hx-file-upload accept="image/*,.pdf"></hx-file-upload>',
+      );
+      const errorPromise = oneEvent<CustomEvent<{ message: string; files: File[] }>>(
+        el,
+        'hx-error',
+      );
+      simulateFileInput(el, [makeFile('script.js', 100, 'application/javascript')]);
+      const event = await errorPromise;
+      expect(event.detail.files).toHaveLength(1);
+    });
+  });
+
   // ─── Multiple file validation messages (2) ───
 
   describe('Multiple file validation', () => {
@@ -673,6 +742,22 @@ describe('hx-file-upload', () => {
       const el = await fixture<HelixFileUpload>(
         '<hx-file-upload label="Upload" disabled></hx-file-upload>',
       );
+      await page.screenshot();
+      const { violations } = await checkA11y(el);
+      expect(violations).toEqual([]);
+    });
+
+    it('has no axe violations with files in the list', async () => {
+      const el = await fixture<HelixFileUpload>(
+        '<hx-file-upload label="Documents" multiple></hx-file-upload>',
+      );
+      simulateFileInput(el, [
+        makeFile('report.pdf', 2048, 'application/pdf'),
+        makeFile('scan.jpg', 4096, 'image/jpeg'),
+      ]);
+      await el.updateComplete;
+      el.setProgress(0, 50);
+      await el.updateComplete;
       await page.screenshot();
       const { violations } = await checkA11y(el);
       expect(violations).toEqual([]);
