@@ -12,7 +12,7 @@ Angular requires an explicit schema declaration to allow custom elements in temp
 ## Installation
 
 ```bash
-npm install @helix/library
+npm install @helixui/library
 ```
 
 ## Schema Configuration
@@ -64,7 +64,7 @@ Import HELIX once in `main.ts` (or `app.config.ts`):
 ```ts
 // main.ts
 import { bootstrapApplication } from '@angular/platform-browser';
-import '@helix/library';
+import '@helixui/library';
 import { AppComponent } from './app/app.component';
 
 bootstrapApplication(AppComponent);
@@ -239,7 +239,7 @@ export class AppComponent implements OnInit {
 
   ngOnInit() {
     if (isPlatformBrowser(this.platformId)) {
-      import('@helix/library');
+      import('@helixui/library');
     }
   }
 }

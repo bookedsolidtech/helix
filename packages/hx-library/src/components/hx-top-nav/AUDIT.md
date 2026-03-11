@@ -312,7 +312,7 @@ Correct token usage for focus indicators.
 
 ### 6.1 ✅ Bundle size under limit
 
-Component-specific code: `hx-top-nav.ts` (~153 lines) + `hx-top-nav.styles.ts` (~162 lines of CSS). No external dependencies beyond Lit (shared) and `@helix/tokens/lit` (shared). Estimated component-specific bundle contribution: **~1.2KB min+gz**, well under the 5KB gate.
+Component-specific code: `hx-top-nav.ts` (~153 lines) + `hx-top-nav.styles.ts` (~162 lines of CSS). No external dependencies beyond Lit (shared) and `@helixui/tokens/lit` (shared). Estimated component-specific bundle contribution: **~1.2KB min+gz**, well under the 5KB gate.
 
 ### 6.2 🔵 Inline SVG rendered on every update
 
