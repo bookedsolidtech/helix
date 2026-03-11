@@ -1,0 +1,629 @@
+---
+title: 'hx-grid'
+description: 'CSS Grid layout primitive with design-token-based column and gap system for composing responsive healthcare UI layouts.'
+---
+
+import ComponentLoader from '../../../components/ComponentLoader.astro';
+import ComponentDemo from '../../../components/ComponentDemo.astro';
+import ComponentDoc from '../../../components/ComponentDoc.astro';
+
+<ComponentLoader />
+
+<ComponentDoc tagName="hx-grid" section="summary" />
+
+## Overview
+
+`hx-grid` is a CSS Grid layout primitive that provides a design-token-based column and gap system. It wraps a standard CSS grid container in shadow DOM, exposing `columns`, `gap`, `row-gap`, `column-gap`, `align`, and `justify` properties as HTML attributes so that grid configurations compose directly in markup or Twig templates without requiring custom CSS.
+
+**Use `hx-grid` when:** you need multi-column layouts — patient record dashboards, form field grids, card galleries, data panels, or any repeated-column structure where consistent spacing between items matters.
+
+**Use `hx-grid-item`** (the companion element) to precisely place a child at a specific column or row, or to have a child span multiple columns.
+
+**Do not use `hx-grid`** as a replacement for single-column stacking layouts — use `hx-container` for max-width-constrained single-column sections instead.
+
+## Live Demo
+
+### Column Variants
+
+Equal-width columns using the `columns` property. Numeric values resolve to `repeat(N, 1fr)`.
+
+<ComponentDemo title="Column Variants">
+  <div style="display: grid; gap: 0.75rem;">
+    <hx-grid columns="1">
+      <div style="background: #e0f2fe; padding: 0.75rem; border-radius: 4px;">
+        1 column (default)
+      </div>
+    </hx-grid>
+    <hx-grid columns="2">
+      <div style="background: #e0f2fe; padding: 0.75rem; border-radius: 4px;">Col 1</div>
+      <div style="background: #bae6fd; padding: 0.75rem; border-radius: 4px;">Col 2</div>
+    </hx-grid>
+    <hx-grid columns="3">
+      <div style="background: #e0f2fe; padding: 0.75rem; border-radius: 4px;">Col 1</div>
+      <div style="background: #bae6fd; padding: 0.75rem; border-radius: 4px;">Col 2</div>
+      <div style="background: #7dd3fc; padding: 0.75rem; border-radius: 4px;">Col 3</div>
+    </hx-grid>
+    <hx-grid columns="4">
+      <div style="background: #e0f2fe; padding: 0.75rem; border-radius: 4px;">Col 1</div>
+      <div style="background: #bae6fd; padding: 0.75rem; border-radius: 4px;">Col 2</div>
+      <div style="background: #7dd3fc; padding: 0.75rem; border-radius: 4px;">Col 3</div>
+      <div style="background: #38bdf8; padding: 0.75rem; border-radius: 4px;">Col 4</div>
+    </hx-grid>
+  </div>
+</ComponentDemo>
+
+### Gap Sizes
+
+All six gap variants from `none` through `xl`. The `gap` property sets both row and column gap uniformly.
+
+<ComponentDemo title="Gap Sizes">
+  <div style="display: grid; gap: 1.25rem;">
+    <div>
+      <p style="margin: 0 0 0.5rem; font-size: 0.75rem; color: #64748b; font-weight: 600;">
+        gap="none"
+      </p>
+      <hx-grid columns="3" gap="none">
+        <div style="background: #fef9c3; padding: 0.75rem; border-radius: 4px;">A</div>
+        <div style="background: #fef08a; padding: 0.75rem; border-radius: 4px;">B</div>
+        <div style="background: #fde047; padding: 0.75rem; border-radius: 4px;">C</div>
+      </hx-grid>
+    </div>
+    <div>
+      <p style="margin: 0 0 0.5rem; font-size: 0.75rem; color: #64748b; font-weight: 600;">
+        gap="xs" (0.25rem)
+      </p>
+      <hx-grid columns="3" gap="xs">
+        <div style="background: #fef9c3; padding: 0.75rem; border-radius: 4px;">A</div>
+        <div style="background: #fef08a; padding: 0.75rem; border-radius: 4px;">B</div>
+        <div style="background: #fde047; padding: 0.75rem; border-radius: 4px;">C</div>
+      </hx-grid>
+    </div>
+    <div>
+      <p style="margin: 0 0 0.5rem; font-size: 0.75rem; color: #64748b; font-weight: 600;">
+        gap="sm" (0.5rem)
+      </p>
+      <hx-grid columns="3" gap="sm">
+        <div style="background: #fef9c3; padding: 0.75rem; border-radius: 4px;">A</div>
+        <div style="background: #fef08a; padding: 0.75rem; border-radius: 4px;">B</div>
+        <div style="background: #fde047; padding: 0.75rem; border-radius: 4px;">C</div>
+      </hx-grid>
+    </div>
+    <div>
+      <p style="margin: 0 0 0.5rem; font-size: 0.75rem; color: #64748b; font-weight: 600;">
+        gap="md" (1rem, default)
+      </p>
+      <hx-grid columns="3" gap="md">
+        <div style="background: #fef9c3; padding: 0.75rem; border-radius: 4px;">A</div>
+        <div style="background: #fef08a; padding: 0.75rem; border-radius: 4px;">B</div>
+        <div style="background: #fde047; padding: 0.75rem; border-radius: 4px;">C</div>
+      </hx-grid>
+    </div>
+    <div>
+      <p style="margin: 0 0 0.5rem; font-size: 0.75rem; color: #64748b; font-weight: 600;">
+        gap="lg" (1.5rem)
+      </p>
+      <hx-grid columns="3" gap="lg">
+        <div style="background: #fef9c3; padding: 0.75rem; border-radius: 4px;">A</div>
+        <div style="background: #fef08a; padding: 0.75rem; border-radius: 4px;">B</div>
+        <div style="background: #fde047; padding: 0.75rem; border-radius: 4px;">C</div>
+      </hx-grid>
+    </div>
+    <div>
+      <p style="margin: 0 0 0.5rem; font-size: 0.75rem; color: #64748b; font-weight: 600;">
+        gap="xl" (2rem)
+      </p>
+      <hx-grid columns="3" gap="xl">
+        <div style="background: #fef9c3; padding: 0.75rem; border-radius: 4px;">A</div>
+        <div style="background: #fef08a; padding: 0.75rem; border-radius: 4px;">B</div>
+        <div style="background: #fde047; padding: 0.75rem; border-radius: 4px;">C</div>
+      </hx-grid>
+    </div>
+  </div>
+</ComponentDemo>
+
+### Column Span with hx-grid-item
+
+Use `hx-grid-item` with `span` to let a child occupy multiple columns.
+
+<ComponentDemo title="Column Span">
+  <hx-grid columns="4" gap="sm">
+    <hx-grid-item span="2">
+      <div style="background: #dcfce7; padding: 0.75rem; border-radius: 4px;">Span 2</div>
+    </hx-grid-item>
+    <div style="background: #bbf7d0; padding: 0.75rem; border-radius: 4px;">Col 3</div>
+    <div style="background: #86efac; padding: 0.75rem; border-radius: 4px;">Col 4</div>
+    <hx-grid-item span="4">
+      <div style="background: #4ade80; padding: 0.75rem; border-radius: 4px;">
+        Full width (span 4)
+      </div>
+    </hx-grid-item>
+  </hx-grid>
+</ComponentDemo>
+
+### Explicit Placement with hx-grid-item
+
+Use `column` and `row` attributes for precise grid placement.
+
+<ComponentDemo title="Explicit Placement">
+  <hx-grid columns="3" gap="sm" style="--hx-grid-row-gap: 0.5rem;">
+    <hx-grid-item column="2 / 4" row="1 / 2">
+      <div style="background: #ede9fe; padding: 0.75rem; border-radius: 4px;">
+        column="2 / 4" row="1 / 2"
+      </div>
+    </hx-grid-item>
+    <hx-grid-item column="1 / 2" row="1 / 3">
+      <div style="background: #ddd6fe; padding: 0.75rem; border-radius: 4px; height: 100%;">
+        column="1 / 2" row="1 / 3"
+      </div>
+    </hx-grid-item>
+    <hx-grid-item column="2 / 4" row="2 / 3">
+      <div style="background: #c4b5fd; padding: 0.75rem; border-radius: 4px;">
+        column="2 / 4" row="2 / 3"
+      </div>
+    </hx-grid-item>
+  </hx-grid>
+</ComponentDemo>
+
+### Align and Justify
+
+Control item alignment along the block axis (`align`) and inline axis (`justify`).
+
+<ComponentDemo title="Align and Justify">
+  <div style="display: grid; gap: 1rem;">
+    <div>
+      <p style="margin: 0 0 0.5rem; font-size: 0.75rem; color: #64748b; font-weight: 600;">
+        align="start"
+      </p>
+      <hx-grid
+        columns="3"
+        gap="sm"
+        align="start"
+        style="min-height: 80px; background: #f8fafc; padding: 0.5rem; border-radius: 4px;"
+      >
+        <div style="background: #fecaca; padding: 0.5rem; border-radius: 4px;">Short</div>
+        <div style="background: #fca5a5; padding: 1.5rem 0.5rem; border-radius: 4px;">Taller</div>
+        <div style="background: #f87171; padding: 0.5rem; border-radius: 4px;">Short</div>
+      </hx-grid>
+    </div>
+    <div>
+      <p style="margin: 0 0 0.5rem; font-size: 0.75rem; color: #64748b; font-weight: 600;">
+        align="center"
+      </p>
+      <hx-grid
+        columns="3"
+        gap="sm"
+        align="center"
+        style="min-height: 80px; background: #f8fafc; padding: 0.5rem; border-radius: 4px;"
+      >
+        <div style="background: #fecaca; padding: 0.5rem; border-radius: 4px;">Short</div>
+        <div style="background: #fca5a5; padding: 1.5rem 0.5rem; border-radius: 4px;">Taller</div>
+        <div style="background: #f87171; padding: 0.5rem; border-radius: 4px;">Short</div>
+      </hx-grid>
+    </div>
+    <div>
+      <p style="margin: 0 0 0.5rem; font-size: 0.75rem; color: #64748b; font-weight: 600;">
+        align="stretch" (default)
+      </p>
+      <hx-grid
+        columns="3"
+        gap="sm"
+        align="stretch"
+        style="min-height: 80px; background: #f8fafc; padding: 0.5rem; border-radius: 4px;"
+      >
+        <div style="background: #fecaca; padding: 0.5rem; border-radius: 4px;">Short</div>
+        <div style="background: #fca5a5; padding: 1.5rem 0.5rem; border-radius: 4px;">Taller</div>
+        <div style="background: #f87171; padding: 0.5rem; border-radius: 4px;">Short</div>
+      </hx-grid>
+    </div>
+  </div>
+</ComponentDemo>
+
+### Custom Column Template
+
+Pass any valid CSS `grid-template-columns` string to `columns` for non-uniform layouts.
+
+<ComponentDemo title="Custom Column Template">
+  <hx-grid columns="1fr 2fr 1fr" gap="md">
+    <div style="background: #fef3c7; padding: 0.75rem; border-radius: 4px;">1fr sidebar</div>
+    <div style="background: #fde68a; padding: 0.75rem; border-radius: 4px;">2fr main content</div>
+    <div style="background: #fcd34d; padding: 0.75rem; border-radius: 4px;">1fr sidebar</div>
+  </hx-grid>
+</ComponentDemo>
+
+### Healthcare Dashboard Pattern
+
+A realistic patient record panel composed with `hx-grid` and `hx-grid-item`.
+
+<ComponentDemo title="Healthcare Dashboard">
+  <hx-grid columns="12" gap="md">
+    <hx-grid-item span="8">
+      <div style="background: #f0f9ff; border: 1px solid #bae6fd; padding: 1rem; border-radius: 6px;">
+        <strong>Patient Summary</strong>
+        <p style="margin: 0.5rem 0 0; font-size: 0.875rem; color: #475569;">
+          John Doe — DOB: 1958-03-22 — MRN: 00123456
+        </p>
+      </div>
+    </hx-grid-item>
+    <hx-grid-item span="4">
+      <div style="background: #fef9c3; border: 1px solid #fde68a; padding: 1rem; border-radius: 6px;">
+        <strong>Alerts</strong>
+        <p style="margin: 0.5rem 0 0; font-size: 0.875rem; color: #92400e;">
+          Penicillin allergy on file
+        </p>
+      </div>
+    </hx-grid-item>
+    <hx-grid-item span="4">
+      <div style="background: #f0fdf4; border: 1px solid #bbf7d0; padding: 1rem; border-radius: 6px;">
+        <strong>Vitals</strong>
+        <p style="margin: 0.5rem 0 0; font-size: 0.875rem; color: #166534;">BP: 118/76 — HR: 72</p>
+      </div>
+    </hx-grid-item>
+    <hx-grid-item span="4">
+      <div style="background: #fdf4ff; border: 1px solid #e9d5ff; padding: 1rem; border-radius: 6px;">
+        <strong>Medications</strong>
+        <p style="margin: 0.5rem 0 0; font-size: 0.875rem; color: #6b21a8;">
+          Lisinopril 10mg daily
+        </p>
+      </div>
+    </hx-grid-item>
+    <hx-grid-item span="4">
+      <div style="background: #fff7ed; border: 1px solid #fed7aa; padding: 1rem; border-radius: 6px;">
+        <strong>Next Appointment</strong>
+        <p style="margin: 0.5rem 0 0; font-size: 0.875rem; color: #9a3412;">
+          Mar 15, 2026 — 10:00 AM
+        </p>
+      </div>
+    </hx-grid-item>
+  </hx-grid>
+</ComponentDemo>
+
+## Installation
+
+Install the full library or import the component individually:
+
+```bash
+npm install @helixui/library
+```
+
+Then register the component:
+
+```ts
+// Full library (registers all components)
+import '@helixui/library';
+
+// Individual import (tree-shaking friendly)
+import '@helixui/library/components/hx-grid';
+```
+
+## Basic Usage
+
+After registering the component, use it in your HTML:
+
+```html
+<!-- 3-column equal grid with default md gap -->
+<hx-grid columns="3">
+  <div>Item 1</div>
+  <div>Item 2</div>
+  <div>Item 3</div>
+</hx-grid>
+
+<!-- 12-column layout with explicit placement -->
+<hx-grid columns="12" gap="lg">
+  <hx-grid-item span="8">
+    <main>Main content area</main>
+  </hx-grid-item>
+  <hx-grid-item span="4">
+    <aside>Sidebar</aside>
+  </hx-grid-item>
+</hx-grid>
+
+<!-- Custom column template -->
+<hx-grid columns="1fr 2fr 1fr" gap="md">
+  <nav>Left nav</nav>
+  <article>Article</article>
+  <aside>Right panel</aside>
+</hx-grid>
+```
+
+## Properties
+
+### hx-grid
+
+| Property    | Attribute    | Type                                                          | Default     | Description                                                                                                         |
+| ----------- | ------------ | ------------------------------------------------------------- | ----------- | ------------------------------------------------------------------------------------------------------------------- |
+| `columns`   | `columns`    | `number \| string`                                            | `1`         | Number of equal columns (`repeat(N, 1fr)`) or a CSS `grid-template-columns` string for custom templates.            |
+| `gap`       | `gap`        | `'none' \| 'xs' \| 'sm' \| 'md' \| 'lg' \| 'xl'`              | `'md'`      | Gap applied to both row and column gaps. Maps to design tokens: `0`, `0.25rem`, `0.5rem`, `1rem`, `1.5rem`, `2rem`. |
+| `rowGap`    | `row-gap`    | `'none' \| 'xs' \| 'sm' \| 'md' \| 'lg' \| 'xl' \| undefined` | `undefined` | Row gap override. When set, takes precedence over `gap` for row spacing.                                            |
+| `columnGap` | `column-gap` | `'none' \| 'xs' \| 'sm' \| 'md' \| 'lg' \| 'xl' \| undefined` | `undefined` | Column gap override. When set, takes precedence over `gap` for column spacing.                                      |
+| `align`     | `align`      | `'start' \| 'center' \| 'end' \| 'stretch'`                   | `'stretch'` | Aligns grid items along the block axis (`align-items`).                                                             |
+| `justify`   | `justify`    | `'start' \| 'center' \| 'end' \| 'stretch'`                   | `'stretch'` | Justifies grid items along the inline axis (`justify-items`).                                                       |
+
+### hx-grid-item
+
+| Property | Attribute | Type                  | Default     | Description                                                                              |
+| -------- | --------- | --------------------- | ----------- | ---------------------------------------------------------------------------------------- |
+| `column` | `column`  | `string \| undefined` | `undefined` | CSS `grid-column` value (e.g., `"1 / 3"`, `"2 / span 3"`). Takes precedence over `span`. |
+| `row`    | `row`     | `string \| undefined` | `undefined` | CSS `grid-row` value (e.g., `"1 / 2"`, `"2 / span 2"`).                                  |
+| `span`   | `span`    | `number \| undefined` | `undefined` | Column span shorthand — equivalent to setting `column: "span N"`.                        |
+
+## Events
+
+`hx-grid` and `hx-grid-item` are structural layout elements and do not dispatch any custom events.
+
+## Slots
+
+### hx-grid
+
+| Slot        | Description                                                                                                               |
+| ----------- | ------------------------------------------------------------------------------------------------------------------------- |
+| _(default)_ | Any flow content or layout children. Use `hx-grid-item` for children that need explicit column/row placement or spanning. |
+
+### hx-grid-item
+
+| Slot        | Description                                     |
+| ----------- | ----------------------------------------------- |
+| _(default)_ | Any flow content to place within the grid cell. |
+
+## CSS Custom Properties
+
+### hx-grid
+
+| Property               | Default   | Description                                                                                            |
+| ---------------------- | --------- | ------------------------------------------------------------------------------------------------------ |
+| `--hx-grid-columns`    | _(unset)_ | Override the computed `grid-template-columns`. Takes precedence over the `columns` property value.     |
+| `--hx-grid-gap`        | _(unset)_ | Override the computed gap for both axes simultaneously.                                                |
+| `--hx-grid-row-gap`    | _(unset)_ | Override the computed row-gap. Takes precedence over `--hx-grid-gap` and the `row-gap` property.       |
+| `--hx-grid-column-gap` | _(unset)_ | Override the computed column-gap. Takes precedence over `--hx-grid-gap` and the `column-gap` property. |
+
+Override CSS custom properties to adjust layout from outside the shadow DOM:
+
+```css
+/* Force a responsive grid regardless of the columns attribute */
+hx-grid.dashboard {
+  --hx-grid-columns: repeat(auto-fit, minmax(240px, 1fr));
+}
+
+/* Tighten column gap while keeping row spacing */
+hx-grid.compact {
+  --hx-grid-column-gap: var(--hx-space-2, 0.5rem);
+  --hx-grid-row-gap: var(--hx-space-4, 1rem);
+}
+```
+
+## CSS Parts
+
+### hx-grid
+
+| Part   | Description                                                                                                      |
+| ------ | ---------------------------------------------------------------------------------------------------------------- |
+| `base` | The inner `<div>` that establishes the CSS grid context. Target this to override layout from outside shadow DOM. |
+
+```css
+/* Target the grid container directly */
+hx-grid::part(base) {
+  padding: 1rem;
+  background: var(--hx-color-surface);
+}
+```
+
+### hx-grid-item
+
+`hx-grid-item` does not expose any CSS parts. Grid placement styles are applied directly to the host element so it participates correctly in the parent CSS grid.
+
+## Accessibility
+
+`hx-grid` and `hx-grid-item` are transparent layout primitives with no semantic meaning of their own.
+
+| Topic         | Details                                                                                                                                                                   |
+| ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| ARIA role     | The inner grid container (`[part="base"]`) uses `role="presentation"` to indicate it is layout-only. Screen readers encounter slotted content in normal document order.   |
+| Keyboard      | No keyboard interactions. Neither element is focusable. Focusable elements in the default slot behave normally.                                                           |
+| Screen reader | Content placed in slots is read in source order. Grid reordering via `column`/`row` properties affects visual order only — not DOM order. Structure your DOM accordingly. |
+| Focus         | Focus management is not handled by these components. Focusable children in the slot receive focus in DOM order.                                                           |
+| Headings      | Ensure slotted content uses correctly nested heading levels (`<h1>` through `<h6>`) for a logical document outline when using grids as page layout regions.               |
+| WCAG 2.1 AA   | Verified with axe-core: zero violations in default state, 2-column, 3-column, 4-column, and hx-grid-item composition scenarios.                                           |
+
+## Design Tokens
+
+`hx-grid` consumes spacing tokens from the design token cascade:
+
+| Tier      | Token                  | Usage                                   |
+| --------- | ---------------------- | --------------------------------------- |
+| Semantic  | `--hx-space-1`         | Gap resolved for `gap="xs"` (0.25rem)   |
+| Semantic  | `--hx-space-2`         | Gap resolved for `gap="sm"` (0.5rem)    |
+| Semantic  | `--hx-space-4`         | Gap resolved for `gap="md"` (1rem)      |
+| Semantic  | `--hx-space-6`         | Gap resolved for `gap="lg"` (1.5rem)    |
+| Semantic  | `--hx-space-8`         | Gap resolved for `gap="xl"` (2rem)      |
+| Component | `--hx-grid-columns`    | Override resolved grid-template-columns |
+| Component | `--hx-grid-gap`        | Override both row and column gap        |
+| Component | `--hx-grid-row-gap`    | Override row gap independently          |
+| Component | `--hx-grid-column-gap` | Override column gap independently       |
+
+Each gap size uses token values with pixel fallbacks so the grid works even when the full token system is not loaded:
+
+```css
+/* Internal token resolution (simplified) */
+gap="xs" → var(--hx-space-1, 0.25rem)
+gap="sm" → var(--hx-space-2, 0.5rem)
+gap="md" → var(--hx-space-4, 1rem)
+gap="lg" → var(--hx-space-6, 1.5rem)
+gap="xl" → var(--hx-space-8, 2rem)
+```
+
+## Drupal Integration
+
+Use the component in a Twig template after registering the library:
+
+```twig
+{# my-module/templates/grid-layout.html.twig #}
+<hx-grid
+  columns="{{ columns|default(1) }}"
+  gap="{{ gap|default('md') }}"
+  {% if row_gap %}row-gap="{{ row_gap }}"{% endif %}
+  {% if column_gap %}column-gap="{{ column_gap }}"{% endif %}
+  {% if align %}align="{{ align }}"{% endif %}
+>
+  {% for item in items %}
+    {% if item.span or item.column or item.row %}
+      <hx-grid-item
+        {% if item.span %}span="{{ item.span }}"{% endif %}
+        {% if item.column %}column="{{ item.column }}"{% endif %}
+        {% if item.row %}row="{{ item.row }}"{% endif %}
+      >
+        {{ item.content }}
+      </hx-grid-item>
+    {% else %}
+      {{ item.content }}
+    {% endif %}
+  {% endfor %}
+</hx-grid>
+```
+
+Load the library in your module's `.libraries.yml`:
+
+```yaml
+helix-components:
+  js:
+    /libraries/helix/helix.min.js: { minified: true }
+```
+
+Example usage from a Drupal paragraph template for a multi-column layout region:
+
+```twig
+{# paragraph--two-column-layout.html.twig #}
+<hx-grid columns="2" gap="lg">
+  <hx-grid-item>
+    {{ content.field_primary_column }}
+  </hx-grid-item>
+  <hx-grid-item>
+    {{ content.field_secondary_column }}
+  </hx-grid-item>
+</hx-grid>
+```
+
+For a 12-column dashboard layout common in healthcare admin panels:
+
+```twig
+{# paragraph--dashboard-layout.html.twig #}
+<hx-grid columns="12" gap="md">
+  <hx-grid-item span="8">
+    {{ content.field_main_content }}
+  </hx-grid-item>
+  <hx-grid-item span="4">
+    {{ content.field_sidebar }}
+  </hx-grid-item>
+</hx-grid>
+```
+
+## Standalone HTML Example
+
+Copy-paste this into a `.html` file and open it in a browser — no build tool needed:
+
+```html
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>hx-grid example</title>
+    <script
+      type="module"
+      src="https://cdn.jsdelivr.net/npm/@helixui/library/dist/index.js"
+    ></script>
+    <style>
+      body {
+        margin: 0;
+        padding: 2rem;
+        font-family: sans-serif;
+        background: #f8fafc;
+      }
+      .card {
+        background: white;
+        border: 1px solid #e2e8f0;
+        border-radius: 6px;
+        padding: 1rem;
+      }
+      .card h3 {
+        margin: 0 0 0.5rem;
+        font-size: 0.875rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: #64748b;
+      }
+      .card p {
+        margin: 0;
+        color: #1e293b;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Patient Dashboard</h1>
+
+    <!-- 12-column dashboard with spanning items -->
+    <hx-grid columns="12" gap="md">
+      <!-- Patient header — full width -->
+      <hx-grid-item span="12">
+        <div class="card" style="background: #1e40af; color: white; border-color: transparent;">
+          <h3 style="color: rgba(255,255,255,0.7);">Patient</h3>
+          <p>Jane Smith — MRN: 00987654 — DOB: 1972-07-14</p>
+        </div>
+      </hx-grid-item>
+
+      <!-- Vitals -->
+      <hx-grid-item span="3">
+        <div class="card">
+          <h3>Blood Pressure</h3>
+          <p>122 / 78 mmHg</p>
+        </div>
+      </hx-grid-item>
+
+      <!-- Heart rate -->
+      <hx-grid-item span="3">
+        <div class="card">
+          <h3>Heart Rate</h3>
+          <p>68 bpm</p>
+        </div>
+      </hx-grid-item>
+
+      <!-- Temperature -->
+      <hx-grid-item span="3">
+        <div class="card">
+          <h3>Temperature</h3>
+          <p>98.6 °F</p>
+        </div>
+      </hx-grid-item>
+
+      <!-- O2 Sat -->
+      <hx-grid-item span="3">
+        <div class="card">
+          <h3>O2 Saturation</h3>
+          <p>99%</p>
+        </div>
+      </hx-grid-item>
+
+      <!-- Main content — 8 columns -->
+      <hx-grid-item span="8">
+        <div class="card">
+          <h3>Care Summary</h3>
+          <p>
+            Patient admitted for routine annual physical. All values within normal range. Follow-up
+            in 12 months.
+          </p>
+        </div>
+      </hx-grid-item>
+
+      <!-- Sidebar — 4 columns -->
+      <hx-grid-item span="4">
+        <div class="card" style="border-left: 4px solid #f59e0b;">
+          <h3>Alerts</h3>
+          <p>Latex sensitivity noted. Use nitrile gloves.</p>
+        </div>
+      </hx-grid-item>
+    </hx-grid>
+  </body>
+</html>
+```
+
+## API Reference
+
+<ComponentDoc tagName="hx-grid" section="api" />

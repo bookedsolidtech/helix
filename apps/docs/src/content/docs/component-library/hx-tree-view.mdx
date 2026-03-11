@@ -1,0 +1,340 @@
+---
+title: 'hx-tree-view'
+description: 'Hierarchical tree structure for navigating nested data with full keyboard and screen reader support'
+---
+
+import ComponentLoader from '../../../components/ComponentLoader.astro';
+import ComponentDemo from '../../../components/ComponentDemo.astro';
+import ComponentDoc from '../../../components/ComponentDoc.astro';
+
+<ComponentLoader />
+
+<ComponentDoc tagName="hx-tree-view" section="summary" />
+
+## Overview
+
+`hx-tree-view` is a hierarchical tree component built on the [WAI-ARIA Tree View pattern](https://www.w3.org/WAI/ARIA/apg/patterns/treeview/). It renders a `role="tree"` container holding `hx-tree-item` elements that support expand/collapse, single and multiple selection, nested nesting, and full keyboard navigation.
+
+Use `hx-tree-view` for healthcare use cases such as ICD-10 code hierarchies, department org charts, file system browsers, and taxonomy-driven navigation menus where users need to drill into layered data structures.
+
+**Use `hx-tree-view` when:** you have two or more levels of hierarchical data and users need to expand/collapse subtrees or select individual nodes.
+
+**Use `hx-nav` instead when:** you have a flat list of navigation links with no nesting or selection semantics.
+
+## Live Demo
+
+### Basic Tree
+
+<ComponentDemo title="Basic Tree">
+  <hx-tree-view label="Department Navigation">
+    <hx-tree-item>Administration</hx-tree-item>
+    <hx-tree-item>Clinical Services</hx-tree-item>
+    <hx-tree-item>Facilities</hx-tree-item>
+  </hx-tree-view>
+</ComponentDemo>
+
+### Nested Items with Expand/Collapse
+
+<ComponentDemo title="Nested Tree">
+  <hx-tree-view label="ICD-10 Hierarchy">
+    <hx-tree-item expanded>
+      Diseases of the circulatory system (I00–I99)
+      <hx-tree-item slot="children" expanded>
+        Hypertensive diseases (I10–I16)
+        <hx-tree-item slot="children">Essential hypertension (I10)</hx-tree-item>
+        <hx-tree-item slot="children">Hypertensive heart disease (I11)</hx-tree-item>
+        <hx-tree-item slot="children">Hypertensive CKD (I12)</hx-tree-item>
+      </hx-tree-item>
+      <hx-tree-item slot="children">
+        Ischemic heart diseases (I20–I25)
+        <hx-tree-item slot="children">Unstable angina (I20.0)</hx-tree-item>
+        <hx-tree-item slot="children">Acute MI (I21)</hx-tree-item>
+      </hx-tree-item>
+    </hx-tree-item>
+  </hx-tree-view>
+</ComponentDemo>
+
+### Single Selection
+
+<ComponentDemo title="Single Selection">
+  <hx-tree-view label="Select Department" selection="single">
+    <hx-tree-item selected>Emergency Department</hx-tree-item>
+    <hx-tree-item>Intensive Care Unit</hx-tree-item>
+    <hx-tree-item>Surgical Services</hx-tree-item>
+    <hx-tree-item disabled>Restricted Wing</hx-tree-item>
+  </hx-tree-view>
+</ComponentDemo>
+
+### Multiple Selection
+
+<ComponentDemo title="Multiple Selection">
+  <hx-tree-view label="Select Diagnoses" selection="multiple">
+    <hx-tree-item selected>Hypertension (I10)</hx-tree-item>
+    <hx-tree-item selected>Type 2 Diabetes (E11)</hx-tree-item>
+    <hx-tree-item>Chronic Kidney Disease (N18)</hx-tree-item>
+    <hx-tree-item>Heart Failure (I50)</hx-tree-item>
+  </hx-tree-view>
+</ComponentDemo>
+
+## Installation
+
+```bash
+# Full library
+npm install @helix/library
+
+# Or import only this component (tree-shaking friendly)
+import '@helix/library/components/hx-tree-view';
+```
+
+## Basic Usage
+
+```html
+<hx-tree-view label="Navigation" selection="single">
+  <hx-tree-item>Top-level item</hx-tree-item>
+  <hx-tree-item expanded>
+    Parent item
+    <hx-tree-item slot="children">Child item 1</hx-tree-item>
+    <hx-tree-item slot="children">Child item 2</hx-tree-item>
+  </hx-tree-item>
+</hx-tree-view>
+```
+
+## Properties
+
+### hx-tree-view
+
+| Property    | Attribute   | Type                               | Default  | Description                                                                                                                                                                      |
+| ----------- | ----------- | ---------------------------------- | -------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `label`     | `label`     | `string`                           | `''`     | Accessible label applied as `aria-label` on the tree container. Required for screen reader identification. Omit only if a visible heading labels the tree via `aria-labelledby`. |
+| `selection` | `selection` | `'none' \| 'single' \| 'multiple'` | `'none'` | Selection mode. `'none'` — read-only navigation; `'single'` — one item selected at a time; `'multiple'` — any number of items selectable simultaneously.                         |
+
+### hx-tree-item
+
+| Property   | Attribute  | Type      | Default | Description                                                                                                                                 |
+| ---------- | ---------- | --------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
+| `expanded` | `expanded` | `boolean` | `false` | Whether this item is expanded, revealing its slotted children.                                                                              |
+| `selected` | `selected` | `boolean` | `false` | Whether this item is currently selected. Only meaningful when the parent `hx-tree-view` has `selection="single"` or `selection="multiple"`. |
+| `disabled` | `disabled` | `boolean` | `false` | Prevents the item from being interacted with via click or keyboard.                                                                         |
+
+## Events
+
+`hx-tree-view` dispatches the following event. It bubbles and is composed so it can be listened to anywhere in the DOM above the component.
+
+| Event       | Detail Type                                  | Description                                                                                                                                                                                           |
+| ----------- | -------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `hx-select` | `{ item: HelixTreeItem, selected: boolean }` | Fired when a tree item is selected or deselected. `item` is the `hx-tree-item` element; `selected` reflects the item's new selected state. Only fires when `selection` is `'single'` or `'multiple'`. |
+
+```js
+document.querySelector('hx-tree-view').addEventListener('hx-select', (e) => {
+  console.log('Item:', e.detail.item.textContent);
+  console.log('Selected:', e.detail.selected);
+});
+```
+
+## CSS Custom Properties
+
+### hx-tree-view
+
+| Property                | Default                      | Description                      |
+| ----------------------- | ---------------------------- | -------------------------------- |
+| `--hx-tree-font-family` | `var(--hx-font-family-sans)` | Font family for the entire tree. |
+
+### hx-tree-item
+
+| Property                        | Default                       | Description                                |
+| ------------------------------- | ----------------------------- | ------------------------------------------ |
+| `--hx-tree-item-color`          | `var(--hx-color-neutral-900)` | Item text color.                           |
+| `--hx-tree-item-hover-bg`       | `var(--hx-color-neutral-100)` | Row background on hover.                   |
+| `--hx-tree-item-selected-bg`    | `var(--hx-color-primary-100)` | Row background when selected.              |
+| `--hx-tree-item-selected-color` | `var(--hx-color-primary-800)` | Text color when selected.                  |
+| `--hx-tree-item-padding-x`      | `var(--hx-space-2)`           | Horizontal padding on item rows.           |
+| `--hx-tree-item-padding-y`      | `var(--hx-space-1)`           | Vertical padding on item rows.             |
+| `--hx-tree-indent-size`         | `1.5rem`                      | Indentation width added per nesting level. |
+
+## CSS Parts
+
+### hx-tree-view
+
+| Part   | Description                                          |
+| ------ | ---------------------------------------------------- |
+| `tree` | The `<div role="tree">` container inside shadow DOM. |
+
+### hx-tree-item
+
+| Part          | Description                                                                        |
+| ------------- | ---------------------------------------------------------------------------------- |
+| `item`        | The outer item container wrapping the row and children.                            |
+| `row`         | The interactive row element with `role="treeitem"` (contains expand, icon, label). |
+| `expand-icon` | The expand/collapse `<button>` shown when children are present.                    |
+| `label`       | The `<span>` containing the default slot (item label text).                        |
+| `children`    | The children container `<div role="group">`.                                       |
+
+## Slots
+
+### hx-tree-view
+
+| Slot        | Description                                            |
+| ----------- | ------------------------------------------------------ |
+| _(default)_ | One or more `hx-tree-item` elements at the root level. |
+
+### hx-tree-item
+
+| Slot        | Description                                                                          |
+| ----------- | ------------------------------------------------------------------------------------ |
+| _(default)_ | The label content for this item (text, icons, or HTML).                              |
+| `icon`      | Optional icon shown before the label. Use `hx-icon` or an `<svg>` element.           |
+| `children`  | Nested `hx-tree-item` elements that form the subtree. Add `slot="children"` on each. |
+
+## Accessibility
+
+`hx-tree-view` implements the [WAI-ARIA Tree View Pattern](https://www.w3.org/WAI/ARIA/apg/patterns/treeview/) with roving `tabindex` for focus management and full keyboard navigation.
+
+| Topic                  | Details                                                                                                                                                                                                                                                                                                                                |
+| ---------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| ARIA roles             | `role="tree"` on the container; `role="treeitem"` on each item row; `role="group"` on children containers.                                                                                                                                                                                                                             |
+| `aria-label`           | Set via the `label` property on `hx-tree-view`. Provides the tree's accessible name to screen readers. Always provide a label.                                                                                                                                                                                                         |
+| `aria-expanded`        | Set to `'true'`/`'false'` on expandable treeitems. Omitted on leaf nodes.                                                                                                                                                                                                                                                              |
+| `aria-selected`        | Set on treeitems only when the parent tree has `selection="single"` or `selection="multiple"`. Omitted in navigation-only (`selection="none"`) mode to avoid implying selectable semantics.                                                                                                                                            |
+| `aria-disabled`        | Set to `'true'` on disabled item rows.                                                                                                                                                                                                                                                                                                 |
+| `aria-level`           | Computed automatically based on nesting depth (1-based). Communicates nesting depth to screen readers.                                                                                                                                                                                                                                 |
+| `aria-posinset`        | Computed automatically as the item's 1-based position among its siblings.                                                                                                                                                                                                                                                              |
+| `aria-setsize`         | Computed automatically as the total count of sibling items at the same level.                                                                                                                                                                                                                                                          |
+| `aria-multiselectable` | Set to `'true'` on the tree container when `selection="multiple"`.                                                                                                                                                                                                                                                                     |
+| Keyboard               | `Tab` — enter the tree (roving tabindex); `ArrowDown` / `ArrowUp` — move to next/previous visible item (wraps); `ArrowRight` — expand collapsed node or move to first child; `ArrowLeft` — collapse expanded node or move to parent; `Home` — first item; `End` — last visible item; `Enter` / `Space` — select/deselect focused item. |
+| Screen reader          | Item state changes (expanded, selected, disabled) are announced via ARIA attributes. Nesting depth, position, and set size are announced on focus.                                                                                                                                                                                     |
+| Focus                  | Roving tabindex: exactly one item has `tabindex="0"` at a time; all others have `tabindex="-1"`. On tab into the tree, the last-focused item (or the first item) receives focus.                                                                                                                                                       |
+| Motion                 | The tree itself has no animated transitions; expand/collapse state is applied immediately via CSS class.                                                                                                                                                                                                                               |
+| WCAG                   | Meets WCAG 2.1 AA. Focus rings are visible; no color is the sole conveyor of state; all interactive controls are keyboard-operable.                                                                                                                                                                                                    |
+
+## Drupal Integration
+
+```twig
+{# my-module/templates/healthcare-tree.html.twig #}
+<hx-tree-view
+  label="{{ tree.label }}"
+  selection="{{ tree.selection|default('none') }}"
+>
+  {% for item in tree.items %}
+    {% include 'my-module--hx-tree-item.html.twig' with { item: item, depth: 1 } %}
+  {% endfor %}
+</hx-tree-view>
+```
+
+```twig
+{# my-module/templates/my-module--hx-tree-item.html.twig #}
+<hx-tree-item
+  {% if item.expanded %}expanded{% endif %}
+  {% if item.selected %}selected{% endif %}
+  {% if item.disabled %}disabled{% endif %}
+>
+  {{ item.label }}
+  {% if item.children %}
+    {% for child in item.children %}
+      <hx-tree-item
+        slot="children"
+        {% if child.expanded %}expanded{% endif %}
+        {% if child.selected %}selected{% endif %}
+        {% if child.disabled %}disabled{% endif %}
+      >
+        {{ child.label }}
+      </hx-tree-item>
+    {% endfor %}
+  {% endif %}
+</hx-tree-item>
+```
+
+Load the library in your module's `.libraries.yml`:
+
+```yaml
+helix-components:
+  js:
+    /libraries/helix/helix.min.js: { minified: true }
+```
+
+Listen for selection events in Drupal behaviors using `once()` to prevent duplicate listeners on AJAX:
+
+```javascript
+Drupal.behaviors.helixTreeView = {
+  attach(context) {
+    // once() is a Drupal core utility (no import needed) — prevents duplicate event binding during AJAX attach cycles
+    once('helixTreeView', 'hx-tree-view', context).forEach((el) => {
+      el.addEventListener('hx-select', (e) => {
+        const selectedLabel = e.detail.item.textContent.trim();
+        const isSelected = e.detail.selected;
+        console.log(`${selectedLabel}: ${isSelected ? 'selected' : 'deselected'}`);
+      });
+    });
+  },
+};
+```
+
+## Standalone HTML Example
+
+Copy-paste into a `.html` file and open in any browser — no build tool required:
+
+```html
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>hx-tree-view example</title>
+    <!-- @helix/library is a private package — install via npm workspace, not CDN -->
+    <!-- In your project: import '@helix/library'; in your bundler entry point -->
+  </head>
+  <body style="font-family: sans-serif; padding: 2rem; max-width: 600px; margin: 0 auto;">
+    <h1>ICD-10 Code Browser</h1>
+
+    <hx-tree-view id="icd10-tree" label="ICD-10 Code Hierarchy" selection="single">
+      <hx-tree-item expanded>
+        Diseases of the circulatory system (I00–I99)
+        <hx-tree-item slot="children" expanded>
+          Hypertensive diseases (I10–I16)
+          <hx-tree-item slot="children">Essential hypertension (I10)</hx-tree-item>
+          <hx-tree-item slot="children">Hypertensive heart disease (I11)</hx-tree-item>
+          <hx-tree-item slot="children">Hypertensive chronic kidney disease (I12)</hx-tree-item>
+        </hx-tree-item>
+        <hx-tree-item slot="children">
+          Ischemic heart diseases (I20–I25)
+          <hx-tree-item slot="children">Unstable angina (I20.0)</hx-tree-item>
+          <hx-tree-item slot="children">Acute myocardial infarction (I21)</hx-tree-item>
+        </hx-tree-item>
+      </hx-tree-item>
+      <hx-tree-item>
+        Endocrine, nutritional and metabolic diseases (E00–E89)
+        <hx-tree-item slot="children">Type 1 diabetes mellitus (E10)</hx-tree-item>
+        <hx-tree-item slot="children">Type 2 diabetes mellitus (E11)</hx-tree-item>
+      </hx-tree-item>
+    </hx-tree-view>
+
+    <p id="selection-output" style="margin-top: 1rem; color: #555;">No code selected.</p>
+
+    <script>
+      const tree = document.getElementById('icd10-tree');
+      const output = document.getElementById('selection-output');
+
+      tree.addEventListener('hx-select', (e) => {
+        if (e.detail.selected) {
+          output.textContent = `Selected: ${e.detail.item.textContent.trim()}`;
+        } else {
+          output.textContent = 'No code selected.';
+        }
+      });
+    </script>
+  </body>
+</html>
+```
+
+## API Reference
+
+<ComponentDoc tagName="hx-tree-view" section="api" />
+
+---
+
+## hx-tree-item
+
+`hx-tree-item` is the building block of `hx-tree-view`. It renders a single interactive row with optional expand/collapse, icon, and nested children. Always use `hx-tree-item` inside an `hx-tree-view` container — it reads the parent tree's `selection` attribute to determine ARIA semantics.
+
+<ComponentDoc tagName="hx-tree-item" section="summary" />
+
+<ComponentDoc tagName="hx-tree-item" section="api" />

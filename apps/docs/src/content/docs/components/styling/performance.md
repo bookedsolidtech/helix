@@ -7,7 +7,7 @@ sidebar:
 
 CSS performance is not just about faster page loads—it's about creating interfaces that feel instant, responsive, and predictable. In healthcare applications where every interaction matters, understanding how browsers process styles, trigger reflows, and paint pixels is essential for delivering enterprise-grade experiences.
 
-This guide covers the complete CSS performance optimization strategy for wc-2026 components, from style recalculation optimization to advanced containment techniques, with real-world examples tested in production environments.
+This guide covers the complete CSS performance optimization strategy for HELiX components, from style recalculation optimization to advanced containment techniques, with real-world examples tested in production environments.
 
 ---
 
@@ -36,7 +36,7 @@ Poor CSS performance manifests as:
 - **Layout thrashing** — Visible reflows, content jumping
 - **Render blocking** — Blank screens while styles load
 
-In Shadow DOM-based component libraries like wc-2026, CSS performance optimization requires understanding both browser rendering fundamentals and Web Components-specific patterns.
+In Shadow DOM-based component libraries like HELiX, CSS performance optimization requires understanding both browser rendering fundamentals and Web Components-specific patterns.
 
 ---
 
@@ -155,8 +155,8 @@ Shadow DOM eliminates global scope conflicts, allowing flat, simple selectors:
 ```css
 /* ✅ GOOD: Flat class selector */
 .button {
-  background-color: var(--wc-button-bg, var(--wc-color-primary-500, #2563eb));
-  padding: var(--wc-space-2, 0.5rem) var(--wc-space-4, 1rem);
+  background-color: var(--hx-button-bg, var(--hx-color-primary-500, #2563eb));
+  padding: var(--hx-space-2, 0.5rem) var(--hx-space-4, 1rem);
 }
 
 .button:hover {
@@ -184,12 +184,12 @@ The `:host` pseudo-class is efficient for styling the component root:
 
 :host([disabled]) {
   pointer-events: none;
-  opacity: var(--wc-opacity-disabled, 0.5);
+  opacity: var(--hx-opacity-disabled, 0.5);
 }
 
 :host(:focus-visible) {
-  outline: var(--wc-focus-ring-width, 2px) solid var(--wc-focus-ring-color, #2563eb);
-  outline-offset: var(--wc-focus-ring-offset, 2px);
+  outline: var(--hx-focus-ring-width, 2px) solid var(--hx-focus-ring-color, #2563eb);
+  outline-offset: var(--hx-focus-ring-offset, 2px);
 }
 ```
 
@@ -202,16 +202,16 @@ The `:host` pseudo-class is efficient for styling the component root:
 ```css
 /* ⚠️ CAUTION: Expensive ancestor traversal, Firefox incompatible */
 :host-context([data-theme='dark']) {
-  --wc-color-neutral-0: #212529;
+  --hx-color-neutral-0: #212529;
 }
 
 /* ✅ BETTER: Use inherited CSS custom properties */
 :host {
-  background-color: var(--wc-card-bg, var(--wc-color-neutral-0, #ffffff));
+  background-color: var(--hx-card-bg, var(--hx-color-neutral-0, #ffffff));
 }
 ```
 
-**wc-2026 policy:** Avoid `:host-context()` for core functionality. Use CSS custom properties for theming instead.
+**HELiX policy:** Avoid `:host-context()` for core functionality. Use CSS custom properties for theming instead.
 
 ### Reducing Recalculation Scope
 
@@ -292,19 +292,19 @@ CSS custom properties update more efficiently than inline styles for certain ope
 element.style.backgroundColor = newColor;
 
 // ✅ FAST: Custom property update (may skip recalc if value doesn't affect layout)
-element.style.setProperty('--wc-button-bg', newColor);
+element.style.setProperty('--hx-button-bg', newColor);
 ```
 
 **Why this is faster:** Custom property changes can skip style recalculation if the computed value doesn't affect layout. However, the performance benefit is marginal—the primary value of custom properties is theming flexibility, not performance.
 
-### Real-World Example: wc-button Hover State
+### Real-World Example: hx-button Hover State
 
 ```css
 /* Optimized hover state using filter */
 .button {
   background-color: var(--_bg);
   color: var(--_color);
-  transition: filter var(--wc-duration-fast, 150ms) var(--wc-easing-default, ease);
+  transition: filter var(--hx-duration-fast, 150ms) var(--hx-easing-default, ease);
 }
 
 .button:hover:not([disabled]) {
@@ -314,8 +314,8 @@ element.style.setProperty('--wc-button-bg', newColor);
 
 /* ❌ AVOID: Triggers style recalc + layout + paint */
 .button:hover {
-  background-color: var(--wc-color-primary-600);
-  padding: calc(var(--wc-space-2) + 1px); /* NEVER do this - causes layout shift */
+  background-color: var(--hx-color-primary-600);
+  padding: calc(var(--hx-space-2) + 1px); /* NEVER do this - causes layout shift */
 }
 ```
 
@@ -361,7 +361,7 @@ These properties only trigger compositing (no layout or paint):
 }
 
 .card {
-  animation: slideIn var(--wc-duration-normal, 300ms) var(--wc-easing-default, ease);
+  animation: slideIn var(--hx-duration-normal, 300ms) var(--hx-easing-default, ease);
 }
 
 /* ❌ BAD: Triggers layout + paint on every frame */
@@ -372,7 +372,7 @@ These properties only trigger compositing (no layout or paint):
   }
   to {
     top: 0;
-    background-color: var(--wc-color-neutral-0);
+    background-color: var(--hx-color-neutral-0);
   }
 }
 ```
@@ -393,7 +393,7 @@ The `will-change` property hints to the browser that an element will change, all
 
 .modal-overlay.is-animating {
   opacity: 0;
-  transition: opacity var(--wc-duration-normal, 300ms);
+  transition: opacity var(--hx-duration-normal, 300ms);
 }
 
 .modal-overlay.is-visible {
@@ -460,12 +460,12 @@ Some CSS properties are more expensive to paint:
 ```css
 /* ✅ GOOD: Expensive shadow on static card */
 .card {
-  box-shadow: var(--wc-shadow-lg, 0 10px 25px rgba(0, 0, 0, 0.1));
+  box-shadow: var(--hx-shadow-lg, 0 10px 25px rgba(0, 0, 0, 0.1));
 }
 
 /* ❌ BAD: Animating expensive shadow */
 .card:hover {
-  box-shadow: var(--wc-shadow-xl, 0 20px 40px rgba(0, 0, 0, 0.15));
+  box-shadow: var(--hx-shadow-xl, 0 20px 40px rgba(0, 0, 0, 0.15));
   transition: box-shadow 300ms; /* Repaints entire element on every frame */
 }
 
@@ -478,7 +478,7 @@ Some CSS properties are more expensive to paint:
   content: '';
   position: absolute;
   inset: 0;
-  box-shadow: var(--wc-shadow-xl, 0 20px 40px rgba(0, 0, 0, 0.15));
+  box-shadow: var(--hx-shadow-xl, 0 20px 40px rgba(0, 0, 0, 0.15));
   opacity: 0;
   transition: opacity 300ms; /* Compositor-only animation */
   pointer-events: none;
@@ -537,14 +537,14 @@ Layout containment prevents internal layout changes from affecting external elem
 
 .card .content {
   /* These changes won't trigger layout outside .card */
-  padding: var(--wc-space-4, 1rem);
+  padding: var(--hx-space-4, 1rem);
   flex-grow: 1;
 }
 ```
 
 **Performance benefit:** In a list of 100 cards, updating one card's layout only recalculates that card, not all 100.
 
-**Real-world example in wc-card:**
+**Real-world example in hx-card:**
 
 ```typescript
 import { css } from 'lit';
@@ -558,11 +558,11 @@ export const wcCardStyles = css`
   .card {
     display: flex;
     flex-direction: column;
-    background-color: var(--wc-card-bg, var(--wc-color-neutral-0, #ffffff));
-    border: var(--wc-border-width-thin, 1px) solid
-      var(--wc-card-border-color, var(--wc-color-neutral-200, #dee2e6));
-    border-radius: var(--wc-card-border-radius, var(--wc-border-radius-lg, 0.5rem));
-    padding: var(--wc-card-padding, var(--wc-space-4, 1rem));
+    background-color: var(--hx-card-bg, var(--hx-color-neutral-0, #ffffff));
+    border: var(--hx-border-width-thin, 1px) solid
+      var(--hx-card-border-color, var(--hx-color-neutral-200, #dee2e6));
+    border-radius: var(--hx-card-border-radius, var(--hx-border-radius-lg, 0.5rem));
+    padding: var(--hx-card-padding, var(--hx-space-4, 1rem));
   }
 `;
 ```
@@ -653,7 +653,7 @@ Size containment treats the element as if it has no children for size calculatio
 import { LitElement, html, css } from 'lit';
 import { customElement } from 'lit/decorators.js';
 
-@customElement('wc-docs-section')
+@customElement('hx-docs-section')
 export class WcDocsSection extends LitElement {
   static styles = css`
     :host {
@@ -664,7 +664,7 @@ export class WcDocsSection extends LitElement {
     }
 
     .section {
-      padding: var(--wc-space-8, 2rem) 0;
+      padding: var(--hx-space-8, 2rem) 0;
     }
   `;
 
@@ -691,10 +691,10 @@ export class WcDocsSection extends LitElement {
 5. **Test with DevTools Paint Flashing** — Verify containment reduces paint areas (DevTools → Rendering → Paint flashing)
 6. **Test with DevTools Performance panel** — Verify layout recalculation times improve
 
-**wc-2026 pattern:** All independent components (cards, buttons, form controls) use `contain: content` on `:host`.
+**HELiX pattern:** All independent components (cards, buttons, form controls) use `contain: content` on `:host`.
 
 ```css
-/* Standard wc-2026 containment pattern */
+/* Standard HELiX containment pattern */
 :host {
   display: block;
   contain: content; /* layout + paint isolation */
@@ -774,7 +774,7 @@ Reading these properties forces layout (synchronous reflow):
 import { LitElement, html } from 'lit';
 import { customElement, query, state } from 'lit/decorators.js';
 
-@customElement('wc-collapsible')
+@customElement('hx-collapsible')
 export class WcCollapsible extends LitElement {
   @query('.content')
   private _content!: HTMLElement;
@@ -842,7 +842,7 @@ connectedCallback() {
 }
 ```
 
-**wc-2026 pattern:** Use `ResizeObserver` and `IntersectionObserver` instead of manual layout reads.
+**HELiX pattern:** Use `ResizeObserver` and `IntersectionObserver` instead of manual layout reads.
 
 ---
 
@@ -860,14 +860,14 @@ import { css } from 'lit';
 
 export const wcButtonStyles = css`
   .button {
-    background-color: var(--wc-button-bg, var(--wc-color-primary-500, #2563eb));
-    padding: var(--wc-space-2, 0.5rem) var(--wc-space-4, 1rem);
+    background-color: var(--hx-button-bg, var(--hx-color-primary-500, #2563eb));
+    padding: var(--hx-space-2, 0.5rem) var(--hx-space-4, 1rem);
   }
 `;
 
-// All wc-button instances share the same parsed stylesheet
-@customElement('wc-button')
-export class WcButton extends LitElement {
+// All hx-button instances share the same parsed stylesheet
+@customElement('hx-button')
+export class HxButton extends LitElement {
   static styles = [wcButtonStyles];
 }
 ```
@@ -881,7 +881,7 @@ For more details, see [Constructable Stylesheets](/components/styling/constructa
 Declarative Shadow DOM allows SSR with no client-side JavaScript for initial render:
 
 ```html
-<wc-button>
+<hx-button>
   <template shadowrootmode="open">
     <style>
       .button {
@@ -894,7 +894,7 @@ Declarative Shadow DOM allows SSR with no client-side JavaScript for initial ren
     </button>
   </template>
   Click me
-</wc-button>
+</hx-button>
 ```
 
 **Performance benefit:** Instant first paint, no JavaScript execution required. LCP improvement: 800ms → 200ms for component-heavy pages.
@@ -915,7 +915,7 @@ Each shadow root has its own style scope, which can improve or hurt performance 
 
 **Optimization:** Keep shadow DOM styles simple and leverage constructable stylesheets to share parsed styles. Avoid deep nesting and complex selectors.
 
-**Measured cost:** 100 wc-button instances with shared stylesheet: ~10ms total style recalc. 100 instances with inline styles: ~50ms. Sharing saves 80%.
+**Measured cost:** 100 hx-button instances with shared stylesheet: ~10ms total style recalc. 100 instances with inline styles: ~50ms. Sharing saves 80%.
 
 ---
 
@@ -988,13 +988,13 @@ Run Lighthouse (DevTools → Lighthouse) and check:
 - **Minimize main-thread work** — Highlights expensive style operations
 - **Reduce layout shifts** — CLS score (target: <0.1)
 
-**wc-2026 CI:** Lighthouse runs on every PR. Performance budget violations block merge.
+**HELiX CI:** Lighthouse runs on every PR. Performance budget violations block merge.
 
 ---
 
-## wc-2026 Performance Patterns
+## HELiX Performance Patterns
 
-These patterns are battle-tested in wc-2026 for maximum performance.
+These patterns are battle-tested in HELiX for maximum performance.
 
 ### Pattern 1: Contain Independent Components
 
@@ -1015,8 +1015,8 @@ export const wcCardStyles = css`
 
 ```css
 .button {
-  background-color: var(--wc-button-bg, var(--wc-color-primary-500, #2563eb));
-  color: var(--wc-button-color, var(--wc-color-neutral-0, #ffffff));
+  background-color: var(--hx-button-bg, var(--hx-color-primary-500, #2563eb));
+  color: var(--hx-button-color, var(--hx-color-neutral-0, #ffffff));
 }
 ```
 
@@ -1026,7 +1026,7 @@ export const wcCardStyles = css`
 
 ```css
 .button {
-  transition: filter var(--wc-duration-fast, 150ms) var(--wc-easing-default, ease);
+  transition: filter var(--hx-duration-fast, 150ms) var(--hx-easing-default, ease);
 }
 
 .button:hover:not([disabled]) {
@@ -1039,7 +1039,7 @@ export const wcCardStyles = css`
 ### Pattern 4: Lazy-Render Off-Screen Content
 
 ```typescript
-@customElement('wc-tabs')
+@customElement('hx-tabs')
 export class WcTabs extends LitElement {
   render() {
     return html`
@@ -1133,7 +1133,7 @@ Use this checklist when building or auditing components:
 
 ## Performance Budgets
 
-wc-2026 enforces these performance budgets in CI:
+HELiX enforces these performance budgets in CI:
 
 | Metric                        | Budget               | Measurement                 |
 | ----------------------------- | -------------------- | --------------------------- |
@@ -1161,7 +1161,7 @@ CSS performance optimization is about understanding the browser rendering pipeli
 4. **Containment** — Isolate components with `contain: content`, use `content-visibility: auto` for off-screen content
 5. **Layout thrashing** — Separate reads and writes, use `requestAnimationFrame`, prefer `ResizeObserver`/`IntersectionObserver`
 
-By applying these techniques, wc-2026 components deliver enterprise-grade performance: instant interactions (<200ms INP), smooth animations (60fps), and zero layout shifts (CLS < 0.1).
+By applying these techniques, HELiX components deliver enterprise-grade performance: instant interactions (<200ms INP), smooth animations (60fps), and zero layout shifts (CLS < 0.1).
 
 **Key takeaways:**
 

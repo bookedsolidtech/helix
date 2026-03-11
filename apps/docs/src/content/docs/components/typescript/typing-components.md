@@ -582,7 +582,7 @@ export class HelixButton extends LitElement {
 
 ```typescript
 import { CSSResultGroup } from 'lit';
-import { tokenStyles } from '@helix/tokens/lit';
+import { tokenStyles } from '@helixui/tokens/lit';
 import { helixButtonStyles } from './hx-button.styles.js';
 
 export class HelixButton extends LitElement {

@@ -516,7 +516,7 @@ The CEM is registered globally in `.storybook/preview.ts`:
 
 ```typescript
 import { setCustomElementsManifest } from '@storybook/web-components';
-import customElements from '@helix/library/custom-elements.json';
+import customElements from '@helixui/library/custom-elements.json';
 
 setCustomElementsManifest(customElements);
 ```
@@ -890,12 +890,12 @@ export default config;
 ### `preview.ts` — Global Decorators and Parameters
 
 ```typescript
-import '@helix/tokens/tokens.css';
+import '@helixui/tokens/tokens.css';
 import type { Preview } from '@storybook/web-components';
 import { setCustomElementsManifest } from '@storybook/web-components';
 import { withThemeByDataAttribute } from '@storybook/addon-themes';
 import { html } from 'lit';
-import customElements from '@helix/library/custom-elements.json';
+import customElements from '@helixui/library/custom-elements.json';
 
 setCustomElementsManifest(customElements);
 

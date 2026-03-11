@@ -1,7 +1,7 @@
 import { LitElement, html, nothing } from 'lit';
-import { customElement, property } from 'lit/decorators.js';
+import { customElement, property, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
-import { tokenStyles } from '@helix/tokens/lit';
+import { tokenStyles } from '@helixui/tokens/lit';
 import { helixAlertStyles } from './hx-alert.styles.js';
 
 /** Alert variant determines visual styling and ARIA semantics. */
@@ -16,13 +16,15 @@ type AlertVariant = 'info' | 'success' | 'warning' | 'error';
  * @tag hx-alert
  *
  * @slot - Default slot for alert message content.
+ * @slot title - Optional title/headline for the alert.
  * @slot icon - Custom icon to override the default variant icon.
  * @slot actions - Action buttons rendered within the alert.
  *
- * @fires {CustomEvent<{reason: string}>} hx-dismiss - Dispatched when the user dismisses the alert.
- * @fires {CustomEvent} hx-after-dismiss - Dispatched after the alert is dismissed.
+ * @fires {CustomEvent<{reason: string}>} hx-close - Dispatched when the user dismisses the alert.
+ * @fires {CustomEvent} hx-after-close - Dispatched after the alert is dismissed.
  *
  * @csspart alert - The outer alert container.
+ * @csspart title - The title/headline container.
  * @csspart icon - The icon container.
  * @csspart message - The message content area.
  * @csspart close-button - The dismiss button (only rendered when dismissible).
@@ -37,6 +39,8 @@ type AlertVariant = 'info' | 'success' | 'warning' | 'error';
  * @cssprop [--hx-alert-gap=var(--hx-space-3)] - Gap between alert elements.
  * @cssprop [--hx-alert-icon-color=var(--hx-color-info-500)] - Alert icon color.
  * @cssprop [--hx-alert-font-family=var(--hx-font-family-sans)] - Alert font family.
+ * @cssprop [--hx-touch-target-size=44px] - Minimum touch target size for the close button.
+ * @cssprop [--hx-alert-accent-width=4px] - Width of the left border accent stripe.
  */
 @customElement('hx-alert')
 export class HelixAlert extends LitElement {
@@ -67,10 +71,43 @@ export class HelixAlert extends LitElement {
 
   /**
    * Whether to show the default variant icon. Set to false to hide the icon container entirely.
-   * @attr icon
+   * Note: Boolean attribute semantics apply — the attribute must be absent (not set to "false")
+   * to hide the icon. `<hx-alert show-icon="false">` still shows the icon because the attribute
+   * is present; use `<hx-alert>` (attribute absent) or `el.showIcon = false` to hide it.
+   * @attr show-icon
+   */
+  @property({ type: Boolean, reflect: true, attribute: 'show-icon' })
+  showIcon = true;
+
+  /**
+   * When true, applies a left border accent stripe instead of a full border.
+   * Common healthcare/enterprise dashboard pattern for visual distinction of alert types.
+   * @attr accent
    */
   @property({ type: Boolean, reflect: true })
-  icon = true;
+  accent = false;
+
+  /**
+   * CSS selector for the element to return focus to after the alert is dismissed.
+   * When set, the component will find and focus the matching element after dismissal.
+   * If not set, focus management is the caller's responsibility via the hx-after-close event.
+   * @attr return-focus-to
+   */
+  @property({ type: String, attribute: 'return-focus-to' })
+  returnFocusTo: string | null = null;
+
+  // ─── State ───
+
+  @state()
+  private _hasActions = false;
+
+  @state()
+  private _hasTitle = false;
+
+  // ─── Private Handler References ───
+
+  private _actionsSlotChangeHandler: (() => void) | null = null;
+  private _titleSlotChangeHandler: (() => void) | null = null;
 
   // ─── Private Helpers ───
 
@@ -79,14 +116,76 @@ export class HelixAlert extends LitElement {
     return this.variant === 'error' || this.variant === 'warning';
   }
 
-  /** Returns the appropriate ARIA role based on variant. */
+  /**
+   * Returns the appropriate ARIA role based on variant.
+   * role="alert" implies aria-live="assertive"; role="status" implies aria-live="polite".
+   * We do NOT set aria-live explicitly to avoid double-announcements in JAWS.
+   */
   private get _role(): string {
     return this._isAssertive ? 'alert' : 'status';
   }
 
-  /** Returns the appropriate aria-live value based on variant. */
-  private get _ariaLive(): string {
-    return this._isAssertive ? 'assertive' : 'polite';
+  // ─── Lifecycle ───
+
+  override connectedCallback(): void {
+    super.connectedCallback();
+    // Apply ARIA role to the host element for reliable screen reader support across
+    // Shadow DOM boundaries. Placing role on a shadow-internal element has inconsistent
+    // AT support in JAWS+Chrome and VoiceOver+Safari combinations (particularly pre-2024).
+    this.setAttribute('role', this._role);
+    if (!this.open) {
+      this.setAttribute('aria-hidden', 'true');
+    }
+  }
+
+  override disconnectedCallback(): void {
+    super.disconnectedCallback();
+    const actionsSlot = this.renderRoot.querySelector<HTMLSlotElement>('slot[name="actions"]');
+    if (actionsSlot && this._actionsSlotChangeHandler) {
+      actionsSlot.removeEventListener('slotchange', this._actionsSlotChangeHandler);
+    }
+    const titleSlot = this.renderRoot.querySelector<HTMLSlotElement>('slot[name="title"]');
+    if (titleSlot && this._titleSlotChangeHandler) {
+      titleSlot.removeEventListener('slotchange', this._titleSlotChangeHandler);
+    }
+  }
+
+  override firstUpdated(): void {
+    // Track actions slot content to avoid invisible spacing when no actions are slotted.
+    const actionsSlot = this.renderRoot.querySelector<HTMLSlotElement>('slot[name="actions"]');
+    if (actionsSlot) {
+      this._actionsSlotChangeHandler = () => {
+        this._hasActions = actionsSlot.assignedNodes({ flatten: true }).length > 0;
+      };
+      actionsSlot.addEventListener('slotchange', this._actionsSlotChangeHandler);
+    }
+
+    // Track title slot content so the title container doesn't create dead space when empty.
+    const titleSlot = this.renderRoot.querySelector<HTMLSlotElement>('slot[name="title"]');
+    if (titleSlot) {
+      this._titleSlotChangeHandler = () => {
+        this._hasTitle = titleSlot.assignedNodes({ flatten: true }).length > 0;
+      };
+      titleSlot.addEventListener('slotchange', this._titleSlotChangeHandler);
+    }
+  }
+
+  protected override updated(changedProperties: Map<PropertyKey, unknown>): void {
+    super.updated(changedProperties);
+    if (changedProperties.has('variant')) {
+      // Keep host ARIA role in sync with variant (assertive vs. polite).
+      this.setAttribute('role', this._role);
+    }
+    if (changedProperties.has('open')) {
+      // Manage aria-hidden in addition to display:none for reliable AT exclusion.
+      // When open transitions from false→true, removing aria-hidden signals to AT
+      // that the live region content should be announced.
+      if (this.open) {
+        this.removeAttribute('aria-hidden');
+      } else {
+        this.setAttribute('aria-hidden', 'true');
+      }
+    }
   }
 
   // ─── Default Icons ───
@@ -152,10 +251,10 @@ export class HelixAlert extends LitElement {
 
     /**
      * Dispatched when the user dismisses the alert.
-     * @event hx-dismiss
+     * @event hx-close
      */
     this.dispatchEvent(
-      new CustomEvent('hx-dismiss', {
+      new CustomEvent('hx-close', {
         bubbles: true,
         composed: true,
         detail: { reason: 'user' },
@@ -164,14 +263,22 @@ export class HelixAlert extends LitElement {
 
     /**
      * Dispatched after the alert is dismissed.
-     * @event hx-after-dismiss
+     * @event hx-after-close
      */
     this.dispatchEvent(
-      new CustomEvent('hx-after-dismiss', {
+      new CustomEvent('hx-after-close', {
         bubbles: true,
         composed: true,
       }),
     );
+
+    // Return focus to a designated element if specified via returnFocusTo.
+    if (this.returnFocusTo) {
+      const target = document.querySelector(this.returnFocusTo);
+      if (target instanceof HTMLElement) {
+        target.focus();
+      }
+    }
   }
 
   // ─── Render ───
@@ -180,11 +287,12 @@ export class HelixAlert extends LitElement {
     const classes = {
       alert: true,
       [`alert--${this.variant}`]: true,
+      'alert--accent': this.accent,
     };
 
     return html`
-      <div part="alert" class=${classMap(classes)} role=${this._role} aria-live=${this._ariaLive}>
-        ${this.icon
+      <div part="alert" class=${classMap(classes)}>
+        ${this.showIcon
           ? html`
               <div part="icon" class="alert__icon">
                 <slot name="icon">${this._renderDefaultIcon()}</slot>
@@ -193,8 +301,14 @@ export class HelixAlert extends LitElement {
           : nothing}
 
         <div part="message" class="alert__message">
+          <div part="title" class="alert__title ${this._hasTitle ? 'alert__title--visible' : ''}">
+            <slot name="title"></slot>
+          </div>
           <slot></slot>
-          <div part="actions" class="alert__actions">
+          <div
+            part="actions"
+            class="alert__actions ${this._hasActions ? 'alert__actions--visible' : ''}"
+          >
             <slot name="actions"></slot>
           </div>
         </div>
@@ -222,4 +336,4 @@ declare global {
   }
 }
 
-export type { HelixAlert as WcAlert };
+export type { HelixAlert as HxAlert };

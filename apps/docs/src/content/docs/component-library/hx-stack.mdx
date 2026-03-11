@@ -1,0 +1,362 @@
+---
+title: 'hx-stack'
+description: 'Flexbox-based layout utility for vertical or horizontal stacking with gap control via design tokens.'
+---
+
+import ComponentLoader from '../../../components/ComponentLoader.astro';
+import ComponentDemo from '../../../components/ComponentDemo.astro';
+import ComponentDoc from '../../../components/ComponentDoc.astro';
+
+<ComponentLoader />
+
+<ComponentDoc tagName="hx-stack" section="summary" />
+
+## Overview
+
+`hx-stack` is a flexbox layout wrapper for arranging child elements vertically or horizontally with consistent, token-driven spacing. It is not an interactive component — it is pure layout infrastructure.
+
+Use `hx-stack` to build form layouts, card bodies, patient record sections, and navigation regions without writing repetitive flexbox CSS. Nesting stacks is safe and encouraged: a vertical outer stack with horizontal inner stacks is a common pattern for healthcare form rows.
+
+**Use `hx-stack` when:** you need a reliable, token-consistent spacing wrapper for a group of elements.
+
+**Use `hx-grid` instead when:** you need multi-column grid placement rather than single-axis flex flow.
+
+## Live Demo
+
+### Default (Vertical)
+
+<ComponentDemo title="Default Vertical Stack">
+  <hx-stack gap="md" style="max-width: 320px;">
+    <div style="padding: 0.75rem; background: #f1f5f9; border-radius: 0.375rem;">Patient Name</div>
+    <div style="padding: 0.75rem; background: #f1f5f9; border-radius: 0.375rem;">Date of Birth</div>
+    <div style="padding: 0.75rem; background: #f1f5f9; border-radius: 0.375rem;">MRN</div>
+  </hx-stack>
+</ComponentDemo>
+
+### Horizontal
+
+<ComponentDemo title="Horizontal Stack">
+  <hx-stack direction="horizontal" gap="sm" align="center">
+    <div style="padding: 0.5rem 1rem; background: #dbeafe; border-radius: 0.375rem;">Labs</div>
+    <div style="padding: 0.5rem 1rem; background: #dbeafe; border-radius: 0.375rem;">Vitals</div>
+    <div style="padding: 0.5rem 1rem; background: #dbeafe; border-radius: 0.375rem;">
+      Medications
+    </div>
+  </hx-stack>
+</ComponentDemo>
+
+### Gap Scale
+
+<ComponentDemo title="Gap Scale">
+  <hx-stack gap="xl">
+    <div>
+      <span style="font-size: 0.75rem; color: #6b7280; display: block; margin-bottom: 0.25rem;">
+        gap="none"
+      </span>
+      <hx-stack direction="horizontal" gap="none">
+        <div style="padding: 0.5rem; background: #fde68a; border-radius: 0.25rem;">A</div>
+        <div style="padding: 0.5rem; background: #fde68a; border-radius: 0.25rem;">B</div>
+      </hx-stack>
+    </div>
+    <div>
+      <span style="font-size: 0.75rem; color: #6b7280; display: block; margin-bottom: 0.25rem;">
+        gap="sm"
+      </span>
+      <hx-stack direction="horizontal" gap="sm">
+        <div style="padding: 0.5rem; background: #fde68a; border-radius: 0.25rem;">A</div>
+        <div style="padding: 0.5rem; background: #fde68a; border-radius: 0.25rem;">B</div>
+      </hx-stack>
+    </div>
+    <div>
+      <span style="font-size: 0.75rem; color: #6b7280; display: block; margin-bottom: 0.25rem;">
+        gap="lg"
+      </span>
+      <hx-stack direction="horizontal" gap="lg">
+        <div style="padding: 0.5rem; background: #fde68a; border-radius: 0.25rem;">A</div>
+        <div style="padding: 0.5rem; background: #fde68a; border-radius: 0.25rem;">B</div>
+      </hx-stack>
+    </div>
+  </hx-stack>
+</ComponentDemo>
+
+### Nested Stacks (Healthcare Form)
+
+<ComponentDemo title="Patient Form Layout">
+  <hx-stack
+    gap="lg"
+    style="max-width: 480px; padding: 1.5rem; border: 1px solid #e5e7eb; border-radius: 0.5rem;"
+  >
+    <hx-stack direction="horizontal" gap="md">
+      <div style="flex: 1; padding: 0.5rem; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 0.375rem;">
+        First Name
+      </div>
+      <div style="flex: 1; padding: 0.5rem; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 0.375rem;">
+        Last Name
+      </div>
+    </hx-stack>
+    <hx-stack direction="horizontal" gap="md">
+      <div style="flex: 1; padding: 0.5rem; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 0.375rem;">
+        Date of Birth
+      </div>
+      <div style="flex: 1; padding: 0.5rem; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 0.375rem;">
+        MRN
+      </div>
+    </hx-stack>
+    <div style="padding: 0.5rem; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 0.375rem;">
+      Primary Diagnosis
+    </div>
+  </hx-stack>
+</ComponentDemo>
+
+## Installation
+
+```bash
+# Full library
+npm install @helix/library
+
+# Or import only this component (tree-shaking friendly)
+import '@helix/library/components/hx-stack';
+```
+
+## Basic Usage
+
+Minimal HTML snippet — no build tool required:
+
+```html
+<!-- Vertical stack with medium gap (defaults) -->
+<hx-stack>
+  <div>Item 1</div>
+  <div>Item 2</div>
+  <div>Item 3</div>
+</hx-stack>
+
+<!-- Horizontal stack centered on the cross axis -->
+<hx-stack direction="horizontal" gap="sm" align="center">
+  <hx-icon name="user"></hx-icon>
+  <span>Dr. Martinez</span>
+</hx-stack>
+
+<!-- Nested: vertical outer, horizontal inner rows -->
+<hx-stack gap="lg">
+  <hx-stack direction="horizontal" gap="md">
+    <input type="text" placeholder="First name" />
+    <input type="text" placeholder="Last name" />
+  </hx-stack>
+  <input type="text" placeholder="MRN" />
+</hx-stack>
+```
+
+Set properties via JavaScript:
+
+```javascript
+const stack = document.querySelector('hx-stack');
+
+// Switch to horizontal layout at runtime
+stack.direction = 'horizontal';
+
+// Tighten the gap
+stack.gap = 'sm';
+
+// Center children on both axes
+stack.align = 'center';
+stack.justify = 'center';
+```
+
+## Properties
+
+| Property    | Attribute   | Type                                                                | Default      | Description                                                                                  |
+| ----------- | ----------- | ------------------------------------------------------------------- | ------------ | -------------------------------------------------------------------------------------------- |
+| `direction` | `direction` | `'vertical' \| 'horizontal'`                                        | `'vertical'` | Flex direction of the stack. `vertical` = column, `horizontal` = row. Reflects to attribute. |
+| `gap`       | `gap`       | `'none' \| 'xs' \| 'sm' \| 'md' \| 'lg' \| 'xl'`                    | `'md'`       | Gap between children using design token spacing scale. Reflects to attribute.                |
+| `align`     | `align`     | `'start' \| 'center' \| 'end' \| 'stretch' \| 'baseline'`           | `'stretch'`  | Cross-axis alignment (`align-items`). Reflects to attribute.                                 |
+| `justify`   | `justify`   | `'start' \| 'center' \| 'end' \| 'between' \| 'around' \| 'evenly'` | `'start'`    | Main-axis distribution (`justify-content`). Reflects to attribute.                           |
+| `wrap`      | `wrap`      | `boolean`                                                           | `false`      | When true, children wrap onto multiple lines (`flex-wrap: wrap`). Reflects to attribute.     |
+| `inline`    | `inline`    | `boolean`                                                           | `false`      | When true, renders as `display: inline-block` rather than `block`. Reflects to attribute.    |
+
+## Events
+
+`hx-stack` is a layout-only component. It does not dispatch any custom events.
+
+| Event    | Detail Type | Description       |
+| -------- | ----------- | ----------------- |
+| _(none)_ | —           | No custom events. |
+
+## CSS Custom Properties
+
+`hx-stack` consumes spacing tokens from the global token system. Override these tokens at the `:root` level to adjust spacing across all stack instances, or at the host level to adjust a single instance.
+
+| Property          | Default   | Description                               |
+| ----------------- | --------- | ----------------------------------------- |
+| `--hx-spacing-xs` | `0.25rem` | Gap token used when `gap="xs"`.           |
+| `--hx-spacing-sm` | `0.5rem`  | Gap token used when `gap="sm"`.           |
+| `--hx-spacing-md` | `1rem`    | Gap token used when `gap="md"` (default). |
+| `--hx-spacing-lg` | `1.5rem`  | Gap token used when `gap="lg"`.           |
+| `--hx-spacing-xl` | `2rem`    | Gap token used when `gap="xl"`.           |
+
+Override the global token scale for your theme:
+
+```css
+:root {
+  --hx-spacing-md: 1.25rem; /* tighten or loosen default gap globally */
+}
+```
+
+## CSS Parts
+
+| Part   | Description                                                                       |
+| ------ | --------------------------------------------------------------------------------- |
+| `base` | The inner `<div>` flex container. Target for external styling via `::part(base)`. |
+
+Use CSS parts to apply styles that CSS custom properties do not expose:
+
+```css
+hx-stack.card-body::part(base) {
+  padding: 1rem;
+  min-height: 120px;
+}
+```
+
+## Slots
+
+| Slot        | Description                                                                            |
+| ----------- | -------------------------------------------------------------------------------------- |
+| _(default)_ | Any child content. Elements are spaced by the `gap` token and arranged by `direction`. |
+
+## Accessibility
+
+`hx-stack` is a layout presentation wrapper. It carries no semantic meaning of its own.
+
+| Topic         | Details                                                                                                                                                                           |
+| ------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| ARIA role     | `role="presentation"` is applied automatically on `connectedCallback`. This tells assistive technology the element is a non-semantic container and should not be announced.       |
+| Role override | Consumers can override the role by setting it on the element: `<hx-stack role="group">`. The component will not overwrite a role already set by the consumer.                     |
+| Keyboard      | `hx-stack` is not interactive. It does not receive keyboard focus and handles no key events. Focus management is the responsibility of the interactive children inside the stack. |
+| Screen reader | With `role="presentation"`, screen readers skip the container and announce the children directly. This is the correct behavior for a layout-only wrapper.                         |
+| Focus         | No focus management. The stack is transparent to focus order — the DOM order of children determines Tab sequence.                                                                 |
+| WCAG          | Meets WCAG 2.1 AA. Zero axe-core violations across all direction, gap, align, and justify combinations. Verified with 3 automated axe tests.                                      |
+
+## Drupal Integration
+
+Use `hx-stack` in Twig templates to produce consistent layout regions without custom CSS. All properties are plain HTML attributes — no JavaScript initialization required.
+
+```twig
+{# my-module/templates/patient-card.html.twig #}
+
+{# Vertical form layout #}
+<hx-stack gap="{{ gap|default('lg') }}">
+  <hx-stack direction="horizontal" gap="{{ row_gap|default('md') }}">
+    <hx-text-input label="First Name" name="first_name"></hx-text-input>
+    <hx-text-input label="Last Name" name="last_name"></hx-text-input>
+  </hx-stack>
+  <hx-text-input label="MRN" name="mrn"></hx-text-input>
+</hx-stack>
+```
+
+Load the library in your module's `.libraries.yml`:
+
+```yaml
+helix-components:
+  js:
+    /libraries/helix/helix.min.js: { minified: true }
+```
+
+`hx-stack` has no interactive events, so no Drupal behaviors are needed. If you nest interactive components (buttons, inputs) inside a stack, attach behaviors to those components directly:
+
+```javascript
+Drupal.behaviors.patientForm = {
+  attach(context) {
+    // once() is a Drupal core utility (no import needed) — prevents duplicate event binding during AJAX attach cycles
+    once('patientForm', '[data-patient-form]', context).forEach((form) => {
+      form.querySelector('hx-button')?.addEventListener('hx-click', () => {
+        // handle form submission
+      });
+    });
+  },
+};
+```
+
+## Standalone HTML Example
+
+Copy-paste this into a `.html` file and open it in a browser — no build tool needed:
+
+```html
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>hx-stack example</title>
+    <!-- @helix/library is a private package — install via npm workspace, not CDN -->
+    <!-- In your project: import '@helix/library'; in your bundler entry point -->
+  </head>
+  <body style="font-family: sans-serif; padding: 2rem; max-width: 600px;">
+    <!-- 1. Vertical stack: patient info summary -->
+    <section>
+      <h2 style="margin-bottom: 1rem;">Patient Summary</h2>
+      <hx-stack gap="sm">
+        <div
+          style="padding: 0.75rem; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 0.375rem;"
+        >
+          <strong>Name:</strong> Jane Smith
+        </div>
+        <div
+          style="padding: 0.75rem; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 0.375rem;"
+        >
+          <strong>DOB:</strong> 1985-04-12
+        </div>
+        <div
+          style="padding: 0.75rem; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 0.375rem;"
+        >
+          <strong>MRN:</strong> 00284917
+        </div>
+      </hx-stack>
+    </section>
+
+    <!-- 2. Horizontal stack: action bar -->
+    <section style="margin-top: 2rem;">
+      <h2 style="margin-bottom: 1rem;">Actions</h2>
+      <hx-stack direction="horizontal" gap="sm" align="center">
+        <button style="padding: 0.5rem 1rem; cursor: pointer;">View Chart</button>
+        <button style="padding: 0.5rem 1rem; cursor: pointer;">Order Labs</button>
+        <button style="padding: 0.5rem 1rem; cursor: pointer;">Write Note</button>
+      </hx-stack>
+    </section>
+
+    <!-- 3. Nested stacks: form layout -->
+    <section style="margin-top: 2rem;">
+      <h2 style="margin-bottom: 1rem;">Edit Patient</h2>
+      <hx-stack gap="lg" style="padding: 1.5rem; border: 1px solid #e5e7eb; border-radius: 0.5rem;">
+        <hx-stack direction="horizontal" gap="md">
+          <input
+            type="text"
+            placeholder="First name"
+            style="flex: 1; padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 0.375rem;"
+          />
+          <input
+            type="text"
+            placeholder="Last name"
+            style="flex: 1; padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 0.375rem;"
+          />
+        </hx-stack>
+        <input
+          type="text"
+          placeholder="MRN"
+          style="padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 0.375rem; width: 100%; box-sizing: border-box;"
+        />
+        <hx-stack direction="horizontal" gap="sm" justify="end">
+          <button style="padding: 0.5rem 1.25rem; cursor: pointer;">Cancel</button>
+          <button
+            style="padding: 0.5rem 1.25rem; background: #2563eb; color: #fff; border: none; border-radius: 0.375rem; cursor: pointer;"
+          >
+            Save
+          </button>
+        </hx-stack>
+      </hx-stack>
+    </section>
+  </body>
+</html>
+```
+
+## API Reference
+
+<ComponentDoc tagName="hx-stack" section="api" />

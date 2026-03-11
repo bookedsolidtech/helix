@@ -1,0 +1,557 @@
+---
+title: 'hx-icon'
+description: 'SVG icon component with sprite and inline fetch modes, accessible label support, and built-in XSS sanitization for healthcare applications.'
+---
+
+import ComponentLoader from '../../../components/ComponentLoader.astro';
+import ComponentDemo from '../../../components/ComponentDemo.astro';
+import ComponentDoc from '../../../components/ComponentDoc.astro';
+
+<ComponentLoader />
+
+<ComponentDoc tagName="hx-icon" section="summary" />
+
+## Overview
+
+`hx-icon` is an SVG icon component that supports two render modes: **sprite mode** (recommended) and **inline fetch mode**. It handles decorative vs. informative icon semantics automatically — when a `label` is provided the icon is announced as an image; when no label is present `aria-hidden="true"` is applied so assistive technology skips it entirely.
+
+**Sprite mode** (recommended for production and Drupal/SSR): Set `name` and optionally `sprite-url`. The component renders `<svg><use href="...#name">` — this works server-side without JavaScript and avoids content shift before hydration.
+
+**Inline fetch mode**: Set `src` to a URL of a standalone `.svg` file. The component fetches the file, sanitizes the markup (stripping `<script>` elements, `on*` event-handler attributes, `javascript:` URIs, `<foreignObject>`, and `style` attributes), and embeds the sanitized SVG directly into the shadow root. This mode requires browser JavaScript and is not server-side renderable. For Drupal/Twig use sprite mode instead.
+
+**Use `hx-icon` when:** you need a consistent, accessible, scalable icon that integrates with a token-based design system. Common healthcare use cases include status indicators, action affordances in buttons or menus, navigation items, alert and notification badges, and informational iconography in clinical data displays.
+
+**Do not use `hx-icon`** for complex illustrations or bitmap images — use `<img>` or `hx-image` for those.
+
+## Live Demo
+
+### Sprite Mode
+
+Sprite mode uses `<svg><use href="...">` to reference an icon from an SVG sprite sheet. No network request is needed at component registration time — the sprite resolves via the browser's built-in SVG reference mechanism.
+
+<ComponentDemo title="Sprite Mode">
+  <div style="display: flex; align-items: center; gap: 1.5rem; flex-wrap: wrap;">
+    <hx-icon name="check" label="Check"></hx-icon>
+    <hx-icon name="alert-circle" label="Alert"></hx-icon>
+    <hx-icon name="info" label="Information"></hx-icon>
+    <hx-icon name="user" label="User"></hx-icon>
+    <hx-icon name="calendar" label="Calendar"></hx-icon>
+  </div>
+</ComponentDemo>
+
+### Size Variants
+
+Five size presets scale the icon from compact inline usage to prominent hero placement. Each size maps to a design token.
+
+<ComponentDemo title="Size Variants">
+  <div style="display: flex; align-items: flex-end; gap: 2rem; flex-wrap: wrap;">
+    <div style="display: flex; flex-direction: column; align-items: center; gap: 0.5rem;">
+      <hx-icon hx-size="xs" name="check" label="Check, extra small"></hx-icon>
+      <span style="font-size: 0.75rem; color: #6b7280;">xs — 1rem</span>
+    </div>
+    <div style="display: flex; flex-direction: column; align-items: center; gap: 0.5rem;">
+      <hx-icon hx-size="sm" name="check" label="Check, small"></hx-icon>
+      <span style="font-size: 0.75rem; color: #6b7280;">sm — 1.25rem</span>
+    </div>
+    <div style="display: flex; flex-direction: column; align-items: center; gap: 0.5rem;">
+      <hx-icon hx-size="md" name="check" label="Check, medium"></hx-icon>
+      <span style="font-size: 0.75rem; color: #6b7280;">md — 1.5rem (default)</span>
+    </div>
+    <div style="display: flex; flex-direction: column; align-items: center; gap: 0.5rem;">
+      <hx-icon hx-size="lg" name="check" label="Check, large"></hx-icon>
+      <span style="font-size: 0.75rem; color: #6b7280;">lg — 2rem</span>
+    </div>
+    <div style="display: flex; flex-direction: column; align-items: center; gap: 0.5rem;">
+      <hx-icon hx-size="xl" name="check" label="Check, extra large"></hx-icon>
+      <span style="font-size: 0.75rem; color: #6b7280;">xl — 2.5rem</span>
+    </div>
+  </div>
+</ComponentDemo>
+
+### Informative vs. Decorative
+
+When an icon conveys meaning on its own (no adjacent visible text), provide a `label`. When the icon is purely decorative and adjacent text already conveys the meaning, omit `label` — the component applies `aria-hidden="true"` automatically.
+
+<ComponentDemo title="Informative vs. Decorative">
+  <div style="display: flex; flex-direction: column; gap: 1rem;">
+    <div style="display: flex; align-items: center; gap: 0.5rem;">
+      <hx-icon
+        name="check-circle"
+        label="Success: appointment confirmed"
+        hx-size="lg"
+        style="color: #16a34a;"
+      ></hx-icon>
+      <span style="font-size: 0.875rem; color: #6b7280;">
+        Informative — label="Success: appointment confirmed"
+      </span>
+    </div>
+    <div style="display: flex; align-items: center; gap: 0.5rem;">
+      <hx-icon name="check-circle" hx-size="lg" style="color: #16a34a;"></hx-icon>
+      <span>Appointment confirmed</span>
+    </div>
+    <span style="font-size: 0.875rem; color: #6b7280; margin-top: -0.5rem;">
+      Decorative — no label, adjacent text conveys meaning
+    </span>
+  </div>
+</ComponentDemo>
+
+### Color Inheritance
+
+`hx-icon` inherits color from its parent context via `currentColor`. Override with `--hx-icon-color` or the parent element's `color` property.
+
+<ComponentDemo title="Color Inheritance">
+  <div style="display: flex; align-items: center; gap: 1.5rem; flex-wrap: wrap;">
+    <hx-icon name="heart" hx-size="lg" label="Favorite" style="color: #dc2626;"></hx-icon>
+    <hx-icon name="shield" hx-size="lg" label="Protected" style="color: #2563eb;"></hx-icon>
+    <hx-icon name="star" hx-size="lg" label="Starred" style="color: #d97706;"></hx-icon>
+    <hx-icon name="bell" hx-size="lg" label="Notifications" style="color: #7c3aed;"></hx-icon>
+    <hx-icon name="activity" hx-size="lg" label="Activity" style="color: #059669;"></hx-icon>
+  </div>
+</ComponentDemo>
+
+### Icon in Button Context
+
+A common pattern in healthcare UI — pairing an icon with visible button text. The icon is decorative because the button label already conveys the action.
+
+<ComponentDemo title="Icon in Button Context">
+  <div style="display: flex; gap: 1rem; flex-wrap: wrap; align-items: center;">
+    <button style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.5rem 1rem; background: #2563eb; color: white; border: none; border-radius: 0.375rem; cursor: pointer; font-size: 0.875rem;">
+      <hx-icon name="plus" hx-size="sm"></hx-icon>
+      Add Patient
+    </button>
+    <button style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.5rem 1rem; background: #dc2626; color: white; border: none; border-radius: 0.375rem; cursor: pointer; font-size: 0.875rem;">
+      <hx-icon name="trash-2" hx-size="sm"></hx-icon>
+      Delete Record
+    </button>
+    <button style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.5rem 1rem; background: white; color: #374151; border: 1px solid #d1d5db; border-radius: 0.375rem; cursor: pointer; font-size: 0.875rem;">
+      <hx-icon name="download" hx-size="sm"></hx-icon>
+      Export PDF
+    </button>
+  </div>
+</ComponentDemo>
+
+### Status Indicators
+
+Icons used as standalone status indicators must have a `label` describing the status they represent.
+
+<ComponentDemo title="Status Indicators">
+  <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+    <div style="display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem; background: #f0fdf4; border: 1px solid #86efac; border-radius: 0.375rem;">
+      <hx-icon name="check-circle" label="Success" style="color: #16a34a;" hx-size="lg"></hx-icon>
+      <span>Lab results received and processed</span>
+    </div>
+    <div style="display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem; background: #fffbeb; border: 1px solid #fcd34d; border-radius: 0.375rem;">
+      <hx-icon name="alert-triangle" label="Warning" style="color: #d97706;" hx-size="lg"></hx-icon>
+      <span>Medication dosage requires pharmacist review</span>
+    </div>
+    <div style="display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem; background: #fef2f2; border: 1px solid #fca5a5; border-radius: 0.375rem;">
+      <hx-icon name="x-circle" label="Error" style="color: #dc2626;" hx-size="lg"></hx-icon>
+      <span>Insurance verification failed — manual review required</span>
+    </div>
+    <div style="display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem; background: #eff6ff; border: 1px solid #93c5fd; border-radius: 0.375rem;">
+      <hx-icon name="info" label="Information" style="color: #2563eb;" hx-size="lg"></hx-icon>
+      <span>Patient has an active DNR order on file</span>
+    </div>
+  </div>
+</ComponentDemo>
+
+## Installation
+
+```bash
+# Full library
+npm install @helixui/library
+
+# Or import only this component (tree-shaking friendly)
+import '@helixui/library/components/hx-icon';
+```
+
+## Basic Usage
+
+```html
+<!-- Inline sprite mode (recommended) — sprite-url is optional when using inline SVG sprites -->
+<hx-icon name="check"></hx-icon>
+
+<!-- External sprite sheet — use sprite-url to point to a separate SVG sprite file -->
+<hx-icon name="check" sprite-url="/assets/icons/sprite.svg"></hx-icon>
+
+<!-- Informative icon — provides accessible name to screen readers -->
+<hx-icon name="check-circle" label="Success: form submitted"></hx-icon>
+
+<!-- Decorative icon — aria-hidden="true" applied automatically -->
+<hx-icon name="check"></hx-icon>
+<span>Saved successfully</span>
+
+<!-- Size variant -->
+<hx-icon name="alert-circle" hx-size="lg" label="Alert"></hx-icon>
+
+<!-- Inline fetch mode — fetches and sanitizes an external SVG file -->
+<hx-icon src="/assets/icons/custom-logo.svg" label="Company logo"></hx-icon>
+
+<!-- Color via CSS custom property -->
+<hx-icon name="heart" label="Favorite" style="--hx-icon-color: #dc2626;"></hx-icon>
+
+<!-- Color via currentColor inheritance -->
+<span style="color: #2563eb;">
+  <hx-icon name="info" label="Info"></hx-icon>
+  Informational note
+</span>
+```
+
+## Properties
+
+| Property    | Attribute    | Type                                   | Default     | Description                                                                                                                                                                                                                                                  |
+| ----------- | ------------ | -------------------------------------- | ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `name`      | `name`       | `string`                               | `''`        | Icon name used as the fragment identifier for a sprite sheet reference. Provide the bare symbol id (e.g. `check`). The component builds `${spriteUrl}#${name}`. If `name` already starts with `#` it is used as-is as an inline sprite reference.            |
+| `src`       | `src`        | `string \| undefined`                  | `undefined` | URL of a standalone SVG file to fetch and render inline. Takes precedence over sprite mode when both `src` and `name`/`sprite-url` are set. Requires browser JavaScript — use sprite mode in Drupal/SSR contexts.                                            |
+| `spriteUrl` | `sprite-url` | `string \| undefined`                  | `undefined` | Base URL of the SVG sprite sheet. Combined with `name` to build the `<use>` href: `${spriteUrl}#${name}`.                                                                                                                                                    |
+| `size`      | `hx-size`    | `'xs' \| 'sm' \| 'md' \| 'lg' \| 'xl'` | `'md'`      | Size variant controlling the width and height of the icon. Maps to design tokens: `xs`=1rem, `sm`=1.25rem, `md`=1.5rem, `lg`=2rem, `xl`=2.5rem. Override with `--hx-icon-size`.                                                                              |
+| `label`     | `label`      | `string`                               | `''`        | Accessible label for the icon. When non-empty, `role="img"` and `aria-label` are applied so assistive technology announces the icon. When empty the icon is treated as decorative and `aria-hidden="true"` is applied. Sprite mode also renders a `<title>`. |
+
+**Note on the `hx-size` attribute name:** The `size` JavaScript property maps to the `hx-size` HTML attribute (not `size`) to avoid colliding with the native `<input size>` attribute in Drupal attribute-passthrough scenarios.
+
+## Events
+
+`hx-icon` is a presentational component and does not dispatch any custom events.
+
+## CSS Parts
+
+| Part  | Description                                                                                                                                                                                                |
+| ----- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `svg` | In sprite mode: the `<svg>` element itself. In inline fetch mode: the `<span>` wrapper that contains the fetched SVG markup. Both parts share this name for consistent external styling via `::part(svg)`. |
+
+```css
+/* Override icon dimensions from outside the shadow DOM */
+hx-icon::part(svg) {
+  width: 2rem;
+  height: 2rem;
+}
+
+/* Apply a stroke-based style to sprite-mode icons */
+hx-icon::part(svg) {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.5;
+}
+```
+
+## CSS Custom Properties
+
+| Property          | Default                    | Description                                                                                       |
+| ----------------- | -------------------------- | ------------------------------------------------------------------------------------------------- |
+| `--hx-icon-size`  | `var(--hx-size-6, 1.5rem)` | Width and height of the icon. Overrides the size variant when set directly on the host.           |
+| `--hx-icon-color` | `currentColor`             | Icon fill color. Defaults to `currentColor` so the icon inherits the parent text color naturally. |
+
+```css
+/* Fixed size override — takes precedence over hx-size attribute */
+hx-icon {
+  --hx-icon-size: 2.25rem;
+}
+
+/* Brand color for primary icons */
+hx-icon.icon--primary {
+  --hx-icon-color: var(--hx-color-primary);
+}
+
+/* Muted decorative icons */
+hx-icon.icon--muted {
+  --hx-icon-color: var(--hx-color-neutral-400);
+}
+```
+
+## Accessibility
+
+`hx-icon` implements the WCAG 2.1 AA pattern for SVG icons: decorative icons are hidden from assistive technology, informative icons carry an accessible name via `role="img"` and `aria-label`.
+
+| Topic             | Details                                                                                                                                                                                                                                                              |
+| ----------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Decorative icons  | When `label` is empty, `aria-hidden="true"` is applied to the SVG/wrapper so screen readers skip it entirely. Use this pattern when adjacent visible text already communicates the icon's meaning.                                                                   |
+| Informative icons | When `label` is non-empty, `role="img"` and `aria-label="${label}"` are applied. Sprite mode also injects a `<title>` element inside the SVG for maximum compatibility. Use this pattern for standalone icons that convey meaning without accompanying visible text. |
+| Focusability      | `focusable="false"` is set on all SVG elements (inner SVG in inline mode, the outer SVG in sprite mode) to prevent IE11/old-Edge from making SVGs keyboard-focusable.                                                                                                |
+| ARIA conflict     | In inline fetch mode, ARIA attributes (`role`, `aria-label`, `aria-hidden`) are stripped from the fetched inner SVG by the sanitizer. The wrapper `<span part="svg">` owns all ARIA semantics, preventing conflicts between inner and outer ARIA state.              |
+| XSS sanitization  | Inline fetch mode runs a sanitization pass that removes `<script>`, `<foreignObject>`, `on*` event-handler attributes, `javascript:` and `data:` URIs in URL-bearing attributes, and `style` attributes that could carry CSS injection payloads.                     |
+| Keyboard          | `hx-icon` is not interactive and is not keyboard-focusable. When used inside interactive elements (buttons, links), focus and keyboard handling belong to the parent.                                                                                                |
+| Color contrast    | Icon color defaults to `currentColor`. Ensure the surrounding context meets WCAG 2.1 AA contrast ratios (3:1 for graphical elements against their background per WCAG 1.4.11).                                                                                       |
+| WCAG 2.1 AA       | Verified with axe-core: zero violations in sprite mode (decorative and informative) and inline fetch mode (decorative and informative). All test cases pass.                                                                                                         |
+
+### Choosing Decorative vs. Informative
+
+```html
+<!-- CORRECT: Decorative — button text conveys the action -->
+<button>
+  <hx-icon name="save"></hx-icon>
+  Save Changes
+</button>
+
+<!-- CORRECT: Informative — icon stands alone, label conveys meaning -->
+<hx-icon name="alert-triangle" label="Critical alert: patient allergy on file"></hx-icon>
+
+<!-- INCORRECT: Icon-only button without a label — screen reader gets nothing -->
+<button>
+  <hx-icon name="trash-2"></hx-icon>
+</button>
+
+<!-- CORRECT: Icon-only button — either label the icon or the button -->
+<button aria-label="Delete record">
+  <hx-icon name="trash-2"></hx-icon>
+</button>
+```
+
+## Design Tokens
+
+`hx-icon` consumes two component-level CSS custom properties, both of which fall back to semantic tokens.
+
+| Token             | Fallback                   | Notes                                                                        |
+| ----------------- | -------------------------- | ---------------------------------------------------------------------------- |
+| `--hx-icon-size`  | `var(--hx-size-6, 1.5rem)` | Overridden per size variant via `:host([hx-size="..."])` selectors.          |
+| `--hx-icon-color` | `currentColor`             | Inherits parent text color by default. Override to apply a fixed icon color. |
+
+Size variant token map:
+
+| `hx-size` | Token          | Value     |
+| --------- | -------------- | --------- |
+| `xs`      | `--hx-size-4`  | `1rem`    |
+| `sm`      | `--hx-size-5`  | `1.25rem` |
+| `md`      | `--hx-size-6`  | `1.5rem`  |
+| `lg`      | `--hx-size-8`  | `2rem`    |
+| `xl`      | `--hx-size-10` | `2.5rem`  |
+
+## Drupal Integration
+
+Use sprite mode in Twig templates — it works server-side without JavaScript and avoids content shift during hydration. Inline fetch mode requires JavaScript and should be avoided in Drupal page renders.
+
+```twig
+{# Decorative icon — no label, aria-hidden applied automatically #}
+<hx-icon name="{{ icon_name }}"></hx-icon>
+
+{# Informative icon — label required for standalone icon usage #}
+<hx-icon
+  name="{{ icon_name }}"
+  label="{{ icon_label }}"
+></hx-icon>
+
+{# With explicit sprite sheet URL (CDN or static asset path) #}
+<hx-icon
+  name="{{ icon_name }}"
+  sprite-url="{{ base_path ~ directory }}/dist/icons/sprite.svg"
+  {% if icon_label %}label="{{ icon_label }}"{% endif %}
+></hx-icon>
+
+{# With size variant #}
+<hx-icon
+  name="{{ icon_name }}"
+  hx-size="{{ icon_size|default('md') }}"
+  {% if icon_label %}label="{{ icon_label }}"{% endif %}
+></hx-icon>
+```
+
+Load the library in your module's `.libraries.yml`:
+
+```yaml
+helix-components:
+  js:
+    /libraries/helix/dist/index.js: {}
+```
+
+Example from a Drupal alert paragraph template:
+
+```twig
+{# paragraph--alert-message.html.twig #}
+{% set alert_icons = {
+  'success': 'check-circle',
+  'warning': 'alert-triangle',
+  'error':   'x-circle',
+  'info':    'info',
+} %}
+{% set icon_name = alert_icons[alert_type|default('info')] %}
+
+<div class="alert alert--{{ alert_type }}">
+  <hx-icon
+    name="{{ icon_name }}"
+    hx-size="lg"
+    label="{{ alert_type|capitalize }}"
+    sprite-url="{{ base_path ~ directory }}/dist/icons/sprite.svg"
+  ></hx-icon>
+  <div class="alert__body">{{ content.field_body }}</div>
+</div>
+```
+
+## Standalone HTML Example
+
+Copy-paste into a `.html` file and open in any browser — no build tool required:
+
+```html
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>hx-icon example</title>
+    <script
+      type="module"
+      src="https://cdn.jsdelivr.net/npm/@helixui/library/dist/index.js"
+    ></script>
+    <style>
+      body {
+        font-family: sans-serif;
+        padding: 2rem;
+        max-width: 640px;
+        margin: 0 auto;
+        color: #1a1a2e;
+      }
+
+      .demo-row {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0.75rem;
+        border: 1px solid #e5e7eb;
+        border-radius: 0.375rem;
+        margin-bottom: 0.5rem;
+      }
+
+      .alert {
+        display: flex;
+        align-items: flex-start;
+        gap: 0.75rem;
+        padding: 1rem;
+        border-radius: 0.5rem;
+        margin-bottom: 0.75rem;
+      }
+
+      .alert--success {
+        background: #f0fdf4;
+        border: 1px solid #86efac;
+      }
+      .alert--warning {
+        background: #fffbeb;
+        border: 1px solid #fcd34d;
+      }
+      .alert--error {
+        background: #fef2f2;
+        border: 1px solid #fca5a5;
+      }
+      .alert--info {
+        background: #eff6ff;
+        border: 1px solid #93c5fd;
+      }
+
+      .icon-grid {
+        display: flex;
+        gap: 1.5rem;
+        flex-wrap: wrap;
+        margin-bottom: 1.5rem;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>hx-icon Examples</h1>
+
+    <h2>Size Variants</h2>
+    <div class="icon-grid">
+      <hx-icon hx-size="xs" name="check" label="Check, xs"></hx-icon>
+      <hx-icon hx-size="sm" name="check" label="Check, sm"></hx-icon>
+      <hx-icon hx-size="md" name="check" label="Check, md"></hx-icon>
+      <hx-icon hx-size="lg" name="check" label="Check, lg"></hx-icon>
+      <hx-icon hx-size="xl" name="check" label="Check, xl"></hx-icon>
+    </div>
+
+    <h2>Color Inheritance</h2>
+    <div class="icon-grid">
+      <hx-icon name="heart" hx-size="lg" label="Favorite" style="color: #dc2626;"></hx-icon>
+      <hx-icon name="shield" hx-size="lg" label="Protected" style="color: #2563eb;"></hx-icon>
+      <hx-icon name="star" hx-size="lg" label="Starred" style="color: #d97706;"></hx-icon>
+      <hx-icon name="activity" hx-size="lg" label="Activity" style="color: #059669;"></hx-icon>
+    </div>
+
+    <h2>Status Alerts</h2>
+
+    <div class="alert alert--success">
+      <!-- Informative icon: label describes the status -->
+      <hx-icon
+        name="check-circle"
+        hx-size="lg"
+        label="Success"
+        style="color: #16a34a; flex-shrink: 0;"
+      ></hx-icon>
+      <div>
+        <strong>Lab results received</strong>
+        <p style="margin: 0.25rem 0 0;">All values within normal range. No action required.</p>
+      </div>
+    </div>
+
+    <div class="alert alert--warning">
+      <hx-icon
+        name="alert-triangle"
+        hx-size="lg"
+        label="Warning"
+        style="color: #d97706; flex-shrink: 0;"
+      ></hx-icon>
+      <div>
+        <strong>Dosage review required</strong>
+        <p style="margin: 0.25rem 0 0;">
+          Metformin 1000mg exceeds standard dosage for patient weight. Pharmacist review pending.
+        </p>
+      </div>
+    </div>
+
+    <div class="alert alert--error">
+      <hx-icon
+        name="x-circle"
+        hx-size="lg"
+        label="Error"
+        style="color: #dc2626; flex-shrink: 0;"
+      ></hx-icon>
+      <div>
+        <strong>Insurance verification failed</strong>
+        <p style="margin: 0.25rem 0 0;">
+          Policy ID not found. Manual verification required before procedure.
+        </p>
+      </div>
+    </div>
+
+    <div class="alert alert--info">
+      <hx-icon
+        name="info"
+        hx-size="lg"
+        label="Information"
+        style="color: #2563eb; flex-shrink: 0;"
+      ></hx-icon>
+      <div>
+        <strong>DNR order on file</strong>
+        <p style="margin: 0.25rem 0 0;">
+          Patient has an active Do Not Resuscitate order. See advance directives section for
+          details.
+        </p>
+      </div>
+    </div>
+
+    <h2>Icon + Button (Decorative)</h2>
+    <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+      <button
+        style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.5rem 1rem; background: #2563eb; color: white; border: none; border-radius: 0.375rem; cursor: pointer;"
+      >
+        <!-- Decorative: button text already conveys action -->
+        <hx-icon name="plus" hx-size="sm"></hx-icon>
+        Add Patient
+      </button>
+      <button
+        style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.5rem 1rem; background: white; color: #374151; border: 1px solid #d1d5db; border-radius: 0.375rem; cursor: pointer;"
+      >
+        <hx-icon name="download" hx-size="sm"></hx-icon>
+        Export PDF
+      </button>
+      <!-- Icon-only button: label the button itself -->
+      <button
+        aria-label="Delete record"
+        style="display: inline-flex; align-items: center; padding: 0.5rem; background: #fef2f2; color: #dc2626; border: 1px solid #fca5a5; border-radius: 0.375rem; cursor: pointer;"
+      >
+        <hx-icon name="trash-2" hx-size="sm"></hx-icon>
+      </button>
+    </div>
+  </body>
+</html>
+```
+
+## API Reference
+
+<ComponentDoc tagName="hx-icon" section="api" />

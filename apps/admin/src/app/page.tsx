@@ -3,8 +3,8 @@ import { getManifestStats } from '@/lib/cem-parser';
 import { scoreAllComponents } from '@/lib/health-scorer';
 import { getAllTestResults } from '@/lib/test-results-reader';
 import { loadIssues } from '@/lib/issues-loader';
-import { tokenEntries, tokensByCategory } from '@helix/tokens';
-import { getTokenStats } from '@helix/tokens/utils';
+import { tokenEntries, tokensByCategory } from '@helixui/tokens';
+import { getTokenStats } from '@helixui/tokens/utils';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 import {

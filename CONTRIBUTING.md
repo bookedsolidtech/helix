@@ -259,9 +259,37 @@ All PRs must pass:
 
 ### After Approval
 
-PRs are merged by maintainers using **squash and merge** strategy.
+PRs are merged by maintainers using **merge commits** strategy (squash merging is disabled to preserve conventional commit messages for semantic-release).
 
 ## Component Development
+
+### Component Generator
+
+Use the generator to scaffold a new component's 5-file structure with correct boilerplate:
+
+```bash
+npm run create:component hx-my-component
+```
+
+This creates all 5 required files in `packages/hx-library/src/components/hx-my-component/`:
+
+```
+hx-my-component/
+├── index.ts                    # Re-export
+├── hx-my-component.ts          # Component class
+├── hx-my-component.styles.ts   # Lit CSS tagged template
+├── hx-my-component.stories.ts  # Storybook stories (stub)
+└── hx-my-component.test.ts     # Vitest browser tests (stub)
+```
+
+Generated files are pre-formatted and pass `npm run verify` immediately. After scaffolding:
+
+1. Implement logic in `hx-my-component.ts`
+2. Add styles in `hx-my-component.styles.ts`
+3. Export from `packages/hx-library/src/index.ts`
+4. Add Storybook stories in `hx-my-component.stories.ts`
+5. Write tests in `hx-my-component.test.ts`
+6. Run `npm run cem` to update the Custom Elements Manifest
 
 ### File Structure
 
@@ -312,7 +340,119 @@ When creating a new component:
 - **Integration tests**: Rendering, events, state
 - **Browser tests**: DOM interactions, accessibility
 
-### Writing Tests
+### Test Section Pattern
+
+Every component test file follows this **required section order**. Import from shared utilities:
+
+```typescript
+import { describe, it, expect, afterEach } from 'vitest';
+import { page, userEvent } from '@vitest/browser/context';
+import { fixture, shadowQuery, oneEvent, cleanup, checkA11y } from '../../test-utils.js';
+import type { HelixFoo } from './hx-foo.js';
+import './index.js';
+
+afterEach(cleanup);
+
+describe('hx-foo', () => {
+  // ─── Rendering ───
+  describe('Rendering', () => {
+    // Shadow DOM exists, CSS parts exposed, default classes/attributes applied
+    it('renders with shadow DOM', async () => {
+      const el = await fixture<HelixFoo>('<hx-foo></hx-foo>');
+      expect(el.shadowRoot).toBeTruthy();
+    });
+  });
+
+  // ─── Properties ───
+  // One describe block per public property
+  describe('Property: variant', () => {
+    // Each property: attribute reflection, class/behavior changes, defaults
+  });
+
+  // ─── Events ───
+  describe('Events', () => {
+    // Each event: fires, bubbles, composed, detail shape
+    // Negative cases: does NOT fire when disabled/loading
+    it('dispatches hx-change on interaction', async () => {
+      const el = await fixture<HelixFoo>('<hx-foo></hx-foo>');
+      const eventPromise = oneEvent(el, 'hx-change');
+      // trigger interaction...
+      const event = await eventPromise;
+      expect(event).toBeTruthy();
+    });
+  });
+
+  // ─── Keyboard ───
+  describe('Keyboard', () => {
+    // Enter/Space activation, Tab focus order, Escape dismissal (as applicable)
+    it('Enter activates component', async () => {
+      const el = await fixture<HelixFoo>('<hx-foo></hx-foo>');
+      el.focus();
+      await userEvent.keyboard('{Enter}');
+      // assert result...
+    });
+  });
+
+  // ─── Slots ───
+  describe('Slots', () => {
+    // Default slot, named slots — verify slotted content via el.querySelector
+    it('default slot renders text', async () => {
+      const el = await fixture<HelixFoo>('<hx-foo>Hello</hx-foo>');
+      expect(el.textContent?.trim()).toBe('Hello');
+    });
+  });
+
+  // ─── CSS Parts ───
+  describe('CSS Parts', () => {
+    // Each @csspart is accessible via shadowQuery(el, '[part~="name"]')
+    it('exposes "root" part', async () => {
+      const el = await fixture<HelixFoo>('<hx-foo></hx-foo>');
+      expect(shadowQuery(el, '[part~="root"]')).toBeTruthy();
+    });
+  });
+
+  // ─── Form ─── (only for form-associated components)
+  describe('Form', () => {
+    it('has formAssociated=true', () => {
+      const ctor = customElements.get('hx-foo') as unknown as { formAssociated: boolean };
+      expect(ctor.formAssociated).toBe(true);
+    });
+  });
+
+  // ─── Accessibility (axe-core) ───
+  describe('Accessibility (axe-core)', () => {
+    // checkA11y(el) for default state and key variants
+    // Always call page.screenshot() before checkA11y
+    it('has no axe violations in default state', async () => {
+      const el = await fixture<HelixFoo>('<hx-foo>Content</hx-foo>');
+      await page.screenshot();
+      const { violations } = await checkA11y(el);
+      expect(violations).toEqual([]);
+    });
+  });
+});
+```
+
+### Test Utilities
+
+| Utility       | Purpose                                                      |
+| ------------- | ------------------------------------------------------------ |
+| `fixture()`   | Creates element from HTML string, appends to DOM, returns it |
+| `shadowQuery` | Queries inside shadow root: `shadowQuery(el, 'button')`      |
+| `oneEvent`    | Returns promise that resolves when event fires once          |
+| `cleanup`     | Removes all test fixtures — call in `afterEach`              |
+| `checkA11y`   | Runs axe-core accessibility audit, returns `{ violations }`  |
+
+### Test Conventions
+
+- `afterEach(cleanup)` — always at top level of `describe`
+- Never call `setAttribute` in a custom element constructor — use `connectedCallback()`
+- `await el.updateComplete` after triggering reactive property changes
+- Use `shadowQuery<HTMLButtonElement>(el, 'button')!` for type-safe shadow DOM queries
+- Negative event tests: set `fired = false`, trigger, `await el.updateComplete`, assert `false`
+- Positive event tests: call `oneEvent(el, 'hx-event-name')` before triggering, then await
+
+### Writing Tests (simple example)
 
 ```typescript
 import { expect, test } from 'vitest';

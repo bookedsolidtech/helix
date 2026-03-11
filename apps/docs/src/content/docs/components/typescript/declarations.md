@@ -234,7 +234,7 @@ variant: 'primary' | 'secondary' | 'ghost';
 **Consumer benefit:**
 
 ```typescript
-import { HelixButton } from '@helix/library/components/hx-button';
+import { HelixButton } from '@helixui/library/components/hx-button';
 
 const button = document.createElement('hx-button');
 button.variant = 'primary'; // ✅ Valid
@@ -337,7 +337,7 @@ declare global {
 After importing the component (which loads its `.d.ts` file):
 
 ```typescript
-import '@helix/library/components/hx-button';
+import '@helixui/library/components/hx-button';
 
 // TypeScript knows this is HelixButton | null
 const button = document.querySelector('hx-button');
@@ -455,7 +455,7 @@ In monorepo setups (like hx-library), declaration maps enable cross-package navi
 
 ```typescript
 // apps/admin/src/app/page.tsx
-import { HelixButton } from '@helix/library/components/hx-button';
+import { HelixButton } from '@helixui/library/components/hx-button';
 
 const button = new HelixButton();
 // Cmd+Click on HelixButton → jumps to packages/hx-library/src/components/hx-button/hx-button.ts
@@ -463,7 +463,7 @@ const button = new HelixButton();
 
 This works because:
 
-1. `@helix/library` is a workspace dependency (not downloaded from npm)
+1. `@helixui/library` is a workspace dependency (not downloaded from npm)
 2. Source files are accessible in the monorepo
 3. Declaration map `sources` paths resolve correctly via `tsconfig.json` path mapping
 
@@ -553,7 +553,7 @@ The `package.json` `exports` field maps import paths to declaration files, ensur
 
 ```json
 {
-  "name": "@helix/library",
+  "name": "@helixui/library",
   "type": "module",
   "main": "./dist/index.js",
   "module": "./dist/index.js",
@@ -574,9 +574,9 @@ The `package.json` `exports` field maps import paths to declaration files, ensur
 
 **How TypeScript uses this:**
 
-1. **Import `@helix/library`**: TypeScript resolves to `dist/index.d.ts` (via `exports["."].types`)
-2. **Import `@helix/library/components/hx-button`**: TypeScript resolves to `dist/components/hx-button/index.d.ts` (via wildcard pattern)
-3. **Import `@helix/library/custom-elements.json`**: No types (JSON file)
+1. **Import `@helixui/library`**: TypeScript resolves to `dist/index.d.ts` (via `exports["."].types`)
+2. **Import `@helixui/library/components/hx-button`**: TypeScript resolves to `dist/components/hx-button/index.d.ts` (via wildcard pattern)
+3. **Import `@helixui/library/custom-elements.json`**: No types (JSON file)
 
 ### Conditional Exports
 
@@ -606,9 +606,9 @@ The wildcard `"./components/*"` expands to match any path:
 
 ```typescript
 // All resolve to dist/components/{name}/index.d.ts
-import '@helix/library/components/hx-button';
-import '@helix/library/components/hx-card';
-import '@helix/library/components/hx-nonexistent'; // Resolves, but fails at runtime
+import '@helixui/library/components/hx-button';
+import '@helixui/library/components/hx-card';
+import '@helixui/library/components/hx-nonexistent'; // Resolves, but fails at runtime
 ```
 
 **Limitation:** TypeScript doesn't validate that the component exists. If you typo a component name, you get a runtime error (module not found), not a compile-time error.
@@ -759,7 +759,7 @@ npm install /path/to/helix-library-0.0.1.tgz
 
 Verify:
 
-- Import paths resolve (`import '@helix/library/components/hx-button'`)
+- Import paths resolve (`import '@helixui/library/components/hx-button'`)
 - Autocomplete works (`button.variant` suggests union values)
 - "Go to Definition" navigates to source (if declaration maps enabled)
 
@@ -907,8 +907,8 @@ declare global {
 
 This mirrors JavaScript output and allows:
 
-- **Direct class imports**: `import { HelixButton } from '@helix/library/components/hx-button'` resolves to `index.d.ts`
-- **Deep imports (advanced)**: `import { HelixButton } from '@helix/library/components/hx-button/hx-button'` resolves to `hx-button.d.ts`
+- **Direct class imports**: `import { HelixButton } from '@helixui/library/components/hx-button'` resolves to `index.d.ts`
+- **Deep imports (advanced)**: `import { HelixButton } from '@helixui/library/components/hx-button/hx-button'` resolves to `hx-button.d.ts`
 
 ### Package.json Mapping
 
@@ -925,7 +925,7 @@ The `exports` field maps both entry points:
 }
 ```
 
-TypeScript resolves `@helix/library/components/hx-button` → `dist/components/hx-button/index.d.ts` → re-export from `hx-button.d.ts`.
+TypeScript resolves `@helixui/library/components/hx-button` → `dist/components/hx-button/index.d.ts` → re-export from `hx-button.d.ts`.
 
 ---
 

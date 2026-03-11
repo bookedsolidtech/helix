@@ -7,7 +7,7 @@ describe('MCP Tools - CEM Analyzer', () => {
 
   beforeEach(() => {
     server = new Server(
-      { name: '@helix/mcp-cem-analyzer', version: '0.1.0' },
+      { name: '@helixui/mcp-cem-analyzer', version: '0.1.0' },
       { capabilities: { tools: {} } },
     );
   });

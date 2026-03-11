@@ -1,0 +1,30 @@
+---
+title: 'hx-tab'
+description: An individual tab trigger within an hx-tabs container.
+---
+
+import ComponentLoader from '../../../components/ComponentLoader.astro';
+import ComponentDoc from '../../../components/ComponentDoc.astro';
+
+<ComponentLoader />
+
+<ComponentDoc tagName="hx-tab" section="summary" />
+
+`hx-tab` is a sub-component of [`hx-tabs`](/component-library/hx-tabs). Full usage documentation, live demos, accessibility details, and Drupal integration examples are on the **[hx-tabs documentation page](/component-library/hx-tabs)**.
+
+## Quick Reference
+
+`<hx-tab>` must be placed in the `tab` named slot of an `<hx-tabs>` container. The `panel` attribute must match the `name` attribute on the corresponding `<hx-tab-panel>`.
+
+```html
+<hx-tabs label="Example tabs">
+  <hx-tab slot="tab" panel="one">Tab One</hx-tab>
+  <hx-tab slot="tab" panel="two" disabled>Tab Two (disabled)</hx-tab>
+  <hx-tab-panel name="one"><p>Panel one content.</p></hx-tab-panel>
+  <hx-tab-panel name="two"><p>Panel two content.</p></hx-tab-panel>
+</hx-tabs>
+```
+
+## API Reference
+
+<ComponentDoc tagName="hx-tab" section="api" />

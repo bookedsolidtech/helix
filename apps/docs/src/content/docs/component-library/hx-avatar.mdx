@@ -1,0 +1,274 @@
+---
+title: 'hx-avatar'
+description: Visual representation of a user or entity with image, initials, or icon fallback, sized and shaped for healthcare application UIs
+---
+
+import ComponentLoader from '../../../components/ComponentLoader.astro';
+import ComponentDemo from '../../../components/ComponentDemo.astro';
+import ComponentDoc from '../../../components/ComponentDoc.astro';
+
+<ComponentLoader />
+
+<ComponentDoc tagName="hx-avatar" section="summary" />
+
+## Overview
+
+`hx-avatar` displays a visual representation of a user or entity — a photo, initials, or a generic person icon when no other content is available. It implements a three-tier fallback chain: image → initials → icon, and recovers gracefully from broken image URLs without requiring a page reload.
+
+**Use `hx-avatar` when:** you need to identify a person (clinician, patient, staff member) visually in lists, cards, chat threads, or profile headers.
+
+**Use the `badge` slot** to overlay a status indicator — for example, a color dot indicating clinician availability or an alert badge for unread notifications.
+
+**Do not use `hx-avatar` as a button.** Wrap it in an `hx-button` or `<a>` element if the avatar should be interactive.
+
+## Live Demo
+
+### Default (Fallback Icon)
+
+When no `src` or `initials` are provided, the generic person silhouette renders as the baseline anonymous avatar.
+
+<ComponentDemo title="Default avatar">
+  <hx-avatar label="Anonymous user"></hx-avatar>
+</ComponentDemo>
+
+### With Initials
+
+Display the user's initials when no photo is available. Always pair with `label` to give screen readers a meaningful name instead of individual letters.
+
+<ComponentDemo title="Initials avatar">
+  <hx-avatar initials="JD" label="Dr. Jane Doe"></hx-avatar>
+</ComponentDemo>
+
+### With Image
+
+When a valid `src` is set, the image renders. If the image fails to load, the component falls back to initials (if set) or the icon.
+
+<ComponentDemo title="Image avatar">
+  <hx-avatar src="https://i.pravatar.cc/150?img=1" alt="Dr. Jane Smith" initials="JS"></hx-avatar>
+</ComponentDemo>
+
+### Sizes
+
+Five sizes from `xs` (compact list rows) to `xl` (profile headers).
+
+<ComponentDemo title="Size variants">
+  <div style="display: flex; align-items: center; gap: 1.5rem; flex-wrap: wrap;">
+    <div style="display: flex; flex-direction: column; align-items: center; gap: 0.5rem;">
+      <hx-avatar hx-size="xs" initials="XS" label="Extra small"></hx-avatar>
+      <span style="font-size: 0.75rem; color: #6b7280;">xs</span>
+    </div>
+    <div style="display: flex; flex-direction: column; align-items: center; gap: 0.5rem;">
+      <hx-avatar hx-size="sm" initials="SM" label="Small"></hx-avatar>
+      <span style="font-size: 0.75rem; color: #6b7280;">sm</span>
+    </div>
+    <div style="display: flex; flex-direction: column; align-items: center; gap: 0.5rem;">
+      <hx-avatar hx-size="md" initials="MD" label="Medium"></hx-avatar>
+      <span style="font-size: 0.75rem; color: #6b7280;">md</span>
+    </div>
+    <div style="display: flex; flex-direction: column; align-items: center; gap: 0.5rem;">
+      <hx-avatar hx-size="lg" initials="LG" label="Large"></hx-avatar>
+      <span style="font-size: 0.75rem; color: #6b7280;">lg</span>
+    </div>
+    <div style="display: flex; flex-direction: column; align-items: center; gap: 0.5rem;">
+      <hx-avatar hx-size="xl" initials="XL" label="Extra large"></hx-avatar>
+      <span style="font-size: 0.75rem; color: #6b7280;">xl</span>
+    </div>
+  </div>
+</ComponentDemo>
+
+### Shapes
+
+Circle (default) and square variants.
+
+<ComponentDemo title="Shape variants">
+  <div style="display: flex; align-items: center; gap: 2rem;">
+    <div style="display: flex; flex-direction: column; align-items: center; gap: 0.5rem;">
+      <hx-avatar hx-size="lg" shape="circle" initials="RN" label="Registered Nurse"></hx-avatar>
+      <span style="font-size: 0.75rem; color: #6b7280;">circle</span>
+    </div>
+    <div style="display: flex; flex-direction: column; align-items: center; gap: 0.5rem;">
+      <hx-avatar hx-size="lg" shape="square" initials="RN" label="Registered Nurse"></hx-avatar>
+      <span style="font-size: 0.75rem; color: #6b7280;">square</span>
+    </div>
+  </div>
+</ComponentDemo>
+
+### With Badge
+
+Slot a status indicator into the `badge` slot. The badge renders outside the avatar's `overflow: hidden` boundary so it is never clipped.
+
+<ComponentDemo title="Avatar with status badge">
+  <hx-avatar hx-size="lg" src="https://i.pravatar.cc/150?img=5" alt="Dr. Maria Chen" initials="MC">
+    <span
+      slot="badge"
+      style="display: inline-block; width: 0.75rem; height: 0.75rem; border-radius: 50%; background-color: #22c55e; border: 2px solid #ffffff;"
+      role="img"
+      aria-label="Online"
+    ></span>
+  </hx-avatar>
+</ComponentDemo>
+
+## Installation
+
+```bash
+# Full library
+npm install @helixui/library
+
+# Or import only this component (tree-shaking friendly)
+import '@helixui/library/components/hx-avatar';
+```
+
+## Basic Usage
+
+Minimal HTML snippet — no build tool required:
+
+```html
+<!-- Fallback icon (anonymous user) -->
+<hx-avatar label="Anonymous user"></hx-avatar>
+
+<!-- Initials fallback -->
+<hx-avatar initials="JD" label="Dr. Jane Doe"></hx-avatar>
+
+<!-- Photo with alt text -->
+<hx-avatar src="/photos/dr-doe.jpg" alt="Dr. Jane Doe" initials="JD"></hx-avatar>
+```
+
+## Properties
+
+| Property   | Attribute  | Type                                   | Default     | Description                                                                                                                                                           |
+| ---------- | ---------- | -------------------------------------- | ----------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `src`      | `src`      | `string \| undefined`                  | `undefined` | Image URL. When provided and successfully loaded, the image renders. If the load fails, the component falls back to initials or the icon.                             |
+| `alt`      | `alt`      | `string`                               | `''`        | Accessible label for the image. **Required when `src` is set.** Used as `aria-label` on the container in image mode.                                                  |
+| `label`    | `label`    | `string`                               | `''`        | Human-readable accessible name for non-image states. In healthcare contexts provide the full name (e.g., `"Dr. Jane Doe"`) rather than relying on raw initials alone. |
+| `initials` | `initials` | `string`                               | `''`        | Fallback initials shown when no image is available. Up to 2–3 characters recommended.                                                                                 |
+| `size`     | `hx-size`  | `'xs' \| 'sm' \| 'md' \| 'lg' \| 'xl'` | `'md'`      | Size variant controlling the width and height of the avatar.                                                                                                          |
+| `shape`    | `shape`    | `'circle' \| 'square'`                 | `'circle'`  | Shape variant. Circle uses `50%` border-radius; square uses the `--hx-border-radius-md` token.                                                                        |
+
+## Events
+
+`hx-avatar` is a display-only component and dispatches no custom events.
+
+## CSS Custom Properties
+
+| Property                    | Default                       | Description                                                        |
+| --------------------------- | ----------------------------- | ------------------------------------------------------------------ |
+| `--hx-avatar-size`          | _(set by size variant)_       | Computed width and height. Override to set a custom size.          |
+| `--hx-avatar-border-radius` | _(set by shape variant)_      | `50%` for circle, `var(--hx-border-radius-md)` for square.         |
+| `--hx-avatar-bg`            | `var(--hx-color-primary-100)` | Background color of the avatar container (initials / icon states). |
+| `--hx-avatar-color`         | `var(--hx-color-primary-700)` | Text and icon color inside the avatar.                             |
+| `--hx-avatar-font-size`     | _(set by size variant)_       | Font size for the initials text.                                   |
+
+## CSS Parts
+
+| Part            | Description                                                                           |
+| --------------- | ------------------------------------------------------------------------------------- |
+| `avatar`        | The outer container element — target this to change the shape, background, or border. |
+| `image`         | The `<img>` element shown when `src` is provided and loads successfully.              |
+| `initials`      | The `<span>` displaying initials when no valid image is available.                    |
+| `fallback-icon` | The SVG person silhouette shown when no `src` or `initials` are set.                  |
+| `badge`         | The badge slot container positioned at the bottom-right of the avatar wrapper.        |
+
+## Slots
+
+| Slot        | Description                                                                                                                                                        |
+| ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| _(default)_ | Custom avatar content. When slotted content is present it overrides the `src`/`initials` rendering path and the component removes its `role="img"` / `aria-label`. |
+| `badge`     | Status indicator overlay positioned at the bottom-right of the avatar, outside the `overflow: hidden` boundary.                                                    |
+
+## Accessibility
+
+| Topic         | Details                                                                                                                                                                                                                     |
+| ------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| ARIA role     | The inner container receives `role="img"` automatically in image, initials, and icon states. The role is removed when custom content is slotted into the default slot, delegating semantics to the slotted content.         |
+| `aria-label`  | Set automatically from `alt` (image state) or `label` (initials / icon states). When neither is provided the fallback is `"Avatar"`. Always set `alt` when `src` is used, and `label` when displaying initials or the icon. |
+| `alt` on img  | The internal `<img>` carries `aria-hidden="true"` because the outer container already owns the accessible label via `role="img"` + `aria-label`. Setting `alt` on the host populates that outer label.                      |
+| Screen reader | In image mode the container announces `alt` text. In initials mode it announces `label` (or falls back to the raw initials). In icon mode it announces `label` or `"Avatar"`.                                               |
+| Keyboard      | `hx-avatar` is a non-interactive element and does not receive keyboard focus. Interactive wrappers (`<a>`, `hx-button`) provide their own focus semantics.                                                                  |
+| Healthcare    | Always provide `label` with the person's full name (e.g., `"Dr. Jane Doe"`) instead of raw initials. Screen readers announce "J D" for initials but "Dr. Jane Doe" for the label, which is meaningful to users.             |
+
+## Drupal Integration
+
+Use the component in a Twig template after registering the library:
+
+```twig
+{# my-module/templates/user-avatar.html.twig #}
+
+<hx-avatar
+  {% if avatar_src %}src="{{ avatar_src }}"{% endif %}
+  alt="{{ user.name }}"
+  label="{{ user.name }}"
+  initials="{{ user.initials }}"
+  hx-size="{{ avatar_size|default('md') }}"
+  shape="{{ avatar_shape|default('circle') }}"
+>
+  {% if status_indicator %}
+    <span
+      slot="badge"
+      style="display: inline-block; width: 0.75rem; height: 0.75rem; border-radius: 50%; background-color: {{ status_color }}; border: 2px solid #ffffff;"
+      role="img"
+      aria-label="{{ status_label }}"
+    ></span>
+  {% endif %}
+</hx-avatar>
+```
+
+Load the library in your module's `.libraries.yml`:
+
+```yaml
+helix-components:
+  js:
+    /libraries/helix/helix.min.js: { minified: true }
+```
+
+## Standalone HTML Example
+
+Copy-paste this into a `.html` file and open it in a browser — no build tool needed:
+
+```html
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>hx-avatar example</title>
+    <!-- @helixui/library is a private package — install via npm workspace, not CDN -->
+    <!-- In your project: import '@helixui/library'; in your bundler entry point -->
+  </head>
+  <body
+    style="font-family: sans-serif; padding: 2rem; display: flex; gap: 1.5rem; align-items: center; flex-wrap: wrap;"
+  >
+    <!-- Photo avatar -->
+    <hx-avatar
+      src="https://i.pravatar.cc/150?img=1"
+      alt="Dr. Jane Smith"
+      initials="JS"
+      hx-size="lg"
+    ></hx-avatar>
+
+    <!-- Initials avatar -->
+    <hx-avatar initials="JD" label="Dr. John Doe" hx-size="lg"></hx-avatar>
+
+    <!-- Icon fallback -->
+    <hx-avatar label="Anonymous user" hx-size="lg"></hx-avatar>
+
+    <!-- Avatar with online badge -->
+    <hx-avatar
+      src="https://i.pravatar.cc/150?img=5"
+      alt="Dr. Maria Chen"
+      initials="MC"
+      hx-size="lg"
+    >
+      <span
+        slot="badge"
+        style="display: inline-block; width: 0.75rem; height: 0.75rem; border-radius: 50%; background-color: #22c55e; border: 2px solid #ffffff;"
+        role="img"
+        aria-label="Online"
+      ></span>
+    </hx-avatar>
+  </body>
+</html>
+```
+
+## API Reference
+
+<ComponentDoc tagName="hx-avatar" section="api" />

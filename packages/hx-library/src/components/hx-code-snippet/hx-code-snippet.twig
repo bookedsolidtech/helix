@@ -1,0 +1,153 @@
+{#
+/**
+ * @file hx-code-snippet.twig
+ * Twig template for the hx-code-snippet web component.
+ *
+ * Renders a styled code block (or inline code span) with optional copy-to-clipboard,
+ * line numbers, and expand/collapse truncation. The component has no external syntax
+ * highlighting dependency — supply `language` as a hint and integrate your own
+ * highlighter via the default slot if needed.
+ *
+ * Available variables:
+ *   - content (string, required): The raw code text. Rendered as the default slot child.
+ *       Pre-highlighted HTML is not supported — the component extracts textContent only.
+ *       Wrap pre-highlighted markup in a separate <pre><code> and set inline: false to
+ *       layer it alongside rather than inside the component.
+ *
+ *   - language (string, optional): Language hint, e.g. 'javascript', 'bash', 'html', 'css',
+ *       'php', 'twig'. Applied as a `language-*` class on the inner <code> element so
+ *       external highlighters (Prism, highlight.js) can target it. Has no visual effect
+ *       on its own. Default: '' (no language class).
+ *
+ *   - inline (boolean, optional): When true, renders as an inline <code> element rather
+ *       than a <pre><code> block. Copy button, line numbers, and max-lines truncation are
+ *       not available in inline mode. Default: false.
+ *
+ *   - wrap (boolean, optional): When true, enables word-wrap in block mode so long lines
+ *       do not overflow their container. Has no effect in inline mode. Default: false.
+ *
+ *   - copyable (boolean, optional): When true, shows a copy-to-clipboard button.
+ *       Default: true.
+ *
+ *       BOOLEAN ATTRIBUTE TRAP — READ BEFORE EDITING:
+ *       `copyable` defaults to TRUE in the component. The copy button is shown whenever
+ *       the `copyable` attribute is PRESENT on the element, regardless of its value.
+ *       Writing `<hx-code-snippet copyable="false">` will NOT hide the button — the
+ *       attribute presence alone signals true.
+ *
+ *       This template handles the inversion correctly:
+ *         - copyable is undefined (not passed)  → show button (component default is true)
+ *         - copyable is true                    → show button (add `copyable` attribute)
+ *         - copyable is false                   → hide button (omit `copyable` attribute entirely)
+ *
+ *       To disable from JavaScript: `el.copyable = false;`
+ *       In Lit templates: `?copyable=${false}` (Lit boolean binding removes the attribute).
+ *
+ *   - max_lines (integer, optional): Maximum lines to display before a "Show more" button
+ *       appears. Set to 0 to disable truncation (no limit). Default: 0.
+ *       Maps to the `max-lines` HTML attribute / `maxLines` JS property.
+ *
+ *   - line_numbers (boolean, optional): When true, prepends line numbers to each line in
+ *       block mode. Line numbers are aria-hidden so screen readers skip them. Default: false.
+ *       Maps to the `line-numbers` HTML attribute / `lineNumbers` JS property.
+ *
+ *   - attributes (Drupal\Core\Template\Attribute, optional): Additional HTML attributes
+ *       to merge onto the element (e.g. data-* attributes, id, class additions).
+ *
+ * CLIPBOARD AND HTTPS REQUIREMENT:
+ *   navigator.clipboard.writeText() requires a secure context (HTTPS or localhost).
+ *   On HTTP Drupal staging environments the copy button renders and is clickable, but
+ *   the clipboard write will silently fail — no error is shown to the user. The `hx-copy`
+ *   CustomEvent still fires and bubbles, so Drupal behaviors can intercept it and fall back
+ *   to a document.execCommand('copy') approach if needed on non-HTTPS environments.
+ *
+ * PROGRESSIVE ENHANCEMENT:
+ *   The `content` variable is rendered as a text node inside the element. It is visible
+ *   in the DOM before JavaScript loads, satisfying SEO and no-JS requirements. The copy
+ *   button, expand/collapse, and line numbers are added by the component after hydration.
+ *
+ * DRUPAL LIBRARY LOADING:
+ *   Register the component script in your theme's .libraries.yml:
+ *
+ *     hx-code-snippet:
+ *       js:
+ *         path/to/@wc-2026/library/dist/hx-code-snippet.js: { attributes: { type: module } }
+ *
+ *   Attach in your template or preprocess function:
+ *     {{ attach_library('mytheme/hx-code-snippet') }}
+ *
+ * COPY EVENT — DRUPAL BEHAVIORS INTEGRATION:
+ *   The component fires `hx-copy` (bubbles, composed) on clipboard action:
+ *
+ *     (function (Drupal, once) {
+ *       Drupal.behaviors.hxCodeSnippetCopy = {
+ *         attach(context) {
+ *           once('hx-copy', 'hx-code-snippet', context).forEach((el) => {
+ *             el.addEventListener('hx-copy', (e) => {
+ *               // e.detail.text — the copied string
+ *               Drupal.announce('Code copied to clipboard');
+ *             });
+ *           });
+ *         },
+ *       };
+ *     })(Drupal, once);
+ *
+ * Usage examples:
+ *
+ *   Block mode with language hint and copy button (default):
+ *     {% include '@mytheme/hx-code-snippet/hx-code-snippet.twig' with {
+ *       language: 'javascript',
+ *       content: 'const greeting = "Hello, world!";',
+ *     } %}
+ *
+ *   Block mode with line numbers and max-lines truncation:
+ *     {% include '@mytheme/hx-code-snippet/hx-code-snippet.twig' with {
+ *       language: 'php',
+ *       content: node.field_code_block.value,
+ *       line_numbers: true,
+ *       max_lines: 20,
+ *     } %}
+ *
+ *   Inline code snippet (no copy button):
+ *     {% include '@mytheme/hx-code-snippet/hx-code-snippet.twig' with {
+ *       inline: true,
+ *       content: '$patient->getMrn()',
+ *     } %}
+ *
+ *   Block mode with copy button explicitly disabled:
+ *     {% include '@mytheme/hx-code-snippet/hx-code-snippet.twig' with {
+ *       language: 'bash',
+ *       content: 'drush cr',
+ *       copyable: false,
+ *     } %}
+ *
+ *   Word-wrap enabled (long lines, no horizontal scroll):
+ *     {% include '@mytheme/hx-code-snippet/hx-code-snippet.twig' with {
+ *       language: 'html',
+ *       content: node.field_markup.value,
+ *       wrap: true,
+ *       copyable: false,
+ *     } %}
+ */
+#}
+
+{# ── Resolve defaults ─────────────────────────────────────────────────────── #}
+{# `copyable` defaults to true in the component. Only add the attribute when  #}
+{# the caller has not explicitly set it to false. Passing copyable="false"    #}
+{# in raw HTML would still show the button (boolean attribute trap), so we    #}
+{# omit the attribute entirely when the caller passes false.                  #}
+{% set _copyable = copyable is not defined or copyable != false %}
+
+{# `max_lines` maps to the `max-lines` HTML attribute (hyphenated).          #}
+{# Only emit the attribute when a non-zero positive integer is provided.     #}
+{% set _max_lines = max_lines|default(0)|number_format(0, '.', '') %}
+
+<hx-code-snippet
+  {% if language %}language="{{ language }}"{% endif %}
+  {% if inline %}inline{% endif %}
+  {% if wrap %}wrap{% endif %}
+  {% if _copyable %}copyable{% endif %}
+  {% if _max_lines > 0 %}max-lines="{{ _max_lines }}"{% endif %}
+  {% if line_numbers %}line-numbers{% endif %}
+  {% if attributes %}{{ attributes }}{% endif %}
+>{{ content }}</hx-code-snippet>

@@ -1,0 +1,183 @@
+---
+title: 'hx-number-input'
+description: 'Numeric input field with increment and decrement controls, bounds checking, and full form association'
+---
+
+import ComponentLoader from '../../../components/ComponentLoader.astro';
+import ComponentDemo from '../../../components/ComponentDemo.astro';
+import ComponentDoc from '../../../components/ComponentDoc.astro';
+
+<ComponentLoader />
+
+<ComponentDoc tagName="hx-number-input" section="summary" />
+
+## Basic
+
+Simple numeric input with a label and default step of 1.
+
+<ComponentDemo title="Basic">
+  <hx-number-input label="Quantity" value="10"></hx-number-input>
+</ComponentDemo>
+
+## With Min / Max
+
+Bounds-checked input — the stepper buttons disable at the boundaries.
+
+<ComponentDemo title="With Min / Max">
+  <div style="max-width: 400px;">
+    <hx-number-input label="Percentage" value="50" min="0" max="100" step="5"></hx-number-input>
+  </div>
+</ComponentDemo>
+
+## Help Text
+
+Guidance text displayed below the input.
+
+<ComponentDemo title="Help Text">
+  <div style="max-width: 400px;">
+    <hx-number-input
+      label="Dosage (mg)"
+      help-text="Enter the prescribed dosage in milligrams."
+    ></hx-number-input>
+  </div>
+</ComponentDemo>
+
+## Error State
+
+Input with a validation error message.
+
+<ComponentDemo title="Error State">
+  <div style="max-width: 400px;">
+    <hx-number-input
+      label="Patient Age"
+      value="150"
+      max="120"
+      error="Age must be 120 or below."
+    ></hx-number-input>
+  </div>
+</ComponentDemo>
+
+## Required
+
+Required field with visual indicator.
+
+<ComponentDemo title="Required">
+  <div style="max-width: 400px;">
+    <hx-number-input
+      label="Blood Pressure (mmHg)"
+      required
+      help-text="This field is required."
+    ></hx-number-input>
+  </div>
+</ComponentDemo>
+
+## Disabled
+
+Non-interactive disabled state.
+
+<ComponentDemo title="Disabled">
+  <div style="max-width: 400px;">
+    <hx-number-input
+      label="System Score"
+      value="42"
+      disabled
+      help-text="This value is calculated automatically."
+    ></hx-number-input>
+  </div>
+</ComponentDemo>
+
+## Read-only
+
+Value is visible but cannot be changed.
+
+<ComponentDemo title="Read-only">
+  <div style="max-width: 400px;">
+    <hx-number-input
+      label="Recorded Measurement"
+      value="98"
+      readonly
+      help-text="Recorded at time of admission."
+    ></hx-number-input>
+  </div>
+</ComponentDemo>
+
+## No Stepper
+
+Hides the increment/decrement buttons for a minimal look.
+
+<ComponentDemo title="No Stepper">
+  <div style="max-width: 400px;">
+    <hx-number-input label="Quantity" value="5" no-stepper></hx-number-input>
+  </div>
+</ComponentDemo>
+
+## Prefix & Suffix Slots
+
+Content rendered before or after the input field.
+
+<ComponentDemo title="Prefix & Suffix Slots">
+  <div style="display: grid; gap: 1rem; max-width: 400px;">
+    <hx-number-input label="Dosage" value="250" min="0" step="10">
+      <span slot="prefix">mg</span>
+    </hx-number-input>
+    <hx-number-input label="Patient Weight" value="72" min="0" step="0.1">
+      <span slot="suffix">kg</span>
+    </hx-number-input>
+  </div>
+</ComponentDemo>
+
+## Size Variants
+
+Three sizes for different layout contexts.
+
+<ComponentDemo title="Size Variants">
+  <div style="display: flex; flex-direction: column; gap: 1rem; max-width: 400px;">
+    <hx-number-input label="Small (hx-size=sm)" value="1" hx-size="sm"></hx-number-input>
+    <hx-number-input label="Medium (hx-size=md, default)" value="2" hx-size="md"></hx-number-input>
+    <hx-number-input label="Large (hx-size=lg)" value="3" hx-size="lg"></hx-number-input>
+  </div>
+</ComponentDemo>
+
+## Validation States
+
+Multiple states side by side.
+
+<ComponentDemo title="Validation States">
+  <div style="display: grid; gap: 1rem; max-width: 400px;">
+    <hx-number-input
+      label="Valid input"
+      value="10"
+      help-text="Within acceptable range."
+    ></hx-number-input>
+    <hx-number-input
+      label="Error input"
+      value="999"
+      max="100"
+      error="Value exceeds maximum of 100."
+    ></hx-number-input>
+    <hx-number-input label="Disabled input" value="37" disabled></hx-number-input>
+  </div>
+</ComponentDemo>
+
+## Healthcare Example
+
+A realistic dosage entry field for a medication order form.
+
+<ComponentDemo title="Healthcare Example">
+  <div style="max-width: 400px;">
+    <hx-number-input
+      label="Dosage (mg)"
+      value="250"
+      min="0"
+      max="1000"
+      step="0.5"
+      help-text="Enter prescribed dosage amount (0–1000 mg)."
+      name="dosage"
+      required
+    ></hx-number-input>
+  </div>
+</ComponentDemo>
+
+## API Reference
+
+<ComponentDoc tagName="hx-number-input" section="api" />

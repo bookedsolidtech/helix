@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
-import { MCPError, ErrorCategory } from '@helix/mcp-shared';
+import { MCPError, ErrorCategory } from '@helixui/mcp-shared';
 
 // Create shared mock objects that will be used by all tests
 const mockFileOps = {
@@ -20,8 +20,8 @@ vi.mock('node:fs', () => ({
   readFileSync: vi.fn(),
 }));
 
-vi.mock('@helix/mcp-shared', async () => {
-  const actual = await vi.importActual('@helix/mcp-shared');
+vi.mock('@helixui/mcp-shared', async () => {
+  const actual = await vi.importActual('@helixui/mcp-shared');
 
   return {
     ...actual,

@@ -5,7 +5,7 @@ sidebar:
   order: 5
 ---
 
-Lit components render their UI using JavaScript template literals tagged with the `html` function. This approach leverages the browser's native template literal feature to create efficient, declarative templates that only re-render changed content. Understanding Lit's template syntax is essential for building components in the wc-2026 library.
+Lit components render their UI using JavaScript template literals tagged with the `html` function. This approach leverages the browser's native template literal feature to create efficient, declarative templates that only re-render changed content. Understanding Lit's template syntax is essential for building components in the HELiX library.
 
 ## HTML Tagged Template Literals
 
@@ -679,7 +679,7 @@ override render() {
 }
 ```
 
-## Real-World Examples from wc-2026
+## Real-World Examples from HELiX
 
 ### Example 1: hx-card Component
 

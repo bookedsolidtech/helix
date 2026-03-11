@@ -32,8 +32,8 @@ drush cr
 **Solution**: Add `display: none` until components are defined:
 
 ```css
-wc-card:not(:defined),
-wc-button:not(:defined) {
+hx-card:not(:defined),
+hx-button:not(:defined) {
   display: none;
 }
 ```
@@ -61,10 +61,10 @@ wc-button:not(:defined) {
 **Solution**: Ensure Drupal Behaviors are properly configured:
 
 ```javascript
-Drupal.behaviors.wcInit = {
+Drupal.behaviors.hxInit = {
   attach(context) {
     // This runs on AJAX responses too
-    customElements.whenDefined('wc-card').then(() => {
+    customElements.whenDefined('hx-card').then(() => {
       // Components are ready
     });
   },
@@ -85,4 +85,4 @@ Content-Security-Policy: script-src 'self' https://cdn.jsdelivr.net;
 
 - Check the [Drupal Integration Guide](/pre-planning/drupal-guide/) for comprehensive documentation
 - Review the [Component API](/components/api/) for correct attribute usage
-- File an issue on [GitHub](https://github.com/himerus/helix/issues)
+- File an issue on [GitHub](https://github.com/bookedsolidtech/helix/issues)

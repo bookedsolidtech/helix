@@ -1,0 +1,79 @@
+{#
+/**
+ * @file
+ * HELIX hx-skeleton — Drupal 11 Twig integration.
+ *
+ * Renders an animated shimmer skeleton placeholder for loading states.
+ * The component is purely decorative and hidden from assistive technology.
+ * Use an aria-busy wrapper and an aria-live region to communicate loading
+ * state to screen reader users.
+ *
+ * Variables:
+ *   - variant     (string)  Shape variant: text | circle | rect | button | paragraph. Default: rect.
+ *   - width       (string)  CSS width value. Default: 100%.
+ *   - height      (string)  CSS height value. Defaults vary by variant.
+ *   - animated    (bool)    Whether shimmer animation is active. Default: true.
+ *   - loaded      (bool)    When true, hides the skeleton and fires hx-loaded. Default: false.
+ *   - live_region (bool)    When true, renders an aria-live region alongside the skeleton.
+ *   - live_id     (string)  ID for the aria-live region element (required when live_region is true).
+ *
+ * Usage — static skeleton:
+ *   {% include '@my_theme/helix-skeleton.html.twig' with {
+ *     variant: 'rect',
+ *     width: '100%',
+ *     height: '80px',
+ *   } %}
+ *
+ * Usage — conditional skeleton with real content:
+ *   {% set is_loading = not node %}
+ *   <div aria-busy="{{ is_loading ? 'true' : 'false' }}" aria-label="Patient summary">
+ *     {% if is_loading %}
+ *       {% include '@my_theme/helix-skeleton.html.twig' with {
+ *         variant: 'rect',
+ *         width: '100%',
+ *         height: '120px',
+ *         live_region: true,
+ *         live_id: 'patient-summary-status',
+ *       } %}
+ *     {% else %}
+ *       <div>{{ node.label }}</div>
+ *     {% endif %}
+ *   </div>
+ *
+ * Accessibility notes:
+ *   - Wrap skeleton groups in an element with aria-busy="true" and aria-label.
+ *   - Use the live_region option (or provide your own aria-live region) to
+ *     announce loading completion to assistive technology users.
+ *   - Set loaded="true" on the component once data is available to trigger
+ *     the hx-loaded event and automatically hide the skeleton.
+ *   - Listen for the hx-loaded event in JavaScript to update the live region
+ *     text and reveal real content.
+ *
+ * CDN include (add once per page, typically in html.html.twig):
+ *   <script type="module" src="/libraries/helix/dist/hx-skeleton.js"></script>
+ */
+#}
+
+{% set _variant = variant|default('rect') %}
+{% set _width = width|default('100%') %}
+{% set _animated = animated is not defined ? true : animated %}
+{% set _loaded = loaded|default(false) %}
+
+{# Optional aria-live region for AT announcements on load completion #}
+{% if live_region and live_id %}
+  <div
+    id="{{ live_id }}"
+    aria-live="polite"
+    aria-atomic="true"
+    style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap;"
+  ></div>
+{% endif %}
+
+<hx-skeleton
+  variant="{{ _variant }}"
+  width="{{ _width }}"
+  {% if height %}height="{{ height }}"{% endif %}
+  {% if not _animated %}{% else %}animated{% endif %}
+  {% if _loaded %}loaded{% endif %}
+  {% if attributes %}{{ attributes }}{% endif %}
+></hx-skeleton>

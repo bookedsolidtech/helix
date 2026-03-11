@@ -1,13 +1,13 @@
 ---
 title: Component Styling Fundamentals
-description: Deep dive into Shadow DOM styling with :host selectors, :host() functions, style encapsulation, CSS custom properties, and the wc-2026 design token system.
+description: Deep dive into Shadow DOM styling with :host selectors, :host() functions, style encapsulation, CSS custom properties, and the HELiX design token system.
 sidebar:
   order: 1
 ---
 
 Shadow DOM provides powerful style encapsulation for web components, creating a boundary where external styles cannot leak in and internal styles cannot leak out. This isolation is fundamental to building enterprise-grade component libraries where reliability and predictability are non-negotiable.
 
-This guide covers the Shadow DOM styling mechanisms that power wc-2026 components: the `:host` selector, `:host()` function, `:host-context()` pattern, style boundaries, CSS custom properties, and the three-tier design token architecture.
+This guide covers the Shadow DOM styling mechanisms that power HELiX components: the `:host` selector, `:host()` function, `:host-context()` pattern, style boundaries, CSS custom properties, and the three-tier design token architecture.
 
 ---
 
@@ -241,7 +241,7 @@ wc-button.primary {
 
 **This is intentional.** Low specificity allows consumers to style the host element without needing `!important`. Component authors provide **default** host styles; consumers can override them naturally.
 
-### wc-2026 `:host` Patterns
+### HELiX `:host` Patterns
 
 **Pattern 1: Display mode + containment**
 
@@ -382,7 +382,7 @@ Combine multiple conditions:
 }
 ```
 
-### wc-2026 `:host()` Patterns
+### HELiX `:host()` Patterns
 
 **Pattern 1: Variant-driven token overrides**
 
@@ -495,9 +495,9 @@ Instead of relying on `:host-context()`, use CSS custom properties for theming:
 - Explicit theming API (documented tokens vs. implicit context dependency)
 - Testable (override tokens in tests vs. wrapping in context divs)
 
-### wc-2026 Policy on `:host-context()`
+### HELiX Policy on `:host-context()`
 
-**Policy:** wc-2026 components **do not use `:host-context()`** for theming or critical functionality. All theming is CSS custom property-based to ensure Firefox compatibility.
+**Policy:** HELiX components **do not use `:host-context()`** for theming or critical functionality. All theming is CSS custom property-based to ensure Firefox compatibility.
 
 **Exception:** `:host-context()` may be used for **optional enhancements** in Chromium/Safari (e.g., experimental features, developer tools), but never for core component behavior.
 
@@ -656,7 +656,7 @@ Even though the shadow boundary blocks selector matching, CSS custom properties 
 
 ### The Fallback Pattern
 
-wc-2026 uses a **two-level fallback chain** for every CSS custom property:
+HELiX uses a **two-level fallback chain** for every CSS custom property:
 
 ```css
 property: var(--wc-component-token, var(--wc-semantic-token, primitive-value));
@@ -742,9 +742,9 @@ This JSDoc is processed by Custom Elements Manifest (CEM) to generate machine-re
 
 ---
 
-## wc-2026 Design Token System
+## HELiX Design Token System
 
-wc-2026 uses a **three-tier token architecture** that separates primitive values, semantic meaning, and component-specific overrides.
+HELiX uses a **three-tier token architecture** that separates primitive values, semantic meaning, and component-specific overrides.
 
 ### Three-Tier Architecture
 
@@ -910,7 +910,7 @@ All tokens follow a strict pattern:
 }
 ```
 
-**Result:** All wc-2026 components automatically adopt the new theme without code changes. Every component that uses `--wc-color-primary-500` now renders in teal. Every component using `--wc-font-family-sans` uses Inter.
+**Result:** All HELiX components automatically adopt the new theme without code changes. Every component that uses `--wc-color-primary-500` now renders in teal. Every component using `--wc-font-family-sans` uses Inter.
 
 **Component-specific override:**
 
@@ -1051,7 +1051,7 @@ Shadow DOM styling provides the foundation for enterprise-grade component librar
 - **CSS custom properties** — The only mechanism for external styling, creating a theming API
 - **Three-tier tokens** — Primitive → Semantic → Component cascade for flexible, maintainable theming
 
-For wc-2026, these patterns are non-negotiable. Every component uses `:host` for display mode, `:host()` for variants, two-level token fallbacks, and complete JSDoc documentation for all CSS custom properties.
+For HELiX, these patterns are non-negotiable. Every component uses `:host` for display mode, `:host()` for variants, two-level token fallbacks, and complete JSDoc documentation for all CSS custom properties.
 
 **Key takeaways:**
 

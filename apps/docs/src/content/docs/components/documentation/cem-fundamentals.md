@@ -453,7 +453,7 @@ hx-library uses `@custom-elements-manifest/analyzer` to generate CEM from source
 
 ### Output Location
 
-Generated CEM is written to `/Volumes/Development/wc-2026/packages/hx-library/custom-elements.json`.
+Generated CEM is written to `packages/hx-library/custom-elements.json`.
 
 This file is committed to version control and published with the package.
 
@@ -505,7 +505,7 @@ Run `npm run cem` after:
 
 After generation, validate CEM:
 
-1. **File exists**: `/Volumes/Development/wc-2026/packages/hx-library/custom-elements.json` should be present.
+1. **File exists**: `packages/hx-library/custom-elements.json` should be present.
 2. **Valid JSON**: File should parse without errors.
 3. **Tag name present**: Each component declaration should have `"tagName"` and `"customElement": true`.
 4. **Public API complete**: All `@property` decorators should appear in `members` and `attributes` arrays.

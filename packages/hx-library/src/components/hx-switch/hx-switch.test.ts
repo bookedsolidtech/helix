@@ -157,10 +157,11 @@ describe('hx-switch', () => {
       expect(errorDiv?.textContent?.trim()).toBe('Must accept terms');
     });
 
-    it('error div has aria-live="polite"', async () => {
+    it('error div uses role="alert" (implicit assertive live region)', async () => {
       const el = await fixture<WcSwitch>('<hx-switch error="Error"></hx-switch>');
       const errorDiv = shadowQuery(el, '.switch__error');
-      expect(errorDiv?.getAttribute('aria-live')).toBe('polite');
+      expect(errorDiv?.getAttribute('role')).toBe('alert');
+      expect(errorDiv?.hasAttribute('aria-live')).toBe(false);
     });
 
     it('sets aria-invalid="true" on track', async () => {
@@ -196,7 +197,7 @@ describe('hx-switch', () => {
   // --- Events (3) ---
 
   describe('Events', () => {
-    it('dispatches wc-change on toggle', async () => {
+    it('dispatches hx-change on toggle', async () => {
       const el = await fixture<WcSwitch>('<hx-switch></hx-switch>');
       const track = shadowQuery<HTMLElement>(el, '.switch__track');
       const eventPromise = oneEvent<CustomEvent>(el, 'hx-change');
@@ -235,6 +236,16 @@ describe('hx-switch', () => {
       const slotContent = el.querySelector('strong');
       expect(slotContent).toBeTruthy();
       expect(slotContent?.textContent).toBe('Slot Label');
+    });
+
+    it('slotted label content sets aria-labelledby on track', async () => {
+      const el = await fixture<WcSwitch>(
+        '<hx-switch><strong>Slotted Label</strong></hx-switch>',
+      );
+      await el.updateComplete;
+      const track = shadowQuery(el, '[role="switch"]');
+      const label = shadowQuery(el, '[part="label"]');
+      expect(track?.getAttribute('aria-labelledby')).toBe(label?.id);
     });
 
     it('help-text slot renders', async () => {
@@ -306,7 +317,7 @@ describe('hx-switch', () => {
 
     it('formStateRestoreCallback restores checked state', async () => {
       const el = await fixture<WcSwitch>('<hx-switch></hx-switch>');
-      el.formStateRestoreCallback('on');
+      el.formStateRestoreCallback('on', 'restore');
       await el.updateComplete;
       expect(el.checked).toBe(true);
     });
@@ -358,18 +369,29 @@ describe('hx-switch', () => {
       expect(el.checked).toBe(true);
     });
 
-    it('Enter toggles the switch', async () => {
+    it('Enter does not double-toggle (native button click handles it)', async () => {
       const el = await fixture<WcSwitch>('<hx-switch></hx-switch>');
       const track = shadowQuery<HTMLElement>(el, '.switch__track');
       track?.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
       await el.updateComplete;
-      expect(el.checked).toBe(true);
+      expect(el.checked).toBe(false);
     });
 
     it('other keys do not toggle', async () => {
       const el = await fixture<WcSwitch>('<hx-switch></hx-switch>');
       const track = shadowQuery<HTMLElement>(el, '.switch__track');
       track?.dispatchEvent(new KeyboardEvent('keydown', { key: 'Tab', bubbles: true }));
+      await el.updateComplete;
+      expect(el.checked).toBe(false);
+    });
+
+    it('disabled switch does not toggle on keyboard', async () => {
+      const el = await fixture<WcSwitch>('<hx-switch disabled></hx-switch>');
+      const track = shadowQuery<HTMLElement>(el, '.switch__track');
+      track?.dispatchEvent(new KeyboardEvent('keydown', { key: ' ', bubbles: true }));
+      await el.updateComplete;
+      expect(el.checked).toBe(false);
+      track?.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
       await el.updateComplete;
       expect(el.checked).toBe(false);
     });
@@ -440,8 +462,8 @@ describe('hx-switch', () => {
   describe('Methods', () => {
     it('focus() moves focus to track button', async () => {
       const el = await fixture<WcSwitch>('<hx-switch label="Test"></hx-switch>');
+      await el.updateComplete;
       el.focus();
-      await new Promise((r) => setTimeout(r, 50));
       const track = shadowQuery<HTMLButtonElement>(el, '.switch__track')!;
       expect(el.shadowRoot?.activeElement).toBe(track);
     });

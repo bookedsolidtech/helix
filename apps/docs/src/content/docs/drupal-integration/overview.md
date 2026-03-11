@@ -46,7 +46,7 @@ Load components directly from a CDN with a single `<script>` tag. This is the fa
 helix_cdn:
   version: VERSION
   js:
-    https://cdn.jsdelivr.net/npm/@helix/library@latest/dist/index.js:
+    https://cdn.jsdelivr.net/npm/@helixui/library@latest/dist/index.js:
       type: external
       attributes:
         type: module
@@ -85,7 +85,7 @@ Install via npm and integrate with your theme's build pipeline. Full control ove
 
 ```bash
 # In your Drupal theme directory
-npm install @helix/library
+npm install @helixui/library
 ```
 
 ```yaml

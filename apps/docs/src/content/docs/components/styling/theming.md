@@ -1,13 +1,13 @@
 ---
 title: Theming Web Components
-description: Complete guide to CSS custom properties cascade through Shadow DOM, theming strategies, dark mode implementation, theme switching patterns, and design system integration for wc-2026 components.
+description: Complete guide to CSS custom properties cascade through Shadow DOM, theming strategies, dark mode implementation, theme switching patterns, and design system integration for HELiX components.
 sidebar:
   order: 4
 ---
 
-Theming web components requires understanding how CSS custom properties pierce through Shadow DOM boundaries while maintaining encapsulation. This comprehensive guide explores how wc-2026's three-tier token architecture enables powerful, performant theming across all consumption contexts — from Drupal CMS to React, Vue, Angular, and vanilla HTML.
+Theming web components requires understanding how CSS custom properties pierce through Shadow DOM boundaries while maintaining encapsulation. This comprehensive guide explores how HELiX's three-tier token architecture enables powerful, performant theming across all consumption contexts — from Drupal CMS to React, Vue, Angular, and vanilla HTML.
 
-Master the cascade, understand token resolution, implement dark mode, build theme switchers, and integrate wc-2026 components into any design system.
+Master the cascade, understand token resolution, implement dark mode, build theme switchers, and integrate HELiX components into any design system.
 
 ---
 
@@ -148,7 +148,7 @@ Later (more specific) overrides always win due to CSS specificity rules.
 
 ### Multi-Level Fallback Chains
 
-wc-2026 components use two-level or three-level fallback chains to ensure robust token resolution:
+HELiX components use two-level or three-level fallback chains to ensure robust token resolution:
 
 **Two-level fallback (most common):**
 
@@ -184,7 +184,7 @@ This pattern ensures components always render correctly, even if consumers overr
 
 ## Theming Strategies
 
-wc-2026's token architecture enables multiple theming approaches, each suited to different use cases.
+HELiX's token architecture enables multiple theming approaches, each suited to different use cases.
 
 ### Strategy 1: Global Brand Theming
 
@@ -195,7 +195,7 @@ wc-2026's token architecture enables multiple theming approaches, each suited to
 ```css
 /* Consumer's theme file */
 :root {
-  /* Rebrand to teal (wc-2026's primary color) */
+  /* Rebrand to teal (HELiX's primary color) */
   --wc-color-primary-50: #e6f7f7;
   --wc-color-primary-100: #cceff0;
   --wc-color-primary-200: #99dfe0;
@@ -396,7 +396,7 @@ wc-text-input {
 
 ## Dark Mode Implementation
 
-Dark mode is no longer optional in 2026 — it is a standard user expectation. wc-2026 supports dark mode by swapping semantic token values while keeping primitives unchanged.
+Dark mode is no longer optional in 2026 — it is a standard user expectation. HELiX supports dark mode by swapping semantic token values while keeping primitives unchanged.
 
 ### Light Theme (Default)
 
@@ -705,7 +705,7 @@ function setThemeWithoutTransition(theme) {
 
 ## Design System Integration
 
-wc-2026 components work in any framework or CMS. Here's how to integrate theming.
+HELiX components work in any framework or CMS. Here's how to integrate theming.
 
 ### Drupal CMS
 
@@ -899,10 +899,10 @@ export class AppComponent implements OnInit {
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <title>wc-2026 Theming Example</title>
+    <title>HELiX Theming Example</title>
 
     <!-- Load components from CDN -->
-    <script type="module" src="https://unpkg.com/@wc-2026/library"></script>
+    <script type="module" src="https://unpkg.com/@helixui/library"></script>
 
     <style>
       /* Global theme tokens */

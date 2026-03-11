@@ -1,0 +1,460 @@
+---
+title: 'hx-structured-list'
+description: 'Key-value data display container for detail, summary, and patient record views with WCAG 2.1 AA accessibility.'
+---
+
+import ComponentLoader from '../../../components/ComponentLoader.astro';
+import ComponentDemo from '../../../components/ComponentDemo.astro';
+import ComponentDoc from '../../../components/ComponentDoc.astro';
+
+<ComponentLoader />
+
+<ComponentDoc tagName="hx-structured-list" section="summary" />
+
+## Overview
+
+`hx-structured-list` displays structured key-value data in a consistent, scannable layout. Each row pairs a label (term) with its value (definition) and an optional actions area. It is the go-to pattern for patient demographics, medication details, insurance information, and settings panels in healthcare enterprise interfaces.
+
+Use `hx-structured-list` when you need to present a set of named fields with their values — for example, a patient's date of birth, allergies, or contact details. For tabular data with multiple columns, use an HTML `<table>`. For navigation lists, use `hx-menu` or `<nav>`.
+
+Each row must be an `hx-structured-list-row` child element. See the [hx-structured-list-row](/component-library/hx-structured-list-row) docs for the row-level API.
+
+## Live Demo
+
+### Default
+
+<ComponentDemo title="Default">
+  <hx-structured-list>
+    <hx-structured-list-row>
+      <span slot="label">Patient Name</span>
+      Margaret Okonkwo
+    </hx-structured-list-row>
+    <hx-structured-list-row>
+      <span slot="label">Date of Birth</span>
+      1974-03-15
+    </hx-structured-list-row>
+    <hx-structured-list-row>
+      <span slot="label">MRN</span>
+      MRN-00124857
+    </hx-structured-list-row>
+  </hx-structured-list>
+</ComponentDemo>
+
+### Bordered
+
+<ComponentDemo title="Bordered">
+  <hx-structured-list bordered>
+    <hx-structured-list-row>
+      <span slot="label">Diagnosis</span>
+      Type 2 Diabetes Mellitus
+    </hx-structured-list-row>
+    <hx-structured-list-row>
+      <span slot="label">HbA1c</span>
+      6.8%
+    </hx-structured-list-row>
+    <hx-structured-list-row>
+      <span slot="label">Last Visit</span>
+      2026-02-14
+    </hx-structured-list-row>
+  </hx-structured-list>
+</ComponentDemo>
+
+### Striped
+
+<ComponentDemo title="Striped">
+  <hx-structured-list striped>
+    <hx-structured-list-row>
+      <span slot="label">Insurance Provider</span>
+      BlueCross BlueShield
+    </hx-structured-list-row>
+    <hx-structured-list-row>
+      <span slot="label">Policy Number</span>
+      BCB-4472019-X
+    </hx-structured-list-row>
+    <hx-structured-list-row>
+      <span slot="label">Group Number</span>
+      GRP-88201
+    </hx-structured-list-row>
+    <hx-structured-list-row>
+      <span slot="label">Copay</span>
+      $30
+    </hx-structured-list-row>
+  </hx-structured-list>
+</ComponentDemo>
+
+### Condensed
+
+<ComponentDemo title="Condensed">
+  <hx-structured-list condensed bordered>
+    <hx-structured-list-row>
+      <span slot="label">Blood Type</span>
+      O+
+    </hx-structured-list-row>
+    <hx-structured-list-row>
+      <span slot="label">Allergies</span>
+      Penicillin, Sulfa drugs
+    </hx-structured-list-row>
+    <hx-structured-list-row>
+      <span slot="label">Primary Care</span>
+      Dr. Adaeze Nwosu
+    </hx-structured-list-row>
+  </hx-structured-list>
+</ComponentDemo>
+
+### With Actions
+
+<ComponentDemo title="With Actions">
+  <hx-structured-list bordered>
+    <hx-structured-list-row>
+      <span slot="label">Email</span>
+      m.okonkwo@example.com
+      <button slot="actions" style="font-size:0.75rem;padding:0.25rem 0.5rem;cursor:pointer;">
+        Edit
+      </button>
+    </hx-structured-list-row>
+    <hx-structured-list-row>
+      <span slot="label">Phone</span>
+      (555) 234-7890
+      <button slot="actions" style="font-size:0.75rem;padding:0.25rem 0.5rem;cursor:pointer;">
+        Edit
+      </button>
+    </hx-structured-list-row>
+  </hx-structured-list>
+</ComponentDemo>
+
+## Installation
+
+```bash
+# Full library
+npm install @helix/library
+
+# Or import only this component (tree-shaking friendly)
+import '@helix/library/components/hx-structured-list';
+```
+
+## Basic Usage
+
+Minimal HTML snippet — no build tool required:
+
+```html
+<!-- Default key-value list -->
+<hx-structured-list>
+  <hx-structured-list-row>
+    <span slot="label">Patient Name</span>
+    Margaret Okonkwo
+  </hx-structured-list-row>
+  <hx-structured-list-row>
+    <span slot="label">MRN</span>
+    MRN-00124857
+  </hx-structured-list-row>
+</hx-structured-list>
+
+<!-- Bordered + striped variant -->
+<hx-structured-list bordered striped>
+  <hx-structured-list-row>
+    <span slot="label">Diagnosis</span>
+    Type 2 Diabetes Mellitus
+  </hx-structured-list-row>
+</hx-structured-list>
+```
+
+Set properties via JavaScript for dynamic control:
+
+```javascript
+const list = document.querySelector('hx-structured-list');
+
+// Toggle bordered mode at runtime
+list.bordered = true;
+
+// Enable condensed layout for dense views
+list.condensed = true;
+
+// Apply striped rows
+list.striped = true;
+```
+
+## Properties
+
+### hx-structured-list
+
+| Property    | Attribute   | Type      | Default | Description                                           |
+| ----------- | ----------- | --------- | ------- | ----------------------------------------------------- |
+| `bordered`  | `bordered`  | `boolean` | `false` | Renders a border and rounded corners around the list. |
+| `condensed` | `condensed` | `boolean` | `false` | Reduces row padding for denser layouts.               |
+| `striped`   | `striped`   | `boolean` | `false` | Alternates row background colors for easier scanning. |
+
+### hx-structured-list-row
+
+`hx-structured-list-row` has no configurable properties. Content is provided via slots.
+
+## Events
+
+`hx-structured-list` and `hx-structured-list-row` are display-only components. They do not dispatch any custom events.
+
+| Event    | Detail Type | Description       |
+| -------- | ----------- | ----------------- |
+| _(none)_ | —           | No custom events. |
+
+## CSS Custom Properties
+
+### hx-structured-list
+
+| Property                                        | Default                                | Description                                |
+| ----------------------------------------------- | -------------------------------------- | ------------------------------------------ |
+| `--hx-structured-list-border-color`             | `var(--hx-color-neutral-200, #e2e8f0)` | Border color when `bordered` is set.       |
+| `--hx-structured-list-border-width`             | `var(--hx-border-width-thin, 1px)`     | Border width when `bordered` is set.       |
+| `--hx-structured-list-stripe-bg`                | `var(--hx-color-neutral-50, #f8fafc)`  | Alternating row background when `striped`. |
+| `--hx-structured-list-padding-block`            | `var(--hx-space-4, 1rem)`              | Row block (top/bottom) padding.            |
+| `--hx-structured-list-padding-inline`           | `var(--hx-space-4, 1rem)`              | Row inline (left/right) padding.           |
+| `--hx-structured-list-condensed-padding-block`  | `var(--hx-space-2, 0.5rem)`            | Row block padding in condensed mode.       |
+| `--hx-structured-list-condensed-padding-inline` | `var(--hx-space-3, 0.75rem)`           | Row inline padding in condensed mode.      |
+
+### hx-structured-list-row
+
+| Property                           | Default                                | Description            |
+| ---------------------------------- | -------------------------------------- | ---------------------- |
+| `--hx-structured-list-label-color` | `var(--hx-color-neutral-700, #374151)` | Label cell text color. |
+| `--hx-structured-list-value-color` | `var(--hx-color-neutral-900, #111827)` | Value cell text color. |
+
+Override at the semantic token level to theme all instances, or at the element level to style a single instance:
+
+```css
+/* Theme all structured lists */
+:root {
+  --hx-structured-list-border-color: #cbd5e1;
+  --hx-structured-list-label-color: #0f172a;
+}
+
+/* Override a single instance */
+hx-structured-list#patient-summary {
+  --hx-structured-list-stripe-bg: #eff6ff;
+}
+```
+
+## CSS Parts
+
+### hx-structured-list
+
+| Part   | Description                         |
+| ------ | ----------------------------------- |
+| `base` | The root `<div>` container element. |
+
+### hx-structured-list-row
+
+| Part      | Description                   |
+| --------- | ----------------------------- |
+| `base`    | The root `<div>` row element. |
+| `label`   | The label (term) cell.        |
+| `value`   | The value (definition) cell.  |
+| `actions` | The optional actions cell.    |
+
+Use CSS parts to style internals:
+
+```css
+/* Style all label cells */
+hx-structured-list-row::part(label) {
+  font-style: italic;
+  min-width: 12rem;
+}
+
+/* Style the value cell */
+hx-structured-list-row::part(value) {
+  font-family: monospace;
+}
+```
+
+## Slots
+
+### hx-structured-list
+
+| Slot        | Description                                    |
+| ----------- | ---------------------------------------------- |
+| _(default)_ | One or more `hx-structured-list-row` elements. |
+
+### hx-structured-list-row
+
+| Slot        | Description                                                            |
+| ----------- | ---------------------------------------------------------------------- |
+| `label`     | The term or key label (rendered with `role="term"` semantics).         |
+| _(default)_ | The value or definition (rendered with `role="definition"` semantics). |
+| `actions`   | Optional action controls such as edit or copy buttons.                 |
+
+## Accessibility
+
+`hx-structured-list` is built for WCAG 2.1 AA compliance in healthcare contexts where clear communication of data relationships to assistive technology is mandatory.
+
+| Topic         | Details                                                                                                                                                                                  |
+| ------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| ARIA role     | The list container has `role="list"` for assistive technology. Each row's label cell has `role="term"` and the value cell has `role="definition"`, providing description-list semantics. |
+| Keyboard      | The component is display-only and contains no interactive elements by default. Any interactive elements placed in the `actions` slot follow standard keyboard conventions.               |
+| Screen reader | Screen readers announce each row as a term-definition pair. Provide meaningful label content in the `label` slot; avoid empty or abbreviation-only labels.                               |
+| Focus         | No focus is managed by the component itself. Action buttons in the `actions` slot receive focus in document order.                                                                       |
+| Contrast      | Label and value text colors default to neutral-700 and neutral-900 respectively, both meeting WCAG AA contrast requirements on white backgrounds.                                        |
+| WCAG          | Meets WCAG 2.1 AA. SC 1.3.1 (Info and Relationships), SC 1.4.3 (Contrast Minimum) satisfied. Zero axe-core violations.                                                                   |
+
+### Accessible Label Best Practices
+
+Always use descriptive label text. In healthcare contexts, abbreviations should be avoided or expanded:
+
+```html
+<!-- Preferred: expanded, descriptive labels -->
+<hx-structured-list-row>
+  <span slot="label">Date of Birth</span>
+  1974-03-15
+</hx-structured-list-row>
+
+<!-- Avoid: abbreviations without context -->
+<hx-structured-list-row>
+  <span slot="label">DOB</span>
+  1974-03-15
+</hx-structured-list-row>
+```
+
+## Drupal Integration
+
+Use the component in a Twig template after registering the library. A typical patient demographics panel might look like:
+
+```twig
+{# my-module/templates/patient-summary.html.twig #}
+
+<hx-structured-list
+  {{ bordered ? 'bordered' : '' }}
+  {{ condensed ? 'condensed' : '' }}
+  {{ striped ? 'striped' : '' }}
+>
+  {% for field in fields %}
+    <hx-structured-list-row>
+      <span slot="label">{{ field.label }}</span>
+      {{ field.value }}
+    </hx-structured-list-row>
+  {% endfor %}
+</hx-structured-list>
+```
+
+Load the library in your module's `.libraries.yml`:
+
+```yaml
+helix-components:
+  js:
+    /libraries/helix/helix.min.js: { minified: true }
+```
+
+Listen for events in Drupal behaviors using `once()` to prevent duplicate listeners on AJAX:
+
+```javascript
+Drupal.behaviors.helixStructuredList = {
+  attach(context) {
+    // once() is a Drupal core utility (no import needed) — prevents duplicate event binding during AJAX attach cycles
+    once('helixStructuredListActions', '[data-structured-list-edit]', context).forEach((btn) => {
+      btn.addEventListener('click', (e) => {
+        const field = btn.dataset.structuredListEdit;
+        // open edit dialog for field
+      });
+    });
+  },
+};
+```
+
+## Standalone HTML Example
+
+Copy-paste this into a `.html` file and open it in a browser — no build tool needed:
+
+```html
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>hx-structured-list example</title>
+    <!-- @helix/library is a private package — install via npm workspace, not CDN -->
+    <!-- In your project: import '@helix/library/components/hx-structured-list'; in your bundler entry point -->
+  </head>
+  <body style="font-family: sans-serif; padding: 2rem; max-width: 640px;">
+    <h2>Patient Demographics</h2>
+
+    <!-- 1. Bordered structured list -->
+    <hx-structured-list bordered id="patient-demographics">
+      <hx-structured-list-row>
+        <span slot="label">Patient Name</span>
+        Margaret Okonkwo
+      </hx-structured-list-row>
+      <hx-structured-list-row>
+        <span slot="label">Date of Birth</span>
+        1974-03-15 (age 51)
+      </hx-structured-list-row>
+      <hx-structured-list-row>
+        <span slot="label">MRN</span>
+        MRN-00124857
+      </hx-structured-list-row>
+      <hx-structured-list-row>
+        <span slot="label">Primary Care</span>
+        Dr. Adaeze Nwosu, MD
+        <button slot="actions" style="font-size:0.75rem;padding:0.25rem 0.5rem;cursor:pointer;">
+          Edit
+        </button>
+      </hx-structured-list-row>
+    </hx-structured-list>
+
+    <h2 style="margin-top: 2rem;">Insurance Details</h2>
+
+    <!-- 2. Striped structured list -->
+    <hx-structured-list striped>
+      <hx-structured-list-row>
+        <span slot="label">Provider</span>
+        BlueCross BlueShield
+      </hx-structured-list-row>
+      <hx-structured-list-row>
+        <span slot="label">Policy Number</span>
+        BCB-4472019-X
+      </hx-structured-list-row>
+      <hx-structured-list-row>
+        <span slot="label">Group Number</span>
+        GRP-88201
+      </hx-structured-list-row>
+      <hx-structured-list-row>
+        <span slot="label">Copay</span>
+        $30
+      </hx-structured-list-row>
+    </hx-structured-list>
+
+    <h2 style="margin-top: 2rem;">Vitals (Condensed)</h2>
+
+    <!-- 3. Condensed + bordered -->
+    <hx-structured-list condensed bordered>
+      <hx-structured-list-row>
+        <span slot="label">Blood Pressure</span>
+        128/82 mmHg
+      </hx-structured-list-row>
+      <hx-structured-list-row>
+        <span slot="label">Heart Rate</span>
+        72 bpm
+      </hx-structured-list-row>
+      <hx-structured-list-row>
+        <span slot="label">Temperature</span>
+        98.6°F
+      </hx-structured-list-row>
+      <hx-structured-list-row>
+        <span slot="label">Weight</span>
+        165 lbs
+      </hx-structured-list-row>
+    </hx-structured-list>
+
+    <script>
+      // Toggle bordered at runtime
+      const demographics = document.getElementById('patient-demographics');
+      demographics.addEventListener('click', (e) => {
+        if (e.target.tagName === 'BUTTON') {
+          const label = e.target
+            .closest('hx-structured-list-row')
+            ?.querySelector('[slot="label"]')?.textContent;
+          console.log('Edit requested for field:', label);
+        }
+      });
+    </script>
+  </body>
+</html>
+```
+
+## API Reference
+
+<ComponentDoc tagName="hx-structured-list" section="api" />

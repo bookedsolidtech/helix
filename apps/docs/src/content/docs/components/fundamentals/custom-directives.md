@@ -1148,7 +1148,7 @@ Test directives in isolation using a minimal Lit component:
 // directives/format-mrn.test.ts
 import { html, LitElement } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
-import { fixture } from '@helix/library/test-utils';
+import { fixture } from '@helixui/library/test-utils';
 import { expect } from '@esm-bundle/chai';
 import { formatMRN } from './format-mrn.js';
 
@@ -1204,7 +1204,7 @@ Async directives need tests that handle timing and resource cleanup:
 // directives/timer.test.ts
 import { html, LitElement } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
-import { fixture } from '@helix/library/test-utils';
+import { fixture } from '@helixui/library/test-utils';
 import { expect } from '@esm-bundle/chai';
 import { timer } from './timer.js';
 
@@ -1267,7 +1267,7 @@ Test directives in the context of actual hx-library components:
 ```typescript
 // components/hx-text-input/hx-text-input.test.ts
 import { html } from 'lit';
-import { fixture, shadowQuery } from '@helix/library/test-utils';
+import { fixture, shadowQuery } from '@helixui/library/test-utils';
 import { expect } from '@esm-bundle/chai';
 import { HelixTextInput } from './hx-text-input.js';
 

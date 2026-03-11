@@ -1,0 +1,242 @@
+---
+title: 'hx-link'
+description: Accessible hyperlink component with external-link detection, disabled state, and download support
+---
+
+import ComponentLoader from '../../../components/ComponentLoader.astro';
+import ComponentDemo from '../../../components/ComponentDemo.astro';
+import ComponentDoc from '../../../components/ComponentDoc.astro';
+
+<ComponentLoader />
+
+<ComponentDoc tagName="hx-link" section="summary" />
+
+## Overview
+
+`hx-link` is a semantic hyperlink component built on a native `<a>` element for full browser and assistive technology compatibility. It supports three visual variants (default, subtle, danger), a disabled state that renders a keyboard-focusable `<span>`, automatic external-link indication when `target="_blank"`, and file downloads via the `download` attribute.
+
+**Use `hx-link` when:** the user navigates to another page or URL — inline within prose, in navigation lists, or as a standalone action.
+**Use `hx-button` instead when:** the user triggers an action (submit, delete, open a dialog) without navigating away.
+
+## Live Demo
+
+### Variants
+
+Default, subtle, and danger visual styles for different contexts.
+
+<ComponentDemo title="Variants">
+  <div style="display: flex; gap: 1.5rem; flex-wrap: wrap; align-items: center;">
+    <hx-link href="#">Default</hx-link>
+    <hx-link href="#" variant="subtle">
+      Subtle
+    </hx-link>
+    <hx-link href="#" variant="danger">
+      Danger
+    </hx-link>
+  </div>
+</ComponentDemo>
+
+### Disabled
+
+Disabled links render as a keyboard-focusable `<span>` and block navigation.
+
+<ComponentDemo title="Disabled">
+  <hx-link href="#" disabled>
+    Unavailable link
+  </hx-link>
+</ComponentDemo>
+
+### External Link
+
+When `target="_blank"` is set, a visual external-link icon and screen-reader text are added automatically.
+
+<ComponentDemo title="External Link">
+  <hx-link href="https://example.com" target="_blank">
+    Open in new tab
+  </hx-link>
+</ComponentDemo>
+
+### Download
+
+Set the `download` attribute to prompt a file download instead of navigation.
+
+<ComponentDemo title="Download">
+  <hx-link href="/reports/discharge-summary.pdf" download="discharge-summary.pdf">
+    Download Discharge Summary
+  </hx-link>
+</ComponentDemo>
+
+### Inline Context
+
+`hx-link` is `display: inline` and flows naturally within prose.
+
+<ComponentDemo title="Inline in Prose">
+  <p style="max-width: 600px; line-height: 1.6;">
+    The patient's <hx-link href="#">lab results</hx-link> are available for review. Please consult
+    the{' '}
+    <hx-link href="https://example.com/guidelines" target="_blank">
+      clinical guidelines
+    </hx-link>{' '}
+    before making changes to the treatment plan.
+  </p>
+</ComponentDemo>
+
+## Installation
+
+```bash
+# Full library
+npm install @helix/library
+
+# Or import only this component (tree-shaking friendly)
+import '@helix/library/components/hx-link';
+```
+
+## Basic Usage
+
+```html
+<hx-link href="/patient/123">View Patient Record</hx-link>
+```
+
+## Properties
+
+| Property   | Attribute  | Type                                | Default     | Description                                                                                                                    |
+| ---------- | ---------- | ----------------------------------- | ----------- | ------------------------------------------------------------------------------------------------------------------------------ |
+| `href`     | `href`     | `string \| undefined`               | `undefined` | The URL the link points to.                                                                                                    |
+| `target`   | `target`   | `string \| undefined`               | `undefined` | Where to display the linked URL. When `_blank`, automatically adds `rel="noopener noreferrer"` and an external-link indicator. |
+| `variant`  | `variant`  | `'default' \| 'subtle' \| 'danger'` | `'default'` | Visual style variant of the link.                                                                                              |
+| `disabled` | `disabled` | `boolean`                           | `false`     | Renders a `<span>` instead of `<a>`. The span is keyboard-focusable and announces as a disabled link.                          |
+| `download` | `download` | `string \| undefined`               | `undefined` | Prompts a file download. When set to a string, the value is used as the suggested filename.                                    |
+| `rel`      | `rel`      | `string \| undefined`               | `undefined` | Relationship between the current document and the linked URL. Auto-set to `noopener noreferrer` when `target="_blank"`.        |
+
+## Events
+
+| Event      | Detail Type                     | Description                                                                       |
+| ---------- | ------------------------------- | --------------------------------------------------------------------------------- |
+| `hx-click` | `{ originalEvent: MouseEvent }` | Dispatched when the link is clicked and is not disabled. Bubbles and is composed. |
+
+## CSS Custom Properties
+
+| Property                     | Default                       | Description             |
+| ---------------------------- | ----------------------------- | ----------------------- |
+| `--hx-link-color`            | `var(--hx-color-primary-500)` | Default link color.     |
+| `--hx-link-color-hover`      | `var(--hx-color-primary-700)` | Hover color.            |
+| `--hx-link-color-active`     | `var(--hx-color-primary-800)` | Active (pressed) color. |
+| `--hx-link-color-disabled`   | `var(--hx-color-neutral-400)` | Disabled state color.   |
+| `--hx-link-color-subtle`     | `var(--hx-color-neutral-600)` | Subtle variant color.   |
+| `--hx-link-color-danger`     | `var(--hx-color-error-500)`   | Danger variant color.   |
+| `--hx-link-text-decoration`  | `underline`                   | Link text decoration.   |
+| `--hx-link-focus-ring-color` | `var(--hx-focus-ring-color)`  | Focus ring color.       |
+
+## CSS Parts
+
+| Part            | Description                                                    |
+| --------------- | -------------------------------------------------------------- |
+| `link`          | The inner `<a>` element (or `<span>` when disabled).           |
+| `external-icon` | The external-link icon `<svg>` (shown when `target="_blank"`). |
+
+## Slots
+
+| Slot        | Description                        |
+| ----------- | ---------------------------------- |
+| _(default)_ | Link label text or inline content. |
+
+## Accessibility
+
+| Topic            | Details                                                                                                          |
+| ---------------- | ---------------------------------------------------------------------------------------------------------------- |
+| ARIA role        | Native `link` role via `<a>` element. Disabled state uses `<span role="link" aria-disabled="true">`.             |
+| External links   | `target="_blank"` adds a visually hidden "(opens in new tab)" text and an `aria-hidden` icon for screen readers. |
+| `rel` security   | `rel="noopener noreferrer"` is set automatically when `target="_blank"` to prevent tab-napping.                  |
+| Keyboard         | `Tab` to focus; `Enter` to activate. Disabled span is `tabindex="0"` and focusable but does not navigate.        |
+| Screen reader    | Disabled links announce as "link, dimmed" or "link, unavailable" depending on the browser/AT pairing.            |
+| Focus            | `:focus-visible` focus ring using `--hx-link-focus-ring-color`. No focus ring on mouse click.                    |
+| WCAG 2.1 AA      | Passes axe-core audit in default, disabled, external, subtle, and danger states.                                 |
+| Known limitation | The `:visited` pseudo-class does not work inside Shadow DOM due to browser privacy restrictions.                 |
+
+## Drupal Integration
+
+Use the component in a Twig template after registering the library:
+
+```twig
+{# my-module/templates/my-template.html.twig #}
+<hx-link
+  href="{{ url }}"
+  {% if target %}target="{{ target }}"{% endif %}
+  {% if variant != 'default' %}variant="{{ variant }}"{% endif %}
+  {% if disabled %}disabled{% endif %}
+>
+  {{ label }}
+</hx-link>
+```
+
+Load the library in your module's `.libraries.yml`:
+
+```yaml
+helix-components:
+  js:
+    /libraries/helix/helix.min.js: { minified: true }
+```
+
+Listen for events in Drupal behaviors using `once()` to prevent duplicate listeners on AJAX:
+
+```javascript
+Drupal.behaviors.helixLink = {
+  attach(context) {
+    // once() is a Drupal core utility (no import needed) — prevents duplicate event binding during AJAX attach cycles
+    once('helixLink', 'hx-link', context).forEach((el) => {
+      el.addEventListener('hx-click', (e) => {
+        console.log('Link clicked:', e.detail.originalEvent);
+      });
+    });
+  },
+};
+```
+
+## Standalone HTML Example
+
+Copy-paste this into a `.html` file and open it in a browser — no build tool needed:
+
+```html
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>hx-link example</title>
+    <!-- @helix/library is a private package — install via npm workspace, not CDN -->
+    <!-- In your project: import '@helix/library'; in your bundler entry point -->
+  </head>
+  <body
+    style="font-family: sans-serif; padding: 2rem; display: flex; flex-direction: column; gap: 1rem;"
+  >
+    <p>
+      Internal link:
+      <hx-link href="/patient/123" id="patient-link">Patient Chart</hx-link>
+    </p>
+    <p>
+      External link:
+      <hx-link href="https://example.com" target="_blank">Lab Portal</hx-link>
+    </p>
+    <p>
+      Disabled link:
+      <hx-link href="/restricted" disabled>Restricted</hx-link>
+    </p>
+    <p>
+      Download link:
+      <hx-link href="/reports/discharge-summary.pdf" download="discharge-summary.pdf"
+        >Download Summary</hx-link
+      >
+    </p>
+
+    <script>
+      document.getElementById('patient-link').addEventListener('hx-click', (e) => {
+        console.log('Link clicked:', e.detail.originalEvent);
+      });
+    </script>
+  </body>
+</html>
+```
+
+## API Reference
+
+<ComponentDoc tagName="hx-link" section="api" />

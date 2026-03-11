@@ -164,9 +164,9 @@ console.log(host.shadowRoot); // null
 
 **Use when**: Rarely. Consider open mode with clear documentation instead. Closed mode prevents component authors from accessing their own shadow DOM in some scenarios.
 
-### wc-2026 Convention
+### HELiX Convention
 
-All wc-2026 components use **open mode** for testability, accessibility tooling compatibility, and developer experience:
+All HELiX components use **open mode** for testability, accessibility tooling compatibility, and developer experience:
 
 ```typescript
 export class WcButton extends LitElement {
@@ -333,7 +333,7 @@ this.dispatchEvent(
 );
 ```
 
-**wc-2026 convention**: All public component events use `composed: true` to ensure consumers can listen at any level. Internal implementation events use `composed: false`.
+**HELiX convention**: All public component events use `composed: true` to ensure consumers can listen at any level. Internal implementation events use `composed: false`.
 
 ### Events That Automatically Compose
 
@@ -587,7 +587,7 @@ Style based on ancestors outside the shadow DOM.
 
 ### Design Token Strategy
 
-wc-2026 uses a **three-tier cascade** for theming:
+HELiX uses a **three-tier cascade** for theming:
 
 ```css
 /* Tier 1: Primitive tokens (defined globally) */
@@ -860,7 +860,7 @@ For older browsers (IE11, pre-Chromium Edge), polyfills exist:
 - **ShadyDOM**: Emulates shadow DOM scoping
 - **ShadyCSS**: Emulates style scoping
 
-**Note**: wc-2026 does **not** support IE11. All target browsers have native Shadow DOM.
+**Note**: HELiX does **not** support IE11. All target browsers have native Shadow DOM.
 
 ## When NOT to Use Shadow DOM
 
@@ -967,7 +967,7 @@ Widgets distributed to external sites where you have no control over page styles
 Library components consumed across multiple applications:
 
 ```html
-<!-- wc-2026 use case -->
+<!-- HELiX use case -->
 <wc-card>
   <wc-button>Action</wc-button>
 </wc-card>
@@ -1100,7 +1100,7 @@ Shadow DOM is the foundation that makes web components viable for enterprise sys
 - **Performance**: Scoped styles and shared stylesheets optimize rendering
 - **Accessibility**: Works transparently with ARIA and assistive tech
 
-For wc-2026, Shadow DOM is non-negotiable. Every component uses it. Every pattern depends on it. Encapsulation is not a feature—it's the guarantee that makes healthcare-grade reliability possible.
+For HELiX, Shadow DOM is non-negotiable. Every component uses it. Every pattern depends on it. Encapsulation is not a feature—it's the guarantee that makes healthcare-grade reliability possible.
 
 ## Next Steps
 

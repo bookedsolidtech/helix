@@ -1,0 +1,46 @@
+{#
+/**
+ * @file
+ * HELIX hx-help-text Drupal 11 Twig integration example.
+ *
+ * Renders hx-help-text as a form field description or validation message.
+ * Replaces the standard Drupal #description or form_element description slot.
+ *
+ * Usage in Drupal templates:
+ *   {% include '@my_theme/helix-help-text.html.twig' with {
+ *     text: 'Enter your full legal name as it appears on your ID.',
+ *     variant: 'default',
+ *   } %}
+ *
+ *   {# Validation error state #}
+ *   {% include '@my_theme/helix-help-text.html.twig' with {
+ *     text: element['#errors'],
+ *     variant: 'error',
+ *   } %}
+ *
+ * Integration with Drupal form_element.html.twig:
+ *   Override form_element.html.twig in your theme and replace the
+ *   description block with this template. The `id` variable should
+ *   match the aria-describedby value set on the associated input:
+ *
+ *   <input aria-describedby="{{ element_id }}-description" ... />
+ *   {% include '@my_theme/helix-help-text.html.twig' with {
+ *     id: element_id ~ '-description',
+ *     text: element['#description'],
+ *     variant: errors ? 'error' : 'default',
+ *   } %}
+ *
+ * Variables:
+ *   - text: The help text content (required). Supports translated strings via t().
+ *   - variant: 'default' | 'error' | 'warning' | 'success' (default: 'default')
+ *   - id: HTML id attribute for aria-describedby association (optional)
+ *   - attributes: Drupal attributes object (optional)
+ */
+#}
+{% set variant = variant|default('default') %}
+
+<hx-help-text
+  variant="{{ variant }}"
+  {% if id %}id="{{ id }}"{% endif %}
+  {% if attributes %}{{ attributes }}{% endif %}
+>{{ text }}</hx-help-text>

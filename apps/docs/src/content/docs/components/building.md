@@ -21,16 +21,16 @@ import { customElement, property } from 'lit/decorators.js';
  *
  * @csspart container - The outer container
  *
- * @fires wc-click - Fired when the component is clicked
+ * @fires hx-click - Fired when the component is clicked
  */
-@customElement('wc-example')
-export class WcExample extends LitElement {
+@customElement('hx-example')
+export class HxExample extends LitElement {
   static styles = css`
     :host {
       display: block;
       /* Use design tokens */
-      font-family: var(--wc-font-family-body);
-      color: var(--wc-color-text-primary);
+      font-family: var(--hx-font-family-body);
+      color: var(--hx-color-text-primary);
     }
   `;
 
@@ -49,20 +49,33 @@ export class WcExample extends LitElement {
 }
 ```
 
+## File Structure
+
+```
+src/components/hx-example/
+├── index.ts              # Re-export
+├── hx-example.ts         # Component class
+├── hx-example.styles.ts  # Lit CSS tagged template
+├── hx-example.stories.ts # Storybook stories
+└── hx-example.test.ts    # Vitest browser tests
+```
+
 ## Key Patterns
 
-1. **Always use design tokens** - Never hard-code colors, spacing, or typography
-2. **Reflect boolean attributes** - For CSS state selectors
-3. **Expose CSS Parts** - For external styling customization
-4. **Named slots** - For composition flexibility
-5. **JSDoc comments** - For Custom Elements Manifest generation
-6. **ElementInternals** - For form-associated components
+1. **Always use design tokens** — Never hard-code colors, spacing, or typography
+2. **Reflect boolean attributes** — For CSS state selectors (`:host([disabled])`)
+3. **Expose CSS Parts** — For external styling customization
+4. **Named slots** — For composition flexibility
+5. **JSDoc comments** — For Custom Elements Manifest generation
+6. **ElementInternals** — For form-associated components
 
-## Detailed Guide
+## Quality Checklist
 
-For the complete component building guide (80,000+ words), see the [Pre-Planning: Component Building Guide](/pre-planning/building-guide/).
+Before marking a component complete:
 
-## Next Steps
-
-- [Component API](/components/api/) - API conventions and patterns
-- [Examples](/components/examples/) - Working component examples
+- [ ] TypeScript strict — zero errors from `npm run type-check`
+- [ ] Tests pass — `npm run test` (80%+ coverage)
+- [ ] Accessibility — WCAG 2.1 AA (axe-core clean)
+- [ ] Storybook — stories for all variants and states
+- [ ] CEM — `npm run cem` generates accurate API manifest
+- [ ] Bundle size — under 5KB min+gz

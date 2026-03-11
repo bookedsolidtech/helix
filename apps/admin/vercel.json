@@ -1,7 +1,7 @@
 {
   "framework": "nextjs",
   "installCommand": "cd ../.. && npm ci",
-  "buildCommand": "cd ../.. && npx turbo run build --filter=@helix/admin",
+  "buildCommand": "cd ../.. && npx turbo run build --filter=@helixui/admin",
   "headers": [
     {
       "source": "/(.*)",

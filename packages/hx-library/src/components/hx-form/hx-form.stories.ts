@@ -1795,3 +1795,148 @@ export const ClinicalWebform: Story = {
     </hx-form>
   `,
 };
+
+// ─────────────────────────────────────────────────
+// VALIDATION ERROR CYCLE
+// ─────────────────────────────────────────────────
+
+/**
+ * Demonstrates the complete validation/error cycle:
+ * 1. Submit empty required fields → hx-invalid fires
+ * 2. Error summary with role="alert" appears
+ * 3. Fields get aria-invalid="true"
+ * 4. User corrects fields → resubmit fires hx-submit
+ *
+ * This story documents the expected consumer pattern for hx-form validation.
+ */
+export const ValidationErrorCycle: Story = {
+  render: () => html`
+    <hx-form id="validation-demo-form">
+      <form>
+        <div class="form-item">
+          <label for="ve-name">
+            Full Name
+            <span class="form-required" aria-hidden="true">*</span>
+          </label>
+          <input type="text" id="ve-name" name="fullName" required />
+        </div>
+
+        <div class="form-item">
+          <label for="ve-email">
+            Email Address
+            <span class="form-required" aria-hidden="true">*</span>
+          </label>
+          <input type="email" id="ve-email" name="email" required />
+        </div>
+
+        <div class="form-actions">
+          <hx-button type="submit">Submit</hx-button>
+          <hx-button type="reset" variant="secondary">Reset</hx-button>
+        </div>
+      </form>
+    </hx-form>
+  `,
+  play: async ({ canvasElement }) => {
+    const hxForm = canvasElement.querySelector('#validation-demo-form') as HTMLElement & {
+      updateComplete: Promise<boolean>;
+    };
+    const form = canvasElement.querySelector('form')!;
+
+    // Step 1: Submit with empty required fields → triggers hx-invalid
+    form.dispatchEvent(new SubmitEvent('submit', { bubbles: true, cancelable: true }));
+    await hxForm.updateComplete;
+
+    // Step 2: Verify error summary appears
+    const summary = canvasElement.querySelector('.hx-form-error-summary');
+    await expect(summary).toBeTruthy();
+    await expect(summary?.getAttribute('role')).toBe('alert');
+
+    // Step 3: Verify aria-invalid is set on invalid inputs
+    const nameInput = canvasElement.querySelector('input[name="fullName"]') as HTMLInputElement;
+    await expect(nameInput?.getAttribute('aria-invalid')).toBe('true');
+
+    // Step 4: Fill in the fields
+    await userEvent.type(nameInput, 'Dr. Jane Smith');
+    const emailInput = canvasElement.querySelector('input[name="email"]') as HTMLInputElement;
+    await userEvent.type(emailInput, 'jane.smith@hospital.org');
+
+    // Step 5: Resubmit — should fire hx-submit (no errors)
+    let submitted = false;
+    hxForm.addEventListener('hx-submit', () => {
+      submitted = true;
+    });
+    form.dispatchEvent(new SubmitEvent('submit', { bubbles: true, cancelable: true }));
+    await hxForm.updateComplete;
+
+    await expect(submitted).toBe(true);
+    // Error summary should be gone
+    await expect(canvasElement.querySelector('.hx-form-error-summary')).toBeNull();
+  },
+};
+
+// ─────────────────────────────────────────────────
+// RESET BEHAVIOR
+// ─────────────────────────────────────────────────
+
+/**
+ * Demonstrates the reset cycle:
+ * 1. Fill in fields
+ * 2. Click Reset → hx-reset fires
+ * 3. Error summary is removed if present
+ */
+export const ResetBehavior: Story = {
+  render: () => html`
+    <hx-form id="reset-demo-form">
+      <form>
+        <div class="form-item">
+          <label for="rb-name">
+            Patient Name
+            <span class="form-required" aria-hidden="true">*</span>
+          </label>
+          <input type="text" id="rb-name" name="patientName" required />
+        </div>
+
+        <div class="form-item">
+          <label for="rb-mrn">MRN</label>
+          <input type="text" id="rb-mrn" name="mrn" />
+        </div>
+
+        <div class="form-actions">
+          <hx-button type="submit">Submit</hx-button>
+          <hx-button type="reset" variant="secondary">Reset</hx-button>
+        </div>
+      </form>
+    </hx-form>
+  `,
+  play: async ({ canvasElement }) => {
+    const hxForm = canvasElement.querySelector('#reset-demo-form') as HTMLElement & {
+      updateComplete: Promise<boolean>;
+    };
+    const form = canvasElement.querySelector('form')!;
+    const nameInput = canvasElement.querySelector('input[name="patientName"]') as HTMLInputElement;
+    const mrnInput = canvasElement.querySelector('input[name="mrn"]') as HTMLInputElement;
+
+    // Step 1: Fill in fields
+    await userEvent.type(nameInput, 'John Doe');
+    await userEvent.type(mrnInput, 'MRN-123456');
+    await expect(nameInput.value).toBe('John Doe');
+
+    // Step 2: Trigger validation failure to show error summary
+    form.dispatchEvent(new SubmitEvent('submit', { bubbles: true, cancelable: true }));
+    await hxForm.updateComplete;
+
+    // Step 3: Reset the form
+    let resetFired = false;
+    hxForm.addEventListener('hx-reset', () => {
+      resetFired = true;
+    });
+    form.dispatchEvent(new Event('reset', { bubbles: true }));
+    await hxForm.updateComplete;
+
+    // Step 4: Verify hx-reset was dispatched
+    await expect(resetFired).toBe(true);
+
+    // Step 5: Verify error summary is cleared
+    await expect(canvasElement.querySelector('.hx-form-error-summary')).toBeNull();
+  },
+};

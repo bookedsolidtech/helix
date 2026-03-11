@@ -904,3 +904,36 @@ export const MedicationDosageSelector: Story = {
     </div>
   `,
 };
+
+/**
+ * Demonstrates the `label` slot for rich label content. The `<input type="range">` inside
+ * shadow DOM receives `aria-labelledby` pointing to the `<label>` wrapper element, which
+ * always exists in shadow DOM when a label slot is populated — fixing the P0 accessible
+ * name failure that previously occurred when the `label` prop was empty.
+ */
+export const LabelSlotAccessibleName: Story = {
+  render: () => html`
+    <div style="max-width: 400px; display: flex; flex-direction: column; gap: 2rem;">
+      <hx-slider name="pain" value="5" min="0" max="10" step="1" show-value>
+        <strong slot="label">Pain Level <em style="font-weight: normal;">(0–10)</em></strong>
+        <span slot="min-label">No Pain</span>
+        <span slot="max-label">Worst Pain</span>
+      </hx-slider>
+
+      <hx-slider
+        name="satisfaction"
+        value="3"
+        min="1"
+        max="5"
+        step="1"
+        show-value
+        aria-valuetext="3 — Neutral"
+        help-text="Select a satisfaction rating from 1 (Very Poor) to 5 (Excellent)."
+      >
+        <span slot="label">Patient Satisfaction</span>
+        <span slot="min-label">Very Poor</span>
+        <span slot="max-label">Excellent</span>
+      </hx-slider>
+    </div>
+  `,
+};

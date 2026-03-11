@@ -25,7 +25,7 @@ turbo run type-check
 
 Turborepo automatically resolves the build order based on `dependsOn` relationships:
 
-1. `packages/wc-library` builds first (upstream dependency)
+1. `packages/hx-library` builds first (upstream dependency)
 2. `apps/storybook` builds after library (depends on `^build`)
 3. `apps/docs` builds after library (depends on `^build`)
 
@@ -37,15 +37,15 @@ Turborepo caches build outputs by default:
 - **Remote cache**: Available via Vercel or self-hosted (CI/CD)
 - **Cache keys**: Hashed from source files, config, and environment
 
-## CI/CD Pipeline (Planned)
+## CI/CD Pipeline
 
-The CI/CD pipeline will include:
+The CI/CD pipeline runs on every PR and merge to `dev`:
 
-- TypeScript type checking
-- Unit tests (Vitest)
-- Visual regression tests (Chromatic)
+- TypeScript strict type checking
+- Unit tests (Vitest 3.x browser mode)
+- Visual regression tests (Playwright VRT)
 - Accessibility audits (axe-core)
 - Documentation build verification
-- Deployment to CDN
+- npm pack dry-run (verifies publishable output)
 
 See the [Pre-Planning Architecture document](/pre-planning/architecture/) for the complete pipeline design.

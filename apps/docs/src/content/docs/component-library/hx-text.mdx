@@ -1,0 +1,477 @@
+---
+title: 'hx-text'
+description: 'Semantic typography wrapper for consistent text styles across variants, weights, and colors using design tokens.'
+---
+
+import ComponentLoader from '../../../components/ComponentLoader.astro';
+import ComponentDemo from '../../../components/ComponentDemo.astro';
+import ComponentDoc from '../../../components/ComponentDoc.astro';
+
+<ComponentLoader />
+
+<ComponentDoc tagName="hx-text" section="summary" />
+
+## Overview
+
+`hx-text` is a semantic typography wrapper that applies consistent text styles using Helix design tokens. It renders an inner element (`span` by default) with the correct font size, weight, line height, letter spacing, and color for the chosen variant.
+
+Use `hx-text` to display body copy, labels, captions, code references, and overlines in healthcare UI — patient names, field labels, clinical notes, status messages, and metadata all benefit from a single, token-driven text component.
+
+**Use `hx-text` when:** rendering any presentational text that should follow the Helix type scale. **Use native heading elements (`h1`–`h6`) instead when:** the text needs to establish document hierarchy — `hx-text` is not a heading component.
+
+## Live Demo
+
+### Default
+
+<ComponentDemo title="Default Body Text">
+  <hx-text variant="body">Patient information has been successfully updated in the system.</hx-text>
+</ComponentDemo>
+
+### Type Scale
+
+<ComponentDemo title="Type Scale — All Variants">
+  <div style="display: flex; flex-direction: column; gap: 1rem; max-width: 640px;">
+    <div>
+      <hx-text variant="caption" color="subtle">
+        overline
+      </hx-text>
+      <br />
+      <hx-text variant="overline">Section Label</hx-text>
+    </div>
+    <div>
+      <hx-text variant="caption" color="subtle">
+        body-lg
+      </hx-text>
+      <br />
+      <hx-text variant="body-lg">
+        Patient information has been successfully updated in the system.
+      </hx-text>
+    </div>
+    <div>
+      <hx-text variant="caption" color="subtle">
+        body
+      </hx-text>
+      <br />
+      <hx-text variant="body">Review the patient's current medications before proceeding.</hx-text>
+    </div>
+    <div>
+      <hx-text variant="caption" color="subtle">
+        body-sm
+      </hx-text>
+      <br />
+      <hx-text variant="body-sm">Last updated: March 6, 2026 at 9:41 AM</hx-text>
+    </div>
+    <div>
+      <hx-text variant="caption" color="subtle">
+        label
+      </hx-text>
+      <br />
+      <hx-text variant="label">Date of Birth</hx-text>
+    </div>
+    <div>
+      <hx-text variant="caption" color="subtle">
+        label-sm
+      </hx-text>
+      <br />
+      <hx-text variant="label-sm">Required field</hx-text>
+    </div>
+    <div>
+      <hx-text variant="caption" color="subtle">
+        caption
+      </hx-text>
+      <br />
+      <hx-text variant="caption">This field is used for insurance verification purposes.</hx-text>
+    </div>
+    <div>
+      <hx-text variant="caption" color="subtle">
+        code
+      </hx-text>
+      <br />
+      <hx-text variant="code">ICD-10: J45.901</hx-text>
+    </div>
+  </div>
+</ComponentDemo>
+
+### Color Variants
+
+<ComponentDemo title="Color Variants">
+  <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+    <hx-text color="default">Default — Primary content text</hx-text>
+    <hx-text color="subtle">Subtle — Secondary or supporting text</hx-text>
+    <hx-text color="disabled">Disabled — Inactive or unavailable text</hx-text>
+    <div style="background: #1e293b; padding: 0.5rem 0.75rem; border-radius: 0.25rem;">
+      <hx-text color="inverse">Inverse — Text on dark backgrounds</hx-text>
+    </div>
+    <hx-text color="danger">Danger — Error or critical alert text</hx-text>
+    <hx-text color="success">Success — Confirmation or positive status text</hx-text>
+    <hx-text color="warning">Warning — Caution or advisory text</hx-text>
+  </div>
+</ComponentDemo>
+
+### Truncation
+
+<ComponentDemo title="Single-line Truncation">
+  <div style="max-width: 320px; border: 1px dashed #d1d5db; padding: 1rem;">
+    <hx-text truncate>
+      Patient: John Alexander Smith — Admitted 2026-01-15 — Diagnosis: Acute respiratory failure
+      with hypoxia
+    </hx-text>
+  </div>
+</ComponentDemo>
+
+<ComponentDemo title="Multi-line Clamp (lines=3)">
+  <div style="max-width: 320px; border: 1px dashed #d1d5db; padding: 1rem;">
+    <hx-text lines="3">
+      Patient admitted via emergency department following rapid decline in oxygen saturation. Family
+      has been notified and is present at bedside. Attending physician has ordered further pulmonary
+      function tests and a chest CT scan.
+    </hx-text>
+  </div>
+</ComponentDemo>
+
+### Healthcare Example: Patient Record
+
+<ComponentDemo title="Patient Record Label/Value">
+  <div style="display: grid; grid-template-columns: max-content 1fr; gap: 0.5rem 1.5rem; max-width: 480px;">
+    <hx-text variant="label-sm" color="subtle">Patient Name</hx-text>
+    <hx-text variant="body">Jane Marie Doe</hx-text>
+
+    <hx-text variant="label-sm" color="subtle">Date of Birth</hx-text>
+    <hx-text variant="body">March 12, 1985</hx-text>
+
+    <hx-text variant="label-sm" color="subtle">MRN</hx-text>
+    <hx-text variant="code">MRN-00123456</hx-text>
+
+    <hx-text variant="label-sm" color="subtle">Admission Status</hx-text>
+    <hx-text variant="body" color="success" weight="semibold">Active — Inpatient</hx-text>
+
+    <hx-text variant="label-sm" color="subtle">Allergy Alert</hx-text>
+    <hx-text variant="body" color="danger" weight="semibold">Penicillin — Severe</hx-text>
+
+    <hx-text variant="label-sm" color="subtle">Notes</hx-text>
+    <hx-text variant="caption" color="subtle">Last reviewed by Dr. Rivera on 2026-03-05</hx-text>
+
+  </div>
+</ComponentDemo>
+
+## Installation
+
+```bash
+# Full library
+npm install @helix/library
+
+# Or import only this component (tree-shaking friendly)
+import '@helix/library/components/hx-text';
+```
+
+## Basic Usage
+
+Minimal HTML snippet — no build tool required:
+
+```html
+<!-- Default body text -->
+<hx-text>Patient information updated successfully.</hx-text>
+
+<!-- Label variant with semibold weight -->
+<hx-text variant="label" weight="semibold">Date of Birth</hx-text>
+
+<!-- Caption with subtle color -->
+<hx-text variant="caption" color="subtle">Last reviewed on 2026-03-05</hx-text>
+
+<!-- Single-line truncation (include attribute to enable) -->
+<hx-text truncate>Long patient note that gets clipped at container width</hx-text>
+
+<!-- Multi-line clamp (pass as string; component coerces to number) -->
+<hx-text lines="3">Extended clinical notes spanning multiple lines...</hx-text>
+
+<!-- Semantic element override -->
+<hx-text as="p" variant="body">Paragraph-level body content.</hx-text>
+<hx-text as="strong" variant="label">Bold label text</hx-text>
+```
+
+Set properties via JavaScript for dynamic control:
+
+```javascript
+const el = document.querySelector('hx-text');
+
+// Change variant at runtime
+el.variant = 'body-lg';
+
+// Update color based on status
+el.color = 'danger';
+
+// Enable truncation
+el.truncate = true;
+
+// Clamp to 2 lines
+el.lines = 2;
+```
+
+## Properties
+
+| Property   | Attribute  | Type                                                                                             | Default     | Description                                                                                                                       |
+| ---------- | ---------- | ------------------------------------------------------------------------------------------------ | ----------- | --------------------------------------------------------------------------------------------------------------------------------- |
+| `variant`  | `variant`  | `'body' \| 'body-sm' \| 'body-lg' \| 'label' \| 'label-sm' \| 'caption' \| 'code' \| 'overline'` | `'body'`    | Typography variant controlling font size, line height, and letter spacing. Reflects to attribute.                                 |
+| `weight`   | `weight`   | `'regular' \| 'medium' \| 'semibold' \| 'bold' \| undefined`                                     | `undefined` | Font weight override. When unset, the variant's default weight is used. Reflects to attribute.                                    |
+| `color`    | `color`    | `'default' \| 'subtle' \| 'disabled' \| 'inverse' \| 'danger' \| 'success' \| 'warning'`         | `'default'` | Semantic color intent. Reflects to attribute.                                                                                     |
+| `truncate` | `truncate` | `boolean`                                                                                        | `false`     | Clips text to a single line with an ellipsis overflow. Include the attribute to enable. Reflects to attribute.                    |
+| `lines`    | `lines`    | `number`                                                                                         | `0`         | Maximum number of lines before clamping with ellipsis. Overrides `truncate` when set. 0 disables clamping. Reflects to attribute. |
+| `as`       | `as`       | `'span' \| 'p' \| 'strong' \| 'em' \| 'div'`                                                     | `'span'`    | The HTML element to render as the inner base element. Use to produce semantically appropriate markup. Reflects to attribute.      |
+
+### Variant Reference
+
+| Variant    | Font Size | Weight   | Line Height | Use Case                                      |
+| ---------- | --------- | -------- | ----------- | --------------------------------------------- |
+| `body`     | 1rem      | Regular  | 1.5         | Standard body copy, descriptions              |
+| `body-sm`  | 0.875rem  | Regular  | 1.5         | Secondary content, metadata                   |
+| `body-lg`  | 1.125rem  | Regular  | 1.5         | Introductory text, highlighted summaries      |
+| `label`    | 1rem      | Medium   | 1.25        | Form field labels, section headers            |
+| `label-sm` | 0.875rem  | Medium   | 1.25        | Compact labels, table column headers          |
+| `caption`  | 0.75rem   | Regular  | 1.5         | Supporting copy, timestamps, helper text      |
+| `code`     | 0.875rem  | Regular  | 1.5         | Monospace content: ICD codes, MRNs, snippets  |
+| `overline` | 0.75rem   | Semibold | 1.25        | Section dividers, category labels (uppercase) |
+
+## Events
+
+`hx-text` is a display-only component. It does not dispatch any custom events.
+
+| Event    | Detail Type | Description       |
+| -------- | ----------- | ----------------- |
+| _(none)_ | —           | No custom events. |
+
+## CSS Custom Properties
+
+| Property                   | Default                                      | Description                               |
+| -------------------------- | -------------------------------------------- | ----------------------------------------- |
+| `--hx-text-font-size`      | Set per variant (e.g. `1rem` for `body`)     | Font size. Override to set a custom size. |
+| `--hx-text-font-weight`    | Set per variant (e.g. `400` for `body`)      | Font weight. Override per instance.       |
+| `--hx-text-line-height`    | Set per variant (e.g. `1.5` for `body`)      | Line height. Override per instance.       |
+| `--hx-text-letter-spacing` | Set per variant (e.g. `0` for `body`)        | Letter spacing. Override per instance.    |
+| `--hx-text-color`          | Set per color (e.g. `#0f172a` for `default`) | Text color. Override per instance.        |
+
+Override at the semantic token level to theme all instances, or at the component level for a single instance:
+
+```css
+/* Override font size via semantic token (affects all body-variant text) */
+:root {
+  --hx-font-size-md: 1.0625rem;
+}
+
+/* Override a single instance inline */
+hx-text#patient-name {
+  --hx-text-font-size: 1.25rem;
+  --hx-text-font-weight: 600;
+}
+```
+
+## CSS Parts
+
+| Part   | Description                                                                                 |
+| ------ | ------------------------------------------------------------------------------------------- |
+| `base` | The inner element (tag determined by the `as` property). Target for custom style overrides. |
+
+```css
+/* Style the inner base element directly */
+hx-text::part(base) {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+```
+
+## Slots
+
+| Slot        | Description                                      |
+| ----------- | ------------------------------------------------ |
+| _(default)_ | Text content. Accepts plain text or inline HTML. |
+
+## Accessibility
+
+`hx-text` is a presentational component. It exposes no ARIA roles of its own — semantic meaning comes from the `as` property and the surrounding document structure.
+
+| Topic         | Details                                                                                                                                                                                                                      |
+| ------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| ARIA role     | No ARIA role is applied. The rendered element inherits the implicit role of its tag (e.g. `span` → generic, `strong` → strong importance, `em` → emphasis).                                                                  |
+| Keyboard      | `hx-text` is not interactive and does not receive keyboard focus.                                                                                                                                                            |
+| Screen reader | Rendered text is read as normal document content. When truncation is active (`truncate` or `lines > 0`), a `title` attribute is automatically added to the inner element exposing the full unclipped text to screen readers. |
+| Truncation    | Full text is exposed via `title` on the base element when `truncate` or `lines > 0` is active. Assistive technology users can access the complete string even when the visible text is clipped.                              |
+| Color         | `color="disabled"` renders intentionally low-contrast text — WCAG 1.4.3 exempts inactive UI components. `color="inverse"` must be placed on a sufficiently dark background to meet contrast requirements.                    |
+| WCAG          | Meets WCAG 2.1 AA. Zero axe-core violations across all variant and color combinations. SC 1.3.1, SC 1.4.3, SC 4.1.2 satisfied.                                                                                               |
+
+### Semantic Element Best Practices
+
+Use the `as` property to produce semantically correct markup:
+
+```html
+<!-- Inline content (default) -->
+<hx-text variant="body">Inline patient data</hx-text>
+
+<!-- Block-level paragraph -->
+<hx-text as="p" variant="body">Clinical notes paragraph content.</hx-text>
+
+<!-- Emphasized text -->
+<hx-text as="em" variant="body" color="subtle">Optional field</hx-text>
+
+<!-- Strong importance -->
+<hx-text as="strong" variant="label" weight="semibold">CRITICAL ALERT</hx-text>
+```
+
+## Drupal Integration
+
+Use the component in a Twig template after registering the library:
+
+```twig
+{# my-module/templates/patient-record.html.twig #}
+
+{# Standard body text #}
+<hx-text variant="body" color="default">{{ patient.name }}</hx-text>
+
+{# Label with weight override #}
+<hx-text variant="label" weight="semibold">Date of Birth</hx-text>
+
+{# Caption with subtle color #}
+<hx-text variant="caption" color="subtle">{{ node.field_last_reviewed }}</hx-text>
+
+{# Boolean attribute (truncate) — include attribute to enable, omit to disable #}
+{% if truncate_notes %}
+  <hx-text truncate>{{ clinical_notes }}</hx-text>
+{% else %}
+  <hx-text>{{ clinical_notes }}</hx-text>
+{% endif %}
+
+{# Numeric attribute (lines) — pass as string; component coerces to number #}
+<hx-text lines="3">{{ clinical_summary }}</hx-text>
+
+{# Semantic element override #}
+<hx-text as="p" variant="body">{{ body_text }}</hx-text>
+<hx-text as="strong" variant="label">{{ field_label }}</hx-text>
+
+{# Status coloring #}
+<hx-text variant="body" color="{{ status == 'critical' ? 'danger' : 'success' }}">
+  {{ status_label }}
+</hx-text>
+```
+
+Load the library in your module's `.libraries.yml`:
+
+```yaml
+helix-components:
+  js:
+    /libraries/helix/helix.min.js: { minified: true }
+```
+
+`hx-text` is a display-only component with no events. For dynamic color or content updates, use standard JavaScript:
+
+```javascript
+Drupal.behaviors.helixText = {
+  attach(context) {
+    // once() is a Drupal core utility (no import needed) — prevents duplicate event binding during AJAX attach cycles
+    once('helixText', '[data-hx-text-status]', context).forEach((el) => {
+      const textEl = el.querySelector('hx-text');
+      if (textEl) {
+        textEl.color = el.dataset.hxTextStatus === 'critical' ? 'danger' : 'default';
+      }
+    });
+  },
+};
+```
+
+## Standalone HTML Example
+
+Copy-paste this into a `.html` file and open it in a browser — no build tool needed:
+
+```html
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>hx-text example</title>
+    <!-- @helix/library is a private package — install via npm workspace, not CDN -->
+    <!-- In your project: import '@helix/library'; in your bundler entry point -->
+  </head>
+  <body
+    style="font-family: sans-serif; padding: 2rem; max-width: 640px; display: flex; flex-direction: column; gap: 2rem;"
+  >
+    <!-- 1. Type scale demonstration -->
+    <section>
+      <hx-text variant="overline" color="subtle">Type Scale</hx-text>
+      <div style="display: flex; flex-direction: column; gap: 0.75rem; margin-top: 0.75rem;">
+        <hx-text variant="body-lg">Body Large — Patient summary introduction</hx-text>
+        <hx-text variant="body">Body — Standard clinical notes and descriptions</hx-text>
+        <hx-text variant="body-sm">Body Small — Secondary metadata and timestamps</hx-text>
+        <hx-text variant="label">Label — Form field labels</hx-text>
+        <hx-text variant="label-sm">Label Small — Compact table headers</hx-text>
+        <hx-text variant="caption" color="subtle">Caption — Helper text and fine print</hx-text>
+        <hx-text variant="code">ICD-10: J45.901 — Code variant for clinical identifiers</hx-text>
+      </div>
+    </section>
+
+    <!-- 2. Patient record layout -->
+    <section>
+      <hx-text variant="overline" color="subtle">Patient Record</hx-text>
+      <div
+        style="display: grid; grid-template-columns: max-content 1fr; gap: 0.5rem 1.5rem; margin-top: 0.75rem;"
+      >
+        <hx-text variant="label-sm" color="subtle">Patient Name</hx-text>
+        <hx-text variant="body">Jane Marie Doe</hx-text>
+
+        <hx-text variant="label-sm" color="subtle">Date of Birth</hx-text>
+        <hx-text variant="body">March 12, 1985</hx-text>
+
+        <hx-text variant="label-sm" color="subtle">MRN</hx-text>
+        <hx-text variant="code">MRN-00123456</hx-text>
+
+        <hx-text variant="label-sm" color="subtle">Admission Status</hx-text>
+        <hx-text variant="body" color="success" weight="semibold">Active — Inpatient</hx-text>
+
+        <hx-text variant="label-sm" color="subtle">Allergy Alert</hx-text>
+        <hx-text variant="body" color="danger" weight="semibold">Penicillin — Severe</hx-text>
+      </div>
+    </section>
+
+    <!-- 3. Truncation examples -->
+    <section>
+      <hx-text variant="overline" color="subtle">Truncation</hx-text>
+      <div
+        style="max-width: 360px; border: 1px dashed #d1d5db; padding: 0.75rem; margin-top: 0.75rem; display: flex; flex-direction: column; gap: 0.75rem;"
+      >
+        <hx-text truncate>
+          Single-line: Patient John Alexander Smith — Admitted 2026-01-15 — Diagnosis: Acute
+          respiratory failure
+        </hx-text>
+        <hx-text lines="2">
+          Multi-line (2): Patient admitted via emergency department following rapid decline in
+          oxygen saturation. Family has been notified and is present at bedside.
+        </hx-text>
+      </div>
+    </section>
+
+    <!-- 4. Dynamic color update -->
+    <section>
+      <hx-text variant="overline" color="subtle">Dynamic Control</hx-text>
+      <div style="display: flex; align-items: center; gap: 1rem; margin-top: 0.75rem;">
+        <hx-text id="dynamic-status" variant="body" color="success">Status: Active</hx-text>
+        <button id="toggle-btn" style="padding: 0.25rem 0.75rem; cursor: pointer;">
+          Toggle Critical
+        </button>
+      </div>
+    </section>
+
+    <script>
+      const statusEl = document.getElementById('dynamic-status');
+      const toggleBtn = document.getElementById('toggle-btn');
+      let isCritical = false;
+
+      toggleBtn.addEventListener('click', () => {
+        isCritical = !isCritical;
+        statusEl.color = isCritical ? 'danger' : 'success';
+        statusEl.textContent = isCritical ? 'Status: Critical' : 'Status: Active';
+      });
+    </script>
+  </body>
+</html>
+```
+
+## API Reference
+
+<ComponentDoc tagName="hx-text" section="api" />
