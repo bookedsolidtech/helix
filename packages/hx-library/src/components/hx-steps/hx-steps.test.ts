@@ -233,6 +233,20 @@ describe('hx-step', () => {
       );
       expect(shadowQuery(el, '[part~="description"]')).toBeTruthy();
     });
+
+    it('connector has aria-hidden="true"', async () => {
+      const el = await fixture<HelixStep>('<hx-step label="Test" status="pending"></hx-step>');
+      const connector = shadowQuery(el, '[part~="connector"]');
+      expect(connector?.getAttribute('aria-hidden')).toBe('true');
+    });
+
+    it('displays step number (index + 1) when pending', async () => {
+      const el = await fixture<HelixStep>('<hx-step label="Test" status="pending"></hx-step>');
+      el.index = 2;
+      await el.updateComplete;
+      const indicator = shadowQuery(el, '[part~="indicator"]');
+      expect(indicator?.textContent?.trim()).toContain('3');
+    });
   });
 
   // ─── Property: status ───
@@ -280,6 +294,20 @@ describe('hx-step', () => {
       const svg = indicator?.querySelector('svg');
       expect(svg).toBeTruthy();
     });
+
+    it('renders sr-only "Complete" text when complete', async () => {
+      const el = await fixture<HelixStep>('<hx-step label="Test" status="complete"></hx-step>');
+      const indicator = shadowQuery(el, '[part~="indicator"]');
+      const srOnly = indicator?.querySelector('.sr-only');
+      expect(srOnly?.textContent).toBe('Complete');
+    });
+
+    it('renders sr-only "Error" text when error', async () => {
+      const el = await fixture<HelixStep>('<hx-step label="Test" status="error"></hx-step>');
+      const indicator = shadowQuery(el, '[part~="indicator"]');
+      const srOnly = indicator?.querySelector('.sr-only');
+      expect(srOnly?.textContent).toBe('Error');
+    });
   });
 
   // ─── Property: label ───
@@ -305,6 +333,14 @@ describe('hx-step', () => {
         '<hx-step label="Test" status="pending" description="Some desc"></hx-step>',
       );
       expect(el.getAttribute('description')).toBe('Some desc');
+    });
+
+    it('renders description text in shadow DOM', async () => {
+      const el = await fixture<HelixStep>(
+        '<hx-step label="Test" status="pending" description="Some desc"></hx-step>',
+      );
+      const descEl = shadowQuery(el, '[part~="description"]');
+      expect(descEl?.textContent?.trim()).toContain('Some desc');
     });
   });
 
@@ -376,6 +412,18 @@ describe('hx-step', () => {
         ?.dispatchEvent(new MouseEvent('click', { bubbles: true, composed: true }));
       expect(fired).toBe(false);
     });
+
+    it('removes aria-disabled when re-enabled', async () => {
+      const el = await fixture<HelixStep>(
+        '<hx-step label="Test" status="pending" disabled></hx-step>',
+      );
+      await el.updateComplete;
+      expect(el.getAttribute('aria-disabled')).toBe('true');
+      el.disabled = false;
+      await el.updateComplete;
+      expect(el.hasAttribute('aria-disabled')).toBe(false);
+      expect(el.getAttribute('tabindex')).toBe('0');
+    });
   });
 
   // ─── Keyboard Navigation ───
@@ -428,6 +476,15 @@ describe('hx-step', () => {
 
     it('removes aria-current from host when not active', async () => {
       const el = await fixture<HelixStep>('<hx-step label="Test" status="pending"></hx-step>');
+      await el.updateComplete;
+      expect(el.hasAttribute('aria-current')).toBe(false);
+    });
+
+    it('removes aria-current when status changes from active to complete', async () => {
+      const el = await fixture<HelixStep>('<hx-step label="Test" status="active"></hx-step>');
+      await el.updateComplete;
+      expect(el.getAttribute('aria-current')).toBe('step');
+      el.status = 'complete';
       await el.updateComplete;
       expect(el.hasAttribute('aria-current')).toBe(false);
     });
