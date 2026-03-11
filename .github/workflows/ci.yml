@@ -140,6 +140,14 @@ jobs:
         if: github.event_name == 'pull_request'
         run: |
           BRANCH="${{ github.head_ref }}"
+          BASE="${{ github.base_ref }}"
+
+          # Promotion PRs (staging→main): tests already passed on staging CI — skip
+          if [[ "$BRANCH" == "staging" && "$BASE" == "main" ]]; then
+            echo "Promotion PR (staging → main) — tests already verified on staging. Skipping."
+            exit 0
+          fi
+
           # Fast path: audit-fix branches encode the component name directly
           if [[ "$BRANCH" =~ feature/audit-fix-(hx-[a-z-]+) ]]; then
             COMPONENT="${BASH_REMATCH[1]}"
@@ -147,7 +155,7 @@ jobs:
             npx vitest run "src/components/$COMPONENT/"
           else
             # General PR: extract changed component dirs from git diff
-            CHANGED=$(git diff --name-only "origin/${{ github.base_ref }}...HEAD" \
+            CHANGED=$(git diff --name-only "origin/$BASE...HEAD" \
               | grep 'src/components/hx-' \
               | sed 's|.*src/components/\(hx-[^/]*\)/.*|\1|' \
               | sort -u)
@@ -407,14 +415,15 @@ jobs:
             fi
           done
 
-          # Test and VRT are allowed to be skipped (no source changes)
+          # Test and VRT are allowed to be skipped (no source changes) or
+          # cancelled (concurrency group replaced a running job)
           for gate in test vrt; do
             result="${{ needs.test.result }}"
             case "$gate" in
               test) result="${{ needs.test.result }}" ;;
               vrt)  result="${{ needs.vrt.result }}" ;;
             esac
-            if [[ "$result" != "success" && "$result" != "skipped" ]]; then
+            if [[ "$result" != "success" && "$result" != "skipped" && "$result" != "cancelled" ]]; then
               echo "::error::Gate '$gate' did not succeed: $result"
               FAIL=1
             fi
