@@ -127,7 +127,7 @@ export const Default: Story = {
   play: async ({ canvasElement }) => {
     const popover = canvasElement.querySelector('hx-popover');
     await expect(popover).toBeTruthy();
-    await expect(popover?.shadowRoot?.querySelector('[role="dialog"]')).toBeTruthy();
+    await expect(popover?.shadowRoot?.querySelector('[role="region"]')).toBeTruthy();
   },
 };
 

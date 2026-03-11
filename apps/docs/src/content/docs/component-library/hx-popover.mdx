@@ -1,14 +1,239 @@
 ---
 title: 'hx-popover'
-description: 'Floating content panel anchored to a trigger element'
+description: Rich floating overlay anchored to a trigger element with placement, arrow, and multiple trigger modes.
 ---
 
 import ComponentLoader from '../../../components/ComponentLoader.astro';
+import ComponentDemo from '../../../components/ComponentDemo.astro';
 import ComponentDoc from '../../../components/ComponentDoc.astro';
 
 <ComponentLoader />
 
 <ComponentDoc tagName="hx-popover" section="summary" />
+
+## Overview
+
+`hx-popover` is a floating content panel anchored to a trigger element. It supports multiple trigger modes (click, hover, focus, manual), 12 placement options via Floating UI, an optional arrow indicator, and full accessibility with focus management and Escape key dismissal.
+
+**Use `hx-popover` when:** you need to display rich, interactive content attached to a trigger element (patient details, contextual help, form previews).
+**Use `hx-tooltip` instead when:** you need a simple text label on hover/focus with no interactive content.
+
+## Live Demo
+
+### Click Trigger (Default)
+
+Click the button to open the popover. Click again or press Escape to dismiss.
+
+<ComponentDemo title="Click Trigger">
+  <hx-popover label="Details">
+    <button slot="anchor">Open Popover</button>
+    <p style="margin: 0;">
+      Click the button to open this popover. Press Escape or click outside to close.
+    </p>
+  </hx-popover>
+</ComponentDemo>
+
+### With Arrow
+
+An arrow indicator points from the popover body to the anchor element.
+
+<ComponentDemo title="With Arrow">
+  <hx-popover arrow label="Patient info">
+    <button slot="anchor">Patient Details</button>
+    <div>
+      <h4 style="margin: 0 0 0.5rem; font-size: 0.875rem; font-weight: 600;">
+        John Doe — MRN 12345678
+      </h4>
+      <p style="margin: 0 0 0.25rem; font-size: 0.8125rem;">DOB: 1965-03-14 (age 61)</p>
+      <p style="margin: 0; font-size: 0.8125rem;">Allergies: Penicillin, Sulfa</p>
+    </div>
+  </hx-popover>
+</ComponentDemo>
+
+### Hover Trigger
+
+Opens on mouse hover, closes on mouse leave.
+
+<ComponentDemo title="Hover Trigger">
+  <hx-popover trigger="hover" label="Hover content">
+    <button slot="anchor">Hover me</button>
+    <p style="margin: 0;">This popover appears on hover.</p>
+  </hx-popover>
+</ComponentDemo>
+
+### Focus Trigger
+
+Opens when the anchor receives keyboard focus, closes on blur.
+
+<ComponentDemo title="Focus Trigger">
+  <hx-popover trigger="focus" label="Focus content">
+    <button slot="anchor">Focus me (Tab to this button)</button>
+    <p style="margin: 0;">This popover appears on keyboard focus.</p>
+  </hx-popover>
+</ComponentDemo>
+
+## Installation
+
+```bash
+# Full library
+npm install @helixui/library
+
+# Or import only this component (tree-shaking friendly)
+import '@helixui/library/components/hx-popover';
+```
+
+## Basic Usage
+
+```html
+<hx-popover placement="bottom" trigger="click" label="Help text">
+  <button slot="anchor">Open Popover</button>
+  <p>Rich popover content here.</p>
+</hx-popover>
+```
+
+## Properties
+
+| Property    | Attribute   | Type               | Default     | Description                                             |
+| ----------- | ----------- | ------------------ | ----------- | ------------------------------------------------------- |
+| `open`      | `open`      | `boolean`          | `false`     | Whether the popover is open.                            |
+| `placement` | `placement` | `PopoverPlacement` | `'bottom'`  | Preferred placement relative to the anchor (12 values). |
+| `trigger`   | `trigger`   | `TriggerMode`      | `'click'`   | How the popover is triggered.                           |
+| `distance`  | `distance`  | `number`           | `8`         | Distance in pixels between popover and anchor.          |
+| `skidding`  | `skidding`  | `number`           | `0`         | Alignment offset in pixels along the anchor.            |
+| `arrow`     | `arrow`     | `boolean`          | `false`     | Whether to show an arrow pointing to the anchor.        |
+| `label`     | `label`     | `string`           | `'Popover'` | Accessible label for the popover body (`aria-label`).   |
+
+### Placement Values
+
+`top` | `top-start` | `top-end` | `right` | `right-start` | `right-end` | `bottom` | `bottom-start` | `bottom-end` | `left` | `left-start` | `left-end`
+
+### Trigger Modes
+
+| Mode     | Description                                        |
+| -------- | -------------------------------------------------- |
+| `click`  | Toggle on click. Click outside or Escape to close. |
+| `hover`  | Show on mouseenter, hide on mouseleave.            |
+| `focus`  | Show on focusin, hide on focusout.                 |
+| `manual` | Controlled externally via the `open` property.     |
+
+## Events
+
+| Event           | Description                                    |
+| --------------- | ---------------------------------------------- |
+| `hx-show`       | Dispatched when the popover begins to show.    |
+| `hx-after-show` | Dispatched after the popover is fully visible. |
+| `hx-hide`       | Dispatched when the popover begins to hide.    |
+| `hx-after-hide` | Dispatched after the popover is fully hidden.  |
+
+## CSS Custom Properties
+
+| Property                           | Default                       | Description                 |
+| ---------------------------------- | ----------------------------- | --------------------------- |
+| `--hx-popover-bg`                  | `var(--hx-color-neutral-0)`   | Popover background color.   |
+| `--hx-popover-color`               | `var(--hx-color-neutral-900)` | Popover text color.         |
+| `--hx-popover-font-size`           | `var(--hx-font-size-sm)`      | Popover font size.          |
+| `--hx-popover-max-width`           | `320px`                       | Maximum popover width.      |
+| `--hx-popover-padding`             | `var(--hx-space-3)`           | Popover padding.            |
+| `--hx-popover-border-color`        | `var(--hx-color-neutral-200)` | Popover border color.       |
+| `--hx-popover-border-radius`       | `var(--hx-border-radius-md)`  | Popover border radius.      |
+| `--hx-popover-shadow`              | `var(--hx-shadow-md)`         | Popover box shadow.         |
+| `--hx-popover-z-index`             | `9999`                        | Popover z-index.            |
+| `--hx-popover-transition-duration` | `0.2s`                        | Show/hide transition speed. |
+| `--hx-popover-arrow-size`          | `10px`                        | Size of the arrow.          |
+
+## CSS Parts
+
+| Part    | Description                  |
+| ------- | ---------------------------- |
+| `body`  | The popover body container.  |
+| `arrow` | The arrow indicator element. |
+
+## Slots
+
+| Slot        | Description                                 |
+| ----------- | ------------------------------------------- |
+| `anchor`    | The trigger element that opens the popover. |
+| _(default)_ | Content displayed inside the popover body.  |
+
+## Accessibility
+
+| Topic            | Details                                                                          |
+| ---------------- | -------------------------------------------------------------------------------- |
+| ARIA role        | `role="region"` on the popover body with `aria-label`.                           |
+| `aria-expanded`  | Set on the anchor element, tracks open/close state.                              |
+| `aria-hidden`    | Body has `aria-hidden="true"` when closed, `"false"` when open.                  |
+| `inert`          | Body is marked `inert` when hidden, preventing tab focus into invisible content. |
+| Focus management | Focus moves into the popover body on open, returns to trigger on close.          |
+| Escape key       | Pressing Escape anywhere on the document closes the popover.                     |
+| Click outside    | Clicking outside the component closes the popover (click trigger mode).          |
+| Reduced motion   | Transitions disabled when `prefers-reduced-motion: reduce` is active.            |
+| WCAG 2.1 AA      | Verified with axe-core in both closed and open states.                           |
+
+## Drupal Integration
+
+```twig
+{# my-module/templates/my-template.html.twig #}
+<hx-popover
+  placement="{{ popover_placement|default('bottom') }}"
+  trigger="{{ popover_trigger|default('click') }}"
+  label="{{ popover_label }}"
+  {% if popover_arrow %}arrow{% endif %}
+>
+  <button slot="anchor">{{ trigger_text }}</button>
+  {{ popover_content }}
+</hx-popover>
+```
+
+Load the library in your module's `.libraries.yml`:
+
+```yaml
+helix-components:
+  js:
+    /libraries/helix/helix.min.js: { minified: true }
+```
+
+Listen for popover events in Drupal behaviors:
+
+```javascript
+Drupal.behaviors.myPopover = {
+  attach(context) {
+    once('myPopover', 'hx-popover', context).forEach((el) => {
+      el.addEventListener('hx-show', () => {
+        // popover opened
+      });
+      el.addEventListener('hx-hide', () => {
+        // popover closed
+      });
+    });
+  },
+};
+```
+
+## Standalone HTML Example
+
+```html
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>hx-popover example</title>
+  </head>
+  <body style="font-family: sans-serif; padding: 4rem;">
+    <hx-popover placement="bottom" arrow label="Patient info">
+      <button slot="anchor">View Patient Details</button>
+      <div>
+        <h4 style="margin: 0 0 0.5rem;">Jane Smith — MRN 87654321</h4>
+        <p style="margin: 0;">DOB: 1982-07-22 | Allergies: None</p>
+      </div>
+    </hx-popover>
+
+    <script type="module">
+      import '@helixui/library/components/hx-popover';
+    </script>
+  </body>
+</html>
+```
 
 ## API Reference
 
