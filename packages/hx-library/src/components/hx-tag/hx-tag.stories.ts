@@ -171,6 +171,22 @@ export const WithSuffix: Story = {
   `,
 };
 
+export const Sizes: Story = {
+  render: () => html`
+    <div style="display:flex;gap:1rem;align-items:center;">
+      ${(['sm', 'md', 'lg'] as const).map(
+        (size) => html`
+          <div style="display:flex;flex-direction:column;gap:0.5rem;align-items:center;">
+            <hx-tag hx-size=${size}>${size}</hx-tag>
+            <hx-tag hx-size=${size} variant="primary" removable>${size}</hx-tag>
+            <hx-tag hx-size=${size} pill variant="success">${size}</hx-tag>
+          </div>
+        `,
+      )}
+    </div>
+  `,
+};
+
 export const RemovableInteractive: Story = {
   render: () => html`
     <div
