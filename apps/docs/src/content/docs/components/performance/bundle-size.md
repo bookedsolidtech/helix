@@ -1,6 +1,6 @@
 ---
 title: Bundle Size Fundamentals
-description: Master bundle size optimization for HELiX—tree-shaking, code splitting, lazy loading, minification, compression, and CI enforcement of performance budgets.
+description: Master bundle size optimization for wc-2026—tree-shaking, code splitting, lazy loading, minification, compression, and CI enforcement of performance budgets.
 prerequisites:
   - components/fundamentals/overview
 sidebar:
@@ -11,7 +11,7 @@ sidebar:
 
 Bundle size is one of the most critical performance metrics for web applications, directly impacting page load time, Time to Interactive (TTI), and user experience. For enterprise healthcare applications where every millisecond counts, optimizing JavaScript bundle size is not optional—it's a requirement.
 
-This guide provides deep technical coverage of bundle size optimization for `HELiX`, covering tree-shaking, code splitting, lazy loading, minification, compression, and CI enforcement of performance budgets.
+This guide provides deep technical coverage of bundle size optimization for `wc-2026`, covering tree-shaking, code splitting, lazy loading, minification, compression, and CI enforcement of performance budgets.
 
 ## Why Bundle Size Matters
 
@@ -50,7 +50,7 @@ For a 500 KB bundle on a mid-range mobile device:
 
 This is why bundle size optimization is a top priority for hx-library.
 
-## HELiX Performance Budgets
+## wc-2026 Performance Budgets
 
 Performance budgets are hard limits enforced in CI. Every component must meet these thresholds or the build fails.
 
@@ -75,11 +75,11 @@ Performance budgets are hard limits enforced in CI. Every component must meet th
 
 ## Bundle Analysis Tools
 
-Measuring bundle size accurately requires the right tools. HELiX uses a combination of build-time analysis and runtime monitoring.
+Measuring bundle size accurately requires the right tools. wc-2026 uses a combination of build-time analysis and runtime monitoring.
 
 ### Vite Build Analysis
 
-Vite provides detailed bundle analysis during production builds. The HELiX configuration outputs granular metrics for each component.
+Vite provides detailed bundle analysis during production builds. The wc-2026 configuration outputs granular metrics for each component.
 
 ```bash
 npm run build
@@ -112,10 +112,10 @@ Key metrics to monitor:
 2. Enter package name at bundlephobia.com
 3. View per-component tree-shaking impact
 
-**Example analysis for wc-button:**
+**Example analysis for hx-button:**
 
 ```
-Import: import { WcButton } from '@helixui/library'
+Import: import { HxButton } from '@helixui/library'
 Bundle size: 8.2 KB (minified)
 Gzipped: 3.1 KB
 Tree-shakeable: ✅
@@ -199,7 +199,7 @@ usedFunction(); // Only this code is included in bundle
 
 Tree-shaking only works with ES module syntax (`import`/`export`). CommonJS (`require`/`module.exports`) cannot be tree-shaken.
 
-**HELiX configuration:**
+**wc-2026 configuration:**
 
 ```json
 // package.json
@@ -241,7 +241,7 @@ The `sideEffects` field tells bundlers that modules are pure and safe to remove 
 
 #### 3. Per-Component Entry Points
 
-HELiX exposes each component as a separate entry point to enable granular imports.
+wc-2026 exposes each component as a separate entry point to enable granular imports.
 
 **Vite configuration:**
 
@@ -265,8 +265,8 @@ export default defineConfig({
 **Consumer usage:**
 
 ```typescript
-// ✅ Tree-shakeable (only loads wc-button)
-import '@helixui/library/components/wc-button';
+// ✅ Tree-shakeable (only loads hx-button)
+import '@helixui/library/components/hx-button';
 
 // ❌ NOT tree-shakeable (loads entire library)
 import '@helixui/library';
@@ -280,23 +280,23 @@ Barrel exports (re-exporting everything from `index.ts`) defeat tree-shaking.
 
 ```typescript
 // ❌ src/index.ts (barrel export)
-export * from './components/wc-button/index.js';
-export * from './components/wc-card/index.js';
-export * from './components/wc-text-input/index.js';
+export * from './components/hx-button/index.js';
+export * from './components/hx-card/index.js';
+export * from './components/hx-text-input/index.js';
 // ... (all components)
 
 // Consumer can't tree-shake this
-import { WcButton } from '@helixui/library';
+import { HxButton } from '@helixui/library';
 ```
 
-**HELiX approach:**
+**wc-2026 approach:**
 
 ```typescript
-// ✅ src/components/wc-button/index.ts
-export { WcButton } from './wc-button.js';
+// ✅ src/components/hx-button/index.ts
+export { HxButton } from './hx-button.js';
 
 // Consumer imports directly
-import { WcButton } from '@helixui/library/components/wc-button';
+import { HxButton } from '@helixui/library/components/hx-button';
 ```
 
 ### Verifying Tree-Shaking
@@ -310,12 +310,12 @@ import { WcButton } from '@helixui/library/components/wc-button';
 
 ```typescript
 // test-app/src/main.ts
-import '@helixui/library/components/wc-button';
+import '@helixui/library/components/hx-button';
 
-document.body.innerHTML = '<wc-button>Test</wc-button>';
+document.body.innerHTML = '<hx-button>Test</hx-button>';
 ```
 
-**Expected bundle size:** ~8-10 KB (5 KB Lit + 3-5 KB wc-button)
+**Expected bundle size:** ~8-10 KB (5 KB Lit + 3-5 KB hx-button)
 
 **If larger:** Tree-shaking is broken. Common causes:
 
@@ -349,7 +349,7 @@ function App() {
 }
 ```
 
-**Impact:** If Dashboard uses `wc-card` and Profile uses `wc-form`, each route only loads the components it needs.
+**Impact:** If Dashboard uses `hx-card` and Profile uses `wc-form`, each route only loads the components it needs.
 
 ### Component-Level Code Splitting
 
@@ -367,7 +367,7 @@ For heavy components used in specific contexts, split them into separate chunks.
 // Dynamically import heavy component
 async function loadDataTable() {
   const { WcDataTable } = await import('@helixui/library/components/wc-data-table');
-  customElements.define('wc-data-table', WcDataTable);
+  customElements.define('hx-data-table', WcDataTable);
 }
 
 // Load only when needed
@@ -389,7 +389,7 @@ export default defineConfig({
       output: {
         manualChunks: {
           'vendor-lit': ['lit', '@lit/reactive-element'],
-          'vendor-wc': ['@helixui/tokens'],
+          'vendor-hx': ['@helixui/tokens'],
         },
       },
     },
@@ -424,8 +424,8 @@ Load components when they enter the viewport.
 ```typescript
 // Register observer for lazy components
 const lazyComponents = new Map([
-  ['wc-data-table', () => import('@helixui/library/components/wc-data-table')],
-  ['wc-chart', () => import('@helixui/library/components/wc-chart')],
+  ['hx-data-table', () => import('@helixui/library/components/wc-data-table')],
+  ['hx-chart', () => import('@helixui/library/components/wc-chart')],
 ]);
 
 const observer = new IntersectionObserver((entries) => {
@@ -444,7 +444,7 @@ const observer = new IntersectionObserver((entries) => {
 
 // Observe all lazy component placeholders
 document
-  .querySelectorAll('wc-data-table:not(:defined), wc-chart:not(:defined)')
+  .querySelectorAll('hx-data-table:not(:defined), wc-chart:not(:defined)')
   .forEach((el) => observer.observe(el));
 ```
 
@@ -461,9 +461,9 @@ Load components when the user interacts with a trigger.
 ```typescript
 // Load modal component on button click
 document.getElementById('open-modal')?.addEventListener('click', async () => {
-  await import('@helixui/library/components/wc-modal');
+  await import('@helixui/library/components/hx-modal');
 
-  const modal = document.createElement('wc-modal');
+  const modal = document.createElement('hx-modal');
   modal.innerHTML = '<p>Modal content</p>';
   document.body.appendChild(modal);
 });
@@ -485,7 +485,7 @@ if ('requestIdleCallback' in window) {
   requestIdleCallback(() => {
     const link = document.createElement('link');
     link.rel = 'prefetch';
-    link.href = '/dist/components/wc-modal/index.js';
+    link.href = '/dist/components/hx-modal/index.js';
     document.head.appendChild(link);
   });
 }
@@ -499,15 +499,15 @@ if ('requestIdleCallback' in window) {
 
 ```html
 <!-- Preload critical component -->
-<link rel="modulepreload" href="/dist/components/wc-button/index.js" />
+<link rel="modulepreload" href="/dist/components/hx-button/index.js" />
 
 <!-- Prefetch likely-needed component -->
-<link rel="prefetch" href="/dist/components/wc-modal/index.js" />
+<link rel="prefetch" href="/dist/components/hx-modal/index.js" />
 ```
 
 ## Minification
 
-Minification removes whitespace, comments, and shortens variable names to reduce code size. HELiX uses **esbuild** for fast, efficient minification.
+Minification removes whitespace, comments, and shortens variable names to reduce code size. wc-2026 uses **esbuild** for fast, efficient minification.
 
 ### Vite Minification Configuration
 
@@ -526,7 +526,7 @@ export default defineConfig({
 - **esbuild:** 10-100x faster, good compression (~95% of terser)
 - **terser:** Slower, slightly better compression (~5% smaller)
 
-**HELiX uses esbuild** for development speed. For production releases, consider terser for maximum compression:
+**wc-2026 uses esbuild** for development speed. For production releases, consider terser for maximum compression:
 
 ```typescript
 export default defineConfig({
@@ -548,7 +548,7 @@ export default defineConfig({
 
 ### Minification Impact
 
-**Example: wc-button component**
+**Example: hx-button component**
 
 | Version            | Size                   |
 | ------------------ | ---------------------- |
@@ -671,9 +671,9 @@ export default defineConfig({
 **Output:**
 
 ```
-dist/components/wc-button/index.js      (4.2 KB)
-dist/components/wc-button/index.js.gz   (1.8 KB) - 57% smaller
-dist/components/wc-button/index.js.br   (1.6 KB) - 62% smaller
+dist/components/hx-button/index.js      (4.2 KB)
+dist/components/hx-button/index.js.gz   (1.8 KB) - 57% smaller
+dist/components/hx-button/index.js.br   (1.6 KB) - 62% smaller
 ```
 
 **Server configuration (Nginx):**
@@ -700,7 +700,7 @@ Bundle size limits are only effective if they're continuously monitored and enfo
 
 ### CI Bundle Size Checks
 
-HELiX uses GitHub Actions to enforce bundle size budgets on every PR.
+wc-2026 uses GitHub Actions to enforce bundle size budgets on every PR.
 
 **Workflow configuration:**
 
@@ -728,7 +728,7 @@ jobs:
       - name: Analyze bundle size
         run: |
           # Check total bundle size
-          TOTAL_SIZE=$(du -sb packages/wc-library/dist | awk '{print $1}')
+          TOTAL_SIZE=$(du -sb packages/hx-library/dist | awk '{print $1}')
           MAX_SIZE=$((50 * 1024)) # 50 KB
 
           if [ "$TOTAL_SIZE" -gt "$MAX_SIZE" ]; then
@@ -794,12 +794,12 @@ npm install --save-dev bundlesize
 {
   "bundlesize": [
     {
-      "path": "packages/wc-library/dist/components/wc-button/index.js",
+      "path": "packages/hx-library/dist/components/hx-button/index.js",
       "maxSize": "5 KB",
       "compression": "gzip"
     },
     {
-      "path": "packages/wc-library/dist/index.js",
+      "path": "packages/hx-library/dist/index.js",
       "maxSize": "50 KB",
       "compression": "gzip"
     }
@@ -833,9 +833,9 @@ Track bundle size trends over time using the Admin Dashboard.
 
 **Location:** `http://localhost:3159/health` → Performance section
 
-## HELiX Bundle Metrics
+## wc-2026 Bundle Metrics
 
-Current bundle size metrics for HELiX (as of latest build):
+Current bundle size metrics for wc-2026 (as of latest build):
 
 ### Full Library Bundle
 
@@ -852,13 +852,13 @@ Current bundle size metrics for HELiX (as of latest build):
 
 | Component     | Minified | Gzipped | Brotli |
 | ------------- | -------- | ------- | ------ |
-| wc-button     | 4.2 KB   | 1.8 KB  | 1.6 KB |
-| wc-card       | 3.8 KB   | 1.6 KB  | 1.4 KB |
-| wc-text-input | 5.1 KB   | 2.1 KB  | 1.9 KB |
-| wc-checkbox   | 3.9 KB   | 1.7 KB  | 1.5 KB |
-| wc-select     | 4.8 KB   | 2.0 KB  | 1.8 KB |
-| wc-alert      | 3.2 KB   | 1.4 KB  | 1.2 KB |
-| wc-badge      | 2.8 KB   | 1.2 KB  | 1.1 KB |
+| hx-button     | 4.2 KB   | 1.8 KB  | 1.6 KB |
+| hx-card       | 3.8 KB   | 1.6 KB  | 1.4 KB |
+| hx-text-input | 5.1 KB   | 2.1 KB  | 1.9 KB |
+| hx-checkbox   | 3.9 KB   | 1.7 KB  | 1.5 KB |
+| hx-select     | 4.8 KB   | 2.0 KB  | 1.8 KB |
+| hx-alert      | 3.2 KB   | 1.4 KB  | 1.2 KB |
+| hx-badge      | 2.8 KB   | 1.2 KB  | 1.1 KB |
 
 **Status:** ✅ All components under 5 KB budget (minified)
 
@@ -884,7 +884,7 @@ Current bundle size metrics for HELiX (as of latest build):
 
 ## Best Practices Checklist
 
-When building components for HELiX, follow these bundle size optimization practices:
+When building components for wc-2026, follow these bundle size optimization practices:
 
 ### Library Configuration
 
@@ -932,7 +932,7 @@ If bundle size exceeds budgets, use this debugging workflow:
 npm run build --workspace=@helixui/library
 
 # Check component sizes
-ls -lh packages/wc-library/dist/components/**/index.js
+ls -lh packages/hx-library/dist/components/**/index.js
 ```
 
 ### Step 2: Analyze Dependencies
@@ -956,12 +956,12 @@ open packages/hx-library/dist/stats.html
 
 ```typescript
 // Create minimal test app
-import '@helixui/library/components/wc-button';
+import '@helixui/library/components/hx-button';
 
 // Build and measure
 npm run build
 
-// Expected: ~8 KB (Lit + wc-button)
+// Expected: ~8 KB (Lit + hx-button)
 // Actual: ??? KB
 ```
 
@@ -976,7 +976,7 @@ npm run build
 ```javascript
 // Measure component load time
 const start = performance.now();
-await import('@helixui/library/components/wc-button');
+await import('@helixui/library/components/hx-button');
 const end = performance.now();
 console.log(`Load time: ${end - start}ms`);
 ```
@@ -991,14 +991,14 @@ git checkout main
 npm run build
 
 # Measure baseline size
-BASELINE=$(du -sb packages/wc-library/dist | awk '{print $1}')
+BASELINE=$(du -sb packages/hx-library/dist | awk '{print $1}')
 
 # Checkout PR branch
 git checkout feature-branch
 npm run build
 
 # Measure PR size
-PR_SIZE=$(du -sb packages/wc-library/dist | awk '{print $1}')
+PR_SIZE=$(du -sb packages/hx-library/dist | awk '{print $1}')
 
 # Calculate delta
 echo "Size change: $((PR_SIZE - BASELINE)) bytes"

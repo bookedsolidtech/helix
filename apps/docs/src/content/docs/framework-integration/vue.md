@@ -12,7 +12,7 @@ Vue 3 has first-class support for custom elements. With one compiler option, Vue
 ## Installation
 
 ```bash
-npm install @helix/library
+npm install @helixui/library
 ```
 
 ## Compiler Configuration
@@ -58,7 +58,7 @@ Import once at the app entry point (or in a plugin):
 ```ts
 // main.ts
 import { createApp } from 'vue';
-import '@helix/library';
+import '@helixui/library';
 import App from './App.vue';
 
 createApp(App).mount('#app');
@@ -69,7 +69,7 @@ createApp(App).mount('#app');
 ```ts
 // plugins/helix.client.ts
 export default defineNuxtPlugin(() => {
-  import('@helix/library');
+  import('@helixui/library');
 });
 ```
 

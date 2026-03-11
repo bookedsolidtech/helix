@@ -34,7 +34,7 @@ Web components are framework-agnostic by design, but frameworks differ in:
 All guides assume the library is installed via npm:
 
 ```bash
-npm install @helix/library
+npm install @helixui/library
 ```
 
 Or loaded via CDN — see the [Plain HTML guide](/framework-integration/html).

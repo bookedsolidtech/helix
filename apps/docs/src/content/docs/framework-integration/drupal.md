@@ -16,7 +16,7 @@ Two options are available:
 ### Via npm (recommended for custom themes)
 
 ```bash
-npm install @helix/library
+npm install @helixui/library
 ```
 
 Reference the built files from your theme's `.libraries.yml`.
@@ -27,7 +27,7 @@ Reference the built files from your theme's `.libraries.yml`.
 # mytheme.libraries.yml
 helix:
   js:
-    https://cdn.jsdelivr.net/npm/@helix/library/dist/index.js: { type: external, attributes: { type: module } }
+    https://cdn.jsdelivr.net/npm/@helixui/library/dist/index.js: { type: external, attributes: { type: module } }
 ```
 
 See [CDN Installation](/drupal-integration/installation/cdn) for the full setup.
