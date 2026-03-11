@@ -293,6 +293,29 @@ describe('hx-code-snippet', () => {
       const lineNums = el.shadowRoot!.querySelectorAll('.code-snippet__line-number');
       expect(lineNums.length).toBeGreaterThan(0);
     });
+
+    it('renders one line number per line', async () => {
+      const el = await fixture<HelixCodeSnippet>(
+        '<hx-code-snippet line-numbers>line1\nline2\nline3</hx-code-snippet>',
+      );
+      await el.updateComplete;
+      const lineNums = el.shadowRoot!.querySelectorAll('.code-snippet__line-number');
+      expect(lineNums.length).toBe(3);
+      expect(lineNums[0]?.textContent).toBe('1');
+      expect(lineNums[1]?.textContent).toBe('2');
+      expect(lineNums[2]?.textContent).toBe('3');
+    });
+
+    it('line number spans are aria-hidden', async () => {
+      const el = await fixture<HelixCodeSnippet>(
+        '<hx-code-snippet line-numbers>line1\nline2</hx-code-snippet>',
+      );
+      await el.updateComplete;
+      const lineNums = el.shadowRoot!.querySelectorAll('.code-snippet__line-number');
+      for (const span of lineNums) {
+        expect(span.getAttribute('aria-hidden')).toBe('true');
+      }
+    });
   });
 
   // ─── Slots (3) ───
@@ -401,6 +424,15 @@ describe('hx-code-snippet', () => {
     it('copyable=false has no axe violations', async () => {
       const el = await fixture<HelixCodeSnippet>('<hx-code-snippet>const x = 1;</hx-code-snippet>');
       el.copyable = false;
+      await el.updateComplete;
+      const { violations } = await checkA11y(el);
+      expect(violations).toEqual([]);
+    });
+
+    it('line-numbers mode has no axe violations', async () => {
+      const el = await fixture<HelixCodeSnippet>(
+        '<hx-code-snippet line-numbers>line1\nline2\nline3</hx-code-snippet>',
+      );
       await el.updateComplete;
       const { violations } = await checkA11y(el);
       expect(violations).toEqual([]);
