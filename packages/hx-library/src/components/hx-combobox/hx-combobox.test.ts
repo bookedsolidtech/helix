@@ -647,4 +647,157 @@ describe('hx-combobox', () => {
       await checkA11y(el);
     });
   });
+
+  // ─── Property: name (1) ───
+
+  describe('Property: name', () => {
+    it('sets name attribute on native input', async () => {
+      const el = await fixture<HxCombobox>('<hx-combobox name="fruit"></hx-combobox>');
+      const input = shadowQuery<HTMLInputElement>(el, 'input')!;
+      expect(input.getAttribute('name')).toBe('fruit');
+    });
+  });
+
+  // ─── Property: ariaLabel (2) ───
+
+  describe('Property: ariaLabel', () => {
+    it('sets aria-label on input when ariaLabel is set', async () => {
+      const el = await fixture<HxCombobox>(
+        '<hx-combobox aria-label="Search fruits"></hx-combobox>',
+      );
+      const input = shadowQuery(el, 'input');
+      expect(input?.getAttribute('aria-label')).toBe('Search fruits');
+    });
+
+    it('uses aria-labelledby when label is set and ariaLabel is not', async () => {
+      const el = await fixture<HxCombobox>('<hx-combobox label="Fruit"></hx-combobox>');
+      const input = shadowQuery(el, 'input');
+      expect(input?.getAttribute('aria-labelledby')).toBeTruthy();
+      expect(input?.getAttribute('aria-label')).toBeNull();
+    });
+  });
+
+  // ─── ARIA: describedby (2) ───
+
+  describe('ARIA: describedby', () => {
+    it('aria-describedby links to help text element', async () => {
+      const el = await fixture<HxCombobox>(
+        '<hx-combobox label="Fruit" help-text="Pick one"></hx-combobox>',
+      );
+      const input = shadowQuery(el, 'input');
+      const helpEl = shadowQuery(el, '[part="help-text"]');
+      expect(input?.getAttribute('aria-describedby')).toContain(helpEl?.id);
+    });
+
+    it('aria-describedby links to error element', async () => {
+      const el = await fixture<HxCombobox>(
+        '<hx-combobox label="Fruit" error="Required"></hx-combobox>',
+      );
+      const input = shadowQuery(el, 'input');
+      const errorEl = shadowQuery(el, '[role="alert"]');
+      expect(input?.getAttribute('aria-describedby')).toContain(errorEl?.id);
+    });
+  });
+
+  // ─── ARIA: busy and multiselectable (2) ───
+
+  describe('ARIA: loading and multiple', () => {
+    it('sets aria-busy="true" on input when loading', async () => {
+      const el = await fixture<HxCombobox>('<hx-combobox label="Fruit" loading></hx-combobox>');
+      const input = shadowQuery(el, 'input');
+      expect(input?.getAttribute('aria-busy')).toBe('true');
+    });
+
+    it('sets aria-multiselectable="true" on listbox when multiple', async () => {
+      const el = await fixture<HxCombobox>('<hx-combobox label="Fruit" multiple></hx-combobox>');
+      const listbox = shadowQuery(el, '[role="listbox"]');
+      expect(listbox?.getAttribute('aria-multiselectable')).toBe('true');
+    });
+  });
+
+  // ─── Additional CSS Parts (4) ───
+
+  describe('CSS Parts (additional)', () => {
+    it('label part exposed when label is set', async () => {
+      const el = await fixture<HxCombobox>('<hx-combobox label="Test"></hx-combobox>');
+      const part = shadowQuery(el, '[part="label"]');
+      expect(part).toBeTruthy();
+    });
+
+    it('option part exposed when dropdown is open', async () => {
+      const el = await fixture<HxCombobox>(withOptions());
+      const input = shadowQuery<HTMLInputElement>(el, 'input')!;
+      input.dispatchEvent(new Event('focus'));
+      await el.updateComplete;
+      const options = el.shadowRoot?.querySelectorAll('[part="option"]');
+      expect(options?.length).toBeGreaterThan(0);
+    });
+
+    it('error part exposed when error is set', async () => {
+      const el = await fixture<HxCombobox>('<hx-combobox error="Oops"></hx-combobox>');
+      const part = shadowQuery(el, '[part="error"]');
+      expect(part).toBeTruthy();
+    });
+
+    it('help-text part exposed when help-text is set', async () => {
+      const el = await fixture<HxCombobox>('<hx-combobox help-text="Help"></hx-combobox>');
+      const part = shadowQuery(el, '[part="help-text"]');
+      expect(part).toBeTruthy();
+    });
+  });
+
+  // ─── Outside Click (1) ───
+
+  describe('Outside click', () => {
+    it('closes dropdown on outside click', async () => {
+      const el = await fixture<HxCombobox>(withOptions());
+      const input = shadowQuery<HTMLInputElement>(el, 'input')!;
+      input.dispatchEvent(new Event('focus'));
+      await el.updateComplete;
+      // Verify open
+      const listbox = shadowQuery(el, '[role="listbox"]');
+      expect(listbox?.hasAttribute('hidden')).toBe(false);
+      // Click outside
+      document.dispatchEvent(new MouseEvent('click', { bubbles: true, composed: true }));
+      await el.updateComplete;
+      expect(shadowQuery(el, '[role="listbox"]')?.hasAttribute('hidden')).toBe(true);
+    });
+  });
+
+  // ─── Filter Debounce (1) ───
+
+  describe('Filter debounce', () => {
+    it('delays hx-input event when filterDebounce > 0', async () => {
+      const el = await fixture<HxCombobox>(withOptions('filter-debounce="200"'));
+      const input = shadowQuery<HTMLInputElement>(el, 'input')!;
+      let eventFired = false;
+      el.addEventListener('hx-input', () => {
+        eventFired = true;
+      });
+      input.value = 'app';
+      input.dispatchEvent(new Event('input', { bubbles: true }));
+      // Event should NOT have fired immediately
+      expect(eventFired).toBe(false);
+      // Wait for debounce to complete
+      await new Promise((resolve) => setTimeout(resolve, 250));
+      expect(eventFired).toBe(true);
+    });
+  });
+
+  // ─── Accessibility: open state (1) ───
+
+  describe('Accessibility (open state)', () => {
+    it('has no axe violations when open with options', async () => {
+      const el = await fixture<HxCombobox>(
+        `<hx-combobox label="Fruit" placeholder="Search...">
+          <option slot="option" value="apple">Apple</option>
+          <option slot="option" value="banana">Banana</option>
+        </hx-combobox>`,
+      );
+      const input = shadowQuery<HTMLInputElement>(el, 'input')!;
+      input.dispatchEvent(new Event('focus'));
+      await el.updateComplete;
+      await checkA11y(el, { rules: { 'color-contrast': { enabled: false } } });
+    });
+  });
 });
