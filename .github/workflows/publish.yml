@@ -1,16 +1,14 @@
 # ============================================================================
 # Publish Pipeline — wc-2026 Enterprise Healthcare Web Component Library
 # ============================================================================
-# Triggers on push to main. Uses changesets/action@v1 to:
-#   - Open a "Version Packages" PR when unreleased changesets exist
-#   - Publish to npm when that PR is merged (changesets consumed)
+# Triggers on push to main. If unreleased changesets exist, bumps versions
+# and publishes directly to npm in a single step. No intermediate PR.
 #
 # Tests are NOT re-run here — CI (ci.yml + ci-matrix.yml) already validates
 # all code before it reaches main via the staging→main promotion flow.
-# This pipeline only builds and publishes.
 #
 # Required secrets:
-#   GITHUB_TOKEN  — auto-provided by Actions (needs contents:write + pull-requests:write)
+#   GITHUB_TOKEN  — auto-provided by Actions (needs contents:write)
 #   NPM_TOKEN     — npm automation token (must be added to repo settings by repo admin)
 # ============================================================================
 
@@ -26,18 +24,18 @@ concurrency:
 
 permissions:
   contents: write
-  pull-requests: write
   id-token: write
 
 jobs:
   publish:
-    name: Version or Publish
+    name: Publish to npm
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - uses: actions/setup-node@v4
         with:
@@ -51,14 +49,32 @@ jobs:
       - name: Build
         run: npx turbo run build --filter='!docs'
 
-      - name: Version or Publish via Changesets
-        uses: changesets/action@v1
-        with:
-          publish: npm run changeset:publish
-          version: npm run changeset:version
-          commit: 'chore: version packages'
-          title: 'chore: version packages'
+      - name: Check for unreleased changesets
+        id: changesets
+        run: |
+          if ls .changeset/*.md 1>/dev/null 2>&1 && [ "$(ls .changeset/*.md 2>/dev/null | grep -v README.md)" ]; then
+            echo "has_changesets=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "has_changesets=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Version packages
+        if: steps.changesets.outputs.has_changesets == 'true'
+        run: |
+          npm run changeset:version
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "chore: version packages" || echo "No version changes to commit"
+          git push
+
+      - name: Publish to npm
+        if: steps.changesets.outputs.has_changesets == 'true'
+        run: npm run changeset:publish
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           NPM_CONFIG_PROVENANCE: 'true'
+
+      - name: No changesets found
+        if: steps.changesets.outputs.has_changesets == 'false'
+        run: echo "No unreleased changesets — nothing to publish."
