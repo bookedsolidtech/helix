@@ -183,9 +183,9 @@ export const Default: Story = {
     const input = getInput(canvasElement);
     await expect(input).toBeTruthy();
     await expect(input.value).toBe('50');
-    await expect(input.getAttribute('aria-valuemin')).toBe('0');
-    await expect(input.getAttribute('aria-valuemax')).toBe('100');
-    await expect(input.getAttribute('aria-valuenow')).toBe('50');
+    // Native <input type="range"> provides implicit ARIA from min/max/value attributes
+    await expect(input.min).toBe('0');
+    await expect(input.max).toBe('100');
   },
 };
 
@@ -350,8 +350,9 @@ export const PainScale: Story = {
     const ticks = host?.shadowRoot?.querySelectorAll('[part="tick"]');
     // step=1 on 0-10 range yields 11 ticks
     await expect(ticks?.length).toBe(11);
-    await expect(input?.getAttribute('aria-valuemin')).toBe('0');
-    await expect(input?.getAttribute('aria-valuemax')).toBe('10');
+    // Native <input type="range"> derives ARIA from min/max attributes
+    await expect(input?.min).toBe('0');
+    await expect(input?.max).toBe('10');
   },
 };
 
@@ -382,8 +383,9 @@ export const Satisfaction: Story = {
     const valueDisplay = host?.shadowRoot?.querySelector('[part="value-display"]');
     await expect(valueDisplay?.textContent?.trim()).toBe('3');
     const input = host?.shadowRoot?.querySelector<HTMLInputElement>('input[type="range"]');
-    await expect(input?.getAttribute('aria-valuemin')).toBe('1');
-    await expect(input?.getAttribute('aria-valuemax')).toBe('5');
+    // Native <input type="range"> derives ARIA from min/max attributes
+    await expect(input?.min).toBe('1');
+    await expect(input?.max).toBe('5');
   },
 };
 
