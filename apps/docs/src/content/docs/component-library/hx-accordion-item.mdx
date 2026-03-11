@@ -10,6 +10,64 @@ import ComponentDoc from '../../../components/ComponentDoc.astro';
 
 <ComponentDoc tagName="hx-accordion-item" section="summary" />
 
+`hx-accordion-item` is a sub-component of [`hx-accordion`](/component-library/hx-accordion/). It must always be used as a direct child of `hx-accordion`.
+
+For full documentation including live demos, usage examples, CSS custom properties, accessibility notes, and Drupal integration, see the [hx-accordion documentation](/component-library/hx-accordion/).
+
+## Quick Reference
+
+```html
+<!-- Basic item -->
+<hx-accordion-item>
+  <span slot="trigger">Section title</span>
+  <p>Collapsible body content.</p>
+</hx-accordion-item>
+
+<!-- Pre-expanded -->
+<hx-accordion-item expanded>
+  <span slot="trigger">Open by default</span>
+  <p>This section is visible on load.</p>
+</hx-accordion-item>
+
+<!-- Disabled (cannot be toggled) -->
+<hx-accordion-item disabled>
+  <span slot="trigger">Restricted section</span>
+  <p>This content is not accessible to the current user.</p>
+</hx-accordion-item>
+```
+
+## Properties
+
+| Property   | Attribute  | Type      | Default | Description                                                                      |
+| ---------- | ---------- | --------- | ------- | -------------------------------------------------------------------------------- |
+| `expanded` | `expanded` | `boolean` | `false` | Whether this item is currently expanded (open). Reflected as an HTML attribute.  |
+| `disabled` | `disabled` | `boolean` | `false` | Prevents the item from being toggled by the user. Removes it from the tab order. |
+
+## Events
+
+Both events bubble and are composed so they can be listened for on the parent `hx-accordion`.
+
+| Event         | Detail                                  | Description                                       |
+| ------------- | --------------------------------------- | ------------------------------------------------- |
+| `hx-expand`   | `{ expanded: boolean, itemId: string }` | Fired when this item transitions to open state.   |
+| `hx-collapse` | `{ expanded: boolean, itemId: string }` | Fired when this item transitions to closed state. |
+
+## Slots
+
+| Slot        | Description                                                      |
+| ----------- | ---------------------------------------------------------------- |
+| `trigger`   | The heading or label rendered inside the trigger button.         |
+| _(default)_ | The collapsible body content revealed when the item is expanded. |
+
+## CSS Parts
+
+| Part      | Element     | Description                                                          |
+| --------- | ----------- | -------------------------------------------------------------------- |
+| `item`    | `<details>` | Outer container element. Receives `open` attribute when expanded.    |
+| `trigger` | `<summary>` | Interactive trigger button. Has `aria-expanded` and `aria-disabled`. |
+| `content` | `<div>`     | Collapsible content area with `role="region"`.                       |
+| `icon`    | `<span>`    | Chevron icon that rotates to indicate expanded state.                |
+
 ## API Reference
 
 <ComponentDoc tagName="hx-accordion-item" section="api" />
