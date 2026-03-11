@@ -69,7 +69,13 @@ jobs:
       # ---- Tests ----
 
       - name: Test
-        run: npm run test
+        run: |
+          # Promotion PRs (staging→main): tests already verified on staging — skip
+          if [[ "${{ github.head_ref }}" == "staging" && "${{ github.base_ref }}" == "main" ]]; then
+            echo "Promotion PR (staging → main) — skipping matrix tests"
+            exit 0
+          fi
+          npm run test
 
       - name: Generate Custom Elements Manifest
         run: npm run cem
