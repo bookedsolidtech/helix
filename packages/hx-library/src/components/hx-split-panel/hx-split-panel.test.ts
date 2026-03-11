@@ -123,7 +123,9 @@ describe('hx-split-panel', () => {
     });
 
     it('Home moves divider to min value', async () => {
-      const el = await fixture<HelixSplitPanel>('<hx-split-panel position="50" min="20"></hx-split-panel>');
+      const el = await fixture<HelixSplitPanel>(
+        '<hx-split-panel position="50" min="20"></hx-split-panel>',
+      );
       const divider = shadowQuery<HTMLElement>(el, '[part="divider"]');
       divider?.dispatchEvent(new KeyboardEvent('keydown', { key: 'Home', bubbles: true }));
       await el.updateComplete;
@@ -131,7 +133,9 @@ describe('hx-split-panel', () => {
     });
 
     it('End moves divider to max value', async () => {
-      const el = await fixture<HelixSplitPanel>('<hx-split-panel position="50" max="80"></hx-split-panel>');
+      const el = await fixture<HelixSplitPanel>(
+        '<hx-split-panel position="50" max="80"></hx-split-panel>',
+      );
       const divider = shadowQuery<HTMLElement>(el, '[part="divider"]');
       divider?.dispatchEvent(new KeyboardEvent('keydown', { key: 'End', bubbles: true }));
       await el.updateComplete;
@@ -139,7 +143,9 @@ describe('hx-split-panel', () => {
     });
 
     it('clamps position to min on ArrowLeft', async () => {
-      const el = await fixture<HelixSplitPanel>('<hx-split-panel position="21" min="20"></hx-split-panel>');
+      const el = await fixture<HelixSplitPanel>(
+        '<hx-split-panel position="21" min="20"></hx-split-panel>',
+      );
       const divider = shadowQuery<HTMLElement>(el, '[part="divider"]');
       divider?.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowLeft', bubbles: true }));
       await el.updateComplete;
@@ -147,7 +153,9 @@ describe('hx-split-panel', () => {
     });
 
     it('clamps position to max on ArrowRight', async () => {
-      const el = await fixture<HelixSplitPanel>('<hx-split-panel position="89" max="90"></hx-split-panel>');
+      const el = await fixture<HelixSplitPanel>(
+        '<hx-split-panel position="89" max="90"></hx-split-panel>',
+      );
       const divider = shadowQuery<HTMLElement>(el, '[part="divider"]');
       divider?.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true }));
       await el.updateComplete;
@@ -187,6 +195,22 @@ describe('hx-split-panel', () => {
     it('empty snap attribute yields empty array', async () => {
       const el = await fixture<HelixSplitPanel>('<hx-split-panel></hx-split-panel>');
       expect(el.snap).toEqual([]);
+    });
+
+    it('snap attribute with non-array JSON yields empty array', async () => {
+      const el = await fixture<HelixSplitPanel>('<hx-split-panel snap="42"></hx-split-panel>');
+      expect(el.snap).toEqual([]);
+    });
+
+    it('snap set via property is usable', async () => {
+      const el = await fixture<HelixSplitPanel>('<hx-split-panel position="50"></hx-split-panel>');
+      el.snap = [25, 50, 75];
+      const divider = shadowQuery<HTMLElement>(el, '[part="divider"]');
+      // Move to 48 — within 5% of snap 50, should snap back
+      divider?.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowLeft', bubbles: true }));
+      divider?.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowLeft', bubbles: true }));
+      await el.updateComplete;
+      expect(el.position).toBe(50); // snapped back to 50
     });
   });
 
@@ -625,7 +649,9 @@ describe('hx-split-panel', () => {
       const el = await fixture<HelixSplitPanel>(
         '<hx-split-panel collapsible position="50"></hx-split-panel>',
       );
-      const btn = el.shadowRoot?.querySelector('[aria-label="Collapse start panel"]') as HTMLElement;
+      const btn = el.shadowRoot?.querySelector(
+        '[aria-label="Collapse start panel"]',
+      ) as HTMLElement;
       btn?.click();
       await el.updateComplete;
       expect(el.collapsed).toBe('start');

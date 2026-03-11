@@ -134,6 +134,50 @@ export const SizeLg: Story = {
   `,
 };
 
+export const Sizes: Story = {
+  name: 'Sizes',
+  render: () => html`
+    <div style="display: flex; flex-direction: column; gap: 2rem;">
+      <div>
+        <p
+          style="margin: 0 0 0.5rem; font-family: sans-serif; font-size: 0.875rem; color: #64748b;"
+        >
+          Small
+        </p>
+        <hx-steps size="sm">
+          <hx-step label="Step 1" status="complete"></hx-step>
+          <hx-step label="Step 2" status="active"></hx-step>
+          <hx-step label="Step 3" status="pending"></hx-step>
+        </hx-steps>
+      </div>
+      <div>
+        <p
+          style="margin: 0 0 0.5rem; font-family: sans-serif; font-size: 0.875rem; color: #64748b;"
+        >
+          Medium (default)
+        </p>
+        <hx-steps size="md">
+          <hx-step label="Step 1" status="complete"></hx-step>
+          <hx-step label="Step 2" status="active"></hx-step>
+          <hx-step label="Step 3" status="pending"></hx-step>
+        </hx-steps>
+      </div>
+      <div>
+        <p
+          style="margin: 0 0 0.5rem; font-family: sans-serif; font-size: 0.875rem; color: #64748b;"
+        >
+          Large
+        </p>
+        <hx-steps size="lg">
+          <hx-step label="Step 1" status="complete"></hx-step>
+          <hx-step label="Step 2" status="active"></hx-step>
+          <hx-step label="Step 3" status="pending"></hx-step>
+        </hx-steps>
+      </div>
+    </div>
+  `,
+};
+
 export const SizeSmVertical: Story = {
   name: 'Size: Small + Vertical',
   render: () => html`

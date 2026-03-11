@@ -1,6 +1,7 @@
 import { describe, it, expect, afterEach } from 'vitest';
 import { fixture, shadowQuery, oneEvent, cleanup, checkA11y } from '../../test-utils.js';
 import type { HxTextInput } from './hx-text-input.js';
+import { HelixTextInput } from './hx-text-input.js';
 import './index.js';
 
 // Backward-compat alias used throughout tests
@@ -296,6 +297,17 @@ describe('hx-text-input', () => {
       expect(event.bubbles).toBe(true);
       expect(event.composed).toBe(true);
     });
+
+    it('hx-input bubbles and is composed', async () => {
+      const el = await fixture<WcTextInput>('<hx-text-input></hx-text-input>');
+      const input = shadowQuery<HTMLInputElement>(el, 'input')!;
+      const eventPromise = oneEvent<CustomEvent>(el, 'hx-input');
+      input.value = 'x';
+      input.dispatchEvent(new Event('input', { bubbles: true }));
+      const event = await eventPromise;
+      expect(event.bubbles).toBe(true);
+      expect(event.composed).toBe(true);
+    });
   });
 
   // ─── Slots (3) ───
@@ -379,6 +391,17 @@ describe('hx-text-input', () => {
       el.formStateRestoreCallback('restored');
       await el.updateComplete;
       expect(el.value).toBe('restored');
+    });
+
+    it('submits value in FormData', async () => {
+      const form = document.createElement('form');
+      form.innerHTML = '<hx-text-input name="username" value="jane"></hx-text-input>';
+      document.getElementById('test-fixture-container')!.appendChild(form);
+      const el = form.querySelector('hx-text-input') as WcTextInput;
+      await el.updateComplete;
+      const data = new FormData(form);
+      expect(data.get('username')).toBe('jane');
+      form.remove();
     });
   });
 
@@ -634,6 +657,20 @@ describe('hx-text-input', () => {
       const el = await fixture<WcTextInput>('<hx-text-input error="An error"></hx-text-input>');
       const errorPart = shadowQuery(el, '[part="error"]');
       expect(errorPart).toBeTruthy();
+    });
+  });
+
+  // ─── Export Verification (2) ───
+
+  describe('Export Verification', () => {
+    it('HelixTextInput class is exported and is a constructor', () => {
+      expect(HelixTextInput).toBeDefined();
+      expect(typeof HelixTextInput).toBe('function');
+    });
+
+    it('is registered as hx-text-input custom element', () => {
+      const ctor = customElements.get('hx-text-input');
+      expect(ctor).toBe(HelixTextInput);
     });
   });
 

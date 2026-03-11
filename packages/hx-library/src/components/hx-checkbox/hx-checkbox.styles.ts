@@ -206,4 +206,12 @@ export const helixCheckboxStyles = css`
     font-size: var(--hx-font-size-sm, 0.875rem);
     padding-left: calc(var(--hx-size-6, 1.5rem) + var(--hx-space-2, 0.5rem));
   }
+
+  /* ─── Reduced Motion ─── */
+
+  @media (prefers-reduced-motion: reduce) {
+    .checkbox__box {
+      transition: none;
+    }
+  }
 `;

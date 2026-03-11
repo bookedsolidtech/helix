@@ -287,10 +287,70 @@ describe('hx-grid-item', () => {
     });
   });
 
+  describe('Property: column takes precedence over span', () => {
+    it('column attribute overrides span when both are set', async () => {
+      const el = await fixture<HelixGridItem>(
+        '<hx-grid-item column="1 / 4" span="2"></hx-grid-item>',
+      );
+      expect(el.style.gridColumn).toBe('1 / 4');
+    });
+  });
+
+  describe('Dynamic updates', () => {
+    it('updates grid-column when span changes', async () => {
+      const el = await fixture<HelixGridItem>('<hx-grid-item span="2"></hx-grid-item>');
+      expect(el.style.gridColumn).toBe('span 2');
+      el.span = 4;
+      await el.updateComplete;
+      expect(el.style.gridColumn).toBe('span 4');
+    });
+
+    it('updates grid-column when column changes', async () => {
+      const el = await fixture<HelixGridItem>('<hx-grid-item column="1 / 3"></hx-grid-item>');
+      expect(el.style.gridColumn).toBe('1 / 3');
+      el.column = '2 / 5';
+      await el.updateComplete;
+      expect(el.style.gridColumn).toBe('2 / 5');
+    });
+
+    it('updates grid-row when row changes', async () => {
+      const el = await fixture<HelixGridItem>('<hx-grid-item row="1 / 2"></hx-grid-item>');
+      expect(el.style.gridRow).toBe('1 / 2');
+      el.row = '2 / 4';
+      await el.updateComplete;
+      expect(el.style.gridRow).toBe('2 / 4');
+    });
+
+    it('clears grid-column when span is removed', async () => {
+      const el = await fixture<HelixGridItem>('<hx-grid-item span="2"></hx-grid-item>');
+      expect(el.style.gridColumn).toBe('span 2');
+      el.span = undefined;
+      await el.updateComplete;
+      expect(el.style.gridColumn).toBe('');
+    });
+
+    it('clears grid-row when row is removed', async () => {
+      const el = await fixture<HelixGridItem>('<hx-grid-item row="1 / 2"></hx-grid-item>');
+      expect(el.style.gridRow).toBe('1 / 2');
+      el.row = undefined;
+      await el.updateComplete;
+      expect(el.style.gridRow).toBe('');
+    });
+  });
+
   describe('Accessibility (axe-core)', () => {
     it('has no axe violations when used inside hx-grid', async () => {
       const grid = await fixture<HelixGrid>(
         '<hx-grid columns="3"><hx-grid-item span="2"><div>Content</div></hx-grid-item><div>Item 2</div></hx-grid>',
+      );
+      await page.screenshot();
+      const { violations } = await checkA11y(grid);
+      expect(violations).toEqual([]);
+    });
+
+    it('has no axe violations with multiple grid items and explicit placement', async () => {
+      const grid = await fixture<HelixGrid>(
+        '<hx-grid columns="4"><hx-grid-item column="1 / 3"><div>Wide</div></hx-grid-item><hx-grid-item><div>Normal</div></hx-grid-item><hx-grid-item row="2 / 3"><div>Row placed</div></hx-grid-item></hx-grid>',
       );
       await page.screenshot();
       const { violations } = await checkA11y(grid);

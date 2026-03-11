@@ -1,14 +1,93 @@
 ---
 title: 'hx-carousel-item'
-description: 'Individual slide within a carousel component'
+description: 'Individual slide wrapper for use inside hx-carousel'
 ---
 
 import ComponentLoader from '../../../components/ComponentLoader.astro';
+import ComponentDemo from '../../../components/ComponentDemo.astro';
 import ComponentDoc from '../../../components/ComponentDoc.astro';
 
 <ComponentLoader />
 
 <ComponentDoc tagName="hx-carousel-item" section="summary" />
+
+## Overview
+
+`hx-carousel-item` is the required slide wrapper for content within [`hx-carousel`](/component-library/hx-carousel). It is a lightweight custom element that:
+
+- Establishes a `role="group"` landmark with `aria-label="Slide N of M"` for screen reader position announcements.
+- Receives `slideIndex` and `totalSlides` automatically from the parent `hx-carousel` — you do not need to set these manually.
+- Applies the correct slide width based on the parent's `slides-per-page` setting via a CSS custom property.
+- Exposes a visible focus ring on both `:focus` and `:focus-visible` to support programmatic `.focus()` calls.
+
+**Always use `hx-carousel-item`** as the direct child of `hx-carousel`. Place your slide content (images, cards, text, HTML) inside it.
+
+## Live Demo
+
+<ComponentDemo title="Carousel Item within Carousel">
+  <hx-carousel label="Example carousel" style="max-width: 480px;">
+    <hx-carousel-item>
+      <div style="background: var(--hx-color-primary-100, #dbeafe); padding: 2rem; border-radius: 0.5rem; text-align: center;">
+        Slide 1 Content
+      </div>
+    </hx-carousel-item>
+    <hx-carousel-item>
+      <div style="background: var(--hx-color-success-100, #dcfce7); padding: 2rem; border-radius: 0.5rem; text-align: center;">
+        Slide 2 Content
+      </div>
+    </hx-carousel-item>
+    <hx-carousel-item>
+      <div style="background: var(--hx-color-warning-100, #fef9c3); padding: 2rem; border-radius: 0.5rem; text-align: center;">
+        Slide 3 Content
+      </div>
+    </hx-carousel-item>
+  </hx-carousel>
+</ComponentDemo>
+
+## Usage
+
+```html
+<hx-carousel label="Featured slides">
+  <hx-carousel-item>
+    <img src="slide1.jpg" alt="Slide 1 description" />
+  </hx-carousel-item>
+  <hx-carousel-item>
+    <div class="card">Any HTML content works here</div>
+  </hx-carousel-item>
+</hx-carousel>
+```
+
+## Properties
+
+| Property      | Attribute      | Type     | Default | Description                                                                          |
+| ------------- | -------------- | -------- | ------- | ------------------------------------------------------------------------------------ |
+| `slideIndex`  | `slide-index`  | `number` | `0`     | 0-based index of this slide within the carousel. Set automatically by `hx-carousel`. |
+| `totalSlides` | `total-slides` | `number` | `0`     | Total number of slides. Set automatically by `hx-carousel`.                          |
+
+Both properties are managed by the parent `hx-carousel` during its `_syncSlides()` lifecycle. You should not set them manually in most cases.
+
+## Slots
+
+| Slot        | Description                                                |
+| ----------- | ---------------------------------------------------------- |
+| _(default)_ | Any slide content: images, cards, text, or arbitrary HTML. |
+
+## Accessibility
+
+| Topic            | Details                                                                                               |
+| ---------------- | ----------------------------------------------------------------------------------------------------- |
+| ARIA role        | Renders `role="group"` on the inner slide wrapper.                                                    |
+| `aria-label`     | Automatically set to `"Slide N of M"` based on `slideIndex` and `totalSlides`.                        |
+| Focus management | The slide group has `tabindex="-1"` for programmatic focus. A visible focus ring appears on `:focus`. |
+| Focus ring       | Uses `--hx-focus-ring-width`, `--hx-focus-ring-color`, and `--hx-focus-ring-offset` design tokens.    |
+
+## Relationship to hx-carousel
+
+`hx-carousel-item` is not intended for standalone use. It must be a direct child of `hx-carousel`. The parent carousel:
+
+1. Detects `hx-carousel-item` children via slot change events.
+2. Sets `slideIndex` and `totalSlides` on each item.
+3. Applies slide width via the `--_hx-carousel-slide-width` CSS custom property based on `slides-per-page`.
 
 ## API Reference
 
