@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/web-components';
 import { html } from 'lit';
-import { expect, within, userEvent, fn } from 'storybook/test';
+import { expect, userEvent, fn } from 'storybook/test';
 import './hx-button.js';
 
 // ─────────────────────────────────────────────────
@@ -139,7 +139,6 @@ export const Default: Story = {
     label: 'Schedule Appointment',
   },
   play: async ({ canvasElement }) => {
-    const _canvas = within(canvasElement);
     const hxButton = canvasElement.querySelector('hx-button');
     await expect(hxButton).toBeTruthy();
 
@@ -1174,9 +1173,9 @@ export const PatientActions: Story = {
 export const EmergencyAction: Story = {
   render: () => html`
     <hx-button
-      variant="primary"
+      variant="danger"
       hx-size="lg"
-      style="--hx-button-bg: #dc2626; --hx-button-focus-ring-color: #dc2626;"
+      style="--hx-button-focus-ring-color: var(--hx-color-error-500, #dc2626);"
     >
       <svg
         xmlns="http://www.w3.org/2000/svg"
