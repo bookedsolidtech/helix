@@ -1,233 +1,252 @@
-# AUDIT: hx-alert — Antagonistic Quality Review (T1-24)
+# AUDIT: hx-alert — Deep Opus-Level Quality Review
 
-**Reviewer:** Antagonistic audit agent
-**Date:** 2026-03-05
+**Reviewer:** Deep audit agent (Opus 4.6)
+**Date:** 2026-03-11
 **Scope:** `packages/hx-library/src/components/hx-alert/`
-**Files reviewed:** `hx-alert.ts`, `hx-alert.styles.ts`, `hx-alert.test.ts`, `hx-alert.stories.ts`, `index.ts`
+**Files reviewed:** `hx-alert.ts`, `hx-alert.styles.ts`, `hx-alert.test.ts`, `hx-alert.stories.ts`, `index.ts`, `hx-alert.twig`
 
 ---
 
 ## Summary
 
 | Severity | Count |
-|----------|-------|
+| -------- | ----- |
 | P0       | 1     |
-| P1       | 7     |
-| P2       | 9     |
-| P3       | 2     |
+| P1       | 1     |
+| P2       | 7     |
+| P3       | 3     |
+
+**Previous audit (2026-03-05) status:** 14 of 19 findings have been remediated. The component is substantially improved — ARIA role placement, focus management, title slot, accent variant, touch target sizing, and type naming are all fixed. The remaining findings are concentrated in Storybook story accuracy and feature completeness gaps.
 
 ---
 
 ## P0 — Blocking Defects
 
-### P0-01: Double event dispatch on keyboard activation
+### P0-01: Storybook play functions assert ARIA attributes that no longer exist
 
-**File:** `hx-alert.ts:176-181`, `hx-alert.ts:213-216`
+**File:** `hx-alert.stories.ts` — Default (line ~103-104), Info (line ~135-136), Warning (line ~170-171), Error (line ~188-189)
 
-The `_handleCloseKeydown` handler is attached to a native `<button>` element. Native `<button>` elements already synthesize a `click` event when Enter or Space is pressed. This means keyboard activation triggers both the `keydown` handler (which calls `_handleDismiss()`) AND the `click` handler — two full invocations.
+Multiple Storybook play functions query the shadow DOM internal `[part="alert"]` div for `role` and `aria-live` attributes:
 
-Result: `hx-close` and `hx-after-close` are dispatched **twice** on a single keyboard dismiss action. Consumers listening for `hx-close` to perform side effects (navigate, log, update state) will fire their handler twice.
+```ts
+await expect(container?.getAttribute('role')).toBe('status');
+await expect(container?.getAttribute('aria-live')).toBe('polite');
+```
 
-The test suite at lines 208–245 uses `dispatchEvent(new KeyboardEvent('keydown', ...))` directly, which only fires the `keydown` handler and never the synthesized `click`, so the double-dispatch is invisible in tests. No test asserts the event fires exactly once.
+**Problem:** After the P1-01 remediation from the previous audit, `role` is now set on the **host element** (not the shadow internal div), and `aria-live` is **intentionally never set** (to avoid JAWS double-announcements). These assertions will always fail:
 
-**Fix direction:** Remove `_handleCloseKeydown` entirely. Native `<button>` + `@click` is sufficient for keyboard and pointer interaction. The keydown handler is not needed and actively harmful.
+- `container?.getAttribute('role')` → `null` (role is on host, not internal div)
+- `container?.getAttribute('aria-live')` → `null` (intentionally omitted)
+
+**Impact:** All Storybook interaction tests for Default, Info, Warning, and Error stories are broken. This blocks Storybook CI validation and makes the component appear broken in the Storybook playground.
+
+**Affected stories:** `Default`, `Info`, `Success` (partial), `Warning`, `Error`, `RapidToggle`
+
+**Fix direction:** Update play functions to query `alert.getAttribute('role')` on the host element and remove `aria-live` assertions entirely.
 
 ---
 
 ## P1 — High Severity
 
-### P1-01: ARIA role is on a Shadow DOM internal element, not the host
+### P1-01: Stories use `?icon` binding but property attribute is `show-icon`
 
-**File:** `hx-alert.ts:192`
+**File:** `hx-alert.stories.ts` — meta render function (line ~73), argTypes (line ~43)
 
-`role="alert"` and `role="status"` are applied to the inner `<div class="alert">` inside the Shadow DOM, not on the host `<hx-alert>` element. ARIA roles placed inside Shadow DOM boundaries have known reliability issues with some screen reader / browser combinations (particularly JAWS on Chrome before 2024, and VoiceOver on Safari). For a healthcare component where live region announcements may be critical to patient safety, this is unacceptable risk.
+The meta render template binds `?icon=${args.icon}`, which sets/removes an HTML attribute named `icon`. But the component property is `showIcon` with `attribute: 'show-icon'`. The `?icon` binding has no effect — it creates a meaningless `icon` attribute that the component ignores.
 
-The host element exposes no ARIA role, so it appears as a generic `div` in the accessibility tree in some AT configurations.
+```ts
+// Current (broken):
+?icon=${args.icon}
 
-**Fix direction:** Apply `role` to the host via `@property` and `reflect: true` on a host attribute, or use `internals.role` (ElementInternals) which is the Lit-idiomatic approach for shadow DOM components.
-
-### P1-02: Live region announcement reliability for toggled visibility
-
-**File:** `hx-alert.ts:64-66`, `hx-alert.styles.ts:8-10`
-
-Visibility is controlled by `:host(:not([open])) { display: none }`. When an alert transitions from `open=false` to `open=true`, the host reappears in the accessibility tree. However, the `role="alert"` div and its content were already present in the Shadow DOM — only the host's display toggled.
-
-Re-announcing existing content when an element transitions from `display:none` to `display:block` is AT-dependent behavior. NVDA+Firefox and JAWS+Chrome handle this differently. For dynamic alerts injected via `open=true` (the primary interactive use case for dismissible alerts), there is no guarantee the content will be announced.
-
-The comment at line 85-86 acknowledges the JAWS double-announcement concern, but the chosen architecture creates a different class of reliability failure. No test verifies announcement fires on programmatic `open` toggle.
-
-### P1-03: Missing `title` slot
-
-**File:** `hx-alert.ts` (entire render method)
-
-The feature description explicitly lists "title/description slots" as an audit area. The component has only a default slot for message content. No `title` slot exists. Industry-standard alert components (Shoelace `sl-alert`, Carbon `cds-actionable-notification`, Adobe Spectrum `sp-alert-banner`) all provide separate title/headline slots for structured alert content.
-
-Without a `title` slot, consumers must compose their own title structure inside the default slot with no guaranteed styling or semantic structure. The CSS parts schema also exposes no `title` part.
-
-### P1-04: Left border accent variant missing
-
-**File:** `hx-alert.styles.ts` (entire file)
-
-The feature description explicitly lists "left border variant" as an audit area. No left-border decorative accent is implemented. The component uses a uniform full-border (`border: ... solid`). A left-border-only variant (accent stripe) is a common healthcare/enterprise UI pattern that distinguishes alert types at a glance (especially in dashboards with dense information). Multiple peer libraries ship this as a variant modifier.
-
-### P1-05: Touch target uses relative units that break at non-default font sizes
-
-**File:** `hx-alert.styles.ts:72-73`
-
-```css
-min-width: 2.75rem; /* 44px */
-min-height: 2.75rem; /* 44px */
+// Correct:
+?show-icon=${args.icon}
 ```
 
-`2.75rem` equals 44px only at the default browser font size of 16px. If the user or OS has set a larger base font size (common for accessibility users, especially in healthcare settings), `2.75rem` will compute to a value larger than 44px — which sounds fine but means the comment "44px" is misleading. More critically, if a consumer resets `font-size` on the document root (common in CMS integrations), `2.75rem` could compute to anything.
+**Impact:** The "Show Icon" toggle in Storybook controls does nothing. Users cannot interactively test icon visibility through the Storybook UI. This undermines the component's documentation value.
 
-Should use `44px` directly or a component token `--hx-touch-target-size` that defaults to `44px` in absolute units. Mixed rem/absolute concerns apply to a healthcare component where accessibility compliance is a mandate.
-
-### P1-06: Focus management is caller responsibility with no component mechanism
-
-**File:** `hx-alert.ts:149-174`, `hx-alert.test.ts:250-278`
-
-After dismiss, focus is left on the now-hidden close button. Browser AT behavior varies: some move focus to `body`, some leave it on the element. The focus management tests (lines 251-278) are misleading:
-
-- Test at line 252: asserts only `document.activeElement !== closeBtn` — this passes if the browser naturally moves focus anywhere, even to `body`. It does not verify focus went somewhere meaningful.
-- Test at line 262: manually calls `trigger.focus()` inside the test body. This doesn't test component behavior — it tests that JavaScript can focus a button. The comment "component signals via hx-after-close" acknowledges the component delegates this entirely to callers.
-
-For a healthcare component, leaving focus management to callers with no built-in mechanism (no `returnFocusTo` property, no focus-trap utility, no default behavior) is a P1 gap. Every caller must independently implement the pattern.
-
-### P1-07: Stale screenshot artifacts from incomplete rename (closable → dismissible)
-
-**File:** `__screenshots__/hx-alert.test.ts/` (multiple files)
-
-Screenshot filenames include `closable` in multiple test names:
-- `hx-alert-Accessibility--axe-core--has-no-axe-violations-when-closable-1.png`
-- `hx-alert-Property--closable-defaults-to-false-1.png`
-- `hx-alert-Property--closable-renders-close-button-when-closable-1.png`
-- `hx-alert-Property--closable-does-not-render-close-button-when-not-closable-1.png`
-
-The current test file uses `dismissible` throughout. Screenshots are generated from test descriptions, so these stale screenshots indicate the property was renamed from `closable` to `dismissible` but the screenshot baselines were never regenerated. This means:
-
-1. The screenshot baseline directory contains artifacts from a deleted API surface.
-2. CI visual regression tests (if any) are comparing against the wrong baseline.
-3. If screenshots are referenced in documentation, they show a property name that no longer exists.
+**Fix direction:** Change `?icon` to `?show-icon` in the render function. Consider renaming the argType from `icon` to `showIcon` for consistency with the property name.
 
 ---
 
 ## P2 — Medium Severity
 
-### P2-01: `icon` property name collides with `icon` slot name
+### P2-01: CEM exposes private members in public manifest
 
-**File:** `hx-alert.ts:71-73`, JSDoc line 19
+**File:** `custom-elements.json` (generated)
 
-Both the boolean property (`icon: boolean`) and the named slot (`slot="icon"`) are called "icon". In CEM-generated documentation and Storybook autodocs, a property and a slot with the same name creates confusion. The property controls whether the icon container renders at all; the slot allows custom icon content. If `icon=false`, the slot is silently discarded — no component in the slot hierarchy can override the property's behavior. Consider renaming: `showIcon` for the property or `custom-icon` for the slot.
+The Custom Elements Manifest includes all private members: `_hasActions`, `_hasTitle`, `_actionsSlotChangeHandler`, `_titleSlotChangeHandler`, `_isAssertive`, `_role`, `_renderInfoIcon`, `_renderSuccessIcon`, `_renderWarningIcon`, `_renderErrorIcon`, `_renderDefaultIcon`, `_renderCloseIcon`, `_handleDismiss`.
 
-### P2-02: `WcAlert` type alias does not follow naming convention
+13 private implementation details appear in the public API manifest. CEM consumers (Storybook autodocs, IDE plugins, documentation generators) will surface these as part of the component's public API, creating noise and confusion.
 
-**File:** `hx-alert.ts:232`
+**Fix direction:** Add `@internal` JSDoc tags to private members, or configure CEM analyzer to exclude `private` privacy members. Alternatively, use a CEM post-processing plugin to strip private members.
 
-```ts
-export type { HelixAlert as WcAlert };
-```
+### P2-02: No auto-dismiss timer capability
 
-`WcAlert` does not follow either established naming convention: not `hx-` prefixed (DOM convention), not `Helix`-prefixed (class naming convention). The test file imports it as `WcAlert`. This creates confusion between `HelixAlert` (the class), `hx-alert` (the tag), and `WcAlert` (the type alias). Should be `HxAlert` for consistency with other type exports in the library.
+**Audit scope explicitly requested:** "auto-dismiss timer"
 
-### P2-03: `color-mix()` is CSS Color Level 5 — browser support caveat undocumented
+No `duration`, `auto-dismiss`, or timeout property exists. Success and info alerts commonly auto-dismiss after a configurable timeout (e.g., 5 seconds). Peer libraries:
 
-**File:** `hx-alert.styles.ts:91`
+- Shoelace `sl-alert`: `duration` property in ms
+- Carbon `cds-notification`: `timeout` property
+- Adobe Spectrum: `timeout` attribute
 
-```css
-background-color: color-mix(in srgb, currentColor 10%, transparent);
-```
+For healthcare, auto-dismiss is appropriate only for non-critical informational alerts. Error/warning alerts should never auto-dismiss (patient safety). If implemented, should default to disabled and be restricted to `info`/`success` variants.
 
-`color-mix()` has good support in modern browsers (Chrome 111+, Firefox 113+, Safari 16.2+) but is not supported in any version of IE and some older enterprise browser deployments common in healthcare IT. No browser support note or fallback is documented. If the component's browser support matrix includes anything below these versions, this will silently fail (the hover background will be transparent).
+**Fix direction:** Add optional `duration` property (number, ms). When set and variant is info/success, start a timer on render that calls `_handleDismiss()` with `detail.reason = 'timeout'`. Clear timer on disconnect or manual dismiss.
 
-### P2-04: Actions container always renders with margin-top even when empty
+### P2-03: No toast-style stacking or positioning support
 
-**File:** `hx-alert.ts:202-204`, `hx-alert.styles.ts:57-62`
+**Audit scope explicitly requested:** "toast-style stacking"
 
-```html
-<div part="actions" class="alert__actions">
-  <slot name="actions"></slot>
-</div>
-```
+The component has no positioning mechanism for toast/notification patterns (fixed/absolute positioning, stacking order, entrance/exit animations). This is typically handled by a companion container component (e.g., `hx-alert-group` or `hx-toast-container`), not the alert itself.
 
-```css
-.alert__actions {
-  margin-top: var(--hx-space-2, 0.5rem);
-}
-```
+**Current workaround:** Consumers must build their own stacking container (as shown in the `StackedAlerts` story, which uses a simple flex column).
 
-The actions container always renders. When no content is slotted, the `margin-top: 0.5rem` creates invisible spacing below the message content. This adds unexpected vertical padding inside the alert that cannot be overridden without targeting the shadow DOM. Should use `display: contents` fallback or CSS `:slotchange` detection, or use `display: none` when empty (requires JS slot monitoring or CSS `:has()` on the slot).
+**Fix direction:** Consider creating a companion `hx-alert-group` component that handles positioning, stacking, and animation. The alert component itself should not be responsible for positioning.
 
-### P2-05: Missing test for initial-render `icon=false` state
+### P2-04: Missing Storybook stories for key features
 
-**File:** `hx-alert.test.ts:120-138`
+Three significant component features lack dedicated Storybook stories:
 
-The `icon` property tests only test setting `icon=false` programmatically after render (line 131). There is no test for `<hx-alert icon="false">` as an HTML attribute at initial render. The property defaults to `true` and uses `reflect: true`, so `<hx-alert icon="false">` would set the boolean attribute, but Boolean property/attribute mapping for `false` in HTML attributes (empty string presence/absence vs explicit "false") is a known footgun in Lit. No test validates initial HTML attribute state.
+1. **`accent` variant** — Left border stripe mode has no story. Only tested in Vitest.
+2. **`title` slot** — The title slot has no dedicated story showing structured alert content with headline + body.
+3. **`returnFocusTo` property** — Focus management has no interactive story demonstrating the pattern.
 
-### P2-06: Redundant `_shadowQueryAll` import in tests
+These gaps reduce documentation coverage and make the Storybook playground incomplete for evaluating the component's full API surface.
 
-**File:** `hx-alert.test.ts:7`
+**Fix direction:** Add dedicated stories: `AccentVariant`, `WithTitle`, `FocusReturn`.
+
+### P2-05: CSS Parts demo story references 5 parts but component exposes 6
+
+**File:** `hx-alert.stories.ts` — CSSParts story JSDoc (line ~784)
 
 ```ts
-import { fixture, shadowQuery, _shadowQueryAll, oneEvent, cleanup, checkA11y } from '../../test-utils.js';
+/** Demonstrates all 5 CSS `::part()` targets exposed by `hx-alert`. */
 ```
 
-`_shadowQueryAll` (note the leading underscore indicating internal/private) is imported but never used in the test file. This is a dead import.
+The component exposes 6 parts: `alert`, `title`, `icon`, `message`, `close-button`, `actions`. The `title` part was added after this story was written.
 
-### P2-07: No `aria-live` tests beyond role assignment
+**Fix direction:** Update JSDoc to say "6 CSS `::part()` targets" and add `::part(title)` styling to the demo.
 
-**File:** `hx-alert.test.ts:344-368`
+### P2-06: `AlertVariant` type not exported
 
-The accessibility tests verify `role` attribute assignment but do not verify `aria-live` region behavior. The component explicitly avoids setting `aria-live` to prevent JAWS double-announcement (justified in comments). However, there is no test that verifies the live region actually announces when content changes dynamically — no integration-level announcement test exists. In a healthcare context, an untested live region is an untested patient safety feature.
+**File:** `hx-alert.ts:8`, `index.ts:1`
 
-### P2-08: No Drupal Twig template or integration test
+The `AlertVariant` type (`'info' | 'success' | 'warning' | 'error'`) is defined locally but not exported from the component or the barrel file. Consumers who want to type-check variant values in their TypeScript code cannot import this type.
 
-**File:** component directory
+**Fix direction:** Export `AlertVariant` from `hx-alert.ts` and re-export from `index.ts`:
 
-No `hx-alert.twig` template or Drupal behavior JS exists in the component directory. Per project architecture, the primary consumer is Drupal CMS. Static alert rendering via Twig (for server-side-rendered, SEO-visible alerts like form validation summaries) is undocumented and untested from the Drupal integration layer.
+```ts
+export type { AlertVariant } from './hx-alert.js';
+```
 
-### P2-09: Missing bundle size verification in component documentation
+### P2-07: Live region re-announcement reliability on `open` toggle
 
-No documented bundle size measurement exists for `hx-alert`. The component inlines 5 SVG path definitions and uses Lit decorators. Bundle size gate requires <5KB min+gz per component. Without a recorded measurement, there is no evidence this gate has been verified against the current implementation (post-SVG addition).
+**File:** `hx-alert.ts:179-188`, `hx-alert.styles.ts:8-10`
+
+When an alert transitions from `open=false` to `open=true`, the host toggles from `display:none` to `display:block` and `aria-hidden` is removed. Whether screen readers re-announce the live region content depends on AT implementation:
+
+- NVDA + Firefox: Generally re-announces on `aria-hidden` removal
+- JAWS + Chrome: Inconsistent — may not re-announce existing content
+- VoiceOver + Safari: Generally re-announces
+
+No test verifies actual announcement behavior. The component handles this as well as possible without `aria-live` (which would cause JAWS double-announcements), but the inherent AT inconsistency should be documented for consumers.
+
+**Fix direction:** Add JSDoc documentation on the `open` property noting the AT behavior variance. Consider adding a recipe/pattern in docs showing how to force re-announcement by clearing and re-inserting content.
 
 ---
 
 ## P3 — Low Severity / Informational
 
-### P3-01: WCAG criterion citation in CSS comment is inaccurate
+### P3-01: `color-mix()` browser support caveat
 
-**File:** `hx-alert.styles.ts:65`
+**File:** `hx-alert.styles.ts:124`
 
 ```css
-/* Minimum 44x44px touch target per WCAG 2.5.5 (healthcare mandate). */
+background-color: color-mix(in srgb, currentColor 10%, transparent);
 ```
 
-WCAG 2.5.5 (Target Size) is a **Level AAA** criterion at 44x44px. The project targets **WCAG 2.1 AA**. The AA-relevant criterion for touch targets is WCAG 2.5.8 (Target Size Minimum) in WCAG 2.2, which specifies 24x24px at AA level. The 44x44px target is good practice (and aligns with Apple HIG / Google Material), but the citation of WCAG 2.5.5 as the mandate is technically incorrect. This could cause confusion during external accessibility audits.
+`color-mix()` requires Chrome 111+, Firefox 113+, Safari 16.2+. Falls back gracefully to no hover background (transparent) in older browsers. A comment documents the browser support range (line 122-123). This is acceptable for modern healthcare applications but should be noted in the component's browser support documentation.
 
-### P3-02: Close icon SVG path produces non-standard X shape
+### P3-02: Twig template `show-icon` logic is inverted/verbose
 
-**File:** `hx-alert.ts:140-145`
+**File:** `hx-alert.twig:41`
 
-The close icon SVG path generates an X from four `l` commands through a center point. Visual inspection suggests the path computes correctly, but the path data does not follow the more readable multi-path or polyline approach used in most icon libraries. Minor maintainability concern — if the icon is ever modified, the single-path approach makes it harder to adjust individual arms of the X independently.
+```twig
+{% if not show_icon %}{% else %}show-icon{% endif %}
+```
+
+This works correctly but is an unnecessarily complex way to express "output `show-icon` when `show_icon` is true." Simpler:
+
+```twig
+{% if show_icon %}show-icon{% endif %}
+```
+
+### P3-03: No `fill="currentColor"` on variant icon SVGs
+
+**File:** `hx-alert.ts:194-222`
+
+The default variant icon SVGs rely on the parent `.alert__icon svg { fill: currentColor }` CSS rule to inherit their fill color. The SVG elements themselves don't set `fill="currentColor"`. This works correctly in Shadow DOM where the CSS is co-located, but if the SVGs were ever extracted or used outside the shadow root context, they would render black (default SVG fill). Minor robustness concern.
 
 ---
 
-## Coverage Matrix
+## Previous Audit Remediation Status
 
-| Audit Area       | Status         | Key Gaps                                      |
-|------------------|----------------|-----------------------------------------------|
-| TypeScript       | Mostly clean   | `WcAlert` alias naming, stale rename artifacts|
-| Accessibility    | Gaps present   | Role placement, live region reliability, focus |
-| Tests            | Gaps present   | Double-dispatch, announcement, dead import     |
-| Storybook        | Appears complete | Could not fully verify (file truncated)      |
-| CSS              | Gaps present   | No left-border variant, `color-mix()` caveat  |
-| Performance      | Unverified     | No bundle size measurement on record           |
-| Drupal           | Untested       | No Twig template or Drupal behavior test       |
+| Previous Finding                        | Status         | Notes                                                                              |
+| --------------------------------------- | -------------- | ---------------------------------------------------------------------------------- |
+| P0-01: Double event dispatch            | **FIXED**      | `_handleCloseKeydown` removed; native button + `@click` only                       |
+| P1-01: ARIA role on shadow DOM internal | **FIXED**      | Role applied to host in `connectedCallback` + `updated`                            |
+| P1-02: Live region reliability          | **Mitigated**  | Host-level role + `aria-hidden` toggle; inherent AT variance remains (P2-07 above) |
+| P1-03: Missing title slot               | **FIXED**      | `slot="title"` with slotchange detection + visibility toggle                       |
+| P1-04: Left border accent variant       | **FIXED**      | `accent` property + `.alert--accent` styles                                        |
+| P1-05: Touch target relative units      | **FIXED**      | Uses `var(--hx-touch-target-size, 44px)` with absolute default                     |
+| P1-06: Focus management                 | **FIXED**      | `returnFocusTo` property with CSS selector targeting                               |
+| P1-07: Stale screenshots                | **FIXED**      | No stale screenshot files found                                                    |
+| P2-01: icon/showIcon naming collision   | **FIXED**      | Property renamed to `showIcon`, attribute `show-icon`                              |
+| P2-02: WcAlert type alias               | **FIXED**      | Now exports `HxAlert`                                                              |
+| P2-03: color-mix() caveat               | **Documented** | Browser support comment added (P3-01 above)                                        |
+| P2-04: Actions container spacing        | **FIXED**      | JS slotchange detection + `display:none` default                                   |
+| P2-05: Missing initial icon=false test  | **FIXED**      | Boolean attribute semantics test added                                             |
+| P2-06: Redundant import                 | **FIXED**      | No unused imports in test file                                                     |
+| P2-07: No aria-live tests               | **Deferred**   | Inherent AT limitation; documented (P2-07 above)                                   |
+| P2-08: No Twig template                 | **FIXED**      | `hx-alert.twig` added with full variable support                                   |
+| P2-09: Bundle size verification         | **VERIFIED**   | 3.65 KB gzipped — well under 5 KB budget                                           |
+| P3-01: WCAG citation                    | **FIXED**      | Comment corrected to reference WCAG 2.5.8                                          |
+| P3-02: Close icon SVG                   | **Unchanged**  | Minor maintainability concern; no action needed                                    |
+
+---
+
+## Verification Results
+
+| Gate | Check             | Result                                                         |
+| ---- | ----------------- | -------------------------------------------------------------- |
+| 1    | TypeScript strict | **PASS** — Zero errors                                         |
+| 2    | Test suite        | **PASS** — 57/57 tests pass                                    |
+| 3    | Accessibility     | **PASS** — axe-core: 4 test scenarios, zero violations         |
+| 4    | Storybook stories | **FAIL** — Play function assertions are broken (P0-01)         |
+| 5    | CEM accuracy      | **PARTIAL** — Public API correct; private members leak (P2-01) |
+| 6    | Bundle size       | **PASS** — 3.65 KB gzipped (budget: <5 KB)                     |
+| 7    | Code review       | This document                                                  |
 
 ---
 
 ## Verdict
 
-The component is structurally sound with correct token usage, well-typed properties, and good axe-core coverage. However, **P0-01 (double event dispatch) is a functional correctness bug that affects any consumer using keyboard to dismiss alerts**, and **P1-01/P1-02 (ARIA role reliability in Shadow DOM) are healthcare-mandate compliance risks**. Neither should ship without remediation.
+The component has improved significantly since the previous audit. The core implementation is solid:
 
-The missing `title` slot (P1-03) and left-border variant (P1-04) represent gaps against peer library feature parity that the feature description explicitly flagged. These are implementation omissions, not bugs, but they reduce the component's viability for real-world healthcare dashboard usage patterns.
+- Correct ARIA role placement on host element
+- Proper Shadow DOM encapsulation with 6 CSS parts and 11 CSS custom properties
+- Complete design token usage (zero hardcoded values)
+- Comprehensive test suite (57 tests, all passing)
+- axe-core validation across all variants and states
+- Well under bundle size budget at 3.65 KB gzipped
+
+**Remaining blockers:**
+
+1. **P0-01** — Storybook play functions are broken and will fail in CI. Must be fixed before the stories can be trusted.
+2. **P1-01** — Storybook `icon` control does nothing, undermining documentation.
+
+**Feature gaps (not blockers):**
+
+- Auto-dismiss timer (P2-02) and toast stacking (P2-03) are feature requests, not bugs
+- Missing stories for accent/title/returnFocusTo reduce documentation coverage but don't block shipping
