@@ -130,11 +130,7 @@ export const Loading: Story = {
 
 export const Empty: Story = {
   render: () => html`
-    <hx-data-table
-      .columns=${COLUMNS}
-      .rows=${[]}
-      empty-label="No patients found"
-    ></hx-data-table>
+    <hx-data-table .columns=${COLUMNS} .rows=${[]} empty-label="No patients found"></hx-data-table>
   `,
 };
 
@@ -216,7 +212,13 @@ export const WithToolbar: Story = {
 export const FullFeatured: Story = {
   name: 'Full Featured',
   render: () => html`
-    <hx-data-table .columns=${COLUMNS} .rows=${ROWS} selectable sort-key="name" sort-direction="asc">
+    <hx-data-table
+      .columns=${COLUMNS}
+      .rows=${ROWS}
+      selectable
+      sort-key="name"
+      sort-direction="asc"
+    >
       <div
         slot="toolbar"
         style="display:flex;justify-content:space-between;align-items:center;padding:0.75rem 0;"
@@ -249,4 +251,80 @@ export const CustomColumnWidths: Story = {
       .rows=${ROWS}
     ></hx-data-table>
   `,
+};
+
+// ─────────────────────────────────────────────────
+// 10. Pagination
+// ─────────────────────────────────────────────────
+
+export const Paginated: Story = {
+  name: 'Paginated',
+  render: () => html`
+    <hx-data-table
+      .columns=${COLUMNS}
+      .rows=${[...ROWS, ...ROWS, ...ROWS]}
+      page-size="5"
+      page="1"
+    ></hx-data-table>
+  `,
+};
+
+export const PaginatedPage2: Story = {
+  name: 'Paginated — Page 2',
+  render: () => html`
+    <hx-data-table
+      .columns=${COLUMNS}
+      .rows=${[...ROWS, ...ROWS, ...ROWS]}
+      page-size="5"
+      page="2"
+    ></hx-data-table>
+  `,
+};
+
+// ─────────────────────────────────────────────────
+// 11. Custom Loading Slot
+// ─────────────────────────────────────────────────
+
+export const CustomLoadingSlot: Story = {
+  name: 'Loading — Custom Slot',
+  render: () => html`
+    <hx-data-table .columns=${COLUMNS} .rows=${[]} loading>
+      <div
+        slot="loading"
+        style="display:flex;justify-content:center;align-items:center;padding:2rem;gap:0.5rem;color:#64748b;font-size:0.875rem;"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="20"
+          height="20"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+          style="animation:spin 1s linear infinite;"
+        >
+          <path d="M21 12a9 9 0 1 1-6.219-8.56" />
+        </svg>
+        Loading patient records…
+      </div>
+    </hx-data-table>
+  `,
+};
+
+// ─────────────────────────────────────────────────
+// 12. JSON Attribute Usage (Drupal/Twig Path)
+// ─────────────────────────────────────────────────
+
+export const JsonAttributes: Story = {
+  name: 'JSON String Attributes (Drupal)',
+  render: () => {
+    const columnsJson = JSON.stringify(COLUMNS);
+    const rowsJson = JSON.stringify(ROWS);
+    return html`
+      <hx-data-table columns=${columnsJson} rows=${rowsJson} selectable></hx-data-table>
+    `;
+  },
 };
