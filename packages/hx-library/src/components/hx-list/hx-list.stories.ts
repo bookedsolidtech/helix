@@ -143,7 +143,7 @@ export const InteractiveDivided: Story = {
 export const WithPrefixSlot: Story = {
   name: 'With Prefix Icons',
   render: () => html`
-    <hx-list variant="interactive" divided style="max-width: 360px;">
+    <hx-list variant="interactive" label="Health records" divided style="max-width: 360px;">
       <hx-list-item value="appointments">
         <svg
           slot="prefix"
@@ -191,7 +191,7 @@ export const WithPrefixSlot: Story = {
 export const WithDescriptionSlot: Story = {
   name: 'With Description',
   render: () => html`
-    <hx-list variant="interactive" divided style="max-width: 400px;">
+    <hx-list variant="interactive" label="Care providers" divided style="max-width: 400px;">
       <hx-list-item value="john">
         John Smith
         <span slot="description">Primary Care · Last visit: Jan 15, 2026</span>
@@ -211,7 +211,7 @@ export const WithDescriptionSlot: Story = {
 export const WithSuffixSlot: Story = {
   name: 'With Suffix Badges',
   render: () => html`
-    <hx-list variant="interactive" divided style="max-width: 360px;">
+    <hx-list variant="interactive" label="Notifications" divided style="max-width: 360px;">
       <hx-list-item value="messages">
         Messages
         <span
@@ -238,7 +238,7 @@ export const WithSuffixSlot: Story = {
 export const RichItems: Story = {
   name: 'Rich Items (prefix + description + suffix)',
   render: () => html`
-    <hx-list variant="interactive" divided style="max-width: 460px;">
+    <hx-list variant="interactive" label="Patient records" divided style="max-width: 460px;">
       <hx-list-item value="smith">
         <svg
           slot="prefix"
@@ -324,7 +324,7 @@ export const RichItems: Story = {
 export const DisabledItem: Story = {
   name: 'Disabled Item',
   render: () => html`
-    <hx-list variant="interactive" divided style="max-width: 320px;">
+    <hx-list variant="interactive" label="Actions" divided style="max-width: 320px;">
       <hx-list-item value="available">Available Action</hx-list-item>
       <hx-list-item value="disabled" disabled>Restricted Action</hx-list-item>
       <hx-list-item value="another">Another Action</hx-list-item>
@@ -335,7 +335,7 @@ export const DisabledItem: Story = {
 export const SelectedItem: Story = {
   name: 'Selected Item',
   render: () => html`
-    <hx-list variant="interactive" style="max-width: 320px;">
+    <hx-list variant="interactive" label="Navigation" style="max-width: 320px;">
       <hx-list-item value="appointments" selected>Appointments</hx-list-item>
       <hx-list-item value="records">Medical Records</hx-list-item>
       <hx-list-item value="billing">Billing</hx-list-item>
@@ -362,7 +362,7 @@ export const PatientNavigationMenu: Story = {
   name: 'Patient Navigation Menu',
   render: () => html`
     <nav aria-label="Patient portal navigation" style="max-width: 280px;">
-      <hx-list variant="interactive" divided>
+      <hx-list variant="interactive" label="Patient portal" divided>
         <hx-list-item value="overview" selected>
           <svg
             slot="prefix"
