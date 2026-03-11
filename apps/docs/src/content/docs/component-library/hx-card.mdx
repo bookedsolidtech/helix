@@ -133,18 +133,18 @@ Minimal HTML snippet — no build tool required:
 
 ## Properties
 
-| Property      | Attribute       | Type                                   | Default     | Description                                                                                                                                                                           |
-| ------------- | --------------- | -------------------------------------- | ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `variant`     | `variant`       | `'default' \| 'featured' \| 'compact'` | `'default'` | Visual style variant of the card. `featured` adds a primary-colored border; `compact` reduces internal padding.                                                                       |
-| `elevation`   | `elevation`     | `'flat' \| 'raised' \| 'floating'`     | `'flat'`    | Shadow depth of the card. `flat` has no shadow; `raised` adds a subtle shadow; `floating` adds a prominent shadow.                                                                    |
-| `hxHref`      | `hx-href`       | `string \| undefined`                  | `undefined` | Optional URL. When set, the card becomes interactive — it gains `role="link"`, `tabindex="0"`, and fires `hx-card-click` on click or Enter/Space. Do not combine with `actions` slot. |
-| `hxAriaLabel` | `hx-aria-label` | `string \| undefined`                  | `undefined` | Accessible label for interactive cards. Provides a meaningful description beyond the visible content. Only applied when `hx-href` is set.                                             |
+| Property      | Attribute       | Type                                   | Default     | Description                                                                                                                                                                      |
+| ------------- | --------------- | -------------------------------------- | ----------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `variant`     | `variant`       | `'default' \| 'featured' \| 'compact'` | `'default'` | Visual style variant of the card. `featured` adds a primary-colored border; `compact` reduces internal padding.                                                                  |
+| `elevation`   | `elevation`     | `'flat' \| 'raised' \| 'floating'`     | `'flat'`    | Shadow depth of the card. `flat` has no shadow; `raised` adds a subtle shadow; `floating` adds a prominent shadow.                                                               |
+| `hxHref`      | `hx-href`       | `string \| undefined`                  | `undefined` | Optional URL. When set, the card becomes interactive — it gains `role="link"`, `tabindex="0"`, and fires `hx-click` on click or Enter/Space. Do not combine with `actions` slot. |
+| `hxAriaLabel` | `hx-aria-label` | `string \| undefined`                  | `undefined` | Accessible label for interactive cards. Provides a meaningful description beyond the visible content. Only applied when `hx-href` is set.                                        |
 
 ## Events
 
-| Event           | Detail Type                                                    | Description                                                                                                                 |
-| --------------- | -------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
-| `hx-card-click` | `{ href: string; originalEvent: MouseEvent \| KeyboardEvent }` | Dispatched when an interactive card (with `hx-href`) is clicked or activated via keyboard. `bubbles: true, composed: true`. |
+| Event      | Detail Type                                                    | Description                                                                                                                 |
+| ---------- | -------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
+| `hx-click` | `{ href: string; originalEvent: MouseEvent \| KeyboardEvent }` | Dispatched when an interactive card (with `hx-href`) is clicked or activated via keyboard. `bubbles: true, composed: true`. |
 
 ## Slots
 
@@ -285,7 +285,7 @@ Copy-paste this into a `.html` file and open it in a browser — no build tool n
     </div>
 
     <script>
-      document.getElementById('interactive-card').addEventListener('hx-card-click', (e) => {
+      document.getElementById('interactive-card').addEventListener('hx-click', (e) => {
         console.log('Card clicked, href:', e.detail.href);
         // Handle navigation here or let the browser follow the href
       });
