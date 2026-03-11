@@ -209,6 +209,30 @@ describe('hx-split-button', () => {
     });
   });
 
+  // ─── Property: triggerLabel ───
+
+  describe('Property: triggerLabel', () => {
+    it('sets aria-label on the trigger button', async () => {
+      const el = await fixture<HelixSplitButton>(`
+        <hx-split-button trigger-label="Show options">Save</hx-split-button>
+      `);
+      const trigger = shadowQuery<HTMLButtonElement>(el, '.split-button__trigger');
+      expect(trigger?.getAttribute('aria-label')).toBe('Show options');
+    });
+  });
+
+  // ─── Property: menuLabel ───
+
+  describe('Property: menuLabel', () => {
+    it('sets aria-label on the menu panel', async () => {
+      const el = await fixture<HelixSplitButton>(`
+        <hx-split-button menu-label="Additional actions">Save</hx-split-button>
+      `);
+      const menu = shadowQuery(el, '.split-button__menu');
+      expect(menu?.getAttribute('aria-label')).toBe('Additional actions');
+    });
+  });
+
   // ─── Slots ───
 
   describe('Slots', () => {
@@ -696,6 +720,17 @@ describe('hx-split-button', () => {
       await page.screenshot();
       const { violations } = await checkA11y(el);
       expect(violations).toEqual([]);
+    });
+
+    it('trigger has aria-haspopup="menu"', async () => {
+      const el = await fixture<HelixSplitButton>(`
+        <hx-split-button>
+          Save Record
+          <hx-menu-item slot="menu" value="save-draft">Save as Draft</hx-menu-item>
+        </hx-split-button>
+      `);
+      const trigger = shadowQuery<HTMLButtonElement>(el, '.split-button__trigger');
+      expect(trigger?.getAttribute('aria-haspopup')).toBe('menu');
     });
   });
 });
