@@ -7,14 +7,24 @@ import { helixFieldLabelStyles } from './hx-field-label.styles.js';
  * Standardized label for form fields. Used as a consistent sub-component
  * for hx-field and other form field components.
  *
- * When the `for` attribute is set, renders a native `<label for="...">` element.
- * **Note:** Due to the shadow DOM boundary, this label association only works
- * when the associated input is in the **same shadow root**. For inputs in
- * light DOM (the typical consumer deployment), use `aria-labelledby` pointing
- * to the host element's `id` instead of the `for` attribute.
+ * ## Label Association
+ *
+ * **For inputs in light DOM (the typical consumer deployment):** Use
+ * `aria-labelledby` pointing to the host element's `id`. The `for` attribute
+ * renders a native `<label for="...">` inside shadow DOM, but the HTML spec
+ * scopes `for`/`id` lookup to the same tree — a shadow-DOM label cannot
+ * associate with a light-DOM input. Example:
+ *
+ * ```html
+ * <hx-field-label id="label-email">Email</hx-field-label>
+ * <input id="email" aria-labelledby="label-email" />
+ * ```
+ *
+ * **For inputs in the same shadow root:** The `for` attribute works as
+ * expected for direct label association.
  *
  * When `for` is unset, renders a `<span>` that can be referenced via
- * `aria-labelledby` for labeling controls in a shadow DOM boundary.
+ * `aria-labelledby` for labeling controls across the shadow DOM boundary.
  *
  * @summary Standardized label for form fields.
  *
@@ -28,7 +38,7 @@ import { helixFieldLabelStyles } from './hx-field-label.styles.js';
  * @csspart optional-indicator - The optional text indicator.
  *
  * @cssprop [--hx-field-label-color=var(--hx-color-neutral-700)] - Label text color.
- * @cssprop [--hx-field-label-required-color=var(--hx-color-danger, var(--hx-color-error-500, #ef4444))] - Required indicator color.
+ * @cssprop [--hx-field-label-required-color=var(--hx-color-danger, var(--hx-color-error-text, #b91c1c))] - Required indicator color.
  * @cssprop [--hx-font-label-size=var(--hx-font-size-sm)] - Label font size.
  * @cssprop [--hx-font-label-weight=var(--hx-font-weight-medium)] - Label font weight.
  * @cssprop [--hx-font-label-line-height=var(--hx-line-height-normal)] - Label line height.
