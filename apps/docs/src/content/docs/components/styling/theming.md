@@ -902,7 +902,7 @@ export class AppComponent implements OnInit {
     <title>wc-2026 Theming Example</title>
 
     <!-- Load components from CDN -->
-    <script type="module" src="https://unpkg.com/@helix/library"></script>
+    <script type="module" src="https://unpkg.com/@helixui/library"></script>
 
     <style>
       /* Global theme tokens */

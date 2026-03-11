@@ -190,7 +190,7 @@ No token. Should be `line-height: var(--hx-line-height-none, 1)` or similar.
 filter: brightness(var(--hx-filter-brightness-active, 0.8));
 ```
 
-This token is not part of the documented `--hx-*` token system. If it does not exist in `@helix/tokens`, the fallback value `0.8` is a hardcoded raw value.
+This token is not part of the documented `--hx-*` token system. If it does not exist in `@helixui/tokens`, the fallback value `0.8` is a hardcoded raw value.
 
 ---
 
@@ -219,7 +219,7 @@ With a `true` default, the `copyable` attribute is not reflected by default (Lit
 
 ## 7. Performance
 
-### P1 — `tokenStyles` import from `@helix/tokens/lit` — bundle impact unquantified
+### P1 — `tokenStyles` import from `@helixui/tokens/lit` — bundle impact unquantified
 
 ```ts
 static override styles = [tokenStyles, helixCodeSnippetStyles];

@@ -174,7 +174,7 @@ Injecting a `<script>` tag into `document.head` is a global side effect. In serv
 3. No `updated()` handler watches `jsonLd` property changes — if `json-ld` is set after initial render via JS (`el.jsonLd = true`), nothing happens until the next `slotchange` event.
 
 #### P2 — Bundle size: cannot verify without build output
-No bundle size measurement was produced as part of this audit. `npm run cem` and a build run are required to confirm the `<5KB` gate. The `tokenStyles` import from `@helix/tokens/lit` is an unknown size contribution.
+No bundle size measurement was produced as part of this audit. `npm run cem` and a build run are required to confirm the `<5KB` gate. The `tokenStyles` import from `@helixui/tokens/lit` is an unknown size contribution.
 
 ---
 

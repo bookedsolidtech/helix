@@ -191,7 +191,7 @@ This creates `package.json`:
 Install the HELIX component library as a production dependency:
 
 ```bash
-npm install @helix/library --save
+npm install @helixui/library --save
 ```
 
 This adds HELIX to `package.json`:
@@ -199,7 +199,7 @@ This adds HELIX to `package.json`:
 ```json
 {
   "dependencies": {
-    "@helix/library": "^0.0.1"
+    "@helixui/library": "^0.0.1"
   }
 }
 ```
@@ -209,7 +209,7 @@ This adds HELIX to `package.json`:
 **Production environments** should use **exact versions** (no `^` or `~` prefixes):
 
 ```bash
-npm install @helix/library --save-exact
+npm install @helixui/library --save-exact
 ```
 
 Resulting `package.json`:
@@ -217,7 +217,7 @@ Resulting `package.json`:
 ```json
 {
   "dependencies": {
-    "@helix/library": "0.0.1"
+    "@helixui/library": "0.0.1"
   }
 }
 ```
@@ -234,7 +234,7 @@ Resulting `package.json`:
 ```json
 {
   "dependencies": {
-    "@helix/library": "^0.0.1" // Allows 0.0.2, 0.0.3, etc.
+    "@helixui/library": "^0.0.1" // Allows 0.0.2, 0.0.3, etc.
   }
 }
 ```
@@ -244,20 +244,20 @@ Resulting `package.json`:
 Check that HELIX installed correctly:
 
 ```bash
-npm list @helix/library
+npm list @helixui/library
 ```
 
 Output:
 
 ```
 mytheme@1.0.0 /path/to/mytheme
-└── @helix/library@0.0.1
+└── @helixui/library@0.0.1
 ```
 
 Inspect installed files:
 
 ```bash
-ls -la node_modules/@helix/library/
+ls -la node_modules/@helixui/library/
 ```
 
 You should see:
@@ -317,7 +317,7 @@ export default defineConfig({
 
         // Manual chunk splitting for better caching
         manualChunks: {
-          helix: ['@helix/library'],
+          helix: ['@helixui/library'],
         },
       },
     },
@@ -434,7 +434,7 @@ Create your theme's JavaScript entry point and import HELIX components.
  */
 
 // Import entire HELIX library
-import '@helix/library';
+import '@helixui/library';
 
 // Custom theme JavaScript
 console.log('[Theme] HELIX components loaded');
@@ -460,10 +460,10 @@ document.addEventListener('hx-button-click', (e) => {
  */
 
 // Import only specific components
-import '@helix/library/components/hx-button';
-import '@helix/library/components/hx-card';
-import '@helix/library/components/hx-text-input';
-import '@helix/library/components/hx-alert';
+import '@helixui/library/components/hx-button';
+import '@helixui/library/components/hx-card';
+import '@helixui/library/components/hx-text-input';
+import '@helixui/library/components/hx-alert';
 
 // Custom theme JavaScript
 console.log('[Theme] HELIX components loaded (tree-shaken)');
@@ -486,14 +486,14 @@ For advanced scenarios, load components conditionally based on page type:
  */
 
 // Core components (always loaded)
-import '@helix/library/components/hx-button';
+import '@helixui/library/components/hx-button';
 
 // Check page type via data attribute on <body>
 const pageType = document.body.dataset.pageType;
 
 if (pageType === 'article') {
   // Article-specific components
-  import('@helix/library/components/hx-card').then(() => {
+  import('@helixui/library/components/hx-card').then(() => {
     console.log('[Theme] Article components loaded');
   });
 }
@@ -501,10 +501,10 @@ if (pageType === 'article') {
 if (pageType === 'form') {
   // Form-specific components
   Promise.all([
-    import('@helix/library/components/hx-text-input'),
-    import('@helix/library/components/hx-textarea'),
-    import('@helix/library/components/hx-select'),
-    import('@helix/library/components/hx-checkbox'),
+    import('@helixui/library/components/hx-text-input'),
+    import('@helixui/library/components/hx-textarea'),
+    import('@helixui/library/components/hx-select'),
+    import('@helixui/library/components/hx-checkbox'),
   ]).then(() => {
     console.log('[Theme] Form components loaded');
   });
@@ -537,7 +537,7 @@ npm run dev
 **What happens:**
 
 1. Vite/Webpack reads `src/js/theme.js`
-2. Resolves `@helix/library` imports from `node_modules/`
+2. Resolves `@helixui/library` imports from `node_modules/`
 3. Bundles components + dependencies
 4. Outputs to `dist/js/theme.js`
 5. Watches for file changes and rebuilds automatically
@@ -652,7 +652,7 @@ global:
 **When to increment:**
 
 - After `npm run build` (production builds)
-- After updating `@helix/library` version
+- After updating `@helixui/library` version
 - After any code changes to `src/js/theme.js`
 
 ### Multi-Bundle Approach (Code Splitting)
@@ -917,7 +917,7 @@ export default defineConfig({
     rollupOptions: {
       output: {
         manualChunks: {
-          helix: ['@helix/library'],
+          helix: ['@helixui/library'],
           vendors: ['lit'],
         },
       },
@@ -950,9 +950,9 @@ export default defineConfig({
   build: {
     rollupOptions: {
       input: {
-        'hx-button': 'node_modules/@helix/library/src/components/hx-button/index.js',
-        'hx-card': 'node_modules/@helix/library/src/components/hx-card/index.js',
-        'hx-text-input': 'node_modules/@helix/library/src/components/hx-text-input/index.js',
+        'hx-button': 'node_modules/@helixui/library/src/components/hx-button/index.js',
+        'hx-card': 'node_modules/@helixui/library/src/components/hx-card/index.js',
+        'hx-text-input': 'node_modules/@helixui/library/src/components/hx-text-input/index.js',
       },
       output: {
         entryFileNames: 'components/[name].js',
@@ -1005,25 +1005,25 @@ When HELIX releases a new version, update via npm:
 **Check current version**:
 
 ```bash
-npm list @helix/library
+npm list @helixui/library
 ```
 
 **Check available versions**:
 
 ```bash
-npm view @helix/library versions
+npm view @helixui/library versions
 ```
 
 **Update to latest patch version** (e.g., 0.0.1 → 0.0.2):
 
 ```bash
-npm update @helix/library
+npm update @helixui/library
 ```
 
 **Update to specific version**:
 
 ```bash
-npm install @helix/library@0.1.0 --save-exact
+npm install @helixui/library@0.1.0 --save-exact
 ```
 
 **Rebuild assets**:
@@ -1253,7 +1253,7 @@ web/themes/custom/healthsystem/
     "prod": "cross-env NODE_ENV=production vite build"
   },
   "dependencies": {
-    "@helix/library": "0.0.1"
+    "@helixui/library": "0.0.1"
   },
   "devDependencies": {
     "cross-env": "^7.0.3",
@@ -1279,7 +1279,7 @@ export default defineConfig({
     rollupOptions: {
       output: {
         manualChunks: {
-          helix: ['@helix/library'],
+          helix: ['@helixui/library'],
         },
       },
     },
@@ -1297,12 +1297,12 @@ export default defineConfig({
  */
 
 // Import HELIX components (tree-shaken)
-import '@helix/library/components/hx-button';
-import '@helix/library/components/hx-card';
-import '@helix/library/components/hx-alert';
-import '@helix/library/components/hx-text-input';
-import '@helix/library/components/hx-textarea';
-import '@helix/library/components/hx-select';
+import '@helixui/library/components/hx-button';
+import '@helixui/library/components/hx-card';
+import '@helixui/library/components/hx-alert';
+import '@helixui/library/components/hx-text-input';
+import '@helixui/library/components/hx-textarea';
+import '@helixui/library/components/hx-select';
 
 // Drupal behaviors for HELIX integration
 import './behaviors/helix-forms.js';
@@ -1414,7 +1414,7 @@ rsync -av dist/ /var/www/drupal/themes/custom/healthsystem/dist/
 ```json
 {
   "dependencies": {
-    "@helix/library": "0.0.1" // Not ^0.0.1 or ~0.0.1
+    "@helixui/library": "0.0.1" // Not ^0.0.1 or ~0.0.1
   }
 }
 ```
@@ -1478,11 +1478,11 @@ Only import components you use:
 
 ```javascript
 // Bad: Imports everything
-import '@helix/library';
+import '@helixui/library';
 
 // Good: Imports only what you need
-import '@helix/library/components/hx-button';
-import '@helix/library/components/hx-card';
+import '@helixui/library/components/hx-button';
+import '@helixui/library/components/hx-card';
 ```
 
 ### 7. Monitor Bundle Size
@@ -1522,20 +1522,20 @@ export default defineConfig({
 
 ## Troubleshooting
 
-### Issue: "Cannot find module '@helix/library'"
+### Issue: "Cannot find module '@helixui/library'"
 
 **Cause**: Package not installed or wrong path.
 
 **Fix**:
 
 ```bash
-npm install @helix/library --save
+npm install @helixui/library --save
 ```
 
 Verify install:
 
 ```bash
-ls node_modules/@helix/library
+ls node_modules/@helixui/library
 ```
 
 ### Issue: Components don't render (no Shadow DOM)
@@ -1592,11 +1592,11 @@ global:
 
 ```javascript
 // Before (48KB)
-import '@helix/library';
+import '@helixui/library';
 
 // After (18KB)
-import '@helix/library/components/hx-button';
-import '@helix/library/components/hx-card';
+import '@helixui/library/components/hx-button';
+import '@helixui/library/components/hx-card';
 ```
 
 ### Issue: "exports is not defined" error
@@ -1647,7 +1647,7 @@ npm installation provides the optimal balance of control, performance, and secur
 **Key Steps Recap**:
 
 1. Initialize npm in theme directory (`npm init -y`)
-2. Install HELIX library (`npm install @helix/library --save-exact`)
+2. Install HELIX library (`npm install @helixui/library --save-exact`)
 3. Choose build tool (Vite recommended)
 4. Import components in `src/js/theme.js`
 5. Build assets (`npm run build`)

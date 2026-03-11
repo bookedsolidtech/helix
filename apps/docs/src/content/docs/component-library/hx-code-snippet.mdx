@@ -103,10 +103,10 @@ Disable the copy button by setting `copyable` to `false` via JavaScript.
 
 ```bash
 # Full library
-npm install @helix/library
+npm install @helixui/library
 
 # Or import only this component (tree-shaking friendly)
-import '@helix/library/components/hx-code-snippet';
+import '@helixui/library/components/hx-code-snippet';
 ```
 
 ## Basic Usage
@@ -225,8 +225,8 @@ Copy-paste into a `.html` file and open in any browser — no build tool require
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>hx-code-snippet example</title>
-    <!-- @helix/library is a private package — install via npm workspace, not CDN -->
-    <!-- In your project: import '@helix/library'; in your bundler entry point -->
+    <!-- @helixui/library is a private package — install via npm workspace, not CDN -->
+    <!-- In your project: import '@helixui/library'; in your bundler entry point -->
   </head>
   <body
     style="font-family: sans-serif; padding: 2rem; display: grid; gap: 1.5rem; max-width: 720px;"
@@ -239,7 +239,7 @@ Copy-paste into a `.html` file and open in any browser — no build tool require
 
     <!-- Line numbers -->
     <hx-code-snippet language="bash" line-numbers>
-      npm install @helix/library npm run build npm run test
+      npm install @helixui/library npm run build npm run test
     </hx-code-snippet>
 
     <!-- Inline mode -->

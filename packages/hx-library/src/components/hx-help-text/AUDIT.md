@@ -92,7 +92,7 @@ The component JSDoc comment in `hx-help-text.ts` (line 9) states it is "Used by 
 **File:** `hx-help-text.ts`, line 4
 
 ```ts
-import { tokenStyles } from '@helix/tokens/lit';
+import { tokenStyles } from '@helixui/tokens/lit';
 ```
 
 **Resolution:** Bundle size verified via production build (Vite library mode):

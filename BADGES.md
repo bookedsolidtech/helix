@@ -37,7 +37,7 @@ This file contains all status badges for the WC-2026 project. These badges are e
 
 ## Package & License
 
-![npm version](https://img.shields.io/npm/v/@helix/library)
+![npm version](https://img.shields.io/npm/v/@helixui/library)
 ![License](https://img.shields.io/badge/license-MIT-blue)
 ![Private](https://img.shields.io/badge/status-private-orange)
 

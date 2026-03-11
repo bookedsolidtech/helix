@@ -19,7 +19,7 @@ The documentation site will be available at `http://localhost:3150`, Storybook a
 HELIX components are standard Web Components. They work in any HTML page:
 
 ```html
-<script type="module" src="@helix/library"></script>
+<script type="module" src="@helixui/library"></script>
 
 <hx-card variant="elevated">
   <hx-text>Browse our latest content and support resources.</hx-text>

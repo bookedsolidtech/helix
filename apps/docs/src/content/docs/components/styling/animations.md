@@ -918,7 +918,7 @@ export const helixAlertStyles = css`
 import { LitElement, html, nothing, PropertyValues } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
-import { tokenStyles } from '@helix/tokens/lit';
+import { tokenStyles } from '@helixui/tokens/lit';
 import { helixAlertStyles } from './hx-alert.styles.js';
 
 type AlertVariant = 'info' | 'success' | 'warning' | 'error';

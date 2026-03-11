@@ -108,14 +108,14 @@ Key metrics to monitor:
 
 **How to use:**
 
-1. Publish a pre-release version of `@helix/library`
+1. Publish a pre-release version of `@helixui/library`
 2. Enter package name at bundlephobia.com
 3. View per-component tree-shaking impact
 
 **Example analysis for hx-button:**
 
 ```
-Import: import { HxButton } from '@helix/library'
+Import: import { HxButton } from '@helixui/library'
 Bundle size: 8.2 KB (minified)
 Gzipped: 3.1 KB
 Tree-shakeable: ✅
@@ -266,10 +266,10 @@ export default defineConfig({
 
 ```typescript
 // ✅ Tree-shakeable (only loads hx-button)
-import '@helix/library/components/hx-button';
+import '@helixui/library/components/hx-button';
 
 // ❌ NOT tree-shakeable (loads entire library)
-import '@helix/library';
+import '@helixui/library';
 ```
 
 #### 4. No Barrel Exports
@@ -286,7 +286,7 @@ export * from './components/hx-text-input/index.js';
 // ... (all components)
 
 // Consumer can't tree-shake this
-import { HxButton } from '@helix/library';
+import { HxButton } from '@helixui/library';
 ```
 
 **wc-2026 approach:**
@@ -296,7 +296,7 @@ import { HxButton } from '@helix/library';
 export { HxButton } from './hx-button.js';
 
 // Consumer imports directly
-import { HxButton } from '@helix/library/components/hx-button';
+import { HxButton } from '@helixui/library/components/hx-button';
 ```
 
 ### Verifying Tree-Shaking
@@ -310,7 +310,7 @@ import { HxButton } from '@helix/library/components/hx-button';
 
 ```typescript
 // test-app/src/main.ts
-import '@helix/library/components/hx-button';
+import '@helixui/library/components/hx-button';
 
 document.body.innerHTML = '<hx-button>Test</hx-button>';
 ```
@@ -366,7 +366,7 @@ For heavy components used in specific contexts, split them into separate chunks.
 ```typescript
 // Dynamically import heavy component
 async function loadDataTable() {
-  const { WcDataTable } = await import('@helix/library/components/wc-data-table');
+  const { WcDataTable } = await import('@helixui/library/components/wc-data-table');
   customElements.define('hx-data-table', WcDataTable);
 }
 
@@ -389,7 +389,7 @@ export default defineConfig({
       output: {
         manualChunks: {
           'vendor-lit': ['lit', '@lit/reactive-element'],
-          'vendor-hx': ['@helix/tokens'],
+          'vendor-hx': ['@helixui/tokens'],
         },
       },
     },
@@ -424,8 +424,8 @@ Load components when they enter the viewport.
 ```typescript
 // Register observer for lazy components
 const lazyComponents = new Map([
-  ['hx-data-table', () => import('@helix/library/components/wc-data-table')],
-  ['hx-chart', () => import('@helix/library/components/wc-chart')],
+  ['hx-data-table', () => import('@helixui/library/components/wc-data-table')],
+  ['hx-chart', () => import('@helixui/library/components/wc-chart')],
 ]);
 
 const observer = new IntersectionObserver((entries) => {
@@ -461,7 +461,7 @@ Load components when the user interacts with a trigger.
 ```typescript
 // Load modal component on button click
 document.getElementById('open-modal')?.addEventListener('click', async () => {
-  await import('@helix/library/components/hx-modal');
+  await import('@helixui/library/components/hx-modal');
 
   const modal = document.createElement('hx-modal');
   modal.innerHTML = '<p>Modal content</p>';
@@ -723,7 +723,7 @@ jobs:
         run: npm ci
 
       - name: Build library
-        run: npm run build --workspace=@helix/library
+        run: npm run build --workspace=@helixui/library
 
       - name: Analyze bundle size
         run: |
@@ -867,7 +867,7 @@ Current bundle size metrics for wc-2026 (as of latest build):
 | Dependency      | Size (min+gz) | Percentage |
 | --------------- | ------------- | ---------- |
 | Lit core        | 5.1 KB        | 28%        |
-| @helix/tokens | 1.8 KB        | 10%        |
+| @helixui/tokens | 1.8 KB        | 10%        |
 | Component code  | 11.1 KB       | 62%        |
 
 **Note:** Lit is externalized and only loaded once, even when using multiple components.
@@ -929,7 +929,7 @@ If bundle size exceeds budgets, use this debugging workflow:
 
 ```bash
 # Build with analysis
-npm run build --workspace=@helix/library
+npm run build --workspace=@helixui/library
 
 # Check component sizes
 ls -lh packages/hx-library/dist/components/**/index.js
@@ -956,7 +956,7 @@ open packages/hx-library/dist/stats.html
 
 ```typescript
 // Create minimal test app
-import '@helix/library/components/hx-button';
+import '@helixui/library/components/hx-button';
 
 // Build and measure
 npm run build
@@ -976,7 +976,7 @@ npm run build
 ```javascript
 // Measure component load time
 const start = performance.now();
-await import('@helix/library/components/hx-button');
+await import('@helixui/library/components/hx-button');
 const end = performance.now();
 console.log(`Load time: ${end - start}ms`);
 ```

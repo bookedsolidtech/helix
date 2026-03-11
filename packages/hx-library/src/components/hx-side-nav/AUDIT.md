@@ -314,4 +314,4 @@ The test suite covers `expanded` property reflection but not the interactive exp
 
 **OBS-04: `aria-disabled` on anchor elements.** Using `aria-disabled="true"` on `<a>` elements with `tabindex="-1"` is an accepted pattern (native `disabled` is not valid on anchors). The implementation is correct.
 
-**OBS-05: Bundle size.** Without a build run, bundle size cannot be verified. The component has no external dependencies beyond `lit` and `@helix/tokens`, suggesting it should be well within the 5KB threshold. Formal measurement required as part of gate verification.
+**OBS-05: Bundle size.** Without a build run, bundle size cannot be verified. The component has no external dependencies beyond `lit` and `@helixui/tokens`, suggesting it should be well within the 5KB threshold. Formal measurement required as part of gate verification.
