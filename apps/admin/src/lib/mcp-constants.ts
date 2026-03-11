@@ -4,17 +4,19 @@
  *
  * Resolves the helixir MCP server binary from the npm package.
  * CEM_PATH is resolved relative to the monorepo root.
+ *
+ * NOTE: This file is bundled by Next.js webpack which transforms
+ * import.meta.url into a numeric module ID. We use process.cwd()
+ * and direct node_modules resolution instead.
  */
-import { resolve, dirname } from 'node:path';
-import { fileURLToPath } from 'node:url';
-import { createRequire } from 'node:module';
+import { resolve } from 'node:path';
 
-const __dirname = dirname(fileURLToPath(import.meta.url));
-const MONOREPO_ROOT = resolve(__dirname, '../../../../');
+// In turborepo + npm workspaces, process.cwd() is the app directory (apps/admin)
+const MONOREPO_ROOT = resolve(process.cwd(), '../..');
 
-const require = createRequire(import.meta.url);
-const HELIXIR_BINARY = require.resolve('helixir');
-const HELIXIR_ROOT = resolve(HELIXIR_BINARY, '../../..');
+// Resolve helixir binary from the hoisted node_modules
+const HELIXIR_ROOT = resolve(MONOREPO_ROOT, 'node_modules/helixir');
+const HELIXIR_BINARY = resolve(HELIXIR_ROOT, 'build/src/index.js');
 
 export const WC_TOOLS_ROOT = process.env.WC_TOOLS_ROOT ?? HELIXIR_ROOT;
 export const WC_TOOLS_BINARY = process.env.WC_TOOLS_ROOT
