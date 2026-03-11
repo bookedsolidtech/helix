@@ -327,7 +327,7 @@ CLAUDE.md states "No hardcoded values — Colors, spacing, typography, and timin
 static override styles = [tokenStyles, helixCardStyles];
 ```
 
-`tokenStyles` is imported from `@helix/tokens/lit` and included in every component's static styles. If `tokenStyles` is the full design token CSS (`:root { --hx-color-*: ...; --hx-space-*: ...; }`) it is loaded into every shadow root. Depending on the token file size, this could meaningfully impact bundle size and stylesheet evaluation time in pages with many card instances.
+`tokenStyles` is imported from `@helixui/tokens/lit` and included in every component's static styles. If `tokenStyles` is the full design token CSS (`:root { --hx-color-*: ...; --hx-space-*: ...; }`) it is loaded into every shadow root. Depending on the token file size, this could meaningfully impact bundle size and stylesheet evaluation time in pages with many card instances.
 
 This is a systemic pattern shared with other components — flagging here so the token injection strategy can be audited once across the library.
 

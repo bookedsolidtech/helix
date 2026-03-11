@@ -232,7 +232,7 @@ helix-tokens:
 helix-components:
   version: 0.0.1
   js:
-    https://cdn.jsdelivr.net/npm/@helix/library@latest/dist/helix.bundled.js:
+    https://cdn.jsdelivr.net/npm/@helixui/library@latest/dist/helix.bundled.js:
       type: external
       attributes:
         type: module
@@ -650,7 +650,7 @@ helix-responsive:
 helix-library:
   version: 0.0.1
   js:
-    https://cdn.jsdelivr.net/npm/@helix/library@latest/dist/helix.bundled.js:
+    https://cdn.jsdelivr.net/npm/@helixui/library@latest/dist/helix.bundled.js:
       type: external
       attributes:
         type: module

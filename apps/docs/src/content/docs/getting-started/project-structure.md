@@ -27,8 +27,8 @@ helix/
 │   └── admin/                # Admin Dashboard — health scoring (port 3159)
 │
 ├── packages/
-│   ├── hx-library/           # @helix/library — Lit 3.x components
-│   └── hx-tokens/            # @helix/tokens — design token system
+│   ├── hx-library/           # @helixui/library — Lit 3.x components
+│   └── hx-tokens/            # @helixui/tokens — design token system
 │
 └── .claude/agents/           # Specialized engineering agents
 ```

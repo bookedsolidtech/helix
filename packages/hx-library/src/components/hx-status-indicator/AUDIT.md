@@ -233,7 +233,7 @@ The same violation applies to size fallbacks:
 }
 ```
 
-**Counterargument:** Fallback values in `var()` are a common and necessary pattern for resilience when tokens are not loaded. Many components in this library use this pattern. However, the existence of `tokenStyles` import (`@helix/tokens/lit`) in the component suggests tokens are expected to be available at render time. If tokens are guaranteed via `tokenStyles`, the hardcoded fallbacks are redundant. If they are not guaranteed, this reveals a token-loading architecture concern.
+**Counterargument:** Fallback values in `var()` are a common and necessary pattern for resilience when tokens are not loaded. Many components in this library use this pattern. However, the existence of `tokenStyles` import (`@helixui/tokens/lit`) in the component suggests tokens are expected to be available at render time. If tokens are guaranteed via `tokenStyles`, the hardcoded fallbacks are redundant. If they are not guaranteed, this reveals a token-loading architecture concern.
 
 **Action required:** Clarify with the design system team whether hardcoded CSS `var()` fallbacks are explicitly permitted as a resilience pattern or violate the no-hardcoded-values policy. Document the decision as a project-wide exception if allowed.
 

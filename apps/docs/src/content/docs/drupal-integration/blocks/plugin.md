@@ -793,7 +793,7 @@ package: 'HELIX'
 ```yaml
 hx-alert:
   js:
-    https://cdn.example.com/@helix/library/dist/hx-alert.js:
+    https://cdn.example.com/@helixui/library/dist/hx-alert.js:
       type: external
       attributes:
         type: module
@@ -802,7 +802,7 @@ hx-alert:
 
 hx-button:
   js:
-    https://cdn.example.com/@helix/library/dist/hx-button.js:
+    https://cdn.example.com/@helixui/library/dist/hx-button.js:
       type: external
       attributes:
         type: module

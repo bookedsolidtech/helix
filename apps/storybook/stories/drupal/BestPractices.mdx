@@ -176,7 +176,7 @@ Load HELIX components from a CDN for automatic caching and global distribution.
 # CDN approach with version pinning
 helix-components:
   js:
-    https://cdn.jsdelivr.net/npm/@helix/library@1.0.0/dist/index.js:
+    https://cdn.jsdelivr.net/npm/@helixui/library@1.0.0/dist/index.js:
       type: external
       attributes:
         type: module
@@ -213,13 +213,13 @@ Install HELIX via npm and serve from Drupal's libraries directory.
 **Install via npm:**
 
 ```bash
-npm install @helix/library
+npm install @helixui/library
 ```
 
 **Copy to Drupal libraries directory:**
 
 ```bash
-cp -r node_modules/@helix/library/dist /path/to/drupal/libraries/helix/
+cp -r node_modules/@helixui/library/dist /path/to/drupal/libraries/helix/
 ```
 
 **Add to `your_theme.libraries.yml`:**
@@ -242,7 +242,7 @@ For performance-critical pages, load only the components you use.
 ```yaml
 helix-button:
   js:
-    https://cdn.jsdelivr.net/npm/@helix/library@1.0.0/dist/hx-button.js:
+    https://cdn.jsdelivr.net/npm/@helixui/library@1.0.0/dist/hx-button.js:
       type: external
       attributes:
         type: module
@@ -250,7 +250,7 @@ helix-button:
 
 helix-card:
   js:
-    https://cdn.jsdelivr.net/npm/@helix/library@1.0.0/dist/hx-card.js:
+    https://cdn.jsdelivr.net/npm/@helixui/library@1.0.0/dist/hx-card.js:
       type: external
       attributes:
         type: module
@@ -756,7 +756,7 @@ Here's a complete `your_theme.libraries.yml` for HELIX integration:
 # Global HELIX library (CDN)
 helix-components:
   js:
-    https://cdn.jsdelivr.net/npm/@helix/library@1.0.0/dist/index.js:
+    https://cdn.jsdelivr.net/npm/@helixui/library@1.0.0/dist/index.js:
       type: external
       attributes:
         type: module
@@ -786,7 +786,7 @@ helix-theme:
 ### HELIX Documentation
 
 - **Component API Reference**: See individual component MDX docs in Storybook
-- **Design Tokens**: See `@helix/library` token documentation
+- **Design Tokens**: See `@helixui/library` token documentation
 - **Accessibility Guide**: WCAG 2.1 AA compliance documentation
 
 ### Visual ADRs

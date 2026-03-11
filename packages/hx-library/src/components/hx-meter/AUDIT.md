@@ -168,7 +168,7 @@ This is the expected pattern. Pass.
 
 ### PASS (estimated) — Bundle size likely within budget
 
-Source is ~190 lines for the component and ~77 lines for styles. No external runtime dependencies beyond Lit and `@helix/tokens`. Estimated minified+gzipped size is well under 5KB. Exact measurement requires running `npm run build` and checking Vite output.
+Source is ~190 lines for the component and ~77 lines for styles. No external runtime dependencies beyond Lit and `@helixui/tokens`. Estimated minified+gzipped size is well under 5KB. Exact measurement requires running `npm run build` and checking Vite output.
 
 ### P2 — Bundle size not verified in CI for this component
 

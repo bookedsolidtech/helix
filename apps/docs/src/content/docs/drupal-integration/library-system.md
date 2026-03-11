@@ -67,7 +67,7 @@ For external URLs (CDN):
 ```yaml
 helix-cdn:
   js:
-    https://cdn.jsdelivr.net/npm/@helix/library@latest/dist/helix.bundled.js:
+    https://cdn.jsdelivr.net/npm/@helixui/library@latest/dist/helix.bundled.js:
       type: external
 ```
 
@@ -141,7 +141,7 @@ For CDN-hosted files:
 ```yaml
 helix-cdn:
   js:
-    https://cdn.jsdelivr.net/npm/@helix/library@0.0.1/dist/helix.bundled.js:
+    https://cdn.jsdelivr.net/npm/@helixui/library@0.0.1/dist/helix.bundled.js:
       type: external
       attributes:
         type: module
@@ -269,7 +269,7 @@ For CDN assets with their own versioning:
 ```yaml
 helix-cdn:
   js:
-    https://cdn.jsdelivr.net/npm/@helix/library@0.0.1/dist/helix.bundled.js:
+    https://cdn.jsdelivr.net/npm/@helixui/library@0.0.1/dist/helix.bundled.js:
       type: external
       version: -1 # Disable query string
       attributes:
@@ -372,7 +372,7 @@ For optimal performance, define one library per component. This enables tree-sha
 helix-all:
   version: 0.0.1
   js:
-    https://cdn.jsdelivr.net/npm/@helix/library@0.0.1/dist/helix.bundled.js:
+    https://cdn.jsdelivr.net/npm/@helixui/library@0.0.1/dist/helix.bundled.js:
       type: external
       minified: true
       preprocess: false
@@ -657,7 +657,7 @@ Drupal's library system integrates with its cache system:
    ```yaml
    helix-cdn:
      js:
-       https://cdn.jsdelivr.net/npm/@helix/library@0.0.1/dist/helix.bundled.js:
+       https://cdn.jsdelivr.net/npm/@helixui/library@0.0.1/dist/helix.bundled.js:
          type: external
          minified: true
    ```
@@ -686,7 +686,7 @@ ls -lh dist/js/hx-*.js | awk '{print $5, $9}'
 helix-button-cdn:
   version: 0.0.1
   js:
-    https://cdn.jsdelivr.net/npm/@helix/library@0.0.1/dist/components/hx-button.js:
+    https://cdn.jsdelivr.net/npm/@helixui/library@0.0.1/dist/components/hx-button.js:
       type: external
       minified: true
       preprocess: false
@@ -731,7 +731,7 @@ helix-button:
     "dev": "vite build --watch"
   },
   "dependencies": {
-    "@helix/library": "^0.0.1"
+    "@helixui/library": "^0.0.1"
   }
 }
 ```
@@ -746,7 +746,7 @@ export default defineConfig({
     outDir: 'dist/js',
     lib: {
       entry: {
-        'hx-button': 'node_modules/@helix/library/src/components/hx-button/index.js',
+        'hx-button': 'node_modules/@helixui/library/src/components/hx-button/index.js',
       },
       formats: ['es'],
     },

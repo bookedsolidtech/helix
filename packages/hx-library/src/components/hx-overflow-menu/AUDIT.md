@@ -83,7 +83,7 @@ WCAG 2.4.6 (Headings and Labels) and 2.4.9 (Link Purpose) are at risk when ident
 
 **File:** `vite.config.ts` (library root), `packages/hx-library/package.json`
 
-The `rollupOptions.external` array externalizes `lit`, `@lit/*`, and `@helix/tokens` but does **not** externalize `@floating-ui/dom`. The library lists it as a `dependency`, not a `peerDependency`. This means the entire `@floating-ui/dom` package (~5.4 KB min+gz as of v1.7.x) is bundled into the `hx-overflow-menu` component chunk.
+The `rollupOptions.external` array externalizes `lit`, `@lit/*`, and `@helixui/tokens` but does **not** externalize `@floating-ui/dom`. The library lists it as a `dependency`, not a `peerDependency`. This means the entire `@floating-ui/dom` package (~5.4 KB min+gz as of v1.7.x) is bundled into the `hx-overflow-menu` component chunk.
 
 The project budget is **< 5 KB per component min+gz**. `@floating-ui/dom` alone reaches that limit before any component code is included. This is an automatic budget violation.
 
