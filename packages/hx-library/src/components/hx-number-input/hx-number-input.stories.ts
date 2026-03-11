@@ -252,7 +252,7 @@ export const WithHelpText: Story = {
   args: {
     label: 'Dosage',
     value: null,
-    helpText: 'Enter dosage in mg',
+    'help-text': 'Enter dosage in mg',
   },
   parameters: {
     docs: {
@@ -302,7 +302,7 @@ export const Disabled: Story = {
     label: 'System-Calculated Score',
     value: 42,
     disabled: true,
-    helpText: 'This value is calculated automatically and cannot be modified.',
+    'help-text': 'This value is calculated automatically and cannot be modified.',
   },
   parameters: {
     docs: {
@@ -326,7 +326,7 @@ export const Readonly: Story = {
     label: 'Recorded Measurement',
     value: 98,
     readonly: true,
-    helpText: 'This measurement was recorded at time of admission and cannot be changed.',
+    'help-text': 'This measurement was recorded at time of admission and cannot be changed.',
   },
   parameters: {
     docs: {
@@ -350,7 +350,7 @@ export const NoStepper: Story = {
   args: {
     label: 'Quantity',
     value: 5,
-    noStepper: true,
+    'no-stepper': true,
   },
   parameters: {
     docs: {
@@ -376,7 +376,7 @@ export const SmallSize: Story = {
   args: {
     label: 'Count',
     value: 3,
-    size: 'sm',
+    'hx-size': 'sm',
   },
   parameters: {
     docs: {
@@ -395,7 +395,7 @@ export const LargeSize: Story = {
   args: {
     label: 'Count',
     value: 3,
-    size: 'lg',
+    'hx-size': 'lg',
   },
   parameters: {
     docs: {
@@ -608,7 +608,10 @@ export const WithHelpSlot: Story = {
   name: 'With Help Slot',
   render: () => html`
     <hx-number-input label="Infusion Rate" .value=${125} name="infusionRate">
-      <div slot="help" style="font-size: 0.75rem; color: var(--hx-color-neutral-500, #6c757d);">
+      <div
+        slot="help-text"
+        style="font-size: 0.75rem; color: var(--hx-color-neutral-500, #6c757d);"
+      >
         Standard adult maintenance rate is 125 mL/hr. Adjust based on patient weight and clinical
         status.
       </div>
@@ -678,7 +681,10 @@ export const DrupalFormAPI: Story = {
         </svg>
         Dosage is required.
       </div>
-      <div slot="help" style="font-size: 0.75rem; color: var(--hx-color-neutral-500, #6c757d);">
+      <div
+        slot="help-text"
+        style="font-size: 0.75rem; color: var(--hx-color-neutral-500, #6c757d);"
+      >
         Enter prescribed dosage in milligrams (0–1000 mg).
       </div>
     </hx-number-input>
@@ -868,7 +874,7 @@ export const TypeAndVerify: Story = {
     name: 'bloodGlucose',
     min: 0,
     max: 500,
-    helpText: 'Enter blood glucose reading in mg/dL.',
+    'help-text': 'Enter blood glucose reading in mg/dL.',
   },
   parameters: {
     docs: {
@@ -989,7 +995,7 @@ export const KeyboardArrows: Story = {
     min: 0,
     max: 60,
     step: 1,
-    helpText: 'Normal adult respiratory rate: 12-20 breaths per minute.',
+    'help-text': 'Normal adult respiratory rate: 12-20 breaths per minute.',
   },
   parameters: {
     docs: {
@@ -1083,7 +1089,7 @@ export const DisabledNoInput: Story = {
     label: 'Locked Reading',
     value: 98,
     disabled: true,
-    helpText: 'This value is locked and cannot be modified.',
+    'help-text': 'This value is locked and cannot be modified.',
   },
   parameters: {
     docs: {
