@@ -71,13 +71,13 @@ function extractPropertyTypes(content: string): Map<string, string> {
 describe('semantic-versioning (H23)', () => {
   describe('Hook Structure', () => {
     it('should have executable shebang', () => {
-      const hookPath = '/Volumes/Development/wc-2026/scripts/hooks/semantic-versioning.ts';
+      const hookPath = 'scripts/hooks/semantic-versioning.ts';
       const content = readFileSync(hookPath, 'utf-8');
       expect(content.startsWith('#!/usr/bin/env tsx')).toBe(true);
     });
 
     it('should export validation types', () => {
-      const hookPath = '/Volumes/Development/wc-2026/scripts/hooks/semantic-versioning.ts';
+      const hookPath = 'scripts/hooks/semantic-versioning.ts';
       const content = readFileSync(hookPath, 'utf-8');
       expect(content).toContain('interface Violation');
       expect(content).toContain('interface ValidationResult');
@@ -85,14 +85,14 @@ describe('semantic-versioning (H23)', () => {
     });
 
     it('should have main execution function', () => {
-      const hookPath = '/Volumes/Development/wc-2026/scripts/hooks/semantic-versioning.ts';
+      const hookPath = 'scripts/hooks/semantic-versioning.ts';
       const content = readFileSync(hookPath, 'utf-8');
       expect(content).toContain('function main()');
       expect(content).toContain('main();');
     });
 
     it('should support JSON output mode', () => {
-      const hookPath = '/Volumes/Development/wc-2026/scripts/hooks/semantic-versioning.ts';
+      const hookPath = 'scripts/hooks/semantic-versioning.ts';
       const content = readFileSync(hookPath, 'utf-8');
       expect(content).toContain('--json');
       expect(content).toContain('JSON.stringify');
