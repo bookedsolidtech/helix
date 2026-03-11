@@ -100,11 +100,7 @@ export const Default: Story = {
     items: sampleItems,
   },
   render: (args) => html`
-    <hx-nav
-      orientation=${args.orientation}
-      label=${args.label}
-      .items=${args.items}
-    ></hx-nav>
+    <hx-nav orientation=${args.orientation} label=${args.label} .items=${args.items}></hx-nav>
   `,
 };
 
@@ -120,11 +116,7 @@ export const WithSubmenus: Story = {
     items: itemsWithSubmenus,
   },
   render: (args) => html`
-    <hx-nav
-      orientation=${args.orientation}
-      label=${args.label}
-      .items=${args.items}
-    ></hx-nav>
+    <hx-nav orientation=${args.orientation} label=${args.label} .items=${args.items}></hx-nav>
   `,
 };
 
@@ -140,11 +132,7 @@ export const Vertical: Story = {
   },
   render: (args) => html`
     <div style="width: 240px; height: 500px;">
-      <hx-nav
-        orientation=${args.orientation}
-        label=${args.label}
-        .items=${args.items}
-      ></hx-nav>
+      <hx-nav orientation=${args.orientation} label=${args.label} .items=${args.items}></hx-nav>
     </div>
   `,
 };
@@ -165,11 +153,47 @@ export const MobileView: Story = {
     },
   },
   render: (args) => html`
-    <hx-nav
-      orientation=${args.orientation}
-      label=${args.label}
-      .items=${args.items}
-    ></hx-nav>
+    <hx-nav orientation=${args.orientation} label=${args.label} .items=${args.items}></hx-nav>
+  `,
+};
+
+/**
+ * Navigation with an active child inside a submenu.
+ * The active item is highlighted with `current: true` within the nested children.
+ */
+export const ActiveSubItem: Story = {
+  args: {
+    orientation: 'horizontal',
+    label: 'Main navigation',
+    items: [
+      { label: 'Dashboard', href: '/dashboard' },
+      {
+        label: 'Patients',
+        children: [
+          { label: 'All Patients', href: '/patients', current: true },
+          { label: 'New Intake', href: '/patients/new' },
+        ],
+      },
+      { label: 'Reports', href: '/reports' },
+    ] as NavItem[],
+  },
+  render: (args) => html`
+    <hx-nav orientation=${args.orientation} label=${args.label} .items=${args.items}></hx-nav>
+  `,
+};
+
+/**
+ * Empty navigation with no items.
+ * Renders the nav landmark but no list items.
+ */
+export const Empty: Story = {
+  args: {
+    orientation: 'horizontal',
+    label: 'Main navigation',
+    items: [] as NavItem[],
+  },
+  render: (args) => html`
+    <hx-nav orientation=${args.orientation} label=${args.label} .items=${args.items}></hx-nav>
   `,
 };
 
