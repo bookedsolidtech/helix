@@ -1,5 +1,5 @@
 import { describe, it, expect, afterEach } from 'vitest';
-import { fixture, shadowQuery, cleanup, oneEvent } from '../../test-utils.js';
+import { fixture, shadowQuery, cleanup, oneEvent, checkA11y } from '../../test-utils.js';
 import type { HelixPagination } from './hx-pagination.js';
 import './index.js';
 
@@ -542,6 +542,137 @@ describe('hx-pagination', () => {
       const nextBtn = shadowQuery(el, 'button[aria-label="Next page"]') as HTMLButtonElement;
       expect(prevBtn.disabled).toBe(true);
       expect(nextBtn.disabled).toBe(true);
+    });
+  });
+
+  // ─── Aria-live Announcements ───
+
+  describe('Aria-live Announcements', () => {
+    it('announces page change via aria-live region', async () => {
+      const el = await fixture<HelixPagination>(
+        '<hx-pagination total-pages="10" current-page="3"></hx-pagination>',
+      );
+      const nextBtn = shadowQuery(el, 'button[aria-label="Next page"]') as HTMLButtonElement;
+      nextBtn.click();
+      await el.updateComplete;
+      const liveRegion = el.shadowRoot!.querySelector('[aria-live="polite"]');
+      expect(liveRegion).toBeTruthy();
+      expect(liveRegion!.textContent).toContain('Page 4 of 10');
+    });
+
+    it('aria-live region is empty before navigation', async () => {
+      const el = await fixture<HelixPagination>(
+        '<hx-pagination total-pages="10" current-page="3"></hx-pagination>',
+      );
+      const liveRegion = el.shadowRoot!.querySelector('[aria-live="polite"]');
+      expect(liveRegion).toBeTruthy();
+      expect(liveRegion!.textContent?.trim()).toBe('');
+    });
+  });
+
+  // ─── First/Last Navigation Events ───
+
+  describe('First / Last navigation events', () => {
+    it('fires hx-page-change with page 1 when clicking first button', async () => {
+      const el = await fixture<HelixPagination>(
+        '<hx-pagination total-pages="10" current-page="5" show-first-last></hx-pagination>',
+      );
+      const firstBtn = shadowQuery(el, 'button[aria-label="First page"]') as HTMLButtonElement;
+      const [event] = await Promise.all([
+        oneEvent(el, 'hx-page-change'),
+        Promise.resolve(firstBtn.click()),
+      ]);
+      expect((event as CustomEvent<{ page: number }>).detail.page).toBe(1);
+    });
+
+    it('fires hx-page-change with last page when clicking last button', async () => {
+      const el = await fixture<HelixPagination>(
+        '<hx-pagination total-pages="10" current-page="5" show-first-last></hx-pagination>',
+      );
+      const lastBtn = shadowQuery(el, 'button[aria-label="Last page"]') as HTMLButtonElement;
+      const [event] = await Promise.all([
+        oneEvent(el, 'hx-page-change'),
+        Promise.resolve(lastBtn.click()),
+      ]);
+      expect((event as CustomEvent<{ page: number }>).detail.page).toBe(10);
+    });
+  });
+
+  // ─── Page-size CSS Parts ───
+
+  describe('Page Size CSS Parts', () => {
+    it('exposes "page-size-wrapper" part when show-page-size is set', async () => {
+      const el = await fixture<HelixPagination>(
+        '<hx-pagination total-pages="5" current-page="1" show-page-size></hx-pagination>',
+      );
+      const wrapper = el.shadowRoot!.querySelector('[part="page-size-wrapper"]');
+      expect(wrapper).toBeTruthy();
+    });
+
+    it('exposes "page-size-label" part when show-page-size is set', async () => {
+      const el = await fixture<HelixPagination>(
+        '<hx-pagination total-pages="5" current-page="1" show-page-size></hx-pagination>',
+      );
+      const label = el.shadowRoot!.querySelector('[part="page-size-label"]');
+      expect(label).toBeTruthy();
+    });
+
+    it('exposes "page-size-select" part when show-page-size is set', async () => {
+      const el = await fixture<HelixPagination>(
+        '<hx-pagination total-pages="5" current-page="1" show-page-size></hx-pagination>',
+      );
+      const select = el.shadowRoot!.querySelector('[part="page-size-select"]');
+      expect(select).toBeTruthy();
+    });
+  });
+
+  // ─── Accessibility (axe-core) ───
+
+  describe('Accessibility (axe-core)', () => {
+    const axeOptions = {
+      rules: {
+        region: { enabled: false },
+      },
+    };
+
+    it('has no axe violations in default state', async () => {
+      const el = await fixture<HelixPagination>(
+        '<hx-pagination total-pages="10" current-page="5"></hx-pagination>',
+      );
+      const { violations } = await checkA11y(el, axeOptions);
+      expect(violations).toEqual([]);
+    });
+
+    it('has no axe violations on first page', async () => {
+      const el = await fixture<HelixPagination>(
+        '<hx-pagination total-pages="10" current-page="1"></hx-pagination>',
+      );
+      const { violations } = await checkA11y(el, axeOptions);
+      expect(violations).toEqual([]);
+    });
+
+    it('has no axe violations with first/last buttons', async () => {
+      const el = await fixture<HelixPagination>(
+        '<hx-pagination total-pages="10" current-page="5" show-first-last></hx-pagination>',
+      );
+      const { violations } = await checkA11y(el, axeOptions);
+      expect(violations).toEqual([]);
+    });
+
+    it('has no axe violations with page-size selector', async () => {
+      const el = await fixture<HelixPagination>(
+        '<hx-pagination total-pages="10" current-page="5" show-page-size page-size="25"></hx-pagination>',
+      );
+      const { violations } = await checkA11y(el, axeOptions);
+      expect(violations).toEqual([]);
+    });
+
+    it('has no axe violations with single page', async () => {
+      const el = await fixture<HelixPagination>(
+        '<hx-pagination total-pages="1" current-page="1"></hx-pagination>',
+      );
+      const { violations } = await checkA11y(el, axeOptions);
+      expect(violations).toEqual([]);
     });
   });
 });

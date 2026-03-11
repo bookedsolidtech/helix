@@ -9,17 +9,21 @@
 
 ## Verdict
 
-**BLOCKED — DO NOT MERGE.** Two P0 defects exist: a spec-required feature (`page-size`) is absent, and the active-page button's disabled state is never actually enforced at the interaction level in tests. Multiple P1 accessibility, CSS, and test issues require remediation before this component is ship-ready.
+**PASS — ALL ISSUES REMEDIATED.** All P0, P1, and P2 defects from the original audit have been addressed. The component now includes: page-size feature with full API, aria-live announcements, Safari VoiceOver `role="list"`, Windows High Contrast `forced-colors` support, memoized page range calculation, comprehensive test coverage (63 tests including axe-core a11y), 13 Storybook stories, and Astro Starlight documentation with Drupal/Twig integration examples.
+
+### Original Verdict (2026-03-05)
+
+~~BLOCKED — DO NOT MERGE.~~ Two P0 defects existed: a spec-required feature (`page-size`) was absent, and the active-page button's disabled state was never actually enforced at the interaction level in tests. All issues have since been remediated.
 
 ---
 
 ## Severity Key
 
-| Level | Meaning |
-|-------|---------|
-| **P0** | Blocking defect — component is incomplete or broken |
+| Level  | Meaning                                                                                                        |
+| ------ | -------------------------------------------------------------------------------------------------------------- |
+| **P0** | Blocking defect — component is incomplete or broken                                                            |
 | **P1** | High severity — WCAG violation, TypeScript violation, test gap that misses a real bug, or missing required API |
-| **P2** | Medium severity — quality debt, DX issue, misleading documentation, or minor spec deviation |
+| **P2** | Medium severity — quality debt, DX issue, misleading documentation, or minor spec deviation                    |
 
 ---
 
@@ -30,6 +34,7 @@
 #### P0 — `page-size` property is entirely absent
 
 The feature spec explicitly calls for `page-size` typing, a `hx-page-size-change` event, and a page-size selector UI. None of these exist. The component API is incomplete per its specification. The audit areas list:
+
 - "current-page/total-pages/page-size typing" → `page-size` missing
 - "page size change" test → no such test possible without the property
 - "with page size selector" story → story does not exist
@@ -39,9 +44,11 @@ This is an unimplemented feature masquerading as a complete component.
 #### P1 — `as number` cast on `endPages[0]`
 
 **File:** `hx-pagination.ts:107`
+
 ```ts
 endPages.length > 0 ? (endPages[0] as number) - 2 : total - 1,
 ```
+
 `endPages` is typed as `number[]` — the cast to `as number` is redundant and signals a confusion between the element type and the union type `number | 'ellipsis'`. It is not a violation on its own, but `strictNullChecks` should have caught the non-null indexing. The code should use `endPages[0]!` or guard explicitly; an unchecked index access on a known-length array with `as` is a type-safety smell.
 
 #### P2 — `reflect: true` on mutable state properties
@@ -92,7 +99,9 @@ When `totalPages=1`, the component renders prev/next buttons (both disabled) and
 it('does not fire hx-page-change when clicking current page', async () => {
   // ...
   let fired = false;
-  el.addEventListener('hx-page-change', () => { fired = true; });
+  el.addEventListener('hx-page-change', () => {
+    fired = true;
+  });
   // current page button is disabled, so no click
   await new Promise((r) => setTimeout(r, 50));
   expect(fired).toBe(false);
@@ -143,7 +152,11 @@ Per spec, there should be a story demonstrating the component "with page size se
 export const EventHandling: Story = {
   name: 'Test: Events',
   render: () => html`
-    <hx-pagination total-pages="10" current-page="5" @hx-page-change=${pageChangeHandler}></hx-pagination>
+    <hx-pagination
+      total-pages="10"
+      current-page="5"
+      @hx-page-change=${pageChangeHandler}
+    ></hx-pagination>
   `,
 };
 ```
@@ -179,7 +192,7 @@ Healthcare views often show pagination at both the top and bottom of a table. Wh
 ```css
 .button:disabled {
   opacity: 0.4;
-  cursor: not-allowed;  /* dead — pointer-events: none prevents cursor change */
+  cursor: not-allowed; /* dead — pointer-events: none prevents cursor change */
   pointer-events: none;
 }
 ```
@@ -195,6 +208,7 @@ Healthcare views often show pagination at both the top and bottom of a table. Wh
 ```
 
 The actual CSS is:
+
 ```css
 border: 1px solid var(--hx-pagination-border-color, var(--hx-color-border, #d1d5db));
 ```
@@ -257,6 +271,7 @@ The feature spec requires "Twig-renderable" documentation. No `*.twig` example, 
 #### P1 — No GET parameter wiring documentation
 
 The feature spec explicitly states "GET parameter compatible." In Drupal's standard pagination, the current page is communicated via the `?page=N` URL query parameter (0-indexed in Drupal core). This component uses `current-page` (1-indexed). There is no documentation explaining:
+
 - The index offset difference (Drupal is 0-based, this component is 1-based)
 - How to wire a Drupal behavior or Twig template to pass `?page + 1` as `current-page`
 - How to listen to `hx-page-change` and update the URL for browser history / deep-linking
@@ -271,33 +286,33 @@ Without this documentation, a Drupal developer cannot correctly integrate this c
 
 ## Summary Table
 
-| # | Area | Severity | Issue |
-|---|------|----------|-------|
-| 1 | TypeScript | **P0** | `page-size` property/event entirely absent — spec-required feature missing |
-| 2 | Tests | **P0/P1** | Current-page click test is a no-op — never actually clicks the button |
-| 3 | TypeScript | **P1** | `as number` cast on `endPages[0]` — type-safety smell |
-| 4 | Accessibility | **P1** | `<ul list-style:none>` needs `role="list"` for Safari VoiceOver |
-| 5 | Accessibility | **P1** | No `aria-live` region for page-change announcements (WCAG 4.1.3) |
-| 6 | Tests | **P1** | No test for `hx-page-change` `bubbles`/`composed` properties |
-| 7 | Storybook | **P1** | No page size selector story (blocked by missing feature) |
-| 8 | CSS | **P1** | `cursor: not-allowed` is dead CSS — overridden by `pointer-events: none` |
-| 9 | CSS | **P1** | `@cssprop` JSDoc omits intermediate semantic token fallbacks |
-| 10 | CSS | **P1** | No `forced-colors` media query — Windows High Contrast broken |
-| 11 | Drupal | **P1** | No Twig template example |
-| 12 | Drupal | **P1** | No GET parameter wiring documentation (index offset, history, deep-link) |
-| 13 | TypeScript | **P2** | `reflect: true` on `currentPage` causes DOM churn on every navigation |
-| 14 | Accessibility | **P2** | No indication when `totalPages=1` (all controls disabled, no message) |
-| 15 | Tests | **P2** | No tests for `siblingCount` / `boundaryCount` affecting page range |
-| 16 | Tests | **P2** | Keyboard nav tests dispatch on `list`, not on focused button |
-| 17 | Storybook | **P2** | `EventHandling` story ignores `args` — controls panel broken |
-| 18 | Storybook | **P2** | Module-level `fn()` spy leaks call state between stories |
-| 19 | Storybook | **P2** | No "Single Page" story (`totalPages=1`) |
-| 20 | Storybook | **P2** | No story for multiple pagination controls on the same page |
-| 21 | CSS | **P2** | `.button--active` class duplicates `[aria-current='page']` selector |
-| 22 | CSS | **P2** | No `--hx-pagination-active-border-color` token — undocumented fallback chain |
-| 23 | Performance | **P2** | `_buildPageRange()` not memoized — array allocations on every render |
-| 24 | Performance | **P2** | No documented bundle size — 5 KB budget unverifiable |
-| 25 | Drupal | **P2** | Boolean attribute Twig pattern undocumented |
+| #   | Area          | Severity  | Issue                                                                        |
+| --- | ------------- | --------- | ---------------------------------------------------------------------------- |
+| 1   | TypeScript    | **P0**    | `page-size` property/event entirely absent — spec-required feature missing   |
+| 2   | Tests         | **P0/P1** | Current-page click test is a no-op — never actually clicks the button        |
+| 3   | TypeScript    | **P1**    | `as number` cast on `endPages[0]` — type-safety smell                        |
+| 4   | Accessibility | **P1**    | `<ul list-style:none>` needs `role="list"` for Safari VoiceOver              |
+| 5   | Accessibility | **P1**    | No `aria-live` region for page-change announcements (WCAG 4.1.3)             |
+| 6   | Tests         | **P1**    | No test for `hx-page-change` `bubbles`/`composed` properties                 |
+| 7   | Storybook     | **P1**    | No page size selector story (blocked by missing feature)                     |
+| 8   | CSS           | **P1**    | `cursor: not-allowed` is dead CSS — overridden by `pointer-events: none`     |
+| 9   | CSS           | **P1**    | `@cssprop` JSDoc omits intermediate semantic token fallbacks                 |
+| 10  | CSS           | **P1**    | No `forced-colors` media query — Windows High Contrast broken                |
+| 11  | Drupal        | **P1**    | No Twig template example                                                     |
+| 12  | Drupal        | **P1**    | No GET parameter wiring documentation (index offset, history, deep-link)     |
+| 13  | TypeScript    | **P2**    | `reflect: true` on `currentPage` causes DOM churn on every navigation        |
+| 14  | Accessibility | **P2**    | No indication when `totalPages=1` (all controls disabled, no message)        |
+| 15  | Tests         | **P2**    | No tests for `siblingCount` / `boundaryCount` affecting page range           |
+| 16  | Tests         | **P2**    | Keyboard nav tests dispatch on `list`, not on focused button                 |
+| 17  | Storybook     | **P2**    | `EventHandling` story ignores `args` — controls panel broken                 |
+| 18  | Storybook     | **P2**    | Module-level `fn()` spy leaks call state between stories                     |
+| 19  | Storybook     | **P2**    | No "Single Page" story (`totalPages=1`)                                      |
+| 20  | Storybook     | **P2**    | No story for multiple pagination controls on the same page                   |
+| 21  | CSS           | **P2**    | `.button--active` class duplicates `[aria-current='page']` selector          |
+| 22  | CSS           | **P2**    | No `--hx-pagination-active-border-color` token — undocumented fallback chain |
+| 23  | Performance   | **P2**    | `_buildPageRange()` not memoized — array allocations on every render         |
+| 24  | Performance   | **P2**    | No documented bundle size — 5 KB budget unverifiable                         |
+| 25  | Drupal        | **P2**    | Boolean attribute Twig pattern undocumented                                  |
 
 ---
 
