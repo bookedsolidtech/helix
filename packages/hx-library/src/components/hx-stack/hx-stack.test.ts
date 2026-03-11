@@ -176,6 +176,18 @@ describe('hx-stack', () => {
       const base = shadowQuery(el, '[part="base"]');
       expect(getComputedStyle(base).justifyContent).toBe('space-evenly');
     });
+
+    it('applies justify-content: flex-start for justify="start"', async () => {
+      const el = await fixture<HelixStack>('<hx-stack justify="start"></hx-stack>');
+      const base = shadowQuery(el, '[part="base"]');
+      expect(getComputedStyle(base).justifyContent).toBe('flex-start');
+    });
+
+    it('applies justify-content: flex-end for justify="end"', async () => {
+      const el = await fixture<HelixStack>('<hx-stack justify="end"></hx-stack>');
+      const base = shadowQuery(el, '[part="base"]');
+      expect(getComputedStyle(base).justifyContent).toBe('flex-end');
+    });
   });
 
   // ─── Property: wrap ───
@@ -234,9 +246,7 @@ describe('hx-stack', () => {
 
   describe('Slots', () => {
     it('renders default slot content', async () => {
-      const el = await fixture<HelixStack>(
-        '<hx-stack><div id="child">content</div></hx-stack>',
-      );
+      const el = await fixture<HelixStack>('<hx-stack><div id="child">content</div></hx-stack>');
       expect(el.querySelector('#child')).toBeTruthy();
     });
   });
@@ -265,6 +275,20 @@ describe('hx-stack', () => {
       expect(innerStack.querySelector('#inner-a')).toBeTruthy();
       expect(innerStack.querySelector('#inner-b')).toBeTruthy();
       expect(el.querySelector('#outer-c')).toBeTruthy();
+    });
+  });
+
+  // ─── Reactivity ───
+
+  describe('Reactivity', () => {
+    it('updates flex-direction when direction property changes at runtime', async () => {
+      const el = await fixture<HelixStack>('<hx-stack direction="vertical"></hx-stack>');
+      const base = shadowQuery(el, '[part="base"]');
+      expect(getComputedStyle(base).flexDirection).toBe('column');
+
+      el.direction = 'horizontal';
+      await el.updateComplete;
+      expect(getComputedStyle(base).flexDirection).toBe('row');
     });
   });
 
