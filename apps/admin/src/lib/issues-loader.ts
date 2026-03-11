@@ -58,7 +58,12 @@ export function computeStats(issues: TrackedIssue[]): IssuesIndex['stats'] {
  */
 export function loadIssues(): IssuesIndex {
   if (!existsSync(ISSUES_PATH)) {
-    return { issues: [], stats: computeStats([]), lastUpdated: new Date().toISOString() };
+    return {
+      version: '1.0.0',
+      issues: [],
+      stats: computeStats([]),
+      lastUpdated: new Date().toISOString(),
+    };
   }
   const content = readFileSync(ISSUES_PATH, 'utf-8');
   return JSON.parse(content) as IssuesIndex;
