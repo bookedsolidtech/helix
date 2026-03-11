@@ -88,6 +88,146 @@ describe('hx-accordion', () => {
     });
   });
 
+  // ─── Arrow key navigation (4) ───
+
+  describe('Arrow key navigation', () => {
+    it('ArrowDown moves focus to next item trigger', async () => {
+      const el = await fixture<HelixAccordion>(`
+        <hx-accordion>
+          <hx-accordion-item>
+            <span slot="trigger">Item 1</span>
+            <p>Content 1</p>
+          </hx-accordion-item>
+          <hx-accordion-item>
+            <span slot="trigger">Item 2</span>
+            <p>Content 2</p>
+          </hx-accordion-item>
+          <hx-accordion-item>
+            <span slot="trigger">Item 3</span>
+            <p>Content 3</p>
+          </hx-accordion-item>
+        </hx-accordion>
+      `);
+
+      const items = el.querySelectorAll<HelixAccordionItem>('hx-accordion-item');
+      const summary1 = shadowQuery<HTMLElement>(items[0], 'summary')!;
+      const summary2 = shadowQuery<HTMLElement>(items[1], 'summary')!;
+
+      summary1.focus();
+      await userEvent.keyboard('{ArrowDown}');
+
+      expect(items[1].shadowRoot?.activeElement).toBe(summary2);
+    });
+
+    it('ArrowUp moves focus to previous item trigger', async () => {
+      const el = await fixture<HelixAccordion>(`
+        <hx-accordion>
+          <hx-accordion-item>
+            <span slot="trigger">Item 1</span>
+            <p>Content 1</p>
+          </hx-accordion-item>
+          <hx-accordion-item>
+            <span slot="trigger">Item 2</span>
+            <p>Content 2</p>
+          </hx-accordion-item>
+        </hx-accordion>
+      `);
+
+      const items = el.querySelectorAll<HelixAccordionItem>('hx-accordion-item');
+      const summary1 = shadowQuery<HTMLElement>(items[0], 'summary')!;
+      const summary2 = shadowQuery<HTMLElement>(items[1], 'summary')!;
+
+      summary2.focus();
+      await userEvent.keyboard('{ArrowUp}');
+
+      expect(items[0].shadowRoot?.activeElement).toBe(summary1);
+    });
+
+    it('Home moves focus to first item trigger', async () => {
+      const el = await fixture<HelixAccordion>(`
+        <hx-accordion>
+          <hx-accordion-item>
+            <span slot="trigger">Item 1</span>
+            <p>Content 1</p>
+          </hx-accordion-item>
+          <hx-accordion-item>
+            <span slot="trigger">Item 2</span>
+            <p>Content 2</p>
+          </hx-accordion-item>
+          <hx-accordion-item>
+            <span slot="trigger">Item 3</span>
+            <p>Content 3</p>
+          </hx-accordion-item>
+        </hx-accordion>
+      `);
+
+      const items = el.querySelectorAll<HelixAccordionItem>('hx-accordion-item');
+      const summary1 = shadowQuery<HTMLElement>(items[0], 'summary')!;
+      const summary3 = shadowQuery<HTMLElement>(items[2], 'summary')!;
+
+      summary3.focus();
+      await userEvent.keyboard('{Home}');
+
+      expect(items[0].shadowRoot?.activeElement).toBe(summary1);
+    });
+
+    it('End moves focus to last item trigger', async () => {
+      const el = await fixture<HelixAccordion>(`
+        <hx-accordion>
+          <hx-accordion-item>
+            <span slot="trigger">Item 1</span>
+            <p>Content 1</p>
+          </hx-accordion-item>
+          <hx-accordion-item>
+            <span slot="trigger">Item 2</span>
+            <p>Content 2</p>
+          </hx-accordion-item>
+          <hx-accordion-item>
+            <span slot="trigger">Item 3</span>
+            <p>Content 3</p>
+          </hx-accordion-item>
+        </hx-accordion>
+      `);
+
+      const items = el.querySelectorAll<HelixAccordionItem>('hx-accordion-item');
+      const summary1 = shadowQuery<HTMLElement>(items[0], 'summary')!;
+      const summary3 = shadowQuery<HTMLElement>(items[2], 'summary')!;
+
+      summary1.focus();
+      await userEvent.keyboard('{End}');
+
+      expect(items[2].shadowRoot?.activeElement).toBe(summary3);
+    });
+  });
+
+  // ─── Edge cases (2) ───
+
+  describe('Edge cases', () => {
+    it('renders empty accordion without errors', async () => {
+      const el = await fixture<HelixAccordion>('<hx-accordion></hx-accordion>');
+      await el.updateComplete;
+      const slot = shadowQuery<HTMLSlotElement>(el, 'slot')!;
+      expect(slot.assignedElements().length).toBe(0);
+    });
+
+    it('handles single item accordion', async () => {
+      const el = await fixture<HelixAccordion>(`
+        <hx-accordion>
+          <hx-accordion-item>
+            <span slot="trigger">Only Item</span>
+            <p>Content</p>
+          </hx-accordion-item>
+        </hx-accordion>
+      `);
+
+      const item = el.querySelector<HelixAccordionItem>('hx-accordion-item')!;
+      const summary = shadowQuery<HTMLElement>(item, 'summary')!;
+      summary.click();
+      await item.updateComplete;
+      expect(item.expanded).toBe(true);
+    });
+  });
+
   // ─── Sibling collapse events (1) ───
 
   describe('Sibling collapse events', () => {
@@ -478,6 +618,33 @@ describe('hx-accordion-item', () => {
       `);
       const content = shadowQuery(el, '[role="region"]')!;
       expect(content.getAttribute('aria-hidden')).toBe('true');
+    });
+
+    it('content does NOT have aria-hidden when expanded', async () => {
+      const el = await fixture<HelixAccordionItem>(`
+        <hx-accordion-item expanded>
+          <span slot="trigger">Title</span>
+          <p>Content</p>
+        </hx-accordion-item>
+      `);
+      const content = shadowQuery(el, '[role="region"]')!;
+      expect(content.hasAttribute('aria-hidden')).toBe(false);
+    });
+
+    it('summary has aria-controls pointing to content panel', async () => {
+      const el = await fixture<HelixAccordionItem>(`
+        <hx-accordion-item>
+          <span slot="trigger">Title</span>
+          <p>Content</p>
+        </hx-accordion-item>
+      `);
+      const summary = shadowQuery<HTMLElement>(el, 'summary')!;
+      const controlsId = summary.getAttribute('aria-controls');
+      expect(controlsId).toBe('content');
+
+      const panel = shadowQuery(el, `#${controlsId}`);
+      expect(panel).toBeTruthy();
+      expect(panel?.getAttribute('role')).toBe('region');
     });
   });
 });

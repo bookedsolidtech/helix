@@ -14,6 +14,8 @@ import type { HelixAccordionItem } from './hx-accordion-item.js';
  *
  * @slot - Default slot for hx-accordion-item elements.
  *
+ * @csspart accordion - The outer container wrapping all accordion items.
+ *
  * @cssprop [--hx-accordion-border-radius=var(--hx-border-radius-md)] - Outer border radius.
  *
  * @example
@@ -42,13 +44,13 @@ export class HelixAccordion extends LitElement {
 
   override connectedCallback(): void {
     super.connectedCallback();
-    this.addEventListener('hx-expand', this._handleChildExpand as EventListener);
+    this.addEventListener('hx-expand', this._handleChildExpand);
     this.addEventListener('keydown', this._handleKeyDown);
   }
 
   override disconnectedCallback(): void {
     super.disconnectedCallback();
-    this.removeEventListener('hx-expand', this._handleChildExpand as EventListener);
+    this.removeEventListener('hx-expand', this._handleChildExpand);
     this.removeEventListener('keydown', this._handleKeyDown);
   }
 
@@ -75,7 +77,7 @@ export class HelixAccordion extends LitElement {
     });
   }
 
-  private _handleChildExpand(e: CustomEvent<{ expanded: boolean; itemId: string }>): void {
+  private _handleChildExpand = (e: Event): void => {
     if (this.mode !== 'single') return;
 
     const expandedItem = e.composedPath()[0] as HelixAccordionItem;
@@ -87,7 +89,7 @@ export class HelixAccordion extends LitElement {
         item._dispatchToggleEvent(false);
       }
     });
-  }
+  };
 
   // ─── Arrow key navigation (ARIA APG Accordion pattern) ───
 
