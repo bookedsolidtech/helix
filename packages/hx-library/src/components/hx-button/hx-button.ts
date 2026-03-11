@@ -1,4 +1,4 @@
-import { LitElement, html, nothing } from 'lit';
+import { LitElement, html, nothing, type TemplateResult } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
@@ -116,6 +116,13 @@ export class HelixButton extends LitElement {
   @property({ type: String })
   value: string | undefined = undefined;
 
+  /**
+   * Accessible label forwarded to the inner button/anchor. Required for icon-only usage.
+   * @attr aria-label
+   */
+  @property({ type: String, reflect: true, attribute: 'aria-label' })
+  override ariaLabel: string | null = null;
+
   // ─── Form API ───
 
   /** Returns the associated form element, if any. */
@@ -125,6 +132,7 @@ export class HelixButton extends LitElement {
 
   // ─── Event Handling ───
 
+  /** @private */
   private _handleClick(e: MouseEvent): void {
     if (this.disabled || this.loading) {
       e.preventDefault();
@@ -157,7 +165,8 @@ export class HelixButton extends LitElement {
 
   // ─── Render Helpers ───
 
-  private _renderSpinner() {
+  /** @private */
+  private _renderSpinner(): TemplateResult {
     return html`
       <svg
         class="button__spinner"
@@ -186,7 +195,8 @@ export class HelixButton extends LitElement {
     `;
   }
 
-  private _renderInner() {
+  /** @private */
+  private _renderInner(): TemplateResult {
     return html`
       ${this.loading ? this._renderSpinner() : nothing}
       <span part="prefix" class="button__prefix">
@@ -216,9 +226,10 @@ export class HelixButton extends LitElement {
         <a
           part="button"
           class=${classMap(classes)}
-          href=${this.disabled ? nothing : ifDefined(this.href)}
+          href=${this.disabled || this.loading ? nothing : ifDefined(this.href)}
           target=${ifDefined(this.target)}
           rel=${this.target === '_blank' ? 'noopener noreferrer' : nothing}
+          aria-label=${this.ariaLabel ?? nothing}
           aria-disabled=${this.disabled ? 'true' : nothing}
           aria-busy=${this.loading ? 'true' : nothing}
           @click=${this._handleClick}
@@ -234,6 +245,7 @@ export class HelixButton extends LitElement {
         class=${classMap(classes)}
         ?disabled=${this.disabled}
         type=${this.type}
+        aria-label=${this.ariaLabel ?? nothing}
         aria-busy=${this.loading ? 'true' : nothing}
         @click=${this._handleClick}
       >
@@ -248,6 +260,3 @@ declare global {
     'hx-button': HelixButton;
   }
 }
-
-/** @deprecated Use HelixButton */
-export type WcButton = HelixButton;

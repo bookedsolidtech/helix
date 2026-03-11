@@ -1,7 +1,7 @@
 import { describe, it, expect, afterEach } from 'vitest';
 import { page, userEvent } from '@vitest/browser/context';
 import { fixture, shadowQuery, oneEvent, cleanup, checkA11y } from '../../test-utils.js';
-import type { WcButton } from './hx-button.js';
+import type { HelixButton } from './hx-button.js';
 import './index.js';
 
 afterEach(cleanup);
@@ -11,30 +11,30 @@ describe('hx-button', () => {
 
   describe('Rendering', () => {
     it('renders with shadow DOM', async () => {
-      const el = await fixture<WcButton>('<hx-button>Click</hx-button>');
+      const el = await fixture<HelixButton>('<hx-button>Click</hx-button>');
       expect(el.shadowRoot).toBeTruthy();
     });
 
     it('exposes "button" CSS part', async () => {
-      const el = await fixture<WcButton>('<hx-button>Click</hx-button>');
+      const el = await fixture<HelixButton>('<hx-button>Click</hx-button>');
       const btn = shadowQuery(el, '[part~="button"]');
       expect(btn).toBeTruthy();
     });
 
     it('applies default variant=primary class', async () => {
-      const el = await fixture<WcButton>('<hx-button>Click</hx-button>');
+      const el = await fixture<HelixButton>('<hx-button>Click</hx-button>');
       const btn = shadowQuery(el, 'button')!;
       expect(btn.classList.contains('button--primary')).toBe(true);
     });
 
     it('applies default size=md class', async () => {
-      const el = await fixture<WcButton>('<hx-button>Click</hx-button>');
+      const el = await fixture<HelixButton>('<hx-button>Click</hx-button>');
       const btn = shadowQuery(el, 'button')!;
       expect(btn.classList.contains('button--md')).toBe(true);
     });
 
     it('renders native <button> element', async () => {
-      const el = await fixture<WcButton>('<hx-button>Click</hx-button>');
+      const el = await fixture<HelixButton>('<hx-button>Click</hx-button>');
       const btn = shadowQuery(el, 'button');
       expect(btn).toBeInstanceOf(HTMLButtonElement);
     });
@@ -44,36 +44,36 @@ describe('hx-button', () => {
 
   describe('Property: variant', () => {
     it('reflects variant attr to host', async () => {
-      const el = await fixture<WcButton>('<hx-button variant="secondary">Click</hx-button>');
+      const el = await fixture<HelixButton>('<hx-button variant="secondary">Click</hx-button>');
       expect(el.getAttribute('variant')).toBe('secondary');
     });
 
     it('applies secondary class', async () => {
-      const el = await fixture<WcButton>('<hx-button variant="secondary">Click</hx-button>');
+      const el = await fixture<HelixButton>('<hx-button variant="secondary">Click</hx-button>');
       const btn = shadowQuery(el, 'button')!;
       expect(btn.classList.contains('button--secondary')).toBe(true);
     });
 
     it('applies ghost class', async () => {
-      const el = await fixture<WcButton>('<hx-button variant="ghost">Click</hx-button>');
+      const el = await fixture<HelixButton>('<hx-button variant="ghost">Click</hx-button>');
       const btn = shadowQuery(el, 'button')!;
       expect(btn.classList.contains('button--ghost')).toBe(true);
     });
 
     it('applies tertiary class', async () => {
-      const el = await fixture<WcButton>('<hx-button variant="tertiary">Click</hx-button>');
+      const el = await fixture<HelixButton>('<hx-button variant="tertiary">Click</hx-button>');
       const btn = shadowQuery(el, 'button')!;
       expect(btn.classList.contains('button--tertiary')).toBe(true);
     });
 
     it('applies danger class', async () => {
-      const el = await fixture<WcButton>('<hx-button variant="danger">Click</hx-button>');
+      const el = await fixture<HelixButton>('<hx-button variant="danger">Click</hx-button>');
       const btn = shadowQuery(el, 'button')!;
       expect(btn.classList.contains('button--danger')).toBe(true);
     });
 
     it('applies outline class', async () => {
-      const el = await fixture<WcButton>('<hx-button variant="outline">Click</hx-button>');
+      const el = await fixture<HelixButton>('<hx-button variant="outline">Click</hx-button>');
       const btn = shadowQuery(el, 'button')!;
       expect(btn.classList.contains('button--outline')).toBe(true);
     });
@@ -83,19 +83,19 @@ describe('hx-button', () => {
 
   describe('Property: size', () => {
     it('applies sm class', async () => {
-      const el = await fixture<WcButton>('<hx-button hx-size="sm">Click</hx-button>');
+      const el = await fixture<HelixButton>('<hx-button hx-size="sm">Click</hx-button>');
       const btn = shadowQuery(el, 'button')!;
       expect(btn.classList.contains('button--sm')).toBe(true);
     });
 
     it('applies md class', async () => {
-      const el = await fixture<WcButton>('<hx-button hx-size="md">Click</hx-button>');
+      const el = await fixture<HelixButton>('<hx-button hx-size="md">Click</hx-button>');
       const btn = shadowQuery(el, 'button')!;
       expect(btn.classList.contains('button--md')).toBe(true);
     });
 
     it('applies lg class', async () => {
-      const el = await fixture<WcButton>('<hx-button hx-size="lg">Click</hx-button>');
+      const el = await fixture<HelixButton>('<hx-button hx-size="lg">Click</hx-button>');
       const btn = shadowQuery(el, 'button')!;
       expect(btn.classList.contains('button--lg')).toBe(true);
     });
@@ -105,25 +105,25 @@ describe('hx-button', () => {
 
   describe('Property: disabled', () => {
     it('sets native disabled attribute', async () => {
-      const el = await fixture<WcButton>('<hx-button disabled>Click</hx-button>');
+      const el = await fixture<HelixButton>('<hx-button disabled>Click</hx-button>');
       const btn = shadowQuery<HTMLButtonElement>(el, 'button')!;
       expect(btn.disabled).toBe(true);
     });
 
     it('does not set aria-disabled on native button (native disabled is sufficient)', async () => {
-      const el = await fixture<WcButton>('<hx-button disabled>Click</hx-button>');
+      const el = await fixture<HelixButton>('<hx-button disabled>Click</hx-button>');
       const btn = shadowQuery(el, 'button')!;
       expect(btn.hasAttribute('aria-disabled')).toBe(false);
     });
 
     it('does not set aria-disabled when enabled', async () => {
-      const el = await fixture<WcButton>('<hx-button>Click</hx-button>');
+      const el = await fixture<HelixButton>('<hx-button>Click</hx-button>');
       const btn = shadowQuery(el, 'button')!;
       expect(btn.hasAttribute('aria-disabled')).toBe(false);
     });
 
-    it('applies host opacity 0.5 via disabled attribute', async () => {
-      const el = await fixture<WcButton>('<hx-button disabled>Click</hx-button>');
+    it('reflects disabled attribute on host', async () => {
+      const el = await fixture<HelixButton>('<hx-button disabled>Click</hx-button>');
       expect(el.hasAttribute('disabled')).toBe(true);
     });
   });
@@ -132,19 +132,19 @@ describe('hx-button', () => {
 
   describe('Property: type', () => {
     it('defaults to type="button"', async () => {
-      const el = await fixture<WcButton>('<hx-button>Click</hx-button>');
+      const el = await fixture<HelixButton>('<hx-button>Click</hx-button>');
       const btn = shadowQuery<HTMLButtonElement>(el, 'button')!;
       expect(btn.getAttribute('type')).toBe('button');
     });
 
     it('sets type="submit" on native button', async () => {
-      const el = await fixture<WcButton>('<hx-button type="submit">Submit</hx-button>');
+      const el = await fixture<HelixButton>('<hx-button type="submit">Submit</hx-button>');
       const btn = shadowQuery<HTMLButtonElement>(el, 'button')!;
       expect(btn.getAttribute('type')).toBe('submit');
     });
 
     it('sets type="reset" on native button', async () => {
-      const el = await fixture<WcButton>('<hx-button type="reset">Reset</hx-button>');
+      const el = await fixture<HelixButton>('<hx-button type="reset">Reset</hx-button>');
       const btn = shadowQuery<HTMLButtonElement>(el, 'button')!;
       expect(btn.getAttribute('type')).toBe('reset');
     });
@@ -154,24 +154,30 @@ describe('hx-button', () => {
 
   describe('Property: loading', () => {
     it('defaults to false', async () => {
-      const el = await fixture<WcButton>('<hx-button>Click</hx-button>');
+      const el = await fixture<HelixButton>('<hx-button>Click</hx-button>');
       expect(el.loading).toBe(false);
     });
 
+    it('does not set aria-busy when not loading', async () => {
+      const el = await fixture<HelixButton>('<hx-button>Click</hx-button>');
+      const btn = shadowQuery(el, 'button')!;
+      expect(btn.hasAttribute('aria-busy')).toBe(false);
+    });
+
     it('adds button--loading class when true', async () => {
-      const el = await fixture<WcButton>('<hx-button loading>Click</hx-button>');
+      const el = await fixture<HelixButton>('<hx-button loading>Click</hx-button>');
       const btn = shadowQuery(el, 'button')!;
       expect(btn.classList.contains('button--loading')).toBe(true);
     });
 
     it('shows spinner when loading', async () => {
-      const el = await fixture<WcButton>('<hx-button loading>Click</hx-button>');
+      const el = await fixture<HelixButton>('<hx-button loading>Click</hx-button>');
       const spinner = shadowQuery(el, '[part="spinner"]');
       expect(spinner).toBeTruthy();
     });
 
     it('prevents hx-click when loading', async () => {
-      const el = await fixture<WcButton>('<hx-button loading>Click</hx-button>');
+      const el = await fixture<HelixButton>('<hx-button loading>Click</hx-button>');
       const btn = shadowQuery<HTMLButtonElement>(el, 'button')!;
       let fired = false;
       el.addEventListener('hx-click', () => {
@@ -183,9 +189,32 @@ describe('hx-button', () => {
     });
 
     it('sets aria-busy="true" when loading', async () => {
-      const el = await fixture<WcButton>('<hx-button loading>Click</hx-button>');
+      const el = await fixture<HelixButton>('<hx-button loading>Click</hx-button>');
       const btn = shadowQuery(el, 'button')!;
       expect(btn.getAttribute('aria-busy')).toBe('true');
+    });
+  });
+
+  // ─── Combined states (2) ───
+
+  describe('Combined states', () => {
+    it('applies both loading and disabled classes', async () => {
+      const el = await fixture<HelixButton>('<hx-button loading disabled>Click</hx-button>');
+      const btn = shadowQuery(el, 'button')!;
+      expect(btn.classList.contains('button--loading')).toBe(true);
+      expect(btn.disabled).toBe(true);
+    });
+
+    it('prevents hx-click when both loading and disabled', async () => {
+      const el = await fixture<HelixButton>('<hx-button loading disabled>Click</hx-button>');
+      const btn = shadowQuery<HTMLButtonElement>(el, 'button')!;
+      let fired = false;
+      el.addEventListener('hx-click', () => {
+        fired = true;
+      });
+      btn.click();
+      await el.updateComplete;
+      expect(fired).toBe(false);
     });
   });
 
@@ -193,19 +222,23 @@ describe('hx-button', () => {
 
   describe('href mode', () => {
     it('renders <a> element when href is set', async () => {
-      const el = await fixture<WcButton>('<hx-button href="https://example.com">Link</hx-button>');
+      const el = await fixture<HelixButton>(
+        '<hx-button href="https://example.com">Link</hx-button>',
+      );
       const anchor = shadowQuery(el, 'a');
       expect(anchor).toBeInstanceOf(HTMLAnchorElement);
     });
 
     it('sets href attribute on anchor', async () => {
-      const el = await fixture<WcButton>('<hx-button href="https://example.com">Link</hx-button>');
+      const el = await fixture<HelixButton>(
+        '<hx-button href="https://example.com">Link</hx-button>',
+      );
       const anchor = shadowQuery<HTMLAnchorElement>(el, 'a')!;
       expect(anchor.getAttribute('href')).toBe('https://example.com');
     });
 
     it('sets target attribute on anchor', async () => {
-      const el = await fixture<WcButton>(
+      const el = await fixture<HelixButton>(
         '<hx-button href="https://example.com" target="_blank">Link</hx-button>',
       );
       const anchor = shadowQuery<HTMLAnchorElement>(el, 'a')!;
@@ -213,7 +246,7 @@ describe('hx-button', () => {
     });
 
     it('sets rel="noopener noreferrer" when target="_blank"', async () => {
-      const el = await fixture<WcButton>(
+      const el = await fixture<HelixButton>(
         '<hx-button href="https://example.com" target="_blank">Link</hx-button>',
       );
       const anchor = shadowQuery<HTMLAnchorElement>(el, 'a')!;
@@ -221,13 +254,31 @@ describe('hx-button', () => {
     });
 
     it('does not set rel when target is not "_blank"', async () => {
-      const el = await fixture<WcButton>('<hx-button href="https://example.com">Link</hx-button>');
+      const el = await fixture<HelixButton>(
+        '<hx-button href="https://example.com">Link</hx-button>',
+      );
       const anchor = shadowQuery<HTMLAnchorElement>(el, 'a')!;
       expect(anchor.hasAttribute('rel')).toBe(false);
     });
 
+    it('removes href when loading in anchor mode', async () => {
+      const el = await fixture<HelixButton>(
+        '<hx-button href="https://example.com" loading>Link</hx-button>',
+      );
+      const anchor = shadowQuery<HTMLAnchorElement>(el, 'a')!;
+      expect(anchor.getAttribute('href')).not.toBe('https://example.com');
+    });
+
+    it('sets aria-busy on anchor when loading', async () => {
+      const el = await fixture<HelixButton>(
+        '<hx-button href="https://example.com" loading>Link</hx-button>',
+      );
+      const anchor = shadowQuery(el, 'a')!;
+      expect(anchor.getAttribute('aria-busy')).toBe('true');
+    });
+
     it('removes href when disabled in anchor mode', async () => {
-      const el = await fixture<WcButton>(
+      const el = await fixture<HelixButton>(
         '<hx-button href="https://example.com" disabled>Link</hx-button>',
       );
       const anchor = shadowQuery<HTMLAnchorElement>(el, 'a')!;
@@ -247,7 +298,7 @@ describe('hx-button', () => {
 
   describe('Events', () => {
     it('dispatches hx-click on click', async () => {
-      const el = await fixture<WcButton>('<hx-button>Click</hx-button>');
+      const el = await fixture<HelixButton>('<hx-button>Click</hx-button>');
       const btn = shadowQuery<HTMLButtonElement>(el, 'button')!;
       const eventPromise = oneEvent(el, 'hx-click');
       btn.click();
@@ -256,7 +307,7 @@ describe('hx-button', () => {
     });
 
     it('hx-click bubbles and is composed', async () => {
-      const el = await fixture<WcButton>('<hx-button>Click</hx-button>');
+      const el = await fixture<HelixButton>('<hx-button>Click</hx-button>');
       const btn = shadowQuery<HTMLButtonElement>(el, 'button')!;
       const eventPromise = oneEvent<CustomEvent>(el, 'hx-click');
       btn.click();
@@ -266,7 +317,7 @@ describe('hx-button', () => {
     });
 
     it('hx-click detail contains originalEvent', async () => {
-      const el = await fixture<WcButton>('<hx-button>Click</hx-button>');
+      const el = await fixture<HelixButton>('<hx-button>Click</hx-button>');
       const btn = shadowQuery<HTMLButtonElement>(el, 'button')!;
       const eventPromise = oneEvent<CustomEvent>(el, 'hx-click');
       btn.click();
@@ -275,7 +326,7 @@ describe('hx-button', () => {
     });
 
     it('does NOT dispatch hx-click when disabled', async () => {
-      const el = await fixture<WcButton>('<hx-button disabled>Click</hx-button>');
+      const el = await fixture<HelixButton>('<hx-button disabled>Click</hx-button>');
       const btn = shadowQuery<HTMLButtonElement>(el, 'button')!;
       let fired = false;
       el.addEventListener('hx-click', () => {
@@ -291,7 +342,7 @@ describe('hx-button', () => {
 
   describe('Keyboard', () => {
     it('Enter activates native button', async () => {
-      const el = await fixture<WcButton>('<hx-button>Click</hx-button>');
+      const el = await fixture<HelixButton>('<hx-button>Click</hx-button>');
       const btn = shadowQuery<HTMLButtonElement>(el, 'button')!;
       const eventPromise = oneEvent<CustomEvent>(el, 'hx-click');
       btn.focus();
@@ -301,7 +352,7 @@ describe('hx-button', () => {
     });
 
     it('Space activates native button', async () => {
-      const el = await fixture<WcButton>('<hx-button>Click</hx-button>');
+      const el = await fixture<HelixButton>('<hx-button>Click</hx-button>');
       const btn = shadowQuery<HTMLButtonElement>(el, 'button')!;
       const eventPromise = oneEvent<CustomEvent>(el, 'hx-click');
       btn.focus();
@@ -315,19 +366,21 @@ describe('hx-button', () => {
 
   describe('Slots', () => {
     it('default slot renders text', async () => {
-      const el = await fixture<WcButton>('<hx-button>Hello World</hx-button>');
+      const el = await fixture<HelixButton>('<hx-button>Hello World</hx-button>');
       expect(el.textContent?.trim()).toBe('Hello World');
     });
 
     it('default slot renders HTML', async () => {
-      const el = await fixture<WcButton>('<hx-button><span class="icon">+</span> Add</hx-button>');
+      const el = await fixture<HelixButton>(
+        '<hx-button><span class="icon">+</span> Add</hx-button>',
+      );
       const span = el.querySelector('span.icon');
       expect(span).toBeTruthy();
       expect(span?.textContent).toBe('+');
     });
 
     it('prefix slot renders content', async () => {
-      const el = await fixture<WcButton>(
+      const el = await fixture<HelixButton>(
         '<hx-button><svg slot="prefix" aria-hidden="true"></svg>Label</hx-button>',
       );
       const slottedPrefix = el.querySelector('[slot="prefix"]');
@@ -336,7 +389,7 @@ describe('hx-button', () => {
     });
 
     it('suffix slot renders content', async () => {
-      const el = await fixture<WcButton>(
+      const el = await fixture<HelixButton>(
         '<hx-button>Label<svg slot="suffix" aria-hidden="true"></svg></hx-button>',
       );
       const slottedSuffix = el.querySelector('[slot="suffix"]');
@@ -349,13 +402,13 @@ describe('hx-button', () => {
 
   describe('CSS Parts', () => {
     it('exposes "label" part', async () => {
-      const el = await fixture<WcButton>('<hx-button>Click</hx-button>');
+      const el = await fixture<HelixButton>('<hx-button>Click</hx-button>');
       const labelPart = shadowQuery(el, '[part~="label"]');
       expect(labelPart).toBeTruthy();
     });
 
     it('exposes "prefix" part', async () => {
-      const el = await fixture<WcButton>(
+      const el = await fixture<HelixButton>(
         '<hx-button><span slot="prefix">*</span>Click</hx-button>',
       );
       const prefixPart = shadowQuery(el, '[part~="prefix"]');
@@ -363,7 +416,7 @@ describe('hx-button', () => {
     });
 
     it('exposes "suffix" part', async () => {
-      const el = await fixture<WcButton>(
+      const el = await fixture<HelixButton>(
         '<hx-button>Click<span slot="suffix">*</span></hx-button>',
       );
       const suffixPart = shadowQuery(el, '[part~="suffix"]');
@@ -371,7 +424,7 @@ describe('hx-button', () => {
     });
 
     it('exposes "spinner" part when loading', async () => {
-      const el = await fixture<WcButton>('<hx-button loading>Click</hx-button>');
+      const el = await fixture<HelixButton>('<hx-button loading>Click</hx-button>');
       const spinnerPart = shadowQuery(el, '[part~="spinner"]');
       expect(spinnerPart).toBeTruthy();
     });
@@ -386,7 +439,7 @@ describe('hx-button', () => {
     });
 
     it('has ElementInternals attached', async () => {
-      const el = await fixture<WcButton>('<hx-button>Click</hx-button>');
+      const el = await fixture<HelixButton>('<hx-button>Click</hx-button>');
       // ElementInternals is attached in constructor — verify form getter works
       expect(el.form).toBe(null); // null when not inside a form
     });
@@ -395,7 +448,7 @@ describe('hx-button', () => {
       const form = document.createElement('form');
       form.innerHTML = '<hx-button type="submit">Submit</hx-button>';
       document.getElementById('test-fixture-container')!.appendChild(form);
-      const el = form.querySelector('hx-button') as WcButton;
+      const el = form.querySelector('hx-button') as HelixButton;
       await el.updateComplete;
 
       let submitted = false;
@@ -410,12 +463,40 @@ describe('hx-button', () => {
       expect(submitted).toBe(true);
     });
 
+    it('calls setFormValue when name and value are set on submit', async () => {
+      const form = document.createElement('form');
+      form.innerHTML = '<hx-button type="submit" name="action" value="confirm">Submit</hx-button>';
+      document.getElementById('test-fixture-container')!.appendChild(form);
+      const el = form.querySelector('hx-button') as HelixButton;
+      await el.updateComplete;
+
+      let submitted = false;
+      form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        submitted = true;
+      });
+
+      const btn = shadowQuery<HTMLButtonElement>(el, 'button')!;
+      btn.click();
+      await el.updateComplete;
+      expect(submitted).toBe(true);
+    });
+
+    it('returns parent form from form getter', async () => {
+      const form = document.createElement('form');
+      form.innerHTML = '<hx-button>Click</hx-button>';
+      document.getElementById('test-fixture-container')!.appendChild(form);
+      const el = form.querySelector('hx-button') as HelixButton;
+      await el.updateComplete;
+      expect(el.form).toBe(form);
+    });
+
     it('calls form.reset on type=reset click', async () => {
       const form = document.createElement('form');
       form.innerHTML =
         '<input name="test" value="hello" /><hx-button type="reset">Reset</hx-button>';
       document.getElementById('test-fixture-container')!.appendChild(form);
-      const el = form.querySelector('hx-button') as WcButton;
+      const el = form.querySelector('hx-button') as HelixButton;
       await el.updateComplete;
 
       const input = form.querySelector('input') as HTMLInputElement;
@@ -437,14 +518,14 @@ describe('hx-button', () => {
 
   describe('Accessibility (axe-core)', () => {
     it('has no axe violations in default state', async () => {
-      const el = await fixture<WcButton>('<hx-button>Click me</hx-button>');
+      const el = await fixture<HelixButton>('<hx-button>Click me</hx-button>');
       await page.screenshot();
       const { violations } = await checkA11y(el);
       expect(violations).toEqual([]);
     });
 
     it('has no axe violations when disabled', async () => {
-      const el = await fixture<WcButton>('<hx-button disabled>Click me</hx-button>');
+      const el = await fixture<HelixButton>('<hx-button disabled>Click me</hx-button>');
       await page.screenshot();
       const { violations } = await checkA11y(el);
       expect(violations).toEqual([]);
@@ -452,7 +533,9 @@ describe('hx-button', () => {
 
     it('has no axe violations for original variants', async () => {
       for (const variant of ['primary', 'secondary', 'ghost']) {
-        const el = await fixture<WcButton>(`<hx-button variant="${variant}">Click me</hx-button>`);
+        const el = await fixture<HelixButton>(
+          `<hx-button variant="${variant}">Click me</hx-button>`,
+        );
         await page.screenshot();
         const { violations } = await checkA11y(el);
         expect(violations, `variant="${variant}" should have no violations`).toEqual([]);
@@ -462,7 +545,9 @@ describe('hx-button', () => {
 
     it('has no axe violations for new variants', async () => {
       for (const variant of ['tertiary', 'danger', 'outline']) {
-        const el = await fixture<WcButton>(`<hx-button variant="${variant}">Click me</hx-button>`);
+        const el = await fixture<HelixButton>(
+          `<hx-button variant="${variant}">Click me</hx-button>`,
+        );
         await page.screenshot();
         const { violations } = await checkA11y(el);
         expect(violations, `variant="${variant}" should have no violations`).toEqual([]);
@@ -471,14 +556,28 @@ describe('hx-button', () => {
     });
 
     it('has no axe violations when loading', async () => {
-      const el = await fixture<WcButton>('<hx-button loading>Loading...</hx-button>');
+      const el = await fixture<HelixButton>('<hx-button loading>Loading...</hx-button>');
       await page.screenshot();
       const { violations } = await checkA11y(el);
       expect(violations).toEqual([]);
     });
 
+    it('forwards aria-label to inner button', async () => {
+      const el = await fixture<HelixButton>('<hx-button aria-label="Close dialog">X</hx-button>');
+      const btn = shadowQuery(el, 'button')!;
+      expect(btn.getAttribute('aria-label')).toBe('Close dialog');
+    });
+
+    it('forwards aria-label to inner anchor', async () => {
+      const el = await fixture<HelixButton>(
+        '<hx-button href="https://example.com" aria-label="Visit site">→</hx-button>',
+      );
+      const anchor = shadowQuery(el, 'a')!;
+      expect(anchor.getAttribute('aria-label')).toBe('Visit site');
+    });
+
     it('has no axe violations in href (anchor) mode', async () => {
-      const el = await fixture<WcButton>(
+      const el = await fixture<HelixButton>(
         '<hx-button href="https://example.com">Visit site</hx-button>',
       );
       await page.screenshot();
